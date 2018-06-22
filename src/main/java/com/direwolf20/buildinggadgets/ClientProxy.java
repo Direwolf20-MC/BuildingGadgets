@@ -1,8 +1,6 @@
 package com.direwolf20.buildinggadgets;
 
 import net.minecraftforge.client.event.ModelRegistryEvent;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -22,7 +20,7 @@ public class ClientProxy extends CommonProxy {
     public static void registerModels(ModelRegistryEvent event) {
         //ModBlocks.gooBlock.initModel();
         //ModBlocks.turretLaser.initModel();
-        //ModItems.gooDust.initModel();
+        ModItems.buildingTool.initModel();
         //ModItems.laserGun.initModel();
     }
 
