@@ -1,6 +1,9 @@
 package com.direwolf20.buildinggadgets;
 
+import com.direwolf20.buildinggadgets.Entities.BlockBuildEntity;
+import com.direwolf20.buildinggadgets.Entities.BlockBuildEntityRender;
 import net.minecraftforge.client.event.ModelRegistryEvent;
+import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -11,8 +14,8 @@ public class ClientProxy extends CommonProxy {
     @Override
     public void preInit(FMLPreInitializationEvent e) {
         // register texture stitcher
-        ModEntities.initModels();
         //MinecraftForge.EVENT_BUS.register(new TextureStitcher());
+        ModEntities.initModels();
         super.preInit(e);
     }
 
@@ -25,7 +28,7 @@ public class ClientProxy extends CommonProxy {
     }
 
     public void registerEntityRenderers() {
-        //RenderingRegistry.registerEntityRenderingHandler(LaserGunEntity.class, new LaserGunEntityRender.Factory());
+        RenderingRegistry.registerEntityRenderingHandler(BlockBuildEntity.class, new BlockBuildEntityRender.Factory());
         //RenderingRegistry.registerEntityRenderingHandler(LaserBlastEntity.class, new LaserBlastEntityRender.Factory());
     }
 }

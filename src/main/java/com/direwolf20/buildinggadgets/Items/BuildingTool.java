@@ -1,7 +1,9 @@
 package com.direwolf20.buildinggadgets.Items;
 
 import com.direwolf20.buildinggadgets.BuildingGadgets;
+import com.direwolf20.buildinggadgets.Entities.BlockBuildEntity;
 import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
@@ -34,7 +36,9 @@ public class BuildingTool extends Item {
         player.setActiveHand(hand);
         RayTraceResult lookingAt = player.rayTrace(20, 1.0F);
         if (!world.isRemote) {
-            buildToMe(world, player,lookingAt.getBlockPos());
+            if (world.getBlockState(lookingAt.getBlockPos()) != Blocks.AIR.getDefaultState()) {
+                buildToMe(world, player, lookingAt.getBlockPos());
+            }
         }
         else {
 
@@ -45,13 +49,13 @@ public class BuildingTool extends Item {
     public boolean buildToMe(World world, EntityPlayer player, BlockPos startBlock) {
         BlockPos playerPos = player.getPosition();
         Block airBlock = Blocks.AIR;
-        Block cobbleBlock = Blocks.COBBLESTONE;
+        IBlockState cobbleBlock = Blocks.COBBLESTONE.getDefaultState();
         BlockPos changePos;
         if (playerPos.getX() == startBlock.getX()) {
             for (int i = startBlock.getZ();i<= playerPos.getZ();i++) {
                 changePos = new BlockPos(startBlock.getX(),startBlock.getY(),i);
                 if (world.getBlockState(changePos) == airBlock.getDefaultState()) {
-                    world.setBlockState(changePos,cobbleBlock.getDefaultState());
+                    world.spawnEntity(new BlockBuildEntity(world, changePos, player,cobbleBlock));
                 }
 
             }
