@@ -38,6 +38,7 @@ public class BuildingTool extends Item {
         if (!world.isRemote) {
             if (world.getBlockState(lookingAt.getBlockPos()) != Blocks.AIR.getDefaultState()) {
                 buildToMe(world, player, lookingAt.getBlockPos());
+                //world.spawnEntity(new BlockBuildEntity(world, lookingAt.getBlockPos().up(), player,Blocks.COBBLESTONE.getDefaultState()));
             }
         }
         else {

@@ -44,7 +44,6 @@ public class BlockBuildEntityRender extends Render<BlockBuildEntity> {
         */
 
         mc.renderEngine.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
-
         int teCounter = entity.getTicksExisted();
         int maxLife = entity.maxLife;
         if (teCounter > maxLife) {teCounter = maxLife;}

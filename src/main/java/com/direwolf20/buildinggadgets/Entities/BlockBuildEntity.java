@@ -15,7 +15,7 @@ import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
 public class BlockBuildEntity extends Entity implements IEntityAdditionalSpawnData {
 
     public int despawning = -1;
-    public int maxLife = 80;
+    public int maxLife = 20;
     private IBlockState setBlock;
     private BlockPos setPos;
     World world;
@@ -33,6 +33,12 @@ public class BlockBuildEntity extends Entity implements IEntityAdditionalSpawnDa
         setPos = spawnPos;
         setBlock = spawnBlock;
         world = worldIn;
+        //ignoreFrustumCheck = true;
+    }
+
+    @Override
+    public boolean isInRangeToRender3d(double x, double y, double z) {
+        return true;
     }
 
     @Override
