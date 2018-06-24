@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.Entities;
 
+import com.direwolf20.buildinggadgets.ModBlocks;
 import com.sun.org.apache.xpath.internal.operations.Bool;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.block.state.IBlockState;
@@ -61,9 +62,9 @@ public class BlockBuildEntity extends Entity implements IEntityAdditionalSpawnDa
         setExchangeMode(exchanger);
         spawnedBy = player;
         if (getExchangeMode()) {
-            world.setBlockState(spawnPos, Blocks.AIR.getDefaultState());
+            world.setBlockState(spawnPos, ModBlocks.effectBlock.getDefaultState());
         }
-        System.out.println(exchangeMode);
+        //System.out.println(exchangeMode);
     }
 
     public Boolean getExchangeMode() {

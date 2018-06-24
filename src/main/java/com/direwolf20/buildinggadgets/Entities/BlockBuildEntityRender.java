@@ -89,7 +89,8 @@ public class BlockBuildEntityRender extends Render<BlockBuildEntity> {
             blue = 0f;
         }
         float alpha = (1f-(scale));
-        if (alpha <0.25f) {alpha = 0.25f;}
+        if (alpha <0.15f) {alpha = 0.15f;}
+        if (alpha >0.75f) {alpha = 0.75f;}
         //down
         bufferBuilder.pos(minX, minY, minZ).color(red, green, blue, alpha).endVertex();
         bufferBuilder.pos(maxX, minY, minZ).color(red, green, blue, alpha).endVertex();

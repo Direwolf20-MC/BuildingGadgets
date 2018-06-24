@@ -21,7 +21,7 @@ public class ClientProxy extends CommonProxy {
 
     @SubscribeEvent
     public static void registerModels(ModelRegistryEvent event) {
-        //ModBlocks.gooBlock.initModel();
+        ModBlocks.effectBlock.initModel();
         //ModBlocks.turretLaser.initModel();
         ModItems.buildingTool.initModel();
         ModItems.exchangerTool.initModel();

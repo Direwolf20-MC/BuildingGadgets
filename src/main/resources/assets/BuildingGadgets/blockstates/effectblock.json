@@ -1,31 +1,10 @@
 {
   "forge_marker": 1,
   "defaults": {
-    "model": "diregoo:gooblock",
-    "textures": {
-      "front": "diregoo:blocks/gooblock"
-    }
+    "model": "buildinggadgets:effectblock"
   },
   "variants": {
     "normal": [{}],
-    "inventory": [{}],
-    "decaystate": {
-      "0": {},
-      "1": {
-        "textures": {
-          "front": "diregoo:blocks/googonestage1"
-        }
-      },
-      "2": {
-        "textures": {
-          "front": "diregoo:blocks/googonestage2"
-        }
-      },
-      "3": {
-        "textures": {
-          "front": "diregoo:blocks/googonestage3"
-        }
-      }
-    }
+    "inventory": [{}]
   }
 }

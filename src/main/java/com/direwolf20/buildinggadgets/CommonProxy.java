@@ -1,10 +1,12 @@
 package com.direwolf20.buildinggadgets;
 
 
+import com.direwolf20.buildinggadgets.Blocks.EffectBlock;
 import com.direwolf20.buildinggadgets.Items.BuildingTool;
 import com.direwolf20.buildinggadgets.Items.ExchangerTool;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemBlock;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -27,7 +29,7 @@ public class CommonProxy {
 
     @SubscribeEvent
     public static void registerBlocks(RegistryEvent.Register<Block> event) {
-        //event.getRegistry().register(new GooBlock());
+        event.getRegistry().register(new EffectBlock());
         //event.getRegistry().register(new TurretLaser());
         //GameRegistry.registerTileEntity(GooBlockTileEntity.class, BuildingGadgets.MODID + "_gooblock");
         //GameRegistry.registerTileEntity(TurretLaserTileEntity.class, BuildingGadgets.MODID + "_turretblock");
@@ -35,7 +37,7 @@ public class CommonProxy {
 
     @SubscribeEvent
     public static void registerItems(RegistryEvent.Register<Item> event) {
-        //event.getRegistry().register(new ItemBlock(ModBlocks.gooBlock).setRegistryName(ModBlocks.gooBlock.getRegistryName()));
+        event.getRegistry().register(new ItemBlock(ModBlocks.effectBlock).setRegistryName(ModBlocks.effectBlock.getRegistryName()));
         //event.getRegistry().register(new ItemBlock(ModBlocks.turretLaser).setRegistryName(ModBlocks.turretLaser.getRegistryName()));
         event.getRegistry().register(new BuildingTool());
         event.getRegistry().register(new ExchangerTool());
