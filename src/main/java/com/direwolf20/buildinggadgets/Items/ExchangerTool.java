@@ -22,6 +22,8 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class ExchangerTool extends Item {
 
+    public int range = 3;
+
     public ExchangerTool() {
         setRegistryName("exchangertool");        // The unique name (within your mod) that identifies this item
         setUnlocalizedName(BuildingGadgets.MODID + ".exchangertool");     // Used for localization (en_US.lang)
@@ -52,13 +54,21 @@ public class ExchangerTool extends Item {
     @Override
     public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
         if (!world.isRemote) {
-            exchangeBlock(world, player, pos);
+            range = 5;
+            int bound = (range-1)/2;
+            BlockPos newPos;
+            for (int x = pos.getX()-bound;x<=pos.getX()+bound;x++) {
+                for (int z = pos.getZ()-bound;z<=pos.getZ()+bound;z++) {
+                        newPos = new BlockPos(x,pos.getY(),z);
+                        exchangeBlock(world, player, newPos);
+                    }
+            }
         }
         return EnumActionResult.SUCCESS;
     }
 
     public boolean exchangeBlock(World world, EntityPlayer player, BlockPos startBlock) {
-        IBlockState cobbleBlock = Blocks.STONE.getDefaultState();
+        IBlockState cobbleBlock = Blocks.STONEBRICK.getDefaultState();
         world.spawnEntity(new BlockBuildEntity(world, startBlock, player,cobbleBlock,true));
         return true;
     }

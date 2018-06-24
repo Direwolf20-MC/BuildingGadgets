@@ -44,7 +44,8 @@ public class BlockBuildEntityRender extends Render<BlockBuildEntity> {
         int teCounter = entity.getTicksExisted();
         int maxLife = entity.maxLife;
         if (teCounter > maxLife) {teCounter = maxLife;}
-        float scale = (float) teCounter / (float) maxLife;
+        float scale = (float) (teCounter) / (float) maxLife;
+        if (scale >= 1.0f) {scale = 0.99f;}
         if (entExchangeMode) {
             scale = (float) (maxLife-teCounter) / maxLife;
         }
@@ -85,12 +86,12 @@ public class BlockBuildEntityRender extends Render<BlockBuildEntity> {
         float blue = 1f;
         if (entExchangeMode) {
             red = 1f;
-            green = 0f;
-            blue = 0f;
+            green = 0.25f;
+            blue = 0.25f;
         }
         float alpha = (1f-(scale));
-        if (alpha <0.15f) {alpha = 0.15f;}
-        if (alpha >0.75f) {alpha = 0.75f;}
+        if (alpha <0.051f) {alpha = 0.051f;}
+        if (alpha >0.33f) {alpha = 0.33f;}
         //down
         bufferBuilder.pos(minX, minY, minZ).color(red, green, blue, alpha).endVertex();
         bufferBuilder.pos(maxX, minY, minZ).color(red, green, blue, alpha).endVertex();

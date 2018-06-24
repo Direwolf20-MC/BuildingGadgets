@@ -62,6 +62,7 @@ public class BlockBuildEntity extends Entity implements IEntityAdditionalSpawnDa
         setExchangeMode(exchanger);
         spawnedBy = player;
         if (getExchangeMode()) {
+            //world.setBlockState(spawnPos, Blocks.AIR.getDefaultState());
             world.setBlockState(spawnPos, ModBlocks.effectBlock.getDefaultState());
         }
         //System.out.println(exchangeMode);
@@ -102,7 +103,7 @@ public class BlockBuildEntity extends Entity implements IEntityAdditionalSpawnDa
 
     @Override
     public boolean shouldRenderInPass(int pass) {
-        return pass == 1; //After tr
+        return pass == 0; //After tr
     }
 
     public int getTicksExisted() {

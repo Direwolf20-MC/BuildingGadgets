@@ -39,4 +39,14 @@ public class EffectBlock extends Block {
     {
         return false;
     }
+
+    @Override
+    public BlockRenderLayer getBlockLayer() {
+        return BlockRenderLayer.TRANSLUCENT;
+    }
+
+    @Override
+    public boolean isFullCube(IBlockState state) {
+        return false;
+    }
 }
