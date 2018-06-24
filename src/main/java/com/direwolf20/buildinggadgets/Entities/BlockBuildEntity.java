@@ -1,23 +1,35 @@
 package com.direwolf20.buildinggadgets.Entities;
 
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import com.google.common.base.Optional;
 import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
+
+import javax.annotation.Nullable;
 
 public class BlockBuildEntity extends Entity implements IEntityAdditionalSpawnData {
 
+    private static final DataParameter<Boolean> exchangeMode = EntityDataManager.<Boolean>createKey(BlockBuildEntity.class, DataSerializers.BOOLEAN);
+    private static final DataParameter<Optional<IBlockState>> SET_BLOCK = EntityDataManager.<Optional<IBlockState>>createKey(BlockBuildEntity.class, DataSerializers.OPTIONAL_BLOCK_STATE);
+
     public int despawning = -1;
     public int maxLife = 20;
+    private boolean exchange;
     private IBlockState setBlock;
+    private IBlockState originalSetBlock;
     private BlockPos setPos;
+    private EntityLivingBase spawnedBy;
+
     World world;
     private static DataParameter<BlockPos> FIXED = EntityDataManager.createKey(BlockBuildEntity.class, DataSerializers.BLOCK_POS);
 
@@ -26,14 +38,49 @@ public class BlockBuildEntity extends Entity implements IEntityAdditionalSpawnDa
         setSize(0.1F, 0.1F);
     }
 
-    public BlockBuildEntity(World worldIn, BlockPos spawnPos, EntityLivingBase player, IBlockState spawnBlock) {
+    public BlockBuildEntity(World worldIn, BlockPos spawnPos, EntityLivingBase player, IBlockState spawnBlock, Boolean exchanger) {
         super(worldIn);
         setSize(0.1F, 0.1F);
         setPosition(spawnPos.getX(), spawnPos.getY(), spawnPos.getZ());
+        IBlockState currentBlock = worldIn.getBlockState(spawnPos);
         setPos = spawnPos;
         setBlock = spawnBlock;
+        originalSetBlock = spawnBlock;
+        setSetBlock(spawnBlock);
+        if (exchanger) {
+            if (currentBlock != null) {
+                setBlock = currentBlock;
+                setSetBlock(setBlock);
+            } else {
+                setBlock = Blocks.AIR.getDefaultState();
+                setSetBlock(setBlock);
+            }
+        }
         world = worldIn;
-        //ignoreFrustumCheck = true;
+        exchange = exchanger;
+        setExchangeMode(exchanger);
+        spawnedBy = player;
+        if (getExchangeMode()) {
+            world.setBlockState(spawnPos, Blocks.AIR.getDefaultState());
+        }
+        System.out.println(exchangeMode);
+    }
+
+    public Boolean getExchangeMode() {
+        return this.dataManager.get(exchangeMode);
+    }
+
+    public void setExchangeMode(Boolean exchanger) {
+        this.dataManager.set(exchangeMode, exchanger);
+    }
+
+    @Nullable
+    public IBlockState getSetBlock() {
+        return (IBlockState) ((Optional) this.dataManager.get(SET_BLOCK)).orNull();
+    }
+
+    public void setSetBlock(@Nullable IBlockState state) {
+        this.dataManager.set(SET_BLOCK, Optional.fromNullable(state));
     }
 
     @Override
@@ -83,17 +130,22 @@ public class BlockBuildEntity extends Entity implements IEntityAdditionalSpawnDa
     private void setDespawning() {
         if(despawning == -1) {
             despawning = 0;
-            if (setPos != null && setBlock != null) {
+            if (setPos != null && setBlock != null && !(getExchangeMode())) {
                 world.setBlockState(setPos, setBlock);
             }
+
         }
     }
 
     private void despawnTick() {
         despawning++;
         if(despawning > 1) {
+
             setDead();
             //System.out.println(setPos+":"+setBlock);
+            if(exchange) {
+                world.spawnEntity(new BlockBuildEntity(world, setPos, spawnedBy,originalSetBlock,false));
+            }
         }
     }
 
@@ -114,6 +166,8 @@ public class BlockBuildEntity extends Entity implements IEntityAdditionalSpawnDa
     @Override
     protected void entityInit() {
         this.dataManager.register(FIXED, BlockPos.ORIGIN);
+        this.dataManager.register(exchangeMode, false);
+        this.dataManager.register(SET_BLOCK, Optional.absent());
     }
 
 }

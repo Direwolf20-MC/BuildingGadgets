@@ -1,10 +1,7 @@
 package com.direwolf20.buildinggadgets.Entities;
 
-import com.direwolf20.buildinggadgets.client.RenderHelper;
-import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.renderer.BlockRendererDispatcher;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
@@ -15,9 +12,7 @@ import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.client.registry.IRenderFactory;
-import org.lwjgl.opengl.GL11;
 
 import javax.annotation.Nullable;
 
@@ -44,12 +39,15 @@ public class BlockBuildEntityRender extends Render<BlockBuildEntity> {
         GlStateManager.translate((1-scale2)/2,(1-scale2)/2,(1-scale2)/2);
         GlStateManager.scale(scale2,scale2,scale2);
         */
-
+        boolean entExchangeMode = entity.getExchangeMode();
         mc.renderEngine.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
         int teCounter = entity.getTicksExisted();
         int maxLife = entity.maxLife;
         if (teCounter > maxLife) {teCounter = maxLife;}
         float scale = (float) teCounter / (float) maxLife;
+        if (entExchangeMode) {
+            scale = (float) (maxLife-teCounter) / maxLife;
+        }
         float trans = (1-scale)/2;
         GlStateManager.translate(x,y,z);
         GlStateManager.translate(trans,trans,trans);
@@ -57,7 +55,11 @@ public class BlockBuildEntityRender extends Render<BlockBuildEntity> {
         GlStateManager.scale(scale,scale,scale);
 
 
-        IBlockState renderBlockState = Blocks.COBBLESTONE.getDefaultState();
+        //IBlockState renderBlockState = Blocks.COBBLESTONE.getDefaultState();
+        IBlockState renderBlockState = entity.getSetBlock();
+        if (renderBlockState == null) {
+            renderBlockState = Blocks.COBBLESTONE.getDefaultState();
+        }
         blockrendererdispatcher.renderBlockBrightness(renderBlockState, 1.0f);
         GlStateManager.popMatrix();
 
@@ -81,6 +83,11 @@ public class BlockBuildEntityRender extends Render<BlockBuildEntity> {
         float red = 0f;
         float green = 1f;
         float blue = 1f;
+        if (entExchangeMode) {
+            red = 1f;
+            green = 0f;
+            blue = 0f;
+        }
         float alpha = (1f-(scale));
         if (alpha <0.25f) {alpha = 0.25f;}
         //down

@@ -2,6 +2,7 @@ package com.direwolf20.buildinggadgets;
 
 
 import com.direwolf20.buildinggadgets.Items.BuildingTool;
+import com.direwolf20.buildinggadgets.Items.ExchangerTool;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraftforge.event.RegistryEvent;
@@ -37,6 +38,6 @@ public class CommonProxy {
         //event.getRegistry().register(new ItemBlock(ModBlocks.gooBlock).setRegistryName(ModBlocks.gooBlock.getRegistryName()));
         //event.getRegistry().register(new ItemBlock(ModBlocks.turretLaser).setRegistryName(ModBlocks.turretLaser.getRegistryName()));
         event.getRegistry().register(new BuildingTool());
-        //event.getRegistry().register(new LaserGun());
+        event.getRegistry().register(new ExchangerTool());
     }
 }

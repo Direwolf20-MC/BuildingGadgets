@@ -11,6 +11,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
@@ -19,10 +20,11 @@ import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class BuildingTool extends Item {
-    public BuildingTool() {
-        setRegistryName("buildingtool");        // The unique name (within your mod) that identifies this item
-        setUnlocalizedName(BuildingGadgets.MODID + ".buildingtool");     // Used for localization (en_US.lang)
+public class ExchangerTool extends Item {
+
+    public ExchangerTool() {
+        setRegistryName("exchangertool");        // The unique name (within your mod) that identifies this item
+        setUnlocalizedName(BuildingGadgets.MODID + ".exchangertool");     // Used for localization (en_US.lang)
     }
 
     @SideOnly(Side.CLIENT)
@@ -30,7 +32,7 @@ public class BuildingTool extends Item {
         ModelLoader.setCustomModelResourceLocation(this, 0, new ModelResourceLocation(getRegistryName(), "inventory"));
     }
 
-    @Override
+    /*@Override
     public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
         ItemStack itemstack = player.getHeldItem(hand);
         player.setActiveHand(hand);
@@ -45,6 +47,20 @@ public class BuildingTool extends Item {
 
         }
         return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, itemstack);
+    }*/
+
+    @Override
+    public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+        if (!world.isRemote) {
+            exchangeBlock(world, player, pos);
+        }
+        return EnumActionResult.SUCCESS;
+    }
+
+    public boolean exchangeBlock(World world, EntityPlayer player, BlockPos startBlock) {
+        IBlockState cobbleBlock = Blocks.STONE.getDefaultState();
+        world.spawnEntity(new BlockBuildEntity(world, startBlock, player,cobbleBlock,true));
+        return true;
     }
 
     public boolean buildToMe(World world, EntityPlayer player, BlockPos startBlock) {
@@ -56,7 +72,7 @@ public class BuildingTool extends Item {
             for (int i = startBlock.getZ();i<= playerPos.getZ();i++) {
                 changePos = new BlockPos(startBlock.getX(),startBlock.getY(),i);
                 if (world.getBlockState(changePos) == airBlock.getDefaultState()) {
-                    world.spawnEntity(new BlockBuildEntity(world, changePos, player,cobbleBlock,false));
+                    world.spawnEntity(new BlockBuildEntity(world, changePos, player,cobbleBlock,true));
                 }
 
             }
@@ -68,4 +84,5 @@ public class BuildingTool extends Item {
     public int getMaxItemUseDuration(ItemStack stack) {
         return 20;
     }
+
 }

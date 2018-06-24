@@ -24,7 +24,7 @@ public class ClientProxy extends CommonProxy {
         //ModBlocks.gooBlock.initModel();
         //ModBlocks.turretLaser.initModel();
         ModItems.buildingTool.initModel();
-        //ModItems.laserGun.initModel();
+        ModItems.exchangerTool.initModel();
     }
 
     public void registerEntityRenderers() {
