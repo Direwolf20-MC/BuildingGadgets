@@ -5,9 +5,11 @@ import com.direwolf20.buildinggadgets.Entities.BlockBuildEntity;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockRendererDispatcher;
+import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
@@ -133,10 +135,81 @@ public class BuildingTool extends Item {
         double doubleY = p.lastTickPosY + (p.posY - p.lastTickPosY) * evt.getPartialTicks();
         double doubleZ = p.lastTickPosZ + (p.posZ - p.lastTickPosZ) * evt.getPartialTicks();
 
-        IBlockState renderBlockState = Blocks.GOLD_BLOCK.getDefaultState();
+        double minX = pos.getX();
+        double minY = pos.getY();
+        double minZ = pos.getZ();
+        double maxX = pos.getX()+1;
+        double maxY = pos.getY()+1;
+        double maxZ = pos.getZ()+1;
+        float red = 0f;
+        float green = 0f;
+        float blue = 0f;
+        float alpha = 0.25f;
+
+        IBlockState renderBlockState = Blocks.COBBLESTONE.getDefaultState();
         if (renderBlockState == null) {
             renderBlockState = Blocks.COBBLESTONE.getDefaultState();
         }
+
+        GlStateManager.pushMatrix();
+        GlStateManager.pushAttrib();
+        GlStateManager.enableBlend();
+        GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+        GlStateManager.disableTexture2D();
+        GlStateManager.depthMask(false);
+
+
+        GlStateManager.translate(-doubleX,-doubleY,-doubleZ);
+
+
+        Tessellator t = Tessellator.getInstance();
+        BufferBuilder bufferBuilder = t.getBuffer();
+        bufferBuilder.begin(7, DefaultVertexFormats.POSITION_COLOR);
+
+        //down
+        bufferBuilder.pos(minX, minY, minZ).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(maxX, minY, minZ).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(maxX, minY, maxZ).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(minX, minY, maxZ).color(red, green, blue, alpha).endVertex();
+
+        //up
+        bufferBuilder.pos(minX, maxY, minZ).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(minX, maxY, maxZ).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(maxX, maxY, maxZ).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(maxX, maxY, minZ).color(red, green, blue, alpha).endVertex();
+
+        //north
+        bufferBuilder.pos(minX, minY, minZ).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(minX, maxY, minZ).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(maxX, maxY, minZ).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(maxX, minY, minZ).color(red, green, blue, alpha).endVertex();
+
+        //south
+        bufferBuilder.pos(minX, minY, maxZ).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(maxX, minY, maxZ).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(maxX, maxY, maxZ).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(minX, maxY, maxZ).color(red, green, blue, alpha).endVertex();
+
+        //east
+        bufferBuilder.pos(maxX, minY, minZ).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(maxX, maxY, minZ).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(maxX, maxY, maxZ).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(maxX, minY, maxZ).color(red, green, blue, alpha).endVertex();
+
+        //west
+        bufferBuilder.pos(minX, minY, minZ).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(minX, minY, maxZ).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(minX, maxY, maxZ).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(minX, maxY, minZ).color(red, green, blue, alpha).endVertex();
+        t.draw();
+
+
+        GlStateManager.disableBlend();
+        GlStateManager.enableTexture2D();
+        GlStateManager.depthMask(true);
+        GlStateManager.popAttrib();
+        GlStateManager.popMatrix();
+
 
         GlStateManager.pushMatrix();
         GlStateManager.enableBlend();
@@ -147,19 +220,19 @@ public class BuildingTool extends Item {
         GlStateManager.rotate(-90.0F, 0.0F, 1.0F, 0.0F);
         GlStateManager.scale(1.0f,1.0f,1.0f);
         GlStateManager.blendFunc(GL11.GL_ONE, GL11.GL_ONE);
-        blockrendererdispatcher.renderBlockBrightness(renderBlockState, 0.15f);
-        GlStateManager.rotate(-90.0F, 0.0F, 1.0F, 0.0F);
-        GlStateManager.scale(1.0f,1.0f,1.0f);
-        GlStateManager.blendFunc(GL11.GL_ONE, GL11.GL_ONE);
-        blockrendererdispatcher.renderBlockBrightness(renderBlockState, 0.15f);
-        GlStateManager.rotate(-90.0F, 0.0F, 1.0F, 0.0F);
-        GlStateManager.scale(1.0f,1.0f,1.0f);
-        GlStateManager.blendFunc(GL11.GL_ONE, GL11.GL_ONE);
-        blockrendererdispatcher.renderBlockBrightness(renderBlockState, 0.15f);
+        blockrendererdispatcher.renderBlockBrightness(renderBlockState, 0.75f);
+
+
         GlStateManager.enableDepth();
         GlStateManager.disableBlend();
-        //GlStateManager.popAttrib();
+        GlStateManager.enableTexture2D();
+        GlStateManager.popAttrib();
         GlStateManager.popMatrix();
+
+//-------------------------------------------------------------------------------------------------------
+
+
+
     }
 
     private static void renderBlockOutline(Tessellator tessellator, float mx, float my, float mz, float o) {

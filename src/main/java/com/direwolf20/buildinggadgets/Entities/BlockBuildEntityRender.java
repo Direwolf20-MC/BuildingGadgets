@@ -55,6 +55,7 @@ public class BlockBuildEntityRender extends Render<BlockBuildEntity> {
         blockrendererdispatcher.renderBlockBrightness(renderBlockState, 1.0f);
         GlStateManager.popMatrix();
 
+
         GlStateManager.pushMatrix();
         GlStateManager.pushAttrib();
 
