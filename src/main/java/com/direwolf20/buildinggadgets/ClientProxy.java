@@ -47,15 +47,10 @@ public class ClientProxy extends CommonProxy {
     }
 
     @SubscribeEvent
-    public void renderWorldLastEvent(RenderWorldLastEvent evt) {
+    public static void renderWorldLastEvent(RenderWorldLastEvent evt) {
         Minecraft mc = Minecraft.getMinecraft();
         EntityPlayer p = mc.player;
-
         ItemStack heldItem = p.getHeldItemMainhand();
-
-        if (heldItem == null) {
-            return;
-        }
         if (heldItem.getItem() instanceof BuildingTool) {
             BuildingTool buildingTool = (BuildingTool) heldItem.getItem();
             buildingTool.renderOverlay(evt, p, heldItem);
