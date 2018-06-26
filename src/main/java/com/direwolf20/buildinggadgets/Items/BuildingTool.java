@@ -2,6 +2,8 @@ package com.direwolf20.buildinggadgets.Items;
 
 import com.direwolf20.buildinggadgets.BuildingGadgets;
 import com.direwolf20.buildinggadgets.Entities.BlockBuildEntity;
+import com.direwolf20.buildinggadgets.ModBlocks;
+import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockRendererDispatcher;
@@ -14,6 +16,8 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTUtil;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
@@ -45,6 +49,45 @@ public class BuildingTool extends Item {
     @SideOnly(Side.CLIENT)
     public void initModel() {
         ModelLoader.setCustomModelResourceLocation(this, 0, new ModelResourceLocation(getRegistryName(), "inventory"));
+    }
+
+    @Override
+    public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
+        ItemStack stack = player.getHeldItem(hand);
+        if (!world.isRemote) {
+            if (player.isSneaking()) {
+                selectBlock(stack, player, world, pos);
+            } else {
+                buildToMe(world, player, pos,side);
+            }
+        }
+        return EnumActionResult.SUCCESS;
+    }
+
+    private void selectBlock(ItemStack stack, EntityPlayer player, World world, BlockPos pos) {
+        IBlockState state = world.getBlockState(pos);
+
+        if (state != null) {
+            //Block block = state.getBlock();
+            NBTTagCompound tagCompound = stack.getTagCompound();
+            if (tagCompound == null){
+                tagCompound = new NBTTagCompound();
+                stack.setTagCompound(tagCompound);
+            }
+            NBTTagCompound stateTag = new NBTTagCompound();
+            NBTUtil.writeBlockState(stateTag, state);
+            //ItemStack item = block.getPickBlock(state, null, world, pos, player);
+            //int meta = item.getMetadata();
+            //NBTTagCompound tagCompound = Tools.getTagCompound(stack);
+            //String name = item.getDisplayName();
+            //if (name == null) {
+
+            //} else {
+            //int id = Block.REGISTRY.getIDForObject(block);
+            tagCompound.setTag("blockstate", stateTag);
+            //Tools.notify(player, "Selected block: " + name);
+            //}
+        }
     }
 
     @Override
@@ -117,9 +160,13 @@ public class BuildingTool extends Item {
 
     public boolean buildToMe(World world, EntityPlayer player, BlockPos startBlock, EnumFacing sideHit) {
         Set<BlockPos> coordinates = getBuildOrders(world,player,startBlock,sideHit);
-        IBlockState cobbleBlock = Blocks.COBBLESTONE.getDefaultState();
+        IBlockState blockState = Blocks.AIR.getDefaultState();
+        ItemStack heldItem = player.getHeldItemMainhand();
+        NBTTagCompound tagCompound = heldItem.getTagCompound();
+        blockState = NBTUtil.readBlockState(tagCompound.getCompoundTag("blockstate"));
+        //IBlockState cobbleBlock = Blocks.COBBLESTONE.getDefaultState();
         for (BlockPos coordinate : coordinates) {
-            placeBlock(world, player, coordinate, cobbleBlock);
+            placeBlock(world, player, coordinate, blockState);
         }
 
         return true;
@@ -144,7 +191,7 @@ public class BuildingTool extends Item {
         if (lookingAt != null) {
             World world = player.world;
             IBlockState startBlock = world.getBlockState(lookingAt.getBlockPos());
-            if (startBlock != null && startBlock != Blocks.AIR.getDefaultState()) {
+            if ((startBlock != null) && (startBlock != Blocks.AIR.getDefaultState()) && (startBlock != ModBlocks.effectBlock.getDefaultState())) {
                 Set<BlockPos> coordinates = getBuildOrders(world,player,lookingAt.getBlockPos(),lookingAt.sideHit);
                 for (BlockPos coordinate : coordinates) {
                     renderOutlines(evt, player, coordinate);
@@ -175,9 +222,13 @@ public class BuildingTool extends Item {
         float alpha = 0.5f;
 
         //Temporarily render just lapis, will eventually render tool selection
-        IBlockState renderBlockState = Blocks.LAPIS_BLOCK.getDefaultState();
+        //IBlockState renderBlockState = Blocks.LAPIS_BLOCK.getDefaultState();
+        IBlockState renderBlockState = Blocks.AIR.getDefaultState();
+        ItemStack heldItem = p.getHeldItemMainhand();
+        NBTTagCompound tagCompound = heldItem.getTagCompound();
+        renderBlockState = NBTUtil.readBlockState(tagCompound.getCompoundTag("blockstate"));
         if (renderBlockState == null) {
-            renderBlockState = Blocks.COBBLESTONE.getDefaultState();
+            renderBlockState = Blocks.AIR.getDefaultState();
         }
 
         //Prep GL for rendering fancy stuff

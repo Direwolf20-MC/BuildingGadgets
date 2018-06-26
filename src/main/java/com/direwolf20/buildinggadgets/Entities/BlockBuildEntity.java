@@ -61,10 +61,10 @@ public class BlockBuildEntity extends Entity implements IEntityAdditionalSpawnDa
         exchange = exchanger;
         setExchangeMode(exchanger);
         spawnedBy = player;
-        if (getExchangeMode()) {
+        //if (getExchangeMode()) {
             //world.setBlockState(spawnPos, Blocks.AIR.getDefaultState());
             world.setBlockState(spawnPos, ModBlocks.effectBlock.getDefaultState());
-        }
+        //}
         //System.out.println(exchangeMode);
     }
 
