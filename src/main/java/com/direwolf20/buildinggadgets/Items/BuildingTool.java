@@ -233,7 +233,7 @@ public class BuildingTool extends Item {
 
         //Prep GL for rendering fancy stuff
         GlStateManager.pushMatrix();
-        //GlStateManager.pushAttrib();
+        GlStateManager.pushAttrib();
         GlStateManager.enableBlend();
         GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
         GlStateManager.disableTexture2D();
@@ -310,9 +310,9 @@ public class BuildingTool extends Item {
         //GlStateManager.enableDepth();
         GlStateManager.disableBlend();
         GlStateManager.enableTexture2D();
-        //GlStateManager.popAttrib();
+        GlStateManager.popAttrib();
         GlStateManager.popMatrix();
-
+        GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
     }
 
     private static void renderBlockOutline(Tessellator tessellator, float mx, float my, float mz, float o) {
