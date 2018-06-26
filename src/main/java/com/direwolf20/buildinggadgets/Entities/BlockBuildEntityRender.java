@@ -26,19 +26,10 @@ public class BlockBuildEntityRender extends Render<BlockBuildEntity> {
 
     @Override
     public void doRender(BlockBuildEntity entity, double x, double y, double z, float entityYaw, float partialTicks) {
-
-
-
         BlockRendererDispatcher blockrendererdispatcher = Minecraft.getMinecraft().getBlockRendererDispatcher();
-
         Minecraft mc = Minecraft.getMinecraft();
         GlStateManager.pushMatrix();
 
-                //GlStateManager.scale(1.01F, 1.01F, 1.01F);
-        /*float scale2 = 0.025f;
-        GlStateManager.translate((1-scale2)/2,(1-scale2)/2,(1-scale2)/2);
-        GlStateManager.scale(scale2,scale2,scale2);
-        */
         boolean entExchangeMode = entity.getExchangeMode();
         mc.renderEngine.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
         int teCounter = entity.getTicksExisted();
