@@ -27,11 +27,19 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.opengl.GL11;
 
+import java.util.HashSet;
+import java.util.Set;
+
 
 public class BuildingTool extends Item {
+
+    private enum toolModes {BuildToMe}
+    toolModes mode;
+
     public BuildingTool() {
         setRegistryName("buildingtool");        // The unique name (within your mod) that identifies this item
         setUnlocalizedName(BuildingGadgets.MODID + ".buildingtool");     // Used for localization (en_US.lang)
+        mode = toolModes.BuildToMe;
     }
 
     @SideOnly(Side.CLIENT)
@@ -57,46 +65,63 @@ public class BuildingTool extends Item {
         return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, itemstack);
     }
 
-    public boolean buildToMe(World world, EntityPlayer player, BlockPos startBlock, EnumFacing sideHit) {
+    private boolean isReplaceable(World world, BlockPos pos) {
+        if (world.getBlockState(pos).getBlock().isReplaceable(world,pos)) {return true;}
+        return false;
+    }
+
+    private Set<BlockPos> getBuildOrders(World world, EntityPlayer player, BlockPos startBlock, EnumFacing sideHit) {
+        Set<BlockPos> coordinates = new HashSet<>();
         BlockPos playerPos = player.getPosition();
+        BlockPos pos = startBlock;
+        if (mode == toolModes.BuildToMe) {
+            if (sideHit == EnumFacing.SOUTH) {
+                for (int i = startBlock.getZ()+1; i <= playerPos.getZ(); i++) {
+                    pos = new BlockPos(startBlock.getX(), startBlock.getY(), i);
+                    if (isReplaceable(world,pos)) {coordinates.add(pos);}
+                }
+            }
+            else if (sideHit == EnumFacing.NORTH) {
+                for (int i = startBlock.getZ()-1; i >= playerPos.getZ(); i--) {
+                    pos = new BlockPos(startBlock.getX(), startBlock.getY(), i);
+                    if (isReplaceable(world,pos)) {coordinates.add(pos);}
+                }
+            }
+            else if (sideHit == EnumFacing.EAST) {
+                for (int i = startBlock.getX()+1; i <= playerPos.getX(); i++) {
+                    pos = new BlockPos(i, startBlock.getY(), startBlock.getZ());
+                    if (isReplaceable(world,pos)) {coordinates.add(pos);}
+                }
+            }
+            else if (sideHit == EnumFacing.WEST) {
+                for (int i = startBlock.getX()-1; i >= playerPos.getX(); i--) {
+                    pos = new BlockPos(i, startBlock.getY(), startBlock.getZ());
+                    if (isReplaceable(world,pos)) {coordinates.add(pos);}
+                }
+            }
+            else if (sideHit == EnumFacing.UP) {
+                for (int i = startBlock.getY()+1; i <= playerPos.getY(); i++) {
+                    pos = new BlockPos(startBlock.getX(), i, startBlock.getZ());
+                    if (isReplaceable(world,pos)) {coordinates.add(pos);}
+                }
+            }
+            else if (sideHit == EnumFacing.DOWN) {
+                for (int i = startBlock.getY()-1; i >= playerPos.getY(); i--) {
+                    pos = new BlockPos(startBlock.getX(), i, startBlock.getZ());
+                    if (isReplaceable(world,pos)) {coordinates.add(pos);}
+                }
+            }
+        }
+        return coordinates;
+    }
+
+    public boolean buildToMe(World world, EntityPlayer player, BlockPos startBlock, EnumFacing sideHit) {
+        Set<BlockPos> coordinates = getBuildOrders(world,player,startBlock,sideHit);
         IBlockState cobbleBlock = Blocks.COBBLESTONE.getDefaultState();
-        BlockPos changePos;
-        if (sideHit == EnumFacing.SOUTH) {
-            for (int i = startBlock.getZ(); i <= playerPos.getZ(); i++) {
-                changePos = new BlockPos(startBlock.getX(), startBlock.getY(), i);
-                placeBlock(world, player, changePos, cobbleBlock);
-            }
+        for (BlockPos coordinate : coordinates) {
+            placeBlock(world, player, coordinate, cobbleBlock);
         }
-        else if (sideHit == EnumFacing.NORTH) {
-            for (int i = startBlock.getZ(); i >= playerPos.getZ(); i--) {
-                changePos = new BlockPos(startBlock.getX(), startBlock.getY(), i);
-                placeBlock(world, player, changePos, cobbleBlock);
-            }
-        }
-        else if (sideHit == EnumFacing.EAST) {
-            for (int i = startBlock.getX(); i <= playerPos.getX(); i++) {
-                changePos = new BlockPos(i, startBlock.getY(), startBlock.getZ());
-                placeBlock(world, player, changePos, cobbleBlock);
-            }
-        }
-        else if (sideHit == EnumFacing.WEST) {
-            for (int i = startBlock.getX(); i >= playerPos.getX(); i--) {
-                changePos = new BlockPos(i, startBlock.getY(), startBlock.getZ());
-                placeBlock(world, player, changePos, cobbleBlock);
-            }
-        }
-        else if (sideHit == EnumFacing.UP) {
-            for (int i = startBlock.getY(); i <= playerPos.getY(); i++) {
-                changePos = new BlockPos(startBlock.getX(), i, startBlock.getZ());
-                placeBlock(world, player, changePos, cobbleBlock);
-            }
-        }
-        else if (sideHit == EnumFacing.DOWN) {
-            for (int i = startBlock.getY(); i >= playerPos.getY(); i--) {
-                changePos = new BlockPos(startBlock.getX(), i, startBlock.getZ());
-                placeBlock(world, player, changePos, cobbleBlock);
-            }
-        }
+
         return true;
     }
 
@@ -118,23 +143,26 @@ public class BuildingTool extends Item {
         RayTraceResult lookingAt = player.rayTrace(20, 1.0F);
         if (lookingAt != null) {
             World world = player.world;
-            int x = lookingAt.getBlockPos().getX();
-            int y = lookingAt.getBlockPos().getY();
-            int z = lookingAt.getBlockPos().getZ();
-            IBlockState block = world.getBlockState(lookingAt.getBlockPos());
-            if (block != null && block != Blocks.AIR.getDefaultState()) {
-                renderOutlines(evt, player, lookingAt.getBlockPos().up(), 200, 230, 180);
+            IBlockState startBlock = world.getBlockState(lookingAt.getBlockPos());
+            if (startBlock != null && startBlock != Blocks.AIR.getDefaultState()) {
+                Set<BlockPos> coordinates = getBuildOrders(world,player,lookingAt.getBlockPos(),lookingAt.sideHit);
+                for (BlockPos coordinate : coordinates) {
+                    renderOutlines(evt, player, coordinate);
+                }
             }
         }
     }
 
-    protected static void renderOutlines(RenderWorldLastEvent evt, EntityPlayer p, BlockPos pos, int r, int g, int b) {
-        BlockRendererDispatcher blockrendererdispatcher = Minecraft.getMinecraft().getBlockRendererDispatcher();
+    protected static void renderOutlines(RenderWorldLastEvent evt, EntityPlayer p, BlockPos pos) {
 
+
+        BlockRendererDispatcher blockrendererdispatcher = Minecraft.getMinecraft().getBlockRendererDispatcher();
+        //Get player position, since the render starts at player position
         double doubleX = p.lastTickPosX + (p.posX - p.lastTickPosX) * evt.getPartialTicks();
         double doubleY = p.lastTickPosY + (p.posY - p.lastTickPosY) * evt.getPartialTicks();
         double doubleZ = p.lastTickPosZ + (p.posZ - p.lastTickPosZ) * evt.getPartialTicks();
 
+        //Define the values for the GL Cube we're about to render
         double minX = pos.getX();
         double minY = pos.getY();
         double minZ = pos.getZ();
@@ -144,28 +172,31 @@ public class BuildingTool extends Item {
         float red = 0f;
         float green = 0f;
         float blue = 0f;
-        float alpha = 0.25f;
+        float alpha = 0.5f;
 
-        IBlockState renderBlockState = Blocks.COBBLESTONE.getDefaultState();
+        //Temporarily render just lapis, will eventually render tool selection
+        IBlockState renderBlockState = Blocks.LAPIS_BLOCK.getDefaultState();
         if (renderBlockState == null) {
             renderBlockState = Blocks.COBBLESTONE.getDefaultState();
         }
 
+        //Prep GL for rendering fancy stuff
         GlStateManager.pushMatrix();
-        GlStateManager.pushAttrib();
+        //GlStateManager.pushAttrib();
         GlStateManager.enableBlend();
         GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
         GlStateManager.disableTexture2D();
         GlStateManager.depthMask(false);
 
-
+        //Move the render from player position to 0,0,0
         GlStateManager.translate(-doubleX,-doubleY,-doubleZ);
 
-
+        //Prepare to render a GL cube
         Tessellator t = Tessellator.getInstance();
         BufferBuilder bufferBuilder = t.getBuffer();
         bufferBuilder.begin(7, DefaultVertexFormats.POSITION_COLOR);
 
+        //Define GL Cube points and render them with t.Draw()
         //down
         bufferBuilder.pos(minX, minY, minZ).color(red, green, blue, alpha).endVertex();
         bufferBuilder.pos(maxX, minY, minZ).color(red, green, blue, alpha).endVertex();
@@ -203,35 +234,33 @@ public class BuildingTool extends Item {
         bufferBuilder.pos(minX, maxY, minZ).color(red, green, blue, alpha).endVertex();
         t.draw();
 
-
+        //Set GL state back to the way it was
         GlStateManager.disableBlend();
         GlStateManager.enableTexture2D();
         GlStateManager.depthMask(true);
-        GlStateManager.popAttrib();
+        //GlStateManager.popAttrib();
         GlStateManager.popMatrix();
 
-
+        //Prep GL for a new render
         GlStateManager.pushMatrix();
         GlStateManager.enableBlend();
-        GlStateManager.disableDepth();
+        //GlStateManager.disableDepth();
+
+        //Move block position to the X,Y,Z of the rendering spot, rotate and scale the block
         GlStateManager.translate(-doubleX,-doubleY,-doubleZ);
         GlStateManager.translate(pos.getX(),pos.getY(),pos.getZ());
-
         GlStateManager.rotate(-90.0F, 0.0F, 1.0F, 0.0F);
         GlStateManager.scale(1.0f,1.0f,1.0f);
         GlStateManager.blendFunc(GL11.GL_ONE, GL11.GL_ONE);
+        //Render the defined block
         blockrendererdispatcher.renderBlockBrightness(renderBlockState, 0.75f);
 
-
-        GlStateManager.enableDepth();
+        //Cleanup GL
+        //GlStateManager.enableDepth();
         GlStateManager.disableBlend();
         GlStateManager.enableTexture2D();
-        GlStateManager.popAttrib();
+        //GlStateManager.popAttrib();
         GlStateManager.popMatrix();
-
-//-------------------------------------------------------------------------------------------------------
-
-
 
     }
 
