@@ -37,13 +37,15 @@ import java.util.Set;
 
 public class BuildingTool extends Item {
 
-    private enum toolModes {BuildToMe}
+    private enum toolModes {BuildToMe,PerpWall}
     toolModes mode;
+    public int range = 3;
 
     public BuildingTool() {
         setRegistryName("buildingtool");        // The unique name (within your mod) that identifies this item
         setUnlocalizedName(BuildingGadgets.MODID + ".buildingtool");     // Used for localization (en_US.lang)
-        mode = toolModes.BuildToMe;
+        //mode = toolModes.BuildToMe;
+        mode = toolModes.PerpWall;
     }
 
     @SideOnly(Side.CLIENT)
@@ -117,6 +119,20 @@ public class BuildingTool extends Item {
         Set<BlockPos> coordinates = new HashSet<>();
         BlockPos playerPos = player.getPosition();
         BlockPos pos = startBlock;
+        int bound = (range-1)/2;
+        EnumFacing playerFacing = player.getHorizontalFacing();
+        int boundX, boundZ;
+        if (playerFacing == EnumFacing.SOUTH || playerFacing == EnumFacing.NORTH) {
+            boundX = bound;
+            boundZ = 0;
+        }
+        else {
+            boundX = 0;
+            boundZ = bound;
+        }
+        //***************************************************
+        //Build to me
+        //***************************************************
         if (mode == toolModes.BuildToMe) {
             if (sideHit == EnumFacing.SOUTH) {
                 for (int i = startBlock.getZ()+1; i <= playerPos.getZ(); i++) {
@@ -155,6 +171,35 @@ public class BuildingTool extends Item {
                 }
             }
         }
+        //***************************************************
+        //PerpWall
+        //***************************************************
+        else if (mode == toolModes.PerpWall) {
+            if (sideHit == EnumFacing.UP) {
+                for (int y = 1; y <= range; y++) {
+                    for (int x = boundX * -1; x <= boundX; x++) {
+                        for (int z = boundZ * -1; z <= boundZ; z++) {
+                            pos = new BlockPos(startBlock.getX() + x, startBlock.getY() + y, startBlock.getZ() + z);
+                            if (isReplaceable(world, pos)) {
+                                coordinates.add(pos);
+                            }
+                        }
+                    }
+                }
+            }
+            else if (sideHit == EnumFacing.DOWN) {
+                for (int y = 1; y <= range; y++) {
+                    for (int x = boundX * -1; x <= boundX; x++) {
+                        for (int z = boundZ * -1; z <= boundZ; z++) {
+                            pos = new BlockPos(startBlock.getX() + x, startBlock.getY() - y, startBlock.getZ() + z);
+                            if (isReplaceable(world, pos)) {
+                                coordinates.add(pos);
+                            }
+                        }
+                    }
+                }
+            }
+        }
         return coordinates;
     }
 
@@ -164,7 +209,6 @@ public class BuildingTool extends Item {
         ItemStack heldItem = player.getHeldItemMainhand();
         NBTTagCompound tagCompound = heldItem.getTagCompound();
         blockState = NBTUtil.readBlockState(tagCompound.getCompoundTag("blockstate"));
-        //IBlockState cobbleBlock = Blocks.COBBLESTONE.getDefaultState();
         for (BlockPos coordinate : coordinates) {
             placeBlock(world, player, coordinate, blockState);
         }
@@ -226,6 +270,10 @@ public class BuildingTool extends Item {
         IBlockState renderBlockState = Blocks.AIR.getDefaultState();
         ItemStack heldItem = p.getHeldItemMainhand();
         NBTTagCompound tagCompound = heldItem.getTagCompound();
+        if (tagCompound == null){
+            tagCompound = new NBTTagCompound();
+            heldItem.setTagCompound(tagCompound);
+        }
         renderBlockState = NBTUtil.readBlockState(tagCompound.getCompoundTag("blockstate"));
         if (renderBlockState == null) {
             renderBlockState = Blocks.AIR.getDefaultState();
@@ -235,7 +283,8 @@ public class BuildingTool extends Item {
         GlStateManager.pushMatrix();
         GlStateManager.pushAttrib();
         GlStateManager.enableBlend();
-        GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+        //GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+
         GlStateManager.disableTexture2D();
         GlStateManager.depthMask(false);
 
@@ -295,7 +344,7 @@ public class BuildingTool extends Item {
         //Prep GL for a new render
         GlStateManager.pushMatrix();
         GlStateManager.enableBlend();
-        //GlStateManager.disableDepth();
+        //GlStateManager.depthMask(false);
 
         //Move block position to the X,Y,Z of the rendering spot, rotate and scale the block
         GlStateManager.translate(-doubleX,-doubleY,-doubleZ);
@@ -303,11 +352,12 @@ public class BuildingTool extends Item {
         GlStateManager.rotate(-90.0F, 0.0F, 1.0F, 0.0F);
         GlStateManager.scale(1.0f,1.0f,1.0f);
         GlStateManager.blendFunc(GL11.GL_ONE, GL11.GL_ONE);
+
         //Render the defined block
         blockrendererdispatcher.renderBlockBrightness(renderBlockState, 0.75f);
 
         //Cleanup GL
-        //GlStateManager.enableDepth();
+        //GlStateManager.depthMask(true);
         GlStateManager.disableBlend();
         GlStateManager.enableTexture2D();
         GlStateManager.popAttrib();
