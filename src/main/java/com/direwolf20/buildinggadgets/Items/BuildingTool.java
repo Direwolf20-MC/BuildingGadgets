@@ -4,7 +4,6 @@ import com.direwolf20.buildinggadgets.BuildingGadgets;
 import com.direwolf20.buildinggadgets.Entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.ModBlocks;
 import com.direwolf20.buildinggadgets.Tools.BuildingModes;
-import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockRendererDispatcher;
@@ -32,21 +31,19 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.opengl.GL11;
 
-import java.util.HashSet;
 import java.util.Set;
 
 
 public class BuildingTool extends Item {
 
-    public enum toolModes {BuildToMe,PerpWall,VertCol,HorzCol}
+    public enum toolModes {BuildToMe,VertWall,HorzWall,VertCol,HorzCol}
     public static toolModes mode;
     public static int range = 3;
 
     public BuildingTool() {
         setRegistryName("buildingtool");        // The unique name (within your mod) that identifies this item
         setUnlocalizedName(BuildingGadgets.MODID + ".buildingtool");     // Used for localization (en_US.lang)
-        //mode = toolModes.BuildToMe;
-        mode = toolModes.PerpWall;
+        mode = toolModes.BuildToMe;
     }
 
     @SideOnly(Side.CLIENT)
@@ -99,22 +96,22 @@ public class BuildingTool extends Item {
         ItemStack itemstack = player.getHeldItem(hand);
         player.setActiveHand(hand);
         RayTraceResult lookingAt = player.rayTrace(20, 1.0F);
-        //System.out.println(lookingAt.sideHit);
         if (!world.isRemote) {
             if (world.getBlockState(lookingAt.getBlockPos()) != Blocks.AIR.getDefaultState()) {
                 build(world, player, lookingAt.getBlockPos(),lookingAt.sideHit);
-                //world.spawnEntity(new BlockBuildEntity(world, lookingAt.getBlockPos().up(), player,Blocks.COBBLESTONE.getDefaultState()));
             }
             else {
                 if (player.isSneaking()) {
-                    if (mode == toolModes.PerpWall) {
+                    if (mode == toolModes.VertWall) {
                         mode = toolModes.BuildToMe;
                     } else if (mode == toolModes.BuildToMe) {
                         mode = toolModes.VertCol;
                     } else if (mode == toolModes.VertCol) {
                         mode = toolModes.HorzCol;
                     } else if (mode == toolModes.HorzCol) {
-                        mode = toolModes.PerpWall;
+                        mode = toolModes.HorzWall;
+                    }else if (mode == toolModes.HorzWall) {
+                        mode = toolModes.VertWall;
                     }
                 }
             }
@@ -126,9 +123,7 @@ public class BuildingTool extends Item {
     }
 
     public static boolean build(World world, EntityPlayer player, BlockPos startBlock, EnumFacing sideHit) {
-        //System.out.println(startBlock);
         Set<BlockPos> coordinates = BuildingModes.getBuildOrders(world,player,startBlock,sideHit,range,mode);
-        //System.out.println(player);
         IBlockState blockState = Blocks.AIR.getDefaultState();
         ItemStack heldItem = player.getHeldItemMainhand();
         NBTTagCompound tagCompound = heldItem.getTagCompound();
@@ -154,13 +149,11 @@ public class BuildingTool extends Item {
     @SideOnly(Side.CLIENT)
     public static void renderOverlay(RenderWorldLastEvent evt, EntityPlayer player, ItemStack buildingTool) {
         RayTraceResult lookingAt = player.rayTrace(20, 1.0F);
-        //System.out.println(player);
         if (lookingAt != null) {
             World world = player.world;
             IBlockState startBlock = world.getBlockState(lookingAt.getBlockPos());
             if ((startBlock != null) && (startBlock != Blocks.AIR.getDefaultState()) && (startBlock != ModBlocks.effectBlock.getDefaultState())) {
                 Set<BlockPos> coordinates = BuildingModes.getBuildOrders(world,player,lookingAt.getBlockPos(),lookingAt.sideHit, range, mode);
-                //System.out.println(coordinates);
                 for (BlockPos coordinate : coordinates) {
                     renderOutlines(evt, player, coordinate);
                 }
