@@ -37,7 +37,7 @@ import java.util.Set;
 
 public class BuildingTool extends Item {
 
-    private enum toolModes {BuildToMe,PerpWall}
+    private enum toolModes {BuildToMe,PerpWall,VertCol,HorzCol}
     toolModes mode;
     public int range = 3;
 
@@ -103,6 +103,19 @@ public class BuildingTool extends Item {
                 buildToMe(world, player, lookingAt.getBlockPos(),lookingAt.sideHit);
                 //world.spawnEntity(new BlockBuildEntity(world, lookingAt.getBlockPos().up(), player,Blocks.COBBLESTONE.getDefaultState()));
             }
+            else {
+                if (player.isSneaking()) {
+                    if (mode == toolModes.PerpWall) {
+                        mode = toolModes.BuildToMe;
+                    } else if (mode == toolModes.BuildToMe) {
+                        mode = toolModes.VertCol;
+                    } else if (mode == toolModes.VertCol) {
+                        mode = toolModes.HorzCol;
+                    } else if (mode == toolModes.HorzCol) {
+                        mode = toolModes.PerpWall;
+                    }
+                }
+            }
         }
         else {
 
@@ -135,37 +148,37 @@ public class BuildingTool extends Item {
         //***************************************************
         if (mode == toolModes.BuildToMe) {
             if (sideHit == EnumFacing.SOUTH) {
-                for (int i = startBlock.getZ()+1; i <= playerPos.getZ(); i++) {
+                for (int i = startBlock.getZ()+1; i <= playerPos.getZ()-1; i++) {
                     pos = new BlockPos(startBlock.getX(), startBlock.getY(), i);
                     if (isReplaceable(world,pos)) {coordinates.add(pos);}
                 }
             }
             else if (sideHit == EnumFacing.NORTH) {
-                for (int i = startBlock.getZ()-1; i >= playerPos.getZ(); i--) {
+                for (int i = startBlock.getZ()-1; i >= playerPos.getZ()+1; i--) {
                     pos = new BlockPos(startBlock.getX(), startBlock.getY(), i);
                     if (isReplaceable(world,pos)) {coordinates.add(pos);}
                 }
             }
             else if (sideHit == EnumFacing.EAST) {
-                for (int i = startBlock.getX()+1; i <= playerPos.getX(); i++) {
+                for (int i = startBlock.getX()+1; i <= playerPos.getX()-1; i++) {
                     pos = new BlockPos(i, startBlock.getY(), startBlock.getZ());
                     if (isReplaceable(world,pos)) {coordinates.add(pos);}
                 }
             }
             else if (sideHit == EnumFacing.WEST) {
-                for (int i = startBlock.getX()-1; i >= playerPos.getX(); i--) {
+                for (int i = startBlock.getX()-1; i >= playerPos.getX()+1; i--) {
                     pos = new BlockPos(i, startBlock.getY(), startBlock.getZ());
                     if (isReplaceable(world,pos)) {coordinates.add(pos);}
                 }
             }
             else if (sideHit == EnumFacing.UP) {
-                for (int i = startBlock.getY()+1; i <= playerPos.getY(); i++) {
+                for (int i = startBlock.getY()+1; i <= playerPos.getY()-1; i++) {
                     pos = new BlockPos(startBlock.getX(), i, startBlock.getZ());
                     if (isReplaceable(world,pos)) {coordinates.add(pos);}
                 }
             }
             else if (sideHit == EnumFacing.DOWN) {
-                for (int i = startBlock.getY()-1; i >= playerPos.getY(); i--) {
+                for (int i = startBlock.getY()-1; i >= playerPos.getY()+1; i--) {
                     pos = new BlockPos(startBlock.getX(), i, startBlock.getZ());
                     if (isReplaceable(world,pos)) {coordinates.add(pos);}
                 }
@@ -196,6 +209,95 @@ public class BuildingTool extends Item {
                                 coordinates.add(pos);
                             }
                         }
+                    }
+                }
+            }
+            else {
+                for (int y = bound*-1; y <= bound; y++) {
+                    for (int x = boundX * -1; x <= boundX; x++) {
+                        for (int z = boundZ * -1; z <= boundZ; z++) {
+                            pos = new BlockPos(startBlock.getX() + x, startBlock.getY() - y, startBlock.getZ() + z);
+                            if (isReplaceable(world, pos)) {
+                                coordinates.add(pos);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        //***************************************************
+        //VertCol
+        //***************************************************
+        else if (mode == toolModes.VertCol) {
+            if (sideHit == EnumFacing.UP) {
+                for (int y = 1; y <= range; y++) {
+                    pos = new BlockPos(startBlock.getX(), startBlock.getY() + y, startBlock.getZ());
+                    if (isReplaceable(world, pos)) {
+                        coordinates.add(pos);
+                    }
+                }
+            }
+            else if (sideHit == EnumFacing.DOWN) {
+                for (int y = 1; y <= range; y++) {
+                    pos = new BlockPos(startBlock.getX(), startBlock.getY() - y, startBlock.getZ());
+                    if (isReplaceable(world, pos)) {
+                        coordinates.add(pos);
+                    }
+                }
+            }
+            else {
+                for (int y = bound * -1; y <= bound; y++) {
+                    pos = new BlockPos(startBlock.getX(), startBlock.getY() - y, startBlock.getZ());
+                    if (isReplaceable(world, pos)) {
+                        coordinates.add(pos);
+                    }
+                }
+            }
+        }
+        //***************************************************
+        //HorzCol
+        //***************************************************
+        else if (mode == toolModes.HorzCol) {
+            if (sideHit == EnumFacing.UP || sideHit == EnumFacing.DOWN) {
+                sideHit = playerFacing.getOpposite();
+            }
+            if (sideHit == EnumFacing.NORTH) {
+                for (int z = 1; z <= range; z++) {
+                    pos = new BlockPos(startBlock.getX(), startBlock.getY(), startBlock.getZ()+z);
+                    if (isReplaceable(world, pos)) {
+                        coordinates.add(pos);
+                    }
+                }
+            }
+            else if (sideHit == EnumFacing.SOUTH) {
+                for (int z = 1; z <= range; z++) {
+                    pos = new BlockPos(startBlock.getX(), startBlock.getY(), startBlock.getZ()-z);
+                    if (isReplaceable(world, pos)) {
+                        coordinates.add(pos);
+                    }
+                }
+            }
+            else if (sideHit == EnumFacing.EAST) {
+                for (int x = 1; x <= range; x++) {
+                    pos = new BlockPos(startBlock.getX()-x, startBlock.getY(), startBlock.getZ());
+                    if (isReplaceable(world, pos)) {
+                        coordinates.add(pos);
+                    }
+                }
+            }
+            else if (sideHit == EnumFacing.WEST) {
+                for (int x = 1; x <= range; x++) {
+                    pos = new BlockPos(startBlock.getX()+x, startBlock.getY(), startBlock.getZ());
+                    if (isReplaceable(world, pos)) {
+                        coordinates.add(pos);
+                    }
+                }
+            }
+            else {
+                for (int y = bound * -1; y <= bound; y++) {
+                    pos = new BlockPos(startBlock.getX(), startBlock.getY() - y, startBlock.getZ());
+                    if (isReplaceable(world, pos)) {
+                        coordinates.add(pos);
                     }
                 }
             }
@@ -283,7 +385,7 @@ public class BuildingTool extends Item {
         GlStateManager.pushMatrix();
         GlStateManager.pushAttrib();
         GlStateManager.enableBlend();
-        //GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+        GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
         GlStateManager.disableTexture2D();
         GlStateManager.depthMask(false);
@@ -344,6 +446,7 @@ public class BuildingTool extends Item {
         //Prep GL for a new render
         GlStateManager.pushMatrix();
         GlStateManager.enableBlend();
+        //GlStateManager.disableDepth();
         //GlStateManager.depthMask(false);
 
         //Move block position to the X,Y,Z of the rendering spot, rotate and scale the block
@@ -359,6 +462,7 @@ public class BuildingTool extends Item {
         //Cleanup GL
         //GlStateManager.depthMask(true);
         GlStateManager.disableBlend();
+        //GlStateManager.enableDepth();
         GlStateManager.enableTexture2D();
         GlStateManager.popAttrib();
         GlStateManager.popMatrix();
