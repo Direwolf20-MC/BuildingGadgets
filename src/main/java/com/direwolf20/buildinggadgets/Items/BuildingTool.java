@@ -12,6 +12,7 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
@@ -24,6 +25,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.client.model.ModelLoader;
@@ -31,6 +33,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.opengl.GL11;
 
+import java.util.List;
 import java.util.Set;
 
 
@@ -49,6 +52,36 @@ public class BuildingTool extends Item {
     @SideOnly(Side.CLIENT)
     public void initModel() {
         ModelLoader.setCustomModelResourceLocation(this, 0, new ModelResourceLocation(getRegistryName(), "inventory"));
+    }
+
+    @Override
+    public void addInformation(ItemStack stack, World player, List<String> list, ITooltipFlag b) {
+        super.addInformation(stack, player, list, b);
+        IBlockState renderBlockState = Blocks.AIR.getDefaultState();
+        NBTTagCompound tagCompound = stack.getTagCompound();
+        if (tagCompound == null){
+            tagCompound = new NBTTagCompound();
+            stack.setTagCompound(tagCompound);
+        }
+        renderBlockState = NBTUtil.readBlockState(tagCompound.getCompoundTag("blockstate"));
+        if (tagCompound != null) {
+            list.add(TextFormatting.DARK_GREEN + "Block: " + renderBlockState.getBlock().getLocalizedName());
+            list.add(TextFormatting.AQUA + "Mode: " + mode);
+        }
+            /*int mode = compound.getInteger("mode");
+            if (mode == MODE_9ROW || mode == MODE_25ROW) {
+                int submode = getSubMode(stack);
+                list.add(TextFormatting.GREEN + "Mode: " + descriptions[mode] + (submode == 1 ? " [Rotated]" : ""));
+            } else {
+                list.add(TextFormatting.GREEN + "Mode: " + descriptions[mode]);
+            }
+        }
+        list.add("Right click to extend blocks in that direction.");
+        list.add("Sneak right click on such a block to undo one of");
+        list.add("the last two operations.");
+
+        showModeKeyDescription(list, "switch mode");
+        showSubModeKeyDescription(list, "change orientation");*/
     }
 
     @Override
