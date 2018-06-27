@@ -57,13 +57,14 @@ public class BuildingTool extends Item {
     @Override
     public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
         ItemStack stack = player.getHeldItem(hand);
-        if (!world.isRemote) {
-            if (player.isSneaking()) {
-                selectBlock(stack, player, world, pos);
-            } else {
-                build(world, player, pos,side);
+        player.setActiveHand(hand);
+            if (!world.isRemote) {
+                if (player.isSneaking()) {
+                    selectBlock(stack, player, world, pos);
+                } else {
+                    build(world, player, pos, side);
+                }
             }
-        }
         return EnumActionResult.SUCCESS;
     }
 
@@ -124,10 +125,10 @@ public class BuildingTool extends Item {
         return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, itemstack);
     }
 
-
-
     public static boolean build(World world, EntityPlayer player, BlockPos startBlock, EnumFacing sideHit) {
+        //System.out.println(startBlock);
         Set<BlockPos> coordinates = BuildingModes.getBuildOrders(world,player,startBlock,sideHit,range,mode);
+        //System.out.println(player);
         IBlockState blockState = Blocks.AIR.getDefaultState();
         ItemStack heldItem = player.getHeldItemMainhand();
         NBTTagCompound tagCompound = heldItem.getTagCompound();
@@ -140,9 +141,7 @@ public class BuildingTool extends Item {
     }
 
     public static boolean placeBlock(World world, EntityPlayer player, BlockPos pos, IBlockState setBlock) {
-        if (world.getBlockState(pos).getBlock().isReplaceable(world,pos)) {
-            world.spawnEntity(new BlockBuildEntity(world, pos, player, setBlock,false));
-        }
+        world.spawnEntity(new BlockBuildEntity(world, pos, player, setBlock,false));
         return true;
     }
 
@@ -155,11 +154,13 @@ public class BuildingTool extends Item {
     @SideOnly(Side.CLIENT)
     public static void renderOverlay(RenderWorldLastEvent evt, EntityPlayer player, ItemStack buildingTool) {
         RayTraceResult lookingAt = player.rayTrace(20, 1.0F);
+        //System.out.println(player);
         if (lookingAt != null) {
             World world = player.world;
             IBlockState startBlock = world.getBlockState(lookingAt.getBlockPos());
             if ((startBlock != null) && (startBlock != Blocks.AIR.getDefaultState()) && (startBlock != ModBlocks.effectBlock.getDefaultState())) {
                 Set<BlockPos> coordinates = BuildingModes.getBuildOrders(world,player,lookingAt.getBlockPos(),lookingAt.sideHit, range, mode);
+                //System.out.println(coordinates);
                 for (BlockPos coordinate : coordinates) {
                     renderOutlines(evt, player, coordinate);
                 }

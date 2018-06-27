@@ -16,8 +16,10 @@ public class BuildingModes {
     }
 
     public static Set<BlockPos> getBuildOrders(World world, EntityPlayer player, BlockPos startBlock, EnumFacing sideHit, int range, BuildingTool.toolModes mode) {
+
         Set<BlockPos> coordinates = new HashSet<>();
-        BlockPos playerPos = player.getPosition();
+        BlockPos playerPos = new BlockPos (Math.floor(player.posX),Math.floor(player.posY),Math.floor(player.posZ));
+        //System.out.println(player.posX);
         BlockPos pos = startBlock;
         int bound = (range-1)/2;
         EnumFacing playerFacing = player.getHorizontalFacing();
@@ -49,6 +51,7 @@ public class BuildingModes {
             else if (sideHit == EnumFacing.EAST) {
                 for (int i = startBlock.getX()+1; i <= playerPos.getX()-1; i++) {
                     pos = new BlockPos(i, startBlock.getY(), startBlock.getZ());
+                    //System.out.println("i: "+i+"....Pos: " + pos);
                     if (isReplaceable(world,pos)) {coordinates.add(pos);}
                 }
             }
