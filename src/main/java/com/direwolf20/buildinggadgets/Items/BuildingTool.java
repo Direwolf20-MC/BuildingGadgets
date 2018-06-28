@@ -191,17 +191,29 @@ public class BuildingTool extends Item {
     @SideOnly(Side.CLIENT)
     public static void renderOverlay(RenderWorldLastEvent evt, EntityPlayer player, ItemStack buildingTool) {
         RayTraceResult lookingAt = player.rayTrace(20, 1.0F);
+        IBlockState state = Blocks.AIR.getDefaultState();
         if (lookingAt != null) {
             World world = player.world;
             IBlockState startBlock = world.getBlockState(lookingAt.getBlockPos());
             if ((startBlock != null) && (startBlock != Blocks.AIR.getDefaultState()) && (startBlock != ModBlocks.effectBlock.getDefaultState())) {
+                IBlockState renderBlockState = Blocks.AIR.getDefaultState();
+                ItemStack heldItem = player.getHeldItemMainhand();
+                NBTTagCompound tagCompound = heldItem.getTagCompound();
+                if (tagCompound == null){
+                    tagCompound = new NBTTagCompound();
+                    heldItem.setTagCompound(tagCompound);
+                }
+                renderBlockState = NBTUtil.readBlockState(tagCompound.getCompoundTag("blockstate"));
+                if (renderBlockState == null) {
+                    renderBlockState = Blocks.AIR.getDefaultState();
+                }
                 Set<BlockPos> coordinates = BuildingModes.getBuildOrders(world,player,lookingAt.getBlockPos(),lookingAt.sideHit, range, mode);
                 //Minecraft mc = Minecraft.getMinecraft();
                 //mc.renderEngine.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
                 Tessellator tessellator = Tessellator.getInstance();
                 BlockRendererDispatcher dispatcher = Minecraft.getMinecraft().getBlockRendererDispatcher();
                 BlockRenderLayer origLayer = MinecraftForgeClient.getRenderLayer();
-                fakeWorld.setWorldAndState(player.world,Blocks.COBBLESTONE.getDefaultState(),coordinates);
+                fakeWorld.setWorldAndState(player.world,renderBlockState,coordinates);
 
                 double doubleX = player.lastTickPosX + (player.posX - player.lastTickPosX) * evt.getPartialTicks();
                 double doubleY = player.lastTickPosY + (player.posY - player.lastTickPosY) * evt.getPartialTicks();
@@ -213,43 +225,37 @@ public class BuildingTool extends Item {
 
 
                 for (BlockRenderLayer layer : LAYERS) {
+
                     ForgeHooksClient.setRenderLayer(layer);
+                    //System.out.println(layer);
 
+                        for (BlockPos coordinate : coordinates) {
+                            GlStateManager.pushMatrix();
+                            GlStateManager.translate(-doubleX, -doubleY, -doubleZ);
+                            //GlStateManager.translate(0,0,0);
+                            GlStateManager.translate(coordinate.getX(), coordinate.getY(), coordinate.getZ());
+                            GlStateManager.rotate(-90.0F, 0.0F, 1.0F, 0.0F);
+                            GlStateManager.scale(1.0f, 1.0f, 1.0f);
+                            GL14.glBlendColor(1F, 1F, 1F, 0.2f);
+                            if (fakeWorld.getWorldType() != WorldType.DEBUG_ALL_BLOCK_STATES) {
+                                try {
+                                    state = renderBlockState.getActualState(fakeWorld, coordinate);
+                                } catch (Exception var8) {
+                                }
+                            }
 
-                    for (BlockPos coordinate : coordinates) {
-                        GlStateManager.pushMatrix();
-                        GlStateManager.translate(-doubleX,-doubleY,-doubleZ);
-                        //GlStateManager.translate(0,0,0);
-                        GlStateManager.translate(coordinate.getX(),coordinate.getY(),coordinate.getZ());
-                        GlStateManager.rotate(-90.0F, 0.0F, 1.0F, 0.0F);
-                        GlStateManager.scale(1.0f,1.0f,1.0f);
-                        GL14.glBlendColor(1F, 1F, 1F, 0.2f);
-
-                        IBlockState renderBlockState = Blocks.AIR.getDefaultState();
-                        ItemStack heldItem = player.getHeldItemMainhand();
-                        NBTTagCompound tagCompound = heldItem.getTagCompound();
-                        if (tagCompound == null){
-                            tagCompound = new NBTTagCompound();
-                            heldItem.setTagCompound(tagCompound);
+                            state = state.getBlock().getExtendedState(state, fakeWorld, coordinate);
+                            //Render the defined block
+//System.out.println(state);
+                            dispatcher.renderBlockBrightness(state, 1f);
+                            GlStateManager.popMatrix();
+                            //tessellator.getBuffer().begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
+                            //tessellator.getBuffer().setTranslation(-doubleX,-doubleY,-doubleZ);
+                            //renderOutlines2(dispatcher, Blocks.COBBLESTONE.getDefaultState(), coordinate, fakeWorld, tessellator.getBuffer());
+                            //tessellator.draw();
+                            //renderOutlines(evt, player, coordinate);
                         }
-                        renderBlockState = NBTUtil.readBlockState(tagCompound.getCompoundTag("blockstate"));
-                        if (renderBlockState == null) {
-                            renderBlockState = Blocks.AIR.getDefaultState();
-                        }
 
-                        //Render the defined block
-
-                        dispatcher.renderBlockBrightness(renderBlockState, 1f);
-                        GlStateManager.popMatrix();
-                        //tessellator.getBuffer().begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
-                        //tessellator.getBuffer().setTranslation(-doubleX,-doubleY,-doubleZ);
-                        //renderOutlines2(dispatcher, Blocks.COBBLESTONE.getDefaultState(), coordinate, fakeWorld, tessellator.getBuffer());
-                        //tessellator.draw();
-                        //renderOutlines(evt, player, coordinate);
-                    }
-                    if (layer == BlockRenderLayer.TRANSLUCENT) {
-                        GlStateManager.disableBlend();
-                    }
                 }
                 GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
                 ForgeHooksClient.setRenderLayer(origLayer);
