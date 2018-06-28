@@ -198,7 +198,7 @@ public class BuildingTool extends Item {
                 Set<BlockPos> coordinates = BuildingModes.getBuildOrders(world,player,lookingAt.getBlockPos(),lookingAt.sideHit, range, mode);
                 Minecraft mc = Minecraft.getMinecraft();
                 GlStateManager.pushMatrix();
-                RenderHelper.disableStandardItemLighting();
+                //RenderHelper.disableStandardItemLighting();
                 mc.renderEngine.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
                 Tessellator tessellator = Tessellator.getInstance();
                 BlockRendererDispatcher dispatcher = Minecraft.getMinecraft().getBlockRendererDispatcher();
@@ -208,30 +208,36 @@ public class BuildingTool extends Item {
                 double doubleX = player.lastTickPosX + (player.posX - player.lastTickPosX) * evt.getPartialTicks();
                 double doubleY = player.lastTickPosY + (player.posY - player.lastTickPosY) * evt.getPartialTicks();
                 double doubleZ = player.lastTickPosZ + (player.posZ - player.lastTickPosZ) * evt.getPartialTicks();
-                GlStateManager.enableBlend();
-                GlStateManager.blendFunc(GL11.GL_ONE, GL11.GL_ONE_MINUS_CONSTANT_ALPHA);
-                GL14.glBlendColor(1F, 1F, 1F, 0.7f);
 
+                GlStateManager.pushMatrix();
+                GlStateManager.enableBlend();
+                GlStateManager.blendFunc(GL11.GL_CONSTANT_ALPHA, GL11.GL_ONE_MINUS_CONSTANT_ALPHA);
+                GL14.glBlendColor(1F, 1F, 1F, 0.5f);
+                GlStateManager.translate(-doubleX,-doubleY,-doubleZ);
                 for (BlockRenderLayer layer : LAYERS) {
                     ForgeHooksClient.setRenderLayer(layer);
 
-                    if (layer == BlockRenderLayer.TRANSLUCENT) {
-                        GlStateManager.enableBlend();
-                    }
 
                     for (BlockPos coordinate : coordinates) {
-                        tessellator.getBuffer().begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
-                        tessellator.getBuffer().setTranslation(-doubleX,-doubleY,-doubleZ);
-                        renderOutlines2(dispatcher, Blocks.COBBLESTONE.getDefaultState(), coordinate, fakeWorld, tessellator.getBuffer());
-                        tessellator.draw();
+
+                        GlStateManager.translate(coordinate.getX(),coordinate.getY(),coordinate.getZ());
+                        GlStateManager.rotate(-90.0F, 0.0F, 1.0F, 0.0F);
+                        GlStateManager.scale(1.0f,1.0f,1.0f);
+
+                        //Render the defined block
+                        dispatcher.renderBlockBrightness(Blocks.COBBLESTONE.getDefaultState(), 1f);
+                        //tessellator.getBuffer().begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
+                        //tessellator.getBuffer().setTranslation(-doubleX,-doubleY,-doubleZ);
+                        //renderOutlines2(dispatcher, Blocks.COBBLESTONE.getDefaultState(), coordinate, fakeWorld, tessellator.getBuffer());
+                        //tessellator.draw();
                         //renderOutlines(evt, player, coordinate);
                     }
                     if (layer == BlockRenderLayer.TRANSLUCENT) {
                         GlStateManager.disableBlend();
                     }
                 }
+                GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
                 ForgeHooksClient.setRenderLayer(origLayer);
-                tessellator.getBuffer().setTranslation(0, 0, 0);
                 GlStateManager.disableBlend();
                 RenderHelper.enableStandardItemLighting();
                 GlStateManager.popMatrix();
@@ -257,7 +263,6 @@ public class BuildingTool extends Item {
                     case MODEL:
                         IBakedModel model = dispatcher.getModelForState(state);
                         state = state.getBlock().getExtendedState(state, blockAccess, pos);
-
                         return dispatcher.getBlockModelRenderer().renderModel(blockAccess, model, state, pos, worldRendererIn, false);
                     case ENTITYBLOCK_ANIMATED:
                         return false;
@@ -391,9 +396,6 @@ public class BuildingTool extends Item {
         //GL14.glBlendFuncSeparate(GL11.GL_ONE,GL11.GL_ONE,GL11.GL_ONE, GL11.GL_ONE);
         GlStateManager.blendFunc(GL11.GL_CONSTANT_ALPHA, GL11.GL_ONE_MINUS_CONSTANT_ALPHA);
         GL14.glBlendColor(1F, 1F, 1F, 0.7f);
-
-        //GlStateManager.blendFunc(GL11.GL_ONE, GL11.GL_ONE);
-
 
         //Render the defined block
         blockrendererdispatcher.renderBlockBrightness(renderBlockState, 1f);
