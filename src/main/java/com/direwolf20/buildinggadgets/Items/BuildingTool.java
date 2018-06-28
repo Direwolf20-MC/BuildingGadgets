@@ -7,13 +7,8 @@ import com.direwolf20.buildinggadgets.Tools.BuildingModes;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.*;
-import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
-import net.minecraft.client.renderer.texture.TextureMap;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.crash.CrashReport;
-import net.minecraft.crash.CrashReportCategory;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
@@ -24,7 +19,6 @@ import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.text.TextFormatting;
-import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldType;
 import net.minecraftforge.client.ForgeHooksClient;
@@ -272,173 +266,5 @@ public class BuildingTool extends Item {
             }
         }
     }
-/*
-    protected static boolean renderOutlines2(BlockRendererDispatcher dispatcher, IBlockState state, BlockPos pos, IBlockAccess blockAccess, BufferBuilder worldRendererIn) {
-        try {
-            EnumBlockRenderType enumblockrendertype = state.getRenderType();
-
-            if (enumblockrendertype == EnumBlockRenderType.INVISIBLE) {
-                return false;
-            } else {
-                if (blockAccess.getWorldType() != WorldType.DEBUG_ALL_BLOCK_STATES) {
-                    try {
-                        state = state.getActualState(blockAccess, pos);
-                    } catch (Exception var8) {
-                    }
-                }
-
-                switch (enumblockrendertype) {
-                    case MODEL:
-                        IBakedModel model = dispatcher.getModelForState(state);
-                        state = state.getBlock().getExtendedState(state, blockAccess, pos);
-                        return dispatcher.getBlockModelRenderer().renderModel(blockAccess, model, state, pos, worldRendererIn, false);
-                    case ENTITYBLOCK_ANIMATED:
-                        return false;
-                    default:
-                        return false;
-                }
-            }
-        } catch (Throwable throwable) {
-            CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Tesselating block in world");
-            CrashReportCategory crashreportcategory = crashreport.makeCategory("Block being tesselated");
-            CrashReportCategory.addBlockInfo(crashreportcategory, pos, state.getBlock(), state.getBlock().getMetaFromState(state));
-            throw new ReportedException(crashreport);
-        }
-    }
-
-    protected static void renderOutlines(RenderWorldLastEvent evt, EntityPlayer p, BlockPos pos) {
-
-
-        BlockRendererDispatcher blockrendererdispatcher = Minecraft.getMinecraft().getBlockRendererDispatcher();
-
-        //Get player position, since the render starts at player position
-        double doubleX = p.lastTickPosX + (p.posX - p.lastTickPosX) * evt.getPartialTicks();
-        double doubleY = p.lastTickPosY + (p.posY - p.lastTickPosY) * evt.getPartialTicks();
-        double doubleZ = p.lastTickPosZ + (p.posZ - p.lastTickPosZ) * evt.getPartialTicks();
-
-        //Define the values for the GL Cube we're about to render
-        double minX = pos.getX();
-        double minY = pos.getY();
-        double minZ = pos.getZ();
-        double maxX = pos.getX()+1;
-        double maxY = pos.getY()+1;
-        double maxZ = pos.getZ()+1;
-        float red = 0f;
-        float green = 0f;
-        float blue = 0f;
-        float alpha = 0.5f;
-
-
-        //Prep GL for rendering fancy stuff
-        GlStateManager.pushMatrix();
-        GlStateManager.pushAttrib();
-        GlStateManager.enableBlend();
-        GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-
-        GlStateManager.disableTexture2D();
-        GlStateManager.depthMask(false);
-
-        //Move the render from player position to 0,0,0
-        GlStateManager.translate(-doubleX,-doubleY,-doubleZ);
-
-        //Prepare to render a GL cube
-        Tessellator t = Tessellator.getInstance();
-        BufferBuilder bufferBuilder = t.getBuffer();
-        bufferBuilder.begin(7, DefaultVertexFormats.POSITION_COLOR);
-
-        //Define GL Cube points and render them with t.Draw()
-        //down
-        bufferBuilder.pos(minX, minY, minZ).color(red, green, blue, alpha).endVertex();
-        bufferBuilder.pos(maxX, minY, minZ).color(red, green, blue, alpha).endVertex();
-        bufferBuilder.pos(maxX, minY, maxZ).color(red, green, blue, alpha).endVertex();
-        bufferBuilder.pos(minX, minY, maxZ).color(red, green, blue, alpha).endVertex();
-
-        //up
-        bufferBuilder.pos(minX, maxY, minZ).color(red, green, blue, alpha).endVertex();
-        bufferBuilder.pos(minX, maxY, maxZ).color(red, green, blue, alpha).endVertex();
-        bufferBuilder.pos(maxX, maxY, maxZ).color(red, green, blue, alpha).endVertex();
-        bufferBuilder.pos(maxX, maxY, minZ).color(red, green, blue, alpha).endVertex();
-
-        //north
-        bufferBuilder.pos(minX, minY, minZ).color(red, green, blue, alpha).endVertex();
-        bufferBuilder.pos(minX, maxY, minZ).color(red, green, blue, alpha).endVertex();
-        bufferBuilder.pos(maxX, maxY, minZ).color(red, green, blue, alpha).endVertex();
-        bufferBuilder.pos(maxX, minY, minZ).color(red, green, blue, alpha).endVertex();
-
-        //south
-        bufferBuilder.pos(minX, minY, maxZ).color(red, green, blue, alpha).endVertex();
-        bufferBuilder.pos(maxX, minY, maxZ).color(red, green, blue, alpha).endVertex();
-        bufferBuilder.pos(maxX, maxY, maxZ).color(red, green, blue, alpha).endVertex();
-        bufferBuilder.pos(minX, maxY, maxZ).color(red, green, blue, alpha).endVertex();
-
-        //east
-        bufferBuilder.pos(maxX, minY, minZ).color(red, green, blue, alpha).endVertex();
-        bufferBuilder.pos(maxX, maxY, minZ).color(red, green, blue, alpha).endVertex();
-        bufferBuilder.pos(maxX, maxY, maxZ).color(red, green, blue, alpha).endVertex();
-        bufferBuilder.pos(maxX, minY, maxZ).color(red, green, blue, alpha).endVertex();
-
-        //west
-        bufferBuilder.pos(minX, minY, minZ).color(red, green, blue, alpha).endVertex();
-        bufferBuilder.pos(minX, minY, maxZ).color(red, green, blue, alpha).endVertex();
-        bufferBuilder.pos(minX, maxY, maxZ).color(red, green, blue, alpha).endVertex();
-        bufferBuilder.pos(minX, maxY, minZ).color(red, green, blue, alpha).endVertex();
-        t.draw();
-
-        //Set GL state back to the way it was
-        GlStateManager.disableBlend();
-        GlStateManager.enableTexture2D();
-        GlStateManager.depthMask(true);
-        //GlStateManager.popAttrib();
-        GlStateManager.popMatrix();
-
-        //Get Block to be rendered from the tool's data
-        IBlockState renderBlockState = Blocks.AIR.getDefaultState();
-        ItemStack heldItem = p.getHeldItemMainhand();
-        NBTTagCompound tagCompound = heldItem.getTagCompound();
-        if (tagCompound == null){
-            tagCompound = new NBTTagCompound();
-            heldItem.setTagCompound(tagCompound);
-        }
-        renderBlockState = NBTUtil.readBlockState(tagCompound.getCompoundTag("blockstate"));
-        if (renderBlockState == null) {
-            renderBlockState = Blocks.AIR.getDefaultState();
-        }
-
-        //Prep GL for a new render
-        GlStateManager.pushMatrix();
-        GlStateManager.enableBlend();
-
-        //GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.ONE,GlStateManager.DestFactor.ONE,GlStateManager.SourceFactor.CONSTANT_ALPHA,GlStateManager.DestFactor.ONE_MINUS_CONSTANT_ALPHA);
-        //GlStateManager.disableDepth();
-        //GlStateManager.disableLighting();
-        //GlStateManager.disableDepth();
-        //GlStateManager.depthMask(false);
-
-        //Move block position to the X,Y,Z of the rendering spot, rotate and scale the block
-        GlStateManager.translate(-doubleX,-doubleY,-doubleZ);
-        GlStateManager.translate(pos.getX(),pos.getY(),pos.getZ());
-        GlStateManager.rotate(-90.0F, 0.0F, 1.0F, 0.0F);
-        GlStateManager.scale(1.0f,1.0f,1.0f);
-
-        //GlStateManager.color(1F, 1F, 1F, 1F);
-        //GL14.glBlendFuncSeparate(GL11.GL_ONE,GL11.GL_ONE,GL11.GL_ONE, GL11.GL_ONE);
-        GlStateManager.blendFunc(GL11.GL_CONSTANT_ALPHA, GL11.GL_ONE_MINUS_CONSTANT_ALPHA);
-        GL14.glBlendColor(1F, 1F, 1F, 0.7f);
-
-        //Render the defined block
-        blockrendererdispatcher.renderBlockBrightness(renderBlockState, 1f);
-
-        //Cleanup GL
-        //GlStateManager.depthMask(true);
-        GlStateManager.disableBlend();
-        //GlStateManager.enableDepth();
-        //GlStateManager.enableLighting();
-        GlStateManager.enableTexture2D();
-        GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-        GlStateManager.popAttrib();
-        GlStateManager.popMatrix();
-
-    }
-*/
 
 }
