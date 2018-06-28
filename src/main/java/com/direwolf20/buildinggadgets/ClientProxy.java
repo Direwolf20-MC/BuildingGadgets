@@ -14,8 +14,10 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
@@ -31,6 +33,13 @@ public class ClientProxy extends CommonProxy {
         //MinecraftForge.EVENT_BUS.register(new TextureStitcher());
         ModEntities.initModels();
         super.preInit(e);
+    }
+
+    @Override
+    public void init(FMLInitializationEvent e) {
+        super.init(e);
+        MinecraftForge.EVENT_BUS.register(new KeyInputHandler());
+        KeyBindings.init();
     }
 
     @SubscribeEvent
