@@ -6,32 +6,35 @@ import com.direwolf20.buildinggadgets.ModBlocks;
 import com.direwolf20.buildinggadgets.Tools.BuildingModes;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.BlockRendererDispatcher;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.*;
+import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.crash.CrashReport;
+import net.minecraft.crash.CrashReportCategory;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTUtil;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldType;
+import net.minecraftforge.client.ForgeHooksClient;
+import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL14;
 
 import java.util.List;
 import java.util.Set;
@@ -39,14 +42,18 @@ import java.util.Set;
 
 public class BuildingTool extends Item {
 
+    private static final BlockRenderLayer[] LAYERS = BlockRenderLayer.values();
+    private static final FakeBuilderWorld fakeWorld = new FakeBuilderWorld();
+
     public enum toolModes {BuildToMe,VertWall,HorzWall,VertCol,HorzCol}
     public static toolModes mode;
-    public static int range = 3;
+    public static int range;
 
     public BuildingTool() {
         setRegistryName("buildingtool");        // The unique name (within your mod) that identifies this item
         setUnlocalizedName(BuildingGadgets.MODID + ".buildingtool");     // Used for localization (en_US.lang)
         mode = toolModes.BuildToMe;
+        range = 1;
     }
 
     @SideOnly(Side.CLIENT)
@@ -62,27 +69,18 @@ public class BuildingTool extends Item {
         if (tagCompound == null){
             tagCompound = new NBTTagCompound();
             stack.setTagCompound(tagCompound);
+            tagCompound.setString("mode", mode.name());
+            tagCompound.setInteger("range", range);
+            stack.setTagCompound(tagCompound);
         }
+        tagCompound = stack.getTagCompound();
         renderBlockState = NBTUtil.readBlockState(tagCompound.getCompoundTag("blockstate"));
-        if (tagCompound != null) {
-            list.add(TextFormatting.DARK_GREEN + "Block: " + renderBlockState.getBlock().getLocalizedName());
-            list.add(TextFormatting.AQUA + "Mode: " + mode);
-            list.add(TextFormatting.RED + "Range: " + range);
-        }
-            /*int mode = compound.getInteger("mode");
-            if (mode == MODE_9ROW || mode == MODE_25ROW) {
-                int submode = getSubMode(stack);
-                list.add(TextFormatting.GREEN + "Mode: " + descriptions[mode] + (submode == 1 ? " [Rotated]" : ""));
-            } else {
-                list.add(TextFormatting.GREEN + "Mode: " + descriptions[mode]);
-            }
-        }
-        list.add("Right click to extend blocks in that direction.");
-        list.add("Sneak right click on such a block to undo one of");
-        list.add("the last two operations.");
+        //mode = toolModes.valueOf(tagCompound.getString("mode"));
+        //range = tagCompound.getInteger("range");
+        list.add(TextFormatting.DARK_GREEN + "Block: " + renderBlockState.getBlock().getLocalizedName());
+        list.add(TextFormatting.AQUA + "Mode: " + mode);
+        list.add(TextFormatting.RED + "Range: " + range);
 
-        showModeKeyDescription(list, "switch mode");
-        showSubModeKeyDescription(list, "change orientation");*/
     }
 
     @Override
@@ -103,7 +101,6 @@ public class BuildingTool extends Item {
         IBlockState state = world.getBlockState(pos);
 
         if (state != null) {
-            //Block block = state.getBlock();
             NBTTagCompound tagCompound = stack.getTagCompound();
             if (tagCompound == null){
                 tagCompound = new NBTTagCompound();
@@ -111,14 +108,6 @@ public class BuildingTool extends Item {
             }
             NBTTagCompound stateTag = new NBTTagCompound();
             NBTUtil.writeBlockState(stateTag, state);
-            //ItemStack item = block.getPickBlock(state, null, world, pos, player);
-            //int meta = item.getMetadata();
-            //NBTTagCompound tagCompound = Tools.getTagCompound(stack);
-            //String name = item.getDisplayName();
-            //if (name == null) {
-
-            //} else {
-            //int id = Block.REGISTRY.getIDForObject(block);
             tagCompound.setTag("blockstate", stateTag);
             //Tools.notify(player, "Selected block: " + name);
             //}
@@ -158,6 +147,9 @@ public class BuildingTool extends Item {
         }else if (mode == toolModes.HorzWall) {
             mode = toolModes.VertWall;
         }
+        NBTTagCompound tagCompound = heldItem.getTagCompound();
+        tagCompound.setString("mode", mode.name());
+        heldItem.setTagCompound(tagCompound);
     }
 
     public static void rangeChange(EntityPlayer player, ItemStack heldItem) {
@@ -167,7 +159,9 @@ public class BuildingTool extends Item {
         else {
             range++;
         }
-
+        NBTTagCompound tagCompound = heldItem.getTagCompound();
+        tagCompound.setInteger("range", range);
+        heldItem.setTagCompound(tagCompound);
     }
 
     public static boolean build(World world, EntityPlayer player, BlockPos startBlock, EnumFacing sideHit) {
@@ -202,10 +196,80 @@ public class BuildingTool extends Item {
             IBlockState startBlock = world.getBlockState(lookingAt.getBlockPos());
             if ((startBlock != null) && (startBlock != Blocks.AIR.getDefaultState()) && (startBlock != ModBlocks.effectBlock.getDefaultState())) {
                 Set<BlockPos> coordinates = BuildingModes.getBuildOrders(world,player,lookingAt.getBlockPos(),lookingAt.sideHit, range, mode);
-                for (BlockPos coordinate : coordinates) {
-                    renderOutlines(evt, player, coordinate);
+                Minecraft mc = Minecraft.getMinecraft();
+                GlStateManager.pushMatrix();
+                RenderHelper.disableStandardItemLighting();
+                mc.renderEngine.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+                Tessellator tessellator = Tessellator.getInstance();
+                BlockRendererDispatcher dispatcher = Minecraft.getMinecraft().getBlockRendererDispatcher();
+                BlockRenderLayer origLayer = MinecraftForgeClient.getRenderLayer();
+                fakeWorld.setWorldAndState(player.world,Blocks.COBBLESTONE.getDefaultState(),coordinates);
+
+                double doubleX = player.lastTickPosX + (player.posX - player.lastTickPosX) * evt.getPartialTicks();
+                double doubleY = player.lastTickPosY + (player.posY - player.lastTickPosY) * evt.getPartialTicks();
+                double doubleZ = player.lastTickPosZ + (player.posZ - player.lastTickPosZ) * evt.getPartialTicks();
+                GlStateManager.enableBlend();
+                GlStateManager.blendFunc(GL11.GL_ONE, GL11.GL_ONE_MINUS_CONSTANT_ALPHA);
+                GL14.glBlendColor(1F, 1F, 1F, 0.7f);
+
+                for (BlockRenderLayer layer : LAYERS) {
+                    ForgeHooksClient.setRenderLayer(layer);
+
+                    if (layer == BlockRenderLayer.TRANSLUCENT) {
+                        GlStateManager.enableBlend();
+                    }
+
+                    for (BlockPos coordinate : coordinates) {
+                        tessellator.getBuffer().begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
+                        tessellator.getBuffer().setTranslation(-doubleX,-doubleY,-doubleZ);
+                        renderOutlines2(dispatcher, Blocks.COBBLESTONE.getDefaultState(), coordinate, fakeWorld, tessellator.getBuffer());
+                        tessellator.draw();
+                        //renderOutlines(evt, player, coordinate);
+                    }
+                    if (layer == BlockRenderLayer.TRANSLUCENT) {
+                        GlStateManager.disableBlend();
+                    }
+                }
+                ForgeHooksClient.setRenderLayer(origLayer);
+                tessellator.getBuffer().setTranslation(0, 0, 0);
+                GlStateManager.disableBlend();
+                RenderHelper.enableStandardItemLighting();
+                GlStateManager.popMatrix();
+            }
+        }
+    }
+
+    protected static boolean renderOutlines2(BlockRendererDispatcher dispatcher, IBlockState state, BlockPos pos, IBlockAccess blockAccess, BufferBuilder worldRendererIn) {
+        try {
+            EnumBlockRenderType enumblockrendertype = state.getRenderType();
+
+            if (enumblockrendertype == EnumBlockRenderType.INVISIBLE) {
+                return false;
+            } else {
+                if (blockAccess.getWorldType() != WorldType.DEBUG_ALL_BLOCK_STATES) {
+                    try {
+                        state = state.getActualState(blockAccess, pos);
+                    } catch (Exception var8) {
+                    }
+                }
+
+                switch (enumblockrendertype) {
+                    case MODEL:
+                        IBakedModel model = dispatcher.getModelForState(state);
+                        state = state.getBlock().getExtendedState(state, blockAccess, pos);
+
+                        return dispatcher.getBlockModelRenderer().renderModel(blockAccess, model, state, pos, worldRendererIn, false);
+                    case ENTITYBLOCK_ANIMATED:
+                        return false;
+                    default:
+                        return false;
                 }
             }
+        } catch (Throwable throwable) {
+            CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Tesselating block in world");
+            CrashReportCategory crashreportcategory = crashreport.makeCategory("Block being tesselated");
+            CrashReportCategory.addBlockInfo(crashreportcategory, pos, state.getBlock(), state.getBlock().getMetaFromState(state));
+            throw new ReportedException(crashreport);
         }
     }
 
@@ -213,11 +277,12 @@ public class BuildingTool extends Item {
 
 
         BlockRendererDispatcher blockrendererdispatcher = Minecraft.getMinecraft().getBlockRendererDispatcher();
+
         //Get player position, since the render starts at player position
         double doubleX = p.lastTickPosX + (p.posX - p.lastTickPosX) * evt.getPartialTicks();
         double doubleY = p.lastTickPosY + (p.posY - p.lastTickPosY) * evt.getPartialTicks();
         double doubleZ = p.lastTickPosZ + (p.posZ - p.lastTickPosZ) * evt.getPartialTicks();
-
+/*
         //Define the values for the GL Cube we're about to render
         double minX = pos.getX();
         double minY = pos.getY();
@@ -230,19 +295,6 @@ public class BuildingTool extends Item {
         float blue = 0f;
         float alpha = 0.5f;
 
-        //Temporarily render just lapis, will eventually render tool selection
-        //IBlockState renderBlockState = Blocks.LAPIS_BLOCK.getDefaultState();
-        IBlockState renderBlockState = Blocks.AIR.getDefaultState();
-        ItemStack heldItem = p.getHeldItemMainhand();
-        NBTTagCompound tagCompound = heldItem.getTagCompound();
-        if (tagCompound == null){
-            tagCompound = new NBTTagCompound();
-            heldItem.setTagCompound(tagCompound);
-        }
-        renderBlockState = NBTUtil.readBlockState(tagCompound.getCompoundTag("blockstate"));
-        if (renderBlockState == null) {
-            renderBlockState = Blocks.AIR.getDefaultState();
-        }
 
         //Prep GL for rendering fancy stuff
         GlStateManager.pushMatrix();
@@ -305,10 +357,27 @@ public class BuildingTool extends Item {
         GlStateManager.depthMask(true);
         //GlStateManager.popAttrib();
         GlStateManager.popMatrix();
+*/
+        //Get Block to be rendered from the tool's data
+        IBlockState renderBlockState = Blocks.AIR.getDefaultState();
+        ItemStack heldItem = p.getHeldItemMainhand();
+        NBTTagCompound tagCompound = heldItem.getTagCompound();
+        if (tagCompound == null){
+            tagCompound = new NBTTagCompound();
+            heldItem.setTagCompound(tagCompound);
+        }
+        renderBlockState = NBTUtil.readBlockState(tagCompound.getCompoundTag("blockstate"));
+        if (renderBlockState == null) {
+            renderBlockState = Blocks.AIR.getDefaultState();
+        }
 
         //Prep GL for a new render
         GlStateManager.pushMatrix();
         GlStateManager.enableBlend();
+
+        //GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.ONE,GlStateManager.DestFactor.ONE,GlStateManager.SourceFactor.CONSTANT_ALPHA,GlStateManager.DestFactor.ONE_MINUS_CONSTANT_ALPHA);
+        //GlStateManager.disableDepth();
+        //GlStateManager.disableLighting();
         //GlStateManager.disableDepth();
         //GlStateManager.depthMask(false);
 
@@ -317,23 +386,29 @@ public class BuildingTool extends Item {
         GlStateManager.translate(pos.getX(),pos.getY(),pos.getZ());
         GlStateManager.rotate(-90.0F, 0.0F, 1.0F, 0.0F);
         GlStateManager.scale(1.0f,1.0f,1.0f);
-        GlStateManager.blendFunc(GL11.GL_ONE, GL11.GL_ONE);
+
+        //GlStateManager.color(1F, 1F, 1F, 1F);
+        //GL14.glBlendFuncSeparate(GL11.GL_ONE,GL11.GL_ONE,GL11.GL_ONE, GL11.GL_ONE);
+        GlStateManager.blendFunc(GL11.GL_CONSTANT_ALPHA, GL11.GL_ONE_MINUS_CONSTANT_ALPHA);
+        GL14.glBlendColor(1F, 1F, 1F, 0.7f);
+
+        //GlStateManager.blendFunc(GL11.GL_ONE, GL11.GL_ONE);
+
 
         //Render the defined block
-        blockrendererdispatcher.renderBlockBrightness(renderBlockState, 0.75f);
+        blockrendererdispatcher.renderBlockBrightness(renderBlockState, 1f);
 
         //Cleanup GL
         //GlStateManager.depthMask(true);
         GlStateManager.disableBlend();
         //GlStateManager.enableDepth();
+        //GlStateManager.enableLighting();
         GlStateManager.enableTexture2D();
+        GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
         GlStateManager.popAttrib();
         GlStateManager.popMatrix();
-        GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-    }
-
-    private static void renderBlockOutline(Tessellator tessellator, float mx, float my, float mz, float o) {
 
     }
+
 
 }
