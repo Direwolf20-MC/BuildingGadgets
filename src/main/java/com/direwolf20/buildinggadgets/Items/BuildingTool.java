@@ -207,53 +207,72 @@ public class BuildingTool extends Item {
                 if (renderBlockState == null) {
                     renderBlockState = Blocks.AIR.getDefaultState();
                 }
+
+                //Build a list of coordinates based on the tool mode and range
                 Set<BlockPos> coordinates = BuildingModes.getBuildOrders(world,player,lookingAt.getBlockPos(),lookingAt.sideHit, range, mode);
+
                 BlockRendererDispatcher dispatcher = Minecraft.getMinecraft().getBlockRendererDispatcher();
                 BlockRenderLayer origLayer = MinecraftForgeClient.getRenderLayer();
                 fakeWorld.setWorldAndState(player.world,renderBlockState,coordinates);
 
+                //Calculate the players current position, which is needed later
                 double doubleX = player.lastTickPosX + (player.posX - player.lastTickPosX) * evt.getPartialTicks();
                 double doubleY = player.lastTickPosY + (player.posY - player.lastTickPosY) * evt.getPartialTicks();
                 double doubleZ = player.lastTickPosZ + (player.posZ - player.lastTickPosZ) * evt.getPartialTicks();
 
+                //Save the current position thats being rendered (I think)
                 GlStateManager.pushMatrix();
+                //Enable Blending (So we can have transparent effect)
                 GlStateManager.enableBlend();
+                //This blend function allows you to use a constant alpha, which is defined later
                 GlStateManager.blendFunc(GL11.GL_CONSTANT_ALPHA, GL11.GL_ONE_MINUS_CONSTANT_ALPHA);
 
 
                 for (BlockRenderLayer layer : LAYERS) {
+                    //Technically we are rendering these blocks in all 4 render Layers
+                    //I'm not sure why but its the only way it works properly
                         ForgeHooksClient.setRenderLayer(layer);
 
 
                         for (BlockPos coordinate : coordinates) {
+                            //Push matrix again just because
                             GlStateManager.pushMatrix();
+                            //The render starts at the player, so we subtract the player coords and move the render to 0,0,0
                             GlStateManager.translate(-doubleX, -doubleY, -doubleZ);
+                            //Now move the render position to the coordinates we want to render at
                             GlStateManager.translate(coordinate.getX(), coordinate.getY(), coordinate.getZ());
+                            //Rotate it because i'm not sure why but we need to
                             GlStateManager.rotate(-90.0F, 0.0F, 1.0F, 0.0F);
                             GlStateManager.scale(1.0f, 1.0f, 1.0f);
+                            //Set the alpha of the blocks we are rendering -- 1/4 of what we really want because we render 4x over
                             GL14.glBlendColor(1F, 1F, 1F, 0.17f);
+                            //Get the block state in the fake world
                             if (fakeWorld.getWorldType() != WorldType.DEBUG_ALL_BLOCK_STATES) {
                                 try {
                                     state = renderBlockState.getActualState(fakeWorld, coordinate);
                                 } catch (Exception var8) {
                                 }
                             }
-
+                            //Get the extended block state in the fake world
                             state = state.getBlock().getExtendedState(state, fakeWorld, coordinate);
                             //Render the defined block
                             dispatcher.renderBlockBrightness(state, 1f);
+                            //Move the render position back to where it was
                             GlStateManager.popMatrix();
                         }
                 }
+                //Set blending back to the default mode
                 GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
                 ForgeHooksClient.setRenderLayer(origLayer);
+                //Disable blend
                 GlStateManager.disableBlend();
                 RenderHelper.enableStandardItemLighting();
+                //Pop from the original push in this method
                 GlStateManager.popMatrix();
             }
         }
     }
-
+/*
     protected static boolean renderOutlines2(BlockRendererDispatcher dispatcher, IBlockState state, BlockPos pos, IBlockAccess blockAccess, BufferBuilder worldRendererIn) {
         try {
             EnumBlockRenderType enumblockrendertype = state.getRenderType();
@@ -296,7 +315,7 @@ public class BuildingTool extends Item {
         double doubleX = p.lastTickPosX + (p.posX - p.lastTickPosX) * evt.getPartialTicks();
         double doubleY = p.lastTickPosY + (p.posY - p.lastTickPosY) * evt.getPartialTicks();
         double doubleZ = p.lastTickPosZ + (p.posZ - p.lastTickPosZ) * evt.getPartialTicks();
-/*
+
         //Define the values for the GL Cube we're about to render
         double minX = pos.getX();
         double minY = pos.getY();
@@ -371,7 +390,7 @@ public class BuildingTool extends Item {
         GlStateManager.depthMask(true);
         //GlStateManager.popAttrib();
         GlStateManager.popMatrix();
-*/
+
         //Get Block to be rendered from the tool's data
         IBlockState renderBlockState = Blocks.AIR.getDefaultState();
         ItemStack heldItem = p.getHeldItemMainhand();
@@ -420,6 +439,6 @@ public class BuildingTool extends Item {
         GlStateManager.popMatrix();
 
     }
-
+*/
 
 }
