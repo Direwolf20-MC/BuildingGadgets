@@ -67,6 +67,7 @@ public class BuildingTool extends Item {
         if (tagCompound != null) {
             list.add(TextFormatting.DARK_GREEN + "Block: " + renderBlockState.getBlock().getLocalizedName());
             list.add(TextFormatting.AQUA + "Mode: " + mode);
+            list.add(TextFormatting.RED + "Range: " + range);
         }
             /*int mode = compound.getInteger("mode");
             if (mode == MODE_9ROW || mode == MODE_25ROW) {
@@ -135,17 +136,7 @@ public class BuildingTool extends Item {
             }
             else {
                 if (player.isSneaking()) {
-                    if (mode == toolModes.VertWall) {
-                        mode = toolModes.BuildToMe;
-                    } else if (mode == toolModes.BuildToMe) {
-                        mode = toolModes.VertCol;
-                    } else if (mode == toolModes.VertCol) {
-                        mode = toolModes.HorzCol;
-                    } else if (mode == toolModes.HorzCol) {
-                        mode = toolModes.HorzWall;
-                    }else if (mode == toolModes.HorzWall) {
-                        mode = toolModes.VertWall;
-                    }
+                    toggleMode(player, itemstack);
                 }
             }
         }
@@ -153,6 +144,30 @@ public class BuildingTool extends Item {
 
         }
         return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, itemstack);
+    }
+
+    public static void toggleMode(EntityPlayer player, ItemStack heldItem) {
+        if (mode == toolModes.VertWall) {
+            mode = toolModes.BuildToMe;
+        } else if (mode == toolModes.BuildToMe) {
+            mode = toolModes.VertCol;
+        } else if (mode == toolModes.VertCol) {
+            mode = toolModes.HorzCol;
+        } else if (mode == toolModes.HorzCol) {
+            mode = toolModes.HorzWall;
+        }else if (mode == toolModes.HorzWall) {
+            mode = toolModes.VertWall;
+        }
+    }
+
+    public static void rangeChange(EntityPlayer player, ItemStack heldItem) {
+        if (range >=10) {
+            range = 1;
+        }
+        else {
+            range++;
+        }
+
     }
 
     public static boolean build(World world, EntityPlayer player, BlockPos startBlock, EnumFacing sideHit) {

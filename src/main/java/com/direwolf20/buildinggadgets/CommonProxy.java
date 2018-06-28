@@ -4,6 +4,7 @@ package com.direwolf20.buildinggadgets;
 import com.direwolf20.buildinggadgets.Blocks.EffectBlock;
 import com.direwolf20.buildinggadgets.Items.BuildingTool;
 import com.direwolf20.buildinggadgets.Items.ExchangerTool;
+import com.direwolf20.buildinggadgets.Network.PacketHandler;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
@@ -19,6 +20,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 public class CommonProxy {
     public void preInit(FMLPreInitializationEvent e) {
         ModEntities.init();
+        PacketHandler.registerMessages();
     }
 
     public void init(FMLInitializationEvent e) {
