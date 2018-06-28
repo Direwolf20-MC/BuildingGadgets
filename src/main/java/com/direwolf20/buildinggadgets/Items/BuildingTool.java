@@ -196,10 +196,8 @@ public class BuildingTool extends Item {
             IBlockState startBlock = world.getBlockState(lookingAt.getBlockPos());
             if ((startBlock != null) && (startBlock != Blocks.AIR.getDefaultState()) && (startBlock != ModBlocks.effectBlock.getDefaultState())) {
                 Set<BlockPos> coordinates = BuildingModes.getBuildOrders(world,player,lookingAt.getBlockPos(),lookingAt.sideHit, range, mode);
-                Minecraft mc = Minecraft.getMinecraft();
-                GlStateManager.pushMatrix();
-                //RenderHelper.disableStandardItemLighting();
-                mc.renderEngine.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+                //Minecraft mc = Minecraft.getMinecraft();
+                //mc.renderEngine.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
                 Tessellator tessellator = Tessellator.getInstance();
                 BlockRendererDispatcher dispatcher = Minecraft.getMinecraft().getBlockRendererDispatcher();
                 BlockRenderLayer origLayer = MinecraftForgeClient.getRenderLayer();
@@ -212,20 +210,37 @@ public class BuildingTool extends Item {
                 GlStateManager.pushMatrix();
                 GlStateManager.enableBlend();
                 GlStateManager.blendFunc(GL11.GL_CONSTANT_ALPHA, GL11.GL_ONE_MINUS_CONSTANT_ALPHA);
-                GL14.glBlendColor(1F, 1F, 1F, 0.5f);
-                GlStateManager.translate(-doubleX,-doubleY,-doubleZ);
+
+
                 for (BlockRenderLayer layer : LAYERS) {
                     ForgeHooksClient.setRenderLayer(layer);
 
 
                     for (BlockPos coordinate : coordinates) {
-
+                        GlStateManager.pushMatrix();
+                        GlStateManager.translate(-doubleX,-doubleY,-doubleZ);
+                        //GlStateManager.translate(0,0,0);
                         GlStateManager.translate(coordinate.getX(),coordinate.getY(),coordinate.getZ());
                         GlStateManager.rotate(-90.0F, 0.0F, 1.0F, 0.0F);
                         GlStateManager.scale(1.0f,1.0f,1.0f);
+                        GL14.glBlendColor(1F, 1F, 1F, 0.2f);
+
+                        IBlockState renderBlockState = Blocks.AIR.getDefaultState();
+                        ItemStack heldItem = player.getHeldItemMainhand();
+                        NBTTagCompound tagCompound = heldItem.getTagCompound();
+                        if (tagCompound == null){
+                            tagCompound = new NBTTagCompound();
+                            heldItem.setTagCompound(tagCompound);
+                        }
+                        renderBlockState = NBTUtil.readBlockState(tagCompound.getCompoundTag("blockstate"));
+                        if (renderBlockState == null) {
+                            renderBlockState = Blocks.AIR.getDefaultState();
+                        }
 
                         //Render the defined block
-                        dispatcher.renderBlockBrightness(Blocks.COBBLESTONE.getDefaultState(), 1f);
+
+                        dispatcher.renderBlockBrightness(renderBlockState, 1f);
+                        GlStateManager.popMatrix();
                         //tessellator.getBuffer().begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
                         //tessellator.getBuffer().setTranslation(-doubleX,-doubleY,-doubleZ);
                         //renderOutlines2(dispatcher, Blocks.COBBLESTONE.getDefaultState(), coordinate, fakeWorld, tessellator.getBuffer());
