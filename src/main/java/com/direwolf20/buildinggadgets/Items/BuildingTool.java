@@ -164,8 +164,18 @@ public class BuildingTool extends Item {
         ItemStack heldItem = player.getHeldItemMainhand();
         NBTTagCompound tagCompound = heldItem.getTagCompound();
         blockState = NBTUtil.readBlockState(tagCompound.getCompoundTag("blockstate"));
+        IBlockState state = Blocks.AIR.getDefaultState();
         for (BlockPos coordinate : coordinates) {
-            placeBlock(world, player, coordinate, blockState);
+            fakeWorld.setWorldAndState(player.world,blockState,coordinates);
+            if (fakeWorld.getWorldType() != WorldType.DEBUG_ALL_BLOCK_STATES) {
+                try {
+                    state = blockState.getActualState(fakeWorld, coordinate);
+                } catch (Exception var8) {
+                }
+            }
+            //Get the extended block state in the fake world
+            state = state.getBlock().getExtendedState(state, fakeWorld, coordinate);
+            placeBlock(world, player, coordinate, state);
         }
 
         return true;
