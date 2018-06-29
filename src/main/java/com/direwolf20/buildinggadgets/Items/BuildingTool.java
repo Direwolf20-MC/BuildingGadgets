@@ -4,6 +4,8 @@ import com.direwolf20.buildinggadgets.BuildingGadgets;
 import com.direwolf20.buildinggadgets.Entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.ModBlocks;
 import com.direwolf20.buildinggadgets.Tools.BuildingModes;
+import com.direwolf20.buildinggadgets.Tools.InventoryManipulation;
+import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.*;
@@ -11,6 +13,7 @@ import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
+import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -32,6 +35,8 @@ import org.lwjgl.opengl.GL14;
 
 import java.util.List;
 import java.util.Set;
+
+import static net.minecraft.block.BlockStainedGlass.COLOR;
 
 
 public class BuildingTool extends Item {
@@ -182,7 +187,11 @@ public class BuildingTool extends Item {
     }
 
     public static boolean placeBlock(World world, EntityPlayer player, BlockPos pos, IBlockState setBlock) {
-        world.spawnEntity(new BlockBuildEntity(world, pos, player, setBlock,false));
+        ItemStack itemStack = setBlock.getBlock().getPickBlock(setBlock,null,world,pos,player);
+        //InventoryManipulation.countItem(itemStack,player);
+        if (InventoryManipulation.useItem(itemStack,player)) {
+            world.spawnEntity(new BlockBuildEntity(world, pos, player, setBlock, false));
+        }
         return true;
     }
 
@@ -214,6 +223,11 @@ public class BuildingTool extends Item {
 
                 //Build a list of coordinates based on the tool mode and range
                 Set<BlockPos> coordinates = BuildingModes.getBuildOrders(world,player,lookingAt.getBlockPos(),lookingAt.sideHit, range, mode);
+
+                //int neededBlocks = coordinates.size();
+                ItemStack itemStack = renderBlockState.getBlock().getPickBlock(renderBlockState,null,world,new BlockPos(0,0,0),player);
+                int hasBlocks = InventoryManipulation.countItem(itemStack,player);
+                int tempHasBlocks = hasBlocks;
 
                 BlockRendererDispatcher dispatcher = Minecraft.getMinecraft().getBlockRendererDispatcher();
                 BlockRenderLayer origLayer = MinecraftForgeClient.getRenderLayer();
@@ -260,10 +274,18 @@ public class BuildingTool extends Item {
                             //Get the extended block state in the fake world
                             state = state.getBlock().getExtendedState(state, fakeWorld, coordinate);
                             //Render the defined block
-                            dispatcher.renderBlockBrightness(state, 1f);
+                            //System.out.println(state);
+                            dispatcher.renderBlockBrightness(state,1f);
+                            tempHasBlocks--;
+                            //System.out.println(hasBlocks);
+                            if (tempHasBlocks <0) {
+                                GlStateManager.rotate(-90.0F, 0.0F, 1.0F, 0.0F);
+                                dispatcher.renderBlockBrightness(Blocks.STAINED_GLASS.getDefaultState().withProperty(COLOR, EnumDyeColor.RED), 1f);
+                            }
                             //Move the render position back to where it was
                             GlStateManager.popMatrix();
                         }
+                        tempHasBlocks = hasBlocks;
                 }
                 //Set blending back to the default mode
                 GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
