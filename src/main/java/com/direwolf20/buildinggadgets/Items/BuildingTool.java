@@ -33,6 +33,8 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL14;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -164,13 +166,14 @@ public class BuildingTool extends Item {
     }
 
     public static boolean build(World world, EntityPlayer player, BlockPos startBlock, EnumFacing sideHit) {
-        Set<BlockPos> coordinates = BuildingModes.getBuildOrders(world,player,startBlock,sideHit,range,mode);
+        ArrayList<BlockPos> coords = BuildingModes.getBuildOrders(world,player,startBlock,sideHit,range,mode);
+        Set<BlockPos> coordinates = new HashSet<BlockPos>(coords);
         IBlockState blockState = Blocks.AIR.getDefaultState();
         ItemStack heldItem = player.getHeldItemMainhand();
         NBTTagCompound tagCompound = heldItem.getTagCompound();
         blockState = NBTUtil.readBlockState(tagCompound.getCompoundTag("blockstate"));
         IBlockState state = Blocks.AIR.getDefaultState();
-        for (BlockPos coordinate : coordinates) {
+        for (BlockPos coordinate : coords) {
             fakeWorld.setWorldAndState(player.world,blockState,coordinates);
             if (fakeWorld.getWorldType() != WorldType.DEBUG_ALL_BLOCK_STATES) {
                 try {
@@ -222,7 +225,7 @@ public class BuildingTool extends Item {
                 }
 
                 //Build a list of coordinates based on the tool mode and range
-                Set<BlockPos> coordinates = BuildingModes.getBuildOrders(world,player,lookingAt.getBlockPos(),lookingAt.sideHit, range, mode);
+                ArrayList<BlockPos> coordinates = BuildingModes.getBuildOrders(world,player,lookingAt.getBlockPos(),lookingAt.sideHit, range, mode);
 
                 //int neededBlocks = coordinates.size();
                 ItemStack itemStack = renderBlockState.getBlock().getPickBlock(renderBlockState,null,world,new BlockPos(0,0,0),player);
@@ -231,7 +234,8 @@ public class BuildingTool extends Item {
 
                 BlockRendererDispatcher dispatcher = Minecraft.getMinecraft().getBlockRendererDispatcher();
                 BlockRenderLayer origLayer = MinecraftForgeClient.getRenderLayer();
-                fakeWorld.setWorldAndState(player.world,renderBlockState,coordinates);
+                Set<BlockPos> coords = new HashSet<BlockPos>(coordinates);
+                fakeWorld.setWorldAndState(player.world,renderBlockState,coords);
 
                 //Calculate the players current position, which is needed later
                 double doubleX = player.lastTickPosX + (player.posX - player.lastTickPosX) * evt.getPartialTicks();

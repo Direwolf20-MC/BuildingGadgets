@@ -6,6 +6,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -16,9 +17,9 @@ public class BuildingModes {
         return false;
     }
 
-    public static Set<BlockPos> getBuildOrders(World world, EntityPlayer player, BlockPos startBlock, EnumFacing sideHit, int range, BuildingTool.toolModes mode) {
+    public static ArrayList<BlockPos> getBuildOrders(World world, EntityPlayer player, BlockPos startBlock, EnumFacing sideHit, int range, BuildingTool.toolModes mode) {
 
-        Set<BlockPos> coordinates = new HashSet<>();
+        ArrayList<BlockPos> coordinates = new ArrayList<BlockPos>();
         BlockPos playerPos = new BlockPos (Math.floor(player.posX),Math.floor(player.posY),Math.floor(player.posZ));
         BlockPos pos = startBlock;
         int bound = (range-1)/2;
@@ -102,7 +103,7 @@ public class BuildingModes {
                 }
             }
             else {
-                for (int y = bound*-1; y <= bound; y++) {
+                for (int y = bound; y >= bound*-1; y--) {
                     for (int x = boundX * -1; x <= boundX; x++) {
                         for (int z = boundZ * -1; z <= boundZ; z++) {
                             pos = new BlockPos(startBlock.getX() + x, startBlock.getY() - y, startBlock.getZ() + z);
