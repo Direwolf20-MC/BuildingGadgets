@@ -10,12 +10,10 @@ public class ModEntities {
     public static void init() {
         int id = 1;
         EntityRegistry.registerModEntity(new ResourceLocation("buildinggadgets:BlockBuildEntity"),BlockBuildEntity.class,"LaserGunEntity",id++,BuildingGadgets.instance,64,1,true);
-        //EntityRegistry.registerModEntity(new ResourceLocation("diregoo:LaserBlastEntity"),LaserBlastEntity.class,"LaserBlastEntity",id++,DireGoo.instance,64,1,true);
 
     }
 
     public static void initModels() {
         RenderingRegistry.registerEntityRenderingHandler(BlockBuildEntity.class, new BlockBuildEntityRender.Factory());
-        //RenderingRegistry.registerEntityRenderingHandler(LaserBlastEntity.class, new LaserBlastEntityRender.Factory());
     }
 }

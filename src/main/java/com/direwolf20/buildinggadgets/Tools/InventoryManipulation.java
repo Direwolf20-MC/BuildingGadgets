@@ -10,6 +10,15 @@ import java.util.Set;
 
 public class InventoryManipulation {
 
+    public static boolean giveItem(ItemStack itemStack, EntityPlayer player) {
+        if (player.capabilities.isCreativeMode) {
+            return true;
+        }
+        InventoryPlayer inv = player.inventory;
+        boolean success = inv.addItemStackToInventory(itemStack);
+        return success;
+    }
+
     public static boolean useItem(ItemStack itemStack, EntityPlayer player) {
         if (player.capabilities.isCreativeMode) {
             return true;
@@ -21,7 +30,6 @@ public class InventoryManipulation {
         ArrayList<Integer> slots = findItem(itemStack.getItem(),itemStack.getMetadata(),inv);
         if (slots.size() == 0) {return false;}
         int slot = slots.get(0);
-        System.out.println(slot);
         ItemStack stackInSlot = inv.getStackInSlot(slot);
         stackInSlot.shrink(1);
         stackInSlot = stackInSlot;

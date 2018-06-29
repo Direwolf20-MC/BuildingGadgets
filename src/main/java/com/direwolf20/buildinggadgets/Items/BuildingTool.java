@@ -33,10 +33,8 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL14;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.lang.reflect.Array;
+import java.util.*;
 
 import static net.minecraft.block.BlockStainedGlass.COLOR;
 
@@ -45,6 +43,8 @@ public class BuildingTool extends Item {
 
     private static final BlockRenderLayer[] LAYERS = BlockRenderLayer.values();
     private static final FakeBuilderWorld fakeWorld = new FakeBuilderWorld();
+
+    public static Stack<ArrayList<BlockPos>> undoList = new Stack<ArrayList<BlockPos>>();
 
     public enum toolModes {BuildToMe,VertWall,HorzWall,VertCol,HorzCol}
     public static toolModes mode;
@@ -167,6 +167,8 @@ public class BuildingTool extends Item {
 
     public static boolean build(World world, EntityPlayer player, BlockPos startBlock, EnumFacing sideHit) {
         ArrayList<BlockPos> coords = BuildingModes.getBuildOrders(world,player,startBlock,sideHit,range,mode);
+        ArrayList<BlockPos> undoCoords = new ArrayList<BlockPos>();
+
         Set<BlockPos> coordinates = new HashSet<BlockPos>(coords);
         IBlockState blockState = Blocks.AIR.getDefaultState();
         ItemStack heldItem = player.getHeldItemMainhand();
@@ -183,9 +185,39 @@ public class BuildingTool extends Item {
             }
             //Get the extended block state in the fake world
             state = state.getBlock().getExtendedState(state, fakeWorld, coordinate);
-            placeBlock(world, player, coordinate, state);
+            if (placeBlock(world, player, coordinate, state)) {
+                undoCoords.add(coordinate);
+            }
         }
+        if (undoCoords.size() > 0) {
+            undoList.push(undoCoords);
+        }
+        return true;
+    }
 
+    public static boolean undoBuild(EntityPlayer player) {
+        if (undoList.empty()) {return false;}
+        World world = player.world;
+        if (!world.isRemote) {
+            IBlockState airBlock = Blocks.AIR.getDefaultState();
+            IBlockState currentBlock = Blocks.AIR.getDefaultState();
+            ArrayList<BlockPos> undoCoords = undoList.pop();
+            ArrayList<BlockPos> failedRemovals = new ArrayList<BlockPos>();
+            for (BlockPos coord : undoCoords) {
+                currentBlock = world.getBlockState(coord);
+                ItemStack itemStack = currentBlock.getBlock().getPickBlock(currentBlock, null, world, coord, player);
+                if (InventoryManipulation.giveItem(itemStack, player)) {
+                    world.setBlockState(coord, airBlock);
+                }
+                else {
+                    failedRemovals.add(coord);
+                }
+
+            }
+            if (failedRemovals.size() != 0) {
+                undoList.push(failedRemovals);
+            }
+        }
         return true;
     }
 

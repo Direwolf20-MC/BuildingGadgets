@@ -8,6 +8,4 @@ public class ModBlocks {
     @GameRegistry.ObjectHolder("buildinggadgets:effectblock")
     public static EffectBlock effectBlock;
 
-    //@GameRegistry.ObjectHolder("diregoo:turretlaser")
-    //public static TurretLaser turretLaser;
 }

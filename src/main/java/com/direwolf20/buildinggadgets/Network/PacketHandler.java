@@ -13,6 +13,7 @@ public class PacketHandler {
         // Server side
         INSTANCE.registerMessage(PacketToggleMode.Handler.class, PacketToggleMode.class, 0, Side.SERVER);
         INSTANCE.registerMessage(PacketChangeRange.Handler.class, PacketChangeRange.class, 1, Side.SERVER);
+        INSTANCE.registerMessage(PacketUndoKey.Handler.class, PacketUndoKey.class, 2, Side.SERVER);
 
         // Client side
     }
