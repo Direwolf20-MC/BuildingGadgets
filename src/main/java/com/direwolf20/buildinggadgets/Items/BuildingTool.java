@@ -46,15 +46,21 @@ public class BuildingTool extends Item {
 
     public static Stack<ArrayList<BlockPos>> undoList = new Stack<ArrayList<BlockPos>>();
 
-    public enum toolModes {BuildToMe,VertWall,HorzWall,VertCol,HorzCol}
-    public static toolModes mode;
-    public static int range;
+    public enum toolModes {
+        BuildToMe,VertWall,HorzWall,VertCol,HorzCol;
+        private static toolModes[] vals = values();
+        public toolModes next()
+        {
+            return vals[(this.ordinal()+1) % vals.length];
+        }
+
+    }
+    //public static toolModes mode;
+    //public static int range;
 
     public BuildingTool() {
         setRegistryName("buildingtool");        // The unique name (within your mod) that identifies this item
         setUnlocalizedName(BuildingGadgets.MODID + ".buildingtool");     // Used for localization (en_US.lang)
-        mode = toolModes.BuildToMe;
-        range = 1;
     }
 
     @SideOnly(Side.CLIENT)
@@ -62,26 +68,80 @@ public class BuildingTool extends Item {
         ModelLoader.setCustomModelResourceLocation(this, 0, new ModelResourceLocation(getRegistryName(), "inventory"));
     }
 
-    @Override
-    public void addInformation(ItemStack stack, World player, List<String> list, ITooltipFlag b) {
-        super.addInformation(stack, player, list, b);
-        IBlockState renderBlockState = Blocks.AIR.getDefaultState();
+    public NBTTagCompound initToolTag (ItemStack stack) {
         NBTTagCompound tagCompound = stack.getTagCompound();
         if (tagCompound == null){
             tagCompound = new NBTTagCompound();
             stack.setTagCompound(tagCompound);
-            tagCompound.setString("mode", mode.name());
-            tagCompound.setInteger("range", range);
+            tagCompound.setString("mode", toolModes.BuildToMe.name());
+            tagCompound.setInteger("range", 1);
             stack.setTagCompound(tagCompound);
+            NBTTagCompound stateTag = new NBTTagCompound();
+            NBTUtil.writeBlockState(stateTag, Blocks.AIR.getDefaultState());
+            tagCompound.setTag("blockstate", stateTag);
         }
-        tagCompound = stack.getTagCompound();
-        renderBlockState = NBTUtil.readBlockState(tagCompound.getCompoundTag("blockstate"));
-        //mode = toolModes.valueOf(tagCompound.getString("mode"));
-        //range = tagCompound.getInteger("range");
-        list.add(TextFormatting.DARK_GREEN + "Block: " + renderBlockState.getBlock().getLocalizedName());
-        list.add(TextFormatting.AQUA + "Mode: " + mode);
-        list.add(TextFormatting.RED + "Range: " + range);
+        return tagCompound;
+    }
 
+    public void setToolMode(ItemStack stack, toolModes mode) {
+        NBTTagCompound tagCompound = stack.getTagCompound();
+        if (tagCompound == null){
+            tagCompound = initToolTag(stack);
+        }
+        tagCompound.setString("mode", mode.name());
+    }
+
+    public void setToolRange(ItemStack stack, int range) {
+        NBTTagCompound tagCompound = stack.getTagCompound();
+        if (tagCompound == null){
+            tagCompound = initToolTag(stack);
+        }
+        tagCompound.setInteger("range", range);
+    }
+
+    public void setToolBlock(ItemStack stack, IBlockState state) {
+        NBTTagCompound tagCompound = stack.getTagCompound();
+        if (tagCompound == null){
+            tagCompound = initToolTag(stack);
+        }
+        if (state == null) {state = Blocks.AIR.getDefaultState();}
+        NBTTagCompound stateTag = new NBTTagCompound();
+        NBTUtil.writeBlockState(stateTag, state);
+        tagCompound.setTag("blockstate", stateTag);
+    }
+
+    public toolModes getToolMode(ItemStack stack) {
+        NBTTagCompound tagCompound = stack.getTagCompound();
+        if (tagCompound == null){
+            tagCompound = initToolTag(stack);
+        }
+
+        return toolModes.valueOf(tagCompound.getString("mode"));
+    }
+
+    public int getToolRange(ItemStack stack) {
+        NBTTagCompound tagCompound = stack.getTagCompound();
+        if (tagCompound == null){
+            tagCompound = initToolTag(stack);
+        }
+        return tagCompound.getInteger("range");
+    }
+
+    public IBlockState getToolBlock(ItemStack stack) {
+        NBTTagCompound tagCompound = stack.getTagCompound();
+        if (tagCompound == null){
+            tagCompound = initToolTag(stack);
+        }
+        return NBTUtil.readBlockState(tagCompound.getCompoundTag("blockstate"));
+    }
+
+
+    @Override
+    public void addInformation(ItemStack stack, World player, List<String> list, ITooltipFlag b) {
+        super.addInformation(stack, player, list, b);
+        list.add(TextFormatting.DARK_GREEN + "Block: " + getToolBlock(stack).getBlock().getLocalizedName());
+        list.add(TextFormatting.AQUA + "Mode: " + getToolMode(stack));
+        list.add(TextFormatting.RED + "Range: " + getToolRange(stack));
     }
 
     @Override
@@ -92,7 +152,7 @@ public class BuildingTool extends Item {
                 if (player.isSneaking()) {
                     selectBlock(stack, player, world, pos);
                 } else {
-                    build(world, player, pos, side);
+                    build(world, player, pos, side,stack);
                 }
             }
         return EnumActionResult.SUCCESS;
@@ -100,18 +160,8 @@ public class BuildingTool extends Item {
 
     private void selectBlock(ItemStack stack, EntityPlayer player, World world, BlockPos pos) {
         IBlockState state = world.getBlockState(pos);
-
         if (state != null) {
-            NBTTagCompound tagCompound = stack.getTagCompound();
-            if (tagCompound == null){
-                tagCompound = new NBTTagCompound();
-                stack.setTagCompound(tagCompound);
-            }
-            NBTTagCompound stateTag = new NBTTagCompound();
-            NBTUtil.writeBlockState(stateTag, state);
-            tagCompound.setTag("blockstate", stateTag);
-            //Tools.notify(player, "Selected block: " + name);
-            //}
+            setToolBlock(stack,state);
         }
     }
 
@@ -122,7 +172,7 @@ public class BuildingTool extends Item {
         RayTraceResult lookingAt = player.rayTrace(20, 1.0F);
         if (!world.isRemote) {
             if (world.getBlockState(lookingAt.getBlockPos()) != Blocks.AIR.getDefaultState()) {
-                build(world, player, lookingAt.getBlockPos(),lookingAt.sideHit);
+                build(world, player, lookingAt.getBlockPos(),lookingAt.sideHit,itemstack);
             }
             else {
                 if (player.isSneaking()) {
@@ -136,36 +186,27 @@ public class BuildingTool extends Item {
         return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, itemstack);
     }
 
-    public static void toggleMode(EntityPlayer player, ItemStack heldItem) {
-        if (mode == toolModes.VertWall) {
-            mode = toolModes.BuildToMe;
-        } else if (mode == toolModes.BuildToMe) {
-            mode = toolModes.VertCol;
-        } else if (mode == toolModes.VertCol) {
-            mode = toolModes.HorzCol;
-        } else if (mode == toolModes.HorzCol) {
-            mode = toolModes.HorzWall;
-        }else if (mode == toolModes.HorzWall) {
-            mode = toolModes.VertWall;
-        }
-        NBTTagCompound tagCompound = heldItem.getTagCompound();
-        tagCompound.setString("mode", mode.name());
-        heldItem.setTagCompound(tagCompound);
+    public void toggleMode(EntityPlayer player, ItemStack heldItem) {
+        toolModes mode = getToolMode(heldItem);
+        mode = mode.next();
+        setToolMode(heldItem,mode);
+
     }
 
-    public static void rangeChange(EntityPlayer player, ItemStack heldItem) {
+    public void rangeChange(EntityPlayer player, ItemStack heldItem) {
+        int range = getToolRange(heldItem);
         if (range >=10) {
             range = 1;
         }
         else {
             range++;
         }
-        NBTTagCompound tagCompound = heldItem.getTagCompound();
-        tagCompound.setInteger("range", range);
-        heldItem.setTagCompound(tagCompound);
+        setToolRange(heldItem,range);
     }
 
-    public static boolean build(World world, EntityPlayer player, BlockPos startBlock, EnumFacing sideHit) {
+    public boolean build(World world, EntityPlayer player, BlockPos startBlock, EnumFacing sideHit, ItemStack stack) {
+        int range = getToolRange(stack);
+        toolModes mode = getToolMode(stack);
         ArrayList<BlockPos> coords = BuildingModes.getBuildOrders(world,player,startBlock,sideHit,range,mode);
         ArrayList<BlockPos> undoCoords = new ArrayList<BlockPos>();
 
@@ -223,7 +264,6 @@ public class BuildingTool extends Item {
 
     public static boolean placeBlock(World world, EntityPlayer player, BlockPos pos, IBlockState setBlock) {
         ItemStack itemStack = setBlock.getBlock().getPickBlock(setBlock,null,world,pos,player);
-        //InventoryManipulation.countItem(itemStack,player);
         if (InventoryManipulation.useItem(itemStack,player)) {
             world.spawnEntity(new BlockBuildEntity(world, pos, player, setBlock, false));
         }
@@ -237,7 +277,9 @@ public class BuildingTool extends Item {
 
 
     @SideOnly(Side.CLIENT)
-    public static void renderOverlay(RenderWorldLastEvent evt, EntityPlayer player, ItemStack buildingTool) {
+    public void renderOverlay(RenderWorldLastEvent evt, EntityPlayer player, ItemStack buildingTool) {
+        int range = getToolRange(buildingTool);
+        toolModes mode = getToolMode(buildingTool);
         RayTraceResult lookingAt = player.rayTrace(20, 1.0F);
         IBlockState state = Blocks.AIR.getDefaultState();
         if (lookingAt != null) {
