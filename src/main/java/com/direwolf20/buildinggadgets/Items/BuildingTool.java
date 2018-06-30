@@ -7,7 +7,6 @@ import com.direwolf20.buildinggadgets.Tools.BuildingModes;
 import com.direwolf20.buildinggadgets.Tools.InventoryManipulation;
 import com.direwolf20.buildinggadgets.Tools.UndoBuild;
 import com.direwolf20.buildinggadgets.Tools.UndoState;
-import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.*;
@@ -38,7 +37,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL14;
 
-import java.lang.reflect.Array;
 import java.util.*;
 
 import static net.minecraft.block.BlockStainedGlass.COLOR;
@@ -49,8 +47,6 @@ public class BuildingTool extends Item {
     private static final BlockRenderLayer[] LAYERS = BlockRenderLayer.values();
     private static final FakeBuilderWorld fakeWorld = new FakeBuilderWorld();
 
-    //public static Stack<UndoState> undoList = new Stack<UndoState>();
-
     public enum toolModes {
         BuildToMe,VertWall,HorzWall,VertCol,HorzCol;
         private static toolModes[] vals = values();
@@ -60,8 +56,6 @@ public class BuildingTool extends Item {
         }
 
     }
-    //public static toolModes mode;
-    //public static int range;
 
     public BuildingTool() {
         setRegistryName("buildingtool");        // The unique name (within your mod) that identifies this item
@@ -179,12 +173,12 @@ public class BuildingTool extends Item {
     public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
         ItemStack itemstack = player.getHeldItem(hand);
         player.setActiveHand(hand);
+
         float rayTraceRange = 20f;
         Vec3d look = player.getLookVec();
         Vec3d start = new Vec3d(player.posX,player.posY+player.getEyeHeight(),player.posZ);
         Vec3d end = new Vec3d(player.posX+look.x * rayTraceRange,player.posY+player.getEyeHeight()+look.y*rayTraceRange,player.posZ+look.z*rayTraceRange);
 
-        //RayTraceResult lookingAt = player.rayTrace(20, 1.0F);
         RayTraceResult lookingAt = world.rayTraceBlocks(start,end,false,true,false);
 
         if (!world.isRemote) {
@@ -246,7 +240,6 @@ public class BuildingTool extends Item {
                 Stack<UndoState> undoStack = UndoBuild.getPlayerMap(player.getUniqueID());
                 undoStack.push(undoState);
                 UndoBuild.updatePlayerMap(player.getUniqueID(), undoStack);
-                System.out.println(UndoBuild.getPlayerMap(player.getUniqueID()));
             }
         }
         return true;
@@ -257,7 +250,6 @@ public class BuildingTool extends Item {
         if (undoStack.empty()) {return false;}
         World world = player.world;
         if (!world.isRemote) {
-            IBlockState airBlock = Blocks.AIR.getDefaultState();
             IBlockState currentBlock = Blocks.AIR.getDefaultState();
             UndoState undoState = undoStack.pop();
             ArrayList<BlockPos> undoCoords = undoState.coordinates;
@@ -377,10 +369,8 @@ public class BuildingTool extends Item {
                             //Get the extended block state in the fake world
                             state = state.getBlock().getExtendedState(state, fakeWorld, coordinate);
                             //Render the defined block
-                            //System.out.println(state);
                             dispatcher.renderBlockBrightness(state,1f);
                             tempHasBlocks--;
-                            //System.out.println(hasBlocks);
                             if (tempHasBlocks <0) {
                                 GlStateManager.rotate(-90.0F, 0.0F, 1.0F, 0.0F);
                                 dispatcher.renderBlockBrightness(Blocks.STAINED_GLASS.getDefaultState().withProperty(COLOR, EnumDyeColor.RED), 1f);
