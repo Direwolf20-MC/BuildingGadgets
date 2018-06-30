@@ -48,6 +48,7 @@ public class BlockBuildEntityRender extends Render<BlockBuildEntity> {
 
 
         //IBlockState renderBlockState = Blocks.COBBLESTONE.getDefaultState();
+
         IBlockState renderBlockState = entity.getSetBlock();
         if (renderBlockState == null) {
             renderBlockState = Blocks.COBBLESTONE.getDefaultState();

@@ -230,7 +230,8 @@ public class BuildingTool extends Item {
                     }
                 }
                 //Get the extended block state in the fake world
-                state = state.getBlock().getExtendedState(state, fakeWorld, coordinate);
+                //Disabled to fix Chisel
+                //state = state.getBlock().getExtendedState(state, fakeWorld, coordinate);
                 if (placeBlock(world, player, coordinate, state)) {
                     undoCoords.add(coordinate);
                 }
@@ -367,7 +368,8 @@ public class BuildingTool extends Item {
                                 }
                             }
                             //Get the extended block state in the fake world
-                            state = state.getBlock().getExtendedState(state, fakeWorld, coordinate);
+                            //Disabled to fix chisel, not sure why.
+                            //state = state.getBlock().getExtendedState(state, fakeWorld, coordinate);
                             //Render the defined block
                             dispatcher.renderBlockBrightness(state,1f);
                             tempHasBlocks--;
