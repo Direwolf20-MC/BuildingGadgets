@@ -133,7 +133,7 @@ public class BlockBuildEntity extends Entity implements IEntityAdditionalSpawnDa
             if (setPos != null && setBlock != null && (getToolMode() == 1)) {
                 world.setBlockState(setPos, setBlock);
             }
-            else if (getToolMode() == 2) {
+            else if (setPos != null && setBlock != null && getToolMode() == 2) {
                 world.setBlockState(setPos,Blocks.AIR.getDefaultState());
             }
 
