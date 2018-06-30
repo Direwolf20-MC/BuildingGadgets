@@ -5,6 +5,8 @@ import com.direwolf20.buildinggadgets.Entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.ModBlocks;
 import com.direwolf20.buildinggadgets.Tools.BuildingModes;
 import com.direwolf20.buildinggadgets.Tools.InventoryManipulation;
+import com.direwolf20.buildinggadgets.Tools.UndoBuild;
+import com.direwolf20.buildinggadgets.Tools.UndoState;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -45,7 +47,7 @@ public class BuildingTool extends Item {
     private static final BlockRenderLayer[] LAYERS = BlockRenderLayer.values();
     private static final FakeBuilderWorld fakeWorld = new FakeBuilderWorld();
 
-    public static Stack<ArrayList<BlockPos>> undoList = new Stack<ArrayList<BlockPos>>();
+    //public static Stack<UndoState> undoList = new Stack<UndoState>();
 
     public enum toolModes {
         BuildToMe,VertWall,HorzWall,VertCol,HorzCol;
@@ -239,25 +241,32 @@ public class BuildingTool extends Item {
             }
         }
         if (undoCoords.size() > 0) {
-            undoList.push(undoCoords);
+            UndoState undoState = new UndoState(player.dimension,undoCoords);
+            Stack<UndoState> undoStack = UndoBuild.getPlayerMap(player.getUniqueID());
+            undoStack.push(undoState);
+            UndoBuild.updatePlayerMap(player.getUniqueID(),undoStack);
+            System.out.println(UndoBuild.getPlayerMap(player.getUniqueID()));
         }
         return true;
     }
 
     public static boolean undoBuild(EntityPlayer player) {
-        if (undoList.empty()) {return false;}
+        Stack<UndoState> undoStack = UndoBuild.getPlayerMap(player.getUniqueID());
+        if (undoStack.empty()) {return false;}
         World world = player.world;
         if (!world.isRemote) {
             IBlockState airBlock = Blocks.AIR.getDefaultState();
             IBlockState currentBlock = Blocks.AIR.getDefaultState();
-            ArrayList<BlockPos> undoCoords = undoList.pop();
+            UndoState undoState = undoStack.pop();
+            ArrayList<BlockPos> undoCoords = undoState.coordinates;
+            int dimension = undoState.dimension;
             ArrayList<BlockPos> failedRemovals = new ArrayList<BlockPos>();
             for (BlockPos coord : undoCoords) {
                 currentBlock = world.getBlockState(coord);
                 ItemStack itemStack = currentBlock.getBlock().getPickBlock(currentBlock, null, world, coord, player);
                 double distance = coord.getDistance(player.getPosition().getX(),player.getPosition().getY(),player.getPosition().getZ());
-                System.out.println(distance);
-                if (distance < 35) {
+                boolean sameDim = (player.dimension == dimension);
+                if (distance < 35 && sameDim) {
                     if (InventoryManipulation.giveItem(itemStack, player)) {
                         world.spawnEntity(new BlockBuildEntity(world, coord, player, currentBlock, 2));
                     } else {
@@ -269,7 +278,9 @@ public class BuildingTool extends Item {
                 }
             }
             if (failedRemovals.size() != 0) {
-                undoList.push(failedRemovals);
+                UndoState failedState = new UndoState(player.dimension,failedRemovals);
+                undoStack.push(failedState);
+                UndoBuild.updatePlayerMap(player.getUniqueID(),undoStack);
             }
         }
         return true;
