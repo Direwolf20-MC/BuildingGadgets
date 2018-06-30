@@ -20,6 +20,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTUtil;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
@@ -164,6 +165,11 @@ public class BuildingTool extends Item {
 
     private void selectBlock(ItemStack stack, EntityPlayer player, World world, BlockPos pos) {
         IBlockState state = world.getBlockState(pos);
+        TileEntity te = world.getTileEntity(pos);
+        if (te != null) {
+            player.sendStatusMessage(new TextComponentString(TextFormatting.RED + "Invalid Block"), true);
+            return;
+        }
         if (state != null) {
             setToolBlock(stack,state);
         }
@@ -182,17 +188,9 @@ public class BuildingTool extends Item {
         RayTraceResult lookingAt = world.rayTraceBlocks(start,end,false,true,false);
 
         if (!world.isRemote) {
-            if (world.getBlockState(lookingAt.getBlockPos()) != Blocks.AIR.getDefaultState()) {
+            if (lookingAt != null && world.getBlockState(lookingAt.getBlockPos()) != Blocks.AIR.getDefaultState()) {
                 build(world, player, lookingAt.getBlockPos(),lookingAt.sideHit,itemstack);
             }
-            else {
-                if (player.isSneaking()) {
-                    toggleMode(player, itemstack);
-                }
-            }
-        }
-        else {
-
         }
         return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, itemstack);
     }
@@ -222,33 +220,34 @@ public class BuildingTool extends Item {
         toolModes mode = getToolMode(stack);
         ArrayList<BlockPos> coords = BuildingModes.getBuildOrders(world,player,startBlock,sideHit,range,mode);
         ArrayList<BlockPos> undoCoords = new ArrayList<BlockPos>();
-
         Set<BlockPos> coordinates = new HashSet<BlockPos>(coords);
         IBlockState blockState = Blocks.AIR.getDefaultState();
         ItemStack heldItem = player.getHeldItemMainhand();
         NBTTagCompound tagCompound = heldItem.getTagCompound();
         blockState = NBTUtil.readBlockState(tagCompound.getCompoundTag("blockstate"));
-        IBlockState state = Blocks.AIR.getDefaultState();
-        for (BlockPos coordinate : coords) {
-            fakeWorld.setWorldAndState(player.world,blockState,coordinates);
-            if (fakeWorld.getWorldType() != WorldType.DEBUG_ALL_BLOCK_STATES) {
-                try {
-                    state = blockState.getActualState(fakeWorld, coordinate);
-                } catch (Exception var8) {
+        if (blockState != Blocks.AIR.getDefaultState()) {
+            IBlockState state = Blocks.AIR.getDefaultState();
+            for (BlockPos coordinate : coords) {
+                fakeWorld.setWorldAndState(player.world, blockState, coordinates);
+                if (fakeWorld.getWorldType() != WorldType.DEBUG_ALL_BLOCK_STATES) {
+                    try {
+                        state = blockState.getActualState(fakeWorld, coordinate);
+                    } catch (Exception var8) {
+                    }
+                }
+                //Get the extended block state in the fake world
+                state = state.getBlock().getExtendedState(state, fakeWorld, coordinate);
+                if (placeBlock(world, player, coordinate, state)) {
+                    undoCoords.add(coordinate);
                 }
             }
-            //Get the extended block state in the fake world
-            state = state.getBlock().getExtendedState(state, fakeWorld, coordinate);
-            if (placeBlock(world, player, coordinate, state)) {
-                undoCoords.add(coordinate);
+            if (undoCoords.size() > 0) {
+                UndoState undoState = new UndoState(player.dimension, undoCoords);
+                Stack<UndoState> undoStack = UndoBuild.getPlayerMap(player.getUniqueID());
+                undoStack.push(undoState);
+                UndoBuild.updatePlayerMap(player.getUniqueID(), undoStack);
+                System.out.println(UndoBuild.getPlayerMap(player.getUniqueID()));
             }
-        }
-        if (undoCoords.size() > 0) {
-            UndoState undoState = new UndoState(player.dimension,undoCoords);
-            Stack<UndoState> undoStack = UndoBuild.getPlayerMap(player.getUniqueID());
-            undoStack.push(undoState);
-            UndoBuild.updatePlayerMap(player.getUniqueID(),undoStack);
-            System.out.println(UndoBuild.getPlayerMap(player.getUniqueID()));
         }
         return true;
     }
@@ -313,28 +312,27 @@ public class BuildingTool extends Item {
             World world = player.world;
             IBlockState startBlock = world.getBlockState(lookingAt.getBlockPos());
             if ((startBlock != null) && (startBlock != Blocks.AIR.getDefaultState()) && (startBlock != ModBlocks.effectBlock.getDefaultState())) {
-                IBlockState renderBlockState = Blocks.AIR.getDefaultState();
+                //Get the item stack and the block that we'll be rendering (From the Itemstack's NBT)
                 ItemStack heldItem = player.getHeldItemMainhand();
-                NBTTagCompound tagCompound = heldItem.getTagCompound();
-                if (tagCompound == null){
-                    tagCompound = new NBTTagCompound();
-                    heldItem.setTagCompound(tagCompound);
-                }
-                renderBlockState = NBTUtil.readBlockState(tagCompound.getCompoundTag("blockstate"));
-                if (renderBlockState == null) {
-                    renderBlockState = Blocks.AIR.getDefaultState();
-                }
+                IBlockState renderBlockState = getToolBlock(heldItem);
 
+                //Don't render anything if theres no block selected (Air)
+                if (renderBlockState == Blocks.AIR.getDefaultState()) {
+                    return;
+                }
                 //Build a list of coordinates based on the tool mode and range
                 ArrayList<BlockPos> coordinates = BuildingModes.getBuildOrders(world,player,lookingAt.getBlockPos(),lookingAt.sideHit, range, mode);
 
-                //int neededBlocks = coordinates.size();
+                //Figure out how many of the block we're rendering we have in the inventory of the player.
                 ItemStack itemStack = renderBlockState.getBlock().getPickBlock(renderBlockState,null,world,new BlockPos(0,0,0),player);
                 int hasBlocks = InventoryManipulation.countItem(itemStack,player);
                 int tempHasBlocks = hasBlocks;
 
+                //Prepare the block rendering
                 BlockRendererDispatcher dispatcher = Minecraft.getMinecraft().getBlockRendererDispatcher();
                 BlockRenderLayer origLayer = MinecraftForgeClient.getRenderLayer();
+
+                //Prepare the fake world -- using a fake world lets us render things properly, like fences connecting.
                 Set<BlockPos> coords = new HashSet<BlockPos>(coordinates);
                 fakeWorld.setWorldAndState(player.world,renderBlockState,coords);
 
