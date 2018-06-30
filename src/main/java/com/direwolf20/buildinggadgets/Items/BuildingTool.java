@@ -24,6 +24,7 @@ import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldType;
@@ -200,6 +201,7 @@ public class BuildingTool extends Item {
         toolModes mode = getToolMode(heldItem);
         mode = mode.next();
         setToolMode(heldItem,mode);
+        player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + "Tool Mode: " + mode.name()), true);
 
     }
 
@@ -212,6 +214,7 @@ public class BuildingTool extends Item {
             range++;
         }
         setToolRange(heldItem,range);
+        player.sendStatusMessage(new TextComponentString(TextFormatting.RED + "Tool range: " + range), true);
     }
 
     public boolean build(World world, EntityPlayer player, BlockPos startBlock, EnumFacing sideHit, ItemStack stack) {
