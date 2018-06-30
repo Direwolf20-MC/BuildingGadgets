@@ -21,6 +21,7 @@ import net.minecraft.nbt.NBTUtil;
 import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldType;
@@ -169,7 +170,14 @@ public class BuildingTool extends Item {
     public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
         ItemStack itemstack = player.getHeldItem(hand);
         player.setActiveHand(hand);
-        RayTraceResult lookingAt = player.rayTrace(20, 1.0F);
+        float rayTraceRange = 20f;
+        Vec3d look = player.getLookVec();
+        Vec3d start = new Vec3d(player.posX,player.posY+player.getEyeHeight(),player.posZ);
+        Vec3d end = new Vec3d(player.posX+look.x * rayTraceRange,player.posY+player.getEyeHeight()+look.y*rayTraceRange,player.posZ+look.z*rayTraceRange);
+
+        //RayTraceResult lookingAt = player.rayTrace(20, 1.0F);
+        RayTraceResult lookingAt = world.rayTraceBlocks(start,end,false,true,false);
+
         if (!world.isRemote) {
             if (world.getBlockState(lookingAt.getBlockPos()) != Blocks.AIR.getDefaultState()) {
                 build(world, player, lookingAt.getBlockPos(),lookingAt.sideHit,itemstack);
@@ -247,13 +255,18 @@ public class BuildingTool extends Item {
             for (BlockPos coord : undoCoords) {
                 currentBlock = world.getBlockState(coord);
                 ItemStack itemStack = currentBlock.getBlock().getPickBlock(currentBlock, null, world, coord, player);
-                if (InventoryManipulation.giveItem(itemStack, player)) {
-                    world.spawnEntity(new BlockBuildEntity(world, coord, player, currentBlock, 2));
+                double distance = coord.getDistance(player.getPosition().getX(),player.getPosition().getY(),player.getPosition().getZ());
+                System.out.println(distance);
+                if (distance < 35) {
+                    if (InventoryManipulation.giveItem(itemStack, player)) {
+                        world.spawnEntity(new BlockBuildEntity(world, coord, player, currentBlock, 2));
+                    } else {
+                        failedRemovals.add(coord);
+                    }
                 }
                 else {
                     failedRemovals.add(coord);
                 }
-
             }
             if (failedRemovals.size() != 0) {
                 undoList.push(failedRemovals);

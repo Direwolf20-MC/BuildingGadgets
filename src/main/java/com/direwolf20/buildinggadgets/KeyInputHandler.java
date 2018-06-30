@@ -13,13 +13,10 @@ public class KeyInputHandler {
     public void onKeyInput(InputEvent.KeyInputEvent event) {
         if (KeyBindings.modeSwitch.isPressed()) {
             PacketHandler.INSTANCE.sendToServer(new PacketToggleMode());
-            System.out.println("Mode Switch");
         } else if (KeyBindings.rangeChange.isPressed()) {
             PacketHandler.INSTANCE.sendToServer(new PacketChangeRange());
-            System.out.println("Range Change");
         } else if (KeyBindings.undoKey.isPressed()) {
             PacketHandler.INSTANCE.sendToServer(new PacketUndoKey());
-            System.out.println("Undo Key");
         }
 
     }
