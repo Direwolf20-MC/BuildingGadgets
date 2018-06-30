@@ -69,7 +69,7 @@ public class ExchangerTool extends Item {
 
     public boolean exchangeBlock(World world, EntityPlayer player, BlockPos startBlock) {
         IBlockState cobbleBlock = Blocks.STONEBRICK.getDefaultState();
-        world.spawnEntity(new BlockBuildEntity(world, startBlock, player,cobbleBlock,true));
+        world.spawnEntity(new BlockBuildEntity(world, startBlock, player,cobbleBlock,3));
         return true;
     }
 
@@ -82,7 +82,7 @@ public class ExchangerTool extends Item {
             for (int i = startBlock.getZ();i<= playerPos.getZ();i++) {
                 changePos = new BlockPos(startBlock.getX(),startBlock.getY(),i);
                 if (world.getBlockState(changePos) == airBlock.getDefaultState()) {
-                    world.spawnEntity(new BlockBuildEntity(world, changePos, player,cobbleBlock,true));
+                    world.spawnEntity(new BlockBuildEntity(world, changePos, player,cobbleBlock,3));
                 }
 
             }

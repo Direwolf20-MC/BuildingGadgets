@@ -20,18 +20,20 @@ import javax.annotation.Nullable;
 
 public class BlockBuildEntity extends Entity implements IEntityAdditionalSpawnData {
 
-    private static final DataParameter<Boolean> exchangeMode = EntityDataManager.<Boolean>createKey(BlockBuildEntity.class, DataSerializers.BOOLEAN);
+    private static final DataParameter<Integer> toolMode = EntityDataManager.<Integer>createKey(BlockBuildEntity.class, DataSerializers.VARINT);
     private static final DataParameter<Optional<IBlockState>> SET_BLOCK = EntityDataManager.<Optional<IBlockState>>createKey(BlockBuildEntity.class, DataSerializers.OPTIONAL_BLOCK_STATE);
 
     public int despawning = -1;
     public int maxLife = 20;
-    private boolean exchange;
+    private int mode;
+    //private boolean exchange;
     private IBlockState setBlock;
     private IBlockState originalSetBlock;
     private BlockPos setPos;
     private EntityLivingBase spawnedBy;
 
     World world;
+
     private static DataParameter<BlockPos> FIXED = EntityDataManager.createKey(BlockBuildEntity.class, DataSerializers.BLOCK_POS);
 
     public BlockBuildEntity(World worldIn) {
@@ -39,7 +41,7 @@ public class BlockBuildEntity extends Entity implements IEntityAdditionalSpawnDa
         setSize(0.1F, 0.1F);
     }
 
-    public BlockBuildEntity(World worldIn, BlockPos spawnPos, EntityLivingBase player, IBlockState spawnBlock, Boolean exchanger) {
+    public BlockBuildEntity(World worldIn, BlockPos spawnPos, EntityLivingBase player, IBlockState spawnBlock, int toolMode) {
         super(worldIn);
         setSize(0.1F, 0.1F);
         setPosition(spawnPos.getX(), spawnPos.getY(), spawnPos.getZ());
@@ -48,7 +50,7 @@ public class BlockBuildEntity extends Entity implements IEntityAdditionalSpawnDa
         setBlock = spawnBlock;
         originalSetBlock = spawnBlock;
         setSetBlock(spawnBlock);
-        if (exchanger) {
+        if (toolMode == 3) {
             if (currentBlock != null) {
                 setBlock = currentBlock;
                 setSetBlock(setBlock);
@@ -58,18 +60,18 @@ public class BlockBuildEntity extends Entity implements IEntityAdditionalSpawnDa
             }
         }
         world = worldIn;
-        exchange = exchanger;
-        setExchangeMode(exchanger);
+        mode = toolMode;
+        setToolMode(toolMode);
         spawnedBy = player;
         world.setBlockState(spawnPos, ModBlocks.effectBlock.getDefaultState());
     }
 
-    public Boolean getExchangeMode() {
-        return this.dataManager.get(exchangeMode);
+    public int getToolMode() {
+        return this.dataManager.get(toolMode);
     }
 
-    public void setExchangeMode(Boolean exchanger) {
-        this.dataManager.set(exchangeMode, exchanger);
+    public void setToolMode(int mode) {
+        this.dataManager.set(toolMode, mode);
     }
 
     @Nullable
@@ -128,8 +130,11 @@ public class BlockBuildEntity extends Entity implements IEntityAdditionalSpawnDa
     private void setDespawning() {
         if(despawning == -1) {
             despawning = 0;
-            if (setPos != null && setBlock != null && !(getExchangeMode())) {
+            if (setPos != null && setBlock != null && (getToolMode() == 1)) {
                 world.setBlockState(setPos, setBlock);
+            }
+            else if (getToolMode() == 2) {
+                world.setBlockState(setPos,Blocks.AIR.getDefaultState());
             }
 
         }
@@ -141,8 +146,8 @@ public class BlockBuildEntity extends Entity implements IEntityAdditionalSpawnDa
 
             setDead();
             //System.out.println(setPos+":"+setBlock);
-            if(exchange) {
-                world.spawnEntity(new BlockBuildEntity(world, setPos, spawnedBy,originalSetBlock,false));
+            if(getToolMode() == 3) {
+                world.spawnEntity(new BlockBuildEntity(world, setPos, spawnedBy,originalSetBlock,1));
             }
         }
     }
@@ -164,7 +169,7 @@ public class BlockBuildEntity extends Entity implements IEntityAdditionalSpawnDa
     @Override
     protected void entityInit() {
         this.dataManager.register(FIXED, BlockPos.ORIGIN);
-        this.dataManager.register(exchangeMode, false);
+        this.dataManager.register(toolMode, 1);
         this.dataManager.register(SET_BLOCK, Optional.absent());
     }
 

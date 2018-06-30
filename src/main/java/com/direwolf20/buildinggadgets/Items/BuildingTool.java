@@ -248,7 +248,7 @@ public class BuildingTool extends Item {
                 currentBlock = world.getBlockState(coord);
                 ItemStack itemStack = currentBlock.getBlock().getPickBlock(currentBlock, null, world, coord, player);
                 if (InventoryManipulation.giveItem(itemStack, player)) {
-                    world.setBlockState(coord, airBlock);
+                    world.spawnEntity(new BlockBuildEntity(world, coord, player, currentBlock, 2));
                 }
                 else {
                     failedRemovals.add(coord);
@@ -265,7 +265,7 @@ public class BuildingTool extends Item {
     public static boolean placeBlock(World world, EntityPlayer player, BlockPos pos, IBlockState setBlock) {
         ItemStack itemStack = setBlock.getBlock().getPickBlock(setBlock,null,world,pos,player);
         if (InventoryManipulation.useItem(itemStack,player)) {
-            world.spawnEntity(new BlockBuildEntity(world, pos, player, setBlock, false));
+            world.spawnEntity(new BlockBuildEntity(world, pos, player, setBlock, 1));
         }
         return true;
     }

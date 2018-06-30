@@ -30,14 +30,14 @@ public class BlockBuildEntityRender extends Render<BlockBuildEntity> {
         Minecraft mc = Minecraft.getMinecraft();
         GlStateManager.pushMatrix();
 
-        boolean entExchangeMode = entity.getExchangeMode();
+        int toolMode = entity.getToolMode();
         mc.renderEngine.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
         int teCounter = entity.getTicksExisted();
         int maxLife = entity.maxLife;
         if (teCounter > maxLife) {teCounter = maxLife;}
         float scale = (float) (teCounter) / (float) maxLife;
         if (scale >= 1.0f) {scale = 0.99f;}
-        if (entExchangeMode) {
+        if (toolMode == 2 || toolMode == 3) {
             scale = (float) (maxLife-teCounter) / maxLife;
         }
         float trans = (1-scale)/2;
@@ -76,7 +76,7 @@ public class BlockBuildEntityRender extends Render<BlockBuildEntity> {
         float red = 0f;
         float green = 1f;
         float blue = 1f;
-        if (entExchangeMode) {
+        if (toolMode == 2 || toolMode == 3) {
             red = 1f;
             green = 0.25f;
             blue = 0.25f;
