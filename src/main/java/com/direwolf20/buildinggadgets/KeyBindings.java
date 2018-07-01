@@ -23,5 +23,6 @@ public class KeyBindings {
         ClientRegistry.registerKeyBinding(modeSwitch);
         ClientRegistry.registerKeyBinding(rangeChange);
         ClientRegistry.registerKeyBinding(undoKey);
+        ClientRegistry.registerKeyBinding(anchorKey);
     }
 }
