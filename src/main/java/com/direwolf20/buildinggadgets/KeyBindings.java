@@ -13,11 +13,13 @@ public class KeyBindings {
     public static KeyBinding modeSwitch;
     public static KeyBinding rangeChange;
     public static KeyBinding undoKey;
+    public static KeyBinding anchorKey;
 
     public static void init() {
         modeSwitch = new KeyBinding("key.modeSwitch", KeyConflictContext.IN_GAME, Keyboard.KEY_SEMICOLON, "key.categories.buildingGadgets");
         rangeChange = new KeyBinding("key.rangeChange", KeyConflictContext.IN_GAME, Keyboard.KEY_APOSTROPHE, "key.categories.buildingGadgets");
         undoKey = new KeyBinding("key.undoKey", KeyConflictContext.IN_GAME, Keyboard.KEY_U, "key.categories.buildingGadgets");
+        anchorKey = new KeyBinding("key.anchorKey", KeyConflictContext.IN_GAME, Keyboard.KEY_LCONTROL, "key.categories.buildingGadgets");
         ClientRegistry.registerKeyBinding(modeSwitch);
         ClientRegistry.registerKeyBinding(rangeChange);
         ClientRegistry.registerKeyBinding(undoKey);

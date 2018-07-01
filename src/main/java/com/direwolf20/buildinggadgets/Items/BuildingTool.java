@@ -4,15 +4,18 @@ import com.direwolf20.buildinggadgets.Blocks.EffectBlock;
 import com.direwolf20.buildinggadgets.BuildingGadgets;
 import com.direwolf20.buildinggadgets.Config;
 import com.direwolf20.buildinggadgets.Entities.BlockBuildEntity;
+import com.direwolf20.buildinggadgets.KeyBindings;
 import com.direwolf20.buildinggadgets.ModBlocks;
 import com.direwolf20.buildinggadgets.Tools.BuildingModes;
 import com.direwolf20.buildinggadgets.Tools.InventoryManipulation;
 import com.direwolf20.buildinggadgets.Tools.UndoBuild;
 import com.direwolf20.buildinggadgets.Tools.UndoState;
+import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
@@ -20,6 +23,7 @@ import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
@@ -34,11 +38,13 @@ import net.minecraftforge.client.ForgeHooksClient;
 import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.client.model.ModelLoader;
+import net.minecraftforge.client.settings.KeyBindingMap;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL14;
 
+import javax.swing.text.JTextComponent;
 import java.util.*;
 
 import static net.minecraft.block.BlockStainedGlass.COLOR;
@@ -50,7 +56,7 @@ public class BuildingTool extends Item {
     private static final FakeBuilderWorld fakeWorld = new FakeBuilderWorld();
 
     public enum toolModes {
-        BuildToMe,VertWall,HorzWall,VertCol,HorzCol;
+        BuildToMe,VerticalColumn,HorizontalColumn,VerticalWall,HorizontalWall;
         private static toolModes[] vals = values();
         public toolModes next()
         {
@@ -80,8 +86,37 @@ public class BuildingTool extends Item {
             NBTTagCompound stateTag = new NBTTagCompound();
             NBTUtil.writeBlockState(stateTag, Blocks.AIR.getDefaultState());
             tagCompound.setTag("blockstate", stateTag);
+            NBTTagList coords = new NBTTagList();
+            tagCompound.setTag("anchorcoords", coords);
         }
         return tagCompound;
+    }
+
+    public void setAnchor(ItemStack stack, ArrayList<BlockPos> coordinates) {
+        NBTTagCompound tagCompound = stack.getTagCompound();
+        if (tagCompound == null){
+            tagCompound = initToolTag(stack);
+        }
+        NBTTagList coords = new NBTTagList();
+        for (BlockPos coord : coordinates) {
+            coords.appendTag(NBTUtil.createPosTag(coord));
+        }
+        tagCompound.setTag("anchorcoords", coords);
+    }
+
+    public ArrayList<BlockPos> getAnchor(ItemStack stack) {
+        NBTTagCompound tagCompound = stack.getTagCompound();
+        if (tagCompound == null){
+            tagCompound = initToolTag(stack);
+        }
+        ArrayList<BlockPos> coordinates = new ArrayList<BlockPos>();
+        NBTTagList coordList = (NBTTagList) tagCompound.getTag("anchorcoords");
+        if (coordList.tagCount() == 0 || coordList == null) { return coordinates;}
+
+        for (int i = 0;i<coordList.tagCount();i++) {
+            coordinates.add(NBTUtil.getPosFromTag(coordList.getCompoundTagAt(i)));
+        }
+        return coordinates;
     }
 
     public void setToolMode(ItemStack stack, toolModes mode) {
@@ -183,8 +218,22 @@ public class BuildingTool extends Item {
         RayTraceResult lookingAt = world.rayTraceBlocks(start,end,false,true,false);
 
         if (!world.isRemote) {
-            if (lookingAt != null && world.getBlockState(lookingAt.getBlockPos()) != Blocks.AIR.getDefaultState()) {
-                build(world, player, lookingAt.getBlockPos(),lookingAt.sideHit,itemstack);
+            ArrayList<BlockPos> coords = getAnchor(itemstack);
+            if (coords.size() > 0) {
+                if (KeyBindings.anchorKey.isKeyDown()) {
+                    setAnchor(itemstack,new ArrayList<BlockPos>());
+                    player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + "Anchor Removed"), true);
+                } else {
+                    build(world, player, new BlockPos(0,0,0), EnumFacing.UP, itemstack);
+                }
+            }else {
+                if ((lookingAt != null && world.getBlockState(lookingAt.getBlockPos()) != Blocks.AIR.getDefaultState())) {
+                    if (KeyBindings.anchorKey.isKeyDown()) {
+                        anchorBlocks(world, player, lookingAt.getBlockPos(), lookingAt.sideHit, itemstack);
+                    } else {
+                        build(world, player, lookingAt.getBlockPos(), lookingAt.sideHit, itemstack);
+                    }
+                }
             }
         }
         return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, itemstack);
@@ -206,13 +255,34 @@ public class BuildingTool extends Item {
             range++;
         }
         setToolRange(heldItem,range);
-        player.sendStatusMessage(new TextComponentString(TextFormatting.RED + "Tool range: " + range), true);
+        player.sendStatusMessage(new TextComponentString(TextFormatting.DARK_BLUE + "Tool range: " + range), true);
+    }
+
+    public boolean anchorBlocks(World world, EntityPlayer player, BlockPos startBlock, EnumFacing sideHit, ItemStack stack) {
+        if (startBlock == null || world.getBlockState(startBlock) == Blocks.AIR.getDefaultState()) {return false;}
+        int range = getToolRange(stack);
+        toolModes mode = getToolMode(stack);
+        ArrayList<BlockPos> currentCoords = getAnchor(stack);
+        if (currentCoords.size() == 0) {
+            ArrayList<BlockPos> coords = BuildingModes.getBuildOrders(world, player, startBlock, sideHit, range, mode);
+            setAnchor(stack, coords);
+            player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + "Render Anchored"), true);
+        } else {
+            setAnchor(stack, new ArrayList<BlockPos>());
+            player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + "Anchor Removed"), true);
+        }
+        return true;
     }
 
     public boolean build(World world, EntityPlayer player, BlockPos startBlock, EnumFacing sideHit, ItemStack stack) {
         int range = getToolRange(stack);
         toolModes mode = getToolMode(stack);
-        ArrayList<BlockPos> coords = BuildingModes.getBuildOrders(world,player,startBlock,sideHit,range,mode);
+        ArrayList<BlockPos> coords = getAnchor(stack);
+        if (coords.size() == 0) {
+            coords = BuildingModes.getBuildOrders(world, player, startBlock, sideHit, range, mode);
+        } else {
+            setAnchor(stack,new ArrayList<BlockPos>());
+        }
         ArrayList<BlockPos> undoCoords = new ArrayList<BlockPos>();
         Set<BlockPos> coordinates = new HashSet<BlockPos>(coords);
         ItemStack heldItem = player.getHeldItemMainhand();
@@ -304,7 +374,8 @@ public class BuildingTool extends Item {
         if (lookingAt != null) {
             World world = player.world;
             IBlockState startBlock = world.getBlockState(lookingAt.getBlockPos());
-            if ((startBlock != null) && (startBlock != Blocks.AIR.getDefaultState()) && (startBlock != ModBlocks.effectBlock.getDefaultState())) {
+            ArrayList<BlockPos> coordinates = getAnchor(buildingTool);
+            if (((startBlock != null) && (startBlock != Blocks.AIR.getDefaultState()) && (startBlock != ModBlocks.effectBlock.getDefaultState())) || coordinates.size() > 0) {
                 //Get the item stack and the block that we'll be rendering (From the Itemstack's NBT)
                 ItemStack heldItem = player.getHeldItemMainhand();
                 IBlockState renderBlockState = getToolBlock(heldItem);
@@ -314,7 +385,10 @@ public class BuildingTool extends Item {
                     return;
                 }
                 //Build a list of coordinates based on the tool mode and range
-                ArrayList<BlockPos> coordinates = BuildingModes.getBuildOrders(world,player,lookingAt.getBlockPos(),lookingAt.sideHit, range, mode);
+
+                if (coordinates.size() == 0) {
+                    coordinates = BuildingModes.getBuildOrders(world, player, lookingAt.getBlockPos(), lookingAt.sideHit, range, mode);
+                }
 
                 //Figure out how many of the block we're rendering we have in the inventory of the player.
                 ItemStack itemStack = renderBlockState.getBlock().getPickBlock(renderBlockState,null,world,new BlockPos(0,0,0),player);

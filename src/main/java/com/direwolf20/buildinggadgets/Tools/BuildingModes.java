@@ -7,9 +7,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 public class BuildingModes {
     private static boolean isReplaceable(World world, BlockPos pos) {
@@ -75,9 +72,9 @@ public class BuildingModes {
             }
         }
         //***************************************************
-        //VertWall
+        //VerticalWall
         //***************************************************
-        else if (mode == BuildingTool.toolModes.VertWall) {
+        else if (mode == BuildingTool.toolModes.VerticalWall) {
             if (sideHit == EnumFacing.UP) {
                 for (int y = 1; y <= range; y++) {
                     for (int x = boundX * -1; x <= boundX; x++) {
@@ -116,9 +113,9 @@ public class BuildingModes {
             }
         }
         //***************************************************
-        //VertCol
+        //VerticalColumn
         //***************************************************
-        else if (mode == BuildingTool.toolModes.VertCol) {
+        else if (mode == BuildingTool.toolModes.VerticalColumn) {
             if (sideHit == EnumFacing.UP) {
                 for (int y = 1; y <= range; y++) {
                     pos = new BlockPos(startBlock.getX(), startBlock.getY() + y, startBlock.getZ());
@@ -145,9 +142,9 @@ public class BuildingModes {
             }
         }
         //***************************************************
-        //HorzCol
+        //HorizontalColumn
         //***************************************************
-        else if (mode == BuildingTool.toolModes.HorzCol) {
+        else if (mode == BuildingTool.toolModes.HorizontalColumn) {
             if (sideHit == EnumFacing.UP || sideHit == EnumFacing.DOWN) {
                 sideHit = playerFacing.getOpposite();
             }
@@ -193,9 +190,9 @@ public class BuildingModes {
             }
         }
         //***************************************************
-        //HorzWall
+        //HorizontalWall
         //***************************************************
-        else if (mode == BuildingTool.toolModes.HorzWall) {
+        else if (mode == BuildingTool.toolModes.HorizontalWall) {
             /*if (sideHit == EnumFacing.UP || sideHit == EnumFacing.DOWN) {
                 sideHit = playerFacing.getOpposite();
             }*/
