@@ -31,7 +31,6 @@ public class PacketChangeRange implements IMessage {
         }
 
         private void handle(PacketChangeRange message, MessageContext ctx) {
-            // @todo
             EntityPlayerMP playerEntity = ctx.getServerHandler().player;
             ItemStack heldItem = playerEntity.getHeldItem(EnumHand.MAIN_HAND);
             if (!heldItem.isEmpty() && heldItem.getItem() instanceof BuildingTool) {

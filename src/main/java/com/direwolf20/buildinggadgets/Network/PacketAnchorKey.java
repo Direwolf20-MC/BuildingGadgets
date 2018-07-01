@@ -1,6 +1,10 @@
 package com.direwolf20.buildinggadgets.Network;
 
+import com.direwolf20.buildinggadgets.Items.BuildingTool;
 import io.netty.buffer.ByteBuf;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumHand;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
@@ -27,7 +31,12 @@ public class PacketAnchorKey implements IMessage {
         }
 
         private void handle(PacketAnchorKey message, MessageContext ctx) {
-
+            EntityPlayerMP playerEntity = ctx.getServerHandler().player;
+            ItemStack heldItem = playerEntity.getHeldItem(EnumHand.MAIN_HAND);
+            if (!heldItem.isEmpty() && heldItem.getItem() instanceof BuildingTool) {
+                BuildingTool buildingTool = (BuildingTool) (heldItem.getItem());
+                buildingTool.anchorBlocks(playerEntity, heldItem);
+            }
         }
     }
 }

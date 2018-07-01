@@ -220,19 +220,10 @@ public class BuildingTool extends Item {
         if (!world.isRemote) {
             ArrayList<BlockPos> coords = getAnchor(itemstack);
             if (coords.size() > 0) {
-                if (KeyBindings.anchorKey.isKeyDown()) {
-                    setAnchor(itemstack,new ArrayList<BlockPos>());
-                    player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + "Anchor Removed"), true);
-                } else {
-                    build(world, player, new BlockPos(0,0,0), EnumFacing.UP, itemstack);
-                }
+                build(world, player, new BlockPos(0,0,0), EnumFacing.UP, itemstack);
             }else {
                 if ((lookingAt != null && world.getBlockState(lookingAt.getBlockPos()) != Blocks.AIR.getDefaultState())) {
-                    if (KeyBindings.anchorKey.isKeyDown()) {
-                        anchorBlocks(world, player, lookingAt.getBlockPos(), lookingAt.sideHit, itemstack);
-                    } else {
-                        build(world, player, lookingAt.getBlockPos(), lookingAt.sideHit, itemstack);
-                    }
+                    build(world, player, lookingAt.getBlockPos(), lookingAt.sideHit, itemstack);
                 }
             }
         }
@@ -258,12 +249,23 @@ public class BuildingTool extends Item {
         player.sendStatusMessage(new TextComponentString(TextFormatting.DARK_BLUE + "Tool range: " + range), true);
     }
 
-    public boolean anchorBlocks(World world, EntityPlayer player, BlockPos startBlock, EnumFacing sideHit, ItemStack stack) {
-        if (startBlock == null || world.getBlockState(startBlock) == Blocks.AIR.getDefaultState()) {return false;}
+    public boolean anchorBlocks(EntityPlayer player, ItemStack stack) {
+        World world = player.world;
+        //if (startBlock == null || world.getBlockState(startBlock) == Blocks.AIR.getDefaultState()) {return false;}
+
         int range = getToolRange(stack);
         toolModes mode = getToolMode(stack);
         ArrayList<BlockPos> currentCoords = getAnchor(stack);
         if (currentCoords.size() == 0) {
+            float rayTraceRange = 20f;
+            Vec3d look = player.getLookVec();
+            Vec3d start = new Vec3d(player.posX,player.posY+player.getEyeHeight(),player.posZ);
+            Vec3d end = new Vec3d(player.posX+look.x * rayTraceRange,player.posY+player.getEyeHeight()+look.y*rayTraceRange,player.posZ+look.z*rayTraceRange);
+            RayTraceResult lookingAt = world.rayTraceBlocks(start,end,false,true,false);
+            if (lookingAt == null) {return false;}
+            BlockPos startBlock = lookingAt.getBlockPos();
+            EnumFacing sideHit = lookingAt.sideHit;
+            if (startBlock == null || world.getBlockState(startBlock) == Blocks.AIR.getDefaultState()) {return false;}
             ArrayList<BlockPos> coords = BuildingModes.getBuildOrders(world, player, startBlock, sideHit, range, mode);
             setAnchor(stack, coords);
             player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + "Render Anchored"), true);
