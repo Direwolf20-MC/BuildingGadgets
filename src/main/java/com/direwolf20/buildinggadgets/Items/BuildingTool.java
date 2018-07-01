@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.Items;
 
+import com.direwolf20.buildinggadgets.Blocks.EffectBlock;
 import com.direwolf20.buildinggadgets.BuildingGadgets;
 import com.direwolf20.buildinggadgets.Config;
 import com.direwolf20.buildinggadgets.Entities.BlockBuildEntity;
@@ -179,7 +180,6 @@ public class BuildingTool extends Item {
         Vec3d look = player.getLookVec();
         Vec3d start = new Vec3d(player.posX,player.posY+player.getEyeHeight(),player.posZ);
         Vec3d end = new Vec3d(player.posX+look.x * rayTraceRange,player.posY+player.getEyeHeight()+look.y*rayTraceRange,player.posZ+look.z*rayTraceRange);
-
         RayTraceResult lookingAt = world.rayTraceBlocks(start,end,false,true,false);
 
         if (!world.isRemote) {
@@ -195,7 +195,6 @@ public class BuildingTool extends Item {
         mode = mode.next();
         setToolMode(heldItem,mode);
         player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + "Tool Mode: " + mode.name()), true);
-
     }
 
     public void rangeChange(EntityPlayer player, ItemStack heldItem) {
@@ -216,14 +215,14 @@ public class BuildingTool extends Item {
         ArrayList<BlockPos> coords = BuildingModes.getBuildOrders(world,player,startBlock,sideHit,range,mode);
         ArrayList<BlockPos> undoCoords = new ArrayList<BlockPos>();
         Set<BlockPos> coordinates = new HashSet<BlockPos>(coords);
-        IBlockState blockState = Blocks.AIR.getDefaultState();
         ItemStack heldItem = player.getHeldItemMainhand();
-        NBTTagCompound tagCompound = heldItem.getTagCompound();
-        blockState = NBTUtil.readBlockState(tagCompound.getCompoundTag("blockstate"));
+        IBlockState blockState = getToolBlock(heldItem);
+
         if (blockState != Blocks.AIR.getDefaultState()) {
             IBlockState state = Blocks.AIR.getDefaultState();
+            fakeWorld.setWorldAndState(player.world, blockState, coordinates);
+
             for (BlockPos coordinate : coords) {
-                fakeWorld.setWorldAndState(player.world, blockState, coordinates);
                 if (fakeWorld.getWorldType() != WorldType.DEBUG_ALL_BLOCK_STATES) {
                     try {
                         state = blockState.getActualState(fakeWorld, coordinate);
@@ -262,7 +261,7 @@ public class BuildingTool extends Item {
                 ItemStack itemStack = currentBlock.getBlock().getPickBlock(currentBlock, null, world, coord, player);
                 double distance = coord.getDistance(player.getPosition().getX(),player.getPosition().getY(),player.getPosition().getZ());
                 boolean sameDim = (player.dimension == dimension);
-                if (distance < 35 && sameDim) {
+                if (distance < 35 && sameDim && currentBlock != ModBlocks.effectBlock.getDefaultState()) {
                     if (InventoryManipulation.giveItem(itemStack, player)) {
                         world.spawnEntity(new BlockBuildEntity(world, coord, player, currentBlock, 2));
                     } else {
