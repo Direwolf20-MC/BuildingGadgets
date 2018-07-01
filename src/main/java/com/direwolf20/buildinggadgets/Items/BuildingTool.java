@@ -1,6 +1,7 @@
 package com.direwolf20.buildinggadgets.Items;
 
 import com.direwolf20.buildinggadgets.BuildingGadgets;
+import com.direwolf20.buildinggadgets.Config;
 import com.direwolf20.buildinggadgets.Entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.ModBlocks;
 import com.direwolf20.buildinggadgets.Tools.BuildingModes;
@@ -199,7 +200,7 @@ public class BuildingTool extends Item {
 
     public void rangeChange(EntityPlayer player, ItemStack heldItem) {
         int range = getToolRange(heldItem);
-        if (range >=10) {
+        if (range >= Config.maxRange) {
             range = 1;
         }
         else {
