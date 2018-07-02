@@ -48,6 +48,7 @@ public class BuildingTool extends Item {
 
     private static final BlockRenderLayer[] LAYERS = BlockRenderLayer.values();
     private static final FakeBuilderWorld fakeWorld = new FakeBuilderWorld();
+    float rayTraceRange = 20f; //Range of the tool's working mode @todo make this a config
 
     public enum toolModes {
         BuildToMe,VerticalColumn,HorizontalColumn,VerticalWall,HorizontalWall;
@@ -178,17 +179,35 @@ public class BuildingTool extends Item {
     public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
         ItemStack stack = player.getHeldItem(hand);
         player.setActiveHand(hand);
-            if (!world.isRemote) {
-                if (player.isSneaking()) {
-                    selectBlock(stack, player, world, pos);
-                } else {
-                    build(world, player, pos, side,stack);
-                }
+        if (!world.isRemote) {
+            if (player.isSneaking()) {
+                selectBlock(stack, player);
+            } else {
+                build(player,stack);
             }
+        }
         return EnumActionResult.SUCCESS;
     }
 
-    private void selectBlock(ItemStack stack, EntityPlayer player, World world, BlockPos pos) {
+    @Override
+    public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
+        ItemStack itemstack = player.getHeldItem(hand);
+        player.setActiveHand(hand);
+        if (!world.isRemote) {
+            if (player.isSneaking()) {
+                selectBlock(itemstack, player);
+            } else {
+                build(player,itemstack);
+            }
+        }
+        return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, itemstack);
+    }
+
+    private void selectBlock(ItemStack stack, EntityPlayer player) {
+        World world = player.world;
+        RayTraceResult lookingAt = getLookingAt(player);
+        if (lookingAt == null) {return;}
+        BlockPos pos = lookingAt.getBlockPos();
         IBlockState state = world.getBlockState(pos);
         TileEntity te = world.getTileEntity(pos);
         if (te != null) {
@@ -198,30 +217,6 @@ public class BuildingTool extends Item {
         if (state != null) {
             setToolBlock(stack,state);
         }
-    }
-
-    @Override
-    public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
-        ItemStack itemstack = player.getHeldItem(hand);
-        player.setActiveHand(hand);
-
-        float rayTraceRange = 20f;
-        Vec3d look = player.getLookVec();
-        Vec3d start = new Vec3d(player.posX,player.posY+player.getEyeHeight(),player.posZ);
-        Vec3d end = new Vec3d(player.posX+look.x * rayTraceRange,player.posY+player.getEyeHeight()+look.y*rayTraceRange,player.posZ+look.z*rayTraceRange);
-        RayTraceResult lookingAt = world.rayTraceBlocks(start,end,false,true,false);
-
-        if (!world.isRemote) {
-            ArrayList<BlockPos> coords = getAnchor(itemstack);
-            if (coords.size() > 0) {
-                build(world, player, new BlockPos(0,0,0), EnumFacing.UP, itemstack);
-            }else {
-                if ((lookingAt != null && world.getBlockState(lookingAt.getBlockPos()) != Blocks.AIR.getDefaultState())) {
-                    build(world, player, lookingAt.getBlockPos(), lookingAt.sideHit, itemstack);
-                }
-            }
-        }
-        return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, itemstack);
     }
 
     public void toggleMode(EntityPlayer player, ItemStack heldItem) {
@@ -243,40 +238,58 @@ public class BuildingTool extends Item {
         player.sendStatusMessage(new TextComponentString(TextFormatting.DARK_BLUE + "Tool range: " + range), true);
     }
 
+    public RayTraceResult getLookingAt(EntityPlayer player) {
+        World world = player.world;
+        Vec3d look = player.getLookVec();
+        Vec3d start = new Vec3d(player.posX,player.posY+player.getEyeHeight(),player.posZ);
+        Vec3d end = new Vec3d(player.posX+look.x * rayTraceRange,player.posY+player.getEyeHeight()+look.y*rayTraceRange,player.posZ+look.z*rayTraceRange);
+        return world.rayTraceBlocks(start,end,false,true,false);
+    }
+
     public boolean anchorBlocks(EntityPlayer player, ItemStack stack) {
         World world = player.world;
-        //if (startBlock == null || world.getBlockState(startBlock) == Blocks.AIR.getDefaultState()) {return false;}
-
         int range = getToolRange(stack);
         toolModes mode = getToolMode(stack);
         ArrayList<BlockPos> currentCoords = getAnchor(stack);
+
         if (currentCoords.size() == 0) {
-            float rayTraceRange = 20f;
-            Vec3d look = player.getLookVec();
-            Vec3d start = new Vec3d(player.posX,player.posY+player.getEyeHeight(),player.posZ);
-            Vec3d end = new Vec3d(player.posX+look.x * rayTraceRange,player.posY+player.getEyeHeight()+look.y*rayTraceRange,player.posZ+look.z*rayTraceRange);
-            RayTraceResult lookingAt = world.rayTraceBlocks(start,end,false,true,false);
+            //If we don't have an anchor, find the block we're supposed to anchor to
+            RayTraceResult lookingAt = getLookingAt(player);
+            //If we aren't looking at anything, exit
             if (lookingAt == null) {return false;}
             BlockPos startBlock = lookingAt.getBlockPos();
             EnumFacing sideHit = lookingAt.sideHit;
+            //If we are looking at air, exit
             if (startBlock == null || world.getBlockState(startBlock) == Blocks.AIR.getDefaultState()) {return false;}
+            //Build the positions list based on tool mode and range
             ArrayList<BlockPos> coords = BuildingModes.getBuildOrders(world, player, startBlock, sideHit, range, mode);
+            //Set the anchor NBT
             setAnchor(stack, coords);
             player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + "Render Anchored"), true);
         } else {
+            //If theres already an anchor, remove it.
             setAnchor(stack, new ArrayList<BlockPos>());
             player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + "Anchor Removed"), true);
         }
         return true;
     }
 
-    public boolean build(World world, EntityPlayer player, BlockPos startBlock, EnumFacing sideHit, ItemStack stack) {
+    public boolean build(EntityPlayer player, ItemStack stack) {
+        World world = player.world;
         int range = getToolRange(stack);
         toolModes mode = getToolMode(stack);
         ArrayList<BlockPos> coords = getAnchor(stack);
+
         if (coords.size() == 0) {
+            //If we don't have an anchor, build in the current spot
+            RayTraceResult lookingAt = getLookingAt(player);
+            //If we aren't looking at anything, exit
+            if (lookingAt == null) {return false;}
+            BlockPos startBlock = lookingAt.getBlockPos();
+            EnumFacing sideHit = lookingAt.sideHit;
             coords = BuildingModes.getBuildOrders(world, player, startBlock, sideHit, range, mode);
         } else {
+            //If we do have an anchor, erase it (Even if the build fails)
             setAnchor(stack,new ArrayList<BlockPos>());
         }
         ArrayList<BlockPos> undoCoords = new ArrayList<BlockPos>();
@@ -285,12 +298,14 @@ public class BuildingTool extends Item {
         IBlockState blockState = getToolBlock(heldItem);
 
         if (blockState != Blocks.AIR.getDefaultState()) {
-            IBlockState state = Blocks.AIR.getDefaultState();
-            fakeWorld.setWorldAndState(player.world, blockState, coordinates);
+            //Don't attempt a build if a block is not chosen -- Typically only happens on a new tool.
+            IBlockState state = Blocks.AIR.getDefaultState(); //Initialize a new State Variable for use in the fake world
+            fakeWorld.setWorldAndState(player.world, blockState, coordinates); // Initialize the fake world's blocks
 
             for (BlockPos coordinate : coords) {
                 if (fakeWorld.getWorldType() != WorldType.DEBUG_ALL_BLOCK_STATES) {
                     try {
+                        //Get the state of the block in the fake world (This lets fences be connected, etc)
                         state = blockState.getActualState(fakeWorld, coordinate);
                     } catch (Exception var8) {
                     }
@@ -299,10 +314,12 @@ public class BuildingTool extends Item {
                 //Disabled to fix Chisel
                 //state = state.getBlock().getExtendedState(state, fakeWorld, coordinate);
                 if (placeBlock(world, player, coordinate, state)) {
+                    //If we successfully place the block, add the location to the undo list.
                     undoCoords.add(coordinate);
                 }
             }
             if (undoCoords.size() > 0) {
+                //If the undo list has any data in it, add it to the player Map.
                 UndoState undoState = new UndoState(player.dimension, undoCoords);
                 Stack<UndoState> undoStack = UndoBuild.getPlayerMap(player.getUniqueID());
                 undoStack.push(undoState);
