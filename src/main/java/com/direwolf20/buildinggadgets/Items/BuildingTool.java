@@ -230,8 +230,7 @@ public class BuildingTool extends Item {
         int range = getToolRange(heldItem);
         if (range >= Config.maxRange) {
             range = 1;
-        }
-        else {
+        } else {
             range++;
         }
         setToolRange(heldItem,range);
@@ -331,31 +330,36 @@ public class BuildingTool extends Item {
 
     public static boolean undoBuild(EntityPlayer player) {
         Stack<UndoState> undoStack = UndoBuild.getPlayerMap(player.getUniqueID());
-        if (undoStack.empty()) {return false;}
+        if (undoStack.empty()) {return false;} //Exit if theres nothing to undo.
         World world = player.world;
         if (!world.isRemote) {
             IBlockState currentBlock = Blocks.AIR.getDefaultState();
-            UndoState undoState = undoStack.pop();
-            ArrayList<BlockPos> undoCoords = undoState.coordinates;
-            int dimension = undoState.dimension;
+            UndoState undoState = undoStack.pop(); //Get the Dim and Coords to Undo
+            ArrayList<BlockPos> undoCoords = undoState.coordinates; //Get the Coords to undo
+            int dimension = undoState.dimension; //Get the Dimension to undo
             ArrayList<BlockPos> failedRemovals = new ArrayList<BlockPos>();
             for (BlockPos coord : undoCoords) {
                 currentBlock = world.getBlockState(coord);
                 ItemStack itemStack = currentBlock.getBlock().getPickBlock(currentBlock, null, world, coord, player);
+                //Only allow undo from the same dimension, if you're within 35 blocks (Due to chunkloading concerns)
                 double distance = coord.getDistance(player.getPosition().getX(),player.getPosition().getY(),player.getPosition().getZ());
                 boolean sameDim = (player.dimension == dimension);
-                if (distance < 35 && sameDim && currentBlock != ModBlocks.effectBlock.getDefaultState()) {
+                if (distance < 35 && sameDim && currentBlock != ModBlocks.effectBlock.getDefaultState()) { //Don't allow us to undo a block while its still being placed
                     if (InventoryManipulation.giveItem(itemStack, player)) {
+                        //Try to give the player an item, if inventory is full this fails
                         world.spawnEntity(new BlockBuildEntity(world, coord, player, currentBlock, 2));
                     } else {
+                        //If we failed to give the item, we want to put this back on the undo list, so start building a list
                         failedRemovals.add(coord);
                     }
                 }
                 else {
+                    //If you're in the wrong dimension or too far away, fail the undo.
                     failedRemovals.add(coord);
                 }
             }
             if (failedRemovals.size() != 0) {
+                //Add any failed undo blocks to the undo stack.
                 UndoState failedState = new UndoState(player.dimension,failedRemovals);
                 undoStack.push(failedState);
                 UndoBuild.updatePlayerMap(player.getUniqueID(),undoStack);
@@ -480,5 +484,4 @@ public class BuildingTool extends Item {
             }
         }
     }
-
 }
