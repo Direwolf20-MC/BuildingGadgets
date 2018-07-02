@@ -383,15 +383,15 @@ public class BuildingTool extends Item {
 
 
     @SideOnly(Side.CLIENT)
-    public void renderOverlay(RenderWorldLastEvent evt, EntityPlayer player, ItemStack buildingTool) {
-        int range = getToolRange(buildingTool);
-        toolModes mode = getToolMode(buildingTool);
+    public void renderOverlay(RenderWorldLastEvent evt, EntityPlayer player, ItemStack stack) {
+        int range = getToolRange(stack);
+        toolModes mode = getToolMode(stack);
         RayTraceResult lookingAt = player.rayTrace(20, 1.0F);
         IBlockState state = Blocks.AIR.getDefaultState();
         if (lookingAt != null) {
             World world = player.world;
             IBlockState startBlock = world.getBlockState(lookingAt.getBlockPos());
-            ArrayList<BlockPos> coordinates = getAnchor(buildingTool);
+            ArrayList<BlockPos> coordinates = getAnchor(stack);
             if (((startBlock != null) && (startBlock != Blocks.AIR.getDefaultState()) && (startBlock != ModBlocks.effectBlock.getDefaultState())) || coordinates.size() > 0) {
                 //Get the item stack and the block that we'll be rendering (From the Itemstack's NBT)
                 ItemStack heldItem = player.getHeldItemMainhand();

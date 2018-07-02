@@ -136,19 +136,16 @@ public class BlockBuildEntity extends Entity implements IEntityAdditionalSpawnDa
             else if (setPos != null && setBlock != null && getToolMode() == 2) {
                 world.setBlockState(setPos,Blocks.AIR.getDefaultState());
             }
-
+            else if(setPos != null && setBlock != null && getToolMode() == 3) {
+                world.spawnEntity(new BlockBuildEntity(world, setPos, spawnedBy,originalSetBlock,1));
+            }
         }
     }
 
     private void despawnTick() {
         despawning++;
         if(despawning > 1) {
-
             setDead();
-            //System.out.println(setPos+":"+setBlock);
-            if(getToolMode() == 3) {
-                world.spawnEntity(new BlockBuildEntity(world, setPos, spawnedBy,originalSetBlock,1));
-            }
         }
     }
 

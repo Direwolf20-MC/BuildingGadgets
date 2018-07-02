@@ -3,6 +3,7 @@ package com.direwolf20.buildinggadgets;
 import com.direwolf20.buildinggadgets.Entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.Entities.BlockBuildEntityRender;
 import com.direwolf20.buildinggadgets.Items.BuildingTool;
+import com.direwolf20.buildinggadgets.Items.ExchangerTool;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockRendererDispatcher;
@@ -63,6 +64,10 @@ public class ClientProxy extends CommonProxy {
         if (heldItem.getItem() instanceof BuildingTool) {
             BuildingTool buildingTool = (BuildingTool) heldItem.getItem();
             buildingTool.renderOverlay(evt, p, heldItem);
+        }
+        else if (heldItem.getItem() instanceof ExchangerTool) {
+            ExchangerTool exchangerTool = (ExchangerTool) heldItem.getItem();
+            exchangerTool.renderOverlay(evt, p, heldItem);
         }
 
     }

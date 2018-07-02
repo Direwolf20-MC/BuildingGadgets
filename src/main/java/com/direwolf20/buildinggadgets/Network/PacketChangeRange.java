@@ -1,6 +1,7 @@
 package com.direwolf20.buildinggadgets.Network;
 
 import com.direwolf20.buildinggadgets.Items.BuildingTool;
+import com.direwolf20.buildinggadgets.Items.ExchangerTool;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
@@ -36,6 +37,10 @@ public class PacketChangeRange implements IMessage {
             if (!heldItem.isEmpty() && heldItem.getItem() instanceof BuildingTool) {
                 BuildingTool buildingTool = (BuildingTool) (heldItem.getItem());
                 buildingTool.rangeChange(playerEntity, heldItem);
+            }
+            else if (!heldItem.isEmpty() && heldItem.getItem() instanceof ExchangerTool) {
+                ExchangerTool exchangerTool = (ExchangerTool) (heldItem.getItem());
+                exchangerTool.rangeChange(playerEntity, heldItem);
             }
         }
     }
