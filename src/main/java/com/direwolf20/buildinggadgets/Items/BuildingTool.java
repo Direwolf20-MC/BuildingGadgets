@@ -1,21 +1,17 @@
 package com.direwolf20.buildinggadgets.Items;
 
-import com.direwolf20.buildinggadgets.Blocks.EffectBlock;
 import com.direwolf20.buildinggadgets.BuildingGadgets;
 import com.direwolf20.buildinggadgets.Config;
 import com.direwolf20.buildinggadgets.Entities.BlockBuildEntity;
-import com.direwolf20.buildinggadgets.KeyBindings;
 import com.direwolf20.buildinggadgets.ModBlocks;
 import com.direwolf20.buildinggadgets.Tools.BuildingModes;
 import com.direwolf20.buildinggadgets.Tools.InventoryManipulation;
 import com.direwolf20.buildinggadgets.Tools.UndoBuild;
 import com.direwolf20.buildinggadgets.Tools.UndoState;
-import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
-import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
@@ -38,13 +34,11 @@ import net.minecraftforge.client.ForgeHooksClient;
 import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.client.model.ModelLoader;
-import net.minecraftforge.client.settings.KeyBindingMap;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL14;
 
-import javax.swing.text.JTextComponent;
 import java.util.*;
 
 import static net.minecraft.block.BlockStainedGlass.COLOR;
