@@ -246,7 +246,7 @@ public class BuildingTool extends Item {
         Vec3d look = player.getLookVec();
         Vec3d start = new Vec3d(player.posX,player.posY+player.getEyeHeight(),player.posZ);
         Vec3d end = new Vec3d(player.posX+look.x * rayTraceRange,player.posY+player.getEyeHeight()+look.y*rayTraceRange,player.posZ+look.z*rayTraceRange);
-        return world.rayTraceBlocks(start,end,false,true,false);
+        return world.rayTraceBlocks(start,end,false,false,false);
     }
 
     public boolean anchorBlocks(EntityPlayer player, ItemStack stack) {
@@ -390,7 +390,7 @@ public class BuildingTool extends Item {
     public void renderOverlay(RenderWorldLastEvent evt, EntityPlayer player, ItemStack stack) {
         int range = getToolRange(stack);
         toolModes mode = getToolMode(stack);
-        RayTraceResult lookingAt = player.rayTrace(20, 1.0F);
+        RayTraceResult lookingAt = getLookingAt(player);
         IBlockState state = Blocks.AIR.getDefaultState();
         if (lookingAt != null) {
             World world = player.world;
@@ -407,7 +407,7 @@ public class BuildingTool extends Item {
                     return;
                 }
                 //Build a list of coordinates based on the tool mode and range
-
+                //System.out.println(lookingAt.getBlockPos());
                 if (coordinates.size() == 0) {
                     coordinates = BuildingModes.getBuildOrders(world, player, lookingAt.getBlockPos(), lookingAt.sideHit, range, mode);
                 }
