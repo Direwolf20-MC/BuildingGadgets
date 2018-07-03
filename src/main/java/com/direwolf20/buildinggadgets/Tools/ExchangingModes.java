@@ -25,7 +25,7 @@ public class ExchangingModes {
         BlockPos pos = startBlock;
         int bound = (range-1)/2;
         EnumFacing playerFacing = player.getHorizontalFacing();
-        int boundX, boundZ;
+        int boundX, boundZ, boundXS, boundZS;
         if (playerFacing == EnumFacing.SOUTH || playerFacing == EnumFacing.NORTH) {
             boundX = bound;
             boundZ = 0;
@@ -34,6 +34,15 @@ public class ExchangingModes {
             boundX = 0;
             boundZ = bound;
         }
+        if (sideHit == EnumFacing.SOUTH || sideHit == EnumFacing.NORTH) {
+            boundXS = bound;
+            boundZS = 0;
+        }
+        else {
+            boundXS = 0;
+            boundZS = bound;
+        }
+
         IBlockState currentBlock = world.getBlockState(startBlock);
 
         //***************************************************
@@ -52,9 +61,10 @@ public class ExchangingModes {
             }
             else {
                 for (int y = bound; y >= bound*-1; y--) {
-                    for (int x = boundX * -1; x <= boundX; x++) {
-                        for (int z = boundZ * -1; z <= boundZ; z++) {
+                    for (int x = boundXS * -1; x <= boundXS; x++) {
+                        for (int z = boundZS * -1; z <= boundZS; z++) {
                             pos = new BlockPos(startBlock.getX() + x, startBlock.getY() - y, startBlock.getZ() + z);
+                            //System.out.println(pos);
                             if (isReplaceable(world, pos,currentBlock,setBlock)) {
                                 coordinates.add(pos);
                             }
