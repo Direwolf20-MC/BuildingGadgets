@@ -392,11 +392,15 @@ public class BuildingTool extends Item {
         toolModes mode = getToolMode(stack);
         RayTraceResult lookingAt = getLookingAt(player);
         IBlockState state = Blocks.AIR.getDefaultState();
-        if (lookingAt != null) {
+        ArrayList<BlockPos> coordinates = getAnchor(stack);
+        if (lookingAt != null || coordinates.size() > 0) {
             World world = player.world;
-            IBlockState startBlock = world.getBlockState(lookingAt.getBlockPos());
-            ArrayList<BlockPos> coordinates = getAnchor(stack);
-            if (((startBlock != null) && (startBlock != Blocks.AIR.getDefaultState()) && (startBlock != ModBlocks.effectBlock.getDefaultState())) || coordinates.size() > 0) {
+            IBlockState startBlock = Blocks.AIR.getDefaultState();
+            if (!(lookingAt == null)) {
+                startBlock = world.getBlockState(lookingAt.getBlockPos());
+            }
+            //if (((startBlock != null) && (startBlock != Blocks.AIR.getDefaultState()) && (startBlock != ModBlocks.effectBlock.getDefaultState())) || coordinates.size() > 0) {
+            if (startBlock != ModBlocks.effectBlock.getDefaultState()) {
                 //Get the item stack and the block that we'll be rendering (From the Itemstack's NBT)
                 ItemStack heldItem = player.getHeldItemMainhand();
                 IBlockState renderBlockState = getToolBlock(heldItem);
