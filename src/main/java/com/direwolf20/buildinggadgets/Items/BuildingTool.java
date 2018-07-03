@@ -63,6 +63,7 @@ public class BuildingTool extends Item {
     public BuildingTool() {
         setRegistryName("buildingtool");        // The unique name (within your mod) that identifies this item
         setUnlocalizedName(BuildingGadgets.MODID + ".buildingtool");     // Used for localization (en_US.lang)
+        setMaxStackSize(1);
     }
 
     @SideOnly(Side.CLIENT)
@@ -172,7 +173,9 @@ public class BuildingTool extends Item {
         super.addInformation(stack, player, list, b);
         list.add(TextFormatting.DARK_GREEN + "Block: " + getToolBlock(stack).getBlock().getLocalizedName());
         list.add(TextFormatting.AQUA + "Mode: " + getToolMode(stack));
-        list.add(TextFormatting.RED + "Range: " + getToolRange(stack));
+        if (getToolMode(stack) != toolModes.BuildToMe) {
+            list.add(TextFormatting.RED + "Range: " + getToolRange(stack));
+        }
     }
 
     @Override

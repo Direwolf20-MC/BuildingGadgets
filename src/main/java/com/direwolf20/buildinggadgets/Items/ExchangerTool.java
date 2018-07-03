@@ -56,12 +56,12 @@ public class ExchangerTool extends Item {
         {
             return vals[(this.ordinal()+1) % vals.length];
         }
-
     }
 
     public ExchangerTool() {
         setRegistryName("exchangertool");        // The unique name (within your mod) that identifies this item
         setUnlocalizedName(BuildingGadgets.MODID + ".exchangertool");     // Used for localization (en_US.lang)
+        setMaxStackSize(1);
     }
 
     @SideOnly(Side.CLIENT)
@@ -171,6 +171,7 @@ public class ExchangerTool extends Item {
         list.add(TextFormatting.DARK_GREEN + "Block: " + getToolBlock(stack).getBlock().getLocalizedName());
         list.add(TextFormatting.AQUA + "Mode: " + getToolMode(stack));
         list.add(TextFormatting.RED + "Range: " + getToolRange(stack));
+
     }
 
 
@@ -296,8 +297,7 @@ public class ExchangerTool extends Item {
         ItemStack heldItem = player.getHeldItemMainhand();
         IBlockState blockState = getToolBlock(heldItem);
 
-        if (blockState != Blocks.AIR.getDefaultState()) {
-            //Don't attempt a build if a block is not chosen -- Typically only happens on a new tool.
+        if (blockState != Blocks.AIR.getDefaultState()) {  //Don't attempt a build if a block is not chosen -- Typically only happens on a new tool.
             IBlockState state = Blocks.AIR.getDefaultState(); //Initialize a new State Variable for use in the fake world
             fakeWorld.setWorldAndState(player.world, blockState, coordinates); // Initialize the fake world's blocks
             for (BlockPos coordinate : coords) {
@@ -318,7 +318,6 @@ public class ExchangerTool extends Item {
     }
 
     public boolean exchangeBlock(World world, EntityPlayer player, BlockPos pos, IBlockState setBlock) {
-        //@todo figure out why this dupes items....
         IBlockState currentBlock = world.getBlockState(pos);
         ItemStack itemStack = setBlock.getBlock().getPickBlock(setBlock,null,world,pos,player);
         ItemStack returnItem = currentBlock.getBlock().getPickBlock(currentBlock, null, world,pos,player);

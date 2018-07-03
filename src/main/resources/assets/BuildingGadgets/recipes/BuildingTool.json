@@ -1,0 +1,26 @@
+{
+  "result": {
+    "item": "buildinggadgets:buildingtool"
+  },
+  "pattern": [
+    "iri",
+    "drd",
+    "ili"
+  ],
+  "type": "forge:ore_shaped",
+  "key": {
+    "i": {
+      "item": "minecraft:iron_ingot"
+    },
+    "r": {
+      "item": "minecraft:redstone"
+    },
+    "l": {
+      "item": "minecraft:dye",
+      "data": 4
+    },
+    "d": {
+      "item": "minecraft:diamond"
+    }
+  }
+}

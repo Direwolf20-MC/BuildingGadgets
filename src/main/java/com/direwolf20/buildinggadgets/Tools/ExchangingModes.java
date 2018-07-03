@@ -127,7 +127,6 @@ public class ExchangingModes {
                     }
             }
         }
-
         return coordinates;
     }
 }
