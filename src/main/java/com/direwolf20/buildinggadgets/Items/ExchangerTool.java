@@ -12,6 +12,7 @@ import net.minecraft.client.renderer.BlockRendererDispatcher;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
@@ -351,7 +352,8 @@ public class ExchangerTool extends Item {
                 //Get the item stack and the block that we'll be rendering (From the Itemstack's NBT)
                 ItemStack heldItem = player.getHeldItemMainhand();
                 IBlockState renderBlockState = getToolBlock(heldItem);
-
+                Minecraft mc = Minecraft.getMinecraft();
+                mc.renderEngine.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
                 //Don't render anything if theres no block selected (Air)
                 if (renderBlockState == Blocks.AIR.getDefaultState()) {
                     return;
