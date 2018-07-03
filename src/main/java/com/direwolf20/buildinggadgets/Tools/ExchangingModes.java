@@ -12,8 +12,6 @@ import java.util.ArrayList;
 
 public class ExchangingModes {
     private static boolean isReplaceable(World world, BlockPos pos, IBlockState currentBlock, IBlockState setBlock) {
-        //System.out.println(currentBlock);
-        //System.out.println(pos+":"+world.getBlockState(pos).getBlock().getExtendedState(world.getBlockState(pos), world, pos));
         if (world.getBlockState(pos) != currentBlock || world.getBlockState(pos) == ModBlocks.effectBlock.getDefaultState() || world.getBlockState(pos) == setBlock || world.getTileEntity(pos) != null) {
             return false;
         }
@@ -37,7 +35,6 @@ public class ExchangingModes {
             boundZ = bound;
         }
         IBlockState currentBlock = world.getBlockState(startBlock);
-        //IBlockState currentBlock = world.getBlockState(startBlock).getBlock().getExtendedState(world.getBlockState(startBlock), world, pos);
 
         //***************************************************
         //VerticalWall

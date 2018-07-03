@@ -317,7 +317,7 @@ public class ExchangerTool extends Item {
         return true;
     }
 
-    public static boolean exchangeBlock(World world, EntityPlayer player, BlockPos pos, IBlockState setBlock) {
+    public boolean exchangeBlock(World world, EntityPlayer player, BlockPos pos, IBlockState setBlock) {
         //@todo figure out why this dupes items....
         IBlockState currentBlock = world.getBlockState(pos);
         ItemStack itemStack = setBlock.getBlock().getPickBlock(setBlock,null,world,pos,player);
@@ -327,7 +327,6 @@ public class ExchangerTool extends Item {
                 world.spawnEntity(new BlockBuildEntity(world, pos, player, setBlock, 3));
             }
             else {
-                System.out.println(returnItem);
                 InventoryManipulation.useItem(returnItem,player);
             }
         }

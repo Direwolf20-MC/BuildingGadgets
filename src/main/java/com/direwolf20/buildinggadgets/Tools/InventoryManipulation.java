@@ -15,7 +15,8 @@ public class InventoryManipulation {
             return true;
         }
         InventoryPlayer inv = player.inventory;
-        boolean success = inv.addItemStackToInventory(itemStack);
+        ItemStack giveItemStack = itemStack.copy();
+        boolean success = inv.addItemStackToInventory(giveItemStack);
         return success;
     }
 
