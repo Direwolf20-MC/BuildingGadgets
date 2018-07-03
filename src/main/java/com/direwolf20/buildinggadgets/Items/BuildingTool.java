@@ -265,7 +265,7 @@ public class BuildingTool extends Item {
             //If we are looking at air, exit
             if (startBlock == null || world.getBlockState(startBlock) == Blocks.AIR.getDefaultState()) {return false;}
             //Build the positions list based on tool mode and range
-            ArrayList<BlockPos> coords = BuildingModes.getBuildOrders(world, player, startBlock, sideHit, range, mode);
+            ArrayList<BlockPos> coords = BuildingModes.getBuildOrders(world, player, startBlock, sideHit, range, mode,getToolBlock(stack));
             //Set the anchor NBT
             setAnchor(stack, coords);
             player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + "Render Anchored"), true);
@@ -290,7 +290,7 @@ public class BuildingTool extends Item {
             if (lookingAt == null) {return false;}
             BlockPos startBlock = lookingAt.getBlockPos();
             EnumFacing sideHit = lookingAt.sideHit;
-            coords = BuildingModes.getBuildOrders(world, player, startBlock, sideHit, range, mode);
+            coords = BuildingModes.getBuildOrders(world, player, startBlock, sideHit, range, mode,getToolBlock(stack));
         } else {
             //If we do have an anchor, erase it (Even if the build fails)
             setAnchor(stack,new ArrayList<BlockPos>());
@@ -409,7 +409,7 @@ public class BuildingTool extends Item {
                 //Build a list of coordinates based on the tool mode and range
                 //System.out.println(lookingAt.getBlockPos());
                 if (coordinates.size() == 0) {
-                    coordinates = BuildingModes.getBuildOrders(world, player, lookingAt.getBlockPos(), lookingAt.sideHit, range, mode);
+                    coordinates = BuildingModes.getBuildOrders(world, player, lookingAt.getBlockPos(), lookingAt.sideHit, range, mode,renderBlockState);
                 }
 
                 //Figure out how many of the block we're rendering we have in the inventory of the player.
