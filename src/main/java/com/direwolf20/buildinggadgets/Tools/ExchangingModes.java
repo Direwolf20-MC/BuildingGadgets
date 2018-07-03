@@ -63,6 +63,61 @@ public class ExchangingModes {
                 }
             }
         }
+        //***************************************************
+        //VerticalColumn
+        //***************************************************
+        if (mode == ExchangerTool.toolModes.VerticalColumn) {
+            if (sideHit == EnumFacing.UP || sideHit == EnumFacing.DOWN ) {
+                for (int x = boundZ*-1; x <= boundZ; x++) {
+                    for (int z = boundX * -1; z <= boundX; z++) {
+                        pos = new BlockPos(startBlock.getX() - x, startBlock.getY(), startBlock.getZ()+z);
+                        if (isReplaceable(world,pos,currentBlock,setBlock)) {
+                            coordinates.add(pos);
+                        }
+                    }
+                }
+            }
+            else {
+                for (int y = bound; y >= bound*-1; y--) {
+                            pos = new BlockPos(startBlock.getX(), startBlock.getY() - y, startBlock.getZ());
+                            if (isReplaceable(world, pos,currentBlock,setBlock)) {
+                                coordinates.add(pos);
+                            }
+                }
+            }
+        }
+        //***************************************************
+        //HorizontalColumn
+        //***************************************************
+        if (mode == ExchangerTool.toolModes.HorizontalColumn) {
+            if (sideHit == EnumFacing.UP || sideHit == EnumFacing.DOWN ) {
+                for (int x = boundX*-1; x <= boundX; x++) {
+                    for (int z = boundZ * -1; z <= boundZ; z++) {
+                        pos = new BlockPos(startBlock.getX() - x, startBlock.getY(), startBlock.getZ()+z);
+                        if (isReplaceable(world,pos,currentBlock,setBlock)) {
+                            coordinates.add(pos);
+                        }
+                    }
+                }
+            }
+            else if (sideHit == EnumFacing.NORTH || sideHit == EnumFacing.SOUTH ) {
+                for (int x = bound*-1; x <= bound; x++) {
+                    pos = new BlockPos(startBlock.getX()+x, startBlock.getY(), startBlock.getZ());
+                    if (isReplaceable(world, pos,currentBlock,setBlock)) {
+                        coordinates.add(pos);
+                    }
+                }
+            }
+            else if (sideHit == EnumFacing.EAST || sideHit == EnumFacing.WEST ) {
+                    for (int z = bound*-1; z <= bound; z++) {
+                        pos = new BlockPos(startBlock.getX(), startBlock.getY(), startBlock.getZ()+z);
+                        if (isReplaceable(world, pos,currentBlock,setBlock)) {
+                            coordinates.add(pos);
+                        }
+                    }
+            }
+        }
+
         return coordinates;
     }
 }
