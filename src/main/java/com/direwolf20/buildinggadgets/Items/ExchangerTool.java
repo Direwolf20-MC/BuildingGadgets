@@ -426,6 +426,11 @@ public class ExchangerTool extends Item {
                             GlStateManager.rotate(-90.0F, 0.0F, 1.0F, 0.0F);
                             dispatcher.renderBlockBrightness(Blocks.STAINED_GLASS.getDefaultState().withProperty(COLOR, EnumDyeColor.RED), 1f);
                         }
+                        if(!state.getBlock().isOpaqueCube(state)) {
+                            GL14.glBlendColor(1F, 1F, 1F, 0.05f);
+                            GlStateManager.rotate(-90.0F, 0.0F, 1.0F, 0.0F);
+                            dispatcher.renderBlockBrightness(Blocks.STAINED_GLASS.getDefaultState().withProperty(COLOR, EnumDyeColor.WHITE), 1f);
+                        }
                         //Move the render position back to where it was
                         GlStateManager.popMatrix();
                     }
