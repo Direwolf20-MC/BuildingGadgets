@@ -12,7 +12,7 @@ import java.util.ArrayList;
 
 public class ExchangingModes {
     private static boolean isReplaceable(World world, BlockPos pos, IBlockState currentBlock, IBlockState setBlock) {
-        if (world.getBlockState(pos) != currentBlock || world.getBlockState(pos) == ModBlocks.effectBlock.getDefaultState() || world.getBlockState(pos) == setBlock || world.getTileEntity(pos) != null) {
+        if (world.getBlockState(pos) != currentBlock || world.getBlockState(pos) == ModBlocks.effectBlock.getDefaultState() || world.getBlockState(pos) == setBlock || world.getTileEntity(pos) != null || currentBlock.getBlock().getBlockHardness(currentBlock,world,pos) < 0) {
             return false;
         }
         return true;

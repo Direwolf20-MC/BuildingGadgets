@@ -321,13 +321,22 @@ public class ExchangerTool extends Item {
     public boolean exchangeBlock(World world, EntityPlayer player, BlockPos pos, IBlockState setBlock) {
         IBlockState currentBlock = world.getBlockState(pos);
         ItemStack itemStack = setBlock.getBlock().getPickBlock(setBlock,null,world,pos,player);
-        ItemStack returnItem = currentBlock.getBlock().getPickBlock(currentBlock, null, world,pos,player);
-        if (InventoryManipulation.giveItem(returnItem, player)) {
+        //ItemStack returnItem = currentBlock.getBlock().getPickBlock(currentBlock, null, world,pos,player);
+        //ItemStack returnItem = new ItemStack(currentBlock.getBlock().getItemDropped(currentBlock,null,0));
+        NonNullList<ItemStack> returnItems = NonNullList.create();
+        currentBlock.getBlock().getDrops(returnItems,world,pos,currentBlock,0);
+        boolean returnSuccess = true;
+        for (ItemStack returnItem : returnItems) {
+            if (!InventoryManipulation.giveItem(returnItem, player)) {returnSuccess = false;}
+        }
+        if (returnSuccess) {
             if (InventoryManipulation.useItem(itemStack,player)) {
                 world.spawnEntity(new BlockBuildEntity(world, pos, player, setBlock, 3));
             }
             else {
-                InventoryManipulation.useItem(returnItem,player);
+                for (ItemStack returnItem : returnItems) {
+                    InventoryManipulation.useItem(returnItem, player);
+                }
             }
         }
         return true;
