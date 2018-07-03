@@ -8,7 +8,7 @@ public class Config {
     //
 
     // This values below you can access elsewhere in your mod:
-    public static int maxRange = 10;
+    public static int maxRange = 15;
     //public static String yourRealName = "Steve";
 
     // Call this from CommonProxy.preInit(). It will create our config if it doesn't
@@ -31,8 +31,7 @@ public class Config {
     private static void initGeneralConfig(Configuration cfg) {
         cfg.addCustomCategoryComment(CATEGORY_GENERAL, "General configuration");
         // cfg.getBoolean() will get the value in the config if it is already specified there. If not it will create the value.
-        maxRange = cfg.getInt("maxRange", CATEGORY_GENERAL, maxRange,1,35, "The max range of the building tool");
-        //yourRealName = cfg.getString("realName", CATEGORY_GENERAL, yourRealName, "Set your real name here");
+        maxRange = cfg.getInt("maxRange", CATEGORY_GENERAL, maxRange,1,55, "The max range of the building tool");
     }
 
     /*private static void initDimensionConfig(Configuration cfg) {

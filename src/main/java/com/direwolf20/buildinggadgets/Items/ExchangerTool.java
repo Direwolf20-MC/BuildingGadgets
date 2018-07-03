@@ -232,7 +232,7 @@ public class ExchangerTool extends Item {
         if (range >= Config.maxRange) {
             range = 1;
         } else {
-            range++;
+            range = range+2;
         }
         setToolRange(heldItem,range);
         player.sendStatusMessage(new TextComponentString(TextFormatting.DARK_BLUE + "Tool range: " + range), true);
