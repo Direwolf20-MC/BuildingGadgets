@@ -12,6 +12,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
@@ -399,7 +400,8 @@ public class BuildingTool extends Item {
                 //Get the item stack and the block that we'll be rendering (From the Itemstack's NBT)
                 ItemStack heldItem = player.getHeldItemMainhand();
                 IBlockState renderBlockState = getToolBlock(heldItem);
-
+                Minecraft mc = Minecraft.getMinecraft();
+                mc.renderEngine.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
                 //Don't render anything if theres no block selected (Air)
                 if (renderBlockState == Blocks.AIR.getDefaultState()) {
                     return;
