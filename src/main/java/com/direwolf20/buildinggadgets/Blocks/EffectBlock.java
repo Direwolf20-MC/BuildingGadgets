@@ -22,7 +22,7 @@ public class EffectBlock extends Block {
     public EffectBlock() {
         super(Material.ROCK);
         setHardness(20.0f);
-       //this.setBlockUnbreakable();
+        //this.setBlockUnbreakable();
         //this.setCreativeTab(CreativeTabs.BUILDING_BLOCKS);   // the block will appear on the Blocks tab in creative
         setUnlocalizedName(BuildingGadgets.MODID + ".effectblock");     // Used for localization (en_US.lang)
         setRegistryName("effectblock");        // The unique name (within your mod) that identifies this block
@@ -39,8 +39,7 @@ public class EffectBlock extends Block {
     }
 
     @Override
-    public boolean isOpaqueCube(IBlockState p_isFullBlock_1_)
-    {
+    public boolean isOpaqueCube(IBlockState p_isFullBlock_1_) {
         return false;
     }
 
@@ -55,8 +54,7 @@ public class EffectBlock extends Block {
     }
 
     @Override
-    public BlockFaceShape getBlockFaceShape(IBlockAccess worldIn, IBlockState state, BlockPos pos, EnumFacing face)
-    {
+    public BlockFaceShape getBlockFaceShape(IBlockAccess worldIn, IBlockState state, BlockPos pos, EnumFacing face) {
         return BlockFaceShape.UNDEFINED;
     }
 }

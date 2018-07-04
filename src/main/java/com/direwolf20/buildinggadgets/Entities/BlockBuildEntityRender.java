@@ -34,17 +34,21 @@ public class BlockBuildEntityRender extends Render<BlockBuildEntity> {
         mc.renderEngine.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
         int teCounter = entity.getTicksExisted();
         int maxLife = entity.maxLife;
-        if (teCounter > maxLife) {teCounter = maxLife;}
-        float scale = (float) (teCounter) / (float) maxLife;
-        if (scale >= 1.0f) {scale = 0.99f;}
-        if (toolMode == 2 || toolMode == 3) {
-            scale = (float) (maxLife-teCounter) / maxLife;
+        if (teCounter > maxLife) {
+            teCounter = maxLife;
         }
-        float trans = (1-scale)/2;
-        GlStateManager.translate(x,y,z);
-        GlStateManager.translate(trans,trans,trans);
+        float scale = (float) (teCounter) / (float) maxLife;
+        if (scale >= 1.0f) {
+            scale = 0.99f;
+        }
+        if (toolMode == 2 || toolMode == 3) {
+            scale = (float) (maxLife - teCounter) / maxLife;
+        }
+        float trans = (1 - scale) / 2;
+        GlStateManager.translate(x, y, z);
+        GlStateManager.translate(trans, trans, trans);
         GlStateManager.rotate(-90.0F, 0.0F, 1.0F, 0.0F);
-        GlStateManager.scale(scale,scale,scale);
+        GlStateManager.scale(scale, scale, scale);
 
 
         //IBlockState renderBlockState = Blocks.COBBLESTONE.getDefaultState();
@@ -71,9 +75,9 @@ public class BlockBuildEntityRender extends Render<BlockBuildEntity> {
         double minX = x;
         double minY = y;
         double minZ = z;
-        double maxX = x+1;
-        double maxY = y+1;
-        double maxZ = z+1;
+        double maxX = x + 1;
+        double maxY = y + 1;
+        double maxZ = z + 1;
         float red = 0f;
         float green = 1f;
         float blue = 1f;
@@ -82,9 +86,13 @@ public class BlockBuildEntityRender extends Render<BlockBuildEntity> {
             green = 0.25f;
             blue = 0.25f;
         }
-        float alpha = (1f-(scale));
-        if (alpha <0.051f) {alpha = 0.051f;}
-        if (alpha >0.33f) {alpha = 0.33f;}
+        float alpha = (1f - (scale));
+        if (alpha < 0.051f) {
+            alpha = 0.051f;
+        }
+        if (alpha > 0.33f) {
+            alpha = 0.33f;
+        }
         //down
         bufferBuilder.pos(minX, minY, minZ).color(red, green, blue, alpha).endVertex();
         bufferBuilder.pos(maxX, minY, minZ).color(red, green, blue, alpha).endVertex();

@@ -118,7 +118,7 @@ public class BlockBuildEntity extends Entity implements IEntityAdditionalSpawnDa
 
         if (!isDespawning()) {
 
-        }else {
+        } else {
             despawnTick();
         }
     }
@@ -128,30 +128,27 @@ public class BlockBuildEntity extends Entity implements IEntityAdditionalSpawnDa
     }
 
     private void setDespawning() {
-        if(despawning == -1) {
+        if (despawning == -1) {
             despawning = 0;
             if (setPos != null && setBlock != null && (getToolMode() == 1)) {
                 world.setBlockState(setPos, setBlock);
-            }
-            else if (setPos != null && setBlock != null && getToolMode() == 2) {
-                world.setBlockState(setPos,Blocks.AIR.getDefaultState());
-            }
-            else if(setPos != null && setBlock != null && getToolMode() == 3) {
-                world.spawnEntity(new BlockBuildEntity(world, setPos, spawnedBy,originalSetBlock,1));
+            } else if (setPos != null && setBlock != null && getToolMode() == 2) {
+                world.setBlockState(setPos, Blocks.AIR.getDefaultState());
+            } else if (setPos != null && setBlock != null && getToolMode() == 3) {
+                world.spawnEntity(new BlockBuildEntity(world, setPos, spawnedBy, originalSetBlock, 1));
             }
         }
     }
 
     private void despawnTick() {
         despawning++;
-        if(despawning > 1) {
+        if (despawning > 1) {
             setDead();
         }
     }
 
     @Override
-    public void setDead()
-    {
+    public void setDead() {
         this.isDead = true;
     }
 
