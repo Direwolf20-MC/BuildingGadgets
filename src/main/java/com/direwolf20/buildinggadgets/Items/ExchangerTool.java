@@ -355,8 +355,10 @@ public class ExchangerTool extends Item {
 
         if (InventoryManipulation.countItem(itemStack,player) == 0) {return false;}
 
-        if (tool.isItemEnchanted()) {
-            returnItem = currentBlock.getBlock().getPickBlock(currentBlock, null, world,pos,player);
+        if (EnchantmentHelper.getEnchantmentLevel(Enchantments.SILK_TOUCH, tool) > 0) {
+            Item tempItem = Item.getItemFromBlock(currentBlock.getBlock());
+            returnItem = new ItemStack(tempItem);
+            //returnItem = currentBlock.getBlock().getPickBlock(currentBlock, null, world,pos,player);
             if (!InventoryManipulation.giveItem(returnItem, player)) {returnSuccess = false;}
         } else {
             NonNullList<ItemStack> returnItems = NonNullList.create();
