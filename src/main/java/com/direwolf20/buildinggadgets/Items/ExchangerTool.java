@@ -365,9 +365,9 @@ public class ExchangerTool extends Item {
         if (InventoryManipulation.countItem(itemStack,player) == 0) {return false;}
 
         if (EnchantmentHelper.getEnchantmentLevel(Enchantments.SILK_TOUCH, tool) > 0) {
-            Item tempItem = Item.getItemFromBlock(currentBlock.getBlock());
-            returnItem = new ItemStack(tempItem);
-            //returnItem = currentBlock.getBlock().getPickBlock(currentBlock, null, world,pos,player);
+            //Item tempItem = Item.getItemFromBlock(currentBlock.getBlock());
+            //returnItem = new ItemStack(tempItem);
+            returnItem = currentBlock.getBlock().getPickBlock(currentBlock, null, world,pos,player);
             if (!InventoryManipulation.giveItem(returnItem, player)) {returnSuccess = false;}
         } else {
             NonNullList<ItemStack> returnItems = NonNullList.create();
@@ -398,7 +398,7 @@ public class ExchangerTool extends Item {
     @SideOnly(Side.CLIENT)
     public void renderOverlay(RenderWorldLastEvent evt, EntityPlayer player, ItemStack stack) {
         int range = getToolRange(stack);
-        ExchangerTool.toolModes mode = getToolMode(stack);
+        toolModes mode = getToolMode(stack);
         RayTraceResult lookingAt = getLookingAt(player);
         IBlockState state = Blocks.AIR.getDefaultState();
         ArrayList<BlockPos> coordinates = getAnchor(stack);
@@ -408,26 +408,21 @@ public class ExchangerTool extends Item {
             if (!(lookingAt == null)) {
                 startBlock = world.getBlockState(lookingAt.getBlockPos());
             }
-
             if (startBlock != ModBlocks.effectBlock.getDefaultState()) {
-                //Get the item stack and the block that we'll be rendering (From the Itemstack's NBT)
-                ItemStack heldItem = player.getHeldItemMainhand();
+                ItemStack heldItem = player.getHeldItemMainhand(); //Get the item stack and the block that we'll be rendering (From the Itemstack's NBT)
                 IBlockState renderBlockState = getToolBlock(heldItem);
                 Minecraft mc = Minecraft.getMinecraft();
                 mc.renderEngine.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
-                //Don't render anything if theres no block selected (Air)
-                if (renderBlockState == Blocks.AIR.getDefaultState()) {
+                if (renderBlockState == Blocks.AIR.getDefaultState()) {//Don't render anything if there is no block selected (Air)
                     return;
                 }
-                //Build a list of coordinates based on the tool mode and range
-                if (coordinates.size() == 0) {
+                if (coordinates.size() == 0) { //Build a list of coordinates based on the tool mode and range
                     coordinates = ExchangingModes.getBuildOrders(world, player, lookingAt.getBlockPos(), lookingAt.sideHit, range, mode, renderBlockState);
                 }
 
                 //Figure out how many of the block we're rendering we have in the inventory of the player.
-                ItemStack itemStack = renderBlockState.getBlock().getPickBlock(renderBlockState,null,world,new BlockPos(0,0,0),player);
-                int hasBlocks = InventoryManipulation.countItem(itemStack,player);
-                int tempHasBlocks = hasBlocks;
+                ItemStack itemStack = renderBlockState.getBlock().getPickBlock(renderBlockState, null, world, new BlockPos(0, 0, 0), player);
+                int hasBlocks = InventoryManipulation.countItem(itemStack, player);
 
                 //Prepare the block rendering
                 BlockRendererDispatcher dispatcher = Minecraft.getMinecraft().getBlockRendererDispatcher();
@@ -435,67 +430,56 @@ public class ExchangerTool extends Item {
 
                 //Prepare the fake world -- using a fake world lets us render things properly, like fences connecting.
                 Set<BlockPos> coords = new HashSet<BlockPos>(coordinates);
-                fakeWorld.setWorldAndState(player.world,renderBlockState,coords);
+                fakeWorld.setWorldAndState(player.world, renderBlockState, coords);
 
                 //Calculate the players current position, which is needed later
                 double doubleX = player.lastTickPosX + (player.posX - player.lastTickPosX) * evt.getPartialTicks();
                 double doubleY = player.lastTickPosY + (player.posY - player.lastTickPosY) * evt.getPartialTicks();
                 double doubleZ = player.lastTickPosZ + (player.posZ - player.lastTickPosZ) * evt.getPartialTicks();
 
-                //Save the current position thats being rendered (I think)
+                //Save the current position that is being rendered (I think)
                 GlStateManager.pushMatrix();
                 //Enable Blending (So we can have transparent effect)
                 GlStateManager.enableBlend();
                 //This blend function allows you to use a constant alpha, which is defined later
                 GlStateManager.blendFunc(GL11.GL_CONSTANT_ALPHA, GL11.GL_ONE_MINUS_CONSTANT_ALPHA);
 
+                //ArrayList<BlockPos> sortedCoordinates = ExchangingModes.sortByDistance(coordinates, player); //Sort the coords by distance to player.
 
-                for (BlockRenderLayer layer : LAYERS) {
-                    //Technically we are rendering these blocks in all 4 render Layers
-                    //I'm not sure why but its the only way it works properly
-                    ForgeHooksClient.setRenderLayer(layer);
-
-
-                    for (BlockPos coordinate : coordinates) {
-                        //Push matrix again just because
-                        GlStateManager.pushMatrix();
-                        //The render starts at the player, so we subtract the player coords and move the render to 0,0,0
-                        GlStateManager.translate(-doubleX, -doubleY, -doubleZ);
-                        //Now move the render position to the coordinates we want to render at
-                        GlStateManager.translate(coordinate.getX(), coordinate.getY(), coordinate.getZ());
-                        //Rotate it because i'm not sure why but we need to
-                        GlStateManager.rotate(-90.0F, 0.0F, 1.0F, 0.0F);
-                        //Slightly Larger block to avoid z-fighting.
-                        GlStateManager.translate(-0.005f,-0.005f,0.005f);
-                        GlStateManager.scale(1.01f, 1.01f, 1.01f);
-                        //Set the alpha of the blocks we are rendering -- 1/4 of what we really want because we render 4x over
-                        GL14.glBlendColor(1F, 1F, 1F, 0.17f);
-                        //Get the block state in the fake world
-                        if (fakeWorld.getWorldType() != WorldType.DEBUG_ALL_BLOCK_STATES) {
-                            try {
-                                state = renderBlockState.getActualState(fakeWorld, coordinate);
-                            } catch (Exception var8) {
-                            }
+                for (BlockPos coordinate : coordinates) {
+                    GlStateManager.pushMatrix();//Push matrix again just because
+                    GlStateManager.translate(-doubleX, -doubleY, -doubleZ);//The render starts at the player, so we subtract the player coords and move the render to 0,0,0
+                    GlStateManager.translate(coordinate.getX(), coordinate.getY(), coordinate.getZ());//Now move the render position to the coordinates we want to render at
+                    GlStateManager.rotate(-90.0F, 0.0F, 1.0F, 0.0F); //Rotate it because i'm not sure why but we need to
+                    GlStateManager.translate(-0.005f,-0.005f,0.005f);
+                    GlStateManager.scale(1.01f, 1.01f, 1.01f);//Slightly Larger block to avoid z-fighting.
+                    GL14.glBlendColor(1F, 1F, 1F, 0.55f); //Set the alpha of the blocks we are rendering
+                    if (fakeWorld.getWorldType() != WorldType.DEBUG_ALL_BLOCK_STATES) { //Get the block state in the fake world
+                        try {
+                            state = renderBlockState.getActualState(fakeWorld, coordinate);
+                        } catch (Exception var8) {
                         }
-                        //Get the extended block state in the fake world
-                        //Disabled to fix chisel, not sure why.
-                        //state = state.getBlock().getExtendedState(state, fakeWorld, coordinate);
-                        //Render the defined block
-                        dispatcher.renderBlockBrightness(state,1f);
-                        tempHasBlocks--;
-                        if (tempHasBlocks <0) {
-                            GlStateManager.rotate(-90.0F, 0.0F, 1.0F, 0.0F);
-                            dispatcher.renderBlockBrightness(Blocks.STAINED_GLASS.getDefaultState().withProperty(COLOR, EnumDyeColor.RED), 1f);
-                        }
-                        if(!state.getBlock().isOpaqueCube(state)) {
-                            GL14.glBlendColor(1F, 1F, 1F, 0.05f);
-                            GlStateManager.rotate(-90.0F, 0.0F, 1.0F, 0.0F);
-                            dispatcher.renderBlockBrightness(Blocks.STAINED_GLASS.getDefaultState().withProperty(COLOR, EnumDyeColor.WHITE), 1f);
-                        }
-                        //Move the render position back to where it was
-                        GlStateManager.popMatrix();
                     }
-                    tempHasBlocks = hasBlocks;
+                    //state = state.getBlock().getExtendedState(state, fakeWorld, coordinate); //Get the extended block state in the fake world (Disabled to fix chisel, not sure why.)
+                    dispatcher.renderBlockBrightness(state, 1f);//Render the defined block
+                    //Move the render position back to where it was
+                    GlStateManager.popMatrix();
+                }
+
+                for (BlockPos coordinate : coordinates) { //Now run through the UNSORTED list of coords, to show which blocks won't place if you don't have enough of them.
+                    GlStateManager.pushMatrix();//Push matrix again just because
+                    GlStateManager.translate(-doubleX, -doubleY, -doubleZ);//The render starts at the player, so we subtract the player coords and move the render to 0,0,0
+                    GlStateManager.translate(coordinate.getX(), coordinate.getY(), coordinate.getZ());//Now move the render position to the coordinates we want to render at
+                    GlStateManager.rotate(-90.0F, 0.0F, 1.0F, 0.0F); //Rotate it because i'm not sure why but we need to
+                    GlStateManager.translate(-0.005f,-0.005f,0.005f);
+                    GlStateManager.scale(1.01f, 1.01f, 1.01f);//Slightly Larger block to avoid z-fighting.
+                    GL14.glBlendColor(1F, 1F, 1F, 0.55f); //Set the alpha of the blocks we are rendering
+                    hasBlocks--;
+                    if (hasBlocks < 0) {
+                        dispatcher.renderBlockBrightness(Blocks.STAINED_GLASS.getDefaultState().withProperty(COLOR, EnumDyeColor.RED), 1f);
+                    }
+                    //Move the render position back to where it was
+                    GlStateManager.popMatrix();
                 }
                 //Set blending back to the default mode
                 GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);

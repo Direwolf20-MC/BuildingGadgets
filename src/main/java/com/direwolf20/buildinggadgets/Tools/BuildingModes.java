@@ -1,13 +1,18 @@
 package com.direwolf20.buildinggadgets.Tools;
 
 import com.direwolf20.buildinggadgets.Items.BuildingTool;
+import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 public class BuildingModes {
     private static boolean isReplaceable(World world, BlockPos pos, IBlockState setBlock) {
@@ -250,5 +255,30 @@ public class BuildingModes {
         }
         return coordinates;
     }
+    public static ArrayList<BlockPos> sortByDistance(ArrayList<BlockPos> unSortedList, EntityPlayer player) {
+        ArrayList<BlockPos> sortedList = new ArrayList<BlockPos>();
+        Map<Double,BlockPos> rangeMap = new HashMap<Double,BlockPos>();
+        Double distances[] = new Double[unSortedList.size()];
+        Double distance;
+        double x = player.posX;
+        double y = player.posY+player.getEyeHeight();
+        double z = player.posZ;
+        int i = 0;
+        for (BlockPos pos : unSortedList) {
+            distance = pos.distanceSqToCenter(x,y,z);
+            rangeMap.put(distance,pos);
+            distances[i] = distance;
+            i++;
+        }
+        Arrays.sort(distances);
+        //ArrayUtils.reverse(distances);
 
+        for (Double dist : distances) {
+            //System.out.println(dist);
+            sortedList.add(rangeMap.get(dist));
+        }
+        //System.out.println(unSortedList);
+        //System.out.println(sortedList);
+        return sortedList;
+    }
 }
