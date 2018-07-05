@@ -75,6 +75,15 @@ public class ExchangerTool extends Item {
     }
 
     @Override
+    public int getItemEnchantability()
+    {
+        return 3;
+    }
+
+    @Override
+    public boolean isEnchantable(ItemStack stack) {return true;}
+
+    @Override
     public boolean isBookEnchantable(ItemStack stack, ItemStack book) {
         if (EnchantmentHelper.getEnchantments(book).containsKey(Enchantments.SILK_TOUCH)) {
             return true;
