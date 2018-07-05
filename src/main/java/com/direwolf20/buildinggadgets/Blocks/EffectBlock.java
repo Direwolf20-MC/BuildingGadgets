@@ -17,6 +17,8 @@ import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import java.util.Random;
+
 public class EffectBlock extends Block {
 
     public EffectBlock() {
@@ -54,7 +56,7 @@ public class EffectBlock extends Block {
     }
 
     @Override
-    public BlockFaceShape getBlockFaceShape(IBlockAccess worldIn, IBlockState state, BlockPos pos, EnumFacing face) {
-        return BlockFaceShape.UNDEFINED;
+    public Item getItemDropped(IBlockState state, Random rand, int fortune) {
+        return null;
     }
 }

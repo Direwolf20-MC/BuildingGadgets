@@ -14,6 +14,7 @@ import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.EnumDyeColor;
@@ -58,13 +59,13 @@ public class BuildingTool extends Item {
         {
             return vals[(this.ordinal()+1) % vals.length];
         }
-
     }
 
     public BuildingTool() {
         setRegistryName("buildingtool");        // The unique name (within your mod) that identifies this item
         setUnlocalizedName(BuildingGadgets.MODID + ".buildingtool");     // Used for localization (en_US.lang)
         setMaxStackSize(1);
+        setCreativeTab(CreativeTabs.TOOLS);
     }
 
     @SideOnly(Side.CLIENT)
@@ -232,10 +233,19 @@ public class BuildingTool extends Item {
 
     public void rangeChange(EntityPlayer player, ItemStack heldItem) {
         int range = getToolRange(heldItem);
-        if (range >= Config.maxRange) {
-            range = 1;
-        } else {
-            range++;
+        if (player.isSneaking()) {
+            if (range == 1) {
+                range = Config.maxRange;
+            }
+            else {
+                range--;
+            }
+        }else {
+            if (range >= Config.maxRange) {
+                range = 1;
+            } else {
+                range++;
+            }
         }
         setToolRange(heldItem,range);
         player.sendStatusMessage(new TextComponentString(TextFormatting.DARK_BLUE + "Tool range: " + range), true);

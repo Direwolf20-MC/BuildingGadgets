@@ -14,8 +14,11 @@ import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
+import net.minecraft.init.Enchantments;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -63,11 +66,28 @@ public class ExchangerTool extends Item {
         setRegistryName("exchangertool");        // The unique name (within your mod) that identifies this item
         setUnlocalizedName(BuildingGadgets.MODID + ".exchangertool");     // Used for localization (en_US.lang)
         setMaxStackSize(1);
+        setCreativeTab(CreativeTabs.TOOLS);
     }
 
     @SideOnly(Side.CLIENT)
     public void initModel() {
         ModelLoader.setCustomModelResourceLocation(this, 0, new ModelResourceLocation(getRegistryName(), "inventory"));
+    }
+
+    @Override
+    public boolean isBookEnchantable(ItemStack stack, ItemStack book) {
+        if (EnchantmentHelper.getEnchantments(book).containsKey(Enchantments.SILK_TOUCH)) {
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean canApplyAtEnchantingTable(ItemStack stack, net.minecraft.enchantment.Enchantment enchantment) {
+        if (enchantment == Enchantments.SILK_TOUCH) {
+            return true;
+        }
+        return false;
     }
 
     public NBTTagCompound initToolTag (ItemStack stack) {
@@ -229,12 +249,20 @@ public class ExchangerTool extends Item {
 
     public void rangeChange(EntityPlayer player, ItemStack heldItem) {
         int range = getToolRange(heldItem);
-        if (range >= Config.maxRange) {
-            range = 1;
+        if (player.isSneaking()) {
+            if (range <= 1) {
+                range = Config.maxRange;
+            } else {
+                range = range - 2;
+            }
         } else {
-            range = range+2;
+            if (range >= Config.maxRange) {
+                range = 1;
+            } else {
+                range = range + 2;
+            }
         }
-        setToolRange(heldItem,range);
+        setToolRange(heldItem, range);
         player.sendStatusMessage(new TextComponentString(TextFormatting.DARK_BLUE + "Tool range: " + range), true);
     }
 
@@ -321,23 +349,26 @@ public class ExchangerTool extends Item {
     public boolean exchangeBlock(World world, EntityPlayer player, BlockPos pos, IBlockState setBlock) {
         IBlockState currentBlock = world.getBlockState(pos);
         ItemStack itemStack = setBlock.getBlock().getPickBlock(setBlock,null,world,pos,player);
-        //ItemStack returnItem = currentBlock.getBlock().getPickBlock(currentBlock, null, world,pos,player);
-        //ItemStack returnItem = new ItemStack(currentBlock.getBlock().getItemDropped(currentBlock,null,0));
-        NonNullList<ItemStack> returnItems = NonNullList.create();
-        currentBlock.getBlock().getDrops(returnItems,world,pos,currentBlock,0);
+        ItemStack returnItem;
+        ItemStack tool = player.getHeldItemMainhand();
         boolean returnSuccess = true;
-        for (ItemStack returnItem : returnItems) {
+
+        if (InventoryManipulation.countItem(itemStack,player) == 0) {return false;}
+
+        if (tool.isItemEnchanted()) {
+            returnItem = currentBlock.getBlock().getPickBlock(currentBlock, null, world,pos,player);
             if (!InventoryManipulation.giveItem(returnItem, player)) {returnSuccess = false;}
+        } else {
+            NonNullList<ItemStack> returnItems = NonNullList.create();
+            currentBlock.getBlock().getDrops(returnItems,world,pos,currentBlock,0);
+            for (ItemStack returnItemStack : returnItems) {
+                if (!InventoryManipulation.giveItem(returnItemStack, player)) {returnSuccess = false;}
+            }
         }
+
         if (returnSuccess) {
-            if (InventoryManipulation.useItem(itemStack,player)) {
-                world.spawnEntity(new BlockBuildEntity(world, pos, player, setBlock, 3));
-            }
-            else {
-                for (ItemStack returnItem : returnItems) {
-                    InventoryManipulation.useItem(returnItem, player);
-                }
-            }
+            InventoryManipulation.useItem(itemStack,player);
+            world.spawnEntity(new BlockBuildEntity(world, pos, player, setBlock, 3));
         }
         return true;
     }
@@ -345,6 +376,12 @@ public class ExchangerTool extends Item {
     @Override
     public int getMaxItemUseDuration(ItemStack stack) {
         return 20;
+    }
+
+    @SideOnly(Side.CLIENT)
+    public boolean hasEffect(ItemStack stack)
+    {
+        return false;
     }
 
     @SideOnly(Side.CLIENT)
