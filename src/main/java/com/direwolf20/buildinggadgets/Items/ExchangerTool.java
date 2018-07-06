@@ -175,8 +175,12 @@ public class ExchangerTool extends Item {
         if (tagCompound == null){
             tagCompound = initToolTag(stack);
         }
-
-        return ExchangerTool.toolModes.valueOf(tagCompound.getString("mode"));
+        if (tagCompound.getString("mode") != "") {
+            return ExchangerTool.toolModes.valueOf(tagCompound.getString("mode"));
+        }
+        else {
+            return toolModes.Wall;
+        }
     }
 
     public int getToolRange(ItemStack stack) {
@@ -198,11 +202,9 @@ public class ExchangerTool extends Item {
     @Override
     public void addInformation(ItemStack stack, World player, List<String> list, ITooltipFlag b) {
         super.addInformation(stack, player, list, b);
-        if (stack.getTagCompound().getSize() > 3) {
-            list.add(TextFormatting.DARK_GREEN + "Block: " + getToolBlock(stack).getBlock().getLocalizedName());
-            list.add(TextFormatting.AQUA + "Mode: " + getToolMode(stack));
-            list.add(TextFormatting.RED + "Range: " + getToolRange(stack));
-        }
+        list.add(TextFormatting.DARK_GREEN + "Block: " + getToolBlock(stack).getBlock().getLocalizedName());
+        list.add(TextFormatting.AQUA + "Mode: " + getToolMode(stack));
+        list.add(TextFormatting.RED + "Range: " + getToolRange(stack));
     }
 
 
