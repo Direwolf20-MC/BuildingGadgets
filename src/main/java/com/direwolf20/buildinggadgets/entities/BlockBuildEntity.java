@@ -25,7 +25,6 @@ public class BlockBuildEntity extends Entity implements IEntityAdditionalSpawnDa
     public int despawning = -1;
     public int maxLife = 20;
     private int mode;
-    //private boolean exchange;
     private IBlockState setBlock;
     private IBlockState originalSetBlock;
     private BlockPos setPos;
