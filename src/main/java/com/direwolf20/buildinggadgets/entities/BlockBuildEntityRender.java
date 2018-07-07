@@ -1,4 +1,4 @@
-package com.direwolf20.buildinggadgets.Entities;
+package com.direwolf20.buildinggadgets.entities;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -51,7 +51,7 @@ public class BlockBuildEntityRender extends Render<BlockBuildEntity> {
         GlStateManager.scale(scale, scale, scale);
 
 
-        //IBlockState renderBlockState = Blocks.COBBLESTONE.getDefaultState();
+        //IBlockState renderBlockState = blocks.COBBLESTONE.getDefaultState();
 
         IBlockState renderBlockState = entity.getSetBlock();
         if (renderBlockState == null) {

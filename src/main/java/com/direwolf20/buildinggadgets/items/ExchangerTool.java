@@ -1,11 +1,11 @@
-package com.direwolf20.buildinggadgets.Items;
+package com.direwolf20.buildinggadgets.items;
 
 import com.direwolf20.buildinggadgets.BuildingGadgets;
 import com.direwolf20.buildinggadgets.Config;
-import com.direwolf20.buildinggadgets.Entities.BlockBuildEntity;
+import com.direwolf20.buildinggadgets.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.ModBlocks;
-import com.direwolf20.buildinggadgets.Tools.ExchangingModes;
-import com.direwolf20.buildinggadgets.Tools.InventoryManipulation;
+import com.direwolf20.buildinggadgets.tools.ExchangingModes;
+import com.direwolf20.buildinggadgets.tools.InventoryManipulation;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockRendererDispatcher;
@@ -54,11 +54,11 @@ public class ExchangerTool extends Item {
     float rayTraceRange = 20f; //Range of the tool's working mode @todo make this a config
 
     public enum toolModes {
-        Wall,VerticalColumn,HorizontalColumn;
+        Wall, VerticalColumn, HorizontalColumn;
         private static ExchangerTool.toolModes[] vals = values();
-        public ExchangerTool.toolModes next()
-        {
-            return vals[(this.ordinal()+1) % vals.length];
+
+        public ExchangerTool.toolModes next() {
+            return vals[(this.ordinal() + 1) % vals.length];
         }
     }
 
@@ -75,13 +75,14 @@ public class ExchangerTool extends Item {
     }
 
     @Override
-    public int getItemEnchantability()
-    {
+    public int getItemEnchantability() {
         return 3;
     }
 
     @Override
-    public boolean isEnchantable(ItemStack stack) {return true;}
+    public boolean isEnchantable(ItemStack stack) {
+        return true;
+    }
 
     @Override
     public boolean isBookEnchantable(ItemStack stack, ItemStack book) {
@@ -99,9 +100,9 @@ public class ExchangerTool extends Item {
         return false;
     }
 
-    public NBTTagCompound initToolTag (ItemStack stack) {
+    public NBTTagCompound initToolTag(ItemStack stack) {
         NBTTagCompound tagCompound = stack.getTagCompound();
-        if (tagCompound == null){
+        if (tagCompound == null) {
             tagCompound = new NBTTagCompound();
             stack.setTagCompound(tagCompound);
             tagCompound.setString("mode", ExchangerTool.toolModes.Wall.name());
@@ -118,7 +119,7 @@ public class ExchangerTool extends Item {
 
     public void setAnchor(ItemStack stack, ArrayList<BlockPos> coordinates) {
         NBTTagCompound tagCompound = stack.getTagCompound();
-        if (tagCompound == null){
+        if (tagCompound == null) {
             tagCompound = initToolTag(stack);
         }
         NBTTagList coords = new NBTTagList();
@@ -130,14 +131,16 @@ public class ExchangerTool extends Item {
 
     public ArrayList<BlockPos> getAnchor(ItemStack stack) {
         NBTTagCompound tagCompound = stack.getTagCompound();
-        if (tagCompound == null){
+        if (tagCompound == null) {
             tagCompound = initToolTag(stack);
         }
         ArrayList<BlockPos> coordinates = new ArrayList<BlockPos>();
         NBTTagList coordList = (NBTTagList) tagCompound.getTag("anchorcoords");
-        if (coordList.tagCount() == 0 || coordList == null) { return coordinates;}
+        if (coordList.tagCount() == 0 || coordList == null) {
+            return coordinates;
+        }
 
-        for (int i = 0;i<coordList.tagCount();i++) {
+        for (int i = 0; i < coordList.tagCount(); i++) {
             coordinates.add(NBTUtil.getPosFromTag(coordList.getCompoundTagAt(i)));
         }
         return coordinates;
@@ -145,7 +148,7 @@ public class ExchangerTool extends Item {
 
     public void setToolMode(ItemStack stack, ExchangerTool.toolModes mode) {
         NBTTagCompound tagCompound = stack.getTagCompound();
-        if (tagCompound == null){
+        if (tagCompound == null) {
             tagCompound = initToolTag(stack);
         }
         tagCompound.setString("mode", mode.name());
@@ -153,7 +156,7 @@ public class ExchangerTool extends Item {
 
     public void setToolRange(ItemStack stack, int range) {
         NBTTagCompound tagCompound = stack.getTagCompound();
-        if (tagCompound == null){
+        if (tagCompound == null) {
             tagCompound = initToolTag(stack);
         }
         tagCompound.setInteger("range", range);
@@ -161,10 +164,12 @@ public class ExchangerTool extends Item {
 
     public void setToolBlock(ItemStack stack, IBlockState state) {
         NBTTagCompound tagCompound = stack.getTagCompound();
-        if (tagCompound == null){
+        if (tagCompound == null) {
             tagCompound = initToolTag(stack);
         }
-        if (state == null) {state = Blocks.AIR.getDefaultState();}
+        if (state == null) {
+            state = Blocks.AIR.getDefaultState();
+        }
         NBTTagCompound stateTag = new NBTTagCompound();
         NBTUtil.writeBlockState(stateTag, state);
         tagCompound.setTag("blockstate", stateTag);
@@ -172,20 +177,19 @@ public class ExchangerTool extends Item {
 
     public ExchangerTool.toolModes getToolMode(ItemStack stack) {
         NBTTagCompound tagCompound = stack.getTagCompound();
-        if (tagCompound == null){
+        if (tagCompound == null) {
             tagCompound = initToolTag(stack);
         }
         if (tagCompound.getString("mode") != "") {
             return ExchangerTool.toolModes.valueOf(tagCompound.getString("mode"));
-        }
-        else {
+        } else {
             return toolModes.Wall;
         }
     }
 
     public int getToolRange(ItemStack stack) {
         NBTTagCompound tagCompound = stack.getTagCompound();
-        if (tagCompound == null){
+        if (tagCompound == null) {
             tagCompound = initToolTag(stack);
         }
         return tagCompound.getInteger("range");
@@ -193,7 +197,7 @@ public class ExchangerTool extends Item {
 
     public IBlockState getToolBlock(ItemStack stack) {
         NBTTagCompound tagCompound = stack.getTagCompound();
-        if (tagCompound == null){
+        if (tagCompound == null) {
             tagCompound = initToolTag(stack);
         }
         return NBTUtil.readBlockState(tagCompound.getCompoundTag("blockstate"));
@@ -216,7 +220,7 @@ public class ExchangerTool extends Item {
             if (player.isSneaking()) {
                 selectBlock(stack, player);
             } else {
-                exchange(player,stack);
+                exchange(player, stack);
             }
         }
         return EnumActionResult.SUCCESS;
@@ -230,7 +234,7 @@ public class ExchangerTool extends Item {
             if (player.isSneaking()) {
                 selectBlock(itemstack, player);
             } else {
-                exchange(player,itemstack);
+                exchange(player, itemstack);
             }
         }
         return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, itemstack);
@@ -239,7 +243,9 @@ public class ExchangerTool extends Item {
     private void selectBlock(ItemStack stack, EntityPlayer player) {
         World world = player.world;
         RayTraceResult lookingAt = getLookingAt(player);
-        if (lookingAt == null) {return;}
+        if (lookingAt == null) {
+            return;
+        }
         BlockPos pos = lookingAt.getBlockPos();
         IBlockState state = world.getBlockState(pos);
         TileEntity te = world.getTileEntity(pos);
@@ -248,14 +254,14 @@ public class ExchangerTool extends Item {
             return;
         }
         if (state != null) {
-            setToolBlock(stack,state);
+            setToolBlock(stack, state);
         }
     }
 
     public void toggleMode(EntityPlayer player, ItemStack heldItem) {
         ExchangerTool.toolModes mode = getToolMode(heldItem);
         mode = mode.next();
-        setToolMode(heldItem,mode);
+        setToolMode(heldItem, mode);
         player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + "Tool Mode: " + mode.name()), true);
     }
 
@@ -281,9 +287,9 @@ public class ExchangerTool extends Item {
     public RayTraceResult getLookingAt(EntityPlayer player) {
         World world = player.world;
         Vec3d look = player.getLookVec();
-        Vec3d start = new Vec3d(player.posX,player.posY+player.getEyeHeight(),player.posZ);
-        Vec3d end = new Vec3d(player.posX+look.x * rayTraceRange,player.posY+player.getEyeHeight()+look.y*rayTraceRange,player.posZ+look.z*rayTraceRange);
-        return world.rayTraceBlocks(start,end,false,false,false);
+        Vec3d start = new Vec3d(player.posX, player.posY + player.getEyeHeight(), player.posZ);
+        Vec3d end = new Vec3d(player.posX + look.x * rayTraceRange, player.posY + player.getEyeHeight() + look.y * rayTraceRange, player.posZ + look.z * rayTraceRange);
+        return world.rayTraceBlocks(start, end, false, false, false);
     }
 
     public boolean anchorBlocks(EntityPlayer player, ItemStack stack) {
@@ -296,14 +302,18 @@ public class ExchangerTool extends Item {
             //If we don't have an anchor, find the block we're supposed to anchor to
             RayTraceResult lookingAt = getLookingAt(player);
             //If we aren't looking at anything, exit
-            if (lookingAt == null) {return false;}
+            if (lookingAt == null) {
+                return false;
+            }
             BlockPos startBlock = lookingAt.getBlockPos();
             EnumFacing sideHit = lookingAt.sideHit;
             IBlockState setBlock = getToolBlock(stack);
             //If we are looking at air, exit
-            if (startBlock == null || world.getBlockState(startBlock) == Blocks.AIR.getDefaultState()) {return false;}
+            if (startBlock == null || world.getBlockState(startBlock) == Blocks.AIR.getDefaultState()) {
+                return false;
+            }
             //Build the positions list based on tool mode and range
-            ArrayList<BlockPos> coords = ExchangingModes.getBuildOrders(world, player, startBlock, sideHit, range, mode,setBlock);
+            ArrayList<BlockPos> coords = ExchangingModes.getBuildOrders(world, player, startBlock, sideHit, range, mode, setBlock);
             //Set the anchor NBT
             setAnchor(stack, coords);
             player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + "Render Anchored"), true);
@@ -325,14 +335,16 @@ public class ExchangerTool extends Item {
             //If we don't have an anchor, build in the current spot
             RayTraceResult lookingAt = getLookingAt(player);
             //If we aren't looking at anything, exit
-            if (lookingAt == null) {return false;}
+            if (lookingAt == null) {
+                return false;
+            }
             BlockPos startBlock = lookingAt.getBlockPos();
             EnumFacing sideHit = lookingAt.sideHit;
             IBlockState setBlock = getToolBlock(stack);
-            coords = ExchangingModes.getBuildOrders(world, player, startBlock, sideHit, range, mode,setBlock);
+            coords = ExchangingModes.getBuildOrders(world, player, startBlock, sideHit, range, mode, setBlock);
         } else {
             //If we do have an anchor, erase it (Even if the build fails)
-            setAnchor(stack,new ArrayList<BlockPos>());
+            setAnchor(stack, new ArrayList<BlockPos>());
         }
         Set<BlockPos> coordinates = new HashSet<BlockPos>(coords);
         ItemStack heldItem = player.getHeldItemMainhand();
@@ -353,8 +365,8 @@ public class ExchangerTool extends Item {
                 //Disabled to fix Chisel
                 //state = state.getBlock().getExtendedState(state, fakeWorld, coordinate);
                 exchangeBlock(world, player, coordinate, state);
-                }
             }
+        }
         return true;
     }
 
@@ -366,24 +378,30 @@ public class ExchangerTool extends Item {
         ItemStack tool = player.getHeldItemMainhand();
         boolean returnSuccess = true;
 
-        if (InventoryManipulation.countItem(itemStack,player) == 0) {return false;}
+        if (InventoryManipulation.countItem(itemStack, player) == 0) {
+            return false;
+        }
 
         if (EnchantmentHelper.getEnchantmentLevel(Enchantments.SILK_TOUCH, tool) > 0) {
             //Item tempItem = Item.getItemFromBlock(currentBlock.getBlock());
             //returnItem = new ItemStack(tempItem);
             //returnItem = currentBlock.getBlock().getPickBlock(currentBlock, null, world,pos,player);
             returnItem = getSilkTouchDrop(currentBlock);
-            if (!InventoryManipulation.giveItem(returnItem, player)) {returnSuccess = false;}
+            if (!InventoryManipulation.giveItem(returnItem, player)) {
+                returnSuccess = false;
+            }
         } else {
             NonNullList<ItemStack> returnItems = NonNullList.create();
-            currentBlock.getBlock().getDrops(returnItems,world,pos,currentBlock,0);
+            currentBlock.getBlock().getDrops(returnItems, world, pos, currentBlock, 0);
             for (ItemStack returnItemStack : returnItems) {
-                if (!InventoryManipulation.giveItem(returnItemStack, player)) {returnSuccess = false;}
+                if (!InventoryManipulation.giveItem(returnItemStack, player)) {
+                    returnSuccess = false;
+                }
             }
         }
 
         if (returnSuccess) {
-            InventoryManipulation.useItem(itemStack,player);
+            InventoryManipulation.useItem(itemStack, player);
             world.spawnEntity(new BlockBuildEntity(world, pos, player, setBlock, 3));
         }
         return true;
@@ -393,8 +411,7 @@ public class ExchangerTool extends Item {
         Item item = Item.getItemFromBlock(state.getBlock());
         int i = 0;
 
-        if (item.getHasSubtypes())
-        {
+        if (item.getHasSubtypes()) {
             i = state.getBlock().getMetaFromState(state);
         }
         return new ItemStack(item, 1, i);
@@ -406,8 +423,7 @@ public class ExchangerTool extends Item {
     }
 
     @SideOnly(Side.CLIENT)
-    public boolean hasEffect(ItemStack stack)
-    {
+    public boolean hasEffect(ItemStack stack) {
         return false;
     }
 
@@ -468,7 +484,7 @@ public class ExchangerTool extends Item {
                     GlStateManager.translate(-doubleX, -doubleY, -doubleZ);//The render starts at the player, so we subtract the player coords and move the render to 0,0,0
                     GlStateManager.translate(coordinate.getX(), coordinate.getY(), coordinate.getZ());//Now move the render position to the coordinates we want to render at
                     GlStateManager.rotate(-90.0F, 0.0F, 1.0F, 0.0F); //Rotate it because i'm not sure why but we need to
-                    GlStateManager.translate(-0.005f,-0.005f,0.005f);
+                    GlStateManager.translate(-0.005f, -0.005f, 0.005f);
                     GlStateManager.scale(1.01f, 1.01f, 1.01f);//Slightly Larger block to avoid z-fighting.
                     GL14.glBlendColor(1F, 1F, 1F, 0.55f); //Set the alpha of the blocks we are rendering
                     if (fakeWorld.getWorldType() != WorldType.DEBUG_ALL_BLOCK_STATES) { //Get the block state in the fake world
@@ -488,7 +504,7 @@ public class ExchangerTool extends Item {
                     GlStateManager.translate(-doubleX, -doubleY, -doubleZ);//The render starts at the player, so we subtract the player coords and move the render to 0,0,0
                     GlStateManager.translate(coordinate.getX(), coordinate.getY(), coordinate.getZ());//Now move the render position to the coordinates we want to render at
                     GlStateManager.rotate(-90.0F, 0.0F, 1.0F, 0.0F); //Rotate it because i'm not sure why but we need to
-                    GlStateManager.translate(-0.005f,-0.005f,0.005f);
+                    GlStateManager.translate(-0.005f, -0.005f, 0.005f);
                     GlStateManager.scale(1.01f, 1.01f, 1.01f);//Slightly Larger block to avoid z-fighting.
                     GL14.glBlendColor(1F, 1F, 1F, 0.55f); //Set the alpha of the blocks we are rendering
                     hasBlocks--;

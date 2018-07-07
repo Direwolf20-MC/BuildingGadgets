@@ -1,6 +1,4 @@
-package com.direwolf20.buildinggadgets.Tools;
-
-import net.minecraftforge.event.world.NoteBlockEvent;
+package com.direwolf20.buildinggadgets.tools;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -8,18 +6,17 @@ import java.util.Stack;
 import java.util.UUID;
 
 public class UndoBuild {
-    private static final Map<UUID,Stack<UndoState>> playerUndoList = new HashMap<UUID,Stack<UndoState>>();
+    private static final Map<UUID, Stack<UndoState>> playerUndoList = new HashMap<UUID, Stack<UndoState>>();
 
     public UndoBuild(UUID PlayerUUID, Stack<UndoState> undoStack) {
-        playerUndoList.put(PlayerUUID,undoStack);
+        playerUndoList.put(PlayerUUID, undoStack);
     }
 
     public static void updatePlayerMap(UUID PlayerUUID, Stack<UndoState> undoStack) {
         if (playerUndoList.containsKey(PlayerUUID)) {
             playerUndoList.replace(PlayerUUID, undoStack);
-        }
-        else {
-            playerUndoList.put(PlayerUUID,undoStack);
+        } else {
+            playerUndoList.put(PlayerUUID, undoStack);
         }
 
     }

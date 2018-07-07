@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets;
 
-import com.direwolf20.buildinggadgets.Items.BuildingTool;
-import com.direwolf20.buildinggadgets.Items.ExchangerTool;
+import com.direwolf20.buildinggadgets.items.BuildingTool;
+import com.direwolf20.buildinggadgets.items.ExchangerTool;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
 public class ModItems {

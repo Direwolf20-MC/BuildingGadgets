@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets;
 
-import com.direwolf20.buildinggadgets.Entities.BlockBuildEntity;
-import com.direwolf20.buildinggadgets.Entities.BlockBuildEntityRender;
+import com.direwolf20.buildinggadgets.entities.BlockBuildEntity;
+import com.direwolf20.buildinggadgets.entities.BlockBuildEntityRender;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
@@ -9,7 +9,7 @@ import net.minecraftforge.fml.common.registry.EntityRegistry;
 public class ModEntities {
     public static void init() {
         int id = 1;
-        EntityRegistry.registerModEntity(new ResourceLocation("buildinggadgets:BlockBuildEntity"),BlockBuildEntity.class,"LaserGunEntity",id++,BuildingGadgets.instance,64,1,true);
+        EntityRegistry.registerModEntity(new ResourceLocation("buildinggadgets:BlockBuildEntity"), BlockBuildEntity.class, "LaserGunEntity", id++, BuildingGadgets.instance, 64, 1, true);
 
     }
 

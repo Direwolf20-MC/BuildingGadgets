@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets;
 
-import com.direwolf20.buildinggadgets.Blocks.EffectBlock;
+import com.direwolf20.buildinggadgets.blocks.EffectBlock;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
 public class ModBlocks {

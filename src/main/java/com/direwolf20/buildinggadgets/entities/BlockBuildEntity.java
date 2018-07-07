@@ -1,7 +1,6 @@
-package com.direwolf20.buildinggadgets.Entities;
+package com.direwolf20.buildinggadgets.entities;
 
 import com.direwolf20.buildinggadgets.ModBlocks;
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;

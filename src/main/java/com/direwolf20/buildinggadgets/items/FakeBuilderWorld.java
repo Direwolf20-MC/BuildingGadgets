@@ -1,4 +1,4 @@
-package com.direwolf20.buildinggadgets.Items;
+package com.direwolf20.buildinggadgets.items;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
@@ -22,7 +22,7 @@ public class FakeBuilderWorld implements IBlockAccess {
     private final IBlockState AIR = Blocks.AIR.getDefaultState();
 
 
-    public void setWorldAndState(World rWorld,IBlockState setBlock, Set<BlockPos> coordinates) {
+    public void setWorldAndState(World rWorld, IBlockState setBlock, Set<BlockPos> coordinates) {
         this.state = setBlock;
         this.realWorld = rWorld;
         positions = coordinates;

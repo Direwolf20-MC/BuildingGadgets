@@ -1,7 +1,6 @@
-package com.direwolf20.buildinggadgets.Network;
+package com.direwolf20.buildinggadgets.network;
 
-import com.direwolf20.buildinggadgets.Items.BuildingTool;
-import com.direwolf20.buildinggadgets.Items.ExchangerTool;
+import com.direwolf20.buildinggadgets.items.BuildingTool;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
@@ -11,7 +10,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
-public class PacketAnchorKey implements IMessage {
+public class PacketUndoKey implements IMessage {
 
     @Override
     public void fromBytes(ByteBuf buf) {
@@ -21,26 +20,22 @@ public class PacketAnchorKey implements IMessage {
     public void toBytes(ByteBuf buf) {
     }
 
-    public PacketAnchorKey() {
+    public PacketUndoKey() {
     }
 
-    public static class Handler implements IMessageHandler<PacketAnchorKey, IMessage> {
+    public static class Handler implements IMessageHandler<PacketUndoKey, IMessage> {
         @Override
-        public IMessage onMessage(PacketAnchorKey message, MessageContext ctx) {
+        public IMessage onMessage(PacketUndoKey message, MessageContext ctx) {
             FMLCommonHandler.instance().getWorldThread(ctx.netHandler).addScheduledTask(() -> handle(message, ctx));
             return null;
         }
 
-        private void handle(PacketAnchorKey message, MessageContext ctx) {
+        private void handle(PacketUndoKey message, MessageContext ctx) {
             EntityPlayerMP playerEntity = ctx.getServerHandler().player;
             ItemStack heldItem = playerEntity.getHeldItem(EnumHand.MAIN_HAND);
             if (!heldItem.isEmpty() && heldItem.getItem() instanceof BuildingTool) {
                 BuildingTool buildingTool = (BuildingTool) (heldItem.getItem());
-                buildingTool.anchorBlocks(playerEntity, heldItem);
-            }
-            else if (!heldItem.isEmpty() && heldItem.getItem() instanceof ExchangerTool) {
-                ExchangerTool exchangerTool = (ExchangerTool) (heldItem.getItem());
-                exchangerTool.anchorBlocks(playerEntity, heldItem);
+                buildingTool.undoBuild(playerEntity);
             }
         }
     }

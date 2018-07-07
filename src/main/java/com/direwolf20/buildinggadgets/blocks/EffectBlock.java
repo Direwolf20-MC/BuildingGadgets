@@ -1,19 +1,14 @@
-package com.direwolf20.buildinggadgets.Blocks;
+package com.direwolf20.buildinggadgets.blocks;
 
 import com.direwolf20.buildinggadgets.BuildingGadgets;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.state.BlockFaceShape;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
-import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumBlockRenderType;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -26,7 +21,7 @@ public class EffectBlock extends Block {
         super(Material.ROCK);
         setHardness(20.0f);
         //this.setBlockUnbreakable();
-        //this.setCreativeTab(CreativeTabs.BUILDING_BLOCKS);   // the block will appear on the Blocks tab in creative
+        //this.setCreativeTab(CreativeTabs.BUILDING_BLOCKS);   // the block will appear on the blocks tab in creative
         setUnlocalizedName(BuildingGadgets.MODID + ".effectblock");     // Used for localization (en_US.lang)
         setRegistryName("effectblock");        // The unique name (within your mod) that identifies this block
     }

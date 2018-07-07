@@ -1,4 +1,4 @@
-package com.direwolf20.buildinggadgets.Network;
+package com.direwolf20.buildinggadgets.network;
 
 import com.direwolf20.buildinggadgets.BuildingGadgets;
 import net.minecraftforge.fml.common.network.NetworkRegistry;

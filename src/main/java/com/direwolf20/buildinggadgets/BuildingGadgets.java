@@ -9,7 +9,7 @@ import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import org.apache.logging.log4j.Logger;
 
 
-@Mod(modid = BuildingGadgets.MODID, name = BuildingGadgets.MODNAME,version = BuildingGadgets.VERSION, useMetadata = true)
+@Mod(modid = BuildingGadgets.MODID, name = BuildingGadgets.MODNAME, version = BuildingGadgets.VERSION, useMetadata = true)
 
 public class BuildingGadgets {
     public static final String MODID = "buildinggadgets";

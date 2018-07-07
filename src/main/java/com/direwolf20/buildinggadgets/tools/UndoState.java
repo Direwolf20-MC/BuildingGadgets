@@ -1,4 +1,4 @@
-package com.direwolf20.buildinggadgets.Tools;
+package com.direwolf20.buildinggadgets.tools;
 
 import net.minecraft.util.math.BlockPos;
 

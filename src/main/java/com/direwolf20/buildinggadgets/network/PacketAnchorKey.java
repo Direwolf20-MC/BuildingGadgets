@@ -1,7 +1,7 @@
-package com.direwolf20.buildinggadgets.Network;
+package com.direwolf20.buildinggadgets.network;
 
-import com.direwolf20.buildinggadgets.Items.BuildingTool;
-import com.direwolf20.buildinggadgets.Items.ExchangerTool;
+import com.direwolf20.buildinggadgets.items.BuildingTool;
+import com.direwolf20.buildinggadgets.items.ExchangerTool;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
@@ -11,7 +11,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
-public class PacketToggleMode implements IMessage {
+public class PacketAnchorKey implements IMessage {
 
     @Override
     public void fromBytes(ByteBuf buf) {
@@ -21,26 +21,25 @@ public class PacketToggleMode implements IMessage {
     public void toBytes(ByteBuf buf) {
     }
 
-    public PacketToggleMode() {
+    public PacketAnchorKey() {
     }
 
-    public static class Handler implements IMessageHandler<PacketToggleMode, IMessage> {
+    public static class Handler implements IMessageHandler<PacketAnchorKey, IMessage> {
         @Override
-        public IMessage onMessage(PacketToggleMode message, MessageContext ctx) {
+        public IMessage onMessage(PacketAnchorKey message, MessageContext ctx) {
             FMLCommonHandler.instance().getWorldThread(ctx.netHandler).addScheduledTask(() -> handle(message, ctx));
             return null;
         }
 
-        private void handle(PacketToggleMode message, MessageContext ctx) {
+        private void handle(PacketAnchorKey message, MessageContext ctx) {
             EntityPlayerMP playerEntity = ctx.getServerHandler().player;
             ItemStack heldItem = playerEntity.getHeldItem(EnumHand.MAIN_HAND);
             if (!heldItem.isEmpty() && heldItem.getItem() instanceof BuildingTool) {
                 BuildingTool buildingTool = (BuildingTool) (heldItem.getItem());
-                buildingTool.toggleMode(playerEntity, heldItem);
-            }
-            else if (!heldItem.isEmpty() && heldItem.getItem() instanceof ExchangerTool) {
+                buildingTool.anchorBlocks(playerEntity, heldItem);
+            } else if (!heldItem.isEmpty() && heldItem.getItem() instanceof ExchangerTool) {
                 ExchangerTool exchangerTool = (ExchangerTool) (heldItem.getItem());
-                exchangerTool.toggleMode(playerEntity, heldItem);
+                exchangerTool.anchorBlocks(playerEntity, heldItem);
             }
         }
     }

@@ -1,13 +1,13 @@
-package com.direwolf20.buildinggadgets.Items;
+package com.direwolf20.buildinggadgets.items;
 
 import com.direwolf20.buildinggadgets.BuildingGadgets;
 import com.direwolf20.buildinggadgets.Config;
-import com.direwolf20.buildinggadgets.Entities.BlockBuildEntity;
+import com.direwolf20.buildinggadgets.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.ModBlocks;
-import com.direwolf20.buildinggadgets.Tools.BuildingModes;
-import com.direwolf20.buildinggadgets.Tools.InventoryManipulation;
-import com.direwolf20.buildinggadgets.Tools.UndoBuild;
-import com.direwolf20.buildinggadgets.Tools.UndoState;
+import com.direwolf20.buildinggadgets.tools.BuildingModes;
+import com.direwolf20.buildinggadgets.tools.InventoryManipulation;
+import com.direwolf20.buildinggadgets.tools.UndoBuild;
+import com.direwolf20.buildinggadgets.tools.UndoState;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.*;
@@ -53,11 +53,11 @@ public class BuildingTool extends Item {
     float rayTraceRange = 20f; //Range of the tool's working mode @todo make this a config
 
     public enum toolModes {
-        BuildToMe,VerticalColumn,HorizontalColumn,VerticalWall,HorizontalWall;
+        BuildToMe, VerticalColumn, HorizontalColumn, VerticalWall, HorizontalWall;
         private static toolModes[] vals = values();
-        public toolModes next()
-        {
-            return vals[(this.ordinal()+1) % vals.length];
+
+        public toolModes next() {
+            return vals[(this.ordinal() + 1) % vals.length];
         }
     }
 
@@ -73,9 +73,9 @@ public class BuildingTool extends Item {
         ModelLoader.setCustomModelResourceLocation(this, 0, new ModelResourceLocation(getRegistryName(), "inventory"));
     }
 
-    public NBTTagCompound initToolTag (ItemStack stack) {
+    public NBTTagCompound initToolTag(ItemStack stack) {
         NBTTagCompound tagCompound = stack.getTagCompound();
-        if (tagCompound == null){
+        if (tagCompound == null) {
             tagCompound = new NBTTagCompound();
             stack.setTagCompound(tagCompound);
             tagCompound.setString("mode", toolModes.BuildToMe.name());
@@ -92,7 +92,7 @@ public class BuildingTool extends Item {
 
     public void setAnchor(ItemStack stack, ArrayList<BlockPos> coordinates) {
         NBTTagCompound tagCompound = stack.getTagCompound();
-        if (tagCompound == null){
+        if (tagCompound == null) {
             tagCompound = initToolTag(stack);
         }
         NBTTagList coords = new NBTTagList();
@@ -104,14 +104,16 @@ public class BuildingTool extends Item {
 
     public ArrayList<BlockPos> getAnchor(ItemStack stack) {
         NBTTagCompound tagCompound = stack.getTagCompound();
-        if (tagCompound == null){
+        if (tagCompound == null) {
             tagCompound = initToolTag(stack);
         }
         ArrayList<BlockPos> coordinates = new ArrayList<BlockPos>();
         NBTTagList coordList = (NBTTagList) tagCompound.getTag("anchorcoords");
-        if (coordList.tagCount() == 0 || coordList == null) { return coordinates;}
+        if (coordList.tagCount() == 0 || coordList == null) {
+            return coordinates;
+        }
 
-        for (int i = 0;i<coordList.tagCount();i++) {
+        for (int i = 0; i < coordList.tagCount(); i++) {
             coordinates.add(NBTUtil.getPosFromTag(coordList.getCompoundTagAt(i)));
         }
         return coordinates;
@@ -119,7 +121,7 @@ public class BuildingTool extends Item {
 
     public void setToolMode(ItemStack stack, toolModes mode) {
         NBTTagCompound tagCompound = stack.getTagCompound();
-        if (tagCompound == null){
+        if (tagCompound == null) {
             tagCompound = initToolTag(stack);
         }
         tagCompound.setString("mode", mode.name());
@@ -127,7 +129,7 @@ public class BuildingTool extends Item {
 
     public void setToolRange(ItemStack stack, int range) {
         NBTTagCompound tagCompound = stack.getTagCompound();
-        if (tagCompound == null){
+        if (tagCompound == null) {
             tagCompound = initToolTag(stack);
         }
         tagCompound.setInteger("range", range);
@@ -135,10 +137,12 @@ public class BuildingTool extends Item {
 
     public void setToolBlock(ItemStack stack, IBlockState state) {
         NBTTagCompound tagCompound = stack.getTagCompound();
-        if (tagCompound == null){
+        if (tagCompound == null) {
             tagCompound = initToolTag(stack);
         }
-        if (state == null) {state = Blocks.AIR.getDefaultState();}
+        if (state == null) {
+            state = Blocks.AIR.getDefaultState();
+        }
         NBTTagCompound stateTag = new NBTTagCompound();
         NBTUtil.writeBlockState(stateTag, state);
         tagCompound.setTag("blockstate", stateTag);
@@ -146,7 +150,7 @@ public class BuildingTool extends Item {
 
     public toolModes getToolMode(ItemStack stack) {
         NBTTagCompound tagCompound = stack.getTagCompound();
-        if (tagCompound == null){
+        if (tagCompound == null) {
             tagCompound = initToolTag(stack);
         }
 
@@ -155,7 +159,7 @@ public class BuildingTool extends Item {
 
     public int getToolRange(ItemStack stack) {
         NBTTagCompound tagCompound = stack.getTagCompound();
-        if (tagCompound == null){
+        if (tagCompound == null) {
             tagCompound = initToolTag(stack);
         }
         return tagCompound.getInteger("range");
@@ -163,7 +167,7 @@ public class BuildingTool extends Item {
 
     public IBlockState getToolBlock(ItemStack stack) {
         NBTTagCompound tagCompound = stack.getTagCompound();
-        if (tagCompound == null){
+        if (tagCompound == null) {
             tagCompound = initToolTag(stack);
         }
         return NBTUtil.readBlockState(tagCompound.getCompoundTag("blockstate"));
@@ -188,7 +192,7 @@ public class BuildingTool extends Item {
             if (player.isSneaking()) {
                 selectBlock(stack, player);
             } else {
-                build(player,stack);
+                build(player, stack);
             }
         }
         return EnumActionResult.SUCCESS;
@@ -202,7 +206,7 @@ public class BuildingTool extends Item {
             if (player.isSneaking()) {
                 selectBlock(itemstack, player);
             } else {
-                build(player,itemstack);
+                build(player, itemstack);
             }
         }
         return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, itemstack);
@@ -211,7 +215,9 @@ public class BuildingTool extends Item {
     private void selectBlock(ItemStack stack, EntityPlayer player) {
         World world = player.world;
         RayTraceResult lookingAt = getLookingAt(player);
-        if (lookingAt == null) {return;}
+        if (lookingAt == null) {
+            return;
+        }
         BlockPos pos = lookingAt.getBlockPos();
         IBlockState state = world.getBlockState(pos);
         TileEntity te = world.getTileEntity(pos);
@@ -220,14 +226,14 @@ public class BuildingTool extends Item {
             return;
         }
         if (state != null) {
-            setToolBlock(stack,state);
+            setToolBlock(stack, state);
         }
     }
 
     public void toggleMode(EntityPlayer player, ItemStack heldItem) {
         toolModes mode = getToolMode(heldItem);
         mode = mode.next();
-        setToolMode(heldItem,mode);
+        setToolMode(heldItem, mode);
         player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + "Tool Mode: " + mode.name()), true);
     }
 
@@ -236,27 +242,26 @@ public class BuildingTool extends Item {
         if (player.isSneaking()) {
             if (range == 1) {
                 range = Config.maxRange;
-            }
-            else {
+            } else {
                 range--;
             }
-        }else {
+        } else {
             if (range >= Config.maxRange) {
                 range = 1;
             } else {
                 range++;
             }
         }
-        setToolRange(heldItem,range);
+        setToolRange(heldItem, range);
         player.sendStatusMessage(new TextComponentString(TextFormatting.DARK_BLUE + "Tool range: " + range), true);
     }
 
     public RayTraceResult getLookingAt(EntityPlayer player) {
         World world = player.world;
         Vec3d look = player.getLookVec();
-        Vec3d start = new Vec3d(player.posX,player.posY+player.getEyeHeight(),player.posZ);
-        Vec3d end = new Vec3d(player.posX+look.x * rayTraceRange,player.posY+player.getEyeHeight()+look.y*rayTraceRange,player.posZ+look.z*rayTraceRange);
-        return world.rayTraceBlocks(start,end,false,false,false);
+        Vec3d start = new Vec3d(player.posX, player.posY + player.getEyeHeight(), player.posZ);
+        Vec3d end = new Vec3d(player.posX + look.x * rayTraceRange, player.posY + player.getEyeHeight() + look.y * rayTraceRange, player.posZ + look.z * rayTraceRange);
+        return world.rayTraceBlocks(start, end, false, false, false);
     }
 
     public boolean anchorBlocks(EntityPlayer player, ItemStack stack) {
@@ -269,13 +274,17 @@ public class BuildingTool extends Item {
             //If we don't have an anchor, find the block we're supposed to anchor to
             RayTraceResult lookingAt = getLookingAt(player);
             //If we aren't looking at anything, exit
-            if (lookingAt == null) {return false;}
+            if (lookingAt == null) {
+                return false;
+            }
             BlockPos startBlock = lookingAt.getBlockPos();
             EnumFacing sideHit = lookingAt.sideHit;
             //If we are looking at air, exit
-            if (startBlock == null || world.getBlockState(startBlock) == Blocks.AIR.getDefaultState()) {return false;}
+            if (startBlock == null || world.getBlockState(startBlock) == Blocks.AIR.getDefaultState()) {
+                return false;
+            }
             //Build the positions list based on tool mode and range
-            ArrayList<BlockPos> coords = BuildingModes.getBuildOrders(world, player, startBlock, sideHit, range, mode,getToolBlock(stack));
+            ArrayList<BlockPos> coords = BuildingModes.getBuildOrders(world, player, startBlock, sideHit, range, mode, getToolBlock(stack));
             //Set the anchor NBT
             setAnchor(stack, coords);
             player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + "Render Anchored"), true);
@@ -297,13 +306,15 @@ public class BuildingTool extends Item {
             //If we don't have an anchor, build in the current spot
             RayTraceResult lookingAt = getLookingAt(player);
             //If we aren't looking at anything, exit
-            if (lookingAt == null) {return false;}
+            if (lookingAt == null) {
+                return false;
+            }
             BlockPos startBlock = lookingAt.getBlockPos();
             EnumFacing sideHit = lookingAt.sideHit;
-            coords = BuildingModes.getBuildOrders(world, player, startBlock, sideHit, range, mode,getToolBlock(stack));
+            coords = BuildingModes.getBuildOrders(world, player, startBlock, sideHit, range, mode, getToolBlock(stack));
         } else {
             //If we do have an anchor, erase it (Even if the build fails)
-            setAnchor(stack,new ArrayList<BlockPos>());
+            setAnchor(stack, new ArrayList<BlockPos>());
         }
         ArrayList<BlockPos> undoCoords = new ArrayList<BlockPos>();
         Set<BlockPos> coordinates = new HashSet<BlockPos>(coords);
@@ -339,13 +350,15 @@ public class BuildingTool extends Item {
                 UndoBuild.updatePlayerMap(player.getUniqueID(), undoStack);
             }
         }
-        BuildingModes.sortByDistance(coords,player);
+        BuildingModes.sortByDistance(coords, player);
         return true;
     }
 
     public static boolean undoBuild(EntityPlayer player) {
         Stack<UndoState> undoStack = UndoBuild.getPlayerMap(player.getUniqueID());
-        if (undoStack.empty()) {return false;} //Exit if theres nothing to undo.
+        if (undoStack.empty()) {
+            return false;
+        } //Exit if theres nothing to undo.
         World world = player.world;
         if (!world.isRemote) {
             IBlockState currentBlock = Blocks.AIR.getDefaultState();
@@ -357,7 +370,7 @@ public class BuildingTool extends Item {
                 currentBlock = world.getBlockState(coord);
                 ItemStack itemStack = currentBlock.getBlock().getPickBlock(currentBlock, null, world, coord, player);
                 //Only allow undo from the same dimension, if you're within 35 blocks (Due to chunkloading concerns)
-                double distance = coord.getDistance(player.getPosition().getX(),player.getPosition().getY(),player.getPosition().getZ());
+                double distance = coord.getDistance(player.getPosition().getX(), player.getPosition().getY(), player.getPosition().getZ());
                 boolean sameDim = (player.dimension == dimension);
                 if (distance < 35 && sameDim && currentBlock != ModBlocks.effectBlock.getDefaultState()) { //Don't allow us to undo a block while its still being placed
                     if (InventoryManipulation.giveItem(itemStack, player)) {
@@ -367,25 +380,24 @@ public class BuildingTool extends Item {
                         //If we failed to give the item, we want to put this back on the undo list, so start building a list
                         failedRemovals.add(coord);
                     }
-                }
-                else {
+                } else {
                     //If you're in the wrong dimension or too far away, fail the undo.
                     failedRemovals.add(coord);
                 }
             }
             if (failedRemovals.size() != 0) {
                 //Add any failed undo blocks to the undo stack.
-                UndoState failedState = new UndoState(player.dimension,failedRemovals);
+                UndoState failedState = new UndoState(player.dimension, failedRemovals);
                 undoStack.push(failedState);
-                UndoBuild.updatePlayerMap(player.getUniqueID(),undoStack);
+                UndoBuild.updatePlayerMap(player.getUniqueID(), undoStack);
             }
         }
         return true;
     }
 
     public static boolean placeBlock(World world, EntityPlayer player, BlockPos pos, IBlockState setBlock) {
-        ItemStack itemStack = setBlock.getBlock().getPickBlock(setBlock,null,world,pos,player);
-        if (InventoryManipulation.useItem(itemStack,player)) {
+        ItemStack itemStack = setBlock.getBlock().getPickBlock(setBlock, null, world, pos, player);
+        if (InventoryManipulation.useItem(itemStack, player)) {
             world.spawnEntity(new BlockBuildEntity(world, pos, player, setBlock, 1));
         }
         return true;
@@ -395,8 +407,7 @@ public class BuildingTool extends Item {
         Item item = Item.getItemFromBlock(state.getBlock());
         int i = 0;
 
-        if (item.getHasSubtypes())
-        {
+        if (item.getHasSubtypes()) {
             i = state.getBlock().getMetaFromState(state);
         }
         return new ItemStack(item, 1, i);

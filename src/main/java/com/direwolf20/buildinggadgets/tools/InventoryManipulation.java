@@ -1,4 +1,4 @@
-package com.direwolf20.buildinggadgets.Tools;
+package com.direwolf20.buildinggadgets.tools;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -6,7 +6,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
 import java.util.ArrayList;
-import java.util.Set;
 
 public class InventoryManipulation {
 
@@ -28,8 +27,10 @@ public class InventoryManipulation {
         //int slot = inv.getSlotFor(itemStack);
         //if (slot == -1) {return false;}
 
-        ArrayList<Integer> slots = findItem(itemStack.getItem(),itemStack.getMetadata(),inv);
-        if (slots.size() == 0) {return false;}
+        ArrayList<Integer> slots = findItem(itemStack.getItem(), itemStack.getMetadata(), inv);
+        if (slots.size() == 0) {
+            return false;
+        }
         int slot = slots.get(0);
         ItemStack stackInSlot = inv.getStackInSlot(slot);
         stackInSlot.shrink(1);
@@ -40,14 +41,17 @@ public class InventoryManipulation {
 
         return true;
     }
-    public static int countItem(ItemStack itemStack,EntityPlayer player) {
+
+    public static int countItem(ItemStack itemStack, EntityPlayer player) {
         if (player.capabilities.isCreativeMode) {
             return 10000;
         }
-        int count=0;
+        int count = 0;
         InventoryPlayer inv = player.inventory;
-        ArrayList<Integer> slots = findItem(itemStack.getItem(),itemStack.getMetadata(),inv);
-        if (slots.size() == 0) {return 0;}
+        ArrayList<Integer> slots = findItem(itemStack.getItem(), itemStack.getMetadata(), inv);
+        if (slots.size() == 0) {
+            return 0;
+        }
         for (int slot : slots) {
             ItemStack stackInSlot = inv.getStackInSlot(slot);
             count += stackInSlot.getCount();
