@@ -360,7 +360,8 @@ public class ExchangerTool extends Item {
 
     public boolean exchangeBlock(World world, EntityPlayer player, BlockPos pos, IBlockState setBlock) {
         IBlockState currentBlock = world.getBlockState(pos);
-        ItemStack itemStack = setBlock.getBlock().getPickBlock(setBlock,null,world,pos,player);
+        //ItemStack itemStack = setBlock.getBlock().getPickBlock(setBlock,null,world,pos,player);
+        ItemStack itemStack = getSilkTouchDrop(setBlock);
         ItemStack returnItem;
         ItemStack tool = player.getHeldItemMainhand();
         boolean returnSuccess = true;
@@ -370,7 +371,8 @@ public class ExchangerTool extends Item {
         if (EnchantmentHelper.getEnchantmentLevel(Enchantments.SILK_TOUCH, tool) > 0) {
             //Item tempItem = Item.getItemFromBlock(currentBlock.getBlock());
             //returnItem = new ItemStack(tempItem);
-            returnItem = currentBlock.getBlock().getPickBlock(currentBlock, null, world,pos,player);
+            //returnItem = currentBlock.getBlock().getPickBlock(currentBlock, null, world,pos,player);
+            returnItem = getSilkTouchDrop(currentBlock);
             if (!InventoryManipulation.giveItem(returnItem, player)) {returnSuccess = false;}
         } else {
             NonNullList<ItemStack> returnItems = NonNullList.create();
@@ -385,6 +387,17 @@ public class ExchangerTool extends Item {
             world.spawnEntity(new BlockBuildEntity(world, pos, player, setBlock, 3));
         }
         return true;
+    }
+
+    public static ItemStack getSilkTouchDrop(IBlockState state) {
+        Item item = Item.getItemFromBlock(state.getBlock());
+        int i = 0;
+
+        if (item.getHasSubtypes())
+        {
+            i = state.getBlock().getMetaFromState(state);
+        }
+        return new ItemStack(item, 1, i);
     }
 
     @Override
@@ -424,7 +437,8 @@ public class ExchangerTool extends Item {
                 }
 
                 //Figure out how many of the block we're rendering we have in the inventory of the player.
-                ItemStack itemStack = renderBlockState.getBlock().getPickBlock(renderBlockState, null, world, new BlockPos(0, 0, 0), player);
+                //ItemStack itemStack = renderBlockState.getBlock().getPickBlock(renderBlockState, null, world, new BlockPos(0, 0, 0), player);
+                ItemStack itemStack = getSilkTouchDrop(renderBlockState);
                 int hasBlocks = InventoryManipulation.countItem(itemStack, player);
 
                 //Prepare the block rendering

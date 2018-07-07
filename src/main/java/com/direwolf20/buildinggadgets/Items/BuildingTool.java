@@ -391,6 +391,17 @@ public class BuildingTool extends Item {
         return true;
     }
 
+    public static ItemStack getSilkTouchDrop(IBlockState state) {
+        Item item = Item.getItemFromBlock(state.getBlock());
+        int i = 0;
+
+        if (item.getHasSubtypes())
+        {
+            i = state.getBlock().getMetaFromState(state);
+        }
+        return new ItemStack(item, 1, i);
+    }
+
     @Override
     public int getMaxItemUseDuration(ItemStack stack) {
         return 20;
@@ -423,7 +434,8 @@ public class BuildingTool extends Item {
                 }
 
                 //Figure out how many of the block we're rendering we have in the inventory of the player.
-                ItemStack itemStack = renderBlockState.getBlock().getPickBlock(renderBlockState, null, world, new BlockPos(0, 0, 0), player);
+                //ItemStack itemStack = renderBlockState.getBlock().getPickBlock(renderBlockState, null, world, new BlockPos(0, 0, 0), player);
+                ItemStack itemStack = getSilkTouchDrop(renderBlockState);
                 int hasBlocks = InventoryManipulation.countItem(itemStack, player);
 
                 //Prepare the block rendering
