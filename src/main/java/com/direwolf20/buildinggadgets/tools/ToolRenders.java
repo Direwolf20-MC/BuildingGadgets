@@ -200,7 +200,7 @@ public class ToolRenders {
                     dispatcher.renderBlockBrightness(state, 1f);//Render the defined block
                     GL14.glBlendColor(1F, 1F, 1F, 0.1f); //Set the alpha of the blocks we are rendering
                     GlStateManager.rotate(-90.0F, 0.0F, 1.0F, 0.0F); //Rotate it because i'm not sure why but we need to
-                    dispatcher.renderBlockBrightness(Blocks.STAINED_GLASS.getDefaultState().withProperty(COLOR,EnumDyeColor.WHITE), 1f);//Render the defined block
+                    dispatcher.renderBlockBrightness(Blocks.STAINED_GLASS.getDefaultState().withProperty(COLOR,EnumDyeColor.WHITE), 1f);//Render the defined block - White glass to show non-full block renders (Example: Torch)
                     //Move the render position back to where it was
                     GlStateManager.popMatrix();
                 }
