@@ -3,23 +3,17 @@ package com.direwolf20.buildinggadgets.items;
 import com.direwolf20.buildinggadgets.BuildingGadgets;
 import com.direwolf20.buildinggadgets.Config;
 import com.direwolf20.buildinggadgets.entities.BlockBuildEntity;
-import com.direwolf20.buildinggadgets.ModBlocks;
 import com.direwolf20.buildinggadgets.tools.ExchangingModes;
 import com.direwolf20.buildinggadgets.tools.InventoryManipulation;
+import com.direwolf20.buildinggadgets.tools.VectorTools;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.BlockRendererDispatcher;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
-import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Enchantments;
-import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -29,29 +23,21 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldType;
-import net.minecraftforge.client.ForgeHooksClient;
-import net.minecraftforge.client.MinecraftForgeClient;
-import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL14;
 
-import java.util.*;
-
-import static net.minecraft.block.BlockStainedGlass.COLOR;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class ExchangerTool extends Item {
-
-    private static final BlockRenderLayer[] LAYERS = BlockRenderLayer.values();
     private static final FakeBuilderWorld fakeWorld = new FakeBuilderWorld();
-    float rayTraceRange = 20f; //Range of the tool's working mode @todo make this a config
 
     public enum toolModes {
         Wall, VerticalColumn, HorizontalColumn;
@@ -100,7 +86,7 @@ public class ExchangerTool extends Item {
         return false;
     }
 
-    public NBTTagCompound initToolTag(ItemStack stack) {
+    public static NBTTagCompound initToolTag(ItemStack stack) {
         NBTTagCompound tagCompound = stack.getTagCompound();
         if (tagCompound == null) {
             tagCompound = new NBTTagCompound();
@@ -117,7 +103,7 @@ public class ExchangerTool extends Item {
         return tagCompound;
     }
 
-    public void setAnchor(ItemStack stack, ArrayList<BlockPos> coordinates) {
+    public static void setAnchor(ItemStack stack, ArrayList<BlockPos> coordinates) {
         NBTTagCompound tagCompound = stack.getTagCompound();
         if (tagCompound == null) {
             tagCompound = initToolTag(stack);
@@ -129,7 +115,7 @@ public class ExchangerTool extends Item {
         tagCompound.setTag("anchorcoords", coords);
     }
 
-    public ArrayList<BlockPos> getAnchor(ItemStack stack) {
+    public static ArrayList<BlockPos> getAnchor(ItemStack stack) {
         NBTTagCompound tagCompound = stack.getTagCompound();
         if (tagCompound == null) {
             tagCompound = initToolTag(stack);
@@ -146,7 +132,7 @@ public class ExchangerTool extends Item {
         return coordinates;
     }
 
-    public void setToolMode(ItemStack stack, ExchangerTool.toolModes mode) {
+    public static void setToolMode(ItemStack stack, ExchangerTool.toolModes mode) {
         NBTTagCompound tagCompound = stack.getTagCompound();
         if (tagCompound == null) {
             tagCompound = initToolTag(stack);
@@ -154,7 +140,7 @@ public class ExchangerTool extends Item {
         tagCompound.setString("mode", mode.name());
     }
 
-    public void setToolRange(ItemStack stack, int range) {
+    public static void setToolRange(ItemStack stack, int range) {
         NBTTagCompound tagCompound = stack.getTagCompound();
         if (tagCompound == null) {
             tagCompound = initToolTag(stack);
@@ -162,7 +148,7 @@ public class ExchangerTool extends Item {
         tagCompound.setInteger("range", range);
     }
 
-    public void setToolBlock(ItemStack stack, IBlockState state) {
+    public static void setToolBlock(ItemStack stack, IBlockState state) {
         NBTTagCompound tagCompound = stack.getTagCompound();
         if (tagCompound == null) {
             tagCompound = initToolTag(stack);
@@ -175,7 +161,7 @@ public class ExchangerTool extends Item {
         tagCompound.setTag("blockstate", stateTag);
     }
 
-    public ExchangerTool.toolModes getToolMode(ItemStack stack) {
+    public static ExchangerTool.toolModes getToolMode(ItemStack stack) {
         NBTTagCompound tagCompound = stack.getTagCompound();
         if (tagCompound == null) {
             tagCompound = initToolTag(stack);
@@ -187,7 +173,7 @@ public class ExchangerTool extends Item {
         }
     }
 
-    public int getToolRange(ItemStack stack) {
+    public static int getToolRange(ItemStack stack) {
         NBTTagCompound tagCompound = stack.getTagCompound();
         if (tagCompound == null) {
             tagCompound = initToolTag(stack);
@@ -195,7 +181,7 @@ public class ExchangerTool extends Item {
         return tagCompound.getInteger("range");
     }
 
-    public IBlockState getToolBlock(ItemStack stack) {
+    public static IBlockState getToolBlock(ItemStack stack) {
         NBTTagCompound tagCompound = stack.getTagCompound();
         if (tagCompound == null) {
             tagCompound = initToolTag(stack);
@@ -242,7 +228,7 @@ public class ExchangerTool extends Item {
 
     private void selectBlock(ItemStack stack, EntityPlayer player) {
         World world = player.world;
-        RayTraceResult lookingAt = getLookingAt(player);
+        RayTraceResult lookingAt = VectorTools.getLookingAt(player);
         if (lookingAt == null) {
             return;
         }
@@ -284,14 +270,6 @@ public class ExchangerTool extends Item {
         player.sendStatusMessage(new TextComponentString(TextFormatting.DARK_BLUE + "Tool range: " + range), true);
     }
 
-    public RayTraceResult getLookingAt(EntityPlayer player) {
-        World world = player.world;
-        Vec3d look = player.getLookVec();
-        Vec3d start = new Vec3d(player.posX, player.posY + player.getEyeHeight(), player.posZ);
-        Vec3d end = new Vec3d(player.posX + look.x * rayTraceRange, player.posY + player.getEyeHeight() + look.y * rayTraceRange, player.posZ + look.z * rayTraceRange);
-        return world.rayTraceBlocks(start, end, false, false, false);
-    }
-
     public boolean anchorBlocks(EntityPlayer player, ItemStack stack) {
         World world = player.world;
         int range = getToolRange(stack);
@@ -300,7 +278,7 @@ public class ExchangerTool extends Item {
 
         if (currentCoords.size() == 0) {
             //If we don't have an anchor, find the block we're supposed to anchor to
-            RayTraceResult lookingAt = getLookingAt(player);
+            RayTraceResult lookingAt = VectorTools.getLookingAt(player);
             //If we aren't looking at anything, exit
             if (lookingAt == null) {
                 return false;
@@ -333,7 +311,7 @@ public class ExchangerTool extends Item {
 
         if (coords.size() == 0) {
             //If we don't have an anchor, build in the current spot
-            RayTraceResult lookingAt = getLookingAt(player);
+            RayTraceResult lookingAt = VectorTools.getLookingAt(player);
             //If we aren't looking at anything, exit
             if (lookingAt == null) {
                 return false;
@@ -427,102 +405,4 @@ public class ExchangerTool extends Item {
         return false;
     }
 
-    @SideOnly(Side.CLIENT)
-    public void renderOverlay(RenderWorldLastEvent evt, EntityPlayer player, ItemStack stack) {
-        int range = getToolRange(stack);
-        toolModes mode = getToolMode(stack);
-        RayTraceResult lookingAt = getLookingAt(player);
-        IBlockState state = Blocks.AIR.getDefaultState();
-        ArrayList<BlockPos> coordinates = getAnchor(stack);
-        if (lookingAt != null || coordinates.size() > 0) {
-            World world = player.world;
-            IBlockState startBlock = Blocks.AIR.getDefaultState();
-            if (!(lookingAt == null)) {
-                startBlock = world.getBlockState(lookingAt.getBlockPos());
-            }
-            if (startBlock != ModBlocks.effectBlock.getDefaultState()) {
-                ItemStack heldItem = player.getHeldItemMainhand(); //Get the item stack and the block that we'll be rendering (From the Itemstack's NBT)
-                IBlockState renderBlockState = getToolBlock(heldItem);
-                Minecraft mc = Minecraft.getMinecraft();
-                mc.renderEngine.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
-                if (renderBlockState == Blocks.AIR.getDefaultState()) {//Don't render anything if there is no block selected (Air)
-                    return;
-                }
-                if (coordinates.size() == 0) { //Build a list of coordinates based on the tool mode and range
-                    coordinates = ExchangingModes.getBuildOrders(world, player, lookingAt.getBlockPos(), lookingAt.sideHit, range, mode, renderBlockState);
-                }
-
-                //Figure out how many of the block we're rendering we have in the inventory of the player.
-                //ItemStack itemStack = renderBlockState.getBlock().getPickBlock(renderBlockState, null, world, new BlockPos(0, 0, 0), player);
-                ItemStack itemStack = getSilkTouchDrop(renderBlockState);
-                int hasBlocks = InventoryManipulation.countItem(itemStack, player);
-
-                //Prepare the block rendering
-                BlockRendererDispatcher dispatcher = Minecraft.getMinecraft().getBlockRendererDispatcher();
-                BlockRenderLayer origLayer = MinecraftForgeClient.getRenderLayer();
-
-                //Prepare the fake world -- using a fake world lets us render things properly, like fences connecting.
-                Set<BlockPos> coords = new HashSet<BlockPos>(coordinates);
-                fakeWorld.setWorldAndState(player.world, renderBlockState, coords);
-
-                //Calculate the players current position, which is needed later
-                double doubleX = player.lastTickPosX + (player.posX - player.lastTickPosX) * evt.getPartialTicks();
-                double doubleY = player.lastTickPosY + (player.posY - player.lastTickPosY) * evt.getPartialTicks();
-                double doubleZ = player.lastTickPosZ + (player.posZ - player.lastTickPosZ) * evt.getPartialTicks();
-
-                //Save the current position that is being rendered (I think)
-                GlStateManager.pushMatrix();
-                //Enable Blending (So we can have transparent effect)
-                GlStateManager.enableBlend();
-                //This blend function allows you to use a constant alpha, which is defined later
-                GlStateManager.blendFunc(GL11.GL_CONSTANT_ALPHA, GL11.GL_ONE_MINUS_CONSTANT_ALPHA);
-
-                //ArrayList<BlockPos> sortedCoordinates = ExchangingModes.sortByDistance(coordinates, player); //Sort the coords by distance to player.
-
-                for (BlockPos coordinate : coordinates) {
-                    GlStateManager.pushMatrix();//Push matrix again just because
-                    GlStateManager.translate(-doubleX, -doubleY, -doubleZ);//The render starts at the player, so we subtract the player coords and move the render to 0,0,0
-                    GlStateManager.translate(coordinate.getX(), coordinate.getY(), coordinate.getZ());//Now move the render position to the coordinates we want to render at
-                    GlStateManager.rotate(-90.0F, 0.0F, 1.0F, 0.0F); //Rotate it because i'm not sure why but we need to
-                    GlStateManager.translate(-0.005f, -0.005f, 0.005f);
-                    GlStateManager.scale(1.01f, 1.01f, 1.01f);//Slightly Larger block to avoid z-fighting.
-                    GL14.glBlendColor(1F, 1F, 1F, 0.55f); //Set the alpha of the blocks we are rendering
-                    if (fakeWorld.getWorldType() != WorldType.DEBUG_ALL_BLOCK_STATES) { //Get the block state in the fake world
-                        try {
-                            state = renderBlockState.getActualState(fakeWorld, coordinate);
-                        } catch (Exception var8) {
-                        }
-                    }
-                    //state = state.getBlock().getExtendedState(state, fakeWorld, coordinate); //Get the extended block state in the fake world (Disabled to fix chisel, not sure why.)
-                    dispatcher.renderBlockBrightness(state, 1f);//Render the defined block
-                    //Move the render position back to where it was
-                    GlStateManager.popMatrix();
-                }
-
-                for (BlockPos coordinate : coordinates) { //Now run through the UNSORTED list of coords, to show which blocks won't place if you don't have enough of them.
-                    GlStateManager.pushMatrix();//Push matrix again just because
-                    GlStateManager.translate(-doubleX, -doubleY, -doubleZ);//The render starts at the player, so we subtract the player coords and move the render to 0,0,0
-                    GlStateManager.translate(coordinate.getX(), coordinate.getY(), coordinate.getZ());//Now move the render position to the coordinates we want to render at
-                    GlStateManager.rotate(-90.0F, 0.0F, 1.0F, 0.0F); //Rotate it because i'm not sure why but we need to
-                    GlStateManager.translate(-0.005f, -0.005f, 0.005f);
-                    GlStateManager.scale(1.01f, 1.01f, 1.01f);//Slightly Larger block to avoid z-fighting.
-                    GL14.glBlendColor(1F, 1F, 1F, 0.55f); //Set the alpha of the blocks we are rendering
-                    hasBlocks--;
-                    if (hasBlocks < 0) {
-                        dispatcher.renderBlockBrightness(Blocks.STAINED_GLASS.getDefaultState().withProperty(COLOR, EnumDyeColor.RED), 1f);
-                    }
-                    //Move the render position back to where it was
-                    GlStateManager.popMatrix();
-                }
-                //Set blending back to the default mode
-                GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-                ForgeHooksClient.setRenderLayer(origLayer);
-                //Disable blend
-                GlStateManager.disableBlend();
-                RenderHelper.enableStandardItemLighting();
-                //Pop from the original push in this method
-                GlStateManager.popMatrix();
-            }
-        }
-    }
 }

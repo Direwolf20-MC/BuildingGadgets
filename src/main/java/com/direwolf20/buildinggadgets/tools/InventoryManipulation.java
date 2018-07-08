@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.tools;
 
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.Item;
@@ -69,5 +70,15 @@ public class InventoryManipulation {
         }
 
         return slots;
+    }
+
+    public static ItemStack getSilkTouchDrop(IBlockState state) {
+        Item item = Item.getItemFromBlock(state.getBlock());
+        int i = 0;
+
+        if (item.getHasSubtypes()) {
+            i = state.getBlock().getMetaFromState(state);
+        }
+        return new ItemStack(item, 1, i);
     }
 }
