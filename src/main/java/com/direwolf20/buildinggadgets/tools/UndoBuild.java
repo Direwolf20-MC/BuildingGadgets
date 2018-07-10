@@ -13,21 +13,22 @@ public class UndoBuild {
     }
 
     public static void updatePlayerMap(UUID PlayerUUID, Stack<UndoState> undoStack) {
-        if (playerUndoList.containsKey(PlayerUUID)) {
-            playerUndoList.replace(PlayerUUID, undoStack);
-        } else {
+        //if (playerUndoList.containsKey(PlayerUUID)) {
+        //    playerUndoList.replace(PlayerUUID, undoStack);
+        //} else {
             playerUndoList.put(PlayerUUID, undoStack);
-        }
+        //}
 
     }
 
     public static Stack<UndoState> getPlayerMap(UUID PlayerUUID) {
-        if (playerUndoList.containsKey(PlayerUUID)) {
+        /*if (playerUndoList.containsKey(PlayerUUID)) {
             return playerUndoList.get(PlayerUUID);
         } else {
             Stack<UndoState> undoStack = new Stack<UndoState>();
             playerUndoList.put(PlayerUUID, undoStack);
             return undoStack;
-        }
+        }*/
+        return playerUndoList.computeIfAbsent(PlayerUUID, k -> new Stack<UndoState>());
     }
 }
