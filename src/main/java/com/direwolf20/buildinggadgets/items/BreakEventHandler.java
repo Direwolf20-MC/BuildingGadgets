@@ -13,6 +13,7 @@ public class BreakEventHandler {
     @SubscribeEvent
     public void GetDrops(BlockEvent.HarvestDropsEvent event) {
         EntityPlayer player = event.getHarvester();
+        if (player == null) {return;}
         ItemStack heldItem = player.getHeldItemMainhand();
         List<ItemStack> drops = event.getDrops();
         if (heldItem.getItem() instanceof ExchangerTool) {

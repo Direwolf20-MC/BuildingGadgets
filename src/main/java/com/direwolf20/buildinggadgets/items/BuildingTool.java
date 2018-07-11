@@ -13,9 +13,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraft.nbt.NBTUtil;
+import net.minecraft.nbt.*;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
@@ -70,6 +68,57 @@ public class BuildingTool extends Item {
             tagCompound.setTag("anchorcoords", coords);
         }
         return tagCompound;
+    }
+
+    public static void pushUndoList(ItemStack stack, UndoState undoState) {
+        NBTTagCompound tagCompound = stack.getTagCompound();
+        if (tagCompound == null) {
+            tagCompound = initToolTag(stack);
+        }
+        NBTTagList undoStates = (NBTTagList) tagCompound.getTag("undocoords");
+        if (undoStates == null) {undoStates = new NBTTagList();}
+        if (undoStates.tagCount() >= 10) {undoStates.removeTag(0);}
+        undoStates.appendTag(undoStateToNBT(undoState));
+        tagCompound.setTag("undoStack",undoStates);
+    }
+
+    public static UndoState popUndoList(ItemStack stack) {
+        NBTTagCompound tagCompound = stack.getTagCompound();
+        if (tagCompound == null) {
+            tagCompound = initToolTag(stack);
+            return null;
+        }
+        NBTTagList undoStates = (NBTTagList) tagCompound.getTag("undoStack");
+        if (undoStates == null) {
+            undoStates = new NBTTagList();
+            return null;
+        }
+        UndoState undoState = NBTToUndoState(undoStates.getCompoundTagAt(undoStates.tagCount()-1));
+        undoStates.removeTag(undoStates.tagCount()-1);
+        tagCompound.setTag("undoStack",undoStates);
+        return undoState;
+    }
+
+    public static NBTTagCompound undoStateToNBT(UndoState undoState) {
+        NBTTagCompound compound = new NBTTagCompound();
+        compound.setInteger("dim",undoState.dimension);
+        NBTTagList coords = new NBTTagList();
+        for (BlockPos coord : undoState.coordinates) {
+            coords.appendTag(NBTUtil.createPosTag(coord));
+        }
+        compound.setTag("undocoords", coords);
+        return compound;
+    }
+
+    public static UndoState NBTToUndoState(NBTTagCompound compound) {
+        int dim = compound.getInteger("dim");
+        ArrayList<BlockPos> coordinates = new ArrayList<BlockPos>();
+        NBTTagList coordList = (NBTTagList) compound.getTag("undocoords");
+        for (int i = 0; i <= coordList.tagCount()-1; i++) {
+            coordinates.add(NBTUtil.getPosFromTag(coordList.getCompoundTagAt(i)));
+        }
+        UndoState undoState = new UndoState(dim,coordinates);
+        return undoState;
     }
 
     public static void setAnchor(ItemStack stack, ArrayList<BlockPos> coordinates) {
@@ -319,9 +368,10 @@ public class BuildingTool extends Item {
             if (undoCoords.size() > 0) {
                 //If the undo list has any data in it, add it to the player Map.
                 UndoState undoState = new UndoState(player.dimension, undoCoords);
-                Stack<UndoState> undoStack = UndoBuild.getPlayerMap(player.getUniqueID());
-                undoStack.push(undoState);
-                UndoBuild.updatePlayerMap(player.getUniqueID(), undoStack);
+                //Stack<UndoState> undoStack = UndoBuild.getPlayerMap(player.getUniqueID());
+                //undoStack.push(undoState);
+                //UndoBuild.updatePlayerMap(player.getUniqueID(), undoStack);
+                pushUndoList(heldItem,undoState);
             }
         }
         BuildingModes.sortByDistance(coords, player);
@@ -329,14 +379,16 @@ public class BuildingTool extends Item {
     }
 
     public static boolean undoBuild(EntityPlayer player) {
-        Stack<UndoState> undoStack = UndoBuild.getPlayerMap(player.getUniqueID());
-        if (undoStack.empty()) {
+        //Stack<UndoState> undoStack = UndoBuild.getPlayerMap(player.getUniqueID());
+        ItemStack heldItem = player.getHeldItemMainhand();
+        UndoState undoState = popUndoList(heldItem);
+        if (undoState == null) {
             return false;
         } //Exit if theres nothing to undo.
         World world = player.world;
         if (!world.isRemote) {
             IBlockState currentBlock = Blocks.AIR.getDefaultState();
-            UndoState undoState = undoStack.pop(); //Get the Dim and Coords to Undo
+            //UndoState undoState = undoStack.pop(); //Get the Dim and Coords to Undo
             ArrayList<BlockPos> undoCoords = undoState.coordinates; //Get the Coords to undo
             int dimension = undoState.dimension; //Get the Dimension to undo
             ArrayList<BlockPos> failedRemovals = new ArrayList<BlockPos>();
@@ -362,8 +414,9 @@ public class BuildingTool extends Item {
             if (failedRemovals.size() != 0) {
                 //Add any failed undo blocks to the undo stack.
                 UndoState failedState = new UndoState(player.dimension, failedRemovals);
-                undoStack.push(failedState);
-                UndoBuild.updatePlayerMap(player.getUniqueID(), undoStack);
+                pushUndoList(heldItem,failedState);
+                //undoStack.push(failedState);
+                //UndoBuild.updatePlayerMap(player.getUniqueID(), undoStack);
             }
         }
         return true;

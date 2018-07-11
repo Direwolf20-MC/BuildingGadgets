@@ -18,7 +18,6 @@ public class UndoBuild {
         //} else {
             playerUndoList.put(PlayerUUID, undoStack);
         //}
-
     }
 
     public static Stack<UndoState> getPlayerMap(UUID PlayerUUID) {
