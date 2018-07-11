@@ -75,7 +75,7 @@ public class BuildingTool extends Item {
         if (tagCompound == null) {
             tagCompound = initToolTag(stack);
         }
-        NBTTagList undoStates = (NBTTagList) tagCompound.getTag("undocoords");
+        NBTTagList undoStates = (NBTTagList) tagCompound.getTag("undoStack");
         if (undoStates == null) {undoStates = new NBTTagList();}
         if (undoStates.tagCount() >= 10) {undoStates.removeTag(0);}
         undoStates.appendTag(undoStateToNBT(undoState));
@@ -89,8 +89,7 @@ public class BuildingTool extends Item {
             return null;
         }
         NBTTagList undoStates = (NBTTagList) tagCompound.getTag("undoStack");
-        if (undoStates == null) {
-            undoStates = new NBTTagList();
+        if (undoStates == null || undoStates.tagCount() == 0) {
             return null;
         }
         UndoState undoState = NBTToUndoState(undoStates.getCompoundTagAt(undoStates.tagCount()-1));
