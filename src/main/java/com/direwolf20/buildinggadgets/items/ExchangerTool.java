@@ -350,38 +350,15 @@ public class ExchangerTool extends Item {
 
     public boolean exchangeBlock(World world, EntityPlayer player, BlockPos pos, IBlockState setBlock) {
         IBlockState currentBlock = world.getBlockState(pos);
-        //ItemStack itemStack = setBlock.getBlock().getPickBlock(setBlock,null,world,pos,player);
         ItemStack itemStack = getSilkTouchDrop(setBlock);
-        ItemStack returnItem;
         ItemStack tool = player.getHeldItemMainhand();
-        boolean returnSuccess = true;
-
         if (InventoryManipulation.countItem(itemStack, player) == 0) {
             return false;
         }
+        currentBlock.getBlock().harvestBlock(world,player,pos,currentBlock,world.getTileEntity(pos),tool);
 
-        if (EnchantmentHelper.getEnchantmentLevel(Enchantments.SILK_TOUCH, tool) > 0) {
-            //Item tempItem = Item.getItemFromBlock(currentBlock.getBlock());
-            //returnItem = new ItemStack(tempItem);
-            //returnItem = currentBlock.getBlock().getPickBlock(currentBlock, null, world,pos,player);
-            returnItem = getSilkTouchDrop(currentBlock);
-            if (!InventoryManipulation.giveItem(returnItem, player)) {
-                returnSuccess = false;
-            }
-        } else {
-            NonNullList<ItemStack> returnItems = NonNullList.create();
-            currentBlock.getBlock().getDrops(returnItems, world, pos, currentBlock, 0);
-            for (ItemStack returnItemStack : returnItems) {
-                if (!InventoryManipulation.giveItem(returnItemStack, player)) {
-                    returnSuccess = false;
-                }
-            }
-        }
-
-        if (returnSuccess) {
-            InventoryManipulation.useItem(itemStack, player);
-            world.spawnEntity(new BlockBuildEntity(world, pos, player, setBlock, 3));
-        }
+        InventoryManipulation.useItem(itemStack, player);
+        world.spawnEntity(new BlockBuildEntity(world, pos, player, setBlock, 3));
         return true;
     }
 
