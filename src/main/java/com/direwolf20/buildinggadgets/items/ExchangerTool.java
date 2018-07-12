@@ -20,7 +20,10 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.*;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.EnumActionResult;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.text.TextComponentString;
@@ -350,12 +353,16 @@ public class ExchangerTool extends Item {
 
     public boolean exchangeBlock(World world, EntityPlayer player, BlockPos pos, IBlockState setBlock) {
         IBlockState currentBlock = world.getBlockState(pos);
-        ItemStack itemStack = getSilkTouchDrop(setBlock);
+        ItemStack itemStack = setBlock.getBlock().getPickBlock(setBlock, null, world, pos, player);
         ItemStack tool = player.getHeldItemMainhand();
         if (InventoryManipulation.countItem(itemStack, player) == 0) {
             return false;
         }
-        currentBlock.getBlock().harvestBlock(world,player,pos,currentBlock,world.getTileEntity(pos),tool);
+        if (player.isSpectator()) {
+            return false;
+        }
+        //if (!player.canPlayerEdit(pos,EnumFacing.UP,tool)) {return false;}
+        currentBlock.getBlock().harvestBlock(world, player, pos, currentBlock, world.getTileEntity(pos), tool);
 
         InventoryManipulation.useItem(itemStack, player);
         world.spawnEntity(new BlockBuildEntity(world, pos, player, setBlock, 3));

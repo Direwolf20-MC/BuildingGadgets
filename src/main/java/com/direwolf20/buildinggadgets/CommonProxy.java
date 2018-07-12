@@ -20,7 +20,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import java.io.File;
 
 
-@Mod.EventBusSubscriber(value = Side.CLIENT, modid = BuildingGadgets.MODID)
+@Mod.EventBusSubscriber()
 public class CommonProxy {
     public static Configuration config;
 

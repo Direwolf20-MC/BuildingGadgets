@@ -4,7 +4,10 @@ import com.direwolf20.buildinggadgets.BuildingGadgets;
 import com.direwolf20.buildinggadgets.Config;
 import com.direwolf20.buildinggadgets.ModBlocks;
 import com.direwolf20.buildinggadgets.entities.BlockBuildEntity;
-import com.direwolf20.buildinggadgets.tools.*;
+import com.direwolf20.buildinggadgets.tools.BuildingModes;
+import com.direwolf20.buildinggadgets.tools.InventoryManipulation;
+import com.direwolf20.buildinggadgets.tools.UndoState;
+import com.direwolf20.buildinggadgets.tools.VectorTools;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.util.ITooltipFlag;
@@ -13,9 +16,14 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.*;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.NBTUtil;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.*;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.EnumActionResult;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.text.TextComponentString;
@@ -26,7 +34,10 @@ import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 
 public class BuildingTool extends Item {
@@ -76,10 +87,14 @@ public class BuildingTool extends Item {
             tagCompound = initToolTag(stack);
         }
         NBTTagList undoStates = (NBTTagList) tagCompound.getTag("undoStack");
-        if (undoStates == null) {undoStates = new NBTTagList();}
-        if (undoStates.tagCount() >= 10) {undoStates.removeTag(0);}
+        if (undoStates == null) {
+            undoStates = new NBTTagList();
+        }
+        if (undoStates.tagCount() >= 10) {
+            undoStates.removeTag(0);
+        }
         undoStates.appendTag(undoStateToNBT(undoState));
-        tagCompound.setTag("undoStack",undoStates);
+        tagCompound.setTag("undoStack", undoStates);
     }
 
     public static UndoState popUndoList(ItemStack stack) {
@@ -92,15 +107,15 @@ public class BuildingTool extends Item {
         if (undoStates == null || undoStates.tagCount() == 0) {
             return null;
         }
-        UndoState undoState = NBTToUndoState(undoStates.getCompoundTagAt(undoStates.tagCount()-1));
-        undoStates.removeTag(undoStates.tagCount()-1);
-        tagCompound.setTag("undoStack",undoStates);
+        UndoState undoState = NBTToUndoState(undoStates.getCompoundTagAt(undoStates.tagCount() - 1));
+        undoStates.removeTag(undoStates.tagCount() - 1);
+        tagCompound.setTag("undoStack", undoStates);
         return undoState;
     }
 
     public static NBTTagCompound undoStateToNBT(UndoState undoState) {
         NBTTagCompound compound = new NBTTagCompound();
-        compound.setInteger("dim",undoState.dimension);
+        compound.setInteger("dim", undoState.dimension);
         NBTTagList coords = new NBTTagList();
         for (BlockPos coord : undoState.coordinates) {
             coords.appendTag(NBTUtil.createPosTag(coord));
@@ -113,10 +128,10 @@ public class BuildingTool extends Item {
         int dim = compound.getInteger("dim");
         ArrayList<BlockPos> coordinates = new ArrayList<BlockPos>();
         NBTTagList coordList = (NBTTagList) compound.getTag("undocoords");
-        for (int i = 0; i <= coordList.tagCount()-1; i++) {
+        for (int i = 0; i <= coordList.tagCount() - 1; i++) {
             coordinates.add(NBTUtil.getPosFromTag(coordList.getCompoundTagAt(i)));
         }
-        UndoState undoState = new UndoState(dim,coordinates);
+        UndoState undoState = new UndoState(dim, coordinates);
         return undoState;
     }
 
@@ -370,7 +385,7 @@ public class BuildingTool extends Item {
                 //Stack<UndoState> undoStack = UndoBuild.getPlayerMap(player.getUniqueID());
                 //undoStack.push(undoState);
                 //UndoBuild.updatePlayerMap(player.getUniqueID(), undoStack);
-                pushUndoList(heldItem,undoState);
+                pushUndoList(heldItem, undoState);
             }
         }
         BuildingModes.sortByDistance(coords, player);
@@ -413,7 +428,7 @@ public class BuildingTool extends Item {
             if (failedRemovals.size() != 0) {
                 //Add any failed undo blocks to the undo stack.
                 UndoState failedState = new UndoState(player.dimension, failedRemovals);
-                pushUndoList(heldItem,failedState);
+                pushUndoList(heldItem, failedState);
                 //undoStack.push(failedState);
                 //UndoBuild.updatePlayerMap(player.getUniqueID(), undoStack);
             }
@@ -423,6 +438,10 @@ public class BuildingTool extends Item {
 
     public static boolean placeBlock(World world, EntityPlayer player, BlockPos pos, IBlockState setBlock) {
         ItemStack itemStack = setBlock.getBlock().getPickBlock(setBlock, null, world, pos, player);
+        if (player.isSpectator()) {
+            return false;
+        }
+        //if (!player.canPlayerEdit(pos,EnumFacing.UP,player.getHeldItemMainhand())) {return false;}
         if (InventoryManipulation.useItem(itemStack, player)) {
             world.spawnEntity(new BlockBuildEntity(world, pos, player, setBlock, 1));
         }
