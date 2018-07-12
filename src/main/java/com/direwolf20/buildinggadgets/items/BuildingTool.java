@@ -264,10 +264,10 @@ public class BuildingTool extends Item {
     @Override
     public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
         ItemStack itemstack = player.getHeldItem(hand);
-        NBTTagCompound tagCompound = itemstack.getTagCompound();
+        /*NBTTagCompound tagCompound = itemstack.getTagCompound();
         ByteBuf buf = Unpooled.buffer(16);
         ByteBufUtils.writeTag(buf,tagCompound);
-        System.out.println(buf.readableBytes());
+        System.out.println(buf.readableBytes());*/
         player.setActiveHand(hand);
         if (!world.isRemote) {
             if (player.isSneaking()) {
