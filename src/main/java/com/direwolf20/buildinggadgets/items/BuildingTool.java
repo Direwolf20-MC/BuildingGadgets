@@ -8,6 +8,8 @@ import com.direwolf20.buildinggadgets.tools.BuildingModes;
 import com.direwolf20.buildinggadgets.tools.InventoryManipulation;
 import com.direwolf20.buildinggadgets.tools.UndoState;
 import com.direwolf20.buildinggadgets.tools.VectorTools;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.util.ITooltipFlag;
@@ -31,9 +33,12 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldType;
 import net.minecraftforge.client.model.ModelLoader;
+import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -116,20 +121,32 @@ public class BuildingTool extends Item {
     public static NBTTagCompound undoStateToNBT(UndoState undoState) {
         NBTTagCompound compound = new NBTTagCompound();
         compound.setInteger("dim", undoState.dimension);
-        NBTTagList coords = new NBTTagList();
+        BlockPos startBlock = undoState.coordinates.get(0);
+        int[] array = new int[undoState.coordinates.size()];
+        int idx = 0;
         for (BlockPos coord : undoState.coordinates) {
-            coords.appendTag(NBTUtil.createPosTag(coord));
+            int px = (((coord.getX() - startBlock.getX()) & 0xff) <<16);
+            int py = (((coord.getY() - startBlock.getY()) & 0xff) <<8);
+            int pz = (((coord.getZ() - startBlock.getZ()) & 0xff));
+            int p = px+py+pz;
+            array[idx++] = p;
         }
-        compound.setTag("undocoords", coords);
+        compound.setTag("startBlock",NBTUtil.createPosTag(startBlock));
+        compound.setIntArray("undoIntCoords",array);
         return compound;
     }
 
     public static UndoState NBTToUndoState(NBTTagCompound compound) {
         int dim = compound.getInteger("dim");
         ArrayList<BlockPos> coordinates = new ArrayList<BlockPos>();
-        NBTTagList coordList = (NBTTagList) compound.getTag("undocoords");
-        for (int i = 0; i <= coordList.tagCount() - 1; i++) {
-            coordinates.add(NBTUtil.getPosFromTag(coordList.getCompoundTagAt(i)));
+        int[] array = compound.getIntArray("undoIntCoords");
+        BlockPos startBlock = NBTUtil.getPosFromTag(compound.getCompoundTag("startBlock"));
+        for (int i = 0; i <= array.length - 1; i++) {
+            int p = array[i];
+            int x = startBlock.getX() + (int)(byte)(p>>16);
+            int y = startBlock.getY() + (int)(byte)((p-(x<<16))>>8);
+            int z = startBlock.getZ() + (int)(byte)(p-(x<<16)-(y<<8));
+            coordinates.add(new BlockPos(x,y,z));
         }
         UndoState undoState = new UndoState(dim, coordinates);
         return undoState;
@@ -232,6 +249,7 @@ public class BuildingTool extends Item {
     @Override
     public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
         ItemStack stack = player.getHeldItem(hand);
+
         player.setActiveHand(hand);
         if (!world.isRemote) {
             if (player.isSneaking()) {
@@ -246,6 +264,10 @@ public class BuildingTool extends Item {
     @Override
     public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
         ItemStack itemstack = player.getHeldItem(hand);
+        NBTTagCompound tagCompound = itemstack.getTagCompound();
+        ByteBuf buf = Unpooled.buffer(16);
+        ByteBufUtils.writeTag(buf,tagCompound);
+        System.out.println(buf.readableBytes());
         player.setActiveHand(hand);
         if (!world.isRemote) {
             if (player.isSneaking()) {
