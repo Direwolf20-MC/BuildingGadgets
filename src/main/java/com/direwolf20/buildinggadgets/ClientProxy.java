@@ -24,8 +24,6 @@ import static com.direwolf20.buildinggadgets.ModItems.buildingTool;
 public class ClientProxy extends CommonProxy {
     @Override
     public void preInit(FMLPreInitializationEvent e) {
-        // register texture stitcher
-        //MinecraftForge.EVENT_BUS.register(new TextureStitcher());
         ModEntities.initModels();
         super.preInit(e);
     }
@@ -40,14 +38,12 @@ public class ClientProxy extends CommonProxy {
     @SubscribeEvent
     public static void registerModels(ModelRegistryEvent event) {
         ModBlocks.effectBlock.initModel();
-        //ModBlocks.turretLaser.initModel();
         buildingTool.initModel();
         ModItems.exchangerTool.initModel();
     }
 
     public void registerEntityRenderers() {
         RenderingRegistry.registerEntityRenderingHandler(BlockBuildEntity.class, new BlockBuildEntityRender.Factory());
-        //RenderingRegistry.registerEntityRenderingHandler(LaserBlastEntity.class, new LaserBlastEntityRender.Factory());
     }
 
     @SubscribeEvent

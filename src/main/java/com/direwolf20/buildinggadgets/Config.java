@@ -9,7 +9,6 @@ public class Config {
 
     // This values below you can access elsewhere in your mod:
     public static int maxRange = 15;
-    //public static String yourRealName = "Steve";
 
     // Call this from CommonProxy.preInit(). It will create our config if it doesn't
     // exist yet and read the values if it does exist.
@@ -34,8 +33,4 @@ public class Config {
         maxRange = cfg.getInt("maxRange", CATEGORY_GENERAL, maxRange, 1, 55, "The max range of the building tool");
     }
 
-    /*private static void initDimensionConfig(Configuration cfg) {
-        cfg.addCustomCategoryComment(CATEGORY_DIMENSIONS, "Dimension configuration");
-
-    }*/
 }
