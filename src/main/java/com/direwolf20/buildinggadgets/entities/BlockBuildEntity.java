@@ -21,6 +21,7 @@ public class BlockBuildEntity extends Entity implements IEntityAdditionalSpawnDa
 
     private static final DataParameter<Integer> toolMode = EntityDataManager.<Integer>createKey(BlockBuildEntity.class, DataSerializers.VARINT);
     private static final DataParameter<Optional<IBlockState>> SET_BLOCK = EntityDataManager.<Optional<IBlockState>>createKey(BlockBuildEntity.class, DataSerializers.OPTIONAL_BLOCK_STATE);
+    private static DataParameter<BlockPos> FIXED = EntityDataManager.createKey(BlockBuildEntity.class, DataSerializers.BLOCK_POS);
 
     public int despawning = -1;
     public int maxLife = 20;
@@ -31,8 +32,6 @@ public class BlockBuildEntity extends Entity implements IEntityAdditionalSpawnDa
     private EntityLivingBase spawnedBy;
 
     World world;
-
-    private static DataParameter<BlockPos> FIXED = EntityDataManager.createKey(BlockBuildEntity.class, DataSerializers.BLOCK_POS);
 
     public BlockBuildEntity(World worldIn) {
         super(worldIn);
