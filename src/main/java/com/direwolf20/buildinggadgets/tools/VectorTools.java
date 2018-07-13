@@ -7,7 +7,7 @@ import net.minecraft.world.World;
 
 public class VectorTools {
 
-    static float rayTraceRange = 20f; //Range of the tool's working mode @todo make this a config
+    static float rayTraceRange = 32f; //Range of the tool's working range @todo make this a config
 
     public static RayTraceResult getLookingAt(EntityPlayer player) {
         World world = player.world;
