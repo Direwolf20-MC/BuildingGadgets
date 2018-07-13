@@ -353,7 +353,8 @@ public class ExchangerTool extends Item {
 
     public boolean exchangeBlock(World world, EntityPlayer player, BlockPos pos, IBlockState setBlock) {
         IBlockState currentBlock = world.getBlockState(pos);
-        ItemStack itemStack = setBlock.getBlock().getPickBlock(setBlock, null, world, pos, player);
+        //ItemStack itemStack = setBlock.getBlock().getPickBlock(setBlock, null, world, pos, player);
+        ItemStack itemStack = InventoryManipulation.getSilkTouchDrop(setBlock);
         ItemStack tool = player.getHeldItemMainhand();
         if (InventoryManipulation.countItem(itemStack, player) == 0) {
             return false;
@@ -367,16 +368,6 @@ public class ExchangerTool extends Item {
         InventoryManipulation.useItem(itemStack, player);
         world.spawnEntity(new BlockBuildEntity(world, pos, player, setBlock, 3));
         return true;
-    }
-
-    public static ItemStack getSilkTouchDrop(IBlockState state) {
-        Item item = Item.getItemFromBlock(state.getBlock());
-        int i = 0;
-
-        if (item.getHasSubtypes()) {
-            i = state.getBlock().getMetaFromState(state);
-        }
-        return new ItemStack(item, 1, i);
     }
 
     @Override

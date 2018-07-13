@@ -20,6 +20,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.NBTTagShort;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResult;
@@ -73,16 +74,23 @@ public class BuildingTool extends Item {
         NBTTagCompound tagCompound = stack.getTagCompound();
         if (tagCompound == null) {
             tagCompound = new NBTTagCompound();
-            stack.setTagCompound(tagCompound);
+        }
+        if (tagCompound.getTag("mode") == null) {
             tagCompound.setString("mode", toolModes.BuildToMe.name());
+        }
+        if (tagCompound.getTag("range") == null) {
             tagCompound.setInteger("range", 1);
-            stack.setTagCompound(tagCompound);
+        }
+        if (tagCompound.getCompoundTag("blockstate") == null) {
             NBTTagCompound stateTag = new NBTTagCompound();
             NBTUtil.writeBlockState(stateTag, Blocks.AIR.getDefaultState());
             tagCompound.setTag("blockstate", stateTag);
+        }
+        if (tagCompound.getTag("coords") == null) {
             NBTTagList coords = new NBTTagList();
             tagCompound.setTag("anchorcoords", coords);
         }
+        stack.setTagCompound(tagCompound);
         return tagCompound;
     }
 
@@ -128,7 +136,7 @@ public class BuildingTool extends Item {
             int px = (((coord.getX() - startBlock.getX()) & 0xff) <<16);
             int py = (((coord.getY() - startBlock.getY()) & 0xff) <<8);
             int pz = (((coord.getZ() - startBlock.getZ()) & 0xff));
-            int p = px+py+pz;
+            int p = (px+py+pz);
             array[idx++] = p;
         }
         compound.setTag("startBlock",NBTUtil.createPosTag(startBlock));
@@ -143,9 +151,9 @@ public class BuildingTool extends Item {
         BlockPos startBlock = NBTUtil.getPosFromTag(compound.getCompoundTag("startBlock"));
         for (int i = 0; i <= array.length - 1; i++) {
             int p = array[i];
-            int x = startBlock.getX() + (int)(byte)(p>>16);
-            int y = startBlock.getY() + (int)(byte)((p-(x<<16))>>8);
-            int z = startBlock.getZ() + (int)(byte)(p-(x<<16)-(y<<8));
+            int x = startBlock.getX() + (int)(byte)((p & 0xff0000)>>16);
+            int y = startBlock.getY() + (int)(byte)((p & 0x00ff00)>>8);
+            int z = startBlock.getZ() + (int)(byte)(p & 0x0000ff);
             coordinates.add(new BlockPos(x,y,z));
         }
         UndoState undoState = new UndoState(dim, coordinates);
@@ -248,7 +256,7 @@ public class BuildingTool extends Item {
 
     @Override
     public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
-        ItemStack stack = player.getHeldItem(hand);
+        ItemStack stack = player.getHeldItemMainhand();
 
         player.setActiveHand(hand);
         if (!world.isRemote) {
@@ -263,7 +271,7 @@ public class BuildingTool extends Item {
 
     @Override
     public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
-        ItemStack itemstack = player.getHeldItem(hand);
+        ItemStack itemstack = player.getHeldItemMainhand();
         NBTTagCompound tagCompound = itemstack.getTagCompound();
         ByteBuf buf = Unpooled.buffer(16);
         ByteBufUtils.writeTag(buf,tagCompound);
@@ -444,6 +452,7 @@ public class BuildingTool extends Item {
                     }
                 } else {
                     //If you're in the wrong dimension or too far away, fail the undo.
+                    player.sendStatusMessage(new TextComponentString(TextFormatting.RED + "Undo Failed (Too far away)"), true);
                     failedRemovals.add(coord);
                 }
             }
@@ -459,7 +468,8 @@ public class BuildingTool extends Item {
     }
 
     public static boolean placeBlock(World world, EntityPlayer player, BlockPos pos, IBlockState setBlock) {
-        ItemStack itemStack = setBlock.getBlock().getPickBlock(setBlock, null, world, pos, player);
+        //ItemStack itemStack = setBlock.getBlock().getPickBlock(setBlock, null, world, pos, player);
+        ItemStack itemStack = InventoryManipulation.getSilkTouchDrop(setBlock);
         if (player.isSpectator()) {
             return false;
         }

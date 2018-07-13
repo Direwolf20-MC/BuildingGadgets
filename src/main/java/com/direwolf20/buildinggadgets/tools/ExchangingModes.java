@@ -4,6 +4,7 @@ import com.direwolf20.buildinggadgets.items.ExchangerTool;
 import com.direwolf20.buildinggadgets.ModBlocks;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -11,7 +12,16 @@ import net.minecraft.world.World;
 import java.util.ArrayList;
 
 public class ExchangingModes {
-    private static boolean isReplaceable(World world, BlockPos pos, IBlockState currentBlock, IBlockState setBlock) {
+    private static boolean isReplaceable(World world, BlockPos pos, IBlockState currentBlock, IBlockState setBlock, EntityPlayer player) {
+        /*IBlockState worldBlockState = world.getBlockState(pos);
+        ItemStack worldBlockItem = worldBlockState.getBlock().getPickBlock(worldBlockState,null,world,pos,player);
+        ItemStack currentBlockItem = currentBlock.getBlock().getPickBlock(currentBlock,null,world,pos,player);
+        ItemStack setBlockItem = setBlock.getBlock().getPickBlock(setBlock,null,world,pos,player);
+        if (!worldBlockItem.isItemEqual(currentBlockItem)) {return false;}
+        if (world.getBlockState(pos) == ModBlocks.effectBlock.getDefaultState()) {return false;}
+        if (worldBlockItem.isItemEqual(setBlockItem))  {return false;}
+        if (world.getTileEntity(pos) != null) {return false;}
+        if (currentBlock.getBlock().getBlockHardness(currentBlock, world, pos) < 0) {return false;}*/
         if (world.getBlockState(pos) != currentBlock || world.getBlockState(pos) == ModBlocks.effectBlock.getDefaultState() || world.getBlockState(pos) == setBlock || world.getTileEntity(pos) != null || currentBlock.getBlock().getBlockHardness(currentBlock, world, pos) < 0) {
             return false;
         }
@@ -51,7 +61,7 @@ public class ExchangingModes {
                 for (int x = bound * -1; x <= bound; x++) {
                     for (int z = bound * -1; z <= bound; z++) {
                         pos = new BlockPos(startBlock.getX() - x, startBlock.getY(), startBlock.getZ() + z);
-                        if (isReplaceable(world, pos, currentBlock, setBlock)) {
+                        if (isReplaceable(world, pos, currentBlock, setBlock,player)) {
                             coordinates.add(pos);
                         }
                     }
@@ -62,7 +72,7 @@ public class ExchangingModes {
                         for (int z = boundZS * -1; z <= boundZS; z++) {
                             pos = new BlockPos(startBlock.getX() + x, startBlock.getY() - y, startBlock.getZ() + z);
                             //System.out.println(pos);
-                            if (isReplaceable(world, pos, currentBlock, setBlock)) {
+                            if (isReplaceable(world, pos, currentBlock, setBlock,player)) {
                                 coordinates.add(pos);
                             }
                         }
@@ -78,7 +88,7 @@ public class ExchangingModes {
                 for (int x = boundZ * -1; x <= boundZ; x++) {
                     for (int z = boundX * -1; z <= boundX; z++) {
                         pos = new BlockPos(startBlock.getX() - x, startBlock.getY(), startBlock.getZ() + z);
-                        if (isReplaceable(world, pos, currentBlock, setBlock)) {
+                        if (isReplaceable(world, pos, currentBlock, setBlock,player)) {
                             coordinates.add(pos);
                         }
                     }
@@ -86,7 +96,7 @@ public class ExchangingModes {
             } else {
                 for (int y = bound; y >= bound * -1; y--) {
                     pos = new BlockPos(startBlock.getX(), startBlock.getY() - y, startBlock.getZ());
-                    if (isReplaceable(world, pos, currentBlock, setBlock)) {
+                    if (isReplaceable(world, pos, currentBlock, setBlock,player)) {
                         coordinates.add(pos);
                     }
                 }
@@ -100,7 +110,7 @@ public class ExchangingModes {
                 for (int x = boundX * -1; x <= boundX; x++) {
                     for (int z = boundZ * -1; z <= boundZ; z++) {
                         pos = new BlockPos(startBlock.getX() - x, startBlock.getY(), startBlock.getZ() + z);
-                        if (isReplaceable(world, pos, currentBlock, setBlock)) {
+                        if (isReplaceable(world, pos, currentBlock, setBlock,player)) {
                             coordinates.add(pos);
                         }
                     }
@@ -108,14 +118,14 @@ public class ExchangingModes {
             } else if (sideHit == EnumFacing.NORTH || sideHit == EnumFacing.SOUTH) {
                 for (int x = bound * -1; x <= bound; x++) {
                     pos = new BlockPos(startBlock.getX() + x, startBlock.getY(), startBlock.getZ());
-                    if (isReplaceable(world, pos, currentBlock, setBlock)) {
+                    if (isReplaceable(world, pos, currentBlock, setBlock,player)) {
                         coordinates.add(pos);
                     }
                 }
             } else if (sideHit == EnumFacing.EAST || sideHit == EnumFacing.WEST) {
                 for (int z = bound * -1; z <= bound; z++) {
                     pos = new BlockPos(startBlock.getX(), startBlock.getY(), startBlock.getZ() + z);
-                    if (isReplaceable(world, pos, currentBlock, setBlock)) {
+                    if (isReplaceable(world, pos, currentBlock, setBlock,player)) {
                         coordinates.add(pos);
                     }
                 }
