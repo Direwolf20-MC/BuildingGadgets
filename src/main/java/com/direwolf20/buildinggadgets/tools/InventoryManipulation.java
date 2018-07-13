@@ -25,8 +25,6 @@ public class InventoryManipulation {
             return true;
         }
         InventoryPlayer inv = player.inventory;
-        //int slot = inv.getSlotFor(itemStack);
-        //if (slot == -1) {return false;}
 
         ArrayList<Integer> slots = findItem(itemStack.getItem(), itemStack.getMetadata(), inv);
         if (slots.size() == 0) {
@@ -36,10 +34,6 @@ public class InventoryManipulation {
         ItemStack stackInSlot = inv.getStackInSlot(slot);
         stackInSlot.shrink(1);
         stackInSlot = stackInSlot;
-        if (stackInSlot.getCount() == 0) {
-            //inv.setInventorySlotContents(slot, ItemStack.EMPTY);
-        }
-
         return true;
     }
 
@@ -68,7 +62,6 @@ public class InventoryManipulation {
                 slots.add(i);
             }
         }
-
         return slots;
     }
 
