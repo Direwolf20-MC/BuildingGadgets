@@ -349,8 +349,13 @@ public class ExchangerTool extends Item {
 
     public boolean exchangeBlock(World world, EntityPlayer player, BlockPos pos, IBlockState setBlock) {
         IBlockState currentBlock = world.getBlockState(pos);
+        ItemStack itemStack;
         //ItemStack itemStack = setBlock.getBlock().getPickBlock(setBlock, null, world, pos, player);
-        ItemStack itemStack = InventoryManipulation.getSilkTouchDrop(setBlock);
+        if (setBlock.getBlock().canSilkHarvest(world,pos,setBlock,player)) {
+            itemStack = InventoryManipulation.getSilkTouchDrop(setBlock);
+        } else {
+            itemStack = setBlock.getBlock().getPickBlock(setBlock, null, world, pos, player);
+        }
         ItemStack tool = player.getHeldItemMainhand();
         if (InventoryManipulation.countItem(itemStack, player) == 0) {
             return false;

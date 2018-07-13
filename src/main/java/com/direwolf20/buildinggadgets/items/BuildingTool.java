@@ -453,8 +453,14 @@ public class BuildingTool extends Item {
     }
 
     public static boolean placeBlock(World world, EntityPlayer player, BlockPos pos, IBlockState setBlock) {
+        ItemStack itemStack;
         //ItemStack itemStack = setBlock.getBlock().getPickBlock(setBlock, null, world, pos, player);
-        ItemStack itemStack = InventoryManipulation.getSilkTouchDrop(setBlock);
+        //ItemStack itemStack = InventoryManipulation.getSilkTouchDrop(setBlock);
+        if (setBlock.getBlock().canSilkHarvest(world,pos,setBlock,player)) {
+            itemStack = InventoryManipulation.getSilkTouchDrop(setBlock);
+        } else {
+            itemStack = setBlock.getBlock().getPickBlock(setBlock, null, world, pos, player);
+        }
         if (player.isSpectator()) {
             return false;
         }

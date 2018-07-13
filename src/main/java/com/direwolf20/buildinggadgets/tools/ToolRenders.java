@@ -61,7 +61,13 @@ public class ToolRenders {
 
                 //Figure out how many of the block we're rendering we have in the inventory of the player.
                 //ItemStack itemStack = renderBlockState.getBlock().getPickBlock(renderBlockState, null, world, new BlockPos(0, 0, 0), player);
-                ItemStack itemStack = InventoryManipulation.getSilkTouchDrop(renderBlockState);
+                //ItemStack itemStack = InventoryManipulation.getSilkTouchDrop(renderBlockState);
+                ItemStack itemStack;
+                if (renderBlockState.getBlock().canSilkHarvest(world,new BlockPos(0,0,0),renderBlockState,player)) {
+                    itemStack = InventoryManipulation.getSilkTouchDrop(renderBlockState);
+                } else {
+                    itemStack = renderBlockState.getBlock().getPickBlock(renderBlockState, null, world, new BlockPos(0, 0, 0), player);
+                }
 
                 int hasBlocks = InventoryManipulation.countItem(itemStack, player);
 
@@ -158,7 +164,13 @@ public class ToolRenders {
 
                 //Figure out how many of the block we're rendering we have in the inventory of the player.
                 //ItemStack itemStack = renderBlockState.getBlock().getPickBlock(renderBlockState, null, world, new BlockPos(0, 0, 0), player);
-                ItemStack itemStack = InventoryManipulation.getSilkTouchDrop(renderBlockState);
+                //ItemStack itemStack = InventoryManipulation.getSilkTouchDrop(renderBlockState);
+                ItemStack itemStack;
+                if (renderBlockState.getBlock().canSilkHarvest(world,new BlockPos(0,0,0),renderBlockState,player)) {
+                    itemStack = InventoryManipulation.getSilkTouchDrop(renderBlockState);
+                } else {
+                    itemStack = renderBlockState.getBlock().getPickBlock(renderBlockState, null, world, new BlockPos(0, 0, 0), player);
+                }
                 int hasBlocks = InventoryManipulation.countItem(itemStack, player);
 
                 //Prepare the block rendering
