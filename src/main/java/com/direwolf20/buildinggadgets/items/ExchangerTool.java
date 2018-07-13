@@ -31,6 +31,8 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldType;
 import net.minecraftforge.client.model.ModelLoader;
+import net.minecraftforge.common.util.BlockSnapshot;
+import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -364,6 +366,9 @@ public class ExchangerTool extends Item {
             return false;
         }
         //if (!player.canPlayerEdit(pos,EnumFacing.UP,tool)) {return false;}
+        if (!world.isBlockModifiable(player,pos)) {return false;}
+        BlockSnapshot blockSnapshot = BlockSnapshot.getBlockSnapshot(world,pos);
+        if (ForgeEventFactory.onPlayerBlockPlace(player, blockSnapshot, EnumFacing.UP, EnumHand.MAIN_HAND).isCanceled()) {return false;}
         currentBlock.getBlock().harvestBlock(world, player, pos, currentBlock, world.getTileEntity(pos), tool);
 
         InventoryManipulation.useItem(itemStack, player);

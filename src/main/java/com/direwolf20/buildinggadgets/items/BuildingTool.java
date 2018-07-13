@@ -31,6 +31,8 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldType;
 import net.minecraftforge.client.model.ModelLoader;
+import net.minecraftforge.common.util.BlockSnapshot;
+import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -465,6 +467,9 @@ public class BuildingTool extends Item {
             return false;
         }
         //if (!player.canPlayerEdit(pos,EnumFacing.UP,player.getHeldItemMainhand())) {return false;}
+        if (!world.isBlockModifiable(player,pos)) {return false;}
+        BlockSnapshot blockSnapshot = BlockSnapshot.getBlockSnapshot(world,pos);
+        if (ForgeEventFactory.onPlayerBlockPlace(player, blockSnapshot, EnumFacing.UP, EnumHand.MAIN_HAND).isCanceled()) {return false;}
         if (InventoryManipulation.useItem(itemStack, player)) {
             world.spawnEntity(new BlockBuildEntity(world, pos, player, setBlock, 1));
             return true;
