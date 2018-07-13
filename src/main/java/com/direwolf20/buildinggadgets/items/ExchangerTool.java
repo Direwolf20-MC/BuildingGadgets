@@ -45,7 +45,6 @@ public class ExchangerTool extends Item {
     public enum toolModes {
         Wall, VerticalColumn, HorizontalColumn;
         private static ExchangerTool.toolModes[] vals = values();
-
         public ExchangerTool.toolModes next() {
             return vals[(this.ordinal() + 1) % vals.length];
         }
@@ -93,16 +92,23 @@ public class ExchangerTool extends Item {
         NBTTagCompound tagCompound = stack.getTagCompound();
         if (tagCompound == null) {
             tagCompound = new NBTTagCompound();
-            stack.setTagCompound(tagCompound);
+        }
+        if (tagCompound.getTag("mode") == null) {
             tagCompound.setString("mode", ExchangerTool.toolModes.Wall.name());
+        }
+        if (tagCompound.getTag("range") == null) {
             tagCompound.setInteger("range", 1);
-            stack.setTagCompound(tagCompound);
+        }
+        if (tagCompound.getCompoundTag("blockstate").getSize() == 0) {
             NBTTagCompound stateTag = new NBTTagCompound();
             NBTUtil.writeBlockState(stateTag, Blocks.AIR.getDefaultState());
             tagCompound.setTag("blockstate", stateTag);
+        }
+        if (tagCompound.getTag("coords") == null) {
             NBTTagList coords = new NBTTagList();
             tagCompound.setTag("anchorcoords", coords);
         }
+        stack.setTagCompound(tagCompound);
         return tagCompound;
     }
 
@@ -279,27 +285,21 @@ public class ExchangerTool extends Item {
         ExchangerTool.toolModes mode = getToolMode(stack);
         ArrayList<BlockPos> currentCoords = getAnchor(stack);
 
-        if (currentCoords.size() == 0) {
-            //If we don't have an anchor, find the block we're supposed to anchor to
+        if (currentCoords.size() == 0) { //If we don't have an anchor, find the block we're supposed to anchor to
             RayTraceResult lookingAt = VectorTools.getLookingAt(player);
-            //If we aren't looking at anything, exit
-            if (lookingAt == null) {
+            if (lookingAt == null) { //If we aren't looking at anything, exit
                 return false;
             }
             BlockPos startBlock = lookingAt.getBlockPos();
             EnumFacing sideHit = lookingAt.sideHit;
             IBlockState setBlock = getToolBlock(stack);
-            //If we are looking at air, exit
-            if (startBlock == null || world.getBlockState(startBlock) == Blocks.AIR.getDefaultState()) {
+            if (startBlock == null || world.getBlockState(startBlock) == Blocks.AIR.getDefaultState()) { //If we are looking at air, exit
                 return false;
             }
-            //Build the positions list based on tool mode and range
-            ArrayList<BlockPos> coords = ExchangingModes.getBuildOrders(world, player, startBlock, sideHit, range, mode, setBlock);
-            //Set the anchor NBT
-            setAnchor(stack, coords);
+            ArrayList<BlockPos> coords = ExchangingModes.getBuildOrders(world, player, startBlock, sideHit, range, mode, setBlock); //Build the positions list based on tool mode and range
+            setAnchor(stack, coords);//Set the anchor NBT
             player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + "Render Anchored"), true);
-        } else {
-            //If theres already an anchor, remove it.
+        } else { //If theres already an anchor, remove it.
             setAnchor(stack, new ArrayList<BlockPos>());
             player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + "Anchor Removed"), true);
         }
@@ -312,19 +312,16 @@ public class ExchangerTool extends Item {
         ExchangerTool.toolModes mode = getToolMode(stack);
         ArrayList<BlockPos> coords = getAnchor(stack);
 
-        if (coords.size() == 0) {
-            //If we don't have an anchor, build in the current spot
+        if (coords.size() == 0) { //If we don't have an anchor, build in the current spot
             RayTraceResult lookingAt = VectorTools.getLookingAt(player);
-            //If we aren't looking at anything, exit
-            if (lookingAt == null) {
+            if (lookingAt == null) { //If we aren't looking at anything, exit
                 return false;
             }
             BlockPos startBlock = lookingAt.getBlockPos();
             EnumFacing sideHit = lookingAt.sideHit;
             IBlockState setBlock = getToolBlock(stack);
             coords = ExchangingModes.getBuildOrders(world, player, startBlock, sideHit, range, mode, setBlock);
-        } else {
-            //If we do have an anchor, erase it (Even if the build fails)
+        } else { //If we do have an anchor, erase it (Even if the build fails)
             setAnchor(stack, new ArrayList<BlockPos>());
         }
         Set<BlockPos> coordinates = new HashSet<BlockPos>(coords);
@@ -337,8 +334,7 @@ public class ExchangerTool extends Item {
             for (BlockPos coordinate : coords) {
                 if (fakeWorld.getWorldType() != WorldType.DEBUG_ALL_BLOCK_STATES) {
                     try {
-                        //Get the state of the block in the fake world (This lets fences be connected, etc)
-                        state = blockState.getActualState(fakeWorld, coordinate);
+                        state = blockState.getActualState(fakeWorld, coordinate);  //Get the state of the block in the fake world (This lets fences be connected, etc)
                     } catch (Exception var8) {
                     }
                 }

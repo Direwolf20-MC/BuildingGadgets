@@ -20,8 +20,6 @@ public class EffectBlock extends Block {
     public EffectBlock() {
         super(Material.ROCK);
         setHardness(20.0f);
-        //this.setBlockUnbreakable();
-        //this.setCreativeTab(CreativeTabs.BUILDING_BLOCKS);   // the block will appear on the blocks tab in creative
         setUnlocalizedName(BuildingGadgets.MODID + ".effectblock");     // Used for localization (en_US.lang)
         setRegistryName("effectblock");        // The unique name (within your mod) that identifies this block
     }

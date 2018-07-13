@@ -12,6 +12,8 @@ import java.util.List;
 public class BreakEventHandler {
     @SubscribeEvent
     public void GetDrops(BlockEvent.HarvestDropsEvent event) {
+        //If you are holding an exchanger gadget and break a block, put it into your inventory
+        //This allows us to use the BreakBlock event on our exchanger, to properly remove blocks from the world.
         EntityPlayer player = event.getHarvester();
         if (player == null) {return;}
         ItemStack heldItem = player.getHeldItemMainhand();

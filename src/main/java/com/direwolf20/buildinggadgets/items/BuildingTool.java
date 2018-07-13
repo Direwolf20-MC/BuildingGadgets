@@ -8,8 +8,6 @@ import com.direwolf20.buildinggadgets.tools.BuildingModes;
 import com.direwolf20.buildinggadgets.tools.InventoryManipulation;
 import com.direwolf20.buildinggadgets.tools.UndoState;
 import com.direwolf20.buildinggadgets.tools.VectorTools;
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.util.ITooltipFlag;
@@ -20,7 +18,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.nbt.NBTTagShort;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResult;
@@ -34,12 +31,9 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldType;
 import net.minecraftforge.client.model.ModelLoader;
-import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -71,6 +65,7 @@ public class BuildingTool extends Item {
     }
 
     public static NBTTagCompound initToolTag(ItemStack stack) {
+        //If any NBT Tags are missing, we should initialize them
         NBTTagCompound tagCompound = stack.getTagCompound();
         if (tagCompound == null) {
             tagCompound = new NBTTagCompound();
@@ -81,7 +76,7 @@ public class BuildingTool extends Item {
         if (tagCompound.getTag("range") == null) {
             tagCompound.setInteger("range", 1);
         }
-        if (tagCompound.getCompoundTag("blockstate") == null) {
+        if (tagCompound.getCompoundTag("blockstate").getSize() == 0) {
             NBTTagCompound stateTag = new NBTTagCompound();
             NBTUtil.writeBlockState(stateTag, Blocks.AIR.getDefaultState());
             tagCompound.setTag("blockstate", stateTag);
@@ -95,6 +90,7 @@ public class BuildingTool extends Item {
     }
 
     public static void pushUndoList(ItemStack stack, UndoState undoState) {
+        //When we have a new set of Undo Coordinates, push it onto a list stored in NBT, max 10
         NBTTagCompound tagCompound = stack.getTagCompound();
         if (tagCompound == null) {
             tagCompound = initToolTag(stack);
@@ -111,6 +107,7 @@ public class BuildingTool extends Item {
     }
 
     public static UndoState popUndoList(ItemStack stack) {
+        //Get the most recent Undo Coordinate set from the list in NBT
         NBTTagCompound tagCompound = stack.getTagCompound();
         if (tagCompound == null) {
             tagCompound = initToolTag(stack);
@@ -127,40 +124,44 @@ public class BuildingTool extends Item {
     }
 
     public static NBTTagCompound undoStateToNBT(UndoState undoState) {
+        //Convert an UndoState object into NBT data. Uses ints to store relative positions to a start block for data compression..
         NBTTagCompound compound = new NBTTagCompound();
         compound.setInteger("dim", undoState.dimension);
         BlockPos startBlock = undoState.coordinates.get(0);
         int[] array = new int[undoState.coordinates.size()];
         int idx = 0;
         for (BlockPos coord : undoState.coordinates) {
-            int px = (((coord.getX() - startBlock.getX()) & 0xff) <<16);
-            int py = (((coord.getY() - startBlock.getY()) & 0xff) <<8);
+            //Converts relative blockPos coordinates to a single integer value. Max range 127 due to 8 bits.
+            int px = (((coord.getX() - startBlock.getX()) & 0xff) << 16);
+            int py = (((coord.getY() - startBlock.getY()) & 0xff) << 8);
             int pz = (((coord.getZ() - startBlock.getZ()) & 0xff));
-            int p = (px+py+pz);
+            int p = (px + py + pz);
             array[idx++] = p;
         }
-        compound.setTag("startBlock",NBTUtil.createPosTag(startBlock));
-        compound.setIntArray("undoIntCoords",array);
+        compound.setTag("startBlock", NBTUtil.createPosTag(startBlock));
+        compound.setIntArray("undoIntCoords", array);
         return compound;
     }
 
     public static UndoState NBTToUndoState(NBTTagCompound compound) {
+        //Convert an integer list stored in NBT into UndoState
         int dim = compound.getInteger("dim");
         ArrayList<BlockPos> coordinates = new ArrayList<BlockPos>();
         int[] array = compound.getIntArray("undoIntCoords");
         BlockPos startBlock = NBTUtil.getPosFromTag(compound.getCompoundTag("startBlock"));
         for (int i = 0; i <= array.length - 1; i++) {
             int p = array[i];
-            int x = startBlock.getX() + (int)(byte)((p & 0xff0000)>>16);
-            int y = startBlock.getY() + (int)(byte)((p & 0x00ff00)>>8);
-            int z = startBlock.getZ() + (int)(byte)(p & 0x0000ff);
-            coordinates.add(new BlockPos(x,y,z));
+            int x = startBlock.getX() + (int) (byte) ((p & 0xff0000) >> 16);
+            int y = startBlock.getY() + (int) (byte) ((p & 0x00ff00) >> 8);
+            int z = startBlock.getZ() + (int) (byte) (p & 0x0000ff);
+            coordinates.add(new BlockPos(x, y, z));
         }
         UndoState undoState = new UndoState(dim, coordinates);
         return undoState;
     }
 
     public static void setAnchor(ItemStack stack, ArrayList<BlockPos> coordinates) {
+        //Store 1 set of BlockPos in NBT to anchor the Ghost Blocks in the world when the anchor key is pressed
         NBTTagCompound tagCompound = stack.getTagCompound();
         if (tagCompound == null) {
             tagCompound = initToolTag(stack);
@@ -173,6 +174,7 @@ public class BuildingTool extends Item {
     }
 
     public static ArrayList<BlockPos> getAnchor(ItemStack stack) {
+        //Return the list of coordinates in the NBT Tag for anchor Coordinates
         NBTTagCompound tagCompound = stack.getTagCompound();
         if (tagCompound == null) {
             tagCompound = initToolTag(stack);
@@ -182,7 +184,6 @@ public class BuildingTool extends Item {
         if (coordList.tagCount() == 0 || coordList == null) {
             return coordinates;
         }
-
         for (int i = 0; i < coordList.tagCount(); i++) {
             coordinates.add(NBTUtil.getPosFromTag(coordList.getCompoundTagAt(i)));
         }
@@ -190,6 +191,7 @@ public class BuildingTool extends Item {
     }
 
     public static void setToolMode(ItemStack stack, toolModes mode) {
+        //Store the tool's mode in NBT as a string
         NBTTagCompound tagCompound = stack.getTagCompound();
         if (tagCompound == null) {
             tagCompound = initToolTag(stack);
@@ -198,6 +200,7 @@ public class BuildingTool extends Item {
     }
 
     public static void setToolRange(ItemStack stack, int range) {
+        //Store the tool's range in NBT as an Integer
         NBTTagCompound tagCompound = stack.getTagCompound();
         if (tagCompound == null) {
             tagCompound = initToolTag(stack);
@@ -206,6 +209,7 @@ public class BuildingTool extends Item {
     }
 
     public static void setToolBlock(ItemStack stack, IBlockState state) {
+        //Store the selected block in the tool's NBT
         NBTTagCompound tagCompound = stack.getTagCompound();
         if (tagCompound == null) {
             tagCompound = initToolTag(stack);
@@ -246,6 +250,7 @@ public class BuildingTool extends Item {
 
     @Override
     public void addInformation(ItemStack stack, World player, List<String> list, ITooltipFlag b) {
+        //Add tool information to the tooltip
         super.addInformation(stack, player, list, b);
         list.add(TextFormatting.DARK_GREEN + "Block: " + getToolBlock(stack).getBlock().getLocalizedName());
         list.add(TextFormatting.AQUA + "Mode: " + getToolMode(stack));
@@ -256,8 +261,8 @@ public class BuildingTool extends Item {
 
     @Override
     public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
+        //On item use, if sneaking, select the block clicked on, else build -- This is called when a block in clicked on
         ItemStack stack = player.getHeldItemMainhand();
-
         player.setActiveHand(hand);
         if (!world.isRemote) {
             if (player.isSneaking()) {
@@ -271,11 +276,12 @@ public class BuildingTool extends Item {
 
     @Override
     public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
+        //On item use, if sneaking, select the block clicked on, else build -- This is called when you right click a tool NOT on a block.
         ItemStack itemstack = player.getHeldItemMainhand();
-        NBTTagCompound tagCompound = itemstack.getTagCompound();
+        /*NBTTagCompound tagCompound = itemstack.getTagCompound();
         ByteBuf buf = Unpooled.buffer(16);
         ByteBufUtils.writeTag(buf,tagCompound);
-        System.out.println(buf.readableBytes());
+        System.out.println(buf.readableBytes());*/
         player.setActiveHand(hand);
         if (!world.isRemote) {
             if (player.isSneaking()) {
@@ -288,6 +294,7 @@ public class BuildingTool extends Item {
     }
 
     private void selectBlock(ItemStack stack, EntityPlayer player) {
+        //Used to find which block the player is looking at, and store it in NBT on the tool.
         World world = player.world;
         RayTraceResult lookingAt = VectorTools.getLookingAt(player);
         if (lookingAt == null) {
@@ -296,7 +303,7 @@ public class BuildingTool extends Item {
         BlockPos pos = lookingAt.getBlockPos();
         IBlockState state = world.getBlockState(pos);
         TileEntity te = world.getTileEntity(pos);
-        if (te != null) {
+        if (te != null) {  //Currently not allowing tile entities.
             player.sendStatusMessage(new TextComponentString(TextFormatting.RED + "Invalid Block"), true);
             return;
         }
@@ -306,6 +313,7 @@ public class BuildingTool extends Item {
     }
 
     public void toggleMode(EntityPlayer player, ItemStack heldItem) {
+        //Called when the mode toggle hotkey is pressed
         toolModes mode = getToolMode(heldItem);
         mode = mode.next();
         setToolMode(heldItem, mode);
@@ -313,6 +321,7 @@ public class BuildingTool extends Item {
     }
 
     public void rangeChange(EntityPlayer player, ItemStack heldItem) {
+        //Called when the range change hotkey is pressed
         int range = getToolRange(heldItem);
         if (player.isSneaking()) {
             if (range == 1) {
@@ -332,31 +341,26 @@ public class BuildingTool extends Item {
     }
 
     public boolean anchorBlocks(EntityPlayer player, ItemStack stack) {
+        //Stores the current visual blocks in NBT on the tool, so the player can look around without moving the visual render
         World world = player.world;
         int range = getToolRange(stack);
         toolModes mode = getToolMode(stack);
         ArrayList<BlockPos> currentCoords = getAnchor(stack);
 
-        if (currentCoords.size() == 0) {
-            //If we don't have an anchor, find the block we're supposed to anchor to
+        if (currentCoords.size() == 0) {  //If we don't have an anchor, find the block we're supposed to anchor to
             RayTraceResult lookingAt = VectorTools.getLookingAt(player);
-            //If we aren't looking at anything, exit
-            if (lookingAt == null) {
+            if (lookingAt == null) {  //If we aren't looking at anything, exit
                 return false;
             }
             BlockPos startBlock = lookingAt.getBlockPos();
             EnumFacing sideHit = lookingAt.sideHit;
-            //If we are looking at air, exit
-            if (startBlock == null || world.getBlockState(startBlock) == Blocks.AIR.getDefaultState()) {
+            if (startBlock == null || world.getBlockState(startBlock) == Blocks.AIR.getDefaultState()) { //If we are looking at air, exit
                 return false;
             }
-            //Build the positions list based on tool mode and range
-            ArrayList<BlockPos> coords = BuildingModes.getBuildOrders(world, player, startBlock, sideHit, range, mode, getToolBlock(stack));
-            //Set the anchor NBT
-            setAnchor(stack, coords);
+            ArrayList<BlockPos> coords = BuildingModes.getBuildOrders(world, player, startBlock, sideHit, range, mode, getToolBlock(stack)); //Build the positions list based on tool mode and range
+            setAnchor(stack, coords); //Set the anchor NBT
             player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + "Render Anchored"), true);
-        } else {
-            //If theres already an anchor, remove it.
+        } else {  //If theres already an anchor, remove it.
             setAnchor(stack, new ArrayList<BlockPos>());
             player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + "Anchor Removed"), true);
         }
@@ -364,23 +368,21 @@ public class BuildingTool extends Item {
     }
 
     public boolean build(EntityPlayer player, ItemStack stack) {
+        //Build the blocks as shown in the visual render
         World world = player.world;
         int range = getToolRange(stack);
         toolModes mode = getToolMode(stack);
         ArrayList<BlockPos> coords = getAnchor(stack);
 
-        if (coords.size() == 0) {
-            //If we don't have an anchor, build in the current spot
+        if (coords.size() == 0) {  //If we don't have an anchor, build in the current spot
             RayTraceResult lookingAt = VectorTools.getLookingAt(player);
-            //If we aren't looking at anything, exit
-            if (lookingAt == null) {
+            if (lookingAt == null) { //If we aren't looking at anything, exit
                 return false;
             }
             BlockPos startBlock = lookingAt.getBlockPos();
             EnumFacing sideHit = lookingAt.sideHit;
             coords = BuildingModes.getBuildOrders(world, player, startBlock, sideHit, range, mode, getToolBlock(stack));
-        } else {
-            //If we do have an anchor, erase it (Even if the build fails)
+        } else { //If we do have an anchor, erase it (Even if the build fails)
             setAnchor(stack, new ArrayList<BlockPos>());
         }
         ArrayList<BlockPos> undoCoords = new ArrayList<BlockPos>();
@@ -388,15 +390,12 @@ public class BuildingTool extends Item {
         ItemStack heldItem = player.getHeldItemMainhand();
         IBlockState blockState = getToolBlock(heldItem);
 
-        if (blockState != Blocks.AIR.getDefaultState()) {
-            //Don't attempt a build if a block is not chosen -- Typically only happens on a new tool.
+        if (blockState != Blocks.AIR.getDefaultState()) { //Don't attempt a build if a block is not chosen -- Typically only happens on a new tool.
             IBlockState state = Blocks.AIR.getDefaultState(); //Initialize a new State Variable for use in the fake world
             fakeWorld.setWorldAndState(player.world, blockState, coordinates); // Initialize the fake world's blocks
-
             for (BlockPos coordinate : coords) {
                 if (fakeWorld.getWorldType() != WorldType.DEBUG_ALL_BLOCK_STATES) {
-                    try {
-                        //Get the state of the block in the fake world (This lets fences be connected, etc)
+                    try { //Get the state of the block in the fake world (This lets fences be connected, etc)
                         state = blockState.getActualState(fakeWorld, coordinate);
                     } catch (Exception var8) {
                     }
@@ -405,16 +404,11 @@ public class BuildingTool extends Item {
                 //Disabled to fix Chisel
                 //state = state.getBlock().getExtendedState(state, fakeWorld, coordinate);
                 if (placeBlock(world, player, coordinate, state)) {
-                    //If we successfully place the block, add the location to the undo list.
-                    undoCoords.add(coordinate);
+                    undoCoords.add(coordinate);//If we successfully place the block, add the location to the undo list.
                 }
             }
-            if (undoCoords.size() > 0) {
-                //If the undo list has any data in it, add it to the player Map.
+            if (undoCoords.size() > 0) { //If the undo list has any data in it, add it to NBT on the tool.
                 UndoState undoState = new UndoState(player.dimension, undoCoords);
-                //Stack<UndoState> undoStack = UndoBuild.getPlayerMap(player.getUniqueID());
-                //undoStack.push(undoState);
-                //UndoBuild.updatePlayerMap(player.getUniqueID(), undoStack);
                 pushUndoList(heldItem, undoState);
             }
         }
@@ -423,45 +417,36 @@ public class BuildingTool extends Item {
     }
 
     public static boolean undoBuild(EntityPlayer player) {
-        //Stack<UndoState> undoStack = UndoBuild.getPlayerMap(player.getUniqueID());
         ItemStack heldItem = player.getHeldItemMainhand();
-        UndoState undoState = popUndoList(heldItem);
+        UndoState undoState = popUndoList(heldItem); //Get the undo list off the tool, exit if empty
         if (undoState == null) {
             return false;
-        } //Exit if theres nothing to undo.
+        }
         World world = player.world;
         if (!world.isRemote) {
             IBlockState currentBlock = Blocks.AIR.getDefaultState();
-            //UndoState undoState = undoStack.pop(); //Get the Dim and Coords to Undo
             ArrayList<BlockPos> undoCoords = undoState.coordinates; //Get the Coords to undo
             int dimension = undoState.dimension; //Get the Dimension to undo
-            ArrayList<BlockPos> failedRemovals = new ArrayList<BlockPos>();
+            ArrayList<BlockPos> failedRemovals = new ArrayList<BlockPos>(); //Build a list of removals that fail
             for (BlockPos coord : undoCoords) {
                 currentBlock = world.getBlockState(coord);
                 ItemStack itemStack = currentBlock.getBlock().getPickBlock(currentBlock, null, world, coord, player);
-                //Only allow undo from the same dimension, if you're within 35 blocks (Due to chunkloading concerns)
                 double distance = coord.getDistance(player.getPosition().getX(), player.getPosition().getY(), player.getPosition().getZ());
                 boolean sameDim = (player.dimension == dimension);
-                if (distance < 35 && sameDim && currentBlock != ModBlocks.effectBlock.getDefaultState()) { //Don't allow us to undo a block while its still being placed
-                    if (InventoryManipulation.giveItem(itemStack, player)) {
-                        //Try to give the player an item, if inventory is full this fails
+                if (distance < 35 && sameDim && currentBlock != ModBlocks.effectBlock.getDefaultState()) { //Don't allow us to undo a block while its still being placed or too far away
+                    if (InventoryManipulation.giveItem(itemStack, player)) { //Try to give the player an item, if inventory is full this fails
                         world.spawnEntity(new BlockBuildEntity(world, coord, player, currentBlock, 2));
-                    } else {
-                        //If we failed to give the item, we want to put this back on the undo list, so start building a list
+                    } else { //If we failed to give the item, we want to put this back on the undo list, so start building a list
                         failedRemovals.add(coord);
                     }
-                } else {
-                    //If you're in the wrong dimension or too far away, fail the undo.
+                } else { //If you're in the wrong dimension or too far away, fail the undo.
                     player.sendStatusMessage(new TextComponentString(TextFormatting.RED + "Undo Failed (Too far away)"), true);
                     failedRemovals.add(coord);
                 }
             }
-            if (failedRemovals.size() != 0) {
-                //Add any failed undo blocks to the undo stack.
+            if (failedRemovals.size() != 0) { //Add any failed undo blocks to the undo stack.
                 UndoState failedState = new UndoState(player.dimension, failedRemovals);
                 pushUndoList(heldItem, failedState);
-                //undoStack.push(failedState);
-                //UndoBuild.updatePlayerMap(player.getUniqueID(), undoStack);
             }
         }
         return true;
