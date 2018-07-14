@@ -184,13 +184,6 @@ public class BuildingModes {
                         coordinates.add(pos);
                     }
                 }
-            } else {
-                for (int y = bound * -1; y <= bound; y++) {
-                    pos = new BlockPos(startBlock.getX(), startBlock.getY() - y, startBlock.getZ());
-                    if (isReplaceable(world, pos, setBlock)) {
-                        coordinates.add(pos);
-                    }
-                }
             }
         }
         //***************************************************
@@ -243,6 +236,59 @@ public class BuildingModes {
                         if (isReplaceable(world, pos, setBlock)) {
                             coordinates.add(pos);
                         }
+                    }
+                }
+            }
+        }
+        //***************************************************
+        //Stairs
+        //***************************************************
+        else if (mode == BuildingTool.toolModes.Stairs) {
+            if (sideHit == EnumFacing.UP || sideHit == EnumFacing.DOWN) {
+                sideHit = playerFacing.getOpposite();
+            }
+            if (sideHit == EnumFacing.NORTH) {
+                for (int z = 1; z <= range; z++) {
+                    if (startBlock.getY() > player.posY+1) {
+                        pos = new BlockPos(startBlock.getX(), startBlock.getY() - z, startBlock.getZ() - z);
+                    } else {
+                        pos = new BlockPos(startBlock.getX(), startBlock.getY() + z, startBlock.getZ() + z-1);
+                    }
+                    if (isReplaceable(world, pos, setBlock)) {
+                        coordinates.add(pos);
+                    }
+                }
+            } else if (sideHit == EnumFacing.SOUTH) {
+                for (int z = 1; z <= range; z++) {
+                    if (startBlock.getY() > player.posY+1) {
+                        pos = new BlockPos(startBlock.getX(), startBlock.getY() - z, startBlock.getZ() + z);
+                    } else {
+                        pos = new BlockPos(startBlock.getX(), startBlock.getY() + z, startBlock.getZ() - z+1);
+                    }
+                    if (isReplaceable(world, pos, setBlock)) {
+                        coordinates.add(pos);
+                    }
+                }
+            } else if (sideHit == EnumFacing.EAST) {
+                for (int x = 1; x <= range; x++) {
+                    if (startBlock.getY() > player.posY+1) {
+                        pos = new BlockPos(startBlock.getX() + x, startBlock.getY() - x, startBlock.getZ());
+                    } else {
+                        pos = new BlockPos(startBlock.getX() - x+1, startBlock.getY() + x, startBlock.getZ());
+                    }
+                    if (isReplaceable(world, pos, setBlock)) {
+                        coordinates.add(pos);
+                    }
+                }
+            } else if (sideHit == EnumFacing.WEST) {
+                for (int x = 1; x <= range; x++) {
+                    if (startBlock.getY() > player.posY+1) {
+                        pos = new BlockPos(startBlock.getX() - x, startBlock.getY() - x, startBlock.getZ());
+                    } else {
+                        pos = new BlockPos(startBlock.getX() + x-1, startBlock.getY() + x, startBlock.getZ());
+                    }
+                    if (isReplaceable(world, pos, setBlock)) {
+                        coordinates.add(pos);
                     }
                 }
             }

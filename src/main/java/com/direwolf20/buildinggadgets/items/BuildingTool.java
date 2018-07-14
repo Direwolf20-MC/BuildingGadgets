@@ -46,7 +46,7 @@ public class BuildingTool extends Item {
     private static final FakeBuilderWorld fakeWorld = new FakeBuilderWorld();
 
     public enum toolModes {
-        BuildToMe, VerticalColumn, HorizontalColumn, VerticalWall, HorizontalWall;
+        BuildToMe, VerticalColumn, HorizontalColumn, VerticalWall, HorizontalWall, Stairs;
         private static toolModes[] vals = values();
 
         public toolModes next() {
