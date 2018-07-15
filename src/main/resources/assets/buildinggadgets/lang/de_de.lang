@@ -1,0 +1,9 @@
+item.buildinggadgets.buildingtool.name=Bau-Gadget
+item.buildinggadgets.exchangertool.name=Austausch-Gadget
+tile.buildinggadgets.effectblock.name=(Unbenutzt)Effektblock
+block.buildinggadgets.effectblock.name=(Unbenutzt)Effektblock
+key.categories.buildingGadgets=Building Gadgets
+key.anchorKey=Festsetzen
+key.modeSwitch=Modus ändern
+key.rangeChange=Reichweite
+key.undoKey=Rückgängig
