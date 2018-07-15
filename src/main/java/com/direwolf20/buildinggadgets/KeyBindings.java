@@ -16,8 +16,8 @@ public class KeyBindings {
     public static KeyBinding anchorKey;
 
     public static void init() {
-        modeSwitch = new KeyBinding("key.modeSwitch", KeyConflictContext.IN_GAME, Keyboard.KEY_SEMICOLON, "key.categories.buildingGadgets");
-        rangeChange = new KeyBinding("key.rangeChange", KeyConflictContext.IN_GAME, Keyboard.KEY_APOSTROPHE, "key.categories.buildingGadgets");
+        modeSwitch = new KeyBinding("key.modeSwitch", KeyConflictContext.IN_GAME, Keyboard.KEY_F, "key.categories.buildingGadgets");
+        rangeChange = new KeyBinding("key.rangeChange", KeyConflictContext.IN_GAME, Keyboard.KEY_R, "key.categories.buildingGadgets");
         undoKey = new KeyBinding("key.undoKey", KeyConflictContext.IN_GAME, Keyboard.KEY_U, "key.categories.buildingGadgets");
         anchorKey = new KeyBinding("key.anchorKey", KeyConflictContext.IN_GAME, Keyboard.KEY_G, "key.categories.buildingGadgets");
         ClientRegistry.registerKeyBinding(modeSwitch);
