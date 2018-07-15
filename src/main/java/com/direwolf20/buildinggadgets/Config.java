@@ -30,7 +30,7 @@ public class Config {
     private static void initGeneralConfig(Configuration cfg) {
         cfg.addCustomCategoryComment(CATEGORY_GENERAL, "General configuration");
         // cfg.getBoolean() will get the value in the config if it is already specified there. If not it will create the value.
-        maxRange = cfg.getInt("maxRange", CATEGORY_GENERAL, maxRange, 1, 55, "The max range of the building tool");
+        maxRange = cfg.getInt("maxRange", CATEGORY_GENERAL, maxRange, 1, 25, "The max range of the building tool");
     }
 
 }
