@@ -1,8 +1,8 @@
-item.buildinggadgets.buildingtool.name=建ての道具
-item.buildinggadgets.exchangertool.name=替えの道具
+item.buildinggadgets.buildingtool.name=建てのガジェット
+item.buildinggadgets.exchangertool.name=替えのガジェット
 tile.buildinggadgets.effectblock.name=（未使用）エフェクトブロク
 block.buildinggadgets.effectblock.name=（未使用）エフェクトブロク
-key.categories.buildingGadgets=建ての道具
+key.categories.buildingGadgets=建てのガジェットス
 key.anchorKey=固定
 key.modeSwitch=スイッチモード
 key.rangeChange=距離
