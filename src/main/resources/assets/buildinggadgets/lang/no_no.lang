@@ -1,0 +1,9 @@
+item.buildinggadgets.buildingtool.name=Byggeapparat
+item.buildinggadgets.exchangertool.name=Erstatningsapparat
+tile.buildinggadgets.effectblock.name=(Ubrukt)Effekt Blokk
+block.buildinggadgets.effectblock.name=(Ubrukt)Effekt Blokk
+key.categories.buildingGadgets=Byggeapparater
+key.anchorKey=Forankring
+key.modeSwitch=Bytte Modus
+key.rangeChange=Rekkevidde
+key.undoKey=Angre
