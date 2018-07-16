@@ -20,7 +20,7 @@ public class InventoryManipulation {
         return success;
     }
 
-    public static boolean useItem(ItemStack itemStack, EntityPlayer player) {
+    public static boolean useItem(ItemStack itemStack, EntityPlayer player, int count) {
         if (player.capabilities.isCreativeMode) {
             return true;
         }
@@ -32,7 +32,10 @@ public class InventoryManipulation {
         }
         int slot = slots.get(0);
         ItemStack stackInSlot = inv.getStackInSlot(slot);
-        stackInSlot.shrink(1);
+        if (stackInSlot.getCount() < count) {
+            return false;
+        }
+        stackInSlot.shrink(count);
         stackInSlot = stackInSlot;
         return true;
     }

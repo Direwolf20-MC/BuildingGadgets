@@ -20,10 +20,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.text.TextComponentString;
@@ -474,11 +471,20 @@ public class BuildingTool extends Item {
         if (player.isSpectator()) {
             return false;
         }
+        NonNullList<ItemStack> drops = NonNullList.create();
+        setBlock.getBlock().getDrops(drops,world,pos,setBlock,0);
+        int neededItems = 0;
+        for (ItemStack drop : drops) {
+            if (drop.getItem().equals(itemStack.getItem())) {
+                neededItems++;
+            }
+        }
+        if (neededItems == 0) {neededItems = 1;}
         //if (!player.canPlayerEdit(pos,EnumFacing.UP,player.getHeldItemMainhand())) {return false;}
         if (!world.isBlockModifiable(player,pos)) {return false;}
         BlockSnapshot blockSnapshot = BlockSnapshot.getBlockSnapshot(world,pos);
         if (ForgeEventFactory.onPlayerBlockPlace(player, blockSnapshot, EnumFacing.UP, EnumHand.MAIN_HAND).isCanceled()) {return false;}
-        if (InventoryManipulation.useItem(itemStack, player)) {
+        if (InventoryManipulation.useItem(itemStack, player,neededItems)) {
             world.spawnEntity(new BlockBuildEntity(world, pos, player, setBlock, 1));
             return true;
         }

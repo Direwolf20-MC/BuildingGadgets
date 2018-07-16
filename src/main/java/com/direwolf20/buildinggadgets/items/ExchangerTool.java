@@ -6,6 +6,7 @@ import com.direwolf20.buildinggadgets.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.tools.ExchangingModes;
 import com.direwolf20.buildinggadgets.tools.InventoryManipulation;
 import com.direwolf20.buildinggadgets.tools.VectorTools;
+import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.util.ITooltipFlag;
@@ -20,10 +21,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.text.TextComponentString;
@@ -367,7 +365,16 @@ public class ExchangerTool extends Item {
             tool = player.getHeldItemOffhand();
             if (!(tool.getItem() instanceof ExchangerTool)) {return false;}
         }
-        if (InventoryManipulation.countItem(itemStack, player) == 0) {
+        NonNullList<ItemStack> drops = NonNullList.create();
+        setBlock.getBlock().getDrops(drops,world,pos,setBlock,0);
+        int neededItems = 0;
+        for (ItemStack drop : drops) {
+            if (drop.getItem().equals(itemStack.getItem())) {
+                neededItems++;
+            }
+        }
+        if (neededItems == 0) {neededItems = 1;}
+        if (InventoryManipulation.countItem(itemStack, player) < neededItems) {
             return false;
         }
         if (player.isSpectator()) {
@@ -379,7 +386,7 @@ public class ExchangerTool extends Item {
         if (ForgeEventFactory.onPlayerBlockPlace(player, blockSnapshot, EnumFacing.UP, EnumHand.MAIN_HAND).isCanceled()) {return false;}
         currentBlock.getBlock().harvestBlock(world, player, pos, currentBlock, world.getTileEntity(pos), tool);
 
-        InventoryManipulation.useItem(itemStack, player);
+        InventoryManipulation.useItem(itemStack, player,neededItems);
         world.spawnEntity(new BlockBuildEntity(world, pos, player, setBlock, 3));
         return true;
     }
