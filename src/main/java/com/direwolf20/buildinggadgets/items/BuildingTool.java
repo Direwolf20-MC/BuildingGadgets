@@ -1,15 +1,17 @@
 package com.direwolf20.buildinggadgets.items;
 
 import com.direwolf20.buildinggadgets.BuildingGadgets;
-import com.direwolf20.buildinggadgets.Config;
+import com.direwolf20.buildinggadgets.GadgetConfig;
 import com.direwolf20.buildinggadgets.ModBlocks;
 import com.direwolf20.buildinggadgets.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.tools.BuildingModes;
 import com.direwolf20.buildinggadgets.tools.InventoryManipulation;
 import com.direwolf20.buildinggadgets.tools.UndoState;
 import com.direwolf20.buildinggadgets.tools.VectorTools;
+import com.direwolf20.buildinggadgets.tools.PlayerUtil;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
@@ -26,7 +28,6 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldType;
@@ -254,10 +255,10 @@ public class BuildingTool extends Item {
     public void addInformation(ItemStack stack, World player, List<String> list, ITooltipFlag b) {
         //Add tool information to the tooltip
         super.addInformation(stack, player, list, b);
-        list.add(TextFormatting.DARK_GREEN + "Block: " + getToolBlock(stack).getBlock().getLocalizedName());
-        list.add(TextFormatting.AQUA + "Mode: " + getToolMode(stack));
+        list.add(I18n.format("tooltip.gadget.block", getToolBlock(stack).getBlock().getLocalizedName()));
+        list.add(I18n.format("tooltip.gadget.mode", getToolMode(stack)));
         if (getToolMode(stack) != toolModes.BuildToMe) {
-            list.add(TextFormatting.RED + "Range: " + getToolRange(stack));
+            list.add(I18n.format("tooltip.gadget.range", getToolRange(stack)));
         }
     }
 
@@ -306,7 +307,7 @@ public class BuildingTool extends Item {
         IBlockState state = world.getBlockState(pos);
         TileEntity te = world.getTileEntity(pos);
         if (te != null) {  //Currently not allowing tile entities.
-            player.sendStatusMessage(new TextComponentString(TextFormatting.RED + "Invalid Block"), true);
+            PlayerUtil.sendPlayerActionBarMessage(player, "message.gadgets.invalidBlock");
             return;
         }
         if (state != null) {
@@ -319,7 +320,7 @@ public class BuildingTool extends Item {
         toolModes mode = getToolMode(heldItem);
         mode = mode.next();
         setToolMode(heldItem, mode);
-        player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + "Tool Mode: " + mode.name()), true);
+        PlayerUtil.sendPlayerActionBarMessage(player, "message.gadgets.toolMode", mode.name());
     }
 
     public void rangeChange(EntityPlayer player, ItemStack heldItem) {
@@ -327,19 +328,19 @@ public class BuildingTool extends Item {
         int range = getToolRange(heldItem);
         if (player.isSneaking()) {
             if (range == 1) {
-                range = Config.maxRange;
+                range = GadgetConfig.maxRange;
             } else {
                 range--;
             }
         } else {
-            if (range >= Config.maxRange) {
+            if (range >= GadgetConfig.maxRange) {
                 range = 1;
             } else {
                 range++;
             }
         }
         setToolRange(heldItem, range);
-        player.sendStatusMessage(new TextComponentString(TextFormatting.DARK_BLUE + "Tool range: " + range), true);
+        PlayerUtil.sendPlayerActionBarMessage(player, "message.gadgets.toolRange", range);
     }
 
     public boolean anchorBlocks(EntityPlayer player, ItemStack stack) {
@@ -361,10 +362,10 @@ public class BuildingTool extends Item {
             }
             ArrayList<BlockPos> coords = BuildingModes.getBuildOrders(world, player, startBlock, sideHit, range, mode, getToolBlock(stack)); //Build the positions list based on tool mode and range
             setAnchor(stack, coords); //Set the anchor NBT
-            player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + "Render Anchored"), true);
+            PlayerUtil.sendPlayerActionBarMessage(player, "message.gadgets.anchoredRendered");
         } else {  //If theres already an anchor, remove it.
             setAnchor(stack, new ArrayList<BlockPos>());
-            player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + "Anchor Removed"), true);
+            PlayerUtil.sendPlayerActionBarMessage(player, "message.gadgets.anchoredRemoved");
         }
         return true;
     }
@@ -422,6 +423,7 @@ public class BuildingTool extends Item {
         ItemStack heldItem = player.getHeldItemMainhand();
         UndoState undoState = popUndoList(heldItem); //Get the undo list off the tool, exit if empty
         if (undoState == null) {
+            PlayerUtil.sendPlayerActionBarMessage(player, "message.gadgets.nothingToUndo");
             return false;
         }
         World world = player.world;
@@ -442,7 +444,7 @@ public class BuildingTool extends Item {
                         failedRemovals.add(coord);
                     }
                 } else { //If you're in the wrong dimension or too far away, fail the undo.
-                    player.sendStatusMessage(new TextComponentString(TextFormatting.RED + "Undo Failed (Too far away)"), true);
+                    PlayerUtil.sendPlayerActionBarMessage(player, "message.gadgets.undoToFar");
                     failedRemovals.add(coord);
                 }
             }
