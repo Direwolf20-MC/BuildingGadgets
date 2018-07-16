@@ -68,9 +68,8 @@ public class InventoryManipulation {
     public static ItemStack getSilkTouchDrop(IBlockState state) {
         Item item = Item.getItemFromBlock(state.getBlock());
         int i = 0;
-
         if (item.getHasSubtypes()) {
-            i = state.getBlock().getMetaFromState(state);
+            i = state.getBlock().damageDropped(state);
         }
         return new ItemStack(item, 1, i);
     }
