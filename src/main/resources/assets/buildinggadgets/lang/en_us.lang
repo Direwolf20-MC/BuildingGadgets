@@ -7,3 +7,15 @@ key.anchorKey=Anchor
 key.modeSwitch=Mode Switch
 key.rangeChange=Range
 key.undoKey=Undo
+
+message.gadgets.nothingToUndo=§cNothing To Undo
+message.gadgets.undoToFar=§cUndo Failed (Too far away)
+message.gadgets.anchoredRendered=§bRender Anchored
+message.gadgets.anchoredRemoved=§bAnchor Removed
+message.gadgets.toolRange=§bTool Range: %d
+message.gadgets.toolMode=§bTool Mode: %s
+message.gadgets.invalidBlock=§cInvalid Block
+
+tooltip.gadget.block=§2Block: %s
+tooltip.gadget.mode=§bMode: %s
+tooltip.gadget.range=§cRange: %d
