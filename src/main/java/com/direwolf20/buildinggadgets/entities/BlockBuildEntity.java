@@ -1,7 +1,8 @@
 package com.direwolf20.buildinggadgets.entities;
 
 import com.direwolf20.buildinggadgets.ModBlocks;
-import io.netty.buffer.ByteBuf;
+import com.google.common.base.Optional;
+import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -12,16 +13,14 @@ import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import com.google.common.base.Optional;
-import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
 
 import javax.annotation.Nullable;
 
-public class BlockBuildEntity extends Entity implements IEntityAdditionalSpawnData {
+public class BlockBuildEntity extends Entity{
 
     private static final DataParameter<Integer> toolMode = EntityDataManager.<Integer>createKey(BlockBuildEntity.class, DataSerializers.VARINT);
     private static final DataParameter<Optional<IBlockState>> SET_BLOCK = EntityDataManager.<Optional<IBlockState>>createKey(BlockBuildEntity.class, DataSerializers.OPTIONAL_BLOCK_STATE);
-    private static DataParameter<BlockPos> FIXED = EntityDataManager.createKey(BlockBuildEntity.class, DataSerializers.BLOCK_POS);
+    private static final DataParameter<BlockPos> FIXED = EntityDataManager.createKey(BlockBuildEntity.class, DataSerializers.BLOCK_POS);
 
     public int despawning = -1;
     public int maxLife = 20;
@@ -36,6 +35,9 @@ public class BlockBuildEntity extends Entity implements IEntityAdditionalSpawnDa
     public BlockBuildEntity(World worldIn) {
         super(worldIn);
         setSize(0.1F, 0.1F);
+
+        // We get an instance of the world (though this can be achieved with getEntityWorld)
+        world = worldIn;
     }
 
     public BlockBuildEntity(World worldIn, BlockPos spawnPos, EntityLivingBase player, IBlockState spawnBlock, int toolMode) {
@@ -83,17 +85,6 @@ public class BlockBuildEntity extends Entity implements IEntityAdditionalSpawnDa
     @Override
     public boolean isInRangeToRender3d(double x, double y, double z) {
         return true;
-    }
-
-    @Override
-    public void readSpawnData(ByteBuf additionalData) {
-        int id = additionalData.readInt();
-    }
-
-    @Override
-    public void writeSpawnData(ByteBuf buffer) {
-        int id = -1;
-        buffer.writeInt(id);
     }
 
     @Override
@@ -151,10 +142,33 @@ public class BlockBuildEntity extends Entity implements IEntityAdditionalSpawnDa
 
     @Override
     public void writeEntityToNBT(NBTTagCompound compound) {
+        compound.setInteger("despawning", despawning);
+        // This is usually not saved, but it is important here, so we will
+        compound.setInteger("ticksExisted", ticksExisted);
+
+        compound.setIntArray("setPos", new int[]{setPos.getX(), setPos.getY(), setPos.getZ()});
+
+        compound.setInteger("setBlock", Block.getStateId(setBlock));
+        compound.setInteger("originalSetBlock", Block.getStateId(originalSetBlock));
+
+        compound.setInteger("mode", mode);
     }
 
     @Override
     public void readEntityFromNBT(NBTTagCompound compound) {
+        despawning = compound.getInteger("despawning");
+        ticksExisted = compound.getInteger("ticksExisted");
+
+        int[] pos = compound.getIntArray("setPos");
+        setPos = new BlockPos(pos[0], pos[1], pos[2]);
+
+        setBlock = Block.getStateById(compound.getInteger("setBlock"));
+        originalSetBlock = Block.getStateById(compound.getInteger("originalSetBlock"));
+
+        mode = compound.getInteger("mode");
+
+        setSetBlock(setBlock);
+        setToolMode(mode);
     }
 
     @Override
@@ -163,5 +177,4 @@ public class BlockBuildEntity extends Entity implements IEntityAdditionalSpawnDa
         this.dataManager.register(toolMode, 1);
         this.dataManager.register(SET_BLOCK, Optional.absent());
     }
-
 }
