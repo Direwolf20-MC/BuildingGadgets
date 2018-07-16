@@ -1,0 +1,9 @@
+item.buildinggadgets.buildingtool.name=Dispositivo de Construção
+item.buildinggadgets.exchangertool.name=Dispositivo de Troca
+tile.buildinggadgets.effectblock.name=(Sem Uso)Bloco de Efeito
+block.buildinggadgets.effectblock.name=(Sem Uso)Bloco de Efeito
+key.categories.buildingGadgets=Dispositivos de Construção
+key.anchorKey=Ancorar
+key.modeSwitch=Trocar Modo
+key.rangeChange=Alcance
+key.undoKey=Desfazer
