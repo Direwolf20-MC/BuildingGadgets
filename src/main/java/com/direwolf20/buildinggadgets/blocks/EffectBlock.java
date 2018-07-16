@@ -2,6 +2,7 @@ package com.direwolf20.buildinggadgets.blocks;
 
 import com.direwolf20.buildinggadgets.BuildingGadgets;
 import net.minecraft.block.Block;
+import net.minecraft.block.material.EnumPushReaction;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
@@ -52,5 +53,10 @@ public class EffectBlock extends Block {
     @Override
     public Item getItemDropped(IBlockState state, Random rand, int fortune) {
         return Items.AIR;
+    }
+
+    @Override
+    public EnumPushReaction getMobilityFlag(IBlockState state) {
+        return EnumPushReaction.BLOCK;  // Prevents block from being pushed by pistons
     }
 }
