@@ -17,6 +17,10 @@ public class BreakEventHandler {
         EntityPlayer player = event.getHarvester();
         if (player == null) {return;}
         ItemStack heldItem = player.getHeldItemMainhand();
+        if (!(heldItem.getItem() instanceof ExchangerTool)) {
+            heldItem = player.getHeldItemOffhand();
+            if (!(heldItem.getItem() instanceof ExchangerTool)) {return;}
+        }
         List<ItemStack> drops = event.getDrops();
         if (heldItem.getItem() instanceof ExchangerTool) {
             drops.removeIf(item->InventoryManipulation.giveItem(item,player));

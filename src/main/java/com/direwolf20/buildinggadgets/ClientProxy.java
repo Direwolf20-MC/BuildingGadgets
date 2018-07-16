@@ -51,6 +51,10 @@ public class ClientProxy extends CommonProxy {
         Minecraft mc = Minecraft.getMinecraft();
         EntityPlayer p = mc.player;
         ItemStack heldItem = p.getHeldItemMainhand();
+        if (!(heldItem.getItem() instanceof BuildingTool) && !(heldItem.getItem() instanceof  ExchangerTool)) {
+            heldItem = p.getHeldItemOffhand();
+            if (!(heldItem.getItem() instanceof BuildingTool) && !(heldItem.getItem() instanceof  ExchangerTool)) {return;}
+        }
         if (heldItem.getItem() instanceof BuildingTool) {
             BuildingTool buildingTool = (BuildingTool) heldItem.getItem();
             ToolRenders.renderBuilderOverlay(evt, p, heldItem);

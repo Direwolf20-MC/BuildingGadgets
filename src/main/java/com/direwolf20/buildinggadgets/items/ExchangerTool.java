@@ -328,6 +328,10 @@ public class ExchangerTool extends Item {
         }
         Set<BlockPos> coordinates = new HashSet<BlockPos>(coords);
         ItemStack heldItem = player.getHeldItemMainhand();
+        if (!(heldItem.getItem() instanceof ExchangerTool)) {
+            heldItem = player.getHeldItemOffhand();
+            if (!(heldItem.getItem() instanceof ExchangerTool)) {return false;}
+        }
         IBlockState blockState = getToolBlock(heldItem);
 
         if (blockState != Blocks.AIR.getDefaultState()) {  //Don't attempt a build if a block is not chosen -- Typically only happens on a new tool.
@@ -359,6 +363,10 @@ public class ExchangerTool extends Item {
             itemStack = setBlock.getBlock().getPickBlock(setBlock, null, world, pos, player);
         }
         ItemStack tool = player.getHeldItemMainhand();
+        if (!(tool.getItem() instanceof ExchangerTool)) {
+            tool = player.getHeldItemOffhand();
+            if (!(tool.getItem() instanceof ExchangerTool)) {return false;}
+        }
         if (InventoryManipulation.countItem(itemStack, player) == 0) {
             return false;
         }

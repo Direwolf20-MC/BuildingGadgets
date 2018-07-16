@@ -264,7 +264,7 @@ public class BuildingTool extends Item {
     @Override
     public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
         //On item use, if sneaking, select the block clicked on, else build -- This is called when a block in clicked on
-        ItemStack stack = player.getHeldItemMainhand();
+        ItemStack stack = player.getHeldItem(hand);
         player.setActiveHand(hand);
         if (!world.isRemote) {
             if (player.isSneaking()) {
@@ -279,7 +279,7 @@ public class BuildingTool extends Item {
     @Override
     public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
         //On item use, if sneaking, select the block clicked on, else build -- This is called when you right click a tool NOT on a block.
-        ItemStack itemstack = player.getHeldItemMainhand();
+        ItemStack itemstack = player.getHeldItem(hand);
         /*NBTTagCompound tagCompound = itemstack.getTagCompound();
         ByteBuf buf = Unpooled.buffer(16);
         ByteBufUtils.writeTag(buf,tagCompound);
@@ -390,6 +390,10 @@ public class BuildingTool extends Item {
         ArrayList<BlockPos> undoCoords = new ArrayList<BlockPos>();
         Set<BlockPos> coordinates = new HashSet<BlockPos>(coords);
         ItemStack heldItem = player.getHeldItemMainhand();
+        if (!(heldItem.getItem() instanceof BuildingTool)) {
+            heldItem = player.getHeldItemOffhand();
+            if (!(heldItem.getItem() instanceof BuildingTool)) {return false;}
+        }
         IBlockState blockState = getToolBlock(heldItem);
 
         if (blockState != Blocks.AIR.getDefaultState()) { //Don't attempt a build if a block is not chosen -- Typically only happens on a new tool.
@@ -420,6 +424,10 @@ public class BuildingTool extends Item {
 
     public static boolean undoBuild(EntityPlayer player) {
         ItemStack heldItem = player.getHeldItemMainhand();
+        if (!(heldItem.getItem() instanceof BuildingTool)) {
+            heldItem = player.getHeldItemOffhand();
+            if (!(heldItem.getItem() instanceof BuildingTool)) {return false;}
+        }
         UndoState undoState = popUndoList(heldItem); //Get the undo list off the tool, exit if empty
         if (undoState == null) {
             return false;

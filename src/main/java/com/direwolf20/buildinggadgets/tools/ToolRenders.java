@@ -49,6 +49,10 @@ public class ToolRenders {
             }
             if (startBlock != ModBlocks.effectBlock.getDefaultState()) {
                 ItemStack heldItem = player.getHeldItemMainhand(); //Get the item stack and the block that we'll be rendering (From the Itemstack's NBT)
+                if (!(heldItem.getItem() instanceof BuildingTool)) {
+                    heldItem = player.getHeldItemOffhand();
+                    if (!(heldItem.getItem() instanceof BuildingTool)) {return;}
+                }
                 IBlockState renderBlockState = BuildingTool.getToolBlock(heldItem);
                 Minecraft mc = Minecraft.getMinecraft();
                 mc.renderEngine.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
@@ -152,6 +156,10 @@ public class ToolRenders {
             }
             if (startBlock != ModBlocks.effectBlock.getDefaultState()) {
                 ItemStack heldItem = player.getHeldItemMainhand(); //Get the item stack and the block that we'll be rendering (From the Itemstack's NBT)
+                if (!(heldItem.getItem() instanceof ExchangerTool)) {
+                    heldItem = player.getHeldItemOffhand();
+                    if (!(heldItem.getItem() instanceof ExchangerTool)) {return;}
+                }
                 IBlockState renderBlockState = ExchangerTool.getToolBlock(heldItem);
                 Minecraft mc = Minecraft.getMinecraft();
                 mc.renderEngine.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
