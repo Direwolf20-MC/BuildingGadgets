@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.items;
 
 import com.direwolf20.buildinggadgets.BuildingGadgets;
-import com.direwolf20.buildinggadgets.GadgetConfig;
+import com.direwolf20.buildinggadgets.Config;
 import com.direwolf20.buildinggadgets.ModBlocks;
 import com.direwolf20.buildinggadgets.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.tools.BuildingModes;
@@ -328,12 +328,12 @@ public class BuildingTool extends Item {
         int range = getToolRange(heldItem);
         if (player.isSneaking()) {
             if (range == 1) {
-                range = GadgetConfig.maxRange;
+                range = Config.maxRange;
             } else {
                 range--;
             }
         } else {
-            if (range >= GadgetConfig.maxRange) {
+            if (range >= Config.maxRange) {
                 range = 1;
             } else {
                 range++;
