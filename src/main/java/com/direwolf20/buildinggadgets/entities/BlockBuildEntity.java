@@ -7,6 +7,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTUtil;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
@@ -21,7 +22,7 @@ public class BlockBuildEntity extends Entity implements IEntityAdditionalSpawnDa
 
     private static final DataParameter<Integer> toolMode = EntityDataManager.<Integer>createKey(BlockBuildEntity.class, DataSerializers.VARINT);
     private static final DataParameter<Optional<IBlockState>> SET_BLOCK = EntityDataManager.<Optional<IBlockState>>createKey(BlockBuildEntity.class, DataSerializers.OPTIONAL_BLOCK_STATE);
-    private static DataParameter<BlockPos> FIXED = EntityDataManager.createKey(BlockBuildEntity.class, DataSerializers.BLOCK_POS);
+    private static final DataParameter<BlockPos> FIXED = EntityDataManager.createKey(BlockBuildEntity.class, DataSerializers.BLOCK_POS);
 
     public int despawning = -1;
     public int maxLife = 20;
@@ -36,6 +37,7 @@ public class BlockBuildEntity extends Entity implements IEntityAdditionalSpawnDa
     public BlockBuildEntity(World worldIn) {
         super(worldIn);
         setSize(0.1F, 0.1F);
+        world = worldIn;
     }
 
     public BlockBuildEntity(World worldIn, BlockPos spawnPos, EntityLivingBase player, IBlockState spawnBlock, int toolMode) {
@@ -151,10 +153,25 @@ public class BlockBuildEntity extends Entity implements IEntityAdditionalSpawnDa
 
     @Override
     public void writeEntityToNBT(NBTTagCompound compound) {
+        compound.setInteger("despawning", despawning);
+        compound.setInteger("ticksExisted", ticksExisted);
+        compound.setTag("setPos", NBTUtil.createPosTag(setPos));
+        NBTTagCompound blockStateTag = new NBTTagCompound();
+        NBTUtil.writeBlockState(blockStateTag,setBlock);
+        compound.setTag("setBlock", blockStateTag);
+        NBTUtil.writeBlockState(blockStateTag,originalSetBlock);
+        compound.setTag("originalBlock",blockStateTag);
+        compound.setInteger("mode", mode);
     }
 
     @Override
     public void readEntityFromNBT(NBTTagCompound compound) {
+        despawning = compound.getInteger("despawning");
+        ticksExisted = compound.getInteger("ticksExisted");
+        setPos = NBTUtil.getPosFromTag(compound.getCompoundTag("setPos"));
+        setBlock = NBTUtil.readBlockState(compound.getCompoundTag("setBlock"));
+        originalSetBlock = NBTUtil.readBlockState(compound.getCompoundTag("originalBlock"));
+        mode = compound.getInteger("mode");
     }
 
     @Override
