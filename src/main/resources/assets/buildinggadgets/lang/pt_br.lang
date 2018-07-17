@@ -14,6 +14,6 @@ message.gadget.invalidblock=Bloco Invalido
 message.gadget.toolmode=Modo da Ferramenta
 message.gadget.toolrange=Alcance da Ferramenta
 message.gadget.anchorrender=Render Ancorado
-message.gadget.anchorremove=Desancorado
+message.gadget.anchorremove=Render Desancorado
 message.gadget.nothingtoundo=Nada para Desfazer
 message.gadget.undofailed=Falha ao Desfazer (Muito Longe?)
