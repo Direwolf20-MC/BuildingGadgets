@@ -7,7 +7,7 @@ Dire's Building Gadgets aims to make building a little bit easier. At this time 
 
 [Spotlight](https://youtu.be/D4Ib4h7aTSk)
 
-Press the `Mode Switch` hotkey (Default F) to switch modes.
+Press the `Mode Switch` hotkey to switch modes.
 
 Press the `Range Change` hotkey to increase the range (Sneak+Hotkey decrements the range). 
 
