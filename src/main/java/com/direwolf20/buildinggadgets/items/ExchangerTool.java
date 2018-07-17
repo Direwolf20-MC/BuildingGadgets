@@ -26,6 +26,7 @@ import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldType;
@@ -246,7 +247,7 @@ public class ExchangerTool extends Item {
         IBlockState state = world.getBlockState(pos);
         TileEntity te = world.getTileEntity(pos);
         if (te != null) {
-            player.sendStatusMessage(new TextComponentString(TextFormatting.RED + I18n.format("message.gadget.invalidblock")), true);
+            player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.invalidblock").getUnformattedComponentText()), true);
             return;
         }
         if (state != null) {
@@ -258,7 +259,7 @@ public class ExchangerTool extends Item {
         ExchangerTool.toolModes mode = getToolMode(heldItem);
         mode = mode.next();
         setToolMode(heldItem, mode);
-        player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + I18n.format("message.gadget.toolmode") + ": " + mode.name()), true);
+        player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.toolmode").getUnformattedComponentText() + ": " + mode.name()), true);
     }
 
     public void rangeChange(EntityPlayer player, ItemStack heldItem) {
@@ -277,7 +278,7 @@ public class ExchangerTool extends Item {
             }
         }
         setToolRange(heldItem, range);
-        player.sendStatusMessage(new TextComponentString(TextFormatting.DARK_AQUA + I18n.format("message.gadget.toolrange") + ": " + range), true);
+        player.sendStatusMessage(new TextComponentString(TextFormatting.DARK_AQUA + new TextComponentTranslation("message.gadget.toolrange").getUnformattedComponentText() + ": " + range), true);
     }
 
     public boolean anchorBlocks(EntityPlayer player, ItemStack stack) {
@@ -299,10 +300,10 @@ public class ExchangerTool extends Item {
             }
             ArrayList<BlockPos> coords = ExchangingModes.getBuildOrders(world, player, startBlock, sideHit, range, mode, setBlock); //Build the positions list based on tool mode and range
             setAnchor(stack, coords);//Set the anchor NBT
-            player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + I18n.format("message.gadget.anchorrender")), true);
+            player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.anchorrender").getUnformattedComponentText()), true);
         } else { //If theres already an anchor, remove it.
             setAnchor(stack, new ArrayList<BlockPos>());
-            player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + I18n.format("message.gadget.anchorremove")), true);
+            player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.anchorremove").getUnformattedComponentText()), true);
         }
         return true;
     }
