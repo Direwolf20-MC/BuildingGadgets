@@ -443,10 +443,12 @@ public class BuildingTool extends Item {
                 double distance = coord.getDistance(player.getPosition().getX(), player.getPosition().getY(), player.getPosition().getZ());
                 boolean sameDim = (player.dimension == dimension);
                 if (distance < 35 && sameDim && currentBlock != ModBlocks.effectBlock.getDefaultState()) { //Don't allow us to undo a block while its still being placed or too far away
-                    if (InventoryManipulation.giveItem(itemStack, player)) { //Try to give the player an item, if inventory is full this fails
-                        world.spawnEntity(new BlockBuildEntity(world, coord, player, currentBlock, 2));
-                    } else { //If we failed to give the item, we want to put this back on the undo list, so start building a list
-                        failedRemovals.add(coord);
+                    if (currentBlock != Blocks.AIR.getDefaultState()) {
+                        if (InventoryManipulation.giveItem(itemStack, player)) { //Try to give the player an item, if inventory is full this fails
+                            world.spawnEntity(new BlockBuildEntity(world, coord, player, currentBlock, 2));
+                        } else { //If we failed to give the item, we want to put this back on the undo list, so start building a list
+                            failedRemovals.add(coord);
+                        }
                     }
                 } else { //If you're in the wrong dimension or too far away, fail the undo.
                     player.sendStatusMessage(new TextComponentString(TextFormatting.RED + I18n.format("message.gadget.undofailed")), true);
