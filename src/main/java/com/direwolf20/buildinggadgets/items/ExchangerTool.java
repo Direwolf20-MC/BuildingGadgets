@@ -9,6 +9,7 @@ import com.direwolf20.buildinggadgets.tools.VectorTools;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -201,9 +202,9 @@ public class ExchangerTool extends Item {
     @Override
     public void addInformation(ItemStack stack, World player, List<String> list, ITooltipFlag b) {
         super.addInformation(stack, player, list, b);
-        list.add(TextFormatting.DARK_GREEN + "Block: " + getToolBlock(stack).getBlock().getLocalizedName());
-        list.add(TextFormatting.AQUA + "Mode: " + getToolMode(stack));
-        list.add(TextFormatting.RED + "Range: " + getToolRange(stack));
+        list.add(TextFormatting.DARK_GREEN + I18n.format("tooltip.gadget.block") + ": " + getToolBlock(stack).getBlock().getLocalizedName());
+        list.add(TextFormatting.AQUA + I18n.format("tooltip.gadget.mode") + ": " + getToolMode(stack));
+        list.add(TextFormatting.RED + I18n.format("tooltip.gadget.range") + ": " + getToolRange(stack));
     }
 
 
@@ -245,7 +246,7 @@ public class ExchangerTool extends Item {
         IBlockState state = world.getBlockState(pos);
         TileEntity te = world.getTileEntity(pos);
         if (te != null) {
-            player.sendStatusMessage(new TextComponentString(TextFormatting.RED + "Invalid Block"), true);
+            player.sendStatusMessage(new TextComponentString(TextFormatting.RED + I18n.format("message.gadget.invalidblock")), true);
             return;
         }
         if (state != null) {
@@ -257,7 +258,7 @@ public class ExchangerTool extends Item {
         ExchangerTool.toolModes mode = getToolMode(heldItem);
         mode = mode.next();
         setToolMode(heldItem, mode);
-        player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + "Tool Mode: " + mode.name()), true);
+        player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + I18n.format("message.gadget.toolmode") + ": " + mode.name()), true);
     }
 
     public void rangeChange(EntityPlayer player, ItemStack heldItem) {
@@ -276,7 +277,7 @@ public class ExchangerTool extends Item {
             }
         }
         setToolRange(heldItem, range);
-        player.sendStatusMessage(new TextComponentString(TextFormatting.DARK_BLUE + "Tool range: " + range), true);
+        player.sendStatusMessage(new TextComponentString(TextFormatting.DARK_AQUA + I18n.format("message.gadget.toolrange") + ": " + range), true);
     }
 
     public boolean anchorBlocks(EntityPlayer player, ItemStack stack) {
@@ -298,10 +299,10 @@ public class ExchangerTool extends Item {
             }
             ArrayList<BlockPos> coords = ExchangingModes.getBuildOrders(world, player, startBlock, sideHit, range, mode, setBlock); //Build the positions list based on tool mode and range
             setAnchor(stack, coords);//Set the anchor NBT
-            player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + "Render Anchored"), true);
+            player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + I18n.format("message.gadget.anchorrender")), true);
         } else { //If theres already an anchor, remove it.
             setAnchor(stack, new ArrayList<BlockPos>());
-            player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + "Anchor Removed"), true);
+            player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + I18n.format("message.gadget.anchorremove")), true);
         }
         return true;
     }
