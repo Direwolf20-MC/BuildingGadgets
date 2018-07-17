@@ -2,7 +2,6 @@ package com.direwolf20.buildinggadgets;
 
 import com.direwolf20.buildinggadgets.items.BreakEventHandler;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -48,5 +47,6 @@ public class BuildingGadgets {
     @Mod.EventHandler
     public void serverLoad(FMLServerStartingEvent event) {
         //event.registerServerCommand(new ResetCommand());
+        proxy.onServerStart(event);
     }
 }

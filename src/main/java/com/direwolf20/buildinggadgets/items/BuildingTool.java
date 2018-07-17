@@ -1,8 +1,8 @@
 package com.direwolf20.buildinggadgets.items;
 
 import com.direwolf20.buildinggadgets.BuildingGadgets;
-import com.direwolf20.buildinggadgets.Config;
 import com.direwolf20.buildinggadgets.ModBlocks;
+import com.direwolf20.buildinggadgets.config.InGameConfig;
 import com.direwolf20.buildinggadgets.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.tools.BuildingModes;
 import com.direwolf20.buildinggadgets.tools.InventoryManipulation;
@@ -316,7 +316,10 @@ public class BuildingTool extends Item {
     public void toggleMode(EntityPlayer player, ItemStack heldItem) {
         //Called when the mode toggle hotkey is pressed
         toolModes mode = getToolMode(heldItem);
-        mode = mode.next();
+        toolModes startMode = mode;
+        do {
+            mode = mode.next();
+        } while (mode!=startMode && !InGameConfig.isActiveBuildingMode(mode));
         setToolMode(heldItem, mode);
         player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.toolmode").getUnformattedComponentText() + ": " + mode.name()), true);
     }
@@ -326,12 +329,12 @@ public class BuildingTool extends Item {
         int range = getToolRange(heldItem);
         if (player.isSneaking()) {
             if (range == 1) {
-                range = Config.maxRange;
+                range = InGameConfig.maxRange;
             } else {
                 range--;
             }
         } else {
-            if (range >= Config.maxRange) {
+            if (range >= InGameConfig.maxRange) {
                 range = 1;
             } else {
                 range++;
@@ -342,6 +345,8 @@ public class BuildingTool extends Item {
     }
 
     public boolean anchorBlocks(EntityPlayer player, ItemStack stack) {
+        if (!InGameConfig.allowAnchor)
+            return false;
         //Stores the current visual blocks in NBT on the tool, so the player can look around without moving the visual render
         World world = player.world;
         int range = getToolRange(stack);
@@ -395,7 +400,7 @@ public class BuildingTool extends Item {
         }
         IBlockState blockState = getToolBlock(heldItem);
 
-        if (blockState != Blocks.AIR.getDefaultState()) { //Don't attempt a build if a block is not chosen -- Typically only happens on a new tool.
+        if (blockState != Blocks.AIR.getDefaultState() && InGameConfig.canBuildBlock(blockState.getBlock())) { //Don't attempt a build if a block is not chosen -- Typically only happens on a new tool.
             IBlockState state = Blocks.AIR.getDefaultState(); //Initialize a new State Variable for use in the fake world
             fakeWorld.setWorldAndState(player.world, blockState, coordinates); // Initialize the fake world's blocks
             for (BlockPos coordinate : coords) {
