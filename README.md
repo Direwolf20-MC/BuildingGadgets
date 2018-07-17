@@ -43,4 +43,4 @@ Wall -  Exchanges in a Range x Range (Example: 3x3 or 5x5), around the block yo
 
 Horizontal Column - Horizontal with respect to the players look vector. This will be a straight line typically left and right of the block you're looking at. 
 
-Vertical Column - Vertical with respect to the players look vector. This will be a straight line typically 'up' and 'down' of the block you're looking at.
+Vertical Column - Vertical with respect to the players look vector. This will be a straight line typically `up` and `down` of the block you're looking at.
