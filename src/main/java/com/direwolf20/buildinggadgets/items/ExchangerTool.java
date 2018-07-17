@@ -1,12 +1,11 @@
 package com.direwolf20.buildinggadgets.items;
 
 import com.direwolf20.buildinggadgets.BuildingGadgets;
-import com.direwolf20.buildinggadgets.Config;
+import com.direwolf20.buildinggadgets.config.InGameConfig;
 import com.direwolf20.buildinggadgets.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.tools.ExchangingModes;
 import com.direwolf20.buildinggadgets.tools.InventoryManipulation;
 import com.direwolf20.buildinggadgets.tools.VectorTools;
-import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.resources.I18n;
@@ -258,6 +257,10 @@ public class ExchangerTool extends Item {
     public void toggleMode(EntityPlayer player, ItemStack heldItem) {
         ExchangerTool.toolModes mode = getToolMode(heldItem);
         mode = mode.next();
+        toolModes startMode = mode;
+        do {
+            mode = mode.next();
+        } while (mode!=startMode && !InGameConfig.isActiveExchangingMode(mode));
         setToolMode(heldItem, mode);
         player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.toolmode").getUnformattedComponentText() + ": " + mode.name()), true);
     }
@@ -266,12 +269,12 @@ public class ExchangerTool extends Item {
         int range = getToolRange(heldItem);
         if (player.isSneaking()) {
             if (range <= 1) {
-                range = Config.maxRange;
+                range = InGameConfig.maxRange;
             } else {
                 range = range - 2;
             }
         } else {
-            if (range >= Config.maxRange) {
+            if (range >= InGameConfig.maxRange) {
                 range = 1;
             } else {
                 range = range + 2;
@@ -282,6 +285,9 @@ public class ExchangerTool extends Item {
     }
 
     public boolean anchorBlocks(EntityPlayer player, ItemStack stack) {
+        if (!InGameConfig.allowAnchor)
+            return false;
+
         World world = player.world;
         int range = getToolRange(stack);
         ExchangerTool.toolModes mode = getToolMode(stack);
@@ -334,7 +340,7 @@ public class ExchangerTool extends Item {
         }
         IBlockState blockState = getToolBlock(heldItem);
 
-        if (blockState != Blocks.AIR.getDefaultState()) {  //Don't attempt a build if a block is not chosen -- Typically only happens on a new tool.
+        if (blockState != Blocks.AIR.getDefaultState() && InGameConfig.canChangeWithBlock(blockState.getBlock())) {  //Don't attempt a build if a block is not chosen -- Typically only happens on a new tool.
             IBlockState state = Blocks.AIR.getDefaultState(); //Initialize a new State Variable for use in the fake world
             fakeWorld.setWorldAndState(player.world, blockState, coordinates); // Initialize the fake world's blocks
             for (BlockPos coordinate : coords) {
@@ -342,6 +348,7 @@ public class ExchangerTool extends Item {
                     try {
                         state = blockState.getActualState(fakeWorld, coordinate);  //Get the state of the block in the fake world (This lets fences be connected, etc)
                     } catch (Exception var8) {
+                        BuildingGadgets.logger.error("Failed to retrieve Blockstate");
                     }
                 }
                 //Get the extended block state in the fake world
@@ -355,6 +362,8 @@ public class ExchangerTool extends Item {
 
     public boolean exchangeBlock(World world, EntityPlayer player, BlockPos pos, IBlockState setBlock) {
         IBlockState currentBlock = world.getBlockState(pos);
+        if (!InGameConfig.canExchangeBlock(currentBlock.getBlock()))
+            return false;
         ItemStack itemStack;
         //ItemStack itemStack = setBlock.getBlock().getPickBlock(setBlock, null, world, pos, player);
         if (setBlock.getBlock().canSilkHarvest(world,pos,setBlock,player)) {
@@ -362,6 +371,7 @@ public class ExchangerTool extends Item {
         } else {
             itemStack = setBlock.getBlock().getPickBlock(setBlock, null, world, pos, player);
         }
+
         ItemStack tool = player.getHeldItemMainhand();
         if (!(tool.getItem() instanceof ExchangerTool)) {
             tool = player.getHeldItemOffhand();

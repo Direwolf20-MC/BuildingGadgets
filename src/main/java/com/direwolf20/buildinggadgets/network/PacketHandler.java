@@ -16,5 +16,6 @@ public class PacketHandler {
         INSTANCE.registerMessage(PacketUndoKey.Handler.class, PacketUndoKey.class, 2, Side.SERVER);
         INSTANCE.registerMessage(PacketAnchorKey.Handler.class, PacketAnchorKey.class, 3, Side.SERVER);
         // Client side
+        INSTANCE.registerMessage(PacketSyncConfig.Handler.class,PacketSyncConfig.class,4,Side.CLIENT);
     }
 }
