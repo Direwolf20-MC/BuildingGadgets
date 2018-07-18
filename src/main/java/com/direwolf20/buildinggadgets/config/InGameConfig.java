@@ -27,26 +27,42 @@ public class InGameConfig {
     private static final String KEY_NAME = "NAME";
     static final String KEY_VALUE = "VAL";
     static final String KEY_TYPE = "ID";
-    /*@SyncedConfig
+    @SyncedConfig
     public static boolean     bool = false;
     @SyncedConfig
     public static boolean[]   boolA = {false, true};
+    @SyncedConfig
+    public static Boolean     Bool = false;
+    @SyncedConfig
+    public static Boolean[]   BoolA = {false, true};
     @SyncedConfig
     public static double      dbl = 1.0d;
     @SyncedConfig
     public static double[]    dblA = {1.0d, 2.0d};
     @SyncedConfig
+    public static Double      Dbl = 1.0D;
+    @SyncedConfig
+    public static Double[]    DblA = {1.0D, 2.0D};
+    @SyncedConfig
     public static char        chr = 'a';
     @SyncedConfig
     public static char[]      chrA = {'a', 'b'};
+    @SyncedConfig
+    public static Character   Chr = 'A';
+    @SyncedConfig
+    public static Character[] ChrA = {'A', 'B'};
     @SyncedConfig
     public static int         int_ = 1;
     @SyncedConfig
     public static int[]       intA = {1, 2};
     @SyncedConfig
+    public static Integer     Int = 1;
+    @SyncedConfig
+    public static Integer[]   IntA = {1, 2};
+    @SyncedConfig
     public static String      Str = "STRING!";
     @SyncedConfig
-    public static String[]    StrA = {"STR", "ING!"};*/
+    public static String[]    StrA = {"STR", "ING!"};
 
     @SyncedConfig
     public static double rayTraceRange;
@@ -106,6 +122,7 @@ public class InGameConfig {
             }
         }
         return true;
+
     }
 
     @SyncedConfig
@@ -211,6 +228,7 @@ public class InGameConfig {
     }
 
     public static NBTTagCompound parseSynchronisation() {
+        FieldSerializer.init();
         NBTTagList list = new NBTTagList();
         List<Field> fields = Collections.unmodifiableList(getSyncFields());
         for (Field field: fields) {
@@ -219,6 +237,7 @@ public class InGameConfig {
         }
         NBTTagCompound compound = new NBTTagCompound(); //parsed in PacketSyncConfig => requires an TagCompound;
         compound.setTag(KEY_VALUE,list);
+        FieldSerializer.clear();
         return compound;
     }
 
@@ -228,6 +247,7 @@ public class InGameConfig {
         NBTTagList list = (NBTTagList) compound.getTag(KEY_VALUE);
         List<Field> fields = Collections.unmodifiableList(getSyncFields());
         Map<String,Field> map = new HashMap<>();
+        FieldSerializer.init();
         for (Field f: fields) {
             map.put(getSyncName(f),f);
         }
@@ -238,6 +258,7 @@ public class InGameConfig {
                 BuildingGadgets.logger.warn("Unexpected "+rawNBT.getClass().getName()+" found in NBTTagList which was expected to only contain NBTTagCompounds!");
             }
         }
+        FieldSerializer.clear();
         /*
         BuildingGadgets.logger.info(bool);
         BuildingGadgets.logger.info(Arrays.toString(boolA));
@@ -252,24 +273,16 @@ public class InGameConfig {
     }
 
     private static NBTTagCompound parseField(Field field) {
-        try {
-            field.setAccessible(true); //should not be needed, but better safe than sorry
-            Object value = field.get(null);
-            NBTBase valueTag = ConfigType.getValueTag(value);
-            if (valueTag==null) {
-                BuildingGadgets.logger.warn("Could not use type of Field "+field.getName()+"!"+" Found type "+field.getType().getName()+"!");
-                return null;
-            }
-            String name = getSyncName(field);
-            NBTTagCompound compound = new NBTTagCompound();
-            compound.setTag(KEY_VALUE,valueTag);
-            compound.setString(KEY_NAME,name);
-            return compound;
-
-        } catch (IllegalAccessException e) {
-            BuildingGadgets.logger.error("Failed to parse Field "+field.getName()+" in order to parse ConfigSync data!",e);
+        NBTBase valueTag = FieldSerializer.parseFieldValue(field);
+        if (valueTag==null) {
+            BuildingGadgets.logger.warn("Could not use type of Field "+field.getName()+"!"+" Found type "+field.getType().getName()+"!");
+            return null;
         }
-        return null;
+        String name = getSyncName(field);
+        NBTTagCompound compound = new NBTTagCompound();
+        compound.setTag(KEY_VALUE,valueTag);
+        compound.setString(KEY_NAME,name);
+        return compound;
     }
 
     private static void handleNBT(NBTTagCompound compound, Map<String,Field> fields) {
@@ -279,16 +292,11 @@ public class InGameConfig {
         }
         String name = compound.getString(KEY_NAME);
         NBTBase rawValue = compound.getTag(KEY_VALUE);
-        if (!(rawValue instanceof NBTTagCompound)) {
-            BuildingGadgets.logger.warn("Tried to read synchronisation from an inproperly initialised NBTTagCompound!");
-            return;
-        }
-        NBTTagCompound value = (NBTTagCompound) rawValue;
         if (!fields.containsKey(name)) {
             BuildingGadgets.logger.warn("Tried to read synchronisation from an unknown Field!");
             return;
         }
-        ConfigType.handleValueTag(fields.get(name),value);
+        FieldSerializer.applyValue(rawValue,fields.get(name));
     }
 
     private static List<Field> getSyncFields() {
