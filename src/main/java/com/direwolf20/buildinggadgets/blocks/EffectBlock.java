@@ -19,7 +19,7 @@ import java.util.Random;
 public class EffectBlock extends Block {
 
     public EffectBlock() {
-        super(Material.ROCK);
+        super(EffectBlockMaterial.EFFECTBLOCKMATERIAL);
         setHardness(20.0f);
         setUnlocalizedName(BuildingGadgets.MODID + ".effectblock");     // Used for localization (en_US.lang)
         setRegistryName("effectblock");        // The unique name (within your mod) that identifies this block
