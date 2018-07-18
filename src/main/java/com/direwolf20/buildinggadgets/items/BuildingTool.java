@@ -8,6 +8,7 @@ import com.direwolf20.buildinggadgets.tools.BuildingModes;
 import com.direwolf20.buildinggadgets.tools.InventoryManipulation;
 import com.direwolf20.buildinggadgets.tools.UndoState;
 import com.direwolf20.buildinggadgets.tools.VectorTools;
+import net.minecraft.block.BlockBush;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.resources.I18n;
@@ -15,6 +16,7 @@ import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
+import net.minecraft.init.Enchantments;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -304,12 +306,13 @@ public class BuildingTool extends Item {
         BlockPos pos = lookingAt.getBlockPos();
         IBlockState state = world.getBlockState(pos);
         TileEntity te = world.getTileEntity(pos);
-        if (te != null) {  //Currently not allowing tile entities.
+        if (te != null || (state.getBlock() instanceof BlockBush)) {  //Currently not allowing tile entities and plants.
             player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.invalidblock").getUnformattedComponentText()), true);
             return;
         }
         if (state != null) {
-            setToolBlock(stack, state);
+            IBlockState placeState = InventoryManipulation.getSpecificStates(state, world, player);
+            setToolBlock(stack, placeState);
         }
     }
 
@@ -396,7 +399,9 @@ public class BuildingTool extends Item {
         ItemStack heldItem = player.getHeldItemMainhand();
         if (!(heldItem.getItem() instanceof BuildingTool)) {
             heldItem = player.getHeldItemOffhand();
-            if (!(heldItem.getItem() instanceof BuildingTool)) {return false;}
+            if (!(heldItem.getItem() instanceof BuildingTool)) {
+                return false;
+            }
         }
         IBlockState blockState = getToolBlock(heldItem);
 
@@ -430,7 +435,9 @@ public class BuildingTool extends Item {
         ItemStack heldItem = player.getHeldItemMainhand();
         if (!(heldItem.getItem() instanceof BuildingTool)) {
             heldItem = player.getHeldItemOffhand();
-            if (!(heldItem.getItem() instanceof BuildingTool)) {return false;}
+            if (!(heldItem.getItem() instanceof BuildingTool)) {
+                return false;
+            }
         }
         UndoState undoState = popUndoList(heldItem); //Get the undo list off the tool, exit if empty
         if (undoState == null) {
@@ -443,6 +450,8 @@ public class BuildingTool extends Item {
             ArrayList<BlockPos> undoCoords = undoState.coordinates; //Get the Coords to undo
             int dimension = undoState.dimension; //Get the Dimension to undo
             ArrayList<BlockPos> failedRemovals = new ArrayList<BlockPos>(); //Build a list of removals that fail
+            ItemStack silkTool = heldItem.copy(); //Setup a Silk Touch version of the tool so we can return stone instead of cobblestone, etc.
+            silkTool.addEnchantment(Enchantments.SILK_TOUCH, 1);
             for (BlockPos coord : undoCoords) {
                 currentBlock = world.getBlockState(coord);
                 ItemStack itemStack = currentBlock.getBlock().getPickBlock(currentBlock, null, world, coord, player);
@@ -450,11 +459,8 @@ public class BuildingTool extends Item {
                 boolean sameDim = (player.dimension == dimension);
                 if (distance < 35 && sameDim && currentBlock != ModBlocks.effectBlock.getDefaultState()) { //Don't allow us to undo a block while its still being placed or too far away
                     if (currentBlock != Blocks.AIR.getDefaultState()) {
-                        if (InventoryManipulation.giveItem(itemStack, player)) { //Try to give the player an item, if inventory is full this fails
-                            world.spawnEntity(new BlockBuildEntity(world, coord, player, currentBlock, 2));
-                        } else { //If we failed to give the item, we want to put this back on the undo list, so start building a list
-                            failedRemovals.add(coord);
-                        }
+                        currentBlock.getBlock().harvestBlock(world, player, coord, currentBlock, world.getTileEntity(coord), silkTool);
+                        world.spawnEntity(new BlockBuildEntity(world, coord, player, currentBlock, 2));
                     }
                 } else { //If you're in the wrong dimension or too far away, fail the undo.
                     player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.undofailed").getUnformattedComponentText()), true);
@@ -473,7 +479,7 @@ public class BuildingTool extends Item {
         ItemStack itemStack;
         //ItemStack itemStack = setBlock.getBlock().getPickBlock(setBlock, null, world, pos, player);
         //ItemStack itemStack = InventoryManipulation.getSilkTouchDrop(setBlock);
-        if (setBlock.getBlock().canSilkHarvest(world,pos,setBlock,player)) {
+        if (setBlock.getBlock().canSilkHarvest(world, pos, setBlock, player)) {
             itemStack = InventoryManipulation.getSilkTouchDrop(setBlock);
         } else {
             itemStack = setBlock.getBlock().getPickBlock(setBlock, null, world, pos, player);
@@ -482,19 +488,25 @@ public class BuildingTool extends Item {
             return false;
         }
         NonNullList<ItemStack> drops = NonNullList.create();
-        setBlock.getBlock().getDrops(drops,world,pos,setBlock,0);
+        setBlock.getBlock().getDrops(drops, world, pos, setBlock, 0);
         int neededItems = 0;
         for (ItemStack drop : drops) {
             if (drop.getItem().equals(itemStack.getItem())) {
                 neededItems++;
             }
         }
-        if (neededItems == 0) {neededItems = 1;}
+        if (neededItems == 0) {
+            neededItems = 1;
+        }
         //if (!player.canPlayerEdit(pos,EnumFacing.UP,player.getHeldItemMainhand())) {return false;}
-        if (!world.isBlockModifiable(player,pos)) {return false;}
-        BlockSnapshot blockSnapshot = BlockSnapshot.getBlockSnapshot(world,pos);
-        if (ForgeEventFactory.onPlayerBlockPlace(player, blockSnapshot, EnumFacing.UP, EnumHand.MAIN_HAND).isCanceled()) {return false;}
-        if (InventoryManipulation.useItem(itemStack, player,neededItems)) {
+        if (!world.isBlockModifiable(player, pos)) {
+            return false;
+        }
+        BlockSnapshot blockSnapshot = BlockSnapshot.getBlockSnapshot(world, pos);
+        if (ForgeEventFactory.onPlayerBlockPlace(player, blockSnapshot, EnumFacing.UP, EnumHand.MAIN_HAND).isCanceled()) {
+            return false;
+        }
+        if (InventoryManipulation.useItem(itemStack, player, neededItems)) {
             world.spawnEntity(new BlockBuildEntity(world, pos, player, setBlock, 1));
             return true;
         }

@@ -17,12 +17,12 @@ public class BreakEventHandler {
         EntityPlayer player = event.getHarvester();
         if (player == null) {return;}
         ItemStack heldItem = player.getHeldItemMainhand();
-        if (!(heldItem.getItem() instanceof ExchangerTool)) {
+        if (!(heldItem.getItem() instanceof ExchangerTool) && !(heldItem.getItem() instanceof BuildingTool)) {
             heldItem = player.getHeldItemOffhand();
-            if (!(heldItem.getItem() instanceof ExchangerTool)) {return;}
+            if (!(heldItem.getItem() instanceof ExchangerTool) && !(heldItem.getItem() instanceof BuildingTool)) {return;}
         }
         List<ItemStack> drops = event.getDrops();
-        if (heldItem.getItem() instanceof ExchangerTool) {
+        if ((heldItem.getItem() instanceof ExchangerTool) || (heldItem.getItem() instanceof BuildingTool)) {
             drops.removeIf(item->InventoryManipulation.giveItem(item,player));
         }
 
