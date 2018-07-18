@@ -253,10 +253,8 @@ public class ExchangerTool extends Item {
             return;
         }
         if (state != null) {
-            if (state.getPropertyKeys().contains(BlockPistonBase.EXTENDED)) {
-                state = state.withProperty(BlockPistonBase.EXTENDED, false);
-            }
-            setToolBlock(stack, state);
+            IBlockState placeState = InventoryManipulation.getSpecificStates(state, world, player);
+            setToolBlock(stack, placeState);
         }
     }
 

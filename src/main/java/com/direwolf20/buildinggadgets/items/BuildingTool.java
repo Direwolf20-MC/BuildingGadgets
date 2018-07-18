@@ -9,6 +9,7 @@ import com.direwolf20.buildinggadgets.tools.InventoryManipulation;
 import com.direwolf20.buildinggadgets.tools.UndoState;
 import com.direwolf20.buildinggadgets.tools.VectorTools;
 import net.minecraft.block.BlockBush;
+import net.minecraft.block.BlockLog;
 import net.minecraft.block.BlockPistonBase;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
@@ -311,11 +312,8 @@ public class BuildingTool extends Item {
             return;
         }
         if (state != null) {
-            if (state.getPropertyKeys().contains(BlockPistonBase.EXTENDED)) {
-                state = state.withProperty(BlockPistonBase.EXTENDED, false);
-            }
-            setToolBlock(stack, state);
-            System.out.println(state.getPropertyKeys());
+            IBlockState placeState = InventoryManipulation.getSpecificStates(state, world, player);
+            setToolBlock(stack, placeState);
         }
     }
 
