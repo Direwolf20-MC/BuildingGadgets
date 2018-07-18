@@ -16,6 +16,7 @@ import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
+import net.minecraft.init.Enchantments;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -444,6 +445,8 @@ public class BuildingTool extends Item {
             ArrayList<BlockPos> undoCoords = undoState.coordinates; //Get the Coords to undo
             int dimension = undoState.dimension; //Get the Dimension to undo
             ArrayList<BlockPos> failedRemovals = new ArrayList<BlockPos>(); //Build a list of removals that fail
+            ItemStack silkTool = heldItem.copy(); //Setup a Silk Touch version of the tool so we can return stone instead of cobblestone, etc.
+            silkTool.addEnchantment(Enchantments.SILK_TOUCH, 1);
             for (BlockPos coord : undoCoords) {
                 currentBlock = world.getBlockState(coord);
                 ItemStack itemStack = currentBlock.getBlock().getPickBlock(currentBlock, null, world, coord, player);
@@ -451,7 +454,7 @@ public class BuildingTool extends Item {
                 boolean sameDim = (player.dimension == dimension);
                 if (distance < 35 && sameDim && currentBlock != ModBlocks.effectBlock.getDefaultState()) { //Don't allow us to undo a block while its still being placed or too far away
                     if (currentBlock != Blocks.AIR.getDefaultState()) {
-                        currentBlock.getBlock().harvestBlock(world, player, coord, currentBlock, world.getTileEntity(coord), heldItem);
+                        currentBlock.getBlock().harvestBlock(world, player, coord, currentBlock, world.getTileEntity(coord), silkTool);
                         world.spawnEntity(new BlockBuildEntity(world, coord, player, currentBlock, 2));
                     }
                 } else { //If you're in the wrong dimension or too far away, fail the undo.
