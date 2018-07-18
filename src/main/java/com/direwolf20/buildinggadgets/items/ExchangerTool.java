@@ -6,7 +6,8 @@ import com.direwolf20.buildinggadgets.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.tools.ExchangingModes;
 import com.direwolf20.buildinggadgets.tools.InventoryManipulation;
 import com.direwolf20.buildinggadgets.tools.VectorTools;
-import net.minecraft.block.Block;
+import net.minecraft.block.BlockBush;
+import net.minecraft.block.BlockPistonBase;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.resources.I18n;
@@ -47,6 +48,7 @@ public class ExchangerTool extends Item {
     public enum toolModes {
         Wall, VerticalColumn, HorizontalColumn;
         private static ExchangerTool.toolModes[] vals = values();
+
         public ExchangerTool.toolModes next() {
             return vals[(this.ordinal() + 1) % vals.length];
         }
@@ -246,11 +248,14 @@ public class ExchangerTool extends Item {
         BlockPos pos = lookingAt.getBlockPos();
         IBlockState state = world.getBlockState(pos);
         TileEntity te = world.getTileEntity(pos);
-        if (te != null) {
+        if (te != null || (state.getBlock() instanceof BlockBush)) {
             player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.invalidblock").getUnformattedComponentText()), true);
             return;
         }
         if (state != null) {
+            if (state.getPropertyKeys().contains(BlockPistonBase.EXTENDED)) {
+                state = state.withProperty(BlockPistonBase.EXTENDED, false);
+            }
             setToolBlock(stack, state);
         }
     }
@@ -330,7 +335,9 @@ public class ExchangerTool extends Item {
         ItemStack heldItem = player.getHeldItemMainhand();
         if (!(heldItem.getItem() instanceof ExchangerTool)) {
             heldItem = player.getHeldItemOffhand();
-            if (!(heldItem.getItem() instanceof ExchangerTool)) {return false;}
+            if (!(heldItem.getItem() instanceof ExchangerTool)) {
+                return false;
+            }
         }
         IBlockState blockState = getToolBlock(heldItem);
 
@@ -357,7 +364,7 @@ public class ExchangerTool extends Item {
         IBlockState currentBlock = world.getBlockState(pos);
         ItemStack itemStack;
         //ItemStack itemStack = setBlock.getBlock().getPickBlock(setBlock, null, world, pos, player);
-        if (setBlock.getBlock().canSilkHarvest(world,pos,setBlock,player)) {
+        if (setBlock.getBlock().canSilkHarvest(world, pos, setBlock, player)) {
             itemStack = InventoryManipulation.getSilkTouchDrop(setBlock);
         } else {
             itemStack = setBlock.getBlock().getPickBlock(setBlock, null, world, pos, player);
@@ -365,17 +372,21 @@ public class ExchangerTool extends Item {
         ItemStack tool = player.getHeldItemMainhand();
         if (!(tool.getItem() instanceof ExchangerTool)) {
             tool = player.getHeldItemOffhand();
-            if (!(tool.getItem() instanceof ExchangerTool)) {return false;}
+            if (!(tool.getItem() instanceof ExchangerTool)) {
+                return false;
+            }
         }
         NonNullList<ItemStack> drops = NonNullList.create();
-        setBlock.getBlock().getDrops(drops,world,pos,setBlock,0);
+        setBlock.getBlock().getDrops(drops, world, pos, setBlock, 0);
         int neededItems = 0;
         for (ItemStack drop : drops) {
             if (drop.getItem().equals(itemStack.getItem())) {
                 neededItems++;
             }
         }
-        if (neededItems == 0) {neededItems = 1;}
+        if (neededItems == 0) {
+            neededItems = 1;
+        }
         if (InventoryManipulation.countItem(itemStack, player) < neededItems) {
             return false;
         }
@@ -383,12 +394,16 @@ public class ExchangerTool extends Item {
             return false;
         }
         //if (!player.canPlayerEdit(pos,EnumFacing.UP,tool)) {return false;}
-        if (!world.isBlockModifiable(player,pos)) {return false;}
-        BlockSnapshot blockSnapshot = BlockSnapshot.getBlockSnapshot(world,pos);
-        if (ForgeEventFactory.onPlayerBlockPlace(player, blockSnapshot, EnumFacing.UP, EnumHand.MAIN_HAND).isCanceled()) {return false;}
+        if (!world.isBlockModifiable(player, pos)) {
+            return false;
+        }
+        BlockSnapshot blockSnapshot = BlockSnapshot.getBlockSnapshot(world, pos);
+        if (ForgeEventFactory.onPlayerBlockPlace(player, blockSnapshot, EnumFacing.UP, EnumHand.MAIN_HAND).isCanceled()) {
+            return false;
+        }
         currentBlock.getBlock().harvestBlock(world, player, pos, currentBlock, world.getTileEntity(pos), tool);
 
-        InventoryManipulation.useItem(itemStack, player,neededItems);
+        InventoryManipulation.useItem(itemStack, player, neededItems);
         world.spawnEntity(new BlockBuildEntity(world, pos, player, setBlock, 3));
         return true;
     }
