@@ -1,6 +1,5 @@
 package com.direwolf20.buildinggadgets.tools;
 
-import com.google.common.collect.ImmutableMap;
 import net.minecraft.block.*;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.IBlockState;
@@ -13,10 +12,8 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import scala.actors.threadpool.Arrays;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -95,7 +92,7 @@ public class InventoryManipulation {
     public static IBlockState getSpecificStates(IBlockState originalState, World world, EntityPlayer player) {
         IBlockState placeState = Blocks.AIR.getDefaultState();
         try {
-            placeState = originalState.getBlock().getStateForPlacement(world, new BlockPos(0,0,0),EnumFacing.UP, 0,0,0,originalState.getBlock().getMetaFromState(originalState),player,EnumHand.MAIN_HAND);
+            placeState = originalState.getBlock().getStateForPlacement(world, new BlockPos(0, 0, 0), EnumFacing.UP, 0, 0, 0, originalState.getBlock().getMetaFromState(originalState), player, EnumHand.MAIN_HAND);
         } catch (Exception var8) {
             placeState = originalState.getBlock().getDefaultState();
         }
