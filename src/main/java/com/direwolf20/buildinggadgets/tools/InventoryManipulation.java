@@ -89,10 +89,13 @@ public class InventoryManipulation {
         return new ItemStack(item, 1, i);
     }
 
-    public static IBlockState getSpecificStates(IBlockState originalState, World world, EntityPlayer player) {
+    public static IBlockState getSpecificStates(IBlockState originalState, World world, EntityPlayer player, BlockPos pos) {
         IBlockState placeState = Blocks.AIR.getDefaultState();
+        Block block = originalState.getBlock();
+        ItemStack item = block.getPickBlock(originalState, null, world, pos, player);
+        int meta = item.getMetadata();
         try {
-            placeState = originalState.getBlock().getStateForPlacement(world, new BlockPos(0, 0, 0), EnumFacing.UP, 0, 0, 0, originalState.getBlock().getMetaFromState(originalState), player, EnumHand.MAIN_HAND);
+            placeState = originalState.getBlock().getStateForPlacement(world, pos, EnumFacing.UP, 0, 0, 0, meta, player, EnumHand.MAIN_HAND);
         } catch (Exception var8) {
             placeState = originalState.getBlock().getDefaultState();
         }

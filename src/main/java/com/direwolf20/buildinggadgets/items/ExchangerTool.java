@@ -247,12 +247,12 @@ public class ExchangerTool extends Item {
         BlockPos pos = lookingAt.getBlockPos();
         IBlockState state = world.getBlockState(pos);
         TileEntity te = world.getTileEntity(pos);
-        if (te != null || (state.getBlock() instanceof BlockBush)) {
+        if (te != null) {
             player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.invalidblock").getUnformattedComponentText()), true);
             return;
         }
         if (state != null) {
-            IBlockState placeState = InventoryManipulation.getSpecificStates(state, world, player);
+            IBlockState placeState = InventoryManipulation.getSpecificStates(state, world, player, pos);
             setToolBlock(stack, placeState);
         }
     }
