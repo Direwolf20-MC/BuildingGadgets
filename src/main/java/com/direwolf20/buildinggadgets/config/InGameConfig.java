@@ -25,8 +25,8 @@ import java.util.Map;
 @Mod.EventBusSubscriber
 public class InGameConfig {
     private static final String KEY_NAME = "NAME";
-    static final String KEY_VALUE = "VAL";
-    static final String KEY_TYPE = "ID";
+    private static final String KEY_VALUE = "VAL";
+    /*
     @SyncedConfig
     public static boolean     bool = false;
     @SyncedConfig
@@ -62,7 +62,7 @@ public class InGameConfig {
     @SyncedConfig
     public static String      Str = "STRING!";
     @SyncedConfig
-    public static String[]    StrA = {"STR", "ING!"};
+    public static String[]    StrA = {"STR", "ING!"};*/
 
     @SyncedConfig
     public static double rayTraceRange;
