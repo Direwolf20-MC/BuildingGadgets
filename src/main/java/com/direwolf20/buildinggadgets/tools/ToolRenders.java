@@ -168,7 +168,7 @@ public class ToolRenders {
                     return;
                 }
                 if (coordinates.size() == 0) { //Build a list of coordinates based on the tool mode and range
-                    coordinates = ExchangingModes.getBuildOrders(world, player, lookingAt.getBlockPos(), lookingAt.sideHit, range, mode, renderBlockState);
+                    coordinates = ExchangingModes.getBuildOrders(world, player, lookingAt.getBlockPos(), lookingAt.sideHit, range, mode, renderBlockState, ExchangerTool.getFuzzy(stack));
                 }
 
                 //Figure out how many of the block we're rendering we have in the inventory of the player.

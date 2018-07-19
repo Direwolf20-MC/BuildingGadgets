@@ -42,6 +42,10 @@ public class PacketUndoKey implements IMessage {
                 BuildingTool buildingTool = (BuildingTool) (heldItem.getItem());
                 buildingTool.undoBuild(playerEntity);
             }
+            if (!heldItem.isEmpty() && heldItem.getItem() instanceof ExchangerTool) {
+                ExchangerTool exchangerTool = (ExchangerTool) (heldItem.getItem());
+                exchangerTool.toggleFuzzy(playerEntity, heldItem);
+            }
         }
     }
 }

@@ -110,8 +110,27 @@ public class ExchangerTool extends Item {
             NBTTagList coords = new NBTTagList();
             tagCompound.setTag("anchorcoords", coords);
         }
+        if (tagCompound.getTag("fuzzy") == null) {
+            tagCompound.setBoolean("fuzzy", false);
+        }
         stack.setTagCompound(tagCompound);
         return tagCompound;
+    }
+
+    public static void setFuzzy(ItemStack stack, boolean fuzzy) {
+        NBTTagCompound tagCompound = stack.getTagCompound();
+        if (tagCompound == null) {
+            tagCompound = initToolTag(stack);
+        }
+        tagCompound.setBoolean("fuzzy", fuzzy);
+    }
+
+    public static boolean getFuzzy(ItemStack stack) {
+        NBTTagCompound tagCompound = stack.getTagCompound();
+        if (tagCompound == null) {
+            tagCompound = initToolTag(stack);
+        }
+        return tagCompound.getBoolean("fuzzy");
     }
 
     public static void setAnchor(ItemStack stack, ArrayList<BlockPos> coordinates) {
@@ -263,6 +282,11 @@ public class ExchangerTool extends Item {
         player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.toolmode").getUnformattedComponentText() + ": " + mode.name()), true);
     }
 
+    public void toggleFuzzy(EntityPlayer player, ItemStack heldItem) {
+        setFuzzy(heldItem, !(getFuzzy(heldItem)));
+        player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.fuzzymode").getUnformattedComponentText() + ": " + getFuzzy(heldItem)), true);
+    }
+
     public void rangeChange(EntityPlayer player, ItemStack heldItem) {
         int range = getToolRange(heldItem);
         int changeAmount = getToolMode(heldItem) == toolModes.Checkerboard ? 1 : 2;
@@ -301,7 +325,7 @@ public class ExchangerTool extends Item {
             if (startBlock == null || world.getBlockState(startBlock) == Blocks.AIR.getDefaultState()) { //If we are looking at air, exit
                 return false;
             }
-            ArrayList<BlockPos> coords = ExchangingModes.getBuildOrders(world, player, startBlock, sideHit, range, mode, setBlock); //Build the positions list based on tool mode and range
+            ArrayList<BlockPos> coords = ExchangingModes.getBuildOrders(world, player, startBlock, sideHit, range, mode, setBlock, getFuzzy(stack)); //Build the positions list based on tool mode and range
             setAnchor(stack, coords);//Set the anchor NBT
             player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.anchorrender").getUnformattedComponentText()), true);
         } else { //If theres already an anchor, remove it.
@@ -325,7 +349,7 @@ public class ExchangerTool extends Item {
             BlockPos startBlock = lookingAt.getBlockPos();
             EnumFacing sideHit = lookingAt.sideHit;
             IBlockState setBlock = getToolBlock(stack);
-            coords = ExchangingModes.getBuildOrders(world, player, startBlock, sideHit, range, mode, setBlock);
+            coords = ExchangingModes.getBuildOrders(world, player, startBlock, sideHit, range, mode, setBlock, getFuzzy(stack));
         } else { //If we do have an anchor, erase it (Even if the build fails)
             setAnchor(stack, new ArrayList<BlockPos>());
         }
