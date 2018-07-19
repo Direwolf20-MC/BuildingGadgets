@@ -14,9 +14,6 @@ import java.util.ArrayList;
 public class ExchangingModes {
     private static boolean isReplaceable(World world, BlockPos pos, IBlockState currentBlock, IBlockState setBlock, EntityPlayer player) {
         IBlockState worldBlockState = world.getBlockState(pos);
-        ItemStack worldBlockItem = worldBlockState.getBlock().getPickBlock(worldBlockState,null,world,pos,player);
-        ItemStack currentBlockItem = currentBlock.getBlock().getPickBlock(currentBlock,null,world,pos,player);
-        ItemStack setBlockItem = setBlock.getBlock().getPickBlock(setBlock,null,world,pos,player);
         if (worldBlockState != currentBlock) {return false;}
         if (worldBlockState == ModBlocks.effectBlock.getDefaultState()) {return false;}
         if (worldBlockState == setBlock)  {return false;}
