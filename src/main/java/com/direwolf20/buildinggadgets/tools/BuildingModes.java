@@ -293,6 +293,21 @@ public class BuildingModes {
                 }
             }
         }
+        //***************************************************
+        //TorchPlacer
+        //***************************************************
+        else if (mode == BuildingTool.toolModes.TorchPlacer) {
+            for (int x = range*-7/5; x<=range*7/5;x++) {
+                for (int z = range*-7/5; z<=range*7/5;z++) {
+                    if (x % 7 == 0 && z % 7 == 0) {
+                        pos = new BlockPos(startBlock.getX() + x, startBlock.getY()+1, startBlock.getZ()+z);
+                        if (isReplaceable(world, pos, setBlock)) {
+                            coordinates.add(pos);
+                        }
+                    }
+                }
+            }
+        }
         return coordinates;
     }
 

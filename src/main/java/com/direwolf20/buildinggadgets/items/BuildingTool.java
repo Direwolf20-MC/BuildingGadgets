@@ -47,7 +47,7 @@ public class BuildingTool extends Item {
     private static final FakeBuilderWorld fakeWorld = new FakeBuilderWorld();
 
     public enum toolModes {
-        BuildToMe, VerticalColumn, HorizontalColumn, VerticalWall, HorizontalWall, Stairs;
+        BuildToMe, VerticalColumn, HorizontalColumn, VerticalWall, HorizontalWall, Stairs, TorchPlacer;
         private static toolModes[] vals = values();
 
         public toolModes next() {
@@ -452,7 +452,7 @@ public class BuildingTool extends Item {
                 ItemStack itemStack = currentBlock.getBlock().getPickBlock(currentBlock, null, world, coord, player);
                 double distance = coord.getDistance(player.getPosition().getX(), player.getPosition().getY(), player.getPosition().getZ());
                 boolean sameDim = (player.dimension == dimension);
-                if (distance < 35 && sameDim && currentBlock != ModBlocks.effectBlock.getDefaultState()) { //Don't allow us to undo a block while its still being placed or too far away
+                if (distance < 64 && sameDim && currentBlock != ModBlocks.effectBlock.getDefaultState()) { //Don't allow us to undo a block while its still being placed or too far away
                     if (currentBlock != Blocks.AIR.getDefaultState()) {
                         currentBlock.getBlock().harvestBlock(world, player, coord, currentBlock, world.getTileEntity(coord), silkTool);
                         world.spawnEntity(new BlockBuildEntity(world, coord, player, currentBlock, 2));
