@@ -6,7 +6,6 @@ import com.direwolf20.buildinggadgets.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.tools.ExchangingModes;
 import com.direwolf20.buildinggadgets.tools.InventoryManipulation;
 import com.direwolf20.buildinggadgets.tools.VectorTools;
-import net.minecraft.block.BlockBush;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.resources.I18n;
@@ -45,7 +44,7 @@ public class ExchangerTool extends Item {
     private static final FakeBuilderWorld fakeWorld = new FakeBuilderWorld();
 
     public enum toolModes {
-        Wall, VerticalColumn, HorizontalColumn;
+        Wall, VerticalColumn, HorizontalColumn, Checkerboard;
         private static ExchangerTool.toolModes[] vals = values();
 
         public ExchangerTool.toolModes next() {

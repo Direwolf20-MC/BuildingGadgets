@@ -8,7 +8,6 @@ import com.direwolf20.buildinggadgets.tools.BuildingModes;
 import com.direwolf20.buildinggadgets.tools.InventoryManipulation;
 import com.direwolf20.buildinggadgets.tools.UndoState;
 import com.direwolf20.buildinggadgets.tools.VectorTools;
-import net.minecraft.block.BlockBush;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.resources.I18n;
@@ -47,7 +46,7 @@ public class BuildingTool extends Item {
     private static final FakeBuilderWorld fakeWorld = new FakeBuilderWorld();
 
     public enum toolModes {
-        BuildToMe, VerticalColumn, HorizontalColumn, VerticalWall, HorizontalWall, Stairs, TorchPlacer;
+        BuildToMe, VerticalColumn, HorizontalColumn, VerticalWall, HorizontalWall, Stairs, Checkerboard;
         private static toolModes[] vals = values();
 
         public toolModes next() {
@@ -230,8 +229,13 @@ public class BuildingTool extends Item {
         if (tagCompound == null) {
             tagCompound = initToolTag(stack);
         }
-
-        return toolModes.valueOf(tagCompound.getString("mode"));
+        toolModes mode = toolModes.BuildToMe;
+        try {
+             mode = toolModes.valueOf(tagCompound.getString("mode"));
+        } catch (Exception e) {
+            setToolMode(stack, mode);
+        }
+        return mode;
     }
 
     public static int getToolRange(ItemStack stack) {
