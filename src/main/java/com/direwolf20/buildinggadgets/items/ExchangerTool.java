@@ -265,17 +265,19 @@ public class ExchangerTool extends Item {
 
     public void rangeChange(EntityPlayer player, ItemStack heldItem) {
         int range = getToolRange(heldItem);
+        int changeAmount = getToolMode(heldItem) == toolModes.Checkerboard ? 1 : 2;
         if (player.isSneaking()) {
             if (range <= 1) {
                 range = Config.maxRange;
             } else {
-                range = range - 2;
+
+                range = range - changeAmount;
             }
         } else {
             if (range >= Config.maxRange) {
                 range = 1;
             } else {
-                range = range + 2;
+                range = range + changeAmount;
             }
         }
         setToolRange(heldItem, range);
