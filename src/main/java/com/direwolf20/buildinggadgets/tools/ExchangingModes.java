@@ -4,6 +4,7 @@ import com.direwolf20.buildinggadgets.ModBlocks;
 import com.direwolf20.buildinggadgets.items.ExchangerTool;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -12,18 +13,18 @@ import java.util.ArrayList;
 
 public class ExchangingModes {
     private static boolean isReplaceable(World world, BlockPos pos, IBlockState currentBlock, IBlockState setBlock, EntityPlayer player) {
-        /*IBlockState worldBlockState = world.getBlockState(pos);
+        IBlockState worldBlockState = world.getBlockState(pos);
         ItemStack worldBlockItem = worldBlockState.getBlock().getPickBlock(worldBlockState,null,world,pos,player);
         ItemStack currentBlockItem = currentBlock.getBlock().getPickBlock(currentBlock,null,world,pos,player);
         ItemStack setBlockItem = setBlock.getBlock().getPickBlock(setBlock,null,world,pos,player);
-        if (!worldBlockItem.isItemEqual(currentBlockItem)) {return false;}
-        if (world.getBlockState(pos) == ModBlocks.effectBlock.getDefaultState()) {return false;}
-        if (worldBlockItem.isItemEqual(setBlockItem))  {return false;}
+        if (worldBlockState != currentBlock) {return false;}
+        if (worldBlockState == ModBlocks.effectBlock.getDefaultState()) {return false;}
+        if (worldBlockState == setBlock)  {return false;}
         if (world.getTileEntity(pos) != null) {return false;}
-        if (currentBlock.getBlock().getBlockHardness(currentBlock, world, pos) < 0) {return false;}*/
-        if (world.getBlockState(pos) != currentBlock || world.getBlockState(pos) == ModBlocks.effectBlock.getDefaultState() || world.getBlockState(pos) == setBlock || world.getTileEntity(pos) != null || currentBlock.getBlock().getBlockHardness(currentBlock, world, pos) < 0) {
+        if (currentBlock.getBlock().getBlockHardness(currentBlock, world, pos) < 0) {return false;}
+        /*if (world.getBlockState(pos) != currentBlock || world.getBlockState(pos) == ModBlocks.effectBlock.getDefaultState() || world.getBlockState(pos) == setBlock || world.getTileEntity(pos) != null || currentBlock.getBlock().getBlockHardness(currentBlock, world, pos) < 0) {
             return false;
-        }
+        }*/
         return true;
     }
 
