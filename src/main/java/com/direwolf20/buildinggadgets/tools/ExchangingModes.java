@@ -25,14 +25,14 @@ public class ExchangingModes {
         return true;
     }
 
-    public static ArrayList<BlockPos> getBuildOrders(World world, EntityPlayer player, BlockPos startBlock, EnumFacing sideHit, int range, ExchangerTool.toolModes mode, IBlockState setBlock, boolean fuzzyMode) {
+    public static ArrayList<BlockPos> getBuildOrders(World world, EntityPlayer player, BlockPos startBlock, EnumFacing sideHit, int range, ExchangerTool.Mode mode, IBlockState setBlock, boolean fuzzyMode) {
 
         ArrayList<BlockPos> coordinates = new ArrayList<BlockPos>();
         BlockPos playerPos = new BlockPos(Math.floor(player.posX), Math.floor(player.posY), Math.floor(player.posZ));
         BlockPos pos = startBlock;
         int bound = (range - 1) / 2;
         EnumFacing playerFacing = player.getHorizontalFacing();
-        int boundX, boundZ, boundXS, boundZS;
+        int boundX, boundZ;
         if (playerFacing == EnumFacing.SOUTH || playerFacing == EnumFacing.NORTH) {
             boundX = bound;
             boundZ = 0;
@@ -40,47 +40,30 @@ public class ExchangingModes {
             boundX = 0;
             boundZ = bound;
         }
-        if (sideHit == EnumFacing.SOUTH || sideHit == EnumFacing.NORTH) {
-            boundXS = bound;
-            boundZS = 0;
-        } else {
-            boundXS = 0;
-            boundZS = bound;
-        }
 
         IBlockState currentBlock = world.getBlockState(startBlock);
 
         //***************************************************
         //VerticalWall
         //***************************************************
-        if (mode == ExchangerTool.toolModes.Wall) {
-            if (sideHit == EnumFacing.UP || sideHit == EnumFacing.DOWN) {
-                for (int x = bound * -1; x <= bound; x++) {
-                    for (int z = bound * -1; z <= bound; z++) {
-                        pos = new BlockPos(startBlock.getX() - x, startBlock.getY(), startBlock.getZ() + z);
-                        if (isReplaceable(world, pos, currentBlock, setBlock, player, fuzzyMode)) {
-                            coordinates.add(pos);
-                        }
-                    }
-                }
-            } else {
-                for (int y = bound; y >= bound * -1; y--) {
-                    for (int x = boundXS * -1; x <= boundXS; x++) {
-                        for (int z = boundZS * -1; z <= boundZS; z++) {
-                            pos = new BlockPos(startBlock.getX() + x, startBlock.getY() - y, startBlock.getZ() + z);
-                            //System.out.println(pos);
-                            if (isReplaceable(world, pos, currentBlock, setBlock, player, fuzzyMode)) {
-                                coordinates.add(pos);
-                            }
-                        }
-                    }
+        if (mode == ExchangerTool.Mode.WALL) {
+            EnumFacing growFrom = 
+                sideHit == EnumFacing.UP || sideHit == EnumFacing.DOWN ? EnumFacing.SOUTH : EnumFacing.DOWN;
+            EnumFacing side = growFrom == EnumFacing.SOUTH ? EnumFacing.EAST : sideHit.rotateY();
+
+            for(int y = -bound; y <= bound; y++) {
+                for(int x = -bound; x <= bound; x++) {
+                    BlockPos p = startBlock.offset(growFrom, y).offset(side, x);
+
+                    if (isReplaceable(world, p, currentBlock, setBlock, player, fuzzyMode))
+                        coordinates.add(p);
                 }
             }
         }
         //***************************************************
         //VerticalColumn
         //***************************************************
-        if (mode == ExchangerTool.toolModes.VerticalColumn) {
+        if (mode == ExchangerTool.Mode.VERTICAL_COLUMN) {
             if (sideHit == EnumFacing.UP || sideHit == EnumFacing.DOWN) {
                 for (int x = boundZ * -1; x <= boundZ; x++) {
                     for (int z = boundX * -1; z <= boundX; z++) {
@@ -102,7 +85,7 @@ public class ExchangingModes {
         //***************************************************
         //HorizontalColumn
         //***************************************************
-        if (mode == ExchangerTool.toolModes.HorizontalColumn) {
+        if (mode == ExchangerTool.Mode.HORIZONTAL_COLUMN) {
             if (sideHit == EnumFacing.UP || sideHit == EnumFacing.DOWN) {
                 for (int x = boundX * -1; x <= boundX; x++) {
                     for (int z = boundZ * -1; z <= boundZ; z++) {
@@ -131,7 +114,7 @@ public class ExchangingModes {
         //***************************************************
         //TorchPlacer
         //***************************************************
-        else if (mode == ExchangerTool.toolModes.Checkerboard) {
+        else if (mode == ExchangerTool.Mode.CHECKERBOARD) {
             range++;
             for (int x = range * -7 / 5; x <= range * 7 / 5; x++) {
                 for (int z = range * -7 / 5; z <= range * 7 / 5; z++) {

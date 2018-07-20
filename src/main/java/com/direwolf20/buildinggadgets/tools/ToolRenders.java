@@ -37,7 +37,7 @@ public class ToolRenders {
 
     public static void renderBuilderOverlay(RenderWorldLastEvent evt, EntityPlayer player, ItemStack stack) {
         int range = BuildingTool.getToolRange(stack);
-        BuildingTool.toolModes mode = BuildingTool.getToolMode(stack);
+        BuildingTool.Mode mode = BuildingTool.getToolMode(stack);
         RayTraceResult lookingAt = VectorTools.getLookingAt(player);
         IBlockState state = Blocks.AIR.getDefaultState();
         ArrayList<BlockPos> coordinates = BuildingTool.getAnchor(stack);
@@ -145,7 +145,7 @@ public class ToolRenders {
 
     public static void renderExchangerOverlay(RenderWorldLastEvent evt, EntityPlayer player, ItemStack stack) {
         int range = ExchangerTool.getToolRange(stack);
-        ExchangerTool.toolModes mode = ExchangerTool.getToolMode(stack);
+        ExchangerTool.Mode mode = ExchangerTool.getToolMode(stack);
         RayTraceResult lookingAt = VectorTools.getLookingAt(player);
         IBlockState state = Blocks.AIR.getDefaultState();
         ArrayList<BlockPos> coordinates = ExchangerTool.getAnchor(stack);

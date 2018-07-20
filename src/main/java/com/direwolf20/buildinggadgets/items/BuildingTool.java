@@ -8,6 +8,8 @@ import com.direwolf20.buildinggadgets.tools.BuildingModes;
 import com.direwolf20.buildinggadgets.tools.InventoryManipulation;
 import com.direwolf20.buildinggadgets.tools.UndoState;
 import com.direwolf20.buildinggadgets.tools.VectorTools;
+import com.google.common.base.CaseFormat;
+
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.resources.I18n;
@@ -45,12 +47,16 @@ import java.util.Set;
 public class BuildingTool extends Item {
     private static final FakeBuilderWorld fakeWorld = new FakeBuilderWorld();
 
-    public enum toolModes {
-        BuildToMe, VerticalColumn, HorizontalColumn, VerticalWall, HorizontalWall, Stairs, Checkerboard;
-        private static toolModes[] vals = values();
+    public enum Mode {
+        BUILD_TO_ME, VERTICAL_COLUMN, HORIZONTAL_COLUMN, VERTICAL_WALL, HORIZONTAL_WALL, STAIRS, CHECKERBOARD;
+        private static Mode[] vals = values();
 
-        public toolModes next() {
+        public Mode next() {
             return vals[(this.ordinal() + 1) % vals.length];
+        }
+        
+        public String camelName() {
+            return CaseFormat.UPPER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, name());
         }
     }
 
@@ -73,7 +79,7 @@ public class BuildingTool extends Item {
             tagCompound = new NBTTagCompound();
         }
         if (tagCompound.getTag("mode") == null) {
-            tagCompound.setString("mode", toolModes.BuildToMe.name());
+            tagCompound.setString("mode", Mode.BUILD_TO_ME.name());
         }
         if (tagCompound.getTag("range") == null) {
             tagCompound.setInteger("range", 1);
@@ -192,7 +198,7 @@ public class BuildingTool extends Item {
         return coordinates;
     }
 
-    public static void setToolMode(ItemStack stack, toolModes mode) {
+    public static void setToolMode(ItemStack stack, Mode mode) {
         //Store the tool's mode in NBT as a string
         NBTTagCompound tagCompound = stack.getTagCompound();
         if (tagCompound == null) {
@@ -224,14 +230,14 @@ public class BuildingTool extends Item {
         tagCompound.setTag("blockstate", stateTag);
     }
 
-    public static toolModes getToolMode(ItemStack stack) {
+    public static Mode getToolMode(ItemStack stack) {
         NBTTagCompound tagCompound = stack.getTagCompound();
         if (tagCompound == null) {
             tagCompound = initToolTag(stack);
         }
-        toolModes mode = toolModes.BuildToMe;
+        Mode mode = Mode.BUILD_TO_ME;
         try {
-             mode = toolModes.valueOf(tagCompound.getString("mode"));
+             mode = Mode.valueOf(tagCompound.getString("mode"));
         } catch (Exception e) {
             setToolMode(stack, mode);
         }
@@ -260,8 +266,8 @@ public class BuildingTool extends Item {
         //Add tool information to the tooltip
         super.addInformation(stack, player, list, b);
         list.add(TextFormatting.DARK_GREEN + I18n.format("tooltip.gadget.block") + ": " + getToolBlock(stack).getBlock().getLocalizedName());
-        list.add(TextFormatting.AQUA + I18n.format("tooltip.gadget.mode") + ": " + getToolMode(stack));
-        if (getToolMode(stack) != toolModes.BuildToMe) {
+        list.add(TextFormatting.AQUA + I18n.format("tooltip.gadget.mode") + ": " + I18n.format("buildingtool.mode." + getToolMode(stack).camelName()));
+        if (getToolMode(stack) != Mode.BUILD_TO_ME) {
             list.add(TextFormatting.RED + I18n.format("tooltip.gadget.range") + ": " + getToolRange(stack));
         }
     }
@@ -322,10 +328,10 @@ public class BuildingTool extends Item {
 
     public void toggleMode(EntityPlayer player, ItemStack heldItem) {
         //Called when the mode toggle hotkey is pressed
-        toolModes mode = getToolMode(heldItem);
+        Mode mode = getToolMode(heldItem);
         mode = mode.next();
         setToolMode(heldItem, mode);
-        player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.toolmode").getUnformattedComponentText() + ": " + mode.name()), true);
+        player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.toolmode").getUnformattedComponentText() + ": " + I18n.format("buildingtool.mode." + mode.camelName())), true);
     }
 
     public void rangeChange(EntityPlayer player, ItemStack heldItem) {
@@ -352,7 +358,7 @@ public class BuildingTool extends Item {
         //Stores the current visual blocks in NBT on the tool, so the player can look around without moving the visual render
         World world = player.world;
         int range = getToolRange(stack);
-        toolModes mode = getToolMode(stack);
+        Mode mode = getToolMode(stack);
         ArrayList<BlockPos> currentCoords = getAnchor(stack);
 
         if (currentCoords.size() == 0) {  //If we don't have an anchor, find the block we're supposed to anchor to
@@ -379,7 +385,7 @@ public class BuildingTool extends Item {
         //Build the blocks as shown in the visual render
         World world = player.world;
         int range = getToolRange(stack);
-        toolModes mode = getToolMode(stack);
+        Mode mode = getToolMode(stack);
         ArrayList<BlockPos> coords = getAnchor(stack);
 
         if (coords.size() == 0) {  //If we don't have an anchor, build in the current spot

@@ -6,6 +6,8 @@ import com.direwolf20.buildinggadgets.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.tools.ExchangingModes;
 import com.direwolf20.buildinggadgets.tools.InventoryManipulation;
 import com.direwolf20.buildinggadgets.tools.VectorTools;
+import com.google.common.base.CaseFormat;
+
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.resources.I18n;
@@ -43,12 +45,16 @@ import java.util.Set;
 public class ExchangerTool extends Item {
     private static final FakeBuilderWorld fakeWorld = new FakeBuilderWorld();
 
-    public enum toolModes {
-        Wall, VerticalColumn, HorizontalColumn, Checkerboard;
-        private static ExchangerTool.toolModes[] vals = values();
+    public enum Mode {
+        WALL, VERTICAL_COLUMN, HORIZONTAL_COLUMN, CHECKERBOARD;
+        private static ExchangerTool.Mode[] vals = values();
 
-        public ExchangerTool.toolModes next() {
+        public ExchangerTool.Mode next() {
             return vals[(this.ordinal() + 1) % vals.length];
+        }
+
+        public String camelName() {
+            return CaseFormat.UPPER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, name());
         }
     }
 
@@ -96,7 +102,7 @@ public class ExchangerTool extends Item {
             tagCompound = new NBTTagCompound();
         }
         if (tagCompound.getTag("mode") == null) {
-            tagCompound.setString("mode", ExchangerTool.toolModes.Wall.name());
+            tagCompound.setString("mode", ExchangerTool.Mode.WALL.name());
         }
         if (tagCompound.getTag("range") == null) {
             tagCompound.setInteger("range", 1);
@@ -162,7 +168,7 @@ public class ExchangerTool extends Item {
         return coordinates;
     }
 
-    public static void setToolMode(ItemStack stack, ExchangerTool.toolModes mode) {
+    public static void setToolMode(ItemStack stack, ExchangerTool.Mode mode) {
         NBTTagCompound tagCompound = stack.getTagCompound();
         if (tagCompound == null) {
             tagCompound = initToolTag(stack);
@@ -191,15 +197,15 @@ public class ExchangerTool extends Item {
         tagCompound.setTag("blockstate", stateTag);
     }
 
-    public static ExchangerTool.toolModes getToolMode(ItemStack stack) {
+    public static ExchangerTool.Mode getToolMode(ItemStack stack) {
         NBTTagCompound tagCompound = stack.getTagCompound();
         if (tagCompound == null) {
             tagCompound = initToolTag(stack);
         }
         if (tagCompound.getString("mode") != "") {
-            return ExchangerTool.toolModes.valueOf(tagCompound.getString("mode"));
+            return ExchangerTool.Mode.valueOf(tagCompound.getString("mode"));
         } else {
-            return toolModes.Wall;
+            return Mode.WALL;
         }
     }
 
@@ -223,7 +229,7 @@ public class ExchangerTool extends Item {
     public void addInformation(ItemStack stack, World player, List<String> list, ITooltipFlag b) {
         super.addInformation(stack, player, list, b);
         list.add(TextFormatting.DARK_GREEN + I18n.format("tooltip.gadget.block") + ": " + getToolBlock(stack).getBlock().getLocalizedName());
-        list.add(TextFormatting.AQUA + I18n.format("tooltip.gadget.mode") + ": " + getToolMode(stack));
+        list.add(TextFormatting.AQUA + I18n.format("tooltip.gadget.mode") + ": " + I18n.format("exchangertool.mode." + getToolMode(stack).camelName()));
         list.add(TextFormatting.RED + I18n.format("tooltip.gadget.range") + ": " + getToolRange(stack));
     }
 
@@ -276,10 +282,10 @@ public class ExchangerTool extends Item {
     }
 
     public void toggleMode(EntityPlayer player, ItemStack heldItem) {
-        ExchangerTool.toolModes mode = getToolMode(heldItem);
+        ExchangerTool.Mode mode = getToolMode(heldItem);
         mode = mode.next();
         setToolMode(heldItem, mode);
-        player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.toolmode").getUnformattedComponentText() + ": " + mode.name()), true);
+        player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.toolmode").getUnformattedComponentText() + ": " + I18n.format("exchangertool.mode." + mode.camelName())), true);
     }
 
     public void toggleFuzzy(EntityPlayer player, ItemStack heldItem) {
@@ -289,7 +295,7 @@ public class ExchangerTool extends Item {
 
     public void rangeChange(EntityPlayer player, ItemStack heldItem) {
         int range = getToolRange(heldItem);
-        int changeAmount = (getToolMode(heldItem) == toolModes.Checkerboard || (range % 2 == 0)) ? 1 : 2;
+        int changeAmount = (getToolMode(heldItem) == Mode.CHECKERBOARD || (range % 2 == 0)) ? 1 : 2;
         if (player.isSneaking()) {
             if (range <= 1) {
                 range = Config.maxRange;
@@ -311,7 +317,7 @@ public class ExchangerTool extends Item {
     public boolean anchorBlocks(EntityPlayer player, ItemStack stack) {
         World world = player.world;
         int range = getToolRange(stack);
-        ExchangerTool.toolModes mode = getToolMode(stack);
+        ExchangerTool.Mode mode = getToolMode(stack);
         ArrayList<BlockPos> currentCoords = getAnchor(stack);
 
         if (currentCoords.size() == 0) { //If we don't have an anchor, find the block we're supposed to anchor to
@@ -338,7 +344,7 @@ public class ExchangerTool extends Item {
     public boolean exchange(EntityPlayer player, ItemStack stack) {
         World world = player.world;
         int range = getToolRange(stack);
-        ExchangerTool.toolModes mode = getToolMode(stack);
+        ExchangerTool.Mode mode = getToolMode(stack);
         ArrayList<BlockPos> coords = getAnchor(stack);
 
         if (coords.size() == 0) { //If we don't have an anchor, build in the current spot
