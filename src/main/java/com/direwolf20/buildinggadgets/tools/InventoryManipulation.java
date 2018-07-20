@@ -98,7 +98,7 @@ public class InventoryManipulation {
                 count += countInContainer(container, itemStack.getItem(), itemStack.getMetadata());
             }
         }
-        
+
         for (int slot : slots) {
             ItemStack stackInSlot = inv.getStackInSlot(slot);
             count += stackInSlot.getCount();
