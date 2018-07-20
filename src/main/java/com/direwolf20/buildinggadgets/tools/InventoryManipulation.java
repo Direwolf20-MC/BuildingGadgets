@@ -57,9 +57,6 @@ public class InventoryManipulation {
 
         ArrayList<Integer> slots = findItem(itemStack.getItem(), itemStack.getMetadata(), inv);
         ArrayList<IItemHandler> invContainers = findInvContainers(inv);
-        if (slots.size() == 0 && invContainers.size() == 0) {
-            return false;
-        }
 
         if (invContainers.size() > 0) {
             for (IItemHandler container : invContainers) {
@@ -72,7 +69,9 @@ public class InventoryManipulation {
                 }
             }
         }
-
+        if (slots.size() == 0) {
+            return false;
+        }
         int slot = slots.get(0);
         ItemStack stackInSlot = inv.getStackInSlot(slot);
         if (stackInSlot.getCount() < count) {
@@ -99,8 +98,7 @@ public class InventoryManipulation {
                 count += countInContainer(container, itemStack.getItem(), itemStack.getMetadata());
             }
         }
-
-
+        
         for (int slot : slots) {
             ItemStack stackInSlot = inv.getStackInSlot(slot);
             count += stackInSlot.getCount();
