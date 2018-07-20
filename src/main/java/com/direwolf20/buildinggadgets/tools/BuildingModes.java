@@ -1,8 +1,10 @@
 package com.direwolf20.buildinggadgets.tools;
 
 import com.direwolf20.buildinggadgets.items.BuildingTool;
+
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
+import static net.minecraft.util.EnumFacing.*;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -20,222 +22,102 @@ public class BuildingModes {
         return true;
     }
 
-    public static ArrayList<BlockPos> getBuildOrders(World world, EntityPlayer player, BlockPos startBlock, EnumFacing sideHit, int range, BuildingTool.toolModes mode, IBlockState setBlock) {
+    public static ArrayList<BlockPos> getBuildOrders(World world, EntityPlayer player, BlockPos startBlock, EnumFacing sideHit, int range, BuildingTool.Mode mode, IBlockState setBlock) {
 
         ArrayList<BlockPos> coordinates = new ArrayList<BlockPos>();
         BlockPos playerPos = new BlockPos(Math.floor(player.posX), Math.floor(player.posY), Math.floor(player.posZ));
         BlockPos pos = startBlock;
         int bound = (range - 1) / 2;
         EnumFacing playerFacing = player.getHorizontalFacing();
-        int boundX, boundZ;
-        if (playerFacing == EnumFacing.SOUTH || playerFacing == EnumFacing.NORTH) {
-            boundX = bound;
-            boundZ = 0;
-        } else {
-            boundX = 0;
-            boundZ = bound;
-        }
+
         //***************************************************
         //Build to me
         //***************************************************
-        if (mode == BuildingTool.toolModes.BuildToMe) {
-            if (sideHit == EnumFacing.SOUTH) {
-                for (int i = startBlock.getZ() + 1; i <= playerPos.getZ() - 1; i++) {
-                    pos = new BlockPos(startBlock.getX(), startBlock.getY(), i);
-                    if (isReplaceable(world, pos, setBlock)) {
-                        coordinates.add(pos);
-                    }
-                }
-            } else if (sideHit == EnumFacing.NORTH) {
-                for (int i = startBlock.getZ() - 1; i >= playerPos.getZ() + 1; i--) {
-                    pos = new BlockPos(startBlock.getX(), startBlock.getY(), i);
-                    if (isReplaceable(world, pos, setBlock)) {
-                        coordinates.add(pos);
-                    }
-                }
-            } else if (sideHit == EnumFacing.EAST) {
-                for (int i = startBlock.getX() + 1; i <= playerPos.getX() - 1; i++) {
-                    pos = new BlockPos(i, startBlock.getY(), startBlock.getZ());
-                    if (isReplaceable(world, pos, setBlock)) {
-                        coordinates.add(pos);
-                    }
-                }
-            } else if (sideHit == EnumFacing.WEST) {
-                for (int i = startBlock.getX() - 1; i >= playerPos.getX() + 1; i--) {
-                    pos = new BlockPos(i, startBlock.getY(), startBlock.getZ());
-                    if (isReplaceable(world, pos, setBlock)) {
-                        coordinates.add(pos);
-                    }
-                }
-            } else if (sideHit == EnumFacing.UP) {
-                for (int i = startBlock.getY() + 1; i <= playerPos.getY() - 1; i++) {
-                    pos = new BlockPos(startBlock.getX(), i, startBlock.getZ());
-                    if (isReplaceable(world, pos, setBlock)) {
-                        coordinates.add(pos);
-                    }
-                }
-            } else if (sideHit == EnumFacing.DOWN) {
-                for (int i = startBlock.getY() - 1; i >= playerPos.getY() + 1; i--) {
-                    pos = new BlockPos(startBlock.getX(), i, startBlock.getZ());
-                    if (isReplaceable(world, pos, setBlock)) {
-                        coordinates.add(pos);
-                    }
-                }
-            }
+        if (mode == BuildingTool.Mode.BUILD_TO_ME) {
+            int dist;
+            if(sideHit == UP || sideHit == DOWN)
+                dist = Math.abs(startBlock.getY() - playerPos.getY());
+            else if(sideHit == EAST || sideHit == WEST)
+                dist = Math.abs(startBlock.getX() - playerPos.getX());
+            else
+                dist = Math.abs(startBlock.getZ() - playerPos.getZ());
+
+            dist -= 2;//don't pick player and startBlock pos;
+            for(BlockPos p = startBlock.offset(sideHit); dist > 0; dist--, p = p.offset(sideHit))
+                if(isReplaceable(world, p, setBlock))
+                    coordinates.add(p);
+            
         }
         //***************************************************
         //VerticalWall
         //***************************************************
-        else if (mode == BuildingTool.toolModes.VerticalWall) {
-            if (sideHit == EnumFacing.UP) {
-                for (int y = 1; y <= range; y++) {
-                    for (int x = boundX * -1; x <= boundX; x++) {
-                        for (int z = boundZ * -1; z <= boundZ; z++) {
-                            pos = new BlockPos(startBlock.getX() + x, startBlock.getY() + y, startBlock.getZ() + z);
-                            if (isReplaceable(world, pos, setBlock)) {
-                                coordinates.add(pos);
-                            }
-                        }
-                    }
-                }
-            } else if (sideHit == EnumFacing.DOWN) {
-                for (int y = 1; y <= range; y++) {
-                    for (int x = boundX * -1; x <= boundX; x++) {
-                        for (int z = boundZ * -1; z <= boundZ; z++) {
-                            pos = new BlockPos(startBlock.getX() + x, startBlock.getY() - y, startBlock.getZ() + z);
-                            if (isReplaceable(world, pos, setBlock)) {
-                                coordinates.add(pos);
-                            }
-                        }
-                    }
-                }
-            } else {
-                for (int y = bound; y >= bound * -1; y--) {
-                    for (int x = boundX * -1; x <= boundX; x++) {
-                        for (int z = boundZ * -1; z <= boundZ; z++) {
-                            pos = new BlockPos(startBlock.getX() + x, startBlock.getY() - y, startBlock.getZ() + z);
-                            if (isReplaceable(world, pos, setBlock)) {
-                                coordinates.add(pos);
-                            }
-                        }
-                    }
+        else if (mode == BuildingTool.Mode.VERTICAL_WALL) {
+            BlockPos start = startBlock;
+            if(sideHit == UP)
+                start = start.offset(UP);
+            else if(sideHit == DOWN)
+                start = start.offset(DOWN, range);
+            else 
+                start = start.offset(DOWN, bound);
+            
+            for(int x = -bound; x <= bound; x++) {
+                BlockPos p = start.offset(playerFacing.rotateY(), x);
+                for(int y = 0; y < range; y++, p = p.offset(UP)) {
+                    if(isReplaceable(world, p, setBlock))
+                        coordinates.add(p);
                 }
             }
         }
         //***************************************************
         //VerticalColumn
         //***************************************************
-        else if (mode == BuildingTool.toolModes.VerticalColumn) {
-            if (sideHit == EnumFacing.UP) {
-                for (int y = 1; y <= range; y++) {
-                    pos = new BlockPos(startBlock.getX(), startBlock.getY() + y, startBlock.getZ());
-                    if (isReplaceable(world, pos, setBlock)) {
-                        coordinates.add(pos);
-                    }
-                }
-            } else if (sideHit == EnumFacing.DOWN) {
-                for (int y = 1; y <= range; y++) {
-                    pos = new BlockPos(startBlock.getX(), startBlock.getY() - y, startBlock.getZ());
-                    if (isReplaceable(world, pos, setBlock)) {
-                        coordinates.add(pos);
-                    }
-                }
-            } else {
-                for (int y = bound * -1; y <= bound; y++) {
-                    pos = new BlockPos(startBlock.getX(), startBlock.getY() - y, startBlock.getZ());
-                    if (isReplaceable(world, pos, setBlock)) {
-                        coordinates.add(pos);
-                    }
-                }
+        else if (mode == BuildingTool.Mode.VERTICAL_COLUMN) {
+            BlockPos p;
+            if(sideHit == UP)
+                p = startBlock.offset(UP);
+            else if(sideHit == DOWN)
+                p = startBlock.offset(DOWN, range);
+            else p = startBlock.offset(DOWN, bound);
+            for(int y = 0; y < range; y++, p = p.offset(UP)) {
+                if(isReplaceable(world, p, setBlock))
+                    coordinates.add(p);
             }
         }
         //***************************************************
         //HorizontalColumn
         //***************************************************
-        else if (mode == BuildingTool.toolModes.HorizontalColumn) {
-            if (sideHit == EnumFacing.UP || sideHit == EnumFacing.DOWN) {
-                sideHit = playerFacing.getOpposite();
-            }
-            if (sideHit == EnumFacing.NORTH) {
-                for (int z = 1; z <= range; z++) {
-                    pos = new BlockPos(startBlock.getX(), startBlock.getY(), startBlock.getZ() + z);
-                    if (isReplaceable(world, pos, setBlock)) {
-                        coordinates.add(pos);
-                    }
-                }
-            } else if (sideHit == EnumFacing.SOUTH) {
-                for (int z = 1; z <= range; z++) {
-                    pos = new BlockPos(startBlock.getX(), startBlock.getY(), startBlock.getZ() - z);
-                    if (isReplaceable(world, pos, setBlock)) {
-                        coordinates.add(pos);
-                    }
-                }
-            } else if (sideHit == EnumFacing.EAST) {
-                for (int x = 1; x <= range; x++) {
-                    pos = new BlockPos(startBlock.getX() - x, startBlock.getY(), startBlock.getZ());
-                    if (isReplaceable(world, pos, setBlock)) {
-                        coordinates.add(pos);
-                    }
-                }
-            } else if (sideHit == EnumFacing.WEST) {
-                for (int x = 1; x <= range; x++) {
-                    pos = new BlockPos(startBlock.getX() + x, startBlock.getY(), startBlock.getZ());
-                    if (isReplaceable(world, pos, setBlock)) {
-                        coordinates.add(pos);
-                    }
-                }
-            }
+        else if (mode == BuildingTool.Mode.HORIZONTAL_COLUMN) {
+            if (sideHit == UP || sideHit == DOWN)
+                sideHit = playerFacing;
+            else sideHit = sideHit.getOpposite();
+
+            for(BlockPos p = startBlock.offset(sideHit); range > 0; range--, p = p.offset(sideHit))
+                if(isReplaceable(world, p, setBlock))
+                    coordinates.add(p);
         }
         //***************************************************
         //HorizontalWall
         //***************************************************
-        else if (mode == BuildingTool.toolModes.HorizontalWall) {
-            /*if (sideHit == EnumFacing.UP || sideHit == EnumFacing.DOWN) {
-                sideHit = playerFacing.getOpposite();
-            }*/
-            if (sideHit == EnumFacing.NORTH) {
-                for (int z = 1; z <= range; z++) {
-                    for (int x = bound * -1; x <= bound; x++) {
-                        pos = new BlockPos(startBlock.getX() + x, startBlock.getY(), startBlock.getZ() - z);
-                        if (isReplaceable(world, pos, setBlock)) {
-                            coordinates.add(pos);
-                        }
+        else if (mode == BuildingTool.Mode.HORIZONTAL_WALL) {
+            BlockPos start = startBlock;
+            if(sideHit == UP || sideHit == DOWN)
+                start = start.offset(sideHit.getOpposite(), bound);
+            else start = start.offset(sideHit);
+            
+            for(int x = -bound; x <= bound; x++) {
+                BlockPos p;
+                if(sideHit == UP || sideHit == DOWN) {
+                    for(int z = -bound; z <= bound; z++) {
+                        p = start.add(x, 0, z);
+                        if(isReplaceable(world, p, setBlock))
+                            coordinates.add(p);
                     }
                 }
-            } else if (sideHit == EnumFacing.SOUTH) {
-                for (int z = 1; z <= range; z++) {
-                    for (int x = bound * -1; x <= bound; x++) {
-                        pos = new BlockPos(startBlock.getX() + x, startBlock.getY(), startBlock.getZ() + z);
-                        if (isReplaceable(world, pos, setBlock)) {
-                            coordinates.add(pos);
-                        }
-                    }
-                }
-            } else if (sideHit == EnumFacing.EAST) {
-                for (int x = 1; x <= range; x++) {
-                    for (int z = bound * -1; z <= bound; z++) {
-                        pos = new BlockPos(startBlock.getX() + x, startBlock.getY(), startBlock.getZ() + z);
-                        if (isReplaceable(world, pos, setBlock)) {
-                            coordinates.add(pos);
-                        }
-                    }
-                }
-            } else if (sideHit == EnumFacing.WEST) {
-                for (int x = 1; x <= range; x++) {
-                    for (int z = bound * -1; z <= bound; z++) {
-                        pos = new BlockPos(startBlock.getX() - x, startBlock.getY(), startBlock.getZ() + z);
-                        if (isReplaceable(world, pos, setBlock)) {
-                            coordinates.add(pos);
-                        }
-                    }
-                }
-            } else {
-                for (int x = bound * -1; x <= bound; x++) {
-                    for (int z = bound * -1; z <= bound; z++) {
-                        pos = new BlockPos(startBlock.getX() - x, startBlock.getY(), startBlock.getZ() + z);
-                        if (isReplaceable(world, pos, setBlock)) {
-                            coordinates.add(pos);
-                        }
+                else {
+                    p = start.offset(sideHit.rotateY(), x);
+                    for(int a = 0; a < range; a++, p = p.offset(sideHit)) {
+                        if(isReplaceable(world, p, setBlock))
+                            coordinates.add(p);
                     }
                 }
             }
@@ -243,7 +125,7 @@ public class BuildingModes {
         //***************************************************
         //Stairs
         //***************************************************
-        else if (mode == BuildingTool.toolModes.Stairs) {
+        else if (mode == BuildingTool.Mode.STAIRS) {
             if (sideHit == EnumFacing.UP || sideHit == EnumFacing.DOWN) {
                 sideHit = playerFacing.getOpposite();
             }
@@ -296,7 +178,7 @@ public class BuildingModes {
         //***************************************************
         //Checkerboard
         //***************************************************
-        else if (mode == BuildingTool.toolModes.Checkerboard) {
+        else if (mode == BuildingTool.Mode.CHECKERBOARD) {
             range++;
             for (int x = range * -7 / 5; x <= range * 7 / 5; x++) {
                 for (int z = range * -7 / 5; z <= range * 7 / 5; z++) {
