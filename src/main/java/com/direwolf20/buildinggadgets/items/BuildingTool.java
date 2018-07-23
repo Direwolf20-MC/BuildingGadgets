@@ -4,6 +4,7 @@ import com.direwolf20.buildinggadgets.BuildingGadgets;
 import com.direwolf20.buildinggadgets.Config;
 import com.direwolf20.buildinggadgets.ModBlocks;
 import com.direwolf20.buildinggadgets.entities.BlockBuildEntity;
+import com.direwolf20.buildinggadgets.items.ItemCaps.CapabilityProviderEnergy;
 import com.direwolf20.buildinggadgets.tools.BuildingModes;
 import com.direwolf20.buildinggadgets.tools.InventoryManipulation;
 import com.direwolf20.buildinggadgets.tools.UndoState;
@@ -21,9 +22,11 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTUtil;
+import net.minecraft.network.play.client.CPacketAnimation;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
@@ -31,7 +34,10 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldType;
 import net.minecraftforge.client.model.ModelLoader;
+import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.BlockSnapshot;
+import net.minecraftforge.energy.CapabilityEnergy;
+import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -44,6 +50,9 @@ import java.util.Set;
 
 public class BuildingTool extends Item {
     private static final FakeBuilderWorld fakeWorld = new FakeBuilderWorld();
+    private static final int energyCapacity = 10000;
+    private static final int energyCost = 10;
+
 
     public enum toolModes {
         BuildToMe, VerticalColumn, HorizontalColumn, VerticalWall, HorizontalWall, Stairs, Checkerboard;
@@ -65,6 +74,48 @@ public class BuildingTool extends Item {
     public void initModel() {
         ModelLoader.setCustomModelResourceLocation(this, 0, new ModelResourceLocation(getRegistryName(), "inventory"));
     }
+
+    @Override
+    public ICapabilityProvider initCapabilities(ItemStack stack, NBTTagCompound tag) {
+        return new CapabilityProviderEnergy(stack, energyCapacity);
+    }
+
+    @Override
+    public boolean isDamageable() {
+        return true;
+    }
+
+    @Override
+    public boolean isRepairable() {
+        return false;
+    }
+
+    @Override
+    public double getDurabilityForDisplay(ItemStack stack) {
+        IEnergyStorage energy = stack.getCapability(CapabilityEnergy.ENERGY, null);
+
+        return 1D - ((double) energy.getEnergyStored() / (double) energy.getMaxEnergyStored());
+    }
+
+    @Override
+    public int getRGBDurabilityForDisplay(ItemStack stack) {
+        IEnergyStorage energy = stack.getCapability(CapabilityEnergy.ENERGY, null);
+
+        return MathHelper.hsvToRGB(Math.max(0.0F, (float) energy.getEnergyStored() / (float) energy.getMaxEnergyStored()) / 3.0F, 1.0F, 1.0F);
+    }
+
+    @Override
+    public boolean isDamaged(ItemStack stack) {
+        IEnergyStorage energy = stack.getCapability(CapabilityEnergy.ENERGY, null);
+        return energy.getEnergyStored() != energy.getMaxEnergyStored();
+    }
+
+    @Override
+    public boolean showDurabilityBar(ItemStack stack) {
+        IEnergyStorage energy = stack.getCapability(CapabilityEnergy.ENERGY, null);
+        return energy.getEnergyStored() != energy.getMaxEnergyStored();
+    }
+
 
     public static NBTTagCompound initToolTag(ItemStack stack) {
         //If any NBT Tags are missing, we should initialize them
@@ -231,7 +282,7 @@ public class BuildingTool extends Item {
         }
         toolModes mode = toolModes.BuildToMe;
         try {
-             mode = toolModes.valueOf(tagCompound.getString("mode"));
+            mode = toolModes.valueOf(tagCompound.getString("mode"));
         } catch (Exception e) {
             setToolMode(stack, mode);
         }
@@ -264,6 +315,8 @@ public class BuildingTool extends Item {
         if (getToolMode(stack) != toolModes.BuildToMe) {
             list.add(TextFormatting.RED + I18n.format("tooltip.gadget.range") + ": " + getToolRange(stack));
         }
+        IEnergyStorage energy = stack.getCapability(CapabilityEnergy.ENERGY, null);
+        list.add(TextFormatting.WHITE + I18n.format("tooltip.gadget.energy") + ": " + energy.getEnergyStored() + "/" + energy.getMaxEnergyStored());
     }
 
     @Override
@@ -475,6 +528,13 @@ public class BuildingTool extends Item {
     }
 
     public static boolean placeBlock(World world, EntityPlayer player, BlockPos pos, IBlockState setBlock) {
+        ItemStack heldItem = player.getHeldItemMainhand();
+        if (!(heldItem.getItem() instanceof BuildingTool)) {
+            heldItem = player.getHeldItemOffhand();
+            if (!(heldItem.getItem() instanceof BuildingTool)) {
+                return false;
+            }
+        }
         ItemStack itemStack;
         //ItemStack itemStack = setBlock.getBlock().getPickBlock(setBlock, null, world, pos, player);
         //ItemStack itemStack = InventoryManipulation.getSilkTouchDrop(setBlock);
@@ -505,11 +565,25 @@ public class BuildingTool extends Item {
         if (ForgeEventFactory.onPlayerBlockPlace(player, blockSnapshot, EnumFacing.UP, EnumHand.MAIN_HAND).isCanceled()) {
             return false;
         }
+        if (!useEnergy(heldItem,energyCost)) {
+            return false;
+        }
         if (InventoryManipulation.useItem(itemStack, player, neededItems)) {
             world.spawnEntity(new BlockBuildEntity(world, pos, player, setBlock, 1));
             return true;
         }
         return false;
+    }
+
+    private static boolean useEnergy(ItemStack stack, int amount) {
+        IEnergyStorage energy = stack.getCapability(CapabilityEnergy.ENERGY, null);
+        if (amount > energy.getEnergyStored()) {
+            return false;
+        }
+        else {
+            energy.extractEnergy(amount, false);
+            return true;
+        }
     }
 
     @Override
