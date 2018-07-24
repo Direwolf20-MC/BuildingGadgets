@@ -9,6 +9,9 @@ public class Config {
 
     // This values below you can access elsewhere in your mod:
     public static int maxRange = 15;
+    public static int energyCostBuilder = 50;
+    public static int energyCostExchanger = 100;
+    public static int energyMax = 500000;
 
     // Call this from CommonProxy.preInit(). It will create our config if it doesn't
     // exist yet and read the values if it does exist.
@@ -31,6 +34,9 @@ public class Config {
         cfg.addCustomCategoryComment(CATEGORY_GENERAL, "General configuration");
         // cfg.getBoolean() will get the value in the config if it is already specified there. If not it will create the value.
         maxRange = cfg.getInt("maxRange", CATEGORY_GENERAL, maxRange, 1, 25, "The max range of the building tool");
+        energyCostBuilder = cfg.getInt("energyCostBuilder", CATEGORY_GENERAL, energyCostBuilder, 0, 100000, "The energy cost of the Builder per block");
+        energyCostExchanger = cfg.getInt("energyCostExchanger", CATEGORY_GENERAL, energyCostExchanger, 0, 100000, "The energy cost of the Exchanger per block");
+        energyMax = cfg.getInt("energyMax", CATEGORY_GENERAL, energyMax, 0, Integer.MAX_VALUE, "The max energy of the Builder & Exchanger");
     }
 
 }

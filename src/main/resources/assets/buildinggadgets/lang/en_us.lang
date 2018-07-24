@@ -10,6 +10,7 @@ key.undoKey=Undo/Fuzzy
 tooltip.gadget.block=Block
 tooltip.gadget.mode=Mode
 tooltip.gadget.range=Range
+tooltip.gadget.energy=Energy
 message.gadget.invalidblock=Invalid Block
 message.gadget.toolmode=Tool Mode
 message.gadget.toolrange= Tool Range

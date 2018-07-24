@@ -6,8 +6,7 @@ import net.minecraft.block.material.Material;
 public class EffectBlockMaterial extends Material {
     public static final Material EFFECTBLOCKMATERIAL = new EffectBlockMaterial(MapColor.AIR);
 
-    public EffectBlockMaterial(MapColor color)
-    {
+    public EffectBlockMaterial(MapColor color) {
         super(color);
         this.setNoPushMobility();
     }
@@ -15,8 +14,7 @@ public class EffectBlockMaterial extends Material {
     /**
      * Returns true if the block is a considered solid. This is true by default.
      */
-    public boolean isSolid()
-    {
+    public boolean isSolid() {
         return false;
     }
 }

@@ -14,18 +14,33 @@ import java.util.ArrayList;
 public class ExchangingModes {
     private static boolean isReplaceable(World world, BlockPos pos, IBlockState currentBlock, IBlockState setBlock, EntityPlayer player, boolean fuzzyMode) {
         IBlockState worldBlockState = world.getBlockState(pos);
-        if (worldBlockState != currentBlock && !fuzzyMode) {return false;}
-        if (worldBlockState == ModBlocks.effectBlock.getDefaultState()) {return false;}
-        if (worldBlockState == setBlock)  {return false;}
-        if (world.getTileEntity(pos) != null) {return false;}
-        if (worldBlockState.getBlock().getBlockHardness(worldBlockState, world, pos) < 0) {return false;}
+        if (worldBlockState != currentBlock && !fuzzyMode) {
+            return false;
+        }
+        if (worldBlockState == ModBlocks.effectBlock.getDefaultState()) {
+            return false;
+        }
+        if (worldBlockState == setBlock) {
+            return false;
+        }
+        if (world.getTileEntity(pos) != null) {
+            return false;
+        }
+        if (worldBlockState.getBlock().getBlockHardness(worldBlockState, world, pos) < 0) {
+            return false;
+        }
         /*if (world.getBlockState(pos) != currentBlock || world.getBlockState(pos) == ModBlocks.effectBlock.getDefaultState() || world.getBlockState(pos) == setBlock || world.getTileEntity(pos) != null || currentBlock.getBlock().getBlockHardness(currentBlock, world, pos) < 0) {
             return false;
         }*/
         return true;
     }
 
-    public static ArrayList<BlockPos> getBuildOrders(World world, EntityPlayer player, BlockPos startBlock, EnumFacing sideHit, int range, ExchangerTool.toolModes mode, IBlockState setBlock, boolean fuzzyMode) {
+    public static ArrayList<BlockPos> getBuildOrders(World world, EntityPlayer player, BlockPos startBlock, EnumFacing sideHit, ItemStack tool) {
+
+        ExchangerTool.toolModes mode = ExchangerTool.getToolMode(tool);
+        IBlockState setBlock = GadgetUtils.getToolBlock(tool);
+        int range = GadgetUtils.getToolRange(tool);
+        Boolean fuzzyMode = ExchangerTool.getFuzzy(tool);
 
         ArrayList<BlockPos> coordinates = new ArrayList<BlockPos>();
         BlockPos playerPos = new BlockPos(Math.floor(player.posX), Math.floor(player.posY), Math.floor(player.posZ));

@@ -3,6 +3,7 @@ package com.direwolf20.buildinggadgets.tools;
 import com.direwolf20.buildinggadgets.items.BuildingTool;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -20,8 +21,11 @@ public class BuildingModes {
         return true;
     }
 
-    public static ArrayList<BlockPos> getBuildOrders(World world, EntityPlayer player, BlockPos startBlock, EnumFacing sideHit, int range, BuildingTool.toolModes mode, IBlockState setBlock) {
-
+    public static ArrayList<BlockPos> getBuildOrders(World world, EntityPlayer player, BlockPos startBlock, EnumFacing sideHit, ItemStack tool) {
+        //BuildingTool.toolModes mode, IBlockState setBlock
+        BuildingTool.toolModes mode = BuildingTool.getToolMode(tool);
+        IBlockState setBlock = GadgetUtils.getToolBlock(tool);
+        int range = GadgetUtils.getToolRange(tool);
         ArrayList<BlockPos> coordinates = new ArrayList<BlockPos>();
         BlockPos playerPos = new BlockPos(Math.floor(player.posX), Math.floor(player.posY), Math.floor(player.posZ));
         BlockPos pos = startBlock;
