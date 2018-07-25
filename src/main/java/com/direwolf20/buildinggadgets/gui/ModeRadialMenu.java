@@ -4,7 +4,7 @@
  * Psi License: http://psi.vazkii.us/license.php
  */
 
-package com.direwolf20.buildinggadgets.GUIs;
+package com.direwolf20.buildinggadgets.gui;
 
 import com.direwolf20.buildinggadgets.KeyBindings;
 import com.direwolf20.buildinggadgets.items.BuildingTool;

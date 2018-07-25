@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets;
 
-import com.direwolf20.buildinggadgets.GUIs.ModeRadialMenu;
+import com.direwolf20.buildinggadgets.gui.ModeRadialMenu;
 import com.direwolf20.buildinggadgets.items.GenericGadget;
 import com.direwolf20.buildinggadgets.network.*;
 import net.minecraft.client.Minecraft;
