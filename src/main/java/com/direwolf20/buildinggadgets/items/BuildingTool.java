@@ -138,6 +138,13 @@ public class BuildingTool extends GenericGadget {
         player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.toolmode").getUnformattedComponentText() + ": " + mode.name()), true);
     }
 
+    public void setMode(EntityPlayer player, ItemStack heldItem, int modeInt) {
+        //Called when we specify a mode with the radial menu
+        toolModes mode = toolModes.values()[modeInt];
+        setToolMode(heldItem, mode);
+        player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.toolmode").getUnformattedComponentText() + ": " + mode.name()), true);
+    }
+
     public void rangeChange(EntityPlayer player, ItemStack heldItem) {
         //Called when the range change hotkey is pressed
         int range = getToolRange(heldItem);
