@@ -24,7 +24,11 @@ public class GenericGadget extends Item {
 
     @Override
     public ICapabilityProvider initCapabilities(ItemStack stack, NBTTagCompound tag) {
-        return new CapabilityProviderEnergy(stack, Config.energyMax);
+        if (Config.poweredByFE) {
+            return new CapabilityProviderEnergy(stack, Config.energyMax);
+        } else {
+            return null;
+        }
     }
 
     @Override
@@ -39,27 +43,41 @@ public class GenericGadget extends Item {
 
     @Override
     public double getDurabilityForDisplay(ItemStack stack) {
-        IEnergyStorage energy = stack.getCapability(CapabilityEnergy.ENERGY, null);
-
-        return 1D - ((double) energy.getEnergyStored() / (double) energy.getMaxEnergyStored());
+        if (Config.poweredByFE) {
+            IEnergyStorage energy = stack.getCapability(CapabilityEnergy.ENERGY, null);
+            return 1D - ((double) energy.getEnergyStored() / (double) energy.getMaxEnergyStored());
+        } else {
+            return (double)stack.getItemDamage() / (double)stack.getMaxDamage();
+        }
     }
 
     @Override
     public int getRGBDurabilityForDisplay(ItemStack stack) {
-        IEnergyStorage energy = stack.getCapability(CapabilityEnergy.ENERGY, null);
-
-        return MathHelper.hsvToRGB(Math.max(0.0F, (float) energy.getEnergyStored() / (float) energy.getMaxEnergyStored()) / 3.0F, 1.0F, 1.0F);
+        if (Config.poweredByFE) {
+            IEnergyStorage energy = stack.getCapability(CapabilityEnergy.ENERGY, null);
+            return MathHelper.hsvToRGB(Math.max(0.0F, (float) energy.getEnergyStored() / (float) energy.getMaxEnergyStored()) / 3.0F, 1.0F, 1.0F);
+        } else {
+            return MathHelper.hsvToRGB(Math.max(0.0F, (float) (1.0F - getDurabilityForDisplay(stack))) / 3.0F, 1.0F, 1.0F);
+        }
     }
 
     @Override
     public boolean isDamaged(ItemStack stack) {
-        IEnergyStorage energy = stack.getCapability(CapabilityEnergy.ENERGY, null);
-        return energy.getEnergyStored() != energy.getMaxEnergyStored();
+        if (Config.poweredByFE) {
+            IEnergyStorage energy = stack.getCapability(CapabilityEnergy.ENERGY, null);
+            return energy.getEnergyStored() != energy.getMaxEnergyStored();
+        } else {
+            return (stack.getItemDamage() > 0);
+        }
     }
 
     @Override
     public boolean showDurabilityBar(ItemStack stack) {
-        IEnergyStorage energy = stack.getCapability(CapabilityEnergy.ENERGY, null);
-        return energy.getEnergyStored() != energy.getMaxEnergyStored();
+        if (Config.poweredByFE) {
+            IEnergyStorage energy = stack.getCapability(CapabilityEnergy.ENERGY, null);
+            return energy.getEnergyStored() != energy.getMaxEnergyStored();
+        } else {
+            return stack.isItemDamaged();
+        }
     }
 }

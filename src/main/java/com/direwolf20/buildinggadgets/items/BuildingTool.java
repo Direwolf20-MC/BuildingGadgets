@@ -56,6 +56,9 @@ public class BuildingTool extends GenericGadget {
         setUnlocalizedName(BuildingGadgets.MODID + ".buildingtool");     // Used for localization (en_US.lang)
         setMaxStackSize(1);
         setCreativeTab(CreativeTabs.TOOLS);
+        if (!Config.poweredByFE) {
+            setMaxDamage(50);
+        }
     }
 
     public static void setToolMode(ItemStack stack, toolModes mode) {
@@ -92,8 +95,10 @@ public class BuildingTool extends GenericGadget {
         if (getToolMode(stack) != toolModes.BuildToMe) {
             list.add(TextFormatting.RED + I18n.format("tooltip.gadget.range") + ": " + getToolRange(stack));
         }
-        IEnergyStorage energy = stack.getCapability(CapabilityEnergy.ENERGY, null);
-        list.add(TextFormatting.WHITE + I18n.format("tooltip.gadget.energy") + ": " + withSuffix(energy.getEnergyStored()) + "/" + withSuffix(energy.getMaxEnergyStored()));
+        if (Config.poweredByFE) {
+            IEnergyStorage energy = stack.getCapability(CapabilityEnergy.ENERGY, null);
+            list.add(TextFormatting.WHITE + I18n.format("tooltip.gadget.energy") + ": " + withSuffix(energy.getEnergyStored()) + "/" + withSuffix(energy.getMaxEnergyStored()));
+        }
     }
 
     @Override
@@ -289,8 +294,19 @@ public class BuildingTool extends GenericGadget {
         if (ForgeEventFactory.onPlayerBlockPlace(player, blockSnapshot, EnumFacing.UP, EnumHand.MAIN_HAND).isCanceled()) {
             return false;
         }
-        if (!useEnergy(heldItem, Config.energyCostBuilder)) {
-            return false;
+        if (Config.poweredByFE) {
+            if (!useEnergy(heldItem, Config.energyCostBuilder)) {
+                return false;
+            }
+        } else {
+            if (heldItem.getItemDamage() >= heldItem.getMaxDamage()) {
+                return false;
+            } else {
+                heldItem.setItemDamage(heldItem.getItemDamage()+1);
+                if (heldItem.getItemDamage() >= heldItem.getMaxDamage()) {
+                    //Todo: Figure out how to destroy the item
+                }
+            }
         }
         if (InventoryManipulation.useItem(itemStack, player, neededItems)) {
             world.spawnEntity(new BlockBuildEntity(world, pos, player, setBlock, 1));

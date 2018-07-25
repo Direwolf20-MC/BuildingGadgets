@@ -76,7 +76,12 @@ public class ToolRenders {
                 }
 
                 int hasBlocks = InventoryManipulation.countItem(itemStack, player);
-                int hasEnergy = stack.getCapability(CapabilityEnergy.ENERGY, null).getEnergyStored();
+                int hasEnergy = 0;
+                if (Config.poweredByFE) {
+                    hasEnergy = stack.getCapability(CapabilityEnergy.ENERGY, null).getEnergyStored();
+                } else {
+                    hasEnergy = stack.getMaxDamage() - stack.getItemDamage();
+                }
                 //Prepare the block rendering
                 BlockRendererDispatcher dispatcher = Minecraft.getMinecraft().getBlockRendererDispatcher();
                 BlockRenderLayer origLayer = MinecraftForgeClient.getRenderLayer();
@@ -127,7 +132,12 @@ public class ToolRenders {
                     GlStateManager.scale(1.01f, 1.01f, 1.01f);
                     GL14.glBlendColor(1F, 1F, 1F, 0.35f); //Set the alpha of the blocks we are rendering
                     hasBlocks--;
-                    hasEnergy = hasEnergy - Config.energyCostBuilder;
+                    if (Config.poweredByFE) {
+                        hasEnergy = hasEnergy - Config.energyCostBuilder;
+                    } else {
+                        hasEnergy--;
+                    }
+
                     if (hasBlocks < 0 || hasEnergy < 0) {
                         dispatcher.renderBlockBrightness(Blocks.STAINED_GLASS.getDefaultState().withProperty(COLOR, EnumDyeColor.RED), 1f);
                     }
@@ -186,7 +196,12 @@ public class ToolRenders {
                     itemStack = renderBlockState.getBlock().getPickBlock(renderBlockState, null, world, new BlockPos(0, 0, 0), player);
                 }
                 int hasBlocks = InventoryManipulation.countItem(itemStack, player);
-                int hasEnergy = stack.getCapability(CapabilityEnergy.ENERGY, null).getEnergyStored();
+                int hasEnergy = 0;
+                if (Config.poweredByFE) {
+                    hasEnergy = stack.getCapability(CapabilityEnergy.ENERGY, null).getEnergyStored();
+                } else {
+                    hasEnergy = stack.getMaxDamage() - stack.getItemDamage();
+                }
                 //Prepare the block rendering
                 BlockRendererDispatcher dispatcher = Minecraft.getMinecraft().getBlockRendererDispatcher();
                 BlockRenderLayer origLayer = MinecraftForgeClient.getRenderLayer();
@@ -241,7 +256,11 @@ public class ToolRenders {
                     GlStateManager.scale(1.02f, 1.02f, 1.02f);//Slightly Larger block to avoid z-fighting.
                     GL14.glBlendColor(1F, 1F, 1F, 0.55f); //Set the alpha of the blocks we are rendering
                     hasBlocks--;
-                    hasEnergy = hasEnergy - Config.energyCostExchanger;
+                    if (Config.poweredByFE) {
+                        hasEnergy = hasEnergy - Config.energyCostExchanger;
+                    } else {
+                        hasEnergy = hasEnergy - 2;
+                    }
                     if (hasBlocks < 0 || hasEnergy < 0) {
                         dispatcher.renderBlockBrightness(Blocks.STAINED_GLASS.getDefaultState().withProperty(COLOR, EnumDyeColor.RED), 1f);
                     }

@@ -55,6 +55,9 @@ public class ExchangerTool extends GenericGadget {
         setUnlocalizedName(BuildingGadgets.MODID + ".exchangertool");     // Used for localization (en_US.lang)
         setMaxStackSize(1);
         setCreativeTab(CreativeTabs.TOOLS);
+        if (!Config.poweredByFE) {
+            setMaxDamage(50);
+        }
     }
 
     /*@SideOnly(Side.CLIENT)
@@ -134,8 +137,10 @@ public class ExchangerTool extends GenericGadget {
         list.add(TextFormatting.DARK_GREEN + I18n.format("tooltip.gadget.block") + ": " + getToolBlock(stack).getBlock().getLocalizedName());
         list.add(TextFormatting.AQUA + I18n.format("tooltip.gadget.mode") + ": " + getToolMode(stack));
         list.add(TextFormatting.RED + I18n.format("tooltip.gadget.range") + ": " + getToolRange(stack));
-        IEnergyStorage energy = stack.getCapability(CapabilityEnergy.ENERGY, null);
-        list.add(TextFormatting.WHITE + I18n.format("tooltip.gadget.energy") + ": " + withSuffix(energy.getEnergyStored()) + "/" + withSuffix(energy.getMaxEnergyStored()));
+        if (Config.poweredByFE) {
+            IEnergyStorage energy = stack.getCapability(CapabilityEnergy.ENERGY, null);
+            list.add(TextFormatting.WHITE + I18n.format("tooltip.gadget.energy") + ": " + withSuffix(energy.getEnergyStored()) + "/" + withSuffix(energy.getMaxEnergyStored()));
+        }
     }
 
 
@@ -284,8 +289,16 @@ public class ExchangerTool extends GenericGadget {
         if (ForgeEventFactory.onPlayerBlockPlace(player, blockSnapshot, EnumFacing.UP, EnumHand.MAIN_HAND).isCanceled()) {
             return false;
         }
-        if (!useEnergy(tool, Config.energyCostExchanger)) {
-            return false;
+        if (Config.poweredByFE) {
+            if (!useEnergy(tool, Config.energyCostBuilder)) {
+                return false;
+            }
+        } else {
+            if (tool.getItemDamage()  >= tool.getMaxDamage()) {
+                return false;
+            } else {
+                tool.setItemDamage(tool.getItemDamage()+2);
+            }
         }
         currentBlock.getBlock().harvestBlock(world, player, pos, currentBlock, world.getTileEntity(pos), tool);
         InventoryManipulation.useItem(itemStack, player, neededItems);
