@@ -2,8 +2,10 @@ package com.direwolf20.buildinggadgets.tools;
 
 import com.direwolf20.buildinggadgets.ModBlocks;
 import com.direwolf20.buildinggadgets.items.ExchangerTool;
+import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
@@ -27,6 +29,12 @@ public class ExchangingModes {
             return false;
         }
         if (worldBlockState.getBlock().getBlockHardness(worldBlockState, world, pos) < 0) {
+            return false;
+        }
+        if (worldBlockState == Blocks.AIR.getDefaultState()) {
+            return false;
+        }
+        if (worldBlockState.getBlock().getMaterial(worldBlockState).isLiquid()) {
             return false;
         }
         /*if (world.getBlockState(pos) != currentBlock || world.getBlockState(pos) == ModBlocks.effectBlock.getDefaultState() || world.getBlockState(pos) == setBlock || world.getTileEntity(pos) != null || currentBlock.getBlock().getBlockHardness(currentBlock, world, pos) < 0) {
