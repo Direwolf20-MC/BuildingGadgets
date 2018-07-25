@@ -1,11 +1,12 @@
 /**
  * This class was adapted from code written by Vazkii for the PSI mod: https://github.com/Vazkii/Psi
+ * Psi is Open Source and distributed under the
+ * Psi License: http://psi.vazkii.us/license.php
  */
 
 package com.direwolf20.buildinggadgets.GUIs;
 
 import com.direwolf20.buildinggadgets.KeyBindings;
-import com.direwolf20.buildinggadgets.KeyInputHandler;
 import com.direwolf20.buildinggadgets.items.BuildingTool;
 import com.direwolf20.buildinggadgets.items.ExchangerTool;
 import com.direwolf20.buildinggadgets.items.GenericGadget;
@@ -39,40 +40,29 @@ public class ModeRadialMenu extends GuiScreen {
     int timeIn = 0;
     int slotSelected = -1;
 
-    //ItemStack controllerStack;
-    //ItemStack[] controlledStacks;
-    //int controlSlot;
-
     ItemStack itemStack;
     List<Integer> slots;
-
-    BuildingTool buildingTool;
-    ExchangerTool exchangerTool;
 
     public ModeRadialMenu(ItemStack stack) {
         mc = Minecraft.getMinecraft();
 
-        //controllerStack = ItemStack.EMPTY;
         itemStack = ItemStack.EMPTY;
-
-        if(stack.getItem() instanceof BuildingTool) {
+        if (stack.getItem() instanceof BuildingTool) {
             setSocketable(stack);
-        }
-        else if(stack.getItem() instanceof ExchangerTool) {
+        } else if (stack.getItem() instanceof ExchangerTool) {
             setSocketable(stack);
         }
     }
 
     public void setSocketable(ItemStack stack) {
         slots = new ArrayList();
-        if(stack.isEmpty())
+        if (stack.isEmpty())
             return;
         itemStack = stack;
         if (stack.getItem() instanceof BuildingTool) {
             for (int i = 0; i < BuildingTool.toolModes.values().length; i++)
                 slots.add(i);
-        }
-        else if (stack.getItem() instanceof ExchangerTool) {
+        } else if (stack.getItem() instanceof ExchangerTool) {
             for (int i = 0; i < ExchangerTool.toolModes.values().length; i++)
                 slots.add(i);
         }
@@ -112,23 +102,23 @@ public class ModeRadialMenu extends GuiScreen {
         }
         slotSelected = -1;
 
-        for(int seg = 0; seg < segments; seg++) {
+        for (int seg = 0; seg < segments; seg++) {
             boolean mouseInSector = mouseIn && angle > totalDeg && angle < totalDeg + degPer;
             float radius = Math.max(0F, Math.min((timeIn + partialTicks - seg * 6F / segments) * 40F, maxRadius));
 
             GL11.glBegin(GL11.GL_TRIANGLE_FAN);
 
             float gs = 0.25F;
-            if(seg % 2 == 0)
+            if (seg % 2 == 0)
                 gs += 0.1F;
             float r = gs;
             float g = gs;
             float b = gs;
             float a = 0.4F;
-            if(mouseInSector) {
+            if (mouseInSector) {
                 slotSelected = seg;
 
-                if(!tool.isEmpty()) {
+                if (!tool.isEmpty()) {
                     Color color = new Color(255, 255, 255);
                     r = color.getRed() / 255F;
                     g = color.getGreen() / 255F;
@@ -139,12 +129,12 @@ public class ModeRadialMenu extends GuiScreen {
             GlStateManager.color(r, g, b, a);
             GL11.glVertex2i(x, y);
 
-            for(float i = degPer; i >= 0; i--) {
+            for (float i = degPer; i >= 0; i--) {
                 float rad = (float) ((i + totalDeg) / 180F * Math.PI);
                 double xp = x + Math.cos(rad) * radius;
                 double yp = y + Math.sin(rad) * radius;
-                if((int)i == (int) (degPer / 2))
-                    stringPositions.add(new int[] { seg, (int) xp, (int) yp, mouseInSector ? 'n' : 'r' });
+                if ((int) i == (int) (degPer / 2))
+                    stringPositions.add(new int[]{seg, (int) xp, (int) yp, mouseInSector ? 'n' : 'r'});
 
                 GL11.glVertex2d(xp, yp);
             }
@@ -153,46 +143,49 @@ public class ModeRadialMenu extends GuiScreen {
             GL11.glVertex2i(x, y);
             GL11.glEnd();
 
-            if(mouseInSector)
+            if (mouseInSector)
                 radius -= highlight;
         }
         GlStateManager.shadeModel(GL11.GL_FLAT);
         GlStateManager.enableTexture2D();
 
-        for(int[] pos : stringPositions) {
+        for (int[] pos : stringPositions) {
             int slot = slots.get(pos[0]);
             int xp = pos[1];
             int yp = pos[2];
             char c = (char) pos[3];
 
-            //ItemStack stack = socketable.getBulletInSocket(socketableStack, slot);
-            BuildingTool.toolModes mode = BuildingTool.toolModes.values()[slot];
-            //if() {
-                int xsp = xp - 4;
-                int ysp = yp;
-                String name = "\u00a7" + c + mode.name();
-                int width = fontRenderer.getStringWidth(name);
+            String name = "";
+            if (tool.getItem() instanceof BuildingTool) {
+                BuildingTool.toolModes mode = BuildingTool.toolModes.values()[slot];
+                name = "\u00a7" + c + mode.name();
+            } else if (tool.getItem() instanceof ExchangerTool){
+                ExchangerTool.toolModes mode = ExchangerTool.toolModes.values()[slot];
+                name = "\u00a7" + c + mode.name();
+            }
 
-                double mod = 0.6;
-                int xdp = (int) ((xp - x) * mod + x);
-                int ydp = (int) ((yp - y) * mod + y);
+            int xsp = xp - 4;
+            int ysp = yp;
+            int width = fontRenderer.getStringWidth(name);
 
-                //mc.getRenderItem().renderItemIntoGUI(tool, xdp - 8, ydp - 8);
+            double mod = 0.6;
+            int xdp = (int) ((xp - x) * mod + x);
+            int ydp = (int) ((yp - y) * mod + y);
 
-                if(xsp < x)
-                    xsp -= width - 8;
-                if(ysp < y)
-                    ysp -= 9;
+            if (xsp < x)
+                xsp -= width - 8;
+            if (ysp < y)
+                ysp -= 9;
 
-                fontRenderer.drawStringWithShadow(name, xsp, ysp, 0xFFFFFF);
+            fontRenderer.drawStringWithShadow(name, xsp, ysp, 0xFFFFFF);
 
-                mod = 0.8;
-                xdp = (int) ((xp - x) * mod + x);
-                ydp = (int) ((yp - y) * mod + y);
+            mod = 0.8;
+            xdp = (int) ((xp - x) * mod + x);
+            ydp = (int) ((yp - y) * mod + y);
 
-                mc.renderEngine.bindTexture(signs[0]); //@Todo Inject Graphics from Rorax
-                drawModalRectWithCustomSizedTexture(xdp - 8, ydp - 8, 0, 0, 16, 16, 16, 16);
-            //}
+            mc.renderEngine.bindTexture(signs[0]); //@Todo Inject Graphics from Rorax
+            drawModalRectWithCustomSizedTexture(xdp - 8, ydp - 8, 0, 0, 16, 16, 16, 16);
+
         }
 
         float stime = 5F;
@@ -203,23 +196,7 @@ public class ModeRadialMenu extends GuiScreen {
         GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
         RenderHelper.enableGUIStandardItemLighting();
 
-        /*if(controlledStacks != null && controlledStacks.length > 0) {
-            int xs = width / 2 - 18 * controlledStacks.length / 2;
-            int ys = height / 2;
-
-            for(int i = 0; i < controlledStacks.length; i++) {
-                float yoff = 25F + maxRadius;
-                if(i == controlSlot)
-                    yoff += 5F;
-
-                GlStateManager.translate(0, -yoff * fract, 0F);
-                mc.getRenderItem().renderItemAndEffectIntoGUI(controlledStacks[i], xs + i * 18, ys);
-                GlStateManager.translate(0, yoff * fract, 0F);
-            }
-
-        }*/
-
-        if(!tool.isEmpty()) {
+        if (!tool.isEmpty()) {
             GlStateManager.scale(s, s, s);
             GlStateManager.translate(x / s - 8, y / s - 8, 0);
             mc.getRenderItem().renderItemAndEffectIntoGUI(tool, 0, 0);
@@ -234,41 +211,21 @@ public class ModeRadialMenu extends GuiScreen {
     @Override
     protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
         super.mouseClicked(mouseX, mouseY, mouseButton);
-
-        /*if(!controllerStack.isEmpty() && controlledStacks.length > 0) {
-            if(mouseButton == 0) {
-                controlSlot++;
-                if(controlSlot >= controlledStacks.length)
-                    controlSlot = 0;
-            } else if(mouseButton == 1) {
-                controlSlot--;
-                if(controlSlot < 0)
-                    controlSlot = controlledStacks.length - 1;
-            }
-
-            setSocketable(controlledStacks[controlSlot]);
-        }*/
     }
 
     @Override
     public void updateScreen() {
         super.updateScreen();
 
-        if(!isKeyDown(KeyBindings.modeSwitch)) {
+        if (!isKeyDown(KeyBindings.modeSwitch)) {
             mc.displayGuiScreen(null);
-            if(slotSelected != -1) {
-                int slot = slots.get(slotSelected);
+            if (slotSelected != -1) {
                 PacketHandler.INSTANCE.sendToServer(new PacketToggleMode(slotSelected));
-                /*NetworkMessage message = null;
-                if(!controllerStack.isEmpty())
-                    message = new MessageChangeControllerSlot(controlSlot, slot);
-                else message = new MessageChangeSocketableSlot(slot);
-                NetworkHandler.INSTANCE.sendToServer(message);*/
             }
         }
 
         ImmutableSet<KeyBinding> set = ImmutableSet.of(mc.gameSettings.keyBindForward, mc.gameSettings.keyBindLeft, mc.gameSettings.keyBindBack, mc.gameSettings.keyBindRight, mc.gameSettings.keyBindSneak, mc.gameSettings.keyBindSprint, mc.gameSettings.keyBindJump);
-        for(KeyBinding k : set)
+        for (KeyBinding k : set)
             KeyBinding.setKeyBindState(k.getKeyCode(), isKeyDown(k));
 
         timeIn++;
@@ -276,7 +233,7 @@ public class ModeRadialMenu extends GuiScreen {
 
     public boolean isKeyDown(KeyBinding keybind) {
         int key = keybind.getKeyCode();
-        if(key < 0) {
+        if (key < 0) {
             int button = 100 + key;
             return Mouse.isButtonDown(button);
         }

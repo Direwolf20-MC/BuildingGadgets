@@ -53,7 +53,7 @@ public class PacketToggleMode implements IMessage {
                 buildingTool.setMode(playerEntity, heldItem, mode);
             } else if (!heldItem.isEmpty() && heldItem.getItem() instanceof ExchangerTool) {
                 ExchangerTool exchangerTool = (ExchangerTool) (heldItem.getItem());
-                exchangerTool.toggleMode(playerEntity, heldItem);
+                exchangerTool.setMode(playerEntity, heldItem, mode);
             }
         }
     }

@@ -167,28 +167,16 @@ public class ExchangerTool extends GenericGadget {
         return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, itemstack);
     }
 
-    /*private void selectBlock(ItemStack stack, EntityPlayer player) {
-        World world = player.world;
-        RayTraceResult lookingAt = VectorTools.getLookingAt(player);
-        if (lookingAt == null) {
-            return;
-        }
-        BlockPos pos = lookingAt.getBlockPos();
-        IBlockState state = world.getBlockState(pos);
-        TileEntity te = world.getTileEntity(pos);
-        if (te != null) {
-            player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.invalidblock").getUnformattedComponentText()), true);
-            return;
-        }
-        if (state != null) {
-            IBlockState placeState = InventoryManipulation.getSpecificStates(state, world, player, pos);
-            setToolBlock(stack, placeState);
-        }
-    }*/
-
     public void toggleMode(EntityPlayer player, ItemStack heldItem) {
         ExchangerTool.toolModes mode = getToolMode(heldItem);
         mode = mode.next();
+        setToolMode(heldItem, mode);
+        player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.toolmode").getUnformattedComponentText() + ": " + mode.name()), true);
+    }
+
+    public void setMode(EntityPlayer player, ItemStack heldItem, int modeInt) {
+        //Called when we specify a mode with the radial menu
+        toolModes mode = toolModes.values()[modeInt];
         setToolMode(heldItem, mode);
         player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.toolmode").getUnformattedComponentText() + ": " + mode.name()), true);
     }
