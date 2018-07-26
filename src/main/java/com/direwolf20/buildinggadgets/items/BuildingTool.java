@@ -57,7 +57,7 @@ public class BuildingTool extends GenericGadget {
         setMaxStackSize(1);
         setCreativeTab(CreativeTabs.TOOLS);
         if (!Config.poweredByFE) {
-            setMaxDamage(50);
+            setMaxDamage(Config.durabilityBuilder);
         }
     }
 

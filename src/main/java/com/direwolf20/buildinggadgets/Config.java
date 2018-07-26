@@ -13,6 +13,8 @@ public class Config {
     public static int energyCostExchanger = 100;
     public static int energyMax = 500000;
     public static boolean poweredByFE = true;
+    public static int durabilityBuilder = 500;
+    public static int durabilityExchanger = 500;
 
     // Call this from CommonProxy.preInit(). It will create our config if it doesn't
     // exist yet and read the values if it does exist.
@@ -39,6 +41,8 @@ public class Config {
         energyCostExchanger = cfg.getInt("energyCostExchanger", CATEGORY_GENERAL, energyCostExchanger, 0, 100000, "The energy cost of the Exchanger per block");
         energyMax = cfg.getInt("energyMax", CATEGORY_GENERAL, energyMax, 0, Integer.MAX_VALUE, "The max energy of the Builder & Exchanger");
         poweredByFE = cfg.getBoolean("poweredByFE", CATEGORY_GENERAL, poweredByFE,"Set to true for Forge Energy Support, set to False for vanilla Item Damage");
+        durabilityBuilder = cfg.getInt("durabilityBuilder", CATEGORY_GENERAL, durabilityBuilder, 0, 100000, "The max durability of the Builder (Ignored if powered by FE)");
+        durabilityExchanger = cfg.getInt("durabilityExchanger", CATEGORY_GENERAL, durabilityExchanger, 0, 100000, "The max durability of the Exchanger (Ignored if powered by FE)");
     }
 
 }

@@ -56,7 +56,7 @@ public class ExchangerTool extends GenericGadget {
         setMaxStackSize(1);
         setCreativeTab(CreativeTabs.TOOLS);
         if (!Config.poweredByFE) {
-            setMaxDamage(50);
+            setMaxDamage(Config.durabilityExchanger);
         }
     }
 
