@@ -302,10 +302,7 @@ public class BuildingTool extends GenericGadget {
             if (heldItem.getItemDamage() >= heldItem.getMaxDamage()) {
                 return false;
             } else {
-                heldItem.setItemDamage(heldItem.getItemDamage()+1);
-                if (heldItem.getItemDamage() >= heldItem.getMaxDamage()) {
-                    //Todo: Figure out how to destroy the item
-                }
+                heldItem.damageItem(1, player);
             }
         }
         if (InventoryManipulation.useItem(itemStack, player, neededItems)) {

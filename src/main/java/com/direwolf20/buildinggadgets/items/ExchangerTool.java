@@ -294,10 +294,10 @@ public class ExchangerTool extends GenericGadget {
                 return false;
             }
         } else {
-            if (tool.getItemDamage()  >= tool.getMaxDamage()) {
+            if (tool.getItemDamage() >= tool.getMaxDamage()) {
                 return false;
             } else {
-                tool.setItemDamage(tool.getItemDamage()+2);
+                tool.damageItem(2, player);
             }
         }
         currentBlock.getBlock().harvestBlock(world, player, pos, currentBlock, world.getTileEntity(pos), tool);
