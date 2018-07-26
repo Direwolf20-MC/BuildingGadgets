@@ -60,11 +60,6 @@ public class ExchangerTool extends GenericGadget {
         }
     }
 
-    /*@SideOnly(Side.CLIENT)
-    public void initModel() {
-        ModelLoader.setCustomModelResourceLocation(this, 0, new ModelResourceLocation(getRegistryName(), "inventory"));
-    }*/
-
     @Override
     public int getItemEnchantability() {
         return 3;
@@ -79,8 +74,9 @@ public class ExchangerTool extends GenericGadget {
     public boolean isBookEnchantable(ItemStack stack, ItemStack book) {
         if (EnchantmentHelper.getEnchantments(book).containsKey(Enchantments.SILK_TOUCH)) {
             return true;
+        } else {
+            return super.isBookEnchantable(stack, book);
         }
-        return false;
     }
 
     @Override
@@ -88,7 +84,7 @@ public class ExchangerTool extends GenericGadget {
         if (enchantment == Enchantments.SILK_TOUCH) {
             return true;
         }
-        return false;
+        return super.canApplyAtEnchantingTable(stack, enchantment);
     }
 
     public static void setFuzzy(ItemStack stack, boolean fuzzy) {
