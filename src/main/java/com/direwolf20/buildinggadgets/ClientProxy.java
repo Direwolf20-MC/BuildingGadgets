@@ -40,6 +40,7 @@ public class ClientProxy extends CommonProxy {
         ModBlocks.effectBlock.initModel();
         buildingTool.initModel();
         ModItems.exchangerTool.initModel();
+        ModBlocks.constructionBlock.initModel();
     }
 
     public void registerEntityRenderers() {
