@@ -2,6 +2,7 @@ package com.direwolf20.buildinggadgets;
 
 
 import com.direwolf20.buildinggadgets.blocks.ConstructionBlock;
+import com.direwolf20.buildinggadgets.blocks.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.blocks.EffectBlock;
 import com.direwolf20.buildinggadgets.items.BuildingTool;
 import com.direwolf20.buildinggadgets.items.ExchangerTool;
@@ -16,6 +17,7 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 
 import java.io.File;
 
@@ -45,6 +47,7 @@ public class CommonProxy {
     public static void registerBlocks(RegistryEvent.Register<Block> event) {
         event.getRegistry().register(new EffectBlock());
         event.getRegistry().register(new ConstructionBlock());
+        GameRegistry.registerTileEntity(ConstructionBlockTileEntity.class, BuildingGadgets.MODID + "_constructionBlock");
     }
 
     @SubscribeEvent
