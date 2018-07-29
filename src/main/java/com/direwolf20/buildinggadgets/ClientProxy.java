@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets;
 
+import com.direwolf20.buildinggadgets.blocks.Models.BakedModelLoader;
 import com.direwolf20.buildinggadgets.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.entities.BlockBuildEntityRender;
 import com.direwolf20.buildinggadgets.items.BuildingTool;
@@ -10,6 +11,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
+import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.Mod;
@@ -25,6 +27,7 @@ public class ClientProxy extends CommonProxy {
     @Override
     public void preInit(FMLPreInitializationEvent e) {
         ModEntities.initModels();
+        ModelLoaderRegistry.registerLoader(new BakedModelLoader());
         super.preInit(e);
     }
 
