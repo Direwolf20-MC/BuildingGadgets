@@ -1,7 +1,6 @@
 package com.direwolf20.buildinggadgets.blocks.Models;
 
 import com.direwolf20.buildinggadgets.BuildingGadgets;
-import com.direwolf20.buildinggadgets.blocks.ConstructionBlock;
 import com.google.common.collect.ImmutableSet;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.resources.IResourceManager;
@@ -13,7 +12,6 @@ import java.util.Set;
 
 public class BakedModelLoader implements ICustomModelLoader {
     public static final ConstructionModel CONSTRUCTION_MODEL = new ConstructionModel();
-
     private static final Set<String> NAMES = ImmutableSet.of(
             "constructionblock");
 

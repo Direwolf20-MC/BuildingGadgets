@@ -13,6 +13,7 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Enchantments;
 import net.minecraft.item.ItemStack;
@@ -309,8 +310,18 @@ public class BuildingTool extends GenericGadget {
                 heldItem.damageItem(1, player);
             }
         }
+        int toolMode = 1;
+        ItemStack constructionStack = InventoryManipulation.getSilkTouchDrop(ModBlocks.constructionBlock.getDefaultState());
+        if (InventoryManipulation.countItem(itemStack, player) == 0) {
+            if (InventoryManipulation.countItem(constructionStack, player) == 0) {
+                return false;
+            } else {
+                itemStack = constructionStack.copy();
+                toolMode = 4;
+            }
+        }
         if (InventoryManipulation.useItem(itemStack, player, neededItems)) {
-            world.spawnEntity(new BlockBuildEntity(world, pos, player, setBlock, 1));
+            world.spawnEntity(new BlockBuildEntity(world, pos, player, setBlock, toolMode));
             return true;
         }
         return false;

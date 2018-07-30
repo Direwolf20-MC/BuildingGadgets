@@ -33,7 +33,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import javax.annotation.Nullable;
 
 public class ConstructionBlock extends Block implements ITileEntityProvider {
-    public static final ConstructionProperty FACADEID = new ConstructionProperty("constructionid");
+    public static final ConstructionProperty FACADEID = new ConstructionProperty("facadeid");
 
     public ConstructionBlock() {
         super(Material.ROCK);
@@ -68,14 +68,12 @@ public class ConstructionBlock extends Block implements ITileEntityProvider {
     public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
         ConstructionBlockTileEntity te = getTE(world, pos);
         ItemStack heldItem = player.getHeldItem(hand);
-        IBlockState newState = Block.getBlockFromItem(heldItem.getItem()).getDefaultState();
-        System.out.println(getExtendedState(state, world, pos));
-        System.out.println(newState);
+        IBlockState newState = Block.getBlockFromItem(heldItem.getItem()).getStateFromMeta(heldItem.getMetadata());
         if (newState != null && newState != Blocks.AIR.getDefaultState()) {
             te.setBlockState(newState);
             return true;
         }
-        System.out.println("Failed: " + newState);
+        System.out.println("Failed: " + newState + ":" + te.getBlockState()+":"+world.isRemote);
         return false;
     }
 
@@ -103,8 +101,8 @@ public class ConstructionBlock extends Block implements ITileEntityProvider {
 
     @Override
     protected BlockStateContainer createBlockState() {
-        IProperty<?>[] listedProperties = new IProperty<?>[] {};
-        IUnlistedProperty<?>[] unlistedProperties = new IUnlistedProperty<?>[] {FACADEID};
+        IProperty<?>[] listedProperties = new IProperty<?>[]{};
+        IUnlistedProperty<?>[] unlistedProperties = new IUnlistedProperty<?>[]{FACADEID};
         return new ExtendedBlockState(this, listedProperties, unlistedProperties);
     }
 

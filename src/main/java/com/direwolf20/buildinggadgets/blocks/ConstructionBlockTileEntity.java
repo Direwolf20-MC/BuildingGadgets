@@ -10,7 +10,7 @@ import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 
 public class ConstructionBlockTileEntity extends TileEntity {
-    private IBlockState blockState;
+    private IBlockState blockState = Blocks.COBBLESTONE.getDefaultState();
 
     public boolean setBlockState(IBlockState state) {
         blockState = state;
@@ -21,7 +21,7 @@ public class ConstructionBlockTileEntity extends TileEntity {
 
     public IBlockState getBlockState() {
         if (blockState == null || blockState == Blocks.AIR.getDefaultState()) {
-            return ModBlocks.constructionBlock.getDefaultState();
+            return Blocks.COBBLESTONE.getDefaultState();
         }
         return blockState;
     }
@@ -30,6 +30,7 @@ public class ConstructionBlockTileEntity extends TileEntity {
     public void readFromNBT(NBTTagCompound compound) {
         super.readFromNBT(compound);
         blockState = NBTUtil.readBlockState(compound.getCompoundTag("blockState"));
+        markDirtyClient();
     }
 
     public void markDirtyClient() {
@@ -41,10 +42,25 @@ public class ConstructionBlockTileEntity extends TileEntity {
     }
 
     @Override
+    public NBTTagCompound getUpdateTag() {
+        NBTTagCompound updateTag = super.getUpdateTag();
+        writeToNBT(updateTag);
+        return updateTag;
+    }
+
+    @Override
+    public SPacketUpdateTileEntity getUpdatePacket(){
+        NBTTagCompound nbtTag = new NBTTagCompound();
+        writeToNBT(nbtTag);
+        return new SPacketUpdateTileEntity(getPos(), 1, nbtTag);
+    }
+
+    @Override
     public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity packet) {
-        //@Todo make this look more like MCJty's
         IBlockState oldMimicBlock = getBlockState();
+        NBTTagCompound tagCompound = packet.getNbtCompound();
         super.onDataPacket(net, packet);
+        readFromNBT(tagCompound);
         if (world.isRemote) {
             // If needed send a render update.
             if (getBlockState() != oldMimicBlock) {
