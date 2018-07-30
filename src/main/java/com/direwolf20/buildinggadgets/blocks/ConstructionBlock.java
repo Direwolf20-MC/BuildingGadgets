@@ -12,12 +12,15 @@ import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.block.statemap.StateMapperBase;
+import net.minecraft.client.renderer.color.BlockColors;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.BlockRenderLayer;
+import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
@@ -104,6 +107,53 @@ public class ConstructionBlock extends Block implements ITileEntityProvider {
         IProperty<?>[] listedProperties = new IProperty<?>[]{};
         IUnlistedProperty<?>[] unlistedProperties = new IUnlistedProperty<?>[]{FACADEID};
         return new ExtendedBlockState(this, listedProperties, unlistedProperties);
+    }
+
+    @Override
+    public EnumBlockRenderType getRenderType(IBlockState state) {
+        return EnumBlockRenderType.MODEL;
+    }
+
+    @Override
+    public boolean isOpaqueCube(IBlockState p_isFullBlock_1_) {
+        return true;
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public boolean canRenderInLayer(IBlockState state, BlockRenderLayer layer) {
+        return true; // delegated to FacadeBakedModel#getQuads
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public boolean shouldSideBeRendered(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, EnumFacing side) {
+        IBlockState mimicBlock = getMimicBlock(blockAccess, pos);
+        return mimicBlock == null ? true : mimicBlock.shouldSideBeRendered(blockAccess, pos, side);
+    }
+
+    @Override
+    public boolean isBlockNormalCube(IBlockState blockState) {
+        return true;
+    }
+
+    @Override
+    public boolean doesSideBlockRendering(IBlockState state, IBlockAccess world, BlockPos pos, EnumFacing face) {
+        IBlockState mimicBlock = getMimicBlock(world, pos);
+        return mimicBlock == null ? true : mimicBlock.doesSideBlockRendering(world, pos, face);
+    }
+
+    @Override
+    public boolean isFullCube(IBlockState state) {
+        return true;
+    }
+
+    @SideOnly(Side.CLIENT)
+    public void initColorHandler(BlockColors blockColors) {
+        blockColors.registerBlockColorHandler((state, world, pos, tintIndex) -> {
+            IBlockState mimicBlock = getMimicBlock(world, pos);
+            return mimicBlock != null ? blockColors.colorMultiplier(mimicBlock, world, pos, tintIndex) : -1;
+        }, this);
     }
 
 }
