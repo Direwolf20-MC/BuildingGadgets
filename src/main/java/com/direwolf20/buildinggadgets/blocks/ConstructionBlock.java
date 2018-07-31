@@ -8,12 +8,14 @@ import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
+import net.minecraft.block.state.BlockFaceShape;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.block.statemap.StateMapperBase;
 import net.minecraft.client.renderer.color.BlockColors;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
@@ -23,6 +25,7 @@ import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -34,6 +37,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nullable;
+import java.util.List;
 
 public class ConstructionBlock extends Block implements ITileEntityProvider {
     public static final ConstructionProperty FACADEID = new ConstructionProperty("facadeid");
@@ -116,7 +120,7 @@ public class ConstructionBlock extends Block implements ITileEntityProvider {
 
     @Override
     public boolean isOpaqueCube(IBlockState p_isFullBlock_1_) {
-        return true;
+        return false;
     }
 
     @Override
@@ -134,7 +138,7 @@ public class ConstructionBlock extends Block implements ITileEntityProvider {
 
     @Override
     public boolean isBlockNormalCube(IBlockState blockState) {
-        return true;
+        return false;
     }
 
     @Override
@@ -154,6 +158,46 @@ public class ConstructionBlock extends Block implements ITileEntityProvider {
             IBlockState mimicBlock = getMimicBlock(world, pos);
             return mimicBlock != null ? blockColors.colorMultiplier(mimicBlock, world, pos, tintIndex) : -1;
         }, this);
+    }
+
+    public BlockFaceShape getBlockFaceShape(IBlockAccess worldIn, IBlockState state, BlockPos pos, EnumFacing face)
+    {
+        IBlockState mimicBlock = getMimicBlock(worldIn, pos);
+        return mimicBlock == null ? BlockFaceShape.SOLID : mimicBlock.getBlockFaceShape(worldIn, pos, face);
+    }
+
+    @Override
+    public void addCollisionBoxToList(IBlockState state, World worldIn, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, @Nullable Entity entityIn, boolean isActualState)
+    {
+        IBlockState mimicBlock = getMimicBlock(worldIn, pos);
+        if (mimicBlock == null) {
+            addCollisionBoxToList(pos, entityBox, collidingBoxes, state.getCollisionBoundingBox(worldIn, pos));
+        } else {
+            addCollisionBoxToList(pos, entityBox, collidingBoxes, mimicBlock.getCollisionBoundingBox(worldIn, pos));
+        }
+    }
+
+    @Override
+    @Nullable
+    public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, IBlockAccess worldIn, BlockPos pos)
+    {
+        IBlockState mimicBlock = getMimicBlock(worldIn, pos);
+        if (mimicBlock == null) {
+            return blockState.getBoundingBox(worldIn, pos);
+        } else {
+            return mimicBlock.getBoundingBox(worldIn, pos);
+        }
+    }
+
+    @Override
+    public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos)
+    {
+        IBlockState mimicBlock = getMimicBlock(source, pos);
+        if (mimicBlock == null) {
+            return FULL_BLOCK_AABB;
+        } else {
+            return mimicBlock.getBoundingBox(source, pos);
+        }
     }
 
 }
