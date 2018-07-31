@@ -36,6 +36,7 @@ public class ClientProxy extends CommonProxy {
         super.init(e);
         MinecraftForge.EVENT_BUS.register(new KeyInputHandler());
         KeyBindings.init();
+        ModBlocks.initColorHandlers();
     }
 
     @SubscribeEvent
