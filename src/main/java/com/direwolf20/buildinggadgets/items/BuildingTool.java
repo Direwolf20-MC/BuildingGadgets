@@ -249,7 +249,7 @@ public class BuildingTool extends GenericGadget {
                 if (distance < 64 && sameDim && currentBlock != ModBlocks.effectBlock.getDefaultState() && !cancelled) { //Don't allow us to undo a block while its still being placed or too far away
                     if (currentBlock != Blocks.AIR.getDefaultState()) {
                         currentBlock.getBlock().harvestBlock(world, player, coord, currentBlock, world.getTileEntity(coord), silkTool);
-                        world.spawnEntity(new BlockBuildEntity(world, coord, player, currentBlock, 2));
+                        world.spawnEntity(new BlockBuildEntity(world, coord, player, currentBlock, 2, getToolActualBlock(heldItem)));
                     }
                 } else { //If you're in the wrong dimension or too far away, fail the undo.
                     player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.undofailed").getUnformattedComponentText()), true);
@@ -321,7 +321,7 @@ public class BuildingTool extends GenericGadget {
             }
         }
         if (InventoryManipulation.useItem(itemStack, player, neededItems)) {
-            world.spawnEntity(new BlockBuildEntity(world, pos, player, setBlock, toolMode));
+            world.spawnEntity(new BlockBuildEntity(world, pos, player, setBlock, toolMode, getToolActualBlock(heldItem)));
             return true;
         }
         return false;

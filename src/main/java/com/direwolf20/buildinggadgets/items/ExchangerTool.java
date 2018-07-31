@@ -304,7 +304,7 @@ public class ExchangerTool extends GenericGadget {
         }
         currentBlock.getBlock().harvestBlock(world, player, pos, currentBlock, world.getTileEntity(pos), tool);
         InventoryManipulation.useItem(itemStack, player, neededItems);
-        world.spawnEntity(new BlockBuildEntity(world, pos, player, setBlock, 3));
+        world.spawnEntity(new BlockBuildEntity(world, pos, player, setBlock, 3, getToolActualBlock(tool)));
         return true;
     }
 

@@ -11,9 +11,17 @@ import net.minecraft.tileentity.TileEntity;
 
 public class ConstructionBlockTileEntity extends TileEntity {
     private IBlockState blockState = Blocks.COBBLESTONE.getDefaultState();
+    private IBlockState actualBlockState;
 
     public boolean setBlockState(IBlockState state) {
         blockState = state;
+        System.out.println(state);
+        markDirtyClient();
+        return true;
+    }
+
+    public boolean setActualBlockState(IBlockState state) {
+        actualBlockState = state;
         System.out.println(state);
         markDirtyClient();
         return true;
@@ -26,10 +34,18 @@ public class ConstructionBlockTileEntity extends TileEntity {
         return blockState;
     }
 
+    public IBlockState getActualBlockState() {
+        if (actualBlockState == null || actualBlockState == Blocks.AIR.getDefaultState()) {
+            return null;
+        }
+        return actualBlockState;
+    }
+
     @Override
     public void readFromNBT(NBTTagCompound compound) {
         super.readFromNBT(compound);
         blockState = NBTUtil.readBlockState(compound.getCompoundTag("blockState"));
+        actualBlockState = NBTUtil.readBlockState(compound.getCompoundTag("actualBlockState"));
         markDirtyClient();
     }
 
@@ -74,8 +90,11 @@ public class ConstructionBlockTileEntity extends TileEntity {
         super.writeToNBT(compound);
         if (blockState != null) {
             NBTTagCompound blockStateTag = new NBTTagCompound();
+            NBTTagCompound actualBlockStateTag = new NBTTagCompound();
             NBTUtil.writeBlockState(blockStateTag, blockState);
             compound.setTag("blockState", blockStateTag);
+            NBTUtil.writeBlockState(actualBlockStateTag, actualBlockState);
+            compound.setTag("actualBlockState", actualBlockStateTag);
         }
         return compound;
     }

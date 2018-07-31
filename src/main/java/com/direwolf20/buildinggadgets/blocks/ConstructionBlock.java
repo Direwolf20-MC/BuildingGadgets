@@ -80,7 +80,7 @@ public class ConstructionBlock extends Block implements ITileEntityProvider {
             te.setBlockState(newState);
             return true;
         }
-        System.out.println("Failed: " + newState + ":" + te.getBlockState()+":"+world.isRemote);
+        System.out.println("Failed: " + newState + ":" + te.getBlockState()+":"+world.isRemote+":"+te.getActualBlockState());
         return false;
     }
 
@@ -101,6 +101,16 @@ public class ConstructionBlock extends Block implements ITileEntityProvider {
         TileEntity te = blockAccess.getTileEntity(pos);
         if (te instanceof ConstructionBlockTileEntity) {
             return ((ConstructionBlockTileEntity) te).getBlockState();
+        } else {
+            return null;
+        }
+    }
+
+    @Nullable
+    protected IBlockState getActualMimicBlock(IBlockAccess blockAccess, BlockPos pos) {
+        TileEntity te = blockAccess.getTileEntity(pos);
+        if (te instanceof ConstructionBlockTileEntity) {
+            return ((ConstructionBlockTileEntity) te).getActualBlockState();
         } else {
             return null;
         }
@@ -163,7 +173,11 @@ public class ConstructionBlock extends Block implements ITileEntityProvider {
     public BlockFaceShape getBlockFaceShape(IBlockAccess worldIn, IBlockState state, BlockPos pos, EnumFacing face)
     {
         IBlockState mimicBlock = getMimicBlock(worldIn, pos);
-        return mimicBlock == null ? BlockFaceShape.SOLID : mimicBlock.getBlock().getBlockFaceShape(worldIn, state, pos, face);
+        try {
+            return mimicBlock == null ? BlockFaceShape.SOLID : mimicBlock.getBlock().getBlockFaceShape(worldIn, state, pos, face);
+        } catch (Exception var8) {
+            return BlockFaceShape.SOLID;
+        }
     }
 
     @Override
@@ -210,15 +224,15 @@ public class ConstructionBlock extends Block implements ITileEntityProvider {
 
     @Override
     public IBlockState getActualState(IBlockState state, IBlockAccess worldIn, BlockPos pos) {
-        return super.getActualState(state, worldIn, pos);
-        /*IBlockState mimicBlock = getMimicBlock(worldIn, pos);
-        if (mimicBlock == null) {
+        //return super.getActualState(state, worldIn, pos);
+        IBlockState mimicBlock = getMimicBlock(worldIn, pos);
+        IBlockState actualMimicBlock = getActualMimicBlock(worldIn, pos);
+        if (actualMimicBlock == null || mimicBlock == null || actualMimicBlock.equals(mimicBlock)) {
             return super.getActualState(state, worldIn, pos);
         } else {
-            return mimicBlock;
-        }*/
+            return actualMimicBlock;
+        }
 
     }
-
 
 }

@@ -163,6 +163,21 @@ public class GadgetUtils {
         stack.setTagCompound(tagCompound);
     }
 
+    public static void setToolActualBlock(ItemStack stack, IBlockState state) {
+        //Store the selected block actual state in the tool's NBT
+        NBTTagCompound tagCompound = stack.getTagCompound();
+        if (tagCompound == null) {
+            tagCompound = new NBTTagCompound();
+        }
+        if (state == null) {
+            state = Blocks.AIR.getDefaultState();
+        }
+        NBTTagCompound stateTag = new NBTTagCompound();
+        NBTUtil.writeBlockState(stateTag, state);
+        tagCompound.setTag("actualblockstate", stateTag);
+        stack.setTagCompound(tagCompound);
+    }
+
 
     public static IBlockState getToolBlock(ItemStack stack) {
         NBTTagCompound tagCompound = stack.getTagCompound();
@@ -172,6 +187,16 @@ public class GadgetUtils {
             return Blocks.AIR.getDefaultState();
         }
         return NBTUtil.readBlockState(tagCompound.getCompoundTag("blockstate"));
+    }
+
+    public static IBlockState getToolActualBlock(ItemStack stack) {
+        NBTTagCompound tagCompound = stack.getTagCompound();
+        if (tagCompound == null) {
+            setToolBlock(stack, Blocks.AIR.getDefaultState());
+            tagCompound = stack.getTagCompound();
+            return Blocks.AIR.getDefaultState();
+        }
+        return NBTUtil.readBlockState(tagCompound.getCompoundTag("actualblockstate"));
     }
 
     public static void selectBlock(ItemStack stack, EntityPlayer player) {
@@ -193,6 +218,7 @@ public class GadgetUtils {
             IBlockState actualState = placeState.getBlock().getActualState(placeState, world, pos);
             System.out.println(placeState +":"+ actualState);
             setToolBlock(stack, placeState);
+            setToolActualBlock(stack, actualState);
         }
     }
 

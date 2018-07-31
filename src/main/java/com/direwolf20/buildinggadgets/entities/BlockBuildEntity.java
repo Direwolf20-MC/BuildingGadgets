@@ -31,6 +31,7 @@ public class BlockBuildEntity extends Entity implements IEntityAdditionalSpawnDa
     private int mode;
     private IBlockState setBlock;
     private IBlockState originalSetBlock;
+    private IBlockState actualSetBlock;
     private BlockPos setPos;
     private EntityLivingBase spawnedBy;
 
@@ -42,7 +43,7 @@ public class BlockBuildEntity extends Entity implements IEntityAdditionalSpawnDa
         world = worldIn;
     }
 
-    public BlockBuildEntity(World worldIn, BlockPos spawnPos, EntityLivingBase player, IBlockState spawnBlock, int toolMode) {
+    public BlockBuildEntity(World worldIn, BlockPos spawnPos, EntityLivingBase player, IBlockState spawnBlock, int toolMode, IBlockState actualSpawnBlock) {
         super(worldIn);
         setSize(0.1F, 0.1F);
         setPosition(spawnPos.getX(), spawnPos.getY(), spawnPos.getZ());
@@ -69,6 +70,7 @@ public class BlockBuildEntity extends Entity implements IEntityAdditionalSpawnDa
         mode = toolMode;
         setToolMode(toolMode);
         spawnedBy = player;
+        actualSetBlock = actualSpawnBlock;
         world.setBlockState(spawnPos, ModBlocks.effectBlock.getDefaultState());
     }
 
@@ -141,12 +143,13 @@ public class BlockBuildEntity extends Entity implements IEntityAdditionalSpawnDa
             } else if (setPos != null && setBlock != null && getToolMode() == 2) {
                 world.setBlockState(setPos, Blocks.AIR.getDefaultState());
             } else if (setPos != null && setBlock != null && getToolMode() == 3) {
-                world.spawnEntity(new BlockBuildEntity(world, setPos, spawnedBy, originalSetBlock, 1));
+                world.spawnEntity(new BlockBuildEntity(world, setPos, spawnedBy, originalSetBlock, 1, actualSetBlock));
             } else if (setPos != null && setBlock != null && getToolMode() == 4) {
                 world.setBlockState(setPos, ModBlocks.constructionBlock.getDefaultState());
                 TileEntity te = world.getTileEntity(setPos);
                 if (te instanceof ConstructionBlockTileEntity) {
                     ((ConstructionBlockTileEntity) te).setBlockState(setBlock);
+                    ((ConstructionBlockTileEntity) te).setActualBlockState(actualSetBlock);
                 }
             }
         }
