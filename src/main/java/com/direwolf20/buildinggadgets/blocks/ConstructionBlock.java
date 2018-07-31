@@ -149,7 +149,7 @@ public class ConstructionBlock extends Block implements ITileEntityProvider {
 
     @Override
     public boolean isFullCube(IBlockState state) {
-        return true;
+        return false;
     }
 
     @SideOnly(Side.CLIENT)
@@ -163,7 +163,7 @@ public class ConstructionBlock extends Block implements ITileEntityProvider {
     public BlockFaceShape getBlockFaceShape(IBlockAccess worldIn, IBlockState state, BlockPos pos, EnumFacing face)
     {
         IBlockState mimicBlock = getMimicBlock(worldIn, pos);
-        return mimicBlock == null ? BlockFaceShape.SOLID : mimicBlock.getBlockFaceShape(worldIn, pos, face);
+        return mimicBlock == null ? BlockFaceShape.SOLID : mimicBlock.getBlock().getBlockFaceShape(worldIn, state, pos, face);
     }
 
     @Override
@@ -171,9 +171,9 @@ public class ConstructionBlock extends Block implements ITileEntityProvider {
     {
         IBlockState mimicBlock = getMimicBlock(worldIn, pos);
         if (mimicBlock == null) {
-            addCollisionBoxToList(pos, entityBox, collidingBoxes, state.getCollisionBoundingBox(worldIn, pos));
+            super.addCollisionBoxToList(state, worldIn, pos, entityBox, collidingBoxes, entityIn, isActualState);
         } else {
-            addCollisionBoxToList(pos, entityBox, collidingBoxes, mimicBlock.getCollisionBoundingBox(worldIn, pos));
+            mimicBlock.getBlock().addCollisionBoxToList(mimicBlock, worldIn, pos, entityBox, collidingBoxes, entityIn, isActualState);
         }
     }
 
@@ -183,9 +183,13 @@ public class ConstructionBlock extends Block implements ITileEntityProvider {
     {
         IBlockState mimicBlock = getMimicBlock(worldIn, pos);
         if (mimicBlock == null) {
-            return blockState.getBoundingBox(worldIn, pos);
+            return super.getBoundingBox(blockState, worldIn, pos);
         } else {
-            return mimicBlock.getBoundingBox(worldIn, pos);
+            try {
+                return mimicBlock.getBlock().getBoundingBox(blockState, worldIn, pos);
+            } catch (Exception var8) {
+                return super.getBoundingBox(blockState, worldIn, pos);
+            }
         }
     }
 
@@ -194,9 +198,13 @@ public class ConstructionBlock extends Block implements ITileEntityProvider {
     {
         IBlockState mimicBlock = getMimicBlock(source, pos);
         if (mimicBlock == null) {
-            return FULL_BLOCK_AABB;
+            return super.getBoundingBox(state, source, pos);
         } else {
-            return mimicBlock.getBoundingBox(source, pos);
+            try {
+                return mimicBlock.getBlock().getBoundingBox(state, source, pos);
+            } catch (Exception var8) {
+                return super.getBoundingBox(state, source, pos);
+            }
         }
     }
 
