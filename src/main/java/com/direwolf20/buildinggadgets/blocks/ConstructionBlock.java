@@ -133,7 +133,7 @@ public class ConstructionBlock extends Block implements ITileEntityProvider {
     @SideOnly(Side.CLIENT)
     public boolean shouldSideBeRendered(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, EnumFacing side) {
         IBlockState mimicBlock = getMimicBlock(blockAccess, pos);
-        return mimicBlock == null ? true : mimicBlock.shouldSideBeRendered(blockAccess, pos, side);
+        return mimicBlock == null ? true : mimicBlock.getBlock().shouldSideBeRendered(mimicBlock, blockAccess, pos, side);
     }
 
     @Override
@@ -144,7 +144,7 @@ public class ConstructionBlock extends Block implements ITileEntityProvider {
     @Override
     public boolean doesSideBlockRendering(IBlockState state, IBlockAccess world, BlockPos pos, EnumFacing face) {
         IBlockState mimicBlock = getMimicBlock(world, pos);
-        return mimicBlock == null ? true : mimicBlock.doesSideBlockRendering(world, pos, face);
+        return mimicBlock == null ? true : mimicBlock.getBlock().doesSideBlockRendering(mimicBlock, world, pos, face);
     }
 
     @Override
@@ -207,5 +207,18 @@ public class ConstructionBlock extends Block implements ITileEntityProvider {
             }
         }
     }
+
+    @Override
+    public IBlockState getActualState(IBlockState state, IBlockAccess worldIn, BlockPos pos) {
+        return super.getActualState(state, worldIn, pos);
+        /*IBlockState mimicBlock = getMimicBlock(worldIn, pos);
+        if (mimicBlock == null) {
+            return super.getActualState(state, worldIn, pos);
+        } else {
+            return mimicBlock;
+        }*/
+
+    }
+
 
 }
