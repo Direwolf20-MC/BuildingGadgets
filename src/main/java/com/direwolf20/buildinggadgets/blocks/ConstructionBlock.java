@@ -78,6 +78,7 @@ public class ConstructionBlock extends Block implements ITileEntityProvider {
         IBlockState newState = Block.getBlockFromItem(heldItem.getItem()).getStateFromMeta(heldItem.getMetadata());
         if (newState != null && newState != Blocks.AIR.getDefaultState()) {
             te.setBlockState(newState);
+            te.setActualBlockState(newState);
             return true;
         }
         System.out.println("Failed: " + newState + ":" + te.getBlockState() + ":" + world.isRemote + ":" + te.getActualBlockState());
@@ -87,7 +88,7 @@ public class ConstructionBlock extends Block implements ITileEntityProvider {
     @Override
     public IBlockState getExtendedState(IBlockState state, IBlockAccess world, BlockPos pos) {
         IExtendedBlockState extendedBlockState = (IExtendedBlockState) super.getExtendedState(state, world, pos);
-        IBlockState mimicBlock = getMimicBlock(world, pos);
+        IBlockState mimicBlock = getActualMimicBlock(world, pos);
         if (mimicBlock != null) {
             ConstructionID mimicID = new ConstructionID(mimicBlock);
             return extendedBlockState.withProperty(FACADEID, mimicID);
@@ -217,18 +218,4 @@ public class ConstructionBlock extends Block implements ITileEntityProvider {
             }
         }
     }
-
-    @Override
-    public IBlockState getActualState(IBlockState state, IBlockAccess worldIn, BlockPos pos) {
-        //return super.getActualState(state, worldIn, pos);
-        IBlockState mimicBlock = getMimicBlock(worldIn, pos);
-        IBlockState actualMimicBlock = getActualMimicBlock(worldIn, pos);
-        if (actualMimicBlock == null || mimicBlock == null || actualMimicBlock.equals(mimicBlock)) {
-            return super.getActualState(state, worldIn, pos);
-        } else {
-            return actualMimicBlock;
-        }
-
-    }
-
 }

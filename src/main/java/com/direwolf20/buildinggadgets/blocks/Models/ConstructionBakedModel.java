@@ -24,9 +24,11 @@ public class ConstructionBakedModel implements IBakedModel {
 
     private VertexFormat format;
     private static TextureAtlasSprite spriteCable;
+    private IBakedModel blankConstructionModel;
 
-    public ConstructionBakedModel(IModelState state, VertexFormat format, Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter) {
+    public ConstructionBakedModel(IModelState state, VertexFormat format, Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter, IBakedModel blankConstrModel) {
         this.format = format;
+        this.blankConstructionModel = blankConstrModel;
     }
 
     private static void initTextures() {
@@ -41,22 +43,18 @@ public class ConstructionBakedModel implements IBakedModel {
         ConstructionID facadeId = extendedBlockState.getValue(ConstructionBlock.FACADEID);
         IBakedModel model;
         if (facadeId == null) {
-            //return Collections.emptyList();
-            model = getModel(state);
-            return model.getQuads(state, side, rand);
+            return blankConstructionModel.getQuads(state, side, rand);
         }
 
         IBlockState facadeState = facadeId.getBlockState();
-        /*if (facadeState == ModBlocks.constructionBlock.getDefaultState()) {
-            return Collections.emptyList();
-        }*/
         BlockRenderLayer layer = MinecraftForgeClient.getRenderLayer();
+
         if (layer != null && !facadeState.getBlock().canRenderInLayer(facadeState, layer)) { // always render in the null layer or the block-breaking textures don't show up
             return Collections.emptyList();
         }
         model = getModel(facadeState);
         try {
-            return model.getQuads(state, side, rand);
+            return model.getQuads(facadeState, side, rand);
         } catch (Exception e) {
             return Collections.emptyList();
         }
