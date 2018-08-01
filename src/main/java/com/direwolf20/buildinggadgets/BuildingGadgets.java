@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets;
 
+import com.direwolf20.buildinggadgets.config.InGameConfig;
 import com.direwolf20.buildinggadgets.items.AnvilRepairHandler;
 import com.direwolf20.buildinggadgets.items.BreakEventHandler;
 import net.minecraftforge.common.MinecraftForge;
@@ -33,7 +34,7 @@ public class BuildingGadgets {
         logger = event.getModLog();
         proxy.preInit(event);
         MinecraftForge.EVENT_BUS.register(new BreakEventHandler());
-        if (!Config.poweredByFE) {
+        if (!InGameConfig.poweredByFE) {
             MinecraftForge.EVENT_BUS.register(new AnvilRepairHandler());
         }
     }

@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.tools;
 
-import com.direwolf20.buildinggadgets.Config;
 import com.direwolf20.buildinggadgets.ModBlocks;
+import com.direwolf20.buildinggadgets.config.InGameConfig;
 import com.direwolf20.buildinggadgets.items.BuildingTool;
 import com.direwolf20.buildinggadgets.items.ExchangerTool;
 import com.direwolf20.buildinggadgets.items.FakeBuilderWorld;
@@ -77,7 +77,7 @@ public class ToolRenders {
 
                 int hasBlocks = InventoryManipulation.countItem(itemStack, player);
                 int hasEnergy = 0;
-                if (Config.poweredByFE) {
+                if (InGameConfig.poweredByFE) {
                     hasEnergy = stack.getCapability(CapabilityEnergy.ENERGY, null).getEnergyStored();
                 } else {
                     hasEnergy = stack.getMaxDamage() - stack.getItemDamage();
@@ -132,8 +132,8 @@ public class ToolRenders {
                     GlStateManager.scale(1.01f, 1.01f, 1.01f);
                     GL14.glBlendColor(1F, 1F, 1F, 0.35f); //Set the alpha of the blocks we are rendering
                     hasBlocks--;
-                    if (Config.poweredByFE) {
-                        hasEnergy = hasEnergy - Config.energyCostBuilder;
+                    if (InGameConfig.poweredByFE) {
+                        hasEnergy = hasEnergy - InGameConfig.energyCostBuilder;
                     } else {
                         hasEnergy--;
                     }
@@ -197,7 +197,7 @@ public class ToolRenders {
                 }
                 int hasBlocks = InventoryManipulation.countItem(itemStack, player);
                 int hasEnergy = 0;
-                if (Config.poweredByFE) {
+                if (InGameConfig.poweredByFE) {
                     hasEnergy = stack.getCapability(CapabilityEnergy.ENERGY, null).getEnergyStored();
                 } else {
                     hasEnergy = stack.getMaxDamage() - stack.getItemDamage();
@@ -256,8 +256,8 @@ public class ToolRenders {
                     GlStateManager.scale(1.02f, 1.02f, 1.02f);//Slightly Larger block to avoid z-fighting.
                     GL14.glBlendColor(1F, 1F, 1F, 0.55f); //Set the alpha of the blocks we are rendering
                     hasBlocks--;
-                    if (Config.poweredByFE) {
-                        hasEnergy = hasEnergy - Config.energyCostExchanger;
+                    if (InGameConfig.poweredByFE) {
+                        hasEnergy = hasEnergy - InGameConfig.energyCostExchanger;
                     } else {
                         hasEnergy = hasEnergy - 2;
                     }
