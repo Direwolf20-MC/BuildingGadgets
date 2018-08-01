@@ -25,7 +25,6 @@ public class BlockBuildEntity extends Entity implements IEntityAdditionalSpawnDa
     private static final DataParameter<Integer> toolMode = EntityDataManager.<Integer>createKey(BlockBuildEntity.class, DataSerializers.VARINT);
     private static final DataParameter<Optional<IBlockState>> SET_BLOCK = EntityDataManager.<Optional<IBlockState>>createKey(BlockBuildEntity.class, DataSerializers.OPTIONAL_BLOCK_STATE);
     private static final DataParameter<BlockPos> FIXED = EntityDataManager.createKey(BlockBuildEntity.class, DataSerializers.BLOCK_POS);
-    //@Todo add actualSteBlock and ConstructionPaste to the data parameters
 
     public int despawning = -1;
     public int maxLife = 20;
@@ -184,9 +183,13 @@ public class BlockBuildEntity extends Entity implements IEntityAdditionalSpawnDa
         NBTTagCompound blockStateTag = new NBTTagCompound();
         NBTUtil.writeBlockState(blockStateTag, setBlock);
         compound.setTag("setBlock", blockStateTag);
+        NBTTagCompound actualBlockStateTag = new NBTTagCompound();
+        NBTUtil.writeBlockState(actualBlockStateTag, actualSetBlock);
+        compound.setTag("actualSetBlock", actualBlockStateTag);
         NBTUtil.writeBlockState(blockStateTag, originalSetBlock);
         compound.setTag("originalBlock", blockStateTag);
         compound.setInteger("mode", mode);
+        compound.setBoolean("paste", useConstructionPaste);
     }
 
     @Override
@@ -196,7 +199,9 @@ public class BlockBuildEntity extends Entity implements IEntityAdditionalSpawnDa
         setPos = NBTUtil.getPosFromTag(compound.getCompoundTag("setPos"));
         setBlock = NBTUtil.readBlockState(compound.getCompoundTag("setBlock"));
         originalSetBlock = NBTUtil.readBlockState(compound.getCompoundTag("originalBlock"));
+        actualSetBlock = NBTUtil.readBlockState(compound.getCompoundTag("actualSetBlock"));
         mode = compound.getInteger("mode");
+        useConstructionPaste = compound.getBoolean("paste");
     }
 
     @Override
