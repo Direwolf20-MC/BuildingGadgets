@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.tools;
 
+import com.direwolf20.buildinggadgets.Config;
 import com.direwolf20.buildinggadgets.ModBlocks;
 import com.direwolf20.buildinggadgets.items.BuildingTool;
 import com.direwolf20.buildinggadgets.items.ExchangerTool;
@@ -22,6 +23,7 @@ import net.minecraft.world.WorldType;
 import net.minecraftforge.client.ForgeHooksClient;
 import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
+import net.minecraftforge.energy.CapabilityEnergy;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL14;
 
@@ -29,17 +31,16 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
+import static com.direwolf20.buildinggadgets.tools.GadgetUtils.*;
 import static net.minecraft.block.BlockStainedGlass.COLOR;
 
 public class ToolRenders {
     private static final FakeBuilderWorld fakeWorld = new FakeBuilderWorld();
 
     public static void renderBuilderOverlay(RenderWorldLastEvent evt, EntityPlayer player, ItemStack stack) {
-        int range = BuildingTool.getToolRange(stack);
-        BuildingTool.toolModes mode = BuildingTool.getToolMode(stack);
         RayTraceResult lookingAt = VectorTools.getLookingAt(player);
         IBlockState state = Blocks.AIR.getDefaultState();
-        ArrayList<BlockPos> coordinates = BuildingTool.getAnchor(stack);
+        ArrayList<BlockPos> coordinates = getAnchor(stack);
         if (lookingAt != null || coordinates.size() > 0) {
             World world = player.world;
             IBlockState startBlock = Blocks.AIR.getDefaultState();
@@ -50,30 +51,37 @@ public class ToolRenders {
                 ItemStack heldItem = player.getHeldItemMainhand(); //Get the item stack and the block that we'll be rendering (From the Itemstack's NBT)
                 if (!(heldItem.getItem() instanceof BuildingTool)) {
                     heldItem = player.getHeldItemOffhand();
-                    if (!(heldItem.getItem() instanceof BuildingTool)) {return;}
+                    if (!(heldItem.getItem() instanceof BuildingTool)) {
+                        return;
+                    }
                 }
-                IBlockState renderBlockState = BuildingTool.getToolBlock(heldItem);
+                IBlockState renderBlockState = getToolBlock(heldItem);
                 Minecraft mc = Minecraft.getMinecraft();
                 mc.renderEngine.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
                 if (renderBlockState == Blocks.AIR.getDefaultState()) {//Don't render anything if there is no block selected (Air)
                     return;
                 }
                 if (coordinates.size() == 0) { //Build a list of coordinates based on the tool mode and range
-                    coordinates = BuildingModes.getBuildOrders(world, player, lookingAt.getBlockPos(), lookingAt.sideHit, range, mode, renderBlockState);
+                    coordinates = BuildingModes.getBuildOrders(world, player, lookingAt.getBlockPos(), lookingAt.sideHit, heldItem);
                 }
 
                 //Figure out how many of the block we're rendering we have in the inventory of the player.
                 //ItemStack itemStack = renderBlockState.getBlock().getPickBlock(renderBlockState, null, world, new BlockPos(0, 0, 0), player);
                 //ItemStack itemStack = InventoryManipulation.getSilkTouchDrop(renderBlockState);
                 ItemStack itemStack;
-                if (renderBlockState.getBlock().canSilkHarvest(world,new BlockPos(0,0,0),renderBlockState,player)) {
+                if (renderBlockState.getBlock().canSilkHarvest(world, new BlockPos(0, 0, 0), renderBlockState, player)) {
                     itemStack = InventoryManipulation.getSilkTouchDrop(renderBlockState);
                 } else {
                     itemStack = renderBlockState.getBlock().getPickBlock(renderBlockState, null, world, new BlockPos(0, 0, 0), player);
                 }
 
                 int hasBlocks = InventoryManipulation.countItem(itemStack, player);
-
+                int hasEnergy = 0;
+                if (Config.poweredByFE) {
+                    hasEnergy = stack.getCapability(CapabilityEnergy.ENERGY, null).getEnergyStored();
+                } else {
+                    hasEnergy = stack.getMaxDamage() - stack.getItemDamage();
+                }
                 //Prepare the block rendering
                 BlockRendererDispatcher dispatcher = Minecraft.getMinecraft().getBlockRendererDispatcher();
                 BlockRenderLayer origLayer = MinecraftForgeClient.getRenderLayer();
@@ -124,7 +132,13 @@ public class ToolRenders {
                     GlStateManager.scale(1.01f, 1.01f, 1.01f);
                     GL14.glBlendColor(1F, 1F, 1F, 0.35f); //Set the alpha of the blocks we are rendering
                     hasBlocks--;
-                    if (hasBlocks < 0) {
+                    if (Config.poweredByFE) {
+                        hasEnergy = hasEnergy - Config.energyCostBuilder;
+                    } else {
+                        hasEnergy--;
+                    }
+
+                    if (hasBlocks < 0 || hasEnergy < 0) {
                         dispatcher.renderBlockBrightness(Blocks.STAINED_GLASS.getDefaultState().withProperty(COLOR, EnumDyeColor.RED), 1f);
                     }
                     //Move the render position back to where it was
@@ -143,11 +157,11 @@ public class ToolRenders {
     }
 
     public static void renderExchangerOverlay(RenderWorldLastEvent evt, EntityPlayer player, ItemStack stack) {
-        int range = ExchangerTool.getToolRange(stack);
+        int range = getToolRange(stack);
         ExchangerTool.toolModes mode = ExchangerTool.getToolMode(stack);
         RayTraceResult lookingAt = VectorTools.getLookingAt(player);
         IBlockState state = Blocks.AIR.getDefaultState();
-        ArrayList<BlockPos> coordinates = ExchangerTool.getAnchor(stack);
+        ArrayList<BlockPos> coordinates = getAnchor(stack);
         if (lookingAt != null || coordinates.size() > 0) {
             World world = player.world;
             IBlockState startBlock = Blocks.AIR.getDefaultState();
@@ -158,29 +172,36 @@ public class ToolRenders {
                 ItemStack heldItem = player.getHeldItemMainhand(); //Get the item stack and the block that we'll be rendering (From the Itemstack's NBT)
                 if (!(heldItem.getItem() instanceof ExchangerTool)) {
                     heldItem = player.getHeldItemOffhand();
-                    if (!(heldItem.getItem() instanceof ExchangerTool)) {return;}
+                    if (!(heldItem.getItem() instanceof ExchangerTool)) {
+                        return;
+                    }
                 }
-                IBlockState renderBlockState = ExchangerTool.getToolBlock(heldItem);
+                IBlockState renderBlockState = getToolBlock(heldItem);
                 Minecraft mc = Minecraft.getMinecraft();
                 mc.renderEngine.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
                 if (renderBlockState == Blocks.AIR.getDefaultState()) {//Don't render anything if there is no block selected (Air)
                     return;
                 }
                 if (coordinates.size() == 0) { //Build a list of coordinates based on the tool mode and range
-                    coordinates = ExchangingModes.getBuildOrders(world, player, lookingAt.getBlockPos(), lookingAt.sideHit, range, mode, renderBlockState);
+                    coordinates = ExchangingModes.getBuildOrders(world, player, lookingAt.getBlockPos(), lookingAt.sideHit, stack);
                 }
 
                 //Figure out how many of the block we're rendering we have in the inventory of the player.
                 //ItemStack itemStack = renderBlockState.getBlock().getPickBlock(renderBlockState, null, world, new BlockPos(0, 0, 0), player);
                 //ItemStack itemStack = InventoryManipulation.getSilkTouchDrop(renderBlockState);
                 ItemStack itemStack;
-                if (renderBlockState.getBlock().canSilkHarvest(world,new BlockPos(0,0,0),renderBlockState,player)) {
+                if (renderBlockState.getBlock().canSilkHarvest(world, new BlockPos(0, 0, 0), renderBlockState, player)) {
                     itemStack = InventoryManipulation.getSilkTouchDrop(renderBlockState);
                 } else {
                     itemStack = renderBlockState.getBlock().getPickBlock(renderBlockState, null, world, new BlockPos(0, 0, 0), player);
                 }
                 int hasBlocks = InventoryManipulation.countItem(itemStack, player);
-
+                int hasEnergy = 0;
+                if (Config.poweredByFE) {
+                    hasEnergy = stack.getCapability(CapabilityEnergy.ENERGY, null).getEnergyStored();
+                } else {
+                    hasEnergy = stack.getMaxDamage() - stack.getItemDamage();
+                }
                 //Prepare the block rendering
                 BlockRendererDispatcher dispatcher = Minecraft.getMinecraft().getBlockRendererDispatcher();
                 BlockRenderLayer origLayer = MinecraftForgeClient.getRenderLayer();
@@ -221,7 +242,7 @@ public class ToolRenders {
                     dispatcher.renderBlockBrightness(state, 1f);//Render the defined block
                     GL14.glBlendColor(1F, 1F, 1F, 0.1f); //Set the alpha of the blocks we are rendering
                     GlStateManager.rotate(-90.0F, 0.0F, 1.0F, 0.0F); //Rotate it because i'm not sure why but we need to
-                    dispatcher.renderBlockBrightness(Blocks.STAINED_GLASS.getDefaultState().withProperty(COLOR,EnumDyeColor.WHITE), 1f);//Render the defined block - White glass to show non-full block renders (Example: Torch)
+                    dispatcher.renderBlockBrightness(Blocks.STAINED_GLASS.getDefaultState().withProperty(COLOR, EnumDyeColor.WHITE), 1f);//Render the defined block - White glass to show non-full block renders (Example: Torch)
                     //Move the render position back to where it was
                     GlStateManager.popMatrix();
                 }
@@ -235,7 +256,12 @@ public class ToolRenders {
                     GlStateManager.scale(1.02f, 1.02f, 1.02f);//Slightly Larger block to avoid z-fighting.
                     GL14.glBlendColor(1F, 1F, 1F, 0.55f); //Set the alpha of the blocks we are rendering
                     hasBlocks--;
-                    if (hasBlocks < 0) {
+                    if (Config.poweredByFE) {
+                        hasEnergy = hasEnergy - Config.energyCostExchanger;
+                    } else {
+                        hasEnergy = hasEnergy - 2;
+                    }
+                    if (hasBlocks < 0 || hasEnergy < 0) {
                         dispatcher.renderBlockBrightness(Blocks.STAINED_GLASS.getDefaultState().withProperty(COLOR, EnumDyeColor.RED), 1f);
                     }
                     //Move the render position back to where it was

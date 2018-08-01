@@ -3,6 +3,7 @@ package com.direwolf20.buildinggadgets.tools;
 import com.direwolf20.buildinggadgets.items.BuildingTool;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -20,8 +21,11 @@ public class BuildingModes {
         return true;
     }
 
-    public static ArrayList<BlockPos> getBuildOrders(World world, EntityPlayer player, BlockPos startBlock, EnumFacing sideHit, int range, BuildingTool.toolModes mode, IBlockState setBlock) {
-
+    public static ArrayList<BlockPos> getBuildOrders(World world, EntityPlayer player, BlockPos startBlock, EnumFacing sideHit, ItemStack tool) {
+        //BuildingTool.toolModes mode, IBlockState setBlock
+        BuildingTool.toolModes mode = BuildingTool.getToolMode(tool);
+        IBlockState setBlock = GadgetUtils.getToolBlock(tool);
+        int range = GadgetUtils.getToolRange(tool);
         ArrayList<BlockPos> coordinates = new ArrayList<BlockPos>();
         BlockPos playerPos = new BlockPos(Math.floor(player.posX), Math.floor(player.posY), Math.floor(player.posZ));
         BlockPos pos = startBlock;
@@ -249,10 +253,10 @@ public class BuildingModes {
             }
             if (sideHit == EnumFacing.NORTH) {
                 for (int z = 1; z <= range; z++) {
-                    if (startBlock.getY() > player.posY+1) {
+                    if (startBlock.getY() > player.posY + 1) {
                         pos = new BlockPos(startBlock.getX(), startBlock.getY() - z, startBlock.getZ() - z);
                     } else {
-                        pos = new BlockPos(startBlock.getX(), startBlock.getY() + z, startBlock.getZ() + z-1);
+                        pos = new BlockPos(startBlock.getX(), startBlock.getY() + z, startBlock.getZ() + z - 1);
                     }
                     if (isReplaceable(world, pos, setBlock)) {
                         coordinates.add(pos);
@@ -260,10 +264,10 @@ public class BuildingModes {
                 }
             } else if (sideHit == EnumFacing.SOUTH) {
                 for (int z = 1; z <= range; z++) {
-                    if (startBlock.getY() > player.posY+1) {
+                    if (startBlock.getY() > player.posY + 1) {
                         pos = new BlockPos(startBlock.getX(), startBlock.getY() - z, startBlock.getZ() + z);
                     } else {
-                        pos = new BlockPos(startBlock.getX(), startBlock.getY() + z, startBlock.getZ() - z+1);
+                        pos = new BlockPos(startBlock.getX(), startBlock.getY() + z, startBlock.getZ() - z + 1);
                     }
                     if (isReplaceable(world, pos, setBlock)) {
                         coordinates.add(pos);
@@ -271,10 +275,10 @@ public class BuildingModes {
                 }
             } else if (sideHit == EnumFacing.EAST) {
                 for (int x = 1; x <= range; x++) {
-                    if (startBlock.getY() > player.posY+1) {
+                    if (startBlock.getY() > player.posY + 1) {
                         pos = new BlockPos(startBlock.getX() + x, startBlock.getY() - x, startBlock.getZ());
                     } else {
-                        pos = new BlockPos(startBlock.getX() - x+1, startBlock.getY() + x, startBlock.getZ());
+                        pos = new BlockPos(startBlock.getX() - x + 1, startBlock.getY() + x, startBlock.getZ());
                     }
                     if (isReplaceable(world, pos, setBlock)) {
                         coordinates.add(pos);
@@ -282,13 +286,29 @@ public class BuildingModes {
                 }
             } else if (sideHit == EnumFacing.WEST) {
                 for (int x = 1; x <= range; x++) {
-                    if (startBlock.getY() > player.posY+1) {
+                    if (startBlock.getY() > player.posY + 1) {
                         pos = new BlockPos(startBlock.getX() - x, startBlock.getY() - x, startBlock.getZ());
                     } else {
-                        pos = new BlockPos(startBlock.getX() + x-1, startBlock.getY() + x, startBlock.getZ());
+                        pos = new BlockPos(startBlock.getX() + x - 1, startBlock.getY() + x, startBlock.getZ());
                     }
                     if (isReplaceable(world, pos, setBlock)) {
                         coordinates.add(pos);
+                    }
+                }
+            }
+        }
+        //***************************************************
+        //Checkerboard
+        //***************************************************
+        else if (mode == BuildingTool.toolModes.Checkerboard) {
+            range++;
+            for (int x = range * -7 / 5; x <= range * 7 / 5; x++) {
+                for (int z = range * -7 / 5; z <= range * 7 / 5; z++) {
+                    if (x % (((range - 2) % 6) + 2) == 0 && z % (((range - 2) % 6) + 2) == 0) {
+                        pos = new BlockPos(startBlock.getX() + x, startBlock.getY() + 1, startBlock.getZ() + z);
+                        if (isReplaceable(world, pos, setBlock)) {
+                            coordinates.add(pos);
+                        }
                     }
                 }
             }

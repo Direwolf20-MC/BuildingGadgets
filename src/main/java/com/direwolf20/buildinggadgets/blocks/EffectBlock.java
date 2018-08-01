@@ -3,7 +3,6 @@ package com.direwolf20.buildinggadgets.blocks;
 import com.direwolf20.buildinggadgets.BuildingGadgets;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.EnumPushReaction;
-import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.init.Items;
@@ -19,7 +18,7 @@ import java.util.Random;
 public class EffectBlock extends Block {
 
     public EffectBlock() {
-        super(Material.ROCK);
+        super(EffectBlockMaterial.EFFECTBLOCKMATERIAL);
         setHardness(20.0f);
         setUnlocalizedName(BuildingGadgets.MODID + ".effectblock");     // Used for localization (en_US.lang)
         setRegistryName("effectblock");        // The unique name (within your mod) that identifies this block

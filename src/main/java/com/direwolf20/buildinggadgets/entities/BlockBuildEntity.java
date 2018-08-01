@@ -1,6 +1,7 @@
 package com.direwolf20.buildinggadgets.entities;
 
 import com.direwolf20.buildinggadgets.ModBlocks;
+import com.google.common.base.Optional;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
@@ -13,7 +14,6 @@ import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import com.google.common.base.Optional;
 import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
 
 import javax.annotation.Nullable;
@@ -157,10 +157,10 @@ public class BlockBuildEntity extends Entity implements IEntityAdditionalSpawnDa
         compound.setInteger("ticksExisted", ticksExisted);
         compound.setTag("setPos", NBTUtil.createPosTag(setPos));
         NBTTagCompound blockStateTag = new NBTTagCompound();
-        NBTUtil.writeBlockState(blockStateTag,setBlock);
+        NBTUtil.writeBlockState(blockStateTag, setBlock);
         compound.setTag("setBlock", blockStateTag);
-        NBTUtil.writeBlockState(blockStateTag,originalSetBlock);
-        compound.setTag("originalBlock",blockStateTag);
+        NBTUtil.writeBlockState(blockStateTag, originalSetBlock);
+        compound.setTag("originalBlock", blockStateTag);
         compound.setInteger("mode", mode);
     }
 

@@ -6,9 +6,7 @@ import com.direwolf20.buildinggadgets.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.tools.ExchangingModes;
 import com.direwolf20.buildinggadgets.tools.InventoryManipulation;
 import com.direwolf20.buildinggadgets.tools.VectorTools;
-import net.minecraft.block.BlockBush;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
@@ -16,12 +14,8 @@ import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Enchantments;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraft.nbt.NBTUtil;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
@@ -30,9 +24,12 @@ import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldType;
-import net.minecraftforge.client.model.ModelLoader;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.BlockSnapshot;
+import net.minecraftforge.energy.CapabilityEnergy;
+import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.event.ForgeEventFactory;
+import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -41,11 +38,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class ExchangerTool extends Item {
+import static com.direwolf20.buildinggadgets.tools.GadgetUtils.*;
+
+public class ExchangerTool extends GenericGadget {
     private static final FakeBuilderWorld fakeWorld = new FakeBuilderWorld();
 
     public enum toolModes {
-        Wall, VerticalColumn, HorizontalColumn;
+        Wall, VerticalColumn, HorizontalColumn, Checkerboard;
         private static ExchangerTool.toolModes[] vals = values();
 
         public ExchangerTool.toolModes next() {
@@ -58,11 +57,9 @@ public class ExchangerTool extends Item {
         setUnlocalizedName(BuildingGadgets.MODID + ".exchangertool");     // Used for localization (en_US.lang)
         setMaxStackSize(1);
         setCreativeTab(CreativeTabs.TOOLS);
-    }
-
-    @SideOnly(Side.CLIENT)
-    public void initModel() {
-        ModelLoader.setCustomModelResourceLocation(this, 0, new ModelResourceLocation(getRegistryName(), "inventory"));
+        if (!Config.poweredByFE) {
+            setMaxDamage(Config.durabilityExchanger);
+        }
     }
 
     @Override
@@ -79,8 +76,9 @@ public class ExchangerTool extends Item {
     public boolean isBookEnchantable(ItemStack stack, ItemStack book) {
         if (EnchantmentHelper.getEnchantments(book).containsKey(Enchantments.SILK_TOUCH)) {
             return true;
+        } else {
+            return super.isBookEnchantable(stack, book);
         }
-        return false;
     }
 
     @Override
@@ -88,117 +86,47 @@ public class ExchangerTool extends Item {
         if (enchantment == Enchantments.SILK_TOUCH) {
             return true;
         }
-        return false;
+        return super.canApplyAtEnchantingTable(stack, enchantment);
     }
 
-    public static NBTTagCompound initToolTag(ItemStack stack) {
+    public static void setFuzzy(ItemStack stack, boolean fuzzy) {
         NBTTagCompound tagCompound = stack.getTagCompound();
         if (tagCompound == null) {
             tagCompound = new NBTTagCompound();
         }
-        if (tagCompound.getTag("mode") == null) {
-            tagCompound.setString("mode", ExchangerTool.toolModes.Wall.name());
-        }
-        if (tagCompound.getTag("range") == null) {
-            tagCompound.setInteger("range", 1);
-        }
-        if (tagCompound.getCompoundTag("blockstate").getSize() == 0) {
-            NBTTagCompound stateTag = new NBTTagCompound();
-            NBTUtil.writeBlockState(stateTag, Blocks.AIR.getDefaultState());
-            tagCompound.setTag("blockstate", stateTag);
-        }
-        if (tagCompound.getTag("coords") == null) {
-            NBTTagList coords = new NBTTagList();
-            tagCompound.setTag("anchorcoords", coords);
-        }
-        stack.setTagCompound(tagCompound);
-        return tagCompound;
+        tagCompound.setBoolean("fuzzy", fuzzy);
     }
 
-    public static void setAnchor(ItemStack stack, ArrayList<BlockPos> coordinates) {
+    public static boolean getFuzzy(ItemStack stack) {
         NBTTagCompound tagCompound = stack.getTagCompound();
         if (tagCompound == null) {
-            tagCompound = initToolTag(stack);
+            tagCompound = new NBTTagCompound();
         }
-        NBTTagList coords = new NBTTagList();
-        for (BlockPos coord : coordinates) {
-            coords.appendTag(NBTUtil.createPosTag(coord));
-        }
-        tagCompound.setTag("anchorcoords", coords);
-    }
-
-    public static ArrayList<BlockPos> getAnchor(ItemStack stack) {
-        NBTTagCompound tagCompound = stack.getTagCompound();
-        if (tagCompound == null) {
-            tagCompound = initToolTag(stack);
-        }
-        ArrayList<BlockPos> coordinates = new ArrayList<BlockPos>();
-        NBTTagList coordList = (NBTTagList) tagCompound.getTag("anchorcoords");
-        if (coordList.tagCount() == 0 || coordList == null) {
-            return coordinates;
-        }
-
-        for (int i = 0; i < coordList.tagCount(); i++) {
-            coordinates.add(NBTUtil.getPosFromTag(coordList.getCompoundTagAt(i)));
-        }
-        return coordinates;
+        return tagCompound.getBoolean("fuzzy");
     }
 
     public static void setToolMode(ItemStack stack, ExchangerTool.toolModes mode) {
         NBTTagCompound tagCompound = stack.getTagCompound();
         if (tagCompound == null) {
-            tagCompound = initToolTag(stack);
+            tagCompound = new NBTTagCompound();
         }
         tagCompound.setString("mode", mode.name());
-    }
-
-    public static void setToolRange(ItemStack stack, int range) {
-        NBTTagCompound tagCompound = stack.getTagCompound();
-        if (tagCompound == null) {
-            tagCompound = initToolTag(stack);
-        }
-        tagCompound.setInteger("range", range);
-    }
-
-    public static void setToolBlock(ItemStack stack, IBlockState state) {
-        NBTTagCompound tagCompound = stack.getTagCompound();
-        if (tagCompound == null) {
-            tagCompound = initToolTag(stack);
-        }
-        if (state == null) {
-            state = Blocks.AIR.getDefaultState();
-        }
-        NBTTagCompound stateTag = new NBTTagCompound();
-        NBTUtil.writeBlockState(stateTag, state);
-        tagCompound.setTag("blockstate", stateTag);
+        stack.setTagCompound(tagCompound);
     }
 
     public static ExchangerTool.toolModes getToolMode(ItemStack stack) {
         NBTTagCompound tagCompound = stack.getTagCompound();
+        toolModes mode = toolModes.Wall;
         if (tagCompound == null) {
-            tagCompound = initToolTag(stack);
+            setToolMode(stack, mode);
+            return mode;
         }
-        if (tagCompound.getString("mode") != "") {
-            return ExchangerTool.toolModes.valueOf(tagCompound.getString("mode"));
-        } else {
-            return toolModes.Wall;
+        try {
+            mode = toolModes.valueOf(tagCompound.getString("mode"));
+        } catch (Exception e) {
+            setToolMode(stack, mode);
         }
-    }
-
-    public static int getToolRange(ItemStack stack) {
-        NBTTagCompound tagCompound = stack.getTagCompound();
-        if (tagCompound == null) {
-            tagCompound = initToolTag(stack);
-        }
-        return tagCompound.getInteger("range");
-    }
-
-    public static IBlockState getToolBlock(ItemStack stack) {
-        NBTTagCompound tagCompound = stack.getTagCompound();
-        if (tagCompound == null) {
-            tagCompound = initToolTag(stack);
-        }
-        return NBTUtil.readBlockState(tagCompound.getCompoundTag("blockstate"));
+        return mode;
     }
 
     @Override
@@ -207,6 +135,10 @@ public class ExchangerTool extends Item {
         list.add(TextFormatting.DARK_GREEN + I18n.format("tooltip.gadget.block") + ": " + getToolBlock(stack).getBlock().getLocalizedName());
         list.add(TextFormatting.AQUA + I18n.format("tooltip.gadget.mode") + ": " + getToolMode(stack));
         list.add(TextFormatting.RED + I18n.format("tooltip.gadget.range") + ": " + getToolRange(stack));
+        if (Config.poweredByFE) {
+            IEnergyStorage energy = stack.getCapability(CapabilityEnergy.ENERGY, null);
+            list.add(TextFormatting.WHITE + I18n.format("tooltip.gadget.energy") + ": " + withSuffix(energy.getEnergyStored()) + "/" + withSuffix(energy.getMaxEnergyStored()));
+        }
     }
 
 
@@ -238,25 +170,6 @@ public class ExchangerTool extends Item {
         return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, itemstack);
     }
 
-    private void selectBlock(ItemStack stack, EntityPlayer player) {
-        World world = player.world;
-        RayTraceResult lookingAt = VectorTools.getLookingAt(player);
-        if (lookingAt == null) {
-            return;
-        }
-        BlockPos pos = lookingAt.getBlockPos();
-        IBlockState state = world.getBlockState(pos);
-        TileEntity te = world.getTileEntity(pos);
-        if (te != null || (state.getBlock() instanceof BlockBush)) {
-            player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.invalidblock").getUnformattedComponentText()), true);
-            return;
-        }
-        if (state != null) {
-            IBlockState placeState = InventoryManipulation.getSpecificStates(state, world, player);
-            setToolBlock(stack, placeState);
-        }
-    }
-
     public void toggleMode(EntityPlayer player, ItemStack heldItem) {
         ExchangerTool.toolModes mode = getToolMode(heldItem);
         mode = mode.next();
@@ -268,8 +181,21 @@ public class ExchangerTool extends Item {
         player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.toolmode").getUnformattedComponentText() + ": " + mode.name()), true);
     }
 
+    public void setMode(EntityPlayer player, ItemStack heldItem, int modeInt) {
+        //Called when we specify a mode with the radial menu
+        toolModes mode = toolModes.values()[modeInt];
+        setToolMode(heldItem, mode);
+        player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.toolmode").getUnformattedComponentText() + ": " + mode.name()), true);
+    }
+
+    public void toggleFuzzy(EntityPlayer player, ItemStack heldItem) {
+        setFuzzy(heldItem, !(getFuzzy(heldItem)));
+        player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.fuzzymode").getUnformattedComponentText() + ": " + getFuzzy(heldItem)), true);
+    }
+
     public void rangeChange(EntityPlayer player, ItemStack heldItem) {
         int range = getToolRange(heldItem);
+        int changeAmount = (getToolMode(heldItem) == toolModes.Checkerboard || (range % 2 == 0)) ? 1 : 2;
         if (player.isSneaking()) {
             if (range <= 1) {
                 range = InGameConfig.maxRange;
@@ -287,40 +213,8 @@ public class ExchangerTool extends Item {
         player.sendStatusMessage(new TextComponentString(TextFormatting.DARK_AQUA + new TextComponentTranslation("message.gadget.toolrange").getUnformattedComponentText() + ": " + range), true);
     }
 
-    public boolean anchorBlocks(EntityPlayer player, ItemStack stack) {
-        if (!InGameConfig.allowAnchor)
-            return false;
-
-        World world = player.world;
-        int range = getToolRange(stack);
-        ExchangerTool.toolModes mode = getToolMode(stack);
-        ArrayList<BlockPos> currentCoords = getAnchor(stack);
-
-        if (currentCoords.size() == 0) { //If we don't have an anchor, find the block we're supposed to anchor to
-            RayTraceResult lookingAt = VectorTools.getLookingAt(player);
-            if (lookingAt == null) { //If we aren't looking at anything, exit
-                return false;
-            }
-            BlockPos startBlock = lookingAt.getBlockPos();
-            EnumFacing sideHit = lookingAt.sideHit;
-            IBlockState setBlock = getToolBlock(stack);
-            if (startBlock == null || world.getBlockState(startBlock) == Blocks.AIR.getDefaultState()) { //If we are looking at air, exit
-                return false;
-            }
-            ArrayList<BlockPos> coords = ExchangingModes.getBuildOrders(world, player, startBlock, sideHit, range, mode, setBlock); //Build the positions list based on tool mode and range
-            setAnchor(stack, coords);//Set the anchor NBT
-            player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.anchorrender").getUnformattedComponentText()), true);
-        } else { //If theres already an anchor, remove it.
-            setAnchor(stack, new ArrayList<BlockPos>());
-            player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.anchorremove").getUnformattedComponentText()), true);
-        }
-        return true;
-    }
-
     public boolean exchange(EntityPlayer player, ItemStack stack) {
         World world = player.world;
-        int range = getToolRange(stack);
-        ExchangerTool.toolModes mode = getToolMode(stack);
         ArrayList<BlockPos> coords = getAnchor(stack);
 
         if (coords.size() == 0) { //If we don't have an anchor, build in the current spot
@@ -331,7 +225,7 @@ public class ExchangerTool extends Item {
             BlockPos startBlock = lookingAt.getBlockPos();
             EnumFacing sideHit = lookingAt.sideHit;
             IBlockState setBlock = getToolBlock(stack);
-            coords = ExchangingModes.getBuildOrders(world, player, startBlock, sideHit, range, mode, setBlock);
+            coords = ExchangingModes.getBuildOrders(world, player, startBlock, sideHit, stack);
         } else { //If we do have an anchor, erase it (Even if the build fails)
             setAnchor(stack, new ArrayList<BlockPos>());
         }
@@ -409,8 +303,22 @@ public class ExchangerTool extends Item {
         if (ForgeEventFactory.onPlayerBlockPlace(player, blockSnapshot, EnumFacing.UP, EnumHand.MAIN_HAND).isCanceled()) {
             return false;
         }
+        BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(world, pos, currentBlock, player);
+        if (MinecraftForge.EVENT_BUS.post(e)) {
+            return false;
+        }
+        if (Config.poweredByFE) {
+            if (!useEnergy(tool, Config.energyCostBuilder)) {
+                return false;
+            }
+        } else {
+            if (tool.getItemDamage() >= tool.getMaxDamage()) {
+                return false;
+            } else {
+                tool.damageItem(2, player);
+            }
+        }
         currentBlock.getBlock().harvestBlock(world, player, pos, currentBlock, world.getTileEntity(pos), tool);
-
         InventoryManipulation.useItem(itemStack, player, neededItems);
         world.spawnEntity(new BlockBuildEntity(world, pos, player, setBlock, 3));
         return true;

@@ -13,15 +13,23 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 public class PacketToggleMode implements IMessage {
 
+    static int mode;
+
     @Override
     public void fromBytes(ByteBuf buf) {
+        mode = buf.readByte();
     }
 
     @Override
     public void toBytes(ByteBuf buf) {
+        buf.writeByte(mode);
     }
 
     public PacketToggleMode() {
+    }
+
+    public PacketToggleMode(int modeInt) {
+        mode = modeInt;
     }
 
     public static class Handler implements IMessageHandler<PacketToggleMode, IMessage> {
@@ -34,16 +42,18 @@ public class PacketToggleMode implements IMessage {
         private void handle(PacketToggleMode message, MessageContext ctx) {
             EntityPlayerMP playerEntity = ctx.getServerHandler().player;
             ItemStack heldItem = playerEntity.getHeldItem(EnumHand.MAIN_HAND);
-            if (!(heldItem.getItem() instanceof BuildingTool) && !(heldItem.getItem() instanceof  ExchangerTool)) {
+            if (!(heldItem.getItem() instanceof BuildingTool) && !(heldItem.getItem() instanceof ExchangerTool)) {
                 heldItem = playerEntity.getHeldItemOffhand();
-                if (!(heldItem.getItem() instanceof BuildingTool) && !(heldItem.getItem() instanceof  ExchangerTool)) {return;}
+                if (!(heldItem.getItem() instanceof BuildingTool) && !(heldItem.getItem() instanceof ExchangerTool)) {
+                    return;
+                }
             }
             if (!heldItem.isEmpty() && heldItem.getItem() instanceof BuildingTool) {
                 BuildingTool buildingTool = (BuildingTool) (heldItem.getItem());
-                buildingTool.toggleMode(playerEntity, heldItem);
+                buildingTool.setMode(playerEntity, heldItem, mode);
             } else if (!heldItem.isEmpty() && heldItem.getItem() instanceof ExchangerTool) {
                 ExchangerTool exchangerTool = (ExchangerTool) (heldItem.getItem());
-                exchangerTool.toggleMode(playerEntity, heldItem);
+                exchangerTool.setMode(playerEntity, heldItem, mode);
             }
         }
     }
