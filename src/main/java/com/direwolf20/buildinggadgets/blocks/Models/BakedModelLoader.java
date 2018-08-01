@@ -20,7 +20,7 @@ public class BakedModelLoader implements ICustomModelLoader {
         if (!modelLocation.getResourceDomain().equals(BuildingGadgets.MODID)) {
             return false;
         }
-        if (modelLocation instanceof ModelResourceLocation && ((ModelResourceLocation)modelLocation).getVariant().equals("inventory")) {
+        if (modelLocation instanceof ModelResourceLocation && ((ModelResourceLocation) modelLocation).getVariant().equals("inventory")) {
             return false;
         }
         return NAMES.contains(modelLocation.getResourcePath());

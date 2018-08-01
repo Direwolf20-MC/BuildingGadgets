@@ -80,7 +80,7 @@ public class ConstructionBlock extends Block implements ITileEntityProvider {
             te.setBlockState(newState);
             return true;
         }
-        System.out.println("Failed: " + newState + ":" + te.getBlockState()+":"+world.isRemote+":"+te.getActualBlockState());
+        System.out.println("Failed: " + newState + ":" + te.getBlockState() + ":" + world.isRemote + ":" + te.getActualBlockState());
         return false;
     }
 
@@ -170,8 +170,7 @@ public class ConstructionBlock extends Block implements ITileEntityProvider {
         }, this);
     }
 
-    public BlockFaceShape getBlockFaceShape(IBlockAccess worldIn, IBlockState state, BlockPos pos, EnumFacing face)
-    {
+    public BlockFaceShape getBlockFaceShape(IBlockAccess worldIn, IBlockState state, BlockPos pos, EnumFacing face) {
         IBlockState mimicBlock = getMimicBlock(worldIn, pos);
         try {
             return mimicBlock == null ? BlockFaceShape.SOLID : mimicBlock.getBlock().getBlockFaceShape(worldIn, state, pos, face);
@@ -181,8 +180,7 @@ public class ConstructionBlock extends Block implements ITileEntityProvider {
     }
 
     @Override
-    public void addCollisionBoxToList(IBlockState state, World worldIn, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, @Nullable Entity entityIn, boolean isActualState)
-    {
+    public void addCollisionBoxToList(IBlockState state, World worldIn, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, @Nullable Entity entityIn, boolean isActualState) {
         IBlockState mimicBlock = getMimicBlock(worldIn, pos);
         if (mimicBlock == null) {
             super.addCollisionBoxToList(state, worldIn, pos, entityBox, collidingBoxes, entityIn, isActualState);
@@ -193,8 +191,7 @@ public class ConstructionBlock extends Block implements ITileEntityProvider {
 
     @Override
     @Nullable
-    public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, IBlockAccess worldIn, BlockPos pos)
-    {
+    public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, IBlockAccess worldIn, BlockPos pos) {
         IBlockState mimicBlock = getMimicBlock(worldIn, pos);
         if (mimicBlock == null) {
             return super.getBoundingBox(blockState, worldIn, pos);
@@ -208,8 +205,7 @@ public class ConstructionBlock extends Block implements ITileEntityProvider {
     }
 
     @Override
-    public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos)
-    {
+    public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
         IBlockState mimicBlock = getMimicBlock(source, pos);
         if (mimicBlock == null) {
             return super.getBoundingBox(state, source, pos);

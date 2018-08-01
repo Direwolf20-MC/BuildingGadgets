@@ -1,7 +1,6 @@
 package com.direwolf20.buildinggadgets.blocks.Models;
 
 import com.direwolf20.buildinggadgets.BuildingGadgets;
-import com.direwolf20.buildinggadgets.ModBlocks;
 import com.direwolf20.buildinggadgets.blocks.ConstructionBlock;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -42,7 +41,9 @@ public class ConstructionBakedModel implements IBakedModel {
         ConstructionID facadeId = extendedBlockState.getValue(ConstructionBlock.FACADEID);
         IBakedModel model;
         if (facadeId == null) {
-            return Collections.emptyList();
+            //return Collections.emptyList();
+            model = getModel(state);
+            return model.getQuads(state, side, rand);
         }
 
         IBlockState facadeState = facadeId.getBlockState();

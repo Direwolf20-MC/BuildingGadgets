@@ -1,6 +1,5 @@
 package com.direwolf20.buildinggadgets.blocks;
 
-import com.direwolf20.buildinggadgets.ModBlocks;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
@@ -10,7 +9,7 @@ import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 
 public class ConstructionBlockTileEntity extends TileEntity {
-    private IBlockState blockState = Blocks.COBBLESTONE.getDefaultState();
+    private IBlockState blockState;
     private IBlockState actualBlockState;
 
     public boolean setBlockState(IBlockState state) {
@@ -29,7 +28,8 @@ public class ConstructionBlockTileEntity extends TileEntity {
 
     public IBlockState getBlockState() {
         if (blockState == null || blockState == Blocks.AIR.getDefaultState()) {
-            return Blocks.COBBLESTONE.getDefaultState();
+            //return Blocks.COBBLESTONE.getDefaultState();
+            return null;
         }
         return blockState;
     }
@@ -65,7 +65,7 @@ public class ConstructionBlockTileEntity extends TileEntity {
     }
 
     @Override
-    public SPacketUpdateTileEntity getUpdatePacket(){
+    public SPacketUpdateTileEntity getUpdatePacket() {
         NBTTagCompound nbtTag = new NBTTagCompound();
         writeToNBT(nbtTag);
         return new SPacketUpdateTileEntity(getPos(), 1, nbtTag);
@@ -91,10 +91,14 @@ public class ConstructionBlockTileEntity extends TileEntity {
         if (blockState != null) {
             NBTTagCompound blockStateTag = new NBTTagCompound();
             NBTTagCompound actualBlockStateTag = new NBTTagCompound();
-            NBTUtil.writeBlockState(blockStateTag, blockState);
-            compound.setTag("blockState", blockStateTag);
-            NBTUtil.writeBlockState(actualBlockStateTag, actualBlockState);
-            compound.setTag("actualBlockState", actualBlockStateTag);
+            if (blockState != null) {
+                NBTUtil.writeBlockState(blockStateTag, blockState);
+                compound.setTag("blockState", blockStateTag);
+            }
+            if (actualBlockState != null) {
+                NBTUtil.writeBlockState(actualBlockStateTag, actualBlockState);
+                compound.setTag("actualBlockState", actualBlockStateTag);
+            }
         }
         return compound;
     }
