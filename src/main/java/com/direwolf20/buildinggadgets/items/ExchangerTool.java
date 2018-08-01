@@ -57,8 +57,8 @@ public class ExchangerTool extends GenericGadget {
         setUnlocalizedName(BuildingGadgets.MODID + ".exchangertool");     // Used for localization (en_US.lang)
         setMaxStackSize(1);
         setCreativeTab(CreativeTabs.TOOLS);
-        if (!Config.poweredByFE) {
-            setMaxDamage(Config.durabilityExchanger);
+        if (!InGameConfig.poweredByFE) {
+            setMaxDamage(InGameConfig.durabilityExchanger);
         }
     }
 
@@ -135,7 +135,7 @@ public class ExchangerTool extends GenericGadget {
         list.add(TextFormatting.DARK_GREEN + I18n.format("tooltip.gadget.block") + ": " + getToolBlock(stack).getBlock().getLocalizedName());
         list.add(TextFormatting.AQUA + I18n.format("tooltip.gadget.mode") + ": " + getToolMode(stack));
         list.add(TextFormatting.RED + I18n.format("tooltip.gadget.range") + ": " + getToolRange(stack));
-        if (Config.poweredByFE) {
+        if (InGameConfig.poweredByFE) {
             IEnergyStorage energy = stack.getCapability(CapabilityEnergy.ENERGY, null);
             list.add(TextFormatting.WHITE + I18n.format("tooltip.gadget.energy") + ": " + withSuffix(energy.getEnergyStored()) + "/" + withSuffix(energy.getMaxEnergyStored()));
         }
@@ -200,13 +200,13 @@ public class ExchangerTool extends GenericGadget {
             if (range <= 1) {
                 range = InGameConfig.maxRange;
             } else {
-                range = range - 2;
+                range = range - changeAmount;
             }
         } else {
             if (range >= InGameConfig.maxRange) {
                 range = 1;
             } else {
-                range = range + 2;
+                range = range + changeAmount;
             }
         }
         setToolRange(heldItem, range);
@@ -307,8 +307,8 @@ public class ExchangerTool extends GenericGadget {
         if (MinecraftForge.EVENT_BUS.post(e)) {
             return false;
         }
-        if (Config.poweredByFE) {
-            if (!useEnergy(tool, Config.energyCostBuilder)) {
+        if (InGameConfig.poweredByFE) {
+            if (!useEnergy(tool, InGameConfig.energyCostExchanger)) {
                 return false;
             }
         } else {

@@ -2,7 +2,10 @@ package com.direwolf20.buildinggadgets;
 
 import com.direwolf20.buildinggadgets.gui.ModeRadialMenu;
 import com.direwolf20.buildinggadgets.items.GenericGadget;
-import com.direwolf20.buildinggadgets.network.*;
+import com.direwolf20.buildinggadgets.network.PacketAnchorKey;
+import com.direwolf20.buildinggadgets.network.PacketChangeRange;
+import com.direwolf20.buildinggadgets.network.PacketHandler;
+import com.direwolf20.buildinggadgets.network.PacketUndoKey;
 import net.minecraft.client.Minecraft;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumHand;

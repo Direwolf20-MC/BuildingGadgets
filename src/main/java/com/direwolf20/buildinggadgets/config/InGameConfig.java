@@ -22,7 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Mod.EventBusSubscriber
+@Mod.EventBusSubscriber(modid = BuildingGadgets.MODID)
 public class InGameConfig {
     private static final String KEY_NAME = "NAME";
     private static final String KEY_VALUE = "VAL";
@@ -63,6 +63,24 @@ public class InGameConfig {
     public static String      Str = "STRING!";
     @SyncedConfig
     public static String[]    StrA = {"STR", "ING!"};*/
+
+    @SyncedConfig
+    public static int energyCostBuilder;
+
+    @SyncedConfig
+    public static int energyCostExchanger;
+
+    @SyncedConfig
+    public static int energyMax;
+
+    @SyncedConfig
+    public static boolean poweredByFE;
+
+    @SyncedConfig
+    public static int durabilityBuilder;
+
+    @SyncedConfig
+    public static int durabilityExchanger;
 
     @SyncedConfig
     public static double rayTraceRange;
@@ -202,15 +220,21 @@ public class InGameConfig {
 
     public static void init() {
         rayTraceRange = Config.rayTraceRange;
+        poweredByFE = Config.poweredByFE;
 
         maxRange = Config.subCategoryGadgets.maxRange;
+        energyMax = Config.subCategoryGadgets.maxEnergy;
         allowAnchor = Config.subCategoryGadgets.allowAnchors;
 
+        energyCostBuilder = Config.subCategoryGadgets.subCategoryBuildingGadget.energyCostBuilder;
+        durabilityBuilder = Config.subCategoryGadgets.subCategoryBuildingGadget.durabilityBuilder;
         buildingModeWhiteList = Config.subCategoryGadgets.subCategoryBuildingGadget.modeWhiteList;
         buildingModeBlackList = Config.subCategoryGadgets.subCategoryBuildingGadget.modeBlackList;
         buildingBlockWhiteList = Config.subCategoryGadgets.subCategoryBuildingGadget.setBlockWhiteList;
         buildingBlockBlackList = Config.subCategoryGadgets.subCategoryBuildingGadget.setBlockBlackList;
 
+        energyCostExchanger = Config.subCategoryGadgets.subCategoryExchanger.energyCostExchanger;
+        durabilityExchanger = Config.subCategoryGadgets.subCategoryExchanger.durabilityExchanger;
         exchangingModeWhiteList = Config.subCategoryGadgets.subCategoryExchanger.modeWhiteList;
         exchangingModeBlackList = Config.subCategoryGadgets.subCategoryExchanger.modeBlackList;
         exchangeBlockWhiteList = Config.subCategoryGadgets.subCategoryExchanger.exchangeBlockWhiteList;

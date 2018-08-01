@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.items;
 
-import com.direwolf20.buildinggadgets.Config;
+import com.direwolf20.buildinggadgets.config.InGameConfig;
 import com.direwolf20.buildinggadgets.items.ItemCaps.CapabilityProviderEnergy;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.init.Items;
@@ -25,8 +25,8 @@ public class GenericGadget extends Item {
 
     @Override
     public ICapabilityProvider initCapabilities(ItemStack stack, NBTTagCompound tag) {
-        if (Config.poweredByFE) {
-            return new CapabilityProviderEnergy(stack, Config.energyMax);
+        if (InGameConfig.poweredByFE) {
+            return new CapabilityProviderEnergy(stack, InGameConfig.energyMax);
         } else {
             return null;
         }
@@ -44,7 +44,7 @@ public class GenericGadget extends Item {
 
     @Override
     public double getDurabilityForDisplay(ItemStack stack) {
-        if (Config.poweredByFE) {
+        if (InGameConfig.poweredByFE) {
             IEnergyStorage energy = stack.getCapability(CapabilityEnergy.ENERGY, null);
             return 1D - ((double) energy.getEnergyStored() / (double) energy.getMaxEnergyStored());
         } else {
@@ -55,7 +55,7 @@ public class GenericGadget extends Item {
 
     @Override
     public int getRGBDurabilityForDisplay(ItemStack stack) {
-        if (Config.poweredByFE) {
+        if (InGameConfig.poweredByFE) {
             IEnergyStorage energy = stack.getCapability(CapabilityEnergy.ENERGY, null);
             return MathHelper.hsvToRGB(Math.max(0.0F, (float) energy.getEnergyStored() / (float) energy.getMaxEnergyStored()) / 3.0F, 1.0F, 1.0F);
         } else {
@@ -66,7 +66,7 @@ public class GenericGadget extends Item {
 
     @Override
     public boolean isDamaged(ItemStack stack) {
-        if (Config.poweredByFE) {
+        if (InGameConfig.poweredByFE) {
             IEnergyStorage energy = stack.getCapability(CapabilityEnergy.ENERGY, null);
             return energy.getEnergyStored() != energy.getMaxEnergyStored();
         } else {
@@ -77,7 +77,7 @@ public class GenericGadget extends Item {
 
     @Override
     public boolean showDurabilityBar(ItemStack stack) {
-        if (Config.poweredByFE) {
+        if (InGameConfig.poweredByFE) {
             IEnergyStorage energy = stack.getCapability(CapabilityEnergy.ENERGY, null);
             return energy.getEnergyStored() != energy.getMaxEnergyStored();
         } else {
@@ -88,7 +88,7 @@ public class GenericGadget extends Item {
 
     @Override
     public boolean getIsRepairable(ItemStack toRepair, ItemStack repair) {
-        if (Config.poweredByFE) {
+        if (InGameConfig.poweredByFE) {
             return false;
         } else {
             if (repair.getItem() == Items.DIAMOND) {

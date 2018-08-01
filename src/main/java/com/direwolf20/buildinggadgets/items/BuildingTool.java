@@ -58,8 +58,8 @@ public class BuildingTool extends GenericGadget {
         setUnlocalizedName(BuildingGadgets.MODID + ".buildingtool");     // Used for localization (en_US.lang)
         setMaxStackSize(1);
         setCreativeTab(CreativeTabs.TOOLS);
-        if (!Config.poweredByFE) {
-            setMaxDamage(Config.durabilityBuilder);
+        if (!InGameConfig.poweredByFE) {
+            setMaxDamage(InGameConfig.durabilityBuilder);
         }
     }
 
@@ -76,7 +76,7 @@ public class BuildingTool extends GenericGadget {
     public static toolModes getToolMode(ItemStack stack) {
         NBTTagCompound tagCompound = stack.getTagCompound();
         toolModes mode = toolModes.BuildToMe;
-        if (tagCompound == null) {
+        if (tagCompound == null || !tagCompound.hasKey("mode")) { //this will no longer result in NullPointerExceptions being caught below
             setToolMode(stack, mode);
             return mode;
         }
@@ -97,7 +97,7 @@ public class BuildingTool extends GenericGadget {
         if (getToolMode(stack) != toolModes.BuildToMe) {
             list.add(TextFormatting.RED + I18n.format("tooltip.gadget.range") + ": " + getToolRange(stack));
         }
-        if (Config.poweredByFE) {
+        if (InGameConfig.poweredByFE) {
             IEnergyStorage energy = stack.getCapability(CapabilityEnergy.ENERGY, null);
             list.add(TextFormatting.WHITE + I18n.format("tooltip.gadget.energy") + ": " + withSuffix(energy.getEnergyStored()) + "/" + withSuffix(energy.getMaxEnergyStored()));
         }
@@ -311,8 +311,8 @@ public class BuildingTool extends GenericGadget {
         if (ForgeEventFactory.onPlayerBlockPlace(player, blockSnapshot, EnumFacing.UP, EnumHand.MAIN_HAND).isCanceled()) {
             return false;
         }
-        if (Config.poweredByFE) {
-            if (!useEnergy(heldItem, Config.energyCostBuilder)) {
+        if (InGameConfig.poweredByFE) {
+            if (!useEnergy(heldItem, InGameConfig.energyCostBuilder)) {
                 return false;
             }
         } else {
