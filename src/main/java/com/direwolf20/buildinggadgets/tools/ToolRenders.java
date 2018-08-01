@@ -75,7 +75,9 @@ public class ToolRenders {
                     itemStack = renderBlockState.getBlock().getPickBlock(renderBlockState, null, world, new BlockPos(0, 0, 0), player);
                 }
 
+                ItemStack constructionStack = InventoryManipulation.getSilkTouchDrop(ModBlocks.constructionBlock.getDefaultState());
                 int hasBlocks = InventoryManipulation.countItem(itemStack, player);
+                hasBlocks = hasBlocks + InventoryManipulation.countItem(constructionStack, player);
                 int hasEnergy = 0;
                 if (Config.poweredByFE) {
                     hasEnergy = stack.getCapability(CapabilityEnergy.ENERGY, null).getEnergyStored();
@@ -195,7 +197,9 @@ public class ToolRenders {
                 } else {
                     itemStack = renderBlockState.getBlock().getPickBlock(renderBlockState, null, world, new BlockPos(0, 0, 0), player);
                 }
+                ItemStack constructionStack = InventoryManipulation.getSilkTouchDrop(ModBlocks.constructionBlock.getDefaultState());
                 int hasBlocks = InventoryManipulation.countItem(itemStack, player);
+                hasBlocks = hasBlocks + InventoryManipulation.countItem(constructionStack, player);
                 int hasEnergy = 0;
                 if (Config.poweredByFE) {
                     hasEnergy = stack.getCapability(CapabilityEnergy.ENERGY, null).getEnergyStored();

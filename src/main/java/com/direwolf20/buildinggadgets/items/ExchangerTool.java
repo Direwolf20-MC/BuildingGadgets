@@ -2,6 +2,7 @@ package com.direwolf20.buildinggadgets.items;
 
 import com.direwolf20.buildinggadgets.BuildingGadgets;
 import com.direwolf20.buildinggadgets.Config;
+import com.direwolf20.buildinggadgets.ModBlocks;
 import com.direwolf20.buildinggadgets.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.tools.ExchangingModes;
 import com.direwolf20.buildinggadgets.tools.InventoryManipulation;
@@ -249,6 +250,7 @@ public class ExchangerTool extends GenericGadget {
     public boolean exchangeBlock(World world, EntityPlayer player, BlockPos pos, IBlockState setBlock) {
         IBlockState currentBlock = world.getBlockState(pos);
         ItemStack itemStack;
+        boolean useConstructionPaste = false;
         //ItemStack itemStack = setBlock.getBlock().getPickBlock(setBlock, null, world, pos, player);
         if (setBlock.getBlock().canSilkHarvest(world, pos, setBlock, player)) {
             itemStack = InventoryManipulation.getSilkTouchDrop(setBlock);
@@ -274,7 +276,13 @@ public class ExchangerTool extends GenericGadget {
             neededItems = 1;
         }
         if (InventoryManipulation.countItem(itemStack, player) < neededItems) {
-            return false;
+            ItemStack constructionStack = InventoryManipulation.getSilkTouchDrop(ModBlocks.constructionBlock.getDefaultState());
+            if (InventoryManipulation.countItem(constructionStack, player) < neededItems) {
+                return false;
+            } else {
+                itemStack = constructionStack.copy();
+                useConstructionPaste = true;
+            }
         }
         if (player.isSpectator()) {
             return false;
@@ -304,7 +312,7 @@ public class ExchangerTool extends GenericGadget {
         }
         currentBlock.getBlock().harvestBlock(world, player, pos, currentBlock, world.getTileEntity(pos), tool);
         InventoryManipulation.useItem(itemStack, player, neededItems);
-        world.spawnEntity(new BlockBuildEntity(world, pos, player, setBlock, 3, getToolActualBlock(tool)));
+        world.spawnEntity(new BlockBuildEntity(world, pos, player, setBlock, 3, getToolActualBlock(tool), useConstructionPaste));
         return true;
     }
 

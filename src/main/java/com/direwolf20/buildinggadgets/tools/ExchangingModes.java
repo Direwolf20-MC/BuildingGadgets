@@ -1,12 +1,14 @@
 package com.direwolf20.buildinggadgets.tools;
 
 import com.direwolf20.buildinggadgets.ModBlocks;
+import com.direwolf20.buildinggadgets.blocks.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.items.ExchangerTool;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -16,6 +18,7 @@ import java.util.ArrayList;
 public class ExchangingModes {
     private static boolean isReplaceable(World world, BlockPos pos, IBlockState currentBlock, IBlockState setBlock, EntityPlayer player, boolean fuzzyMode) {
         IBlockState worldBlockState = world.getBlockState(pos);
+        TileEntity te = world.getTileEntity(pos);
         if (worldBlockState != currentBlock && !fuzzyMode) {
             return false;
         }
@@ -25,8 +28,13 @@ public class ExchangingModes {
         if (worldBlockState == setBlock) {
             return false;
         }
-        if (world.getTileEntity(pos) != null) {
+        if (te != null && !(te instanceof ConstructionBlockTileEntity)) {
             return false;
+        }
+        if (te instanceof ConstructionBlockTileEntity) {
+            if (((ConstructionBlockTileEntity) te).getBlockState() == setBlock) {
+                return false;
+            }
         }
         if (worldBlockState.getBlock().getBlockHardness(worldBlockState, world, pos) < 0) {
             return false;

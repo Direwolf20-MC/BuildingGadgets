@@ -249,7 +249,7 @@ public class BuildingTool extends GenericGadget {
                 if (distance < 64 && sameDim && currentBlock != ModBlocks.effectBlock.getDefaultState() && !cancelled) { //Don't allow us to undo a block while its still being placed or too far away
                     if (currentBlock != Blocks.AIR.getDefaultState()) {
                         currentBlock.getBlock().harvestBlock(world, player, coord, currentBlock, world.getTileEntity(coord), silkTool);
-                        world.spawnEntity(new BlockBuildEntity(world, coord, player, currentBlock, 2, getToolActualBlock(heldItem)));
+                        world.spawnEntity(new BlockBuildEntity(world, coord, player, currentBlock, 2, getToolActualBlock(heldItem), false));
                     }
                 } else { //If you're in the wrong dimension or too far away, fail the undo.
                     player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.undofailed").getUnformattedComponentText()), true);
@@ -266,6 +266,7 @@ public class BuildingTool extends GenericGadget {
 
     public static boolean placeBlock(World world, EntityPlayer player, BlockPos pos, IBlockState setBlock) {
         ItemStack heldItem = player.getHeldItemMainhand();
+        boolean useConstructionPaste = false;
         if (!(heldItem.getItem() instanceof BuildingTool)) {
             heldItem = player.getHeldItemOffhand();
             if (!(heldItem.getItem() instanceof BuildingTool)) {
@@ -310,18 +311,17 @@ public class BuildingTool extends GenericGadget {
                 heldItem.damageItem(1, player);
             }
         }
-        int toolMode = 1;
         ItemStack constructionStack = InventoryManipulation.getSilkTouchDrop(ModBlocks.constructionBlock.getDefaultState());
         if (InventoryManipulation.countItem(itemStack, player) == 0) {
             if (InventoryManipulation.countItem(constructionStack, player) == 0) {
                 return false;
             } else {
                 itemStack = constructionStack.copy();
-                toolMode = 4;
+                useConstructionPaste = true;
             }
         }
         if (InventoryManipulation.useItem(itemStack, player, neededItems)) {
-            world.spawnEntity(new BlockBuildEntity(world, pos, player, setBlock, toolMode, getToolActualBlock(heldItem)));
+            world.spawnEntity(new BlockBuildEntity(world, pos, player, setBlock, 1, getToolActualBlock(heldItem), useConstructionPaste));
             return true;
         }
         return false;
