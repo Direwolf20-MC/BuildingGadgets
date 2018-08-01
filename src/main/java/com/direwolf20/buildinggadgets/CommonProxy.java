@@ -17,7 +17,7 @@ import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 
-@Mod.EventBusSubscriber()
+@Mod.EventBusSubscriber(modid = BuildingGadgets.MODID)
 public class CommonProxy {
 
     public void preInit(FMLPreInitializationEvent e) {
