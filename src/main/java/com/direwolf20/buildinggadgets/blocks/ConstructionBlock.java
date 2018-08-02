@@ -8,6 +8,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
+import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.state.BlockFaceShape;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
@@ -41,6 +42,7 @@ import java.util.List;
 
 public class ConstructionBlock extends Block implements ITileEntityProvider {
     public static final ConstructionProperty FACADEID = new ConstructionProperty("facadeid");
+    //public static final PropertyBool BRIGHT = PropertyBool.create("bright");
 
     public ConstructionBlock() {
         super(Material.ROCK);
@@ -48,6 +50,7 @@ public class ConstructionBlock extends Block implements ITileEntityProvider {
         this.setCreativeTab(CreativeTabs.BUILDING_BLOCKS);
         setUnlocalizedName(BuildingGadgets.MODID + ".constructionblock");     // Used for localization (en_US.lang)
         setRegistryName("constructionblock");        // The unique name (within your mod) that identifies this block
+        //setDefaultState(blockState.getBaseState().withProperty(BRIGHT, true));
     }
 
     @SideOnly(Side.CLIENT)
@@ -134,11 +137,6 @@ public class ConstructionBlock extends Block implements ITileEntityProvider {
     }
 
     @Override
-    public boolean isOpaqueCube(IBlockState p_isFullBlock_1_) {
-        return true;
-    }
-
-    @Override
     @SideOnly(Side.CLIENT)
     public boolean canRenderInLayer(IBlockState state, BlockRenderLayer layer) {
         return true; // delegated to FacadeBakedModel#getQuads
@@ -151,15 +149,16 @@ public class ConstructionBlock extends Block implements ITileEntityProvider {
         return mimicBlock == null ? true : mimicBlock.getBlock().shouldSideBeRendered(mimicBlock, blockAccess, pos, side);
     }
 
-    @Override
+    /*@Override
     public boolean isBlockNormalCube(IBlockState blockState) {
         return false;
-    }
+    }*/
 
     @Override
-    public boolean doesSideBlockRendering(IBlockState state, IBlockAccess world, BlockPos pos, EnumFacing face) {
-        IBlockState mimicBlock = getActualMimicBlock(world, pos);
-        return mimicBlock == null ? true : mimicBlock.getBlock().doesSideBlockRendering(mimicBlock, world, pos, face);
+    public boolean isOpaqueCube(IBlockState p_isFullBlock_1_) {
+        //boolean bright = p_isFullBlock_1_.getValue(ConstructionBlock.BRIGHT);
+        //return !(bright);
+        return false;
     }
 
     @Override
@@ -169,14 +168,22 @@ public class ConstructionBlock extends Block implements ITileEntityProvider {
 
     @Override
     public int getLightOpacity(IBlockState state, IBlockAccess world, BlockPos pos) {
+        //Boolean bright = state.getValue(ConstructionBlock.BRIGHT);
+        //if (bright) {return 0;}
+        //return 255;
+        //return super.getLightOpacity(state, world, pos);
         IBlockState mimicBlock = getActualMimicBlock(world, pos);
         int opacity = 0;
         if (mimicBlock != null) {
-            //opacity = mimicBlock.getBlock().getLightOpacity(state, world, pos);
-            opacity = super.getLightOpacity(state, world, pos);
+            opacity = mimicBlock.getBlock().getLightOpacity(mimicBlock, world, pos);
         }
-       //opacity = super.getLightOpacity(state, world, pos);
         return opacity;
+    }
+
+    @Override
+    public boolean doesSideBlockRendering(IBlockState state, IBlockAccess world, BlockPos pos, EnumFacing face) {
+        IBlockState mimicBlock = getActualMimicBlock(world, pos);
+        return mimicBlock == null ? true : mimicBlock.getBlock().doesSideBlockRendering(mimicBlock, world, pos, face);
     }
 
     @SideOnly(Side.CLIENT)
@@ -234,6 +241,17 @@ public class ConstructionBlock extends Block implements ITileEntityProvider {
             }
         }
     }
+
+    /*@Override
+    public IBlockState getStateFromMeta(int meta) {
+        return getDefaultState()
+                .withProperty(BRIGHT,(meta == 0) ? false : true);
+    }
+
+    @Override
+    public int getMetaFromState(IBlockState state) {
+        return (state.getValue(BRIGHT) ? 1 : 0);
+    }*/
 
     /*@Override
     public boolean isNormalCube(IBlockState state, IBlockAccess world, BlockPos pos) {

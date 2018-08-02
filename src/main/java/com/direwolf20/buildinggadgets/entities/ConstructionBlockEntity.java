@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.entities;
 
+import com.direwolf20.buildinggadgets.blocks.ConstructionBlockTileEntity;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -7,6 +8,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
@@ -32,6 +34,7 @@ public class ConstructionBlockEntity extends Entity implements IEntityAdditional
         setSize(0.1F, 0.1F);
         world = worldIn;
         setPosition(spawnPos.getX(), spawnPos.getY(), spawnPos.getZ());
+        setPos = spawnPos;
     }
 
     public int getTicksExisted() {
@@ -60,6 +63,13 @@ public class ConstructionBlockEntity extends Entity implements IEntityAdditional
     private void setDespawning() {
         if (despawning == -1) {
             despawning = 0;
+            if (setPos != null) {
+                TileEntity te = world.getTileEntity(setPos);
+                if (te instanceof ConstructionBlockTileEntity) {
+                    ((ConstructionBlockTileEntity) te).updateLighting();
+                    //((ConstructionBlockTileEntity) te).markDirtyClient();
+                }
+            }
         }
     }
 
