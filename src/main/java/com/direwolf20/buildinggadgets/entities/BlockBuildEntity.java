@@ -56,6 +56,7 @@ public class BlockBuildEntity extends Entity implements IEntityAdditionalSpawnDa
         setPos = spawnPos;
         if (te instanceof ConstructionBlockTileEntity) {
             setBlock = ((ConstructionBlockTileEntity) te).getBlockState();
+            if (setBlock == null) {setBlock = spawnBlock;}
         } else {
             setBlock = spawnBlock;
         }
@@ -65,6 +66,7 @@ public class BlockBuildEntity extends Entity implements IEntityAdditionalSpawnDa
             if (currentBlock != null) {
                 if (te instanceof ConstructionBlockTileEntity) {
                     setBlock = ((ConstructionBlockTileEntity) te).getBlockState();
+                    if (setBlock == null) {setBlock = currentBlock;}
                 } else {
                     setBlock = currentBlock;
                 }

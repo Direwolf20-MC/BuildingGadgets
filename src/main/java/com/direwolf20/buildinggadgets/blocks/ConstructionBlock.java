@@ -44,7 +44,7 @@ public class ConstructionBlock extends Block implements ITileEntityProvider {
 
     public ConstructionBlock() {
         super(Material.ROCK);
-        setHardness(5.0f);
+        setHardness(2.0f);
         this.setCreativeTab(CreativeTabs.BUILDING_BLOCKS);
         setUnlocalizedName(BuildingGadgets.MODID + ".constructionblock");     // Used for localization (en_US.lang)
         setRegistryName("constructionblock");        // The unique name (within your mod) that identifies this block
@@ -97,7 +97,7 @@ public class ConstructionBlock extends Block implements ITileEntityProvider {
         }
     }
 
-    @Nullable
+    /*@Nullable
     protected IBlockState getMimicBlock(IBlockAccess blockAccess, BlockPos pos) {
         TileEntity te = blockAccess.getTileEntity(pos);
         if (te instanceof ConstructionBlockTileEntity) {
@@ -105,7 +105,7 @@ public class ConstructionBlock extends Block implements ITileEntityProvider {
         } else {
             return null;
         }
-    }
+    }*/
 
     @Nullable
     protected IBlockState getActualMimicBlock(IBlockAccess blockAccess, BlockPos pos) {
@@ -135,7 +135,7 @@ public class ConstructionBlock extends Block implements ITileEntityProvider {
 
     @Override
     public boolean isOpaqueCube(IBlockState p_isFullBlock_1_) {
-        return false;
+        return true;
     }
 
     @Override
@@ -147,7 +147,7 @@ public class ConstructionBlock extends Block implements ITileEntityProvider {
     @Override
     @SideOnly(Side.CLIENT)
     public boolean shouldSideBeRendered(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, EnumFacing side) {
-        IBlockState mimicBlock = getMimicBlock(blockAccess, pos);
+        IBlockState mimicBlock = getActualMimicBlock(blockAccess, pos);
         return mimicBlock == null ? true : mimicBlock.getBlock().shouldSideBeRendered(mimicBlock, blockAccess, pos, side);
     }
 
@@ -158,13 +158,25 @@ public class ConstructionBlock extends Block implements ITileEntityProvider {
 
     @Override
     public boolean doesSideBlockRendering(IBlockState state, IBlockAccess world, BlockPos pos, EnumFacing face) {
-        IBlockState mimicBlock = getMimicBlock(world, pos);
+        IBlockState mimicBlock = getActualMimicBlock(world, pos);
         return mimicBlock == null ? true : mimicBlock.getBlock().doesSideBlockRendering(mimicBlock, world, pos, face);
     }
 
     @Override
     public boolean isFullCube(IBlockState state) {
         return false;
+    }
+
+    @Override
+    public int getLightOpacity(IBlockState state, IBlockAccess world, BlockPos pos) {
+        IBlockState mimicBlock = getActualMimicBlock(world, pos);
+        int opacity = 0;
+        if (mimicBlock != null) {
+            //opacity = mimicBlock.getBlock().getLightOpacity(state, world, pos);
+            opacity = super.getLightOpacity(state, world, pos);
+        }
+       //opacity = super.getLightOpacity(state, world, pos);
+        return opacity;
     }
 
     @SideOnly(Side.CLIENT)
@@ -176,7 +188,7 @@ public class ConstructionBlock extends Block implements ITileEntityProvider {
     }
 
     public BlockFaceShape getBlockFaceShape(IBlockAccess worldIn, IBlockState state, BlockPos pos, EnumFacing face) {
-        IBlockState mimicBlock = getMimicBlock(worldIn, pos);
+        IBlockState mimicBlock = getActualMimicBlock(worldIn, pos);
         try {
             return mimicBlock == null ? BlockFaceShape.SOLID : mimicBlock.getBlock().getBlockFaceShape(worldIn, state, pos, face);
         } catch (Exception var8) {
@@ -186,7 +198,7 @@ public class ConstructionBlock extends Block implements ITileEntityProvider {
 
     @Override
     public void addCollisionBoxToList(IBlockState state, World worldIn, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, @Nullable Entity entityIn, boolean isActualState) {
-        IBlockState mimicBlock = getMimicBlock(worldIn, pos);
+        IBlockState mimicBlock = getActualMimicBlock(worldIn, pos);
         if (mimicBlock == null) {
             super.addCollisionBoxToList(state, worldIn, pos, entityBox, collidingBoxes, entityIn, isActualState);
         } else {
@@ -197,7 +209,7 @@ public class ConstructionBlock extends Block implements ITileEntityProvider {
     @Override
     @Nullable
     public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, IBlockAccess worldIn, BlockPos pos) {
-        IBlockState mimicBlock = getMimicBlock(worldIn, pos);
+        IBlockState mimicBlock = getActualMimicBlock(worldIn, pos);
         if (mimicBlock == null) {
             return super.getBoundingBox(blockState, worldIn, pos);
         } else {
@@ -211,7 +223,7 @@ public class ConstructionBlock extends Block implements ITileEntityProvider {
 
     @Override
     public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
-        IBlockState mimicBlock = getMimicBlock(source, pos);
+        IBlockState mimicBlock = getActualMimicBlock(source, pos);
         if (mimicBlock == null) {
             return super.getBoundingBox(state, source, pos);
         } else {
@@ -222,4 +234,14 @@ public class ConstructionBlock extends Block implements ITileEntityProvider {
             }
         }
     }
+
+    /*@Override
+    public boolean isNormalCube(IBlockState state, IBlockAccess world, BlockPos pos) {
+        IBlockState mimicBlock = getActualMimicBlock(world, pos);
+        if (mimicBlock == null) {
+            return super.isNormalCube(state, world, pos);
+        } else {
+            return mimicBlock.getBlock().isNormalCube(state, world, pos);
+        }
+    }*/
 }
