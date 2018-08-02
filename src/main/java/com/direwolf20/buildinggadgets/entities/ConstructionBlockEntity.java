@@ -16,7 +16,7 @@ public class ConstructionBlockEntity extends Entity implements IEntityAdditional
     private static final DataParameter<BlockPos> FIXED = EntityDataManager.createKey(BlockBuildEntity.class, DataSerializers.BLOCK_POS);
 
     public int despawning = -1;
-    public int maxLife = 20;
+    public int maxLife = 80;
     private BlockPos setPos;
     private EntityLivingBase spawnedBy;
     World world;

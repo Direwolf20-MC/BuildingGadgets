@@ -3,6 +3,7 @@ package com.direwolf20.buildinggadgets.entities;
 import com.direwolf20.buildinggadgets.ModBlocks;
 import com.direwolf20.buildinggadgets.blocks.ConstructionBlockTileEntity;
 import com.google.common.base.Optional;
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
@@ -25,6 +26,8 @@ public class BlockBuildEntity extends Entity implements IEntityAdditionalSpawnDa
     private static final DataParameter<Integer> toolMode = EntityDataManager.<Integer>createKey(BlockBuildEntity.class, DataSerializers.VARINT);
     private static final DataParameter<Optional<IBlockState>> SET_BLOCK = EntityDataManager.<Optional<IBlockState>>createKey(BlockBuildEntity.class, DataSerializers.OPTIONAL_BLOCK_STATE);
     private static final DataParameter<BlockPos> FIXED = EntityDataManager.createKey(BlockBuildEntity.class, DataSerializers.BLOCK_POS);
+    private static final DataParameter<Boolean> usePaste = EntityDataManager.createKey(BlockBuildEntity.class, DataSerializers.BOOLEAN);
+
 
     public int despawning = -1;
     public int maxLife = 20;
@@ -77,7 +80,7 @@ public class BlockBuildEntity extends Entity implements IEntityAdditionalSpawnDa
         spawnedBy = player;
         actualSetBlock = actualSpawnBlock;
         world.setBlockState(spawnPos, ModBlocks.effectBlock.getDefaultState());
-        useConstructionPaste = constrPaste;
+        setUsingConstructionPaste(constrPaste);
     }
 
     public int getToolMode() {
@@ -95,6 +98,14 @@ public class BlockBuildEntity extends Entity implements IEntityAdditionalSpawnDa
 
     public void setSetBlock(@Nullable IBlockState state) {
         this.dataManager.set(SET_BLOCK, Optional.fromNullable(state));
+    }
+
+    public void setUsingConstructionPaste(Boolean paste) {
+        this.dataManager.set(usePaste, paste);
+    }
+
+    public boolean getUsingConstructionPaste() {
+        return this.dataManager.get(usePaste);
     }
 
     @Override
@@ -145,7 +156,7 @@ public class BlockBuildEntity extends Entity implements IEntityAdditionalSpawnDa
         if (despawning == -1) {
             despawning = 0;
             if (setPos != null && setBlock != null && (getToolMode() == 1)) {
-                if (useConstructionPaste) {
+                if (getUsingConstructionPaste()) {
                     world.setBlockState(setPos, ModBlocks.constructionBlock.getDefaultState());
                     TileEntity te = world.getTileEntity(setPos);
                     if (te instanceof ConstructionBlockTileEntity) {
@@ -159,7 +170,7 @@ public class BlockBuildEntity extends Entity implements IEntityAdditionalSpawnDa
             } else if (setPos != null && setBlock != null && getToolMode() == 2) {
                 world.setBlockState(setPos, Blocks.AIR.getDefaultState());
             } else if (setPos != null && setBlock != null && getToolMode() == 3) {
-                world.spawnEntity(new BlockBuildEntity(world, setPos, spawnedBy, originalSetBlock, 1, actualSetBlock, useConstructionPaste));
+                world.spawnEntity(new BlockBuildEntity(world, setPos, spawnedBy, originalSetBlock, 1, actualSetBlock, getUsingConstructionPaste()));
             }
         }
     }
@@ -210,6 +221,7 @@ public class BlockBuildEntity extends Entity implements IEntityAdditionalSpawnDa
         this.dataManager.register(FIXED, BlockPos.ORIGIN);
         this.dataManager.register(toolMode, 1);
         this.dataManager.register(SET_BLOCK, Optional.absent());
+        this.dataManager.register(usePaste, useConstructionPaste);
     }
 
 }

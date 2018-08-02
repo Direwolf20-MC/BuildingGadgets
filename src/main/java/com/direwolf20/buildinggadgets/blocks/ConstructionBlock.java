@@ -109,10 +109,14 @@ public class ConstructionBlock extends Block implements ITileEntityProvider {
 
     @Nullable
     protected IBlockState getActualMimicBlock(IBlockAccess blockAccess, BlockPos pos) {
-        TileEntity te = blockAccess.getTileEntity(pos);
-        if (te instanceof ConstructionBlockTileEntity) {
-            return ((ConstructionBlockTileEntity) te).getActualBlockState();
-        } else {
+        try {
+            TileEntity te = blockAccess.getTileEntity(pos);
+            if (te instanceof ConstructionBlockTileEntity) {
+                return ((ConstructionBlockTileEntity) te).getActualBlockState();
+            } else {
+                return null;
+            }
+        } catch (Exception var8) {
             return null;
         }
     }
@@ -166,7 +170,7 @@ public class ConstructionBlock extends Block implements ITileEntityProvider {
     @SideOnly(Side.CLIENT)
     public void initColorHandler(BlockColors blockColors) {
         blockColors.registerBlockColorHandler((state, world, pos, tintIndex) -> {
-            IBlockState mimicBlock = getMimicBlock(world, pos);
+            IBlockState mimicBlock = getActualMimicBlock(world, pos);
             return mimicBlock != null ? blockColors.colorMultiplier(mimicBlock, world, pos, tintIndex) : -1;
         }, this);
     }
