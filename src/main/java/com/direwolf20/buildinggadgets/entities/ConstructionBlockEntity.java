@@ -25,7 +25,6 @@ public class ConstructionBlockEntity extends Entity implements IEntityAdditional
         super(worldIn);
         setSize(0.1F, 0.1F);
         world = worldIn;
-        System.out.println("ConstructionBlockEntity is alive!");
     }
 
     public ConstructionBlockEntity(World worldIn, BlockPos spawnPos) {
@@ -33,7 +32,6 @@ public class ConstructionBlockEntity extends Entity implements IEntityAdditional
         setSize(0.1F, 0.1F);
         world = worldIn;
         setPosition(spawnPos.getX(), spawnPos.getY(), spawnPos.getZ());
-        System.out.println("ConstructionBlockEntity is alive!");
     }
 
     public int getTicksExisted() {
@@ -62,7 +60,6 @@ public class ConstructionBlockEntity extends Entity implements IEntityAdditional
     private void setDespawning() {
         if (despawning == -1) {
             despawning = 0;
-            System.out.println("ConstructionBlockEntity is dead!");
         }
     }
 
