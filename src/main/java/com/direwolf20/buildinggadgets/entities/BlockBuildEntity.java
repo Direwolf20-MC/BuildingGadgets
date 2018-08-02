@@ -152,6 +152,7 @@ public class BlockBuildEntity extends Entity implements IEntityAdditionalSpawnDa
                         ((ConstructionBlockTileEntity) te).setBlockState(setBlock);
                         ((ConstructionBlockTileEntity) te).setActualBlockState(actualSetBlock);
                     }
+                    world.spawnEntity(new ConstructionBlockEntity(world, setPos));
                 } else {
                     world.setBlockState(setPos, setBlock);
                 }

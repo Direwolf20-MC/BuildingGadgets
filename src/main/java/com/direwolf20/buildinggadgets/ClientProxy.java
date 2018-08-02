@@ -3,6 +3,8 @@ package com.direwolf20.buildinggadgets;
 import com.direwolf20.buildinggadgets.blocks.Models.BakedModelLoader;
 import com.direwolf20.buildinggadgets.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.entities.BlockBuildEntityRender;
+import com.direwolf20.buildinggadgets.entities.ConstructionBlockEntity;
+import com.direwolf20.buildinggadgets.entities.ConstructionBlockEntityRender;
 import com.direwolf20.buildinggadgets.items.BuildingTool;
 import com.direwolf20.buildinggadgets.items.ExchangerTool;
 import com.direwolf20.buildinggadgets.tools.ToolRenders;
@@ -49,6 +51,7 @@ public class ClientProxy extends CommonProxy {
 
     public void registerEntityRenderers() {
         RenderingRegistry.registerEntityRenderingHandler(BlockBuildEntity.class, new BlockBuildEntityRender.Factory());
+        RenderingRegistry.registerEntityRenderingHandler(ConstructionBlockEntity.class, new ConstructionBlockEntityRender.Factory());
     }
 
     @SubscribeEvent
