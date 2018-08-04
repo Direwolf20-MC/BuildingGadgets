@@ -55,7 +55,7 @@ public class BlockBuildEntityRender extends Render<BlockBuildEntity> {
         //IBlockState renderBlockState = blocks.COBBLESTONE.getDefaultState();
 
         IBlockState renderBlockState = entity.getSetBlock();
-        if (entity.getUsingConstructionPaste()) {
+        if (entity.getUsingConstructionPaste() && toolMode == 1) {
             renderBlockState = ModBlocks.constructionBlock.getDefaultState();
         }
         if (renderBlockState == null) {

@@ -9,6 +9,7 @@ import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.chunk.Chunk;
+import net.minecraftforge.fml.relauncher.ReflectionHelper;
 
 import java.lang.reflect.Method;
 
@@ -53,6 +54,8 @@ public class ConstructionBlockTileEntity extends TileEntity {
         markDirtyClient();
     }
 
+    private static Method relightBlock = ReflectionHelper.findMethod(Chunk.class, "relightBlock", "func_76615_h", int.class, int.class, int.class);
+
     private static Method getRelightBlockMethod() {
         try {
             Method ret = Chunk.class.getDeclaredMethod("relightBlock", int.class, int.class, int.class);
@@ -92,7 +95,7 @@ public class ConstructionBlockTileEntity extends TileEntity {
         if (getWorld() != null) {
             try {
                 System.out.println("Doing Lighting");
-                relightBlockMethod.invoke(world.getChunkFromBlockCoords(getPos()), pos.getX() & 15, pos.getY() + 1, pos.getZ() & 15);
+                relightBlock.invoke(world.getChunkFromBlockCoords(getPos()), pos.getX() & 15, pos.getY() + 1, pos.getZ() & 15);
                 world.checkLight(getPos());
                 //relightBlockMethod.invoke(world.getChunkFromBlockCoords(getPos()), pos.getX() & 15, pos.getY(), pos.getZ() & 15);
                 //propegateMethod.invoke(world.getChunkFromBlockCoords(getPos()), pos.getX() & 15, pos.getZ() & 15);
