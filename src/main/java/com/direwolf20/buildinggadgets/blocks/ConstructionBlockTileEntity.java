@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.blocks;
 
+import akka.util.Reflect;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
@@ -10,6 +11,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
+import sun.reflect.Reflection;
 
 import java.lang.reflect.Method;
 
@@ -55,7 +57,7 @@ public class ConstructionBlockTileEntity extends TileEntity {
     }
 
     private static Method relightBlock = ReflectionHelper.findMethod(Chunk.class, "relightBlock", "func_76615_h", int.class, int.class, int.class);
-
+    private static Method propagateLight = ReflectionHelper.findMethod(Chunk.class, "propagateSkylightOcclusion", "func_76595_e", int.class, int.class);
     private static Method getRelightBlockMethod() {
         try {
             Method ret = Chunk.class.getDeclaredMethod("relightBlock", int.class, int.class, int.class);
@@ -96,6 +98,8 @@ public class ConstructionBlockTileEntity extends TileEntity {
             try {
                 System.out.println("Doing Lighting");
                 relightBlock.invoke(world.getChunkFromBlockCoords(getPos()), pos.getX() & 15, pos.getY() + 1, pos.getZ() & 15);
+                //relightBlock.invoke(world.getChunkFromBlockCoords(getPos()), pos.getX() & 15, pos.getY(), pos.getZ() & 15);
+                propagateLight.invoke(world.getChunkFromBlockCoords(getPos()), pos.getX() & 15, pos.getZ() & 15);
                 world.checkLight(getPos());
                 //relightBlockMethod.invoke(world.getChunkFromBlockCoords(getPos()), pos.getX() & 15, pos.getY(), pos.getZ() & 15);
                 //propegateMethod.invoke(world.getChunkFromBlockCoords(getPos()), pos.getX() & 15, pos.getZ() & 15);

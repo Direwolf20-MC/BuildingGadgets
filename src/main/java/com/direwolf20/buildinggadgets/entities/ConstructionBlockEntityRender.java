@@ -67,7 +67,7 @@ public class ConstructionBlockEntityRender extends Render<ConstructionBlockEntit
             if (entity.getPosition() != null) {
                 TileEntity te = entity.getEntityWorld().getTileEntity(entity.getPosition());
                 if (te instanceof ConstructionBlockTileEntity) {
-                    ((ConstructionBlockTileEntity) te).updateLighting();
+                    //((ConstructionBlockTileEntity) te).updateLighting();
                 }
             }
         }

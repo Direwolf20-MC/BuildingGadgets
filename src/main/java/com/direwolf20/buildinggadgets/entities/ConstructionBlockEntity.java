@@ -1,7 +1,10 @@
 package com.direwolf20.buildinggadgets.entities;
 
+import com.direwolf20.buildinggadgets.ModBlocks;
+import com.direwolf20.buildinggadgets.blocks.ConstructionBlock;
 import com.direwolf20.buildinggadgets.blocks.ConstructionBlockTileEntity;
 import io.netty.buffer.ByteBuf;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.nbt.NBTTagCompound;
@@ -9,9 +12,12 @@ import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class ConstructionBlockEntity extends Entity implements IEntityAdditionalSpawnData {
 
@@ -66,7 +72,20 @@ public class ConstructionBlockEntity extends Entity implements IEntityAdditional
             if (setPos != null) {
                 TileEntity te = world.getTileEntity(setPos);
                 if (te instanceof ConstructionBlockTileEntity) {
-                    ((ConstructionBlockTileEntity) te).updateLighting();
+                    IBlockState tempState = ((ConstructionBlockTileEntity) te).getBlockState();
+                    int opacity = tempState.getBlock().getLightOpacity(tempState, world, setPos);
+                    if (opacity == 255) {
+                        IBlockState tempSetBlock = ((ConstructionBlockTileEntity) te).getBlockState();
+                        IBlockState tempActualSetBlock = ((ConstructionBlockTileEntity) te).getActualBlockState();
+                        world.setBlockState(setPos, ModBlocks.constructionBlock.getDefaultState().withProperty(ConstructionBlock.BRIGHT, false));
+                        te = world.getTileEntity(setPos);
+                        if (te instanceof ConstructionBlockTileEntity) {
+                            ((ConstructionBlockTileEntity) te).setBlockState(tempSetBlock);
+                            ((ConstructionBlockTileEntity) te).setActualBlockState(tempActualSetBlock);
+                        }
+                    }
+
+                    //((ConstructionBlockTileEntity) te).updateLighting();
                     //((ConstructionBlockTileEntity) te).markDirtyClient();
                 }
             }
@@ -121,5 +140,18 @@ public class ConstructionBlockEntity extends Entity implements IEntityAdditional
         return pass == 0; //After tr
     }
 
+    /*@SideOnly(Side.CLIENT)
+    @Override
+    public AxisAlignedBB getRenderBoundingBox() {
+        if (setPos != null) {
+            int xCoord = setPos.getX();
+            int yCoord = setPos.getY();
+            int zCoord = setPos.getZ();
+
+            return new AxisAlignedBB(xCoord - 7, yCoord - 7, zCoord - 7, xCoord + 8, yCoord + 7, zCoord + 8);
+        } else {
+            return super.getRenderBoundingBox();
+        }
+    }*/
 
 }

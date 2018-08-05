@@ -42,7 +42,7 @@ import java.util.List;
 
 public class ConstructionBlock extends Block implements ITileEntityProvider {
     public static final ConstructionProperty FACADEID = new ConstructionProperty("facadeid");
-    //public static final PropertyBool BRIGHT = PropertyBool.create("bright");
+    public static final PropertyBool BRIGHT = PropertyBool.create("bright");
 
     public ConstructionBlock() {
         super(Material.ROCK);
@@ -50,7 +50,7 @@ public class ConstructionBlock extends Block implements ITileEntityProvider {
         this.setCreativeTab(CreativeTabs.BUILDING_BLOCKS);
         setUnlocalizedName(BuildingGadgets.MODID + ".constructionblock");     // Used for localization (en_US.lang)
         setRegistryName("constructionblock");        // The unique name (within your mod) that identifies this block
-        //setDefaultState(blockState.getBaseState().withProperty(BRIGHT, true));
+        setDefaultState(blockState.getBaseState().withProperty(BRIGHT, true));
     }
 
     @SideOnly(Side.CLIENT)
@@ -126,7 +126,7 @@ public class ConstructionBlock extends Block implements ITileEntityProvider {
 
     @Override
     protected BlockStateContainer createBlockState() {
-        IProperty<?>[] listedProperties = new IProperty<?>[]{};
+        IProperty<?>[] listedProperties = new IProperty<?>[]{BRIGHT};
         IUnlistedProperty<?>[] unlistedProperties = new IUnlistedProperty<?>[]{FACADEID};
         return new ExtendedBlockState(this, listedProperties, unlistedProperties);
     }
@@ -168,16 +168,16 @@ public class ConstructionBlock extends Block implements ITileEntityProvider {
 
     @Override
     public int getLightOpacity(IBlockState state, IBlockAccess world, BlockPos pos) {
-        //Boolean bright = state.getValue(ConstructionBlock.BRIGHT);
-        //if (bright) {return 0;}
-        //return 255;
+        Boolean bright = state.getValue(ConstructionBlock.BRIGHT);
+        if (bright) {return 0;}
+        return 255;
         //return super.getLightOpacity(state, world, pos);
-        IBlockState mimicBlock = getActualMimicBlock(world, pos);
+        /*IBlockState mimicBlock = getActualMimicBlock(world, pos);
         int opacity = 0;
         if (mimicBlock != null) {
             opacity = mimicBlock.getBlock().getLightOpacity(mimicBlock, world, pos);
         }
-        return opacity;
+        return opacity;*/
     }
 
     @Override
@@ -242,7 +242,7 @@ public class ConstructionBlock extends Block implements ITileEntityProvider {
         }
     }
 
-    /*@Override
+    @Override
     public IBlockState getStateFromMeta(int meta) {
         return getDefaultState()
                 .withProperty(BRIGHT,(meta == 0) ? false : true);
@@ -251,7 +251,7 @@ public class ConstructionBlock extends Block implements ITileEntityProvider {
     @Override
     public int getMetaFromState(IBlockState state) {
         return (state.getValue(BRIGHT) ? 1 : 0);
-    }*/
+    }
 
     /*@Override
     public boolean isNormalCube(IBlockState state, IBlockAccess world, BlockPos pos) {
