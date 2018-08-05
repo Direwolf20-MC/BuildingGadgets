@@ -57,7 +57,6 @@ public class ConstructionBakedModel implements IBakedModel {
             return model.getQuads(state, side, rand);
         } catch (Exception e) {
             return model.getQuads(facadeState, side, rand);
-            //return Collections.emptyList();
         }
     }
 

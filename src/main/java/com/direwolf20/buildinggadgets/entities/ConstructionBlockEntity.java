@@ -12,12 +12,9 @@ import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class ConstructionBlockEntity extends Entity implements IEntityAdditionalSpawnData {
 
@@ -84,9 +81,6 @@ public class ConstructionBlockEntity extends Entity implements IEntityAdditional
                             ((ConstructionBlockTileEntity) te).setActualBlockState(tempActualSetBlock);
                         }
                     }
-
-                    //((ConstructionBlockTileEntity) te).updateLighting();
-                    //((ConstructionBlockTileEntity) te).markDirtyClient();
                 }
             }
         }
@@ -139,19 +133,5 @@ public class ConstructionBlockEntity extends Entity implements IEntityAdditional
     public boolean shouldRenderInPass(int pass) {
         return pass == 0; //After tr
     }
-
-    /*@SideOnly(Side.CLIENT)
-    @Override
-    public AxisAlignedBB getRenderBoundingBox() {
-        if (setPos != null) {
-            int xCoord = setPos.getX();
-            int yCoord = setPos.getY();
-            int zCoord = setPos.getZ();
-
-            return new AxisAlignedBB(xCoord - 7, yCoord - 7, zCoord - 7, xCoord + 8, yCoord + 7, zCoord + 8);
-        } else {
-            return super.getRenderBoundingBox();
-        }
-    }*/
 
 }

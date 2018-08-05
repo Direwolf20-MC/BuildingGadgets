@@ -1,10 +1,8 @@
 package com.direwolf20.buildinggadgets.entities;
 
 import com.direwolf20.buildinggadgets.ModBlocks;
-import com.direwolf20.buildinggadgets.blocks.ConstructionBlock;
 import com.direwolf20.buildinggadgets.blocks.ConstructionBlockTileEntity;
 import com.google.common.base.Optional;
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
@@ -57,7 +55,9 @@ public class BlockBuildEntity extends Entity implements IEntityAdditionalSpawnDa
         setPos = spawnPos;
         if (te instanceof ConstructionBlockTileEntity) {
             setBlock = ((ConstructionBlockTileEntity) te).getBlockState();
-            if (setBlock == null) {setBlock = spawnBlock;}
+            if (setBlock == null) {
+                setBlock = spawnBlock;
+            }
         } else {
             setBlock = spawnBlock;
         }
@@ -67,7 +67,9 @@ public class BlockBuildEntity extends Entity implements IEntityAdditionalSpawnDa
             if (currentBlock != null) {
                 if (te instanceof ConstructionBlockTileEntity) {
                     setBlock = ((ConstructionBlockTileEntity) te).getBlockState();
-                    if (setBlock == null) {setBlock = currentBlock;}
+                    if (setBlock == null) {
+                        setBlock = currentBlock;
+                    }
                 } else {
                     setBlock = currentBlock;
                 }

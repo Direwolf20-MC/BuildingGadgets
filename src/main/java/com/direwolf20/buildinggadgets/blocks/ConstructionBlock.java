@@ -100,16 +100,6 @@ public class ConstructionBlock extends Block implements ITileEntityProvider {
         }
     }
 
-    /*@Nullable
-    protected IBlockState getMimicBlock(IBlockAccess blockAccess, BlockPos pos) {
-        TileEntity te = blockAccess.getTileEntity(pos);
-        if (te instanceof ConstructionBlockTileEntity) {
-            return ((ConstructionBlockTileEntity) te).getBlockState();
-        } else {
-            return null;
-        }
-    }*/
-
     @Nullable
     protected IBlockState getActualMimicBlock(IBlockAccess blockAccess, BlockPos pos) {
         try {
@@ -149,15 +139,8 @@ public class ConstructionBlock extends Block implements ITileEntityProvider {
         return mimicBlock == null ? true : mimicBlock.getBlock().shouldSideBeRendered(mimicBlock, blockAccess, pos, side);
     }
 
-    /*@Override
-    public boolean isBlockNormalCube(IBlockState blockState) {
-        return false;
-    }*/
-
     @Override
     public boolean isOpaqueCube(IBlockState p_isFullBlock_1_) {
-        //boolean bright = p_isFullBlock_1_.getValue(ConstructionBlock.BRIGHT);
-        //return !(bright);
         return false;
     }
 
@@ -169,15 +152,10 @@ public class ConstructionBlock extends Block implements ITileEntityProvider {
     @Override
     public int getLightOpacity(IBlockState state, IBlockAccess world, BlockPos pos) {
         Boolean bright = state.getValue(ConstructionBlock.BRIGHT);
-        if (bright) {return 0;}
-        return 255;
-        //return super.getLightOpacity(state, world, pos);
-        /*IBlockState mimicBlock = getActualMimicBlock(world, pos);
-        int opacity = 0;
-        if (mimicBlock != null) {
-            opacity = mimicBlock.getBlock().getLightOpacity(mimicBlock, world, pos);
+        if (bright) {
+            return 0;
         }
-        return opacity;*/
+        return 255;
     }
 
     @Override
@@ -245,7 +223,7 @@ public class ConstructionBlock extends Block implements ITileEntityProvider {
     @Override
     public IBlockState getStateFromMeta(int meta) {
         return getDefaultState()
-                .withProperty(BRIGHT,(meta == 0) ? false : true);
+                .withProperty(BRIGHT, (meta == 0) ? false : true);
     }
 
     @Override
@@ -253,13 +231,4 @@ public class ConstructionBlock extends Block implements ITileEntityProvider {
         return (state.getValue(BRIGHT) ? 1 : 0);
     }
 
-    /*@Override
-    public boolean isNormalCube(IBlockState state, IBlockAccess world, BlockPos pos) {
-        IBlockState mimicBlock = getActualMimicBlock(world, pos);
-        if (mimicBlock == null) {
-            return super.isNormalCube(state, world, pos);
-        } else {
-            return mimicBlock.getBlock().isNormalCube(state, world, pos);
-        }
-    }*/
 }

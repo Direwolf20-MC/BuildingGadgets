@@ -1,6 +1,5 @@
 package com.direwolf20.buildinggadgets.blocks;
 
-import akka.util.Reflect;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
@@ -8,12 +7,6 @@ import net.minecraft.nbt.NBTUtil;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.chunk.Chunk;
-import net.minecraftforge.fml.relauncher.ReflectionHelper;
-import sun.reflect.Reflection;
-
-import java.lang.reflect.Method;
 
 public class ConstructionBlockTileEntity extends TileEntity {
     private IBlockState blockState;
@@ -21,21 +14,18 @@ public class ConstructionBlockTileEntity extends TileEntity {
 
     public boolean setBlockState(IBlockState state) {
         blockState = state;
-        System.out.println(state);
         markDirtyClient();
         return true;
     }
 
     public boolean setActualBlockState(IBlockState state) {
         actualBlockState = state;
-        System.out.println(state);
         markDirtyClient();
         return true;
     }
 
     public IBlockState getBlockState() {
         if (blockState == null || blockState == Blocks.AIR.getDefaultState()) {
-            //return Blocks.COBBLESTONE.getDefaultState();
             return null;
         }
         return blockState;
@@ -56,62 +46,14 @@ public class ConstructionBlockTileEntity extends TileEntity {
         markDirtyClient();
     }
 
-    private static Method relightBlock = ReflectionHelper.findMethod(Chunk.class, "relightBlock", "func_76615_h", int.class, int.class, int.class);
-    private static Method propagateLight = ReflectionHelper.findMethod(Chunk.class, "propagateSkylightOcclusion", "func_76595_e", int.class, int.class);
-    private static Method getRelightBlockMethod() {
-        try {
-            Method ret = Chunk.class.getDeclaredMethod("relightBlock", int.class, int.class, int.class);
-            ret.setAccessible(true);
-            return ret;
-        } catch (ReflectiveOperationException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    /*private static Method getPropegateMethod() {
-        try {
-            Method ret = Chunk.class.getDeclaredMethod("propagateSkylightOcclusion", int.class, int.class);
-            ret.setAccessible(true);
-            return ret;
-        } catch (ReflectiveOperationException e) {
-            throw new RuntimeException(e);
-        }
-    }*/
-
-    private static final Method relightBlockMethod = getRelightBlockMethod();
-    //private static final Method propegateMethod = getPropegateMethod();
-
     public void markDirtyClient() {
 
         markDirty();
         if (getWorld() != null) {
-            BlockPos pos = getPos();
             IBlockState state = getWorld().getBlockState(getPos());
-            //world.checkLight(getPos());
-            //updateLighting();
             getWorld().notifyBlockUpdate(getPos(), state, state, 3);
         }
     }
-
-    public void updateLighting() {
-        if (getWorld() != null) {
-            try {
-                System.out.println("Doing Lighting");
-                relightBlock.invoke(world.getChunkFromBlockCoords(getPos()), pos.getX() & 15, pos.getY() + 1, pos.getZ() & 15);
-                //relightBlock.invoke(world.getChunkFromBlockCoords(getPos()), pos.getX() & 15, pos.getY(), pos.getZ() & 15);
-                propagateLight.invoke(world.getChunkFromBlockCoords(getPos()), pos.getX() & 15, pos.getZ() & 15);
-                world.checkLight(getPos());
-                //relightBlockMethod.invoke(world.getChunkFromBlockCoords(getPos()), pos.getX() & 15, pos.getY(), pos.getZ() & 15);
-                //propegateMethod.invoke(world.getChunkFromBlockCoords(getPos()), pos.getX() & 15, pos.getZ() & 15);
-                //IBlockState state = getWorld().getBlockState(getPos());
-                //getWorld().notifyBlockUpdate(getPos().down(), state, state, 3);
-            } catch (ReflectiveOperationException e) {
-                throw new RuntimeException(e);
-            }
-
-        }
-    }
-
 
     @Override
     public NBTTagCompound getUpdateTag() {

@@ -1,7 +1,6 @@
 package com.direwolf20.buildinggadgets.entities;
 
 import com.direwolf20.buildinggadgets.ModBlocks;
-import com.direwolf20.buildinggadgets.blocks.ConstructionBlockTileEntity;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockRendererDispatcher;
@@ -10,7 +9,6 @@ import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.init.Blocks;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.client.registry.IRenderFactory;
@@ -62,15 +60,6 @@ public class ConstructionBlockEntityRender extends Render<ConstructionBlockEntit
         GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
         GlStateManager.disableBlend();
         GlStateManager.popMatrix();
-
-        if (entity.despawning == 1) {
-            if (entity.getPosition() != null) {
-                TileEntity te = entity.getEntityWorld().getTileEntity(entity.getPosition());
-                if (te instanceof ConstructionBlockTileEntity) {
-                    //((ConstructionBlockTileEntity) te).updateLighting();
-                }
-            }
-        }
     }
 
     @Nullable

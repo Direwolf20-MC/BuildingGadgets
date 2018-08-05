@@ -13,7 +13,6 @@ import net.minecraftforge.common.model.TRSRTransformation;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 
@@ -38,13 +37,7 @@ public class ConstructionModel implements IModel {
 
         dependencies.add(MODEL_CONSTRUCTION_BLOCK);
         return dependencies;
-        //return Collections.emptySet();
     }
-
-    /*@Override
-    public Collection<ResourceLocation> getTextures() {
-        return Collections.emptyList();
-    }*/
 
     @Override
     public IModelState getDefaultState() {
