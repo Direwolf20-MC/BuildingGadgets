@@ -66,8 +66,6 @@ public class ToolRenders {
                 }
 
                 //Figure out how many of the block we're rendering we have in the inventory of the player.
-                //ItemStack itemStack = renderBlockState.getBlock().getPickBlock(renderBlockState, null, world, new BlockPos(0, 0, 0), player);
-                //ItemStack itemStack = InventoryManipulation.getSilkTouchDrop(renderBlockState);
                 ItemStack itemStack;
                 if (renderBlockState.getBlock().canSilkHarvest(world, new BlockPos(0, 0, 0), renderBlockState, player)) {
                     itemStack = InventoryManipulation.getSilkTouchDrop(renderBlockState);
@@ -77,7 +75,7 @@ public class ToolRenders {
 
                 ItemStack constructionStack = InventoryManipulation.getSilkTouchDrop(ModBlocks.constructionBlock.getDefaultState());
                 int hasBlocks = InventoryManipulation.countItem(itemStack, player);
-                hasBlocks = hasBlocks + InventoryManipulation.countItem(constructionStack, player);
+                hasBlocks = hasBlocks + InventoryManipulation.countPaste(player);
                 int hasEnergy = 0;
                 if (Config.poweredByFE) {
                     hasEnergy = stack.getCapability(CapabilityEnergy.ENERGY, null).getEnergyStored();
@@ -199,7 +197,7 @@ public class ToolRenders {
                 }
                 ItemStack constructionStack = InventoryManipulation.getSilkTouchDrop(ModBlocks.constructionBlock.getDefaultState());
                 int hasBlocks = InventoryManipulation.countItem(itemStack, player);
-                hasBlocks = hasBlocks + InventoryManipulation.countItem(constructionStack, player);
+                hasBlocks = hasBlocks + InventoryManipulation.countPaste(player);
                 int hasEnergy = 0;
                 if (Config.poweredByFE) {
                     hasEnergy = stack.getCapability(CapabilityEnergy.ENERGY, null).getEnergyStored();

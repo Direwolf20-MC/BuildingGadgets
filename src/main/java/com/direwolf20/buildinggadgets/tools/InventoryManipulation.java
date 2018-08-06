@@ -1,5 +1,7 @@
 package com.direwolf20.buildinggadgets.tools;
 
+import com.direwolf20.buildinggadgets.ModItems;
+import com.direwolf20.buildinggadgets.items.ConstructionPaste;
 import net.minecraft.block.*;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.IBlockState;
@@ -99,6 +101,24 @@ public class InventoryManipulation {
             }
         }
 
+        for (int slot : slots) {
+            ItemStack stackInSlot = inv.getStackInSlot(slot);
+            count += stackInSlot.getCount();
+        }
+        return count;
+    }
+
+    public static int countPaste(EntityPlayer player) {
+        if (player.capabilities.isCreativeMode) {
+            return 10000;
+        }
+        int count = 0;
+        InventoryPlayer inv = player.inventory;
+        Item item = ModItems.constructionPaste;
+        ArrayList<Integer> slots = findItem(item, 0, inv);
+        if (slots.size() == 0) {
+            return 0;
+        }
         for (int slot : slots) {
             ItemStack stackInSlot = inv.getStackInSlot(slot);
             count += stackInSlot.getCount();

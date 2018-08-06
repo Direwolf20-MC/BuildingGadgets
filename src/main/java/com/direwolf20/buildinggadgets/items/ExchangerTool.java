@@ -3,6 +3,7 @@ package com.direwolf20.buildinggadgets.items;
 import com.direwolf20.buildinggadgets.BuildingGadgets;
 import com.direwolf20.buildinggadgets.Config;
 import com.direwolf20.buildinggadgets.ModBlocks;
+import com.direwolf20.buildinggadgets.ModItems;
 import com.direwolf20.buildinggadgets.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.tools.ExchangingModes;
 import com.direwolf20.buildinggadgets.tools.InventoryManipulation;
@@ -276,18 +277,17 @@ public class ExchangerTool extends GenericGadget {
             neededItems = 1;
         }
         if (InventoryManipulation.countItem(itemStack, player) < neededItems) {
-            ItemStack constructionStack = InventoryManipulation.getSilkTouchDrop(ModBlocks.constructionBlock.getDefaultState());
-            if (InventoryManipulation.countItem(constructionStack, player) < neededItems) {
+            ItemStack constructionPaste = new ItemStack(ModItems.constructionPaste);
+            if (InventoryManipulation.countPaste(player) < neededItems) {
                 return false;
             } else {
-                itemStack = constructionStack.copy();
+                itemStack = constructionPaste.copy();
                 useConstructionPaste = true;
             }
         }
         if (player.isSpectator()) {
             return false;
         }
-        //if (!player.canPlayerEdit(pos,EnumFacing.UP,tool)) {return false;}
         if (!world.isBlockModifiable(player, pos)) {
             return false;
         }
@@ -311,9 +311,12 @@ public class ExchangerTool extends GenericGadget {
             }
         }
         currentBlock.getBlock().harvestBlock(world, player, pos, currentBlock, world.getTileEntity(pos), tool);
-        InventoryManipulation.useItem(itemStack, player, neededItems);
-        world.spawnEntity(new BlockBuildEntity(world, pos, player, setBlock, 3, getToolActualBlock(tool), useConstructionPaste));
-        return true;
+        if (InventoryManipulation.useItem(itemStack, player, neededItems)) {
+            world.spawnEntity(new BlockBuildEntity(world, pos, player, setBlock, 3, getToolActualBlock(tool), useConstructionPaste));
+            return true;
+        } else {
+            return false;
+        }
     }
 
     @Override

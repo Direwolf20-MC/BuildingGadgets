@@ -3,6 +3,7 @@ package com.direwolf20.buildinggadgets.items;
 import com.direwolf20.buildinggadgets.BuildingGadgets;
 import com.direwolf20.buildinggadgets.Config;
 import com.direwolf20.buildinggadgets.ModBlocks;
+import com.direwolf20.buildinggadgets.ModItems;
 import com.direwolf20.buildinggadgets.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.tools.BuildingModes;
 import com.direwolf20.buildinggadgets.tools.InventoryManipulation;
@@ -311,12 +312,14 @@ public class BuildingTool extends GenericGadget {
                 heldItem.damageItem(1, player);
             }
         }
-        ItemStack constructionStack = InventoryManipulation.getSilkTouchDrop(ModBlocks.constructionBlock.getDefaultState());
-        if (InventoryManipulation.countItem(itemStack, player) == 0) {
-            if (InventoryManipulation.countItem(constructionStack, player) == 0) {
+        //ItemStack constructionStack = InventoryManipulation.getSilkTouchDrop(ModBlocks.constructionBlock.getDefaultState());
+        ItemStack constructionPaste = new ItemStack(ModItems.constructionPaste);
+        if (InventoryManipulation.countItem(itemStack, player) < neededItems) {
+            //if (InventoryManipulation.countItem(constructionStack, player) == 0) {
+            if (InventoryManipulation.countPaste(player) < neededItems) {
                 return false;
             } else {
-                itemStack = constructionStack.copy();
+                itemStack = constructionPaste.copy();
                 useConstructionPaste = true;
             }
         }

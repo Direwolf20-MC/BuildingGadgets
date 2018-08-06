@@ -46,6 +46,7 @@ public class ClientProxy extends CommonProxy {
         ModBlocks.effectBlock.initModel();
         buildingTool.initModel();
         ModItems.exchangerTool.initModel();
+        ModItems.constructionPaste.initModel();
         ModBlocks.constructionBlock.initModel();
     }
 

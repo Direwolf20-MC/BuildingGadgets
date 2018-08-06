@@ -1,6 +1,7 @@
 package com.direwolf20.buildinggadgets.blocks;
 
 import com.direwolf20.buildinggadgets.BuildingGadgets;
+import com.direwolf20.buildinggadgets.ModItems;
 import com.direwolf20.buildinggadgets.blocks.Models.ConstructionBakedModel;
 import com.direwolf20.buildinggadgets.blocks.Models.ConstructionID;
 import com.direwolf20.buildinggadgets.blocks.Models.ConstructionProperty;
@@ -39,6 +40,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Random;
 
 public class ConstructionBlock extends Block implements ITileEntityProvider {
     public static final ConstructionProperty FACADEID = new ConstructionProperty("facadeid");
@@ -63,6 +65,16 @@ public class ConstructionBlock extends Block implements ITileEntityProvider {
             }
         };
         ModelLoader.setCustomStateMapper(this, ignoreState);
+    }
+
+    @Override
+    public Item getItemDropped(IBlockState state, Random rand, int fortune) {
+        return ModItems.constructionPaste;
+    }
+
+    @Override
+    public boolean canSilkHarvest(World world, BlockPos pos, IBlockState state, EntityPlayer player) {
+        return false;
     }
 
     @Override

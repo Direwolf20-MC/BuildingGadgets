@@ -5,6 +5,7 @@ import com.direwolf20.buildinggadgets.blocks.ConstructionBlock;
 import com.direwolf20.buildinggadgets.blocks.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.blocks.EffectBlock;
 import com.direwolf20.buildinggadgets.items.BuildingTool;
+import com.direwolf20.buildinggadgets.items.ConstructionPaste;
 import com.direwolf20.buildinggadgets.items.ExchangerTool;
 import com.direwolf20.buildinggadgets.network.PacketHandler;
 import net.minecraft.block.Block;
@@ -55,5 +56,6 @@ public class CommonProxy {
         event.getRegistry().register(new ItemBlock(ModBlocks.constructionBlock).setRegistryName(ModBlocks.constructionBlock.getRegistryName()));
         event.getRegistry().register(new BuildingTool());
         event.getRegistry().register(new ExchangerTool());
+        event.getRegistry().register(new ConstructionPaste());
     }
 }
