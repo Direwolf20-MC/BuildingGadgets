@@ -10,6 +10,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTUtil;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
@@ -134,12 +135,19 @@ public class ConstructionBlockEntity extends Entity implements IEntityAdditional
 
     @Override
     public void writeEntityToNBT(NBTTagCompound compound) {
-
+        compound.setInteger("despawning", despawning);
+        compound.setInteger("ticksExisted", ticksExisted);
+        compound.setTag("setPos", NBTUtil.createPosTag(setPos));
+        compound.setBoolean("makingPaste", getMakingPaste());
     }
 
     @Override
     public void readEntityFromNBT(NBTTagCompound compound) {
-
+        System.out.println(compound);
+        despawning = compound.getInteger("despawning");
+        ticksExisted = compound.getInteger("ticksExisted");
+        setPos = NBTUtil.getPosFromTag(compound.getCompoundTag("setPos"));
+        setMakingPaste(compound.getBoolean("makingPaste"));
     }
 
     @Override
