@@ -41,6 +41,9 @@ public class ConstructionBlockEntityRender extends Render<ConstructionBlockEntit
             teCounter = maxLife;
         }
         float scale = (float) (maxLife - teCounter) / maxLife;
+        if (entity.getMakingPaste()) {
+            scale = (float) teCounter / maxLife;
+        }
         GlStateManager.translate(x, y, z);
         GlStateManager.translate(-0.005f, -0.005f, -0.005f);
         GlStateManager.scale(1.01f, 1.01f, 1.01f);//Slightly Larger block to avoid z-fighting.
@@ -51,10 +54,6 @@ public class ConstructionBlockEntityRender extends Render<ConstructionBlockEntit
         if (renderBlockState == null) {
             renderBlockState = Blocks.COBBLESTONE.getDefaultState();
         }
-
-        Set<BlockPos> coords = new HashSet<BlockPos>();
-        BlockPos pos = entity.getPosition();
-        coords.add(pos);
 
         blockrendererdispatcher.renderBlockBrightness(renderBlockState, 1.0f);
         GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);

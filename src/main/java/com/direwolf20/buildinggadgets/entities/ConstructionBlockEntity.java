@@ -2,12 +2,13 @@ package com.direwolf20.buildinggadgets.entities;
 
 import com.direwolf20.buildinggadgets.ModBlocks;
 import com.direwolf20.buildinggadgets.blocks.ConstructionBlock;
+import com.direwolf20.buildinggadgets.blocks.ConstructionBlockPowder;
 import com.direwolf20.buildinggadgets.blocks.ConstructionBlockTileEntity;
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
@@ -19,7 +20,8 @@ import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
 
 public class ConstructionBlockEntity extends Entity implements IEntityAdditionalSpawnData {
 
-    private static final DataParameter<BlockPos> FIXED = EntityDataManager.createKey(BlockBuildEntity.class, DataSerializers.BLOCK_POS);
+    private static final DataParameter<BlockPos> FIXED = EntityDataManager.createKey(ConstructionBlockEntity.class, DataSerializers.BLOCK_POS);
+    private static final DataParameter<Boolean> MAKING = EntityDataManager.createKey(ConstructionBlockEntity.class, DataSerializers.BOOLEAN);
 
     public int despawning = -1;
     public int maxLife = 80;
@@ -33,12 +35,13 @@ public class ConstructionBlockEntity extends Entity implements IEntityAdditional
         world = worldIn;
     }
 
-    public ConstructionBlockEntity(World worldIn, BlockPos spawnPos) {
+    public ConstructionBlockEntity(World worldIn, BlockPos spawnPos, boolean makePaste) {
         super(worldIn);
         setSize(0.1F, 0.1F);
         world = worldIn;
         setPosition(spawnPos.getX(), spawnPos.getY(), spawnPos.getZ());
         setPos = spawnPos;
+        setMakingPaste(makePaste);
     }
 
     public int getTicksExisted() {
@@ -53,7 +56,7 @@ public class ConstructionBlockEntity extends Entity implements IEntityAdditional
             setDespawning();
         }
         if (setPos != null) {
-            if (!(world.getBlockState(setPos).getBlock() instanceof ConstructionBlock)) {
+            if (!(world.getBlockState(setPos).getBlock() instanceof ConstructionBlock) && !(world.getBlockState(setPos).getBlock() instanceof ConstructionBlockPowder)) {
                 setDespawning();
             }
         }
@@ -73,19 +76,25 @@ public class ConstructionBlockEntity extends Entity implements IEntityAdditional
         if (despawning == -1) {
             despawning = 0;
             if (setPos != null) {
-                TileEntity te = world.getTileEntity(setPos);
-                if (te instanceof ConstructionBlockTileEntity) {
-                    IBlockState tempState = ((ConstructionBlockTileEntity) te).getBlockState();
-                    int opacity = tempState.getBlock().getLightOpacity(tempState, world, setPos);
-                    if (opacity == 255) {
-                        IBlockState tempSetBlock = ((ConstructionBlockTileEntity) te).getBlockState();
-                        IBlockState tempActualSetBlock = ((ConstructionBlockTileEntity) te).getActualBlockState();
-                        world.setBlockState(setPos, ModBlocks.constructionBlock.getDefaultState().withProperty(ConstructionBlock.BRIGHT, false));
-                        te = world.getTileEntity(setPos);
-                        if (te instanceof ConstructionBlockTileEntity) {
-                            ((ConstructionBlockTileEntity) te).setBlockState(tempSetBlock);
-                            ((ConstructionBlockTileEntity) te).setActualBlockState(tempActualSetBlock);
+                if (!getMakingPaste()) {
+                    TileEntity te = world.getTileEntity(setPos);
+                    if (te instanceof ConstructionBlockTileEntity) {
+                        IBlockState tempState = ((ConstructionBlockTileEntity) te).getBlockState();
+                        int opacity = tempState.getBlock().getLightOpacity(tempState, world, setPos);
+                        if (opacity == 255) {
+                            IBlockState tempSetBlock = ((ConstructionBlockTileEntity) te).getBlockState();
+                            IBlockState tempActualSetBlock = ((ConstructionBlockTileEntity) te).getActualBlockState();
+                            world.setBlockState(setPos, ModBlocks.constructionBlock.getDefaultState().withProperty(ConstructionBlock.BRIGHT, false));
+                            te = world.getTileEntity(setPos);
+                            if (te instanceof ConstructionBlockTileEntity) {
+                                ((ConstructionBlockTileEntity) te).setBlockState(tempSetBlock);
+                                ((ConstructionBlockTileEntity) te).setActualBlockState(tempActualSetBlock);
+                            }
                         }
+                    }
+                } else {
+                    if (world.getBlockState(setPos) == ModBlocks.constructionBlockPowder.getDefaultState()) {
+                        world.setBlockState(setPos, ModBlocks.constructionBlock.getDefaultState().withProperty(ConstructionBlock.BRIGHT, false));
                     }
                 }
             }
@@ -102,6 +111,14 @@ public class ConstructionBlockEntity extends Entity implements IEntityAdditional
     @Override
     public void setDead() {
         this.isDead = true;
+    }
+
+    public void setMakingPaste(Boolean paste) {
+        this.dataManager.set(MAKING, paste);
+    }
+
+    public boolean getMakingPaste() {
+        return this.dataManager.get(MAKING);
     }
 
     @Override
@@ -128,6 +145,7 @@ public class ConstructionBlockEntity extends Entity implements IEntityAdditional
     @Override
     protected void entityInit() {
         this.dataManager.register(FIXED, BlockPos.ORIGIN);
+        this.dataManager.register(MAKING, false);
     }
 
     @Override

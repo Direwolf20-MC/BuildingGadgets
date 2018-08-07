@@ -1,0 +1,10 @@
+{
+  "forge_marker": 1,
+  "defaults": {
+    "model": "buildinggadgets:constructionblockpowder"
+  },
+  "variants": {
+    "normal": [{}],
+    "inventory": [{}]
+  }
+}

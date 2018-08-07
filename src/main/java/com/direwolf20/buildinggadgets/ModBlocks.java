@@ -1,6 +1,7 @@
 package com.direwolf20.buildinggadgets;
 
 import com.direwolf20.buildinggadgets.blocks.ConstructionBlock;
+import com.direwolf20.buildinggadgets.blocks.ConstructionBlockPowder;
 import com.direwolf20.buildinggadgets.blocks.EffectBlock;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.color.BlockColors;
@@ -14,6 +15,8 @@ public class ModBlocks {
     public static EffectBlock effectBlock;
     @GameRegistry.ObjectHolder("buildinggadgets:constructionblock")
     public static ConstructionBlock constructionBlock;
+    @GameRegistry.ObjectHolder("buildinggadgets:constructionblockpowder")
+    public static ConstructionBlockPowder constructionBlockPowder;
 
     @SideOnly(Side.CLIENT)
     public static void initColorHandlers() {

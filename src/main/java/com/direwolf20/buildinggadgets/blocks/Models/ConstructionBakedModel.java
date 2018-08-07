@@ -84,7 +84,7 @@ public class ConstructionBakedModel implements IBakedModel {
 
     @Override
     public TextureAtlasSprite getParticleTexture() {
-        return spriteCable;
+        return blankConstructionModel.getParticleTexture();
     }
 
     @Override
