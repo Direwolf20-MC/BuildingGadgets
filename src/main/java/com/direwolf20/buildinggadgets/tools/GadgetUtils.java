@@ -113,8 +113,13 @@ public class GadgetUtils {
         //Return the list of coordinates in the NBT Tag for anchor Coordinates
         NBTTagCompound tagCompound = stack.getTagCompound();
         ArrayList<BlockPos> coordinates = new ArrayList<BlockPos>();
+        if (tagCompound == null) {
+            setAnchor(stack, coordinates);
+            tagCompound = stack.getTagCompound();
+            return coordinates;
+        }
         NBTTagList coordList = (NBTTagList) tagCompound.getTag("anchorcoords");
-        if (tagCompound == null || coordList == null) {
+        if (coordList == null) {
             setAnchor(stack, coordinates);
             tagCompound = stack.getTagCompound();
             return coordinates;
