@@ -45,8 +45,8 @@ public class ConstructionBlockEntityRender extends Render<ConstructionBlockEntit
             scale = (float) teCounter / maxLife;
         }
         GlStateManager.translate(x, y, z);
-        GlStateManager.translate(-0.005f, -0.005f, -0.005f);
-        GlStateManager.scale(1.01f, 1.01f, 1.01f);//Slightly Larger block to avoid z-fighting.
+        GlStateManager.translate(-0.0005f, -0.0005f, -0.0005f);
+        GlStateManager.scale(1.001f, 1.001f, 1.001f);//Slightly Larger block to avoid z-fighting.
         GlStateManager.rotate(-90.0F, 0.0F, 1.0F, 0.0F);
 
         GL14.glBlendColor(1F, 1F, 1F, scale); //Set the alpha of the blocks we are rendering
