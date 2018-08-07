@@ -1,5 +1,7 @@
-package com.direwolf20.buildinggadgets.items;
+package com.direwolf20.buildinggadgets.eventhandlers;
 
+import com.direwolf20.buildinggadgets.items.BuildingTool;
+import com.direwolf20.buildinggadgets.items.ExchangerTool;
 import com.direwolf20.buildinggadgets.tools.InventoryManipulation;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;

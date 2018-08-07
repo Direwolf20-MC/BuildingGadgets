@@ -7,6 +7,7 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
@@ -50,6 +51,11 @@ public class ConstructionBlockEntity extends Entity implements IEntityAdditional
 
         if (ticksExisted > maxLife) {
             setDespawning();
+        }
+        if (setPos != null) {
+            if (!(world.getBlockState(setPos).getBlock() instanceof ConstructionBlock)) {
+                setDespawning();
+            }
         }
 
         if (!isDespawning()) {

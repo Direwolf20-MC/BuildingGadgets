@@ -1,7 +1,8 @@
 package com.direwolf20.buildinggadgets;
 
-import com.direwolf20.buildinggadgets.items.AnvilRepairHandler;
-import com.direwolf20.buildinggadgets.items.BreakEventHandler;
+import com.direwolf20.buildinggadgets.eventhandlers.AnvilRepairHandler;
+import com.direwolf20.buildinggadgets.eventhandlers.BreakEventHandler;
+import com.direwolf20.buildinggadgets.eventhandlers.ItemPickupHandler;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
@@ -33,6 +34,7 @@ public class BuildingGadgets {
         logger = event.getModLog();
         proxy.preInit(event);
         MinecraftForge.EVENT_BUS.register(new BreakEventHandler());
+        MinecraftForge.EVENT_BUS.register(new ItemPickupHandler());
         if (!Config.poweredByFE) {
             MinecraftForge.EVENT_BUS.register(new AnvilRepairHandler());
         }

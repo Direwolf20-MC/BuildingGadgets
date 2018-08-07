@@ -6,13 +6,16 @@ import com.direwolf20.buildinggadgets.entities.BlockBuildEntityRender;
 import com.direwolf20.buildinggadgets.entities.ConstructionBlockEntity;
 import com.direwolf20.buildinggadgets.entities.ConstructionBlockEntityRender;
 import com.direwolf20.buildinggadgets.items.BuildingTool;
+import com.direwolf20.buildinggadgets.items.ConstructionPasteContainer;
 import com.direwolf20.buildinggadgets.items.ExchangerTool;
+import com.direwolf20.buildinggadgets.tools.PasteContainerMeshDefinition;
 import com.direwolf20.buildinggadgets.tools.ToolRenders;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
+import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
@@ -47,7 +50,9 @@ public class ClientProxy extends CommonProxy {
         buildingTool.initModel();
         ModItems.exchangerTool.initModel();
         ModItems.constructionPaste.initModel();
+        ModItems.constructionPasteContainer.initModel();
         ModBlocks.constructionBlock.initModel();
+        ModelLoader.setCustomMeshDefinition(ModItems.constructionPasteContainer, new PasteContainerMeshDefinition());
     }
 
     public void registerEntityRenderers() {

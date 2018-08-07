@@ -1,5 +1,6 @@
-package com.direwolf20.buildinggadgets.items;
+package com.direwolf20.buildinggadgets.eventhandlers;
 
+import com.direwolf20.buildinggadgets.items.GenericGadget;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.event.AnvilUpdateEvent;

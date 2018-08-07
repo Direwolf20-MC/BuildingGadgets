@@ -323,7 +323,13 @@ public class BuildingTool extends GenericGadget {
                 useConstructionPaste = true;
             }
         }
-        if (InventoryManipulation.useItem(itemStack, player, neededItems)) {
+        boolean useItemSuccess;
+        if (useConstructionPaste) {
+            useItemSuccess = InventoryManipulation.usePaste(player, neededItems);
+        } else {
+            useItemSuccess = InventoryManipulation.useItem(itemStack, player, neededItems);
+        }
+        if (useItemSuccess) {
             world.spawnEntity(new BlockBuildEntity(world, pos, player, setBlock, 1, getToolActualBlock(heldItem), useConstructionPaste));
             return true;
         }

@@ -2,9 +2,11 @@ package com.direwolf20.buildinggadgets.tools;
 
 import com.direwolf20.buildinggadgets.ModItems;
 import com.direwolf20.buildinggadgets.items.ConstructionPaste;
+import com.direwolf20.buildinggadgets.items.ConstructionPasteContainer;
 import net.minecraft.block.*;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.init.Blocks;
@@ -30,6 +32,10 @@ public class InventoryManipulation {
         if (player.capabilities.isCreativeMode) {
             return true;
         }
+        if (itemStack.getItem() instanceof ConstructionPaste) {
+            itemStack = addPasteToContainer(player, itemStack);
+        }
+        if (itemStack.getCount() == 0) {return true;}
         InventoryPlayer inv = player.inventory;
         ArrayList<IItemHandler> invContainers = findInvContainers(inv);
         if (invContainers.size() > 0) {
@@ -116,14 +122,74 @@ public class InventoryManipulation {
         InventoryPlayer inv = player.inventory;
         Item item = ModItems.constructionPaste;
         ArrayList<Integer> slots = findItem(item, 0, inv);
-        if (slots.size() == 0) {
-            return 0;
+        if (slots.size() > 0) {
+            for (int slot : slots) {
+                ItemStack stackInSlot = inv.getStackInSlot(slot);
+                count += stackInSlot.getCount();
+            }
         }
-        for (int slot : slots) {
-            ItemStack stackInSlot = inv.getStackInSlot(slot);
-            count += stackInSlot.getCount();
+        ArrayList<Integer> containerSlots = findItem(ModItems.constructionPasteContainer, 0, inv);
+        if (containerSlots.size() > 0) {
+            for (int slot : containerSlots) {
+                ItemStack stackInSlot = inv.getStackInSlot(slot);
+                if (stackInSlot.getItem() instanceof ConstructionPasteContainer) {
+                    count = count + ConstructionPasteContainer.getPasteAmount(stackInSlot);
+                }
+            }
         }
         return count;
+    }
+
+    public static ItemStack addPasteToContainer(EntityPlayer player, ItemStack itemStack) {
+        if (!(itemStack.getItem() instanceof ConstructionPaste)) {
+            return itemStack;
+        }
+        InventoryPlayer inv = player.inventory;
+        ArrayList<Integer> slots = findItem(ModItems.constructionPasteContainer, 0, inv);
+        if (slots.size() == 0) {return itemStack;}
+
+        for (int slot : slots) {
+            ItemStack containerStack = inv.getStackInSlot(slot);
+            int pasteInContainer = ConstructionPasteContainer.getPasteAmount(containerStack);
+            int freeSpace = 100 - pasteInContainer;
+            int stackSize = itemStack.getCount();
+            int remainingPaste = stackSize - freeSpace;
+            if (remainingPaste < 0) {remainingPaste = 0;}
+            int usedPaste = Math.abs(stackSize - remainingPaste);
+            itemStack.setCount(remainingPaste);
+            ConstructionPasteContainer.setPasteAmount(containerStack, pasteInContainer+usedPaste);
+        }
+        return itemStack;
+    }
+
+    public static boolean usePaste(EntityPlayer player, int count) {
+        InventoryPlayer inv = player.inventory;
+        ArrayList<Integer> slots = findItem(ModItems.constructionPaste, 0, inv);
+        if (slots.size() > 0) {
+            for (int slot : slots) {
+                ItemStack pasteStack = inv.getStackInSlot(slot);
+                if (pasteStack.getCount() >= count) {
+                    pasteStack.shrink(count);
+                    pasteStack = pasteStack;
+                    return true;
+                }
+            }
+        }
+        ArrayList<Integer> containerSlots = findItem(ModItems.constructionPasteContainer, 0, inv);
+        if (containerSlots.size() > 0) {
+            for (int slot : containerSlots) {
+                ItemStack containerStack = inv.getStackInSlot(slot);
+                if (containerStack.getItem() instanceof ConstructionPasteContainer) {
+                    int pasteAmt = ConstructionPasteContainer.getPasteAmount(containerStack);
+                    if (pasteAmt >= count) {
+                        ConstructionPasteContainer.setPasteAmount(containerStack, pasteAmt - count);
+                        return true;
+                    }
+
+                }
+            }
+        }
+        return false;
     }
 
     public static ArrayList<IItemHandler> findInvContainers(InventoryPlayer inv) {
