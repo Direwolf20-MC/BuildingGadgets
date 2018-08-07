@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.tools;
 
+import com.direwolf20.buildinggadgets.blocks.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.items.BuildingTool;
 import com.direwolf20.buildinggadgets.items.ExchangerTool;
 import net.minecraft.block.state.IBlockState;
@@ -210,8 +211,19 @@ public class GadgetUtils {
         IBlockState state = world.getBlockState(pos);
         TileEntity te = world.getTileEntity(pos);
         if (te != null) {  //Currently not allowing tile entities and plants.
-            player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.invalidblock").getUnformattedComponentText()), true);
-            return;
+            if (te instanceof ConstructionBlockTileEntity) {
+                if (((ConstructionBlockTileEntity) te).getBlockState() != null) {
+                    setToolBlock(stack, ((ConstructionBlockTileEntity) te).getActualBlockState());
+                    setToolActualBlock(stack, ((ConstructionBlockTileEntity) te).getActualBlockState());
+                    return;
+                } else {
+                    player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.invalidblock").getUnformattedComponentText()), true);
+                    return;
+                }
+            } else {
+                player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.invalidblock").getUnformattedComponentText()), true);
+                return;
+            }
         }
         if (state != null) {
             IBlockState placeState = InventoryManipulation.getSpecificStates(state, world, player, pos);
