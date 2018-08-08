@@ -26,3 +26,4 @@ block.buildinggadgets.constructionblock.name=Construction Block
 tile.buildinggadgets.constructionblock.name=Construction Block
 block.buildinggadgets.constructionblockpowder.name=Construction Block Powder
 tile.buildinggadgets.constructionblockpowder.name=Construction Block Powder
+tooltip.constructionblockpowder.helptext=Place next to water
