@@ -1,10 +1,12 @@
 package com.direwolf20.buildinggadgets;
 
+import com.direwolf20.buildinggadgets.tools.BlacklistBlocks;
 import net.minecraftforge.common.config.Configuration;
 import org.apache.logging.log4j.Level;
 
 public class Config {
     private static final String CATEGORY_GENERAL = "general";
+    public static final String CATEGORY_BLACKLIST = "blockBlacklist";
     //
 
     // This values below you can access elsewhere in your mod:
@@ -43,6 +45,9 @@ public class Config {
         poweredByFE = cfg.getBoolean("poweredByFE", CATEGORY_GENERAL, poweredByFE, "Set to true for Forge Energy Support, set to False for vanilla Item Damage");
         durabilityBuilder = cfg.getInt("durabilityBuilder", CATEGORY_GENERAL, durabilityBuilder, 0, 100000, "The max durability of the Builder (Ignored if powered by FE)");
         durabilityExchanger = cfg.getInt("durabilityExchanger", CATEGORY_GENERAL, durabilityExchanger, 0, 100000, "The max durability of the Exchanger (Ignored if powered by FE)");
+
+        cfg.addCustomCategoryComment(CATEGORY_BLACKLIST, "Blacklist configuration");
+        BlacklistBlocks.getBlacklist(cfg);
     }
 
 }

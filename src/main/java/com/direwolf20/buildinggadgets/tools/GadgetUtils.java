@@ -207,6 +207,7 @@ public class GadgetUtils {
 
     public static void selectBlock(ItemStack stack, EntityPlayer player) {
         //Used to find which block the player is looking at, and store it in NBT on the tool.
+        boolean validBlock = true;
         World world = player.world;
         RayTraceResult lookingAt = VectorTools.getLookingAt(player);
         if (lookingAt == null) {
@@ -214,6 +215,9 @@ public class GadgetUtils {
         }
         BlockPos pos = lookingAt.getBlockPos();
         IBlockState state = world.getBlockState(pos);
+        if (BlacklistBlocks.checkBlacklist(state.getBlock())) {
+            validBlock = false;
+        }
         TileEntity te = world.getTileEntity(pos);
         if (te != null) {  //Currently not allowing tile entities and plants.
             if (te instanceof ConstructionBlockTileEntity) {
@@ -222,13 +226,15 @@ public class GadgetUtils {
                     setToolActualBlock(stack, ((ConstructionBlockTileEntity) te).getActualBlockState());
                     return;
                 } else {
-                    player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.invalidblock").getUnformattedComponentText()), true);
-                    return;
+                    validBlock = false;
                 }
             } else {
-                player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.invalidblock").getUnformattedComponentText()), true);
-                return;
+                validBlock = false;
             }
+        }
+        if (!validBlock) {
+            player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.invalidblock").getUnformattedComponentText()), true);
+            return;
         }
         if (state != null) {
             IBlockState placeState = InventoryManipulation.getSpecificStates(state, world, player, pos);
