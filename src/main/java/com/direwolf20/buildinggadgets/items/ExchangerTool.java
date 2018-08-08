@@ -299,7 +299,7 @@ public class ExchangerTool extends GenericGadget {
             return false;
         }
         if (Config.poweredByFE) {
-            if (!useEnergy(tool, Config.energyCostBuilder)) {
+            if (!useEnergy(tool, Config.energyCostBuilder, player)) {
                 return false;
             }
         } else {

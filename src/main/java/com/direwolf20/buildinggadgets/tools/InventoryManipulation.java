@@ -168,6 +168,9 @@ public class InventoryManipulation {
     }
 
     public static boolean usePaste(EntityPlayer player, int count) {
+        if (player.capabilities.isCreativeMode) {
+            return true;
+        }
         InventoryPlayer inv = player.inventory;
         ArrayList<Integer> slots = findItem(ModItems.constructionPaste, 0, inv);
         if (slots.size() > 0) {

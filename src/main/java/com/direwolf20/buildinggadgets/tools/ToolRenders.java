@@ -82,6 +82,9 @@ public class ToolRenders {
                 } else {
                     hasEnergy = stack.getMaxDamage() - stack.getItemDamage();
                 }
+                if (player.capabilities.isCreativeMode) {
+                    hasEnergy = 1000000;
+                }
                 //Prepare the block rendering
                 BlockRendererDispatcher dispatcher = Minecraft.getMinecraft().getBlockRendererDispatcher();
                 BlockRenderLayer origLayer = MinecraftForgeClient.getRenderLayer();
@@ -202,6 +205,9 @@ public class ToolRenders {
                     hasEnergy = stack.getCapability(CapabilityEnergy.ENERGY, null).getEnergyStored();
                 } else {
                     hasEnergy = stack.getMaxDamage() - stack.getItemDamage();
+                }
+                if (player.capabilities.isCreativeMode) {
+                    hasEnergy = 1000000;
                 }
                 //Prepare the block rendering
                 BlockRendererDispatcher dispatcher = Minecraft.getMinecraft().getBlockRendererDispatcher();

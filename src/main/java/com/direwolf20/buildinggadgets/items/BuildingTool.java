@@ -300,18 +300,6 @@ public class BuildingTool extends GenericGadget {
         if (ForgeEventFactory.onPlayerBlockPlace(player, blockSnapshot, EnumFacing.UP, EnumHand.MAIN_HAND).isCanceled()) {
             return false;
         }
-        if (Config.poweredByFE) {
-            if (!useEnergy(heldItem, Config.energyCostBuilder)) {
-                return false;
-            }
-        } else {
-            if (heldItem.getItemDamage() >= heldItem.getMaxDamage()) {
-                return false;
-            } else {
-                heldItem.damageItem(1, player);
-            }
-        }
-        //ItemStack constructionStack = InventoryManipulation.getSilkTouchDrop(ModBlocks.constructionBlock.getDefaultState());
         ItemStack constructionPaste = new ItemStack(ModItems.constructionPaste);
         if (InventoryManipulation.countItem(itemStack, player) < neededItems) {
             //if (InventoryManipulation.countItem(constructionStack, player) == 0) {
@@ -322,6 +310,18 @@ public class BuildingTool extends GenericGadget {
                 useConstructionPaste = true;
             }
         }
+        if (Config.poweredByFE) {
+            if (!useEnergy(heldItem, Config.energyCostBuilder, player)) {
+                return false;
+            }
+        } else {
+            if (heldItem.getItemDamage() >= heldItem.getMaxDamage()) {
+                return false;
+            } else {
+                heldItem.damageItem(1, player);
+            }
+        }
+        //ItemStack constructionStack = InventoryManipulation.getSilkTouchDrop(ModBlocks.constructionBlock.getDefaultState());
         boolean useItemSuccess;
         if (useConstructionPaste) {
             useItemSuccess = InventoryManipulation.usePaste(player, neededItems);

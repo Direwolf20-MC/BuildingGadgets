@@ -267,7 +267,10 @@ public class GadgetUtils {
         return true;
     }
 
-    public static boolean useEnergy(ItemStack stack, int amount) {
+    public static boolean useEnergy(ItemStack stack, int amount, EntityPlayer player) {
+        if (player.capabilities.isCreativeMode) {
+            return true;
+        }
         IEnergyStorage energy = stack.getCapability(CapabilityEnergy.ENERGY, null);
         if (amount > energy.getEnergyStored()) {
             return false;
