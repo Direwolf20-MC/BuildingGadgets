@@ -19,6 +19,8 @@ import java.util.List;
 
 public class ConstructionPasteContainer extends Item {
 
+    public static int maxAmount = 500;
+
     public ConstructionPasteContainer() {
         setRegistryName("constructionpastecontainer");        // The unique name (within your mod) that identifies this item
         setUnlocalizedName(BuildingGadgets.MODID + ".constructionpastecontainer");     // Used for localization (en_US.lang)
@@ -28,9 +30,6 @@ public class ConstructionPasteContainer extends Item {
 
     @SideOnly(Side.CLIENT)
     public void initModel() {
-        /*ModelLoader.setCustomModelResourceLocation(this, 0, new ModelResourceLocation(getRegistryName(), "inventory"));
-        ModelLoader.setCustomModelResourceLocation(this, 0, new ModelResourceLocation(getRegistryName()+"-half", "inventory"));
-        ModelLoader.setCustomModelResourceLocation(this, 0, new ModelResourceLocation(getRegistryName()+"-full", "inventory"));*/
         ModelBakery.registerItemVariants(this,
                 new ModelResourceLocation(getRegistryName(), "inventory"),
                 new ModelResourceLocation(getRegistryName()+"-half", "inventory"),

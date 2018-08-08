@@ -151,7 +151,7 @@ public class InventoryManipulation {
         for (int slot : slots) {
             ItemStack containerStack = inv.getStackInSlot(slot);
             int pasteInContainer = ConstructionPasteContainer.getPasteAmount(containerStack);
-            int freeSpace = 100 - pasteInContainer;
+            int freeSpace = ConstructionPasteContainer.maxAmount - pasteInContainer;
             int stackSize = itemStack.getCount();
             int remainingPaste = stackSize - freeSpace;
             if (remainingPaste < 0) {remainingPaste = 0;}
