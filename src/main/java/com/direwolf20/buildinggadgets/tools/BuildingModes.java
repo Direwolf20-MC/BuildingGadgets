@@ -14,10 +14,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class BuildingModes {
-	//private int brushRadius = 3;
-	//private void changeBrushRadius(int newRadius){
-	//	brushRadius = newRadius;
-	//}
     private static boolean isReplaceable(World world, BlockPos pos, IBlockState setBlock) {
         if (!world.getBlockState(pos).getBlock().isReplaceable(world, pos) || !setBlock.getBlock().canPlaceBlockAt(world, pos)) {
             return false;
