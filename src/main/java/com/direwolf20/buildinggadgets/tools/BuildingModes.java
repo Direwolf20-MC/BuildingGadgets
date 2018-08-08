@@ -255,6 +255,8 @@ public class BuildingModes {
                 for (int z = 1; z <= range; z++) {
                     if (startBlock.getY() > player.posY + 1) {
                         pos = new BlockPos(startBlock.getX(), startBlock.getY() - z, startBlock.getZ() - z);
+                    } else if (startBlock.getY() < player.posY -2) {
+                        pos = new BlockPos(startBlock.getX(), startBlock.getY() + z, startBlock.getZ() - z);
                     } else {
                         pos = new BlockPos(startBlock.getX(), startBlock.getY() + z, startBlock.getZ() + z - 1);
                     }
@@ -266,6 +268,8 @@ public class BuildingModes {
                 for (int z = 1; z <= range; z++) {
                     if (startBlock.getY() > player.posY + 1) {
                         pos = new BlockPos(startBlock.getX(), startBlock.getY() - z, startBlock.getZ() + z);
+                    } else if (startBlock.getY() < player.posY -2) {
+                        pos = new BlockPos(startBlock.getX(), startBlock.getY() + z, startBlock.getZ() + z);
                     } else {
                         pos = new BlockPos(startBlock.getX(), startBlock.getY() + z, startBlock.getZ() - z + 1);
                     }
@@ -277,6 +281,8 @@ public class BuildingModes {
                 for (int x = 1; x <= range; x++) {
                     if (startBlock.getY() > player.posY + 1) {
                         pos = new BlockPos(startBlock.getX() + x, startBlock.getY() - x, startBlock.getZ());
+                    } else if (startBlock.getY() < player.posY -2) {
+                        pos = new BlockPos(startBlock.getX() + x, startBlock.getY() + x, startBlock.getZ());
                     } else {
                         pos = new BlockPos(startBlock.getX() - x + 1, startBlock.getY() + x, startBlock.getZ());
                     }
@@ -288,6 +294,8 @@ public class BuildingModes {
                 for (int x = 1; x <= range; x++) {
                     if (startBlock.getY() > player.posY + 1) {
                         pos = new BlockPos(startBlock.getX() - x, startBlock.getY() - x, startBlock.getZ());
+                    } else if (startBlock.getY() < player.posY -2) {
+                        pos = new BlockPos(startBlock.getX() - x, startBlock.getY() + x, startBlock.getZ());
                     } else {
                         pos = new BlockPos(startBlock.getX() + x - 1, startBlock.getY() + x, startBlock.getZ());
                     }
