@@ -149,7 +149,6 @@ public class ToolRenders {
                 ForgeHooksClient.setRenderLayer(origLayer);
                 //Disable blend
                 GlStateManager.disableBlend();
-                RenderHelper.enableStandardItemLighting();
                 //Pop from the original push in this method
                 GlStateManager.popMatrix();
             }
@@ -274,7 +273,6 @@ public class ToolRenders {
                 ForgeHooksClient.setRenderLayer(origLayer);
                 //Disable blend
                 GlStateManager.disableBlend();
-                RenderHelper.enableStandardItemLighting();
                 //Pop from the original push in this method
                 GlStateManager.popMatrix();
             }
