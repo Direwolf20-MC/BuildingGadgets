@@ -46,7 +46,7 @@ public class BuildingTool extends GenericGadget {
 
 
     public enum toolModes {
-        BuildToMe, VerticalColumn, HorizontalColumn, VerticalWall, HorizontalWall, Stairs, Checkerboard;
+        BuildToMe, VerticalColumn, HorizontalColumn, VerticalWall, HorizontalWall, Stairs, Checkerboard, Brush;
         private static toolModes[] vals = values();
 
         public toolModes next() {

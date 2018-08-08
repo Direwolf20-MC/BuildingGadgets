@@ -321,6 +321,54 @@ public class BuildingModes {
                 }
             }
         }
+        //***************************************************
+        //Brush
+        //***************************************************
+		else if (mode == BuildingTool.toolModes.Brush) {
+            double radiusSq = range * range;
+			for (int x = 0; x <= range; x++) {
+			for (int y = 0; y <= range; y++) {
+			for (int z = 0; z <= range; z++) {
+			double dSq = x*x+y*y+z*z;
+			if (dSq > radiusSq) {
+				continue;
+			}
+			pos = new BlockPos(startBlock.getX()+x,startBlock.getY()+y,startBlock.getZ()+z);
+			if (isReplaceable(world, pos, setBlock)) {
+				coordinates.add(pos);
+			}
+			pos = new BlockPos(startBlock.getX()-x,startBlock.getY()+y,startBlock.getZ()+z);
+			if (isReplaceable(world, pos, setBlock)) {
+				coordinates.add(pos);
+			}
+			pos = new BlockPos(startBlock.getX()+x,startBlock.getY()-y,startBlock.getZ()+z);
+			if (isReplaceable(world, pos, setBlock)) {
+				coordinates.add(pos);
+			}
+			pos = new BlockPos(startBlock.getX()+x,startBlock.getY()+y,startBlock.getZ()-z);
+			if (isReplaceable(world, pos, setBlock)) {
+				coordinates.add(pos);
+			}
+			pos = new BlockPos(startBlock.getX()-x,startBlock.getY()-y,startBlock.getZ()+z);
+			if (isReplaceable(world, pos, setBlock)) {
+				coordinates.add(pos);
+			}
+			pos = new BlockPos(startBlock.getX()+x,startBlock.getY()-y,startBlock.getZ()-z);
+			if (isReplaceable(world, pos, setBlock)) {
+				coordinates.add(pos);
+			}
+			pos = new BlockPos(startBlock.getX()-x,startBlock.getY()+y,startBlock.getZ()-z);
+			if (isReplaceable(world, pos, setBlock)) {
+				coordinates.add(pos);
+			}
+			pos = new BlockPos(startBlock.getX()-x,startBlock.getY()-y,startBlock.getZ()-z);
+			if (isReplaceable(world, pos, setBlock)) {
+				coordinates.add(pos);
+			}
+		}//z
+		}//y
+		}//x
+        }
         return coordinates;
     }
 
