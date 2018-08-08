@@ -34,7 +34,13 @@ import java.util.List;
 public class ModeRadialMenu extends GuiScreen {
 
     private static final ResourceLocation[] signs = new ResourceLocation[]{
-            new ResourceLocation("buildinggadgets:textures/items/buildingtool.png")
+            new ResourceLocation("buildinggadgets:textures/ui/buildtome.png"),
+            new ResourceLocation("buildinggadgets:textures/ui/verticalcolumn.png"),
+            new ResourceLocation("buildinggadgets:textures/ui/horizontalcolumn.png"),
+            new ResourceLocation("buildinggadgets:textures/ui/verticalwall.png"),
+            new ResourceLocation("buildinggadgets:textures/ui/horizontalwall.png"),
+            new ResourceLocation("buildinggadgets:textures/ui/stairs.png"),
+            new ResourceLocation("buildinggadgets:textures/ui/checker.png")
     };
 
     int timeIn = 0;
@@ -183,7 +189,7 @@ public class ModeRadialMenu extends GuiScreen {
             xdp = (int) ((xp - x) * mod + x);
             ydp = (int) ((yp - y) * mod + y);
 
-            mc.renderEngine.bindTexture(signs[0]); //@Todo Inject Graphics from Rorax
+            mc.renderEngine.bindTexture(signs[slot]);
             drawModalRectWithCustomSizedTexture(xdp - 8, ydp - 8, 0, 0, 16, 16, 16, 16);
 
         }

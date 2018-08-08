@@ -73,7 +73,6 @@ public class ToolRenders {
                     itemStack = renderBlockState.getBlock().getPickBlock(renderBlockState, null, world, new BlockPos(0, 0, 0), player);
                 }
 
-                ItemStack constructionStack = InventoryManipulation.getSilkTouchDrop(ModBlocks.constructionBlock.getDefaultState());
                 int hasBlocks = InventoryManipulation.countItem(itemStack, player);
                 hasBlocks = hasBlocks + InventoryManipulation.countPaste(player);
                 int hasEnergy = 0;
