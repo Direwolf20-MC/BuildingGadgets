@@ -11,7 +11,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
-import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -32,8 +31,8 @@ public class ConstructionPasteContainer extends Item {
     public void initModel() {
         ModelBakery.registerItemVariants(this,
                 new ModelResourceLocation(getRegistryName(), "inventory"),
-                new ModelResourceLocation(getRegistryName()+"-half", "inventory"),
-                new ModelResourceLocation(getRegistryName()+"-full", "inventory"));
+                new ModelResourceLocation(getRegistryName() + "-half", "inventory"),
+                new ModelResourceLocation(getRegistryName() + "-full", "inventory"));
     }
 
     public static void setPasteAmount(ItemStack stack, int amount) {

@@ -7,12 +7,11 @@ import net.minecraft.item.ItemStack;
 
 public class PasteContainerMeshDefinition implements ItemMeshDefinition {
     @Override
-    public ModelResourceLocation getModelLocation(ItemStack stack)
-    {
+    public ModelResourceLocation getModelLocation(ItemStack stack) {
         int pasteAmt = ConstructionPasteContainer.getPasteAmount(stack);
         if (pasteAmt < 50) {
             return new ModelResourceLocation("buildinggadgets:constructionpastecontainer", "inventory");
-        }else if (pasteAmt >=50 && pasteAmt < 100) {
+        } else if (pasteAmt >= 50 && pasteAmt < 100) {
             return new ModelResourceLocation("buildinggadgets:constructionpastecontainer-half", "inventory");
         } else {
             return new ModelResourceLocation("buildinggadgets:constructionpastecontainer-full", "inventory");

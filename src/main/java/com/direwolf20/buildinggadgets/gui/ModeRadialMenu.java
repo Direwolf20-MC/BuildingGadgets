@@ -159,7 +159,7 @@ public class ModeRadialMenu extends GuiScreen {
             if (tool.getItem() instanceof BuildingTool) {
                 BuildingTool.toolModes mode = BuildingTool.toolModes.values()[slot];
                 name = "\u00a7" + c + mode.name();
-            } else if (tool.getItem() instanceof ExchangerTool){
+            } else if (tool.getItem() instanceof ExchangerTool) {
                 ExchangerTool.toolModes mode = ExchangerTool.toolModes.values()[slot];
                 name = "\u00a7" + c + mode.name();
             }

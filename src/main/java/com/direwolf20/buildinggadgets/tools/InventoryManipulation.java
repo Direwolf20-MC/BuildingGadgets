@@ -6,7 +6,6 @@ import com.direwolf20.buildinggadgets.items.ConstructionPasteContainer;
 import net.minecraft.block.*;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.init.Blocks;
@@ -35,7 +34,9 @@ public class InventoryManipulation {
         if (itemStack.getItem() instanceof ConstructionPaste) {
             itemStack = addPasteToContainer(player, itemStack);
         }
-        if (itemStack.getCount() == 0) {return true;}
+        if (itemStack.getCount() == 0) {
+            return true;
+        }
         InventoryPlayer inv = player.inventory;
         ArrayList<IItemHandler> invContainers = findInvContainers(inv);
         if (invContainers.size() > 0) {
@@ -146,7 +147,9 @@ public class InventoryManipulation {
         }
         InventoryPlayer inv = player.inventory;
         ArrayList<Integer> slots = findItem(ModItems.constructionPasteContainer, 0, inv);
-        if (slots.size() == 0) {return itemStack;}
+        if (slots.size() == 0) {
+            return itemStack;
+        }
 
         for (int slot : slots) {
             ItemStack containerStack = inv.getStackInSlot(slot);
@@ -154,10 +157,12 @@ public class InventoryManipulation {
             int freeSpace = ConstructionPasteContainer.maxAmount - pasteInContainer;
             int stackSize = itemStack.getCount();
             int remainingPaste = stackSize - freeSpace;
-            if (remainingPaste < 0) {remainingPaste = 0;}
+            if (remainingPaste < 0) {
+                remainingPaste = 0;
+            }
             int usedPaste = Math.abs(stackSize - remainingPaste);
             itemStack.setCount(remainingPaste);
-            ConstructionPasteContainer.setPasteAmount(containerStack, pasteInContainer+usedPaste);
+            ConstructionPasteContainer.setPasteAmount(containerStack, pasteInContainer + usedPaste);
         }
         return itemStack;
     }

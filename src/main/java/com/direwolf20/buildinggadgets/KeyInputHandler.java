@@ -2,7 +2,10 @@ package com.direwolf20.buildinggadgets;
 
 import com.direwolf20.buildinggadgets.gui.ModeRadialMenu;
 import com.direwolf20.buildinggadgets.items.GenericGadget;
-import com.direwolf20.buildinggadgets.network.*;
+import com.direwolf20.buildinggadgets.network.PacketAnchorKey;
+import com.direwolf20.buildinggadgets.network.PacketChangeRange;
+import com.direwolf20.buildinggadgets.network.PacketHandler;
+import com.direwolf20.buildinggadgets.network.PacketUndoKey;
 import net.minecraft.client.Minecraft;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumHand;
@@ -18,11 +21,11 @@ public class KeyInputHandler {
             //PacketHandler.INSTANCE.sendToServer(new PacketToggleMode());
             Minecraft mc = Minecraft.getMinecraft();
             ItemStack stack = mc.player.getHeldItem(EnumHand.MAIN_HAND);
-            if(!stack.isEmpty() && (stack.getItem() instanceof GenericGadget))
+            if (!stack.isEmpty() && (stack.getItem() instanceof GenericGadget))
                 mc.displayGuiScreen(new ModeRadialMenu(stack));
             else {
                 stack = mc.player.getHeldItem(EnumHand.OFF_HAND);
-                if(!stack.isEmpty() && (stack.getItem() instanceof GenericGadget))
+                if (!stack.isEmpty() && (stack.getItem() instanceof GenericGadget))
                     mc.displayGuiScreen(new ModeRadialMenu(stack));
             }
         } else if (KeyBindings.rangeChange.isPressed()) {
