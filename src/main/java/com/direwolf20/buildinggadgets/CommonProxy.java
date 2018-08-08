@@ -25,7 +25,7 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import java.io.File;
 
 
-@Mod.EventBusSubscriber()
+@Mod.EventBusSubscriber(modid = BuildingGadgets.MODID)
 public class CommonProxy {
     public static Configuration config;
 
