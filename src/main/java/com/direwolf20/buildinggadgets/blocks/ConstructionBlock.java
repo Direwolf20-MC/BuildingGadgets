@@ -88,7 +88,8 @@ public class ConstructionBlock extends Block implements ITileEntityProvider {
 
     @Override
     public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
-        ConstructionBlockTileEntity te = getTE(world, pos);
+        //super.onBlockActivated(world, pos, state, player, hand, side, hitX, hitY, hitZ);
+        /*ConstructionBlockTileEntity te = getTE(world, pos);
         ItemStack heldItem = player.getHeldItem(hand);
         IBlockState newState = Block.getBlockFromItem(heldItem.getItem()).getStateFromMeta(heldItem.getMetadata());
         if (newState != null && newState != Blocks.AIR.getDefaultState()) {
@@ -96,7 +97,7 @@ public class ConstructionBlock extends Block implements ITileEntityProvider {
             te.setActualBlockState(newState);
             return true;
         }
-        System.out.println("Failed: " + newState + ":" + te.getBlockState() + ":" + world.isRemote + ":" + te.getActualBlockState());
+        System.out.println("Failed: " + newState + ":" + te.getBlockState() + ":" + world.isRemote + ":" + te.getActualBlockState());*/
         return false;
     }
 
