@@ -18,7 +18,7 @@ import java.util.List;
 
 public class ConstructionPasteContainer extends Item {
 
-    public static int maxAmount = 500;
+    public static int maxAmount = 512;
 
     public ConstructionPasteContainer() {
         setRegistryName("constructionpastecontainer");        // The unique name (within your mod) that identifies this item
