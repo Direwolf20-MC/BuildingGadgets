@@ -49,18 +49,22 @@ public class CommonProxy {
     @SubscribeEvent
     public static void registerBlocks(RegistryEvent.Register<Block> event) {
         event.getRegistry().register(new EffectBlock());
-        event.getRegistry().register(new ConstructionBlock());
-        event.getRegistry().register(new ConstructionBlockPowder());
-        GameRegistry.registerTileEntity(ConstructionBlockTileEntity.class, BuildingGadgets.MODID + "_constructionBlock");
+        if (Config.enablePaste) {
+            event.getRegistry().register(new ConstructionBlock());
+            event.getRegistry().register(new ConstructionBlockPowder());
+            GameRegistry.registerTileEntity(ConstructionBlockTileEntity.class, BuildingGadgets.MODID + "_constructionBlock");
+        }
     }
 
     @SubscribeEvent
     public static void registerItems(RegistryEvent.Register<Item> event) {
-        event.getRegistry().register(new ItemBlock(ModBlocks.constructionBlock).setRegistryName(ModBlocks.constructionBlock.getRegistryName()));
-        event.getRegistry().register(new ItemBlock(ModBlocks.constructionBlockPowder).setRegistryName(ModBlocks.constructionBlockPowder.getRegistryName()));
         event.getRegistry().register(new BuildingTool());
         event.getRegistry().register(new ExchangerTool());
-        event.getRegistry().register(new ConstructionPaste());
-        event.getRegistry().register(new ConstructionPasteContainer());
+        if (Config.enablePaste) {
+            event.getRegistry().register(new ItemBlock(ModBlocks.constructionBlock).setRegistryName(ModBlocks.constructionBlock.getRegistryName()));
+            event.getRegistry().register(new ItemBlock(ModBlocks.constructionBlockPowder).setRegistryName(ModBlocks.constructionBlockPowder.getRegistryName()));
+            event.getRegistry().register(new ConstructionPaste());
+            event.getRegistry().register(new ConstructionPasteContainer());
+        }
     }
 }

@@ -48,11 +48,13 @@ public class ClientProxy extends CommonProxy {
         ModBlocks.effectBlock.initModel();
         buildingTool.initModel();
         ModItems.exchangerTool.initModel();
-        ModItems.constructionPaste.initModel();
-        ModItems.constructionPasteContainer.initModel();
-        ModBlocks.constructionBlock.initModel();
-        ModBlocks.constructionBlockPowder.initModel();
-        ModelLoader.setCustomMeshDefinition(ModItems.constructionPasteContainer, new PasteContainerMeshDefinition());
+        if (Config.enablePaste) {
+            ModItems.constructionPaste.initModel();
+            ModItems.constructionPasteContainer.initModel();
+            ModBlocks.constructionBlock.initModel();
+            ModBlocks.constructionBlockPowder.initModel();
+            ModelLoader.setCustomMeshDefinition(ModItems.constructionPasteContainer, new PasteContainerMeshDefinition());
+        }
     }
 
     public void registerEntityRenderers() {

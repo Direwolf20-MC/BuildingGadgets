@@ -15,5 +15,10 @@
     "r": {
       "item": "buildinggadgets:constructionpaste"
     }
-  }
+  },
+  "conditions": [
+    {
+      "type": "buildinggadgets:enablePaste"
+    }
+  ]
 }
