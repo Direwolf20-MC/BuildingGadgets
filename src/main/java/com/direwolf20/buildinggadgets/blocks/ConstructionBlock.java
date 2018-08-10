@@ -188,7 +188,7 @@ public class ConstructionBlock extends Block implements ITileEntityProvider {
     public BlockFaceShape getBlockFaceShape(IBlockAccess worldIn, IBlockState state, BlockPos pos, EnumFacing face) {
         IBlockState mimicBlock = getActualMimicBlock(worldIn, pos);
         try {
-            return mimicBlock == null ? BlockFaceShape.SOLID : mimicBlock.getBlock().getBlockFaceShape(worldIn, state, pos, face);
+            return mimicBlock == null ? BlockFaceShape.SOLID : mimicBlock.getBlock().getBlockFaceShape(worldIn, mimicBlock, pos, face);
         } catch (Exception var8) {
             return BlockFaceShape.SOLID;
         }
@@ -212,7 +212,7 @@ public class ConstructionBlock extends Block implements ITileEntityProvider {
             return super.getBoundingBox(blockState, worldIn, pos);
         } else {
             try {
-                return mimicBlock.getBlock().getBoundingBox(blockState, worldIn, pos);
+                return mimicBlock.getBlock().getBoundingBox(mimicBlock, worldIn, pos);
             } catch (Exception var8) {
                 return super.getBoundingBox(blockState, worldIn, pos);
             }
@@ -226,11 +226,51 @@ public class ConstructionBlock extends Block implements ITileEntityProvider {
             return super.getBoundingBox(state, source, pos);
         } else {
             try {
-                return mimicBlock.getBlock().getBoundingBox(state, source, pos);
+                return mimicBlock.getBlock().getBoundingBox(mimicBlock, source, pos);
             } catch (Exception var8) {
                 return super.getBoundingBox(state, source, pos);
             }
         }
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public AxisAlignedBB getSelectedBoundingBox(IBlockState state, World worldIn, BlockPos pos) {
+        IBlockState mimicBlock = getActualMimicBlock(worldIn, pos);
+        if (mimicBlock == null) {
+            return super.getSelectedBoundingBox(state, worldIn, pos);
+        } else {
+            try {
+                return mimicBlock.getBlock().getSelectedBoundingBox(mimicBlock, worldIn, pos);
+            } catch (Exception var8) {
+                return super.getSelectedBoundingBox(state, worldIn, pos);
+            }
+        }
+    }
+
+    @Override
+    public boolean isNormalCube(IBlockState state, IBlockAccess world, BlockPos pos) {
+        IBlockState mimicBlock = getActualMimicBlock(world, pos);
+        if (mimicBlock == null) {
+            return super.isNormalCube(state, world, pos);
+        } else {
+            try {
+                return mimicBlock.getBlock().isNormalCube(mimicBlock, world, pos);
+            } catch (Exception var8) {
+                return super.isNormalCube(state, world, pos);
+            }
+        }
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public float getAmbientOcclusionLightValue(IBlockState state)
+    {
+        Boolean bright = state.getValue(ConstructionBlock.BRIGHT);
+        if (bright) {
+            return 1f;
+        }
+        return 0.2f;
     }
 
     @Override
