@@ -1,0 +1,5 @@
+{
+    "conditions": {
+        "enablePaste": "com.direwolf20.buildinggadgets.tools.CraftingCondition"
+    }
+}

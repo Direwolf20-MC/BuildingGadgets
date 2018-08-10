@@ -17,6 +17,8 @@ public class Config {
     public static boolean poweredByFE = true;
     public static int durabilityBuilder = 500;
     public static int durabilityExchanger = 500;
+    public static int pasteContainerSize = 500;
+    public static boolean enablePaste = true;
 
     // Call this from CommonProxy.preInit(). It will create our config if it doesn't
     // exist yet and read the values if it does exist.
@@ -45,6 +47,8 @@ public class Config {
         poweredByFE = cfg.getBoolean("poweredByFE", CATEGORY_GENERAL, poweredByFE, "Set to true for Forge Energy Support, set to False for vanilla Item Damage");
         durabilityBuilder = cfg.getInt("durabilityBuilder", CATEGORY_GENERAL, durabilityBuilder, 0, 100000, "The max durability of the Builder (Ignored if powered by FE)");
         durabilityExchanger = cfg.getInt("durabilityExchanger", CATEGORY_GENERAL, durabilityExchanger, 0, 100000, "The max durability of the Exchanger (Ignored if powered by FE)");
+        pasteContainerSize = cfg.getInt("pasteContainerSize", CATEGORY_GENERAL, pasteContainerSize, 0, 32768, "The size of the Paste Container (set to 0 to disable)");
+        enablePaste = cfg.getBoolean("enablePaste", CATEGORY_GENERAL, enablePaste, "Set to true to enable Construction Paste, set to false to disable");
 
         cfg.addCustomCategoryComment(CATEGORY_BLACKLIST, "Blacklist configuration");
         BlacklistBlocks.getBlacklist(cfg);
