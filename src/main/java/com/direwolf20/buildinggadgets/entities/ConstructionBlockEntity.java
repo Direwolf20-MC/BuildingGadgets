@@ -142,7 +142,7 @@ public class ConstructionBlockEntity extends Entity implements IEntityAdditional
 
     @Override
     public void readEntityFromNBT(NBTTagCompound compound) {
-        System.out.println(compound);
+        //System.out.println(compound);
         despawning = compound.getInteger("despawning");
         ticksExisted = compound.getInteger("ticksExisted");
         setPos = NBTUtil.getPosFromTag(compound.getCompoundTag("setPos"));
