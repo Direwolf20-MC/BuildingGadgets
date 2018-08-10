@@ -73,6 +73,18 @@ public class ConstructionBakedModel implements IBakedModel {
     }
 
     @Override
+    public boolean isAmbientOcclusion(IBlockState state) {
+        IExtendedBlockState extendedBlockState = (IExtendedBlockState) state;
+        ConstructionID facadeId = extendedBlockState.getValue(ConstructionBlock.FACADEID);
+        IBakedModel model;
+        if (facadeId == null) {
+            return true;
+        }
+        IBlockState facadeState = facadeId.getBlockState();
+        return facadeState.getBlock().isNormalCube(facadeState);
+    }
+
+    @Override
     public boolean isGui3d() {
         return false;
     }
