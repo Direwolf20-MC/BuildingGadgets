@@ -1,6 +1,7 @@
 package com.direwolf20.buildinggadgets.items;
 
 import com.direwolf20.buildinggadgets.BuildingGadgets;
+import com.direwolf20.buildinggadgets.Config;
 import net.minecraft.client.renderer.block.model.ModelBakery;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.resources.I18n;
@@ -18,7 +19,7 @@ import java.util.List;
 
 public class ConstructionPasteContainer extends Item {
 
-    public static int maxAmount = 500;
+    public static int maxAmount = Config.pasteContainerSize;
 
     public ConstructionPasteContainer() {
         setRegistryName("constructionpastecontainer");        // The unique name (within your mod) that identifies this item
