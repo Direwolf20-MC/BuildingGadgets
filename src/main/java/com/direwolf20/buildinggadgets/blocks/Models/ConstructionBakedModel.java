@@ -72,17 +72,16 @@ public class ConstructionBakedModel implements IBakedModel {
         return true;
     }
 
-    @Override
+    /*@Override //This is causing darkness on stairs, and I have no idea why.
     public boolean isAmbientOcclusion(IBlockState state) {
         IExtendedBlockState extendedBlockState = (IExtendedBlockState) state;
         ConstructionID facadeId = extendedBlockState.getValue(ConstructionBlock.FACADEID);
-        IBakedModel model;
         if (facadeId == null) {
             return true;
         }
         IBlockState facadeState = facadeId.getBlockState();
-        return facadeState.getBlock().isNormalCube(facadeState);
-    }
+        return facadeState.getBlock().isOpaqueCube(facadeState);
+    }*/
 
     @Override
     public boolean isGui3d() {
