@@ -343,7 +343,6 @@ public class ToolRenders {
         //This blend function allows you to use a constant alpha, which is defined later
         GlStateManager.blendFunc(GL11.GL_CONSTANT_ALPHA, GL11.GL_ONE_MINUS_CONSTANT_ALPHA);
 
-        IBlockState state = Blocks.AIR.getDefaultState();
         ArrayList<BlockMap> sortedMapList = BuildingModes.sortMapByDistance(blockMapList, player);
 
         for (BlockMap blockMap : sortedMapList) {
