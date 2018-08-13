@@ -20,8 +20,12 @@ public class BlockMapIntState {
         return IntStateMap;
     }
 
-    public void addToMap(Short mapSlot, IBlockState mapState) {
-        IntStateMap.put(mapSlot, mapState);
+    public void addToMap(IBlockState mapState) {
+        if (findSlot(mapState) == -1) {
+            short nextSlot = (short)IntStateMap.size();
+            nextSlot++;
+            IntStateMap.put(nextSlot, mapState);
+        }
     }
 
     public Short findSlot(IBlockState mapState) {

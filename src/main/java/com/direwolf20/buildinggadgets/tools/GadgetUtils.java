@@ -293,4 +293,32 @@ public class GadgetUtils {
                 count / Math.pow(1000, exp),
                 "kMGTPE".charAt(exp - 1));
     }
+
+    public static void writePOSToNBT(ItemStack stack, BlockPos pos, String tagName) {
+        NBTTagCompound tagCompound = stack.getTagCompound();
+        if (tagCompound == null) {
+            tagCompound = new NBTTagCompound();
+        }
+        if (pos == null) {
+            if (tagCompound.getTag(tagName) != null) {
+                tagCompound.removeTag(tagName);
+                stack.setTagCompound(tagCompound);
+            }
+            return;
+        }
+        tagCompound.setTag(tagName, NBTUtil.createPosTag(pos));
+        stack.setTagCompound(tagCompound);
+    }
+
+    public static BlockPos getPOSFromNBT(ItemStack stack, String tagName) {
+        NBTTagCompound tagCompound = stack.getTagCompound();
+        if (tagCompound == null) {
+            return null;
+        }
+        NBTTagCompound posTag = tagCompound.getCompoundTag(tagName);
+        if (posTag.equals(new NBTTagCompound())) {
+            return null;
+        }
+        return NBTUtil.getPosFromTag(posTag);
+    }
 }

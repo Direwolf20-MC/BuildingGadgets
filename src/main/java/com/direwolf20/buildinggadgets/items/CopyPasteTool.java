@@ -5,6 +5,7 @@ import com.direwolf20.buildinggadgets.Config;
 import com.direwolf20.buildinggadgets.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.tools.BlockMap;
 import com.direwolf20.buildinggadgets.tools.BlockMapIntState;
+import com.direwolf20.buildinggadgets.tools.GadgetUtils;
 import com.direwolf20.buildinggadgets.tools.VectorTools;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -55,93 +56,35 @@ public class CopyPasteTool extends GenericGadget {
     }
 
     public static void setAnchor(ItemStack stack, BlockPos anchorPos) {
-        NBTTagCompound tagCompound = stack.getTagCompound();
-        if (tagCompound == null) {
-            tagCompound = new NBTTagCompound();
-        }
-        if (anchorPos == null) {
-            if (tagCompound.getTag("anchor") != null) {
-                tagCompound.removeTag("anchor");
-                stack.setTagCompound(tagCompound);
-            }
-            return;
-        }
-        NBTTagCompound pos = NBTUtil.createPosTag(anchorPos);
-        tagCompound.setTag("anchor", pos);
-        stack.setTagCompound(tagCompound);
+        GadgetUtils.writePOSToNBT(stack, anchorPos, "anchor");
     }
 
     public static BlockPos getAnchor(ItemStack stack) {
-        NBTTagCompound tagCompound = stack.getTagCompound();
-        if (tagCompound == null) {
-            return null;
-        }
-        NBTTagCompound anchorPosTag = tagCompound.getCompoundTag("anchor");
-        if (anchorPosTag.equals(new NBTTagCompound())) {
-            return null;
-        }
-        return NBTUtil.getPosFromTag(tagCompound.getCompoundTag("anchor"));
+        return GadgetUtils.getPOSFromNBT(stack, "anchor");
     }
 
     public static void setLastBuild(ItemStack stack, BlockPos anchorPos) {
-        NBTTagCompound tagCompound = stack.getTagCompound();
-        if (tagCompound == null) {
-            tagCompound = new NBTTagCompound();
-        }
-        if (anchorPos == null) {
-            if (tagCompound.getTag("lastBuild") != null) {
-                tagCompound.removeTag("lastBuild");
-                stack.setTagCompound(tagCompound);
-            }
-            return;
-        }
-        NBTTagCompound pos = NBTUtil.createPosTag(anchorPos);
-        tagCompound.setTag("lastBuild", pos);
-        stack.setTagCompound(tagCompound);
+        GadgetUtils.writePOSToNBT(stack, anchorPos, "lastBuild");
     }
 
     public static BlockPos getLastBuild(ItemStack stack) {
-        NBTTagCompound tagCompound = stack.getTagCompound();
-        if (tagCompound == null) {
-            return null;
-        }
-        NBTTagCompound anchorPosTag = tagCompound.getCompoundTag("lastBuild");
-        if (anchorPosTag.equals(new NBTTagCompound())) {
-            return null;
-        }
-        return NBTUtil.getPosFromTag(tagCompound.getCompoundTag("lastBuild"));
+        return GadgetUtils.getPOSFromNBT(stack, "lastBuild");
     }
 
     public static void setStartPos(ItemStack stack, BlockPos startPos) {
-        NBTTagCompound tagCompound = stack.getTagCompound();
-        if (tagCompound == null) {
-            tagCompound = new NBTTagCompound();
-        }
-        NBTTagCompound pos = NBTUtil.createPosTag(startPos);
-        tagCompound.setTag("startPos", pos);
-        stack.setTagCompound(tagCompound);
+        GadgetUtils.writePOSToNBT(stack, startPos, "startPos");
     }
 
     public static BlockPos getStartPos(ItemStack stack) {
-        NBTTagCompound tagCompound = stack.getTagCompound();
-        if (tagCompound == null) {
-            return null;
-        }
-        NBTTagCompound anchorPosTag = tagCompound.getCompoundTag("startPos");
-        if (anchorPosTag == null) {
-            return null;
-        }
-        return NBTUtil.getPosFromTag(tagCompound.getCompoundTag("startPos"));
+        return GadgetUtils.getPOSFromNBT(stack, "startPos");
     }
 
     public static void setEndPos(ItemStack stack, BlockPos startPos) {
-        NBTTagCompound tagCompound = stack.getTagCompound();
-        if (tagCompound == null) {
-            tagCompound = new NBTTagCompound();
-        }
-        NBTTagCompound pos = NBTUtil.createPosTag(startPos);
-        tagCompound.setTag("endPos", pos);
-        stack.setTagCompound(tagCompound);
+        GadgetUtils.writePOSToNBT(stack, startPos, "endPos");
+    }
+
+    public static BlockPos getEndPos(ItemStack stack) {
+        return GadgetUtils.getPOSFromNBT(stack, "endPos");
     }
 
     public static void addBlockToMap(ItemStack stack, BlockMap map) {
@@ -162,18 +105,12 @@ public class CopyPasteTool extends GenericGadget {
         int py = (((map.pos.getY() - startPos.getY()) & 0xff) << 8);
         int pz = (((map.pos.getZ() - startPos.getZ()) & 0xff));
         int p = (px + py + pz);
-        NBTTagCompound blockMap = new NBTTagCompound();
 
+        NBTTagCompound blockMap = new NBTTagCompound();
         BlockMapIntState MapIntState = new BlockMapIntState();
         MapIntState.getIntStateMapFromNBT(MapIntStateTag);
-        if (MapIntState.findSlot(map.state) == -1) {
-            short nextSlot = (short)MapIntState.getIntStateMap().size();
-            nextSlot++;
-            MapIntState.addToMap(nextSlot, map.state);
-        }
-        //NBTTagCompound blockState = new NBTTagCompound();
-        //NBTUtil.writeBlockState(blockState, map.state);
-        //blockMap.setTag("state", blockState);
+        MapIntState.addToMap(map.state);
+
         blockMap.setShort("state", MapIntState.findSlot(map.state));
         blockMap.setInteger("pos", p);
         blocks.appendTag(blockMap);
@@ -209,7 +146,6 @@ public class CopyPasteTool extends GenericGadget {
             int z = startBlock.getZ() + (int) (byte) (p & 0x0000ff);
             short IntState = compound.getShort("state");
             blockMap.add(new BlockMap(new BlockPos(x, y, z), MapIntState.getStateFromSlot(IntState)));
-            //blockMap.add(new BlockMap(new BlockPos(x, y, z), NBTUtil.readBlockState(compound.getCompoundTag("state"))));
         }
         return blockMap;
     }
@@ -224,18 +160,6 @@ public class CopyPasteTool extends GenericGadget {
         tagCompound.setTag("blocksMapList", blocks);
         tagCompound.setTag("mapIntState", blocksIntMap);
         stack.setTagCompound(tagCompound);
-    }
-
-    public static BlockPos getEndPos(ItemStack stack) {
-        NBTTagCompound tagCompound = stack.getTagCompound();
-        if (tagCompound == null) {
-            return null;
-        }
-        NBTTagCompound anchorPosTag = tagCompound.getCompoundTag("endPos");
-        if (anchorPosTag == null) {
-            return null;
-        }
-        return NBTUtil.getPosFromTag(tagCompound.getCompoundTag("endPos"));
     }
 
     public static void setToolMode(ItemStack stack, toolModes mode) {
@@ -363,13 +287,11 @@ public class CopyPasteTool extends GenericGadget {
             } else {
                 world.spawnEntity(new BlockBuildEntity(world, blockMap.pos, player, blockMap.state, 1, blockMap.state, false));
             }
-            //world.setBlockState(blockMap.pos, blockMap.state);
         }
         setAnchor(stack, null);
     }
 
     public static void anchorBlocks(EntityPlayer player, ItemStack stack) {
-        World world = player.world;
         BlockPos currentAnchor = getAnchor(stack);
         if (currentAnchor == null) {
             RayTraceResult lookingAt = VectorTools.getLookingAt(player);
