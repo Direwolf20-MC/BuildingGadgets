@@ -18,7 +18,7 @@ import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.nbt.NBTUtil;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
@@ -207,35 +207,54 @@ public class CopyPasteTool extends GenericGadget {
 
     @Override
     public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
-        //On item use, if sneaking, select the block clicked on, else build -- This is called when a block in clicked on
         ItemStack stack = player.getHeldItem(hand);
         player.setActiveHand(hand);
         if (!world.isRemote) {
             if (getToolMode(stack) == toolModes.Copy) {
-                if (player.isSneaking()) {
-                    setEndPos(stack, pos);
-                    if (getStartPos(stack) != null) {
-                        findBlocks(world, getStartPos(stack), getEndPos(stack), stack);
-                        player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.copied").getUnformattedComponentText()), true);
-                    }
-                } else {
-                    setStartPos(stack, pos);
-                    if (getEndPos(stack) != null) {
-                        findBlocks(world, getStartPos(stack), getEndPos(stack), stack);
-                        player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.copied").getUnformattedComponentText()), true);
-                    }
-                }
+                copyBlocks(stack, pos, player, world);
             } else if (getToolMode(stack) == toolModes.Paste) {
-                if (getBlockMapList(stack, pos).size() > 0) {
-                    buildBlockMap(world, pos.up(), stack, player);
-                }
+                buildBlockMap(world, pos.up(), stack, player);
             }
         }
         NBTTagCompound tagCompound = stack.getTagCompound();
         ByteBuf buf = Unpooled.buffer(16);
-        ByteBufUtils.writeTag(buf,tagCompound);
+        ByteBufUtils.writeTag(buf, tagCompound);
         System.out.println(buf.readableBytes());
         return EnumActionResult.SUCCESS;
+    }
+
+    @Override
+    public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
+        ItemStack stack = player.getHeldItem(hand);
+        player.setActiveHand(hand);
+        if (!world.isRemote) {
+            if (getToolMode(stack) == toolModes.Copy) {
+                BlockPos pos = VectorTools.getPosLookingAt(player);
+                if (pos == null) return new ActionResult<ItemStack>(EnumActionResult.FAIL, stack);
+                copyBlocks(stack, pos, player, world);
+            } else if (getToolMode(stack) == toolModes.Paste) {
+                if (getAnchor(stack) == null) {
+                    BlockPos pos = VectorTools.getPosLookingAt(player);
+                    if (pos == null) return new ActionResult<ItemStack>(EnumActionResult.FAIL, stack);
+                    buildBlockMap(world, pos.up(), stack, player);
+                } else {
+                    buildBlockMap(world, getAnchor(stack).up(), stack, player);
+                }
+            }
+        }
+        return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);
+    }
+
+    public void copyBlocks(ItemStack stack, BlockPos pos, EntityPlayer player, World world) {
+        if (player.isSneaking()) {
+            setEndPos(stack, pos);
+        } else {
+            setStartPos(stack, pos);
+        }
+        if (getStartPos(stack) != null && getEndPos(stack) != null) {
+            findBlocks(world, getStartPos(stack), getEndPos(stack), stack);
+            player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.copied").getUnformattedComponentText()), true);
+        }
     }
 
     public void findBlocks(World world, BlockPos start, BlockPos end, ItemStack stack) {
@@ -320,7 +339,6 @@ public class CopyPasteTool extends GenericGadget {
         for (BlockMap blockMap : blockMapList) {
             if (world.getBlockState(blockMap.pos) == blockMap.state) {
                 world.spawnEntity(new BlockBuildEntity(world, blockMap.pos, player, blockMap.state, 2, blockMap.state, false));
-                //world.setBlockState(blockMap.pos, Blocks.AIR.getDefaultState());
             }
         }
     }
