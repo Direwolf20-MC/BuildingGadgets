@@ -10,6 +10,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockRendererDispatcher;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
@@ -344,17 +345,13 @@ public class ToolRenders {
         GlStateManager.blendFunc(GL11.GL_CONSTANT_ALPHA, GL11.GL_ONE_MINUS_CONSTANT_ALPHA);
 
         ArrayList<BlockMap> sortedMapList = BuildingModes.sortMapByDistance(blockMapList, player);
-
+        Frustum frustum = new Frustum();
+        frustum.setPosition(doubleX, doubleY, doubleZ);
+        ArrayList<BlockPos> drawBlocks = new ArrayList<BlockPos>();
+        
         for (BlockMap blockMap : sortedMapList) {
             BlockPos coordinate = blockMap.pos;
             IBlockState renderBlockState = blockMap.state;
-            GlStateManager.pushMatrix();//Push matrix again just because
-            GlStateManager.translate(-doubleX, -doubleY, -doubleZ);//The render starts at the player, so we subtract the player coords and move the render to 0,0,0
-            GlStateManager.translate(coordinate.getX(), coordinate.getY(), coordinate.getZ());//Now move the render position to the coordinates we want to render at
-            GlStateManager.rotate(-90.0F, 0.0F, 1.0F, 0.0F); //Rotate it because i'm not sure why but we need to
-            GlStateManager.translate(-0.005f, -0.005f, 0.005f);
-            GlStateManager.scale(1.01f, 1.01f, 1.01f);//Slightly Larger block to avoid z-fighting.
-            GL14.glBlendColor(1F, 1F, 1F, 0.55f); //Set the alpha of the blocks we are rendering
                     /*if (fakeWorld.getWorldType() != WorldType.DEBUG_ALL_BLOCK_STATES) { //Get the block state in the fake world
                         try {
                             state = renderBlockState.getActualState(fakeWorld, coordinate);
@@ -362,12 +359,28 @@ public class ToolRenders {
                         }
                     }*/
             //state = state.getBlock().getExtendedState(state, fakeWorld, coordinate); //Get the extended block state in the fake world (Disabled to fix chisel, not sure why.)
-            dispatcher.renderBlockBrightness(renderBlockState, 1f);//Render the defined block
+
+            boolean test1 = frustum.isBoxInFrustum(coordinate.getX(), coordinate.getY(), coordinate.getZ(), coordinate.getX(), coordinate.getY(), coordinate.getZ());
+
+            if (test1) {
+                GlStateManager.pushMatrix();//Push matrix again just because
+                GlStateManager.translate(-doubleX, -doubleY, -doubleZ);//The render starts at the player, so we subtract the player coords and move the render to 0,0,0
+                GlStateManager.translate(coordinate.getX(), coordinate.getY(), coordinate.getZ());//Now move the render position to the coordinates we want to render at
+                GlStateManager.rotate(-90.0F, 0.0F, 1.0F, 0.0F); //Rotate it because i'm not sure why but we need to
+                GlStateManager.translate(-0.005f, -0.005f, 0.005f);
+                GlStateManager.scale(1.01f, 1.01f, 1.01f);//Slightly Larger block to avoid z-fighting.
+                GL14.glBlendColor(1F, 1F, 1F, 0.55f); //Set the alpha of the blocks we are rendering
+                dispatcher.renderBlockBrightness(renderBlockState, 1f);//Render the defined block
+                drawBlocks.add(coordinate);
+                GlStateManager.popMatrix();
+            } else {
+                //System.out.println(coordinate);
+            }
             //GL14.glBlendColor(1F, 1F, 1F, 0.1f); //Set the alpha of the blocks we are rendering
             //GlStateManager.rotate(-90.0F, 0.0F, 1.0F, 0.0F); //Rotate it because i'm not sure why but we need to
             //dispatcher.renderBlockBrightness(Blocks.STAINED_GLASS.getDefaultState().withProperty(COLOR, EnumDyeColor.WHITE), 1f);//Render the defined block - White glass to show non-full block renders (Example: Torch)
             //Move the render position back to where it was
-            GlStateManager.popMatrix();
+
         }
 
                 /*for (BlockPos coordinate : coordinates) { //Now run through the UNSORTED list of coords, to show which blocks won't place if you don't have enough of them.
