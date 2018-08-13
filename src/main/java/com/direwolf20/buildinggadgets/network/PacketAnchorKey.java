@@ -1,7 +1,9 @@
 package com.direwolf20.buildinggadgets.network;
 
 import com.direwolf20.buildinggadgets.items.BuildingTool;
+import com.direwolf20.buildinggadgets.items.CopyPasteTool;
 import com.direwolf20.buildinggadgets.items.ExchangerTool;
+import com.direwolf20.buildinggadgets.items.GenericGadget;
 import com.direwolf20.buildinggadgets.tools.GadgetUtils;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -35,9 +37,9 @@ public class PacketAnchorKey implements IMessage {
         private void handle(PacketAnchorKey message, MessageContext ctx) {
             EntityPlayerMP playerEntity = ctx.getServerHandler().player;
             ItemStack heldItem = playerEntity.getHeldItem(EnumHand.MAIN_HAND);
-            if (!(heldItem.getItem() instanceof BuildingTool) && !(heldItem.getItem() instanceof ExchangerTool)) {
+            if (!(heldItem.getItem() instanceof GenericGadget)) {
                 heldItem = playerEntity.getHeldItemOffhand();
-                if (!(heldItem.getItem() instanceof BuildingTool) && !(heldItem.getItem() instanceof ExchangerTool)) {
+                if (!(heldItem.getItem() instanceof GenericGadget)) {
                     return;
                 }
             }
@@ -47,6 +49,8 @@ public class PacketAnchorKey implements IMessage {
             } else if (!heldItem.isEmpty() && heldItem.getItem() instanceof ExchangerTool) {
                 ExchangerTool exchangerTool = (ExchangerTool) (heldItem.getItem());
                 GadgetUtils.anchorBlocks(playerEntity, heldItem);
+            } else if (!heldItem.isEmpty() && heldItem.getItem() instanceof GenericGadget) {
+                CopyPasteTool.anchorBlocks(playerEntity, heldItem);
             }
         }
     }

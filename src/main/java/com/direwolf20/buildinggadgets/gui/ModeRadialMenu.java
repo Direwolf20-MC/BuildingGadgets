@@ -8,6 +8,7 @@ package com.direwolf20.buildinggadgets.gui;
 
 import com.direwolf20.buildinggadgets.KeyBindings;
 import com.direwolf20.buildinggadgets.items.BuildingTool;
+import com.direwolf20.buildinggadgets.items.CopyPasteTool;
 import com.direwolf20.buildinggadgets.items.ExchangerTool;
 import com.direwolf20.buildinggadgets.items.GenericGadget;
 import com.direwolf20.buildinggadgets.network.PacketHandler;
@@ -57,6 +58,8 @@ public class ModeRadialMenu extends GuiScreen {
             setSocketable(stack);
         } else if (stack.getItem() instanceof ExchangerTool) {
             setSocketable(stack);
+        } else if (stack.getItem() instanceof CopyPasteTool) {
+            setSocketable(stack);
         }
     }
 
@@ -70,6 +73,9 @@ public class ModeRadialMenu extends GuiScreen {
                 slots.add(i);
         } else if (stack.getItem() instanceof ExchangerTool) {
             for (int i = 0; i < ExchangerTool.toolModes.values().length; i++)
+                slots.add(i);
+        } else if (stack.getItem() instanceof CopyPasteTool) {
+            for (int i = 0; i < CopyPasteTool.toolModes.values().length; i++)
                 slots.add(i);
         }
     }
@@ -167,6 +173,9 @@ public class ModeRadialMenu extends GuiScreen {
                 name = "\u00a7" + c + mode.name();
             } else if (tool.getItem() instanceof ExchangerTool) {
                 ExchangerTool.toolModes mode = ExchangerTool.toolModes.values()[slot];
+                name = "\u00a7" + c + mode.name();
+            } else if (tool.getItem() instanceof CopyPasteTool) {
+                CopyPasteTool.toolModes mode = CopyPasteTool.toolModes.values()[slot];
                 name = "\u00a7" + c + mode.name();
             }
 

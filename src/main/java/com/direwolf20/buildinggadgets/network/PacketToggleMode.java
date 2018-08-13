@@ -1,7 +1,9 @@
 package com.direwolf20.buildinggadgets.network;
 
 import com.direwolf20.buildinggadgets.items.BuildingTool;
+import com.direwolf20.buildinggadgets.items.CopyPasteTool;
 import com.direwolf20.buildinggadgets.items.ExchangerTool;
+import com.direwolf20.buildinggadgets.items.GenericGadget;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
@@ -42,9 +44,9 @@ public class PacketToggleMode implements IMessage {
         private void handle(PacketToggleMode message, MessageContext ctx) {
             EntityPlayerMP playerEntity = ctx.getServerHandler().player;
             ItemStack heldItem = playerEntity.getHeldItem(EnumHand.MAIN_HAND);
-            if (!(heldItem.getItem() instanceof BuildingTool) && !(heldItem.getItem() instanceof ExchangerTool)) {
+            if (!(heldItem.getItem() instanceof GenericGadget)) {
                 heldItem = playerEntity.getHeldItemOffhand();
-                if (!(heldItem.getItem() instanceof BuildingTool) && !(heldItem.getItem() instanceof ExchangerTool)) {
+                if (!(heldItem.getItem() instanceof GenericGadget)) {
                     return;
                 }
             }
@@ -54,6 +56,9 @@ public class PacketToggleMode implements IMessage {
             } else if (!heldItem.isEmpty() && heldItem.getItem() instanceof ExchangerTool) {
                 ExchangerTool exchangerTool = (ExchangerTool) (heldItem.getItem());
                 exchangerTool.setMode(playerEntity, heldItem, mode);
+            } else if (!heldItem.isEmpty() && heldItem.getItem() instanceof CopyPasteTool) {
+                CopyPasteTool copyPasteTool = (CopyPasteTool) (heldItem.getItem());
+                copyPasteTool.setMode(playerEntity, heldItem, mode);
             }
         }
     }

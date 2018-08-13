@@ -350,4 +350,40 @@ public class BuildingModes {
         //System.out.println(sortedList);
         return sortedList;
     }
+
+    public static ArrayList<BlockMap> sortMapByDistance(ArrayList<BlockMap> unSortedMap, EntityPlayer player) {
+        ArrayList<BlockPos> unSortedList = new ArrayList<BlockPos>();
+        ArrayList<BlockPos> sortedList = new ArrayList<BlockPos>();
+        Map<BlockPos, IBlockState> PosToStateMap = new HashMap<BlockPos, IBlockState>();
+        for (BlockMap blockMap : unSortedMap) {
+            PosToStateMap.put(blockMap.pos, blockMap.state);
+            unSortedList.add(blockMap.pos);
+        }
+        ArrayList<BlockMap> sortedMap = new ArrayList<BlockMap>();
+        Map<Double, BlockPos> rangeMap = new HashMap<Double, BlockPos>();
+        Double distances[] = new Double[unSortedList.size()];
+        Double distance;
+        double x = player.posX;
+        double y = player.posY + player.getEyeHeight();
+        double z = player.posZ;
+        int i = 0;
+        for (BlockPos pos : unSortedList) {
+            distance = pos.distanceSqToCenter(x, y, z);
+            rangeMap.put(distance, pos);
+            distances[i] = distance;
+            i++;
+        }
+        Arrays.sort(distances);
+        //ArrayUtils.reverse(distances);
+
+        for (Double dist : distances) {
+            //System.out.println(dist);
+            //sortedList.add(rangeMap.get(dist));
+            BlockPos pos = new BlockPos(rangeMap.get(dist));
+            sortedMap.add(new BlockMap(pos, PosToStateMap.get(pos)));
+        }
+        //System.out.println(unSortedList);
+        //System.out.println(sortedList);
+        return sortedMap;
+    }
 }

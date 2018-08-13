@@ -5,10 +5,7 @@ import com.direwolf20.buildinggadgets.blocks.ConstructionBlock;
 import com.direwolf20.buildinggadgets.blocks.ConstructionBlockPowder;
 import com.direwolf20.buildinggadgets.blocks.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.blocks.EffectBlock;
-import com.direwolf20.buildinggadgets.items.BuildingTool;
-import com.direwolf20.buildinggadgets.items.ConstructionPaste;
-import com.direwolf20.buildinggadgets.items.ConstructionPasteContainer;
-import com.direwolf20.buildinggadgets.items.ExchangerTool;
+import com.direwolf20.buildinggadgets.items.*;
 import com.direwolf20.buildinggadgets.network.PacketHandler;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
@@ -60,6 +57,7 @@ public class CommonProxy {
     public static void registerItems(RegistryEvent.Register<Item> event) {
         event.getRegistry().register(new BuildingTool());
         event.getRegistry().register(new ExchangerTool());
+        event.getRegistry().register(new CopyPasteTool());
         if (Config.enablePaste) {
             event.getRegistry().register(new ItemBlock(ModBlocks.constructionBlock).setRegistryName(ModBlocks.constructionBlock.getRegistryName()));
             event.getRegistry().register(new ItemBlock(ModBlocks.constructionBlockPowder).setRegistryName(ModBlocks.constructionBlockPowder.getRegistryName()));

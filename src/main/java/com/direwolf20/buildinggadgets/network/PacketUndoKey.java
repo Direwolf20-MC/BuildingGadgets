@@ -1,7 +1,9 @@
 package com.direwolf20.buildinggadgets.network;
 
 import com.direwolf20.buildinggadgets.items.BuildingTool;
+import com.direwolf20.buildinggadgets.items.CopyPasteTool;
 import com.direwolf20.buildinggadgets.items.ExchangerTool;
+import com.direwolf20.buildinggadgets.items.GenericGadget;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
@@ -34,19 +36,21 @@ public class PacketUndoKey implements IMessage {
         private void handle(PacketUndoKey message, MessageContext ctx) {
             EntityPlayerMP playerEntity = ctx.getServerHandler().player;
             ItemStack heldItem = playerEntity.getHeldItem(EnumHand.MAIN_HAND);
-            if (!(heldItem.getItem() instanceof BuildingTool) && !(heldItem.getItem() instanceof ExchangerTool)) {
+            if (!(heldItem.getItem() instanceof GenericGadget)) {
                 heldItem = playerEntity.getHeldItemOffhand();
-                if (!(heldItem.getItem() instanceof BuildingTool) && !(heldItem.getItem() instanceof ExchangerTool)) {
+                if (!(heldItem.getItem() instanceof GenericGadget)) {
                     return;
                 }
             }
             if (!heldItem.isEmpty() && heldItem.getItem() instanceof BuildingTool) {
                 BuildingTool buildingTool = (BuildingTool) (heldItem.getItem());
                 buildingTool.undoBuild(playerEntity);
-            }
-            if (!heldItem.isEmpty() && heldItem.getItem() instanceof ExchangerTool) {
+            } else if (!heldItem.isEmpty() && heldItem.getItem() instanceof ExchangerTool) {
                 ExchangerTool exchangerTool = (ExchangerTool) (heldItem.getItem());
                 exchangerTool.toggleFuzzy(playerEntity, heldItem);
+            } else if (!heldItem.isEmpty() && heldItem.getItem() instanceof CopyPasteTool) {
+                CopyPasteTool copyPasteTool = (CopyPasteTool) (heldItem.getItem());
+                copyPasteTool.undoBuild(playerEntity, heldItem);
             }
         }
     }

@@ -21,11 +21,11 @@ public class KeyInputHandler {
             //PacketHandler.INSTANCE.sendToServer(new PacketToggleMode());
             Minecraft mc = Minecraft.getMinecraft();
             ItemStack stack = mc.player.getHeldItem(EnumHand.MAIN_HAND);
-            if (!stack.isEmpty() && (stack.getItem() instanceof GenericGadget))
+            if (!stack.isEmpty() && ((stack.getItem() instanceof GenericGadget)))
                 mc.displayGuiScreen(new ModeRadialMenu(stack));
             else {
                 stack = mc.player.getHeldItem(EnumHand.OFF_HAND);
-                if (!stack.isEmpty() && (stack.getItem() instanceof GenericGadget))
+                if (!stack.isEmpty() && ((stack.getItem() instanceof GenericGadget)))
                     mc.displayGuiScreen(new ModeRadialMenu(stack));
             }
         } else if (KeyBindings.rangeChange.isPressed()) {

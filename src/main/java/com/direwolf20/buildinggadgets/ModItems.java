@@ -1,9 +1,6 @@
 package com.direwolf20.buildinggadgets;
 
-import com.direwolf20.buildinggadgets.items.BuildingTool;
-import com.direwolf20.buildinggadgets.items.ConstructionPaste;
-import com.direwolf20.buildinggadgets.items.ConstructionPasteContainer;
-import com.direwolf20.buildinggadgets.items.ExchangerTool;
+import com.direwolf20.buildinggadgets.items.*;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
 public class ModItems {
@@ -18,4 +15,7 @@ public class ModItems {
 
     @GameRegistry.ObjectHolder("buildinggadgets:constructionpastecontainer")
     public static ConstructionPasteContainer constructionPasteContainer;
+
+    @GameRegistry.ObjectHolder("buildinggadgets:copypastetool")
+    public static CopyPasteTool copyPasteTool;
 }
