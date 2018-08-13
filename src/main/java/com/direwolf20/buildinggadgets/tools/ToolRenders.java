@@ -288,30 +288,25 @@ public class ToolRenders {
             return;
         }
         RayTraceResult lookingAt = VectorTools.getLookingAt(player);
-        BlockPos anchorPos = CopyPasteTool.getAnchor(stack);
-        if (lookingAt != null || anchorPos != null) {
-            World world = player.world;
-            BlockPos startPos = CopyPasteTool.getAnchor(stack);
-            if (startPos == null) {
-                startPos = lookingAt.getBlockPos().up();
-            }
-            ArrayList<BlockMap> blockMapList = CopyPasteTool.getBlockMapList(stack, startPos);
-            IBlockState startBlock = world.getBlockState(startPos);
-            if (startBlock != ModBlocks.effectBlock.getDefaultState()) {
-                ItemStack heldItem = player.getHeldItemMainhand(); //Get the item stack and the block that we'll be rendering (From the Itemstack's NBT)
-                if (!(heldItem.getItem() instanceof CopyPasteTool)) {
-                    heldItem = player.getHeldItemOffhand();
-                    if (!(heldItem.getItem() instanceof CopyPasteTool)) {
-                        return;
-                    }
-                }
-                //IBlockState renderBlockState = getToolBlock(heldItem);
-                Minecraft mc = Minecraft.getMinecraft();
-                mc.renderEngine.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+        BlockPos startPos = CopyPasteTool.getAnchor(stack);
+        if (startPos == null) {
+            startPos = VectorTools.getPosLookingAt(player);
+            if (startPos == null) return;
+            else startPos = startPos.up();
+        }
 
-                //Figure out how many of the block we're rendering we have in the inventory of the player.
-                //ItemStack itemStack = renderBlockState.getBlock().getPickBlock(renderBlockState, null, world, new BlockPos(0, 0, 0), player);
-                //ItemStack itemStack = InventoryManipulation.getSilkTouchDrop(renderBlockState);
+        World world = player.world;
+
+        ArrayList<BlockMap> blockMapList = CopyPasteTool.getBlockMapList(stack, startPos);
+        IBlockState startBlock = world.getBlockState(startPos);
+        if (startBlock == ModBlocks.effectBlock.getDefaultState()) return;
+
+        Minecraft mc = Minecraft.getMinecraft();
+        mc.renderEngine.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+
+        //Figure out how many of the block we're rendering we have in the inventory of the player.
+        //ItemStack itemStack = renderBlockState.getBlock().getPickBlock(renderBlockState, null, world, new BlockPos(0, 0, 0), player);
+        //ItemStack itemStack = InventoryManipulation.getSilkTouchDrop(renderBlockState);
                 /*ItemStack itemStack;
                 if (renderBlockState.getBlock().canSilkHarvest(world, new BlockPos(0, 0, 0), renderBlockState, player)) {
                     itemStack = InventoryManipulation.getSilkTouchDrop(renderBlockState);
@@ -329,54 +324,52 @@ public class ToolRenders {
                 if (player.capabilities.isCreativeMode) {
                     hasEnergy = 1000000;
                 }*/
-                //Prepare the block rendering
-                BlockRendererDispatcher dispatcher = Minecraft.getMinecraft().getBlockRendererDispatcher();
-                //BlockRenderLayer origLayer = MinecraftForgeClient.getRenderLayer();
+        //Prepare the block rendering
+        BlockRendererDispatcher dispatcher = Minecraft.getMinecraft().getBlockRendererDispatcher();
 
-                //Prepare the fake world -- using a fake world lets us render things properly, like fences connecting.
-                //Set<BlockPos> coords = new HashSet<BlockPos>(coordinates);
-                //fakeWorld.setWorldAndState(player.world, renderBlockState, coords);
+        //Prepare the fake world -- using a fake world lets us render things properly, like fences connecting.
+        //Set<BlockPos> coords = new HashSet<BlockPos>(coordinates);
+        //fakeWorld.setWorldAndState(player.world, renderBlockState, coords);
 
-                //Calculate the players current position, which is needed later
-                double doubleX = player.lastTickPosX + (player.posX - player.lastTickPosX) * evt.getPartialTicks();
-                double doubleY = player.lastTickPosY + (player.posY - player.lastTickPosY) * evt.getPartialTicks();
-                double doubleZ = player.lastTickPosZ + (player.posZ - player.lastTickPosZ) * evt.getPartialTicks();
+        //Calculate the players current position, which is needed later
+        double doubleX = player.lastTickPosX + (player.posX - player.lastTickPosX) * evt.getPartialTicks();
+        double doubleY = player.lastTickPosY + (player.posY - player.lastTickPosY) * evt.getPartialTicks();
+        double doubleZ = player.lastTickPosZ + (player.posZ - player.lastTickPosZ) * evt.getPartialTicks();
 
-                //Save the current position that is being rendered (I think)
-                GlStateManager.pushMatrix();
-                //Enable Blending (So we can have transparent effect)
-                GlStateManager.enableBlend();
-                //This blend function allows you to use a constant alpha, which is defined later
-                GlStateManager.blendFunc(GL11.GL_CONSTANT_ALPHA, GL11.GL_ONE_MINUS_CONSTANT_ALPHA);
+        //Save the current position that is being rendered
+        GlStateManager.pushMatrix();
+        //Enable Blending (So we can have transparent effect)
+        GlStateManager.enableBlend();
+        //This blend function allows you to use a constant alpha, which is defined later
+        GlStateManager.blendFunc(GL11.GL_CONSTANT_ALPHA, GL11.GL_ONE_MINUS_CONSTANT_ALPHA);
 
-                //ArrayList<BlockPos> sortedCoordinates = ExchangingModes.sortByDistance(coordinates, player); //Sort the coords by distance to player.
-                IBlockState state = Blocks.AIR.getDefaultState();
+        IBlockState state = Blocks.AIR.getDefaultState();
+        ArrayList<BlockMap> sortedMapList = BuildingModes.sortMapByDistance(blockMapList, player);
 
-                ArrayList<BlockMap> sortedMapList = BuildingModes.sortMapByDistance(blockMapList, player);
-                for (BlockMap blockMap : sortedMapList) {
-                    BlockPos coordinate = blockMap.pos;
-                    IBlockState renderBlockState = blockMap.state;
-                    GlStateManager.pushMatrix();//Push matrix again just because
-                    GlStateManager.translate(-doubleX, -doubleY, -doubleZ);//The render starts at the player, so we subtract the player coords and move the render to 0,0,0
-                    GlStateManager.translate(coordinate.getX(), coordinate.getY(), coordinate.getZ());//Now move the render position to the coordinates we want to render at
-                    GlStateManager.rotate(-90.0F, 0.0F, 1.0F, 0.0F); //Rotate it because i'm not sure why but we need to
-                    GlStateManager.translate(-0.005f, -0.005f, 0.005f);
-                    GlStateManager.scale(1.01f, 1.01f, 1.01f);//Slightly Larger block to avoid z-fighting.
-                    GL14.glBlendColor(1F, 1F, 1F, 0.55f); //Set the alpha of the blocks we are rendering
+        for (BlockMap blockMap : sortedMapList) {
+            BlockPos coordinate = blockMap.pos;
+            IBlockState renderBlockState = blockMap.state;
+            GlStateManager.pushMatrix();//Push matrix again just because
+            GlStateManager.translate(-doubleX, -doubleY, -doubleZ);//The render starts at the player, so we subtract the player coords and move the render to 0,0,0
+            GlStateManager.translate(coordinate.getX(), coordinate.getY(), coordinate.getZ());//Now move the render position to the coordinates we want to render at
+            GlStateManager.rotate(-90.0F, 0.0F, 1.0F, 0.0F); //Rotate it because i'm not sure why but we need to
+            GlStateManager.translate(-0.005f, -0.005f, 0.005f);
+            GlStateManager.scale(1.01f, 1.01f, 1.01f);//Slightly Larger block to avoid z-fighting.
+            GL14.glBlendColor(1F, 1F, 1F, 0.55f); //Set the alpha of the blocks we are rendering
                     /*if (fakeWorld.getWorldType() != WorldType.DEBUG_ALL_BLOCK_STATES) { //Get the block state in the fake world
                         try {
                             state = renderBlockState.getActualState(fakeWorld, coordinate);
                         } catch (Exception var8) {
                         }
                     }*/
-                    //state = state.getBlock().getExtendedState(state, fakeWorld, coordinate); //Get the extended block state in the fake world (Disabled to fix chisel, not sure why.)
-                    dispatcher.renderBlockBrightness(renderBlockState, 1f);//Render the defined block
-                    //GL14.glBlendColor(1F, 1F, 1F, 0.1f); //Set the alpha of the blocks we are rendering
-                    //GlStateManager.rotate(-90.0F, 0.0F, 1.0F, 0.0F); //Rotate it because i'm not sure why but we need to
-                    //dispatcher.renderBlockBrightness(Blocks.STAINED_GLASS.getDefaultState().withProperty(COLOR, EnumDyeColor.WHITE), 1f);//Render the defined block - White glass to show non-full block renders (Example: Torch)
-                    //Move the render position back to where it was
-                    GlStateManager.popMatrix();
-                }
+            //state = state.getBlock().getExtendedState(state, fakeWorld, coordinate); //Get the extended block state in the fake world (Disabled to fix chisel, not sure why.)
+            dispatcher.renderBlockBrightness(renderBlockState, 1f);//Render the defined block
+            //GL14.glBlendColor(1F, 1F, 1F, 0.1f); //Set the alpha of the blocks we are rendering
+            //GlStateManager.rotate(-90.0F, 0.0F, 1.0F, 0.0F); //Rotate it because i'm not sure why but we need to
+            //dispatcher.renderBlockBrightness(Blocks.STAINED_GLASS.getDefaultState().withProperty(COLOR, EnumDyeColor.WHITE), 1f);//Render the defined block - White glass to show non-full block renders (Example: Torch)
+            //Move the render position back to where it was
+            GlStateManager.popMatrix();
+        }
 
                 /*for (BlockPos coordinate : coordinates) { //Now run through the UNSORTED list of coords, to show which blocks won't place if you don't have enough of them.
                     GlStateManager.pushMatrix();//Push matrix again just because
@@ -398,13 +391,11 @@ public class ToolRenders {
                     //Move the render position back to where it was
                     GlStateManager.popMatrix();
                 }*/
-                //Set blending back to the default mode
-                GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-                //Disable blend
-                GlStateManager.disableBlend();
-                //Pop from the original push in this method
-                GlStateManager.popMatrix();
-            }
-        }
+        //Set blending back to the default mode
+        GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+        //Disable blend
+        GlStateManager.disableBlend();
+        //Pop from the original push in this method
+        GlStateManager.popMatrix();
     }
 }
