@@ -9,7 +9,6 @@ import com.direwolf20.buildinggadgets.items.FakeBuilderWorld;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockRendererDispatcher;
-import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.entity.player.EntityPlayer;
@@ -299,6 +298,9 @@ public class ToolRenders {
         World world = player.world;
 
         ArrayList<BlockMap> blockMapList = CopyPasteTool.getBlockMapList(stack, startPos);
+        if (blockMapList.size() == 0) {
+            return;
+        }
         IBlockState startBlock = world.getBlockState(startPos);
         if (startBlock == ModBlocks.effectBlock.getDefaultState()) return;
 
@@ -339,99 +341,23 @@ public class ToolRenders {
 
         //Save the current position that is being rendered
         GlStateManager.pushMatrix();
+        ToolDireBuffer toolDireBuffer = PasteToolBufferBuilder.getBuffer();
+        if (toolDireBuffer.getVertexCount() == 0) {
+            PasteToolBufferBuilder.addMapToBuffer(blockMapList);
+        }
+
+
         //Enable Blending (So we can have transparent effect)
-
-        //GlStateManager.blendFunc(GL11.GL_ONE, GL11.GL_SRC_ALPHA);
-        ArrayList<BlockMap> sortedMapList = BuildingModes.sortMapByDistance(blockMapList, player);
-        //Frustum frustum = new Frustum();
-        //frustum.setPosition(doubleX, doubleY, doubleZ);
-        //ArrayList<BlockPos> drawBlocks = new ArrayList<BlockPos>();
-
-        //Tessellator tessellator = Tessellator.getInstance();
-
-        //PasteToolBufferBuilder pasteBuffer = new PasteToolBufferBuilder(tessellator);
-
-        //BufferBuilder bufferBuilder = tessellator.getBuffer();
-        BufferBuilder pasteBufferBuilder = PasteToolBufferBuilder.getBuffer();
-        //pasteBufferBuilder.setTranslation(startPos.getX(), startPos.getY(), startPos.getZ());
-        //pasteBufferBuilder.setTranslation(-doubleX, -doubleY, -doubleZ);
-        //PasteToolBufferBuilder.addMapToBuffer(blockMapList, stack);
-        //BufferBuilder pasteBufferBuilder = pasteBuffer.getBuffer();
-        //ByteBuffer pasteByteBuffer = pasteBufferBuilder.getByteBuffer();
-
-        //pasteBufferBuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
-        //bufferBuilder.putBulkData(byteBuffer);
-        //bufferBuilder.setTranslation(-doubleX, -doubleY, -doubleZ);
-        //GL11.glDepthFunc(GL11.GL_ALWAYS);
         GlStateManager.enableBlend();
         //This blend function allows you to use a constant alpha, which is defined later
         GlStateManager.blendFunc(GL11.GL_CONSTANT_ALPHA, GL11.GL_ONE_MINUS_CONSTANT_ALPHA);
-        //GlStateManager.blendFunc(GL11.GL_DST_COLOR, GL11.GL_ZERO);
-
 
         GlStateManager.pushMatrix();//Push matrix again just because
-
         GlStateManager.translate(-doubleX, -doubleY, -doubleZ);//The render starts at the player, so we subtract the player coords and move the render to 0,0,0
-        GlStateManager.translate(startPos.getX(), startPos.getY(), startPos.getZ());
-        //GlStateManager.translate(coordinate.getX(), coordinate.getY(), coordinate.getZ());//Now move the render position to the coordinates we want to render at
-        //GlStateManager.rotate(-90.0F, 0.0F, 1.0F, 0.0F); //Rotate it because i'm not sure why but we need to
-        //GlStateManager.translate(-0.005f, -0.005f, 0.005f);
-        GlStateManager.scale(1.01f, 1.01f, 1.01f);//Slightly Larger block to avoid z-fighting.
-        //bufferBuilder.setTranslation(-0.005f, -0.005f, 0.005f);
+        GlStateManager.translate(startPos.getX(), startPos.getY(), startPos.getZ()); //Move the render to the startingBlockPos
         GL14.glBlendColor(1F, 1F, 1F, 0.55f); //Set the alpha of the blocks we are rendering
-        //GlStateManager.translate(startPos.getX()/100, -startPos.getY()/100-1, -startPos.getZ()/100); //wut????
-        //GlStateManager.alphaFunc(GL11.GL_GREATER, 0.99f);
-
-        //GL11.glEnable(GL11.GL_CULL_FACE);
-        //GL11.glEnable(GL11.GL_DEPTH_TEST);
-        //GL11.glDepthMask(true);
-        //GL11.glDepthFunc(GL11.GL_LESS);
-        long time = System.currentTimeMillis();
-        //System.out.println(System.currentTimeMillis()-time);
-
-        //for (BlockMap blockMap : sortedMapList) {
-        //    BlockPos coordinate = blockMap.pos;
-        //    IBlockState renderBlockState = blockMap.state;
-                    /*if (fakeWorld.getWorldType() != WorldType.DEBUG_ALL_BLOCK_STATES) { //Get the block state in the fake world
-                        try {
-                            state = renderBlockState.getActualState(fakeWorld, coordinate);
-                        } catch (Exception var8) {
-                        }
-                    }*/
-            //state = state.getBlock().getExtendedState(state, fakeWorld, coordinate); //Get the extended block state in the fake world (Disabled to fix chisel, not sure why.)
-
-        //boolean test1 = frustum.isBoxInFrustum(coordinate.getX(), coordinate.getY(), coordinate.getZ(), coordinate.getX(), coordinate.getY(), coordinate.getZ());
-
-        //if (test1) {
-
-        //    IBakedModel model = dispatcher.getModelForState(renderBlockState);
-        //    dispatcher.getBlockModelRenderer().renderModelFlat(world, model, renderBlockState, coordinate, bufferBuilder, true, 0L);
-        //dispatcher.renderBlockBrightness(renderBlockState, 1f);//Render the defined block
-        //drawBlocks.add(coordinate);
-
-        //} else {
-        //System.out.println(coordinate);
-        //}
-            //GL14.glBlendColor(1F, 1F, 1F, 0.1f); //Set the alpha of the blocks we are rendering
-            //GlStateManager.rotate(-90.0F, 0.0F, 1.0F, 0.0F); //Rotate it because i'm not sure why but we need to
-            //dispatcher.renderBlockBrightness(Blocks.STAINED_GLASS.getDefaultState().withProperty(COLOR, EnumDyeColor.WHITE), 1f);//Render the defined block - White glass to show non-full block renders (Example: Torch)
-            //Move the render position back to where it was
-        //}
-        //System.out.println(System.currentTimeMillis()-time);
-
-
-        //WorldVertexBufferUploader vboUploader = new WorldVertexBufferUploader();
-        //pasteBufferBuilder = PasteToolBufferBuilder.getBuffer();
-        //pasteBufferBuilder.finishDrawing();
-        //pasteBufferBuilder.setTranslation(0,0,0);
-        //pasteBufferBuilder = PasteToolBufferBuilder.getBuffer();
-        //vboUploader.draw(pasteBufferBuilder);
-        //GlStateManager.alphaFunc(GL11.GL_GREATER, 0.6f);
-        //GlStateManager.enableAlpha();
         PasteToolBufferBuilder.draw(player, doubleX, doubleY, doubleZ, startPos);
-        //tessellator.draw();
         GlStateManager.popMatrix();
-        //System.out.println(System.currentTimeMillis()-time);
 
                 /*for (BlockPos coordinate : coordinates) { //Now run through the UNSORTED list of coords, to show which blocks won't place if you don't have enough of them.
                     GlStateManager.pushMatrix();//Push matrix again just because

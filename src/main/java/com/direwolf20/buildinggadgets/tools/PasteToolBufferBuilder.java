@@ -3,14 +3,12 @@ package com.direwolf20.buildinggadgets.tools;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockRendererDispatcher;
-import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.client.renderer.vertex.VertexFormatElement;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -27,27 +25,21 @@ public class PasteToolBufferBuilder {
     private static int counter = 0;
 
 
-    public static BufferBuilder getBuffer() {
+    public static ToolDireBuffer getBuffer() {
         return bufferBuilder;
     }
 
-    public static void addMapToBuffer(ArrayList<BlockMap> sortedMapList, ItemStack stack) {
+    public static void addMapToBuffer(ArrayList<BlockMap> sortedMapList) {
 
         BlockRendererDispatcher dispatcher = Minecraft.getMinecraft().getBlockRendererDispatcher();
         bufferBuilder.reset();
-        //bufferBuilder.setTranslation(doubleX, doubleY, doubleZ);
-        //bufferBuilder.setTranslation(0,1,0);
         bufferBuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
 
         for (BlockMap blockMap : sortedMapList) {
-            BlockPos coordinate = blockMap.pos;
             IBlockState renderBlockState = blockMap.state;
-            //
             IBakedModel model = dispatcher.getModelForState(renderBlockState);
             dispatcher.getBlockModelRenderer().renderModelFlat(Minecraft.getMinecraft().world, model, renderBlockState, new BlockPos(blockMap.xOffset, blockMap.yOffset, blockMap.zOffset), bufferBuilder, true, 0L);
-
         }
-        //bufferBuilder.setTranslation(0,0,0);
         bufferBuilder.finishDrawing();
     }
 
