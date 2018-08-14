@@ -355,8 +355,14 @@ public class BuildingModes {
         ArrayList<BlockPos> unSortedList = new ArrayList<BlockPos>();
         ArrayList<BlockPos> sortedList = new ArrayList<BlockPos>();
         Map<BlockPos, IBlockState> PosToStateMap = new HashMap<BlockPos, IBlockState>();
+        Map<BlockPos, Integer> PosToX = new HashMap<BlockPos, Integer>();
+        Map<BlockPos, Integer> PosToY = new HashMap<BlockPos, Integer>();
+        Map<BlockPos, Integer> PosToZ = new HashMap<BlockPos, Integer>();
         for (BlockMap blockMap : unSortedMap) {
             PosToStateMap.put(blockMap.pos, blockMap.state);
+            PosToX.put(blockMap.pos, blockMap.xOffset);
+            PosToY.put(blockMap.pos, blockMap.yOffset);
+            PosToZ.put(blockMap.pos, blockMap.zOffset);
             unSortedList.add(blockMap.pos);
         }
         ArrayList<BlockMap> sortedMap = new ArrayList<BlockMap>();
@@ -380,7 +386,7 @@ public class BuildingModes {
             //System.out.println(dist);
             //sortedList.add(rangeMap.get(dist));
             BlockPos pos = new BlockPos(rangeMap.get(dist));
-            sortedMap.add(new BlockMap(pos, PosToStateMap.get(pos)));
+            sortedMap.add(new BlockMap(pos, PosToStateMap.get(pos), PosToX.get(pos), PosToY.get(pos), PosToZ.get(pos)));
         }
         //System.out.println(unSortedList);
         //System.out.println(sortedList);

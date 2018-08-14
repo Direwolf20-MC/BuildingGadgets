@@ -145,7 +145,7 @@ public class CopyPasteTool extends GenericGadget {
             int y = startBlock.getY() + (int) (byte) ((p & 0x00ff00) >> 8);
             int z = startBlock.getZ() + (int) (byte) (p & 0x0000ff);
             short IntState = compound.getShort("state");
-            blockMap.add(new BlockMap(new BlockPos(x, y, z), MapIntState.getStateFromSlot(IntState)));
+            blockMap.add(new BlockMap(new BlockPos(x, y, z), MapIntState.getStateFromSlot(IntState), (int) (byte) ((p & 0xff0000) >> 16), (int) (byte) ((p & 0x00ff00) >> 8), (int) (byte) (p & 0x0000ff)));
         }
         return blockMap;
     }
