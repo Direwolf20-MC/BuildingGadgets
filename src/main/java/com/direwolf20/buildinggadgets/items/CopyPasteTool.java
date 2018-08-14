@@ -251,7 +251,10 @@ public class CopyPasteTool extends GenericGadget {
         if (getStartPos(stack) != null && getEndPos(stack) != null) {
             findBlocks(world, getStartPos(stack), getEndPos(stack), stack);
             ArrayList<BlockMap> blockMapList = getBlockMapList(stack, getStartPos(stack));
+            long time = System.nanoTime();
             PasteToolBufferBuilder.addMapToBuffer(blockMapList);
+            System.out.printf("Copied %d Blocks to buffer in %.2f ms%n", blockMapList.size(), (System.nanoTime() - time) * 1e-6);
+            //System.out.println("Copied " + blockMapList.size() + " blocks in: " + (System.currentTimeMillis() - time));
             player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.copied").getUnformattedComponentText()), true);
         }
     }

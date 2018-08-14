@@ -356,7 +356,10 @@ public class ToolRenders {
         GlStateManager.translate(-doubleX, -doubleY, -doubleZ);//The render starts at the player, so we subtract the player coords and move the render to 0,0,0
         GlStateManager.translate(startPos.getX(), startPos.getY(), startPos.getZ()); //Move the render to the startingBlockPos
         GL14.glBlendColor(1F, 1F, 1F, 0.55f); //Set the alpha of the blocks we are rendering
+        long time = System.nanoTime();
         PasteToolBufferBuilder.draw(player, doubleX, doubleY, doubleZ, startPos);
+        //System.out.println("Drew " + blockMapList.size() + " blocks in " + (System.nanoTime() - time));
+        System.out.printf("Drew %d blocks in %.2f ms%n", blockMapList.size(), (System.nanoTime() - time) * 1e-6);
         GlStateManager.popMatrix();
 
                 /*for (BlockPos coordinate : coordinates) { //Now run through the UNSORTED list of coords, to show which blocks won't place if you don't have enough of them.

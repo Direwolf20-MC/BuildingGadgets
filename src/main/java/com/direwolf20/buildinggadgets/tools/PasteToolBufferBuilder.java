@@ -30,11 +30,9 @@ public class PasteToolBufferBuilder {
     }
 
     public static void addMapToBuffer(ArrayList<BlockMap> sortedMapList) {
-
         BlockRendererDispatcher dispatcher = Minecraft.getMinecraft().getBlockRendererDispatcher();
         bufferBuilder.reset();
         bufferBuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
-
         for (BlockMap blockMap : sortedMapList) {
             IBlockState renderBlockState = blockMap.state;
             IBakedModel model = dispatcher.getModelForState(renderBlockState);
@@ -45,7 +43,10 @@ public class PasteToolBufferBuilder {
 
 
     public static void draw(EntityPlayer player, double x, double y, double z, BlockPos startPos) {
+        long time = System.nanoTime();
         bufferBuilder.sortVertexData((float) (x - startPos.getX()), (float) ((y + player.getEyeHeight()) - startPos.getY()), (float) (z - startPos.getZ()));
+        //System.out.println("Sorted " + bufferBuilder.getVertexCount() + " Vertexes in " + (System.nanoTime() - time));
+        System.out.printf("Sorted %d Vertexes in %.2f ms%n", bufferBuilder.getVertexCount(), (System.nanoTime() - time) * 1e-6);
         if (bufferBuilder.getVertexCount() > 0) {
             VertexFormat vertexformat = bufferBuilder.getVertexFormat();
             int i = vertexformat.getNextOffset();
