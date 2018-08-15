@@ -7,11 +7,13 @@ import com.direwolf20.buildinggadgets.tools.*;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -28,9 +30,12 @@ import net.minecraft.world.World;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
+import org.lwjgl.input.Keyboard;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.direwolf20.buildinggadgets.tools.GadgetUtils.withSuffix;
 
@@ -147,6 +152,20 @@ public class CopyPasteTool extends GenericGadget {
         return blockMap;
     }
 
+    public static BlockMapIntState getBlockMapIntState(ItemStack stack) {
+        NBTTagCompound tagCompound = stack.getTagCompound();
+        if (tagCompound == null) {
+            tagCompound = new NBTTagCompound();
+        }
+        NBTTagList MapIntStateTag = (NBTTagList) tagCompound.getTag("mapIntState");
+        if (MapIntStateTag == null) {
+            MapIntStateTag = new NBTTagList();
+        }
+        BlockMapIntState MapIntState = new BlockMapIntState();
+        MapIntState.getIntStateMapFromNBT(MapIntStateTag);
+        return MapIntState;
+    }
+
     public static void resetBlockMap(ItemStack stack) {
         NBTTagCompound tagCompound = stack.getTagCompound();
         if (tagCompound == null) {
@@ -186,12 +205,53 @@ public class CopyPasteTool extends GenericGadget {
 
     @Override
     public void addInformation(ItemStack stack, World player, List<String> list, ITooltipFlag b) {
+        long time = System.nanoTime();
         //Add tool information to the tooltip
         super.addInformation(stack, player, list, b);
         list.add(TextFormatting.AQUA + I18n.format("tooltip.gadget.mode") + ": " + getToolMode(stack));
         if (Config.poweredByFE) {
             IEnergyStorage energy = stack.getCapability(CapabilityEnergy.ENERGY, null);
             list.add(TextFormatting.WHITE + I18n.format("tooltip.gadget.energy") + ": " + withSuffix(energy.getEnergyStored()) + "/" + withSuffix(energy.getMaxEnergyStored()));
+        }
+        if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT)) {
+            Map<Short, IBlockState> IntStateMap = getBlockMapIntState(stack).getIntStateMap();
+            ArrayList<BlockMap> blockMapList = getBlockMapList(stack, getStartPos(stack));
+            Map<IBlockState, String> stateItemMap = new HashMap<IBlockState, String>();
+            Map<String, ItemStack> stackNames = new HashMap<String, ItemStack>();
+            for (Map.Entry<Short, IBlockState> entry : IntStateMap.entrySet()) {
+                IBlockState setBlock = entry.getValue();
+                ItemStack itemStack;
+                if (entry.getValue().getBlock().canSilkHarvest(player, null, setBlock, null)) {
+                    itemStack = InventoryManipulation.getSilkTouchDrop(setBlock);
+                } else {
+                    itemStack = new ItemStack(Item.getItemFromBlock(setBlock.getBlock()), 1, setBlock.getBlock().damageDropped(setBlock));
+                }
+                stateItemMap.put(entry.getValue(), itemStack.getDisplayName());
+                stackNames.put(itemStack.getDisplayName(), itemStack);
+            }
+            int totalCount = 0;
+            Map<String, Integer> itemCountMap = new HashMap<String, Integer>();
+            for (BlockMap blockMap : blockMapList) {
+                String name = stateItemMap.get(blockMap.state);
+                if (!name.equals("Air")) {
+                    if (itemCountMap.get(name) == null) {
+                        itemCountMap.put(name, 1);
+                    } else {
+                        itemCountMap.put(name, itemCountMap.get(name) + 1);
+                    }
+                }
+            }
+            for (Map.Entry<String, Integer> entry : itemCountMap.entrySet()) {
+                ItemStack itemStack = stackNames.get(entry.getKey());
+                int itemCount = InventoryManipulation.countItem(itemStack, Minecraft.getMinecraft().player);
+                if (itemCount >= entry.getValue()) {
+                    list.add(TextFormatting.GREEN + I18n.format(entry.getKey() + ": " + entry.getValue()));
+                } else {
+                    list.add(TextFormatting.RED + I18n.format(entry.getKey() + ": " + entry.getValue() + " (" + (entry.getValue() - itemCount) + ")"));
+                }
+
+            }
+            //System.out.printf("Counted %d Blocks in %.2f ms%n", blockMapList.size(), (System.nanoTime() - time) * 1e-6);
         }
     }
 
