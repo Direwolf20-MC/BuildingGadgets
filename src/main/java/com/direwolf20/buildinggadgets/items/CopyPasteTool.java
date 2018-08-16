@@ -247,7 +247,7 @@ public class CopyPasteTool extends GenericGadget {
                 if (itemCount >= entry.getValue()) {
                     list.add(TextFormatting.GREEN + I18n.format(entry.getKey() + ": " + entry.getValue()));
                 } else {
-                    list.add(TextFormatting.RED + I18n.format(entry.getKey() + ": " + entry.getValue() + " (" + (entry.getValue() - itemCount) + ")"));
+                    list.add(TextFormatting.RED + I18n.format(entry.getKey() + ": " + entry.getValue() + " (Missing: " + (entry.getValue() - itemCount) + ")"));
                 }
 
             }
@@ -343,7 +343,7 @@ public class CopyPasteTool extends GenericGadget {
                 for (int z = iStartZ; z <= iEndZ; z++) {
                     BlockPos tempPos = new BlockPos(x, y, z);
                     IBlockState tempState = world.getBlockState(tempPos);
-                    if (tempState != Blocks.AIR.getDefaultState() && world.getTileEntity(tempPos) == null) {
+                    if (tempState != Blocks.AIR.getDefaultState() && world.getTileEntity(tempPos) == null && !tempState.getBlock().getMaterial(tempState).isLiquid()) {
                         BlockMap tempMap = new BlockMap(tempPos, tempState);
                         addBlockToMap(stack, tempMap);
                     }
@@ -353,6 +353,7 @@ public class CopyPasteTool extends GenericGadget {
     }
 
     public void buildBlockMap(World world, BlockPos startPos, ItemStack stack, EntityPlayer player) {
+        long time = System.nanoTime();
         BlockPos anchorPos = getAnchor(stack);
         ArrayList<BlockMap> blockMapList = new ArrayList<BlockMap>();
         if (anchorPos == null) {
@@ -370,6 +371,7 @@ public class CopyPasteTool extends GenericGadget {
             }
         }
         setAnchor(stack, null);
+        System.out.printf("Built %d Blocks in %.2f ms%n", blockMapList.size(), (System.nanoTime() - time) * 1e-6);
     }
 
     public static void anchorBlocks(EntityPlayer player, ItemStack stack) {
@@ -389,6 +391,7 @@ public class CopyPasteTool extends GenericGadget {
     }
 
     public static void undoBuild(EntityPlayer player, ItemStack heldItem) {
+        long time = System.nanoTime();
         World world = player.world;
         if (world.isRemote) {
             return;
@@ -403,5 +406,6 @@ public class CopyPasteTool extends GenericGadget {
                 world.spawnEntity(new BlockBuildEntity(world, blockMap.pos, player, blockMap.state, 2, blockMap.state, false));
             }
         }
+        System.out.printf("Undid %d Blocks in %.2f ms%n", blockMapList.size(), (System.nanoTime() - time) * 1e-6);
     }
 }
