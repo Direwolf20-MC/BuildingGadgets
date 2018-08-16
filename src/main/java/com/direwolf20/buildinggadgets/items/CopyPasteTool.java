@@ -343,7 +343,7 @@ public class CopyPasteTool extends GenericGadget {
                 for (int z = iStartZ; z <= iEndZ; z++) {
                     BlockPos tempPos = new BlockPos(x, y, z);
                     IBlockState tempState = world.getBlockState(tempPos);
-                    if (tempState != Blocks.AIR.getDefaultState() && world.getTileEntity(tempPos) == null && !tempState.getBlock().getMaterial(tempState).isLiquid()) {
+                    if (tempState != Blocks.AIR.getDefaultState() && world.getTileEntity(tempPos) == null && !tempState.getBlock().getMaterial(tempState).isLiquid() && !BlacklistBlocks.checkBlacklist(tempState.getBlock())) {
                         BlockMap tempMap = new BlockMap(tempPos, tempState);
                         addBlockToMap(stack, tempMap);
                     }
