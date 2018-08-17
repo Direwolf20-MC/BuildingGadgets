@@ -309,7 +309,7 @@ public class CopyPasteTool extends GenericGadget {
             setStartPos(stack, pos);
         }
         if (getStartPos(stack) != null && getEndPos(stack) != null) {
-            findBlocks(world, getStartPos(stack), getEndPos(stack), stack);
+            findBlocks(world, getStartPos(stack), getEndPos(stack), stack, player);
             ArrayList<BlockMap> blockMapList = getBlockMapList(stack, getStartPos(stack));
             long time = System.nanoTime();
             PasteToolBufferBuilder.addMapToBuffer(blockMapList);
@@ -319,7 +319,7 @@ public class CopyPasteTool extends GenericGadget {
         }
     }
 
-    public void findBlocks(World world, BlockPos start, BlockPos end, ItemStack stack) {
+    public void findBlocks(World world, BlockPos start, BlockPos end, ItemStack stack, EntityPlayer player) {
         resetBlockMap(stack);
         setLastBuild(stack, null);
 
@@ -344,7 +344,8 @@ public class CopyPasteTool extends GenericGadget {
                     BlockPos tempPos = new BlockPos(x, y, z);
                     IBlockState tempState = world.getBlockState(tempPos);
                     if (tempState != Blocks.AIR.getDefaultState() && world.getTileEntity(tempPos) == null && !tempState.getBlock().getMaterial(tempState).isLiquid() && !BlacklistBlocks.checkBlacklist(tempState.getBlock())) {
-                        BlockMap tempMap = new BlockMap(tempPos, tempState);
+                        IBlockState assignState = InventoryManipulation.getSpecificStates(tempState, world, player, tempPos);
+                        BlockMap tempMap = new BlockMap(tempPos, assignState);
                         addBlockToMap(stack, tempMap);
                     }
                 }
@@ -365,13 +366,17 @@ public class CopyPasteTool extends GenericGadget {
         }
         for (BlockMap blockMap : blockMapList) {
             if (world.getBlockState(blockMap.pos) != Blocks.AIR.getDefaultState()) {
-                world.spawnEntity(new BlockBuildEntity(world, blockMap.pos, player, blockMap.state, 3, blockMap.state, false));
+                //world.spawnEntity(new BlockBuildEntity(world, blockMap.pos, player, blockMap.state, 3, blockMap.state, false));
             } else {
                 world.spawnEntity(new BlockBuildEntity(world, blockMap.pos, player, blockMap.state, 1, blockMap.state, false));
             }
         }
         setAnchor(stack, null);
         System.out.printf("Built %d Blocks in %.2f ms%n", blockMapList.size(), (System.nanoTime() - time) * 1e-6);
+    }
+
+    public static void placeBlock(World world, BlockPos pos, EntityPlayer player, IBlockState state) {
+
     }
 
     public static void anchorBlocks(EntityPlayer player, ItemStack stack) {
