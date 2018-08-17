@@ -25,7 +25,7 @@ import java.util.stream.Stream;
 
 public class InventoryManipulation {
     private static final Set<IProperty> safeProperties = Stream.of(BlockSlab.HALF, BlockStairs.HALF, BlockLog.LOG_AXIS,
-            BlockDirectional.FACING, BlockStairs.FACING, BlockTrapDoor.HALF, BlockStairs.SHAPE).collect(Collectors.toSet());
+            BlockDirectional.FACING, BlockStairs.FACING, BlockTrapDoor.HALF, BlockTorch.FACING, BlockStairs.SHAPE).collect(Collectors.toSet());
 
     public static boolean giveItem(ItemStack itemStack, EntityPlayer player) {
         if (player.capabilities.isCreativeMode) {
@@ -258,6 +258,14 @@ public class InventoryManipulation {
                 placeState = placeState.withProperty(prop, originalState.getValue(prop));
             }
         }
+        return placeState;
+
+    }
+
+    public static IBlockState getBaseState(IBlockState originalState, World world, EntityPlayer player, BlockPos pos) {
+        IBlockState placeState = Blocks.AIR.getDefaultState();
+        Block block = originalState.getBlock();
+        placeState = originalState.getBlock().getDefaultState();
         return placeState;
 
     }

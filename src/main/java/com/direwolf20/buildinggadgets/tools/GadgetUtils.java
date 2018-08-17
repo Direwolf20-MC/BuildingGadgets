@@ -321,4 +321,17 @@ public class GadgetUtils {
         }
         return NBTUtil.getPosFromTag(posTag);
     }
+
+    public static NBTTagCompound stateToCompound(IBlockState state) {
+        NBTTagCompound tagCompound = new NBTTagCompound();
+        NBTUtil.writeBlockState(tagCompound, state);
+        return tagCompound;
+    }
+
+    public static IBlockState compoundToState(NBTTagCompound tagCompound) {
+        if (tagCompound == null) {
+            return null;
+        }
+        return NBTUtil.readBlockState(tagCompound);
+    }
 }
