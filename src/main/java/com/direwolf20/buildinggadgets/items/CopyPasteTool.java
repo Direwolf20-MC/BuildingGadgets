@@ -231,7 +231,7 @@ public class CopyPasteTool extends GenericGadget {
 
     @Override
     public void addInformation(ItemStack stack, World player, List<String> list, ITooltipFlag b) {
-        long time = System.nanoTime();
+        //long time = System.nanoTime();
         //Add tool information to the tooltip
         super.addInformation(stack, player, list, b);
         list.add(TextFormatting.AQUA + I18n.format("tooltip.gadget.mode") + ": " + getToolMode(stack));
@@ -292,7 +292,7 @@ public class CopyPasteTool extends GenericGadget {
                     list.add(TextFormatting.RED + I18n.format(entry.getKey() + ": " + entry.getValue() + " (Missing: " + (entry.getValue() - itemCount) + ")"));
                 }
             }
-            System.out.printf("Counted %d Blocks in %.2f ms%n", blockMapList.size(), (System.nanoTime() - time) * 1e-6);
+            //System.out.printf("Counted %d Blocks in %.2f ms%n", blockMapList.size(), (System.nanoTime() - time) * 1e-6);
         }
     }
 
