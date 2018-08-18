@@ -2,6 +2,8 @@ package com.direwolf20.buildinggadgets.items;
 
 import com.direwolf20.buildinggadgets.BuildingGadgets;
 import com.direwolf20.buildinggadgets.Config;
+import com.direwolf20.buildinggadgets.ModItems;
+import com.direwolf20.buildinggadgets.blocks.ConstructionBlock;
 import com.direwolf20.buildinggadgets.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.tools.*;
 import io.netty.buffer.ByteBuf;
@@ -13,23 +15,25 @@ import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
+import net.minecraft.init.Enchantments;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.util.BlockSnapshot;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
+import net.minecraftforge.event.ForgeEventFactory;
+import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import org.lwjgl.input.Keyboard;
 
@@ -38,6 +42,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.direwolf20.buildinggadgets.tools.GadgetUtils.useEnergy;
 import static com.direwolf20.buildinggadgets.tools.GadgetUtils.withSuffix;
 
 public class CopyPasteTool extends GenericGadget {
@@ -284,13 +289,18 @@ public class CopyPasteTool extends GenericGadget {
                 int itemCount = InventoryManipulation.countItem(itemStack, Minecraft.getMinecraft().player);
                 hasMap.put(stackNames.get(entry.getKey()), itemCount);
             }
+            int totalMissing = 0;
             for (Map.Entry<String, Integer> entry : stringCount.entrySet()) {
                 int itemCount = hasMap.get(entry.getKey());
                 if (itemCount >= entry.getValue()) {
                     list.add(TextFormatting.GREEN + I18n.format(entry.getKey() + ": " + entry.getValue()));
                 } else {
                     list.add(TextFormatting.RED + I18n.format(entry.getKey() + ": " + entry.getValue() + " (Missing: " + (entry.getValue() - itemCount) + ")"));
+                    totalMissing = totalMissing + (entry.getValue() - itemCount);
                 }
+            }
+            if (totalMissing > 0) {
+                list.add(TextFormatting.AQUA + I18n.format("message.gadget.pasterequired" + ": " + totalMissing));
             }
             //System.out.printf("Counted %d Blocks in %.2f ms%n", blockMapList.size(), (System.nanoTime() - time) * 1e-6);
         }
@@ -386,7 +396,8 @@ public class CopyPasteTool extends GenericGadget {
                     IBlockState tempState = world.getBlockState(tempPos);
                     if (tempState != Blocks.AIR.getDefaultState() && world.getTileEntity(tempPos) == null && !tempState.getBlock().getMaterial(tempState).isLiquid() && !BlacklistBlocks.checkBlacklist(tempState.getBlock())) {
                         IBlockState assignState = InventoryManipulation.getSpecificStates(tempState, world, player, tempPos);
-                        BlockMap tempMap = new BlockMap(tempPos, assignState);
+                        IBlockState actualState = assignState.getBlock().getActualState(assignState, world, tempPos);
+                        BlockMap tempMap = new BlockMap(tempPos, actualState);
                         addBlockToMap(stack, tempMap, world, tempPos, player);
                     }
                 }
@@ -407,17 +418,79 @@ public class CopyPasteTool extends GenericGadget {
             setLastBuild(stack, anchorPos);
         }
         for (BlockMap blockMap : blockMapList) {
-            if (world.getBlockState(blockMap.pos) != Blocks.AIR.getDefaultState()) {
+            placeBlock(world, blockMap.pos, player, blockMap.state);
+            /*if (world.getBlockState(blockMap.pos) != Blocks.AIR.getDefaultState()) {
                 //world.spawnEntity(new BlockBuildEntity(world, blockMap.pos, player, blockMap.state, 3, blockMap.state, false));
             } else {
-                world.spawnEntity(new BlockBuildEntity(world, blockMap.pos, player, blockMap.state, 1, blockMap.state, false));
-            }
+
+            }*/
         }
         setAnchor(stack, null);
         System.out.printf("Built %d Blocks in %.2f ms%n", blockMapList.size(), (System.nanoTime() - time) * 1e-6);
     }
 
     public static void placeBlock(World world, BlockPos pos, EntityPlayer player, IBlockState state) {
+        if (!world.getBlockState(pos).getBlock().isReplaceable(world, pos)) return;
+        ItemStack heldItem = player.getHeldItemMainhand();
+        if (!(heldItem.getItem() instanceof CopyPasteTool)) {
+            heldItem = player.getHeldItemOffhand();
+            if (!(heldItem.getItem() instanceof CopyPasteTool)) {
+                return;
+            }
+        }
+        Map<IBlockState, UniqueItem> IntStackMap = getBlockMapIntState(heldItem).getIntStackMap();
+        UniqueItem uniqueItem = IntStackMap.get(state);
+        if (uniqueItem == null) return; //This shouldn't happen I hope!
+        ItemStack itemStack = new ItemStack(uniqueItem.item, 1, uniqueItem.meta);
+        NonNullList<ItemStack> drops = NonNullList.create();
+        state.getBlock().getDrops(drops, world, pos, state, 0);
+        int neededItems = 0;
+        for (ItemStack drop : drops) {
+            if (drop.getItem().equals(itemStack.getItem())) {
+                neededItems++;
+            }
+        }
+        if (neededItems == 0) {
+            neededItems = 1;
+        }
+        if (!world.isBlockModifiable(player, pos)) {
+            return;
+        }
+        BlockSnapshot blockSnapshot = BlockSnapshot.getBlockSnapshot(world, pos);
+        if (ForgeEventFactory.onPlayerBlockPlace(player, blockSnapshot, EnumFacing.UP, EnumHand.MAIN_HAND).isCanceled()) {
+            return;
+        }
+        ItemStack constructionPaste = new ItemStack(ModItems.constructionPaste);
+        boolean useConstructionPaste = false;
+        if (InventoryManipulation.countItem(itemStack, player) < neededItems) {
+            //if (InventoryManipulation.countItem(constructionStack, player) == 0) {
+            if (InventoryManipulation.countPaste(player) < neededItems) {
+                return;
+            } else {
+                itemStack = constructionPaste.copy();
+                useConstructionPaste = true;
+            }
+        }
+        if (Config.poweredByFE) {
+            if (!useEnergy(heldItem, Config.energyCostBuilder, player)) {
+                return;
+            }
+        } else {
+            if (heldItem.getItemDamage() >= heldItem.getMaxDamage()) {
+                return;
+            } else {
+                heldItem.damageItem(1, player);
+            }
+        }
+        boolean useItemSuccess;
+        if (useConstructionPaste) {
+            useItemSuccess = InventoryManipulation.usePaste(player, neededItems);
+        } else {
+            useItemSuccess = InventoryManipulation.useItem(itemStack, player, neededItems);
+        }
+        if (useItemSuccess) {
+            world.spawnEntity(new BlockBuildEntity(world, pos, player, state, 1, state, useConstructionPaste));
+        }
 
     }
 
@@ -447,12 +520,22 @@ public class CopyPasteTool extends GenericGadget {
         if (startPos == null) {
             return;
         }
+        ItemStack silkTool = heldItem.copy(); //Setup a Silk Touch version of the tool so we can return stone instead of cobblestone, etc.
+        silkTool.addEnchantment(Enchantments.SILK_TOUCH, 1);
         ArrayList<BlockMap> blockMapList = getBlockMapList(heldItem, startPos);
         for (BlockMap blockMap : blockMapList) {
-            if (world.getBlockState(blockMap.pos) == blockMap.state) {
-                world.spawnEntity(new BlockBuildEntity(world, blockMap.pos, player, blockMap.state, 2, blockMap.state, false));
+            double distance = blockMap.pos.getDistance(player.getPosition().getX(), player.getPosition().getY(), player.getPosition().getZ());
+            //boolean sameDim = (player.dimension == dimension);
+            IBlockState currentBlock = world.getBlockState(blockMap.pos);
+            BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(world, blockMap.pos, currentBlock, player);
+            boolean cancelled = MinecraftForge.EVENT_BUS.post(e);
+            if (distance < 64 && !cancelled) { //Don't allow us to undo a block while its still being placed or too far away
+                if (currentBlock == blockMap.state || currentBlock.getBlock() instanceof ConstructionBlock) {
+                    currentBlock.getBlock().harvestBlock(world, player, blockMap.pos, currentBlock, world.getTileEntity(blockMap.pos), silkTool);
+                    world.spawnEntity(new BlockBuildEntity(world, blockMap.pos, player, currentBlock, 2, currentBlock, false));
+                }
             }
+            System.out.printf("Undid %d Blocks in %.2f ms%n", blockMapList.size(), (System.nanoTime() - time) * 1e-6);
         }
-        System.out.printf("Undid %d Blocks in %.2f ms%n", blockMapList.size(), (System.nanoTime() - time) * 1e-6);
     }
 }

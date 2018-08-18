@@ -1,7 +1,6 @@
 package com.direwolf20.buildinggadgets.eventhandlers;
 
-import com.direwolf20.buildinggadgets.items.BuildingTool;
-import com.direwolf20.buildinggadgets.items.ExchangerTool;
+import com.direwolf20.buildinggadgets.items.GenericGadget;
 import com.direwolf20.buildinggadgets.tools.InventoryManipulation;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -20,14 +19,14 @@ public class BreakEventHandler {
             return;
         }
         ItemStack heldItem = player.getHeldItemMainhand();
-        if (!(heldItem.getItem() instanceof ExchangerTool) && !(heldItem.getItem() instanceof BuildingTool)) {
+        if (!(heldItem.getItem() instanceof GenericGadget)) {
             heldItem = player.getHeldItemOffhand();
-            if (!(heldItem.getItem() instanceof ExchangerTool) && !(heldItem.getItem() instanceof BuildingTool)) {
+            if (!(heldItem.getItem() instanceof GenericGadget)) {
                 return;
             }
         }
         List<ItemStack> drops = event.getDrops();
-        if ((heldItem.getItem() instanceof ExchangerTool) || (heldItem.getItem() instanceof BuildingTool)) {
+        if ((heldItem.getItem() instanceof GenericGadget)) {
             drops.removeIf(item -> InventoryManipulation.giveItem(item, player));
         }
 
