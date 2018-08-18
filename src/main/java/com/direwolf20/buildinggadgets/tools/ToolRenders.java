@@ -359,7 +359,7 @@ public class ToolRenders {
         long time = System.nanoTime();
         PasteToolBufferBuilder.draw(player, doubleX, doubleY, doubleZ, startPos);
         //System.out.println("Drew " + blockMapList.size() + " blocks in " + (System.nanoTime() - time));
-        System.out.printf("Drew %d blocks in %.2f ms%n", blockMapList.size(), (System.nanoTime() - time) * 1e-6);
+        //System.out.printf("Drew %d blocks in %.2f ms%n", blockMapList.size(), (System.nanoTime() - time) * 1e-6);
         GlStateManager.popMatrix();
 
                 /*for (BlockPos coordinate : coordinates) { //Now run through the UNSORTED list of coords, to show which blocks won't place if you don't have enough of them.
