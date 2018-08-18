@@ -36,7 +36,7 @@ public class PasteToolBufferBuilder {
         for (BlockMap blockMap : sortedMapList) {
             IBlockState renderBlockState = blockMap.state;
             IBakedModel model = dispatcher.getModelForState(renderBlockState);
-            dispatcher.getBlockModelRenderer().renderModelFlat(Minecraft.getMinecraft().world, model, renderBlockState, new BlockPos(blockMap.xOffset, blockMap.yOffset, blockMap.zOffset), bufferBuilder, true, 0L);
+            dispatcher.getBlockModelRenderer().renderModelFlat(Minecraft.getMinecraft().world, model, renderBlockState, new BlockPos(blockMap.xOffset, blockMap.yOffset, blockMap.zOffset), bufferBuilder, false, 0L);
         }
         bufferBuilder.finishDrawing();
     }
