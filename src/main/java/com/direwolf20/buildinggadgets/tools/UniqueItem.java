@@ -10,4 +10,8 @@ public class UniqueItem {
         item = i;
         meta = m;
     }
+
+    public boolean equals(UniqueItem uniqueItem) {
+        return (uniqueItem.item == item && uniqueItem.meta == meta);
+    }
 }

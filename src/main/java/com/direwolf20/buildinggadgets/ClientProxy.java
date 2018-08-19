@@ -5,6 +5,7 @@ import com.direwolf20.buildinggadgets.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.entities.BlockBuildEntityRender;
 import com.direwolf20.buildinggadgets.entities.ConstructionBlockEntity;
 import com.direwolf20.buildinggadgets.entities.ConstructionBlockEntityRender;
+import com.direwolf20.buildinggadgets.eventhandlers.TooltipRender;
 import com.direwolf20.buildinggadgets.items.BuildingTool;
 import com.direwolf20.buildinggadgets.items.CopyPasteTool;
 import com.direwolf20.buildinggadgets.items.ExchangerTool;
@@ -34,6 +35,7 @@ public class ClientProxy extends CommonProxy {
     public void preInit(FMLPreInitializationEvent e) {
         ModEntities.initModels();
         ModelLoaderRegistry.registerLoader(new BakedModelLoader());
+        MinecraftForge.EVENT_BUS.register(TooltipRender.class);
         super.preInit(e);
     }
 
