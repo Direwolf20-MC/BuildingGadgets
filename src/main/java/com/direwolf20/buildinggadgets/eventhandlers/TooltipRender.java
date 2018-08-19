@@ -16,8 +16,8 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderItem;
 import net.minecraft.init.Items;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.client.event.RenderTooltipEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -25,17 +25,11 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.opengl.GL11;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class TooltipRender {
 
     private static final int STACKS_PER_LINE = 8;
-
-    private static Map<UniqueItem, Integer> itemCountMapCache = new HashMap<UniqueItem, Integer>();
-    private static Map<ItemStack, Integer> itemStackCountCache = new HashMap<ItemStack, Integer>();
 
     @SideOnly(Side.CLIENT)
     public static void tooltipIfShift(List<String> tooltip, Runnable r) {
@@ -77,44 +71,22 @@ public class TooltipRender {
         ItemStack stack = event.getStack();
         if (stack.getItem() instanceof CopyPasteTool && GuiScreen.isShiftKeyDown()) {
             Map<UniqueItem, Integer> itemCountMap = makeRequiredList(stack); //Create a new UniqueItem->Count map
-            boolean sameAsCache = true;
-            //Compare the new map with the cache (Theres probably a smarter way to do this...)
-            if (itemCountMapCache.isEmpty()) {
-                itemCountMapCache.putAll(itemCountMap);
-                sameAsCache = false;
-            } else {
-                for (Map.Entry<UniqueItem, Integer> entry : itemCountMap.entrySet()) {
-                    boolean foundInCache = false;
-                    for (Map.Entry<UniqueItem, Integer> entry2 : itemCountMapCache.entrySet()) {
-                        if (entry2.getKey().equals(entry.getKey())) {
-                            if (entry2.getValue().equals(entry.getValue())) {
-                                foundInCache = true;
-                                break;
-                            }
-                        }
-                    }
-                    if (!foundInCache) {
-                        sameAsCache = false;
-                        break;
-                    }
-                }
-            }
-            //If the new map differs from the cache, build a new ItemStack map and store it in the cache
-            //We can't build a new itemStack map every time we draw because if we do, it will redraw in random order every time
-            //Another option would probably have been to sort the lists or something
-            //@Todo sort instead -- it'll look nicer.
-            if (!sameAsCache) {
-                itemCountMapCache.clear();
-                itemStackCountCache.clear();
-                itemCountMapCache.putAll(itemCountMap);
-                for (Map.Entry<UniqueItem, Integer> entry : itemCountMapCache.entrySet()) {
-                    ItemStack itemStack = new ItemStack(entry.getKey().item, 1, entry.getKey().meta);
-                    itemStackCountCache.put(itemStack, entry.getValue());
-                }
-            }
 
+            //Create an ItemStack -> Integer Map
+            Map<ItemStack, Integer> itemStackCount = new HashMap<ItemStack, Integer>();
+            for (Map.Entry<UniqueItem, Integer> entry : itemCountMap.entrySet()) {
+                ItemStack itemStack = new ItemStack(entry.getKey().item, 1, entry.getKey().meta);
+                itemStackCount.put(itemStack, entry.getValue());
+            }
+            // Sort the ItemStack -> Integer map, first by Required Items, then ItemID, then Meta
+            List<Map.Entry<ItemStack, Integer>> list = new ArrayList<>(itemStackCount.entrySet());
+            Comparator<Map.Entry<ItemStack, Integer>> comparator = Comparator.comparing(entry -> entry.getValue());
+            comparator = comparator.reversed();
+            comparator = comparator.thenComparing(Comparator.comparing(entry -> Item.getIdFromItem(entry.getKey().getItem())));
+            comparator = comparator.thenComparing(Comparator.comparing(entry -> entry.getKey().getMetadata()));
+            list.sort(comparator);
 
-            int count = itemStackCountCache.size();
+            int count = itemStackCount.size();
 
             int bx = event.getX();
             int by = event.getY();
@@ -136,7 +108,7 @@ public class TooltipRender {
 
             int j = 0;
             //Look through all the ItemStacks and draw each one in the specified X/Y position
-            for (Map.Entry<ItemStack, Integer> entry : itemStackCountCache.entrySet()) {
+            for (Map.Entry<ItemStack, Integer> entry : list) {
                 int hasAmt = InventoryManipulation.countItem(entry.getKey(), Minecraft.getMinecraft().player);
                 int x = bx + (j % STACKS_PER_LINE) * 18;
                 int y = by + (j / STACKS_PER_LINE) * 20;
@@ -154,7 +126,8 @@ public class TooltipRender {
         net.minecraft.client.renderer.RenderHelper.enableGUIStandardItemLighting();
         render.renderItemIntoGUI(itemStack, x, y);
 
-        String s1 = count == Integer.MAX_VALUE ? "\u221E" : TextFormatting.BOLD + Integer.toString((int) ((float) req));
+        //String s1 = count == Integer.MAX_VALUE ? "\u221E" : TextFormatting.BOLD + Integer.toString((int) ((float) req));
+        String s1 = count == Integer.MAX_VALUE ? "\u221E" : Integer.toString((int) ((float) req));
         int w1 = mc.fontRenderer.getStringWidth(s1);
         int color = 0xFFFFFF;
 
@@ -176,7 +149,8 @@ public class TooltipRender {
             }*/
             if (count < req) {
                 String fs = Integer.toString(req - count);
-                String s2 = TextFormatting.BOLD + "(" + fs + ")";
+                //String s2 = TextFormatting.BOLD + "(" + fs + ")";
+                String s2 = "(" + fs + ")";
                 int w2 = mc.fontRenderer.getStringWidth(s2);
 
                 GlStateManager.pushMatrix();
