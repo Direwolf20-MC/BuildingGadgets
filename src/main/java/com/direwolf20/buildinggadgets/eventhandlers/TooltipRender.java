@@ -1,5 +1,10 @@
 package com.direwolf20.buildinggadgets.eventhandlers;
 
+/**
+ * This class was adapted from code written by Vazkii
+ * Thanks Vazkii!!
+ */
+
 import com.direwolf20.buildinggadgets.items.CopyPasteTool;
 import com.direwolf20.buildinggadgets.tools.BlockMap;
 import com.direwolf20.buildinggadgets.tools.InventoryManipulation;
@@ -10,8 +15,7 @@ import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderItem;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.item.Item;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.client.event.RenderTooltipEvent;
@@ -42,24 +46,15 @@ public class TooltipRender {
 
     @SubscribeEvent
     public static void onMakeTooltip(ItemTooltipEvent event) {
+        //This method extends the tooltip box size to fit the item's we will render in onDrawTooltip
+
         Minecraft mc = Minecraft.getMinecraft();
         ItemStack stack = event.getItemStack();
         List<String> tooltip = event.getToolTip();
         if (stack.getItem() instanceof CopyPasteTool) {
-            //ReagentList list = ReagentHandler.getReagents(stack);
-            /*Map<UniqueItem, Integer> itemCountMap = makeRequiredList(stack);
-            if (!itemCountMap.equals(itemCountMapCache)) {
-                itemCountMapCache = itemCountMap;
-                itemStackCountCache.clear();
-                for (Map.Entry<UniqueItem, Integer> entry : itemCountMapCache.entrySet()) {
-                    ItemStack itemStack = new ItemStack(entry.getKey().item, 1, entry.getKey().meta);
-                    itemStackCountCache.put(itemStack, entry.getValue());
-                }
-            }*/
-            if (itemStackCountCache.isEmpty()) {
-                makeRequiredList(stack);
-            }
-            int count = itemStackCountCache.size();
+            Map<UniqueItem, Integer> itemCountMap = makeRequiredList(stack);
+
+            int count = itemCountMap.size();
             //boolean creative = ((IReagentHolder) stack.getItem()).isCreativeReagentHolder(stack);
 
             if (count > 0)
@@ -70,7 +65,7 @@ public class TooltipRender {
                     while (mc.fontRenderer.getStringWidth(spaces) < width)
                         spaces += " ";
 
-                    for (int i = 0; i < lines; i++)
+                    for (int j = 0; j < lines; j++)
                         tooltip.add(spaces);
                 });
         }
@@ -78,25 +73,48 @@ public class TooltipRender {
 
     @SubscribeEvent
     public static void onDrawTooltip(RenderTooltipEvent.PostText event) {
-        Minecraft mc = Minecraft.getMinecraft();
+        //This method will draw items on the tooltip
         ItemStack stack = event.getStack();
         if (stack.getItem() instanceof CopyPasteTool && GuiScreen.isShiftKeyDown()) {
-            /*Map<UniqueItem, Integer> itemCountMap = makeRequiredList(stack);
-            if (!itemCountMap.equals(itemCountMapCache)) {
-                itemCountMapCache = itemCountMap;
+            Map<UniqueItem, Integer> itemCountMap = makeRequiredList(stack); //Create a new UniqueItem->Count map
+            boolean sameAsCache = true;
+            //Compare the new map with the cache (Theres probably a smarter way to do this...)
+            if (itemCountMapCache.isEmpty()) {
+                itemCountMapCache.putAll(itemCountMap);
+                sameAsCache = false;
+            } else {
+                for (Map.Entry<UniqueItem, Integer> entry : itemCountMap.entrySet()) {
+                    boolean foundInCache = false;
+                    for (Map.Entry<UniqueItem, Integer> entry2 : itemCountMapCache.entrySet()) {
+                        if (entry2.getKey().equals(entry.getKey())) {
+                            if (entry2.getValue().equals(entry.getValue())) {
+                                foundInCache = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (!foundInCache) {
+                        sameAsCache = false;
+                        break;
+                    }
+                }
+            }
+            //If the new map differs from the cache, build a new ItemStack map and store it in the cache
+            //We can't build a new itemStack map every time we draw because if we do, it will redraw in random order every time
+            //Another option would probably have been to sort the lists or something
+            //@Todo sort instead -- it'll look nicer.
+            if (!sameAsCache) {
+                itemCountMapCache.clear();
                 itemStackCountCache.clear();
+                itemCountMapCache.putAll(itemCountMap);
                 for (Map.Entry<UniqueItem, Integer> entry : itemCountMapCache.entrySet()) {
                     ItemStack itemStack = new ItemStack(entry.getKey().item, 1, entry.getKey().meta);
                     itemStackCountCache.put(itemStack, entry.getValue());
                 }
-            }*/
-            if (itemStackCountCache.isEmpty()) {
-                makeRequiredList(stack);
             }
-            int count = itemStackCountCache.size();
 
-            //List<ReagentStack> stacks = new ArrayList(list.stacks);
-            //Collections.sort(stacks);
+
+            int count = itemStackCountCache.size();
 
             int bx = event.getX();
             int by = event.getY();
@@ -116,20 +134,18 @@ public class TooltipRender {
             GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
             Gui.drawRect(bx, by, bx + width, by + height, 0x55000000);
 
-            //for(int i = 0; i < stacks.size(); i++) {
-            int i = 0;
+            int j = 0;
+            //Look through all the ItemStacks and draw each one in the specified X/Y position
             for (Map.Entry<ItemStack, Integer> entry : itemStackCountCache.entrySet()) {
-                i++;
                 int hasAmt = InventoryManipulation.countItem(entry.getKey(), Minecraft.getMinecraft().player);
-                //ReagentStack rstack = stacks.get(i);
-                int x = bx + (i % STACKS_PER_LINE) * 18;
-                int y = by + (i / STACKS_PER_LINE) * 20;
+                int x = bx + (j % STACKS_PER_LINE) * 18;
+                int y = by + (j / STACKS_PER_LINE) * 20;
                 renderRequiredBlocks(entry.getKey(), x, y, hasAmt, entry.getValue());
+                j++;
             }
         }
     }
 
-    //private static void renderRequiredBlocks(ReagentStack rstack, int x, int y, int count, int req) {
     private static void renderRequiredBlocks(ItemStack itemStack, int x, int y, int count, int req) {
         Minecraft mc = Minecraft.getMinecraft();
         GlStateManager.disableDepth();
@@ -138,14 +154,9 @@ public class TooltipRender {
         net.minecraft.client.renderer.RenderHelper.enableGUIStandardItemLighting();
         render.renderItemIntoGUI(itemStack, x, y);
 
-        //if(count == -1)
-        //    count = rstack.trueCount;
-
-        String s1 = count == Integer.MAX_VALUE ? "\u221E" : TextFormatting.BOLD + Integer.toString((int) ((float) count));
+        String s1 = count == Integer.MAX_VALUE ? "\u221E" : TextFormatting.BOLD + Integer.toString((int) ((float) req));
         int w1 = mc.fontRenderer.getStringWidth(s1);
         int color = 0xFFFFFF;
-        if (count < req)
-            color = 0xFF0000;
 
         boolean hasReq = req > 0;
 
@@ -156,91 +167,49 @@ public class TooltipRender {
         GlStateManager.popMatrix();
 
         if (hasReq) {
-            if (count < req) {
+            //The commented out code will draw a red box around any items that you don't have enough of
+            //I personally didn't like it.
+            /*if (count < req) {
                 GlStateManager.enableDepth();
                 Gui.drawRect(x - 1, y - 1, x + 17, y + 17, 0x44FF0000);
                 GlStateManager.disableDepth();
+            }*/
+            if (count < req) {
+                String fs = Integer.toString(req - count);
+                String s2 = TextFormatting.BOLD + "(" + fs + ")";
+                int w2 = mc.fontRenderer.getStringWidth(s2);
+
+                GlStateManager.pushMatrix();
+                GlStateManager.translate(x + 8 - w2 / 4, y + 17, 0);
+                GlStateManager.scale(0.5F, 0.5F, 0.5F);
+                mc.fontRenderer.drawStringWithShadow(s2, 0, 0, 0xFF0000);
+                GlStateManager.popMatrix();
             }
-
-            //float f = (float) req / ReagentList.DEFAULT_MULTIPLICATION_FACTOR;
-            float f = (float) req;
-            String fs = (f - (int) f) == 0 ? Integer.toString((int) f) : Float.toString(f);
-            String s2 = TextFormatting.BOLD + "(" + fs + ")";
-            int w2 = mc.fontRenderer.getStringWidth(s2);
-
-            GlStateManager.pushMatrix();
-            GlStateManager.translate(x + 8 - w2 / 4, y + 17, 0);
-            GlStateManager.scale(0.5F, 0.5F, 0.5F);
-            mc.fontRenderer.drawStringWithShadow(s2, 0, 0, 0x999999);
-            GlStateManager.popMatrix();
         }
         GlStateManager.enableDepth();
     }
 
-    public static void makeRequiredList(ItemStack stack) {
-        //Map<UniqueItem, Integer> itemCountMap = new HashMap<UniqueItem, Integer>();
+    public static Map<UniqueItem, Integer> makeRequiredList(ItemStack stack) {
+        Map<UniqueItem, Integer> itemCountMap = new HashMap<UniqueItem, Integer>();
         Map<IBlockState, UniqueItem> IntStackMap = CopyPasteTool.getBlockMapIntState(stack).getIntStackMap();
         ArrayList<BlockMap> blockMapList = CopyPasteTool.getBlockMapList(stack, CopyPasteTool.getStartPos(stack));
-        Map<UniqueItem, String> stackNames = new HashMap<UniqueItem, String>();
-        //Map<String, Integer> stringCount = new HashMap<String, Integer>();
         for (BlockMap blockMap : blockMapList) {
             UniqueItem uniqueItem = IntStackMap.get(blockMap.state);
-            ItemStack itemStack = new ItemStack(uniqueItem.item, 1, uniqueItem.meta);
-            Item item = uniqueItem.item;
-            String name = "";
-            String domain = item.getRegistryName().getResourceDomain();
-            if (domain.equals("chisel")) {
-                List<String> extendedName = itemStack.getTooltip(Minecraft.getMinecraft().player, ITooltipFlag.TooltipFlags.NORMAL);
-                if (extendedName.size() > 1) {
-                    name = extendedName.get(1);
-                } else {
-                    name = itemStack.getDisplayName();
-                }
-            } else {
-                name = itemStack.getDisplayName();
-            }
-            if (name != "Air") {
+            if (uniqueItem.item != Items.AIR) {
                 boolean found = false;
-                for (Map.Entry<UniqueItem, Integer> entry : itemCountMapCache.entrySet()) {
-                    //if (entry.getKey().item == uniqueItem.item && entry.getKey().meta == uniqueItem.meta) {
+                for (Map.Entry<UniqueItem, Integer> entry : itemCountMap.entrySet()) {
                     if (entry.getKey().equals(uniqueItem)) {
-                        itemCountMapCache.put(entry.getKey(), itemCountMapCache.get(entry.getKey()) + 1);
-                        //stringCount.put(name, stringCount.get(name) + 1);
+                        itemCountMap.put(entry.getKey(), itemCountMap.get(entry.getKey()) + 1);
                         found = true;
                         break;
                     }
                 }
                 if (!found) {
-                    itemCountMapCache.put(uniqueItem, 1);
-                    stackNames.put(uniqueItem, name);
-                    //stringCount.put(name, 1);
+                    itemCountMap.put(uniqueItem, 1);
                 }
             }
         }
-        for (Map.Entry<UniqueItem, Integer> entry : itemCountMapCache.entrySet()) {
-            ItemStack itemStack = new ItemStack(entry.getKey().item, 1, entry.getKey().meta);
-            itemStackCountCache.put(itemStack, entry.getValue());
-        }
-        //return itemCountMapCache;
-        /*Map<String, Integer> hasMap = new HashMap<String, Integer>();
-        for (Map.Entry<UniqueItem, Integer> entry : itemCountMap.entrySet()) {
-            ItemStack itemStack = new ItemStack(entry.getKey().item, 1, entry.getKey().meta);
-            int itemCount = InventoryManipulation.countItem(itemStack, Minecraft.getMinecraft().player);
-            hasMap.put(stackNames.get(entry.getKey()), itemCount);
-        }
-        int totalMissing = 0;
-        for (Map.Entry<String, Integer> entry : stringCount.entrySet()) {
-            int itemCount = hasMap.get(entry.getKey());
-            if (itemCount >= entry.getValue()) {
-                //list.add(TextFormatting.GREEN + net.minecraft.client.resources.I18n.format(entry.getKey() + ": " + entry.getValue()));
-            } else {
-                //list.add(TextFormatting.RED + net.minecraft.client.resources.I18n.format(entry.getKey() + ": " + entry.getValue() + " (Missing: " + (entry.getValue() - itemCount) + ")"));
-                totalMissing = totalMissing + (entry.getValue() - itemCount);
-            }
-        }
-        if (totalMissing > 0) {
-            //list.add(TextFormatting.AQUA + net.minecraft.client.resources.I18n.format("message.gadget.pasterequired" + ": " + totalMissing));
-        }*/
+        return itemCountMap;
     }
 
 }

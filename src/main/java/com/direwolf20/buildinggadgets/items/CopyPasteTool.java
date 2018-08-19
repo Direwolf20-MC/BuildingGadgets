@@ -5,7 +5,6 @@ import com.direwolf20.buildinggadgets.Config;
 import com.direwolf20.buildinggadgets.ModItems;
 import com.direwolf20.buildinggadgets.blocks.ConstructionBlock;
 import com.direwolf20.buildinggadgets.entities.BlockBuildEntity;
-import com.direwolf20.buildinggadgets.eventhandlers.TooltipRender;
 import com.direwolf20.buildinggadgets.tools.*;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -350,12 +349,6 @@ public class CopyPasteTool extends GenericGadget {
                     buildBlockMap(world, getAnchor(stack).up(), stack, player);
                 }
             }
-        } else {
-            if (getToolMode(stack) == toolModes.Copy) {
-                if (getStartPos(stack) != null && getEndPos(stack) != null) {
-                    TooltipRender.makeRequiredList(stack);
-                }
-            }
         }
         return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);
     }
@@ -374,7 +367,6 @@ public class CopyPasteTool extends GenericGadget {
             System.out.printf("Copied %d Blocks to buffer in %.2f ms%n", blockMapList.size(), (System.nanoTime() - time) * 1e-6);
             //System.out.println("Copied " + blockMapList.size() + " blocks in: " + (System.currentTimeMillis() - time));
             player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.copied").getUnformattedComponentText()), true);
-            //TooltipRender.makeRequiredList(stack);
         }
     }
 
