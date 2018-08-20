@@ -353,6 +353,38 @@ public class CopyPasteTool extends GenericGadget {
         return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);
     }
 
+    public void rotateBlocks(ItemStack stack, World world, EntityPlayer player) {
+        ArrayList<BlockMap> blockMapList = new ArrayList<BlockMap>();
+        BlockPos startPos = getStartPos(stack);
+        blockMapList = getBlockMapList(stack, startPos);
+        resetBlockMap(stack);
+        for (BlockMap blockMap : blockMapList) {
+            BlockPos tempPos = blockMap.pos;
+
+            int px = (tempPos.getX() - startPos.getX());
+            //int py = (tempPos.getY() - startPos.getY());
+            int pz = (tempPos.getZ() - startPos.getZ());
+
+            //int nx = (px<0) ? pz : (pz*-1);
+            //int nz = (pz<0) ? (px*-1) : px;
+            int nx = -pz;
+            int nz = px;
+            //if (px < 0) nx = pz; else nx = (pz * -1);
+            //if (pz < 0) nz = (px *-1); else nz = px;
+
+            BlockPos newPos = new BlockPos(startPos.getX() + nx, tempPos.getY(), startPos.getZ() + nz);
+            IBlockState rotatedState = blockMap.state.withRotation(Rotation.CLOCKWISE_90);
+            BlockMap tempMap = new BlockMap(newPos, rotatedState);
+            addBlockToMap(stack, tempMap, world, newPos, player);
+        }
+        ArrayList<BlockMap> newBlockMapList = getBlockMapList(stack, getStartPos(stack));
+        long time = System.nanoTime();
+        PasteToolBufferBuilder.addMapToBuffer(newBlockMapList);
+        System.out.printf("Copied %d Blocks to buffer in %.2f ms%n", blockMapList.size(), (System.nanoTime() - time) * 1e-6);
+        //System.out.println("Copied " + blockMapList.size() + " blocks in: " + (System.currentTimeMillis() - time));
+        player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.rotated").getUnformattedComponentText()), true);
+    }
+
     public void copyBlocks(ItemStack stack, BlockPos pos, EntityPlayer player, World world) {
         if (player.isSneaking()) {
             setEndPos(stack, pos);
