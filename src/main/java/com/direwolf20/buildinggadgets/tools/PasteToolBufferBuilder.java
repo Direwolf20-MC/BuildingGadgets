@@ -22,11 +22,16 @@ import java.util.List;
 public class PasteToolBufferBuilder {
 
     private static ToolDireBuffer bufferBuilder = new ToolDireBuffer(2097152);
+    private static ToolDireBuffer bufferHighlightBuilder = new ToolDireBuffer(2097152);
     private static int counter = 0;
 
 
     public static ToolDireBuffer getBuffer() {
         return bufferBuilder;
+    }
+
+    public static ToolDireBuffer getHighlightBuffer() {
+        return bufferHighlightBuilder;
     }
 
     public static void addMapToBuffer(ArrayList<BlockMap> sortedMapList) {
@@ -39,6 +44,15 @@ public class PasteToolBufferBuilder {
             dispatcher.getBlockModelRenderer().renderModelFlat(Minecraft.getMinecraft().world, model, renderBlockState, new BlockPos(blockMap.xOffset, blockMap.yOffset, blockMap.zOffset), bufferBuilder, false, 0L);
         }
         bufferBuilder.finishDrawing();
+
+        /*IBlockState greenGlass = Blocks.STAINED_GLASS.getDefaultState().withProperty(COLOR, EnumDyeColor.CYAN);
+        IBakedModel glassModel = dispatcher.getModelForState(greenGlass);
+        bufferHighlightBuilder.reset();
+        bufferHighlightBuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
+        for (BlockMap blockMap : sortedMapList) {
+            dispatcher.getBlockModelRenderer().renderModelFlat(Minecraft.getMinecraft().world, glassModel, greenGlass, new BlockPos(blockMap.xOffset, blockMap.yOffset, blockMap.zOffset), bufferHighlightBuilder, false, 0L);
+        }
+        bufferHighlightBuilder.finishDrawing();*/
     }
 
 
@@ -64,6 +78,41 @@ public class PasteToolBufferBuilder {
             }
 
             GlStateManager.glDrawArrays(bufferBuilder.getDrawMode(), 0, bufferBuilder.getVertexCount());
+            int i1 = 0;
+
+            for (int j1 = list.size(); i1 < j1; ++i1) {
+                VertexFormatElement vertexformatelement1 = list.get(i1);
+                VertexFormatElement.EnumUsage vertexformatelement$enumusage1 = vertexformatelement1.getUsage();
+                int k1 = vertexformatelement1.getIndex();
+
+                // moved to VertexFormatElement.postDraw
+                vertexformatelement1.getUsage().postDraw(vertexformat, i1, i, bytebuffer);
+            }
+        }
+    }
+
+    public static void drawGlass(EntityPlayer player, double x, double y, double z, BlockPos startPos) {
+        long time = System.nanoTime();
+        bufferHighlightBuilder.sortVertexData((float) (x - startPos.getX()), (float) ((y + player.getEyeHeight()) - startPos.getY()), (float) (z - startPos.getZ()));
+        //System.out.printf("Sorted %d Vertexes in %.2f ms%n", bufferBuilder.getVertexCount(), (System.nanoTime() - time) * 1e-6);
+        if (bufferHighlightBuilder.getVertexCount() > 0) {
+            VertexFormat vertexformat = bufferHighlightBuilder.getVertexFormat();
+            int i = vertexformat.getNextOffset();
+            ByteBuffer bytebuffer = bufferHighlightBuilder.getByteBuffer();
+            List<VertexFormatElement> list = vertexformat.getElements();
+
+            for (int j = 0; j < list.size(); ++j) {
+                VertexFormatElement vertexformatelement = list.get(j);
+                VertexFormatElement.EnumUsage vertexformatelement$enumusage = vertexformatelement.getUsage();
+                int k = vertexformatelement.getType().getGlConstant();
+                int l = vertexformatelement.getIndex();
+                bytebuffer.position(vertexformat.getOffset(j));
+
+                // moved to VertexFormatElement.preDraw
+                vertexformatelement.getUsage().preDraw(vertexformat, j, i, bytebuffer);
+            }
+
+            GlStateManager.glDrawArrays(bufferHighlightBuilder.getDrawMode(), 0, bufferHighlightBuilder.getVertexCount());
             int i1 = 0;
 
             for (int j1 = list.size(); i1 < j1; ++i1) {
