@@ -9,6 +9,7 @@ import com.direwolf20.buildinggadgets.tools.*;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
@@ -251,6 +252,9 @@ public class CopyPasteTool extends GenericGadget {
         toolModes mode = toolModes.values()[modeInt];
         setToolMode(heldItem, mode);
         player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.toolmode").getUnformattedComponentText() + ": " + mode.name()), true);
+        if (getToolMode(heldItem) == toolModes.Copy) {
+            copyBlocks(heldItem, player, Minecraft.getMinecraft().world);
+        }
     }
 
     @Override
@@ -259,7 +263,7 @@ public class CopyPasteTool extends GenericGadget {
         player.setActiveHand(hand);
         if (!world.isRemote) {
             if (getToolMode(stack) == toolModes.Copy) {
-                copyBlocks(stack, pos, player, world);
+                copyBlocks(stack, player, world);
             } else if (getToolMode(stack) == toolModes.Paste) {
                 buildBlockMap(world, pos.up(), stack, player);
             }
@@ -284,7 +288,12 @@ public class CopyPasteTool extends GenericGadget {
                     setEndPos(stack, null);
                     return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);
                 }
-                copyBlocks(stack, pos, player, world);
+                if (player.isSneaking()) {
+                    setEndPos(stack, pos);
+                } else {
+                    setStartPos(stack, pos);
+                }
+                copyBlocks(stack, player, world);
             } else if (getToolMode(stack) == toolModes.Paste) {
                 if (getAnchor(stack) == null) {
                     BlockPos pos = VectorTools.getPosLookingAt(player);
@@ -299,6 +308,7 @@ public class CopyPasteTool extends GenericGadget {
     }
 
     public void rotateBlocks(ItemStack stack, World world, EntityPlayer player) {
+        if (!(getToolMode(stack) == toolModes.Paste)) return;
         ArrayList<BlockMap> blockMapList = new ArrayList<BlockMap>();
         BlockPos startPos = getStartPos(stack);
         blockMapList = getBlockMapList(stack, startPos);
@@ -324,12 +334,7 @@ public class CopyPasteTool extends GenericGadget {
         player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.rotated").getUnformattedComponentText()), true);
     }
 
-    public void copyBlocks(ItemStack stack, BlockPos pos, EntityPlayer player, World world) {
-        if (player.isSneaking()) {
-            setEndPos(stack, pos);
-        } else {
-            setStartPos(stack, pos);
-        }
+    public void copyBlocks(ItemStack stack, EntityPlayer player, World world) {
         if (getStartPos(stack) != null && getEndPos(stack) != null) {
             findBlocks(world, getStartPos(stack), getEndPos(stack), stack, player);
             ArrayList<BlockMap> blockMapList = getBlockMapList(stack, getStartPos(stack));
