@@ -346,8 +346,6 @@ public class BuildingModes {
             //System.out.println(dist);
             sortedList.add(rangeMap.get(dist));
         }
-        //System.out.println(unSortedList);
-        //System.out.println(sortedList);
         return sortedList;
     }
 

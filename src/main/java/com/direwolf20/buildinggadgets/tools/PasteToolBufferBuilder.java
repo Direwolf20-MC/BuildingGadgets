@@ -44,15 +44,6 @@ public class PasteToolBufferBuilder {
             dispatcher.getBlockModelRenderer().renderModelFlat(Minecraft.getMinecraft().world, model, renderBlockState, new BlockPos(blockMap.xOffset, blockMap.yOffset, blockMap.zOffset), bufferBuilder, false, 0L);
         }
         bufferBuilder.finishDrawing();
-
-        /*IBlockState greenGlass = Blocks.STAINED_GLASS.getDefaultState().withProperty(COLOR, EnumDyeColor.CYAN);
-        IBakedModel glassModel = dispatcher.getModelForState(greenGlass);
-        bufferHighlightBuilder.reset();
-        bufferHighlightBuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
-        for (BlockMap blockMap : sortedMapList) {
-            dispatcher.getBlockModelRenderer().renderModelFlat(Minecraft.getMinecraft().world, glassModel, greenGlass, new BlockPos(blockMap.xOffset, blockMap.yOffset, blockMap.zOffset), bufferHighlightBuilder, false, 0L);
-        }
-        bufferHighlightBuilder.finishDrawing();*/
     }
 
 

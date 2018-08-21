@@ -9,7 +9,6 @@ import com.direwolf20.buildinggadgets.tools.*;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
@@ -17,7 +16,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Enchantments;
 import net.minecraft.init.Items;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -35,10 +33,8 @@ import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
-import org.lwjgl.input.Keyboard;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -248,66 +244,6 @@ public class CopyPasteTool extends GenericGadget {
             IEnergyStorage energy = stack.getCapability(CapabilityEnergy.ENERGY, null);
             list.add(TextFormatting.WHITE + I18n.format("tooltip.gadget.energy") + ": " + withSuffix(energy.getEnergyStored()) + "/" + withSuffix(energy.getMaxEnergyStored()));
         }
-        if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT)) {
-            Map<UniqueItem, Integer> itemCountMap = new HashMap<UniqueItem, Integer>();
-            Map<IBlockState, UniqueItem> IntStackMap = getBlockMapIntState(stack).getIntStackMap();
-            ArrayList<BlockMap> blockMapList = getBlockMapList(stack, getStartPos(stack));
-            Map<UniqueItem, String> stackNames = new HashMap<UniqueItem, String>();
-            Map<String, Integer> stringCount = new HashMap<String, Integer>();
-            for (BlockMap blockMap : blockMapList) {
-                UniqueItem uniqueItem = IntStackMap.get(blockMap.state);
-                ItemStack itemStack = new ItemStack(uniqueItem.item, 1, uniqueItem.meta);
-                Item item = uniqueItem.item;
-                String name = "";
-                String domain = item.getRegistryName().getResourceDomain();
-                if (domain.equals("chisel")) {
-                    List<String> extendedName = itemStack.getTooltip(Minecraft.getMinecraft().player, ITooltipFlag.TooltipFlags.NORMAL);
-                    if (extendedName.size() > 1) {
-                        name = extendedName.get(1);
-                    } else {
-                        name = itemStack.getDisplayName();
-                    }
-                } else {
-                    name = itemStack.getDisplayName();
-                }
-                if (name != "Air") {
-                    boolean found = false;
-                    for (Map.Entry<UniqueItem, Integer> entry : itemCountMap.entrySet()) {
-                        if (entry.getKey().item == uniqueItem.item && entry.getKey().meta == uniqueItem.meta) {
-                            itemCountMap.put(entry.getKey(), itemCountMap.get(entry.getKey()) + 1);
-                            stringCount.put(name, stringCount.get(name) + 1);
-                            found = true;
-                            break;
-                        }
-                    }
-                    if (!found) {
-                        itemCountMap.put(uniqueItem, 1);
-                        stackNames.put(uniqueItem, name);
-                        stringCount.put(name, 1);
-                    }
-                }
-            }
-            Map<String, Integer> hasMap = new HashMap<String, Integer>();
-            for (Map.Entry<UniqueItem, Integer> entry : itemCountMap.entrySet()) {
-                ItemStack itemStack = new ItemStack(entry.getKey().item, 1, entry.getKey().meta);
-                int itemCount = InventoryManipulation.countItem(itemStack, Minecraft.getMinecraft().player);
-                hasMap.put(stackNames.get(entry.getKey()), itemCount);
-            }
-            int totalMissing = 0;
-            for (Map.Entry<String, Integer> entry : stringCount.entrySet()) {
-                int itemCount = hasMap.get(entry.getKey());
-                if (itemCount >= entry.getValue()) {
-                    //list.add(TextFormatting.GREEN + I18n.format(entry.getKey() + ": " + entry.getValue()));
-                } else {
-                    //list.add(TextFormatting.RED + I18n.format(entry.getKey() + ": " + entry.getValue() + " (Missing: " + (entry.getValue() - itemCount) + ")"));
-                    totalMissing = totalMissing + (entry.getValue() - itemCount);
-                }
-            }
-            if (totalMissing > 0) {
-                //list.add(TextFormatting.AQUA + I18n.format("message.gadget.pasterequired" + ": " + totalMissing));
-            }
-            //System.out.printf("Counted %d Blocks in %.2f ms%n", blockMapList.size(), (System.nanoTime() - time) * 1e-6);
-        }
     }
 
     public void setMode(EntityPlayer player, ItemStack heldItem, int modeInt) {
@@ -400,7 +336,6 @@ public class CopyPasteTool extends GenericGadget {
             long time = System.nanoTime();
             PasteToolBufferBuilder.addMapToBuffer(blockMapList);
             System.out.printf("Copied %d Blocks to buffer in %.2f ms%n", blockMapList.size(), (System.nanoTime() - time) * 1e-6);
-            //System.out.println("Copied " + blockMapList.size() + " blocks in: " + (System.currentTimeMillis() - time));
             player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.copied").getUnformattedComponentText()), true);
         }
     }
@@ -454,6 +389,9 @@ public class CopyPasteTool extends GenericGadget {
         }
         for (BlockMap blockMap : blockMapList) {
             placeBlock(world, blockMap.pos, player, blockMap.state);
+
+            //The below commented out line would allow the copy/paste tool to exchange blocks
+            //(Would need to add inventory manipulation to it....)
             /*if (world.getBlockState(blockMap.pos) != Blocks.AIR.getDefaultState()) {
                 //world.spawnEntity(new BlockBuildEntity(world, blockMap.pos, player, blockMap.state, 3, blockMap.state, false));
             } else {
