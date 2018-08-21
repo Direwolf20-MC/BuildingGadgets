@@ -9,7 +9,6 @@ import com.direwolf20.buildinggadgets.tools.*;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
@@ -68,6 +67,16 @@ public class CopyPasteTool extends GenericGadget {
         return GadgetUtils.getPOSFromNBT(stack, "anchor");
     }
 
+    public static Integer getCopyCounter(ItemStack stack) {
+        return stack.getTagCompound().getInteger("copycounter");
+    }
+
+    public static void incrementCopyCounter(ItemStack stack) {
+        NBTTagCompound tagCompound = stack.getTagCompound();
+        tagCompound.setInteger("copycounter", tagCompound.getInteger("copycounter") + 1);
+        stack.setTagCompound(tagCompound);
+    }
+
     public static void setLastBuild(ItemStack stack, BlockPos anchorPos, Integer dim) {
         GadgetUtils.writePOSToNBT(stack, anchorPos, "lastBuild", dim);
     }
@@ -96,7 +105,7 @@ public class CopyPasteTool extends GenericGadget {
         return GadgetUtils.getPOSFromNBT(stack, "endPos");
     }
 
-    public static void addBlockToMap(ItemStack stack, BlockMap map, World world, BlockPos pos, EntityPlayer player) {
+    public static void addBlockToMap(ItemStack stack, BlockMap map, BlockPos pos, EntityPlayer player) {
         NBTTagCompound tagCompound = stack.getTagCompound();
         if (tagCompound == null) {
             tagCompound = new NBTTagCompound();
@@ -127,10 +136,10 @@ public class CopyPasteTool extends GenericGadget {
         MapIntState.addToMap(state);
 
         ItemStack itemStack;
-        if (state.getBlock().canSilkHarvest(world, pos, state, player)) {
+        if (state.getBlock().canSilkHarvest(player.world, pos, state, player)) {
             itemStack = InventoryManipulation.getSilkTouchDrop(state);
         } else {
-            itemStack = state.getBlock().getPickBlock(state, null, world, pos, player);
+            itemStack = state.getBlock().getPickBlock(state, null, player.world, pos, player);
         }
         if (!itemStack.equals(Items.AIR)) {
             UniqueItem uniqueItem = new UniqueItem(itemStack.getItem(), itemStack.getMetadata());
@@ -253,7 +262,7 @@ public class CopyPasteTool extends GenericGadget {
         setToolMode(heldItem, mode);
         player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.toolmode").getUnformattedComponentText() + ": " + mode.name()), true);
         if (getToolMode(heldItem) == toolModes.Copy) {
-            copyBlocks(heldItem, player, Minecraft.getMinecraft().world);
+            copyBlocks(heldItem, player, player.world);
         }
     }
 
@@ -263,15 +272,22 @@ public class CopyPasteTool extends GenericGadget {
         player.setActiveHand(hand);
         if (!world.isRemote) {
             if (getToolMode(stack) == toolModes.Copy) {
+                if (player.isSneaking()) {
+                    setEndPos(stack, pos);
+                } else {
+                    setStartPos(stack, pos);
+                }
                 copyBlocks(stack, player, world);
             } else if (getToolMode(stack) == toolModes.Paste) {
                 buildBlockMap(world, pos.up(), stack, player);
             }
+            NBTTagCompound tagCompound = stack.getTagCompound();
+            ByteBuf buf = Unpooled.buffer(16);
+            ByteBufUtils.writeTag(buf, tagCompound);
+            System.out.println(getBlockMapList(stack, getStartPos(stack)).size() + " Blocks");
+            System.out.println(buf.readableBytes());
         }
-        NBTTagCompound tagCompound = stack.getTagCompound();
-        ByteBuf buf = Unpooled.buffer(16);
-        ByteBufUtils.writeTag(buf, tagCompound);
-        System.out.println(buf.readableBytes());
+
         return EnumActionResult.SUCCESS;
     }
 
@@ -307,7 +323,7 @@ public class CopyPasteTool extends GenericGadget {
         return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);
     }
 
-    public void rotateBlocks(ItemStack stack, World world, EntityPlayer player) {
+    public void rotateBlocks(ItemStack stack, EntityPlayer player) {
         if (!(getToolMode(stack) == toolModes.Paste)) return;
         ArrayList<BlockMap> blockMapList = new ArrayList<BlockMap>();
         BlockPos startPos = getStartPos(stack);
@@ -325,22 +341,20 @@ public class CopyPasteTool extends GenericGadget {
             BlockPos newPos = new BlockPos(startPos.getX() + nx, tempPos.getY(), startPos.getZ() + nz);
             IBlockState rotatedState = blockMap.state.withRotation(Rotation.CLOCKWISE_90);
             BlockMap tempMap = new BlockMap(newPos, rotatedState);
-            addBlockToMap(stack, tempMap, world, newPos, player);
+            addBlockToMap(stack, tempMap, newPos, player);
         }
         ArrayList<BlockMap> newBlockMapList = getBlockMapList(stack, getStartPos(stack));
         long time = System.nanoTime();
-        PasteToolBufferBuilder.addMapToBuffer(newBlockMapList);
-        System.out.printf("Copied %d Blocks to buffer in %.2f ms%n", blockMapList.size(), (System.nanoTime() - time) * 1e-6);
+        incrementCopyCounter(stack);
+        //System.out.printf("Copied %d Blocks to buffer in %.2f ms%n", blockMapList.size(), (System.nanoTime() - time) * 1e-6);
         player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.rotated").getUnformattedComponentText()), true);
     }
 
     public void copyBlocks(ItemStack stack, EntityPlayer player, World world) {
         if (getStartPos(stack) != null && getEndPos(stack) != null) {
             findBlocks(world, getStartPos(stack), getEndPos(stack), stack, player);
-            ArrayList<BlockMap> blockMapList = getBlockMapList(stack, getStartPos(stack));
-            long time = System.nanoTime();
-            PasteToolBufferBuilder.addMapToBuffer(blockMapList);
-            System.out.printf("Copied %d Blocks to buffer in %.2f ms%n", blockMapList.size(), (System.nanoTime() - time) * 1e-6);
+            incrementCopyCounter(stack);
+            //System.out.printf("Copied %d Blocks to buffer in %.2f ms%n", blockMapList.size(), (System.nanoTime() - time) * 1e-6);
             player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.copied").getUnformattedComponentText()), true);
         }
     }
@@ -373,12 +387,12 @@ public class CopyPasteTool extends GenericGadget {
                         IBlockState assignState = InventoryManipulation.getSpecificStates(tempState, world, player, tempPos);
                         IBlockState actualState = assignState.getBlock().getActualState(assignState, world, tempPos);
                         BlockMap tempMap = new BlockMap(tempPos, actualState);
-                        addBlockToMap(stack, tempMap, world, tempPos, player);
+                        addBlockToMap(stack, tempMap, tempPos, player);
                     }
                 }
             }
         }
-        System.out.println("Done");
+        //System.out.println("Done");
     }
 
     public void buildBlockMap(World world, BlockPos startPos, ItemStack stack, EntityPlayer player) {

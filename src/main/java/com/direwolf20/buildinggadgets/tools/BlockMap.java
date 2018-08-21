@@ -23,4 +23,8 @@ public class BlockMap {
         yOffset = y;
         zOffset = z;
     }
+
+    public boolean equals(BlockMap map) {
+        return (map.pos.equals(pos) && map.state.equals(state));
+    }
 }

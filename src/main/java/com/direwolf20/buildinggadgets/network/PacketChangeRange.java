@@ -5,7 +5,6 @@ import com.direwolf20.buildinggadgets.items.CopyPasteTool;
 import com.direwolf20.buildinggadgets.items.ExchangerTool;
 import com.direwolf20.buildinggadgets.items.GenericGadget;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumHand;
@@ -51,7 +50,7 @@ public class PacketChangeRange implements IMessage {
                 exchangerTool.rangeChange(playerEntity, heldItem);
             } else if (!heldItem.isEmpty() && heldItem.getItem() instanceof CopyPasteTool) {
                 CopyPasteTool copyPasteTool = (CopyPasteTool) (heldItem.getItem());
-                copyPasteTool.rotateBlocks(heldItem, Minecraft.getMinecraft().world, playerEntity);
+                copyPasteTool.rotateBlocks(heldItem, playerEntity);
             }
         }
     }

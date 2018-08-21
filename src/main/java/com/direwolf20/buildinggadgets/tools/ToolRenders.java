@@ -319,8 +319,10 @@ public class ToolRenders {
             //Save the current position that is being rendered
             GlStateManager.pushMatrix();
             ToolDireBuffer toolDireBuffer = PasteToolBufferBuilder.getBuffer();
-            if (toolDireBuffer.getVertexCount() == 0) {
-                PasteToolBufferBuilder.addMapToBuffer(blockMapList);
+            if (toolDireBuffer.getVertexCount() == 0 || CopyPasteTool.getCopyCounter(stack) != PasteToolBufferBuilder.getCopyCounter()) {
+                System.out.println("Rebuilding buffer");
+                PasteToolBufferBuilder.addMapToBuffer(stack);
+                PasteToolBufferBuilder.setCopyCounter(CopyPasteTool.getCopyCounter(stack));
             }
 
 
@@ -336,7 +338,7 @@ public class ToolRenders {
             long time = System.nanoTime();
             PasteToolBufferBuilder.draw(player, doubleX, doubleY, doubleZ, startPos);
             //System.out.println("Drew " + blockMapList.size() + " blocks in " + (System.nanoTime() - time));
-            System.out.printf("Drew %d blocks in %.2f ms%n", blockMapList.size(), (System.nanoTime() - time) * 1e-6);
+            //System.out.printf("Drew %d blocks in %.2f ms%n", blockMapList.size(), (System.nanoTime() - time) * 1e-6);
             GlStateManager.popMatrix();
             //Set blending back to the default mode
             GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
