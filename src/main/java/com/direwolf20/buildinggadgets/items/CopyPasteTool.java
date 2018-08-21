@@ -71,12 +71,16 @@ public class CopyPasteTool extends GenericGadget {
         return GadgetUtils.getPOSFromNBT(stack, "anchor");
     }
 
-    public static void setLastBuild(ItemStack stack, BlockPos anchorPos) {
-        GadgetUtils.writePOSToNBT(stack, anchorPos, "lastBuild");
+    public static void setLastBuild(ItemStack stack, BlockPos anchorPos, Integer dim) {
+        GadgetUtils.writePOSToNBT(stack, anchorPos, "lastBuild", dim);
     }
 
     public static BlockPos getLastBuild(ItemStack stack) {
         return GadgetUtils.getPOSFromNBT(stack, "lastBuild");
+    }
+
+    public static Integer getLastBuildDim(ItemStack stack) {
+        return GadgetUtils.getDIMFromNBT(stack, "lastBuild");
     }
 
     public static void setStartPos(ItemStack stack, BlockPos startPos) {
@@ -338,7 +342,12 @@ public class CopyPasteTool extends GenericGadget {
         if (!world.isRemote) {
             if (getToolMode(stack) == toolModes.Copy) {
                 BlockPos pos = VectorTools.getPosLookingAt(player);
-                if (pos == null) return new ActionResult<ItemStack>(EnumActionResult.FAIL, stack);
+                if (pos == null) {
+                    resetBlockMap(stack);
+                    setStartPos(stack, null);
+                    setEndPos(stack, null);
+                    return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);
+                }
                 copyBlocks(stack, pos, player, world);
             } else if (getToolMode(stack) == toolModes.Paste) {
                 if (getAnchor(stack) == null) {
@@ -398,7 +407,7 @@ public class CopyPasteTool extends GenericGadget {
 
     public void findBlocks(World world, BlockPos start, BlockPos end, ItemStack stack, EntityPlayer player) {
         resetBlockMap(stack);
-        setLastBuild(stack, null);
+        setLastBuild(stack, null, 0);
 
         int startX = start.getX();
         int startY = start.getY();
@@ -438,10 +447,10 @@ public class CopyPasteTool extends GenericGadget {
         ArrayList<BlockMap> blockMapList = new ArrayList<BlockMap>();
         if (anchorPos == null) {
             blockMapList = getBlockMapList(stack, startPos);
-            setLastBuild(stack, startPos);
+            setLastBuild(stack, startPos, player.dimension);
         } else {
             blockMapList = getBlockMapList(stack, anchorPos);
-            setLastBuild(stack, anchorPos);
+            setLastBuild(stack, anchorPos, player.dimension);
         }
         for (BlockMap blockMap : blockMapList) {
             placeBlock(world, blockMap.pos, player, blockMap.state);
@@ -546,20 +555,23 @@ public class CopyPasteTool extends GenericGadget {
         if (startPos == null) {
             return;
         }
+        Integer dimension = getLastBuildDim(heldItem);
         ItemStack silkTool = heldItem.copy(); //Setup a Silk Touch version of the tool so we can return stone instead of cobblestone, etc.
         silkTool.addEnchantment(Enchantments.SILK_TOUCH, 1);
         ArrayList<BlockMap> blockMapList = getBlockMapList(heldItem, startPos);
         for (BlockMap blockMap : blockMapList) {
             double distance = blockMap.pos.getDistance(player.getPosition().getX(), player.getPosition().getY(), player.getPosition().getZ());
-            //boolean sameDim = (player.dimension == dimension);
+            boolean sameDim = (player.dimension == dimension);
             IBlockState currentBlock = world.getBlockState(blockMap.pos);
             BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(world, blockMap.pos, currentBlock, player);
             boolean cancelled = MinecraftForge.EVENT_BUS.post(e);
-            if (distance < 64 && !cancelled) { //Don't allow us to undo a block while its still being placed or too far away
+            if (distance < 64 && !cancelled && sameDim) { //Don't allow us to undo a block while its still being placed or too far away
                 if (currentBlock.getBlock() == blockMap.state.getBlock() || currentBlock.getBlock() instanceof ConstructionBlock) {
                     currentBlock.getBlock().harvestBlock(world, player, blockMap.pos, currentBlock, world.getTileEntity(blockMap.pos), silkTool);
                     world.spawnEntity(new BlockBuildEntity(world, blockMap.pos, player, currentBlock, 2, currentBlock, false));
                 }
+            } else {
+                player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.undofailed").getUnformattedComponentText()), true);
             }
             System.out.printf("Undid %d Blocks in %.2f ms%n", blockMapList.size(), (System.nanoTime() - time) * 1e-6);
         }
