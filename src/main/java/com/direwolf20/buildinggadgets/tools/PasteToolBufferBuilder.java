@@ -18,68 +18,52 @@ import org.lwjgl.opengl.GL11;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @SideOnly(Side.CLIENT)
 public class PasteToolBufferBuilder {
 
-    private static ToolDireBuffer bufferBuilder = new ToolDireBuffer(2097152);
-    private static int copyCounter;
-    private static NBTTagCompound tagCompound;
-    private static String toolUUID;
-    private static boolean packetSent = false;
-    private static int packetAttemptsSinceSend = 0;
+    //private static ToolDireBuffer bufferBuilder = new ToolDireBuffer(2097152);
+    private static Map<String, NBTTagCompound> tagMap = new HashMap<String, NBTTagCompound>();
+    private static Map<String, ToolDireBuffer> bufferMap = new HashMap<String, ToolDireBuffer>();
 
-    public static ToolDireBuffer getBuffer() {
-        return bufferBuilder;
+    //public static ToolDireBuffer getBuffer() {
+    //    return bufferBuilder;
+    //}
+
+    public static int getCopyCounter(String UUID) {
+        if (tagMap.containsKey(UUID)) {
+            return tagMap.get(UUID).getInteger("copycounter");
+        }
+        return -1;
     }
 
-    public static void setCopyCounter(int counter) {
-        copyCounter = counter;
+    public static void addToMap(String UUID, NBTTagCompound tag) {
+        tagMap.put(UUID, tag);
     }
 
-    public static int getCopyCounter() {
-        return copyCounter;
+    public static NBTTagCompound getTagFromUUID(String UUID) {
+        if (tagMap.containsKey(UUID)) {
+            return tagMap.get(UUID);
+        }
+        return null;
     }
 
-    public static void setAttempts(int counter) {
-        packetAttemptsSinceSend = counter;
+    public static ToolDireBuffer getBufferFromMap(String UUID) {
+        if (bufferMap.containsKey(UUID)) {
+            return bufferMap.get(UUID);
+        }
+        return null;
     }
 
-    public static int getAttemps() {
-        return packetAttemptsSinceSend;
-    }
-
-    public static void setTagCompound(NBTTagCompound tag) {
-        tagCompound = tag.copy();
-    }
-
-    public static NBTTagCompound getTagCompound() {
-        return tagCompound;
-    }
-
-    public static void setUUID(String UUID) {
-        toolUUID = UUID;
-    }
-
-    public static String getUUID() {
-        return toolUUID;
-    }
-
-    public static void setPacketSent(Boolean sent) {
-        packetSent = sent;
-    }
-
-    public static boolean getPacketSent() {
-        return packetSent;
-    }
-
-    public static void addMapToBuffer() {
-        System.out.println("Rebuilding Buffer");
-        //ArrayList<BlockMap> blockMapList = CopyPasteTool.getBlockMapList(stack, CopyPasteTool.getStartPos(stack), world);
-        ArrayList<BlockMap> blockMapList = CopyPasteTool.getBlockMapList(tagCompound);
+    public static void addMapToBuffer(String UUID) {
+        long time = System.nanoTime();
+        ArrayList<BlockMap> blockMapList = CopyPasteTool.getBlockMapList(tagMap.get(UUID));
         BlockRendererDispatcher dispatcher = Minecraft.getMinecraft().getBlockRendererDispatcher();
-        bufferBuilder.reset();
+        ToolDireBuffer bufferBuilder = new ToolDireBuffer(2097152);
+        //bufferBuilder.reset();
         bufferBuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
         for (BlockMap blockMap : blockMapList) {
             IBlockState renderBlockState = blockMap.state;
@@ -87,10 +71,14 @@ public class PasteToolBufferBuilder {
             dispatcher.getBlockModelRenderer().renderModelFlat(Minecraft.getMinecraft().world, model, renderBlockState, new BlockPos(blockMap.xOffset, blockMap.yOffset, blockMap.zOffset), bufferBuilder, false, 0L);
         }
         bufferBuilder.finishDrawing();
+        bufferMap.put(UUID, bufferBuilder);
+        System.out.printf("Created %d Vertexes for %d blocks in %.2f ms%n", bufferBuilder.getVertexCount(), blockMapList.size(), (System.nanoTime() - time) * 1e-6);
     }
 
-    public static void draw(EntityPlayer player, double x, double y, double z, BlockPos startPos) {
+    public static void draw(EntityPlayer player, double x, double y, double z, BlockPos startPos, String UUID) {
         long time = System.nanoTime();
+        ToolDireBuffer bufferBuilder = bufferMap.get(UUID);
+        //bufferBuilder = bufferMap.get(UUID);
         bufferBuilder.sortVertexData((float) (x - startPos.getX()), (float) ((y + player.getEyeHeight()) - startPos.getY()), (float) (z - startPos.getZ()));
         //System.out.printf("Sorted %d Vertexes in %.2f ms%n", bufferBuilder.getVertexCount(), (System.nanoTime() - time) * 1e-6);
         if (bufferBuilder.getVertexCount() > 0) {

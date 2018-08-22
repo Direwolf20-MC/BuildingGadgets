@@ -42,12 +42,12 @@ public class TooltipRender {
     @SubscribeEvent
     public static void onMakeTooltip(ItemTooltipEvent event) {
         //This method extends the tooltip box size to fit the item's we will render in onDrawTooltip
-
         Minecraft mc = Minecraft.getMinecraft();
         ItemStack stack = event.getItemStack();
+        String UUID = CopyPasteTool.getUUID(stack);
         List<String> tooltip = event.getToolTip();
         if (stack.getItem() instanceof CopyPasteTool) {
-            Map<UniqueItem, Integer> itemCountMap = makeRequiredList();
+            Map<UniqueItem, Integer> itemCountMap = makeRequiredList(UUID);
             int count = itemCountMap.size();
             //boolean creative = ((IReagentHolder) stack.getItem()).isCreativeReagentHolder(stack);
 
@@ -69,8 +69,9 @@ public class TooltipRender {
     public static void onDrawTooltip(RenderTooltipEvent.PostText event) {
         //This method will draw items on the tooltip
         ItemStack stack = event.getStack();
+        String UUID = CopyPasteTool.getUUID(stack);
         if (stack.getItem() instanceof CopyPasteTool && GuiScreen.isShiftKeyDown()) {
-            Map<UniqueItem, Integer> itemCountMap = makeRequiredList(); //Create a new UniqueItem->Count map
+            Map<UniqueItem, Integer> itemCountMap = makeRequiredList(UUID); //Create a new UniqueItem->Count map
 
             //Create an ItemStack -> Integer Map
             Map<ItemStack, Integer> itemStackCount = new HashMap<ItemStack, Integer>();
@@ -163,10 +164,10 @@ public class TooltipRender {
         GlStateManager.enableDepth();
     }
 
-    public static Map<UniqueItem, Integer> makeRequiredList() {
+    public static Map<UniqueItem, Integer> makeRequiredList(String UUID) {
         Map<UniqueItem, Integer> itemCountMap = new HashMap<UniqueItem, Integer>();
-        Map<IBlockState, UniqueItem> IntStackMap = CopyPasteTool.getBlockMapIntState(PasteToolBufferBuilder.getTagCompound()).getIntStackMap();
-        ArrayList<BlockMap> blockMapList = CopyPasteTool.getBlockMapList(PasteToolBufferBuilder.getTagCompound());
+        Map<IBlockState, UniqueItem> IntStackMap = CopyPasteTool.getBlockMapIntState(PasteToolBufferBuilder.getTagFromUUID(UUID)).getIntStackMap();
+        ArrayList<BlockMap> blockMapList = CopyPasteTool.getBlockMapList(PasteToolBufferBuilder.getTagFromUUID(UUID));
         for (BlockMap blockMap : blockMapList) {
             UniqueItem uniqueItem = IntStackMap.get(blockMap.state);
             if (uniqueItem.item != Items.AIR) {

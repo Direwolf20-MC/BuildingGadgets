@@ -6,8 +6,6 @@ import com.direwolf20.buildinggadgets.items.BuildingTool;
 import com.direwolf20.buildinggadgets.items.CopyPasteTool;
 import com.direwolf20.buildinggadgets.items.ExchangerTool;
 import com.direwolf20.buildinggadgets.items.FakeBuilderWorld;
-import com.direwolf20.buildinggadgets.network.PacketHandler;
-import com.direwolf20.buildinggadgets.network.PacketRequestBlockMap;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockRendererDispatcher;
@@ -289,6 +287,8 @@ public class ToolRenders {
     }
 
     public static void renderPasteOverlay(RenderWorldLastEvent evt, EntityPlayer player, ItemStack stack) {
+        String UUID = CopyPasteTool.getUUID(stack);
+        World world = player.world;
         if (CopyPasteTool.getToolMode(stack) == CopyPasteTool.toolModes.Paste) {
             RayTraceResult lookingAt = VectorTools.getLookingAt(player);
             BlockPos startPos = CopyPasteTool.getAnchor(stack);
@@ -298,9 +298,7 @@ public class ToolRenders {
                 else startPos = startPos.up();
             }
 
-            World world = player.world;
-
-            if (PasteToolBufferBuilder.getPacketSent()) {
+            /*if (PasteToolBufferBuilder.getPacketSent()) {
                 System.out.println("Attempts: " + PasteToolBufferBuilder.getAttemps());
                 PasteToolBufferBuilder.setAttempts(PasteToolBufferBuilder.getAttemps() + 1);
                 if (PasteToolBufferBuilder.getAttemps() > 100) {
@@ -310,15 +308,19 @@ public class ToolRenders {
             }
 
 
-            ToolDireBuffer toolDireBuffer = PasteToolBufferBuilder.getBuffer();
-            if ((CopyPasteTool.getCopyCounter(stack) != PasteToolBufferBuilder.getCopyCounter() || !(CopyPasteTool.getUUID(stack).equals(PasteToolBufferBuilder.getUUID()))) && !PasteToolBufferBuilder.getPacketSent()) {
-                System.out.println("Requesting BlockMap Packet");
-                PacketHandler.INSTANCE.sendToServer(new PacketRequestBlockMap(CopyPasteTool.getUUID(stack)));
-                PasteToolBufferBuilder.setPacketSent(true);
-                PasteToolBufferBuilder.setAttempts(0);
-            }
 
-            ArrayList<BlockMap> blockMapList = CopyPasteTool.getBlockMapList(PasteToolBufferBuilder.getTagCompound());
+            if ((CopyPasteTool.getCopyCounter(stack) != PasteToolBufferBuilder.getCopyCounter(UUID) || PasteToolBufferBuilder.getTagFromUUID(UUID) == null) && !PasteToolBufferBuilder.getPacketSent()) {
+                System.out.println("Requesting BlockMap Packet(Paste)");
+                //PacketHandler.INSTANCE.sendToServer(new PacketRequestBlockMap(CopyPasteTool.getUUID(stack)));
+                //PasteToolBufferBuilder.setPacketSent(true);
+                PasteToolBufferBuilder.setAttempts(0);
+            }*/
+
+            ToolDireBuffer toolDireBuffer = PasteToolBufferBuilder.getBufferFromMap(UUID);
+            if (toolDireBuffer == null) {
+                return;
+            }
+            ArrayList<BlockMap> blockMapList = CopyPasteTool.getBlockMapList(PasteToolBufferBuilder.getTagFromUUID(UUID));
             if (toolDireBuffer.getVertexCount() == 0 || blockMapList.size() == 0) {
                 return;
             }
@@ -350,7 +352,7 @@ public class ToolRenders {
             GlStateManager.translate(startPos.getX(), startPos.getY(), startPos.getZ()); //Move the render to the startingBlockPos
             GL14.glBlendColor(1F, 1F, 1F, 0.55f); //Set the alpha of the blocks we are rendering
             long time = System.nanoTime();
-            PasteToolBufferBuilder.draw(player, doubleX, doubleY, doubleZ, startPos);
+            PasteToolBufferBuilder.draw(player, doubleX, doubleY, doubleZ, startPos, UUID);
             //System.out.println("Drew " + blockMapList.size() + " blocks in " + (System.nanoTime() - time));
             //System.out.printf("Drew %d blocks in %.2f ms%n", blockMapList.size(), (System.nanoTime() - time) * 1e-6);
             GlStateManager.popMatrix();
@@ -367,7 +369,7 @@ public class ToolRenders {
                 return;
             }
 
-            if (PasteToolBufferBuilder.getPacketSent()) {
+            /*if (PasteToolBufferBuilder.getPacketSent()) {
                 System.out.println("Attempts: " + PasteToolBufferBuilder.getAttemps());
                 PasteToolBufferBuilder.setAttempts(PasteToolBufferBuilder.getAttemps() + 1);
                 if (PasteToolBufferBuilder.getAttemps() > 100) {
@@ -376,14 +378,14 @@ public class ToolRenders {
                 }
             }
 
-            if ((CopyPasteTool.getCopyCounter(stack) != PasteToolBufferBuilder.getCopyCounter() || !(CopyPasteTool.getUUID(stack).equals(PasteToolBufferBuilder.getUUID()))) && !PasteToolBufferBuilder.getPacketSent()) {
-                System.out.println("Requesting BlockMap Packet");
-                PacketHandler.INSTANCE.sendToServer(new PacketRequestBlockMap(CopyPasteTool.getUUID(stack)));
-                PasteToolBufferBuilder.setPacketSent(true);
+            if ((CopyPasteTool.getCopyCounter(stack) != PasteToolBufferBuilder.getCopyCounter(UUID) || PasteToolBufferBuilder.getTagFromUUID(UUID) == null) && !PasteToolBufferBuilder.getPacketSent()) {
+                System.out.println("Requesting BlockMap Packet (Copy)");
+                //PacketHandler.INSTANCE.sendToServer(new PacketRequestBlockMap(CopyPasteTool.getUUID(stack)));
+                //PasteToolBufferBuilder.setPacketSent(true);
                 PasteToolBufferBuilder.setAttempts(0);
-            }
+            }*/
 
-            ArrayList<BlockMap> blockMapList = CopyPasteTool.getBlockMapList(PasteToolBufferBuilder.getTagCompound());
+            ArrayList<BlockMap> blockMapList = CopyPasteTool.getBlockMapList(PasteToolBufferBuilder.getTagFromUUID(UUID));
             if (blockMapList.size() == 0) {
                 return;
             }

@@ -38,11 +38,9 @@ public class PacketBlockMap implements IMessage {
         }
 
         private void handle(PacketBlockMap message, MessageContext ctx) {
-            PasteToolBufferBuilder.setTagCompound(message.tag);
-            PasteToolBufferBuilder.setUUID(message.tag.getString("UUID"));
-            PasteToolBufferBuilder.setCopyCounter(message.tag.getInteger("copycounter"));
-            PasteToolBufferBuilder.setPacketSent(false);
-            PasteToolBufferBuilder.addMapToBuffer();
+            String UUID = message.tag.getString("UUID");
+            PasteToolBufferBuilder.addToMap(UUID, message.tag);
+            PasteToolBufferBuilder.addMapToBuffer(UUID);
         }
     }
 }
