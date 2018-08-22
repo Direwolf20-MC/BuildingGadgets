@@ -37,6 +37,7 @@ import net.minecraftforge.fml.common.network.ByteBufUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import static com.direwolf20.buildinggadgets.tools.GadgetUtils.useEnergy;
 import static com.direwolf20.buildinggadgets.tools.GadgetUtils.withSuffix;
@@ -65,6 +66,18 @@ public class CopyPasteTool extends GenericGadget {
 
     public static BlockPos getAnchor(ItemStack stack) {
         return GadgetUtils.getPOSFromNBT(stack, "anchor");
+    }
+
+    public static String getUUID(ItemStack stack) {
+        NBTTagCompound tagCompound = stack.getTagCompound();
+        String uuid = tagCompound.getString("UUID");
+        if (tagCompound == null || uuid == "") {
+            UUID uid = UUID.randomUUID();
+            tagCompound.setString("UUID", uid.toString());
+            stack.setTagCompound(tagCompound);
+            uuid = uid.toString();
+        }
+        return uuid;
     }
 
     public static Integer getCopyCounter(ItemStack stack) {
@@ -110,10 +123,25 @@ public class CopyPasteTool extends GenericGadget {
         if (tagCompound == null) {
             tagCompound = new NBTTagCompound();
         }
-        NBTTagList blocks = (NBTTagList) tagCompound.getTag("blocksMapList");
-        if (blocks == null) {
-            blocks = new NBTTagList();
+        //NBTTagList blocks = (NBTTagList) tagCompound.getTag("blocksMapList");
+        //if (blocks == null) {
+        //    blocks = new NBTTagList();
+        //}
+
+        int[] posIntArray = tagCompound.getIntArray("posIntArray");
+        if (posIntArray == null) {
+            posIntArray = new int[1];
         }
+        int[] newPosIntArray = new int[posIntArray.length + 1];
+        System.arraycopy(posIntArray, 0, newPosIntArray, 0, posIntArray.length);
+
+        int[] stateIntArray = tagCompound.getIntArray("stateIntArray");
+        if (stateIntArray == null) {
+            stateIntArray = new int[1];
+        }
+        int[] newStateIntArray = new int[stateIntArray.length + 1];
+        System.arraycopy(stateIntArray, 0, newStateIntArray, 0, stateIntArray.length);
+
         NBTTagList MapIntStateTag = (NBTTagList) tagCompound.getTag("mapIntState");
         if (MapIntStateTag == null) {
             MapIntStateTag = new NBTTagList();
@@ -128,7 +156,9 @@ public class CopyPasteTool extends GenericGadget {
         int pz = (((map.pos.getZ() - startPos.getZ()) & 0xff));
         int p = (px + py + pz);
 
-        NBTTagCompound blockMap = new NBTTagCompound();
+        newPosIntArray[newPosIntArray.length - 1] = p;
+
+        //NBTTagCompound blockMap = new NBTTagCompound();
         BlockMapIntState MapIntState = new BlockMapIntState();
         MapIntState.getIntStateMapFromNBT(MapIntStateTag);
         MapIntState.getIntStackMapFromNBT(MapIntStackTag);
@@ -146,12 +176,15 @@ public class CopyPasteTool extends GenericGadget {
             MapIntState.addToStackMap(uniqueItem, state);
         }
 
-        blockMap.setShort("state", MapIntState.findSlot(state));
-        blockMap.setInteger("pos", p);
-        blocks.appendTag(blockMap);
-        tagCompound.setTag("blocksMapList", blocks);
+        newStateIntArray[newStateIntArray.length - 1] = (int) MapIntState.findSlot(state);
+        //blockMap.setShort("state", MapIntState.findSlot(state));
+        //blockMap.setInteger("pos", p);
+        //blocks.appendTag(blockMap);
+        //tagCompound.setTag("blocksMapList", blocks);
         tagCompound.setTag("mapIntState", MapIntState.putIntStateMapIntoNBT());
         tagCompound.setTag("mapIntStack", MapIntState.putIntStackMapIntoNBT());
+        tagCompound.setIntArray("posIntArray", newPosIntArray);
+        tagCompound.setIntArray("stateIntArray", newStateIntArray);
         stack.setTagCompound(tagCompound);
     }
 
@@ -161,26 +194,36 @@ public class CopyPasteTool extends GenericGadget {
         if (tagCompound == null) {
             tagCompound = new NBTTagCompound();
         }
-        NBTTagList blocks = (NBTTagList) tagCompound.getTag("blocksMapList");
+        /*NBTTagList blocks = (NBTTagList) tagCompound.getTag("blocksMapList");
         if (blocks == null) {
             blocks = new NBTTagList();
         }
         if (blocks.tagCount() == 0) {
             return blockMap;
-        }
+        }*/
         NBTTagList MapIntStateTag = (NBTTagList) tagCompound.getTag("mapIntState");
         if (MapIntStateTag == null) {
             MapIntStateTag = new NBTTagList();
         }
         BlockMapIntState MapIntState = new BlockMapIntState();
         MapIntState.getIntStateMapFromNBT(MapIntStateTag);
-        for (int i = 0; i < blocks.tagCount(); i++) {
+        /*for (int i = 0; i < blocks.tagCount(); i++) {
             NBTTagCompound compound = blocks.getCompoundTagAt(i);
             int p = compound.getInteger("pos");
             int x = startBlock.getX() + (int) (byte) ((p & 0xff0000) >> 16);
             int y = startBlock.getY() + (int) (byte) ((p & 0x00ff00) >> 8);
             int z = startBlock.getZ() + (int) (byte) (p & 0x0000ff);
             short IntState = compound.getShort("state");
+            blockMap.add(new BlockMap(new BlockPos(x, y, z), MapIntState.getStateFromSlot(IntState), (int) (byte) ((p & 0xff0000) >> 16), (int) (byte) ((p & 0x00ff00) >> 8), (int) (byte) (p & 0x0000ff)));
+        }*/
+        int[] posIntArray = tagCompound.getIntArray("posIntArray");
+        int[] stateIntArray = tagCompound.getIntArray("stateIntArray");
+        for (int i = 0; i < posIntArray.length; i++) {
+            int p = posIntArray[i];
+            int x = startBlock.getX() + (int) (byte) ((p & 0xff0000) >> 16);
+            int y = startBlock.getY() + (int) (byte) ((p & 0x00ff00) >> 8);
+            int z = startBlock.getZ() + (int) (byte) (p & 0x0000ff);
+            short IntState = (short) stateIntArray[i];
             blockMap.add(new BlockMap(new BlockPos(x, y, z), MapIntState.getStateFromSlot(IntState), (int) (byte) ((p & 0xff0000) >> 16), (int) (byte) ((p & 0x00ff00) >> 8), (int) (byte) (p & 0x0000ff)));
         }
         return blockMap;
@@ -213,6 +256,10 @@ public class CopyPasteTool extends GenericGadget {
         }
         NBTTagList blocks = new NBTTagList();
         NBTTagList blocksIntMap = new NBTTagList();
+        int newPosIntArray[] = new int[0];
+        int newStateIntArray[] = new int[0];
+        tagCompound.setIntArray("posIntArray", newPosIntArray);
+        tagCompound.setIntArray("stateIntArray", newStateIntArray);
         tagCompound.setTag("blocksMapList", blocks);
         tagCompound.setTag("mapIntState", blocksIntMap);
         tagCompound.setTag("mapIntStack", blocksIntMap);
@@ -299,6 +346,9 @@ public class CopyPasteTool extends GenericGadget {
             if (getToolMode(stack) == toolModes.Copy) {
                 BlockPos pos = VectorTools.getPosLookingAt(player);
                 if (pos == null) {
+                    BlockMapWorldSave worldSave = BlockMapWorldSave.get(world);
+                    NBTTagCompound tagCompound = worldSave.getCompoundFromUUID(getUUID(stack));
+
                     resetBlockMap(stack);
                     setStartPos(stack, null);
                     setEndPos(stack, null);
@@ -377,7 +427,7 @@ public class CopyPasteTool extends GenericGadget {
         int iEndX = startX < endX ? endX : startX;
         int iEndY = startY < endY ? endY : startY;
         int iEndZ = startZ < endZ ? endZ : startZ;
-
+        BlockMapWorldSave worldSave = BlockMapWorldSave.get(world);
         for (int x = iStartX; x <= iEndX; x++) {
             for (int y = iStartY; y <= iEndY; y++) {
                 for (int z = iStartZ; z <= iEndZ; z++) {
@@ -392,6 +442,10 @@ public class CopyPasteTool extends GenericGadget {
                 }
             }
         }
+
+
+        worldSave.addToMap(getUUID(stack), stack.getTagCompound());
+        worldSave.markForSaving();
         //System.out.println("Done");
     }
 
@@ -530,7 +584,7 @@ public class CopyPasteTool extends GenericGadget {
             } else {
                 player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.undofailed").getUnformattedComponentText()), true);
             }
-            System.out.printf("Undid %d Blocks in %.2f ms%n", blockMapList.size(), (System.nanoTime() - time) * 1e-6);
+            //System.out.printf("Undid %d Blocks in %.2f ms%n", blockMapList.size(), (System.nanoTime() - time) * 1e-6);
         }
     }
 }
