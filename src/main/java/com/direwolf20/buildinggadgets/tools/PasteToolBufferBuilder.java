@@ -10,7 +10,7 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.client.renderer.vertex.VertexFormatElement;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -25,8 +25,10 @@ public class PasteToolBufferBuilder {
 
     private static ToolDireBuffer bufferBuilder = new ToolDireBuffer(2097152);
     private static int copyCounter;
-    //private static ToolDireBuffer bufferHighlightBuilder = new ToolDireBuffer(2097152);
-    //private static ArrayList<BlockMap> blockMapListCached = new ArrayList<BlockMap>();
+    private static NBTTagCompound tagCompound;
+    private static String toolUUID;
+    private static boolean packetSent = false;
+    private static int packetAttemptsSinceSend = 0;
 
     public static ToolDireBuffer getBuffer() {
         return bufferBuilder;
@@ -39,16 +41,43 @@ public class PasteToolBufferBuilder {
     public static int getCopyCounter() {
         return copyCounter;
     }
-    //public static ToolDireBuffer getHighlightBuffer() {
-    //    return bufferHighlightBuilder;
-    //}
 
-    //public static ArrayList<BlockMap> getCachedMapList() {
-    //    return blockMapListCached;
-    //}
+    public static void setAttempts(int counter) {
+        packetAttemptsSinceSend = counter;
+    }
 
-    public static void addMapToBuffer(ItemStack stack) {
-        ArrayList<BlockMap> blockMapList = CopyPasteTool.getBlockMapList(stack, CopyPasteTool.getStartPos(stack));
+    public static int getAttemps() {
+        return packetAttemptsSinceSend;
+    }
+
+    public static void setTagCompound(NBTTagCompound tag) {
+        tagCompound = tag.copy();
+    }
+
+    public static NBTTagCompound getTagCompound() {
+        return tagCompound;
+    }
+
+    public static void setUUID(String UUID) {
+        toolUUID = UUID;
+    }
+
+    public static String getUUID() {
+        return toolUUID;
+    }
+
+    public static void setPacketSent(Boolean sent) {
+        packetSent = sent;
+    }
+
+    public static boolean getPacketSent() {
+        return packetSent;
+    }
+
+    public static void addMapToBuffer() {
+        System.out.println("Rebuilding Buffer");
+        //ArrayList<BlockMap> blockMapList = CopyPasteTool.getBlockMapList(stack, CopyPasteTool.getStartPos(stack), world);
+        ArrayList<BlockMap> blockMapList = CopyPasteTool.getBlockMapList(tagCompound);
         BlockRendererDispatcher dispatcher = Minecraft.getMinecraft().getBlockRendererDispatcher();
         bufferBuilder.reset();
         bufferBuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);

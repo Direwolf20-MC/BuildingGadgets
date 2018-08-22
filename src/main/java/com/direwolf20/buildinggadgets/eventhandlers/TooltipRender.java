@@ -8,6 +8,7 @@ package com.direwolf20.buildinggadgets.eventhandlers;
 import com.direwolf20.buildinggadgets.items.CopyPasteTool;
 import com.direwolf20.buildinggadgets.tools.BlockMap;
 import com.direwolf20.buildinggadgets.tools.InventoryManipulation;
+import com.direwolf20.buildinggadgets.tools.PasteToolBufferBuilder;
 import com.direwolf20.buildinggadgets.tools.UniqueItem;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -46,8 +47,7 @@ public class TooltipRender {
         ItemStack stack = event.getItemStack();
         List<String> tooltip = event.getToolTip();
         if (stack.getItem() instanceof CopyPasteTool) {
-            Map<UniqueItem, Integer> itemCountMap = makeRequiredList(stack);
-
+            Map<UniqueItem, Integer> itemCountMap = makeRequiredList();
             int count = itemCountMap.size();
             //boolean creative = ((IReagentHolder) stack.getItem()).isCreativeReagentHolder(stack);
 
@@ -70,7 +70,7 @@ public class TooltipRender {
         //This method will draw items on the tooltip
         ItemStack stack = event.getStack();
         if (stack.getItem() instanceof CopyPasteTool && GuiScreen.isShiftKeyDown()) {
-            Map<UniqueItem, Integer> itemCountMap = makeRequiredList(stack); //Create a new UniqueItem->Count map
+            Map<UniqueItem, Integer> itemCountMap = makeRequiredList(); //Create a new UniqueItem->Count map
 
             //Create an ItemStack -> Integer Map
             Map<ItemStack, Integer> itemStackCount = new HashMap<ItemStack, Integer>();
@@ -163,10 +163,10 @@ public class TooltipRender {
         GlStateManager.enableDepth();
     }
 
-    public static Map<UniqueItem, Integer> makeRequiredList(ItemStack stack) {
+    public static Map<UniqueItem, Integer> makeRequiredList() {
         Map<UniqueItem, Integer> itemCountMap = new HashMap<UniqueItem, Integer>();
-        Map<IBlockState, UniqueItem> IntStackMap = CopyPasteTool.getBlockMapIntState(stack).getIntStackMap();
-        ArrayList<BlockMap> blockMapList = CopyPasteTool.getBlockMapList(stack, CopyPasteTool.getStartPos(stack));
+        Map<IBlockState, UniqueItem> IntStackMap = CopyPasteTool.getBlockMapIntState(PasteToolBufferBuilder.getTagCompound()).getIntStackMap();
+        ArrayList<BlockMap> blockMapList = CopyPasteTool.getBlockMapList(PasteToolBufferBuilder.getTagCompound());
         for (BlockMap blockMap : blockMapList) {
             UniqueItem uniqueItem = IntStackMap.get(blockMap.state);
             if (uniqueItem.item != Items.AIR) {

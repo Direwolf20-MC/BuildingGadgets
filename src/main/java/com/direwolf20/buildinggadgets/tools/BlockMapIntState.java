@@ -1,10 +1,14 @@
 package com.direwolf20.buildinggadgets.tools;
 
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Items;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTUtil;
+import net.minecraft.util.math.BlockPos;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -108,5 +112,19 @@ public class BlockMapIntState {
             tagList.appendTag(compound);
         }
         return tagList;
+    }
+
+    public static UniqueItem blockStateToUniqueItem(IBlockState state, EntityPlayer player, BlockPos pos) {
+        ItemStack itemStack;
+        if (state.getBlock().canSilkHarvest(player.world, pos, state, player)) {
+            itemStack = InventoryManipulation.getSilkTouchDrop(state);
+        } else {
+            itemStack = state.getBlock().getPickBlock(state, null, player.world, pos, player);
+        }
+        if (!itemStack.equals(Items.AIR)) {
+            UniqueItem uniqueItem = new UniqueItem(itemStack.getItem(), itemStack.getMetadata());
+            return uniqueItem;
+        }
+        return null;
     }
 }

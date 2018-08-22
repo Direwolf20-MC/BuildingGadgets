@@ -6,6 +6,8 @@ import com.direwolf20.buildinggadgets.items.BuildingTool;
 import com.direwolf20.buildinggadgets.items.CopyPasteTool;
 import com.direwolf20.buildinggadgets.items.ExchangerTool;
 import com.direwolf20.buildinggadgets.items.FakeBuilderWorld;
+import com.direwolf20.buildinggadgets.network.PacketHandler;
+import com.direwolf20.buildinggadgets.network.PacketRequestBlockMap;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockRendererDispatcher;
@@ -298,10 +300,29 @@ public class ToolRenders {
 
             World world = player.world;
 
-            ArrayList<BlockMap> blockMapList = CopyPasteTool.getBlockMapList(stack, startPos);
-            if (blockMapList.size() == 0) {
+            if (PasteToolBufferBuilder.getPacketSent()) {
+                System.out.println("Attempts: " + PasteToolBufferBuilder.getAttemps());
+                PasteToolBufferBuilder.setAttempts(PasteToolBufferBuilder.getAttemps() + 1);
+                if (PasteToolBufferBuilder.getAttemps() > 100) {
+                    PasteToolBufferBuilder.setPacketSent(false);
+                    PasteToolBufferBuilder.setAttempts(0);
+                }
+            }
+
+
+            ToolDireBuffer toolDireBuffer = PasteToolBufferBuilder.getBuffer();
+            if ((CopyPasteTool.getCopyCounter(stack) != PasteToolBufferBuilder.getCopyCounter() || !(CopyPasteTool.getUUID(stack).equals(PasteToolBufferBuilder.getUUID()))) && !PasteToolBufferBuilder.getPacketSent()) {
+                System.out.println("Requesting BlockMap Packet");
+                PacketHandler.INSTANCE.sendToServer(new PacketRequestBlockMap(CopyPasteTool.getUUID(stack)));
+                PasteToolBufferBuilder.setPacketSent(true);
+                PasteToolBufferBuilder.setAttempts(0);
+            }
+
+            ArrayList<BlockMap> blockMapList = CopyPasteTool.getBlockMapList(PasteToolBufferBuilder.getTagCompound());
+            if (toolDireBuffer.getVertexCount() == 0 || blockMapList.size() == 0) {
                 return;
             }
+
             IBlockState startBlock = world.getBlockState(startPos);
             if (startBlock == ModBlocks.effectBlock.getDefaultState()) return;
 
@@ -318,13 +339,6 @@ public class ToolRenders {
 
             //Save the current position that is being rendered
             GlStateManager.pushMatrix();
-            ToolDireBuffer toolDireBuffer = PasteToolBufferBuilder.getBuffer();
-            if (toolDireBuffer.getVertexCount() == 0 || CopyPasteTool.getCopyCounter(stack) != PasteToolBufferBuilder.getCopyCounter()) {
-                System.out.println("Rebuilding buffer");
-                PasteToolBufferBuilder.addMapToBuffer(stack);
-                PasteToolBufferBuilder.setCopyCounter(CopyPasteTool.getCopyCounter(stack));
-            }
-
 
             //Enable Blending (So we can have transparent effect)
             GlStateManager.enableBlend();
@@ -348,11 +362,28 @@ public class ToolRenders {
             GlStateManager.popMatrix();
         } else {
             BlockPos startPos = CopyPasteTool.getStartPos(stack);
-            if (startPos == null) {
+            BlockPos endPos = CopyPasteTool.getEndPos(stack);
+            if (startPos == null || endPos == null) {
                 return;
             }
 
-            ArrayList<BlockMap> blockMapList = CopyPasteTool.getBlockMapList(stack, startPos);
+            if (PasteToolBufferBuilder.getPacketSent()) {
+                System.out.println("Attempts: " + PasteToolBufferBuilder.getAttemps());
+                PasteToolBufferBuilder.setAttempts(PasteToolBufferBuilder.getAttemps() + 1);
+                if (PasteToolBufferBuilder.getAttemps() > 100) {
+                    PasteToolBufferBuilder.setPacketSent(false);
+                    PasteToolBufferBuilder.setAttempts(0);
+                }
+            }
+
+            if ((CopyPasteTool.getCopyCounter(stack) != PasteToolBufferBuilder.getCopyCounter() || !(CopyPasteTool.getUUID(stack).equals(PasteToolBufferBuilder.getUUID()))) && !PasteToolBufferBuilder.getPacketSent()) {
+                System.out.println("Requesting BlockMap Packet");
+                PacketHandler.INSTANCE.sendToServer(new PacketRequestBlockMap(CopyPasteTool.getUUID(stack)));
+                PasteToolBufferBuilder.setPacketSent(true);
+                PasteToolBufferBuilder.setAttempts(0);
+            }
+
+            ArrayList<BlockMap> blockMapList = CopyPasteTool.getBlockMapList(PasteToolBufferBuilder.getTagCompound());
             if (blockMapList.size() == 0) {
                 return;
             }

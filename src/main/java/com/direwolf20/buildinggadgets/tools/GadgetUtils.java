@@ -339,6 +339,17 @@ public class GadgetUtils {
         return NBTUtil.getPosFromTag(posTag);
     }
 
+    public static BlockPos getPOSFromNBT(NBTTagCompound tagCompound, String tagName) {
+        if (tagCompound == null) {
+            return null;
+        }
+        NBTTagCompound posTag = tagCompound.getCompoundTag(tagName);
+        if (posTag.equals(new NBTTagCompound())) {
+            return null;
+        }
+        return NBTUtil.getPosFromTag(posTag);
+    }
+
     public static Integer getDIMFromNBT(ItemStack stack, String tagName) {
         NBTTagCompound tagCompound = stack.getTagCompound();
         if (tagCompound == null) {
@@ -362,5 +373,21 @@ public class GadgetUtils {
             return null;
         }
         return NBTUtil.readBlockState(tagCompound);
+    }
+
+    public static int relPosToInt(BlockPos startPos, BlockPos relPos) {
+        int px = (((relPos.getX() - startPos.getX()) & 0xff) << 16);
+        int py = (((relPos.getY() - startPos.getY()) & 0xff) << 8);
+        int pz = (((relPos.getZ() - startPos.getZ()) & 0xff));
+        int p = (px + py + pz);
+        return p;
+    }
+
+    public static BlockPos relIntToPos(BlockPos startPos, int relInt) {
+        int p = relInt;
+        int x = startPos.getX() + (int) (byte) ((p & 0xff0000) >> 16);
+        int y = startPos.getY() + (int) (byte) ((p & 0x00ff00) >> 8);
+        int z = startPos.getZ() + (int) (byte) (p & 0x0000ff);
+        return new BlockPos(x, y, z);
     }
 }
