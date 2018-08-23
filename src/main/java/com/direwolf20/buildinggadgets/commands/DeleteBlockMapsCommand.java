@@ -71,7 +71,7 @@ public class DeleteBlockMapsCommand extends CommandBase {
         if (counter > 0) {
             worldSave.setTagMap(newMap);
             worldSave.markForSaving();
-            if (searchName == sender.getName()) {
+            if (searchName.equals(sender.getName())) {
                 PacketHandler.INSTANCE.sendTo(new PacketBlockMap(new NBTTagCompound()), (EntityPlayerMP) sender);
                 System.out.println("Sending BlockMap Packet");
             }

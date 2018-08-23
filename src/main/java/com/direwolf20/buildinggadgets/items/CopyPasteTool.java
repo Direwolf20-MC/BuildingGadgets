@@ -326,10 +326,13 @@ public class CopyPasteTool extends GenericGadget {
             posIntArrayList.add(GadgetUtils.relPosToInt(startPos, newPos));
             blockMapIntState.addToMap(rotatedState);
             stateIntArrayList.add((int) blockMapIntState.findSlot(rotatedState));
+            UniqueItem uniqueItem = BlockMapIntState.blockStateToUniqueItem(rotatedState, player, tempPos);
+            blockMapIntState.addToStackMap(uniqueItem, rotatedState);
         }
         int[] posIntArray = posIntArrayList.stream().mapToInt(i -> i).toArray();
         int[] stateIntArray = stateIntArrayList.stream().mapToInt(i -> i).toArray();
         tagCompound.setTag("mapIntState", blockMapIntState.putIntStateMapIntoNBT());
+        tagCompound.setTag("mapIntStack", blockMapIntState.putIntStackMapIntoNBT());
         tagCompound.setIntArray("posIntArray", posIntArray);
         tagCompound.setIntArray("stateIntArray", stateIntArray);
         incrementCopyCounter(stack);
