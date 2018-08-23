@@ -4,6 +4,7 @@ import com.direwolf20.buildinggadgets.BuildingGadgets;
 import com.direwolf20.buildinggadgets.Config;
 import com.direwolf20.buildinggadgets.ModItems;
 import com.direwolf20.buildinggadgets.blocks.ConstructionBlock;
+import com.direwolf20.buildinggadgets.blocks.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.network.PacketBlockMap;
 import com.direwolf20.buildinggadgets.network.PacketHandler;
@@ -22,6 +23,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTUtil;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
@@ -372,9 +374,13 @@ public class CopyPasteTool extends GenericGadget {
                 for (int z = iStartZ; z <= iEndZ; z++) {
                     BlockPos tempPos = new BlockPos(x, y, z);
                     IBlockState tempState = world.getBlockState(tempPos);
-                    if (tempState != Blocks.AIR.getDefaultState() && world.getTileEntity(tempPos) == null && !tempState.getBlock().getMaterial(tempState).isLiquid() && !BlacklistBlocks.checkBlacklist(tempState.getBlock())) {
+                    if (tempState != Blocks.AIR.getDefaultState() && (world.getTileEntity(tempPos) == null || world.getTileEntity(tempPos) instanceof ConstructionBlockTileEntity) && !tempState.getBlock().getMaterial(tempState).isLiquid() && !BlacklistBlocks.checkBlacklist(tempState.getBlock())) {
+                        TileEntity te = world.getTileEntity(tempPos);
                         IBlockState assignState = InventoryManipulation.getSpecificStates(tempState, world, player, tempPos);
                         IBlockState actualState = assignState.getBlock().getActualState(assignState, world, tempPos);
+                        if (te instanceof ConstructionBlockTileEntity) {
+                            actualState = ((ConstructionBlockTileEntity) te).getActualBlockState();
+                        }
                         posIntArrayList.add(GadgetUtils.relPosToInt(start, tempPos));
                         blockMapIntState.addToMap(actualState);
                         stateIntArrayList.add((int) blockMapIntState.findSlot(actualState));
