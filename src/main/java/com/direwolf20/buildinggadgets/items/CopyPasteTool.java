@@ -527,6 +527,7 @@ public class CopyPasteTool extends GenericGadget {
         ItemStack silkTool = heldItem.copy(); //Setup a Silk Touch version of the tool so we can return stone instead of cobblestone, etc.
         silkTool.addEnchantment(Enchantments.SILK_TOUCH, 1);
         ArrayList<BlockMap> blockMapList = getBlockMapList(tagCompound, startPos);
+        boolean success = true;
         for (BlockMap blockMap : blockMapList) {
             double distance = blockMap.pos.getDistance(player.getPosition().getX(), player.getPosition().getY(), player.getPosition().getZ());
             boolean sameDim = (player.dimension == dimension);
@@ -540,8 +541,10 @@ public class CopyPasteTool extends GenericGadget {
                 }
             } else {
                 player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.undofailed").getUnformattedComponentText()), true);
+                success = false;
             }
             //System.out.printf("Undid %d Blocks in %.2f ms%n", blockMapList.size(), (System.nanoTime() - time) * 1e-6);
         }
+        if (success) setLastBuild(heldItem, null, 0);
     }
 }

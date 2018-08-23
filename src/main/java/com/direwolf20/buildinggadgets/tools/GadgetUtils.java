@@ -322,8 +322,9 @@ public class GadgetUtils {
             }
             return;
         }
-        tagCompound.setTag(tagName, NBTUtil.createPosTag(pos));
-        tagCompound.setInteger("dim", dim);
+        NBTTagCompound posTag = NBTUtil.createPosTag(pos);
+        posTag.setInteger("dim", dim);
+        tagCompound.setTag(tagName, posTag);
         stack.setTagCompound(tagCompound);
     }
 
@@ -373,7 +374,7 @@ public class GadgetUtils {
         if (posTag.equals(new NBTTagCompound())) {
             return null;
         }
-        return tagCompound.getInteger("dim");
+        return posTag.getInteger("dim");
     }
 
     public static NBTTagCompound stateToCompound(IBlockState state) {
