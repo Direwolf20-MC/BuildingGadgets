@@ -26,13 +26,9 @@ import java.util.Map;
 @SideOnly(Side.CLIENT)
 public class PasteToolBufferBuilder {
 
-    //private static ToolDireBuffer bufferBuilder = new ToolDireBuffer(2097152);
     private static Map<String, NBTTagCompound> tagMap = new HashMap<String, NBTTagCompound>();
     private static Map<String, ToolDireBuffer> bufferMap = new HashMap<String, ToolDireBuffer>();
 
-    //public static ToolDireBuffer getBuffer() {
-    //    return bufferBuilder;
-    //}
 
     public static int getCopyCounter(String UUID) {
         if (tagMap.containsKey(UUID)) {
