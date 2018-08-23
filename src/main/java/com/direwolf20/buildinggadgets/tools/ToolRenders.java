@@ -290,7 +290,7 @@ public class ToolRenders {
         String UUID = CopyPasteTool.getUUID(stack);
         World world = player.world;
         if (CopyPasteTool.getToolMode(stack) == CopyPasteTool.toolModes.Paste) {
-            RayTraceResult lookingAt = VectorTools.getLookingAt(player);
+            //First check if we have an anchor, if not check if we're looking at a block, if not, exit
             BlockPos startPos = CopyPasteTool.getAnchor(stack);
             if (startPos == null) {
                 startPos = VectorTools.getPosLookingAt(player);
@@ -298,31 +298,18 @@ public class ToolRenders {
                 else startPos = startPos.up();
             }
 
-            /*if (PasteToolBufferBuilder.getPacketSent()) {
-                System.out.println("Attempts: " + PasteToolBufferBuilder.getAttemps());
-                PasteToolBufferBuilder.setAttempts(PasteToolBufferBuilder.getAttemps() + 1);
-                if (PasteToolBufferBuilder.getAttemps() > 100) {
-                    PasteToolBufferBuilder.setPacketSent(false);
-                    PasteToolBufferBuilder.setAttempts(0);
-                }
-            }
-
-            if ((CopyPasteTool.getCopyCounter(stack) != PasteToolBufferBuilder.getCopyCounter(UUID) || PasteToolBufferBuilder.getTagFromUUID(UUID) == null) && !PasteToolBufferBuilder.getPacketSent()) {
-                System.out.println("Requesting BlockMap Packet(Paste)");
-                //PacketHandler.INSTANCE.sendToServer(new PacketRequestBlockMap(CopyPasteTool.getUUID(stack)));
-                //PasteToolBufferBuilder.setPacketSent(true);
-                PasteToolBufferBuilder.setAttempts(0);
-            }*/
-
+            //We store our buffers in PasteToolBufferBuilder (A client only class) -- retrieve the buffer from this locally cache'd map
             ToolDireBuffer toolDireBuffer = PasteToolBufferBuilder.getBufferFromMap(UUID);
             if (toolDireBuffer == null) {
                 return;
             }
+            //Also get the blockMapList from the local cache - If either the buffer or the blockmap list are empty, exit.
             ArrayList<BlockMap> blockMapList = CopyPasteTool.getBlockMapList(PasteToolBufferBuilder.getTagFromUUID(UUID));
             if (toolDireBuffer.getVertexCount() == 0 || blockMapList.size() == 0) {
                 return;
             }
 
+            //Don't draw on top of blocks being built by our tools.
             IBlockState startBlock = world.getBlockState(startPos);
             if (startBlock == ModBlocks.effectBlock.getDefaultState()) return;
 
@@ -349,10 +336,9 @@ public class ToolRenders {
             GlStateManager.translate(-doubleX, -doubleY, -doubleZ);//The render starts at the player, so we subtract the player coords and move the render to 0,0,0
             GlStateManager.translate(startPos.getX(), startPos.getY(), startPos.getZ()); //Move the render to the startingBlockPos
             GL14.glBlendColor(1F, 1F, 1F, 0.55f); //Set the alpha of the blocks we are rendering
-            long time = System.nanoTime();
-            PasteToolBufferBuilder.draw(player, doubleX, doubleY, doubleZ, startPos, UUID);
-            //System.out.println("Drew " + blockMapList.size() + " blocks in " + (System.nanoTime() - time));
-            //System.out.printf("Drew %d blocks in %.2f ms%n", blockMapList.size(), (System.nanoTime() - time) * 1e-6);
+
+            PasteToolBufferBuilder.draw(player, doubleX, doubleY, doubleZ, startPos, UUID); //Draw the cached buffer in the world.
+
             GlStateManager.popMatrix();
             //Set blending back to the default mode
             GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
@@ -367,22 +353,6 @@ public class ToolRenders {
                 return;
             }
 
-            /*if (PasteToolBufferBuilder.getPacketSent()) {
-                System.out.println("Attempts: " + PasteToolBufferBuilder.getAttemps());
-                PasteToolBufferBuilder.setAttempts(PasteToolBufferBuilder.getAttemps() + 1);
-                if (PasteToolBufferBuilder.getAttemps() > 100) {
-                    PasteToolBufferBuilder.setPacketSent(false);
-                    PasteToolBufferBuilder.setAttempts(0);
-                }
-            }
-
-            if ((CopyPasteTool.getCopyCounter(stack) != PasteToolBufferBuilder.getCopyCounter(UUID) || PasteToolBufferBuilder.getTagFromUUID(UUID) == null) && !PasteToolBufferBuilder.getPacketSent()) {
-                System.out.println("Requesting BlockMap Packet (Copy)");
-                //PacketHandler.INSTANCE.sendToServer(new PacketRequestBlockMap(CopyPasteTool.getUUID(stack)));
-                //PasteToolBufferBuilder.setPacketSent(true);
-                PasteToolBufferBuilder.setAttempts(0);
-            }*/
-
             ArrayList<BlockMap> blockMapList = CopyPasteTool.getBlockMapList(PasteToolBufferBuilder.getTagFromUUID(UUID));
             if (blockMapList.size() == 0) {
                 return;
@@ -396,34 +366,13 @@ public class ToolRenders {
             double doubleY = player.lastTickPosY + (player.posY - player.lastTickPosY) * evt.getPartialTicks();
             double doubleZ = player.lastTickPosZ + (player.posZ - player.lastTickPosZ) * evt.getPartialTicks();
 
-            int x = startPos.getX();
-            int y = startPos.getY();
-            int z = startPos.getZ();
-
-            int dx = 0, dy = 0, dz = 0;
-
-            for (BlockMap blockMap : blockMapList) {
-                if (Math.abs(blockMap.xOffset) > Math.abs(dx)) dx = blockMap.xOffset;
-                if (Math.abs(blockMap.yOffset) > Math.abs(dy)) dy = blockMap.yOffset;
-                if (Math.abs(blockMap.zOffset) > Math.abs(dz)) dz = blockMap.zOffset;
-            }
-
-            if (dx >= 0) dx++;
-            else {
-                x++;
-                dx--;
-            }
-
-            if (dy >= 0) dy++;
-            else {
-                y++;
-                dy--;
-            }
-            if (dz >= 0) dz++;
-            else {
-                z++;
-                dz--;
-            }
+            //We want to draw from the starting position to the (ending position)+1
+            int x = (startPos.getX() <= endPos.getX()) ? startPos.getX() : endPos.getX();
+            int y = (startPos.getY() <= endPos.getY()) ? startPos.getY() : endPos.getY();
+            int z = (startPos.getZ() <= endPos.getZ()) ? startPos.getZ() : endPos.getZ();
+            int dx = (startPos.getX() > endPos.getX()) ? startPos.getX() + 1 : endPos.getX() + 1;
+            int dy = (startPos.getY() > endPos.getY()) ? startPos.getY() + 1 : endPos.getY() + 1;
+            int dz = (startPos.getZ() > endPos.getZ()) ? startPos.getZ() + 1 : endPos.getZ() + 1;
 
             Tessellator tessellator = Tessellator.getInstance();
             BufferBuilder bufferbuilder = tessellator.getBuffer();
@@ -435,7 +384,7 @@ public class ToolRenders {
             GlStateManager.enableBlend();
             GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
 
-            renderBox(tessellator, bufferbuilder, x, y, z, x + dx, y + dy, z + dz, 255, 223, 127);
+            renderBox(tessellator, bufferbuilder, x, y, z, dx, dy, dz, 255, 223, 127); // Draw the box around the blocks we've copied.
 
             GlStateManager.glLineWidth(1.0F);
             GlStateManager.enableLighting();
@@ -447,28 +396,28 @@ public class ToolRenders {
         }
     }
 
-    private static void renderBox(Tessellator p_190055_1_, BufferBuilder p_190055_2_, double p_190055_3_, double p_190055_5_, double p_190055_7_, double p_190055_9_, double p_190055_11_, double p_190055_13_, int p_190055_15_, int p_190055_16_, int p_190055_17_) {
+    private static void renderBox(Tessellator tessellator, BufferBuilder bufferBuilder, double startX, double startY, double startZ, double endX, double endY, double endZ, int R, int G, int B) {
         GlStateManager.glLineWidth(2.0F);
-        p_190055_2_.begin(3, DefaultVertexFormats.POSITION_COLOR);
-        p_190055_2_.pos(p_190055_3_, p_190055_5_, p_190055_7_).color((float) p_190055_16_, (float) p_190055_16_, (float) p_190055_16_, 0.0F).endVertex();
-        p_190055_2_.pos(p_190055_3_, p_190055_5_, p_190055_7_).color(p_190055_16_, p_190055_16_, p_190055_16_, p_190055_15_).endVertex();
-        p_190055_2_.pos(p_190055_9_, p_190055_5_, p_190055_7_).color(p_190055_16_, p_190055_17_, p_190055_17_, p_190055_15_).endVertex();
-        p_190055_2_.pos(p_190055_9_, p_190055_5_, p_190055_13_).color(p_190055_16_, p_190055_16_, p_190055_16_, p_190055_15_).endVertex();
-        p_190055_2_.pos(p_190055_3_, p_190055_5_, p_190055_13_).color(p_190055_16_, p_190055_16_, p_190055_16_, p_190055_15_).endVertex();
-        p_190055_2_.pos(p_190055_3_, p_190055_5_, p_190055_7_).color(p_190055_17_, p_190055_17_, p_190055_16_, p_190055_15_).endVertex();
-        p_190055_2_.pos(p_190055_3_, p_190055_11_, p_190055_7_).color(p_190055_17_, p_190055_16_, p_190055_17_, p_190055_15_).endVertex();
-        p_190055_2_.pos(p_190055_9_, p_190055_11_, p_190055_7_).color(p_190055_16_, p_190055_16_, p_190055_16_, p_190055_15_).endVertex();
-        p_190055_2_.pos(p_190055_9_, p_190055_11_, p_190055_13_).color(p_190055_16_, p_190055_16_, p_190055_16_, p_190055_15_).endVertex();
-        p_190055_2_.pos(p_190055_3_, p_190055_11_, p_190055_13_).color(p_190055_16_, p_190055_16_, p_190055_16_, p_190055_15_).endVertex();
-        p_190055_2_.pos(p_190055_3_, p_190055_11_, p_190055_7_).color(p_190055_16_, p_190055_16_, p_190055_16_, p_190055_15_).endVertex();
-        p_190055_2_.pos(p_190055_3_, p_190055_11_, p_190055_13_).color(p_190055_16_, p_190055_16_, p_190055_16_, p_190055_15_).endVertex();
-        p_190055_2_.pos(p_190055_3_, p_190055_5_, p_190055_13_).color(p_190055_16_, p_190055_16_, p_190055_16_, p_190055_15_).endVertex();
-        p_190055_2_.pos(p_190055_9_, p_190055_5_, p_190055_13_).color(p_190055_16_, p_190055_16_, p_190055_16_, p_190055_15_).endVertex();
-        p_190055_2_.pos(p_190055_9_, p_190055_11_, p_190055_13_).color(p_190055_16_, p_190055_16_, p_190055_16_, p_190055_15_).endVertex();
-        p_190055_2_.pos(p_190055_9_, p_190055_11_, p_190055_7_).color(p_190055_16_, p_190055_16_, p_190055_16_, p_190055_15_).endVertex();
-        p_190055_2_.pos(p_190055_9_, p_190055_5_, p_190055_7_).color(p_190055_16_, p_190055_16_, p_190055_16_, p_190055_15_).endVertex();
-        p_190055_2_.pos(p_190055_9_, p_190055_5_, p_190055_7_).color((float) p_190055_16_, (float) p_190055_16_, (float) p_190055_16_, 0.0F).endVertex();
-        p_190055_1_.draw();
+        bufferBuilder.begin(3, DefaultVertexFormats.POSITION_COLOR);
+        bufferBuilder.pos(startX, startY, startZ).color((float) G, (float) G, (float) G, 0.0F).endVertex();
+        bufferBuilder.pos(startX, startY, startZ).color(G, G, G, R).endVertex();
+        bufferBuilder.pos(endX, startY, startZ).color(G, B, B, R).endVertex();
+        bufferBuilder.pos(endX, startY, endZ).color(G, G, G, R).endVertex();
+        bufferBuilder.pos(startX, startY, endZ).color(G, G, G, R).endVertex();
+        bufferBuilder.pos(startX, startY, startZ).color(B, B, G, R).endVertex();
+        bufferBuilder.pos(startX, endY, startZ).color(B, G, B, R).endVertex();
+        bufferBuilder.pos(endX, endY, startZ).color(G, G, G, R).endVertex();
+        bufferBuilder.pos(endX, endY, endZ).color(G, G, G, R).endVertex();
+        bufferBuilder.pos(startX, endY, endZ).color(G, G, G, R).endVertex();
+        bufferBuilder.pos(startX, endY, startZ).color(G, G, G, R).endVertex();
+        bufferBuilder.pos(startX, endY, endZ).color(G, G, G, R).endVertex();
+        bufferBuilder.pos(startX, startY, endZ).color(G, G, G, R).endVertex();
+        bufferBuilder.pos(endX, startY, endZ).color(G, G, G, R).endVertex();
+        bufferBuilder.pos(endX, endY, endZ).color(G, G, G, R).endVertex();
+        bufferBuilder.pos(endX, endY, startZ).color(G, G, G, R).endVertex();
+        bufferBuilder.pos(endX, startY, startZ).color(G, G, G, R).endVertex();
+        bufferBuilder.pos(endX, startY, startZ).color((float) G, (float) G, (float) G, 0.0F).endVertex();
+        tessellator.draw();
         GlStateManager.glLineWidth(1.0F);
     }
 }
