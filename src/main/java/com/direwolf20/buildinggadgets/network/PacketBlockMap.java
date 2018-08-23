@@ -38,6 +38,9 @@ public class PacketBlockMap implements IMessage {
         }
 
         private void handle(PacketBlockMap message, MessageContext ctx) {
+            if (message.tag.equals(new NBTTagCompound())) {
+                PasteToolBufferBuilder.clearMaps();
+            }
             String UUID = message.tag.getString("UUID");
             PasteToolBufferBuilder.addToMap(UUID, message.tag);
             PasteToolBufferBuilder.addMapToBuffer(UUID);

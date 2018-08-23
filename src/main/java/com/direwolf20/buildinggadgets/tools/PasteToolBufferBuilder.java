@@ -37,6 +37,11 @@ public class PasteToolBufferBuilder {
         return -1;
     }
 
+    public static void clearMaps() {
+        tagMap = new HashMap<String, NBTTagCompound>();
+        bufferMap = new HashMap<String, ToolDireBuffer>();
+    }
+
     public static void addToMap(String UUID, NBTTagCompound tag) {
         tagMap.put(UUID, tag);
     }
@@ -60,7 +65,6 @@ public class PasteToolBufferBuilder {
         ArrayList<BlockMap> blockMapList = CopyPasteTool.getBlockMapList(tagMap.get(UUID));
         BlockRendererDispatcher dispatcher = Minecraft.getMinecraft().getBlockRendererDispatcher();
         ToolDireBuffer bufferBuilder = new ToolDireBuffer(2097152);
-        //bufferBuilder.reset();
         bufferBuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
         for (BlockMap blockMap : blockMapList) {
             IBlockState renderBlockState = blockMap.state;
@@ -75,7 +79,6 @@ public class PasteToolBufferBuilder {
     public static void draw(EntityPlayer player, double x, double y, double z, BlockPos startPos, String UUID) {
         long time = System.nanoTime();
         ToolDireBuffer bufferBuilder = bufferMap.get(UUID);
-        //bufferBuilder = bufferMap.get(UUID);
         bufferBuilder.sortVertexData((float) (x - startPos.getX()), (float) ((y + player.getEyeHeight()) - startPos.getY()), (float) (z - startPos.getZ()));
         //System.out.printf("Sorted %d Vertexes in %.2f ms%n", bufferBuilder.getVertexCount(), (System.nanoTime() - time) * 1e-6);
         if (bufferBuilder.getVertexCount() > 0) {

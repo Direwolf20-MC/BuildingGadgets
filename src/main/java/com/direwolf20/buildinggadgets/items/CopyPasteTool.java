@@ -91,6 +91,16 @@ public class CopyPasteTool extends GenericGadget {
         return uuid;
     }
 
+    public static String getOwner(ItemStack stack) {
+        return stack.getTagCompound().getString("owner");
+    }
+
+    public static void setOwner(ItemStack stack, String owner) {
+        NBTTagCompound tagCompound = stack.getTagCompound();
+        tagCompound.setString("owner", owner);
+        stack.setTagCompound(tagCompound);
+    }
+
     public static Integer getCopyCounter(ItemStack stack) {
         return stack.getTagCompound().getInteger("copycounter");
     }
@@ -99,14 +109,6 @@ public class CopyPasteTool extends GenericGadget {
         NBTTagCompound tagCompound = stack.getTagCompound();
         tagCompound.setInteger("copycounter", tagCompound.getInteger("copycounter") + 1);
         stack.setTagCompound(tagCompound);
-    }
-
-    public static Integer getCopyCounter(NBTTagCompound tagCompound) {
-        return tagCompound.getInteger("copycounter");
-    }
-
-    public static void incrementCopyCounter(NBTTagCompound tagCompound) {
-        tagCompound.setInteger("copycounter", tagCompound.getInteger("copycounter") + 1);
     }
 
     public static void setLastBuild(ItemStack stack, BlockPos anchorPos, Integer dim) {
@@ -194,7 +196,6 @@ public class CopyPasteTool extends GenericGadget {
         if (MapIntStackTag == null) {
             MapIntStackTag = new NBTTagList();
         }
-
         BlockMapIntState MapIntState = new BlockMapIntState();
         MapIntState.getIntStateMapFromNBT(MapIntStateTag);
         MapIntState.getIntStackMapFromNBT(MapIntStackTag);
@@ -402,7 +403,7 @@ public class CopyPasteTool extends GenericGadget {
         tagCompound.setTag("endPos", NBTUtil.createPosTag(end));
         tagCompound.setInteger("dim", player.dimension);
         tagCompound.setString("UUID", getUUID(stack));
-
+        tagCompound.setString("owner", player.getName());
         incrementCopyCounter(stack);
         tagCompound.setInteger("copycounter", getCopyCounter(stack));
 
@@ -429,7 +430,7 @@ public class CopyPasteTool extends GenericGadget {
             placeBlock(world, blockMap.pos, player, blockMap.state, IntStackMap);
         }
         setAnchor(stack, null);
-        System.out.printf("Built %d Blocks in %.2f ms%n", blockMapList.size(), (System.nanoTime() - time) * 1e-6);
+        //System.out.printf("Built %d Blocks in %.2f ms%n", blockMapList.size(), (System.nanoTime() - time) * 1e-6);
     }
 
     public static void placeBlock(World world, BlockPos pos, EntityPlayer player, IBlockState state, Map<IBlockState, UniqueItem> IntStackMap) {

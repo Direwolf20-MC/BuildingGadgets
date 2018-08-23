@@ -1,5 +1,7 @@
 package com.direwolf20.buildinggadgets;
 
+import com.direwolf20.buildinggadgets.commands.DeleteBlockMapsCommand;
+import com.direwolf20.buildinggadgets.commands.FindBlockMapsCommand;
 import com.direwolf20.buildinggadgets.eventhandlers.AnvilRepairHandler;
 import com.direwolf20.buildinggadgets.eventhandlers.BreakEventHandler;
 import com.direwolf20.buildinggadgets.eventhandlers.ItemPickupHandler;
@@ -52,6 +54,7 @@ public class BuildingGadgets {
 
     @Mod.EventHandler
     public void serverLoad(FMLServerStartingEvent event) {
-        //event.registerServerCommand(new ResetCommand());
+        event.registerServerCommand(new FindBlockMapsCommand());
+        event.registerServerCommand(new DeleteBlockMapsCommand());
     }
 }

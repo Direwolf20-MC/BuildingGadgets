@@ -32,6 +32,14 @@ public class BlockMapWorldSave extends WorldSavedData {
         markDirty();
     }
 
+    public Map<String, NBTTagCompound> getTagMap() {
+        return tagMap;
+    }
+
+    public void setTagMap(Map<String, NBTTagCompound> newMap) {
+        tagMap = new HashMap<String, NBTTagCompound>(newMap);
+    }
+
     public NBTTagCompound getCompoundFromUUID(String UUID) {
         return tagMap.get(UUID);
     }
