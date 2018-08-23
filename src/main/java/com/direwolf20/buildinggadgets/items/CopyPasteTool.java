@@ -78,6 +78,9 @@ public class CopyPasteTool extends GenericGadget {
         }
         String uuid = tagCompound.getString("UUID");
         if (tagCompound == null || uuid == "") {
+            if (getStartPos(stack) == null && getEndPos(stack) == null) {
+                return null;
+            }
             UUID uid = UUID.randomUUID();
             tagCompound.setString("UUID", uid.toString());
             stack.setTagCompound(tagCompound);

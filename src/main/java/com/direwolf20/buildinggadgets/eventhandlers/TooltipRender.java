@@ -44,9 +44,13 @@ public class TooltipRender {
         //This method extends the tooltip box size to fit the item's we will render in onDrawTooltip
         Minecraft mc = Minecraft.getMinecraft();
         ItemStack stack = event.getItemStack();
-        String UUID = CopyPasteTool.getUUID(stack);
-        List<String> tooltip = event.getToolTip();
         if (stack.getItem() instanceof CopyPasteTool) {
+            String UUID = CopyPasteTool.getUUID(stack);
+            if (UUID == null) {
+                return;
+            }
+
+            List<String> tooltip = event.getToolTip();
             Map<UniqueItem, Integer> itemCountMap = makeRequiredList(UUID);
             int count = itemCountMap.size();
             //boolean creative = ((IReagentHolder) stack.getItem()).isCreativeReagentHolder(stack);
@@ -69,8 +73,8 @@ public class TooltipRender {
     public static void onDrawTooltip(RenderTooltipEvent.PostText event) {
         //This method will draw items on the tooltip
         ItemStack stack = event.getStack();
-        String UUID = CopyPasteTool.getUUID(stack);
         if (stack.getItem() instanceof CopyPasteTool && GuiScreen.isShiftKeyDown()) {
+            String UUID = CopyPasteTool.getUUID(stack);
             Map<UniqueItem, Integer> itemCountMap = makeRequiredList(UUID); //Create a new UniqueItem->Count map
 
             //Create an ItemStack -> Integer Map

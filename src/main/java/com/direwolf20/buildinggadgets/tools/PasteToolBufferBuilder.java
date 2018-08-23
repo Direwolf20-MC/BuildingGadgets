@@ -10,6 +10,7 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.client.renderer.vertex.VertexFormatElement;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.relauncher.Side;
@@ -110,5 +111,9 @@ public class PasteToolBufferBuilder {
                 vertexformatelement1.getUsage().postDraw(vertexformat, i1, i, bytebuffer);
             }
         }
+    }
+
+    public static boolean isUpdateNeeded(String UUID, ItemStack stack) {
+        return ((CopyPasteTool.getCopyCounter(stack) != getCopyCounter(UUID) || PasteToolBufferBuilder.getTagFromUUID(UUID) == null));
     }
 }

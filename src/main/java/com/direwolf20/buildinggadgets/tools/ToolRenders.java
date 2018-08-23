@@ -307,8 +307,6 @@ public class ToolRenders {
                 }
             }
 
-
-
             if ((CopyPasteTool.getCopyCounter(stack) != PasteToolBufferBuilder.getCopyCounter(UUID) || PasteToolBufferBuilder.getTagFromUUID(UUID) == null) && !PasteToolBufferBuilder.getPacketSent()) {
                 System.out.println("Requesting BlockMap Packet(Paste)");
                 //PacketHandler.INSTANCE.sendToServer(new PacketRequestBlockMap(CopyPasteTool.getUUID(stack)));
