@@ -7,6 +7,15 @@ Dire's Building Gadgets aims to make building a little bit easier. At this time 
 
 [Spotlight](https://youtu.be/D4Ib4h7aTSk)
 
+### Contents
++ [Building Gadget](#building-gadget)  
+  - [Builder Modes](#builder-modes)  
+
++ [Exchanger Tool](#exchanger-tool)  
+  - [Exchanger Modes](#exchanger-modes)  
+  
+ [Download](#download)
+
 Press the `Mode Switch` hotkey to switch modes.
 
 Press the `Range Change` hotkey to increase the range (Sneak+Hotkey decrements the range). 
@@ -44,3 +53,7 @@ Wall -  Exchanges in a Range x Range (Example: 3x3 or 5x5), around the block yo
 Horizontal Column - Horizontal with respect to the players look vector. This will be a straight line typically left and right of the block you're looking at. 
 
 Vertical Column - Vertical with respect to the players look vector. This will be a straight line typically `up` and `down` of the block you're looking at.
+
+### Download
+
+If you like the look of it, you can add it to your modpack with the Twitch launcher or you can download it from the CurseForge page [here](https://minecraft.curseforge.com/projects/building-gadgets)
