@@ -20,7 +20,7 @@ import org.apache.logging.log4j.Logger;
 public class BuildingGadgets {
     public static final String MODID = "buildinggadgets";
     public static final String MODNAME = "Building Gadgets";
-    public static final String VERSION = "2.2.0";
+    public static final String VERSION = "2.2.1";
 
 
     @SidedProxy(clientSide = "com.direwolf20.buildinggadgets.ClientProxy", serverSide = "com.direwolf20.buildinggadgets.ServerProxy")
