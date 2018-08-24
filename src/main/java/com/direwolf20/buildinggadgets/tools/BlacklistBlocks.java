@@ -39,6 +39,7 @@ public class BlacklistBlocks {
             addBlockToBlacklist(Blocks.IRON_DOOR);
             addBlockToBlacklist(Blocks.JUNGLE_DOOR);
             addBlockToBlacklist(Blocks.SPRUCE_DOOR);
+            addBlockToBlacklist(Blocks.PISTON_HEAD);
             setConfig(cfg, blacklistedBlocks);
         } else{
             for (String entry : category.get("Blacklist").getStringList()) {
