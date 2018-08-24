@@ -12,6 +12,7 @@ import com.direwolf20.buildinggadgets.tools.*;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
@@ -19,6 +20,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Enchantments;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -39,10 +41,7 @@ import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 import static com.direwolf20.buildinggadgets.tools.GadgetUtils.useEnergy;
 import static com.direwolf20.buildinggadgets.tools.GadgetUtils.withSuffix;
@@ -121,6 +120,26 @@ public class CopyPasteTool extends GenericGadget {
 
     public static Integer getLastBuildDim(ItemStack stack) {
         return GadgetUtils.getDIMFromNBT(stack, "lastBuild");
+    }
+
+    public static void setItemCountMap(ItemStack stack, Map<UniqueItem, Integer> tagMap) {
+        NBTTagCompound tagCompound = stack.getTagCompound();
+        if (tagCompound == null) {
+            tagCompound = new NBTTagCompound();
+        }
+        NBTTagList tagList = GadgetUtils.itemCountToNBT(tagMap);
+        tagCompound.setTag("itemcountmap", tagList);
+        stack.setTagCompound(tagCompound);
+    }
+
+    public static Map<UniqueItem, Integer> getItemCountMap(ItemStack stack) {
+        NBTTagCompound tagCompound = stack.getTagCompound();
+        if (tagCompound == null) {
+            return null;
+        }
+
+        Map<UniqueItem, Integer> tagMap = GadgetUtils.nbtToItemCount((NBTTagList) tagCompound.getTag("itemcountmap"));
+        return tagMap;
     }
 
     public static void setStartPos(ItemStack stack, BlockPos startPos) {
@@ -270,7 +289,7 @@ public class CopyPasteTool extends GenericGadget {
             NBTTagCompound tagCompound = stack.getTagCompound();
             ByteBuf buf = Unpooled.buffer(16);
             ByteBufUtils.writeTag(buf, tagCompound);
-            System.out.println(buf.readableBytes());
+            //System.out.println(buf.readableBytes());
         }
 
         return EnumActionResult.SUCCESS;
@@ -396,6 +415,7 @@ public class CopyPasteTool extends GenericGadget {
         ArrayList<Integer> posIntArrayList = new ArrayList<Integer>();
         ArrayList<Integer> stateIntArrayList = new ArrayList<Integer>();
         BlockMapIntState blockMapIntState = new BlockMapIntState();
+        Map<UniqueItem, Integer> itemCountMap = new HashMap<UniqueItem, Integer>();
 
         int blockCount = 0;
 
@@ -421,10 +441,35 @@ public class CopyPasteTool extends GenericGadget {
                             player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.toomanyblocks").getUnformattedComponentText()), true);
                             return false;
                         }
+                        NonNullList<ItemStack> drops = NonNullList.create();
+                        actualState.getBlock().getDrops(drops, Minecraft.getMinecraft().world, new BlockPos(0, 0, 0), actualState, 0);
+                        int neededItems = 0;
+                        for (ItemStack drop : drops) {
+                            if (drop.getItem().equals(uniqueItem.item)) {
+                                neededItems++;
+                            }
+                        }
+                        if (neededItems == 0) {
+                            neededItems = 1;
+                        }
+                        if (uniqueItem.item != Items.AIR) {
+                            boolean found = false;
+                            for (Map.Entry<UniqueItem, Integer> entry : itemCountMap.entrySet()) {
+                                if (entry.getKey().equals(uniqueItem)) {
+                                    itemCountMap.put(entry.getKey(), itemCountMap.get(entry.getKey()) + neededItems);
+                                    found = true;
+                                    break;
+                                }
+                            }
+                            if (!found) {
+                                itemCountMap.put(uniqueItem, neededItems);
+                            }
+                        }
                     }
                 }
             }
         }
+        setItemCountMap(stack, itemCountMap);
         tagCompound.setTag("mapIntState", blockMapIntState.putIntStateMapIntoNBT());
         tagCompound.setTag("mapIntStack", blockMapIntState.putIntStackMapIntoNBT());
         int[] posIntArray = posIntArrayList.stream().mapToInt(i -> i).toArray();

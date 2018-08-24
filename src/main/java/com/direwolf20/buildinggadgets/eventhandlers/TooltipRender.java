@@ -53,7 +53,7 @@ public class TooltipRender {
             }
 
             List<String> tooltip = event.getToolTip();
-            Map<UniqueItem, Integer> itemCountMap = makeRequiredList(UUID);
+            Map<UniqueItem, Integer> itemCountMap = CopyPasteTool.getItemCountMap(stack);
             int count = itemCountMap.size();
             //boolean creative = ((IReagentHolder) stack.getItem()).isCreativeReagentHolder(stack);
 
@@ -77,7 +77,7 @@ public class TooltipRender {
         ItemStack stack = event.getStack();
         if (stack.getItem() instanceof CopyPasteTool && GuiScreen.isShiftKeyDown()) {
             String UUID = CopyPasteTool.getUUID(stack);
-            Map<UniqueItem, Integer> itemCountMap = makeRequiredList(UUID); //Create a new UniqueItem->Count map
+            Map<UniqueItem, Integer> itemCountMap = CopyPasteTool.getItemCountMap(stack);
 
             //Create an ItemStack -> Integer Map
             Map<ItemStack, Integer> itemStackCount = new HashMap<ItemStack, Integer>();

@@ -28,7 +28,7 @@ public class ClientTickEvent {
                     String UUID = CopyPasteTool.getUUID(stack);
                     if (UUID != null) {
                         if (PasteToolBufferBuilder.isUpdateNeeded(UUID, stack)) {
-                            System.out.println("BlockMap Update Needed for UUID: " + UUID + " in slot " + i);
+                            //System.out.println("BlockMap Update Needed for UUID: " + UUID + " in slot " + i);
                             PacketHandler.INSTANCE.sendToServer(new PacketRequestBlockMap(CopyPasteTool.getUUID(stack)));
                         }
                     }

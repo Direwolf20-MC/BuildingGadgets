@@ -73,7 +73,7 @@ public class PasteToolBufferBuilder {
         }
         bufferBuilder.finishDrawing();
         bufferMap.put(UUID, bufferBuilder);
-        System.out.printf("Created %d Vertexes for %d blocks in %.2f ms%n", bufferBuilder.getVertexCount(), blockMapList.size(), (System.nanoTime() - time) * 1e-6);
+        //System.out.printf("Created %d Vertexes for %d blocks in %.2f ms%n", bufferBuilder.getVertexCount(), blockMapList.size(), (System.nanoTime() - time) * 1e-6);
     }
 
     public static void draw(EntityPlayer player, double x, double y, double z, BlockPos startPos, String UUID) {

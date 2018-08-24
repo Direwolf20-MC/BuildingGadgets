@@ -73,7 +73,7 @@ public class DeleteBlockMapsCommand extends CommandBase {
             worldSave.markForSaving();
             if (searchName.equals(sender.getName())) {
                 PacketHandler.INSTANCE.sendTo(new PacketBlockMap(new NBTTagCompound()), (EntityPlayerMP) sender);
-                System.out.println("Sending BlockMap Packet");
+                //System.out.println("Sending BlockMap Packet");
             }
         }
         sender.sendMessage(new TextComponentString(TextFormatting.WHITE + "Deleted " + counter + " blockmaps in world data."));

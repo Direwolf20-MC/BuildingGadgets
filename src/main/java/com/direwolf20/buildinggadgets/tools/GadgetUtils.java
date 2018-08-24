@@ -6,6 +6,7 @@ import com.direwolf20.buildinggadgets.items.ExchangerTool;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -22,6 +23,8 @@ import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class GadgetUtils {
 
@@ -404,5 +407,34 @@ public class GadgetUtils {
         int y = startPos.getY() + (int) (byte) ((p & 0x00ff00) >> 8);
         int z = startPos.getZ() + (int) (byte) (p & 0x0000ff);
         return new BlockPos(x, y, z);
+    }
+
+    public static NBTTagList itemCountToNBT(Map<UniqueItem, Integer> itemCountMap) {
+        NBTTagList tagList = new NBTTagList();
+
+        for (Map.Entry<UniqueItem, Integer> entry : itemCountMap.entrySet()) {
+            int item = Item.getIdFromItem(entry.getKey().item);
+            int meta = entry.getKey().meta;
+            int count = entry.getValue();
+            NBTTagCompound tagCompound = new NBTTagCompound();
+            tagCompound.setInteger("item", item);
+            tagCompound.setInteger("meta", meta);
+            tagCompound.setInteger("count", count);
+            tagList.appendTag(tagCompound);
+        }
+        return tagList;
+    }
+
+    public static Map<UniqueItem, Integer> nbtToItemCount(NBTTagList tagList) {
+        Map<UniqueItem, Integer> itemCountMap = new HashMap<UniqueItem, Integer>();
+        if (tagList == null) return itemCountMap;
+        for (int i = 0; i < tagList.tagCount(); i++) {
+            NBTTagCompound tagCompound = tagList.getCompoundTagAt(i);
+            UniqueItem uniqueItem = new UniqueItem(Item.getItemById(tagCompound.getInteger("item")), tagCompound.getInteger("meta"));
+            int count = tagCompound.getInteger("count");
+            itemCountMap.put(uniqueItem, count);
+        }
+
+        return itemCountMap;
     }
 }
