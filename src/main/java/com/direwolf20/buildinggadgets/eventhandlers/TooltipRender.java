@@ -19,6 +19,8 @@ import net.minecraft.client.renderer.RenderItem;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.NonNullList;
+import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.client.event.RenderTooltipEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -174,17 +176,28 @@ public class TooltipRender {
         ArrayList<BlockMap> blockMapList = CopyPasteTool.getBlockMapList(PasteToolBufferBuilder.getTagFromUUID(UUID));
         for (BlockMap blockMap : blockMapList) {
             UniqueItem uniqueItem = IntStackMap.get(blockMap.state);
+            NonNullList<ItemStack> drops = NonNullList.create();
+            blockMap.state.getBlock().getDrops(drops, Minecraft.getMinecraft().world, new BlockPos(0, 0, 0), blockMap.state, 0);
+            int neededItems = 0;
+            for (ItemStack drop : drops) {
+                if (drop.getItem().equals(uniqueItem.item)) {
+                    neededItems++;
+                }
+            }
+            if (neededItems == 0) {
+                neededItems = 1;
+            }
             if (uniqueItem.item != Items.AIR) {
                 boolean found = false;
                 for (Map.Entry<UniqueItem, Integer> entry : itemCountMap.entrySet()) {
                     if (entry.getKey().equals(uniqueItem)) {
-                        itemCountMap.put(entry.getKey(), itemCountMap.get(entry.getKey()) + 1);
+                        itemCountMap.put(entry.getKey(), itemCountMap.get(entry.getKey()) + neededItems);
                         found = true;
                         break;
                     }
                 }
                 if (!found) {
-                    itemCountMap.put(uniqueItem, 1);
+                    itemCountMap.put(uniqueItem, neededItems);
                 }
             }
         }

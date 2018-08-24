@@ -116,10 +116,17 @@ public class BlockMapIntState {
 
     public static UniqueItem blockStateToUniqueItem(IBlockState state, EntityPlayer player, BlockPos pos) {
         ItemStack itemStack;
-        if (state.getBlock().canSilkHarvest(player.world, pos, state, player)) {
-            itemStack = InventoryManipulation.getSilkTouchDrop(state);
-        } else {
+        //if (state.getBlock().canSilkHarvest(player.world, pos, state, player)) {
+        //    itemStack = InventoryManipulation.getSilkTouchDrop(state);
+        //} else {
+        //}
+        try {
             itemStack = state.getBlock().getPickBlock(state, null, player.world, pos, player);
+        } catch (Exception e) {
+            itemStack = InventoryManipulation.getSilkTouchDrop(state);
+        }
+        if (itemStack == null || itemStack.equals(Items.AIR)) {
+            itemStack = InventoryManipulation.getSilkTouchDrop(state);
         }
         if (!itemStack.equals(Items.AIR)) {
             UniqueItem uniqueItem = new UniqueItem(itemStack.getItem(), itemStack.getMetadata());
