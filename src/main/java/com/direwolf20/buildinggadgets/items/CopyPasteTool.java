@@ -250,11 +250,20 @@ public class CopyPasteTool extends GenericGadget {
         if (!world.isRemote) {
             if (getToolMode(stack) == toolModes.Copy) {
                 if (player.isSneaking()) {
-                    setEndPos(stack, pos);
+                    if (getStartPos(stack) != null) {
+                        copyBlocks(stack, player, world, getStartPos(stack), pos);
+                    } else {
+                        setEndPos(stack, pos);
+                    }
                 } else {
-                    setStartPos(stack, pos);
+                    //setStartPos(stack, pos);
+                    if (getEndPos(stack) != null) {
+                        copyBlocks(stack, player, world, pos, getEndPos(stack));
+                    } else {
+                        setStartPos(stack, pos);
+                    }
                 }
-                copyBlocks(stack, player, world);
+
             } else if (getToolMode(stack) == toolModes.Paste) {
                 buildBlockMap(world, pos.up(), stack, player);
             }
@@ -280,11 +289,18 @@ public class CopyPasteTool extends GenericGadget {
                     return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);
                 }
                 if (player.isSneaking()) {
-                    setEndPos(stack, pos);
+                    if (getStartPos(stack) != null) {
+                        copyBlocks(stack, player, world, getStartPos(stack), pos);
+                    } else {
+                        setEndPos(stack, pos);
+                    }
                 } else {
-                    setStartPos(stack, pos);
+                    if (getEndPos(stack) != null) {
+                        copyBlocks(stack, player, world, pos, getEndPos(stack));
+                    } else {
+                        setStartPos(stack, pos);
+                    }
                 }
-                copyBlocks(stack, player, world);
             } else if (getToolMode(stack) == toolModes.Paste) {
                 if (getAnchor(stack) == null) {
                     BlockPos pos = VectorTools.getPosLookingAt(player);
@@ -343,14 +359,17 @@ public class CopyPasteTool extends GenericGadget {
         player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.rotated").getUnformattedComponentText()), true);
     }
 
-    public void copyBlocks(ItemStack stack, EntityPlayer player, World world) {
-        if (getStartPos(stack) != null && getEndPos(stack) != null) {
-            findBlocks(world, getStartPos(stack), getEndPos(stack), stack, player);
-            player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.copied").getUnformattedComponentText()), true);
+    public void copyBlocks(ItemStack stack, EntityPlayer player, World world, BlockPos startPos, BlockPos endPos) {
+        if (startPos != null && endPos != null) {
+            if (findBlocks(world, startPos, endPos, stack, player)) {
+                setStartPos(stack, startPos);
+                setEndPos(stack, endPos);
+                player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.copied").getUnformattedComponentText()), true);
+            }
         }
     }
 
-    public void findBlocks(World world, BlockPos start, BlockPos end, ItemStack stack, EntityPlayer player) {
+    public boolean findBlocks(World world, BlockPos start, BlockPos end, ItemStack stack, EntityPlayer player) {
         setLastBuild(stack, null, 0);
 
         int startX = start.getX();
@@ -360,6 +379,11 @@ public class CopyPasteTool extends GenericGadget {
         int endX = end.getX();
         int endY = end.getY();
         int endZ = end.getZ();
+
+        if (Math.abs(startX - endX) >= 125 || Math.abs(startY - endY) >= 125 || Math.abs(startZ - endZ) >= 125) {
+            player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.toobigarea").getUnformattedComponentText()), true);
+            return false;
+        }
 
         int iStartX = startX < endX ? startX : endX;
         int iStartY = startY < endY ? startY : endY;
@@ -372,6 +396,8 @@ public class CopyPasteTool extends GenericGadget {
         ArrayList<Integer> posIntArrayList = new ArrayList<Integer>();
         ArrayList<Integer> stateIntArrayList = new ArrayList<Integer>();
         BlockMapIntState blockMapIntState = new BlockMapIntState();
+
+        int blockCount = 0;
 
         for (int x = iStartX; x <= iEndX; x++) {
             for (int y = iStartY; y <= iEndY; y++) {
@@ -390,7 +416,11 @@ public class CopyPasteTool extends GenericGadget {
                         stateIntArrayList.add((int) blockMapIntState.findSlot(actualState));
                         UniqueItem uniqueItem = BlockMapIntState.blockStateToUniqueItem(actualState, player, tempPos);
                         blockMapIntState.addToStackMap(uniqueItem, actualState);
-
+                        blockCount++;
+                        if (blockCount > 32768) {
+                            player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.toomanyblocks").getUnformattedComponentText()), true);
+                            return false;
+                        }
                     }
                 }
             }
@@ -413,6 +443,7 @@ public class CopyPasteTool extends GenericGadget {
         worldSave.addToMap(getUUID(stack), tagCompound);
         worldSave.markForSaving();
         PacketHandler.INSTANCE.sendTo(new PacketBlockMap(tagCompound), (EntityPlayerMP) player);
+        return true;
     }
 
     public void buildBlockMap(World world, BlockPos startPos, ItemStack stack, EntityPlayer player) {

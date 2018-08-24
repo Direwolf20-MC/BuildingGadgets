@@ -30,3 +30,5 @@ tile.buildinggadgets.constructionblockpowder.name=Construction Block Powder
 tooltip.constructionblockpowder.helptext=Place next to water
 item.buildinggadgets.copypastetool.name=Copy-Paste Gadget
 message.gadget.rotated=Blocks Rotated
+message.gadget.toomanyblocks=Too Many Blocks, Limit is 32,768
+message.gadget.toobigarea=Area too Large, max area is 125x125x125
