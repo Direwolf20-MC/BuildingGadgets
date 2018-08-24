@@ -336,7 +336,11 @@ public class ToolRenders {
             GlStateManager.translate(-doubleX, -doubleY, -doubleZ);//The render starts at the player, so we subtract the player coords and move the render to 0,0,0
             GlStateManager.translate(startPos.getX(), startPos.getY(), startPos.getZ()); //Move the render to the startingBlockPos
             GL14.glBlendColor(1F, 1F, 1F, 0.55f); //Set the alpha of the blocks we are rendering
-
+            //GlStateManager.translate(-0.0005f, -0.0005f, 0.0005f);
+            //GlStateManager.scale(1.001f, 1.001f, 1.001f);//Slightly Larger block to avoid z-fighting.
+            GlStateManager.translate(0.0005f, 0.0005f, -0.0005f);
+            GlStateManager.scale(0.999f, 0.999f, 0.999f);//Slightly Larger block to avoid z-fighting.
+            //GL11.glClear(GL11.GL_DEPTH_BUFFER_BIT);
             PasteToolBufferBuilder.draw(player, doubleX, doubleY, doubleZ, startPos, UUID); //Draw the cached buffer in the world.
 
             GlStateManager.popMatrix();
@@ -346,6 +350,7 @@ public class ToolRenders {
             GlStateManager.disableBlend();
             //Pop from the original push in this method
             GlStateManager.popMatrix();
+
         } else {
             BlockPos startPos = CopyPasteTool.getStartPos(stack);
             BlockPos endPos = CopyPasteTool.getEndPos(stack);
