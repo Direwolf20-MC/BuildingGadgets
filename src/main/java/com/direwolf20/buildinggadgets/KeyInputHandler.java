@@ -9,6 +9,7 @@ import com.direwolf20.buildinggadgets.network.PacketUndoKey;
 import net.minecraft.client.Minecraft;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumHand;
+import net.minecraftforge.client.settings.KeyModifier;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent;
 
@@ -17,7 +18,7 @@ public class KeyInputHandler {
     @SubscribeEvent
     public void onKeyInput(InputEvent.KeyInputEvent event) {
         //if (KeyBindings.modeSwitch.isPressed()) {
-        if (KeyBindings.modeSwitch.isKeyDown()) {
+        if (KeyBindings.modeSwitch.isKeyDown() && ((KeyBindings.modeSwitch.getKeyModifier() == KeyModifier.NONE && KeyModifier.getActiveModifier() == KeyModifier.NONE) || KeyBindings.modeSwitch.getKeyModifier() != KeyModifier.NONE)) {
             //PacketHandler.INSTANCE.sendToServer(new PacketToggleMode());
             Minecraft mc = Minecraft.getMinecraft();
             ItemStack stack = mc.player.getHeldItem(EnumHand.MAIN_HAND);
@@ -41,7 +42,7 @@ public class KeyInputHandler {
     @SubscribeEvent
     public void onMouseInput(InputEvent.MouseInputEvent event) {
         //if (KeyBindings.modeSwitch.isPressed()) {
-        if (KeyBindings.modeSwitch.isKeyDown()) {
+        if (KeyBindings.modeSwitch.isKeyDown() && ((KeyBindings.modeSwitch.getKeyModifier() == KeyModifier.NONE && KeyModifier.getActiveModifier() == KeyModifier.NONE) || KeyBindings.modeSwitch.getKeyModifier() != KeyModifier.NONE)) {
             //PacketHandler.INSTANCE.sendToServer(new PacketToggleMode());
             Minecraft mc = Minecraft.getMinecraft();
             ItemStack stack = mc.player.getHeldItem(EnumHand.MAIN_HAND);
