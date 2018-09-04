@@ -19,8 +19,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 
-import java.util.ArrayList;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -156,8 +155,18 @@ public class InventoryManipulation {
             return itemStack;
         }
 
+        Map<Integer, Integer> slotMap = new HashMap<Integer, Integer>();
         for (int slot : slots) {
-            ItemStack containerStack = inv.getStackInSlot(slot);
+            slotMap.put(slot, ConstructionPasteContainer.getPasteAmount(inv.getStackInSlot(slot)));
+        }
+        List<Map.Entry<Integer, Integer>> list = new ArrayList<>(slotMap.entrySet());
+        Comparator<Map.Entry<Integer, Integer>> comparator = Comparator.comparing(entry -> entry.getValue());
+        comparator = comparator.reversed();
+        list.sort(comparator);
+
+
+        for (Map.Entry<Integer, Integer> entry : list) {
+            ItemStack containerStack = inv.getStackInSlot(entry.getKey());
             int pasteInContainer = ConstructionPasteContainer.getPasteAmount(containerStack);
             int freeSpace = ConstructionPasteContainer.maxAmount - pasteInContainer;
             int stackSize = itemStack.getCount();
