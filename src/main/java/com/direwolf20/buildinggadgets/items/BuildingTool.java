@@ -328,7 +328,7 @@ public class BuildingTool extends GenericGadget {
         //ItemStack constructionStack = InventoryManipulation.getSilkTouchDrop(ModBlocks.constructionBlock.getDefaultState());
         boolean useItemSuccess;
         if (useConstructionPaste) {
-            useItemSuccess = InventoryManipulation.usePaste(player, neededItems);
+            useItemSuccess = InventoryManipulation.usePaste(player, 1);
         } else {
             useItemSuccess = InventoryManipulation.useItem(itemStack, player, neededItems);
         }
