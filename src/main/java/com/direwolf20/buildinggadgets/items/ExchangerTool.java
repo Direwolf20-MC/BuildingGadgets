@@ -15,6 +15,7 @@ import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Enchantments;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.*;
@@ -255,6 +256,9 @@ public class ExchangerTool extends GenericGadget {
         if (setBlock.getBlock().canSilkHarvest(world, pos, setBlock, player)) {
             itemStack = InventoryManipulation.getSilkTouchDrop(setBlock);
         } else {
+            itemStack = setBlock.getBlock().getPickBlock(setBlock, null, world, pos, player);
+        }
+        if (itemStack.getItem().equals(Items.AIR)) {
             itemStack = setBlock.getBlock().getPickBlock(setBlock, null, world, pos, player);
         }
         ItemStack tool = player.getHeldItemMainhand();
