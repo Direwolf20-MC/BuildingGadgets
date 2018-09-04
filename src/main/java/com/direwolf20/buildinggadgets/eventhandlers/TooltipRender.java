@@ -5,6 +5,7 @@ package com.direwolf20.buildinggadgets.eventhandlers;
  * Thanks Vazkii!!
  */
 
+import com.direwolf20.buildinggadgets.ModItems;
 import com.direwolf20.buildinggadgets.items.CopyPasteTool;
 import com.direwolf20.buildinggadgets.tools.BlockMap;
 import com.direwolf20.buildinggadgets.tools.InventoryManipulation;
@@ -54,7 +55,24 @@ public class TooltipRender {
 
             List<String> tooltip = event.getToolTip();
             Map<UniqueItem, Integer> itemCountMap = CopyPasteTool.getItemCountMap(stack);
-            int count = itemCountMap.size();
+
+            Map<ItemStack, Integer> itemStackCount = new HashMap<ItemStack, Integer>();
+            for (Map.Entry<UniqueItem, Integer> entry : itemCountMap.entrySet()) {
+                ItemStack itemStack = new ItemStack(entry.getKey().item, 1, entry.getKey().meta);
+                itemStackCount.put(itemStack, entry.getValue());
+            }
+            List<Map.Entry<ItemStack, Integer>> list = new ArrayList<>(itemStackCount.entrySet());
+
+            int totalMissing = 0;
+            //Look through all the ItemStacks and draw each one in the specified X/Y position
+            for (Map.Entry<ItemStack, Integer> entry : list) {
+                int hasAmt = InventoryManipulation.countItem(entry.getKey(), Minecraft.getMinecraft().player);
+                if (hasAmt < entry.getValue()) {
+                    totalMissing = totalMissing + Math.abs(entry.getValue() - hasAmt);
+                }
+            }
+
+            int count = (totalMissing > 0) ? itemCountMap.size() + 1 : itemStackCount.size();
             //boolean creative = ((IReagentHolder) stack.getItem()).isCreativeReagentHolder(stack);
 
             if (count > 0)
@@ -76,6 +94,7 @@ public class TooltipRender {
         //This method will draw items on the tooltip
         ItemStack stack = event.getStack();
         if (stack.getItem() instanceof CopyPasteTool && GuiScreen.isShiftKeyDown()) {
+            int totalMissing = 0;
             String UUID = CopyPasteTool.getUUID(stack);
             Map<UniqueItem, Integer> itemCountMap = CopyPasteTool.getItemCountMap(stack);
 
@@ -119,13 +138,21 @@ public class TooltipRender {
                 int hasAmt = InventoryManipulation.countItem(entry.getKey(), Minecraft.getMinecraft().player);
                 int x = bx + (j % STACKS_PER_LINE) * 18;
                 int y = by + (j / STACKS_PER_LINE) * 20;
-                renderRequiredBlocks(entry.getKey(), x, y, hasAmt, entry.getValue());
+                totalMissing = totalMissing + renderRequiredBlocks(entry.getKey(), x, y, hasAmt, entry.getValue());
+                j++;
+            }
+            if (totalMissing > 0) {
+                ItemStack pasteItemStack = new ItemStack(ModItems.constructionPaste);
+                int hasAmt = InventoryManipulation.countItem(pasteItemStack, Minecraft.getMinecraft().player);
+                int x = bx + (j % STACKS_PER_LINE) * 18;
+                int y = by + (j / STACKS_PER_LINE) * 20;
+                renderRequiredBlocks(pasteItemStack, x, y, hasAmt, totalMissing);
                 j++;
             }
         }
     }
 
-    private static void renderRequiredBlocks(ItemStack itemStack, int x, int y, int count, int req) {
+    private static int renderRequiredBlocks(ItemStack itemStack, int x, int y, int count, int req) {
         Minecraft mc = Minecraft.getMinecraft();
         GlStateManager.disableDepth();
         RenderItem render = mc.getRenderItem();
@@ -146,6 +173,8 @@ public class TooltipRender {
         mc.fontRenderer.drawStringWithShadow(s1, 0, 0, color);
         GlStateManager.popMatrix();
 
+        int missingCount = 0;
+
         if (hasReq) {
             //The commented out code will draw a red box around any items that you don't have enough of
             //I personally didn't like it.
@@ -165,9 +194,11 @@ public class TooltipRender {
                 GlStateManager.scale(0.5F, 0.5F, 0.5F);
                 mc.fontRenderer.drawStringWithShadow(s2, 0, 0, 0xFF0000);
                 GlStateManager.popMatrix();
+                missingCount = (req - count);
             }
         }
         GlStateManager.enableDepth();
+        return missingCount;
     }
 
     public static Map<UniqueItem, Integer> makeRequiredList(String UUID) {
