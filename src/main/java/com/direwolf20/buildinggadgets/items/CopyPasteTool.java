@@ -426,7 +426,7 @@ public class CopyPasteTool extends GenericGadget {
                     IBlockState tempState = world.getBlockState(tempPos);
                     if (tempState != Blocks.AIR.getDefaultState() && (world.getTileEntity(tempPos) == null || world.getTileEntity(tempPos) instanceof ConstructionBlockTileEntity) && !tempState.getBlock().getMaterial(tempState).isLiquid() && !BlacklistBlocks.checkBlacklist(tempState.getBlock())) {
                         TileEntity te = world.getTileEntity(tempPos);
-                        IBlockState assignState = InventoryManipulation.getSpecificStates(tempState, world, player, tempPos);
+                        IBlockState assignState = InventoryManipulation.getSpecificStates(tempState, world, player, tempPos, stack);
                         IBlockState actualState = assignState.getBlock().getActualState(assignState, world, tempPos);
                         if (te instanceof ConstructionBlockTileEntity) {
                             actualState = ((ConstructionBlockTileEntity) te).getActualBlockState();

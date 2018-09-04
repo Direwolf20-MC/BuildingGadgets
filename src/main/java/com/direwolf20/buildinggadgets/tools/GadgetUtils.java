@@ -240,7 +240,7 @@ public class GadgetUtils {
             return;
         }
         if (state != null) {
-            IBlockState placeState = InventoryManipulation.getSpecificStates(state, world, player, pos);
+            IBlockState placeState = InventoryManipulation.getSpecificStates(state, world, player, pos, stack);
             IBlockState actualState = placeState.getBlock().getActualState(placeState, world, pos);
             setToolBlock(stack, placeState);
             setToolActualBlock(stack, actualState);

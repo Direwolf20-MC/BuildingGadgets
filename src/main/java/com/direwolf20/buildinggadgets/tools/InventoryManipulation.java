@@ -3,6 +3,7 @@ package com.direwolf20.buildinggadgets.tools;
 import com.direwolf20.buildinggadgets.ModItems;
 import com.direwolf20.buildinggadgets.items.ConstructionPaste;
 import com.direwolf20.buildinggadgets.items.ConstructionPasteContainer;
+import com.direwolf20.buildinggadgets.items.CopyPasteTool;
 import net.minecraft.block.*;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.IBlockState;
@@ -25,6 +26,9 @@ import java.util.stream.Stream;
 
 public class InventoryManipulation {
     private static final Set<IProperty> safeProperties = Stream.of(BlockSlab.HALF, BlockStairs.HALF, BlockLog.LOG_AXIS,
+            BlockDirectional.FACING, BlockStairs.FACING, BlockTrapDoor.HALF, BlockTorch.FACING, BlockStairs.SHAPE, BlockLever.FACING, BlockLever.POWERED).collect(Collectors.toSet());
+
+    private static final Set<IProperty> safePropertiesCopyPaste = Stream.of(BlockSlab.HALF, BlockStairs.HALF, BlockLog.LOG_AXIS,
             BlockDirectional.FACING, BlockStairs.FACING, BlockTrapDoor.HALF, BlockTorch.FACING, BlockStairs.SHAPE, BlockRail.SHAPE, BlockRailPowered.SHAPE,
             BlockLever.FACING, BlockLever.POWERED).collect(Collectors.toSet());
 
@@ -244,7 +248,7 @@ public class InventoryManipulation {
         return new ItemStack(item, 1, i);
     }
 
-    public static IBlockState getSpecificStates(IBlockState originalState, World world, EntityPlayer player, BlockPos pos) {
+    public static IBlockState getSpecificStates(IBlockState originalState, World world, EntityPlayer player, BlockPos pos, ItemStack tool) {
         IBlockState placeState = Blocks.AIR.getDefaultState();
         Block block = originalState.getBlock();
         ItemStack item = block.getPickBlock(originalState, null, world, pos, player);
@@ -255,8 +259,14 @@ public class InventoryManipulation {
             placeState = originalState.getBlock().getDefaultState();
         }
         for (IProperty prop : placeState.getPropertyKeys()) {
-            if (safeProperties.contains(prop)) {
-                placeState = placeState.withProperty(prop, originalState.getValue(prop));
+            if (tool.getItem() instanceof CopyPasteTool) {
+                if (safePropertiesCopyPaste.contains(prop)) {
+                    placeState = placeState.withProperty(prop, originalState.getValue(prop));
+                }
+            } else {
+                if (safeProperties.contains(prop)) {
+                    placeState = placeState.withProperty(prop, originalState.getValue(prop));
+                }
             }
         }
         return placeState;
