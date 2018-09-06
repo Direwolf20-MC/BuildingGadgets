@@ -5,6 +5,9 @@ import com.direwolf20.buildinggadgets.blocks.ConstructionBlock;
 import com.direwolf20.buildinggadgets.blocks.ConstructionBlockPowder;
 import com.direwolf20.buildinggadgets.blocks.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.blocks.EffectBlock;
+import com.direwolf20.buildinggadgets.blocks.templatemanager.TemplateManager;
+import com.direwolf20.buildinggadgets.blocks.templatemanager.TemplateManagerTileEntity;
+import com.direwolf20.buildinggadgets.gui.GuiProxy;
 import com.direwolf20.buildinggadgets.items.*;
 import com.direwolf20.buildinggadgets.network.PacketHandler;
 import net.minecraft.block.Block;
@@ -17,6 +20,7 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
 import java.io.File;
@@ -35,6 +39,7 @@ public class CommonProxy {
     }
 
     public void init(FMLInitializationEvent e) {
+        NetworkRegistry.INSTANCE.registerGuiHandler(BuildingGadgets.instance, new GuiProxy());
     }
 
     public void postInit(FMLPostInitializationEvent e) {
@@ -46,6 +51,8 @@ public class CommonProxy {
     @SubscribeEvent
     public static void registerBlocks(RegistryEvent.Register<Block> event) {
         event.getRegistry().register(new EffectBlock());
+        event.getRegistry().register(new TemplateManager());
+        GameRegistry.registerTileEntity(TemplateManagerTileEntity.class, BuildingGadgets.MODID + "_templateManager");
         if (Config.enablePaste) {
             event.getRegistry().register(new ConstructionBlock());
             event.getRegistry().register(new ConstructionBlockPowder());
@@ -58,6 +65,7 @@ public class CommonProxy {
         event.getRegistry().register(new BuildingTool());
         event.getRegistry().register(new ExchangerTool());
         event.getRegistry().register(new CopyPasteTool());
+        event.getRegistry().register(new ItemBlock(ModBlocks.templateManager).setRegistryName(ModBlocks.templateManager.getRegistryName()));
         if (Config.enablePaste) {
             event.getRegistry().register(new ItemBlock(ModBlocks.constructionBlock).setRegistryName(ModBlocks.constructionBlock.getRegistryName()));
             event.getRegistry().register(new ItemBlock(ModBlocks.constructionBlockPowder).setRegistryName(ModBlocks.constructionBlockPowder.getRegistryName()));

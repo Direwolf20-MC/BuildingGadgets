@@ -52,6 +52,7 @@ public class ClientProxy extends CommonProxy {
     @SubscribeEvent
     public static void registerModels(ModelRegistryEvent event) {
         ModBlocks.effectBlock.initModel();
+        ModBlocks.templateManager.initModel();
         buildingTool.initModel();
         ModItems.exchangerTool.initModel();
         ModItems.copyPasteTool.initModel();

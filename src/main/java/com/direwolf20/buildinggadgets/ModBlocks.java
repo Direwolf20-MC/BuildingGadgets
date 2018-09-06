@@ -3,6 +3,7 @@ package com.direwolf20.buildinggadgets;
 import com.direwolf20.buildinggadgets.blocks.ConstructionBlock;
 import com.direwolf20.buildinggadgets.blocks.ConstructionBlockPowder;
 import com.direwolf20.buildinggadgets.blocks.EffectBlock;
+import com.direwolf20.buildinggadgets.blocks.templatemanager.TemplateManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.color.BlockColors;
 import net.minecraftforge.fml.common.registry.GameRegistry;
@@ -17,6 +18,8 @@ public class ModBlocks {
     public static ConstructionBlock constructionBlock;
     @GameRegistry.ObjectHolder("buildinggadgets:constructionblockpowder")
     public static ConstructionBlockPowder constructionBlockPowder;
+    @GameRegistry.ObjectHolder("buildinggadgets:templatemanager")
+    public static TemplateManager templateManager;
 
     @SideOnly(Side.CLIENT)
     public static void initColorHandlers() {
