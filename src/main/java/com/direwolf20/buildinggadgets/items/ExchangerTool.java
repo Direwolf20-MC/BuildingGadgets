@@ -303,7 +303,7 @@ public class ExchangerTool extends GenericGadget {
             return false;
         }
         if (Config.poweredByFE) {
-            if (!useEnergy(tool, Config.energyCostBuilder, player)) {
+            if (!useEnergy(tool, Config.energyCostExchanger, player)) {
                 return false;
             }
         } else {
