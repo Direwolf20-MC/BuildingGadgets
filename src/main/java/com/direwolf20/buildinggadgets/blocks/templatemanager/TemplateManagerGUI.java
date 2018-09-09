@@ -2,6 +2,7 @@ package com.direwolf20.buildinggadgets.blocks.templatemanager;
 
 import com.direwolf20.buildinggadgets.BuildingGadgets;
 import com.direwolf20.buildinggadgets.network.PacketHandler;
+import com.direwolf20.buildinggadgets.network.PacketTemplateManagerLoad;
 import com.direwolf20.buildinggadgets.network.PacketTemplateManagerSave;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.inventory.GuiContainer;
@@ -46,6 +47,7 @@ public class TemplateManagerGUI extends GuiContainer {
             //System.out.println("My Button is Clicked!");
             PacketHandler.INSTANCE.sendToServer(new PacketTemplateManagerSave(te.getPos()));
         } else if (b.id == 2) {
+            PacketHandler.INSTANCE.sendToServer(new PacketTemplateManagerLoad(te.getPos()));
             //loadTemplate();
             //System.out.println("My OTHER Button is Clicked!");
         }

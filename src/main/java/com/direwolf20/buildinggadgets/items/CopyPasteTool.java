@@ -104,6 +104,12 @@ public class CopyPasteTool extends GenericGadget {
         return stack.getTagCompound().getInteger("copycounter");
     }
 
+    public static void setCopyCounter(ItemStack stack, int counter) {
+        NBTTagCompound tagCompound = stack.getTagCompound();
+        tagCompound.setInteger("copycounter", counter);
+        stack.setTagCompound(tagCompound);
+    }
+
     public static void incrementCopyCounter(ItemStack stack) {
         NBTTagCompound tagCompound = stack.getTagCompound();
         tagCompound.setInteger("copycounter", tagCompound.getInteger("copycounter") + 1);
