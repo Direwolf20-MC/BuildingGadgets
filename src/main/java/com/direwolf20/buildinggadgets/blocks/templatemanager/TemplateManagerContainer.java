@@ -1,7 +1,9 @@
 package com.direwolf20.buildinggadgets.blocks.templatemanager;
 
 import com.direwolf20.buildinggadgets.items.CopyPasteTool;
+import com.direwolf20.buildinggadgets.items.Template;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Items;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
@@ -45,16 +47,18 @@ public class TemplateManagerContainer extends Container {
 
     private void addOwnSlots() {
         IItemHandler itemHandler = this.te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
-        int x = 155;
-        int y = 50;
+        int x = 90;
+        int y = 30;
 
         // Add our own slots
-        int slotIndex = 0;
-        for (int i = 0; i < itemHandler.getSlots(); i++) {
-            addSlotToContainer(new SlotItemHandler(itemHandler, slotIndex, x, y));
-            slotIndex++;
-            x += 18;
-        }
+        //int slotIndex = 0;
+        //for (int i = 0; i < itemHandler.getSlots(); i++) {
+        addSlotToContainer(new SlotItemHandler(itemHandler, 0, x, y));
+        x += 30;
+        addSlotToContainer(new SlotItemHandler(itemHandler, 1, x, y));
+        //slotIndex++;
+
+        //}
     }
 
     @Nullable
@@ -65,7 +69,8 @@ public class TemplateManagerContainer extends Container {
 
         if (slot != null && slot.getHasStack()) {
             ItemStack itemstack1 = slot.getStack();
-            if (!(itemstack1.getItem() instanceof CopyPasteTool)) return itemstack;
+            if (!(itemstack1.getItem() instanceof CopyPasteTool) && !itemstack1.getItem().equals(Items.PAPER) && !(itemstack1.getItem() instanceof Template))
+                return itemstack;
             itemstack = itemstack1.copy();
 
             if (index < TemplateManagerTileEntity.SIZE) {

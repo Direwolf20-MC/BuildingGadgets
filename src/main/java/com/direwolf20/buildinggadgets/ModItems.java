@@ -18,4 +18,7 @@ public class ModItems {
 
     @GameRegistry.ObjectHolder("buildinggadgets:copypastetool")
     public static CopyPasteTool copyPasteTool;
+
+    @GameRegistry.ObjectHolder("buildinggadgets:template")
+    public static Template template;
 }

@@ -10,7 +10,7 @@ import net.minecraftforge.items.ItemStackHandler;
 
 public class TemplateManagerTileEntity extends TileEntity {
 
-    public static final int SIZE = 1;
+    public static final int SIZE = 2;
 
     // This item handler will hold our inventory slots
     private ItemStackHandler itemStackHandler = new ItemStackHandler(SIZE) {
@@ -56,5 +56,9 @@ public class TemplateManagerTileEntity extends TileEntity {
             return CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.cast(itemStackHandler);
         }
         return super.getCapability(capability, facing);
+    }
+
+    public TemplateManagerContainer getContainer(EntityPlayer playerIn) {
+        return new TemplateManagerContainer(playerIn.inventory, this);
     }
 }

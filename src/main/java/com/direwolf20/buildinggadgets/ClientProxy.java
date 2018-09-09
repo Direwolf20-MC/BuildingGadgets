@@ -56,6 +56,7 @@ public class ClientProxy extends CommonProxy {
         buildingTool.initModel();
         ModItems.exchangerTool.initModel();
         ModItems.copyPasteTool.initModel();
+        ModItems.template.initModel();
         if (Config.enablePaste) {
             ModItems.constructionPaste.initModel();
             ModItems.constructionPasteContainer.initModel();

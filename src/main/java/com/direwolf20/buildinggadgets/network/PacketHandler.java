@@ -17,6 +17,7 @@ public class PacketHandler {
         INSTANCE.registerMessage(PacketAnchorKey.Handler.class, PacketAnchorKey.class, 3, Side.SERVER);
         INSTANCE.registerMessage(PacketBlockMap.Handler.class, PacketBlockMap.class, 4, Side.CLIENT);
         INSTANCE.registerMessage(PacketRequestBlockMap.Handler.class, PacketRequestBlockMap.class, 5, Side.SERVER);
+        INSTANCE.registerMessage(PacketTemplateManagerSave.Handler.class, PacketTemplateManagerSave.class, 6, Side.SERVER);
         // Client side
     }
 }

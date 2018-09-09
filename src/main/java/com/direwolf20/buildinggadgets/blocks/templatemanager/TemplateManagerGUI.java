@@ -1,6 +1,8 @@
 package com.direwolf20.buildinggadgets.blocks.templatemanager;
 
 import com.direwolf20.buildinggadgets.BuildingGadgets;
+import com.direwolf20.buildinggadgets.network.PacketHandler;
+import com.direwolf20.buildinggadgets.network.PacketTemplateManagerSave;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.util.ResourceLocation;
@@ -9,11 +11,15 @@ public class TemplateManagerGUI extends GuiContainer {
     public static final int WIDTH = 180;
     public static final int HEIGHT = 152;
 
+    private TemplateManagerTileEntity te;
+    private TemplateManagerContainer container;
+
     private static final ResourceLocation background = new ResourceLocation(BuildingGadgets.MODID, "textures/gui/testcontainer.png");
 
     public TemplateManagerGUI(TemplateManagerTileEntity tileEntity, TemplateManagerContainer container) {
         super(container);
-
+        this.te = tileEntity;
+        this.container = container;
         xSize = WIDTH;
         ySize = HEIGHT;
     }
@@ -37,9 +43,11 @@ public class TemplateManagerGUI extends GuiContainer {
     protected void actionPerformed(GuiButton b) {
         //If the button id is different, or you have mrs buttons, create another if block for that too!
         if (b.id == 1) {
-            System.out.println("My Button is Clicked!");
+            //System.out.println("My Button is Clicked!");
+            PacketHandler.INSTANCE.sendToServer(new PacketTemplateManagerSave(te.getPos()));
         } else if (b.id == 2) {
-            System.out.println("My OTHER Button is Clicked!");
+            //loadTemplate();
+            //System.out.println("My OTHER Button is Clicked!");
         }
     }
 }
