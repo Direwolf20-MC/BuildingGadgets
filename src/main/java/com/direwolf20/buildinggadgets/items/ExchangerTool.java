@@ -308,7 +308,9 @@ public class ExchangerTool extends GenericGadget {
             }
         } else {
             if (tool.getItemDamage() >= tool.getMaxDamage()) {
-                return false;
+                if (tool.isItemStackDamageable()) {
+                    return false;
+                }
             } else {
                 tool.damageItem(2, player);
             }

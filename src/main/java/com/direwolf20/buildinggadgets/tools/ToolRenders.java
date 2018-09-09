@@ -88,7 +88,7 @@ public class ToolRenders {
                 } else {
                     hasEnergy = stack.getMaxDamage() - stack.getItemDamage();
                 }
-                if (player.capabilities.isCreativeMode) {
+                if (player.capabilities.isCreativeMode || (!Config.poweredByFE && !stack.isItemStackDamageable())) {
                     hasEnergy = 1000000;
                 }
                 //Prepare the block rendering
@@ -214,7 +214,7 @@ public class ToolRenders {
                 } else {
                     hasEnergy = stack.getMaxDamage() - stack.getItemDamage();
                 }
-                if (player.capabilities.isCreativeMode) {
+                if (player.capabilities.isCreativeMode || (!Config.poweredByFE && !stack.isItemStackDamageable())) {
                     hasEnergy = 1000000;
                 }
                 //Prepare the block rendering
