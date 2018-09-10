@@ -6,7 +6,6 @@ import com.direwolf20.buildinggadgets.blocks.Models.ConstructionBakedModel;
 import com.direwolf20.buildinggadgets.blocks.Models.ConstructionID;
 import com.direwolf20.buildinggadgets.blocks.Models.ConstructionProperty;
 import net.minecraft.block.Block;
-import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyBool;
@@ -40,7 +39,7 @@ import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Random;
 
-public class ConstructionBlock extends Block implements ITileEntityProvider {
+public class ConstructionBlock extends Block {
     public static final ConstructionProperty FACADEID = new ConstructionProperty("facadeid");
     public static final PropertyBool BRIGHT = PropertyBool.create("bright");
 
@@ -76,7 +75,12 @@ public class ConstructionBlock extends Block implements ITileEntityProvider {
     }
 
     @Override
-    public TileEntity createNewTileEntity(World worldIn, int meta) {
+    public boolean hasTileEntity(IBlockState state) {
+        return true;
+    }
+
+    @Override
+    public TileEntity createTileEntity(World worldIn, IBlockState state) {
         return new ConstructionBlockTileEntity();
     }
 
