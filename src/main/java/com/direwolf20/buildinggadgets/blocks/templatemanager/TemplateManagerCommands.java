@@ -5,6 +5,7 @@ import com.direwolf20.buildinggadgets.items.CopyPasteTool;
 import com.direwolf20.buildinggadgets.items.Template;
 import com.direwolf20.buildinggadgets.network.PacketBlockMap;
 import com.direwolf20.buildinggadgets.network.PacketHandler;
+import com.direwolf20.buildinggadgets.network.PacketTemplateBlockMap;
 import com.direwolf20.buildinggadgets.tools.BlockMapWorldSave;
 import com.direwolf20.buildinggadgets.tools.TemplateWorldSave;
 import com.direwolf20.buildinggadgets.tools.UniqueItem;
@@ -55,12 +56,12 @@ public class TemplateManagerCommands {
 
             NBTTagCompound templateTagCompound = templateWorldSave.getCompoundFromUUID(UUIDTemplate);
             tagCompound = templateTagCompound.copy();
-
+            CopyPasteTool.incrementCopyCounter(itemStack0);
             tagCompound.setInteger("copycounter", CopyPasteTool.getCopyCounter(itemStack0));
             tagCompound.setString("UUID", CopyPasteTool.getUUID(itemStack0));
             tagCompound.setString("owner", player.getName());
             worldSave.addToMap(UUID, tagCompound);
-            CopyPasteTool.incrementCopyCounter(itemStack0);
+
 
             container.putStackInSlot(0, itemStack0);
             PacketHandler.INSTANCE.sendTo(new PacketBlockMap(tagCompound), (EntityPlayerMP) player);
@@ -102,6 +103,9 @@ public class TemplateManagerCommands {
 
             NBTTagCompound tagCompound = worldSave.getCompoundFromUUID(UUID);
             templateTagCompound = tagCompound.copy();
+            Template.incrementCopyCounter(itemStack1);
+            templateTagCompound.setInteger("copycounter", Template.getCopyCounter(itemStack1));
+            templateTagCompound.setString("UUID", Template.getUUID(itemStack1));
 
             templateWorldSave.addToMap(UUIDTemplate, templateTagCompound);
             BlockPos startPos = CopyPasteTool.getStartPos(itemStack0);
@@ -112,6 +116,7 @@ public class TemplateManagerCommands {
             Template.setItemCountMap(templateStack, tagMap);
             Template.setName(templateStack, templateName);
             container.putStackInSlot(1, templateStack);
+            PacketHandler.INSTANCE.sendTo(new PacketTemplateBlockMap(templateTagCompound), (EntityPlayerMP) player);
         } else {
             String UUID = Template.getUUID(itemStack0);
             String UUIDTemplate = Template.getUUID(templateStack);
@@ -120,6 +125,9 @@ public class TemplateManagerCommands {
 
             NBTTagCompound tagCompound = templateWorldSave.getCompoundFromUUID(UUID);
             templateTagCompound = tagCompound.copy();
+            Template.incrementCopyCounter(itemStack1);
+            templateTagCompound.setInteger("copycounter", Template.getCopyCounter(itemStack1));
+            templateTagCompound.setString("UUID", Template.getUUID(itemStack1));
 
             templateWorldSave.addToMap(UUIDTemplate, templateTagCompound);
             BlockPos startPos = Template.getStartPos(itemStack0);
@@ -134,6 +142,7 @@ public class TemplateManagerCommands {
                 Template.setName(templateStack, templateName);
             }
             container.putStackInSlot(1, templateStack);
+            PacketHandler.INSTANCE.sendTo(new PacketTemplateBlockMap(templateTagCompound), (EntityPlayerMP) player);
         }
     }
 }

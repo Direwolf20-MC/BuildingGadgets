@@ -1,15 +1,23 @@
 package com.direwolf20.buildinggadgets.blocks.templatemanager;
 
 import com.direwolf20.buildinggadgets.BuildingGadgets;
+import com.direwolf20.buildinggadgets.items.CopyPasteTool;
 import com.direwolf20.buildinggadgets.network.PacketHandler;
 import com.direwolf20.buildinggadgets.network.PacketTemplateManagerLoad;
 import com.direwolf20.buildinggadgets.network.PacketTemplateManagerSave;
+import com.direwolf20.buildinggadgets.tools.GadgetUtils;
+import com.direwolf20.buildinggadgets.tools.PasteToolBufferBuilder;
+import com.direwolf20.buildinggadgets.tools.UniqueItem;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.ResourceLocation;
 
 import java.io.IOException;
+import java.util.Map;
 
 public class TemplateManagerGUI extends GuiContainer {
     public static final int WIDTH = 180;
@@ -53,14 +61,21 @@ public class TemplateManagerGUI extends GuiContainer {
 
     @Override
     protected void actionPerformed(GuiButton b) {
-        //If the button id is different, or you have mrs buttons, create another if block for that too!
         if (b.id == 1) {
-            //System.out.println("My Button is Clicked!");
             PacketHandler.INSTANCE.sendToServer(new PacketTemplateManagerSave(te.getPos(), nameField.getText()));
         } else if (b.id == 2) {
             PacketHandler.INSTANCE.sendToServer(new PacketTemplateManagerLoad(te.getPos()));
-            //loadTemplate();
-            //System.out.println("My OTHER Button is Clicked!");
+        } else if (b.id == 3) {
+            ItemStack itemStack0 = container.getSlot(0).getStack();
+            if (itemStack0.getItem() instanceof CopyPasteTool) {
+                NBTTagCompound tagCompound = PasteToolBufferBuilder.getTagFromUUID(CopyPasteTool.getUUID(itemStack0));
+                Map<UniqueItem, Integer> tagMap = CopyPasteTool.getItemCountMap(itemStack0);
+                NBTTagList tagList = GadgetUtils.itemCountToNBT(tagMap);
+                tagCompound.setTag("itemcountmap", tagList);
+                String jsonTag = tagCompound.toString();
+                setClipboardString(jsonTag);
+                System.out.println(jsonTag);
+            }
         }
     }
 

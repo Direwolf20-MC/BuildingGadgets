@@ -19,6 +19,8 @@ public class PacketHandler {
         INSTANCE.registerMessage(PacketRequestBlockMap.Handler.class, PacketRequestBlockMap.class, 5, Side.SERVER);
         INSTANCE.registerMessage(PacketTemplateManagerSave.Handler.class, PacketTemplateManagerSave.class, 6, Side.SERVER);
         INSTANCE.registerMessage(PacketTemplateManagerLoad.Handler.class, PacketTemplateManagerLoad.class, 7, Side.SERVER);
+        INSTANCE.registerMessage(PacketTemplateBlockMap.Handler.class, PacketTemplateBlockMap.class, 8, Side.CLIENT);
+        INSTANCE.registerMessage(PacketRequestTemplateBlockMap.Handler.class, PacketRequestTemplateBlockMap.class, 9, Side.SERVER);
         // Client side
     }
 }

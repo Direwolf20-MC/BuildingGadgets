@@ -74,6 +74,22 @@ public class Template extends Item {
         return GadgetUtils.getStringFromNBT(stack, "TemplateName");
     }
 
+    public static Integer getCopyCounter(ItemStack stack) {
+        return stack.getTagCompound().getInteger("copycounter");
+    }
+
+    public static void setCopyCounter(ItemStack stack, int counter) {
+        NBTTagCompound tagCompound = stack.getTagCompound();
+        tagCompound.setInteger("copycounter", counter);
+        stack.setTagCompound(tagCompound);
+    }
+
+    public static void incrementCopyCounter(ItemStack stack) {
+        NBTTagCompound tagCompound = stack.getTagCompound();
+        tagCompound.setInteger("copycounter", tagCompound.getInteger("copycounter") + 1);
+        stack.setTagCompound(tagCompound);
+    }
+
     public static void setStartPos(ItemStack stack, BlockPos startPos) {
         GadgetUtils.writePOSToNBT(stack, startPos, "startPos");
     }
