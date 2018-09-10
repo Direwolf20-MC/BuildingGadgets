@@ -32,3 +32,5 @@ item.buildinggadgets.copypastetool.name=Copy-Paste Gadget
 message.gadget.rotated=Blocks Rotated
 message.gadget.toomanyblocks=Too Many Blocks, Limit is 32,768
 message.gadget.toobigarea=Area too Large, max area is 125x125x125
+tooltip.template.name=Name
+item.buildinggadgets.template.name=Template

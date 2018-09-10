@@ -4,6 +4,8 @@ import com.direwolf20.buildinggadgets.BuildingGadgets;
 import com.direwolf20.buildinggadgets.tools.GadgetUtils;
 import com.direwolf20.buildinggadgets.tools.UniqueItem;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.client.resources.I18n;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -13,11 +15,13 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -62,6 +66,14 @@ public class Template extends Item {
         return tagMap;
     }
 
+    public static void setName(ItemStack stack, String name) {
+        GadgetUtils.writeStringToNBT(stack, name, "TemplateName");
+    }
+
+    public static String getName(ItemStack stack) {
+        return GadgetUtils.getStringFromNBT(stack, "TemplateName");
+    }
+
     public static void setStartPos(ItemStack stack, BlockPos startPos) {
         GadgetUtils.writePOSToNBT(stack, startPos, "startPos");
     }
@@ -76,6 +88,13 @@ public class Template extends Item {
 
     public static BlockPos getEndPos(ItemStack stack) {
         return GadgetUtils.getPOSFromNBT(stack, "endPos");
+    }
+
+    @Override
+    public void addInformation(ItemStack stack, World player, List<String> list, ITooltipFlag b) {
+        //Add tool information to the tooltip
+        super.addInformation(stack, player, list, b);
+        list.add(TextFormatting.AQUA + I18n.format("tooltip.template.name") + ": " + getName(stack));
     }
 
     @SideOnly(Side.CLIENT)

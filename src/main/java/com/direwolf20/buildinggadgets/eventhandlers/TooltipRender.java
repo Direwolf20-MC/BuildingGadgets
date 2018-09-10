@@ -7,6 +7,7 @@ package com.direwolf20.buildinggadgets.eventhandlers;
 
 import com.direwolf20.buildinggadgets.ModItems;
 import com.direwolf20.buildinggadgets.items.CopyPasteTool;
+import com.direwolf20.buildinggadgets.items.Template;
 import com.direwolf20.buildinggadgets.tools.BlockMap;
 import com.direwolf20.buildinggadgets.tools.InventoryManipulation;
 import com.direwolf20.buildinggadgets.tools.PasteToolBufferBuilder;
@@ -47,14 +48,14 @@ public class TooltipRender {
         //This method extends the tooltip box size to fit the item's we will render in onDrawTooltip
         Minecraft mc = Minecraft.getMinecraft();
         ItemStack stack = event.getItemStack();
-        if (stack.getItem() instanceof CopyPasteTool) {
-            String UUID = CopyPasteTool.getUUID(stack);
+        if (stack.getItem() instanceof CopyPasteTool || stack.getItem() instanceof Template) {
+            String UUID = stack.getItem() instanceof CopyPasteTool ? CopyPasteTool.getUUID(stack) : Template.getUUID(stack);
             if (UUID == null) {
                 return;
             }
 
             List<String> tooltip = event.getToolTip();
-            Map<UniqueItem, Integer> itemCountMap = CopyPasteTool.getItemCountMap(stack);
+            Map<UniqueItem, Integer> itemCountMap = stack.getItem() instanceof CopyPasteTool ? CopyPasteTool.getItemCountMap(stack) : Template.getItemCountMap(stack);
 
             Map<ItemStack, Integer> itemStackCount = new HashMap<ItemStack, Integer>();
             for (Map.Entry<UniqueItem, Integer> entry : itemCountMap.entrySet()) {
@@ -93,10 +94,10 @@ public class TooltipRender {
     public static void onDrawTooltip(RenderTooltipEvent.PostText event) {
         //This method will draw items on the tooltip
         ItemStack stack = event.getStack();
-        if (stack.getItem() instanceof CopyPasteTool && GuiScreen.isShiftKeyDown()) {
+        if ((stack.getItem() instanceof CopyPasteTool || stack.getItem() instanceof Template) && GuiScreen.isShiftKeyDown()) {
             int totalMissing = 0;
-            String UUID = CopyPasteTool.getUUID(stack);
-            Map<UniqueItem, Integer> itemCountMap = CopyPasteTool.getItemCountMap(stack);
+            String UUID = stack.getItem() instanceof CopyPasteTool ? CopyPasteTool.getUUID(stack) : Template.getUUID(stack);
+            Map<UniqueItem, Integer> itemCountMap = stack.getItem() instanceof CopyPasteTool ? CopyPasteTool.getItemCountMap(stack) : Template.getItemCountMap(stack);
 
             //Create an ItemStack -> Integer Map
             Map<ItemStack, Integer> itemStackCount = new HashMap<ItemStack, Integer>();

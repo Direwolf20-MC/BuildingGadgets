@@ -357,6 +357,41 @@ public class GadgetUtils {
         return NBTUtil.getPosFromTag(posTag);
     }
 
+    public static void writeStringToNBT(ItemStack stack, String string, String tagName) {
+        NBTTagCompound tagCompound = stack.getTagCompound();
+        if (tagCompound == null) {
+            tagCompound = new NBTTagCompound();
+        }
+        if (string.equals(null)) {
+            if (tagCompound.getTag(tagName) != null) {
+                tagCompound.removeTag(tagName);
+            }
+            return;
+        }
+        tagCompound.setString(tagName, string);
+    }
+
+    public static void writeStringToNBT(NBTTagCompound tagCompound, String string, String tagName) {
+        if (tagCompound == null) {
+            tagCompound = new NBTTagCompound();
+        }
+        if (string.equals(null)) {
+            if (tagCompound.getTag(tagName) != null) {
+                tagCompound.removeTag(tagName);
+            }
+            return;
+        }
+        tagCompound.setString(tagName, string);
+    }
+
+    public static String getStringFromNBT(ItemStack stack, String tagName) {
+        NBTTagCompound tagCompound = stack.getTagCompound();
+        if (tagCompound == null) {
+            return null;
+        }
+        return tagCompound.getString(tagName);
+    }
+
     public static BlockPos getPOSFromNBT(NBTTagCompound tagCompound, String tagName) {
         if (tagCompound == null) {
             return null;

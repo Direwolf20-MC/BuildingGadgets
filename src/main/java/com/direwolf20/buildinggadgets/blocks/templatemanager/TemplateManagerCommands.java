@@ -23,36 +23,37 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class TemplateManagerCommands {
-    private static final Set<Item> allowedItems = Stream.of(Items.PAPER, ModItems.copyPasteTool, ModItems.template).collect(Collectors.toSet());
+    private static final Set<Item> allowedItemsLeft = Stream.of(ModItems.copyPasteTool, ModItems.template).collect(Collectors.toSet());
+    private static final Set<Item> allowedItemsRight = Stream.of(Items.PAPER, ModItems.template).collect(Collectors.toSet());
 
     public static void loadTemplate(TemplateManagerContainer container, EntityPlayer player) {
-        if (!(allowedItems.contains(container.getSlot(0).getStack().getItem())) || !(allowedItems.contains(container.getSlot(1).getStack().getItem()))) {
-            return;
-        }
         ItemStack itemStack0 = container.getSlot(0).getStack();
         ItemStack itemStack1 = container.getSlot(1).getStack();
+        if (!(allowedItemsLeft.contains(itemStack0.getItem())) || !(allowedItemsRight.contains(itemStack1.getItem()))) {
+            return;
+        }
         if (itemStack1.getItem().equals(Items.PAPER)) return;
         World world = player.world;
-        if (itemStack0.getItem().equals(ModItems.copyPasteTool)) {
-            BlockPos startPos = Template.getStartPos(itemStack1);
-            BlockPos endPos = Template.getEndPos(itemStack1);
-            Map<UniqueItem, Integer> tagMap = Template.getItemCountMap(itemStack1);
 
+        BlockPos startPos = Template.getStartPos(itemStack1);
+        BlockPos endPos = Template.getEndPos(itemStack1);
+        Map<UniqueItem, Integer> tagMap = Template.getItemCountMap(itemStack1);
+        String UUIDTemplate = Template.getUUID(itemStack1);
+        if (UUIDTemplate == null || UUIDTemplate.equals("")) return;
+
+        BlockMapWorldSave worldSave = BlockMapWorldSave.get(world);
+        TemplateWorldSave templateWorldSave = TemplateWorldSave.get(world);
+        NBTTagCompound tagCompound;
+
+        if (itemStack0.getItem().equals(ModItems.copyPasteTool)) {
             CopyPasteTool.setStartPos(itemStack0, startPos);
             CopyPasteTool.setEndPos(itemStack0, endPos);
             CopyPasteTool.setItemCountMap(itemStack0, tagMap);
             String UUID = CopyPasteTool.getUUID(itemStack0);
-            String UUIDTemplate = Template.getUUID(itemStack1);
 
             if (UUID == null || UUID.equals("")) return;
-            if (UUIDTemplate == null || UUIDTemplate.equals("")) return;
 
-            BlockMapWorldSave worldSave = BlockMapWorldSave.get(world);
-            TemplateWorldSave templateWorldSave = TemplateWorldSave.get(world);
-
-            NBTTagCompound tagCompound = new NBTTagCompound();
             NBTTagCompound templateTagCompound = templateWorldSave.getCompoundFromUUID(UUIDTemplate);
-
             tagCompound = templateTagCompound.copy();
 
             tagCompound.setInteger("copycounter", CopyPasteTool.getCopyCounter(itemStack0));
@@ -63,35 +64,45 @@ public class TemplateManagerCommands {
 
             container.putStackInSlot(0, itemStack0);
             PacketHandler.INSTANCE.sendTo(new PacketBlockMap(tagCompound), (EntityPlayerMP) player);
-            System.out.println("Good");
         }
     }
 
-    public static void saveTemplate(TemplateManagerContainer container, EntityPlayer player) {
-        Set<Item> allowedItems = Stream.of(Items.PAPER, ModItems.copyPasteTool, ModItems.template).collect(Collectors.toSet());
-        if (!(allowedItems.contains(container.getSlot(0).getStack().getItem())) || !(allowedItems.contains(container.getSlot(1).getStack().getItem()))) {
-            return;
-        }
+    public static void saveTemplate(TemplateManagerContainer container, EntityPlayer player, String templateName) {
         ItemStack itemStack0 = container.getSlot(0).getStack();
         ItemStack itemStack1 = container.getSlot(1).getStack();
-        if (itemStack0.getItem().equals(Items.PAPER)) return;
+
+        if (itemStack0.isEmpty() && itemStack1.getItem() instanceof Template && !templateName.isEmpty()) {
+            Template.setName(itemStack1, templateName);
+            container.putStackInSlot(1, itemStack1);
+            return;
+        }
+
+
+        if (!(allowedItemsLeft.contains(itemStack0.getItem())) || !(allowedItemsRight.contains(itemStack1.getItem()))) {
+            return;
+        }
+
         World world = player.world;
+        ItemStack templateStack;
+        if (itemStack1.getItem().equals(Items.PAPER)) {
+            templateStack = new ItemStack(ModItems.template, 1);
+            container.putStackInSlot(1, templateStack);
+        }
+        if (!(container.getSlot(1).getStack().getItem().equals(ModItems.template))) return;
+        templateStack = container.getSlot(1).getStack();
+        BlockMapWorldSave worldSave = BlockMapWorldSave.get(world);
+        TemplateWorldSave templateWorldSave = TemplateWorldSave.get(world);
+        NBTTagCompound templateTagCompound;
+
         if (itemStack0.getItem().equals(ModItems.copyPasteTool)) {
             String UUID = CopyPasteTool.getUUID(itemStack0);
-            ItemStack templateStack;
-            if (itemStack1.getItem().equals(Items.PAPER)) {
-                templateStack = new ItemStack(ModItems.template, 1);
-                container.putStackInSlot(1, templateStack);
-            }
-            if (!(container.getSlot(1).getStack().getItem().equals(ModItems.template))) return;
-            templateStack = container.getSlot(1).getStack();
             String UUIDTemplate = Template.getUUID(templateStack);
             if (UUID == null || UUID.equals("")) return;
-            BlockMapWorldSave worldSave = BlockMapWorldSave.get(world);
+            if (UUIDTemplate == null || UUIDTemplate.equals("")) return;
+
             NBTTagCompound tagCompound = worldSave.getCompoundFromUUID(UUID);
-            TemplateWorldSave templateWorldSave = TemplateWorldSave.get(world);
-            NBTTagCompound templateTagCompound = new NBTTagCompound();
             templateTagCompound = tagCompound.copy();
+
             templateWorldSave.addToMap(UUIDTemplate, templateTagCompound);
             BlockPos startPos = CopyPasteTool.getStartPos(itemStack0);
             BlockPos endPos = CopyPasteTool.getEndPos(itemStack0);
@@ -99,8 +110,30 @@ public class TemplateManagerCommands {
             Template.setStartPos(templateStack, startPos);
             Template.setEndPos(templateStack, endPos);
             Template.setItemCountMap(templateStack, tagMap);
+            Template.setName(templateStack, templateName);
             container.putStackInSlot(1, templateStack);
-            System.out.println("Good");
+        } else {
+            String UUID = Template.getUUID(itemStack0);
+            String UUIDTemplate = Template.getUUID(templateStack);
+            if (UUID == null || UUID.equals("")) return;
+            if (UUIDTemplate == null || UUIDTemplate.equals("")) return;
+
+            NBTTagCompound tagCompound = templateWorldSave.getCompoundFromUUID(UUID);
+            templateTagCompound = tagCompound.copy();
+
+            templateWorldSave.addToMap(UUIDTemplate, templateTagCompound);
+            BlockPos startPos = Template.getStartPos(itemStack0);
+            BlockPos endPos = Template.getEndPos(itemStack0);
+            Map<UniqueItem, Integer> tagMap = Template.getItemCountMap(itemStack0);
+            Template.setStartPos(templateStack, startPos);
+            Template.setEndPos(templateStack, endPos);
+            Template.setItemCountMap(templateStack, tagMap);
+            if (templateName.equals("")) {
+                Template.setName(templateStack, Template.getName(itemStack0));
+            } else {
+                Template.setName(templateStack, templateName);
+            }
+            container.putStackInSlot(1, templateStack);
         }
     }
 }
