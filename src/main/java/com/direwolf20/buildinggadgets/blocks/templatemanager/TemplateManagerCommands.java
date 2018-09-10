@@ -7,6 +7,7 @@ import com.direwolf20.buildinggadgets.network.PacketBlockMap;
 import com.direwolf20.buildinggadgets.network.PacketHandler;
 import com.direwolf20.buildinggadgets.network.PacketTemplateBlockMap;
 import com.direwolf20.buildinggadgets.tools.BlockMapWorldSave;
+import com.direwolf20.buildinggadgets.tools.GadgetUtils;
 import com.direwolf20.buildinggadgets.tools.TemplateWorldSave;
 import com.direwolf20.buildinggadgets.tools.UniqueItem;
 import net.minecraft.entity.player.EntityPlayer;
@@ -15,6 +16,7 @@ import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -103,9 +105,9 @@ public class TemplateManagerCommands {
 
             NBTTagCompound tagCompound = worldSave.getCompoundFromUUID(UUID);
             templateTagCompound = tagCompound.copy();
-            Template.incrementCopyCounter(itemStack1);
-            templateTagCompound.setInteger("copycounter", Template.getCopyCounter(itemStack1));
-            templateTagCompound.setString("UUID", Template.getUUID(itemStack1));
+            Template.incrementCopyCounter(templateStack);
+            templateTagCompound.setInteger("copycounter", Template.getCopyCounter(templateStack));
+            templateTagCompound.setString("UUID", Template.getUUID(templateStack));
 
             templateWorldSave.addToMap(UUIDTemplate, templateTagCompound);
             BlockPos startPos = CopyPasteTool.getStartPos(itemStack0);
@@ -125,9 +127,9 @@ public class TemplateManagerCommands {
 
             NBTTagCompound tagCompound = templateWorldSave.getCompoundFromUUID(UUID);
             templateTagCompound = tagCompound.copy();
-            Template.incrementCopyCounter(itemStack1);
-            templateTagCompound.setInteger("copycounter", Template.getCopyCounter(itemStack1));
-            templateTagCompound.setString("UUID", Template.getUUID(itemStack1));
+            Template.incrementCopyCounter(templateStack);
+            templateTagCompound.setInteger("copycounter", Template.getCopyCounter(templateStack));
+            templateTagCompound.setString("UUID", Template.getUUID(templateStack));
 
             templateWorldSave.addToMap(UUIDTemplate, templateTagCompound);
             BlockPos startPos = Template.getStartPos(itemStack0);
@@ -144,5 +146,46 @@ public class TemplateManagerCommands {
             container.putStackInSlot(1, templateStack);
             PacketHandler.INSTANCE.sendTo(new PacketTemplateBlockMap(templateTagCompound), (EntityPlayerMP) player);
         }
+    }
+
+    public static void PasteTemplate(TemplateManagerContainer container, EntityPlayer player, NBTTagCompound sentTagCompound) {
+        ItemStack itemStack1 = container.getSlot(1).getStack();
+
+        if (!(allowedItemsRight.contains(itemStack1.getItem()))) {
+            return;
+        }
+
+        World world = player.world;
+        ItemStack templateStack;
+        if (itemStack1.getItem().equals(Items.PAPER)) {
+            templateStack = new ItemStack(ModItems.template, 1);
+            container.putStackInSlot(1, templateStack);
+        }
+        if (!(container.getSlot(1).getStack().getItem().equals(ModItems.template))) return;
+        templateStack = container.getSlot(1).getStack();
+
+        TemplateWorldSave templateWorldSave = TemplateWorldSave.get(world);
+
+        String UUIDTemplate = Template.getUUID(templateStack);
+        if (UUIDTemplate == null || UUIDTemplate.equals("")) return;
+
+        NBTTagCompound templateTagCompound;
+
+        templateTagCompound = sentTagCompound.copy();
+        Template.incrementCopyCounter(templateStack);
+        templateTagCompound.setInteger("copycounter", Template.getCopyCounter(templateStack));
+        templateTagCompound.setString("UUID", Template.getUUID(templateStack));
+        Map<UniqueItem, Integer> tagMap = GadgetUtils.nbtToItemCount((NBTTagList) templateTagCompound.getTag("itemcountmap"));
+        templateTagCompound.removeTag("itemcountmap");
+        templateWorldSave.addToMap(UUIDTemplate, templateTagCompound);
+        BlockPos startPos = GadgetUtils.getPOSFromNBT(templateTagCompound, "startPos");
+        BlockPos endPos = GadgetUtils.getPOSFromNBT(templateTagCompound, "endPos");
+
+        Template.setStartPos(templateStack, startPos);
+        Template.setEndPos(templateStack, endPos);
+        Template.setItemCountMap(templateStack, tagMap);
+        //Template.setName(templateStack, templateName);
+        container.putStackInSlot(1, templateStack);
+        PacketHandler.INSTANCE.sendTo(new PacketTemplateBlockMap(templateTagCompound), (EntityPlayerMP) player);
     }
 }

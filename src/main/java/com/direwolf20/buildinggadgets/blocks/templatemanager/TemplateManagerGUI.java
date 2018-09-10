@@ -4,17 +4,23 @@ import com.direwolf20.buildinggadgets.BuildingGadgets;
 import com.direwolf20.buildinggadgets.items.CopyPasteTool;
 import com.direwolf20.buildinggadgets.network.PacketHandler;
 import com.direwolf20.buildinggadgets.network.PacketTemplateManagerLoad;
+import com.direwolf20.buildinggadgets.network.PacketTemplateManagerPaste;
 import com.direwolf20.buildinggadgets.network.PacketTemplateManagerSave;
 import com.direwolf20.buildinggadgets.tools.GadgetUtils;
 import com.direwolf20.buildinggadgets.tools.PasteToolBufferBuilder;
 import com.direwolf20.buildinggadgets.tools.UniqueItem;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.JsonToNBT;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TextFormatting;
 
 import java.io.IOException;
 import java.util.Map;
@@ -75,6 +81,15 @@ public class TemplateManagerGUI extends GuiContainer {
                 String jsonTag = tagCompound.toString();
                 setClipboardString(jsonTag);
                 System.out.println(jsonTag);
+            }
+        } else if (b.id == 4) {
+            String CBString = getClipboardString();
+            System.out.println(CBString);
+            try {
+                NBTTagCompound tagCompound = JsonToNBT.getTagFromJson(CBString);
+                PacketHandler.INSTANCE.sendToServer(new PacketTemplateManagerPaste(tagCompound, te.getPos()));
+            } catch (Throwable t) {
+                Minecraft.getMinecraft().player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.pastefailed").getUnformattedComponentText()), false);
             }
         }
     }
