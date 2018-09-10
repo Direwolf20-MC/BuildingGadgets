@@ -118,7 +118,7 @@ public class ToolRenders {
                     GlStateManager.pushMatrix();//Push matrix again just because
                     GlStateManager.translate(-doubleX, -doubleY, -doubleZ);//The render starts at the player, so we subtract the player coords and move the render to 0,0,0
                     GlStateManager.translate(coordinate.getX(), coordinate.getY(), coordinate.getZ());//Now move the render position to the coordinates we want to render at
-                    GlStateManager.rotate(-90.0F, 0.0F, 1.0F, 0.0F); //Rotate it because i'm not sure why but we need to
+                    GlStateManager.rotate(-90.0F, 0.0F, 1.0F, 0.0F); //Preemptively rotate it to counteract the rotation applied in the process of rendering the block with BlockRendererDispatcher#renderBlockBrightness below
                     GlStateManager.scale(1.0f, 1.0f, 1.0f); //Block scale 1 = full sized block
                     GL14.glBlendColor(1F, 1F, 1F, 0.55f); //Set the alpha of the blocks we are rendering
                     if (fakeWorld.getWorldType() != WorldType.DEBUG_ALL_BLOCK_STATES) { //Get the block state in the fake world
@@ -137,7 +137,7 @@ public class ToolRenders {
                     GlStateManager.pushMatrix();//Push matrix again just because
                     GlStateManager.translate(-doubleX, -doubleY, -doubleZ);//The render starts at the player, so we subtract the player coords and move the render to 0,0,0
                     GlStateManager.translate(coordinate.getX(), coordinate.getY(), coordinate.getZ());//Now move the render position to the coordinates we want to render at
-                    GlStateManager.rotate(-90.0F, 0.0F, 1.0F, 0.0F); //Rotate it because i'm not sure why but we need to
+                    GlStateManager.rotate(-90.0F, 0.0F, 1.0F, 0.0F); //Preemptively rotate it to counteract the rotation applied in the process of rendering the block with BlockRendererDispatcher#renderBlockBrightness below
                     GlStateManager.translate(-0.005f, -0.005f, 0.005f);
                     GlStateManager.scale(1.01f, 1.01f, 1.01f);
                     GL14.glBlendColor(1F, 1F, 1F, 0.35f); //Set the alpha of the blocks we are rendering
@@ -244,7 +244,7 @@ public class ToolRenders {
                     GlStateManager.pushMatrix();//Push matrix again just because
                     GlStateManager.translate(-doubleX, -doubleY, -doubleZ);//The render starts at the player, so we subtract the player coords and move the render to 0,0,0
                     GlStateManager.translate(coordinate.getX(), coordinate.getY(), coordinate.getZ());//Now move the render position to the coordinates we want to render at
-                    GlStateManager.rotate(-90.0F, 0.0F, 1.0F, 0.0F); //Rotate it because i'm not sure why but we need to
+                    GlStateManager.rotate(-90.0F, 0.0F, 1.0F, 0.0F); //Preemptively rotate it to counteract the rotation applied in the process of rendering the block with BlockRendererDispatcher#renderBlockBrightness below
                     GlStateManager.translate(-0.005f, -0.005f, 0.005f);
                     GlStateManager.scale(1.01f, 1.01f, 1.01f);//Slightly Larger block to avoid z-fighting.
                     GL14.glBlendColor(1F, 1F, 1F, 0.55f); //Set the alpha of the blocks we are rendering
@@ -255,9 +255,9 @@ public class ToolRenders {
                         }
                     }
                     //state = state.getBlock().getExtendedState(state, fakeWorld, coordinate); //Get the extended block state in the fake world (Disabled to fix chisel, not sure why.)
-                    if (renderBlockState.getRenderType() != EnumBlockRenderType.INVISIBLE) {
+                    if (renderBlockState.getRenderType() != EnumBlockRenderType.INVISIBLE) { //Only render the block and perform the next block's preemptive rotation if the block is visible, since invisible blocks are neither rotated nor rendered
                         dispatcher.renderBlockBrightness(state, 1f);//Render the defined block
-                        GlStateManager.rotate(-90.0F, 0.0F, 1.0F, 0.0F); //Rotate it because i'm not sure why but we need to
+                        GlStateManager.rotate(-90.0F, 0.0F, 1.0F, 0.0F); //Preemptively rotate it to counteract the rotation applied in the process of rendering the block with BlockRendererDispatcher#renderBlockBrightness below
                     }
                     GL14.glBlendColor(1F, 1F, 1F, 0.1f); //Set the alpha of the blocks we are rendering
                     dispatcher.renderBlockBrightness(Blocks.STAINED_GLASS.getDefaultState().withProperty(COLOR, EnumDyeColor.WHITE), 1f);//Render the defined block - White glass to show non-full block renders (Example: Torch)
@@ -269,7 +269,7 @@ public class ToolRenders {
                     GlStateManager.pushMatrix();//Push matrix again just because
                     GlStateManager.translate(-doubleX, -doubleY, -doubleZ);//The render starts at the player, so we subtract the player coords and move the render to 0,0,0
                     GlStateManager.translate(coordinate.getX(), coordinate.getY(), coordinate.getZ());//Now move the render position to the coordinates we want to render at
-                    GlStateManager.rotate(-90.0F, 0.0F, 1.0F, 0.0F); //Rotate it because i'm not sure why but we need to
+                    GlStateManager.rotate(-90.0F, 0.0F, 1.0F, 0.0F); //Preemptively rotate it to counteract the rotation applied in the process of rendering the block with BlockRendererDispatcher#renderBlockBrightness below
                     GlStateManager.translate(-0.01f, -0.01f, 0.01f);
                     GlStateManager.scale(1.02f, 1.02f, 1.02f);//Slightly Larger block to avoid z-fighting.
                     GL14.glBlendColor(1F, 1F, 1F, 0.55f); //Set the alpha of the blocks we are rendering
