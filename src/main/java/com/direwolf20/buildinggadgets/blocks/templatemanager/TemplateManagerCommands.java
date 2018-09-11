@@ -182,8 +182,8 @@ public class TemplateManagerCommands {
         templateTagCompound.setString("UUID", Template.getUUID(templateStack));
         GadgetUtils.writePOSToNBT(templateTagCompound, startPos, "startPos", 0);
         GadgetUtils.writePOSToNBT(templateTagCompound, endPos, "startPos", 0);
-        Map<UniqueItem, Integer> tagMap = GadgetUtils.nbtToItemCount((NBTTagList) templateTagCompound.getTag("itemcountmap"));
-        templateTagCompound.removeTag("itemcountmap");
+        //Map<UniqueItem, Integer> tagMap = GadgetUtils.nbtToItemCount((NBTTagList) templateTagCompound.getTag("itemcountmap"));
+        //templateTagCompound.removeTag("itemcountmap");
 
         NBTTagList MapIntStateTag = (NBTTagList) templateTagCompound.getTag("mapIntState");
 
@@ -229,7 +229,7 @@ public class TemplateManagerCommands {
 
         Template.setStartPos(templateStack, startPos);
         Template.setEndPos(templateStack, endPos);
-        Template.setItemCountMap(templateStack, tagMap);
+        //Template.setItemCountMap(templateStack, tagMap);
         Template.setItemCountMap(templateStack, itemCountMap);
         //Template.setName(templateStack, templateName);
         container.putStackInSlot(1, templateStack);
