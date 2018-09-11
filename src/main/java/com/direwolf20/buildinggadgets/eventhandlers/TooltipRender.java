@@ -144,7 +144,7 @@ public class TooltipRender {
             }
             if (totalMissing > 0) {
                 ItemStack pasteItemStack = new ItemStack(ModItems.constructionPaste);
-                int hasAmt = InventoryManipulation.countItem(pasteItemStack, Minecraft.getMinecraft().player);
+                int hasAmt = InventoryManipulation.countPaste(Minecraft.getMinecraft().player);
                 int x = bx + (j % STACKS_PER_LINE) * 18;
                 int y = by + (j / STACKS_PER_LINE) * 20;
                 renderRequiredBlocks(pasteItemStack, x, y, hasAmt, totalMissing);
