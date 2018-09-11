@@ -311,6 +311,7 @@ public class CopyPasteTool extends GenericGadget {
                 if (pos == null) {
                     setStartPos(stack, null);
                     setEndPos(stack, null);
+                    player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.areareset").getUnformattedComponentText()), true);
                     return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);
                 }
                 if (player.isSneaking()) {
