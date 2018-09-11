@@ -6,10 +6,8 @@ import com.direwolf20.buildinggadgets.items.Template;
 import com.direwolf20.buildinggadgets.network.PacketBlockMap;
 import com.direwolf20.buildinggadgets.network.PacketHandler;
 import com.direwolf20.buildinggadgets.network.PacketTemplateBlockMap;
-import com.direwolf20.buildinggadgets.tools.BlockMapWorldSave;
-import com.direwolf20.buildinggadgets.tools.GadgetUtils;
-import com.direwolf20.buildinggadgets.tools.TemplateWorldSave;
-import com.direwolf20.buildinggadgets.tools.UniqueItem;
+import com.direwolf20.buildinggadgets.tools.*;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Items;
@@ -17,13 +15,18 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static net.minecraft.client.gui.GuiScreen.setClipboardString;
 
 public class TemplateManagerCommands {
     private static final Set<Item> allowedItemsLeft = Stream.of(ModItems.copyPasteTool, ModItems.template).collect(Collectors.toSet());
@@ -170,22 +173,82 @@ public class TemplateManagerCommands {
         if (UUIDTemplate == null || UUIDTemplate.equals("")) return;
 
         NBTTagCompound templateTagCompound;
+        BlockPos startPos = new BlockPos(0, 0, 0);
+        BlockPos endPos = new BlockPos(0, 0, 0);
 
         templateTagCompound = sentTagCompound.copy();
         Template.incrementCopyCounter(templateStack);
         templateTagCompound.setInteger("copycounter", Template.getCopyCounter(templateStack));
         templateTagCompound.setString("UUID", Template.getUUID(templateStack));
+        GadgetUtils.writePOSToNBT(templateTagCompound, startPos, "startPos", 0);
+        GadgetUtils.writePOSToNBT(templateTagCompound, endPos, "startPos", 0);
         Map<UniqueItem, Integer> tagMap = GadgetUtils.nbtToItemCount((NBTTagList) templateTagCompound.getTag("itemcountmap"));
         templateTagCompound.removeTag("itemcountmap");
+
+        NBTTagList MapIntStateTag = (NBTTagList) templateTagCompound.getTag("mapIntState");
+
+        BlockMapIntState MapIntState = new BlockMapIntState();
+        MapIntState.getIntStateMapFromNBT(MapIntStateTag);
+        MapIntState.makeStackMapFromStateMap(player);
+        templateTagCompound.setTag("mapIntStack", MapIntState.putIntStackMapIntoNBT());
+        templateTagCompound.setString("owner", player.getName());
+
+        Map<UniqueItem, Integer> itemCountMap = new HashMap<UniqueItem, Integer>();
+        Map<IBlockState, UniqueItem> IntStackMap = MapIntState.IntStackMap;
+        ArrayList<BlockMap> blockMapList = CopyPasteTool.getBlockMapList(templateTagCompound);
+        for (BlockMap blockMap : blockMapList) {
+            UniqueItem uniqueItem = IntStackMap.get(blockMap.state);
+            NonNullList<ItemStack> drops = NonNullList.create();
+            blockMap.state.getBlock().getDrops(drops, world, new BlockPos(0, 0, 0), blockMap.state, 0);
+            int neededItems = 0;
+            for (ItemStack drop : drops) {
+                if (drop.getItem().equals(uniqueItem.item)) {
+                    neededItems++;
+                }
+            }
+            if (neededItems == 0) {
+                neededItems = 1;
+            }
+            if (uniqueItem.item != Items.AIR) {
+                boolean found = false;
+                for (Map.Entry<UniqueItem, Integer> entry : itemCountMap.entrySet()) {
+                    if (entry.getKey().equals(uniqueItem)) {
+                        itemCountMap.put(entry.getKey(), itemCountMap.get(entry.getKey()) + neededItems);
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    itemCountMap.put(uniqueItem, neededItems);
+                }
+            }
+        }
+
         templateWorldSave.addToMap(UUIDTemplate, templateTagCompound);
-        BlockPos startPos = GadgetUtils.getPOSFromNBT(templateTagCompound, "startPos");
-        BlockPos endPos = GadgetUtils.getPOSFromNBT(templateTagCompound, "endPos");
+
 
         Template.setStartPos(templateStack, startPos);
         Template.setEndPos(templateStack, endPos);
         Template.setItemCountMap(templateStack, tagMap);
+        Template.setItemCountMap(templateStack, itemCountMap);
         //Template.setName(templateStack, templateName);
         container.putStackInSlot(1, templateStack);
         PacketHandler.INSTANCE.sendTo(new PacketTemplateBlockMap(templateTagCompound), (EntityPlayerMP) player);
+    }
+
+    public static void CopyTemplate(TemplateManagerContainer container) {
+        ItemStack itemStack0 = container.getSlot(0).getStack();
+        if (itemStack0.getItem() instanceof CopyPasteTool) {
+            NBTTagCompound tagCompound = PasteToolBufferBuilder.getTagFromUUID(CopyPasteTool.getUUID(itemStack0));
+            NBTTagCompound newCompound = new NBTTagCompound();
+            newCompound.setIntArray("stateIntArray", tagCompound.getIntArray("stateIntArray"));
+            newCompound.setIntArray("posIntArray", tagCompound.getIntArray("posIntArray"));
+            newCompound.setTag("mapIntState", tagCompound.getTag("mapIntState"));
+            //Map<UniqueItem, Integer> tagMap = CopyPasteTool.getItemCountMap(itemStack0);
+            //NBTTagList tagList = GadgetUtils.itemCountToNBT(tagMap);
+            //newCompound.setTag("itemcountmap", tagList);
+            String jsonTag = newCompound.toString();
+            setClipboardString(jsonTag);
+        }
     }
 }

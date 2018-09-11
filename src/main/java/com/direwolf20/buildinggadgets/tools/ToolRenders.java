@@ -361,7 +361,8 @@ public class ToolRenders {
         } else {
             BlockPos startPos = CopyPasteTool.getStartPos(stack);
             BlockPos endPos = CopyPasteTool.getEndPos(stack);
-            if (startPos == null || endPos == null) {
+            BlockPos blankPos = new BlockPos(0, 0, 0);
+            if (startPos == null || endPos == null || startPos.equals(blankPos) || endPos.equals(blankPos)) {
                 return;
             }
 

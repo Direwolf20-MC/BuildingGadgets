@@ -134,4 +134,14 @@ public class BlockMapIntState {
         }
         return null;
     }
+
+    public void makeStackMapFromStateMap(EntityPlayer player) {
+        IntStackMap.clear();
+        for (Map.Entry<Short, IBlockState> entry : IntStateMap.entrySet()) {
+            UniqueItem uniqueItem = blockStateToUniqueItem(entry.getValue(), player, new BlockPos(0, 0, 0));
+            if (uniqueItem != null) {
+                IntStackMap.put(entry.getValue(), uniqueItem);
+            }
+        }
+    }
 }
