@@ -35,3 +35,5 @@ message.gadget.toobigarea=Area too Large, max area is 125x125x125 (Right click e
 message.gadget.areareset=Copy Area Reset
 tooltip.template.name=Name
 item.buildinggadgets.template.name=Template
+message.gadget.pastetoobig=Paste is too large
+message.gadget.pastefailed=Paste Failed, Invalid JSON

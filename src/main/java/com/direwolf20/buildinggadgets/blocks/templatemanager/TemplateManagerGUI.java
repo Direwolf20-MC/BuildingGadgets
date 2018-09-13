@@ -1,14 +1,18 @@
 package com.direwolf20.buildinggadgets.blocks.templatemanager;
 
 import com.direwolf20.buildinggadgets.BuildingGadgets;
+import com.direwolf20.buildinggadgets.items.CopyPasteTool;
 import com.direwolf20.buildinggadgets.network.PacketHandler;
 import com.direwolf20.buildinggadgets.network.PacketTemplateManagerLoad;
 import com.direwolf20.buildinggadgets.network.PacketTemplateManagerPaste;
 import com.direwolf20.buildinggadgets.network.PacketTemplateManagerSave;
+import com.direwolf20.buildinggadgets.tools.BlockMapIntState;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.JsonToNBT;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
@@ -16,7 +20,10 @@ import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Map;
 
 public class TemplateManagerGUI extends GuiContainer {
     public static final int WIDTH = 180;
@@ -68,14 +75,35 @@ public class TemplateManagerGUI extends GuiContainer {
             TemplateManagerCommands.CopyTemplate(container);
         } else if (b.id == 4) {
             String CBString = getClipboardString();
-            System.out.println(CBString);
+            System.out.println("CBString Length: " + CBString.length());
+            //System.out.println(CBString);
             try {
                 NBTTagCompound tagCompound = JsonToNBT.getTagFromJson(CBString);
-                PacketHandler.INSTANCE.sendToServer(new PacketTemplateManagerPaste(tagCompound, te.getPos()));
+                BlockMapIntState MapIntState = CopyPasteTool.getBlockMapIntState(tagCompound);
+                int[] stateArray = tagCompound.getIntArray("stateIntArray");
+                int[] posArray = tagCompound.getIntArray("posIntArray");
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                CompressedStreamTools.writeCompressed(tagCompound, baos);
+                ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+                NBTTagCompound newTag = CompressedStreamTools.readCompressed(bais);
+                //System.out.println("BAOS Size: " + baos.size());
+                if (stateArray.length <= 12000 && baos.size() < 31000) {
+                    PacketHandler.INSTANCE.sendToServer(new PacketTemplateManagerPaste(tagCompound, te.getPos(), true, true));
+                } else {
+                    Minecraft.getMinecraft().player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.pastetoobig").getUnformattedComponentText()), false);
+                }
+
             } catch (Throwable t) {
+                System.out.println(t);
                 Minecraft.getMinecraft().player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.pastefailed").getUnformattedComponentText()), false);
             }
+
         }
+    }
+
+    public static void sendSplitArrays(int[] stateArray, int[] posArray, Map<Short, IBlockState> stateMap) {
+
+        System.out.println("PosArray Length: " + posArray.length);
     }
 
     @Override
