@@ -8,6 +8,7 @@ import com.direwolf20.buildinggadgets.network.PacketHandler;
 import com.direwolf20.buildinggadgets.network.PacketTemplateBlockMap;
 import com.direwolf20.buildinggadgets.tools.*;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Items;
@@ -17,6 +18,9 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 
 import java.util.ArrayList;
@@ -240,6 +244,10 @@ public class TemplateManagerCommands {
         ItemStack itemStack0 = container.getSlot(0).getStack();
         if (itemStack0.getItem() instanceof CopyPasteTool) {
             NBTTagCompound tagCompound = PasteToolBufferBuilder.getTagFromUUID(CopyPasteTool.getUUID(itemStack0));
+            if (tagCompound == null) {
+                Minecraft.getMinecraft().player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.copyfailed").getUnformattedComponentText()), false);
+                return;
+            }
             NBTTagCompound newCompound = new NBTTagCompound();
             newCompound.setIntArray("stateIntArray", tagCompound.getIntArray("stateIntArray"));
             newCompound.setIntArray("posIntArray", tagCompound.getIntArray("posIntArray"));
