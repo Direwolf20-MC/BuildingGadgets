@@ -1,13 +1,10 @@
 package com.direwolf20.buildinggadgets.blocks.templatemanager;
 
 import com.direwolf20.buildinggadgets.BuildingGadgets;
-import com.direwolf20.buildinggadgets.items.CopyPasteTool;
 import com.direwolf20.buildinggadgets.network.PacketHandler;
 import com.direwolf20.buildinggadgets.network.PacketTemplateManagerLoad;
 import com.direwolf20.buildinggadgets.network.PacketTemplateManagerPaste;
 import com.direwolf20.buildinggadgets.network.PacketTemplateManagerSave;
-import com.direwolf20.buildinggadgets.tools.BlockMapIntState;
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiTextField;
@@ -20,10 +17,8 @@ import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.Map;
 
 public class TemplateManagerGUI extends GuiContainer {
     public static final int WIDTH = 180;
@@ -75,18 +70,20 @@ public class TemplateManagerGUI extends GuiContainer {
             TemplateManagerCommands.CopyTemplate(container);
         } else if (b.id == 4) {
             String CBString = getClipboardString();
-            System.out.println("CBString Length: " + CBString.length());
+            //System.out.println("CBString Length: " + CBString.length());
             //System.out.println(CBString);
             try {
                 NBTTagCompound tagCompound = JsonToNBT.getTagFromJson(CBString);
-                BlockMapIntState MapIntState = CopyPasteTool.getBlockMapIntState(tagCompound);
+                //BlockMapIntState MapIntState = CopyPasteTool.getBlockMapIntState(tagCompound);
                 int[] stateArray = tagCompound.getIntArray("stateIntArray");
-                int[] posArray = tagCompound.getIntArray("posIntArray");
+                //int[] posArray = tagCompound.getIntArray("posIntArray");
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 CompressedStreamTools.writeCompressed(tagCompound, baos);
-                ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
-                NBTTagCompound newTag = CompressedStreamTools.readCompressed(bais);
+                //ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+                //NBTTagCompound newTag = CompressedStreamTools.readCompressed(bais);
                 //System.out.println("BAOS Size: " + baos.size());
+
+                //Anything larger than below is likely to overflow the max packet size, crashing your client.
                 if (stateArray.length <= 12000 && baos.size() < 31000) {
                     PacketHandler.INSTANCE.sendToServer(new PacketTemplateManagerPaste(tagCompound, te.getPos(), true, true));
                 } else {
@@ -101,10 +98,10 @@ public class TemplateManagerGUI extends GuiContainer {
         }
     }
 
-    public static void sendSplitArrays(int[] stateArray, int[] posArray, Map<Short, IBlockState> stateMap) {
+    /*public static void sendSplitArrays(int[] stateArray, int[] posArray, Map<Short, IBlockState> stateMap) {
 
         System.out.println("PosArray Length: " + posArray.length);
-    }
+    }*/
 
     @Override
     protected void keyTyped(char typedChar, int keyCode) throws IOException {

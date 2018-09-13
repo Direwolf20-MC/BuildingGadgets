@@ -25,7 +25,7 @@ public class PacketTemplateManagerPaste implements IMessage {
 
     @Override
     public void fromBytes(ByteBuf buf) {
-        System.out.println("Buf size: " + buf.readableBytes());
+        //System.out.println("Buf size: " + buf.readableBytes());
         buf.readBytes(baos.toByteArray());
         pos = BlockPos.fromLong(buf.readLong());
     }
@@ -34,7 +34,7 @@ public class PacketTemplateManagerPaste implements IMessage {
     public void toBytes(ByteBuf buf) {
         buf.writeLong(pos.toLong());
         buf.writeBytes(baos.toByteArray());
-        System.out.println("Buf size: " + buf.readableBytes());
+        //System.out.println("Buf size: " + buf.readableBytes());
     }
 
     public PacketTemplateManagerPaste() {

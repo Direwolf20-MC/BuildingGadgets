@@ -21,7 +21,7 @@ public class PacketHandler {
         INSTANCE.registerMessage(PacketTemplateManagerLoad.Handler.class, PacketTemplateManagerLoad.class, 7, Side.SERVER);
         INSTANCE.registerMessage(PacketTemplateBlockMap.Handler.class, PacketTemplateBlockMap.class, 8, Side.CLIENT);
         INSTANCE.registerMessage(PacketRequestTemplateBlockMap.Handler.class, PacketRequestTemplateBlockMap.class, 9, Side.SERVER);
-        INSTANCE.registerMessage(PacketTemplateManagerPaste.Handler.class, PacketTemplateManagerPaste.class, 11, Side.SERVER);
+        INSTANCE.registerMessage(PacketTemplateManagerPaste.Handler.class, PacketTemplateManagerPaste.class, 10, Side.SERVER);
         // Client side
     }
 }
