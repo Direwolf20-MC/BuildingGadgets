@@ -155,7 +155,7 @@ public class TemplateManagerCommands {
         }
     }
 
-    public static void PasteTemplate(TemplateManagerContainer container, EntityPlayer player, NBTTagCompound sentTagCompound) {
+    public static void PasteTemplate(TemplateManagerContainer container, EntityPlayer player, NBTTagCompound sentTagCompound, String templateName) {
         ItemStack itemStack1 = container.getSlot(1).getStack();
 
         if (!(allowedItemsRight.contains(itemStack1.getItem()))) {
@@ -235,7 +235,7 @@ public class TemplateManagerCommands {
         Template.setEndPos(templateStack, endPos);
         //Template.setItemCountMap(templateStack, tagMap);
         Template.setItemCountMap(templateStack, itemCountMap);
-        //Template.setName(templateStack, templateName);
+        Template.setName(templateStack, templateName);
         container.putStackInSlot(1, templateStack);
         PacketHandler.INSTANCE.sendTo(new PacketTemplateBlockMap(templateTagCompound), (EntityPlayerMP) player);
     }

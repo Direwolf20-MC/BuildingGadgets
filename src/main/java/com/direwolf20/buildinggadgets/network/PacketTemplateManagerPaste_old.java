@@ -59,7 +59,7 @@ public class PacketTemplateManagerPaste_old implements IMessage {
             TileEntity te = world.getTileEntity(pos);
             if (!(te instanceof TemplateManagerTileEntity)) return;
             TemplateManagerContainer container = ((TemplateManagerTileEntity) te).getContainer(player);
-            TemplateManagerCommands.PasteTemplate(container, player, message.tag);
+            TemplateManagerCommands.PasteTemplate(container, player, message.tag, "");
         }
     }
 }

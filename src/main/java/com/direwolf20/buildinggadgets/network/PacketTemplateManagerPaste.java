@@ -11,6 +11,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
@@ -20,33 +21,41 @@ import java.io.ByteArrayOutputStream;
 
 public class PacketTemplateManagerPaste implements IMessage {
 
-    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    //ByteArrayOutputStream baos = new ByteArrayOutputStream();
     private BlockPos pos;
+    byte[] data;
+    String templateName;
 
     @Override
     public void fromBytes(ByteBuf buf) {
         //System.out.println("Buf size: " + buf.readableBytes());
-        buf.readBytes(baos.toByteArray());
         pos = BlockPos.fromLong(buf.readLong());
+        data = new byte[buf.readableBytes()];
+        buf.readBytes(data);
+        templateName = ByteBufUtils.readUTF8String(buf);
     }
 
     @Override
     public void toBytes(ByteBuf buf) {
         buf.writeLong(pos.toLong());
-        buf.writeBytes(baos.toByteArray());
+        buf.writeBytes(data);
+        ByteBufUtils.writeUTF8String(buf, templateName);
         //System.out.println("Buf size: " + buf.readableBytes());
     }
 
     public PacketTemplateManagerPaste() {
     }
 
-    public PacketTemplateManagerPaste(NBTTagCompound tagCompound, BlockPos TMpos, Boolean first, Boolean last) {
+    public PacketTemplateManagerPaste(NBTTagCompound tagCompound, BlockPos TMpos, String name) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        pos = TMpos;
         try {
             CompressedStreamTools.writeCompressed(tagCompound, baos);
-            pos = TMpos;
         } catch (Throwable t) {
+            System.out.println(t);
         }
-
+        data = baos.toByteArray();
+        templateName = name;
     }
 
     public static class Handler implements IMessageHandler<PacketTemplateManagerPaste, IMessage> {
@@ -57,7 +66,7 @@ public class PacketTemplateManagerPaste implements IMessage {
         }
 
         private void handle(PacketTemplateManagerPaste message, MessageContext ctx) {
-            ByteArrayInputStream bais = new ByteArrayInputStream(message.baos.toByteArray());
+            ByteArrayInputStream bais = new ByteArrayInputStream(message.data);
             try {
                 NBTTagCompound newTag = CompressedStreamTools.readCompressed(bais);
                 if (newTag.equals(new NBTTagCompound())) return;
@@ -68,8 +77,9 @@ public class PacketTemplateManagerPaste implements IMessage {
                 TileEntity te = world.getTileEntity(pos);
                 if (!(te instanceof TemplateManagerTileEntity)) return;
                 TemplateManagerContainer container = ((TemplateManagerTileEntity) te).getContainer(player);
-                TemplateManagerCommands.PasteTemplate(container, player, newTag);
+                TemplateManagerCommands.PasteTemplate(container, player, newTag, message.templateName);
             } catch (Throwable t) {
+                System.out.println(t);
             }
 
 
