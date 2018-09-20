@@ -15,6 +15,7 @@ import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.BlockRendererDispatcher;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.client.renderer.vertex.VertexFormatElement;
 import net.minecraft.item.ItemStack;
@@ -27,6 +28,7 @@ import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.Rectangle;
+import org.lwjgl.util.glu.Project;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -71,13 +73,15 @@ public class TemplateManagerGUI extends GuiContainer {
         mc.getTextureManager().bindTexture(background);
         drawTexturedModalRect(guiLeft, guiTop, 0, 0, xSize, ySize);
         this.nameField.drawTextBox();
-        //drawStructure();
+        drawStructure();
     }
 
     private void drawStructure() {
         Rectangle panel = new Rectangle(this.guiLeft + 8, this.guiTop + 14, 50, 50);
         ItemStack itemstack = this.container.getSlot(0).getStack();
         BlockRendererDispatcher dispatcher = this.mc.getBlockRendererDispatcher();
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+
         float rotX = 165, rotY = 0, zoom = 1;
         if (!itemstack.isEmpty()) {
             String UUID = CopyPasteTool.getUUID(itemstack);
@@ -85,17 +89,29 @@ public class TemplateManagerGUI extends GuiContainer {
             if (bufferBuilder != null) {
 
                 GlStateManager.pushMatrix();
-                GlStateManager.translate(guiLeft, guiTop, 0);
+                //GlStateManager.translate(panel.getX() + (panel.getWidth() / 2), panel.getY() + (panel.getHeight() / 2), 100);
+
                 GlStateManager.matrixMode(GL11.GL_PROJECTION);
                 GlStateManager.pushMatrix();
-                //GlStateManager.loadIdentity();
+                GlStateManager.loadIdentity();
                 int scale = new ScaledResolution(mc).getScaleFactor();
-                //Project.gluPerspective(60, (float) panel.getWidth() / panel.getHeight(), 0.01F, 4000);
+                Project.gluPerspective(60, (float) panel.getWidth() / panel.getHeight(), 0.01F, 4000);
                 GlStateManager.matrixMode(GL11.GL_MODELVIEW);
-                //GlStateManager.translate(-panel.getX() - panel.getWidth() / 2, -panel.getY() - panel.getHeight() / 2, 0);
-                //GlStateManager.viewport((guiLeft + panel.getX()) * scale, mc.displayHeight - (guiTop + panel.getY() + panel.getHeight()) * scale, panel.getWidth() * scale, panel.getHeight() * scale);
+                GlStateManager.translate(-panel.getX() - panel.getWidth() / 2, -panel.getY() - panel.getHeight() / 2, 0);
+                GlStateManager.viewport((guiLeft + panel.getX()) * scale, mc.displayHeight - (guiTop + panel.getY() + panel.getHeight()) * scale, panel.getWidth() * scale, panel.getHeight() * scale);
                 GlStateManager.clear(GL11.GL_DEPTH_BUFFER_BIT);
-                GlStateManager.scale(50, 10, 0);//Slightly Larger block to avoid z-fighting.
+
+                double sc = 300 + 8 * 1 * (Math.sqrt(zoom + 99) - 9);
+                GlStateManager.scale(-sc, -sc, sc);
+
+                //GlStateManager.rotate(rotX, 1, 0, 0);
+                GlStateManager.rotate(90, 0, 1, 0);
+                GlStateManager.translate(-1.5, -2.5, -0.5);
+
+                mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+                //Tessellator.getInstance().getBuffer().begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
+                //dispatcher.renderBlockBrightness(Blocks.GLASS.getDefaultState(), 1f);
+                //Tessellator.getInstance().draw();
 
                 if (bufferBuilder.getVertexCount() > 0) {
                     VertexFormat vertexformat = bufferBuilder.getVertexFormat();
