@@ -9,10 +9,14 @@ public class PasteContainerMeshDefinition implements ItemMeshDefinition {
     @Override
     public ModelResourceLocation getModelLocation(ItemStack stack) {
         int pasteAmt = ConstructionPasteContainer.getPasteAmount(stack);
-        if (pasteAmt < 50) {
+        if (pasteAmt < 128) {
             return new ModelResourceLocation("buildinggadgets:constructionpastecontainer", "inventory");
-        } else if (pasteAmt >= 50 && pasteAmt < 100) {
+        } else if (pasteAmt >= 128 && pasteAmt < 256) {
+            return new ModelResourceLocation("buildinggadgets:constructionpastecontainer-quarter", "inventory");
+        } else if (pasteAmt >= 256 && pasteAmt < 384) {
             return new ModelResourceLocation("buildinggadgets:constructionpastecontainer-half", "inventory");
+        } else if (pasteAmt >= 384 && pasteAmt < 512) {
+            return new ModelResourceLocation("buildinggadgets:constructionpastecontainer-3quarter", "inventory");
         } else {
             return new ModelResourceLocation("buildinggadgets:constructionpastecontainer-full", "inventory");
         }

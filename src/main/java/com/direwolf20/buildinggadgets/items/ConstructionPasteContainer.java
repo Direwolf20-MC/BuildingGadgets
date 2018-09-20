@@ -32,7 +32,9 @@ public class ConstructionPasteContainer extends Item {
         ModelBakery.registerItemVariants(this,
                 new ModelResourceLocation(getRegistryName(), "inventory"),
                 new ModelResourceLocation(getRegistryName() + "-half", "inventory"),
-                new ModelResourceLocation(getRegistryName() + "-full", "inventory"));
+                new ModelResourceLocation(getRegistryName() + "-full", "inventory"),
+                new ModelResourceLocation(getRegistryName() + "-quarter", "inventory"),
+                new ModelResourceLocation(getRegistryName() + "-3quarter", "inventory"));
     }
 
     public static void setPasteAmount(ItemStack stack, int amount) {
