@@ -104,7 +104,7 @@ public class TemplateManagerGUI extends GuiContainer {
                 double sc = 300 + 8 * 1 * (Math.sqrt(zoom + 99) - 9);
                 GlStateManager.scale(-sc, -sc, sc);
 
-                //GlStateManager.rotate(rotX, 1, 0, 0);
+                GlStateManager.rotate(15, 0, -1, 0);
                 GlStateManager.rotate(90, 0, 1, 0);
                 GlStateManager.translate(-1.5, -2.5, -0.5);
 

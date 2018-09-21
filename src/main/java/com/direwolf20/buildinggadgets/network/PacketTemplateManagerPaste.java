@@ -30,16 +30,18 @@ public class PacketTemplateManagerPaste implements IMessage {
     public void fromBytes(ByteBuf buf) {
         //System.out.println("Buf size: " + buf.readableBytes());
         pos = BlockPos.fromLong(buf.readLong());
+        templateName = ByteBufUtils.readUTF8String(buf);
         data = new byte[buf.readableBytes()];
         buf.readBytes(data);
-        templateName = ByteBufUtils.readUTF8String(buf);
+
     }
 
     @Override
     public void toBytes(ByteBuf buf) {
         buf.writeLong(pos.toLong());
-        buf.writeBytes(data);
         ByteBufUtils.writeUTF8String(buf, templateName);
+        buf.writeBytes(data);
+
         //System.out.println("Buf size: " + buf.readableBytes());
     }
 
