@@ -77,7 +77,7 @@ public class TemplateManagerGUI extends GuiContainer {
     }
 
     private void drawStructure() {
-        Rectangle panel = new Rectangle(this.guiLeft + 8, this.guiTop + 14, 50, 50);
+        Rectangle panel = new Rectangle(1, 18, 60, 60);
         ItemStack itemstack = this.container.getSlot(0).getStack();
         BlockRendererDispatcher dispatcher = this.mc.getBlockRendererDispatcher();
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
@@ -89,7 +89,7 @@ public class TemplateManagerGUI extends GuiContainer {
             if (bufferBuilder != null) {
 
                 GlStateManager.pushMatrix();
-                //GlStateManager.translate(panel.getX() + (panel.getWidth() / 2), panel.getY() + (panel.getHeight() / 2), 100);
+                GlStateManager.translate(panel.getX() + (panel.getWidth() / 2), panel.getY() + (panel.getHeight() / 2), 100);
 
                 GlStateManager.matrixMode(GL11.GL_PROJECTION);
                 GlStateManager.pushMatrix();
@@ -101,12 +101,13 @@ public class TemplateManagerGUI extends GuiContainer {
                 GlStateManager.viewport((guiLeft + panel.getX()) * scale, mc.displayHeight - (guiTop + panel.getY() + panel.getHeight()) * scale, panel.getWidth() * scale, panel.getHeight() * scale);
                 GlStateManager.clear(GL11.GL_DEPTH_BUFFER_BIT);
 
-                double sc = 300 + 8 * 1 * (Math.sqrt(zoom + 99) - 9);
-                GlStateManager.scale(-sc, -sc, sc);
+                double sc = 300 + 8 * 20 * (Math.sqrt(zoom + 99) - 9);
+                //sc = 375;
+                GlStateManager.scale(sc, sc, sc);
 
-                GlStateManager.rotate(15, 0, -1, 0);
-                GlStateManager.rotate(90, 0, 1, 0);
-                GlStateManager.translate(-1.5, -2.5, -0.5);
+                GlStateManager.rotate(30, 0, 1, 0);
+                GlStateManager.rotate(90, 0, -1, 0);
+                GlStateManager.translate(-1.5, -2.25, -0.5);
 
                 mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
                 //Tessellator.getInstance().getBuffer().begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
