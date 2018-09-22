@@ -40,6 +40,18 @@ public class TemplateManagerGUI extends GuiContainer {
     public static final int WIDTH = 256;
     public static final int HEIGHT = 256;
 
+    private boolean panelClicked;
+    private int clickButton;
+    private long lastDragTime;
+    private int clickX, clickY;
+    private float initRotX, initRotY, initZoom;
+    private float prevRotX, prevRotY;
+    private float momentumX, momentumY;
+    private float momentumDampening = 0.98f;
+    private float rotX = 165, rotY, zoom = 1;
+
+    private int scrollAcc;
+
     private GuiTextField nameField;
 
     private TemplateManagerTileEntity te;
@@ -85,7 +97,7 @@ public class TemplateManagerGUI extends GuiContainer {
         BlockRendererDispatcher dispatcher = this.mc.getBlockRendererDispatcher();
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 
-        float rotX = 165, rotY = 0, zoom = 1;
+        //float rotX = 165, rotY = 0, zoom = 1;
         if (!itemstack.isEmpty()) {
             String UUID = CopyPasteTool.getUUID(itemstack);
             ToolDireBuffer bufferBuilder = PasteToolBufferBuilder.getBufferFromMap(UUID);
@@ -93,15 +105,15 @@ public class TemplateManagerGUI extends GuiContainer {
                 BlockPos startPos = CopyPasteTool.getStartPos(itemstack);
                 BlockPos endPos = CopyPasteTool.getEndPos(itemstack);
                 double distance = endPos.getX() - startPos.getX();
-                double lengthX = Math.abs(startPos.getX() - endPos.getX()) * 16;
-                double lengthY = Math.abs(startPos.getY() - endPos.getY()) * 16;
-                double lengthZ = Math.abs(startPos.getZ() - endPos.getZ()) * 16;
+                double lengthX = Math.abs(startPos.getX() - endPos.getX());
+                double lengthY = Math.abs(startPos.getY() - endPos.getY());
+                double lengthZ = Math.abs(startPos.getZ() - endPos.getZ());
 
                 final double maxW = 6 * 16;
                 final double maxH = 11 * 16;
 
-                double overW = Math.max(lengthX - maxW, lengthZ - maxW);
-                double overH = lengthY - maxH;
+                double overW = Math.max(lengthX * 16 - maxW, lengthZ * 16 - maxW);
+                double overH = lengthY * 16 - maxH;
 
                 double sc = 1;
 
@@ -113,7 +125,7 @@ public class TemplateManagerGUI extends GuiContainer {
 
                 //System.out.println(distance);
                 GlStateManager.pushMatrix();
-                GlStateManager.translate(panel.getX() + (panel.getWidth() / 2), panel.getY() + (panel.getHeight() / 2), 100);
+                //GlStateManager.translate(panel.getX() + (panel.getWidth() / 2), panel.getY() + (panel.getHeight() / 2), 100);
 
                 GlStateManager.matrixMode(GL11.GL_PROJECTION);
                 GlStateManager.pushMatrix();
@@ -121,19 +133,22 @@ public class TemplateManagerGUI extends GuiContainer {
                 //int scale = new ScaledResolution(mc).getScaleFactor();
                 Project.gluPerspective(60, (float) panel.getWidth() / panel.getHeight(), 0.01F, 4000);
                 GlStateManager.matrixMode(GL11.GL_MODELVIEW);
-                GlStateManager.translate(-panel.getX() - panel.getWidth() / 2, -panel.getY() - panel.getHeight() / 2, 0);
+                //GlStateManager.translate(-panel.getX() - panel.getWidth() / 2, -panel.getY() - panel.getHeight() / 2, 0);
                 GlStateManager.viewport((guiLeft + panel.getX()) * scale, mc.displayHeight - (guiTop + panel.getY() + panel.getHeight()) * scale, panel.getWidth() * scale, panel.getHeight() * scale);
                 GlStateManager.clear(GL11.GL_DEPTH_BUFFER_BIT);
 
                 //double sc = 300 + 8 * 0.0125 * (Math.sqrt(zoom + 99) - 9);
                 sc = 293 * sc;
                 GlStateManager.scale(sc, sc, sc);
-
-                GlStateManager.rotate(30, 0, 1, 0);
+                int moveX = startPos.getX() - endPos.getX();
+                if (moveX == 0) moveX++;
+                //GlStateManager.rotate(30, 0, 1, 0);
                 if (startPos.getX() >= endPos.getX()) {
-                    GlStateManager.rotate(90, 0, -1, 0);
+                    moveX--;
+                    //GlStateManager.rotate(90, 0, -1, 0);
                 }
-                GlStateManager.translate(-1.5, -2.38, -0.5);
+
+                GlStateManager.translate((moveX) / 1.75, -Math.abs(startPos.getY() - endPos.getY()) / 1.75, 0);
 
                 mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
                 //Tessellator.getInstance().getBuffer().begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
