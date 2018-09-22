@@ -205,6 +205,12 @@ public class TemplateManagerGUI extends GuiContainer {
                 GlStateManager.viewport(0, 0, mc.displayWidth, mc.displayHeight);
 
             }
+        } else {
+            rotX = 0;
+            rotY = 0;
+            zoom = 1;
+            momentumX = 0;
+            momentumY = 0;
         }
     }
 
@@ -322,7 +328,7 @@ public class TemplateManagerGUI extends GuiContainer {
         zoom = initZoom + Mouse.getEventDWheel() / 2;
         if (zoom < -200) zoom = -200;
         if (zoom > 1000) zoom = 1000;
-        System.out.println(zoom);
+        //System.out.println(zoom);
 
     }
 
