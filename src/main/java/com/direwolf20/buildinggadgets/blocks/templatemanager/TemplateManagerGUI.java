@@ -48,7 +48,7 @@ public class TemplateManagerGUI extends GuiContainer {
     private float prevRotX, prevRotY;
     private float momentumX, momentumY;
     private float momentumDampening = 0.98f;
-    private float rotX = 165, rotY, zoom = 1;
+    private float rotX = 0, rotY = 0, zoom = 1;
 
     private int scrollAcc;
 
@@ -141,7 +141,7 @@ public class TemplateManagerGUI extends GuiContainer {
                 sc = 293 * sc;
                 GlStateManager.scale(sc, sc, sc);
                 int moveX = startPos.getX() - endPos.getX();
-                if (moveX == 0) moveX++;
+
                 //GlStateManager.rotate(30, 0, 1, 0);
                 if (startPos.getX() >= endPos.getX()) {
                     moveX--;
@@ -149,6 +149,12 @@ public class TemplateManagerGUI extends GuiContainer {
                 }
 
                 GlStateManager.translate((moveX) / 1.75, -Math.abs(startPos.getY() - endPos.getY()) / 1.75, 0);
+                if ((startPos.getX() - endPos.getX()) == 0) {
+                    GlStateManager.rotate(270, 0, 1, 0);
+                }
+
+                GlStateManager.rotate(rotX, 1, 0, 0);
+                GlStateManager.rotate(rotY, 0, 1, 0);
 
                 mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
                 //Tessellator.getInstance().getBuffer().begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
