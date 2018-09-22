@@ -27,6 +27,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
+import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.Rectangle;
 import org.lwjgl.util.glu.Project;
@@ -49,6 +50,7 @@ public class TemplateManagerGUI extends GuiContainer {
     private float momentumX, momentumY;
     private float momentumDampening = 0.98f;
     private float rotX = 0, rotY = 0, zoom = 1;
+    Rectangle panel = new Rectangle(10, 18, 60, 60);
 
     private int scrollAcc;
 
@@ -90,7 +92,6 @@ public class TemplateManagerGUI extends GuiContainer {
     }
 
     private void drawStructure() {
-        Rectangle panel = new Rectangle(10, 18, 60, 60);
         int scale = new ScaledResolution(mc).getScaleFactor();
         drawRect(guiLeft + panel.getX() - 1, guiTop + panel.getY() - 1, guiLeft + panel.getX() + panel.getWidth() + 1, guiTop + panel.getY() + panel.getHeight() + 1, 0xFF8A8A8A);
         ItemStack itemstack = this.container.getSlot(0).getStack();
@@ -259,7 +260,63 @@ public class TemplateManagerGUI extends GuiContainer {
             nameField.setFocused(true);
         } else {
             nameField.setFocused(false);
+            if (panel.contains(mouseX - guiLeft, mouseY - guiTop)) {
+                clickButton = mouseButton;
+                panelClicked = true;
+                clickX = Mouse.getX();
+                clickY = Mouse.getY();
+            }
             super.mouseClicked(mouseX, mouseY, mouseButton);
         }
+    }
+
+    @Override
+    protected void mouseReleased(int mouseX, int mouseY, int state) {
+        super.mouseReleased(mouseX, mouseY, state);
+        if (panelClicked) {
+            lastDragTime = System.currentTimeMillis();
+        }
+        panelClicked = false;
+        initRotX = rotX;
+        initRotY = rotY;
+        initZoom = zoom;
+    }
+
+    @SuppressWarnings("deprecation")
+    @Override
+    protected void drawGuiContainerForegroundLayer(int j, int i) {
+        boolean doMomentum = true;
+        if (panelClicked) {
+            if (clickButton == 0) {
+                prevRotX = rotX;
+                prevRotY = rotY;
+                rotX = initRotX + Mouse.getY() - clickY;
+                rotY = initRotY + Mouse.getX() - clickX;
+                momentumX = rotX - prevRotX;
+                momentumY = rotY - prevRotY;
+                doMomentum = false;
+            } else if (clickButton == 1) {
+                zoom = Math.max(1, initZoom + (clickY - Mouse.getY()));
+            }
+        }
+
+        if (doMomentum) {
+            rotX += momentumX;
+            rotY += momentumY;
+            momentumX *= momentumDampening;
+            momentumY *= momentumDampening;
+        }
+    }
+
+    @Override
+    public void updateScreen() {
+        super.updateScreen();
+
+        if (!panelClicked) {
+            initRotX = rotX;
+            initRotY = rotY;
+            initZoom = zoom;
+        }
+        
     }
 }
