@@ -1,5 +1,5 @@
 /**
- * This class was adapted from code written by TTerrag for the Chisel mod: https://github.com/Chisel-Team/Chisel
+ * Parts of this class were adapted from code written by TTerrag for the Chisel mod: https://github.com/Chisel-Team/Chisel
  * Chisel is Open Source and distributed under GNU GPL v2
  */
 
