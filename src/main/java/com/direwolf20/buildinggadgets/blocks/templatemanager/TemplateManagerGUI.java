@@ -158,10 +158,10 @@ public class TemplateManagerGUI extends GuiContainer {
                 if ((startPos.getX() - endPos.getX()) == 0) {
                     GlStateManager.rotate(270, 0, 1, 0);
                 }
-
+                GlStateManager.translate(((startPos.getX() - endPos.getX()) / 2) * -1, ((startPos.getY() - endPos.getY()) / 2) * -1, 0);
                 GlStateManager.rotate(rotX, 1, 0, 0);
                 GlStateManager.rotate(rotY, 0, 1, 0);
-
+                GlStateManager.translate(((startPos.getX() - endPos.getX()) / 2), ((startPos.getY() - endPos.getY()) / 2), 0);
                 mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
                 //Tessellator.getInstance().getBuffer().begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
                 //dispatcher.renderBlockBrightness(Blocks.GLASS.getDefaultState(), 1f);
