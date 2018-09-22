@@ -144,7 +144,7 @@ public class TemplateManagerGUI extends GuiContainer {
                 GlStateManager.clear(GL11.GL_DEPTH_BUFFER_BIT);
 
                 //double sc = 300 + 8 * 0.0125 * (Math.sqrt(zoom + 99) - 9);
-                sc = 293 * sc;
+                sc = (293 * sc) + zoom;
                 GlStateManager.scale(sc, sc, sc);
                 int moveX = startPos.getX() - endPos.getX();
 
@@ -162,6 +162,7 @@ public class TemplateManagerGUI extends GuiContainer {
                 GlStateManager.rotate(rotX, 1, 0, 0);
                 GlStateManager.rotate(rotY, 0, 1, 0);
                 GlStateManager.translate(((startPos.getX() - endPos.getX()) / 2), ((startPos.getY() - endPos.getY()) / 2), 0);
+                //GlStateManager.translate(0,0,5);
                 mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
                 //Tessellator.getInstance().getBuffer().begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
                 //dispatcher.renderBlockBrightness(Blocks.GLASS.getDefaultState(), 1f);
@@ -301,7 +302,8 @@ public class TemplateManagerGUI extends GuiContainer {
                 momentumY = rotY - prevRotY;
                 doMomentum = false;
             } else if (clickButton == 1) {
-                zoom = Math.max(1, initZoom + (clickY - Mouse.getY()));
+                //zoom = Math.max(1, initZoom + (clickY - Mouse.getY()));
+                zoom = initZoom + (clickY - Mouse.getY());
             }
         }
 
@@ -311,6 +313,17 @@ public class TemplateManagerGUI extends GuiContainer {
             momentumX *= momentumDampening;
             momentumY *= momentumDampening;
         }
+    }
+
+    @Override
+    public void handleMouseInput() throws IOException {
+        super.handleMouseInput();
+        //System.out.println(Mouse.getEventDWheel());
+        zoom = initZoom + Mouse.getEventDWheel() / 2;
+        if (zoom < -200) zoom = -200;
+        if (zoom > 1000) zoom = 1000;
+        System.out.println(zoom);
+
     }
 
     @Override
