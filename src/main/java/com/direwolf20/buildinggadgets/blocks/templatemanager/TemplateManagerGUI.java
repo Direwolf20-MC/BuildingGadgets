@@ -50,11 +50,12 @@ public class TemplateManagerGUI extends GuiContainer {
     private int clickButton;
     private long lastDragTime;
     private int clickX, clickY;
-    private float initRotX, initRotY, initZoom;
-    private float prevRotX, prevRotY;
+    private float initRotX, initRotY, initZoom, initPanX, initPanY;
+    private float prevRotX, prevRotY, prevPanX, prevPanY;
     private float momentumX, momentumY;
     private float momentumDampening = 0.98f;
     private float rotX = 0, rotY = 0, zoom = 1;
+    private float panX = 0, panY = 0;
     Rectangle panel = new Rectangle(10, 18, 60, 60);
 
     private int scrollAcc;
@@ -155,15 +156,16 @@ public class TemplateManagerGUI extends GuiContainer {
                 }
 
                 GlStateManager.translate((moveX) / 1.75, -Math.abs(startPos.getY() - endPos.getY()) / 1.75, 0);
-                if ((startPos.getX() - endPos.getX()) == 0) {
-                    GlStateManager.rotate(270, 0, 1, 0);
-                }
+
                 GlStateManager.translate(((startPos.getX() - endPos.getX()) / 2) * -1, ((startPos.getY() - endPos.getY()) / 2) * -1, 0);
                 GlStateManager.rotate(rotX, 1, 0, 0);
                 GlStateManager.rotate(rotY, 0, 1, 0);
                 GlStateManager.translate(((startPos.getX() - endPos.getX()) / 2), ((startPos.getY() - endPos.getY()) / 2), 0);
-                //GlStateManager.translate(0,0,5);
+                GlStateManager.translate(panX, panY, 0);
                 mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+                if ((startPos.getX() - endPos.getX()) == 0) {
+                    GlStateManager.rotate(270, 0, 1, 0);
+                }
                 //Tessellator.getInstance().getBuffer().begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
                 //dispatcher.renderBlockBrightness(Blocks.GLASS.getDefaultState(), 1f);
                 //Tessellator.getInstance().draw();
@@ -211,6 +213,8 @@ public class TemplateManagerGUI extends GuiContainer {
             zoom = 1;
             momentumX = 0;
             momentumY = 0;
+            panX = 0;
+            panY = 0;
         }
     }
 
@@ -291,6 +295,8 @@ public class TemplateManagerGUI extends GuiContainer {
         panelClicked = false;
         initRotX = rotX;
         initRotY = rotY;
+        initPanX = panX;
+        initPanY = panY;
         initZoom = zoom;
     }
 
@@ -308,8 +314,10 @@ public class TemplateManagerGUI extends GuiContainer {
                 momentumY = rotY - prevRotY;
                 doMomentum = false;
             } else if (clickButton == 1) {
-                //zoom = Math.max(1, initZoom + (clickY - Mouse.getY()));
-                zoom = initZoom + (clickY - Mouse.getY());
+                prevPanX = panX;
+                prevPanY = panY;
+                panX = initPanX + (Mouse.getX() - clickX) / 8;
+                panY = initPanY + (Mouse.getY() - clickY) / 8;
             }
         }
 
@@ -340,6 +348,8 @@ public class TemplateManagerGUI extends GuiContainer {
             initRotX = rotX;
             initRotY = rotY;
             initZoom = zoom;
+            initPanX = panX;
+            initPanY = panY;
         }
 
     }
