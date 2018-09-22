@@ -23,6 +23,7 @@ import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.JsonToNBT;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
@@ -77,7 +78,9 @@ public class TemplateManagerGUI extends GuiContainer {
     }
 
     private void drawStructure() {
-        Rectangle panel = new Rectangle(1, 18, 60, 60);
+        Rectangle panel = new Rectangle(10, 18, 60, 60);
+        int scale = new ScaledResolution(mc).getScaleFactor();
+        drawRect(guiLeft + panel.getX() - 1, guiTop + panel.getY() - 1, guiLeft + panel.getX() + panel.getWidth() + 1, guiTop + panel.getY() + panel.getHeight() + 1, 0xFF8A8A8A);
         ItemStack itemstack = this.container.getSlot(0).getStack();
         BlockRendererDispatcher dispatcher = this.mc.getBlockRendererDispatcher();
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
@@ -87,27 +90,50 @@ public class TemplateManagerGUI extends GuiContainer {
             String UUID = CopyPasteTool.getUUID(itemstack);
             ToolDireBuffer bufferBuilder = PasteToolBufferBuilder.getBufferFromMap(UUID);
             if (bufferBuilder != null) {
+                BlockPos startPos = CopyPasteTool.getStartPos(itemstack);
+                BlockPos endPos = CopyPasteTool.getEndPos(itemstack);
+                double distance = endPos.getX() - startPos.getX();
+                double lengthX = Math.abs(startPos.getX() - endPos.getX()) * 16;
+                double lengthY = Math.abs(startPos.getY() - endPos.getY()) * 16;
+                double lengthZ = Math.abs(startPos.getZ() - endPos.getZ()) * 16;
 
+                final double maxW = 6 * 16;
+                final double maxH = 11 * 16;
+
+                double overW = Math.max(lengthX - maxW, lengthZ - maxW);
+                double overH = lengthY - maxH;
+
+                double sc = 1;
+
+                if (overW > 0 && overW >= overH) {
+                    sc = maxW / (overW + maxW);
+                } else if (overH > 0 && overH >= overW) {
+                    sc = maxH / (overH + maxH);
+                }
+
+                //System.out.println(distance);
                 GlStateManager.pushMatrix();
                 GlStateManager.translate(panel.getX() + (panel.getWidth() / 2), panel.getY() + (panel.getHeight() / 2), 100);
 
                 GlStateManager.matrixMode(GL11.GL_PROJECTION);
                 GlStateManager.pushMatrix();
                 GlStateManager.loadIdentity();
-                int scale = new ScaledResolution(mc).getScaleFactor();
+                //int scale = new ScaledResolution(mc).getScaleFactor();
                 Project.gluPerspective(60, (float) panel.getWidth() / panel.getHeight(), 0.01F, 4000);
                 GlStateManager.matrixMode(GL11.GL_MODELVIEW);
                 GlStateManager.translate(-panel.getX() - panel.getWidth() / 2, -panel.getY() - panel.getHeight() / 2, 0);
                 GlStateManager.viewport((guiLeft + panel.getX()) * scale, mc.displayHeight - (guiTop + panel.getY() + panel.getHeight()) * scale, panel.getWidth() * scale, panel.getHeight() * scale);
                 GlStateManager.clear(GL11.GL_DEPTH_BUFFER_BIT);
 
-                double sc = 300 + 8 * 20 * (Math.sqrt(zoom + 99) - 9);
-                //sc = 375;
+                //double sc = 300 + 8 * 0.0125 * (Math.sqrt(zoom + 99) - 9);
+                sc = 293 * sc;
                 GlStateManager.scale(sc, sc, sc);
 
                 GlStateManager.rotate(30, 0, 1, 0);
-                GlStateManager.rotate(90, 0, -1, 0);
-                GlStateManager.translate(-1.5, -2.25, -0.5);
+                if (startPos.getX() >= endPos.getX()) {
+                    GlStateManager.rotate(90, 0, -1, 0);
+                }
+                GlStateManager.translate(-1.5, -2.38, -0.5);
 
                 mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
                 //Tessellator.getInstance().getBuffer().begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
