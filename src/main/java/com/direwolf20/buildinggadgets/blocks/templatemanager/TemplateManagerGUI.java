@@ -1,3 +1,8 @@
+/**
+ * This class was adapted from code written by TTerrag for the Chisel mod: https://github.com/Chisel-Team/Chisel
+ * Chisel is Open Source and distributed under GNU GPL v2
+ */
+
 package com.direwolf20.buildinggadgets.blocks.templatemanager;
 
 import com.direwolf20.buildinggadgets.BuildingGadgets;
@@ -317,6 +322,6 @@ public class TemplateManagerGUI extends GuiContainer {
             initRotY = rotY;
             initZoom = zoom;
         }
-        
+
     }
 }
