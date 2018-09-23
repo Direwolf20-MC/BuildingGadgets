@@ -9,7 +9,6 @@ import com.direwolf20.buildinggadgets.network.PacketTemplateBlockMap;
 import com.direwolf20.buildinggadgets.tools.BlockMapWorldSave;
 import com.direwolf20.buildinggadgets.tools.TemplateWorldSave;
 import net.minecraft.block.Block;
-import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
@@ -27,7 +26,7 @@ import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class TemplateManager extends Block implements ITileEntityProvider {
+public class TemplateManager extends Block {
     public static final int GUI_ID = 1;
 
     public TemplateManager() {
@@ -43,7 +42,12 @@ public class TemplateManager extends Block implements ITileEntityProvider {
     }
 
     @Override
-    public TileEntity createNewTileEntity(World worldIn, int meta) {
+    public boolean hasTileEntity(IBlockState state) {
+        return true;
+    }
+
+    @Override
+    public TileEntity createTileEntity(World worldin, IBlockState state) {
         return new TemplateManagerTileEntity();
     }
 
