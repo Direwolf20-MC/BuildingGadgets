@@ -90,6 +90,9 @@ public class TemplateManagerCommands {
             tagCompound.setString("owner", player.getName());
             worldSave.addToMap(UUID, tagCompound);
             Template.setName(itemStack0, Template.getName(itemStack1));
+
+            container.putStackInSlot(0, itemStack0);
+            PacketHandler.INSTANCE.sendTo(new PacketTemplateBlockMap(tagCompound), (EntityPlayerMP) player);
         }
     }
 
