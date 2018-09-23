@@ -1,6 +1,10 @@
 package com.direwolf20.buildinggadgets.blocks.templatemanager;
 
+import com.direwolf20.buildinggadgets.ModItems;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Items;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
@@ -8,7 +12,15 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 
+import javax.annotation.Nonnull;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 public class TemplateManagerTileEntity extends TileEntity {
+
+    private static final Set<Item> allowedItemsLeft = Stream.of(ModItems.copyPasteTool, ModItems.template).collect(Collectors.toSet());
+    private static final Set<Item> allowedItemsRight = Stream.of(Items.PAPER, ModItems.template).collect(Collectors.toSet());
 
     public static final int SIZE = 2;
 
@@ -19,6 +31,21 @@ public class TemplateManagerTileEntity extends TileEntity {
             // We need to tell the tile entity that something has changed so
             // that the chest contents is persisted
             TemplateManagerTileEntity.this.markDirty();
+        }
+
+        @Override
+        @Nonnull
+        public ItemStack insertItem(int slot, @Nonnull ItemStack stack, boolean simulate) {
+            if (slot == 0) {
+                if (!(allowedItemsLeft.contains(stack.getItem()))) {
+                    return stack;
+                }
+            } else if (slot == 1) {
+                if (!(allowedItemsRight.contains(stack.getItem()))) {
+                    return stack;
+                }
+            }
+            return super.insertItem(slot, stack, simulate);
         }
     };
 
