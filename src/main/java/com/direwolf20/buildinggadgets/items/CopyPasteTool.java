@@ -12,7 +12,6 @@ import com.direwolf20.buildinggadgets.tools.*;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
@@ -449,7 +448,7 @@ public class CopyPasteTool extends GenericGadget {
                             return false;
                         }
                         NonNullList<ItemStack> drops = NonNullList.create();
-                        actualState.getBlock().getDrops(drops, Minecraft.getMinecraft().world, new BlockPos(0, 0, 0), actualState, 0);
+                        actualState.getBlock().getDrops(drops, world, new BlockPos(0, 0, 0), actualState, 0);
                         int neededItems = 0;
                         for (ItemStack drop : drops) {
                             if (drop.getItem().equals(uniqueItem.item)) {
