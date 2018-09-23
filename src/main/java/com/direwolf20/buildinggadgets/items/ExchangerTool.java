@@ -303,12 +303,14 @@ public class ExchangerTool extends GenericGadget {
             return false;
         }
         if (Config.poweredByFE) {
-            if (!useEnergy(tool, Config.energyCostBuilder, player)) {
+            if (!useEnergy(tool, Config.energyCostExchanger, player)) {
                 return false;
             }
         } else {
             if (tool.getItemDamage() >= tool.getMaxDamage()) {
-                return false;
+                if (tool.isItemStackDamageable()) {
+                    return false;
+                }
             } else {
                 tool.damageItem(2, player);
             }

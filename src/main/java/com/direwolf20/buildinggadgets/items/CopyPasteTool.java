@@ -566,7 +566,9 @@ public class CopyPasteTool extends GenericGadget {
             }
         } else {
             if (heldItem.getItemDamage() >= heldItem.getMaxDamage()) {
-                return;
+                if (heldItem.isItemStackDamageable()) {
+                    return;
+                }
             } else {
                 heldItem.damageItem(1, player);
             }

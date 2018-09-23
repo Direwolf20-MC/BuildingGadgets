@@ -320,7 +320,9 @@ public class BuildingTool extends GenericGadget {
             }
         } else {
             if (heldItem.getItemDamage() >= heldItem.getMaxDamage()) {
-                return false;
+                if (heldItem.isItemStackDamageable()) {
+                    return false;
+                }
             } else {
                 heldItem.damageItem(1, player);
             }
