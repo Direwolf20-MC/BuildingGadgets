@@ -315,7 +315,7 @@ public class TemplateManagerGUI extends GuiContainer {
             } else if (clickButton == 1) {
                 prevPanX = panX;
                 prevPanY = panY;
-                panX = initPanX - (Mouse.getX() - clickX) / 8;
+                panX = initPanX + (Mouse.getX() - clickX) / 8;
                 panY = initPanY + (Mouse.getY() - clickY) / 8;
             }
         }
