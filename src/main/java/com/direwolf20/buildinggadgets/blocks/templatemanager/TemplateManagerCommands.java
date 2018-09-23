@@ -177,15 +177,15 @@ public class TemplateManagerCommands {
         if (UUIDTemplate == null || UUIDTemplate.equals("")) return;
 
         NBTTagCompound templateTagCompound;
-        BlockPos startPos = new BlockPos(0, 0, 0);
-        BlockPos endPos = new BlockPos(0, 0, 0);
 
         templateTagCompound = sentTagCompound.copy();
+        BlockPos startPos = GadgetUtils.getPOSFromNBT(templateTagCompound, "startPos");
+        BlockPos endPos = GadgetUtils.getPOSFromNBT(templateTagCompound, "endPos");
         Template.incrementCopyCounter(templateStack);
         templateTagCompound.setInteger("copycounter", Template.getCopyCounter(templateStack));
         templateTagCompound.setString("UUID", Template.getUUID(templateStack));
-        GadgetUtils.writePOSToNBT(templateTagCompound, startPos, "startPos", 0);
-        GadgetUtils.writePOSToNBT(templateTagCompound, endPos, "startPos", 0);
+        //GadgetUtils.writePOSToNBT(templateTagCompound, startPos, "startPos", 0);
+        //GadgetUtils.writePOSToNBT(templateTagCompound, endPos, "startPos", 0);
         //Map<UniqueItem, Integer> tagMap = GadgetUtils.nbtToItemCount((NBTTagList) templateTagCompound.getTag("itemcountmap"));
         //templateTagCompound.removeTag("itemcountmap");
 
@@ -252,6 +252,8 @@ public class TemplateManagerCommands {
             newCompound.setIntArray("stateIntArray", tagCompound.getIntArray("stateIntArray"));
             newCompound.setIntArray("posIntArray", tagCompound.getIntArray("posIntArray"));
             newCompound.setTag("mapIntState", tagCompound.getTag("mapIntState"));
+            GadgetUtils.writePOSToNBT(newCompound, GadgetUtils.getPOSFromNBT(tagCompound, "startPos"), "startPos", 0);
+            GadgetUtils.writePOSToNBT(newCompound, GadgetUtils.getPOSFromNBT(tagCompound, "endPos"), "endPos", 0);
             //Map<UniqueItem, Integer> tagMap = CopyPasteTool.getItemCountMap(itemStack0);
             //NBTTagList tagList = GadgetUtils.itemCountToNBT(tagMap);
             //newCompound.setTag("itemcountmap", tagList);
