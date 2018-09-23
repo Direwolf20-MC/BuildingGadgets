@@ -122,11 +122,14 @@ public class TemplateManagerGUI extends GuiContainer {
                 double overH = lengthY * 16 - maxH;
 
                 double sc = 1;
+                double zoomScale = 1;
 
                 if (overW > 0 && overW >= overH) {
                     sc = maxW / (overW + maxW);
+                    zoomScale = overW / 40;
                 } else if (overH > 0 && overH >= overW) {
                     sc = maxH / (overH + maxH);
+                    zoomScale = overH / 40;
                 }
 
                 //System.out.println(distance);
@@ -144,7 +147,7 @@ public class TemplateManagerGUI extends GuiContainer {
                 GlStateManager.clear(GL11.GL_DEPTH_BUFFER_BIT);
 
                 //double sc = 300 + 8 * 0.0125 * (Math.sqrt(zoom + 99) - 9);
-                sc = (293 * sc) + zoom;
+                sc = (293 * sc) + zoom / zoomScale;
                 GlStateManager.scale(sc, sc, sc);
                 int moveX = startPos.getX() - endPos.getX();
 
@@ -155,12 +158,13 @@ public class TemplateManagerGUI extends GuiContainer {
                 }
 
                 GlStateManager.translate((moveX) / 1.75, -Math.abs(startPos.getY() - endPos.getY()) / 1.75, 0);
+                GlStateManager.translate(panX, panY, 0);
 //System.out.println(((startPos.getX() - endPos.getX()) / 2) * -1 + ":" + ((startPos.getY() - endPos.getY()) / 2) * -1 + ":" + ((startPos.getZ() - endPos.getZ()) / 2) * -1);
                 GlStateManager.translate(((startPos.getX() - endPos.getX()) / 2) * -1, ((startPos.getY() - endPos.getY()) / 2) * -1, ((startPos.getZ() - endPos.getZ()) / 2) * -1);
                 GlStateManager.rotate(rotX, 1, 0, 0);
                 GlStateManager.rotate(rotY, 0, 1, 0);
                 GlStateManager.translate(((startPos.getX() - endPos.getX()) / 2), ((startPos.getY() - endPos.getY()) / 2), ((startPos.getZ() - endPos.getZ()) / 2));
-                GlStateManager.translate(panX, panY, 0);
+
                 mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
                 if ((startPos.getX() - endPos.getX()) == 0) {
                     //GlStateManager.rotate(270, 0, 1, 0);

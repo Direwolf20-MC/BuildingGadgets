@@ -1,6 +1,7 @@
 package com.direwolf20.buildinggadgets.blocks.templatemanager;
 
 import com.direwolf20.buildinggadgets.BuildingGadgets;
+import com.direwolf20.buildinggadgets.items.CopyPasteTool;
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
@@ -8,6 +9,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
@@ -46,6 +48,16 @@ public class TemplateManager extends Block implements ITileEntityProvider {
         TileEntity te = world.getTileEntity(pos);
         if (!(te instanceof TemplateManagerTileEntity)) {
             return false;
+        }
+        TemplateManagerContainer container = ((TemplateManagerTileEntity) te).getContainer(player);
+        for (int i = 0; i <= 1; i++) {
+            ItemStack itemStack = container.getSlot(i).getStack();
+            if (itemStack.getItem() instanceof CopyPasteTool) {
+                String UUID = CopyPasteTool.getUUID(itemStack);
+                if (!(UUID.isEmpty())) {
+
+                }
+            }
         }
         player.openGui(BuildingGadgets.instance, GUI_ID, world, pos.getX(), pos.getY(), pos.getZ());
         return true;
