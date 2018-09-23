@@ -14,7 +14,6 @@ import com.direwolf20.buildinggadgets.tools.PasteToolBufferBuilder;
 import com.direwolf20.buildinggadgets.tools.UniqueItem;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderItem;
@@ -131,7 +130,7 @@ public class TooltipRender {
 
             GlStateManager.enableBlend();
             GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-            Gui.drawRect(bx, by, bx + width, by + height, 0x55000000);
+            //Gui.drawRect(bx, by, bx + width, by + height, 0x55000000);
 
             int j = 0;
             //Look through all the ItemStacks and draw each one in the specified X/Y position
