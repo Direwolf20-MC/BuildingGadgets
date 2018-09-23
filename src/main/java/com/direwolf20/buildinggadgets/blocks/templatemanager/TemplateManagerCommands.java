@@ -88,7 +88,7 @@ public class TemplateManagerCommands {
             tagCompound.setInteger("copycounter", Template.getCopyCounter(itemStack0));
             tagCompound.setString("UUID", Template.getUUID(itemStack0));
             tagCompound.setString("owner", player.getName());
-            worldSave.addToMap(UUID, tagCompound);
+            templateWorldSave.addToMap(UUID, tagCompound);
             Template.setName(itemStack0, Template.getName(itemStack1));
 
             container.putStackInSlot(0, itemStack0);
