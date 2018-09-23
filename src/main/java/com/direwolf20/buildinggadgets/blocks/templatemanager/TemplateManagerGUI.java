@@ -76,6 +76,12 @@ public class TemplateManagerGUI extends GuiContainer {
     }
 
     @Override
+    public void drawScreen(int mouseX, int mouseY, float partialTicks) {
+        super.drawScreen(mouseX, mouseY, partialTicks);
+        this.renderHoveredToolTip(mouseX, mouseY);
+    }
+
+    @Override
     public void initGui() {
         super.initGui();
         //The parameters of GuiButton are(id, x, y, width, height, text);

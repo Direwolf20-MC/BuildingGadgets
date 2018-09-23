@@ -74,6 +74,22 @@ public class TemplateManagerCommands {
 
             container.putStackInSlot(0, itemStack0);
             PacketHandler.INSTANCE.sendTo(new PacketBlockMap(tagCompound), (EntityPlayerMP) player);
+        } else if (itemStack0.getItem().equals(ModItems.template)) {
+            Template.setStartPos(itemStack0, startPos);
+            Template.setEndPos(itemStack0, endPos);
+            Template.setItemCountMap(itemStack0, tagMap);
+            String UUID = Template.getUUID(itemStack0);
+
+            if (UUID == null || UUID.equals("")) return;
+
+            NBTTagCompound templateTagCompound = templateWorldSave.getCompoundFromUUID(UUIDTemplate);
+            tagCompound = templateTagCompound.copy();
+            Template.incrementCopyCounter(itemStack0);
+            tagCompound.setInteger("copycounter", Template.getCopyCounter(itemStack0));
+            tagCompound.setString("UUID", Template.getUUID(itemStack0));
+            tagCompound.setString("owner", player.getName());
+            worldSave.addToMap(UUID, tagCompound);
+            Template.setName(itemStack0, Template.getName(itemStack1));
         }
     }
 
