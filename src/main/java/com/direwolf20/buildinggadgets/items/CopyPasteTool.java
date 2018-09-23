@@ -623,7 +623,7 @@ public class CopyPasteTool extends GenericGadget {
             IBlockState currentBlock = world.getBlockState(blockMap.pos);
             BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(world, blockMap.pos, currentBlock, player);
             boolean cancelled = MinecraftForge.EVENT_BUS.post(e);
-            if (distance < 64 && !cancelled && sameDim) { //Don't allow us to undo a block while its still being placed or too far away
+            if (distance < 256 && !cancelled && sameDim) { //Don't allow us to undo a block while its still being placed or too far away
                 if (currentBlock.getBlock() == blockMap.state.getBlock() || currentBlock.getBlock() instanceof ConstructionBlock) {
                     if (currentBlock.getBlock().getBlockHardness(currentBlock, world, blockMap.pos) >= 0) {
                         currentBlock.getBlock().harvestBlock(world, player, blockMap.pos, currentBlock, world.getTileEntity(blockMap.pos), silkTool);
