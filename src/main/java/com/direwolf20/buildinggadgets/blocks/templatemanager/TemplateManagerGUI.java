@@ -306,7 +306,7 @@ public class TemplateManagerGUI extends GuiContainer {
     @SuppressWarnings("deprecation")
     @Override
     protected void drawGuiContainerForegroundLayer(int j, int i) {
-        boolean doMomentum = true;
+        boolean doMomentum = false;
         if (panelClicked) {
             if (clickButton == 0) {
                 prevRotX = rotX;
