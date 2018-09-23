@@ -111,7 +111,6 @@ public class TemplateManagerGUI extends GuiContainer {
             if (bufferBuilder != null) {
                 BlockPos startPos = CopyPasteTool.getStartPos(itemstack);
                 BlockPos endPos = CopyPasteTool.getEndPos(itemstack);
-                double distance = endPos.getX() - startPos.getX();
                 double lengthX = Math.abs(startPos.getX() - endPos.getX());
                 double lengthY = Math.abs(startPos.getY() - endPos.getY());
                 double lengthZ = Math.abs(startPos.getZ() - endPos.getZ());
@@ -156,15 +155,15 @@ public class TemplateManagerGUI extends GuiContainer {
                 }
 
                 GlStateManager.translate((moveX) / 1.75, -Math.abs(startPos.getY() - endPos.getY()) / 1.75, 0);
-
-                GlStateManager.translate(((startPos.getX() - endPos.getX()) / 2) * -1, ((startPos.getY() - endPos.getY()) / 2) * -1, 0);
+//System.out.println(((startPos.getX() - endPos.getX()) / 2) * -1 + ":" + ((startPos.getY() - endPos.getY()) / 2) * -1 + ":" + ((startPos.getZ() - endPos.getZ()) / 2) * -1);
+                GlStateManager.translate(((startPos.getX() - endPos.getX()) / 2) * -1, ((startPos.getY() - endPos.getY()) / 2) * -1, ((startPos.getZ() - endPos.getZ()) / 2) * -1);
                 GlStateManager.rotate(rotX, 1, 0, 0);
                 GlStateManager.rotate(rotY, 0, 1, 0);
-                GlStateManager.translate(((startPos.getX() - endPos.getX()) / 2), ((startPos.getY() - endPos.getY()) / 2), 0);
+                GlStateManager.translate(((startPos.getX() - endPos.getX()) / 2), ((startPos.getY() - endPos.getY()) / 2), ((startPos.getZ() - endPos.getZ()) / 2));
                 GlStateManager.translate(panX, panY, 0);
                 mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
                 if ((startPos.getX() - endPos.getX()) == 0) {
-                    GlStateManager.rotate(270, 0, 1, 0);
+                    //GlStateManager.rotate(270, 0, 1, 0);
                 }
                 //Tessellator.getInstance().getBuffer().begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
                 //dispatcher.renderBlockBrightness(Blocks.GLASS.getDefaultState(), 1f);
@@ -308,15 +307,15 @@ public class TemplateManagerGUI extends GuiContainer {
             if (clickButton == 0) {
                 prevRotX = rotX;
                 prevRotY = rotY;
-                rotX = initRotX + Mouse.getY() - clickY;
-                rotY = initRotY + Mouse.getX() - clickX;
+                rotX = initRotX - (Mouse.getY() - clickY);
+                rotY = initRotY + (Mouse.getX() - clickX);
                 momentumX = rotX - prevRotX;
                 momentumY = rotY - prevRotY;
                 doMomentum = false;
             } else if (clickButton == 1) {
                 prevPanX = panX;
                 prevPanY = panY;
-                panX = initPanX + (Mouse.getX() - clickX) / 8;
+                panX = initPanX - (Mouse.getX() - clickX) / 8;
                 panY = initPanY + (Mouse.getY() - clickY) / 8;
             }
         }
