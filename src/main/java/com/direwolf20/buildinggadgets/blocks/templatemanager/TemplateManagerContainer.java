@@ -1,9 +1,6 @@
 package com.direwolf20.buildinggadgets.blocks.templatemanager;
 
-import com.direwolf20.buildinggadgets.items.CopyPasteTool;
-import com.direwolf20.buildinggadgets.items.Template;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Items;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
@@ -69,8 +66,8 @@ public class TemplateManagerContainer extends Container {
 
         if (slot != null && slot.getHasStack()) {
             ItemStack itemstack1 = slot.getStack();
-            if (!(itemstack1.getItem() instanceof CopyPasteTool) && !itemstack1.getItem().equals(Items.PAPER) && !(itemstack1.getItem() instanceof Template))
-                return itemstack;
+            //if (!(itemstack1.getItem() instanceof CopyPasteTool) && !itemstack1.getItem().equals(Items.PAPER) && !(itemstack1.getItem() instanceof Template))
+            //    return itemstack;
             itemstack = itemstack1.copy();
 
             if (index < TemplateManagerTileEntity.SIZE) {
