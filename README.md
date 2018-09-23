@@ -1,7 +1,7 @@
 # Building Gadgets
 Welcome to Dire's Building Gadgets!
 
-Sometimes, building large structures can be a little tedious, and take a lot of effort. Not all of us a great builders you know!
+Sometimes, building large structures can be a little tedious, and take a lot of effort. Not all of us are great builders you know!
 
 Dire's Building Gadgets aims to make building a little bit easier. At this time there are two tools, and they are described below. Alternatively, watch the following mod spotlight for instructions!
 
