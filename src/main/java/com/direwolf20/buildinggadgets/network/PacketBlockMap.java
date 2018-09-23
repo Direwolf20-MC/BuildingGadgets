@@ -44,7 +44,7 @@ public class PacketBlockMap implements IMessage {
             String UUID = message.tag.getString("UUID");
             PasteToolBufferBuilder.addToMap(UUID, message.tag);
             PasteToolBufferBuilder.addMapToBuffer(UUID);
-            System.out.println("Sent blockmap for: " + UUID);
+            //System.out.println("Sent blockmap for: " + UUID);
         }
     }
 }
