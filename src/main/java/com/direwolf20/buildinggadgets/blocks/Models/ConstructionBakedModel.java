@@ -40,15 +40,16 @@ public class ConstructionBakedModel implements IBakedModel {
     @Override
     public List<BakedQuad> getQuads(IBlockState state, EnumFacing side, long rand) {
         IExtendedBlockState extendedBlockState = (IExtendedBlockState) state;
-        ConstructionID facadeId = extendedBlockState.getValue(ConstructionBlock.FACADEID);
+        //ConstructionID facadeId = extendedBlockState.getValue(ConstructionBlock.FACADEID);
+        IBlockState facadeState = extendedBlockState.getValue(ConstructionBlock.FACADE_ID);
+        IBlockState extFacadeState = extendedBlockState.getValue(ConstructionBlock.FACADE_EXT_STATE);
         IBakedModel model;
-        if (facadeId == null) {
+        if (facadeState == null) {
             return blankConstructionModel.getQuads(state, side, rand);
         }
 
         //IBlockState facadeState = facadeId.getBlockState();
-        IBlockState facadeState = extendedBlockState.getValue(ConstructionBlock.FACADE_ID);
-        IBlockState extFacadeState = extendedBlockState.getValue(ConstructionBlock.FACADE_EXT_STATE);
+
         BlockRenderLayer layer = MinecraftForgeClient.getRenderLayer();
 
         if (layer != null && !facadeState.getBlock().canRenderInLayer(facadeState, layer)) { // always render in the null layer or the block-breaking textures don't show up

@@ -5,8 +5,6 @@ import com.direwolf20.buildinggadgets.ModBlocks;
 import com.direwolf20.buildinggadgets.ModItems;
 import com.direwolf20.buildinggadgets.blocks.Models.BlockstateProperty;
 import com.direwolf20.buildinggadgets.blocks.Models.ConstructionBakedModel;
-import com.direwolf20.buildinggadgets.blocks.Models.ConstructionID;
-import com.direwolf20.buildinggadgets.blocks.Models.ConstructionProperty;
 import com.direwolf20.buildinggadgets.items.FakeRenderWorld;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
@@ -48,7 +46,7 @@ import java.util.Random;
 @Optional.Interface(iface = "team.chisel.ctm.api.IFacade", modid = "ctm-api")
 public class ConstructionBlock extends Block implements IFacade {
 
-    public static final ConstructionProperty FACADEID = new ConstructionProperty("facadeid");
+    //public static final ConstructionProperty FACADEID = new ConstructionProperty("facadeid");
     public static final PropertyBool BRIGHT = PropertyBool.create("bright");
 
     public static final IUnlistedProperty<IBlockState> FACADE_ID = new BlockstateProperty("facadestate");
@@ -122,8 +120,8 @@ public class ConstructionBlock extends Block implements IFacade {
             FakeRenderWorld fakeRenderWorld = new FakeRenderWorld();
             fakeRenderWorld.setState(world, mimicBlock, pos);
             IBlockState extState = mimicBlock.getBlock().getExtendedState(mimicBlock, fakeRenderWorld, pos);
-            ConstructionID mimicID = new ConstructionID(mimicBlock);
-            return extendedBlockState.withProperty(FACADE_ID, mimicBlock).withProperty(FACADE_EXT_STATE, extState).withProperty(FACADEID, mimicID);
+            //ConstructionID mimicID = new ConstructionID(mimicBlock);
+            return extendedBlockState.withProperty(FACADE_ID, mimicBlock).withProperty(FACADE_EXT_STATE, extState);
         } else {
             return extendedBlockState;
         }
@@ -146,7 +144,7 @@ public class ConstructionBlock extends Block implements IFacade {
     @Override
     protected BlockStateContainer createBlockState() {
         IProperty<?>[] listedProperties = new IProperty<?>[]{BRIGHT};
-        IUnlistedProperty<?>[] unlistedProperties = new IUnlistedProperty<?>[]{FACADEID, FACADE_ID, FACADE_EXT_STATE};
+        IUnlistedProperty<?>[] unlistedProperties = new IUnlistedProperty<?>[]{FACADE_ID, FACADE_EXT_STATE};
         return new ExtendedBlockState(this, listedProperties, unlistedProperties);
     }
 
