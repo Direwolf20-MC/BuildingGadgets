@@ -34,7 +34,16 @@ minecraft {
     // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
 }
 
+repositories {
+    maven {
+        name 'tterrag\'s Maven' // CTM
+        url 'http://maven.tterrag.com/'
+    }
+}
+
 dependencies {
+    deobfCompile "team.chisel.ctm:CTM:MC${minecraft_version}-${ctm_version}:api"
+    runtime "team.chisel.ctm:CTM:MC${minecraft_version}-${ctm_version}"
     // you may put jars on which you depend on in ./libs
     // or you may define them like so..
     //compile "some.group:artifact:version:classifier"

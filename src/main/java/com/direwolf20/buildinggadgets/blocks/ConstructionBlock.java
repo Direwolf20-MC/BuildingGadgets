@@ -3,6 +3,7 @@ package com.direwolf20.buildinggadgets.blocks;
 import com.direwolf20.buildinggadgets.BuildingGadgets;
 import com.direwolf20.buildinggadgets.ModBlocks;
 import com.direwolf20.buildinggadgets.ModItems;
+import com.direwolf20.buildinggadgets.blocks.Models.BlockstateProperty;
 import com.direwolf20.buildinggadgets.blocks.Models.ConstructionBakedModel;
 import com.direwolf20.buildinggadgets.blocks.Models.ConstructionID;
 import com.direwolf20.buildinggadgets.blocks.Models.ConstructionProperty;
@@ -34,16 +35,24 @@ import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.common.property.ExtendedBlockState;
 import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
+import net.minecraftforge.fml.common.Optional;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import team.chisel.ctm.api.IFacade;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Random;
 
-public class ConstructionBlock extends Block {
+@Optional.Interface(iface = "team.chisel.ctm.api.IFacade", modid = "ctm-api")
+public class ConstructionBlock extends Block implements IFacade {
+
     public static final ConstructionProperty FACADEID = new ConstructionProperty("facadeid");
     public static final PropertyBool BRIGHT = PropertyBool.create("bright");
+
+    public static final IUnlistedProperty<IBlockState> FACADE_ID = new BlockstateProperty("facadestate");
+    public static final IUnlistedProperty<IBlockState> FACADE_EXT_STATE = new BlockstateProperty("facadeextstate");
 
     public ConstructionBlock() {
         super(Material.ROCK);
@@ -110,8 +119,11 @@ public class ConstructionBlock extends Block {
         IExtendedBlockState extendedBlockState = (IExtendedBlockState) super.getExtendedState(state, world, pos);
         IBlockState mimicBlock = getActualMimicBlock(world, pos);
         if (mimicBlock != null) {
+            FakeRenderWorld fakeRenderWorld = new FakeRenderWorld();
+            fakeRenderWorld.setState(world, mimicBlock, pos);
+            IBlockState extState = mimicBlock.getBlock().getExtendedState(mimicBlock, fakeRenderWorld, pos);
             ConstructionID mimicID = new ConstructionID(mimicBlock);
-            return extendedBlockState.withProperty(FACADEID, mimicID);
+            return extendedBlockState.withProperty(FACADE_ID, mimicBlock).withProperty(FACADE_EXT_STATE, extState).withProperty(FACADEID, mimicID);
         } else {
             return extendedBlockState;
         }
@@ -134,7 +146,7 @@ public class ConstructionBlock extends Block {
     @Override
     protected BlockStateContainer createBlockState() {
         IProperty<?>[] listedProperties = new IProperty<?>[]{BRIGHT};
-        IUnlistedProperty<?>[] unlistedProperties = new IUnlistedProperty<?>[]{FACADEID};
+        IUnlistedProperty<?>[] unlistedProperties = new IUnlistedProperty<?>[]{FACADEID, FACADE_ID, FACADE_EXT_STATE};
         return new ExtendedBlockState(this, listedProperties, unlistedProperties);
     }
 
@@ -299,8 +311,7 @@ public class ConstructionBlock extends Block {
 
     @Override
     @SideOnly(Side.CLIENT)
-    public float getAmbientOcclusionLightValue(IBlockState state)
-    {
+    public float getAmbientOcclusionLightValue(IBlockState state) {
         Boolean bright = state.getValue(ConstructionBlock.BRIGHT);
         if (bright) {
             return 1f;
@@ -318,5 +329,15 @@ public class ConstructionBlock extends Block {
     public int getMetaFromState(IBlockState state) {
         return (state.getValue(BRIGHT) ? 1 : 0);
     }
+
+
+    //The below implements support for CTM's Connected Textures to work properly
+    @Nonnull
+    public IBlockState getFacade(@Nonnull IBlockAccess world, @Nonnull BlockPos pos, @Nullable EnumFacing side) {
+        IBlockState mimicBlock = getActualMimicBlock(world, pos);
+        return mimicBlock != null ? mimicBlock : world.getBlockState(pos);
+        //return mimicBlock;
+    }
+
 
 }
