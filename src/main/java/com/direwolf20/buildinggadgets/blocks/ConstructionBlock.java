@@ -1,6 +1,7 @@
 package com.direwolf20.buildinggadgets.blocks;
 
 import com.direwolf20.buildinggadgets.BuildingGadgets;
+import com.direwolf20.buildinggadgets.ModBlocks;
 import com.direwolf20.buildinggadgets.ModItems;
 import com.direwolf20.buildinggadgets.blocks.Models.ConstructionBakedModel;
 import com.direwolf20.buildinggadgets.blocks.Models.ConstructionID;
@@ -147,12 +148,12 @@ public class ConstructionBlock extends Block {
         return true; // delegated to FacadeBakedModel#getQuads
     }
 
-    @Override
+    /*@Override
     @SideOnly(Side.CLIENT)
     public boolean shouldSideBeRendered(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, EnumFacing side) {
         IBlockState mimicBlock = getActualMimicBlock(blockAccess, pos);
         return mimicBlock == null ? true : mimicBlock.getBlock().shouldSideBeRendered(mimicBlock, blockAccess, pos, side);
-    }
+    }*/
 
     @Override
     public boolean isOpaqueCube(IBlockState p_isFullBlock_1_) {
@@ -224,6 +225,29 @@ public class ConstructionBlock extends Block {
                 return super.getBoundingBox(blockState, worldIn, pos);
             }
         }
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public boolean shouldSideBeRendered(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, EnumFacing side) {
+        IBlockState mimicBlock = getActualMimicBlock(blockAccess, pos);
+        if (mimicBlock == null) {
+            return super.shouldSideBeRendered(blockState, blockAccess, pos, side);
+        }
+        IBlockState sideBlockState = blockAccess.getBlockState(pos.offset(side));
+        if (sideBlockState.getBlock().equals(ModBlocks.constructionBlock)) {
+            if (!(getActualMimicBlock(blockAccess, pos.offset(side)).equals(null))) {
+                sideBlockState = getActualMimicBlock(blockAccess, pos.offset(side));
+            }
+        }
+
+        if (!(mimicBlock.getBlock().getMaterial(mimicBlock).isOpaque())) {
+            if (mimicBlock.equals(sideBlockState)) {
+                return false;
+            }
+
+        }
+        return super.shouldSideBeRendered(blockState, blockAccess, pos, side);
     }
 
     @Override
