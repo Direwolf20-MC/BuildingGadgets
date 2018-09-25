@@ -251,7 +251,7 @@ public class ConstructionBlock extends Block implements IFacade {
         }
         IBlockState sideBlockState = blockAccess.getBlockState(pos.offset(side));
         if (sideBlockState.getBlock().equals(ModBlocks.constructionBlock)) {
-            if (!(getActualMimicBlock(blockAccess, pos.offset(side)).equals(null))) {
+            if (!(getActualMimicBlock(blockAccess, pos.offset(side)) == null)) {
                 sideBlockState = getActualMimicBlock(blockAccess, pos.offset(side));
             }
         }

@@ -34,7 +34,7 @@ public class FakeRenderWorld implements IBlockAccess {
     @Nullable
     @Override
     public TileEntity getTileEntity(BlockPos pos) {
-        return null;
+        return realWorld.getTileEntity(pos);
     }
 
 
