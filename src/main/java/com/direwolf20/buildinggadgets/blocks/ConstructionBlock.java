@@ -6,6 +6,7 @@ import com.direwolf20.buildinggadgets.ModItems;
 import com.direwolf20.buildinggadgets.blocks.Models.ConstructionBakedModel;
 import com.direwolf20.buildinggadgets.blocks.Models.ConstructionID;
 import com.direwolf20.buildinggadgets.blocks.Models.ConstructionProperty;
+import com.direwolf20.buildinggadgets.items.FakeRenderWorld;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
@@ -230,6 +231,8 @@ public class ConstructionBlock extends Block {
     @Override
     @SideOnly(Side.CLIENT)
     public boolean shouldSideBeRendered(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, EnumFacing side) {
+        FakeRenderWorld fakeWorld = new FakeRenderWorld();
+
         IBlockState mimicBlock = getActualMimicBlock(blockAccess, pos);
         if (mimicBlock == null) {
             return super.shouldSideBeRendered(blockState, blockAccess, pos, side);
@@ -241,13 +244,14 @@ public class ConstructionBlock extends Block {
             }
         }
 
-        if (!(mimicBlock.getBlock().getMaterial(mimicBlock).isOpaque())) {
-            if (mimicBlock.equals(sideBlockState)) {
-                return false;
-            }
+        fakeWorld.setState(blockAccess, mimicBlock, pos);
+        fakeWorld.setState(blockAccess, sideBlockState, pos.offset(side));
 
+        try {
+            return mimicBlock.getBlock().shouldSideBeRendered(mimicBlock, fakeWorld, pos, side);
+        } catch (Exception var8) {
+            return super.shouldSideBeRendered(blockState, blockAccess, pos, side);
         }
-        return super.shouldSideBeRendered(blockState, blockAccess, pos, side);
     }
 
     @Override
