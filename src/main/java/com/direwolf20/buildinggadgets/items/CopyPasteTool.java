@@ -335,6 +335,16 @@ public class CopyPasteTool extends GenericGadget {
                     buildBlockMap(world, getAnchor(stack).up(), stack, player);
                 }
             }
+        } else {
+            if (getToolMode(stack) == toolModes.Copy) {
+                BlockPos pos = VectorTools.getPosLookingAt(player);
+                if (pos == null) {
+                    if (player.isSneaking()) {
+                        //player.openGui(BuildingGadgets.instance, GuiProxy.CopyPasteID, world, hand.ordinal(), 0, 0);
+                        return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);
+                    }
+                }
+            }
         }
         return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);
     }
@@ -361,7 +371,7 @@ public class CopyPasteTool extends GenericGadget {
 
             int nx = -pz;
             int nz = px;
-           
+
             BlockPos newPos = new BlockPos(startPos.getX() + nx, tempPos.getY(), startPos.getZ() + nz);
             IBlockState rotatedState = blockMap.state.withRotation(Rotation.CLOCKWISE_90);
             posIntArrayList.add(GadgetUtils.relPosToInt(startPos, newPos));
