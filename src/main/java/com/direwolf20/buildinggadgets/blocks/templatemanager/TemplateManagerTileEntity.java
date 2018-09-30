@@ -10,6 +10,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.items.ItemStackHandler;
 
 import javax.annotation.Nonnull;
@@ -43,6 +44,10 @@ public class TemplateManagerTileEntity extends TileEntity {
             } else if (slot == 1) {
                 if (!(allowedItemsRight.contains(stack.getItem()))) {
                     return stack;
+                }
+                if (stack.getCount() > 1) {
+                    super.insertItem(slot, ItemHandlerHelper.copyStackWithSize(stack, 1), simulate);
+                    return ItemHandlerHelper.copyStackWithSize(stack, stack.getCount() - 1);
                 }
             }
             return super.insertItem(slot, stack, simulate);
