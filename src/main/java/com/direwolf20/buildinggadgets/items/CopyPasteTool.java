@@ -6,6 +6,7 @@ import com.direwolf20.buildinggadgets.ModItems;
 import com.direwolf20.buildinggadgets.blocks.ConstructionBlock;
 import com.direwolf20.buildinggadgets.blocks.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.entities.BlockBuildEntity;
+import com.direwolf20.buildinggadgets.gui.GuiProxy;
 import com.direwolf20.buildinggadgets.network.PacketBlockMap;
 import com.direwolf20.buildinggadgets.network.PacketHandler;
 import com.direwolf20.buildinggadgets.tools.*;
@@ -308,9 +309,9 @@ public class CopyPasteTool extends GenericGadget {
             if (getToolMode(stack) == toolModes.Copy) {
                 BlockPos pos = VectorTools.getPosLookingAt(player);
                 if (pos == null) {
-                    setStartPos(stack, null);
-                    setEndPos(stack, null);
-                    player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.areareset").getUnformattedComponentText()), true);
+                    //setStartPos(stack, null);
+                    //setEndPos(stack, null);
+                    //player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.areareset").getUnformattedComponentText()), true);
                     return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);
                 }
                 if (player.isSneaking()) {
@@ -340,7 +341,7 @@ public class CopyPasteTool extends GenericGadget {
                 BlockPos pos = VectorTools.getPosLookingAt(player);
                 if (pos == null) {
                     if (player.isSneaking()) {
-                        //player.openGui(BuildingGadgets.instance, GuiProxy.CopyPasteID, world, hand.ordinal(), 0, 0);
+                        player.openGui(BuildingGadgets.instance, GuiProxy.CopyPasteID, world, hand.ordinal(), 0, 0);
                         return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);
                     }
                 }
@@ -394,7 +395,7 @@ public class CopyPasteTool extends GenericGadget {
         player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.rotated").getUnformattedComponentText()), true);
     }
 
-    public void copyBlocks(ItemStack stack, EntityPlayer player, World world, BlockPos startPos, BlockPos endPos) {
+    public static void copyBlocks(ItemStack stack, EntityPlayer player, World world, BlockPos startPos, BlockPos endPos) {
         if (startPos != null && endPos != null) {
             if (findBlocks(world, startPos, endPos, stack, player)) {
                 setStartPos(stack, startPos);
@@ -404,7 +405,7 @@ public class CopyPasteTool extends GenericGadget {
         }
     }
 
-    public boolean findBlocks(World world, BlockPos start, BlockPos end, ItemStack stack, EntityPlayer player) {
+    public static boolean findBlocks(World world, BlockPos start, BlockPos end, ItemStack stack, EntityPlayer player) {
         setLastBuild(stack, null, 0);
 
         int startX = start.getX();
