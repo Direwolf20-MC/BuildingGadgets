@@ -6,6 +6,7 @@
 package com.direwolf20.buildinggadgets.gui;
 
 import com.direwolf20.buildinggadgets.BuildingGadgets;
+import com.direwolf20.buildinggadgets.Config;
 import com.direwolf20.buildinggadgets.items.CopyPasteTool;
 import com.direwolf20.buildinggadgets.network.PacketCopyCoords;
 import com.direwolf20.buildinggadgets.network.PacketHandler;
@@ -33,7 +34,7 @@ public class CopyPasteGUI extends GuiScreen {
     private GuiTextField endY;
     private GuiTextField endZ;
 
-    private boolean absoluteCoords;
+    private boolean absoluteCoords = Config.absoluteCoordDefault;
 
     int guiLeft = 15;
     int guiTop = 15;
@@ -62,28 +63,28 @@ public class CopyPasteGUI extends GuiScreen {
         if (startPos == null) startPos = new BlockPos(0, 0, 0);
         if (endPos == null) endPos = new BlockPos(0, 0, 0);
 
-        startX = new GuiTextField(0, this.fontRenderer, this.guiLeft + 45, this.guiTop + 15, 80, this.fontRenderer.FONT_HEIGHT);
+        startX = new GuiTextField(0, this.fontRenderer, this.guiLeft + 65, this.guiTop + 15, 40, this.fontRenderer.FONT_HEIGHT);
         startX.setMaxStringLength(50);
         startX.setVisible(true);
 
-        startY = new GuiTextField(1, this.fontRenderer, this.guiLeft + 145, this.guiTop + 15, 80, this.fontRenderer.FONT_HEIGHT);
+        startY = new GuiTextField(1, this.fontRenderer, this.guiLeft + 165, this.guiTop + 15, 40, this.fontRenderer.FONT_HEIGHT);
         startY.setMaxStringLength(50);
         startY.setVisible(true);
 
-        startZ = new GuiTextField(2, this.fontRenderer, this.guiLeft + 245, this.guiTop + 15, 80, this.fontRenderer.FONT_HEIGHT);
+        startZ = new GuiTextField(2, this.fontRenderer, this.guiLeft + 265, this.guiTop + 15, 40, this.fontRenderer.FONT_HEIGHT);
         startZ.setMaxStringLength(50);
         startZ.setVisible(true);
 
 
-        endX = new GuiTextField(3, this.fontRenderer, this.guiLeft + 45, this.guiTop + 35, 80, this.fontRenderer.FONT_HEIGHT);
+        endX = new GuiTextField(3, this.fontRenderer, this.guiLeft + 65, this.guiTop + 35, 40, this.fontRenderer.FONT_HEIGHT);
         endX.setMaxStringLength(50);
         endX.setVisible(true);
 
-        endY = new GuiTextField(4, this.fontRenderer, this.guiLeft + 145, this.guiTop + 35, 80, this.fontRenderer.FONT_HEIGHT);
+        endY = new GuiTextField(4, this.fontRenderer, this.guiLeft + 165, this.guiTop + 35, 40, this.fontRenderer.FONT_HEIGHT);
         endY.setMaxStringLength(50);
         endY.setVisible(true);
 
-        endZ = new GuiTextField(5, this.fontRenderer, this.guiLeft + 245, this.guiTop + 35, 80, this.fontRenderer.FONT_HEIGHT);
+        endZ = new GuiTextField(5, this.fontRenderer, this.guiLeft + 265, this.guiTop + 35, 40, this.fontRenderer.FONT_HEIGHT);
         endZ.setMaxStringLength(50);
         endZ.setVisible(true);
 
@@ -93,6 +94,30 @@ public class CopyPasteGUI extends GuiScreen {
         this.buttonList.add(new GuiButton(2, this.guiLeft + 145, this.guiTop + 60, 40, 20, "Cancel"));
         this.buttonList.add(new GuiButton(3, this.guiLeft + 245, this.guiTop + 60, 40, 20, "Clear"));
         this.buttonList.add(new GuiButton(4, this.guiLeft + 325, this.guiTop + 60, 80, 20, "CoordsMode"));
+        this.buttonList.add(new DireButton(5, this.guiLeft + 50, this.guiTop + 14, 10, 10, "-"));
+        this.buttonList.add(new DireButton(6, this.guiLeft + 110, this.guiTop + 14, 10, 10, "+"));
+        this.buttonList.add(new DireButton(7, this.guiLeft + 150, this.guiTop + 14, 10, 10, "-"));
+        this.buttonList.add(new DireButton(8, this.guiLeft + 210, this.guiTop + 14, 10, 10, "+"));
+        this.buttonList.add(new DireButton(9, this.guiLeft + 250, this.guiTop + 14, 10, 10, "-"));
+        this.buttonList.add(new DireButton(10, this.guiLeft + 310, this.guiTop + 14, 10, 10, "+"));
+        this.buttonList.add(new DireButton(11, this.guiLeft + 50, this.guiTop + 34, 10, 10, "-"));
+        this.buttonList.add(new DireButton(12, this.guiLeft + 110, this.guiTop + 34, 10, 10, "+"));
+        this.buttonList.add(new DireButton(13, this.guiLeft + 150, this.guiTop + 34, 10, 10, "-"));
+        this.buttonList.add(new DireButton(14, this.guiLeft + 210, this.guiTop + 34, 10, 10, "+"));
+        this.buttonList.add(new DireButton(15, this.guiLeft + 250, this.guiTop + 34, 10, 10, "-"));
+        this.buttonList.add(new DireButton(16, this.guiLeft + 310, this.guiTop + 34, 10, 10, "+"));
+    }
+
+    public void fieldChange(GuiTextField textField, int amount) {
+        nullCheckTextBoxes();
+        if (GuiScreen.isShiftKeyDown()) amount = amount * 10;
+        try {
+            int i = Integer.valueOf(textField.getText());
+            i = i + amount;
+            textField.setText(String.valueOf(i));
+        } catch (Throwable t) {
+            this.mc.displayGuiScreen(null);
+        }
     }
 
     @Override
@@ -181,6 +206,30 @@ public class CopyPasteGUI extends GuiScreen {
         } else if (b.id == 4) {
             coordsModeSwitch();
             updateTextFields();
+        } else if (b.id == 5) {
+            fieldChange(startX, -1);
+        } else if (b.id == 6) {
+            fieldChange(startX, 1);
+        } else if (b.id == 7) {
+            fieldChange(startY, -1);
+        } else if (b.id == 8) {
+            fieldChange(startY, 1);
+        } else if (b.id == 9) {
+            fieldChange(startZ, -1);
+        } else if (b.id == 10) {
+            fieldChange(startZ, 1);
+        } else if (b.id == 11) {
+            fieldChange(endX, -1);
+        } else if (b.id == 12) {
+            fieldChange(endX, 1);
+        } else if (b.id == 13) {
+            fieldChange(endY, -1);
+        } else if (b.id == 14) {
+            fieldChange(endY, 1);
+        } else if (b.id == 15) {
+            fieldChange(endZ, -1);
+        } else if (b.id == 16) {
+            fieldChange(endZ, 1);
         }
 
     }
@@ -192,9 +241,8 @@ public class CopyPasteGUI extends GuiScreen {
     protected void updateTextFields() {
         String x, y, z;
         if (absoluteCoords) {
-            nullCheckTextBoxes();
-            BlockPos start = new BlockPos(startPos.getX() + Integer.parseInt(startX.getText()), startPos.getY() + Integer.parseInt(startY.getText()), startPos.getZ() + Integer.parseInt(startZ.getText()));
-            BlockPos end = new BlockPos(startPos.getX() + Integer.parseInt(endX.getText()), startPos.getY() + Integer.parseInt(endY.getText()), startPos.getZ() + Integer.parseInt(endZ.getText()));
+            BlockPos start = startX.getText() != "" ? new BlockPos(startPos.getX() + Integer.parseInt(startX.getText()), startPos.getY() + Integer.parseInt(startY.getText()), startPos.getZ() + Integer.parseInt(startZ.getText())) : startPos;
+            BlockPos end = endX.getText() != "" ? new BlockPos(startPos.getX() + Integer.parseInt(endX.getText()), startPos.getY() + Integer.parseInt(endY.getText()), startPos.getZ() + Integer.parseInt(endZ.getText())) : endPos;
             startX.setText(String.valueOf(start.getX()));
             startY.setText(String.valueOf(start.getY()));
             startZ.setText(String.valueOf(start.getZ()));
@@ -282,5 +330,10 @@ public class CopyPasteGUI extends GuiScreen {
     @Override
     public void updateScreen() {
         super.updateScreen();
+    }
+
+    @Override
+    public boolean doesGuiPauseGame() {
+        return false;
     }
 }

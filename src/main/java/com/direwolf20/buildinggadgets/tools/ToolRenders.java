@@ -372,7 +372,7 @@ public class ToolRenders {
 
             ArrayList<BlockMap> blockMapList = CopyPasteTool.getBlockMapList(PasteToolBufferBuilder.getTagFromUUID(UUID));
             if (blockMapList.size() == 0) {
-                return;
+                //return;
             }
 
             Minecraft mc = Minecraft.getMinecraft();
