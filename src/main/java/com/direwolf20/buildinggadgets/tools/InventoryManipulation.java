@@ -25,11 +25,11 @@ import java.util.stream.Stream;
 
 public class InventoryManipulation {
     private static final Set<IProperty> safeProperties = Stream.of(BlockSlab.HALF, BlockStairs.HALF, BlockLog.LOG_AXIS,
-            BlockDirectional.FACING, BlockStairs.FACING, BlockTrapDoor.HALF, BlockTorch.FACING, BlockStairs.SHAPE, BlockLever.FACING, BlockLever.POWERED).collect(Collectors.toSet());
+            BlockDirectional.FACING, BlockStairs.FACING, BlockTrapDoor.HALF, BlockTorch.FACING, BlockStairs.SHAPE, BlockLever.FACING, BlockLever.POWERED, BlockRedstoneRepeater.DELAY).collect(Collectors.toSet());
 
     private static final Set<IProperty> safePropertiesCopyPaste = Stream.of(BlockSlab.HALF, BlockStairs.HALF, BlockLog.LOG_AXIS,
             BlockDirectional.FACING, BlockStairs.FACING, BlockTrapDoor.HALF, BlockTorch.FACING, BlockStairs.SHAPE, BlockRail.SHAPE, BlockRailPowered.SHAPE,
-            BlockLever.FACING, BlockLever.POWERED).collect(Collectors.toSet());
+            BlockLever.FACING, BlockLever.POWERED, BlockRedstoneRepeater.DELAY).collect(Collectors.toSet());
 
     public static boolean giveItem(ItemStack itemStack, EntityPlayer player) {
         if (player.capabilities.isCreativeMode) {
