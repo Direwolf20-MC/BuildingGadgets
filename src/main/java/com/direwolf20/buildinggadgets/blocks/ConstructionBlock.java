@@ -326,8 +326,8 @@ public class ConstructionBlock extends Block implements IFacade {
     @Override
     public IBlockState getStateFromMeta(int meta) {
         return getDefaultState()
-                .withProperty(BRIGHT, (meta % 2 == 0) ? false : true)
-                .withProperty(NEIGHBOR_BRIGHTNESS, (meta / 2 == 1) ? false : true);
+                .withProperty(BRIGHT, (meta % 2 == 1))
+                .withProperty(NEIGHBOR_BRIGHTNESS, (meta / 2 == 1));
     }
 
     @Override
