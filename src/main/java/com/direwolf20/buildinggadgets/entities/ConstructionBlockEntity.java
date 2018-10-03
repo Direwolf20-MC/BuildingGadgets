@@ -81,10 +81,13 @@ public class ConstructionBlockEntity extends Entity implements IEntityAdditional
                     if (te instanceof ConstructionBlockTileEntity) {
                         IBlockState tempState = ((ConstructionBlockTileEntity) te).getBlockState();
                         int opacity = tempState.getBlock().getLightOpacity(tempState, world, setPos);
-                        if (opacity == 255) {
+                        boolean neighborBrightness = tempState.getBlock().getUseNeighborBrightness(tempState);
+                        if (opacity == 255 || neighborBrightness) {
                             IBlockState tempSetBlock = ((ConstructionBlockTileEntity) te).getBlockState();
                             IBlockState tempActualSetBlock = ((ConstructionBlockTileEntity) te).getActualBlockState();
-                            world.setBlockState(setPos, ModBlocks.constructionBlock.getDefaultState().withProperty(ConstructionBlock.BRIGHT, false));
+                            world.setBlockState(setPos, ModBlocks.constructionBlock.getDefaultState()
+                                    .withProperty(ConstructionBlock.BRIGHT, opacity != 255)
+                                    .withProperty(ConstructionBlock.NEIGHBOR_BRIGHTNESS, neighborBrightness));
                             te = world.getTileEntity(setPos);
                             if (te instanceof ConstructionBlockTileEntity) {
                                 ((ConstructionBlockTileEntity) te).setBlockState(tempSetBlock);

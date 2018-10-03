@@ -48,6 +48,7 @@ public class ConstructionBlock extends Block implements IFacade {
 
     //public static final ConstructionProperty FACADEID = new ConstructionProperty("facadeid");
     public static final PropertyBool BRIGHT = PropertyBool.create("bright");
+    public static final PropertyBool NEIGHBOR_BRIGHTNESS = PropertyBool.create("neighbor_brightness");
 
     public static final IUnlistedProperty<IBlockState> FACADE_ID = new BlockstateProperty("facadestate");
     public static final IUnlistedProperty<IBlockState> FACADE_EXT_STATE = new BlockstateProperty("facadeextstate");
@@ -58,7 +59,7 @@ public class ConstructionBlock extends Block implements IFacade {
         this.setCreativeTab(CreativeTabs.BUILDING_BLOCKS);
         setUnlocalizedName(BuildingGadgets.MODID + ".constructionblock");     // Used for localization (en_US.lang)
         setRegistryName("constructionblock");        // The unique name (within your mod) that identifies this block
-        setDefaultState(blockState.getBaseState().withProperty(BRIGHT, true));
+        setDefaultState(blockState.getBaseState().withProperty(BRIGHT, true).withProperty(NEIGHBOR_BRIGHTNESS, false));
     }
 
     @SideOnly(Side.CLIENT)
@@ -143,7 +144,7 @@ public class ConstructionBlock extends Block implements IFacade {
 
     @Override
     protected BlockStateContainer createBlockState() {
-        IProperty<?>[] listedProperties = new IProperty<?>[]{BRIGHT};
+        IProperty<?>[] listedProperties = new IProperty<?>[]{BRIGHT, NEIGHBOR_BRIGHTNESS};
         IUnlistedProperty<?>[] unlistedProperties = new IUnlistedProperty<?>[]{FACADE_ID, FACADE_EXT_STATE};
         return new ExtendedBlockState(this, listedProperties, unlistedProperties);
     }
@@ -318,14 +319,21 @@ public class ConstructionBlock extends Block implements IFacade {
     }
 
     @Override
+    public boolean getUseNeighborBrightness(IBlockState state) {
+        return state.getValue(ConstructionBlock.NEIGHBOR_BRIGHTNESS);
+    }
+
+    @Override
     public IBlockState getStateFromMeta(int meta) {
         return getDefaultState()
-                .withProperty(BRIGHT, (meta == 0) ? false : true);
+                .withProperty(BRIGHT, (meta % 2 == 1))
+                .withProperty(NEIGHBOR_BRIGHTNESS, (meta / 2 == 1));
     }
 
     @Override
     public int getMetaFromState(IBlockState state) {
-        return (state.getValue(BRIGHT) ? 1 : 0);
+        int value = state.getValue(BRIGHT) ? 1 : 0;
+        return state.getValue(NEIGHBOR_BRIGHTNESS) ? value + 2 : value;
     }
 
 
