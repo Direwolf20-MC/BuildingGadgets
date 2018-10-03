@@ -312,7 +312,8 @@ public class ConstructionBlock extends Block implements IFacade {
     @SideOnly(Side.CLIENT)
     public float getAmbientOcclusionLightValue(IBlockState state) {
         Boolean bright = state.getValue(ConstructionBlock.BRIGHT);
-        if (bright) {
+        Boolean neighborBrightness = state.getValue(ConstructionBlock.NEIGHBOR_BRIGHTNESS);
+        if (bright || neighborBrightness) {
             return 1f;
         }
         return 0.2f;
