@@ -532,6 +532,9 @@ public class CopyPasteTool extends GenericGadget {
     public static void placeBlock(World world, BlockPos pos, EntityPlayer player, IBlockState state, Map<IBlockState, UniqueItem> IntStackMap) {
         if (!world.getBlockState(pos).getBlock().isReplaceable(world, pos)) return;
         if (state.equals(Blocks.AIR.getDefaultState())) return;
+        if (!player.isAllowEdit()) {
+            return;
+        }
         ItemStack heldItem = player.getHeldItemMainhand();
         if (!(heldItem.getItem() instanceof CopyPasteTool)) {
             heldItem = player.getHeldItemOffhand();

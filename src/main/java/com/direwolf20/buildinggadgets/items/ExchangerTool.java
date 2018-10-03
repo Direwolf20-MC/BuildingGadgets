@@ -288,7 +288,7 @@ public class ExchangerTool extends GenericGadget {
                 useConstructionPaste = true;
             }
         }
-        if (player.isSpectator()) {
+        if (!player.isAllowEdit()) {
             return false;
         }
         if (!world.isBlockModifiable(player, pos)) {

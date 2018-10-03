@@ -283,7 +283,7 @@ public class BuildingTool extends GenericGadget {
         if (itemStack.getItem().equals(Items.AIR)) {
             itemStack = setBlock.getBlock().getPickBlock(setBlock, null, world, pos, player);
         }
-        if (player.isSpectator()) {
+        if (!player.isAllowEdit()) {
             return false;
         }
         NonNullList<ItemStack> drops = NonNullList.create();
