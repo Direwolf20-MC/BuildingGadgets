@@ -81,8 +81,7 @@ Right click to paste the structure into the world -- it will use blocks / paste 
 ### Template Manager
 
 Place a copy/paste tool in the left hand slot, and a piece of paper (vanilla) in the right hand slot. Click 'save' to write the structure stored on the tool to the paper, which turns into a 'template' item.
-
-    Optionally give it a name using the text box at the top of the UI
+Optionally give it a name using the text box at the top of the UI
 
 Click 'Load' to transfer the structure from the template item to the Copy/Paste tool.
 
