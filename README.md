@@ -6,6 +6,7 @@ Sometimes, building large structures can be a little tedious, and take a lot of 
 Dire's Building Gadgets aims to make building a little bit easier. At this time there are two tools, and they are described below. Alternatively, watch the following mod spotlight for instructions!
 
 [Spotlight](https://youtu.be/D4Ib4h7aTSk)
+[Spotlight Pt2](https://youtu.be/JS1Xx_kwQQ0)
 
 Press the `Mode Switch` hotkey to switch modes.
 
