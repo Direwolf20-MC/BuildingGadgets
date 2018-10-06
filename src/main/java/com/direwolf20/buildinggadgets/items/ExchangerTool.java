@@ -336,6 +336,7 @@ public class ExchangerTool extends GenericGadget {
         return 20;
     }
 
+    @Override
     @SideOnly(Side.CLIENT)
     public boolean hasEffect(ItemStack stack) {
         return false;

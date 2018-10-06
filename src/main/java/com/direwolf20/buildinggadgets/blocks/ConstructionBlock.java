@@ -339,6 +339,7 @@ public class ConstructionBlock extends Block implements IFacade {
 
 
     //The below implements support for CTM's Connected Textures to work properly
+    @Override
     @Nonnull
     public IBlockState getFacade(@Nonnull IBlockAccess world, @Nonnull BlockPos pos, @Nullable EnumFacing side) {
         IBlockState mimicBlock = getActualMimicBlock(world, pos);

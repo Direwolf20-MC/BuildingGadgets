@@ -91,7 +91,6 @@ public class InventoryManipulation {
             return false;
         }
         stackInSlot.shrink(count);
-        stackInSlot = stackInSlot;
         return true;
     }
 
@@ -192,7 +191,6 @@ public class InventoryManipulation {
                 ItemStack pasteStack = inv.getStackInSlot(slot);
                 if (pasteStack.getCount() >= count) {
                     pasteStack.shrink(count);
-                    pasteStack = pasteStack;
                     return true;
                 }
             }
