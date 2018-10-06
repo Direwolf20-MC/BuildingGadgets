@@ -16,6 +16,8 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 public class ConstructionPasteContainer extends Item {
 
     public static int maxAmount = 512;
@@ -58,8 +60,8 @@ public class ConstructionPasteContainer extends Item {
     }
 
     @Override
-    public void addInformation(ItemStack stack, World player, List<String> list, ITooltipFlag b) {
-        super.addInformation(stack, player, list, b);
+    public void addInformation(ItemStack stack, @Nullable World world, List<String> list, ITooltipFlag b) {
+        super.addInformation(stack, world, list, b);
         list.add(TextFormatting.WHITE + I18n.format("tooltip.pasteContainer.amount") + ": " + getPasteAmount(stack));
     }
 

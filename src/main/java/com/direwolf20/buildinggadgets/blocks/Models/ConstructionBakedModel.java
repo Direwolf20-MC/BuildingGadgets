@@ -15,6 +15,8 @@ import net.minecraftforge.common.model.IModelState;
 import net.minecraftforge.common.property.IExtendedBlockState;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
@@ -38,7 +40,7 @@ public class ConstructionBakedModel implements IBakedModel {
     }
 
     @Override
-    public List<BakedQuad> getQuads(IBlockState state, EnumFacing side, long rand) {
+    public List<BakedQuad> getQuads(@Nullable IBlockState state, @Nullable EnumFacing side, long rand) {
         IExtendedBlockState extendedBlockState = (IExtendedBlockState) state;
         //ConstructionID facadeId = extendedBlockState.getValue(ConstructionBlock.FACADEID);
         IBlockState facadeState = extendedBlockState.getValue(ConstructionBlock.FACADE_ID);

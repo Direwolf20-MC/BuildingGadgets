@@ -37,18 +37,17 @@ public class DeleteBlockMapsCommand extends CommandBase {
 
     @Override
     @Nonnull
-    public String getUsage(@Nonnull ICommandSender sender) {
+    public String getUsage(ICommandSender sender) {
         return "DeleteBlockMaps <player>";
     }
 
     @Override
-    @Nonnull
     public List<String> getAliases() {
         return aliases;
     }
 
     @Override
-    public void execute(@Nonnull MinecraftServer server, @Nonnull ICommandSender sender, @Nonnull String[] args) throws CommandException {
+    public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
         if (args.length > 0) {
             if (!(sender.canUseCommand(4, this.getName()))) {
                 sender.sendMessage(new TextComponentString(TextFormatting.RED + "Only OPS can use this command with an argument."));
@@ -85,7 +84,6 @@ public class DeleteBlockMapsCommand extends CommandBase {
     }
 
     @Override
-    @Nonnull
     public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, @Nullable BlockPos targetPos) {
         return Collections.emptyList();
     }

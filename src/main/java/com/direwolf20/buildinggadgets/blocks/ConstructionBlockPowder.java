@@ -21,6 +21,8 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 public class ConstructionBlockPowder extends BlockFalling {
 
     public ConstructionBlockPowder() {
@@ -36,8 +38,8 @@ public class ConstructionBlockPowder extends BlockFalling {
     }
 
     @Override
-    public void addInformation(ItemStack stack, World player, List<String> list, ITooltipFlag b) {
-        super.addInformation(stack, player, list, b);
+    public void addInformation(ItemStack stack, @Nullable World world, List<String> list, ITooltipFlag b) {
+        super.addInformation(stack, world, list, b);
         list.add(I18n.format("tooltip.constructionblockpowder.helptext"));
     }
 

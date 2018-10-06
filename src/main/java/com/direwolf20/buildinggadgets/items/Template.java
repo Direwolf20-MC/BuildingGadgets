@@ -55,9 +55,9 @@ public class Template extends Item implements ITemplate {
     }
 
     @Override
-    public void addInformation(ItemStack stack, World player, List<String> list, ITooltipFlag b) {
+    public void addInformation(ItemStack stack, @Nullable World world, List<String> list, ITooltipFlag b) {
         //Add tool information to the tooltip
-        super.addInformation(stack, player, list, b);
+        super.addInformation(stack, world, list, b);
         list.add(TextFormatting.AQUA + I18n.format("tooltip.template.name") + ": " + getName(stack));
     }
 

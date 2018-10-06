@@ -204,8 +204,8 @@ public class CopyPasteTool extends GenericGadget implements ITemplate {
     }
 
     @Override
-    public void addInformation(ItemStack stack, World player, List<String> list, ITooltipFlag b) {
-        super.addInformation(stack, player, list, b);
+    public void addInformation(ItemStack stack, @Nullable World world, List<String> list, ITooltipFlag b) {
+        super.addInformation(stack, world, list, b);
         list.add(TextFormatting.AQUA + I18n.format("tooltip.gadget.mode") + ": " + getToolMode(stack));
         if (Config.poweredByFE) {
             IEnergyStorage energy = stack.getCapability(CapabilityEnergy.ENERGY, null);

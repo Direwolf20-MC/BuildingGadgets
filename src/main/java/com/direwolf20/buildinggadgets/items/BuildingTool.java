@@ -39,6 +39,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.annotation.Nullable;
+
 import static com.direwolf20.buildinggadgets.tools.GadgetUtils.*;
 
 
@@ -91,9 +93,9 @@ public class BuildingTool extends GenericGadget {
     }
 
     @Override
-    public void addInformation(ItemStack stack, World player, List<String> list, ITooltipFlag b) {
+    public void addInformation(ItemStack stack, @Nullable World world, List<String> list, ITooltipFlag b) {
         //Add tool information to the tooltip
-        super.addInformation(stack, player, list, b);
+        super.addInformation(stack, world, list, b);
         list.add(TextFormatting.DARK_GREEN + I18n.format("tooltip.gadget.block") + ": " + getToolBlock(stack).getBlock().getLocalizedName());
         list.add(TextFormatting.AQUA + I18n.format("tooltip.gadget.mode") + ": " + getToolMode(stack));
         if (getToolMode(stack) != toolModes.BuildToMe) {

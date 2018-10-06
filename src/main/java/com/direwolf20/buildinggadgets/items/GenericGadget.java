@@ -1,5 +1,7 @@
 package com.direwolf20.buildinggadgets.items;
 
+import javax.annotation.Nullable;
+
 import com.direwolf20.buildinggadgets.Config;
 import com.direwolf20.buildinggadgets.items.ItemCaps.CapabilityProviderEnergy;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
@@ -24,7 +26,7 @@ public class GenericGadget extends Item {
     }
 
     @Override
-    public ICapabilityProvider initCapabilities(ItemStack stack, NBTTagCompound tag) {
+    public ICapabilityProvider initCapabilities(ItemStack stack, @Nullable NBTTagCompound tag) {
         if (Config.poweredByFE) {
             return new CapabilityProviderEnergy(stack, Config.energyMax);
         } else {

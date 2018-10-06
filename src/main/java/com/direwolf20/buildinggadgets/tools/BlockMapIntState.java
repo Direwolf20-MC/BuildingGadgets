@@ -125,7 +125,7 @@ public class BlockMapIntState {
         } catch (Exception e) {
             itemStack = InventoryManipulation.getSilkTouchDrop(state);
         }
-        if (itemStack == null || itemStack.equals(Items.AIR)) {
+        if (itemStack.equals(Items.AIR)) {
             itemStack = InventoryManipulation.getSilkTouchDrop(state);
         }
         if (!itemStack.equals(Items.AIR)) {

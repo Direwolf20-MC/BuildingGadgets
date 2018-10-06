@@ -239,12 +239,10 @@ public class GadgetUtils {
             player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.invalidblock").getUnformattedComponentText()), true);
             return;
         }
-        if (state != null) {
-            IBlockState placeState = InventoryManipulation.getSpecificStates(state, world, player, pos, stack);
-            IBlockState actualState = placeState.getBlock().getActualState(placeState, world, pos);
-            setToolBlock(stack, placeState);
-            setToolActualBlock(stack, actualState);
-        }
+        IBlockState placeState = InventoryManipulation.getSpecificStates(state, world, player, pos, stack);
+        IBlockState actualState = placeState.getBlock().getActualState(placeState, world, pos);
+        setToolBlock(stack, placeState);
+        setToolActualBlock(stack, actualState);
     }
 
     public static boolean anchorBlocks(EntityPlayer player, ItemStack stack) {
