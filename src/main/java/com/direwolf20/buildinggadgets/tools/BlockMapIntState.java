@@ -125,10 +125,10 @@ public class BlockMapIntState {
         } catch (Exception e) {
             itemStack = InventoryManipulation.getSilkTouchDrop(state);
         }
-        if (itemStack.equals(Items.AIR)) {
+        if (itemStack.isEmpty()) {
             itemStack = InventoryManipulation.getSilkTouchDrop(state);
         }
-        if (!itemStack.equals(Items.AIR)) {
+        if (!itemStack.isEmpty()) {
             UniqueItem uniqueItem = new UniqueItem(itemStack.getItem(), itemStack.getMetadata());
             return uniqueItem;
         }
