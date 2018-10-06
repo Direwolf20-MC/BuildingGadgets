@@ -5,7 +5,6 @@ import com.direwolf20.buildinggadgets.items.CopyPasteTool;
 import com.direwolf20.buildinggadgets.items.Template;
 import com.direwolf20.buildinggadgets.network.PacketBlockMap;
 import com.direwolf20.buildinggadgets.network.PacketHandler;
-import com.direwolf20.buildinggadgets.network.PacketTemplateBlockMap;
 import com.direwolf20.buildinggadgets.tools.*;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -70,11 +69,7 @@ public class TemplateManagerCommands {
             tagCompound.setString("UUID", CopyPasteTool.getUUID(itemStack0));
             tagCompound.setString("owner", player.getName());
             worldSave.addToMap(UUID, tagCompound);
-
-
-            container.putStackInSlot(0, itemStack0);
-            PacketHandler.INSTANCE.sendTo(new PacketBlockMap(tagCompound), (EntityPlayerMP) player);
-        } else if (itemStack0.getItem().equals(ModItems.template)) {
+        } else {
             Template.setStartPos(itemStack0, startPos);
             Template.setEndPos(itemStack0, endPos);
             Template.setItemCountMap(itemStack0, tagMap);
@@ -90,10 +85,9 @@ public class TemplateManagerCommands {
             tagCompound.setString("owner", player.getName());
             templateWorldSave.addToMap(UUID, tagCompound);
             Template.setName(itemStack0, Template.getName(itemStack1));
-
-            container.putStackInSlot(0, itemStack0);
-            PacketHandler.INSTANCE.sendTo(new PacketTemplateBlockMap(tagCompound), (EntityPlayerMP) player);
         }
+        container.putStackInSlot(0, itemStack0);
+        PacketHandler.INSTANCE.sendTo(new PacketBlockMap(tagCompound), (EntityPlayerMP) player);
     }
 
     public static void saveTemplate(TemplateManagerContainer container, EntityPlayer player, String templateName) {
@@ -144,7 +138,7 @@ public class TemplateManagerCommands {
             Template.setItemCountMap(templateStack, tagMap);
             Template.setName(templateStack, templateName);
             container.putStackInSlot(1, templateStack);
-            PacketHandler.INSTANCE.sendTo(new PacketTemplateBlockMap(templateTagCompound), (EntityPlayerMP) player);
+            PacketHandler.INSTANCE.sendTo(new PacketBlockMap(templateTagCompound), (EntityPlayerMP) player);
         } else {
             String UUID = Template.getUUID(itemStack0);
             String UUIDTemplate = Template.getUUID(templateStack);
@@ -170,7 +164,7 @@ public class TemplateManagerCommands {
                 Template.setName(templateStack, templateName);
             }
             container.putStackInSlot(1, templateStack);
-            PacketHandler.INSTANCE.sendTo(new PacketTemplateBlockMap(templateTagCompound), (EntityPlayerMP) player);
+            PacketHandler.INSTANCE.sendTo(new PacketBlockMap(templateTagCompound), (EntityPlayerMP) player);
         }
     }
 
@@ -256,7 +250,7 @@ public class TemplateManagerCommands {
         Template.setItemCountMap(templateStack, itemCountMap);
         Template.setName(templateStack, templateName);
         container.putStackInSlot(1, templateStack);
-        PacketHandler.INSTANCE.sendTo(new PacketTemplateBlockMap(templateTagCompound), (EntityPlayerMP) player);
+        PacketHandler.INSTANCE.sendTo(new PacketBlockMap(templateTagCompound), (EntityPlayerMP) player);
     }
 
     public static void CopyTemplate(TemplateManagerContainer container) {

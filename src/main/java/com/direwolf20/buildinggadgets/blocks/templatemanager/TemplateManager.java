@@ -5,7 +5,6 @@ import com.direwolf20.buildinggadgets.items.CopyPasteTool;
 import com.direwolf20.buildinggadgets.items.Template;
 import com.direwolf20.buildinggadgets.network.PacketBlockMap;
 import com.direwolf20.buildinggadgets.network.PacketHandler;
-import com.direwolf20.buildinggadgets.network.PacketTemplateBlockMap;
 import com.direwolf20.buildinggadgets.tools.BlockMapWorldSave;
 import com.direwolf20.buildinggadgets.tools.TemplateWorldSave;
 import net.minecraft.block.Block;
@@ -79,7 +78,7 @@ public class TemplateManager extends Block {
                     TemplateWorldSave worldSave = TemplateWorldSave.get(world);
                     NBTTagCompound tagCompound = worldSave.getCompoundFromUUID(UUID);
                     if (tagCompound != null) {
-                        PacketHandler.INSTANCE.sendTo(new PacketTemplateBlockMap(tagCompound), (EntityPlayerMP) player);
+                        PacketHandler.INSTANCE.sendTo(new PacketBlockMap(tagCompound), (EntityPlayerMP) player);
                     }
                 }
             }
