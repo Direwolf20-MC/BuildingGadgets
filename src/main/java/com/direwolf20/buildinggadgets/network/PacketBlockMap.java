@@ -11,7 +11,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 public class PacketBlockMap implements IMessage {
 
-    NBTTagCompound tag = new NBTTagCompound();
+    private NBTTagCompound tag = new NBTTagCompound();
 
     @Override
     public void fromBytes(ByteBuf buf) {

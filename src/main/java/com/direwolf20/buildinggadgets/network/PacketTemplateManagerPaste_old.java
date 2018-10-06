@@ -17,7 +17,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 public class PacketTemplateManagerPaste_old implements IMessage {
 
-    NBTTagCompound tag = new NBTTagCompound();
+    private NBTTagCompound tag = new NBTTagCompound();
     private BlockPos pos;
 
     @Override

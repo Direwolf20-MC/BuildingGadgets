@@ -13,7 +13,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 public class PacketRequestBlockMap implements IMessage {
 
-    String UUID = "";
+    private String UUID = "";
 
     @Override
     public void fromBytes(ByteBuf buf) {

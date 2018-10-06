@@ -15,7 +15,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 public class PacketToggleMode implements IMessage {
 
-    static int mode;
+    private int mode;
 
     @Override
     public void fromBytes(ByteBuf buf) {
@@ -52,13 +52,13 @@ public class PacketToggleMode implements IMessage {
             }
             if (!heldItem.isEmpty() && heldItem.getItem() instanceof BuildingTool) {
                 BuildingTool buildingTool = (BuildingTool) (heldItem.getItem());
-                buildingTool.setMode(playerEntity, heldItem, mode);
+                buildingTool.setMode(playerEntity, heldItem, message.mode);
             } else if (!heldItem.isEmpty() && heldItem.getItem() instanceof ExchangerTool) {
                 ExchangerTool exchangerTool = (ExchangerTool) (heldItem.getItem());
-                exchangerTool.setMode(playerEntity, heldItem, mode);
+                exchangerTool.setMode(playerEntity, heldItem, message.mode);
             } else if (!heldItem.isEmpty() && heldItem.getItem() instanceof CopyPasteTool) {
                 CopyPasteTool copyPasteTool = (CopyPasteTool) (heldItem.getItem());
-                copyPasteTool.setMode(playerEntity, heldItem, mode);
+                copyPasteTool.setMode(playerEntity, heldItem, message.mode);
             }
         }
     }

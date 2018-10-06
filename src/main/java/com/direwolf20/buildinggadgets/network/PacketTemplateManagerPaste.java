@@ -23,8 +23,8 @@ public class PacketTemplateManagerPaste implements IMessage {
 
     //ByteArrayOutputStream baos = new ByteArrayOutputStream();
     private BlockPos pos;
-    byte[] data;
-    String templateName;
+    private byte[] data;
+    private String templateName;
 
     @Override
     public void fromBytes(ByteBuf buf) {

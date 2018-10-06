@@ -17,8 +17,8 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 public class PacketCopyCoords implements IMessage {
 
-    BlockPos start;
-    BlockPos end;
+    private BlockPos start;
+    private BlockPos end;
 
     @Override
     public void fromBytes(ByteBuf buf) {
