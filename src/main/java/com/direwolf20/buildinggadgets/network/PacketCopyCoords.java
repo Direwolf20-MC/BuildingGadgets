@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.network;
 
+import com.direwolf20.buildinggadgets.ModItems;
 import com.direwolf20.buildinggadgets.items.CopyPasteTool;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -58,14 +59,15 @@ public class PacketCopyCoords implements IMessage {
             }
             BlockPos startPos = message.start;
             BlockPos endPos = message.end;
+            CopyPasteTool tool = ModItems.copyPasteTool;
             if (startPos.equals(BlockPos.ORIGIN) && endPos.equals(BlockPos.ORIGIN)) {
-                CopyPasteTool.setStartPos(heldItem, null);
-                CopyPasteTool.setEndPos(heldItem, null);
+                tool.setStartPos(heldItem, null);
+                tool.setEndPos(heldItem, null);
                 playerEntity.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.areareset").getUnformattedComponentText()), true);
             } else {
-                CopyPasteTool.setStartPos(heldItem, startPos);
-                CopyPasteTool.setEndPos(heldItem, endPos);
-                CopyPasteTool.copyBlocks(heldItem, playerEntity, playerEntity.world, CopyPasteTool.getStartPos(heldItem), CopyPasteTool.getEndPos(heldItem));
+                tool.setStartPos(heldItem, startPos);
+                tool.setEndPos(heldItem, endPos);
+                CopyPasteTool.copyBlocks(heldItem, playerEntity, playerEntity.world, tool.getStartPos(heldItem), tool.getEndPos(heldItem));
             }
         }
     }

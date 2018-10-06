@@ -6,7 +6,7 @@
 package com.direwolf20.buildinggadgets.blocks.templatemanager;
 
 import com.direwolf20.buildinggadgets.BuildingGadgets;
-import com.direwolf20.buildinggadgets.items.CopyPasteTool;
+import com.direwolf20.buildinggadgets.ModItems;
 import com.direwolf20.buildinggadgets.network.PacketHandler;
 import com.direwolf20.buildinggadgets.network.PacketTemplateManagerLoad;
 import com.direwolf20.buildinggadgets.network.PacketTemplateManagerPaste;
@@ -112,11 +112,11 @@ public class TemplateManagerGUI extends GuiContainer {
 
         //float rotX = 165, rotY = 0, zoom = 1;
         if (!itemstack.isEmpty()) {
-            String UUID = CopyPasteTool.getUUID(itemstack);
+            String UUID = ModItems.copyPasteTool.getUUID(itemstack);
             ToolDireBuffer bufferBuilder = PasteToolBufferBuilder.getBufferFromMap(UUID);
             if (bufferBuilder != null) {
-                BlockPos startPos = CopyPasteTool.getStartPos(itemstack);
-                BlockPos endPos = CopyPasteTool.getEndPos(itemstack);
+                BlockPos startPos = ModItems.copyPasteTool.getStartPos(itemstack);
+                BlockPos endPos = ModItems.copyPasteTool.getEndPos(itemstack);
                 double lengthX = Math.abs(startPos.getX() - endPos.getX());
                 double lengthY = Math.abs(startPos.getY() - endPos.getY());
                 double lengthZ = Math.abs(startPos.getZ() - endPos.getZ());

@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.tools;
 
+import com.direwolf20.buildinggadgets.ModItems;
 import com.direwolf20.buildinggadgets.items.CopyPasteTool;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -116,6 +117,6 @@ public class PasteToolBufferBuilder {
     }
 
     public static boolean isUpdateNeeded(String UUID, ItemStack stack) {
-        return ((CopyPasteTool.getCopyCounter(stack) != getCopyCounter(UUID) || PasteToolBufferBuilder.getTagFromUUID(UUID) == null));
+        return ((ModItems.copyPasteTool.getCopyCounter(stack) != getCopyCounter(UUID) || PasteToolBufferBuilder.getTagFromUUID(UUID) == null));
     }
 }

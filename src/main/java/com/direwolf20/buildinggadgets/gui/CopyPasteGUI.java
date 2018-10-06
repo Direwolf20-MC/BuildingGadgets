@@ -7,7 +7,7 @@ package com.direwolf20.buildinggadgets.gui;
 
 import com.direwolf20.buildinggadgets.BuildingGadgets;
 import com.direwolf20.buildinggadgets.Config;
-import com.direwolf20.buildinggadgets.items.CopyPasteTool;
+import com.direwolf20.buildinggadgets.ModItems;
 import com.direwolf20.buildinggadgets.network.PacketCopyCoords;
 import com.direwolf20.buildinggadgets.network.PacketHandler;
 import net.minecraft.client.Minecraft;
@@ -58,8 +58,8 @@ public class CopyPasteGUI extends GuiScreen {
     @Override
     public void initGui() {
         super.initGui();
-        startPos = CopyPasteTool.getStartPos(copyPasteTool);
-        endPos = CopyPasteTool.getEndPos(copyPasteTool);
+        startPos = ModItems.copyPasteTool.getStartPos(copyPasteTool);
+        endPos = ModItems.copyPasteTool.getEndPos(copyPasteTool);
         if (startPos == null) startPos = new BlockPos(0, 0, 0);
         if (endPos == null) endPos = new BlockPos(0, 0, 0);
 

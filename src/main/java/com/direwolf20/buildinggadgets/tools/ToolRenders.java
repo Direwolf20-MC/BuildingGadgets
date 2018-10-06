@@ -2,6 +2,7 @@ package com.direwolf20.buildinggadgets.tools;
 
 import com.direwolf20.buildinggadgets.Config;
 import com.direwolf20.buildinggadgets.ModBlocks;
+import com.direwolf20.buildinggadgets.ModItems;
 import com.direwolf20.buildinggadgets.items.BuildingTool;
 import com.direwolf20.buildinggadgets.items.CopyPasteTool;
 import com.direwolf20.buildinggadgets.items.ExchangerTool;
@@ -298,7 +299,7 @@ public class ToolRenders {
     }
 
     public static void renderPasteOverlay(RenderWorldLastEvent evt, EntityPlayer player, ItemStack stack) {
-        String UUID = CopyPasteTool.getUUID(stack);
+        String UUID = ModItems.copyPasteTool.getUUID(stack);
         World world = player.world;
         if (CopyPasteTool.getToolMode(stack) == CopyPasteTool.toolModes.Paste) {
             //First check if we have an anchor, if not check if we're looking at a block, if not, exit
@@ -363,8 +364,8 @@ public class ToolRenders {
             GlStateManager.popMatrix();
 
         } else {
-            BlockPos startPos = CopyPasteTool.getStartPos(stack);
-            BlockPos endPos = CopyPasteTool.getEndPos(stack);
+            BlockPos startPos = ModItems.copyPasteTool.getStartPos(stack);
+            BlockPos endPos = ModItems.copyPasteTool.getEndPos(stack);
             BlockPos blankPos = new BlockPos(0, 0, 0);
             if (startPos == null || endPos == null || startPos.equals(blankPos) || endPos.equals(blankPos)) {
                 return;
