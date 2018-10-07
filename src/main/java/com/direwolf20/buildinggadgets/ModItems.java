@@ -16,6 +16,12 @@ public class ModItems {
     @GameRegistry.ObjectHolder("buildinggadgets:constructionpastecontainer")
     public static ConstructionPasteContainer constructionPasteContainer;
 
+    @GameRegistry.ObjectHolder("buildinggadgets:constructionpastecontainert2")
+    public static ConstructionPasteContainerT2 constructionPasteContainert2;
+
+    @GameRegistry.ObjectHolder("buildinggadgets:constructionpastecontainert3")
+    public static ConstructionPasteContainerT3 constructionPasteContainert3;
+
     @GameRegistry.ObjectHolder("buildinggadgets:copypastetool")
     public static CopyPasteTool copyPasteTool;
 

@@ -1,6 +1,8 @@
 package com.direwolf20.buildinggadgets.tools;
 
 import com.direwolf20.buildinggadgets.items.ConstructionPasteContainer;
+import com.direwolf20.buildinggadgets.items.ConstructionPasteContainerT2;
+import com.direwolf20.buildinggadgets.items.ConstructionPasteContainerT3;
 import net.minecraft.client.renderer.ItemMeshDefinition;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.item.ItemStack;
@@ -9,16 +11,23 @@ public class PasteContainerMeshDefinition implements ItemMeshDefinition {
     @Override
     public ModelResourceLocation getModelLocation(ItemStack stack) {
         int pasteAmt = ConstructionPasteContainer.getPasteAmount(stack);
-        if (pasteAmt < 128) {
-            return new ModelResourceLocation("buildinggadgets:constructionpastecontainer", "inventory");
-        } else if (pasteAmt >= 128 && pasteAmt < 256) {
-            return new ModelResourceLocation("buildinggadgets:constructionpastecontainer-quarter", "inventory");
-        } else if (pasteAmt >= 256 && pasteAmt < 384) {
-            return new ModelResourceLocation("buildinggadgets:constructionpastecontainer-half", "inventory");
-        } else if (pasteAmt >= 384 && pasteAmt < 512) {
-            return new ModelResourceLocation("buildinggadgets:constructionpastecontainer-3quarter", "inventory");
+        int maxAmount = 0;
+        if (stack.getItem() instanceof ConstructionPasteContainer)
+            maxAmount = ConstructionPasteContainer.maxAmount;
+        else if (stack.getItem() instanceof ConstructionPasteContainerT2)
+            maxAmount = ConstructionPasteContainerT2.maxAmount;
+        else if (stack.getItem() instanceof ConstructionPasteContainerT3)
+            maxAmount = ConstructionPasteContainerT3.maxAmount;
+        if (pasteAmt < maxAmount / 4) {
+            return new ModelResourceLocation(stack.getItem().getRegistryName(), "inventory");
+        } else if (pasteAmt >= maxAmount / 4 && pasteAmt < maxAmount / 2) {
+            return new ModelResourceLocation(stack.getItem().getRegistryName() + "-quarter", "inventory");
+        } else if (pasteAmt >= maxAmount / 2 && pasteAmt < maxAmount * 3 / 4) {
+            return new ModelResourceLocation(stack.getItem().getRegistryName() + "-half", "inventory");
+        } else if (pasteAmt >= maxAmount * 3 / 4 && pasteAmt < maxAmount) {
+            return new ModelResourceLocation(stack.getItem().getRegistryName() + "-3quarter", "inventory");
         } else {
-            return new ModelResourceLocation("buildinggadgets:constructionpastecontainer-full", "inventory");
+            return new ModelResourceLocation(stack.getItem().getRegistryName() + "-full", "inventory");
         }
     }
 }
