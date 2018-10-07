@@ -28,5 +28,8 @@ public class ConstructionPasteContainerT3 extends GenericPasteContainer {
                 new ModelResourceLocation(getRegistryName() + "-3quarter", "inventory"));
     }
 
-
+    @Override
+    public int getMaxAmount() {
+        return maxAmount;
+    }
 }

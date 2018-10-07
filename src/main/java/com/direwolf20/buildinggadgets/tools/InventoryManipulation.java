@@ -1,7 +1,9 @@
 package com.direwolf20.buildinggadgets.tools;
 
 import com.direwolf20.buildinggadgets.ModItems;
-import com.direwolf20.buildinggadgets.items.*;
+import com.direwolf20.buildinggadgets.items.ConstructionPaste;
+import com.direwolf20.buildinggadgets.items.CopyPasteTool;
+import com.direwolf20.buildinggadgets.items.GenericPasteContainer;
 import net.minecraft.block.*;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.IBlockState;
@@ -165,13 +167,7 @@ public class InventoryManipulation {
 
         for (Map.Entry<Integer, Integer> entry : list) {
             ItemStack containerStack = inv.getStackInSlot(entry.getKey());
-            int maxAmount = 0;
-            if (containerStack.getItem() instanceof ConstructionPasteContainer)
-                maxAmount = ConstructionPasteContainer.maxAmount;
-            else if (containerStack.getItem() instanceof ConstructionPasteContainerT2)
-                maxAmount = ConstructionPasteContainerT2.maxAmount;
-            else if (containerStack.getItem() instanceof ConstructionPasteContainerT3)
-                maxAmount = ConstructionPasteContainerT3.maxAmount;
+            int maxAmount = ((GenericPasteContainer) containerStack.getItem()).getMaxAmount();
             int pasteInContainer = GenericPasteContainer.getPasteAmount(containerStack);
             int freeSpace = maxAmount - pasteInContainer;
             int stackSize = itemStack.getCount();
