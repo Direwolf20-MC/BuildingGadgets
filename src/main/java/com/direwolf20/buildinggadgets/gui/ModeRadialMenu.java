@@ -82,6 +82,7 @@ public class ModeRadialMenu extends GuiScreen {
 
     @Override
     public void drawScreen(int mx, int my, float partialTicks) {
+        if (slots.equals(new ArrayList())) return;
         super.drawScreen(mx, my, partialTicks);
 
         GlStateManager.pushMatrix();

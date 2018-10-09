@@ -13,6 +13,7 @@ public class Config {
     public static int maxRange = 15;
     public static int energyCostBuilder = 50;
     public static int energyCostExchanger = 100;
+    public static int energyCostDestruction = 200;
     public static int energyMax = 500000;
     public static boolean poweredByFE = true;
     public static int durabilityBuilder = 500;
@@ -43,6 +44,7 @@ public class Config {
         maxRange = cfg.getInt("maxRange", CATEGORY_GENERAL, maxRange, 1, 25, "The max range of the building tool");
         energyCostBuilder = cfg.getInt("energyCostBuilder", CATEGORY_GENERAL, energyCostBuilder, 0, 100000, "The energy cost of the Builder per block");
         energyCostExchanger = cfg.getInt("energyCostExchanger", CATEGORY_GENERAL, energyCostExchanger, 0, 100000, "The energy cost of the Exchanger per block");
+        energyCostDestruction = cfg.getInt("energyCostDestruction", CATEGORY_GENERAL, energyCostDestruction, 0, 100000, "The energy cost of the Destruction Gadget per block");
         energyMax = cfg.getInt("energyMax", CATEGORY_GENERAL, energyMax, 0, Integer.MAX_VALUE, "The max energy of the Builder & Exchanger");
         poweredByFE = cfg.getBoolean("poweredByFE", CATEGORY_GENERAL, poweredByFE, "Set to true for Forge Energy Support, set to False for vanilla Item Damage");
         durabilityBuilder = cfg.getInt("durabilityBuilder", CATEGORY_GENERAL, durabilityBuilder, 0, 100000, "The max durability of the Builder (Ignored if powered by FE)");

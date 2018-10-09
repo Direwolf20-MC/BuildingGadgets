@@ -23,6 +23,7 @@ public class PacketHandler {
         INSTANCE.registerMessage(PacketRequestTemplateBlockMap.Handler.class, PacketRequestTemplateBlockMap.class, 9, Side.SERVER);
         INSTANCE.registerMessage(PacketTemplateManagerPaste.Handler.class, PacketTemplateManagerPaste.class, 10, Side.SERVER);
         INSTANCE.registerMessage(PacketCopyCoords.Handler.class, PacketCopyCoords.class, 11, Side.SERVER);
+        INSTANCE.registerMessage(PacketDestructionGUI.Handler.class, PacketDestructionGUI.class, 12, Side.SERVER);
         // Client side
     }
 }

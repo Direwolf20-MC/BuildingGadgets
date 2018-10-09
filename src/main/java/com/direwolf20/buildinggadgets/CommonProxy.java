@@ -67,6 +67,7 @@ public class CommonProxy {
         event.getRegistry().register(new CopyPasteTool());
         event.getRegistry().register(new ItemBlock(ModBlocks.templateManager).setRegistryName(ModBlocks.templateManager.getRegistryName()));
         event.getRegistry().register(new Template());
+        event.getRegistry().register(new DestructionTool());
         if (Config.enablePaste) {
             event.getRegistry().register(new ItemBlock(ModBlocks.constructionBlock).setRegistryName(ModBlocks.constructionBlock.getRegistryName()));
             event.getRegistry().register(new ItemBlock(ModBlocks.constructionBlockPowder).setRegistryName(ModBlocks.constructionBlockPowder.getRegistryName()));

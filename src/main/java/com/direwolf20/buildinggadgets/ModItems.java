@@ -27,4 +27,7 @@ public class ModItems {
 
     @GameRegistry.ObjectHolder("buildinggadgets:template")
     public static Template template;
+
+    @GameRegistry.ObjectHolder("buildinggadgets:destructiontool")
+    public static DestructionTool destructionTool;
 }
