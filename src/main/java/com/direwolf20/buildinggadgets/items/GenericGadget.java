@@ -26,6 +26,7 @@ public class GenericGadget extends Item {
     }
 
     @Override
+    @Nullable
     public ICapabilityProvider initCapabilities(ItemStack stack, @Nullable NBTTagCompound tag) {
         if (Config.poweredByFE) {
             return new CapabilityProviderEnergy(stack, Config.energyMax);

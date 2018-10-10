@@ -25,6 +25,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Nullable;
+
 @SideOnly(Side.CLIENT)
 public class PasteToolBufferBuilder {
 
@@ -48,6 +50,7 @@ public class PasteToolBufferBuilder {
         tagMap.put(UUID, tag);
     }
 
+    @Nullable
     public static NBTTagCompound getTagFromUUID(String UUID) {
         if (tagMap.containsKey(UUID)) {
             return tagMap.get(UUID);
@@ -55,6 +58,7 @@ public class PasteToolBufferBuilder {
         return null;
     }
 
+    @Nullable
     public static ToolDireBuffer getBufferFromMap(String UUID) {
         if (bufferMap.containsKey(UUID)) {
             return bufferMap.get(UUID);

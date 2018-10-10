@@ -31,6 +31,7 @@ public interface ITemplate {
         stack.setTagCompound(tagCompound);
     }
 
+    @Nullable
     default Map<UniqueItem, Integer> getItemCountMap(ItemStack stack) {
         NBTTagCompound tagCompound = stack.getTagCompound();
         if (tagCompound == null) {

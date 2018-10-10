@@ -122,7 +122,7 @@ public class CopyPasteTool extends GenericGadget implements ITemplate {
         return GadgetUtils.getDIMFromNBT(stack, "lastBuild");
     }
 
-    public static ArrayList<BlockMap> getBlockMapList(NBTTagCompound tagCompound) {
+    public static ArrayList<BlockMap> getBlockMapList(@Nullable NBTTagCompound tagCompound) {
         ArrayList<BlockMap> blockMap = new ArrayList<BlockMap>();
         BlockPos startBlock = GadgetUtils.getPOSFromNBT(tagCompound, "startPos");
         if (tagCompound == null) {
@@ -145,7 +145,7 @@ public class CopyPasteTool extends GenericGadget implements ITemplate {
         return blockMap;
     }
 
-    public static ArrayList<BlockMap> getBlockMapList(NBTTagCompound tagCompound, BlockPos startBlock) {
+    public static ArrayList<BlockMap> getBlockMapList(@Nullable NBTTagCompound tagCompound, BlockPos startBlock) {
         ArrayList<BlockMap> blockMap = new ArrayList<BlockMap>();
         if (tagCompound == null) {
             tagCompound = new NBTTagCompound();
@@ -167,7 +167,7 @@ public class CopyPasteTool extends GenericGadget implements ITemplate {
         return blockMap;
     }
 
-    public static BlockMapIntState getBlockMapIntState(NBTTagCompound tagCompound) {
+    public static BlockMapIntState getBlockMapIntState(@Nullable NBTTagCompound tagCompound) {
         if (tagCompound == null) {
             tagCompound = new NBTTagCompound();
         }

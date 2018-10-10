@@ -26,6 +26,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.annotation.Nullable;
+
 public class GadgetUtils {
 
     public static void pushUndoList(ItemStack stack, UndoState undoState) {
@@ -46,6 +48,7 @@ public class GadgetUtils {
         stack.setTagCompound(tagCompound);
     }
 
+    @Nullable
     public static UndoState popUndoList(ItemStack stack) {
         //Get the most recent Undo Coordinate set from the list in NBT
         NBTTagCompound tagCompound = stack.getTagCompound();
@@ -157,7 +160,7 @@ public class GadgetUtils {
         return tagCompound.getInteger("range");
     }
 
-    public static void setToolBlock(ItemStack stack, IBlockState state) {
+    public static void setToolBlock(ItemStack stack, @Nullable IBlockState state) {
         //Store the selected block in the tool's NBT
         NBTTagCompound tagCompound = stack.getTagCompound();
         if (tagCompound == null) {
@@ -172,7 +175,7 @@ public class GadgetUtils {
         stack.setTagCompound(tagCompound);
     }
 
-    public static void setToolActualBlock(ItemStack stack, IBlockState state) {
+    public static void setToolActualBlock(ItemStack stack, @Nullable IBlockState state) {
         //Store the selected block actual state in the tool's NBT
         NBTTagCompound tagCompound = stack.getTagCompound();
         if (tagCompound == null) {
@@ -295,7 +298,7 @@ public class GadgetUtils {
                 "kMGTPE".charAt(exp - 1));
     }
 
-    public static void writePOSToNBT(ItemStack stack, BlockPos pos, String tagName) {
+    public static void writePOSToNBT(ItemStack stack, @Nullable BlockPos pos, String tagName) {
         NBTTagCompound tagCompound = stack.getTagCompound();
         if (tagCompound == null) {
             tagCompound = new NBTTagCompound();
@@ -311,7 +314,7 @@ public class GadgetUtils {
         stack.setTagCompound(tagCompound);
     }
 
-    public static void writePOSToNBT(ItemStack stack, BlockPos pos, String tagName, Integer dim) {
+    public static void writePOSToNBT(ItemStack stack, @Nullable BlockPos pos, String tagName, Integer dim) {
         NBTTagCompound tagCompound = stack.getTagCompound();
         if (tagCompound == null) {
             tagCompound = new NBTTagCompound();
@@ -329,7 +332,7 @@ public class GadgetUtils {
         stack.setTagCompound(tagCompound);
     }
 
-    public static void writePOSToNBT(NBTTagCompound tagCompound, BlockPos pos, String tagName, Integer dim) {
+    public static void writePOSToNBT(NBTTagCompound tagCompound, @Nullable BlockPos pos, String tagName, Integer dim) {
         if (tagCompound == null) {
             tagCompound = new NBTTagCompound();
         }
@@ -343,6 +346,7 @@ public class GadgetUtils {
         tagCompound.setInteger("dim", dim);
     }
 
+    @Nullable
     public static BlockPos getPOSFromNBT(ItemStack stack, String tagName) {
         NBTTagCompound tagCompound = stack.getTagCompound();
         if (tagCompound == null) {
@@ -382,6 +386,7 @@ public class GadgetUtils {
         tagCompound.setString(tagName, string);
     }
 
+    @Nullable
     public static String getStringFromNBT(ItemStack stack, String tagName) {
         NBTTagCompound tagCompound = stack.getTagCompound();
         if (tagCompound == null) {
@@ -390,6 +395,7 @@ public class GadgetUtils {
         return tagCompound.getString(tagName);
     }
 
+    @Nullable
     public static BlockPos getPOSFromNBT(NBTTagCompound tagCompound, String tagName) {
         if (tagCompound == null) {
             return null;
@@ -401,6 +407,7 @@ public class GadgetUtils {
         return NBTUtil.getPosFromTag(posTag);
     }
 
+    @Nullable
     public static Integer getDIMFromNBT(ItemStack stack, String tagName) {
         NBTTagCompound tagCompound = stack.getTagCompound();
         if (tagCompound == null) {
@@ -419,7 +426,8 @@ public class GadgetUtils {
         return tagCompound;
     }
 
-    public static IBlockState compoundToState(NBTTagCompound tagCompound) {
+    @Nullable
+    public static IBlockState compoundToState(@Nullable NBTTagCompound tagCompound) {
         if (tagCompound == null) {
             return null;
         }
@@ -458,7 +466,7 @@ public class GadgetUtils {
         return tagList;
     }
 
-    public static Map<UniqueItem, Integer> nbtToItemCount(NBTTagList tagList) {
+    public static Map<UniqueItem, Integer> nbtToItemCount(@Nullable NBTTagList tagList) {
         Map<UniqueItem, Integer> itemCountMap = new HashMap<UniqueItem, Integer>();
         if (tagList == null) return itemCountMap;
         for (int i = 0; i < tagList.tagCount(); i++) {

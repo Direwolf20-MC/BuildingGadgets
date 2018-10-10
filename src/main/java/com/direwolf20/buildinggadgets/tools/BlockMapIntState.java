@@ -2,7 +2,6 @@ package com.direwolf20.buildinggadgets.tools;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -12,6 +11,8 @@ import net.minecraft.util.math.BlockPos;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.annotation.Nullable;
 
 public class BlockMapIntState {
 
@@ -54,6 +55,7 @@ public class BlockMapIntState {
         return -1;
     }
 
+    @Nullable
     public IBlockState findStackSlot(UniqueItem uniqueItem) {
         for (Map.Entry<IBlockState, UniqueItem> entry : IntStackMap.entrySet()) {
             if (entry.getValue().item == uniqueItem.item && entry.getValue().meta == uniqueItem.meta) {
@@ -114,6 +116,7 @@ public class BlockMapIntState {
         return tagList;
     }
 
+    @Nullable
     public static UniqueItem blockStateToUniqueItem(IBlockState state, EntityPlayer player, BlockPos pos) {
         ItemStack itemStack;
         //if (state.getBlock().canSilkHarvest(player.world, pos, state, player)) {
