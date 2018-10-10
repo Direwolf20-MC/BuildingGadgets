@@ -3,7 +3,7 @@ package com.direwolf20.buildinggadgets.commands;
 import com.direwolf20.buildinggadgets.BuildingGadgets;
 import com.direwolf20.buildinggadgets.network.PacketBlockMap;
 import com.direwolf20.buildinggadgets.network.PacketHandler;
-import com.direwolf20.buildinggadgets.tools.BlockMapWorldSave;
+import com.direwolf20.buildinggadgets.tools.WorldSave;
 import com.google.common.collect.Lists;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
@@ -60,7 +60,7 @@ public abstract class CommandAlterBlockMaps extends CommandBase {
                 return;
             }
         }
-        BlockMapWorldSave worldSave = BlockMapWorldSave.get(sender.getEntityWorld());
+        WorldSave worldSave = WorldSave.getWorldSave(sender.getEntityWorld());
         Map<String, NBTTagCompound> tagMap = worldSave.getTagMap();
         Map<String, NBTTagCompound> newMap = removeData ? new HashMap<String, NBTTagCompound>(tagMap) : null;
         String searchName = (args.length == 0) ? sender.getName() : args[0];

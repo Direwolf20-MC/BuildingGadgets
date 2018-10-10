@@ -4,7 +4,6 @@ import com.direwolf20.buildinggadgets.items.CopyPasteTool;
 import com.direwolf20.buildinggadgets.items.ITemplate;
 import com.direwolf20.buildinggadgets.network.PacketHandler;
 import com.direwolf20.buildinggadgets.network.PacketRequestBlockMap;
-import com.direwolf20.buildinggadgets.network.PacketRequestTemplateBlockMap;
 import com.direwolf20.buildinggadgets.tools.PasteToolBufferBuilder;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
@@ -30,15 +29,9 @@ public class ClientTickEvent {
 
                 ITemplate template = (ITemplate) stack.getItem();
                 String UUID = template.getUUID(stack);
-                if (UUID != null) {
-                    if (PasteToolBufferBuilder.isUpdateNeeded(UUID, stack)) {
-                        //System.out.println("BlockMap Update Needed for UUID: " + UUID + " in slot " + i);
-                        if (template instanceof CopyPasteTool) {
-                            PacketHandler.INSTANCE.sendToServer(new PacketRequestBlockMap(template.getUUID(stack)));
-                        } else {
-                            PacketHandler.INSTANCE.sendToServer(new PacketRequestTemplateBlockMap(template.getUUID(stack)));
-                        }
-                    }
+                if (UUID != null && PasteToolBufferBuilder.isUpdateNeeded(UUID, stack)) {
+                    //System.out.println("BlockMap Update Needed for UUID: " + UUID + " in slot " + i);
+                    PacketHandler.INSTANCE.sendToServer(new PacketRequestBlockMap(template.getUUID(stack), !(template instanceof CopyPasteTool)));
                 }
             }
         }

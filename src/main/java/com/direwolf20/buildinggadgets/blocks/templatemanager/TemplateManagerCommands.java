@@ -48,11 +48,11 @@ public class TemplateManagerCommands {
         BlockPos startPos = template.getStartPos(itemStack1);
         BlockPos endPos = template.getEndPos(itemStack1);
         Map<UniqueItem, Integer> tagMap = template.getItemCountMap(itemStack1);
-        String UUIDTemplate = template.getUUID(itemStack1);
+        String UUIDTemplate = ModItems.template.getUUID(itemStack1);
         if (UUIDTemplate == null) return;
 
-        BlockMapWorldSave worldSave = BlockMapWorldSave.get(world);
-        TemplateWorldSave templateWorldSave = TemplateWorldSave.get(world);
+        WorldSave worldSave = WorldSave.getWorldSave(world);
+        WorldSave templateWorldSave = WorldSave.getTemplateWorldSave(world);
         NBTTagCompound tagCompound;
 
         template.setStartPos(itemStack0, startPos);
@@ -100,12 +100,12 @@ public class TemplateManagerCommands {
         }
         if (!(container.getSlot(1).getStack().getItem().equals(ModItems.template))) return;
         templateStack = container.getSlot(1).getStack();
-        BlockMapWorldSave worldSave = BlockMapWorldSave.get(world);
-        TemplateWorldSave templateWorldSave = TemplateWorldSave.get(world);
+        WorldSave worldSave = WorldSave.getWorldSave(world);
+        WorldSave templateWorldSave = WorldSave.getTemplateWorldSave(world);
         NBTTagCompound templateTagCompound;
 
         String UUID = template.getUUID(itemStack0);
-        String UUIDTemplate = template.getUUID(templateStack);
+        String UUIDTemplate = ModItems.template.getUUID(templateStack);
         if (UUID == null) return;
         if (UUIDTemplate == null) return;
 
@@ -114,7 +114,7 @@ public class TemplateManagerCommands {
         templateTagCompound = tagCompound.copy();
         template.incrementCopyCounter(templateStack);
         templateTagCompound.setInteger("copycounter", template.getCopyCounter(templateStack));
-        templateTagCompound.setString("UUID", template.getUUID(templateStack));
+        templateTagCompound.setString("UUID", ModItems.template.getUUID(templateStack));
 
         templateWorldSave.addToMap(UUIDTemplate, templateTagCompound);
         BlockPos startPos = template.getStartPos(itemStack0);
@@ -152,7 +152,7 @@ public class TemplateManagerCommands {
         if (!(container.getSlot(1).getStack().getItem().equals(ModItems.template))) return;
         templateStack = container.getSlot(1).getStack();
 
-        TemplateWorldSave templateWorldSave = TemplateWorldSave.get(world);
+        WorldSave templateWorldSave = WorldSave.getTemplateWorldSave(world);
         Template template = ModItems.template;
         String UUIDTemplate = template.getUUID(templateStack);
         if (UUIDTemplate == null) return;

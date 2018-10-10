@@ -2,6 +2,8 @@ package com.direwolf20.buildinggadgets.items;
 
 import com.direwolf20.buildinggadgets.BuildingGadgets;
 import com.direwolf20.buildinggadgets.tools.GadgetUtils;
+import com.direwolf20.buildinggadgets.tools.WorldSave;
+
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
@@ -27,6 +29,12 @@ public class Template extends Item implements ITemplate {
     public Template() {
         setRegistryName("template");        // The unique name (within your mod) that identifies this item
         setUnlocalizedName(BuildingGadgets.MODID + ".template");     // Used for localization (en_US.lang)
+    }
+
+    @Override
+    public WorldSave getWorldSave(World world)
+    {
+        return WorldSave.getTemplateWorldSave(world);
     }
 
     @Override
