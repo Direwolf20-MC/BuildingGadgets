@@ -123,26 +123,7 @@ public class CopyPasteTool extends GenericGadget implements ITemplate {
     }
 
     public static ArrayList<BlockMap> getBlockMapList(@Nullable NBTTagCompound tagCompound) {
-        ArrayList<BlockMap> blockMap = new ArrayList<BlockMap>();
-        BlockPos startBlock = GadgetUtils.getPOSFromNBT(tagCompound, "startPos");
-        if (tagCompound == null) {
-            tagCompound = new NBTTagCompound();
-        }
-        NBTTagList MapIntStateTag = (NBTTagList) tagCompound.getTag("mapIntState");
-        if (MapIntStateTag == null) {
-            MapIntStateTag = new NBTTagList();
-        }
-        BlockMapIntState MapIntState = new BlockMapIntState();
-        MapIntState.getIntStateMapFromNBT(MapIntStateTag);
-        int[] posIntArray = tagCompound.getIntArray("posIntArray");
-        int[] stateIntArray = tagCompound.getIntArray("stateIntArray");
-        for (int i = 0; i < posIntArray.length; i++) {
-            int p = posIntArray[i];
-            BlockPos pos = GadgetUtils.relIntToPos(startBlock, p);
-            short IntState = (short) stateIntArray[i];
-            blockMap.add(new BlockMap(pos, MapIntState.getStateFromSlot(IntState), (int) (byte) ((p & 0xff0000) >> 16), (int) (byte) ((p & 0x00ff00) >> 8), (int) (byte) (p & 0x0000ff)));
-        }
-        return blockMap;
+        return getBlockMapList(tagCompound, GadgetUtils.getPOSFromNBT(tagCompound, "startPos"));
     }
 
     public static ArrayList<BlockMap> getBlockMapList(@Nullable NBTTagCompound tagCompound, BlockPos startBlock) {
