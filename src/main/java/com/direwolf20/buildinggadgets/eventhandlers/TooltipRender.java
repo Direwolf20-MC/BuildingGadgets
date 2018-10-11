@@ -36,7 +36,7 @@ public class TooltipRender {
     private static final int STACKS_PER_LINE = 8;
 
     @SideOnly(Side.CLIENT)
-    public static void tooltipIfShift(Runnable r) {
+    public static void tooltipIfShift(@SuppressWarnings("unused") List<String> tooltip, Runnable r) {
         if (GuiScreen.isShiftKeyDown())
             r.run();
         //else addToTooltip(tooltip, "arl.misc.shiftForInfo");
@@ -77,7 +77,7 @@ public class TooltipRender {
             //boolean creative = ((IReagentHolder) stack.getItem()).isCreativeReagentHolder(stack);
 
             if (count > 0)
-                tooltipIfShift(() -> {
+                tooltipIfShift(tooltip, () -> {
                     int lines = (((count - 1) / STACKS_PER_LINE) + 1) * 2;
                     int width = Math.min(STACKS_PER_LINE, count) * 18;
                     String spaces = "\u00a7r\u00a7r\u00a7r\u00a7r\u00a7r";
