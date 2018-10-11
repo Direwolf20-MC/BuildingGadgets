@@ -167,8 +167,8 @@ public class ToolRenders {
     }
 
     public static void renderExchangerOverlay(RenderWorldLastEvent evt, EntityPlayer player, ItemStack stack) {
-        int range = getToolRange(stack);
-        ExchangerTool.ToolMode mode = ExchangerTool.getToolMode(stack);
+//        int range = getToolRange(stack);
+//        ExchangerTool.ToolMode mode = ExchangerTool.getToolMode(stack);
         RayTraceResult lookingAt = VectorTools.getLookingAt(player);
         IBlockState state = Blocks.AIR.getDefaultState();
         List<BlockPos> coordinates = getAnchor(stack);

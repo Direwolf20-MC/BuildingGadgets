@@ -16,7 +16,7 @@ import net.minecraftforge.fml.common.gameevent.InputEvent;
 public class KeyInputHandler {
 
     @SubscribeEvent
-    public void onKeyInput(InputEvent.KeyInputEvent event) {
+    public void onKeyInput(@SuppressWarnings("unused") InputEvent.KeyInputEvent event) {
         //if (KeyBindings.modeSwitch.isPressed()) {
         if (KeyBindings.modeSwitch.isKeyDown() && ((KeyBindings.modeSwitch.getKeyModifier() == KeyModifier.NONE && KeyModifier.getActiveModifier() == KeyModifier.NONE) || KeyBindings.modeSwitch.getKeyModifier() != KeyModifier.NONE)) {
             //PacketHandler.INSTANCE.sendToServer(new PacketToggleMode());
@@ -40,7 +40,7 @@ public class KeyInputHandler {
     }
 
     @SubscribeEvent
-    public void onMouseInput(InputEvent.MouseInputEvent event) {
+    public void onMouseInput(@SuppressWarnings("unused") InputEvent.MouseInputEvent event) {
         //if (KeyBindings.modeSwitch.isPressed()) {
         if (KeyBindings.modeSwitch.isKeyDown() && ((KeyBindings.modeSwitch.getKeyModifier() == KeyModifier.NONE && KeyModifier.getActiveModifier() == KeyModifier.NONE) || KeyBindings.modeSwitch.getKeyModifier() != KeyModifier.NONE)) {
             //PacketHandler.INSTANCE.sendToServer(new PacketToggleMode());

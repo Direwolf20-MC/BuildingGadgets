@@ -43,13 +43,13 @@ public class BuildingGadgets {
     }
 
     @Mod.EventHandler
-    public void init(FMLInitializationEvent e) {
-        proxy.init(e);
+    public void init(@SuppressWarnings("unused") FMLInitializationEvent e) {
+        proxy.init();
     }
 
     @Mod.EventHandler
-    public void postInit(FMLPostInitializationEvent e) {
-        proxy.postInit(e);
+    public void postInit(@SuppressWarnings("unused") FMLPostInitializationEvent e) {
+        proxy.postInit();
     }
 
     @Mod.EventHandler

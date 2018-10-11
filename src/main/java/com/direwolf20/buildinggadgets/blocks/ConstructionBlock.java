@@ -24,7 +24,6 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
@@ -94,14 +93,14 @@ public class ConstructionBlock extends Block implements IFacade {
         return new ConstructionBlockTileEntity();
     }
 
-    private static ConstructionBlockTileEntity getTE(World world, BlockPos pos) {
+    /*private static ConstructionBlockTileEntity getTE(World world, BlockPos pos) {
         return (ConstructionBlockTileEntity) world.getTileEntity(pos);
     }
 
     @Override
     public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
         //super.onBlockActivated(world, pos, state, player, hand, side, hitX, hitY, hitZ);
-        /*ConstructionBlockTileEntity te = getTE(world, pos);
+        ConstructionBlockTileEntity te = getTE(world, pos);
         ItemStack heldItem = player.getHeldItem(hand);
         IBlockState newState = Block.getBlockFromItem(heldItem.getItem()).getStateFromMeta(heldItem.getMetadata());
         if (newState != null && newState != Blocks.AIR.getDefaultState()) {
@@ -109,9 +108,9 @@ public class ConstructionBlock extends Block implements IFacade {
             te.setActualBlockState(newState);
             return true;
         }
-        System.out.println("Failed: " + newState + ":" + te.getBlockState() + ":" + world.isRemote + ":" + te.getActualBlockState());*/
+        System.out.println("Failed: " + newState + ":" + te.getBlockState() + ":" + world.isRemote + ":" + te.getActualBlockState());
         return false;
-    }
+    }*/
 
     @Override
     public IBlockState getExtendedState(IBlockState state, IBlockAccess world, BlockPos pos) {

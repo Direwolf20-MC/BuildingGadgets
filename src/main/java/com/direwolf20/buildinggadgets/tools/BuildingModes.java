@@ -352,7 +352,7 @@ public class BuildingModes {
 
     public static List<BlockMap> sortMapByDistance(List<BlockMap> unSortedMap, EntityPlayer player) {
         List<BlockPos> unSortedList = new ArrayList<BlockPos>();
-        List<BlockPos> sortedList = new ArrayList<BlockPos>();
+//        List<BlockPos> sortedList = new ArrayList<BlockPos>();
         Map<BlockPos, IBlockState> PosToStateMap = new HashMap<BlockPos, IBlockState>();
         Map<BlockPos, Integer> PosToX = new HashMap<BlockPos, Integer>();
         Map<BlockPos, Integer> PosToY = new HashMap<BlockPos, Integer>();

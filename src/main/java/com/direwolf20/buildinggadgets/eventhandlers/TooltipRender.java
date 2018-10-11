@@ -36,7 +36,7 @@ public class TooltipRender {
     private static final int STACKS_PER_LINE = 8;
 
     @SideOnly(Side.CLIENT)
-    public static void tooltipIfShift(List<String> tooltip, Runnable r) {
+    public static void tooltipIfShift(Runnable r) {
         if (GuiScreen.isShiftKeyDown())
             r.run();
         //else addToTooltip(tooltip, "arl.misc.shiftForInfo");
@@ -77,7 +77,7 @@ public class TooltipRender {
             //boolean creative = ((IReagentHolder) stack.getItem()).isCreativeReagentHolder(stack);
 
             if (count > 0)
-                tooltipIfShift(tooltip, () -> {
+                tooltipIfShift(() -> {
                     int lines = (((count - 1) / STACKS_PER_LINE) + 1) * 2;
                     int width = Math.min(STACKS_PER_LINE, count) * 18;
                     String spaces = "\u00a7r\u00a7r\u00a7r\u00a7r\u00a7r";
@@ -112,15 +112,15 @@ public class TooltipRender {
             comparator = comparator.thenComparing(Comparator.comparing(entry -> entry.getKey().getMetadata()));
             list.sort(comparator);
 
-            int count = itemStackCount.size();
+//            int count = itemStackCount.size();
 
             int bx = event.getX();
             int by = event.getY();
 
             List<String> tooltip = event.getLines();
-            int lines = (((count - 1) / STACKS_PER_LINE) + 1);
-            int width = Math.min(STACKS_PER_LINE, count) * 18;
-            int height = lines * 20 + 1;
+//            int lines = (((count - 1) / STACKS_PER_LINE) + 1);
+//            int width = Math.min(STACKS_PER_LINE, count) * 18;
+//            int height = lines * 20 + 1;
 
             for (String s : tooltip) {
                 if (s.trim().equals("\u00a77\u00a7r\u00a7r\u00a7r\u00a7r\u00a7r"))

@@ -244,7 +244,7 @@ public class BuildingTool extends GenericGadget {
             silkTool.addEnchantment(Enchantments.SILK_TOUCH, 1);
             for (BlockPos coord : undoCoords) {
                 currentBlock = world.getBlockState(coord);
-                ItemStack itemStack = currentBlock.getBlock().getPickBlock(currentBlock, null, world, coord, player);
+//                ItemStack itemStack = currentBlock.getBlock().getPickBlock(currentBlock, null, world, coord, player);
                 double distance = coord.getDistance(player.getPosition().getX(), player.getPosition().getY(), player.getPosition().getZ());
                 boolean sameDim = (player.dimension == dimension);
                 BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(world, coord, currentBlock, player);

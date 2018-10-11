@@ -6,12 +6,9 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.*;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.MinecraftForgeClient;
-import net.minecraftforge.common.model.IModelState;
 import net.minecraftforge.common.property.IExtendedBlockState;
 
 import javax.annotation.Nonnull;
@@ -19,17 +16,16 @@ import javax.annotation.Nullable;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.function.Function;
 
 public class ConstructionBakedModel implements IBakedModel {
     public static final ModelResourceLocation modelFacade = new ModelResourceLocation(BuildingGadgets.MODID + ":" + "constructionblock");
 
-    private VertexFormat format;
+//    private VertexFormat format;
     private static TextureAtlasSprite spriteCable;
     private IBakedModel blankConstructionModel;
 
-    public ConstructionBakedModel(IModelState state, VertexFormat format, Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter, IBakedModel blankConstrModel) {
-        this.format = format;
+    public ConstructionBakedModel(IBakedModel blankConstrModel) {
+//        this.format = format;
         this.blankConstructionModel = blankConstrModel;
     }
 

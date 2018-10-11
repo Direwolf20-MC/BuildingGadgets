@@ -280,11 +280,11 @@ public class InventoryManipulation {
 
     }
 
-    public static IBlockState getBaseState(IBlockState originalState, World world, EntityPlayer player, BlockPos pos) {
+    /*public static IBlockState getBaseState(IBlockState originalState, World world, EntityPlayer player, BlockPos pos) {
         IBlockState placeState = Blocks.AIR.getDefaultState();
         Block block = originalState.getBlock();
         placeState = originalState.getBlock().getDefaultState();
         return placeState;
 
-    }
+    }*/
 }

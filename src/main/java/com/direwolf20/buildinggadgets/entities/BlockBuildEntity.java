@@ -38,7 +38,7 @@ public class BlockBuildEntity extends Entity implements IEntityAdditionalSpawnDa
     private EntityLivingBase spawnedBy;
     private boolean useConstructionPaste;
 
-    World world;
+    private World world;
 
     public BlockBuildEntity(World worldIn) {
         super(worldIn);
@@ -120,13 +120,13 @@ public class BlockBuildEntity extends Entity implements IEntityAdditionalSpawnDa
 
     @Override
     public void readSpawnData(ByteBuf additionalData) {
-        int id = additionalData.readInt();
+//        int id = additionalData.readInt();
     }
 
     @Override
     public void writeSpawnData(ByteBuf buffer) {
-        int id = -1;
-        buffer.writeInt(id);
+//        int id = -1;
+//        buffer.writeInt(id);
     }
 
     @Override

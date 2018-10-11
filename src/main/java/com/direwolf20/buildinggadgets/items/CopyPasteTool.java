@@ -450,7 +450,7 @@ public class CopyPasteTool extends GenericGadget implements ITemplate {
     }
 
     public void buildBlockMap(World world, BlockPos startPos, ItemStack stack, EntityPlayer player) {
-        long time = System.nanoTime();
+//        long time = System.nanoTime();
         BlockPos anchorPos = getAnchor(stack);
         List<BlockMap> blockMapList = new ArrayList<BlockMap>();
         WorldSave worldSave = WorldSave.getWorldSave(world);
@@ -556,7 +556,7 @@ public class CopyPasteTool extends GenericGadget implements ITemplate {
     }
 
     public static void undoBuild(EntityPlayer player, ItemStack heldItem) {
-        long time = System.nanoTime();
+//        long time = System.nanoTime();
         NBTTagCompound tagCompound = WorldSave.getWorldSave(player.world).getCompoundFromUUID(ModItems.copyPasteTool.getUUID(heldItem));
         World world = player.world;
         if (world.isRemote) {

@@ -16,7 +16,7 @@ public class ClientTickEvent {
     private static int counter = 0;
 
     @SubscribeEvent
-    public void onClientTick(TickEvent.ClientTickEvent event) {
+    public void onClientTick(@SuppressWarnings("unused") TickEvent.ClientTickEvent event) {
         counter++;
         if (counter > 600) {
             counter = 0;

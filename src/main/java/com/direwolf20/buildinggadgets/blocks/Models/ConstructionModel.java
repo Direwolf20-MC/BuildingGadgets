@@ -27,8 +27,7 @@ public class ConstructionModel implements IModel {
         } catch (Exception e) {
             throw new Error("Unable to load construction block model", e);
         }
-        IBakedModel bakedConstructionModel = constructionModel.bake(state, format, bakedTextureGetter);
-        return new ConstructionBakedModel(state, format, bakedTextureGetter, bakedConstructionModel);
+        return new ConstructionBakedModel(constructionModel.bake(state, format, bakedTextureGetter));
     }
 
     @Override

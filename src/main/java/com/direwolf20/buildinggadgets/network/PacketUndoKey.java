@@ -29,11 +29,11 @@ public class PacketUndoKey implements IMessage {
     public static class Handler implements IMessageHandler<PacketUndoKey, IMessage> {
         @Override
         public IMessage onMessage(PacketUndoKey message, MessageContext ctx) {
-            FMLCommonHandler.instance().getWorldThread(ctx.netHandler).addScheduledTask(() -> handle(message, ctx));
+            FMLCommonHandler.instance().getWorldThread(ctx.netHandler).addScheduledTask(() -> handle(ctx));
             return null;
         }
 
-        private void handle(PacketUndoKey message, MessageContext ctx) {
+        private void handle(MessageContext ctx) {
             EntityPlayerMP playerEntity = ctx.getServerHandler().player;
             ItemStack heldItem = playerEntity.getHeldItem(EnumHand.MAIN_HAND);
             if (!(heldItem.getItem() instanceof GenericGadget)) {

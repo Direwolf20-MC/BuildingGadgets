@@ -7,7 +7,6 @@ import com.direwolf20.buildinggadgets.blocks.ConstructionBlockTileEntity;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.network.datasync.DataParameter;
@@ -26,8 +25,8 @@ public class ConstructionBlockEntity extends Entity implements IEntityAdditional
     public int despawning = -1;
     public int maxLife = 80;
     private BlockPos setPos;
-    private EntityLivingBase spawnedBy;
-    World world;
+//    private EntityLivingBase spawnedBy;
+    private World world;
 
     public ConstructionBlockEntity(World worldIn) {
         super(worldIn);
@@ -126,13 +125,13 @@ public class ConstructionBlockEntity extends Entity implements IEntityAdditional
 
     @Override
     public void readSpawnData(ByteBuf additionalData) {
-        int id = additionalData.readInt();
+//        int id = additionalData.readInt();
     }
 
     @Override
     public void writeSpawnData(ByteBuf buffer) {
-        int id = -1;
-        buffer.writeInt(id);
+//        int id = -1;
+//        buffer.writeInt(id);
     }
 
     @Override

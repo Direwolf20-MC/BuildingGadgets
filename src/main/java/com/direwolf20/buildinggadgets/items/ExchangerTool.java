@@ -216,7 +216,7 @@ public class ExchangerTool extends GenericGadget {
             }
             BlockPos startBlock = lookingAt.getBlockPos();
             EnumFacing sideHit = lookingAt.sideHit;
-            IBlockState setBlock = getToolBlock(stack);
+//            IBlockState setBlock = getToolBlock(stack);
             coords = ExchangingModes.getBuildOrders(world, player, startBlock, sideHit, stack);
         } else { //If we do have an anchor, erase it (Even if the build fails)
             setAnchor(stack, new ArrayList<BlockPos>());
