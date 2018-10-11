@@ -143,7 +143,7 @@ public class CopyPasteTool extends GenericGadget implements ITemplate {
             int p = posIntArray[i];
             BlockPos pos = GadgetUtils.relIntToPos(startBlock, p);
             short IntState = (short) stateIntArray[i];
-            blockMap.add(new BlockMap(pos, MapIntState.getStateFromSlot(IntState), (int) (byte) ((p & 0xff0000) >> 16), (int) (byte) ((p & 0x00ff00) >> 8), (int) (byte) (p & 0x0000ff)));
+            blockMap.add(new BlockMap(pos, MapIntState.getStateFromSlot(IntState), (byte) ((p & 0xff0000) >> 16), (byte) ((p & 0x00ff00) >> 8), (byte) (p & 0x0000ff)));
         }
         return blockMap;
     }

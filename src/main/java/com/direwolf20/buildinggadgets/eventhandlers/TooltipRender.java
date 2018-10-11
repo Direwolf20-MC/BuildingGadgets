@@ -161,7 +161,7 @@ public class TooltipRender {
         render.renderItemIntoGUI(itemStack, x, y);
 
         //String s1 = count == Integer.MAX_VALUE ? "\u221E" : TextFormatting.BOLD + Integer.toString((int) ((float) req));
-        String s1 = count == Integer.MAX_VALUE ? "\u221E" : Integer.toString((int) ((float) req));
+        String s1 = count == Integer.MAX_VALUE ? "\u221E" : Integer.toString(req);
         int w1 = mc.fontRenderer.getStringWidth(s1);
         int color = 0xFFFFFF;
 

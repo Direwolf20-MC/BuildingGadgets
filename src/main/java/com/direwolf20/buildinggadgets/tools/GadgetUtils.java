@@ -94,9 +94,9 @@ public class GadgetUtils {
         BlockPos startBlock = NBTUtil.getPosFromTag(compound.getCompoundTag("startBlock"));
         for (int i = 0; i <= array.length - 1; i++) {
             int p = array[i];
-            int x = startBlock.getX() + (int) (byte) ((p & 0xff0000) >> 16);
-            int y = startBlock.getY() + (int) (byte) ((p & 0x00ff00) >> 8);
-            int z = startBlock.getZ() + (int) (byte) (p & 0x0000ff);
+            int x = startBlock.getX() + (byte) ((p & 0xff0000) >> 16);
+            int y = startBlock.getY() + (byte) ((p & 0x00ff00) >> 8);
+            int z = startBlock.getZ() + (byte) (p & 0x0000ff);
             coordinates.add(new BlockPos(x, y, z));
         }
         UndoState undoState = new UndoState(dim, coordinates);
@@ -445,9 +445,9 @@ public class GadgetUtils {
 
     public static BlockPos relIntToPos(BlockPos startPos, int relInt) {
         int p = relInt;
-        int x = startPos.getX() + (int) (byte) ((p & 0xff0000) >> 16);
-        int y = startPos.getY() + (int) (byte) ((p & 0x00ff00) >> 8);
-        int z = startPos.getZ() + (int) (byte) (p & 0x0000ff);
+        int x = startPos.getX() + (byte) ((p & 0xff0000) >> 16);
+        int y = startPos.getY() + (byte) ((p & 0x00ff00) >> 8);
+        int z = startPos.getZ() + (byte) (p & 0x0000ff);
         return new BlockPos(x, y, z);
     }
 

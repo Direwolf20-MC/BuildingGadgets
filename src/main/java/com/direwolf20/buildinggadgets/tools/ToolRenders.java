@@ -417,7 +417,7 @@ public class ToolRenders {
     private static void renderBox(Tessellator tessellator, BufferBuilder bufferBuilder, double startX, double startY, double startZ, double endX, double endY, double endZ, int R, int G, int B) {
         GlStateManager.glLineWidth(2.0F);
         bufferBuilder.begin(3, DefaultVertexFormats.POSITION_COLOR);
-        bufferBuilder.pos(startX, startY, startZ).color((float) G, (float) G, (float) G, 0.0F).endVertex();
+        bufferBuilder.pos(startX, startY, startZ).color(G, G, G, 0.0F).endVertex();
         bufferBuilder.pos(startX, startY, startZ).color(G, G, G, R).endVertex();
         bufferBuilder.pos(endX, startY, startZ).color(G, B, B, R).endVertex();
         bufferBuilder.pos(endX, startY, endZ).color(G, G, G, R).endVertex();
@@ -434,7 +434,7 @@ public class ToolRenders {
         bufferBuilder.pos(endX, endY, endZ).color(G, G, G, R).endVertex();
         bufferBuilder.pos(endX, endY, startZ).color(G, G, G, R).endVertex();
         bufferBuilder.pos(endX, startY, startZ).color(G, G, G, R).endVertex();
-        bufferBuilder.pos(endX, startY, startZ).color((float) G, (float) G, (float) G, 0.0F).endVertex();
+        bufferBuilder.pos(endX, startY, startZ).color(G, G, G, 0.0F).endVertex();
         tessellator.draw();
         GlStateManager.glLineWidth(1.0F);
     }
