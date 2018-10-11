@@ -50,7 +50,7 @@ public class ConstructionBlockPowder extends BlockFalling {
         }
     }
 
-    protected boolean tryTouchWater(World worldIn, BlockPos pos) {
+    private boolean tryTouchWater(World worldIn, BlockPos pos) {
         boolean flag = false;
 
         for (EnumFacing enumfacing : EnumFacing.values()) {

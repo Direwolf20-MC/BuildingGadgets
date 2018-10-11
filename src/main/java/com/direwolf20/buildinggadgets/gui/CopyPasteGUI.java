@@ -24,8 +24,8 @@ import net.minecraft.util.text.TextFormatting;
 import java.io.IOException;
 
 public class CopyPasteGUI extends GuiScreen {
-    public static final int WIDTH = 256;
-    public static final int HEIGHT = 256;
+//     public static final int WIDTH = 256;
+//     public static final int HEIGHT = 256;
 
     private GuiTextField startX;
     private GuiTextField startY;
@@ -36,12 +36,12 @@ public class CopyPasteGUI extends GuiScreen {
 
     private boolean absoluteCoords = Config.absoluteCoordDefault;
 
-    int guiLeft = 15;
-    int guiTop = 15;
+    private int guiLeft = 15;
+    private int guiTop = 15;
 
-    ItemStack copyPasteTool;
-    BlockPos startPos;
-    BlockPos endPos;
+    private ItemStack copyPasteTool;
+    private BlockPos startPos;
+    private BlockPos endPos;
 
     private static final ResourceLocation background = new ResourceLocation(BuildingGadgets.MODID, "textures/gui/testcontainer.png");
 
@@ -108,7 +108,7 @@ public class CopyPasteGUI extends GuiScreen {
         this.buttonList.add(new DireButton(16, this.guiLeft + 310, this.guiTop + 34, 10, 10, "+"));
     }
 
-    public void fieldChange(GuiTextField textField, int amount) {
+    private void fieldChange(GuiTextField textField, int amount) {
         nullCheckTextBoxes();
         if (GuiScreen.isShiftKeyDown()) amount = amount * 10;
         try {
@@ -139,7 +139,7 @@ public class CopyPasteGUI extends GuiScreen {
         super.drawScreen(mouseX, mouseY, partialTicks);
     }
 
-    protected void nullCheckTextBoxes() {
+    private void nullCheckTextBoxes() {
         if (absoluteCoords) {
             if (startX.getText() == "") {
                 startX.setText(String.valueOf(startPos.getX()));
@@ -234,11 +234,11 @@ public class CopyPasteGUI extends GuiScreen {
 
     }
 
-    protected void coordsModeSwitch() {
+    private void coordsModeSwitch() {
         absoluteCoords = !absoluteCoords;
     }
 
-    protected void updateTextFields() {
+    private void updateTextFields() {
         String x, y, z;
         if (absoluteCoords) {
             BlockPos start = startX.getText() != "" ? new BlockPos(startPos.getX() + Integer.parseInt(startX.getText()), startPos.getY() + Integer.parseInt(startY.getText()), startPos.getZ() + Integer.parseInt(startZ.getText())) : startPos;

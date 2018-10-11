@@ -66,7 +66,7 @@ public class CopyPasteTool extends GenericGadget implements ITemplate {
         setCreativeTab(CreativeTabs.TOOLS);
     }
 
-    public static void setAnchor(ItemStack stack, BlockPos anchorPos) {
+    private static void setAnchor(ItemStack stack, BlockPos anchorPos) {
         GadgetUtils.writePOSToNBT(stack, anchorPos, "anchor");
     }
 
@@ -100,25 +100,25 @@ public class CopyPasteTool extends GenericGadget implements ITemplate {
         return uuid;
     }
 
-    public static String getOwner(ItemStack stack) {
+    public static String getOwner(ItemStack stack) {//TODO unused
         return stack.getTagCompound().getString("owner");
     }
 
-    public static void setOwner(ItemStack stack, String owner) {
+    public static void setOwner(ItemStack stack, String owner) {//TODO unused
         NBTTagCompound tagCompound = stack.getTagCompound();
         tagCompound.setString("owner", owner);
         stack.setTagCompound(tagCompound);
     }
 
-    public static void setLastBuild(ItemStack stack, BlockPos anchorPos, Integer dim) {
+    private static void setLastBuild(ItemStack stack, BlockPos anchorPos, Integer dim) {
         GadgetUtils.writePOSToNBT(stack, anchorPos, "lastBuild", dim);
     }
 
-    public static BlockPos getLastBuild(ItemStack stack) {
+    private static BlockPos getLastBuild(ItemStack stack) {
         return GadgetUtils.getPOSFromNBT(stack, "lastBuild");
     }
 
-    public static Integer getLastBuildDim(ItemStack stack) {
+    private static Integer getLastBuildDim(ItemStack stack) {
         return GadgetUtils.getDIMFromNBT(stack, "lastBuild");
     }
 
@@ -126,7 +126,7 @@ public class CopyPasteTool extends GenericGadget implements ITemplate {
         return getBlockMapList(tagCompound, GadgetUtils.getPOSFromNBT(tagCompound, "startPos"));
     }
 
-    public static List<BlockMap> getBlockMapList(@Nullable NBTTagCompound tagCompound, BlockPos startBlock) {
+    private static List<BlockMap> getBlockMapList(@Nullable NBTTagCompound tagCompound, BlockPos startBlock) {
         List<BlockMap> blockMap = new ArrayList<BlockMap>();
         if (tagCompound == null) {
             tagCompound = new NBTTagCompound();
@@ -166,7 +166,7 @@ public class CopyPasteTool extends GenericGadget implements ITemplate {
         return MapIntState;
     }
 
-    public static void setToolMode(ItemStack stack, ToolMode mode) {
+    private static void setToolMode(ItemStack stack, ToolMode mode) {
         NBTTagCompound tagCompound = stack.getTagCompound();
         if (tagCompound == null) {
             tagCompound = new NBTTagCompound();
@@ -346,7 +346,7 @@ public class CopyPasteTool extends GenericGadget implements ITemplate {
         }
     }
 
-    public static boolean findBlocks(World world, BlockPos start, BlockPos end, ItemStack stack, EntityPlayer player, CopyPasteTool tool) {
+    private static boolean findBlocks(World world, BlockPos start, BlockPos end, ItemStack stack, EntityPlayer player, CopyPasteTool tool) {
         setLastBuild(stack, null, 0);
 
         int startX = start.getX();
@@ -449,7 +449,7 @@ public class CopyPasteTool extends GenericGadget implements ITemplate {
         return true;
     }
 
-    public void buildBlockMap(World world, BlockPos startPos, ItemStack stack, EntityPlayer player) {
+    private void buildBlockMap(World world, BlockPos startPos, ItemStack stack, EntityPlayer player) {
 //        long time = System.nanoTime();
         BlockPos anchorPos = getAnchor(stack);
         List<BlockMap> blockMapList = new ArrayList<BlockMap>();
@@ -470,7 +470,7 @@ public class CopyPasteTool extends GenericGadget implements ITemplate {
         //System.out.printf("Built %d Blocks in %.2f ms%n", blockMapList.size(), (System.nanoTime() - time) * 1e-6);
     }
 
-    public static void placeBlock(World world, BlockPos pos, EntityPlayer player, IBlockState state, Map<IBlockState, UniqueItem> IntStackMap) {
+    private static void placeBlock(World world, BlockPos pos, EntityPlayer player, IBlockState state, Map<IBlockState, UniqueItem> IntStackMap) {
         if (!world.getBlockState(pos).getBlock().isReplaceable(world, pos)) return;
         if (state.equals(Blocks.AIR.getDefaultState())) return;
         if (!player.isAllowEdit()) {

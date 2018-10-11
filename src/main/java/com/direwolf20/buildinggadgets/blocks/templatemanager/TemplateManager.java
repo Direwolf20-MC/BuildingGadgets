@@ -24,7 +24,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class TemplateManager extends Block {
-    public static final int GUI_ID = 1;
+    private static final int GUI_ID = 1;
 
     public TemplateManager() {
         super(Material.ROCK);

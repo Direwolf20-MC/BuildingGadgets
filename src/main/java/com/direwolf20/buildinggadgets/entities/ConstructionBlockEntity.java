@@ -20,7 +20,7 @@ public class ConstructionBlockEntity extends Entity {
     private static final DataParameter<BlockPos> FIXED = EntityDataManager.createKey(ConstructionBlockEntity.class, DataSerializers.BLOCK_POS);
     private static final DataParameter<Boolean> MAKING = EntityDataManager.createKey(ConstructionBlockEntity.class, DataSerializers.BOOLEAN);
 
-    public int despawning = -1;
+    private int despawning = -1;
     public int maxLife = 80;
     private BlockPos setPos;
 //    private EntityLivingBase spawnedBy;

@@ -42,8 +42,8 @@ import java.nio.ByteBuffer;
 import java.util.List;
 
 public class TemplateManagerGUI extends GuiContainer {
-    public static final int WIDTH = 256;
-    public static final int HEIGHT = 256;
+//  public static final int WIDTH = 256;
+//  public static final int HEIGHT = 256;
 
     private boolean panelClicked;
     private int clickButton;
@@ -55,7 +55,7 @@ public class TemplateManagerGUI extends GuiContainer {
     private float momentumDampening = 0.98f;
     private float rotX = 0, rotY = 0, zoom = 1;
     private float panX = 0, panY = 0;
-    Rectangle panel = new Rectangle(10, 18, 60, 60);
+    private Rectangle panel = new Rectangle(10, 18, 60, 60);
 
 //    private int scrollAcc;
 
@@ -233,7 +233,7 @@ public class TemplateManagerGUI extends GuiContainer {
         } else if (b.id == 2) {
             PacketHandler.INSTANCE.sendToServer(new PacketTemplateManagerLoad(te.getPos()));
         } else if (b.id == 3) {
-            TemplateManagerCommands.CopyTemplate(container);
+            TemplateManagerCommands.copyTemplate(container);
         } else if (b.id == 4) {
             String CBString = getClipboardString();
             //System.out.println("CBString Length: " + CBString.length());

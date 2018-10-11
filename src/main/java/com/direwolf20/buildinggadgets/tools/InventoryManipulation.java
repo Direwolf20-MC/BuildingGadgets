@@ -212,7 +212,7 @@ public class InventoryManipulation {
         return false;
     }
 
-    public static List<IItemHandler> findInvContainers(InventoryPlayer inv) {
+    private static List<IItemHandler> findInvContainers(InventoryPlayer inv) {
         List<IItemHandler> containers = new ArrayList<IItemHandler>();
         for (int i = 0; i < 36; ++i) {
             ItemStack stack = inv.getStackInSlot(i);
@@ -223,7 +223,7 @@ public class InventoryManipulation {
         return containers;
     }
 
-    public static int countInContainer(IItemHandler container, Item item, int meta) {
+    private static int countInContainer(IItemHandler container, Item item, int meta) {
         int count = 0;
         ItemStack tempItem;
         for (int i = 0; i < container.getSlots(); ++i) {
@@ -235,7 +235,7 @@ public class InventoryManipulation {
         return count;
     }
 
-    public static List<Integer> findItem(Item item, int meta, InventoryPlayer inv) {
+    private static List<Integer> findItem(Item item, int meta, InventoryPlayer inv) {
         List<Integer> slots = new ArrayList<Integer>();
         for (int i = 0; i < 36; ++i) {
             ItemStack stack = inv.getStackInSlot(i);

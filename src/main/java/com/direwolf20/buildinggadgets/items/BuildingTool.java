@@ -67,7 +67,7 @@ public class BuildingTool extends GenericGadget {
         }
     }
 
-    public static void setToolMode(ItemStack stack, ToolMode mode) {
+    private static void setToolMode(ItemStack stack, ToolMode mode) {
         //Store the tool's mode in NBT as a string
         NBTTagCompound tagCompound = stack.getTagCompound();
         if (tagCompound == null) {
@@ -141,7 +141,7 @@ public class BuildingTool extends GenericGadget {
         return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, itemstack);
     }
 
-    public void toggleMode(EntityPlayer player, ItemStack heldItem) {
+    public void toggleMode(EntityPlayer player, ItemStack heldItem) {//TODO unused
         //Called when the mode toggle hotkey is pressed
         ToolMode mode = getToolMode(heldItem);
         mode = mode.next();
@@ -168,7 +168,7 @@ public class BuildingTool extends GenericGadget {
         player.sendStatusMessage(new TextComponentString(TextFormatting.DARK_AQUA + new TextComponentTranslation("message.gadget.toolrange").getUnformattedComponentText() + ": " + range), true);
     }
 
-    public boolean build(EntityPlayer player, ItemStack stack) {
+    private boolean build(EntityPlayer player, ItemStack stack) {
         //Build the blocks as shown in the visual render
         World world = player.world;
         List<BlockPos> coords = getAnchor(stack);
@@ -267,7 +267,7 @@ public class BuildingTool extends GenericGadget {
         return true;
     }
 
-    public static boolean placeBlock(World world, EntityPlayer player, BlockPos pos, IBlockState setBlock) {
+    private static boolean placeBlock(World world, EntityPlayer player, BlockPos pos, IBlockState setBlock) {
         ItemStack heldItem = player.getHeldItemMainhand();
         boolean useConstructionPaste = false;
         if (!(heldItem.getItem() instanceof BuildingTool)) {

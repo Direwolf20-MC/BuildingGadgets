@@ -44,16 +44,16 @@ public class ModeRadialMenu extends GuiScreen {
             new ResourceLocation("buildinggadgets:textures/ui/checker.png")
     };
 
-    int timeIn = 0;
-    int slotSelected = -1;
+    private int timeIn = 0;
+    private int slotSelected = -1;
 
-    ItemStack itemStack;
-    List<Integer> slots;
+//  ItemStack itemStack;
+    private List<Integer> slots;
 
     public ModeRadialMenu(ItemStack stack) {
         mc = Minecraft.getMinecraft();
 
-        itemStack = ItemStack.EMPTY;
+//        itemStack = ItemStack.EMPTY;
         if (stack.getItem() instanceof BuildingTool) {
             setSocketable(stack);
         } else if (stack.getItem() instanceof ExchangerTool) {
@@ -67,7 +67,7 @@ public class ModeRadialMenu extends GuiScreen {
         slots = new ArrayList();
         if (stack.isEmpty())
             return;
-        itemStack = stack;
+//        itemStack = stack;
         if (stack.getItem() instanceof BuildingTool) {
             for (int i = 0; i < BuildingTool.ToolMode.values().length; i++)
                 slots.add(i);
@@ -246,7 +246,7 @@ public class ModeRadialMenu extends GuiScreen {
         timeIn++;
     }
 
-    public boolean isKeyDown(KeyBinding keybind) {
+    private boolean isKeyDown(KeyBinding keybind) {
         int key = keybind.getKeyCode();
         if (key < 0) {
             int button = 100 + key;

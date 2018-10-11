@@ -36,7 +36,7 @@ public class TooltipRender {
     private static final int STACKS_PER_LINE = 8;
 
     @SideOnly(Side.CLIENT)
-    public static void tooltipIfShift(@SuppressWarnings("unused") List<String> tooltip, Runnable r) {
+    private static void tooltipIfShift(@SuppressWarnings("unused") List<String> tooltip, Runnable r) {
         if (GuiScreen.isShiftKeyDown())
             r.run();
         //else addToTooltip(tooltip, "arl.misc.shiftForInfo");
@@ -201,7 +201,7 @@ public class TooltipRender {
         return missingCount;
     }
 
-    public static Map<UniqueItem, Integer> makeRequiredList(String UUID) {
+    public static Map<UniqueItem, Integer> makeRequiredList(String UUID) {//TODO unused
         Map<UniqueItem, Integer> itemCountMap = new HashMap<UniqueItem, Integer>();
         Map<IBlockState, UniqueItem> IntStackMap = CopyPasteTool.getBlockMapIntState(PasteToolBufferBuilder.getTagFromUUID(UUID)).getIntStackMap();
         List<BlockMap> blockMapList = CopyPasteTool.getBlockMapList(PasteToolBufferBuilder.getTagFromUUID(UUID));

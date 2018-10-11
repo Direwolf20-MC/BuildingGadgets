@@ -50,7 +50,7 @@ public class ConstructionBlockTileEntity extends TileEntity {
         markDirtyClient();
     }
 
-    public void markDirtyClient() {
+    private void markDirtyClient() {
         markDirty();
         if (getWorld() != null) {
             IBlockState state = getWorld().getBlockState(getPos());

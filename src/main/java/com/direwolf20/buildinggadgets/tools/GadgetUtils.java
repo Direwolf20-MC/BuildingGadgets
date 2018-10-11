@@ -66,7 +66,7 @@ public class GadgetUtils {
         return undoState;
     }
 
-    public static NBTTagCompound undoStateToNBT(UndoState undoState) {
+    private static NBTTagCompound undoStateToNBT(UndoState undoState) {
         //Convert an UndoState object into NBT data. Uses ints to store relative positions to a start block for data compression..
         NBTTagCompound compound = new NBTTagCompound();
         compound.setInteger("dim", undoState.dimension);
@@ -86,7 +86,7 @@ public class GadgetUtils {
         return compound;
     }
 
-    public static UndoState NBTToUndoState(NBTTagCompound compound) {
+    private static UndoState NBTToUndoState(NBTTagCompound compound) {
         //Convert an integer list stored in NBT into UndoState
         int dim = compound.getInteger("dim");
         List<BlockPos> coordinates = new ArrayList<BlockPos>();
@@ -161,7 +161,7 @@ public class GadgetUtils {
         return tagCompound.getInteger("range");
     }
 
-    public static void setToolBlock(ItemStack stack, @Nullable IBlockState state) {
+    private static void setToolBlock(ItemStack stack, @Nullable IBlockState state) {
         //Store the selected block in the tool's NBT
         NBTTagCompound tagCompound = stack.getTagCompound();
         if (tagCompound == null) {
@@ -176,7 +176,7 @@ public class GadgetUtils {
         stack.setTagCompound(tagCompound);
     }
 
-    public static void setToolActualBlock(ItemStack stack, @Nullable IBlockState state) {
+    private static void setToolActualBlock(ItemStack stack, @Nullable IBlockState state) {
         //Store the selected block actual state in the tool's NBT
         NBTTagCompound tagCompound = stack.getTagCompound();
         if (tagCompound == null) {
@@ -368,7 +368,7 @@ public class GadgetUtils {
         tagCompound.setString(tagName, string);
     }
 
-    public static void writeStringToNBT(NBTTagCompound tagCompound, String string, String tagName) {
+    public static void writeStringToNBT(NBTTagCompound tagCompound, String string, String tagName) {//TODO unused
         if (tagCompound == null) {
             tagCompound = new NBTTagCompound();
         }

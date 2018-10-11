@@ -127,7 +127,7 @@ public class ConstructionBlock extends Block implements IFacade {
     }
 
     @Nullable
-    protected IBlockState getActualMimicBlock(IBlockAccess blockAccess, BlockPos pos) {
+    private IBlockState getActualMimicBlock(IBlockAccess blockAccess, BlockPos pos) {
         try {
             TileEntity te = blockAccess.getTileEntity(pos);
             if (te instanceof ConstructionBlockTileEntity) {

@@ -136,7 +136,7 @@ public class TemplateManagerCommands {
         PacketHandler.INSTANCE.sendTo(new PacketBlockMap(templateTagCompound), (EntityPlayerMP) player);
     }
 
-    public static void PasteTemplate(TemplateManagerContainer container, EntityPlayer player, NBTTagCompound sentTagCompound, String templateName) {
+    public static void pasteTemplate(TemplateManagerContainer container, EntityPlayer player, NBTTagCompound sentTagCompound, String templateName) {
         ItemStack itemStack1 = container.getSlot(1).getStack();
 
         if (!(allowedItemsRight.contains(itemStack1.getItem()))) {
@@ -172,17 +172,17 @@ public class TemplateManagerCommands {
 
         NBTTagList MapIntStateTag = (NBTTagList) templateTagCompound.getTag("mapIntState");
 
-        BlockMapIntState MapIntState = new BlockMapIntState();
-        MapIntState.getIntStateMapFromNBT(MapIntStateTag);
-        MapIntState.makeStackMapFromStateMap(player);
-        templateTagCompound.setTag("mapIntStack", MapIntState.putIntStackMapIntoNBT());
+        BlockMapIntState mapIntState = new BlockMapIntState();
+        mapIntState.getIntStateMapFromNBT(MapIntStateTag);
+        mapIntState.makeStackMapFromStateMap(player);
+        templateTagCompound.setTag("mapIntStack", mapIntState.putIntStackMapIntoNBT());
         templateTagCompound.setString("owner", player.getName());
 
         Map<UniqueItem, Integer> itemCountMap = new HashMap<UniqueItem, Integer>();
-        Map<IBlockState, UniqueItem> IntStackMap = MapIntState.IntStackMap;
+        Map<IBlockState, UniqueItem> intStackMap = mapIntState.intStackMap;
         List<BlockMap> blockMapList = CopyPasteTool.getBlockMapList(templateTagCompound);
         for (BlockMap blockMap : blockMapList) {
-            UniqueItem uniqueItem = IntStackMap.get(blockMap.state);
+            UniqueItem uniqueItem = intStackMap.get(blockMap.state);
             NonNullList<ItemStack> drops = NonNullList.create();
             blockMap.state.getBlock().getDrops(drops, world, new BlockPos(0, 0, 0), blockMap.state, 0);
             int neededItems = 0;
@@ -221,7 +221,7 @@ public class TemplateManagerCommands {
         PacketHandler.INSTANCE.sendTo(new PacketBlockMap(templateTagCompound), (EntityPlayerMP) player);
     }
 
-    public static void CopyTemplate(TemplateManagerContainer container) {
+    public static void copyTemplate(TemplateManagerContainer container) {
         ItemStack itemStack0 = container.getSlot(0).getStack();
         if (itemStack0.getItem() instanceof CopyPasteTool) {
             NBTTagCompound tagCompound = PasteToolBufferBuilder.getTagFromUUID(ModItems.copyPasteTool.getUUID(itemStack0));

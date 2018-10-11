@@ -10,17 +10,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BlacklistBlocks {
-    protected static ArrayList<String> blacklistedBlocks = new ArrayList<String>();
+    private static ArrayList<String> blacklistedBlocks = new ArrayList<String>();
 
-    public static void addBlockToBlacklist(Block block) {
+    private static void addBlockToBlacklist(Block block) {
         blacklistedBlocks.add(block.getRegistryName().toString());
     }
 
-    public static void addStringToBlacklist(String name) {
+    private static void addStringToBlacklist(String name) {
         blacklistedBlocks.add(name);
     }
 
-    public static void setConfig(Configuration cfg, List<String> blacklist) {
+    private static void setConfig(Configuration cfg, List<String> blacklist) {
         String[] tempArray = new String[blacklist.size()];
         blacklist.toArray(tempArray);
         cfg.get(Config.CATEGORY_BLACKLIST, "Blacklist", tempArray);

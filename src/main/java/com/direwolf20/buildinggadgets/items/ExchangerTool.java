@@ -49,9 +49,9 @@ public class ExchangerTool extends GenericGadget {
 
     public enum ToolMode {
         Wall, VerticalColumn, HorizontalColumn, Checkerboard;
-        private static ExchangerTool.ToolMode[] vals = values();
+        private static ExchangerTool.ToolMode[] vals = values();//TODO unused
 
-        public ExchangerTool.ToolMode next() {
+        public ExchangerTool.ToolMode next() {//TODO unused
             return vals[(this.ordinal() + 1) % vals.length];
         }
     }
@@ -92,7 +92,7 @@ public class ExchangerTool extends GenericGadget {
         return super.canApplyAtEnchantingTable(stack, enchantment);
     }
 
-    public static void setFuzzy(ItemStack stack, boolean fuzzy) {
+    private static void setFuzzy(ItemStack stack, boolean fuzzy) {
         NBTTagCompound tagCompound = stack.getTagCompound();
         if (tagCompound == null) {
             tagCompound = new NBTTagCompound();
@@ -108,7 +108,7 @@ public class ExchangerTool extends GenericGadget {
         return tagCompound.getBoolean("fuzzy");
     }
 
-    public static void setToolMode(ItemStack stack, ExchangerTool.ToolMode mode) {
+    private static void setToolMode(ItemStack stack, ExchangerTool.ToolMode mode) {
         NBTTagCompound tagCompound = stack.getTagCompound();
         if (tagCompound == null) {
             tagCompound = new NBTTagCompound();
@@ -173,7 +173,7 @@ public class ExchangerTool extends GenericGadget {
         return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, itemstack);
     }
 
-    public void toggleMode(EntityPlayer player, ItemStack heldItem) {
+    public void toggleMode(EntityPlayer player, ItemStack heldItem) {//TODO unused
         ExchangerTool.ToolMode mode = getToolMode(heldItem);
         mode = mode.next();
         setToolMode(heldItem, mode);
@@ -204,7 +204,7 @@ public class ExchangerTool extends GenericGadget {
         player.sendStatusMessage(new TextComponentString(TextFormatting.DARK_AQUA + new TextComponentTranslation("message.gadget.toolrange").getUnformattedComponentText() + ": " + range), true);
     }
 
-    public boolean exchange(EntityPlayer player, ItemStack stack) {
+    private boolean exchange(EntityPlayer player, ItemStack stack) {
         World world = player.world;
         List<BlockPos> coords = getAnchor(stack);
 
@@ -249,7 +249,7 @@ public class ExchangerTool extends GenericGadget {
         return true;
     }
 
-    public boolean exchangeBlock(World world, EntityPlayer player, BlockPos pos, IBlockState setBlock) {
+    private boolean exchangeBlock(World world, EntityPlayer player, BlockPos pos, IBlockState setBlock) {
         IBlockState currentBlock = world.getBlockState(pos);
         ItemStack itemStack;
         boolean useConstructionPaste = false;

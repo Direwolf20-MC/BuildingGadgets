@@ -46,7 +46,7 @@ public interface ITemplate {
         return stack.getTagCompound().getInteger("copycounter");
     }
 
-    default void setCopyCounter(ItemStack stack, int counter) {
+    default void setCopyCounter(ItemStack stack, int counter) {//TODO unused
         NBTTagCompound tagCompound = stack.getTagCompound();
         tagCompound.setInteger("copycounter", counter);
         stack.setTagCompound(tagCompound);

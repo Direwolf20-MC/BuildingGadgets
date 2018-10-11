@@ -33,7 +33,7 @@ public class PasteToolBufferBuilder {
     private static Map<String, ToolDireBuffer> bufferMap = new HashMap<String, ToolDireBuffer>();
 
 
-    public static int getCopyCounter(String UUID) {
+    private static int getCopyCounter(String UUID) {
         if (tagMap.containsKey(UUID)) {
             return tagMap.get(UUID).getInteger("copycounter");
         }

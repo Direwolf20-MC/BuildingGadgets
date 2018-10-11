@@ -26,7 +26,7 @@ public class BlockBuildEntity extends Entity {
     private static final DataParameter<Boolean> usePaste = EntityDataManager.createKey(BlockBuildEntity.class, DataSerializers.BOOLEAN);
 
 
-    public int despawning = -1;
+    private int despawning = -1;
     public int maxLife = 20;
     private int mode;
     private IBlockState setBlock;

@@ -79,7 +79,7 @@ public class PacketTemplateManagerPaste implements IMessage {
                 TileEntity te = world.getTileEntity(pos);
                 if (!(te instanceof TemplateManagerTileEntity)) return;
                 TemplateManagerContainer container = ((TemplateManagerTileEntity) te).getContainer(player);
-                TemplateManagerCommands.PasteTemplate(container, player, newTag, message.templateName);
+                TemplateManagerCommands.pasteTemplate(container, player, newTag, message.templateName);
             } catch (Throwable t) {
                 System.out.println(t);
             }
