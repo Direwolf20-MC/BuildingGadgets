@@ -50,11 +50,11 @@ import static com.direwolf20.buildinggadgets.tools.GadgetUtils.withSuffix;
 
 public class CopyPasteTool extends GenericGadget implements ITemplate {
 
-    public enum toolModes {
+    public enum ToolMode {
         Copy, Paste;
-        private static toolModes[] vals = values();
+        private static ToolMode[] vals = values();
 
-        public toolModes next() {
+        public ToolMode next() {
             return vals[(this.ordinal() + 1) % vals.length];
         }
     }
@@ -166,7 +166,7 @@ public class CopyPasteTool extends GenericGadget implements ITemplate {
         return MapIntState;
     }
 
-    public static void setToolMode(ItemStack stack, toolModes mode) {
+    public static void setToolMode(ItemStack stack, ToolMode mode) {
         NBTTagCompound tagCompound = stack.getTagCompound();
         if (tagCompound == null) {
             tagCompound = new NBTTagCompound();
@@ -175,15 +175,15 @@ public class CopyPasteTool extends GenericGadget implements ITemplate {
         stack.setTagCompound(tagCompound);
     }
 
-    public static toolModes getToolMode(ItemStack stack) {
+    public static ToolMode getToolMode(ItemStack stack) {
         NBTTagCompound tagCompound = stack.getTagCompound();
-        toolModes mode = toolModes.Copy;
+        ToolMode mode = ToolMode.Copy;
         if (tagCompound == null) {
             setToolMode(stack, mode);
             return mode;
         }
         try {
-            mode = toolModes.valueOf(tagCompound.getString("mode"));
+            mode = ToolMode.valueOf(tagCompound.getString("mode"));
         } catch (Exception e) {
             setToolMode(stack, mode);
         }
@@ -202,7 +202,7 @@ public class CopyPasteTool extends GenericGadget implements ITemplate {
 
     public void setMode(EntityPlayer player, ItemStack heldItem, int modeInt) {
         //Called when we specify a mode with the radial menu
-        toolModes mode = toolModes.values()[modeInt];
+        ToolMode mode = ToolMode.values()[modeInt];
         setToolMode(heldItem, mode);
         player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.toolmode").getUnformattedComponentText() + ": " + mode.name()), true);
     }
@@ -212,7 +212,7 @@ public class CopyPasteTool extends GenericGadget implements ITemplate {
         ItemStack stack = player.getHeldItem(hand);
         player.setActiveHand(hand);
         if (!world.isRemote) {
-            if (getToolMode(stack) == toolModes.Copy) {
+            if (getToolMode(stack) == ToolMode.Copy) {
                 if (player.isSneaking()) {
                     if (getStartPos(stack) != null) {
                         copyBlocks(stack, player, world, getStartPos(stack), pos);
@@ -228,7 +228,7 @@ public class CopyPasteTool extends GenericGadget implements ITemplate {
                     }
                 }
 
-            } else if (getToolMode(stack) == toolModes.Paste) {
+            } else if (getToolMode(stack) == ToolMode.Paste) {
                 buildBlockMap(world, pos.up(), stack, player);
             }
             NBTTagCompound tagCompound = stack.getTagCompound();
@@ -245,7 +245,7 @@ public class CopyPasteTool extends GenericGadget implements ITemplate {
         ItemStack stack = player.getHeldItem(hand);
         player.setActiveHand(hand);
         if (!world.isRemote) {
-            if (getToolMode(stack) == toolModes.Copy) {
+            if (getToolMode(stack) == ToolMode.Copy) {
                 BlockPos pos = VectorTools.getPosLookingAt(player);
                 if (pos == null) {
                     //setStartPos(stack, null);
@@ -266,7 +266,7 @@ public class CopyPasteTool extends GenericGadget implements ITemplate {
                         setStartPos(stack, pos);
                     }
                 }
-            } else if (getToolMode(stack) == toolModes.Paste) {
+            } else if (getToolMode(stack) == ToolMode.Paste) {
                 if (getAnchor(stack) == null) {
                     BlockPos pos = VectorTools.getPosLookingAt(player);
                     if (pos == null) return new ActionResult<ItemStack>(EnumActionResult.FAIL, stack);
@@ -276,7 +276,7 @@ public class CopyPasteTool extends GenericGadget implements ITemplate {
                 }
             }
         } else {
-            if (getToolMode(stack) == toolModes.Copy) {
+            if (getToolMode(stack) == ToolMode.Copy) {
                 BlockPos pos = VectorTools.getPosLookingAt(player);
                 if (pos == null) {
                     if (player.isSneaking()) {
@@ -290,7 +290,7 @@ public class CopyPasteTool extends GenericGadget implements ITemplate {
     }
 
     public static void rotateBlocks(ItemStack stack, EntityPlayer player) {
-        if (!(getToolMode(stack) == toolModes.Paste)) return;
+        if (!(getToolMode(stack) == ToolMode.Paste)) return;
         if (player.world.isRemote) {
             return;
         }

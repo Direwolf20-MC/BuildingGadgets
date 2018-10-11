@@ -48,11 +48,11 @@ public class BuildingTool extends GenericGadget {
     private static final FakeBuilderWorld fakeWorld = new FakeBuilderWorld();
 
 
-    public enum toolModes {
+    public enum ToolMode {
         BuildToMe, VerticalColumn, HorizontalColumn, VerticalWall, HorizontalWall, Stairs, Checkerboard;
-        private static toolModes[] vals = values();
+        private static ToolMode[] vals = values();
 
-        public toolModes next() {
+        public ToolMode next() {
             return vals[(this.ordinal() + 1) % vals.length];
         }
     }
@@ -67,7 +67,7 @@ public class BuildingTool extends GenericGadget {
         }
     }
 
-    public static void setToolMode(ItemStack stack, toolModes mode) {
+    public static void setToolMode(ItemStack stack, ToolMode mode) {
         //Store the tool's mode in NBT as a string
         NBTTagCompound tagCompound = stack.getTagCompound();
         if (tagCompound == null) {
@@ -77,15 +77,15 @@ public class BuildingTool extends GenericGadget {
         stack.setTagCompound(tagCompound);
     }
 
-    public static toolModes getToolMode(ItemStack stack) {
+    public static ToolMode getToolMode(ItemStack stack) {
         NBTTagCompound tagCompound = stack.getTagCompound();
-        toolModes mode = toolModes.BuildToMe;
+        ToolMode mode = ToolMode.BuildToMe;
         if (tagCompound == null) {
             setToolMode(stack, mode);
             return mode;
         }
         try {
-            mode = toolModes.valueOf(tagCompound.getString("mode"));
+            mode = ToolMode.valueOf(tagCompound.getString("mode"));
         } catch (Exception e) {
             setToolMode(stack, mode);
         }
@@ -98,7 +98,7 @@ public class BuildingTool extends GenericGadget {
         super.addInformation(stack, world, list, b);
         list.add(TextFormatting.DARK_GREEN + I18n.format("tooltip.gadget.block") + ": " + getToolBlock(stack).getBlock().getLocalizedName());
         list.add(TextFormatting.AQUA + I18n.format("tooltip.gadget.mode") + ": " + getToolMode(stack));
-        if (getToolMode(stack) != toolModes.BuildToMe) {
+        if (getToolMode(stack) != ToolMode.BuildToMe) {
             list.add(TextFormatting.RED + I18n.format("tooltip.gadget.range") + ": " + getToolRange(stack));
         }
         if (Config.poweredByFE) {
@@ -143,7 +143,7 @@ public class BuildingTool extends GenericGadget {
 
     public void toggleMode(EntityPlayer player, ItemStack heldItem) {
         //Called when the mode toggle hotkey is pressed
-        toolModes mode = getToolMode(heldItem);
+        ToolMode mode = getToolMode(heldItem);
         mode = mode.next();
         setToolMode(heldItem, mode);
         player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.toolmode").getUnformattedComponentText() + ": " + mode.name()), true);
@@ -151,7 +151,7 @@ public class BuildingTool extends GenericGadget {
 
     public void setMode(EntityPlayer player, ItemStack heldItem, int modeInt) {
         //Called when we specify a mode with the radial menu
-        toolModes mode = toolModes.values()[modeInt];
+        ToolMode mode = ToolMode.values()[modeInt];
         setToolMode(heldItem, mode);
         player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.toolmode").getUnformattedComponentText() + ": " + mode.name()), true);
     }

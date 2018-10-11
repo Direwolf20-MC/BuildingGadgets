@@ -23,8 +23,8 @@ public class BuildingModes {
     }
 
     public static List<BlockPos> getBuildOrders(World world, EntityPlayer player, BlockPos startBlock, EnumFacing sideHit, ItemStack tool) {
-        //BuildingTool.toolModes mode, IBlockState setBlock
-        BuildingTool.toolModes mode = BuildingTool.getToolMode(tool);
+        //BuildingTool.ToolMode mode, IBlockState setBlock
+        BuildingTool.ToolMode mode = BuildingTool.getToolMode(tool);
         IBlockState setBlock = GadgetUtils.getToolBlock(tool);
         int range = GadgetUtils.getToolRange(tool);
         List<BlockPos> coordinates = new ArrayList<BlockPos>();
@@ -43,7 +43,7 @@ public class BuildingModes {
         //***************************************************
         //Build to me
         //***************************************************
-        if (mode == BuildingTool.toolModes.BuildToMe) {
+        if (mode == BuildingTool.ToolMode.BuildToMe) {
             if (sideHit == EnumFacing.SOUTH) {
                 for (int i = startBlock.getZ() + 1; i <= playerPos.getZ() - 1; i++) {
                     pos = new BlockPos(startBlock.getX(), startBlock.getY(), i);
@@ -91,7 +91,7 @@ public class BuildingModes {
         //***************************************************
         //VerticalWall
         //***************************************************
-        else if (mode == BuildingTool.toolModes.VerticalWall) {
+        else if (mode == BuildingTool.ToolMode.VerticalWall) {
             if (sideHit == EnumFacing.UP) {
                 for (int y = 1; y <= range; y++) {
                     for (int x = boundX * -1; x <= boundX; x++) {
@@ -130,7 +130,7 @@ public class BuildingModes {
         //***************************************************
         //VerticalColumn
         //***************************************************
-        else if (mode == BuildingTool.toolModes.VerticalColumn) {
+        else if (mode == BuildingTool.ToolMode.VerticalColumn) {
             if (sideHit == EnumFacing.UP) {
                 for (int y = 1; y <= range; y++) {
                     pos = new BlockPos(startBlock.getX(), startBlock.getY() + y, startBlock.getZ());
@@ -157,7 +157,7 @@ public class BuildingModes {
         //***************************************************
         //HorizontalColumn
         //***************************************************
-        else if (mode == BuildingTool.toolModes.HorizontalColumn) {
+        else if (mode == BuildingTool.ToolMode.HorizontalColumn) {
             if (sideHit == EnumFacing.UP || sideHit == EnumFacing.DOWN) {
                 sideHit = playerFacing.getOpposite();
             }
@@ -194,7 +194,7 @@ public class BuildingModes {
         //***************************************************
         //HorizontalWall
         //***************************************************
-        else if (mode == BuildingTool.toolModes.HorizontalWall) {
+        else if (mode == BuildingTool.ToolMode.HorizontalWall) {
             /*if (sideHit == EnumFacing.UP || sideHit == EnumFacing.DOWN) {
                 sideHit = playerFacing.getOpposite();
             }*/
@@ -248,7 +248,7 @@ public class BuildingModes {
         //***************************************************
         //Stairs
         //***************************************************
-        else if (mode == BuildingTool.toolModes.Stairs) {
+        else if (mode == BuildingTool.ToolMode.Stairs) {
             if (sideHit == EnumFacing.UP || sideHit == EnumFacing.DOWN) {
                 sideHit = playerFacing.getOpposite();
             }
@@ -309,7 +309,7 @@ public class BuildingModes {
         //***************************************************
         //Checkerboard
         //***************************************************
-        else if (mode == BuildingTool.toolModes.Checkerboard) {
+        else if (mode == BuildingTool.ToolMode.Checkerboard) {
             range++;
             for (int x = range * -7 / 5; x <= range * 7 / 5; x++) {
                 for (int z = range * -7 / 5; z <= range * 7 / 5; z++) {

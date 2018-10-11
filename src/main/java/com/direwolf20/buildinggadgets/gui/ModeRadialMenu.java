@@ -69,13 +69,13 @@ public class ModeRadialMenu extends GuiScreen {
             return;
         itemStack = stack;
         if (stack.getItem() instanceof BuildingTool) {
-            for (int i = 0; i < BuildingTool.toolModes.values().length; i++)
+            for (int i = 0; i < BuildingTool.ToolMode.values().length; i++)
                 slots.add(i);
         } else if (stack.getItem() instanceof ExchangerTool) {
-            for (int i = 0; i < ExchangerTool.toolModes.values().length; i++)
+            for (int i = 0; i < ExchangerTool.ToolMode.values().length; i++)
                 slots.add(i);
         } else if (stack.getItem() instanceof CopyPasteTool) {
-            for (int i = 0; i < CopyPasteTool.toolModes.values().length; i++)
+            for (int i = 0; i < CopyPasteTool.ToolMode.values().length; i++)
                 slots.add(i);
         }
     }
@@ -169,13 +169,13 @@ public class ModeRadialMenu extends GuiScreen {
 
             String name = "";
             if (tool.getItem() instanceof BuildingTool) {
-                BuildingTool.toolModes mode = BuildingTool.toolModes.values()[slot];
+                BuildingTool.ToolMode mode = BuildingTool.ToolMode.values()[slot];
                 name = "\u00a7" + c + mode.name();
             } else if (tool.getItem() instanceof ExchangerTool) {
-                ExchangerTool.toolModes mode = ExchangerTool.toolModes.values()[slot];
+                ExchangerTool.ToolMode mode = ExchangerTool.ToolMode.values()[slot];
                 name = "\u00a7" + c + mode.name();
             } else if (tool.getItem() instanceof CopyPasteTool) {
-                CopyPasteTool.toolModes mode = CopyPasteTool.toolModes.values()[slot];
+                CopyPasteTool.ToolMode mode = CopyPasteTool.ToolMode.values()[slot];
                 name = "\u00a7" + c + mode.name();
             }
 

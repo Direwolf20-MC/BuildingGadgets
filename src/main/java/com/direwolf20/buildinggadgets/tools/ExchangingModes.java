@@ -53,7 +53,7 @@ public class ExchangingModes {
 
     public static List<BlockPos> getBuildOrders(World world, EntityPlayer player, BlockPos startBlock, EnumFacing sideHit, ItemStack tool) {
 
-        ExchangerTool.toolModes mode = ExchangerTool.getToolMode(tool);
+        ExchangerTool.ToolMode mode = ExchangerTool.getToolMode(tool);
         IBlockState setBlock = GadgetUtils.getToolBlock(tool);
         int range = GadgetUtils.getToolRange(tool);
         Boolean fuzzyMode = ExchangerTool.getFuzzy(tool);
@@ -84,7 +84,7 @@ public class ExchangingModes {
         //***************************************************
         //VerticalWall
         //***************************************************
-        if (mode == ExchangerTool.toolModes.Wall) {
+        if (mode == ExchangerTool.ToolMode.Wall) {
             if (sideHit == EnumFacing.UP || sideHit == EnumFacing.DOWN) {
                 for (int x = bound * -1; x <= bound; x++) {
                     for (int z = bound * -1; z <= bound; z++) {
@@ -111,7 +111,7 @@ public class ExchangingModes {
         //***************************************************
         //VerticalColumn
         //***************************************************
-        if (mode == ExchangerTool.toolModes.VerticalColumn) {
+        if (mode == ExchangerTool.ToolMode.VerticalColumn) {
             if (sideHit == EnumFacing.UP || sideHit == EnumFacing.DOWN) {
                 for (int x = boundZ * -1; x <= boundZ; x++) {
                     for (int z = boundX * -1; z <= boundX; z++) {
@@ -133,7 +133,7 @@ public class ExchangingModes {
         //***************************************************
         //HorizontalColumn
         //***************************************************
-        if (mode == ExchangerTool.toolModes.HorizontalColumn) {
+        if (mode == ExchangerTool.ToolMode.HorizontalColumn) {
             if (sideHit == EnumFacing.UP || sideHit == EnumFacing.DOWN) {
                 for (int x = boundX * -1; x <= boundX; x++) {
                     for (int z = boundZ * -1; z <= boundZ; z++) {
@@ -162,7 +162,7 @@ public class ExchangingModes {
         //***************************************************
         //TorchPlacer
         //***************************************************
-        else if (mode == ExchangerTool.toolModes.Checkerboard) {
+        else if (mode == ExchangerTool.ToolMode.Checkerboard) {
             range++;
             for (int x = range * -7 / 5; x <= range * 7 / 5; x++) {
                 for (int z = range * -7 / 5; z <= range * 7 / 5; z++) {

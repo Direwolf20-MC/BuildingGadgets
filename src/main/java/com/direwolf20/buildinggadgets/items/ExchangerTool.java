@@ -47,11 +47,11 @@ import static com.direwolf20.buildinggadgets.tools.GadgetUtils.*;
 public class ExchangerTool extends GenericGadget {
     private static final FakeBuilderWorld fakeWorld = new FakeBuilderWorld();
 
-    public enum toolModes {
+    public enum ToolMode {
         Wall, VerticalColumn, HorizontalColumn, Checkerboard;
-        private static ExchangerTool.toolModes[] vals = values();
+        private static ExchangerTool.ToolMode[] vals = values();
 
-        public ExchangerTool.toolModes next() {
+        public ExchangerTool.ToolMode next() {
             return vals[(this.ordinal() + 1) % vals.length];
         }
     }
@@ -109,7 +109,7 @@ public class ExchangerTool extends GenericGadget {
         return tagCompound.getBoolean("fuzzy");
     }
 
-    public static void setToolMode(ItemStack stack, ExchangerTool.toolModes mode) {
+    public static void setToolMode(ItemStack stack, ExchangerTool.ToolMode mode) {
         NBTTagCompound tagCompound = stack.getTagCompound();
         if (tagCompound == null) {
             tagCompound = new NBTTagCompound();
@@ -118,15 +118,15 @@ public class ExchangerTool extends GenericGadget {
         stack.setTagCompound(tagCompound);
     }
 
-    public static ExchangerTool.toolModes getToolMode(ItemStack stack) {
+    public static ExchangerTool.ToolMode getToolMode(ItemStack stack) {
         NBTTagCompound tagCompound = stack.getTagCompound();
-        toolModes mode = toolModes.Wall;
+        ToolMode mode = ToolMode.Wall;
         if (tagCompound == null) {
             setToolMode(stack, mode);
             return mode;
         }
         try {
-            mode = toolModes.valueOf(tagCompound.getString("mode"));
+            mode = ToolMode.valueOf(tagCompound.getString("mode"));
         } catch (Exception e) {
             setToolMode(stack, mode);
         }
@@ -175,7 +175,7 @@ public class ExchangerTool extends GenericGadget {
     }
 
     public void toggleMode(EntityPlayer player, ItemStack heldItem) {
-        ExchangerTool.toolModes mode = getToolMode(heldItem);
+        ExchangerTool.ToolMode mode = getToolMode(heldItem);
         mode = mode.next();
         setToolMode(heldItem, mode);
         player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.toolmode").getUnformattedComponentText() + ": " + mode.name()), true);
@@ -183,7 +183,7 @@ public class ExchangerTool extends GenericGadget {
 
     public void setMode(EntityPlayer player, ItemStack heldItem, int modeInt) {
         //Called when we specify a mode with the radial menu
-        toolModes mode = toolModes.values()[modeInt];
+        ToolMode mode = ToolMode.values()[modeInt];
         setToolMode(heldItem, mode);
         player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.toolmode").getUnformattedComponentText() + ": " + mode.name()), true);
     }
@@ -195,7 +195,7 @@ public class ExchangerTool extends GenericGadget {
 
     public void rangeChange(EntityPlayer player, ItemStack heldItem) {
         int range = getToolRange(heldItem);
-        int changeAmount = (getToolMode(heldItem) == toolModes.Checkerboard || (range % 2 == 0)) ? 1 : 2;
+        int changeAmount = (getToolMode(heldItem) == ToolMode.Checkerboard || (range % 2 == 0)) ? 1 : 2;
         if (player.isSneaking()) {
             range = (range <= 1) ? Config.maxRange : range - changeAmount;
         } else {

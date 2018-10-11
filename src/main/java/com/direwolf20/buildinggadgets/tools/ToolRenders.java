@@ -168,7 +168,7 @@ public class ToolRenders {
 
     public static void renderExchangerOverlay(RenderWorldLastEvent evt, EntityPlayer player, ItemStack stack) {
         int range = getToolRange(stack);
-        ExchangerTool.toolModes mode = ExchangerTool.getToolMode(stack);
+        ExchangerTool.ToolMode mode = ExchangerTool.getToolMode(stack);
         RayTraceResult lookingAt = VectorTools.getLookingAt(player);
         IBlockState state = Blocks.AIR.getDefaultState();
         List<BlockPos> coordinates = getAnchor(stack);
@@ -301,7 +301,7 @@ public class ToolRenders {
     public static void renderPasteOverlay(RenderWorldLastEvent evt, EntityPlayer player, ItemStack stack) {
         String UUID = ModItems.copyPasteTool.getUUID(stack);
         World world = player.world;
-        if (CopyPasteTool.getToolMode(stack) == CopyPasteTool.toolModes.Paste) {
+        if (CopyPasteTool.getToolMode(stack) == CopyPasteTool.ToolMode.Paste) {
             //First check if we have an anchor, if not check if we're looking at a block, if not, exit
             BlockPos startPos = CopyPasteTool.getAnchor(stack);
             if (startPos == null) {
