@@ -2,14 +2,14 @@ package com.direwolf20.buildinggadgets.tools;
 
 import net.minecraft.util.math.BlockPos;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public class UndoState {
 
     public final int dimension;
-    public final ArrayList<BlockPos> coordinates;
+    public final List<BlockPos> coordinates;
 
-    public UndoState(int dim, ArrayList<BlockPos> coords) {
+    public UndoState(int dim, List<BlockPos> coords) {
         dimension = dim;
         coordinates = coords;
     }

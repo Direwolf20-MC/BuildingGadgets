@@ -171,7 +171,7 @@ public class BuildingTool extends GenericGadget {
     public boolean build(EntityPlayer player, ItemStack stack) {
         //Build the blocks as shown in the visual render
         World world = player.world;
-        ArrayList<BlockPos> coords = getAnchor(stack);
+        List<BlockPos> coords = getAnchor(stack);
 
         if (coords.size() == 0) {  //If we don't have an anchor, build in the current spot
             RayTraceResult lookingAt = VectorTools.getLookingAt(player);
@@ -184,7 +184,7 @@ public class BuildingTool extends GenericGadget {
         } else { //If we do have an anchor, erase it (Even if the build fails)
             setAnchor(stack, new ArrayList<BlockPos>());
         }
-        ArrayList<BlockPos> undoCoords = new ArrayList<BlockPos>();
+        List<BlockPos> undoCoords = new ArrayList<BlockPos>();
         Set<BlockPos> coordinates = new HashSet<BlockPos>(coords);
         ItemStack heldItem = player.getHeldItemMainhand();
         if (!(heldItem.getItem() instanceof BuildingTool)) {
@@ -237,9 +237,9 @@ public class BuildingTool extends GenericGadget {
         World world = player.world;
         if (!world.isRemote) {
             IBlockState currentBlock = Blocks.AIR.getDefaultState();
-            ArrayList<BlockPos> undoCoords = undoState.coordinates; //Get the Coords to undo
+            List<BlockPos> undoCoords = undoState.coordinates; //Get the Coords to undo
             int dimension = undoState.dimension; //Get the Dimension to undo
-            ArrayList<BlockPos> failedRemovals = new ArrayList<BlockPos>(); //Build a list of removals that fail
+            List<BlockPos> failedRemovals = new ArrayList<BlockPos>(); //Build a list of removals that fail
             ItemStack silkTool = heldItem.copy(); //Setup a Silk Touch version of the tool so we can return stone instead of cobblestone, etc.
             silkTool.addEnchantment(Enchantments.SILK_TOUCH, 1);
             for (BlockPos coord : undoCoords) {

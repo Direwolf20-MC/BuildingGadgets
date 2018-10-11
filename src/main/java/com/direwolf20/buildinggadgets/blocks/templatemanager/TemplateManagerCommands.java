@@ -23,8 +23,8 @@ import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -180,7 +180,7 @@ public class TemplateManagerCommands {
 
         Map<UniqueItem, Integer> itemCountMap = new HashMap<UniqueItem, Integer>();
         Map<IBlockState, UniqueItem> IntStackMap = MapIntState.IntStackMap;
-        ArrayList<BlockMap> blockMapList = CopyPasteTool.getBlockMapList(templateTagCompound);
+        List<BlockMap> blockMapList = CopyPasteTool.getBlockMapList(templateTagCompound);
         for (BlockMap blockMap : blockMapList) {
             UniqueItem uniqueItem = IntStackMap.get(blockMap.state);
             NonNullList<ItemStack> drops = NonNullList.create();

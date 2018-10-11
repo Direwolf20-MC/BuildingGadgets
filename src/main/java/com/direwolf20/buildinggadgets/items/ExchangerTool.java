@@ -207,7 +207,7 @@ public class ExchangerTool extends GenericGadget {
 
     public boolean exchange(EntityPlayer player, ItemStack stack) {
         World world = player.world;
-        ArrayList<BlockPos> coords = getAnchor(stack);
+        List<BlockPos> coords = getAnchor(stack);
 
         if (coords.size() == 0) { //If we don't have an anchor, build in the current spot
             RayTraceResult lookingAt = VectorTools.getLookingAt(player);

@@ -7,6 +7,7 @@ import net.minecraftforge.common.config.ConfigCategory;
 import net.minecraftforge.common.config.Configuration;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class BlacklistBlocks {
     protected static ArrayList<String> blacklistedBlocks = new ArrayList<String>();
@@ -19,7 +20,7 @@ public class BlacklistBlocks {
         blacklistedBlocks.add(name);
     }
 
-    public static void setConfig(Configuration cfg, ArrayList<String> blacklist) {
+    public static void setConfig(Configuration cfg, List<String> blacklist) {
         String[] tempArray = new String[blacklist.size()];
         blacklist.toArray(tempArray);
         cfg.get(Config.CATEGORY_BLACKLIST, "Blacklist", tempArray);

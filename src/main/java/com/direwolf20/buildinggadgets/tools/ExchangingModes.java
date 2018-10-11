@@ -13,6 +13,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class ExchangingModes {
     private static boolean isReplaceable(World world, BlockPos pos, IBlockState currentBlock, IBlockState setBlock, EntityPlayer player, boolean fuzzyMode) {
@@ -50,14 +51,14 @@ public class ExchangingModes {
         return true;
     }
 
-    public static ArrayList<BlockPos> getBuildOrders(World world, EntityPlayer player, BlockPos startBlock, EnumFacing sideHit, ItemStack tool) {
+    public static List<BlockPos> getBuildOrders(World world, EntityPlayer player, BlockPos startBlock, EnumFacing sideHit, ItemStack tool) {
 
         ExchangerTool.toolModes mode = ExchangerTool.getToolMode(tool);
         IBlockState setBlock = GadgetUtils.getToolBlock(tool);
         int range = GadgetUtils.getToolRange(tool);
         Boolean fuzzyMode = ExchangerTool.getFuzzy(tool);
 
-        ArrayList<BlockPos> coordinates = new ArrayList<BlockPos>();
+        List<BlockPos> coordinates = new ArrayList<BlockPos>();
         BlockPos playerPos = new BlockPos(Math.floor(player.posX), Math.floor(player.posY), Math.floor(player.posZ));
         BlockPos pos = startBlock;
         int bound = (range - 1) / 2;

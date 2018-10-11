@@ -24,6 +24,7 @@ import net.minecraftforge.energy.IEnergyStorage;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Nullable;
@@ -88,7 +89,7 @@ public class GadgetUtils {
     public static UndoState NBTToUndoState(NBTTagCompound compound) {
         //Convert an integer list stored in NBT into UndoState
         int dim = compound.getInteger("dim");
-        ArrayList<BlockPos> coordinates = new ArrayList<BlockPos>();
+        List<BlockPos> coordinates = new ArrayList<BlockPos>();
         int[] array = compound.getIntArray("undoIntCoords");
         BlockPos startBlock = NBTUtil.getPosFromTag(compound.getCompoundTag("startBlock"));
         for (int i = 0; i <= array.length - 1; i++) {
@@ -102,7 +103,7 @@ public class GadgetUtils {
         return undoState;
     }
 
-    public static void setAnchor(ItemStack stack, ArrayList<BlockPos> coordinates) {
+    public static void setAnchor(ItemStack stack, List<BlockPos> coordinates) {
         //Store 1 set of BlockPos in NBT to anchor the Ghost Blocks in the world when the anchor key is pressed
         NBTTagCompound tagCompound = stack.getTagCompound();
         NBTTagList coords = new NBTTagList();
@@ -116,10 +117,10 @@ public class GadgetUtils {
         stack.setTagCompound(tagCompound);
     }
 
-    public static ArrayList<BlockPos> getAnchor(ItemStack stack) {
+    public static List<BlockPos> getAnchor(ItemStack stack) {
         //Return the list of coordinates in the NBT Tag for anchor Coordinates
         NBTTagCompound tagCompound = stack.getTagCompound();
-        ArrayList<BlockPos> coordinates = new ArrayList<BlockPos>();
+        List<BlockPos> coordinates = new ArrayList<BlockPos>();
         if (tagCompound == null) {
             setAnchor(stack, coordinates);
             tagCompound = stack.getTagCompound();
@@ -251,7 +252,7 @@ public class GadgetUtils {
     public static boolean anchorBlocks(EntityPlayer player, ItemStack stack) {
         //Stores the current visual blocks in NBT on the tool, so the player can look around without moving the visual render
         World world = player.world;
-        ArrayList<BlockPos> currentCoords = getAnchor(stack);
+        List<BlockPos> currentCoords = getAnchor(stack);
         if (currentCoords.size() == 0) {  //If we don't have an anchor, find the block we're supposed to anchor to
             RayTraceResult lookingAt = VectorTools.getLookingAt(player);
             if (lookingAt == null) {  //If we aren't looking at anything, exit
@@ -262,7 +263,7 @@ public class GadgetUtils {
             if (startBlock == null || world.getBlockState(startBlock) == Blocks.AIR.getDefaultState()) { //If we are looking at air, exit
                 return false;
             }
-            ArrayList<BlockPos> coords = new ArrayList<BlockPos>();
+            List<BlockPos> coords = new ArrayList<BlockPos>();
             if (stack.getItem() instanceof BuildingTool) {
                 coords = BuildingModes.getBuildOrders(world, player, startBlock, sideHit, stack); //Build the positions list based on tool mode and range
             } else if (stack.getItem() instanceof ExchangerTool) {

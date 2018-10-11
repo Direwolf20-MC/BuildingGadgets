@@ -122,12 +122,12 @@ public class CopyPasteTool extends GenericGadget implements ITemplate {
         return GadgetUtils.getDIMFromNBT(stack, "lastBuild");
     }
 
-    public static ArrayList<BlockMap> getBlockMapList(@Nullable NBTTagCompound tagCompound) {
+    public static List<BlockMap> getBlockMapList(@Nullable NBTTagCompound tagCompound) {
         return getBlockMapList(tagCompound, GadgetUtils.getPOSFromNBT(tagCompound, "startPos"));
     }
 
-    public static ArrayList<BlockMap> getBlockMapList(@Nullable NBTTagCompound tagCompound, BlockPos startBlock) {
-        ArrayList<BlockMap> blockMap = new ArrayList<BlockMap>();
+    public static List<BlockMap> getBlockMapList(@Nullable NBTTagCompound tagCompound, BlockPos startBlock) {
+        List<BlockMap> blockMap = new ArrayList<BlockMap>();
         if (tagCompound == null) {
             tagCompound = new NBTTagCompound();
         }
@@ -295,13 +295,13 @@ public class CopyPasteTool extends GenericGadget implements ITemplate {
             return;
         }
         CopyPasteTool tool = ModItems.copyPasteTool;
-        ArrayList<BlockMap> blockMapList = new ArrayList<BlockMap>();
+        List<BlockMap> blockMapList = new ArrayList<BlockMap>();
         WorldSave worldSave = WorldSave.getWorldSave(player.world);
         NBTTagCompound tagCompound = worldSave.getCompoundFromUUID(tool.getUUID(stack));
         BlockPos startPos = tool.getStartPos(stack);
         blockMapList = getBlockMapList(tagCompound);
-        ArrayList<Integer> posIntArrayList = new ArrayList<Integer>();
-        ArrayList<Integer> stateIntArrayList = new ArrayList<Integer>();
+        List<Integer> posIntArrayList = new ArrayList<Integer>();
+        List<Integer> stateIntArrayList = new ArrayList<Integer>();
         BlockMapIntState blockMapIntState = new BlockMapIntState();
 
         for (BlockMap blockMap : blockMapList) {
@@ -370,8 +370,8 @@ public class CopyPasteTool extends GenericGadget implements ITemplate {
         int iEndZ = startZ < endZ ? endZ : startZ;
         WorldSave worldSave = WorldSave.getWorldSave(world);
         NBTTagCompound tagCompound = new NBTTagCompound();
-        ArrayList<Integer> posIntArrayList = new ArrayList<Integer>();
-        ArrayList<Integer> stateIntArrayList = new ArrayList<Integer>();
+        List<Integer> posIntArrayList = new ArrayList<Integer>();
+        List<Integer> stateIntArrayList = new ArrayList<Integer>();
         BlockMapIntState blockMapIntState = new BlockMapIntState();
         Map<UniqueItem, Integer> itemCountMap = new HashMap<UniqueItem, Integer>();
 
@@ -452,7 +452,7 @@ public class CopyPasteTool extends GenericGadget implements ITemplate {
     public void buildBlockMap(World world, BlockPos startPos, ItemStack stack, EntityPlayer player) {
         long time = System.nanoTime();
         BlockPos anchorPos = getAnchor(stack);
-        ArrayList<BlockMap> blockMapList = new ArrayList<BlockMap>();
+        List<BlockMap> blockMapList = new ArrayList<BlockMap>();
         WorldSave worldSave = WorldSave.getWorldSave(world);
         NBTTagCompound tagCompound = worldSave.getCompoundFromUUID(getUUID(stack));
         Map<IBlockState, UniqueItem> IntStackMap = getBlockMapIntState(tagCompound).getIntStackMap();
@@ -569,7 +569,7 @@ public class CopyPasteTool extends GenericGadget implements ITemplate {
         Integer dimension = getLastBuildDim(heldItem);
         ItemStack silkTool = heldItem.copy(); //Setup a Silk Touch version of the tool so we can return stone instead of cobblestone, etc.
         silkTool.addEnchantment(Enchantments.SILK_TOUCH, 1);
-        ArrayList<BlockMap> blockMapList = getBlockMapList(tagCompound, startPos);
+        List<BlockMap> blockMapList = getBlockMapList(tagCompound, startPos);
         boolean success = true;
         for (BlockMap blockMap : blockMapList) {
             double distance = blockMap.pos.getDistance(player.getPosition().getX(), player.getPosition().getY(), player.getPosition().getZ());

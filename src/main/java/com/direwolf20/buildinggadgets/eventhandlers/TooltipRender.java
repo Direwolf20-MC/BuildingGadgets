@@ -204,7 +204,7 @@ public class TooltipRender {
     public static Map<UniqueItem, Integer> makeRequiredList(String UUID) {
         Map<UniqueItem, Integer> itemCountMap = new HashMap<UniqueItem, Integer>();
         Map<IBlockState, UniqueItem> IntStackMap = CopyPasteTool.getBlockMapIntState(PasteToolBufferBuilder.getTagFromUUID(UUID)).getIntStackMap();
-        ArrayList<BlockMap> blockMapList = CopyPasteTool.getBlockMapList(PasteToolBufferBuilder.getTagFromUUID(UUID));
+        List<BlockMap> blockMapList = CopyPasteTool.getBlockMapList(PasteToolBufferBuilder.getTagFromUUID(UUID));
         for (BlockMap blockMap : blockMapList) {
             UniqueItem uniqueItem = IntStackMap.get(blockMap.state);
             NonNullList<ItemStack> drops = NonNullList.create();

@@ -20,7 +20,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.opengl.GL11;
 
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -68,7 +67,7 @@ public class PasteToolBufferBuilder {
 
     public static void addMapToBuffer(String UUID) {
         long time = System.nanoTime();
-        ArrayList<BlockMap> blockMapList = CopyPasteTool.getBlockMapList(tagMap.get(UUID));
+        List<BlockMap> blockMapList = CopyPasteTool.getBlockMapList(tagMap.get(UUID));
         BlockRendererDispatcher dispatcher = Minecraft.getMinecraft().getBlockRendererDispatcher();
         ToolDireBuffer bufferBuilder = new ToolDireBuffer(2097152);
         bufferBuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);

@@ -33,8 +33,8 @@ import net.minecraftforge.energy.CapabilityEnergy;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL14;
 
-import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import static com.direwolf20.buildinggadgets.tools.GadgetUtils.*;
@@ -46,7 +46,7 @@ public class ToolRenders {
     public static void renderBuilderOverlay(RenderWorldLastEvent evt, EntityPlayer player, ItemStack stack) {
         RayTraceResult lookingAt = VectorTools.getLookingAt(player);
         IBlockState state = Blocks.AIR.getDefaultState();
-        ArrayList<BlockPos> coordinates = getAnchor(stack);
+        List<BlockPos> coordinates = getAnchor(stack);
         if (lookingAt != null || coordinates.size() > 0) {
             World world = player.world;
             IBlockState startBlock = Blocks.AIR.getDefaultState();
@@ -113,7 +113,7 @@ public class ToolRenders {
                 //This blend function allows you to use a constant alpha, which is defined later
                 GlStateManager.blendFunc(GL11.GL_CONSTANT_ALPHA, GL11.GL_ONE_MINUS_CONSTANT_ALPHA);
 
-                ArrayList<BlockPos> sortedCoordinates = BuildingModes.sortByDistance(coordinates, player); //Sort the coords by distance to player.
+                List<BlockPos> sortedCoordinates = BuildingModes.sortByDistance(coordinates, player); //Sort the coords by distance to player.
 
                 for (BlockPos coordinate : sortedCoordinates) {
                     GlStateManager.pushMatrix();//Push matrix again just because
@@ -171,7 +171,7 @@ public class ToolRenders {
         ExchangerTool.toolModes mode = ExchangerTool.getToolMode(stack);
         RayTraceResult lookingAt = VectorTools.getLookingAt(player);
         IBlockState state = Blocks.AIR.getDefaultState();
-        ArrayList<BlockPos> coordinates = getAnchor(stack);
+        List<BlockPos> coordinates = getAnchor(stack);
         if (lookingAt != null || coordinates.size() > 0) {
             World world = player.world;
             IBlockState startBlock = Blocks.AIR.getDefaultState();
@@ -239,7 +239,7 @@ public class ToolRenders {
                 //This blend function allows you to use a constant alpha, which is defined later
                 GlStateManager.blendFunc(GL11.GL_CONSTANT_ALPHA, GL11.GL_ONE_MINUS_CONSTANT_ALPHA);
 
-                //ArrayList<BlockPos> sortedCoordinates = ExchangingModes.sortByDistance(coordinates, player); //Sort the coords by distance to player.
+                //List<BlockPos> sortedCoordinates = ExchangingModes.sortByDistance(coordinates, player); //Sort the coords by distance to player.
 
                 for (BlockPos coordinate : coordinates) {
                     GlStateManager.pushMatrix();//Push matrix again just because
@@ -316,7 +316,7 @@ public class ToolRenders {
                 return;
             }
             //Also get the blockMapList from the local cache - If either the buffer or the blockmap list are empty, exit.
-            ArrayList<BlockMap> blockMapList = CopyPasteTool.getBlockMapList(PasteToolBufferBuilder.getTagFromUUID(UUID));
+            List<BlockMap> blockMapList = CopyPasteTool.getBlockMapList(PasteToolBufferBuilder.getTagFromUUID(UUID));
             if (toolDireBuffer.getVertexCount() == 0 || blockMapList.size() == 0) {
                 return;
             }
@@ -371,7 +371,7 @@ public class ToolRenders {
                 return;
             }
 
-            ArrayList<BlockMap> blockMapList = CopyPasteTool.getBlockMapList(PasteToolBufferBuilder.getTagFromUUID(UUID));
+            List<BlockMap> blockMapList = CopyPasteTool.getBlockMapList(PasteToolBufferBuilder.getTagFromUUID(UUID));
             if (blockMapList.size() == 0) {
                 //return;
             }
