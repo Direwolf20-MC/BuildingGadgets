@@ -41,6 +41,7 @@ public class ClientProxy extends CommonProxy {
 
     @Override
     public void init() {
+        super.init();
         MinecraftForge.EVENT_BUS.register(new KeyInputHandler());
         MinecraftForge.EVENT_BUS.register(new ClientTickEvent());
         KeyBindings.init();
