@@ -125,7 +125,7 @@ public class TooltipRender {
             for (String s : tooltip) {
                 if (s.trim().equals("\u00a77\u00a7r\u00a7r\u00a7r\u00a7r\u00a7r"))
                     break;
-                else by += 10;
+                by += 10;
             }
 
             GlStateManager.enableBlend();

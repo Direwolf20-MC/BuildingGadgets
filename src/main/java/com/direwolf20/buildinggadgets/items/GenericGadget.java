@@ -30,9 +30,8 @@ public class GenericGadget extends Item {
     public ICapabilityProvider initCapabilities(ItemStack stack, @Nullable NBTTagCompound tag) {
         if (Config.poweredByFE) {
             return new CapabilityProviderEnergy(stack, Config.energyMax);
-        } else {
-            return null;
         }
+        return null;
     }
 
     @Override
@@ -50,10 +49,9 @@ public class GenericGadget extends Item {
         if (Config.poweredByFE) {
             IEnergyStorage energy = stack.getCapability(CapabilityEnergy.ENERGY, null);
             return 1D - ((double) energy.getEnergyStored() / (double) energy.getMaxEnergyStored());
-        } else {
-            //return (double)stack.getItemDamage() / (double)stack.getMaxDamage();
-            return super.getDurabilityForDisplay(stack);
         }
+        //return (double)stack.getItemDamage() / (double)stack.getMaxDamage();
+        return super.getDurabilityForDisplay(stack);
     }
 
     @Override
@@ -61,10 +59,9 @@ public class GenericGadget extends Item {
         if (Config.poweredByFE) {
             IEnergyStorage energy = stack.getCapability(CapabilityEnergy.ENERGY, null);
             return MathHelper.hsvToRGB(Math.max(0.0F, (float) energy.getEnergyStored() / (float) energy.getMaxEnergyStored()) / 3.0F, 1.0F, 1.0F);
-        } else {
-            //return MathHelper.hsvToRGB(Math.max(0.0F, (float) (1.0F - getDurabilityForDisplay(stack))) / 3.0F, 1.0F, 1.0F);
-            return super.getRGBDurabilityForDisplay(stack);
         }
+        //return MathHelper.hsvToRGB(Math.max(0.0F, (float) (1.0F - getDurabilityForDisplay(stack))) / 3.0F, 1.0F, 1.0F);
+        return super.getRGBDurabilityForDisplay(stack);
     }
 
     @Override
@@ -72,10 +69,9 @@ public class GenericGadget extends Item {
         if (Config.poweredByFE) {
             IEnergyStorage energy = stack.getCapability(CapabilityEnergy.ENERGY, null);
             return energy.getEnergyStored() != energy.getMaxEnergyStored();
-        } else {
-            //return (stack.getItemDamage() > 0);
-            return super.isDamaged(stack);
         }
+        //return (stack.getItemDamage() > 0);
+        return super.isDamaged(stack);
     }
 
     @Override
@@ -83,20 +79,18 @@ public class GenericGadget extends Item {
         if (Config.poweredByFE) {
             IEnergyStorage energy = stack.getCapability(CapabilityEnergy.ENERGY, null);
             return energy.getEnergyStored() != energy.getMaxEnergyStored();
-        } else {
-            //return stack.isItemDamaged();
-            return super.showDurabilityBar(stack);
         }
+        //return stack.isItemDamaged();
+        return super.showDurabilityBar(stack);
     }
 
     @Override
     public boolean getIsRepairable(ItemStack toRepair, ItemStack repair) {
         if (Config.poweredByFE) {
             return false;
-        } else {
-            if (repair.getItem() == Items.DIAMOND) {
-                return true;
-            }
+        }
+        if (repair.getItem() == Items.DIAMOND) {
+            return true;
         }
         return false;
     }

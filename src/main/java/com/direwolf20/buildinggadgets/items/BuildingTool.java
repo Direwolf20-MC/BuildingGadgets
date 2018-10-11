@@ -311,10 +311,9 @@ public class BuildingTool extends GenericGadget {
             //if (InventoryManipulation.countItem(constructionStack, player) == 0) {
             if (InventoryManipulation.countPaste(player) < neededItems) {
                 return false;
-            } else {
-                itemStack = constructionPaste.copy();
-                useConstructionPaste = true;
             }
+            itemStack = constructionPaste.copy();
+            useConstructionPaste = true;
         }
         if (Config.poweredByFE) {
             if (!useEnergy(heldItem, Config.energyCostBuilder, player)) {

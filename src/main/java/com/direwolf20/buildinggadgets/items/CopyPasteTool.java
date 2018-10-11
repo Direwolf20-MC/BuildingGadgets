@@ -509,10 +509,9 @@ public class CopyPasteTool extends GenericGadget implements ITemplate {
         if (InventoryManipulation.countItem(itemStack, player) < neededItems) {
             if (InventoryManipulation.countPaste(player) < neededItems) {
                 return;
-            } else {
-                itemStack = constructionPaste.copy();
-                useConstructionPaste = true;
             }
+            itemStack = constructionPaste.copy();
+            useConstructionPaste = true;
         }
         if (Config.poweredByFE) {
             if (!useEnergy(heldItem, Config.energyCostBuilder, player)) {

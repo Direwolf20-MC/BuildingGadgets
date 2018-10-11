@@ -47,9 +47,8 @@ public class FakeRenderWorld implements IBlockAccess {
     public boolean isAirBlock(BlockPos pos) {
         if (posMap.containsKey(pos)) {
             return posMap.get(pos).equals(Blocks.AIR.getDefaultState());
-        } else {
-            return realWorld.isAirBlock(pos);
         }
+        return realWorld.isAirBlock(pos);
     }
 
     @Override

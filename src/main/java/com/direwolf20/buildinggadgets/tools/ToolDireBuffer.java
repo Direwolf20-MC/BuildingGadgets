@@ -176,15 +176,14 @@ public class ToolDireBuffer extends BufferBuilder {
     public void begin(int glMode, VertexFormat format) {
         if (this.isDrawing) {
             throw new IllegalStateException("Already building!");
-        } else {
-            this.isDrawing = true;
-            this.reset();
-            this.drawMode = glMode;
-            this.vertexFormat = format;
-            this.vertexFormatElement = format.getElement(this.vertexFormatIndex);
-            this.noColor = false;
-            this.byteBuffer.limit(this.byteBuffer.capacity());
         }
+        this.isDrawing = true;
+        this.reset();
+        this.drawMode = glMode;
+        this.vertexFormat = format;
+        this.vertexFormatElement = format.getElement(this.vertexFormatIndex);
+        this.noColor = false;
+        this.byteBuffer.limit(this.byteBuffer.capacity());
     }
 
     @Override
@@ -355,49 +354,48 @@ public class ToolDireBuffer extends BufferBuilder {
     public BufferBuilder color(int red, int green, int blue, int alpha) {
         if (this.noColor) {
             return this;
-        } else {
-            int i = this.vertexCount * this.vertexFormat.getNextOffset() + this.vertexFormat.getOffset(this.vertexFormatIndex);
-
-            switch (this.vertexFormatElement.getType()) {
-                case FLOAT:
-                    this.byteBuffer.putFloat(i, red / 255.0F);
-                    this.byteBuffer.putFloat(i + 4, green / 255.0F);
-                    this.byteBuffer.putFloat(i + 8, blue / 255.0F);
-                    this.byteBuffer.putFloat(i + 12, alpha / 255.0F);
-                    break;
-                case UINT:
-                case INT:
-                    this.byteBuffer.putFloat(i, red);
-                    this.byteBuffer.putFloat(i + 4, green);
-                    this.byteBuffer.putFloat(i + 8, blue);
-                    this.byteBuffer.putFloat(i + 12, alpha);
-                    break;
-                case USHORT:
-                case SHORT:
-                    this.byteBuffer.putShort(i, (short) red);
-                    this.byteBuffer.putShort(i + 2, (short) green);
-                    this.byteBuffer.putShort(i + 4, (short) blue);
-                    this.byteBuffer.putShort(i + 6, (short) alpha);
-                    break;
-                case UBYTE:
-                case BYTE:
-
-                    if (ByteOrder.nativeOrder() == ByteOrder.LITTLE_ENDIAN) {
-                        this.byteBuffer.put(i, (byte) red);
-                        this.byteBuffer.put(i + 1, (byte) green);
-                        this.byteBuffer.put(i + 2, (byte) blue);
-                        this.byteBuffer.put(i + 3, (byte) alpha);
-                    } else {
-                        this.byteBuffer.put(i, (byte) alpha);
-                        this.byteBuffer.put(i + 1, (byte) blue);
-                        this.byteBuffer.put(i + 2, (byte) green);
-                        this.byteBuffer.put(i + 3, (byte) red);
-                    }
-            }
-
-            this.nextVertexFormatIndex();
-            return this;
         }
+        int i = this.vertexCount * this.vertexFormat.getNextOffset() + this.vertexFormat.getOffset(this.vertexFormatIndex);
+
+        switch (this.vertexFormatElement.getType()) {
+            case FLOAT:
+                this.byteBuffer.putFloat(i, red / 255.0F);
+                this.byteBuffer.putFloat(i + 4, green / 255.0F);
+                this.byteBuffer.putFloat(i + 8, blue / 255.0F);
+                this.byteBuffer.putFloat(i + 12, alpha / 255.0F);
+                break;
+            case UINT:
+            case INT:
+                this.byteBuffer.putFloat(i, red);
+                this.byteBuffer.putFloat(i + 4, green);
+                this.byteBuffer.putFloat(i + 8, blue);
+                this.byteBuffer.putFloat(i + 12, alpha);
+                break;
+            case USHORT:
+            case SHORT:
+                this.byteBuffer.putShort(i, (short) red);
+                this.byteBuffer.putShort(i + 2, (short) green);
+                this.byteBuffer.putShort(i + 4, (short) blue);
+                this.byteBuffer.putShort(i + 6, (short) alpha);
+                break;
+            case UBYTE:
+            case BYTE:
+
+                if (ByteOrder.nativeOrder() == ByteOrder.LITTLE_ENDIAN) {
+                    this.byteBuffer.put(i, (byte) red);
+                    this.byteBuffer.put(i + 1, (byte) green);
+                    this.byteBuffer.put(i + 2, (byte) blue);
+                    this.byteBuffer.put(i + 3, (byte) alpha);
+                } else {
+                    this.byteBuffer.put(i, (byte) alpha);
+                    this.byteBuffer.put(i + 1, (byte) blue);
+                    this.byteBuffer.put(i + 2, (byte) green);
+                    this.byteBuffer.put(i + 3, (byte) red);
+                }
+        }
+
+        this.nextVertexFormatIndex();
+        return this;
     }
 
     @Override
@@ -515,11 +513,10 @@ public class ToolDireBuffer extends BufferBuilder {
     public void finishDrawing() {
         if (!this.isDrawing) {
             throw new IllegalStateException("Not building!");
-        } else {
-            this.isDrawing = false;
-            this.byteBuffer.position(0);
-            this.byteBuffer.limit(this.getBufferSize() * 4);
         }
+        this.isDrawing = false;
+        this.byteBuffer.position(0);
+        this.byteBuffer.limit(this.getBufferSize() * 4);
     }
 
     @Override

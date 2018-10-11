@@ -307,7 +307,7 @@ public class ToolRenders {
             if (startPos == null) {
                 startPos = VectorTools.getPosLookingAt(player);
                 if (startPos == null) return;
-                else startPos = startPos.up();
+                startPos = startPos.up();
             }
 
             //We store our buffers in PasteToolBufferBuilder (A client only class) -- retrieve the buffer from this locally cache'd map

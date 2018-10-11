@@ -80,9 +80,8 @@ public class ExchangerTool extends GenericGadget {
     public boolean isBookEnchantable(ItemStack stack, ItemStack book) {
         if (EnchantmentHelper.getEnchantments(book).containsKey(Enchantments.SILK_TOUCH)) {
             return true;
-        } else {
-            return super.isBookEnchantable(stack, book);
         }
+        return super.isBookEnchantable(stack, book);
     }
 
     @Override
@@ -285,10 +284,9 @@ public class ExchangerTool extends GenericGadget {
             ItemStack constructionPaste = new ItemStack(ModItems.constructionPaste);
             if (InventoryManipulation.countPaste(player) < neededItems) {
                 return false;
-            } else {
-                itemStack = constructionPaste.copy();
-                useConstructionPaste = true;
             }
+            itemStack = constructionPaste.copy();
+            useConstructionPaste = true;
         }
         if (!player.isAllowEdit()) {
             return false;

@@ -227,17 +227,12 @@ public class GadgetUtils {
         }
         TileEntity te = world.getTileEntity(pos);
         if (te != null) {  //Currently not allowing tile entities and plants.
-            if (te instanceof ConstructionBlockTileEntity) {
-                if (((ConstructionBlockTileEntity) te).getBlockState() != null) {
-                    setToolBlock(stack, ((ConstructionBlockTileEntity) te).getActualBlockState());
-                    setToolActualBlock(stack, ((ConstructionBlockTileEntity) te).getActualBlockState());
-                    return;
-                } else {
-                    validBlock = false;
-                }
-            } else {
-                validBlock = false;
+            if (te instanceof ConstructionBlockTileEntity && ((ConstructionBlockTileEntity) te).getBlockState() != null) {
+                setToolBlock(stack, ((ConstructionBlockTileEntity) te).getActualBlockState());
+                setToolActualBlock(stack, ((ConstructionBlockTileEntity) te).getActualBlockState());
+                return;
             }
+            validBlock = false;
         }
         if (!validBlock) {
             player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.invalidblock").getUnformattedComponentText()), true);
@@ -285,10 +280,9 @@ public class GadgetUtils {
         IEnergyStorage energy = stack.getCapability(CapabilityEnergy.ENERGY, null);
         if (amount > energy.getEnergyStored()) {
             return false;
-        } else {
-            energy.extractEnergy(amount, false);
-            return true;
         }
+        energy.extractEnergy(amount, false);
+        return true;
     }
 
     public static String withSuffix(int count) {

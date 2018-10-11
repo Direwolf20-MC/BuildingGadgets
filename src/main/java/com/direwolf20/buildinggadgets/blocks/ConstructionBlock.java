@@ -122,9 +122,8 @@ public class ConstructionBlock extends Block implements IFacade {
             IBlockState extState = mimicBlock.getBlock().getExtendedState(mimicBlock, fakeRenderWorld, pos);
             //ConstructionID mimicID = new ConstructionID(mimicBlock);
             return extendedBlockState.withProperty(FACADE_ID, mimicBlock).withProperty(FACADE_EXT_STATE, extState);
-        } else {
-            return extendedBlockState;
         }
+        return extendedBlockState;
     }
 
     @Nullable
@@ -133,9 +132,8 @@ public class ConstructionBlock extends Block implements IFacade {
             TileEntity te = blockAccess.getTileEntity(pos);
             if (te instanceof ConstructionBlockTileEntity) {
                 return ((ConstructionBlockTileEntity) te).getActualBlockState();
-            } else {
-                return null;
             }
+            return null;
         } catch (Exception var8) {
             return null;
         }
@@ -229,12 +227,11 @@ public class ConstructionBlock extends Block implements IFacade {
         IBlockState mimicBlock = getActualMimicBlock(worldIn, pos);
         if (mimicBlock == null) {
             return super.getBoundingBox(blockState, worldIn, pos);
-        } else {
-            try {
-                return mimicBlock.getBlock().getBoundingBox(mimicBlock, worldIn, pos);
-            } catch (Exception var8) {
-                return super.getBoundingBox(blockState, worldIn, pos);
-            }
+        }
+        try {
+            return mimicBlock.getBlock().getBoundingBox(mimicBlock, worldIn, pos);
+        } catch (Exception var8) {
+            return super.getBoundingBox(blockState, worldIn, pos);
         }
     }
 
@@ -269,12 +266,11 @@ public class ConstructionBlock extends Block implements IFacade {
         IBlockState mimicBlock = getActualMimicBlock(source, pos);
         if (mimicBlock == null) {
             return super.getBoundingBox(state, source, pos);
-        } else {
-            try {
-                return mimicBlock.getBlock().getBoundingBox(mimicBlock, source, pos);
-            } catch (Exception var8) {
-                return super.getBoundingBox(state, source, pos);
-            }
+        }
+        try {
+            return mimicBlock.getBlock().getBoundingBox(mimicBlock, source, pos);
+        } catch (Exception var8) {
+            return super.getBoundingBox(state, source, pos);
         }
     }
 
@@ -284,12 +280,11 @@ public class ConstructionBlock extends Block implements IFacade {
         IBlockState mimicBlock = getActualMimicBlock(worldIn, pos);
         if (mimicBlock == null) {
             return super.getSelectedBoundingBox(state, worldIn, pos);
-        } else {
-            try {
-                return mimicBlock.getBlock().getSelectedBoundingBox(mimicBlock, worldIn, pos);
-            } catch (Exception var8) {
-                return super.getSelectedBoundingBox(state, worldIn, pos);
-            }
+        }
+        try {
+            return mimicBlock.getBlock().getSelectedBoundingBox(mimicBlock, worldIn, pos);
+        } catch (Exception var8) {
+            return super.getSelectedBoundingBox(state, worldIn, pos);
         }
     }
 
@@ -298,12 +293,11 @@ public class ConstructionBlock extends Block implements IFacade {
         IBlockState mimicBlock = getActualMimicBlock(world, pos);
         if (mimicBlock == null) {
             return super.isNormalCube(state, world, pos);
-        } else {
-            try {
-                return mimicBlock.getBlock().isNormalCube(mimicBlock, world, pos);
-            } catch (Exception var8) {
-                return super.isNormalCube(state, world, pos);
-            }
+        }
+        try {
+            return mimicBlock.getBlock().isNormalCube(mimicBlock, world, pos);
+        } catch (Exception var8) {
+            return super.isNormalCube(state, world, pos);
         }
     }
 
