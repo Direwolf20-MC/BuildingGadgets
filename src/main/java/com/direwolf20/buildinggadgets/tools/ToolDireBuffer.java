@@ -79,12 +79,7 @@ public class ToolDireBuffer extends BufferBuilder {
             ainteger[k] = k;
         }
 
-        Arrays.sort(ainteger, new Comparator<Integer>() {
-            @Override
-            public int compare(Integer p_compare_2_, Integer p_compare_1_) {
-                return Floats.compare(afloat[p_compare_2_.intValue()], afloat[p_compare_1_.intValue()]);
-            }
-        });
+        Arrays.sort(ainteger, (i0, i1) -> Floats.compare(afloat[i0.intValue()], afloat[i1.intValue()]));
         //ArrayUtils.reverse(ainteger);
         BitSet bitset = new BitSet();
         int l = this.vertexFormat.getNextOffset();
