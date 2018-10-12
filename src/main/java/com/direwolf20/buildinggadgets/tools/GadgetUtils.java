@@ -3,6 +3,8 @@ package com.direwolf20.buildinggadgets.tools;
 import com.direwolf20.buildinggadgets.blocks.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.items.BuildingTool;
 import com.direwolf20.buildinggadgets.items.ExchangerTool;
+import com.direwolf20.buildinggadgets.items.ItemCaps.CapabilityProviderEnergy;
+
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
@@ -19,7 +21,6 @@ import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
-import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
 
 import java.util.ArrayList;
@@ -277,7 +278,7 @@ public class GadgetUtils {
         if (player.capabilities.isCreativeMode) {
             return true;
         }
-        IEnergyStorage energy = stack.getCapability(CapabilityEnergy.ENERGY, null);
+        IEnergyStorage energy = CapabilityProviderEnergy.getCap(stack);
         if (amount > energy.getEnergyStored()) {
             return false;
         }

@@ -12,7 +12,6 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -47,7 +46,7 @@ public class GenericGadget extends Item {
     @Override
     public double getDurabilityForDisplay(ItemStack stack) {
         if (Config.poweredByFE) {
-            IEnergyStorage energy = stack.getCapability(CapabilityEnergy.ENERGY, null);
+            IEnergyStorage energy = CapabilityProviderEnergy.getCap(stack);
             return 1D - ((double) energy.getEnergyStored() / (double) energy.getMaxEnergyStored());
         }
         //return (double)stack.getItemDamage() / (double)stack.getMaxDamage();
@@ -57,7 +56,7 @@ public class GenericGadget extends Item {
     @Override
     public int getRGBDurabilityForDisplay(ItemStack stack) {
         if (Config.poweredByFE) {
-            IEnergyStorage energy = stack.getCapability(CapabilityEnergy.ENERGY, null);
+            IEnergyStorage energy = CapabilityProviderEnergy.getCap(stack);
             return MathHelper.hsvToRGB(Math.max(0.0F, (float) energy.getEnergyStored() / (float) energy.getMaxEnergyStored()) / 3.0F, 1.0F, 1.0F);
         }
         //return MathHelper.hsvToRGB(Math.max(0.0F, (float) (1.0F - getDurabilityForDisplay(stack))) / 3.0F, 1.0F, 1.0F);
@@ -67,7 +66,7 @@ public class GenericGadget extends Item {
     @Override
     public boolean isDamaged(ItemStack stack) {
         if (Config.poweredByFE) {
-            IEnergyStorage energy = stack.getCapability(CapabilityEnergy.ENERGY, null);
+            IEnergyStorage energy = CapabilityProviderEnergy.getCap(stack);
             return energy.getEnergyStored() != energy.getMaxEnergyStored();
         }
         //return (stack.getItemDamage() > 0);
@@ -77,7 +76,7 @@ public class GenericGadget extends Item {
     @Override
     public boolean showDurabilityBar(ItemStack stack) {
         if (Config.poweredByFE) {
-            IEnergyStorage energy = stack.getCapability(CapabilityEnergy.ENERGY, null);
+            IEnergyStorage energy = CapabilityProviderEnergy.getCap(stack);
             return energy.getEnergyStored() != energy.getMaxEnergyStored();
         }
         //return stack.isItemDamaged();

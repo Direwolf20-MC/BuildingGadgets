@@ -14,7 +14,6 @@ import org.apache.logging.log4j.Logger;
 import java.nio.*;
 import java.util.Arrays;
 import java.util.BitSet;
-import java.util.Comparator;
 
 public class ToolDireBuffer extends BufferBuilder {
 

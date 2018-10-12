@@ -7,6 +7,8 @@ import com.direwolf20.buildinggadgets.items.BuildingTool;
 import com.direwolf20.buildinggadgets.items.CopyPasteTool;
 import com.direwolf20.buildinggadgets.items.ExchangerTool;
 import com.direwolf20.buildinggadgets.items.FakeBuilderWorld;
+import com.direwolf20.buildinggadgets.items.ItemCaps.CapabilityProviderEnergy;
+
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockRendererDispatcher;
@@ -29,7 +31,6 @@ import net.minecraft.world.WorldType;
 import net.minecraftforge.client.ForgeHooksClient;
 import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
-import net.minecraftforge.energy.CapabilityEnergy;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL14;
 
@@ -86,7 +87,7 @@ public class ToolRenders {
                 hasBlocks = hasBlocks + InventoryManipulation.countPaste(player);
                 int hasEnergy = 0;
                 if (Config.poweredByFE) {
-                    hasEnergy = stack.getCapability(CapabilityEnergy.ENERGY, null).getEnergyStored();
+                    hasEnergy = CapabilityProviderEnergy.getCap(stack).getEnergyStored();
                 } else {
                     hasEnergy = stack.getMaxDamage() - stack.getItemDamage();
                 }
@@ -212,7 +213,7 @@ public class ToolRenders {
                 hasBlocks = hasBlocks + InventoryManipulation.countPaste(player);
                 int hasEnergy = 0;
                 if (Config.poweredByFE) {
-                    hasEnergy = stack.getCapability(CapabilityEnergy.ENERGY, null).getEnergyStored();
+                    hasEnergy = CapabilityProviderEnergy.getCap(stack).getEnergyStored();
                 } else {
                     hasEnergy = stack.getMaxDamage() - stack.getItemDamage();
                 }
