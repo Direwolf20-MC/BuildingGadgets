@@ -62,7 +62,7 @@ public abstract class CommandAlterBlockMaps extends CommandBase {
         }
         WorldSave worldSave = WorldSave.getWorldSave(sender.getEntityWorld());
         Map<String, NBTTagCompound> tagMap = worldSave.getTagMap();
-        Map<String, NBTTagCompound> newMap = removeData ? new HashMap<String, NBTTagCompound>(tagMap) : null;
+        Map<String, NBTTagCompound> newMap = new HashMap<String, NBTTagCompound>(tagMap);
         String searchName = (args.length == 0) ? sender.getName() : args[0];
         int counter = 0;
         for (Map.Entry<String, NBTTagCompound> entry : tagMap.entrySet()) {

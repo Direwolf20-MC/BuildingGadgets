@@ -2,6 +2,7 @@ package com.direwolf20.buildinggadgets.items;
 
 import java.util.Map;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.direwolf20.buildinggadgets.tools.GadgetUtils;
@@ -31,29 +32,28 @@ public interface ITemplate {
         stack.setTagCompound(tagCompound);
     }
 
-    @Nullable
+    @Nonnull
     default Map<UniqueItem, Integer> getItemCountMap(ItemStack stack) {
         NBTTagCompound tagCompound = stack.getTagCompound();
-        if (tagCompound == null) {
-            return null;
-        }
+        Map<UniqueItem, Integer> tagMap = tagCompound == null ? null : GadgetUtils.nbtToItemCount((NBTTagList) tagCompound.getTag("itemcountmap"));
+        if (tagMap == null)
+            throw new IllegalArgumentException("ITemplate#getItemCountMap faild to retieve tag map from " + GadgetUtils.getStackErrorSuffix(stack));
 
-        Map<UniqueItem, Integer> tagMap = GadgetUtils.nbtToItemCount((NBTTagList) tagCompound.getTag("itemcountmap"));
         return tagMap;
     }
 
     default int getCopyCounter(ItemStack stack) {
-        return stack.getTagCompound().getInteger("copycounter");
+        return GadgetUtils.getStackTag(stack).getInteger("copycounter");
     }
 
     default void setCopyCounter(ItemStack stack, int counter) {//TODO unused
-        NBTTagCompound tagCompound = stack.getTagCompound();
+        NBTTagCompound tagCompound = GadgetUtils.getStackTag(stack);
         tagCompound.setInteger("copycounter", counter);
         stack.setTagCompound(tagCompound);
     }
 
     default void incrementCopyCounter(ItemStack stack) {
-        NBTTagCompound tagCompound = stack.getTagCompound();
+        NBTTagCompound tagCompound = GadgetUtils.getStackTag(stack);
         tagCompound.setInteger("copycounter", tagCompound.getInteger("copycounter") + 1);
         stack.setTagCompound(tagCompound);
     }

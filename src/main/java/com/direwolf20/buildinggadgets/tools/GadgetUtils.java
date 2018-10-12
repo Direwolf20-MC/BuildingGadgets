@@ -28,9 +28,27 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public class GadgetUtils {
+
+    public static String getStackErrorSuffix(ItemStack stack) {
+        return getStackErrorText(stack) + " with NBT tag: " + stack.getTagCompound();
+    }
+
+    private static String getStackErrorText(ItemStack stack) {
+        return "the following stack: [" + stack + "]";
+    }
+
+    @Nonnull
+    public static NBTTagCompound getStackTag(ItemStack stack) {
+        NBTTagCompound tag = stack.getTagCompound();
+        if (tag == null)
+            throw new IllegalArgumentException("An NBT tag could net be retrieved from " + getStackErrorText(stack));
+
+        return tag;
+    }
 
     public static void pushUndoList(ItemStack stack, UndoState undoState) {
         //When we have a new set of Undo Coordinates, push it onto a list stored in NBT, max 10

@@ -68,7 +68,7 @@ public class ToolRenders {
                 if (renderBlockState == Blocks.AIR.getDefaultState()) {//Don't render anything if there is no block selected (Air)
                     return;
                 }
-                if (coordinates.size() == 0) { //Build a list of coordinates based on the tool mode and range
+                if (coordinates.size() == 0 && lookingAt != null) { //Build a list of coordinates based on the tool mode and range
                     coordinates = BuildingModes.getBuildOrders(world, player, lookingAt.getBlockPos(), lookingAt.sideHit, heldItem);
                 }
 
@@ -193,7 +193,7 @@ public class ToolRenders {
                 if (renderBlockState == Blocks.AIR.getDefaultState()) {//Don't render anything if there is no block selected (Air)
                     return;
                 }
-                if (coordinates.size() == 0) { //Build a list of coordinates based on the tool mode and range
+                if (coordinates.size() == 0 && lookingAt != null) { //Build a list of coordinates based on the tool mode and range
                     coordinates = ExchangingModes.getBuildOrders(world, player, lookingAt.getBlockPos(), lookingAt.sideHit, stack);
                 }
 

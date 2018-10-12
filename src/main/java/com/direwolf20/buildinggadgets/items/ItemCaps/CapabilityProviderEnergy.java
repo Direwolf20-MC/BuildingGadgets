@@ -10,6 +10,8 @@ import net.minecraftforge.energy.IEnergyStorage;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.direwolf20.buildinggadgets.tools.GadgetUtils;
+
 public class CapabilityProviderEnergy implements ICapabilityProvider {
     private ItemStack stack;
     private int energyCapacity;
@@ -29,8 +31,12 @@ public class CapabilityProviderEnergy implements ICapabilityProvider {
         return capability == CapabilityEnergy.ENERGY ? CapabilityEnergy.ENERGY.cast(new ItemEnergyForge(stack, energyCapacity)) : null;
     }
 
-    @Nullable
+    @Nonnull
     public static IEnergyStorage getCap(ItemStack stack) {
-        return stack.getCapability(CapabilityEnergy.ENERGY, null);
+        IEnergyStorage energy = stack.getCapability(CapabilityEnergy.ENERGY, null);
+        if (energy == null)
+            throw new IllegalArgumentException("CapabilityEnergy could not be retrieved for " + GadgetUtils.getStackErrorSuffix(stack));
+
+        return energy;
     }
 }

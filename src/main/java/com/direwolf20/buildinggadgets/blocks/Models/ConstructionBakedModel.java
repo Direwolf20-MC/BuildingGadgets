@@ -38,6 +38,9 @@ public class ConstructionBakedModel implements IBakedModel {
     @Override
     public List<BakedQuad> getQuads(@Nullable IBlockState state, @Nullable EnumFacing side, long rand) {
         IExtendedBlockState extendedBlockState = (IExtendedBlockState) state;
+        if (extendedBlockState == null)
+            return Collections.emptyList();
+
         //ConstructionID facadeId = extendedBlockState.getValue(ConstructionBlock.FACADEID);
         IBlockState facadeState = extendedBlockState.getValue(ConstructionBlock.FACADE_ID);
         IBlockState extFacadeState = extendedBlockState.getValue(ConstructionBlock.FACADE_EXT_STATE);
@@ -55,8 +58,7 @@ public class ConstructionBakedModel implements IBakedModel {
         }
         model = getModel(facadeState);
         try {
-            List<BakedQuad> quads = model.getQuads(extFacadeState, side, rand);
-            return quads;
+            return model.getQuads(extFacadeState, side, rand);
         } catch (Exception e) {
             e.printStackTrace();
             return model.getQuads(facadeState, side, rand);

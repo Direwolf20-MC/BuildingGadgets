@@ -5,6 +5,8 @@ import static com.direwolf20.buildinggadgets.BuildingGadgets.MODID;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.annotation.Nonnull;
+
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.world.World;
@@ -80,10 +82,14 @@ public class WorldSave extends WorldSavedData {
         return get(world, WorldSaveTemplate.class);
     }
 
+    @Nonnull
     private static WorldSave get(World world, Class<? extends WorldSave> clazz) {
         boolean isTemplate = clazz == WorldSaveTemplate.class;
         String name = MODID + (isTemplate ? "_TemplateData" : "_BlockMapData");
         MapStorage storage = world.getMapStorage();
+        if (storage == null)
+            throw new IllegalStateException("World#getMapStorage returned null. The following WorldSave failed to save data: " + name);
+
         WorldSave instance = (WorldSave) storage.getOrLoadData(clazz, name);
 
         if (instance == null) {

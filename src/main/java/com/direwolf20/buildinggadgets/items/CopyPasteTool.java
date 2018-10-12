@@ -101,11 +101,11 @@ public class CopyPasteTool extends GenericGadget implements ITemplate {
     }
 
     public static String getOwner(ItemStack stack) {//TODO unused
-        return stack.getTagCompound().getString("owner");
+        return GadgetUtils.getStackTag(stack).getString("owner");
     }
 
     public static void setOwner(ItemStack stack, String owner) {//TODO unused
-        NBTTagCompound tagCompound = stack.getTagCompound();
+        NBTTagCompound tagCompound = GadgetUtils.getStackTag(stack);
         tagCompound.setString("owner", owner);
         stack.setTagCompound(tagCompound);
     }
@@ -400,7 +400,9 @@ public class CopyPasteTool extends GenericGadget implements ITemplate {
                             return false;
                         }
                         NonNullList<ItemStack> drops = NonNullList.create();
-                        actualState.getBlock().getDrops(drops, world, new BlockPos(0, 0, 0), actualState, 0);
+                        if (actualState != null)
+                            actualState.getBlock().getDrops(drops, world, new BlockPos(0, 0, 0), actualState, 0);
+
                         int neededItems = 0;
                         for (ItemStack drop : drops) {
                             if (drop.getItem().equals(uniqueItem.item)) {

@@ -12,6 +12,7 @@ import net.minecraft.util.math.BlockPos;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public class BlockMapIntState {
@@ -116,7 +117,7 @@ public class BlockMapIntState {
         return tagList;
     }
 
-    @Nullable
+    @Nonnull
     public static UniqueItem blockStateToUniqueItem(IBlockState state, EntityPlayer player, BlockPos pos) {
         ItemStack itemStack;
         //if (state.getBlock().canSilkHarvest(player.world, pos, state, player)) {
@@ -135,16 +136,15 @@ public class BlockMapIntState {
             UniqueItem uniqueItem = new UniqueItem(itemStack.getItem(), itemStack.getMetadata());
             return uniqueItem;
         }
-        return null;
+        throw new IllegalArgumentException("A UniqueItem could net be retrieved for the the follwing state (at position " + pos +"): " + state);
     }
 
     public void makeStackMapFromStateMap(EntityPlayer player) {
         intStackMap.clear();
         for (Map.Entry<Short, IBlockState> entry : intStateMap.entrySet()) {
-            UniqueItem uniqueItem = blockStateToUniqueItem(entry.getValue(), player, new BlockPos(0, 0, 0));
-            if (uniqueItem != null) {
-                intStackMap.put(entry.getValue(), uniqueItem);
-            }
+            try {
+                intStackMap.put(entry.getValue(), blockStateToUniqueItem(entry.getValue(), player, new BlockPos(0, 0, 0)));
+            } catch (IllegalArgumentException e) {}
         }
     }
 }
