@@ -5,8 +5,6 @@ import com.direwolf20.buildinggadgets.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.entities.BlockBuildEntityRender;
 import com.direwolf20.buildinggadgets.entities.ConstructionBlockEntity;
 import com.direwolf20.buildinggadgets.entities.ConstructionBlockEntityRender;
-import com.direwolf20.buildinggadgets.eventhandlers.ClientTickEvent;
-import com.direwolf20.buildinggadgets.eventhandlers.TooltipRender;
 import com.direwolf20.buildinggadgets.items.BuildingTool;
 import com.direwolf20.buildinggadgets.items.CopyPasteTool;
 import com.direwolf20.buildinggadgets.items.ExchangerTool;
@@ -20,7 +18,6 @@ import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
@@ -35,15 +32,12 @@ public class ClientProxy extends CommonProxy {
     public void preInit(FMLPreInitializationEvent e) {
         ModEntities.initModels();
         ModelLoaderRegistry.registerLoader(new BakedModelLoader());
-        MinecraftForge.EVENT_BUS.register(TooltipRender.class);
         super.preInit(e);
     }
 
     @Override
     public void init() {
         super.init();
-        MinecraftForge.EVENT_BUS.register(new KeyInputHandler());
-        MinecraftForge.EVENT_BUS.register(new ClientTickEvent());
         KeyBindings.init();
         ModBlocks.initColorHandlers();
     }

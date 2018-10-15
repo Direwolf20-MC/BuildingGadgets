@@ -8,15 +8,18 @@ import com.direwolf20.buildinggadgets.tools.PasteToolBufferBuilder;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
+import net.minecraftforge.fml.relauncher.Side;
 
+@EventBusSubscriber(Side.CLIENT)
 public class ClientTickEvent {
 
     private static int counter = 0;
 
     @SubscribeEvent
-    public void onClientTick(@SuppressWarnings("unused") TickEvent.ClientTickEvent event) {
+    public static void onClientTick(@SuppressWarnings("unused") TickEvent.ClientTickEvent event) {
         counter++;
         if (counter > 600) {
             counter = 0;

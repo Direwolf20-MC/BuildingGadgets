@@ -3,8 +3,6 @@ package com.direwolf20.buildinggadgets;
 import com.direwolf20.buildinggadgets.commands.DeleteBlockMapsCommand;
 import com.direwolf20.buildinggadgets.commands.FindBlockMapsCommand;
 import com.direwolf20.buildinggadgets.eventhandlers.AnvilRepairHandler;
-import com.direwolf20.buildinggadgets.eventhandlers.BreakEventHandler;
-import com.direwolf20.buildinggadgets.eventhandlers.ItemPickupHandler;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
@@ -35,8 +33,6 @@ public class BuildingGadgets {
     public void preInit(FMLPreInitializationEvent event) {
         logger = event.getModLog();
         proxy.preInit(event);
-        MinecraftForge.EVENT_BUS.register(new BreakEventHandler());
-        MinecraftForge.EVENT_BUS.register(new ItemPickupHandler());
         if (!Config.poweredByFE) {
             MinecraftForge.EVENT_BUS.register(new AnvilRepairHandler());
         }
