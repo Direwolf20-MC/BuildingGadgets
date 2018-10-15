@@ -62,6 +62,7 @@ public interface ITemplate {
         GadgetUtils.writePOSToNBT(stack, startPos, "startPos");
     }
 
+    @Nullable
     default BlockPos getStartPos(ItemStack stack) {
         return GadgetUtils.getPOSFromNBT(stack, "startPos");
     }
@@ -70,6 +71,7 @@ public interface ITemplate {
         GadgetUtils.writePOSToNBT(stack, startPos, "endPos");
     }
 
+    @Nullable
     default BlockPos getEndPos(ItemStack stack) {
         return GadgetUtils.getPOSFromNBT(stack, "endPos");
     }
