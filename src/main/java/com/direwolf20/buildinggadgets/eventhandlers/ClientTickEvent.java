@@ -24,6 +24,9 @@ public class ClientTickEvent {
     public static void onClientTick(@SuppressWarnings("unused") TickEvent.ClientTickEvent event) {
         counter++;
         if (counter > 600 || !joinedWorld) {
+            if (!joinedWorld && counter > 200)
+                joinedWorld = true;
+
             counter = 0;
             EntityPlayer player = Minecraft.getMinecraft().player;
             if (player == null) return;
