@@ -18,12 +18,11 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.client.settings.GameSettings;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
-import org.lwjgl.input.Keyboard;
-import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.vector.Vector2f;
 
@@ -232,7 +231,7 @@ public class ModeRadialMenu extends GuiScreen {
     public void updateScreen() {
         super.updateScreen();
 
-        if (!isKeyDown(KeyBindings.modeSwitch)) {
+        if (!GameSettings.isKeyDown(KeyBindings.modeSwitch)) {
             mc.displayGuiScreen(null);
             if (slotSelected != -1) {
                 PacketHandler.INSTANCE.sendToServer(new PacketToggleMode(slotSelected));
@@ -241,18 +240,9 @@ public class ModeRadialMenu extends GuiScreen {
 
         ImmutableSet<KeyBinding> set = ImmutableSet.of(mc.gameSettings.keyBindForward, mc.gameSettings.keyBindLeft, mc.gameSettings.keyBindBack, mc.gameSettings.keyBindRight, mc.gameSettings.keyBindSneak, mc.gameSettings.keyBindSprint, mc.gameSettings.keyBindJump);
         for (KeyBinding k : set)
-            KeyBinding.setKeyBindState(k.getKeyCode(), isKeyDown(k));
+            KeyBinding.setKeyBindState(k.getKeyCode(), GameSettings.isKeyDown(k));
 
         timeIn++;
-    }
-
-    private boolean isKeyDown(KeyBinding keybind) {
-        int key = keybind.getKeyCode();
-        if (key < 0) {
-            int button = 100 + key;
-            return Mouse.isButtonDown(button);
-        }
-        return Keyboard.isKeyDown(key);
     }
 
     @Override
