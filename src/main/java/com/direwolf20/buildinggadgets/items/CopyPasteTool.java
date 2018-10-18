@@ -485,8 +485,8 @@ public class CopyPasteTool extends GenericGadget implements ITemplate {
                 return;
             }
         }
-        if (((CopyPasteTool) heldItem.getItem()).getStartPos(heldItem) == null) return;
-        if (((CopyPasteTool) heldItem.getItem()).getEndPos(heldItem) == null) return;
+        if (ModItems.copyPasteTool.getStartPos(heldItem) == null) return;
+        if (ModItems.copyPasteTool.getEndPos(heldItem) == null) return;
         UniqueItem uniqueItem = IntStackMap.get(state);
         if (uniqueItem == null) return; //This shouldn't happen I hope!
         ItemStack itemStack = new ItemStack(uniqueItem.item, 1, uniqueItem.meta);

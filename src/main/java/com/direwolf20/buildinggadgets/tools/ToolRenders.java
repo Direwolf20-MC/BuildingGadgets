@@ -302,8 +302,8 @@ public class ToolRenders {
     public static void renderPasteOverlay(RenderWorldLastEvent evt, EntityPlayer player, ItemStack stack) {
         String UUID = ModItems.copyPasteTool.getUUID(stack);
         World world = player.world;
-        if (((CopyPasteTool) stack.getItem()).getStartPos(stack) == null) return;
-        if (((CopyPasteTool) stack.getItem()).getEndPos(stack) == null) return;
+        if (ModItems.copyPasteTool.getStartPos(stack) == null) return;
+        if (ModItems.copyPasteTool.getEndPos(stack) == null) return;
         if (CopyPasteTool.getToolMode(stack) == CopyPasteTool.ToolMode.Paste) {
             //First check if we have an anchor, if not check if we're looking at a block, if not, exit
             BlockPos startPos = CopyPasteTool.getAnchor(stack);
