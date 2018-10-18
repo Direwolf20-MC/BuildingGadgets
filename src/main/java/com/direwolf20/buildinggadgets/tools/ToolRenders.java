@@ -8,7 +8,6 @@ import com.direwolf20.buildinggadgets.items.CopyPasteTool;
 import com.direwolf20.buildinggadgets.items.ExchangerTool;
 import com.direwolf20.buildinggadgets.items.FakeBuilderWorld;
 import com.direwolf20.buildinggadgets.items.ItemCaps.CapabilityProviderEnergy;
-
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockRendererDispatcher;
@@ -38,7 +37,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static com.direwolf20.buildinggadgets.tools.GadgetUtils.*;
+import static com.direwolf20.buildinggadgets.tools.GadgetUtils.getAnchor;
+import static com.direwolf20.buildinggadgets.tools.GadgetUtils.getToolBlock;
 import static net.minecraft.block.BlockStainedGlass.COLOR;
 
 public class ToolRenders {
@@ -302,6 +302,8 @@ public class ToolRenders {
     public static void renderPasteOverlay(RenderWorldLastEvent evt, EntityPlayer player, ItemStack stack) {
         String UUID = ModItems.copyPasteTool.getUUID(stack);
         World world = player.world;
+        if (((CopyPasteTool) stack.getItem()).getStartPos(stack) == null) return;
+        if (((CopyPasteTool) stack.getItem()).getEndPos(stack) == null) return;
         if (CopyPasteTool.getToolMode(stack) == CopyPasteTool.ToolMode.Paste) {
             //First check if we have an anchor, if not check if we're looking at a block, if not, exit
             BlockPos startPos = CopyPasteTool.getAnchor(stack);

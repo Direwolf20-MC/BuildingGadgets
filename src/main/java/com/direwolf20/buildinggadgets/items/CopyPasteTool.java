@@ -41,9 +41,8 @@ import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 
-import java.util.*;
-
 import javax.annotation.Nullable;
+import java.util.*;
 
 import static com.direwolf20.buildinggadgets.tools.GadgetUtils.useEnergy;
 import static com.direwolf20.buildinggadgets.tools.GadgetUtils.withSuffix;
@@ -299,6 +298,7 @@ public class CopyPasteTool extends GenericGadget implements ITemplate {
         WorldSave worldSave = WorldSave.getWorldSave(player.world);
         NBTTagCompound tagCompound = worldSave.getCompoundFromUUID(tool.getUUID(stack));
         BlockPos startPos = tool.getStartPos(stack);
+        if (startPos == null) return;
         blockMapList = getBlockMapList(tagCompound);
         List<Integer> posIntArrayList = new ArrayList<Integer>();
         List<Integer> stateIntArrayList = new ArrayList<Integer>();
@@ -485,6 +485,8 @@ public class CopyPasteTool extends GenericGadget implements ITemplate {
                 return;
             }
         }
+        if (((CopyPasteTool) heldItem.getItem()).getStartPos(heldItem) == null) return;
+        if (((CopyPasteTool) heldItem.getItem()).getEndPos(heldItem) == null) return;
         UniqueItem uniqueItem = IntStackMap.get(state);
         if (uniqueItem == null) return; //This shouldn't happen I hope!
         ItemStack itemStack = new ItemStack(uniqueItem.item, 1, uniqueItem.meta);
