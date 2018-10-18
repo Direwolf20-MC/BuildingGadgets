@@ -1,7 +1,5 @@
 package com.direwolf20.buildinggadgets.items;
 
-import javax.annotation.Nullable;
-
 import com.direwolf20.buildinggadgets.Config;
 import com.direwolf20.buildinggadgets.items.ItemCaps.CapabilityProviderEnergy;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
@@ -15,6 +13,8 @@ import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+
+import javax.annotation.Nullable;
 
 public class GenericGadget extends Item {
 

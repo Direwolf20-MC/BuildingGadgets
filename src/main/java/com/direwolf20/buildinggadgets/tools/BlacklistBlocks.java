@@ -7,17 +7,15 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.config.ConfigCategory;
 import net.minecraftforge.common.config.Configuration;
 
+import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.annotation.Nonnull;
 
 public class BlacklistBlocks {
     private static ArrayList<String> blacklistedBlocks = new ArrayList<String>();
 
     @Nonnull
-    private static ResourceLocation getName(Block block)
-    {
+    private static ResourceLocation getName(Block block) {
         ResourceLocation name = block.getRegistryName();
         if (name == null)
             throw new IllegalArgumentException("A registry name for the following block could not be found: " + block);

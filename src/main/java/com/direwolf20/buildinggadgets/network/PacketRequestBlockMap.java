@@ -1,7 +1,6 @@
 package com.direwolf20.buildinggadgets.network;
 
 import com.direwolf20.buildinggadgets.tools.WorldSave;
-
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;

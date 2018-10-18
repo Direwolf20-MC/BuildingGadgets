@@ -47,7 +47,7 @@ public class TemplateManagerGUI extends GuiContainer {
 
     private boolean panelClicked;
     private int clickButton;
-//    private long lastDragTime;
+    //    private long lastDragTime;
     private int clickX, clickY;
     private float initRotX, initRotY, initZoom, initPanX, initPanY;
     private float prevRotX, prevRotY;// prevPanX, prevPanY;

@@ -21,13 +21,13 @@ public class PacketHandler {
         registerMessage(PacketTemplateManagerLoad.Handler.class, PacketTemplateManagerLoad.class, Side.SERVER);
         registerMessage(PacketTemplateManagerPaste.Handler.class, PacketTemplateManagerPaste.class, Side.SERVER);
         registerMessage(PacketCopyCoords.Handler.class, PacketCopyCoords.class, Side.SERVER);
+        registerMessage(PacketDestructionGUI.Handler.class, PacketDestructionGUI.class, Side.SERVER);
 
         // Client side
         registerMessage(PacketBlockMap.Handler.class, PacketBlockMap.class, Side.CLIENT);
     }
 
-    private static void registerMessage(Class handler, Class packet, Side side)
-    {
+    private static void registerMessage(Class handler, Class packet, Side side) {
         INSTANCE.registerMessage(handler, packet, packetId++, side);
     }
 }

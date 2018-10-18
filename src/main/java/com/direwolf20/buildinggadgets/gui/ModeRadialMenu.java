@@ -46,7 +46,7 @@ public class ModeRadialMenu extends GuiScreen {
     private int timeIn = 0;
     private int slotSelected = -1;
 
-//  ItemStack itemStack;
+    //  ItemStack itemStack;
     private List<Integer> slots;
 
     public ModeRadialMenu(ItemStack stack) {

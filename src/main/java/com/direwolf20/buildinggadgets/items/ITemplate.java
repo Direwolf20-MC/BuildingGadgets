@@ -1,19 +1,17 @@
 package com.direwolf20.buildinggadgets.items;
 
-import java.util.Map;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
 import com.direwolf20.buildinggadgets.tools.GadgetUtils;
 import com.direwolf20.buildinggadgets.tools.UniqueItem;
 import com.direwolf20.buildinggadgets.tools.WorldSave;
-
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.Map;
 
 public interface ITemplate {
 

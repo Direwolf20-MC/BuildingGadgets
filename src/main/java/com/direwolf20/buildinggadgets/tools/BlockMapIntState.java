@@ -9,11 +9,10 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.util.math.BlockPos;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.HashMap;
+import java.util.Map;
 
 public class BlockMapIntState {
 
@@ -35,7 +34,7 @@ public class BlockMapIntState {
 
     public void addToMap(IBlockState mapState) {
         if (findSlot(mapState) == -1) {
-            short nextSlot = (short)intStateMap.size();
+            short nextSlot = (short) intStateMap.size();
             nextSlot++;
             intStateMap.put(nextSlot, mapState);
         }
@@ -136,7 +135,7 @@ public class BlockMapIntState {
             UniqueItem uniqueItem = new UniqueItem(itemStack.getItem(), itemStack.getMetadata());
             return uniqueItem;
         }
-        throw new IllegalArgumentException("A UniqueItem could net be retrieved for the the follwing state (at position " + pos +"): " + state);
+        throw new IllegalArgumentException("A UniqueItem could net be retrieved for the the follwing state (at position " + pos + "): " + state);
     }
 
     public void makeStackMapFromStateMap(EntityPlayer player) {
@@ -144,7 +143,8 @@ public class BlockMapIntState {
         for (Map.Entry<Short, IBlockState> entry : intStateMap.entrySet()) {
             try {
                 intStackMap.put(entry.getValue(), blockStateToUniqueItem(entry.getValue(), player, new BlockPos(0, 0, 0)));
-            } catch (IllegalArgumentException e) {}
+            } catch (IllegalArgumentException e) {
+            }
         }
     }
 }

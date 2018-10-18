@@ -23,7 +23,7 @@ public class ConstructionBlockEntity extends Entity {
     private int despawning = -1;
     public int maxLife = 80;
     private BlockPos setPos;
-//    private EntityLivingBase spawnedBy;
+    //    private EntityLivingBase spawnedBy;
     private World world;
 
     public ConstructionBlockEntity(World worldIn) {

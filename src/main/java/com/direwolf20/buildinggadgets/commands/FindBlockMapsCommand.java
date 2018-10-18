@@ -9,14 +9,12 @@ public class FindBlockMapsCommand extends CommandAlterBlockMaps {
     }
 
     @Override
-    protected String getActionFeedback(NBTTagCompound tagCompound)
-    {
+    protected String getActionFeedback(NBTTagCompound tagCompound) {
         return TextFormatting.WHITE + tagCompound.getString("owner") + ":" + tagCompound.getString("UUID");
     }
 
     @Override
-    protected String getCompletionFeedback(int counter)
-    {
+    protected String getCompletionFeedback(int counter) {
         return TextFormatting.WHITE + "Found " + counter + " blockmaps in world data.";
     }
 }

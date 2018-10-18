@@ -13,14 +13,13 @@ import net.minecraftforge.common.property.IExtendedBlockState;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-
 import java.util.Collections;
 import java.util.List;
 
 public class ConstructionBakedModel implements IBakedModel {
     public static final ModelResourceLocation modelFacade = new ModelResourceLocation(BuildingGadgets.MODID + ":" + "constructionblock");
 
-//    private VertexFormat format;
+    //    private VertexFormat format;
     private static TextureAtlasSprite spriteCable;
     private IBakedModel blankConstructionModel;
 

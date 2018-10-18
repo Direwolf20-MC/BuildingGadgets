@@ -3,7 +3,6 @@ package com.direwolf20.buildinggadgets.items;
 import com.direwolf20.buildinggadgets.BuildingGadgets;
 import com.direwolf20.buildinggadgets.tools.GadgetUtils;
 import com.direwolf20.buildinggadgets.tools.WorldSave;
-
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
@@ -20,10 +19,9 @@ import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.UUID;
-
-import javax.annotation.Nullable;
 
 public class Template extends Item implements ITemplate {
     public Template() {
@@ -32,8 +30,7 @@ public class Template extends Item implements ITemplate {
     }
 
     @Override
-    public WorldSave getWorldSave(World world)
-    {
+    public WorldSave getWorldSave(World world) {
         return WorldSave.getTemplateWorldSave(world);
     }
 

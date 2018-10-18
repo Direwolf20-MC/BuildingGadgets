@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.items.ItemCaps;
 
+import com.direwolf20.buildinggadgets.tools.GadgetUtils;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.capabilities.Capability;
@@ -9,8 +10,6 @@ import net.minecraftforge.energy.IEnergyStorage;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-
-import com.direwolf20.buildinggadgets.tools.GadgetUtils;
 
 public class CapabilityProviderEnergy implements ICapabilityProvider {
     private ItemStack stack;

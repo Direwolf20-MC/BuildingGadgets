@@ -15,7 +15,6 @@ import net.minecraftforge.items.ItemStackHandler;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;

@@ -74,8 +74,7 @@ public class CopyPasteTool extends GenericGadget implements ITemplate {
     }
 
     @Override
-    public WorldSave getWorldSave(World world)
-    {
+    public WorldSave getWorldSave(World world) {
         return WorldSave.getWorldSave(world);
     }
 

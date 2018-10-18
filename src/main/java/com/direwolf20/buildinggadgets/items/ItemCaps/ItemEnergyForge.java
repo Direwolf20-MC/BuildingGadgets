@@ -28,8 +28,7 @@ public class ItemEnergyForge extends EnergyStorage {
         return changeEnergy(super.extractEnergy(maxExtract, simulate), simulate);
     }
 
-    private int changeEnergy(int amount, boolean simulate)
-    {
+    private int changeEnergy(int amount, boolean simulate) {
         if (amount > 0 && !simulate) {
             NBTTagCompound nbt = stack.getTagCompound();
             if (nbt == null) {
