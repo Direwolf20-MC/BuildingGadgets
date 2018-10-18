@@ -132,7 +132,7 @@ public class InventoryManipulation {
                 count += stackInSlot.getCount();
             }
         }
-        ArrayList<Integer> containerSlots = findItemClass(GenericPasteContainer.class, inv);
+        List<Integer> containerSlots = findItemClass(GenericPasteContainer.class, inv);
         if (containerSlots.size() > 0) {
             for (int slot : containerSlots) {
                 ItemStack stackInSlot = inv.getStackInSlot(slot);
@@ -149,7 +149,7 @@ public class InventoryManipulation {
             return itemStack;
         }
         InventoryPlayer inv = player.inventory;
-        ArrayList<Integer> slots = findItemClass(GenericPasteContainer.class, inv);
+        List<Integer> slots = findItemClass(GenericPasteContainer.class, inv);
         if (slots.size() == 0) {
             return itemStack;
         }
@@ -192,12 +192,11 @@ public class InventoryManipulation {
                 ItemStack pasteStack = inv.getStackInSlot(slot);
                 if (pasteStack.getCount() >= count) {
                     pasteStack.shrink(count);
-                    pasteStack = pasteStack;
                     return true;
                 }
             }
         }
-        ArrayList<Integer> containerSlots = findItemClass(GenericPasteContainer.class, inv);
+        List<Integer> containerSlots = findItemClass(GenericPasteContainer.class, inv);
         if (containerSlots.size() > 0) {
             for (int slot : containerSlots) {
                 ItemStack containerStack = inv.getStackInSlot(slot);
@@ -248,8 +247,8 @@ public class InventoryManipulation {
         return slots;
     }
 
-    public static ArrayList<Integer> findItemClass(Class c, InventoryPlayer inv) {
-        ArrayList<Integer> slots = new ArrayList<Integer>();
+    public static List<Integer> findItemClass(Class c, InventoryPlayer inv) {
+        List<Integer> slots = new ArrayList<Integer>();
         for (int i = 0; i < 36; ++i) {
             ItemStack stack = inv.getStackInSlot(i);
             if (!stack.isEmpty() && c.isInstance(stack.getItem())) {

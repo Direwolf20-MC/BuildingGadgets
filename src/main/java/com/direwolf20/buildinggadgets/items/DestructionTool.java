@@ -35,6 +35,8 @@ import net.minecraftforge.event.world.BlockEvent;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import static com.direwolf20.buildinggadgets.tools.GadgetUtils.useEnergy;
 import static com.direwolf20.buildinggadgets.tools.GadgetUtils.withSuffix;
 
@@ -48,12 +50,13 @@ public class DestructionTool extends GenericGadget {
     }
 
     @Override
-    public void addInformation(ItemStack stack, World player, List<String> list, ITooltipFlag b) {
-        super.addInformation(stack, player, list, b);
+    public void addInformation(ItemStack stack, @Nullable World world, List<String> list, ITooltipFlag b) {
+        super.addInformation(stack, world, list, b);
         //list.add(TextFormatting.AQUA + I18n.format("tooltip.gadget.mode") + ": " + getToolMode(stack));
         if (Config.poweredByFE) {
             IEnergyStorage energy = stack.getCapability(CapabilityEnergy.ENERGY, null);
-            list.add(TextFormatting.WHITE + I18n.format("tooltip.gadget.energy") + ": " + withSuffix(energy.getEnergyStored()) + "/" + withSuffix(energy.getMaxEnergyStored()));
+            if (energy != null)
+                list.add(TextFormatting.WHITE + I18n.format("tooltip.gadget.energy") + ": " + withSuffix(energy.getEnergyStored()) + "/" + withSuffix(energy.getMaxEnergyStored()));
         }
     }
 
