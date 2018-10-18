@@ -14,6 +14,7 @@ public class EffectBlockMaterial extends Material {
     /**
      * Returns true if the block is a considered solid. This is true by default.
      */
+    @Override
     public boolean isSolid() {
         return false;
     }

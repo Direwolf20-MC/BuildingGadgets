@@ -7,7 +7,7 @@ package com.direwolf20.buildinggadgets.eventhandlers;
 
 import com.direwolf20.buildinggadgets.ModItems;
 import com.direwolf20.buildinggadgets.items.CopyPasteTool;
-import com.direwolf20.buildinggadgets.items.Template;
+import com.direwolf20.buildinggadgets.items.ITemplate;
 import com.direwolf20.buildinggadgets.tools.BlockMap;
 import com.direwolf20.buildinggadgets.tools.InventoryManipulation;
 import com.direwolf20.buildinggadgets.tools.PasteToolBufferBuilder;
@@ -24,6 +24,7 @@ import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.client.event.RenderTooltipEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
+import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -31,12 +32,13 @@ import org.lwjgl.opengl.GL11;
 
 import java.util.*;
 
+@EventBusSubscriber(Side.CLIENT)
 public class TooltipRender {
 
     private static final int STACKS_PER_LINE = 8;
 
     @SideOnly(Side.CLIENT)
-    public static void tooltipIfShift(List<String> tooltip, Runnable r) {
+    private static void tooltipIfShift(@SuppressWarnings("unused") List<String> tooltip, Runnable r) {
         if (GuiScreen.isShiftKeyDown())
             r.run();
         //else addToTooltip(tooltip, "arl.misc.shiftForInfo");
@@ -47,14 +49,15 @@ public class TooltipRender {
         //This method extends the tooltip box size to fit the item's we will render in onDrawTooltip
         Minecraft mc = Minecraft.getMinecraft();
         ItemStack stack = event.getItemStack();
-        if (stack.getItem() instanceof CopyPasteTool || stack.getItem() instanceof Template) {
-            String UUID = stack.getItem() instanceof CopyPasteTool ? CopyPasteTool.getUUID(stack) : Template.getUUID(stack);
+        if (stack.getItem() instanceof ITemplate) {
+            ITemplate template = (ITemplate) stack.getItem();
+            String UUID = template.getUUID(stack);
             if (UUID == null) {
                 return;
             }
 
             List<String> tooltip = event.getToolTip();
-            Map<UniqueItem, Integer> itemCountMap = stack.getItem() instanceof CopyPasteTool ? CopyPasteTool.getItemCountMap(stack) : Template.getItemCountMap(stack);
+            Map<UniqueItem, Integer> itemCountMap = template.getItemCountMap(stack);
 
             Map<ItemStack, Integer> itemStackCount = new HashMap<ItemStack, Integer>();
             for (Map.Entry<UniqueItem, Integer> entry : itemCountMap.entrySet()) {
@@ -93,10 +96,9 @@ public class TooltipRender {
     public static void onDrawTooltip(RenderTooltipEvent.PostText event) {
         //This method will draw items on the tooltip
         ItemStack stack = event.getStack();
-        if ((stack.getItem() instanceof CopyPasteTool || stack.getItem() instanceof Template) && GuiScreen.isShiftKeyDown()) {
+        if ((stack.getItem() instanceof ITemplate) && GuiScreen.isShiftKeyDown()) {
             int totalMissing = 0;
-            String UUID = stack.getItem() instanceof CopyPasteTool ? CopyPasteTool.getUUID(stack) : Template.getUUID(stack);
-            Map<UniqueItem, Integer> itemCountMap = stack.getItem() instanceof CopyPasteTool ? CopyPasteTool.getItemCountMap(stack) : Template.getItemCountMap(stack);
+            Map<UniqueItem, Integer> itemCountMap = ((ITemplate) stack.getItem()).getItemCountMap(stack);
 
             //Create an ItemStack -> Integer Map
             Map<ItemStack, Integer> itemStackCount = new HashMap<ItemStack, Integer>();
@@ -112,20 +114,20 @@ public class TooltipRender {
             comparator = comparator.thenComparing(Comparator.comparing(entry -> entry.getKey().getMetadata()));
             list.sort(comparator);
 
-            int count = itemStackCount.size();
+//            int count = itemStackCount.size();
 
             int bx = event.getX();
             int by = event.getY();
 
             List<String> tooltip = event.getLines();
-            int lines = (((count - 1) / STACKS_PER_LINE) + 1);
-            int width = Math.min(STACKS_PER_LINE, count) * 18;
-            int height = lines * 20 + 1;
+//            int lines = (((count - 1) / STACKS_PER_LINE) + 1);
+//            int width = Math.min(STACKS_PER_LINE, count) * 18;
+//            int height = lines * 20 + 1;
 
             for (String s : tooltip) {
                 if (s.trim().equals("\u00a77\u00a7r\u00a7r\u00a7r\u00a7r\u00a7r"))
                     break;
-                else by += 10;
+                by += 10;
             }
 
             GlStateManager.enableBlend();
@@ -161,7 +163,7 @@ public class TooltipRender {
         render.renderItemIntoGUI(itemStack, x, y);
 
         //String s1 = count == Integer.MAX_VALUE ? "\u221E" : TextFormatting.BOLD + Integer.toString((int) ((float) req));
-        String s1 = count == Integer.MAX_VALUE ? "\u221E" : Integer.toString((int) ((float) req));
+        String s1 = count == Integer.MAX_VALUE ? "\u221E" : Integer.toString(req);
         int w1 = mc.fontRenderer.getStringWidth(s1);
         int color = 0xFFFFFF;
 
@@ -201,10 +203,10 @@ public class TooltipRender {
         return missingCount;
     }
 
-    public static Map<UniqueItem, Integer> makeRequiredList(String UUID) {
+    public static Map<UniqueItem, Integer> makeRequiredList(String UUID) {//TODO unused
         Map<UniqueItem, Integer> itemCountMap = new HashMap<UniqueItem, Integer>();
         Map<IBlockState, UniqueItem> IntStackMap = CopyPasteTool.getBlockMapIntState(PasteToolBufferBuilder.getTagFromUUID(UUID)).getIntStackMap();
-        ArrayList<BlockMap> blockMapList = CopyPasteTool.getBlockMapList(PasteToolBufferBuilder.getTagFromUUID(UUID));
+        List<BlockMap> blockMapList = CopyPasteTool.getBlockMapList(PasteToolBufferBuilder.getTagFromUUID(UUID));
         for (BlockMap blockMap : blockMapList) {
             UniqueItem uniqueItem = IntStackMap.get(blockMap.state);
             NonNullList<ItemStack> drops = NonNullList.create();

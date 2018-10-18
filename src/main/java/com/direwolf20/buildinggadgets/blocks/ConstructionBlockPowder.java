@@ -21,6 +21,8 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 public class ConstructionBlockPowder extends BlockFalling {
 
     public ConstructionBlockPowder() {
@@ -36,8 +38,8 @@ public class ConstructionBlockPowder extends BlockFalling {
     }
 
     @Override
-    public void addInformation(ItemStack stack, World player, List<String> list, ITooltipFlag b) {
-        super.addInformation(stack, player, list, b);
+    public void addInformation(ItemStack stack, @Nullable World world, List<String> list, ITooltipFlag b) {
+        super.addInformation(stack, world, list, b);
         list.add(I18n.format("tooltip.constructionblockpowder.helptext"));
     }
 
@@ -48,7 +50,7 @@ public class ConstructionBlockPowder extends BlockFalling {
         }
     }
 
-    protected boolean tryTouchWater(World worldIn, BlockPos pos, IBlockState state) {
+    private boolean tryTouchWater(World worldIn, BlockPos pos) {
         boolean flag = false;
 
         for (EnumFacing enumfacing : EnumFacing.values()) {
@@ -78,7 +80,7 @@ public class ConstructionBlockPowder extends BlockFalling {
      */
     @Override
     public void neighborChanged(IBlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos fromPos) {
-        if (!this.tryTouchWater(worldIn, pos, state)) {
+        if (!this.tryTouchWater(worldIn, pos)) {
             super.neighborChanged(state, worldIn, pos, blockIn, fromPos);
         }
     }
@@ -88,7 +90,7 @@ public class ConstructionBlockPowder extends BlockFalling {
      */
     @Override
     public void onBlockAdded(World worldIn, BlockPos pos, IBlockState state) {
-        if (!this.tryTouchWater(worldIn, pos, state)) {
+        if (!this.tryTouchWater(worldIn, pos)) {
             super.onBlockAdded(worldIn, pos, state);
         }
     }

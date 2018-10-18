@@ -1,13 +1,10 @@
 package com.direwolf20.buildinggadgets.blocks.templatemanager;
 
 import com.direwolf20.buildinggadgets.BuildingGadgets;
-import com.direwolf20.buildinggadgets.items.CopyPasteTool;
-import com.direwolf20.buildinggadgets.items.Template;
+import com.direwolf20.buildinggadgets.items.ITemplate;
 import com.direwolf20.buildinggadgets.network.PacketBlockMap;
 import com.direwolf20.buildinggadgets.network.PacketHandler;
-import com.direwolf20.buildinggadgets.network.PacketTemplateBlockMap;
-import com.direwolf20.buildinggadgets.tools.BlockMapWorldSave;
-import com.direwolf20.buildinggadgets.tools.TemplateWorldSave;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -27,7 +24,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class TemplateManager extends Block {
-    public static final int GUI_ID = 1;
+    private static final int GUI_ID = 1;
 
     public TemplateManager() {
         super(Material.ROCK);
@@ -64,24 +61,15 @@ public class TemplateManager extends Block {
         TemplateManagerContainer container = ((TemplateManagerTileEntity) te).getContainer(player);
         for (int i = 0; i <= 1; i++) {
             ItemStack itemStack = container.getSlot(i).getStack();
-            if (itemStack.getItem() instanceof CopyPasteTool) {
-                String UUID = CopyPasteTool.getUUID(itemStack);
-                if (!(UUID == null)) {
-                    BlockMapWorldSave worldSave = BlockMapWorldSave.get(world);
-                    NBTTagCompound tagCompound = worldSave.getCompoundFromUUID(UUID);
-                    if (tagCompound != null) {
-                        PacketHandler.INSTANCE.sendTo(new PacketBlockMap(tagCompound), (EntityPlayerMP) player);
-                    }
-                }
-            } else if (itemStack.getItem() instanceof Template) {
-                String UUID = Template.getUUID(itemStack);
-                if (!(UUID == null)) {
-                    TemplateWorldSave worldSave = TemplateWorldSave.get(world);
-                    NBTTagCompound tagCompound = worldSave.getCompoundFromUUID(UUID);
-                    if (tagCompound != null) {
-                        PacketHandler.INSTANCE.sendTo(new PacketTemplateBlockMap(tagCompound), (EntityPlayerMP) player);
-                    }
-                }
+            if (!(itemStack.getItem() instanceof ITemplate)) continue;
+
+            ITemplate template = (ITemplate) itemStack.getItem();
+            String UUID = template.getUUID(itemStack);
+            if (UUID == null) continue;
+
+            NBTTagCompound tagCompound = template.getWorldSave(world).getCompoundFromUUID(UUID);
+            if (tagCompound != null) {
+                PacketHandler.INSTANCE.sendTo(new PacketBlockMap(tagCompound), (EntityPlayerMP) player);
             }
         }
         player.openGui(BuildingGadgets.instance, GUI_ID, world, pos.getX(), pos.getY(), pos.getZ());

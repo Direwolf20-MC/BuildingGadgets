@@ -18,12 +18,11 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.client.settings.GameSettings;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
-import org.lwjgl.input.Keyboard;
-import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.vector.Vector2f;
 
@@ -44,16 +43,16 @@ public class ModeRadialMenu extends GuiScreen {
             new ResourceLocation("buildinggadgets:textures/ui/checker.png")
     };
 
-    int timeIn = 0;
-    int slotSelected = -1;
+    private int timeIn = 0;
+    private int slotSelected = -1;
 
-    ItemStack itemStack;
-    List<Integer> slots;
+//  ItemStack itemStack;
+    private List<Integer> slots;
 
     public ModeRadialMenu(ItemStack stack) {
         mc = Minecraft.getMinecraft();
 
-        itemStack = ItemStack.EMPTY;
+//        itemStack = ItemStack.EMPTY;
         if (stack.getItem() instanceof BuildingTool) {
             setSocketable(stack);
         } else if (stack.getItem() instanceof ExchangerTool) {
@@ -67,15 +66,15 @@ public class ModeRadialMenu extends GuiScreen {
         slots = new ArrayList();
         if (stack.isEmpty())
             return;
-        itemStack = stack;
+//        itemStack = stack;
         if (stack.getItem() instanceof BuildingTool) {
-            for (int i = 0; i < BuildingTool.toolModes.values().length; i++)
+            for (int i = 0; i < BuildingTool.ToolMode.values().length; i++)
                 slots.add(i);
         } else if (stack.getItem() instanceof ExchangerTool) {
-            for (int i = 0; i < ExchangerTool.toolModes.values().length; i++)
+            for (int i = 0; i < ExchangerTool.ToolMode.values().length; i++)
                 slots.add(i);
         } else if (stack.getItem() instanceof CopyPasteTool) {
-            for (int i = 0; i < CopyPasteTool.toolModes.values().length; i++)
+            for (int i = 0; i < CopyPasteTool.ToolMode.values().length; i++)
                 slots.add(i);
         }
     }
@@ -169,13 +168,13 @@ public class ModeRadialMenu extends GuiScreen {
 
             String name = "";
             if (tool.getItem() instanceof BuildingTool) {
-                BuildingTool.toolModes mode = BuildingTool.toolModes.values()[slot];
+                BuildingTool.ToolMode mode = BuildingTool.ToolMode.values()[slot];
                 name = "\u00a7" + c + mode.name();
             } else if (tool.getItem() instanceof ExchangerTool) {
-                ExchangerTool.toolModes mode = ExchangerTool.toolModes.values()[slot];
+                ExchangerTool.ToolMode mode = ExchangerTool.ToolMode.values()[slot];
                 name = "\u00a7" + c + mode.name();
             } else if (tool.getItem() instanceof CopyPasteTool) {
-                CopyPasteTool.toolModes mode = CopyPasteTool.toolModes.values()[slot];
+                CopyPasteTool.ToolMode mode = CopyPasteTool.ToolMode.values()[slot];
                 name = "\u00a7" + c + mode.name();
             }
 
@@ -232,7 +231,7 @@ public class ModeRadialMenu extends GuiScreen {
     public void updateScreen() {
         super.updateScreen();
 
-        if (!isKeyDown(KeyBindings.modeSwitch)) {
+        if (!GameSettings.isKeyDown(KeyBindings.modeSwitch)) {
             mc.displayGuiScreen(null);
             if (slotSelected != -1) {
                 PacketHandler.INSTANCE.sendToServer(new PacketToggleMode(slotSelected));
@@ -241,18 +240,9 @@ public class ModeRadialMenu extends GuiScreen {
 
         ImmutableSet<KeyBinding> set = ImmutableSet.of(mc.gameSettings.keyBindForward, mc.gameSettings.keyBindLeft, mc.gameSettings.keyBindBack, mc.gameSettings.keyBindRight, mc.gameSettings.keyBindSneak, mc.gameSettings.keyBindSprint, mc.gameSettings.keyBindJump);
         for (KeyBinding k : set)
-            KeyBinding.setKeyBindState(k.getKeyCode(), isKeyDown(k));
+            KeyBinding.setKeyBindState(k.getKeyCode(), GameSettings.isKeyDown(k));
 
         timeIn++;
-    }
-
-    public boolean isKeyDown(KeyBinding keybind) {
-        int key = keybind.getKeyCode();
-        if (key < 0) {
-            int button = 100 + key;
-            return Mouse.isButtonDown(button);
-        }
-        return Keyboard.isKeyDown(key);
     }
 
     @Override

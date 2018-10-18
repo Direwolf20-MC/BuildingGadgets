@@ -10,13 +10,16 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumHand;
 import net.minecraftforge.client.settings.KeyModifier;
+import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent;
+import net.minecraftforge.fml.relauncher.Side;
 
+@EventBusSubscriber(Side.CLIENT)
 public class KeyInputHandler {
 
     @SubscribeEvent
-    public void onKeyInput(InputEvent.KeyInputEvent event) {
+    public static void onKeyInput(@SuppressWarnings("unused") InputEvent.KeyInputEvent event) {
         //if (KeyBindings.modeSwitch.isPressed()) {
         if (KeyBindings.modeSwitch.isKeyDown() && ((KeyBindings.modeSwitch.getKeyModifier() == KeyModifier.NONE && KeyModifier.getActiveModifier() == KeyModifier.NONE) || KeyBindings.modeSwitch.getKeyModifier() != KeyModifier.NONE)) {
             //PacketHandler.INSTANCE.sendToServer(new PacketToggleMode());
@@ -40,7 +43,7 @@ public class KeyInputHandler {
     }
 
     @SubscribeEvent
-    public void onMouseInput(InputEvent.MouseInputEvent event) {
+    public static void onMouseInput(@SuppressWarnings("unused") InputEvent.MouseInputEvent event) {
         //if (KeyBindings.modeSwitch.isPressed()) {
         if (KeyBindings.modeSwitch.isKeyDown() && ((KeyBindings.modeSwitch.getKeyModifier() == KeyModifier.NONE && KeyModifier.getActiveModifier() == KeyModifier.NONE) || KeyBindings.modeSwitch.getKeyModifier() != KeyModifier.NONE)) {
             //PacketHandler.INSTANCE.sendToServer(new PacketToggleMode());

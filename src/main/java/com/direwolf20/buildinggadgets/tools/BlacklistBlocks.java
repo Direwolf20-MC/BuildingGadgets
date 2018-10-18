@@ -3,30 +3,44 @@ package com.direwolf20.buildinggadgets.tools;
 import com.direwolf20.buildinggadgets.Config;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.config.ConfigCategory;
 import net.minecraftforge.common.config.Configuration;
 
 import java.util.ArrayList;
+import java.util.List;
+
+import javax.annotation.Nonnull;
 
 public class BlacklistBlocks {
-    protected static ArrayList<String> blacklistedBlocks = new ArrayList<String>();
+    private static ArrayList<String> blacklistedBlocks = new ArrayList<String>();
 
-    public static void addBlockToBlacklist(Block block) {
-        blacklistedBlocks.add(block.getRegistryName().toString());
+    @Nonnull
+    private static ResourceLocation getName(Block block)
+    {
+        ResourceLocation name = block.getRegistryName();
+        if (name == null)
+            throw new IllegalArgumentException("A registry name for the following block could not be found: " + block);
+
+        return name;
     }
 
-    public static void addStringToBlacklist(String name) {
+    private static void addBlockToBlacklist(Block block) {
+        blacklistedBlocks.add(getName(block).toString());
+    }
+
+    private static void addStringToBlacklist(String name) {
         blacklistedBlocks.add(name);
     }
 
-    public static void setConfig(Configuration cfg, ArrayList<String> blacklist) {
+    private static void setConfig(Configuration cfg, List<String> blacklist) {
         String[] tempArray = new String[blacklist.size()];
         blacklist.toArray(tempArray);
         cfg.get(Config.CATEGORY_BLACKLIST, "Blacklist", tempArray);
     }
 
     public static boolean checkBlacklist(Block block) {
-        return blacklistedBlocks.contains(block.getRegistryName().toString());
+        return blacklistedBlocks.contains(getName(block).toString());
     }
 
     public static void getBlacklist(Configuration cfg) {

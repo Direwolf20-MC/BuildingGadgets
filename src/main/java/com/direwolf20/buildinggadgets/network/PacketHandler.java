@@ -7,22 +7,27 @@ import net.minecraftforge.fml.relauncher.Side;
 
 public class PacketHandler {
     public static final SimpleNetworkWrapper INSTANCE = NetworkRegistry.INSTANCE.newSimpleChannel(BuildingGadgets.MODID);
+    private static int packetId = 0;
 
     public static void registerMessages() {
 
         // Server side
-        INSTANCE.registerMessage(PacketToggleMode.Handler.class, PacketToggleMode.class, 0, Side.SERVER);
-        INSTANCE.registerMessage(PacketChangeRange.Handler.class, PacketChangeRange.class, 1, Side.SERVER);
-        INSTANCE.registerMessage(PacketUndoKey.Handler.class, PacketUndoKey.class, 2, Side.SERVER);
-        INSTANCE.registerMessage(PacketAnchorKey.Handler.class, PacketAnchorKey.class, 3, Side.SERVER);
-        INSTANCE.registerMessage(PacketBlockMap.Handler.class, PacketBlockMap.class, 4, Side.CLIENT);
-        INSTANCE.registerMessage(PacketRequestBlockMap.Handler.class, PacketRequestBlockMap.class, 5, Side.SERVER);
-        INSTANCE.registerMessage(PacketTemplateManagerSave.Handler.class, PacketTemplateManagerSave.class, 6, Side.SERVER);
-        INSTANCE.registerMessage(PacketTemplateManagerLoad.Handler.class, PacketTemplateManagerLoad.class, 7, Side.SERVER);
-        INSTANCE.registerMessage(PacketTemplateBlockMap.Handler.class, PacketTemplateBlockMap.class, 8, Side.CLIENT);
-        INSTANCE.registerMessage(PacketRequestTemplateBlockMap.Handler.class, PacketRequestTemplateBlockMap.class, 9, Side.SERVER);
-        INSTANCE.registerMessage(PacketTemplateManagerPaste.Handler.class, PacketTemplateManagerPaste.class, 10, Side.SERVER);
-        INSTANCE.registerMessage(PacketCopyCoords.Handler.class, PacketCopyCoords.class, 11, Side.SERVER);
+        registerMessage(PacketToggleMode.Handler.class, PacketToggleMode.class, Side.SERVER);
+        registerMessage(PacketChangeRange.Handler.class, PacketChangeRange.class, Side.SERVER);
+        registerMessage(PacketUndoKey.Handler.class, PacketUndoKey.class, Side.SERVER);
+        registerMessage(PacketAnchorKey.Handler.class, PacketAnchorKey.class, Side.SERVER);
+        registerMessage(PacketRequestBlockMap.Handler.class, PacketRequestBlockMap.class, Side.SERVER);
+        registerMessage(PacketTemplateManagerSave.Handler.class, PacketTemplateManagerSave.class, Side.SERVER);
+        registerMessage(PacketTemplateManagerLoad.Handler.class, PacketTemplateManagerLoad.class, Side.SERVER);
+        registerMessage(PacketTemplateManagerPaste.Handler.class, PacketTemplateManagerPaste.class, Side.SERVER);
+        registerMessage(PacketCopyCoords.Handler.class, PacketCopyCoords.class, Side.SERVER);
+
         // Client side
+        registerMessage(PacketBlockMap.Handler.class, PacketBlockMap.class, Side.CLIENT);
+    }
+
+    private static void registerMessage(Class handler, Class packet, Side side)
+    {
+        INSTANCE.registerMessage(handler, packet, packetId++, side);
     }
 }

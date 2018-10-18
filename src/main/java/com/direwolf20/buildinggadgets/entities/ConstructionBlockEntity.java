@@ -4,10 +4,8 @@ import com.direwolf20.buildinggadgets.ModBlocks;
 import com.direwolf20.buildinggadgets.blocks.ConstructionBlock;
 import com.direwolf20.buildinggadgets.blocks.ConstructionBlockPowder;
 import com.direwolf20.buildinggadgets.blocks.ConstructionBlockTileEntity;
-import io.netty.buffer.ByteBuf;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.network.datasync.DataParameter;
@@ -16,18 +14,17 @@ import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
 
-public class ConstructionBlockEntity extends Entity implements IEntityAdditionalSpawnData {
+public class ConstructionBlockEntity extends Entity {
 
     private static final DataParameter<BlockPos> FIXED = EntityDataManager.createKey(ConstructionBlockEntity.class, DataSerializers.BLOCK_POS);
     private static final DataParameter<Boolean> MAKING = EntityDataManager.createKey(ConstructionBlockEntity.class, DataSerializers.BOOLEAN);
 
-    public int despawning = -1;
+    private int despawning = -1;
     public int maxLife = 80;
     private BlockPos setPos;
-    private EntityLivingBase spawnedBy;
-    World world;
+//    private EntityLivingBase spawnedBy;
+    private World world;
 
     public ConstructionBlockEntity(World worldIn) {
         super(worldIn);
@@ -80,6 +77,9 @@ public class ConstructionBlockEntity extends Entity implements IEntityAdditional
                     TileEntity te = world.getTileEntity(setPos);
                     if (te instanceof ConstructionBlockTileEntity) {
                         IBlockState tempState = ((ConstructionBlockTileEntity) te).getBlockState();
+                        if (tempState == null)
+                            return;
+
                         int opacity = tempState.getBlock().getLightOpacity(tempState, world, setPos);
                         boolean neighborBrightness = tempState.getBlock().getUseNeighborBrightness(tempState);
                         if (opacity == 255 || neighborBrightness) {
@@ -122,17 +122,6 @@ public class ConstructionBlockEntity extends Entity implements IEntityAdditional
 
     public boolean getMakingPaste() {
         return this.dataManager.get(MAKING);
-    }
-
-    @Override
-    public void readSpawnData(ByteBuf additionalData) {
-        int id = additionalData.readInt();
-    }
-
-    @Override
-    public void writeSpawnData(ByteBuf buffer) {
-        int id = -1;
-        buffer.writeInt(id);
     }
 
     @Override

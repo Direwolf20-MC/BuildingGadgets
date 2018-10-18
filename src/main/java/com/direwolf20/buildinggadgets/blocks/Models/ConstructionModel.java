@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.function.Function;
 
 public class ConstructionModel implements IModel {
-    public static final ResourceLocation MODEL_CONSTRUCTION_BLOCK = new ModelResourceLocation(BuildingGadgets.MODID + ":blankconstblock");
+    private static final ResourceLocation MODEL_CONSTRUCTION_BLOCK = new ModelResourceLocation(BuildingGadgets.MODID + ":blankconstblock");
 
     @Override
     public IBakedModel bake(IModelState state, VertexFormat format, Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter) {
@@ -27,8 +27,7 @@ public class ConstructionModel implements IModel {
         } catch (Exception e) {
             throw new Error("Unable to load construction block model", e);
         }
-        IBakedModel bakedConstructionModel = constructionModel.bake(state, format, bakedTextureGetter);
-        return new ConstructionBakedModel(state, format, bakedTextureGetter, bakedConstructionModel);
+        return new ConstructionBakedModel(constructionModel.bake(state, format, bakedTextureGetter));
     }
 
     @Override

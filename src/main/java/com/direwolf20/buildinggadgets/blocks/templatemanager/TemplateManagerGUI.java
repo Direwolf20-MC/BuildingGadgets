@@ -6,7 +6,7 @@
 package com.direwolf20.buildinggadgets.blocks.templatemanager;
 
 import com.direwolf20.buildinggadgets.BuildingGadgets;
-import com.direwolf20.buildinggadgets.items.CopyPasteTool;
+import com.direwolf20.buildinggadgets.ModItems;
 import com.direwolf20.buildinggadgets.network.PacketHandler;
 import com.direwolf20.buildinggadgets.network.PacketTemplateManagerLoad;
 import com.direwolf20.buildinggadgets.network.PacketTemplateManagerPaste;
@@ -18,7 +18,6 @@ import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.gui.inventory.GuiContainer;
-import net.minecraft.client.renderer.BlockRendererDispatcher;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.vertex.VertexFormat;
@@ -43,22 +42,22 @@ import java.nio.ByteBuffer;
 import java.util.List;
 
 public class TemplateManagerGUI extends GuiContainer {
-    public static final int WIDTH = 256;
-    public static final int HEIGHT = 256;
+//  public static final int WIDTH = 256;
+//  public static final int HEIGHT = 256;
 
     private boolean panelClicked;
     private int clickButton;
-    private long lastDragTime;
+//    private long lastDragTime;
     private int clickX, clickY;
     private float initRotX, initRotY, initZoom, initPanX, initPanY;
-    private float prevRotX, prevRotY, prevPanX, prevPanY;
+    private float prevRotX, prevRotY;// prevPanX, prevPanY;
     private float momentumX, momentumY;
     private float momentumDampening = 0.98f;
     private float rotX = 0, rotY = 0, zoom = 1;
     private float panX = 0, panY = 0;
-    Rectangle panel = new Rectangle(10, 18, 60, 60);
+    private Rectangle panel = new Rectangle(10, 18, 60, 60);
 
-    private int scrollAcc;
+//    private int scrollAcc;
 
     private GuiTextField nameField;
 
@@ -107,16 +106,16 @@ public class TemplateManagerGUI extends GuiContainer {
         int scale = new ScaledResolution(mc).getScaleFactor();
         drawRect(guiLeft + panel.getX() - 1, guiTop + panel.getY() - 1, guiLeft + panel.getX() + panel.getWidth() + 1, guiTop + panel.getY() + panel.getHeight() + 1, 0xFF8A8A8A);
         ItemStack itemstack = this.container.getSlot(0).getStack();
-        BlockRendererDispatcher dispatcher = this.mc.getBlockRendererDispatcher();
+//        BlockRendererDispatcher dispatcher = this.mc.getBlockRendererDispatcher();
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 
         //float rotX = 165, rotY = 0, zoom = 1;
         if (!itemstack.isEmpty()) {
-            String UUID = CopyPasteTool.getUUID(itemstack);
+            String UUID = ModItems.copyPasteTool.getUUID(itemstack);
             ToolDireBuffer bufferBuilder = PasteToolBufferBuilder.getBufferFromMap(UUID);
             if (bufferBuilder != null) {
-                BlockPos startPos = CopyPasteTool.getStartPos(itemstack);
-                BlockPos endPos = CopyPasteTool.getEndPos(itemstack);
+                BlockPos startPos = ModItems.copyPasteTool.getStartPos(itemstack);
+                BlockPos endPos = ModItems.copyPasteTool.getEndPos(itemstack);
                 double lengthX = Math.abs(startPos.getX() - endPos.getX());
                 double lengthY = Math.abs(startPos.getY() - endPos.getY());
                 double lengthZ = Math.abs(startPos.getZ() - endPos.getZ());
@@ -187,9 +186,9 @@ public class TemplateManagerGUI extends GuiContainer {
 
                     for (int j = 0; j < list.size(); ++j) {
                         VertexFormatElement vertexformatelement = list.get(j);
-                        VertexFormatElement.EnumUsage vertexformatelement$enumusage = vertexformatelement.getUsage();
-                        int k = vertexformatelement.getType().getGlConstant();
-                        int l = vertexformatelement.getIndex();
+//                        VertexFormatElement.EnumUsage vertexformatelement$enumusage = vertexformatelement.getUsage();
+//                        int k = vertexformatelement.getType().getGlConstant();
+//                        int l = vertexformatelement.getIndex();
                         bytebuffer.position(vertexformat.getOffset(j));
 
                         // moved to VertexFormatElement.preDraw
@@ -201,8 +200,8 @@ public class TemplateManagerGUI extends GuiContainer {
 
                     for (int j1 = list.size(); i1 < j1; ++i1) {
                         VertexFormatElement vertexformatelement1 = list.get(i1);
-                        VertexFormatElement.EnumUsage vertexformatelement$enumusage1 = vertexformatelement1.getUsage();
-                        int k1 = vertexformatelement1.getIndex();
+//                        VertexFormatElement.EnumUsage vertexformatelement$enumusage1 = vertexformatelement1.getUsage();
+//                        int k1 = vertexformatelement1.getIndex();
 
                         // moved to VertexFormatElement.postDraw
                         vertexformatelement1.getUsage().postDraw(vertexformat, i1, i, bytebuffer);
@@ -234,7 +233,7 @@ public class TemplateManagerGUI extends GuiContainer {
         } else if (b.id == 2) {
             PacketHandler.INSTANCE.sendToServer(new PacketTemplateManagerLoad(te.getPos()));
         } else if (b.id == 3) {
-            TemplateManagerCommands.CopyTemplate(container);
+            TemplateManagerCommands.copyTemplate(container);
         } else if (b.id == 4) {
             String CBString = getClipboardString();
             //System.out.println("CBString Length: " + CBString.length());
@@ -298,9 +297,9 @@ public class TemplateManagerGUI extends GuiContainer {
     @Override
     protected void mouseReleased(int mouseX, int mouseY, int state) {
         super.mouseReleased(mouseX, mouseY, state);
-        if (panelClicked) {
-            lastDragTime = System.currentTimeMillis();
-        }
+//        if (panelClicked) {
+//            lastDragTime = System.currentTimeMillis();
+//        }
         panelClicked = false;
         initRotX = rotX;
         initRotY = rotY;
@@ -309,7 +308,6 @@ public class TemplateManagerGUI extends GuiContainer {
         initZoom = zoom;
     }
 
-    @SuppressWarnings("deprecation")
     @Override
     protected void drawGuiContainerForegroundLayer(int j, int i) {
         boolean doMomentum = false;
@@ -323,8 +321,8 @@ public class TemplateManagerGUI extends GuiContainer {
                 momentumY = rotY - prevRotY;
                 doMomentum = false;
             } else if (clickButton == 1) {
-                prevPanX = panX;
-                prevPanY = panY;
+//                prevPanX = panX;
+//                prevPanY = panY;
                 panX = initPanX + (Mouse.getX() - clickX) / 8;
                 panY = initPanY + (Mouse.getY() - clickY) / 8;
             }

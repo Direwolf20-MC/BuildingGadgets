@@ -11,7 +11,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 public class PacketBlockMap implements IMessage {
 
-    NBTTagCompound tag = new NBTTagCompound();
+    private NBTTagCompound tag = new NBTTagCompound();
 
     @Override
     public void fromBytes(ByteBuf buf) {
@@ -33,11 +33,11 @@ public class PacketBlockMap implements IMessage {
     public static class Handler implements IMessageHandler<PacketBlockMap, IMessage> {
         @Override
         public IMessage onMessage(PacketBlockMap message, MessageContext ctx) {
-            FMLCommonHandler.instance().getWorldThread(ctx.netHandler).addScheduledTask(() -> handle(message, ctx));
+            FMLCommonHandler.instance().getWorldThread(ctx.netHandler).addScheduledTask(() -> handle(message));
             return null;
         }
 
-        private void handle(PacketBlockMap message, MessageContext ctx) {
+        private void handle(PacketBlockMap message) {
             if (message.tag.equals(new NBTTagCompound())) {
                 PasteToolBufferBuilder.clearMaps();
             }

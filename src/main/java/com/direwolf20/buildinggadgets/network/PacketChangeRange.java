@@ -29,11 +29,11 @@ public class PacketChangeRange implements IMessage {
     public static class Handler implements IMessageHandler<PacketChangeRange, IMessage> {
         @Override
         public IMessage onMessage(PacketChangeRange message, MessageContext ctx) {
-            FMLCommonHandler.instance().getWorldThread(ctx.netHandler).addScheduledTask(() -> handle(message, ctx));
+            FMLCommonHandler.instance().getWorldThread(ctx.netHandler).addScheduledTask(() -> handle(ctx));
             return null;
         }
 
-        private void handle(PacketChangeRange message, MessageContext ctx) {
+        private void handle(MessageContext ctx) {
             EntityPlayerMP playerEntity = ctx.getServerHandler().player;
             ItemStack heldItem = playerEntity.getHeldItem(EnumHand.MAIN_HAND);
             if (!(heldItem.getItem() instanceof GenericGadget)) {

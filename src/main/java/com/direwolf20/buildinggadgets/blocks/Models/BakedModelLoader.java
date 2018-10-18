@@ -11,7 +11,7 @@ import net.minecraftforge.client.model.IModel;
 import java.util.Set;
 
 public class BakedModelLoader implements ICustomModelLoader {
-    public static final ConstructionModel CONSTRUCTION_MODEL = new ConstructionModel();
+    private static final ConstructionModel CONSTRUCTION_MODEL = new ConstructionModel();
     private static final Set<String> NAMES = ImmutableSet.of(
             "constructionblock");
 
