@@ -13,12 +13,13 @@ import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import org.apache.logging.log4j.Logger;
 
 
-@Mod(modid = BuildingGadgets.MODID, name = BuildingGadgets.MODNAME, version = BuildingGadgets.VERSION, useMetadata = true)
+@Mod(modid = BuildingGadgets.MODID, name = BuildingGadgets.MODNAME, version = BuildingGadgets.VERSION, updateJSON = BuildingGadgets.UPDATE_JSON, useMetadata = true)
 
 public class BuildingGadgets {
     public static final String MODID = "buildinggadgets";
     public static final String MODNAME = "Building Gadgets";
     public static final String VERSION = "@VERSION@";
+    public static final String UPDATE_JSON = "@UPDATE@";
 
 
     @SidedProxy(clientSide = "com.direwolf20.buildinggadgets.ClientProxy", serverSide = "com.direwolf20.buildinggadgets.ServerProxy")
