@@ -116,6 +116,7 @@ public class TemplateManagerGUI extends GuiContainer {
             if (bufferBuilder != null) {
                 BlockPos startPos = ModItems.copyPasteTool.getStartPos(itemstack);
                 BlockPos endPos = ModItems.copyPasteTool.getEndPos(itemstack);
+                if (startPos == null || endPos == null) return;
                 double lengthX = Math.abs(startPos.getX() - endPos.getX());
                 double lengthY = Math.abs(startPos.getY() - endPos.getY());
                 double lengthZ = Math.abs(startPos.getZ() - endPos.getZ());
