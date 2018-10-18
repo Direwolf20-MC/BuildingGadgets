@@ -3,7 +3,6 @@ package com.direwolf20.buildinggadgets.entities;
 import com.direwolf20.buildinggadgets.ModBlocks;
 import com.direwolf20.buildinggadgets.blocks.ConstructionBlockTileEntity;
 import com.google.common.base.Optional;
-import io.netty.buffer.ByteBuf;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -16,11 +15,10 @@ import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
 
 import javax.annotation.Nullable;
 
-public class BlockBuildEntity extends Entity implements IEntityAdditionalSpawnData {
+public class BlockBuildEntity extends Entity {
 
     private static final DataParameter<Integer> toolMode = EntityDataManager.<Integer>createKey(BlockBuildEntity.class, DataSerializers.VARINT);
     private static final DataParameter<Optional<IBlockState>> SET_BLOCK = EntityDataManager.<Optional<IBlockState>>createKey(BlockBuildEntity.class, DataSerializers.OPTIONAL_BLOCK_STATE);
@@ -28,7 +26,7 @@ public class BlockBuildEntity extends Entity implements IEntityAdditionalSpawnDa
     private static final DataParameter<Boolean> usePaste = EntityDataManager.createKey(BlockBuildEntity.class, DataSerializers.BOOLEAN);
 
 
-    public int despawning = -1;
+    private int despawning = -1;
     public int maxLife = 20;
     private int mode;
     private IBlockState setBlock;
@@ -38,7 +36,7 @@ public class BlockBuildEntity extends Entity implements IEntityAdditionalSpawnDa
     private EntityLivingBase spawnedBy;
     private boolean useConstructionPaste;
 
-    World world;
+    private World world;
 
     public BlockBuildEntity(World worldIn) {
         super(worldIn);
@@ -116,17 +114,6 @@ public class BlockBuildEntity extends Entity implements IEntityAdditionalSpawnDa
     @Override
     public boolean isInRangeToRender3d(double x, double y, double z) {
         return true;
-    }
-
-    @Override
-    public void readSpawnData(ByteBuf additionalData) {
-        int id = additionalData.readInt();
-    }
-
-    @Override
-    public void writeSpawnData(ByteBuf buffer) {
-        int id = -1;
-        buffer.writeInt(id);
     }
 
     @Override

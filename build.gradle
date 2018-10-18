@@ -12,7 +12,6 @@ apply plugin: 'net.minecraftforge.gradle.forge'
 //Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
 
 
-version = "2.3.6"
 group = "com.direwolf20.buildinggadgets" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "BuildingGadgets"
 
@@ -22,7 +21,7 @@ compileJava {
 }
 
 minecraft {
-    version = "1.12.2-14.23.4.2705"
+    version = minecraft_version + "-" + forge_version
     runDir = "run"
     
     // the mappings can be changed at any time, and must be in the following format.
@@ -32,6 +31,9 @@ minecraft {
     // simply re-run your setup task after changing the mappings to update your workspace.
     mappings = "snapshot_20171003"
     // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
+    replaceIn "BuildingGadgets.java"
+    replace "@VERSION@", project.version
+    replace "@UPDATE@", update_json
 }
 
 repositories {
@@ -70,13 +72,14 @@ processResources {
     // this will ensure that this task is redone when the versions change.
     inputs.property "version", project.version
     inputs.property "mcversion", project.minecraft.version
+    inputs.property "updatejson", update_json
 
     // replace stuff in mcmod.info, nothing else
     from(sourceSets.main.resources.srcDirs) {
         include 'mcmod.info'
                 
         // replace version and mcversion
-        expand 'version':project.version, 'mcversion':project.minecraft.version
+        expand 'version':project.version, 'mcversion':project.minecraft.version, 'updatejson':update_json
     }
         
     // copy everything else except the mcmod.info

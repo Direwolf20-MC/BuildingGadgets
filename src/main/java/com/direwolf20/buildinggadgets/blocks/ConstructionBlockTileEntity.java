@@ -1,5 +1,7 @@
 package com.direwolf20.buildinggadgets.blocks;
 
+import javax.annotation.Nullable;
+
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
@@ -24,6 +26,7 @@ public class ConstructionBlockTileEntity extends TileEntity {
         return true;
     }
 
+    @Nullable
     public IBlockState getBlockState() {
         if (blockState == null || blockState == Blocks.AIR.getDefaultState()) {
             return null;
@@ -31,6 +34,7 @@ public class ConstructionBlockTileEntity extends TileEntity {
         return blockState;
     }
 
+    @Nullable
     public IBlockState getActualBlockState() {
         if (actualBlockState == null || actualBlockState == Blocks.AIR.getDefaultState()) {
             return null;
@@ -46,7 +50,7 @@ public class ConstructionBlockTileEntity extends TileEntity {
         markDirtyClient();
     }
 
-    public void markDirtyClient() {
+    private void markDirtyClient() {
         markDirty();
         if (getWorld() != null) {
             IBlockState state = getWorld().getBlockState(getPos());

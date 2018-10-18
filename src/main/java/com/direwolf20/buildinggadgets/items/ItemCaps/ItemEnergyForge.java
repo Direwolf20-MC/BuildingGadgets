@@ -14,37 +14,31 @@ public class ItemEnergyForge extends EnergyStorage {
         super(capacity, Integer.MAX_VALUE, Integer.MAX_VALUE);
 
         this.stack = stack;
-        this.energy = stack.hasTagCompound() && stack.getTagCompound().hasKey(NBT_ENERGY) ? stack.getTagCompound().getInteger(NBT_ENERGY) : 0;
+        NBTTagCompound nbt = stack.getTagCompound();
+        this.energy = nbt != null && nbt.hasKey(NBT_ENERGY) ? nbt.getInteger(NBT_ENERGY) : 0;
     }
 
     @Override
     public int receiveEnergy(int maxReceive, boolean simulate) {
-        int received = super.receiveEnergy(maxReceive, simulate);
-
-        if (received > 0 && !simulate) {
-            if (!stack.hasTagCompound()) {
-                stack.setTagCompound(new NBTTagCompound());
-            }
-
-            stack.getTagCompound().setInteger(NBT_ENERGY, getEnergyStored());
-        }
-
-        return received;
+        return changeEnergy(super.receiveEnergy(maxReceive, simulate), simulate);
     }
 
     @Override
     public int extractEnergy(int maxExtract, boolean simulate) {
-        int extracted = super.extractEnergy(maxExtract, simulate);
+        return changeEnergy(super.extractEnergy(maxExtract, simulate), simulate);
+    }
 
-        if (extracted > 0 && !simulate) {
-            if (!stack.hasTagCompound()) {
-                stack.setTagCompound(new NBTTagCompound());
+    private int changeEnergy(int amount, boolean simulate)
+    {
+        if (amount > 0 && !simulate) {
+            NBTTagCompound nbt = stack.getTagCompound();
+            if (nbt == null) {
+                stack.setTagCompound(nbt = new NBTTagCompound());
             }
 
-            stack.getTagCompound().setInteger(NBT_ENERGY, getEnergyStored());
+            nbt.setInteger(NBT_ENERGY, getEnergyStored());
         }
-
-        return extracted;
+        return amount;
     }
 
 }

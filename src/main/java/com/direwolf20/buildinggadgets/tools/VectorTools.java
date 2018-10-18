@@ -1,5 +1,7 @@
 package com.direwolf20.buildinggadgets.tools;
 
+import javax.annotation.Nullable;
+
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
@@ -8,7 +10,7 @@ import net.minecraft.world.World;
 
 public class VectorTools {
 
-    static float rayTraceRange = 32f;
+    private static float rayTraceRange = 32f;
 
     public static RayTraceResult getLookingAt(EntityPlayer player) {
         World world = player.world;
@@ -18,6 +20,7 @@ public class VectorTools {
         return world.rayTraceBlocks(start, end, false, false, false);
     }
 
+    @Nullable
     public static BlockPos getPosLookingAt(EntityPlayer player) {
         RayTraceResult lookingAt = VectorTools.getLookingAt(player);
         if (lookingAt == null) return null;

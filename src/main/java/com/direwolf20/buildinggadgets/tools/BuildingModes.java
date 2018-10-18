@@ -11,6 +11,7 @@ import net.minecraft.world.World;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class BuildingModes {
@@ -21,12 +22,12 @@ public class BuildingModes {
         return true;
     }
 
-    public static ArrayList<BlockPos> getBuildOrders(World world, EntityPlayer player, BlockPos startBlock, EnumFacing sideHit, ItemStack tool) {
-        //BuildingTool.toolModes mode, IBlockState setBlock
-        BuildingTool.toolModes mode = BuildingTool.getToolMode(tool);
+    public static List<BlockPos> getBuildOrders(World world, EntityPlayer player, BlockPos startBlock, EnumFacing sideHit, ItemStack tool) {
+        //BuildingTool.ToolMode mode, IBlockState setBlock
+        BuildingTool.ToolMode mode = BuildingTool.getToolMode(tool);
         IBlockState setBlock = GadgetUtils.getToolBlock(tool);
         int range = GadgetUtils.getToolRange(tool);
-        ArrayList<BlockPos> coordinates = new ArrayList<BlockPos>();
+        List<BlockPos> coordinates = new ArrayList<BlockPos>();
         BlockPos playerPos = new BlockPos(Math.floor(player.posX), Math.floor(player.posY), Math.floor(player.posZ));
         BlockPos pos = startBlock;
         int bound = (range - 1) / 2;
@@ -42,7 +43,7 @@ public class BuildingModes {
         //***************************************************
         //Build to me
         //***************************************************
-        if (mode == BuildingTool.toolModes.BuildToMe) {
+        if (mode == BuildingTool.ToolMode.BuildToMe) {
             if (sideHit == EnumFacing.SOUTH) {
                 for (int i = startBlock.getZ() + 1; i <= playerPos.getZ() - 1; i++) {
                     pos = new BlockPos(startBlock.getX(), startBlock.getY(), i);
@@ -90,7 +91,7 @@ public class BuildingModes {
         //***************************************************
         //VerticalWall
         //***************************************************
-        else if (mode == BuildingTool.toolModes.VerticalWall) {
+        else if (mode == BuildingTool.ToolMode.VerticalWall) {
             if (sideHit == EnumFacing.UP) {
                 for (int y = 1; y <= range; y++) {
                     for (int x = boundX * -1; x <= boundX; x++) {
@@ -129,7 +130,7 @@ public class BuildingModes {
         //***************************************************
         //VerticalColumn
         //***************************************************
-        else if (mode == BuildingTool.toolModes.VerticalColumn) {
+        else if (mode == BuildingTool.ToolMode.VerticalColumn) {
             if (sideHit == EnumFacing.UP) {
                 for (int y = 1; y <= range; y++) {
                     pos = new BlockPos(startBlock.getX(), startBlock.getY() + y, startBlock.getZ());
@@ -156,7 +157,7 @@ public class BuildingModes {
         //***************************************************
         //HorizontalColumn
         //***************************************************
-        else if (mode == BuildingTool.toolModes.HorizontalColumn) {
+        else if (mode == BuildingTool.ToolMode.HorizontalColumn) {
             if (sideHit == EnumFacing.UP || sideHit == EnumFacing.DOWN) {
                 sideHit = playerFacing.getOpposite();
             }
@@ -193,7 +194,7 @@ public class BuildingModes {
         //***************************************************
         //HorizontalWall
         //***************************************************
-        else if (mode == BuildingTool.toolModes.HorizontalWall) {
+        else if (mode == BuildingTool.ToolMode.HorizontalWall) {
             /*if (sideHit == EnumFacing.UP || sideHit == EnumFacing.DOWN) {
                 sideHit = playerFacing.getOpposite();
             }*/
@@ -247,7 +248,7 @@ public class BuildingModes {
         //***************************************************
         //Stairs
         //***************************************************
-        else if (mode == BuildingTool.toolModes.Stairs) {
+        else if (mode == BuildingTool.ToolMode.Stairs) {
             if (sideHit == EnumFacing.UP || sideHit == EnumFacing.DOWN) {
                 sideHit = playerFacing.getOpposite();
             }
@@ -308,7 +309,7 @@ public class BuildingModes {
         //***************************************************
         //Checkerboard
         //***************************************************
-        else if (mode == BuildingTool.toolModes.Checkerboard) {
+        else if (mode == BuildingTool.ToolMode.Checkerboard) {
             range++;
             for (int x = range * -7 / 5; x <= range * 7 / 5; x++) {
                 for (int z = range * -7 / 5; z <= range * 7 / 5; z++) {
@@ -324,8 +325,8 @@ public class BuildingModes {
         return coordinates;
     }
 
-    public static ArrayList<BlockPos> sortByDistance(ArrayList<BlockPos> unSortedList, EntityPlayer player) {
-        ArrayList<BlockPos> sortedList = new ArrayList<BlockPos>();
+    public static List<BlockPos> sortByDistance(List<BlockPos> unSortedList, EntityPlayer player) {
+        List<BlockPos> sortedList = new ArrayList<BlockPos>();
         Map<Double, BlockPos> rangeMap = new HashMap<Double, BlockPos>();
         Double distances[] = new Double[unSortedList.size()];
         Double distance;
@@ -349,9 +350,9 @@ public class BuildingModes {
         return sortedList;
     }
 
-    public static ArrayList<BlockMap> sortMapByDistance(ArrayList<BlockMap> unSortedMap, EntityPlayer player) {
-        ArrayList<BlockPos> unSortedList = new ArrayList<BlockPos>();
-        ArrayList<BlockPos> sortedList = new ArrayList<BlockPos>();
+    public static List<BlockMap> sortMapByDistance(List<BlockMap> unSortedMap, EntityPlayer player) {//TODO unused
+        List<BlockPos> unSortedList = new ArrayList<BlockPos>();
+//        List<BlockPos> sortedList = new ArrayList<BlockPos>();
         Map<BlockPos, IBlockState> PosToStateMap = new HashMap<BlockPos, IBlockState>();
         Map<BlockPos, Integer> PosToX = new HashMap<BlockPos, Integer>();
         Map<BlockPos, Integer> PosToY = new HashMap<BlockPos, Integer>();
@@ -363,7 +364,7 @@ public class BuildingModes {
             PosToZ.put(blockMap.pos, blockMap.zOffset);
             unSortedList.add(blockMap.pos);
         }
-        ArrayList<BlockMap> sortedMap = new ArrayList<BlockMap>();
+        List<BlockMap> sortedMap = new ArrayList<BlockMap>();
         Map<Double, BlockPos> rangeMap = new HashMap<Double, BlockPos>();
         Double distances[] = new Double[unSortedList.size()];
         Double distance;

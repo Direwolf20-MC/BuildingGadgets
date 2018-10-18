@@ -5,8 +5,6 @@ import com.direwolf20.buildinggadgets.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.entities.BlockBuildEntityRender;
 import com.direwolf20.buildinggadgets.entities.ConstructionBlockEntity;
 import com.direwolf20.buildinggadgets.entities.ConstructionBlockEntityRender;
-import com.direwolf20.buildinggadgets.eventhandlers.ClientTickEvent;
-import com.direwolf20.buildinggadgets.eventhandlers.TooltipRender;
 import com.direwolf20.buildinggadgets.items.BuildingTool;
 import com.direwolf20.buildinggadgets.items.CopyPasteTool;
 import com.direwolf20.buildinggadgets.items.ExchangerTool;
@@ -20,10 +18,8 @@ import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
@@ -36,21 +32,18 @@ public class ClientProxy extends CommonProxy {
     public void preInit(FMLPreInitializationEvent e) {
         ModEntities.initModels();
         ModelLoaderRegistry.registerLoader(new BakedModelLoader());
-        MinecraftForge.EVENT_BUS.register(TooltipRender.class);
         super.preInit(e);
     }
 
     @Override
-    public void init(FMLInitializationEvent e) {
-        super.init(e);
-        MinecraftForge.EVENT_BUS.register(new KeyInputHandler());
-        MinecraftForge.EVENT_BUS.register(new ClientTickEvent());
+    public void init() {
+        super.init();
         KeyBindings.init();
         ModBlocks.initColorHandlers();
     }
 
     @SubscribeEvent
-    public static void registerModels(ModelRegistryEvent event) {
+    public static void registerModels(@SuppressWarnings("unused") ModelRegistryEvent event) {
         ModBlocks.effectBlock.initModel();
         ModBlocks.templateManager.initModel();
         buildingTool.initModel();
@@ -88,10 +81,10 @@ public class ClientProxy extends CommonProxy {
             }
         }
         if (heldItem.getItem() instanceof BuildingTool) {
-            BuildingTool buildingTool = (BuildingTool) heldItem.getItem();
+//            BuildingTool buildingTool = (BuildingTool) heldItem.getItem();
             ToolRenders.renderBuilderOverlay(evt, p, heldItem);
         } else if (heldItem.getItem() instanceof ExchangerTool) {
-            ExchangerTool exchangerTool = (ExchangerTool) heldItem.getItem();
+//            ExchangerTool exchangerTool = (ExchangerTool) heldItem.getItem();
             ToolRenders.renderExchangerOverlay(evt, p, heldItem);
         } else if (heldItem.getItem() instanceof CopyPasteTool) {
             //CopyPasteTool copyPasteTool = (CopyPasteTool) heldItem.getItem();

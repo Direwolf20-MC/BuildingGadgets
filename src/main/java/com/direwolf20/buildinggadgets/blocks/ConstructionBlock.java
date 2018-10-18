@@ -24,7 +24,6 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
@@ -94,14 +93,14 @@ public class ConstructionBlock extends Block implements IFacade {
         return new ConstructionBlockTileEntity();
     }
 
-    private static ConstructionBlockTileEntity getTE(World world, BlockPos pos) {
+    /*private static ConstructionBlockTileEntity getTE(World world, BlockPos pos) {
         return (ConstructionBlockTileEntity) world.getTileEntity(pos);
     }
 
     @Override
     public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
         //super.onBlockActivated(world, pos, state, player, hand, side, hitX, hitY, hitZ);
-        /*ConstructionBlockTileEntity te = getTE(world, pos);
+        ConstructionBlockTileEntity te = getTE(world, pos);
         ItemStack heldItem = player.getHeldItem(hand);
         IBlockState newState = Block.getBlockFromItem(heldItem.getItem()).getStateFromMeta(heldItem.getMetadata());
         if (newState != null && newState != Blocks.AIR.getDefaultState()) {
@@ -109,9 +108,9 @@ public class ConstructionBlock extends Block implements IFacade {
             te.setActualBlockState(newState);
             return true;
         }
-        System.out.println("Failed: " + newState + ":" + te.getBlockState() + ":" + world.isRemote + ":" + te.getActualBlockState());*/
+        System.out.println("Failed: " + newState + ":" + te.getBlockState() + ":" + world.isRemote + ":" + te.getActualBlockState());
         return false;
-    }
+    }*/
 
     @Override
     public IBlockState getExtendedState(IBlockState state, IBlockAccess world, BlockPos pos) {
@@ -123,20 +122,18 @@ public class ConstructionBlock extends Block implements IFacade {
             IBlockState extState = mimicBlock.getBlock().getExtendedState(mimicBlock, fakeRenderWorld, pos);
             //ConstructionID mimicID = new ConstructionID(mimicBlock);
             return extendedBlockState.withProperty(FACADE_ID, mimicBlock).withProperty(FACADE_EXT_STATE, extState);
-        } else {
-            return extendedBlockState;
         }
+        return extendedBlockState;
     }
 
     @Nullable
-    protected IBlockState getActualMimicBlock(IBlockAccess blockAccess, BlockPos pos) {
+    private IBlockState getActualMimicBlock(IBlockAccess blockAccess, BlockPos pos) {
         try {
             TileEntity te = blockAccess.getTileEntity(pos);
             if (te instanceof ConstructionBlockTileEntity) {
                 return ((ConstructionBlockTileEntity) te).getActualBlockState();
-            } else {
-                return null;
             }
+            return null;
         } catch (Exception var8) {
             return null;
         }
@@ -230,12 +227,11 @@ public class ConstructionBlock extends Block implements IFacade {
         IBlockState mimicBlock = getActualMimicBlock(worldIn, pos);
         if (mimicBlock == null) {
             return super.getBoundingBox(blockState, worldIn, pos);
-        } else {
-            try {
-                return mimicBlock.getBlock().getBoundingBox(mimicBlock, worldIn, pos);
-            } catch (Exception var8) {
-                return super.getBoundingBox(blockState, worldIn, pos);
-            }
+        }
+        try {
+            return mimicBlock.getBlock().getBoundingBox(mimicBlock, worldIn, pos);
+        } catch (Exception var8) {
+            return super.getBoundingBox(blockState, worldIn, pos);
         }
     }
 
@@ -270,12 +266,11 @@ public class ConstructionBlock extends Block implements IFacade {
         IBlockState mimicBlock = getActualMimicBlock(source, pos);
         if (mimicBlock == null) {
             return super.getBoundingBox(state, source, pos);
-        } else {
-            try {
-                return mimicBlock.getBlock().getBoundingBox(mimicBlock, source, pos);
-            } catch (Exception var8) {
-                return super.getBoundingBox(state, source, pos);
-            }
+        }
+        try {
+            return mimicBlock.getBlock().getBoundingBox(mimicBlock, source, pos);
+        } catch (Exception var8) {
+            return super.getBoundingBox(state, source, pos);
         }
     }
 
@@ -285,12 +280,11 @@ public class ConstructionBlock extends Block implements IFacade {
         IBlockState mimicBlock = getActualMimicBlock(worldIn, pos);
         if (mimicBlock == null) {
             return super.getSelectedBoundingBox(state, worldIn, pos);
-        } else {
-            try {
-                return mimicBlock.getBlock().getSelectedBoundingBox(mimicBlock, worldIn, pos);
-            } catch (Exception var8) {
-                return super.getSelectedBoundingBox(state, worldIn, pos);
-            }
+        }
+        try {
+            return mimicBlock.getBlock().getSelectedBoundingBox(mimicBlock, worldIn, pos);
+        } catch (Exception var8) {
+            return super.getSelectedBoundingBox(state, worldIn, pos);
         }
     }
 
@@ -299,12 +293,11 @@ public class ConstructionBlock extends Block implements IFacade {
         IBlockState mimicBlock = getActualMimicBlock(world, pos);
         if (mimicBlock == null) {
             return super.isNormalCube(state, world, pos);
-        } else {
-            try {
-                return mimicBlock.getBlock().isNormalCube(mimicBlock, world, pos);
-            } catch (Exception var8) {
-                return super.isNormalCube(state, world, pos);
-            }
+        }
+        try {
+            return mimicBlock.getBlock().isNormalCube(mimicBlock, world, pos);
+        } catch (Exception var8) {
+            return super.isNormalCube(state, world, pos);
         }
     }
 
@@ -339,6 +332,7 @@ public class ConstructionBlock extends Block implements IFacade {
 
 
     //The below implements support for CTM's Connected Textures to work properly
+    @Override
     @Nonnull
     public IBlockState getFacade(@Nonnull IBlockAccess world, @Nonnull BlockPos pos, @Nullable EnumFacing side) {
         IBlockState mimicBlock = getActualMimicBlock(world, pos);

@@ -17,7 +17,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 public class PacketTemplateManagerPaste_old implements IMessage {
 
-    NBTTagCompound tag = new NBTTagCompound();
+    private NBTTagCompound tag = new NBTTagCompound();
     private BlockPos pos;
 
     @Override
@@ -59,7 +59,7 @@ public class PacketTemplateManagerPaste_old implements IMessage {
             TileEntity te = world.getTileEntity(pos);
             if (!(te instanceof TemplateManagerTileEntity)) return;
             TemplateManagerContainer container = ((TemplateManagerTileEntity) te).getContainer(player);
-            TemplateManagerCommands.PasteTemplate(container, player, message.tag, "");
+            TemplateManagerCommands.pasteTemplate(container, player, message.tag, "");
         }
     }
 }

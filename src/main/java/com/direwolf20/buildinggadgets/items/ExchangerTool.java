@@ -4,6 +4,7 @@ import com.direwolf20.buildinggadgets.BuildingGadgets;
 import com.direwolf20.buildinggadgets.Config;
 import com.direwolf20.buildinggadgets.ModItems;
 import com.direwolf20.buildinggadgets.entities.BlockBuildEntity;
+import com.direwolf20.buildinggadgets.items.ItemCaps.CapabilityProviderEnergy;
 import com.direwolf20.buildinggadgets.tools.ExchangingModes;
 import com.direwolf20.buildinggadgets.tools.InventoryManipulation;
 import com.direwolf20.buildinggadgets.tools.VectorTools;
@@ -28,7 +29,6 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldType;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.BlockSnapshot;
-import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.world.BlockEvent;
@@ -40,16 +40,18 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.annotation.Nullable;
+
 import static com.direwolf20.buildinggadgets.tools.GadgetUtils.*;
 
 public class ExchangerTool extends GenericGadget {
     private static final FakeBuilderWorld fakeWorld = new FakeBuilderWorld();
 
-    public enum toolModes {
+    public enum ToolMode {
         Wall, VerticalColumn, HorizontalColumn, Checkerboard;
-        private static ExchangerTool.toolModes[] vals = values();
+        private static ExchangerTool.ToolMode[] vals = values();//TODO unused
 
-        public ExchangerTool.toolModes next() {
+        public ExchangerTool.ToolMode next() {//TODO unused
             return vals[(this.ordinal() + 1) % vals.length];
         }
     }
@@ -78,9 +80,8 @@ public class ExchangerTool extends GenericGadget {
     public boolean isBookEnchantable(ItemStack stack, ItemStack book) {
         if (EnchantmentHelper.getEnchantments(book).containsKey(Enchantments.SILK_TOUCH)) {
             return true;
-        } else {
-            return super.isBookEnchantable(stack, book);
         }
+        return super.isBookEnchantable(stack, book);
     }
 
     @Override
@@ -91,7 +92,7 @@ public class ExchangerTool extends GenericGadget {
         return super.canApplyAtEnchantingTable(stack, enchantment);
     }
 
-    public static void setFuzzy(ItemStack stack, boolean fuzzy) {
+    private static void setFuzzy(ItemStack stack, boolean fuzzy) {
         NBTTagCompound tagCompound = stack.getTagCompound();
         if (tagCompound == null) {
             tagCompound = new NBTTagCompound();
@@ -107,7 +108,7 @@ public class ExchangerTool extends GenericGadget {
         return tagCompound.getBoolean("fuzzy");
     }
 
-    public static void setToolMode(ItemStack stack, ExchangerTool.toolModes mode) {
+    private static void setToolMode(ItemStack stack, ExchangerTool.ToolMode mode) {
         NBTTagCompound tagCompound = stack.getTagCompound();
         if (tagCompound == null) {
             tagCompound = new NBTTagCompound();
@@ -116,15 +117,15 @@ public class ExchangerTool extends GenericGadget {
         stack.setTagCompound(tagCompound);
     }
 
-    public static ExchangerTool.toolModes getToolMode(ItemStack stack) {
+    public static ExchangerTool.ToolMode getToolMode(ItemStack stack) {
         NBTTagCompound tagCompound = stack.getTagCompound();
-        toolModes mode = toolModes.Wall;
+        ToolMode mode = ToolMode.Wall;
         if (tagCompound == null) {
             setToolMode(stack, mode);
             return mode;
         }
         try {
-            mode = toolModes.valueOf(tagCompound.getString("mode"));
+            mode = ToolMode.valueOf(tagCompound.getString("mode"));
         } catch (Exception e) {
             setToolMode(stack, mode);
         }
@@ -132,13 +133,13 @@ public class ExchangerTool extends GenericGadget {
     }
 
     @Override
-    public void addInformation(ItemStack stack, World player, List<String> list, ITooltipFlag b) {
-        super.addInformation(stack, player, list, b);
+    public void addInformation(ItemStack stack, @Nullable World world, List<String> list, ITooltipFlag b) {
+        super.addInformation(stack, world, list, b);
         list.add(TextFormatting.DARK_GREEN + I18n.format("tooltip.gadget.block") + ": " + getToolBlock(stack).getBlock().getLocalizedName());
         list.add(TextFormatting.AQUA + I18n.format("tooltip.gadget.mode") + ": " + getToolMode(stack));
         list.add(TextFormatting.RED + I18n.format("tooltip.gadget.range") + ": " + getToolRange(stack));
         if (Config.poweredByFE) {
-            IEnergyStorage energy = stack.getCapability(CapabilityEnergy.ENERGY, null);
+            IEnergyStorage energy = CapabilityProviderEnergy.getCap(stack);
             list.add(TextFormatting.WHITE + I18n.format("tooltip.gadget.energy") + ": " + withSuffix(energy.getEnergyStored()) + "/" + withSuffix(energy.getMaxEnergyStored()));
         }
     }
@@ -172,8 +173,8 @@ public class ExchangerTool extends GenericGadget {
         return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, itemstack);
     }
 
-    public void toggleMode(EntityPlayer player, ItemStack heldItem) {
-        ExchangerTool.toolModes mode = getToolMode(heldItem);
+    public void toggleMode(EntityPlayer player, ItemStack heldItem) {//TODO unused
+        ExchangerTool.ToolMode mode = getToolMode(heldItem);
         mode = mode.next();
         setToolMode(heldItem, mode);
         player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.toolmode").getUnformattedComponentText() + ": " + mode.name()), true);
@@ -181,7 +182,7 @@ public class ExchangerTool extends GenericGadget {
 
     public void setMode(EntityPlayer player, ItemStack heldItem, int modeInt) {
         //Called when we specify a mode with the radial menu
-        toolModes mode = toolModes.values()[modeInt];
+        ToolMode mode = ToolMode.values()[modeInt];
         setToolMode(heldItem, mode);
         player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.toolmode").getUnformattedComponentText() + ": " + mode.name()), true);
     }
@@ -193,7 +194,7 @@ public class ExchangerTool extends GenericGadget {
 
     public void rangeChange(EntityPlayer player, ItemStack heldItem) {
         int range = getToolRange(heldItem);
-        int changeAmount = (getToolMode(heldItem) == toolModes.Checkerboard || (range % 2 == 0)) ? 1 : 2;
+        int changeAmount = (getToolMode(heldItem) == ToolMode.Checkerboard || (range % 2 == 0)) ? 1 : 2;
         if (player.isSneaking()) {
             range = (range <= 1) ? Config.maxRange : range - changeAmount;
         } else {
@@ -203,9 +204,9 @@ public class ExchangerTool extends GenericGadget {
         player.sendStatusMessage(new TextComponentString(TextFormatting.DARK_AQUA + new TextComponentTranslation("message.gadget.toolrange").getUnformattedComponentText() + ": " + range), true);
     }
 
-    public boolean exchange(EntityPlayer player, ItemStack stack) {
+    private boolean exchange(EntityPlayer player, ItemStack stack) {
         World world = player.world;
-        ArrayList<BlockPos> coords = getAnchor(stack);
+        List<BlockPos> coords = getAnchor(stack);
 
         if (coords.size() == 0) { //If we don't have an anchor, build in the current spot
             RayTraceResult lookingAt = VectorTools.getLookingAt(player);
@@ -214,7 +215,7 @@ public class ExchangerTool extends GenericGadget {
             }
             BlockPos startBlock = lookingAt.getBlockPos();
             EnumFacing sideHit = lookingAt.sideHit;
-            IBlockState setBlock = getToolBlock(stack);
+//            IBlockState setBlock = getToolBlock(stack);
             coords = ExchangingModes.getBuildOrders(world, player, startBlock, sideHit, stack);
         } else { //If we do have an anchor, erase it (Even if the build fails)
             setAnchor(stack, new ArrayList<BlockPos>());
@@ -248,7 +249,7 @@ public class ExchangerTool extends GenericGadget {
         return true;
     }
 
-    public boolean exchangeBlock(World world, EntityPlayer player, BlockPos pos, IBlockState setBlock) {
+    private boolean exchangeBlock(World world, EntityPlayer player, BlockPos pos, IBlockState setBlock) {
         IBlockState currentBlock = world.getBlockState(pos);
         ItemStack itemStack;
         boolean useConstructionPaste = false;
@@ -283,10 +284,9 @@ public class ExchangerTool extends GenericGadget {
             ItemStack constructionPaste = new ItemStack(ModItems.constructionPaste);
             if (InventoryManipulation.countPaste(player) < neededItems) {
                 return false;
-            } else {
-                itemStack = constructionPaste.copy();
-                useConstructionPaste = true;
             }
+            itemStack = constructionPaste.copy();
+            useConstructionPaste = true;
         }
         if (!player.isAllowEdit()) {
             return false;
@@ -334,6 +334,7 @@ public class ExchangerTool extends GenericGadget {
         return 20;
     }
 
+    @Override
     @SideOnly(Side.CLIENT)
     public boolean hasEffect(ItemStack stack) {
         return false;

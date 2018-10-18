@@ -16,8 +16,6 @@ import net.minecraft.item.ItemBlock;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.event.FMLInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
@@ -38,11 +36,11 @@ public class CommonProxy {
         Config.readConfig();
     }
 
-    public void init(FMLInitializationEvent e) {
+    public void init() {
         NetworkRegistry.INSTANCE.registerGuiHandler(BuildingGadgets.instance, new GuiProxy());
     }
 
-    public void postInit(FMLPostInitializationEvent e) {
+    public void postInit() {
         if (config.hasChanged()) {
             config.save();
         }

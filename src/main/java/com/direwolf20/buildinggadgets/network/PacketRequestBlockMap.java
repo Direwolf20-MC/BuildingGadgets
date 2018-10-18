@@ -1,10 +1,10 @@
 package com.direwolf20.buildinggadgets.network;
 
-import com.direwolf20.buildinggadgets.tools.BlockMapWorldSave;
+import com.direwolf20.buildinggadgets.tools.WorldSave;
+
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.world.World;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
@@ -13,23 +13,27 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 public class PacketRequestBlockMap implements IMessage {
 
-    String UUID = "";
+    private String UUID = "";
+    private boolean isTemplate;
 
     @Override
     public void fromBytes(ByteBuf buf) {
         UUID = ByteBufUtils.readUTF8String(buf);
+        isTemplate = buf.readBoolean();
     }
 
     @Override
     public void toBytes(ByteBuf buf) {
         ByteBufUtils.writeUTF8String(buf, UUID);
+        buf.writeBoolean(isTemplate);
     }
 
     public PacketRequestBlockMap() {
     }
 
-    public PacketRequestBlockMap(String ID) {
+    public PacketRequestBlockMap(String ID, boolean isTemplate) {
         UUID = ID;
+        this.isTemplate = isTemplate;
     }
 
     public static class Handler implements IMessageHandler<PacketRequestBlockMap, IMessage> {
@@ -41,11 +45,9 @@ public class PacketRequestBlockMap implements IMessage {
 
         private void handle(PacketRequestBlockMap message, MessageContext ctx) {
             EntityPlayerMP player = ctx.getServerHandler().player;
-            World world = player.world;
-            BlockMapWorldSave worldSave = BlockMapWorldSave.get(world);
-            NBTTagCompound tagCompound = worldSave.getCompoundFromUUID(message.UUID);
+            NBTTagCompound tagCompound = (message.isTemplate ? WorldSave.getTemplateWorldSave(player.world) : WorldSave.getWorldSave(player.world)).getCompoundFromUUID(message.UUID);
             if (tagCompound != null) {
-                PacketHandler.INSTANCE.sendTo(new PacketBlockMap(tagCompound), (EntityPlayerMP) player);
+                PacketHandler.INSTANCE.sendTo(new PacketBlockMap(tagCompound), player);
                 //System.out.println("Sending BlockMap Packet");
             }
         }

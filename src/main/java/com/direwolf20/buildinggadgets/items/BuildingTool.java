@@ -5,6 +5,7 @@ import com.direwolf20.buildinggadgets.Config;
 import com.direwolf20.buildinggadgets.ModBlocks;
 import com.direwolf20.buildinggadgets.ModItems;
 import com.direwolf20.buildinggadgets.entities.BlockBuildEntity;
+import com.direwolf20.buildinggadgets.items.ItemCaps.CapabilityProviderEnergy;
 import com.direwolf20.buildinggadgets.tools.BuildingModes;
 import com.direwolf20.buildinggadgets.tools.InventoryManipulation;
 import com.direwolf20.buildinggadgets.tools.UndoState;
@@ -29,7 +30,6 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldType;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.BlockSnapshot;
-import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.world.BlockEvent;
@@ -39,6 +39,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.annotation.Nullable;
+
 import static com.direwolf20.buildinggadgets.tools.GadgetUtils.*;
 
 
@@ -46,11 +48,11 @@ public class BuildingTool extends GenericGadget {
     private static final FakeBuilderWorld fakeWorld = new FakeBuilderWorld();
 
 
-    public enum toolModes {
+    public enum ToolMode {
         BuildToMe, VerticalColumn, HorizontalColumn, VerticalWall, HorizontalWall, Stairs, Checkerboard;
-        private static toolModes[] vals = values();
+        private static ToolMode[] vals = values();
 
-        public toolModes next() {
+        public ToolMode next() {
             return vals[(this.ordinal() + 1) % vals.length];
         }
     }
@@ -65,7 +67,7 @@ public class BuildingTool extends GenericGadget {
         }
     }
 
-    public static void setToolMode(ItemStack stack, toolModes mode) {
+    private static void setToolMode(ItemStack stack, ToolMode mode) {
         //Store the tool's mode in NBT as a string
         NBTTagCompound tagCompound = stack.getTagCompound();
         if (tagCompound == null) {
@@ -75,15 +77,15 @@ public class BuildingTool extends GenericGadget {
         stack.setTagCompound(tagCompound);
     }
 
-    public static toolModes getToolMode(ItemStack stack) {
+    public static ToolMode getToolMode(ItemStack stack) {
         NBTTagCompound tagCompound = stack.getTagCompound();
-        toolModes mode = toolModes.BuildToMe;
+        ToolMode mode = ToolMode.BuildToMe;
         if (tagCompound == null) {
             setToolMode(stack, mode);
             return mode;
         }
         try {
-            mode = toolModes.valueOf(tagCompound.getString("mode"));
+            mode = ToolMode.valueOf(tagCompound.getString("mode"));
         } catch (Exception e) {
             setToolMode(stack, mode);
         }
@@ -91,16 +93,16 @@ public class BuildingTool extends GenericGadget {
     }
 
     @Override
-    public void addInformation(ItemStack stack, World player, List<String> list, ITooltipFlag b) {
+    public void addInformation(ItemStack stack, @Nullable World world, List<String> list, ITooltipFlag b) {
         //Add tool information to the tooltip
-        super.addInformation(stack, player, list, b);
+        super.addInformation(stack, world, list, b);
         list.add(TextFormatting.DARK_GREEN + I18n.format("tooltip.gadget.block") + ": " + getToolBlock(stack).getBlock().getLocalizedName());
         list.add(TextFormatting.AQUA + I18n.format("tooltip.gadget.mode") + ": " + getToolMode(stack));
-        if (getToolMode(stack) != toolModes.BuildToMe) {
+        if (getToolMode(stack) != ToolMode.BuildToMe) {
             list.add(TextFormatting.RED + I18n.format("tooltip.gadget.range") + ": " + getToolRange(stack));
         }
         if (Config.poweredByFE) {
-            IEnergyStorage energy = stack.getCapability(CapabilityEnergy.ENERGY, null);
+            IEnergyStorage energy = CapabilityProviderEnergy.getCap(stack);
             list.add(TextFormatting.WHITE + I18n.format("tooltip.gadget.energy") + ": " + withSuffix(energy.getEnergyStored()) + "/" + withSuffix(energy.getMaxEnergyStored()));
         }
     }
@@ -139,9 +141,9 @@ public class BuildingTool extends GenericGadget {
         return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, itemstack);
     }
 
-    public void toggleMode(EntityPlayer player, ItemStack heldItem) {
+    public void toggleMode(EntityPlayer player, ItemStack heldItem) {//TODO unused
         //Called when the mode toggle hotkey is pressed
-        toolModes mode = getToolMode(heldItem);
+        ToolMode mode = getToolMode(heldItem);
         mode = mode.next();
         setToolMode(heldItem, mode);
         player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.toolmode").getUnformattedComponentText() + ": " + mode.name()), true);
@@ -149,7 +151,7 @@ public class BuildingTool extends GenericGadget {
 
     public void setMode(EntityPlayer player, ItemStack heldItem, int modeInt) {
         //Called when we specify a mode with the radial menu
-        toolModes mode = toolModes.values()[modeInt];
+        ToolMode mode = ToolMode.values()[modeInt];
         setToolMode(heldItem, mode);
         player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.toolmode").getUnformattedComponentText() + ": " + mode.name()), true);
     }
@@ -166,10 +168,10 @@ public class BuildingTool extends GenericGadget {
         player.sendStatusMessage(new TextComponentString(TextFormatting.DARK_AQUA + new TextComponentTranslation("message.gadget.toolrange").getUnformattedComponentText() + ": " + range), true);
     }
 
-    public boolean build(EntityPlayer player, ItemStack stack) {
+    private boolean build(EntityPlayer player, ItemStack stack) {
         //Build the blocks as shown in the visual render
         World world = player.world;
-        ArrayList<BlockPos> coords = getAnchor(stack);
+        List<BlockPos> coords = getAnchor(stack);
 
         if (coords.size() == 0) {  //If we don't have an anchor, build in the current spot
             RayTraceResult lookingAt = VectorTools.getLookingAt(player);
@@ -182,7 +184,7 @@ public class BuildingTool extends GenericGadget {
         } else { //If we do have an anchor, erase it (Even if the build fails)
             setAnchor(stack, new ArrayList<BlockPos>());
         }
-        ArrayList<BlockPos> undoCoords = new ArrayList<BlockPos>();
+        List<BlockPos> undoCoords = new ArrayList<BlockPos>();
         Set<BlockPos> coordinates = new HashSet<BlockPos>(coords);
         ItemStack heldItem = player.getHeldItemMainhand();
         if (!(heldItem.getItem() instanceof BuildingTool)) {
@@ -235,14 +237,14 @@ public class BuildingTool extends GenericGadget {
         World world = player.world;
         if (!world.isRemote) {
             IBlockState currentBlock = Blocks.AIR.getDefaultState();
-            ArrayList<BlockPos> undoCoords = undoState.coordinates; //Get the Coords to undo
+            List<BlockPos> undoCoords = undoState.coordinates; //Get the Coords to undo
             int dimension = undoState.dimension; //Get the Dimension to undo
-            ArrayList<BlockPos> failedRemovals = new ArrayList<BlockPos>(); //Build a list of removals that fail
+            List<BlockPos> failedRemovals = new ArrayList<BlockPos>(); //Build a list of removals that fail
             ItemStack silkTool = heldItem.copy(); //Setup a Silk Touch version of the tool so we can return stone instead of cobblestone, etc.
             silkTool.addEnchantment(Enchantments.SILK_TOUCH, 1);
             for (BlockPos coord : undoCoords) {
                 currentBlock = world.getBlockState(coord);
-                ItemStack itemStack = currentBlock.getBlock().getPickBlock(currentBlock, null, world, coord, player);
+//                ItemStack itemStack = currentBlock.getBlock().getPickBlock(currentBlock, null, world, coord, player);
                 double distance = coord.getDistance(player.getPosition().getX(), player.getPosition().getY(), player.getPosition().getZ());
                 boolean sameDim = (player.dimension == dimension);
                 BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(world, coord, currentBlock, player);
@@ -265,7 +267,7 @@ public class BuildingTool extends GenericGadget {
         return true;
     }
 
-    public static boolean placeBlock(World world, EntityPlayer player, BlockPos pos, IBlockState setBlock) {
+    private static boolean placeBlock(World world, EntityPlayer player, BlockPos pos, IBlockState setBlock) {
         ItemStack heldItem = player.getHeldItemMainhand();
         boolean useConstructionPaste = false;
         if (!(heldItem.getItem() instanceof BuildingTool)) {
@@ -309,10 +311,9 @@ public class BuildingTool extends GenericGadget {
             //if (InventoryManipulation.countItem(constructionStack, player) == 0) {
             if (InventoryManipulation.countPaste(player) < neededItems) {
                 return false;
-            } else {
-                itemStack = constructionPaste.copy();
-                useConstructionPaste = true;
             }
+            itemStack = constructionPaste.copy();
+            useConstructionPaste = true;
         }
         if (Config.poweredByFE) {
             if (!useEnergy(heldItem, Config.energyCostBuilder, player)) {

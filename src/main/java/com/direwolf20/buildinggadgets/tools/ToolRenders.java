@@ -2,10 +2,12 @@ package com.direwolf20.buildinggadgets.tools;
 
 import com.direwolf20.buildinggadgets.Config;
 import com.direwolf20.buildinggadgets.ModBlocks;
+import com.direwolf20.buildinggadgets.ModItems;
 import com.direwolf20.buildinggadgets.items.BuildingTool;
 import com.direwolf20.buildinggadgets.items.CopyPasteTool;
 import com.direwolf20.buildinggadgets.items.ExchangerTool;
 import com.direwolf20.buildinggadgets.items.FakeBuilderWorld;
+import com.direwolf20.buildinggadgets.items.ItemCaps.CapabilityProviderEnergy;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockRendererDispatcher;
@@ -28,15 +30,15 @@ import net.minecraft.world.WorldType;
 import net.minecraftforge.client.ForgeHooksClient;
 import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
-import net.minecraftforge.energy.CapabilityEnergy;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL14;
 
-import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
-import static com.direwolf20.buildinggadgets.tools.GadgetUtils.*;
+import static com.direwolf20.buildinggadgets.tools.GadgetUtils.getAnchor;
+import static com.direwolf20.buildinggadgets.tools.GadgetUtils.getToolBlock;
 import static net.minecraft.block.BlockStainedGlass.COLOR;
 
 public class ToolRenders {
@@ -45,7 +47,7 @@ public class ToolRenders {
     public static void renderBuilderOverlay(RenderWorldLastEvent evt, EntityPlayer player, ItemStack stack) {
         RayTraceResult lookingAt = VectorTools.getLookingAt(player);
         IBlockState state = Blocks.AIR.getDefaultState();
-        ArrayList<BlockPos> coordinates = getAnchor(stack);
+        List<BlockPos> coordinates = getAnchor(stack);
         if (lookingAt != null || coordinates.size() > 0) {
             World world = player.world;
             IBlockState startBlock = Blocks.AIR.getDefaultState();
@@ -66,7 +68,7 @@ public class ToolRenders {
                 if (renderBlockState == Blocks.AIR.getDefaultState()) {//Don't render anything if there is no block selected (Air)
                     return;
                 }
-                if (coordinates.size() == 0) { //Build a list of coordinates based on the tool mode and range
+                if (coordinates.size() == 0 && lookingAt != null) { //Build a list of coordinates based on the tool mode and range
                     coordinates = BuildingModes.getBuildOrders(world, player, lookingAt.getBlockPos(), lookingAt.sideHit, heldItem);
                 }
 
@@ -85,7 +87,7 @@ public class ToolRenders {
                 hasBlocks = hasBlocks + InventoryManipulation.countPaste(player);
                 int hasEnergy = 0;
                 if (Config.poweredByFE) {
-                    hasEnergy = stack.getCapability(CapabilityEnergy.ENERGY, null).getEnergyStored();
+                    hasEnergy = CapabilityProviderEnergy.getCap(stack).getEnergyStored();
                 } else {
                     hasEnergy = stack.getMaxDamage() - stack.getItemDamage();
                 }
@@ -112,7 +114,7 @@ public class ToolRenders {
                 //This blend function allows you to use a constant alpha, which is defined later
                 GlStateManager.blendFunc(GL11.GL_CONSTANT_ALPHA, GL11.GL_ONE_MINUS_CONSTANT_ALPHA);
 
-                ArrayList<BlockPos> sortedCoordinates = BuildingModes.sortByDistance(coordinates, player); //Sort the coords by distance to player.
+                List<BlockPos> sortedCoordinates = BuildingModes.sortByDistance(coordinates, player); //Sort the coords by distance to player.
 
                 for (BlockPos coordinate : sortedCoordinates) {
                     GlStateManager.pushMatrix();//Push matrix again just because
@@ -166,11 +168,11 @@ public class ToolRenders {
     }
 
     public static void renderExchangerOverlay(RenderWorldLastEvent evt, EntityPlayer player, ItemStack stack) {
-        int range = getToolRange(stack);
-        ExchangerTool.toolModes mode = ExchangerTool.getToolMode(stack);
+//        int range = getToolRange(stack);
+//        ExchangerTool.ToolMode mode = ExchangerTool.getToolMode(stack);
         RayTraceResult lookingAt = VectorTools.getLookingAt(player);
         IBlockState state = Blocks.AIR.getDefaultState();
-        ArrayList<BlockPos> coordinates = getAnchor(stack);
+        List<BlockPos> coordinates = getAnchor(stack);
         if (lookingAt != null || coordinates.size() > 0) {
             World world = player.world;
             IBlockState startBlock = Blocks.AIR.getDefaultState();
@@ -191,7 +193,7 @@ public class ToolRenders {
                 if (renderBlockState == Blocks.AIR.getDefaultState()) {//Don't render anything if there is no block selected (Air)
                     return;
                 }
-                if (coordinates.size() == 0) { //Build a list of coordinates based on the tool mode and range
+                if (coordinates.size() == 0 && lookingAt != null) { //Build a list of coordinates based on the tool mode and range
                     coordinates = ExchangingModes.getBuildOrders(world, player, lookingAt.getBlockPos(), lookingAt.sideHit, stack);
                 }
 
@@ -211,7 +213,7 @@ public class ToolRenders {
                 hasBlocks = hasBlocks + InventoryManipulation.countPaste(player);
                 int hasEnergy = 0;
                 if (Config.poweredByFE) {
-                    hasEnergy = stack.getCapability(CapabilityEnergy.ENERGY, null).getEnergyStored();
+                    hasEnergy = CapabilityProviderEnergy.getCap(stack).getEnergyStored();
                 } else {
                     hasEnergy = stack.getMaxDamage() - stack.getItemDamage();
                 }
@@ -238,7 +240,7 @@ public class ToolRenders {
                 //This blend function allows you to use a constant alpha, which is defined later
                 GlStateManager.blendFunc(GL11.GL_CONSTANT_ALPHA, GL11.GL_ONE_MINUS_CONSTANT_ALPHA);
 
-                //ArrayList<BlockPos> sortedCoordinates = ExchangingModes.sortByDistance(coordinates, player); //Sort the coords by distance to player.
+                //List<BlockPos> sortedCoordinates = ExchangingModes.sortByDistance(coordinates, player); //Sort the coords by distance to player.
 
                 for (BlockPos coordinate : coordinates) {
                     GlStateManager.pushMatrix();//Push matrix again just because
@@ -298,15 +300,17 @@ public class ToolRenders {
     }
 
     public static void renderPasteOverlay(RenderWorldLastEvent evt, EntityPlayer player, ItemStack stack) {
-        String UUID = CopyPasteTool.getUUID(stack);
+        String UUID = ModItems.copyPasteTool.getUUID(stack);
         World world = player.world;
-        if (CopyPasteTool.getToolMode(stack) == CopyPasteTool.toolModes.Paste) {
+        if (ModItems.copyPasteTool.getStartPos(stack) == null) return;
+        if (ModItems.copyPasteTool.getEndPos(stack) == null) return;
+        if (CopyPasteTool.getToolMode(stack) == CopyPasteTool.ToolMode.Paste) {
             //First check if we have an anchor, if not check if we're looking at a block, if not, exit
             BlockPos startPos = CopyPasteTool.getAnchor(stack);
             if (startPos == null) {
                 startPos = VectorTools.getPosLookingAt(player);
                 if (startPos == null) return;
-                else startPos = startPos.up();
+                startPos = startPos.up();
             }
 
             //We store our buffers in PasteToolBufferBuilder (A client only class) -- retrieve the buffer from this locally cache'd map
@@ -315,7 +319,7 @@ public class ToolRenders {
                 return;
             }
             //Also get the blockMapList from the local cache - If either the buffer or the blockmap list are empty, exit.
-            ArrayList<BlockMap> blockMapList = CopyPasteTool.getBlockMapList(PasteToolBufferBuilder.getTagFromUUID(UUID));
+            List<BlockMap> blockMapList = CopyPasteTool.getBlockMapList(PasteToolBufferBuilder.getTagFromUUID(UUID));
             if (toolDireBuffer.getVertexCount() == 0 || blockMapList.size() == 0) {
                 return;
             }
@@ -363,14 +367,14 @@ public class ToolRenders {
             GlStateManager.popMatrix();
 
         } else {
-            BlockPos startPos = CopyPasteTool.getStartPos(stack);
-            BlockPos endPos = CopyPasteTool.getEndPos(stack);
+            BlockPos startPos = ModItems.copyPasteTool.getStartPos(stack);
+            BlockPos endPos = ModItems.copyPasteTool.getEndPos(stack);
             BlockPos blankPos = new BlockPos(0, 0, 0);
             if (startPos == null || endPos == null || startPos.equals(blankPos) || endPos.equals(blankPos)) {
                 return;
             }
 
-            ArrayList<BlockMap> blockMapList = CopyPasteTool.getBlockMapList(PasteToolBufferBuilder.getTagFromUUID(UUID));
+            List<BlockMap> blockMapList = CopyPasteTool.getBlockMapList(PasteToolBufferBuilder.getTagFromUUID(UUID));
             if (blockMapList.size() == 0) {
                 //return;
             }
@@ -416,7 +420,7 @@ public class ToolRenders {
     private static void renderBox(Tessellator tessellator, BufferBuilder bufferBuilder, double startX, double startY, double startZ, double endX, double endY, double endZ, int R, int G, int B) {
         GlStateManager.glLineWidth(2.0F);
         bufferBuilder.begin(3, DefaultVertexFormats.POSITION_COLOR);
-        bufferBuilder.pos(startX, startY, startZ).color((float) G, (float) G, (float) G, 0.0F).endVertex();
+        bufferBuilder.pos(startX, startY, startZ).color(G, G, G, 0.0F).endVertex();
         bufferBuilder.pos(startX, startY, startZ).color(G, G, G, R).endVertex();
         bufferBuilder.pos(endX, startY, startZ).color(G, B, B, R).endVertex();
         bufferBuilder.pos(endX, startY, endZ).color(G, G, G, R).endVertex();
@@ -433,7 +437,7 @@ public class ToolRenders {
         bufferBuilder.pos(endX, endY, endZ).color(G, G, G, R).endVertex();
         bufferBuilder.pos(endX, endY, startZ).color(G, G, G, R).endVertex();
         bufferBuilder.pos(endX, startY, startZ).color(G, G, G, R).endVertex();
-        bufferBuilder.pos(endX, startY, startZ).color((float) G, (float) G, (float) G, 0.0F).endVertex();
+        bufferBuilder.pos(endX, startY, startZ).color(G, G, G, 0.0F).endVertex();
         tessellator.draw();
         GlStateManager.glLineWidth(1.0F);
     }

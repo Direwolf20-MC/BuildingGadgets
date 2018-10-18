@@ -30,11 +30,11 @@ public class PacketAnchorKey implements IMessage {
     public static class Handler implements IMessageHandler<PacketAnchorKey, IMessage> {
         @Override
         public IMessage onMessage(PacketAnchorKey message, MessageContext ctx) {
-            FMLCommonHandler.instance().getWorldThread(ctx.netHandler).addScheduledTask(() -> handle(message, ctx));
+            FMLCommonHandler.instance().getWorldThread(ctx.netHandler).addScheduledTask(() -> handle(ctx));
             return null;
         }
 
-        private void handle(PacketAnchorKey message, MessageContext ctx) {
+        private void handle(MessageContext ctx) {
             EntityPlayerMP playerEntity = ctx.getServerHandler().player;
             ItemStack heldItem = playerEntity.getHeldItem(EnumHand.MAIN_HAND);
             if (!(heldItem.getItem() instanceof GenericGadget)) {
@@ -44,10 +44,8 @@ public class PacketAnchorKey implements IMessage {
                 }
             }
             if (!heldItem.isEmpty() && heldItem.getItem() instanceof BuildingTool) {
-                BuildingTool buildingTool = (BuildingTool) (heldItem.getItem());
                 GadgetUtils.anchorBlocks(playerEntity, heldItem);
             } else if (!heldItem.isEmpty() && heldItem.getItem() instanceof ExchangerTool) {
-                ExchangerTool exchangerTool = (ExchangerTool) (heldItem.getItem());
                 GadgetUtils.anchorBlocks(playerEntity, heldItem);
             } else if (!heldItem.isEmpty() && heldItem.getItem() instanceof GenericGadget) {
                 CopyPasteTool.anchorBlocks(playerEntity, heldItem);

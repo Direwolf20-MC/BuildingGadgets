@@ -23,8 +23,8 @@ public class PacketTemplateManagerPaste implements IMessage {
 
     //ByteArrayOutputStream baos = new ByteArrayOutputStream();
     private BlockPos pos;
-    byte[] data;
-    String templateName;
+    private byte[] data;
+    private String templateName;
 
     @Override
     public void fromBytes(ByteBuf buf) {
@@ -79,7 +79,7 @@ public class PacketTemplateManagerPaste implements IMessage {
                 TileEntity te = world.getTileEntity(pos);
                 if (!(te instanceof TemplateManagerTileEntity)) return;
                 TemplateManagerContainer container = ((TemplateManagerTileEntity) te).getContainer(player);
-                TemplateManagerCommands.PasteTemplate(container, player, newTag, message.templateName);
+                TemplateManagerCommands.pasteTemplate(container, player, newTag, message.templateName);
             } catch (Throwable t) {
                 System.out.println(t);
             }
