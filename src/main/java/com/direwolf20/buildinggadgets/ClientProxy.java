@@ -14,8 +14,10 @@ import com.direwolf20.buildinggadgets.tools.ToolRenders;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
+import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
@@ -91,5 +93,15 @@ public class ClientProxy extends CommonProxy {
             ToolRenders.renderPasteOverlay(evt, p, heldItem);
         }
 
+    }
+
+    @SubscribeEvent
+    public static void registerSprites(TextureStitchEvent.Pre event) {
+        registerSprite(event, "slot_copypastetool");
+        registerSprite(event, "slot_template");
+    }
+
+    private static void registerSprite(TextureStitchEvent.Pre event, String name) {
+        event.getMap().registerSprite(new ResourceLocation(BuildingGadgets.MODID, "gui/" + name));
     }
 }

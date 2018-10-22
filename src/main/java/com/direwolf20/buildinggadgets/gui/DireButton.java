@@ -2,12 +2,12 @@ package com.direwolf20.buildinggadgets.gui;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.renderer.GlStateManager;
 
-public class DireButton extends GuiButton {
+public class DireButton extends GuiButtonHelpText {
+
     public DireButton(int buttonId, int x, int y, int widthIn, int heightIn, String buttonText) {
-        super(buttonId, x, y, widthIn, heightIn, buttonText);
+        super(buttonId, x, y, widthIn, heightIn, buttonText, "");
     }
 
     @Override
