@@ -6,10 +6,7 @@ import com.direwolf20.buildinggadgets.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.entities.BlockBuildEntityRender;
 import com.direwolf20.buildinggadgets.entities.ConstructionBlockEntity;
 import com.direwolf20.buildinggadgets.entities.ConstructionBlockEntityRender;
-import com.direwolf20.buildinggadgets.items.BuildingTool;
-import com.direwolf20.buildinggadgets.items.CopyPasteTool;
-import com.direwolf20.buildinggadgets.items.ExchangerTool;
-import com.direwolf20.buildinggadgets.items.GenericGadget;
+import com.direwolf20.buildinggadgets.items.*;
 import com.direwolf20.buildinggadgets.tools.PasteContainerMeshDefinition;
 import com.direwolf20.buildinggadgets.tools.ToolRenders;
 import net.minecraft.client.Minecraft;
@@ -84,14 +81,13 @@ public class ClientProxy extends CommonProxy {
             }
         }
         if (heldItem.getItem() instanceof BuildingTool) {
-//            BuildingTool buildingTool = (BuildingTool) heldItem.getItem();
             ToolRenders.renderBuilderOverlay(evt, p, heldItem);
         } else if (heldItem.getItem() instanceof ExchangerTool) {
-//            ExchangerTool exchangerTool = (ExchangerTool) heldItem.getItem();
             ToolRenders.renderExchangerOverlay(evt, p, heldItem);
         } else if (heldItem.getItem() instanceof CopyPasteTool) {
-            //CopyPasteTool copyPasteTool = (CopyPasteTool) heldItem.getItem();
             ToolRenders.renderPasteOverlay(evt, p, heldItem);
+        } else if (heldItem.getItem() instanceof DestructionTool) {
+            ToolRenders.renderDestructionOverlay(evt, p, heldItem);
         }
 
     }

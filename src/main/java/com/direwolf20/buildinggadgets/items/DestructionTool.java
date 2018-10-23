@@ -32,10 +32,9 @@ import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.world.BlockEvent;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.annotation.Nullable;
 
 import static com.direwolf20.buildinggadgets.tools.GadgetUtils.useEnergy;
 import static com.direwolf20.buildinggadgets.tools.GadgetUtils.withSuffix;
@@ -156,23 +155,26 @@ public class DestructionTool extends GenericGadget {
         return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);
     }
 
-    public static void clearArea(World world, BlockPos pos, EnumFacing side, EntityPlayer player, ItemStack stack) {
+    public static ArrayList<BlockPos> getArea(World world, BlockPos startPos, EnumFacing side, EntityPlayer player, ItemStack stack) {
+        ArrayList<BlockPos> voidPosArray = new ArrayList<BlockPos>();
         ArrayList<EnumFacing> directions = assignDirections(side, player);
         for (int d = 0; d < getToolValue(stack, "depth"); d++) {
             for (int x = getToolValue(stack, "left") * -1; x <= getToolValue(stack, "right"); x++) {
                 for (int y = getToolValue(stack, "down") * -1; y <= getToolValue(stack, "up"); y++) {
-                    BlockPos voidPos = new BlockPos(pos);
+                    BlockPos voidPos = new BlockPos(startPos);
                     voidPos = voidPos.offset(directions.get(0), x);
                     voidPos = voidPos.offset(directions.get(2), y);
                     voidPos = voidPos.offset(directions.get(4), d);
-                    boolean success = destroyBlock(world, voidPos, player);
-
+                    if (validBlock(world, voidPos, player)) {
+                        voidPosArray.add(voidPos);
+                    }
                 }
             }
         }
+        return voidPosArray;
     }
 
-    public static boolean destroyBlock(World world, BlockPos voidPos, EntityPlayer player) {
+    public static boolean validBlock(World world, BlockPos voidPos, EntityPlayer player) {
         IBlockState currentBlock = world.getBlockState(voidPos);
         TileEntity te = world.getTileEntity(voidPos);
         if (currentBlock.getMaterial() == Material.AIR) return false;
@@ -199,6 +201,24 @@ public class DestructionTool extends GenericGadget {
         BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(world, voidPos, currentBlock, player);
         if (MinecraftForge.EVENT_BUS.post(e)) {
             return false;
+        }
+        return true;
+    }
+
+    public static void clearArea(World world, BlockPos pos, EnumFacing side, EntityPlayer player, ItemStack stack) {
+        ArrayList<BlockPos> voidPosArray = getArea(world, pos, side, player, stack);
+        for (BlockPos voidPos : voidPosArray) {
+            boolean success = destroyBlock(world, voidPos, player);
+        }
+    }
+
+    public static boolean destroyBlock(World world, BlockPos voidPos, EntityPlayer player) {
+        ItemStack tool = player.getHeldItemMainhand();
+        if (!(tool.getItem() instanceof DestructionTool)) {
+            tool = player.getHeldItemOffhand();
+            if (!(tool.getItem() instanceof DestructionTool)) {
+                return false;
+            }
         }
         if (Config.poweredByFE) {
             if (!useEnergy(tool, Config.energyCostDestruction, player)) {

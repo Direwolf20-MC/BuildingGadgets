@@ -7,10 +7,7 @@
 package com.direwolf20.buildinggadgets.gui;
 
 import com.direwolf20.buildinggadgets.KeyBindings;
-import com.direwolf20.buildinggadgets.items.BuildingTool;
-import com.direwolf20.buildinggadgets.items.CopyPasteTool;
-import com.direwolf20.buildinggadgets.items.ExchangerTool;
-import com.direwolf20.buildinggadgets.items.GenericGadget;
+import com.direwolf20.buildinggadgets.items.*;
 import com.direwolf20.buildinggadgets.network.PacketHandler;
 import com.direwolf20.buildinggadgets.network.PacketToggleMode;
 import com.google.common.collect.ImmutableSet;
@@ -59,6 +56,8 @@ public class ModeRadialMenu extends GuiScreen {
             setSocketable(stack);
         } else if (stack.getItem() instanceof CopyPasteTool) {
             setSocketable(stack);
+        } else if (stack.getItem() instanceof DestructionTool) {
+            setSocketable(stack);
         }
     }
 
@@ -76,6 +75,8 @@ public class ModeRadialMenu extends GuiScreen {
         } else if (stack.getItem() instanceof CopyPasteTool) {
             for (int i = 0; i < CopyPasteTool.ToolMode.values().length; i++)
                 slots.add(i);
+        } else if (stack.getItem() instanceof DestructionTool) {
+
         }
     }
 

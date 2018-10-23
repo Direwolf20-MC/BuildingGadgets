@@ -1,9 +1,6 @@
 package com.direwolf20.buildinggadgets.network;
 
-import com.direwolf20.buildinggadgets.items.BuildingTool;
-import com.direwolf20.buildinggadgets.items.CopyPasteTool;
-import com.direwolf20.buildinggadgets.items.ExchangerTool;
-import com.direwolf20.buildinggadgets.items.GenericGadget;
+import com.direwolf20.buildinggadgets.items.*;
 import com.direwolf20.buildinggadgets.tools.GadgetUtils;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -47,8 +44,10 @@ public class PacketAnchorKey implements IMessage {
                 GadgetUtils.anchorBlocks(playerEntity, heldItem);
             } else if (!heldItem.isEmpty() && heldItem.getItem() instanceof ExchangerTool) {
                 GadgetUtils.anchorBlocks(playerEntity, heldItem);
-            } else if (!heldItem.isEmpty() && heldItem.getItem() instanceof GenericGadget) {
+            } else if (!heldItem.isEmpty() && heldItem.getItem() instanceof CopyPasteTool) {
                 CopyPasteTool.anchorBlocks(playerEntity, heldItem);
+            } else if (!heldItem.isEmpty() && heldItem.getItem() instanceof DestructionTool) {
+                //CopyPasteTool.anchorBlocks(playerEntity, heldItem);
             }
         }
     }

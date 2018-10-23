@@ -3,10 +3,7 @@ package com.direwolf20.buildinggadgets.tools;
 import com.direwolf20.buildinggadgets.Config;
 import com.direwolf20.buildinggadgets.ModBlocks;
 import com.direwolf20.buildinggadgets.ModItems;
-import com.direwolf20.buildinggadgets.items.BuildingTool;
-import com.direwolf20.buildinggadgets.items.CopyPasteTool;
-import com.direwolf20.buildinggadgets.items.ExchangerTool;
-import com.direwolf20.buildinggadgets.items.FakeBuilderWorld;
+import com.direwolf20.buildinggadgets.items.*;
 import com.direwolf20.buildinggadgets.items.ItemCaps.CapabilityProviderEnergy;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -33,6 +30,7 @@ import net.minecraftforge.client.event.RenderWorldLastEvent;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL14;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -296,6 +294,65 @@ public class ToolRenders {
                 //Pop from the original push in this method
                 GlStateManager.popMatrix();
             }
+        }
+    }
+
+    public static void renderDestructionOverlay(RenderWorldLastEvent evt, EntityPlayer player, ItemStack stack) {
+        RayTraceResult lookingAt = VectorTools.getLookingAt(player);
+        if (lookingAt != null) {
+            World world = player.world;
+            IBlockState startBlock = world.getBlockState(lookingAt.getBlockPos());
+            if (startBlock == ModBlocks.effectBlock.getDefaultState()) return;
+            ItemStack heldItem = player.getHeldItemMainhand(); //Get the item stack and the block that we'll be rendering (From the Itemstack's NBT)
+            if (!(heldItem.getItem() instanceof DestructionTool)) {
+                heldItem = player.getHeldItemOffhand();
+                if (!(heldItem.getItem() instanceof DestructionTool)) {
+                    return;
+                }
+            }
+            Minecraft mc = Minecraft.getMinecraft();
+            mc.renderEngine.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+
+            ArrayList<BlockPos> coordinates = DestructionTool.getArea(world, lookingAt.getBlockPos(), lookingAt.sideHit, player, heldItem);
+
+            //Prepare the block rendering
+            BlockRendererDispatcher dispatcher = Minecraft.getMinecraft().getBlockRendererDispatcher();
+            BlockRenderLayer origLayer = MinecraftForgeClient.getRenderLayer();
+
+            //Calculate the players current position, which is needed later
+            double doubleX = player.lastTickPosX + (player.posX - player.lastTickPosX) * evt.getPartialTicks();
+            double doubleY = player.lastTickPosY + (player.posY - player.lastTickPosY) * evt.getPartialTicks();
+            double doubleZ = player.lastTickPosZ + (player.posZ - player.lastTickPosZ) * evt.getPartialTicks();
+
+            //Save the current position that is being rendered (I think)
+            GlStateManager.pushMatrix();
+            //Enable Blending (So we can have transparent effect)
+            GlStateManager.enableBlend();
+            //This blend function allows you to use a constant alpha, which is defined later
+            GlStateManager.blendFunc(GL11.GL_CONSTANT_ALPHA, GL11.GL_ONE_MINUS_CONSTANT_ALPHA);
+
+            List<BlockPos> sortedCoordinates = BuildingModes.sortByDistance(coordinates, player); //Sort the coords by distance to player.
+
+            for (BlockPos coordinate : sortedCoordinates) {
+                GlStateManager.pushMatrix();//Push matrix again just because
+                GlStateManager.translate(-doubleX, -doubleY, -doubleZ);//The render starts at the player, so we subtract the player coords and move the render to 0,0,0
+                GlStateManager.translate(coordinate.getX(), coordinate.getY(), coordinate.getZ());//Now move the render position to the coordinates we want to render at
+                GlStateManager.rotate(-90.0F, 0.0F, 1.0F, 0.0F); //Rotate it because i'm not sure why but we need to
+                GlStateManager.translate(-0.005f, -0.005f, 0.005f);
+                GlStateManager.scale(1.01f, 1.01f, 1.01f);//Slightly Larger block to avoid z-fighting.
+                GL14.glBlendColor(1F, 1F, 1F, 0.55f); //Set the alpha of the blocks we are rendering
+                //GlStateManager.rotate(-90.0F, 0.0F, 1.0F, 0.0F); //Rotate it because i'm not sure why but we need to
+                dispatcher.renderBlockBrightness(Blocks.STAINED_GLASS.getDefaultState().withProperty(COLOR, EnumDyeColor.RED), 1f);//Render the defined block - White glass to show non-full block renders (Example: Torch)
+                //Move the render position back to where it was
+                GlStateManager.popMatrix();
+            }
+            //Set blending back to the default mode
+            GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+            ForgeHooksClient.setRenderLayer(origLayer);
+            //Disable blend
+            GlStateManager.disableBlend();
+            //Pop from the original push in this method
+            GlStateManager.popMatrix();
         }
     }
 
