@@ -293,23 +293,36 @@ public class DestructionTool extends GenericGadget {
     public static void clearArea(World world, BlockPos pos, EnumFacing side, EntityPlayer player, ItemStack stack) {
         ArrayList<BlockPos> voidPosArray = getArea(world, pos, side, player, stack);
         Map<BlockPos, IBlockState> posStateMap = new HashMap<BlockPos, IBlockState>();
+        Map<BlockPos, IBlockState> pasteStateMap = new HashMap<BlockPos, IBlockState>();
         for (BlockPos voidPos : voidPosArray) {
             IBlockState blockState = world.getBlockState(voidPos);
+            IBlockState pasteState = Blocks.AIR.getDefaultState();
+            if (blockState.getBlock() == ModBlocks.constructionBlock) {
+                TileEntity te = world.getTileEntity(voidPos);
+                if (te instanceof ConstructionBlockTileEntity) {
+                    pasteState = ((ConstructionBlockTileEntity) te).getActualBlockState();
+                }
+            }
             boolean success = destroyBlock(world, voidPos, player);
-            if (success && blockState != ModBlocks.constructionBlock.getDefaultState())
+            if (success)
                 posStateMap.put(voidPos, blockState);
+            if (pasteState != Blocks.AIR.getDefaultState()) {
+                pasteStateMap.put(voidPos, pasteState);
+            }
         }
         if (voidPosArray.size() > 0) {
             BlockPos startPos = (getAnchor(stack) == null) ? pos : getAnchor(stack);
-            storeUndo(world, posStateMap, startPos, stack, player);
+            storeUndo(world, posStateMap, pasteStateMap, startPos, stack, player);
         }
     }
 
-    public static void storeUndo(World world, Map<BlockPos, IBlockState> posStateMap, BlockPos startBlock, ItemStack stack, EntityPlayer player) {
+    public static void storeUndo(World world, Map<BlockPos, IBlockState> posStateMap, Map<BlockPos, IBlockState> pasteStateMap, BlockPos startBlock, ItemStack stack, EntityPlayer player) {
         WorldSave worldSave = WorldSave.getWorldSaveDestruction(world);
         NBTTagCompound tagCompound = new NBTTagCompound();
         List<Integer> posIntArrayList = new ArrayList<Integer>();
         List<Integer> stateIntArrayList = new ArrayList<Integer>();
+        List<Integer> pastePosArrayList = new ArrayList<Integer>();
+        List<Integer> pasteStateArrayList = new ArrayList<Integer>();
         BlockMapIntState blockMapIntState = new BlockMapIntState();
         String UUID = getUUID(stack);
 
@@ -317,12 +330,22 @@ public class DestructionTool extends GenericGadget {
             posIntArrayList.add(GadgetUtils.relPosToInt(startBlock, entry.getKey()));
             blockMapIntState.addToMap(entry.getValue());
             stateIntArrayList.add((int) blockMapIntState.findSlot(entry.getValue()));
+            if (pasteStateMap.containsKey(entry.getKey())) {
+                pastePosArrayList.add(GadgetUtils.relPosToInt(startBlock, entry.getKey()));
+                IBlockState pasteBlockState = pasteStateMap.get(entry.getKey());
+                blockMapIntState.addToMap(pasteBlockState);
+                pasteStateArrayList.add((int) blockMapIntState.findSlot(pasteBlockState));
+            }
         }
         tagCompound.setTag("mapIntState", blockMapIntState.putIntStateMapIntoNBT());
         int[] posIntArray = posIntArrayList.stream().mapToInt(i -> i).toArray();
         int[] stateIntArray = stateIntArrayList.stream().mapToInt(i -> i).toArray();
+        int[] posPasteArray = pastePosArrayList.stream().mapToInt(i -> i).toArray();
+        int[] statePasteArray = pasteStateArrayList.stream().mapToInt(i -> i).toArray();
         tagCompound.setIntArray("posIntArray", posIntArray);
         tagCompound.setIntArray("stateIntArray", stateIntArray);
+        tagCompound.setIntArray("posPasteArray", posPasteArray);
+        tagCompound.setIntArray("statePasteArray", statePasteArray);
         tagCompound.setTag("startPos", NBTUtil.createPosTag(startBlock));
         tagCompound.setInteger("dim", player.dimension);
         tagCompound.setString("UUID", UUID);
