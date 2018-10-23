@@ -6,6 +6,7 @@ import com.direwolf20.buildinggadgets.ModBlocks;
 import com.direwolf20.buildinggadgets.blocks.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.gui.GuiProxy;
+import com.direwolf20.buildinggadgets.tools.GadgetUtils;
 import com.direwolf20.buildinggadgets.tools.VectorTools;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -23,6 +24,8 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
@@ -57,6 +60,40 @@ public class DestructionTool extends GenericGadget {
             if (energy != null)
                 list.add(TextFormatting.WHITE + I18n.format("tooltip.gadget.energy") + ": " + withSuffix(energy.getEnergyStored()) + "/" + withSuffix(energy.getMaxEnergyStored()));
         }
+    }
+
+    public static void setAnchor(ItemStack stack, BlockPos pos) {
+        GadgetUtils.writePOSToNBT(stack, pos, "anchor");
+    }
+
+    public static BlockPos getAnchor(ItemStack stack) {
+        return GadgetUtils.getPOSFromNBT(stack, "anchor");
+    }
+
+    public static void setAnchorSide(ItemStack stack, EnumFacing side) {
+        NBTTagCompound tagCompound = stack.getTagCompound();
+        if (tagCompound == null) {
+            tagCompound = new NBTTagCompound();
+        }
+        if (side == null) {
+            if (tagCompound.getTag("anchorSide") != null) {
+                tagCompound.removeTag("anchorSide");
+                stack.setTagCompound(tagCompound);
+            }
+            return;
+        }
+        tagCompound.setString("anchorSide", side.getName());
+        stack.setTagCompound(tagCompound);
+    }
+
+    public static EnumFacing getAnchorSide(ItemStack stack) {
+        NBTTagCompound tagCompound = stack.getTagCompound();
+        if (tagCompound == null) {
+            return null;
+        }
+        String facing = tagCompound.getString("anchorSide");
+        if (facing.equals("") || facing.isEmpty()) return null;
+        return EnumFacing.byName(facing);
     }
 
     public static void setToolValue(ItemStack stack, int value, String valueName) {
@@ -121,6 +158,11 @@ public class DestructionTool extends GenericGadget {
         if (!world.isRemote) {
             if (!player.isSneaking()) {
                 clearArea(world, pos, side, player, stack);
+                if (getAnchor(stack) != null) {
+                    setAnchor(stack, null);
+                    setAnchorSide(stack, null);
+                    player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.anchorremove").getUnformattedComponentText()), true);
+                }
             }
         } else {
             if (player.isSneaking()) {
@@ -139,12 +181,17 @@ public class DestructionTool extends GenericGadget {
         if (!world.isRemote) {
             if (!player.isSneaking()) {
                 RayTraceResult lookingAt = VectorTools.getLookingAt(player);
-                if (lookingAt == null) { //If we aren't looking at anything, exit
+                if (lookingAt == null && getAnchor(stack) == null) { //If we aren't looking at anything, exit
                     return new ActionResult<ItemStack>(EnumActionResult.FAIL, stack);
                 }
-                BlockPos startBlock = lookingAt.getBlockPos();
-                EnumFacing sideHit = lookingAt.sideHit;
+                BlockPos startBlock = (getAnchor(stack) == null) ? lookingAt.getBlockPos() : getAnchor(stack);
+                EnumFacing sideHit = (getAnchorSide(stack) == null) ? lookingAt.sideHit : getAnchorSide(stack);
                 clearArea(world, startBlock, sideHit, player, stack);
+                if (getAnchor(stack) != null) {
+                    setAnchor(stack, null);
+                    setAnchorSide(stack, null);
+                    player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.anchorremove").getUnformattedComponentText()), true);
+                }
             }
         } else {
             if (player.isSneaking()) {
@@ -155,8 +202,28 @@ public class DestructionTool extends GenericGadget {
         return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);
     }
 
-    public static ArrayList<BlockPos> getArea(World world, BlockPos startPos, EnumFacing side, EntityPlayer player, ItemStack stack) {
+    public static void anchorBlocks(EntityPlayer player, ItemStack stack) {
+        BlockPos currentAnchor = getAnchor(stack);
+        if (currentAnchor == null) {
+            RayTraceResult lookingAt = VectorTools.getLookingAt(player);
+            if (lookingAt == null) {
+                return;
+            }
+            currentAnchor = lookingAt.getBlockPos();
+            setAnchor(stack, currentAnchor);
+            setAnchorSide(stack, lookingAt.sideHit);
+            player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.anchorrender").getUnformattedComponentText()), true);
+        } else {
+            setAnchor(stack, null);
+            setAnchorSide(stack, null);
+            player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.anchorremove").getUnformattedComponentText()), true);
+        }
+    }
+
+    public static ArrayList<BlockPos> getArea(World world, BlockPos pos, EnumFacing incomingSide, EntityPlayer player, ItemStack stack) {
         ArrayList<BlockPos> voidPosArray = new ArrayList<BlockPos>();
+        BlockPos startPos = (getAnchor(stack) == null) ? pos : getAnchor(stack);
+        EnumFacing side = (getAnchorSide(stack) == null) ? incomingSide : getAnchorSide(stack);
         ArrayList<EnumFacing> directions = assignDirections(side, player);
         for (int d = 0; d < getToolValue(stack, "depth"); d++) {
             for (int x = getToolValue(stack, "left") * -1; x <= getToolValue(stack, "right"); x++) {

@@ -47,7 +47,7 @@ public class PacketAnchorKey implements IMessage {
             } else if (!heldItem.isEmpty() && heldItem.getItem() instanceof CopyPasteTool) {
                 CopyPasteTool.anchorBlocks(playerEntity, heldItem);
             } else if (!heldItem.isEmpty() && heldItem.getItem() instanceof DestructionTool) {
-                //CopyPasteTool.anchorBlocks(playerEntity, heldItem);
+                DestructionTool.anchorBlocks(playerEntity, heldItem);
             }
         }
     }
