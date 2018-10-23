@@ -91,10 +91,12 @@ public class TemplateManagerGUI extends GuiContainer {
         drawDefaultBackground();
         super.drawScreen(mouseX, mouseY, partialTicks);
         if (buttonHelp.selected) {
-            for (IHoverHelpText helpTextProvider : helpTextProviders) {
-                if (helpTextProvider instanceof GuiButtonHelpText)
-                    helpTextProvider.drawRect(this, HELP_TEXT_BACKGROUNG_COLOR);
-            }
+            GlStateManager.color(1, 1, 1, 1);
+            GlStateManager.disableLighting();
+            for (IHoverHelpText helpTextProvider : helpTextProviders)
+                helpTextProvider.drawRect(this, HELP_TEXT_BACKGROUNG_COLOR);
+
+            GlStateManager.enableLighting();
             for (IHoverHelpText helpTextProvider : helpTextProviders) {
                 if (helpTextProvider.isHovered(mouseX, mouseY))
                     drawHoveringText(helpTextProvider.getHoverHelpText(), mouseX, mouseY);
@@ -143,12 +145,6 @@ public class TemplateManagerGUI extends GuiContainer {
 
         this.nameField.drawTextBox();
         drawStructure();
-        if (buttonHelp.selected) {
-            for (IHoverHelpText helpTextProvider : helpTextProviders) {
-                if (helpTextProvider instanceof AreaHelpText)
-                    helpTextProvider.drawRect(this, HELP_TEXT_BACKGROUNG_COLOR);
-            }
-        }
     }
 
     public void drawTexturedModalRectReverseX(int x, int y, int textureX, int textureY, int width, int height, boolean reverse) {
