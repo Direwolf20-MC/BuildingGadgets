@@ -1,6 +1,7 @@
 package com.direwolf20.buildinggadgets;
 
 import com.direwolf20.buildinggadgets.blocks.Models.BakedModelLoader;
+import com.direwolf20.buildinggadgets.blocks.templatemanager.TemplateManagerContainer;
 import com.direwolf20.buildinggadgets.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.entities.BlockBuildEntityRender;
 import com.direwolf20.buildinggadgets.entities.ConstructionBlockEntity;
@@ -14,8 +15,10 @@ import com.direwolf20.buildinggadgets.tools.ToolRenders;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
+import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
@@ -91,5 +94,15 @@ public class ClientProxy extends CommonProxy {
             ToolRenders.renderPasteOverlay(evt, p, heldItem);
         }
 
+    }
+
+    @SubscribeEvent
+    public static void registerSprites(TextureStitchEvent.Pre event) {
+        registerSprite(event, TemplateManagerContainer.TEXTURE_LOC_SLOT_TOOL);
+        registerSprite(event, TemplateManagerContainer.TEXTURE_LOC_SLOT_TEMPLATE);
+    }
+
+    private static void registerSprite(TextureStitchEvent.Pre event, String loc) {
+        event.getMap().registerSprite(new ResourceLocation(loc));
     }
 }

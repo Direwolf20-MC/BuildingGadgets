@@ -27,6 +27,7 @@ public class Template extends Item implements ITemplate {
     public Template() {
         setRegistryName("template");        // The unique name (within your mod) that identifies this item
         setUnlocalizedName(BuildingGadgets.MODID + ".template");     // Used for localization (en_US.lang)
+        setMaxStackSize(1);
     }
 
     @Override

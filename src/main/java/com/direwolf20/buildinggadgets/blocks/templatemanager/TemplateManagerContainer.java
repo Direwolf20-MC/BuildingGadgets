@@ -7,11 +7,14 @@ import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.SlotItemHandler;
 
 import javax.annotation.Nullable;
 
+import com.direwolf20.buildinggadgets.BuildingGadgets;
+
 public class TemplateManagerContainer extends Container {
+    public static final String TEXTURE_LOC_SLOT_TOOL = BuildingGadgets.MODID + ":gui/slot_copypastetool";
+    public static final String TEXTURE_LOC_SLOT_TEMPLATE = BuildingGadgets.MODID + ":gui/slot_template";
     private TemplateManagerTileEntity te;
 
     public TemplateManagerContainer(IInventory playerInventory, TemplateManagerTileEntity te) {
@@ -30,7 +33,7 @@ public class TemplateManagerContainer extends Container {
             for (int col = 0; col < 9; ++col) {
                 int x = 8 + col * 18;
                 int y = row * 18 + 84;
-                this.addSlotToContainer(new Slot(playerInventory, col + row * 9 + 10, x, y));
+                this.addSlotToContainer(new Slot(playerInventory, col + row * 9 + 9, x, y));
             }
         }
 
@@ -44,15 +47,15 @@ public class TemplateManagerContainer extends Container {
 
     private void addOwnSlots() {
         IItemHandler itemHandler = this.te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
-        int x = 94;
-        int y = 35;
+        int x = 86;
+        int y = 41;
 
         // Add our own slots
         //int slotIndex = 0;
         //for (int i = 0; i < itemHandler.getSlots(); i++) {
-        addSlotToContainer(new SlotItemHandler(itemHandler, 0, x, y));
-        x = 146;
-        addSlotToContainer(new SlotItemHandler(itemHandler, 1, x, y));
+        addSlotToContainer(new SlotTemplateManager(itemHandler, 0, x, y, TEXTURE_LOC_SLOT_TOOL));
+        x = 144;
+        addSlotToContainer(new SlotTemplateManager(itemHandler, 1, x, y, TEXTURE_LOC_SLOT_TEMPLATE));
         //slotIndex++;
 
         //}

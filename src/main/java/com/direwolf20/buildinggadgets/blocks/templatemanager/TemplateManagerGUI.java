@@ -7,6 +7,10 @@ package com.direwolf20.buildinggadgets.blocks.templatemanager;
 
 import com.direwolf20.buildinggadgets.BuildingGadgets;
 import com.direwolf20.buildinggadgets.ModItems;
+import com.direwolf20.buildinggadgets.gui.AreaHelpText;
+import com.direwolf20.buildinggadgets.gui.GuiButtonHelp;
+import com.direwolf20.buildinggadgets.gui.GuiButtonHelpText;
+import com.direwolf20.buildinggadgets.gui.IHoverHelpText;
 import com.direwolf20.buildinggadgets.network.PacketHandler;
 import com.direwolf20.buildinggadgets.network.PacketTemplateManagerLoad;
 import com.direwolf20.buildinggadgets.network.PacketTemplateManagerPaste;
@@ -18,10 +22,14 @@ import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.texture.TextureMap;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.client.renderer.vertex.VertexFormatElement;
+import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.JsonToNBT;
@@ -39,11 +47,11 @@ import org.lwjgl.util.glu.Project;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.List;
 
 public class TemplateManagerGUI extends GuiContainer {
-//  public static final int WIDTH = 256;
-//  public static final int HEIGHT = 256;
+    public static final int HELP_TEXT_BACKGROUNG_COLOR = 1694460416;
 
     private boolean panelClicked;
     private int clickButton;
@@ -55,11 +63,15 @@ public class TemplateManagerGUI extends GuiContainer {
     private float momentumDampening = 0.98f;
     private float rotX = 0, rotY = 0, zoom = 1;
     private float panX = 0, panY = 0;
-    private Rectangle panel = new Rectangle(10, 18, 60, 60);
+    private Rectangle panel = new Rectangle(8, 18, 62, 62);
 
 //    private int scrollAcc;
 
     private GuiTextField nameField;
+    private GuiButton buttonSave, buttonLoad, buttonCopy, buttonPaste;
+
+    private GuiButtonHelp buttonHelp;
+    private List<IHoverHelpText> helpTextProviders = new ArrayList<>();
 
     private TemplateManagerTileEntity te;
     private TemplateManagerContainer container;
@@ -76,30 +88,81 @@ public class TemplateManagerGUI extends GuiContainer {
 
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
+        drawDefaultBackground();
         super.drawScreen(mouseX, mouseY, partialTicks);
-        this.renderHoveredToolTip(mouseX, mouseY);
+        if (buttonHelp.selected) {
+            GlStateManager.color(1, 1, 1, 1);
+            GlStateManager.disableLighting();
+            for (IHoverHelpText helpTextProvider : helpTextProviders)
+                helpTextProvider.drawRect(this, HELP_TEXT_BACKGROUNG_COLOR);
+
+            GlStateManager.enableLighting();
+            for (IHoverHelpText helpTextProvider : helpTextProviders) {
+                if (helpTextProvider.isHovered(mouseX, mouseY))
+                    drawHoveringText(helpTextProvider.getHoverHelpText(), mouseX, mouseY);
+            }
+        } else {
+            this.renderHoveredToolTip(mouseX, mouseY);
+        }
+        if (buttonHelp.isMouseOver())
+            drawHoveringText(buttonHelp.getHoverText(), mouseX, mouseY);
     }
 
     @Override
     public void initGui() {
         super.initGui();
+        helpTextProviders.clear();
+        this.buttonList.add(buttonHelp = new GuiButtonHelp(100, this.guiLeft + this.xSize - 16, this.guiTop + 4));
         //The parameters of GuiButton are(id, x, y, width, height, text);
-        this.buttonList.add(new GuiButton(1, this.guiLeft + 87, this.guiTop + 11, 30, 20, "Save"));
-        this.buttonList.add(new GuiButton(2, this.guiLeft + 136, this.guiTop + 11, 30, 20, "Load"));
-        this.buttonList.add(new GuiButton(3, this.guiLeft + 87, this.guiTop + 55, 30, 20, "Copy"));
-        this.buttonList.add(new GuiButton(4, this.guiLeft + 134, this.guiTop + 55, 35, 20, "Paste"));
-        this.nameField = new GuiTextField(0, this.fontRenderer, this.guiLeft + 5, this.guiTop + 6, 80, this.fontRenderer.FONT_HEIGHT);
+        this.buttonList.add(buttonSave = createAndAddButton(0, 79, 17, 30, 20, "Save"));
+        this.buttonList.add(buttonLoad = createAndAddButton(1, 137, 17, 30, 20, "Load"));
+        this.buttonList.add(buttonCopy = createAndAddButton(2, 79, 61, 30, 20, "Copy"));
+        this.buttonList.add(buttonPaste = createAndAddButton(3, 135, 61, 34, 20, "Paste"));
+        this.nameField = new GuiTextField(0, this.fontRenderer, this.guiLeft + 8, this.guiTop + 6, 149, this.fontRenderer.FONT_HEIGHT);
         this.nameField.setMaxStringLength(50);
         this.nameField.setVisible(true);
+        helpTextProviders.add(new AreaHelpText(nameField, "field.template_name"));
+        helpTextProviders.add(new AreaHelpText(inventorySlots.getSlot(0), guiLeft, guiTop, "slot.gadget"));
+        helpTextProviders.add(new AreaHelpText(inventorySlots.getSlot(1), guiLeft, guiTop, "slot.template"));
+        helpTextProviders.add(new AreaHelpText(guiLeft + 112, guiTop + 41, 22, 15, "arrow.data_flow"));
+        helpTextProviders.add(new AreaHelpText(panel, guiLeft, guiTop + 10, "preview"));
         //NOTE: the id always has to be different or else it might get called twice or never!
+    }
+
+    private GuiButton createAndAddButton(int id, int x, int y, int witdth, int height, String text) {
+        GuiButtonHelpText button = new GuiButtonHelpText(id, this.guiLeft + x, this.guiTop + y, witdth, height, text, text.toLowerCase());
+        helpTextProviders.add(button);
+        return button;
     }
 
     @Override
     protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
+        GlStateManager.color(1, 1, 1, 1);
         mc.getTextureManager().bindTexture(background);
         drawTexturedModalRect(guiLeft, guiTop, 0, 0, xSize, ySize);
+        if (!buttonCopy.isMouseOver() && !buttonPaste.isMouseOver())
+            drawTexturedModalRectReverseX(guiLeft + 112, guiTop + 41, 176, 0, 22, 15, buttonLoad.isMouseOver());
+
         this.nameField.drawTextBox();
         drawStructure();
+    }
+
+    public void drawTexturedModalRectReverseX(int x, int y, int textureX, int textureY, int width, int height, boolean reverse) {
+        Tessellator tessellator = Tessellator.getInstance();
+        BufferBuilder bufferbuilder = tessellator.getBuffer();
+        bufferbuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+        if (reverse) {
+            bufferbuilder.pos(x + 0, y + height, zLevel).tex((textureX + width) * 0.00390625F, textureY * 0.00390625F).endVertex();
+            bufferbuilder.pos(x + width, y + height, zLevel).tex(textureX * 0.00390625F, textureY * 0.00390625F).endVertex();
+            bufferbuilder.pos(x + width, y + 0, zLevel).tex(textureX * 0.00390625F, (textureY + height) * 0.00390625F).endVertex();
+            bufferbuilder.pos(x + 0, y + 0, zLevel).tex((textureX + width) * 0.00390625F, (textureY + height) * 0.00390625F).endVertex();
+        } else {
+            bufferbuilder.pos(x + 0, y + height, zLevel).tex(textureX * 0.00390625F, (textureY + height) * 0.00390625F).endVertex();
+            bufferbuilder.pos(x + width, y + height, zLevel).tex((textureX + width) * 0.00390625F, (textureY + height) * 0.00390625F).endVertex();
+            bufferbuilder.pos(x + width, y + 0, zLevel).tex((textureX + width) * 0.00390625F, textureY * 0.00390625F).endVertex();
+            bufferbuilder.pos(x + 0, y + 0, zLevel).tex(textureX * 0.00390625F, textureY * 0.00390625F).endVertex();
+        }
+        tessellator.draw();
     }
 
     private void drawStructure() {
@@ -229,13 +292,15 @@ public class TemplateManagerGUI extends GuiContainer {
 
     @Override
     protected void actionPerformed(GuiButton b) {
-        if (b.id == 1) {
+        if (b.id == buttonHelp.id) {
+            buttonHelp.selected ^= true;
+        } else if (b.id == 0) {
             PacketHandler.INSTANCE.sendToServer(new PacketTemplateManagerSave(te.getPos(), nameField.getText()));
-        } else if (b.id == 2) {
+        } else if (b.id == 1) {
             PacketHandler.INSTANCE.sendToServer(new PacketTemplateManagerLoad(te.getPos()));
-        } else if (b.id == 3) {
+        } else if (b.id == 2) {
             TemplateManagerCommands.copyTemplate(container);
-        } else if (b.id == 4) {
+        } else if (b.id == 3) {
             String CBString = getClipboardString();
             //System.out.println("CBString Length: " + CBString.length());
             //System.out.println(CBString);
@@ -256,12 +321,10 @@ public class TemplateManagerGUI extends GuiContainer {
                 } else {
                     Minecraft.getMinecraft().player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.pastetoobig").getUnformattedComponentText()), false);
                 }
-
             } catch (Throwable t) {
-                System.out.println(t);
+                BuildingGadgets.logger.error(t);
                 Minecraft.getMinecraft().player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.pastefailed").getUnformattedComponentText()), false);
             }
-
         }
     }
 
@@ -335,6 +398,18 @@ public class TemplateManagerGUI extends GuiContainer {
             momentumX *= momentumDampening;
             momentumY *= momentumDampening;
         }
+
+        if (!nameField.isFocused() && nameField.getText().isEmpty())
+            fontRenderer.drawString("template name", nameField.x - guiLeft + 4, nameField.y - guiTop, -10197916);
+
+        if (buttonSave.isMouseOver() || buttonLoad.isMouseOver() || buttonPaste.isMouseOver())
+            drawSlotOverlay(buttonLoad.isMouseOver() ? container.getSlot(0) : container.getSlot(1));
+    }
+
+    private void drawSlotOverlay(Slot slot) {
+        GlStateManager.translate(0, 0, 1000);
+        drawRect(slot.xPos, slot.yPos, slot.xPos + 16, slot.yPos + 16, -1660903937);
+        GlStateManager.translate(0, 0, -1000);
     }
 
     @Override
