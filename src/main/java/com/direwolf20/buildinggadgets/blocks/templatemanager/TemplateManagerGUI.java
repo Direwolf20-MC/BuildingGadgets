@@ -127,8 +127,7 @@ public class TemplateManagerGUI extends GuiContainer {
         //NOTE: the id always has to be different or else it might get called twice or never!
     }
 
-    private GuiButton createAndAddButton(int id, int x, int y, int witdth, int height, String text)
-    {
+    private GuiButton createAndAddButton(int id, int x, int y, int witdth, int height, String text) {
         GuiButtonHelpText button = new GuiButtonHelpText(id, this.guiLeft + x, this.guiTop + y, witdth, height, text, text.toLowerCase());
         helpTextProviders.add(button);
         return button;
@@ -136,6 +135,7 @@ public class TemplateManagerGUI extends GuiContainer {
 
     @Override
     protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
+        GlStateManager.color(1, 1, 1, 1);
         mc.getTextureManager().bindTexture(background);
         drawTexturedModalRect(guiLeft, guiTop, 0, 0, xSize, ySize);
         if (!buttonCopy.isMouseOver() && !buttonPaste.isMouseOver())
@@ -154,7 +154,7 @@ public class TemplateManagerGUI extends GuiContainer {
     public void drawTexturedModalRectReverseX(int x, int y, int textureX, int textureY, int width, int height, boolean reverse) {
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder bufferbuilder = tessellator.getBuffer();
-        bufferbuilder.begin(7, DefaultVertexFormats.POSITION_TEX);
+        bufferbuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
         if (reverse) {
             bufferbuilder.pos(x + 0, y + height, zLevel).tex((textureX + width) * 0.00390625F, textureY * 0.00390625F).endVertex();
             bufferbuilder.pos(x + width, y + height, zLevel).tex(textureX * 0.00390625F, textureY * 0.00390625F).endVertex();

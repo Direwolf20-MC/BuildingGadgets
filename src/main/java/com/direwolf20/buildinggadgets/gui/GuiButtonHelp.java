@@ -16,8 +16,7 @@ public class GuiButtonHelp extends GuiButton {
         super(buttonId, x, y, 12, 12, "?");
     }
 
-    public String getHoverText()
-    {
+    public String getHoverText() {
         return IHoverHelpText.get("button." + (selected ? "help.exit" : "help.enter"));
     }
 

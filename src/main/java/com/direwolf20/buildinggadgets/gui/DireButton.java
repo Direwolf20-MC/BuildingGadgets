@@ -7,7 +7,11 @@ import net.minecraft.client.renderer.GlStateManager;
 public class DireButton extends GuiButtonHelpText {
 
     public DireButton(int buttonId, int x, int y, int widthIn, int heightIn, String buttonText) {
-        super(buttonId, x, y, widthIn, heightIn, buttonText, "");
+        this(buttonId, x, y, widthIn, heightIn, buttonText, "");
+    }
+
+    public DireButton(int buttonId, int x, int y, int widthIn, int heightIn, String buttonText, String helpTextKey) {
+        super(buttonId, x, y, widthIn, heightIn, buttonText, helpTextKey);
     }
 
     @Override
