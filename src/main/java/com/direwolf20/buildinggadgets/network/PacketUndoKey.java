@@ -1,9 +1,6 @@
 package com.direwolf20.buildinggadgets.network;
 
-import com.direwolf20.buildinggadgets.items.BuildingTool;
-import com.direwolf20.buildinggadgets.items.CopyPasteTool;
-import com.direwolf20.buildinggadgets.items.ExchangerTool;
-import com.direwolf20.buildinggadgets.items.GenericGadget;
+import com.direwolf20.buildinggadgets.items.*;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
@@ -51,6 +48,9 @@ public class PacketUndoKey implements IMessage {
             } else if (!heldItem.isEmpty() && heldItem.getItem() instanceof CopyPasteTool) {
                 CopyPasteTool copyPasteTool = (CopyPasteTool) (heldItem.getItem());
                 copyPasteTool.undoBuild(playerEntity, heldItem);
+            } else if (!heldItem.isEmpty() && heldItem.getItem() instanceof DestructionTool) {
+                DestructionTool destructionTool = (DestructionTool) (heldItem.getItem());
+                destructionTool.undo(playerEntity, heldItem);
             }
         }
     }

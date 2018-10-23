@@ -6,8 +6,10 @@ import com.direwolf20.buildinggadgets.ModBlocks;
 import com.direwolf20.buildinggadgets.blocks.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.gui.GuiProxy;
+import com.direwolf20.buildinggadgets.tools.BlockMapIntState;
 import com.direwolf20.buildinggadgets.tools.GadgetUtils;
 import com.direwolf20.buildinggadgets.tools.VectorTools;
+import com.direwolf20.buildinggadgets.tools.WorldSave;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
@@ -17,6 +19,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTUtil;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
@@ -36,8 +39,7 @@ import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.world.BlockEvent;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import static com.direwolf20.buildinggadgets.tools.GadgetUtils.useEnergy;
 import static com.direwolf20.buildinggadgets.tools.GadgetUtils.withSuffix;
@@ -60,6 +62,22 @@ public class DestructionTool extends GenericGadget {
             if (energy != null)
                 list.add(TextFormatting.WHITE + I18n.format("tooltip.gadget.energy") + ": " + withSuffix(energy.getEnergyStored()) + "/" + withSuffix(energy.getMaxEnergyStored()));
         }
+    }
+
+    @Nullable
+    public static String getUUID(ItemStack stack) {
+        NBTTagCompound tagCompound = stack.getTagCompound();
+        if (tagCompound == null) {
+            tagCompound = new NBTTagCompound();
+        }
+        String uuid = tagCompound.getString("UUID");
+        if (uuid.equals("")) {
+            UUID uid = UUID.randomUUID();
+            tagCompound.setString("UUID", uid.toString());
+            stack.setTagCompound(tagCompound);
+            uuid = uid.toString();
+        }
+        return uuid;
     }
 
     public static void setAnchor(ItemStack stack, BlockPos pos) {
@@ -274,9 +292,46 @@ public class DestructionTool extends GenericGadget {
 
     public static void clearArea(World world, BlockPos pos, EnumFacing side, EntityPlayer player, ItemStack stack) {
         ArrayList<BlockPos> voidPosArray = getArea(world, pos, side, player, stack);
+        Map<BlockPos, IBlockState> posStateMap = new HashMap<BlockPos, IBlockState>();
         for (BlockPos voidPos : voidPosArray) {
+            IBlockState blockState = world.getBlockState(voidPos);
             boolean success = destroyBlock(world, voidPos, player);
+            if (success && blockState != ModBlocks.constructionBlock.getDefaultState())
+                posStateMap.put(voidPos, blockState);
         }
+        if (voidPosArray.size() > 0) {
+            BlockPos startPos = (getAnchor(stack) == null) ? pos : getAnchor(stack);
+            storeUndo(world, posStateMap, startPos, stack, player);
+        }
+    }
+
+    public static void storeUndo(World world, Map<BlockPos, IBlockState> posStateMap, BlockPos startBlock, ItemStack stack, EntityPlayer player) {
+        WorldSave worldSave = WorldSave.getWorldSaveDestruction(world);
+        NBTTagCompound tagCompound = new NBTTagCompound();
+        List<Integer> posIntArrayList = new ArrayList<Integer>();
+        List<Integer> stateIntArrayList = new ArrayList<Integer>();
+        BlockMapIntState blockMapIntState = new BlockMapIntState();
+        String UUID = getUUID(stack);
+
+        for (Map.Entry<BlockPos, IBlockState> entry : posStateMap.entrySet()) {
+            posIntArrayList.add(GadgetUtils.relPosToInt(startBlock, entry.getKey()));
+            blockMapIntState.addToMap(entry.getValue());
+            stateIntArrayList.add((int) blockMapIntState.findSlot(entry.getValue()));
+        }
+        tagCompound.setTag("mapIntState", blockMapIntState.putIntStateMapIntoNBT());
+        int[] posIntArray = posIntArrayList.stream().mapToInt(i -> i).toArray();
+        int[] stateIntArray = stateIntArrayList.stream().mapToInt(i -> i).toArray();
+        tagCompound.setIntArray("posIntArray", posIntArray);
+        tagCompound.setIntArray("stateIntArray", stateIntArray);
+        tagCompound.setTag("startPos", NBTUtil.createPosTag(startBlock));
+        tagCompound.setInteger("dim", player.dimension);
+        tagCompound.setString("UUID", UUID);
+        worldSave.addToMap(UUID, tagCompound);
+        worldSave.markForSaving();
+    }
+
+    public void undo(EntityPlayer player, ItemStack stack) {
+
     }
 
     public static boolean destroyBlock(World world, BlockPos voidPos, EntityPlayer player) {

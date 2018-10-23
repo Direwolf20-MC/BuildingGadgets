@@ -81,10 +81,22 @@ public class WorldSave extends WorldSavedData {
         return get(world, WorldSaveTemplate.class);
     }
 
+    public static WorldSave getWorldSaveDestruction(World world) {
+        return get(world, WorldSaveDestruction.class);
+    }
+
     @Nonnull
     private static WorldSave get(World world, Class<? extends WorldSave> clazz) {
-        boolean isTemplate = clazz == WorldSaveTemplate.class;
-        String name = MODID + (isTemplate ? "_TemplateData" : "_BlockMapData");
+        //boolean isTemplate = clazz == WorldSaveTemplate.class;
+        String name = MODID;
+        if (clazz == WorldSaveBlockMap.class) {
+            name += "_BlockMapData";
+        } else if (clazz == WorldSaveTemplate.class) {
+            name += "_TemplateData";
+        } else if (clazz == WorldSaveDestruction.class) {
+            name += "_DestructionUndo";
+        }
+        //String name = MODID + (isTemplate ? "_TemplateData" : "_BlockMapData");
         MapStorage storage = world.getMapStorage();
         if (storage == null)
             throw new IllegalStateException("World#getMapStorage returned null. The following WorldSave failed to save data: " + name);
@@ -92,7 +104,14 @@ public class WorldSave extends WorldSavedData {
         WorldSave instance = (WorldSave) storage.getOrLoadData(clazz, name);
 
         if (instance == null) {
-            instance = isTemplate ? new WorldSaveTemplate(name) : new WorldSaveBlockMap(name);
+            if (clazz == WorldSaveBlockMap.class) {
+                instance = new WorldSaveBlockMap(name);
+            } else if (clazz == WorldSaveTemplate.class) {
+                instance = new WorldSaveTemplate(name);
+            } else if (clazz == WorldSaveDestruction.class) {
+                instance = new WorldSaveDestruction(name);
+            }
+            //instance = isTemplate ? new WorldSaveTemplate(name) : new WorldSaveBlockMap(name);
             storage.setData(name, instance);
         }
         return instance;
@@ -107,6 +126,12 @@ public class WorldSave extends WorldSavedData {
     public static class WorldSaveTemplate extends WorldSave {
         public WorldSaveTemplate(String name) {
             super(name, "templatedata");
+        }
+    }
+
+    public static class WorldSaveDestruction extends WorldSave {
+        public WorldSaveDestruction(String name) {
+            super(name, "destructionundo");
         }
     }
 }
