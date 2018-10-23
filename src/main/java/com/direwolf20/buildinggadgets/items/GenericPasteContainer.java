@@ -16,6 +16,8 @@ import net.minecraft.world.World;
 
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 public class GenericPasteContainer extends Item {
     public static void setPasteAmount(ItemStack stack, int amount) {
         NBTTagCompound tagCompound = stack.getTagCompound();
@@ -38,8 +40,8 @@ public class GenericPasteContainer extends Item {
     }
 
     @Override
-    public void addInformation(ItemStack stack, World player, List<String> list, ITooltipFlag b) {
-        super.addInformation(stack, player, list, b);
+    public void addInformation(ItemStack stack, @Nullable World world, List<String> list, ITooltipFlag b) {
+        super.addInformation(stack, world, list, b);
         list.add(TextFormatting.WHITE + I18n.format("tooltip.pasteContainer.amount") + ": " + getPasteAmount(stack));
     }
 
