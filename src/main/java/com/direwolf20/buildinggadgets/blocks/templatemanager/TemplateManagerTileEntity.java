@@ -46,6 +46,9 @@ public class TemplateManagerTileEntity extends TileEntity {
                 if (!(allowedItemsRight.contains(stack.getItem()))) {
                     return stack;
                 }
+                if (getStackInSlot(slot).getCount() > 0)
+                    return stack;
+
                 if (stack.getCount() > 1) {
                     super.insertItem(slot, ItemHandlerHelper.copyStackWithSize(stack, 1), simulate);
                     return ItemHandlerHelper.copyStackWithSize(stack, stack.getCount() - 1);

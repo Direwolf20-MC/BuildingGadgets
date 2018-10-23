@@ -7,7 +7,6 @@ import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.SlotItemHandler;
 
 import javax.annotation.Nullable;
 
@@ -54,21 +53,9 @@ public class TemplateManagerContainer extends Container {
         // Add our own slots
         //int slotIndex = 0;
         //for (int i = 0; i < itemHandler.getSlots(); i++) {
-        addSlotToContainer(new SlotItemHandler(itemHandler, 0, x, y) {
-            @Override
-            @Nullable
-            public String getSlotTexture() {
-                return TEXTURE_LOC_SLOT_TOOL;
-            }
-        });
+        addSlotToContainer(new SlotTemplateManager(itemHandler, 0, x, y, TEXTURE_LOC_SLOT_TOOL));
         x = 144;
-        addSlotToContainer(new SlotItemHandler(itemHandler, 1, x, y) {
-            @Override
-            @Nullable
-            public String getSlotTexture() {
-                return TEXTURE_LOC_SLOT_TEMPLATE;
-            }
-        });
+        addSlotToContainer(new SlotTemplateManager(itemHandler, 1, x, y, TEXTURE_LOC_SLOT_TEMPLATE));
         //slotIndex++;
 
         //}
