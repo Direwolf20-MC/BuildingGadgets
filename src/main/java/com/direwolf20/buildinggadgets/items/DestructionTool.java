@@ -19,6 +19,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResult;
@@ -354,7 +355,53 @@ public class DestructionTool extends GenericGadget {
     }
 
     public void undo(EntityPlayer player, ItemStack stack) {
+        World world = player.world;
+        Map<BlockPos, IBlockState> posStateMap = new HashMap<BlockPos, IBlockState>();
+        Map<BlockPos, IBlockState> pasteStateMap = new HashMap<BlockPos, IBlockState>();
+        WorldSave worldSave = WorldSave.getWorldSaveDestruction(world);
+        NBTTagCompound tagCompound = worldSave.getCompoundFromUUID(getUUID(stack));
+        if (tagCompound == null) return;
+        BlockPos startPos = NBTUtil.getPosFromTag(tagCompound.getCompoundTag("startPos"));
+        if (startPos == null) return;
+        int[] posIntArray = tagCompound.getIntArray("posIntArray");
+        int[] stateIntArray = tagCompound.getIntArray("stateIntArray");
+        int[] posPasteArray = tagCompound.getIntArray("posPasteArray");
+        int[] statePasteArray = tagCompound.getIntArray("statePasteArray");
 
+        NBTTagList MapIntStateTag = (NBTTagList) tagCompound.getTag("mapIntState");
+        if (MapIntStateTag == null) {
+            return;
+        }
+        BlockMapIntState MapIntState = new BlockMapIntState();
+        MapIntState.getIntStateMapFromNBT(MapIntStateTag);
+        boolean success = false;
+        for (int i = 0; i < posIntArray.length; i++) {
+            BlockPos placePos = GadgetUtils.relIntToPos(startPos, posIntArray[i]);
+            if (world.getBlockState(placePos).getMaterial() == Material.AIR) {
+                IBlockState placeState = MapIntState.getStateFromSlot((short) stateIntArray[i]);
+                if (placeState.getBlock() == ModBlocks.constructionBlock) {
+                    IBlockState pasteState = Blocks.AIR.getDefaultState();
+                    for (int j = 0; j < posPasteArray.length; j++) {
+                        if (posPasteArray[j] == posIntArray[i]) {
+                            pasteState = MapIntState.getStateFromSlot((short) statePasteArray[j]);
+                            break;
+                        }
+                    }
+                    if (pasteState != Blocks.AIR.getDefaultState()) {
+                        world.spawnEntity(new BlockBuildEntity(world, placePos, player, pasteState, 1, pasteState, true));
+                        success = true;
+                    }
+                } else {
+                    world.spawnEntity(new BlockBuildEntity(world, placePos, player, placeState, 1, placeState, false));
+                    success = true;
+                }
+            }
+        }
+        if (success) {
+            NBTTagCompound newTag = new NBTTagCompound();
+            worldSave.addToMap(getUUID(stack), newTag);
+            worldSave.markForSaving();
+        }
     }
 
     public static boolean destroyBlock(World world, BlockPos voidPos, EntityPlayer player) {
