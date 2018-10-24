@@ -150,15 +150,15 @@ public class DestructionTool extends GenericGadget {
         down = up.getOpposite();
 
         if (side.equals(EnumFacing.WEST)) {
-            left = EnumFacing.NORTH;
-        } else if (side.equals(EnumFacing.EAST)) {
             left = EnumFacing.SOUTH;
+        } else if (side.equals(EnumFacing.EAST)) {
+            left = EnumFacing.NORTH;
         } else if (side.equals(EnumFacing.NORTH)) {
-            left = EnumFacing.EAST;
-        } else if (side.equals(EnumFacing.SOUTH)) {
             left = EnumFacing.WEST;
+        } else if (side.equals(EnumFacing.SOUTH)) {
+            left = EnumFacing.EAST;
         } else {
-            left = player.getHorizontalFacing().rotateYCCW();
+            left = player.getHorizontalFacing().rotateYCCW().getOpposite();
         }
         right = left.getOpposite();
         dirs.add(left);
