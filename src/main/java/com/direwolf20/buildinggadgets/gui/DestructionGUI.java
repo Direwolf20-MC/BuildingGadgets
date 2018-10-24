@@ -9,11 +9,15 @@ import com.direwolf20.buildinggadgets.BuildingGadgets;
 import com.direwolf20.buildinggadgets.items.DestructionTool;
 import com.direwolf20.buildinggadgets.network.PacketDestructionGUI;
 import com.direwolf20.buildinggadgets.network.PacketHandler;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TextFormatting;
 
 import java.io.IOException;
 
@@ -99,6 +103,8 @@ public class DestructionGUI extends GuiScreen {
         try {
             int i = Integer.valueOf(textField.getText());
             i = i + amount;
+            if (i < 0) i = 0;
+            if (i > 16) i = 16;
             textField.setText(String.valueOf(i));
         } catch (Throwable t) {
             this.mc.displayGuiScreen(null);
@@ -140,12 +146,29 @@ public class DestructionGUI extends GuiScreen {
         }
     }
 
+    protected boolean sizeCheckBoxes() {
+        if (Integer.parseInt(left.getText()) + Integer.parseInt(right.getText()) > 16) return false;
+        if (Integer.parseInt(up.getText()) + Integer.parseInt(down.getText()) > 16) return false;
+        if (Integer.parseInt(depth.getText()) > 16) return false;
+        if (Integer.parseInt(left.getText()) < 0) return false;
+        if (Integer.parseInt(right.getText()) < 0) return false;
+        if (Integer.parseInt(up.getText()) < 0) return false;
+        if (Integer.parseInt(down.getText()) < 0) return false;
+        if (Integer.parseInt(depth.getText()) < 0) return false;
+        return true;
+    }
+
     @Override
     protected void actionPerformed(GuiButton b) {
         if (b.id == 1) {
             nullCheckTextBoxes();
-            PacketHandler.INSTANCE.sendToServer(new PacketDestructionGUI(Integer.parseInt(left.getText()), Integer.parseInt(right.getText()), Integer.parseInt(up.getText()), Integer.parseInt(down.getText()), Integer.parseInt(depth.getText())));
-            this.mc.displayGuiScreen(null);
+            if (sizeCheckBoxes()) {
+                PacketHandler.INSTANCE.sendToServer(new PacketDestructionGUI(Integer.parseInt(left.getText()), Integer.parseInt(right.getText()), Integer.parseInt(up.getText()), Integer.parseInt(down.getText()), Integer.parseInt(depth.getText())));
+                this.mc.displayGuiScreen(null);
+            } else {
+                Minecraft.getMinecraft().player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.destroysizeerror").getUnformattedComponentText()), true);
+            }
+
         } else if (b.id == 2) {
             this.mc.displayGuiScreen(null);
         } else if (b.id == 5) {
