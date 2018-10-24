@@ -313,6 +313,7 @@ public class ToolRenders {
                 return;
             }
         }
+        if (!DestructionTool.getOverlay(heldItem)) return;
         Minecraft mc = Minecraft.getMinecraft();
         mc.renderEngine.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
 

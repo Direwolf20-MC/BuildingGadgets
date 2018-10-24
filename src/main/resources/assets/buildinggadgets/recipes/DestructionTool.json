@@ -1,0 +1,26 @@
+{
+  "result": {
+    "item": "buildinggadgets:destructiontool"
+  },
+  "pattern": [
+    "iri",
+    "ere",
+    "ili"
+  ],
+  "type": "forge:ore_shaped",
+  "key": {
+    "i": {
+      "item": "minecraft:iron_ingot"
+    },
+    "r": {
+      "item": "minecraft:redstone"
+    },
+    "l": {
+      "item": "minecraft:dye",
+      "data": 4
+    },
+    "e": {
+      "item": "minecraft:ender_pearl"
+    }
+  }
+}

@@ -57,7 +57,8 @@ public class DestructionTool extends GenericGadget {
     @Override
     public void addInformation(ItemStack stack, @Nullable World world, List<String> list, ITooltipFlag b) {
         super.addInformation(stack, world, list, b);
-        //list.add(TextFormatting.AQUA + I18n.format("tooltip.gadget.mode") + ": " + getToolMode(stack));
+        list.add(TextFormatting.RED + I18n.format("tooltip.gadget.destroywarning"));
+        list.add(TextFormatting.AQUA + I18n.format("tooltip.gadget.destroyshowoverlay") + ": " + getOverlay(stack));
         if (Config.poweredByFE) {
             IEnergyStorage energy = stack.getCapability(CapabilityEnergy.ENERGY, null);
             if (energy != null)
@@ -132,6 +133,36 @@ public class DestructionTool extends GenericGadget {
             tagCompound = new NBTTagCompound();
         }
         return tagCompound.getInteger(valueName);
+    }
+
+    public static boolean getOverlay(ItemStack stack) {
+        NBTTagCompound tagCompound = stack.getTagCompound();
+        if (tagCompound == null) {
+            tagCompound = new NBTTagCompound();
+            tagCompound.setBoolean("overlay", true);
+            stack.setTagCompound(tagCompound);
+            return true;
+        }
+        if (tagCompound.hasKey("overlay")) {
+            return tagCompound.getBoolean("overlay");
+        } else {
+            tagCompound.setBoolean("overlay", true);
+            stack.setTagCompound(tagCompound);
+            return true;
+        }
+    }
+
+    public static void setOverlay(ItemStack stack, boolean showOverlay) {
+        NBTTagCompound tagCompound = stack.getTagCompound();
+        if (tagCompound == null) {
+            tagCompound = new NBTTagCompound();
+        }
+        tagCompound.setBoolean("overlay", showOverlay);
+        stack.setTagCompound(tagCompound);
+    }
+
+    public void switchOverlay(ItemStack stack) {
+        setOverlay(stack, !getOverlay(stack));
     }
 
     public static ArrayList<EnumFacing> assignDirections(EnumFacing side, EntityPlayer player) {
