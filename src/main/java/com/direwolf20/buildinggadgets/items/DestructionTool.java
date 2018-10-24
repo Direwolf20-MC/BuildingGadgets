@@ -264,6 +264,7 @@ public class DestructionTool extends GenericGadget {
         IBlockState currentBlock = world.getBlockState(voidPos);
         TileEntity te = world.getTileEntity(voidPos);
         if (currentBlock.getMaterial() == Material.AIR) return false;
+        //if (currentBlock.getBlock().getMaterial(currentBlock).isLiquid()) return false;
         if (currentBlock.equals(ModBlocks.effectBlock.getDefaultState())) return false;
         if ((te != null) && !(te instanceof ConstructionBlockTileEntity)) return false;
         if (currentBlock.getBlock().getBlockHardness(currentBlock, world, voidPos) < 0) return false;
@@ -377,7 +378,8 @@ public class DestructionTool extends GenericGadget {
         boolean success = false;
         for (int i = 0; i < posIntArray.length; i++) {
             BlockPos placePos = GadgetUtils.relIntToPos(startPos, posIntArray[i]);
-            if (world.getBlockState(placePos).getMaterial() == Material.AIR) {
+            IBlockState currentState = world.getBlockState(placePos);
+            if (currentState.getMaterial() == Material.AIR || currentState.getBlock().getMaterial(currentState).isLiquid()) {
                 IBlockState placeState = MapIntState.getStateFromSlot((short) stateIntArray[i]);
                 if (placeState.getBlock() == ModBlocks.constructionBlock) {
                     IBlockState pasteState = Blocks.AIR.getDefaultState();
