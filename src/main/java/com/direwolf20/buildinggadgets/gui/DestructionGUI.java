@@ -31,7 +31,7 @@ public class DestructionGUI extends GuiScreen {
     //private boolean absoluteCoords = Config.absoluteCoordDefault;
 
     int guiLeft = 15;
-    int guiTop = 15;
+    int guiTop = 50;
 
     ItemStack destructionTool;
 
