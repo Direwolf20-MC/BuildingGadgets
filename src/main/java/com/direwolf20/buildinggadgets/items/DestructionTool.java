@@ -312,7 +312,7 @@ public class DestructionTool extends GenericGadget {
                 pasteStateMap.put(voidPos, pasteState);
             }
         }
-        if (voidPosArray.size() > 0) {
+        if (posStateMap.size() > 0) {
             BlockPos startPos = (getAnchor(stack) == null) ? pos : getAnchor(stack);
             storeUndo(world, posStateMap, pasteStateMap, startPos, stack, player);
         }
