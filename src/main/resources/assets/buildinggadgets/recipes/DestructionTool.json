@@ -22,5 +22,10 @@
     "e": {
       "item": "minecraft:ender_pearl"
     }
-  }
+  },
+  "conditions": [
+    {
+      "type": "buildinggadgets:enableDestruction"
+    }
+  ]
 }

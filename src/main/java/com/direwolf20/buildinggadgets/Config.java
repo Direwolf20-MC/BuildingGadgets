@@ -19,6 +19,7 @@ public class Config {
     public static int durabilityBuilder = 500;
     public static int durabilityExchanger = 500;
     public static boolean enablePaste = true;
+    public static boolean enableDestructionTool = true;
     public static boolean absoluteCoordDefault = false;
 
     // Call this from CommonProxy.preInit(). It will create our config if it doesn't
@@ -50,6 +51,7 @@ public class Config {
         durabilityBuilder = cfg.getInt("durabilityBuilder", CATEGORY_GENERAL, durabilityBuilder, 0, 100000, "The max durability of the Builder (Ignored if powered by FE)");
         durabilityExchanger = cfg.getInt("durabilityExchanger", CATEGORY_GENERAL, durabilityExchanger, 0, 100000, "The max durability of the Exchanger (Ignored if powered by FE)");
         enablePaste = cfg.getBoolean("enablePaste", CATEGORY_GENERAL, enablePaste, "Set to false to disable the recipe for construction paste.");
+        enableDestructionTool = cfg.getBoolean("enableDestructionTool", CATEGORY_GENERAL, enableDestructionTool, "Set to false to disable the destruction tool.");
         absoluteCoordDefault = cfg.getBoolean("absoluteCoordinateModeDefault", CATEGORY_GENERAL, absoluteCoordDefault, "Determines if the Copy/Paste GUI's coordinate mode starts in 'Absolute' mode by default. Set to true for Absolute, set to False for Relative.");
         cfg.addCustomCategoryComment(CATEGORY_BLACKLIST, "Blacklist configuration");
         BlacklistBlocks.getBlacklist(cfg);
