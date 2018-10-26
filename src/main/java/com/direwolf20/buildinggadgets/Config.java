@@ -21,6 +21,7 @@ public class Config {
     public static boolean enablePaste = true;
     public static boolean enableDestructionTool = true;
     public static boolean absoluteCoordDefault = false;
+    public static boolean canOverwriteBlocks = true;
 
     // Call this from CommonProxy.preInit(). It will create our config if it doesn't
     // exist yet and read the values if it does exist.
@@ -53,6 +54,7 @@ public class Config {
         enablePaste = cfg.getBoolean("enablePaste", CATEGORY_GENERAL, enablePaste, "Set to false to disable the recipe for construction paste.");
         enableDestructionTool = cfg.getBoolean("enableDestructionTool", CATEGORY_GENERAL, enableDestructionTool, "Set to false to disable the destruction tool.");
         absoluteCoordDefault = cfg.getBoolean("absoluteCoordinateModeDefault", CATEGORY_GENERAL, absoluteCoordDefault, "Determines if the Copy/Paste GUI's coordinate mode starts in 'Absolute' mode by default. Set to true for Absolute, set to False for Relative.");
+        canOverwriteBlocks = cfg.getBoolean("canOverwriteBlocks", CATEGORY_GENERAL, canOverwriteBlocks, "Whether the Builder / CopyPaste gadgets can overwrite blocks like water, lava, grass, etc (like a player can). False will only allow it to overwrite air blocks.");
         cfg.addCustomCategoryComment(CATEGORY_BLACKLIST, "Blacklist configuration");
         BlacklistBlocks.getBlacklist(cfg);
     }

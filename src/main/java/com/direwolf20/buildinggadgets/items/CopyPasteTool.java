@@ -13,6 +13,7 @@ import com.direwolf20.buildinggadgets.network.PacketHandler;
 import com.direwolf20.buildinggadgets.tools.*;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
@@ -472,7 +473,15 @@ public class CopyPasteTool extends GenericGadget implements ITemplate {
     }
 
     private static void placeBlock(World world, BlockPos pos, EntityPlayer player, IBlockState state, Map<IBlockState, UniqueItem> IntStackMap) {
-        if (!world.getBlockState(pos).getBlock().isReplaceable(world, pos)) return;
+        if (Config.canOverwriteBlocks) {
+            if (!world.getBlockState(pos).getBlock().isReplaceable(world, pos)) {
+                return;
+            }
+        } else {
+            if (world.getBlockState(pos).getMaterial() != Material.AIR) {
+                return;
+            }
+        }
         if (state.equals(Blocks.AIR.getDefaultState())) return;
         if (!player.isAllowEdit()) {
             return;

@@ -1,6 +1,8 @@
 package com.direwolf20.buildinggadgets.tools;
 
+import com.direwolf20.buildinggadgets.Config;
 import com.direwolf20.buildinggadgets.items.BuildingTool;
+import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -12,8 +14,17 @@ import java.util.*;
 
 public class BuildingModes {
     private static boolean isReplaceable(World world, BlockPos pos, IBlockState setBlock) {
-        if (!world.getBlockState(pos).getBlock().isReplaceable(world, pos) || !setBlock.getBlock().canPlaceBlockAt(world, pos)) {
+        if (!setBlock.getBlock().canPlaceBlockAt(world, pos)) {
             return false;
+        }
+        if (Config.canOverwriteBlocks) {
+            if (!world.getBlockState(pos).getBlock().isReplaceable(world, pos)) {
+                return false;
+            }
+        } else {
+            if (world.getBlockState(pos).getMaterial() != Material.AIR) {
+                return false;
+            }
         }
         return true;
     }
