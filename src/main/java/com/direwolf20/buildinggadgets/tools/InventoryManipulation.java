@@ -29,7 +29,7 @@ public class InventoryManipulation {
 
     private static final Set<IProperty> safePropertiesCopyPaste = Stream.of(BlockSlab.HALF, BlockStairs.HALF, BlockLog.LOG_AXIS,
             BlockDirectional.FACING, BlockStairs.FACING, BlockTrapDoor.HALF, BlockTorch.FACING, BlockStairs.SHAPE, BlockRail.SHAPE, BlockRailPowered.SHAPE,
-            BlockLever.FACING, BlockLever.POWERED, BlockRedstoneRepeater.DELAY).collect(Collectors.toSet());
+            BlockLever.FACING, BlockLever.POWERED, BlockRedstoneRepeater.DELAY, BlockDoubleWoodSlab.VARIANT).collect(Collectors.toSet());
 
     public static boolean giveItem(ItemStack itemStack, EntityPlayer player) {
         if (player.capabilities.isCreativeMode) {
