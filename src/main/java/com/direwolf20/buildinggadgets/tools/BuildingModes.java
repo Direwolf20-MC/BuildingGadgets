@@ -17,6 +17,9 @@ public class BuildingModes {
         if (!setBlock.getBlock().canPlaceBlockAt(world, pos)) {
             return false;
         }
+        if (pos.getY() < 0) {
+            return false;
+        }
         if (Config.canOverwriteBlocks) {
             if (!world.getBlockState(pos).getBlock().isReplaceable(world, pos)) {
                 return false;
