@@ -482,6 +482,7 @@ public class CopyPasteTool extends GenericGadget implements ITemplate {
                 return;
             }
         }
+        if (pos.getY() < 0) return;
         if (state.equals(Blocks.AIR.getDefaultState())) return;
         if (!player.isAllowEdit()) {
             return;
