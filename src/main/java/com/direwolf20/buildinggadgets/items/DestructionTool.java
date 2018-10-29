@@ -312,13 +312,15 @@ public class DestructionTool extends GenericGadget {
         if (!world.isBlockModifiable(player, voidPos)) {
             return false;
         }
-        BlockSnapshot blockSnapshot = BlockSnapshot.getBlockSnapshot(world, voidPos);
-        if (ForgeEventFactory.onPlayerBlockPlace(player, blockSnapshot, EnumFacing.UP, EnumHand.MAIN_HAND).isCanceled()) {
-            return false;
-        }
-        BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(world, voidPos, currentBlock, player);
-        if (MinecraftForge.EVENT_BUS.post(e)) {
-            return false;
+        if (!world.isRemote) {
+            BlockSnapshot blockSnapshot = BlockSnapshot.getBlockSnapshot(world, voidPos);
+            if (ForgeEventFactory.onPlayerBlockPlace(player, blockSnapshot, EnumFacing.UP, EnumHand.MAIN_HAND).isCanceled()) {
+                return false;
+            }
+            BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(world, voidPos, currentBlock, player);
+            if (MinecraftForge.EVENT_BUS.post(e)) {
+                return false;
+            }
         }
         return true;
     }
