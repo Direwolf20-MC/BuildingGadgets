@@ -240,6 +240,7 @@ public class TemplateManagerCommands {
             //newCompound.setTag("itemcountmap", tagList);
             String jsonTag = newCompound.toString();
             setClipboardString(jsonTag);
+            Minecraft.getMinecraft().player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.copysuccess").getUnformattedComponentText()), false);
         }
     }
 }
