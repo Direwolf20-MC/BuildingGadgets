@@ -61,7 +61,14 @@ public class BlockBuildEntityRender extends Render<BlockBuildEntity> {
         if (renderBlockState == null) {
             renderBlockState = Blocks.COBBLESTONE.getDefaultState();
         }
-        blockrendererdispatcher.renderBlockBrightness(renderBlockState, 1.0f);
+        try {
+            blockrendererdispatcher.renderBlockBrightness(renderBlockState, 1.0f);
+        } catch (Throwable t) {
+            Tessellator tessellator = Tessellator.getInstance();
+            BufferBuilder bufferBuilder = tessellator.getBuffer();
+            bufferBuilder.finishDrawing();
+
+        }
         GlStateManager.popMatrix();
 
 
