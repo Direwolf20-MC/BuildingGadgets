@@ -129,7 +129,14 @@ public class ToolRenders {
                         }
                     }
                     //state = state.getBlock().getExtendedState(state, fakeWorld, coordinate); //Get the extended block state in the fake world (Disabled to fix chisel, not sure why.)
-                    dispatcher.renderBlockBrightness(state, 1f);//Render the defined block
+                    try {
+                        dispatcher.renderBlockBrightness(state, 1f);//Render the defined block
+                    } catch (Throwable t) {
+                        Tessellator tessellator = Tessellator.getInstance();
+                        BufferBuilder bufferBuilder = tessellator.getBuffer();
+                        bufferBuilder.finishDrawing();
+
+                    }
                     //Move the render position back to where it was
                     GlStateManager.popMatrix();
                 }
@@ -257,7 +264,14 @@ public class ToolRenders {
                     }
                     //state = state.getBlock().getExtendedState(state, fakeWorld, coordinate); //Get the extended block state in the fake world (Disabled to fix chisel, not sure why.)
                     if (renderBlockState.getRenderType() != EnumBlockRenderType.INVISIBLE) {
-                        dispatcher.renderBlockBrightness(state, 1f);//Render the defined block
+                        try {
+                            dispatcher.renderBlockBrightness(state, 1f);//Render the defined block
+                        } catch (Throwable t) {
+                            Tessellator tessellator = Tessellator.getInstance();
+                            BufferBuilder bufferBuilder = tessellator.getBuffer();
+                            bufferBuilder.finishDrawing();
+
+                        }
                         GlStateManager.rotate(-90.0F, 0.0F, 1.0F, 0.0F); //Rotate it because i'm not sure why but we need to
                     }
                     GL14.glBlendColor(1F, 1F, 1F, 0.1f); //Set the alpha of the blocks we are rendering
