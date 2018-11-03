@@ -18,18 +18,8 @@ import javax.annotation.Nullable;
 
 public class GenericGadget extends Item {
 
-    private int energyMax;
-
-    public GenericGadget() {
-        this.energyMax = Config.energyMax;
-    }
-
     public int getEnergyMax() {
-        return energyMax;
-    }
-
-    public void setEnergyMax(int energyMax) {
-        this.energyMax = energyMax;
+        return Config.energyMax;
     }
 
     @SideOnly(Side.CLIENT)
