@@ -18,6 +18,19 @@ import javax.annotation.Nullable;
 
 public class GenericGadget extends Item {
 
+    public int energyMax;
+
+    public GenericGadget() {
+        this.energyMax = Config.energyMax;
+    }
+
+    public int getEnergyMax() {
+        return energyMax;
+    }
+
+    public void setEnergyMax(int energyMax) {
+        this.energyMax = energyMax;
+    }
 
     @SideOnly(Side.CLIENT)
     public void initModel() {
@@ -28,7 +41,7 @@ public class GenericGadget extends Item {
     @Nullable
     public ICapabilityProvider initCapabilities(ItemStack stack, @Nullable NBTTagCompound tag) {
         if (Config.poweredByFE) {
-            return new CapabilityProviderEnergy(stack, Config.energyMax);
+            return new CapabilityProviderEnergy(stack, this.energyMax);
         }
         return null;
     }
