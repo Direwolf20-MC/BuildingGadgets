@@ -18,7 +18,7 @@ import javax.annotation.Nullable;
 
 public class GenericGadget extends Item {
 
-    public int energyMax;
+    private int energyMax;
 
     public GenericGadget() {
         this.energyMax = Config.energyMax;
@@ -41,7 +41,7 @@ public class GenericGadget extends Item {
     @Nullable
     public ICapabilityProvider initCapabilities(ItemStack stack, @Nullable NBTTagCompound tag) {
         if (Config.poweredByFE) {
-            return new CapabilityProviderEnergy(stack, this.energyMax);
+            return new CapabilityProviderEnergy(stack, this.getEnergyMax());
         }
         return null;
     }
