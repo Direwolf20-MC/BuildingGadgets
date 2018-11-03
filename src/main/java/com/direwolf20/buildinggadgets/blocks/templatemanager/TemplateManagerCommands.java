@@ -183,28 +183,30 @@ public class TemplateManagerCommands {
         List<BlockMap> blockMapList = CopyPasteTool.getBlockMapList(templateTagCompound);
         for (BlockMap blockMap : blockMapList) {
             UniqueItem uniqueItem = intStackMap.get(blockMap.state);
-            NonNullList<ItemStack> drops = NonNullList.create();
-            blockMap.state.getBlock().getDrops(drops, world, new BlockPos(0, 0, 0), blockMap.state, 0);
-            int neededItems = 0;
-            for (ItemStack drop : drops) {
-                if (drop.getItem().equals(uniqueItem.item)) {
-                    neededItems++;
-                }
-            }
-            if (neededItems == 0) {
-                neededItems = 1;
-            }
-            if (uniqueItem.item != Items.AIR) {
-                boolean found = false;
-                for (Map.Entry<UniqueItem, Integer> entry : itemCountMap.entrySet()) {
-                    if (entry.getKey().equals(uniqueItem)) {
-                        itemCountMap.put(entry.getKey(), itemCountMap.get(entry.getKey()) + neededItems);
-                        found = true;
-                        break;
+            if (!(uniqueItem == null)) {
+                NonNullList<ItemStack> drops = NonNullList.create();
+                blockMap.state.getBlock().getDrops(drops, world, new BlockPos(0, 0, 0), blockMap.state, 0);
+                int neededItems = 0;
+                for (ItemStack drop : drops) {
+                    if (drop.getItem().equals(uniqueItem.item)) {
+                        neededItems++;
                     }
                 }
-                if (!found) {
-                    itemCountMap.put(uniqueItem, neededItems);
+                if (neededItems == 0) {
+                    neededItems = 1;
+                }
+                if (uniqueItem.item != Items.AIR) {
+                    boolean found = false;
+                    for (Map.Entry<UniqueItem, Integer> entry : itemCountMap.entrySet()) {
+                        if (entry.getKey().equals(uniqueItem)) {
+                            itemCountMap.put(entry.getKey(), itemCountMap.get(entry.getKey()) + neededItems);
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found) {
+                        itemCountMap.put(uniqueItem, neededItems);
+                    }
                 }
             }
         }
