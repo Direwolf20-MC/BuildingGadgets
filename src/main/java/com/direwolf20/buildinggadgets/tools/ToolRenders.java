@@ -363,6 +363,15 @@ public class ToolRenders {
         b = b.offset(directions.get(4), DestructionTool.getToolValue(stack, "depth"));*/
 
         for (BlockPos coordinate : sortedCoordinates) {
+            boolean invisible = true;
+            IBlockState state = world.getBlockState(coordinate);
+            for (EnumFacing side : EnumFacing.values()) {
+                if (state.shouldSideBeRendered(world, coordinate, side)) {
+                    invisible = false;
+                    break;
+                }
+            }
+            if (invisible) continue;
             GlStateManager.pushMatrix();//Push matrix again just because
             GlStateManager.translate(-doubleX, -doubleY, -doubleZ);//The render starts at the player, so we subtract the player coords and move the render to 0,0,0
             GlStateManager.translate(coordinate.getX(), coordinate.getY(), coordinate.getZ());//Now move the render position to the coordinates we want to render at
