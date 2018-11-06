@@ -570,25 +570,25 @@ public class ToolRenders {
         bufferBuilder.pos(maxX, maxY, maxZ).color(red, green, blue, alpha).endVertex();
         bufferBuilder.pos(maxX, maxY, minZ).color(red, green, blue, alpha).endVertex();
 
-        //north
+        //east
         bufferBuilder.pos(minX, minY, minZ).color(red, green, blue, alpha).endVertex();
         bufferBuilder.pos(minX, maxY, minZ).color(red, green, blue, alpha).endVertex();
         bufferBuilder.pos(maxX, maxY, minZ).color(red, green, blue, alpha).endVertex();
         bufferBuilder.pos(maxX, minY, minZ).color(red, green, blue, alpha).endVertex();
 
-        //south
+        //west
         bufferBuilder.pos(minX, minY, maxZ).color(red, green, blue, alpha).endVertex();
         bufferBuilder.pos(maxX, minY, maxZ).color(red, green, blue, alpha).endVertex();
         bufferBuilder.pos(maxX, maxY, maxZ).color(red, green, blue, alpha).endVertex();
         bufferBuilder.pos(minX, maxY, maxZ).color(red, green, blue, alpha).endVertex();
 
-        //east
+        //south
         bufferBuilder.pos(maxX, minY, minZ).color(red, green, blue, alpha).endVertex();
         bufferBuilder.pos(maxX, maxY, minZ).color(red, green, blue, alpha).endVertex();
         bufferBuilder.pos(maxX, maxY, maxZ).color(red, green, blue, alpha).endVertex();
         bufferBuilder.pos(maxX, minY, maxZ).color(red, green, blue, alpha).endVertex();
-
-        //west
+        
+        //north
         bufferBuilder.pos(minX, minY, minZ).color(red, green, blue, alpha).endVertex();
         bufferBuilder.pos(minX, minY, maxZ).color(red, green, blue, alpha).endVertex();
         bufferBuilder.pos(minX, maxY, maxZ).color(red, green, blue, alpha).endVertex();
