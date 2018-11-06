@@ -55,6 +55,11 @@ public class DestructionTool extends GenericGadget {
     }
 
     @Override
+    public int getEnergyMax() {
+        return Config.energyMaxDestruction;
+    }
+
+    @Override
     public void addInformation(ItemStack stack, @Nullable World world, List<String> list, ITooltipFlag b) {
         super.addInformation(stack, world, list, b);
         list.add(TextFormatting.RED + I18n.format("tooltip.gadget.destroywarning"));
