@@ -363,6 +363,15 @@ public class ToolRenders {
         b = b.offset(directions.get(4), DestructionTool.getToolValue(stack, "depth"));*/
 
         for (BlockPos coordinate : sortedCoordinates) {
+            boolean invisible = true;
+            IBlockState state = world.getBlockState(coordinate);
+            for (EnumFacing side : EnumFacing.values()) {
+                if (state.shouldSideBeRendered(world, coordinate, side)) {
+                    invisible = false;
+                    break;
+                }
+            }
+            if (invisible) continue;
             GlStateManager.pushMatrix();//Push matrix again just because
             GlStateManager.translate(-doubleX, -doubleY, -doubleZ);//The render starts at the player, so we subtract the player coords and move the render to 0,0,0
             GlStateManager.translate(coordinate.getX(), coordinate.getY(), coordinate.getZ());//Now move the render position to the coordinates we want to render at
@@ -561,25 +570,25 @@ public class ToolRenders {
         bufferBuilder.pos(maxX, maxY, maxZ).color(red, green, blue, alpha).endVertex();
         bufferBuilder.pos(maxX, maxY, minZ).color(red, green, blue, alpha).endVertex();
 
-        //north
+        //east
         bufferBuilder.pos(minX, minY, minZ).color(red, green, blue, alpha).endVertex();
         bufferBuilder.pos(minX, maxY, minZ).color(red, green, blue, alpha).endVertex();
         bufferBuilder.pos(maxX, maxY, minZ).color(red, green, blue, alpha).endVertex();
         bufferBuilder.pos(maxX, minY, minZ).color(red, green, blue, alpha).endVertex();
 
-        //south
+        //west
         bufferBuilder.pos(minX, minY, maxZ).color(red, green, blue, alpha).endVertex();
         bufferBuilder.pos(maxX, minY, maxZ).color(red, green, blue, alpha).endVertex();
         bufferBuilder.pos(maxX, maxY, maxZ).color(red, green, blue, alpha).endVertex();
         bufferBuilder.pos(minX, maxY, maxZ).color(red, green, blue, alpha).endVertex();
 
-        //east
+        //south
         bufferBuilder.pos(maxX, minY, minZ).color(red, green, blue, alpha).endVertex();
         bufferBuilder.pos(maxX, maxY, minZ).color(red, green, blue, alpha).endVertex();
         bufferBuilder.pos(maxX, maxY, maxZ).color(red, green, blue, alpha).endVertex();
         bufferBuilder.pos(maxX, minY, maxZ).color(red, green, blue, alpha).endVertex();
-
-        //west
+        
+        //north
         bufferBuilder.pos(minX, minY, minZ).color(red, green, blue, alpha).endVertex();
         bufferBuilder.pos(minX, minY, maxZ).color(red, green, blue, alpha).endVertex();
         bufferBuilder.pos(minX, maxY, maxZ).color(red, green, blue, alpha).endVertex();
