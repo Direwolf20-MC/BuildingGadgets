@@ -64,6 +64,9 @@ public class CopyPasteTool extends GenericGadget implements ITemplate {
         setUnlocalizedName(BuildingGadgets.MODID + ".copypastetool");     // Used for localization (en_US.lang)
         setMaxStackSize(1);
         setCreativeTab(CreativeTabs.TOOLS);
+        if (!Config.poweredByFE) {
+            setMaxDamage(Config.durabilityCopyPaste);
+        }
     }
 
     private static void setAnchor(ItemStack stack, BlockPos anchorPos) {

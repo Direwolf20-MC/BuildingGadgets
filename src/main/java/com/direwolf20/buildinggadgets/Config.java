@@ -19,6 +19,8 @@ public class Config {
     public static boolean poweredByFE = true;
     public static int durabilityBuilder = 500;
     public static int durabilityExchanger = 500;
+    public static int durabilityDestruction = 500;
+    public static int durabilityCopyPaste = 500;
     public static boolean enablePaste = true;
     public static boolean enableDestructionTool = true;
     public static boolean absoluteCoordDefault = false;
@@ -53,6 +55,8 @@ public class Config {
         poweredByFE = cfg.getBoolean("poweredByFE", CATEGORY_GENERAL, poweredByFE, "Set to true for Forge Energy Support, set to False for vanilla Item Damage");
         durabilityBuilder = cfg.getInt("durabilityBuilder", CATEGORY_GENERAL, durabilityBuilder, 0, 100000, "The max durability of the Builder (Ignored if powered by FE)");
         durabilityExchanger = cfg.getInt("durabilityExchanger", CATEGORY_GENERAL, durabilityExchanger, 0, 100000, "The max durability of the Exchanger (Ignored if powered by FE)");
+        durabilityDestruction = cfg.getInt("durabilityDestruction", CATEGORY_GENERAL, durabilityDestruction, 0, 100000, "The max durability of the Destruction Gadget (Ignored if powered by FE)");
+        durabilityCopyPaste = cfg.getInt("durabilityCopyPaste", CATEGORY_GENERAL, durabilityCopyPaste, 0, 100000, "The max durability of the Copy & Paste Gadget (Ignored if powered by FE)");
         enablePaste = cfg.getBoolean("enablePaste", CATEGORY_GENERAL, enablePaste, "Set to false to disable the recipe for construction paste.");
         enableDestructionTool = cfg.getBoolean("enableDestructionTool", CATEGORY_GENERAL, enableDestructionTool, "Set to false to disable the destruction tool.");
         absoluteCoordDefault = cfg.getBoolean("absoluteCoordinateModeDefault", CATEGORY_GENERAL, absoluteCoordDefault, "Determines if the Copy/Paste GUI's coordinate mode starts in 'Absolute' mode by default. Set to true for Absolute, set to False for Relative.");
