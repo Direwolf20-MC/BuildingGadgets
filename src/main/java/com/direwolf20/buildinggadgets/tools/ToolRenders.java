@@ -347,20 +347,48 @@ public class ToolRenders {
         //Enable Blending (So we can have transparent effect)
         GlStateManager.enableBlend();
         //This blend function allows you to use a constant alpha, which is defined later
-        GlStateManager.blendFunc(GL11.GL_CONSTANT_ALPHA, GL11.GL_ONE_MINUS_CONSTANT_ALPHA);
-
+        //GlStateManager.blendFunc(GL11.GL_CONSTANT_ALPHA, GL11.GL_ONE_MINUS_CONSTANT_ALPHA);
+        GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
         List<BlockPos> sortedCoordinates = BuildingModes.sortByDistance(coordinates, player); //Sort the coords by distance to player.
 
+        Tessellator t = Tessellator.getInstance();
+        BufferBuilder bufferBuilder = t.getBuffer();
+        /*ArrayList<EnumFacing> directions = DestructionTool.assignDirections(facing, player);
+        BlockPos a = new BlockPos(0,0,0);
+        a = a.offset(directions.get(0), DestructionTool.getToolValue(stack, "left"));
+        a = a.offset(directions.get(2), DestructionTool.getToolValue(stack, "up"));
+        BlockPos b = new BlockPos(0,0,0);
+        b = b.offset(directions.get(1), DestructionTool.getToolValue(stack, "right"));
+        b = b.offset(directions.get(2), DestructionTool.getToolValue(stack, "down"));
+        b = b.offset(directions.get(4), DestructionTool.getToolValue(stack, "depth"));*/
+
         for (BlockPos coordinate : sortedCoordinates) {
+            boolean invisible = true;
+            IBlockState state = world.getBlockState(coordinate);
+            for (EnumFacing side : EnumFacing.values()) {
+                if (state.shouldSideBeRendered(world, coordinate, side)) {
+                    invisible = false;
+                    break;
+                }
+            }
+            if (invisible) continue;
             GlStateManager.pushMatrix();//Push matrix again just because
             GlStateManager.translate(-doubleX, -doubleY, -doubleZ);//The render starts at the player, so we subtract the player coords and move the render to 0,0,0
             GlStateManager.translate(coordinate.getX(), coordinate.getY(), coordinate.getZ());//Now move the render position to the coordinates we want to render at
             GlStateManager.rotate(-90.0F, 0.0F, 1.0F, 0.0F); //Rotate it because i'm not sure why but we need to
             GlStateManager.translate(-0.005f, -0.005f, 0.005f);
             GlStateManager.scale(1.01f, 1.01f, 1.01f);//Slightly Larger block to avoid z-fighting.
-            GL14.glBlendColor(1F, 1F, 1F, 0.55f); //Set the alpha of the blocks we are rendering
+            //GL14.glBlendColor(1F, 1F, 1F, 0.55f); //Set the alpha of the blocks we are rendering
             //GlStateManager.rotate(-90.0F, 0.0F, 1.0F, 0.0F); //Rotate it because i'm not sure why but we need to
-            dispatcher.renderBlockBrightness(Blocks.STAINED_GLASS.getDefaultState().withProperty(COLOR, EnumDyeColor.RED), 1f);//Render the defined block - White glass to show non-full block renders (Example: Torch)
+            //GlStateManager.disableCull();
+            GlStateManager.disableLighting();
+            GlStateManager.disableTexture2D();
+            //renderBoxSolid(t, bufferBuilder, a.getX(), a.getY(), a.getZ()+1, b.getX()+1, b.getY()+1, b.getZ()+1, 1, 1, 1);
+            renderBoxSolid(t, bufferBuilder, 0, 0, -1, 1, 1, 0, 1, 1, 1);
+            GlStateManager.enableTexture2D();
+            GlStateManager.enableLighting();
+            //GlStateManager.enableCull();
+            //dispatcher.renderBlockBrightness(Blocks.STAINED_GLASS.getDefaultState().withProperty(COLOR, EnumDyeColor.RED), 1f);//Render the defined block - White glass to show non-full block renders (Example: Torch)
             //Move the render position back to where it was
             GlStateManager.popMatrix();
         }
@@ -515,4 +543,57 @@ public class ToolRenders {
         tessellator.draw();
         GlStateManager.glLineWidth(1.0F);
     }
+
+    private static void renderBoxSolid(Tessellator tessellator, BufferBuilder bufferBuilder, double startX, double startY, double startZ, double endX, double endY, double endZ, int R, int G, int B) {
+        bufferBuilder.begin(7, DefaultVertexFormats.POSITION_COLOR);
+        double minX = startX;
+        double minY = startY;
+        double minZ = startZ;
+        double maxX = endX;
+        double maxY = endY;
+        double maxZ = endZ;
+        float red = 1f;
+        float green = 0f;
+        float blue = 0f;
+
+        float alpha = (0.5f);
+
+        //down
+        bufferBuilder.pos(minX, minY, minZ).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(maxX, minY, minZ).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(maxX, minY, maxZ).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(minX, minY, maxZ).color(red, green, blue, alpha).endVertex();
+
+        //up
+        bufferBuilder.pos(minX, maxY, minZ).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(minX, maxY, maxZ).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(maxX, maxY, maxZ).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(maxX, maxY, minZ).color(red, green, blue, alpha).endVertex();
+
+        //east
+        bufferBuilder.pos(minX, minY, minZ).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(minX, maxY, minZ).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(maxX, maxY, minZ).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(maxX, minY, minZ).color(red, green, blue, alpha).endVertex();
+
+        //west
+        bufferBuilder.pos(minX, minY, maxZ).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(maxX, minY, maxZ).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(maxX, maxY, maxZ).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(minX, maxY, maxZ).color(red, green, blue, alpha).endVertex();
+
+        //south
+        bufferBuilder.pos(maxX, minY, minZ).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(maxX, maxY, minZ).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(maxX, maxY, maxZ).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(maxX, minY, maxZ).color(red, green, blue, alpha).endVertex();
+        
+        //north
+        bufferBuilder.pos(minX, minY, minZ).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(minX, minY, maxZ).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(minX, maxY, maxZ).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(minX, maxY, minZ).color(red, green, blue, alpha).endVertex();
+        tessellator.draw();
+    }
+
 }
