@@ -55,44 +55,44 @@ public class DestructionGUI extends GuiScreen {
     public void initGui() {
         super.initGui();
 
-        left = new GuiTextField(0, this.fontRenderer, this.guiLeft + 65, this.guiTop + 15, 40, this.fontRenderer.FONT_HEIGHT);
+        left = new GuiTextField(0, this.fontRenderer, this.guiLeft + 80, this.guiTop + 60, 40, this.fontRenderer.FONT_HEIGHT);
         left.setMaxStringLength(50);
         left.setVisible(true);
 
-        right = new GuiTextField(1, this.fontRenderer, this.guiLeft + 165, this.guiTop + 15, 40, this.fontRenderer.FONT_HEIGHT);
+        right = new GuiTextField(1, this.fontRenderer, this.guiLeft + 320, this.guiTop + 60, 40, this.fontRenderer.FONT_HEIGHT);
         right.setMaxStringLength(50);
         right.setVisible(true);
 
-        up = new GuiTextField(2, this.fontRenderer, this.guiLeft + 265, this.guiTop + 15, 40, this.fontRenderer.FONT_HEIGHT);
+        up = new GuiTextField(2, this.fontRenderer, this.guiLeft + 200, this.guiTop + 30, 40, this.fontRenderer.FONT_HEIGHT);
         up.setMaxStringLength(50);
         up.setVisible(true);
 
 
-        down = new GuiTextField(3, this.fontRenderer, this.guiLeft + 65, this.guiTop + 35, 40, this.fontRenderer.FONT_HEIGHT);
+        down = new GuiTextField(3, this.fontRenderer, this.guiLeft + 200, this.guiTop + 90, 40, this.fontRenderer.FONT_HEIGHT);
         down.setMaxStringLength(50);
         down.setVisible(true);
 
-        depth = new GuiTextField(4, this.fontRenderer, this.guiLeft + 165, this.guiTop + 35, 40, this.fontRenderer.FONT_HEIGHT);
+        depth = new GuiTextField(4, this.fontRenderer, this.guiLeft + 200, this.guiTop + 60, 40, this.fontRenderer.FONT_HEIGHT);
         depth.setMaxStringLength(50);
         depth.setVisible(true);
 
         nullCheckTextBoxes();
 
         //NOTE: the id always has to be different or else it might get called twice or never!
-        this.buttonList.add(new GuiButton(1, this.guiLeft + 45, this.guiTop + 60, 40, 20, "Ok"));
-        this.buttonList.add(new GuiButton(2, this.guiLeft + 145, this.guiTop + 60, 40, 20, "Cancel"));
+        this.buttonList.add(new GuiButton(1, this.guiLeft + 145, this.guiTop + 125, 40, 20, "Ok"));
+        this.buttonList.add(new GuiButton(2, this.guiLeft + 245, this.guiTop + 125, 40, 20, "Cancel"));
         //this.buttonList.add(new GuiButton(3, this.guiLeft + 245, this.guiTop + 60, 40, 20, "Clear"));
         //this.buttonList.add(new GuiButton(4, this.guiLeft + 325, this.guiTop + 60, 80, 20, "CoordsMode"));
-        this.buttonList.add(new DireButton(5, this.guiLeft + 50, this.guiTop + 14, 10, 10, "-"));
-        this.buttonList.add(new DireButton(6, this.guiLeft + 110, this.guiTop + 14, 10, 10, "+"));
-        this.buttonList.add(new DireButton(7, this.guiLeft + 150, this.guiTop + 14, 10, 10, "-"));
-        this.buttonList.add(new DireButton(8, this.guiLeft + 210, this.guiTop + 14, 10, 10, "+"));
-        this.buttonList.add(new DireButton(9, this.guiLeft + 250, this.guiTop + 14, 10, 10, "-"));
-        this.buttonList.add(new DireButton(10, this.guiLeft + 310, this.guiTop + 14, 10, 10, "+"));
-        this.buttonList.add(new DireButton(11, this.guiLeft + 50, this.guiTop + 34, 10, 10, "-"));
-        this.buttonList.add(new DireButton(12, this.guiLeft + 110, this.guiTop + 34, 10, 10, "+"));
-        this.buttonList.add(new DireButton(13, this.guiLeft + 150, this.guiTop + 34, 10, 10, "-"));
-        this.buttonList.add(new DireButton(14, this.guiLeft + 210, this.guiTop + 34, 10, 10, "+"));
+        this.buttonList.add(new DireButton(5, this.guiLeft + 65, this.guiTop + 59, 10, 10, "-"));
+        this.buttonList.add(new DireButton(6, this.guiLeft + 125, this.guiTop + 59, 10, 10, "+"));
+        this.buttonList.add(new DireButton(7, this.guiLeft + 365, this.guiTop + 59, 10, 10, "-"));
+        this.buttonList.add(new DireButton(8, this.guiLeft + 305, this.guiTop + 59, 10, 10, "+"));
+        this.buttonList.add(new DireButton(9, this.guiLeft + 185, this.guiTop + 29, 10, 10, "-"));
+        this.buttonList.add(new DireButton(10, this.guiLeft + 245, this.guiTop + 29, 10, 10, "+"));
+        this.buttonList.add(new DireButton(11, this.guiLeft + 185, this.guiTop + 89, 10, 10, "-"));
+        this.buttonList.add(new DireButton(12, this.guiLeft + 245, this.guiTop + 89, 10, 10, "+"));
+        this.buttonList.add(new DireButton(13, this.guiLeft + 185, this.guiTop + 59, 10, 10, "-"));
+        this.buttonList.add(new DireButton(14, this.guiLeft + 245, this.guiTop + 59, 10, 10, "+"));
         //this.buttonList.add(new DireButton(15, this.guiLeft + 250, this.guiTop + 34, 10, 10, "-"));
         //this.buttonList.add(new DireButton(16, this.guiLeft + 310, this.guiTop + 34, 10, 10, "+"));
     }
@@ -120,11 +120,11 @@ public class DestructionGUI extends GuiScreen {
         this.up.drawTextBox();
         this.down.drawTextBox();
         this.depth.drawTextBox();
-        fontRenderer.drawStringWithShadow("Left", this.guiLeft + 8, this.guiTop + 15, 0xFFFFFF);
-        fontRenderer.drawStringWithShadow("Right", this.guiLeft + 131, this.guiTop + 15, 0xFFFFFF);
-        fontRenderer.drawStringWithShadow("Up", this.guiLeft + 231, this.guiTop + 15, 0xFFFFFF);
-        fontRenderer.drawStringWithShadow("Down", this.guiLeft + 8, this.guiTop + 35, 0xFFFFFF);
-        fontRenderer.drawStringWithShadow("Depth", this.guiLeft + 131, this.guiTop + 35, 0xFFFFFF);
+        fontRenderer.drawStringWithShadow("Left", this.guiLeft + 35, this.guiTop + 60, 0xFFFFFF);
+        fontRenderer.drawStringWithShadow("Right", this.guiLeft + 278, this.guiTop + 60, 0xFFFFFF);
+        fontRenderer.drawStringWithShadow("Up", this.guiLeft + 170, this.guiTop + 30, 0xFFFFFF);
+        fontRenderer.drawStringWithShadow("Down", this.guiLeft + 158, this.guiTop + 90, 0xFFFFFF);
+        fontRenderer.drawStringWithShadow("Depth", this.guiLeft + 155, this.guiTop + 60, 0xFFFFFF);
         super.drawScreen(mouseX, mouseY, partialTicks);
     }
 
