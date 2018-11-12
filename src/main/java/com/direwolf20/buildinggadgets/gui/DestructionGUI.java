@@ -85,8 +85,8 @@ public class DestructionGUI extends GuiScreen {
         //this.buttonList.add(new GuiButton(4, this.guiLeft + 325, this.guiTop + 60, 80, 20, "CoordsMode"));
         this.buttonList.add(new DireButton(5, this.guiLeft + 65, this.guiTop + 59, 10, 10, "-"));
         this.buttonList.add(new DireButton(6, this.guiLeft + 125, this.guiTop + 59, 10, 10, "+"));
-        this.buttonList.add(new DireButton(7, this.guiLeft + 365, this.guiTop + 59, 10, 10, "-"));
-        this.buttonList.add(new DireButton(8, this.guiLeft + 305, this.guiTop + 59, 10, 10, "+"));
+        this.buttonList.add(new DireButton(7, this.guiLeft + 305, this.guiTop + 59, 10, 10, "-"));
+        this.buttonList.add(new DireButton(8, this.guiLeft + 365, this.guiTop + 59, 10, 10, "+"));
         this.buttonList.add(new DireButton(9, this.guiLeft + 185, this.guiTop + 29, 10, 10, "-"));
         this.buttonList.add(new DireButton(10, this.guiLeft + 245, this.guiTop + 29, 10, 10, "+"));
         this.buttonList.add(new DireButton(11, this.guiLeft + 185, this.guiTop + 89, 10, 10, "-"));
