@@ -256,7 +256,7 @@ public class CopyPasteTool extends GenericGadget implements ITemplate {
 
             } else if (getToolMode(stack) == ToolMode.Paste) {
                 if (!player.isSneaking()) {
-                    buildBlockMap(world, pos.up(), stack, player);
+                    buildBlockMap(world, pos, stack, player);
                 }
             }
             NBTTagCompound tagCompound = stack.getTagCompound();
@@ -300,12 +300,15 @@ public class CopyPasteTool extends GenericGadget implements ITemplate {
                     }
                 }
             } else if (getToolMode(stack) == ToolMode.Paste) {
-                if (getAnchor(stack) == null) {
-                    BlockPos pos = VectorTools.getPosLookingAt(player);
-                    if (pos == null) return new ActionResult<ItemStack>(EnumActionResult.FAIL, stack);
-                    buildBlockMap(world, pos.up(), stack, player);
-                } else {
-                    buildBlockMap(world, getAnchor(stack).up(), stack, player);
+                if (!player.isSneaking()) {
+                    if (getAnchor(stack) == null) {
+                        BlockPos pos = VectorTools.getPosLookingAt(player);
+                        if (pos == null) return new ActionResult<ItemStack>(EnumActionResult.FAIL, stack);
+                        buildBlockMap(world, pos, stack, player);
+                    } else {
+                        BlockPos startPos = getAnchor(stack);
+                        buildBlockMap(world, startPos, stack, player);
+                    }
                 }
             }
         } else {
@@ -498,9 +501,15 @@ public class CopyPasteTool extends GenericGadget implements ITemplate {
         NBTTagCompound tagCompound = worldSave.getCompoundFromUUID(getUUID(stack));
         Map<IBlockState, UniqueItem> IntStackMap = getBlockMapIntState(tagCompound).getIntStackMap();
         if (anchorPos == null) {
+            startPos = startPos.up(CopyPasteTool.getY(stack));
+            startPos = startPos.east(CopyPasteTool.getX(stack));
+            startPos = startPos.south(CopyPasteTool.getZ(stack));
             blockMapList = getBlockMapList(tagCompound, startPos);
             setLastBuild(stack, startPos, player.dimension);
         } else {
+            anchorPos = anchorPos.up(CopyPasteTool.getY(stack));
+            anchorPos = anchorPos.east(CopyPasteTool.getX(stack));
+            anchorPos = anchorPos.south(CopyPasteTool.getZ(stack));
             blockMapList = getBlockMapList(tagCompound, anchorPos);
             setLastBuild(stack, anchorPos, player.dimension);
         }
@@ -597,7 +606,7 @@ public class CopyPasteTool extends GenericGadget implements ITemplate {
             if (lookingAt == null) {
                 return;
             }
-            currentAnchor = lookingAt.getBlockPos().up();
+            currentAnchor = lookingAt.getBlockPos();
             setAnchor(stack, currentAnchor);
             player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.anchorrender").getUnformattedComponentText()), true);
         } else {

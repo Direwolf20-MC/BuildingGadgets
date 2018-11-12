@@ -412,7 +412,13 @@ public class ToolRenders {
             if (startPos == null) {
                 startPos = VectorTools.getPosLookingAt(player);
                 if (startPos == null) return;
-                startPos = startPos.up();
+                startPos = startPos.up(CopyPasteTool.getY(stack));
+                startPos = startPos.east(CopyPasteTool.getX(stack));
+                startPos = startPos.south(CopyPasteTool.getZ(stack));
+            } else {
+                startPos = startPos.up(CopyPasteTool.getY(stack));
+                startPos = startPos.east(CopyPasteTool.getX(stack));
+                startPos = startPos.south(CopyPasteTool.getZ(stack));
             }
 
             //We store our buffers in PasteToolBufferBuilder (A client only class) -- retrieve the buffer from this locally cache'd map

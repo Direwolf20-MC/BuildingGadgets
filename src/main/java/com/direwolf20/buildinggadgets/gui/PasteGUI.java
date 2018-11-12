@@ -67,7 +67,7 @@ public class PasteGUI extends GuiScreen {
 
         //NOTE: the id always has to be different or else it might get called twice or never!
         this.buttonList.add(new GuiButton(1, this.guiLeft + 80, this.guiTop + 125, 40, 20, "Ok"));
-        this.buttonList.add(new GuiButton(2, this.guiLeft + 200, this.guiTop + 125, 40, 20, "Cancel"));
+        //this.buttonList.add(new GuiButton(2, this.guiLeft + 200, this.guiTop + 125, 40, 20, "Cancel"));
         this.buttonList.add(new DireButton(3, this.guiLeft + 65, this.guiTop + 99, 10, 10, "-"));
         this.buttonList.add(new DireButton(4, this.guiLeft + 125, this.guiTop + 99, 10, 10, "+"));
         this.buttonList.add(new DireButton(5, this.guiLeft + 185, this.guiTop + 99, 10, 10, "-"));
@@ -141,20 +141,27 @@ public class PasteGUI extends GuiScreen {
             this.mc.displayGuiScreen(null);
         } else if (b.id == 3) {
             fieldChange(X, -1);
+            PacketHandler.INSTANCE.sendToServer(new PacketPasteGUI(Integer.parseInt(X.getText()), Integer.parseInt(Y.getText()), Integer.parseInt(Z.getText())));
         } else if (b.id == 4) {
             fieldChange(X, 1);
+            PacketHandler.INSTANCE.sendToServer(new PacketPasteGUI(Integer.parseInt(X.getText()), Integer.parseInt(Y.getText()), Integer.parseInt(Z.getText())));
         } else if (b.id == 5) {
             fieldChange(Y, -1);
+            PacketHandler.INSTANCE.sendToServer(new PacketPasteGUI(Integer.parseInt(X.getText()), Integer.parseInt(Y.getText()), Integer.parseInt(Z.getText())));
         } else if (b.id == 6) {
             fieldChange(Y, 1);
+            PacketHandler.INSTANCE.sendToServer(new PacketPasteGUI(Integer.parseInt(X.getText()), Integer.parseInt(Y.getText()), Integer.parseInt(Z.getText())));
         } else if (b.id == 7) {
             fieldChange(Z, -1);
+            PacketHandler.INSTANCE.sendToServer(new PacketPasteGUI(Integer.parseInt(X.getText()), Integer.parseInt(Y.getText()), Integer.parseInt(Z.getText())));
         } else if (b.id == 8) {
             fieldChange(Z, 1);
+            PacketHandler.INSTANCE.sendToServer(new PacketPasteGUI(Integer.parseInt(X.getText()), Integer.parseInt(Y.getText()), Integer.parseInt(Z.getText())));
         } else if (b.id == 9) {
             X.setText(String.valueOf(0));
-            Y.setText(String.valueOf(0));
+            Y.setText(String.valueOf(1));
             Z.setText(String.valueOf(0));
+            PacketHandler.INSTANCE.sendToServer(new PacketPasteGUI(Integer.parseInt(X.getText()), Integer.parseInt(Y.getText()), Integer.parseInt(Z.getText())));
         }
     }
 
