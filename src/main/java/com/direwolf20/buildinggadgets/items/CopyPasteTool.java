@@ -90,7 +90,11 @@ public class CopyPasteTool extends GenericGadget implements ITemplate {
     }
 
     public static int getY(ItemStack stack) {
-        return GadgetUtils.getIntFromNBT(stack, "Y");
+        NBTTagCompound tagCompound = stack.getTagCompound();
+        if (tagCompound == null) return 1;
+        if (!tagCompound.hasKey("Y")) return 1;
+        Integer tagInt = tagCompound.getInteger("Y");
+        return tagInt;
     }
 
     public static int getZ(ItemStack stack) {
@@ -264,7 +268,7 @@ public class CopyPasteTool extends GenericGadget implements ITemplate {
             ByteBufUtils.writeTag(buf, tagCompound);
             //System.out.println(buf.readableBytes());
         } else {
-            if (player.isSneaking()) {
+            if (player.isSneaking() && getToolMode(stack) == ToolMode.Paste) {
                 player.openGui(BuildingGadgets.instance, GuiProxy.PasteID, world, hand.ordinal(), 0, 0);
                 return EnumActionResult.SUCCESS;
             }
