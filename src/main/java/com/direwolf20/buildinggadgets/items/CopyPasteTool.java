@@ -73,6 +73,30 @@ public class CopyPasteTool extends GenericGadget implements ITemplate {
         GadgetUtils.writePOSToNBT(stack, anchorPos, "anchor");
     }
 
+    public static void setX(ItemStack stack, int horz) {
+        GadgetUtils.writeIntToNBT(stack, horz, "X");
+    }
+
+    public static void setY(ItemStack stack, int vert) {
+        GadgetUtils.writeIntToNBT(stack, vert, "Y");
+    }
+
+    public static void setZ(ItemStack stack, int depth) {
+        GadgetUtils.writeIntToNBT(stack, depth, "Z");
+    }
+
+    public static int getX(ItemStack stack) {
+        return GadgetUtils.getIntFromNBT(stack, "X");
+    }
+
+    public static int getY(ItemStack stack) {
+        return GadgetUtils.getIntFromNBT(stack, "Y");
+    }
+
+    public static int getZ(ItemStack stack) {
+        return GadgetUtils.getIntFromNBT(stack, "Z");
+    }
+
     public static BlockPos getAnchor(ItemStack stack) {
         return GadgetUtils.getPOSFromNBT(stack, "anchor");
     }
@@ -231,12 +255,19 @@ public class CopyPasteTool extends GenericGadget implements ITemplate {
                 }
 
             } else if (getToolMode(stack) == ToolMode.Paste) {
-                buildBlockMap(world, pos.up(), stack, player);
+                if (!player.isSneaking()) {
+                    buildBlockMap(world, pos.up(), stack, player);
+                }
             }
             NBTTagCompound tagCompound = stack.getTagCompound();
             ByteBuf buf = Unpooled.buffer(16);
             ByteBufUtils.writeTag(buf, tagCompound);
             //System.out.println(buf.readableBytes());
+        } else {
+            if (player.isSneaking()) {
+                player.openGui(BuildingGadgets.instance, GuiProxy.PasteID, world, hand.ordinal(), 0, 0);
+                return EnumActionResult.SUCCESS;
+            }
         }
 
         return EnumActionResult.SUCCESS;
@@ -285,6 +316,11 @@ public class CopyPasteTool extends GenericGadget implements ITemplate {
                         player.openGui(BuildingGadgets.instance, GuiProxy.CopyPasteID, world, hand.ordinal(), 0, 0);
                         return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);
                     }
+                }
+            } else {
+                if (player.isSneaking()) {
+                    player.openGui(BuildingGadgets.instance, GuiProxy.PasteID, world, hand.ordinal(), 0, 0);
+                    return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);
                 }
             }
         }

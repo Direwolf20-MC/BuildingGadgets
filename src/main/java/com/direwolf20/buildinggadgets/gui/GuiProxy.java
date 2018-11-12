@@ -15,6 +15,7 @@ public class GuiProxy implements IGuiHandler {
 
     public static final int CopyPasteID = 0;
     public static final int DestructionID = 1;
+    public static final int PasteID = 2;
 
     @Override
     public Object getServerGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
@@ -48,6 +49,13 @@ public class GuiProxy implements IGuiHandler {
                 return new DestructionGUI(player.getHeldItemMainhand());
             else if (player.getHeldItemOffhand().getItem() instanceof DestructionTool)
                 return new DestructionGUI(player.getHeldItemOffhand());
+            else
+                return null;
+        } else if (ID == PasteID) {
+            if (player.getHeldItemMainhand().getItem() instanceof CopyPasteTool)
+                return new PasteGUI(player.getHeldItemMainhand());
+            else if (player.getHeldItemOffhand().getItem() instanceof CopyPasteTool)
+                return new PasteGUI(player.getHeldItemOffhand());
             else
                 return null;
         }
