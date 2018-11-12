@@ -52,6 +52,9 @@ public class DestructionTool extends GenericGadget {
         setUnlocalizedName(BuildingGadgets.MODID + ".destructiontool");     // Used for localization (en_US.lang)
         setMaxStackSize(1);
         setCreativeTab(CreativeTabs.TOOLS);
+        if (!Config.poweredByFE) {
+            setMaxDamage(Config.durabilityDestruction);
+        }
     }
 
     @Override
