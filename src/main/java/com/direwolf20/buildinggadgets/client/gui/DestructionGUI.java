@@ -147,6 +147,9 @@ public class DestructionGUI extends GuiScreen {
     }
 
     protected boolean sizeCheckBoxes() {
+        if( left.getText().equals("") || right.getText().equals("") || down.getText().equals("") || up.getText().equals("") || depth.getText().equals(""))
+            return false;
+
         if (Integer.parseInt(left.getText()) + Integer.parseInt(right.getText()) > 16) return false;
         if (Integer.parseInt(up.getText()) + Integer.parseInt(down.getText()) > 16) return false;
         if (Integer.parseInt(depth.getText()) > 16) return false;
