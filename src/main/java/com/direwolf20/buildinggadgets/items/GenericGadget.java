@@ -3,6 +3,7 @@ package com.direwolf20.buildinggadgets.items;
 import com.direwolf20.buildinggadgets.Config;
 import com.direwolf20.buildinggadgets.items.ItemCaps.CapabilityProviderEnergy;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -95,5 +96,49 @@ public class GenericGadget extends Item {
             return true;
         }
         return false;
+    }
+
+    @Nullable
+    public ItemStack getGadget(EntityPlayer player) {
+        ItemStack heldItem = player.getHeldItemMainhand();
+
+        if (!(heldItem.getItem() instanceof GenericGadget )) {
+
+            heldItem = player.getHeldItemOffhand();
+            if (!(heldItem.getItem() instanceof GenericGadget)) {
+                return null;
+            }
+        }
+
+        return heldItem;
+    }
+
+    public int getEnergyCost() {
+        return 200;
+    }
+
+    public int getDamagePerUse() {
+        return 1;
+    }
+
+    public boolean canUse(ItemStack tool, EntityPlayer player) {
+        if (player.capabilities.isCreativeMode)
+            return true;
+
+        if (Config.poweredByFE) {
+            IEnergyStorage energy = CapabilityProviderEnergy.getCap(tool);
+            return this.getEnergyCost() > energy.getEnergyStored();
+        }
+        else
+            return tool.getItemDamage() < tool.getMaxDamage() || tool.isItemStackDamageable();
+    }
+
+    public void applyDamage(ItemStack tool, EntityPlayer player) {
+        if( Config.poweredByFE ) {
+            IEnergyStorage energy = CapabilityProviderEnergy.getCap(tool);
+            energy.extractEnergy(this.getEnergyCost(), false);
+        }
+        else
+            tool.damageItem(this.getDamagePerUse(), player);
     }
 }

@@ -42,7 +42,6 @@ import net.minecraftforge.event.world.BlockEvent;
 import javax.annotation.Nullable;
 import java.util.*;
 
-import static com.direwolf20.buildinggadgets.tools.GadgetUtils.useEnergy;
 import static com.direwolf20.buildinggadgets.tools.GadgetUtils.withSuffix;
 
 public class DestructionTool extends GenericGadget {
@@ -60,6 +59,16 @@ public class DestructionTool extends GenericGadget {
     @Override
     public int getEnergyMax() {
         return Config.energyMaxDestruction;
+    }
+
+    @Override
+    public int getEnergyCost() {
+        return Config.energyCostDestruction;
+    }
+
+    @Override
+    public int getDamagePerUse() {
+        return 2;
     }
 
     @Override
@@ -299,7 +308,7 @@ public class DestructionTool extends GenericGadget {
         return voidPosArray;
     }
 
-    public static boolean validBlock(World world, BlockPos voidPos, EntityPlayer player) {
+    public boolean validBlock(World world, BlockPos voidPos, EntityPlayer player) {
         IBlockState currentBlock = world.getBlockState(voidPos);
         TileEntity te = world.getTileEntity(voidPos);
         if (currentBlock.getMaterial() == Material.AIR) return false;
@@ -307,13 +316,11 @@ public class DestructionTool extends GenericGadget {
         if (currentBlock.equals(ModBlocks.effectBlock.getDefaultState())) return false;
         if ((te != null) && !(te instanceof ConstructionBlockTileEntity)) return false;
         if (currentBlock.getBlock().getBlockHardness(currentBlock, world, voidPos) < 0) return false;
-        ItemStack tool = player.getHeldItemMainhand();
-        if (!(tool.getItem() instanceof DestructionTool)) {
-            tool = player.getHeldItemOffhand();
-            if (!(tool.getItem() instanceof DestructionTool)) {
-                return false;
-            }
-        }
+
+        ItemStack tool = this.getGadget(player);
+        if( tool == null )
+            return false;
+
         if (!player.isAllowEdit()) {
             return false;
         }
@@ -333,7 +340,7 @@ public class DestructionTool extends GenericGadget {
         return true;
     }
 
-    public static void clearArea(World world, BlockPos pos, EnumFacing side, EntityPlayer player, ItemStack stack) {
+    public void clearArea(World world, BlockPos pos, EnumFacing side, EntityPlayer player, ItemStack stack) {
         ArrayList<BlockPos> voidPosArray = getArea(world, pos, side, player, stack);
         Map<BlockPos, IBlockState> posStateMap = new HashMap<BlockPos, IBlockState>();
         Map<BlockPos, IBlockState> pasteStateMap = new HashMap<BlockPos, IBlockState>();
@@ -447,27 +454,16 @@ public class DestructionTool extends GenericGadget {
         }
     }
 
-    public static boolean destroyBlock(World world, BlockPos voidPos, EntityPlayer player) {
-        ItemStack tool = player.getHeldItemMainhand();
-        if (!(tool.getItem() instanceof DestructionTool)) {
-            tool = player.getHeldItemOffhand();
-            if (!(tool.getItem() instanceof DestructionTool)) {
-                return false;
-            }
-        }
-        if (Config.poweredByFE) {
-            if (!useEnergy(tool, Config.energyCostDestruction, player)) {
-                return false;
-            }
-        } else {
-            if (tool.getItemDamage() >= tool.getMaxDamage()) {
-                if (tool.isItemStackDamageable()) {
-                    return false;
-                }
-            } else {
-                tool.damageItem(2, player);
-            }
-        }
+    private boolean destroyBlock(World world, BlockPos voidPos, EntityPlayer player) {
+        ItemStack tool = this.getGadget(player);
+        if( tool == null )
+            return false;
+
+        if( !this.canUse(tool, player) )
+            return false;
+
+        this.applyDamage(tool, player);
+
         world.spawnEntity(new BlockBuildEntity(world, voidPos, player, world.getBlockState(voidPos), 2, Blocks.AIR.getDefaultState(), false));
         return true;
     }

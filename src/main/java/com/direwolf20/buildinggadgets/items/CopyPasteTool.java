@@ -45,7 +45,6 @@ import net.minecraftforge.fml.common.network.ByteBufUtils;
 import javax.annotation.Nullable;
 import java.util.*;
 
-import static com.direwolf20.buildinggadgets.tools.GadgetUtils.useEnergy;
 import static com.direwolf20.buildinggadgets.tools.GadgetUtils.withSuffix;
 
 public class CopyPasteTool extends GenericGadget implements ITemplate {
@@ -67,6 +66,16 @@ public class CopyPasteTool extends GenericGadget implements ITemplate {
         if (!Config.poweredByFE) {
             setMaxDamage(Config.durabilityCopyPaste);
         }
+    }
+
+    @Override
+    public int getEnergyCost() {
+        return Config.energyCostBuilder;
+    }
+
+    @Override
+    public int getDamagePerUse() {
+        return 1;
     }
 
     private static void setAnchor(ItemStack stack, BlockPos anchorPos) {
@@ -499,55 +508,40 @@ public class CopyPasteTool extends GenericGadget implements ITemplate {
 
     private void buildBlockMap(World world, BlockPos startPos, ItemStack stack, EntityPlayer player) {
 //        long time = System.nanoTime();
+
         BlockPos anchorPos = getAnchor(stack);
-        List<BlockMap> blockMapList = new ArrayList<BlockMap>();
-        WorldSave worldSave = WorldSave.getWorldSave(world);
-        NBTTagCompound tagCompound = worldSave.getCompoundFromUUID(getUUID(stack));
-        Map<IBlockState, UniqueItem> IntStackMap = getBlockMapIntState(tagCompound).getIntStackMap();
-        if (anchorPos == null) {
-            startPos = startPos.up(CopyPasteTool.getY(stack));
-            startPos = startPos.east(CopyPasteTool.getX(stack));
-            startPos = startPos.south(CopyPasteTool.getZ(stack));
-            blockMapList = getBlockMapList(tagCompound, startPos);
-            setLastBuild(stack, startPos, player.dimension);
-        } else {
-            anchorPos = anchorPos.up(CopyPasteTool.getY(stack));
-            anchorPos = anchorPos.east(CopyPasteTool.getX(stack));
-            anchorPos = anchorPos.south(CopyPasteTool.getZ(stack));
-            blockMapList = getBlockMapList(tagCompound, anchorPos);
-            setLastBuild(stack, anchorPos, player.dimension);
-        }
-        for (BlockMap blockMap : blockMapList) {
-            placeBlock(world, blockMap.pos, player, blockMap.state, IntStackMap);
-        }
+        BlockPos pos = anchorPos == null ? startPos : anchorPos;
+        NBTTagCompound tagCompound = WorldSave.getWorldSave(world).getCompoundFromUUID(getUUID(stack));
+
+        pos = pos.up(CopyPasteTool.getY(stack));
+        pos = pos.east(CopyPasteTool.getX(stack));
+        pos = pos.south(CopyPasteTool.getZ(stack));
+
+        List<BlockMap> blockMapList = getBlockMapList(tagCompound, pos);
+        setLastBuild(stack, pos, player.dimension);
+
+        for (BlockMap blockMap : blockMapList)
+            placeBlock(world, blockMap.pos, player, blockMap.state, getBlockMapIntState(tagCompound).getIntStackMap());
+
         setAnchor(stack, null);
         //System.out.printf("Built %d Blocks in %.2f ms%n", blockMapList.size(), (System.nanoTime() - time) * 1e-6);
     }
 
-    private static void placeBlock(World world, BlockPos pos, EntityPlayer player, IBlockState state, Map<IBlockState, UniqueItem> IntStackMap) {
-        if (Config.canOverwriteBlocks) {
-            if (!world.getBlockState(pos).getBlock().isReplaceable(world, pos)) {
-                return;
-            }
-        } else {
-            if (world.getBlockState(pos).getMaterial() != Material.AIR) {
-                return;
-            }
-        }
-        if (pos.getY() < 0) return;
-        if (state.equals(Blocks.AIR.getDefaultState())) return;
-        if (!player.isAllowEdit()) {
+    private void placeBlock(World world, BlockPos pos, EntityPlayer player, IBlockState state, Map<IBlockState, UniqueItem> IntStackMap) {
+        IBlockState testState = world.getBlockState(pos);
+        if( Config.canOverwriteBlocks && !testState.getBlock().isReplaceable(world, pos) || world.getBlockState(pos).getMaterial() != Material.AIR)
             return;
-        }
-        ItemStack heldItem = player.getHeldItemMainhand();
-        if (!(heldItem.getItem() instanceof CopyPasteTool)) {
-            heldItem = player.getHeldItemOffhand();
-            if (!(heldItem.getItem() instanceof CopyPasteTool)) {
-                return;
-            }
-        }
-        if (ModItems.copyPasteTool.getStartPos(heldItem) == null) return;
-        if (ModItems.copyPasteTool.getEndPos(heldItem) == null) return;
+
+        if (pos.getY() < 0 || state.equals(Blocks.AIR.getDefaultState()) || !player.isAllowEdit())
+            return;
+
+        ItemStack heldItem = this.getGadget(player);
+        if( heldItem == null )
+            return;
+
+        if (ModItems.copyPasteTool.getStartPos(heldItem) == null || ModItems.copyPasteTool.getEndPos(heldItem) == null)
+            return;
+
         UniqueItem uniqueItem = IntStackMap.get(state);
         if (uniqueItem == null) return; //This shouldn't happen I hope!
         ItemStack itemStack = new ItemStack(uniqueItem.item, 1, uniqueItem.meta);
@@ -578,19 +572,12 @@ public class CopyPasteTool extends GenericGadget implements ITemplate {
             itemStack = constructionPaste.copy();
             useConstructionPaste = true;
         }
-        if (Config.poweredByFE) {
-            if (!useEnergy(heldItem, Config.energyCostBuilder, player)) {
-                return;
-            }
-        } else {
-            if (heldItem.getItemDamage() >= heldItem.getMaxDamage()) {
-                if (heldItem.isItemStackDamageable()) {
-                    return;
-                }
-            } else {
-                heldItem.damageItem(1, player);
-            }
-        }
+
+        if( !this.canUse(heldItem, player) )
+            return;
+
+        this.applyDamage(heldItem, player);
+
         boolean useItemSuccess;
         if (useConstructionPaste) {
             useItemSuccess = InventoryManipulation.usePaste(player, 1);
@@ -619,7 +606,7 @@ public class CopyPasteTool extends GenericGadget implements ITemplate {
         }
     }
 
-    public static void undoBuild(EntityPlayer player, ItemStack heldItem) {
+    public void undoBuild(EntityPlayer player, ItemStack heldItem) {
 //        long time = System.nanoTime();
         NBTTagCompound tagCompound = WorldSave.getWorldSave(player.world).getCompoundFromUUID(ModItems.copyPasteTool.getUUID(heldItem));
         World world = player.world;
@@ -627,9 +614,9 @@ public class CopyPasteTool extends GenericGadget implements ITemplate {
             return;
         }
         BlockPos startPos = getLastBuild(heldItem);
-        if (startPos == null) {
+        if (startPos == null)
             return;
-        }
+
         Integer dimension = getLastBuildDim(heldItem);
         ItemStack silkTool = heldItem.copy(); //Setup a Silk Touch version of the tool so we can return stone instead of cobblestone, etc.
         silkTool.addEnchantment(Enchantments.SILK_TOUCH, 1);

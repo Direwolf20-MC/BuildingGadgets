@@ -66,6 +66,16 @@ public class BuildingTool extends GenericGadget {
         }
     }
 
+    @Override
+    public int getEnergyCost() {
+        return Config.energyCostBuilder;
+    }
+
+    @Override
+    public int getDamagePerUse() {
+        return 1;
+    }
+
     private static void setToolMode(ItemStack stack, ToolMode mode) {
         //Store the tool's mode in NBT as a string
         NBTTagCompound tagCompound = stack.getTagCompound();
@@ -109,15 +119,17 @@ public class BuildingTool extends GenericGadget {
     @Override
     public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
         //On item use, if sneaking, select the block clicked on, else build -- This is called when a block in clicked on
+        if (!world.isRemote)
+            return EnumActionResult.FAIL;
+
         ItemStack stack = player.getHeldItem(hand);
         player.setActiveHand(hand);
-        if (!world.isRemote) {
-            if (player.isSneaking()) {
-                selectBlock(stack, player);
-            } else {
-                build(player, stack);
-            }
-        }
+
+        if (player.isSneaking())
+            selectBlock(stack, player);
+        else
+            this.build(player, stack);
+
         return EnumActionResult.SUCCESS;
     }
 
@@ -185,13 +197,11 @@ public class BuildingTool extends GenericGadget {
         }
         List<BlockPos> undoCoords = new ArrayList<BlockPos>();
         Set<BlockPos> coordinates = new HashSet<BlockPos>(coords);
-        ItemStack heldItem = player.getHeldItemMainhand();
-        if (!(heldItem.getItem() instanceof BuildingTool)) {
-            heldItem = player.getHeldItemOffhand();
-            if (!(heldItem.getItem() instanceof BuildingTool)) {
-                return false;
-            }
-        }
+
+        ItemStack heldItem = this.getGadget(player);
+        if( heldItem == null )
+            return false;
+
         IBlockState blockState = getToolBlock(heldItem);
 
         if (blockState != Blocks.AIR.getDefaultState()) { //Don't attempt a build if a block is not chosen -- Typically only happens on a new tool.
@@ -220,14 +230,11 @@ public class BuildingTool extends GenericGadget {
         return true;
     }
 
-    public static boolean undoBuild(EntityPlayer player) {
-        ItemStack heldItem = player.getHeldItemMainhand();
-        if (!(heldItem.getItem() instanceof BuildingTool)) {
-            heldItem = player.getHeldItemOffhand();
-            if (!(heldItem.getItem() instanceof BuildingTool)) {
-                return false;
-            }
-        }
+    public boolean undoBuild(EntityPlayer player) {
+        ItemStack heldItem = this.getGadget(player);
+        if( heldItem == null )
+            return false;
+
         UndoState undoState = popUndoList(heldItem); //Get the undo list off the tool, exit if empty
         if (undoState == null) {
             player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.nothingtoundo").getUnformattedComponentText()), true);
@@ -266,15 +273,16 @@ public class BuildingTool extends GenericGadget {
         return true;
     }
 
-    private static boolean placeBlock(World world, EntityPlayer player, BlockPos pos, IBlockState setBlock) {
-        ItemStack heldItem = player.getHeldItemMainhand();
+    private boolean placeBlock(World world, EntityPlayer player, BlockPos pos, IBlockState setBlock) {
+        if (!player.isAllowEdit())
+            return false;
+
+        ItemStack heldItem = this.getGadget(player);
+        if( heldItem == null )
+            return false;
+
         boolean useConstructionPaste = false;
-        if (!(heldItem.getItem() instanceof BuildingTool)) {
-            heldItem = player.getHeldItemOffhand();
-            if (!(heldItem.getItem() instanceof BuildingTool)) {
-                return false;
-            }
-        }
+
         ItemStack itemStack;
         if (setBlock.getBlock().canSilkHarvest(world, pos, setBlock, player)) {
             itemStack = InventoryManipulation.getSilkTouchDrop(setBlock);
@@ -284,9 +292,7 @@ public class BuildingTool extends GenericGadget {
         if (itemStack.getItem().equals(Items.AIR)) {
             itemStack = setBlock.getBlock().getPickBlock(setBlock, null, world, pos, player);
         }
-        if (!player.isAllowEdit()) {
-            return false;
-        }
+
         NonNullList<ItemStack> drops = NonNullList.create();
         setBlock.getBlock().getDrops(drops, world, pos, setBlock, 0);
         int neededItems = 0;
@@ -314,19 +320,12 @@ public class BuildingTool extends GenericGadget {
             itemStack = constructionPaste.copy();
             useConstructionPaste = true;
         }
-        if (Config.poweredByFE) {
-            if (!useEnergy(heldItem, Config.energyCostBuilder, player)) {
-                return false;
-            }
-        } else {
-            if (heldItem.getItemDamage() >= heldItem.getMaxDamage()) {
-                if (heldItem.isItemStackDamageable()) {
-                    return false;
-                }
-            } else {
-                heldItem.damageItem(1, player);
-            }
-        }
+
+        if( !this.canUse(heldItem, player) )
+            return false;
+
+        this.applyDamage(heldItem, player);
+
         //ItemStack constructionStack = InventoryManipulation.getSilkTouchDrop(ModBlocks.constructionBlock.getDefaultState());
         boolean useItemSuccess;
         if (useConstructionPaste) {

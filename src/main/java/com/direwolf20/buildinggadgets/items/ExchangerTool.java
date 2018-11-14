@@ -220,13 +220,11 @@ public class ExchangerTool extends GenericGadget {
             setAnchor(stack, new ArrayList<BlockPos>());
         }
         Set<BlockPos> coordinates = new HashSet<BlockPos>(coords);
-        ItemStack heldItem = player.getHeldItemMainhand();
-        if (!(heldItem.getItem() instanceof ExchangerTool)) {
-            heldItem = player.getHeldItemOffhand();
-            if (!(heldItem.getItem() instanceof ExchangerTool)) {
-                return false;
-            }
-        }
+
+        ItemStack heldItem = this.getGadget(player);
+        if( heldItem == null )
+            return false;
+
         IBlockState blockState = getToolBlock(heldItem);
 
         if (blockState != Blocks.AIR.getDefaultState()) {  //Don't attempt a build if a block is not chosen -- Typically only happens on a new tool.
@@ -261,13 +259,11 @@ public class ExchangerTool extends GenericGadget {
         if (itemStack.getItem().equals(Items.AIR)) {
             itemStack = setBlock.getBlock().getPickBlock(setBlock, null, world, pos, player);
         }
-        ItemStack tool = player.getHeldItemMainhand();
-        if (!(tool.getItem() instanceof ExchangerTool)) {
-            tool = player.getHeldItemOffhand();
-            if (!(tool.getItem() instanceof ExchangerTool)) {
-                return false;
-            }
-        }
+
+        ItemStack tool = this.getGadget(player);
+        if( tool == null )
+            return false;
+
         NonNullList<ItemStack> drops = NonNullList.create();
         setBlock.getBlock().getDrops(drops, world, pos, setBlock, 0);
         int neededItems = 0;
@@ -301,19 +297,12 @@ public class ExchangerTool extends GenericGadget {
         if (MinecraftForge.EVENT_BUS.post(e)) {
             return false;
         }
-        if (Config.poweredByFE) {
-            if (!useEnergy(tool, Config.energyCostExchanger, player)) {
-                return false;
-            }
-        } else {
-            if (tool.getItemDamage() >= tool.getMaxDamage()) {
-                if (tool.isItemStackDamageable()) {
-                    return false;
-                }
-            } else {
-                tool.damageItem(2, player);
-            }
-        }
+
+        if( !this.canUse(tool, player) )
+            return false;
+
+        this.applyDamage(tool, player);
+
         currentBlock.getBlock().harvestBlock(world, player, pos, currentBlock, world.getTileEntity(pos), tool);
         boolean useItemSuccess;
         if (useConstructionPaste) {

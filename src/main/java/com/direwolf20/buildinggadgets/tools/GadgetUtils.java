@@ -290,18 +290,6 @@ public class GadgetUtils {
         return true;
     }
 
-    public static boolean useEnergy(ItemStack stack, int amount, EntityPlayer player) {
-        if (player.capabilities.isCreativeMode) {
-            return true;
-        }
-        IEnergyStorage energy = CapabilityProviderEnergy.getCap(stack);
-        if (amount > energy.getEnergyStored()) {
-            return false;
-        }
-        energy.extractEnergy(amount, false);
-        return true;
-    }
-
     public static String withSuffix(int count) {
         if (count < 1000) return "" + count;
         int exp = (int) (Math.log(count) / Math.log(1000));
