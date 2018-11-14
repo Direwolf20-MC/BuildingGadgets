@@ -1,11 +1,11 @@
 package com.direwolf20.buildinggadgets.common.items.gadgets;
 
+import com.direwolf20.buildinggadgets.client.gui.GuiProxy;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.Config;
-import com.direwolf20.buildinggadgets.common.blocks.ModBlocks;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
+import com.direwolf20.buildinggadgets.common.blocks.ModBlocks;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
-import com.direwolf20.buildinggadgets.client.gui.GuiProxy;
 import com.direwolf20.buildinggadgets.common.tools.BlockMapIntState;
 import com.direwolf20.buildinggadgets.common.tools.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.tools.VectorTools;
@@ -14,7 +14,6 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
@@ -314,7 +313,7 @@ public class GadgetDestruction extends GadgetGeneric {
         //if (currentBlock.getBlock().getMaterial(currentBlock).isLiquid()) return false;
         if (currentBlock.equals(ModBlocks.effectBlock.getDefaultState())) return false;
         if ((te != null) && !(te instanceof ConstructionBlockTileEntity)) return false;
-        if (currentBlock.getBlock().getBlockHardness(currentBlock, world, voidPos) < 0) return false;
+        if (currentBlock.getBlockHardness(world, voidPos) < 0) return false;
 
         ItemStack tool = player.getHeldItemMainhand(); //Get the item stack and the block that we'll be rendering (From the Itemstack's NBT)
         if (!(tool.getItem() instanceof GadgetDestruction)) {
@@ -430,7 +429,7 @@ public class GadgetDestruction extends GadgetGeneric {
         for (int i = 0; i < posIntArray.length; i++) {
             BlockPos placePos = GadgetUtils.relIntToPos(startPos, posIntArray[i]);
             IBlockState currentState = world.getBlockState(placePos);
-            if (currentState.getMaterial() == Material.AIR || currentState.getBlock().getMaterial(currentState).isLiquid()) {
+            if (currentState.getMaterial() == Material.AIR || currentState.getMaterial().isLiquid()) {
                 IBlockState placeState = MapIntState.getStateFromSlot((short) stateIntArray[i]);
                 if (placeState.getBlock() == ModBlocks.constructionBlock) {
                     IBlockState pasteState = Blocks.AIR.getDefaultState();
