@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.common.items.gadgets;
 
+import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.Config;
 import com.direwolf20.buildinggadgets.common.items.capability.CapabilityProviderEnergy;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
@@ -18,6 +19,10 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import javax.annotation.Nullable;
 
 public class GadgetGeneric extends Item {
+
+    public GadgetGeneric() {
+        setCreativeTab(BuildingGadgets.buildingCreativeTab);
+    }
 
     public int getEnergyMax() {
         return Config.energyMax;

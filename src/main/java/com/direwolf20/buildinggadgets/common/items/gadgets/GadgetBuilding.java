@@ -47,7 +47,6 @@ import static com.direwolf20.buildinggadgets.common.tools.GadgetUtils.*;
 public class GadgetBuilding extends GadgetGeneric {
     private static final FakeBuilderWorld fakeWorld = new FakeBuilderWorld();
 
-
     public enum ToolMode {
         BuildToMe, VerticalColumn, HorizontalColumn, VerticalWall, HorizontalWall, Stairs, Checkerboard;
         private static ToolMode[] vals = values();
@@ -61,7 +60,6 @@ public class GadgetBuilding extends GadgetGeneric {
         setRegistryName("buildingtool");        // The unique name (within your mod) that identifies this item
         setUnlocalizedName(BuildingGadgets.MODID + ".buildingtool");     // Used for localization (en_US.lang)
         setMaxStackSize(1);
-        setCreativeTab(CreativeTabs.TOOLS);
         if (!Config.poweredByFE) {
             setMaxDamage(Config.durabilityBuilder);
         }

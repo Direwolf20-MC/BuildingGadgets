@@ -3,7 +3,13 @@ package com.direwolf20.buildinggadgets.common;
 import com.direwolf20.buildinggadgets.common.commands.DeleteBlockMapsCommand;
 import com.direwolf20.buildinggadgets.common.commands.FindBlockMapsCommand;
 import com.direwolf20.buildinggadgets.common.events.AnvilRepairHandler;
+import com.direwolf20.buildinggadgets.common.items.ModItems;
+import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetBuilding;
 import com.direwolf20.buildinggadgets.common.proxy.CommonProxy;
+import net.minecraft.client.resources.I18n;
+import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
@@ -22,6 +28,12 @@ public class BuildingGadgets {
     public static final String VERSION = "@VERSION@";
     public static final String UPDATE_JSON = "@UPDATE@";
 
+    public static final CreativeTabs buildingCreativeTab = new CreativeTabs(I18n.format("buildingGadgets")) {
+        @Override
+        public ItemStack getTabIconItem() {
+            return new ItemStack(ModItems.gadgetBuilding);
+        }
+    };
 
     @SidedProxy(clientSide = "com.direwolf20.buildinggadgets.client.proxy.ClientProxy", serverSide = "com.direwolf20.buildinggadgets.common.proxy.ServerProxy")
     public static CommonProxy proxy;

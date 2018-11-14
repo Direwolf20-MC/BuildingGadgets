@@ -60,7 +60,6 @@ public class GadgetExchanger extends GadgetGeneric {
         setRegistryName("exchangertool");        // The unique name (within your mod) that identifies this item
         setUnlocalizedName(BuildingGadgets.MODID + ".exchangertool");     // Used for localization (en_US.lang)
         setMaxStackSize(1);
-        setCreativeTab(CreativeTabs.TOOLS);
         if (!Config.poweredByFE) {
             setMaxDamage(Config.durabilityExchanger);
         }

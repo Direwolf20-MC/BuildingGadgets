@@ -1,4 +1,5 @@
 #PARSE_ESCAPES
+itemGroup.buildingGadgets=Building Gadgets
 item.buildinggadgets.buildingtool.name=Building Gadget
 item.buildinggadgets.exchangertool.name=Exchanging Gadget
 item.buildinggadgets.destructiontool.name=Destruction Gadget

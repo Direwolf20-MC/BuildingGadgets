@@ -7,6 +7,7 @@
 package com.direwolf20.buildinggadgets.client.gui;
 
 import com.direwolf20.buildinggadgets.client.KeyBindings;
+import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.items.gadgets.*;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetBuilding;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetDestruction;
@@ -33,20 +34,20 @@ import java.util.List;
 public class ModeRadialMenu extends GuiScreen {
 
     private static final ResourceLocation[] signs = new ResourceLocation[]{
-            new ResourceLocation("buildinggadgets:textures/ui/buildtome.png"),
-            new ResourceLocation("buildinggadgets:textures/ui/verticalcolumn.png"),
-            new ResourceLocation("buildinggadgets:textures/ui/horizontalcolumn.png"),
-            new ResourceLocation("buildinggadgets:textures/ui/verticalwall.png"),
-            new ResourceLocation("buildinggadgets:textures/ui/horizontalwall.png"),
-            new ResourceLocation("buildinggadgets:textures/ui/stairs.png"),
-            new ResourceLocation("buildinggadgets:textures/ui/checker.png")
+            new ResourceLocation(BuildingGadgets.MODID,"textures/ui/buildtome.png"),
+            new ResourceLocation(BuildingGadgets.MODID,"textures/ui/verticalcolumn.png"),
+            new ResourceLocation(BuildingGadgets.MODID,"textures/ui/horizontalcolumn.png"),
+            new ResourceLocation(BuildingGadgets.MODID,"textures/ui/verticalwall.png"),
+            new ResourceLocation(BuildingGadgets.MODID,"textures/ui/horizontalwall.png"),
+            new ResourceLocation(BuildingGadgets.MODID,"textures/ui/stairs.png"),
+            new ResourceLocation(BuildingGadgets.MODID,"textures/ui/checker.png")
     };
 
     private int timeIn = 0;
     private int slotSelected = -1;
 
     //  ItemStack itemStack;
-    private List<Integer> slots;
+    private ArrayList<Integer> slots;
 
     public ModeRadialMenu(ItemStack stack) {
         mc = Minecraft.getMinecraft();

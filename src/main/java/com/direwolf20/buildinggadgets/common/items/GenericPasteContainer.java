@@ -1,8 +1,10 @@
 package com.direwolf20.buildinggadgets.common.items;
 
+import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.tools.InventoryManipulation;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.Item;
@@ -19,6 +21,10 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 public class GenericPasteContainer extends Item {
+    public GenericPasteContainer() {
+        setCreativeTab(BuildingGadgets.buildingCreativeTab);
+    }
+
     public static void setPasteAmount(ItemStack stack, int amount) {
         NBTTagCompound tagCompound = stack.getTagCompound();
         if (tagCompound == null) {

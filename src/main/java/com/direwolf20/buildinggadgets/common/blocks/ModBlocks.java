@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.common.blocks;
 
+import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.Config;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlock;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockPowder;
@@ -11,15 +12,16 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+@GameRegistry.ObjectHolder(BuildingGadgets.MODID)
 public class ModBlocks {
 
-    @GameRegistry.ObjectHolder("buildinggadgets:effectblock")
+    @GameRegistry.ObjectHolder("effectblock")
     public static EffectBlock effectBlock;
-    @GameRegistry.ObjectHolder("buildinggadgets:constructionblock")
+    @GameRegistry.ObjectHolder("constructionblock")
     public static ConstructionBlock constructionBlock;
-    @GameRegistry.ObjectHolder("buildinggadgets:constructionblockpowder")
+    @GameRegistry.ObjectHolder("constructionblockpowder")
     public static ConstructionBlockPowder constructionBlockPowder;
-    @GameRegistry.ObjectHolder("buildinggadgets:templatemanager")
+    @GameRegistry.ObjectHolder("templatemanager")
     public static TemplateManager templateManager;
 
     @SideOnly(Side.CLIENT)

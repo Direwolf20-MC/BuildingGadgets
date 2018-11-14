@@ -54,7 +54,7 @@ public class ConstructionBlock extends Block implements IFacade {
     public ConstructionBlock() {
         super(Material.ROCK);
         setHardness(2.0f);
-        this.setCreativeTab(CreativeTabs.BUILDING_BLOCKS);
+        setCreativeTab(BuildingGadgets.buildingCreativeTab);
         setUnlocalizedName(BuildingGadgets.MODID + ".constructionblock");     // Used for localization (en_US.lang)
         setRegistryName("constructionblock");        // The unique name (within your mod) that identifies this block
         setDefaultState(blockState.getBaseState().withProperty(BRIGHT, true).withProperty(NEIGHBOR_BRIGHTNESS, false));

@@ -50,7 +50,6 @@ public class GadgetDestruction extends GadgetGeneric {
         setRegistryName("destructiontool");        // The unique name (within your mod) that identifies this item
         setUnlocalizedName(BuildingGadgets.MODID + ".destructiontool");     // Used for localization (en_US.lang)
         setMaxStackSize(1);
-        setCreativeTab(CreativeTabs.TOOLS);
         if (!Config.poweredByFE) {
             setMaxDamage(Config.durabilityDestruction);
         }
@@ -318,9 +317,9 @@ public class GadgetDestruction extends GadgetGeneric {
         if (currentBlock.getBlock().getBlockHardness(currentBlock, world, voidPos) < 0) return false;
 
         ItemStack tool = player.getHeldItemMainhand(); //Get the item stack and the block that we'll be rendering (From the Itemstack's NBT)
-        if (!(tool.getItem() instanceof GadgetBuilding)) {
+        if (!(tool.getItem() instanceof GadgetDestruction)) {
             tool = player.getHeldItemOffhand();
-            if (!(tool.getItem() instanceof GadgetBuilding)) {
+            if (!(tool.getItem() instanceof GadgetDestruction)) {
                 return false;
             }
         }

@@ -15,7 +15,6 @@ public class ConstructionPasteContainerT3 extends GenericPasteContainer {
         setRegistryName("constructionpastecontainert3");        // The unique name (within your mod) that identifies this item
         setUnlocalizedName(BuildingGadgets.MODID + ".constructionpastecontainert3");     // Used for localization (en_US.lang)
         setMaxStackSize(1);
-        setCreativeTab(CreativeTabs.TOOLS);
     }
 
     @SideOnly(Side.CLIENT)
