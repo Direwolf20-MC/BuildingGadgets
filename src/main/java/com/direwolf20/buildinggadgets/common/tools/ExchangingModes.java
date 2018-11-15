@@ -36,13 +36,13 @@ public class ExchangingModes {
                 return false;
             }
         }
-        if (worldBlockState.getBlock().getBlockHardness(worldBlockState, world, pos) < 0) {
+        if (worldBlockState.getBlockHardness(world, pos) < 0) {
             return false;
         }
         if (worldBlockState.getMaterial() == Material.AIR) {
             return false;
         }
-        if (worldBlockState.getBlock().getMaterial(worldBlockState).isLiquid()) {
+        if (worldBlockState.getMaterial().isLiquid()) {
             return false;
         }
         /*if (world.getBlockState(pos) != currentBlock || world.getBlockState(pos) == ModBlocks.effectBlock.getDefaultState() || world.getBlockState(pos) == setBlock || world.getTileEntity(pos) != null || currentBlock.getBlock().getBlockHardness(currentBlock, world, pos) < 0) {

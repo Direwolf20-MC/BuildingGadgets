@@ -21,6 +21,7 @@ import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -58,11 +59,11 @@ public class CommonProxy {
     public static void registerBlocks(RegistryEvent.Register<Block> event) {
         event.getRegistry().register(new EffectBlock());
         event.getRegistry().register(new TemplateManager());
-        GameRegistry.registerTileEntity(TemplateManagerTileEntity.class, BuildingGadgets.MODID + ":templateManager");
+        GameRegistry.registerTileEntity(TemplateManagerTileEntity.class, new ResourceLocation(BuildingGadgets.MODID, "templateManager"));
         if (Config.enablePaste) {
             event.getRegistry().register(new ConstructionBlock());
             event.getRegistry().register(new ConstructionBlockPowder());
-            GameRegistry.registerTileEntity(ConstructionBlockTileEntity.class, BuildingGadgets.MODID + "_constructionBlock");
+            GameRegistry.registerTileEntity(ConstructionBlockTileEntity.class, new ResourceLocation(BuildingGadgets.MODID,  "_constructionBlock"));
         }
     }
 
