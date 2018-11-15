@@ -4,7 +4,6 @@ import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.tools.InventoryManipulation;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.Item;
@@ -22,7 +21,7 @@ import javax.annotation.Nullable;
 
 public class GenericPasteContainer extends Item {
     public GenericPasteContainer() {
-        setCreativeTab(BuildingGadgets.buildingCreativeTab);
+        setCreativeTab(BuildingGadgets.BUILDING_CREATIVE_TAB);
     }
 
     public static void setPasteAmount(ItemStack stack, int amount) {

@@ -28,7 +28,7 @@ public class BuildingGadgets {
     public static final String VERSION = "@VERSION@";
     public static final String UPDATE_JSON = "@UPDATE@";
 
-    public static final CreativeTabs buildingCreativeTab = new CreativeTabs(I18n.format("buildingGadgets")) {
+    public static final CreativeTabs BUILDING_CREATIVE_TAB = new CreativeTabs(I18n.format("buildingGadgets")) {
         @Override
         public ItemStack getTabIconItem() {
             return new ItemStack(ModItems.gadgetBuilding);

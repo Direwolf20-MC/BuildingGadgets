@@ -21,7 +21,7 @@ import javax.annotation.Nullable;
 public class GadgetGeneric extends Item {
 
     public GadgetGeneric() {
-        setCreativeTab(BuildingGadgets.buildingCreativeTab);
+        setCreativeTab(BuildingGadgets.BUILDING_CREATIVE_TAB);
     }
 
     public int getEnergyMax() {

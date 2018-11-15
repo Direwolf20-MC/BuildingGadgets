@@ -30,7 +30,7 @@ public class TemplateManager extends Block {
         setHardness(2.0f);
         setUnlocalizedName(BuildingGadgets.MODID + ".templatemanager");
         setRegistryName("templatemanager");
-        setCreativeTab(BuildingGadgets.buildingCreativeTab);
+        setCreativeTab(BuildingGadgets.BUILDING_CREATIVE_TAB);
     }
 
     @SideOnly(Side.CLIENT)

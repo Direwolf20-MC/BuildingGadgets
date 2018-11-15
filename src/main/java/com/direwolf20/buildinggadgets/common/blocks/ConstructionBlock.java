@@ -15,7 +15,6 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.block.statemap.StateMapperBase;
 import net.minecraft.client.renderer.color.BlockColors;
-import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
@@ -54,7 +53,7 @@ public class ConstructionBlock extends Block implements IFacade {
     public ConstructionBlock() {
         super(Material.ROCK);
         setHardness(2.0f);
-        setCreativeTab(BuildingGadgets.buildingCreativeTab);
+        setCreativeTab(BuildingGadgets.BUILDING_CREATIVE_TAB);
         setUnlocalizedName(BuildingGadgets.MODID + ".constructionblock");     // Used for localization (en_US.lang)
         setRegistryName("constructionblock");        // The unique name (within your mod) that identifies this block
         setDefaultState(blockState.getBaseState().withProperty(BRIGHT, true).withProperty(NEIGHBOR_BRIGHTNESS, false));

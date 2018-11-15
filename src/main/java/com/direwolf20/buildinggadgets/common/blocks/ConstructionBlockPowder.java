@@ -29,7 +29,7 @@ public class ConstructionBlockPowder extends BlockFalling {
         setHardness(0.5f);
         setUnlocalizedName(BuildingGadgets.MODID + ".constructionblockpowder");     // Used for localization (en_US.lang)
         setRegistryName("constructionblockpowder");        // The unique name (within your mod) that identifies this block
-        setCreativeTab(BuildingGadgets.buildingCreativeTab);
+        setCreativeTab(BuildingGadgets.BUILDING_CREATIVE_TAB);
     }
 
     @SideOnly(Side.CLIENT)
