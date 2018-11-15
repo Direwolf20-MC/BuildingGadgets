@@ -457,7 +457,7 @@ public class GadgetDestruction extends GadgetGeneric {
     }
 
     private boolean destroyBlock(World world, BlockPos voidPos, EntityPlayer player) {
-        ItemStack tool = this.getGadget(player);
+        ItemStack tool = getGadget(player);
         if( tool == null )
             return false;
 

@@ -221,7 +221,7 @@ public class GadgetExchanger extends GadgetGeneric {
         }
         Set<BlockPos> coordinates = new HashSet<BlockPos>(coords);
 
-        ItemStack heldItem = this.getGadget(player);
+        ItemStack heldItem = getGadget(player);
         if( heldItem == null )
             return false;
 
@@ -260,7 +260,7 @@ public class GadgetExchanger extends GadgetGeneric {
             itemStack = setBlock.getBlock().getPickBlock(setBlock, null, world, pos, player);
         }
 
-        ItemStack tool = this.getGadget(player);
+        ItemStack tool = getGadget(player);
         if( tool == null )
             return false;
 

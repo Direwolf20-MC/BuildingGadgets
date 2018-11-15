@@ -47,8 +47,8 @@ public class ModeRadialMenu extends GuiScreen {
     private int slotSelected = -1;
 
     //  ItemStack itemStack;
-    private ArrayList<Integer> slots;
-private List<Integer> slots;
+    private List<Integer> slots;
+
     public ModeRadialMenu(ItemStack stack) {
         mc = Minecraft.getMinecraft();
 
@@ -65,7 +65,7 @@ private List<Integer> slots;
     }
 
     public void setSocketable(ItemStack stack) {
-        slots = new ArrayList();
+        slots = new ArrayList<>();
         if (stack.isEmpty())
             return;
 //        itemStack = stack;

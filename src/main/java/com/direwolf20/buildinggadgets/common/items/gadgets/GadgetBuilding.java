@@ -197,7 +197,7 @@ public class GadgetBuilding extends GadgetGeneric {
         List<BlockPos> undoCoords = new ArrayList<BlockPos>();
         Set<BlockPos> coordinates = new HashSet<BlockPos>(coords);
 
-        ItemStack heldItem = this.getGadget(player);
+        ItemStack heldItem = getGadget(player);
         if( heldItem == null )
             return false;
 
@@ -230,7 +230,7 @@ public class GadgetBuilding extends GadgetGeneric {
     }
 
     public boolean undoBuild(EntityPlayer player) {
-        ItemStack heldItem = this.getGadget(player);
+        ItemStack heldItem = getGadget(player);
         if( heldItem == null )
             return false;
 
@@ -276,7 +276,7 @@ public class GadgetBuilding extends GadgetGeneric {
         if (!player.isAllowEdit())
             return false;
 
-        ItemStack heldItem = this.getGadget(player);
+        ItemStack heldItem = getGadget(player);
         if( heldItem == null )
             return false;
 

@@ -104,7 +104,7 @@ public class GadgetGeneric extends Item {
     }
 
     @Nullable
-    public ItemStack getGadget(EntityPlayer player) {
+    public static ItemStack getGadget(EntityPlayer player) {
         ItemStack heldItem = player.getHeldItemMainhand();
 
         if (!(heldItem.getItem() instanceof GadgetGeneric)) {

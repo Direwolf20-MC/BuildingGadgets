@@ -535,7 +535,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
         if (pos.getY() < 0 || state.equals(Blocks.AIR.getDefaultState()) || !player.isAllowEdit())
             return;
 
-        ItemStack heldItem = this.getGadget(player);
+        ItemStack heldItem = getGadget(player);
         if( heldItem == null )
             return;
 
