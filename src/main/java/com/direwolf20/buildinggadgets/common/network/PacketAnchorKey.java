@@ -35,20 +35,17 @@ public class PacketAnchorKey implements IMessage {
 
         private void handle(MessageContext ctx) {
             EntityPlayerMP playerEntity = ctx.getServerHandler().player;
-            ItemStack heldItem = playerEntity.getHeldItem(EnumHand.MAIN_HAND);
-            if (!(heldItem.getItem() instanceof GadgetGeneric)) {
-                heldItem = playerEntity.getHeldItemOffhand();
-                if (!(heldItem.getItem() instanceof GadgetGeneric)) {
-                    return;
-                }
-            }
-            if (!heldItem.isEmpty() && heldItem.getItem() instanceof GadgetBuilding) {
+            ItemStack heldItem = GadgetGeneric.getGadget(playerEntity);
+            if( heldItem == null || heldItem.isEmpty() )
+                return;
+
+            if (heldItem.getItem() instanceof GadgetBuilding) {
                 GadgetUtils.anchorBlocks(playerEntity, heldItem);
-            } else if (!heldItem.isEmpty() && heldItem.getItem() instanceof GadgetExchanger) {
+            } else if (heldItem.getItem() instanceof GadgetExchanger) {
                 GadgetUtils.anchorBlocks(playerEntity, heldItem);
-            } else if (!heldItem.isEmpty() && heldItem.getItem() instanceof GadgetCopyPaste) {
+            } else if (heldItem.getItem() instanceof GadgetCopyPaste) {
                 GadgetCopyPaste.anchorBlocks(playerEntity, heldItem);
-            } else if (!heldItem.isEmpty() && heldItem.getItem() instanceof GadgetDestruction) {
+            } else if (heldItem.getItem() instanceof GadgetDestruction) {
                 GadgetDestruction.anchorBlocks(playerEntity, heldItem);
             }
         }

@@ -77,22 +77,19 @@ public class ClientProxy extends CommonProxy {
     @SubscribeEvent
     public static void renderWorldLastEvent(RenderWorldLastEvent evt) {
         Minecraft mc = Minecraft.getMinecraft();
-        EntityPlayer p = mc.player;
-        ItemStack heldItem = p.getHeldItemMainhand();
-        if (!(heldItem.getItem() instanceof GadgetGeneric)) {
-            heldItem = p.getHeldItemOffhand();
-            if (!(heldItem.getItem() instanceof GadgetGeneric)) {
-                return;
-            }
-        }
+        EntityPlayer player = mc.player;
+        ItemStack heldItem = GadgetGeneric.getGadget(player);
+        if( heldItem == null )
+            return;
+
         if (heldItem.getItem() instanceof GadgetBuilding) {
-            ToolRenders.renderBuilderOverlay(evt, p, heldItem);
+            ToolRenders.renderBuilderOverlay(evt, player, heldItem);
         } else if (heldItem.getItem() instanceof GadgetExchanger) {
-            ToolRenders.renderExchangerOverlay(evt, p, heldItem);
+            ToolRenders.renderExchangerOverlay(evt, player, heldItem);
         } else if (heldItem.getItem() instanceof GadgetCopyPaste) {
-            ToolRenders.renderPasteOverlay(evt, p, heldItem);
+            ToolRenders.renderPasteOverlay(evt, player, heldItem);
         } else if (heldItem.getItem() instanceof GadgetDestruction) {
-            ToolRenders.renderDestructionOverlay(evt, p, heldItem);
+            ToolRenders.renderDestructionOverlay(evt, player, heldItem);
         }
 
     }
