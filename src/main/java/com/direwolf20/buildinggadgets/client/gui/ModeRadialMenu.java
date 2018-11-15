@@ -48,7 +48,7 @@ public class ModeRadialMenu extends GuiScreen {
 
     //  ItemStack itemStack;
     private ArrayList<Integer> slots;
-
+private List<Integer> slots;
     public ModeRadialMenu(ItemStack stack) {
         mc = Minecraft.getMinecraft();
 

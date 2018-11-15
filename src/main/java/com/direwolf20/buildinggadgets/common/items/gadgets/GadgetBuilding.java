@@ -118,7 +118,7 @@ public class GadgetBuilding extends GadgetGeneric {
     @Override
     public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
         //On item use, if sneaking, select the block clicked on, else build -- This is called when a block in clicked on
-        if (!world.isRemote)
+        if (world.isRemote)
             return EnumActionResult.FAIL;
 
         ItemStack stack = player.getHeldItem(hand);
