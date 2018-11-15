@@ -43,20 +43,17 @@ public class PacketToggleMode implements IMessage {
 
         private void handle(PacketToggleMode message, MessageContext ctx) {
             EntityPlayerMP playerEntity = ctx.getServerHandler().player;
-            ItemStack heldItem = playerEntity.getHeldItem(EnumHand.MAIN_HAND);
-            if (!(heldItem.getItem() instanceof GadgetGeneric)) {
-                heldItem = playerEntity.getHeldItemOffhand();
-                if (!(heldItem.getItem() instanceof GadgetGeneric)) {
-                    return;
-                }
-            }
-            if (!heldItem.isEmpty() && heldItem.getItem() instanceof GadgetBuilding) {
+            ItemStack heldItem = GadgetGeneric.getGadget(playerEntity);
+            if( heldItem == null || !heldItem.isEmpty())
+                return;
+
+            if (heldItem.getItem() instanceof GadgetBuilding) {
                 GadgetBuilding gadgetBuilding = (GadgetBuilding) (heldItem.getItem());
                 gadgetBuilding.setMode(playerEntity, heldItem, message.mode);
-            } else if (!heldItem.isEmpty() && heldItem.getItem() instanceof GadgetExchanger) {
+            } else if (heldItem.getItem() instanceof GadgetExchanger) {
                 GadgetExchanger gadgetExchanger = (GadgetExchanger) (heldItem.getItem());
                 gadgetExchanger.setMode(playerEntity, heldItem, message.mode);
-            } else if (!heldItem.isEmpty() && heldItem.getItem() instanceof GadgetCopyPaste) {
+            } else if (heldItem.getItem() instanceof GadgetCopyPaste) {
                 GadgetCopyPaste gadgetCopyPaste = (GadgetCopyPaste) (heldItem.getItem());
                 gadgetCopyPaste.setMode(playerEntity, heldItem, message.mode);
             }
