@@ -23,7 +23,7 @@ import java.util.stream.Stream;
 public class TemplateManagerTileEntity extends TileEntity {
 
     private static final Set<Item> allowedItemsLeft = ImmutableSet.of(ModItems.gadgetCopyPaste, ModItems.template);
-    private static final Set<Item> allowedItemsRight = Stream.of(Items.PAPER, ModItems.template).collect(Collectors.toSet());
+    private static final Set<Item> allowedItemsRight = ImmutableSet.of(Items.PAPER, ModItems.template);
 
     public static final int SIZE = 2;
 

@@ -643,4 +643,11 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
         }
         if (success) setLastBuild(heldItem, null, 0);
     }
+
+    public static ItemStack getGadget(EntityPlayer player) {
+        ItemStack stack = GadgetGeneric.getGadget(player);
+        if( stack == null || !(stack.getItem() instanceof GadgetCopyPaste) )
+            return null;
+        return stack;
+    }
 }

@@ -25,10 +25,7 @@ public class BreakEventHandler {
             return;
 
         List<ItemStack> drops = event.getDrops();
-        if ((heldItem.getItem() instanceof GadgetGeneric)) {
-            drops.removeIf(item -> InventoryManipulation.giveItem(item, player));
-        }
-
+        drops.removeIf(item -> InventoryManipulation.giveItem(item, player));
     }
 }
 

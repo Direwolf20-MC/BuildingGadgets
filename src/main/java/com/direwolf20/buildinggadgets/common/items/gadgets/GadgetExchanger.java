@@ -317,6 +317,13 @@ public class GadgetExchanger extends GadgetGeneric {
         return false;
     }
 
+    public static ItemStack getGadget(EntityPlayer player) {
+        ItemStack stack = GadgetGeneric.getGadget(player);
+        if( stack == null || !(stack.getItem() instanceof GadgetExchanger) )
+            return null;
+        return stack;
+    }
+
     @Override
     public int getMaxItemUseDuration(ItemStack stack) {
         return 20;

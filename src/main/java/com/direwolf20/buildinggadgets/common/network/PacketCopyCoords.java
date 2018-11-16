@@ -50,13 +50,10 @@ public class PacketCopyCoords implements IMessage {
 
         private void handle(PacketCopyCoords message, MessageContext ctx) {
             EntityPlayerMP playerEntity = ctx.getServerHandler().player;
-            ItemStack heldItem = playerEntity.getHeldItem(EnumHand.MAIN_HAND);
-            if (!(heldItem.getItem() instanceof GadgetCopyPaste)) {
-                heldItem = playerEntity.getHeldItemOffhand();
-                if (!(heldItem.getItem() instanceof GadgetCopyPaste)) {
-                    return;
-                }
-            }
+
+            ItemStack heldItem = GadgetCopyPaste.getGadget(playerEntity);
+            if( heldItem == null ) return;
+
             BlockPos startPos = message.start;
             BlockPos endPos = message.end;
             GadgetCopyPaste tool = ModItems.gadgetCopyPaste;

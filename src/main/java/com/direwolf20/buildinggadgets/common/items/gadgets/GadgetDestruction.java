@@ -315,13 +315,8 @@ public class GadgetDestruction extends GadgetGeneric {
         if ((te != null) && !(te instanceof ConstructionBlockTileEntity)) return false;
         if (currentBlock.getBlockHardness(world, voidPos) < 0) return false;
 
-        ItemStack tool = player.getHeldItemMainhand(); //Get the item stack and the block that we'll be rendering (From the Itemstack's NBT)
-        if (!(tool.getItem() instanceof GadgetDestruction)) {
-            tool = player.getHeldItemOffhand();
-            if (!(tool.getItem() instanceof GadgetDestruction)) {
-                return false;
-            }
-        }
+        ItemStack tool = getGadget(player);
+        if(tool == null) return false;
 
         if (!player.isAllowEdit()) {
             return false;
@@ -468,5 +463,12 @@ public class GadgetDestruction extends GadgetGeneric {
 
         world.spawnEntity(new BlockBuildEntity(world, voidPos, player, world.getBlockState(voidPos), 2, Blocks.AIR.getDefaultState(), false));
         return true;
+    }
+
+    public static ItemStack getGadget(EntityPlayer player) {
+        ItemStack stack = GadgetGeneric.getGadget(player);
+        if( stack == null || !(stack.getItem() instanceof GadgetDestruction) )
+            return null;
+        return stack;
     }
 }

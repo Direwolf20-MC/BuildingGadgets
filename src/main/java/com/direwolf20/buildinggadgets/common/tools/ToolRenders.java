@@ -58,13 +58,10 @@ public class ToolRenders {
                 startBlock = world.getBlockState(lookingAt.getBlockPos());
             }
             if (startBlock != ModBlocks.effectBlock.getDefaultState()) {
-                ItemStack heldItem = player.getHeldItemMainhand(); //Get the item stack and the block that we'll be rendering (From the Itemstack's NBT)
-                if (!(heldItem.getItem() instanceof GadgetBuilding)) {
-                    heldItem = player.getHeldItemOffhand();
-                    if (!(heldItem.getItem() instanceof GadgetBuilding)) {
-                        return;
-                    }
-                }
+
+                ItemStack heldItem = GadgetBuilding.getGadget(player);
+                if( heldItem == null ) return;
+
                 IBlockState renderBlockState = getToolBlock(heldItem);
                 Minecraft mc = Minecraft.getMinecraft();
                 mc.renderEngine.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
@@ -190,13 +187,9 @@ public class ToolRenders {
                 startBlock = world.getBlockState(lookingAt.getBlockPos());
             }
             if (startBlock != ModBlocks.effectBlock.getDefaultState()) {
-                ItemStack heldItem = player.getHeldItemMainhand(); //Get the item stack and the block that we'll be rendering (From the Itemstack's NBT)
-                if (!(heldItem.getItem() instanceof GadgetExchanger)) {
-                    heldItem = player.getHeldItemOffhand();
-                    if (!(heldItem.getItem() instanceof GadgetExchanger)) {
-                        return;
-                    }
-                }
+                ItemStack heldItem = GadgetExchanger.getGadget(player);
+                if( heldItem == null ) return;
+
                 IBlockState renderBlockState = getToolBlock(heldItem);
                 Minecraft mc = Minecraft.getMinecraft();
                 mc.renderEngine.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
@@ -324,13 +317,9 @@ public class ToolRenders {
         EnumFacing facing = (GadgetDestruction.getAnchorSide(stack) == null) ? lookingAt.sideHit : GadgetDestruction.getAnchorSide(stack);
         if (startBlock == ModBlocks.effectBlock.getDefaultState()) return;
 
-        ItemStack heldItem = player.getHeldItemMainhand(); //Get the item stack and the block that we'll be rendering (From the Itemstack's NBT)
-        if (!(heldItem.getItem() instanceof GadgetDestruction)) {
-            heldItem = player.getHeldItemOffhand();
-            if (!(heldItem.getItem() instanceof GadgetDestruction)) {
-                return;
-            }
-        }
+        ItemStack heldItem = GadgetDestruction.getGadget(player);
+        if(heldItem == null) return;
+
         if (!GadgetDestruction.getOverlay(heldItem)) return;
         Minecraft mc = Minecraft.getMinecraft();
         mc.renderEngine.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);

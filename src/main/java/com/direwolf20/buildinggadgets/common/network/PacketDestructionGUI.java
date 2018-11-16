@@ -53,13 +53,10 @@ public class PacketDestructionGUI implements IMessage {
 
         private void handle(PacketDestructionGUI message, MessageContext ctx) {
             EntityPlayerMP playerEntity = ctx.getServerHandler().player;
-            ItemStack heldItem = playerEntity.getHeldItem(EnumHand.MAIN_HAND);
-            if (!(heldItem.getItem() instanceof GadgetDestruction)) {
-                heldItem = playerEntity.getHeldItemOffhand();
-                if (!(heldItem.getItem() instanceof GadgetDestruction)) {
-                    return;
-                }
-            }
+
+            ItemStack heldItem = GadgetDestruction.getGadget(playerEntity);
+            if(heldItem == null) return;
+
             GadgetDestruction.setToolValue(heldItem, message.left, "left");
             GadgetDestruction.setToolValue(heldItem, message.right, "right");
             GadgetDestruction.setToolValue(heldItem, message.up, "up");

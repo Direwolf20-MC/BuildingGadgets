@@ -47,13 +47,10 @@ public class PacketPasteGUI implements IMessage {
 
         private void handle(PacketPasteGUI message, MessageContext ctx) {
             EntityPlayerMP playerEntity = ctx.getServerHandler().player;
-            ItemStack heldItem = playerEntity.getHeldItem(EnumHand.MAIN_HAND);
-            if (!(heldItem.getItem() instanceof GadgetCopyPaste)) {
-                heldItem = playerEntity.getHeldItemOffhand();
-                if (!(heldItem.getItem() instanceof GadgetCopyPaste)) {
-                    return;
-                }
-            }
+
+            ItemStack heldItem = GadgetCopyPaste.getGadget(playerEntity);
+            if( heldItem == null ) return;
+
             GadgetCopyPaste.setX(heldItem, message.X);
             GadgetCopyPaste.setY(heldItem, message.Y);
             GadgetCopyPaste.setZ(heldItem, message.Z);
