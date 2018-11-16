@@ -145,6 +145,7 @@ public class ConstructionBlock extends Block implements IFacade {
     }
 
     @Override
+    @Deprecated
     public EnumBlockRenderType getRenderType(IBlockState state) {
         return EnumBlockRenderType.MODEL;
     }
@@ -163,11 +164,13 @@ public class ConstructionBlock extends Block implements IFacade {
     }*/
 
     @Override
+    @Deprecated
     public boolean isOpaqueCube(IBlockState p_isFullBlock_1_) {
         return false;
     }
 
     @Override
+    @Deprecated
     public boolean isFullCube(IBlockState state) {
         return false;
     }
@@ -196,6 +199,7 @@ public class ConstructionBlock extends Block implements IFacade {
     }
 
     @Override
+    @Deprecated
     public BlockFaceShape getBlockFaceShape(IBlockAccess worldIn, IBlockState state, BlockPos pos, EnumFacing face) {
         IBlockState mimicBlock = getActualMimicBlock(worldIn, pos);
         try {
@@ -206,6 +210,7 @@ public class ConstructionBlock extends Block implements IFacade {
     }
 
     @Override
+    @Deprecated
     public void addCollisionBoxToList(IBlockState state, World worldIn, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, @Nullable Entity entityIn, boolean isActualState) {
         IBlockState mimicBlock = getActualMimicBlock(worldIn, pos);
         if (mimicBlock == null) {
@@ -221,6 +226,7 @@ public class ConstructionBlock extends Block implements IFacade {
 
     @Override
     @Nullable
+    @Deprecated
     public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, IBlockAccess worldIn, BlockPos pos) {
         IBlockState mimicBlock = getActualMimicBlock(worldIn, pos);
         if (mimicBlock == null) {
@@ -234,6 +240,7 @@ public class ConstructionBlock extends Block implements IFacade {
     }
 
     @Override
+    @Deprecated
     @SideOnly(Side.CLIENT)
     public boolean shouldSideBeRendered(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, EnumFacing side) {
         FakeRenderWorld fakeWorld = new FakeRenderWorld();
@@ -260,6 +267,7 @@ public class ConstructionBlock extends Block implements IFacade {
     }
 
     @Override
+    @Deprecated
     public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
         IBlockState mimicBlock = getActualMimicBlock(source, pos);
         if (mimicBlock == null) {
@@ -273,6 +281,7 @@ public class ConstructionBlock extends Block implements IFacade {
     }
 
     @Override
+    @Deprecated
     @SideOnly(Side.CLIENT)
     public AxisAlignedBB getSelectedBoundingBox(IBlockState state, World worldIn, BlockPos pos) {
         IBlockState mimicBlock = getActualMimicBlock(worldIn, pos);
@@ -300,6 +309,7 @@ public class ConstructionBlock extends Block implements IFacade {
     }
 
     @Override
+    @Deprecated
     @SideOnly(Side.CLIENT)
     public float getAmbientOcclusionLightValue(IBlockState state) {
         Boolean bright = state.getValue(ConstructionBlock.BRIGHT);
@@ -311,11 +321,13 @@ public class ConstructionBlock extends Block implements IFacade {
     }
 
     @Override
+    @Deprecated
     public boolean getUseNeighborBrightness(IBlockState state) {
         return state.getValue(ConstructionBlock.NEIGHBOR_BRIGHTNESS);
     }
 
     @Override
+    @Deprecated
     public IBlockState getStateFromMeta(int meta) {
         return getDefaultState()
                 .withProperty(BRIGHT, (meta % 2 == 1))
@@ -328,15 +340,22 @@ public class ConstructionBlock extends Block implements IFacade {
         return state.getValue(NEIGHBOR_BRIGHTNESS) ? value + 2 : value;
     }
 
-
-    //The below implements support for CTM's Connected Textures to work properly
+    /**
+     * The below implements support for CTM's Connected Textures to work properly
+     *
+     * @param world IBlockAccess
+     * @param pos BlockPos
+     * @param side EnumFacing
+     * @return IBlockState
+     *
+     * @deprecated see {@link team.chisel.ctm.api.IFacade#getFacade(IBlockAccess, BlockPos, EnumFacing, BlockPos)}
+     */
     @Override
     @Nonnull
+    @Deprecated
     public IBlockState getFacade(@Nonnull IBlockAccess world, @Nonnull BlockPos pos, @Nullable EnumFacing side) {
         IBlockState mimicBlock = getActualMimicBlock(world, pos);
         return mimicBlock != null ? mimicBlock : world.getBlockState(pos);
         //return mimicBlock;
     }
-
-
 }
