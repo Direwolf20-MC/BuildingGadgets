@@ -13,6 +13,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextComponentString;
@@ -79,8 +80,8 @@ public class DestructionGUI extends GuiScreen {
         nullCheckTextBoxes();
 
         //NOTE: the id always has to be different or else it might get called twice or never!
-        this.buttonList.add(new GuiButton(1, this.guiLeft + 145, this.guiTop + 125, 40, 20, "Ok"));
-        this.buttonList.add(new GuiButton(2, this.guiLeft + 245, this.guiTop + 125, 40, 20, "Cancel"));
+        this.buttonList.add(new GuiButton(1, this.guiLeft + 145, this.guiTop + 125, 40, 20, I18n.format("singles.buildinggadgets.confirm")));
+        this.buttonList.add(new GuiButton(2, this.guiLeft + 245, this.guiTop + 125, 40, 20, I18n.format("singles.buildinggadgets.cancel")));
         //this.buttonList.add(new GuiButton(3, this.guiLeft + 245, this.guiTop + 60, 40, 20, "Clear"));
         //this.buttonList.add(new GuiButton(4, this.guiLeft + 325, this.guiTop + 60, 80, 20, "CoordsMode"));
         this.buttonList.add(new DireButton(5, this.guiLeft + 65, this.guiTop + 59, 10, 10, "-"));
@@ -106,7 +107,7 @@ public class DestructionGUI extends GuiScreen {
             if (i < 0) i = 0;
             if (i > 16) i = 16;
             textField.setText(String.valueOf(i));
-        } catch (Throwable t) {
+        } catch (NumberFormatException t) {
             this.mc.displayGuiScreen(null);
         }
     }
@@ -120,11 +121,11 @@ public class DestructionGUI extends GuiScreen {
         this.up.drawTextBox();
         this.down.drawTextBox();
         this.depth.drawTextBox();
-        fontRenderer.drawStringWithShadow("Left", this.guiLeft + 35, this.guiTop + 60, 0xFFFFFF);
-        fontRenderer.drawStringWithShadow("Right", this.guiLeft + 278, this.guiTop + 60, 0xFFFFFF);
-        fontRenderer.drawStringWithShadow("Up", this.guiLeft + 170, this.guiTop + 30, 0xFFFFFF);
-        fontRenderer.drawStringWithShadow("Down", this.guiLeft + 158, this.guiTop + 90, 0xFFFFFF);
-        fontRenderer.drawStringWithShadow("Depth", this.guiLeft + 155, this.guiTop + 60, 0xFFFFFF);
+        fontRenderer.drawStringWithShadow(I18n.format("singles.buildinggadgets.left"), this.guiLeft + 35, this.guiTop + 60, 0xFFFFFF);
+        fontRenderer.drawStringWithShadow(I18n.format("singles.buildinggadgets.right"), this.guiLeft + 278, this.guiTop + 60, 0xFFFFFF);
+        fontRenderer.drawStringWithShadow(I18n.format("singles.buildinggadgets.up"), this.guiLeft + 170, this.guiTop + 30, 0xFFFFFF);
+        fontRenderer.drawStringWithShadow(I18n.format("singles.buildinggadgets.down"), this.guiLeft + 158, this.guiTop + 90, 0xFFFFFF);
+        fontRenderer.drawStringWithShadow(I18n.format("singles.buildinggadgets.depth"), this.guiLeft + 155, this.guiTop + 60, 0xFFFFFF);
         super.drawScreen(mouseX, mouseY, partialTicks);
     }
 
@@ -147,9 +148,6 @@ public class DestructionGUI extends GuiScreen {
     }
 
     protected boolean sizeCheckBoxes() {
-        if( left.getText().equals("") || right.getText().equals("") || down.getText().equals("") || up.getText().equals("") || depth.getText().equals(""))
-            return false;
-
         if (Integer.parseInt(left.getText()) + Integer.parseInt(right.getText()) > 16) return false;
         if (Integer.parseInt(up.getText()) + Integer.parseInt(down.getText()) > 16) return false;
         if (Integer.parseInt(depth.getText()) > 16) return false;

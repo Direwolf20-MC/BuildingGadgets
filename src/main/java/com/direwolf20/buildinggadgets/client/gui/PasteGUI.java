@@ -86,7 +86,7 @@ public class PasteGUI extends GuiScreen {
             if (i < -16) i = -16;
             if (i > 16) i = 16;
             textField.setText(String.valueOf(i));
-        } catch (Throwable t) {
+        } catch (NumberFormatException t) {
             this.mc.displayGuiScreen(null);
         }
     }
