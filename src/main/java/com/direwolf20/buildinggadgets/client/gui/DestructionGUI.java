@@ -129,7 +129,7 @@ public class DestructionGUI extends GuiScreen {
         super.drawScreen(mouseX, mouseY, partialTicks);
     }
 
-    protected void nullCheckTextBoxes() {
+    private void nullCheckTextBoxes() {
         if (left.getText() == "") {
             left.setText(String.valueOf(GadgetDestruction.getToolValue(destructionTool, "left")));
         }
@@ -147,7 +147,10 @@ public class DestructionGUI extends GuiScreen {
         }
     }
 
-    protected boolean sizeCheckBoxes() {
+    private boolean sizeCheckBoxes() {
+        if( !isNumeric(left.getText()) || !isNumeric(right.getText()) || !isNumeric(up.getText()) || !isNumeric(down.getText()) || !isNumeric(depth.getText()) )
+            return false;
+
         if (Integer.parseInt(left.getText()) + Integer.parseInt(right.getText()) > 16) return false;
         if (Integer.parseInt(up.getText()) + Integer.parseInt(down.getText()) > 16) return false;
         if (Integer.parseInt(depth.getText()) > 16) return false;
@@ -156,6 +159,7 @@ public class DestructionGUI extends GuiScreen {
         if (Integer.parseInt(up.getText()) < 0) return false;
         if (Integer.parseInt(down.getText()) < 0) return false;
         if (Integer.parseInt(depth.getText()) < 0) return false;
+
         return true;
     }
 
@@ -262,5 +266,14 @@ public class DestructionGUI extends GuiScreen {
     @Override
     public boolean doesGuiPauseGame() {
         return false;
+    }
+
+    // Todo: Move this to a utils package logically
+    private static boolean isNumeric(String str)
+    {
+        for (char c : str.toCharArray())
+            if (!Character.isDigit(c)) return false;
+
+        return true;
     }
 }
