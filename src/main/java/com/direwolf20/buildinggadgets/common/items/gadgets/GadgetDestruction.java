@@ -401,8 +401,6 @@ public class GadgetDestruction extends GadgetGeneric {
 
     public void undo(EntityPlayer player, ItemStack stack) {
         World world = player.world;
-        Map<BlockPos, IBlockState> posStateMap = new HashMap<BlockPos, IBlockState>();
-        Map<BlockPos, IBlockState> pasteStateMap = new HashMap<BlockPos, IBlockState>();
         WorldSave worldSave = WorldSave.getWorldSaveDestruction(world);
         NBTTagCompound tagCompound = worldSave.getCompoundFromUUID(getUUID(stack));
         if (tagCompound == null) return;
