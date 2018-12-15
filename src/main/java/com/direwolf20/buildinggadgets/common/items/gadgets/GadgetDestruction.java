@@ -160,11 +160,10 @@ public class GadgetDestruction extends GadgetGeneric {
         }
         if (tagCompound.hasKey("overlay")) {
             return tagCompound.getBoolean("overlay");
-        } else {
-            tagCompound.setBoolean("overlay", true);
-            stack.setTagCompound(tagCompound);
-            return true;
         }
+        tagCompound.setBoolean("overlay", true);
+        stack.setTagCompound(tagCompound);
+        return true;
     }
 
     public static void setOverlay(ItemStack stack, boolean showOverlay) {

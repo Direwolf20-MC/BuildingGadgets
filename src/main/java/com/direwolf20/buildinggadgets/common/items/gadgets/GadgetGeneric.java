@@ -130,8 +130,7 @@ public class GadgetGeneric extends Item {
             IEnergyStorage energy = CapabilityProviderEnergy.getCap(tool);
             return this.getEnergyCost() <= energy.getEnergyStored();
         }
-        else
-            return tool.getItemDamage() < tool.getMaxDamage() || tool.isItemStackDamageable();
+        return tool.getItemDamage() < tool.getMaxDamage() || tool.isItemStackDamageable();
     }
 
     public void applyDamage(ItemStack tool, EntityPlayer player) {
