@@ -536,7 +536,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
             return;
 
         ItemStack heldItem = getGadget(player);
-        if( heldItem == null )
+        if (heldItem.isEmpty())
             return;
 
         if (ModItems.gadgetCopyPaste.getStartPos(heldItem) == null || ModItems.gadgetCopyPaste.getEndPos(heldItem) == null)
@@ -646,8 +646,9 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
 
     public static ItemStack getGadget(EntityPlayer player) {
         ItemStack stack = GadgetGeneric.getGadget(player);
-        if( stack == null || !(stack.getItem() instanceof GadgetCopyPaste) )
-            return null;
+        if (!(stack.getItem() instanceof GadgetCopyPaste))
+            return ItemStack.EMPTY;
+
         return stack;
     }
 }

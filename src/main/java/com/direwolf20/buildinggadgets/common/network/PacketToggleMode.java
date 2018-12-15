@@ -44,7 +44,7 @@ public class PacketToggleMode implements IMessage {
         private void handle(PacketToggleMode message, MessageContext ctx) {
             EntityPlayerMP playerEntity = ctx.getServerHandler().player;
             ItemStack heldItem = GadgetGeneric.getGadget(playerEntity);
-            if( heldItem == null || heldItem.isEmpty())
+            if (heldItem.isEmpty())
                 return;
 
             if (heldItem.getItem() instanceof GadgetBuilding) {

@@ -103,18 +103,14 @@ public class GadgetGeneric extends Item {
         return false;
     }
 
-    @Nullable
     public static ItemStack getGadget(EntityPlayer player) {
         ItemStack heldItem = player.getHeldItemMainhand();
-
         if (!(heldItem.getItem() instanceof GadgetGeneric)) {
-
             heldItem = player.getHeldItemOffhand();
             if (!(heldItem.getItem() instanceof GadgetGeneric)) {
-                return null;
+                return ItemStack.EMPTY;
             }
         }
-
         return heldItem;
     }
 

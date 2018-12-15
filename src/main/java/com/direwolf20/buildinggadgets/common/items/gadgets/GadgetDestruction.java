@@ -316,7 +316,7 @@ public class GadgetDestruction extends GadgetGeneric {
         if (currentBlock.getBlockHardness(world, voidPos) < 0) return false;
 
         ItemStack tool = getGadget(player);
-        if(tool == null) return false;
+        if (tool.isEmpty()) return false;
 
         if (!player.isAllowEdit()) {
             return false;
@@ -453,7 +453,7 @@ public class GadgetDestruction extends GadgetGeneric {
 
     private boolean destroyBlock(World world, BlockPos voidPos, EntityPlayer player) {
         ItemStack tool = getGadget(player);
-        if( tool == null )
+        if (tool.isEmpty())
             return false;
 
         if( !this.canUse(tool, player) )
@@ -467,8 +467,9 @@ public class GadgetDestruction extends GadgetGeneric {
 
     public static ItemStack getGadget(EntityPlayer player) {
         ItemStack stack = GadgetGeneric.getGadget(player);
-        if( stack == null || !(stack.getItem() instanceof GadgetDestruction) )
-            return null;
+        if (!(stack.getItem() instanceof GadgetDestruction))
+            return ItemStack.EMPTY;
+
         return stack;
     }
 }

@@ -79,7 +79,7 @@ public class ClientProxy extends CommonProxy {
         Minecraft mc = Minecraft.getMinecraft();
         EntityPlayer player = mc.player;
         ItemStack heldItem = GadgetGeneric.getGadget(player);
-        if( heldItem == null )
+        if (heldItem.isEmpty())
             return;
 
         if (heldItem.getItem() instanceof GadgetBuilding) {

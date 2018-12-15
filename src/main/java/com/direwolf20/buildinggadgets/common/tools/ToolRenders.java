@@ -60,7 +60,7 @@ public class ToolRenders {
             if (startBlock != ModBlocks.effectBlock.getDefaultState()) {
 
                 ItemStack heldItem = GadgetBuilding.getGadget(player);
-                if( heldItem == null ) return;
+                if (heldItem.isEmpty()) return;
 
                 IBlockState renderBlockState = getToolBlock(heldItem);
                 Minecraft mc = Minecraft.getMinecraft();
@@ -188,7 +188,7 @@ public class ToolRenders {
             }
             if (startBlock != ModBlocks.effectBlock.getDefaultState()) {
                 ItemStack heldItem = GadgetExchanger.getGadget(player);
-                if( heldItem == null ) return;
+                if (heldItem.isEmpty()) return;
 
                 IBlockState renderBlockState = getToolBlock(heldItem);
                 Minecraft mc = Minecraft.getMinecraft();
@@ -318,7 +318,7 @@ public class ToolRenders {
         if (startBlock == ModBlocks.effectBlock.getDefaultState()) return;
 
         ItemStack heldItem = GadgetDestruction.getGadget(player);
-        if(heldItem == null) return;
+        if (heldItem.isEmpty()) return;
 
         if (!GadgetDestruction.getOverlay(heldItem)) return;
         Minecraft mc = Minecraft.getMinecraft();

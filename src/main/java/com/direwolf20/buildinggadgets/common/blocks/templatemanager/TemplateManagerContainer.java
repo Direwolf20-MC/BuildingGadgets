@@ -61,7 +61,6 @@ public class TemplateManagerContainer extends Container {
         //}
     }
 
-    @Nullable
     @Override
     public ItemStack transferStackInSlot(EntityPlayer playerIn, int index) {
         ItemStack itemstack = ItemStack.EMPTY;
