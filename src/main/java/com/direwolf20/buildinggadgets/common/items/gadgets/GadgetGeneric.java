@@ -132,7 +132,7 @@ public class GadgetGeneric extends Item {
 
         if (Config.poweredByFE) {
             IEnergyStorage energy = CapabilityProviderEnergy.getCap(tool);
-            return this.getEnergyCost() > energy.getEnergyStored();
+            return this.getEnergyCost() <= energy.getEnergyStored();
         }
         else
             return tool.getItemDamage() < tool.getMaxDamage() || tool.isItemStackDamageable();
