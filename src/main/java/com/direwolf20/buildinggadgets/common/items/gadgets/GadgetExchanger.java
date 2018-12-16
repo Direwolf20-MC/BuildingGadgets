@@ -12,7 +12,6 @@ import com.direwolf20.buildinggadgets.common.tools.VectorTools;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
@@ -222,7 +221,7 @@ public class GadgetExchanger extends GadgetGeneric {
         Set<BlockPos> coordinates = new HashSet<BlockPos>(coords);
 
         ItemStack heldItem = getGadget(player);
-        if( heldItem == null )
+        if (heldItem.isEmpty())
             return false;
 
         IBlockState blockState = getToolBlock(heldItem);
@@ -261,7 +260,7 @@ public class GadgetExchanger extends GadgetGeneric {
         }
 
         ItemStack tool = getGadget(player);
-        if( tool == null )
+        if (tool.isEmpty())
             return false;
 
         NonNullList<ItemStack> drops = NonNullList.create();
@@ -319,8 +318,9 @@ public class GadgetExchanger extends GadgetGeneric {
 
     public static ItemStack getGadget(EntityPlayer player) {
         ItemStack stack = GadgetGeneric.getGadget(player);
-        if( stack == null || !(stack.getItem() instanceof GadgetExchanger) )
-            return null;
+        if (!(stack.getItem() instanceof GadgetExchanger))
+            return ItemStack.EMPTY;
+
         return stack;
     }
 

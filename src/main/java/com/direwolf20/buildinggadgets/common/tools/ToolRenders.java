@@ -60,7 +60,7 @@ public class ToolRenders {
             if (startBlock != ModBlocks.effectBlock.getDefaultState()) {
 
                 ItemStack heldItem = GadgetBuilding.getGadget(player);
-                if( heldItem == null ) return;
+                if (heldItem.isEmpty()) return;
 
                 IBlockState renderBlockState = getToolBlock(heldItem);
                 Minecraft mc = Minecraft.getMinecraft();
@@ -188,7 +188,7 @@ public class ToolRenders {
             }
             if (startBlock != ModBlocks.effectBlock.getDefaultState()) {
                 ItemStack heldItem = GadgetExchanger.getGadget(player);
-                if( heldItem == null ) return;
+                if (heldItem.isEmpty()) return;
 
                 IBlockState renderBlockState = getToolBlock(heldItem);
                 Minecraft mc = Minecraft.getMinecraft();
@@ -318,7 +318,7 @@ public class ToolRenders {
         if (startBlock == ModBlocks.effectBlock.getDefaultState()) return;
 
         ItemStack heldItem = GadgetDestruction.getGadget(player);
-        if(heldItem == null) return;
+        if (heldItem.isEmpty()) return;
 
         if (!GadgetDestruction.getOverlay(heldItem)) return;
         Minecraft mc = Minecraft.getMinecraft();
@@ -327,7 +327,6 @@ public class ToolRenders {
         ArrayList<BlockPos> coordinates = GadgetDestruction.getArea(world, startBlock, facing, player, heldItem);
 
         //Prepare the block rendering
-        BlockRendererDispatcher dispatcher = Minecraft.getMinecraft().getBlockRendererDispatcher();
         BlockRenderLayer origLayer = MinecraftForgeClient.getRenderLayer();
 
         //Calculate the players current position, which is needed later
@@ -377,7 +376,7 @@ public class ToolRenders {
             GlStateManager.disableLighting();
             GlStateManager.disableTexture2D();
             //renderBoxSolid(t, bufferBuilder, a.getX(), a.getY(), a.getZ()+1, b.getX()+1, b.getY()+1, b.getZ()+1, 1, 1, 1);
-            renderBoxSolid(t, bufferBuilder, 0, 0, -1, 1, 1, 0, 1, 1, 1);
+            renderBoxSolid(t, bufferBuilder, 0, 0, -1, 1, 1, 0, 1, 0, 0, 0.5f);
             GlStateManager.enableTexture2D();
             GlStateManager.enableLighting();
             //GlStateManager.enableCull();
@@ -543,7 +542,7 @@ public class ToolRenders {
         GlStateManager.glLineWidth(1.0F);
     }
 
-    private static void renderBoxSolid(Tessellator tessellator, BufferBuilder bufferBuilder, double startX, double startY, double startZ, double endX, double endY, double endZ, int R, int G, int B) {
+    private static void renderBoxSolid(Tessellator tessellator, BufferBuilder bufferBuilder, double startX, double startY, double startZ, double endX, double endY, double endZ, float red, float green, float blue, float alpha) {
         bufferBuilder.begin(7, DefaultVertexFormats.POSITION_COLOR);
         double minX = startX;
         double minY = startY;
@@ -551,11 +550,6 @@ public class ToolRenders {
         double maxX = endX;
         double maxY = endY;
         double maxZ = endZ;
-        float red = 1f;
-        float green = 0f;
-        float blue = 0f;
-
-        float alpha = (0.5f);
 
         //down
         bufferBuilder.pos(minX, minY, minZ).color(red, green, blue, alpha).endVertex();

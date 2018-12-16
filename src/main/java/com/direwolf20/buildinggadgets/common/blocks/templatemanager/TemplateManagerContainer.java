@@ -8,8 +8,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 
-import javax.annotation.Nullable;
-
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 
 public class TemplateManagerContainer extends Container {
@@ -61,7 +59,6 @@ public class TemplateManagerContainer extends Container {
         //}
     }
 
-    @Nullable
     @Override
     public ItemStack transferStackInSlot(EntityPlayer playerIn, int index) {
         ItemStack itemstack = ItemStack.EMPTY;

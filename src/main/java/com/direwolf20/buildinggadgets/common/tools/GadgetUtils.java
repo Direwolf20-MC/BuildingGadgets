@@ -368,10 +368,7 @@ public class GadgetUtils {
 
     public static int getIntFromNBT(ItemStack stack, String tagName) {
         NBTTagCompound tagCompound = stack.getTagCompound();
-        if (tagCompound == null) return 0;
-        Integer tagInt = tagCompound.getInteger(tagName);
-        if (tagInt == null) return 0;
-        return tagInt;
+        return tagCompound == null ? 0 : tagCompound.getInteger(tagName);
     }
 
     public static void writeStringToNBT(ItemStack stack, String string, String tagName) {

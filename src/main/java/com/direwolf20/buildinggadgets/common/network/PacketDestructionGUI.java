@@ -4,7 +4,6 @@ import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetDestruction;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumHand;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
@@ -55,7 +54,7 @@ public class PacketDestructionGUI implements IMessage {
             EntityPlayerMP playerEntity = ctx.getServerHandler().player;
 
             ItemStack heldItem = GadgetDestruction.getGadget(playerEntity);
-            if(heldItem == null) return;
+            if (heldItem.isEmpty()) return;
 
             GadgetDestruction.setToolValue(heldItem, message.left, "left");
             GadgetDestruction.setToolValue(heldItem, message.right, "right");

@@ -21,7 +21,7 @@ public class BreakEventHandler {
             return;
 
         ItemStack heldItem = GadgetGeneric.getGadget(player);
-        if( heldItem == null )
+        if (heldItem.isEmpty())
             return;
 
         List<ItemStack> drops = event.getDrops();

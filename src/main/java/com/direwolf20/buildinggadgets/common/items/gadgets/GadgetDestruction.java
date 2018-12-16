@@ -160,11 +160,10 @@ public class GadgetDestruction extends GadgetGeneric {
         }
         if (tagCompound.hasKey("overlay")) {
             return tagCompound.getBoolean("overlay");
-        } else {
-            tagCompound.setBoolean("overlay", true);
-            stack.setTagCompound(tagCompound);
-            return true;
         }
+        tagCompound.setBoolean("overlay", true);
+        stack.setTagCompound(tagCompound);
+        return true;
     }
 
     public static void setOverlay(ItemStack stack, boolean showOverlay) {
@@ -316,7 +315,7 @@ public class GadgetDestruction extends GadgetGeneric {
         if (currentBlock.getBlockHardness(world, voidPos) < 0) return false;
 
         ItemStack tool = getGadget(player);
-        if(tool == null) return false;
+        if (tool.isEmpty()) return false;
 
         if (!player.isAllowEdit()) {
             return false;
@@ -402,8 +401,6 @@ public class GadgetDestruction extends GadgetGeneric {
 
     public void undo(EntityPlayer player, ItemStack stack) {
         World world = player.world;
-        Map<BlockPos, IBlockState> posStateMap = new HashMap<BlockPos, IBlockState>();
-        Map<BlockPos, IBlockState> pasteStateMap = new HashMap<BlockPos, IBlockState>();
         WorldSave worldSave = WorldSave.getWorldSaveDestruction(world);
         NBTTagCompound tagCompound = worldSave.getCompoundFromUUID(getUUID(stack));
         if (tagCompound == null) return;
@@ -453,7 +450,7 @@ public class GadgetDestruction extends GadgetGeneric {
 
     private boolean destroyBlock(World world, BlockPos voidPos, EntityPlayer player) {
         ItemStack tool = getGadget(player);
-        if( tool == null )
+        if (tool.isEmpty())
             return false;
 
         if( !this.canUse(tool, player) )
@@ -467,8 +464,9 @@ public class GadgetDestruction extends GadgetGeneric {
 
     public static ItemStack getGadget(EntityPlayer player) {
         ItemStack stack = GadgetGeneric.getGadget(player);
-        if( stack == null || !(stack.getItem() instanceof GadgetDestruction) )
-            return null;
+        if (!(stack.getItem() instanceof GadgetDestruction))
+            return ItemStack.EMPTY;
+
         return stack;
     }
 }

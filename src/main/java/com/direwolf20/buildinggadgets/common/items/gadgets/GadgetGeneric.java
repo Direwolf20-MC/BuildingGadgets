@@ -103,18 +103,14 @@ public class GadgetGeneric extends Item {
         return false;
     }
 
-    @Nullable
     public static ItemStack getGadget(EntityPlayer player) {
         ItemStack heldItem = player.getHeldItemMainhand();
-
         if (!(heldItem.getItem() instanceof GadgetGeneric)) {
-
             heldItem = player.getHeldItemOffhand();
             if (!(heldItem.getItem() instanceof GadgetGeneric)) {
-                return null;
+                return ItemStack.EMPTY;
             }
         }
-
         return heldItem;
     }
 
@@ -134,8 +130,7 @@ public class GadgetGeneric extends Item {
             IEnergyStorage energy = CapabilityProviderEnergy.getCap(tool);
             return this.getEnergyCost() <= energy.getEnergyStored();
         }
-        else
-            return tool.getItemDamage() < tool.getMaxDamage() || tool.isItemStackDamageable();
+        return tool.getItemDamage() < tool.getMaxDamage() || tool.isItemStackDamageable();
     }
 
     public void applyDamage(ItemStack tool, EntityPlayer player) {
