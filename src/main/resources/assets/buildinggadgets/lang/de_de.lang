@@ -1,43 +1,89 @@
+#PARSE_ESCAPES
+#itemGroup:
+itemGroup.buildingGadgets=Building Gadgets
+
+#singles: 
+singles.buildinggadgets.depth=Tiefe
+singles.buildinggadgets.down=Unten
+singles.buildinggadgets.left=Links
+singles.buildinggadgets.right=Rechts
+singles.buildinggadgets.up=Open
+singles.buildinggadgets.confirm=Ok
+singles.buildinggadgets.cancel=Abbrechen
+
+#item: 
 item.buildinggadgets.buildingtool.name=Bau-Gadget
+item.buildinggadgets.constructionpaste.name=Baupaste
+item.buildinggadgets.constructionpastecontainer.name=Pastenbehälter
+item.buildinggadgets.constructionpastecontainert2.name=Pastenbehälter T2
+item.buildinggadgets.constructionpastecontainert3.name=Pastenbehälter T3
+item.buildinggadgets.copypastetool.name=Kopier-und-Einfüge-Gadget
+item.buildinggadgets.destructiontool.name=Demolier-Gadget
 item.buildinggadgets.exchangertool.name=Austausch-Gadget
+item.buildinggadgets.template.name=Schablone
+
+#tile: 
+tile.buildinggadgets.constructionblock.name=Baustoffblock
+tile.buildinggadgets.constructionblockpowder.name=Baustoffpulver
 tile.buildinggadgets.effectblock.name=(Unbenutzt)Effektblock
+tile.buildinggadgets.templatemanager.name=Schablonen-Manager
+
+#block: 
+block.buildinggadgets.constructionblock.name=Baustoffblock
+block.buildinggadgets.constructionblockpowder.name=Baustoffpulver
 block.buildinggadgets.effectblock.name=(Unbenutzt)Effektblock
-key.categories.buildingGadgets=Building Gadgets
+block.buildinggadgets.templatemanager.name=Schablonen-Manager
+
+#key: 
 key.anchorKey=Festsetzen
+key.categories.buildingGadgets=Building Gadgets
 key.modeSwitch=Modus ändern
 key.rangeChange=Reichweite
 key.undoKey=Rückgängig
+
+#tooltip: 
+tooltip.constructionblockpowder.helptext=Neben Wasser zu platzieren
 tooltip.gadget.block=Block
+tooltip.gadget.destroyshowoverlay=Overlay angezeigt
+tooltip.gadget.destroywarning=WARNUNG: Dieses Ding zerstört Blöcke.
+tooltip.gadget.energy=Energie
 tooltip.gadget.mode=Modus
 tooltip.gadget.range=Reichweite
-tooltip.gadget.energy=Energie
+tooltip.pasteContainer.amount=Menge
+tooltip.template.name=Name
+
+#message: 
+message.gadget.anchorremove=Festsetzen aufgehoben
+message.gadget.anchorrender=Darstellung festgesetzt
+message.gadget.areareset=Kopierbereich zurückgesetzt
+message.gadget.copied=Bereich kopiert
+message.gadget.copyfailed=Kopieren fehlgeschlagen, keine verwendbaren Daten
+message.gadget.copyguierror=Bereichskopie fehlgeschlagen
+message.gadget.copysuccess=Kopie in die Zwischenablage erfolgreich
+message.gadget.destroysizeerror=Maximaler Demolierungsbereich ist 16x16x16, negative Zahlen sind nicht erlaubt
+message.gadget.fuzzymode=Ungenauerer Modus
 message.gadget.invalidblock=Block ungültig
+message.gadget.nothingtoundo=Nichts zum Rückgängigmachen
+message.gadget.pastefailed=Einfügen fehlgeschlagen, ungültiges JSON
+message.gadget.pastesuccess=Einfügen aus Zwischenablage erfolgreich
+message.gadget.pastetoobig=Einzufügende Daten sind zu groß
+message.gadget.rotated=Blöcke rotiert
+message.gadget.toobigarea=Bereich zu groß, maximaler Bereich ist 125x125x125 (Rechtsklicke in die Luft zum Zurücksetzen)
 message.gadget.toolmode=Werkzeugmodus
 message.gadget.toolrange=Werkzeugreichweite
-message.gadget.anchorrender=Darstellung festgesetzt
-message.gadget.anchorremove=Festsetzen aufgehoben
-message.gadget.nothingtoundo=Nichts zum Rückgängigmachen
+message.gadget.toomanyblocks=Zu viele Blöcke, Limit ist 32768 (Rechtsklicke in die Luft zum Zurücksetzen)
 message.gadget.undofailed=Fehler beim Rückgängigmachen (zu weit weg?)
-message.gadget.fuzzymode=Ungenauerer Modus
-message.gadget.copied=Bereich kopiert
-item.buildinggadgets.constructionpastecontainer.name=Pastenbehälter
-item.buildinggadgets.constructionpaste.name=Baupaste
-tooltip.pasteContainer.amount=Menge
-block.buildinggadgets.constructionblock.name=Baustoffblock
-tile.buildinggadgets.constructionblock.name=Baustoffblock
-block.buildinggadgets.constructionblockpowder.name=Baustoffpulver
-tile.buildinggadgets.constructionblockpowder.name=Baustoffpulver
-tile.buildinggadgets.templatemanager.name=Schablonen-Manager
-block.buildinggadgets.templatemanager.name=Schablonen-Manager
-tooltip.constructionblockpowder.helptext=Neben Wasser zu platzieren
-item.buildinggadgets.copypastetool.name=Kopier-Gadget
-message.gadget.rotated=Blöcke rotiert
-message.gadget.toomanyblocks=Zu viele Blöcke, Limit ist 32768 (Rechtsklick in die Luft zum Zurücksetzen)
-message.gadget.toobigarea=Bereich zu groß, Maximalgröße ist 125x125x125 (Rechtsklick in die Luft zum Zurücksetzen)
-message.gadget.areareset=Kopierbereich zurückgesetzt
-tooltip.template.name=Name
-item.buildinggadgets.template.name=Schablone
-message.gadget.pastetoobig=Eingefügtes ist zu groß
-message.gadget.pastefailed=Einfügen fehlgeschlagen: Ungültiges JSON
-message.gadget.copyfailed=Kopieren fehlgeschlagen: Keine Daten auf dem Gadget
-message.gadget.copyguierror="Bereichkopie fehlgeschlagen"
+
+#help: 
+help.gui.buildinggadgets.area.arrow.data_flow=Stellt den Datenfluss von einem Item auf ein anderes dar, entweder von Schablone zu Gadget oder einer anderen Schablone, oder von Gadget/Schablone auf eine Schablone oder ein Stück Papier.
+help.gui.buildinggadgets.area.field.template_name=Wenn Daten gespeichert oder eingefügt werden, wird die kreierte Schablone diesen Namen haben.
+help.gui.buildinggadgets.area.preview=Vorschau der in Gadget oder Schablone gespeicherten Daten
+help.gui.buildinggadgets.area.slot.gadget=§nKopier-und-Einfüge-Gadgets§r oder §nSchablonen§r können von hier aus eingelesen oder beschrieben werden.\n\nEin §9farbiges Overlay§r zeigt an, wenn das Item Daten erhalten wird.
+help.gui.buildinggadgets.area.slot.template=§nPapier§r oder §nSchablonen§r können von hier aus eingelesen oder beschrieben werden\n\nEin §9farbiges Overlay§r zeigt an, wenn das Item Daten erhalten wird.
+help.gui.buildinggadgets.button.copy=Kopiert Daten von Gadget oder Schablone in die Zwischenablage deines Computers.
+help.gui.buildinggadgets.button.help.enter=Hilfstext anzeigen
+help.gui.buildinggadgets.button.help.exit=Hilfsmodus beenden
+help.gui.buildinggadgets.button.load=Lädt Daten von einer Schablone auf ein Gadget oder eine andere Schablone
+help.gui.buildinggadgets.button.paste=Speichert Daten in der Zwischenablage deines Computers in eine andere Schablone oder ein Stück Papier, in welchem Fall eine Schablone kreiert wird.
+help.gui.buildinggadgets.button.save=Speichert Daten in Gadget oder Schablone auf eine andere Schablone oder ein Stück Papier, in welchem Fall eine Schablone kreiert wird.
+
