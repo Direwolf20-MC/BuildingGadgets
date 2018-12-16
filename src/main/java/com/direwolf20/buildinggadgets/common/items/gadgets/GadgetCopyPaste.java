@@ -1,13 +1,13 @@
 package com.direwolf20.buildinggadgets.common.items.gadgets;
 
+import com.direwolf20.buildinggadgets.client.gui.GuiProxy;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.Config;
-import com.direwolf20.buildinggadgets.common.items.ModItems;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlock;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
-import com.direwolf20.buildinggadgets.client.gui.GuiProxy;
 import com.direwolf20.buildinggadgets.common.items.ITemplate;
+import com.direwolf20.buildinggadgets.common.items.ModItems;
 import com.direwolf20.buildinggadgets.common.items.capability.CapabilityProviderEnergy;
 import com.direwolf20.buildinggadgets.common.network.PacketBlockMap;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
@@ -443,40 +443,43 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
                         if (te instanceof ConstructionBlockTileEntity) {
                             actualState = ((ConstructionBlockTileEntity) te).getActualBlockState();
                         }
-                        posIntArrayList.add(GadgetUtils.relPosToInt(start, tempPos));
-                        blockMapIntState.addToMap(actualState);
-                        stateIntArrayList.add((int) blockMapIntState.findSlot(actualState));
                         UniqueItem uniqueItem = BlockMapIntState.blockStateToUniqueItem(actualState, player, tempPos);
-                        blockMapIntState.addToStackMap(uniqueItem, actualState);
-                        blockCount++;
-                        if (blockCount > 32768) {
-                            player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.toomanyblocks").getUnformattedComponentText()), true);
-                            return false;
-                        }
-                        NonNullList<ItemStack> drops = NonNullList.create();
-                        if (actualState != null)
-                            actualState.getBlock().getDrops(drops, world, new BlockPos(0, 0, 0), actualState, 0);
-
-                        int neededItems = 0;
-                        for (ItemStack drop : drops) {
-                            if (drop.getItem().equals(uniqueItem.item)) {
-                                neededItems++;
-                            }
-                        }
-                        if (neededItems == 0) {
-                            neededItems = 1;
-                        }
                         if (uniqueItem.item != Items.AIR) {
-                            boolean found = false;
-                            for (Map.Entry<UniqueItem, Integer> entry : itemCountMap.entrySet()) {
-                                if (entry.getKey().equals(uniqueItem)) {
-                                    itemCountMap.put(entry.getKey(), itemCountMap.get(entry.getKey()) + neededItems);
-                                    found = true;
-                                    break;
+                            posIntArrayList.add(GadgetUtils.relPosToInt(start, tempPos));
+                            blockMapIntState.addToMap(actualState);
+                            stateIntArrayList.add((int) blockMapIntState.findSlot(actualState));
+
+                            blockMapIntState.addToStackMap(uniqueItem, actualState);
+                            blockCount++;
+                            if (blockCount > 32768) {
+                                player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.toomanyblocks").getUnformattedComponentText()), true);
+                                return false;
+                            }
+                            NonNullList<ItemStack> drops = NonNullList.create();
+                            if (actualState != null)
+                                actualState.getBlock().getDrops(drops, world, new BlockPos(0, 0, 0), actualState, 0);
+
+                            int neededItems = 0;
+                            for (ItemStack drop : drops) {
+                                if (drop.getItem().equals(uniqueItem.item)) {
+                                    neededItems++;
                                 }
                             }
-                            if (!found) {
-                                itemCountMap.put(uniqueItem, neededItems);
+                            if (neededItems == 0) {
+                                neededItems = 1;
+                            }
+                            if (uniqueItem.item != Items.AIR) {
+                                boolean found = false;
+                                for (Map.Entry<UniqueItem, Integer> entry : itemCountMap.entrySet()) {
+                                    if (entry.getKey().equals(uniqueItem)) {
+                                        itemCountMap.put(entry.getKey(), itemCountMap.get(entry.getKey()) + neededItems);
+                                        found = true;
+                                        break;
+                                    }
+                                }
+                                if (!found) {
+                                    itemCountMap.put(uniqueItem, neededItems);
+                                }
                             }
                         }
                     }
@@ -528,7 +531,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
 
     private void placeBlock(World world, BlockPos pos, EntityPlayer player, IBlockState state, Map<IBlockState, UniqueItem> IntStackMap) {
         IBlockState testState = world.getBlockState(pos);
-        if( Config.canOverwriteBlocks && !testState.getBlock().isReplaceable(world, pos) || world.getBlockState(pos).getMaterial() != Material.AIR)
+        if (Config.canOverwriteBlocks && !testState.getBlock().isReplaceable(world, pos) || world.getBlockState(pos).getMaterial() != Material.AIR)
             return;
 
         if (pos.getY() < 0 || state.equals(Blocks.AIR.getDefaultState()) || !player.isAllowEdit())
@@ -572,7 +575,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
             useConstructionPaste = true;
         }
 
-        if( !this.canUse(heldItem, player) )
+        if (!this.canUse(heldItem, player))
             return;
 
         this.applyDamage(heldItem, player);

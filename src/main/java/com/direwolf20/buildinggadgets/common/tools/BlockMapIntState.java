@@ -2,6 +2,7 @@ package com.direwolf20.buildinggadgets.common.tools;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -135,7 +136,9 @@ public class BlockMapIntState {
             UniqueItem uniqueItem = new UniqueItem(itemStack.getItem(), itemStack.getMetadata());
             return uniqueItem;
         }
-        throw new IllegalArgumentException("A UniqueItem could net be retrieved for the the follwing state (at position " + pos + "): " + state);
+        UniqueItem uniqueItem = new UniqueItem(Items.AIR, 0);
+        return uniqueItem;
+        //throw new IllegalArgumentException("A UniqueItem could net be retrieved for the the follwing state (at position " + pos + "): " + state);
     }
 
     public void makeStackMapFromStateMap(EntityPlayer player) {
