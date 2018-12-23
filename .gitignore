@@ -11,3 +11,5 @@
 !/build.gradle
 !/gradlew
 !/gradlew.bat
+!/gradle.properties
+!/update.json

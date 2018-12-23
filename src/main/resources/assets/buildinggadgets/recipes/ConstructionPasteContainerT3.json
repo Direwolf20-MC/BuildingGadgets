@@ -1,0 +1,24 @@
+{
+  "result": {
+    "item": "buildinggadgets:constructionpastecontainert3"
+  },
+  "pattern": [
+    "cgc",
+    "ggg",
+    "cgc"
+  ],
+  "type": "buildinggadgets:constructionpaste",
+  "key": {
+    "g": {
+      "item": "minecraft:diamond"
+    },
+    "c": {
+      "item": "buildinggadgets:constructionpastecontainert2"
+    }
+  },
+  "conditions": [
+    {
+      "type": "buildinggadgets:enablePaste"
+    }
+  ]
+}

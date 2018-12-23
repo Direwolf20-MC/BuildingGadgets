@@ -5,12 +5,14 @@
   "description": "Adds some gadgets to help you build!",
   "version": "${version}",
   "mcversion": "${mcversion}",
-  "url": "",
-  "updateUrl": "",
+  "url": "https://minecraft.curseforge.com/projects/building-gadgets",
+  "updateUrl": "${updatejson}",
   "authorList": ["Direwolf20"],
   "credits": "The Forge and FML guys, McJty, Vazkii, CPW, and Pahimar for helping me learn java/forge modding.  Rorax for the textures!",
-  "logoFile": "",
+  "logoFile": "assets/buildinggadgets/textures/logo/logo.png",
   "screenshots": [],
-  "dependencies": []
+  "dependencies": [
+    "ctm"
+  ]
 }
 ]

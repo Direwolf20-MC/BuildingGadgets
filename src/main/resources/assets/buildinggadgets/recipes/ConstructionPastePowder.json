@@ -1,0 +1,24 @@
+{
+  "result": {
+    "item": "buildinggadgets:constructionblockpowder"
+  },
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "minecraft:sand",
+      "data": 0
+    },
+    {
+      "item": "minecraft:dye",
+      "data": 4
+    },
+    {
+      "item": "minecraft:clay_ball"
+    }
+  ],
+  "conditions": [
+    {
+      "type": "buildinggadgets:enablePaste"
+    }
+  ]
+}

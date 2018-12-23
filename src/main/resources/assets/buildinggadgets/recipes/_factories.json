@@ -1,0 +1,9 @@
+{
+  "conditions": {
+    "enablePaste": "com.direwolf20.buildinggadgets.common.tools.CraftingCondition",
+    "enableDestruction": "com.direwolf20.buildinggadgets.common.tools.CraftingConditionDestruction"
+  },
+  "recipes": {
+    "constructionpaste": "com.direwolf20.buildinggadgets.common.tools.ConstructionPasteRecipeHandler$Factory"
+  }
+}
