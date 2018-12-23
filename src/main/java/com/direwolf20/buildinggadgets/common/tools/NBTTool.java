@@ -1,4 +1,4 @@
-package com.direwolf20.buildinggadgets.tools;
+package com.direwolf20.buildinggadgets.common.tools;
 
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;

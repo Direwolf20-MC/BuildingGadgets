@@ -1,7 +1,6 @@
-package com.direwolf20.buildinggadgets.tools;
+package com.direwolf20.buildinggadgets.common.tools;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableList.Builder;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -19,7 +18,7 @@ public class ReflectionTool {
      */
     public static List<Field> getFilteredFields(Class<?> clazz, Predicate<Field> filter) {
         Field[] fields = clazz.getDeclaredFields();
-        ImmutableList.Builder<Field> res = new Builder<>(fields.length);
+        ImmutableList.Builder<Field> res = ImmutableList.builder();
         for (Field field:
              fields) {
             if (filter.test(field))

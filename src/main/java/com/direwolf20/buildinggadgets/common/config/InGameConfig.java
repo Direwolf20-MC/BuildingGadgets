@@ -3,7 +3,7 @@ package com.direwolf20.buildinggadgets.common.config;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.PacketSyncConfig;
-import com.direwolf20.buildinggadgets.tools.ReflectionTool;
+import com.direwolf20.buildinggadgets.common.tools.ReflectionTool;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;

@@ -1,4 +1,4 @@
-package com.direwolf20.buildinggadgets.tools;
+package com.direwolf20.buildinggadgets.common.tools;
 
 public class CollectionTool {
     public static byte[] asPrimitive(Byte[] ar) {

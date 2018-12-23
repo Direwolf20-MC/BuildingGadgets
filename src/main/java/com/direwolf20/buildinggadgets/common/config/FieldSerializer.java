@@ -1,8 +1,8 @@
 package com.direwolf20.buildinggadgets.common.config;
 
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
-import com.direwolf20.buildinggadgets.tools.CollectionTool;
-import com.direwolf20.buildinggadgets.tools.NBTTool;
+import com.direwolf20.buildinggadgets.common.tools.CollectionTool;
+import com.direwolf20.buildinggadgets.common.tools.NBTTool;
 import net.minecraft.nbt.*;
 
 import javax.annotation.Nullable;
