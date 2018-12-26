@@ -22,43 +22,6 @@ import java.util.Map;
 public class InGameConfig {
     private static final String KEY_NAME = "NAME";
     private static final String KEY_VALUE = "VAL";
-    /*
-    @SyncedConfig
-    public static boolean     bool = false;
-    @SyncedConfig
-    public static boolean[]   boolA = {false, true};
-    @SyncedConfig
-    public static Boolean     Bool = false;
-    @SyncedConfig
-    public static Boolean[]   BoolA = {false, true};
-    @SyncedConfig
-    public static double      dbl = 1.0d;
-    @SyncedConfig
-    public static double[]    dblA = {1.0d, 2.0d};
-    @SyncedConfig
-    public static Double      Dbl = 1.0D;
-    @SyncedConfig
-    public static Double[]    DblA = {1.0D, 2.0D};
-    @SyncedConfig
-    public static char        chr = 'a';
-    @SyncedConfig
-    public static char[]      chrA = {'a', 'b'};
-    @SyncedConfig
-    public static Character   Chr = 'A';
-    @SyncedConfig
-    public static Character[] ChrA = {'A', 'B'};
-    @SyncedConfig
-    public static int         int_ = 1;
-    @SyncedConfig
-    public static int[]       intA = {1, 2};
-    @SyncedConfig
-    public static Integer     Int = 1;
-    @SyncedConfig
-    public static Integer[]   IntA = {1, 2};
-    @SyncedConfig
-    public static String      Str = "STRING!";
-    @SyncedConfig
-    public static String[]    StrA = {"STR", "ING!"};*/
 
     @SyncedConfig
     public static int energyCostBuilder;
@@ -156,7 +119,6 @@ public class InGameConfig {
     }
 
     private static NBTTagCompound parseSynchronisation() {
-        //FieldSerializer.init();
         NBTTagList list = new NBTTagList();
         List<Field> fields = Collections.unmodifiableList(getSyncFields());
         for (Field field: fields) {
@@ -165,7 +127,6 @@ public class InGameConfig {
         }
         NBTTagCompound compound = new NBTTagCompound(); //parsed in PacketSyncConfig => requires an TagCompound;
         compound.setTag(KEY_VALUE,list);
-        //FieldSerializer.clear();
         return compound;
     }
 
@@ -175,7 +136,6 @@ public class InGameConfig {
         NBTTagList list = (NBTTagList) compound.getTag(KEY_VALUE);
         List<Field> fields = getSyncFields();
         Map<String,Field> map = new HashMap<>();
-        //FieldSerializer.init();
         for (Field f: fields) {
             map.put(getSyncName(f),f);
         }
@@ -187,18 +147,6 @@ public class InGameConfig {
             }
         }
         handleSpecialCases();
-        //FieldSerializer.clear();
-        /*
-        BuildingGadgets.logger.info(bool);
-        BuildingGadgets.logger.info(Arrays.toString(boolA));
-        BuildingGadgets.logger.info(dbl);
-        BuildingGadgets.logger.info(Arrays.toString(dblA));
-        BuildingGadgets.logger.info(chr);
-        BuildingGadgets.logger.info(Arrays.toString(chrA));
-        BuildingGadgets.logger.info(int_);
-        BuildingGadgets.logger.info(Arrays.toString(intA));
-        BuildingGadgets.logger.info(Str);
-        BuildingGadgets.logger.info(Arrays.toString(StrA));*/
     }
 
     private static NBTTagCompound parseField(Field field) {

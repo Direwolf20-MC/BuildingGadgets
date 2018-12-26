@@ -10,13 +10,7 @@ import java.util.function.BooleanSupplier;
 public class CraftingConditionDestruction implements IConditionFactory {
     @Override
     public BooleanSupplier parse(JsonContext jsonContext, JsonObject jsonObject) {
-        final boolean result;
-        if (InGameConfig.enableDestructionGadget) {
-            result = true;
-        } else {
-            result = false;
-        }
-        return () -> result;
+        return () -> InGameConfig.enableDestructionGadget;
     }
 
 }

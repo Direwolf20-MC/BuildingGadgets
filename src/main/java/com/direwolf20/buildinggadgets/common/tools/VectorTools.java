@@ -8,14 +8,15 @@ import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
 
-public class VectorTools {
+import static com.direwolf20.buildinggadgets.common.config.InGameConfig.rayTraceRange;
 
-    private static float rayTraceRange = 32f;
+public class VectorTools {
 
     public static RayTraceResult getLookingAt(EntityPlayer player) {
         World world = player.world;
         Vec3d look = player.getLookVec();
         Vec3d start = new Vec3d(player.posX, player.posY + player.getEyeHeight(), player.posZ);
+        //rayTraceRange here refers to InGameConfig.rayTraceRange
         Vec3d end = new Vec3d(player.posX + look.x * rayTraceRange, player.posY + player.getEyeHeight() + look.y * rayTraceRange, player.posZ + look.z * rayTraceRange);
         return world.rayTraceBlocks(start, end, false, false, false);
     }

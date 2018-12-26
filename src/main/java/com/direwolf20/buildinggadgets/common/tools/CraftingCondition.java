@@ -10,13 +10,7 @@ import java.util.function.BooleanSupplier;
 public class CraftingCondition implements IConditionFactory {
     @Override
     public BooleanSupplier parse(JsonContext jsonContext, JsonObject jsonObject) {
-        final boolean result;
-        if (InGameConfig.enablePaste) {
-            result = true;
-        } else {
-            result = false;
-        }
-        return () -> result;
+        return () -> InGameConfig.enablePaste;
     }
 
 }
