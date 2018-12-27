@@ -13,8 +13,6 @@ import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
 
 import java.lang.reflect.Field;
 import java.util.Collections;
@@ -109,12 +107,8 @@ public class InGameConfig {
         durabilityCopyPaste = Config.subCategoryGadgets.subCategoryGadgetCopyPaste.durabilityCopyPaste;
     }
 
-    @SubscribeEvent
-    public static void onPlayerLogin(PlayerLoggedInEvent event) {
-        if (event.player instanceof EntityPlayerMP) {
-            BuildingGadgets.logger.info("Sending InGameConfig to freshly logged in client.");
-            PacketHandler.INSTANCE.sendTo(new PacketSyncConfig(parseSynchronisation()), (EntityPlayerMP) event.player);
-        }
+    public static void sendConfigUpdateTo(EntityPlayerMP player) {
+        PacketHandler.INSTANCE.sendTo(new PacketSyncConfig(InGameConfig.parseSynchronisation()), player);
     }
 
     private static NBTTagCompound parseSynchronisation() {

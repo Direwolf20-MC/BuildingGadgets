@@ -46,7 +46,7 @@ public class Config {
     public static CategoryBlacklist subCategoryBlacklist = new CategoryBlacklist();
 
     public static final class CategoryBlacklist {
-        //In 1.13 this should be converted to a tag
+        //In 1.13 this should be converted to a tag (or at least made compatible with)
         @Name("Blacklist")
         public String[] blockBlacklist = {getName(Blocks.OAK_DOOR),getName(Blocks.BIRCH_DOOR),getName(Blocks.ACACIA_DOOR),getName(Blocks.DARK_OAK_DOOR),getName(Blocks.IRON_DOOR),getName(Blocks.JUNGLE_DOOR),getName(Blocks.SPRUCE_DOOR),getName(Blocks.PISTON_HEAD)};
     }
