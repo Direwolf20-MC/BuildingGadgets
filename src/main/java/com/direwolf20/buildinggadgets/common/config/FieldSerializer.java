@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.common.config;
 
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
-import com.direwolf20.buildinggadgets.common.tools.CollectionTool;
+import com.direwolf20.buildinggadgets.common.tools.ArrayUtils;
 import com.direwolf20.buildinggadgets.common.tools.NBTTool;
 import net.minecraft.nbt.*;
 
@@ -296,7 +296,7 @@ public class FieldSerializer {
                     return new NBTTagByteArray((byte[]) field.get(null));
                 }
                 else {
-                    return new NBTTagByteArray(CollectionTool.asPrimitive((Byte[]) field.get(null)));
+                    return new NBTTagByteArray(ArrayUtils.asPrimitive((Byte[]) field.get(null)));
                 }
             }
 
@@ -308,7 +308,7 @@ public class FieldSerializer {
                     field.set( null,((NBTTagByteArray)tag).getByteArray());
                 }
                 else {
-                    field.set(null,CollectionTool.asBoxed(((NBTTagByteArray)tag).getByteArray()));
+                    field.set(null, ArrayUtils.asBoxed(((NBTTagByteArray)tag).getByteArray()));
                 }
                 return true;
             }
@@ -350,7 +350,7 @@ public class FieldSerializer {
                     return new NBTTagString(String.valueOf((char[])field.get(null)));
                 }
                 else {
-                    return new NBTTagString(String.valueOf(CollectionTool.asPrimitive((Character[])field.get(null))));
+                    return new NBTTagString(String.valueOf(ArrayUtils.asPrimitive((Character[])field.get(null))));
                 }
             }
 
@@ -362,7 +362,7 @@ public class FieldSerializer {
                     field.set(null,((NBTTagString)tag).getString().toCharArray());
                 }
                 else {
-                    field.set(null,CollectionTool.asBoxed(((NBTTagString)tag).getString().toCharArray()));
+                    field.set(null, ArrayUtils.asBoxed(((NBTTagString)tag).getString().toCharArray()));
                 }
                 return true;
             }
@@ -377,7 +377,7 @@ public class FieldSerializer {
                     return new NBTTagIntArray((int[])field.get(null));
                 }
                 else {
-                    return new NBTTagIntArray(CollectionTool.asPrimitive((Integer[]) field.get(null)));
+                    return new NBTTagIntArray(ArrayUtils.asPrimitive((Integer[]) field.get(null)));
                 }
             }
 
@@ -389,7 +389,7 @@ public class FieldSerializer {
                     field.set(null,((NBTTagIntArray) tag).getIntArray());
                 }
                 else {
-                    field.set(null,CollectionTool.asBoxed(((NBTTagIntArray) tag).getIntArray()));
+                    field.set(null, ArrayUtils.asBoxed(((NBTTagIntArray) tag).getIntArray()));
                 }
                 return true;
             }

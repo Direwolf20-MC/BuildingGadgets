@@ -1,6 +1,9 @@
 package com.direwolf20.buildinggadgets.common.tools;
 
-public class CollectionTool {
+/**
+ * Utility class providing various Methods for boxing and unboxing arrays
+ */
+public class ArrayUtils {
     public static byte[] asPrimitive(Byte[] ar) {
         byte[] res = new byte[ar.length];
         for (int i = 0; i < ar.length; ++i) {

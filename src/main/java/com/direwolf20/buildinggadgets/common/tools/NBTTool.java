@@ -8,6 +8,9 @@ import javax.annotation.Nonnull;
 import java.util.Map;
 import java.util.function.Function;
 
+/**
+ * Utility class providing additional Methods for reading and writing array's which are not normally provided as NBT-Objects by Minecraft.
+ */
 public class NBTTool {
 
     public static NBTTagByteArray createBooleanList(boolean[] booleans) {
