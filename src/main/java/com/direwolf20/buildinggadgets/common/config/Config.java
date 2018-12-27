@@ -1,13 +1,23 @@
 package com.direwolf20.buildinggadgets.common.config;
 
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
+import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.config.Config.*;
 
-import static com.direwolf20.buildinggadgets.common.config.BlacklistBlocks.getName;
+import javax.annotation.Nonnull;
 
 @net.minecraftforge.common.config.Config(modid = BuildingGadgets.MODID, name = BuildingGadgets.MODNAME, category =  Config.CATEGORY_ROOT)
 public class Config {
+    @Nonnull
+    static String getName(Block block) {
+        ResourceLocation name = block.getRegistryName();
+        if (name == null)
+            throw new IllegalArgumentException("A registry name for the following block could not be found: " + block);
+
+        return name.toString();
+    }
     @Ignore
     static final String CATEGORY_ROOT = "general";
 
@@ -20,8 +30,10 @@ public class Config {
     public static boolean poweredByFE = true;
 
     @Comment("Set to false to disable the recipe for construction paste.")
+    @RequiresMcRestart
     public static boolean enablePaste = true;
     @Comment("Set to false to disable the Destruction Gadget.")
+    @RequiresMcRestart
     public static boolean enableDestructionGadget = true;
     @Comment({"Determines if the Copy/Paste GUI's coordinate mode starts in 'Absolute' mode by default.",
               "Set to true for Absolute, set to False for Relative."})

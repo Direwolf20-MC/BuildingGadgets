@@ -1,9 +1,13 @@
 package com.direwolf20.buildinggadgets.common.config;
 
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
+import com.direwolf20.buildinggadgets.common.config.fieldmap.FieldMapper;
+import com.direwolf20.buildinggadgets.common.config.fieldmap.FieldSerializer;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.PacketSyncConfig;
 import com.direwolf20.buildinggadgets.common.tools.ReflectionTool;
+import com.google.common.collect.ImmutableList;
+import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
@@ -74,11 +78,11 @@ public class InGameConfig {
     @SyncedConfig
     public static boolean enablePaste;
 
-    @SyncedConfig
-    public static String[] blockBlacklist;
+    @SyncedConfig(mapperId = FieldMapper.BLOCK_LIST_MAPPER_ID)
+    public static ImmutableList<Block> blockBlacklist;
 
 
-    public static void init() {
+    public static void transferValues() {
         rayTraceRange = Config.rayTraceRange;
         poweredByFE = Config.poweredByFE;
         enableDestructionGadget = Config.enableDestructionGadget;
@@ -86,7 +90,7 @@ public class InGameConfig {
         canOverwriteBlocks = Config.canOverwriteBlocks;
         enablePaste = Config.enablePaste;
 
-        blockBlacklist = Config.subCategoryBlacklist.blockBlacklist;
+        blockBlacklist = FieldMapper.BLOCK_LIST_MAPPER.mapToField(Config.subCategoryBlacklist.blockBlacklist);
 
         maxRange = Config.subCategoryGadgets.maxRange;
         energyMax = Config.subCategoryGadgets.maxEnergy;
@@ -103,11 +107,6 @@ public class InGameConfig {
 
         energyCostCopyPaste = Config.subCategoryGadgets.subCategoryGadgetCopyPaste.energyCostCopyPaste;
         durabilityCopyPaste = Config.subCategoryGadgets.subCategoryGadgetCopyPaste.durabilityCopyPaste;
-        handleSpecialCases();
-    }
-
-    private static void handleSpecialCases() {
-        BlacklistBlocks.parseBlackList(blockBlacklist);
     }
 
     @SubscribeEvent
@@ -119,6 +118,7 @@ public class InGameConfig {
     }
 
     private static NBTTagCompound parseSynchronisation() {
+        transferValues();
         NBTTagList list = new NBTTagList();
         List<Field> fields = Collections.unmodifiableList(getSyncFields());
         for (Field field: fields) {
@@ -146,11 +146,10 @@ public class InGameConfig {
                 BuildingGadgets.logger.warn("Unexpected "+rawNBT.getClass().getName()+" found in NBTTagList which was expected to only contain NBTTagCompounds!");
             }
         }
-        handleSpecialCases();
     }
 
     private static NBTTagCompound parseField(Field field) {
-        NBTBase valueTag = FieldSerializer.parseFieldValue(field);
+        NBTBase valueTag = FieldSerializer.parseFieldValue(field,field.getAnnotation(SyncedConfig.class).mapperId());
         if (valueTag==null) {
             BuildingGadgets.logger.warn("Could not use type of Field "+field.getName()+"!"+" Found type "+field.getType().getName()+"!");
             return null;
@@ -173,7 +172,8 @@ public class InGameConfig {
             BuildingGadgets.logger.warn("Tried to read synchronisation from an unknown Field!");
             return;
         }
-        FieldSerializer.applyValue(rawValue,fields.get(name));
+        Field field = fields.get(name);
+        FieldSerializer.applyValue(rawValue,field,field.getAnnotation(SyncedConfig.class).mapperId());
     }
 
     private static List<Field> getSyncFields() {
@@ -186,6 +186,6 @@ public class InGameConfig {
     }
 
     static {
-        init();//ensure that everything is initialised after the class was loaded
+        transferValues();//ensure that everything is initialised after the class was loaded
     }
 }
