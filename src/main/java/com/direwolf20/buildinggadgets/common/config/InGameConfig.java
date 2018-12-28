@@ -20,7 +20,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Mod.EventBusSubscriber(modid = BuildingGadgets.MODID)
 public class InGameConfig {
     private static final String KEY_NAME = "NAME";
     private static final String KEY_VALUE = "VAL";

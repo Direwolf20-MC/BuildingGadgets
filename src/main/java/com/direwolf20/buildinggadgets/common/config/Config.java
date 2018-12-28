@@ -8,7 +8,8 @@ import net.minecraftforge.common.config.Config.*;
 
 import javax.annotation.Nonnull;
 
-@net.minecraftforge.common.config.Config(modid = BuildingGadgets.MODID, name = BuildingGadgets.MODNAME, category =  Config.CATEGORY_ROOT)
+//hardcode this name, so that we don't use a different config file than before we used Annotations
+@net.minecraftforge.common.config.Config(modid = BuildingGadgets.MODID, name = "BuildingGadgets", category =  Config.CATEGORY_ROOT)
 public class Config {
     @Nonnull
     static String getName(Block block) {

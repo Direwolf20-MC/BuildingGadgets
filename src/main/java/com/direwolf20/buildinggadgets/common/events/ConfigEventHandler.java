@@ -8,11 +8,11 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.common.config.Config.Type;
 import net.minecraftforge.common.config.ConfigManager;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
-import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
+import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
 
-@EventBusSubscriber
+@Mod.EventBusSubscriber(modid = BuildingGadgets.MODID)
 public class ConfigEventHandler {
     @SubscribeEvent
     public static void onPlayerLogin(PlayerLoggedInEvent event) {
