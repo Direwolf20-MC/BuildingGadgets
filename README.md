@@ -1,12 +1,11 @@
-<div style="padding: 3em; text-align:center;">
-	<img width="60" src="https://i.imgur.com/hFRs7eN.png" />
-	<h1 style="margin-top: 20px; border-bottom: 0;">Building Gadgets</h1>
-    <p style="color: rgba(0, 0, 0, .5); margin-bottom: 2em;">Sometimes, building large structures can be a little tedious, and take a lot of effort. Not all of us are great builders you know!
-    </p>
-    <p>
-        <img src="http://cf.way2muchnoise.eu/full_298187_downloads.svg" />
-    </p>    
-</div>
+
+<p align="center" style="padding: 3em;"><img width="60" src="https://github.com/Direwolf20-MC/BuildingGadgets/blob/master/src/main/resources/assets/buildinggadgets/textures/logo/logo.png?raw=true" /></p>
+<h1 align="center" style="margin-top: 20px; border-bottom: 0;">Building Gadgets</h1>
+<p align="center">Sometimes, building large structures can be a little tedious, and take a lot of effort. Not all of us are great builders you know!
+</p>
+<p align="center">
+    <a href="https://minecraft.curseforge.com/projects/building-gadgets"><img src="http://cf.way2muchnoise.eu/full_298187_downloads.svg" /></a>
+</p>    
 
 <h2 style=" border-bottom: 0; text-align: center;">Welcome to Dire's Building Gadgets!</h2>
 
