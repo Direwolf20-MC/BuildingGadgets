@@ -7,7 +7,11 @@
     <a href="https://minecraft.curseforge.com/projects/building-gadgets"><img src="http://cf.way2muchnoise.eu/full_298187_downloads.svg" /></a>
 </p>    
 
-<h2 style=" border-bottom: 0; text-align: center;">Welcome to Dire's Building Gadgets!</h2>
+<p></p>
+<p></p>
+<p></p>
+
+<h2 align="center">Welcome to Dire's Building Gadgets!</h2>
 
 `Dire's Building Gadgets` aims to make building a little bit easier. At this time there are `four` tools, and they are described below. Alternatively, watch the following mod spotlight for instructions!
 
