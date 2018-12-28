@@ -10,11 +10,12 @@ import javax.annotation.Nullable;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 public class FieldSerializer {
     private static Set<ITypeSerializer> serializers = new HashSet<>();
-    private static HashMap<String, FieldMapper<?,?>> mappingAdapters = new HashMap<>();
+    private static Map<String, FieldMapper<?,?>> mappingAdapters = new HashMap<>();
 
     private static void addSerializer(ITypeSerializer serializer) {
         serializers.add(serializer);
@@ -462,6 +463,7 @@ public class FieldSerializer {
 
     public static void clear() {
         serializers.clear();
+        mappingAdapters.clear();
     }
 
     static {
