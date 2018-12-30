@@ -402,7 +402,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
 
     private static boolean findBlocks(World world, BlockPos start, BlockPos end, ItemStack stack, EntityPlayer player, GadgetCopyPaste tool) {
         setLastBuild(stack, null, 0);
-
+        int foundTE = 0;
         int startX = start.getX();
         int startY = start.getY();
         int startZ = start.getZ();
@@ -484,6 +484,8 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
                                 }
                             }
                         }
+                    } else if (!(world.getTileEntity(tempPos) instanceof ConstructionBlockTileEntity)) {
+                        foundTE++;
                     }
                 }
             }
@@ -507,6 +509,10 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
         worldSave.addToMap(tool.getUUID(stack), tagCompound);
         worldSave.markForSaving();
         PacketHandler.INSTANCE.sendTo(new PacketBlockMap(tagCompound), (EntityPlayerMP) player);
+
+        if (foundTE > 0) {
+            player.sendStatusMessage(new TextComponentString(TextFormatting.YELLOW + new TextComponentTranslation("message.gadget.TEinCopy").getUnformattedComponentText() + ": " + foundTE), false);
+        }
         return true;
     }
 
