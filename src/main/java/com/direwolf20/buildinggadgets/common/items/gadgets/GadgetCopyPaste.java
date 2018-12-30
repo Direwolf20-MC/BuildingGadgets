@@ -484,7 +484,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
                                 }
                             }
                         }
-                    } else if (!(world.getTileEntity(tempPos) instanceof ConstructionBlockTileEntity)) {
+                    } else if ((world.getTileEntity(tempPos) != null) && !(world.getTileEntity(tempPos) instanceof ConstructionBlockTileEntity)) {
                         foundTE++;
                     }
                 }

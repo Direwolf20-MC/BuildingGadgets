@@ -5,9 +5,9 @@ import com.direwolf20.buildinggadgets.common.commands.FindBlockMapsCommand;
 import com.direwolf20.buildinggadgets.common.events.AnvilRepairHandler;
 import com.direwolf20.buildinggadgets.common.items.ModItems;
 import com.direwolf20.buildinggadgets.common.proxy.CommonProxy;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
@@ -26,7 +26,7 @@ public class BuildingGadgets {
     public static final String VERSION = "@VERSION@";
     public static final String UPDATE_JSON = "@UPDATE@";
 
-    public static final CreativeTabs BUILDING_CREATIVE_TAB = new CreativeTabs(I18n.format("buildingGadgets")) {
+    public static final CreativeTabs BUILDING_CREATIVE_TAB = new CreativeTabs(new TextComponentTranslation("buildingGadgets").getUnformattedComponentText()) {
         @Override
         public ItemStack getTabIconItem() {
             return new ItemStack(ModItems.gadgetBuilding);
