@@ -443,42 +443,44 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
                         if (te instanceof ConstructionBlockTileEntity) {
                             actualState = ((ConstructionBlockTileEntity) te).getActualBlockState();
                         }
-                        UniqueItem uniqueItem = BlockMapIntState.blockStateToUniqueItem(actualState, player, tempPos);
-                        if (uniqueItem.item != Items.AIR) {
-                            posIntArrayList.add(GadgetUtils.relPosToInt(start, tempPos));
-                            blockMapIntState.addToMap(actualState);
-                            stateIntArrayList.add((int) blockMapIntState.findSlot(actualState));
-
-                            blockMapIntState.addToStackMap(uniqueItem, actualState);
-                            blockCount++;
-                            if (blockCount > 32768) {
-                                player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.toomanyblocks").getUnformattedComponentText()), true);
-                                return false;
-                            }
-                            NonNullList<ItemStack> drops = NonNullList.create();
-                            if (actualState != null)
-                                actualState.getBlock().getDrops(drops, world, new BlockPos(0, 0, 0), actualState, 0);
-
-                            int neededItems = 0;
-                            for (ItemStack drop : drops) {
-                                if (drop.getItem().equals(uniqueItem.item)) {
-                                    neededItems++;
-                                }
-                            }
-                            if (neededItems == 0) {
-                                neededItems = 1;
-                            }
+                        if (actualState != null) {
+                            UniqueItem uniqueItem = BlockMapIntState.blockStateToUniqueItem(actualState, player, tempPos);
                             if (uniqueItem.item != Items.AIR) {
-                                boolean found = false;
-                                for (Map.Entry<UniqueItem, Integer> entry : itemCountMap.entrySet()) {
-                                    if (entry.getKey().equals(uniqueItem)) {
-                                        itemCountMap.put(entry.getKey(), itemCountMap.get(entry.getKey()) + neededItems);
-                                        found = true;
-                                        break;
+                                posIntArrayList.add(GadgetUtils.relPosToInt(start, tempPos));
+                                blockMapIntState.addToMap(actualState);
+                                stateIntArrayList.add((int) blockMapIntState.findSlot(actualState));
+
+                                blockMapIntState.addToStackMap(uniqueItem, actualState);
+                                blockCount++;
+                                if (blockCount > 32768) {
+                                    player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.toomanyblocks").getUnformattedComponentText()), true);
+                                    return false;
+                                }
+                                NonNullList<ItemStack> drops = NonNullList.create();
+                                if (actualState != null)
+                                    actualState.getBlock().getDrops(drops, world, new BlockPos(0, 0, 0), actualState, 0);
+
+                                int neededItems = 0;
+                                for (ItemStack drop : drops) {
+                                    if (drop.getItem().equals(uniqueItem.item)) {
+                                        neededItems++;
                                     }
                                 }
-                                if (!found) {
-                                    itemCountMap.put(uniqueItem, neededItems);
+                                if (neededItems == 0) {
+                                    neededItems = 1;
+                                }
+                                if (uniqueItem.item != Items.AIR) {
+                                    boolean found = false;
+                                    for (Map.Entry<UniqueItem, Integer> entry : itemCountMap.entrySet()) {
+                                        if (entry.getKey().equals(uniqueItem)) {
+                                            itemCountMap.put(entry.getKey(), itemCountMap.get(entry.getKey()) + neededItems);
+                                            found = true;
+                                            break;
+                                        }
+                                    }
+                                    if (!found) {
+                                        itemCountMap.put(uniqueItem, neededItems);
+                                    }
                                 }
                             }
                         }
