@@ -395,14 +395,13 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
             if (findBlocks(world, startPos, endPos, stack, player, tool)) {
                 tool.setStartPos(stack, startPos);
                 tool.setEndPos(stack, endPos);
-                player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.copied").getUnformattedComponentText()), true);
             }
         }
     }
 
     private static boolean findBlocks(World world, BlockPos start, BlockPos end, ItemStack stack, EntityPlayer player, GadgetCopyPaste tool) {
         setLastBuild(stack, null, 0);
-
+        int foundTE = 0;
         int startX = start.getX();
         int startY = start.getY();
         int startZ = start.getZ();
@@ -443,45 +442,49 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
                         if (te instanceof ConstructionBlockTileEntity) {
                             actualState = ((ConstructionBlockTileEntity) te).getActualBlockState();
                         }
-                        UniqueItem uniqueItem = BlockMapIntState.blockStateToUniqueItem(actualState, player, tempPos);
-                        if (uniqueItem.item != Items.AIR) {
-                            posIntArrayList.add(GadgetUtils.relPosToInt(start, tempPos));
-                            blockMapIntState.addToMap(actualState);
-                            stateIntArrayList.add((int) blockMapIntState.findSlot(actualState));
-
-                            blockMapIntState.addToStackMap(uniqueItem, actualState);
-                            blockCount++;
-                            if (blockCount > 32768) {
-                                player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.toomanyblocks").getUnformattedComponentText()), true);
-                                return false;
-                            }
-                            NonNullList<ItemStack> drops = NonNullList.create();
-                            if (actualState != null)
-                                actualState.getBlock().getDrops(drops, world, new BlockPos(0, 0, 0), actualState, 0);
-
-                            int neededItems = 0;
-                            for (ItemStack drop : drops) {
-                                if (drop.getItem().equals(uniqueItem.item)) {
-                                    neededItems++;
-                                }
-                            }
-                            if (neededItems == 0) {
-                                neededItems = 1;
-                            }
+                        if (actualState != null) {
+                            UniqueItem uniqueItem = BlockMapIntState.blockStateToUniqueItem(actualState, player, tempPos);
                             if (uniqueItem.item != Items.AIR) {
-                                boolean found = false;
-                                for (Map.Entry<UniqueItem, Integer> entry : itemCountMap.entrySet()) {
-                                    if (entry.getKey().equals(uniqueItem)) {
-                                        itemCountMap.put(entry.getKey(), itemCountMap.get(entry.getKey()) + neededItems);
-                                        found = true;
-                                        break;
+                                posIntArrayList.add(GadgetUtils.relPosToInt(start, tempPos));
+                                blockMapIntState.addToMap(actualState);
+                                stateIntArrayList.add((int) blockMapIntState.findSlot(actualState));
+
+                                blockMapIntState.addToStackMap(uniqueItem, actualState);
+                                blockCount++;
+                                if (blockCount > 32768) {
+                                    player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.toomanyblocks").getUnformattedComponentText()), true);
+                                    return false;
+                                }
+                                NonNullList<ItemStack> drops = NonNullList.create();
+                                if (actualState != null)
+                                    actualState.getBlock().getDrops(drops, world, new BlockPos(0, 0, 0), actualState, 0);
+
+                                int neededItems = 0;
+                                for (ItemStack drop : drops) {
+                                    if (drop.getItem().equals(uniqueItem.item)) {
+                                        neededItems++;
                                     }
                                 }
-                                if (!found) {
-                                    itemCountMap.put(uniqueItem, neededItems);
+                                if (neededItems == 0) {
+                                    neededItems = 1;
+                                }
+                                if (uniqueItem.item != Items.AIR) {
+                                    boolean found = false;
+                                    for (Map.Entry<UniqueItem, Integer> entry : itemCountMap.entrySet()) {
+                                        if (entry.getKey().equals(uniqueItem)) {
+                                            itemCountMap.put(entry.getKey(), itemCountMap.get(entry.getKey()) + neededItems);
+                                            found = true;
+                                            break;
+                                        }
+                                    }
+                                    if (!found) {
+                                        itemCountMap.put(uniqueItem, neededItems);
+                                    }
                                 }
                             }
                         }
+                    } else if ((world.getTileEntity(tempPos) != null) && !(world.getTileEntity(tempPos) instanceof ConstructionBlockTileEntity)) {
+                        foundTE++;
                     }
                 }
             }
@@ -505,6 +508,12 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
         worldSave.addToMap(tool.getUUID(stack), tagCompound);
         worldSave.markForSaving();
         PacketHandler.INSTANCE.sendTo(new PacketBlockMap(tagCompound), (EntityPlayerMP) player);
+
+        if (foundTE > 0) {
+            player.sendStatusMessage(new TextComponentString(TextFormatting.YELLOW + new TextComponentTranslation("message.gadget.TEinCopy").getUnformattedComponentText() + ": " + foundTE), true);
+        } else {
+            player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.copied").getUnformattedComponentText()), true);
+        }
         return true;
     }
 
