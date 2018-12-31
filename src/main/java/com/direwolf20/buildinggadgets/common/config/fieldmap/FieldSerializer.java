@@ -477,9 +477,10 @@ public class FieldSerializer {
         });
         addSerializer(new StringArraySerializer());
         addMapper(FieldMapper.BLOCK_LIST_MAPPER_ID, FieldMapper.BLOCK_LIST_MAPPER);
+        addMapper(FieldMapper.PATTERN_LIST_MAPPER_ID, FieldMapper.PATTERN_LIST_MAPPER);
     }
 
-    public static void clear() {
+    private static void clear() {
         serializers.clear();
         mappingAdapters.clear();
     }
