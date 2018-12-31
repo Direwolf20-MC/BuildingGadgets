@@ -82,14 +82,14 @@ public class SyncedConfig {
     @AutoSync
     public static boolean enablePaste;
 
-    @AutoSync(mapperId = FieldMapper.BLOCK_LIST_MAPPER_ID)
-    public static ImmutableList<Block> blockBlacklist;
+    @AutoSync(mapperId = FieldMapper.PATTERN_LIST_MAPPER_ID)
+    public static PatternList blockBlacklist;
 
     /**
      * This Methods transfers Data from the 'Master copy' (the normal {@link Config}) into the SyncedConfig,
      * so that it can be synced to the Client.
      */
-    private static void transferValues() {
+    static void transferValues() {
         rayTraceRange = Config.rayTraceRange;
         poweredByFE = Config.poweredByFE;
         enableDestructionGadget = Config.enableDestructionGadget;
@@ -97,7 +97,7 @@ public class SyncedConfig {
         canOverwriteBlocks = Config.canOverwriteBlocks;
         enablePaste = Config.enablePaste;
 
-        blockBlacklist = FieldMapper.BLOCK_LIST_MAPPER.mapToField(Config.subCategoryBlacklist.blockBlacklist);
+        blockBlacklist = FieldMapper.PATTERN_LIST_MAPPER.mapToField(Config.subCategoryBlacklist.blockBlacklist);
 
         maxRange = Config.subCategoryGadgets.maxRange;
         energyMax = Config.subCategoryGadgets.maxEnergy;
