@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.common.tools;
 
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
-import com.direwolf20.buildinggadgets.common.config.InGameConfig;
+import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetBuilding;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetExchanger;
 import net.minecraft.block.state.IBlockState;
@@ -238,7 +238,7 @@ public class GadgetUtils {
         }
         BlockPos pos = lookingAt.getBlockPos();
         IBlockState state = world.getBlockState(pos);
-        if (InGameConfig.blockBlacklist.contains(state.getBlock())) {
+        if (SyncedConfig.blockBlacklist.contains(state.getBlock())) {
             validBlock = false;
         }
         TileEntity te = world.getTileEntity(pos);

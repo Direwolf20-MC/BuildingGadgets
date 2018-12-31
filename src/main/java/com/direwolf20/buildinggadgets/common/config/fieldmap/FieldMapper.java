@@ -9,6 +9,14 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
+/**
+ * Class representing a bijective Function and it's reverse Function used to Mapping Field Types to other Types which can be
+ * synced more easily.
+ * The Value produced by {@link #mapToSync(Object)}will then be given to a {@link ITypeSerializer} to be serialized.
+ * The value given to {@link #mapToField(Object)} will be the deserialized Value from an appropriate {@link ITypeSerializer}.
+ * @param <FieldVal> The Type of Field this Mapper maps to
+ * @param <SyncedVal> The Type of Synced Value this Mapper maps to
+ */
 public class FieldMapper<FieldVal,SyncedVal> {
     public static final String BLOCK_LIST_MAPPER_ID = "Block List Mapper";
 

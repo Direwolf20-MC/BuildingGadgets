@@ -8,7 +8,7 @@ import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
 
-import static com.direwolf20.buildinggadgets.common.config.InGameConfig.rayTraceRange;
+import static com.direwolf20.buildinggadgets.common.config.SyncedConfig.rayTraceRange;
 
 public class VectorTools {
 
@@ -16,7 +16,7 @@ public class VectorTools {
         World world = player.world;
         Vec3d look = player.getLookVec();
         Vec3d start = new Vec3d(player.posX, player.posY + player.getEyeHeight(), player.posZ);
-        //rayTraceRange here refers to InGameConfig.rayTraceRange
+        //rayTraceRange here refers to SyncedConfig.rayTraceRange
         Vec3d end = new Vec3d(player.posX + look.x * rayTraceRange, player.posY + player.getEyeHeight() + look.y * rayTraceRange, player.posZ + look.z * rayTraceRange);
         return world.rayTraceBlocks(start, end, false, false, false);
     }

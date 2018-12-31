@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.common.network;
 
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
-import com.direwolf20.buildinggadgets.common.config.InGameConfig;
+import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.NBTTagCompound;
@@ -11,31 +11,24 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
 
+/**
+ * Packet containing a {@link NBTTagCompound} representing the serialized Config Data, to be updated on the Client.
+ */
 public class PacketSyncConfig implements IMessage {
     private NBTTagCompound tagCompound;
     public PacketSyncConfig() {
-        this(null);
+        this(new NBTTagCompound());
     }
 
     public PacketSyncConfig(NBTTagCompound tagCompound) {
         this.tagCompound = tagCompound;
     }
 
-    /**
-     * Convert from the supplied buffer into your specific message type
-     *
-     * @param buf
-     */
     @Override
     public void fromBytes(ByteBuf buf) {
         tagCompound = ByteBufUtils.readTag(buf);
     }
 
-    /**
-     * Deconstruct your message into the supplied byte buffer
-     *
-     * @param buf
-     */
     @Override
     public void toBytes(ByteBuf buf) {
         ByteBufUtils.writeTag(buf,tagCompound);
@@ -44,24 +37,19 @@ public class PacketSyncConfig implements IMessage {
     public NBTTagCompound getTagCompound() {
         return tagCompound;
     }
-
+    /**
+     * Client-Side Handler for {@link PacketSyncConfig}
+     */
     public static class Handler implements IMessageHandler<PacketSyncConfig,IMessage> {
-        /**
-         * Called when a message is received of the appropriate type. You can optionally return a reply message, or null if no reply
-         * is needed.
-         *
-         * @param message The message
-         * @param ctx
-         * @return an optional return message
-         */
+
         @Override
         public IMessage onMessage(PacketSyncConfig message, MessageContext ctx) {
             if (ctx.side!=Side.CLIENT)
                 return null;
             Minecraft.getMinecraft().addScheduledTask(() -> {
                 NBTTagCompound compound = message.getTagCompound();
-                BuildingGadgets.logger.info("Received InGameConfig from Server.");
-                InGameConfig.onReadSynchronisation(compound);
+                BuildingGadgets.logger.info("Received SyncedConfig from Server.");
+                SyncedConfig.onReadSynchronisation(compound);
             });
             return null;
         }

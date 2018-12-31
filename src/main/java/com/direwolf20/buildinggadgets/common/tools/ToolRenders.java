@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.common.tools;
 
 import com.direwolf20.buildinggadgets.common.blocks.ModBlocks;
-import com.direwolf20.buildinggadgets.common.config.InGameConfig;
+import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
 import com.direwolf20.buildinggadgets.common.items.FakeBuilderWorld;
 import com.direwolf20.buildinggadgets.common.items.ModItems;
 import com.direwolf20.buildinggadgets.common.items.capability.CapabilityProviderEnergy;
@@ -86,12 +86,12 @@ public class ToolRenders {
                 int hasBlocks = InventoryManipulation.countItem(itemStack, player);
                 hasBlocks = hasBlocks + InventoryManipulation.countPaste(player);
                 int hasEnergy = 0;
-                if (InGameConfig.poweredByFE) {
+                if (SyncedConfig.poweredByFE) {
                     hasEnergy = CapabilityProviderEnergy.getCap(stack).getEnergyStored();
                 } else {
                     hasEnergy = stack.getMaxDamage() - stack.getItemDamage();
                 }
-                if (player.capabilities.isCreativeMode || (!InGameConfig.poweredByFE && !stack.isItemStackDamageable())) {
+                if (player.capabilities.isCreativeMode || (!SyncedConfig.poweredByFE && !stack.isItemStackDamageable())) {
                     hasEnergy = 1000000;
                 }
                 //Prepare the block rendering
@@ -151,7 +151,7 @@ public class ToolRenders {
                     GlStateManager.scale(1.01f, 1.01f, 1.01f);
                     GL14.glBlendColor(1F, 1F, 1F, 0.35f); //Set the alpha of the blocks we are rendering
                     hasBlocks--;
-                    if (InGameConfig.poweredByFE) {
+                    if (SyncedConfig.poweredByFE) {
                         hasEnergy = hasEnergy - ModItems.gadgetBuilding.getEnergyCost();
                     } else {
                         hasEnergy--;
@@ -215,12 +215,12 @@ public class ToolRenders {
                 int hasBlocks = InventoryManipulation.countItem(itemStack, player);
                 hasBlocks = hasBlocks + InventoryManipulation.countPaste(player);
                 int hasEnergy = 0;
-                if (InGameConfig.poweredByFE) {
+                if (SyncedConfig.poweredByFE) {
                     hasEnergy = CapabilityProviderEnergy.getCap(stack).getEnergyStored();
                 } else {
                     hasEnergy = stack.getMaxDamage() - stack.getItemDamage();
                 }
-                if (player.capabilities.isCreativeMode || (!InGameConfig.poweredByFE && !stack.isItemStackDamageable())) {
+                if (player.capabilities.isCreativeMode || (!SyncedConfig.poweredByFE && !stack.isItemStackDamageable())) {
                     hasEnergy = 1000000;
                 }
                 //Prepare the block rendering
@@ -287,7 +287,7 @@ public class ToolRenders {
                     GlStateManager.scale(1.02f, 1.02f, 1.02f);//Slightly Larger block to avoid z-fighting.
                     GL14.glBlendColor(1F, 1F, 1F, 0.55f); //Set the alpha of the blocks we are rendering
                     hasBlocks--;
-                    if (InGameConfig.poweredByFE) {
+                    if (SyncedConfig.poweredByFE) {
                         hasEnergy = hasEnergy - ModItems.gadgetExchanger.getEnergyCost();
                     } else {
                         hasEnergy = hasEnergy - 2;

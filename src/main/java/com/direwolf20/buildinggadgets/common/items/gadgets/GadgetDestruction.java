@@ -4,7 +4,7 @@ import com.direwolf20.buildinggadgets.client.gui.GuiProxy;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.blocks.ModBlocks;
-import com.direwolf20.buildinggadgets.common.config.InGameConfig;
+import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.common.tools.BlockMapIntState;
 import com.direwolf20.buildinggadgets.common.tools.GadgetUtils;
@@ -49,19 +49,19 @@ public class GadgetDestruction extends GadgetGeneric {
         setRegistryName("destructiontool");        // The unique name (within your mod) that identifies this item
         setUnlocalizedName(BuildingGadgets.MODID + ".destructiontool");     // Used for localization (en_US.lang)
         setMaxStackSize(1);
-        if (!InGameConfig.poweredByFE) {
-            setMaxDamage(InGameConfig.durabilityDestruction);
+        if (!SyncedConfig.poweredByFE) {
+            setMaxDamage(SyncedConfig.durabilityDestruction);
         }
     }
 
     @Override
     public int getEnergyMax() {
-        return InGameConfig.energyMaxDestruction;
+        return SyncedConfig.energyMaxDestruction;
     }
 
     @Override
     public int getEnergyCost() {
-        return InGameConfig.energyCostDestruction;
+        return SyncedConfig.energyCostDestruction;
     }
 
     @Override
@@ -74,7 +74,7 @@ public class GadgetDestruction extends GadgetGeneric {
         super.addInformation(stack, world, list, b);
         list.add(TextFormatting.RED + I18n.format("tooltip.gadget.destroywarning"));
         list.add(TextFormatting.AQUA + I18n.format("tooltip.gadget.destroyshowoverlay") + ": " + getOverlay(stack));
-        if (InGameConfig.poweredByFE) {
+        if (SyncedConfig.poweredByFE) {
             IEnergyStorage energy = stack.getCapability(CapabilityEnergy.ENERGY, null);
             if (energy != null)
                 list.add(TextFormatting.WHITE + I18n.format("tooltip.gadget.energy") + ": " + withSuffix(energy.getEnergyStored()) + "/" + withSuffix(energy.getMaxEnergyStored()));

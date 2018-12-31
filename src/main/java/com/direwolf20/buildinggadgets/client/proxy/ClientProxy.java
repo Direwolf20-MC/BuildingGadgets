@@ -5,7 +5,7 @@ import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.blocks.ModBlocks;
 import com.direwolf20.buildinggadgets.common.blocks.Models.BakedModelLoader;
 import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManagerContainer;
-import com.direwolf20.buildinggadgets.common.config.InGameConfig;
+import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
 import com.direwolf20.buildinggadgets.common.entities.*;
 import com.direwolf20.buildinggadgets.common.items.ModItems;
 import com.direwolf20.buildinggadgets.common.items.gadgets.*;
@@ -53,10 +53,10 @@ public class ClientProxy extends CommonProxy {
         ModItems.gadgetExchanger.initModel();
         ModItems.gadgetCopyPaste.initModel();
         ModItems.template.initModel();
-        if (InGameConfig.enableDestructionGadget) {
+        if (SyncedConfig.enableDestructionGadget) {
             ModItems.gadgetDestruction.initModel();
         }
-        if (InGameConfig.enablePaste) {
+        if (SyncedConfig.enablePaste) {
             ModItems.constructionPaste.initModel();
             ModItems.constructionPasteContainer.initModel();
             ModItems.constructionPasteContainert2.initModel();

@@ -6,7 +6,7 @@ import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.blocks.*;
 import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManager;
 import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManagerTileEntity;
-import com.direwolf20.buildinggadgets.common.config.InGameConfig;
+import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
 import com.direwolf20.buildinggadgets.common.entities.ModEntities;
 import com.direwolf20.buildinggadgets.common.items.*;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetBuilding;
@@ -47,7 +47,7 @@ public class CommonProxy {
         event.getRegistry().register(new EffectBlock());
         event.getRegistry().register(new TemplateManager());
         GameRegistry.registerTileEntity(TemplateManagerTileEntity.class, new ResourceLocation(BuildingGadgets.MODID, "templateManager"));
-        if (InGameConfig.enablePaste) {
+        if (SyncedConfig.enablePaste) {
             event.getRegistry().register(new ConstructionBlock());
             event.getRegistry().register(new ConstructionBlockPowder());
             GameRegistry.registerTileEntity(ConstructionBlockTileEntity.class, new ResourceLocation(BuildingGadgets.MODID,  "_constructionBlock"));
@@ -61,10 +61,10 @@ public class CommonProxy {
         event.getRegistry().register(new GadgetCopyPaste());
         event.getRegistry().register(new ItemBlock(ModBlocks.templateManager).setRegistryName(ModBlocks.templateManager.getRegistryName()));
         event.getRegistry().register(new Template());
-        if (InGameConfig.enableDestructionGadget) {
+        if (SyncedConfig.enableDestructionGadget) {
             event.getRegistry().register(new GadgetDestruction());
         }
-        if (InGameConfig.enablePaste) {
+        if (SyncedConfig.enablePaste) {
             event.getRegistry().register(new ItemBlock(ModBlocks.constructionBlock).setRegistryName(ModBlocks.constructionBlock.getRegistryName()));
             event.getRegistry().register(new ItemBlock(ModBlocks.constructionBlockPowder).setRegistryName(ModBlocks.constructionBlockPowder.getRegistryName()));
             event.getRegistry().register(new ConstructionPaste());

@@ -2,7 +2,7 @@ package com.direwolf20.buildinggadgets.common.blocks;
 
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManager;
-import com.direwolf20.buildinggadgets.common.config.InGameConfig;
+import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.color.BlockColors;
 import net.minecraftforge.fml.common.registry.GameRegistry;
@@ -24,6 +24,6 @@ public class ModBlocks {
     @SideOnly(Side.CLIENT)
     public static void initColorHandlers() {
         BlockColors blockColors = Minecraft.getMinecraft().getBlockColors();
-        if (InGameConfig.enablePaste) {constructionBlock.initColorHandler(blockColors);}
+        if (SyncedConfig.enablePaste) {constructionBlock.initColorHandler(blockColors);}
     }
 }

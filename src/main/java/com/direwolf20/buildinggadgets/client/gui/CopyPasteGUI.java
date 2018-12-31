@@ -6,7 +6,7 @@
 package com.direwolf20.buildinggadgets.client.gui;
 
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
-import com.direwolf20.buildinggadgets.common.config.InGameConfig;
+import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
 import com.direwolf20.buildinggadgets.common.items.ModItems;
 import com.direwolf20.buildinggadgets.common.network.PacketCopyCoords;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
@@ -34,7 +34,7 @@ public class CopyPasteGUI extends GuiScreen {
     private GuiTextField endY;
     private GuiTextField endZ;
 
-    private boolean absoluteCoords = InGameConfig.absoluteCoordDefault;
+    private boolean absoluteCoords = SyncedConfig.absoluteCoordDefault;
 
     private int guiLeft = 15;
     private int guiTop = 15;

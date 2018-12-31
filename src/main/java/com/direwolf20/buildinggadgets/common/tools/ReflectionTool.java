@@ -2,6 +2,8 @@ package com.direwolf20.buildinggadgets.common.tools;
 
 import com.google.common.collect.ImmutableList;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.List;
@@ -25,5 +27,15 @@ public class ReflectionTool {
                 res.add(field);
         }
         return res.build();
+    }
+
+    /**
+     *
+     * @param field The field to test
+     * @param instance The instance to check for appropriate nullability
+     * @return whether or not the instance is null if the Field is static, or non-null (and of an appropriate class) if the Field is not
+     */
+    public static boolean isInstanceProvidedForField(@Nonnull Field field, @Nullable Object instance) {
+        return (instance != null && !ReflectionTool.PREDICATE_STATIC.test(field) && field.getType().isAssignableFrom(instance.getClass())) || (instance == null && ReflectionTool.PREDICATE_STATIC.test(field));
     }
 }

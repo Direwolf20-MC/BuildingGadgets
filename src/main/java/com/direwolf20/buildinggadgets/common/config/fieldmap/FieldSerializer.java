@@ -3,9 +3,11 @@ package com.direwolf20.buildinggadgets.common.config.fieldmap;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.tools.ArrayUtils;
 import com.direwolf20.buildinggadgets.common.tools.NBTTool;
+import com.direwolf20.buildinggadgets.common.tools.ReflectionTool;
 import com.google.common.base.Preconditions;
 import net.minecraft.nbt.*;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.lang.reflect.Field;
 import java.util.HashMap;
@@ -13,6 +15,9 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * This class allows for converting
+ */
 public class FieldSerializer {
     private static Set<ITypeSerializer> serializers = new HashSet<>();
     private static Map<String, FieldMapper<?,?>> mappingAdapters = new HashMap<>();
@@ -26,14 +31,23 @@ public class FieldSerializer {
         mappingAdapters.put(id,mapper);
     }
 
+    private static FieldWrapper wrapperFor(@Nonnull Field field, @Nullable Object instance,@Nonnull String mapper) {
+        return new FieldWrapper(field,mappingAdapters.getOrDefault(mapper, FieldMapper.GENERIC_IDENTITY_MAPPER), instance);
+    }
+
     private static FieldWrapper wrapperFor(Field field, String mapper) {
-        return new FieldWrapper(field,mappingAdapters.getOrDefault(mapper, FieldMapper.GENERIC_IDENTITY_MAPPER));
+        return wrapperFor(field,null,mapper);
     }
 
     @Nullable
     public static NBTBase parseFieldValue(Field field, String mapperId) {
+        return parseFieldValue(field,null,mapperId);
+    }
+
+    @Nullable
+    public static NBTBase parseFieldValue(@Nonnull Field field, @Nullable Object instance, @Nonnull String mapperId) {
         field.setAccessible(true);
-        FieldWrapper wrapper = wrapperFor(field,mapperId);
+        FieldWrapper wrapper = wrapperFor(field,instance,mapperId);
         NBTBase tag = null;
         for (ITypeSerializer serializer: serializers) {
             try {
@@ -48,8 +62,12 @@ public class FieldSerializer {
     }
 
     public static void applyValue(NBTBase nbt, Field field, String mapperId){
+        applyValue(nbt,field,null,mapperId);
+    }
+
+    public static void applyValue(@Nonnull NBTBase nbt, @Nonnull Field field, @Nullable Object instance, @Nonnull String mapperId){
         field.setAccessible(true);
-        FieldWrapper wrapper = wrapperFor(field,mapperId);
+        FieldWrapper wrapper = wrapperFor(field,instance,mapperId);
         for (ITypeSerializer serializer: serializers) {
             try {
                 if (serializer.applyValue(nbt,wrapper))
