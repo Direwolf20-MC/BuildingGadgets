@@ -1,10 +1,10 @@
 package com.direwolf20.buildinggadgets.common.blocks;
 
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
-import com.direwolf20.buildinggadgets.common.items.ModItems;
 import com.direwolf20.buildinggadgets.common.blocks.Models.BlockstateProperty;
 import com.direwolf20.buildinggadgets.common.blocks.Models.ConstructionBakedModel;
 import com.direwolf20.buildinggadgets.common.items.FakeRenderWorld;
+import com.direwolf20.buildinggadgets.common.items.ModItems;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;

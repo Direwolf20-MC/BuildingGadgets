@@ -1,10 +1,9 @@
 package com.direwolf20.buildinggadgets.client.gui;
 
-import org.lwjgl.util.Rectangle;
-
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.inventory.Slot;
+import org.lwjgl.util.Rectangle;
 
 public class AreaHelpText implements IHoverHelpText {
     private int minX, minY, maxX, maxY;
