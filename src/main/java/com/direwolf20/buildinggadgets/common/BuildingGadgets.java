@@ -2,6 +2,7 @@ package com.direwolf20.buildinggadgets.common;
 
 import com.direwolf20.buildinggadgets.common.commands.DeleteBlockMapsCommand;
 import com.direwolf20.buildinggadgets.common.commands.FindBlockMapsCommand;
+import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
 import com.direwolf20.buildinggadgets.common.events.AnvilRepairHandler;
 import com.direwolf20.buildinggadgets.common.items.ModItems;
 import com.direwolf20.buildinggadgets.common.proxy.CommonProxy;
@@ -19,7 +20,6 @@ import org.apache.logging.log4j.Logger;
 
 
 @Mod(modid = BuildingGadgets.MODID, name = BuildingGadgets.MODNAME, version = BuildingGadgets.VERSION, updateJSON = BuildingGadgets.UPDATE_JSON, useMetadata = true)
-
 public class BuildingGadgets {
     public static final String MODID = "buildinggadgets";
     public static final String MODNAME = "Building Gadgets";
@@ -45,7 +45,7 @@ public class BuildingGadgets {
     public void preInit(FMLPreInitializationEvent event) {
         logger = event.getModLog();
         proxy.preInit(event);
-        if (!Config.poweredByFE) {
+        if (!SyncedConfig.poweredByFE) {
             MinecraftForge.EVENT_BUS.register(new AnvilRepairHandler());
         }
     }

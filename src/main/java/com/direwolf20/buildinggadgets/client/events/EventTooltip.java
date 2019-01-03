@@ -5,9 +5,9 @@ package com.direwolf20.buildinggadgets.client.events;
  * Thanks Vazkii!!
  */
 
+import com.direwolf20.buildinggadgets.common.items.ITemplate;
 import com.direwolf20.buildinggadgets.common.items.ModItems;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
-import com.direwolf20.buildinggadgets.common.items.ITemplate;
 import com.direwolf20.buildinggadgets.common.tools.BlockMap;
 import com.direwolf20.buildinggadgets.common.tools.InventoryManipulation;
 import com.direwolf20.buildinggadgets.common.tools.PasteToolBufferBuilder;
