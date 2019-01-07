@@ -470,7 +470,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
                                 if (neededItems == 0) {
                                     neededItems = 1;
                                 }
-                                itemCountMap.setCount(uniqueItem,itemCountMap.count(uniqueItem)+neededItems);
+                                itemCountMap.add(uniqueItem,neededItems);
                             }
                         }
                     } else if ((world.getTileEntity(tempPos) != null) && !(world.getTileEntity(tempPos) instanceof ConstructionBlockTileEntity)) {

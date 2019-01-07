@@ -197,7 +197,7 @@ public class TemplateManagerCommands {
                     neededItems = 1;
                 }
                 if (uniqueItem.item != Items.AIR) {
-                    itemCountMap.setCount(uniqueItem,itemCountMap.count(uniqueItem)+neededItems);
+                    itemCountMap.add(uniqueItem,neededItems);
                 }
             }
         }
