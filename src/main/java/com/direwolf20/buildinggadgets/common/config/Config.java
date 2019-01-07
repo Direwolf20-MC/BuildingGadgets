@@ -71,7 +71,7 @@ public class Config {
                   "Notice that you can use Regular Expressions as defined by Java Patterns to express more complex name combinations.",
                   "Use for example \"awfulmod:.*\" to blacklist all awfulmod Blocks."})
         @LangKey(LANG_KEY_BLACKLIST+".blockBlacklist")
-        public String[] blockBlacklist = {"minecraft:.*door.*",PatternList.getName(Blocks.PISTON_HEAD)};
+        public String[] blockBlacklist = {"minecraft:.*_door.*",PatternList.getName(Blocks.PISTON_HEAD)};
     }
 
     @Name("Gadgets")
