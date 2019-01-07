@@ -12,6 +12,8 @@ import com.direwolf20.buildinggadgets.common.items.capability.CapabilityProvider
 import com.direwolf20.buildinggadgets.common.network.PacketBlockMap;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.tools.*;
+import com.google.common.collect.HashMultiset;
+import com.google.common.collect.Multiset;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import net.minecraft.block.material.Material;
@@ -426,7 +428,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
         List<Integer> posIntArrayList = new ArrayList<Integer>();
         List<Integer> stateIntArrayList = new ArrayList<Integer>();
         BlockMapIntState blockMapIntState = new BlockMapIntState();
-        Map<UniqueItem, Integer> itemCountMap = new HashMap<UniqueItem, Integer>();
+        Multiset<UniqueItem> itemCountMap = HashMultiset.create();
 
         int blockCount = 0;
 
@@ -468,19 +470,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
                                 if (neededItems == 0) {
                                     neededItems = 1;
                                 }
-                                if (uniqueItem.item != Items.AIR) {
-                                    boolean found = false;
-                                    for (Map.Entry<UniqueItem, Integer> entry : itemCountMap.entrySet()) {
-                                        if (entry.getKey().equals(uniqueItem)) {
-                                            itemCountMap.put(entry.getKey(), itemCountMap.get(entry.getKey()) + neededItems);
-                                            found = true;
-                                            break;
-                                        }
-                                    }
-                                    if (!found) {
-                                        itemCountMap.put(uniqueItem, neededItems);
-                                    }
-                                }
+                                itemCountMap.setCount(uniqueItem,itemCountMap.count(uniqueItem)+neededItems);
                             }
                         }
                     } else if ((world.getTileEntity(tempPos) != null) && !(world.getTileEntity(tempPos) instanceof ConstructionBlockTileEntity)) {
