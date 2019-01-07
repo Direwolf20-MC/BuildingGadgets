@@ -10,7 +10,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
 
 /**
- * This empty packets represents a Request from the Server to re-send the {@link SyncedConfig}.
+ * This empty packets represents a Request from the Client to re-send the {@link SyncedConfig}.
  */
 public class PacketRequestConfigSync implements IMessage {
     @Override
