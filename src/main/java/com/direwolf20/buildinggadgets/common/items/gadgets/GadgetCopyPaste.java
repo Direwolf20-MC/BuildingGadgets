@@ -246,46 +246,6 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
     }
 
     @Override
-    public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
-        ItemStack stack = player.getHeldItem(hand);
-        player.setActiveHand(hand);
-        if (!world.isRemote) {
-            if (getToolMode(stack) == ToolMode.Copy) {
-                if (player.isSneaking()) {
-                    if (getStartPos(stack) != null) {
-                        copyBlocks(stack, player, world, getStartPos(stack), pos);
-                    } else {
-                        setEndPos(stack, pos);
-                    }
-                } else {
-                    //setStartPos(stack, pos);
-                    if (getEndPos(stack) != null) {
-                        copyBlocks(stack, player, world, pos, getEndPos(stack));
-                    } else {
-                        setStartPos(stack, pos);
-                    }
-                }
-
-            } else if (getToolMode(stack) == ToolMode.Paste) {
-                if (!player.isSneaking()) {
-                    buildBlockMap(world, pos, stack, player);
-                }
-            }
-            NBTTagCompound tagCompound = stack.getTagCompound();
-            ByteBuf buf = Unpooled.buffer(16);
-            ByteBufUtils.writeTag(buf, tagCompound);
-            //System.out.println(buf.readableBytes());
-        } else {
-            if (player.isSneaking() && getToolMode(stack) == ToolMode.Paste) {
-                player.openGui(BuildingGadgets.instance, GuiProxy.PasteID, world, hand.ordinal(), 0, 0);
-                return EnumActionResult.SUCCESS;
-            }
-        }
-
-        return EnumActionResult.SUCCESS;
-    }
-
-    @Override
     public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
         ItemStack stack = player.getHeldItem(hand);
         player.setActiveHand(hand);

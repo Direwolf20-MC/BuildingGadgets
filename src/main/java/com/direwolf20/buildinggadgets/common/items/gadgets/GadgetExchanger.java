@@ -142,21 +142,6 @@ public class GadgetExchanger extends GadgetGeneric {
         }
     }
 
-
-    @Override
-    public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
-        ItemStack stack = player.getHeldItem(hand);
-        player.setActiveHand(hand);
-        if (!world.isRemote) {
-            if (player.isSneaking()) {
-                selectBlock(stack, player);
-            } else {
-                exchange(player, stack);
-            }
-        }
-        return EnumActionResult.SUCCESS;
-    }
-
     @Override
     public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
         ItemStack itemstack = player.getHeldItem(hand);
