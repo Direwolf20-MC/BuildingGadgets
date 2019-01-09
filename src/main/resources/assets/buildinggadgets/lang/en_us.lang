@@ -40,6 +40,7 @@ key.categories.buildingGadgets=Building Gadgets
 key.modeSwitch=Mode Switch
 key.rangeChange=Range
 key.undoKey=Undo/Fuzzy
+key.tooltip=Tooltip Modifier
 
 #tooltip: 
 tooltip.constructionblockpowder.helptext=Place next to water

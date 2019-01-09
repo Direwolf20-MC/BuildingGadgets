@@ -19,16 +19,19 @@ public class KeyBindings {
     public static KeyBinding rangeChange;
     public static KeyBinding undoKey;
     public static KeyBinding anchorKey;
+    public static KeyBinding tooltipKey;
 
     public static void init() {
         modeSwitch = new KeyBinding("key.modeSwitch", CONFLICT_CONTEXT_GADGET, Keyboard.KEY_G, "key.categories.buildingGadgets");
         rangeChange = new KeyBinding("key.rangeChange", CONFLICT_CONTEXT_GADGET, Keyboard.KEY_R, "key.categories.buildingGadgets");
         undoKey = new KeyBinding("key.undoKey", CONFLICT_CONTEXT_GADGET, Keyboard.KEY_U, "key.categories.buildingGadgets");
         anchorKey = new KeyBinding("key.anchorKey", CONFLICT_CONTEXT_GADGET, Keyboard.KEY_H, "key.categories.buildingGadgets");
+        tooltipKey = new KeyBinding("key.tooltip", KeyConflictContext.GUI, Keyboard.KEY_LSHIFT, "key.categories.buildingGadgets");
         ClientRegistry.registerKeyBinding(modeSwitch);
         ClientRegistry.registerKeyBinding(rangeChange);
         ClientRegistry.registerKeyBinding(undoKey);
         ClientRegistry.registerKeyBinding(anchorKey);
+        ClientRegistry.registerKeyBinding(tooltipKey);
     }
 
     public static class KeyConflictContextGadget implements IKeyConflictContext

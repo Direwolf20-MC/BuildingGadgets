@@ -7,6 +7,7 @@ package com.direwolf20.buildinggadgets.client.events;
 
 import com.direwolf20.buildinggadgets.common.items.ModItems;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
+import com.direwolf20.buildinggadgets.client.KeyBindings;
 import com.direwolf20.buildinggadgets.common.items.ITemplate;
 import com.direwolf20.buildinggadgets.common.tools.BlockMap;
 import com.direwolf20.buildinggadgets.common.tools.InventoryManipulation;
@@ -14,7 +15,6 @@ import com.direwolf20.buildinggadgets.common.tools.PasteToolBufferBuilder;
 import com.direwolf20.buildinggadgets.common.tools.UniqueItem;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderItem;
 import net.minecraft.init.Items;
@@ -23,11 +23,14 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.client.event.RenderTooltipEvent;
+import net.minecraftforge.client.settings.KeyConflictContext;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+
+import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
 
 import java.util.*;
@@ -37,9 +40,16 @@ public class EventTooltip {
 
     private static final int STACKS_PER_LINE = 8;
 
+    private static boolean tooltipKeyIsDown() {
+        int keyCode = KeyBindings.tooltipKey.getKeyCode();
+        return keyCode != 0
+                && KeyBindings.tooltipKey.getKeyModifier().isActive(KeyBindings.tooltipKey.getKeyConflictContext())
+                && Keyboard.isKeyDown(keyCode);
+    }
+
     @SideOnly(Side.CLIENT)
     private static void tooltipIfShift(@SuppressWarnings("unused") List<String> tooltip, Runnable r) {
-        if (GuiScreen.isShiftKeyDown())
+        if (tooltipKeyIsDown())
             r.run();
         //else addToTooltip(tooltip, "arl.misc.shiftForInfo");
     }
@@ -96,7 +106,7 @@ public class EventTooltip {
     public static void onDrawTooltip(RenderTooltipEvent.PostText event) {
         //This method will draw items on the tooltip
         ItemStack stack = event.getStack();
-        if ((stack.getItem() instanceof ITemplate) && GuiScreen.isShiftKeyDown()) {
+        if ((stack.getItem() instanceof ITemplate) && tooltipKeyIsDown()) {
             int totalMissing = 0;
             Map<UniqueItem, Integer> itemCountMap = ((ITemplate) stack.getItem()).getItemCountMap(stack);
 
