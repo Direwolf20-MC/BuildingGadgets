@@ -26,10 +26,10 @@ import java.util.*;
 
 public class InventoryManipulation {
     private static IProperty AXIS = PropertyEnum.create("axis", EnumFacing.Axis.class);
-    private static final Set<IProperty> safeProperties = ImmutableSet.of(BlockSlab.HALF, BlockStairs.HALF, BlockLog.LOG_AXIS, AXIS,
+    private static final Set<IProperty> SAFE_PROPERTIES = ImmutableSet.of(BlockSlab.HALF, BlockStairs.HALF, BlockLog.LOG_AXIS, AXIS,
             BlockDirectional.FACING, BlockStairs.FACING, BlockTrapDoor.HALF, BlockTorch.FACING, BlockStairs.SHAPE, BlockLever.FACING, BlockLever.POWERED, BlockRedstoneRepeater.DELAY);
 
-    private static final Set<IProperty> safePropertiesCopyPaste = ImmutableSet.of(BlockSlab.HALF, BlockStairs.HALF, BlockLog.LOG_AXIS, AXIS,
+    private static final Set<IProperty> SAFE_PROPERTIES_COPY_PASTE = ImmutableSet.of(BlockSlab.HALF, BlockStairs.HALF, BlockLog.LOG_AXIS, AXIS,
             BlockDirectional.FACING, BlockStairs.FACING, BlockTrapDoor.HALF, BlockTorch.FACING, BlockStairs.SHAPE, BlockRail.SHAPE, BlockRailPowered.SHAPE,
             BlockLever.FACING, BlockLever.POWERED, BlockRedstoneRepeater.DELAY, BlockDoubleWoodSlab.VARIANT);
 
@@ -281,11 +281,11 @@ public class InventoryManipulation {
         }
         for (IProperty prop : placeState.getPropertyKeys()) {
             if (tool.getItem() instanceof GadgetCopyPaste) {
-                if (safePropertiesCopyPaste.contains(prop)) {
+                if (SAFE_PROPERTIES_COPY_PASTE.contains(prop)) {
                     placeState = placeState.withProperty(prop, originalState.getValue(prop));
                 }
             } else {
-                if (safeProperties.contains(prop)) {
+                if (SAFE_PROPERTIES.contains(prop)) {
                     placeState = placeState.withProperty(prop, originalState.getValue(prop));
                 }
             }
