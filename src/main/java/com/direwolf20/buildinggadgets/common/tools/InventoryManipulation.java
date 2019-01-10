@@ -6,6 +6,7 @@ import com.direwolf20.buildinggadgets.common.items.ModItems;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
 import net.minecraft.block.*;
 import net.minecraft.block.properties.IProperty;
+import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -24,14 +25,13 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class InventoryManipulation {
-    private static final Set<IProperty> safeProperties = Stream.of(BlockSlab.HALF, BlockStairs.HALF, BlockLog.LOG_AXIS,
-            BlockDirectional.FACING, BlockStairs.FACING, BlockTrapDoor.HALF, BlockTorch.FACING, BlockStairs.SHAPE, BlockLever.FACING, BlockLever.POWERED, BlockRedstoneRepeater.DELAY,
-            BlockStoneSlab.VARIANT, BlockWoodSlab.VARIANT, BlockDoubleWoodSlab.VARIANT, BlockDoubleStoneSlab.VARIANT).collect(Collectors.toSet());
+    private static IProperty AXIS = PropertyEnum.create("axis", EnumFacing.Axis.class);
+    private static final Set<IProperty> safeProperties = Stream.of(BlockSlab.HALF, BlockStairs.HALF, BlockLog.LOG_AXIS, AXIS,
+            BlockDirectional.FACING, BlockStairs.FACING, BlockTrapDoor.HALF, BlockTorch.FACING, BlockStairs.SHAPE, BlockLever.FACING, BlockLever.POWERED, BlockRedstoneRepeater.DELAY).collect(Collectors.toSet());
 
-    private static final Set<IProperty> safePropertiesCopyPaste = Stream.of(BlockSlab.HALF, BlockStairs.HALF, BlockLog.LOG_AXIS,
-            BlockDirectional.FACING, BlockStairs.FACING, BlockTrapDoor.HALF, BlockTrapDoor.OPEN, BlockTorch.FACING, BlockStairs.SHAPE, BlockRail.SHAPE, BlockRailPowered.SHAPE,
-            BlockLever.FACING, BlockLever.POWERED, BlockRedstoneRepeater.DELAY, BlockDoubleWoodSlab.VARIANT, BlockDoubleStoneSlab.VARIANT,
-            BlockStoneSlab.VARIANT, BlockWoodSlab.VARIANT).collect(Collectors.toSet());
+    private static final Set<IProperty> safePropertiesCopyPaste = Stream.of(BlockSlab.HALF, BlockStairs.HALF, BlockLog.LOG_AXIS, AXIS,
+            BlockDirectional.FACING, BlockStairs.FACING, BlockTrapDoor.HALF, BlockTorch.FACING, BlockStairs.SHAPE, BlockRail.SHAPE, BlockRailPowered.SHAPE,
+            BlockLever.FACING, BlockLever.POWERED, BlockRedstoneRepeater.DELAY, BlockDoubleWoodSlab.VARIANT).collect(Collectors.toSet());
 
     public static boolean giveItem(ItemStack itemStack, EntityPlayer player) {
         if (player.capabilities.isCreativeMode) {
