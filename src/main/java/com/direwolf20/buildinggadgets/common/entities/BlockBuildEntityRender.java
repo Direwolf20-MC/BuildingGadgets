@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.common.entities;
 
+import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.blocks.ModBlocks;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -66,8 +67,13 @@ public class BlockBuildEntityRender extends Render<BlockBuildEntity> {
         } catch (Throwable t) {
             Tessellator tessellator = Tessellator.getInstance();
             BufferBuilder bufferBuilder = tessellator.getBuffer();
-            bufferBuilder.finishDrawing();
-
+            try {
+                // If the buffer is already not drawing then it'll throw
+                // and IllegalStateException... Very rare
+                bufferBuilder.finishDrawing();
+            } catch (IllegalStateException ex) {
+                BuildingGadgets.logger.error(ex);
+            }
         }
         GlStateManager.popMatrix();
 
