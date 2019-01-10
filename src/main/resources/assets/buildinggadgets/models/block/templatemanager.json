@@ -1,6 +1,12 @@
 {
-  "parent": "block/cube_all",
+  "parent": "block/orientable",
   "textures": {
-    "all": "buildinggadgets:blocks/templatemanager"
+    "particle": "buildinggadgets:blocks/templatemanager",
+    "north": "buildinggadgets:blocks/templatemanagerfront",
+    "top": "buildinggadgets:blocks/templatemanagertop",
+    "bottom": "buildinggadgets:blocks/templatemanagerbottom",
+    "south": "buildinggadgets:blocks/templatemanager",
+    "east": "buildinggadgets:blocks/templatemanager",
+    "west": "buildinggadgets:blocks/templatemanager"
   }
 }
