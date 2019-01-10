@@ -4,13 +4,13 @@ import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import net.minecraft.init.Blocks;
 import net.minecraftforge.common.config.Config.*;
 
-//hardcode this name, so that we don't use a different config file than before we used Annotations
+//hardcode this name, so that we use a different config file than before we used Annotations
 @net.minecraftforge.common.config.Config(modid = BuildingGadgets.MODID, name = "Building Gadgets", category =  Config.CATEGORY_ROOT)
 public class Config {
 
     static final String CATEGORY_ROOT = "general";
 
-    private static final String LANG_KEY_ROOT = BuildingGadgets.MODID +".config."+CATEGORY_ROOT;
+    private static final String LANG_KEY_ROOT = "config."+BuildingGadgets.MODID+ "." +CATEGORY_ROOT;
 
     private static final String LANG_KEY_BLACKLIST = LANG_KEY_ROOT+".subCategoryBlacklist";
 
