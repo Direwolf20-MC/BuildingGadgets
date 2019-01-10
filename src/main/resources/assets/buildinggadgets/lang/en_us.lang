@@ -5,7 +5,7 @@ itemGroup.buildingGadgets=Building Gadgets
 #singles: 
 singles.buildinggadgets.depth=Depth
 singles.buildinggadgets.down=Down
-singles.buildinggadgets.left=left
+singles.buildinggadgets.left=Left
 singles.buildinggadgets.right=Right
 singles.buildinggadgets.up=Up
 singles.buildinggadgets.confirm=Ok
