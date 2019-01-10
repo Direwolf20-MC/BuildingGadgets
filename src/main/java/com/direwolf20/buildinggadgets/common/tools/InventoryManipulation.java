@@ -4,6 +4,8 @@ import com.direwolf20.buildinggadgets.common.items.ConstructionPaste;
 import com.direwolf20.buildinggadgets.common.items.GenericPasteContainer;
 import com.direwolf20.buildinggadgets.common.items.ModItems;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
+import com.google.common.collect.ImmutableSet;
+
 import net.minecraft.block.*;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyEnum;
@@ -21,17 +23,15 @@ import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class InventoryManipulation {
     private static IProperty AXIS = PropertyEnum.create("axis", EnumFacing.Axis.class);
-    private static final Set<IProperty> safeProperties = Stream.of(BlockSlab.HALF, BlockStairs.HALF, BlockLog.LOG_AXIS, AXIS,
-            BlockDirectional.FACING, BlockStairs.FACING, BlockTrapDoor.HALF, BlockTorch.FACING, BlockStairs.SHAPE, BlockLever.FACING, BlockLever.POWERED, BlockRedstoneRepeater.DELAY).collect(Collectors.toSet());
+    private static final Set<IProperty> safeProperties = ImmutableSet.of(BlockSlab.HALF, BlockStairs.HALF, BlockLog.LOG_AXIS, AXIS,
+            BlockDirectional.FACING, BlockStairs.FACING, BlockTrapDoor.HALF, BlockTorch.FACING, BlockStairs.SHAPE, BlockLever.FACING, BlockLever.POWERED, BlockRedstoneRepeater.DELAY);
 
-    private static final Set<IProperty> safePropertiesCopyPaste = Stream.of(BlockSlab.HALF, BlockStairs.HALF, BlockLog.LOG_AXIS, AXIS,
+    private static final Set<IProperty> safePropertiesCopyPaste = ImmutableSet.of(BlockSlab.HALF, BlockStairs.HALF, BlockLog.LOG_AXIS, AXIS,
             BlockDirectional.FACING, BlockStairs.FACING, BlockTrapDoor.HALF, BlockTorch.FACING, BlockStairs.SHAPE, BlockRail.SHAPE, BlockRailPowered.SHAPE,
-            BlockLever.FACING, BlockLever.POWERED, BlockRedstoneRepeater.DELAY, BlockDoubleWoodSlab.VARIANT).collect(Collectors.toSet());
+            BlockLever.FACING, BlockLever.POWERED, BlockRedstoneRepeater.DELAY, BlockDoubleWoodSlab.VARIANT);
 
     public static boolean giveItem(ItemStack itemStack, EntityPlayer player) {
         if (player.capabilities.isCreativeMode) {
