@@ -5,6 +5,7 @@ import com.direwolf20.buildinggadgets.common.commands.FindBlockMapsCommand;
 import com.direwolf20.buildinggadgets.common.events.AnvilRepairHandler;
 import com.direwolf20.buildinggadgets.common.items.ModItems;
 import com.direwolf20.buildinggadgets.common.proxy.CommonProxy;
+import com.direwolf20.buildinggadgets.common.schematics.SchematicResourceProvider;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.TextComponentTranslation;
@@ -40,10 +41,12 @@ public class BuildingGadgets {
     public static BuildingGadgets instance;
 
     public static Logger logger;
+    private SchematicResourceProvider schematicProvider;
 
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
         logger = event.getModLog();
+        schematicProvider = SchematicResourceProvider.createInstance(event.getModConfigurationDirectory());
         proxy.preInit(event);
         if (!Config.poweredByFE) {
             MinecraftForge.EVENT_BUS.register(new AnvilRepairHandler());
@@ -64,5 +67,10 @@ public class BuildingGadgets {
     public void serverLoad(FMLServerStartingEvent event) {
         event.registerServerCommand(new FindBlockMapsCommand());
         event.registerServerCommand(new DeleteBlockMapsCommand());
+    }
+
+    public SchematicResourceProvider getSchematicProvider() {
+        if (schematicProvider == null) throw new IllegalStateException("SchematicProvider accessed before it could be properly created. The Schematic provider is only valid after Initilisition has passed!");
+        return schematicProvider;
     }
 }
