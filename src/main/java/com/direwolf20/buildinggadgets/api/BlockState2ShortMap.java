@@ -22,6 +22,7 @@ public class BlockState2ShortMap {
     public static BlockState2ShortMap readFromNBT(@Nullable NBTTagCompound tagCompound) {
         BlockState2ItemMap mapIntState = new BlockState2ItemMap();
         if (tagCompound == null) return mapIntState;
+        mapIntState.readNBT(tagCompound);
         return mapIntState;
     }
 
