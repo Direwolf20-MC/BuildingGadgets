@@ -1,4 +1,4 @@
-package com.direwolf20.buildinggadgets.common.items.capability;
+package com.direwolf20.buildinggadgets.common.capability;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -10,7 +10,7 @@ public class ItemEnergyForge extends EnergyStorage {
 
     private ItemStack stack;
 
-    public ItemEnergyForge(ItemStack stack, int capacity) {
+    ItemEnergyForge(ItemStack stack, int capacity) {
         super(capacity, Integer.MAX_VALUE, Integer.MAX_VALUE);
 
         this.stack = stack;

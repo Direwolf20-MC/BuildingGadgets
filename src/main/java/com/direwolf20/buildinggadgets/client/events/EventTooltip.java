@@ -5,23 +5,16 @@ package com.direwolf20.buildinggadgets.client.events;
  * Thanks Vazkii!!
  */
 
+import com.direwolf20.buildinggadgets.api.ITemplateOld;
 import com.direwolf20.buildinggadgets.common.items.ModItems;
-import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
-import com.direwolf20.buildinggadgets.common.items.ITemplate;
-import com.direwolf20.buildinggadgets.common.tools.BlockMap;
 import com.direwolf20.buildinggadgets.common.tools.InventoryManipulation;
-import com.direwolf20.buildinggadgets.common.tools.PasteToolBufferBuilder;
 import com.direwolf20.buildinggadgets.common.tools.UniqueItem;
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderItem;
-import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.client.event.RenderTooltipEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
@@ -49,8 +42,8 @@ public class EventTooltip {
         //This method extends the tooltip box size to fit the item's we will render in onDrawTooltip
         Minecraft mc = Minecraft.getMinecraft();
         ItemStack stack = event.getItemStack();
-        if (stack.getItem() instanceof ITemplate) {
-            ITemplate template = (ITemplate) stack.getItem();
+        if (stack.getItem() instanceof ITemplateOld) {
+            ITemplateOld template = (ITemplateOld) stack.getItem();
             String UUID = template.getUUID(stack);
             if (UUID == null) {
                 return;
@@ -96,9 +89,9 @@ public class EventTooltip {
     public static void onDrawTooltip(RenderTooltipEvent.PostText event) {
         //This method will draw items on the tooltip
         ItemStack stack = event.getStack();
-        if ((stack.getItem() instanceof ITemplate) && GuiScreen.isShiftKeyDown()) {
+        if ((stack.getItem() instanceof ITemplateOld) && GuiScreen.isShiftKeyDown()) {
             int totalMissing = 0;
-            Map<UniqueItem, Integer> itemCountMap = ((ITemplate) stack.getItem()).getItemCountMap(stack);
+            Map<UniqueItem, Integer> itemCountMap = ((ITemplateOld) stack.getItem()).getItemCountMap(stack);
 
             //Create an ItemStack -> Integer Map
             Map<ItemStack, Integer> itemStackCount = new HashMap<ItemStack, Integer>();
@@ -201,40 +194,6 @@ public class EventTooltip {
         }
         GlStateManager.enableDepth();
         return missingCount;
-    }
-
-    public static Map<UniqueItem, Integer> makeRequiredList(String UUID) {//TODO unused
-        Map<UniqueItem, Integer> itemCountMap = new HashMap<UniqueItem, Integer>();
-        Map<IBlockState, UniqueItem> IntStackMap = GadgetCopyPaste.getBlockMapIntState(PasteToolBufferBuilder.getTagFromUUID(UUID)).getIntStackMap();
-        List<BlockMap> blockMapList = GadgetCopyPaste.getBlockMapList(PasteToolBufferBuilder.getTagFromUUID(UUID));
-        for (BlockMap blockMap : blockMapList) {
-            UniqueItem uniqueItem = IntStackMap.get(blockMap.state);
-            NonNullList<ItemStack> drops = NonNullList.create();
-            blockMap.state.getBlock().getDrops(drops, Minecraft.getMinecraft().world, new BlockPos(0, 0, 0), blockMap.state, 0);
-            int neededItems = 0;
-            for (ItemStack drop : drops) {
-                if (drop.getItem().equals(uniqueItem.item)) {
-                    neededItems++;
-                }
-            }
-            if (neededItems == 0) {
-                neededItems = 1;
-            }
-            if (uniqueItem.item != Items.AIR) {
-                boolean found = false;
-                for (Map.Entry<UniqueItem, Integer> entry : itemCountMap.entrySet()) {
-                    if (entry.getKey().equals(uniqueItem)) {
-                        itemCountMap.put(entry.getKey(), itemCountMap.get(entry.getKey()) + neededItems);
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found) {
-                    itemCountMap.put(uniqueItem, neededItems);
-                }
-            }
-        }
-        return itemCountMap;
     }
 
 }

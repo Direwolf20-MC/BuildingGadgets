@@ -1,19 +1,21 @@
 package com.direwolf20.buildinggadgets.common.items.gadgets;
 
+import com.direwolf20.buildinggadgets.api.BlockMap;
+import com.direwolf20.buildinggadgets.api.ITemplateOld;
+import com.direwolf20.buildinggadgets.api.WorldSave;
 import com.direwolf20.buildinggadgets.client.gui.GuiProxy;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.Config;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlock;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
+import com.direwolf20.buildinggadgets.common.capability.CapabilityProviderEnergy;
+import com.direwolf20.buildinggadgets.common.capability.CapabilityProviderTemplate;
+import com.direwolf20.buildinggadgets.common.capability.WrappingCapabilityProvider;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
-import com.direwolf20.buildinggadgets.common.items.ITemplate;
 import com.direwolf20.buildinggadgets.common.items.ModItems;
-import com.direwolf20.buildinggadgets.common.items.capability.CapabilityProviderEnergy;
 import com.direwolf20.buildinggadgets.common.network.PacketBlockMap;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.tools.*;
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
@@ -36,18 +38,18 @@ import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.BlockSnapshot;
 import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.world.BlockEvent;
-import net.minecraftforge.fml.common.network.ByteBufUtils;
 
 import javax.annotation.Nullable;
 import java.util.*;
 
 import static com.direwolf20.buildinggadgets.common.tools.GadgetUtils.withSuffix;
 
-public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
+public class GadgetCopyPaste extends GadgetGeneric implements ITemplateOld {
 
     public enum ToolMode {
         Copy, Paste;
@@ -65,20 +67,6 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
         if (!Config.poweredByFE) {
             setMaxDamage(Config.durabilityCopyPaste);
         }
-    }
-
-    @Override
-    public int getEnergyCost() {
-        return Config.energyCostBuilder;
-    }
-
-    @Override
-    public int getDamagePerUse() {
-        return 1;
-    }
-
-    private static void setAnchor(ItemStack stack, BlockPos anchorPos) {
-        GadgetUtils.writePOSToNBT(stack, anchorPos, "anchor");
     }
 
     public static void setX(ItemStack stack, int horz) {
@@ -113,31 +101,6 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
         return GadgetUtils.getPOSFromNBT(stack, "anchor");
     }
 
-    @Override
-    public WorldSave getWorldSave(World world) {
-        return WorldSave.getWorldSave(world);
-    }
-
-    @Override
-    @Nullable
-    public String getUUID(ItemStack stack) {
-        NBTTagCompound tagCompound = stack.getTagCompound();
-        if (tagCompound == null) {
-            return null;
-        }
-        String uuid = tagCompound.getString("UUID");
-        if (uuid == "") {
-            if (getStartPos(stack) == null && getEndPos(stack) == null) {
-                return null;
-            }
-            UUID uid = UUID.randomUUID();
-            tagCompound.setString("UUID", uid.toString());
-            stack.setTagCompound(tagCompound);
-            uuid = uid.toString();
-        }
-        return uuid;
-    }
-
     public static String getOwner(ItemStack stack) {//TODO unused
         return GadgetUtils.getStackTag(stack).getString("owner");
     }
@@ -148,42 +111,8 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
         stack.setTagCompound(tagCompound);
     }
 
-    private static void setLastBuild(ItemStack stack, BlockPos anchorPos, Integer dim) {
-        GadgetUtils.writePOSToNBT(stack, anchorPos, "lastBuild", dim);
-    }
-
-    private static BlockPos getLastBuild(ItemStack stack) {
-        return GadgetUtils.getPOSFromNBT(stack, "lastBuild");
-    }
-
-    private static Integer getLastBuildDim(ItemStack stack) {
-        return GadgetUtils.getDIMFromNBT(stack, "lastBuild");
-    }
-
     public static List<BlockMap> getBlockMapList(@Nullable NBTTagCompound tagCompound) {
         return getBlockMapList(tagCompound, GadgetUtils.getPOSFromNBT(tagCompound, "startPos"));
-    }
-
-    private static List<BlockMap> getBlockMapList(@Nullable NBTTagCompound tagCompound, BlockPos startBlock) {
-        List<BlockMap> blockMap = new ArrayList<BlockMap>();
-        if (tagCompound == null) {
-            tagCompound = new NBTTagCompound();
-        }
-        NBTTagList MapIntStateTag = (NBTTagList) tagCompound.getTag("mapIntState");
-        if (MapIntStateTag == null) {
-            MapIntStateTag = new NBTTagList();
-        }
-        BlockMapIntState MapIntState = new BlockMapIntState();
-        MapIntState.getIntStateMapFromNBT(MapIntStateTag);
-        int[] posIntArray = tagCompound.getIntArray("posIntArray");
-        int[] stateIntArray = tagCompound.getIntArray("stateIntArray");
-        for (int i = 0; i < posIntArray.length; i++) {
-            int p = posIntArray[i];
-            BlockPos pos = GadgetUtils.relIntToPos(startBlock, p);
-            short IntState = (short) stateIntArray[i];
-            blockMap.add(new BlockMap(pos, MapIntState.getStateFromSlot(IntState), (byte) ((p & 0xff0000) >> 16), (byte) ((p & 0x00ff00) >> 8), (byte) (p & 0x0000ff)));
-        }
-        return blockMap;
     }
 
     public static BlockMapIntState getBlockMapIntState(@Nullable NBTTagCompound tagCompound) {
@@ -204,15 +133,6 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
         return MapIntState;
     }
 
-    private static void setToolMode(ItemStack stack, ToolMode mode) {
-        NBTTagCompound tagCompound = stack.getTagCompound();
-        if (tagCompound == null) {
-            tagCompound = new NBTTagCompound();
-        }
-        tagCompound.setString("mode", mode.name());
-        stack.setTagCompound(tagCompound);
-    }
-
     public static ToolMode getToolMode(ItemStack stack) {
         NBTTagCompound tagCompound = stack.getTagCompound();
         ToolMode mode = ToolMode.Copy;
@@ -226,80 +146,6 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
             setToolMode(stack, mode);
         }
         return mode;
-    }
-
-    @Override
-    public void addInformation(ItemStack stack, @Nullable World world, List<String> list, ITooltipFlag b) {
-        super.addInformation(stack, world, list, b);
-        list.add(TextFormatting.AQUA + I18n.format("tooltip.gadget.mode") + ": " + getToolMode(stack));
-        if (Config.poweredByFE) {
-            IEnergyStorage energy = CapabilityProviderEnergy.getCap(stack);
-            list.add(TextFormatting.WHITE + I18n.format("tooltip.gadget.energy") + ": " + withSuffix(energy.getEnergyStored()) + "/" + withSuffix(energy.getMaxEnergyStored()));
-        }
-    }
-
-    public void setMode(EntityPlayer player, ItemStack heldItem, int modeInt) {
-        //Called when we specify a mode with the radial menu
-        ToolMode mode = ToolMode.values()[modeInt];
-        setToolMode(heldItem, mode);
-        player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.toolmode").getUnformattedComponentText() + ": " + mode.name()), true);
-    }
-
-    @Override
-    public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
-        ItemStack stack = player.getHeldItem(hand);
-        player.setActiveHand(hand);
-        if (!world.isRemote) {
-            if (getToolMode(stack) == ToolMode.Copy) {
-                BlockPos pos = VectorTools.getPosLookingAt(player);
-                if (pos == null) {
-                    //setStartPos(stack, null);
-                    //setEndPos(stack, null);
-                    //player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.areareset").getUnformattedComponentText()), true);
-                    return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);
-                }
-                if (player.isSneaking()) {
-                    if (getStartPos(stack) != null) {
-                        copyBlocks(stack, player, world, getStartPos(stack), pos);
-                    } else {
-                        setEndPos(stack, pos);
-                    }
-                } else {
-                    if (getEndPos(stack) != null) {
-                        copyBlocks(stack, player, world, pos, getEndPos(stack));
-                    } else {
-                        setStartPos(stack, pos);
-                    }
-                }
-            } else if (getToolMode(stack) == ToolMode.Paste) {
-                if (!player.isSneaking()) {
-                    if (getAnchor(stack) == null) {
-                        BlockPos pos = VectorTools.getPosLookingAt(player);
-                        if (pos == null) return new ActionResult<ItemStack>(EnumActionResult.FAIL, stack);
-                        buildBlockMap(world, pos, stack, player);
-                    } else {
-                        BlockPos startPos = getAnchor(stack);
-                        buildBlockMap(world, startPos, stack, player);
-                    }
-                }
-            }
-        } else {
-            if (getToolMode(stack) == ToolMode.Copy) {
-                BlockPos pos = VectorTools.getPosLookingAt(player);
-                if (pos == null) {
-                    if (player.isSneaking()) {
-                        player.openGui(BuildingGadgets.instance, GuiProxy.CopyPasteID, world, hand.ordinal(), 0, 0);
-                        return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);
-                    }
-                }
-            } else {
-                if (player.isSneaking()) {
-                    player.openGui(BuildingGadgets.instance, GuiProxy.PasteID, world, hand.ordinal(), 0, 0);
-                    return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);
-                }
-            }
-        }
-        return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);
     }
 
     public static void rotateBlocks(ItemStack stack, EntityPlayer player) {
@@ -319,16 +165,15 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
         BlockMapIntState blockMapIntState = new BlockMapIntState();
 
         for (BlockMap blockMap : blockMapList) {
-            BlockPos tempPos = blockMap.pos;
+            BlockPos tempPos = blockMap.getPos();
 
             int px = (tempPos.getX() - startPos.getX());
             int pz = (tempPos.getZ() - startPos.getZ());
 
             int nx = -pz;
-            int nz = px;
 
-            BlockPos newPos = new BlockPos(startPos.getX() + nx, tempPos.getY(), startPos.getZ() + nz);
-            IBlockState rotatedState = blockMap.state.withRotation(Rotation.CLOCKWISE_90);
+            BlockPos newPos = new BlockPos(startPos.getX() + nx, tempPos.getY(), startPos.getZ() + px);
+            IBlockState rotatedState = blockMap.getState().withRotation(Rotation.CLOCKWISE_90);
             posIntArrayList.add(GadgetUtils.relPosToInt(startPos, newPos));
             blockMapIntState.addToMap(rotatedState);
             stateIntArrayList.add((int) blockMapIntState.findSlot(rotatedState));
@@ -357,6 +202,78 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
                 tool.setEndPos(stack, endPos);
             }
         }
+    }
+
+    public static void anchorBlocks(EntityPlayer player, ItemStack stack) {
+        BlockPos currentAnchor = getAnchor(stack);
+        if (currentAnchor == null) {
+            RayTraceResult lookingAt = VectorTools.getLookingAt(player);
+            if (lookingAt == null) {
+                return;
+            }
+            currentAnchor = lookingAt.getBlockPos();
+            setAnchor(stack, currentAnchor);
+            player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.anchorrender").getUnformattedComponentText()), true);
+        } else {
+            setAnchor(stack, null);
+            player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.anchorremove").getUnformattedComponentText()), true);
+        }
+    }
+
+    public static ItemStack getGadget(EntityPlayer player) {
+        ItemStack stack = GadgetGeneric.getGadget(player);
+        if (!(stack.getItem() instanceof GadgetCopyPaste)) {
+            return ItemStack.EMPTY;
+        }
+
+        return stack;
+    }
+
+    private static void setAnchor(ItemStack stack, BlockPos anchorPos) {
+        GadgetUtils.writePOSToNBT(stack, anchorPos, "anchor");
+    }
+
+    private static void setLastBuild(ItemStack stack, BlockPos anchorPos, Integer dim) {
+        GadgetUtils.writePOSToNBT(stack, anchorPos, "lastBuild", dim);
+    }
+
+    private static BlockPos getLastBuild(ItemStack stack) {
+        return GadgetUtils.getPOSFromNBT(stack, "lastBuild");
+    }
+
+    private static Integer getLastBuildDim(ItemStack stack) {
+        return GadgetUtils.getDIMFromNBT(stack, "lastBuild");
+    }
+
+    private static List<BlockMap> getBlockMapList(@Nullable NBTTagCompound tagCompound, BlockPos startBlock) {
+        List<BlockMap> blockMap = new ArrayList<BlockMap>();
+        if (tagCompound == null) {
+            tagCompound = new NBTTagCompound();
+        }
+        NBTTagList MapIntStateTag = (NBTTagList) tagCompound.getTag("mapIntState");
+        if (MapIntStateTag == null) {
+            MapIntStateTag = new NBTTagList();
+        }
+        BlockMapIntState MapIntState = new BlockMapIntState();
+        MapIntState.getIntStateMapFromNBT(MapIntStateTag);
+        int[] posIntArray = tagCompound.getIntArray("posIntArray");
+        int[] stateIntArray = tagCompound.getIntArray("stateIntArray");
+        for (int i = 0; i < posIntArray.length; i++) {
+            int p = posIntArray[i];
+            BlockPos pos = GadgetUtils.relIntToPos(startBlock, p);
+            short IntState = (short) stateIntArray[i];
+            blockMap.add(new BlockMap(pos, MapIntState.getStateFromSlot(IntState), (byte) ((p & 0xff0000) >> 16), (byte) ((p & 0x00ff00) >> 8), (byte) (p & 0x0000ff)));
+        }
+        return blockMap;
+    }
+
+    private static void setToolMode(ItemStack stack, ToolMode mode) {
+        NBTTagCompound tagCompound = stack.getTagCompound();
+        if (tagCompound == null) {
+            tagCompound = new NBTTagCompound();
+        }
+        tagCompound.setString("mode", mode.name());
+        stack.setTagCompound(tagCompound);
     }
 
     private static boolean findBlocks(World world, BlockPos start, BlockPos end, ItemStack stack, EntityPlayer player, GadgetCopyPaste tool) {
@@ -477,6 +394,160 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
         return true;
     }
 
+    @Nullable
+    @Override
+    public ICapabilityProvider initCapabilities(ItemStack stack, @Nullable NBTTagCompound tag) {
+        return new WrappingCapabilityProvider(super.initCapabilities(stack, tag), new CapabilityProviderTemplate(stack));
+    }
+
+    @Override
+    public int getEnergyCost() {
+        return Config.energyCostBuilder;
+    }
+
+    @Override
+    public int getDamagePerUse() {
+        return 1;
+    }
+
+    @Override
+    @Nullable
+    public String getUUID(ItemStack stack) {
+        NBTTagCompound tagCompound = stack.getTagCompound();
+        if (tagCompound == null) {
+            return null;
+        }
+        String uuid = tagCompound.getString("UUID");
+        if (uuid == "") {
+            if (getStartPos(stack) == null && getEndPos(stack) == null) {
+                return null;
+            }
+            UUID uid = UUID.randomUUID();
+            tagCompound.setString("UUID", uid.toString());
+            stack.setTagCompound(tagCompound);
+            uuid = uid.toString();
+        }
+        return uuid;
+    }
+
+    @Override
+    public WorldSave getWorldSave(World world) {
+        return WorldSave.getWorldSave(world);
+    }
+
+    public void setMode(EntityPlayer player, ItemStack heldItem, int modeInt) {
+        //Called when we specify a mode with the radial menu
+        ToolMode mode = ToolMode.values()[modeInt];
+        setToolMode(heldItem, mode);
+        player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.toolmode").getUnformattedComponentText() + ": " + mode.name()), true);
+    }
+
+    @Override
+    public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
+        ItemStack stack = player.getHeldItem(hand);
+        player.setActiveHand(hand);
+        if (!world.isRemote) {
+            if (getToolMode(stack) == ToolMode.Copy) {
+                BlockPos pos = VectorTools.getPosLookingAt(player);
+                if (pos == null) {
+                    //setStartPos(stack, null);
+                    //setEndPos(stack, null);
+                    //player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.areareset").getUnformattedComponentText()), true);
+                    return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);
+                }
+                if (player.isSneaking()) {
+                    if (getStartPos(stack) != null) {
+                        copyBlocks(stack, player, world, getStartPos(stack), pos);
+                    } else {
+                        setEndPos(stack, pos);
+                    }
+                } else {
+                    if (getEndPos(stack) != null) {
+                        copyBlocks(stack, player, world, pos, getEndPos(stack));
+                    } else {
+                        setStartPos(stack, pos);
+                    }
+                }
+            } else if (getToolMode(stack) == ToolMode.Paste) {
+                if (!player.isSneaking()) {
+                    if (getAnchor(stack) == null) {
+                        BlockPos pos = VectorTools.getPosLookingAt(player);
+                        if (pos == null) return new ActionResult<ItemStack>(EnumActionResult.FAIL, stack);
+                        buildBlockMap(world, pos, stack, player);
+                    } else {
+                        BlockPos startPos = getAnchor(stack);
+                        buildBlockMap(world, startPos, stack, player);
+                    }
+                }
+            }
+        } else {
+            if (getToolMode(stack) == ToolMode.Copy) {
+                BlockPos pos = VectorTools.getPosLookingAt(player);
+                if (pos == null) {
+                    if (player.isSneaking()) {
+                        player.openGui(BuildingGadgets.instance, GuiProxy.CopyPasteID, world, hand.ordinal(), 0, 0);
+                        return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);
+                    }
+                }
+            } else {
+                if (player.isSneaking()) {
+                    player.openGui(BuildingGadgets.instance, GuiProxy.PasteID, world, hand.ordinal(), 0, 0);
+                    return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);
+                }
+            }
+        }
+        return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);
+    }
+
+    @Override
+    public void addInformation(ItemStack stack, @Nullable World world, List<String> list, ITooltipFlag b) {
+        super.addInformation(stack, world, list, b);
+        list.add(TextFormatting.AQUA + I18n.format("tooltip.gadget.mode") + ": " + getToolMode(stack));
+        if (Config.poweredByFE) {
+            IEnergyStorage energy = CapabilityProviderEnergy.getCap(stack);
+            list.add(TextFormatting.WHITE + I18n.format("tooltip.gadget.energy") + ": " + withSuffix(energy.getEnergyStored()) + "/" + withSuffix(energy.getMaxEnergyStored()));
+        }
+    }
+
+    public void undoBuild(EntityPlayer player, ItemStack heldItem) {
+//        long time = System.nanoTime();
+        NBTTagCompound tagCompound = WorldSave.getWorldSave(player.world).getCompoundFromUUID(ModItems.gadgetCopyPaste.getUUID(heldItem));
+        World world = player.world;
+        if (world.isRemote) {
+            return;
+        }
+        BlockPos startPos = getLastBuild(heldItem);
+        if (startPos == null) {
+            return;
+        }
+
+        Integer dimension = getLastBuildDim(heldItem);
+        ItemStack silkTool = heldItem.copy(); //Setup a Silk Touch version of the tool so we can return stone instead of cobblestone, etc.
+        silkTool.addEnchantment(Enchantments.SILK_TOUCH, 1);
+        List<BlockMap> blockMapList = getBlockMapList(tagCompound, startPos);
+        boolean success = true;
+        for (BlockMap blockMap : blockMapList) {
+            double distance = blockMap.getPos().getDistance(player.getPosition().getX(), player.getPosition().getY(), player.getPosition().getZ());
+            boolean sameDim = (player.dimension == dimension);
+            IBlockState currentBlock = world.getBlockState(blockMap.getPos());
+            BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(world, blockMap.getPos(), currentBlock, player);
+            boolean cancelled = MinecraftForge.EVENT_BUS.post(e);
+            if (distance < 256 && !cancelled && sameDim) { //Don't allow us to undo a block while its still being placed or too far away
+                if (currentBlock.getBlock() == blockMap.getState().getBlock() || currentBlock.getBlock() instanceof ConstructionBlock) {
+                    if (currentBlock.getBlockHardness(world, blockMap.getPos()) >= 0) {
+                        currentBlock.getBlock().harvestBlock(world, player, blockMap.getPos(), currentBlock, world.getTileEntity(blockMap.getPos()), silkTool);
+                        world.spawnEntity(new BlockBuildEntity(world, blockMap.getPos(), player, currentBlock, 2, currentBlock, false));
+                    }
+                }
+            } else {
+                player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.undofailed").getUnformattedComponentText()), true);
+                success = false;
+            }
+            //System.out.printf("Undid %d Blocks in %.2f ms%n", blockMapList.size(), (System.nanoTime() - time) * 1e-6);
+        }
+        if (success) setLastBuild(heldItem, null, 0);
+    }
+
     private void buildBlockMap(World world, BlockPos startPos, ItemStack stack, EntityPlayer player) {
 //        long time = System.nanoTime();
 
@@ -492,7 +563,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
         setLastBuild(stack, pos, player.dimension);
 
         for (BlockMap blockMap : blockMapList)
-            placeBlock(world, blockMap.pos, player, blockMap.state, getBlockMapIntState(tagCompound).getIntStackMap());
+            placeBlock(world, blockMap.getPos(), player, blockMap.getState(), getBlockMapIntState(tagCompound).getIntStackMap());
 
         setAnchor(stack, null);
         //System.out.printf("Built %d Blocks in %.2f ms%n", blockMapList.size(), (System.nanoTime() - time) * 1e-6);
@@ -559,67 +630,5 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
             world.spawnEntity(new BlockBuildEntity(world, pos, player, state, 1, state, useConstructionPaste));
         }
 
-    }
-
-    public static void anchorBlocks(EntityPlayer player, ItemStack stack) {
-        BlockPos currentAnchor = getAnchor(stack);
-        if (currentAnchor == null) {
-            RayTraceResult lookingAt = VectorTools.getLookingAt(player);
-            if (lookingAt == null) {
-                return;
-            }
-            currentAnchor = lookingAt.getBlockPos();
-            setAnchor(stack, currentAnchor);
-            player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.anchorrender").getUnformattedComponentText()), true);
-        } else {
-            setAnchor(stack, null);
-            player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.anchorremove").getUnformattedComponentText()), true);
-        }
-    }
-
-    public void undoBuild(EntityPlayer player, ItemStack heldItem) {
-//        long time = System.nanoTime();
-        NBTTagCompound tagCompound = WorldSave.getWorldSave(player.world).getCompoundFromUUID(ModItems.gadgetCopyPaste.getUUID(heldItem));
-        World world = player.world;
-        if (world.isRemote) {
-            return;
-        }
-        BlockPos startPos = getLastBuild(heldItem);
-        if (startPos == null)
-            return;
-
-        Integer dimension = getLastBuildDim(heldItem);
-        ItemStack silkTool = heldItem.copy(); //Setup a Silk Touch version of the tool so we can return stone instead of cobblestone, etc.
-        silkTool.addEnchantment(Enchantments.SILK_TOUCH, 1);
-        List<BlockMap> blockMapList = getBlockMapList(tagCompound, startPos);
-        boolean success = true;
-        for (BlockMap blockMap : blockMapList) {
-            double distance = blockMap.pos.getDistance(player.getPosition().getX(), player.getPosition().getY(), player.getPosition().getZ());
-            boolean sameDim = (player.dimension == dimension);
-            IBlockState currentBlock = world.getBlockState(blockMap.pos);
-            BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(world, blockMap.pos, currentBlock, player);
-            boolean cancelled = MinecraftForge.EVENT_BUS.post(e);
-            if (distance < 256 && !cancelled && sameDim) { //Don't allow us to undo a block while its still being placed or too far away
-                if (currentBlock.getBlock() == blockMap.state.getBlock() || currentBlock.getBlock() instanceof ConstructionBlock) {
-                    if (currentBlock.getBlockHardness(world, blockMap.pos) >= 0) {
-                        currentBlock.getBlock().harvestBlock(world, player, blockMap.pos, currentBlock, world.getTileEntity(blockMap.pos), silkTool);
-                        world.spawnEntity(new BlockBuildEntity(world, blockMap.pos, player, currentBlock, 2, currentBlock, false));
-                    }
-                }
-            } else {
-                player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.undofailed").getUnformattedComponentText()), true);
-                success = false;
-            }
-            //System.out.printf("Undid %d Blocks in %.2f ms%n", blockMapList.size(), (System.nanoTime() - time) * 1e-6);
-        }
-        if (success) setLastBuild(heldItem, null, 0);
-    }
-
-    public static ItemStack getGadget(EntityPlayer player) {
-        ItemStack stack = GadgetGeneric.getGadget(player);
-        if (!(stack.getItem() instanceof GadgetCopyPaste))
-            return ItemStack.EMPTY;
-
-        return stack;
     }
 }

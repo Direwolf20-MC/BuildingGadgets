@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.client.events;
 
+import com.direwolf20.buildinggadgets.api.ITemplateOld;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
-import com.direwolf20.buildinggadgets.common.items.ITemplate;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.PacketRequestBlockMap;
 import com.direwolf20.buildinggadgets.common.tools.PasteToolBufferBuilder;
@@ -33,9 +33,9 @@ public class EventClientTick {
 
             for (int i = 0; i < 36; ++i) {
                 ItemStack stack = player.inventory.getStackInSlot(i);
-                if (!(stack.getItem() instanceof ITemplate)) continue;
+                if (!(stack.getItem() instanceof ITemplateOld)) continue;
 
-                ITemplate template = (ITemplate) stack.getItem();
+                ITemplateOld template = (ITemplateOld) stack.getItem();
                 String UUID = template.getUUID(stack);
                 if (UUID != null && PasteToolBufferBuilder.isUpdateNeeded(UUID, stack)) {
                     //System.out.println("BlockMap Update Needed for UUID: " + UUID + " in slot " + i);

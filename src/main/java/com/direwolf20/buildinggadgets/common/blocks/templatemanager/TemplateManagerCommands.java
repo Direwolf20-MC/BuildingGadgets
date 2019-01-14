@@ -1,12 +1,17 @@
 package com.direwolf20.buildinggadgets.common.blocks.templatemanager;
 
+import com.direwolf20.buildinggadgets.api.BlockMap;
+import com.direwolf20.buildinggadgets.api.ITemplateOld;
+import com.direwolf20.buildinggadgets.api.WorldSave;
 import com.direwolf20.buildinggadgets.common.items.ModItems;
-import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
-import com.direwolf20.buildinggadgets.common.items.ITemplate;
 import com.direwolf20.buildinggadgets.common.items.Template;
+import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.network.PacketBlockMap;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
-import com.direwolf20.buildinggadgets.common.tools.*;
+import com.direwolf20.buildinggadgets.common.tools.BlockMapIntState;
+import com.direwolf20.buildinggadgets.common.tools.GadgetUtils;
+import com.direwolf20.buildinggadgets.common.tools.PasteToolBufferBuilder;
+import com.direwolf20.buildinggadgets.common.tools.UniqueItem;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
@@ -38,10 +43,10 @@ public class TemplateManagerCommands {
     public static void loadTemplate(TemplateManagerContainer container, EntityPlayer player) {
         ItemStack itemStack0 = container.getSlot(0).getStack();
         ItemStack itemStack1 = container.getSlot(1).getStack();
-        if (!(itemStack0.getItem() instanceof ITemplate) || !(allowedItemsRight.contains(itemStack1.getItem()))) {
+        if (!(itemStack0.getItem() instanceof ITemplateOld) || !(allowedItemsRight.contains(itemStack1.getItem()))) {
             return;
         }
-        ITemplate template = (ITemplate) itemStack0.getItem();
+        ITemplateOld template = (ITemplateOld) itemStack0.getItem();
         if (itemStack1.getItem().equals(Items.PAPER)) return;
         World world = player.world;
 
@@ -88,10 +93,10 @@ public class TemplateManagerCommands {
             return;
         }
 
-        if (!(itemStack0.getItem() instanceof ITemplate) || !(allowedItemsRight.contains(itemStack1.getItem()))) {
+        if (!(itemStack0.getItem() instanceof ITemplateOld) || !(allowedItemsRight.contains(itemStack1.getItem()))) {
             return;
         }
-        ITemplate template = (ITemplate) itemStack0.getItem();
+        ITemplateOld template = (ITemplateOld) itemStack0.getItem();
         World world = player.world;
         ItemStack templateStack;
         if (itemStack1.getItem().equals(Items.PAPER)) {
@@ -182,10 +187,10 @@ public class TemplateManagerCommands {
         Map<IBlockState, UniqueItem> intStackMap = mapIntState.intStackMap;
         List<BlockMap> blockMapList = GadgetCopyPaste.getBlockMapList(templateTagCompound);
         for (BlockMap blockMap : blockMapList) {
-            UniqueItem uniqueItem = intStackMap.get(blockMap.state);
+            UniqueItem uniqueItem = intStackMap.get(blockMap.getState());
             if (!(uniqueItem == null)) {
                 NonNullList<ItemStack> drops = NonNullList.create();
-                blockMap.state.getBlock().getDrops(drops, world, new BlockPos(0, 0, 0), blockMap.state, 0);
+                blockMap.getState().getBlock().getDrops(drops, world, new BlockPos(0, 0, 0), blockMap.getState(), 0);
                 int neededItems = 0;
                 for (ItemStack drop : drops) {
                     if (drop.getItem().equals(uniqueItem.item)) {

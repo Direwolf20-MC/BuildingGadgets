@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.common.blocks.templatemanager;
 
+import com.direwolf20.buildinggadgets.api.ITemplateOld;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
-import com.direwolf20.buildinggadgets.common.items.ITemplate;
 import com.direwolf20.buildinggadgets.common.network.PacketBlockMap;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import net.minecraft.block.Block;
@@ -104,9 +104,9 @@ public class TemplateManager extends Block {
         TemplateManagerContainer container = ((TemplateManagerTileEntity) te).getContainer(player);
         for (int i = 0; i <= 1; i++) {
             ItemStack itemStack = container.getSlot(i).getStack();
-            if (!(itemStack.getItem() instanceof ITemplate)) continue;
+            if (!(itemStack.getItem() instanceof ITemplateOld)) continue;
 
-            ITemplate template = (ITemplate) itemStack.getItem();
+            ITemplateOld template = (ITemplateOld) itemStack.getItem();
             String UUID = template.getUUID(itemStack);
             if (UUID == null) continue;
 

@@ -1,8 +1,7 @@
-package com.direwolf20.buildinggadgets.common.items;
+package com.direwolf20.buildinggadgets.api;
 
 import com.direwolf20.buildinggadgets.common.tools.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.tools.UniqueItem;
-import com.direwolf20.buildinggadgets.common.tools.WorldSave;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -13,7 +12,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Map;
 
-public interface ITemplate {
+public interface ITemplateOld {
 
     @Nullable
     String getUUID(ItemStack stack);
@@ -42,12 +41,6 @@ public interface ITemplate {
 
     default int getCopyCounter(ItemStack stack) {
         return GadgetUtils.getStackTag(stack).getInteger("copycounter");
-    }
-
-    default void setCopyCounter(ItemStack stack, int counter) {//TODO unused
-        NBTTagCompound tagCompound = GadgetUtils.getStackTag(stack);
-        tagCompound.setInteger("copycounter", counter);
-        stack.setTagCompound(tagCompound);
     }
 
     default void incrementCopyCounter(ItemStack stack) {

@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.common.tools;
 
+import com.direwolf20.buildinggadgets.api.BlockMap;
 import com.direwolf20.buildinggadgets.common.items.ModItems;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
 import net.minecraft.block.state.IBlockState;
@@ -40,8 +41,8 @@ public class PasteToolBufferBuilder {
     }
 
     public static void clearMaps() {
-        tagMap = new HashMap<String, NBTTagCompound>();
-        bufferMap = new HashMap<String, ToolDireBuffer>();
+        tagMap.clear();
+        bufferMap.clear();
     }
 
     public static void addToMap(String UUID, NBTTagCompound tag) {
@@ -71,10 +72,10 @@ public class PasteToolBufferBuilder {
         ToolDireBuffer bufferBuilder = new ToolDireBuffer(2097152);
         bufferBuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
         for (BlockMap blockMap : blockMapList) {
-            IBlockState renderBlockState = blockMap.state;
+            IBlockState renderBlockState = blockMap.getState();
             if (!(renderBlockState.equals(Blocks.AIR.getDefaultState()))) {
                 IBakedModel model = dispatcher.getModelForState(renderBlockState);
-                dispatcher.getBlockModelRenderer().renderModelFlat(Minecraft.getMinecraft().world, model, renderBlockState, new BlockPos(blockMap.xOffset, blockMap.yOffset, blockMap.zOffset), bufferBuilder, false, 0L);
+                dispatcher.getBlockModelRenderer().renderModelFlat(Minecraft.getMinecraft().world, model, renderBlockState, new BlockPos(blockMap.getXOffset(), blockMap.getYOffset(), blockMap.getZOffset()), bufferBuilder, false, 0L);
             }
         }
         bufferBuilder.finishDrawing();

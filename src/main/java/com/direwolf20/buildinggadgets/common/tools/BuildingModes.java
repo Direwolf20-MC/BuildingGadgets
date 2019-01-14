@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.common.tools;
 
+import com.direwolf20.buildinggadgets.api.BlockMap;
 import com.direwolf20.buildinggadgets.common.Config;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetBuilding;
 import net.minecraft.block.material.Material;
@@ -368,11 +369,11 @@ public class BuildingModes {
         Map<BlockPos, Integer> PosToY = new HashMap<BlockPos, Integer>();
         Map<BlockPos, Integer> PosToZ = new HashMap<BlockPos, Integer>();
         for (BlockMap blockMap : unSortedMap) {
-            PosToStateMap.put(blockMap.pos, blockMap.state);
-            PosToX.put(blockMap.pos, blockMap.xOffset);
-            PosToY.put(blockMap.pos, blockMap.yOffset);
-            PosToZ.put(blockMap.pos, blockMap.zOffset);
-            unSortedList.add(blockMap.pos);
+            PosToStateMap.put(blockMap.getPos(), blockMap.getState());
+            PosToX.put(blockMap.getPos(), blockMap.getXOffset());
+            PosToY.put(blockMap.getPos(), blockMap.getYOffset());
+            PosToZ.put(blockMap.getPos(), blockMap.getZOffset());
+            unSortedList.add(blockMap.getPos());
         }
         List<BlockMap> sortedMap = new ArrayList<BlockMap>();
         Map<Double, BlockPos> rangeMap = new HashMap<Double, BlockPos>();
