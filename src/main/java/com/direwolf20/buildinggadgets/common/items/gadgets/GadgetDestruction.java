@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.common.items.gadgets;
 
+import com.direwolf20.buildinggadgets.api.BlockState2ShortMap;
 import com.direwolf20.buildinggadgets.api.WorldSave;
 import com.direwolf20.buildinggadgets.client.gui.GuiProxy;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
@@ -7,9 +8,10 @@ import com.direwolf20.buildinggadgets.common.Config;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.blocks.ModBlocks;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
-import com.direwolf20.buildinggadgets.common.tools.BlockMapIntState;
 import com.direwolf20.buildinggadgets.common.tools.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.tools.VectorTools;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.ints.IntList;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
@@ -18,7 +20,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResult;
@@ -313,8 +314,45 @@ public class GadgetDestruction extends GadgetGeneric {
         return true;
     }
 
+    public static void storeUndo(World world, Map<BlockPos, IBlockState> posStateMap, Map<BlockPos, IBlockState> pasteStateMap, BlockPos startBlock, ItemStack stack, EntityPlayer player) {
+        WorldSave worldSave = WorldSave.getWorldSaveDestruction(world);
+        NBTTagCompound tagCompound = new NBTTagCompound();
+        IntList posIntArrayList = new IntArrayList();
+        IntList stateIntArrayList = new IntArrayList();
+        IntList pastePosArrayList = new IntArrayList();
+        IntList pasteStateArrayList = new IntArrayList();
+        BlockState2ShortMap blockMapIntState = new BlockState2ShortMap();
+        String UUID = getUUID(stack);
+
+        for (Map.Entry<BlockPos, IBlockState> entry : posStateMap.entrySet()) {
+            posIntArrayList.add(GadgetUtils.relPosToInt(startBlock, entry.getKey()));
+            blockMapIntState.addToMap(entry.getValue());
+            stateIntArrayList.add((int) blockMapIntState.getSlot(entry.getValue()));
+            if (pasteStateMap.containsKey(entry.getKey())) {
+                pastePosArrayList.add(GadgetUtils.relPosToInt(startBlock, entry.getKey()));
+                IBlockState pasteBlockState = pasteStateMap.get(entry.getKey());
+                blockMapIntState.addToMap(pasteBlockState);
+                pasteStateArrayList.add((int) blockMapIntState.getSlot(pasteBlockState));
+            }
+        }
+        blockMapIntState.writeToNBT(tagCompound);
+        int[] posIntArray = posIntArrayList.toIntArray();
+        int[] stateIntArray = stateIntArrayList.toIntArray();
+        int[] posPasteArray = pastePosArrayList.toIntArray();
+        int[] statePasteArray = pasteStateArrayList.toIntArray();
+        tagCompound.setIntArray("posIntArray", posIntArray);
+        tagCompound.setIntArray("stateIntArray", stateIntArray);
+        tagCompound.setIntArray("posPasteArray", posPasteArray);
+        tagCompound.setIntArray("statePasteArray", statePasteArray);
+        tagCompound.setTag("startPos", NBTUtil.createPosTag(startBlock));
+        tagCompound.setInteger("dim", player.dimension);
+        tagCompound.setString("UUID", UUID);
+        worldSave.addToMap(UUID, tagCompound);
+        worldSave.markForSaving();
+    }
+
     public void clearArea(World world, BlockPos pos, EnumFacing side, EntityPlayer player, ItemStack stack) {
-        ArrayList<BlockPos> voidPosArray = getArea(world, pos, side, player, stack);
+        List<BlockPos> voidPosArray = getArea(world, pos, side, player, stack);
         Map<BlockPos, IBlockState> posStateMap = new HashMap<BlockPos, IBlockState>();
         Map<BlockPos, IBlockState> pasteStateMap = new HashMap<BlockPos, IBlockState>();
         for (BlockPos voidPos : voidPosArray) {
@@ -327,8 +365,9 @@ public class GadgetDestruction extends GadgetGeneric {
                 }
             }
             boolean success = destroyBlock(world, voidPos, player);
-            if (success)
+            if (success) {
                 posStateMap.put(voidPos, blockState);
+            }
             if (pasteState != Blocks.AIR.getDefaultState()) {
                 pasteStateMap.put(voidPos, pasteState);
             }
@@ -337,43 +376,6 @@ public class GadgetDestruction extends GadgetGeneric {
             BlockPos startPos = (getAnchor(stack) == null) ? pos : getAnchor(stack);
             storeUndo(world, posStateMap, pasteStateMap, startPos, stack, player);
         }
-    }
-
-    public static void storeUndo(World world, Map<BlockPos, IBlockState> posStateMap, Map<BlockPos, IBlockState> pasteStateMap, BlockPos startBlock, ItemStack stack, EntityPlayer player) {
-        WorldSave worldSave = WorldSave.getWorldSaveDestruction(world);
-        NBTTagCompound tagCompound = new NBTTagCompound();
-        List<Integer> posIntArrayList = new ArrayList<Integer>();
-        List<Integer> stateIntArrayList = new ArrayList<Integer>();
-        List<Integer> pastePosArrayList = new ArrayList<Integer>();
-        List<Integer> pasteStateArrayList = new ArrayList<Integer>();
-        BlockMapIntState blockMapIntState = new BlockMapIntState();
-        String UUID = getUUID(stack);
-
-        for (Map.Entry<BlockPos, IBlockState> entry : posStateMap.entrySet()) {
-            posIntArrayList.add(GadgetUtils.relPosToInt(startBlock, entry.getKey()));
-            blockMapIntState.addToMap(entry.getValue());
-            stateIntArrayList.add((int) blockMapIntState.findSlot(entry.getValue()));
-            if (pasteStateMap.containsKey(entry.getKey())) {
-                pastePosArrayList.add(GadgetUtils.relPosToInt(startBlock, entry.getKey()));
-                IBlockState pasteBlockState = pasteStateMap.get(entry.getKey());
-                blockMapIntState.addToMap(pasteBlockState);
-                pasteStateArrayList.add((int) blockMapIntState.findSlot(pasteBlockState));
-            }
-        }
-        tagCompound.setTag("mapIntState", blockMapIntState.putIntStateMapIntoNBT());
-        int[] posIntArray = posIntArrayList.stream().mapToInt(i -> i).toArray();
-        int[] stateIntArray = stateIntArrayList.stream().mapToInt(i -> i).toArray();
-        int[] posPasteArray = pastePosArrayList.stream().mapToInt(i -> i).toArray();
-        int[] statePasteArray = pasteStateArrayList.stream().mapToInt(i -> i).toArray();
-        tagCompound.setIntArray("posIntArray", posIntArray);
-        tagCompound.setIntArray("stateIntArray", stateIntArray);
-        tagCompound.setIntArray("posPasteArray", posPasteArray);
-        tagCompound.setIntArray("statePasteArray", statePasteArray);
-        tagCompound.setTag("startPos", NBTUtil.createPosTag(startBlock));
-        tagCompound.setInteger("dim", player.dimension);
-        tagCompound.setString("UUID", UUID);
-        worldSave.addToMap(UUID, tagCompound);
-        worldSave.markForSaving();
     }
 
     public void undo(EntityPlayer player, ItemStack stack) {
@@ -387,24 +389,18 @@ public class GadgetDestruction extends GadgetGeneric {
         int[] stateIntArray = tagCompound.getIntArray("stateIntArray");
         int[] posPasteArray = tagCompound.getIntArray("posPasteArray");
         int[] statePasteArray = tagCompound.getIntArray("statePasteArray");
-
-        NBTTagList MapIntStateTag = (NBTTagList) tagCompound.getTag("mapIntState");
-        if (MapIntStateTag == null) {
-            return;
-        }
-        BlockMapIntState MapIntState = new BlockMapIntState();
-        MapIntState.getIntStateMapFromNBT(MapIntStateTag);
+        BlockState2ShortMap stateMap = BlockState2ShortMap.readFromNBT(tagCompound);
         boolean success = false;
         for (int i = 0; i < posIntArray.length; i++) {
             BlockPos placePos = GadgetUtils.relIntToPos(startPos, posIntArray[i]);
             IBlockState currentState = world.getBlockState(placePos);
             if (currentState.getMaterial() == Material.AIR || currentState.getMaterial().isLiquid()) {
-                IBlockState placeState = MapIntState.getStateFromSlot((short) stateIntArray[i]);
+                IBlockState placeState = stateMap.getStateFromSlot((short) stateIntArray[i]);
                 if (placeState.getBlock() == ModBlocks.constructionBlock) {
                     IBlockState pasteState = Blocks.AIR.getDefaultState();
                     for (int j = 0; j < posPasteArray.length; j++) {
                         if (posPasteArray[j] == posIntArray[i]) {
-                            pasteState = MapIntState.getStateFromSlot((short) statePasteArray[j]);
+                            pasteState = stateMap.getStateFromSlot((short) statePasteArray[j]);
                             break;
                         }
                     }

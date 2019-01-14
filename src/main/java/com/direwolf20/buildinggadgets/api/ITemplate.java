@@ -1,12 +1,12 @@
 package com.direwolf20.buildinggadgets.api;
 
 import com.google.common.collect.Multiset;
-import jdk.internal.jline.internal.Nullable;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.util.INBTSerializable;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.UUID;
 

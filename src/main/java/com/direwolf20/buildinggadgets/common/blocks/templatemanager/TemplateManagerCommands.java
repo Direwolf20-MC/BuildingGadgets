@@ -1,20 +1,15 @@
 package com.direwolf20.buildinggadgets.common.blocks.templatemanager;
 
-import com.direwolf20.buildinggadgets.api.BlockMap;
-import com.direwolf20.buildinggadgets.api.ITemplateOld;
-import com.direwolf20.buildinggadgets.api.UniqueItem;
-import com.direwolf20.buildinggadgets.api.WorldSave;
+import com.direwolf20.buildinggadgets.api.*;
 import com.direwolf20.buildinggadgets.common.items.ModItems;
 import com.direwolf20.buildinggadgets.common.items.Template;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.network.PacketBlockMap;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
-import com.direwolf20.buildinggadgets.common.tools.BlockMapIntState;
 import com.direwolf20.buildinggadgets.common.tools.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.tools.PasteToolBufferBuilder;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -22,7 +17,6 @@ import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
@@ -31,7 +25,6 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -175,33 +168,28 @@ public class TemplateManagerCommands {
         //GadgetUtils.writePOSToNBT(templateTagCompound, endPos, "startPos", 0);
         //Map<UniqueItem, Integer> tagMap = GadgetUtils.nbtToItemCount((NBTTagList) templateTagCompound.getTag("itemcountmap"));
         //templateTagCompound.removeTag("itemcountmap");
-
-        NBTTagList MapIntStateTag = (NBTTagList) templateTagCompound.getTag("mapIntState");
-
-        BlockMapIntState mapIntState = new BlockMapIntState();
-        mapIntState.getIntStateMapFromNBT(MapIntStateTag);
-        mapIntState.makeStackMapFromStateMap(player);
-        templateTagCompound.setTag("mapIntStack", mapIntState.putIntStackMapIntoNBT());
+        BlockState2ItemMap mapIntState = BlockState2ItemMap.readFromNBT(templateTagCompound);
+        mapIntState.initStateItemMap(player);
+        mapIntState.writeToNBT(templateTagCompound);
         templateTagCompound.setString("owner", player.getName());
 
         Multiset<UniqueItem> itemCountMap = HashMultiset.create();
-        Map<IBlockState, UniqueItem> intStackMap = mapIntState.intStackMap;
         List<BlockMap> blockMapList = GadgetCopyPaste.getBlockMapList(templateTagCompound);
         for (BlockMap blockMap : blockMapList) {
-            UniqueItem uniqueItem = intStackMap.get(blockMap.getState());
+            UniqueItem uniqueItem = mapIntState.getItemForState(blockMap.getState());
             if (!(uniqueItem == null)) {
                 NonNullList<ItemStack> drops = NonNullList.create();
                 blockMap.getState().getBlock().getDrops(drops, world, new BlockPos(0, 0, 0), blockMap.getState(), 0);
                 int neededItems = 0;
                 for (ItemStack drop : drops) {
-                    if (drop.getItem().equals(uniqueItem.item)) {
+                    if (drop.getItem().equals(uniqueItem.getItem())) {
                         neededItems++;
                     }
                 }
                 if (neededItems == 0) {
                     neededItems = 1;
                 }
-                if (uniqueItem.item != Items.AIR) {
+                if (uniqueItem.getItem() != Items.AIR) {
                     itemCountMap.add(uniqueItem, neededItems);
                 }
             }
