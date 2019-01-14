@@ -16,10 +16,7 @@ import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
 
 import javax.annotation.Nullable;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public abstract class CommandAlterBlockMaps extends CommandBase {
     private final String name;
@@ -60,11 +57,11 @@ public abstract class CommandAlterBlockMaps extends CommandBase {
             }
         }
         WorldSave worldSave = WorldSave.getWorldSave(sender.getEntityWorld());
-        Map<String, NBTTagCompound> tagMap = worldSave.getTagMap();
-        Map<String, NBTTagCompound> newMap = new HashMap<String, NBTTagCompound>(tagMap);
+        Map<UUID, NBTTagCompound> tagMap = worldSave.getTagMap();
+        Map<UUID, NBTTagCompound> newMap = new HashMap<>(tagMap);
         String searchName = (args.length == 0) ? sender.getName() : args[0];
         int counter = 0;
-        for (Map.Entry<String, NBTTagCompound> entry : tagMap.entrySet()) {
+        for (Map.Entry<UUID, NBTTagCompound> entry : tagMap.entrySet()) {
             NBTTagCompound tagCompound = entry.getValue();
             if (tagCompound.getString("owner").equals(searchName) || searchName.equals("*")) {
                 sender.sendMessage(new TextComponentString(getActionFeedback(tagCompound)));

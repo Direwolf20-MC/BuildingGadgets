@@ -25,17 +25,18 @@ import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @SideOnly(Side.CLIENT)
 public class PasteToolBufferBuilder {
 
-    private static Map<String, NBTTagCompound> tagMap = new HashMap<String, NBTTagCompound>();
-    private static Map<String, ToolDireBuffer> bufferMap = new HashMap<String, ToolDireBuffer>();
+    private static Map<UUID, NBTTagCompound> tagMap = new HashMap<>();
+    private static Map<UUID, ToolDireBuffer> bufferMap = new HashMap<>();
 
 
-    private static int getCopyCounter(String UUID) {
-        if (tagMap.containsKey(UUID)) {
-            return tagMap.get(UUID).getInteger("copycounter");
+    private static int getCopyCounter(UUID uuid) {
+        if (tagMap.containsKey(uuid)) {
+            return tagMap.get(uuid).getInteger("copycounter");
         }
         return -1;
     }
@@ -45,29 +46,29 @@ public class PasteToolBufferBuilder {
         bufferMap.clear();
     }
 
-    public static void addToMap(String UUID, NBTTagCompound tag) {
-        tagMap.put(UUID, tag);
+    public static void addToMap(UUID uuid, NBTTagCompound tag) {
+        tagMap.put(uuid, tag);
     }
 
     @Nullable
-    public static NBTTagCompound getTagFromUUID(String UUID) {
-        if (tagMap.containsKey(UUID)) {
-            return tagMap.get(UUID);
+    public static NBTTagCompound getTagFromUUID(UUID uuid) {
+        if (tagMap.containsKey(uuid)) {
+            return tagMap.get(uuid);
         }
         return null;
     }
 
     @Nullable
-    public static ToolDireBuffer getBufferFromMap(String UUID) {
-        if (bufferMap.containsKey(UUID)) {
-            return bufferMap.get(UUID);
+    public static ToolDireBuffer getBufferFromMap(UUID uuid) {
+        if (bufferMap.containsKey(uuid)) {
+            return bufferMap.get(uuid);
         }
         return null;
     }
 
-    public static void addMapToBuffer(String UUID) {
+    public static void addMapToBuffer(UUID uuid) {
 //        long time = System.nanoTime();
-        List<BlockMap> blockMapList = GadgetCopyPaste.getBlockMapList(tagMap.get(UUID));
+        List<BlockMap> blockMapList = GadgetCopyPaste.getBlockMapList(tagMap.get(uuid));
         BlockRendererDispatcher dispatcher = Minecraft.getMinecraft().getBlockRendererDispatcher();
         ToolDireBuffer bufferBuilder = new ToolDireBuffer(2097152);
         bufferBuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
@@ -79,13 +80,13 @@ public class PasteToolBufferBuilder {
             }
         }
         bufferBuilder.finishDrawing();
-        bufferMap.put(UUID, bufferBuilder);
+        bufferMap.put(uuid, bufferBuilder);
         //System.out.printf("Created %d Vertexes for %d blocks in %.2f ms%n", bufferBuilder.getVertexCount(), blockMapList.size(), (System.nanoTime() - time) * 1e-6);
     }
 
-    public static void draw(EntityPlayer player, double x, double y, double z, BlockPos startPos, String UUID) {
+    public static void draw(EntityPlayer player, double x, double y, double z, BlockPos startPos, UUID uuid) {
 //        long time = System.nanoTime();
-        ToolDireBuffer bufferBuilder = bufferMap.get(UUID);
+        ToolDireBuffer bufferBuilder = bufferMap.get(uuid);
         bufferBuilder.sortVertexData((float) (x - startPos.getX()), (float) ((y + player.getEyeHeight()) - startPos.getY()), (float) (z - startPos.getZ()));
         //System.out.printf("Sorted %d Vertexes in %.2f ms%n", bufferBuilder.getVertexCount(), (System.nanoTime() - time) * 1e-6);
         if (bufferBuilder.getVertexCount() > 0) {
@@ -119,7 +120,7 @@ public class PasteToolBufferBuilder {
         }
     }
 
-    public static boolean isUpdateNeeded(String UUID, ItemStack stack) {
-        return ((ModItems.gadgetCopyPaste.getCopyCounter(stack) != getCopyCounter(UUID) || PasteToolBufferBuilder.getTagFromUUID(UUID) == null));
+    public static boolean isUpdateNeeded(UUID uuid, ItemStack stack) {
+        return ((ModItems.gadgetCopyPaste.getCopyCounter(stack) != getCopyCounter(uuid) || PasteToolBufferBuilder.getTagFromUUID(uuid) == null));
     }
 }

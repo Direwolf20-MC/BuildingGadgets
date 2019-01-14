@@ -45,10 +45,8 @@ public class EventTooltip {
         ItemStack stack = event.getItemStack();
         if (stack.getItem() instanceof ITemplateOld) {
             ITemplateOld template = (ITemplateOld) stack.getItem();
-            String UUID = template.getUUID(stack);
-            if (UUID == null) {
-                return;
-            }
+            UUID uuid = template.getUUID(stack);
+            if (uuid == null) return;
 
             List<String> tooltip = event.getToolTip();
             Multiset<UniqueItem> itemCountMap = template.getItemCountMap(stack);

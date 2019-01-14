@@ -5,33 +5,36 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
+import java.util.UUID;
+
 public class PacketRequestBlockMap implements IMessage {
 
-    private String UUID = "";
+    private UUID uuid = UUID.randomUUID();
     private boolean isTemplate;
 
     @Override
     public void fromBytes(ByteBuf buf) {
-        UUID = ByteBufUtils.readUTF8String(buf);
+        uuid = new UUID(buf.readLong(),buf.readLong());
         isTemplate = buf.readBoolean();
     }
 
     @Override
     public void toBytes(ByteBuf buf) {
-        ByteBufUtils.writeUTF8String(buf, UUID);
+        //write it in the order the constructor expects it
+        buf.writeLong(uuid.getMostSignificantBits());
+        buf.writeLong(uuid.getLeastSignificantBits());
         buf.writeBoolean(isTemplate);
     }
 
     public PacketRequestBlockMap() {
     }
 
-    public PacketRequestBlockMap(String ID, boolean isTemplate) {
-        UUID = ID;
+    public PacketRequestBlockMap(UUID ID, boolean isTemplate) {
+        uuid = ID;
         this.isTemplate = isTemplate;
     }
 
@@ -44,7 +47,7 @@ public class PacketRequestBlockMap implements IMessage {
 
         private void handle(PacketRequestBlockMap message, MessageContext ctx) {
             EntityPlayerMP player = ctx.getServerHandler().player;
-            NBTTagCompound tagCompound = (message.isTemplate ? WorldSave.getTemplateWorldSave(player.world) : WorldSave.getWorldSave(player.world)).getCompoundFromUUID(message.UUID);
+            NBTTagCompound tagCompound = (message.isTemplate ? WorldSave.getTemplateWorldSave(player.world) : WorldSave.getWorldSave(player.world)).getCompoundFromUUID(message.uuid);
             if (tagCompound != null) {
                 PacketHandler.INSTANCE.sendTo(new PacketBlockMap(tagCompound), player);
                 //System.out.println("Sending BlockMap Packet");

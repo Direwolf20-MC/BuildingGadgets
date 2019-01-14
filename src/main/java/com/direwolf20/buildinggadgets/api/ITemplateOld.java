@@ -10,11 +10,37 @@ import net.minecraft.world.World;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.UUID;
 
 public interface ITemplateOld {
+    public static final String KEY_UUID = "UUID";
+    public static final UUID INVALID_UUID = new UUID(0,0);
 
-    @Nullable
-    String getUUID(ItemStack stack);
+    public default UUID getUUID(ItemStack stack) {
+        NBTTagCompound tagCompound = stack.getTagCompound();
+        if (tagCompound == null) {
+            tagCompound = new NBTTagCompound();
+        }
+        UUID uuid = tagCompound.getUniqueId(KEY_UUID);
+        if (uuid.equals(INVALID_UUID)) {
+            String id = tagCompound.getString(KEY_UUID);
+            if (!id.isEmpty()) {
+                uuid = UUID.fromString(id);
+                setUUID(uuid,tagCompound);
+                stack.setTagCompound(tagCompound);
+            }
+        }
+        if (uuid == null || uuid.equals(INVALID_UUID)) {
+            uuid = UUID.randomUUID();
+            setUUID(uuid,tagCompound);
+            stack.setTagCompound(tagCompound);
+        }
+        return uuid;
+    }
+
+    public static void setUUID (UUID id, NBTTagCompound tagCompound) {
+        tagCompound.setUniqueId(KEY_UUID, id);
+    }
 
     WorldSave getWorldSave(World world);
 

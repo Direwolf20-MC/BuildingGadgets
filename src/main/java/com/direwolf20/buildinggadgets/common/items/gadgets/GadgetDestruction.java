@@ -42,6 +42,7 @@ import net.minecraftforge.event.world.BlockEvent;
 import javax.annotation.Nullable;
 import java.util.*;
 
+import static com.direwolf20.buildinggadgets.api.ITemplateOld.*;
 import static com.direwolf20.buildinggadgets.common.tools.GadgetUtils.withSuffix;
 
 public class GadgetDestruction extends GadgetGeneric {
@@ -80,22 +81,6 @@ public class GadgetDestruction extends GadgetGeneric {
             if (energy != null)
                 list.add(TextFormatting.WHITE + I18n.format("tooltip.gadget.energy") + ": " + withSuffix(energy.getEnergyStored()) + "/" + withSuffix(energy.getMaxEnergyStored()));
         }
-    }
-
-    @Nullable
-    public static String getUUID(ItemStack stack) {
-        NBTTagCompound tagCompound = stack.getTagCompound();
-        if (tagCompound == null) {
-            tagCompound = new NBTTagCompound();
-        }
-        String uuid = tagCompound.getString("UUID");
-        if (uuid.equals("")) {
-            UUID uid = UUID.randomUUID();
-            tagCompound.setString("UUID", uid.toString());
-            stack.setTagCompound(tagCompound);
-            uuid = uid.toString();
-        }
-        return uuid;
     }
 
     public static void setAnchor(ItemStack stack, BlockPos pos) {
@@ -283,6 +268,28 @@ public class GadgetDestruction extends GadgetGeneric {
         return voidPosArray;
     }
 
+    public static UUID getUUID(ItemStack stack) {
+        NBTTagCompound tagCompound = stack.getTagCompound();
+        if (tagCompound == null) {
+            tagCompound = new NBTTagCompound();
+        }
+        UUID uuid = tagCompound.getUniqueId(KEY_UUID);
+        if (uuid == null || uuid.equals(INVALID_UUID)) {
+            String id = tagCompound.getString(KEY_UUID);
+            if (!id.isEmpty()) {
+                uuid = UUID.fromString(id);
+                setUUID(uuid,tagCompound);
+                stack.setTagCompound(tagCompound);
+            }
+        }
+        if (uuid == null || uuid.equals(INVALID_UUID)) {
+            uuid = UUID.randomUUID();
+            setUUID(uuid,tagCompound);
+            stack.setTagCompound(tagCompound);
+        }
+        return uuid;
+    }
+
     public static boolean validBlock(World world, BlockPos voidPos, EntityPlayer player) {
         IBlockState currentBlock = world.getBlockState(voidPos);
         TileEntity te = world.getTileEntity(voidPos);
@@ -322,7 +329,7 @@ public class GadgetDestruction extends GadgetGeneric {
         IntList pastePosArrayList = new IntArrayList();
         IntList pasteStateArrayList = new IntArrayList();
         BlockState2ShortMap blockMapIntState = new BlockState2ShortMap();
-        String UUID = getUUID(stack);
+        UUID uuid = getUUID(stack);
 
         for (Map.Entry<BlockPos, IBlockState> entry : posStateMap.entrySet()) {
             posIntArrayList.add(GadgetUtils.relPosToInt(startBlock, entry.getKey()));
@@ -346,8 +353,8 @@ public class GadgetDestruction extends GadgetGeneric {
         tagCompound.setIntArray("statePasteArray", statePasteArray);
         tagCompound.setTag("startPos", NBTUtil.createPosTag(startBlock));
         tagCompound.setInteger("dim", player.dimension);
-        tagCompound.setString("UUID", UUID);
-        worldSave.addToMap(UUID, tagCompound);
+        setUUID(uuid,tagCompound);
+        worldSave.addToMap(uuid, tagCompound);
         worldSave.markForSaving();
     }
 

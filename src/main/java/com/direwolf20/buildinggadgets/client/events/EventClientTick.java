@@ -14,6 +14,8 @@ import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientConnectedToServerEvent;
 import net.minecraftforge.fml.relauncher.Side;
 
+import java.util.UUID;
+
 @EventBusSubscriber(Side.CLIENT)
 public class EventClientTick {
 
@@ -36,8 +38,8 @@ public class EventClientTick {
                 if (!(stack.getItem() instanceof ITemplateOld)) continue;
 
                 ITemplateOld template = (ITemplateOld) stack.getItem();
-                String UUID = template.getUUID(stack);
-                if (UUID != null && PasteToolBufferBuilder.isUpdateNeeded(UUID, stack)) {
+                UUID uuid = template.getUUID(stack);
+                if (uuid != null && PasteToolBufferBuilder.isUpdateNeeded(uuid, stack)) {
                     //System.out.println("BlockMap Update Needed for UUID: " + UUID + " in slot " + i);
                     PacketHandler.INSTANCE.sendToServer(new PacketRequestBlockMap(template.getUUID(stack), !(template instanceof GadgetCopyPaste)));
                     joinedWorld = true;

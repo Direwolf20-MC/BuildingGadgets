@@ -27,6 +27,8 @@ import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import java.util.UUID;
+
 public class TemplateManager extends Block {
     private static final int GUI_ID = 1;
 
@@ -107,10 +109,10 @@ public class TemplateManager extends Block {
             if (!(itemStack.getItem() instanceof ITemplateOld)) continue;
 
             ITemplateOld template = (ITemplateOld) itemStack.getItem();
-            String UUID = template.getUUID(itemStack);
-            if (UUID == null) continue;
+            UUID uuid = template.getUUID(itemStack);
+            if (uuid == null) continue;
 
-            NBTTagCompound tagCompound = template.getWorldSave(world).getCompoundFromUUID(UUID);
+            NBTTagCompound tagCompound = template.getWorldSave(world).getCompoundFromUUID(uuid);
             if (tagCompound != null) {
                 PacketHandler.INSTANCE.sendTo(new PacketBlockMap(tagCompound), (EntityPlayerMP) player);
             }

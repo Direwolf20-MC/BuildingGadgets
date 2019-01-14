@@ -36,10 +36,7 @@ import net.minecraftforge.client.event.RenderWorldLastEvent;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL14;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static com.direwolf20.buildinggadgets.common.tools.GadgetUtils.getAnchor;
 import static com.direwolf20.buildinggadgets.common.tools.GadgetUtils.getToolBlock;
@@ -395,7 +392,7 @@ public class ToolRenders {
     }
 
     public static void renderPasteOverlay(RenderWorldLastEvent evt, EntityPlayer player, ItemStack stack) {
-        String UUID = ModItems.gadgetCopyPaste.getUUID(stack);
+        UUID uuid = ModItems.gadgetCopyPaste.getUUID(stack);
         World world = player.world;
         if (ModItems.gadgetCopyPaste.getStartPos(stack) == null) return;
         if (ModItems.gadgetCopyPaste.getEndPos(stack) == null) return;
@@ -415,12 +412,12 @@ public class ToolRenders {
             }
 
             //We store our buffers in PasteToolBufferBuilder (A client only class) -- retrieve the buffer from this locally cache'd map
-            ToolDireBuffer toolDireBuffer = PasteToolBufferBuilder.getBufferFromMap(UUID);
+            ToolDireBuffer toolDireBuffer = PasteToolBufferBuilder.getBufferFromMap(uuid);
             if (toolDireBuffer == null) {
                 return;
             }
             //Also get the blockMapList from the local cache - If either the buffer or the blockmap list are empty, exit.
-            List<BlockMap> blockMapList = GadgetCopyPaste.getBlockMapList(PasteToolBufferBuilder.getTagFromUUID(UUID));
+            List<BlockMap> blockMapList = GadgetCopyPaste.getBlockMapList(PasteToolBufferBuilder.getTagFromUUID(uuid));
             if (toolDireBuffer.getVertexCount() == 0 || blockMapList.size() == 0) {
                 return;
             }
@@ -457,7 +454,7 @@ public class ToolRenders {
             GlStateManager.translate(0.0005f, 0.0005f, -0.0005f);
             GlStateManager.scale(0.999f, 0.999f, 0.999f);//Slightly Larger block to avoid z-fighting.
             //GL11.glClear(GL11.GL_DEPTH_BUFFER_BIT);
-            PasteToolBufferBuilder.draw(player, doubleX, doubleY, doubleZ, startPos, UUID); //Draw the cached buffer in the world.
+            PasteToolBufferBuilder.draw(player, doubleX, doubleY, doubleZ, startPos, uuid); //Draw the cached buffer in the world.
 
             GlStateManager.popMatrix();
             //Set blending back to the default mode
@@ -475,7 +472,7 @@ public class ToolRenders {
                 return;
             }
 
-            List<BlockMap> blockMapList = GadgetCopyPaste.getBlockMapList(PasteToolBufferBuilder.getTagFromUUID(UUID));
+            List<BlockMap> blockMapList = GadgetCopyPaste.getBlockMapList(PasteToolBufferBuilder.getTagFromUUID(uuid));
             if (blockMapList.size() == 0) {
                 //return;
             }

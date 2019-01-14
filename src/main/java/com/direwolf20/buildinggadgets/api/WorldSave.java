@@ -8,15 +8,18 @@ import net.minecraft.world.storage.WorldSavedData;
 import net.minecraftforge.common.util.Constants;
 
 import javax.annotation.Nonnull;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import static com.direwolf20.buildinggadgets.common.BuildingGadgets.MODID;
 
 public class WorldSave extends WorldSavedData {
+    private static final String KEY_UUID = "UUID";
     private final String TAG_NAME;
 
-    private Map<String, NBTTagCompound> tagMap = new HashMap<String, NBTTagCompound>();
+    private Map<UUID, NBTTagCompound> tagMap = new HashMap<>();
     //private NBTTagList mapTag;
 
     public WorldSave(String name, String tagName) {
@@ -24,21 +27,21 @@ public class WorldSave extends WorldSavedData {
         TAG_NAME = tagName;
     }
 
-    public void addToMap(String UUID, NBTTagCompound tagCompound) {
-        tagMap.put(UUID, tagCompound);
+    public void addToMap(UUID id, NBTTagCompound tagCompound) {
+        tagMap.put(id, tagCompound);
         markDirty();
     }
 
-    public Map<String, NBTTagCompound> getTagMap() {
-        return tagMap;
+    public Map<UUID, NBTTagCompound> getTagMap() {
+        return Collections.unmodifiableMap(tagMap);
     }
 
-    public void setTagMap(Map<String, NBTTagCompound> newMap) {
-        tagMap = new HashMap<String, NBTTagCompound>(newMap);
+    public void setTagMap(Map<UUID, NBTTagCompound> newMap) {
+        tagMap = new HashMap<>(newMap);
     }
 
-    public NBTTagCompound getCompoundFromUUID(String UUID) {
-        return tagMap.get(UUID);
+    public NBTTagCompound getCompoundFromUUID(UUID uuid) {
+        return tagMap.get(uuid);
     }
 
     @Override
@@ -48,9 +51,14 @@ public class WorldSave extends WorldSavedData {
 
             for (int i = 0; i < tagList.tagCount(); i++) {
                 NBTTagCompound mapTag = tagList.getCompoundTagAt(i);
-                String ID = mapTag.getString("UUID");
+                UUID id = mapTag.getUniqueId(KEY_UUID);
+                if (id == null) { //try compat with older saves
+                    String ID = mapTag.getString(KEY_UUID);
+                    id = UUID.fromString(ID);
+                    if (id == null) throw new RuntimeException("Failed to read UUID from WorldSave. Save must be corrupted!");
+                }
                 NBTTagCompound tagCompound = mapTag.getCompoundTag("tag");
-                tagMap.put(ID, tagCompound);
+                tagMap.put(id, tagCompound);
             }
         }
     }
@@ -59,9 +67,9 @@ public class WorldSave extends WorldSavedData {
     public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
         NBTTagList tagList = new NBTTagList();
 
-        for (Map.Entry<String, NBTTagCompound> entry : tagMap.entrySet()) {
+        for (Map.Entry<UUID, NBTTagCompound> entry : tagMap.entrySet()) {
             NBTTagCompound map = new NBTTagCompound();
-            map.setString("UUID", entry.getKey());
+            map.setUniqueId("UUID", entry.getKey());
             map.setTag("tag", entry.getValue());
             tagList.appendTag(map);
         }

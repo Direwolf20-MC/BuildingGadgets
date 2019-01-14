@@ -20,7 +20,7 @@ public class BlockState2ShortMap {
 
     @Nonnull
     public static BlockState2ShortMap readFromNBT(@Nullable NBTTagCompound tagCompound) {
-        BlockState2ItemMap mapIntState = new BlockState2ItemMap();
+        BlockState2ShortMap mapIntState = new BlockState2ShortMap();
         if (tagCompound == null) return mapIntState;
         mapIntState.readNBT(tagCompound);
         return mapIntState;
@@ -52,7 +52,7 @@ public class BlockState2ShortMap {
 
     public void readNBT(@Nonnull NBTTagCompound tagCompound) {
         NBTTagList mapIntStateTag = (NBTTagList) tagCompound.getTag("mapIntState");
-        readShortStateMapFromNBT(mapIntStateTag == null ? new NBTTagList() : mapIntStateTag);
+        readShortStateMapFromNBT(mapIntStateTag != null ? mapIntStateTag: new NBTTagList());
     }
 
     protected NBTTagList writeShortStateMapToNBT() {

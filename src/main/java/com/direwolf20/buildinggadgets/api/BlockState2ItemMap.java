@@ -48,7 +48,7 @@ public final class BlockState2ItemMap extends BlockState2ShortMap {
     public void readNBT(@Nonnull NBTTagCompound tagCompound) {
         super.readNBT(tagCompound);
         NBTTagList mapIntStackTag = (NBTTagList) tagCompound.getTag("mapIntStack");
-        readStateItemMapFromNBT(mapIntStackTag == null ? mapIntStackTag : new NBTTagList());
+        readStateItemMapFromNBT(mapIntStackTag != null ? mapIntStackTag : new NBTTagList());
     }
 
     public void initStateItemMap(EntityPlayer player) {
