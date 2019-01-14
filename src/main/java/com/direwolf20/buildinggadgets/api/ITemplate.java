@@ -1,6 +1,5 @@
 package com.direwolf20.buildinggadgets.api;
 
-import com.direwolf20.buildinggadgets.common.tools.UniqueItem;
 import com.google.common.collect.Multiset;
 import jdk.internal.jline.internal.Nullable;
 import net.minecraft.nbt.NBTTagCompound;

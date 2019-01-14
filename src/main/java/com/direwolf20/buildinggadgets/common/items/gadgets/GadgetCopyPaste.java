@@ -2,6 +2,7 @@ package com.direwolf20.buildinggadgets.common.items.gadgets;
 
 import com.direwolf20.buildinggadgets.api.BlockMap;
 import com.direwolf20.buildinggadgets.api.ITemplateOld;
+import com.direwolf20.buildinggadgets.api.UniqueItem;
 import com.direwolf20.buildinggadgets.api.WorldSave;
 import com.direwolf20.buildinggadgets.client.gui.GuiProxy;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
@@ -16,6 +17,8 @@ import com.direwolf20.buildinggadgets.common.items.ModItems;
 import com.direwolf20.buildinggadgets.common.network.PacketBlockMap;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.tools.*;
+import com.google.common.collect.HashMultiset;
+import com.google.common.collect.Multiset;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
@@ -45,7 +48,10 @@ import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.world.BlockEvent;
 
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 import static com.direwolf20.buildinggadgets.common.tools.GadgetUtils.withSuffix;
 
@@ -303,7 +309,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplateOld {
         List<Integer> posIntArrayList = new ArrayList<Integer>();
         List<Integer> stateIntArrayList = new ArrayList<Integer>();
         BlockMapIntState blockMapIntState = new BlockMapIntState();
-        Map<UniqueItem, Integer> itemCountMap = new HashMap<UniqueItem, Integer>();
+        Multiset<UniqueItem> itemCountMap = HashMultiset.create();
 
         int blockCount = 0;
 
@@ -321,7 +327,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplateOld {
                         }
                         if (actualState != null) {
                             UniqueItem uniqueItem = BlockMapIntState.blockStateToUniqueItem(actualState, player, tempPos);
-                            if (uniqueItem.item != Items.AIR) {
+                            if (uniqueItem.getItem() != Items.AIR) {
                                 posIntArrayList.add(GadgetUtils.relPosToInt(start, tempPos));
                                 blockMapIntState.addToMap(actualState);
                                 stateIntArrayList.add((int) blockMapIntState.findSlot(actualState));
@@ -338,26 +344,14 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplateOld {
 
                                 int neededItems = 0;
                                 for (ItemStack drop : drops) {
-                                    if (drop.getItem().equals(uniqueItem.item)) {
+                                    if (drop.getItem().equals(uniqueItem.getItem())) {
                                         neededItems++;
                                     }
                                 }
                                 if (neededItems == 0) {
                                     neededItems = 1;
                                 }
-                                if (uniqueItem.item != Items.AIR) {
-                                    boolean found = false;
-                                    for (Map.Entry<UniqueItem, Integer> entry : itemCountMap.entrySet()) {
-                                        if (entry.getKey().equals(uniqueItem)) {
-                                            itemCountMap.put(entry.getKey(), itemCountMap.get(entry.getKey()) + neededItems);
-                                            found = true;
-                                            break;
-                                        }
-                                    }
-                                    if (!found) {
-                                        itemCountMap.put(uniqueItem, neededItems);
-                                    }
-                                }
+                                itemCountMap.add(uniqueItem, neededItems);
                             }
                         }
                     } else if ((world.getTileEntity(tempPos) != null) && !(world.getTileEntity(tempPos) instanceof ConstructionBlockTileEntity)) {
@@ -586,7 +580,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplateOld {
 
         UniqueItem uniqueItem = IntStackMap.get(state);
         if (uniqueItem == null) return; //This shouldn't happen I hope!
-        ItemStack itemStack = new ItemStack(uniqueItem.item, 1, uniqueItem.meta);
+        ItemStack itemStack = new ItemStack(uniqueItem.getItem(), 1, uniqueItem.getMeta());
         NonNullList<ItemStack> drops = NonNullList.create();
         state.getBlock().getDrops(drops, world, pos, state, 0);
         int neededItems = 0;

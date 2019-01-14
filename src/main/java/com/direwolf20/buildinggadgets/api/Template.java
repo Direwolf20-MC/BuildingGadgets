@@ -1,6 +1,5 @@
 package com.direwolf20.buildinggadgets.api;
 
-import com.direwolf20.buildinggadgets.common.tools.UniqueItem;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.Multiset;
@@ -16,13 +15,13 @@ import java.util.UUID;
 public class Template implements ITemplate {
     @Nonnull
     private List<BlockMap> blocks;
-    private BlockPos endPos;
     @Nullable
     private UUID id;
     @Nonnull
     private Multiset<UniqueItem> itemCountMapping;
     @Nonnull
     private String name;
+    private BlockPos endPos;
     private BlockPos startPos;
 
     public Template() {

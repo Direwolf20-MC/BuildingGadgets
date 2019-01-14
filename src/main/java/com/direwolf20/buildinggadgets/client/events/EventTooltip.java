@@ -6,9 +6,10 @@ package com.direwolf20.buildinggadgets.client.events;
  */
 
 import com.direwolf20.buildinggadgets.api.ITemplateOld;
+import com.direwolf20.buildinggadgets.api.UniqueItem;
 import com.direwolf20.buildinggadgets.common.items.ModItems;
 import com.direwolf20.buildinggadgets.common.tools.InventoryManipulation;
-import com.direwolf20.buildinggadgets.common.tools.UniqueItem;
+import com.google.common.collect.Multiset;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
@@ -50,12 +51,12 @@ public class EventTooltip {
             }
 
             List<String> tooltip = event.getToolTip();
-            Map<UniqueItem, Integer> itemCountMap = template.getItemCountMap(stack);
+            Multiset<UniqueItem> itemCountMap = template.getItemCountMap(stack);
 
             Map<ItemStack, Integer> itemStackCount = new HashMap<ItemStack, Integer>();
-            for (Map.Entry<UniqueItem, Integer> entry : itemCountMap.entrySet()) {
-                ItemStack itemStack = new ItemStack(entry.getKey().item, 1, entry.getKey().meta);
-                itemStackCount.put(itemStack, entry.getValue());
+            for (Multiset.Entry<UniqueItem> entry : itemCountMap.entrySet()) {
+                ItemStack itemStack = new ItemStack(entry.getElement().getItem(), 1, entry.getElement().getMeta());
+                itemStackCount.put(itemStack, entry.getCount());
             }
             List<Map.Entry<ItemStack, Integer>> list = new ArrayList<>(itemStackCount.entrySet());
 
@@ -91,13 +92,13 @@ public class EventTooltip {
         ItemStack stack = event.getStack();
         if ((stack.getItem() instanceof ITemplateOld) && GuiScreen.isShiftKeyDown()) {
             int totalMissing = 0;
-            Map<UniqueItem, Integer> itemCountMap = ((ITemplateOld) stack.getItem()).getItemCountMap(stack);
+            Multiset<UniqueItem> itemCountMap = ((ITemplateOld) stack.getItem()).getItemCountMap(stack);
 
             //Create an ItemStack -> Integer Map
             Map<ItemStack, Integer> itemStackCount = new HashMap<ItemStack, Integer>();
-            for (Map.Entry<UniqueItem, Integer> entry : itemCountMap.entrySet()) {
-                ItemStack itemStack = new ItemStack(entry.getKey().item, 1, entry.getKey().meta);
-                itemStackCount.put(itemStack, entry.getValue());
+            for (Multiset.Entry<UniqueItem> entry : itemCountMap.entrySet()) {
+                ItemStack itemStack = new ItemStack(entry.getElement().getItem(), 1, entry.getElement().getMeta());
+                itemStackCount.put(itemStack, entry.getCount());
             }
             // Sort the ItemStack -> Integer map, first by Required Items, then ItemID, then Meta
             List<Map.Entry<ItemStack, Integer>> list = new ArrayList<>(itemStackCount.entrySet());

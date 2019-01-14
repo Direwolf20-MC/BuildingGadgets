@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.common.tools;
 
+import com.direwolf20.buildinggadgets.api.UniqueItem;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
@@ -56,14 +57,16 @@ public class BlockMapIntState {
         return -1;
     }
 
-    @Nullable
-    private IBlockState findStackSlot(UniqueItem uniqueItem) {
+    public NBTTagList putIntStackMapIntoNBT() {
+        NBTTagList tagList = new NBTTagList();
         for (Map.Entry<IBlockState, UniqueItem> entry : intStackMap.entrySet()) {
-            if (entry.getValue().item == uniqueItem.item && entry.getValue().meta == uniqueItem.meta) {
-                return entry.getKey();
-            }
+            NBTTagCompound compound = new NBTTagCompound();
+            compound.setInteger("item", Item.getIdFromItem(entry.getValue().getItem()));
+            compound.setInteger("meta", entry.getValue().getMeta());
+            compound.setTag("state", GadgetUtils.stateToCompound(entry.getKey()));
+            tagList.appendTag(compound);
         }
-        return null;
+        return tagList;
     }
 
     public IBlockState getStateFromSlot(Short slot) {
@@ -105,16 +108,14 @@ public class BlockMapIntState {
         return intStackMap;
     }
 
-    public NBTTagList putIntStackMapIntoNBT() {
-        NBTTagList tagList = new NBTTagList();
+    @Nullable
+    private IBlockState findStackSlot(UniqueItem uniqueItem) {
         for (Map.Entry<IBlockState, UniqueItem> entry : intStackMap.entrySet()) {
-            NBTTagCompound compound = new NBTTagCompound();
-            compound.setInteger("item", Item.getIdFromItem(entry.getValue().item));
-            compound.setInteger("meta", entry.getValue().meta);
-            compound.setTag("state", GadgetUtils.stateToCompound(entry.getKey()));
-            tagList.appendTag(compound);
+            if (entry.getValue().getItem() == uniqueItem.getItem() && entry.getValue().getMeta() == uniqueItem.getMeta()) { //TODO this can propably be replaced with equality check
+                return entry.getKey();
+            }
         }
-        return tagList;
+        return null;
     }
 
     @Nonnull
