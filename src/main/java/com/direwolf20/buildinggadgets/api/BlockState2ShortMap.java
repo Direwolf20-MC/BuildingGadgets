@@ -12,6 +12,9 @@ import javax.annotation.Nullable;
 import java.util.Map;
 
 public class BlockState2ShortMap {
+    private static final String KEY_STATE_MAP = "mapIntState";
+    private static final String KEY_MAP_SLOT = "mapSlot";
+    private static final String KEY_MAP_STATE = "mapState";
     private final BiMap<Short, IBlockState> shortStateMap;
 
     public BlockState2ShortMap() {
@@ -47,12 +50,19 @@ public class BlockState2ShortMap {
     }
 
     public void writeToNBT(@Nonnull NBTTagCompound tagCompound) {
-        tagCompound.setTag("mapIntState", writeShortStateMapToNBT());
+        tagCompound.setTag(KEY_STATE_MAP, writeShortStateMapToNBT());
     }
 
     public void readNBT(@Nonnull NBTTagCompound tagCompound) {
-        NBTTagList mapIntStateTag = (NBTTagList) tagCompound.getTag("mapIntState");
-        readShortStateMapFromNBT(mapIntStateTag != null ? mapIntStateTag: new NBTTagList());
+        clear();
+        if (tagCompound.hasKey(KEY_STATE_MAP)) {
+            NBTTagList mapIntStateTag = (NBTTagList) tagCompound.getTag(KEY_STATE_MAP);
+            readShortStateMapFromNBT(mapIntStateTag);
+        }
+    }
+
+    public void clear() {
+        shortStateMap.clear();
     }
 
     protected NBTTagList writeShortStateMapToNBT() {
@@ -61,8 +71,8 @@ public class BlockState2ShortMap {
             NBTTagCompound compound = new NBTTagCompound();
             NBTTagCompound state = new NBTTagCompound();
             NBTUtil.writeBlockState(state, entry.getValue());
-            compound.setShort("mapSlot", entry.getKey());
-            compound.setTag("mapState", state);
+            compound.setShort(KEY_MAP_SLOT, entry.getKey());
+            compound.setTag(KEY_MAP_STATE, state);
             tagList.appendTag(compound);
         }
         return tagList;
@@ -72,7 +82,7 @@ public class BlockState2ShortMap {
         shortStateMap.clear();
         for (int i = 0; i < tagList.tagCount(); i++) {
             NBTTagCompound compound = tagList.getCompoundTagAt(i);
-            shortStateMap.put(compound.getShort("mapSlot"), NBTUtil.readBlockState(compound.getCompoundTag("mapState")));
+            shortStateMap.put(compound.getShort(KEY_MAP_SLOT), NBTUtil.readBlockState(compound.getCompoundTag(KEY_MAP_STATE)));
         }
     }
 }

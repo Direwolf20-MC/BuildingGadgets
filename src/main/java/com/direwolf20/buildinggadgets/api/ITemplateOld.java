@@ -1,6 +1,7 @@
 package com.direwolf20.buildinggadgets.api;
 
 import com.direwolf20.buildinggadgets.common.tools.GadgetUtils;
+import com.direwolf20.buildinggadgets.common.tools.NBTTool;
 import com.google.common.collect.Multiset;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -49,7 +50,7 @@ public interface ITemplateOld {
         if (tagCompound == null) {
             tagCompound = new NBTTagCompound();
         }
-        NBTTagList tagList = GadgetUtils.itemCountToNBT(tagMap);
+        NBTTagList tagList = NBTTool.itemCountToNBT(tagMap);
         tagCompound.setTag("itemcountmap", tagList);
         stack.setTagCompound(tagCompound);
     }
@@ -57,7 +58,7 @@ public interface ITemplateOld {
     @Nonnull
     default Multiset<UniqueItem> getItemCountMap(ItemStack stack) {
         NBTTagCompound tagCompound = stack.getTagCompound();
-        Multiset<UniqueItem> tagMap = tagCompound == null ? null : GadgetUtils.nbtToItemCount((NBTTagList) tagCompound.getTag("itemcountmap"));
+        Multiset<UniqueItem> tagMap = tagCompound == null ? null : NBTTool.nbtToItemCount((NBTTagList) tagCompound.getTag("itemcountmap"));
         if (tagMap == null)
             throw new IllegalArgumentException("ITemplate#getItemCountMap faild to retieve tag map from " + GadgetUtils.getStackErrorSuffix(stack));
 

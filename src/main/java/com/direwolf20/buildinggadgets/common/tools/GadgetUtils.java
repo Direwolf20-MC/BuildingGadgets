@@ -1,15 +1,11 @@
 package com.direwolf20.buildinggadgets.common.tools;
 
-import com.direwolf20.buildinggadgets.api.UniqueItem;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetBuilding;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetExchanger;
-import com.google.common.collect.HashMultiset;
-import com.google.common.collect.Multiset;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -456,39 +452,22 @@ public class GadgetUtils {
     }
 
     public static BlockPos relIntToPos(BlockPos startPos, int relInt) {
-        int p = relInt;
-        int x = startPos.getX() + (byte) ((p & 0xff0000) >> 16);
-        int y = startPos.getY() + (byte) ((p & 0x00ff00) >> 8);
-        int z = startPos.getZ() + (byte) (p & 0x0000ff);
+        //int p = relInt;
+        int x = startPos.getX() + relIntToX(relInt);
+        int y = startPos.getY() + relIntToY(relInt);
+        int z = startPos.getZ() + relIntToZ(relInt);
         return new BlockPos(x, y, z);
     }
 
-    public static NBTTagList itemCountToNBT(Multiset<UniqueItem> itemCountMap) {
-        NBTTagList tagList = new NBTTagList();
-
-        for (Multiset.Entry<UniqueItem> entry : itemCountMap.entrySet()) {
-            int item = Item.getIdFromItem(entry.getElement().getItem());
-            int meta = entry.getElement().getMeta();
-            int count = entry.getCount();
-            NBTTagCompound tagCompound = new NBTTagCompound();
-            tagCompound.setInteger("item", item);
-            tagCompound.setInteger("meta", meta);
-            tagCompound.setInteger("count", count);
-            tagList.appendTag(tagCompound);
-        }
-        return tagList;
+    public static int relIntToX(int relInt) {
+        return (relInt & 0xff0000) >> 16;
     }
 
-    public static Multiset<UniqueItem> nbtToItemCount(@Nullable NBTTagList tagList) {
-        if (tagList == null) return HashMultiset.create();
-        Multiset<UniqueItem> itemCountMap = HashMultiset.create(tagList.tagCount());
-        for (int i = 0; i < tagList.tagCount(); i++) {
-            NBTTagCompound tagCompound = tagList.getCompoundTagAt(i);
-            UniqueItem uniqueItem = new UniqueItem(Item.getItemById(tagCompound.getInteger("item")), tagCompound.getInteger("meta"));
-            int count = tagCompound.getInteger("count");
-            itemCountMap.setCount(uniqueItem, count);
-        }
+    public static int relIntToY(int relInt) {
+        return (relInt & 0x00ff00) >> 8;
+    }
 
-        return itemCountMap;
+    public static int relIntToZ(int relInt) {
+        return relInt & 0x0000ff;
     }
 }

@@ -50,6 +50,7 @@ import net.minecraftforge.event.world.BlockEvent;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static com.direwolf20.buildinggadgets.common.tools.GadgetUtils.withSuffix;
@@ -221,18 +222,16 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplateOld {
     }
 
     private static List<BlockMap> getBlockMapList(@Nullable NBTTagCompound tagCompound, BlockPos startBlock) {
-        List<BlockMap> blockMap = new ArrayList<BlockMap>();
-        if (tagCompound == null) {
-            tagCompound = new NBTTagCompound();
-        }
-        BlockState2ShortMap MapIntState = BlockState2ShortMap.readFromNBT(tagCompound);
+        if (tagCompound == null || !tagCompound.hasKey("posIntArray") || !tagCompound.hasKey("stateIntArray")) return Collections.emptyList();
+        List<BlockMap> blockMap = new ArrayList<>();
+        BlockState2ShortMap stateMap = BlockState2ShortMap.readFromNBT(tagCompound);
         int[] posIntArray = tagCompound.getIntArray("posIntArray");
         int[] stateIntArray = tagCompound.getIntArray("stateIntArray");
         for (int i = 0; i < posIntArray.length; i++) {
             int p = posIntArray[i];
             BlockPos pos = GadgetUtils.relIntToPos(startBlock, p);
             short IntState = (short) stateIntArray[i];
-            blockMap.add(new BlockMap(pos, MapIntState.getStateFromSlot(IntState), (byte) ((p & 0xff0000) >> 16), (byte) ((p & 0x00ff00) >> 8), (byte) (p & 0x0000ff)));
+            blockMap.add(new BlockMap(pos, stateMap.getStateFromSlot(IntState), (byte) ((p & 0xff0000) >> 16), (byte) ((p & 0x00ff00) >> 8), (byte) (p & 0x0000ff)));
         }
         return blockMap;
     }
@@ -323,8 +322,8 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplateOld {
             }
         }
         tool.setItemCountMap(stack, itemCountMap);
-        int[] posIntArray = posIntArrayList.stream().mapToInt(i -> i).toArray();
-        int[] stateIntArray = stateIntArrayList.stream().mapToInt(i -> i).toArray();
+        int[] posIntArray = posIntArrayList.toIntArray();
+        int[] stateIntArray = stateIntArrayList.toIntArray();
         tagCompound.setIntArray("posIntArray", posIntArray);
         tagCompound.setIntArray("stateIntArray", stateIntArray);
         blockMapIntState.writeToNBT(tagCompound);
