@@ -25,7 +25,7 @@ public class BuildingGadgets {
     public static final String MODNAME = "Building Gadgets";
     public static final String VERSION = "@VERSION@";
     public static final String UPDATE_JSON = "@UPDATE@";
-    public static final String DEPENDENCIES = "required:forge@[14.23.3.2694,)";
+    public static final String DEPENDENCIES = "required-after:forge@[14.23.3.2694,)";
 
     public static final CreativeTabs BUILDING_CREATIVE_TAB = new CreativeTabs(new TextComponentTranslation("buildingGadgets").getUnformattedComponentText()) {
         @Override
