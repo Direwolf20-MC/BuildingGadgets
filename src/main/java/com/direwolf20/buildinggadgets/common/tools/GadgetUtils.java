@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.common.tools;
 
+import com.direwolf20.buildinggadgets.api.*;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetBuilding;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetExchanger;
@@ -12,6 +13,7 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.text.TextComponentString;
@@ -87,11 +89,8 @@ public class GadgetUtils {
         int idx = 0;
         for (BlockPos coord : undoState.coordinates) {
             //Converts relative blockPos coordinates to a single integer value. Max range 127 due to 8 bits.
-            int px = (((coord.getX() - startBlock.getX()) & 0xff) << 16);
-            int py = (((coord.getY() - startBlock.getY()) & 0xff) << 8);
-            int pz = (((coord.getZ() - startBlock.getZ()) & 0xff));
-            int p = (px + py + pz);
-            array[idx++] = p;
+            //TODO make this use a true byte - and have a range of 255
+            array[idx++] = relPosToInt(startBlock, coord);
         }
         compound.setTag("startBlock", NBTUtil.createPosTag(startBlock));
         compound.setIntArray("undoIntCoords", array);
@@ -435,6 +434,39 @@ public class GadgetUtils {
         return tagCompound;
     }
 
+    public static String createClipboardString(ITemplate template) {
+        NBTTagCompound tagCompound = getNBT(template);
+        NBTTagCompound newCompound = new NBTTagCompound();
+        newCompound.setTag(MutableTemplate.KEY_STATE_MAP, tagCompound.getTag(MutableTemplate.KEY_STATE_MAP));
+        newCompound.setIntArray(MutableTemplate.KEY_POS_MAP, tagCompound.getIntArray(MutableTemplate.KEY_POS_MAP));
+        newCompound.setTag(BlockState2ShortMap.KEY_STATE_MAP, tagCompound.getTag(BlockState2ShortMap.KEY_STATE_MAP));
+        newCompound.setTag(MutableTemplate.KEY_START_POS, tagCompound.getTag(MutableTemplate.KEY_START_POS));
+        newCompound.setTag(MutableTemplate.KEY_END_POS, tagCompound.getTag(MutableTemplate.KEY_END_POS));
+        return newCompound.toString();
+    }
+
+    public static NBTTagCompound getNBT(ITemplate template) {
+        if (template instanceof MutableTemplate) { //this cannot be generalized to IMutableTemplate, as custom implementations might use a different NBT Structure
+            return ((MutableTemplate) template).serializeNBT();
+        } else {
+            MutableTemplate tempTemplate = new MutableTemplate(WorldSave.TEMPLATE_STORAGE);
+            tempTemplate.copyFrom(template);
+            return tempTemplate.serializeNBT();
+        }
+    }
+
+    public static int evaluateDrops(UniqueItem item, BlockMap blockMap, EntityPlayer player) {
+        NonNullList<ItemStack> drops = NonNullList.create();
+        blockMap.getState().getBlock().getDrops(drops, player.world, blockMap.getPos(), blockMap.getState(), 0);
+        int neededItems = 0;
+        for (ItemStack drop : drops) {
+            if (drop.getItem().equals(item.getItem())) {
+                neededItems++;
+            }
+        }
+        return Math.max(neededItems, 1);
+    }
+
     @Nullable
     public static IBlockState compoundToState(@Nullable NBTTagCompound tagCompound) {
         if (tagCompound == null) {
@@ -469,5 +501,9 @@ public class GadgetUtils {
 
     public static int relIntToZ(int relInt) {
         return relInt & 0x0000ff;
+    }
+
+    public static int getVolumeBetween(BlockPos start, BlockPos end) {
+        return Math.abs(start.getX() - end.getX()) * Math.abs(start.getY() - end.getY()) * Math.abs(start.getZ() - end.getZ());
     }
 }

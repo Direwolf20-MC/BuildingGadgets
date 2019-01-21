@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.api;
 
+import com.direwolf20.buildinggadgets.common.tools.NBTTool;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.world.World;
@@ -16,7 +17,40 @@ import java.util.UUID;
 import static com.direwolf20.buildinggadgets.common.BuildingGadgets.MODID;
 
 public class WorldSave extends WorldSavedData {
-    private static final String KEY_UUID = "UUID";
+    public static ITemplateDataStorage TEMPLATE_STORAGE = new ITemplateDataStorage() {
+        @Override
+        public void saveData(@Nonnull UUID uuid, @Nonnull NBTTagCompound compound, @Nonnull World world) {
+            if (!world.isRemote) {
+                WorldSave save = getTemplateWorldSave(world);
+                save.addToMap(uuid, compound);
+                save.markForSaving();
+            }
+        }
+
+        @Override
+        public NBTTagCompound loadData(@Nonnull UUID uuid, @Nonnull World world) {
+            return world.isRemote ? new NBTTagCompound() : WorldSave.getTemplateWorldSave(world).getCompoundFromUUID(uuid);
+        }
+    };
+
+    public static ITemplateDataStorage CHANGING_STORAGE = new ITemplateDataStorage() {
+        @Override
+        public void saveData(@Nonnull UUID uuid, @Nonnull NBTTagCompound compound, @Nonnull World world) {
+            if (!world.isRemote) {
+                WorldSave save = getTemplateWorldSave(world);
+                save.addToMap(uuid, compound);
+                save.markForSaving();
+            } else {
+                PasteToolBufferBuilder.addToMap(uuid, compound);
+            }
+        }
+
+        @Override
+        public NBTTagCompound loadData(@Nonnull UUID uuid, @Nonnull World world) {
+            return world.isRemote ? PasteToolBufferBuilder.getTagFromUUID(uuid) : WorldSave.getTemplateWorldSave(world).getCompoundFromUUID(uuid);
+        }
+    };
+    private static final String KEY_COMPOUND_TAG = "tag";
     private final String TAG_NAME;
 
     private Map<UUID, NBTTagCompound> tagMap = new HashMap<>();
@@ -51,13 +85,11 @@ public class WorldSave extends WorldSavedData {
 
             for (int i = 0; i < tagList.tagCount(); i++) {
                 NBTTagCompound mapTag = tagList.getCompoundTagAt(i);
-                UUID id = mapTag.getUniqueId(KEY_UUID);
-                if (id == null) { //try compat with older saves
-                    String ID = mapTag.getString(KEY_UUID);
-                    id = UUID.fromString(ID);
-                    if (id == null) throw new RuntimeException("Failed to read UUID from WorldSave. Save must be corrupted!");
+                UUID id = NBTTool.readUUID(mapTag);
+                if (id == null) {
+                    throw new RuntimeException("Failed to read UUID from WorldSave. Save must be corrupted!");
                 }
-                NBTTagCompound tagCompound = mapTag.getCompoundTag("tag");
+                NBTTagCompound tagCompound = mapTag.getCompoundTag(KEY_COMPOUND_TAG);
                 tagMap.put(id, tagCompound);
             }
         }
@@ -68,10 +100,10 @@ public class WorldSave extends WorldSavedData {
         NBTTagList tagList = new NBTTagList();
 
         for (Map.Entry<UUID, NBTTagCompound> entry : tagMap.entrySet()) {
-            NBTTagCompound map = new NBTTagCompound();
-            map.setUniqueId("UUID", entry.getKey());
-            map.setTag("tag", entry.getValue());
-            tagList.appendTag(map);
+            NBTTagCompound mapTag = new NBTTagCompound();
+            NBTTool.writeUUID(entry.getKey(), mapTag);
+            mapTag.setTag(KEY_COMPOUND_TAG, entry.getValue());
+            tagList.appendTag(mapTag);
         }
         nbt.setTag(TAG_NAME, tagList);
         return nbt;

@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.common.blocks.templatemanager;
 
+import com.direwolf20.buildinggadgets.api.CapabilityBGTemplate;
 import com.direwolf20.buildinggadgets.common.items.ModItems;
 import com.google.common.collect.ImmutableSet;
 import net.minecraft.entity.player.EntityPlayer;
@@ -37,23 +38,25 @@ public class TemplateManagerTileEntity extends TileEntity {
         @Override
         @Nonnull
         public ItemStack insertItem(int slot, @Nonnull ItemStack stack, boolean simulate) {
-            if (slot == 0) {
-                if (!(allowedItemsLeft.contains(stack.getItem()))) {
-                    return stack;
-                }
-            } else if (slot == 1) {
-                if (!(allowedItemsRight.contains(stack.getItem()))) {
-                    return stack;
-                }
-                if (getStackInSlot(slot).getCount() > 0)
-                    return stack;
+            if (!isItemValid(slot, stack)) {
+                return stack;
+            }
 
-                if (stack.getCount() > 1) {
-                    super.insertItem(slot, ItemHandlerHelper.copyStackWithSize(stack, 1), simulate);
-                    return ItemHandlerHelper.copyStackWithSize(stack, stack.getCount() - 1);
-                }
+            if (getStackInSlot(slot).getCount() > 0) {
+                return stack;
+            }
+
+            if (stack.getCount() > 1) {
+                super.insertItem(slot, ItemHandlerHelper.copyStackWithSize(stack, 1), simulate);
+                return ItemHandlerHelper.copyStackWithSize(stack, stack.getCount() - 1);
             }
             return super.insertItem(slot, stack, simulate);
+        }
+
+        @Override
+        public boolean isItemValid(int slot, @Nonnull ItemStack stack) {
+            return (slot == 0 && stack.hasCapability(CapabilityBGTemplate.CAPABILITY_TEMPLATE, null)) ||
+                    (slot == 1 && (stack.getItem() == Items.PAPER || stack.hasCapability(CapabilityBGTemplate.CAPABILITY_TEMPLATE, null)));
         }
     };
 

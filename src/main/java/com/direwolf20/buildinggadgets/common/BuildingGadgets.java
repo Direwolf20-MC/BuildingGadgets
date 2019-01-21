@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.common;
 
+import com.direwolf20.buildinggadgets.api.CapabilityBGTemplate;
 import com.direwolf20.buildinggadgets.common.commands.DeleteBlockMapsCommand;
 import com.direwolf20.buildinggadgets.common.commands.FindBlockMapsCommand;
 import com.direwolf20.buildinggadgets.common.events.AnvilRepairHandler;
@@ -48,6 +49,7 @@ public class BuildingGadgets {
         if (!Config.poweredByFE) {
             MinecraftForge.EVENT_BUS.register(new AnvilRepairHandler());
         }
+        CapabilityBGTemplate.register();
     }
 
     @Mod.EventHandler

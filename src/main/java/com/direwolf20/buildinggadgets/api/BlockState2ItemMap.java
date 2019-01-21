@@ -1,6 +1,7 @@
 package com.direwolf20.buildinggadgets.api;
 
 import com.direwolf20.buildinggadgets.common.tools.GadgetUtils;
+import com.google.common.collect.BiMap;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
@@ -18,8 +19,18 @@ public final class BlockState2ItemMap extends BlockState2ShortMap {
     private static final String KEY_STATE = "state";
     private final Map<IBlockState, UniqueItem> stateItemMap;
 
+    public BlockState2ItemMap(BiMap<Short, IBlockState> shortStateMap, Map<IBlockState, UniqueItem> stateItemMap) {
+        super(shortStateMap);
+        this.stateItemMap = new HashMap<>(stateItemMap);
+    }
+
     public BlockState2ItemMap() {
+        super();
         stateItemMap = new HashMap<>();
+    }
+
+    public Map<IBlockState, UniqueItem> getStateItemMap() {
+        return stateItemMap;
     }
 
     @Nonnull

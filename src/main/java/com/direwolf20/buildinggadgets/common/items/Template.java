@@ -1,21 +1,25 @@
 package com.direwolf20.buildinggadgets.common.items;
 
+import com.direwolf20.buildinggadgets.api.IMutableTemplate;
 import com.direwolf20.buildinggadgets.api.ITemplateOld;
 import com.direwolf20.buildinggadgets.api.WorldSave;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
-import com.direwolf20.buildinggadgets.common.tools.GadgetUtils;
+import com.direwolf20.buildinggadgets.common.capability.CapabilityProviderTemplate;
+import com.direwolf20.buildinggadgets.common.capability.WrappingCapabilityProvider;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.client.model.ModelLoader;
+import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -29,17 +33,14 @@ public class Template extends Item implements ITemplateOld {
         setMaxStackSize(1);
     }
 
-    @Override
-    public WorldSave getWorldSave(World world) {
-        return WorldSave.getTemplateWorldSave(world);
-    }
-
     public static void setName(ItemStack stack, String name) {
-        GadgetUtils.writeStringToNBT(stack, name, "TemplateName");
+        IMutableTemplate template = CapabilityProviderTemplate.getTemplate(stack, null);
+        template.setName(name);
+        CapabilityProviderTemplate.writeTemplate(template, stack, null);
     }
 
     public static String getName(ItemStack stack) {
-        return GadgetUtils.getStringFromNBT(stack, "TemplateName");
+        return CapabilityProviderTemplate.getTemplate(stack, null).getName();
     }
 
     @Override
@@ -56,8 +57,25 @@ public class Template extends Item implements ITemplateOld {
 
     @Override
     public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
-        ItemStack itemstack = player.getHeldItem(hand);
-        return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, itemstack);
+        return new ActionResult<>(EnumActionResult.SUCCESS, player.getHeldItem(hand));
     }
 
+    /**
+     * Called from ItemStack.setItem, will hold extra data for the life of this ItemStack.
+     * Can be retrieved from stack.getCapabilities()
+     * The NBT can be null if this is not called from readNBT or if the item the stack is
+     * changing FROM is different then this item, or the previous item had no capabilities.
+     * <p>
+     * This is called BEFORE the stacks item is set so you can use stack.getItem() to see the OLD item.
+     * Remember that getItem CAN return null.
+     *
+     * @param stack The ItemStack
+     * @param nbt   NBT of this item serialized, or null.
+     * @return A holder instance associated with this ItemStack where you can hold capabilities for the life of this item.
+     */
+    @Nullable
+    @Override
+    public ICapabilityProvider initCapabilities(ItemStack stack, @Nullable NBTTagCompound nbt) {
+        return new WrappingCapabilityProvider(super.initCapabilities(stack, nbt), new CapabilityProviderTemplate(WorldSave.TEMPLATE_STORAGE));
+    }
 }

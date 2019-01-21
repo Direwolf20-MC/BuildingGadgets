@@ -1,10 +1,10 @@
 package com.direwolf20.buildinggadgets.client.events;
 
 import com.direwolf20.buildinggadgets.api.ITemplateOld;
+import com.direwolf20.buildinggadgets.api.PasteToolBufferBuilder;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.PacketRequestBlockMap;
-import com.direwolf20.buildinggadgets.common.tools.PasteToolBufferBuilder;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;

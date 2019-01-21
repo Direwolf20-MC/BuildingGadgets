@@ -43,7 +43,9 @@ public interface ITemplateOld {
         tagCompound.setUniqueId(KEY_UUID, id);
     }
 
-    WorldSave getWorldSave(World world);
+    public default WorldSave getWorldSave(World world) {
+        return WorldSave.getTemplateWorldSave(world);
+    }
 
     default void setItemCountMap(ItemStack stack, Multiset<UniqueItem> tagMap) {
         NBTTagCompound tagCompound = stack.getTagCompound();

@@ -14,8 +14,8 @@ import java.util.stream.Stream;
 public class WrappingCapabilityProvider implements ICapabilityProvider {
     private List<ICapabilityProvider> subProviders;
 
-    public WrappingCapabilityProvider(List<ICapabilityProvider> subProviders) {
-        this.subProviders = ImmutableList.copyOf(subProviders);
+    private WrappingCapabilityProvider(ImmutableList<ICapabilityProvider> subProviders) {
+        this.subProviders = subProviders;
     }
 
     public WrappingCapabilityProvider(ICapabilityProvider... providers) {

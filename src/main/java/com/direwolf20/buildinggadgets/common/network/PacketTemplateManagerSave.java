@@ -1,6 +1,5 @@
 package com.direwolf20.buildinggadgets.common.network;
 
-import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManagerCommands;
 import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManagerContainer;
 import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManagerTileEntity;
 import io.netty.buffer.ByteBuf;
@@ -53,7 +52,7 @@ public class PacketTemplateManagerSave implements IMessage {
             TileEntity te = world.getTileEntity(pos);
             if (!(te instanceof TemplateManagerTileEntity)) return;
             TemplateManagerContainer container = ((TemplateManagerTileEntity) te).getContainer(player);
-            TemplateManagerCommands.saveTemplate(container, player, message.name);
+            container.saveTemplate(player, message.name);
 
 
         }

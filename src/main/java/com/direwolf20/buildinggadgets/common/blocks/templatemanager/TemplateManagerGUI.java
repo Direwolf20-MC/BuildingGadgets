@@ -5,17 +5,21 @@
 
 package com.direwolf20.buildinggadgets.common.blocks.templatemanager;
 
+import com.direwolf20.buildinggadgets.api.CapabilityBGTemplate;
+import com.direwolf20.buildinggadgets.api.ITemplate;
+import com.direwolf20.buildinggadgets.api.PasteToolBufferBuilder;
 import com.direwolf20.buildinggadgets.client.gui.AreaHelpText;
 import com.direwolf20.buildinggadgets.client.gui.GuiButtonHelp;
 import com.direwolf20.buildinggadgets.client.gui.GuiButtonHelpText;
 import com.direwolf20.buildinggadgets.client.gui.IHoverHelpText;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
+import com.direwolf20.buildinggadgets.common.capability.CapabilityProviderTemplate;
 import com.direwolf20.buildinggadgets.common.items.ModItems;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.PacketTemplateManagerLoad;
 import com.direwolf20.buildinggadgets.common.network.PacketTemplateManagerPaste;
 import com.direwolf20.buildinggadgets.common.network.PacketTemplateManagerSave;
-import com.direwolf20.buildinggadgets.common.tools.PasteToolBufferBuilder;
+import com.direwolf20.buildinggadgets.common.tools.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.tools.ToolDireBuffer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
@@ -85,6 +89,20 @@ public class TemplateManagerGUI extends GuiContainer {
         this.container = container;
         //xSize = WIDTH;
         //ySize = HEIGHT;
+    }
+
+    private static void copyTemplate(TemplateManagerContainer container) {
+        ItemStack itemStackSource = container.getMutableSlotContent();
+        if (itemStackSource.hasCapability(CapabilityBGTemplate.CAPABILITY_TEMPLATE, null)) {
+            ITemplate template = CapabilityProviderTemplate.tryLoadTemplate(itemStackSource, Minecraft.getMinecraft().world);
+            if (template.getID() == null || template.getMappedBlocks().isEmpty()) {
+                Minecraft.getMinecraft().player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.copyfailed").getUnformattedComponentText()), false);
+                return;
+            }
+            String jsonTag = GadgetUtils.createClipboardString(template);
+            setClipboardString(jsonTag);
+            Minecraft.getMinecraft().player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.copysuccess").getUnformattedComponentText()), false);
+        }
     }
 
     @Override
@@ -300,7 +318,7 @@ public class TemplateManagerGUI extends GuiContainer {
         } else if (b.id == 1) {
             PacketHandler.INSTANCE.sendToServer(new PacketTemplateManagerLoad(te.getPos()));
         } else if (b.id == 2) {
-            TemplateManagerCommands.copyTemplate(container);
+            copyTemplate(container);
         } else if (b.id == 3) {
             String CBString = getClipboardString();
             //System.out.println("CBString Length: " + CBString.length());

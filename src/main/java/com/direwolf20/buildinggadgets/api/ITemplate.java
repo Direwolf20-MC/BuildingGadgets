@@ -1,16 +1,15 @@
 package com.direwolf20.buildinggadgets.api;
 
-import com.google.common.collect.Multiset;
-import net.minecraft.nbt.NBTTagCompound;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMultiset;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.math.BlockPos;
-import net.minecraftforge.common.util.INBTSerializable;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.List;
 import java.util.UUID;
 
-public interface ITemplate extends INBTSerializable<NBTTagCompound> {
+public interface ITemplate {
     /**
      * Retrieves the {@link UUID} used by this ITemplate to store Data in the TemplateWorldSave.
      *
@@ -26,23 +25,42 @@ public interface ITemplate extends INBTSerializable<NBTTagCompound> {
     @Nonnull
     public String getName();
 
+    /**
+     * @return The absolute startPos this Template was copied from
+     */
     public BlockPos getStartPos();
 
+    /**
+     *
+     * @return The absolute endPos this Template was copied from
+     */
     public BlockPos getEndPos();
 
     /**
      * @return The {@link BlockMap}'s this Template contains
      */
     @Nonnull
-    public List<BlockMap> getMappedBlocks();
-
-    public Multiset<UniqueItem> getItemCount();
+    public ImmutableList<BlockMap> getMappedBlocks();
 
     /**
-     * @param id The Save id to be assigned to this ITemplate
-     * @throws NullPointerException  if the provided ID was null.
-     * @throws IllegalStateException if this Template already has an assigned ID and this id is not equal to {@link #getID()}
-     * @implSpec This Method will do nothing if called with the (Non-null) result from {@link #getID()}.
+     * @param state The state to retrieve a UniqueItem within this Template for
+     * @return The {@link UniqueItem} (if known) for the given BlockState
      */
-    public void assignID(@Nonnull UUID id);
+    public UniqueItem getItemFromState(IBlockState state);
+
+    /**
+     * @return The amount of times copying was performed on this Templates Data.
+     */
+    public int getCopyCounter();
+
+    /**
+     * @return A Multiset of UniqueItem's
+     */
+    public ImmutableMultiset<UniqueItem> getItemCount();
+
+    /**
+     *
+     * @return An Immutable view of this Templates {@link BlockState2ItemMap}
+     */
+    public DelegatingState2ItemMap getState2ItemMap();
 }

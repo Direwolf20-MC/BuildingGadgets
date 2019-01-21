@@ -12,13 +12,17 @@ import javax.annotation.Nullable;
 import java.util.Map;
 
 public class BlockState2ShortMap {
-    private static final String KEY_STATE_MAP = "mapIntState";
+    public static final String KEY_STATE_MAP = "mapIntState";
     private static final String KEY_MAP_SLOT = "mapSlot";
     private static final String KEY_MAP_STATE = "mapState";
     private final BiMap<Short, IBlockState> shortStateMap;
 
+    public BlockState2ShortMap(BiMap<Short, IBlockState> shortStateMap) {
+        this.shortStateMap = shortStateMap;
+    }
+
     public BlockState2ShortMap() {
-        shortStateMap = HashBiMap.create();
+        this(HashBiMap.create());
     }
 
     @Nonnull

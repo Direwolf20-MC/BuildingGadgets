@@ -1,7 +1,9 @@
 package com.direwolf20.buildinggadgets.common.blocks.templatemanager;
 
-import com.direwolf20.buildinggadgets.api.ITemplateOld;
+import com.direwolf20.buildinggadgets.api.CapabilityBGTemplate;
+import com.direwolf20.buildinggadgets.api.IMutableTemplate;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
+import com.direwolf20.buildinggadgets.common.capability.CapabilityProviderTemplate;
 import com.direwolf20.buildinggadgets.common.network.PacketBlockMap;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import net.minecraft.block.Block;
@@ -96,23 +98,19 @@ public class TemplateManager extends Block {
     @Override
     public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
         // Only execute on the server
-        if (world.isRemote) {
-            return true;
-        }
+        if (world.isRemote) return true;
         TileEntity te = world.getTileEntity(pos);
-        if (!(te instanceof TemplateManagerTileEntity)) {
-            return false;
-        }
+        if (!(te instanceof TemplateManagerTileEntity)) return false;
         TemplateManagerContainer container = ((TemplateManagerTileEntity) te).getContainer(player);
         for (int i = 0; i <= 1; i++) {
             ItemStack itemStack = container.getSlot(i).getStack();
-            if (!(itemStack.getItem() instanceof ITemplateOld)) continue;
+            if (!(itemStack.hasCapability(CapabilityBGTemplate.CAPABILITY_MUTABLE_TEMPLATE, null))) continue;
 
-            ITemplateOld template = (ITemplateOld) itemStack.getItem();
-            UUID uuid = template.getUUID(itemStack);
+            IMutableTemplate template = CapabilityProviderTemplate.getTemplate(itemStack, null);
+            UUID uuid = template.getID();
             if (uuid == null) continue;
 
-            NBTTagCompound tagCompound = template.getWorldSave(world).getCompoundFromUUID(uuid);
+            NBTTagCompound tagCompound = template.getDataStorage().loadData(uuid, world);
             if (tagCompound != null) {
                 PacketHandler.INSTANCE.sendTo(new PacketBlockMap(tagCompound), (EntityPlayerMP) player);
             }

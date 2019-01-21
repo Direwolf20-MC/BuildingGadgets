@@ -1,8 +1,7 @@
-package com.direwolf20.buildinggadgets.common.tools;
+package com.direwolf20.buildinggadgets.api;
 
-import com.direwolf20.buildinggadgets.api.BlockMap;
 import com.direwolf20.buildinggadgets.common.items.ModItems;
-import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
+import com.direwolf20.buildinggadgets.common.tools.ToolDireBuffer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockRendererDispatcher;
@@ -22,14 +21,11 @@ import org.lwjgl.opengl.GL11;
 
 import javax.annotation.Nullable;
 import java.nio.ByteBuffer;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @SideOnly(Side.CLIENT)
 public class PasteToolBufferBuilder {
-
+    //TODO decouple BufferBuilder and localMapStorage Functionality
     private static Map<UUID, NBTTagCompound> tagMap = new HashMap<>();
     private static Map<UUID, ToolDireBuffer> bufferMap = new HashMap<>();
 
@@ -69,7 +65,8 @@ public class PasteToolBufferBuilder {
 
     private static void addMapToBuffer(UUID uuid,NBTTagCompound compound) {
 //        long time = System.nanoTime();
-        List<BlockMap> blockMapList = GadgetCopyPaste.getBlockMapList(compound);
+        //TODO make usable again
+        List<BlockMap> blockMapList = Collections.emptyList(); //GadgetCopyPaste.getBlockMapList(compound);
         BlockRendererDispatcher dispatcher = Minecraft.getMinecraft().getBlockRendererDispatcher();
         ToolDireBuffer bufferBuilder = new ToolDireBuffer(2097152);
         bufferBuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
