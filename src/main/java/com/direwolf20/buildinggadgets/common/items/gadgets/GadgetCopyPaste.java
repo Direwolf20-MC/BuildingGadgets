@@ -540,7 +540,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
         }
         ItemStack constructionPaste = new ItemStack(ModItems.constructionPaste);
         boolean useConstructionPaste = false;
-        if (InventoryManipulation.countItem(itemStack, player) < neededItems) {
+        if (InventoryManipulation.countItem(itemStack, player, world) < neededItems) {
             if (InventoryManipulation.countPaste(player) < neededItems) {
                 return;
             }
@@ -557,7 +557,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
         if (useConstructionPaste) {
             useItemSuccess = InventoryManipulation.usePaste(player, 1);
         } else {
-            useItemSuccess = InventoryManipulation.useItem(itemStack, player, neededItems);
+            useItemSuccess = InventoryManipulation.useItem(itemStack, player, neededItems, world);
         }
         if (useItemSuccess) {
             world.spawnEntity(new BlockBuildEntity(world, pos, player, state, 1, state, useConstructionPaste));

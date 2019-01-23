@@ -2,8 +2,8 @@ package com.direwolf20.buildinggadgets.common.tools;
 
 import com.direwolf20.buildinggadgets.common.Config;
 import com.direwolf20.buildinggadgets.common.blocks.ModBlocks;
+import com.direwolf20.buildinggadgets.common.items.FakeBuilderWorld;
 import com.direwolf20.buildinggadgets.common.items.ModItems;
-import com.direwolf20.buildinggadgets.common.items.*;
 import com.direwolf20.buildinggadgets.common.items.capability.CapabilityProviderEnergy;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetBuilding;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
@@ -83,7 +83,7 @@ public class ToolRenders {
                     itemStack = renderBlockState.getBlock().getPickBlock(renderBlockState, null, world, new BlockPos(0, 0, 0), player);
                 }
 
-                int hasBlocks = InventoryManipulation.countItem(itemStack, player);
+                int hasBlocks = InventoryManipulation.countItem(itemStack, player, world);
                 hasBlocks = hasBlocks + InventoryManipulation.countPaste(player);
                 int hasEnergy = 0;
                 if (Config.poweredByFE) {
@@ -212,7 +212,7 @@ public class ToolRenders {
                 if (itemStack.getItem().equals(Items.AIR)) {
                     itemStack = renderBlockState.getBlock().getPickBlock(renderBlockState, null, world, new BlockPos(0, 0, 0), player);
                 }
-                int hasBlocks = InventoryManipulation.countItem(itemStack, player);
+                int hasBlocks = InventoryManipulation.countItem(itemStack, player, world);
                 hasBlocks = hasBlocks + InventoryManipulation.countPaste(player);
                 int hasEnergy = 0;
                 if (Config.poweredByFE) {

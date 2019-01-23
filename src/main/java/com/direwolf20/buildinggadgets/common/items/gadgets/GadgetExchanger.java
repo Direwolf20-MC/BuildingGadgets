@@ -2,9 +2,9 @@ package com.direwolf20.buildinggadgets.common.items.gadgets;
 
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.Config;
-import com.direwolf20.buildinggadgets.common.items.ModItems;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.common.items.FakeBuilderWorld;
+import com.direwolf20.buildinggadgets.common.items.ModItems;
 import com.direwolf20.buildinggadgets.common.items.capability.CapabilityProviderEnergy;
 import com.direwolf20.buildinggadgets.common.tools.ExchangingModes;
 import com.direwolf20.buildinggadgets.common.tools.InventoryManipulation;
@@ -259,7 +259,7 @@ public class GadgetExchanger extends GadgetGeneric {
         if (neededItems == 0) {
             neededItems = 1;
         }
-        if (InventoryManipulation.countItem(itemStack, player) < neededItems) {
+        if (InventoryManipulation.countItem(itemStack, player, world) < neededItems) {
             ItemStack constructionPaste = new ItemStack(ModItems.constructionPaste);
             if (InventoryManipulation.countPaste(player) < neededItems) {
                 return false;
@@ -292,7 +292,7 @@ public class GadgetExchanger extends GadgetGeneric {
         if (useConstructionPaste) {
             useItemSuccess = InventoryManipulation.usePaste(player, 1);
         } else {
-            useItemSuccess = InventoryManipulation.useItem(itemStack, player, neededItems);
+            useItemSuccess = InventoryManipulation.useItem(itemStack, player, neededItems, world);
         }
         if (useItemSuccess) {
             world.spawnEntity(new BlockBuildEntity(world, pos, player, setBlock, 3, getToolActualBlock(tool), useConstructionPaste));

@@ -5,9 +5,9 @@ package com.direwolf20.buildinggadgets.client.events;
  * Thanks Vazkii!!
  */
 
+import com.direwolf20.buildinggadgets.common.items.ITemplate;
 import com.direwolf20.buildinggadgets.common.items.ModItems;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
-import com.direwolf20.buildinggadgets.common.items.ITemplate;
 import com.direwolf20.buildinggadgets.common.tools.BlockMap;
 import com.direwolf20.buildinggadgets.common.tools.InventoryManipulation;
 import com.direwolf20.buildinggadgets.common.tools.PasteToolBufferBuilder;
@@ -63,7 +63,7 @@ public class EventTooltip {
             int totalMissing = 0;
             //Look through all the ItemStacks and draw each one in the specified X/Y position
             for (Map.Entry<ItemStack, Integer> entry : list) {
-                int hasAmt = InventoryManipulation.countItem(entry.getKey(), Minecraft.getMinecraft().player);
+                int hasAmt = InventoryManipulation.countItem(entry.getKey(), Minecraft.getMinecraft().player, Minecraft.getMinecraft().player.world);
                 if (hasAmt < entry.getValue())
                     totalMissing = totalMissing + Math.abs(entry.getValue() - hasAmt);
             }
@@ -89,6 +89,7 @@ public class EventTooltip {
     public static void onDrawTooltip(RenderTooltipEvent.PostText event) {
         //This method will draw items on the tooltip
         ItemStack stack = event.getStack();
+
         if ((stack.getItem() instanceof ITemplate) && GuiScreen.isShiftKeyDown()) {
             int totalMissing = 0;
             Map<UniqueItem, Integer> itemCountMap = ((ITemplate) stack.getItem()).getItemCountMap(stack);
@@ -130,7 +131,7 @@ public class EventTooltip {
             int j = 0;
             //Look through all the ItemStacks and draw each one in the specified X/Y position
             for (Map.Entry<ItemStack, Integer> entry : list) {
-                int hasAmt = InventoryManipulation.countItem(entry.getKey(), Minecraft.getMinecraft().player);
+                int hasAmt = InventoryManipulation.countItem(entry.getKey(), Minecraft.getMinecraft().player, Minecraft.getMinecraft().player.world);
                 int x = bx + (j % STACKS_PER_LINE) * 18;
                 int y = by + (j / STACKS_PER_LINE) * 20;
                 totalMissing = totalMissing + renderRequiredBlocks(entry.getKey(), x, y, hasAmt, entry.getValue());

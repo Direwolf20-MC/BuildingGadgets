@@ -4,8 +4,8 @@ import com.direwolf20.buildinggadgets.common.items.ConstructionPaste;
 import com.direwolf20.buildinggadgets.common.items.GenericPasteContainer;
 import com.direwolf20.buildinggadgets.common.items.ModItems;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
+import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
 import com.google.common.collect.ImmutableSet;
-
 import net.minecraft.block.*;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyEnum;
@@ -15,6 +15,7 @@ import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
@@ -63,10 +64,26 @@ public class InventoryManipulation {
         return success;
     }
 
-    public static boolean useItem(ItemStack itemStack, EntityPlayer player, int count) {
+    public static boolean useItem(ItemStack itemStack, EntityPlayer player, int count, World world) {
         if (player.capabilities.isCreativeMode) {
             return true;
         }
+
+        ItemStack tool = GadgetGeneric.getGadget(player);
+        BlockPos tePos = GadgetUtils.getBoundTE(tool, world);
+        if (tePos != null) {
+            TileEntity te = world.getTileEntity(tePos);
+            IItemHandler cap = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
+            for (int i = 0; i < cap.getSlots(); i++) {
+                ItemStack containerItem = cap.getStackInSlot(i);
+                if (containerItem.getItem() == itemStack.getItem() && containerItem.getMetadata() == itemStack.getMetadata() && containerItem.getCount() >= count) {
+                    cap.extractItem(i, count, false);
+                    return true;
+                }
+            }
+        }
+
+
         InventoryPlayer inv = player.inventory;
 
         List<Integer> slots = findItem(itemStack.getItem(), itemStack.getMetadata(), inv);
@@ -95,15 +112,23 @@ public class InventoryManipulation {
         return true;
     }
 
-    public static int countItem(ItemStack itemStack, EntityPlayer player) {
+    public static int countItem(ItemStack itemStack, EntityPlayer player, World world) {
         if (player.capabilities.isCreativeMode) {
             return 10000;
         }
         int count = 0;
+        ItemStack tool = GadgetGeneric.getGadget(player);
+        BlockPos tePos = GadgetUtils.getBoundTE(tool, world);
+        if (tePos != null) {
+            TileEntity te = world.getTileEntity(tePos);
+            IItemHandler cap = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
+            count += countInContainer(cap, itemStack.getItem(), itemStack.getMetadata());
+        }
+
         InventoryPlayer inv = player.inventory;
         List<Integer> slots = findItem(itemStack.getItem(), itemStack.getMetadata(), inv);
         List<IItemHandler> invContainers = findInvContainers(inv);
-        if (slots.size() == 0 && invContainers.size() == 0) {
+        if (slots.size() == 0 && invContainers.size() == 0 && count == 0) {
             return 0;
         }
         if (invContainers.size() > 0) {
