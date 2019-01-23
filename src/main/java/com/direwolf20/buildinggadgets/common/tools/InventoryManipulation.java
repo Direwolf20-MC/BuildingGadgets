@@ -4,8 +4,11 @@ import com.direwolf20.buildinggadgets.common.items.ConstructionPaste;
 import com.direwolf20.buildinggadgets.common.items.GenericPasteContainer;
 import com.direwolf20.buildinggadgets.common.items.ModItems;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
+import com.google.common.collect.ImmutableSet;
+
 import net.minecraft.block.*;
 import net.minecraft.block.properties.IProperty;
+import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -20,18 +23,14 @@ import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class InventoryManipulation {
-    private static final Set<IProperty> safeProperties = Stream.of(BlockSlab.HALF, BlockStairs.HALF, BlockLog.LOG_AXIS,
-            BlockDirectional.FACING, BlockStairs.FACING, BlockTrapDoor.HALF, BlockTorch.FACING, BlockStairs.SHAPE, BlockLever.FACING, BlockLever.POWERED, BlockRedstoneRepeater.DELAY,
-            BlockStoneSlab.VARIANT, BlockWoodSlab.VARIANT, BlockDoubleWoodSlab.VARIANT, BlockDoubleStoneSlab.VARIANT).collect(Collectors.toSet());
+    private static IProperty AXIS = PropertyEnum.create("axis", EnumFacing.Axis.class);
+    private static final Set<IProperty> SAFE_PROPERTIES = ImmutableSet.of(BlockSlab.HALF, BlockStairs.HALF, BlockLog.LOG_AXIS, AXIS, BlockDirectional.FACING,
+            BlockStairs.FACING, BlockTrapDoor.HALF, BlockTorch.FACING, BlockStairs.SHAPE, BlockLever.FACING, BlockLever.POWERED, BlockRedstoneRepeater.DELAY);
 
-    private static final Set<IProperty> safePropertiesCopyPaste = Stream.of(BlockSlab.HALF, BlockStairs.HALF, BlockLog.LOG_AXIS,
-            BlockDirectional.FACING, BlockStairs.FACING, BlockTrapDoor.HALF, BlockTrapDoor.OPEN, BlockTorch.FACING, BlockStairs.SHAPE, BlockRail.SHAPE, BlockRailPowered.SHAPE,
-            BlockLever.FACING, BlockLever.POWERED, BlockRedstoneRepeater.DELAY, BlockDoubleWoodSlab.VARIANT, BlockDoubleStoneSlab.VARIANT,
-            BlockStoneSlab.VARIANT, BlockWoodSlab.VARIANT).collect(Collectors.toSet());
+    private static final Set<IProperty> SAFE_PROPERTIES_COPY_PASTE = ImmutableSet.<IProperty>builder().addAll(SAFE_PROPERTIES)
+            .addAll(ImmutableSet.of(BlockDoubleWoodSlab.VARIANT, BlockRail.SHAPE, BlockRailPowered.SHAPE)).build();
 
     public static boolean giveItem(ItemStack itemStack, EntityPlayer player) {
         if (player.capabilities.isCreativeMode) {
@@ -281,11 +280,11 @@ public class InventoryManipulation {
         }
         for (IProperty prop : placeState.getPropertyKeys()) {
             if (tool.getItem() instanceof GadgetCopyPaste) {
-                if (safePropertiesCopyPaste.contains(prop)) {
+                if (SAFE_PROPERTIES_COPY_PASTE.contains(prop)) {
                     placeState = placeState.withProperty(prop, originalState.getValue(prop));
                 }
             } else {
-                if (safeProperties.contains(prop)) {
+                if (SAFE_PROPERTIES.contains(prop)) {
                     placeState = placeState.withProperty(prop, originalState.getValue(prop));
                 }
             }
