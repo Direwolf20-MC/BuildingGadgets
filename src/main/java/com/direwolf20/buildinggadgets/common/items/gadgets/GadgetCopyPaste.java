@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.common.items.gadgets;
 
+import com.direwolf20.buildinggadgets.client.events.EventTooltip;
 import com.direwolf20.buildinggadgets.client.gui.GuiProxy;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlock;
@@ -12,8 +13,6 @@ import com.direwolf20.buildinggadgets.common.items.capability.CapabilityProvider
 import com.direwolf20.buildinggadgets.common.network.PacketBlockMap;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.tools.*;
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
@@ -40,7 +39,6 @@ import net.minecraftforge.common.util.BlockSnapshot;
 import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.world.BlockEvent;
-import net.minecraftforge.fml.common.network.ByteBufUtils;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -236,6 +234,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
             IEnergyStorage energy = CapabilityProviderEnergy.getCap(stack);
             list.add(TextFormatting.WHITE + I18n.format("tooltip.gadget.energy") + ": " + withSuffix(energy.getEnergyStored()) + "/" + withSuffix(energy.getMaxEnergyStored()));
         }
+        EventTooltip.addTemplatePadding(stack, list);
     }
 
     public void setMode(EntityPlayer player, ItemStack heldItem, int modeInt) {
@@ -243,46 +242,6 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
         ToolMode mode = ToolMode.values()[modeInt];
         setToolMode(heldItem, mode);
         player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.toolmode").getUnformattedComponentText() + ": " + mode.name()), true);
-    }
-
-    @Override
-    public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
-        ItemStack stack = player.getHeldItem(hand);
-        player.setActiveHand(hand);
-        if (!world.isRemote) {
-            if (getToolMode(stack) == ToolMode.Copy) {
-                if (player.isSneaking()) {
-                    if (getStartPos(stack) != null) {
-                        copyBlocks(stack, player, world, getStartPos(stack), pos);
-                    } else {
-                        setEndPos(stack, pos);
-                    }
-                } else {
-                    //setStartPos(stack, pos);
-                    if (getEndPos(stack) != null) {
-                        copyBlocks(stack, player, world, pos, getEndPos(stack));
-                    } else {
-                        setStartPos(stack, pos);
-                    }
-                }
-
-            } else if (getToolMode(stack) == ToolMode.Paste) {
-                if (!player.isSneaking()) {
-                    buildBlockMap(world, pos, stack, player);
-                }
-            }
-            NBTTagCompound tagCompound = stack.getTagCompound();
-            ByteBuf buf = Unpooled.buffer(16);
-            ByteBufUtils.writeTag(buf, tagCompound);
-            //System.out.println(buf.readableBytes());
-        } else {
-            if (player.isSneaking() && getToolMode(stack) == ToolMode.Paste) {
-                player.openGui(BuildingGadgets.instance, GuiProxy.PasteID, world, hand.ordinal(), 0, 0);
-                return EnumActionResult.SUCCESS;
-            }
-        }
-
-        return EnumActionResult.SUCCESS;
     }
 
     @Override
@@ -540,7 +499,8 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
 
     private void placeBlock(World world, BlockPos pos, EntityPlayer player, IBlockState state, Map<IBlockState, UniqueItem> IntStackMap) {
         IBlockState testState = world.getBlockState(pos);
-        if (SyncedConfig.canOverwriteBlocks && !testState.getBlock().isReplaceable(world, pos) || world.getBlockState(pos).getMaterial() != Material.AIR)
+        if ((SyncedConfig.canOverwriteBlocks && !testState.getBlock().isReplaceable(world, pos)) ||
+            (!SyncedConfig.canOverwriteBlocks && world.getBlockState(pos).getMaterial() != Material.AIR))
             return;
 
         if (pos.getY() < 0 || state.equals(Blocks.AIR.getDefaultState()) || !player.isAllowEdit())
@@ -576,7 +536,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
         }
         ItemStack constructionPaste = new ItemStack(ModItems.constructionPaste);
         boolean useConstructionPaste = false;
-        if (InventoryManipulation.countItem(itemStack, player) < neededItems) {
+        if (InventoryManipulation.countItem(itemStack, player, world) < neededItems) {
             if (InventoryManipulation.countPaste(player) < neededItems) {
                 return;
             }
@@ -593,7 +553,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
         if (useConstructionPaste) {
             useItemSuccess = InventoryManipulation.usePaste(player, 1);
         } else {
-            useItemSuccess = InventoryManipulation.useItem(itemStack, player, neededItems);
+            useItemSuccess = InventoryManipulation.useItem(itemStack, player, neededItems, world);
         }
         if (useItemSuccess) {
             world.spawnEntity(new BlockBuildEntity(world, pos, player, state, 1, state, useConstructionPaste));

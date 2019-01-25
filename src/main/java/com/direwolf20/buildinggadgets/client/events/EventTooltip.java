@@ -23,7 +23,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.client.event.RenderTooltipEvent;
-import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
@@ -44,19 +43,14 @@ public class EventTooltip {
         //else addToTooltip(tooltip, "arl.misc.shiftForInfo");
     }
 
-    @SubscribeEvent
-    public static void onMakeTooltip(ItemTooltipEvent event) {
+    public static void addTemplatePadding(ItemStack stack, List<String> tooltip) {
         //This method extends the tooltip box size to fit the item's we will render in onDrawTooltip
         Minecraft mc = Minecraft.getMinecraft();
-        ItemStack stack = event.getItemStack();
         if (stack.getItem() instanceof ITemplate) {
             ITemplate template = (ITemplate) stack.getItem();
             String UUID = template.getUUID(stack);
-            if (UUID == null) {
-                return;
-            }
+            if (UUID == null) return;
 
-            List<String> tooltip = event.getToolTip();
             Map<UniqueItem, Integer> itemCountMap = template.getItemCountMap(stack);
 
             Map<ItemStack, Integer> itemStackCount = new HashMap<ItemStack, Integer>();
@@ -69,10 +63,9 @@ public class EventTooltip {
             int totalMissing = 0;
             //Look through all the ItemStacks and draw each one in the specified X/Y position
             for (Map.Entry<ItemStack, Integer> entry : list) {
-                int hasAmt = InventoryManipulation.countItem(entry.getKey(), Minecraft.getMinecraft().player);
-                if (hasAmt < entry.getValue()) {
+                int hasAmt = InventoryManipulation.countItem(entry.getKey(), Minecraft.getMinecraft().player, Minecraft.getMinecraft().player.world);
+                if (hasAmt < entry.getValue())
                     totalMissing = totalMissing + Math.abs(entry.getValue() - hasAmt);
-                }
             }
 
             int count = (totalMissing > 0) ? itemCountMap.size() + 1 : itemStackCount.size();
@@ -96,6 +89,7 @@ public class EventTooltip {
     public static void onDrawTooltip(RenderTooltipEvent.PostText event) {
         //This method will draw items on the tooltip
         ItemStack stack = event.getStack();
+
         if ((stack.getItem() instanceof ITemplate) && GuiScreen.isShiftKeyDown()) {
             int totalMissing = 0;
             Map<UniqueItem, Integer> itemCountMap = ((ITemplate) stack.getItem()).getItemCountMap(stack);
@@ -137,7 +131,7 @@ public class EventTooltip {
             int j = 0;
             //Look through all the ItemStacks and draw each one in the specified X/Y position
             for (Map.Entry<ItemStack, Integer> entry : list) {
-                int hasAmt = InventoryManipulation.countItem(entry.getKey(), Minecraft.getMinecraft().player);
+                int hasAmt = InventoryManipulation.countItem(entry.getKey(), Minecraft.getMinecraft().player, Minecraft.getMinecraft().player.world);
                 int x = bx + (j % STACKS_PER_LINE) * 18;
                 int y = by + (j / STACKS_PER_LINE) * 20;
                 totalMissing = totalMissing + renderRequiredBlocks(entry.getKey(), x, y, hasAmt, entry.getValue());

@@ -216,29 +216,6 @@ public class GadgetDestruction extends GadgetGeneric {
     }
 
     @Override
-    public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
-        ItemStack stack = player.getHeldItem(hand);
-        player.setActiveHand(hand);
-        if (!world.isRemote) {
-            if (!player.isSneaking()) {
-                clearArea(world, pos, side, player, stack);
-                if (getAnchor(stack) != null) {
-                    setAnchor(stack, null);
-                    setAnchorSide(stack, null);
-                    player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.anchorremove").getUnformattedComponentText()), true);
-                }
-            }
-        } else {
-            if (player.isSneaking()) {
-                player.openGui(BuildingGadgets.instance, GuiProxy.DestructionID, world, hand.ordinal(), 0, 0);
-                return EnumActionResult.SUCCESS;
-            }
-        }
-
-        return EnumActionResult.SUCCESS;
-    }
-
-    @Override
     public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
         ItemStack stack = player.getHeldItem(hand);
         player.setActiveHand(hand);

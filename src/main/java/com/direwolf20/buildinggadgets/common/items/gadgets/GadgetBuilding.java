@@ -115,23 +115,6 @@ public class GadgetBuilding extends GadgetGeneric {
     }
 
     @Override
-    public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
-        //On item use, if sneaking, select the block clicked on, else build -- This is called when a block in clicked on
-        if (world.isRemote)
-            return EnumActionResult.FAIL;
-
-        ItemStack stack = player.getHeldItem(hand);
-        player.setActiveHand(hand);
-
-        if (player.isSneaking())
-            selectBlock(stack, player);
-        else
-            this.build(player, stack);
-
-        return EnumActionResult.SUCCESS;
-    }
-
-    @Override
     public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
         //On item use, if sneaking, select the block clicked on, else build -- This is called when you right click a tool NOT on a block.
         ItemStack itemstack = player.getHeldItem(hand);
@@ -310,7 +293,7 @@ public class GadgetBuilding extends GadgetGeneric {
             return false;
         }
         ItemStack constructionPaste = new ItemStack(ModItems.constructionPaste);
-        if (InventoryManipulation.countItem(itemStack, player) < neededItems) {
+        if (InventoryManipulation.countItem(itemStack, player, world) < neededItems) {
             //if (InventoryManipulation.countItem(constructionStack, player) == 0) {
             if (InventoryManipulation.countPaste(player) < neededItems) {
                 return false;
@@ -329,7 +312,7 @@ public class GadgetBuilding extends GadgetGeneric {
         if (useConstructionPaste) {
             useItemSuccess = InventoryManipulation.usePaste(player, 1);
         } else {
-            useItemSuccess = InventoryManipulation.useItem(itemStack, player, neededItems);
+            useItemSuccess = InventoryManipulation.useItem(itemStack, player, neededItems, world);
         }
         if (useItemSuccess) {
             world.spawnEntity(new BlockBuildEntity(world, pos, player, setBlock, 1, getToolActualBlock(heldItem), useConstructionPaste));
