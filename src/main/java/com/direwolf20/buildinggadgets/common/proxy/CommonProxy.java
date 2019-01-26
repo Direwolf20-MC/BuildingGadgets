@@ -19,23 +19,23 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
 
 @Mod.EventBusSubscriber(modid = BuildingGadgets.MODID)
 public class CommonProxy {
     private boolean applyCompatConfig = false;
-    public void preInit(FMLPreInitializationEvent e) {
-        ModEntities.init();
-        PacketHandler.registerMessages();
-    }
+//    REIMPLEMENT
+//    public void preInit(FMLPreInitializationEvent e) {
+//        ModEntities.init();
+//        PacketHandler.registerMessages();
+//    }
 
     public void init() {
-        NetworkRegistry.INSTANCE.registerGuiHandler(BuildingGadgets.instance, new GuiProxy());
+//        REIMPLEMENT
+//        NetworkRegistry.INSTANCE.registerGuiHandler(BuildingGadgets.instance, new GuiProxy());
     }
 
     public void postInit() { }
@@ -44,11 +44,13 @@ public class CommonProxy {
     public static void registerBlocks(RegistryEvent.Register<Block> event) {
         event.getRegistry().register(new EffectBlock());
         event.getRegistry().register(new TemplateManager());
-        GameRegistry.registerTileEntity(TemplateManagerTileEntity.class, new ResourceLocation(BuildingGadgets.MODID, "templateManager"));
+//        REIMPLEMENT
+//        GameRegistry.registerTileEntity(TemplateManagerTileEntity.class, new ResourceLocation(BuildingGadgets.MODID, "templateManager"));
         if (SyncedConfig.enablePaste) {
             event.getRegistry().register(new ConstructionBlock());
             event.getRegistry().register(new ConstructionBlockPowder());
-            GameRegistry.registerTileEntity(ConstructionBlockTileEntity.class, new ResourceLocation(BuildingGadgets.MODID,  "_constructionBlock"));
+//        REIMPLEMENT
+//            GameRegistry.registerTileEntity(ConstructionBlockTileEntity.class, new ResourceLocation(BuildingGadgets.MODID,  "_constructionBlock"));
         }
     }
 
@@ -57,14 +59,16 @@ public class CommonProxy {
         event.getRegistry().register(new GadgetBuilding());
         event.getRegistry().register(new GadgetExchanger());
         event.getRegistry().register(new GadgetCopyPaste());
-        event.getRegistry().register(new ItemBlock(ModBlocks.templateManager).setRegistryName(ModBlocks.templateManager.getRegistryName()));
+//        REIMPLEMENT
+//        event.getRegistry().register(new ItemBlock(ModBlocks.templateManager).setRegistryName(ModBlocks.templateManager.getRegistryName()));
         event.getRegistry().register(new Template());
         if (SyncedConfig.enableDestructionGadget) {
             event.getRegistry().register(new GadgetDestruction());
         }
         if (SyncedConfig.enablePaste) {
-            event.getRegistry().register(new ItemBlock(ModBlocks.constructionBlock).setRegistryName(ModBlocks.constructionBlock.getRegistryName()));
-            event.getRegistry().register(new ItemBlock(ModBlocks.constructionBlockPowder).setRegistryName(ModBlocks.constructionBlockPowder.getRegistryName()));
+//        REIMPLEMENT
+//            event.getRegistry().register(new ItemBlock(ModBlocks.constructionBlock).setRegistryName(ModBlocks.constructionBlock.getRegistryName()));
+//            event.getRegistry().register(new ItemBlock(ModBlocks.constructionBlockPowder).setRegistryName(ModBlocks.constructionBlockPowder.getRegistryName()));
             event.getRegistry().register(new ConstructionPaste());
             event.getRegistry().register(new ConstructionPasteContainer());
             event.getRegistry().register(new ConstructionPasteContainerT2());

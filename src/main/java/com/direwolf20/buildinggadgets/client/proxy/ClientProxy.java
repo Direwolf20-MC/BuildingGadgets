@@ -16,27 +16,27 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.relauncher.Side;
 
 import static com.direwolf20.buildinggadgets.common.items.ModItems.gadgetBuilding;
 
-@Mod.EventBusSubscriber(value = Side.CLIENT, modid = BuildingGadgets.MODID)
+@Mod.EventBusSubscriber(value = Dist.CLIENT, modid = BuildingGadgets.MODID)
 public class ClientProxy extends CommonProxy {
-    @Override
-    public void preInit(FMLPreInitializationEvent e) {
-        ModEntities.initModels();
-        ModelLoaderRegistry.registerLoader(new BakedModelLoader());
-        super.preInit(e);
-    }
+// REIMPLEMENT
+//    @Override
+//    public void preInit(FMLPreInitializationEvent e) {
+//        ModEntities.initModels();
+//        ModelLoaderRegistry.registerLoader(new BakedModelLoader());
+//        super.preInit(e);
+//    }
 
     @Override
     public void init() {
@@ -63,9 +63,11 @@ public class ClientProxy extends CommonProxy {
             ModItems.constructionPasteContainert3.initModel();
             ModBlocks.constructionBlock.initModel();
             ModBlocks.constructionBlockPowder.initModel();
-            ModelLoader.setCustomMeshDefinition(ModItems.constructionPasteContainer, new PasteContainerMeshDefinition());
-            ModelLoader.setCustomMeshDefinition(ModItems.constructionPasteContainert2, new PasteContainerMeshDefinition());
-            ModelLoader.setCustomMeshDefinition(ModItems.constructionPasteContainert3, new PasteContainerMeshDefinition());
+
+        // REIMPLEMENT
+//            ModelLoader.setCustomMeshDefinition(ModItems.constructionPasteContainer, new PasteContainerMeshDefinition());
+//            ModelLoader.setCustomMeshDefinition(ModItems.constructionPasteContainert2, new PasteContainerMeshDefinition());
+//            ModelLoader.setCustomMeshDefinition(ModItems.constructionPasteContainert3, new PasteContainerMeshDefinition());
         }
     }
 
@@ -101,6 +103,6 @@ public class ClientProxy extends CommonProxy {
     }
 
     private static void registerSprite(TextureStitchEvent.Pre event, String loc) {
-        event.getMap().registerSprite(new ResourceLocation(loc));
+        event.getMap().registerSprite(Minecraft.getInstance().getResourceManager(), new ResourceLocation(loc));
     }
 }

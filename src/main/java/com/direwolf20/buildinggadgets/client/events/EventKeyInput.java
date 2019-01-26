@@ -10,13 +10,13 @@ import com.direwolf20.buildinggadgets.common.network.PacketUndoKey;
 import net.minecraft.client.Minecraft;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumHand;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.settings.KeyModifier;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent;
-import net.minecraftforge.fml.relauncher.Side;
 
-@EventBusSubscriber(Side.CLIENT)
+@EventBusSubscriber(Dist.CLIENT)
 public class EventKeyInput {
 
     @SubscribeEvent
@@ -42,11 +42,14 @@ public class EventKeyInput {
                     mc.displayGuiScreen(new ModeRadialMenu(stack));
             }
         } else if (KeyBindings.rangeChange.isPressed()) {
-            PacketHandler.INSTANCE.sendToServer(new PacketChangeRange());
+            // REIMPLEMENT
+//            PacketHandler.INSTANCE.sendToServer(new PacketChangeRange());
         } else if (KeyBindings.undoKey.isPressed()) {
-            PacketHandler.INSTANCE.sendToServer(new PacketUndoKey());
+            // REIMPLEMENT
+//            PacketHandler.INSTANCE.sendToServer(new PacketUndoKey());
         } else if (KeyBindings.anchorKey.isPressed()) {
-            PacketHandler.INSTANCE.sendToServer(new PacketAnchorKey());
+            // REIMPLEMENT
+//            PacketHandler.INSTANCE.sendToServer(new PacketAnchorKey());
         }
     }
 }

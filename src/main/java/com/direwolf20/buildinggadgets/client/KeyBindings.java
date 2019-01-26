@@ -3,14 +3,12 @@ package com.direwolf20.buildinggadgets.client;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
+import net.minecraft.client.util.InputMappings;
 import net.minecraftforge.client.settings.IKeyConflictContext;
 import net.minecraftforge.client.settings.KeyConflictContext;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-import org.lwjgl.input.Keyboard;
+import org.lwjgl.glfw.GLFW;
 
-@SideOnly(Side.CLIENT)
 public class KeyBindings {
 
     private static final KeyConflictContextGadget CONFLICT_CONTEXT_GADGET = new KeyConflictContextGadget();
@@ -20,10 +18,11 @@ public class KeyBindings {
     public static KeyBinding anchorKey;
 
     public static void init() {
-        modeSwitch = new KeyBinding("key.modeSwitch", CONFLICT_CONTEXT_GADGET, Keyboard.KEY_G, "key.categories.buildingGadgets");
-        rangeChange = new KeyBinding("key.rangeChange", CONFLICT_CONTEXT_GADGET, Keyboard.KEY_R, "key.categories.buildingGadgets");
-        undoKey = new KeyBinding("key.undoKey", CONFLICT_CONTEXT_GADGET, Keyboard.KEY_U, "key.categories.buildingGadgets");
-        anchorKey = new KeyBinding("key.anchorKey", CONFLICT_CONTEXT_GADGET, Keyboard.KEY_H, "key.categories.buildingGadgets");
+        modeSwitch = new KeyBinding("key.modeSwitch", CONFLICT_CONTEXT_GADGET, InputMappings.Type.KEYSYM.getOrMakeInput(GLFW.GLFW_KEY_G), "key.categories.buildingGadgets");
+        rangeChange = new KeyBinding("key.rangeChange", CONFLICT_CONTEXT_GADGET, InputMappings.Type.KEYSYM.getOrMakeInput(GLFW.GLFW_KEY_R), "key.categories.buildingGadgets");
+        undoKey = new KeyBinding("key.undoKey", CONFLICT_CONTEXT_GADGET, InputMappings.Type.KEYSYM.getOrMakeInput(GLFW.GLFW_KEY_U), "key.categories.buildingGadgets");
+        anchorKey = new KeyBinding("key.anchorKey", CONFLICT_CONTEXT_GADGET, InputMappings.Type.KEYSYM.getOrMakeInput(GLFW.GLFW_KEY_H), "key.categories.buildingGadgets");
+
         ClientRegistry.registerKeyBinding(modeSwitch);
         ClientRegistry.registerKeyBinding(rangeChange);
         ClientRegistry.registerKeyBinding(undoKey);
