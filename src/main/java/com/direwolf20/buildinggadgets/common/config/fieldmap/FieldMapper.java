@@ -4,11 +4,11 @@ import com.direwolf20.buildinggadgets.common.config.PatternList;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.block.Block;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.common.registry.ForgeRegistries;
+import net.minecraftforge.registries.ForgeRegistries;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
-import java.util.stream.Stream;
 
 /**
  * Class representing a bijective Function and it's reverse Function used to Mapping Field Types to other Types which can be
@@ -23,11 +23,11 @@ public class FieldMapper<FieldVal,SyncedVal> {
     public static final String PATTERN_LIST_MAPPER_ID = "Pattern List Mapper";
 
     public static final FieldMapper<Object,Object> GENERIC_IDENTITY_MAPPER = id();
-    public static final FieldMapper<ImmutableList<Block>,String[]> BLOCK_LIST_MAPPER = of(
-            (list) -> list.stream().map((b) -> Objects.requireNonNull(b.getRegistryName()).toString()).toArray(String[]::new),
-            (strings) -> Stream.of(strings).map(ResourceLocation::new).map(ForgeRegistries.BLOCKS::getValue).collect(ImmutableList.toImmutableList()));
-    public static final FieldMapper<PatternList,String[]> PATTERN_LIST_MAPPER = of(
-            PatternList::toArray,
+    public static final FieldMapper<ImmutableList<Block>, List<? extends String>> BLOCK_LIST_MAPPER = of(
+            (list) -> list.stream().map((b) -> Objects.requireNonNull(b.getRegistryName()).toString()).collect(ImmutableList.toImmutableList()),
+            (strings) -> strings.stream().map(ResourceLocation::new).map(ForgeRegistries.BLOCKS::getValue).collect(ImmutableList.toImmutableList()));
+    public static final FieldMapper<PatternList, List<? extends String>> PATTERN_LIST_MAPPER = of(
+            PatternList::toList,
             PatternList::ofResourcePattern);
 
     private final Function<FieldVal,SyncedVal> fieldToSync;

@@ -3,17 +3,11 @@ package com.direwolf20.buildinggadgets.common.config;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.config.fieldmap.FieldMapper;
 import com.direwolf20.buildinggadgets.common.config.fieldmap.FieldSerializer;
-import com.direwolf20.buildinggadgets.common.network.PacketHandler;
-import com.direwolf20.buildinggadgets.common.network.PacketSyncConfig;
 import com.direwolf20.buildinggadgets.common.tools.ReflectionTool;
-import com.google.common.collect.ImmutableList;
-import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.nbt.NBTBase;
+import net.minecraft.nbt.INBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.relauncher.Side;
 
 import java.lang.reflect.Field;
 import java.util.Collections;
@@ -90,30 +84,30 @@ public class SyncedConfig {
      * so that it can be synced to the Client.
      */
     static void transferValues() {
-        rayTraceRange = Config.rayTraceRange;
-        poweredByFE = Config.poweredByFE;
-        enableDestructionGadget = Config.enableDestructionGadget;
-        absoluteCoordDefault = Config.absoluteCoordDefault;
-        canOverwriteBlocks = Config.canOverwriteBlocks;
-        enablePaste = Config.enablePaste;
+        rayTraceRange = Config.GENERAL.rayTraceRange.get();
+        poweredByFE = Config.GENERAL.poweredByFE.get();
+        enableDestructionGadget = Config.GENERAL.enableDestructionGadget.get();
+        absoluteCoordDefault = Config.GENERAL.absoluteCoordDefault.get();
+        canOverwriteBlocks = Config.GENERAL.canOverwriteBlocks.get();
+        enablePaste = Config.GENERAL.enablePaste.get();
 
-        blockBlacklist = FieldMapper.PATTERN_LIST_MAPPER.mapToField(Config.subCategoryBlacklist.blockBlacklist);
+        blockBlacklist = FieldMapper.PATTERN_LIST_MAPPER.mapToField(Config.BLACKLIST.blockBlacklist.get());
 
-        maxRange = Config.subCategoryGadgets.maxRange;
-        energyMax = Config.subCategoryGadgets.maxEnergy;
+        maxRange = Config.GADGETS.maxRange.get();
+        energyMax = Config.GADGETS.maxEnergy.get();
 
-        energyCostBuilder = Config.subCategoryGadgets.subCategoryGadgetBuilding.energyCostBuilder;
-        durabilityBuilder = Config.subCategoryGadgets.subCategoryGadgetBuilding.durabilityBuilder;
+        energyCostBuilder = Config.GADGETS.subCategoryGadgetBuilding.energyCost.get();
+        durabilityBuilder = Config.GADGETS.subCategoryGadgetBuilding.durability.get();
 
-        energyCostExchanger = Config.subCategoryGadgets.subCategoryGadgetExchanger.energyCostExchanger;
-        durabilityExchanger = Config.subCategoryGadgets.subCategoryGadgetExchanger.durabilityExchanger;
+        energyCostExchanger = Config.GADGETS.subCategoryGadgetExchanger.energyCost.get();
+        durabilityExchanger = Config.GADGETS.subCategoryGadgetExchanger.durability.get();
 
-        energyMaxDestruction = Config.subCategoryGadgets.subCategoryGadgetDestruction.energyMaxDestruction;
-        energyCostDestruction = Config.subCategoryGadgets.subCategoryGadgetDestruction.energyCostDestruction;
-        durabilityDestruction = Config.subCategoryGadgets.subCategoryGadgetDestruction.durabilityDestruction;
+        energyMaxDestruction = Config.GADGETS.subCategoryGadgetDestruction.energyMax.get();
+        energyCostDestruction = Config.GADGETS.subCategoryGadgetDestruction.energyCost.get();
+        durabilityDestruction = Config.GADGETS.subCategoryGadgetDestruction.durability.get();
 
-        energyCostCopyPaste = Config.subCategoryGadgets.subCategoryGadgetCopyPaste.energyCostCopyPaste;
-        durabilityCopyPaste = Config.subCategoryGadgets.subCategoryGadgetCopyPaste.durabilityCopyPaste;
+        energyCostCopyPaste = Config.GADGETS.subCategoryGadgetCopyPaste.energyCost.get();
+        durabilityCopyPaste = Config.GADGETS.subCategoryGadgetCopyPaste.durability.get();
     }
 
     /**
@@ -122,9 +116,9 @@ public class SyncedConfig {
      * @implSpec Will do nothing if called from outside game or from the Wrong Side
      */
     public static void sendConfigUpdateTo(EntityPlayerMP player) {
-        if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER)
-            //Testing showed, that this does absolutely nothing if called from outside game (besides taking up a small bit of processing time of course)
-            PacketHandler.INSTANCE.sendTo(new PacketSyncConfig(SyncedConfig.parseSynchronisation()), player);
+        //TODO Networking
+        //Testing showed, that this does absolutely nothing if called from outside game (besides taking up a small bit of processing time of course)
+        //PacketHandler.INSTANCE.sendTo(new PacketSyncConfig(SyncedConfig.parseSynchronisation()), player);
     }
 
     private static NBTTagCompound parseSynchronisation() {
@@ -134,7 +128,7 @@ public class SyncedConfig {
         List<Field> fields = Collections.unmodifiableList(getSyncFields());
         for (Field field: fields) {
             NBTTagCompound compound = parseField(field);
-            if (compound!=null) list.appendTag(compound);
+            if (compound != null) list.add(compound);
         }
         NBTTagCompound compound = new NBTTagCompound(); //ByteBufUtil requires TagCompounds...
         compound.setTag(KEY_VALUE,list);
@@ -156,7 +150,7 @@ public class SyncedConfig {
         for (Field f: fields) {
             map.put(getSyncName(f),f);
         }
-        for (NBTBase rawNBT: list) {
+        for (INBTBase rawNBT : list) {
             if (rawNBT instanceof NBTTagCompound) {
                 handleNBT((NBTTagCompound) rawNBT,map);
             } else {
@@ -170,7 +164,7 @@ public class SyncedConfig {
     }
 
     private static NBTTagCompound parseField(Field field) {
-        NBTBase valueTag = FieldSerializer.parseFieldValue(field,getMapperIdFor(field));
+        INBTBase valueTag = FieldSerializer.parseFieldValue(field, getMapperIdFor(field));
         if (valueTag==null) {
             BuildingGadgets.logger.warn("Could not use type of Field "+field.getName()+"!"+" Found type "+field.getType().getName()+"!");
             return null;
@@ -188,7 +182,7 @@ public class SyncedConfig {
             return;
         }
         String name = compound.getString(KEY_NAME);
-        NBTBase rawValue = compound.getTag(KEY_VALUE);
+        INBTBase rawValue = compound.getTag(KEY_VALUE);
         if (!fields.containsKey(name)) {
             BuildingGadgets.logger.warn("Tried to read synchronisation from an unknown Field!");
             return;

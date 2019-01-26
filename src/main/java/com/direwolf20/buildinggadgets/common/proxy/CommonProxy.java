@@ -6,7 +6,6 @@ import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.blocks.*;
 import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManager;
 import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManagerTileEntity;
-import com.direwolf20.buildinggadgets.common.config.CompatConfig;
 import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
 import com.direwolf20.buildinggadgets.common.entities.ModEntities;
 import com.direwolf20.buildinggadgets.common.items.*;
@@ -26,8 +25,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
-import java.io.File;
-
 
 @Mod.EventBusSubscriber(modid = BuildingGadgets.MODID)
 public class CommonProxy {
@@ -35,19 +32,10 @@ public class CommonProxy {
     public void preInit(FMLPreInitializationEvent e) {
         ModEntities.init();
         PacketHandler.registerMessages();
-        File cfgFile = new File(e.getModConfigurationDirectory(),"BuildingGadgets.cfg");
-        if (cfgFile.exists()) {
-            BuildingGadgets.logger.info("Preparing to migrate old config Data to new Format");
-            applyCompatConfig = CompatConfig.readConfig(cfgFile);
-        }
     }
 
     public void init() {
         NetworkRegistry.INSTANCE.registerGuiHandler(BuildingGadgets.instance, new GuiProxy());
-        if (applyCompatConfig) {
-            BuildingGadgets.logger.info("Migrating old config Data.");
-            CompatConfig.applyCompatConfig();
-        }
     }
 
     public void postInit() { }

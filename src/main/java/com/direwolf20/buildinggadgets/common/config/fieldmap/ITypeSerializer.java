@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.common.config.fieldmap;
 
-import net.minecraft.nbt.NBTBase;
+import net.minecraft.nbt.INBTBase;
 
 import javax.annotation.Nullable;
 
@@ -16,7 +16,7 @@ public interface ITypeSerializer {
      * @throws IllegalAccessException if The Field could not be accessed by the given {@link FieldWrapper}
      */
     @Nullable
-    public NBTBase serializeValue(FieldWrapper field) throws IllegalAccessException;
+    public INBTBase serializeValue(FieldWrapper field) throws IllegalAccessException;
 
     /**
      *
@@ -25,5 +25,5 @@ public interface ITypeSerializer {
      * @return whether or not this ITypeSerializer was capable of applying the given value
      * @throws IllegalAccessException if The Field could not be accessed by the given {@link FieldWrapper}
      */
-    public boolean applyValue(NBTBase tag, FieldWrapper field) throws IllegalAccessException;
+    public boolean applyValue(INBTBase tag, FieldWrapper field) throws IllegalAccessException;
 }
