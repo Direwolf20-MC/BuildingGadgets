@@ -1,32 +1,31 @@
 package com.direwolf20.buildinggadgets.common;
 
-import com.direwolf20.buildinggadgets.common.commands.DeleteBlockMapsCommand;
-import com.direwolf20.buildinggadgets.common.commands.FindBlockMapsCommand;
-import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
-import com.direwolf20.buildinggadgets.common.events.AnvilRepairHandler;
-import com.direwolf20.buildinggadgets.common.items.ModItems;
-import com.direwolf20.buildinggadgets.common.proxy.CommonProxy;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.text.TextComponentTranslation;
-import net.minecraftforge.common.MinecraftForge;
+import com.direwolf20.buildinggadgets.common.config.Config;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.SidedProxy;
-import net.minecraftforge.fml.common.event.FMLInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.javafmlmod.FMLModLoadingContext;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 
-@Mod(modid = BuildingGadgets.MODID, name = BuildingGadgets.MODNAME, version = BuildingGadgets.VERSION, updateJSON = BuildingGadgets.UPDATE_JSON, dependencies = BuildingGadgets.DEPENDENCIES, useMetadata = true)
+@Mod(value = BuildingGadgets.MODID)
 public class BuildingGadgets {
     public static final String MODID = "buildinggadgets";
     public static final String MODNAME = "Building Gadgets";
     public static final String VERSION = "@VERSION@";
     public static final String UPDATE_JSON = "@UPDATE@";
     public static final String DEPENDENCIES = "required-after:forge@[14.23.3.2694,)";
+    public static Logger logger = LogManager.getLogger();
 
+    public BuildingGadgets() {
+        FMLModLoadingContext.get().getModEventBus().addListener(this::preInit);
+    }
+
+
+    private void preInit(final FMLCommonSetupEvent event) {
+        Config.load();
+    }
+    /*
     public static final CreativeTabs BUILDING_CREATIVE_TAB = new CreativeTabs(new TextComponentTranslation("buildingGadgets").getUnformattedComponentText()) {
         @Override
         public ItemStack getTabIconItem() {
@@ -40,7 +39,6 @@ public class BuildingGadgets {
     @Mod.Instance
     public static BuildingGadgets instance;
 
-    public static Logger logger;
 
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
@@ -66,4 +64,5 @@ public class BuildingGadgets {
         event.registerServerCommand(new FindBlockMapsCommand());
         event.registerServerCommand(new DeleteBlockMapsCommand());
     }
+    */
 }

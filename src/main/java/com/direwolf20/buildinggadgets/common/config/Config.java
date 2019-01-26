@@ -2,6 +2,8 @@ package com.direwolf20.buildinggadgets.common.config;
 
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import net.minecraft.init.Blocks;
+import net.minecraftforge.common.ForgeConfig;
+import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.config.Config.*;
 
 //hardcode this name, so that we use a different config file than before we used Annotations
@@ -24,6 +26,9 @@ public class Config {
 
     private static final String LANG_KEY_GADGET_COPY_PASTE = LANG_KEY_GADGETS+".gadgetCopyPaste";
 
+    public static void load() {
+
+    }
     @RangeDouble(min=1,max=48)
     @Name("Max Build Distance")
     @Comment("Defines how far away you can build")
