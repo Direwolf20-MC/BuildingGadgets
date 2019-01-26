@@ -5,23 +5,20 @@ import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateMana
 import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.color.BlockColors;
-import net.minecraftforge.fml.common.registry.GameRegistry;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.registries.ObjectHolder;
 
-@GameRegistry.ObjectHolder(BuildingGadgets.MODID)
+@ObjectHolder(BuildingGadgets.MODID)
 public class ModBlocks {
 
-    @GameRegistry.ObjectHolder("effectblock")
+    @ObjectHolder("effectblock")
     public static EffectBlock effectBlock;
-    @GameRegistry.ObjectHolder("constructionblock")
+    @ObjectHolder("constructionblock")
     public static ConstructionBlock constructionBlock;
-    @GameRegistry.ObjectHolder("constructionblockpowder")
+    @ObjectHolder("constructionblockpowder")
     public static ConstructionBlockPowder constructionBlockPowder;
-    @GameRegistry.ObjectHolder("templatemanager")
+    @ObjectHolder("templatemanager")
     public static TemplateManager templateManager;
 
-    @SideOnly(Side.CLIENT)
     public static void initColorHandlers() {
         BlockColors blockColors = Minecraft.getInstance().getBlockColors();
         if (SyncedConfig.enablePaste) {constructionBlock.initColorHandler(blockColors);}
