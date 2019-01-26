@@ -21,6 +21,8 @@ import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
+import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.items.IItemHandler;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -246,6 +248,16 @@ public class GadgetUtils {
                 setToolBlock(stack, ((ConstructionBlockTileEntity) te).getActualBlockState());
                 setToolActualBlock(stack, ((ConstructionBlockTileEntity) te).getActualBlockState());
                 return;
+            } else {
+                IItemHandler cap = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
+                if (cap == null) validBlock = false;
+                else {
+                    boolean success = setBoundTE(stack, pos, player.dimension, world);
+                    if (success) {
+                        player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.boundTE").getUnformattedComponentText()), true);
+                        return;
+                    }
+                }
             }
             validBlock = false;
         }
@@ -286,6 +298,27 @@ public class GadgetUtils {
             player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.anchorremove").getUnformattedComponentText()), true);
         }
         return true;
+    }
+
+    public static boolean setBoundTE(ItemStack tool, @Nullable BlockPos pos, int dim, World world) {
+        TileEntity te = world.getTileEntity(pos);
+        if (te == null) return false;
+        IItemHandler cap = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
+        if (cap == null) return false;
+        writePOSToNBT(tool, pos, "boundTE", dim);
+        return true;
+    }
+
+    public static BlockPos getBoundTE(ItemStack tool, World world) {
+        BlockPos pos = getPOSFromNBT(tool, "boundTE");
+        //BlockPos blankPos = new BlockPos(0,0,0);
+        if (pos == null) return null;
+        TileEntity te = world.getTileEntity(pos);
+
+        if (te == null) return null;
+        IItemHandler cap = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
+        if (cap == null) return null;
+        return pos;
     }
 
     public static String withSuffix(int count) {

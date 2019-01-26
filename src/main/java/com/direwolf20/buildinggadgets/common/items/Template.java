@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.common.items;
 
+import com.direwolf20.buildinggadgets.client.events.EventTooltip;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.tools.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.tools.WorldSave;
@@ -65,6 +66,7 @@ public class Template extends Item implements ITemplate {
         //Add tool information to the tooltip
         super.addInformation(stack, world, list, b);
         list.add(TextFormatting.AQUA + I18n.format("tooltip.template.name") + ": " + getName(stack));
+        EventTooltip.addTemplatePadding(stack, list);
     }
 
     @SideOnly(Side.CLIENT)
