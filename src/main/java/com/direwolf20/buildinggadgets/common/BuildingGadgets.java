@@ -1,6 +1,7 @@
 package com.direwolf20.buildinggadgets.common;
 
 import com.direwolf20.buildinggadgets.common.config.Config;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLModLoadingContext;
@@ -19,6 +20,7 @@ public class BuildingGadgets {
 
     public BuildingGadgets() {
         FMLModLoadingContext.get().getModEventBus().addListener(this::preInit);
+        MinecraftForge.EVENT_BUS.register(this);
     }
 
 
