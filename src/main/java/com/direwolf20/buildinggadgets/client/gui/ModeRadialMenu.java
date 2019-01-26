@@ -48,7 +48,7 @@ public class ModeRadialMenu extends GuiScreen {
     private List<Integer> slots;
 
     public ModeRadialMenu(ItemStack stack) {
-        mc = Minecraft.getMinecraft();
+        mc = Minecraft.getInstance();
 
 //        itemStack = ItemStack.EMPTY;
         if (stack.getItem() instanceof GadgetBuilding) {
@@ -106,7 +106,7 @@ public class ModeRadialMenu extends GuiScreen {
 
         List<int[]> stringPositions = new ArrayList();
 
-        EntityPlayer player = Minecraft.getMinecraft().player;
+        EntityPlayer player = Minecraft.getInstance().player;
         ItemStack tool = player.getHeldItemMainhand();
         if (!(tool.getItem() instanceof GadgetGeneric)) {
             tool = player.getHeldItemOffhand();

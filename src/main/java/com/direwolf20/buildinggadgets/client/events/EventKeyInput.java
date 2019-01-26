@@ -32,7 +32,7 @@ public class EventKeyInput {
     private static void handleEventInput() {
         if (KeyBindings.modeSwitch.isKeyDown() && ((KeyBindings.modeSwitch.getKeyModifier() == KeyModifier.NONE && KeyModifier.getActiveModifier() == KeyModifier.NONE) || KeyBindings.modeSwitch.getKeyModifier() != KeyModifier.NONE)) {
             //PacketHandler.INSTANCE.sendToServer(new PacketToggleMode());
-            Minecraft mc = Minecraft.getMinecraft();
+            Minecraft mc = Minecraft.getInstance();
             ItemStack stack = mc.player.getHeldItem(EnumHand.MAIN_HAND);
             if (!stack.isEmpty() && ((stack.getItem() instanceof GadgetGeneric)))
                 mc.displayGuiScreen(new ModeRadialMenu(stack));

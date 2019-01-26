@@ -28,8 +28,8 @@ public class BlockBuildEntityRender extends Render<BlockBuildEntity> {
 
     @Override
     public void doRender(BlockBuildEntity entity, double x, double y, double z, float entityYaw, float partialTicks) {
-        BlockRendererDispatcher blockrendererdispatcher = Minecraft.getMinecraft().getBlockRendererDispatcher();
-        Minecraft mc = Minecraft.getMinecraft();
+        BlockRendererDispatcher blockrendererdispatcher = Minecraft.getInstance().getBlockRendererDispatcher();
+        Minecraft mc = Minecraft.getInstance();
         GlStateManager.pushMatrix();
 
         int toolMode = entity.getToolMode();

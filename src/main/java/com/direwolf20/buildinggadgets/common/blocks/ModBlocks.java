@@ -23,7 +23,7 @@ public class ModBlocks {
 
     @SideOnly(Side.CLIENT)
     public static void initColorHandlers() {
-        BlockColors blockColors = Minecraft.getMinecraft().getBlockColors();
+        BlockColors blockColors = Minecraft.getInstance().getBlockColors();
         if (SyncedConfig.enablePaste) {constructionBlock.initColorHandler(blockColors);}
     }
 }

@@ -28,7 +28,7 @@ public class EventClientTick {
                 joinedWorld = true;
 
             counter = 0;
-            EntityPlayer player = Minecraft.getMinecraft().player;
+            EntityPlayer player = Minecraft.getInstance().player;
             if (player == null) return;
 
             for (int i = 0; i < 36; ++i) {
