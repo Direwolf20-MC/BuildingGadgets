@@ -23,8 +23,9 @@ public class PacketHandler {
         registerMessage(PacketCopyCoords.Handler.class, PacketCopyCoords.class, Side.SERVER);
         registerMessage(PacketDestructionGUI.Handler.class, PacketDestructionGUI.class, Side.SERVER);
         registerMessage(PacketPasteGUI.Handler.class, PacketPasteGUI.class, Side.SERVER);
-
+        registerMessage(PacketRequestConfigSync.Handler.class, PacketRequestConfigSync.class, Side.SERVER);
         // Client side
+        registerMessage(PacketSyncConfig.Handler.class,PacketSyncConfig.class,Side.CLIENT);
         registerMessage(PacketBlockMap.Handler.class, PacketBlockMap.class, Side.CLIENT);
     }
 

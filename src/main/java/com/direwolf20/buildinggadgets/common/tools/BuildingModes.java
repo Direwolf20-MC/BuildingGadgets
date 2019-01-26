@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.common.tools;
 
-import com.direwolf20.buildinggadgets.common.Config;
+import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetBuilding;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -20,7 +20,7 @@ public class BuildingModes {
         if (pos.getY() < 0) {
             return false;
         }
-        if (Config.canOverwriteBlocks) {
+        if (SyncedConfig.canOverwriteBlocks) {
             if (!world.getBlockState(pos).getBlock().isReplaceable(world, pos)) {
                 return false;
             }

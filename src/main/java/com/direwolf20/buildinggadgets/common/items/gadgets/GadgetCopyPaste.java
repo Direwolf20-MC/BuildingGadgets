@@ -3,9 +3,9 @@ package com.direwolf20.buildinggadgets.common.items.gadgets;
 import com.direwolf20.buildinggadgets.client.events.EventTooltip;
 import com.direwolf20.buildinggadgets.client.gui.GuiProxy;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
-import com.direwolf20.buildinggadgets.common.Config;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlock;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
+import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.common.items.ITemplate;
 import com.direwolf20.buildinggadgets.common.items.ModItems;
@@ -60,14 +60,14 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
         setRegistryName("copypastetool");        // The unique name (within your mod) that identifies this item
         setUnlocalizedName(BuildingGadgets.MODID + ".copypastetool");     // Used for localization (en_US.lang)
         setMaxStackSize(1);
-        if (!Config.poweredByFE) {
-            setMaxDamage(Config.durabilityCopyPaste);
+        if (!SyncedConfig.poweredByFE) {
+            setMaxDamage(SyncedConfig.durabilityCopyPaste);
         }
     }
 
     @Override
     public int getEnergyCost() {
-        return Config.energyCostBuilder;
+        return SyncedConfig.energyCostCopyPaste;
     }
 
     @Override
@@ -230,7 +230,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
     public void addInformation(ItemStack stack, @Nullable World world, List<String> list, ITooltipFlag b) {
         super.addInformation(stack, world, list, b);
         list.add(TextFormatting.AQUA + I18n.format("tooltip.gadget.mode") + ": " + getToolMode(stack));
-        if (Config.poweredByFE) {
+        if (SyncedConfig.poweredByFE) {
             IEnergyStorage energy = CapabilityProviderEnergy.getCap(stack);
             list.add(TextFormatting.WHITE + I18n.format("tooltip.gadget.energy") + ": " + withSuffix(energy.getEnergyStored()) + "/" + withSuffix(energy.getMaxEnergyStored()));
         }
@@ -394,7 +394,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
                 for (int z = iStartZ; z <= iEndZ; z++) {
                     BlockPos tempPos = new BlockPos(x, y, z);
                     IBlockState tempState = world.getBlockState(tempPos);
-                    if (tempState != Blocks.AIR.getDefaultState() && (world.getTileEntity(tempPos) == null || world.getTileEntity(tempPos) instanceof ConstructionBlockTileEntity) && !tempState.getMaterial().isLiquid() && !BlacklistBlocks.checkBlacklist(tempState.getBlock())) {
+                    if (tempState != Blocks.AIR.getDefaultState() && (world.getTileEntity(tempPos) == null || world.getTileEntity(tempPos) instanceof ConstructionBlockTileEntity) && !tempState.getMaterial().isLiquid() && !SyncedConfig.blockBlacklist.contains(tempState.getBlock())) {
                         TileEntity te = world.getTileEntity(tempPos);
                         IBlockState assignState = InventoryManipulation.getSpecificStates(tempState, world, player, tempPos, stack);
                         IBlockState actualState = assignState.getActualState(world, tempPos);
@@ -499,13 +499,9 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
 
     private void placeBlock(World world, BlockPos pos, EntityPlayer player, IBlockState state, Map<IBlockState, UniqueItem> IntStackMap) {
         IBlockState testState = world.getBlockState(pos);
-        if (Config.canOverwriteBlocks) {
-            if (!testState.getBlock().isReplaceable(world, pos))
-                return;
-        } else {
-            if (world.getBlockState(pos).getMaterial() != Material.AIR)
-                return;
-        }
+        if ((SyncedConfig.canOverwriteBlocks && !testState.getBlock().isReplaceable(world, pos)) ||
+            (!SyncedConfig.canOverwriteBlocks && world.getBlockState(pos).getMaterial() != Material.AIR))
+            return;
 
         if (pos.getY() < 0 || state.equals(Blocks.AIR.getDefaultState()) || !player.isAllowEdit())
             return;
