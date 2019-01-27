@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.common.entities;
 
+import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.blocks.ModBlocks;
 
@@ -40,15 +41,15 @@ public class BlockBuildEntity extends Entity {
 
     int maxLife = 20;
 
-    protected BlockBuildEntity(EntityType<?> type, World world) {
-        super(type, world);
+    public BlockBuildEntity(World world) {
+        super(ModEntities.BLOCK_BUILD, world);
 
         setSize(0.1F, 0.1F);
         this.world = world;
     }
 
-    public BlockBuildEntity(EntityType<?> type, World worldIn, BlockPos spawnPos, EntityLivingBase player, IBlockState spawnBlock, int toolMode, IBlockState actualSpawnBlock, boolean constrPaste) {
-        super(type, worldIn);
+    public BlockBuildEntity(World worldIn, BlockPos spawnPos, EntityLivingBase player, IBlockState spawnBlock, int toolMode, IBlockState actualSpawnBlock, boolean constrPaste) {
+        super(ModEntities.BLOCK_BUILD, worldIn);
         setSize(0.1F, 0.1F);
         setPosition(spawnPos.getX(), spawnPos.getY(), spawnPos.getZ());
         IBlockState currentBlock = worldIn.getBlockState(spawnPos);
@@ -195,8 +196,6 @@ public class BlockBuildEntity extends Entity {
                     TileEntity te = world.getTileEntity(setPos);
                     if (te instanceof ConstructionBlockTileEntity) {
                         ((ConstructionBlockTileEntity) te).setBlockState(setBlock, actualSetBlock);
-                        // TODO: Review
-//                        ((ConstructionBlockTileEntity) te).setActualBlockState(actualSetBlock);
                     }
                     world.spawnEntity(new ConstructionBlockEntity(world, setPos, false));
                 } else {
@@ -206,7 +205,7 @@ public class BlockBuildEntity extends Entity {
             } else if (setPos != null && setBlock != null && getToolMode() == 2) {
                 world.setBlockState(setPos, Blocks.AIR.getDefaultState());
             } else if (setPos != null && setBlock != null && getToolMode() == 3) {
-                world.spawnEntity(new BlockBuildEntity(this.getType(), world, setPos, spawnedBy, originalSetBlock, 1, actualSetBlock, getUsingConstructionPaste()));
+                world.spawnEntity(new BlockBuildEntity(world, setPos, spawnedBy, originalSetBlock, 1, actualSetBlock, getUsingConstructionPaste()));
             }
         }
     }

@@ -1,8 +1,7 @@
 package com.direwolf20.buildinggadgets.common.items.gadgets;
 
 import com.direwolf20.buildinggadgets.client.events.EventTooltip;
-import com.direwolf20.buildinggadgets.client.gui.GuiProxy;
-import com.direwolf20.buildinggadgets.common.BuildingGadgets;
+import com.direwolf20.buildinggadgets.client.gui.CopyPasteGUI;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlock;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
@@ -10,22 +9,20 @@ import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.common.items.ITemplate;
 import com.direwolf20.buildinggadgets.common.items.ModItems;
 import com.direwolf20.buildinggadgets.common.items.capability.CapabilityProviderEnergy;
-import com.direwolf20.buildinggadgets.common.network.PacketBlockMap;
-import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.tools.*;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Enchantments;
 import net.minecraft.init.Items;
+import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -34,6 +31,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
@@ -45,7 +43,10 @@ import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.world.BlockEvent;
 
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 import static com.direwolf20.buildinggadgets.common.tools.GadgetUtils.withSuffix;
 
@@ -60,12 +61,15 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
         }
     }
 
-    public GadgetCopyPaste() {
+    public GadgetCopyPaste(Builder builder) {
+        super(builder.maxStackSize(1));
         setRegistryName("copypastetool");        // The unique name (within your mod) that identifies this item
-        setUnlocalizedName(BuildingGadgets.MODID + ".copypastetool");     // Used for localization (en_US.lang)
-        setMaxStackSize(1);
+
+// @todo: reimplement @since 1.13.x
+//        setUnlocalizedName(BuildingGadgets.MODID + ".copypastetool");     // Used for localization (en_US.lang)
+
         if (!SyncedConfig.poweredByFE) {
-            setMaxDamage(SyncedConfig.durabilityCopyPaste);
+            builder.defaultMaxDamage(SyncedConfig.durabilityCopyPaste);
         }
     }
 
@@ -134,7 +138,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
             }
             UUID uid = UUID.randomUUID();
             tagCompound.setString("UUID", uid.toString());
-            stack.setTagCompound(tagCompound);
+            stack.setTag(tagCompound);
             uuid = uid.toString();
         }
         return uuid;
@@ -147,7 +151,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
     public static void setOwner(ItemStack stack, String owner) {//TODO unused
         NBTTagCompound tagCompound = GadgetUtils.getStackTag(stack);
         tagCompound.setString("owner", owner);
-        stack.setTagCompound(tagCompound);
+        stack.setTag(tagCompound);
     }
 
     private static void setLastBuild(ItemStack stack, BlockPos anchorPos, Integer dim) {
@@ -212,7 +216,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
             tagCompound = new NBTTagCompound();
         }
         tagCompound.setString("mode", mode.name());
-        stack.setTagCompound(tagCompound);
+        stack.setTag(tagCompound);
     }
 
     public static ToolMode getToolMode(ItemStack stack) {
@@ -231,15 +235,17 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
     }
 
     @Override
-    public void addInformation(ItemStack stack, @Nullable World world, List<String> list, ITooltipFlag b) {
-        super.addInformation(stack, world, list, b);
-        list.add(TextFormatting.AQUA + I18n.format("tooltip.gadget.mode") + ": " + getToolMode(stack));
+    public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+        super.addInformation(stack, worldIn, tooltip, flagIn);
+
+        tooltip.add(new TextComponentString(TextFormatting.AQUA + I18n.format("tooltip.gadget.mode") + ": " + getToolMode(stack)));
         if (SyncedConfig.poweredByFE) {
             IEnergyStorage energy = CapabilityProviderEnergy.getCap(stack);
-            list.add(TextFormatting.WHITE + I18n.format("tooltip.gadget.energy") + ": " + withSuffix(energy.getEnergyStored()) + "/" + withSuffix(energy.getMaxEnergyStored()));
+            tooltip.add(new TextComponentString(TextFormatting.WHITE + I18n.format("tooltip.gadget.energy") + ": " + withSuffix(energy.getEnergyStored()) + "/" + withSuffix(energy.getMaxEnergyStored())));
         }
-        EventTooltip.addTemplatePadding(stack, list);
+        EventTooltip.addTemplatePadding(stack, tooltip);
     }
+
 
     public void setMode(EntityPlayer player, ItemStack heldItem, int modeInt) {
         //Called when we specify a mode with the radial menu
@@ -291,13 +297,17 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
                 BlockPos pos = VectorTools.getPosLookingAt(player);
                 if (pos == null) {
                     if (player.isSneaking()) {
-                        player.openGui(BuildingGadgets.instance, GuiProxy.CopyPasteID, world, hand.ordinal(), 0, 0);
+                        Minecraft.getInstance().displayGuiScreen(new CopyPasteGUI(stack));
+                        // @possible: replacement above
+//                        player.openGui(BuildingGadgets.instance, GuiProxy.CopyPasteID, world, hand.ordinal(), 0, 0);
                         return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);
                     }
                 }
             } else {
                 if (player.isSneaking()) {
-                    player.openGui(BuildingGadgets.instance, GuiProxy.PasteID, world, hand.ordinal(), 0, 0);
+                    Minecraft.getInstance().displayGuiScreen(new CopyPasteGUI(stack));
+                    // @possible: replacement above
+//                    player.openGui(BuildingGadgets.instance, GuiProxy.PasteID, world, hand.ordinal(), 0, 0);
                     return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);
                 }
             }
@@ -311,7 +321,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
             return;
         }
         GadgetCopyPaste tool = ModItems.gadgetCopyPaste;
-        List<BlockMap> blockMapList = new ArrayList<BlockMap>();
+        List<BlockMap> blockMapList;
         WorldSave worldSave = WorldSave.getWorldSave(player.world);
         NBTTagCompound tagCompound = worldSave.getCompoundFromUUID(tool.getUUID(stack));
         BlockPos startPos = tool.getStartPos(stack);
@@ -331,7 +341,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
             int nz = px;
 
             BlockPos newPos = new BlockPos(startPos.getX() + nx, tempPos.getY(), startPos.getZ() + nz);
-            IBlockState rotatedState = blockMap.state.withRotation(Rotation.CLOCKWISE_90);
+            IBlockState rotatedState = blockMap.state.rotate(player.world, newPos, Rotation.CLOCKWISE_90);
             posIntArrayList.add(GadgetUtils.relPosToInt(startPos, newPos));
             blockMapIntState.addToMap(rotatedState);
             stateIntArrayList.add((int) blockMapIntState.findSlot(rotatedState));
@@ -348,7 +358,8 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
         tagCompound.setInt("copycounter", tool.getCopyCounter(stack));
         worldSave.addToMap(tool.getUUID(stack), tagCompound);
         worldSave.markForSaving();
-        PacketHandler.INSTANCE.sendTo(new PacketBlockMap(tagCompound), (EntityPlayerMP) player);
+        // @todo: reimplement @since 1.13.x
+//        PacketHandler.INSTANCE.sendTo(new PacketBlockMap(tagCompound), (EntityPlayerMP) player);
         player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.rotated").getUnformattedComponentText()), true);
     }
 
@@ -401,7 +412,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
                     if (tempState != Blocks.AIR.getDefaultState() && (world.getTileEntity(tempPos) == null || world.getTileEntity(tempPos) instanceof ConstructionBlockTileEntity) && !tempState.getMaterial().isLiquid() && !SyncedConfig.blockBlacklist.contains(tempState.getBlock())) {
                         TileEntity te = world.getTileEntity(tempPos);
                         IBlockState assignState = InventoryManipulation.getSpecificStates(tempState, world, player, tempPos, stack);
-                        IBlockState actualState = assignState.getActualState(world, tempPos);
+                        IBlockState actualState = assignState.getExtendedState(world, tempPos);
                         if (te instanceof ConstructionBlockTileEntity) {
                             actualState = ((ConstructionBlockTileEntity) te).getActualBlockState();
                         }
@@ -420,7 +431,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
                                 }
                                 NonNullList<ItemStack> drops = NonNullList.create();
                                 if (actualState != null)
-                                    actualState.getBlock().getDrops(drops, world, new BlockPos(0, 0, 0), actualState, 0);
+                                    actualState.getBlock().getDrops(actualState, drops, world, new BlockPos(0, 0, 0), 0);
 
                                 int neededItems = 0;
                                 for (ItemStack drop : drops) {
@@ -448,17 +459,18 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
         tagCompound.setIntArray("posIntArray", posIntArray);
         tagCompound.setIntArray("stateIntArray", stateIntArray);
 
-        tagCompound.setTag("startPos", NBTUtil.createPosTag(start));
-        tagCompound.setTag("endPos", NBTUtil.createPosTag(end));
+        tagCompound.setTag("startPos", NBTUtil.writeBlockPos(start));
+        tagCompound.setTag("endPos", NBTUtil.writeBlockPos(end));
         tagCompound.setInt("dim", player.dimension);
         tagCompound.setString("UUID", tool.getUUID(stack));
-        tagCompound.setString("owner", player.getName());
+        tagCompound.setString("owner", player.getName().getString());
         tool.incrementCopyCounter(stack);
         tagCompound.setInt("copycounter", tool.getCopyCounter(stack));
 
         worldSave.addToMap(tool.getUUID(stack), tagCompound);
         worldSave.markForSaving();
-        PacketHandler.INSTANCE.sendTo(new PacketBlockMap(tagCompound), (EntityPlayerMP) player);
+        // @todo: reimplement @since 1.13.x
+//        PacketHandler.INSTANCE.sendTo(new PacketBlockMap(tagCompound), (EntityPlayerMP) player);
 
         if (foundTE > 0) {
             player.sendStatusMessage(new TextComponentString(TextFormatting.YELLOW + new TextComponentTranslation("message.gadget.TEinCopy").getUnformattedComponentText() + ": " + foundTE), true);
@@ -491,7 +503,8 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
 
     private void placeBlock(World world, BlockPos pos, EntityPlayer player, IBlockState state, Map<IBlockState, UniqueItem> IntStackMap) {
         IBlockState testState = world.getBlockState(pos);
-        if ((SyncedConfig.canOverwriteBlocks && !testState.getBlock().isReplaceable(world, pos)) ||
+        // @warning: this has been replaced without knowing how to construct a BlockItemUseContent
+        if ((SyncedConfig.canOverwriteBlocks && !testState.isReplaceable(new BlockItemUseContext(world, player, new ItemStack(testState.getBlock()), pos, EnumFacing.DOWN, 0f, 0f, 0f))) ||
             (!SyncedConfig.canOverwriteBlocks && world.getBlockState(pos).getMaterial() != Material.AIR))
             return;
 
@@ -507,9 +520,9 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
 
         UniqueItem uniqueItem = IntStackMap.get(state);
         if (uniqueItem == null) return; //This shouldn't happen I hope!
-        ItemStack itemStack = new ItemStack(uniqueItem.item, 1, uniqueItem.meta);
+        ItemStack itemStack = new ItemStack(uniqueItem.item, 1);
         NonNullList<ItemStack> drops = NonNullList.create();
-        state.getBlock().getDrops(drops, world, pos, state, 0);
+        state.getBlock().getDrops(state, drops, world, pos, 0);
         int neededItems = 0;
         for (ItemStack drop : drops) {
             if (drop.getItem().equals(itemStack.getItem())) {

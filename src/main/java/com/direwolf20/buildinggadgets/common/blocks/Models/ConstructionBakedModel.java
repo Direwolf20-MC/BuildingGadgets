@@ -40,32 +40,34 @@ public class ConstructionBakedModel implements IBakedModel {
 
     @Override
     public List<BakedQuad> getQuads(@Nullable IBlockState state, @Nullable EnumFacing side, Random rand) {
-        IExtendedBlockState extendedBlockState = (IExtendedBlockState) state;
-        if (extendedBlockState == null)
+//        IExtendedBlockState extendedBlockState = (IExtendedBlockState) state;
+//        if (extendedBlockState == null)
             return Collections.emptyList();
 
-        //ConstructionID facadeId = extendedBlockState.getValue(ConstructionBlock.FACADEID);
-        IBlockState facadeState = extendedBlockState.getValue(ConstructionBlock.FACADE_ID);
-        IBlockState extFacadeState = extendedBlockState.getValue(ConstructionBlock.FACADE_EXT_STATE);
-        IBakedModel model;
-        if (facadeState == null) {
-            return blankConstructionModel.getQuads(state, side, rand);
-        }
-
-        //IBlockState facadeState = facadeId.getBlockState();
-
-        BlockRenderLayer layer = MinecraftForgeClient.getRenderLayer();
-
-        if (layer != null && !facadeState.getBlock().canRenderInLayer(facadeState, layer)) { // always render in the null layer or the block-breaking textures don't show up
-            return Collections.emptyList();
-        }
-        model = getModel(facadeState);
-        try {
-            return model.getQuads(extFacadeState, side, rand);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return model.getQuads(facadeState, side, rand);
-        }
+//       TODO: Reimplement
+//
+//        //ConstructionID facadeId = extendedBlockState.getValue(ConstructionBlock.FACADEID);
+//        IBlockState facadeState = extendedBlockState.getValue(ConstructionBlock.FACADE_ID);
+//        IBlockState extFacadeState = extendedBlockState.getValue(ConstructionBlock.FACADE_EXT_STATE);
+//        IBakedModel model;
+//        if (facadeState == null) {
+//            return blankConstructionModel.getQuads(state, side, rand);
+//        }
+//
+//        //IBlockState facadeState = facadeId.getBlockState();
+//
+//        BlockRenderLayer layer = MinecraftForgeClient.getRenderLayer();
+//
+//        if (layer != null && !facadeState.getBlock().canRenderInLayer(facadeState, layer)) { // always render in the null layer or the block-breaking textures don't show up
+//            return Collections.emptyList();
+//        }
+//        model = getModel(facadeState);
+//        try {
+//            return model.getQuads(extFacadeState, side, rand);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            return model.getQuads(facadeState, side, rand);
+//        }
     }
 
     @Override

@@ -3,6 +3,7 @@ package com.direwolf20.buildinggadgets.common.blocks.Models;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.google.common.collect.ImmutableMap;
 import net.minecraft.client.renderer.block.model.IBakedModel;
+import net.minecraft.client.renderer.block.model.IUnbakedModel;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.vertex.VertexFormat;
@@ -14,14 +15,33 @@ import net.minecraftforge.common.model.TRSRTransformation;
 import net.minecraftforge.common.model.animation.IClip;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 
-public class ConstructionModel implements IModel {
+public class ConstructionModel implements IUnbakedModel {
     private static final ResourceLocation MODEL_CONSTRUCTION_BLOCK = new ModelResourceLocation(BuildingGadgets.MODID + ":blankconstblock");
+
+    @Override
+    public Collection<ResourceLocation> getOverrideLocations() {
+        return null;
+    }
+
+    @Override
+    public Collection<ResourceLocation> getTextures(Function<ResourceLocation, IUnbakedModel> modelGetter, Set<String> missingTextureErrors) {
+        return null;
+    }
+
+    @Nullable
+    @Override
+    public IBakedModel bake(Function<ResourceLocation, IUnbakedModel> modelGetter, Function<ResourceLocation, TextureAtlasSprite> spriteGetter, IModelState state, boolean uvlock, VertexFormat format) {
+        IModel constructionModel;
+        try {
+            constructionModel = ModelLoaderRegistry.getModel(MODEL_CONSTRUCTION_BLOCK);
+        } catch (Exception e) {
+            throw new Error("Unable to load construction block model", e);
+        }
+        return new ConstructionBakedModel(constructionModel.bake(modelGetter, spriteGetter, state, uvlock, format));
+    }
 
 //    Does not exist in 1.13
 //    @Override
@@ -34,18 +54,6 @@ public class ConstructionModel implements IModel {
 //
 
 
-    @Nullable
-    @Override
-    public IBakedModel bake(Function modelGetter, Function spriteGetter, IModelState state, boolean uvlock, VertexFormat format) {
-        IModel constructionModel;
-        try {
-            constructionModel = ModelLoaderRegistry.getModel(MODEL_CONSTRUCTION_BLOCK);
-        } catch (Exception e) {
-            throw new Error("Unable to load construction block model", e);
-        }
-        return new ConstructionBakedModel(constructionModel.bake(modelGetter, spriteGetter, state, uvlock, format));
-    }
-
     @Override
     public IModelState getDefaultState() {
         return TRSRTransformation.identity();
@@ -57,22 +65,22 @@ public class ConstructionModel implements IModel {
     }
 
     @Override
-    public IModel smoothLighting(boolean value) {
+    public IUnbakedModel smoothLighting(boolean value) {
         return null;
     }
 
     @Override
-    public IModel gui3d(boolean value) {
+    public IUnbakedModel gui3d(boolean value) {
         return null;
     }
 
     @Override
-    public IModel retexture(ImmutableMap textures) {
+    public IUnbakedModel retexture(ImmutableMap textures) {
         return null;
     }
 
     @Override
-    public IModel process(ImmutableMap customData) {
+    public IUnbakedModel process(ImmutableMap customData) {
         return null;
     }
 }

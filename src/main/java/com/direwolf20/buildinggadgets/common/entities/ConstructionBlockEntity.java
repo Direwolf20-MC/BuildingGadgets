@@ -28,14 +28,14 @@ public class ConstructionBlockEntity extends Entity {
 
     int maxLife = 80;
 
-    public ConstructionBlockEntity(EntityType type, World worldIn) {
-        super(type, worldIn);
+    public ConstructionBlockEntity(World worldIn) {
+        super(ModEntities.CONSTRUCTION_BLOCK, worldIn);
         setSize(0.1F, 0.1F);
         world = worldIn;
     }
 
-    public ConstructionBlockEntity(EntityType type, World worldIn, BlockPos spawnPos, boolean makePaste) {
-        super(type, worldIn);
+    public ConstructionBlockEntity(World worldIn, BlockPos spawnPos, boolean makePaste) {
+        super(ModEntities.CONSTRUCTION_BLOCK, worldIn);
         setSize(0.1F, 0.1F);
         world = worldIn;
         setPosition(spawnPos.getX(), spawnPos.getY(), spawnPos.getZ());

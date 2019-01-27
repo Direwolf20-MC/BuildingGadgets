@@ -11,41 +11,22 @@ import com.direwolf20.buildinggadgets.client.gui.GuiButtonHelpText;
 import com.direwolf20.buildinggadgets.client.gui.IHoverHelpText;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.items.ModItems;
-import com.direwolf20.buildinggadgets.common.network.PacketHandler;
-import com.direwolf20.buildinggadgets.common.network.PacketTemplateManagerLoad;
-import com.direwolf20.buildinggadgets.common.network.PacketTemplateManagerPaste;
-import com.direwolf20.buildinggadgets.common.network.PacketTemplateManagerSave;
 import com.direwolf20.buildinggadgets.common.tools.PasteToolBufferBuilder;
 import com.direwolf20.buildinggadgets.common.tools.ToolDireBuffer;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiTextField;
-import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.gui.inventory.GuiContainer;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.client.renderer.vertex.VertexFormatElement;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompressedStreamTools;
-import net.minecraft.nbt.JsonToNBT;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.util.text.TextComponentTranslation;
-import net.minecraft.util.text.TextFormatting;
-import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.util.Rectangle;
-import org.lwjgl.util.glu.Project;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
@@ -63,7 +44,7 @@ public class TemplateManagerGUI extends GuiContainer {
     private float momentumDampening = 0.98f;
     private float rotX = 0, rotY = 0, zoom = 1;
     private float panX = 0, panY = 0;
-    private Rectangle panel = new Rectangle(8, 18, 62, 62);
+    private Rectangle2d panel = new Rectangle2d(8, 18, 62, 62);
 
 //    private int scrollAcc;
 
@@ -82,16 +63,14 @@ public class TemplateManagerGUI extends GuiContainer {
         super(container);
         this.te = tileEntity;
         this.container = container;
-        //xSize = WIDTH;
-        //ySize = HEIGHT;
     }
 
     @Override
-    public void drawScreen(int mouseX, int mouseY, float partialTicks) {
+    public void render(int mouseX, int mouseY, float partialTicks) {
         drawDefaultBackground();
-        super.drawScreen(mouseX, mouseY, partialTicks);
+        super.render(mouseX, mouseY, partialTicks);
         if (buttonHelp.selected) {
-            GlStateManager.color(1, 1, 1, 1);
+            GlStateManager.color4f(1, 1, 1, 1);
             GlStateManager.disableLighting();
             for (IHoverHelpText helpTextProvider : helpTextProviders)
                 helpTextProvider.drawRect(this, HELP_TEXT_BACKGROUNG_COLOR);
@@ -112,21 +91,21 @@ public class TemplateManagerGUI extends GuiContainer {
     public void initGui() {
         super.initGui();
         helpTextProviders.clear();
-        this.buttonList.add(buttonHelp = new GuiButtonHelp(100, this.guiLeft + this.xSize - 16, this.guiTop + 4));
-        //The parameters of GuiButton are(id, x, y, width, height, text);
-        this.buttonList.add(buttonSave = createAndAddButton(0, 79, 17, 30, 20, "Save"));
-        this.buttonList.add(buttonLoad = createAndAddButton(1, 137, 17, 30, 20, "Load"));
-        this.buttonList.add(buttonCopy = createAndAddButton(2, 79, 61, 30, 20, "Copy"));
-        this.buttonList.add(buttonPaste = createAndAddButton(3, 135, 61, 34, 20, "Paste"));
+        this.buttons.add(buttonHelp = new GuiButtonHelp(100, this.guiLeft + this.xSize - 16, this.guiTop + 4));
+        this.buttons.add(buttonSave = createAndAddButton(0, 79, 17, 30, 20, "Save"));
+        this.buttons.add(buttonLoad = createAndAddButton(1, 137, 17, 30, 20, "Load"));
+        this.buttons.add(buttonCopy = createAndAddButton(2, 79, 61, 30, 20, "Copy"));
+        this.buttons.add(buttonPaste = createAndAddButton(3, 135, 61, 34, 20, "Paste"));
+
         this.nameField = new GuiTextField(0, this.fontRenderer, this.guiLeft + 8, this.guiTop + 6, 149, this.fontRenderer.FONT_HEIGHT);
         this.nameField.setMaxStringLength(50);
         this.nameField.setVisible(true);
+
         helpTextProviders.add(new AreaHelpText(nameField, "field.template_name"));
         helpTextProviders.add(new AreaHelpText(inventorySlots.getSlot(0), guiLeft, guiTop, "slot.gadget"));
         helpTextProviders.add(new AreaHelpText(inventorySlots.getSlot(1), guiLeft, guiTop, "slot.template"));
         helpTextProviders.add(new AreaHelpText(guiLeft + 112, guiTop + 41, 22, 15, "arrow.data_flow"));
         helpTextProviders.add(new AreaHelpText(panel, guiLeft, guiTop + 10, "preview"));
-        //NOTE: the id always has to be different or else it might get called twice or never!
     }
 
     private GuiButton createAndAddButton(int id, int x, int y, int witdth, int height, String text) {
@@ -137,13 +116,13 @@ public class TemplateManagerGUI extends GuiContainer {
 
     @Override
     protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
-        GlStateManager.color(1, 1, 1, 1);
+        GlStateManager.color4f(1, 1, 1, 1);
         mc.getTextureManager().bindTexture(background);
         drawTexturedModalRect(guiLeft, guiTop, 0, 0, xSize, ySize);
         if (!buttonCopy.isMouseOver() && !buttonPaste.isMouseOver())
             drawTexturedModalRectReverseX(guiLeft + 112, guiTop + 41, 176, 0, 22, 15, buttonLoad.isMouseOver());
 
-        this.nameField.drawTextBox();
+        this.nameField.drawTextField(mouseX, mouseY, partialTicks);
         drawStructure();
     }
 
@@ -166,11 +145,12 @@ public class TemplateManagerGUI extends GuiContainer {
     }
 
     private void drawStructure() {
-        int scale = new ScaledResolution(mc).getScaleFactor();
+        int scale = mc.mainWindow.getScaleFactor(this.mc.gameSettings.guiScale);
+
         drawRect(guiLeft + panel.getX() - 1, guiTop + panel.getY() - 1, guiLeft + panel.getX() + panel.getWidth() + 1, guiTop + panel.getY() + panel.getHeight() + 1, 0xFF8A8A8A);
         ItemStack itemstack = this.container.getSlot(0).getStack();
 //        BlockRendererDispatcher dispatcher = this.mc.getBlockRendererDispatcher();
-        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
 
         //float rotX = 165, rotY = 0, zoom = 1;
         if (!itemstack.isEmpty()) {
@@ -201,6 +181,7 @@ public class TemplateManagerGUI extends GuiContainer {
                     zoomScale = overH / 40;
                 }
 
+
                 //System.out.println(distance);
                 GlStateManager.pushMatrix();
                 //GlStateManager.translate(panel.getX() + (panel.getWidth() / 2), panel.getY() + (panel.getHeight() / 2), 100);
@@ -209,15 +190,15 @@ public class TemplateManagerGUI extends GuiContainer {
                 GlStateManager.pushMatrix();
                 GlStateManager.loadIdentity();
                 //int scale = new ScaledResolution(mc).getScaleFactor();
-                Project.gluPerspective(60, (float) panel.getWidth() / panel.getHeight(), 0.01F, 4000);
+                Matrix4f.perspective(60, (float) panel.getWidth() / panel.getHeight(), 0.01F, 4000);
                 GlStateManager.matrixMode(GL11.GL_MODELVIEW);
                 //GlStateManager.translate(-panel.getX() - panel.getWidth() / 2, -panel.getY() - panel.getHeight() / 2, 0);
-                GlStateManager.viewport((guiLeft + panel.getX()) * scale, mc.displayHeight - (guiTop + panel.getY() + panel.getHeight()) * scale, panel.getWidth() * scale, panel.getHeight() * scale);
+                GlStateManager.viewport((guiLeft + panel.getX()) * scale, this.height - (guiTop + panel.getY() + panel.getHeight()) * scale, panel.getWidth() * scale, panel.getHeight() * scale);
                 GlStateManager.clear(GL11.GL_DEPTH_BUFFER_BIT);
 
                 //double sc = 300 + 8 * 0.0125 * (Math.sqrt(zoom + 99) - 9);
                 sc = (293 * sc) + zoom / zoomScale;
-                GlStateManager.scale(sc, sc, sc);
+                GlStateManager.scaled(sc, sc, sc);
                 int moveX = startPos.getX() - endPos.getX();
 
                 //GlStateManager.rotate(30, 0, 1, 0);
@@ -226,13 +207,13 @@ public class TemplateManagerGUI extends GuiContainer {
                     //GlStateManager.rotate(90, 0, -1, 0);
                 }
 
-                GlStateManager.translate((moveX) / 1.75, -Math.abs(startPos.getY() - endPos.getY()) / 1.75, 0);
-                GlStateManager.translate(panX, panY, 0);
+                GlStateManager.translated((moveX) / 1.75, -Math.abs(startPos.getY() - endPos.getY()) / 1.75, 0);
+                GlStateManager.translated(panX, panY, 0);
 //System.out.println(((startPos.getX() - endPos.getX()) / 2) * -1 + ":" + ((startPos.getY() - endPos.getY()) / 2) * -1 + ":" + ((startPos.getZ() - endPos.getZ()) / 2) * -1);
-                GlStateManager.translate(((startPos.getX() - endPos.getX()) / 2) * -1, ((startPos.getY() - endPos.getY()) / 2) * -1, ((startPos.getZ() - endPos.getZ()) / 2) * -1);
-                GlStateManager.rotate(rotX, 1, 0, 0);
-                GlStateManager.rotate(rotY, 0, 1, 0);
-                GlStateManager.translate(((startPos.getX() - endPos.getX()) / 2), ((startPos.getY() - endPos.getY()) / 2), ((startPos.getZ() - endPos.getZ()) / 2));
+                GlStateManager.translated(((startPos.getX() - endPos.getX()) / 2) * -1, ((startPos.getY() - endPos.getY()) / 2) * -1, ((startPos.getZ() - endPos.getZ()) / 2) * -1);
+                GlStateManager.rotatef(rotX, 1, 0, 0);
+                GlStateManager.rotatef(rotY, 0, 1, 0);
+                GlStateManager.translated(((startPos.getX() - endPos.getX()) / 2), ((startPos.getY() - endPos.getY()) / 2), ((startPos.getZ() - endPos.getZ()) / 2));
 
                 mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
                 if ((startPos.getX() - endPos.getX()) == 0) {
@@ -244,7 +225,7 @@ public class TemplateManagerGUI extends GuiContainer {
 
                 if (bufferBuilder.getVertexCount() > 0) {
                     VertexFormat vertexformat = bufferBuilder.getVertexFormat();
-                    int i = vertexformat.getNextOffset();
+                    int i = vertexformat.getSize();
                     ByteBuffer bytebuffer = bufferBuilder.getByteBuffer();
                     List<VertexFormatElement> list = vertexformat.getElements();
 
@@ -259,7 +240,7 @@ public class TemplateManagerGUI extends GuiContainer {
                         vertexformatelement.getUsage().preDraw(vertexformat, j, i, bytebuffer);
                     }
 
-                    GlStateManager.glDrawArrays(bufferBuilder.getDrawMode(), 0, bufferBuilder.getVertexCount());
+                    GlStateManager.drawArrays(bufferBuilder.getDrawMode(), 0, bufferBuilder.getVertexCount());
                     int i1 = 0;
 
                     for (int j1 = list.size(); i1 < j1; ++i1) {
@@ -276,7 +257,7 @@ public class TemplateManagerGUI extends GuiContainer {
                 GlStateManager.matrixMode(GL11.GL_PROJECTION);
                 GlStateManager.popMatrix();
                 GlStateManager.matrixMode(GL11.GL_MODELVIEW);
-                GlStateManager.viewport(0, 0, mc.displayWidth, mc.displayHeight);
+                GlStateManager.viewport(0, 0, this.width, this.height);
 
             }
         } else {
@@ -290,88 +271,86 @@ public class TemplateManagerGUI extends GuiContainer {
         }
     }
 
-    @Override
-    protected void actionPerformed(GuiButton b) {
-        if (b.id == buttonHelp.id) {
-            buttonHelp.selected ^= true;
-        } else if (b.id == 0) {
-            PacketHandler.INSTANCE.sendToServer(new PacketTemplateManagerSave(te.getPos(), nameField.getText()));
-        } else if (b.id == 1) {
-            PacketHandler.INSTANCE.sendToServer(new PacketTemplateManagerLoad(te.getPos()));
-        } else if (b.id == 2) {
-            TemplateManagerCommands.copyTemplate(container);
-        } else if (b.id == 3) {
-            String CBString = getClipboardString();
-            //System.out.println("CBString Length: " + CBString.length());
-            //System.out.println(CBString);
-            try {
-                NBTTagCompound tagCompound = JsonToNBT.getTagFromJson(CBString);
-                //BlockMapIntState MapIntState = GadgetCopyPaste.getBlockMapIntState(tagCompound);
-                int[] stateArray = tagCompound.getIntArray("stateIntArray");
-                //int[] posArray = tagCompound.getIntArray("posIntArray");
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                CompressedStreamTools.writeCompressed(tagCompound, baos);
-                //ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
-                //NBTTagCompound newTag = CompressedStreamTools.readCompressed(bais);
-                //System.out.println("BAOS Size: " + baos.size());
+    // @todo: reimplement @since 1.13.x
+//    @Override
+//    protected void actionPerformed(GuiButton b) {
+//        if (b.id == buttonHelp.id) {
+//            buttonHelp.selected ^= true;
+//        } else if (b.id == 0) {
+//            // @todo: reimplement @since 1.13.x
+////            PacketHandler.INSTANCE.sendToServer(new PacketTemplateManagerSave(te.getPos(), nameField.getText()));
+//        } else if (b.id == 1) {
+//            // @todo: reimplement @since 1.13.x
+////            PacketHandler.INSTANCE.sendToServer(new PacketTemplateManagerLoad(te.getPos()));
+//        } else if (b.id == 2) {
+//            TemplateManagerCommands.copyTemplate(container);
+//        } else if (b.id == 3) {
+//            String CBString = mc.keyboardListener.getClipboardString();
+//            //System.out.println("CBString Length: " + CBString.length());
+//            //System.out.println(CBString);
+//            try {
+//                NBTTagCompound tagCompound = JsonToNBT.getTagFromJson(CBString);
+//                //BlockMapIntState MapIntState = GadgetCopyPaste.getBlockMapIntState(tagCompound);
+//                int[] stateArray = tagCompound.getIntArray("stateIntArray");
+//                //int[] posArray = tagCompound.getIntArray("posIntArray");
+//                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+//                CompressedStreamTools.writeCompressed(tagCompound, baos);
+//                //ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+//                //NBTTagCompound newTag = CompressedStreamTools.readCompressed(bais);
+//                //System.out.println("BAOS Size: " + baos.size());
+//
+//                //Anything larger than below is likely to overflow the max packet size, crashing your client.
+//                if (stateArray.length <= 12000 && baos.size() < 31000) {
+//// @todo: reimplement @since 1.13.x
+//                    //                    PacketHandler.INSTANCE.sendToServer(new PacketTemplateManagerPaste(tagCompound, te.getPos(), nameField.getText()));
+//                    Minecraft.getInstance().player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.pastesuccess").getUnformattedComponentText()), false);
+//                } else {
+//                    Minecraft.getInstance().player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.pastetoobig").getUnformattedComponentText()), false);
+//                }
+//            } catch (Throwable t) {
+//                BuildingGadgets.logger.error(t);
+//                Minecraft.getInstance().player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.pastefailed").getUnformattedComponentText()), false);
+//            }
+//        }
+//    }
 
-                //Anything larger than below is likely to overflow the max packet size, crashing your client.
-                if (stateArray.length <= 12000 && baos.size() < 31000) {
-                    PacketHandler.INSTANCE.sendToServer(new PacketTemplateManagerPaste(tagCompound, te.getPos(), nameField.getText()));
-                    Minecraft.getInstance().player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.pastesuccess").getUnformattedComponentText()), false);
-                } else {
-                    Minecraft.getInstance().player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.pastetoobig").getUnformattedComponentText()), false);
-                }
-            } catch (Throwable t) {
-                BuildingGadgets.logger.error(t);
-                Minecraft.getInstance().player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.pastefailed").getUnformattedComponentText()), false);
-            }
-        }
+
+    @Override
+    public boolean keyPressed(int p_keyPressed_1_, int p_keyPressed_2_, int p_keyPressed_3_) {
+        this.nameField.keyPressed(p_keyPressed_1_, p_keyPressed_2_, p_keyPressed_3_);
+
+        return super.keyPressed(p_keyPressed_1_, p_keyPressed_2_, p_keyPressed_3_);
     }
-
-    /*public static void sendSplitArrays(int[] stateArray, int[] posArray, Map<Short, IBlockState> stateMap) {
-
-        System.out.println("PosArray Length: " + posArray.length);
-    }*/
-
+    
     @Override
-    protected void keyTyped(char typedChar, int keyCode) throws IOException {
-        if (this.nameField.textboxKeyTyped(typedChar, keyCode)) {
-
-        } else {
-            super.keyTyped(typedChar, keyCode);
-        }
-    }
-
-    @Override
-    protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
+    public boolean mouseClicked(double mouseX, double mouseY, int mouseButton) {
         if (this.nameField.mouseClicked(mouseX, mouseY, mouseButton)) {
             nameField.setFocused(true);
         } else {
             nameField.setFocused(false);
-            if (panel.contains(mouseX - guiLeft, mouseY - guiTop)) {
+            if (panel.contains((int) mouseX - guiLeft, (int) mouseY - guiTop)) {
                 clickButton = mouseButton;
                 panelClicked = true;
-                clickX = Mouse.getX();
-                clickY = Mouse.getY();
+                clickX = (int) mc.mouseHelper.getMouseX();
+                clickY = (int) mc.mouseHelper.getMouseY();
             }
-            super.mouseClicked(mouseX, mouseY, mouseButton);
         }
+
+        return super.mouseClicked(mouseX, mouseY, mouseButton);
     }
 
     @Override
-    protected void mouseReleased(int mouseX, int mouseY, int state) {
-        super.mouseReleased(mouseX, mouseY, state);
-//        if (panelClicked) {
-//            lastDragTime = System.currentTimeMillis();
-//        }
+    public boolean mouseReleased(double mouseX, double mouseY, int state) {
         panelClicked = false;
         initRotX = rotX;
         initRotY = rotY;
         initPanX = panX;
         initPanY = panY;
         initZoom = zoom;
+
+        return super.mouseReleased(mouseX, mouseY, state);
     }
+
 
     @Override
     protected void drawGuiContainerForegroundLayer(int j, int i) {
@@ -380,16 +359,16 @@ public class TemplateManagerGUI extends GuiContainer {
             if (clickButton == 0) {
                 prevRotX = rotX;
                 prevRotY = rotY;
-                rotX = initRotX - (Mouse.getY() - clickY);
-                rotY = initRotY + (Mouse.getX() - clickX);
+                rotX = initRotX - ((int) mc.mouseHelper.getMouseY() - clickY);
+                rotY = initRotY + ((int) mc.mouseHelper.getMouseX() - clickX);
                 momentumX = rotX - prevRotX;
                 momentumY = rotY - prevRotY;
                 doMomentum = false;
             } else if (clickButton == 1) {
 //                prevPanX = panX;
 //                prevPanY = panY;
-                panX = initPanX + (Mouse.getX() - clickX) / 8;
-                panY = initPanY + (Mouse.getY() - clickY) / 8;
+                panX = initPanX + ((int) mc.mouseHelper.getMouseX() - clickX) / 8;
+                panY = initPanY + ((int) mc.mouseHelper.getMouseY() - clickY) / 8;
             }
         }
 
@@ -408,25 +387,25 @@ public class TemplateManagerGUI extends GuiContainer {
     }
 
     private void drawSlotOverlay(Slot slot) {
-        GlStateManager.translate(0, 0, 1000);
+        GlStateManager.translated(0, 0, 1000);
         drawRect(slot.xPos, slot.yPos, slot.xPos + 16, slot.yPos + 16, -1660903937);
-        GlStateManager.translate(0, 0, -1000);
+        GlStateManager.translated(0, 0, -1000);
     }
 
+
     @Override
-    public void handleMouseInput() throws IOException {
-        super.handleMouseInput();
-        //System.out.println(Mouse.getEventDWheel());
-        zoom = initZoom + Mouse.getEventDWheel() / 2;
+    public boolean mouseScrolled(double p_mouseScrolled_1_) {
+        zoom = initZoom + (float) p_mouseScrolled_1_ / 2;
         if (zoom < -200) zoom = -200;
         if (zoom > 1000) zoom = 1000;
-        //System.out.println(zoom);
 
+        return super.mouseScrolled(p_mouseScrolled_1_);
     }
 
+
     @Override
-    public void updateScreen() {
-        super.updateScreen();
+    public void tick() {
+        super.tick();
 
         if (!panelClicked) {
             initRotX = rotX;

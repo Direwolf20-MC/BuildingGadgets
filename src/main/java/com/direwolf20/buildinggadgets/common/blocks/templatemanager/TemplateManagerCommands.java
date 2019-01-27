@@ -4,15 +4,12 @@ import com.direwolf20.buildinggadgets.common.items.ITemplate;
 import com.direwolf20.buildinggadgets.common.items.ModItems;
 import com.direwolf20.buildinggadgets.common.items.Template;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
-import com.direwolf20.buildinggadgets.common.network.PacketBlockMap;
-import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.tools.*;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -30,8 +27,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import static net.minecraft.client.gui.GuiScreen.setClipboardString;
 
 public class TemplateManagerCommands {
     private static final Set<Item> allowedItemsRight = Stream.of(Items.PAPER, ModItems.template).collect(Collectors.toSet());
@@ -68,7 +63,7 @@ public class TemplateManagerCommands {
         template.incrementCopyCounter(itemStack0);
         tagCompound.setInt("copycounter", template.getCopyCounter(itemStack0));
         tagCompound.setString("UUID", template.getUUID(itemStack0));
-        tagCompound.setString("owner", player.getName());
+        tagCompound.setString("owner", player.getName().getString());
         if (template.equals(ModItems.gadgetCopyPaste)) {
             worldSave.addToMap(UUID, tagCompound);
         } else {
@@ -76,7 +71,8 @@ public class TemplateManagerCommands {
             Template.setName(itemStack0, Template.getName(itemStack1));
         }
         container.putStackInSlot(0, itemStack0);
-        PacketHandler.INSTANCE.sendTo(new PacketBlockMap(tagCompound), (EntityPlayerMP) player);
+// @todo: reimplement @since 1.13.x
+        //        PacketHandler.INSTANCE.sendTo(new PacketBlockMap(tagCompound), (EntityPlayerMP) player);
     }
 
     public static void saveTemplate(TemplateManagerContainer container, EntityPlayer player, String templateName) {
@@ -134,7 +130,8 @@ public class TemplateManagerCommands {
             }
         }
         container.putStackInSlot(1, templateStack);
-        PacketHandler.INSTANCE.sendTo(new PacketBlockMap(templateTagCompound), (EntityPlayerMP) player);
+        // @todo: reimplement @since 1.13.x
+        //        PacketHandler.INSTANCE.sendTo(new PacketBlockMap(templateTagCompound), (EntityPlayerMP) player);
     }
 
     public static void pasteTemplate(TemplateManagerContainer container, EntityPlayer player, NBTTagCompound sentTagCompound, String templateName) {
@@ -177,7 +174,7 @@ public class TemplateManagerCommands {
         mapIntState.getIntStateMapFromNBT(MapIntStateTag);
         mapIntState.makeStackMapFromStateMap(player);
         templateTagCompound.setTag("mapIntStack", mapIntState.putIntStackMapIntoNBT());
-        templateTagCompound.setString("owner", player.getName());
+        templateTagCompound.setString("owner", player.getName().getString());
 
         Multiset<UniqueItem> itemCountMap = HashMultiset.create();
         Map<IBlockState, UniqueItem> intStackMap = mapIntState.intStackMap;
@@ -186,7 +183,7 @@ public class TemplateManagerCommands {
             UniqueItem uniqueItem = intStackMap.get(blockMap.state);
             if (!(uniqueItem == null)) {
                 NonNullList<ItemStack> drops = NonNullList.create();
-                blockMap.state.getBlock().getDrops(drops, world, new BlockPos(0, 0, 0), blockMap.state, 0);
+                blockMap.state.getBlock().getDrops(blockMap.state, drops, world, new BlockPos(0, 0, 0), 0);
                 int neededItems = 0;
                 for (ItemStack drop : drops) {
                     if (drop.getItem().equals(uniqueItem.item)) {
@@ -207,11 +204,12 @@ public class TemplateManagerCommands {
 
         template.setStartPos(templateStack, startPos);
         template.setEndPos(templateStack, endPos);
-        //template.setItemCountMap(templateStack, tagMap);
+
         template.setItemCountMap(templateStack, itemCountMap);
         Template.setName(templateStack, templateName);
         container.putStackInSlot(1, templateStack);
-        PacketHandler.INSTANCE.sendTo(new PacketBlockMap(templateTagCompound), (EntityPlayerMP) player);
+        // @todo: reimplement @since 1.13.x
+        //        PacketHandler.INSTANCE.sendTo(new PacketBlockMap(templateTagCompound), (EntityPlayerMP) player);
     }
 
     public static void copyTemplate(TemplateManagerContainer container) {
@@ -232,7 +230,8 @@ public class TemplateManagerCommands {
             //NBTTagList tagList = GadgetUtils.itemCountToNBT(tagMap);
             //newCompound.setTag("itemcountmap", tagList);
             String jsonTag = newCompound.toString();
-            setClipboardString(jsonTag);
+
+            Minecraft.getInstance().keyboardListener.setClipboardString(jsonTag);
             Minecraft.getInstance().player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.copysuccess").getUnformattedComponentText()), false);
         }
     }

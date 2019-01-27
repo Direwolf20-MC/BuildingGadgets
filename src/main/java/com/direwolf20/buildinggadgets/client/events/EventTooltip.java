@@ -23,6 +23,8 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.RenderTooltipEvent;
@@ -38,13 +40,13 @@ public class EventTooltip {
     private static final int STACKS_PER_LINE = 8;
 
     @OnlyIn(Dist.CLIENT)
-    private static void tooltipIfShift(@SuppressWarnings("unused") List<String> tooltip, Runnable r) {
+    private static void tooltipIfShift(@SuppressWarnings("unused") List<ITextComponent> tooltip, Runnable r) {
         if (GuiScreen.isShiftKeyDown())
             r.run();
         //else addToTooltip(tooltip, "arl.misc.shiftForInfo");
     }
 
-    public static void addTemplatePadding(ItemStack stack, List<String> tooltip) {
+    public static void addTemplatePadding(ItemStack stack, List<ITextComponent> tooltip) {
         //This method extends the tooltip box size to fit the item's we will render in onDrawTooltip
         Minecraft mc = Minecraft.getInstance();
         if (stack.getItem() instanceof ITemplate) {
@@ -81,7 +83,7 @@ public class EventTooltip {
                         spaces += " ";
 
                     for (int j = 0; j < lines; j++)
-                        tooltip.add(spaces);
+                        tooltip.add(new TextComponentString(spaces));
                 });
         }
     }

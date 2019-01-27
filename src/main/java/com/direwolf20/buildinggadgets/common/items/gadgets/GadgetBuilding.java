@@ -14,6 +14,7 @@ import com.direwolf20.buildinggadgets.common.tools.VectorTools;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Enchantments;
@@ -24,6 +25,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
@@ -58,13 +60,13 @@ public class GadgetBuilding extends GadgetGeneric {
 
     public static final ResourceLocation REGISTRY_NAME = new ResourceLocation("buildingtool");
 
-    public GadgetBuilding() {
-        setRegistryName(REGISTRY_NAME);        // The unique name (within your mod) that identifies this item
+    public GadgetBuilding(Builder builder) {
+        super(builder.maxStackSize(1));
+        setRegistryName(REGISTRY_NAME);
 
 //        setUnlocalizedName(BuildingGadgets.MODID + ".buildingtool");     // Used for localization (en_US.lang)
-//        setMaxStackSize(1);
         if (!SyncedConfig.poweredByFE) {
-//            setMaxDamage(SyncedConfig.durabilityBuilder);
+            builder.defaultMaxDamage(SyncedConfig.durabilityBuilder);
         }
     }
 
@@ -85,7 +87,7 @@ public class GadgetBuilding extends GadgetGeneric {
             tagCompound = new NBTTagCompound();
         }
         tagCompound.setString("mode", mode.name());
-        stack.setTagCompound(tagCompound);
+        stack.setTag(tagCompound);
     }
 
     public static ToolMode getToolMode(ItemStack stack) {
@@ -104,19 +106,20 @@ public class GadgetBuilding extends GadgetGeneric {
     }
 
     @Override
-    public void addInformation(ItemStack stack, @Nullable World world, List<String> list, ITooltipFlag b) {
-        //Add tool information to the tooltip
-        super.addInformation(stack, world, list, b);
-        list.add(TextFormatting.DARK_GREEN + I18n.format("tooltip.gadget.block") + ": " + getToolBlock(stack).getBlock().getLocalizedName());
-        list.add(TextFormatting.AQUA + I18n.format("tooltip.gadget.mode") + ": " + getToolMode(stack));
+    public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+        super.addInformation(stack, worldIn, tooltip, flagIn);
+
+        tooltip.add(new TextComponentString(TextFormatting.DARK_GREEN + I18n.format("tooltip.gadget.block") + ": " + getToolBlock(stack).getBlock().getRegistryName()));
+        tooltip.add(new TextComponentString(TextFormatting.AQUA + I18n.format("tooltip.gadget.mode") + ": " + getToolMode(stack)));
         if (getToolMode(stack) != ToolMode.BuildToMe) {
-            list.add(TextFormatting.RED + I18n.format("tooltip.gadget.range") + ": " + getToolRange(stack));
+            tooltip.add(new TextComponentString(TextFormatting.RED + I18n.format("tooltip.gadget.range") + ": " + getToolRange(stack)));
         }
         if (SyncedConfig.poweredByFE) {
             IEnergyStorage energy = CapabilityProviderEnergy.getCap(stack);
-            list.add(TextFormatting.WHITE + I18n.format("tooltip.gadget.energy") + ": " + withSuffix(energy.getEnergyStored()) + "/" + withSuffix(energy.getMaxEnergyStored()));
+            tooltip.add(new TextComponentString(TextFormatting.WHITE + I18n.format("tooltip.gadget.energy") + ": " + withSuffix(energy.getEnergyStored()) + "/" + withSuffix(energy.getMaxEnergyStored())));
         }
     }
+
 
     @Override
     public EnumActionResult onItemUse(ItemUseContext context) {
@@ -202,7 +205,8 @@ public class GadgetBuilding extends GadgetGeneric {
             for (BlockPos coordinate : coords) {
                 if (fakeWorld.getWorldType() != WorldType.DEBUG_ALL_BLOCK_STATES) {
                     try { //Get the state of the block in the fake world (This lets fences be connected, etc)
-                        state = blockState.getActualState(fakeWorld, coordinate);
+// @todo: reimplement @since 1.13.x
+                        //                        state = blockState.getExtendedState(fakeWorld, coordinate);
                     } catch (Exception var8) {
                     }
                 }
@@ -276,7 +280,7 @@ public class GadgetBuilding extends GadgetGeneric {
         boolean useConstructionPaste = false;
 
         ItemStack itemStack;
-        if (setBlock.getBlock().canSilkHarvest(world, pos, setBlock, player)) {
+        if (setBlock.getBlock().canSilkHarvest(setBlock, world, pos, player)) {
             itemStack = InventoryManipulation.getSilkTouchDrop(setBlock);
         } else {
             itemStack = setBlock.getBlock().getPickBlock(setBlock, null, world, pos, player);
@@ -286,7 +290,7 @@ public class GadgetBuilding extends GadgetGeneric {
         }
 
         NonNullList<ItemStack> drops = NonNullList.create();
-        setBlock.getBlock().getDrops(drops, world, pos, setBlock, 0);
+        setBlock.getBlock().getDrops(setBlock, drops, world, pos, 0);
         int neededItems = 0;
         for (ItemStack drop : drops) {
             if (drop.getItem().equals(itemStack.getItem())) {
@@ -341,8 +345,7 @@ public class GadgetBuilding extends GadgetGeneric {
     }
 
     @Override
-    public int getMaxItemUseDuration(ItemStack stack) {
+    public int getUseDuration(ItemStack stack) {
         return 20;
     }
-
 }

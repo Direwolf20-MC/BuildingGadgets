@@ -42,7 +42,7 @@ public class CopyPasteGUI extends GuiScreen {
     private static final ResourceLocation background = new ResourceLocation(BuildingGadgets.MODID, "textures/gui/testcontainer.png");
     private List<GuiTextFieldWithDefault> guiList = new ArrayList<>();
 
-    CopyPasteGUI(ItemStack tool) {
+    public CopyPasteGUI(ItemStack tool) {
         super();
         this.copyPasteTool = tool;
     }

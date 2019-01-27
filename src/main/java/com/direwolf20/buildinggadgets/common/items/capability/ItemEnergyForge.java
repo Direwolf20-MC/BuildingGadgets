@@ -32,7 +32,7 @@ public class ItemEnergyForge extends EnergyStorage {
         if (amount > 0 && !simulate) {
             NBTTagCompound nbt = stack.getTag();
             if (nbt == null) {
-                stack.setTagCompound(nbt = new NBTTagCompound());
+                stack.setTag(nbt = new NBTTagCompound());
             }
 
             nbt.setInt(NBT_ENERGY, getEnergyStored());
