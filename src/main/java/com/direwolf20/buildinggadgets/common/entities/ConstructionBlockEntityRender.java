@@ -29,9 +29,9 @@ public class ConstructionBlockEntityRender extends Render<ConstructionBlockEntit
         Minecraft mc = Minecraft.getInstance();
         GlStateManager.pushMatrix();
         GlStateManager.enableBlend();
-        GlStateManager.blendFunc(GL11.GL_CONSTANT_ALPHA, GL11.GL_ONE_MINUS_CONSTANT_ALPHA);
+        GlStateManager.blendFunc(GL11.GL_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
-        mc.renderEngine.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+        mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
         int teCounter = entity.getTicksExisted();
         int maxLife = entity.maxLife;
         if (teCounter > maxLife) {
@@ -41,10 +41,10 @@ public class ConstructionBlockEntityRender extends Render<ConstructionBlockEntit
         if (entity.getMakingPaste()) {
             scale = (float) teCounter / maxLife;
         }
-        GlStateManager.translate(x, y, z);
-        GlStateManager.translate(-0.0005f, -0.0005f, -0.0005f);
-        GlStateManager.scale(1.001f, 1.001f, 1.001f);//Slightly Larger block to avoid z-fighting.
-        GlStateManager.rotate(-90.0F, 0.0F, 1.0F, 0.0F);
+        GlStateManager.translated(x, y, z);
+        GlStateManager.translatef(-0.0005f, -0.0005f, -0.0005f);
+        GlStateManager.scalef(1.001f, 1.001f, 1.001f);//Slightly Larger block to avoid z-fighting.
+        GlStateManager.rotatef(-90.0F, 0.0F, 1.0F, 0.0F);
 
         GL14.glBlendColor(1F, 1F, 1F, scale); //Set the alpha of the blocks we are rendering
         IBlockState renderBlockState = ModBlocks.constructionBlock.getDefaultState();

@@ -6,6 +6,7 @@ import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.blocks.ModBlocks;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.network.datasync.DataParameter;
@@ -21,19 +22,20 @@ public class ConstructionBlockEntity extends Entity {
     private static final DataParameter<Boolean> MAKING = EntityDataManager.createKey(ConstructionBlockEntity.class, DataSerializers.BOOLEAN);
 
     private int despawning = -1;
-    public int maxLife = 80;
+
     private BlockPos setPos;
-    //    private EntityLivingBase spawnedBy;
     private World world;
 
-    public ConstructionBlockEntity(World worldIn) {
-        super(worldIn);
+    int maxLife = 80;
+
+    public ConstructionBlockEntity(EntityType type, World worldIn) {
+        super(type, worldIn);
         setSize(0.1F, 0.1F);
         world = worldIn;
     }
 
-    public ConstructionBlockEntity(World worldIn, BlockPos spawnPos, boolean makePaste) {
-        super(worldIn);
+    public ConstructionBlockEntity(EntityType type, World worldIn, BlockPos spawnPos, boolean makePaste) {
+        super(type, worldIn);
         setSize(0.1F, 0.1F);
         world = worldIn;
         setPosition(spawnPos.getX(), spawnPos.getY(), spawnPos.getZ());
@@ -41,8 +43,14 @@ public class ConstructionBlockEntity extends Entity {
         setMakingPaste(makePaste);
     }
 
-    public int getTicksExisted() {
+    int getTicksExisted() {
         return ticksExisted;
+    }
+
+    @Override
+    protected void registerData() {
+        this.dataManager.register(FIXED, BlockPos.ORIGIN);
+        this.dataManager.register(MAKING, false);
     }
 
     /**
@@ -106,13 +114,8 @@ public class ConstructionBlockEntity extends Entity {
     private void despawnTick() {
         despawning++;
         if (despawning > 1) {
-            setDead();
+            this.remove();
         }
-    }
-
-    @Override
-    public void setDead() {
-        this.isDead = true;
     }
 
     public void setMakingPaste(Boolean paste) {
@@ -124,31 +127,24 @@ public class ConstructionBlockEntity extends Entity {
     }
 
     @Override
-    public void writeEntityToNBT(NBTTagCompound compound) {
-        compound.setInt("despawning", despawning);
-        compound.setInt("ticksExisted", ticksExisted);
-        compound.setTag("setPos", NBTUtil.createPosTag(setPos));
-        compound.setBoolean("makingPaste", getMakingPaste());
+    public boolean isInRangeToRender3d(double x, double y, double z) {
+        return true;
     }
 
     @Override
-    public void readEntityFromNBT(NBTTagCompound compound) {
-        //System.out.println(compound);
+    protected void readAdditional(NBTTagCompound compound) {
         despawning = compound.getInt("despawning");
         ticksExisted = compound.getInt("ticksExisted");
-        setPos = NBTUtil.getPosFromTag(compound.getCompound("setPos"));
+        setPos = NBTUtil.readBlockPos(compound.getCompound("setPos"));
         setMakingPaste(compound.getBoolean("makingPaste"));
     }
 
     @Override
-    protected void entityInit() {
-        this.dataManager.register(FIXED, BlockPos.ORIGIN);
-        this.dataManager.register(MAKING, false);
-    }
-
-    @Override
-    public boolean isInRangeToRender3d(double x, double y, double z) {
-        return true;
+    protected void writeAdditional(NBTTagCompound compound) {
+        compound.setInt("despawning", despawning);
+        compound.setInt("ticksExisted", ticksExisted);
+        compound.setTag("setPos", NBTUtil.writeBlockPos(setPos));
+        compound.setBoolean("makingPaste", getMakingPaste());
     }
 
     @Override
