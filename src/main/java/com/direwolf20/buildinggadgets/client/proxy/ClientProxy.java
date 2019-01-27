@@ -3,14 +3,15 @@ package com.direwolf20.buildinggadgets.client.proxy;
 import com.direwolf20.buildinggadgets.client.KeyBindings;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.blocks.ModBlocks;
-import com.direwolf20.buildinggadgets.common.blocks.Models.BakedModelLoader;
 import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManagerContainer;
 import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
-import com.direwolf20.buildinggadgets.common.entities.*;
+import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
+import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntityRender;
+import com.direwolf20.buildinggadgets.common.entities.ConstructionBlockEntity;
+import com.direwolf20.buildinggadgets.common.entities.ConstructionBlockEntityRender;
 import com.direwolf20.buildinggadgets.common.items.ModItems;
 import com.direwolf20.buildinggadgets.common.items.gadgets.*;
 import com.direwolf20.buildinggadgets.common.proxy.CommonProxy;
-import com.direwolf20.buildinggadgets.common.tools.PasteContainerMeshDefinition;
 import com.direwolf20.buildinggadgets.common.tools.ToolRenders;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
@@ -20,13 +21,9 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
-import net.minecraftforge.client.model.ModelLoader;
-import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.Mod;
-
-import static com.direwolf20.buildinggadgets.common.items.ModItems.gadgetBuilding;
 
 @Mod.EventBusSubscriber(value = Dist.CLIENT, modid = BuildingGadgets.MODID)
 public class ClientProxy extends CommonProxy {
@@ -49,20 +46,20 @@ public class ClientProxy extends CommonProxy {
     public static void registerModels(@SuppressWarnings("unused") ModelRegistryEvent event) {
         ModBlocks.effectBlock.initModel();
         ModBlocks.templateManager.initModel();
-        gadgetBuilding.initModel();
-        ModItems.gadgetExchanger.initModel();
-        ModItems.gadgetCopyPaste.initModel();
+//        gadgetBuilding.initModel();
+//        ModItems.gadgetExchanger.initModel();
+//        ModItems.gadgetCopyPaste.initModel();
         ModItems.template.initModel();
         if (SyncedConfig.enableDestructionGadget) {
-            ModItems.gadgetDestruction.initModel();
+//            ModItems.gadgetDestruction.initModel();
         }
         if (SyncedConfig.enablePaste) {
             ModItems.constructionPaste.initModel();
             ModItems.constructionPasteContainer.initModel();
             ModItems.constructionPasteContainert2.initModel();
             ModItems.constructionPasteContainert3.initModel();
-            ModBlocks.constructionBlock.initModel();
-            ModBlocks.constructionBlockPowder.initModel();
+//            ModBlocks.constructionBlock.initModel();
+//            ModBlocks.constructionBlockPowder.initModel();
 
         // REIMPLEMENT
 //            ModelLoader.setCustomMeshDefinition(ModItems.constructionPasteContainer, new PasteContainerMeshDefinition());

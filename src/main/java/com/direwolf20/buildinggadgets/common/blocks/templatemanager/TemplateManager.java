@@ -56,10 +56,10 @@ public class TemplateManager extends Block {
 
 // TODO: Reimplement
 
-//    @OnlyIn(Dist.CLIENT)
-//    public void initModel() {
+    @OnlyIn(Dist.CLIENT)
+    public void initModel() {
 //        ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(this), 0, new ModelResourceLocation(getRegistryName(), "inventory"));
-//    }
+    }
 
 
     @Nullable
