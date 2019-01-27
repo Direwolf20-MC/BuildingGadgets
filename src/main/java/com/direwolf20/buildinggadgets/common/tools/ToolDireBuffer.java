@@ -70,7 +70,7 @@ public class ToolDireBuffer extends BufferBuilder {
         final float[] afloat = new float[i];
 
         for (int j = 0; j < i; ++j) {
-            afloat[j] = getDistanceSq(this.rawFloatBuffer, (float) (p_181674_1_ + this.xOffset), (float) (p_181674_2_ + this.yOffset), (float) (p_181674_3_ + this.zOffset), this.vertexFormat.getIntSize(), j * this.vertexFormat.getSize());
+            afloat[j] = getDistanceSq(this.rawFloatBuffer, (float) (p_181674_1_ + this.xOffset), (float) (p_181674_2_ + this.yOffset), (float) (p_181674_3_ + this.zOffset), this.vertexFormat.getSize(), j * this.vertexFormat.getSize());
         }
 
         Integer[] ainteger = new Integer[i];
@@ -129,7 +129,7 @@ public class ToolDireBuffer extends BufferBuilder {
     }
 
     private int getBufferSize() {
-        return this.vertexCount * this.vertexFormat.getIntSize();
+        return this.vertexCount * this.vertexFormat.getSize();
     }
 
     private static float getDistanceSq(FloatBuffer p_181665_0_, float p_181665_1_, float p_181665_2_, float p_181665_3_, int p_181665_4_, int p_181665_5_) {
@@ -241,7 +241,7 @@ public class ToolDireBuffer extends BufferBuilder {
 
     @Override
     public void putBrightness4(int p_178962_1_, int p_178962_2_, int p_178962_3_, int p_178962_4_) {
-        int i = (this.vertexCount - 4) * this.vertexFormat.getIntSize() + this.vertexFormat.getUvOffsetById(1) / 4;
+        int i = (this.vertexCount - 4) * this.vertexFormat.getSize() + this.vertexFormat.getUvOffsetById(1) / 4;
         int j = this.vertexFormat.getSize() >> 2;
         this.rawIntBuffer.put(i, p_178962_1_);
         this.rawIntBuffer.put(i + j, p_178962_2_);
@@ -251,7 +251,7 @@ public class ToolDireBuffer extends BufferBuilder {
 
     @Override
     public void putPosition(double x, double y, double z) {
-        int i = this.vertexFormat.getIntSize();
+        int i = this.vertexFormat.getSize();
         int j = (this.vertexCount - 4) * i;
 
         for (int k = 0; k < 4; ++k) {
@@ -398,7 +398,7 @@ public class ToolDireBuffer extends BufferBuilder {
         this.growBuffer(vertexData.length * 4 + this.vertexFormat.getSize());//Forge, fix MC-122110
         this.rawIntBuffer.position(this.getBufferSize());
         this.rawIntBuffer.put(vertexData);
-        this.vertexCount += vertexData.length / this.vertexFormat.getIntSize();
+        this.vertexCount += vertexData.length / this.vertexFormat.getSize();
     }
 
     @Override
@@ -563,7 +563,7 @@ public class ToolDireBuffer extends BufferBuilder {
         }
 
         public int getVertexCount() {
-            return this.stateRawBuffer.length / this.stateVertexFormat.getIntSize();
+            return this.stateRawBuffer.length / this.stateVertexFormat.getSize();
         }
 
         public VertexFormat getVertexFormat() {
