@@ -1,22 +1,24 @@
 package com.direwolf20.buildinggadgets.common.items;
 
-import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import net.minecraft.client.renderer.block.model.ModelBakery;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class ConstructionPasteContainer extends GenericPasteContainer {
 
     public static int maxAmount = 512;
 
-    public ConstructionPasteContainer() {
+    public ConstructionPasteContainer(Builder builder) {
+        super(builder.maxStackSize(1));
+
         setRegistryName("constructionpastecontainer");        // The unique name (within your mod) that identifies this item
-        setUnlocalizedName(BuildingGadgets.MODID + ".constructionpastecontainer");     // Used for localization (en_US.lang)
-        setMaxStackSize(1);
+//        setUnlocalizedName(BuildingGadgets.MODID + ".constructionpastecontainer");     // Used for localization (en_US.lang)
+//        setMaxStackSize(1);
+
     }
 
-    @SideOnly(Side.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     public void initModel() {
         ModelBakery.registerItemVariants(this,
                 new ModelResourceLocation(getRegistryName(), "inventory"),
