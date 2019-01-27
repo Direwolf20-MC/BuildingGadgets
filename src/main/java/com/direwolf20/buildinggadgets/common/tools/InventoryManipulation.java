@@ -1,11 +1,14 @@
 package com.direwolf20.buildinggadgets.common.tools;
 
+import com.direwolf20.buildinggadgets.client.RemoteInventoryCache;
 import com.direwolf20.buildinggadgets.common.items.ConstructionPaste;
 import com.direwolf20.buildinggadgets.common.items.GenericPasteContainer;
 import com.direwolf20.buildinggadgets.common.items.ModItems;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Multiset;
+
 import net.minecraft.block.*;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyEnum;
@@ -24,6 +27,8 @@ import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 
 import java.util.*;
+
+import javax.annotation.Nullable;
 
 public class InventoryManipulation {
     private static IProperty AXIS = PropertyEnum.create("axis", EnumFacing.Axis.class);
@@ -113,16 +118,32 @@ public class InventoryManipulation {
     }
 
     public static int countItem(ItemStack itemStack, EntityPlayer player, World world) {
+        return countItem(itemStack, player, world, null);
+    }
+
+    public static int countItem(ItemStack itemStack, EntityPlayer player, RemoteInventoryCache cache) {
+        return countItem(itemStack, player, null, cache);
+    }
+
+    private static int countItem(ItemStack itemStack, EntityPlayer player, @Nullable World world, @Nullable RemoteInventoryCache cache) {
         if (player.capabilities.isCreativeMode) {
             return 10000;
         }
         int count = 0;
         ItemStack tool = GadgetGeneric.getGadget(player);
-        BlockPos tePos = GadgetUtils.getBoundTE(tool, world);
-        if (tePos != null) {
-            TileEntity te = world.getTileEntity(tePos);
-            IItemHandler cap = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
-            count += countInContainer(cap, itemStack.getItem(), itemStack.getMetadata());
+        if (cache != null) {
+            Multiset<UniqueItem> cacheInv = cache.getCache(tool);
+            if (cacheInv != null)
+                count += cacheInv.count(new UniqueItem(itemStack.getItem(), itemStack.getMetadata()));
+        } else if (world != null) {
+            BlockPos tePos = GadgetUtils.getBoundTE(tool, world);
+            if (tePos != null) {
+                TileEntity te = world.getTileEntity(tePos);
+                if (te != null) {
+                    IItemHandler cap = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
+                    count += countInContainer(cap, itemStack.getItem(), itemStack.getMetadata());
+                }
+            }
         }
 
         InventoryPlayer inv = player.inventory;
@@ -250,7 +271,7 @@ public class InventoryManipulation {
         return containers;
     }
 
-    private static int countInContainer(IItemHandler container, Item item, int meta) {
+    public static int countInContainer(IItemHandler container, Item item, int meta) {
         int count = 0;
         ItemStack tempItem;
         for (int i = 0; i < container.getSlots(); ++i) {

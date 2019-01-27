@@ -300,7 +300,7 @@ public class GadgetUtils {
         return true;
     }
 
-    public static boolean setBoundTE(ItemStack tool, @Nullable BlockPos pos, int dim, World world) {
+    public static boolean setBoundTE(ItemStack tool, @Nullable BlockPos pos, int dim, World world) {//TODO include dimension along with pos
         TileEntity te = world.getTileEntity(pos);
         if (te == null) return false;
         IItemHandler cap = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
@@ -309,7 +309,7 @@ public class GadgetUtils {
         return true;
     }
 
-    public static BlockPos getBoundTE(ItemStack tool, World world) {
+    public static BlockPos getBoundTE(ItemStack tool, World world) {//TODO include dimension along with pos
         BlockPos pos = getPOSFromNBT(tool, "boundTE");
         //BlockPos blankPos = new BlockPos(0,0,0);
         if (pos == null) return null;
