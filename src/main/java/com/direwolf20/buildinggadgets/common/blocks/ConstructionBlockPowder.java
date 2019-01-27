@@ -13,6 +13,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.IBlockReader;
+import net.minecraft.world.IWorld;
+import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
@@ -43,38 +45,41 @@ public class ConstructionBlockPowder extends BlockFalling {
         }
     }
 
-    private boolean tryTouchWater(World worldIn, BlockPos pos) {
-        boolean flag = false;
+    private boolean tryTouchWater(IWorld worldIn, BlockPos pos) {
+        boolean foundWater = false;
 
         for (EnumFacing enumfacing : EnumFacing.values()) {
             if (enumfacing != EnumFacing.DOWN) {
                 BlockPos blockpos = pos.offset(enumfacing);
 
-                if (worldIn.getBlockState(blockpos).getMaterial() == Material.WATER) {
-                    flag = true;
+                if (worldIn.getBlockState(blockpos).getMaterial().isLiquid()) {
+                    foundWater = true;
                     break;
                 }
             }
         }
 
-        if (flag) {
-            if (worldIn.getEntitiesWithinAABB(ConstructionBlockEntity.class, new AxisAlignedBB(pos.getX()-0.5, pos.getY()-0.5, pos.getZ()-0.5, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5)).isEmpty()) {
-                worldIn.spawnEntity(new ConstructionBlockEntity(worldIn, pos, true));
+        if (foundWater) {
+            if (worldIn.getWorld().getEntitiesWithinAABB(ConstructionBlockEntity.class, new AxisAlignedBB(pos.getX() - 0.5, pos.getY() - 0.5, pos.getZ() - 0.5, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5)).isEmpty()) {
+                worldIn.spawnEntity(new ConstructionBlockEntity(worldIn.getWorld(), pos, true));
             }
         }
 
-        return flag;
+        return foundWater;
     }
 
     /**
-     * Called when a neighboring block was changed and marks that this state should perform any checks during a neighbor
-     * change. Cases may include when redstone power is updated, cactus blocks popping off due to a neighboring solid
-     * block, etc.
+     * Called when a tile entity on a side of this block changes is created or is destroyed.
+     *
+     * @param state
+     * @param world    The world
+     * @param pos      Block position in world
+     * @param neighbor Block position of neighbor
      */
     @Override
-    public void neighborChanged(IBlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos fromPos) {
-        if (!this.tryTouchWater(worldIn, pos)) {
-            super.neighborChanged(state, worldIn, pos, blockIn, fromPos);
+    public void onNeighborChange(IBlockState state, IWorldReader world, BlockPos pos, BlockPos neighbor) {
+        if (world instanceof IWorld) {
+            this.tryTouchWater((IWorld) world, pos);
         }
     }
 
