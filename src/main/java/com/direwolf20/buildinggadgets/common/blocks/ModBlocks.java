@@ -3,27 +3,27 @@ package com.direwolf20.buildinggadgets.common.blocks;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManager;
 import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
-import net.minecraft.client.Minecraft;
+import net.minecraft.block.material.MapColor;
+import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.color.BlockColors;
-import net.minecraftforge.fml.common.registry.GameRegistry;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.registries.ObjectHolder;
 
-@GameRegistry.ObjectHolder(BuildingGadgets.MODID)
+@ObjectHolder(BuildingGadgets.MODID)
 public class ModBlocks {
-
-    @GameRegistry.ObjectHolder("effectblock")
+    public static final Material EFFECT_BLOCK_MATERIAL = new Material.Builder(MapColor.AIR).notSolid().build();
+    @ObjectHolder("effect_block")
     public static EffectBlock effectBlock;
-    @GameRegistry.ObjectHolder("constructionblock")
+    @ObjectHolder("construction_block")
     public static ConstructionBlock constructionBlock;
-    @GameRegistry.ObjectHolder("constructionblockpowder")
+    @ObjectHolder("construction_block_powder")
     public static ConstructionBlockPowder constructionBlockPowder;
-    @GameRegistry.ObjectHolder("templatemanager")
+    @ObjectHolder("template_manager")
     public static TemplateManager templateManager;
 
-    @SideOnly(Side.CLIENT)
-    public static void initColorHandlers() {
-        BlockColors blockColors = Minecraft.getMinecraft().getBlockColors();
-        if (SyncedConfig.enablePaste) {constructionBlock.initColorHandler(blockColors);}
+    public static void initColorHandlers() { //TODO ItemBlock Creative Tabs
+        BlockColors blockColors = BuildingGadgets.getInstance().getMinecraft().getBlockColors();
+        if (SyncedConfig.enablePaste) constructionBlock.initColorHandler(blockColors);
     }
+
+
 }

@@ -55,8 +55,10 @@ public class GadgetBuilding extends GadgetGeneric {
         }
     }
 
+    public static final ResourceLocation REGISTRY_NAME = new ResourceLocation("buildingtool");
+
     public GadgetBuilding() {
-        setRegistryName("buildingtool");        // The unique name (within your mod) that identifies this item
+        setRegistryName(REGISTRY_NAME);        // The unique name (within your mod) that identifies this item
         setUnlocalizedName(BuildingGadgets.MODID + ".buildingtool");     // Used for localization (en_US.lang)
         setMaxStackSize(1);
         if (!SyncedConfig.poweredByFE) {

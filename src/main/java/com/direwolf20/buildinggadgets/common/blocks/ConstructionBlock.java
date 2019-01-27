@@ -1,65 +1,53 @@
 package com.direwolf20.buildinggadgets.common.blocks;
 
-import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.blocks.Models.BlockstateProperty;
-import com.direwolf20.buildinggadgets.common.blocks.Models.ConstructionBakedModel;
 import com.direwolf20.buildinggadgets.common.items.FakeRenderWorld;
 import com.direwolf20.buildinggadgets.common.items.ModItems;
+import javafx.geometry.Side;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.properties.IProperty;
-import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.state.BlockFaceShape;
-import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.renderer.block.model.ModelResourceLocation;
-import net.minecraft.client.renderer.block.statemap.StateMapperBase;
 import net.minecraft.client.renderer.color.BlockColors;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.Item;
+import net.minecraft.state.BooleanProperty;
+import net.minecraft.state.IProperty;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.IItemProvider;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockAccess;
+import net.minecraft.world.IBlockReader;
+import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
-import net.minecraftforge.client.model.ModelLoader;
-import net.minecraftforge.common.property.ExtendedBlockState;
+import net.minecraft.world.chunk.BlockStateContainer;
+import net.minecraftforge.common.property.ExtendedStateContainer;
 import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
-import net.minecraftforge.fml.common.Optional;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-import team.chisel.ctm.api.IFacade;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
-import java.util.Random;
 
-@Optional.Interface(iface = "team.chisel.ctm.api.IFacade", modid = "ctm-api")
-public class ConstructionBlock extends Block implements IFacade {
+//@Optional.Interface(iface = "team.chisel.ctm.api.IFacade", modid = "ctm-api")
+public class ConstructionBlock extends Block /*implements IFacade*/ {
 
     //public static final ConstructionProperty FACADEID = new ConstructionProperty("facadeid");
-    public static final PropertyBool BRIGHT = PropertyBool.create("bright");
-    public static final PropertyBool NEIGHBOR_BRIGHTNESS = PropertyBool.create("neighbor_brightness");
+    public static final IProperty<Boolean> BRIGHT = BooleanProperty.create("bright");
+    public static final IProperty<Boolean> NEIGHBOR_BRIGHTNESS = BooleanProperty.create("neighbor_brightness");
 
     public static final IUnlistedProperty<IBlockState> FACADE_ID = new BlockstateProperty("facadestate");
     public static final IUnlistedProperty<IBlockState> FACADE_EXT_STATE = new BlockstateProperty("facadeextstate");
 
     public ConstructionBlock() {
-        super(Material.ROCK);
-        setHardness(2.0f);
-        setCreativeTab(BuildingGadgets.BUILDING_CREATIVE_TAB);
-        setUnlocalizedName(BuildingGadgets.MODID + ".constructionblock");     // Used for localization (en_US.lang)
-        setRegistryName("constructionblock");        // The unique name (within your mod) that identifies this block
-        setDefaultState(blockState.getBaseState().withProperty(BRIGHT, true).withProperty(NEIGHBOR_BRIGHTNESS, false));
+        super(Block.Builder.create(Material.ROCK).hardnessAndResistance(2.0f));
+        setRegistryName("construction_block");        // The unique name (within your mod) that identifies this block
+        setDefaultState(createBlockState().getBaseState().withProperty(BRIGHT, true).withProperty(NEIGHBOR_BRIGHTNESS, false));
     }
-
-    @SideOnly(Side.CLIENT)
+/*
     public void initModel() {
         ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(this), 0, new ModelResourceLocation(getRegistryName(), "inventory"));
         StateMapperBase ignoreState = new StateMapperBase() {
@@ -69,26 +57,21 @@ public class ConstructionBlock extends Block implements IFacade {
             }
         };
         ModelLoader.setCustomStateMapper(this, ignoreState);
-    }
+    }*/
 
     @Override
-    public Item getItemDropped(IBlockState state, Random rand, int fortune) {
+    public IItemProvider getItemDropped(IBlockState state, World worldIn, BlockPos pos, int fortune) {
         return ModItems.constructionPaste;
     }
 
     @Override
-    public boolean canSilkHarvest(World world, BlockPos pos, IBlockState state, EntityPlayer player) {
+    public boolean canSilkHarvest(IBlockState state, IWorldReader world, BlockPos pos, EntityPlayer player) {
         return false;
     }
 
     @Override
     public boolean hasTileEntity(IBlockState state) {
         return true;
-    }
-
-    @Override
-    public TileEntity createTileEntity(World worldIn, IBlockState state) {
-        return new ConstructionBlockTileEntity();
     }
 
     /*private static ConstructionBlockTileEntity getTE(World world, BlockPos pos) {
@@ -110,22 +93,29 @@ public class ConstructionBlock extends Block implements IFacade {
         return false;
     }*/
 
+    /**
+     * Can return IExtendedBlockState
+     *
+     * @param state
+     * @param world
+     * @param pos
+     */
     @Override
-    public IBlockState getExtendedState(IBlockState state, IBlockAccess world, BlockPos pos) {
+    public IBlockState getExtendedState(IBlockState state, IBlockReader world, BlockPos pos) {
         IExtendedBlockState extendedBlockState = (IExtendedBlockState) super.getExtendedState(state, world, pos);
         IBlockState mimicBlock = getActualMimicBlock(world, pos);
         if (mimicBlock != null) {
-            FakeRenderWorld fakeRenderWorld = new FakeRenderWorld();
-            fakeRenderWorld.setState(world, mimicBlock, pos);
-            IBlockState extState = mimicBlock.getBlock().getExtendedState(mimicBlock, fakeRenderWorld, pos);
+            FakeRenderWorld fakeRenderWorld = new FakeRenderWorld(); //TODO Update Render world
+            //fakeRenderWorld.setState(world, mimicBlock, pos);
+            //IBlockState extState = mimicBlock.getBlock().getExtendedState(mimicBlock, fakeRenderWorld, pos);
             //ConstructionID mimicID = new ConstructionID(mimicBlock);
-            return extendedBlockState.withProperty(FACADE_ID, mimicBlock).withProperty(FACADE_EXT_STATE, extState);
+            //return extendedBlockState.withProperty(FACADE_ID, mimicBlock).withProperty(FACADE_EXT_STATE, extState);
         }
         return extendedBlockState;
     }
 
     @Nullable
-    private IBlockState getActualMimicBlock(IBlockAccess blockAccess, BlockPos pos) {
+    private IBlockState getActualMimicBlock(IBlockReader blockAccess, BlockPos pos) {
         try {
             TileEntity te = blockAccess.getTileEntity(pos);
             if (te instanceof ConstructionBlockTileEntity) {
@@ -137,11 +127,12 @@ public class ConstructionBlock extends Block implements IFacade {
         }
     }
 
-    @Override
-    protected BlockStateContainer createBlockState() {
-        IProperty<?>[] listedProperties = new IProperty<?>[]{BRIGHT, NEIGHBOR_BRIGHTNESS};
-        IUnlistedProperty<?>[] unlistedProperties = new IUnlistedProperty<?>[]{FACADE_ID, FACADE_EXT_STATE};
-        return new ExtendedBlockState(this, listedProperties, unlistedProperties);
+    protected IExtendedBlockState createBlockState(Block block) {
+        IProperty<?>[] listedProperties = new IProperty<?>[]{};
+        IUnlistedProperty<?>[] unlistedProperties = new IUnlistedProperty<?>[]{};
+        //There's this little comment saying that extended States no longer work... Cause States are now all saved...
+        //it doesn't work, beause ExtendedStateHolder is protected
+        return new ExtendedStateContainer.Builder<>(block).add(BRIGHT, NEIGHBOR_BRIGHTNESS)/*.add(FACADE_ID, FACADE_EXT_STATE)*/.create((b, map) -> new BlockStateContainer<>());
     }
 
     @Override
@@ -151,7 +142,7 @@ public class ConstructionBlock extends Block implements IFacade {
     }
 
     @Override
-    @SideOnly(Side.CLIENT)
+    //@SideOnly(Side.CLIENT)
     public boolean canRenderInLayer(IBlockState state, BlockRenderLayer layer) {
         return true; // delegated to FacadeBakedModel#getQuads
     }

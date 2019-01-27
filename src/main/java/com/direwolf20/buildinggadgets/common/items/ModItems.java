@@ -5,34 +5,34 @@ import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetBuilding;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetDestruction;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetExchanger;
-import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.registries.ObjectHolder;
 
-@GameRegistry.ObjectHolder(BuildingGadgets.MODID)
+@ObjectHolder(BuildingGadgets.MODID)
 public class ModItems {
-    @GameRegistry.ObjectHolder("buildingtool")
+    @ObjectHolder("buildingtool")
     public static GadgetBuilding gadgetBuilding;
 
-    @GameRegistry.ObjectHolder("exchangertool")
+    @ObjectHolder("exchangertool")
     public static GadgetExchanger gadgetExchanger;
 
-    @GameRegistry.ObjectHolder("constructionpaste")
+    @ObjectHolder("constructionpaste")
     public static ConstructionPaste constructionPaste;
 
-    @GameRegistry.ObjectHolder("constructionpastecontainer")
+    @ObjectHolder("constructionpastecontainer")
     public static ConstructionPasteContainer constructionPasteContainer;
 
-    @GameRegistry.ObjectHolder("constructionpastecontainert2")
+    @ObjectHolder("constructionpastecontainert2")
     public static ConstructionPasteContainerT2 constructionPasteContainert2;
 
-    @GameRegistry.ObjectHolder("constructionpastecontainert3")
+    @ObjectHolder("constructionpastecontainert3")
     public static ConstructionPasteContainerT3 constructionPasteContainert3;
 
-    @GameRegistry.ObjectHolder("copypastetool")
+    @ObjectHolder("copypastetool")
     public static GadgetCopyPaste gadgetCopyPaste;
 
-    @GameRegistry.ObjectHolder("template")
+    @ObjectHolder("template")
     public static Template template;
 
-    @GameRegistry.ObjectHolder("destructiontool")
+    @ObjectHolder("destructiontool")
     public static GadgetDestruction gadgetDestruction;
 }

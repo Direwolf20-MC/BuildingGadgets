@@ -45,10 +45,12 @@ public class ConstructionBlockEntity extends Entity {
         return ticksExisted;
     }
 
+    /**
+     * Gets called every tick from main Entity class
+     */
     @Override
-    public void onUpdate() {
-        super.onUpdate();
-
+    public void baseTick() {
+        super.baseTick();
         if (ticksExisted > maxLife) {
             setDespawning();
         }
@@ -58,14 +60,12 @@ public class ConstructionBlockEntity extends Entity {
             }
         }
 
-        if (!isDespawning()) {
-
-        } else {
+        if (isDespawning()) {
             despawnTick();
         }
     }
 
-    public boolean isDespawning() {
+    private boolean isDespawning() {
         return despawning != -1;
     }
 
@@ -80,24 +80,23 @@ public class ConstructionBlockEntity extends Entity {
                         if (tempState == null)
                             return;
 
-                        int opacity = tempState.getBlock().getLightOpacity(tempState, world, setPos);
-                        boolean neighborBrightness = tempState.getBlock().getUseNeighborBrightness(tempState);
+                        int opacity = tempState.getOpacity(world, setPos);
+                        boolean neighborBrightness = tempState.getBlock().useNeighborBrightness(tempState, world, setPos);
                         if (opacity == 255 || neighborBrightness) {
                             IBlockState tempSetBlock = ((ConstructionBlockTileEntity) te).getBlockState();
                             IBlockState tempActualSetBlock = ((ConstructionBlockTileEntity) te).getActualBlockState();
                             world.setBlockState(setPos, ModBlocks.constructionBlock.getDefaultState()
-                                    .withProperty(ConstructionBlock.BRIGHT, opacity != 255)
-                                    .withProperty(ConstructionBlock.NEIGHBOR_BRIGHTNESS, neighborBrightness));
+                                    .with(ConstructionBlock.BRIGHT, opacity != 255)
+                                    .with(ConstructionBlock.NEIGHBOR_BRIGHTNESS, neighborBrightness));
                             te = world.getTileEntity(setPos);
                             if (te instanceof ConstructionBlockTileEntity) {
-                                ((ConstructionBlockTileEntity) te).setBlockState(tempSetBlock);
-                                ((ConstructionBlockTileEntity) te).setActualBlockState(tempActualSetBlock);
+                                ((ConstructionBlockTileEntity) te).setBlockState(tempSetBlock, tempActualSetBlock);
                             }
                         }
                     }
                 } else {
                     if (world.getBlockState(setPos) == ModBlocks.constructionBlockPowder.getDefaultState()) {
-                        world.setBlockState(setPos, ModBlocks.constructionBlock.getDefaultState().withProperty(ConstructionBlock.BRIGHT, false));
+                        world.setBlockState(setPos, ModBlocks.constructionBlock.getDefaultState().with(ConstructionBlock.BRIGHT, false));
                     }
                 }
             }
