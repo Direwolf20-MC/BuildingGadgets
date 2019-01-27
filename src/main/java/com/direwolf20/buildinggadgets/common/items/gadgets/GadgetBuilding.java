@@ -19,6 +19,7 @@ import net.minecraft.init.Blocks;
 import net.minecraft.init.Enchantments;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemUseContext;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
@@ -59,10 +60,11 @@ public class GadgetBuilding extends GadgetGeneric {
 
     public GadgetBuilding() {
         setRegistryName(REGISTRY_NAME);        // The unique name (within your mod) that identifies this item
-        setUnlocalizedName(BuildingGadgets.MODID + ".buildingtool");     // Used for localization (en_US.lang)
-        setMaxStackSize(1);
+
+//        setUnlocalizedName(BuildingGadgets.MODID + ".buildingtool");     // Used for localization (en_US.lang)
+//        setMaxStackSize(1);
         if (!SyncedConfig.poweredByFE) {
-            setMaxDamage(SyncedConfig.durabilityBuilder);
+//            setMaxDamage(SyncedConfig.durabilityBuilder);
         }
     }
 
@@ -78,7 +80,7 @@ public class GadgetBuilding extends GadgetGeneric {
 
     private static void setToolMode(ItemStack stack, ToolMode mode) {
         //Store the tool's mode in NBT as a string
-        NBTTagCompound tagCompound = stack.getTagCompound();
+        NBTTagCompound tagCompound = stack.getTag();
         if (tagCompound == null) {
             tagCompound = new NBTTagCompound();
         }
@@ -87,7 +89,7 @@ public class GadgetBuilding extends GadgetGeneric {
     }
 
     public static ToolMode getToolMode(ItemStack stack) {
-        NBTTagCompound tagCompound = stack.getTagCompound();
+        NBTTagCompound tagCompound = stack.getTag();
         ToolMode mode = ToolMode.BuildToMe;
         if (tagCompound == null) {
             setToolMode(stack, mode);
@@ -117,10 +119,17 @@ public class GadgetBuilding extends GadgetGeneric {
     }
 
     @Override
+    public EnumActionResult onItemUse(ItemUseContext context) {
+//        context.
+
+        return super.onItemUse(context);
+    }
+
+    @Override
     public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
         //On item use, if sneaking, select the block clicked on, else build -- This is called when you right click a tool NOT on a block.
         ItemStack itemstack = player.getHeldItem(hand);
-        /*NBTTagCompound tagCompound = itemstack.getTagCompound();
+        /*NBTTagCompound tagCompound = itemstack.getTag();
         ByteBuf buf = Unpooled.buffer(16);
         ByteBufUtils.writeTag(buf,tagCompound);
         System.out.println(buf.readableBytes());*/
@@ -129,7 +138,7 @@ public class GadgetBuilding extends GadgetGeneric {
             if (player.isSneaking()) {
                 selectBlock(itemstack, player);
             } else {
-                build(player, itemstack);
+//                build(player, itemstack, itemstack.getItem().);
             }
         }
         return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, itemstack);

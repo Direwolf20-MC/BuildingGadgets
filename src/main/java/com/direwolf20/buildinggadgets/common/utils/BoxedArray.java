@@ -1,9 +1,9 @@
-package com.direwolf20.buildinggadgets.common.tools;
+package com.direwolf20.buildinggadgets.common.utils;
 
 /**
  * Utility class providing various Methods for boxing and unboxing arrays
  */
-public class ArrayUtils {
+public class BoxedArray {
     public static byte[] asPrimitive(Byte[] ar) {
         byte[] res = new byte[ar.length];
         for (int i = 0; i < ar.length; ++i) {

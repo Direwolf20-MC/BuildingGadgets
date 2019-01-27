@@ -3,17 +3,15 @@ package com.direwolf20.buildinggadgets.common.tools;
 import net.minecraft.item.Item;
 
 public final class UniqueItem {
-    public final int meta;
     public final Item item;
 
-    public UniqueItem(Item i, int m) {
+    public UniqueItem(Item i) {
         item = i;
-        meta = m;
     }
 
     public boolean equals(UniqueItem uniqueItem) {
         //item.equals will fall back to reference Equality
-        return (uniqueItem.item.equals(item) && uniqueItem.meta == meta);
+        return uniqueItem.item.equals(item);
     }
 
     @Override
@@ -27,8 +25,6 @@ public final class UniqueItem {
 
     @Override
     public int hashCode() {
-        int result = meta;
-        result = 31 * result + item.hashCode();
-        return result;
+        return 31 * item.hashCode();
     }
 }

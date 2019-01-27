@@ -182,8 +182,8 @@ public class BlockBuildEntity extends Entity {
 
     @Override
     public void writeEntityToNBT(NBTTagCompound compound) {
-        compound.setInteger("despawning", despawning);
-        compound.setInteger("ticksExisted", ticksExisted);
+        compound.setInt("despawning", despawning);
+        compound.setInt("ticksExisted", ticksExisted);
         compound.setTag("setPos", NBTUtil.createPosTag(setPos));
         NBTTagCompound blockStateTag = new NBTTagCompound();
         NBTUtil.writeBlockState(blockStateTag, setBlock);
@@ -193,19 +193,19 @@ public class BlockBuildEntity extends Entity {
         compound.setTag("actualSetBlock", actualBlockStateTag);
         NBTUtil.writeBlockState(blockStateTag, originalSetBlock);
         compound.setTag("originalBlock", blockStateTag);
-        compound.setInteger("mode", mode);
+        compound.setInt("mode", mode);
         compound.setBoolean("paste", useConstructionPaste);
     }
 
     @Override
     public void readEntityFromNBT(NBTTagCompound compound) {
-        despawning = compound.getInteger("despawning");
-        ticksExisted = compound.getInteger("ticksExisted");
-        setPos = NBTUtil.getPosFromTag(compound.getCompoundTag("setPos"));
-        setBlock = NBTUtil.readBlockState(compound.getCompoundTag("setBlock"));
-        originalSetBlock = NBTUtil.readBlockState(compound.getCompoundTag("originalBlock"));
-        actualSetBlock = NBTUtil.readBlockState(compound.getCompoundTag("actualSetBlock"));
-        mode = compound.getInteger("mode");
+        despawning = compound.getInt("despawning");
+        ticksExisted = compound.getInt("ticksExisted");
+        setPos = NBTUtil.getPosFromTag(compound.getCompound("setPos"));
+        setBlock = NBTUtil.readBlockState(compound.getCompound("setBlock"));
+        originalSetBlock = NBTUtil.readBlockState(compound.getCompound("originalBlock"));
+        actualSetBlock = NBTUtil.readBlockState(compound.getCompound("actualSetBlock"));
+        mode = compound.getInt("mode");
         useConstructionPaste = compound.getBoolean("paste");
     }
 

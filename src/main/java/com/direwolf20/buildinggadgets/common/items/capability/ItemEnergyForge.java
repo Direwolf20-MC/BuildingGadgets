@@ -14,8 +14,8 @@ public class ItemEnergyForge extends EnergyStorage {
         super(capacity, Integer.MAX_VALUE, Integer.MAX_VALUE);
 
         this.stack = stack;
-        NBTTagCompound nbt = stack.getTagCompound();
-        this.energy = nbt != null && nbt.hasKey(NBT_ENERGY) ? nbt.getInteger(NBT_ENERGY) : 0;
+        NBTTagCompound nbt = stack.getTag();
+        this.energy = nbt != null && nbt.hasKey(NBT_ENERGY) ? nbt.getInt(NBT_ENERGY) : 0;
     }
 
     @Override
@@ -30,12 +30,12 @@ public class ItemEnergyForge extends EnergyStorage {
 
     private int changeEnergy(int amount, boolean simulate) {
         if (amount > 0 && !simulate) {
-            NBTTagCompound nbt = stack.getTagCompound();
+            NBTTagCompound nbt = stack.getTag();
             if (nbt == null) {
                 stack.setTagCompound(nbt = new NBTTagCompound());
             }
 
-            nbt.setInteger(NBT_ENERGY, getEnergyStored());
+            nbt.setInt(NBT_ENERGY, getEnergyStored());
         }
         return amount;
     }

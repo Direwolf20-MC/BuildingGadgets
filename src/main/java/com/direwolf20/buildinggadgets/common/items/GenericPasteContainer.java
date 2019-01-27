@@ -24,22 +24,22 @@ public class GenericPasteContainer extends Item {
     }
 
     public static void setPasteAmount(ItemStack stack, int amount) {
-        NBTTagCompound tagCompound = stack.getTagCompound();
+        NBTTagCompound tagCompound = stack.getTag();
         if (tagCompound == null) {
             tagCompound = new NBTTagCompound();
         }
-        tagCompound.setInteger("amount", amount);
+        tagCompound.setInt("amount", amount);
         stack.setTagCompound(tagCompound);
     }
 
     public static int getPasteAmount(ItemStack stack) {
-        NBTTagCompound tagCompound = stack.getTagCompound();
+        NBTTagCompound tagCompound = stack.getTag();
         int amount = 0;
         if (tagCompound == null) {
             setPasteAmount(stack, 0);
             return amount;
         }
-        amount = tagCompound.getInteger("amount");
+        amount = tagCompound.getInt("amount");
         return amount;
     }
 

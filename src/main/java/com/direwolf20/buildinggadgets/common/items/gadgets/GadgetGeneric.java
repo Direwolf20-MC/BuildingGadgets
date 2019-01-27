@@ -1,37 +1,33 @@
 package com.direwolf20.buildinggadgets.common.items.gadgets;
 
-import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
 import com.direwolf20.buildinggadgets.common.items.capability.CapabilityProviderEnergy;
-import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.MathHelper;
-import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.energy.IEnergyStorage;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nullable;
 
 public class GadgetGeneric extends Item {
 
-    public GadgetGeneric() {
-        setCreativeTab(BuildingGadgets.BUILDING_CREATIVE_TAB);
+    public GadgetGeneric(Builder properties) {
+        super(properties);
+
+//        this.getCreativeTabs().add(this.getGroup());
     }
 
     public int getEnergyMax() {
         return SyncedConfig.energyMax;
     }
-
-    @SideOnly(Side.CLIENT)
-    public void initModel() {
-        ModelLoader.setCustomModelResourceLocation(this, 0, new ModelResourceLocation(getRegistryName(), "inventory"));
-    }
+//
+//    public void initModel() {
+//        ModelLoader.setCustomModelResourceLocation(this, 0, new ModelResourceLocation(getRegistryName(), "inventory"));
+//    }
 
     @Override
     @Nullable
@@ -58,7 +54,8 @@ public class GadgetGeneric extends Item {
             IEnergyStorage energy = CapabilityProviderEnergy.getCap(stack);
             return 1D - ((double) energy.getEnergyStored() / (double) energy.getMaxEnergyStored());
         }
-        //return (double)stack.getItemDamage() / (double)stack.getMaxDamage();
+
+
         return super.getDurabilityForDisplay(stack);
     }
 
@@ -123,14 +120,14 @@ public class GadgetGeneric extends Item {
     }
 
     public boolean canUse(ItemStack tool, EntityPlayer player) {
-        if (player.capabilities.isCreativeMode)
+        if (player.isCreative())
             return true;
 
         if (SyncedConfig.poweredByFE) {
             IEnergyStorage energy = CapabilityProviderEnergy.getCap(tool);
             return this.getEnergyCost() <= energy.getEnergyStored();
         }
-        return tool.getItemDamage() < tool.getMaxDamage() || tool.isItemStackDamageable();
+        return tool.getDamage() < tool.getMaxDamage() || tool.getStack().isDamageable();
     }
 
     public void applyDamage(ItemStack tool, EntityPlayer player) {

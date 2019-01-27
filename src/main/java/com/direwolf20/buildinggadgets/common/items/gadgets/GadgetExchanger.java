@@ -91,7 +91,7 @@ public class GadgetExchanger extends GadgetGeneric {
     }
 
     private static void setFuzzy(ItemStack stack, boolean fuzzy) {
-        NBTTagCompound tagCompound = stack.getTagCompound();
+        NBTTagCompound tagCompound = stack.getTag();
         if (tagCompound == null) {
             tagCompound = new NBTTagCompound();
         }
@@ -99,7 +99,7 @@ public class GadgetExchanger extends GadgetGeneric {
     }
 
     public static boolean getFuzzy(ItemStack stack) {
-        NBTTagCompound tagCompound = stack.getTagCompound();
+        NBTTagCompound tagCompound = stack.getTag();
         if (tagCompound == null) {
             tagCompound = new NBTTagCompound();
         }
@@ -107,7 +107,7 @@ public class GadgetExchanger extends GadgetGeneric {
     }
 
     private static void setToolMode(ItemStack stack, ToolMode mode) {
-        NBTTagCompound tagCompound = stack.getTagCompound();
+        NBTTagCompound tagCompound = stack.getTag();
         if (tagCompound == null) {
             tagCompound = new NBTTagCompound();
         }
@@ -116,7 +116,7 @@ public class GadgetExchanger extends GadgetGeneric {
     }
 
     public static ToolMode getToolMode(ItemStack stack) {
-        NBTTagCompound tagCompound = stack.getTagCompound();
+        NBTTagCompound tagCompound = stack.getTag();
         ToolMode mode = ToolMode.Wall;
         if (tagCompound == null) {
             setToolMode(stack, mode);
