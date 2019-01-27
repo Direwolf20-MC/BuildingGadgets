@@ -15,27 +15,31 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 
 public class ConstructionBakedModel implements IBakedModel {
     public static final ModelResourceLocation modelFacade = new ModelResourceLocation(BuildingGadgets.MODID + ":" + "constructionblock");
 
-    //    private VertexFormat format;
     private static TextureAtlasSprite spriteCable;
     private IBakedModel blankConstructionModel;
 
-    public ConstructionBakedModel(IBakedModel blankConstrModel) {
-//        this.format = format;
+    ConstructionBakedModel(IBakedModel blankConstrModel) {
         this.blankConstructionModel = blankConstrModel;
     }
 
     private static void initTextures() {
         if (spriteCable == null) {
-            spriteCable = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(BuildingGadgets.MODID + ":blocks/constructionblock");
+            spriteCable = Minecraft.getInstance().getTextureMap().getAtlasSprite(BuildingGadgets.MODID + ":blocks/constructionblock");
         }
     }
 
+    private IBakedModel getModel(@Nonnull IBlockState state) {
+        initTextures();
+        return Minecraft.getInstance().getBlockRendererDispatcher().getBlockModelShapes().getModel(state);
+    }
+
     @Override
-    public List<BakedQuad> getQuads(@Nullable IBlockState state, @Nullable EnumFacing side, long rand) {
+    public List<BakedQuad> getQuads(@Nullable IBlockState state, @Nullable EnumFacing side, Random rand) {
         IExtendedBlockState extendedBlockState = (IExtendedBlockState) state;
         if (extendedBlockState == null)
             return Collections.emptyList();
@@ -62,31 +66,13 @@ public class ConstructionBakedModel implements IBakedModel {
             e.printStackTrace();
             return model.getQuads(facadeState, side, rand);
         }
-
     }
-
-    private IBakedModel getModel(@Nonnull IBlockState state) {
-        initTextures();
-        IBakedModel model = Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelShapes().getModelForState(state);
-        return model;
-    }
-
 
     @Override
     public boolean isAmbientOcclusion() {
         return true;
     }
 
-    /*@Override //This is causing darkness on stairs, and I have no idea why.
-    public boolean isAmbientOcclusion(IBlockState state) {
-        IExtendedBlockState extendedBlockState = (IExtendedBlockState) state;
-        ConstructionID facadeId = extendedBlockState.getValue(ConstructionBlock.FACADEID);
-        if (facadeId == null) {
-            return true;
-        }
-        IBlockState facadeState = facadeId.getBlockState();
-        return facadeState.getBlock().isOpaqueCube(facadeState);
-    }*/
 
     @Override
     public boolean isGui3d() {
@@ -110,6 +96,17 @@ public class ConstructionBakedModel implements IBakedModel {
 
     @Override
     public ItemOverrideList getOverrides() {
-        return ItemOverrideList.NONE;
+        return ItemOverrideList.EMPTY;
     }
+
+    /*@Override //This is causing darkness on stairs, and I have no idea why.
+    public boolean isAmbientOcclusion(IBlockState state) {
+        IExtendedBlockState extendedBlockState = (IExtendedBlockState) state;
+        ConstructionID facadeId = extendedBlockState.getValue(ConstructionBlock.FACADEID);
+        if (facadeId == null) {
+            return true;
+        }
+        IBlockState facadeState = facadeId.getBlockState();
+        return facadeState.getBlock().isOpaqueCube(facadeState);
+    }*/
 }

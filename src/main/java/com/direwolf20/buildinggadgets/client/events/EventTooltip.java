@@ -46,7 +46,7 @@ public class EventTooltip {
 
     public static void addTemplatePadding(ItemStack stack, List<String> tooltip) {
         //This method extends the tooltip box size to fit the item's we will render in onDrawTooltip
-        Minecraft mc = Minecraft.getMinecraft();
+        Minecraft mc = Minecraft.getInstance();
         if (stack.getItem() instanceof ITemplate) {
             ITemplate template = (ITemplate) stack.getItem();
             String UUID = template.getUUID(stack);
@@ -64,7 +64,7 @@ public class EventTooltip {
             int totalMissing = 0;
             //Look through all the ItemStacks and draw each one in the specified X/Y position
             for (Map.Entry<ItemStack, Integer> entry : list) {
-                int hasAmt = InventoryManipulation.countItem(entry.getKey(), Minecraft.getMinecraft().player, Minecraft.getMinecraft().player.world);
+                int hasAmt = InventoryManipulation.countItem(entry.getKey(), Minecraft.getInstance().player, Minecraft.getInstance().player.world);
                 if (hasAmt < entry.getValue())
                     totalMissing = totalMissing + Math.abs(entry.getValue() - hasAmt);
             }
@@ -132,7 +132,7 @@ public class EventTooltip {
             int j = 0;
             //Look through all the ItemStacks and draw each one in the specified X/Y position
             for (Map.Entry<ItemStack, Integer> entry : list) {
-                int hasAmt = InventoryManipulation.countItem(entry.getKey(), Minecraft.getMinecraft().player, Minecraft.getMinecraft().player.world);
+                int hasAmt = InventoryManipulation.countItem(entry.getKey(), Minecraft.getInstance().player, Minecraft.getInstance().player.world);
                 int x = bx + (j % STACKS_PER_LINE) * 18;
                 int y = by + (j / STACKS_PER_LINE) * 20;
                 totalMissing = totalMissing + renderRequiredBlocks(entry.getKey(), x, y, hasAmt, entry.getValue());
@@ -140,7 +140,7 @@ public class EventTooltip {
             }
             if (totalMissing > 0) {
                 ItemStack pasteItemStack = new ItemStack(ModItems.constructionPaste);
-                int hasAmt = InventoryManipulation.countPaste(Minecraft.getMinecraft().player);
+                int hasAmt = InventoryManipulation.countPaste(Minecraft.getInstance().player);
                 int x = bx + (j % STACKS_PER_LINE) * 18;
                 int y = by + (j / STACKS_PER_LINE) * 20;
                 renderRequiredBlocks(pasteItemStack, x, y, hasAmt, totalMissing);
@@ -150,7 +150,7 @@ public class EventTooltip {
     }
 
     private static int renderRequiredBlocks(ItemStack itemStack, int x, int y, int count, int req) {
-        Minecraft mc = Minecraft.getMinecraft();
+        Minecraft mc = Minecraft.getInstance();
         GlStateManager.disableDepth();
         RenderItem render = mc.getRenderItem();
 
@@ -205,7 +205,7 @@ public class EventTooltip {
         for (BlockMap blockMap : blockMapList) {
             UniqueItem uniqueItem = IntStackMap.get(blockMap.state);
             NonNullList<ItemStack> drops = NonNullList.create();
-            blockMap.state.getBlock().getDrops(drops, Minecraft.getMinecraft().world, new BlockPos(0, 0, 0), blockMap.state, 0);
+            blockMap.state.getBlock().getDrops(drops, Minecraft.getInstance().world, new BlockPos(0, 0, 0), blockMap.state, 0);
             int neededItems = 0;
             for (ItemStack drop : drops) {
                 if (drop.getItem().equals(uniqueItem.item)) {

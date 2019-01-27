@@ -9,36 +9,32 @@ package com.direwolf20.buildinggadgets.client.gui;
 import com.direwolf20.buildinggadgets.client.KeyBindings;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.items.gadgets.*;
-import com.direwolf20.buildinggadgets.common.network.PacketHandler;
-import com.direwolf20.buildinggadgets.common.network.PacketToggleMode;
 import com.google.common.collect.ImmutableSet;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.settings.GameSettings;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.util.vector.Vector2f;
 
+import javax.vecmath.Vector2f;
 import java.awt.*;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ModeRadialMenu extends GuiScreen {
 
     private static final ResourceLocation[] signs = new ResourceLocation[]{
-            new ResourceLocation(BuildingGadgets.MODID,"textures/ui/buildtome.png"),
-            new ResourceLocation(BuildingGadgets.MODID,"textures/ui/verticalcolumn.png"),
-            new ResourceLocation(BuildingGadgets.MODID,"textures/ui/horizontalcolumn.png"),
-            new ResourceLocation(BuildingGadgets.MODID,"textures/ui/verticalwall.png"),
-            new ResourceLocation(BuildingGadgets.MODID,"textures/ui/horizontalwall.png"),
-            new ResourceLocation(BuildingGadgets.MODID,"textures/ui/stairs.png"),
-            new ResourceLocation(BuildingGadgets.MODID,"textures/ui/checker.png")
+        new ResourceLocation(BuildingGadgets.MODID,"textures/ui/buildtome.png"),
+        new ResourceLocation(BuildingGadgets.MODID,"textures/ui/verticalcolumn.png"),
+        new ResourceLocation(BuildingGadgets.MODID,"textures/ui/horizontalcolumn.png"),
+        new ResourceLocation(BuildingGadgets.MODID,"textures/ui/verticalwall.png"),
+        new ResourceLocation(BuildingGadgets.MODID,"textures/ui/horizontalwall.png"),
+        new ResourceLocation(BuildingGadgets.MODID,"textures/ui/stairs.png"),
+        new ResourceLocation(BuildingGadgets.MODID,"textures/ui/checker.png")
     };
 
     private int timeIn = 0;
@@ -48,7 +44,7 @@ public class ModeRadialMenu extends GuiScreen {
     private List<Integer> slots;
 
     public ModeRadialMenu(ItemStack stack) {
-        mc = Minecraft.getMinecraft();
+        mc = Minecraft.getInstance();
 
 //        itemStack = ItemStack.EMPTY;
         if (stack.getItem() instanceof GadgetBuilding) {
@@ -82,9 +78,9 @@ public class ModeRadialMenu extends GuiScreen {
     }
 
     @Override
-    public void drawScreen(int mx, int my, float partialTicks) {
+    public void render(int mx, int my, float partialTicks) {
         if (slots.equals(new ArrayList())) return;
-        super.drawScreen(mx, my, partialTicks);
+        super.render(mx, my, partialTicks);
 
         GlStateManager.pushMatrix();
         GlStateManager.disableTexture2D();
@@ -106,7 +102,7 @@ public class ModeRadialMenu extends GuiScreen {
 
         List<int[]> stringPositions = new ArrayList();
 
-        EntityPlayer player = Minecraft.getMinecraft().player;
+        EntityPlayer player = Minecraft.getInstance().player;
         ItemStack tool = player.getHeldItemMainhand();
         if (!(tool.getItem() instanceof GadgetGeneric)) {
             tool = player.getHeldItemOffhand();
@@ -140,7 +136,7 @@ public class ModeRadialMenu extends GuiScreen {
                 }
             }
 
-            GlStateManager.color(r, g, b, a);
+            GlStateManager.color4f(r, g, b, a);
             GL11.glVertex2i(x, y);
 
             for (float i = degPer; i >= 0; i--) {
@@ -200,7 +196,7 @@ public class ModeRadialMenu extends GuiScreen {
             xdp = (int) ((xp - x) * mod + x);
             ydp = (int) ((yp - y) * mod + y);
 
-            mc.renderEngine.bindTexture(signs[slot]);
+            mc.getTextureManager().bindTexture(signs[slot]);
             drawModalRectWithCustomSizedTexture(xdp - 8, ydp - 8, 0, 0, 16, 16, 16, 16);
 
         }
@@ -210,13 +206,13 @@ public class ModeRadialMenu extends GuiScreen {
         float s = 3F * fract;
         GlStateManager.enableRescaleNormal();
         GlStateManager.enableBlend();
-        GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
+        GlStateManager.blendFuncSeparate(770, 771, 1, 0);
         RenderHelper.enableGUIStandardItemLighting();
 
         if (!tool.isEmpty()) {
-            GlStateManager.scale(s, s, s);
-            GlStateManager.translate(x / s - 8, y / s - 8, 0);
-            mc.getRenderItem().renderItemAndEffectIntoGUI(tool, 0, 0);
+            GlStateManager.scalef(s, s, s);
+            GlStateManager.translatef(x / s - 8, y / s - 8, 0);
+            mc.getItemRenderer().renderItemAndEffectIntoGUI(tool, 0, 0);
         }
         RenderHelper.disableStandardItemLighting();
         GlStateManager.disableBlend();
@@ -226,24 +222,20 @@ public class ModeRadialMenu extends GuiScreen {
     }
 
     @Override
-    protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
-        super.mouseClicked(mouseX, mouseY, mouseButton);
-    }
+    public void tick() {
+        super.tick();
 
-    @Override
-    public void updateScreen() {
-        super.updateScreen();
-
-        if (!GameSettings.isKeyDown(KeyBindings.modeSwitch)) {
+        if (!KeyBindings.modeSwitch.isKeyDown()) {
             mc.displayGuiScreen(null);
-            if (slotSelected != -1) {
-                PacketHandler.INSTANCE.sendToServer(new PacketToggleMode(slotSelected));
-            }
+// REIMPLEMENT
+//            if (slotSelected != -1) {
+//                PacketHandler.INSTANCE.sendToServer(new PacketToggleMode(slotSelected));
+//            }
         }
 
         ImmutableSet<KeyBinding> set = ImmutableSet.of(mc.gameSettings.keyBindForward, mc.gameSettings.keyBindLeft, mc.gameSettings.keyBindBack, mc.gameSettings.keyBindRight, mc.gameSettings.keyBindSneak, mc.gameSettings.keyBindSprint, mc.gameSettings.keyBindJump);
         for (KeyBinding k : set)
-            KeyBinding.setKeyBindState(k.getKeyCode(), GameSettings.isKeyDown(k));
+            KeyBinding.setKeyBindState(k.getKey(), k.isKeyDown());
 
         timeIn++;
     }
@@ -257,7 +249,7 @@ public class ModeRadialMenu extends GuiScreen {
         Vector2f baseVec = new Vector2f(1F, 0F);
         Vector2f mouseVec = new Vector2f(mx - x, my - y);
 
-        float ang = (float) (Math.acos(Vector2f.dot(baseVec, mouseVec) / (baseVec.length() * mouseVec.length())) * (180F / Math.PI));
+        float ang = (float) (Math.acos(baseVec.dot(mouseVec) / (baseVec.length() * mouseVec.length())) * (180F / Math.PI));
         return my < y ? 360F - ang : ang;
     }
 }

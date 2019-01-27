@@ -67,14 +67,14 @@ public class PasteToolBufferBuilder {
     public static void addMapToBuffer(String UUID) {
 //        long time = System.nanoTime();
         List<BlockMap> blockMapList = GadgetCopyPaste.getBlockMapList(tagMap.get(UUID));
-        BlockRendererDispatcher dispatcher = Minecraft.getMinecraft().getBlockRendererDispatcher();
+        BlockRendererDispatcher dispatcher = Minecraft.getInstance().getBlockRendererDispatcher();
         ToolDireBuffer bufferBuilder = new ToolDireBuffer(2097152);
         bufferBuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
         for (BlockMap blockMap : blockMapList) {
             IBlockState renderBlockState = blockMap.state;
             if (!(renderBlockState.equals(Blocks.AIR.getDefaultState()))) {
                 IBakedModel model = dispatcher.getModelForState(renderBlockState);
-                dispatcher.getBlockModelRenderer().renderModelFlat(Minecraft.getMinecraft().world, model, renderBlockState, new BlockPos(blockMap.xOffset, blockMap.yOffset, blockMap.zOffset), bufferBuilder, false, 0L);
+                dispatcher.getBlockModelRenderer().renderModelFlat(Minecraft.getInstance().world, model, renderBlockState, new BlockPos(blockMap.xOffset, blockMap.yOffset, blockMap.zOffset), bufferBuilder, false, 0L);
             }
         }
         bufferBuilder.finishDrawing();

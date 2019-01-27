@@ -46,7 +46,7 @@ public class PacketSyncConfig implements IMessage {
         public IMessage onMessage(PacketSyncConfig message, MessageContext ctx) {
             if (ctx.side!=Side.CLIENT)
                 return null;
-            Minecraft.getMinecraft().addScheduledTask(() -> {
+            Minecraft.getInstance().addScheduledTask(() -> {
                 NBTTagCompound compound = message.getTagCompound();
                 BuildingGadgets.logger.info("Received SyncedConfig from Server.");
                 SyncedConfig.onReadSynchronisation(compound);

@@ -164,7 +164,7 @@ public class TemplateManagerCommands {
         BlockPos startPos = GadgetUtils.getPOSFromNBT(templateTagCompound, "startPos");
         BlockPos endPos = GadgetUtils.getPOSFromNBT(templateTagCompound, "endPos");
         template.incrementCopyCounter(templateStack);
-        templateTagCompound.setInteger("copycounter", template.getCopyCounter(templateStack));
+        templateTagCompound.setInt("copycounter", template.getCopyCounter(templateStack));
         templateTagCompound.setString("UUID", template.getUUID(templateStack));
         //GadgetUtils.writePOSToNBT(templateTagCompound, startPos, "startPos", 0);
         //GadgetUtils.writePOSToNBT(templateTagCompound, endPos, "startPos", 0);
@@ -219,7 +219,7 @@ public class TemplateManagerCommands {
         if (itemStack0.getItem() instanceof GadgetCopyPaste) {
             NBTTagCompound tagCompound = PasteToolBufferBuilder.getTagFromUUID(ModItems.gadgetCopyPaste.getUUID(itemStack0));
             if (tagCompound == null) {
-                Minecraft.getMinecraft().player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.copyfailed").getUnformattedComponentText()), false);
+                Minecraft.getInstance().player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.copyfailed").getUnformattedComponentText()), false);
                 return;
             }
             NBTTagCompound newCompound = new NBTTagCompound();
@@ -233,7 +233,7 @@ public class TemplateManagerCommands {
             //newCompound.setTag("itemcountmap", tagList);
             String jsonTag = newCompound.toString();
             setClipboardString(jsonTag);
-            Minecraft.getMinecraft().player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.copysuccess").getUnformattedComponentText()), false);
+            Minecraft.getInstance().player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.copysuccess").getUnformattedComponentText()), false);
         }
     }
 }

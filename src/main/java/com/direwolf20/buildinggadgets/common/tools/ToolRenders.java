@@ -64,7 +64,7 @@ public class ToolRenders {
                 if (heldItem.isEmpty()) return;
 
                 IBlockState renderBlockState = getToolBlock(heldItem);
-                Minecraft mc = Minecraft.getMinecraft();
+                Minecraft mc = Minecraft.getInstance();
                 mc.renderEngine.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
                 if (renderBlockState == Blocks.AIR.getDefaultState()) {//Don't render anything if there is no block selected (Air)
                     return;
@@ -96,7 +96,7 @@ public class ToolRenders {
                     hasEnergy = 1000000;
                 }
                 //Prepare the block rendering
-                BlockRendererDispatcher dispatcher = Minecraft.getMinecraft().getBlockRendererDispatcher();
+                BlockRendererDispatcher dispatcher = Minecraft.getInstance().getBlockRendererDispatcher();
                 BlockRenderLayer origLayer = MinecraftForgeClient.getRenderLayer();
 
                 //Prepare the fake world -- using a fake world lets us render things properly, like fences connecting.
@@ -192,7 +192,7 @@ public class ToolRenders {
                 if (heldItem.isEmpty()) return;
 
                 IBlockState renderBlockState = getToolBlock(heldItem);
-                Minecraft mc = Minecraft.getMinecraft();
+                Minecraft mc = Minecraft.getInstance();
                 mc.renderEngine.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
                 if (renderBlockState == Blocks.AIR.getDefaultState()) {//Don't render anything if there is no block selected (Air)
                     return;
@@ -225,7 +225,7 @@ public class ToolRenders {
                     hasEnergy = 1000000;
                 }
                 //Prepare the block rendering
-                BlockRendererDispatcher dispatcher = Minecraft.getMinecraft().getBlockRendererDispatcher();
+                BlockRendererDispatcher dispatcher = Minecraft.getInstance().getBlockRendererDispatcher();
                 BlockRenderLayer origLayer = MinecraftForgeClient.getRenderLayer();
 
                 //Prepare the fake world -- using a fake world lets us render things properly, like fences connecting.
@@ -322,7 +322,7 @@ public class ToolRenders {
         if (heldItem.isEmpty()) return;
 
         if (!GadgetDestruction.getOverlay(heldItem)) return;
-        Minecraft mc = Minecraft.getMinecraft();
+        Minecraft mc = Minecraft.getInstance();
         mc.renderEngine.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
 
         ArrayList<BlockPos> coordinates = GadgetDestruction.getArea(world, startBlock, facing, player, heldItem);
@@ -429,11 +429,11 @@ public class ToolRenders {
             IBlockState startBlock = world.getBlockState(startPos);
             if (startBlock == ModBlocks.effectBlock.getDefaultState()) return;
 
-            Minecraft mc = Minecraft.getMinecraft();
+            Minecraft mc = Minecraft.getInstance();
             mc.renderEngine.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
 
             //Prepare the block rendering
-            //BlockRendererDispatcher dispatcher = Minecraft.getMinecraft().getBlockRendererDispatcher();
+            //BlockRendererDispatcher dispatcher = Minecraft.getInstance().getBlockRendererDispatcher();
 
             //Calculate the players current position, which is needed later
             double doubleX = player.lastTickPosX + (player.posX - player.lastTickPosX) * evt.getPartialTicks();
@@ -480,7 +480,7 @@ public class ToolRenders {
                 //return;
             }
 
-            Minecraft mc = Minecraft.getMinecraft();
+            Minecraft mc = Minecraft.getInstance();
             mc.renderEngine.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
 
             //Calculate the players current position, which is needed later
