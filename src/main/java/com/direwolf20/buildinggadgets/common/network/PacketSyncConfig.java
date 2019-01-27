@@ -34,7 +34,7 @@ public class PacketSyncConfig implements IMessage {
         ByteBufUtils.writeTag(buf,tagCompound);
     }
 
-    public NBTTagCompound getTagCompound() {
+    public NBTTagCompound getTag() {
         return tagCompound;
     }
     /**
@@ -47,7 +47,7 @@ public class PacketSyncConfig implements IMessage {
             if (ctx.side!=Side.CLIENT)
                 return null;
             Minecraft.getInstance().addScheduledTask(() -> {
-                NBTTagCompound compound = message.getTagCompound();
+                NBTTagCompound compound = message.getTag();
                 BuildingGadgets.logger.info("Received SyncedConfig from Server.");
                 SyncedConfig.onReadSynchronisation(compound);
             });

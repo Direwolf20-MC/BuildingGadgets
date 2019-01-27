@@ -15,8 +15,8 @@ import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.BlockPos;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import org.lwjgl.opengl.GL11;
 
 import javax.annotation.Nullable;
@@ -24,8 +24,9 @@ import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
-@SideOnly(Side.CLIENT)
+@OnlyIn(Dist.CLIENT)
 public class PasteToolBufferBuilder {
 
     private static Map<String, NBTTagCompound> tagMap = new HashMap<String, NBTTagCompound>();
@@ -34,7 +35,7 @@ public class PasteToolBufferBuilder {
 
     private static int getCopyCounter(String UUID) {
         if (tagMap.containsKey(UUID)) {
-            return tagMap.get(UUID).getInteger("copycounter");
+            return tagMap.get(UUID).getInt("copycounter");
         }
         return -1;
     }
@@ -74,7 +75,7 @@ public class PasteToolBufferBuilder {
             IBlockState renderBlockState = blockMap.state;
             if (!(renderBlockState.equals(Blocks.AIR.getDefaultState()))) {
                 IBakedModel model = dispatcher.getModelForState(renderBlockState);
-                dispatcher.getBlockModelRenderer().renderModelFlat(Minecraft.getInstance().world, model, renderBlockState, new BlockPos(blockMap.xOffset, blockMap.yOffset, blockMap.zOffset), bufferBuilder, false, 0L);
+                dispatcher.getBlockModelRenderer().renderModelFlat(Minecraft.getInstance().world, model, renderBlockState, new BlockPos(blockMap.xOffset, blockMap.yOffset, blockMap.zOffset), bufferBuilder, false, new Random(), 0L);
             }
         }
         bufferBuilder.finishDrawing();
@@ -89,7 +90,7 @@ public class PasteToolBufferBuilder {
         //System.out.printf("Sorted %d Vertexes in %.2f ms%n", bufferBuilder.getVertexCount(), (System.nanoTime() - time) * 1e-6);
         if (bufferBuilder.getVertexCount() > 0) {
             VertexFormat vertexformat = bufferBuilder.getVertexFormat();
-            int i = vertexformat.getNextOffset();
+            int i = vertexformat.getSize();
             ByteBuffer bytebuffer = bufferBuilder.getByteBuffer();
             List<VertexFormatElement> list = vertexformat.getElements();
 
@@ -104,7 +105,7 @@ public class PasteToolBufferBuilder {
                 vertexformatelement.getUsage().preDraw(vertexformat, j, i, bytebuffer);
             }
 
-            GlStateManager.glDrawArrays(bufferBuilder.getDrawMode(), 0, bufferBuilder.getVertexCount());
+            GlStateManager.drawArrays(bufferBuilder.getDrawMode(), 0, bufferBuilder.getVertexCount());
             int i1 = 0;
 
             for (int j1 = list.size(); i1 < j1; ++i1) {

@@ -39,7 +39,7 @@ public class Template extends Item implements ITemplate {
     @Override
     @Nullable
     public String getUUID(ItemStack stack) {
-        NBTTagCompound tagCompound = stack.getTagCompound();
+        NBTTagCompound tagCompound = stack.getTag();
         if (tagCompound == null) {
             tagCompound = new NBTTagCompound();
         }

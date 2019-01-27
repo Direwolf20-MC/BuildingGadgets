@@ -66,7 +66,7 @@ public class TemplateManagerCommands {
         NBTTagCompound templateTagCompound = templateWorldSave.getCompoundFromUUID(UUIDTemplate);
         tagCompound = templateTagCompound.copy();
         template.incrementCopyCounter(itemStack0);
-        tagCompound.setInteger("copycounter", template.getCopyCounter(itemStack0));
+        tagCompound.setInt("copycounter", template.getCopyCounter(itemStack0));
         tagCompound.setString("UUID", template.getUUID(itemStack0));
         tagCompound.setString("owner", player.getName());
         if (template.equals(ModItems.gadgetCopyPaste)) {
@@ -114,7 +114,7 @@ public class TemplateManagerCommands {
         NBTTagCompound tagCompound = isTool ? worldSave.getCompoundFromUUID(UUID) : templateWorldSave.getCompoundFromUUID(UUID);
         templateTagCompound = tagCompound.copy();
         template.incrementCopyCounter(templateStack);
-        templateTagCompound.setInteger("copycounter", template.getCopyCounter(templateStack));
+        templateTagCompound.setInt("copycounter", template.getCopyCounter(templateStack));
         templateTagCompound.setString("UUID", ModItems.template.getUUID(templateStack));
 
         templateWorldSave.addToMap(UUIDTemplate, templateTagCompound);

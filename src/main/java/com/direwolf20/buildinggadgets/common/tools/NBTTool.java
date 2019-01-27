@@ -32,7 +32,7 @@ public class NBTTool {
     public static NBTTagList createShortList(short[] shorts) {
         NBTTagList list = new NBTTagList();
         for (short s: shorts) {
-            list.appendTag(new NBTTagShort(s));
+            list.add(new NBTTagShort(s));
         }
         return list;
     }
@@ -40,7 +40,7 @@ public class NBTTool {
     public static NBTTagList createShortList(Short[] shorts) {
         NBTTagList list = new NBTTagList();
         for (short s: shorts) {
-            list.appendTag(new NBTTagShort(s));
+            list.add(new NBTTagShort(s));
         }
         return list;
     }
@@ -49,7 +49,7 @@ public class NBTTool {
     public static NBTTagList createFloatList(float[] floats) {
         NBTTagList list = new NBTTagList();
         for (float f: floats) {
-            list.appendTag(new NBTTagFloat(f));
+            list.add(new NBTTagFloat(f));
         }
         return list;
     }
@@ -58,7 +58,7 @@ public class NBTTool {
     public static NBTTagList createFloatList(Float[] floats) {
         NBTTagList list = new NBTTagList();
         for (Float f: floats) {
-            list.appendTag(new NBTTagFloat(f));
+            list.add(new NBTTagFloat(f));
         }
         return list;
     }
@@ -67,7 +67,7 @@ public class NBTTool {
     public static NBTTagList createDoubleList(double[] doubles) {
         NBTTagList list = new NBTTagList();
         for (double d: doubles) {
-            list.appendTag(new NBTTagDouble(d));
+            list.add(new NBTTagDouble(d));
         }
         return list;
     }
@@ -76,17 +76,17 @@ public class NBTTool {
     public static NBTTagList createDoubleList(Double[] doubles) {
         NBTTagList list = new NBTTagList();
         for (Double d: doubles) {
-            list.appendTag(new NBTTagDouble(d));
+            list.add(new NBTTagDouble(d));
         }
         return list;
     }
 
     @Nonnull
     public static short[] readShortList(NBTTagList shorts) {
-        short[] res = new short[shorts.tagCount()];
+        short[] res = new short[shorts.size()];
         IntList failed = new IntArrayList();
-        for (int i = 0; i < shorts.tagCount(); i++) {
-            NBTBase nbt = shorts.get(i);
+        for (int i = 0; i < shorts.size(); i++) {
+            INBTBase nbt = shorts.get(i);
             if (nbt instanceof NBTTagShort) {
                 res[i] = ((NBTTagShort) nbt).getShort();
             } else {
@@ -110,10 +110,10 @@ public class NBTTool {
 
     @Nonnull
     public static Short[] readBShortList(NBTTagList shorts) {
-        Short[] res = new Short[shorts.tagCount()];
+        Short[] res = new Short[shorts.size()];
         IntList failed = new IntArrayList();
-        for (int i = 0; i < shorts.tagCount(); i++) {
-            NBTBase nbt = shorts.get(i);
+        for (int i = 0; i < shorts.size(); i++) {
+            INBTBase nbt = shorts.get(i);
             if (nbt instanceof NBTTagShort) {
                 res[i] = ((NBTTagShort) nbt).getShort();
             } else {
@@ -140,17 +140,17 @@ public class NBTTool {
     public static NBTTagList createStringList(String[] strings) {
         NBTTagList list = new NBTTagList();
         for (String s:strings) {
-            list.appendTag(new NBTTagString(s));
+            list.add(new NBTTagString(s));
         }
         return list;
     }
 
     @Nonnull
     public static float[] readFloatList(NBTTagList floats) {
-        float[] res = new float[floats.tagCount()];
+        float[] res = new float[floats.size()];
         IntList failed = new IntArrayList();
-        for (int i = 0; i < floats.tagCount(); i++) {
-            NBTBase nbt = floats.get(i);
+        for (int i = 0; i < floats.size(); i++) {
+            INBTBase nbt = floats.get(i);
             if (nbt instanceof NBTTagFloat) {
                 res[i] = ((NBTTagFloat) nbt).getFloat();
             } else {
@@ -174,10 +174,10 @@ public class NBTTool {
 
     @Nonnull
     public static Float[] readBFloatList(NBTTagList floats) {
-        Float[] res = new Float[floats.tagCount()];
+        Float[] res = new Float[floats.size()];
         IntList failed = new IntArrayList();
-        for (int i = 0; i < floats.tagCount(); i++) {
-            NBTBase nbt = floats.get(i);
+        for (int i = 0; i < floats.size(); i++) {
+            INBTBase nbt = floats.get(i);
             if (nbt instanceof NBTTagFloat) {
                 res[i] = ((NBTTagFloat) nbt).getFloat();
             } else {
@@ -201,10 +201,10 @@ public class NBTTool {
 
     @Nonnull
     public static double[] readDoubleList(NBTTagList doubles) {
-        double[] res = new double[doubles.tagCount()];
+        double[] res = new double[doubles.size()];
         IntList failed = new IntArrayList();
-        for (int i = 0; i < doubles.tagCount(); i++) {
-            NBTBase nbt = doubles.get(i);
+        for (int i = 0; i < doubles.size(); i++) {
+            INBTBase nbt = doubles.get(i);
             if (nbt instanceof NBTTagDouble) {
                 res[i] = ((NBTTagDouble) nbt).getDouble();
             } else {
@@ -228,10 +228,10 @@ public class NBTTool {
 
     @Nonnull
     public static Double[] readBDoubleList(NBTTagList doubles) {
-        Double[] res = new Double[doubles.tagCount()];
+        Double[] res = new Double[doubles.size()];
         IntList failed = new IntArrayList();
-        for (int i = 0; i < doubles.tagCount(); i++) {
-            NBTBase nbt = doubles.get(i);
+        for (int i = 0; i < doubles.size(); i++) {
+            INBTBase nbt = doubles.get(i);
             if (nbt instanceof NBTTagDouble) {
                 res[i] = ((NBTTagDouble) nbt).getDouble();
             } else {
@@ -255,12 +255,12 @@ public class NBTTool {
 
     @Nonnull
     public static String[] readStringList(NBTTagList strings) {
-        String[] res = new String[strings.tagCount()];
+        String[] res = new String[strings.size()];
         IntList failed = new IntArrayList();
-        for (int i = 0; i < strings.tagCount(); i++) {
-            NBTBase nbt = strings.get(i);
+        for (int i = 0; i < strings.size(); i++) {
+            INBTBase nbt = strings.get(i);
             if (nbt instanceof NBTTagString) {
-                res[i] = ((NBTTagString) nbt).getString();
+                res[i] = nbt.getString();
             } else {
                 res[i] = "";
                 failed.add(i);
@@ -298,19 +298,19 @@ public class NBTTool {
         return res;
     }
 
-    public static <K,V> NBTTagList  serializeMap(Map<K,V> map, Function<K,NBTBase> keySerializer, Function<V,NBTBase> valueSerializer) {
+    public static <K,V> NBTTagList  serializeMap(Map<K,V> map, Function<K,INBTBase> keySerializer, Function<V,INBTBase> valueSerializer) {
         NBTTagList list = new NBTTagList();
         for (Map.Entry<K, V> entry: map.entrySet()){
             NBTTagCompound compound = new NBTTagCompound();
             compound.setTag("key",keySerializer.apply(entry.getKey()));
             compound.setTag("val",valueSerializer.apply(entry.getValue()));
-            list.appendTag(compound);
+            list.add(compound);
         }
         return list;
     }
 
-    public static <K,V> Map<K,V>  deserializeMap(NBTTagList list, Map<K,V> toAppendTo, Function<NBTBase,K> keyDeserializer, Function<NBTBase,V> valueDeserializer) {
-        for (NBTBase nbt: list) {
+    public static <K,V> Map<K,V>  deserializeMap(NBTTagList list, Map<K,V> toAppendTo, Function<INBTBase,K> keyDeserializer, Function<INBTBase,V> valueDeserializer) {
+        for (INBTBase nbt: list) {
             if (nbt instanceof NBTTagCompound) {
                 NBTTagCompound compound = (NBTTagCompound) nbt;
                 toAppendTo.put(

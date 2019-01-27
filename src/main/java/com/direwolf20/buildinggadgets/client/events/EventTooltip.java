@@ -17,27 +17,27 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.RenderItem;
+import net.minecraft.client.renderer.ItemRenderer;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.RenderTooltipEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.opengl.GL11;
 
 import java.util.*;
 
-@EventBusSubscriber(Side.CLIENT)
+@EventBusSubscriber(Dist.CLIENT)
 public class EventTooltip {
 
     private static final int STACKS_PER_LINE = 8;
 
-    @SideOnly(Side.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     private static void tooltipIfShift(@SuppressWarnings("unused") List<String> tooltip, Runnable r) {
         if (GuiScreen.isShiftKeyDown())
             r.run();
@@ -56,7 +56,7 @@ public class EventTooltip {
 
             Map<ItemStack, Integer> itemStackCount = new HashMap<ItemStack, Integer>();
             for (Multiset.Entry<UniqueItem> entry : itemCountMap.entrySet()) {
-                ItemStack itemStack = new ItemStack(entry.getElement().item, 1, entry.getElement().meta);
+                ItemStack itemStack = new ItemStack(entry.getElement().item, 1);
                 itemStackCount.put(itemStack, entry.getCount());
             }
             List<Map.Entry<ItemStack, Integer>> list = new ArrayList<>(itemStackCount.entrySet());
@@ -98,7 +98,7 @@ public class EventTooltip {
             //Create an ItemStack -> Integer Map
             Map<ItemStack, Integer> itemStackCount = new HashMap<ItemStack, Integer>();
             for (Multiset.Entry<UniqueItem> entry : itemCountMap.entrySet()) {
-                ItemStack itemStack = new ItemStack(entry.getElement().item, 1, entry.getElement().meta);
+                ItemStack itemStack = new ItemStack(entry.getElement().item, 1);
                 itemStackCount.put(itemStack, entry.getCount());
             }
             // Sort the ItemStack -> Integer map, first by Required Items, then ItemID, then Meta
@@ -106,7 +106,6 @@ public class EventTooltip {
             Comparator<Map.Entry<ItemStack, Integer>> comparator = Comparator.comparing(entry -> entry.getValue());
             comparator = comparator.reversed();
             comparator = comparator.thenComparing(Comparator.comparing(entry -> Item.getIdFromItem(entry.getKey().getItem())));
-            comparator = comparator.thenComparing(Comparator.comparing(entry -> entry.getKey().getMetadata()));
             list.sort(comparator);
 
 //            int count = itemStackCount.size();
@@ -151,8 +150,8 @@ public class EventTooltip {
 
     private static int renderRequiredBlocks(ItemStack itemStack, int x, int y, int count, int req) {
         Minecraft mc = Minecraft.getInstance();
-        GlStateManager.disableDepth();
-        RenderItem render = mc.getRenderItem();
+        GlStateManager.disableDepthTest();
+        ItemRenderer render = mc.getItemRenderer();
 
         net.minecraft.client.renderer.RenderHelper.enableGUIStandardItemLighting();
         render.renderItemIntoGUI(itemStack, x, y);
@@ -165,8 +164,8 @@ public class EventTooltip {
         boolean hasReq = req > 0;
 
         GlStateManager.pushMatrix();
-        GlStateManager.translate(x + 8 - w1 / 4, y + (hasReq ? 12 : 14), 0);
-        GlStateManager.scale(0.5F, 0.5F, 0.5F);
+        GlStateManager.translatef(x + 8 - w1 / 4, y + (hasReq ? 12 : 14), 0);
+        GlStateManager.scalef(0.5F, 0.5F, 0.5F);
         mc.fontRenderer.drawStringWithShadow(s1, 0, 0, color);
         GlStateManager.popMatrix();
 
@@ -187,14 +186,14 @@ public class EventTooltip {
                 int w2 = mc.fontRenderer.getStringWidth(s2);
 
                 GlStateManager.pushMatrix();
-                GlStateManager.translate(x + 8 - w2 / 4, y + 17, 0);
-                GlStateManager.scale(0.5F, 0.5F, 0.5F);
+                GlStateManager.translatef(x + 8 - w2 / 4, y + 17, 0);
+                GlStateManager.scalef(0.5F, 0.5F, 0.5F);
                 mc.fontRenderer.drawStringWithShadow(s2, 0, 0, 0xFF0000);
                 GlStateManager.popMatrix();
                 missingCount = (req - count);
             }
         }
-        GlStateManager.enableDepth();
+        GlStateManager.enableDepthTest();
         return missingCount;
     }
 
@@ -205,7 +204,7 @@ public class EventTooltip {
         for (BlockMap blockMap : blockMapList) {
             UniqueItem uniqueItem = IntStackMap.get(blockMap.state);
             NonNullList<ItemStack> drops = NonNullList.create();
-            blockMap.state.getBlock().getDrops(drops, Minecraft.getInstance().world, new BlockPos(0, 0, 0), blockMap.state, 0);
+            blockMap.state.getBlock().getDrops(blockMap.state, drops, Minecraft.getInstance().world, new BlockPos(0, 0, 0), 0);
             int neededItems = 0;
             for (ItemStack drop : drops) {
                 if (drop.getItem().equals(uniqueItem.item)) {

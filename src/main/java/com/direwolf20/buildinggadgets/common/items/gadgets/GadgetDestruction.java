@@ -83,7 +83,7 @@ public class GadgetDestruction extends GadgetGeneric {
 
     @Nullable
     public static String getUUID(ItemStack stack) {
-        NBTTagCompound tagCompound = stack.getTagCompound();
+        NBTTagCompound tagCompound = stack.getTag();
         if (tagCompound == null) {
             tagCompound = new NBTTagCompound();
         }
@@ -106,7 +106,7 @@ public class GadgetDestruction extends GadgetGeneric {
     }
 
     public static void setAnchorSide(ItemStack stack, EnumFacing side) {
-        NBTTagCompound tagCompound = stack.getTagCompound();
+        NBTTagCompound tagCompound = stack.getTag();
         if (tagCompound == null) {
             tagCompound = new NBTTagCompound();
         }
@@ -122,7 +122,7 @@ public class GadgetDestruction extends GadgetGeneric {
     }
 
     public static EnumFacing getAnchorSide(ItemStack stack) {
-        NBTTagCompound tagCompound = stack.getTagCompound();
+        NBTTagCompound tagCompound = stack.getTag();
         if (tagCompound == null) {
             return null;
         }
@@ -133,25 +133,25 @@ public class GadgetDestruction extends GadgetGeneric {
 
     public static void setToolValue(ItemStack stack, int value, String valueName) {
         //Store the tool's range in NBT as an Integer
-        NBTTagCompound tagCompound = stack.getTagCompound();
+        NBTTagCompound tagCompound = stack.getTag();
         if (tagCompound == null) {
             tagCompound = new NBTTagCompound();
         }
-        tagCompound.setInteger(valueName, value);
+        tagCompound.setInt(valueName, value);
         stack.setTagCompound(tagCompound);
     }
 
     public static int getToolValue(ItemStack stack, String valueName) {
         //Store the tool's range in NBT as an Integer
-        NBTTagCompound tagCompound = stack.getTagCompound();
+        NBTTagCompound tagCompound = stack.getTag();
         if (tagCompound == null) {
             tagCompound = new NBTTagCompound();
         }
-        return tagCompound.getInteger(valueName);
+        return tagCompound.getInt(valueName);
     }
 
     public static boolean getOverlay(ItemStack stack) {
-        NBTTagCompound tagCompound = stack.getTagCompound();
+        NBTTagCompound tagCompound = stack.getTag();
         if (tagCompound == null) {
             tagCompound = new NBTTagCompound();
             tagCompound.setBoolean("overlay", true);
@@ -167,7 +167,7 @@ public class GadgetDestruction extends GadgetGeneric {
     }
 
     public static void setOverlay(ItemStack stack, boolean showOverlay) {
-        NBTTagCompound tagCompound = stack.getTagCompound();
+        NBTTagCompound tagCompound = stack.getTag();
         if (tagCompound == null) {
             tagCompound = new NBTTagCompound();
         }
@@ -370,7 +370,7 @@ public class GadgetDestruction extends GadgetGeneric {
         tagCompound.setIntArray("posPasteArray", posPasteArray);
         tagCompound.setIntArray("statePasteArray", statePasteArray);
         tagCompound.setTag("startPos", NBTUtil.createPosTag(startBlock));
-        tagCompound.setInteger("dim", player.dimension);
+        tagCompound.setInt("dim", player.dimension);
         tagCompound.setString("UUID", UUID);
         worldSave.addToMap(UUID, tagCompound);
         worldSave.markForSaving();
@@ -381,7 +381,7 @@ public class GadgetDestruction extends GadgetGeneric {
         WorldSave worldSave = WorldSave.getWorldSaveDestruction(world);
         NBTTagCompound tagCompound = worldSave.getCompoundFromUUID(getUUID(stack));
         if (tagCompound == null) return;
-        BlockPos startPos = NBTUtil.getPosFromTag(tagCompound.getCompoundTag("startPos"));
+        BlockPos startPos = NBTUtil.getPosFromTag(tagCompound.getCompound("startPos"));
         if (startPos == null) return;
         int[] posIntArray = tagCompound.getIntArray("posIntArray");
         int[] stateIntArray = tagCompound.getIntArray("stateIntArray");

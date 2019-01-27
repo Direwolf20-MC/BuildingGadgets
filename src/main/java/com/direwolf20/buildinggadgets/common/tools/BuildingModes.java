@@ -2,9 +2,11 @@ package com.direwolf20.buildinggadgets.common.tools;
 
 import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetBuilding;
+import net.minecraft.block.BlockTallGrass;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
@@ -13,23 +15,25 @@ import net.minecraft.world.World;
 import java.util.*;
 
 public class BuildingModes {
+
+//  TODO: Fix this
     private static boolean isReplaceable(World world, BlockPos pos, IBlockState setBlock) {
-        if (!setBlock.getBlock().canPlaceBlockAt(world, pos)) {
+        if (!setBlock.isValidPosition(world, pos)) {
             return false;
         }
         if (pos.getY() < 0) {
             return false;
         }
         if (SyncedConfig.canOverwriteBlocks) {
-            if (!world.getBlockState(pos).getBlock().isReplaceable(world, pos)) {
-                return false;
-            }
+//            if (!world.getBlockState(pos).isReplaceable(new BlockItemUseContext())) {
+//                return false;
+//            }
         } else {
             if (world.getBlockState(pos).getMaterial() != Material.AIR) {
                 return false;
             }
         }
-        return true;
+        return false;
     }
 
     public static List<BlockPos> getBuildOrders(World world, EntityPlayer player, BlockPos startBlock, EnumFacing sideHit, ItemStack tool) {
@@ -50,6 +54,8 @@ public class BuildingModes {
             boundX = 0;
             boundZ = bound;
         }
+
+
         //***************************************************
         //Build to me
         //***************************************************
@@ -351,7 +357,7 @@ public class BuildingModes {
             i++;
         }
         Arrays.sort(distances);
-        //ArrayUtils.reverse(distances);
+        //BoxedArray.reverse(distances);
 
         for (Double dist : distances) {
             //System.out.println(dist);
@@ -389,7 +395,7 @@ public class BuildingModes {
             i++;
         }
         Arrays.sort(distances);
-        //ArrayUtils.reverse(distances);
+        //BoxedArray.reverse(distances);
 
         for (Double dist : distances) {
             //System.out.println(dist);

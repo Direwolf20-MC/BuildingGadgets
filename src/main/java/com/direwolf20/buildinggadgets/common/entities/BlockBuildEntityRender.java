@@ -33,7 +33,7 @@ public class BlockBuildEntityRender extends Render<BlockBuildEntity> {
         GlStateManager.pushMatrix();
 
         int toolMode = entity.getToolMode();
-        mc.renderEngine.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+        mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
         int teCounter = entity.getTicksExisted();
         int maxLife = entity.maxLife;
         if (teCounter > maxLife) {
@@ -47,10 +47,10 @@ public class BlockBuildEntityRender extends Render<BlockBuildEntity> {
             scale = (float) (maxLife - teCounter) / maxLife;
         }
         float trans = (1 - scale) / 2;
-        GlStateManager.translate(x, y, z);
-        GlStateManager.translate(trans, trans, trans);
-        GlStateManager.rotate(-90.0F, 0.0F, 1.0F, 0.0F);
-        GlStateManager.scale(scale, scale, scale);
+        GlStateManager.translated(x, y, z);
+        GlStateManager.translatef(trans, trans, trans);
+        GlStateManager.rotatef(-90.0F, 0.0F, 1.0F, 0.0F);
+        GlStateManager.scalef(scale, scale, scale);
 
 
         //IBlockState renderBlockState = blocks.COBBLESTONE.getDefaultState();
@@ -79,18 +79,16 @@ public class BlockBuildEntityRender extends Render<BlockBuildEntity> {
 
 
         GlStateManager.pushMatrix();
-        GlStateManager.pushAttrib();
+        GlStateManager.pushLightingAttrib();
 
         GlStateManager.enableBlend();
-        GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
+        GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
         GlStateManager.disableTexture2D();
         GlStateManager.depthMask(false);
         Tessellator t = Tessellator.getInstance();
         BufferBuilder bufferBuilder = t.getBuffer();
         bufferBuilder.begin(7, DefaultVertexFormats.POSITION_COLOR);
-        double minX = x;
-        double minY = y;
-        double minZ = z;
+
         double maxX = x + 1;
         double maxY = y + 1;
         double maxZ = z + 1;
@@ -110,40 +108,40 @@ public class BlockBuildEntityRender extends Render<BlockBuildEntity> {
             alpha = 0.33f;
         }
         //down
-        bufferBuilder.pos(minX, minY, minZ).color(red, green, blue, alpha).endVertex();
-        bufferBuilder.pos(maxX, minY, minZ).color(red, green, blue, alpha).endVertex();
-        bufferBuilder.pos(maxX, minY, maxZ).color(red, green, blue, alpha).endVertex();
-        bufferBuilder.pos(minX, minY, maxZ).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(x, y, z).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(maxX, y, z).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(maxX, y, maxZ).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(x, y, maxZ).color(red, green, blue, alpha).endVertex();
 
         //up
-        bufferBuilder.pos(minX, maxY, minZ).color(red, green, blue, alpha).endVertex();
-        bufferBuilder.pos(minX, maxY, maxZ).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(x, maxY, z).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(x, maxY, maxZ).color(red, green, blue, alpha).endVertex();
         bufferBuilder.pos(maxX, maxY, maxZ).color(red, green, blue, alpha).endVertex();
-        bufferBuilder.pos(maxX, maxY, minZ).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(maxX, maxY, z).color(red, green, blue, alpha).endVertex();
 
         //north
-        bufferBuilder.pos(minX, minY, minZ).color(red, green, blue, alpha).endVertex();
-        bufferBuilder.pos(minX, maxY, minZ).color(red, green, blue, alpha).endVertex();
-        bufferBuilder.pos(maxX, maxY, minZ).color(red, green, blue, alpha).endVertex();
-        bufferBuilder.pos(maxX, minY, minZ).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(x, y, z).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(x, maxY, z).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(maxX, maxY, z).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(maxX, y, z).color(red, green, blue, alpha).endVertex();
 
         //south
-        bufferBuilder.pos(minX, minY, maxZ).color(red, green, blue, alpha).endVertex();
-        bufferBuilder.pos(maxX, minY, maxZ).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(x, y, maxZ).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(maxX, y, maxZ).color(red, green, blue, alpha).endVertex();
         bufferBuilder.pos(maxX, maxY, maxZ).color(red, green, blue, alpha).endVertex();
-        bufferBuilder.pos(minX, maxY, maxZ).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(x, maxY, maxZ).color(red, green, blue, alpha).endVertex();
 
         //east
-        bufferBuilder.pos(maxX, minY, minZ).color(red, green, blue, alpha).endVertex();
-        bufferBuilder.pos(maxX, maxY, minZ).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(maxX, y, z).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(maxX, maxY, z).color(red, green, blue, alpha).endVertex();
         bufferBuilder.pos(maxX, maxY, maxZ).color(red, green, blue, alpha).endVertex();
-        bufferBuilder.pos(maxX, minY, maxZ).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(maxX, y, maxZ).color(red, green, blue, alpha).endVertex();
 
         //west
-        bufferBuilder.pos(minX, minY, minZ).color(red, green, blue, alpha).endVertex();
-        bufferBuilder.pos(minX, minY, maxZ).color(red, green, blue, alpha).endVertex();
-        bufferBuilder.pos(minX, maxY, maxZ).color(red, green, blue, alpha).endVertex();
-        bufferBuilder.pos(minX, maxY, minZ).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(x, y, z).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(x, y, maxZ).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(x, maxY, maxZ).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(x, maxY, z).color(red, green, blue, alpha).endVertex();
         t.draw();
 
         GlStateManager.disableBlend();

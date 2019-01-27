@@ -12,6 +12,8 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 
@@ -19,34 +21,36 @@ import javax.annotation.Nullable;
 import java.util.List;
 
 public class GenericPasteContainer extends Item {
-    public GenericPasteContainer() {
-        setCreativeTab(BuildingGadgets.BUILDING_CREATIVE_TAB);
+    public GenericPasteContainer(Builder builder) {
+        super(builder);
+//        setCreativeTab(BuildingGadgets.BUILDING_CREATIVE_TAB);
     }
 
     public static void setPasteAmount(ItemStack stack, int amount) {
-        NBTTagCompound tagCompound = stack.getTagCompound();
+        NBTTagCompound tagCompound = stack.getTag();
         if (tagCompound == null) {
             tagCompound = new NBTTagCompound();
         }
-        tagCompound.setInteger("amount", amount);
-        stack.setTagCompound(tagCompound);
+        tagCompound.setInt("amount", amount);
+        stack.setTag(tagCompound);
     }
 
     public static int getPasteAmount(ItemStack stack) {
-        NBTTagCompound tagCompound = stack.getTagCompound();
+        NBTTagCompound tagCompound = stack.getTag();
         int amount = 0;
         if (tagCompound == null) {
             setPasteAmount(stack, 0);
             return amount;
         }
-        amount = tagCompound.getInteger("amount");
+        amount = tagCompound.getInt("amount");
         return amount;
     }
 
     @Override
-    public void addInformation(ItemStack stack, @Nullable World world, List<String> list, ITooltipFlag b) {
-        super.addInformation(stack, world, list, b);
-        list.add(TextFormatting.WHITE + I18n.format("tooltip.pasteContainer.amount") + ": " + getPasteAmount(stack));
+    public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+        super.addInformation(stack, worldIn, tooltip, flagIn);
+
+        tooltip.add(new TextComponentString(TextFormatting.WHITE + I18n.format("tooltip.pasteContainer.amount") + ": " + getPasteAmount(stack)));
     }
 
     public int getMaxAmount() {

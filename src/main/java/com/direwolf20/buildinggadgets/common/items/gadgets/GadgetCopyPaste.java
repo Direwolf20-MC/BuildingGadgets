@@ -100,10 +100,10 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
     }
 
     public static int getY(ItemStack stack) {
-        NBTTagCompound tagCompound = stack.getTagCompound();
+        NBTTagCompound tagCompound = stack.getTag();
         if (tagCompound == null) return 1;
         if (!tagCompound.hasKey("Y")) return 1;
-        Integer tagInt = tagCompound.getInteger("Y");
+        Integer tagInt = tagCompound.getInt("Y");
         return tagInt;
     }
 
@@ -123,7 +123,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
     @Override
     @Nullable
     public String getUUID(ItemStack stack) {
-        NBTTagCompound tagCompound = stack.getTagCompound();
+        NBTTagCompound tagCompound = stack.getTag();
         if (tagCompound == null) {
             return null;
         }
@@ -207,7 +207,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
     }
 
     private static void setToolMode(ItemStack stack, ToolMode mode) {
-        NBTTagCompound tagCompound = stack.getTagCompound();
+        NBTTagCompound tagCompound = stack.getTag();
         if (tagCompound == null) {
             tagCompound = new NBTTagCompound();
         }
@@ -216,7 +216,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
     }
 
     public static ToolMode getToolMode(ItemStack stack) {
-        NBTTagCompound tagCompound = stack.getTagCompound();
+        NBTTagCompound tagCompound = stack.getTag();
         ToolMode mode = ToolMode.Copy;
         if (tagCompound == null) {
             setToolMode(stack, mode);
@@ -345,7 +345,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
         tagCompound.setIntArray("posIntArray", posIntArray);
         tagCompound.setIntArray("stateIntArray", stateIntArray);
         tool.incrementCopyCounter(stack);
-        tagCompound.setInteger("copycounter", tool.getCopyCounter(stack));
+        tagCompound.setInt("copycounter", tool.getCopyCounter(stack));
         worldSave.addToMap(tool.getUUID(stack), tagCompound);
         worldSave.markForSaving();
         PacketHandler.INSTANCE.sendTo(new PacketBlockMap(tagCompound), (EntityPlayerMP) player);
@@ -450,11 +450,11 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
 
         tagCompound.setTag("startPos", NBTUtil.createPosTag(start));
         tagCompound.setTag("endPos", NBTUtil.createPosTag(end));
-        tagCompound.setInteger("dim", player.dimension);
+        tagCompound.setInt("dim", player.dimension);
         tagCompound.setString("UUID", tool.getUUID(stack));
         tagCompound.setString("owner", player.getName());
         tool.incrementCopyCounter(stack);
-        tagCompound.setInteger("copycounter", tool.getCopyCounter(stack));
+        tagCompound.setInt("copycounter", tool.getCopyCounter(stack));
 
         worldSave.addToMap(tool.getUUID(stack), tagCompound);
         worldSave.markForSaving();

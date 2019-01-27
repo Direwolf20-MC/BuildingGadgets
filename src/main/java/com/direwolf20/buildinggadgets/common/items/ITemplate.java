@@ -21,7 +21,7 @@ public interface ITemplate {
     WorldSave getWorldSave(World world);
 
     default void setItemCountMap(ItemStack stack, Multiset<UniqueItem> tagMap) {
-        NBTTagCompound tagCompound = stack.getTagCompound();
+        NBTTagCompound tagCompound = stack.getTag();
         if (tagCompound == null) {
             tagCompound = new NBTTagCompound();
         }
@@ -32,7 +32,7 @@ public interface ITemplate {
 
     @Nonnull
     default Multiset<UniqueItem> getItemCountMap(ItemStack stack) {
-        NBTTagCompound tagCompound = stack.getTagCompound();
+        NBTTagCompound tagCompound = stack.getTag();
         Multiset<UniqueItem> tagMap = tagCompound == null ? null : GadgetUtils.nbtToItemCount((NBTTagList) tagCompound.getTag("itemcountmap"));
         if (tagMap == null)
             throw new IllegalArgumentException("ITemplate#getItemCountMap faild to retieve tag map from " + GadgetUtils.getStackErrorSuffix(stack));
@@ -41,18 +41,18 @@ public interface ITemplate {
     }
 
     default int getCopyCounter(ItemStack stack) {
-        return GadgetUtils.getStackTag(stack).getInteger("copycounter");
+        return GadgetUtils.getStackTag(stack).getInt("copycounter");
     }
 
     default void setCopyCounter(ItemStack stack, int counter) {//TODO unused
         NBTTagCompound tagCompound = GadgetUtils.getStackTag(stack);
-        tagCompound.setInteger("copycounter", counter);
+        tagCompound.setInt("copycounter", counter);
         stack.setTagCompound(tagCompound);
     }
 
     default void incrementCopyCounter(ItemStack stack) {
         NBTTagCompound tagCompound = GadgetUtils.getStackTag(stack);
-        tagCompound.setInteger("copycounter", tagCompound.getInteger("copycounter") + 1);
+        tagCompound.setInt("copycounter", tagCompound.getInt("copycounter") + 1);
         stack.setTagCompound(tagCompound);
     }
 
