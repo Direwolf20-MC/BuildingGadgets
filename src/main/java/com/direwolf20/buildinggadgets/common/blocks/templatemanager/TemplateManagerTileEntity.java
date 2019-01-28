@@ -9,7 +9,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.OptionalCapabilityInstance;
+import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.items.ItemStackHandler;
@@ -82,12 +82,12 @@ public class TemplateManagerTileEntity extends TileEntity {
 
     @Nonnull
     @Override
-    public <T> OptionalCapabilityInstance<T> getCapability(@Nonnull Capability<T> cap) {
+    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap) {
         if (cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
-            return OptionalCapabilityInstance.of(() -> itemStackHandler).cast();
+            return LazyOptional.of(() -> itemStackHandler).cast();
         }
 
-        return OptionalCapabilityInstance.empty();
+        return LazyOptional.empty();
     }
 
     public TemplateManagerContainer getContainer(EntityPlayer playerIn) {
