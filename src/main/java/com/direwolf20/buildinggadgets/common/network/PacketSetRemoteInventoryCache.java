@@ -20,14 +20,12 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 
 public class PacketSetRemoteInventoryCache implements IMessage {
@@ -91,23 +89,17 @@ public class PacketSetRemoteInventoryCache implements IMessage {
                     EntityPlayerMP player = ctx.getServerHandler().player;
                     Set<UniqueItem> itemTypes = new HashSet<>();
                     ImmutableMultiset.Builder<UniqueItem> builder = ImmutableMultiset.builder();
-                    BlockPos tePos = GadgetUtils.getBoundTE(GadgetGeneric.getGadget(player), player.world);
-                    if (tePos != null) {
-                        TileEntity te = player.world.getTileEntity(tePos);
-                        if (te != null) {
-                            IItemHandler cap = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
-                            if (cap != null) {
-                                for (int i = 0; i < cap.getSlots(); i++) {
-                                    ItemStack stack = cap.getStackInSlot(i);
-                                    if (!stack.isEmpty()) {
-                                        Item item = stack.getItem();
-                                        int meta = stack.getItemDamage();
-                                        UniqueItem uniqueItem = new UniqueItem(item, meta);
-                                        if (!itemTypes.contains(uniqueItem)) {
-                                            itemTypes.add(uniqueItem);
-                                            builder.addCopies(uniqueItem, InventoryManipulation.countInContainer(cap,item, meta));
-                                        }
-                                    }
+                    IItemHandler remoteInventory = GadgetUtils.getBoundRemoteInventory(GadgetGeneric.getGadget(player), player.world);
+                    if (remoteInventory != null) {
+                        for (int i = 0; i < remoteInventory.getSlots(); i++) {
+                            ItemStack stack = remoteInventory.getStackInSlot(i);
+                            if (!stack.isEmpty()) {
+                                Item item = stack.getItem();
+                                int meta = stack.getItemDamage();
+                                UniqueItem uniqueItem = new UniqueItem(item, meta);
+                                if (!itemTypes.contains(uniqueItem)) {
+                                    itemTypes.add(uniqueItem);
+                                    builder.addCopies(uniqueItem, InventoryManipulation.countInContainer(remoteInventory,item, meta));
                                 }
                             }
                         }

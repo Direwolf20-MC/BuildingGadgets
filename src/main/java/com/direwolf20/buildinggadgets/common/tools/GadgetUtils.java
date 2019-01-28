@@ -11,6 +11,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTUtil;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
@@ -252,7 +253,7 @@ public class GadgetUtils {
                 IItemHandler cap = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
                 if (cap == null) validBlock = false;
                 else {
-                    boolean success = setBoundTE(stack, pos, player.dimension, world);
+                    boolean success = setBoundTE(stack, pos, world.provider.getDimension(), world);
                     if (success) {
                         player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.boundTE").getUnformattedComponentText()), true);
                         return;
@@ -300,7 +301,7 @@ public class GadgetUtils {
         return true;
     }
 
-    public static boolean setBoundTE(ItemStack tool, @Nullable BlockPos pos, int dim, World world) {//TODO include dimension along with pos
+    public static boolean setBoundTE(ItemStack tool, @Nullable BlockPos pos, int dim, World world) {
         TileEntity te = world.getTileEntity(pos);
         if (te == null) return false;
         IItemHandler cap = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
@@ -309,16 +310,19 @@ public class GadgetUtils {
         return true;
     }
 
-    public static BlockPos getBoundTE(ItemStack tool, World world) {//TODO include dimension along with pos
+    public static IItemHandler getBoundRemoteInventory(ItemStack tool, World world) {
+        Integer dim = getDIMFromNBT(tool, "boundTE");
+        if (dim == null) return null;
+        MinecraftServer server = world.getMinecraftServer();
+        if (server == null) return null;
+        World worldServer = server.getWorld(dim);
+        if (worldServer == null) return null;
         BlockPos pos = getPOSFromNBT(tool, "boundTE");
-        //BlockPos blankPos = new BlockPos(0,0,0);
         if (pos == null) return null;
-        TileEntity te = world.getTileEntity(pos);
-
+        TileEntity te = worldServer.getTileEntity(pos);
         if (te == null) return null;
         IItemHandler cap = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
-        if (cap == null) return null;
-        return pos;
+        return cap == null ? null : cap;
     }
 
     public static String withSuffix(int count) {

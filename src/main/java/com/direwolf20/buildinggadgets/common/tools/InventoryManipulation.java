@@ -16,7 +16,6 @@ import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
@@ -71,14 +70,12 @@ public class InventoryManipulation {
         }
 
         ItemStack tool = GadgetGeneric.getGadget(player);
-        BlockPos tePos = GadgetUtils.getBoundTE(tool, world);
-        if (tePos != null) {
-            TileEntity te = world.getTileEntity(tePos);
-            IItemHandler cap = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
-            for (int i = 0; i < cap.getSlots(); i++) {
-                ItemStack containerItem = cap.getStackInSlot(i);
+        IItemHandler remoteInventory = GadgetUtils.getBoundRemoteInventory(tool, world);
+        if (remoteInventory != null) {
+            for (int i = 0; i < remoteInventory.getSlots(); i++) {
+                ItemStack containerItem = remoteInventory.getStackInSlot(i);
                 if (containerItem.getItem() == itemStack.getItem() && containerItem.getMetadata() == itemStack.getMetadata() && containerItem.getCount() >= count) {
-                    cap.extractItem(i, count, false);
+                    remoteInventory.extractItem(i, count, false);
                     return true;
                 }
             }
@@ -119,17 +116,8 @@ public class InventoryManipulation {
 
     public static int countItem(ItemStack itemStack, EntityPlayer player, World world) {
         return countItem(itemStack, player, (tool, stack) -> {
-            if (world != null) {
-                BlockPos tePos = GadgetUtils.getBoundTE(tool, world);
-                if (tePos != null) {
-                    TileEntity te = world.getTileEntity(tePos);
-                    if (te != null) {
-                        IItemHandler cap = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
-                        return countInContainer(cap, stack.getItem(), stack.getMetadata());
-                    }
-                }
-            }
-            return 0;
+            IItemHandler remoteInventory = GadgetUtils.getBoundRemoteInventory(tool, world);
+            return remoteInventory == null ? 0 : countInContainer(remoteInventory, stack.getItem(), stack.getMetadata());
         });
     }
 

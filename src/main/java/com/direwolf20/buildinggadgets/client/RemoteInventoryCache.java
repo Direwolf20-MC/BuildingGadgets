@@ -72,6 +72,11 @@ public class RemoteInventoryCache implements IRemoteInventoryProvider {
     @Nullable
     private Pair<Integer, BlockPos> getInventoryLocation(ItemStack stack) {
         NBTTagCompound nbt = stack.getTagCompound();
-        return nbt == null || !nbt.hasKey("boundTE") ? null : new ImmutablePair<>(nbt.getInteger("dimension"), GadgetUtils.getPOSFromNBT(stack, "boundTE"));//TODO mirror GadgetUtils#getBoundTE's inclusion of dimension along with pos
+        if (nbt == null)
+            return null;
+
+        Integer dim = GadgetUtils.getDIMFromNBT(stack, "boundTE");
+        BlockPos pos = GadgetUtils.getPOSFromNBT(stack, "boundTE");
+        return dim == null || pos == null ? null : new ImmutablePair<>(dim, pos);
     }
 }
