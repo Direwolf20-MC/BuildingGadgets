@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.common.items.gadgets;
 
-import com.direwolf20.buildinggadgets.common.BuildingGadgets;
+import com.direwolf20.buildinggadgets.common.BuildingObjects;
 import com.direwolf20.buildinggadgets.common.blocks.ModBlocks;
 import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
@@ -14,7 +14,6 @@ import com.direwolf20.buildinggadgets.common.tools.VectorTools;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.EntityType;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Enchantments;
@@ -61,8 +60,7 @@ public class GadgetBuilding extends GadgetGeneric {
     public static final ResourceLocation REGISTRY_NAME = new ResourceLocation("buildingtool");
 
     public GadgetBuilding(Builder builder) {
-        super(builder.maxStackSize(1));
-        setRegistryName(REGISTRY_NAME);
+        super(builder);
 
 //        setUnlocalizedName(BuildingGadgets.MODID + ".buildingtool");     // Used for localization (en_US.lang)
         if (!SyncedConfig.poweredByFE) {
@@ -115,8 +113,9 @@ public class GadgetBuilding extends GadgetGeneric {
             tooltip.add(new TextComponentString(TextFormatting.RED + I18n.format("tooltip.gadget.range") + ": " + getToolRange(stack)));
         }
         if (SyncedConfig.poweredByFE) {
-            IEnergyStorage energy = CapabilityProviderEnergy.getCap(stack);
-            tooltip.add(new TextComponentString(TextFormatting.WHITE + I18n.format("tooltip.gadget.energy") + ": " + withSuffix(energy.getEnergyStored()) + "/" + withSuffix(energy.getMaxEnergyStored())));
+            CapabilityProviderEnergy.getCap(stack).ifPresent(iEnergyStorage -> {
+                tooltip.add(new TextComponentString(TextFormatting.WHITE + I18n.format("tooltip.gadget.energy") + ": " + withSuffix(iEnergyStorage.getEnergyStored()) + "/" + withSuffix(iEnergyStorage.getMaxEnergyStored())));
+            });
         }
     }
 
@@ -307,7 +306,7 @@ public class GadgetBuilding extends GadgetGeneric {
         if (ForgeEventFactory.onPlayerBlockPlace(player, blockSnapshot, EnumFacing.UP, EnumHand.MAIN_HAND).isCanceled()) {
             return false;
         }
-        ItemStack constructionPaste = new ItemStack(ModItems.constructionPaste);
+        ItemStack constructionPaste = new ItemStack(BuildingObjects.constructionPaste);
         if (InventoryManipulation.countItem(itemStack, player, world) < neededItems) {
             //if (InventoryManipulation.countItem(constructionStack, player) == 0) {
             if (InventoryManipulation.countPaste(player) < neededItems) {

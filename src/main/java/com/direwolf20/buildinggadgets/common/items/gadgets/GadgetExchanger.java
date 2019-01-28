@@ -1,10 +1,9 @@
 package com.direwolf20.buildinggadgets.common.items.gadgets;
 
-import com.direwolf20.buildinggadgets.common.BuildingGadgets;
+import com.direwolf20.buildinggadgets.common.BuildingObjects;
 import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.common.items.FakeBuilderWorld;
-import com.direwolf20.buildinggadgets.common.items.ModItems;
 import com.direwolf20.buildinggadgets.common.items.capability.CapabilityProviderEnergy;
 import com.direwolf20.buildinggadgets.common.tools.ExchangingModes;
 import com.direwolf20.buildinggadgets.common.tools.InventoryManipulation;
@@ -22,18 +21,18 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldType;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.BlockSnapshot;
-import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.world.BlockEvent;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -55,12 +54,11 @@ public class GadgetExchanger extends GadgetGeneric {
         }
     }
 
-    public GadgetExchanger() {
-        setRegistryName("exchangertool");        // The unique name (within your mod) that identifies this item
-        setUnlocalizedName(BuildingGadgets.MODID + ".exchangertool");     // Used for localization (en_US.lang)
-        setMaxStackSize(1);
+    public GadgetExchanger(Builder builder) {
+        super(builder);
+
         if (!SyncedConfig.poweredByFE) {
-            setMaxDamage(SyncedConfig.durabilityExchanger);
+            builder.defaultMaxDamage(SyncedConfig.durabilityExchanger);
         }
     }
 
@@ -112,7 +110,7 @@ public class GadgetExchanger extends GadgetGeneric {
             tagCompound = new NBTTagCompound();
         }
         tagCompound.setString("mode", mode.name());
-        stack.setTagCompound(tagCompound);
+        stack.setTag(tagCompound);
     }
 
     public static ToolMode getToolMode(ItemStack stack) {
@@ -131,14 +129,14 @@ public class GadgetExchanger extends GadgetGeneric {
     }
 
     @Override
-    public void addInformation(ItemStack stack, @Nullable World world, List<String> list, ITooltipFlag b) {
-        super.addInformation(stack, world, list, b);
-        list.add(TextFormatting.DARK_GREEN + I18n.format("tooltip.gadget.block") + ": " + getToolBlock(stack).getBlock().getLocalizedName());
-        list.add(TextFormatting.AQUA + I18n.format("tooltip.gadget.mode") + ": " + getToolMode(stack));
-        list.add(TextFormatting.RED + I18n.format("tooltip.gadget.range") + ": " + getToolRange(stack));
+    public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+        super.addInformation(stack, worldIn, tooltip, flagIn);
+
+        tooltip.add(new TextComponentString(TextFormatting.DARK_GREEN + I18n.format("tooltip.gadget.block") + ": " + getToolBlock(stack).getBlock().getNameTextComponent()));
+        tooltip.add(new TextComponentString(TextFormatting.AQUA + I18n.format("tooltip.gadget.mode") + ": " + getToolMode(stack)));
+        tooltip.add(new TextComponentString(TextFormatting.RED + I18n.format("tooltip.gadget.range") + ": " + getToolRange(stack)));
         if (SyncedConfig.poweredByFE) {
-            IEnergyStorage energy = CapabilityProviderEnergy.getCap(stack);
-            list.add(TextFormatting.WHITE + I18n.format("tooltip.gadget.energy") + ": " + withSuffix(energy.getEnergyStored()) + "/" + withSuffix(energy.getMaxEnergyStored()));
+            CapabilityProviderEnergy.getCap(stack).ifPresent(iEnergyStorage -> tooltip.add(new TextComponentString(TextFormatting.WHITE + I18n.format("tooltip.gadget.energy") + ": " + withSuffix(iEnergyStorage.getEnergyStored()) + "/" + withSuffix(iEnergyStorage.getMaxEnergyStored()))));
         }
     }
 
@@ -217,7 +215,7 @@ public class GadgetExchanger extends GadgetGeneric {
             for (BlockPos coordinate : coords) {
                 if (fakeWorld.getWorldType() != WorldType.DEBUG_ALL_BLOCK_STATES) {
                     try {
-                        state = blockState.getActualState(fakeWorld, coordinate);  //Get the state of the block in the fake world (This lets fences be connected, etc)
+                        state = blockState.getExtendedState(world/*fakework*/, coordinate);  //Get the state of the block in the fake world (This lets fences be connected, etc)
                     } catch (Exception var8) {
                     }
                 }
@@ -235,7 +233,7 @@ public class GadgetExchanger extends GadgetGeneric {
         ItemStack itemStack;
         boolean useConstructionPaste = false;
         //ItemStack itemStack = setBlock.getBlock().getPickBlock(setBlock, null, world, pos, player);
-        if (setBlock.getBlock().canSilkHarvest(world, pos, setBlock, player)) {
+        if (setBlock.getBlock().canSilkHarvest(setBlock, world, pos, player)) {
             itemStack = InventoryManipulation.getSilkTouchDrop(setBlock);
         } else {
             itemStack = setBlock.getBlock().getPickBlock(setBlock, null, world, pos, player);
@@ -249,7 +247,7 @@ public class GadgetExchanger extends GadgetGeneric {
             return false;
 
         NonNullList<ItemStack> drops = NonNullList.create();
-        setBlock.getBlock().getDrops(drops, world, pos, setBlock, 0);
+        setBlock.getBlock().getDrops(setBlock, drops, world, pos, 0);
         int neededItems = 0;
         for (ItemStack drop : drops) {
             if (drop.getItem().equals(itemStack.getItem())) {
@@ -260,7 +258,7 @@ public class GadgetExchanger extends GadgetGeneric {
             neededItems = 1;
         }
         if (InventoryManipulation.countItem(itemStack, player, world) < neededItems) {
-            ItemStack constructionPaste = new ItemStack(ModItems.constructionPaste);
+            ItemStack constructionPaste = new ItemStack(BuildingObjects.constructionPaste);
             if (InventoryManipulation.countPaste(player) < neededItems) {
                 return false;
             }
@@ -310,12 +308,12 @@ public class GadgetExchanger extends GadgetGeneric {
     }
 
     @Override
-    public int getMaxItemUseDuration(ItemStack stack) {
+    public int getUseDuration(ItemStack stack) {
         return 20;
     }
 
     @Override
-    @SideOnly(Side.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     public boolean hasEffect(ItemStack stack) {
         return false;
     }

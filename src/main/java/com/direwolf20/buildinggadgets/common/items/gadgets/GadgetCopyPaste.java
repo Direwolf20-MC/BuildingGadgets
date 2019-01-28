@@ -2,6 +2,7 @@ package com.direwolf20.buildinggadgets.common.items.gadgets;
 
 import com.direwolf20.buildinggadgets.client.events.EventTooltip;
 import com.direwolf20.buildinggadgets.client.gui.CopyPasteGUI;
+import com.direwolf20.buildinggadgets.common.BuildingObjects;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlock;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
@@ -62,12 +63,10 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
     }
 
     public GadgetCopyPaste(Builder builder) {
-        super(builder.maxStackSize(1));
-        setRegistryName("copypastetool");        // The unique name (within your mod) that identifies this item
+        super(builder);
 
 // @todo: reimplement @since 1.13.x
 //        setUnlocalizedName(BuildingGadgets.MODID + ".copypastetool");     // Used for localization (en_US.lang)
-
         if (!SyncedConfig.poweredByFE) {
             builder.defaultMaxDamage(SyncedConfig.durabilityCopyPaste);
         }
@@ -240,8 +239,9 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
 
         tooltip.add(new TextComponentString(TextFormatting.AQUA + I18n.format("tooltip.gadget.mode") + ": " + getToolMode(stack)));
         if (SyncedConfig.poweredByFE) {
-            IEnergyStorage energy = CapabilityProviderEnergy.getCap(stack);
-            tooltip.add(new TextComponentString(TextFormatting.WHITE + I18n.format("tooltip.gadget.energy") + ": " + withSuffix(energy.getEnergyStored()) + "/" + withSuffix(energy.getMaxEnergyStored())));
+            CapabilityProviderEnergy.getCap(stack).ifPresent(iEnergyStorage -> {
+                tooltip.add(new TextComponentString(TextFormatting.WHITE + I18n.format("tooltip.gadget.energy") + ": " + withSuffix(iEnergyStorage.getEnergyStored()) + "/" + withSuffix(iEnergyStorage.getMaxEnergyStored())));
+            });
         }
         EventTooltip.addTemplatePadding(stack, tooltip);
     }
@@ -320,7 +320,9 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
         if (player.world.isRemote) {
             return;
         }
-        GadgetCopyPaste tool = ModItems.gadgetCopyPaste;
+
+        GadgetCopyPaste tool = (GadgetCopyPaste) BuildingObjects.gadgetCopyPaste;
+
         List<BlockMap> blockMapList;
         WorldSave worldSave = WorldSave.getWorldSave(player.world);
         NBTTagCompound tagCompound = worldSave.getCompoundFromUUID(tool.getUUID(stack));
@@ -365,7 +367,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
 
     public static void copyBlocks(ItemStack stack, EntityPlayer player, World world, BlockPos startPos, BlockPos endPos) {
         if (startPos != null && endPos != null) {
-            GadgetCopyPaste tool = ModItems.gadgetCopyPaste;
+            GadgetCopyPaste tool = (GadgetCopyPaste) BuildingObjects.gadgetCopyPaste;
             if (findBlocks(world, startPos, endPos, stack, player, tool)) {
                 tool.setStartPos(stack, startPos);
                 tool.setEndPos(stack, endPos);
@@ -515,7 +517,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
         if (heldItem.isEmpty())
             return;
 
-        if (ModItems.gadgetCopyPaste.getStartPos(heldItem) == null || ModItems.gadgetCopyPaste.getEndPos(heldItem) == null)
+        if (((GadgetCopyPaste) BuildingObjects.gadgetCopyPaste).getStartPos(heldItem) == null ||((GadgetCopyPaste) BuildingObjects.gadgetCopyPaste).getEndPos(heldItem) == null)
             return;
 
         UniqueItem uniqueItem = IntStackMap.get(state);
@@ -539,7 +541,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
         if (ForgeEventFactory.onPlayerBlockPlace(player, blockSnapshot, EnumFacing.UP, EnumHand.MAIN_HAND).isCanceled()) {
             return;
         }
-        ItemStack constructionPaste = new ItemStack(ModItems.constructionPaste);
+        ItemStack constructionPaste = new ItemStack(BuildingObjects.constructionPaste);
         boolean useConstructionPaste = false;
         if (InventoryManipulation.countItem(itemStack, player, world) < neededItems) {
             if (InventoryManipulation.countPaste(player) < neededItems) {
@@ -584,7 +586,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
 
     public void undoBuild(EntityPlayer player, ItemStack heldItem) {
 //        long time = System.nanoTime();
-        NBTTagCompound tagCompound = WorldSave.getWorldSave(player.world).getCompoundFromUUID(ModItems.gadgetCopyPaste.getUUID(heldItem));
+        NBTTagCompound tagCompound = WorldSave.getWorldSave(player.world).getCompoundFromUUID(((GadgetCopyPaste) BuildingObjects.gadgetCopyPaste).getUUID(heldItem));
         World world = player.world;
         if (world.isRemote) {
             return;

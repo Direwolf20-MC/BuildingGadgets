@@ -27,6 +27,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
@@ -45,12 +46,11 @@ import static com.direwolf20.buildinggadgets.common.tools.GadgetUtils.withSuffix
 
 public class GadgetDestruction extends GadgetGeneric {
 
-    public GadgetDestruction() {
-        setRegistryName("destructiontool");        // The unique name (within your mod) that identifies this item
-        setUnlocalizedName(BuildingGadgets.MODID + ".destructiontool");     // Used for localization (en_US.lang)
-        setMaxStackSize(1);
+    public GadgetDestruction(Builder builder) {
+        super(builder);
+
         if (!SyncedConfig.poweredByFE) {
-            setMaxDamage(SyncedConfig.durabilityDestruction);
+            builder.defaultMaxDamage(SyncedConfig.durabilityDestruction);
         }
     }
 
@@ -70,14 +70,13 @@ public class GadgetDestruction extends GadgetGeneric {
     }
 
     @Override
-    public void addInformation(ItemStack stack, @Nullable World world, List<String> list, ITooltipFlag b) {
-        super.addInformation(stack, world, list, b);
-        list.add(TextFormatting.RED + I18n.format("tooltip.gadget.destroywarning"));
-        list.add(TextFormatting.AQUA + I18n.format("tooltip.gadget.destroyshowoverlay") + ": " + getOverlay(stack));
+    public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+        super.addInformation(stack, worldIn, tooltip, flagIn);
+
+        tooltip.add(new TextComponentString(TextFormatting.RED + I18n.format("tooltip.gadget.destroywarning")));
+        tooltip.add(new TextComponentString(TextFormatting.AQUA + I18n.format("tooltip.gadget.destroyshowoverlay") + ": " + getOverlay(stack)));
         if (SyncedConfig.poweredByFE) {
-            IEnergyStorage energy = stack.getCapability(CapabilityEnergy.ENERGY, null);
-            if (energy != null)
-                list.add(TextFormatting.WHITE + I18n.format("tooltip.gadget.energy") + ": " + withSuffix(energy.getEnergyStored()) + "/" + withSuffix(energy.getMaxEnergyStored()));
+            stack.getCapability(CapabilityEnergy.ENERGY, null).ifPresent(iEnergyStorage -> tooltip.add(new TextComponentString(TextFormatting.WHITE + I18n.format("tooltip.gadget.energy") + ": " + withSuffix(iEnergyStorage.getEnergyStored()) + "/" + withSuffix(iEnergyStorage.getMaxEnergyStored()))));
         }
     }
 
@@ -91,7 +90,7 @@ public class GadgetDestruction extends GadgetGeneric {
         if (uuid.equals("")) {
             UUID uid = UUID.randomUUID();
             tagCompound.setString("UUID", uid.toString());
-            stack.setTagCompound(tagCompound);
+            stack.setTag(tagCompound);
             uuid = uid.toString();
         }
         return uuid;
@@ -113,12 +112,12 @@ public class GadgetDestruction extends GadgetGeneric {
         if (side == null) {
             if (tagCompound.getTag("anchorSide") != null) {
                 tagCompound.removeTag("anchorSide");
-                stack.setTagCompound(tagCompound);
+                stack.setTag(tagCompound);
             }
             return;
         }
         tagCompound.setString("anchorSide", side.getName());
-        stack.setTagCompound(tagCompound);
+        stack.setTag(tagCompound);
     }
 
     public static EnumFacing getAnchorSide(ItemStack stack) {
@@ -138,7 +137,7 @@ public class GadgetDestruction extends GadgetGeneric {
             tagCompound = new NBTTagCompound();
         }
         tagCompound.setInt(valueName, value);
-        stack.setTagCompound(tagCompound);
+        stack.setTag(tagCompound);
     }
 
     public static int getToolValue(ItemStack stack, String valueName) {
@@ -155,14 +154,14 @@ public class GadgetDestruction extends GadgetGeneric {
         if (tagCompound == null) {
             tagCompound = new NBTTagCompound();
             tagCompound.setBoolean("overlay", true);
-            stack.setTagCompound(tagCompound);
+            stack.setTag(tagCompound);
             return true;
         }
         if (tagCompound.hasKey("overlay")) {
             return tagCompound.getBoolean("overlay");
         }
         tagCompound.setBoolean("overlay", true);
-        stack.setTagCompound(tagCompound);
+        stack.setTag(tagCompound);
         return true;
     }
 
@@ -172,7 +171,7 @@ public class GadgetDestruction extends GadgetGeneric {
             tagCompound = new NBTTagCompound();
         }
         tagCompound.setBoolean("overlay", showOverlay);
-        stack.setTagCompound(tagCompound);
+        stack.setTag(tagCompound);
     }
 
     public void switchOverlay(ItemStack stack) {
@@ -236,7 +235,8 @@ public class GadgetDestruction extends GadgetGeneric {
             }
         } else {
             if (player.isSneaking()) {
-                player.openGui(BuildingGadgets.instance, GuiProxy.DestructionID, world, hand.ordinal(), 0, 0);
+// @todo: reimplement @since 1.13.x
+                //                player.openGui(BuildingGadgets.instance, GuiProxy.DestructionID, world, hand.ordinal(), 0, 0);
                 return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);
             }
         }
@@ -369,7 +369,7 @@ public class GadgetDestruction extends GadgetGeneric {
         tagCompound.setIntArray("stateIntArray", stateIntArray);
         tagCompound.setIntArray("posPasteArray", posPasteArray);
         tagCompound.setIntArray("statePasteArray", statePasteArray);
-        tagCompound.setTag("startPos", NBTUtil.createPosTag(startBlock));
+        tagCompound.setTag("startPos", NBTUtil.writeBlockPos(startBlock));
         tagCompound.setInt("dim", player.dimension);
         tagCompound.setString("UUID", UUID);
         worldSave.addToMap(UUID, tagCompound);
@@ -381,7 +381,7 @@ public class GadgetDestruction extends GadgetGeneric {
         WorldSave worldSave = WorldSave.getWorldSaveDestruction(world);
         NBTTagCompound tagCompound = worldSave.getCompoundFromUUID(getUUID(stack));
         if (tagCompound == null) return;
-        BlockPos startPos = NBTUtil.getPosFromTag(tagCompound.getCompound("startPos"));
+        BlockPos startPos = NBTUtil.readBlockPos(tagCompound.getCompound("startPos"));
         if (startPos == null) return;
         int[] posIntArray = tagCompound.getIntArray("posIntArray");
         int[] stateIntArray = tagCompound.getIntArray("stateIntArray");

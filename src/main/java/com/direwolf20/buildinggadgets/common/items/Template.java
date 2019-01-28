@@ -1,10 +1,8 @@
 package com.direwolf20.buildinggadgets.common.items;
 
 import com.direwolf20.buildinggadgets.client.events.EventTooltip;
-import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.tools.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.tools.WorldSave;
-import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
@@ -14,21 +12,20 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
-import net.minecraftforge.client.model.ModelLoader;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.UUID;
 
 public class Template extends Item implements ITemplate {
-    public Template() {
-        setRegistryName("template");        // The unique name (within your mod) that identifies this item
-        setUnlocalizedName(BuildingGadgets.MODID + ".template");     // Used for localization (en_US.lang)
-        setMaxStackSize(1);
+    public Template(Builder builder) {
+        super(builder);
     }
 
     @Override
@@ -47,7 +44,7 @@ public class Template extends Item implements ITemplate {
         if (uuid.equals("")) {
             UUID uid = UUID.randomUUID();
             tagCompound.setString("UUID", uid.toString());
-            stack.setTagCompound(tagCompound);
+            stack.setTag(tagCompound);
             uuid = uid.toString();
         }
         return uuid;
@@ -62,22 +59,23 @@ public class Template extends Item implements ITemplate {
     }
 
     @Override
-    public void addInformation(ItemStack stack, @Nullable World world, List<String> list, ITooltipFlag b) {
-        //Add tool information to the tooltip
-        super.addInformation(stack, world, list, b);
-        list.add(TextFormatting.AQUA + I18n.format("tooltip.template.name") + ": " + getName(stack));
-        EventTooltip.addTemplatePadding(stack, list);
+    public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+        super.addInformation(stack, worldIn, tooltip, flagIn);
+
+        tooltip.add(new TextComponentString(TextFormatting.AQUA + I18n.format("tooltip.template.name") + ": " + getName(stack)));
+        EventTooltip.addTemplatePadding(stack, tooltip);
     }
 
-    @SideOnly(Side.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     public void initModel() {
-        ModelLoader.setCustomModelResourceLocation(this, 0, new ModelResourceLocation(getRegistryName(), "inventory"));
+// @todo: reimplement @since 1.13.x
+        //        ModelLoader.setCustomModelResourceLocation(this, 0, new ModelResourceLocation(getRegistryName(), "inventory"));
     }
 
     @Override
     public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
         ItemStack itemstack = player.getHeldItem(hand);
-        return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, itemstack);
+        return new ActionResult<>(EnumActionResult.SUCCESS, itemstack);
     }
 
 }

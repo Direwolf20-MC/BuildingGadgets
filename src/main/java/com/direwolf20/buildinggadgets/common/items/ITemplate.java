@@ -27,7 +27,7 @@ public interface ITemplate {
         }
         NBTTagList tagList = GadgetUtils.itemCountToNBT(tagMap);
         tagCompound.setTag("itemcountmap", tagList);
-        stack.setTagCompound(tagCompound);
+        stack.setTag(tagCompound);
     }
 
     @Nonnull
@@ -47,13 +47,13 @@ public interface ITemplate {
     default void setCopyCounter(ItemStack stack, int counter) {//TODO unused
         NBTTagCompound tagCompound = GadgetUtils.getStackTag(stack);
         tagCompound.setInt("copycounter", counter);
-        stack.setTagCompound(tagCompound);
+        stack.setTag(tagCompound);
     }
 
     default void incrementCopyCounter(ItemStack stack) {
         NBTTagCompound tagCompound = GadgetUtils.getStackTag(stack);
         tagCompound.setInt("copycounter", tagCompound.getInt("copycounter") + 1);
-        stack.setTagCompound(tagCompound);
+        stack.setTag(tagCompound);
     }
 
     default void setStartPos(ItemStack stack, BlockPos startPos) {
