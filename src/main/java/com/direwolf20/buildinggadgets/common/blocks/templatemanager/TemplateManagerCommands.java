@@ -4,12 +4,15 @@ import com.direwolf20.buildinggadgets.common.BuildingObjects;
 import com.direwolf20.buildinggadgets.common.items.ITemplate;
 import com.direwolf20.buildinggadgets.common.items.Template;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
+import com.direwolf20.buildinggadgets.common.network.PacketHandler;
+import com.direwolf20.buildinggadgets.common.network.packets.PacketBlockMap;
 import com.direwolf20.buildinggadgets.common.tools.*;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -71,8 +74,7 @@ public class TemplateManagerCommands {
             Template.setName(itemStack0, Template.getName(itemStack1));
         }
         container.putStackInSlot(0, itemStack0);
-// @todo: reimplement @since 1.13.x
-        //        PacketHandler.INSTANCE.sendTo(new PacketBlockMap(tagCompound), (EntityPlayerMP) player);
+        PacketHandler.sendTo(new PacketBlockMap(tagCompound), (EntityPlayerMP) player);
     }
 
     public static void saveTemplate(TemplateManagerContainer container, EntityPlayer player, String templateName) {
@@ -130,8 +132,7 @@ public class TemplateManagerCommands {
             }
         }
         container.putStackInSlot(1, templateStack);
-        // @todo: reimplement @since 1.13.x
-        //        PacketHandler.INSTANCE.sendTo(new PacketBlockMap(templateTagCompound), (EntityPlayerMP) player);
+        PacketHandler.sendTo(new PacketBlockMap(templateTagCompound), (EntityPlayerMP) player);
     }
 
     public static void pasteTemplate(TemplateManagerContainer container, EntityPlayer player, NBTTagCompound sentTagCompound, String templateName) {
@@ -208,8 +209,7 @@ public class TemplateManagerCommands {
         template.setItemCountMap(templateStack, itemCountMap);
         Template.setName(templateStack, templateName);
         container.putStackInSlot(1, templateStack);
-        // @todo: reimplement @since 1.13.x
-        //        PacketHandler.INSTANCE.sendTo(new PacketBlockMap(templateTagCompound), (EntityPlayerMP) player);
+        PacketHandler.sendTo(new PacketBlockMap(templateTagCompound), (EntityPlayerMP) player);
     }
 
     public static void copyTemplate(TemplateManagerContainer container) {

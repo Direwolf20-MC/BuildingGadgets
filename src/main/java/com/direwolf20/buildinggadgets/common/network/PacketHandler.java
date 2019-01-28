@@ -51,4 +51,9 @@ public class PacketHandler {
             HANDLER.sendTo(msg, player.connection.netManager, NetworkDirection.PLAY_TO_CLIENT);
         }
     }
+
+    public static void sendToServer(Object msg)
+    {
+        HANDLER.sendToServer(msg);
+    }
 }

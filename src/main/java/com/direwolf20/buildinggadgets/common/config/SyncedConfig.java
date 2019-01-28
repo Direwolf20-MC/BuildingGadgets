@@ -3,6 +3,8 @@ package com.direwolf20.buildinggadgets.common.config;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.config.fieldmap.FieldMapper;
 import com.direwolf20.buildinggadgets.common.config.fieldmap.FieldSerializer;
+import com.direwolf20.buildinggadgets.common.network.PacketHandler;
+import com.direwolf20.buildinggadgets.common.network.packets.PacketSyncConfig;
 import com.direwolf20.buildinggadgets.common.tools.ReflectionTool;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.INBTBase;
@@ -118,7 +120,7 @@ public class SyncedConfig {
     public static void sendConfigUpdateTo(EntityPlayerMP player) {
         //TODO Networking
         //Testing showed, that this does absolutely nothing if called from outside game (besides taking up a small bit of processing time of course)
-        //PacketHandler.INSTANCE.sendTo(new PacketSyncConfig(SyncedConfig.parseSynchronisation()), player);
+        PacketHandler.sendTo(new PacketSyncConfig(SyncedConfig.parseSynchronisation()), player);
     }
 
     private static NBTTagCompound parseSynchronisation() {

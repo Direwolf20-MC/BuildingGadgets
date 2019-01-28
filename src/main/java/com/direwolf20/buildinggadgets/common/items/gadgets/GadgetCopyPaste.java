@@ -9,6 +9,8 @@ import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.common.items.ITemplate;
 import com.direwolf20.buildinggadgets.common.items.capability.CapabilityProviderEnergy;
+import com.direwolf20.buildinggadgets.common.network.PacketHandler;
+import com.direwolf20.buildinggadgets.common.network.packets.PacketBlockMap;
 import com.direwolf20.buildinggadgets.common.tools.*;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
@@ -18,6 +20,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Enchantments;
 import net.minecraft.init.Items;
@@ -357,8 +360,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
         tagCompound.setInt("copycounter", tool.getCopyCounter(stack));
         worldSave.addToMap(tool.getUUID(stack), tagCompound);
         worldSave.markForSaving();
-        // @todo: reimplement @since 1.13.x
-//        PacketHandler.INSTANCE.sendTo(new PacketBlockMap(tagCompound), (EntityPlayerMP) player);
+        PacketHandler.sendTo(new PacketBlockMap(tagCompound), (EntityPlayerMP) player);
         player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.rotated").getUnformattedComponentText()), true);
     }
 
@@ -468,8 +470,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
 
         worldSave.addToMap(tool.getUUID(stack), tagCompound);
         worldSave.markForSaving();
-        // @todo: reimplement @since 1.13.x
-//        PacketHandler.INSTANCE.sendTo(new PacketBlockMap(tagCompound), (EntityPlayerMP) player);
+        PacketHandler.sendTo(new PacketBlockMap(tagCompound), (EntityPlayerMP) player);
 
         if (foundTE > 0) {
             player.sendStatusMessage(new TextComponentString(TextFormatting.YELLOW + new TextComponentTranslation("message.gadget.TEinCopy").getUnformattedComponentText() + ": " + foundTE), true);

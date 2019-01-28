@@ -2,6 +2,8 @@ package com.direwolf20.buildinggadgets.common.events;
 
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
+import com.direwolf20.buildinggadgets.common.network.PacketHandler;
+import com.direwolf20.buildinggadgets.common.network.packets.PacketRequestConfigSync;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
@@ -24,7 +26,7 @@ public final class ConfigEventHandler {
             BuildingGadgets.logger.info("Configuration changed. Syncing config File.");
 //            TODO: Reimplement
 //            ConfigManager.sync(BuildingGadgets.MODID, Type.INSTANCE);
-//            PacketHandler.INSTANCE.sendToServer(new PacketRequestConfigSync());
+            PacketHandler.sendToServer(new PacketRequestConfigSync());
         }
     }
 }

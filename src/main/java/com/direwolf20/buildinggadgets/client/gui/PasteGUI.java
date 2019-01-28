@@ -7,6 +7,8 @@ package com.direwolf20.buildinggadgets.client.gui;
 
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
+import com.direwolf20.buildinggadgets.common.network.PacketHandler;
+import com.direwolf20.buildinggadgets.common.network.packets.PacketPasteGUI;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
@@ -61,7 +63,7 @@ public class PasteGUI extends GuiScreen {
             public void onClick(double mouseX, double mouseY) {
                 nullCheckTextBoxes();
                 if (sizeCheckBoxes()) {
-//                PacketHandler.INSTANCE.sendToServer(new PacketPasteGUI(Integer.parseInt(X.getText()), Integer.parseInt(Y.getText()), Integer.parseInt(Z.getText())));
+                PacketHandler.sendToServer(new PacketPasteGUI(Integer.parseInt(X.getText()), Integer.parseInt(Y.getText()), Integer.parseInt(Z.getText())));
                     mc.displayGuiScreen(null);
                 } else {
                     Minecraft.getInstance().player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.destroysizeerror").getUnformattedComponentText()), true);
@@ -74,7 +76,7 @@ public class PasteGUI extends GuiScreen {
             @Override
             public void onClick(double mouseX, double mouseY) {
                 fieldChange(X, -1);
-////            PacketHandler.INSTANCE.sendToServer(new PacketPasteGUI(Integer.parseInt(X.getText()), Integer.parseInt(Y.getText()), Integer.parseInt(Z.getText())));
+                PacketHandler.sendToServer(new PacketPasteGUI(Integer.parseInt(X.getText()), Integer.parseInt(Y.getText()), Integer.parseInt(Z.getText())));
                 super.onClick(mouseX, mouseY);
             }
         });
@@ -82,7 +84,7 @@ public class PasteGUI extends GuiScreen {
             @Override
             public void onClick(double mouseX, double mouseY) {
                 fieldChange(X, 1);
-////            PacketHandler.INSTANCE.sendToServer(new PacketPasteGUI(Integer.parseInt(X.getText()), Integer.parseInt(Y.getText()), Integer.parseInt(Z.getText())));
+                PacketHandler.sendToServer(new PacketPasteGUI(Integer.parseInt(X.getText()), Integer.parseInt(Y.getText()), Integer.parseInt(Z.getText())));
                 super.onClick(mouseX, mouseY);
             }
         });
@@ -90,7 +92,7 @@ public class PasteGUI extends GuiScreen {
             @Override
             public void onClick(double mouseX, double mouseY) {
                 fieldChange(Y, -1);
-////            PacketHandler.INSTANCE.sendToServer(new PacketPasteGUI(Integer.parseInt(X.getText()), Integer.parseInt(Y.getText()), Integer.parseInt(Z.getText())));
+                PacketHandler.sendToServer(new PacketPasteGUI(Integer.parseInt(X.getText()), Integer.parseInt(Y.getText()), Integer.parseInt(Z.getText())));
                 super.onClick(mouseX, mouseY);
             }
         });
@@ -98,7 +100,7 @@ public class PasteGUI extends GuiScreen {
             @Override
             public void onClick(double mouseX, double mouseY) {
                 fieldChange(X, 1);
-////            PacketHandler.INSTANCE.sendToServer(new PacketPasteGUI(Integer.parseInt(X.getText()), Integer.parseInt(Y.getText()), Integer.parseInt(Z.getText())));
+                PacketHandler.sendToServer(new PacketPasteGUI(Integer.parseInt(X.getText()), Integer.parseInt(Y.getText()), Integer.parseInt(Z.getText())));
                 super.onClick(mouseX, mouseY);
             }
         });
@@ -106,7 +108,7 @@ public class PasteGUI extends GuiScreen {
             @Override
             public void onClick(double mouseX, double mouseY) {
                 fieldChange(Z, -1);
-////            PacketHandler.INSTANCE.sendToServer(new PacketPasteGUI(Integer.parseInt(X.getText()), Integer.parseInt(Y.getText()), Integer.parseInt(Z.getText())));
+                PacketHandler.sendToServer(new PacketPasteGUI(Integer.parseInt(X.getText()), Integer.parseInt(Y.getText()), Integer.parseInt(Z.getText())));
                 super.onClick(mouseX, mouseY);
             }
         });
@@ -114,7 +116,7 @@ public class PasteGUI extends GuiScreen {
             @Override
             public void onClick(double mouseX, double mouseY) {
                 fieldChange(Z, 1);
-////            PacketHandler.INSTANCE.sendToServer(new PacketPasteGUI(Integer.parseInt(X.getText()), Integer.parseInt(Y.getText()), Integer.parseInt(Z.getText())));
+                PacketHandler.sendToServer(new PacketPasteGUI(Integer.parseInt(X.getText()), Integer.parseInt(Y.getText()), Integer.parseInt(Z.getText())));
                 super.onClick(mouseX, mouseY);
             }
         });
@@ -124,7 +126,7 @@ public class PasteGUI extends GuiScreen {
                 X.setText(String.valueOf(0));
                 Y.setText(String.valueOf(1));
                 Z.setText(String.valueOf(0));
-//              PacketHandler.INSTANCE.sendToServer(new PacketPasteGUI(Integer.parseInt(X.getText()), Integer.parseInt(Y.getText()), Integer.parseInt(Z.getText())));
+                PacketHandler.sendToServer(new PacketPasteGUI(Integer.parseInt(X.getText()), Integer.parseInt(Y.getText()), Integer.parseInt(Z.getText())));
 
                 super.onClick(mouseX, mouseY);
             }

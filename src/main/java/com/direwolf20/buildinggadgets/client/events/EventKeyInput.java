@@ -3,6 +3,11 @@ package com.direwolf20.buildinggadgets.client.events;
 import com.direwolf20.buildinggadgets.client.KeyBindings;
 import com.direwolf20.buildinggadgets.client.gui.ModeRadialMenu;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
+import com.direwolf20.buildinggadgets.common.network.PacketHandler;
+import com.direwolf20.buildinggadgets.common.network.packets.PacketAnchorKey;
+import com.direwolf20.buildinggadgets.common.network.packets.PacketChangeRange;
+import com.direwolf20.buildinggadgets.common.network.packets.PacketToggleMode;
+import com.direwolf20.buildinggadgets.common.network.packets.PacketUndoKey;
 import net.minecraft.client.Minecraft;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumHand;
@@ -27,7 +32,7 @@ public class EventKeyInput {
 
     private static void handleEventInput() {
         if (KeyBindings.modeSwitch.isKeyDown() && ((KeyBindings.modeSwitch.getKeyModifier() == KeyModifier.NONE && KeyModifier.getActiveModifier() == KeyModifier.NONE) || KeyBindings.modeSwitch.getKeyModifier() != KeyModifier.NONE)) {
-            //PacketHandler.INSTANCE.sendToServer(new PacketToggleMode());
+            PacketHandler.sendToServer(new PacketToggleMode(1)); // TODO: put the right mode value
             Minecraft mc = Minecraft.getInstance();
             ItemStack stack = mc.player.getHeldItem(EnumHand.MAIN_HAND);
             if (!stack.isEmpty() && ((stack.getItem() instanceof GadgetGeneric)))
@@ -38,14 +43,11 @@ public class EventKeyInput {
                     mc.displayGuiScreen(new ModeRadialMenu(stack));
             }
         } else if (KeyBindings.rangeChange.isPressed()) {
-            // REIMPLEMENT
-//            PacketHandler.INSTANCE.sendToServer(new PacketChangeRange());
+            PacketHandler.sendToServer(new PacketChangeRange());
         } else if (KeyBindings.undoKey.isPressed()) {
-            // REIMPLEMENT
-//            PacketHandler.INSTANCE.sendToServer(new PacketUndoKey());
+            PacketHandler.sendToServer(new PacketUndoKey());
         } else if (KeyBindings.anchorKey.isPressed()) {
-            // REIMPLEMENT
-//            PacketHandler.INSTANCE.sendToServer(new PacketAnchorKey());
+            PacketHandler.sendToServer(new PacketAnchorKey());
         }
     }
 }

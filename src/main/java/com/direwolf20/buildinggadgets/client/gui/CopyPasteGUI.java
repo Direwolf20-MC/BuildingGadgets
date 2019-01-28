@@ -9,6 +9,8 @@ import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.BuildingObjects;
 import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
+import com.direwolf20.buildinggadgets.common.network.PacketHandler;
+import com.direwolf20.buildinggadgets.common.network.packets.PacketCopyCoords;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
@@ -79,7 +81,7 @@ public class CopyPasteGUI extends GuiScreen {
                         startPos = new BlockPos(startPos.getX() + Integer.parseInt(startX.getText()), startPos.getY() + Integer.parseInt(startY.getText()), startPos.getZ() + Integer.parseInt(startZ.getText()));
                         endPos = new BlockPos(startPos.getX() + Integer.parseInt(endX.getText()), startPos.getY() + Integer.parseInt(endY.getText()), startPos.getZ() + Integer.parseInt(endZ.getText()));
                     }
-//                    PacketHandler.INSTANCE.sendToServer(new PacketCopyCoords(startPos, endPos));
+                    PacketHandler.sendToServer(new PacketCopyCoords(startPos, endPos));
                 } catch (Throwable t) {
                     Minecraft.getInstance().player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.copyguierror").getUnformattedComponentText()), true);
                 }
@@ -94,7 +96,7 @@ public class CopyPasteGUI extends GuiScreen {
         this.addButton(new GuiButton(3, this.guiLeft + 245, this.guiTop + 60, 40, 20, "Clear"){
             @Override
             public void onClick(double mouseX, double mouseY) {
-//                PacketHandler.INSTANCE.sendToServer(new PacketCopyCoords(BlockPos.ORIGIN, BlockPos.ORIGIN));
+                PacketHandler.sendToServer(new PacketCopyCoords(BlockPos.ORIGIN, BlockPos.ORIGIN));
                 mc.displayGuiScreen(null);
             }
         });

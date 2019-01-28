@@ -1,10 +1,13 @@
 package com.direwolf20.buildinggadgets.common.blocks.templatemanager;
 
 import com.direwolf20.buildinggadgets.common.items.ITemplate;
+import com.direwolf20.buildinggadgets.common.network.PacketHandler;
+import com.direwolf20.buildinggadgets.common.network.packets.PacketBlockMap;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockHorizontal;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemStack;
@@ -70,8 +73,7 @@ public class TemplateManager extends Block {
 
             NBTTagCompound tagCompound = template.getWorldSave(worldIn).getCompoundFromUUID(UUID);
             if (tagCompound != null) {
-                // TODO: Reimplement
-//                PacketHandler.INSTANCE.sendTo(new PacketBlockMap(tagCompound), (EntityPlayerMP) player);
+                PacketHandler.sendTo(new PacketBlockMap(tagCompound), (EntityPlayerMP) player);
             }
         }
 

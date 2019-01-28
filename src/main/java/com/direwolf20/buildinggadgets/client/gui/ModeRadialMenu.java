@@ -9,6 +9,8 @@ package com.direwolf20.buildinggadgets.client.gui;
 import com.direwolf20.buildinggadgets.client.KeyBindings;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.items.gadgets.*;
+import com.direwolf20.buildinggadgets.common.network.PacketHandler;
+import com.direwolf20.buildinggadgets.common.network.packets.PacketToggleMode;
 import com.google.common.collect.ImmutableSet;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
@@ -227,10 +229,9 @@ public class ModeRadialMenu extends GuiScreen {
 
         if (!KeyBindings.modeSwitch.isKeyDown()) {
             mc.displayGuiScreen(null);
-// REIMPLEMENT
-//            if (slotSelected != -1) {
-//                PacketHandler.INSTANCE.sendToServer(new PacketToggleMode(slotSelected));
-//            }
+            if (slotSelected != -1) {
+                PacketHandler.sendToServer(new PacketToggleMode(slotSelected));
+            }
         }
 
         ImmutableSet<KeyBinding> set = ImmutableSet.of(mc.gameSettings.keyBindForward, mc.gameSettings.keyBindLeft, mc.gameSettings.keyBindBack, mc.gameSettings.keyBindRight, mc.gameSettings.keyBindSneak, mc.gameSettings.keyBindSprint, mc.gameSettings.keyBindJump);
