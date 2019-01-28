@@ -4,6 +4,7 @@ import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
+import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.fml.network.NetworkEvent;
 
 import java.util.function.Supplier;
@@ -36,7 +37,9 @@ public class PacketSyncConfig {
      */
     public static class Handler {
         public static void handle(final PacketSyncConfig msg, Supplier<NetworkEvent.Context> ctx) {
-            ctx.get().getDirection().PLAY_TO_CLIENT
+            if( ctx.get().getDirection() != NetworkDirection.PLAY_TO_SERVER )
+                return;
+
             ctx.get().enqueueWork(() -> {
                 NBTTagCompound compound = msg.getTag();
                 BuildingGadgets.logger.info("Received SyncedConfig from Server.");

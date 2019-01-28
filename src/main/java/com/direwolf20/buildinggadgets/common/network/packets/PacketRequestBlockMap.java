@@ -11,7 +11,7 @@ import java.util.function.Supplier;
 
 public class PacketRequestBlockMap {
 
-    static int uuidLength = 128;
+    private static int uuidLength = 128;
 
     private String UUID;
     private boolean isTemplate;

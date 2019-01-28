@@ -1,61 +1,53 @@
-package com.direwolf20.buildinggadgets.common.network;
+package com.direwolf20.buildinggadgets.common.network.packets;
 
 import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManagerCommands;
 import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManagerContainer;
 import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManagerTileEntity;
-import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.common.network.ByteBufUtils;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.minecraftforge.fml.network.NetworkEvent;
 
-public class PacketTemplateManagerSave implements IMessage {
+import java.util.function.Supplier;
 
-    private BlockPos pos;
-    private String name;
+public class PacketTemplateManagerSave {
 
-    @Override
-    public void fromBytes(ByteBuf buf) {
-        pos = BlockPos.fromLong(buf.readLong());
-        name = ByteBufUtils.readUTF8String(buf);
-    }
-
-    @Override
-    public void toBytes(ByteBuf buf) {
-        buf.writeLong(pos.toLong());
-        ByteBufUtils.writeUTF8String(buf, name);
-    }
-
-    public PacketTemplateManagerSave() {
-    }
+    private final BlockPos pos;
+    private final String name;
 
     public PacketTemplateManagerSave(BlockPos blockPos, String TemplateName) {
-        pos = blockPos;
-        name = TemplateName;
+        this.pos = blockPos;
+        this.name = TemplateName;
     }
 
-    public static class Handler implements IMessageHandler<PacketTemplateManagerSave, IMessage> {
-        @Override
-        public IMessage onMessage(PacketTemplateManagerSave message, MessageContext ctx) {
-            FMLCommonHandler.instance().getWorldThread(ctx.netHandler).addScheduledTask(() -> handle(message, ctx));
-            return null;
-        }
+    public static void encode(PacketTemplateManagerSave msg, PacketBuffer buffer) {
+        buffer.writeBlockPos(msg.pos);
+        buffer.writeString(msg.name);
+    }
 
-        private void handle(PacketTemplateManagerSave message, MessageContext ctx) {
-            EntityPlayerMP player = ctx.getServerHandler().player;
-            World world = player.world;
-            BlockPos pos = message.pos;
-            TileEntity te = world.getTileEntity(pos);
-            if (!(te instanceof TemplateManagerTileEntity)) return;
-            TemplateManagerContainer container = ((TemplateManagerTileEntity) te).getContainer(player);
-            TemplateManagerCommands.saveTemplate(container, player, message.name);
+    public static PacketTemplateManagerSave decode(PacketBuffer buffer) {
+        return new PacketTemplateManagerSave(buffer.readBlockPos(), buffer.readString(125));
+    }
 
+    public static class Handler {
+        public static void handle(PacketTemplateManagerSave msg, Supplier<NetworkEvent.Context> ctx) {
+            ctx.get().enqueueWork(() -> {
+                EntityPlayerMP player = ctx.get().getSender();
+                if( player == null ) return;
 
+                World world = player.world;
+                BlockPos pos = msg.pos;
+
+                TileEntity te = world.getTileEntity(pos);
+                if (!(te instanceof TemplateManagerTileEntity)) return;
+                TemplateManagerContainer container = ((TemplateManagerTileEntity) te).getContainer(player);
+
+                TemplateManagerCommands.saveTemplate(container, player, msg.name);
+            });
+
+            ctx.get().setPacketHandled(true);
         }
     }
 }
