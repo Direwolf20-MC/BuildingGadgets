@@ -10,6 +10,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.PacketSetRemoteInventoryCache;
 import com.direwolf20.buildinggadgets.common.tools.GadgetUtils;
+import com.direwolf20.buildinggadgets.common.tools.InventoryManipulation.IRemoteInventoryProvider;
 import com.direwolf20.buildinggadgets.common.tools.UniqueItem;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.Multiset;
@@ -21,7 +22,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class RemoteInventoryCache {
+public class RemoteInventoryCache implements IRemoteInventoryProvider {
     private boolean isCopyPaste;
     private Pair<Integer, BlockPos> locCached;
     private Multiset<UniqueItem> cache;
@@ -32,16 +33,16 @@ public class RemoteInventoryCache {
     }
 
     public void setCache(@Nullable Multiset<UniqueItem> cache) {
-         this.cache = cache;
+        this.cache = cache;
     }
 
-    @Nullable
-    public Multiset<UniqueItem> getCache(ItemStack stack) {
-        Pair<Integer, BlockPos> loc = getInventoryLocation(stack);
+    @Override
+    public int countItem(ItemStack tool, ItemStack stack) {
+        Pair<Integer, BlockPos> loc = getInventoryLocation(tool);
         if (isCacheOld(loc))
             updateCache(loc);
 
-        return cache;
+        return cache == null ? 0 : cache.count(new UniqueItem(stack.getItem(), stack.getMetadata()));
     }
 
     private void updateCache(Pair<Integer, BlockPos> loc) {
