@@ -1,9 +1,8 @@
 package com.direwolf20.buildinggadgets.common.tools;
 
-import com.direwolf20.buildinggadgets.common.blocks.ModBlocks;
+import com.direwolf20.buildinggadgets.common.BuildingObjects;
 import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
 import com.direwolf20.buildinggadgets.common.items.FakeBuilderWorld;
-import com.direwolf20.buildinggadgets.common.items.ModItems;
 import com.direwolf20.buildinggadgets.common.items.capability.CapabilityProviderEnergy;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetBuilding;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
@@ -55,7 +54,7 @@ public class ToolRenders {
             if (!(lookingAt == null)) {
                 startBlock = world.getBlockState(lookingAt.getBlockPos());
             }
-            if (startBlock != ModBlocks.effectBlock.getDefaultState()) {
+            if (startBlock != BuildingObjects.effectBlock.getDefaultState()) {
 
                 ItemStack heldItem = GadgetBuilding.getGadget(player);
                 if (heldItem.isEmpty()) return;
@@ -85,7 +84,7 @@ public class ToolRenders {
                 hasBlocks = hasBlocks + InventoryManipulation.countPaste(player);
                 int hasEnergy = 0;
                 if (SyncedConfig.poweredByFE) {
-                    hasEnergy = CapabilityProviderEnergy.getCap(stack).getEnergyStored();
+                    hasEnergy = CapabilityProviderEnergy.getCap(stack).orElseThrow(NullPointerException::new).getEnergyStored();
                 } else {
                     hasEnergy = stack.getMaxDamage() - stack.getDamage();
                 }
@@ -150,7 +149,7 @@ public class ToolRenders {
                     GL14.glBlendColor(1F, 1F, 1F, 0.35f); //Set the alpha of the blocks we are rendering
                     hasBlocks--;
                     if (SyncedConfig.poweredByFE) {
-                        hasEnergy = hasEnergy - ModItems.gadgetBuilding.getEnergyCost();
+                        hasEnergy = hasEnergy - ((GadgetBuilding) BuildingObjects.gadgetBuilding).getEnergyCost();
                     } else {
                         hasEnergy--;
                     }
@@ -184,7 +183,7 @@ public class ToolRenders {
             if (!(lookingAt == null)) {
                 startBlock = world.getBlockState(lookingAt.getBlockPos());
             }
-            if (startBlock != ModBlocks.effectBlock.getDefaultState()) {
+            if (startBlock != BuildingObjects.effectBlock.getDefaultState()) {
                 ItemStack heldItem = GadgetExchanger.getGadget(player);
                 if (heldItem.isEmpty()) return;
 
@@ -214,7 +213,7 @@ public class ToolRenders {
                 hasBlocks = hasBlocks + InventoryManipulation.countPaste(player);
                 int hasEnergy = 0;
                 if (SyncedConfig.poweredByFE) {
-                    hasEnergy = CapabilityProviderEnergy.getCap(stack).getEnergyStored();
+                    hasEnergy = CapabilityProviderEnergy.getCap(stack).orElseThrow(NullPointerException::new).getEnergyStored();
                 } else {
                     hasEnergy = stack.getMaxDamage() - stack.getDamage();
                 }
@@ -286,7 +285,7 @@ public class ToolRenders {
                     GL14.glBlendColor(1F, 1F, 1F, 0.55f); //Set the alpha of the blocks we are rendering
                     hasBlocks--;
                     if (SyncedConfig.poweredByFE) {
-                        hasEnergy = hasEnergy - ModItems.gadgetExchanger.getEnergyCost();
+                        hasEnergy = hasEnergy - ((GadgetExchanger) BuildingObjects.gadgetExchanger).getEnergyCost();
                     } else {
                         hasEnergy = hasEnergy - 2;
                     }
@@ -313,7 +312,7 @@ public class ToolRenders {
         World world = player.world;
         BlockPos startBlock = (GadgetDestruction.getAnchor(stack) == null) ? lookingAt.getBlockPos() : GadgetDestruction.getAnchor(stack);
         EnumFacing facing = (GadgetDestruction.getAnchorSide(stack) == null) ? lookingAt.sideHit : GadgetDestruction.getAnchorSide(stack);
-        if (startBlock == ModBlocks.effectBlock.getDefaultState()) return;
+        if (startBlock == BuildingObjects.effectBlock.getDefaultState()) return;
 
         ItemStack heldItem = GadgetDestruction.getGadget(player);
         if (heldItem.isEmpty()) return;
@@ -392,10 +391,10 @@ public class ToolRenders {
     }
 
     public static void renderPasteOverlay(RenderWorldLastEvent evt, EntityPlayer player, ItemStack stack) {
-        String UUID = ModItems.gadgetCopyPaste.getUUID(stack);
+        String UUID = ((GadgetCopyPaste) BuildingObjects.gadgetCopyPaste).getUUID(stack);
         World world = player.world;
-        if (ModItems.gadgetCopyPaste.getStartPos(stack) == null) return;
-        if (ModItems.gadgetCopyPaste.getEndPos(stack) == null) return;
+        if (((GadgetCopyPaste) BuildingObjects.gadgetCopyPaste).getStartPos(stack) == null) return;
+        if (((GadgetCopyPaste) BuildingObjects.gadgetCopyPaste).getEndPos(stack) == null) return;
         if (GadgetCopyPaste.getToolMode(stack) == GadgetCopyPaste.ToolMode.Paste) {
             //First check if we have an anchor, if not check if we're looking at a block, if not, exit
             BlockPos startPos = GadgetCopyPaste.getAnchor(stack);
@@ -424,7 +423,7 @@ public class ToolRenders {
 
             //Don't draw on top of blocks being built by our tools.
             IBlockState startBlock = world.getBlockState(startPos);
-            if (startBlock == ModBlocks.effectBlock.getDefaultState()) return;
+            if (startBlock == BuildingObjects.effectBlock.getDefaultState()) return;
 
             Minecraft mc = Minecraft.getInstance();
             mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
@@ -465,8 +464,8 @@ public class ToolRenders {
             GlStateManager.popMatrix();
 
         } else {
-            BlockPos startPos = ModItems.gadgetCopyPaste.getStartPos(stack);
-            BlockPos endPos = ModItems.gadgetCopyPaste.getEndPos(stack);
+            BlockPos startPos = ((GadgetCopyPaste) BuildingObjects.gadgetCopyPaste).getStartPos(stack);
+            BlockPos endPos = ((GadgetCopyPaste) BuildingObjects.gadgetCopyPaste).getEndPos(stack);
             BlockPos blankPos = new BlockPos(0, 0, 0);
             if (startPos == null || endPos == null || startPos.equals(blankPos) || endPos.equals(blankPos)) {
                 return;

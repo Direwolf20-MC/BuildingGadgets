@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.common.blocks.templatemanager;
 
-import com.direwolf20.buildinggadgets.common.items.ModItems;
+import com.direwolf20.buildinggadgets.common.BuildingObjects;
 import com.google.common.collect.ImmutableSet;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
@@ -8,8 +8,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityType;
-import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.OptionalCapabilityInstance;
 import net.minecraftforge.items.CapabilityItemHandler;
@@ -17,13 +15,12 @@ import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.items.ItemStackHandler;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.Set;
 
 public class TemplateManagerTileEntity extends TileEntity {
 
-    private static final Set<Item> allowedItemsLeft = ImmutableSet.of(ModItems.gadgetCopyPaste, ModItems.template);
-    private static final Set<Item> allowedItemsRight = ImmutableSet.of(Items.PAPER, ModItems.template);
+    private static final Set<Item> allowedItemsLeft = ImmutableSet.of(BuildingObjects.gadgetCopyPaste, BuildingObjects.template);
+    private static final Set<Item> allowedItemsRight = ImmutableSet.of(Items.PAPER, BuildingObjects.template);
 
     public static final int SIZE = 2;
 
@@ -59,8 +56,8 @@ public class TemplateManagerTileEntity extends TileEntity {
         }
     };
 
-    public TemplateManagerTileEntity(TileEntityType<?> tileEntityTypeIn) {
-        super(tileEntityTypeIn);
+    public TemplateManagerTileEntity() {
+        super(BuildingObjects.TEMPLATE_MANAGER_TYPE);
     }
 
     @Override

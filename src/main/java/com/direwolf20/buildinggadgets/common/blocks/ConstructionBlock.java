@@ -1,11 +1,10 @@
 package com.direwolf20.buildinggadgets.common.blocks;
 
+import com.direwolf20.buildinggadgets.common.BuildingObjects;
 import com.direwolf20.buildinggadgets.common.items.FakeRenderWorld;
-import com.direwolf20.buildinggadgets.common.items.ModItems;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.EnumPushReaction;
 import net.minecraft.block.material.MapColor;
-import net.minecraft.block.material.Material;
 import net.minecraft.block.state.BlockFaceShape;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.color.BlockColors;
@@ -40,9 +39,9 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
     public static final IUnlistedProperty<IBlockState> FACADE_ID = new BlockStateProperty("facadestate");
     public static final IUnlistedProperty<IBlockState> FACADE_EXT_STATE = new BlockStateProperty("facadeextstate");
 */
-    public ConstructionBlock() {
-        super(Block.Builder.create(Material.ROCK).hardnessAndResistance(2.0f));
-        setRegistryName("construction_block");        // The unique name (within your mod) that identifies this block
+    public ConstructionBlock(Builder builder) {
+        super(builder);
+
         setDefaultState(this.getStateContainer().getBaseState().with(BRIGHT, false).with(NEIGHBOR_BRIGHTNESS, false));
     }
 
@@ -51,8 +50,6 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
         super.fillStateContainer(builder);
         builder.add(BRIGHT, NEIGHBOR_BRIGHTNESS);
     }
-
-
 
     /*
     public void initModel() {
@@ -69,7 +66,7 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
     @Override
     @Nonnull
     public IItemProvider getItemDropped(IBlockState state, World worldIn, BlockPos pos, int fortune) {
-        return ModItems.constructionPaste;
+        return BuildingObjects.constructionPaste;
     }
 
     @Override
@@ -112,11 +109,12 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
     public IBlockState getExtendedState(IBlockState state, IBlockReader world, BlockPos pos) {
         IExtendedBlockState extendedBlockState = (IExtendedBlockState) super.getExtendedState(state, world, pos);
         IBlockState mimicBlock = getActualMimicBlock(world, pos);
-            FakeRenderWorld fakeRenderWorld = new FakeRenderWorld(); //TODO Update Render world
-            //fakeRenderWorld.setState(world, mimicBlock, pos);
-            //IBlockState extState = mimicBlock.getBlock().getExtendedState(mimicBlock, fakeRenderWorld, pos);
-            //ConstructionID mimicID = new ConstructionID(mimicBlock);
-            //return extendedBlockState.withProperty(FACADE_ID, mimicBlock).withProperty(FACADE_EXT_STATE, extState);
+            FakeRenderWorld fakeRenderWorld = new FakeRenderWorld();
+            fakeRenderWorld.setState((World) world, mimicBlock, pos);
+            IBlockState extState = mimicBlock.getBlock().getExtendedState(mimicBlock, fakeRenderWorld, pos);
+// @todo: reimplement @since 1.13.x
+//            ConstructionID mimicID = new ConstructionID(mimicBlock);
+//            return extendedBlockState.withProperty(FACADE_ID, mimicBlock).withProperty(FACADE_EXT_STATE, extState);
 
         return extendedBlockState;
     }
@@ -234,7 +232,7 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
      * @param state
      * @param worldIn
      * @param pos
-     * @deprecated call via {@link IBlockState#getMapColor(IBlockAccess, BlockPos)} whenever possible.
+//     * @deprecated call via {@link IBlockState#(, BlockPos)} whenever possible.
      * Implementing/overriding is fine.
      */
     @Override
@@ -265,7 +263,7 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
 
     /**
      * performs updates on diagonal neighbors of the target position and passes in the flags. The flags can be referenced
-     * from the docs for {@link IWorldWriter#setBlockState(IBlockState, BlockPos, int)}.
+     * from the docs for {@link IWorldWriter#(IBlockState, BlockPos, int)}.
      *
      * @param state
      * @param worldIn
@@ -336,7 +334,7 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
      * @param blockState
      * @param worldIn
      * @param pos
-     * @deprecated call via {@link IBlockState#getBlockHardness(World, BlockPos)} whenever possible.
+     * @deprecated call via {@link IBlockState#(World, BlockPos)} whenever possible.
      * Implementing/overriding is fine.
      */
     @Override
@@ -401,7 +399,7 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
 
     /**
      * Called periodically clientside on blocks near the player to show effects (like furnace fire particles). Note that
-     * this method is unrelated to {@link randomTick} and {@link #needsRandomTick}, and will always be called regardless
+     * this method is unrelated to {@link } and {@link #needsRandomTick}, and will always be called regardless
      * of whether the block can receive random update ticks
      *
      * @param stateIn
@@ -447,7 +445,7 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
      * @param player
      * @param worldIn
      * @param pos
-     * @deprecated call via {@link IBlockState#getPlayerRelativeBlockHardness(EntityPlayer, World, BlockPos)} whenever
+     * @deprecated call via {@link IBlockState#(EntityPlayer, World, BlockPos)} whenever
      * possible. Implementing/overriding is fine.
      */
     @Override
@@ -500,7 +498,7 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
      * @param blockAccess
      * @param pos
      * @param side
-     * @deprecated call via {@link IBlockState#getWeakPower(IBlockAccess, BlockPos, EnumFacing)} whenever possible.
+     * @deprecated call via {@link IBlockState#(, BlockPos, EnumFacing)} whenever possible.
      * Implementing/overriding is fine.
      */
     @Override
@@ -514,7 +512,7 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
      * @param blockAccess
      * @param pos
      * @param side
-     * @deprecated call via {@link IBlockState#getStrongPower(IBlockAccess, BlockPos, EnumFacing)} whenever possible.
+     * @deprecated call via {@link IBlockState#(, BlockPos, EnumFacing)} whenever possible.
      * Implementing/overriding is fine.
      */
     @Override
@@ -525,7 +523,7 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
 
     /**
      * @param state
-     * @deprecated call via {@link IBlockState#getMobilityFlag()} whenever possible. Implementing/overriding is fine.
+     * @deprecated call via {@link IBlockState#()} whenever possible. Implementing/overriding is fine.
      */
     @Override
     public EnumPushReaction getPushReaction(IBlockState state) {
@@ -570,7 +568,7 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
      * @param state
      * @param worldIn
      * @param pos
-     * @deprecated call via {@link IBlockState#getOffset(IBlockAccess, BlockPos)} whenever possible.
+     * @deprecated call via whenever possible.
      * Implementing/overriding is fine.
      */
     @Override

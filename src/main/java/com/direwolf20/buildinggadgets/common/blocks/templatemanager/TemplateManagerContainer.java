@@ -40,7 +40,7 @@ public class TemplateManagerContainer extends Container {
     }
 
     private void addOwnSlots() {
-        IItemHandler itemHandler = this.te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
+        IItemHandler itemHandler = this.te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null).orElseThrow(NullPointerException::new);
         int x = 86;
         int y = 41;
 

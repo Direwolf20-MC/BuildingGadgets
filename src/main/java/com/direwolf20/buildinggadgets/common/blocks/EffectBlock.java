@@ -13,14 +13,14 @@ import net.minecraft.world.World;
 
 public class EffectBlock extends Block {
 
-    public EffectBlock() {
-        super(Block.Builder.create(ModBlocks.EFFECT_BLOCK_MATERIAL).hardnessAndResistance(20f));
-        setRegistryName("effect_block");        // The unique name (within your mod) that identifies this block
+    public EffectBlock(Builder builder) {
+        super(builder);
     }
 
-    public void initModel() {
-        //ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(this), 0, new ModelResourceLocation(getRegistryName(), "inventory"));
-    }
+    // @todo: reimplement @since 1.13.x
+//    public void initModel() {
+//        //ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(this), 0, new ModelResourceLocation(getRegistryName(), "inventory"));
+//    }
 
     @Override
     public EnumBlockRenderType getRenderType(IBlockState state) {

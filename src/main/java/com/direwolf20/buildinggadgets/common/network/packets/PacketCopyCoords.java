@@ -1,6 +1,5 @@
 package com.direwolf20.buildinggadgets.common.network.packets;
 
-import com.direwolf20.buildinggadgets.common.items.ModItems;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;

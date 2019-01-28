@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.common.entities;
 
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
-import com.direwolf20.buildinggadgets.common.blocks.ModBlocks;
+import com.direwolf20.buildinggadgets.common.BuildingObjects;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockRendererDispatcher;
@@ -57,7 +57,7 @@ public class BlockBuildEntityRender extends Render<BlockBuildEntity> {
 
         IBlockState renderBlockState = entity.getSetBlock();
         if (entity.getUsingConstructionPaste() && toolMode == 1) {
-            renderBlockState = ModBlocks.constructionBlock.getDefaultState();
+            renderBlockState = BuildingObjects.constructionBlock.getDefaultState();
         }
         if (renderBlockState == null) {
             renderBlockState = Blocks.COBBLESTONE.getDefaultState();

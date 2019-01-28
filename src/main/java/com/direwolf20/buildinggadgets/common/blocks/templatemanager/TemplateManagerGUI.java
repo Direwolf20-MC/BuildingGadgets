@@ -10,7 +10,8 @@ import com.direwolf20.buildinggadgets.client.gui.GuiButtonHelp;
 import com.direwolf20.buildinggadgets.client.gui.GuiButtonHelpText;
 import com.direwolf20.buildinggadgets.client.gui.IHoverHelpText;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
-import com.direwolf20.buildinggadgets.common.items.ModItems;
+import com.direwolf20.buildinggadgets.common.BuildingObjects;
+import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.tools.PasteToolBufferBuilder;
 import com.direwolf20.buildinggadgets.common.tools.ToolDireBuffer;
 import net.minecraft.client.gui.GuiButton;
@@ -154,11 +155,11 @@ public class TemplateManagerGUI extends GuiContainer {
 
         //float rotX = 165, rotY = 0, zoom = 1;
         if (!itemstack.isEmpty()) {
-            String UUID = ModItems.gadgetCopyPaste.getUUID(itemstack);
+            String UUID = ((GadgetCopyPaste) BuildingObjects.gadgetCopyPaste).getUUID(itemstack);
             ToolDireBuffer bufferBuilder = PasteToolBufferBuilder.getBufferFromMap(UUID);
             if (bufferBuilder != null) {
-                BlockPos startPos = ModItems.gadgetCopyPaste.getStartPos(itemstack);
-                BlockPos endPos = ModItems.gadgetCopyPaste.getEndPos(itemstack);
+                BlockPos startPos = ((GadgetCopyPaste) BuildingObjects.gadgetCopyPaste).getStartPos(itemstack);
+                BlockPos endPos = ((GadgetCopyPaste) BuildingObjects.gadgetCopyPaste).getEndPos(itemstack);
                 if (startPos == null || endPos == null) return;
                 double lengthX = Math.abs(startPos.getX() - endPos.getX());
                 double lengthY = Math.abs(startPos.getY() - endPos.getY());
@@ -321,7 +322,7 @@ public class TemplateManagerGUI extends GuiContainer {
 
         return super.keyPressed(p_keyPressed_1_, p_keyPressed_2_, p_keyPressed_3_);
     }
-    
+
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int mouseButton) {
         if (this.nameField.mouseClicked(mouseX, mouseY, mouseButton)) {

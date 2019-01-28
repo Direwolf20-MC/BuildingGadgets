@@ -1,12 +1,11 @@
 package com.direwolf20.buildinggadgets.common.entities;
 
+import com.direwolf20.buildinggadgets.common.BuildingObjects;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlock;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockPowder;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
-import com.direwolf20.buildinggadgets.common.blocks.ModBlocks;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.network.datasync.DataParameter;
@@ -29,13 +28,13 @@ public class ConstructionBlockEntity extends Entity {
     int maxLife = 80;
 
     public ConstructionBlockEntity(World worldIn) {
-        super(ModEntities.CONSTRUCTION_BLOCK, worldIn);
+        super(BuildingObjects.CONSTRUCTION_BLOCK, worldIn);
         setSize(0.1F, 0.1F);
         world = worldIn;
     }
 
     public ConstructionBlockEntity(World worldIn, BlockPos spawnPos, boolean makePaste) {
-        super(ModEntities.CONSTRUCTION_BLOCK, worldIn);
+        super(BuildingObjects.CONSTRUCTION_BLOCK, worldIn);
         setSize(0.1F, 0.1F);
         world = worldIn;
         setPosition(spawnPos.getX(), spawnPos.getY(), spawnPos.getZ());
@@ -93,7 +92,7 @@ public class ConstructionBlockEntity extends Entity {
                         if (opacity == 255 || neighborBrightness) {
                             IBlockState tempSetBlock = ((ConstructionBlockTileEntity) te).getBlockState();
                             IBlockState tempActualSetBlock = ((ConstructionBlockTileEntity) te).getActualBlockState();
-                            world.setBlockState(setPos, ModBlocks.constructionBlock.getDefaultState()
+                            world.setBlockState(setPos, BuildingObjects.constructionBlock.getDefaultState()
                                     .with(ConstructionBlock.BRIGHT, opacity != 255)
                                     .with(ConstructionBlock.NEIGHBOR_BRIGHTNESS, neighborBrightness));
                             te = world.getTileEntity(setPos);
@@ -103,8 +102,8 @@ public class ConstructionBlockEntity extends Entity {
                         }
                     }
                 } else {
-                    if (world.getBlockState(setPos) == ModBlocks.constructionBlockPowder.getDefaultState()) {
-                        world.setBlockState(setPos, ModBlocks.constructionBlock.getDefaultState().with(ConstructionBlock.BRIGHT, false));
+                    if (world.getBlockState(setPos) == BuildingObjects.constructionBlockPowder.getDefaultState()) {
+                        world.setBlockState(setPos, BuildingObjects.constructionBlock.getDefaultState().with(ConstructionBlock.BRIGHT, false));
                     }
                 }
             }

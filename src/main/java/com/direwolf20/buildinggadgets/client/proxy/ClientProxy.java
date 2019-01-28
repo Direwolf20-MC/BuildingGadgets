@@ -1,79 +1,68 @@
 package com.direwolf20.buildinggadgets.client.proxy;
 
 import com.direwolf20.buildinggadgets.client.KeyBindings;
-import com.direwolf20.buildinggadgets.common.BuildingGadgets;
-import com.direwolf20.buildinggadgets.common.blocks.ModBlocks;
+import com.direwolf20.buildinggadgets.common.BuildingObjects;
+import com.direwolf20.buildinggadgets.common.blocks.Models.BakedModelLoader;
 import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManagerContainer;
-import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
-import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
-import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntityRender;
-import com.direwolf20.buildinggadgets.common.entities.ConstructionBlockEntity;
-import com.direwolf20.buildinggadgets.common.entities.ConstructionBlockEntityRender;
-import com.direwolf20.buildinggadgets.common.items.ModItems;
+import com.direwolf20.buildinggadgets.common.entities.*;
 import com.direwolf20.buildinggadgets.common.items.gadgets.*;
-import com.direwolf20.buildinggadgets.common.proxy.CommonProxy;
 import com.direwolf20.buildinggadgets.common.tools.ToolRenders;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.client.model.ModelLoaderRegistry;
+import net.minecraftforge.fml.DeferredWorkQueue;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
-import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 
-@Mod.EventBusSubscriber(value = Dist.CLIENT, modid = BuildingGadgets.MODID)
-public class ClientProxy extends CommonProxy {
-// REIMPLEMENT
-//    @Override
-//    public void preInit(FMLPreInitializationEvent e) {
-//        ModEntities.initModels();
-//        ModelLoaderRegistry.registerLoader(new BakedModelLoader());
-//        super.preInit(e);
-//    }
-
-    @Override
-    public void init() {
-        super.init();
-        KeyBindings.init();
-        ModBlocks.initColorHandlers();
+public class ClientProxy {
+    public static void clientSetup(final FMLClientSetupEvent event) {
+        DeferredWorkQueue.runLater(() -> {
+            KeyBindings.init();
+            BuildingObjects.initColorHandlers();
+        });
     }
 
-    @SubscribeEvent
     public static void registerModels(@SuppressWarnings("unused") ModelRegistryEvent event) {
-        ModBlocks.effectBlock.initModel();
-        ModBlocks.templateManager.initModel();
-//        gadgetBuilding.initModel();
-//        ModItems.gadgetExchanger.initModel();
-//        ModItems.gadgetCopyPaste.initModel();
-        ModItems.template.initModel();
-        if (SyncedConfig.enableDestructionGadget) {
-//            ModItems.gadgetDestruction.initModel();
-        }
-        if (SyncedConfig.enablePaste) {
-            ModItems.constructionPaste.initModel();
-            ModItems.constructionPasteContainer.initModel();
-            ModItems.constructionPasteContainert2.initModel();
-            ModItems.constructionPasteContainert3.initModel();
+        ModelLoaderRegistry.registerLoader(new BakedModelLoader());
+
+        RenderingRegistry.registerEntityRenderingHandler(BlockBuildEntity.class, new BlockBuildEntityRender.Factory());
+        RenderingRegistry.registerEntityRenderingHandler(ConstructionBlockEntity.class, new ConstructionBlockEntityRender.Factory());
+
+        // @todo: reimplement @since 1.13.x
+//        ModBlocks.effectBlock.initModel();
+//        ModBlocks.templateManager.initModel();
+//
+//        BuildingObjects.gadgetBuilding.initModel();
+//        BuildingObjects.gadgetExchanger.initModel();
+//        BuildingObjects.gadgetCopyPaste.initModel();
+//        BuildingObjects.template.initModel();
+//
+//        if (SyncedConfig.enableDestructionGadget) {
+//            BuildingObjects.gadgetDestruction.initModel();
+//        }
+//
+//        if (SyncedConfig.enablePaste) {
+//            BuildingObjects.ConstructionPasteContainer.initModel();
+//            BuildingObjects.constructionPaste.initModel();
+//
 //            ModBlocks.constructionBlock.initModel();
 //            ModBlocks.constructionBlockPowder.initModel();
+//
+//        // REIMPLEMENT
+////            ModelLoader.setCustomMeshDefinition(ModItems.constructionPasteContainer, new PasteContainerMeshDefinition());
+////            ModelLoader.setCustomMeshDefinition(ModItems.constructionPasteContainert2, new PasteContainerMeshDefinition());
+////            ModelLoader.setCustomMeshDefinition(ModItems.constructionPasteContainert3, new PasteContainerMeshDefinition());
+//        }
 
-        // REIMPLEMENT
-//            ModelLoader.setCustomMeshDefinition(ModItems.constructionPasteContainer, new PasteContainerMeshDefinition());
-//            ModelLoader.setCustomMeshDefinition(ModItems.constructionPasteContainert2, new PasteContainerMeshDefinition());
-//            ModelLoader.setCustomMeshDefinition(ModItems.constructionPasteContainert3, new PasteContainerMeshDefinition());
-        }
-    }
-
-    public void registerEntityRenderers() {
         RenderingRegistry.registerEntityRenderingHandler(BlockBuildEntity.class, new BlockBuildEntityRender.Factory());
         RenderingRegistry.registerEntityRenderingHandler(ConstructionBlockEntity.class, new ConstructionBlockEntityRender.Factory());
     }
 
-    @SubscribeEvent
     public static void renderWorldLastEvent(RenderWorldLastEvent evt) {
         Minecraft mc = Minecraft.getInstance();
         EntityPlayer player = mc.player;
@@ -93,7 +82,6 @@ public class ClientProxy extends CommonProxy {
 
     }
 
-    @SubscribeEvent
     public static void registerSprites(TextureStitchEvent.Pre event) {
         registerSprite(event, TemplateManagerContainer.TEXTURE_LOC_SLOT_TOOL);
         registerSprite(event, TemplateManagerContainer.TEXTURE_LOC_SLOT_TEMPLATE);

@@ -1,7 +1,6 @@
 package com.direwolf20.buildinggadgets.common.blocks.templatemanager;
 
 import com.direwolf20.buildinggadgets.common.items.ITemplate;
-
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockHorizontal;
 import net.minecraft.block.state.IBlockState;
@@ -17,8 +16,6 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.items.CapabilityItemHandler;
 
 import javax.annotation.Nullable;
@@ -30,25 +27,10 @@ public class TemplateManager extends Block {
     public static final DirectionProperty FACING_HORIZ = DirectionProperty.create("facing", EnumFacing.Plane.HORIZONTAL);
 
     public TemplateManager(Builder builder) {
-// TODO: reimplement
+        super(builder);
 
-//        super(Material.ROCK);
-//        setHardness(2.0f);
-//        setUnlocalizedName(BuildingGadgets.MODID + ".templatemanager");
-//        setCreativeTab(BuildingGadgets.BUILDING_CREATIVE_TAB);
-
-        super(builder.hardnessAndResistance(2f));
-        setRegistryName("templatemanager");
         this.setDefaultState(this.getStateContainer().getBaseState().with(FACING, EnumFacing.NORTH));
     }
-
-// TODO: Reimplement
-
-    @OnlyIn(Dist.CLIENT)
-    public void initModel() {
-//        ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(this), 0, new ModelResourceLocation(getRegistryName(), "inventory"));
-    }
-
 
     @Nullable
     @Override

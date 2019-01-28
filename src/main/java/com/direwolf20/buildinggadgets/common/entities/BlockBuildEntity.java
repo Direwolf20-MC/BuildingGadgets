@@ -1,13 +1,11 @@
 package com.direwolf20.buildinggadgets.common.entities;
 
-import com.direwolf20.buildinggadgets.common.BuildingGadgets;
+import com.direwolf20.buildinggadgets.common.BuildingObjects;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
-import com.direwolf20.buildinggadgets.common.blocks.ModBlocks;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.EntityType;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTUtil;
@@ -42,14 +40,14 @@ public class BlockBuildEntity extends Entity {
     int maxLife = 20;
 
     public BlockBuildEntity(World world) {
-        super(ModEntities.BLOCK_BUILD, world);
+        super(BuildingObjects.BLOCK_BUILD, world);
 
         setSize(0.1F, 0.1F);
         this.world = world;
     }
 
     public BlockBuildEntity(World worldIn, BlockPos spawnPos, EntityLivingBase player, IBlockState spawnBlock, int toolMode, IBlockState actualSpawnBlock, boolean constrPaste) {
-        super(ModEntities.BLOCK_BUILD, worldIn);
+        super(BuildingObjects.BLOCK_BUILD, worldIn);
         setSize(0.1F, 0.1F);
         setPosition(spawnPos.getX(), spawnPos.getY(), spawnPos.getZ());
         IBlockState currentBlock = worldIn.getBlockState(spawnPos);
@@ -86,7 +84,7 @@ public class BlockBuildEntity extends Entity {
         setToolMode(toolMode);
         spawnedBy = player;
         actualSetBlock = actualSpawnBlock;
-        world.setBlockState(spawnPos, ModBlocks.effectBlock.getDefaultState());
+        world.setBlockState(spawnPos, BuildingObjects.effectBlock.getDefaultState());
         setUsingConstructionPaste(constrPaste);
     }
 
@@ -192,7 +190,7 @@ public class BlockBuildEntity extends Entity {
             despawning = 0;
             if (setPos != null && setBlock != null && (getToolMode() == 1)) {
                 if (getUsingConstructionPaste()) {
-                    world.setBlockState(setPos, ModBlocks.constructionBlock.getDefaultState());
+                    world.setBlockState(setPos, BuildingObjects.constructionBlock.getDefaultState());
                     TileEntity te = world.getTileEntity(setPos);
                     if (te instanceof ConstructionBlockTileEntity) {
                         ((ConstructionBlockTileEntity) te).setBlockState(setBlock, actualSetBlock);

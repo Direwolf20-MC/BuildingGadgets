@@ -1,9 +1,7 @@
 package com.direwolf20.buildinggadgets.common.items.gadgets;
 
-import com.direwolf20.buildinggadgets.client.gui.GuiProxy;
-import com.direwolf20.buildinggadgets.common.BuildingGadgets;
+import com.direwolf20.buildinggadgets.common.BuildingObjects;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
-import com.direwolf20.buildinggadgets.common.blocks.ModBlocks;
 import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.common.tools.BlockMapIntState;
@@ -35,7 +33,6 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.BlockSnapshot;
 import net.minecraftforge.energy.CapabilityEnergy;
-import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.world.BlockEvent;
 
@@ -287,7 +284,7 @@ public class GadgetDestruction extends GadgetGeneric {
         TileEntity te = world.getTileEntity(voidPos);
         if (currentBlock.getMaterial() == Material.AIR) return false;
         //if (currentBlock.getBlock().getMaterial(currentBlock).isLiquid()) return false;
-        if (currentBlock.equals(ModBlocks.effectBlock.getDefaultState())) return false;
+        if (currentBlock.equals(BuildingObjects.effectBlock.getDefaultState())) return false;
         if ((te != null) && !(te instanceof ConstructionBlockTileEntity)) return false;
         if (currentBlock.getBlockHardness(world, voidPos) < 0) return false;
 
@@ -320,7 +317,7 @@ public class GadgetDestruction extends GadgetGeneric {
         for (BlockPos voidPos : voidPosArray) {
             IBlockState blockState = world.getBlockState(voidPos);
             IBlockState pasteState = Blocks.AIR.getDefaultState();
-            if (blockState.getBlock() == ModBlocks.constructionBlock) {
+            if (blockState.getBlock() == BuildingObjects.constructionBlock) {
                 TileEntity te = world.getTileEntity(voidPos);
                 if (te instanceof ConstructionBlockTileEntity) {
                     pasteState = ((ConstructionBlockTileEntity) te).getActualBlockState();
@@ -400,7 +397,7 @@ public class GadgetDestruction extends GadgetGeneric {
             IBlockState currentState = world.getBlockState(placePos);
             if (currentState.getMaterial() == Material.AIR || currentState.getMaterial().isLiquid()) {
                 IBlockState placeState = MapIntState.getStateFromSlot((short) stateIntArray[i]);
-                if (placeState.getBlock() == ModBlocks.constructionBlock) {
+                if (placeState.getBlock() == BuildingObjects.constructionBlock) {
                     IBlockState pasteState = Blocks.AIR.getDefaultState();
                     for (int j = 0; j < posPasteArray.length; j++) {
                         if (posPasteArray[j] == posIntArray[i]) {

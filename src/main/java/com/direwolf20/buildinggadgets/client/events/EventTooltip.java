@@ -5,8 +5,8 @@ package com.direwolf20.buildinggadgets.client.events;
  * Thanks Vazkii!!
  */
 
+import com.direwolf20.buildinggadgets.common.BuildingObjects;
 import com.direwolf20.buildinggadgets.common.items.ITemplate;
-import com.direwolf20.buildinggadgets.common.items.ModItems;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.tools.BlockMap;
 import com.direwolf20.buildinggadgets.common.tools.InventoryManipulation;
@@ -140,7 +140,7 @@ public class EventTooltip {
                 j++;
             }
             if (totalMissing > 0) {
-                ItemStack pasteItemStack = new ItemStack(ModItems.constructionPaste);
+                ItemStack pasteItemStack = new ItemStack(BuildingObjects.constructionPaste);
                 int hasAmt = InventoryManipulation.countPaste(Minecraft.getInstance().player);
                 int x = bx + (j % STACKS_PER_LINE) * 18;
                 int y = by + (j / STACKS_PER_LINE) * 20;

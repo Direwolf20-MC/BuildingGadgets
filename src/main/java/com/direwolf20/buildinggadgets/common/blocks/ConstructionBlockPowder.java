@@ -23,9 +23,8 @@ import java.util.List;
 
 public class ConstructionBlockPowder extends BlockFalling {
 
-    public ConstructionBlockPowder() {
-        super(Block.Builder.create(Material.SAND).hardnessAndResistance(0.5f, 0f));
-        setRegistryName("construction_block_powder");        // The unique name (within your mod) that identifies this block
+    public ConstructionBlockPowder(Builder builder) {
+        super(builder);
     }
 
     /*
