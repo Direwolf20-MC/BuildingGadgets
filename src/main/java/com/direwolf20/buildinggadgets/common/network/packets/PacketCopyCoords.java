@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.common.network.packets;
 
+import com.direwolf20.buildinggadgets.common.BuildingObjects;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
@@ -48,7 +49,7 @@ public class PacketCopyCoords {
 
                 BlockPos startPos = msg.start;
                 BlockPos endPos = msg.end;
-                GadgetCopyPaste tool = ModItems.gadgetCopyPaste;
+                GadgetCopyPaste tool = (GadgetCopyPaste) BuildingObjects.gadgetCopyPaste;
                 if (startPos.equals(BlockPos.ORIGIN) && endPos.equals(BlockPos.ORIGIN)) {
                     tool.setStartPos(heldItem, null);
                     tool.setEndPos(heldItem, null);

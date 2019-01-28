@@ -35,11 +35,11 @@ public class BuildingObjects {
     private static final String modId = BuildingGadgets.MODID;
 
     // Types
-    public static final EntityType<BlockBuildEntity> BLOCK_BUILD = EntityType.register("build_block", EntityType.Builder.create(BlockBuildEntity.class, BlockBuildEntity::new));
-    public static final EntityType<ConstructionBlockEntity> CONSTRUCTION_BLOCK = EntityType.register("construction_block", EntityType.Builder.create(ConstructionBlockEntity.class, ConstructionBlockEntity::new));
+    public static final EntityType<?> BLOCK_BUILD = EntityType.Builder.create(BlockBuildEntity.class, BlockBuildEntity::new).build("").setRegistryName(modId, "build_block");
+    public static final EntityType<?> CONSTRUCTION_BLOCK = EntityType.Builder.create(ConstructionBlockEntity.class, ConstructionBlockEntity::new).build("").setRegistryName(modId, "construction_block");
 
-    public static final TileEntityType<TemplateManagerTileEntity> TEMPLATE_MANAGER_TYPE = TileEntityType.register("template_manager_tile", TileEntityType.Builder.create(TemplateManagerTileEntity::new));
-    public static final TileEntityType<ConstructionBlockTileEntity> CONSTRUCTION_BLOCK_TYPE = TileEntityType.register("construction_block_tile", TileEntityType.Builder.create(ConstructionBlockTileEntity::new));
+    public static final TileEntityType<?> TEMPLATE_MANAGER_TYPE = TileEntityType.Builder.create(TemplateManagerTileEntity::new).build(null).setRegistryName(modId, "template_manager_tile");
+    public static final TileEntityType<?> CONSTRUCTION_BLOCK_TYPE = TileEntityType.Builder.create(ConstructionBlockTileEntity::new).build(null).setRegistryName(modId, "construction_tile");
 
     // Creative tab
     private static ItemGroup creativeTab = new ItemGroup(BuildingGadgets.MODID){

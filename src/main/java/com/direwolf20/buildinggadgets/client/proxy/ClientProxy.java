@@ -23,7 +23,7 @@ public class ClientProxy {
     public static void clientSetup(final FMLClientSetupEvent event) {
         DeferredWorkQueue.runLater(() -> {
             KeyBindings.init();
-            BuildingObjects.initColorHandlers();
+//            BuildingObjects.initColorHandlers();
         });
     }
 
