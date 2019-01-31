@@ -5,8 +5,11 @@
 //import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 //import com.direwolf20.buildinggadgets.common.tools.WorldSave;
 //import com.google.common.collect.Lists;
+//import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 //import net.minecraft.command.CommandBase;
 //import net.minecraft.command.CommandException;
+//import net.minecraft.command.CommandSource;
+//import net.minecraft.command.Commands;
 //import net.minecraft.command.ICommandSender;
 //import net.minecraft.entity.player.EntityPlayerMP;
 //import net.minecraft.nbt.NBTTagCompound;
@@ -21,7 +24,7 @@
 //import java.util.List;
 //import java.util.Map;
 //
-//public abstract class CommandAlterBlockMaps extends CommandBase {
+//public abstract class CommandAlterBlockMaps {
 //    private final String name;
 //    private final List<String> aliases;
 //    private final boolean removeData;

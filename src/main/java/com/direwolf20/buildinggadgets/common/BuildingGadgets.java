@@ -56,9 +56,9 @@ public class BuildingGadgets {
             MinecraftForge.EVENT_BUS.addListener(ClientProxy::registerModels);
         });
 
-//        if (!SyncedConfig.poweredByFE) {
-//            MinecraftForge.EVENT_BUS.register(new AnvilRepairHandler());
-//        }
+        if (!SyncedConfig.poweredByFE) {
+            MinecraftForge.EVENT_BUS.register(new AnvilRepairHandler());
+        }
 
         MinecraftForge.EVENT_BUS.register(this);
         minecraftSupplier = null;
@@ -73,7 +73,7 @@ public class BuildingGadgets {
     }
 
     private void setup(final FMLCommonSetupEvent event) {
-//        Config.load();
+        Config.load();
 
         DeferredWorkQueue.runLater(PacketHandler::register);
 // @todo: reimplement @since 1.13.x
