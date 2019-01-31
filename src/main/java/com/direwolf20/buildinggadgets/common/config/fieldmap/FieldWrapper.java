@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.common.config.fieldmap;
 
-import com.direwolf20.buildinggadgets.common.tools.ReflectionTool;
+import com.direwolf20.buildinggadgets.common.utils.ReflectionUtil;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 
@@ -30,7 +30,7 @@ public final class FieldWrapper {
      */
     @SuppressWarnings("unchecked")
     public FieldWrapper(@Nonnull Field field, @Nonnull FieldMapper<?, ?> mapper, @Nullable Object instance) {
-        Preconditions.checkArgument(ReflectionTool.isInstanceProvidedForField(field,instance),
+        Preconditions.checkArgument(ReflectionUtil.isInstanceProvidedForField(field,instance),
                 "Non Static fields must be accessed with an instance! Static fields without! Also watch out for incompatible classes! ");
         this.instance = instance;
         this.field = field;

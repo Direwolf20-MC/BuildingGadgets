@@ -11,12 +11,14 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.init.Blocks;
+import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.state.IProperty;
 import net.minecraft.state.EnumProperty;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.items.CapabilityItemHandler;
@@ -303,15 +305,18 @@ public class InventoryManipulation {
     }
 
     public static IBlockState getSpecificStates(IBlockState originalState, World world, EntityPlayer player, BlockPos pos, ItemStack tool) {
-        IBlockState placeState = Blocks.AIR.getDefaultState();
+        IBlockState placeState;
         Block block = originalState.getBlock();
         ItemStack item = block.getPickBlock(originalState, null, world, pos, player);
-// TODO: Reevaluate
-//        try {
-////            placeState = originalState.getBlock().getStateForPlacement(world, pos, EnumFacing.UP, 0, 0, 0, meta, player, EnumHand.MAIN_HAND);
-//        } catch (Exception var8) {
-//            placeState = originalState.getBlock().getDefaultState();
-//        }
+
+        try {
+            placeState = originalState.getBlock().getStateForPlacement(
+                    new BlockItemUseContext(world, player, item, pos, EnumFacing.UP, 0.5F, 0.0F, 0.5F)
+            );
+        } catch (Exception var8) {
+            placeState = originalState.getBlock().getDefaultState();
+        }
+
         for (IProperty prop : placeState.getProperties()) {
             if (tool.getItem() instanceof GadgetCopyPaste) {
                 if (SAFE_PROPERTIES_COPY_PASTE.contains(prop)) {

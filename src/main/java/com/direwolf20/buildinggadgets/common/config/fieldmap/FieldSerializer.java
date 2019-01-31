@@ -2,7 +2,7 @@ package com.direwolf20.buildinggadgets.common.config.fieldmap;
 
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.utils.BoxedArray;
-import com.direwolf20.buildinggadgets.common.tools.NBTTool;
+import com.direwolf20.buildinggadgets.common.utils.NBTUtil;
 import com.google.common.base.Preconditions;
 import net.minecraft.nbt.*;
 
@@ -138,14 +138,14 @@ public class FieldSerializer {
             if(!field.getType().equals(String[].class))
                 return null;
             String[] val = (String[])field.get();
-            return NBTTool.createStringList(val);
+            return NBTUtil.createStringList(val);
         }
 
         @Override
         public boolean applyValue(INBTBase tag, FieldWrapper field) throws IllegalAccessException {
             if(!field.getType().equals(String[].class) || !(tag instanceof NBTTagList))
                 return false;
-            field.set(NBTTool.readStringList((NBTTagList) tag));
+            field.set(NBTUtil.readStringList((NBTTagList) tag));
             return true;
         }
 
@@ -292,10 +292,10 @@ public class FieldSerializer {
                 if(!isAcceptableClass(field.getType()))
                     return null;
                 if (getPrimitiveClass().equals(field.getType())) {
-                    return NBTTool.createBooleanList((boolean[]) field.get());
+                    return NBTUtil.createBooleanList((boolean[]) field.get());
                 }
                 else {
-                    return NBTTool.createBooleanList((Boolean[]) field.get());
+                    return NBTUtil.createBooleanList((Boolean[]) field.get());
                 }
             }
 
@@ -304,10 +304,10 @@ public class FieldSerializer {
                 if (!isAcceptableClass(field.getType()) || !(tag instanceof NBTTagByteArray))
                     return false;
                 if (getPrimitiveClass().equals(field.getType())) {
-                    field.set(NBTTool.readBooleanList((NBTTagByteArray)tag));
+                    field.set(NBTUtil.readBooleanList((NBTTagByteArray)tag));
                 }
                 else {
-                    field.set(NBTTool.readBBooleanList((NBTTagByteArray)tag));
+                    field.set(NBTUtil.readBBooleanList((NBTTagByteArray)tag));
                 }
                 return true;
             }
@@ -346,10 +346,10 @@ public class FieldSerializer {
                 if (!isAcceptableClass(field.getType()))
                     return null;
                 if (getPrimitiveClass().equals(field.getType())) {
-                    return NBTTool.createShortList((short[]) field.get());
+                    return NBTUtil.createShortList((short[]) field.get());
                 }
                 else {
-                    return NBTTool.createShortList((Short[]) field.get());
+                    return NBTUtil.createShortList((Short[]) field.get());
                 }
             }
 
@@ -358,10 +358,10 @@ public class FieldSerializer {
                 if (!isAcceptableClass(field.getType()) || !(tag instanceof NBTTagList))
                     return false;
                 if (getPrimitiveClass().equals(field.getType())) {
-                    field.set(NBTTool.readShortList((NBTTagList) tag));
+                    field.set(NBTUtil.readShortList((NBTTagList) tag));
                 }
                 else {
-                    field.set(NBTTool.readBShortList((NBTTagList)tag));
+                    field.set(NBTUtil.readBShortList((NBTTagList)tag));
                 }
                 return true;
             }
@@ -427,10 +427,10 @@ public class FieldSerializer {
                 if (!isAcceptableClass(field.getType()))
                     return null;
                 if (getPrimitiveClass().equals(field.getType())) {
-                    return NBTTool.createFloatList((float[]) field.get());
+                    return NBTUtil.createFloatList((float[]) field.get());
                 }
                 else {
-                    return NBTTool.createFloatList((Float[]) field.get());
+                    return NBTUtil.createFloatList((Float[]) field.get());
                 }
             }
 
@@ -439,10 +439,10 @@ public class FieldSerializer {
                 if (!isAcceptableClass(field.getType()) || !(tag instanceof NBTTagList))
                     return false;
                 if (getPrimitiveClass().equals(field.getType())) {
-                    field.set(NBTTool.readFloatList((NBTTagList) tag));
+                    field.set(NBTUtil.readFloatList((NBTTagList) tag));
                 }
                 else {
-                    field.set(NBTTool.readBFloatList((NBTTagList)tag));
+                    field.set(NBTUtil.readBFloatList((NBTTagList)tag));
                 }
                 return true;
             }
@@ -454,10 +454,10 @@ public class FieldSerializer {
                 if (!isAcceptableClass(field.getType()))
                     return null;
                 if (getPrimitiveClass().equals(field.getType())) {
-                    return NBTTool.createDoubleList((double[]) field.get());
+                    return NBTUtil.createDoubleList((double[]) field.get());
                 }
                 else {
-                    return NBTTool.createDoubleList((Double[]) field.get());
+                    return NBTUtil.createDoubleList((Double[]) field.get());
                 }
             }
 
@@ -466,10 +466,10 @@ public class FieldSerializer {
                 if (!isAcceptableClass(field.getType()) || !(tag instanceof NBTTagList))
                     return false;
                 if (getPrimitiveClass().equals(field.getType())) {
-                    field.set(NBTTool.readDoubleList((NBTTagList) tag));
+                    field.set(NBTUtil.readDoubleList((NBTTagList) tag));
                 }
                 else {
-                    field.set(NBTTool.readBDoubleList((NBTTagList)tag));
+                    field.set(NBTUtil.readBDoubleList((NBTTagList)tag));
                 }
                 return true;
             }

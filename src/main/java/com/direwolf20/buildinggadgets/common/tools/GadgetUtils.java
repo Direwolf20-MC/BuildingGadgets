@@ -4,6 +4,7 @@ import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetBuilding;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetExchanger;
+import com.direwolf20.buildinggadgets.common.utils.VectorUtil;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
 import net.minecraft.block.state.IBlockState;
@@ -228,7 +229,7 @@ public class GadgetUtils {
         //Used to find which block the player is looking at, and store it in NBT on the tool.
         boolean validBlock = true;
         World world = player.world;
-        RayTraceResult lookingAt = VectorTools.getLookingAt(player);
+        RayTraceResult lookingAt = VectorUtil.getLookingAt(player);
         if (lookingAt == null) {
             return;
         }
@@ -272,7 +273,7 @@ public class GadgetUtils {
         World world = player.world;
         List<BlockPos> currentCoords = getAnchor(stack);
         if (currentCoords.size() == 0) {  //If we don't have an anchor, find the block we're supposed to anchor to
-            RayTraceResult lookingAt = VectorTools.getLookingAt(player);
+            RayTraceResult lookingAt = VectorUtil.getLookingAt(player);
             if (lookingAt == null) {  //If we aren't looking at anything, exit
                 return false;
             }

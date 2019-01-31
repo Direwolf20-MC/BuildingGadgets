@@ -5,7 +5,7 @@ import com.direwolf20.buildinggadgets.common.config.fieldmap.FieldMapper;
 import com.direwolf20.buildinggadgets.common.config.fieldmap.FieldSerializer;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketSyncConfig;
-import com.direwolf20.buildinggadgets.common.tools.ReflectionTool;
+import com.direwolf20.buildinggadgets.common.utils.ReflectionUtil;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.INBTBase;
 import net.minecraft.nbt.NBTTagCompound;
@@ -194,7 +194,7 @@ public class SyncedConfig {
     }
 
     private static List<Field> getSyncFields() {
-        return ReflectionTool.getFilteredFields(SyncedConfig.class, field -> field.isAnnotationPresent(AutoSync.class) && ReflectionTool.PREDICATE_STATIC.test(field));
+        return ReflectionUtil.getFilteredFields(SyncedConfig.class, field -> field.isAnnotationPresent(AutoSync.class) && ReflectionUtil.PREDICATE_STATIC.test(field));
     }
 
     private static String getSyncName(Field field) {

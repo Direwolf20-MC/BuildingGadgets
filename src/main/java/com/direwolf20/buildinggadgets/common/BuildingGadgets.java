@@ -10,6 +10,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.command.Commands;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.DeferredWorkQueue;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
@@ -22,7 +23,6 @@ import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nonnull;
 import java.util.function.Supplier;
-
 
 @Mod(value = BuildingGadgets.MODID)
 public class BuildingGadgets {
@@ -40,18 +40,20 @@ public class BuildingGadgets {
         return theMod;
     }
 
-    private Supplier<Minecraft> minecraftSupplier;
+    private Supplier<Minecraft> mcSupplier;
     public BuildingGadgets() {
         theMod = (BuildingGadgets) FMLModLoadingContext.get().getActiveContainer().getMod();
+        final IEventBus eventBus = FMLModLoadingContext.get().getModEventBus();
 
-        FMLModLoadingContext.get().getModEventBus().addListener(this::setup);
-        FMLModLoadingContext.get().getModEventBus().addListener(this::serverLoad);
+        eventBus.addListener(this::setup);
+        eventBus.addListener(this::serverLoad);
 
+        // Client only registering
         DistExecutor.runWhenOn(Dist.CLIENT, () -> () -> {
-            FMLModLoadingContext.get().getModEventBus().addListener(this::clientInit);
-            FMLModLoadingContext.get().getModEventBus().addListener(ClientProxy::clientSetup);
-            FMLModLoadingContext.get().getModEventBus().addListener(ClientProxy::renderWorldLastEvent);
-            FMLModLoadingContext.get().getModEventBus().addListener(ClientProxy::registerSprites);
+            eventBus.addListener(this::clientInit);
+            eventBus.addListener(ClientProxy::clientSetup);
+            eventBus.addListener(ClientProxy::renderWorldLastEvent);
+            eventBus.addListener(ClientProxy::registerSprites);
 
             MinecraftForge.EVENT_BUS.addListener(ClientProxy::registerModels);
         });
@@ -61,13 +63,13 @@ public class BuildingGadgets {
         }
 
         MinecraftForge.EVENT_BUS.register(this);
-        minecraftSupplier = null;
+        mcSupplier = null;
     }
 
     @Nonnull
     public Minecraft getMinecraft() {
-        if (minecraftSupplier == null) throw new RuntimeException("Attempted to access Minecraft instance server Side");
-        Minecraft mc = minecraftSupplier.get();
+        if (mcSupplier == null) throw new RuntimeException("Attempted to access Minecraft instance server Side");
+        Minecraft mc = mcSupplier.get();
         assert mc != null;
         return mc;
     }
@@ -81,7 +83,7 @@ public class BuildingGadgets {
     }
 
     private void clientInit(final FMLClientSetupEvent event) {
-        minecraftSupplier = event.getMinecraftSupplier();
+        mcSupplier = event.getMinecraftSupplier();
     }
 
     private void serverLoad(FMLServerStartingEvent event) {

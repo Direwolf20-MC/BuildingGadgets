@@ -31,8 +31,8 @@ public class ExchangingModes {
         if (te != null && !(te instanceof ConstructionBlockTileEntity)) {
             return false;
         }
-        if (te instanceof ConstructionBlockTileEntity) {
-            if (((ConstructionBlockTileEntity) te).getBlockState() == setBlock) {
+        if (te != null) {
+            if (te.getBlockState() == setBlock) {
                 return false;
             }
         }
@@ -56,10 +56,10 @@ public class ExchangingModes {
         GadgetExchanger.ToolMode mode = GadgetExchanger.getToolMode(tool);
         IBlockState setBlock = GadgetUtils.getToolBlock(tool);
         int range = GadgetUtils.getToolRange(tool);
-        Boolean fuzzyMode = GadgetExchanger.getFuzzy(tool);
+        boolean fuzzyMode = GadgetExchanger.getFuzzy(tool);
 
-        List<BlockPos> coordinates = new ArrayList<BlockPos>();
-//        BlockPos playerPos = new BlockPos(Math.floor(player.posX), Math.floor(player.posY), Math.floor(player.posZ));
+        List<BlockPos> coordinates = new ArrayList<>();
+
         BlockPos pos = startBlock;
         int bound = (range - 1) / 2;
         EnumFacing playerFacing = player.getHorizontalFacing();

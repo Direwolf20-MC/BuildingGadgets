@@ -2,7 +2,8 @@ package com.direwolf20.buildinggadgets.common.tools;
 
 import com.direwolf20.buildinggadgets.common.BuildingObjects;
 import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
-import com.direwolf20.buildinggadgets.common.items.FakeBuilderWorld;
+import com.direwolf20.buildinggadgets.common.utils.VectorUtil;
+import com.direwolf20.buildinggadgets.common.world.FakeBuilderWorld;
 import com.direwolf20.buildinggadgets.common.items.capability.CapabilityProviderEnergy;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetBuilding;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
@@ -45,7 +46,7 @@ public class ToolRenders {
     private static final FakeBuilderWorld fakeWorld = new FakeBuilderWorld();
 
     public static void renderBuilderOverlay(RenderWorldLastEvent evt, EntityPlayer player, ItemStack stack) {
-        RayTraceResult lookingAt = VectorTools.getLookingAt(player);
+        RayTraceResult lookingAt = VectorUtil.getLookingAt(player);
         IBlockState state = Blocks.AIR.getDefaultState();
         List<BlockPos> coordinates = getAnchor(stack);
         if (lookingAt != null || coordinates.size() > 0) {
@@ -174,7 +175,7 @@ public class ToolRenders {
     public static void renderExchangerOverlay(RenderWorldLastEvent evt, EntityPlayer player, ItemStack stack) {
 //        int range = getToolRange(stack);
 //        GadgetExchanger.ToolMode mode = GadgetExchanger.getToolMode(stack);
-        RayTraceResult lookingAt = VectorTools.getLookingAt(player);
+        RayTraceResult lookingAt = VectorUtil.getLookingAt(player);
         IBlockState state = Blocks.AIR.getDefaultState();
         List<BlockPos> coordinates = getAnchor(stack);
         if (lookingAt != null || coordinates.size() > 0) {
@@ -307,7 +308,7 @@ public class ToolRenders {
     }
 
     public static void renderDestructionOverlay(RenderWorldLastEvent evt, EntityPlayer player, ItemStack stack) {
-        RayTraceResult lookingAt = VectorTools.getLookingAt(player);
+        RayTraceResult lookingAt = VectorUtil.getLookingAt(player);
         if (lookingAt == null && GadgetDestruction.getAnchor(stack) == null) return;
         World world = player.world;
         BlockPos startBlock = (GadgetDestruction.getAnchor(stack) == null) ? lookingAt.getBlockPos() : GadgetDestruction.getAnchor(stack);
@@ -399,7 +400,7 @@ public class ToolRenders {
             //First check if we have an anchor, if not check if we're looking at a block, if not, exit
             BlockPos startPos = GadgetCopyPaste.getAnchor(stack);
             if (startPos == null) {
-                startPos = VectorTools.getPosLookingAt(player);
+                startPos = VectorUtil.getPosLookingAt(player);
                 if (startPos == null) return;
                 startPos = startPos.up(GadgetCopyPaste.getY(stack));
                 startPos = startPos.east(GadgetCopyPaste.getX(stack));
@@ -411,13 +412,13 @@ public class ToolRenders {
             }
 
             //We store our buffers in PasteToolBufferBuilder (A client only class) -- retrieve the buffer from this locally cache'd map
-            ToolDireBuffer toolDireBuffer = PasteToolBufferBuilder.getBufferFromMap(UUID);
-            if (toolDireBuffer == null) {
+            ToolBufferBuilder toolBufferBuilder = PasteToolBufferBuilder.getBufferFromMap(UUID);
+            if (toolBufferBuilder == null) {
                 return;
             }
             //Also get the blockMapList from the local cache - If either the buffer or the blockmap list are empty, exit.
             List<BlockMap> blockMapList = GadgetCopyPaste.getBlockMapList(PasteToolBufferBuilder.getTagFromUUID(UUID));
-            if (toolDireBuffer.getVertexCount() == 0 || blockMapList.size() == 0) {
+            if (toolBufferBuilder.getVertexCount() == 0 || blockMapList.size() == 0) {
                 return;
             }
 

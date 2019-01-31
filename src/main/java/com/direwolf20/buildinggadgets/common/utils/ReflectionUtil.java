@@ -1,4 +1,4 @@
-package com.direwolf20.buildinggadgets.common.tools;
+package com.direwolf20.buildinggadgets.common.utils;
 
 import com.google.common.collect.ImmutableList;
 
@@ -6,12 +6,11 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.Arrays;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-public class ReflectionTool {
+public class ReflectionUtil {
     public static final Predicate<Field> PREDICATE_STATIC = field -> Modifier.isStatic(field.getModifiers());
 
     /**
@@ -31,6 +30,6 @@ public class ReflectionTool {
      * @return whether or not the instance is null if the Field is static, or non-null (and of an appropriate class) if the Field is not
      */
     public static boolean isInstanceProvidedForField(@Nonnull Field field, @Nullable Object instance) {
-        return (instance != null && !ReflectionTool.PREDICATE_STATIC.test(field) && field.getDeclaringClass().isAssignableFrom(instance.getClass())) || (instance == null && ReflectionTool.PREDICATE_STATIC.test(field));
+        return (instance != null && !ReflectionUtil.PREDICATE_STATIC.test(field) && field.getDeclaringClass().isAssignableFrom(instance.getClass())) || (instance == null && ReflectionUtil.PREDICATE_STATIC.test(field));
     }
 }

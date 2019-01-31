@@ -12,6 +12,8 @@ import com.direwolf20.buildinggadgets.common.items.capability.CapabilityProvider
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketBlockMap;
 import com.direwolf20.buildinggadgets.common.tools.*;
+import com.direwolf20.buildinggadgets.common.utils.VectorUtil;
+import com.direwolf20.buildinggadgets.common.world.WorldSave;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
 import net.minecraft.block.material.Material;
@@ -260,7 +262,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
         player.setActiveHand(hand);
         if (!world.isRemote) {
             if (getToolMode(stack) == ToolMode.Copy) {
-                BlockPos pos = VectorTools.getPosLookingAt(player);
+                BlockPos pos = VectorUtil.getPosLookingAt(player);
                 if (pos == null) {
                     //setStartPos(stack, null);
                     //setEndPos(stack, null);
@@ -283,7 +285,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
             } else if (getToolMode(stack) == ToolMode.Paste) {
                 if (!player.isSneaking()) {
                     if (getAnchor(stack) == null) {
-                        BlockPos pos = VectorTools.getPosLookingAt(player);
+                        BlockPos pos = VectorUtil.getPosLookingAt(player);
                         if (pos == null) return new ActionResult<ItemStack>(EnumActionResult.FAIL, stack);
                         buildBlockMap(world, pos, stack, player);
                     } else {
@@ -294,7 +296,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
             }
         } else {
             if (getToolMode(stack) == ToolMode.Copy) {
-                BlockPos pos = VectorTools.getPosLookingAt(player);
+                BlockPos pos = VectorUtil.getPosLookingAt(player);
                 if (pos == null) {
                     if (player.isSneaking()) {
                         Minecraft.getInstance().displayGuiScreen(new CopyPasteGUI(stack));
@@ -504,7 +506,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
     private void placeBlock(World world, BlockPos pos, EntityPlayer player, IBlockState state, Map<IBlockState, UniqueItem> IntStackMap) {
         IBlockState testState = world.getBlockState(pos);
         // @warning: this has been replaced without knowing how to construct a BlockItemUseContent
-        if ((SyncedConfig.canOverwriteBlocks && !testState.isReplaceable(new BlockItemUseContext(world, player, new ItemStack(testState.getBlock()), pos, EnumFacing.DOWN, 0f, 0f, 0f))) ||
+        if ((SyncedConfig.canOverwriteBlocks && !testState.isReplaceable(new BlockItemUseContext(world, player, new ItemStack(testState.getBlock()), pos, EnumFacing.DOWN, 0.5F, 0.0F, 0.5F))) ||
             (!SyncedConfig.canOverwriteBlocks && world.getBlockState(pos).getMaterial() != Material.AIR))
             return;
 
@@ -569,7 +571,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
     public static void anchorBlocks(EntityPlayer player, ItemStack stack) {
         BlockPos currentAnchor = getAnchor(stack);
         if (currentAnchor == null) {
-            RayTraceResult lookingAt = VectorTools.getLookingAt(player);
+            RayTraceResult lookingAt = VectorUtil.getLookingAt(player);
             if (lookingAt == null) {
                 return;
             }

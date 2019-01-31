@@ -13,7 +13,7 @@ import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.BuildingObjects;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.tools.PasteToolBufferBuilder;
-import com.direwolf20.buildinggadgets.common.tools.ToolDireBuffer;
+import com.direwolf20.buildinggadgets.common.tools.ToolBufferBuilder;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.gui.inventory.GuiContainer;
@@ -156,7 +156,7 @@ public class TemplateManagerGUI extends GuiContainer {
         //float rotX = 165, rotY = 0, zoom = 1;
         if (!itemstack.isEmpty()) {
             String UUID = ((GadgetCopyPaste) BuildingObjects.gadgetCopyPaste).getUUID(itemstack);
-            ToolDireBuffer bufferBuilder = PasteToolBufferBuilder.getBufferFromMap(UUID);
+            ToolBufferBuilder bufferBuilder = PasteToolBufferBuilder.getBufferFromMap(UUID);
             if (bufferBuilder != null) {
                 BlockPos startPos = ((GadgetCopyPaste) BuildingObjects.gadgetCopyPaste).getStartPos(itemstack);
                 BlockPos endPos = ((GadgetCopyPaste) BuildingObjects.gadgetCopyPaste).getEndPos(itemstack);

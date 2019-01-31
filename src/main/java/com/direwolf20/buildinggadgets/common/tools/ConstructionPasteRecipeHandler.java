@@ -8,6 +8,7 @@ import net.minecraft.item.crafting.ShapedRecipe;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 
+@Deprecated
 public class ConstructionPasteRecipeHandler extends ShapedRecipe {
 
     public ConstructionPasteRecipeHandler(ResourceLocation idIn, String groupIn, int recipeWidthIn, int recipeHeightIn, NonNullList<Ingredient> recipeItemsIn, ItemStack recipeOutputIn) {

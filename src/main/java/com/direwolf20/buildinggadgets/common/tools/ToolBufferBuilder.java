@@ -16,7 +16,7 @@ import java.nio.*;
 import java.util.Arrays;
 import java.util.BitSet;
 
-public class ToolDireBuffer extends BufferBuilder {
+public class ToolBufferBuilder extends BufferBuilder {
 
     private static final Logger LOGGER = LogManager.getLogger();
     private ByteBuffer byteBuffer;
@@ -37,7 +37,7 @@ public class ToolDireBuffer extends BufferBuilder {
     private VertexFormat vertexFormat;
     private boolean isDrawing;
 
-    public ToolDireBuffer(int bufferSizeIn) {
+    public ToolBufferBuilder(int bufferSizeIn) {
         super(bufferSizeIn);
         this.byteBuffer = GLAllocation.createDirectByteBuffer(bufferSizeIn * 4);
         this.rawIntBuffer = this.byteBuffer.asIntBuffer();

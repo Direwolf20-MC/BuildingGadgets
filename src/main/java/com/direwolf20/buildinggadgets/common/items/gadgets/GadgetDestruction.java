@@ -6,8 +6,8 @@ import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.common.tools.BlockMapIntState;
 import com.direwolf20.buildinggadgets.common.tools.GadgetUtils;
-import com.direwolf20.buildinggadgets.common.tools.VectorTools;
-import com.direwolf20.buildinggadgets.common.tools.WorldSave;
+import com.direwolf20.buildinggadgets.common.utils.VectorUtil;
+import com.direwolf20.buildinggadgets.common.world.WorldSave;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
@@ -217,7 +217,7 @@ public class GadgetDestruction extends GadgetGeneric {
         player.setActiveHand(hand);
         if (!world.isRemote) {
             if (!player.isSneaking()) {
-                RayTraceResult lookingAt = VectorTools.getLookingAt(player);
+                RayTraceResult lookingAt = VectorUtil.getLookingAt(player);
                 if (lookingAt == null && getAnchor(stack) == null) { //If we aren't looking at anything, exit
                     return new ActionResult<ItemStack>(EnumActionResult.FAIL, stack);
                 }
@@ -243,7 +243,7 @@ public class GadgetDestruction extends GadgetGeneric {
     public static void anchorBlocks(EntityPlayer player, ItemStack stack) {
         BlockPos currentAnchor = getAnchor(stack);
         if (currentAnchor == null) {
-            RayTraceResult lookingAt = VectorTools.getLookingAt(player);
+            RayTraceResult lookingAt = VectorUtil.getLookingAt(player);
             if (lookingAt == null) {
                 return;
             }

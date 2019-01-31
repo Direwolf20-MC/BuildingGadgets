@@ -30,7 +30,7 @@ import java.util.Random;
 public class PasteToolBufferBuilder {
 
     private static Map<String, NBTTagCompound> tagMap = new HashMap<String, NBTTagCompound>();
-    private static Map<String, ToolDireBuffer> bufferMap = new HashMap<String, ToolDireBuffer>();
+    private static Map<String, ToolBufferBuilder> bufferMap = new HashMap<String, ToolBufferBuilder>();
 
 
     private static int getCopyCounter(String UUID) {
@@ -42,7 +42,7 @@ public class PasteToolBufferBuilder {
 
     public static void clearMaps() {
         tagMap = new HashMap<String, NBTTagCompound>();
-        bufferMap = new HashMap<String, ToolDireBuffer>();
+        bufferMap = new HashMap<String, ToolBufferBuilder>();
     }
 
     public static void addToMap(String UUID, NBTTagCompound tag) {
@@ -58,7 +58,7 @@ public class PasteToolBufferBuilder {
     }
 
     @Nullable
-    public static ToolDireBuffer getBufferFromMap(String UUID) {
+    public static ToolBufferBuilder getBufferFromMap(String UUID) {
         if (bufferMap.containsKey(UUID)) {
             return bufferMap.get(UUID);
         }
@@ -69,7 +69,7 @@ public class PasteToolBufferBuilder {
 //        long time = System.nanoTime();
         List<BlockMap> blockMapList = GadgetCopyPaste.getBlockMapList(tagMap.get(UUID));
         BlockRendererDispatcher dispatcher = Minecraft.getInstance().getBlockRendererDispatcher();
-        ToolDireBuffer bufferBuilder = new ToolDireBuffer(2097152);
+        ToolBufferBuilder bufferBuilder = new ToolBufferBuilder(2097152);
         bufferBuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
         for (BlockMap blockMap : blockMapList) {
             IBlockState renderBlockState = blockMap.state;
@@ -85,7 +85,7 @@ public class PasteToolBufferBuilder {
 
     public static void draw(EntityPlayer player, double x, double y, double z, BlockPos startPos, String UUID) {
 //        long time = System.nanoTime();
-        ToolDireBuffer bufferBuilder = bufferMap.get(UUID);
+        ToolBufferBuilder bufferBuilder = bufferMap.get(UUID);
         bufferBuilder.sortVertexData((float) (x - startPos.getX()), (float) ((y + player.getEyeHeight()) - startPos.getY()), (float) (z - startPos.getZ()));
         //System.out.printf("Sorted %d Vertexes in %.2f ms%n", bufferBuilder.getVertexCount(), (System.nanoTime() - time) * 1e-6);
         if (bufferBuilder.getVertexCount() > 0) {
