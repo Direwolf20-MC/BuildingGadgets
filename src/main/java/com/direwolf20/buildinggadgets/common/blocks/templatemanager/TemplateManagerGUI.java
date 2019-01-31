@@ -272,7 +272,7 @@ public class TemplateManagerGUI extends GuiContainer {
         }
     }
 
-    // @todo: reimplement @since 1.13.x
+    // @fixme: reimplement @since 1.13.x
 //    @Override
 //    protected void actionPerformed(GuiButton b) {
 //        if (b.id == buttonHelp.id) {

@@ -17,12 +17,19 @@ public class EffectBlock extends Block {
         super(builder);
     }
 
-    // @todo: reimplement @since 1.13.x
+    // @fixme: reimplement @since 1.13.x
 //    public void initModel() {
 //        //ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(this), 0, new ModelResourceLocation(getRegistryName(), "inventory"));
 //    }
 
+    /**
+     * @param state blockState
+     * @return Render Type
+     *
+     * @deprecated call via {@link IBlockState#getRenderType()} whenever possible. Implementing/overriding is fine.
+     */
     @Override
+    @SuppressWarnings("deprecation")
     public EnumBlockRenderType getRenderType(IBlockState state) {
         return EnumBlockRenderType.INVISIBLE;
     }

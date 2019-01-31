@@ -77,7 +77,7 @@ public class TemplateManager extends Block {
             }
         }
 
-//  TODO: reimplement
+//  @fixme: reimplement
 //        player.gui(BuildingGadgets.instance, GUI_ID, world, pos.getX(), pos.getY(), pos.getZ());
         return true;
     }

@@ -254,7 +254,7 @@ public class Config {
 
     private static void loadFrom(final Path configRoot) {
         Path configFile = configRoot.resolve(CONFIG_FILE);
-        CONFIG.setConfigFile(configFile);
+//        CONFIG.setConfigFile(configFile);
         LogManager.getLogger().debug(CORE, "Loaded {} config from {}", BuildingGadgets.MODID, configFile);
     }
 

@@ -43,7 +43,6 @@ public class EventTooltip {
     private static void tooltipIfShift(@SuppressWarnings("unused") List<ITextComponent> tooltip, Runnable r) {
         if (GuiScreen.isShiftKeyDown())
             r.run();
-        //else addToTooltip(tooltip, "arl.misc.shiftForInfo");
     }
 
     public static void addTemplatePadding(ItemStack stack, List<ITextComponent> tooltip) {
@@ -56,7 +55,7 @@ public class EventTooltip {
 
             Multiset<UniqueItem> itemCountMap = template.getItemCountMap(stack);
 
-            Map<ItemStack, Integer> itemStackCount = new HashMap<ItemStack, Integer>();
+            Map<ItemStack, Integer> itemStackCount = new HashMap<>();
             for (Multiset.Entry<UniqueItem> entry : itemCountMap.entrySet()) {
                 ItemStack itemStack = new ItemStack(entry.getElement().item, 1);
                 itemStackCount.put(itemStack, entry.getCount());
@@ -72,8 +71,6 @@ public class EventTooltip {
             }
 
             int count = (totalMissing > 0) ? itemCountMap.size() + 1 : itemStackCount.size();
-            //boolean creative = ((IReagentHolder) stack.getItem()).isCreativeReagentHolder(stack);
-
             if (count > 0)
                 tooltipIfShift(tooltip, () -> {
                     int lines = (((count - 1) / STACKS_PER_LINE) + 1) * 2;
@@ -98,7 +95,7 @@ public class EventTooltip {
             Multiset<UniqueItem> itemCountMap = ((ITemplate) stack.getItem()).getItemCountMap(stack);
 
             //Create an ItemStack -> Integer Map
-            Map<ItemStack, Integer> itemStackCount = new HashMap<ItemStack, Integer>();
+            Map<ItemStack, Integer> itemStackCount = new HashMap<>();
             for (Multiset.Entry<UniqueItem> entry : itemCountMap.entrySet()) {
                 ItemStack itemStack = new ItemStack(entry.getElement().item, 1);
                 itemStackCount.put(itemStack, entry.getCount());
@@ -174,16 +171,8 @@ public class EventTooltip {
         int missingCount = 0;
 
         if (hasReq) {
-            //The commented out code will draw a red box around any items that you don't have enough of
-            //I personally didn't like it.
-            /*if (count < req) {
-                GlStateManager.enableDepth();
-                Gui.drawRect(x - 1, y - 1, x + 17, y + 17, 0x44FF0000);
-                GlStateManager.disableDepth();
-            }*/
             if (count < req) {
                 String fs = Integer.toString(req - count);
-                //String s2 = TextFormatting.BOLD + "(" + fs + ")";
                 String s2 = "(" + fs + ")";
                 int w2 = mc.fontRenderer.getStringWidth(s2);
 
@@ -198,39 +187,4 @@ public class EventTooltip {
         GlStateManager.enableDepthTest();
         return missingCount;
     }
-
-    public static Map<UniqueItem, Integer> makeRequiredList(String UUID) {//TODO unused
-        Map<UniqueItem, Integer> itemCountMap = new HashMap<UniqueItem, Integer>();
-        Map<IBlockState, UniqueItem> IntStackMap = GadgetCopyPaste.getBlockMapIntState(PasteToolBufferBuilder.getTagFromUUID(UUID)).getIntStackMap();
-        List<BlockMap> blockMapList = GadgetCopyPaste.getBlockMapList(PasteToolBufferBuilder.getTagFromUUID(UUID));
-        for (BlockMap blockMap : blockMapList) {
-            UniqueItem uniqueItem = IntStackMap.get(blockMap.state);
-            NonNullList<ItemStack> drops = NonNullList.create();
-            blockMap.state.getBlock().getDrops(blockMap.state, drops, Minecraft.getInstance().world, new BlockPos(0, 0, 0), 0);
-            int neededItems = 0;
-            for (ItemStack drop : drops) {
-                if (drop.getItem().equals(uniqueItem.item)) {
-                    neededItems++;
-                }
-            }
-            if (neededItems == 0) {
-                neededItems = 1;
-            }
-            if (uniqueItem.item != Items.AIR) {
-                boolean found = false;
-                for (Map.Entry<UniqueItem, Integer> entry : itemCountMap.entrySet()) {
-                    if (entry.getKey().equals(uniqueItem)) {
-                        itemCountMap.put(entry.getKey(), itemCountMap.get(entry.getKey()) + neededItems);
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found) {
-                    itemCountMap.put(uniqueItem, neededItems);
-                }
-            }
-        }
-        return itemCountMap;
-    }
-
 }

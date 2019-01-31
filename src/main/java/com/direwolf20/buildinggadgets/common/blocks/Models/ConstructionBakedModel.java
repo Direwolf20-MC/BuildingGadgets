@@ -44,7 +44,7 @@ public class ConstructionBakedModel implements IBakedModel {
 //        if (extendedBlockState == null)
             return Collections.emptyList();
 
-//       TODO: Reimplement
+//       @fixme: Reimplement
 //
 //        //ConstructionID facadeId = extendedBlockState.getValue(ConstructionBlock.FACADEID);
 //        IBlockState facadeState = extendedBlockState.getValue(ConstructionBlock.FACADE_ID);

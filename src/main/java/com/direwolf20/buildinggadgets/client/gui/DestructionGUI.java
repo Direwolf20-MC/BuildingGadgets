@@ -9,6 +9,7 @@ import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetDestruction;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketDestructionGUI;
+import com.direwolf20.buildinggadgets.common.utils.Utils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
@@ -177,17 +178,19 @@ public class DestructionGUI extends GuiScreen {
     @Override
     public void render(int mouseX, int mouseY, float partialTicks) {
         mc.getTextureManager().bindTexture(background);
-        //drawTexturedModalRect(guiLeft, guiTop, 0, 0, xSize, ySize);
+
         this.left.drawTextField(mouseX, mouseY, partialTicks);
         this.right.drawTextField(mouseX, mouseY, partialTicks);
         this.up.drawTextField(mouseX, mouseY, partialTicks);
         this.down.drawTextField(mouseX, mouseY, partialTicks);
         this.depth.drawTextField(mouseX, mouseY, partialTicks);
+
         fontRenderer.drawStringWithShadow(I18n.format("singles.buildinggadgets.left"), this.guiLeft + 35, this.guiTop + 60, 0xFFFFFF);
         fontRenderer.drawStringWithShadow(I18n.format("singles.buildinggadgets.right"), this.guiLeft + 278, this.guiTop + 60, 0xFFFFFF);
         fontRenderer.drawStringWithShadow(I18n.format("singles.buildinggadgets.up"), this.guiLeft + 170, this.guiTop + 30, 0xFFFFFF);
         fontRenderer.drawStringWithShadow(I18n.format("singles.buildinggadgets.down"), this.guiLeft + 158, this.guiTop + 90, 0xFFFFFF);
         fontRenderer.drawStringWithShadow(I18n.format("singles.buildinggadgets.depth"), this.guiLeft + 155, this.guiTop + 60, 0xFFFFFF);
+
         super.render(mouseX, mouseY, partialTicks);
     }
 
@@ -210,7 +213,7 @@ public class DestructionGUI extends GuiScreen {
     }
 
     private boolean sizeCheckBoxes() {
-        if( !isNumeric(left.getText()) || !isNumeric(right.getText()) || !isNumeric(up.getText()) || !isNumeric(down.getText()) || !isNumeric(depth.getText()) )
+        if( !Utils.isStringNumeric(left.getText()) || !Utils.isStringNumeric(right.getText()) || !Utils.isStringNumeric(up.getText()) || !Utils.isStringNumeric(down.getText()) || !Utils.isStringNumeric(depth.getText()) )
             return false;
 
         if (Integer.parseInt(left.getText()) + Integer.parseInt(right.getText()) > 16) return false;
@@ -224,17 +227,6 @@ public class DestructionGUI extends GuiScreen {
 
         return true;
     }
-
-//    @Override
-//    protected void keyPressed(int p_keyPressed_1_, int p_keyPressed_2_, int p_keyPressed_3_) throws IOException {
-//        if (this.left.textboxKeyTyped(typedChar, keyCode) || this.right.textboxKeyTyped(typedChar, keyCode) || this.up.textboxKeyTyped(typedChar, keyCode) || this.down.textboxKeyTyped(typedChar, keyCode) || this.depth.textboxKeyTyped(typedChar, keyCode)) {
-//
-//        } else {
-//            super.keyTyped(typedChar, keyCode);
-//        }
-//    }
-
-
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int mouseButton) {
@@ -250,7 +242,6 @@ public class DestructionGUI extends GuiScreen {
             } else if (this.depth.mouseClicked(mouseX, mouseY, 0)) {
                 depth.setText("");
             } else {
-                //startX.setFocused(false);
                 super.mouseClicked(mouseX, mouseY, mouseButton);
             }
         } else {
@@ -265,7 +256,6 @@ public class DestructionGUI extends GuiScreen {
             } else if (this.depth.mouseClicked(mouseX, mouseY, mouseButton)) {
                 depth.setFocused(true);
             } else {
-                //startX.setFocused(false);
                 super.mouseClicked(mouseX, mouseY, mouseButton);
             }
         }
@@ -276,14 +266,5 @@ public class DestructionGUI extends GuiScreen {
     @Override
     public boolean doesGuiPauseGame() {
         return false;
-    }
-
-    // Todo: Move this to a utils package logically
-    private static boolean isNumeric(String str)
-    {
-        for (char c : str.toCharArray())
-            if (!Character.isDigit(c)) return false;
-
-        return true;
     }
 }

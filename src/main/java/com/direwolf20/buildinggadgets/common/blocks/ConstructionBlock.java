@@ -162,6 +162,7 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
         return mimic != null ? mimic.isNormalCube(world, pos) : super.isNormalCube(state, world, pos);
     }
 
+
     @Override
     public int getOpacity(IBlockState state, IBlockReader worldIn, BlockPos pos) {
         IBlockState mimic = getActualMimicBlock(worldIn, pos);
@@ -201,6 +202,7 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
      * Implementing/overriding is fine.
      */
     @Override
+    @SuppressWarnings("deprecation")
     public BlockFaceShape getBlockFaceShape(IBlockReader worldIn, IBlockState state, BlockPos pos, EnumFacing face) {
         IBlockState mimicBlock = getActualMimicBlock(worldIn, pos);
         try {

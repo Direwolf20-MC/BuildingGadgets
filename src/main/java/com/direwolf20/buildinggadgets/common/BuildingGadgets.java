@@ -1,13 +1,12 @@
 package com.direwolf20.buildinggadgets.common;
 
 import com.direwolf20.buildinggadgets.client.proxy.ClientProxy;
+import com.direwolf20.buildinggadgets.common.commands.BlockMapCommand;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
 import com.direwolf20.buildinggadgets.common.events.AnvilRepairHandler;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
-import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.minecraft.client.Minecraft;
-import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
@@ -46,6 +45,7 @@ public class BuildingGadgets {
         theMod = (BuildingGadgets) FMLModLoadingContext.get().getActiveContainer().getMod();
 
         FMLModLoadingContext.get().getModEventBus().addListener(this::setup);
+        FMLModLoadingContext.get().getModEventBus().addListener(this::serverLoad);
 
         DistExecutor.runWhenOn(Dist.CLIENT, () -> () -> {
             FMLModLoadingContext.get().getModEventBus().addListener(this::clientInit);
@@ -84,13 +84,13 @@ public class BuildingGadgets {
         minecraftSupplier = event.getMinecraftSupplier();
     }
 
-    public void serverLoad(FMLServerStartingEvent event) {
-        LiteralArgumentBuilder<CommandSource> commandSource = Commands.literal(MODID);
-//                .then()
+    private void serverLoad(FMLServerStartingEvent event) {
 
-        event.getCommandDispatcher().register(commandSource);
+        event.getCommandDispatcher().register(
+                Commands.literal(MODID)
+                    .then(BlockMapCommand.registerList())
+                    .then(BlockMapCommand.registerDelete())
+        );
 
-//        event.registerServerCommand(new FindBlockMapsCommand());
-//        event.registerServerCommand(new DeleteBlockMapsCommand());
     }
 }

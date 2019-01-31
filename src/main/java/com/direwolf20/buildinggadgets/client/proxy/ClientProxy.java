@@ -33,7 +33,7 @@ public class ClientProxy {
         RenderingRegistry.registerEntityRenderingHandler(BlockBuildEntity.class, new BlockBuildEntityRender.Factory());
         RenderingRegistry.registerEntityRenderingHandler(ConstructionBlockEntity.class, new ConstructionBlockEntityRender.Factory());
 
-        // @todo: reimplement @since 1.13.x
+        // @todo: reimplement? @since 1.13.x
 //        ModBlocks.effectBlock.initModel();
 //        ModBlocks.templateManager.initModel();
 //

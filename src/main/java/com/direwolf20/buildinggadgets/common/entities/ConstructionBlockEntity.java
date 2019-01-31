@@ -83,14 +83,12 @@ public class ConstructionBlockEntity extends Entity {
                 if (!getMakingPaste()) {
                     TileEntity te = world.getTileEntity(setPos);
                     if (te instanceof ConstructionBlockTileEntity) {
-                        IBlockState tempState = ((ConstructionBlockTileEntity) te).getBlockState();
-                        if (tempState == null)
-                            return;
+                        IBlockState tempState = te.getBlockState();
 
                         int opacity = tempState.getOpacity(world, setPos);
-                        boolean neighborBrightness = tempState.getBlock().useNeighborBrightness(tempState, world, setPos);
+                        boolean neighborBrightness = tempState.useNeighborBrightness(world, setPos);
                         if (opacity == 255 || neighborBrightness) {
-                            IBlockState tempSetBlock = ((ConstructionBlockTileEntity) te).getBlockState();
+                            IBlockState tempSetBlock = te.getBlockState();
                             IBlockState tempActualSetBlock = ((ConstructionBlockTileEntity) te).getActualBlockState();
                             world.setBlockState(setPos, BuildingObjects.constructionBlock.getDefaultState()
                                     .with(ConstructionBlock.BRIGHT, opacity != 255)
