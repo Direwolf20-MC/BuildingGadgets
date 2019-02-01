@@ -3,11 +3,14 @@ package com.direwolf20.buildinggadgets.common.network;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
-import net.minecraftforge.fml.relauncher.Side;
 
 public class PacketHandler {
     public static final SimpleNetworkWrapper INSTANCE = NetworkRegistry.INSTANCE.newSimpleChannel(BuildingGadgets.MODID);
     private static int packetId = 0;
+
+    public static enum Side {
+        CLIENT, SERVER, BOTH;
+    }
 
     public static void registerMessages() {
 
@@ -27,9 +30,20 @@ public class PacketHandler {
         // Client side
         registerMessage(PacketSyncConfig.Handler.class,PacketSyncConfig.class,Side.CLIENT);
         registerMessage(PacketBlockMap.Handler.class, PacketBlockMap.class, Side.CLIENT);
+
+        // Both sides
+        registerMessage(PacketSetRemoteInventoryCache.Handler.class, PacketSetRemoteInventoryCache.class, Side.BOTH);
     }
 
     private static void registerMessage(Class handler, Class packet, Side side) {
+        if (side != Side.CLIENT)
+            registerMessage(handler, packet, net.minecraftforge.fml.relauncher.Side.SERVER);
+        
+        if (side != Side.SERVER)
+            registerMessage(handler, packet, net.minecraftforge.fml.relauncher.Side.CLIENT);
+    }
+
+    private static void registerMessage(Class handler, Class packet, net.minecraftforge.fml.relauncher.Side side) {
         INSTANCE.registerMessage(handler, packet, packetId++, side);
     }
 }

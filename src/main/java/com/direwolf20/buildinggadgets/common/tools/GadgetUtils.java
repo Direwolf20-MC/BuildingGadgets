@@ -12,7 +12,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTUtil;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
@@ -232,37 +234,18 @@ public class GadgetUtils {
 
     public static void selectBlock(ItemStack stack, EntityPlayer player) {
         //Used to find which block the player is looking at, and store it in NBT on the tool.
-        boolean validBlock = true;
         World world = player.world;
         RayTraceResult lookingAt = VectorTools.getLookingAt(player);
-        if (lookingAt == null) {
+        if (lookingAt == null)
             return;
-        }
+
         BlockPos pos = lookingAt.getBlockPos();
+        EnumActionResult result = setRemoteInventory(stack, player, world, pos, true);
+        if (result == EnumActionResult.SUCCESS)
+            return;
+
         IBlockState state = world.getBlockState(pos);
-        if (SyncedConfig.blockBlacklist.contains(state.getBlock())) {
-            validBlock = false;
-        }
-        TileEntity te = world.getTileEntity(pos);
-        if (te != null) {  //Currently not allowing tile entities and plants.
-            if (te instanceof ConstructionBlockTileEntity && ((ConstructionBlockTileEntity) te).getBlockState() != null) {
-                setToolBlock(stack, ((ConstructionBlockTileEntity) te).getActualBlockState());
-                setToolActualBlock(stack, ((ConstructionBlockTileEntity) te).getActualBlockState());
-                return;
-            } else {
-                IItemHandler cap = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
-                if (cap == null) validBlock = false;
-                else {
-                    boolean success = setBoundTE(stack, pos, player.dimension, world);
-                    if (success) {
-                        player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.boundTE").getUnformattedComponentText()), true);
-                        return;
-                    }
-                }
-            }
-            validBlock = false;
-        }
-        if (!validBlock) {
+        if (result != EnumActionResult.FAIL || SyncedConfig.blockBlacklist.contains(state.getBlock())) {
             player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.invalidblock").getUnformattedComponentText()), true);
             return;
         }
@@ -270,6 +253,23 @@ public class GadgetUtils {
         IBlockState actualState = placeState.getActualState(world, pos);
         setToolBlock(stack, placeState);
         setToolActualBlock(stack, actualState);
+    }
+
+    public static EnumActionResult setRemoteInventory(ItemStack stack, EntityPlayer player, World world, BlockPos pos, boolean setTool) {
+        TileEntity te = world.getTileEntity(pos);
+        if (te == null)
+            return EnumActionResult.PASS;
+
+        if (setTool && te instanceof ConstructionBlockTileEntity && ((ConstructionBlockTileEntity) te).getBlockState() != null) {
+            setToolBlock(stack, ((ConstructionBlockTileEntity) te).getActualBlockState());
+            setToolActualBlock(stack, ((ConstructionBlockTileEntity) te).getActualBlockState());
+            return EnumActionResult.SUCCESS;
+        }
+        if (setBoundTE(stack, pos, world.provider.getDimension(), world)) {
+            player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.boundTE").getUnformattedComponentText()), true);
+            return EnumActionResult.SUCCESS;
+        }
+        return EnumActionResult.FAIL;
     }
 
     public static boolean anchorBlocks(EntityPlayer player, ItemStack stack) {
@@ -310,16 +310,19 @@ public class GadgetUtils {
         return true;
     }
 
-    public static BlockPos getBoundTE(ItemStack tool, World world) {
+    public static IItemHandler getBoundRemoteInventory(ItemStack tool, World world) {
+        Integer dim = getDIMFromNBT(tool, "boundTE");
+        if (dim == null) return null;
+        MinecraftServer server = world.getMinecraftServer();
+        if (server == null) return null;
+        World worldServer = server.getWorld(dim);
+        if (worldServer == null) return null;
         BlockPos pos = getPOSFromNBT(tool, "boundTE");
-        //BlockPos blankPos = new BlockPos(0,0,0);
         if (pos == null) return null;
-        TileEntity te = world.getTileEntity(pos);
-
+        TileEntity te = worldServer.getTileEntity(pos);
         if (te == null) return null;
         IItemHandler cap = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
-        if (cap == null) return null;
-        return pos;
+        return cap == null ? null : cap;
     }
 
     public static String withSuffix(int count) {
