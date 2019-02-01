@@ -60,12 +60,12 @@ public class EventTooltip {
             String UUID = template.getUUID(stack);
             if (UUID == null) return;
 
-            Map<UniqueItem, Integer> itemCountMap = template.getItemCountMap(stack);
+            Multiset<UniqueItem> itemCountMap = template.getItemCountMap(stack);
 
             Map<ItemStack, Integer> itemStackCount = new HashMap<ItemStack, Integer>();
-            for (Map.Entry<UniqueItem, Integer> entry : itemCountMap.entrySet()) {
-                ItemStack itemStack = new ItemStack(entry.getKey().item, 1, entry.getKey().meta);
-                itemStackCount.put(itemStack, entry.getValue());
+            for (Multiset.Entry<UniqueItem> entry : itemCountMap.entrySet()) {
+                ItemStack itemStack = new ItemStack(entry.getElement().item, 1, entry.getElement().meta);
+                itemStackCount.put(itemStack, entry.getCount());
             }
             List<Map.Entry<ItemStack, Integer>> list = new ArrayList<>(itemStackCount.entrySet());
 
@@ -101,13 +101,13 @@ public class EventTooltip {
 
         if ((stack.getItem() instanceof ITemplate) && GuiScreen.isShiftKeyDown()) {
             int totalMissing = 0;
-            Map<UniqueItem, Integer> itemCountMap = ((ITemplate) stack.getItem()).getItemCountMap(stack);
+            Multiset<UniqueItem> itemCountMap = ((ITemplate) stack.getItem()).getItemCountMap(stack);
 
             //Create an ItemStack -> Integer Map
             Map<ItemStack, Integer> itemStackCount = new HashMap<ItemStack, Integer>();
-            for (Map.Entry<UniqueItem, Integer> entry : itemCountMap.entrySet()) {
-                ItemStack itemStack = new ItemStack(entry.getKey().item, 1, entry.getKey().meta);
-                itemStackCount.put(itemStack, entry.getValue());
+            for (Multiset.Entry<UniqueItem> entry : itemCountMap.entrySet()) {
+                ItemStack itemStack = new ItemStack(entry.getElement().item, 1, entry.getElement().meta);
+                itemStackCount.put(itemStack, entry.getCount());
             }
             // Sort the ItemStack -> Integer map, first by Required Items, then ItemID, then Meta
             List<Map.Entry<ItemStack, Integer>> list = new ArrayList<>(itemStackCount.entrySet());
