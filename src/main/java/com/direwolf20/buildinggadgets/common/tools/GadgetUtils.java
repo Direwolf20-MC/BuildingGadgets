@@ -245,7 +245,7 @@ public class GadgetUtils {
             return;
 
         IBlockState state = world.getBlockState(pos);
-        if (result != EnumActionResult.FAIL || SyncedConfig.blockBlacklist.contains(state.getBlock())) {
+        if (result == EnumActionResult.FAIL || SyncedConfig.blockBlacklist.contains(state.getBlock())) {
             player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.invalidblock").getUnformattedComponentText()), true);
             return;
         }
