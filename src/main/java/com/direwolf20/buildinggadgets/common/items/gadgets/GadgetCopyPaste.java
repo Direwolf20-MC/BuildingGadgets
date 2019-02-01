@@ -43,6 +43,8 @@ import net.minecraftforge.common.util.BlockSnapshot;
 import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.world.BlockEvent;
+import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.items.IItemHandler;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -252,9 +254,12 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
     public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
         ItemStack stack = player.getHeldItem(hand);
         player.setActiveHand(hand);
+        BlockPos pos = VectorTools.getPosLookingAt(player);
         if (!world.isRemote) {
+            if (pos != null && player.isSneaking() && GadgetUtils.setRemoteInventory(stack, player, world, pos, false) == EnumActionResult.SUCCESS)
+                return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);
+
             if (getToolMode(stack) == ToolMode.Copy) {
-                BlockPos pos = VectorTools.getPosLookingAt(player);
                 if (pos == null) {
                     //setStartPos(stack, null);
                     //setEndPos(stack, null);
@@ -262,22 +267,19 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
                     return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);
                 }
                 if (player.isSneaking()) {
-                    if (getStartPos(stack) != null) {
+                    if (getStartPos(stack) != null)
                         copyBlocks(stack, player, world, getStartPos(stack), pos);
-                    } else {
+                    else
                         setEndPos(stack, pos);
-                    }
                 } else {
-                    if (getEndPos(stack) != null) {
+                    if (getEndPos(stack) != null)
                         copyBlocks(stack, player, world, pos, getEndPos(stack));
-                    } else {
+                    else
                         setStartPos(stack, pos);
-                    }
                 }
             } else if (getToolMode(stack) == ToolMode.Paste) {
                 if (!player.isSneaking()) {
                     if (getAnchor(stack) == null) {
-                        BlockPos pos = VectorTools.getPosLookingAt(player);
                         if (pos == null) return new ActionResult<ItemStack>(EnumActionResult.FAIL, stack);
                         buildBlockMap(world, pos, stack, player);
                     } else {
@@ -287,19 +289,16 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
                 }
             }
         } else {
-            if (getToolMode(stack) == ToolMode.Copy) {
-                BlockPos pos = VectorTools.getPosLookingAt(player);
-                if (pos == null) {
-                    if (player.isSneaking()) {
-                        player.openGui(BuildingGadgets.instance, GuiProxy.CopyPasteID, world, hand.ordinal(), 0, 0);
-                        return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);
-                    }
-                }
-            } else {
-                if (player.isSneaking()) {
-                    player.openGui(BuildingGadgets.instance, GuiProxy.PasteID, world, hand.ordinal(), 0, 0);
+            if (pos != null && player.isSneaking()) {
+                TileEntity te = world.getTileEntity(pos);
+                if (te != null && te.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null))
                     return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);
-                }
+            }
+            if (getToolMode(stack) == ToolMode.Copy) {
+                if (pos == null && player.isSneaking())
+                    player.openGui(BuildingGadgets.instance, GuiProxy.CopyPasteID, world, hand.ordinal(), 0, 0);
+            } else if (player.isSneaking()) {
+                player.openGui(BuildingGadgets.instance, GuiProxy.PasteID, world, hand.ordinal(), 0, 0);
             }
         }
         return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);

@@ -1,5 +1,7 @@
 package com.direwolf20.buildinggadgets.client.events;
 
+import com.direwolf20.buildinggadgets.client.RemoteInventoryCache;
+
 /**
  * This class was adapted from code written by Vazkii
  * Thanks Vazkii!!
@@ -13,6 +15,7 @@ import com.direwolf20.buildinggadgets.common.tools.InventoryManipulation;
 import com.direwolf20.buildinggadgets.common.tools.PasteToolBufferBuilder;
 import com.direwolf20.buildinggadgets.common.tools.UniqueItem;
 import com.google.common.collect.Multiset;
+
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
@@ -36,6 +39,11 @@ import java.util.*;
 public class EventTooltip {
 
     private static final int STACKS_PER_LINE = 8;
+    private static RemoteInventoryCache cache = new RemoteInventoryCache(true);
+
+    public static void setCache(Multiset<UniqueItem> cache) {
+        EventTooltip.cache.setCache(cache);
+    }
 
     @SideOnly(Side.CLIENT)
     private static void tooltipIfShift(@SuppressWarnings("unused") List<String> tooltip, Runnable r) {
@@ -64,7 +72,7 @@ public class EventTooltip {
             int totalMissing = 0;
             //Look through all the ItemStacks and draw each one in the specified X/Y position
             for (Map.Entry<ItemStack, Integer> entry : list) {
-                int hasAmt = InventoryManipulation.countItem(entry.getKey(), Minecraft.getMinecraft().player, Minecraft.getMinecraft().player.world);
+                int hasAmt = InventoryManipulation.countItem(entry.getKey(), Minecraft.getMinecraft().player, cache);
                 if (hasAmt < entry.getValue())
                     totalMissing = totalMissing + Math.abs(entry.getValue() - hasAmt);
             }
@@ -132,7 +140,7 @@ public class EventTooltip {
             int j = 0;
             //Look through all the ItemStacks and draw each one in the specified X/Y position
             for (Map.Entry<ItemStack, Integer> entry : list) {
-                int hasAmt = InventoryManipulation.countItem(entry.getKey(), Minecraft.getMinecraft().player, Minecraft.getMinecraft().player.world);
+                int hasAmt = InventoryManipulation.countItem(entry.getKey(), Minecraft.getMinecraft().player, cache);
                 int x = bx + (j % STACKS_PER_LINE) * 18;
                 int y = by + (j / STACKS_PER_LINE) * 20;
                 totalMissing = totalMissing + renderRequiredBlocks(entry.getKey(), x, y, hasAmt, entry.getValue());
