@@ -15,9 +15,8 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 
-import java.util.List;
-
 import javax.annotation.Nullable;
+import java.util.List;
 
 public class GenericPasteContainer extends Item {
     public GenericPasteContainer() {
