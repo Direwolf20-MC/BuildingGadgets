@@ -1,12 +1,14 @@
 package com.direwolf20.buildinggadgets.common.blocks.templatemanager;
 
-import com.direwolf20.buildinggadgets.common.items.ModItems;
-import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.items.ITemplate;
+import com.direwolf20.buildinggadgets.common.items.ModItems;
 import com.direwolf20.buildinggadgets.common.items.Template;
+import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.network.PacketBlockMap;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.tools.*;
+import com.google.common.collect.HashMultiset;
+import com.google.common.collect.Multiset;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
@@ -23,7 +25,6 @@ import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -47,7 +48,7 @@ public class TemplateManagerCommands {
 
         BlockPos startPos = template.getStartPos(itemStack1);
         BlockPos endPos = template.getEndPos(itemStack1);
-        Map<UniqueItem, Integer> tagMap = template.getItemCountMap(itemStack1);
+        Multiset<UniqueItem> tagMap = template.getItemCountMap(itemStack1);
         String UUIDTemplate = ModItems.template.getUUID(itemStack1);
         if (UUIDTemplate == null) return;
 
@@ -119,7 +120,7 @@ public class TemplateManagerCommands {
         templateWorldSave.addToMap(UUIDTemplate, templateTagCompound);
         BlockPos startPos = template.getStartPos(itemStack0);
         BlockPos endPos = template.getEndPos(itemStack0);
-        Map<UniqueItem, Integer> tagMap = template.getItemCountMap(itemStack0);
+        Multiset<UniqueItem> tagMap = template.getItemCountMap(itemStack0);
         template.setStartPos(templateStack, startPos);
         template.setEndPos(templateStack, endPos);
         template.setItemCountMap(templateStack, tagMap);
@@ -178,7 +179,7 @@ public class TemplateManagerCommands {
         templateTagCompound.setTag("mapIntStack", mapIntState.putIntStackMapIntoNBT());
         templateTagCompound.setString("owner", player.getName());
 
-        Map<UniqueItem, Integer> itemCountMap = new HashMap<UniqueItem, Integer>();
+        Multiset<UniqueItem> itemCountMap = HashMultiset.create();
         Map<IBlockState, UniqueItem> intStackMap = mapIntState.intStackMap;
         List<BlockMap> blockMapList = GadgetCopyPaste.getBlockMapList(templateTagCompound);
         for (BlockMap blockMap : blockMapList) {
@@ -196,17 +197,7 @@ public class TemplateManagerCommands {
                     neededItems = 1;
                 }
                 if (uniqueItem.item != Items.AIR) {
-                    boolean found = false;
-                    for (Map.Entry<UniqueItem, Integer> entry : itemCountMap.entrySet()) {
-                        if (entry.getKey().equals(uniqueItem)) {
-                            itemCountMap.put(entry.getKey(), itemCountMap.get(entry.getKey()) + neededItems);
-                            found = true;
-                            break;
-                        }
-                    }
-                    if (!found) {
-                        itemCountMap.put(uniqueItem, neededItems);
-                    }
+                    itemCountMap.add(uniqueItem,neededItems);
                 }
             }
         }

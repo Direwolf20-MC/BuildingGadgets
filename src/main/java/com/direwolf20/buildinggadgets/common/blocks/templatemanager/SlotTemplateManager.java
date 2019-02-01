@@ -1,9 +1,9 @@
 package com.direwolf20.buildinggadgets.common.blocks.templatemanager;
 
-import javax.annotation.Nullable;
-
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.SlotItemHandler;
+
+import javax.annotation.Nullable;
 
 public class SlotTemplateManager extends SlotItemHandler {
     private String backgroundLoc;
