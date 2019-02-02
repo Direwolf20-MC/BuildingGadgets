@@ -4,7 +4,6 @@ import com.direwolf20.buildinggadgets.common.items.ITemplate;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketBlockMap;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockHorizontal;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -13,6 +12,8 @@ import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.state.DirectionProperty;
+import net.minecraft.state.StateContainer;
+import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
@@ -26,8 +27,8 @@ import javax.annotation.Nullable;
 public class TemplateManager extends Block {
     private static final int GUI_ID = 1;
 
-    public static final DirectionProperty FACING = BlockHorizontal.HORIZONTAL_FACING;
-    public static final DirectionProperty FACING_HORIZ = DirectionProperty.create("facing", EnumFacing.Plane.HORIZONTAL);
+
+    public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
 
     public TemplateManager(Builder builder) {
         super(builder);
@@ -35,10 +36,16 @@ public class TemplateManager extends Block {
         this.setDefaultState(this.getStateContainer().getBaseState().with(FACING, EnumFacing.NORTH));
     }
 
+    @Override
+    protected void fillStateContainer(StateContainer.Builder<Block, IBlockState> builder) {
+        super.fillStateContainer(builder);
+        builder.add(FACING);
+    }
+
     @Nullable
     @Override
     public IBlockState getStateForPlacement(BlockItemUseContext context) {
-        return this.getDefaultState().with(FACING_HORIZ, context.getPlayer().getHorizontalFacing().getOpposite());
+        return this.getDefaultState().with(FACING, context.getPlayer().getHorizontalFacing().getOpposite());
     }
 
     @Override

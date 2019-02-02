@@ -68,12 +68,15 @@ public class BuildingGadgets {
         eventBus.addListener(this::setup);
         eventBus.addListener(this::serverLoad);
 
-
         if (!SyncedConfig.poweredByFE) {
             MinecraftForge.EVENT_BUS.register(new AnvilRepairHandler());
         }
 
         MinecraftForge.EVENT_BUS.register(this);
+        eventBus.addListener(BuildingObjects::registerBlocks);
+        eventBus.addListener(BuildingObjects::registerItems);
+        eventBus.addListener(BuildingObjects::registerEntities);
+        eventBus.addListener(BuildingObjects::registerTileEntities);
         // Client only registering
         DistExecutor.runWhenOn(Dist.CLIENT, () -> () -> {
             eventBus.addListener((Consumer<FMLClientSetupEvent>) (event -> clientInit(event, eventBus)));
