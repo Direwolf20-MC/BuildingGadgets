@@ -62,7 +62,8 @@ public class BuildingGadgets {
     public BuildingGadgets() {
         theMod = (BuildingGadgets) FMLModLoadingContext.get().getActiveContainer().getMod();
         mcSupplier = null;
-        final IEventBus eventBus = FMLModLoadingContext.get().getModEventBus();
+        IEventBus eventBus = FMLModLoadingContext.get().getModEventBus();
+
         FMLModLoadingContext.get().registerConfig(Type.CLIENT, Config.CLIENT_CONFIG);
         FMLModLoadingContext.get().registerConfig(Type.SERVER, Config.CLIENT_CONFIG);
         eventBus.addListener(this::setup);
@@ -73,10 +74,10 @@ public class BuildingGadgets {
         }
 
         MinecraftForge.EVENT_BUS.register(this);
-        eventBus.addListener(BuildingObjects::registerBlocks);
-        eventBus.addListener(BuildingObjects::registerItems);
-        eventBus.addListener(BuildingObjects::registerEntities);
-        eventBus.addListener(BuildingObjects::registerTileEntities);
+//        eventBus.addListener(BuildingObjects::registerBlocks);
+//        eventBus.addListener(BuildingObjects::registerItems);
+//        eventBus.addListener(BuildingObjects::registerEntities);
+//        eventBus.addListener(BuildingObjects::registerTileEntities);
         // Client only registering
         DistExecutor.runWhenOn(Dist.CLIENT, () -> () -> {
             eventBus.addListener((Consumer<FMLClientSetupEvent>) (event -> clientInit(event, eventBus)));
