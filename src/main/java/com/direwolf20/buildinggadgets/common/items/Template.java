@@ -44,7 +44,7 @@ public class Template extends Item implements ITemplate {
             tagCompound = new NBTTagCompound();
         }
         String uuid = tagCompound.getString("UUID");
-        if (uuid.equals("")) {
+        if (uuid.isEmpty()) {
             UUID uid = UUID.randomUUID();
             tagCompound.setString("UUID", uid.toString());
             stack.setTagCompound(tagCompound);

@@ -141,41 +141,41 @@ public class CopyPasteGUI extends GuiScreen {
 
     private void nullCheckTextBoxes() {
         if (absoluteCoords) {
-            if (startX.getText() == "") {
+            if (startX.getText().isEmpty()) {
                 startX.setText(String.valueOf(startPos.getX()));
             }
-            if (startY.getText() == "") {
+            if (startY.getText().isEmpty()) {
                 startY.setText(String.valueOf(startPos.getY()));
             }
-            if (startZ.getText() == "") {
+            if (startZ.getText().isEmpty()) {
                 startZ.setText(String.valueOf(startPos.getZ()));
             }
-            if (endX.getText() == "") {
+            if (endX.getText().isEmpty()) {
                 endX.setText(String.valueOf(endPos.getX()));
             }
-            if (endY.getText() == "") {
+            if (endY.getText().isEmpty()) {
                 endY.setText(String.valueOf(endPos.getY()));
             }
-            if (endZ.getText() == "") {
+            if (endZ.getText().isEmpty()) {
                 endZ.setText(String.valueOf(endPos.getZ()));
             }
         } else {
-            if (startX.getText() == "") {
+            if (startX.getText().isEmpty()) {
                 startX.setText("0");
             }
-            if (startY.getText() == "") {
+            if (startY.getText().isEmpty()) {
                 startY.setText("0");
             }
-            if (startZ.getText() == "") {
+            if (startZ.getText().isEmpty()) {
                 startZ.setText("0");
             }
-            if (endX.getText() == "") {
+            if (endX.getText().isEmpty()) {
                 endX.setText("0");
             }
-            if (endY.getText() == "") {
+            if (endY.getText().isEmpty()) {
                 endY.setText("0");
             }
-            if (endZ.getText() == "") {
+            if (endZ.getText().isEmpty()) {
                 endZ.setText("0");
             }
         }

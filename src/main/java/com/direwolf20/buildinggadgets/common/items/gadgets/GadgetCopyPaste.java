@@ -130,7 +130,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
             return null;
         }
         String uuid = tagCompound.getString("UUID");
-        if (uuid == "") {
+        if (uuid.isEmpty()) {
             if (getStartPos(stack) == null && getEndPos(stack) == null) {
                 return null;
             }
