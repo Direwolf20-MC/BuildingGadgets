@@ -195,19 +195,19 @@ public class DestructionGUI extends GuiScreen {
     }
 
     private void nullCheckTextBoxes() {
-        if (left.getText().equals("")) {
+        if (left.getText().isEmpty()) {
             left.setText(String.valueOf(GadgetDestruction.getToolValue(destructionTool, "left")));
         }
-        if (right.getText().equals("")) {
+        if (right.getText().isEmpty()) {
             right.setText(String.valueOf(GadgetDestruction.getToolValue(destructionTool, "right")));
         }
-        if (up.getText().equals("")) {
+        if (up.getText().isEmpty()) {
             up.setText(String.valueOf(GadgetDestruction.getToolValue(destructionTool, "up")));
         }
-        if (down.getText().equals("")) {
+        if (down.getText().isEmpty()) {
             down.setText(String.valueOf(GadgetDestruction.getToolValue(destructionTool, "down")));
         }
-        if (depth.getText().equals("")) {
+        if (depth.getText().isEmpty()) {
             depth.setText(String.valueOf(GadgetDestruction.getToolValue(destructionTool, "depth")));
         }
     }

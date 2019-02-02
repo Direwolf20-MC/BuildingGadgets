@@ -1,5 +1,7 @@
 package com.direwolf20.buildinggadgets.common.tools;
 
+import com.direwolf20.buildinggadgets.client.RemoteInventoryCache;
+import com.direwolf20.buildinggadgets.common.blocks.ModBlocks;
 import com.direwolf20.buildinggadgets.common.BuildingObjects;
 import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
 import com.direwolf20.buildinggadgets.common.utils.VectorUtil;
@@ -9,6 +11,8 @@ import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetBuilding;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetDestruction;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetExchanger;
+import com.google.common.collect.Multiset;
+
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockRendererDispatcher;
@@ -44,6 +48,11 @@ import static com.direwolf20.buildinggadgets.common.tools.GadgetUtils.getToolBlo
 
 public class ToolRenders {
     private static final FakeBuilderWorld fakeWorld = new FakeBuilderWorld();
+    private static RemoteInventoryCache cache = new RemoteInventoryCache(false);
+
+    public static void setCache(Multiset<UniqueItem> cache) {
+        ToolRenders.cache.setCache(cache);
+    }
 
     public static void renderBuilderOverlay(RenderWorldLastEvent evt, EntityPlayer player, ItemStack stack) {
         RayTraceResult lookingAt = VectorUtil.getLookingAt(player);
@@ -81,7 +90,7 @@ public class ToolRenders {
                     itemStack = renderBlockState.getBlock().getPickBlock(renderBlockState, null, world, new BlockPos(0, 0, 0), player);
                 }
 
-                int hasBlocks = InventoryManipulation.countItem(itemStack, player, world);
+                int hasBlocks = InventoryManipulation.countItem(itemStack, player, cache);
                 hasBlocks = hasBlocks + InventoryManipulation.countPaste(player);
                 int hasEnergy = 0;
                 if (SyncedConfig.poweredByFE) {
@@ -210,7 +219,7 @@ public class ToolRenders {
                 if (itemStack.getItem().equals(Items.AIR)) {
                     itemStack = renderBlockState.getBlock().getPickBlock(renderBlockState, null, world, new BlockPos(0, 0, 0), player);
                 }
-                int hasBlocks = InventoryManipulation.countItem(itemStack, player, world);
+                int hasBlocks = InventoryManipulation.countItem(itemStack, player, cache);
                 hasBlocks = hasBlocks + InventoryManipulation.countPaste(player);
                 int hasEnergy = 0;
                 if (SyncedConfig.poweredByFE) {

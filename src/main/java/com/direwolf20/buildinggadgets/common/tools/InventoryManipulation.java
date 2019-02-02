@@ -6,6 +6,7 @@ import com.direwolf20.buildinggadgets.common.items.ConstructionPasteContainer;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
 import com.google.common.collect.ImmutableSet;
+
 import net.minecraft.block.*;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
@@ -75,23 +76,15 @@ public class InventoryManipulation {
         }
 
         ItemStack tool = GadgetGeneric.getGadget(player);
-        BlockPos tePos = GadgetUtils.getBoundTE(tool, world);
-        if (tePos != null) {
-            TileEntity te = world.getTileEntity(tePos);
-            if( te == null )
-                return false;
-
-            te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null)
-                .ifPresent(iItemHandler -> {
-                    for (int i = 0; i < iItemHandler.getSlots(); i++) {
-                        ItemStack containerItem = iItemHandler.getStackInSlot(i);
-                        if (containerItem.getItem() == itemStack.getItem() && containerItem.getCount() >= count) {
-                            iItemHandler.extractItem(i, count, false);
-                        }
-                    }
-                });
-
-            return true;
+        IItemHandler remoteInventory = GadgetUtils.getBoundRemoteInventory(tool, world);
+        if (remoteInventory != null) {
+            for (int i = 0; i < remoteInventory.getSlots(); i++) {
+                ItemStack containerItem = remoteInventory.getStackInSlot(i);
+                if (containerItem.getItem() == itemStack.getItem() && containerItem.getCount() >= count) {
+                    remoteInventory.extractItem(i, count, false);
+                    return true;
+                }
+            }
         }
 
 
@@ -123,22 +116,22 @@ public class InventoryManipulation {
         return true;
     }
 
+    public static interface IRemoteInventoryProvider {
+        int countItem(ItemStack tool, ItemStack stack);
+    }
+
     public static int countItem(ItemStack itemStack, EntityPlayer player, World world) {
+        return countItem(itemStack, player, (tool, stack) -> {
+            IItemHandler remoteInventory = GadgetUtils.getBoundRemoteInventory(tool, world);
+            return remoteInventory == null ? 0 : countInContainer(remoteInventory, stack.getItem());
+        });
+    }
+
+    public static int countItem(ItemStack itemStack, EntityPlayer player, IRemoteInventoryProvider remoteInventory) {
         if (player.isCreative()) {
             return 10000;
         }
-        int count = 0;
-        ItemStack tool = GadgetGeneric.getGadget(player);
-        BlockPos tePos = GadgetUtils.getBoundTE(tool, world);
-        if (tePos != null) {
-            TileEntity te = world.getTileEntity(tePos);
-            if(te == null)
-                return count;
-
-            IItemHandler cap = (IItemHandler) te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
-            count += countInContainer(cap, itemStack.getItem());
-        }
-
+        int count = remoteInventory.countItem(GadgetGeneric.getGadget(player), itemStack);
         InventoryPlayer inv = player.inventory;
         List<Integer> slots = findItem(itemStack.getItem(), inv);
         List<IItemHandler> invContainers = findInvContainers(inv);

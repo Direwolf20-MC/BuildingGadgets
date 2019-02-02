@@ -11,6 +11,9 @@ import net.minecraftforge.fml.network.simple.SimpleChannel;
 
 public class PacketHandler {
 
+    public static enum Side {
+        CLIENT, SERVER, BOTH;
+    }
     private static final String PROTOCOL_VERSION = Integer.toString(1);
 
     public static final SimpleChannel HANDLER = NetworkRegistry.ChannelBuilder
@@ -25,6 +28,7 @@ public class PacketHandler {
         HANDLER.registerMessage(1,  PacketAnchorKey.class, PacketAnchorKey::encode, PacketAnchorKey::decode, PacketAnchorKey.Handler::handle);
 
         // Client side
+        registerMessage(PacketSetRemoteInventoryCache.Handler.class, PacketSetRemoteInventoryCache.class, Side.BOTH);
         HANDLER.registerMessage(2,  PacketBlockMap.class, PacketBlockMap::encode, PacketBlockMap::decode, PacketBlockMap.Handler::handler);
 
         HANDLER.registerMessage(3,  PacketChangeRange.class, PacketChangeRange::encode, PacketChangeRange::decode, PacketChangeRange.Handler::handle);

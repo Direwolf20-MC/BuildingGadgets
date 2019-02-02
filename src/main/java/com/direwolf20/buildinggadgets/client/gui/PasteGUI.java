@@ -160,14 +160,14 @@ public class PasteGUI extends GuiScreen {
         super.render(mouseX, mouseY, partialTicks);
     }
 
-    private void nullCheckTextBoxes() {
-        if (X.getText().equals("")) {
+    protected void nullCheckTextBoxes() {
+        if (X.getText().isEmpty()) {
             X.setText(String.valueOf(GadgetCopyPaste.getX(tool)));
         }
-        if (Y.getText().equals("")) {
+        if (Y.getText().isEmpty()) {
             Y.setText(String.valueOf(GadgetCopyPaste.getY(tool)));
         }
-        if (Z.getText().equals("")) {
+        if (Z.getText().isEmpty()) {
             Z.setText(String.valueOf(GadgetCopyPaste.getZ(tool)));
         }
     }

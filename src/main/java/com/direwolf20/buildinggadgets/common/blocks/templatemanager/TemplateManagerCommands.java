@@ -126,7 +126,7 @@ public class TemplateManagerCommands {
         if (isTool) {
             Template.setName(templateStack, templateName);
         } else {
-            if (templateName.equals("")) {
+            if (templateName.isEmpty()) {
                 Template.setName(templateStack, Template.getName(itemStack0));
             } else {
                 Template.setName(templateStack, templateName);
