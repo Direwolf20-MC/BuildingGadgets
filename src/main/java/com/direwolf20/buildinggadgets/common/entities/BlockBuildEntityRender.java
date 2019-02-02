@@ -72,7 +72,7 @@ public class BlockBuildEntityRender extends Render<BlockBuildEntity> {
                 // and IllegalStateException... Very rare
                 bufferBuilder.finishDrawing();
             } catch (IllegalStateException ex) {
-                BuildingGadgets.logger.error(ex);
+                BuildingGadgets.LOG.error(ex);
             }
         }
         GlStateManager.popMatrix();

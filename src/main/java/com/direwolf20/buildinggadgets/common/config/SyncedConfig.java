@@ -86,6 +86,7 @@ public class SyncedConfig {
      * so that it can be synced to the Client.
      */
     static void transferValues() {
+        /*
         rayTraceRange = Config.GENERAL.rayTraceRange.get();
         poweredByFE = Config.GENERAL.poweredByFE.get();
         enableDestructionGadget = Config.GENERAL.enableDestructionGadget.get();
@@ -110,6 +111,7 @@ public class SyncedConfig {
 
         energyCostCopyPaste = Config.GADGETS.subCategoryGadgetCopyPaste.energyCost.get();
         durabilityCopyPaste = Config.GADGETS.subCategoryGadgetCopyPaste.durability.get();
+        */
     }
 
     /**
@@ -156,7 +158,7 @@ public class SyncedConfig {
             if (rawNBT instanceof NBTTagCompound) {
                 handleNBT((NBTTagCompound) rawNBT,map);
             } else {
-                BuildingGadgets.logger.warn("Unexpected "+rawNBT.getClass().getName()+" found in NBTTagList which was expected to only contain NBTTagCompounds!");
+                BuildingGadgets.LOG.warn("Unexpected " + rawNBT.getClass().getName() + " found in NBTTagList which was expected to only contain NBTTagCompounds!");
             }
         }
     }
@@ -168,7 +170,7 @@ public class SyncedConfig {
     private static NBTTagCompound parseField(Field field) {
         INBTBase valueTag = FieldSerializer.parseFieldValue(field, getMapperIdFor(field));
         if (valueTag==null) {
-            BuildingGadgets.logger.warn("Could not use type of Field "+field.getName()+"!"+" Found type "+field.getType().getName()+"!");
+            BuildingGadgets.LOG.warn("Could not use type of Field " + field.getName() + "!" + " Found type " + field.getType().getName() + "!");
             return null;
         }
         String name = getSyncName(field);
@@ -180,13 +182,13 @@ public class SyncedConfig {
 
     private static void handleNBT(NBTTagCompound compound, Map<String,Field> fields) {
         if (!compound.hasKey(KEY_NAME) || !compound.hasKey(KEY_VALUE)) {
-            BuildingGadgets.logger.warn("Tried to read synchronisation from an inproperly initialised NBTTagCompound!");
+            BuildingGadgets.LOG.warn("Tried to read synchronisation from an inproperly initialised NBTTagCompound!");
             return;
         }
         String name = compound.getString(KEY_NAME);
         INBTBase rawValue = compound.getTag(KEY_VALUE);
         if (!fields.containsKey(name)) {
-            BuildingGadgets.logger.warn("Tried to read synchronisation from an unknown Field!");
+            BuildingGadgets.LOG.warn("Tried to read synchronisation from an unknown Field!");
             return;
         }
         Field field = fields.get(name);

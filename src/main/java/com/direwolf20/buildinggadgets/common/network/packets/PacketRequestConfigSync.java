@@ -25,7 +25,7 @@ public class PacketRequestConfigSync {
                 EntityPlayerMP player = ctx.get().getSender();
                 if( player == null ) return;
 
-                BuildingGadgets.logger.info("Client requested Config update. Sending config to {}.",player.getName().getString());
+                BuildingGadgets.LOG.info("Client requested Config update. Sending config to {}.", player.getName().getString());
                 SyncedConfig.sendConfigUpdateTo(player);
             });
 

@@ -54,7 +54,7 @@ public class FieldSerializer {
                 if (tag!=null)
                     return tag;
             } catch (IllegalAccessException e) {
-                BuildingGadgets.logger.error("Failed to serialize Field "+field.getName()+"! Retrying with different serializer, if possible.",e);
+                BuildingGadgets.LOG.error("Failed to serialize Field " + field.getName() + "! Retrying with different serializer, if possible.", e);
             }
         }
         return tag;
@@ -72,7 +72,7 @@ public class FieldSerializer {
                 if (serializer.applyValue(nbt,wrapper))
                     return;
             } catch (IllegalAccessException e) {
-                BuildingGadgets.logger.error("Failed to apply Field value to "+field.getName()+"! Retrying with different serializer, if possible.",e);
+                BuildingGadgets.LOG.error("Failed to apply Field value to " + field.getName() + "! Retrying with different serializer, if possible.", e);
             }
         }
     }

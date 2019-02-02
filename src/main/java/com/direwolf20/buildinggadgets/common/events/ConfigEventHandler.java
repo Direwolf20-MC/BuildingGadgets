@@ -15,7 +15,7 @@ public final class ConfigEventHandler {
     @SubscribeEvent
     public static void onPlayerLogin(PlayerLoggedInEvent event) {
         if (event.player instanceof EntityPlayerMP) {
-            BuildingGadgets.logger.info("Sending SyncedConfig to freshly logged in player {}.",event.player.getName());
+            BuildingGadgets.LOG.info("Sending SyncedConfig to freshly logged in player {}.", event.player.getName());
             SyncedConfig.sendConfigUpdateTo((EntityPlayerMP) event.player);
         }
     }
@@ -23,7 +23,7 @@ public final class ConfigEventHandler {
     @SubscribeEvent
     public static void onConfigurationChanged(ConfigChangedEvent.OnConfigChangedEvent event) {
         if (event.getModID().equals(BuildingGadgets.MODID)) {
-            BuildingGadgets.logger.info("Configuration changed. Syncing config File.");
+            BuildingGadgets.LOG.info("Configuration changed. Syncing config File.");
 //            TODO: Reimplement
 //            ConfigManager.sync(BuildingGadgets.MODID, Type.INSTANCE);
             PacketHandler.sendToServer(new PacketRequestConfigSync());

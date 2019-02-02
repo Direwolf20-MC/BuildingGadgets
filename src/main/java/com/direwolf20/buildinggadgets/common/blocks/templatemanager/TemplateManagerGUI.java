@@ -309,7 +309,7 @@ public class TemplateManagerGUI extends GuiContainer {
 //                    Minecraft.getInstance().player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.pastetoobig").getUnformattedComponentText()), false);
 //                }
 //            } catch (Throwable t) {
-//                BuildingGadgets.logger.error(t);
+//                BuildingGadgets.LOG.error(t);
 //                Minecraft.getInstance().player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.pastefailed").getUnformattedComponentText()), false);
 //            }
 //        }

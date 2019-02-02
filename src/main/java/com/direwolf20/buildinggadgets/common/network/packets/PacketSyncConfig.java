@@ -42,7 +42,7 @@ public class PacketSyncConfig {
 
             ctx.get().enqueueWork(() -> {
                 NBTTagCompound compound = msg.getTag();
-                BuildingGadgets.logger.info("Received SyncedConfig from Server.");
+                BuildingGadgets.LOG.info("Received SyncedConfig from Server.");
                 SyncedConfig.onReadSynchronisation(compound);
             });
 
