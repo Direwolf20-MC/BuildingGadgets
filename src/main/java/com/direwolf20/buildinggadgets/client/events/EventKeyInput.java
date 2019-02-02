@@ -2,6 +2,7 @@ package com.direwolf20.buildinggadgets.client.events;
 
 import com.direwolf20.buildinggadgets.client.KeyBindings;
 import com.direwolf20.buildinggadgets.client.gui.ModeRadialMenu;
+import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketAnchorKey;
@@ -14,10 +15,11 @@ import net.minecraft.util.EnumHand;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.settings.KeyModifier;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.gameevent.InputEvent;
 
-@EventBusSubscriber(Dist.CLIENT)
+@Mod.EventBusSubscriber(modid = BuildingGadgets.MODID, value = Dist.CLIENT)
 public class EventKeyInput {
 
     @SubscribeEvent
@@ -31,6 +33,7 @@ public class EventKeyInput {
     }
 
     private static void handleEventInput() {
+        System.out.println("HI");
         if (KeyBindings.modeSwitch.isKeyDown() && ((KeyBindings.modeSwitch.getKeyModifier() == KeyModifier.NONE && KeyModifier.getActiveModifier() == KeyModifier.NONE) || KeyBindings.modeSwitch.getKeyModifier() != KeyModifier.NONE)) {
             PacketHandler.sendToServer(new PacketToggleMode(1)); // TODO: put the right mode value
             Minecraft mc = Minecraft.getInstance();

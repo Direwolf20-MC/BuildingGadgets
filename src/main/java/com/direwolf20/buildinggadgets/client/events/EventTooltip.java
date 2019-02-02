@@ -7,6 +7,7 @@ import com.direwolf20.buildinggadgets.client.RemoteInventoryCache;
  * Thanks Vazkii!!
  */
 
+import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.BuildingObjects;
 import com.direwolf20.buildinggadgets.common.items.ITemplate;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
@@ -32,12 +33,13 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.RenderTooltipEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import org.lwjgl.opengl.GL11;
 
 import java.util.*;
 
-@EventBusSubscriber(Dist.CLIENT)
+@Mod.EventBusSubscriber(modid = BuildingGadgets.MODID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public class EventTooltip {
 
     private static final int STACKS_PER_LINE = 8;
