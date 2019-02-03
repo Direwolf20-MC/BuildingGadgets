@@ -6,20 +6,16 @@ import com.direwolf20.buildinggadgets.common.items.ConstructionPasteContainer;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
 import com.google.common.collect.ImmutableSet;
-
 import net.minecraft.block.*;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.init.Blocks;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.state.IProperty;
 import net.minecraft.state.EnumProperty;
-import net.minecraft.tileentity.TileEntity;
+import net.minecraft.state.IProperty;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.items.CapabilityItemHandler;
@@ -259,7 +255,7 @@ public class InventoryManipulation {
         return containers;
     }
 
-    private static int countInContainer(IItemHandler container, Item item) {
+    public static int countInContainer(IItemHandler container, Item item) {
         int count = 0;
         ItemStack tempItem;
         for (int i = 0; i < container.getSlots(); ++i) {

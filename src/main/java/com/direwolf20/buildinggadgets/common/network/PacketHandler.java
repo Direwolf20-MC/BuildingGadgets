@@ -3,21 +3,29 @@ package com.direwolf20.buildinggadgets.common.network;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.network.packets.*;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.fml.network.NetworkDirection;
+import net.minecraftforge.fml.network.NetworkEvent.Context;
 import net.minecraftforge.fml.network.NetworkRegistry;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
+
+import java.util.function.BiConsumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 public class PacketHandler {
 
     public static enum Side {
         CLIENT, SERVER, BOTH;
     }
-    private static final String PROTOCOL_VERSION = Integer.toString(1);
+
+    private static final String PROTOCOL_VERSION = Integer.toString(2);
+    private static short index = 0;
 
     public static final SimpleChannel HANDLER = NetworkRegistry.ChannelBuilder
-            .named(new ResourceLocation(BuildingGadgets.MODID, "networker_channel"))
+            .named(new ResourceLocation(BuildingGadgets.MODID, "main_network_channel"))
             .clientAcceptedVersions(PROTOCOL_VERSION::equals)
             .serverAcceptedVersions(PROTOCOL_VERSION::equals)
             .networkProtocolVersion(() -> PROTOCOL_VERSION)
@@ -25,27 +33,27 @@ public class PacketHandler {
 
     public static void register() {
 
-        HANDLER.registerMessage(1,  PacketAnchorKey.class, PacketAnchorKey::encode, PacketAnchorKey::decode, PacketAnchorKey.Handler::handle);
+        registerMessage(PacketAnchorKey.class, PacketAnchorKey::encode, PacketAnchorKey::decode, PacketAnchorKey.Handler::handle);
 
         // Client side
-        registerMessage(PacketSetRemoteInventoryCache.Handler.class, PacketSetRemoteInventoryCache.class, Side.BOTH);
-        HANDLER.registerMessage(2,  PacketBlockMap.class, PacketBlockMap::encode, PacketBlockMap::decode, PacketBlockMap.Handler::handler);
+        registerMessage(PacketSetRemoteInventoryCache.class, PacketSetRemoteInventoryCache::encode, PacketSetRemoteInventoryCache::decode, PacketSetRemoteInventoryCache.Handler::handle);
+        registerMessage(PacketBlockMap.class, PacketBlockMap::encode, PacketBlockMap::decode, PacketBlockMap.Handler::handler);
 
-        HANDLER.registerMessage(3,  PacketChangeRange.class, PacketChangeRange::encode, PacketChangeRange::decode, PacketChangeRange.Handler::handle);
-        HANDLER.registerMessage(4,  PacketCopyCoords.class, PacketCopyCoords::encode, PacketCopyCoords::decode, PacketCopyCoords.Handler::handle);
-        HANDLER.registerMessage(5,  PacketDestructionGUI.class, PacketDestructionGUI::encode, PacketDestructionGUI::decode, PacketDestructionGUI.Handler::handle);
-        HANDLER.registerMessage(6,  PacketPasteGUI.class, PacketPasteGUI::encode, PacketPasteGUI::decode, PacketPasteGUI.Handler::handle);
-        HANDLER.registerMessage(7,  PacketRequestBlockMap.class, PacketRequestBlockMap::encode, PacketRequestBlockMap::decode, PacketRequestBlockMap.Handler::handle);
-        HANDLER.registerMessage(8,  PacketRequestConfigSync.class, PacketRequestConfigSync::encode, PacketRequestConfigSync::decode, PacketRequestConfigSync.Handler::handle);
+        registerMessage(PacketChangeRange.class, PacketChangeRange::encode, PacketChangeRange::decode, PacketChangeRange.Handler::handle);
+        registerMessage(PacketCopyCoords.class, PacketCopyCoords::encode, PacketCopyCoords::decode, PacketCopyCoords.Handler::handle);
+        registerMessage(PacketDestructionGUI.class, PacketDestructionGUI::encode, PacketDestructionGUI::decode, PacketDestructionGUI.Handler::handle);
+        registerMessage(PacketPasteGUI.class, PacketPasteGUI::encode, PacketPasteGUI::decode, PacketPasteGUI.Handler::handle);
+        registerMessage(PacketRequestBlockMap.class, PacketRequestBlockMap::encode, PacketRequestBlockMap::decode, PacketRequestBlockMap.Handler::handle);
+        registerMessage(PacketRequestConfigSync.class, PacketRequestConfigSync::encode, PacketRequestConfigSync::decode, PacketRequestConfigSync.Handler::handle);
 
         // Client side
-        HANDLER.registerMessage(9,  PacketSyncConfig.class, PacketSyncConfig::encode, PacketSyncConfig::decode, PacketSyncConfig.Handler::handle);
+        registerMessage(PacketSyncConfig.class, PacketSyncConfig::encode, PacketSyncConfig::decode, PacketSyncConfig.Handler::handle);
 
-        HANDLER.registerMessage(10, PacketTemplateManagerLoad.class, PacketTemplateManagerLoad::encode, PacketTemplateManagerLoad::decode, PacketTemplateManagerLoad.Handler::handle);
-        HANDLER.registerMessage(11, PacketTemplateManagerPaste.class, PacketTemplateManagerPaste::encode, PacketTemplateManagerPaste::decode, PacketTemplateManagerPaste.Handler::handle);
-        HANDLER.registerMessage(12, PacketTemplateManagerSave.class, PacketTemplateManagerSave::encode, PacketTemplateManagerSave::decode, PacketTemplateManagerSave.Handler::handle);
-        HANDLER.registerMessage(13, PacketToggleMode.class, PacketToggleMode::encode, PacketToggleMode::decode, PacketToggleMode.Handler::handle);
-        HANDLER.registerMessage(14, PacketUndoKey.class, PacketUndoKey::encode, PacketUndoKey::decode, PacketUndoKey.Handler::handle);
+        registerMessage(PacketTemplateManagerLoad.class, PacketTemplateManagerLoad::encode, PacketTemplateManagerLoad::decode, PacketTemplateManagerLoad.Handler::handle);
+        registerMessage(PacketTemplateManagerPaste.class, PacketTemplateManagerPaste::encode, PacketTemplateManagerPaste::decode, PacketTemplateManagerPaste.Handler::handle);
+        registerMessage(PacketTemplateManagerSave.class, PacketTemplateManagerSave::encode, PacketTemplateManagerSave::decode, PacketTemplateManagerSave.Handler::handle);
+        registerMessage(PacketToggleMode.class, PacketToggleMode::encode, PacketToggleMode::decode, PacketToggleMode.Handler::handle);
+        registerMessage(PacketUndoKey.class, PacketUndoKey::encode, PacketUndoKey::decode, PacketUndoKey.Handler::handle);
     }
 
     public static void sendTo(Object msg, EntityPlayerMP player)
@@ -59,5 +67,13 @@ public class PacketHandler {
     public static void sendToServer(Object msg)
     {
         HANDLER.sendToServer(msg);
+    }
+
+    private static <MSG> void registerMessage(Class<MSG> messageType, BiConsumer<MSG, PacketBuffer> encoder, Function<PacketBuffer, MSG> decoder, BiConsumer<MSG, Supplier<Context>> messageConsumer) {
+        HANDLER.registerMessage(index, messageType, encoder, decoder, messageConsumer);
+        index++;
+        if (index > 0xFF) {
+            throw new RuntimeException("Too many messages!");
+        }
     }
 }

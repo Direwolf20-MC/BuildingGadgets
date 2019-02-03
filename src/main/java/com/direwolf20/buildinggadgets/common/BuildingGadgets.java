@@ -74,10 +74,6 @@ public class BuildingGadgets {
         }
 
         MinecraftForge.EVENT_BUS.register(this);
-//        eventBus.addListener(BuildingObjects::registerBlocks);
-//        eventBus.addListener(BuildingObjects::registerItems);
-//        eventBus.addListener(BuildingObjects::registerEntities);
-//        eventBus.addListener(BuildingObjects::registerTileEntities);
         // Client only registering
         DistExecutor.runWhenOn(Dist.CLIENT, () -> () -> {
             eventBus.addListener((Consumer<FMLClientSetupEvent>) (event -> clientInit(event, eventBus)));

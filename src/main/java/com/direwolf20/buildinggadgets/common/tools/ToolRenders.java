@@ -1,18 +1,16 @@
 package com.direwolf20.buildinggadgets.common.tools;
 
 import com.direwolf20.buildinggadgets.client.RemoteInventoryCache;
-import com.direwolf20.buildinggadgets.common.blocks.ModBlocks;
 import com.direwolf20.buildinggadgets.common.BuildingObjects;
 import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
-import com.direwolf20.buildinggadgets.common.utils.VectorUtil;
-import com.direwolf20.buildinggadgets.common.world.FakeBuilderWorld;
 import com.direwolf20.buildinggadgets.common.items.capability.CapabilityProviderEnergy;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetBuilding;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetDestruction;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetExchanger;
+import com.direwolf20.buildinggadgets.common.utils.VectorUtil;
+import com.direwolf20.buildinggadgets.common.world.FakeBuilderWorld;
 import com.google.common.collect.Multiset;
-
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockRendererDispatcher;

@@ -1,7 +1,6 @@
 package com.direwolf20.buildinggadgets.common.items.gadgets;
 
 import com.direwolf20.buildinggadgets.client.events.EventTooltip;
-import com.direwolf20.buildinggadgets.client.gui.CopyPasteGUI;
 import com.direwolf20.buildinggadgets.common.BuildingObjects;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlock;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
@@ -18,7 +17,6 @@ import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
@@ -45,7 +43,6 @@ import net.minecraftforge.common.util.BlockSnapshot;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.items.CapabilityItemHandler;
-import net.minecraftforge.items.IItemHandler;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -262,7 +259,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
     public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
         ItemStack stack = player.getHeldItem(hand);
         player.setActiveHand(hand);
-        BlockPos pos = VectorTools.getPosLookingAt(player);
+        BlockPos pos = VectorUtil.getPosLookingAt(player);
         if (!world.isRemote) {
             if (pos != null && player.isSneaking() && GadgetUtils.setRemoteInventory(stack, player, world, pos, false) == EnumActionResult.SUCCESS)
                 return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);
@@ -299,14 +296,15 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
         } else {
             if (pos != null && player.isSneaking()) {
                 TileEntity te = world.getTileEntity(pos);
-                if (te != null && te.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null))
-                    return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);
+                if (te != null && te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).isPresent()) {
+                    return new ActionResult<>(EnumActionResult.SUCCESS, stack);
+                }
             }
             if (getToolMode(stack) == ToolMode.Copy) {
-                if (pos == null && player.isSneaking())
-                    player.openGui(BuildingGadgets.instance, GuiProxy.CopyPasteID, world, hand.ordinal(), 0, 0);
+                //if (pos == null && player.isSneaking()) TODO @since 1.13.x GUI!
+                //player.openGui(BuildingGadgets.instance, GuiProxy.CopyPasteID, world, hand.ordinal(), 0, 0);
             } else if (player.isSneaking()) {
-                player.openGui(BuildingGadgets.instance, GuiProxy.PasteID, world, hand.ordinal(), 0, 0);
+                //player.displayGui(BuildingGadgets.instance, GuiProxy.PasteID, world, hand.ordinal(), 0, 0);
             }
         }
         return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);

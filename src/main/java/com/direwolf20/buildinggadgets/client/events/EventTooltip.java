@@ -1,43 +1,32 @@
 package com.direwolf20.buildinggadgets.client.events;
 
 import com.direwolf20.buildinggadgets.client.RemoteInventoryCache;
+import com.direwolf20.buildinggadgets.common.BuildingGadgets;
+import com.direwolf20.buildinggadgets.common.BuildingObjects;
+import com.direwolf20.buildinggadgets.common.items.ITemplate;
+import com.direwolf20.buildinggadgets.common.tools.InventoryManipulation;
+import com.direwolf20.buildinggadgets.common.tools.UniqueItem;
+import com.google.common.collect.Multiset;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.ItemRenderer;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextComponentString;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.event.RenderTooltipEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
+import org.lwjgl.opengl.GL11;
+
+import java.util.*;
 
 /**
  * This class was adapted from code written by Vazkii
  * Thanks Vazkii!!
  */
-
-import com.direwolf20.buildinggadgets.common.BuildingGadgets;
-import com.direwolf20.buildinggadgets.common.BuildingObjects;
-import com.direwolf20.buildinggadgets.common.items.ITemplate;
-import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
-import com.direwolf20.buildinggadgets.common.tools.BlockMap;
-import com.direwolf20.buildinggadgets.common.tools.InventoryManipulation;
-import com.direwolf20.buildinggadgets.common.tools.PasteToolBufferBuilder;
-import com.direwolf20.buildinggadgets.common.tools.UniqueItem;
-import com.google.common.collect.Multiset;
-
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.ItemRenderer;
-import net.minecraft.init.Items;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.event.RenderTooltipEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
-import org.lwjgl.opengl.GL11;
-
-import java.util.*;
 
 @Mod.EventBusSubscriber(modid = BuildingGadgets.MODID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public class EventTooltip {
@@ -49,8 +38,7 @@ public class EventTooltip {
         EventTooltip.cache.setCache(cache);
     }
 
-    @SideOnly(Side.CLIENT)
-    private static void tooltipIfShift(@SuppressWarnings("unused") List<String> tooltip, Runnable r) {
+    private static void tooltipIfShift(@SuppressWarnings("unused") List<ITextComponent> tooltip, Runnable r) {
         if (GuiScreen.isShiftKeyDown())
             r.run();
     }
@@ -75,7 +63,7 @@ public class EventTooltip {
             int totalMissing = 0;
             //Look through all the ItemStacks and draw each one in the specified X/Y position
             for (Map.Entry<ItemStack, Integer> entry : list) {
-                int hasAmt = InventoryManipulation.countItem(entry.getKey(), Minecraft.getMinecraft().player, cache);
+                int hasAmt = InventoryManipulation.countItem(entry.getKey(), BuildingGadgets.getInstance().getMinecraft().player, cache);
                 if (hasAmt < entry.getValue())
                     totalMissing = totalMissing + Math.abs(entry.getValue() - hasAmt);
             }
@@ -140,7 +128,7 @@ public class EventTooltip {
             int j = 0;
             //Look through all the ItemStacks and draw each one in the specified X/Y position
             for (Map.Entry<ItemStack, Integer> entry : list) {
-                int hasAmt = InventoryManipulation.countItem(entry.getKey(), Minecraft.getMinecraft().player, cache);
+                int hasAmt = InventoryManipulation.countItem(entry.getKey(), BuildingGadgets.getInstance().getMinecraft().player, cache);
                 int x = bx + (j % STACKS_PER_LINE) * 18;
                 int y = by + (j / STACKS_PER_LINE) * 20;
                 totalMissing = totalMissing + renderRequiredBlocks(entry.getKey(), x, y, hasAmt, entry.getValue());
