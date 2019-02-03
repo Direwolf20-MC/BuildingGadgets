@@ -1,0 +1,21 @@
+{
+  "item.buildinggadgets.buildingtool": "Gadget de construção",
+  "item.buildinggadgets.exchangertool": "Gadget de troca",
+  "block.buildinggadgets.effectblock": "(Em desuso)Bloco de efeito",
+  "key.categories.buildingGadgets": "Gadgets de construção",
+  "key.anchorKey": "Âncora",
+  "key.modeSwitch": "Mudar de modo",
+  "key.rangeChange": "Alcance",
+  "key.undoKey": "Desfazer/Modo Fuzzy",
+  "tooltip.gadget.block": "Bloco",
+  "tooltip.gadget.mode": "Modo",
+  "tooltip.gadget.range": "Alcance",
+  "message.gadget.invalidblock": "Bloco inválido",
+  "message.gadget.toolmode": "Modo",
+  "message.gadget.toolrange": "Modo de alcance",
+  "message.gadget.anchorrender": "Âncora ativada",
+  "message.gadget.anchorremove": "Âncora desativada",
+  "message.gadget.nothingtoundo": "Não há nada a desfazer",
+  "message.gadget.undofailed": "Não foi possível desfazer (Longe demais?)",
+  "message.gadget.fuzzymode": "Modo Fuzzy"
+}

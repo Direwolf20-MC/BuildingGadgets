@@ -1,0 +1,20 @@
+{
+  "item.buildinggadgets.buildingtool": "建てのガジェット",
+  "item.buildinggadgets.exchangertool": "替えのガジェット",
+  "block.buildinggadgets.effectblock": "（未使用）エフェクトブロク",
+  "key.categories.buildingGadgets": "建てのガジェットス",
+  "key.anchorKey": "固定",
+  "key.modeSwitch": "スイッチモード",
+  "key.rangeChange": "距離",
+  "key.undoKey": "アンドウ",
+  "tooltip.gadget.block": "ブロク",
+  "tooltip.gadget.mode": "モード",
+  "tooltip.gadget.range": "距離",
+  "message.gadget.invalidblock": "ブロクは無効です。",
+  "message.gadget.toolmode": "モードのガジェット",
+  "message.gadget.toolrange": "距離のガジェッと",
+  "message.gadget.anchorrender": "レンダーは固定です。",
+  "message.gadget.anchorremove": "レンダーは固定じゃないです。",
+  "message.gadget.nothingtoundo": "元に戻すことはありません。",
+  "message.gadget.undofailed": "元に戻すことができませんでした。（あまりにも遠いですか？）"
+}
