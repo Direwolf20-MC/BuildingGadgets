@@ -1,14 +1,15 @@
 package com.direwolf20.buildinggadgets.common.items.gadgets;
 
 import com.direwolf20.buildinggadgets.common.BuildingObjects;
+import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
-import com.direwolf20.buildinggadgets.common.world.FakeBuilderWorld;
 import com.direwolf20.buildinggadgets.common.items.capability.CapabilityProviderEnergy;
 import com.direwolf20.buildinggadgets.common.tools.BuildingModes;
 import com.direwolf20.buildinggadgets.common.tools.InventoryManipulation;
 import com.direwolf20.buildinggadgets.common.tools.UndoState;
 import com.direwolf20.buildinggadgets.common.utils.VectorUtil;
+import com.direwolf20.buildinggadgets.common.world.FakeBuilderWorld;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
@@ -39,7 +40,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static com.direwolf20.buildinggadgets.common.tools.GadgetUtils.*;
+import static com.direwolf20.buildinggadgets.common.utils.GadgetUtils.*;
 
 
 public class GadgetBuilding extends GadgetGeneric {
@@ -60,14 +61,18 @@ public class GadgetBuilding extends GadgetGeneric {
         super(builder);
 
 //        setUnlocalizedName(BuildingGadgets.MODID + ".buildingtool");     // Used for localization (en_US.lang)
-        if (!SyncedConfig.poweredByFE) {
-            builder.defaultMaxDamage(SyncedConfig.durabilityBuilder);
-        }
+        //if (!Config.GADGETS.poweredByFE.get()) //commented out to allow for future Config guis to change this at runtime
+        builder.defaultMaxDamage(Config.GADGETS.GADGET_BUILDING.durability.get());
+    }
+
+    @Override
+    public int getEnergyMax() {
+        return Config.GADGETS.GADGET_BUILDING.maxEnergy.get();
     }
 
     @Override
     public int getEnergyCost() {
-        return SyncedConfig.energyCostBuilder;
+        return Config.GADGETS.GADGET_BUILDING.energyCost.get();
     }
 
     @Override
@@ -109,11 +114,10 @@ public class GadgetBuilding extends GadgetGeneric {
         if (getToolMode(stack) != ToolMode.BuildToMe) {
             tooltip.add(new TextComponentString(TextFormatting.RED + I18n.format("tooltip.gadget.range") + ": " + getToolRange(stack)));
         }
-        if (SyncedConfig.poweredByFE) {
+        if (Config.GADGETS.poweredByFE.get())
             CapabilityProviderEnergy.getCap(stack).ifPresent(iEnergyStorage -> {
                 tooltip.add(new TextComponentString(TextFormatting.WHITE + I18n.format("tooltip.gadget.energy") + ": " + withSuffix(iEnergyStorage.getEnergyStored()) + "/" + withSuffix(iEnergyStorage.getMaxEnergyStored())));
             });
-        }
     }
 
 

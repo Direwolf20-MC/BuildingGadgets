@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.common.items;
 
-import com.direwolf20.buildinggadgets.common.tools.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.tools.UniqueItem;
+import com.direwolf20.buildinggadgets.common.utils.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.world.WorldSave;
 import com.google.common.collect.Multiset;
 import net.minecraft.item.ItemStack;

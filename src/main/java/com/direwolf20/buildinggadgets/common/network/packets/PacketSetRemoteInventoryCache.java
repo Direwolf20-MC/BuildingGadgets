@@ -3,10 +3,10 @@ package com.direwolf20.buildinggadgets.common.network.packets;
 import com.direwolf20.buildinggadgets.client.events.EventTooltip;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
-import com.direwolf20.buildinggadgets.common.tools.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.tools.InventoryManipulation;
 import com.direwolf20.buildinggadgets.common.tools.ToolRenders;
 import com.direwolf20.buildinggadgets.common.tools.UniqueItem;
+import com.direwolf20.buildinggadgets.common.utils.GadgetUtils;
 import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.Multiset.Entry;
@@ -68,7 +68,7 @@ public class PacketSetRemoteInventoryCache {
         buf.writeInt(items.size());
         for (Entry<UniqueItem> entry : items) {
             UniqueItem uniqueItem = entry.getElement();
-            buf.writeInt(Item.getIdFromItem(uniqueItem.item));
+            buf.writeInt(Item.getIdFromItem(uniqueItem.getItem()));
             buf.writeInt(entry.getCount());
         }
     }

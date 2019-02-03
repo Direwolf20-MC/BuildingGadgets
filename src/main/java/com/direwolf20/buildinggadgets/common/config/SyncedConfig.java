@@ -28,24 +28,6 @@ public class SyncedConfig {
     private static final String KEY_VALUE = "VAL";
 
     @AutoSync
-    public static int energyCostBuilder;
-
-    @AutoSync
-    public static int energyCostExchanger;
-
-    @AutoSync
-    public static int energyCostDestruction;
-
-    @AutoSync
-    public static int energyCostCopyPaste;
-
-    @AutoSync
-    public static int energyMax;
-
-    @AutoSync
-    public static int energyMaxDestruction;
-
-    @AutoSync
     public static boolean poweredByFE;
 
     @AutoSync
@@ -91,26 +73,26 @@ public class SyncedConfig {
         poweredByFE = Config.GENERAL.poweredByFE.get();
         enableDestructionGadget = Config.GENERAL.enableDestructionGadget.get();
         absoluteCoordDefault = Config.GENERAL.absoluteCoordDefault.get();
-        canOverwriteBlocks = Config.GENERAL.canOverwriteBlocks.get();
+        allowOverwriteBlocks = Config.GENERAL.allowOverwriteBlocks.get();
         enablePaste = Config.GENERAL.enablePaste.get();
 
         blockBlacklist = FieldMapper.PATTERN_LIST_MAPPER.mapToField(Config.BLACKLIST.blockBlacklist.get());
 
         maxRange = Config.GADGETS.maxRange.get();
-        energyMax = Config.GADGETS.maxEnergy.get();
+        maxEnergy = Config.GADGETS.maxEnergy.get();
 
-        energyCostBuilder = Config.GADGETS.subCategoryGadgetBuilding.energyCost.get();
-        durabilityBuilder = Config.GADGETS.subCategoryGadgetBuilding.durability.get();
+        energyCostBuilder = Config.GADGETS.GADGET_BUILDING.energyCost.get();
+        durabilityBuilder = Config.GADGETS.GADGET_BUILDING.durability.get();
 
-        energyCostExchanger = Config.GADGETS.subCategoryGadgetExchanger.energyCost.get();
-        durabilityExchanger = Config.GADGETS.subCategoryGadgetExchanger.durability.get();
+        energyCostExchanger = Config.GADGETS.GADGET_EXCHANGER.energyCost.get();
+        durabilityExchanger = Config.GADGETS.GADGET_EXCHANGER.durability.get();
 
-        energyMaxDestruction = Config.GADGETS.subCategoryGadgetDestruction.energyMax.get();
-        energyCostDestruction = Config.GADGETS.subCategoryGadgetDestruction.energyCost.get();
-        durabilityDestruction = Config.GADGETS.subCategoryGadgetDestruction.durability.get();
+        energyMaxDestruction = Config.GADGETS.GADGET_DESTRUCTION.maxEnergy.get();
+        energyCostDestruction = Config.GADGETS.GADGET_DESTRUCTION.energyCost.get();
+        durabilityDestruction = Config.GADGETS.GADGET_DESTRUCTION.durability.get();
 
-        energyCostCopyPaste = Config.GADGETS.subCategoryGadgetCopyPaste.energyCost.get();
-        durabilityCopyPaste = Config.GADGETS.subCategoryGadgetCopyPaste.durability.get();
+        energyCostCopyPaste = Config.GADGETS.GADGET_COPY_PASTE.energyCost.get();
+        durabilityCopyPaste = Config.GADGETS.GADGET_COPY_PASTE.durability.get();
         */
     }
 

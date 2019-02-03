@@ -5,7 +5,6 @@ import com.direwolf20.buildinggadgets.common.blocks.Models.BakedModelLoader;
 import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManagerContainer;
 import com.direwolf20.buildinggadgets.common.commands.BlockMapCommand;
 import com.direwolf20.buildinggadgets.common.config.Config;
-import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntityRender;
 import com.direwolf20.buildinggadgets.common.entities.ConstructionBlockEntity;
@@ -65,13 +64,11 @@ public class BuildingGadgets {
         IEventBus eventBus = FMLModLoadingContext.get().getModEventBus();
 
         FMLModLoadingContext.get().registerConfig(Type.CLIENT, Config.CLIENT_CONFIG);
-        FMLModLoadingContext.get().registerConfig(Type.SERVER, Config.CLIENT_CONFIG);
+        FMLModLoadingContext.get().registerConfig(Type.SERVER, Config.SERVER_CONFIG);
         eventBus.addListener(this::setup);
         eventBus.addListener(this::serverLoad);
 
-        if (!SyncedConfig.poweredByFE) {
-            MinecraftForge.EVENT_BUS.register(new AnvilRepairHandler());
-        }
+        MinecraftForge.EVENT_BUS.register(new AnvilRepairHandler());
 
         MinecraftForge.EVENT_BUS.register(this);
         // Client only registering

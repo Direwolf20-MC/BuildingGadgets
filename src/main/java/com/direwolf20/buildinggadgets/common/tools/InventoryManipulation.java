@@ -5,6 +5,7 @@ import com.direwolf20.buildinggadgets.common.items.ConstructionPaste;
 import com.direwolf20.buildinggadgets.common.items.ConstructionPasteContainer;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
+import com.direwolf20.buildinggadgets.common.utils.GadgetUtils;
 import com.google.common.collect.ImmutableSet;
 import net.minecraft.block.*;
 import net.minecraft.block.state.IBlockState;

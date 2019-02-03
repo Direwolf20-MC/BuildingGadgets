@@ -45,15 +45,14 @@ public class Config {
 
         public final DoubleValue rayTraceRange;
 
-        public final BooleanValue poweredByFE;
-
         public final BooleanValue enablePaste;
 
         public final BooleanValue enableDestructionGadget;
 
+        /* Client Only!*/
         public final BooleanValue absoluteCoordDefault;
 
-        public final BooleanValue canOverwriteBlocks;
+        public final BooleanValue allowOverwriteBlocks;
 
         private CategoryGeneral() {
             SERVER_BUILDER.comment("General mod settings")/*.translation(LANG_KEY_GENERAL)*/.push("general");
@@ -62,11 +61,6 @@ public class Config {
                     .comment("Defines how far away you can build")
                     .translation(LANG_KEY_GENERAL + ".rayTraceRange")
                     .defineInRange("MaxBuildDistance", 32D, 1, 48);
-
-            poweredByFE = SERVER_BUILDER
-                    .comment("Set to true for Forge Energy Support, set to False for vanilla Item Damage")
-                    .translation(LANG_KEY_GENERAL + ".poweredByFE")
-                    .define("Powered by Forge Energy", true);
 
             enablePaste = SERVER_BUILDER
                     .comment("Set to false to disable the recipe for construction paste.")
@@ -83,10 +77,10 @@ public class Config {
                     .translation(LANG_KEY_GENERAL + ".absoluteCoordDefault")
                     .define("Default to absolute Coord-Mode", false);
 
-            canOverwriteBlocks = SERVER_BUILDER
+            allowOverwriteBlocks = SERVER_BUILDER
                     .comment("Whether the Building / CopyPaste Gadget can overwrite blocks like water, lava, grass, etc (like a player can).",
                             "False will only allow it to overwrite air blocks.")
-                    .translation(LANG_KEY_GENERAL + ".canOverwriteBlocks")
+                    .translation(LANG_KEY_GENERAL + ".allowOverwriteBlocks")
                     .define("Allow non-Air-Block-Overwrite", true);
             CLIENT_BUILDER.pop();
             SERVER_BUILDER.pop();
@@ -96,18 +90,17 @@ public class Config {
     //using unistantiable final class instead of enum, so that it doesn't cause issues with the ConfigManger trying to access the Instance field
     //No defense against reflection needed here (I think)
     public static final class CategoryGadgets {
-
         public final IntValue maxRange;
 
-        public final IntValue maxEnergy;
+        public final BooleanValue poweredByFE;
 
-        public final CategoryGadgetBuilding subCategoryGadgetBuilding;
+        public final CategoryGadgetBuilding GADGET_BUILDING;
 
-        public final CategoryGadgetExchanger subCategoryGadgetExchanger;
+        public final CategoryGadgetExchanger GADGET_EXCHANGER;
 
-        public final CategoryGadgetDestruction subCategoryGadgetDestruction;
+        public final CategoryGadgetDestruction GADGET_DESTRUCTION;
 
-        public final CategoryGadgetCopyPaste subCategoryGadgetCopyPaste;
+        public final CategoryGadgetCopyPaste GADGET_COPY_PASTE;
 
         private CategoryGadgets() {
             SERVER_BUILDER.comment("Configure the Gadgets here")/*.translation(LANG_KEY_GADGETS)*/.push("Gadgets");
@@ -117,21 +110,23 @@ public class Config {
                     .translation(LANG_KEY_GADGETS + ".maxRange")
                     .defineInRange("Maximum allowed Range", 16, 1, 32);
 
-            maxEnergy = SERVER_BUILDER
-                    .comment("The max energy of Building, Exchanging & Copy-Paste Gadget")
-                    .translation(LANG_KEY_GADGETS + ".maxEnergy")
-                    .defineInRange("Maximum Energy", 500000, 1, Integer.MAX_VALUE);
+            poweredByFE = SERVER_BUILDER
+                    .comment("Set to true for Forge Energy Support, set to False for vanilla Item Damage")
+                    .translation(LANG_KEY_GENERAL + ".poweredByFE")
+                    .define("Powered by Forge Energy", true);
 
-            subCategoryGadgetBuilding = new CategoryGadgetBuilding();
-            subCategoryGadgetExchanger = new CategoryGadgetExchanger();
-            subCategoryGadgetDestruction = new CategoryGadgetDestruction();
-            subCategoryGadgetCopyPaste = new CategoryGadgetCopyPaste();
+            GADGET_BUILDING = new CategoryGadgetBuilding();
+            GADGET_EXCHANGER = new CategoryGadgetExchanger();
+            GADGET_DESTRUCTION = new CategoryGadgetDestruction();
+            GADGET_COPY_PASTE = new CategoryGadgetCopyPaste();
             SERVER_BUILDER.pop();
         }
 
         public static final class CategoryGadgetBuilding {
-
+            //TODO @since 1.13.x add durabilityCost Config option
             public final IntValue energyCost;
+
+            public final IntValue maxEnergy;
 
             public final IntValue durability;
 
@@ -142,6 +137,11 @@ public class Config {
                         .comment("The energy cost of the Builder per block")
                         .translation(LANG_KEY_GADGETS + ".energyCost")
                         .defineInRange("Energy Cost", 50, 0, Integer.MAX_VALUE);
+
+                maxEnergy = SERVER_BUILDER
+                        .comment("The max energy of the Gadget")
+                        .translation(LANG_KEY_GADGETS + ".maxEnergy")
+                        .defineInRange("Maximum Energy", 500000, 1, Integer.MAX_VALUE);
 
                 durability = SERVER_BUILDER
                         .comment("The max durability of the Builder (Ignored if powered by FE)")
@@ -156,6 +156,8 @@ public class Config {
 
             public final IntValue energyCost;
 
+            public final IntValue maxEnergy;
+
             public final IntValue durability;
 
             private CategoryGadgetExchanger() {
@@ -165,6 +167,11 @@ public class Config {
                         .comment("The energy cost of the Exchanger per block")
                         .translation(LANG_KEY_GADGETS + ".energyCost")
                         .defineInRange("Energy Cost", 100, 0, Integer.MAX_VALUE);
+
+                maxEnergy = SERVER_BUILDER
+                        .comment("The max energy of the Gadget")
+                        .translation(LANG_KEY_GADGETS + ".maxEnergy")
+                        .defineInRange("Maximum Energy", 500000, 1, Integer.MAX_VALUE);
 
                 durability = SERVER_BUILDER
                         .comment("The max durability of the Exchanger (Ignored if powered by FE)")
@@ -177,7 +184,7 @@ public class Config {
 
         public static final class CategoryGadgetDestruction {
 
-            public final IntValue energyMax;
+            public final IntValue maxEnergy;
 
             public final IntValue energyCost;
 
@@ -186,15 +193,15 @@ public class Config {
             private CategoryGadgetDestruction() {
                 SERVER_BUILDER.comment("Energy Cost, Durability & Maximum Energy of the Destruction Gadget")/*.translation(LANG_KEY_GADGET_DESTRUCTION)*/.push("Destruction Gadget");
 
-                energyMax = SERVER_BUILDER
-                        .comment("The max energy of the Destruction Gadget")
-                        .translation(LANG_KEY_GADGET_DESTRUCTION + ".maxEnergy")
-                        .defineInRange("Maximum Energy", 1000000, 1, Integer.MAX_VALUE);
-
                 energyCost = SERVER_BUILDER
                         .comment("The energy cost of the Destruction Gadget per block")
                         .translation(LANG_KEY_GADGETS + ".energyCost")
                         .defineInRange("Energy Cost", 200, 0, Integer.MAX_VALUE);
+
+                maxEnergy = SERVER_BUILDER
+                        .comment("The max energy of the Gadget")
+                        .translation(LANG_KEY_GADGETS + ".maxEnergy")
+                        .defineInRange("Maximum Energy", 500000, 1, Integer.MAX_VALUE);
 
                 durability = SERVER_BUILDER
                         .comment("The max durability of the Destruction Gadget (Ignored if powered by FE)")
@@ -210,6 +217,8 @@ public class Config {
 
             public final IntValue energyCost;
 
+            public final IntValue maxEnergy;
+
             public final IntValue durability;
 
 
@@ -220,6 +229,11 @@ public class Config {
                         .comment("The Energy Use of the Copy Paste Gadget")
                         .translation(LANG_KEY_GADGETS + ".energyCost")
                         .defineInRange("Energy Cost", 50, 0, Integer.MAX_VALUE);
+
+                maxEnergy = SERVER_BUILDER
+                        .comment("The max energy of the Gadget")
+                        .translation(LANG_KEY_GADGETS + ".maxEnergy")
+                        .defineInRange("Maximum Energy", 500000, 1, Integer.MAX_VALUE);
 
                 durability = SERVER_BUILDER
                         .comment("The max durability of the Copy & Paste Gadget (Ignored if powered by FE)")

@@ -1,9 +1,9 @@
 package com.direwolf20.buildinggadgets.common.tools;
 
+import com.direwolf20.buildinggadgets.common.utils.GadgetUtils;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -15,6 +15,7 @@ import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 
+@Deprecated //TODO @since 1.13.x replace with BlockState2ItemMap and BlockState2ShortMap respectively
 public class BlockMapIntState {
 
     public Map<Short, IBlockState> intStateMap = new HashMap<>();
@@ -50,7 +51,7 @@ public class BlockMapIntState {
     @Nullable
     private IBlockState findStackSlot(UniqueItem uniqueItem) {
         for (Map.Entry<IBlockState, UniqueItem> entry : intStackMap.entrySet()) {
-            if (entry.getValue().item == uniqueItem.item) {
+            if (entry.getValue().getItem() == uniqueItem.getItem()) {
                 return entry.getKey();
             }
         }
@@ -60,6 +61,7 @@ public class BlockMapIntState {
     public IBlockState getStateFromSlot(Short slot) {
         return intStateMap.get(slot);
     }
+
     public UniqueItem getStackFromSlot(IBlockState blockState) {//TODO unused
         return intStackMap.get(blockState);
     }
@@ -90,7 +92,7 @@ public class BlockMapIntState {
         intStackMap = new HashMap<>();
         for (int i = 0; i < tagList.size(); i++) {
             NBTTagCompound compound = tagList.getCompound(i);
-            intStackMap.put(GadgetUtils.compoundToState(compound.getCompound("state")), new UniqueItem(Item.getItemById(compound.getInt("item"))));
+            intStackMap.put(GadgetUtils.compoundToState(compound.getCompound("state")), UniqueItem.readFromNBT(compound));
         }
         return intStackMap;
     }
@@ -99,7 +101,7 @@ public class BlockMapIntState {
         NBTTagList tagList = new NBTTagList();
         for (Map.Entry<IBlockState, UniqueItem> entry : intStackMap.entrySet()) {
             NBTTagCompound compound = new NBTTagCompound();
-            compound.setInt("item", Item.getIdFromItem(entry.getValue().item));
+            entry.getValue().writeToNBT(compound);
             compound.setTag("state", GadgetUtils.stateToCompound(entry.getKey()));
             tagList.add(compound);
         }
@@ -122,7 +124,7 @@ public class BlockMapIntState {
             return new UniqueItem(itemStack.getItem());
         }
         return new UniqueItem(Items.AIR);
-     }
+    }
 
     public void makeStackMapFromStateMap(EntityPlayer player) {
         intStackMap.clear();

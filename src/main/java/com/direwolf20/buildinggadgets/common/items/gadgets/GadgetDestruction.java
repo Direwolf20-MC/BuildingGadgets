@@ -2,10 +2,11 @@ package com.direwolf20.buildinggadgets.common.items.gadgets;
 
 import com.direwolf20.buildinggadgets.common.BuildingObjects;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
+import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.common.tools.BlockMapIntState;
-import com.direwolf20.buildinggadgets.common.tools.GadgetUtils;
+import com.direwolf20.buildinggadgets.common.utils.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.utils.VectorUtil;
 import com.direwolf20.buildinggadgets.common.world.WorldSave;
 import net.minecraft.block.material.Material;
@@ -39,7 +40,7 @@ import net.minecraftforge.event.world.BlockEvent;
 import javax.annotation.Nullable;
 import java.util.*;
 
-import static com.direwolf20.buildinggadgets.common.tools.GadgetUtils.withSuffix;
+import static com.direwolf20.buildinggadgets.common.utils.GadgetUtils.withSuffix;
 
 public class GadgetDestruction extends GadgetGeneric {
 
@@ -53,12 +54,12 @@ public class GadgetDestruction extends GadgetGeneric {
 
     @Override
     public int getEnergyMax() {
-        return SyncedConfig.energyMaxDestruction;
+        return Config.GADGETS.GADGET_DESTRUCTION.maxEnergy.get();
     }
 
     @Override
     public int getEnergyCost() {
-        return SyncedConfig.energyCostDestruction;
+        return Config.GADGETS.GADGET_DESTRUCTION.energyCost.get();
     }
 
     @Override

@@ -41,8 +41,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static com.direwolf20.buildinggadgets.common.tools.GadgetUtils.getAnchor;
-import static com.direwolf20.buildinggadgets.common.tools.GadgetUtils.getToolBlock;
+import static com.direwolf20.buildinggadgets.common.utils.GadgetUtils.getAnchor;
+import static com.direwolf20.buildinggadgets.common.utils.GadgetUtils.getToolBlock;
 
 public class ToolRenders {
     private static final FakeBuilderWorld fakeWorld = new FakeBuilderWorld();

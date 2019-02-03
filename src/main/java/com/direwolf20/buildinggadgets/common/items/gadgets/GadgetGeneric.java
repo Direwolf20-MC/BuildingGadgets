@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.common.items.gadgets;
 
-import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
+import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.items.capability.CapabilityProviderEnergy;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
@@ -13,17 +13,15 @@ import net.minecraftforge.energy.IEnergyStorage;
 
 import javax.annotation.Nullable;
 
-public class GadgetGeneric extends Item {
+public abstract class GadgetGeneric extends Item {
 
     public GadgetGeneric(Builder properties) {
         super(properties);
-
-//        this.getCreativeTabs().add(this.getGroup());
     }
 
-    public int getEnergyMax() {
-        return SyncedConfig.energyMax;
-    }
+    public abstract int getEnergyMax();
+
+    public abstract int getEnergyCost();
 //
 //    public void initModel() {
 //        ModelLoader.setCustomModelResourceLocation(this, 0, new ModelResourceLocation(getRegistryName(), "inventory"));
@@ -32,7 +30,7 @@ public class GadgetGeneric extends Item {
     @Override
     @Nullable
     public ICapabilityProvider initCapabilities(ItemStack stack, @Nullable NBTTagCompound tag) {
-        if (SyncedConfig.poweredByFE) {
+        if (Config.GADGETS.poweredByFE.get()) {
             return new CapabilityProviderEnergy(stack, this.getEnergyMax());
         }
         return null;
@@ -48,10 +46,14 @@ public class GadgetGeneric extends Item {
         return false;
     }
 
+    public static boolean poweredByFE() {
+        return Config.GADGETS.poweredByFE.get();
+    }
+
     @Override
     public double getDurabilityForDisplay(ItemStack stack) {
-        if (SyncedConfig.poweredByFE) {
-            IEnergyStorage energy = CapabilityProviderEnergy.getCap(stack).orElseThrow(NullPointerException::new);
+        if (poweredByFE()) {
+            IEnergyStorage energy = CapabilityProviderEnergy.getCap(stack).orElseThrow(IllegalStateException::new);
             return 1D - ((double) energy.getEnergyStored() / (double) energy.getMaxEnergyStored());
         }
 
@@ -61,27 +63,25 @@ public class GadgetGeneric extends Item {
 
     @Override
     public int getRGBDurabilityForDisplay(ItemStack stack) {
-        if (SyncedConfig.poweredByFE) {
+        if (poweredByFE()) {
             IEnergyStorage energy = CapabilityProviderEnergy.getCap(stack).orElseThrow(NullPointerException::new);
             return MathHelper.hsvToRGB(Math.max(0.0F, (float) energy.getEnergyStored() / (float) energy.getMaxEnergyStored()) / 3.0F, 1.0F, 1.0F);
         }
-        //return MathHelper.hsvToRGB(Math.max(0.0F, (float) (1.0F - getDurabilityForDisplay(stack))) / 3.0F, 1.0F, 1.0F);
         return super.getRGBDurabilityForDisplay(stack);
     }
 
     @Override
     public boolean isDamaged(ItemStack stack) {
-        if (SyncedConfig.poweredByFE) {
+        if (poweredByFE()) {
             IEnergyStorage energy = CapabilityProviderEnergy.getCap(stack).orElseThrow(NullPointerException::new);
             return energy.getEnergyStored() != energy.getMaxEnergyStored();
         }
-        //return (stack.getItemDamage() > 0);
         return super.isDamaged(stack);
     }
 
     @Override
     public boolean showDurabilityBar(ItemStack stack) {
-        if (SyncedConfig.poweredByFE) {
+        if (poweredByFE()) {
             IEnergyStorage energy = CapabilityProviderEnergy.getCap(stack).orElseThrow(NullPointerException::new);
             return energy.getEnergyStored() != energy.getMaxEnergyStored();
         }
@@ -91,13 +91,7 @@ public class GadgetGeneric extends Item {
 
     @Override
     public boolean getIsRepairable(ItemStack toRepair, ItemStack repair) {
-        if (SyncedConfig.poweredByFE) {
-            return false;
-        }
-        if (repair.getItem() == Items.DIAMOND) {
-            return true;
-        }
-        return false;
+        return !poweredByFE() && repair.getItem() == Items.DIAMOND;
     }
 
     public static ItemStack getGadget(EntityPlayer player) {
@@ -111,10 +105,6 @@ public class GadgetGeneric extends Item {
         return heldItem;
     }
 
-    public int getEnergyCost() {
-        return 200;
-    }
-
     public int getDamagePerUse() {
         return 1;
     }
@@ -123,7 +113,7 @@ public class GadgetGeneric extends Item {
         if (player.isCreative())
             return true;
 
-        if (SyncedConfig.poweredByFE) {
+        if (poweredByFE()) {
             IEnergyStorage energy = CapabilityProviderEnergy.getCap(tool).orElseThrow(NullPointerException::new);
             return this.getEnergyCost() <= energy.getEnergyStored();
         }
@@ -131,8 +121,8 @@ public class GadgetGeneric extends Item {
     }
 
     public void applyDamage(ItemStack tool, EntityPlayer player) {
-        if( SyncedConfig.poweredByFE ) {
-            IEnergyStorage energy = CapabilityProviderEnergy.getCap(tool).orElseThrow(NullPointerException::new);
+        if (poweredByFE()) {
+            IEnergyStorage energy = CapabilityProviderEnergy.getCap(tool).orElseThrow(IllegalStateException::new);
             energy.extractEnergy(this.getEnergyCost(), false);
         }
         else

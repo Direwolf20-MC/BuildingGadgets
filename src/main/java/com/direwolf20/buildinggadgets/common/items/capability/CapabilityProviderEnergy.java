@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.common.items.capability;
 
-import com.direwolf20.buildinggadgets.common.tools.GadgetUtils;
+import com.direwolf20.buildinggadgets.common.utils.GadgetUtils;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.capabilities.Capability;

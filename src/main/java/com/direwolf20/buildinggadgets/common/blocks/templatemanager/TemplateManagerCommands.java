@@ -6,7 +6,11 @@ import com.direwolf20.buildinggadgets.common.items.Template;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketBlockMap;
-import com.direwolf20.buildinggadgets.common.tools.*;
+import com.direwolf20.buildinggadgets.common.tools.BlockMap;
+import com.direwolf20.buildinggadgets.common.tools.BlockMapIntState;
+import com.direwolf20.buildinggadgets.common.tools.PasteToolBufferBuilder;
+import com.direwolf20.buildinggadgets.common.tools.UniqueItem;
+import com.direwolf20.buildinggadgets.common.utils.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.world.WorldSave;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
@@ -188,14 +192,14 @@ public class TemplateManagerCommands {
                 blockMap.state.getBlock().getDrops(blockMap.state, drops, world, new BlockPos(0, 0, 0), 0);
                 int neededItems = 0;
                 for (ItemStack drop : drops) {
-                    if (drop.getItem().equals(uniqueItem.item)) {
+                    if (drop.getItem().equals(uniqueItem.getItem())) {
                         neededItems++;
                     }
                 }
                 if (neededItems == 0) {
                     neededItems = 1;
                 }
-                if (uniqueItem.item != Items.AIR) {
+                if (uniqueItem.getItem() != Items.AIR) {
                     itemCountMap.add(uniqueItem,neededItems);
                 }
             }

@@ -4,13 +4,18 @@ import com.direwolf20.buildinggadgets.client.events.EventTooltip;
 import com.direwolf20.buildinggadgets.common.BuildingObjects;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlock;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
+import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.common.items.ITemplate;
 import com.direwolf20.buildinggadgets.common.items.capability.CapabilityProviderEnergy;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketBlockMap;
-import com.direwolf20.buildinggadgets.common.tools.*;
+import com.direwolf20.buildinggadgets.common.tools.BlockMap;
+import com.direwolf20.buildinggadgets.common.tools.BlockMapIntState;
+import com.direwolf20.buildinggadgets.common.tools.InventoryManipulation;
+import com.direwolf20.buildinggadgets.common.tools.UniqueItem;
+import com.direwolf20.buildinggadgets.common.utils.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.utils.VectorUtil;
 import com.direwolf20.buildinggadgets.common.world.WorldSave;
 import com.google.common.collect.HashMultiset;
@@ -50,7 +55,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import static com.direwolf20.buildinggadgets.common.tools.GadgetUtils.withSuffix;
+import static com.direwolf20.buildinggadgets.common.utils.GadgetUtils.withSuffix;
 
 public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
 
@@ -75,7 +80,12 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
 
     @Override
     public int getEnergyCost() {
-        return SyncedConfig.energyCostCopyPaste;
+        return Config.GADGETS.GADGET_COPY_PASTE.energyCost.get();
+    }
+
+    @Override
+    public int getEnergyMax() {
+        return Config.GADGETS.GADGET_COPY_PASTE.maxEnergy.get();
     }
 
     @Override
@@ -414,7 +424,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
                         }
                         if (actualState != null) {
                             UniqueItem uniqueItem = BlockMapIntState.blockStateToUniqueItem(actualState, player, tempPos);
-                            if (uniqueItem.item != Items.AIR) {
+                            if (uniqueItem.getItem() != Items.AIR) {
                                 posIntArrayList.add(GadgetUtils.relPosToInt(start, tempPos));
                                 blockMapIntState.addToMap(actualState);
                                 stateIntArrayList.add((int) blockMapIntState.findSlot(actualState));
@@ -431,7 +441,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
 
                                 int neededItems = 0;
                                 for (ItemStack drop : drops) {
-                                    if (drop.getItem().equals(uniqueItem.item)) {
+                                    if (drop.getItem().equals(uniqueItem.getItem())) {
                                         neededItems++;
                                     }
                                 }
@@ -515,7 +525,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
 
         UniqueItem uniqueItem = IntStackMap.get(state);
         if (uniqueItem == null) return; //This shouldn't happen I hope!
-        ItemStack itemStack = new ItemStack(uniqueItem.item, 1);
+        ItemStack itemStack = new ItemStack(uniqueItem.getItem(), 1);
         NonNullList<ItemStack> drops = NonNullList.create();
         state.getBlock().getDrops(state, drops, world, pos, 0);
         int neededItems = 0;

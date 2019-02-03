@@ -55,7 +55,7 @@ public class EventTooltip {
 
             Map<ItemStack, Integer> itemStackCount = new HashMap<>();
             for (Multiset.Entry<UniqueItem> entry : itemCountMap.entrySet()) {
-                ItemStack itemStack = new ItemStack(entry.getElement().item, 1);
+                ItemStack itemStack = new ItemStack(entry.getElement().getItem(), 1);
                 itemStackCount.put(itemStack, entry.getCount());
             }
             List<Map.Entry<ItemStack, Integer>> list = new ArrayList<>(itemStackCount.entrySet());
@@ -95,7 +95,7 @@ public class EventTooltip {
             //Create an ItemStack -> Integer Map
             Map<ItemStack, Integer> itemStackCount = new HashMap<>();
             for (Multiset.Entry<UniqueItem> entry : itemCountMap.entrySet()) {
-                ItemStack itemStack = new ItemStack(entry.getElement().item, 1);
+                ItemStack itemStack = new ItemStack(entry.getElement().getItem(), 1);
                 itemStackCount.put(itemStack, entry.getCount());
             }
             // Sort the ItemStack -> Integer map, first by Required Items, then ItemID, then Meta
