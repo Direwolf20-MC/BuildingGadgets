@@ -249,6 +249,6 @@ public class TemplateManagerCommands {
     }
 
     private static void pasteIsTooLarge() {
-        Minecraft.getMinecraft().player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.pastetoobig").getUnformattedComponentText()), false);
+        Minecraft.getMinecraft().player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.pastetoobig").getUnformattedComponentText()), false);
     }
 }
