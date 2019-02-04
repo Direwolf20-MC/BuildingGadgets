@@ -33,6 +33,7 @@ public class Config {
     @Name("Powered by Forge Energy")
     @Comment("Set to true for Forge Energy Support, set to False for vanilla Item Damage")
     @LangKey(LANG_KEY_ROOT+".poweredByFE")
+    @RequiresMcRestart
     public static boolean poweredByFE = true;
 
     @RequiresMcRestart

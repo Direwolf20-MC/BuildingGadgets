@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.common.items.capability;
 
+import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
 import com.direwolf20.buildinggadgets.common.tools.GadgetUtils;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
@@ -22,12 +23,12 @@ public class CapabilityProviderEnergy implements ICapabilityProvider {
 
     @Override
     public boolean hasCapability(@Nonnull Capability<?> capability, @Nullable EnumFacing facing) {
-        return capability == CapabilityEnergy.ENERGY;
+        return capability == CapabilityEnergy.ENERGY && SyncedConfig.poweredByFE ;
     }
 
     @Override
     public <T> T getCapability(@Nonnull Capability<T> capability, @Nullable EnumFacing facing) {
-        return capability == CapabilityEnergy.ENERGY ? CapabilityEnergy.ENERGY.cast(new ItemEnergyForge(stack, energyCapacity)) : null;
+        return capability == CapabilityEnergy.ENERGY && SyncedConfig.poweredByFE ? CapabilityEnergy.ENERGY.cast(new ItemEnergyForge(stack, energyCapacity)) : null;
     }
 
     @Nonnull

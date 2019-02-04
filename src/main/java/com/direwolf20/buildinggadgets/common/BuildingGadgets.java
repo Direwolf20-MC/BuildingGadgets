@@ -46,9 +46,7 @@ public class BuildingGadgets {
     public void preInit(FMLPreInitializationEvent event) {
         logger = event.getModLog();
         proxy.preInit(event);
-        if (!SyncedConfig.poweredByFE) {
-            MinecraftForge.EVENT_BUS.register(new AnvilRepairHandler());
-        }
+        MinecraftForge.EVENT_BUS.register(new AnvilRepairHandler());
     }
 
     @Mod.EventHandler

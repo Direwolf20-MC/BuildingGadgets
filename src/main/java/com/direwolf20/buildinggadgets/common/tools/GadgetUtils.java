@@ -11,7 +11,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTUtil;
@@ -30,8 +29,6 @@ import net.minecraftforge.items.IItemHandler;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,14 +40,6 @@ public class GadgetUtils {
 
     private static String getStackErrorText(ItemStack stack) {
         return "the following stack: [" + stack + "]";
-    }
-
-    public static boolean isSizeValid(@Nonnull NBTTagCompound compound, @Nullable String name) throws IOException{
-        NBTTagCompound withText = name!=null && !name.isEmpty()?compound.copy():compound;
-        if (name!=null && !name.isEmpty()) withText.setString("name",name);
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        CompressedStreamTools.writeCompressed(withText, baos);
-        return baos.size()<Short.MAX_VALUE-200;
     }
 
     @Nonnull

@@ -15,7 +15,6 @@ import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.PacketTemplateManagerLoad;
 import com.direwolf20.buildinggadgets.common.network.PacketTemplateManagerPaste;
 import com.direwolf20.buildinggadgets.common.network.PacketTemplateManagerSave;
-import com.direwolf20.buildinggadgets.common.tools.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.tools.PasteToolBufferBuilder;
 import com.direwolf20.buildinggadgets.common.tools.ToolDireBuffer;
 import net.minecraft.client.Minecraft;
@@ -307,9 +306,17 @@ public class TemplateManagerGUI extends GuiContainer {
             //System.out.println(CBString);
             try {
                 NBTTagCompound tagCompound = JsonToNBT.getTagFromJson(CBString);
+                //BlockMapIntState MapIntState = GadgetCopyPaste.getBlockMapIntState(tagCompound);
+                int[] stateArray = tagCompound.getIntArray("stateIntArray");
+                //int[] posArray = tagCompound.getIntArray("posIntArray");
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                CompressedStreamTools.writeCompressed(tagCompound, baos);
+                //ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+                //NBTTagCompound newTag = CompressedStreamTools.readCompressed(bais);
+                //System.out.println("BAOS Size: " + baos.size());
 
                 //Anything larger than below is likely to overflow the max packet size, crashing your client.
-                if (GadgetUtils.isSizeValid(tagCompound,nameField.getText())) {
+                if (stateArray.length <= 12000 && baos.size() < 31000) {
                     PacketHandler.INSTANCE.sendToServer(new PacketTemplateManagerPaste(tagCompound, te.getPos(), nameField.getText()));
                     Minecraft.getMinecraft().player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.pastesuccess").getUnformattedComponentText()), false);
                 } else {
