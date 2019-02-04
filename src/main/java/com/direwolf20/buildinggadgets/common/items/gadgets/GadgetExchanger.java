@@ -63,6 +63,16 @@ public class GadgetExchanger extends GadgetGeneric {
     }
 
     @Override
+    public int getEnergyMax() {
+        return 0;
+    }
+
+    @Override
+    public int getEnergyCost() {
+        return 0;
+    }
+
+    @Override
     public int getItemEnchantability() {
         return 3;
     }

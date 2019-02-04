@@ -499,7 +499,7 @@ public class GadgetUtils {
         NBTTagList tagList = new NBTTagList();
 
         for (Multiset.Entry<UniqueItem> entry : itemCountMap.entrySet()) {
-            int item = Item.getIdFromItem(entry.getElement().item);
+            int item = Item.getIdFromItem(entry.getElement().getItem());
             int count = entry.getCount();
             NBTTagCompound tagCompound = new NBTTagCompound();
             tagCompound.setInt("item", item);
