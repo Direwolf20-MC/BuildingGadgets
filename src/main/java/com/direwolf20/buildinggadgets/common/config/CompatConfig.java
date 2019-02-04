@@ -63,7 +63,7 @@ public class CompatConfig {
         cfg.addCustomCategoryComment(CATEGORY_BLACKLIST, "Blacklist configuration");
         ConfigCategory category = cfg.getCategory(CATEGORY_BLACKLIST);
         if (!category.isEmpty())
-            blacklist = category.get("blacklist").getStringList();
+            blacklist = category.get("Blacklist").getStringList();
     }
 
     public static void applyCompatConfig() {
