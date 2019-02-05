@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.common.blocks.templatemanager;
 
+import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.items.ITemplate;
 import com.direwolf20.buildinggadgets.common.items.ModItems;
 import com.direwolf20.buildinggadgets.common.items.Template;
@@ -25,6 +26,7 @@ import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -231,9 +233,22 @@ public class TemplateManagerCommands {
             //Map<UniqueItem, Integer> tagMap = GadgetCopyPaste.getItemCountMap(itemStack0);
             //NBTTagList tagList = GadgetUtils.itemCountToNBT(tagMap);
             //newCompound.setTag("itemcountmap", tagList);
-            String jsonTag = newCompound.toString();
-            setClipboardString(jsonTag);
-            Minecraft.getMinecraft().player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.copysuccess").getUnformattedComponentText()), false);
+            try {
+                if (GadgetUtils.isSizeValid(newCompound,tagCompound.getString("name"))) {
+                    String jsonTag = newCompound.toString();
+                    setClipboardString(jsonTag);
+                    Minecraft.getMinecraft().player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.copysuccess").getUnformattedComponentText()), false);
+                } else {
+                    pasteIsTooLarge();
+                }
+            } catch (IOException e) {
+                BuildingGadgets.logger.error("Failed to evaluate template network size. Template will be considered too large.",e);
+                pasteIsTooLarge();
+            }
         }
+    }
+
+    private static void pasteIsTooLarge() {
+        Minecraft.getMinecraft().player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.pastetoobig").getUnformattedComponentText()), false);
     }
 }
