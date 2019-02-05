@@ -45,12 +45,13 @@ public class GadgetUtils {
         return "the following stack: [" + stack + "]";
     }
 
-    public static boolean isSizeValid(@Nonnull NBTTagCompound compound, @Nullable String name) throws IOException{
+    @Nullable
+    public static ByteArrayOutputStream getPasteStream(@Nonnull NBTTagCompound compound, @Nullable String name) throws IOException{
         NBTTagCompound withText = name != null && !name.isEmpty() ? compound.copy() : compound;
         if (name != null && !name.isEmpty()) withText.setString("name", name);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         CompressedStreamTools.writeCompressed(withText, baos);
-        return baos.size() < Short.MAX_VALUE - 200;
+        return baos.size() < Short.MAX_VALUE - 200 ? baos : null;
     }
 
     @Nonnull

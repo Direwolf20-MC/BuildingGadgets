@@ -234,7 +234,7 @@ public class TemplateManagerCommands {
             //NBTTagList tagList = GadgetUtils.itemCountToNBT(tagMap);
             //newCompound.setTag("itemcountmap", tagList);
             try {
-                if (GadgetUtils.isSizeValid(newCompound, tagCompound.getString("name"))) {
+                if (GadgetUtils.getPasteStream(newCompound, tagCompound.getString("name")) != null) {
                     String jsonTag = newCompound.toString();
                     setClipboardString(jsonTag);
                     Minecraft.getMinecraft().player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.copysuccess").getUnformattedComponentText()), false);

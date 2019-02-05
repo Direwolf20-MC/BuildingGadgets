@@ -32,9 +32,7 @@ import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.client.renderer.vertex.VertexFormatElement;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.JsonToNBT;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
@@ -306,11 +304,10 @@ public class TemplateManagerGUI extends GuiContainer {
             //System.out.println("CBString Length: " + CBString.length());
             //System.out.println(CBString);
             try {
-                NBTTagCompound tagCompound = JsonToNBT.getTagFromJson(CBString);
-
                 //Anything larger than below is likely to overflow the max packet size, crashing your client.
-                if (GadgetUtils.isSizeValid(tagCompound, nameField.getText())) {
-                    PacketHandler.INSTANCE.sendToServer(new PacketTemplateManagerPaste(tagCompound, te.getPos(), nameField.getText()));
+                ByteArrayOutputStream pasteStream = GadgetUtils.getPasteStream(JsonToNBT.getTagFromJson(CBString), nameField.getText());
+                if (pasteStream != null) {
+                    PacketHandler.INSTANCE.sendToServer(new PacketTemplateManagerPaste(pasteStream, te.getPos(), nameField.getText()));
                     Minecraft.getMinecraft().player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.pastesuccess").getUnformattedComponentText()), false);
                 } else {
                     Minecraft.getMinecraft().player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.pastetoobig").getUnformattedComponentText()), false);
