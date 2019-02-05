@@ -234,7 +234,7 @@ public class TemplateManagerCommands {
             //NBTTagList tagList = GadgetUtils.itemCountToNBT(tagMap);
             //newCompound.setTag("itemcountmap", tagList);
             try {
-                if (GadgetUtils.isSizeValid(newCompound,tagCompound.getString("name"))) {
+                if (GadgetUtils.isSizeValid(newCompound, tagCompound.getString("name"))) {
                     String jsonTag = newCompound.toString();
                     setClipboardString(jsonTag);
                     Minecraft.getMinecraft().player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.copysuccess").getUnformattedComponentText()), false);
@@ -242,7 +242,7 @@ public class TemplateManagerCommands {
                     pasteIsTooLarge();
                 }
             } catch (IOException e) {
-                BuildingGadgets.logger.error("Failed to evaluate template network size. Template will be considered too large.",e);
+                BuildingGadgets.logger.error("Failed to evaluate template network size. Template will be considered too large.", e);
                 pasteIsTooLarge();
             }
         }

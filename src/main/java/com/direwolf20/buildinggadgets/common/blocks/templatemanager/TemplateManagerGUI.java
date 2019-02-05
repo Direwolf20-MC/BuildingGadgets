@@ -309,7 +309,7 @@ public class TemplateManagerGUI extends GuiContainer {
                 NBTTagCompound tagCompound = JsonToNBT.getTagFromJson(CBString);
 
                 //Anything larger than below is likely to overflow the max packet size, crashing your client.
-                if (GadgetUtils.isSizeValid(tagCompound,nameField.getText())) {
+                if (GadgetUtils.isSizeValid(tagCompound, nameField.getText())) {
                     PacketHandler.INSTANCE.sendToServer(new PacketTemplateManagerPaste(tagCompound, te.getPos(), nameField.getText()));
                     Minecraft.getMinecraft().player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.pastesuccess").getUnformattedComponentText()), false);
                 } else {

@@ -46,11 +46,11 @@ public class GadgetUtils {
     }
 
     public static boolean isSizeValid(@Nonnull NBTTagCompound compound, @Nullable String name) throws IOException{
-        NBTTagCompound withText = name!=null && !name.isEmpty()?compound.copy():compound;
-        if (name!=null && !name.isEmpty()) withText.setString("name",name);
+        NBTTagCompound withText = name != null && !name.isEmpty() ? compound.copy() : compound;
+        if (name != null && !name.isEmpty()) withText.setString("name", name);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         CompressedStreamTools.writeCompressed(withText, baos);
-        return baos.size()<Short.MAX_VALUE-200;
+        return baos.size() < Short.MAX_VALUE - 200;
     }
 
     @Nonnull
