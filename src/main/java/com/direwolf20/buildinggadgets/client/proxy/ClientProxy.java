@@ -1,7 +1,6 @@
 package com.direwolf20.buildinggadgets.client.proxy;
 
 import com.direwolf20.buildinggadgets.client.KeyBindings;
-import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.blocks.ModBlocks;
 import com.direwolf20.buildinggadgets.common.blocks.Models.BakedModelLoader;
 import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManagerContainer;
@@ -29,7 +28,7 @@ import net.minecraftforge.fml.relauncher.Side;
 
 import static com.direwolf20.buildinggadgets.common.items.ModItems.gadgetBuilding;
 
-@Mod.EventBusSubscriber(value = Side.CLIENT, modid = BuildingGadgets.MODID)
+@Mod.EventBusSubscriber(value = Side.CLIENT)
 public class ClientProxy extends CommonProxy {
     @Override
     public void preInit(FMLPreInitializationEvent e) {
