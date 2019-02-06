@@ -1,12 +1,12 @@
 package com.direwolf20.buildinggadgets.common.tools;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.google.common.collect.ImmutableList;
 import com.raoulvdberge.refinedstorage.api.network.INetwork;
 import com.raoulvdberge.refinedstorage.api.util.Action;
 
@@ -17,7 +17,7 @@ public abstract class NetworkExtractor implements IItemHandler {
     private final List<ItemStack> stacks;
 
     protected NetworkExtractor(Collection<ItemStack> stacks) {
-        this.stacks = new ArrayList<>(stacks);
+        this.stacks = stacks.stream().collect(ImmutableList.toImmutableList());
     }
 
     @Override
@@ -28,8 +28,7 @@ public abstract class NetworkExtractor implements IItemHandler {
     @Override
     @Nonnull
     public ItemStack getStackInSlot(int slot) {
-        ItemStack stack = stacks.get(slot);
-        return stack == null ? ItemStack.EMPTY : stack;
+        return stacks.get(slot);
     }
 
     @Override
