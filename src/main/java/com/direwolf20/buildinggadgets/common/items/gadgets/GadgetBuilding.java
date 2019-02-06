@@ -6,7 +6,6 @@ import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.common.items.FakeBuilderWorld;
 import com.direwolf20.buildinggadgets.common.items.ModItems;
-import com.direwolf20.buildinggadgets.common.items.capability.CapabilityProviderEnergy;
 import com.direwolf20.buildinggadgets.common.tools.BuildingModes;
 import com.direwolf20.buildinggadgets.common.tools.InventoryManipulation;
 import com.direwolf20.buildinggadgets.common.tools.ToolRenders;
@@ -31,8 +30,6 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldType;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.BlockSnapshot;
-import net.minecraftforge.energy.CapabilityEnergy;
-import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.world.BlockEvent;
 

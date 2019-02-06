@@ -6,8 +6,6 @@ import com.direwolf20.buildinggadgets.common.config.fieldmap.FieldSerializer;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.PacketSyncConfig;
 import com.direwolf20.buildinggadgets.common.tools.ReflectionTool;
-import com.google.common.collect.ImmutableList;
-import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;

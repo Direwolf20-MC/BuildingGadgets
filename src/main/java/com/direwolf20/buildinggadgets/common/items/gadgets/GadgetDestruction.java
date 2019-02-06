@@ -33,15 +33,11 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.BlockSnapshot;
-import net.minecraftforge.energy.CapabilityEnergy;
-import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.world.BlockEvent;
 
 import javax.annotation.Nullable;
 import java.util.*;
-
-import static com.direwolf20.buildinggadgets.common.tools.GadgetUtils.withSuffix;
 
 public class GadgetDestruction extends GadgetGeneric {
 
