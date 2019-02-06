@@ -49,7 +49,7 @@ repositories {
 
 dependencies {
     deobfCompile "team.chisel.ctm:CTM:MC${minecraft_version}-${ctm_version}:api"
-	deobfCompile "refinedstorage:refinedstorage:${rs_version}:api"
+    deobfCompile "refinedstorage:refinedstorage:${rs_version}:api"
     runtime "team.chisel.ctm:CTM:MC${minecraft_version}-${ctm_version}"
     // you may put jars on which you depend on in ./libs
     // or you may define them like so..
