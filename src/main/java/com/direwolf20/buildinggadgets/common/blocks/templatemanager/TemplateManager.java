@@ -65,23 +65,15 @@ public class TemplateManager extends Block {
     public IBlockState getStateFromMeta(int meta) {
 
         EnumFacing enumfacing = EnumFacing.getFront(meta);
-
         if (enumfacing.getAxis() == EnumFacing.Axis.Y) {
             enumfacing = EnumFacing.NORTH;
         }
-
-
         return this.getDefaultState().withProperty(FACING, enumfacing);
     }
 
     @Override
     public int getMetaFromState(IBlockState state) {
-
-        EnumFacing facing = state.getValue(FACING);
-
-        int meta = ((EnumFacing) state.getValue(FACING)).getIndex();
-
-        return meta;
+        return state.getValue(FACING).getIndex();
     }
 
 
