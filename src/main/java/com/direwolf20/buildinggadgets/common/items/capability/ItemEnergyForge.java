@@ -41,6 +41,7 @@ public class ItemEnergyForge extends EnergyStorage {
 
     private void updateMaxEnergy() {
         this.capacity = maxEnergyProvider.getAsInt();
+        this.energy = Math.max(capacity, getEnergyStored());
     }
 
     private int changeEnergy(int amount, boolean simulate) {
