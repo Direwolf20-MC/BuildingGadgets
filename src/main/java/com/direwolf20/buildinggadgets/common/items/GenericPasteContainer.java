@@ -23,16 +23,46 @@ public class GenericPasteContainer extends Item {
         setCreativeTab(BuildingGadgets.BUILDING_CREATIVE_TAB);
     }
 
+    // TODO completely move logic into paste container item object
+
+    /**
+     * Delegates to {@link GenericPasteContainer#setPastes(ItemStack, int)}.
+     */
     public static void setPasteAmount(ItemStack stack, int amount) {
+        Item item = stack.getItem();
+        if (item instanceof GenericPasteContainer) {
+            ((GenericPasteContainer) item).setPastes(stack, amount);
+        } else {
+            BuildingGadgets.logger.warn("Potential abuse of GenericPasteContainer#setPasteAmount(ItemStack, int) where the given ItemStack does not contain a GenericPasteContainer.");
+        }
+    }
+
+    /**
+     * Delegates to {@link GenericPasteContainer#getPastes(ItemStack)}}.
+     */
+    public static int getPasteAmount(ItemStack stack) {
+        Item item = stack.getItem();
+        if (item instanceof GenericPasteContainer) {
+            return ((GenericPasteContainer) item).getPastes(stack);
+        } else {
+            BuildingGadgets.logger.warn("Potential abuse of GenericPasteContainer#getPasteAmount(ItemStack) where the given ItemStack does not contain a GenericPasteContainer.");
+            return 0;
+        }
+    }
+
+
+    public void setPastes(ItemStack stack, int amount) {
         NBTTagCompound tagCompound = stack.getTagCompound();
         if (tagCompound == null) {
             tagCompound = new NBTTagCompound();
         }
         tagCompound.setInteger("amount", amount);
         stack.setTagCompound(tagCompound);
+
+        stack.setTagCompound(tagCompound);
     }
 
-    public static int getPasteAmount(ItemStack stack) {
+    public int getPastes(ItemStack stack) {
         NBTTagCompound tagCompound = stack.getTagCompound();
         int amount = 0;
         if (tagCompound == null) {
@@ -42,6 +72,7 @@ public class GenericPasteContainer extends Item {
         amount = tagCompound.getInteger("amount");
         return amount;
     }
+
 
     @Override
     public void addInformation(ItemStack stack, @Nullable World world, List<String> list, ITooltipFlag b) {

@@ -81,6 +81,7 @@ public class CommonProxy {
             event.getRegistry().register(new ConstructionPasteContainer());
             event.getRegistry().register(new ConstructionPasteContainerT2());
             event.getRegistry().register(new ConstructionPasteContainerT3());
+            event.getRegistry().register(new ConstructionPasteContainerCreative());
         }
     }
 }
