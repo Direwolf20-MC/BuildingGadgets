@@ -4,8 +4,12 @@ import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetBuilding;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetExchanger;
+import com.direwolf20.buildinggadgets.common.tools.NetworkExtractor.NetworkExtractorRS;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
+import com.raoulvdberge.refinedstorage.api.network.INetwork;
+import com.raoulvdberge.refinedstorage.api.network.node.INetworkNodeProxy;
+
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
@@ -314,14 +318,14 @@ public class GadgetUtils {
     }
 
     public static boolean setBoundTE(ItemStack tool, @Nullable BlockPos pos, int dim, World world) {
-        TileEntity te = world.getTileEntity(pos);
-        if (te == null) return false;
-        IItemHandler cap = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
-        if (cap == null) return false;
-        writePOSToNBT(tool, pos, "boundTE", dim);
-        return true;
+        if (getInventory(world, pos) != null) {
+            writePOSToNBT(tool, pos, "boundTE", dim);
+            return true;
+        }
+        return false;
     }
 
+    @Nullable
     public static IItemHandler getBoundRemoteInventory(ItemStack tool, World world) {
         Integer dim = getDIMFromNBT(tool, "boundTE");
         if (dim == null) return null;
@@ -330,11 +334,23 @@ public class GadgetUtils {
         World worldServer = server.getWorld(dim);
         if (worldServer == null) return null;
         BlockPos pos = getPOSFromNBT(tool, "boundTE");
-        if (pos == null) return null;
-        TileEntity te = worldServer.getTileEntity(pos);
-        if (te == null) return null;
-        IItemHandler cap = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
-        return cap == null ? null : cap;
+        return pos == null ? null : getInventory(worldServer, pos);
+    }
+
+    @Nullable
+    public static IItemHandler getInventory(World world, BlockPos pos) {
+        TileEntity te = world.getTileEntity(pos);
+        if (te != null) {
+            if (te instanceof INetworkNodeProxy) {
+                INetwork network = ((INetworkNodeProxy) te).getNode().getNetwork();
+                if (network != null)
+                    return new NetworkExtractorRS(network);
+            }
+            IItemHandler cap = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
+            if (cap != null)
+                return cap;
+        }
+        return null;
     }
 
     public static String withSuffix(int count) {
