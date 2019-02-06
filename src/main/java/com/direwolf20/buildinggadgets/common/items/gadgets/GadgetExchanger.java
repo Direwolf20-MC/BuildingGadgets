@@ -59,9 +59,12 @@ public class GadgetExchanger extends GadgetGeneric {
         setRegistryName("exchangertool");        // The unique name (within your mod) that identifies this item
         setUnlocalizedName(BuildingGadgets.MODID + ".exchangertool");     // Used for localization (en_US.lang)
         setMaxStackSize(1);
-        if (!SyncedConfig.poweredByFE) {
-            setMaxDamage(SyncedConfig.durabilityExchanger);
-        }
+        setMaxDamage(SyncedConfig.durabilityExchanger);
+    }
+
+    @Override
+    public int getMaxDamage(ItemStack stack) {
+        return SyncedConfig.poweredByFE?0:SyncedConfig.durabilityExchanger;
     }
 
     @Override
@@ -136,10 +139,7 @@ public class GadgetExchanger extends GadgetGeneric {
         list.add(TextFormatting.DARK_GREEN + I18n.format("tooltip.gadget.block") + ": " + getToolBlock(stack).getBlock().getLocalizedName());
         list.add(TextFormatting.AQUA + I18n.format("tooltip.gadget.mode") + ": " + getToolMode(stack));
         list.add(TextFormatting.RED + I18n.format("tooltip.gadget.range") + ": " + getToolRange(stack));
-        if (SyncedConfig.poweredByFE) {
-            IEnergyStorage energy = CapabilityProviderEnergy.getCap(stack);
-            list.add(TextFormatting.WHITE + I18n.format("tooltip.gadget.energy") + ": " + withSuffix(energy.getEnergyStored()) + "/" + withSuffix(energy.getMaxEnergyStored()));
-        }
+        addEnergyInformation(list, stack);
     }
 
     @Override

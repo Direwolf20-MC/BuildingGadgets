@@ -2,14 +2,11 @@ package com.direwolf20.buildinggadgets.common;
 
 import com.direwolf20.buildinggadgets.common.commands.DeleteBlockMapsCommand;
 import com.direwolf20.buildinggadgets.common.commands.FindBlockMapsCommand;
-import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
-import com.direwolf20.buildinggadgets.common.events.AnvilRepairHandler;
 import com.direwolf20.buildinggadgets.common.items.ModItems;
 import com.direwolf20.buildinggadgets.common.proxy.CommonProxy;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.TextComponentTranslation;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -46,9 +43,6 @@ public class BuildingGadgets {
     public void preInit(FMLPreInitializationEvent event) {
         logger = event.getModLog();
         proxy.preInit(event);
-        if (!SyncedConfig.poweredByFE) {
-            MinecraftForge.EVENT_BUS.register(new AnvilRepairHandler());
-        }
     }
 
     @Mod.EventHandler
