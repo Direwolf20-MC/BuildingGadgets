@@ -57,6 +57,10 @@ public class ToolRenders {
         ToolRenders.cache.setCache(cache);
     }
 
+    public static void updateCache() {
+        cache.forceUpdate();
+    }
+
     public static void renderBuilderOverlay(RenderWorldLastEvent evt, EntityPlayer player, ItemStack stack) {
         RayTraceResult lookingAt = VectorTools.getLookingAt(player);
         IBlockState state = Blocks.AIR.getDefaultState();

@@ -8,6 +8,7 @@ import com.direwolf20.buildinggadgets.common.items.ModItems;
 import com.direwolf20.buildinggadgets.common.items.capability.CapabilityProviderEnergy;
 import com.direwolf20.buildinggadgets.common.tools.ExchangingModes;
 import com.direwolf20.buildinggadgets.common.tools.InventoryManipulation;
+import com.direwolf20.buildinggadgets.common.tools.ToolRenders;
 import com.direwolf20.buildinggadgets.common.tools.VectorTools;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
@@ -152,6 +153,8 @@ public class GadgetExchanger extends GadgetGeneric {
             } else {
                 exchange(player, itemstack);
             }
+        } else if (!player.isSneaking()) {
+            ToolRenders.updateCache();
         }
         return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, itemstack);
     }

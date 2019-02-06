@@ -9,6 +9,7 @@ import com.direwolf20.buildinggadgets.common.items.ModItems;
 import com.direwolf20.buildinggadgets.common.items.capability.CapabilityProviderEnergy;
 import com.direwolf20.buildinggadgets.common.tools.BuildingModes;
 import com.direwolf20.buildinggadgets.common.tools.InventoryManipulation;
+import com.direwolf20.buildinggadgets.common.tools.ToolRenders;
 import com.direwolf20.buildinggadgets.common.tools.UndoState;
 import com.direwolf20.buildinggadgets.common.tools.VectorTools;
 import net.minecraft.block.state.IBlockState;
@@ -130,6 +131,8 @@ public class GadgetBuilding extends GadgetGeneric {
             } else {
                 build(player, itemstack);
             }
+        } else if (!player.isSneaking()) {
+            ToolRenders.updateCache();
         }
         return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, itemstack);
     }
