@@ -17,7 +17,7 @@ public abstract class NetworkExtractor implements IItemHandler {
     private final List<ItemStack> stacks;
 
     protected NetworkExtractor(Collection<ItemStack> stacks) {
-        this.stacks = stacks.stream().collect(ImmutableList.toImmutableList());
+        this.stacks = ImmutableList.copyOf(stacks);
     }
 
     @Override
