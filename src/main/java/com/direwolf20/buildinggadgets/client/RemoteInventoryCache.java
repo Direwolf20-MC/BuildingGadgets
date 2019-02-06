@@ -32,7 +32,7 @@ public class RemoteInventoryCache implements IRemoteInventoryProvider {
         this.isCopyPaste = isCopyPaste;
     }
 
-    public void setCache(@Nullable Multiset<UniqueItem> cache) {
+    public void setCache(Multiset<UniqueItem> cache) {
         this.cache = cache;
     }
 

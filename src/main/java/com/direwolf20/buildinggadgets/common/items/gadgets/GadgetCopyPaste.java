@@ -282,7 +282,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
             }
         } else {
             if (pos != null && player.isSneaking()) {
-                if (GadgetUtils.getInventory(world, pos) != null)
+                if (GadgetUtils.getRemoteInventory(stack, world) != null)
                     return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);
             }
             if (getToolMode(stack) == ToolMode.Copy) {
