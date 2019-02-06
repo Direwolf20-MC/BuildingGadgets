@@ -295,9 +295,7 @@ public class FieldSerializer {
                 if (getPrimitiveClass().equals(field.getType())) {
                     return NBTTool.createBooleanList((boolean[]) field.get());
                 }
-                else {
-                    return NBTTool.createBooleanList((Boolean[]) field.get());
-                }
+                return NBTTool.createBooleanList((Boolean[]) field.get());
             }
 
             @Override
@@ -322,9 +320,7 @@ public class FieldSerializer {
                 if (getPrimitiveClass().equals(field.getType())) {
                     return new NBTTagByteArray((byte[]) field.get());
                 }
-                else {
-                    return new NBTTagByteArray(ArrayUtils.asPrimitive((Byte[]) field.get()));
-                }
+                return new NBTTagByteArray(ArrayUtils.asPrimitive((Byte[]) field.get()));
             }
 
             @Override
@@ -349,9 +345,7 @@ public class FieldSerializer {
                 if (getPrimitiveClass().equals(field.getType())) {
                     return NBTTool.createShortList((short[]) field.get());
                 }
-                else {
-                    return NBTTool.createShortList((Short[]) field.get());
-                }
+                return NBTTool.createShortList((Short[]) field.get());
             }
 
             @Override
@@ -376,9 +370,7 @@ public class FieldSerializer {
                 if (getPrimitiveClass().equals(field.getType())) {
                     return new NBTTagString(String.valueOf((char[])field.get()));
                 }
-                else {
-                    return new NBTTagString(String.valueOf(ArrayUtils.asPrimitive((Character[])field.get())));
-                }
+                return new NBTTagString(String.valueOf(ArrayUtils.asPrimitive((Character[])field.get())));
             }
 
             @Override
@@ -403,9 +395,7 @@ public class FieldSerializer {
                 if (getPrimitiveClass().equals(field.getType())) {
                     return new NBTTagIntArray((int[])field.get());
                 }
-                else {
-                    return new NBTTagIntArray(ArrayUtils.asPrimitive((Integer[]) field.get()));
-                }
+                return new NBTTagIntArray(ArrayUtils.asPrimitive((Integer[]) field.get()));
             }
 
             @Override
@@ -430,9 +420,7 @@ public class FieldSerializer {
                 if (getPrimitiveClass().equals(field.getType())) {
                     return NBTTool.createFloatList((float[]) field.get());
                 }
-                else {
-                    return NBTTool.createFloatList((Float[]) field.get());
-                }
+                return NBTTool.createFloatList((Float[]) field.get());
             }
 
             @Override
@@ -457,9 +445,7 @@ public class FieldSerializer {
                 if (getPrimitiveClass().equals(field.getType())) {
                     return NBTTool.createDoubleList((double[]) field.get());
                 }
-                else {
-                    return NBTTool.createDoubleList((Double[]) field.get());
-                }
+                return NBTTool.createDoubleList((Double[]) field.get());
             }
 
             @Override
