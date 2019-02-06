@@ -48,15 +48,9 @@ public class PacketTemplateManagerPaste implements IMessage {
     public PacketTemplateManagerPaste() {
     }
 
-    public PacketTemplateManagerPaste(NBTTagCompound tagCompound, BlockPos TMpos, String name) {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    public PacketTemplateManagerPaste(ByteArrayOutputStream pasteStream, BlockPos TMpos, String name) {
         pos = TMpos;
-        try {
-            CompressedStreamTools.writeCompressed(tagCompound, baos);
-        } catch (Throwable t) {
-            System.out.println(t);
-        }
-        data = baos.toByteArray();
+        data = pasteStream.toByteArray();
         templateName = name;
     }
 

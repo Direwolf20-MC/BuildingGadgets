@@ -15,6 +15,7 @@ import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.PacketTemplateManagerLoad;
 import com.direwolf20.buildinggadgets.common.network.PacketTemplateManagerPaste;
 import com.direwolf20.buildinggadgets.common.network.PacketTemplateManagerSave;
+import com.direwolf20.buildinggadgets.common.tools.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.tools.PasteToolBufferBuilder;
 import com.direwolf20.buildinggadgets.common.tools.ToolDireBuffer;
 import net.minecraft.client.Minecraft;
@@ -31,9 +32,7 @@ import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.client.renderer.vertex.VertexFormatElement;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.JsonToNBT;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
@@ -305,19 +304,10 @@ public class TemplateManagerGUI extends GuiContainer {
             //System.out.println("CBString Length: " + CBString.length());
             //System.out.println(CBString);
             try {
-                NBTTagCompound tagCompound = JsonToNBT.getTagFromJson(CBString);
-                //BlockMapIntState MapIntState = GadgetCopyPaste.getBlockMapIntState(tagCompound);
-                int[] stateArray = tagCompound.getIntArray("stateIntArray");
-                //int[] posArray = tagCompound.getIntArray("posIntArray");
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                CompressedStreamTools.writeCompressed(tagCompound, baos);
-                //ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
-                //NBTTagCompound newTag = CompressedStreamTools.readCompressed(bais);
-                //System.out.println("BAOS Size: " + baos.size());
-
                 //Anything larger than below is likely to overflow the max packet size, crashing your client.
-                if (stateArray.length <= 12000 && baos.size() < 31000) {
-                    PacketHandler.INSTANCE.sendToServer(new PacketTemplateManagerPaste(tagCompound, te.getPos(), nameField.getText()));
+                ByteArrayOutputStream pasteStream = GadgetUtils.getPasteStream(JsonToNBT.getTagFromJson(CBString), nameField.getText());
+                if (pasteStream != null) {
+                    PacketHandler.INSTANCE.sendToServer(new PacketTemplateManagerPaste(pasteStream, te.getPos(), nameField.getText()));
                     Minecraft.getMinecraft().player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.pastesuccess").getUnformattedComponentText()), false);
                 } else {
                     Minecraft.getMinecraft().player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.pastetoobig").getUnformattedComponentText()), false);

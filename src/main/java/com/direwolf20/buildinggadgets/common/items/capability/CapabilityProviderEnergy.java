@@ -11,12 +11,13 @@ import net.minecraftforge.energy.IEnergyStorage;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.function.IntSupplier;
 
 public class CapabilityProviderEnergy implements ICapabilityProvider {
     private ItemStack stack;
-    private int energyCapacity;
+    private IntSupplier energyCapacity;
 
-    public CapabilityProviderEnergy(ItemStack stack, int energyCapacity) {
+    public CapabilityProviderEnergy(ItemStack stack, IntSupplier energyCapacity) {
         this.stack = stack;
         this.energyCapacity = energyCapacity;
     }

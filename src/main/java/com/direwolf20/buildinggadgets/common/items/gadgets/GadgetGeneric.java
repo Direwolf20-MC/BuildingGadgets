@@ -42,7 +42,7 @@ public class GadgetGeneric extends Item {
     @Override
     @Nullable
     public ICapabilityProvider initCapabilities(ItemStack stack, @Nullable NBTTagCompound tag) {
-        return new CapabilityProviderEnergy(stack, this.getEnergyMax());
+        return new CapabilityProviderEnergy(stack, this::getEnergyMax);
     }
 
     @Override
