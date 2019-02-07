@@ -23,9 +23,8 @@ public class GenericPasteContainer extends Item {
         setCreativeTab(BuildingGadgets.BUILDING_CREATIVE_TAB);
     }
 
-    // TODO completely move logic into paste container item object
-
     /**
+     * Helper method.
      * Delegates to {@link GenericPasteContainer#setPastes(ItemStack, int)}.
      */
     public static void setPasteAmount(ItemStack stack, int amount) {
@@ -38,6 +37,7 @@ public class GenericPasteContainer extends Item {
     }
 
     /**
+     * Helper method.
      * Delegates to {@link GenericPasteContainer#getPastes(ItemStack)}}.
      */
     public static int getPasteAmount(ItemStack stack) {
