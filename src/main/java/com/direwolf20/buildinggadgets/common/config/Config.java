@@ -24,6 +24,14 @@ public class Config {
 
     private static final String LANG_KEY_GADGET_COPY_PASTE = LANG_KEY_GADGETS+".gadgetCopyPaste";
 
+    private static final String LANG_KEY_GADGETS_ENERGY = LANG_KEY_GADGETS + ".energyCost";
+
+    private static final String LANG_KEY_GADGETS_DURABILITY = LANG_KEY_GADGETS + ".durability";
+
+    private static final String LANG_KEY_GADGETS_ENERGY_COMMENT = "The Gadget's Energy cost per Operation";
+
+    private static final String LANG_KEY_GADGETS_DURABILITY_COMMENT = "The Gadget's Durability (0 means no durability is used) (Ignored if powered by FE)";
+
     @RangeDouble(min=1,max=48)
     @Name("Max Build Distance")
     @Comment("Defines how far away you can build")
@@ -124,12 +132,14 @@ public class Config {
 
             @RangeInt(min = 0, max = 100000)
             @Name("Energy Cost")
-            @LangKey(LANG_KEY_GADGETS+".energyCost")
+            @Comment(LANG_KEY_GADGETS_ENERGY_COMMENT)
+            @LangKey(LANG_KEY_GADGETS_ENERGY)
             public int energyCostBuilder = 50;
 
             @RangeInt(min = 0, max = 100000)
             @Name("Durability")
-            @LangKey(LANG_KEY_GADGETS+".durability")
+            @Comment(LANG_KEY_GADGETS_DURABILITY_COMMENT)
+            @LangKey(LANG_KEY_GADGETS_DURABILITY)
             public int durabilityBuilder = 500;
         }
 
@@ -138,12 +148,14 @@ public class Config {
 
             @RangeInt(min = 0, max = 100000)
             @Name("Energy Cost")
-            @LangKey(LANG_KEY_GADGETS+".energyCost")
+            @Comment(LANG_KEY_GADGETS_ENERGY_COMMENT)
+            @LangKey(LANG_KEY_GADGETS_ENERGY)
             public int energyCostExchanger = 100;
 
             @RangeInt(min = 0, max = 100000)
             @Name("Durability")
-            @LangKey(LANG_KEY_GADGETS+".durability")
+            @Comment(LANG_KEY_GADGETS_DURABILITY_COMMENT)
+            @LangKey(LANG_KEY_GADGETS_DURABILITY)
             public int durabilityExchanger = 500;
         }
 
@@ -157,12 +169,14 @@ public class Config {
 
             @RangeInt(min = 0, max = 100000)
             @Name("Energy Cost")
-            @LangKey(LANG_KEY_GADGETS+".energyCost")
+            @Comment(LANG_KEY_GADGETS_ENERGY_COMMENT)
+            @LangKey(LANG_KEY_GADGETS_ENERGY)
             public int energyCostDestruction = 200;
 
             @RangeInt(min = 0, max = 100000)
             @Name("Durability")
-            @LangKey(LANG_KEY_GADGETS+".durability")
+            @Comment(LANG_KEY_GADGETS_DURABILITY_COMMENT)
+            @LangKey(LANG_KEY_GADGETS_DURABILITY)
             public int durabilityDestruction = 500;
         }
 
@@ -171,12 +185,14 @@ public class Config {
 
             @RangeInt(min = 0, max = 100000)
             @Name("Energy Cost")
-            @LangKey(LANG_KEY_GADGETS+".energyCost")
+            @Comment(LANG_KEY_GADGETS_ENERGY_COMMENT)
+            @LangKey(LANG_KEY_GADGETS_ENERGY)
             public int energyCostCopyPaste = 50;
 
             @RangeInt(min = 0, max = 100000)
             @Name("Durability")
-            @LangKey(LANG_KEY_GADGETS+".durability")
+            @Comment(LANG_KEY_GADGETS_DURABILITY_COMMENT)
+            @LangKey(LANG_KEY_GADGETS_DURABILITY)
             public int durabilityCopyPaste = 500;
         }
     }
