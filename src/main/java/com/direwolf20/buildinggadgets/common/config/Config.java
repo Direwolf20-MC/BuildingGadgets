@@ -92,7 +92,8 @@ public class Config {
     //using unistantiable final class instead of enum, so that it doesn't cause issues with the ConfigManger trying to access the Instance field
     //No defense against reflection needed here (I think)
     public static final class CategoryGadgets {
-        private CategoryGadgets() { }
+        private CategoryGadgets() {
+        }
 
         @RangeInt(min = 1, max = 25)
         @Name("Maximum allowed Range")

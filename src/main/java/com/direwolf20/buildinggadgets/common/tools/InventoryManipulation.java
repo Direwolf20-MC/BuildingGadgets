@@ -1,9 +1,7 @@
 package com.direwolf20.buildinggadgets.common.tools;
 
-import com.direwolf20.buildinggadgets.common.items.ConstructionPaste;
-import com.direwolf20.buildinggadgets.common.items.GenericPasteContainer;
-import com.direwolf20.buildinggadgets.common.items.ModItems;
-import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
+import com.direwolf20.buildinggadgets.common.items.pastes.ConstructionPaste;
+import com.direwolf20.buildinggadgets.common.items.pastes.GenericPasteContainer;
 import com.direwolf20.buildinggadgets.common.items.ModItems;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;

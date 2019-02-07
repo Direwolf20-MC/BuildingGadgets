@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.common.events;
 
-import com.direwolf20.buildinggadgets.common.items.ConstructionPaste;
+import com.direwolf20.buildinggadgets.common.items.pastes.ConstructionPaste;
 import com.direwolf20.buildinggadgets.common.tools.InventoryManipulation;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.ItemStack;

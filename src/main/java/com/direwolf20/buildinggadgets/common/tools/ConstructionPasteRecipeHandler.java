@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.common.tools;
 
-import com.direwolf20.buildinggadgets.common.items.GenericPasteContainer;
+import com.direwolf20.buildinggadgets.common.items.pastes.GenericPasteContainer;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.gson.JsonArray;

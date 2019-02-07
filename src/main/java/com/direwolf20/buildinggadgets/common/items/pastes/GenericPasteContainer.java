@@ -1,4 +1,4 @@
-package com.direwolf20.buildinggadgets.common.items;
+package com.direwolf20.buildinggadgets.common.items.pastes;
 
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.tools.InventoryManipulation;
@@ -18,9 +18,10 @@ import net.minecraft.world.World;
 import javax.annotation.Nullable;
 import java.util.List;
 
-public class GenericPasteContainer extends Item {
+public abstract class GenericPasteContainer extends Item {
     public GenericPasteContainer() {
         setCreativeTab(BuildingGadgets.BUILDING_CREATIVE_TAB);
+        setMaxStackSize(1);
     }
 
     /**
@@ -51,37 +52,16 @@ public class GenericPasteContainer extends Item {
     }
 
 
-    public void setPastes(ItemStack stack, int amount) {
-        NBTTagCompound tagCompound = stack.getTagCompound();
-        if (tagCompound == null) {
-            tagCompound = new NBTTagCompound();
-        }
-        tagCompound.setInteger("amount", amount);
-        stack.setTagCompound(tagCompound);
+    public abstract void setPastes(ItemStack stack, int amount);
 
-        stack.setTagCompound(tagCompound);
-    }
+    public abstract int getPastes(ItemStack stack);
 
-    public int getPastes(ItemStack stack) {
-        NBTTagCompound tagCompound = stack.getTagCompound();
-        int amount = 0;
-        if (tagCompound == null) {
-            setPasteAmount(stack, 0);
-            return amount;
-        }
-        amount = tagCompound.getInteger("amount");
-        return amount;
-    }
+    public abstract int getMaxAmount();
 
 
     @Override
     public void addInformation(ItemStack stack, @Nullable World world, List<String> list, ITooltipFlag b) {
-        super.addInformation(stack, world, list, b);
         list.add(TextFormatting.WHITE + I18n.format("tooltip.pasteContainer.amount") + ": " + getPasteAmount(stack));
-    }
-
-    public int getMaxAmount() {
-        return 0;
     }
 
     @Override
@@ -93,10 +73,11 @@ public class GenericPasteContainer extends Item {
             for (int i = 0; i < 36; ++i) {
                 ItemStack itemStack = inv.getStackInSlot(i);
                 if (itemStack.getItem() instanceof ConstructionPaste) {
-                    itemStack = InventoryManipulation.addPasteToContainer(player, itemStack);
+                    InventoryManipulation.addPasteToContainer(player, itemStack);
                 }
             }
         }
-        return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, heldItem);
+        return new ActionResult<>(EnumActionResult.SUCCESS, heldItem);
     }
+
 }

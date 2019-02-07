@@ -1,4 +1,4 @@
-package com.direwolf20.buildinggadgets.common.items;
+package com.direwolf20.buildinggadgets.common.items.pastes;
 
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
@@ -23,7 +23,6 @@ public class ConstructionPasteContainerCreative extends GenericPasteContainer {
     public ConstructionPasteContainerCreative() {
         setRegistryName("constructionpastecontainercreative");        // The unique name (within your mod) that identifies this item
         setUnlocalizedName(BuildingGadgets.MODID + ".constructionpastecontainercreative");     // Used for localization (en_US.lang)
-        setMaxStackSize(1);
     }
 
     @Override
@@ -57,4 +56,5 @@ public class ConstructionPasteContainerCreative extends GenericPasteContainer {
     public int getMaxAmount() {
         return Integer.MAX_VALUE;
     }
+
 }
