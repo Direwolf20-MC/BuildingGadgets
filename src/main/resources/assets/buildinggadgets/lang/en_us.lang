@@ -17,6 +17,7 @@ item.buildinggadgets.constructionpaste.name=Construction Paste
 item.buildinggadgets.constructionpastecontainer.name=Paste Container
 item.buildinggadgets.constructionpastecontainert2.name=Paste Container T2
 item.buildinggadgets.constructionpastecontainert3.name=Paste Container T3
+item.buildinggadgets.constructionpastecontainercreative.name=Creative Paste Container
 item.buildinggadgets.copypastetool.name=Copy-Paste Gadget
 item.buildinggadgets.destructiontool.name=Destruction Gadget
 item.buildinggadgets.exchangertool.name=Exchanging Gadget
@@ -50,6 +51,7 @@ tooltip.gadget.energy=Energy
 tooltip.gadget.mode=Mode
 tooltip.gadget.range=Range
 tooltip.pasteContainer.amount=Amount
+tooltip.pasteContainer.creative.amountMsg=Amount: Infinite!
 tooltip.template.name=Name
 
 #message: 

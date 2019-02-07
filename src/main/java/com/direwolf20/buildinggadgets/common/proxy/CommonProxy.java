@@ -81,6 +81,7 @@ public class CommonProxy {
             event.getRegistry().register(new ConstructionPasteContainer("", SyncedConfig.t1ContainerCapacity));
             event.getRegistry().register(new ConstructionPasteContainer("t2", SyncedConfig.t2ContainerCapacity));
             event.getRegistry().register(new ConstructionPasteContainer("t3", SyncedConfig.t3ContainerCapacity));
+            event.getRegistry().register(new ConstructionPasteContainerCreative());
         }
     }
 }

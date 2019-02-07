@@ -10,10 +10,6 @@ public class ConstructionPasteContainer extends GenericPasteContainer {
 
     public int maxAmount;
 
-    public ConstructionPasteContainer(PasteContainerTiers tier) {
-        this(tier.name().toLowerCase(), tier.maxAmount);
-    }
-
     public ConstructionPasteContainer(String suffix, int maxAmount) {
         this.maxAmount = maxAmount;
         setRegistryName("constructionpastecontainer" + suffix);        // The unique name (within your mod) that identifies this item
