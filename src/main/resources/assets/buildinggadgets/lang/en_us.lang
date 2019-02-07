@@ -126,4 +126,4 @@ config.buildinggadgets.general.subCategoryGadgets.gadgetDestruction.maxEnergy=Ma
 config.buildinggadgets.general.subCategoryGadgets.gadgetDestruction.maxEnergy.tooltip=The max energy of the Destruction Gadget
 config.buildinggadgets.general.subCategoryGadgets.gadgetCopyPaste=Copy-Paste Gadget
 config.buildinggadgets.general.subCategoryGadgets.gadgetCopyPaste.tooltip=Energy Cost & Durability of the Copy-Paste Gadget
-
+config.buildinggadgets.general.subCategoryPasteContainers.capacity=Energy Cost & Durability of the Copy-Paste Gadget

@@ -78,9 +78,9 @@ public class CommonProxy {
             event.getRegistry().register(new ItemBlock(ModBlocks.constructionBlock).setRegistryName(ModBlocks.constructionBlock.getRegistryName()));
             event.getRegistry().register(new ItemBlock(ModBlocks.constructionBlockPowder).setRegistryName(ModBlocks.constructionBlockPowder.getRegistryName()));
             event.getRegistry().register(new ConstructionPaste());
-            event.getRegistry().register(new ConstructionPasteContainer("", 512));
-            event.getRegistry().register(new ConstructionPasteContainer("t2", 2048));
-            event.getRegistry().register(new ConstructionPasteContainer("t3", 8192));
+            event.getRegistry().register(new ConstructionPasteContainer("", SyncedConfig.t1ContainerCapacity));
+            event.getRegistry().register(new ConstructionPasteContainer("t2", SyncedConfig.t2ContainerCapacity));
+            event.getRegistry().register(new ConstructionPasteContainer("t3", SyncedConfig.t3ContainerCapacity));
         }
     }
 }
