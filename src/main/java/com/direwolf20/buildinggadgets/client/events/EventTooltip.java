@@ -77,7 +77,7 @@ public class EventTooltip {
                     totalMissing = totalMissing + Math.abs(entry.getValue() - hasAmt);
             }
 
-            int count = (totalMissing > 0) ? itemCountMap.size() + 1 : itemStackCount.size();
+            int count = (totalMissing > 0) ? itemStackCount.size() + 1 : itemStackCount.size();
             //boolean creative = ((IReagentHolder) stack.getItem()).isCreativeReagentHolder(stack);
 
             if (count > 0)
