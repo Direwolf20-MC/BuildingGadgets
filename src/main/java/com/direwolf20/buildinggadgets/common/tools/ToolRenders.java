@@ -95,7 +95,7 @@ public class ToolRenders {
                     itemStack = renderBlockState.getBlock().getPickBlock(renderBlockState, null, world, new BlockPos(0, 0, 0), player);
                 }
 
-                int hasBlocks = InventoryManipulation.countItem(itemStack, player, cache);
+                long hasBlocks = InventoryManipulation.countItem(itemStack, player, cache);
                 hasBlocks = hasBlocks + InventoryManipulation.countPaste(player);
                 int hasEnergy = 0;
                 if (stack.hasCapability(CapabilityEnergy.ENERGY,null)) {
@@ -224,7 +224,7 @@ public class ToolRenders {
                 if (itemStack.getItem().equals(Items.AIR)) {
                     itemStack = renderBlockState.getBlock().getPickBlock(renderBlockState, null, world, new BlockPos(0, 0, 0), player);
                 }
-                int hasBlocks = InventoryManipulation.countItem(itemStack, player, cache);
+                long hasBlocks = InventoryManipulation.countItem(itemStack, player, cache);
                 hasBlocks = hasBlocks + InventoryManipulation.countPaste(player);
                 int hasEnergy = 0;
                 if (stack.hasCapability(CapabilityEnergy.ENERGY,null)) {

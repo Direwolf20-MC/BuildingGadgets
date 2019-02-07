@@ -34,6 +34,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.opengl.GL11;
 
 import java.util.*;
+import java.util.function.LongToIntFunction;
 
 @EventBusSubscriber(Side.CLIENT)
 public class EventTooltip {
@@ -100,7 +101,7 @@ public class EventTooltip {
         ItemStack stack = event.getStack();
 
         if ((stack.getItem() instanceof ITemplate) && GuiScreen.isShiftKeyDown()) {
-            int totalMissing = 0;
+            long totalMissing = 0;
             Multiset<UniqueItem> itemCountMap = ((ITemplate) stack.getItem()).getItemCountMap(stack);
 
             //Create an ItemStack -> Integer Map
@@ -143,7 +144,7 @@ public class EventTooltip {
                 int hasAmt = InventoryManipulation.countItem(entry.getKey(), Minecraft.getMinecraft().player, cache);
                 int x = bx + (j % STACKS_PER_LINE) * 18;
                 int y = by + (j / STACKS_PER_LINE) * 20;
-                totalMissing = totalMissing + renderRequiredBlocks(entry.getKey(), x, y, hasAmt, entry.getValue());
+                totalMissing += renderRequiredBlocks(entry.getKey(), x, y, hasAmt, entry.getValue());
                 j++;
             }
             if (totalMissing > 0) {
@@ -151,7 +152,7 @@ public class EventTooltip {
                 int hasAmt = InventoryManipulation.countPaste(Minecraft.getMinecraft().player);
                 int x = bx + (j % STACKS_PER_LINE) * 18;
                 int y = by + (j / STACKS_PER_LINE) * 20;
-                renderRequiredBlocks(pasteItemStack, x, y, hasAmt, totalMissing);
+                renderRequiredBlocks(pasteItemStack, x, y, hasAmt, InventoryManipulation.longToInt(totalMissing));
                 j++;
             }
         }
@@ -165,8 +166,8 @@ public class EventTooltip {
         net.minecraft.client.renderer.RenderHelper.enableGUIStandardItemLighting();
         render.renderItemIntoGUI(itemStack, x, y);
 
-        //String s1 = count == Integer.MAX_VALUE ? "\u221E" : TextFormatting.BOLD + Integer.toString((int) ((float) req));
-        String s1 = count == Integer.MAX_VALUE ? "\u221E" : Integer.toString(req);
+        //String s1 = req == Integer.MAX_VALUE ? "\u221E" : TextFormatting.BOLD + Integer.toString((int) ((float) req));
+        String s1 = req == Integer.MAX_VALUE ? "\u221E" : Integer.toString(req);
         int w1 = mc.fontRenderer.getStringWidth(s1);
         int color = 0xFFFFFF;
 

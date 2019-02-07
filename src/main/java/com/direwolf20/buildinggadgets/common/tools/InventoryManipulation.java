@@ -123,9 +123,9 @@ public class InventoryManipulation {
 
     public static int countItem(ItemStack itemStack, EntityPlayer player, IRemoteInventoryProvider remoteInventory) {
         if (player.capabilities.isCreativeMode) {
-            return 10000;
+            return Integer.MAX_VALUE;
         }
-        int count = remoteInventory.countItem(GadgetGeneric.getGadget(player), itemStack);
+        long count = remoteInventory.countItem(GadgetGeneric.getGadget(player), itemStack);
         InventoryPlayer inv = player.inventory;
         List<Integer> slots = findItem(itemStack.getItem(), itemStack.getMetadata(), inv);
         List<IItemHandler> invContainers = findInvContainers(inv);
@@ -142,14 +142,14 @@ public class InventoryManipulation {
             ItemStack stackInSlot = inv.getStackInSlot(slot);
             count += stackInSlot.getCount();
         }
-        return count;
+        return longToInt(count);
     }
 
     public static int countPaste(EntityPlayer player) {
         if (player.capabilities.isCreativeMode) {
-            return 10000;
+            return Integer.MAX_VALUE;
         }
-        int count = 0;
+        long count = 0;
         InventoryPlayer inv = player.inventory;
         Item item = ModItems.constructionPaste;
         List<Integer> slots = findItem(item, 0, inv);
@@ -164,11 +164,20 @@ public class InventoryManipulation {
             for (int slot : containerSlots) {
                 ItemStack stackInSlot = inv.getStackInSlot(slot);
                 if (stackInSlot.getItem() instanceof GenericPasteContainer) {
-                    count = count + GenericPasteContainer.getPasteAmount(stackInSlot);
+                    count += GenericPasteContainer.getPasteAmount(stackInSlot);
                 }
             }
         }
-        return count;
+        return longToInt(count);
+    }
+
+    public static int longToInt(long count)
+    {
+        try {
+            return Math.toIntExact(count);
+        } catch (ArithmeticException e) {
+            return Integer.MAX_VALUE;
+        }
     }
 
     public static ItemStack addPasteToContainer(EntityPlayer player, ItemStack itemStack) {
