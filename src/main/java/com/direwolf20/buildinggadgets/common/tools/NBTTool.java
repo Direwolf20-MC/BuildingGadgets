@@ -2,6 +2,7 @@ package com.direwolf20.buildinggadgets.common.tools;
 
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.*;
 
 import javax.annotation.Nonnull;
@@ -31,7 +32,7 @@ public class NBTTool {
 
     public static NBTTagList createShortList(short[] shorts) {
         NBTTagList list = new NBTTagList();
-        for (short s: shorts) {
+        for (short s : shorts) {
             list.appendTag(new NBTTagShort(s));
         }
         return list;
@@ -39,7 +40,7 @@ public class NBTTool {
 
     public static NBTTagList createShortList(Short[] shorts) {
         NBTTagList list = new NBTTagList();
-        for (short s: shorts) {
+        for (short s : shorts) {
             list.appendTag(new NBTTagShort(s));
         }
         return list;
@@ -48,7 +49,7 @@ public class NBTTool {
     @Nonnull
     public static NBTTagList createFloatList(float[] floats) {
         NBTTagList list = new NBTTagList();
-        for (float f: floats) {
+        for (float f : floats) {
             list.appendTag(new NBTTagFloat(f));
         }
         return list;
@@ -57,7 +58,7 @@ public class NBTTool {
     @Nonnull
     public static NBTTagList createFloatList(Float[] floats) {
         NBTTagList list = new NBTTagList();
-        for (Float f: floats) {
+        for (Float f : floats) {
             list.appendTag(new NBTTagFloat(f));
         }
         return list;
@@ -66,7 +67,7 @@ public class NBTTool {
     @Nonnull
     public static NBTTagList createDoubleList(double[] doubles) {
         NBTTagList list = new NBTTagList();
-        for (double d: doubles) {
+        for (double d : doubles) {
             list.appendTag(new NBTTagDouble(d));
         }
         return list;
@@ -75,7 +76,7 @@ public class NBTTool {
     @Nonnull
     public static NBTTagList createDoubleList(Double[] doubles) {
         NBTTagList list = new NBTTagList();
-        for (Double d: doubles) {
+        for (Double d : doubles) {
             list.appendTag(new NBTTagDouble(d));
         }
         return list;
@@ -95,7 +96,7 @@ public class NBTTool {
             }
         }
         if (!failed.isEmpty()) {
-            short[] shortened = new short[res.length-failed.size()];
+            short[] shortened = new short[res.length - failed.size()];
             int shortenedCount = 0;
             for (int i = 0; i < res.length; i++) {
                 if (failed.contains(i))
@@ -122,7 +123,7 @@ public class NBTTool {
             }
         }
         if (!failed.isEmpty()) {
-            Short[] shortened = new Short[res.length-failed.size()];
+            Short[] shortened = new Short[res.length - failed.size()];
             int shortenedCount = 0;
             for (int i = 0; i < res.length; i++) {
                 if (failed.contains(i))
@@ -139,7 +140,7 @@ public class NBTTool {
     @Nonnull
     public static NBTTagList createStringList(String[] strings) {
         NBTTagList list = new NBTTagList();
-        for (String s:strings) {
+        for (String s : strings) {
             list.appendTag(new NBTTagString(s));
         }
         return list;
@@ -159,7 +160,7 @@ public class NBTTool {
             }
         }
         if (!failed.isEmpty()) {
-            float[] shortened = new float[res.length-failed.size()];
+            float[] shortened = new float[res.length - failed.size()];
             int shortenedCount = 0;
             for (int i = 0; i < res.length; i++) {
                 if (failed.contains(i))
@@ -186,7 +187,7 @@ public class NBTTool {
             }
         }
         if (!failed.isEmpty()) {
-            Float[] shortened = new Float[res.length-failed.size()];
+            Float[] shortened = new Float[res.length - failed.size()];
             int shortenedCount = 0;
             for (int i = 0; i < res.length; i++) {
                 if (failed.contains(i))
@@ -213,7 +214,7 @@ public class NBTTool {
             }
         }
         if (!failed.isEmpty()) {
-            double[] shortened = new double[res.length-failed.size()];
+            double[] shortened = new double[res.length - failed.size()];
             int shortenedCount = 0;
             for (int i = 0; i < res.length; i++) {
                 if (failed.contains(i))
@@ -240,7 +241,7 @@ public class NBTTool {
             }
         }
         if (!failed.isEmpty()) {
-            Double[] shortened = new Double[res.length-failed.size()];
+            Double[] shortened = new Double[res.length - failed.size()];
             int shortenedCount = 0;
             for (int i = 0; i < res.length; i++) {
                 if (failed.contains(i))
@@ -267,7 +268,7 @@ public class NBTTool {
             }
         }
         if (!failed.isEmpty()) {
-            String[] shortened = new String[res.length-failed.size()];
+            String[] shortened = new String[res.length - failed.size()];
             int shortenedCount = 0;
             for (int i = 0; i < res.length; i++) {
                 if (failed.contains(i))
@@ -298,19 +299,19 @@ public class NBTTool {
         return res;
     }
 
-    public static <K,V> NBTTagList  serializeMap(Map<K,V> map, Function<K,NBTBase> keySerializer, Function<V,NBTBase> valueSerializer) {
+    public static <K, V> NBTTagList serializeMap(Map<K, V> map, Function<K, NBTBase> keySerializer, Function<V, NBTBase> valueSerializer) {
         NBTTagList list = new NBTTagList();
-        for (Map.Entry<K, V> entry: map.entrySet()){
+        for (Map.Entry<K, V> entry : map.entrySet()) {
             NBTTagCompound compound = new NBTTagCompound();
-            compound.setTag("key",keySerializer.apply(entry.getKey()));
-            compound.setTag("val",valueSerializer.apply(entry.getValue()));
+            compound.setTag("key", keySerializer.apply(entry.getKey()));
+            compound.setTag("val", valueSerializer.apply(entry.getValue()));
             list.appendTag(compound);
         }
         return list;
     }
 
-    public static <K,V> Map<K,V>  deserializeMap(NBTTagList list, Map<K,V> toAppendTo, Function<NBTBase,K> keyDeserializer, Function<NBTBase,V> valueDeserializer) {
-        for (NBTBase nbt: list) {
+    public static <K, V> Map<K, V> deserializeMap(NBTTagList list, Map<K, V> toAppendTo, Function<NBTBase, K> keyDeserializer, Function<NBTBase, V> valueDeserializer) {
+        for (NBTBase nbt : list) {
             if (nbt instanceof NBTTagCompound) {
                 NBTTagCompound compound = (NBTTagCompound) nbt;
                 toAppendTo.put(
@@ -321,4 +322,19 @@ public class NBTTool {
         }
         return toAppendTo;
     }
+
+    /**
+     * If the given stack has a tag, returns it. If the given stack does not have a tag, it will set a reference and return the new tag
+     * compound.
+     */
+    public static NBTTagCompound getOrNewTag(ItemStack stack) {
+        if (stack.hasTagCompound()) {
+            return stack.getTagCompound();
+        } else {
+            NBTTagCompound tag = new NBTTagCompound();
+            stack.setTagCompound(tag);
+            return tag;
+        }
+    }
+
 }

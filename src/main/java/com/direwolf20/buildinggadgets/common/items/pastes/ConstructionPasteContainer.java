@@ -1,12 +1,23 @@
 package com.direwolf20.buildinggadgets.common.items.pastes;
 
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
+import com.direwolf20.buildinggadgets.common.tools.InventoryManipulation;
+import com.direwolf20.buildinggadgets.common.tools.NBTTool;
 import net.minecraft.client.renderer.block.model.ModelBakery;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.EnumActionResult;
+import net.minecraft.util.EnumHand;
+import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+
+import javax.annotation.Nullable;
+import java.util.List;
 
 public class ConstructionPasteContainer extends GenericPasteContainer {
 
@@ -32,26 +43,37 @@ public class ConstructionPasteContainer extends GenericPasteContainer {
 
     @Override
     public void setPastes(ItemStack stack, int amount) {
-        NBTTagCompound tagCompound = stack.getTagCompound();
-        if (tagCompound == null) {
-            tagCompound = new NBTTagCompound();
-        }
-        tagCompound.setInteger("amount", amount);
-        stack.setTagCompound(tagCompound);
-
-        stack.setTagCompound(tagCompound);
+        NBTTool.getOrNewTag(stack).setInteger("amount", amount);
     }
 
     @Override
     public int getPastes(ItemStack stack) {
-        NBTTagCompound tagCompound = stack.getTagCompound();
-        int amount = 0;
-        if (tagCompound == null) {
-            setPasteAmount(stack, 0);
-            return amount;
+        if (!stack.hasTagCompound()) {
+            return 0;
         }
-        amount = tagCompound.getInteger("amount");
-        return amount;
+
+        return stack.getTagCompound().getInteger("amount");
+    }
+
+    @Override
+    public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
+        ItemStack heldItem = player.getHeldItem(hand);
+        player.setActiveHand(hand);
+        InventoryPlayer inv = player.inventory;
+        if (!world.isRemote) {
+            for (int i = 0; i < 36; ++i) {
+                ItemStack itemStack = inv.getStackInSlot(i);
+                if (itemStack.getItem() instanceof ConstructionPaste) {
+                    InventoryManipulation.addPasteToContainer(player, itemStack);
+                }
+            }
+        }
+        return new ActionResult<>(EnumActionResult.SUCCESS, heldItem);
+    }
+
+    @Override
+    public void addInformation(ItemStack stack, @Nullable World world, List<String> list, ITooltipFlag b) {
+        list.add(getAmountDisplayLocalized() + ": " + getPasteAmount(stack));
     }
 
     @Override
