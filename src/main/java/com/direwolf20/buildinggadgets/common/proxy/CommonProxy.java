@@ -32,7 +32,7 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import java.io.File;
 
 
-@Mod.EventBusSubscriber(modid = BuildingGadgets.MODID)
+@Mod.EventBusSubscriber
 public class CommonProxy {
     private boolean applyCompatConfig = false;
     public void preInit(FMLPreInitializationEvent e) {

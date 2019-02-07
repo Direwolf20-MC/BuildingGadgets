@@ -5,9 +5,9 @@ import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.common.items.FakeBuilderWorld;
 import com.direwolf20.buildinggadgets.common.items.ModItems;
-import com.direwolf20.buildinggadgets.common.items.capability.CapabilityProviderEnergy;
 import com.direwolf20.buildinggadgets.common.tools.ExchangingModes;
 import com.direwolf20.buildinggadgets.common.tools.InventoryManipulation;
+import com.direwolf20.buildinggadgets.common.tools.ToolRenders;
 import com.direwolf20.buildinggadgets.common.tools.VectorTools;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
@@ -29,7 +29,6 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldType;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.BlockSnapshot;
-import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.fml.relauncher.Side;
@@ -59,9 +58,12 @@ public class GadgetExchanger extends GadgetGeneric {
         setRegistryName("exchangertool");        // The unique name (within your mod) that identifies this item
         setUnlocalizedName(BuildingGadgets.MODID + ".exchangertool");     // Used for localization (en_US.lang)
         setMaxStackSize(1);
-        if (!SyncedConfig.poweredByFE) {
-            setMaxDamage(SyncedConfig.durabilityExchanger);
-        }
+        setMaxDamage(SyncedConfig.durabilityExchanger);
+    }
+
+    @Override
+    public int getMaxDamage(ItemStack stack) {
+        return SyncedConfig.poweredByFE?0:SyncedConfig.durabilityExchanger;
     }
 
     @Override
@@ -136,10 +138,7 @@ public class GadgetExchanger extends GadgetGeneric {
         list.add(TextFormatting.DARK_GREEN + I18n.format("tooltip.gadget.block") + ": " + getToolBlock(stack).getBlock().getLocalizedName());
         list.add(TextFormatting.AQUA + I18n.format("tooltip.gadget.mode") + ": " + getToolMode(stack));
         list.add(TextFormatting.RED + I18n.format("tooltip.gadget.range") + ": " + getToolRange(stack));
-        if (SyncedConfig.poweredByFE) {
-            IEnergyStorage energy = CapabilityProviderEnergy.getCap(stack);
-            list.add(TextFormatting.WHITE + I18n.format("tooltip.gadget.energy") + ": " + withSuffix(energy.getEnergyStored()) + "/" + withSuffix(energy.getMaxEnergyStored()));
-        }
+        addEnergyInformation(list, stack);
     }
 
     @Override
@@ -152,6 +151,8 @@ public class GadgetExchanger extends GadgetGeneric {
             } else {
                 exchange(player, itemstack);
             }
+        } else if (!player.isSneaking()) {
+            ToolRenders.updateCache();
         }
         return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, itemstack);
     }

@@ -7,7 +7,6 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
 import com.direwolf20.buildinggadgets.client.events.EventTooltip;
-import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
 import com.direwolf20.buildinggadgets.common.tools.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.tools.InventoryManipulation;
 import com.direwolf20.buildinggadgets.common.tools.ToolRenders;
@@ -89,7 +88,7 @@ public class PacketSetRemoteInventoryCache implements IMessage {
                     EntityPlayerMP player = ctx.getServerHandler().player;
                     Set<UniqueItem> itemTypes = new HashSet<>();
                     ImmutableMultiset.Builder<UniqueItem> builder = ImmutableMultiset.builder();
-                    IItemHandler remoteInventory = GadgetUtils.getBoundRemoteInventory(GadgetGeneric.getGadget(player), player.world);
+                    IItemHandler remoteInventory = GadgetUtils.getRemoteInventory(message.loc.getRight(), message.loc.getLeft(), player.world);
                     if (remoteInventory != null) {
                         for (int i = 0; i < remoteInventory.getSlots(); i++) {
                             ItemStack stack = remoteInventory.getStackInSlot(i);

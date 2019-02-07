@@ -35,18 +35,21 @@ public class Config {
     @LangKey(LANG_KEY_ROOT+".rayTraceRange")
     public static double rayTraceRange = 32;
 
+    @RequiresWorldRestart
     @Name("Powered by Forge Energy")
     @Comment("Set to true for Forge Energy Support, set to False for vanilla Item Damage")
     @LangKey(LANG_KEY_ROOT+".poweredByFE")
     public static boolean poweredByFE = true;
 
     @RequiresMcRestart
+    @RequiresWorldRestart
     @Name("Enable Construction Paste")
     @Comment("Set to false to disable the recipe for construction paste.")
     @LangKey(LANG_KEY_ROOT+".enablePaste")
     public static boolean enablePaste = true;
 
     @RequiresMcRestart
+    @RequiresWorldRestart
     @Name("Enable Destruction Gadget")
     @Comment("Set to false to disable the Destruction Gadget.")
     @LangKey(LANG_KEY_ROOT+".enableDestructionGadget")

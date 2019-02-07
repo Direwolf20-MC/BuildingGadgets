@@ -6,9 +6,9 @@ import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.common.items.FakeBuilderWorld;
 import com.direwolf20.buildinggadgets.common.items.ModItems;
-import com.direwolf20.buildinggadgets.common.items.capability.CapabilityProviderEnergy;
 import com.direwolf20.buildinggadgets.common.tools.BuildingModes;
 import com.direwolf20.buildinggadgets.common.tools.InventoryManipulation;
+import com.direwolf20.buildinggadgets.common.tools.ToolRenders;
 import com.direwolf20.buildinggadgets.common.tools.UndoState;
 import com.direwolf20.buildinggadgets.common.tools.VectorTools;
 import net.minecraft.block.state.IBlockState;
@@ -30,7 +30,6 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldType;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.BlockSnapshot;
-import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.world.BlockEvent;
 
@@ -59,9 +58,12 @@ public class GadgetBuilding extends GadgetGeneric {
         setRegistryName("buildingtool");        // The unique name (within your mod) that identifies this item
         setUnlocalizedName(BuildingGadgets.MODID + ".buildingtool");     // Used for localization (en_US.lang)
         setMaxStackSize(1);
-        if (!SyncedConfig.poweredByFE) {
-            setMaxDamage(SyncedConfig.durabilityBuilder);
-        }
+        setMaxDamage(SyncedConfig.durabilityBuilder);
+    }
+
+    @Override
+    public int getMaxDamage(ItemStack stack) {
+        return SyncedConfig.poweredByFE?0:SyncedConfig.durabilityBuilder;
     }
 
     @Override
@@ -108,10 +110,7 @@ public class GadgetBuilding extends GadgetGeneric {
         if (getToolMode(stack) != ToolMode.BuildToMe) {
             list.add(TextFormatting.RED + I18n.format("tooltip.gadget.range") + ": " + getToolRange(stack));
         }
-        if (SyncedConfig.poweredByFE) {
-            IEnergyStorage energy = CapabilityProviderEnergy.getCap(stack);
-            list.add(TextFormatting.WHITE + I18n.format("tooltip.gadget.energy") + ": " + withSuffix(energy.getEnergyStored()) + "/" + withSuffix(energy.getMaxEnergyStored()));
-        }
+        addEnergyInformation(list, stack);
     }
 
     @Override
@@ -129,6 +128,8 @@ public class GadgetBuilding extends GadgetGeneric {
             } else {
                 build(player, itemstack);
             }
+        } else if (!player.isSneaking()) {
+            ToolRenders.updateCache();
         }
         return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, itemstack);
     }

@@ -33,15 +33,11 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.BlockSnapshot;
-import net.minecraftforge.energy.CapabilityEnergy;
-import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.world.BlockEvent;
 
 import javax.annotation.Nullable;
 import java.util.*;
-
-import static com.direwolf20.buildinggadgets.common.tools.GadgetUtils.withSuffix;
 
 public class GadgetDestruction extends GadgetGeneric {
 
@@ -49,9 +45,12 @@ public class GadgetDestruction extends GadgetGeneric {
         setRegistryName("destructiontool");        // The unique name (within your mod) that identifies this item
         setUnlocalizedName(BuildingGadgets.MODID + ".destructiontool");     // Used for localization (en_US.lang)
         setMaxStackSize(1);
-        if (!SyncedConfig.poweredByFE) {
-            setMaxDamage(SyncedConfig.durabilityDestruction);
-        }
+        setMaxDamage(SyncedConfig.durabilityDestruction);
+    }
+
+    @Override
+    public int getMaxDamage(ItemStack stack) {
+        return SyncedConfig.poweredByFE?0:SyncedConfig.durabilityDestruction;
     }
 
     @Override
@@ -74,11 +73,7 @@ public class GadgetDestruction extends GadgetGeneric {
         super.addInformation(stack, world, list, b);
         list.add(TextFormatting.RED + I18n.format("tooltip.gadget.destroywarning"));
         list.add(TextFormatting.AQUA + I18n.format("tooltip.gadget.destroyshowoverlay") + ": " + getOverlay(stack));
-        if (SyncedConfig.poweredByFE) {
-            IEnergyStorage energy = stack.getCapability(CapabilityEnergy.ENERGY, null);
-            if (energy != null)
-                list.add(TextFormatting.WHITE + I18n.format("tooltip.gadget.energy") + ": " + withSuffix(energy.getEnergyStored()) + "/" + withSuffix(energy.getMaxEnergyStored()));
-        }
+        addEnergyInformation(list,stack);
     }
 
     @Nullable

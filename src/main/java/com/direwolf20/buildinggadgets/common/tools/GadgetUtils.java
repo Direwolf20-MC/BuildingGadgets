@@ -4,8 +4,12 @@ import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetBuilding;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetExchanger;
+import com.direwolf20.buildinggadgets.common.tools.NetworkExtractor.NetworkExtractorRS;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
+import com.raoulvdberge.refinedstorage.api.network.INetwork;
+import com.raoulvdberge.refinedstorage.api.network.node.INetworkNodeProxy;
+
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
@@ -277,7 +281,7 @@ public class GadgetUtils {
             setToolActualBlock(stack, ((ConstructionBlockTileEntity) te).getActualBlockState());
             return EnumActionResult.SUCCESS;
         }
-        if (setBoundTE(stack, pos, world.provider.getDimension(), world)) {
+        if (setRemoteInventory(stack, pos, world.provider.getDimension(), world)) {
             player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.boundTE").getUnformattedComponentText()), true);
             return EnumActionResult.SUCCESS;
         }
@@ -313,28 +317,37 @@ public class GadgetUtils {
         return true;
     }
 
-    public static boolean setBoundTE(ItemStack tool, @Nullable BlockPos pos, int dim, World world) {
-        TileEntity te = world.getTileEntity(pos);
-        if (te == null) return false;
-        IItemHandler cap = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
-        if (cap == null) return false;
-        writePOSToNBT(tool, pos, "boundTE", dim);
-        return true;
+    public static boolean setRemoteInventory(ItemStack tool, @Nullable BlockPos pos, int dim, World world) {
+        if (getRemoteInventory(pos, dim, world) != null) {
+            writePOSToNBT(tool, pos, "boundTE", dim);
+            return true;
+        }
+        return false;
     }
 
-    public static IItemHandler getBoundRemoteInventory(ItemStack tool, World world) {
+    @Nullable
+    public static IItemHandler getRemoteInventory(ItemStack tool, World world) {
         Integer dim = getDIMFromNBT(tool, "boundTE");
         if (dim == null) return null;
+        BlockPos pos = getPOSFromNBT(tool, "boundTE");
+        return pos == null ? null : getRemoteInventory(pos, dim, world);
+    }
+
+    @Nullable
+    public static IItemHandler getRemoteInventory(BlockPos pos, int dim, World world) {
         MinecraftServer server = world.getMinecraftServer();
         if (server == null) return null;
         World worldServer = server.getWorld(dim);
         if (worldServer == null) return null;
-        BlockPos pos = getPOSFromNBT(tool, "boundTE");
-        if (pos == null) return null;
-        TileEntity te = worldServer.getTileEntity(pos);
+        TileEntity te = world.getTileEntity(pos);
         if (te == null) return null;
+        if (te instanceof INetworkNodeProxy) {
+            INetwork network = ((INetworkNodeProxy) te).getNode().getNetwork();
+            if (network != null)
+                return new NetworkExtractorRS(network);
+        }
         IItemHandler cap = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
-        return cap == null ? null : cap;
+        return cap != null ? cap : null;
     }
 
     public static String withSuffix(int count) {

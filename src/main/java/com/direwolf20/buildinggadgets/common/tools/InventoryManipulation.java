@@ -1,12 +1,11 @@
 package com.direwolf20.buildinggadgets.common.tools;
 
-import com.direwolf20.buildinggadgets.common.items.pastes.ConstructionPaste;
-import com.direwolf20.buildinggadgets.common.items.pastes.GenericPasteContainer;
 import com.direwolf20.buildinggadgets.common.items.ModItems;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
+import com.direwolf20.buildinggadgets.common.items.pastes.ConstructionPaste;
+import com.direwolf20.buildinggadgets.common.items.pastes.GenericPasteContainer;
 import com.google.common.collect.ImmutableSet;
-
 import net.minecraft.block.*;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyEnum;
@@ -28,7 +27,8 @@ import java.util.*;
 public class InventoryManipulation {
     private static IProperty AXIS = PropertyEnum.create("axis", EnumFacing.Axis.class);
     private static final Set<IProperty> SAFE_PROPERTIES = ImmutableSet.of(BlockSlab.HALF, BlockStairs.HALF, BlockLog.LOG_AXIS, AXIS, BlockDirectional.FACING,
-            BlockStairs.FACING, BlockTrapDoor.HALF, BlockTorch.FACING, BlockStairs.SHAPE, BlockLever.FACING, BlockLever.POWERED, BlockRedstoneRepeater.DELAY);
+            BlockStairs.FACING, BlockTrapDoor.HALF, BlockTorch.FACING, BlockStairs.SHAPE, BlockLever.FACING, BlockLever.POWERED, BlockRedstoneRepeater.DELAY,
+            BlockStoneSlab.VARIANT, BlockWoodSlab.VARIANT, BlockDoubleWoodSlab.VARIANT, BlockDoubleStoneSlab.VARIANT);
 
     private static final Set<IProperty> SAFE_PROPERTIES_COPY_PASTE = ImmutableSet.<IProperty>builder().addAll(SAFE_PROPERTIES)
             .addAll(ImmutableSet.of(BlockDoubleWoodSlab.VARIANT, BlockRail.SHAPE, BlockRailPowered.SHAPE)).build();
@@ -70,7 +70,7 @@ public class InventoryManipulation {
         }
 
         ItemStack tool = GadgetGeneric.getGadget(player);
-        IItemHandler remoteInventory = GadgetUtils.getBoundRemoteInventory(tool, world);
+        IItemHandler remoteInventory = GadgetUtils.getRemoteInventory(tool, world);
         if (remoteInventory != null) {
             for (int i = 0; i < remoteInventory.getSlots(); i++) {
                 ItemStack containerItem = remoteInventory.getStackInSlot(i);
@@ -116,7 +116,7 @@ public class InventoryManipulation {
 
     public static int countItem(ItemStack itemStack, EntityPlayer player, World world) {
         return countItem(itemStack, player, (tool, stack) -> {
-            IItemHandler remoteInventory = GadgetUtils.getBoundRemoteInventory(tool, world);
+            IItemHandler remoteInventory = GadgetUtils.getRemoteInventory(tool, world);
             return remoteInventory == null ? 0 : countInContainer(remoteInventory, stack.getItem(), stack.getMetadata());
         });
     }

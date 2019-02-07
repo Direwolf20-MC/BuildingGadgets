@@ -9,14 +9,11 @@ import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.common.items.ITemplate;
 import com.direwolf20.buildinggadgets.common.items.ModItems;
-import com.direwolf20.buildinggadgets.common.items.capability.CapabilityProviderEnergy;
 import com.direwolf20.buildinggadgets.common.network.PacketBlockMap;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.tools.*;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
@@ -40,16 +37,11 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.BlockSnapshot;
-import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.world.BlockEvent;
-import net.minecraftforge.items.CapabilityItemHandler;
-import net.minecraftforge.items.IItemHandler;
 
 import javax.annotation.Nullable;
 import java.util.*;
-
-import static com.direwolf20.buildinggadgets.common.tools.GadgetUtils.withSuffix;
 
 public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
 
@@ -66,9 +58,12 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
         setRegistryName("copypastetool");        // The unique name (within your mod) that identifies this item
         setUnlocalizedName(BuildingGadgets.MODID + ".copypastetool");     // Used for localization (en_US.lang)
         setMaxStackSize(1);
-        if (!SyncedConfig.poweredByFE) {
-            setMaxDamage(SyncedConfig.durabilityCopyPaste);
-        }
+        setMaxDamage(SyncedConfig.durabilityCopyPaste);
+    }
+
+    @Override
+    public int getMaxDamage(ItemStack stack) {
+        return SyncedConfig.poweredByFE?0:SyncedConfig.durabilityCopyPaste;
     }
 
     @Override
@@ -236,10 +231,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
     public void addInformation(ItemStack stack, @Nullable World world, List<String> list, ITooltipFlag b) {
         super.addInformation(stack, world, list, b);
         list.add(TextFormatting.AQUA + I18n.format("tooltip.gadget.mode") + ": " + getToolMode(stack));
-        if (SyncedConfig.poweredByFE) {
-            IEnergyStorage energy = CapabilityProviderEnergy.getCap(stack);
-            list.add(TextFormatting.WHITE + I18n.format("tooltip.gadget.energy") + ": " + withSuffix(energy.getEnergyStored()) + "/" + withSuffix(energy.getMaxEnergyStored()));
-        }
+        addEnergyInformation(list, stack);
         EventTooltip.addTemplatePadding(stack, list);
     }
 
@@ -290,8 +282,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
             }
         } else {
             if (pos != null && player.isSneaking()) {
-                TileEntity te = world.getTileEntity(pos);
-                if (te != null && te.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null))
+                if (GadgetUtils.getRemoteInventory(stack, world) != null)
                     return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);
             }
             if (getToolMode(stack) == ToolMode.Copy) {
@@ -299,6 +290,8 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
                     player.openGui(BuildingGadgets.instance, GuiProxy.CopyPasteID, world, hand.ordinal(), 0, 0);
             } else if (player.isSneaking()) {
                 player.openGui(BuildingGadgets.instance, GuiProxy.PasteID, world, hand.ordinal(), 0, 0);
+            } else {
+                ToolRenders.updateCache();
             }
         }
         return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);
