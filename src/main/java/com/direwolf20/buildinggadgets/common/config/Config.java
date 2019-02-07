@@ -124,13 +124,11 @@ public class Config {
 
             @RangeInt(min = 0, max = 100000)
             @Name("Energy Cost")
-            @Comment("The energy cost of the Builder per block")
             @LangKey(LANG_KEY_GADGETS+".energyCost")
             public int energyCostBuilder = 50;
 
             @RangeInt(min = 0, max = 100000)
             @Name("Durability")
-            @Comment("The max durability of the Builder (Ignored if powered by FE)")
             @LangKey(LANG_KEY_GADGETS+".durability")
             public int durabilityBuilder = 500;
         }
@@ -140,13 +138,11 @@ public class Config {
 
             @RangeInt(min = 0, max = 100000)
             @Name("Energy Cost")
-            @Comment("The energy cost of the Exchanger per block")
             @LangKey(LANG_KEY_GADGETS+".energyCost")
             public int energyCostExchanger = 100;
 
             @RangeInt(min = 0, max = 100000)
             @Name("Durability")
-            @Comment("The max durability of the Exchanger (Ignored if powered by FE)")
             @LangKey(LANG_KEY_GADGETS+".durability")
             public int durabilityExchanger = 500;
         }
@@ -161,13 +157,11 @@ public class Config {
 
             @RangeInt(min = 0, max = 100000)
             @Name("Energy Cost")
-            @Comment("The energy cost of the Destruction Gadget per block")
             @LangKey(LANG_KEY_GADGETS+".energyCost")
             public int energyCostDestruction = 200;
 
             @RangeInt(min = 0, max = 100000)
             @Name("Durability")
-            @Comment("The max durability of the Destruction Gadget (Ignored if powered by FE)")
             @LangKey(LANG_KEY_GADGETS+".durability")
             public int durabilityDestruction = 500;
         }
@@ -177,13 +171,11 @@ public class Config {
 
             @RangeInt(min = 0, max = 100000)
             @Name("Energy Cost")
-            @Comment("The Energy Use of the Copy Paste Gadget")
             @LangKey(LANG_KEY_GADGETS+".energyCost")
             public int energyCostCopyPaste = 50;
 
             @RangeInt(min = 0, max = 100000)
             @Name("Durability")
-            @Comment("The max durability of the Copy & Paste Gadget (Ignored if powered by FE)")
             @LangKey(LANG_KEY_GADGETS+".durability")
             public int durabilityCopyPaste = 500;
         }
