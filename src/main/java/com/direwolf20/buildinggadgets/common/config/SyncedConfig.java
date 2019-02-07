@@ -130,9 +130,9 @@ public class SyncedConfig {
         transferValues();
         NBTTagList list = new NBTTagList();
         List<Field> fields = Collections.unmodifiableList(getSyncFields());
-        for (Field field: fields) {
+        for (Field field : fields) {
             NBTTagCompound compound = parseField(field);
-            if (compound!=null) list.appendTag(compound);
+            if (compound != null) list.appendTag(compound);
         }
         NBTTagCompound compound = new NBTTagCompound(); //ByteBufUtil requires TagCompounds...
         compound.setTag(KEY_VALUE,list);
@@ -150,15 +150,15 @@ public class SyncedConfig {
             return;
         NBTTagList list = (NBTTagList) compound.getTag(KEY_VALUE);
         List<Field> fields = getSyncFields();
-        Map<String,Field> map = new HashMap<>();
-        for (Field f: fields) {
-            map.put(getSyncName(f),f);
+        Map<String, Field> map = new HashMap<>();
+        for (Field f : fields) {
+            map.put(getSyncName(f), f);
         }
-        for (NBTBase rawNBT: list) {
+        for (NBTBase rawNBT : list) {
             if (rawNBT instanceof NBTTagCompound) {
-                handleNBT((NBTTagCompound) rawNBT,map);
+                handleNBT((NBTTagCompound) rawNBT, map);
             } else {
-                BuildingGadgets.logger.warn("Unexpected "+rawNBT.getClass().getName()+" found in NBTTagList which was expected to only contain NBTTagCompounds!");
+                BuildingGadgets.logger.warn("Unexpected " + rawNBT.getClass().getName() + " found in NBTTagList which was expected to only contain NBTTagCompounds!");
             }
         }
     }
@@ -169,8 +169,8 @@ public class SyncedConfig {
 
     private static NBTTagCompound parseField(Field field) {
         NBTBase valueTag = FieldSerializer.parseFieldValue(field,getMapperIdFor(field));
-        if (valueTag==null) {
-            BuildingGadgets.logger.warn("Could not use type of Field "+field.getName()+"!"+" Found type "+field.getType().getName()+"!");
+        if (valueTag == null) {
+            BuildingGadgets.logger.warn("Could not use type of Field " + field.getName() + "!" + " Found type " + field.getType().getName() + "!");
             return null;
         }
         String name = getSyncName(field);
@@ -180,7 +180,7 @@ public class SyncedConfig {
         return compound;
     }
 
-    private static void handleNBT(NBTTagCompound compound, Map<String,Field> fields) {
+    private static void handleNBT(NBTTagCompound compound, Map<String, Field> fields) {
         if (!compound.hasKey(KEY_NAME) || !compound.hasKey(KEY_VALUE)) {
             BuildingGadgets.logger.warn("Tried to read synchronisation from an inproperly initialised NBTTagCompound!");
             return;
@@ -192,7 +192,7 @@ public class SyncedConfig {
             return;
         }
         Field field = fields.get(name);
-        FieldSerializer.applyValue(rawValue,field,getMapperIdFor(field));
+        FieldSerializer.applyValue(rawValue, field,getMapperIdFor(field));
     }
 
     private static List<Field> getSyncFields() {
@@ -201,7 +201,7 @@ public class SyncedConfig {
 
     private static String getSyncName(Field field) {
         String name = field.getAnnotation(AutoSync.class).value();
-        return name.isEmpty()?field.getName():name;
+        return name.isEmpty() ? field.getName() : name;
     }
 
     static {

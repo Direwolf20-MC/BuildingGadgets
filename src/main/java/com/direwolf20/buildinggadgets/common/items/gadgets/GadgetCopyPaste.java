@@ -63,7 +63,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
 
     @Override
     public int getMaxDamage(ItemStack stack) {
-        return SyncedConfig.poweredByFE?0:SyncedConfig.durabilityCopyPaste;
+        return SyncedConfig.poweredByFE ? 0 : SyncedConfig.durabilityCopyPaste;
     }
 
     @Override

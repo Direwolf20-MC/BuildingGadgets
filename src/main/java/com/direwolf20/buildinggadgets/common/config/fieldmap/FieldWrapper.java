@@ -12,7 +12,7 @@ import java.lang.reflect.Field;
 public final class FieldWrapper {
     private final Object instance;
     private final Field field;
-    private final FieldMapper<Object,Object> mapper;
+    private final FieldMapper<Object, Object> mapper;
     private Object val;
 
     /**
@@ -20,8 +20,8 @@ public final class FieldWrapper {
      * This constructs a FieldWrapper under the assumption, that the given FieldMapper applies to the given field.
      * Do not construct otherwise, as hard to trace ClassCastExceptions will be the result!
      */
-    public FieldWrapper(@Nonnull Field field, @Nonnull FieldMapper<?,?> mapper) {
-        this(field,mapper,null);
+    public FieldWrapper(@Nonnull Field field, @Nonnull FieldMapper<?, ?> mapper) {
+        this(field, mapper, null);
     }
     /**
      * <b>WARNING: USING THIS IS DANGEROUS!</b>
@@ -30,11 +30,11 @@ public final class FieldWrapper {
      */
     @SuppressWarnings("unchecked")
     public FieldWrapper(@Nonnull Field field, @Nonnull FieldMapper<?, ?> mapper, @Nullable Object instance) {
-        Preconditions.checkArgument(ReflectionTool.isInstanceProvidedForField(field,instance),
+        Preconditions.checkArgument(ReflectionTool.isInstanceProvidedForField(field, instance),
                 "Non Static fields must be accessed with an instance! Static fields without! Also watch out for incompatible classes! ");
         this.instance = instance;
         this.field = field;
-        this.mapper = (FieldMapper<Object,Object>)mapper;
+        this.mapper = (FieldMapper<Object, Object>) mapper;
         this.val = null;
     }
 
@@ -43,7 +43,7 @@ public final class FieldWrapper {
      * @see Field#get(Object)
      */
     public Object get() throws IllegalAccessException{
-        if (val == null)  val = mapper.mapToSync(field.get(instance));
+        if (val == null) val = mapper.mapToSync(field.get(instance));
         return val;
     }
     /**
@@ -51,7 +51,7 @@ public final class FieldWrapper {
      * @see Field#set(Object, Object)
      */
     public void set(Object val) throws IllegalAccessException{
-        field.set(instance,mapper.mapToField(val));
+        field.set(instance, mapper.mapToField(val));
     }
 
     /**

@@ -17,7 +17,7 @@ public final class ConfigEventHandler {
     @SubscribeEvent
     public static void onPlayerLogin(PlayerLoggedInEvent event) {
         if (event.player instanceof EntityPlayerMP) {
-            BuildingGadgets.logger.info("Sending SyncedConfig to freshly logged in player {}.",event.player.getName());
+            BuildingGadgets.logger.info("Sending SyncedConfig to freshly logged in player {}.", event.player.getName());
             SyncedConfig.sendConfigUpdateTo((EntityPlayerMP) event.player);
         }
     }
