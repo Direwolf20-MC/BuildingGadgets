@@ -11,7 +11,6 @@ import java.io.File;
 public class CompatConfig {
     private static final String CATEGORY_GENERAL = "general";
     private static final String CATEGORY_BLACKLIST = "blockBlacklist";
-
     private static int maxRange = 15;
     private static int energyCostBuilder = 50;
     private static int energyCostExchanger = 100;

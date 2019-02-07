@@ -13,6 +13,7 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
+import net.minecraftforge.fml.common.versioning.ComparableVersion;
 import org.apache.logging.log4j.Logger;
 
 
@@ -23,6 +24,7 @@ public class BuildingGadgets {
     public static final String VERSION = "@VERSION@";
     public static final String UPDATE_JSON = "@UPDATE@";
     public static final String DEPENDENCIES = "required-after:forge@[14.23.3.2694,)";
+    public static final ComparableVersion COMPARABLE_VERSION = new ComparableVersion(VERSION);
 
     public static final CreativeTabs BUILDING_CREATIVE_TAB = new CreativeTabs(new TextComponentTranslation("buildingGadgets").getUnformattedComponentText()) {
         @Override
