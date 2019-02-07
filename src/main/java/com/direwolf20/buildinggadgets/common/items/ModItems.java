@@ -22,10 +22,10 @@ public class ModItems {
     public static ConstructionPasteContainer constructionPasteContainer;
 
     @GameRegistry.ObjectHolder("constructionpastecontainert2")
-    public static ConstructionPasteContainerT2 constructionPasteContainert2;
+    public static ConstructionPasteContainer constructionPasteContainert2;
 
     @GameRegistry.ObjectHolder("constructionpastecontainert3")
-    public static ConstructionPasteContainerT3 constructionPasteContainert3;
+    public static ConstructionPasteContainer constructionPasteContainert3;
 
     @GameRegistry.ObjectHolder("copypastetool")
     public static GadgetCopyPaste gadgetCopyPaste;

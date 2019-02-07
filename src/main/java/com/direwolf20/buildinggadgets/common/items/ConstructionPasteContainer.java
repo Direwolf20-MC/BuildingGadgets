@@ -8,11 +8,12 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class ConstructionPasteContainer extends GenericPasteContainer {
 
-    public static int maxAmount = 512;
+    public int maxAmount;
 
-    public ConstructionPasteContainer() {
-        setRegistryName("constructionpastecontainer");        // The unique name (within your mod) that identifies this item
-        setUnlocalizedName(BuildingGadgets.MODID + ".constructionpastecontainer");     // Used for localization (en_US.lang)
+    public ConstructionPasteContainer(String suffix, int maxAmount) {
+        this.maxAmount = maxAmount;
+        setRegistryName("constructionpastecontainer" + suffix);        // The unique name (within your mod) that identifies this item
+        setUnlocalizedName(BuildingGadgets.MODID + ".constructionpastecontainer" + suffix);     // Used for localization (en_US.lang)
         setMaxStackSize(1);
     }
 
