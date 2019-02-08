@@ -42,47 +42,26 @@ public class ModeRadialMenu extends GuiScreen {
 
     private int timeIn = 0;
     private int slotSelected = -1;
-
-    //  ItemStack itemStack;
-    private List<Integer> slots;
+    private int segments;
 
     public ModeRadialMenu(ItemStack stack) {
         mc = Minecraft.getMinecraft();
-
-//        itemStack = ItemStack.EMPTY;
-        if (stack.getItem() instanceof GadgetBuilding) {
+        if (stack.getItem() instanceof GadgetGeneric)
             setSocketable(stack);
-        } else if (stack.getItem() instanceof GadgetExchanger) {
-            setSocketable(stack);
-        } else if (stack.getItem() instanceof GadgetCopyPaste) {
-            setSocketable(stack);
-        } else if (stack.getItem() instanceof GadgetDestruction) {
-            setSocketable(stack);
-        }
     }
 
     public void setSocketable(ItemStack stack) {
-        slots = new ArrayList<>();
-        if (stack.isEmpty())
-            return;
-//        itemStack = stack;
-        if (stack.getItem() instanceof GadgetBuilding) {
-            for (int i = 0; i < GadgetBuilding.ToolMode.values().length; i++)
-                slots.add(i);
-        } else if (stack.getItem() instanceof GadgetExchanger) {
-            for (int i = 0; i < GadgetExchanger.ToolMode.values().length; i++)
-                slots.add(i);
-        } else if (stack.getItem() instanceof GadgetCopyPaste) {
-            for (int i = 0; i < GadgetCopyPaste.ToolMode.values().length; i++)
-                slots.add(i);
-        } else if (stack.getItem() instanceof GadgetDestruction) {
-
-        }
+        if (stack.getItem() instanceof GadgetBuilding)
+            segments = GadgetBuilding.ToolMode.values().length;
+        else if (stack.getItem() instanceof GadgetExchanger)
+            segments = GadgetExchanger.ToolMode.values().length;
+        else if (stack.getItem() instanceof GadgetCopyPaste)
+            segments = GadgetCopyPaste.ToolMode.values().length;
     }
 
     @Override
     public void drawScreen(int mx, int my, float partialTicks) {
-        if (slots.equals(new ArrayList())) return;
+        if (segments == 0) return;
         super.drawScreen(mx, my, partialTicks);
 
         GlStateManager.pushMatrix();
@@ -99,7 +78,6 @@ public class ModeRadialMenu extends GuiScreen {
 
         GlStateManager.enableBlend();
         GlStateManager.shadeModel(GL11.GL_SMOOTH);
-        int segments = slots.size();
         float totalDeg = 0;
         float degPer = 360F / segments;
 
@@ -140,7 +118,7 @@ public class ModeRadialMenu extends GuiScreen {
                 double xp = x + Math.cos(rad) * radius;
                 double yp = y + Math.sin(rad) * radius;
                 if ((int) i == (int) (degPer / 2))
-                    stringPositions.add(new int[]{seg, (int) xp, (int) yp, mouseInSector ? 'n' : 'r'});
+                    stringPositions.add(new int[]{(int) xp, (int) yp, mouseInSector ? 'n' : 'r'});
 
                 GL11.glVertex2d(xp, yp);
             }
@@ -155,23 +133,19 @@ public class ModeRadialMenu extends GuiScreen {
         GlStateManager.shadeModel(GL11.GL_FLAT);
         GlStateManager.enableTexture2D();
 
-        for (int[] pos : stringPositions) {
-            int slot = slots.get(pos[0]);
-            int xp = pos[1];
-            int yp = pos[2];
-            char c = (char) pos[3];
+        for (int i = 0; i < stringPositions.size(); i++) {
+            int[] pos = stringPositions.get(i);
+            int xp = pos[0];
+            int yp = pos[1];
+            char c = (char) pos[2];
 
             String name = "";
-            if (tool.getItem() instanceof GadgetBuilding) {
-                GadgetBuilding.ToolMode mode = GadgetBuilding.ToolMode.values()[slot];
-                name = "\u00a7" + c + mode.name();
-            } else if (tool.getItem() instanceof GadgetExchanger) {
-                GadgetExchanger.ToolMode mode = GadgetExchanger.ToolMode.values()[slot];
-                name = "\u00a7" + c + mode.name();
-            } else if (tool.getItem() instanceof GadgetCopyPaste) {
-                GadgetCopyPaste.ToolMode mode = GadgetCopyPaste.ToolMode.values()[slot];
-                name = "\u00a7" + c + mode.name();
-            }
+            if (tool.getItem() instanceof GadgetBuilding)
+                name = "\u00a7" + c + GadgetBuilding.ToolMode.values()[i].name();
+            else if (tool.getItem() instanceof GadgetExchanger)
+                name = "\u00a7" + c + GadgetExchanger.ToolMode.values()[i].name();
+            else if (tool.getItem() instanceof GadgetCopyPaste)
+                name = "\u00a7" + c + GadgetCopyPaste.ToolMode.values()[i].name();
 
             int xsp = xp - 4;
             int ysp = yp;
@@ -192,7 +166,7 @@ public class ModeRadialMenu extends GuiScreen {
             xdp = (int) ((xp - x) * mod + x);
             ydp = (int) ((yp - y) * mod + y);
 
-            mc.renderEngine.bindTexture(signs[slot]);
+            mc.renderEngine.bindTexture(signs[i]);
             drawModalRectWithCustomSizedTexture(xdp - 8, ydp - 8, 0, 0, 16, 16, 16, 16);
 
         }
