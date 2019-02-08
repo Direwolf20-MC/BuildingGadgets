@@ -87,9 +87,9 @@ public class Config {
     @LangKey(LANG_KEY_GADGETS)
     public static CategoryGadgets subCategoryGadgets = new CategoryGadgets();
 
-    @Name("PasteContainers")
+    @Name("Paste Containers")
     @Comment("Configure the Paste Containers here")
-    @LangKey(LANG_KEY_GADGETS)
+    @LangKey(LANG_KEY_PASTE_CONTAINERS)
     public static CategoryPasteContainers subCategoryPasteContainers = new CategoryPasteContainers();
 
     //using unistantiable final class instead of enum, so that it doesn't cause issues with the ConfigManger trying to access the Instance field
@@ -207,19 +207,19 @@ public class Config {
         @RangeInt(min = 1)
         @Comment("The maximum capacity of a tier 1 (iron) Construction Paste Container")
         @Name("T1 Container Capacity")
-        @LangKey(LANG_KEY_PASTE_CONTAINERS_CAPACITY)
+        @LangKey(LANG_KEY_PASTE_CONTAINERS_CAPACITY + ".t1")
         public int t1Capacity = 512;
 
         @RangeInt(min = 1)
         @Comment("The maximum capacity of a tier 2 (gold) Construction Paste Container")
         @Name("T2 Container Capacity")
-        @LangKey(LANG_KEY_PASTE_CONTAINERS_CAPACITY)
+        @LangKey(LANG_KEY_PASTE_CONTAINERS_CAPACITY + ".t2")
         public int t2Capacity = 2048;
 
         @RangeInt(min = 1)
         @Comment("The maximum capacity of a tier 3 (diamond) Construction Paste Container")
         @Name("T3 Container Capacity")
-        @LangKey(LANG_KEY_PASTE_CONTAINERS_CAPACITY)
+        @LangKey(LANG_KEY_PASTE_CONTAINERS_CAPACITY + ".t3")
         public int t3Capacity = 8192;
     }
 

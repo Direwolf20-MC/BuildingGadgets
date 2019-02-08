@@ -34,16 +34,16 @@ public class ConstructionPasteContainerCreative extends GenericPasteContainer {
     }
 
     @Override
-    public void setPastes(ItemStack stack, int amount) {
+    public void setPasteCount(ItemStack stack, int amount) {
     }
 
     @Override
-    public int getPastes(ItemStack stack) {
+    public int getPasteCount(ItemStack stack) {
         return Integer.MAX_VALUE;
     }
 
     @Override
-    public int getMaxAmount() {
+    public int getMaxCapacity() {
         return Integer.MAX_VALUE;
     }
 

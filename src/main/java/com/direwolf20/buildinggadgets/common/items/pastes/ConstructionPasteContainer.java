@@ -18,17 +18,17 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.function.IntSupplier;
 
 public class ConstructionPasteContainer extends GenericPasteContainer {
 
-    public int maxAmount;
+    private IntSupplier maxCapacity;
 
-    public ConstructionPasteContainer(String suffix, int maxAmount) {
-        this.maxAmount = maxAmount;
+    public ConstructionPasteContainer(String suffix, IntSupplier maxCapacity) {
+        this.maxCapacity = maxCapacity;
 
-        String name = "constructionpastecontainer" + suffix;
-        setRegistryName(name);
-        setUnlocalizedName(BuildingGadgets.MODID + name);
+        setRegistryName("constructionpastecontainer" + suffix);
+        setUnlocalizedName(BuildingGadgets.MODID + ".constructionpastecontainer" + suffix);
     }
 
     @SideOnly(Side.CLIENT)
@@ -42,12 +42,12 @@ public class ConstructionPasteContainer extends GenericPasteContainer {
     }
 
     @Override
-    public void setPastes(ItemStack stack, int amount) {
+    public void setPasteCount(ItemStack stack, int amount) {
         NBTTool.getOrNewTag(stack).setInteger("amount", amount);
     }
 
     @Override
-    public int getPastes(ItemStack stack) {
+    public int getPasteCount(ItemStack stack) {
         if (!stack.hasTagCompound()) {
             return 0;
         }
@@ -77,8 +77,8 @@ public class ConstructionPasteContainer extends GenericPasteContainer {
     }
 
     @Override
-    public int getMaxAmount() {
-        return maxAmount;
+    public int getMaxCapacity() {
+        return maxCapacity.getAsInt();
     }
 
 }

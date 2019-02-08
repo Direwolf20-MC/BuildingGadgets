@@ -330,11 +330,10 @@ public class NBTTool {
     public static NBTTagCompound getOrNewTag(ItemStack stack) {
         if (stack.hasTagCompound()) {
             return stack.getTagCompound();
-        } else {
-            NBTTagCompound tag = new NBTTagCompound();
-            stack.setTagCompound(tag);
-            return tag;
         }
+        NBTTagCompound tag = new NBTTagCompound();
+        stack.setTagCompound(tag);
+        return tag;
     }
 
 }
