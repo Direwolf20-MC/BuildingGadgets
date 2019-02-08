@@ -16,7 +16,7 @@ public class Config {
 
     private static final String LANG_KEY_GADGETS = LANG_KEY_ROOT + ".subCategoryGadgets";
 
-    private static final String LANG_KEY_PASTE_CONTAINERS = LANG_KEY_GADGETS+".subCategoryPasteContainers";
+    private static final String LANG_KEY_PASTE_CONTAINERS = LANG_KEY_ROOT + ".subCategoryPasteContainers";
 
     private static final String LANG_KEY_GADGET_BUILDING = LANG_KEY_GADGETS + ".gadgetBuilding";
 
@@ -28,8 +28,6 @@ public class Config {
 
     private static final String LANG_KEY_PASTE_CONTAINERS_CAPACITY = LANG_KEY_PASTE_CONTAINERS + ".capacity";
 
-
-    @RangeDouble(min=1,max=48)
     private static final String LANG_KEY_GADGETS_ENERGY = LANG_KEY_GADGETS + ".energyCost";
 
     private static final String LANG_KEY_GADGETS_DURABILITY = LANG_KEY_GADGETS + ".durability";
