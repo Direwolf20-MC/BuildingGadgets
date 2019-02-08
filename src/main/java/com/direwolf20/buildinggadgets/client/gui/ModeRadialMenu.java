@@ -30,16 +30,25 @@ import java.util.List;
 
 public class ModeRadialMenu extends GuiScreen {
 
-    private static final ResourceLocation[] signs = new ResourceLocation[]{
-            new ResourceLocation(BuildingGadgets.MODID,"textures/ui/buildtome.png"),
-            new ResourceLocation(BuildingGadgets.MODID,"textures/ui/verticalcolumn.png"),
-            new ResourceLocation(BuildingGadgets.MODID,"textures/ui/horizontalcolumn.png"),
-            new ResourceLocation(BuildingGadgets.MODID,"textures/ui/verticalwall.png"),
-            new ResourceLocation(BuildingGadgets.MODID,"textures/ui/horizontalwall.png"),
+    private static final ResourceLocation[] signsBuilding = new ResourceLocation[]{
+            new ResourceLocation(BuildingGadgets.MODID,"textures/ui/build_to_me.png"),
+            new ResourceLocation(BuildingGadgets.MODID,"textures/ui/vertical_column.png"),
+            new ResourceLocation(BuildingGadgets.MODID,"textures/ui/horizontal_column.png"),
+            new ResourceLocation(BuildingGadgets.MODID,"textures/ui/vertical_wall.png"),
+            new ResourceLocation(BuildingGadgets.MODID,"textures/ui/horizontal_wall.png"),
             new ResourceLocation(BuildingGadgets.MODID,"textures/ui/stairs.png"),
             new ResourceLocation(BuildingGadgets.MODID,"textures/ui/checker.png")
     };
-
+    private static final ResourceLocation[] signsExchanger = new ResourceLocation[]{
+            new ResourceLocation(BuildingGadgets.MODID,"textures/ui/wall.png"),
+            new ResourceLocation(BuildingGadgets.MODID,"textures/ui/vertical_column.png"),
+            new ResourceLocation(BuildingGadgets.MODID,"textures/ui/horizontal_column.png"),
+            new ResourceLocation(BuildingGadgets.MODID,"textures/ui/checker.png")
+    };
+    private static final ResourceLocation[] signsCopyPaste = new ResourceLocation[]{
+            new ResourceLocation(BuildingGadgets.MODID,"textures/ui/copy.png"),
+            new ResourceLocation(BuildingGadgets.MODID,"textures/ui/paste.png")
+    };
     private int timeIn = 0;
     private int slotSelected = -1;
     private int segments;
@@ -140,12 +149,17 @@ public class ModeRadialMenu extends GuiScreen {
             char c = (char) pos[2];
 
             String name = "";
-            if (tool.getItem() instanceof GadgetBuilding)
+            ResourceLocation[] signs;
+            if (tool.getItem() instanceof GadgetBuilding) {
                 name = "\u00a7" + c + GadgetBuilding.ToolMode.values()[i].name();
-            else if (tool.getItem() instanceof GadgetExchanger)
+                signs = signsBuilding;
+            } else if (tool.getItem() instanceof GadgetExchanger) {
                 name = "\u00a7" + c + GadgetExchanger.ToolMode.values()[i].name();
-            else if (tool.getItem() instanceof GadgetCopyPaste)
+                signs = signsExchanger;
+            } else {
                 name = "\u00a7" + c + GadgetCopyPaste.ToolMode.values()[i].name();
+                signs = signsCopyPaste;
+            }
 
             int xsp = xp - 4;
             int ysp = yp;
