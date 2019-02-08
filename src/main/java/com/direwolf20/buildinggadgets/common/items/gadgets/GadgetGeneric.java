@@ -57,7 +57,7 @@ public class GadgetGeneric extends Item {
 
     @Override
     public double getDurabilityForDisplay(ItemStack stack) {
-        if (stack.hasCapability(CapabilityEnergy.ENERGY,null)) {
+        if (stack.hasCapability(CapabilityEnergy.ENERGY, null)) {
             IEnergyStorage energy = CapabilityProviderEnergy.getCap(stack);
             return 1D - ((double) energy.getEnergyStored() / (double) energy.getMaxEnergyStored());
         }
@@ -67,7 +67,7 @@ public class GadgetGeneric extends Item {
 
     @Override
     public int getRGBDurabilityForDisplay(ItemStack stack) {
-        if (stack.hasCapability(CapabilityEnergy.ENERGY,null)) {
+        if (stack.hasCapability(CapabilityEnergy.ENERGY, null)) {
             IEnergyStorage energy = CapabilityProviderEnergy.getCap(stack);
             return MathHelper.hsvToRGB(Math.max(0.0F, (float) energy.getEnergyStored() / (float) energy.getMaxEnergyStored()) / 3.0F, 1.0F, 1.0F);
         }
@@ -77,7 +77,7 @@ public class GadgetGeneric extends Item {
 
     @Override
     public boolean isDamaged(ItemStack stack) {
-        if (stack.hasCapability(CapabilityEnergy.ENERGY,null)) {
+        if (stack.hasCapability(CapabilityEnergy.ENERGY, null)) {
             IEnergyStorage energy = CapabilityProviderEnergy.getCap(stack);
             return energy.getEnergyStored() != energy.getMaxEnergyStored();
         }
@@ -87,7 +87,7 @@ public class GadgetGeneric extends Item {
 
     @Override
     public boolean showDurabilityBar(ItemStack stack) {
-        if (stack.hasCapability(CapabilityEnergy.ENERGY,null)) {
+        if (stack.hasCapability(CapabilityEnergy.ENERGY, null)) {
             IEnergyStorage energy = CapabilityProviderEnergy.getCap(stack);
             return energy.getEnergyStored() != energy.getMaxEnergyStored();
         }
@@ -97,7 +97,7 @@ public class GadgetGeneric extends Item {
 
     @Override
     public boolean getIsRepairable(ItemStack toRepair, ItemStack repair) {
-        if (toRepair.hasCapability(CapabilityEnergy.ENERGY,null))
+        if (toRepair.hasCapability(CapabilityEnergy.ENERGY, null))
             return false;
         if (repair.getItem() == Items.DIAMOND) {
             return true;
@@ -128,15 +128,15 @@ public class GadgetGeneric extends Item {
         if (player.capabilities.isCreativeMode)
             return true;
 
-        if (tool.hasCapability(CapabilityEnergy.ENERGY,null)) {
+        if (tool.hasCapability(CapabilityEnergy.ENERGY, null)) {
             IEnergyStorage energy = CapabilityProviderEnergy.getCap(tool);
             return this.getEnergyCost() <= energy.getEnergyStored();
         }
-        return tool.getItemDamage() < tool.getMaxDamage() || tool.isItemStackDamageable();
+        return tool.getMaxDamage() <= 0 || tool.getItemDamage() < tool.getMaxDamage() || tool.isItemStackDamageable();
     }
 
     public void applyDamage(ItemStack tool, EntityPlayer player) {
-        if(tool.hasCapability(CapabilityEnergy.ENERGY,null)) {
+        if(tool.hasCapability(CapabilityEnergy.ENERGY, null)) {
             IEnergyStorage energy = CapabilityProviderEnergy.getCap(tool);
             energy.extractEnergy(this.getEnergyCost(), false);
         }
@@ -145,7 +145,7 @@ public class GadgetGeneric extends Item {
     }
 
     protected void addEnergyInformation(List<String> list, ItemStack stack) {
-        if (stack.hasCapability(CapabilityEnergy.ENERGY,null)) {
+        if (stack.hasCapability(CapabilityEnergy.ENERGY, null)) {
             IEnergyStorage energy = CapabilityProviderEnergy.getCap(stack);
             list.add(TextFormatting.WHITE + I18n.format("tooltip.gadget.energy") + ": " + withSuffix(energy.getEnergyStored()) + "/" + withSuffix(energy.getMaxEnergyStored()));
         }

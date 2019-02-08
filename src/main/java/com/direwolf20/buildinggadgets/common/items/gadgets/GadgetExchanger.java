@@ -63,7 +63,7 @@ public class GadgetExchanger extends GadgetGeneric {
 
     @Override
     public int getMaxDamage(ItemStack stack) {
-        return SyncedConfig.poweredByFE?0:SyncedConfig.durabilityExchanger;
+        return SyncedConfig.poweredByFE ? 0 : SyncedConfig.durabilityExchanger;
     }
 
     @Override

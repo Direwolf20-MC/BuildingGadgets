@@ -5,66 +5,75 @@ import net.minecraft.init.Blocks;
 import net.minecraftforge.common.config.Config.*;
 
 //hardcode this name, so that we use a different config file than before we used Annotations
-@net.minecraftforge.common.config.Config(modid = BuildingGadgets.MODID, name = "Building Gadgets", category =  Config.CATEGORY_ROOT)
+@net.minecraftforge.common.config.Config(modid = BuildingGadgets.MODID, name = "Building Gadgets", category = Config.CATEGORY_ROOT)
 public class Config {
 
     static final String CATEGORY_ROOT = "general";
 
-    private static final String LANG_KEY_ROOT = "config."+BuildingGadgets.MODID+ "." +CATEGORY_ROOT;
+    private static final String LANG_KEY_ROOT = "config." + BuildingGadgets.MODID + "." + CATEGORY_ROOT;
 
-    private static final String LANG_KEY_BLACKLIST = LANG_KEY_ROOT+".subCategoryBlacklist";
+    private static final String LANG_KEY_BLACKLIST = LANG_KEY_ROOT + ".subCategoryBlacklist";
 
-    private static final String LANG_KEY_GADGETS = LANG_KEY_ROOT+".subCategoryGadgets";
+    private static final String LANG_KEY_GADGETS = LANG_KEY_ROOT + ".subCategoryGadgets";
 
     private static final String LANG_KEY_PASTE_CONTAINERS = LANG_KEY_GADGETS+".subCategoryPasteContainers";
 
-    private static final String LANG_KEY_GADGET_BUILDING = LANG_KEY_GADGETS+".gadgetBuilding";
+    private static final String LANG_KEY_GADGET_BUILDING = LANG_KEY_GADGETS + ".gadgetBuilding";
 
-    private static final String LANG_KEY_GADGET_EXCHANGER = LANG_KEY_GADGETS+".gadgetExchanger";
+    private static final String LANG_KEY_GADGET_EXCHANGER = LANG_KEY_GADGETS + ".gadgetExchanger";
 
-    private static final String LANG_KEY_GADGET_DESTRUCTION = LANG_KEY_GADGETS+".gadgetDestruction";
+    private static final String LANG_KEY_GADGET_DESTRUCTION = LANG_KEY_GADGETS + ".gadgetDestruction";
 
-    private static final String LANG_KEY_GADGET_COPY_PASTE = LANG_KEY_GADGETS+".gadgetCopyPaste";
+    private static final String LANG_KEY_GADGET_COPY_PASTE = LANG_KEY_GADGETS + ".gadgetCopyPaste";
 
     private static final String LANG_KEY_PASTE_CONTAINERS_CAPACITY = LANG_KEY_PASTE_CONTAINERS + ".capacity";
 
 
     @RangeDouble(min=1,max=48)
+    private static final String LANG_KEY_GADGETS_ENERGY = LANG_KEY_GADGETS + ".energyCost";
+
+    private static final String LANG_KEY_GADGETS_DURABILITY = LANG_KEY_GADGETS + ".durability";
+
+    private static final String LANG_KEY_GADGETS_ENERGY_COMMENT = "The Gadget's Energy cost per Operation";
+
+    private static final String LANG_KEY_GADGETS_DURABILITY_COMMENT = "The Gadget's Durability (0 means no durability is used) (Ignored if powered by FE)";
+
+    @RangeDouble(min = 1 , max = 48)
     @Name("Max Build Distance")
     @Comment("Defines how far away you can build")
-    @LangKey(LANG_KEY_ROOT+".rayTraceRange")
+    @LangKey(LANG_KEY_ROOT + ".rayTraceRange")
     public static double rayTraceRange = 32;
 
     @RequiresWorldRestart
     @Name("Powered by Forge Energy")
     @Comment("Set to true for Forge Energy Support, set to False for vanilla Item Damage")
-    @LangKey(LANG_KEY_ROOT+".poweredByFE")
+    @LangKey(LANG_KEY_ROOT + ".poweredByFE")
     public static boolean poweredByFE = true;
 
     @RequiresMcRestart
     @RequiresWorldRestart
     @Name("Enable Construction Paste")
     @Comment("Set to false to disable the recipe for construction paste.")
-    @LangKey(LANG_KEY_ROOT+".enablePaste")
+    @LangKey(LANG_KEY_ROOT + ".enablePaste")
     public static boolean enablePaste = true;
 
     @RequiresMcRestart
     @RequiresWorldRestart
     @Name("Enable Destruction Gadget")
     @Comment("Set to false to disable the Destruction Gadget.")
-    @LangKey(LANG_KEY_ROOT+".enableDestructionGadget")
+    @LangKey(LANG_KEY_ROOT + ".enableDestructionGadget")
     public static boolean enableDestructionGadget = true;
 
     @Name("Default to absolute Coord-Mode")
     @Comment({"Determines if the Copy/Paste GUI's coordinate mode starts in 'Absolute' mode by default.",
               "Set to true for Absolute, set to False for Relative."})
-    @LangKey(LANG_KEY_ROOT+".absoluteCoordDefault")
+    @LangKey(LANG_KEY_ROOT + ".absoluteCoordDefault")
     public static boolean absoluteCoordDefault = false;
 
     @Name("Allow non-Air-Block-Overwrite")
     @Comment({"Whether the Building / CopyPaste Gadget can overwrite blocks like water, lava, grass, etc (like a player can).",
               "False will only allow it to overwrite air blocks."})
-    @LangKey(LANG_KEY_ROOT+".canOverwriteBlocks")
+    @LangKey(LANG_KEY_ROOT + ".canOverwriteBlocks")
     public static boolean canOverwriteBlocks = true;
 
     @Name("Blacklist Settings")
@@ -78,8 +87,8 @@ public class Config {
         @Comment({"All Blocks added to this will be treated similar to TileEntities. Not at all.",
                   "Notice that you can use Regular Expressions as defined by Java Patterns to express more complex name combinations.",
                   "Use for example \"awfulmod:.*\" to blacklist all awfulmod Blocks."})
-        @LangKey(LANG_KEY_BLACKLIST+".blockBlacklist")
-        public String[] blockBlacklist = {"minecraft:.*_door.*",PatternList.getName(Blocks.PISTON_HEAD)};
+        @LangKey(LANG_KEY_BLACKLIST + " + blockBlacklist")
+        public String[] blockBlacklist = {"minecraft:.*_door.*", PatternList.getName(Blocks.PISTON_HEAD)};
     }
 
     @Name("Gadgets")
@@ -101,13 +110,13 @@ public class Config {
         @RangeInt(min = 1, max = 25)
         @Name("Maximum allowed Range")
         @Comment("The max range of the Gadgets")
-        @LangKey(LANG_KEY_GADGETS+".maxRange")
+        @LangKey(LANG_KEY_GADGETS + ".maxRange")
         public int maxRange = 15;
 
         @RangeInt(min = 0)
         @Name("Maximum Energy")
         @Comment("The max energy of Building, Exchanging & Copy-Paste Gadget")
-        @LangKey(LANG_KEY_GADGETS+".maxEnergy")
+        @LangKey(LANG_KEY_GADGETS + ".maxEnergy")
         public int maxEnergy = 500000;
 
         @Name("Building Gadget")
@@ -135,14 +144,14 @@ public class Config {
 
             @RangeInt(min = 0, max = 100000)
             @Name("Energy Cost")
-            @Comment("The energy cost of the Builder per block")
-            @LangKey(LANG_KEY_GADGETS+".energyCost")
+            @Comment(LANG_KEY_GADGETS_ENERGY_COMMENT)
+            @LangKey(LANG_KEY_GADGETS_ENERGY)
             public int energyCostBuilder = 50;
 
             @RangeInt(min = 0, max = 100000)
             @Name("Durability")
-            @Comment("The max durability of the Builder (Ignored if powered by FE)")
-            @LangKey(LANG_KEY_GADGETS+".durability")
+            @Comment(LANG_KEY_GADGETS_DURABILITY_COMMENT)
+            @LangKey(LANG_KEY_GADGETS_DURABILITY)
             public int durabilityBuilder = 500;
         }
 
@@ -151,14 +160,14 @@ public class Config {
 
             @RangeInt(min = 0, max = 100000)
             @Name("Energy Cost")
-            @Comment("The energy cost of the Exchanger per block")
-            @LangKey(LANG_KEY_GADGETS+".energyCost")
+            @Comment(LANG_KEY_GADGETS_ENERGY_COMMENT)
+            @LangKey(LANG_KEY_GADGETS_ENERGY)
             public int energyCostExchanger = 100;
 
             @RangeInt(min = 0, max = 100000)
             @Name("Durability")
-            @Comment("The max durability of the Exchanger (Ignored if powered by FE)")
-            @LangKey(LANG_KEY_GADGETS+".durability")
+            @Comment(LANG_KEY_GADGETS_DURABILITY_COMMENT)
+            @LangKey(LANG_KEY_GADGETS_DURABILITY)
             public int durabilityExchanger = 500;
         }
 
@@ -167,19 +176,19 @@ public class Config {
             @RangeInt(min = 0)
             @Name("Maximum Energy")
             @Comment("The max energy of the Destruction Gadget")
-            @LangKey(LANG_KEY_GADGET_DESTRUCTION+".maxEnergy")
+            @LangKey(LANG_KEY_GADGET_DESTRUCTION + ".maxEnergy")
             public int energyMaxDestruction = 1000000;
 
             @RangeInt(min = 0, max = 100000)
             @Name("Energy Cost")
-            @Comment("The energy cost of the Destruction Gadget per block")
-            @LangKey(LANG_KEY_GADGETS+".energyCost")
+            @Comment(LANG_KEY_GADGETS_ENERGY_COMMENT)
+            @LangKey(LANG_KEY_GADGETS_ENERGY)
             public int energyCostDestruction = 200;
 
             @RangeInt(min = 0, max = 100000)
             @Name("Durability")
-            @Comment("The max durability of the Destruction Gadget (Ignored if powered by FE)")
-            @LangKey(LANG_KEY_GADGETS+".durability")
+            @Comment(LANG_KEY_GADGETS_DURABILITY_COMMENT)
+            @LangKey(LANG_KEY_GADGETS_DURABILITY)
             public int durabilityDestruction = 500;
         }
 
@@ -188,14 +197,14 @@ public class Config {
 
             @RangeInt(min = 0, max = 100000)
             @Name("Energy Cost")
-            @Comment("The Energy Use of the Copy Paste Gadget")
-            @LangKey(LANG_KEY_GADGETS+".energyCost")
+            @Comment(LANG_KEY_GADGETS_ENERGY_COMMENT)
+            @LangKey(LANG_KEY_GADGETS_ENERGY)
             public int energyCostCopyPaste = 50;
 
             @RangeInt(min = 0, max = 100000)
             @Name("Durability")
-            @Comment("The max durability of the Copy & Paste Gadget (Ignored if powered by FE)")
-            @LangKey(LANG_KEY_GADGETS+".durability")
+            @Comment(LANG_KEY_GADGETS_DURABILITY_COMMENT)
+            @LangKey(LANG_KEY_GADGETS_DURABILITY)
             public int durabilityCopyPaste = 500;
         }
     }

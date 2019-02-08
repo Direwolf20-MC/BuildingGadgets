@@ -95,15 +95,15 @@ public class ToolRenders {
                     itemStack = renderBlockState.getBlock().getPickBlock(renderBlockState, null, world, new BlockPos(0, 0, 0), player);
                 }
 
-                int hasBlocks = InventoryManipulation.countItem(itemStack, player, cache);
+                long hasBlocks = InventoryManipulation.countItem(itemStack, player, cache);
                 hasBlocks = hasBlocks + InventoryManipulation.countPaste(player);
                 int hasEnergy = 0;
-                if (stack.hasCapability(CapabilityEnergy.ENERGY,null)) {
+                if (stack.hasCapability(CapabilityEnergy.ENERGY, null)) {
                     hasEnergy = CapabilityProviderEnergy.getCap(stack).getEnergyStored();
                 } else {
                     hasEnergy = stack.getMaxDamage() - stack.getItemDamage();
                 }
-                if (player.capabilities.isCreativeMode || (!stack.hasCapability(CapabilityEnergy.ENERGY,null) && !stack.isItemStackDamageable())) {
+                if (player.capabilities.isCreativeMode || (!stack.hasCapability(CapabilityEnergy.ENERGY, null) && !stack.isItemStackDamageable())) {
                     hasEnergy = 1000000;
                 }
                 //Prepare the block rendering
@@ -163,7 +163,7 @@ public class ToolRenders {
                     GlStateManager.scale(1.01f, 1.01f, 1.01f);
                     GL14.glBlendColor(1F, 1F, 1F, 0.35f); //Set the alpha of the blocks we are rendering
                     hasBlocks--;
-                    if (stack.hasCapability(CapabilityEnergy.ENERGY,null)) {
+                    if (stack.hasCapability(CapabilityEnergy.ENERGY, null)) {
                         hasEnergy = hasEnergy - ModItems.gadgetBuilding.getEnergyCost();
                     } else {
                         hasEnergy--;
@@ -224,15 +224,15 @@ public class ToolRenders {
                 if (itemStack.getItem().equals(Items.AIR)) {
                     itemStack = renderBlockState.getBlock().getPickBlock(renderBlockState, null, world, new BlockPos(0, 0, 0), player);
                 }
-                int hasBlocks = InventoryManipulation.countItem(itemStack, player, cache);
+                long hasBlocks = InventoryManipulation.countItem(itemStack, player, cache);
                 hasBlocks = hasBlocks + InventoryManipulation.countPaste(player);
                 int hasEnergy = 0;
-                if (stack.hasCapability(CapabilityEnergy.ENERGY,null)) {
+                if (stack.hasCapability(CapabilityEnergy.ENERGY, null)) {
                     hasEnergy = CapabilityProviderEnergy.getCap(stack).getEnergyStored();
                 } else {
                     hasEnergy = stack.getMaxDamage() - stack.getItemDamage();
                 }
-                if (player.capabilities.isCreativeMode || (!stack.hasCapability(CapabilityEnergy.ENERGY,null) && !stack.isItemStackDamageable())) {
+                if (player.capabilities.isCreativeMode || (!stack.hasCapability(CapabilityEnergy.ENERGY, null) && !stack.isItemStackDamageable())) {
                     hasEnergy = 1000000;
                 }
                 //Prepare the block rendering
@@ -299,7 +299,7 @@ public class ToolRenders {
                     GlStateManager.scale(1.02f, 1.02f, 1.02f);//Slightly Larger block to avoid z-fighting.
                     GL14.glBlendColor(1F, 1F, 1F, 0.55f); //Set the alpha of the blocks we are rendering
                     hasBlocks--;
-                    if (stack.hasCapability(CapabilityEnergy.ENERGY,null)) {
+                    if (stack.hasCapability(CapabilityEnergy.ENERGY, null)) {
                         hasEnergy = hasEnergy - ModItems.gadgetExchanger.getEnergyCost();
                     } else {
                         hasEnergy = hasEnergy - 2;
