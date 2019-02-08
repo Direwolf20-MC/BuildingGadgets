@@ -32,6 +32,8 @@ public final class FieldWrapper {
     public FieldWrapper(@Nonnull Field field, @Nonnull FieldMapper<?, ?> mapper, @Nullable Object instance) {
         Preconditions.checkArgument(ReflectionTool.isInstanceProvidedForField(field, instance),
                 "Non Static fields must be accessed with an instance! Static fields without! Also watch out for incompatible classes! ");
+        Preconditions.checkArgument(field.getType().isAssignableFrom(mapper.getFieldType()),
+                "The Mapper must map to an assignableField Type! Mapper has Type " + mapper.getFieldType().getName() + " but at least " + field.getType().getName() + " is required!");
         this.instance = instance;
         this.field = field;
         this.mapper = (FieldMapper<Object, Object>) mapper;
@@ -42,23 +44,39 @@ public final class FieldWrapper {
      * @implNote Performs caching under the assumption that the underlying Field will not change during the life-time of this Object
      * @see Field#get(Object)
      */
-    public Object get() throws IllegalAccessException{
+    public <T> T get(Class<T> clazz) throws IllegalAccessException {
+        Preconditions.checkArgument(clazz.isAssignableFrom(getMappedType()),
+                "Attempted to retrieve value of type " + clazz.getName() + " but this wrapper only accepts " + mapper.getSyncedType().getName());
         if (val == null) val = mapper.mapToSync(field.get(instance));
-        return val;
+        @SuppressWarnings("unchecked")
+        T obj = (T) val; //Cannot call clazz.cast as this will throw an exception when faced with an primitive type - we already check before, so this should be fine
+        return obj;
     }
     /**
      *
      * @see Field#set(Object, Object)
      */
-    public void set(Object val) throws IllegalAccessException{
+    public <T> void set(T val, Class<T> clazz) throws IllegalAccessException {
+        Preconditions.checkArgument(clazz.isAssignableFrom(getMappedType()),
+                "Attempted to set value of type " + clazz.getName() + " but this wrapper only accepts " + mapper.getSyncedType().getName());
         field.set(instance, mapper.mapToField(val));
     }
 
     /**
      *
+     * @return The type a Field must have, to be usable by this wrapper
      * @see Field#getType()
      */
-    public Class<?> getType() {
-        return field.getType();
+    public Class<?> getFieldType() {
+        return mapper.getFieldType();
     }
+
+    /**
+     * @return The type this wrapper accepts values for
+     */
+    public Class<?> getMappedType() {
+        return mapper.getSyncedType();
+    }
+
+
 }
