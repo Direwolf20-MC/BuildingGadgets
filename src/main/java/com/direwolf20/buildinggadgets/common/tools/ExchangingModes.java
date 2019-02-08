@@ -162,7 +162,7 @@ public class ExchangingModes {
         //***************************************************
         //TorchPlacer
         //***************************************************
-        else if (mode == GadgetExchanger.ToolMode.Checkerboard) {
+        else if (mode == GadgetExchanger.ToolMode.Grid) {
             range++;
             for (int x = range * -7 / 5; x <= range * 7 / 5; x++) {
                 for (int z = range * -7 / 5; z <= range * 7 / 5; z++) {
