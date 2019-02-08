@@ -18,7 +18,6 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.settings.GameSettings;
 import net.minecraft.client.settings.KeyBinding;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
@@ -106,14 +105,10 @@ public class ModeRadialMenu extends GuiScreen {
 
         List<int[]> stringPositions = new ArrayList();
 
-        EntityPlayer player = Minecraft.getMinecraft().player;
-        ItemStack tool = player.getHeldItemMainhand();
-        if (!(tool.getItem() instanceof GadgetGeneric)) {
-            tool = player.getHeldItemOffhand();
-            if (!(tool.getItem() instanceof GadgetGeneric)) {
-                return;
-            }
-        }
+        ItemStack tool = GadgetGeneric.getGadget(Minecraft.getMinecraft().player);
+        if (tool.isEmpty())
+            return;
+
         slotSelected = -1;
 
         for (int seg = 0; seg < segments; seg++) {
@@ -131,13 +126,10 @@ public class ModeRadialMenu extends GuiScreen {
             float a = 0.4F;
             if (mouseInSector) {
                 slotSelected = seg;
-
-                if (!tool.isEmpty()) {
-                    Color color = new Color(255, 255, 255);
-                    r = color.getRed() / 255F;
-                    g = color.getGreen() / 255F;
-                    b = color.getBlue() / 255F;
-                }
+                Color color = new Color(255, 255, 255);
+                r = color.getRed() / 255F;
+                g = color.getGreen() / 255F;
+                b = color.getBlue() / 255F;
             }
 
             GlStateManager.color(r, g, b, a);
