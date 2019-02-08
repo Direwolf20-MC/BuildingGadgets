@@ -45,20 +45,20 @@ public final class FieldWrapper {
      * @see Field#get(Object)
      */
     public <T> T get(Class<T> clazz) throws IllegalAccessException {
-        if (!clazz.isAssignableFrom(getMappedType())) {
-            throw new IllegalArgumentException("Attempted to retrieve value of type " + clazz.getName() + " but this wrapper only accepts " + mapper.getSyncedType());
-        }
+        Preconditions.checkArgument(clazz.isAssignableFrom(getMappedType()),
+                "Attempted to retrieve value of type " + clazz.getName() + " but this wrapper only accepts " + mapper.getSyncedType().getName());
         if (val == null) val = mapper.mapToSync(field.get(instance));
-        return clazz.cast(val);
+        @SuppressWarnings("unchecked")
+        T obj = (T) val; //Cannot call clazz.cast as this will throw an exception when faced with an primitive type - we already check before, so this should be fine
+        return obj;
     }
     /**
      *
      * @see Field#set(Object, Object)
      */
     public <T> void set(T val, Class<T> clazz) throws IllegalAccessException {
-        if (!clazz.isAssignableFrom(getMappedType())) {
-            throw new IllegalArgumentException("Attempted to set value of type " + clazz.getName() + " but this wrapper only accepts " + mapper.getSyncedType());
-        }
+        Preconditions.checkArgument(clazz.isAssignableFrom(getMappedType()),
+                "Attempted to set value of type " + clazz.getName() + " but this wrapper only accepts " + mapper.getSyncedType().getName());
         field.set(instance, mapper.mapToField(val));
     }
 
