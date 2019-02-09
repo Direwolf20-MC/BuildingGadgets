@@ -108,10 +108,15 @@ public class GadgetBuilding extends GadgetGeneric {
         super.addInformation(stack, world, list, b);
         list.add(TextFormatting.DARK_GREEN + I18n.format("tooltip.gadget.block") + ": " + getToolBlock(stack).getBlock().getLocalizedName());
         list.add(TextFormatting.AQUA + I18n.format("tooltip.gadget.mode") + ": " + getToolMode(stack));
-        if (getToolMode(stack) != ToolMode.BuildToMe) {
+        if (getToolMode(stack) == ToolMode.Surface)
+            list.add(TextFormatting.YELLOW + I18n.format("tooltip.gadget.connectedarea") + ": " + getConnectedArea(stack));
+
+        if (getToolMode(stack) != ToolMode.BuildToMe)
             list.add(TextFormatting.LIGHT_PURPLE + I18n.format("tooltip.gadget.range") + ": " + getToolRange(stack));
-        }
-        list.add(TextFormatting.GOLD + I18n.format("tooltip.gadget.fuzzy") + ": " + getFuzzy(stack));
+
+        if (getToolMode(stack) == ToolMode.Surface)
+            list.add(TextFormatting.GOLD + I18n.format("tooltip.gadget.fuzzy") + ": " + getFuzzy(stack));
+
         addEnergyInformation(list, stack);
     }
 

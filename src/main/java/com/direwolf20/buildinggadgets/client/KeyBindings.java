@@ -19,6 +19,7 @@ public class KeyBindings {
     public static KeyBinding undoKey;
     public static KeyBinding anchorKey;
     public static KeyBinding fuzzyKey;
+    public static KeyBinding connectedAreaKey;
 
     public static void init() {
         modeSwitch = createBinding("key.modeSwitch", Keyboard.KEY_G);
@@ -26,6 +27,7 @@ public class KeyBindings {
         undoKey = createBinding("key.undoKey", Keyboard.KEY_U);
         anchorKey = createBinding("key.anchorKey", Keyboard.KEY_H);
         fuzzyKey = createBinding("key.fuzzyKey", Keyboard.KEY_V);
+        connectedAreaKey = createBinding("key.connectedarea", Keyboard.KEY_B);
     }
 
     private static KeyBinding createBinding(String name, int key) {

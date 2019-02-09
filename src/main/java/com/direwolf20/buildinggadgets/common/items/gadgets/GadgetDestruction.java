@@ -74,6 +74,7 @@ public class GadgetDestruction extends GadgetGeneric {
         super.addInformation(stack, world, list, b);
         list.add(TextFormatting.RED + I18n.format("tooltip.gadget.destroywarning"));
         list.add(TextFormatting.AQUA + I18n.format("tooltip.gadget.destroyshowoverlay") + ": " + getOverlay(stack));
+        list.add(TextFormatting.YELLOW + I18n.format("tooltip.gadget.connectedarea") + ": " + getConnectedArea(stack));
         list.add(TextFormatting.GOLD + I18n.format("tooltip.gadget.fuzzy") + ": " + getFuzzy(stack));
         addEnergyInformation(list,stack);
     }
@@ -265,8 +266,7 @@ public class GadgetDestruction extends GadgetGeneric {
         EnumFacing side = (getAnchorSide(stack) == null) ? incomingSide : getAnchorSide(stack);
         ArrayList<EnumFacing> directions = assignDirections(side, player);
         IBlockState stateTarget = GadgetGeneric.getFuzzy(stack) ? world.getBlockState(pos) : null;
-        boolean connected = true;//TODO
-        if (connected) {
+        if (GadgetGeneric.getConnectedArea(stack)) {
             String[] directionNames = new String[] {"right", "left", "up", "down", "depth"};
             AxisAlignedBB area = new AxisAlignedBB(pos);
             for (int i = 0; i < directionNames.length; i++)

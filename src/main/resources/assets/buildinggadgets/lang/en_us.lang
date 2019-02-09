@@ -42,6 +42,7 @@ key.modeSwitch=Mode Switch
 key.rangeChange=Range / Rotate / Overlay
 key.undoKey=Undo
 key.fuzzyKey=Fuzzy
+key.connectedarea=Connected Area
 
 #tooltip: 
 tooltip.constructionblockpowder.helptext=Place next to water
@@ -52,6 +53,7 @@ tooltip.gadget.energy=Energy
 tooltip.gadget.mode=Mode
 tooltip.gadget.range=Range
 tooltip.gadget.fuzzy=Fuzzy
+tooltip.gadget.connectedarea=Connected Area
 tooltip.pasteContainer.amount=Amount
 tooltip.pasteContainer.creative.amountMsg=Amount: Infinite!
 tooltip.template.name=Name
@@ -66,6 +68,7 @@ message.gadget.copyguierror=Copy Area Failed
 message.gadget.copysuccess=Copy to Clipboard successful
 message.gadget.destroysizeerror=Maximum Destruction size is 16x16x16, negative numbers are invalid
 message.gadget.fuzzymode=Fuzzy Mode
+message.gadget.connectedarea=Connected Area
 message.gadget.invalidblock=Invalid Block
 message.gadget.nothingtoundo=Nothing To Undo
 message.gadget.pastefailed=Paste Failed, Invalid JSON

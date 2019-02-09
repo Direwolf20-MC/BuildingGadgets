@@ -160,7 +160,16 @@ public class GadgetGeneric extends Item {
     }
 
     public static void toggleFuzzy(EntityPlayer player, ItemStack stack) {
-        NBTTool.getOrNewTag(stack).setBoolean("fuzzy", !(getFuzzy(stack)));
+        NBTTool.getOrNewTag(stack).setBoolean("fuzzy", !getFuzzy(stack));
         player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.fuzzymode").getUnformattedComponentText() + ": " + getFuzzy(stack)), true);
+    }
+
+    public static boolean getConnectedArea(ItemStack stack) {
+        return !NBTTool.getOrNewTag(stack).getBoolean("unconnectedarea");
+    }
+
+    public static void toggleConnectedArea(EntityPlayer player, ItemStack stack) {
+        NBTTool.getOrNewTag(stack).setBoolean("unconnectedarea", getConnectedArea(stack));
+        player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.connectedarea").getUnformattedComponentText() + ": " + getConnectedArea(stack)), true);
     }
 }

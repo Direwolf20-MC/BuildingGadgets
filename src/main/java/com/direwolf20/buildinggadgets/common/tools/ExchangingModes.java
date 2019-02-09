@@ -106,8 +106,7 @@ public class ExchangingModes {
         //Surface
         //***************************************************
         if (mode == GadgetExchanger.ToolMode.Surface) {
-            boolean connected = true;//TODO
-            if (connected) {
+            if (GadgetGeneric.getConnectedArea(tool)) {
                 AxisAlignedBB area = new AxisAlignedBB(pos).grow(bound * (1 - Math.abs(sideHit.getFrontOffsetX())),
                         bound * (1 - Math.abs(sideHit.getFrontOffsetY())), bound * (1 - Math.abs(sideHit.getFrontOffsetZ())));
                 addConnectedCoords(world, pos, currentBlock, setBlock, fuzzyMode, coordinates,

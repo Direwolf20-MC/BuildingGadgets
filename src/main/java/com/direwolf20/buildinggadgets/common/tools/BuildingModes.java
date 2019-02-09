@@ -344,8 +344,7 @@ public class BuildingModes {
                     bound * (1 - Math.abs(sideHit.getFrontOffsetY())), bound * (1 - Math.abs(sideHit.getFrontOffsetZ())));
             BlockPos locOffset;
             boolean fuzzyMode = GadgetGeneric.getFuzzy(tool);
-            boolean connected = true;//TODO
-            if (connected) {
+            if (GadgetGeneric.getConnectedArea(tool)) {
                 addConnectedCoords(world, pos, startState, setBlock, sideHit, fuzzyMode, coordinates, new HashSet<>(),
                         (int) area.minX, (int) area.minY, (int) area.minZ, (int) area.maxX - 1, (int) area.maxY - 1, (int) area.maxZ - 1);
             } else {
