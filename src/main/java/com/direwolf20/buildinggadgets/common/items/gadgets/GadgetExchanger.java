@@ -46,7 +46,7 @@ public class GadgetExchanger extends GadgetGeneric {
     private static final FakeBuilderWorld fakeWorld = new FakeBuilderWorld();
 
     public enum ToolMode {
-        Wall, VerticalColumn, HorizontalColumn, Grid;
+        Surface, VerticalColumn, HorizontalColumn, Grid;
         private static ToolMode[] vals = values();//TODO unused
 
         public ToolMode next() {//TODO unused
@@ -119,7 +119,7 @@ public class GadgetExchanger extends GadgetGeneric {
 
     public static ToolMode getToolMode(ItemStack stack) {
         NBTTagCompound tagCompound = stack.getTagCompound();
-        ToolMode mode = ToolMode.Wall;
+        ToolMode mode = ToolMode.Surface;
         if (tagCompound == null) {
             setToolMode(stack, mode);
             return mode;

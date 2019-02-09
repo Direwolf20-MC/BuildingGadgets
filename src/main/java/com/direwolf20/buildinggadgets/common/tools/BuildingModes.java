@@ -7,6 +7,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -329,6 +330,20 @@ public class BuildingModes {
                             coordinates.add(pos);
                         }
                     }
+                }
+            }
+        }
+        //***************************************************
+        //Surface
+        //***************************************************
+        else if (mode == GadgetBuilding.ToolMode.Surface) {
+            IBlockState startState = world.getBlockState(startBlock);
+            AxisAlignedBB area = new AxisAlignedBB(pos).grow(bound * (1 - Math.abs(sideHit.getFrontOffsetX())), bound * (1 - Math.abs(sideHit.getFrontOffsetY())), bound * (1 - Math.abs(sideHit.getFrontOffsetZ())));
+            BlockPos locOffset;
+            for (BlockPos loc : BlockPos.getAllInBox((int) area.minX, (int) area.minY, (int) area.minZ, (int) area.maxX - 1, (int) area.maxY - 1, (int) area.maxZ - 1)) {
+                locOffset = loc.offset(sideHit);
+                if (world.getBlockState(loc) == startState && isReplaceable(world, locOffset, setBlock)) {
+                    coordinates.add(locOffset);
                 }
             }
         }

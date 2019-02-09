@@ -37,10 +37,11 @@ public class ModeRadialMenu extends GuiScreen {
             new ResourceLocation(BuildingGadgets.MODID,"textures/ui/vertical_wall.png"),
             new ResourceLocation(BuildingGadgets.MODID,"textures/ui/horizontal_wall.png"),
             new ResourceLocation(BuildingGadgets.MODID,"textures/ui/stairs.png"),
-            new ResourceLocation(BuildingGadgets.MODID,"textures/ui/grid.png")
+            new ResourceLocation(BuildingGadgets.MODID,"textures/ui/grid.png"),
+            new ResourceLocation(BuildingGadgets.MODID,"textures/ui/surface.png")
     };
     private static final ResourceLocation[] signsExchanger = new ResourceLocation[]{
-            new ResourceLocation(BuildingGadgets.MODID,"textures/ui/wall.png"),
+            new ResourceLocation(BuildingGadgets.MODID,"textures/ui/surface.png"),
             new ResourceLocation(BuildingGadgets.MODID,"textures/ui/vertical_column.png"),
             new ResourceLocation(BuildingGadgets.MODID,"textures/ui/horizontal_column.png"),
             new ResourceLocation(BuildingGadgets.MODID,"textures/ui/grid.png")

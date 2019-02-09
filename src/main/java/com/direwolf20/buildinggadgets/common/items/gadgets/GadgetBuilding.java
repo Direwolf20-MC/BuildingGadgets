@@ -46,7 +46,7 @@ public class GadgetBuilding extends GadgetGeneric {
     private static final FakeBuilderWorld fakeWorld = new FakeBuilderWorld();
 
     public enum ToolMode {
-        BuildToMe, VerticalColumn, HorizontalColumn, VerticalWall, HorizontalWall, Stairs, Grid;
+        BuildToMe, VerticalColumn, HorizontalColumn, VerticalWall, HorizontalWall, Stairs, Grid, Surface;
         private static ToolMode[] vals = values();
 
         public ToolMode next() {
@@ -152,11 +152,12 @@ public class GadgetBuilding extends GadgetGeneric {
     public void rangeChange(EntityPlayer player, ItemStack heldItem) {
         //Called when the range change hotkey is pressed
         int range = getToolRange(heldItem);
-        if (player.isSneaking()) {
-            range = (range == 1) ? SyncedConfig.maxRange : range - 1;
-        } else {
-            range = (range >= SyncedConfig.maxRange) ? 1 : range + 1;
-        }
+        int changeAmount = (getToolMode(heldItem) != ToolMode.Surface || (range % 2 == 0)) ? 1 : 2;
+        if (player.isSneaking())
+            range = (range == 1) ? SyncedConfig.maxRange : range - changeAmount;
+        else
+            range = (range >= SyncedConfig.maxRange) ? 1 : range + changeAmount;
+
         setToolRange(heldItem, range);
         player.sendStatusMessage(new TextComponentString(TextFormatting.DARK_AQUA + new TextComponentTranslation("message.gadget.toolrange").getUnformattedComponentText() + ": " + range), true);
     }

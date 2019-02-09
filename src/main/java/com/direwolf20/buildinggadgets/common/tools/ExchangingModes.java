@@ -82,9 +82,9 @@ public class ExchangingModes {
         IBlockState currentBlock = world.getBlockState(startBlock);
 
         //***************************************************
-        //VerticalWall
+        //Surface
         //***************************************************
-        if (mode == GadgetExchanger.ToolMode.Wall) {
+        if (mode == GadgetExchanger.ToolMode.Surface) {
             if (sideHit == EnumFacing.UP || sideHit == EnumFacing.DOWN) {
                 for (int x = bound * -1; x <= bound; x++) {
                     for (int z = bound * -1; z <= bound; z++) {
