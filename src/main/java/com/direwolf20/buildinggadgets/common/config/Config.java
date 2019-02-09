@@ -89,6 +89,8 @@ public class Config {
         public String[] blockBlacklist = {"minecraft:.*_door.*", PatternList.getName(Blocks.PISTON_HEAD)};
     }
 
+    @RequiresMcRestart
+    @RequiresWorldRestart
     @Name("Gadgets")
     @Comment("Configure the Gadgets here")
     @LangKey(LANG_KEY_GADGETS)
