@@ -340,17 +340,43 @@ public class BuildingModes {
         //***************************************************
         else if (mode == GadgetBuilding.ToolMode.Surface) {
             IBlockState startState = world.getBlockState(startBlock);
-            AxisAlignedBB area = new AxisAlignedBB(pos).grow(bound * (1 - Math.abs(sideHit.getFrontOffsetX())), bound * (1 - Math.abs(sideHit.getFrontOffsetY())), bound * (1 - Math.abs(sideHit.getFrontOffsetZ())));
+            AxisAlignedBB area = new AxisAlignedBB(pos).grow(bound * (1 - Math.abs(sideHit.getFrontOffsetX())),
+                    bound * (1 - Math.abs(sideHit.getFrontOffsetY())), bound * (1 - Math.abs(sideHit.getFrontOffsetZ())));
             BlockPos locOffset;
             boolean fuzzyMode = GadgetGeneric.getFuzzy(tool);
-            for (BlockPos loc : BlockPos.getAllInBox((int) area.minX, (int) area.minY, (int) area.minZ, (int) area.maxX - 1, (int) area.maxY - 1, (int) area.maxZ - 1)) {
-                locOffset = loc.offset(sideHit);
-                if ((fuzzyMode ? !world.isAirBlock(loc) : world.getBlockState(loc) == startState) && isReplaceable(world, locOffset, setBlock)) {
-                    coordinates.add(locOffset);
+            boolean connected = true;//TODO
+            if (connected) {
+                addConnectedCoords(world, pos, startState, setBlock, sideHit, fuzzyMode, coordinates, new HashSet<>(),
+                        (int) area.minX, (int) area.minY, (int) area.minZ, (int) area.maxX - 1, (int) area.maxY - 1, (int) area.maxZ - 1);
+            } else {
+                for (BlockPos loc : BlockPos.getAllInBox((int) area.minX, (int) area.minY, (int) area.minZ, (int) area.maxX - 1, (int) area.maxY - 1, (int) area.maxZ - 1)) {
+                    locOffset = loc.offset(sideHit);
+                    if ((fuzzyMode ? !world.isAirBlock(loc) : world.getBlockState(loc) == startState) && isReplaceable(world, locOffset, setBlock))
+                        coordinates.add(locOffset);
                 }
             }
         }
         return coordinates;
+    }
+
+    private static void addConnectedCoords(World world, BlockPos loc, IBlockState state, IBlockState setBlock, EnumFacing sideHit,
+            boolean fuzzyMode, List<BlockPos> coords, Set<BlockPos> coordsSearched, int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
+        if (coordsSearched.contains(loc) || loc.getX() < minX || loc.getY() < minY || loc.getZ() < minZ || loc.getX() > maxX || loc.getY() > maxY || loc.getZ() > maxZ)
+            return;
+
+        BlockPos locOffset = loc.offset(sideHit);
+        if ((fuzzyMode ? world.isAirBlock(loc) : world.getBlockState(loc) != state) || !isReplaceable(world, locOffset, setBlock))
+            return;
+
+        coords.add(locOffset);
+        coordsSearched.add(loc);
+        for (int x = -1; x <= 1; x++) {
+            for (int y = -1; y <= 1; y++) {
+                for (int z = -1; z <= 1; z++) {
+                    addConnectedCoords(world, loc.add(x, y, z), state, setBlock, sideHit, fuzzyMode, coords, coordsSearched, minX, minY, minZ, maxX, maxY, maxZ);
+                }
+            }
+        }
     }
 
     public static List<BlockPos> sortByDistance(List<BlockPos> unSortedList, EntityPlayer player) {

@@ -25,6 +25,7 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.text.TextComponentString;
@@ -264,20 +265,49 @@ public class GadgetDestruction extends GadgetGeneric {
         EnumFacing side = (getAnchorSide(stack) == null) ? incomingSide : getAnchorSide(stack);
         ArrayList<EnumFacing> directions = assignDirections(side, player);
         IBlockState stateTarget = GadgetGeneric.getFuzzy(stack) ? world.getBlockState(pos) : null;
-        for (int d = 0; d < getToolValue(stack, "depth"); d++) {
-            for (int x = getToolValue(stack, "left") * -1; x <= getToolValue(stack, "right"); x++) {
-                for (int y = getToolValue(stack, "down") * -1; y <= getToolValue(stack, "up"); y++) {
-                    BlockPos voidPos = new BlockPos(startPos);
-                    voidPos = voidPos.offset(directions.get(0), x);
-                    voidPos = voidPos.offset(directions.get(2), y);
-                    voidPos = voidPos.offset(directions.get(4), d);
-                    if (validBlock(world, voidPos, player, stateTarget)) {
-                        voidPosArray.add(voidPos);
+        boolean connected = true;//TODO
+        if (connected) {
+            String[] directionNames = new String[] {"right", "left", "up", "down", "depth"};
+            AxisAlignedBB area = new AxisAlignedBB(pos);
+            for (int i = 0; i < directionNames.length; i++)
+                area = area.union(new AxisAlignedBB(pos.offset(directions.get(i), getToolValue(stack, directionNames[i]) - (i == 4 ? 1 : 0))));
+
+            addConnectedCoords(world, player, startPos, world.getBlockState(startPos), voidPosArray,
+                    (int) area.minX, (int) area.minY, (int) area.minZ, (int) area.maxX - 1, (int) area.maxY - 1, (int) area.maxZ - 1);
+        } else {
+            for (int d = 0; d < getToolValue(stack, "depth"); d++) {
+                for (int x = getToolValue(stack, "left") * -1; x <= getToolValue(stack, "right"); x++) {
+                    for (int y = getToolValue(stack, "down") * -1; y <= getToolValue(stack, "up"); y++) {
+                        BlockPos voidPos = new BlockPos(startPos);
+                        voidPos = voidPos.offset(directions.get(0), x);
+                        voidPos = voidPos.offset(directions.get(2), y);
+                        voidPos = voidPos.offset(directions.get(4), d);
+                        if (validBlock(world, voidPos, player, stateTarget)) {
+                            voidPosArray.add(voidPos);
+                        }
                     }
                 }
             }
         }
         return voidPosArray;
+    }
+
+    public static void addConnectedCoords(World world, EntityPlayer player, BlockPos loc, IBlockState state,
+            List<BlockPos> coords, int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
+        if (coords.contains(loc) || loc.getX() < minX || loc.getY() < minY || loc.getZ() < minZ || loc.getX() > maxX || loc.getY() > maxY || loc.getZ() > maxZ)
+            return;
+
+        if (!validBlock(world, loc, player, state))
+            return;
+
+        coords.add(loc);
+        for (int x = -1; x <= 1; x++) {
+            for (int y = -1; y <= 1; y++) {
+                for (int z = -1; z <= 1; z++) {
+                    addConnectedCoords(world, player, loc.add(x, y, z), state, coords, minX, minY, minZ, maxX, maxY, maxZ);
+                }
+            }
+        }
     }
 
     public static boolean validBlock(World world, BlockPos voidPos, EntityPlayer player, @Nullable IBlockState stateTarget) {
