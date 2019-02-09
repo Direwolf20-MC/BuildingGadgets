@@ -89,8 +89,6 @@ public class Config {
         public String[] blockBlacklist = {"minecraft:.*_door.*", PatternList.getName(Blocks.PISTON_HEAD)};
     }
 
-    @RequiresMcRestart
-    @RequiresWorldRestart
     @Name("Gadgets")
     @Comment("Configure the Gadgets here")
     @LangKey(LANG_KEY_GADGETS)
@@ -148,6 +146,7 @@ public class Config {
             @LangKey(LANG_KEY_GADGETS_ENERGY)
             public int energyCostBuilder = 50;
 
+            @RequiresWorldRestart
             @RangeInt(min = 0, max = 100000)
             @Name("Durability")
             @Comment(LANG_KEY_GADGETS_DURABILITY_COMMENT)
@@ -164,6 +163,7 @@ public class Config {
             @LangKey(LANG_KEY_GADGETS_ENERGY)
             public int energyCostExchanger = 100;
 
+            @RequiresWorldRestart
             @RangeInt(min = 0, max = 100000)
             @Name("Durability")
             @Comment(LANG_KEY_GADGETS_DURABILITY_COMMENT)
@@ -185,6 +185,7 @@ public class Config {
             @LangKey(LANG_KEY_GADGETS_ENERGY)
             public int energyCostDestruction = 200;
 
+            @RequiresWorldRestart
             @RangeInt(min = 0, max = 100000)
             @Name("Durability")
             @Comment(LANG_KEY_GADGETS_DURABILITY_COMMENT)
@@ -201,6 +202,7 @@ public class Config {
             @LangKey(LANG_KEY_GADGETS_ENERGY)
             public int energyCostCopyPaste = 50;
 
+            @RequiresWorldRestart
             @RangeInt(min = 0, max = 100000)
             @Name("Durability")
             @Comment(LANG_KEY_GADGETS_DURABILITY_COMMENT)
