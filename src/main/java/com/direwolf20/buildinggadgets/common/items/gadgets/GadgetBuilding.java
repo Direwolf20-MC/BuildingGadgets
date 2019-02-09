@@ -8,7 +8,6 @@ import com.direwolf20.buildinggadgets.common.items.FakeBuilderWorld;
 import com.direwolf20.buildinggadgets.common.items.ModItems;
 import com.direwolf20.buildinggadgets.common.tools.BuildingModes;
 import com.direwolf20.buildinggadgets.common.tools.InventoryManipulation;
-import com.direwolf20.buildinggadgets.common.tools.NBTTool;
 import com.direwolf20.buildinggadgets.common.tools.ToolRenders;
 import com.direwolf20.buildinggadgets.common.tools.UndoState;
 import com.direwolf20.buildinggadgets.common.tools.VectorTools;
@@ -107,10 +106,8 @@ public class GadgetBuilding extends GadgetGeneric {
         //Add tool information to the tooltip
         super.addInformation(stack, world, list, b);
         list.add(TextFormatting.DARK_GREEN + I18n.format("tooltip.gadget.block") + ": " + getToolBlock(stack).getBlock().getLocalizedName());
-        list.add(TextFormatting.AQUA + I18n.format("tooltip.gadget.mode") + ": " + getToolMode(stack));
-        if (getToolMode(stack) == ToolMode.Surface)
-            list.add(TextFormatting.YELLOW + I18n.format("tooltip.gadget.connectedarea") + ": " + getConnectedArea(stack));
-
+        ToolMode mode = getToolMode(stack);
+        list.add(TextFormatting.AQUA + I18n.format("tooltip.gadget.mode") + ": " + (mode == ToolMode.Surface && getConnectedArea(stack) ? I18n.format("tooltip.gadget.connected") + " " : "") + mode);
         if (getToolMode(stack) != ToolMode.BuildToMe)
             list.add(TextFormatting.LIGHT_PURPLE + I18n.format("tooltip.gadget.range") + ": " + getToolRange(stack));
 

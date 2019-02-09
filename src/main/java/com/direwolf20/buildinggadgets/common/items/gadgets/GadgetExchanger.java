@@ -5,6 +5,7 @@ import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.common.items.FakeBuilderWorld;
 import com.direwolf20.buildinggadgets.common.items.ModItems;
+import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetBuilding.ToolMode;
 import com.direwolf20.buildinggadgets.common.tools.ExchangingModes;
 import com.direwolf20.buildinggadgets.common.tools.InventoryManipulation;
 import com.direwolf20.buildinggadgets.common.tools.ToolRenders;
@@ -120,8 +121,8 @@ public class GadgetExchanger extends GadgetGeneric {
     public void addInformation(ItemStack stack, @Nullable World world, List<String> list, ITooltipFlag b) {
         super.addInformation(stack, world, list, b);
         list.add(TextFormatting.DARK_GREEN + I18n.format("tooltip.gadget.block") + ": " + getToolBlock(stack).getBlock().getLocalizedName());
-        list.add(TextFormatting.AQUA + I18n.format("tooltip.gadget.mode") + ": " + getToolMode(stack));
-        list.add(TextFormatting.YELLOW + I18n.format("tooltip.gadget.connectedarea") + ": " + getConnectedArea(stack));
+        ToolMode mode = getToolMode(stack);
+        list.add(TextFormatting.AQUA + I18n.format("tooltip.gadget.mode") + ": " + (mode == ToolMode.Surface && getConnectedArea(stack) ? I18n.format("tooltip.gadget.connected") + " " : "") + mode);
         list.add(TextFormatting.LIGHT_PURPLE + I18n.format("tooltip.gadget.range") + ": " + getToolRange(stack));
         list.add(TextFormatting.GOLD + I18n.format("tooltip.gadget.fuzzy") + ": " + getFuzzy(stack));
         addEnergyInformation(list, stack);

@@ -170,6 +170,7 @@ public class GadgetGeneric extends Item {
 
     public static void toggleConnectedArea(EntityPlayer player, ItemStack stack) {
         NBTTool.getOrNewTag(stack).setBoolean("unconnectedarea", getConnectedArea(stack));
-        player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.connectedarea").getUnformattedComponentText() + ": " + getConnectedArea(stack)), true);
+        String suffix = stack.getItem() instanceof GadgetDestruction ? "area" : "surface";
+        player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.connected" + suffix).getUnformattedComponentText() + ": " + getConnectedArea(stack)), true);
     }
 }
