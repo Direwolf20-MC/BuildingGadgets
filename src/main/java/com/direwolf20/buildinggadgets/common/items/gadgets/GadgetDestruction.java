@@ -24,6 +24,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumFacing.Axis;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
@@ -180,37 +181,20 @@ public class GadgetDestruction extends GadgetGeneric {
 
     public static ArrayList<EnumFacing> assignDirections(EnumFacing side, EntityPlayer player) {
         ArrayList<EnumFacing> dirs = new ArrayList<EnumFacing>();
-        EnumFacing left;
-        EnumFacing right;
-        EnumFacing up;
-        EnumFacing down;
         EnumFacing depth = side.getOpposite();
+        boolean vertical = side.getAxis() == Axis.Y;
+        EnumFacing up = vertical ? player.getHorizontalFacing() : EnumFacing.UP;
+        EnumFacing left = vertical ? up.rotateY() : side.rotateYCCW();
+        EnumFacing right = left.getOpposite();
+        if (side == EnumFacing.DOWN)
+            up = up.getOpposite();
 
-        if (side.equals(EnumFacing.NORTH) || side.equals(EnumFacing.SOUTH) || side.equals(EnumFacing.EAST) || side.equals(EnumFacing.WEST)) {
-            up = EnumFacing.UP;
-        } else {
-            up = player.getHorizontalFacing();
-        }
-        down = up.getOpposite();
-
-        if (side.equals(EnumFacing.WEST)) {
-            left = EnumFacing.SOUTH;
-        } else if (side.equals(EnumFacing.EAST)) {
-            left = EnumFacing.NORTH;
-        } else if (side.equals(EnumFacing.NORTH)) {
-            left = EnumFacing.WEST;
-        } else if (side.equals(EnumFacing.SOUTH)) {
-            left = EnumFacing.EAST;
-        } else {
-            left = player.getHorizontalFacing().rotateYCCW().getOpposite();
-        }
-        right = left.getOpposite();
+        EnumFacing down = up.getOpposite();
         dirs.add(left);
         dirs.add(right);
         dirs.add(up);
         dirs.add(down);
         dirs.add(depth);
-
         return dirs;
     }
 
