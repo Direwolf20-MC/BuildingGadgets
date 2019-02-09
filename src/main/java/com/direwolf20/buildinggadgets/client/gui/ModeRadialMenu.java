@@ -98,6 +98,7 @@ public class ModeRadialMenu extends GuiScreen {
             return;
 
         slotSelected = -1;
+        float offset = 8.5F;
 
         for (int seg = 0; seg < segments; seg++) {
             boolean mouseInSector = mouseIn && angle > totalDeg && angle < totalDeg + degPer;
@@ -160,6 +161,7 @@ public class ModeRadialMenu extends GuiScreen {
             } else {
                 name = GadgetCopyPaste.ToolMode.values()[i].name();
                 signs = signsCopyPaste;
+                offset = 8F;
             }
             name = "\u00a7" + c + name.replaceAll("(?=[A-Z])", " ").trim();
 
@@ -197,7 +199,7 @@ public class ModeRadialMenu extends GuiScreen {
 
         if (!tool.isEmpty()) {
             GlStateManager.scale(s, s, s);
-            GlStateManager.translate(x / s - 8, y / s - 8, 0);
+            GlStateManager.translate(x / s - offset, y / s - 8, 0);
             mc.getRenderItem().renderItemAndEffectIntoGUI(tool, 0, 0);
         }
         RenderHelper.disableStandardItemLighting();
