@@ -51,6 +51,7 @@ tooltip.gadget.destroywarning=WARNING: This tool voids blocks.
 tooltip.gadget.energy=Energy
 tooltip.gadget.mode=Mode
 tooltip.gadget.range=Range
+tooltip.gadget.fuzzy=Fuzzy
 tooltip.pasteContainer.amount=Amount
 tooltip.pasteContainer.creative.amountMsg=Amount: Infinite!
 tooltip.template.name=Name
