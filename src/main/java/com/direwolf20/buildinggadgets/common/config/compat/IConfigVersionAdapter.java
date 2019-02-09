@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.common.config.compat;
 
-import net.minecraftforge.common.config.Configuration;
+import net.minecraftforge.common.config.ConfigCategory;
 import net.minecraftforge.fml.common.versioning.ComparableVersion;
 
 import javax.annotation.Nonnull;
@@ -16,7 +16,7 @@ public interface IConfigVersionAdapter {
     }
 
     @Nonnull
-    public Configuration updateToVersion(@Nonnull Path modConfigDir, @Nullable Configuration configuration);
+    public ConfigCategory updateToVersion(@Nonnull Path modConfigDir, @Nullable ConfigCategory previousPortedVal);
 
     @Nonnull
     public ComparableVersion getMinVersion();

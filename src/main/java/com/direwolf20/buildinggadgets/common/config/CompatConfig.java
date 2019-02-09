@@ -5,6 +5,7 @@ import net.minecraftforge.common.config.Config.Type;
 import net.minecraftforge.common.config.ConfigCategory;
 import net.minecraftforge.common.config.ConfigManager;
 import net.minecraftforge.common.config.Configuration;
+import net.minecraftforge.common.config.Property;
 
 import java.io.File;
 
@@ -86,5 +87,35 @@ public class CompatConfig {
         SyncedConfig.transferValues();
         //save the values to the new config
         ConfigManager.sync(BuildingGadgets.MODID, Type.INSTANCE);
+    }
+
+    public static void copyValue(ConfigCategory target, ConfigCategory source, String newKey, String oldKey, String[] defaultValue, Property.Type type) {
+        Property prop = source.get(oldKey);
+        if (prop != null && prop.getType() == type) {
+            setValue(target, newKey, prop.getString(), type);
+        } else if (prop != null) {
+            throw new RuntimeException("Expected Property types to be identical, but " + prop.getType().name() + " cannot be migrated to " + type.name() + "!");
+        } else {
+            setValue(target, newKey, defaultValue, type);
+        }
+    }
+
+    public static void copyValue(ConfigCategory target, ConfigCategory source, String newKey, String oldKey, String defaultValue, Property.Type type) {
+        Property prop = source.get(oldKey);
+        if (prop != null && prop.getType() == type) {
+            setValue(target, newKey, prop.getString(), type);
+        } else if (prop != null) {
+            throw new RuntimeException("Expected Property types to be identical, but " + prop.getType().name() + " cannot be migrated to " + type.name() + "!");
+        } else {
+            setValue(target, newKey, defaultValue, type);
+        }
+    }
+
+    public static void setValue(ConfigCategory target, String newKey, String[] defaultValue, Property.Type type) {
+        target.put(newKey, new Property(newKey, defaultValue, type));
+    }
+
+    public static void setValue(ConfigCategory target, String newKey, String defaultValue, Property.Type type) {
+        target.put(newKey, new Property(newKey, defaultValue, type));
     }
 }

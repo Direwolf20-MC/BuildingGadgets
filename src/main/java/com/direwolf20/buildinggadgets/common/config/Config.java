@@ -5,7 +5,7 @@ import net.minecraft.init.Blocks;
 import net.minecraftforge.common.config.Config.*;
 
 //hardcode this name, so that we use a different config file than before we used Annotations
-@net.minecraftforge.common.config.Config(modid = BuildingGadgets.MODID, name = "Building Gadgets", category = Config.CATEGORY_ROOT)
+@net.minecraftforge.common.config.Config(modid = BuildingGadgets.MODID, name = "BuildingGadgets", category = Config.CATEGORY_ROOT)
 public class Config {
 
     static final String CATEGORY_ROOT = "general";

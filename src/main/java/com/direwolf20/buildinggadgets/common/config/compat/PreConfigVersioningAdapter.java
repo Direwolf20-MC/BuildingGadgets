@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.common.config.compat;
 
-import net.minecraftforge.common.config.Configuration;
+import net.minecraftforge.common.config.ConfigCategory;
 import net.minecraftforge.fml.common.versioning.ComparableVersion;
 
 import javax.annotation.Nonnull;
@@ -10,7 +10,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class PreConfigVersioningAdapter implements IConfigVersionAdapter {
-    private static final ComparableVersion MIN_VER = new ComparableVersion("0.0.0");
+    private static final ComparableVersion MIN_VER = new ComparableVersion("2.6.0");
 
     @Override
     public boolean isApplicableTo(@Nonnull Path modConfigDir, @Nullable ComparableVersion configVersion) {
@@ -19,8 +19,8 @@ public class PreConfigVersioningAdapter implements IConfigVersionAdapter {
 
     @Override
     @Nonnull
-    public Configuration updateToVersion(@Nonnull Path modConfigDir, @Nullable Configuration configuration) {
-        return new Configuration();
+    public ConfigCategory updateToVersion(@Nonnull Path modConfigDir, @Nullable ConfigCategory configuration) {
+        return new ConfigCategory("Stub");
     }
 
     @Override
