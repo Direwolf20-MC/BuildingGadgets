@@ -13,6 +13,7 @@ import net.minecraft.world.World;
 import java.util.*;
 
 public class BuildingModes {
+
     private static boolean isReplaceable(World world, BlockPos pos, IBlockState setBlock) {
         if (!setBlock.getBlock().canPlaceBlockAt(world, pos)) {
             return false;
@@ -332,6 +333,23 @@ public class BuildingModes {
                 }
             }
         }
+        //***************************************************
+        //SameMaterial
+        //***************************************************
+        else if (mode == GadgetBuilding.ToolMode.SameMaterial) {
+            IBlockState clickedBlock = world.getBlockState(startBlock);
+            // Iterate the base blocks for extending
+            for (BlockPos source : VectorTools.posOnPlane(startBlock, sideHit, range)) {
+                // Select blocks that is same with clickedBlock only
+                if (world.getBlockState(source) == clickedBlock) {
+                    // Build at the space aside of it, based on which side the player clicked
+                    BlockPos buildTarget = source.offset(sideHit);
+                    if (isReplaceable(world, buildTarget, setBlock)) {
+                        coordinates.add(buildTarget);
+                    }
+                }
+            }
+        }
         return coordinates;
     }
 
@@ -401,4 +419,5 @@ public class BuildingModes {
         //System.out.println(sortedList);
         return sortedMap;
     }
+
 }

@@ -46,7 +46,7 @@ public class GadgetBuilding extends GadgetGeneric {
     private static final FakeBuilderWorld fakeWorld = new FakeBuilderWorld();
 
     public enum ToolMode {
-        BuildToMe, VerticalColumn, HorizontalColumn, VerticalWall, HorizontalWall, Stairs, Grid;
+        BuildToMe, VerticalColumn, HorizontalColumn, VerticalWall, HorizontalWall, Stairs, Grid, SameMaterial;
         private static ToolMode[] vals = values();
 
         public ToolMode next() {
