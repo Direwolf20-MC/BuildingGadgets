@@ -17,6 +17,7 @@ item.buildinggadgets.constructionpaste.name=Construction Paste
 item.buildinggadgets.constructionpastecontainer.name=Paste Container
 item.buildinggadgets.constructionpastecontainert2.name=Paste Container T2
 item.buildinggadgets.constructionpastecontainert3.name=Paste Container T3
+item.buildinggadgets.constructionpastecontainercreative.name=Creative Paste Container
 item.buildinggadgets.copypastetool.name=Copy-Paste Gadget
 item.buildinggadgets.destructiontool.name=Destruction Gadget
 item.buildinggadgets.exchangertool.name=Exchanging Gadget
@@ -50,6 +51,7 @@ tooltip.gadget.energy=Energy
 tooltip.gadget.mode=Mode
 tooltip.gadget.range=Range
 tooltip.pasteContainer.amount=Amount
+tooltip.pasteContainer.creative.amountMsg=Amount: Infinite!
 tooltip.template.name=Name
 
 #message: 
@@ -126,4 +128,10 @@ config.buildinggadgets.general.subCategoryGadgets.gadgetDestruction.maxEnergy=Ma
 config.buildinggadgets.general.subCategoryGadgets.gadgetDestruction.maxEnergy.tooltip=The max energy of the Destruction Gadget
 config.buildinggadgets.general.subCategoryGadgets.gadgetCopyPaste=Copy-Paste Gadget
 config.buildinggadgets.general.subCategoryGadgets.gadgetCopyPaste.tooltip=Energy Cost & Durability of the Copy-Paste Gadget
-
+config.buildinggadgets.general.subCategoryPasteContainers=Construction Paste Containers
+config.buildinggadgets.general.subCategoryPasteContainers.tooltip=Configure the Construction Paste Containers here
+config.buildinggadgets.general.subCategoryPasteContainers.capacity.t1.tooltip=The maximum capacity of a tier 1 (iron) Construction Paste Container
+config.buildinggadgets.general.subCategoryPasteContainers.capacity.t2=T2 Paste Container Capacity
+config.buildinggadgets.general.subCategoryPasteContainers.capacity.t2.tooltip=The maximum capacity of a tier 2 (gold) Construction Paste Container
+config.buildinggadgets.general.subCategoryPasteContainers.capacity.t3=T3 Paste Container Capacity
+config.buildinggadgets.general.subCategoryPasteContainers.capacity.t3.tooltip=The maximum capacity of a tier 3 (diamond) Construction Paste Container
