@@ -16,6 +16,8 @@ public class Config {
 
     private static final String LANG_KEY_GADGETS = LANG_KEY_ROOT + ".subCategoryGadgets";
 
+    private static final String LANG_KEY_PASTE_CONTAINERS = LANG_KEY_ROOT + ".subCategoryPasteContainers";
+
     private static final String LANG_KEY_GADGET_BUILDING = LANG_KEY_GADGETS + ".gadgetBuilding";
 
     private static final String LANG_KEY_GADGET_EXCHANGER = LANG_KEY_GADGETS + ".gadgetExchanger";
@@ -23,6 +25,8 @@ public class Config {
     private static final String LANG_KEY_GADGET_DESTRUCTION = LANG_KEY_GADGETS + ".gadgetDestruction";
 
     private static final String LANG_KEY_GADGET_COPY_PASTE = LANG_KEY_GADGETS + ".gadgetCopyPaste";
+
+    private static final String LANG_KEY_PASTE_CONTAINERS_CAPACITY = LANG_KEY_PASTE_CONTAINERS + ".capacity";
 
     private static final String LANG_KEY_GADGETS_ENERGY = LANG_KEY_GADGETS + ".energyCost";
 
@@ -85,15 +89,23 @@ public class Config {
         public String[] blockBlacklist = {"minecraft:.*_door.*", PatternList.getName(Blocks.PISTON_HEAD)};
     }
 
+    @RequiresMcRestart
+    @RequiresWorldRestart
     @Name("Gadgets")
     @Comment("Configure the Gadgets here")
     @LangKey(LANG_KEY_GADGETS)
     public static CategoryGadgets subCategoryGadgets = new CategoryGadgets();
 
+    @Name("Paste Containers")
+    @Comment("Configure the Paste Containers here")
+    @LangKey(LANG_KEY_PASTE_CONTAINERS)
+    public static CategoryPasteContainers subCategoryPasteContainers = new CategoryPasteContainers();
+
     //using unistantiable final class instead of enum, so that it doesn't cause issues with the ConfigManger trying to access the Instance field
     //No defense against reflection needed here (I think)
     public static final class CategoryGadgets {
-        private CategoryGadgets() { }
+        private CategoryGadgets() {
+        }
 
         @RangeInt(min = 1, max = 25)
         @Name("Maximum allowed Range")
@@ -195,6 +207,29 @@ public class Config {
             @LangKey(LANG_KEY_GADGETS_DURABILITY)
             public int durabilityCopyPaste = 500;
         }
+    }
+
+    public static final class CategoryPasteContainers {
+        private CategoryPasteContainers() {
+        }
+
+        @RangeInt(min = 1)
+        @Comment("The maximum capacity of a tier 1 (iron) Construction Paste Container")
+        @Name("T1 Container Capacity")
+        @LangKey(LANG_KEY_PASTE_CONTAINERS_CAPACITY + ".t1")
+        public int t1Capacity = 512;
+
+        @RangeInt(min = 1)
+        @Comment("The maximum capacity of a tier 2 (gold) Construction Paste Container")
+        @Name("T2 Container Capacity")
+        @LangKey(LANG_KEY_PASTE_CONTAINERS_CAPACITY + ".t2")
+        public int t2Capacity = 2048;
+
+        @RangeInt(min = 1)
+        @Comment("The maximum capacity of a tier 3 (diamond) Construction Paste Container")
+        @Name("T3 Container Capacity")
+        @LangKey(LANG_KEY_PASTE_CONTAINERS_CAPACITY + ".t3")
+        public int t3Capacity = 8192;
     }
 
 }

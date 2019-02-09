@@ -1,10 +1,10 @@
 package com.direwolf20.buildinggadgets.common.tools;
 
-import com.direwolf20.buildinggadgets.common.items.ConstructionPaste;
-import com.direwolf20.buildinggadgets.common.items.GenericPasteContainer;
 import com.direwolf20.buildinggadgets.common.items.ModItems;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
+import com.direwolf20.buildinggadgets.common.items.pastes.ConstructionPaste;
+import com.direwolf20.buildinggadgets.common.items.pastes.GenericPasteContainer;
 import com.google.common.collect.ImmutableSet;
 import net.minecraft.block.*;
 import net.minecraft.block.properties.IProperty;
@@ -202,7 +202,7 @@ public class InventoryManipulation {
 
         for (Map.Entry<Integer, Integer> entry : list) {
             ItemStack containerStack = inv.getStackInSlot(entry.getKey());
-            int maxAmount = ((GenericPasteContainer) containerStack.getItem()).getMaxAmount();
+            int maxAmount = ((GenericPasteContainer) containerStack.getItem()).getMaxCapacity();
             int pasteInContainer = GenericPasteContainer.getPasteAmount(containerStack);
             int freeSpace = maxAmount - pasteInContainer;
             int stackSize = itemStack.getCount();
@@ -333,6 +333,5 @@ public class InventoryManipulation {
         Block block = originalState.getBlock();
         placeState = originalState.getBlock().getDefaultState();
         return placeState;
-
     }*/
 }

@@ -319,7 +319,7 @@ public class BuildingModes {
         //***************************************************
         //Checkerboard
         //***************************************************
-        else if (mode == GadgetBuilding.ToolMode.Checkerboard) {
+        else if (mode == GadgetBuilding.ToolMode.Grid) {
             range++;
             for (int x = range * -7 / 5; x <= range * 7 / 5; x++) {
                 for (int z = range * -7 / 5; z <= range * 7 / 5; z++) {

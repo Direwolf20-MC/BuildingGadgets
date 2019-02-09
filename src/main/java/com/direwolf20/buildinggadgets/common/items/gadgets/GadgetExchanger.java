@@ -46,7 +46,7 @@ public class GadgetExchanger extends GadgetGeneric {
     private static final FakeBuilderWorld fakeWorld = new FakeBuilderWorld();
 
     public enum ToolMode {
-        Wall, VerticalColumn, HorizontalColumn, Checkerboard;
+        Wall, VerticalColumn, HorizontalColumn, Grid;
         private static ToolMode[] vals = values();//TODO unused
 
         public ToolMode next() {//TODO unused
@@ -178,7 +178,7 @@ public class GadgetExchanger extends GadgetGeneric {
 
     public void rangeChange(EntityPlayer player, ItemStack heldItem) {
         int range = getToolRange(heldItem);
-        int changeAmount = (getToolMode(heldItem) == ToolMode.Checkerboard || (range % 2 == 0)) ? 1 : 2;
+        int changeAmount = (getToolMode(heldItem) == ToolMode.Grid || (range % 2 == 0)) ? 1 : 2;
         if (player.isSneaking()) {
             range = (range <= 1) ? SyncedConfig.maxRange : range - changeAmount;
         } else {

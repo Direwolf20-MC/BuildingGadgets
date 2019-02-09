@@ -80,6 +80,15 @@ public class SyncedConfig {
     @AutoSync
     public static boolean enablePaste;
 
+    @AutoSync
+    public static int t1ContainerCapacity = 512;
+
+    @AutoSync
+    public static int t2ContainerCapacity = 2048;
+
+    @AutoSync
+    public static int t3ContainerCapacity = 8192;
+
     @AutoSync(mapperId = FieldMapper.PATTERN_LIST_MAPPER_ID)
     public static PatternList blockBlacklist;
 
@@ -112,6 +121,10 @@ public class SyncedConfig {
 
         energyCostCopyPaste = Config.subCategoryGadgets.subCategoryGadgetCopyPaste.energyCostCopyPaste;
         durabilityCopyPaste = Config.subCategoryGadgets.subCategoryGadgetCopyPaste.durabilityCopyPaste;
+
+        t1ContainerCapacity = Config.subCategoryPasteContainers.t1Capacity;
+        t2ContainerCapacity = Config.subCategoryPasteContainers.t2Capacity;
+        t3ContainerCapacity = Config.subCategoryPasteContainers.t3Capacity;
     }
 
     /**

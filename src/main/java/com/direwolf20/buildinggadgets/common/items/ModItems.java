@@ -5,6 +5,9 @@ import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetBuilding;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetDestruction;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetExchanger;
+import com.direwolf20.buildinggadgets.common.items.pastes.ConstructionPaste;
+import com.direwolf20.buildinggadgets.common.items.pastes.ConstructionPasteContainer;
+import com.direwolf20.buildinggadgets.common.items.pastes.ConstructionPasteContainerCreative;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
 @GameRegistry.ObjectHolder(BuildingGadgets.MODID)
@@ -22,10 +25,13 @@ public class ModItems {
     public static ConstructionPasteContainer constructionPasteContainer;
 
     @GameRegistry.ObjectHolder("constructionpastecontainert2")
-    public static ConstructionPasteContainerT2 constructionPasteContainert2;
+    public static ConstructionPasteContainer constructionPasteContainert2;
 
     @GameRegistry.ObjectHolder("constructionpastecontainert3")
-    public static ConstructionPasteContainerT3 constructionPasteContainert3;
+    public static ConstructionPasteContainer constructionPasteContainert3;
+
+    @GameRegistry.ObjectHolder("constructionpastecontainercreative")
+    public static ConstructionPasteContainerCreative constructionPasteContainerCreative;
 
     @GameRegistry.ObjectHolder("copypastetool")
     public static GadgetCopyPaste gadgetCopyPaste;
