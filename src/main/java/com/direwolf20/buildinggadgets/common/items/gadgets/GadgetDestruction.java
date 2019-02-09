@@ -150,6 +150,7 @@ public class GadgetDestruction extends GadgetGeneric {
         if (tagCompound == null) {
             tagCompound = new NBTTagCompound();
             tagCompound.setBoolean("overlay", true);
+            tagCompound.setBoolean("fuzzy", true);
             stack.setTagCompound(tagCompound);
             return true;
         }
@@ -261,6 +262,7 @@ public class GadgetDestruction extends GadgetGeneric {
         BlockPos startPos = (getAnchor(stack) == null) ? pos : getAnchor(stack);
         EnumFacing side = (getAnchorSide(stack) == null) ? incomingSide : getAnchorSide(stack);
         ArrayList<EnumFacing> directions = assignDirections(side, player);
+        IBlockState stateTarget = GadgetGeneric.getFuzzy(stack) ? world.getBlockState(pos) : null;
         for (int d = 0; d < getToolValue(stack, "depth"); d++) {
             for (int x = getToolValue(stack, "left") * -1; x <= getToolValue(stack, "right"); x++) {
                 for (int y = getToolValue(stack, "down") * -1; y <= getToolValue(stack, "up"); y++) {
@@ -268,7 +270,7 @@ public class GadgetDestruction extends GadgetGeneric {
                     voidPos = voidPos.offset(directions.get(0), x);
                     voidPos = voidPos.offset(directions.get(2), y);
                     voidPos = voidPos.offset(directions.get(4), d);
-                    if (validBlock(world, voidPos, player)) {
+                    if (validBlock(world, voidPos, player, stateTarget)) {
                         voidPosArray.add(voidPos);
                     }
                 }
@@ -277,8 +279,9 @@ public class GadgetDestruction extends GadgetGeneric {
         return voidPosArray;
     }
 
-    public static boolean validBlock(World world, BlockPos voidPos, EntityPlayer player) {
+    public static boolean validBlock(World world, BlockPos voidPos, EntityPlayer player, @Nullable IBlockState stateTarget) {
         IBlockState currentBlock = world.getBlockState(voidPos);
+        if (stateTarget != null && currentBlock != stateTarget) return false;
         TileEntity te = world.getTileEntity(voidPos);
         if (currentBlock.getMaterial() == Material.AIR) return false;
         //if (currentBlock.getBlock().getMaterial(currentBlock).isLiquid()) return false;

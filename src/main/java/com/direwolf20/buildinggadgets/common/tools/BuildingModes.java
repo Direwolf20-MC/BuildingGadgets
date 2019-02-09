@@ -2,6 +2,8 @@ package com.direwolf20.buildinggadgets.common.tools;
 
 import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetBuilding;
+import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
+
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
@@ -340,9 +342,10 @@ public class BuildingModes {
             IBlockState startState = world.getBlockState(startBlock);
             AxisAlignedBB area = new AxisAlignedBB(pos).grow(bound * (1 - Math.abs(sideHit.getFrontOffsetX())), bound * (1 - Math.abs(sideHit.getFrontOffsetY())), bound * (1 - Math.abs(sideHit.getFrontOffsetZ())));
             BlockPos locOffset;
+            boolean fuzzyMode = GadgetGeneric.getFuzzy(tool);
             for (BlockPos loc : BlockPos.getAllInBox((int) area.minX, (int) area.minY, (int) area.minZ, (int) area.maxX - 1, (int) area.maxY - 1, (int) area.maxZ - 1)) {
                 locOffset = loc.offset(sideHit);
-                if (world.getBlockState(loc) == startState && isReplaceable(world, locOffset, setBlock)) {
+                if ((fuzzyMode ? !world.isAirBlock(loc) : world.getBlockState(loc) == startState) && isReplaceable(world, locOffset, setBlock)) {
                     coordinates.add(locOffset);
                 }
             }

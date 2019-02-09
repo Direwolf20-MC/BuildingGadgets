@@ -3,6 +3,8 @@ package com.direwolf20.buildinggadgets.common.tools;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.blocks.ModBlocks;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetExchanger;
+import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
+
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
@@ -56,7 +58,7 @@ public class ExchangingModes {
         GadgetExchanger.ToolMode mode = GadgetExchanger.getToolMode(tool);
         IBlockState setBlock = GadgetUtils.getToolBlock(tool);
         int range = GadgetUtils.getToolRange(tool);
-        Boolean fuzzyMode = GadgetExchanger.getFuzzy(tool);
+        boolean fuzzyMode = GadgetGeneric.getFuzzy(tool);
 
         List<BlockPos> coordinates = new ArrayList<BlockPos>();
 //        BlockPos playerPos = new BlockPos(Math.floor(player.posX), Math.floor(player.posY), Math.floor(player.posZ));

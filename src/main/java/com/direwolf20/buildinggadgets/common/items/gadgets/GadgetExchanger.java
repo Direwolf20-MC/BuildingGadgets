@@ -92,22 +92,6 @@ public class GadgetExchanger extends GadgetGeneric {
         return super.canApplyAtEnchantingTable(stack, enchantment);
     }
 
-    private static void setFuzzy(ItemStack stack, boolean fuzzy) {
-        NBTTagCompound tagCompound = stack.getTagCompound();
-        if (tagCompound == null) {
-            tagCompound = new NBTTagCompound();
-        }
-        tagCompound.setBoolean("fuzzy", fuzzy);
-    }
-
-    public static boolean getFuzzy(ItemStack stack) {
-        NBTTagCompound tagCompound = stack.getTagCompound();
-        if (tagCompound == null) {
-            tagCompound = new NBTTagCompound();
-        }
-        return tagCompound.getBoolean("fuzzy");
-    }
-
     private static void setToolMode(ItemStack stack, ToolMode mode) {
         NBTTagCompound tagCompound = stack.getTagCompound();
         if (tagCompound == null) {
@@ -169,11 +153,6 @@ public class GadgetExchanger extends GadgetGeneric {
         ToolMode mode = ToolMode.values()[modeInt];
         setToolMode(heldItem, mode);
         player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.toolmode").getUnformattedComponentText() + ": " + mode.name()), true);
-    }
-
-    public void toggleFuzzy(EntityPlayer player, ItemStack heldItem) {
-        setFuzzy(heldItem, !(getFuzzy(heldItem)));
-        player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.fuzzymode").getUnformattedComponentText() + ": " + getFuzzy(heldItem)), true);
     }
 
     public void rangeChange(EntityPlayer player, ItemStack heldItem) {

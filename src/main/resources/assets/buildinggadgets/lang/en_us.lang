@@ -39,8 +39,9 @@ block.buildinggadgets.templatemanager.name=Template Manager
 key.anchorKey=Anchor
 key.categories.buildingGadgets=Building Gadgets
 key.modeSwitch=Mode Switch
-key.rangeChange=Range
-key.undoKey=Undo/Fuzzy
+key.rangeChange=Range / Rotate / Overlay
+key.undoKey=Undo
+key.fuzzyKey=Fuzzy
 
 #tooltip: 
 tooltip.constructionblockpowder.helptext=Place next to water
