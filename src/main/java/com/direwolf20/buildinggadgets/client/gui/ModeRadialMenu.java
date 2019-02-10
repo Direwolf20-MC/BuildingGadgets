@@ -209,9 +209,15 @@ public class ModeRadialMenu extends GuiScreen {
         GlStateManager.popMatrix();
     }
 
+    private void changeMode() {
+        if (slotSelected >= 0)
+            PacketHandler.INSTANCE.sendToServer(new PacketToggleMode(slotSelected));
+    }
+
     @Override
     protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
         super.mouseClicked(mouseX, mouseY, mouseButton);
+        changeMode();
     }
 
     @Override
@@ -220,9 +226,7 @@ public class ModeRadialMenu extends GuiScreen {
 
         if (!GameSettings.isKeyDown(KeyBindings.modeSwitch)) {
             mc.displayGuiScreen(null);
-            if (slotSelected != -1) {
-                PacketHandler.INSTANCE.sendToServer(new PacketToggleMode(slotSelected));
-            }
+            changeMode();
         }
 
         ImmutableSet<KeyBinding> set = ImmutableSet.of(mc.gameSettings.keyBindForward, mc.gameSettings.keyBindLeft, mc.gameSettings.keyBindBack, mc.gameSettings.keyBindRight, mc.gameSettings.keyBindSneak, mc.gameSettings.keyBindSprint, mc.gameSettings.keyBindJump);
