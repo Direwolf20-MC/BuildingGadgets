@@ -232,7 +232,6 @@ public class GadgetUtils {
         NBTTagCompound tagCompound = stack.getTagCompound();
         if (tagCompound == null) {
             setToolBlock(stack, Blocks.AIR.getDefaultState());
-            tagCompound = stack.getTagCompound();
             return Blocks.AIR.getDefaultState();
         }
         return NBTUtil.readBlockState(tagCompound.getCompoundTag("blockstate"));

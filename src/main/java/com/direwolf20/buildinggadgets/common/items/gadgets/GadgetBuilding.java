@@ -46,8 +46,13 @@ public class GadgetBuilding extends GadgetGeneric {
     private static final FakeBuilderWorld fakeWorld = new FakeBuilderWorld();
 
     public enum ToolMode {
-        BuildToMe, VerticalColumn, HorizontalColumn, VerticalWall, HorizontalWall, Stairs, Grid;
+        BuildToMe, VerticalColumn, HorizontalColumn, VerticalWall, HorizontalWall, Stairs, Grid, Surface;
         private static ToolMode[] vals = values();
+
+        @Override
+        public String toString() {
+            return formatName(name());
+        }
 
         public ToolMode next() {
             return vals[(this.ordinal() + 1) % vals.length];
@@ -106,10 +111,14 @@ public class GadgetBuilding extends GadgetGeneric {
         //Add tool information to the tooltip
         super.addInformation(stack, world, list, b);
         list.add(TextFormatting.DARK_GREEN + I18n.format("tooltip.gadget.block") + ": " + getToolBlock(stack).getBlock().getLocalizedName());
-        list.add(TextFormatting.AQUA + I18n.format("tooltip.gadget.mode") + ": " + getToolMode(stack));
-        if (getToolMode(stack) != ToolMode.BuildToMe) {
-            list.add(TextFormatting.RED + I18n.format("tooltip.gadget.range") + ": " + getToolRange(stack));
-        }
+        ToolMode mode = getToolMode(stack);
+        list.add(TextFormatting.AQUA + I18n.format("tooltip.gadget.mode") + ": " + (mode == ToolMode.Surface && getConnectedArea(stack) ? I18n.format("tooltip.gadget.connected") + " " : "") + mode);
+        if (getToolMode(stack) != ToolMode.BuildToMe)
+            list.add(TextFormatting.LIGHT_PURPLE + I18n.format("tooltip.gadget.range") + ": " + getToolRange(stack));
+
+        if (getToolMode(stack) == ToolMode.Surface)
+            list.add(TextFormatting.GOLD + I18n.format("tooltip.gadget.fuzzy") + ": " + getFuzzy(stack));
+
         addEnergyInformation(list, stack);
     }
 
@@ -135,28 +144,25 @@ public class GadgetBuilding extends GadgetGeneric {
     }
 
     public void toggleMode(EntityPlayer player, ItemStack heldItem) {//TODO unused
-        //Called when the mode toggle hotkey is pressed
-        ToolMode mode = getToolMode(heldItem);
-        mode = mode.next();
-        setToolMode(heldItem, mode);
-        player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.toolmode").getUnformattedComponentText() + ": " + mode.name()), true);
+        setMode(player, heldItem, getToolMode(heldItem).next().ordinal());
     }
 
     public void setMode(EntityPlayer player, ItemStack heldItem, int modeInt) {
         //Called when we specify a mode with the radial menu
         ToolMode mode = ToolMode.values()[modeInt];
         setToolMode(heldItem, mode);
-        player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.toolmode").getUnformattedComponentText() + ": " + mode.name()), true);
+        player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.toolmode").getUnformattedComponentText() + ": " + mode), true);
     }
 
     public void rangeChange(EntityPlayer player, ItemStack heldItem) {
         //Called when the range change hotkey is pressed
         int range = getToolRange(heldItem);
-        if (player.isSneaking()) {
-            range = (range == 1) ? SyncedConfig.maxRange : range - 1;
-        } else {
-            range = (range >= SyncedConfig.maxRange) ? 1 : range + 1;
-        }
+        int changeAmount = (getToolMode(heldItem) != ToolMode.Surface || (range % 2 == 0)) ? 1 : 2;
+        if (player.isSneaking())
+            range = (range == 1) ? SyncedConfig.maxRange : range - changeAmount;
+        else
+            range = (range >= SyncedConfig.maxRange) ? 1 : range + changeAmount;
+
         setToolRange(heldItem, range);
         player.sendStatusMessage(new TextComponentString(TextFormatting.DARK_AQUA + new TextComponentTranslation("message.gadget.toolrange").getUnformattedComponentText() + ": " + range), true);
     }

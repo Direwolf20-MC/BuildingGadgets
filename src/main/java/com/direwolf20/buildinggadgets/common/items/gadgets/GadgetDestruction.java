@@ -24,7 +24,9 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumFacing.Axis;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.text.TextComponentString;
@@ -73,6 +75,8 @@ public class GadgetDestruction extends GadgetGeneric {
         super.addInformation(stack, world, list, b);
         list.add(TextFormatting.RED + I18n.format("tooltip.gadget.destroywarning"));
         list.add(TextFormatting.AQUA + I18n.format("tooltip.gadget.destroyshowoverlay") + ": " + getOverlay(stack));
+        list.add(TextFormatting.YELLOW + I18n.format("tooltip.gadget.connectedarea") + ": " + getConnectedArea(stack));
+        list.add(TextFormatting.GOLD + I18n.format("tooltip.gadget.fuzzy") + ": " + getFuzzy(stack));
         addEnergyInformation(list,stack);
     }
 
@@ -150,6 +154,7 @@ public class GadgetDestruction extends GadgetGeneric {
         if (tagCompound == null) {
             tagCompound = new NBTTagCompound();
             tagCompound.setBoolean("overlay", true);
+            tagCompound.setBoolean("fuzzy", true);
             stack.setTagCompound(tagCompound);
             return true;
         }
@@ -170,43 +175,28 @@ public class GadgetDestruction extends GadgetGeneric {
         stack.setTagCompound(tagCompound);
     }
 
-    public void switchOverlay(ItemStack stack) {
-        setOverlay(stack, !getOverlay(stack));
+    public void switchOverlay(EntityPlayer player, ItemStack stack) {
+        boolean overlay = !getOverlay(stack);
+        setOverlay(stack, overlay);
+        player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("tooltip.gadget.destroyshowoverlay").getUnformattedComponentText() + ": " + overlay), true);
     }
 
     public static ArrayList<EnumFacing> assignDirections(EnumFacing side, EntityPlayer player) {
         ArrayList<EnumFacing> dirs = new ArrayList<EnumFacing>();
-        EnumFacing left;
-        EnumFacing right;
-        EnumFacing up;
-        EnumFacing down;
         EnumFacing depth = side.getOpposite();
+        boolean vertical = side.getAxis() == Axis.Y;
+        EnumFacing up = vertical ? player.getHorizontalFacing() : EnumFacing.UP;
+        EnumFacing left = vertical ? up.rotateY() : side.rotateYCCW();
+        EnumFacing right = left.getOpposite();
+        if (side == EnumFacing.DOWN)
+            up = up.getOpposite();
 
-        if (side.equals(EnumFacing.NORTH) || side.equals(EnumFacing.SOUTH) || side.equals(EnumFacing.EAST) || side.equals(EnumFacing.WEST)) {
-            up = EnumFacing.UP;
-        } else {
-            up = player.getHorizontalFacing();
-        }
-        down = up.getOpposite();
-
-        if (side.equals(EnumFacing.WEST)) {
-            left = EnumFacing.SOUTH;
-        } else if (side.equals(EnumFacing.EAST)) {
-            left = EnumFacing.NORTH;
-        } else if (side.equals(EnumFacing.NORTH)) {
-            left = EnumFacing.WEST;
-        } else if (side.equals(EnumFacing.SOUTH)) {
-            left = EnumFacing.EAST;
-        } else {
-            left = player.getHorizontalFacing().rotateYCCW().getOpposite();
-        }
-        right = left.getOpposite();
+        EnumFacing down = up.getOpposite();
         dirs.add(left);
         dirs.add(right);
         dirs.add(up);
         dirs.add(down);
         dirs.add(depth);
-
         return dirs;
     }
 
@@ -261,15 +251,25 @@ public class GadgetDestruction extends GadgetGeneric {
         BlockPos startPos = (getAnchor(stack) == null) ? pos : getAnchor(stack);
         EnumFacing side = (getAnchorSide(stack) == null) ? incomingSide : getAnchorSide(stack);
         ArrayList<EnumFacing> directions = assignDirections(side, player);
-        for (int d = 0; d < getToolValue(stack, "depth"); d++) {
-            for (int x = getToolValue(stack, "left") * -1; x <= getToolValue(stack, "right"); x++) {
-                for (int y = getToolValue(stack, "down") * -1; y <= getToolValue(stack, "up"); y++) {
-                    BlockPos voidPos = new BlockPos(startPos);
-                    voidPos = voidPos.offset(directions.get(0), x);
-                    voidPos = voidPos.offset(directions.get(2), y);
-                    voidPos = voidPos.offset(directions.get(4), d);
-                    if (validBlock(world, voidPos, player)) {
-                        voidPosArray.add(voidPos);
+        IBlockState stateTarget = GadgetGeneric.getFuzzy(stack) ? null : world.getBlockState(pos);
+        if (GadgetGeneric.getConnectedArea(stack)) {
+            String[] directionNames = new String[] {"right", "left", "up", "down", "depth"};
+            AxisAlignedBB area = new AxisAlignedBB(pos);
+            for (int i = 0; i < directionNames.length; i++)
+                area = area.union(new AxisAlignedBB(pos.offset(directions.get(i), getToolValue(stack, directionNames[i]) - (i == 4 ? 1 : 0))));
+
+            addConnectedCoords(world, player, startPos, stateTarget, voidPosArray,
+                    (int) area.minX, (int) area.minY, (int) area.minZ, (int) area.maxX - 1, (int) area.maxY - 1, (int) area.maxZ - 1);
+        } else {
+            for (int d = 0; d < getToolValue(stack, "depth"); d++) {
+                for (int x = getToolValue(stack, "left") * -1; x <= getToolValue(stack, "right"); x++) {
+                    for (int y = getToolValue(stack, "down") * -1; y <= getToolValue(stack, "up"); y++) {
+                        BlockPos voidPos = new BlockPos(startPos);
+                        voidPos = voidPos.offset(directions.get(0), x);
+                        voidPos = voidPos.offset(directions.get(2), y);
+                        voidPos = voidPos.offset(directions.get(4), d);
+                        if (validBlock(world, voidPos, player, stateTarget))
+                            voidPosArray.add(voidPos);
                     }
                 }
             }
@@ -277,8 +277,27 @@ public class GadgetDestruction extends GadgetGeneric {
         return voidPosArray;
     }
 
-    public static boolean validBlock(World world, BlockPos voidPos, EntityPlayer player) {
+    public static void addConnectedCoords(World world, EntityPlayer player, BlockPos loc, IBlockState state,
+            List<BlockPos> coords, int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
+        if (coords.contains(loc) || loc.getX() < minX || loc.getY() < minY || loc.getZ() < minZ || loc.getX() > maxX || loc.getY() > maxY || loc.getZ() > maxZ)
+            return;
+
+        if (!validBlock(world, loc, player, state))
+            return;
+
+        coords.add(loc);
+        for (int x = -1; x <= 1; x++) {
+            for (int y = -1; y <= 1; y++) {
+                for (int z = -1; z <= 1; z++) {
+                    addConnectedCoords(world, player, loc.add(x, y, z), state, coords, minX, minY, minZ, maxX, maxY, maxZ);
+                }
+            }
+        }
+    }
+
+    public static boolean validBlock(World world, BlockPos voidPos, EntityPlayer player, @Nullable IBlockState stateTarget) {
         IBlockState currentBlock = world.getBlockState(voidPos);
+        if (stateTarget != null && currentBlock != stateTarget) return false;
         TileEntity te = world.getTileEntity(voidPos);
         if (currentBlock.getMaterial() == Material.AIR) return false;
         //if (currentBlock.getBlock().getMaterial(currentBlock).isLiquid()) return false;

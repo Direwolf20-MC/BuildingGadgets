@@ -6,6 +6,8 @@ import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
 import com.direwolf20.buildinggadgets.common.network.PacketAnchorKey;
 import com.direwolf20.buildinggadgets.common.network.PacketChangeRange;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
+import com.direwolf20.buildinggadgets.common.network.PacketToggleConnectedArea;
+import com.direwolf20.buildinggadgets.common.network.PacketToggleFuzzy;
 import com.direwolf20.buildinggadgets.common.network.PacketUndoKey;
 import net.minecraft.client.Minecraft;
 import net.minecraft.item.ItemStack;
@@ -41,6 +43,10 @@ public class EventKeyInput {
             PacketHandler.INSTANCE.sendToServer(new PacketUndoKey());
         } else if (KeyBindings.anchorKey.isPressed()) {
             PacketHandler.INSTANCE.sendToServer(new PacketAnchorKey());
+        } else if (KeyBindings.fuzzyKey.isPressed()) {
+            PacketHandler.INSTANCE.sendToServer(new PacketToggleFuzzy());
+        } else if (KeyBindings.connectedAreaKey.isPressed()) {
+            PacketHandler.INSTANCE.sendToServer(new PacketToggleConnectedArea());
         }
     }
 }

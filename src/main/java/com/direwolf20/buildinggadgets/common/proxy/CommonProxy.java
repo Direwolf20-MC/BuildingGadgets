@@ -3,6 +3,7 @@ package com.direwolf20.buildinggadgets.common.proxy;
 
 import com.direwolf20.buildinggadgets.client.gui.GuiProxy;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
+import com.direwolf20.buildinggadgets.common.ModSounds;
 import com.direwolf20.buildinggadgets.common.blocks.*;
 import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManager;
 import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManagerTileEntity;
@@ -23,6 +24,7 @@ import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.SoundEvent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
@@ -87,6 +89,13 @@ public class CommonProxy {
                 event.getRegistry().register(new ConstructionPasteContainer(type.itemSuffix, type.capacitySupplier));
             }
             event.getRegistry().register(new ConstructionPasteContainerCreative());
+        }
+    }
+
+    @SubscribeEvent
+    public static void registerSounds(RegistryEvent.Register<SoundEvent> event) {
+        for (ModSounds sound : ModSounds.values()) {
+            event.getRegistry().register(sound.getSound());
         }
     }
 }
