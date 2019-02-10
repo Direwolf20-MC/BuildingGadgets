@@ -8,6 +8,7 @@ package com.direwolf20.buildinggadgets.client.gui;
 
 import com.direwolf20.buildinggadgets.client.KeyBindings;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
+import com.direwolf20.buildinggadgets.common.ModSounds;
 import com.direwolf20.buildinggadgets.common.items.gadgets.*;
 import com.direwolf20.buildinggadgets.common.network.PacketChangeRange;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
@@ -28,6 +29,7 @@ import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.Vec3d;
 
 import org.lwjgl.opengl.GL11;
@@ -112,7 +114,9 @@ public class ModeRadialMenu extends GuiScreen {
     private void updateButtons(ItemStack tool) {
         int x = 0;
         for (int i = 0; i < buttonList.size(); i++) {
-            GuiButton button = buttonList.get(i);
+            GuiButtonSound button = (GuiButtonSound) buttonList.get(i);
+            SoundEvent sound = ModSounds.BEEP.getSound();
+            button.setSounds(sound, sound, 0.6F, 1F);
             if (!button.visible) continue;
             int len = mc.fontRenderer.getStringWidth(button.displayString) + 6;
             x += len + 10;
@@ -283,7 +287,7 @@ public class ModeRadialMenu extends GuiScreen {
     private void changeMode() {
         if (slotSelected >= 0) {
             PacketHandler.INSTANCE.sendToServer(new PacketToggleMode(slotSelected));
-            mc.getSoundHandler().playSound(PositionedSoundRecord.getMasterRecord(SoundEvents.UI_BUTTON_CLICK, 1.0F));
+            ModSounds.BEEP.playSound(mc.getSoundHandler());
         }
     }
 
