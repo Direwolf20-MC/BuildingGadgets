@@ -49,6 +49,11 @@ public class GadgetBuilding extends GadgetGeneric {
         BuildToMe, VerticalColumn, HorizontalColumn, VerticalWall, HorizontalWall, Stairs, Grid, Surface;
         private static ToolMode[] vals = values();
 
+        @Override
+        public String toString() {
+            return formatName(name());
+        }
+
         public ToolMode next() {
             return vals[(this.ordinal() + 1) % vals.length];
         }
@@ -139,18 +144,14 @@ public class GadgetBuilding extends GadgetGeneric {
     }
 
     public void toggleMode(EntityPlayer player, ItemStack heldItem) {//TODO unused
-        //Called when the mode toggle hotkey is pressed
-        ToolMode mode = getToolMode(heldItem);
-        mode = mode.next();
-        setToolMode(heldItem, mode);
-        player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.toolmode").getUnformattedComponentText() + ": " + mode.name()), true);
+        setMode(player, heldItem, getToolMode(heldItem).next().ordinal());
     }
 
     public void setMode(EntityPlayer player, ItemStack heldItem, int modeInt) {
         //Called when we specify a mode with the radial menu
         ToolMode mode = ToolMode.values()[modeInt];
         setToolMode(heldItem, mode);
-        player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.toolmode").getUnformattedComponentText() + ": " + mode.name()), true);
+        player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.toolmode").getUnformattedComponentText() + ": " + mode), true);
     }
 
     public void rangeChange(EntityPlayer player, ItemStack heldItem) {

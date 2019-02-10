@@ -173,4 +173,8 @@ public class GadgetGeneric extends Item {
         String suffix = stack.getItem() instanceof GadgetDestruction ? "area" : "surface";
         player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.connected" + suffix).getUnformattedComponentText() + ": " + getConnectedArea(stack)), true);
     }
+
+    protected static String formatName(String name) {
+        return name.replaceAll("(?=[A-Z])", " ").trim();
+    }
 }

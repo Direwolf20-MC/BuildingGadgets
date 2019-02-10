@@ -161,13 +161,13 @@ public class ModeRadialMenu extends GuiScreen {
 
             String name = "";
             if (tool.getItem() instanceof GadgetBuilding)
-                name = GadgetBuilding.ToolMode.values()[i].name();
+                name = GadgetBuilding.ToolMode.values()[i].toString();
             else if (tool.getItem() instanceof GadgetExchanger)
-                name = GadgetExchanger.ToolMode.values()[i].name();
+                name = GadgetExchanger.ToolMode.values()[i].toString();
             else
-                name = GadgetCopyPaste.ToolMode.values()[i].name();
+                name = GadgetCopyPaste.ToolMode.values()[i].toString();
 
-            name = "\u00a7" + c + name.replaceAll("(?=[A-Z])", " ").trim();
+            name = "\u00a7" + c + name;
 
             int xsp = xp - 4;
             int ysp = yp;
