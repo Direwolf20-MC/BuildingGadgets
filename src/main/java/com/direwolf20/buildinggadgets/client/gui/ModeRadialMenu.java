@@ -127,9 +127,7 @@ public class ModeRadialMenu extends GuiScreen {
             float a = 0.4F;
             if (mouseInSector) {
                 slotSelected = seg;
-                r = Color.WHITE.getRed() / 255F;
-                g = Color.WHITE.getGreen() / 255F;
-                b = Color.WHITE.getBlue() / 255F;
+                r = g = b = 1F;
             }
 
             GlStateManager.color(r, g, b, a);
@@ -184,7 +182,7 @@ public class ModeRadialMenu extends GuiScreen {
             if (ysp < y)
                 ysp -= 9;
 
-            fontRenderer.drawStringWithShadow(name, xsp, ysp, i == modeIndex ? Color.GREEN.getRGB() : 0xFFFFFF);
+            fontRenderer.drawStringWithShadow(name, xsp, ysp, i == modeIndex ? Color.GREEN.getRGB() : Color.WHITE.getRGB());
 
             mod = 0.8;
             xdp = (int) ((xp - x) * mod + x);
