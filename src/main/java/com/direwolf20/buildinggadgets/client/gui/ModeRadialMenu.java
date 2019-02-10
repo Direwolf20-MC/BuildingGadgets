@@ -99,6 +99,18 @@ public class ModeRadialMenu extends GuiScreen {
 
         slotSelected = -1;
         float offset = 8.5F;
+        ResourceLocation[] signs;
+        int modeIndex;
+        if (tool.getItem() instanceof GadgetBuilding) {
+            modeIndex = GadgetBuilding.getToolMode(tool).ordinal();
+            signs = signsBuilding;
+        } else if (tool.getItem() instanceof GadgetExchanger) {
+            modeIndex = GadgetExchanger.getToolMode(tool).ordinal();
+            signs = signsExchanger;
+        } else {
+            modeIndex = GadgetCopyPaste.getToolMode(tool).ordinal();
+            signs = signsCopyPaste;
+        }
 
         for (int seg = 0; seg < segments; seg++) {
             boolean mouseInSector = mouseIn && angle > totalDeg && angle < totalDeg + degPer;
@@ -110,15 +122,14 @@ public class ModeRadialMenu extends GuiScreen {
             if (seg % 2 == 0)
                 gs += 0.1F;
             float r = gs;
-            float g = gs;
+            float g = gs + (seg == modeIndex ? 1F : 0.0F);
             float b = gs;
             float a = 0.4F;
             if (mouseInSector) {
                 slotSelected = seg;
-                Color color = new Color(255, 255, 255);
-                r = color.getRed() / 255F;
-                g = color.getGreen() / 255F;
-                b = color.getBlue() / 255F;
+                r = Color.WHITE.getRed() / 255F;
+                g = Color.WHITE.getGreen() / 255F;
+                b = Color.WHITE.getBlue() / 255F;
             }
 
             GlStateManager.color(r, g, b, a);
@@ -151,18 +162,13 @@ public class ModeRadialMenu extends GuiScreen {
             char c = (char) pos[2];
 
             String name = "";
-            ResourceLocation[] signs;
-            if (tool.getItem() instanceof GadgetBuilding) {
+            if (tool.getItem() instanceof GadgetBuilding)
                 name = GadgetBuilding.ToolMode.values()[i].name();
-                signs = signsBuilding;
-            } else if (tool.getItem() instanceof GadgetExchanger) {
+            else if (tool.getItem() instanceof GadgetExchanger)
                 name = GadgetExchanger.ToolMode.values()[i].name();
-                signs = signsExchanger;
-            } else {
+            else
                 name = GadgetCopyPaste.ToolMode.values()[i].name();
-                signs = signsCopyPaste;
-                offset = 8F;
-            }
+
             name = "\u00a7" + c + name.replaceAll("(?=[A-Z])", " ").trim();
 
             int xsp = xp - 4;
@@ -178,7 +184,7 @@ public class ModeRadialMenu extends GuiScreen {
             if (ysp < y)
                 ysp -= 9;
 
-            fontRenderer.drawStringWithShadow(name, xsp, ysp, 0xFFFFFF);
+            fontRenderer.drawStringWithShadow(name, xsp, ysp, i == modeIndex ? Color.GREEN.getRGB() : 0xFFFFFF);
 
             mod = 0.8;
             xdp = (int) ((xp - x) * mod + x);
