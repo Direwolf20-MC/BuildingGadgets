@@ -7,6 +7,7 @@
 # files
 !/.gitignore
 !/README.md
+!/CONTRIBUTION.md
 !/License.md
 !/build.gradle
 !/gradlew
