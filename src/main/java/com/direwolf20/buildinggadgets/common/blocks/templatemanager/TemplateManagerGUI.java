@@ -89,7 +89,7 @@ public class TemplateManagerGUI extends GuiContainer {
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         drawDefaultBackground();
         super.drawScreen(mouseX, mouseY, partialTicks);
-        if (buttonHelp.selected) {
+        if (buttonHelp.isSelected()) {
             GlStateManager.color(1, 1, 1, 1);
             GlStateManager.disableLighting();
             for (IHoverHelpText helpTextProvider : helpTextProviders)
@@ -292,7 +292,7 @@ public class TemplateManagerGUI extends GuiContainer {
     @Override
     protected void actionPerformed(GuiButton b) {
         if (b.id == buttonHelp.id) {
-            buttonHelp.selected ^= true;
+            buttonHelp.toggleSelected();
         } else if (b.id == 0) {
             PacketHandler.INSTANCE.sendToServer(new PacketTemplateManagerSave(te.getPos(), nameField.getText()));
         } else if (b.id == 1) {

@@ -9,15 +9,23 @@ package com.direwolf20.buildinggadgets.client.gui;
 import com.direwolf20.buildinggadgets.client.KeyBindings;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.items.gadgets.*;
+import com.direwolf20.buildinggadgets.common.network.PacketChangeRange;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
+import com.direwolf20.buildinggadgets.common.network.PacketToggleConnectedArea;
+import com.direwolf20.buildinggadgets.common.network.PacketToggleFuzzy;
 import com.direwolf20.buildinggadgets.common.network.PacketToggleMode;
 import com.google.common.collect.ImmutableSet;
+
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.audio.PositionedSoundRecord;
+import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.client.settings.GameSettings;
 import net.minecraft.client.settings.KeyBinding;
+import net.minecraft.init.SoundEvents;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.Vec3d;
@@ -72,15 +80,76 @@ public class ModeRadialMenu extends GuiScreen {
     }
 
     @Override
+    public void initGui() {
+        ItemStack tool = getGadget();
+        boolean destruction = false;
+        if (tool.getItem() instanceof GadgetDestruction) {
+            destruction = true;
+            buttonList.add(new GuiButtonAction(I18n.format("tooltip.gadget.destroy.overlay"), send -> {
+                if (send)
+                    PacketHandler.INSTANCE.sendToServer(new PacketChangeRange());
+
+                return GadgetDestruction.getOverlay(getGadget());
+            }));
+        }
+        if (!(tool.getItem() instanceof GadgetCopyPaste)) {
+            buttonList.add(new GuiButtonAction(I18n.format("tooltip.gadget.fuzzy"), send -> {
+                if (send)
+                    PacketHandler.INSTANCE.sendToServer(new PacketToggleFuzzy());
+
+                return GadgetGeneric.getFuzzy(getGadget());
+            }));
+            buttonList.add(new GuiButtonAction(I18n.format("message.gadget.connected" + (destruction ? "area" : "surface")), send -> {
+                if (send)
+                    PacketHandler.INSTANCE.sendToServer(new PacketToggleConnectedArea());
+
+                return GadgetGeneric.getConnectedArea(getGadget());
+            }));
+        }
+        updateButtons(tool);
+    }
+
+    private void updateButtons(ItemStack tool) {
+        int x = 0;
+        for (int i = 0; i < buttonList.size(); i++) {
+            GuiButton button = buttonList.get(i);
+            if (!button.visible) continue;
+            int len = mc.fontRenderer.getStringWidth(button.displayString) + 6;
+            x += len + 10;
+            button.width = len;
+            button.height = mc.fontRenderer.FONT_HEIGHT + 3;
+            button.y = height / 2 - (tool.getItem() instanceof GadgetDestruction ? button.height + 4 : 110);
+        }
+        x = width / 2 - (x - 10) / 2;
+        for (GuiButton button : buttonList) {
+            if (!button.visible) continue;
+            button.x = x;
+            x += button.width + 10;
+        }
+    }
+
+    private ItemStack getGadget() {
+        return GadgetGeneric.getGadget(Minecraft.getMinecraft().player);
+    }
+
+    @Override
     public void drawScreen(int mx, int my, float partialTicks) {
-        if (segments == 0) return;
+        float stime = 5F;
+        float fract = Math.min(stime, timeIn + partialTicks) / stime;
+        int x = width / 2;
+        int y = height / 2;
+        GlStateManager.pushMatrix();
+        GlStateManager.translate((1 - fract) * x, (1 - fract) * y, 0);
+        GlStateManager.scale(fract, fract, fract);
         super.drawScreen(mx, my, partialTicks);
+        GlStateManager.popMatrix();
+        if (segments == 0)
+            return;
 
         GlStateManager.pushMatrix();
         GlStateManager.disableTexture2D();
 
-        int x = width / 2;
-        int y = height / 2;
+        
         int maxRadius = 80;
 
         float angle = mouseAngle(x, y, mx, my);
@@ -94,7 +163,7 @@ public class ModeRadialMenu extends GuiScreen {
 
         List<int[]> stringPositions = new ArrayList();
 
-        ItemStack tool = GadgetGeneric.getGadget(Minecraft.getMinecraft().player);
+        ItemStack tool = getGadget();
         if (tool.isEmpty())
             return;
 
@@ -195,14 +264,12 @@ public class ModeRadialMenu extends GuiScreen {
 
         }
 
-        float stime = 5F;
-        float fract = Math.min(stime, timeIn + partialTicks) / stime;
-        float s = 3F * fract;
         GlStateManager.enableRescaleNormal();
         GlStateManager.enableBlend();
         GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
         RenderHelper.enableGUIStandardItemLighting();
 
+        float s = 3F * fract;
         GlStateManager.scale(s, s, s);
         GlStateManager.translate(x / s - offset, y / s - 8, 0);
         mc.getRenderItem().renderItemAndEffectIntoGUI(tool, 0, 0);
@@ -214,8 +281,10 @@ public class ModeRadialMenu extends GuiScreen {
     }
 
     private void changeMode() {
-        if (slotSelected >= 0)
+        if (slotSelected >= 0) {
             PacketHandler.INSTANCE.sendToServer(new PacketToggleMode(slotSelected));
+            mc.getSoundHandler().playSound(PositionedSoundRecord.getMasterRecord(SoundEvents.UI_BUTTON_CLICK, 1.0F));
+        }
     }
 
     @Override
@@ -226,8 +295,6 @@ public class ModeRadialMenu extends GuiScreen {
 
     @Override
     public void updateScreen() {
-        super.updateScreen();
-
         if (!GameSettings.isKeyDown(KeyBindings.modeSwitch)) {
             mc.displayGuiScreen(null);
             changeMode();
@@ -238,6 +305,27 @@ public class ModeRadialMenu extends GuiScreen {
             KeyBinding.setKeyBindState(k.getKeyCode(), GameSettings.isKeyDown(k));
 
         timeIn++;
+        ItemStack tool = getGadget();
+        boolean builder = tool.getItem() instanceof GadgetBuilding;
+        if (!builder && !(tool.getItem() instanceof GadgetExchanger))
+            return;
+
+        boolean curent;
+        boolean changed = false;
+        for (int i = 0; i < 2; i++) {
+            GuiButton button = buttonList.get(i);
+            if (builder)
+                curent = GadgetBuilding.getToolMode(tool) == GadgetBuilding.ToolMode.Surface;
+            else
+                curent = i == 0 || GadgetExchanger.getToolMode(tool) == GadgetExchanger.ToolMode.Surface;
+
+            if (button.visible != curent) {
+                button.visible = curent;
+                changed = true;
+            }
+        }
+        if (changed)
+            updateButtons(tool);
     }
 
     @Override

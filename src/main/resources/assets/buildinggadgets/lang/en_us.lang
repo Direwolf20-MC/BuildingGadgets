@@ -48,6 +48,7 @@ key.connectedarea=Connected Area
 tooltip.constructionblockpowder.helptext=Place next to water
 tooltip.gadget.block=Block
 tooltip.gadget.destroyshowoverlay=Showing Overlay
+tooltip.gadget.destroy.overlay=Overlay
 tooltip.gadget.destroywarning=WARNING: This tool voids blocks.
 tooltip.gadget.energy=Energy
 tooltip.gadget.mode=Mode

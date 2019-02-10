@@ -175,8 +175,10 @@ public class GadgetDestruction extends GadgetGeneric {
         stack.setTagCompound(tagCompound);
     }
 
-    public void switchOverlay(ItemStack stack) {
-        setOverlay(stack, !getOverlay(stack));
+    public void switchOverlay(EntityPlayer player, ItemStack stack) {
+        boolean overlay = !getOverlay(stack);
+        setOverlay(stack, overlay);
+        player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("tooltip.gadget.destroyshowoverlay").getUnformattedComponentText() + ": " + overlay), true);
     }
 
     public static ArrayList<EnumFacing> assignDirections(EnumFacing side, EntityPlayer player) {
@@ -249,14 +251,14 @@ public class GadgetDestruction extends GadgetGeneric {
         BlockPos startPos = (getAnchor(stack) == null) ? pos : getAnchor(stack);
         EnumFacing side = (getAnchorSide(stack) == null) ? incomingSide : getAnchorSide(stack);
         ArrayList<EnumFacing> directions = assignDirections(side, player);
-        IBlockState stateTarget = GadgetGeneric.getFuzzy(stack) ? world.getBlockState(pos) : null;
+        IBlockState stateTarget = GadgetGeneric.getFuzzy(stack) ? null : world.getBlockState(pos);
         if (GadgetGeneric.getConnectedArea(stack)) {
             String[] directionNames = new String[] {"right", "left", "up", "down", "depth"};
             AxisAlignedBB area = new AxisAlignedBB(pos);
             for (int i = 0; i < directionNames.length; i++)
                 area = area.union(new AxisAlignedBB(pos.offset(directions.get(i), getToolValue(stack, directionNames[i]) - (i == 4 ? 1 : 0))));
 
-            addConnectedCoords(world, player, startPos, world.getBlockState(startPos), voidPosArray,
+            addConnectedCoords(world, player, startPos, stateTarget, voidPosArray,
                     (int) area.minX, (int) area.minY, (int) area.minZ, (int) area.maxX - 1, (int) area.maxY - 1, (int) area.maxZ - 1);
         } else {
             for (int d = 0; d < getToolValue(stack, "depth"); d++) {
@@ -266,9 +268,8 @@ public class GadgetDestruction extends GadgetGeneric {
                         voidPos = voidPos.offset(directions.get(0), x);
                         voidPos = voidPos.offset(directions.get(2), y);
                         voidPos = voidPos.offset(directions.get(4), d);
-                        if (validBlock(world, voidPos, player, stateTarget)) {
+                        if (validBlock(world, voidPos, player, stateTarget))
                             voidPosArray.add(voidPos);
-                        }
                     }
                 }
             }
