@@ -26,8 +26,8 @@ public class KeyBindings {
         rangeChange = createBinding("key.rangeChange", Keyboard.KEY_R);
         undoKey = createBinding("key.undoKey", Keyboard.KEY_U);
         anchorKey = createBinding("key.anchorKey", Keyboard.KEY_H);
-        fuzzyKey = createBinding("key.fuzzyKey", Keyboard.KEY_V);
-        connectedAreaKey = createBinding("key.connectedarea", Keyboard.KEY_B);
+        fuzzyKey = createBinding("key.fuzzyKey", Keyboard.KEY_NONE);
+        connectedAreaKey = createBinding("key.connectedarea", Keyboard.KEY_NONE);
     }
 
     private static KeyBinding createBinding(String name, int key) {
