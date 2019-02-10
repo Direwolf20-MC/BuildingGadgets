@@ -20,6 +20,8 @@ import net.minecraft.client.settings.GameSettings;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.Vec3d;
+
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.vector.Vector2f;
 
@@ -81,7 +83,6 @@ public class ModeRadialMenu extends GuiScreen {
         int y = height / 2;
         int maxRadius = 80;
 
-        boolean mouseIn = true;
         float angle = mouseAngle(x, y, mx, my);
 
         int highlight = 5;
@@ -99,6 +100,8 @@ public class ModeRadialMenu extends GuiScreen {
 
         slotSelected = -1;
         float offset = 8.5F;
+        double dist = new Vec3d(x, y, 0).distanceTo(new Vec3d(mx, my, 0));
+        boolean inRange = dist > 35 && dist < 81;
         ResourceLocation[] signs;
         int modeIndex;
         if (tool.getItem() instanceof GadgetBuilding) {
@@ -113,10 +116,10 @@ public class ModeRadialMenu extends GuiScreen {
         }
 
         for (int seg = 0; seg < segments; seg++) {
-            boolean mouseInSector = mouseIn && angle > totalDeg && angle < totalDeg + degPer;
+            boolean mouseInSector = inRange && angle > totalDeg && angle < totalDeg + degPer;
             float radius = Math.max(0F, Math.min((timeIn + partialTicks - seg * 6F / segments) * 40F, maxRadius));
 
-            GL11.glBegin(GL11.GL_TRIANGLE_FAN);
+            GL11.glBegin(GL11.GL_TRIANGLE_STRIP);
 
             float gs = 0.25F;
             if (seg % 2 == 0)
@@ -131,7 +134,6 @@ public class ModeRadialMenu extends GuiScreen {
             }
 
             GlStateManager.color(r, g, b, a);
-            GL11.glVertex2i(x, y);
 
             for (float i = degPer; i >= 0; i--) {
                 float rad = (float) ((i + totalDeg) / 180F * Math.PI);
@@ -140,11 +142,11 @@ public class ModeRadialMenu extends GuiScreen {
                 if ((int) i == (int) (degPer / 2))
                     stringPositions.add(new int[]{(int) xp, (int) yp, mouseInSector ? 'n' : 'r'});
 
+                GL11.glVertex2d(x + Math.cos(rad) * radius / 2.3F, y + Math.sin(rad) * radius / 2.3F);
                 GL11.glVertex2d(xp, yp);
             }
             totalDeg += degPer;
 
-            GL11.glVertex2i(x, y);
             GL11.glEnd();
 
             if (mouseInSector)
@@ -184,7 +186,7 @@ public class ModeRadialMenu extends GuiScreen {
 
             fontRenderer.drawStringWithShadow(name, xsp, ysp, i == modeIndex ? Color.GREEN.getRGB() : Color.WHITE.getRGB());
 
-            mod = 0.8;
+            mod = 0.7;
             xdp = (int) ((xp - x) * mod + x);
             ydp = (int) ((yp - y) * mod + y);
 
@@ -201,11 +203,9 @@ public class ModeRadialMenu extends GuiScreen {
         GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
         RenderHelper.enableGUIStandardItemLighting();
 
-        if (!tool.isEmpty()) {
-            GlStateManager.scale(s, s, s);
-            GlStateManager.translate(x / s - offset, y / s - 8, 0);
-            mc.getRenderItem().renderItemAndEffectIntoGUI(tool, 0, 0);
-        }
+        GlStateManager.scale(s, s, s);
+        GlStateManager.translate(x / s - offset, y / s - 8, 0);
+        mc.getRenderItem().renderItemAndEffectIntoGUI(tool, 0, 0);
         RenderHelper.disableStandardItemLighting();
         GlStateManager.disableBlend();
         GlStateManager.disableRescaleNormal();
