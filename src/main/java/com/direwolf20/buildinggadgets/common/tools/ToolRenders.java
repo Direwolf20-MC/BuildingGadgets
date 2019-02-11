@@ -164,11 +164,10 @@ public class ToolRenders {
                     GL14.glBlendColor(1F, 1F, 1F, 0.35f); //Set the alpha of the blocks we are rendering
                     hasBlocks--;
                     if (stack.hasCapability(CapabilityEnergy.ENERGY, null)) {
-                        hasEnergy = hasEnergy - ModItems.gadgetBuilding.getEnergyCost();
+                        hasEnergy -= ModItems.gadgetBuilding.getEnergyCost();
                     } else {
-                        hasEnergy--;
+                        hasEnergy -= ModItems.gadgetBuilding.getDamagePerUse();
                     }
-
                     if (hasBlocks < 0 || hasEnergy < 0) {
                         dispatcher.renderBlockBrightness(Blocks.STAINED_GLASS.getDefaultState().withProperty(COLOR, EnumDyeColor.RED), 1f);
                     }
@@ -300,9 +299,9 @@ public class ToolRenders {
                     GL14.glBlendColor(1F, 1F, 1F, 0.55f); //Set the alpha of the blocks we are rendering
                     hasBlocks--;
                     if (stack.hasCapability(CapabilityEnergy.ENERGY, null)) {
-                        hasEnergy = hasEnergy - ModItems.gadgetExchanger.getEnergyCost();
+                        hasEnergy -= ModItems.gadgetExchanger.getEnergyCost();
                     } else {
-                        hasEnergy = hasEnergy - 2;
+                        hasEnergy -= ModItems.gadgetExchanger.getDamagePerUse();
                     }
                     if (hasBlocks < 0 || hasEnergy < 0) {
                         dispatcher.renderBlockBrightness(Blocks.STAINED_GLASS.getDefaultState().withProperty(COLOR, EnumDyeColor.RED), 1f);

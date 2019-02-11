@@ -77,6 +77,11 @@ public class GadgetExchanger extends GadgetGeneric {
     }
 
     @Override
+    public int getDamagePerUse() {
+        return 2;
+    }
+
+    @Override
     public int getItemEnchantability() {
         return 3;
     }
