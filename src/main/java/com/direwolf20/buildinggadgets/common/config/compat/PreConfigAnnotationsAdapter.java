@@ -32,7 +32,7 @@ public class PreConfigAnnotationsAdapter implements IConfigVersionAdapter {
 
     @Override
     public boolean isApplicableTo(@Nonnull Path modConfigDir, @Nullable ComparableVersion configVersion) {
-        return configVersion == null && Files.exists(modConfigDir.resolve(FILE));
+        return Files.exists(modConfigDir.resolve(FILE));
     }
 
     @Override

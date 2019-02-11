@@ -30,9 +30,13 @@ public class Config {
 
     private static final String LANG_KEY_GADGETS_ENERGY = LANG_KEY_GADGETS + ".energyCost";
 
+    private static final String LANG_KEY_GADGETS_DAMAGE = LANG_KEY_GADGETS + ".damageCost";
+
     private static final String LANG_KEY_GADGETS_DURABILITY = LANG_KEY_GADGETS + ".durability";
 
     private static final String LANG_KEY_GADGETS_ENERGY_COMMENT = "The Gadget's Energy cost per Operation";
+
+    private static final String LANG_KEY_GADGETS_DAMAGE_COMMENT = "The Gadget's Damage cost per Operation";
 
     private static final String LANG_KEY_GADGETS_DURABILITY_COMMENT = "The Gadget's Durability (0 means no durability is used) (Ignored if powered by FE)";
 
@@ -156,6 +160,12 @@ public class Config {
             @LangKey(LANG_KEY_GADGETS_ENERGY)
             public int energyCostBuilder = 50;
 
+            @RangeInt(min = 0, max = 2000)
+            @Name("Damage Cost")
+            @Comment(LANG_KEY_GADGETS_DAMAGE_COMMENT)
+            @LangKey(LANG_KEY_GADGETS_DAMAGE)
+            public int damageCostBuilder = 1;
+
             @RequiresWorldRestart
             @RangeInt(min = 0, max = 100000)
             @Name("Durability")
@@ -173,6 +183,12 @@ public class Config {
             @Comment(LANG_KEY_GADGETS_ENERGY_COMMENT)
             @LangKey(LANG_KEY_GADGETS_ENERGY)
             public int energyCostExchanger = 100;
+
+            @RangeInt(min = 0, max = 2000)
+            @Name("Damage Cost")
+            @Comment(LANG_KEY_GADGETS_DAMAGE_COMMENT)
+            @LangKey(LANG_KEY_GADGETS_DAMAGE)
+            public int damageCostExchanger = 2;
 
             @RequiresWorldRestart
             @RangeInt(min = 0, max = 100000)
@@ -196,12 +212,30 @@ public class Config {
             @LangKey(LANG_KEY_GADGETS_ENERGY)
             public int energyCostDestruction = 200;
 
+            @RangeInt(min = 0, max = 2000)
+            @Name("Damage Cost")
+            @Comment(LANG_KEY_GADGETS_DAMAGE_COMMENT)
+            @LangKey(LANG_KEY_GADGETS_DAMAGE)
+            public int damageCostDestruction = 4;
+
             @RequiresWorldRestart
             @RangeInt(min = 0, max = 100000)
             @Name("Durability")
             @Comment(LANG_KEY_GADGETS_DURABILITY_COMMENT)
             @LangKey(LANG_KEY_GADGETS_DURABILITY)
             public int durabilityDestruction = 500;
+
+            @RangeDouble(min = 0)
+            @Name("Non-Fuzzy Mode Multiplier")
+            @Comment("The cost in energy/durability will increase by this amount when not in fuzzy mode")
+            @LangKey(LANG_KEY_GADGET_DESTRUCTION + ".nonfuzzy.multiplier")
+            public double nonFuzzyMultiplier = 2;
+
+            @Name("Non-Fuzzy Mode Enabled")
+            @Comment("If enabled, the Destruction Gadget can be taken out of fuzzy mode, allowing only instances of the block "
+                    + "clicked to be removed (at a higher cost)")
+            @LangKey(LANG_KEY_GADGET_DESTRUCTION + ".nonfuzzy.enabled")
+            public boolean nonFuzzyEnabled = false;
         }
 
         public static final class CategoryGadgetCopyPaste {
@@ -213,6 +247,12 @@ public class Config {
             @Comment(LANG_KEY_GADGETS_ENERGY_COMMENT)
             @LangKey(LANG_KEY_GADGETS_ENERGY)
             public int energyCostCopyPaste = 50;
+
+            @RangeInt(min = 0, max = 2000)
+            @Name("Damage Cost")
+            @Comment(LANG_KEY_GADGETS_DAMAGE_COMMENT)
+            @LangKey(LANG_KEY_GADGETS_DAMAGE)
+            public int damageCostCopyPaste = 1;
 
             @RequiresWorldRestart
             @RangeInt(min = 0, max = 100000)

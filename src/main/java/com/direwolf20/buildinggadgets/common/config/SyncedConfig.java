@@ -42,6 +42,18 @@ public class SyncedConfig {
     public static int energyCostCopyPaste;
 
     @AutoSync
+    public static int damageCostBuilder;
+
+    @AutoSync
+    public static int damageCostExchanger;
+
+    @AutoSync
+    public static int damageCostDestruction;
+
+    @AutoSync
+    public static int damageCostCopyPaste;
+
+    @AutoSync
     public static int energyMax;
 
     @AutoSync
@@ -58,6 +70,12 @@ public class SyncedConfig {
 
     @AutoSync
     public static int durabilityDestruction;
+
+    @AutoSync
+    public static double nonFuzzyMultiplierDestruction;
+
+    @AutoSync
+    public static boolean nonFuzzyEnabledDestruction;
 
     @AutoSync
     public static int durabilityCopyPaste;
@@ -81,13 +99,13 @@ public class SyncedConfig {
     public static boolean enablePaste;
 
     @AutoSync
-    public static int t1ContainerCapacity = 512;
+    public static int t1ContainerCapacity;
 
     @AutoSync
-    public static int t2ContainerCapacity = 2048;
+    public static int t2ContainerCapacity;
 
     @AutoSync
-    public static int t3ContainerCapacity = 8192;
+    public static int t3ContainerCapacity;
 
     @AutoSync(mapperId = FieldMapper.PATTERN_LIST_MAPPER_ID)
     public static PatternList blockBlacklist;
@@ -110,16 +128,22 @@ public class SyncedConfig {
         energyMax = Config.subCategoryGadgets.maxEnergy;
 
         energyCostBuilder = Config.subCategoryGadgets.subCategoryGadgetBuilding.energyCostBuilder;
+        damageCostBuilder = Config.subCategoryGadgets.subCategoryGadgetBuilding.damageCostBuilder;
         durabilityBuilder = Config.subCategoryGadgets.subCategoryGadgetBuilding.durabilityBuilder;
 
         energyCostExchanger = Config.subCategoryGadgets.subCategoryGadgetExchanger.energyCostExchanger;
+        damageCostExchanger = Config.subCategoryGadgets.subCategoryGadgetExchanger.damageCostExchanger;
         durabilityExchanger = Config.subCategoryGadgets.subCategoryGadgetExchanger.durabilityExchanger;
 
         energyMaxDestruction = Config.subCategoryGadgets.subCategoryGadgetDestruction.energyMaxDestruction;
         energyCostDestruction = Config.subCategoryGadgets.subCategoryGadgetDestruction.energyCostDestruction;
+        damageCostDestruction = Config.subCategoryGadgets.subCategoryGadgetDestruction.damageCostDestruction;
         durabilityDestruction = Config.subCategoryGadgets.subCategoryGadgetDestruction.durabilityDestruction;
+        nonFuzzyMultiplierDestruction = Config.subCategoryGadgets.subCategoryGadgetDestruction.nonFuzzyMultiplier;
+        nonFuzzyEnabledDestruction = Config.subCategoryGadgets.subCategoryGadgetDestruction.nonFuzzyEnabled;
 
         energyCostCopyPaste = Config.subCategoryGadgets.subCategoryGadgetCopyPaste.energyCostCopyPaste;
+        damageCostCopyPaste = Config.subCategoryGadgets.subCategoryGadgetCopyPaste.damageCostCopyPaste;
         durabilityCopyPaste = Config.subCategoryGadgets.subCategoryGadgetCopyPaste.durabilityCopyPaste;
 
         t1ContainerCapacity = Config.subCategoryPasteContainers.t1Capacity;

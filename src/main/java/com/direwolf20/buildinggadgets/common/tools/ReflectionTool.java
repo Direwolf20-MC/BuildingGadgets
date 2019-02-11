@@ -1,12 +1,16 @@
 package com.direwolf20.buildinggadgets.common.tools;
 
+import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.google.common.collect.ImmutableList;
+import net.minecraftforge.common.config.ConfigManager;
+import net.minecraftforge.common.config.Configuration;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
@@ -31,5 +35,28 @@ public class ReflectionTool {
      */
     public static boolean isInstanceProvidedForField(@Nonnull Field field, @Nullable Object instance) {
         return (instance != null && !ReflectionTool.PREDICATE_STATIC.test(field) && field.getDeclaringClass().isAssignableFrom(instance.getClass())) || (instance == null && ReflectionTool.PREDICATE_STATIC.test(field));
+    }
+
+    /**
+     * Reflects into ConfigManager, to retrieve the ManagedConfigMapping
+     *
+     * @return The internal String to {@link Configuration} mappings from the Forge {@link net.minecraftforge.common.config.ConfigManager}. Null on error.
+     */
+    @Nullable
+    public static Map<String, Configuration> getManagedConfigs() {
+        try {
+            Field configs = ConfigManager.class.getField("CONFIGS");
+            configs.setAccessible(true);
+            @SuppressWarnings("unchecked") //According to the source, this is the appropriate type
+                    Map<String, Configuration> res = (Map<String, Configuration>) configs.get(null);
+            return res;
+        } catch (NoSuchFieldException e) {
+            BuildingGadgets.logger.error("Failed to Hack Forge ConfigManager... Could not find Configuration Objects. Which sadly prevents us from updating the Config File :(.", e);
+        } catch (IllegalAccessException e) {
+            BuildingGadgets.logger.error("Failed to Hack Forge ConfigManager... It defended itself against retrieving the Configuration Objects! Which sadly prevents us from updating the Config File :(.", e);
+        } catch (ClassCastException e) {
+            BuildingGadgets.logger.error("Failed to Hack Forge ConfigManager... Configurations have changed their Type - Probly a Forge Update! Which sadly prevents us from updating the Config File :(.", e);
+        }
+        return null;
     }
 }

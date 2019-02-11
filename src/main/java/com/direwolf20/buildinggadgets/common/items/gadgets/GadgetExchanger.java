@@ -75,13 +75,13 @@ public class GadgetExchanger extends GadgetGeneric {
     }
 
     @Override
-    public int getEnergyCost() {
+    public int getEnergyCost(ItemStack tool) {
         return SyncedConfig.energyCostExchanger;
     }
 
     @Override
-    public int getDamagePerUse() {
-        return 2;
+    public int getDamageCost(ItemStack tool) {
+        return SyncedConfig.damageCostExchanger;
     }
 
     @Override

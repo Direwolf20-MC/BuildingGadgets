@@ -61,13 +61,17 @@ public class GadgetDestruction extends GadgetGeneric {
     }
 
     @Override
-    public int getEnergyCost() {
-        return SyncedConfig.energyCostDestruction;
+    public int getEnergyCost(ItemStack tool) {
+        return SyncedConfig.energyCostDestruction * getCostMultiplier(tool);
     }
 
     @Override
-    public int getDamagePerUse() {
-        return 2;
+    public int getDamageCost(ItemStack tool) {
+        return SyncedConfig.damageCostDestruction * getCostMultiplier(tool);
+    }
+
+    private int getCostMultiplier(ItemStack tool) {
+        return (int) (SyncedConfig.nonFuzzyEnabledDestruction && !getFuzzy(tool) ? SyncedConfig.nonFuzzyMultiplierDestruction : 1);
     }
 
     @Override
@@ -76,7 +80,10 @@ public class GadgetDestruction extends GadgetGeneric {
         list.add(TextFormatting.RED + I18n.format("tooltip.gadget.destroywarning"));
         list.add(TextFormatting.AQUA + I18n.format("tooltip.gadget.destroyshowoverlay") + ": " + getOverlay(stack));
         list.add(TextFormatting.YELLOW + I18n.format("tooltip.gadget.connectedarea") + ": " + getConnectedArea(stack));
-        list.add(TextFormatting.GOLD + I18n.format("tooltip.gadget.fuzzy") + ": " + getFuzzy(stack));
+        if (SyncedConfig.nonFuzzyEnabledDestruction) {
+            list.add(TextFormatting.GOLD + I18n.format("tooltip.gadget.fuzzy") + ": " + getFuzzy(stack));
+        }
+
         addEnergyInformation(list,stack);
     }
 
@@ -252,7 +259,7 @@ public class GadgetDestruction extends GadgetGeneric {
         BlockPos startPos = (getAnchor(stack) == null) ? pos : getAnchor(stack);
         EnumFacing side = (getAnchorSide(stack) == null) ? incomingSide : getAnchorSide(stack);
         ArrayList<EnumFacing> directions = assignDirections(side, player);
-        IBlockState stateTarget = GadgetGeneric.getFuzzy(stack) ? null : world.getBlockState(pos);
+        IBlockState stateTarget = !SyncedConfig.nonFuzzyEnabledDestruction || GadgetGeneric.getFuzzy(stack) ? null : world.getBlockState(pos);
         if (GadgetGeneric.getConnectedArea(stack)) {
             String[] directionNames = new String[]{"right", "left", "up", "down", "depth"};
             AxisAlignedBB area = new AxisAlignedBB(pos);

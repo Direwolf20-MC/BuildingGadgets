@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.common.network;
 
+import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetBuilding;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetDestruction;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetExchanger;
@@ -20,9 +21,9 @@ public class PacketToggleFuzzy extends PacketEmpty {
                 EntityPlayer player = ctx.getServerHandler().player;
                 ItemStack stack = GadgetGeneric.getGadget(player);
                 GadgetGeneric item = (GadgetGeneric) stack.getItem();
-                if (item instanceof GadgetExchanger || item instanceof GadgetBuilding || item instanceof GadgetDestruction) {
+                if (item instanceof GadgetExchanger || item instanceof GadgetBuilding
+                        || (item instanceof GadgetDestruction && SyncedConfig.nonFuzzyEnabledDestruction))
                     item.toggleFuzzy(player, stack);
-                }
             });
             return null;
         }

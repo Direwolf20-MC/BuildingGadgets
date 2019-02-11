@@ -9,6 +9,7 @@ package com.direwolf20.buildinggadgets.client.gui;
 import com.direwolf20.buildinggadgets.client.KeyBindings;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.ModSounds;
+import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
 import com.direwolf20.buildinggadgets.common.items.gadgets.*;
 import com.direwolf20.buildinggadgets.common.network.*;
 import com.google.common.collect.ImmutableSet;
@@ -80,25 +81,25 @@ public class ModeRadialMenu extends GuiScreen {
         if (tool.getItem() instanceof GadgetDestruction) {
             destruction = true;
             buttonList.add(new GuiButtonAction(I18n.format("tooltip.gadget.destroy.overlay"), send -> {
-                if (send) {
+                if (send)
                     PacketHandler.INSTANCE.sendToServer(new PacketChangeRange());
-                }
 
                 return GadgetDestruction.getOverlay(getGadget());
             }));
         }
         if (!(tool.getItem() instanceof GadgetCopyPaste)) {
-            buttonList.add(new GuiButtonAction(I18n.format("tooltip.gadget.fuzzy"), send -> {
-                if (send) {
-                    PacketHandler.INSTANCE.sendToServer(new PacketToggleFuzzy());
-                }
+            if (!destruction || SyncedConfig.nonFuzzyEnabledDestruction) {
+                buttonList.add(new GuiButtonAction(I18n.format("tooltip.gadget.fuzzy"), send -> {
+                    if (send) {
+                        PacketHandler.INSTANCE.sendToServer(new PacketToggleFuzzy());
+                    }
 
-                return GadgetGeneric.getFuzzy(getGadget());
-            }));
+                    return GadgetGeneric.getFuzzy(getGadget());
+                }));
+            }
             buttonList.add(new GuiButtonAction(I18n.format("message.gadget.connected" + (destruction ? "area" : "surface")), send -> {
-                if (send) {
+                if (send)
                     PacketHandler.INSTANCE.sendToServer(new PacketToggleConnectedArea());
-                }
 
                 return GadgetGeneric.getConnectedArea(getGadget());
             }));
@@ -142,9 +143,8 @@ public class ModeRadialMenu extends GuiScreen {
         GlStateManager.scale(fract, fract, fract);
         super.drawScreen(mx, my, partialTicks);
         GlStateManager.popMatrix();
-        if (segments == 0) {
+        if (segments == 0)
             return;
-        }
 
         GlStateManager.pushMatrix();
         GlStateManager.disableTexture2D();
@@ -231,13 +231,12 @@ public class ModeRadialMenu extends GuiScreen {
             char c = (char) pos[2];
 
             String name = "";
-            if (tool.getItem() instanceof GadgetBuilding) {
+            if (tool.getItem() instanceof GadgetBuilding)
                 name = GadgetBuilding.ToolMode.values()[i].toString();
-            } else if (tool.getItem() instanceof GadgetExchanger) {
+            else if (tool.getItem() instanceof GadgetExchanger)
                 name = GadgetExchanger.ToolMode.values()[i].toString();
-            } else {
+            else
                 name = GadgetCopyPaste.ToolMode.values()[i].toString();
-            }
 
             name = "\u00a7" + c + name;
 
@@ -308,28 +307,25 @@ public class ModeRadialMenu extends GuiScreen {
         timeIn++;
         ItemStack tool = getGadget();
         boolean builder = tool.getItem() instanceof GadgetBuilding;
-        if (!builder && !(tool.getItem() instanceof GadgetExchanger)) {
+        if (!builder && !(tool.getItem() instanceof GadgetExchanger))
             return;
-        }
 
         boolean curent;
         boolean changed = false;
         for (int i = 0; i < 2; i++) {
             GuiButton button = buttonList.get(i);
-            if (builder) {
+            if (builder)
                 curent = GadgetBuilding.getToolMode(tool) == GadgetBuilding.ToolMode.Surface;
-            } else {
+            else
                 curent = i == 0 || GadgetExchanger.getToolMode(tool) == GadgetExchanger.ToolMode.Surface;
-            }
 
             if (button.visible != curent) {
                 button.visible = curent;
                 changed = true;
             }
         }
-        if (changed) {
+        if (changed)
             updateButtons(tool);
-        }
     }
 
     @Override
