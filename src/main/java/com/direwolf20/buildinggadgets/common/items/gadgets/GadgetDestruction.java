@@ -61,13 +61,17 @@ public class GadgetDestruction extends GadgetGeneric {
     }
 
     @Override
-    public int getEnergyCost() {
-        return SyncedConfig.energyCostDestruction;
+    public int getEnergyCost(ItemStack tool) {
+        return SyncedConfig.energyCostDestruction * getCostMultiplier(tool);
     }
 
     @Override
-    public int getDamagePerUse() {
-        return 2;
+    public int getDamageCost(ItemStack tool) {
+        return 2 * getCostMultiplier(tool);
+    }
+
+    private int getCostMultiplier(ItemStack tool) {
+        return (int) (SyncedConfig.nonFuzzyEnabledDestruction && !getFuzzy(tool) ? SyncedConfig.nonFuzzyMultiplierDestruction : 1);
     }
 
     @Override

@@ -120,11 +120,9 @@ public abstract class GadgetGeneric extends Item {
         return heldItem;
     }
 
-    public abstract int getEnergyCost();
+    public abstract int getEnergyCost(ItemStack tool);
 
-    public int getDamagePerUse() {
-        return 1;
-    }
+    public abstract int getDamageCost(ItemStack tool);
 
     public boolean canUse(ItemStack tool, EntityPlayer player) {
         if (player.capabilities.isCreativeMode)
@@ -132,7 +130,7 @@ public abstract class GadgetGeneric extends Item {
 
         if (tool.hasCapability(CapabilityEnergy.ENERGY, null)) {
             IEnergyStorage energy = CapabilityProviderEnergy.getCap(tool);
-            return this.getEnergyCost() <= energy.getEnergyStored();
+            return getEnergyCost(tool) <= energy.getEnergyStored();
         }
         return tool.getMaxDamage() <= 0 || tool.getItemDamage() < tool.getMaxDamage() || tool.isItemStackDamageable();
     }
@@ -140,10 +138,10 @@ public abstract class GadgetGeneric extends Item {
     public void applyDamage(ItemStack tool, EntityPlayer player) {
         if(tool.hasCapability(CapabilityEnergy.ENERGY, null)) {
             IEnergyStorage energy = CapabilityProviderEnergy.getCap(tool);
-            energy.extractEnergy(this.getEnergyCost(), false);
+            energy.extractEnergy(getEnergyCost(tool), false);
         }
         else
-            tool.damageItem(this.getDamagePerUse(), player);
+            tool.damageItem(getDamageCost(tool), player);
     }
 
     protected void addEnergyInformation(List<String> list, ItemStack stack) {

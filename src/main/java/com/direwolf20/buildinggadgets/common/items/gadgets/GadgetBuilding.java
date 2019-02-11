@@ -68,16 +68,16 @@ public class GadgetBuilding extends GadgetGeneric {
 
     @Override
     public int getMaxDamage(ItemStack stack) {
-        return SyncedConfig.poweredByFE?0:SyncedConfig.durabilityBuilder;
+        return SyncedConfig.poweredByFE ? 0 : SyncedConfig.durabilityBuilder;
     }
 
     @Override
-    public int getEnergyCost() {
+    public int getEnergyCost(ItemStack tool) {
         return SyncedConfig.energyCostBuilder;
     }
 
     @Override
-    public int getDamagePerUse() {
+    public int getDamageCost(ItemStack tool) {
         return 1;
     }
 

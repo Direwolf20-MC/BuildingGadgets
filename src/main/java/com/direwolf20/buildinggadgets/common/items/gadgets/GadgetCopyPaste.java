@@ -67,12 +67,12 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
     }
 
     @Override
-    public int getEnergyCost() {
+    public int getEnergyCost(ItemStack tool) {
         return SyncedConfig.energyCostCopyPaste;
     }
 
     @Override
-    public int getDamagePerUse() {
+    public int getDamageCost(ItemStack tool) {
         return 1;
     }
 
