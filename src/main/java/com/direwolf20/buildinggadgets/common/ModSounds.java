@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.common;
 
-import net.minecraft.client.audio.PositionedSoundRecord;
-import net.minecraft.client.audio.SoundHandler;
+import com.direwolf20.buildinggadgets.client.proxy.ClientProxy;
+
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
 
@@ -19,11 +19,11 @@ public enum ModSounds {
         return sound;
     }
 
-    public void playSound(SoundHandler soundHandler) {
-        playSound(soundHandler, 1.0F);
+    public void playSound() {
+        playSound(1.0F);
     }
 
-    public void playSound(SoundHandler soundHandler, float pitch) {
-        soundHandler.playSound(PositionedSoundRecord.getMasterRecord(sound, pitch));
+    public void playSound(float pitch) {
+        ClientProxy.playSound(sound, pitch);
     }
 }

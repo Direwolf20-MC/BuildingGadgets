@@ -19,7 +19,6 @@ import com.direwolf20.buildinggadgets.common.network.PacketToggleMode;
 import com.google.common.collect.ImmutableSet;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
@@ -27,7 +26,6 @@ import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.settings.GameSettings;
 import net.minecraft.client.settings.KeyBinding;
-import net.minecraft.init.SoundEvents;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
@@ -290,7 +288,7 @@ public class ModeRadialMenu extends GuiScreen {
     private void changeMode() {
         if (slotSelected >= 0) {
             PacketHandler.INSTANCE.sendToServer(new PacketToggleMode(slotSelected));
-            ModSounds.BEEP.playSound(mc.getSoundHandler());
+            ModSounds.BEEP.playSound();
         }
     }
 
