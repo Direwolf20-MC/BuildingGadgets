@@ -67,7 +67,7 @@ public class GadgetDestruction extends GadgetGeneric {
 
     @Override
     public int getDamageCost(ItemStack tool) {
-        return 2 * getCostMultiplier(tool);
+        return SyncedConfig.damageCostDestruction * getCostMultiplier(tool);
     }
 
     private int getCostMultiplier(ItemStack tool) {

@@ -78,7 +78,7 @@ public class GadgetExchanger extends GadgetGeneric {
 
     @Override
     public int getDamageCost(ItemStack tool) {
-        return 2;
+        return SyncedConfig.damageCostExchanger;
     }
 
     @Override

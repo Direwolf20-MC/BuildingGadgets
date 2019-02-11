@@ -78,7 +78,7 @@ public class GadgetBuilding extends GadgetGeneric {
 
     @Override
     public int getDamageCost(ItemStack tool) {
-        return 1;
+        return SyncedConfig.damageCostBuilder;
     }
 
     private static void setToolMode(ItemStack stack, ToolMode mode) {

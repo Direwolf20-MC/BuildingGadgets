@@ -73,7 +73,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
 
     @Override
     public int getDamageCost(ItemStack tool) {
-        return 1;
+        return SyncedConfig.damageCostCopyPaste;
     }
 
     private static void setAnchor(ItemStack stack, BlockPos anchorPos) {

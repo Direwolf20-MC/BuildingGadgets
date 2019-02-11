@@ -42,6 +42,18 @@ public class SyncedConfig {
     public static int energyCostCopyPaste;
 
     @AutoSync
+    public static int damageCostBuilder;
+
+    @AutoSync
+    public static int damageCostExchanger;
+
+    @AutoSync
+    public static int damageCostDestruction;
+
+    @AutoSync
+    public static int damageCostCopyPaste;
+
+    @AutoSync
     public static int energyMax;
 
     @AutoSync
@@ -116,18 +128,22 @@ public class SyncedConfig {
         energyMax = Config.subCategoryGadgets.maxEnergy;
 
         energyCostBuilder = Config.subCategoryGadgets.subCategoryGadgetBuilding.energyCostBuilder;
+        damageCostBuilder = Config.subCategoryGadgets.subCategoryGadgetBuilding.damageCostBuilder;
         durabilityBuilder = Config.subCategoryGadgets.subCategoryGadgetBuilding.durabilityBuilder;
 
         energyCostExchanger = Config.subCategoryGadgets.subCategoryGadgetExchanger.energyCostExchanger;
+        damageCostExchanger = Config.subCategoryGadgets.subCategoryGadgetExchanger.damageCostExchanger;
         durabilityExchanger = Config.subCategoryGadgets.subCategoryGadgetExchanger.durabilityExchanger;
 
         energyMaxDestruction = Config.subCategoryGadgets.subCategoryGadgetDestruction.energyMaxDestruction;
         energyCostDestruction = Config.subCategoryGadgets.subCategoryGadgetDestruction.energyCostDestruction;
+        damageCostDestruction = Config.subCategoryGadgets.subCategoryGadgetDestruction.damageCostDestruction;
         durabilityDestruction = Config.subCategoryGadgets.subCategoryGadgetDestruction.durabilityDestruction;
         nonFuzzyMultiplierDestruction = Config.subCategoryGadgets.subCategoryGadgetDestruction.nonFuzzyMultiplier;
         nonFuzzyEnabledDestruction = Config.subCategoryGadgets.subCategoryGadgetDestruction.nonFuzzyEnabled;
 
         energyCostCopyPaste = Config.subCategoryGadgets.subCategoryGadgetCopyPaste.energyCostCopyPaste;
+        damageCostCopyPaste = Config.subCategoryGadgets.subCategoryGadgetCopyPaste.damageCostCopyPaste;
         durabilityCopyPaste = Config.subCategoryGadgets.subCategoryGadgetCopyPaste.durabilityCopyPaste;
 
         t1ContainerCapacity = Config.subCategoryPasteContainers.t1Capacity;
