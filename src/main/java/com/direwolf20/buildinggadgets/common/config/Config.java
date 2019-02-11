@@ -191,6 +191,17 @@ public class Config {
             @Comment(LANG_KEY_GADGETS_DURABILITY_COMMENT)
             @LangKey(LANG_KEY_GADGETS_DURABILITY)
             public int durabilityDestruction = 500;
+
+            @RangeDouble(min = 0)
+            @Name("Non-Fuzzy Mode Multiplier")
+            @Comment("The cost in energy/durability will increase by this amount when not in fuzzy mode")
+            @LangKey(LANG_KEY_GADGET_DESTRUCTION + ".nonfuzzy.multiplier")
+            public double nonFuzzyMultiplier = 2;
+
+            @Name("Non-Fuzzy Mode Enabled")
+            @Comment("If enabled, the Destruction Gadget can be taken out of fuzzy mode, allowing only instances of the block clicked to be removed (at a higher cost)")
+            @LangKey(LANG_KEY_GADGET_DESTRUCTION + ".nonfuzzy.enabled")
+            public boolean nonFuzzyEnabled = false;
         }
 
         public static final class CategoryGadgetCopyPaste {

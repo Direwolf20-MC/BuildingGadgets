@@ -60,6 +60,12 @@ public class SyncedConfig {
     public static int durabilityDestruction;
 
     @AutoSync
+    public static double nonFuzzyMultiplierDestruction;
+
+    @AutoSync
+    public static boolean nonFuzzyEnabledDestruction;
+
+    @AutoSync
     public static int durabilityCopyPaste;
 
     @AutoSync
@@ -81,13 +87,13 @@ public class SyncedConfig {
     public static boolean enablePaste;
 
     @AutoSync
-    public static int t1ContainerCapacity = 512;
+    public static int t1ContainerCapacity;
 
     @AutoSync
-    public static int t2ContainerCapacity = 2048;
+    public static int t2ContainerCapacity;
 
     @AutoSync
-    public static int t3ContainerCapacity = 8192;
+    public static int t3ContainerCapacity;
 
     @AutoSync(mapperId = FieldMapper.PATTERN_LIST_MAPPER_ID)
     public static PatternList blockBlacklist;
@@ -118,6 +124,8 @@ public class SyncedConfig {
         energyMaxDestruction = Config.subCategoryGadgets.subCategoryGadgetDestruction.energyMaxDestruction;
         energyCostDestruction = Config.subCategoryGadgets.subCategoryGadgetDestruction.energyCostDestruction;
         durabilityDestruction = Config.subCategoryGadgets.subCategoryGadgetDestruction.durabilityDestruction;
+        nonFuzzyMultiplierDestruction = Config.subCategoryGadgets.subCategoryGadgetDestruction.nonFuzzyMultiplier;
+        nonFuzzyEnabledDestruction = Config.subCategoryGadgets.subCategoryGadgetDestruction.nonFuzzyEnabled;
 
         energyCostCopyPaste = Config.subCategoryGadgets.subCategoryGadgetCopyPaste.energyCostCopyPaste;
         durabilityCopyPaste = Config.subCategoryGadgets.subCategoryGadgetCopyPaste.durabilityCopyPaste;
