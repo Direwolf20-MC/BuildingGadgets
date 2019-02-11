@@ -1,15 +1,13 @@
 package com.direwolf20.buildinggadgets.client.gui;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import org.lwjgl.opengl.GL11;
 
-public class GuiButtonHelp extends GuiButton {
-    public boolean selected;
+public class GuiButtonHelp extends GuiButtonSelect {
 
     public GuiButtonHelp(int buttonId, int x, int y) {
         super(buttonId, x, y, 12, 12, "?");

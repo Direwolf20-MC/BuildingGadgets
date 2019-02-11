@@ -3,6 +3,7 @@ package com.direwolf20.buildinggadgets.common.items.gadgets;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
 import com.direwolf20.buildinggadgets.common.items.capability.CapabilityProviderEnergy;
+import com.direwolf20.buildinggadgets.common.tools.NBTTool;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
@@ -11,6 +12,8 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
@@ -24,7 +27,7 @@ import java.util.List;
 
 import static com.direwolf20.buildinggadgets.common.tools.GadgetUtils.withSuffix;
 
-public class GadgetGeneric extends Item {
+public abstract class GadgetGeneric extends Item {
 
     public GadgetGeneric() {
         setCreativeTab(BuildingGadgets.BUILDING_CREATIVE_TAB);
@@ -116,9 +119,7 @@ public class GadgetGeneric extends Item {
         return heldItem;
     }
 
-    public int getEnergyCost() {
-        return 200;
-    }
+    public abstract int getEnergyCost();
 
     public int getDamagePerUse() {
         return 1;
@@ -149,5 +150,28 @@ public class GadgetGeneric extends Item {
             IEnergyStorage energy = CapabilityProviderEnergy.getCap(stack);
             list.add(TextFormatting.WHITE + I18n.format("tooltip.gadget.energy") + ": " + withSuffix(energy.getEnergyStored()) + "/" + withSuffix(energy.getMaxEnergyStored()));
         }
+    }
+
+    public static boolean getFuzzy(ItemStack stack) {
+        return NBTTool.getOrNewTag(stack).getBoolean("fuzzy");
+    }
+
+    public static void toggleFuzzy(EntityPlayer player, ItemStack stack) {
+        NBTTool.getOrNewTag(stack).setBoolean("fuzzy", !getFuzzy(stack));
+        player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.fuzzymode").getUnformattedComponentText() + ": " + getFuzzy(stack)), true);
+    }
+
+    public static boolean getConnectedArea(ItemStack stack) {
+        return !NBTTool.getOrNewTag(stack).getBoolean("unconnectedarea");
+    }
+
+    public static void toggleConnectedArea(EntityPlayer player, ItemStack stack) {
+        NBTTool.getOrNewTag(stack).setBoolean("unconnectedarea", getConnectedArea(stack));
+        String suffix = stack.getItem() instanceof GadgetDestruction ? "area" : "surface";
+        player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.connected" + suffix).getUnformattedComponentText() + ": " + getConnectedArea(stack)), true);
+    }
+
+    protected static String formatName(String name) {
+        return name.replaceAll("(?=[A-Z])", " ").trim();
     }
 }

@@ -46,8 +46,16 @@ public class GadgetExchanger extends GadgetGeneric {
     private static final FakeBuilderWorld fakeWorld = new FakeBuilderWorld();
 
     public enum ToolMode {
-        Wall, VerticalColumn, HorizontalColumn, Grid;
+        Surface,
+        VerticalColumn,
+        HorizontalColumn,
+        Grid;
         private static ToolMode[] vals = values();//TODO unused
+
+        @Override
+        public String toString() {
+            return formatName(name());
+        }
 
         public ToolMode next() {//TODO unused
             return vals[(this.ordinal() + 1) % vals.length];
@@ -64,6 +72,16 @@ public class GadgetExchanger extends GadgetGeneric {
     @Override
     public int getMaxDamage(ItemStack stack) {
         return SyncedConfig.poweredByFE ? 0 : SyncedConfig.durabilityExchanger;
+    }
+
+    @Override
+    public int getEnergyCost() {
+        return SyncedConfig.energyCostExchanger;
+    }
+
+    @Override
+    public int getDamagePerUse() {
+        return 2;
     }
 
     @Override
@@ -92,22 +110,6 @@ public class GadgetExchanger extends GadgetGeneric {
         return super.canApplyAtEnchantingTable(stack, enchantment);
     }
 
-    private static void setFuzzy(ItemStack stack, boolean fuzzy) {
-        NBTTagCompound tagCompound = stack.getTagCompound();
-        if (tagCompound == null) {
-            tagCompound = new NBTTagCompound();
-        }
-        tagCompound.setBoolean("fuzzy", fuzzy);
-    }
-
-    public static boolean getFuzzy(ItemStack stack) {
-        NBTTagCompound tagCompound = stack.getTagCompound();
-        if (tagCompound == null) {
-            tagCompound = new NBTTagCompound();
-        }
-        return tagCompound.getBoolean("fuzzy");
-    }
-
     private static void setToolMode(ItemStack stack, ToolMode mode) {
         NBTTagCompound tagCompound = stack.getTagCompound();
         if (tagCompound == null) {
@@ -119,7 +121,7 @@ public class GadgetExchanger extends GadgetGeneric {
 
     public static ToolMode getToolMode(ItemStack stack) {
         NBTTagCompound tagCompound = stack.getTagCompound();
-        ToolMode mode = ToolMode.Wall;
+        ToolMode mode = ToolMode.Surface;
         if (tagCompound == null) {
             setToolMode(stack, mode);
             return mode;
@@ -136,8 +138,10 @@ public class GadgetExchanger extends GadgetGeneric {
     public void addInformation(ItemStack stack, @Nullable World world, List<String> list, ITooltipFlag b) {
         super.addInformation(stack, world, list, b);
         list.add(TextFormatting.DARK_GREEN + I18n.format("tooltip.gadget.block") + ": " + getToolBlock(stack).getBlock().getLocalizedName());
-        list.add(TextFormatting.AQUA + I18n.format("tooltip.gadget.mode") + ": " + getToolMode(stack));
-        list.add(TextFormatting.RED + I18n.format("tooltip.gadget.range") + ": " + getToolRange(stack));
+        ToolMode mode = getToolMode(stack);
+        list.add(TextFormatting.AQUA + I18n.format("tooltip.gadget.mode") + ": " + (mode == ToolMode.Surface && getConnectedArea(stack) ? I18n.format("tooltip.gadget.connected") + " " : "") + mode);
+        list.add(TextFormatting.LIGHT_PURPLE + I18n.format("tooltip.gadget.range") + ": " + getToolRange(stack));
+        list.add(TextFormatting.GOLD + I18n.format("tooltip.gadget.fuzzy") + ": " + getFuzzy(stack));
         addEnergyInformation(list, stack);
     }
 
@@ -158,22 +162,14 @@ public class GadgetExchanger extends GadgetGeneric {
     }
 
     public void toggleMode(EntityPlayer player, ItemStack heldItem) {//TODO unused
-        ToolMode mode = getToolMode(heldItem);
-        mode = mode.next();
-        setToolMode(heldItem, mode);
-        player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.toolmode").getUnformattedComponentText() + ": " + mode.name()), true);
+        setToolMode(heldItem, getToolMode(heldItem).next());
     }
 
     public void setMode(EntityPlayer player, ItemStack heldItem, int modeInt) {
         //Called when we specify a mode with the radial menu
         ToolMode mode = ToolMode.values()[modeInt];
         setToolMode(heldItem, mode);
-        player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.toolmode").getUnformattedComponentText() + ": " + mode.name()), true);
-    }
-
-    public void toggleFuzzy(EntityPlayer player, ItemStack heldItem) {
-        setFuzzy(heldItem, !(getFuzzy(heldItem)));
-        player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.fuzzymode").getUnformattedComponentText() + ": " + getFuzzy(heldItem)), true);
+        player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.toolmode").getUnformattedComponentText() + ": " + mode), true);
     }
 
     public void rangeChange(EntityPlayer player, ItemStack heldItem) {

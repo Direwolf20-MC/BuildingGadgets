@@ -39,17 +39,23 @@ block.buildinggadgets.templatemanager.name=Template Manager
 key.anchorKey=Anchor
 key.categories.buildingGadgets=Building Gadgets
 key.modeSwitch=Mode Switch
-key.rangeChange=Range
-key.undoKey=Undo/Fuzzy
+key.rangeChange=Range / Rotate / Overlay
+key.undoKey=Undo
+key.fuzzyKey=Fuzzy
+key.connectedarea=Connected Area
 
 #tooltip: 
 tooltip.constructionblockpowder.helptext=Place next to water
 tooltip.gadget.block=Block
 tooltip.gadget.destroyshowoverlay=Showing Overlay
+tooltip.gadget.destroy.overlay=Overlay
 tooltip.gadget.destroywarning=WARNING: This tool voids blocks.
 tooltip.gadget.energy=Energy
 tooltip.gadget.mode=Mode
 tooltip.gadget.range=Range
+tooltip.gadget.fuzzy=Fuzzy
+tooltip.gadget.connected=Connected
+tooltip.gadget.connectedarea=Connected Area
 tooltip.pasteContainer.amount=Amount
 tooltip.pasteContainer.creative.amountMsg=Amount: Infinite!
 tooltip.template.name=Name
@@ -64,6 +70,8 @@ message.gadget.copyguierror=Copy Area Failed
 message.gadget.copysuccess=Copy to Clipboard successful
 message.gadget.destroysizeerror=Maximum Destruction size is 16x16x16, negative numbers are invalid
 message.gadget.fuzzymode=Fuzzy Mode
+message.gadget.connectedarea=Connected Area
+message.gadget.connectedsurface=Connected Surface
 message.gadget.invalidblock=Invalid Block
 message.gadget.nothingtoundo=Nothing To Undo
 message.gadget.pastefailed=Paste Failed, Invalid JSON
@@ -77,6 +85,7 @@ message.gadget.toomanyblocks=Too Many Blocks, Limit is 32,768 (Right click empty
 message.gadget.undofailed=Undo Failed (Too far away?)
 message.gadget.TEinCopy=Area Copied, Number of tile entities not copied
 message.gadget.boundTE=Bound Gadget to Inventory
+message.gadget.unboundTE=Unbound Gadget from Inventory
 
 #help: 
 help.gui.buildinggadgets.area.arrow.data_flow=Represents the flow of data from one item to another; either from a template to a gadget/template, or from a gadget/template to a template or piece of paper

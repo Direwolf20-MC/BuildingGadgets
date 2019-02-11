@@ -5,7 +5,7 @@ import net.minecraft.init.Blocks;
 import net.minecraftforge.common.config.Config.*;
 
 //hardcode this name, so that we use a different config file than before we used Annotations
-@net.minecraftforge.common.config.Config(modid = BuildingGadgets.MODID, name = "BuildingGadgets", category = Config.CATEGORY_ROOT)
+@net.minecraftforge.common.config.Config(modid = BuildingGadgets.MODID, name = BuildingGadgets.MODID, category = Config.CATEGORY_ROOT)
 public class Config {
 
     static final String CATEGORY_ROOT = "general";
@@ -35,6 +35,13 @@ public class Config {
     private static final String LANG_KEY_GADGETS_ENERGY_COMMENT = "The Gadget's Energy cost per Operation";
 
     private static final String LANG_KEY_GADGETS_DURABILITY_COMMENT = "The Gadget's Durability (0 means no durability is used) (Ignored if powered by FE)";
+
+    /**
+     * This value should not be touched by version Adapters and will only be applied by {@link CompatConfig} if all Version Adapters have run.
+     */
+    @Comment("DO NOT MODIFY THIS VALUE IN ANY WAY MANUALLY - CONFIG LOSSES MAY BE THE RESULT!")
+    @Name("Save Version")
+    public static String version = BuildingGadgets.VERSION;
 
     @RangeDouble(min = 1 , max = 48)
     @Name("Max Build Distance")
@@ -80,6 +87,8 @@ public class Config {
     public static CategoryBlacklist subCategoryBlacklist = new CategoryBlacklist();
 
     public static final class CategoryBlacklist {
+        private CategoryBlacklist() {
+        }
         //In 1.13 this should be converted to a tag (or at least made compatible with)
         @Name("Blacklisted Blocks")
         @Comment({"All Blocks added to this will be treated similar to TileEntities. Not at all.",
@@ -89,8 +98,6 @@ public class Config {
         public String[] blockBlacklist = {"minecraft:.*_door.*", PatternList.getName(Blocks.PISTON_HEAD)};
     }
 
-    @RequiresMcRestart
-    @RequiresWorldRestart
     @Name("Gadgets")
     @Comment("Configure the Gadgets here")
     @LangKey(LANG_KEY_GADGETS)
@@ -140,7 +147,8 @@ public class Config {
         public CategoryGadgetCopyPaste subCategoryGadgetCopyPaste = new CategoryGadgetCopyPaste();
 
         public static final class CategoryGadgetBuilding {
-            private CategoryGadgetBuilding(){ }
+            private CategoryGadgetBuilding() {
+            }
 
             @RangeInt(min = 0, max = 100000)
             @Name("Energy Cost")
@@ -148,6 +156,7 @@ public class Config {
             @LangKey(LANG_KEY_GADGETS_ENERGY)
             public int energyCostBuilder = 50;
 
+            @RequiresWorldRestart
             @RangeInt(min = 0, max = 100000)
             @Name("Durability")
             @Comment(LANG_KEY_GADGETS_DURABILITY_COMMENT)
@@ -156,7 +165,8 @@ public class Config {
         }
 
         public static final class CategoryGadgetExchanger {
-            private CategoryGadgetExchanger(){ }
+            private CategoryGadgetExchanger() {
+            }
 
             @RangeInt(min = 0, max = 100000)
             @Name("Energy Cost")
@@ -164,6 +174,7 @@ public class Config {
             @LangKey(LANG_KEY_GADGETS_ENERGY)
             public int energyCostExchanger = 100;
 
+            @RequiresWorldRestart
             @RangeInt(min = 0, max = 100000)
             @Name("Durability")
             @Comment(LANG_KEY_GADGETS_DURABILITY_COMMENT)
@@ -185,6 +196,7 @@ public class Config {
             @LangKey(LANG_KEY_GADGETS_ENERGY)
             public int energyCostDestruction = 200;
 
+            @RequiresWorldRestart
             @RangeInt(min = 0, max = 100000)
             @Name("Durability")
             @Comment(LANG_KEY_GADGETS_DURABILITY_COMMENT)
@@ -193,7 +205,8 @@ public class Config {
         }
 
         public static final class CategoryGadgetCopyPaste {
-            private CategoryGadgetCopyPaste() { }
+            private CategoryGadgetCopyPaste() {
+            }
 
             @RangeInt(min = 0, max = 100000)
             @Name("Energy Cost")
@@ -201,6 +214,7 @@ public class Config {
             @LangKey(LANG_KEY_GADGETS_ENERGY)
             public int energyCostCopyPaste = 50;
 
+            @RequiresWorldRestart
             @RangeInt(min = 0, max = 100000)
             @Name("Durability")
             @Comment(LANG_KEY_GADGETS_DURABILITY_COMMENT)

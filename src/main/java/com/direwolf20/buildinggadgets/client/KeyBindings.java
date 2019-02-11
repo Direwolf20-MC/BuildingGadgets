@@ -18,16 +18,22 @@ public class KeyBindings {
     public static KeyBinding rangeChange;
     public static KeyBinding undoKey;
     public static KeyBinding anchorKey;
+    public static KeyBinding fuzzyKey;
+    public static KeyBinding connectedAreaKey;
 
     public static void init() {
-        modeSwitch = new KeyBinding("key.modeSwitch", CONFLICT_CONTEXT_GADGET, Keyboard.KEY_G, "key.categories.buildingGadgets");
-        rangeChange = new KeyBinding("key.rangeChange", CONFLICT_CONTEXT_GADGET, Keyboard.KEY_R, "key.categories.buildingGadgets");
-        undoKey = new KeyBinding("key.undoKey", CONFLICT_CONTEXT_GADGET, Keyboard.KEY_U, "key.categories.buildingGadgets");
-        anchorKey = new KeyBinding("key.anchorKey", CONFLICT_CONTEXT_GADGET, Keyboard.KEY_H, "key.categories.buildingGadgets");
-        ClientRegistry.registerKeyBinding(modeSwitch);
-        ClientRegistry.registerKeyBinding(rangeChange);
-        ClientRegistry.registerKeyBinding(undoKey);
-        ClientRegistry.registerKeyBinding(anchorKey);
+        modeSwitch = createBinding("key.modeSwitch", Keyboard.KEY_G);
+        rangeChange = createBinding("key.rangeChange", Keyboard.KEY_R);
+        undoKey = createBinding("key.undoKey", Keyboard.KEY_U);
+        anchorKey = createBinding("key.anchorKey", Keyboard.KEY_H);
+        fuzzyKey = createBinding("key.fuzzyKey", Keyboard.KEY_NONE);
+        connectedAreaKey = createBinding("key.connectedarea", Keyboard.KEY_NONE);
+    }
+
+    private static KeyBinding createBinding(String name, int key) {
+        KeyBinding keyBinding = new KeyBinding(name, CONFLICT_CONTEXT_GADGET, key, "key.categories.buildingGadgets");
+        ClientRegistry.registerKeyBinding(keyBinding);
+        return keyBinding;
     }
 
     public static class KeyConflictContextGadget implements IKeyConflictContext

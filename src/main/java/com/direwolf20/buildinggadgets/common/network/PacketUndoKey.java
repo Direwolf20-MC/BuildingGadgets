@@ -1,7 +1,9 @@
 package com.direwolf20.buildinggadgets.common.network;
 
-import com.direwolf20.buildinggadgets.common.items.gadgets.*;
-import io.netty.buffer.ByteBuf;
+import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetBuilding;
+import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
+import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetDestruction;
+import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.FMLCommonHandler;
@@ -9,18 +11,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
-public class PacketUndoKey implements IMessage {
-
-    @Override
-    public void fromBytes(ByteBuf buf) {
-    }
-
-    @Override
-    public void toBytes(ByteBuf buf) {
-    }
-
-    public PacketUndoKey() {
-    }
+public class PacketUndoKey extends PacketEmpty {
 
     public static class Handler implements IMessageHandler<PacketUndoKey, IMessage> {
         @Override
@@ -30,23 +21,15 @@ public class PacketUndoKey implements IMessage {
         }
 
         private void handle(MessageContext ctx) {
-            EntityPlayerMP playerEntity = ctx.getServerHandler().player;
-            ItemStack heldItem = GadgetGeneric.getGadget(playerEntity);
-            if (heldItem.isEmpty())
-                return;
-
-            if (heldItem.getItem() instanceof GadgetBuilding) {
-                GadgetBuilding gadgetBuilding = (GadgetBuilding) (heldItem.getItem());
-                gadgetBuilding.undoBuild(playerEntity);
-            } else if (heldItem.getItem() instanceof GadgetExchanger) {
-                GadgetExchanger gadgetExchanger = (GadgetExchanger) (heldItem.getItem());
-                gadgetExchanger.toggleFuzzy(playerEntity, heldItem);
-            } else if (heldItem.getItem() instanceof GadgetCopyPaste) {
-                GadgetCopyPaste gadgetCopyPaste = (GadgetCopyPaste) (heldItem.getItem());
-                gadgetCopyPaste.undoBuild(playerEntity, heldItem);
-            } else if (heldItem.getItem() instanceof GadgetDestruction) {
-                GadgetDestruction gadgetDestruction = (GadgetDestruction) (heldItem.getItem());
-                gadgetDestruction.undo(playerEntity, heldItem);
+            EntityPlayerMP player = ctx.getServerHandler().player;
+            ItemStack stack = GadgetGeneric.getGadget(player);
+            GadgetGeneric item = (GadgetGeneric) stack.getItem();
+            if (item instanceof GadgetBuilding) {
+                ((GadgetBuilding) item).undoBuild(player);
+            } else if (item instanceof GadgetCopyPaste) {
+                ((GadgetCopyPaste) item).undoBuild(player, stack);
+            } else if (item instanceof GadgetDestruction) {
+                ((GadgetDestruction) item).undo(player, stack);
             }
         }
     }

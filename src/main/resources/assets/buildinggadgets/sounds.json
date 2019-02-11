@@ -1,0 +1,9 @@
+{
+  "beep": {
+    "sounds": [
+      {
+        "name": "buildinggadgets:beep"
+      }
+    ]
+  }
+}

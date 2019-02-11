@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.common.config.compat;
 
+import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.config.PatternList;
 import net.minecraft.init.Blocks;
 import net.minecraftforge.common.config.ConfigCategory;
@@ -9,6 +10,7 @@ import net.minecraftforge.fml.common.versioning.ComparableVersion;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -36,7 +38,9 @@ public class PreConfigAnnotationsAdapter implements IConfigVersionAdapter {
     @Override
     @Nonnull
     public ConfigCategory updateToVersion(@Nonnull Path modConfigDir, @Nullable ConfigCategory configuration) {
-        Configuration loaded = new Configuration(modConfigDir.resolve(FILE).toFile());
+        Path cfgFile = modConfigDir.resolve(FILE);
+        Configuration loaded = new Configuration(cfgFile.toFile());
+        loaded.load();
         ConfigCategory oldGeneral = loaded.getCategory(CATEGORY_GENERAL);
         ConfigCategory oldBlacklist = loaded.getCategory(CATEGORY_BLACKLIST);
         ConfigCategory res = new ConfigCategory(CATEGORY_GENERAL);
@@ -71,6 +75,11 @@ public class PreConfigAnnotationsAdapter implements IConfigVersionAdapter {
 
         setValue(catCopyPaste, "Energy Cost", Integer.toString(50), Type.INTEGER);
         copyValue(catCopyPaste, oldGeneral, "Durability", "durabilityCopyPaste", Integer.toString(500), Type.INTEGER);
+        try {
+            Files.deleteIfExists(cfgFile);
+        } catch (IOException e) {
+            BuildingGadgets.logger.error("Failed to delete old config File {}.", cfgFile.toString(), e);
+        }
         return res;
     }
 
