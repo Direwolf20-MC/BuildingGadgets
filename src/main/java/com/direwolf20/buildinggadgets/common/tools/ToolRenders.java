@@ -10,7 +10,6 @@ import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetDestruction;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetExchanger;
 import com.google.common.collect.Multiset;
-
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockRendererDispatcher;
@@ -174,6 +173,22 @@ public class ToolRenders {
                     //Move the render position back to where it was
                     GlStateManager.popMatrix();
                 }
+
+                Integer dim = GadgetUtils.getDIMFromNBT(heldItem, "boundTE");
+                BlockPos pos = GadgetUtils.getPOSFromNBT(heldItem, "boundTE");
+
+                if (dim != null && pos != null) {
+                    GlStateManager.pushMatrix();//Push matrix again just because
+                    GlStateManager.translate(-doubleX, -doubleY, -doubleZ);//The render starts at the player, so we subtract the player coords and move the render to 0,0,0
+                    GlStateManager.translate(pos.getX(), pos.getY(), pos.getZ());//Now move the render position to the coordinates we want to render at
+                    GlStateManager.rotate(-90.0F, 0.0F, 1.0F, 0.0F); //Rotate it because i'm not sure why but we need to
+                    GlStateManager.translate(-0.005f, -0.005f, 0.005f);
+                    GlStateManager.scale(1.01f, 1.01f, 1.01f);
+                    GL14.glBlendColor(1F, 1F, 1F, 0.35f); //Set the alpha of the blocks we are rendering
+                    dispatcher.renderBlockBrightness(Blocks.STAINED_GLASS.getDefaultState().withProperty(COLOR, EnumDyeColor.YELLOW), 1f);
+                    GlStateManager.popMatrix();
+                }
+
                 //Set blending back to the default mode
                 GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
                 ForgeHooksClient.setRenderLayer(origLayer);
@@ -307,6 +322,21 @@ public class ToolRenders {
                         dispatcher.renderBlockBrightness(Blocks.STAINED_GLASS.getDefaultState().withProperty(COLOR, EnumDyeColor.RED), 1f);
                     }
                     //Move the render position back to where it was
+                    GlStateManager.popMatrix();
+                }
+
+                Integer dim = GadgetUtils.getDIMFromNBT(heldItem, "boundTE");
+                BlockPos pos = GadgetUtils.getPOSFromNBT(heldItem, "boundTE");
+
+                if (dim != null && pos != null) {
+                    GlStateManager.pushMatrix();//Push matrix again just because
+                    GlStateManager.translate(-doubleX, -doubleY, -doubleZ);//The render starts at the player, so we subtract the player coords and move the render to 0,0,0
+                    GlStateManager.translate(pos.getX(), pos.getY(), pos.getZ());//Now move the render position to the coordinates we want to render at
+                    GlStateManager.rotate(-90.0F, 0.0F, 1.0F, 0.0F); //Rotate it because i'm not sure why but we need to
+                    GlStateManager.translate(-0.005f, -0.005f, 0.005f);
+                    GlStateManager.scale(1.01f, 1.01f, 1.01f);
+                    GL14.glBlendColor(1F, 1F, 1F, 0.35f); //Set the alpha of the blocks we are rendering
+                    dispatcher.renderBlockBrightness(Blocks.STAINED_GLASS.getDefaultState().withProperty(COLOR, EnumDyeColor.YELLOW), 1f);
                     GlStateManager.popMatrix();
                 }
                 //Set blending back to the default mode
@@ -471,6 +501,23 @@ public class ToolRenders {
 
             GlStateManager.popMatrix();
             //Set blending back to the default mode
+
+            Integer dim = GadgetUtils.getDIMFromNBT(stack, "boundTE");
+            BlockPos pos = GadgetUtils.getPOSFromNBT(stack, "boundTE");
+
+            if (dim != null && pos != null) {
+                BlockRendererDispatcher dispatcher = Minecraft.getMinecraft().getBlockRendererDispatcher();
+                GlStateManager.pushMatrix();//Push matrix again just because
+                GlStateManager.translate(-doubleX, -doubleY, -doubleZ);//The render starts at the player, so we subtract the player coords and move the render to 0,0,0
+                GlStateManager.translate(pos.getX(), pos.getY(), pos.getZ());//Now move the render position to the coordinates we want to render at
+                GlStateManager.rotate(-90.0F, 0.0F, 1.0F, 0.0F); //Rotate it because i'm not sure why but we need to
+                GlStateManager.translate(-0.005f, -0.005f, 0.005f);
+                GlStateManager.scale(1.01f, 1.01f, 1.01f);
+                GL14.glBlendColor(1F, 1F, 1F, 0.35f); //Set the alpha of the blocks we are rendering
+                dispatcher.renderBlockBrightness(Blocks.STAINED_GLASS.getDefaultState().withProperty(COLOR, EnumDyeColor.YELLOW), 1f);
+                GlStateManager.popMatrix();
+            }
+
             GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
             //Disable blend
             GlStateManager.disableBlend();
@@ -484,6 +531,7 @@ public class ToolRenders {
             if (startPos == null || endPos == null || startPos.equals(blankPos) || endPos.equals(blankPos)) {
                 return;
             }
+
 
             List<BlockMap> blockMapList = GadgetCopyPaste.getBlockMapList(PasteToolBufferBuilder.getTagFromUUID(UUID));
             if (blockMapList.size() == 0) {
@@ -508,6 +556,25 @@ public class ToolRenders {
 
             Tessellator tessellator = Tessellator.getInstance();
             BufferBuilder bufferbuilder = tessellator.getBuffer();
+
+            Integer dim = GadgetUtils.getDIMFromNBT(stack, "boundTE");
+            BlockPos pos = GadgetUtils.getPOSFromNBT(stack, "boundTE");
+
+            if (dim != null && pos != null) {
+                BlockRendererDispatcher dispatcher = Minecraft.getMinecraft().getBlockRendererDispatcher();
+                GlStateManager.blendFunc(GL11.GL_CONSTANT_ALPHA, GL11.GL_ONE_MINUS_CONSTANT_ALPHA);
+                GlStateManager.enableBlend();
+                GlStateManager.pushMatrix();//Push matrix again just because
+                GlStateManager.translate(-doubleX, -doubleY, -doubleZ);//The render starts at the player, so we subtract the player coords and move the render to 0,0,0
+                GlStateManager.translate(pos.getX(), pos.getY(), pos.getZ());//Now move the render position to the coordinates we want to render at
+                GlStateManager.rotate(-90.0F, 0.0F, 1.0F, 0.0F); //Rotate it because i'm not sure why but we need to
+                GlStateManager.translate(-0.005f, -0.005f, 0.005f);
+                GlStateManager.scale(1.01f, 1.01f, 1.01f);
+                GL14.glBlendColor(1F, 1F, 1F, 0.35f); //Set the alpha of the blocks we are rendering
+                dispatcher.renderBlockBrightness(Blocks.STAINED_GLASS.getDefaultState().withProperty(COLOR, EnumDyeColor.YELLOW), 1f);
+                GlStateManager.popMatrix();
+            }
+
             GlStateManager.pushMatrix();
             GlStateManager.translate(-doubleX, -doubleY, -doubleZ);//The render starts at the player, so we subtract the player coords and move the render to 0,0,0
 
@@ -525,6 +592,7 @@ public class ToolRenders {
             GlStateManager.depthMask(true);
 
             GlStateManager.popMatrix();
+
         }
     }
 
