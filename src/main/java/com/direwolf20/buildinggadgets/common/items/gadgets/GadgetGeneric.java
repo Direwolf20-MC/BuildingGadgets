@@ -28,7 +28,7 @@ import java.util.List;
 
 import static com.direwolf20.buildinggadgets.common.tools.GadgetUtils.withSuffix;
 
-public class GadgetGeneric extends Item {
+public abstract class GadgetGeneric extends Item {
 
     public GadgetGeneric() {
         setCreativeTab(BuildingGadgets.BUILDING_CREATIVE_TAB);
@@ -120,9 +120,7 @@ public class GadgetGeneric extends Item {
         return heldItem;
     }
 
-    public int getEnergyCost() {
-        return 200;
-    }
+    public abstract int getEnergyCost();
 
     public int getDamagePerUse() {
         return 1;

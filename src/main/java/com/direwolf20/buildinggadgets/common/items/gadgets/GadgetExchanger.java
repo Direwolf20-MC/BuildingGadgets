@@ -72,6 +72,11 @@ public class GadgetExchanger extends GadgetGeneric {
     }
 
     @Override
+    public int getEnergyCost() {
+        return SyncedConfig.energyCostExchanger;
+    }
+
+    @Override
     public int getItemEnchantability() {
         return 3;
     }
