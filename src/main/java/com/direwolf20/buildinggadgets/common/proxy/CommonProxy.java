@@ -10,6 +10,7 @@ import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateMana
 import com.direwolf20.buildinggadgets.common.config.CompatConfig;
 import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
 import com.direwolf20.buildinggadgets.common.entities.ModEntities;
+import com.direwolf20.buildinggadgets.common.integration.IntegrationHandler;
 import com.direwolf20.buildinggadgets.common.items.Template;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetBuilding;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
@@ -47,6 +48,7 @@ public class CommonProxy {
             BuildingGadgets.logger.info("Preparing to migrate old config Data to new Format");
             applyCompatConfig = CompatConfig.readConfig(cfgFile);
         }
+        IntegrationHandler.preInit(e);
     }
 
     public void init() {

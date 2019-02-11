@@ -2,13 +2,11 @@ package com.direwolf20.buildinggadgets.common.tools;
 
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
+import com.direwolf20.buildinggadgets.common.integration.RefinedStorage;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetBuilding;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetExchanger;
-import com.direwolf20.buildinggadgets.common.tools.NetworkExtractor.NetworkExtractorRS;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
-import com.raoulvdberge.refinedstorage.api.network.INetwork;
-import com.raoulvdberge.refinedstorage.api.network.node.INetworkNodeProxy;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
@@ -341,11 +339,8 @@ public class GadgetUtils {
         if (worldServer == null) return null;
         TileEntity te = world.getTileEntity(pos);
         if (te == null) return null;
-        if (te instanceof INetworkNodeProxy) {
-            INetwork network = ((INetworkNodeProxy) te).getNode().getNetwork();
-            if (network != null)
-                return new NetworkExtractorRS(network);
-        }
+        IItemHandler network = RefinedStorage.getWrappedNetwork(te);
+        if (network != null) return network;
         IItemHandler cap = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
         return cap != null ? cap : null;
     }
