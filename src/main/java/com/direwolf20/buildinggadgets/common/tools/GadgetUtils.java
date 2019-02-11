@@ -280,10 +280,9 @@ public class GadgetUtils {
             setToolActualBlock(stack, ((ConstructionBlockTileEntity) te).getActualBlockState());
             return EnumActionResult.SUCCESS;
         }
-        if (setRemoteInventory(stack, pos, world.provider.getDimension(), world)) {
-            player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.boundTE").getUnformattedComponentText()), true);
+        if (setRemoteInventory(player, stack, pos, world.provider.getDimension(), world))
             return EnumActionResult.SUCCESS;
-        }
+
         return EnumActionResult.FAIL;
     }
 
@@ -316,9 +315,11 @@ public class GadgetUtils {
         return true;
     }
 
-    public static boolean setRemoteInventory(ItemStack tool, @Nullable BlockPos pos, int dim, World world) {
+    public static boolean setRemoteInventory(EntityPlayer player, ItemStack tool, BlockPos pos, int dim, World world) {
         if (getRemoteInventory(pos, dim, world) != null) {
-            writePOSToNBT(tool, pos, "boundTE", dim);
+            boolean same = pos.equals(getPOSFromNBT(tool, "boundTE"));
+            writePOSToNBT(tool, same ? null : pos, "boundTE", dim);
+            player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget." + (same ? "unboundTE" : "boundTE")).getUnformattedComponentText()), true);
             return true;
         }
         return false;

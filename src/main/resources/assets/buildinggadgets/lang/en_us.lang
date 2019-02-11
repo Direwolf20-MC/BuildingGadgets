@@ -85,6 +85,7 @@ message.gadget.toomanyblocks=Too Many Blocks, Limit is 32,768 (Right click empty
 message.gadget.undofailed=Undo Failed (Too far away?)
 message.gadget.TEinCopy=Area Copied, Number of tile entities not copied
 message.gadget.boundTE=Bound Gadget to Inventory
+message.gadget.unboundTE=Unbound Gadget from Inventory
 
 #help: 
 help.gui.buildinggadgets.area.arrow.data_flow=Represents the flow of data from one item to another; either from a template to a gadget/template, or from a gadget/template to a template or piece of paper
