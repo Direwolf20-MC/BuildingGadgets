@@ -1,6 +1,7 @@
 package com.direwolf20.buildinggadgets.common.tools;
 
 import com.direwolf20.buildinggadgets.client.RemoteInventoryCache;
+import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.blocks.ModBlocks;
 import com.direwolf20.buildinggadgets.common.items.FakeBuilderWorld;
 import com.direwolf20.buildinggadgets.common.items.ModItems;
@@ -9,11 +10,14 @@ import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetBuilding;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetDestruction;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetExchanger;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Multiset;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockRendererDispatcher;
 import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.GLAllocation;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.texture.TextureMap;
@@ -34,6 +38,9 @@ import net.minecraftforge.client.ForgeHooksClient;
 import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.energy.CapabilityEnergy;
+
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL14;
 
@@ -41,6 +48,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 import static com.direwolf20.buildinggadgets.common.tools.GadgetUtils.getAnchor;
 import static com.direwolf20.buildinggadgets.common.tools.GadgetUtils.getToolBlock;
@@ -48,14 +57,16 @@ import static net.minecraft.block.BlockStainedGlass.COLOR;
 
 public class ToolRenders {
     private static final FakeBuilderWorld fakeWorld = new FakeBuilderWorld();
-    private static RemoteInventoryCache cache = new RemoteInventoryCache(false);
+    private static RemoteInventoryCache cacheInventory = new RemoteInventoryCache(false);
+    private static Cache<Pair<UniqueItemStack, BlockPos>, Integer> cacheDestructionOverlay = CacheBuilder.newBuilder().maximumSize(1).
+            expireAfterWrite(1, TimeUnit.SECONDS).removalListener(removal -> GLAllocation.deleteDisplayLists((int) removal.getValue())).build();
 
-    public static void setCache(Multiset<UniqueItem> cache) {
-        ToolRenders.cache.setCache(cache);
+    public static void setInventoryCache(Multiset<UniqueItem> cache) {
+        ToolRenders.cacheInventory.setCache(cache);
     }
 
-    public static void updateCache() {
-        cache.forceUpdate();
+    public static void updateInventoryCache() {
+        cacheInventory.forceUpdate();
     }
 
     public static void renderBuilderOverlay(RenderWorldLastEvent evt, EntityPlayer player, ItemStack stack) {
@@ -124,7 +135,7 @@ public class ToolRenders {
                     itemStack = renderBlockState.getBlock().getPickBlock(renderBlockState, null, world, new BlockPos(0, 0, 0), player);
                 }
 
-                long hasBlocks = InventoryManipulation.countItem(itemStack, player, cache);
+                long hasBlocks = InventoryManipulation.countItem(itemStack, player, cacheInventory);
                 hasBlocks = hasBlocks + InventoryManipulation.countPaste(player);
                 int hasEnergy = 0;
                 if (stack.hasCapability(CapabilityEnergy.ENERGY, null)) {
@@ -270,7 +281,7 @@ public class ToolRenders {
                 if (itemStack.getItem().equals(Items.AIR)) {
                     itemStack = renderBlockState.getBlock().getPickBlock(renderBlockState, null, world, new BlockPos(0, 0, 0), player);
                 }
-                long hasBlocks = InventoryManipulation.countItem(itemStack, player, cache);
+                long hasBlocks = InventoryManipulation.countItem(itemStack, player, cacheInventory);
                 hasBlocks = hasBlocks + InventoryManipulation.countPaste(player);
                 int hasEnergy = 0;
                 if (stack.hasCapability(CapabilityEnergy.ENERGY, null)) {
@@ -375,6 +386,27 @@ public class ToolRenders {
         if (heldItem.isEmpty()) return;
 
         if (!GadgetDestruction.getOverlay(heldItem)) return;
+
+        GlStateManager.pushMatrix();
+        double doubleX = player.lastTickPosX + (player.posX - player.lastTickPosX) * evt.getPartialTicks();
+        double doubleY = player.lastTickPosY + (player.posY - player.lastTickPosY) * evt.getPartialTicks();
+        double doubleZ = player.lastTickPosZ + (player.posZ - player.lastTickPosZ) * evt.getPartialTicks();
+        GlStateManager.translate(-doubleX, -doubleY, -doubleZ);
+        try {
+            GlStateManager.callList(cacheDestructionOverlay.get(new ImmutablePair<UniqueItemStack, BlockPos>(new UniqueItemStack(heldItem), startBlock), () -> {
+                int displayList = GLAllocation.generateDisplayLists(1);
+                GlStateManager.glNewList(displayList, GL11.GL_COMPILE);
+                renderDestructionOverlay(player, world, startBlock, facing, heldItem);
+                GlStateManager.glEndList();
+                return displayList;
+            }));
+        } catch (ExecutionException e) {
+            BuildingGadgets.logger.error("Error encountered while rendering destruction gadget overlay", e);
+        }
+        GlStateManager.popMatrix();
+    }
+
+    private static void renderDestructionOverlay(EntityPlayer player, World world, BlockPos startBlock, EnumFacing facing, ItemStack heldItem) {
         Minecraft mc = Minecraft.getMinecraft();
         mc.renderEngine.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
 
@@ -382,11 +414,6 @@ public class ToolRenders {
 
         //Prepare the block rendering
         BlockRenderLayer origLayer = MinecraftForgeClient.getRenderLayer();
-
-        //Calculate the players current position, which is needed later
-        double doubleX = player.lastTickPosX + (player.posX - player.lastTickPosX) * evt.getPartialTicks();
-        double doubleY = player.lastTickPosY + (player.posY - player.lastTickPosY) * evt.getPartialTicks();
-        double doubleZ = player.lastTickPosZ + (player.posZ - player.lastTickPosZ) * evt.getPartialTicks();
 
         //Save the current position that is being rendered (I think)
         GlStateManager.pushMatrix();
@@ -419,7 +446,6 @@ public class ToolRenders {
             }
             if (invisible) continue;
             GlStateManager.pushMatrix();//Push matrix again just because
-            GlStateManager.translate(-doubleX, -doubleY, -doubleZ);//The render starts at the player, so we subtract the player coords and move the render to 0,0,0
             GlStateManager.translate(coordinate.getX(), coordinate.getY(), coordinate.getZ());//Now move the render position to the coordinates we want to render at
             GlStateManager.rotate(-90.0F, 0.0F, 1.0F, 0.0F); //Rotate it because i'm not sure why but we need to
             GlStateManager.translate(-0.005f, -0.005f, 0.005f);

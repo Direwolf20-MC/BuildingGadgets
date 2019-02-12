@@ -291,7 +291,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
             } else if (player.isSneaking()) {
                 player.openGui(BuildingGadgets.instance, GuiProxy.PasteID, world, hand.ordinal(), 0, 0);
             } else {
-                ToolRenders.updateCache();
+                ToolRenders.updateInventoryCache();
             }
         }
         return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);

@@ -109,7 +109,7 @@ public class PacketSetRemoteInventoryCache implements IMessage {
                 if (message.isCopyPaste)
                     EventTooltip.setCache(message.cache);
                 else
-                    ToolRenders.setCache(message.cache);
+                    ToolRenders.setInventoryCache(message.cache);
             });
             return null;
         }

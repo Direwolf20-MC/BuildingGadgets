@@ -153,7 +153,7 @@ public class GadgetExchanger extends GadgetGeneric {
                 exchange(player, itemstack);
             }
         } else if (!player.isSneaking()) {
-            ToolRenders.updateCache();
+            ToolRenders.updateInventoryCache();
         }
         return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, itemstack);
     }

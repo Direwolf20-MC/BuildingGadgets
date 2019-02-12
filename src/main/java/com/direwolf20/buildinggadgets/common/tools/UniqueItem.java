@@ -13,22 +13,17 @@ public final class UniqueItem {
 
     public boolean equals(UniqueItem uniqueItem) {
         //item.equals will fall back to reference Equality
-        return (uniqueItem.item.equals(item) && uniqueItem.meta == meta);
+        return uniqueItem.item.equals(item) && uniqueItem.meta == meta;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof UniqueItem)) return false;
-
-        UniqueItem that = (UniqueItem) o;
-        return equals(that);
+        return !(o instanceof UniqueItem) ? false : equals((UniqueItem) o);
     }
 
     @Override
     public int hashCode() {
-        int result = meta;
-        result = 31 * result + item.hashCode();
-        return result;
+        return 31 * meta + item.hashCode();
     }
 }
