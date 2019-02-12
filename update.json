@@ -1,10 +1,10 @@
 {
   "homepage": "https://minecraft.curseforge.com/projects/building-gadgets",
   "1.12.2": {
-    "2.6.2": "Changelog: https://minecraft.curseforge.com/projects/building-gadgets/files/2670027"
+    "2.6.3": "Changelog: https://minecraft.curseforge.com/projects/building-gadgets/files/2670027"
   },
   "promos": {
-    "1.12.2-latest": "2.6.2",
-    "1.12.2-recommended": "2.6.2"
+    "1.12.2-latest": "2.6.3",
+    "1.12.2-recommended": "2.6.3"
   }
 }
