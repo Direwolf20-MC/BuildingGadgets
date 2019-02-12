@@ -9,28 +9,32 @@ import net.minecraftforge.client.settings.KeyConflictContext;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import org.lwjgl.glfw.GLFW;
 
-public class KeyBindings {
+public class KeyBindings {// TODO Key bindings do not yet work at all
 
     private static final KeyConflictContextGadget CONFLICT_CONTEXT_GADGET = new KeyConflictContextGadget();
     public static KeyBinding modeSwitch;
     public static KeyBinding rangeChange;
     public static KeyBinding undoKey;
     public static KeyBinding anchorKey;
+    public static KeyBinding fuzzyKey;
+    public static KeyBinding connectedAreaKey;
 
     public static void init() {
-        modeSwitch = new KeyBinding("key.modeSwitch", CONFLICT_CONTEXT_GADGET, InputMappings.Type.KEYSYM.getOrMakeInput(GLFW.GLFW_KEY_G), "key.categories.buildingGadgets");
-        rangeChange = new KeyBinding("key.rangeChange", CONFLICT_CONTEXT_GADGET, InputMappings.Type.KEYSYM.getOrMakeInput(GLFW.GLFW_KEY_R), "key.categories.buildingGadgets");
-        undoKey = new KeyBinding("key.undoKey", CONFLICT_CONTEXT_GADGET, InputMappings.Type.KEYSYM.getOrMakeInput(GLFW.GLFW_KEY_U), "key.categories.buildingGadgets");
-        anchorKey = new KeyBinding("key.anchorKey", CONFLICT_CONTEXT_GADGET, InputMappings.Type.KEYSYM.getOrMakeInput(GLFW.GLFW_KEY_H), "key.categories.buildingGadgets");
-
-        ClientRegistry.registerKeyBinding(modeSwitch);
-        ClientRegistry.registerKeyBinding(rangeChange);
-        ClientRegistry.registerKeyBinding(undoKey);
-        ClientRegistry.registerKeyBinding(anchorKey);
+        modeSwitch = createBinding("modeSwitch", GLFW.GLFW_KEY_G);
+        rangeChange = createBinding("rangeChange", GLFW.GLFW_KEY_R);
+        undoKey = createBinding("undoKey", GLFW.GLFW_KEY_U);
+        anchorKey = createBinding("anchorKey", GLFW.GLFW_KEY_H);
+        fuzzyKey = createBinding("fuzzyKey", GLFW.GLFW_KEY_UNKNOWN);
+        connectedAreaKey = createBinding("connectedarea", GLFW.GLFW_KEY_UNKNOWN);
     }
 
-    public static class KeyConflictContextGadget implements IKeyConflictContext
-    {
+    private static KeyBinding createBinding(String name, int key) {
+        KeyBinding keyBinding = new KeyBinding("key." + name, CONFLICT_CONTEXT_GADGET, InputMappings.Type.KEYSYM.getOrMakeInput(key), "key.categories.buildingGadgets");
+        ClientRegistry.registerKeyBinding(keyBinding);
+        return keyBinding;
+    }
+
+    public static class KeyConflictContextGadget implements IKeyConflictContext {
         @Override
         public boolean isActive() {
             return !KeyConflictContext.GUI.isActive() && Minecraft.getInstance().player != null
