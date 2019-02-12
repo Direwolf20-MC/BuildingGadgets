@@ -1,7 +1,6 @@
 package com.direwolf20.buildinggadgets.client.proxy;
 
 import com.direwolf20.buildinggadgets.client.KeyBindings;
-import com.direwolf20.buildinggadgets.common.ModSounds;
 import com.direwolf20.buildinggadgets.common.blocks.ModBlocks;
 import com.direwolf20.buildinggadgets.common.blocks.Models.BakedModelLoader;
 import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManagerContainer;
@@ -14,7 +13,6 @@ import com.direwolf20.buildinggadgets.common.tools.PasteContainerMeshDefinition;
 import com.direwolf20.buildinggadgets.common.tools.ToolRenders;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.PositionedSoundRecord;
-import net.minecraft.client.audio.SoundHandler;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;

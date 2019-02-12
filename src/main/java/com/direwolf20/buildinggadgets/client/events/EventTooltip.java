@@ -34,7 +34,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.opengl.GL11;
 
 import java.util.*;
-import java.util.function.LongToIntFunction;
 
 @EventBusSubscriber(Side.CLIENT)
 public class EventTooltip {
