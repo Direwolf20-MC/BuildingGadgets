@@ -14,6 +14,7 @@ After deleting this template, please provide the following information:
 * Forge Version
 * Building Gadgets version 
   * **NEVER** put "lastest", new releases might come out as you post the issue
+  * If updating crashes the game, clearly state that in your description
   * Use the version Forge shows you **In-Game**
 * *If the issue is a crash*; An external link to the crash report
 * **How to reproduce the bug**
