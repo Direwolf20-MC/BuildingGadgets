@@ -7,6 +7,8 @@ import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketAnchorKey;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketChangeRange;
+import com.direwolf20.buildinggadgets.common.network.packets.PacketToggleConnectedArea;
+import com.direwolf20.buildinggadgets.common.network.packets.PacketToggleFuzzy;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketToggleMode;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketUndoKey;
 import net.minecraft.client.Minecraft;
@@ -16,7 +18,6 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.settings.KeyModifier;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.gameevent.InputEvent;
 
 @Mod.EventBusSubscriber(modid = BuildingGadgets.MODID, value = Dist.CLIENT)
@@ -51,6 +52,10 @@ public class EventKeyInput {
             PacketHandler.sendToServer(new PacketUndoKey());
         } else if (KeyBindings.anchorKey.isPressed()) {
             PacketHandler.sendToServer(new PacketAnchorKey());
+        } else if (KeyBindings.fuzzyKey.isPressed()) {
+            PacketHandler.sendToServer(new PacketToggleFuzzy());
+        } else if (KeyBindings.connectedAreaKey.isPressed()) {
+            PacketHandler.sendToServer(new PacketToggleConnectedArea());
         }
     }
 }

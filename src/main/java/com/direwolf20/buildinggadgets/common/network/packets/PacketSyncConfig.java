@@ -37,7 +37,7 @@ public class PacketSyncConfig {
      */
     public static class Handler {
         public static void handle(final PacketSyncConfig msg, Supplier<NetworkEvent.Context> ctx) {
-            if( ctx.get().getDirection() != NetworkDirection.PLAY_TO_SERVER )
+            if (ctx.get().getDirection() != NetworkDirection.PLAY_TO_CLIENT)
                 return;
 
             ctx.get().enqueueWork(() -> {

@@ -16,17 +16,22 @@ public class KeyBindings {
     public static KeyBinding rangeChange;
     public static KeyBinding undoKey;
     public static KeyBinding anchorKey;
+    public static KeyBinding fuzzyKey;
+    public static KeyBinding connectedAreaKey;
 
     public static void init() {
-        modeSwitch = new KeyBinding("key.modeSwitch", CONFLICT_CONTEXT_GADGET, InputMappings.Type.KEYSYM.getOrMakeInput(GLFW.GLFW_KEY_G), "key.categories.buildingGadgets");
-        rangeChange = new KeyBinding("key.rangeChange", CONFLICT_CONTEXT_GADGET, InputMappings.Type.KEYSYM.getOrMakeInput(GLFW.GLFW_KEY_R), "key.categories.buildingGadgets");
-        undoKey = new KeyBinding("key.undoKey", CONFLICT_CONTEXT_GADGET, InputMappings.Type.KEYSYM.getOrMakeInput(GLFW.GLFW_KEY_U), "key.categories.buildingGadgets");
-        anchorKey = new KeyBinding("key.anchorKey", CONFLICT_CONTEXT_GADGET, InputMappings.Type.KEYSYM.getOrMakeInput(GLFW.GLFW_KEY_H), "key.categories.buildingGadgets");
+        modeSwitch = createBinding("key.modeSwitch", GLFW.GLFW_KEY_G);
+        rangeChange = createBinding("key.rangeChange", GLFW.GLFW_KEY_R);
+        undoKey = createBinding("key.undoKey", GLFW.GLFW_KEY_U);
+        anchorKey = createBinding("key.anchorKey", GLFW.GLFW_KEY_H);
+        fuzzyKey = createBinding("key.fuzzyKey", GLFW.GLFW_KEY_UNKNOWN);
+        connectedAreaKey = createBinding("key.connectedarea", GLFW.GLFW_KEY_UNKNOWN);
+    }
 
-        ClientRegistry.registerKeyBinding(modeSwitch);
-        ClientRegistry.registerKeyBinding(rangeChange);
-        ClientRegistry.registerKeyBinding(undoKey);
-        ClientRegistry.registerKeyBinding(anchorKey);
+    private static KeyBinding createBinding(String name, int key) {
+        KeyBinding keyBinding = new KeyBinding("key" + name, CONFLICT_CONTEXT_GADGET, InputMappings.Type.KEYSYM.getOrMakeInput(key), "key.categories.buildingGadgets");
+        ClientRegistry.registerKeyBinding(keyBinding);
+        return keyBinding;
     }
 
     public static class KeyConflictContextGadget implements IKeyConflictContext

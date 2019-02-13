@@ -4,12 +4,14 @@ import com.direwolf20.buildinggadgets.common.BuildingObjects;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetExchanger;
 import com.direwolf20.buildinggadgets.common.utils.GadgetUtils;
+import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -52,12 +54,30 @@ public class ExchangingModes {
         return true;
     }
 
+    public static void addConnectedCoords(World world, BlockPos loc, IBlockState state, IBlockState setBlock,
+            boolean fuzzyMode, List<BlockPos> coords, int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
+        if (coords.contains(loc) || loc.getX() < minX || loc.getY() < minY || loc.getZ() < minZ || loc.getX() > maxX || loc.getY() > maxY || loc.getZ() > maxZ)
+            return;
+
+        if (!isReplaceable(world, loc, state, setBlock, fuzzyMode))
+            return;
+
+        coords.add(loc);
+        for (int x = -1; x <= 1; x++) {
+            for (int y = -1; y <= 1; y++) {
+                for (int z = -1; z <= 1; z++) {
+                    addConnectedCoords(world, loc.add(x, y, z), state, setBlock, fuzzyMode, coords, minX, minY, minZ, maxX, maxY, maxZ);
+                }
+            }
+        }
+    }
+
     public static List<BlockPos> getBuildOrders(World world, EntityPlayer player, BlockPos startBlock, EnumFacing sideHit, ItemStack tool) {
 
         GadgetExchanger.ToolMode mode = GadgetExchanger.getToolMode(tool);
         IBlockState setBlock = GadgetUtils.getToolBlock(tool);
         int range = GadgetUtils.getToolRange(tool);
-        boolean fuzzyMode = GadgetExchanger.getFuzzy(tool);
+        boolean fuzzyMode = GadgetGeneric.getFuzzy(tool);
 
         List<BlockPos> coordinates = new ArrayList<>();
 
@@ -83,26 +103,33 @@ public class ExchangingModes {
         IBlockState currentBlock = world.getBlockState(startBlock);
 
         //***************************************************
-        //VerticalWall
+        //Surface
         //***************************************************
-        if (mode == GadgetExchanger.ToolMode.Wall) {
-            if (sideHit == EnumFacing.UP || sideHit == EnumFacing.DOWN) {
-                for (int x = bound * -1; x <= bound; x++) {
-                    for (int z = bound * -1; z <= bound; z++) {
-                        pos = new BlockPos(startBlock.getX() - x, startBlock.getY(), startBlock.getZ() + z);
-                        if (isReplaceable(world, pos, currentBlock, setBlock, fuzzyMode)) {
-                            coordinates.add(pos);
-                        }
-                    }
-                }
+        if (mode == GadgetExchanger.ToolMode.Surface) {
+            if (GadgetGeneric.getConnectedArea(tool)) {
+                AxisAlignedBB area = new AxisAlignedBB(pos).grow(bound * (1 - Math.abs(sideHit.getXOffset())),
+                        bound * (1 - Math.abs(sideHit.getYOffset())), bound * (1 - Math.abs(sideHit.getZOffset())));
+                addConnectedCoords(world, pos, currentBlock, setBlock, fuzzyMode, coordinates,
+                        (int) area.minX, (int) area.minY, (int) area.minZ, (int) area.maxX - 1, (int) area.maxY - 1, (int) area.maxZ - 1);
             } else {
-                for (int y = bound; y >= bound * -1; y--) {
-                    for (int x = boundXS * -1; x <= boundXS; x++) {
-                        for (int z = boundZS * -1; z <= boundZS; z++) {
-                            pos = new BlockPos(startBlock.getX() + x, startBlock.getY() - y, startBlock.getZ() + z);
-                            //System.out.println(pos);
+                if (sideHit == EnumFacing.UP || sideHit == EnumFacing.DOWN) {
+                    for (int x = bound * -1; x <= bound; x++) {
+                        for (int z = bound * -1; z <= bound; z++) {
+                            pos = new BlockPos(startBlock.getX() - x, startBlock.getY(), startBlock.getZ() + z);
                             if (isReplaceable(world, pos, currentBlock, setBlock, fuzzyMode)) {
                                 coordinates.add(pos);
+                            }
+                        }
+                    }
+                } else {
+                    for (int y = bound; y >= bound * -1; y--) {
+                        for (int x = boundXS * -1; x <= boundXS; x++) {
+                            for (int z = boundZS * -1; z <= boundZS; z++) {
+                                pos = new BlockPos(startBlock.getX() + x, startBlock.getY() - y, startBlock.getZ() + z);
+                                //System.out.println(pos);
+                                if (isReplaceable(world, pos, currentBlock, setBlock, fuzzyMode)) {
+                                    coordinates.add(pos);
+                                }
                             }
                         }
                     }
@@ -163,7 +190,7 @@ public class ExchangingModes {
         //***************************************************
         //TorchPlacer
         //***************************************************
-        else if (mode == GadgetExchanger.ToolMode.Checkerboard) {
+        else if (mode == GadgetExchanger.ToolMode.Grid) {
             range++;
             for (int x = range * -7 / 5; x <= range * 7 / 5; x++) {
                 for (int z = range * -7 / 5; z <= range * 7 / 5; z++) {

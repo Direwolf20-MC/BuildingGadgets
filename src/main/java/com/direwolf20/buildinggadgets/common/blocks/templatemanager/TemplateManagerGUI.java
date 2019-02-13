@@ -70,7 +70,7 @@ public class TemplateManagerGUI extends GuiContainer {
     public void render(int mouseX, int mouseY, float partialTicks) {
         drawDefaultBackground();
         super.render(mouseX, mouseY, partialTicks);
-        if (buttonHelp.selected) {
+        if (buttonHelp.isSelected()) {
             GlStateManager.color4f(1, 1, 1, 1);
             GlStateManager.disableLighting();
             for (IHoverHelpText helpTextProvider : helpTextProviders)
@@ -272,38 +272,28 @@ public class TemplateManagerGUI extends GuiContainer {
         }
     }
 
+
     // @fixme: reimplement @since 1.13.x
 //    @Override
 //    protected void actionPerformed(GuiButton b) {
 //        if (b.id == buttonHelp.id) {
-//            buttonHelp.selected ^= true;
+//            buttonHelp.toggleSelected();
 //        } else if (b.id == 0) {
 //            // @todo: reimplement @since 1.13.x
-////            PacketHandler.INSTANCE.sendToServer(new PacketTemplateManagerSave(te.getPos(), nameField.getText()));
+//            PacketHandler.sendToServer(new PacketTemplateManagerSave(te.getPos(), nameField.getText()));
 //        } else if (b.id == 1) {
 //            // @todo: reimplement @since 1.13.x
-////            PacketHandler.INSTANCE.sendToServer(new PacketTemplateManagerLoad(te.getPos()));
+//            PacketHandler.sendToServer(new PacketTemplateManagerLoad(te.getPos()));
 //        } else if (b.id == 2) {
 //            TemplateManagerCommands.copyTemplate(container);
 //        } else if (b.id == 3) {
 //            String CBString = mc.keyboardListener.getClipboardString();
-//            //System.out.println("CBString Length: " + CBString.length());
-//            //System.out.println(CBString);
 //            try {
-//                NBTTagCompound tagCompound = JsonToNBT.getTagFromJson(CBString);
-//                //BlockMapIntState MapIntState = GadgetCopyPaste.getBlockMapIntState(tagCompound);
-//                int[] stateArray = tagCompound.getIntArray("stateIntArray");
-//                //int[] posArray = tagCompound.getIntArray("posIntArray");
-//                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-//                CompressedStreamTools.writeCompressed(tagCompound, baos);
-//                //ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
-//                //NBTTagCompound newTag = CompressedStreamTools.readCompressed(bais);
-//                //System.out.println("BAOS Size: " + baos.size());
-//
 //                //Anything larger than below is likely to overflow the max packet size, crashing your client.
-//                if (stateArray.length <= 12000 && baos.size() < 31000) {
-//// @todo: reimplement @since 1.13.x
-//                    //                    PacketHandler.INSTANCE.sendToServer(new PacketTemplateManagerPaste(tagCompound, te.getPos(), nameField.getText()));
+//                ByteArrayOutputStream pasteStream = GadgetUtils.getPasteStream(JsonToNBT.getTagFromJson(CBString), nameField.getText());
+//                if (pasteStream != null) {
+//                    // @todo: reimplement @since 1.13.x
+////                    PacketHandler.sendToServer(new PacketTemplateManagerPaste(pasteStream, te.getPos(), nameField.getText()));
 //                    Minecraft.getInstance().player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.pastesuccess").getUnformattedComponentText()), false);
 //                } else {
 //                    Minecraft.getInstance().player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.pastetoobig").getUnformattedComponentText()), false);

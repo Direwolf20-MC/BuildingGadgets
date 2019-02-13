@@ -1,5 +1,7 @@
 package com.direwolf20.buildinggadgets.common.items.capability;
 
+import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
+import com.direwolf20.buildinggadgets.common.tools.CapabilityNotPresentException;
 import com.direwolf20.buildinggadgets.common.utils.GadgetUtils;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
@@ -11,14 +13,15 @@ import net.minecraftforge.energy.IEnergyStorage;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.function.IntSupplier;
 
 public class CapabilityProviderEnergy implements ICapabilityProvider {
     private ItemStack stack;
-    private int energyCapacity;
+    private IntSupplier energyCapacity;
 
     private final LazyOptional<ItemEnergyForge> energyCapability = LazyOptional.of(() -> new ItemEnergyForge(stack, energyCapacity));
 
-    public CapabilityProviderEnergy(ItemStack stack, int energyCapacity) {
+    public CapabilityProviderEnergy(ItemStack stack, IntSupplier energyCapacity) {
         this.stack = stack;
         this.energyCapacity = energyCapacity;
     }
@@ -26,18 +29,13 @@ public class CapabilityProviderEnergy implements ICapabilityProvider {
     // @todo: reimplement @since 1.13.x removed as of 1.13?
 //    @Override
 //    public boolean hasCapability(@Nonnull Capability<?> capability, @Nullable EnumFacing facing) {
-//        return capability == CapabilityEnergy.ENERGY;
+//        return capability == CapabilityEnergy.ENERGY && SyncedConfig.poweredByFE ;
 //    }
-
 
     @Nonnull
     @Override
     public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable EnumFacing side) {
-        if( cap == CapabilityEnergy.ENERGY ) {
-            return energyCapability.cast();
-        }
-
-        return LazyOptional.empty();
+        return cap == CapabilityEnergy.ENERGY && SyncedConfig.poweredByFE ? energyCapability.cast() : LazyOptional.empty();
     }
 
     @Nonnull
@@ -47,5 +45,16 @@ public class CapabilityProviderEnergy implements ICapabilityProvider {
             throw new IllegalArgumentException("CapabilityEnergy could not be retrieved for " + GadgetUtils.getStackErrorSuffix(stack));
 
         return energy;
+    }
+
+    @Nullable
+    public static IEnergyStorage getCapOrNull(ItemStack stack) {
+        LazyOptional<IEnergyStorage> energy = stack.getCapability(CapabilityEnergy.ENERGY);
+        return energy.isPresent() ? energy.orElseThrow(CapabilityNotPresentException::new) : null;
+    }
+
+    @Nullable
+    public static boolean hasCap(ItemStack stack) {
+        return stack.getCapability(CapabilityEnergy.ENERGY).isPresent();
     }
 }

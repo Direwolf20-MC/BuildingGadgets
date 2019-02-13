@@ -14,10 +14,12 @@ import com.direwolf20.buildinggadgets.common.items.gadgets.*;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.tools.ToolRenders;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.command.Commands;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.SoundEvent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
@@ -107,7 +109,7 @@ public class BuildingGadgets {
 
     }
 
-    private static class ClientProxy {
+    public static class ClientProxy {
 
         private static void clientSetup(final FMLClientSetupEvent event, final IEventBus eventBus) {
             DeferredWorkQueue.runLater(() -> {
@@ -140,6 +142,7 @@ public class BuildingGadgets {
             //
             //        if (SyncedConfig.enablePaste) {
             //            BuildingObjects.ConstructionPasteContainer.initModel();
+            //            BuildingObjects.constructionPasteContainerCreative.initModel();
             //            BuildingObjects.constructionPaste.initModel();
             //
             //            ModBlocks.constructionBlock.initModel();
@@ -182,6 +185,10 @@ public class BuildingGadgets {
 
         private static void registerSprite(TextureStitchEvent.Pre event, String loc) {
             event.getMap().registerSprite(Minecraft.getInstance().getResourceManager(), new ResourceLocation(loc));
+        }
+ 
+        public static void playSound(SoundEvent sound, float pitch) {
+            Minecraft.getInstance().getSoundHandler().play(PositionedSoundRecord.getMasterRecord(sound, pitch));
         }
     }
 }

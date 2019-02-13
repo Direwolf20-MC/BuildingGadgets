@@ -1,51 +1,37 @@
 package com.direwolf20.buildinggadgets.common.network.packets;
 
-import com.direwolf20.buildinggadgets.common.items.gadgets.*;
+import java.util.function.Supplier;
+
+import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetBuilding;
+import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
+import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetExchanger;
+import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
+
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;
 
-import java.util.function.Supplier;
-
 public class PacketChangeRange {
 
-    public PacketChangeRange() {}
     public static void encode(PacketChangeRange msg, PacketBuffer buffer) {}
     public static PacketChangeRange decode(PacketBuffer buffer) { return null; }
 
     public static class Handler {
-//        @Override
-//        public IMessage onMessage(PacketChangeRange message, MessageContext ctx) {
-//            FMLCommonHandler.instance().getWorldThread(ctx.netHandler).addScheduledTask(() -> handle(ctx));
-//            return null;
-//        }
-
         public static void handle(final PacketChangeRange msg, Supplier<NetworkEvent.Context> ctx) {
-            EntityPlayerMP playerEntity = ctx.get().getSender();
-            if( playerEntity == null )
-                return;
-
             ctx.get().enqueueWork(() -> {
-                ItemStack heldItem = GadgetGeneric.getGadget(playerEntity);
-                if (heldItem.isEmpty())
+                EntityPlayerMP player = ctx.get().getSender();
+                if (player == null)
                     return;
 
-                if (heldItem.getItem() instanceof GadgetBuilding) {
-                    GadgetBuilding gadgetBuilding = (GadgetBuilding) (heldItem.getItem());
-                    gadgetBuilding.rangeChange(playerEntity, heldItem);
-                } else if (heldItem.getItem() instanceof GadgetExchanger) {
-                    GadgetExchanger gadgetExchanger = (GadgetExchanger) (heldItem.getItem());
-                    gadgetExchanger.rangeChange(playerEntity, heldItem);
-                } else if (heldItem.getItem() instanceof GadgetCopyPaste) {
-                    GadgetCopyPaste gadgetCopyPaste = (GadgetCopyPaste) (heldItem.getItem());
-                    gadgetCopyPaste.rotateBlocks(heldItem, playerEntity);
-                } else if (heldItem.getItem() instanceof GadgetDestruction) {
-                    GadgetDestruction gadgetDestruction = (GadgetDestruction) (heldItem.getItem());
-                    gadgetDestruction.switchOverlay(heldItem);
-                }
+                ItemStack stack = GadgetGeneric.getGadget(player);
+                if (stack.getItem() instanceof GadgetBuilding)
+                    GadgetBuilding.rangeChange(player, stack);
+                else if (stack.getItem() instanceof GadgetExchanger)
+                    GadgetExchanger.rangeChange(player, stack);
+                else if (stack.getItem() instanceof GadgetCopyPaste)
+                    GadgetCopyPaste.rotateBlocks(stack, player);
             });
-
             ctx.get().setPacketHandled(true);
         }
     }

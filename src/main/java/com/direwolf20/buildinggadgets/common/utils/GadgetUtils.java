@@ -2,16 +2,19 @@ package com.direwolf20.buildinggadgets.common.utils;
 
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
+import com.direwolf20.buildinggadgets.common.integration.RefinedStorage;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetBuilding;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetExchanger;
 import com.direwolf20.buildinggadgets.common.tools.*;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
+
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTUtil;
@@ -30,6 +33,8 @@ import net.minecraftforge.items.IItemHandler;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,6 +46,15 @@ public class GadgetUtils {
 
     private static String getStackErrorText(ItemStack stack) {
         return "the following stack: [" + stack + "]";
+    }
+
+    @Nullable
+    public static ByteArrayOutputStream getPasteStream(@Nonnull NBTTagCompound compound, @Nullable String name) throws IOException{
+        NBTTagCompound withText = name != null && !name.isEmpty() ? compound.copy() : compound;
+        if (name != null && !name.isEmpty()) withText.setString("name", name);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        CompressedStreamTools.writeCompressed(withText, baos);
+        return baos.size() < Short.MAX_VALUE - 200 ? baos : null;
     }
 
     @Nonnull
@@ -262,10 +276,9 @@ public class GadgetUtils {
             setToolActualBlock(stack, ((ConstructionBlockTileEntity) te).getActualBlockState());
             return EnumActionResult.SUCCESS;
         }
-        if (setBoundTE(stack, pos, world.getDimension().getId(), world)) {
-            player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.boundTE").getUnformattedComponentText()), true);
+        if (setRemoteInventory(player, stack, pos, world.getDimension().getId(), world))
             return EnumActionResult.SUCCESS;
-        }
+
         return EnumActionResult.FAIL;
     }
 
@@ -298,31 +311,36 @@ public class GadgetUtils {
         return true;
     }
 
-    public static boolean setBoundTE(ItemStack tool, BlockPos pos, int dim, World world) {
-        TileEntity te = world.getTileEntity(pos);
-
-        if (te == null)
-            return false;
-
-        if (!te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).isPresent())
-            return false;
-        writePOSToNBT(tool, pos, "boundTE", dim);
-        return true;
+    public static boolean setRemoteInventory(EntityPlayer player, ItemStack tool, BlockPos pos, int dim, World world) {
+        if (getRemoteInventory(pos, dim, world) != null) {
+            boolean same = pos.equals(getPOSFromNBT(tool, "boundTE"));
+            writePOSToNBT(tool, same ? null : pos, "boundTE", dim);
+            player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget." + (same ? "unboundTE" : "boundTE")).getUnformattedComponentText()), true);
+            return true;
+        }
+        return false;
     }
 
-    public static IItemHandler getBoundRemoteInventory(ItemStack tool, World world) {
+    @Nullable
+    public static IItemHandler getRemoteInventory(ItemStack tool, World world) {
         Integer dim = getDIMFromNBT(tool, "boundTE");
         if (dim == null) return null;
+        BlockPos pos = getPOSFromNBT(tool, "boundTE");
+        return pos == null ? null : getRemoteInventory(pos, dim, world);
+    }
+
+    @Nullable
+    public static IItemHandler getRemoteInventory(BlockPos pos, int dim, World world) {
         MinecraftServer server = world.getServer();
         if (server == null) return null;
         World worldServer = server.getWorld(dim);
         if (worldServer == null) return null;
-        BlockPos pos = getPOSFromNBT(tool, "boundTE");
-        if (pos == null) return null;
-        TileEntity te = worldServer.getTileEntity(pos);
+        TileEntity te = world.getTileEntity(pos);
         if (te == null) return null;
+//        IItemHandler network = RefinedStorage.getWrappedNetwork(te);// TODO 1.13
+//        if (network != null) return network;
         IItemHandler cap = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null).orElseThrow(NullPointerException::new);
-        return cap == null ? null : cap;
+        return cap != null ? cap : null;
     }
 
     public static String withSuffix(int count) {

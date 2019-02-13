@@ -2,19 +2,23 @@ package com.direwolf20.buildinggadgets.common.tools;
 
 import com.direwolf20.buildinggadgets.client.RemoteInventoryCache;
 import com.direwolf20.buildinggadgets.common.BuildingObjects;
-import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
+import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.items.capability.CapabilityProviderEnergy;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetBuilding;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetDestruction;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetExchanger;
+import com.direwolf20.buildinggadgets.common.utils.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.utils.VectorUtil;
 import com.direwolf20.buildinggadgets.common.world.FakeBuilderWorld;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Multiset;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockRendererDispatcher;
 import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.GLAllocation;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.texture.TextureMap;
@@ -33,6 +37,10 @@ import net.minecraft.world.WorldType;
 import net.minecraftforge.client.ForgeHooksClient;
 import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
+import net.minecraftforge.energy.IEnergyStorage;
+
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL14;
 
@@ -40,19 +48,60 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 import static com.direwolf20.buildinggadgets.common.utils.GadgetUtils.getAnchor;
 import static com.direwolf20.buildinggadgets.common.utils.GadgetUtils.getToolBlock;
 
 public class ToolRenders {
     private static final FakeBuilderWorld fakeWorld = new FakeBuilderWorld();
-    private static RemoteInventoryCache cache = new RemoteInventoryCache(false);
+    private static RemoteInventoryCache cacheInventory = new RemoteInventoryCache(false);
+    private static Cache<Pair<UniqueItemStack, BlockPos>, Integer> cacheDestructionOverlay = CacheBuilder.newBuilder().maximumSize(1).
+            expireAfterWrite(1, TimeUnit.SECONDS).removalListener(removal -> GLAllocation.deleteDisplayLists((int) removal.getValue())).build();
 
-    public static void setCache(Multiset<UniqueItem> cache) {
-        ToolRenders.cache.setCache(cache);
+    public static void setInventoryCache(Multiset<UniqueItem> cache) {
+        ToolRenders.cacheInventory.setCache(cache);
+    }
+
+    public static void updateInventoryCache() {
+        cacheInventory.forceUpdate();
     }
 
     public static void renderBuilderOverlay(RenderWorldLastEvent evt, EntityPlayer player, ItemStack stack) {
+        ItemStack heldItem = GadgetBuilding.getGadget(player);
+        if (heldItem.isEmpty()) return;
+
+        Minecraft mc = Minecraft.getInstance();
+        mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+
+        //Calculate the players current position, which is needed later
+        double doubleX = player.lastTickPosX + (player.posX - player.lastTickPosX) * evt.getPartialTicks();
+        double doubleY = player.lastTickPosY + (player.posY - player.lastTickPosY) * evt.getPartialTicks();
+        double doubleZ = player.lastTickPosZ + (player.posZ - player.lastTickPosZ) * evt.getPartialTicks();
+
+        //Prepare the block rendering
+        BlockRendererDispatcher dispatcher = Minecraft.getInstance().getBlockRendererDispatcher();
+        BlockRenderLayer origLayer = MinecraftForgeClient.getRenderLayer();
+
+        Integer dim = GadgetUtils.getDIMFromNBT(heldItem, "boundTE");
+        BlockPos pos = GadgetUtils.getPOSFromNBT(heldItem, "boundTE");
+
+        if (dim != null && pos != null) {
+            GlStateManager.pushMatrix();//Push matrix again just because
+            GlStateManager.enableBlend();
+            //This blend function allows you to use a constant alpha, which is defined later
+            GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+            GlStateManager.translated(-doubleX, -doubleY, -doubleZ);//The render starts at the player, so we subtract the player coords and move the render to 0,0,0
+            GlStateManager.translatef(pos.getX(), pos.getY(), pos.getZ());//Now move the render position to the coordinates we want to render at
+            GlStateManager.rotatef(-90.0F, 0.0F, 1.0F, 0.0F); //Rotate it because i'm not sure why but we need to
+            GlStateManager.translatef(-0.005f, -0.005f, 0.005f);
+            GlStateManager.scalef(1.01f, 1.01f, 1.01f);
+            GL14.glBlendColor(1F, 1F, 1F, 0.35f); //Set the alpha of the blocks we are rendering
+            dispatcher.renderBlockBrightness(Blocks.YELLOW_STAINED_GLASS.getDefaultState(), 1f);
+            GlStateManager.popMatrix();
+        }
+
         RayTraceResult lookingAt = VectorUtil.getLookingAt(player);
         IBlockState state = Blocks.AIR.getDefaultState();
         List<BlockPos> coordinates = getAnchor(stack);
@@ -64,12 +113,7 @@ public class ToolRenders {
             }
             if (startBlock != BuildingObjects.effectBlock.getDefaultState()) {
 
-                ItemStack heldItem = GadgetBuilding.getGadget(player);
-                if (heldItem.isEmpty()) return;
-
                 IBlockState renderBlockState = getToolBlock(heldItem);
-                Minecraft mc = Minecraft.getInstance();
-                mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
                 if (renderBlockState == Blocks.AIR.getDefaultState()) {//Don't render anything if there is no block selected (Air)
                     return;
                 }
@@ -88,29 +132,22 @@ public class ToolRenders {
                     itemStack = renderBlockState.getBlock().getPickBlock(renderBlockState, null, world, new BlockPos(0, 0, 0), player);
                 }
 
-                int hasBlocks = InventoryManipulation.countItem(itemStack, player, cache);
+                long hasBlocks = InventoryManipulation.countItem(itemStack, player, cacheInventory);
                 hasBlocks = hasBlocks + InventoryManipulation.countPaste(player);
                 int hasEnergy = 0;
-                if (SyncedConfig.poweredByFE) {
-                    hasEnergy = CapabilityProviderEnergy.getCap(stack).orElseThrow(NullPointerException::new).getEnergyStored();
+                IEnergyStorage energy = CapabilityProviderEnergy.getCapOrNull(stack);
+                if (energy != null) {
+                    hasEnergy = energy.getEnergyStored();
                 } else {
                     hasEnergy = stack.getMaxDamage() - stack.getDamage();
                 }
-                if (player.isCreative() || (!SyncedConfig.poweredByFE && !stack.isDamageable())) {
+                if (player.isCreative() || (energy == null && !stack.isDamageable())) {
                     hasEnergy = 1000000;
                 }
-                //Prepare the block rendering
-                BlockRendererDispatcher dispatcher = Minecraft.getInstance().getBlockRendererDispatcher();
-                BlockRenderLayer origLayer = MinecraftForgeClient.getRenderLayer();
 
                 //Prepare the fake world -- using a fake world lets us render things properly, like fences connecting.
                 Set<BlockPos> coords = new HashSet<BlockPos>(coordinates);
                 fakeWorld.setWorldAndState(player.world, renderBlockState, coords);
-
-                //Calculate the players current position, which is needed later
-                double doubleX = player.lastTickPosX + (player.posX - player.lastTickPosX) * evt.getPartialTicks();
-                double doubleY = player.lastTickPosY + (player.posY - player.lastTickPosY) * evt.getPartialTicks();
-                double doubleZ = player.lastTickPosZ + (player.posZ - player.lastTickPosZ) * evt.getPartialTicks();
 
                 //Save the current position that is being rendered (I think)
                 GlStateManager.pushMatrix();
@@ -156,18 +193,18 @@ public class ToolRenders {
                     GlStateManager.scalef(1.01f, 1.01f, 1.01f);
                     GL14.glBlendColor(1F, 1F, 1F, 0.35f); //Set the alpha of the blocks we are rendering
                     hasBlocks--;
-                    if (SyncedConfig.poweredByFE) {
-                        hasEnergy = hasEnergy - ((GadgetBuilding) BuildingObjects.gadgetBuilding).getEnergyCost();
+                    if (energy != null) {
+                        hasEnergy -= BuildingObjects.gadgetBuilding.getEnergyCost(heldItem);
                     } else {
-                        hasEnergy--;
+                        hasEnergy -= BuildingObjects.gadgetBuilding.getDamageCost(heldItem);
                     }
-
                     if (hasBlocks < 0 || hasEnergy < 0) {
                         dispatcher.renderBlockBrightness(Blocks.RED_STAINED_GLASS.getDefaultState(), 1f);
                     }
                     //Move the render position back to where it was
                     GlStateManager.popMatrix();
                 }
+
                 //Set blending back to the default mode
                 GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
                 ForgeHooksClient.setRenderLayer(origLayer);
@@ -180,8 +217,34 @@ public class ToolRenders {
     }
 
     public static void renderExchangerOverlay(RenderWorldLastEvent evt, EntityPlayer player, ItemStack stack) {
-//        int range = getToolRange(stack);
-//        GadgetExchanger.ToolMode mode = GadgetExchanger.getToolMode(stack);
+        ItemStack heldItem = GadgetExchanger.getGadget(player);
+        if (heldItem.isEmpty()) return;
+
+        //Calculate the players current position, which is needed later
+        double doubleX = player.lastTickPosX + (player.posX - player.lastTickPosX) * evt.getPartialTicks();
+        double doubleY = player.lastTickPosY + (player.posY - player.lastTickPosY) * evt.getPartialTicks();
+        double doubleZ = player.lastTickPosZ + (player.posZ - player.lastTickPosZ) * evt.getPartialTicks();
+
+        BlockRendererDispatcher dispatcher = Minecraft.getInstance().getBlockRendererDispatcher();
+        Integer dim = GadgetUtils.getDIMFromNBT(heldItem, "boundTE");
+        BlockPos pos = GadgetUtils.getPOSFromNBT(heldItem, "boundTE");
+
+        if (dim != null && pos != null) {
+            GlStateManager.pushMatrix();//Push matrix again just because
+            //This blend function allows you to use a constant alpha, which is defined later
+            GlStateManager.enableBlend();
+            GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+
+            GlStateManager.translated(-doubleX, -doubleY, -doubleZ);//The render starts at the player, so we subtract the player coords and move the render to 0,0,0
+            GlStateManager.translatef(pos.getX(), pos.getY(), pos.getZ());//Now move the render position to the coordinates we want to render at
+            GlStateManager.rotatef(-90.0F, 0.0F, 1.0F, 0.0F); //Rotate it because i'm not sure why but we need to
+            GlStateManager.translatef(-0.005f, -0.005f, 0.005f);
+            GlStateManager.scalef(1.01f, 1.01f, 1.01f);
+            GL14.glBlendColor(1F, 1F, 1F, 0.35f); //Set the alpha of the blocks we are rendering
+            dispatcher.renderBlockBrightness(Blocks.YELLOW_STAINED_GLASS.getDefaultState(), 1f);
+            GlStateManager.popMatrix();
+        }
+
         RayTraceResult lookingAt = VectorUtil.getLookingAt(player);
         IBlockState state = Blocks.AIR.getDefaultState();
         List<BlockPos> coordinates = getAnchor(stack);
@@ -192,9 +255,6 @@ public class ToolRenders {
                 startBlock = world.getBlockState(lookingAt.getBlockPos());
             }
             if (startBlock != BuildingObjects.effectBlock.getDefaultState()) {
-                ItemStack heldItem = GadgetExchanger.getGadget(player);
-                if (heldItem.isEmpty()) return;
-
                 IBlockState renderBlockState = getToolBlock(heldItem);
                 Minecraft mc = Minecraft.getInstance();
                 mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
@@ -217,29 +277,25 @@ public class ToolRenders {
                 if (itemStack.getItem().equals(Items.AIR)) {
                     itemStack = renderBlockState.getBlock().getPickBlock(renderBlockState, null, world, new BlockPos(0, 0, 0), player);
                 }
-                int hasBlocks = InventoryManipulation.countItem(itemStack, player, cache);
+                long hasBlocks = InventoryManipulation.countItem(itemStack, player, cacheInventory);
                 hasBlocks = hasBlocks + InventoryManipulation.countPaste(player);
                 int hasEnergy = 0;
-                if (SyncedConfig.poweredByFE) {
-                    hasEnergy = CapabilityProviderEnergy.getCap(stack).orElseThrow(NullPointerException::new).getEnergyStored();
+
+                IEnergyStorage energy = CapabilityProviderEnergy.getCapOrNull(stack);
+                if (energy != null) {
+                    hasEnergy = energy.getEnergyStored();
                 } else {
                     hasEnergy = stack.getMaxDamage() - stack.getDamage();
                 }
-                if (player.isCreative() || (!SyncedConfig.poweredByFE && !stack.isDamageable())) {
+                if (player.isCreative() || (energy == null && !stack.isDamageable())) {
                     hasEnergy = 1000000;
                 }
                 //Prepare the block rendering
-                BlockRendererDispatcher dispatcher = Minecraft.getInstance().getBlockRendererDispatcher();
                 BlockRenderLayer origLayer = MinecraftForgeClient.getRenderLayer();
 
                 //Prepare the fake world -- using a fake world lets us render things properly, like fences connecting.
                 Set<BlockPos> coords = new HashSet<BlockPos>(coordinates);
                 fakeWorld.setWorldAndState(player.world, renderBlockState, coords);
-
-                //Calculate the players current position, which is needed later
-                double doubleX = player.lastTickPosX + (player.posX - player.lastTickPosX) * evt.getPartialTicks();
-                double doubleY = player.lastTickPosY + (player.posY - player.lastTickPosY) * evt.getPartialTicks();
-                double doubleZ = player.lastTickPosZ + (player.posZ - player.lastTickPosZ) * evt.getPartialTicks();
 
                 //Save the current position that is being rendered (I think)
                 GlStateManager.pushMatrix();
@@ -292,10 +348,10 @@ public class ToolRenders {
                     GlStateManager.scalef(1.02f, 1.02f, 1.02f);//Slightly Larger block to avoid z-fighting.
                     GL14.glBlendColor(1F, 1F, 1F, 0.55f); //Set the alpha of the blocks we are rendering
                     hasBlocks--;
-                    if (SyncedConfig.poweredByFE) {
-                        hasEnergy = hasEnergy - ((GadgetExchanger) BuildingObjects.gadgetExchanger).getEnergyCost();
+                    if (energy != null) {
+                        hasEnergy -= BuildingObjects.gadgetExchanger.getEnergyCost(heldItem);
                     } else {
-                        hasEnergy = hasEnergy - 2;
+                        hasEnergy -= BuildingObjects.gadgetExchanger.getDamageCost(heldItem);
                     }
                     if (hasBlocks < 0 || hasEnergy < 0) {
                         dispatcher.renderBlockBrightness(Blocks.RED_STAINED_GLASS.getDefaultState(), 1f);
@@ -303,6 +359,8 @@ public class ToolRenders {
                     //Move the render position back to where it was
                     GlStateManager.popMatrix();
                 }
+
+
                 //Set blending back to the default mode
                 GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
                 ForgeHooksClient.setRenderLayer(origLayer);
@@ -326,6 +384,26 @@ public class ToolRenders {
         if (heldItem.isEmpty()) return;
 
         if (!GadgetDestruction.getOverlay(heldItem)) return;
+        GlStateManager.pushMatrix();
+        double doubleX = player.lastTickPosX + (player.posX - player.lastTickPosX) * evt.getPartialTicks();
+        double doubleY = player.lastTickPosY + (player.posY - player.lastTickPosY) * evt.getPartialTicks();
+        double doubleZ = player.lastTickPosZ + (player.posZ - player.lastTickPosZ) * evt.getPartialTicks();
+        GlStateManager.translated(-doubleX, -doubleY, -doubleZ);
+        try {
+            GlStateManager.callList(cacheDestructionOverlay.get(new ImmutablePair<UniqueItemStack, BlockPos>(new UniqueItemStack(heldItem), startBlock), () -> {
+                int displayList = GLAllocation.generateDisplayLists(1);
+                GlStateManager.newList(displayList, GL11.GL_COMPILE);
+                renderDestructionOverlay(player, world, startBlock, facing, heldItem);
+                GlStateManager.endList();
+                return displayList;
+            }));
+        } catch (ExecutionException e) {
+            BuildingGadgets.LOG.error("Error encountered while rendering destruction gadget overlay", e);
+        }
+        GlStateManager.popMatrix();
+    }
+
+    private static void renderDestructionOverlay(EntityPlayer player, World world, BlockPos startBlock, EnumFacing facing, ItemStack heldItem) {
         Minecraft mc = Minecraft.getInstance();
         mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
 
@@ -334,17 +412,12 @@ public class ToolRenders {
         //Prepare the block rendering
         BlockRenderLayer origLayer = MinecraftForgeClient.getRenderLayer();
 
-        //Calculate the players current position, which is needed later
-        double doubleX = player.lastTickPosX + (player.posX - player.lastTickPosX) * evt.getPartialTicks();
-        double doubleY = player.lastTickPosY + (player.posY - player.lastTickPosY) * evt.getPartialTicks();
-        double doubleZ = player.lastTickPosZ + (player.posZ - player.lastTickPosZ) * evt.getPartialTicks();
-
         //Save the current position that is being rendered (I think)
         GlStateManager.pushMatrix();
         //Enable Blending (So we can have transparent effect)
         GlStateManager.enableBlend();
         //This blend function allows you to use a constant alpha, which is defined later
-        //GlStateManager.blendFunc(GL11.GL_CONSTANT_ALPHA, GL11.GL_ONE_MINUS_CONSTANT_ALPHA);
+        //GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
         GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
         List<BlockPos> sortedCoordinates = BuildingModes.sortByDistance(coordinates, player); //Sort the coords by distance to player.
 
@@ -370,7 +443,6 @@ public class ToolRenders {
             }
             if (invisible) continue;
             GlStateManager.pushMatrix();//Push matrix again just because
-            GlStateManager.translatef((float) -doubleX, (float) -doubleY, (float) -doubleZ);//The render starts at the player, so we subtract the player coords and move the render to 0,0,0
             GlStateManager.translatef(coordinate.getX(), coordinate.getY(), coordinate.getZ());//Now move the render position to the coordinates we want to render at
             GlStateManager.rotatef(-90.0F, 0.0F, 1.0F, 0.0F); //Rotate it because i'm not sure why but we need to
             GlStateManager.translatef(-0.005f, -0.005f, 0.005f);
@@ -399,7 +471,34 @@ public class ToolRenders {
     }
 
     public static void renderPasteOverlay(RenderWorldLastEvent evt, EntityPlayer player, ItemStack stack) {
-        String UUID = ((GadgetCopyPaste) BuildingObjects.gadgetCopyPaste).getUUID(stack);
+        Integer dim = GadgetUtils.getDIMFromNBT(stack, "boundTE");
+        BlockPos pos = GadgetUtils.getPOSFromNBT(stack, "boundTE");
+
+        //Calculate the players current position, which is needed later
+        double doubleX = player.lastTickPosX + (player.posX - player.lastTickPosX) * evt.getPartialTicks();
+        double doubleY = player.lastTickPosY + (player.posY - player.lastTickPosY) * evt.getPartialTicks();
+        double doubleZ = player.lastTickPosZ + (player.posZ - player.lastTickPosZ) * evt.getPartialTicks();
+
+        Minecraft mc = Minecraft.getInstance();
+        mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+
+        if (dim != null && pos != null) {
+            BlockRendererDispatcher dispatcher = Minecraft.getInstance().getBlockRendererDispatcher();
+            GlStateManager.enableBlend();
+            //This blend function allows you to use a constant alpha, which is defined later
+            GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+            GlStateManager.pushMatrix();//Push matrix again just because
+            GlStateManager.translated(-doubleX, -doubleY, -doubleZ);//The render starts at the player, so we subtract the player coords and move the render to 0,0,0
+            GlStateManager.translatef(pos.getX(), pos.getY(), pos.getZ());//Now move the render position to the coordinates we want to render at
+            GlStateManager.rotatef(-90.0F, 0.0F, 1.0F, 0.0F); //Rotate it because i'm not sure why but we need to
+            GlStateManager.translatef(-0.005f, -0.005f, 0.005f);
+            GlStateManager.scalef(1.01f, 1.01f, 1.01f);
+            GL14.glBlendColor(1F, 1F, 1F, 0.35f); //Set the alpha of the blocks we are rendering
+            dispatcher.renderBlockBrightness(Blocks.YELLOW_STAINED_GLASS.getDefaultState(), 1f);
+            GlStateManager.popMatrix();
+        }
+
+        String UUID = BuildingObjects.gadgetCopyPaste.getUUID(stack);
         World world = player.world;
         if (((GadgetCopyPaste) BuildingObjects.gadgetCopyPaste).getStartPos(stack) == null) return;
         if (((GadgetCopyPaste) BuildingObjects.gadgetCopyPaste).getEndPos(stack) == null) return;
@@ -433,16 +532,8 @@ public class ToolRenders {
             IBlockState startBlock = world.getBlockState(startPos);
             if (startBlock == BuildingObjects.effectBlock.getDefaultState()) return;
 
-            Minecraft mc = Minecraft.getInstance();
-            mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
-
             //Prepare the block rendering
             //BlockRendererDispatcher dispatcher = Minecraft.getInstance().getBlockRendererDispatcher();
-
-            //Calculate the players current position, which is needed later
-            double doubleX = player.lastTickPosX + (player.posX - player.lastTickPosX) * evt.getPartialTicks();
-            double doubleY = player.lastTickPosY + (player.posY - player.lastTickPosY) * evt.getPartialTicks();
-            double doubleZ = player.lastTickPosZ + (player.posZ - player.lastTickPosZ) * evt.getPartialTicks();
 
             //Save the current position that is being rendered
             GlStateManager.pushMatrix();
@@ -465,6 +556,7 @@ public class ToolRenders {
 
             GlStateManager.popMatrix();
             //Set blending back to the default mode
+
             GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
             //Disable blend
             GlStateManager.disableBlend();
@@ -479,18 +571,11 @@ public class ToolRenders {
                 return;
             }
 
+
             List<BlockMap> blockMapList = GadgetCopyPaste.getBlockMapList(PasteToolBufferBuilder.getTagFromUUID(UUID));
             if (blockMapList.size() == 0) {
                 //return;
             }
-
-            Minecraft mc = Minecraft.getInstance();
-            mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
-
-            //Calculate the players current position, which is needed later
-            double doubleX = player.lastTickPosX + (player.posX - player.lastTickPosX) * evt.getPartialTicks();
-            double doubleY = player.lastTickPosY + (player.posY - player.lastTickPosY) * evt.getPartialTicks();
-            double doubleZ = player.lastTickPosZ + (player.posZ - player.lastTickPosZ) * evt.getPartialTicks();
 
             //We want to draw from the starting position to the (ending position)+1
             int x = (startPos.getX() <= endPos.getX()) ? startPos.getX() : endPos.getX();
@@ -502,6 +587,7 @@ public class ToolRenders {
 
             Tessellator tessellator = Tessellator.getInstance();
             BufferBuilder bufferbuilder = tessellator.getBuffer();
+
             GlStateManager.pushMatrix();
             GlStateManager.translatef((float) -doubleX, (float) -doubleY, (float) -doubleZ);//The render starts at the player, so we subtract the player coords and move the render to 0,0,0
 
@@ -519,6 +605,7 @@ public class ToolRenders {
             GlStateManager.depthMask(true);
 
             GlStateManager.popMatrix();
+
         }
     }
 

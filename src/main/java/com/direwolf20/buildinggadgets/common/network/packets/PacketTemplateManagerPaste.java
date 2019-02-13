@@ -22,15 +22,13 @@ public class PacketTemplateManagerPaste {
     private final byte[] data;
     private final String templateName;
 
-    public PacketTemplateManagerPaste(NBTTagCompound compound, BlockPos pos, String name) {
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
+    public PacketTemplateManagerPaste(ByteArrayOutputStream pasteStream, BlockPos pos, String name) {
+        this(pasteStream.toByteArray(), pos, name);
+    }
 
-        try {
-            CompressedStreamTools.writeCompressed(compound, output);
-        } catch (Throwable t) { System.out.println(t); }
-
+    public PacketTemplateManagerPaste(byte[] data, BlockPos pos, String name) {
         this.pos = pos;
-        this.data = output.toByteArray();
+        this.data = data;
         this.templateName = name;
     }
 
@@ -41,7 +39,7 @@ public class PacketTemplateManagerPaste {
     }
 
     public static PacketTemplateManagerPaste decode(PacketBuffer buffer) {
-        return new PacketTemplateManagerPaste(buffer.readCompoundTag(), buffer.readBlockPos(), buffer.readString(125));
+        return new PacketTemplateManagerPaste(buffer.readByteArray(), buffer.readBlockPos(), buffer.readString(125));
     }
 
 

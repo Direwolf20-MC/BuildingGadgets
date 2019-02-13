@@ -28,6 +28,36 @@ public class SyncedConfig {
     private static final String KEY_VALUE = "VAL";
 
     @AutoSync
+    public static int energyCostBuilder;
+
+    @AutoSync
+    public static int energyCostExchanger;
+
+    @AutoSync
+    public static int energyCostDestruction;
+
+    @AutoSync
+    public static int energyCostCopyPaste;
+
+    @AutoSync
+    public static int damageCostBuilder;
+
+    @AutoSync
+    public static int damageCostExchanger;
+
+    @AutoSync
+    public static int damageCostDestruction;
+
+    @AutoSync
+    public static int damageCostCopyPaste;
+
+    @AutoSync
+    public static int energyMax;
+
+    @AutoSync
+    public static int energyMaxDestruction;
+
+    @AutoSync
     public static boolean poweredByFE;
 
     @AutoSync
@@ -38,6 +68,12 @@ public class SyncedConfig {
 
     @AutoSync
     public static int durabilityDestruction;
+
+    @AutoSync
+    public static double nonFuzzyMultiplierDestruction;
+
+    @AutoSync
+    public static boolean nonFuzzyEnabledDestruction;
 
     @AutoSync
     public static int durabilityCopyPaste;
@@ -59,6 +95,15 @@ public class SyncedConfig {
 
     @AutoSync
     public static boolean enablePaste;
+
+    @AutoSync
+    public static int t1ContainerCapacity;
+
+    @AutoSync
+    public static int t2ContainerCapacity;
+
+    @AutoSync
+    public static int t3ContainerCapacity;
 
     @AutoSync(mapperId = FieldMapper.PATTERN_LIST_MAPPER_ID)
     public static PatternList blockBlacklist;
@@ -112,7 +157,7 @@ public class SyncedConfig {
         transferValues();
         NBTTagList list = new NBTTagList();
         List<Field> fields = Collections.unmodifiableList(getSyncFields());
-        for (Field field: fields) {
+        for (Field field : fields) {
             NBTTagCompound compound = parseField(field);
             if (compound != null) list.add(compound);
         }
@@ -132,13 +177,13 @@ public class SyncedConfig {
             return;
         NBTTagList list = (NBTTagList) compound.getTag(KEY_VALUE);
         List<Field> fields = getSyncFields();
-        Map<String,Field> map = new HashMap<>();
-        for (Field f: fields) {
-            map.put(getSyncName(f),f);
+        Map<String, Field> map = new HashMap<>();
+        for (Field f : fields) {
+            map.put(getSyncName(f), f);
         }
         for (INBTBase rawNBT : list) {
             if (rawNBT instanceof NBTTagCompound) {
-                handleNBT((NBTTagCompound) rawNBT,map);
+                handleNBT((NBTTagCompound) rawNBT, map);
             } else {
                 BuildingGadgets.LOG.warn("Unexpected " + rawNBT.getClass().getName() + " found in NBTTagList which was expected to only contain NBTTagCompounds!");
             }
@@ -162,7 +207,7 @@ public class SyncedConfig {
         return compound;
     }
 
-    private static void handleNBT(NBTTagCompound compound, Map<String,Field> fields) {
+    private static void handleNBT(NBTTagCompound compound, Map<String, Field> fields) {
         if (!compound.hasKey(KEY_NAME) || !compound.hasKey(KEY_VALUE)) {
             BuildingGadgets.LOG.warn("Tried to read synchronisation from an inproperly initialised NBTTagCompound!");
             return;
@@ -174,7 +219,7 @@ public class SyncedConfig {
             return;
         }
         Field field = fields.get(name);
-        FieldSerializer.applyValue(rawValue,field,getMapperIdFor(field));
+        FieldSerializer.applyValue(rawValue, field,getMapperIdFor(field));
     }
 
     private static List<Field> getSyncFields() {
@@ -183,7 +228,7 @@ public class SyncedConfig {
 
     private static String getSyncName(Field field) {
         String name = field.getAnnotation(AutoSync.class).value();
-        return name.isEmpty()?field.getName():name;
+        return name.isEmpty() ? field.getName() : name;
     }
 
     static {

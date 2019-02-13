@@ -1,7 +1,6 @@
 package com.direwolf20.buildinggadgets.common.network.packets;
 
 import com.direwolf20.buildinggadgets.client.events.EventTooltip;
-import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.tools.InventoryManipulation;
 import com.direwolf20.buildinggadgets.common.tools.ToolRenders;
@@ -92,7 +91,7 @@ public class PacketSetRemoteInventoryCache {
                 if (player != null) {
                     Set<UniqueItem> itemTypes = new HashSet<>();
                     ImmutableMultiset.Builder<UniqueItem> builder = ImmutableMultiset.builder();
-                    IItemHandler remoteInventory = GadgetUtils.getBoundRemoteInventory(GadgetGeneric.getGadget(player), player.world);
+                    IItemHandler remoteInventory = GadgetUtils.getRemoteInventory(msg.loc.getRight(), msg.loc.getLeft(), player.world);
                     if (remoteInventory != null) {
                         for (int i = 0; i < remoteInventory.getSlots(); i++) {
                             ItemStack stack = remoteInventory.getStackInSlot(i);
@@ -109,11 +108,10 @@ public class PacketSetRemoteInventoryCache {
                     PacketHandler.sendTo(new PacketSetRemoteInventoryCache(builder.build(), msg.isCopyPaste()), player);
                     return;
                 }
-                if (msg.isCopyPaste()) {
+                if (msg.isCopyPaste())
                     EventTooltip.setCache(msg.getCache());
-                } else {
-                    ToolRenders.setCache(msg.getCache());
-                }
+                else
+                    ToolRenders.setInventoryCache(msg.getCache());
             });
         }
     }

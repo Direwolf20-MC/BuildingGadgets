@@ -17,7 +17,7 @@ import javax.annotation.Nullable;
 import java.util.concurrent.TimeUnit;
 
 public class RemoteInventoryCache implements IRemoteInventoryProvider {
-    private boolean isCopyPaste;
+    private boolean isCopyPaste, forceUpdate;
     private Pair<Integer, BlockPos> locCached;
     private Multiset<UniqueItem> cache;
     private Stopwatch timer;
@@ -26,8 +26,12 @@ public class RemoteInventoryCache implements IRemoteInventoryProvider {
         this.isCopyPaste = isCopyPaste;
     }
 
-    public void setCache(@Nullable Multiset<UniqueItem> cache) {
+    public void setCache(Multiset<UniqueItem> cache) {
         this.cache = cache;
+    }
+
+    public void forceUpdate() {
+        forceUpdate = true;
     }
 
     @Override
@@ -54,10 +58,11 @@ public class RemoteInventoryCache implements IRemoteInventoryProvider {
             return true;
         }
         if (timer != null) {
-            boolean overtime = timer.elapsed(TimeUnit.MILLISECONDS) >= 5000;
+            boolean overtime = forceUpdate || timer.elapsed(TimeUnit.MILLISECONDS) >= 5000;
             if (overtime) {
                 timer.reset();
                 timer.start();
+                forceUpdate = false;
             }
             return overtime;
         }

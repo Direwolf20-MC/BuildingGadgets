@@ -71,9 +71,6 @@ public final class UniqueItem { //TODO @since 1.13.x can this be replaced with I
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof UniqueItem)) return false;
-
-        UniqueItem that = (UniqueItem) o;
-        return equals(that);
+        return !(o instanceof UniqueItem) ? false : equals((UniqueItem) o);
     }
 }

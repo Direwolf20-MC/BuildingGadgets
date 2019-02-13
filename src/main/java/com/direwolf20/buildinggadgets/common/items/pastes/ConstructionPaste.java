@@ -1,4 +1,4 @@
-package com.direwolf20.buildinggadgets.common.items;
+package com.direwolf20.buildinggadgets.common.items.pastes;
 
 import com.direwolf20.buildinggadgets.common.tools.InventoryManipulation;
 import net.minecraft.entity.player.EntityPlayer;

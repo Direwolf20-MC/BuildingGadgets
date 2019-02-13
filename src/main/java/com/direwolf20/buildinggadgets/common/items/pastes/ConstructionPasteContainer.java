@@ -1,18 +1,18 @@
-package com.direwolf20.buildinggadgets.common.items;
+package com.direwolf20.buildinggadgets.common.items.pastes;
 
 import com.direwolf20.buildinggadgets.common.tools.InventoryManipulation;
-import net.minecraft.client.resources.I18n;
+import com.direwolf20.buildinggadgets.common.utils.NBTUtil;
+
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.Style;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
@@ -20,20 +20,19 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.function.IntSupplier;
 
-public class ConstructionPasteContainer extends Item {
+public class ConstructionPasteContainer extends GenericPasteContainer {
 
-    private int maxAmount;
+    private IntSupplier maxCapacity;
 
-    public ConstructionPasteContainer(Builder builder, int maxAmount) {
-        super(builder);
-
-        this.maxAmount = maxAmount;
+    public ConstructionPasteContainer(Builder builder, RegularPasteContainerTypes type) {
+        super(builder, type.itemSuffix);
+        maxCapacity = type.capacitySupplier;
     }
 
     @OnlyIn(Dist.CLIENT)
     public void initModel() {
-// @todo: reimplement @since 1.13.x
 //        ModelBakery.registerItemVariants(this,
 //                new ModelResourceLocation(getRegistryName(), "inventory"),
 //                new ModelResourceLocation(getRegistryName() + "-half", "inventory"),
@@ -42,35 +41,14 @@ public class ConstructionPasteContainer extends Item {
 //                new ModelResourceLocation(getRegistryName() + "-3quarter", "inventory"));
     }
 
-    public static void setPasteAmount(ItemStack stack, int amount) {
-        NBTTagCompound tagCompound = stack.getTag();
-        if (tagCompound == null) {
-            tagCompound = new NBTTagCompound();
-        }
-        tagCompound.setInt("amount", amount);
-        stack.setTag(tagCompound);
-    }
-
-    public static int getPasteAmount(ItemStack stack) {
-        NBTTagCompound tagCompound = stack.getTag();
-        int amount = 0;
-        if (tagCompound == null) {
-            setPasteAmount(stack, 0);
-            return amount;
-        }
-        amount = tagCompound.getInt("amount");
-        return amount;
+    @Override
+    public void setPasteCount(ItemStack stack, int amount) {
+        NBTUtil.getOrNewTag(stack).setInt("amount", amount);
     }
 
     @Override
-    public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
-        super.addInformation(stack, worldIn, tooltip, flagIn);
-
-        tooltip.add(new TextComponentString(TextFormatting.WHITE + I18n.format("tooltip.pasteContainer.amount") + ": " + getPasteAmount(stack)));
-    }
-
-    public int getMaxAmount() {
-        return maxAmount;
+    public int getPasteCount(ItemStack stack) {
+        return !stack.hasTag() ? 0 : stack.getTag().getInt("amount");
     }
 
     @Override
@@ -82,10 +60,21 @@ public class ConstructionPasteContainer extends Item {
             for (int i = 0; i < 36; ++i) {
                 ItemStack itemStack = inv.getStackInSlot(i);
                 if (itemStack.getItem() instanceof ConstructionPaste) {
-                    itemStack = InventoryManipulation.addPasteToContainer(player, itemStack);
+                    InventoryManipulation.addPasteToContainer(player, itemStack);
                 }
             }
         }
-        return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, heldItem);
+        return new ActionResult<>(EnumActionResult.SUCCESS, heldItem);
     }
+
+    @Override
+    public void addInformation(ItemStack stack, @Nullable World world, List<ITextComponent> list, ITooltipFlag flag) {
+        list.add(new TextComponentTranslation(getAmountDisplayLocalized() + ": " + getPasteAmount(stack)).setStyle(new Style().setColor(TextFormatting.WHITE)));
+    }
+
+    @Override
+    public int getMaxCapacity() {
+        return maxCapacity.getAsInt();
+    }
+
 }

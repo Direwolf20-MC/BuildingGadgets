@@ -1,13 +1,14 @@
 package com.direwolf20.buildinggadgets.common.items.gadgets;
 
 import com.direwolf20.buildinggadgets.common.BuildingObjects;
+import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
-import com.direwolf20.buildinggadgets.common.items.capability.CapabilityProviderEnergy;
 import com.direwolf20.buildinggadgets.common.tools.ExchangingModes;
 import com.direwolf20.buildinggadgets.common.tools.InventoryManipulation;
 import com.direwolf20.buildinggadgets.common.utils.VectorUtil;
 import com.direwolf20.buildinggadgets.common.world.FakeBuilderWorld;
+import com.direwolf20.buildinggadgets.common.tools.ToolRenders;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
@@ -46,29 +47,41 @@ public class GadgetExchanger extends GadgetGeneric {
     private static final FakeBuilderWorld fakeWorld = new FakeBuilderWorld();
 
     public enum ToolMode {
-        Wall, VerticalColumn, HorizontalColumn, Checkerboard;
+        Surface, VerticalColumn, HorizontalColumn, Grid;
         private static ToolMode[] vals = values();//TODO unused
+
+        @Override
+        public String toString() {
+            return formatName(name());
+        }
 
         public ToolMode next() {//TODO unused
             return vals[(this.ordinal() + 1) % vals.length];
         }
     }
 
-    public GadgetExchanger(Builder builder) {
-        super(builder);
+    public GadgetExchanger(Builder builder, String name) {
+        super(builder, name);
+        builder.defaultMaxDamage(Config.GADGETS.GADGET_EXCHANGER.durability.get());
+    }
 
-        if (!SyncedConfig.poweredByFE) {
-            builder.defaultMaxDamage(SyncedConfig.durabilityExchanger);
-        }
+    @Override
+    public int getMaxDamage(ItemStack stack) {
+        return SyncedConfig.poweredByFE ? 0 : Config.GADGETS.GADGET_EXCHANGER.durability.get();
+    }
+
+    @Override
+    public int getEnergyCost(ItemStack tool) {
+        return Config.GADGETS.GADGET_EXCHANGER.energyCost.get();
+    }
+
+    @Override
+    public int getDamageCost(ItemStack tool) {
+        return SyncedConfig.damageCostExchanger;
     }
 
     @Override
     public int getEnergyMax() {
-        return 0;
-    }
-
-    @Override
-    public int getEnergyCost() {
         return 0;
     }
 
@@ -98,22 +111,6 @@ public class GadgetExchanger extends GadgetGeneric {
         return super.canApplyAtEnchantingTable(stack, enchantment);
     }
 
-    private static void setFuzzy(ItemStack stack, boolean fuzzy) {
-        NBTTagCompound tagCompound = stack.getTag();
-        if (tagCompound == null) {
-            tagCompound = new NBTTagCompound();
-        }
-        tagCompound.setBoolean("fuzzy", fuzzy);
-    }
-
-    public static boolean getFuzzy(ItemStack stack) {
-        NBTTagCompound tagCompound = stack.getTag();
-        if (tagCompound == null) {
-            tagCompound = new NBTTagCompound();
-        }
-        return tagCompound.getBoolean("fuzzy");
-    }
-
     private static void setToolMode(ItemStack stack, ToolMode mode) {
         NBTTagCompound tagCompound = stack.getTag();
         if (tagCompound == null) {
@@ -125,7 +122,7 @@ public class GadgetExchanger extends GadgetGeneric {
 
     public static ToolMode getToolMode(ItemStack stack) {
         NBTTagCompound tagCompound = stack.getTag();
-        ToolMode mode = ToolMode.Wall;
+        ToolMode mode = ToolMode.Surface;
         if (tagCompound == null) {
             setToolMode(stack, mode);
             return mode;
@@ -139,15 +136,14 @@ public class GadgetExchanger extends GadgetGeneric {
     }
 
     @Override
-    public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
-        super.addInformation(stack, worldIn, tooltip, flagIn);
-
+    public void addInformation(ItemStack stack, @Nullable World world, List<ITextComponent> tooltip, ITooltipFlag flag) {
+        super.addInformation(stack, world, tooltip, flag);
         tooltip.add(new TextComponentString(TextFormatting.DARK_GREEN + I18n.format("tooltip.gadget.block") + ": " + getToolBlock(stack).getBlock().getNameTextComponent()));
-        tooltip.add(new TextComponentString(TextFormatting.AQUA + I18n.format("tooltip.gadget.mode") + ": " + getToolMode(stack)));
-        tooltip.add(new TextComponentString(TextFormatting.RED + I18n.format("tooltip.gadget.range") + ": " + getToolRange(stack)));
-        if (SyncedConfig.poweredByFE) {
-            CapabilityProviderEnergy.getCap(stack).ifPresent(iEnergyStorage -> tooltip.add(new TextComponentString(TextFormatting.WHITE + I18n.format("tooltip.gadget.energy") + ": " + withSuffix(iEnergyStorage.getEnergyStored()) + "/" + withSuffix(iEnergyStorage.getMaxEnergyStored()))));
-        }
+        ToolMode mode = getToolMode(stack);
+        tooltip.add(new TextComponentString(TextFormatting.AQUA + I18n.format("tooltip.gadget.mode") + ": " + (mode == ToolMode.Surface && getConnectedArea(stack) ? I18n.format("tooltip.gadget.connected") + " " : "") + mode));
+        tooltip.add(new TextComponentString(TextFormatting.LIGHT_PURPLE + I18n.format("tooltip.gadget.range") + ": " + getToolRange(stack)));
+        tooltip.add(new TextComponentString(TextFormatting.GOLD + I18n.format("tooltip.gadget.fuzzy") + ": " + getFuzzy(stack)));
+        addEnergyInformation(tooltip, stack);
     }
 
     @Override
@@ -160,32 +156,26 @@ public class GadgetExchanger extends GadgetGeneric {
             } else {
                 exchange(player, itemstack);
             }
+        } else if (!player.isSneaking()) {
+            ToolRenders.updateInventoryCache();
         }
         return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, itemstack);
     }
 
     public void toggleMode(EntityPlayer player, ItemStack heldItem) {//TODO unused
-        ToolMode mode = getToolMode(heldItem);
-        mode = mode.next();
-        setToolMode(heldItem, mode);
-        player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.toolmode").getUnformattedComponentText() + ": " + mode.name()), true);
+        setToolMode(heldItem, getToolMode(heldItem).next());
     }
 
     public void setMode(EntityPlayer player, ItemStack heldItem, int modeInt) {
         //Called when we specify a mode with the radial menu
         ToolMode mode = ToolMode.values()[modeInt];
         setToolMode(heldItem, mode);
-        player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.toolmode").getUnformattedComponentText() + ": " + mode.name()), true);
+        player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.toolmode").getUnformattedComponentText() + ": " + mode), true);
     }
 
-    public void toggleFuzzy(EntityPlayer player, ItemStack heldItem) {
-        setFuzzy(heldItem, !(getFuzzy(heldItem)));
-        player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.fuzzymode").getUnformattedComponentText() + ": " + getFuzzy(heldItem)), true);
-    }
-
-    public void rangeChange(EntityPlayer player, ItemStack heldItem) {
+    public static void rangeChange(EntityPlayer player, ItemStack heldItem) {
         int range = getToolRange(heldItem);
-        int changeAmount = (getToolMode(heldItem) == ToolMode.Checkerboard || (range % 2 == 0)) ? 1 : 2;
+        int changeAmount = (getToolMode(heldItem) == ToolMode.Grid || (range % 2 == 0)) ? 1 : 2;
         if (player.isSneaking()) {
             range = (range <= 1) ? SyncedConfig.maxRange : range - changeAmount;
         } else {

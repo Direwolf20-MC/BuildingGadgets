@@ -15,26 +15,17 @@ public class PacketUndoKey {
 
     public static class Handler {
         public static void handle(PacketUndoKey msg, Supplier<NetworkEvent.Context> ctx) {
-            EntityPlayerMP playerEntity = ctx.get().getSender();
-            if( playerEntity == null ) return;
-
-            ItemStack heldItem = GadgetGeneric.getGadget(playerEntity);
-            if (heldItem.isEmpty())
+            EntityPlayerMP player = ctx.get().getSender();
+            if (player == null)
                 return;
 
-            if (heldItem.getItem() instanceof GadgetBuilding) {
-                GadgetBuilding gadgetBuilding = (GadgetBuilding) (heldItem.getItem());
-                gadgetBuilding.undoBuild(playerEntity);
-            } else if (heldItem.getItem() instanceof GadgetExchanger) {
-                GadgetExchanger gadgetExchanger = (GadgetExchanger) (heldItem.getItem());
-                gadgetExchanger.toggleFuzzy(playerEntity, heldItem);
-            } else if (heldItem.getItem() instanceof GadgetCopyPaste) {
-                GadgetCopyPaste gadgetCopyPaste = (GadgetCopyPaste) (heldItem.getItem());
-                gadgetCopyPaste.undoBuild(playerEntity, heldItem);
-            } else if (heldItem.getItem() instanceof GadgetDestruction) {
-                GadgetDestruction gadgetDestruction = (GadgetDestruction) (heldItem.getItem());
-                gadgetDestruction.undo(playerEntity, heldItem);
-            }
+            ItemStack stack = GadgetGeneric.getGadget(player);
+            if (stack.getItem() instanceof GadgetBuilding)
+                GadgetBuilding.undoBuild(player);
+            else if (stack.getItem() instanceof GadgetCopyPaste)
+                GadgetCopyPaste.undoBuild(player, stack);
+            else if (stack.getItem() instanceof GadgetDestruction)
+                GadgetDestruction.undo(player, stack);
         }
     }
 }

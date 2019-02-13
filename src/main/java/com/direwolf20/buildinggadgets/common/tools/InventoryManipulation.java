@@ -1,10 +1,10 @@
 package com.direwolf20.buildinggadgets.common.tools;
 
 import com.direwolf20.buildinggadgets.common.BuildingObjects;
-import com.direwolf20.buildinggadgets.common.items.ConstructionPaste;
-import com.direwolf20.buildinggadgets.common.items.ConstructionPasteContainer;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
+import com.direwolf20.buildinggadgets.common.items.pastes.ConstructionPaste;
+import com.direwolf20.buildinggadgets.common.items.pastes.ConstructionPasteContainer;
 import com.direwolf20.buildinggadgets.common.utils.GadgetUtils;
 import com.google.common.collect.ImmutableSet;
 import net.minecraft.block.*;
@@ -73,7 +73,7 @@ public class InventoryManipulation {
         }
 
         ItemStack tool = GadgetGeneric.getGadget(player);
-        IItemHandler remoteInventory = GadgetUtils.getBoundRemoteInventory(tool, world);
+        IItemHandler remoteInventory = GadgetUtils.getRemoteInventory(tool, world);
         if (remoteInventory != null) {
             for (int i = 0; i < remoteInventory.getSlots(); i++) {
                 ItemStack containerItem = remoteInventory.getStackInSlot(i);
@@ -119,16 +119,16 @@ public class InventoryManipulation {
 
     public static int countItem(ItemStack itemStack, EntityPlayer player, World world) {
         return countItem(itemStack, player, (tool, stack) -> {
-            IItemHandler remoteInventory = GadgetUtils.getBoundRemoteInventory(tool, world);
+            IItemHandler remoteInventory = GadgetUtils.getRemoteInventory(tool, world);
             return remoteInventory == null ? 0 : countInContainer(remoteInventory, stack.getItem());
         });
     }
 
     public static int countItem(ItemStack itemStack, EntityPlayer player, IRemoteInventoryProvider remoteInventory) {
-        if (player.isCreative()) {
-            return 10000;
-        }
-        int count = remoteInventory.countItem(GadgetGeneric.getGadget(player), itemStack);
+        if (player.isCreative())
+            return Integer.MAX_VALUE;
+
+        long count = remoteInventory.countItem(GadgetGeneric.getGadget(player), itemStack);
         InventoryPlayer inv = player.inventory;
         List<Integer> slots = findItem(itemStack.getItem(), inv);
         List<IItemHandler> invContainers = findInvContainers(inv);
@@ -145,14 +145,14 @@ public class InventoryManipulation {
             ItemStack stackInSlot = inv.getStackInSlot(slot);
             count += stackInSlot.getCount();
         }
-        return count;
+        return longToInt(count);
     }
 
     public static int countPaste(EntityPlayer player) {
-        if (player.isCreative()) {
-            return 10000;
-        }
-        int count = 0;
+        if (player.isCreative())
+            return Integer.MAX_VALUE;
+
+        long count = 0;
         InventoryPlayer inv = player.inventory;
         Item item = BuildingObjects.constructionPaste;
         List<Integer> slots = findItem(item, inv);
@@ -172,7 +172,16 @@ public class InventoryManipulation {
                 }
             }
         }
-        return count;
+        return longToInt(count);
+    }
+
+    public static int longToInt(long count)
+    {
+        try {
+            return Math.toIntExact(count);
+        } catch (ArithmeticException e) {
+            return Integer.MAX_VALUE;
+        }
     }
 
     public static ItemStack addPasteToContainer(EntityPlayer player, ItemStack itemStack) {
@@ -197,7 +206,7 @@ public class InventoryManipulation {
 
         for (Map.Entry<Integer, Integer> entry : list) {
             ItemStack containerStack = inv.getStackInSlot(entry.getKey());
-            int maxAmount = ((ConstructionPasteContainer) containerStack.getItem()).getMaxAmount();
+            int maxAmount = ((ConstructionPasteContainer) containerStack.getItem()).getMaxCapacity();
             int pasteInContainer = ConstructionPasteContainer.getPasteAmount(containerStack);
             int freeSpace = maxAmount - pasteInContainer;
             int stackSize = itemStack.getCount();

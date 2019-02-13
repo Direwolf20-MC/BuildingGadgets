@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.common.blocks.templatemanager;
 
+import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.BuildingObjects;
 import com.direwolf20.buildinggadgets.common.items.ITemplate;
 import com.direwolf20.buildinggadgets.common.items.Template;
@@ -30,6 +31,7 @@ import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -234,10 +236,21 @@ public class TemplateManagerCommands {
             //Map<UniqueItem, Integer> tagMap = GadgetCopyPaste.getItemCountMap(itemStack0);
             //NBTTagList tagList = GadgetUtils.itemCountToNBT(tagMap);
             //newCompound.setTag("itemcountmap", tagList);
-            String jsonTag = newCompound.toString();
-
-            Minecraft.getInstance().keyboardListener.setClipboardString(jsonTag);
-            Minecraft.getInstance().player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.copysuccess").getUnformattedComponentText()), false);
+            try {
+                if (GadgetUtils.getPasteStream(newCompound, tagCompound.getString("name")) != null) {
+                    Minecraft.getInstance().keyboardListener.setClipboardString(newCompound.toString());
+                    Minecraft.getInstance().player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.copysuccess").getUnformattedComponentText()), false);
+                } else {
+                    pasteIsTooLarge();
+                }
+            } catch (IOException e) {
+                BuildingGadgets.LOG.error("Failed to evaluate template network size. Template will be considered too large.", e);
+                pasteIsTooLarge();
+            }
         }
+    }
+
+    private static void pasteIsTooLarge() {
+        Minecraft.getInstance().player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.pastetoobig").getUnformattedComponentText()), false);
     }
 }

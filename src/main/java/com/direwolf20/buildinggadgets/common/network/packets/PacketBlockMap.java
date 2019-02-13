@@ -24,7 +24,7 @@ public class PacketBlockMap {
     }
 
     public static class Handler {
-        public static void handler(final PacketBlockMap msg, Supplier<NetworkEvent.Context> ctx) {
+        public static void handle(final PacketBlockMap msg, Supplier<NetworkEvent.Context> ctx) {
             ctx.get().enqueueWork(() -> {
                 if (msg.compound.equals(new NBTTagCompound())) {
                     PasteToolBufferBuilder.clearMaps();
@@ -38,11 +38,4 @@ public class PacketBlockMap {
             ctx.get().setPacketHandled(true);
         }
     }
-
-//    @Override
-//    public IMessage onMessage(PacketBlockMap message, MessageContext ctx) {
-//        FMLCommonHandler.instance().getWorldThread(ctx.netHandler).addScheduledTask(() -> handle(message));
-//        return null;
-//    }
-
 }

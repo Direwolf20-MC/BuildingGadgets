@@ -1,6 +1,7 @@
 package com.direwolf20.buildinggadgets.common.tools;
 
-import com.direwolf20.buildinggadgets.common.items.ConstructionPasteContainer;
+import com.direwolf20.buildinggadgets.common.items.pastes.ConstructionPasteContainer;
+
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.Ingredient;

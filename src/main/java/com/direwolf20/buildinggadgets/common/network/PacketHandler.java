@@ -16,11 +16,6 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class PacketHandler {
-
-    public static enum Side {
-        CLIENT, SERVER, BOTH;
-    }
-
     private static final String PROTOCOL_VERSION = Integer.toString(2);
     private static short index = 0;
 
@@ -32,48 +27,43 @@ public class PacketHandler {
             .simpleChannel();
 
     public static void register() {
-
+        // Server side
         registerMessage(PacketAnchorKey.class, PacketAnchorKey::encode, PacketAnchorKey::decode, PacketAnchorKey.Handler::handle);
-
-        // Client side
-        registerMessage(PacketSetRemoteInventoryCache.class, PacketSetRemoteInventoryCache::encode, PacketSetRemoteInventoryCache::decode, PacketSetRemoteInventoryCache.Handler::handle);
-        registerMessage(PacketBlockMap.class, PacketBlockMap::encode, PacketBlockMap::decode, PacketBlockMap.Handler::handler);
-
+        registerMessage(PacketBlockMap.class, PacketBlockMap::encode, PacketBlockMap::decode, PacketBlockMap.Handler::handle);
+        registerMessage(PacketToggleFuzzy.class, PacketToggleFuzzy::encode, PacketToggleFuzzy::decode, PacketToggleFuzzy.Handler::handle);
+        registerMessage(PacketToggleConnectedArea.class, PacketToggleConnectedArea::encode, PacketToggleConnectedArea::decode, PacketToggleConnectedArea.Handler::handle);
         registerMessage(PacketChangeRange.class, PacketChangeRange::encode, PacketChangeRange::decode, PacketChangeRange.Handler::handle);
         registerMessage(PacketCopyCoords.class, PacketCopyCoords::encode, PacketCopyCoords::decode, PacketCopyCoords.Handler::handle);
         registerMessage(PacketDestructionGUI.class, PacketDestructionGUI::encode, PacketDestructionGUI::decode, PacketDestructionGUI.Handler::handle);
         registerMessage(PacketPasteGUI.class, PacketPasteGUI::encode, PacketPasteGUI::decode, PacketPasteGUI.Handler::handle);
-        registerMessage(PacketRequestBlockMap.class, PacketRequestBlockMap::encode, PacketRequestBlockMap::decode, PacketRequestBlockMap.Handler::handle);
         registerMessage(PacketRequestConfigSync.class, PacketRequestConfigSync::encode, PacketRequestConfigSync::decode, PacketRequestConfigSync.Handler::handle);
-
-        // Client side
-        registerMessage(PacketSyncConfig.class, PacketSyncConfig::encode, PacketSyncConfig::decode, PacketSyncConfig.Handler::handle);
-
         registerMessage(PacketTemplateManagerLoad.class, PacketTemplateManagerLoad::encode, PacketTemplateManagerLoad::decode, PacketTemplateManagerLoad.Handler::handle);
         registerMessage(PacketTemplateManagerPaste.class, PacketTemplateManagerPaste::encode, PacketTemplateManagerPaste::decode, PacketTemplateManagerPaste.Handler::handle);
         registerMessage(PacketTemplateManagerSave.class, PacketTemplateManagerSave::encode, PacketTemplateManagerSave::decode, PacketTemplateManagerSave.Handler::handle);
         registerMessage(PacketToggleMode.class, PacketToggleMode::encode, PacketToggleMode::decode, PacketToggleMode.Handler::handle);
         registerMessage(PacketUndoKey.class, PacketUndoKey::encode, PacketUndoKey::decode, PacketUndoKey.Handler::handle);
+
+        // Client side
+        registerMessage(PacketSyncConfig.class, PacketSyncConfig::encode, PacketSyncConfig::decode, PacketSyncConfig.Handler::handle);
+        registerMessage(PacketRequestBlockMap.class, PacketRequestBlockMap::encode, PacketRequestBlockMap::decode, PacketRequestBlockMap.Handler::handle);
+
+        // Both Sides
+        registerMessage(PacketSetRemoteInventoryCache.class, PacketSetRemoteInventoryCache::encode, PacketSetRemoteInventoryCache::decode, PacketSetRemoteInventoryCache.Handler::handle);
     }
 
-    public static void sendTo(Object msg, EntityPlayerMP player)
-    {
+    public static void sendTo(Object msg, EntityPlayerMP player) {
         if (!(player instanceof FakePlayer))
-        {
             HANDLER.sendTo(msg, player.connection.netManager, NetworkDirection.PLAY_TO_CLIENT);
-        }
     }
 
-    public static void sendToServer(Object msg)
-    {
+    public static void sendToServer(Object msg) {
         HANDLER.sendToServer(msg);
     }
 
     private static <MSG> void registerMessage(Class<MSG> messageType, BiConsumer<MSG, PacketBuffer> encoder, Function<PacketBuffer, MSG> decoder, BiConsumer<MSG, Supplier<Context>> messageConsumer) {
         HANDLER.registerMessage(index, messageType, encoder, decoder, messageConsumer);
         index++;
-        if (index > 0xFF) {
+        if (index > 0xFF)
             throw new RuntimeException("Too many messages!");
-        }
     }
 }

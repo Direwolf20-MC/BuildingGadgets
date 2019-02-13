@@ -4,9 +4,9 @@ import com.direwolf20.buildinggadgets.common.BuildingObjects;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
-import com.direwolf20.buildinggadgets.common.items.capability.CapabilityProviderEnergy;
 import com.direwolf20.buildinggadgets.common.tools.BuildingModes;
 import com.direwolf20.buildinggadgets.common.tools.InventoryManipulation;
+import com.direwolf20.buildinggadgets.common.tools.ToolRenders;
 import com.direwolf20.buildinggadgets.common.tools.UndoState;
 import com.direwolf20.buildinggadgets.common.utils.VectorUtil;
 import com.direwolf20.buildinggadgets.common.world.FakeBuilderWorld;
@@ -18,7 +18,6 @@ import net.minecraft.init.Blocks;
 import net.minecraft.init.Enchantments;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUseContext;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
@@ -47,8 +46,13 @@ public class GadgetBuilding extends GadgetGeneric {
     private static final FakeBuilderWorld fakeWorld = new FakeBuilderWorld();
 
     public enum ToolMode {
-        BuildToMe, VerticalColumn, HorizontalColumn, VerticalWall, HorizontalWall, Stairs, Checkerboard;
+        BuildToMe, VerticalColumn, HorizontalColumn, VerticalWall, HorizontalWall, Stairs, Grid, Surface;
         private static ToolMode[] vals = values();
+
+        @Override
+        public String toString() {
+            return formatName(name());
+        }
 
         public ToolMode next() {
             return vals[(this.ordinal() + 1) % vals.length];
@@ -57,12 +61,13 @@ public class GadgetBuilding extends GadgetGeneric {
 
     public static final ResourceLocation REGISTRY_NAME = new ResourceLocation("buildingtool");
 
-    public GadgetBuilding(Builder builder) {
-        super(builder);
+    public GadgetBuilding(Builder builder, String name) {
+        super(builder.defaultMaxDamage(Config.GADGETS.GADGET_BUILDING.durability.get()), name);
+    }
 
-//        setUnlocalizedName(BuildingGadgets.MODID + ".buildingtool");     // Used for localization (en_US.lang)
-        //if (!Config.GADGETS.poweredByFE.get()) //commented out to allow for future Config guis to change this at runtime
-        builder.defaultMaxDamage(Config.GADGETS.GADGET_BUILDING.durability.get());
+    @Override
+    public int getMaxDamage(ItemStack stack) {
+        return SyncedConfig.poweredByFE ? 0 : SyncedConfig.durabilityBuilder;
     }
 
     @Override
@@ -71,13 +76,13 @@ public class GadgetBuilding extends GadgetGeneric {
     }
 
     @Override
-    public int getEnergyCost() {
-        return Config.GADGETS.GADGET_BUILDING.energyCost.get();
+    public int getEnergyCost(ItemStack tool) {
+        return Config.GADGETS.GADGET_DESTRUCTION.energyCost.get();
     }
 
     @Override
-    public int getDamagePerUse() {
-        return 1;
+    public int getDamageCost(ItemStack tool) {
+        return SyncedConfig.damageCostBuilder;
     }
 
     private static void setToolMode(ItemStack stack, ToolMode mode) {
@@ -106,26 +111,18 @@ public class GadgetBuilding extends GadgetGeneric {
     }
 
     @Override
-    public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
-        super.addInformation(stack, worldIn, tooltip, flagIn);
-
+    public void addInformation(ItemStack stack, @Nullable World world, List<ITextComponent> tooltip, ITooltipFlag flag) {
+        super.addInformation(stack, world, tooltip, flag);
         tooltip.add(new TextComponentString(TextFormatting.DARK_GREEN + I18n.format("tooltip.gadget.block") + ": " + getToolBlock(stack).getBlock().getRegistryName()));
-        tooltip.add(new TextComponentString(TextFormatting.AQUA + I18n.format("tooltip.gadget.mode") + ": " + getToolMode(stack)));
-        if (getToolMode(stack) != ToolMode.BuildToMe) {
-            tooltip.add(new TextComponentString(TextFormatting.RED + I18n.format("tooltip.gadget.range") + ": " + getToolRange(stack)));
-        }
-        if (Config.GADGETS.poweredByFE.get())
-            CapabilityProviderEnergy.getCap(stack).ifPresent(iEnergyStorage -> {
-                tooltip.add(new TextComponentString(TextFormatting.WHITE + I18n.format("tooltip.gadget.energy") + ": " + withSuffix(iEnergyStorage.getEnergyStored()) + "/" + withSuffix(iEnergyStorage.getMaxEnergyStored())));
-            });
-    }
+        ToolMode mode = getToolMode(stack);
+        tooltip.add(new TextComponentString(TextFormatting.AQUA + I18n.format("tooltip.gadget.mode") + ": " + (mode == ToolMode.Surface && getConnectedArea(stack) ? I18n.format("tooltip.gadget.connected") + " " : "") + mode));
+        if (getToolMode(stack) != ToolMode.BuildToMe)
+            tooltip.add(new TextComponentString(TextFormatting.LIGHT_PURPLE + I18n.format("tooltip.gadget.range") + ": " + getToolRange(stack)));
 
+        if (getToolMode(stack) == ToolMode.Surface)
+            tooltip.add(new TextComponentString(TextFormatting.GOLD + I18n.format("tooltip.gadget.fuzzy") + ": " + getFuzzy(stack)));
 
-    @Override
-    public EnumActionResult onItemUse(ItemUseContext context) {
-//        context.
-
-        return super.onItemUse(context);
+        addEnergyInformation(tooltip, stack);
     }
 
     @Override
@@ -143,33 +140,32 @@ public class GadgetBuilding extends GadgetGeneric {
             } else {
 //                build(player, itemstack, itemstack.getItem().);
             }
+        } else if (!player.isSneaking()) {
+            ToolRenders.updateInventoryCache();
         }
         return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, itemstack);
     }
 
     public void toggleMode(EntityPlayer player, ItemStack heldItem) {//TODO unused
-        //Called when the mode toggle hotkey is pressed
-        ToolMode mode = getToolMode(heldItem);
-        mode = mode.next();
-        setToolMode(heldItem, mode);
-        player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.toolmode").getUnformattedComponentText() + ": " + mode.name()), true);
+        setMode(player, heldItem, getToolMode(heldItem).next().ordinal());
     }
 
     public void setMode(EntityPlayer player, ItemStack heldItem, int modeInt) {
         //Called when we specify a mode with the radial menu
         ToolMode mode = ToolMode.values()[modeInt];
         setToolMode(heldItem, mode);
-        player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.toolmode").getUnformattedComponentText() + ": " + mode.name()), true);
+        player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.toolmode").getUnformattedComponentText() + ": " + mode), true);
     }
 
-    public void rangeChange(EntityPlayer player, ItemStack heldItem) {
+    public static void rangeChange(EntityPlayer player, ItemStack heldItem) {
         //Called when the range change hotkey is pressed
         int range = getToolRange(heldItem);
-        if (player.isSneaking()) {
-            range = (range == 1) ? SyncedConfig.maxRange : range - 1;
-        } else {
-            range = (range >= SyncedConfig.maxRange) ? 1 : range + 1;
-        }
+        int changeAmount = (getToolMode(heldItem) != ToolMode.Surface || (range % 2 == 0)) ? 1 : 2;
+        if (player.isSneaking())
+            range = (range == 1) ? SyncedConfig.maxRange : range - changeAmount;
+        else
+            range = (range >= SyncedConfig.maxRange) ? 1 : range + changeAmount;
+
         setToolRange(heldItem, range);
         player.sendStatusMessage(new TextComponentString(TextFormatting.DARK_AQUA + new TextComponentTranslation("message.gadget.toolrange").getUnformattedComponentText() + ": " + range), true);
     }
@@ -226,7 +222,7 @@ public class GadgetBuilding extends GadgetGeneric {
         return true;
     }
 
-    public boolean undoBuild(EntityPlayer player) {
+    public static boolean undoBuild(EntityPlayer player) {
         ItemStack heldItem = getGadget(player);
         if (heldItem.isEmpty())
             return false;
