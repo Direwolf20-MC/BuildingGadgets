@@ -2,7 +2,6 @@ package com.direwolf20.buildinggadgets.common.items.gadgets;
 
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.config.Config;
-import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
 import com.direwolf20.buildinggadgets.common.items.capability.CapabilityProviderEnergy;
 import com.direwolf20.buildinggadgets.common.utils.NBTUtil;
 import net.minecraft.client.resources.I18n;
@@ -129,8 +128,9 @@ public abstract class GadgetGeneric extends Item {
     }
 
     protected void addEnergyInformation(List<ITextComponent> tooltip, ItemStack stack) {
-        if (SyncedConfig.poweredByFE)
-            stack.getCapability(CapabilityEnergy.ENERGY).ifPresent(energy -> tooltip.add(new TextComponentString(TextFormatting.WHITE + I18n.format("tooltip.gadget.energy") + ": " + withSuffix(energy.getEnergyStored()) + "/" + withSuffix(energy.getMaxEnergyStored()))));
+        stack.getCapability(CapabilityEnergy.ENERGY).ifPresent(energy -> {
+            tooltip.add(new TextComponentString(TextFormatting.WHITE + I18n.format("tooltip.gadget.energy") + ": " + withSuffix(energy.getEnergyStored()) + "/" + withSuffix(energy.getMaxEnergyStored())));
+        });
     }
 
     public static boolean getFuzzy(ItemStack stack) {

@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.common.tools;
 
-import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
+import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetBuilding;
 import com.direwolf20.buildinggadgets.common.utils.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
@@ -26,7 +26,7 @@ public class BuildingModes {
         if (pos.getY() < 0) {
             return false;
         }
-        if (SyncedConfig.canOverwriteBlocks) {
+        if (Config.GENERAL.allowOverwriteBlocks.get()) {
             if (!world.getBlockState(pos).isReplaceable(new BlockItemUseContext(
                     world, player, new ItemStack(setBlock.getBlock()), pos, EnumFacing.UP, 0.5F, 0.0F, 0.5F
             ))) {

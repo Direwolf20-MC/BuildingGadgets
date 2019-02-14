@@ -2,12 +2,14 @@ package com.direwolf20.buildinggadgets.common.config;
 
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.google.common.collect.ImmutableList;
+import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.config.ModConfig;
 
 import java.util.List;
+import java.util.Objects;
 
 import static net.minecraftforge.common.ForgeConfigSpec.*;
 import static net.minecraftforge.fml.Logging.CORE;
@@ -150,18 +152,18 @@ public class Config {
                     .defineInRange("Energy Cost", defaultValue, 0, Integer.MAX_VALUE);
         }
 
-        private static IntValue getDamageCost(int defaultValue) {
+        private static IntValue getDurabilityCost(int defaultValue) {
             return SERVER_BUILDER
-                    .comment("The Gadget's Damage cost per Operation")
-                    .translation(LANG_KEY_GADGETS + ".damageCost")
-                    .defineInRange("Damage Cost", defaultValue, 1, Integer.MAX_VALUE);
+                    .comment("The Gadget's Durability cost per Operation")
+                    .translation(LANG_KEY_GADGETS + ".durabilityCost")
+                    .defineInRange("Durability Cost", defaultValue, 1, Integer.MAX_VALUE);
         }
 
         public static final class CategoryGadgetBuilding {
 
             public final IntValue maxEnergy, durability;
 
-            public final IntValue energyCost, damageCost;
+            public final IntValue energyCost, durabilityCost;
 
             private CategoryGadgetBuilding() {
                 SERVER_BUILDER.comment("Energy Cost & Durability of the Building Gadget")/*.translation(LANG_KEY_GADGET_BUILDING)*/.push("Building Gadget");
@@ -170,7 +172,7 @@ public class Config {
                 durability = getDurability(500);
 
                 energyCost = getEnergyCost(50);
-                damageCost = getDamageCost(1);
+                durabilityCost = getDurabilityCost(1);
 
                 SERVER_BUILDER.pop();
             }
@@ -180,7 +182,7 @@ public class Config {
 
             public final IntValue maxEnergy, durability;
 
-            public final IntValue energyCost, damageCost;
+            public final IntValue energyCost, durabilityCost;
 
             private CategoryGadgetExchanger() {
                 SERVER_BUILDER.comment("Energy Cost & Durability of the Exchanging Gadget")/*.translation(LANG_KEY_GADGET_EXCHANGER)*/.push("Exchanging Gadget");
@@ -189,7 +191,7 @@ public class Config {
                 durability = getDurability(500);
 
                 energyCost = getEnergyCost(100);
-                damageCost = getDamageCost(2);
+                durabilityCost = getDurabilityCost(2);
 
                 SERVER_BUILDER.pop();
             }
@@ -199,7 +201,7 @@ public class Config {
 
             public final IntValue maxEnergy, durability;
 
-            public final IntValue energyCost, damageCost;
+            public final IntValue energyCost, durabilityCost;
 
             public final DoubleValue nonFuzzyMultiplier;
 
@@ -212,7 +214,7 @@ public class Config {
                 durability = getDurability(1000);
 
                 energyCost = getEnergyCost(200);
-                damageCost = getDamageCost(4);
+                durabilityCost = getDurabilityCost(4);
 
                 nonFuzzyMultiplier = SERVER_BUILDER
                         .comment("The cost in energy/durability will increase by this amount when not in fuzzy mode")
@@ -234,7 +236,7 @@ public class Config {
 
             public final IntValue maxEnergy, durability;
 
-            public final IntValue energyCost, damageCost;
+            public final IntValue energyCost, durabilityCost;
 
 
             private CategoryGadgetCopyPaste() {
@@ -244,7 +246,7 @@ public class Config {
                 durability = getDurability(500);
 
                 energyCost = getEnergyCost(50);
-                damageCost = getDamageCost(1);
+                durabilityCost = getDurabilityCost(1);
 
                 SERVER_BUILDER.pop();
             }
@@ -290,7 +292,10 @@ public class Config {
 
         }
 
-
+        public boolean isAllowedBlock(Block block) {
+            //TODO replace with Patternlist
+            return blockBlacklist.get().contains(Objects.requireNonNull(block.getRegistryName()).toString());
+        }
     }
 
     public static final ForgeConfigSpec SERVER_CONFIG = SERVER_BUILDER.build();

@@ -10,27 +10,20 @@ public class ItemEnergyForge extends EnergyStorage {
 
     private static final String NBT_ENERGY = "Energy";
 
-    private ItemStack stack;
-    private IntSupplier maxEnergyProvider;
+    private final ItemStack stack;
+    private final IntSupplier capacitySupplier;
 
-    public ItemEnergyForge(ItemStack stack, IntSupplier maxEnergyProvider) {
-        super(maxEnergyProvider.getAsInt(), Integer.MAX_VALUE, Integer.MAX_VALUE);
-        this.maxEnergyProvider = maxEnergyProvider;
+    public ItemEnergyForge(ItemStack stack, IntSupplier capacity) {
+        super(capacity.getAsInt(), Integer.MAX_VALUE, Integer.MAX_VALUE);
+        this.capacitySupplier = capacity;
         this.stack = stack;
-        NBTTagCompound nbt = stack.getTag();
-        this.energy = nbt != null && nbt.hasKey(NBT_ENERGY) ? nbt.getInt(NBT_ENERGY) : 0;
+        updateEnergy();
     }
 
     @Override
-    public int receiveEnergy(int maxReceive, boolean simulate) {
-        updateMaxEnergy();
-        return changeEnergy(super.receiveEnergy(maxReceive, simulate), simulate);
-    }
-
-    @Override
-    public int extractEnergy(int maxExtract, boolean simulate) {
-        updateMaxEnergy();
-        return changeEnergy(super.extractEnergy(maxExtract, simulate), simulate);
+    public int getEnergyStored() {
+        updateEnergy();
+        return super.getEnergyStored();
     }
 
     @Override
@@ -40,14 +33,15 @@ public class ItemEnergyForge extends EnergyStorage {
     }
 
     @Override
-    public int getEnergyStored() {
-        updateMaxEnergy();
-        return super.getEnergyStored();
+    public int receiveEnergy(int maxReceive, boolean simulate) {
+        updateEnergy();
+        return changeEnergy(super.receiveEnergy(maxReceive, simulate), simulate);
     }
 
-    private void updateMaxEnergy() {
-        this.capacity = maxEnergyProvider.getAsInt();
-        this.energy = Math.min(capacity, this.energy);
+    @Override
+    public int extractEnergy(int maxExtract, boolean simulate) {
+        updateEnergy();
+        return changeEnergy(super.extractEnergy(maxExtract, simulate), simulate);
     }
 
     private int changeEnergy(int amount, boolean simulate) {
@@ -62,4 +56,14 @@ public class ItemEnergyForge extends EnergyStorage {
         return amount;
     }
 
+    private void updateEnergy() {
+        NBTTagCompound nbt = stack.getTag();
+        this.energy = nbt != null && nbt.hasKey(NBT_ENERGY) ? nbt.getInt(NBT_ENERGY) : 0;
+        updateMaxEnergy();
+    }
+
+    private void updateMaxEnergy() {
+        this.capacity = capacitySupplier.getAsInt();
+        this.energy = Math.min(capacity,energy);
+    }
 }

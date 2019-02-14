@@ -2,7 +2,7 @@ package com.direwolf20.buildinggadgets.common.network.packets;
 
 import java.util.function.Supplier;
 
-import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
+import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetBuilding;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetDestruction;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetExchanger;
@@ -27,7 +27,7 @@ public class PacketToggleFuzzy {
 
                 ItemStack stack = GadgetGeneric.getGadget(player);
                 if (stack.getItem() instanceof GadgetExchanger || stack.getItem() instanceof GadgetBuilding
-                        || (stack.getItem() instanceof GadgetDestruction && SyncedConfig.nonFuzzyEnabledDestruction))
+                        || (stack.getItem() instanceof GadgetDestruction && Config.GADGETS.GADGET_DESTRUCTION.nonFuzzyEnabled.get()))
                     GadgetGeneric.toggleFuzzy(player, stack);
             });
             ctx.get().setPacketHandled(true);

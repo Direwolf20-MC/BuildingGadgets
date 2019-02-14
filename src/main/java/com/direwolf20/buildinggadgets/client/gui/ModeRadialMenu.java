@@ -9,7 +9,7 @@ package com.direwolf20.buildinggadgets.client.gui;
 import com.direwolf20.buildinggadgets.client.KeyBindings;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.ModSounds;
-import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
+import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.items.gadgets.*;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketChangeRange;
@@ -92,7 +92,7 @@ public class ModeRadialMenu extends GuiScreen {
             }));
         }
         if (!(tool.getItem() instanceof GadgetCopyPaste)) {
-            if (!destruction || SyncedConfig.nonFuzzyEnabledDestruction) {
+            if (!destruction || Config.GADGETS.GADGET_DESTRUCTION.nonFuzzyEnabled.get()) {
                 buttons.add(new GuiButtonAction(I18n.format("tooltip.gadget.fuzzy"), send -> {
                     if (send)
                         PacketHandler.sendToServer(new PacketToggleFuzzy());

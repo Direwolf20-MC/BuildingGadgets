@@ -3,7 +3,6 @@ package com.direwolf20.buildinggadgets.common.items.gadgets;
 import com.direwolf20.buildinggadgets.common.BuildingObjects;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.config.Config;
-import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.common.tools.BlockMapIntState;
 import com.direwolf20.buildinggadgets.common.utils.GadgetUtils;
@@ -48,13 +47,13 @@ public class GadgetDestruction extends GadgetGeneric {
     }
 
     @Override
-    public int getMaxDamage(ItemStack stack) {
-        return SyncedConfig.poweredByFE ? 0 : SyncedConfig.durabilityDestruction;
+    public int getEnergyMax() {
+        return Config.GADGETS.GADGET_DESTRUCTION.maxEnergy.get();
     }
 
     @Override
-    public int getEnergyMax() {
-        return Config.GADGETS.GADGET_DESTRUCTION.maxEnergy.get();
+    public int getMaxDamage(ItemStack stack) {
+        return Config.GADGETS.poweredByFE.get() ? 0 : Config.GADGETS.GADGET_DESTRUCTION.durability.get();
     }
 
     @Override
@@ -64,11 +63,11 @@ public class GadgetDestruction extends GadgetGeneric {
 
     @Override
     public int getDamageCost(ItemStack tool) {
-        return SyncedConfig.damageCostDestruction * getCostMultiplier(tool);
+        return Config.GADGETS.GADGET_DESTRUCTION.durabilityCost.get() * getCostMultiplier(tool);
     }
 
     private int getCostMultiplier(ItemStack tool) {
-        return (int) (SyncedConfig.nonFuzzyEnabledDestruction && !getFuzzy(tool) ? SyncedConfig.nonFuzzyMultiplierDestruction : 1);
+        return (int) (Config.GADGETS.poweredByFE.get() && !getFuzzy(tool) ? Config.GADGETS.GADGET_DESTRUCTION.nonFuzzyMultiplier.get() : 1);
     }
 
     @Override
@@ -77,7 +76,7 @@ public class GadgetDestruction extends GadgetGeneric {
         tooltip.add(new TextComponentString(TextFormatting.RED + I18n.format("tooltip.gadget.destroywarning")));
         tooltip.add(new TextComponentString(TextFormatting.AQUA + I18n.format("tooltip.gadget.destroyshowoverlay") + ": " + getOverlay(stack)));
         tooltip.add(new TextComponentString(TextFormatting.YELLOW + I18n.format("tooltip.gadget.connectedarea") + ": " + getConnectedArea(stack)));
-        if (SyncedConfig.nonFuzzyEnabledDestruction)
+        if (Config.GADGETS.GADGET_DESTRUCTION.nonFuzzyEnabled.get())
             tooltip.add(new TextComponentString(TextFormatting.GOLD + I18n.format("tooltip.gadget.fuzzy") + ": " + getFuzzy(stack)));
 
         addEnergyInformation(tooltip, stack);
@@ -255,7 +254,7 @@ public class GadgetDestruction extends GadgetGeneric {
         BlockPos startPos = (getAnchor(stack) == null) ? pos : getAnchor(stack);
         EnumFacing side = (getAnchorSide(stack) == null) ? incomingSide : getAnchorSide(stack);
         ArrayList<EnumFacing> directions = assignDirections(side, player);
-        IBlockState stateTarget = !SyncedConfig.nonFuzzyEnabledDestruction || GadgetGeneric.getFuzzy(stack) ? null : world.getBlockState(pos);
+        IBlockState stateTarget = !Config.GADGETS.GADGET_DESTRUCTION.nonFuzzyEnabled.get() || GadgetGeneric.getFuzzy(stack) ? null : world.getBlockState(pos);
         if (GadgetGeneric.getConnectedArea(stack)) {
             String[] directionNames = new String[] {"right", "left", "up", "down", "depth"};
             AxisAlignedBB area = new AxisAlignedBB(pos);

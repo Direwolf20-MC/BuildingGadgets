@@ -2,7 +2,6 @@ package com.direwolf20.buildinggadgets.common.items.gadgets;
 
 import com.direwolf20.buildinggadgets.common.BuildingObjects;
 import com.direwolf20.buildinggadgets.common.config.Config;
-import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.common.tools.ExchangingModes;
 import com.direwolf20.buildinggadgets.common.tools.InventoryManipulation;
@@ -61,13 +60,17 @@ public class GadgetExchanger extends GadgetGeneric {
     }
 
     public GadgetExchanger(Builder builder, String name) {
-        super(builder, name);
-        builder.defaultMaxDamage(Config.GADGETS.GADGET_EXCHANGER.durability.get());
+        super(builder.defaultMaxDamage(Config.GADGETS.GADGET_EXCHANGER.durability.get()), name);
+    }
+
+    @Override
+    public int getEnergyMax() {
+        return Config.GADGETS.GADGET_EXCHANGER.maxEnergy.get();
     }
 
     @Override
     public int getMaxDamage(ItemStack stack) {
-        return SyncedConfig.poweredByFE ? 0 : Config.GADGETS.GADGET_EXCHANGER.durability.get();
+        return Config.GADGETS.poweredByFE.get() ? 0 : Config.GADGETS.GADGET_EXCHANGER.durability.get();
     }
 
     @Override
@@ -77,12 +80,7 @@ public class GadgetExchanger extends GadgetGeneric {
 
     @Override
     public int getDamageCost(ItemStack tool) {
-        return SyncedConfig.damageCostExchanger;
-    }
-
-    @Override
-    public int getEnergyMax() {
-        return 0;
+        return Config.GADGETS.GADGET_EXCHANGER.durabilityCost.get();
     }
 
     @Override
@@ -177,9 +175,9 @@ public class GadgetExchanger extends GadgetGeneric {
         int range = getToolRange(heldItem);
         int changeAmount = (getToolMode(heldItem) == ToolMode.Grid || (range % 2 == 0)) ? 1 : 2;
         if (player.isSneaking()) {
-            range = (range <= 1) ? SyncedConfig.maxRange : range - changeAmount;
+            range = (range <= 1) ? Config.GADGETS.maxRange.get() : range - changeAmount;
         } else {
-            range = (range >= SyncedConfig.maxRange) ? 1 : range + changeAmount;
+            range = (range >= Config.GADGETS.maxRange.get()) ? 1 : range + changeAmount;
         }
         setToolRange(heldItem, range);
         player.sendStatusMessage(new TextComponentString(TextFormatting.DARK_AQUA + new TextComponentTranslation("message.gadget.toolrange").getUnformattedComponentText() + ": " + range), true);

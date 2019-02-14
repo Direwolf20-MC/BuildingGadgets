@@ -5,7 +5,6 @@ import com.direwolf20.buildinggadgets.common.BuildingObjects;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlock;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.config.Config;
-import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.common.items.ITemplate;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
@@ -66,18 +65,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
     }
 
     public GadgetCopyPaste(Builder builder, String name) {
-        super(builder, name);
-        builder.defaultMaxDamage(Config.GADGETS.GADGET_COPY_PASTE.durability.get());
-    }
-
-    @Override
-    public int getMaxDamage(ItemStack stack) {
-        return SyncedConfig.poweredByFE ? 0 : SyncedConfig.durabilityCopyPaste;
-    }
-
-    @Override
-    public int getEnergyCost(ItemStack tool) {
-        return Config.GADGETS.GADGET_COPY_PASTE.energyCost.get();
+        super(builder.defaultMaxDamage(Config.GADGETS.GADGET_COPY_PASTE.durability.get()), name);
     }
 
     @Override
@@ -86,8 +74,18 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
     }
 
     @Override
+    public int getMaxDamage(ItemStack stack) {
+        return Config.GADGETS.poweredByFE.get() ? 0 : Config.GADGETS.GADGET_COPY_PASTE.durability.get();
+    }
+
+    @Override
+    public int getEnergyCost(ItemStack tool) {
+        return Config.GADGETS.GADGET_COPY_PASTE.energyCost.get();
+    }
+
+    @Override
     public int getDamageCost(ItemStack tool) {
-        return SyncedConfig.damageCostCopyPaste;
+        return Config.GADGETS.GADGET_COPY_PASTE.durabilityCost.get();
     }
 
     private static void setAnchor(ItemStack stack, BlockPos anchorPos) {
@@ -407,7 +405,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
                 for (int z = iStartZ; z <= iEndZ; z++) {
                     BlockPos tempPos = new BlockPos(x, y, z);
                     IBlockState tempState = world.getBlockState(tempPos);
-                    if (tempState != Blocks.AIR.getDefaultState() && (world.getTileEntity(tempPos) == null || world.getTileEntity(tempPos) instanceof ConstructionBlockTileEntity) && !tempState.getMaterial().isLiquid() && !SyncedConfig.blockBlacklist.contains(tempState.getBlock())) {
+                    if (tempState != Blocks.AIR.getDefaultState() && (world.getTileEntity(tempPos) == null || world.getTileEntity(tempPos) instanceof ConstructionBlockTileEntity) && !tempState.getMaterial().isLiquid() && Config.BLACKLIST.isAllowedBlock(tempState.getBlock())) {
                         TileEntity te = world.getTileEntity(tempPos);
                         IBlockState assignState = InventoryManipulation.getSpecificStates(tempState, world, player, tempPos, stack);
                         IBlockState actualState = assignState.getExtendedState(world, tempPos);
@@ -501,8 +499,8 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
     private void placeBlock(World world, BlockPos pos, EntityPlayer player, IBlockState state, Map<IBlockState, UniqueItem> IntStackMap) {
         IBlockState testState = world.getBlockState(pos);
         // @warning: this has been replaced without knowing how to construct a BlockItemUseContent
-        if ((SyncedConfig.canOverwriteBlocks && !testState.isReplaceable(new BlockItemUseContext(world, player, new ItemStack(testState.getBlock()), pos, EnumFacing.DOWN, 0.5F, 0.0F, 0.5F))) ||
-            (!SyncedConfig.canOverwriteBlocks && world.getBlockState(pos).getMaterial() != Material.AIR))
+        if ((Config.GENERAL.allowOverwriteBlocks.get() && !testState.isReplaceable(new BlockItemUseContext(world, player, new ItemStack(testState.getBlock()), pos, EnumFacing.DOWN, 0.5F, 0.0F, 0.5F))) ||
+            (!Config.GENERAL.allowOverwriteBlocks.get() && world.getBlockState(pos).getMaterial() != Material.AIR))
             return;
 
         if (pos.getY() < 0 || state.equals(Blocks.AIR.getDefaultState()) || !player.isAllowEdit())
