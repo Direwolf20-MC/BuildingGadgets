@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.common.items.gadgets;
 
 import com.direwolf20.buildinggadgets.common.BuildingObjects;
-import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
+import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.common.items.capability.CapabilityProviderEnergy;
 import com.direwolf20.buildinggadgets.common.tools.ExchangingModes;
@@ -55,11 +55,7 @@ public class GadgetExchanger extends GadgetGeneric {
     }
 
     public GadgetExchanger(Builder builder) {
-        super(builder);
-
-        if (!SyncedConfig.poweredByFE) {
-            builder.defaultMaxDamage(SyncedConfig.durabilityExchanger);
-        }
+        super(builder.defaultMaxDamage(Config.GADGETS.GADGET_EXCHANGER.durability.get()));
     }
 
     @Override
@@ -145,9 +141,8 @@ public class GadgetExchanger extends GadgetGeneric {
         tooltip.add(new TextComponentString(TextFormatting.DARK_GREEN + I18n.format("tooltip.gadget.block") + ": " + getToolBlock(stack).getBlock().getNameTextComponent()));
         tooltip.add(new TextComponentString(TextFormatting.AQUA + I18n.format("tooltip.gadget.mode") + ": " + getToolMode(stack)));
         tooltip.add(new TextComponentString(TextFormatting.RED + I18n.format("tooltip.gadget.range") + ": " + getToolRange(stack)));
-        if (SyncedConfig.poweredByFE) {
-            CapabilityProviderEnergy.getCap(stack).ifPresent(iEnergyStorage -> tooltip.add(new TextComponentString(TextFormatting.WHITE + I18n.format("tooltip.gadget.energy") + ": " + withSuffix(iEnergyStorage.getEnergyStored()) + "/" + withSuffix(iEnergyStorage.getMaxEnergyStored()))));
-        }
+        CapabilityProviderEnergy.getCap(stack).ifPresent(iEnergyStorage -> tooltip.add(new TextComponentString(TextFormatting.WHITE + I18n.format("tooltip.gadget.energy") + ": " + withSuffix(iEnergyStorage.getEnergyStored()) + "/" + withSuffix(iEnergyStorage.getMaxEnergyStored()))));
+
     }
 
     @Override
@@ -187,9 +182,9 @@ public class GadgetExchanger extends GadgetGeneric {
         int range = getToolRange(heldItem);
         int changeAmount = (getToolMode(heldItem) == ToolMode.Checkerboard || (range % 2 == 0)) ? 1 : 2;
         if (player.isSneaking()) {
-            range = (range <= 1) ? SyncedConfig.maxRange : range - changeAmount;
+            range = (range <= 1) ? Config.GADGETS.maxRange.get() : range - changeAmount;
         } else {
-            range = (range >= SyncedConfig.maxRange) ? 1 : range + changeAmount;
+            range = (range >= Config.GADGETS.maxRange.get()) ? 1 : range + changeAmount;
         }
         setToolRange(heldItem, range);
         player.sendStatusMessage(new TextComponentString(TextFormatting.DARK_AQUA + new TextComponentTranslation("message.gadget.toolrange").getUnformattedComponentText() + ": " + range), true);

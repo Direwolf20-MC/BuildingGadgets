@@ -4,27 +4,43 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.energy.EnergyStorage;
 
+import java.util.function.IntSupplier;
+
 public class ItemEnergyForge extends EnergyStorage {
 
     private static final String NBT_ENERGY = "Energy";
 
-    private ItemStack stack;
+    private final ItemStack stack;
+    private final IntSupplier capacitySupplier;
 
-    public ItemEnergyForge(ItemStack stack, int capacity) {
-        super(capacity, Integer.MAX_VALUE, Integer.MAX_VALUE);
-
+    public ItemEnergyForge(ItemStack stack, IntSupplier capacity) {
+        super(capacity.getAsInt(), Integer.MAX_VALUE, Integer.MAX_VALUE);
+        this.capacitySupplier = capacity;
         this.stack = stack;
-        NBTTagCompound nbt = stack.getTag();
-        this.energy = nbt != null && nbt.hasKey(NBT_ENERGY) ? nbt.getInt(NBT_ENERGY) : 0;
+        updateEnergy();
+    }
+
+    @Override
+    public int getEnergyStored() {
+        updateEnergy();
+        return super.getEnergyStored();
+    }
+
+    @Override
+    public int getMaxEnergyStored() {
+        updateMaxEnergy();
+        return super.getMaxEnergyStored();
     }
 
     @Override
     public int receiveEnergy(int maxReceive, boolean simulate) {
+        updateEnergy();
         return changeEnergy(super.receiveEnergy(maxReceive, simulate), simulate);
     }
 
     @Override
     public int extractEnergy(int maxExtract, boolean simulate) {
+        updateEnergy();
         return changeEnergy(super.extractEnergy(maxExtract, simulate), simulate);
     }
 
@@ -40,4 +56,14 @@ public class ItemEnergyForge extends EnergyStorage {
         return amount;
     }
 
+    private void updateEnergy() {
+        NBTTagCompound nbt = stack.getTag();
+        this.energy = nbt != null && nbt.hasKey(NBT_ENERGY) ? nbt.getInt(NBT_ENERGY) : 0;
+        updateMaxEnergy();
+    }
+
+    private void updateMaxEnergy() {
+        this.capacity = capacitySupplier.getAsInt();
+        this.energy = Math.min(capacity,energy);
+    }
 }

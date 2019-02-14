@@ -2,12 +2,14 @@ package com.direwolf20.buildinggadgets.common.config;
 
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.google.common.collect.ImmutableList;
+import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.config.ModConfig;
 
 import java.util.List;
+import java.util.Objects;
 
 import static net.minecraftforge.common.ForgeConfigSpec.*;
 import static net.minecraftforge.fml.Logging.CORE;
@@ -24,13 +26,32 @@ public class Config {
 
     private static final String LANG_KEY_GADGETS = LANG_KEY_ROOT + ".gadgets";
 
-    private static final String LANG_KEY_GADGET_BUILDING = LANG_KEY_GADGETS+".gadgetBuilding";
+    private static final String LANG_KEY_PASTE_CONTAINERS = LANG_KEY_ROOT + ".subCategoryPasteContainers";
 
-    private static final String LANG_KEY_GADGET_EXCHANGER = LANG_KEY_GADGETS+".gadgetExchanger";
+    private static final String LANG_KEY_GADGET_BUILDING = LANG_KEY_GADGETS + ".gadgetBuilding";
 
-    private static final String LANG_KEY_GADGET_DESTRUCTION = LANG_KEY_GADGETS+".gadgetDestruction";
+    private static final String LANG_KEY_GADGET_EXCHANGER = LANG_KEY_GADGETS + ".gadgetExchanger";
 
-    private static final String LANG_KEY_GADGET_COPY_PASTE = LANG_KEY_GADGETS+".gadgetCopyPaste";
+    private static final String LANG_KEY_GADGET_DESTRUCTION = LANG_KEY_GADGETS + ".gadgetDestruction";
+
+    private static final String LANG_KEY_GADGETS_ENERGY = LANG_KEY_GADGETS + ".maxEnergy";
+
+    private static final String LANG_KEY_GADGETS_ENERGY_COST = LANG_KEY_GADGETS + ".energyCost";
+
+    private static final String LANG_KEY_GADGETS_DURABILITY = LANG_KEY_GADGETS + ".durability";
+
+    private static final String LANG_KEY_GADGETS_DURABILITY_COST = LANG_KEY_GADGETS + ".durabilityCost";
+
+    private static final String LANG_KEY_PASTE_CONTAINERS_CAPACITY = LANG_KEY_PASTE_CONTAINERS + ".capacity";
+
+    private static final String COMMENT_GADGETS_ENERGY = "The max energy of the Gadget";
+
+    private static final String COMMENT_GADGETS_ENERGY_COST = "The Gadget's Energy cost per Operation";
+
+    private static final String COMMENT_GADGETS_DURABILITY = "The Gadget's Durability (0 means no durability is used) (Ignored if powered by FE)";
+
+    private static final String COMMENT_GADGETS_DURABILITY_COST = "The Gadget's Damage cost per Operation";
+
 
     private static final Builder SERVER_BUILDER = new Builder();
     private static final Builder CLIENT_BUILDER = new Builder();
@@ -123,30 +144,37 @@ public class Config {
         }
 
         public static final class CategoryGadgetBuilding {
-            //TODO @since 1.13.x add durabilityCost Config option
+
             public final IntValue energyCost;
 
             public final IntValue maxEnergy;
 
             public final IntValue durability;
 
+            public final IntValue durabilityCost;
+
             private CategoryGadgetBuilding() {
                 SERVER_BUILDER.comment("Energy Cost & Durability of the Building Gadget")/*.translation(LANG_KEY_GADGET_BUILDING)*/.push("Building Gadget");
 
-                energyCost = SERVER_BUILDER
-                        .comment("The energy cost of the Builder per block")
-                        .translation(LANG_KEY_GADGETS + ".energyCost")
-                        .defineInRange("Energy Cost", 50, 0, Integer.MAX_VALUE);
-
                 maxEnergy = SERVER_BUILDER
-                        .comment("The max energy of the Gadget")
-                        .translation(LANG_KEY_GADGETS + ".maxEnergy")
+                        .comment(COMMENT_GADGETS_ENERGY)
+                        .translation(LANG_KEY_GADGETS_ENERGY)
                         .defineInRange("Maximum Energy", 500000, 1, Integer.MAX_VALUE);
 
+                energyCost = SERVER_BUILDER
+                        .comment(COMMENT_GADGETS_ENERGY_COST)
+                        .translation(LANG_KEY_GADGETS_ENERGY_COST)
+                        .defineInRange("Energy Cost", 50, 0, Integer.MAX_VALUE);
+
                 durability = SERVER_BUILDER
-                        .comment("The max durability of the Builder (Ignored if powered by FE)")
-                        .translation(LANG_KEY_GADGETS + ".durability")
+                        .comment(COMMENT_GADGETS_DURABILITY)
+                        .translation(LANG_KEY_GADGETS_DURABILITY)
                         .defineInRange("Durability", 500, 1, Integer.MAX_VALUE);
+
+                durabilityCost = SERVER_BUILDER
+                        .comment(COMMENT_GADGETS_DURABILITY_COST)
+                        .translation(LANG_KEY_GADGETS_DURABILITY_COST)
+                        .defineInRange("Damage Cost",1,0,Integer.MAX_VALUE);
 
                 SERVER_BUILDER.pop();
             }
@@ -160,23 +188,30 @@ public class Config {
 
             public final IntValue durability;
 
+            public final IntValue durabilityCost;
+
             private CategoryGadgetExchanger() {
                 SERVER_BUILDER.comment("Energy Cost & Durability of the Exchanging Gadget")/*.translation(LANG_KEY_GADGET_EXCHANGER)*/.push("Exchanging Gadget");
 
-                energyCost = SERVER_BUILDER
-                        .comment("The energy cost of the Exchanger per block")
-                        .translation(LANG_KEY_GADGETS + ".energyCost")
-                        .defineInRange("Energy Cost", 100, 0, Integer.MAX_VALUE);
-
                 maxEnergy = SERVER_BUILDER
-                        .comment("The max energy of the Gadget")
-                        .translation(LANG_KEY_GADGETS + ".maxEnergy")
+                        .comment(COMMENT_GADGETS_ENERGY)
+                        .translation(LANG_KEY_GADGETS_ENERGY)
                         .defineInRange("Maximum Energy", 500000, 1, Integer.MAX_VALUE);
 
+                energyCost = SERVER_BUILDER
+                        .comment(COMMENT_GADGETS_ENERGY_COST)
+                        .translation(LANG_KEY_GADGETS_ENERGY_COST)
+                        .defineInRange("Energy Cost", 100, 0, Integer.MAX_VALUE);
+
                 durability = SERVER_BUILDER
-                        .comment("The max durability of the Exchanger (Ignored if powered by FE)")
-                        .translation(LANG_KEY_GADGETS + ".durability")
+                        .comment(COMMENT_GADGETS_DURABILITY)
+                        .translation(LANG_KEY_GADGETS_DURABILITY)
                         .defineInRange("Durability", 500, 1, Integer.MAX_VALUE);
+
+                durabilityCost = SERVER_BUILDER
+                        .comment(COMMENT_GADGETS_DURABILITY_COST)
+                        .translation(LANG_KEY_GADGETS_DURABILITY_COST)
+                        .defineInRange("Damage Cost",2,0,Integer.MAX_VALUE);
 
                 SERVER_BUILDER.pop();
             }
@@ -184,29 +219,50 @@ public class Config {
 
         public static final class CategoryGadgetDestruction {
 
-            public final IntValue maxEnergy;
-
             public final IntValue energyCost;
 
+            public final IntValue maxEnergy;
+
             public final IntValue durability;
+
+            public final IntValue durabilityCost;
+
+            public final DoubleValue nonFuzzyMultiplier;
+
+            public final BooleanValue nonFuzzyEnabled;
 
             private CategoryGadgetDestruction() {
                 SERVER_BUILDER.comment("Energy Cost, Durability & Maximum Energy of the Destruction Gadget")/*.translation(LANG_KEY_GADGET_DESTRUCTION)*/.push("Destruction Gadget");
 
+                maxEnergy = SERVER_BUILDER
+                        .comment(COMMENT_GADGETS_ENERGY)
+                        .translation(LANG_KEY_GADGETS_ENERGY)
+                        .defineInRange("Maximum Energy", 1000000, 1, Integer.MAX_VALUE);
+
                 energyCost = SERVER_BUILDER
-                        .comment("The energy cost of the Destruction Gadget per block")
-                        .translation(LANG_KEY_GADGETS + ".energyCost")
+                        .comment(COMMENT_GADGETS_ENERGY_COST)
+                        .translation(LANG_KEY_GADGETS_ENERGY_COST)
                         .defineInRange("Energy Cost", 200, 0, Integer.MAX_VALUE);
 
-                maxEnergy = SERVER_BUILDER
-                        .comment("The max energy of the Gadget")
-                        .translation(LANG_KEY_GADGETS + ".maxEnergy")
-                        .defineInRange("Maximum Energy", 500000, 1, Integer.MAX_VALUE);
-
                 durability = SERVER_BUILDER
-                        .comment("The max durability of the Destruction Gadget (Ignored if powered by FE)")
-                        .translation(LANG_KEY_GADGETS + ".durability")
+                        .comment(COMMENT_GADGETS_DURABILITY)
+                        .translation(LANG_KEY_GADGETS_DURABILITY)
                         .defineInRange("Durability", 500, 1, Integer.MAX_VALUE);
+
+                durabilityCost = SERVER_BUILDER
+                        .comment(COMMENT_GADGETS_DURABILITY_COST)
+                        .translation(LANG_KEY_GADGETS_DURABILITY_COST)
+                        .defineInRange("Damage Cost",4,0,Integer.MAX_VALUE);
+
+                nonFuzzyMultiplier = SERVER_BUILDER
+                        .comment("The cost in energy/durability will increase by this amount when not in fuzzy mode")
+                        .translation(LANG_KEY_GADGET_DESTRUCTION + ".nonfuzzy.multiplier")
+                        .defineInRange("Non-Fuzzy Mode Multiplier",2,0,Double.MAX_VALUE);
+
+                nonFuzzyEnabled = SERVER_BUILDER
+                        .comment("If enabled, the Destruction Gadget can be taken out of fuzzy mode, allowing only instances of the block clicked to be removed (at a higher cost)")
+                        .translation(LANG_KEY_GADGET_DESTRUCTION + ".nonfuzzy.enabled")
+                        .define("Non-Fuzzy Mode Enabled",false);
 
                 SERVER_BUILDER.pop();
 
@@ -221,24 +277,31 @@ public class Config {
 
             public final IntValue durability;
 
+            public final IntValue durabilityCost;
+
 
             private CategoryGadgetCopyPaste() {
                 SERVER_BUILDER.comment("Energy Cost & Durability of the Copy-Paste Gadget")/*.translation(LANG_KEY_GADGET_COPY_PASTE)*/.push("Copy-Paste Gadget");
 
-                energyCost = SERVER_BUILDER
-                        .comment("The Energy Use of the Copy Paste Gadget")
-                        .translation(LANG_KEY_GADGETS + ".energyCost")
-                        .defineInRange("Energy Cost", 50, 0, Integer.MAX_VALUE);
-
                 maxEnergy = SERVER_BUILDER
-                        .comment("The max energy of the Gadget")
-                        .translation(LANG_KEY_GADGETS + ".maxEnergy")
+                        .comment(COMMENT_GADGETS_ENERGY)
+                        .translation(LANG_KEY_GADGETS_ENERGY)
                         .defineInRange("Maximum Energy", 500000, 1, Integer.MAX_VALUE);
 
+                energyCost = SERVER_BUILDER
+                        .comment(COMMENT_GADGETS_ENERGY_COST)
+                        .translation(LANG_KEY_GADGETS_ENERGY_COST)
+                        .defineInRange("Energy Cost", 50, 0, Integer.MAX_VALUE);
+
                 durability = SERVER_BUILDER
-                        .comment("The max durability of the Copy & Paste Gadget (Ignored if powered by FE)")
-                        .translation(LANG_KEY_GADGETS + ".durability")
+                        .comment(COMMENT_GADGETS_DURABILITY)
+                        .translation(LANG_KEY_GADGETS_DURABILITY)
                         .defineInRange("Durability", 500, 1, Integer.MAX_VALUE);
+
+                durabilityCost = SERVER_BUILDER
+                        .comment(COMMENT_GADGETS_DURABILITY_COST)
+                        .translation(LANG_KEY_GADGETS_DURABILITY_COST)
+                        .defineInRange("Damage Cost",1,0,Integer.MAX_VALUE);
 
                 SERVER_BUILDER.pop();
             }
@@ -262,7 +325,41 @@ public class Config {
 
         }
 
+        public boolean isAllowedBlock(Block block) {
+            //TODO replace with Patternlist
+            return blockBlacklist.get().contains(Objects.requireNonNull(block.getRegistryName()).toString());
+        }
 
+    }
+
+    public static final class CategoryPasteContainers {
+
+        public final IntValue t1Capacity;
+
+        public final IntValue t2Capacity;
+
+        public final IntValue t3Capacity;
+
+        private CategoryPasteContainers() {
+            SERVER_BUILDER.comment("Configure the Paste Containers here")/*.translation(LANG_KEY_PASTE_CONTAINERS)*/.push("Paste Containers");
+
+            t1Capacity = SERVER_BUILDER
+                    .comment("The maximum capacity of a tier 1 (iron) Construction Paste Container")
+                    .translation(LANG_KEY_PASTE_CONTAINERS_CAPACITY + ".t1")
+                    .defineInRange("T1 Container Capacity",512,0,Integer.MAX_VALUE);
+
+            t2Capacity = SERVER_BUILDER
+                    .comment("The maximum capacity of a tier 2 (gold) Construction Paste Container")
+                    .translation(LANG_KEY_PASTE_CONTAINERS_CAPACITY + ".t2")
+                    .defineInRange("T2 Container Capacity",2048,0,Integer.MAX_VALUE);
+
+            t3Capacity = SERVER_BUILDER
+                    .comment("The maximum capacity of a tier 3 (diamond) Construction Paste Container")
+                    .translation(LANG_KEY_PASTE_CONTAINERS_CAPACITY + ".t3")
+                    .defineInRange("T3 Container Capacity",8192,0,Integer.MAX_VALUE);
+
+            SERVER_BUILDER.pop();
+        }
     }
 
     public static final ForgeConfigSpec SERVER_CONFIG = SERVER_BUILDER.build();

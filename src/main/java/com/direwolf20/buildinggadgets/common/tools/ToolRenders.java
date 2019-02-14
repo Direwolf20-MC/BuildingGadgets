@@ -2,7 +2,7 @@ package com.direwolf20.buildinggadgets.common.tools;
 
 import com.direwolf20.buildinggadgets.client.RemoteInventoryCache;
 import com.direwolf20.buildinggadgets.common.BuildingObjects;
-import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
+import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.items.capability.CapabilityProviderEnergy;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetBuilding;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
@@ -91,12 +91,12 @@ public class ToolRenders {
                 int hasBlocks = InventoryManipulation.countItem(itemStack, player, cache);
                 hasBlocks = hasBlocks + InventoryManipulation.countPaste(player);
                 int hasEnergy = 0;
-                if (SyncedConfig.poweredByFE) {
-                    hasEnergy = CapabilityProviderEnergy.getCap(stack).orElseThrow(NullPointerException::new).getEnergyStored();
+                if (Config.GADGETS.poweredByFE.get()) {
+                    hasEnergy = CapabilityProviderEnergy.getCap(stack).orElseThrow(CapabilityNotPresentException::new).getEnergyStored();
                 } else {
                     hasEnergy = stack.getMaxDamage() - stack.getDamage();
                 }
-                if (player.isCreative() || (!SyncedConfig.poweredByFE && !stack.isDamageable())) {
+                if (player.isCreative() || (!Config.GADGETS.poweredByFE.get() && !stack.isDamageable())) {
                     hasEnergy = 1000000;
                 }
                 //Prepare the block rendering
@@ -156,7 +156,7 @@ public class ToolRenders {
                     GlStateManager.scalef(1.01f, 1.01f, 1.01f);
                     GL14.glBlendColor(1F, 1F, 1F, 0.35f); //Set the alpha of the blocks we are rendering
                     hasBlocks--;
-                    if (SyncedConfig.poweredByFE) {
+                    if (Config.GADGETS.poweredByFE.get()) {
                         hasEnergy = hasEnergy - ((GadgetBuilding) BuildingObjects.gadgetBuilding).getEnergyCost();
                     } else {
                         hasEnergy--;
@@ -220,12 +220,12 @@ public class ToolRenders {
                 int hasBlocks = InventoryManipulation.countItem(itemStack, player, cache);
                 hasBlocks = hasBlocks + InventoryManipulation.countPaste(player);
                 int hasEnergy = 0;
-                if (SyncedConfig.poweredByFE) {
-                    hasEnergy = CapabilityProviderEnergy.getCap(stack).orElseThrow(NullPointerException::new).getEnergyStored();
+                if (Config.GADGETS.poweredByFE.get()) {
+                    hasEnergy = CapabilityProviderEnergy.getCap(stack).orElseThrow(CapabilityNotPresentException::new).getEnergyStored();
                 } else {
                     hasEnergy = stack.getMaxDamage() - stack.getDamage();
                 }
-                if (player.isCreative() || (!SyncedConfig.poweredByFE && !stack.isDamageable())) {
+                if (player.isCreative() || (!Config.GADGETS.poweredByFE.get() && !stack.isDamageable())) {
                     hasEnergy = 1000000;
                 }
                 //Prepare the block rendering
@@ -292,7 +292,7 @@ public class ToolRenders {
                     GlStateManager.scalef(1.02f, 1.02f, 1.02f);//Slightly Larger block to avoid z-fighting.
                     GL14.glBlendColor(1F, 1F, 1F, 0.55f); //Set the alpha of the blocks we are rendering
                     hasBlocks--;
-                    if (SyncedConfig.poweredByFE) {
+                    if (Config.GADGETS.poweredByFE.get()) {
                         hasEnergy = hasEnergy - ((GadgetExchanger) BuildingObjects.gadgetExchanger).getEnergyCost();
                     } else {
                         hasEnergy = hasEnergy - 2;

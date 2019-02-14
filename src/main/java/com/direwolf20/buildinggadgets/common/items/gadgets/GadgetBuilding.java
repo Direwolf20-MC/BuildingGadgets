@@ -2,7 +2,6 @@ package com.direwolf20.buildinggadgets.common.items.gadgets;
 
 import com.direwolf20.buildinggadgets.common.BuildingObjects;
 import com.direwolf20.buildinggadgets.common.config.Config;
-import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.common.items.capability.CapabilityProviderEnergy;
 import com.direwolf20.buildinggadgets.common.tools.BuildingModes;
@@ -166,9 +165,9 @@ public class GadgetBuilding extends GadgetGeneric {
         //Called when the range change hotkey is pressed
         int range = getToolRange(heldItem);
         if (player.isSneaking()) {
-            range = (range == 1) ? SyncedConfig.maxRange : range - 1;
+            range = (range == 1) ? Config.GADGETS.maxRange.get() : range - 1;
         } else {
-            range = (range >= SyncedConfig.maxRange) ? 1 : range + 1;
+            range = (range >= Config.GADGETS.maxRange.get()) ? 1 : range + 1;
         }
         setToolRange(heldItem, range);
         player.sendStatusMessage(new TextComponentString(TextFormatting.DARK_AQUA + new TextComponentTranslation("message.gadget.toolrange").getUnformattedComponentText() + ": " + range), true);

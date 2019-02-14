@@ -3,7 +3,6 @@ package com.direwolf20.buildinggadgets.common.items.gadgets;
 import com.direwolf20.buildinggadgets.common.BuildingObjects;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.config.Config;
-import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.common.tools.BlockMapIntState;
 import com.direwolf20.buildinggadgets.common.utils.GadgetUtils;
@@ -45,11 +44,7 @@ import static com.direwolf20.buildinggadgets.common.utils.GadgetUtils.withSuffix
 public class GadgetDestruction extends GadgetGeneric {
 
     public GadgetDestruction(Builder builder) {
-        super(builder);
-
-        if (!SyncedConfig.poweredByFE) {
-            builder.defaultMaxDamage(SyncedConfig.durabilityDestruction);
-        }
+        super(builder.defaultMaxDamage(Config.GADGETS.GADGET_DESTRUCTION.durability.get()));
     }
 
     @Override
@@ -73,9 +68,8 @@ public class GadgetDestruction extends GadgetGeneric {
 
         tooltip.add(new TextComponentString(TextFormatting.RED + I18n.format("tooltip.gadget.destroywarning")));
         tooltip.add(new TextComponentString(TextFormatting.AQUA + I18n.format("tooltip.gadget.destroyshowoverlay") + ": " + getOverlay(stack)));
-        if (SyncedConfig.poweredByFE) {
-            stack.getCapability(CapabilityEnergy.ENERGY, null).ifPresent(iEnergyStorage -> tooltip.add(new TextComponentString(TextFormatting.WHITE + I18n.format("tooltip.gadget.energy") + ": " + withSuffix(iEnergyStorage.getEnergyStored()) + "/" + withSuffix(iEnergyStorage.getMaxEnergyStored()))));
-        }
+        stack.getCapability(CapabilityEnergy.ENERGY, null).ifPresent(iEnergyStorage ->
+                tooltip.add(new TextComponentString(TextFormatting.WHITE + I18n.format("tooltip.gadget.energy") + ": " + withSuffix(iEnergyStorage.getEnergyStored()) + "/" + withSuffix(iEnergyStorage.getMaxEnergyStored()))));
     }
 
     @Nullable

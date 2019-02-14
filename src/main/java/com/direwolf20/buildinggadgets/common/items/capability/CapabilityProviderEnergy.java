@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.common.items.capability;
 
-import com.direwolf20.buildinggadgets.common.utils.GadgetUtils;
+import com.direwolf20.buildinggadgets.common.config.Config;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.capabilities.Capability;
@@ -11,16 +11,15 @@ import net.minecraftforge.energy.IEnergyStorage;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.function.IntSupplier;
 
 public class CapabilityProviderEnergy implements ICapabilityProvider {
-    private ItemStack stack;
-    private int energyCapacity;
+    private final ItemEnergyForge energyItem;
+    private final LazyOptional<ItemEnergyForge> energyCapability;
 
-    private final LazyOptional<ItemEnergyForge> energyCapability = LazyOptional.of(() -> new ItemEnergyForge(stack, energyCapacity));
-
-    public CapabilityProviderEnergy(ItemStack stack, int energyCapacity) {
-        this.stack = stack;
-        this.energyCapacity = energyCapacity;
+    public CapabilityProviderEnergy(ItemStack stack, IntSupplier energyCapacity) {
+        this.energyItem = new ItemEnergyForge(stack,energyCapacity);
+        this.energyCapability = LazyOptional.of(() -> energyItem);
     }
 
     // @todo: reimplement @since 1.13.x removed as of 1.13?
@@ -33,7 +32,7 @@ public class CapabilityProviderEnergy implements ICapabilityProvider {
     @Nonnull
     @Override
     public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable EnumFacing side) {
-        if( cap == CapabilityEnergy.ENERGY ) {
+        if( cap == CapabilityEnergy.ENERGY && Config.GADGETS.poweredByFE.get()) {
             return energyCapability.cast();
         }
 
@@ -42,10 +41,6 @@ public class CapabilityProviderEnergy implements ICapabilityProvider {
 
     @Nonnull
     public static LazyOptional<IEnergyStorage> getCap(ItemStack stack) {
-        LazyOptional<IEnergyStorage> energy = stack.getCapability(CapabilityEnergy.ENERGY);
-        if (!energy.isPresent())
-            throw new IllegalArgumentException("CapabilityEnergy could not be retrieved for " + GadgetUtils.getStackErrorSuffix(stack));
-
-        return energy;
+        return stack.getCapability(CapabilityEnergy.ENERGY);
     }
 }

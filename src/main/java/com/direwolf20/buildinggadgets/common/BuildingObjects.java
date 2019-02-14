@@ -6,7 +6,7 @@ import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.blocks.EffectBlock;
 import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManager;
 import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManagerTileEntity;
-import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
+import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.common.entities.ConstructionBlockEntity;
 import com.direwolf20.buildinggadgets.common.items.ConstructionPaste;
@@ -100,7 +100,8 @@ public class BuildingObjects {
                 new ItemBlock(templateManger, itemBuilder()).setRegistryName(templateManger.getRegistryName())
         );
 
-        if (SyncedConfig.enableDestructionGadget) {
+        //TODO non conditional registration
+        if (Config.GENERAL.enableDestructionGadget.get()) {
             event.getRegistry().register(gadgetDestruction);
         }
     }
@@ -112,7 +113,8 @@ public class BuildingObjects {
                 templateManger
         );
 
-        if (SyncedConfig.enablePaste) {
+        //TODO non conditional registration
+        if (Config.GENERAL.enablePaste.get()) {
             event.getRegistry().registerAll(
                     constructionBlock,
                     constructionBlockPowder
@@ -148,6 +150,7 @@ public class BuildingObjects {
 
     public static void initColorHandlers() { //TODO ItemBlock Creative Tabs
         BlockColors blockColors = BuildingGadgets.getInstance().getMinecraft().getBlockColors();
-        if (SyncedConfig.enablePaste) ((ConstructionBlock) constructionBlock).initColorHandler(blockColors);
+        //TODO non conditional registration
+        if (Config.GENERAL.enablePaste.get()) ((ConstructionBlock) constructionBlock).initColorHandler(blockColors);
     }
 }
