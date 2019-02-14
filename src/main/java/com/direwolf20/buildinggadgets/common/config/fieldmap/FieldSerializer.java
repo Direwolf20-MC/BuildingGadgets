@@ -548,7 +548,7 @@ public class FieldSerializer {
         });
         addSerializer(new StringArraySerializer());
         //addMapper(FieldMapper.BLOCK_LIST_MAPPER_ID, FieldMapper.BLOCK_LIST_MAPPER);
-        addMapper(FieldMapper.PATTERN_LIST_MAPPER_ID, FieldMapper.PATTERN_LIST_MAPPER);
+//        addMapper(FieldMapper.PATTERN_LIST_MAPPER_ID, FieldMapper.PATTERN_LIST_MAPPER);
     }
 
     private static void clear() {
