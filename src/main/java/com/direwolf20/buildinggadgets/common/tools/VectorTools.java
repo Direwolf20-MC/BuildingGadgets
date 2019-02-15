@@ -1,6 +1,7 @@
 package com.direwolf20.buildinggadgets.common.tools;
 
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
@@ -28,4 +29,17 @@ public class VectorTools {
         BlockPos pos = lookingAt.getBlockPos();
         return pos;
     }
+
+    public static int getAxisValue(BlockPos pos, EnumFacing.Axis axis) {
+        switch (axis) {
+            case X:
+                return pos.getX();
+            case Y:
+                return pos.getY();
+            case Z:
+                return pos.getZ();
+        }
+        throw new IllegalArgumentException("Trying to find the value a imaginary axis of a BlockPos");
+    }
+
 }
