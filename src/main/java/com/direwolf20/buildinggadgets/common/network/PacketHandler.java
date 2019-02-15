@@ -1,51 +1,67 @@
 package com.direwolf20.buildinggadgets.common.network;
 
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
-import net.minecraftforge.fml.common.network.NetworkRegistry;
-import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
+import com.direwolf20.buildinggadgets.common.network.packets.*;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.network.PacketBuffer;
+import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.common.util.FakePlayer;
+import net.minecraftforge.fml.network.NetworkDirection;
+import net.minecraftforge.fml.network.NetworkEvent.Context;
+import net.minecraftforge.fml.network.NetworkRegistry;
+import net.minecraftforge.fml.network.simple.SimpleChannel;
+
+import java.util.function.BiConsumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 public class PacketHandler {
-    public static final SimpleNetworkWrapper INSTANCE = NetworkRegistry.INSTANCE.newSimpleChannel(BuildingGadgets.MODID);
-    private static int packetId = 0;
+    private static final String PROTOCOL_VERSION = Integer.toString(2);
+    private static short index = 0;
 
-    public static enum Side {
-        CLIENT, SERVER, BOTH;
-    }
+    public static final SimpleChannel HANDLER = NetworkRegistry.ChannelBuilder
+            .named(new ResourceLocation(BuildingGadgets.MODID, "main_network_channel"))
+            .clientAcceptedVersions(PROTOCOL_VERSION::equals)
+            .serverAcceptedVersions(PROTOCOL_VERSION::equals)
+            .networkProtocolVersion(() -> PROTOCOL_VERSION)
+            .simpleChannel();
 
-    public static void registerMessages() {
-
+    public static void register() {
         // Server side
-        registerMessage(PacketToggleMode.Handler.class, PacketToggleMode.class, Side.SERVER);
-        registerMessage(PacketChangeRange.Handler.class, PacketChangeRange.class, Side.SERVER);
-        registerMessage(PacketUndoKey.Handler.class, PacketUndoKey.class, Side.SERVER);
-        registerMessage(PacketAnchorKey.Handler.class, PacketAnchorKey.class, Side.SERVER);
-        registerMessage(PacketToggleFuzzy.Handler.class, PacketToggleFuzzy.class, Side.SERVER);
-        registerMessage(PacketToggleConnectedArea.Handler.class, PacketToggleConnectedArea.class, Side.SERVER);
-        registerMessage(PacketRequestBlockMap.Handler.class, PacketRequestBlockMap.class, Side.SERVER);
-        registerMessage(PacketTemplateManagerSave.Handler.class, PacketTemplateManagerSave.class, Side.SERVER);
-        registerMessage(PacketTemplateManagerLoad.Handler.class, PacketTemplateManagerLoad.class, Side.SERVER);
-        registerMessage(PacketTemplateManagerPaste.Handler.class, PacketTemplateManagerPaste.class, Side.SERVER);
-        registerMessage(PacketCopyCoords.Handler.class, PacketCopyCoords.class, Side.SERVER);
-        registerMessage(PacketDestructionGUI.Handler.class, PacketDestructionGUI.class, Side.SERVER);
-        registerMessage(PacketPasteGUI.Handler.class, PacketPasteGUI.class, Side.SERVER);
-        registerMessage(PacketRequestConfigSync.Handler.class, PacketRequestConfigSync.class, Side.SERVER);
+        registerMessage(PacketAnchorKey.class, PacketAnchorKey::encode, PacketAnchorKey::decode, PacketAnchorKey.Handler::handle);
+        registerMessage(PacketBlockMap.class, PacketBlockMap::encode, PacketBlockMap::decode, PacketBlockMap.Handler::handle);
+        registerMessage(PacketToggleFuzzy.class, PacketToggleFuzzy::encode, PacketToggleFuzzy::decode, PacketToggleFuzzy.Handler::handle);
+        registerMessage(PacketToggleConnectedArea.class, PacketToggleConnectedArea::encode, PacketToggleConnectedArea::decode, PacketToggleConnectedArea.Handler::handle);
+        registerMessage(PacketChangeRange.class, PacketChangeRange::encode, PacketChangeRange::decode, PacketChangeRange.Handler::handle);
+        registerMessage(PacketCopyCoords.class, PacketCopyCoords::encode, PacketCopyCoords::decode, PacketCopyCoords.Handler::handle);
+        registerMessage(PacketDestructionGUI.class, PacketDestructionGUI::encode, PacketDestructionGUI::decode, PacketDestructionGUI.Handler::handle);
+        registerMessage(PacketPasteGUI.class, PacketPasteGUI::encode, PacketPasteGUI::decode, PacketPasteGUI.Handler::handle);
+        registerMessage(PacketTemplateManagerLoad.class, PacketTemplateManagerLoad::encode, PacketTemplateManagerLoad::decode, PacketTemplateManagerLoad.Handler::handle);
+        registerMessage(PacketTemplateManagerPaste.class, PacketTemplateManagerPaste::encode, PacketTemplateManagerPaste::decode, PacketTemplateManagerPaste.Handler::handle);
+        registerMessage(PacketTemplateManagerSave.class, PacketTemplateManagerSave::encode, PacketTemplateManagerSave::decode, PacketTemplateManagerSave.Handler::handle);
+        registerMessage(PacketToggleMode.class, PacketToggleMode::encode, PacketToggleMode::decode, PacketToggleMode.Handler::handle);
+        registerMessage(PacketUndoKey.class, PacketUndoKey::encode, PacketUndoKey::decode, PacketUndoKey.Handler::handle);
+
         // Client side
-        registerMessage(PacketSyncConfig.Handler.class,PacketSyncConfig.class,Side.CLIENT);
-        registerMessage(PacketBlockMap.Handler.class, PacketBlockMap.class, Side.CLIENT);
+        registerMessage(PacketRequestBlockMap.class, PacketRequestBlockMap::encode, PacketRequestBlockMap::decode, PacketRequestBlockMap.Handler::handle);
 
-        // Both sides
-        registerMessage(PacketSetRemoteInventoryCache.Handler.class, PacketSetRemoteInventoryCache.class, Side.BOTH);
+        // Both Sides
+        registerMessage(PacketSetRemoteInventoryCache.class, PacketSetRemoteInventoryCache::encode, PacketSetRemoteInventoryCache::decode, PacketSetRemoteInventoryCache.Handler::handle);
     }
 
-    private static void registerMessage(Class handler, Class packet, Side side) {
-        if (side != Side.CLIENT)
-            registerMessage(handler, packet, net.minecraftforge.fml.relauncher.Side.SERVER);
-        
-        if (side != Side.SERVER)
-            registerMessage(handler, packet, net.minecraftforge.fml.relauncher.Side.CLIENT);
+    public static void sendTo(Object msg, EntityPlayerMP player) {
+        if (!(player instanceof FakePlayer))
+            HANDLER.sendTo(msg, player.connection.netManager, NetworkDirection.PLAY_TO_CLIENT);
     }
 
-    private static void registerMessage(Class handler, Class packet, net.minecraftforge.fml.relauncher.Side side) {
-        INSTANCE.registerMessage(handler, packet, packetId++, side);
+    public static void sendToServer(Object msg) {
+        HANDLER.sendToServer(msg);
+    }
+
+    private static <MSG> void registerMessage(Class<MSG> messageType, BiConsumer<MSG, PacketBuffer> encoder, Function<PacketBuffer, MSG> decoder, BiConsumer<MSG, Supplier<Context>> messageConsumer) {
+        HANDLER.registerMessage(index, messageType, encoder, decoder, messageConsumer);
+        index++;
+        if (index > 0xFF)
+            throw new RuntimeException("Too many messages!");
     }
 }

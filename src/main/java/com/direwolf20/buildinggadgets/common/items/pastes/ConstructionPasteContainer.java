@@ -1,10 +1,7 @@
 package com.direwolf20.buildinggadgets.common.items.pastes;
 
-import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.tools.InventoryManipulation;
-import com.direwolf20.buildinggadgets.common.tools.NBTTool;
-import net.minecraft.client.renderer.block.model.ModelBakery;
-import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import com.direwolf20.buildinggadgets.common.utils.NBTUtil;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -12,9 +9,13 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.Style;
+import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -24,35 +25,29 @@ public class ConstructionPasteContainer extends GenericPasteContainer {
 
     private IntSupplier maxCapacity;
 
-    public ConstructionPasteContainer(String suffix, IntSupplier maxCapacity) {
+    public ConstructionPasteContainer(Builder builder, IntSupplier maxCapacity) {
+        super(builder);
         this.maxCapacity = maxCapacity;
-
-        setRegistryName("constructionpastecontainer" + suffix);
-        setUnlocalizedName(BuildingGadgets.MODID + ".constructionpastecontainer" + suffix);
     }
 
-    @SideOnly(Side.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     public void initModel() {
-        ModelBakery.registerItemVariants(this,
-                new ModelResourceLocation(getRegistryName(), "inventory"),
-                new ModelResourceLocation(getRegistryName() + "-half", "inventory"),
-                new ModelResourceLocation(getRegistryName() + "-full", "inventory"),
-                new ModelResourceLocation(getRegistryName() + "-quarter", "inventory"),
-                new ModelResourceLocation(getRegistryName() + "-3quarter", "inventory"));
+//        ModelBakery.registerItemVariants(this,
+//                new ModelResourceLocation(getRegistryName(), "inventory"),
+//                new ModelResourceLocation(getRegistryName() + "-half", "inventory"),
+//                new ModelResourceLocation(getRegistryName() + "-full", "inventory"),
+//                new ModelResourceLocation(getRegistryName() + "-quarter", "inventory"),
+//                new ModelResourceLocation(getRegistryName() + "-3quarter", "inventory"));
     }
 
     @Override
     public void setPasteCount(ItemStack stack, int amount) {
-        NBTTool.getOrNewTag(stack).setInteger("amount", amount);
+        NBTUtil.getOrNewTag(stack).setInt("amount", amount);
     }
 
     @Override
     public int getPasteCount(ItemStack stack) {
-        if (!stack.hasTagCompound()) {
-            return 0;
-        }
-
-        return stack.getTagCompound().getInteger("amount");
+        return !stack.hasTag() ? 0 : stack.getTag().getInt("amount");
     }
 
     @Override
@@ -72,8 +67,8 @@ public class ConstructionPasteContainer extends GenericPasteContainer {
     }
 
     @Override
-    public void addInformation(ItemStack stack, @Nullable World world, List<String> list, ITooltipFlag b) {
-        list.add(getAmountDisplayLocalized() + ": " + getPasteAmount(stack));
+    public void addInformation(ItemStack stack, @Nullable World world, List<ITextComponent> list, ITooltipFlag flag) {
+        list.add(new TextComponentTranslation(getAmountDisplayLocalized() + ": " + getPasteAmount(stack)).setStyle(new Style().setColor(TextFormatting.WHITE)));
     }
 
     @Override

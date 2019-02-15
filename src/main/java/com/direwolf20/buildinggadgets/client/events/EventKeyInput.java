@@ -2,22 +2,20 @@ package com.direwolf20.buildinggadgets.client.events;
 
 import com.direwolf20.buildinggadgets.client.KeyBindings;
 import com.direwolf20.buildinggadgets.client.gui.ModeRadialMenu;
+import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
-import com.direwolf20.buildinggadgets.common.network.PacketAnchorKey;
-import com.direwolf20.buildinggadgets.common.network.PacketChangeRange;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
-import com.direwolf20.buildinggadgets.common.network.PacketToggleConnectedArea;
-import com.direwolf20.buildinggadgets.common.network.PacketToggleFuzzy;
-import com.direwolf20.buildinggadgets.common.network.PacketUndoKey;
+import com.direwolf20.buildinggadgets.common.network.packets.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumHand;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.settings.KeyModifier;
-import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.gameevent.InputEvent;
-import net.minecraftforge.fml.relauncher.Side;
 
-@EventBusSubscriber(Side.CLIENT)
+@Mod.EventBusSubscriber(modid = BuildingGadgets.MODID, value = Dist.CLIENT)
 public class EventKeyInput {
 
     @SubscribeEvent
@@ -31,22 +29,28 @@ public class EventKeyInput {
     }
 
     private static void handleEventInput() {
+        System.out.println("HI");
         if (KeyBindings.modeSwitch.isKeyDown() && ((KeyBindings.modeSwitch.getKeyModifier() == KeyModifier.NONE && KeyModifier.getActiveModifier() == KeyModifier.NONE) || KeyBindings.modeSwitch.getKeyModifier() != KeyModifier.NONE)) {
-            //PacketHandler.INSTANCE.sendToServer(new PacketToggleMode());
-            Minecraft mc = Minecraft.getMinecraft();
-            ItemStack tool = GadgetGeneric.getGadget(mc.player);
-            if (!tool.isEmpty())
-                mc.displayGuiScreen(new ModeRadialMenu(tool));
+            PacketHandler.sendToServer(new PacketToggleMode(1)); // TODO: put the right mode value
+            Minecraft mc = Minecraft.getInstance();
+            ItemStack stack = mc.player.getHeldItem(EnumHand.MAIN_HAND);
+            if (!stack.isEmpty() && ((stack.getItem() instanceof GadgetGeneric)))
+                mc.displayGuiScreen(new ModeRadialMenu(stack));
+            else {
+                stack = mc.player.getHeldItem(EnumHand.OFF_HAND);
+                if (!stack.isEmpty() && ((stack.getItem() instanceof GadgetGeneric)))
+                    mc.displayGuiScreen(new ModeRadialMenu(stack));
+            }
         } else if (KeyBindings.rangeChange.isPressed()) {
-            PacketHandler.INSTANCE.sendToServer(new PacketChangeRange());
+            PacketHandler.sendToServer(new PacketChangeRange());
         } else if (KeyBindings.undoKey.isPressed()) {
-            PacketHandler.INSTANCE.sendToServer(new PacketUndoKey());
+            PacketHandler.sendToServer(new PacketUndoKey());
         } else if (KeyBindings.anchorKey.isPressed()) {
-            PacketHandler.INSTANCE.sendToServer(new PacketAnchorKey());
+            PacketHandler.sendToServer(new PacketAnchorKey());
         } else if (KeyBindings.fuzzyKey.isPressed()) {
-            PacketHandler.INSTANCE.sendToServer(new PacketToggleFuzzy());
+            PacketHandler.sendToServer(new PacketToggleFuzzy());
         } else if (KeyBindings.connectedAreaKey.isPressed()) {
-            PacketHandler.INSTANCE.sendToServer(new PacketToggleConnectedArea());
+            PacketHandler.sendToServer(new PacketToggleConnectedArea());
         }
     }
 }

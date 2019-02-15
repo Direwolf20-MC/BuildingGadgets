@@ -37,6 +37,6 @@ public class GuiButtonSound extends GuiButtonSelect {
             return;
 
         SoundEvent sound = soundSelect == null ? SoundEvents.UI_BUTTON_CLICK : (selected ? soundDeselect : soundSelect);
-        soundHandler.playSound(PositionedSoundRecord.getMasterRecord(sound, selected ? pitchDeselect : pitchSelect));
+        soundHandler.play(PositionedSoundRecord.getMasterRecord(sound, selected ? pitchDeselect : pitchSelect));
     }
 }

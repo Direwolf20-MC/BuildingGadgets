@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.common.blocks;
 
+import com.direwolf20.buildinggadgets.common.registry.objects.BuildingObjects;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
@@ -8,46 +9,55 @@ import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 
-import javax.annotation.Nullable;
+import javax.annotation.Nonnull;
 
 public class ConstructionBlockTileEntity extends TileEntity {
     private IBlockState blockState;
     private IBlockState actualBlockState;
 
-    public boolean setBlockState(IBlockState state) {
-        blockState = state;
-        markDirtyClient();
-        return true;
+    public ConstructionBlockTileEntity() {
+        super(BuildingObjects.CONSTRUCTION_BLOCK_TYPE);
     }
 
-    public boolean setActualBlockState(IBlockState state) {
+    public void setBlockState(IBlockState state, IBlockState actualState) {
+        blockState = state;
         actualBlockState = state;
         markDirtyClient();
-        return true;
     }
 
-    @Nullable
+    @Nonnull
     public IBlockState getBlockState() {
-        if (blockState == null || blockState == Blocks.AIR.getDefaultState()) {
-            return null;
+        if (blockState == null) {
+            return Blocks.AIR.getDefaultState();
         }
         return blockState;
     }
 
-    @Nullable
+    @Nonnull
     public IBlockState getActualBlockState() {
-        if (actualBlockState == null || actualBlockState == Blocks.AIR.getDefaultState()) {
-            return null;
+        if (actualBlockState == null) {
+            return Blocks.AIR.getDefaultState();
         }
         return actualBlockState;
     }
 
     @Override
-    public void readFromNBT(NBTTagCompound compound) {
-        super.readFromNBT(compound);
-        blockState = NBTUtil.readBlockState(compound.getCompoundTag("blockState"));
-        actualBlockState = NBTUtil.readBlockState(compound.getCompoundTag("actualBlockState"));
+    public void read(NBTTagCompound compound) {
+        super.read(compound);
+        blockState = NBTUtil.readBlockState(compound.getCompound("blockState"));
+        actualBlockState = NBTUtil.readBlockState(compound.getCompound("actualBlockState"));
         markDirtyClient();
+    }
+
+    @Override
+    public NBTTagCompound write(NBTTagCompound compound) {
+        if (blockState != null) {
+            compound.setTag("blockState", NBTUtil.writeBlockState(blockState));
+            if (actualBlockState != null) {
+                compound.setTag("actualBlockState", NBTUtil.writeBlockState(actualBlockState));
+            }
+        }
+        return super.write(compound);
     }
 
     private void markDirtyClient() {
@@ -61,14 +71,14 @@ public class ConstructionBlockTileEntity extends TileEntity {
     @Override
     public NBTTagCompound getUpdateTag() {
         NBTTagCompound updateTag = super.getUpdateTag();
-        writeToNBT(updateTag);
+        write(updateTag);
         return updateTag;
     }
 
     @Override
     public SPacketUpdateTileEntity getUpdatePacket() {
         NBTTagCompound nbtTag = new NBTTagCompound();
-        writeToNBT(nbtTag);
+        write(nbtTag);
         return new SPacketUpdateTileEntity(getPos(), 1, nbtTag);
     }
 
@@ -77,30 +87,12 @@ public class ConstructionBlockTileEntity extends TileEntity {
         IBlockState oldMimicBlock = getBlockState();
         NBTTagCompound tagCompound = packet.getNbtCompound();
         super.onDataPacket(net, packet);
-        readFromNBT(tagCompound);
+        read(tagCompound);
         if (world.isRemote) {
             // If needed send a render update.
-            if (getBlockState() != oldMimicBlock) {
+            if (!getBlockState().equals(oldMimicBlock)) {
                 world.markBlockRangeForRenderUpdate(getPos(), getPos());
             }
         }
-    }
-
-    @Override
-    public NBTTagCompound writeToNBT(NBTTagCompound compound) {
-        super.writeToNBT(compound);
-        if (blockState != null) {
-            NBTTagCompound blockStateTag = new NBTTagCompound();
-            NBTTagCompound actualBlockStateTag = new NBTTagCompound();
-            if (blockState != null) {
-                NBTUtil.writeBlockState(blockStateTag, blockState);
-                compound.setTag("blockState", blockStateTag);
-            }
-            if (actualBlockState != null) {
-                NBTUtil.writeBlockState(actualBlockStateTag, actualBlockState);
-                compound.setTag("actualBlockState", actualBlockStateTag);
-            }
-        }
-        return compound;
     }
 }

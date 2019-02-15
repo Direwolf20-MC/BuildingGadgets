@@ -1,22 +1,22 @@
 package com.direwolf20.buildinggadgets.common.tools;
 
-import com.direwolf20.buildinggadgets.common.items.ModItems;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
 import com.direwolf20.buildinggadgets.common.items.pastes.ConstructionPaste;
-import com.direwolf20.buildinggadgets.common.items.pastes.GenericPasteContainer;
+import com.direwolf20.buildinggadgets.common.items.pastes.ConstructionPasteContainer;
+import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
+import com.direwolf20.buildinggadgets.common.utils.GadgetUtils;
 import com.google.common.collect.ImmutableSet;
 import net.minecraft.block.*;
-import net.minecraft.block.properties.IProperty;
-import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.init.Blocks;
+import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.state.EnumProperty;
+import net.minecraft.state.IProperty;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.items.CapabilityItemHandler;
@@ -24,17 +24,21 @@ import net.minecraftforge.items.IItemHandler;
 
 import java.util.*;
 
+/**
+ * @MajorTuvok
+ * Please check of the changes with the Sets as I've had to to some guess work
+ */
 public class InventoryManipulation {
-    private static IProperty AXIS = PropertyEnum.create("axis", EnumFacing.Axis.class);
-    private static final Set<IProperty> SAFE_PROPERTIES = ImmutableSet.of(BlockSlab.HALF, BlockStairs.HALF, BlockLog.LOG_AXIS, AXIS, BlockDirectional.FACING,
-            BlockStairs.FACING, BlockTrapDoor.HALF, BlockTorch.FACING, BlockStairs.SHAPE, BlockLever.FACING, BlockLever.POWERED, BlockRedstoneRepeater.DELAY,
-            BlockStoneSlab.VARIANT, BlockWoodSlab.VARIANT, BlockDoubleWoodSlab.VARIANT, BlockDoubleStoneSlab.VARIANT);
+    private static IProperty AXIS = EnumProperty.create("axis", EnumFacing.Axis.class);
 
-    private static final Set<IProperty> SAFE_PROPERTIES_COPY_PASTE = ImmutableSet.<IProperty>builder().addAll(SAFE_PROPERTIES)
-            .addAll(ImmutableSet.of(BlockDoubleWoodSlab.VARIANT, BlockRail.SHAPE, BlockRailPowered.SHAPE)).build();
+    private static final Set<IProperty> SAFE_PROPERTIES =
+            ImmutableSet.of(BlockSlab.TYPE, BlockStairs.HALF, BlockLog.AXIS, AXIS, BlockDirectional.FACING, BlockStairs.FACING, BlockTrapDoor.HALF, BlockStairs.SHAPE, BlockLever.POWERED, BlockRedstoneRepeater.DELAY);
+
+    private static final Set<IProperty> SAFE_PROPERTIES_COPY_PASTE =
+            ImmutableSet.<IProperty>builder().addAll(SAFE_PROPERTIES).addAll(ImmutableSet.of(BlockRail.SHAPE, BlockRailPowered.SHAPE)).build();
 
     public static boolean giveItem(ItemStack itemStack, EntityPlayer player) {
-        if (player.capabilities.isCreativeMode) {
+        if (player.isCreative()) {
             return true;
         }
         if (itemStack.getItem() instanceof ConstructionPaste) {
@@ -50,7 +54,7 @@ public class InventoryManipulation {
                 for (int i = 0; i < container.getSlots(); i++) {
                     ItemStack containerItem = container.getStackInSlot(i);
                     ItemStack giveItemStack = itemStack.copy();
-                    if (containerItem.getItem() == giveItemStack.getItem() && containerItem.getMetadata() == giveItemStack.getMetadata()) {
+                    if (containerItem.getItem() == giveItemStack.getItem()) {
                         giveItemStack = container.insertItem(i, giveItemStack, false);
                         if (giveItemStack.isEmpty()) {
                             return true;
@@ -60,12 +64,11 @@ public class InventoryManipulation {
             }
         }
         ItemStack giveItemStack = itemStack.copy();
-        boolean success = inv.addItemStackToInventory(giveItemStack);
-        return success;
+        return inv.addItemStackToInventory(giveItemStack);
     }
 
     public static boolean useItem(ItemStack itemStack, EntityPlayer player, int count, World world) {
-        if (player.capabilities.isCreativeMode) {
+        if (player.isCreative()) {
             return true;
         }
 
@@ -74,7 +77,7 @@ public class InventoryManipulation {
         if (remoteInventory != null) {
             for (int i = 0; i < remoteInventory.getSlots(); i++) {
                 ItemStack containerItem = remoteInventory.getStackInSlot(i);
-                if (containerItem.getItem() == itemStack.getItem() && containerItem.getMetadata() == itemStack.getMetadata() && containerItem.getCount() >= count) {
+                if (containerItem.getItem() == itemStack.getItem() && containerItem.getCount() >= count) {
                     remoteInventory.extractItem(i, count, false);
                     return true;
                 }
@@ -84,14 +87,14 @@ public class InventoryManipulation {
 
         InventoryPlayer inv = player.inventory;
 
-        List<Integer> slots = findItem(itemStack.getItem(), itemStack.getMetadata(), inv);
+        List<Integer> slots = findItem(itemStack.getItem(), inv);
         List<IItemHandler> invContainers = findInvContainers(inv);
 
         if (invContainers.size() > 0) {
             for (IItemHandler container : invContainers) {
                 for (int i = 0; i < container.getSlots(); i++) {
                     ItemStack containerItem = container.getStackInSlot(i);
-                    if (containerItem.getItem() == itemStack.getItem() && containerItem.getMetadata() == itemStack.getMetadata() && containerItem.getCount() >= count) {
+                    if (containerItem.getItem() == itemStack.getItem() && containerItem.getCount() >= count) {
                         container.extractItem(i, count, false);
                         return true;
                     }
@@ -117,24 +120,24 @@ public class InventoryManipulation {
     public static int countItem(ItemStack itemStack, EntityPlayer player, World world) {
         return countItem(itemStack, player, (tool, stack) -> {
             IItemHandler remoteInventory = GadgetUtils.getRemoteInventory(tool, world);
-            return remoteInventory == null ? 0 : countInContainer(remoteInventory, stack.getItem(), stack.getMetadata());
+            return remoteInventory == null ? 0 : countInContainer(remoteInventory, stack.getItem());
         });
     }
 
     public static int countItem(ItemStack itemStack, EntityPlayer player, IRemoteInventoryProvider remoteInventory) {
-        if (player.capabilities.isCreativeMode) {
+        if (player.isCreative())
             return Integer.MAX_VALUE;
-        }
+
         long count = remoteInventory.countItem(GadgetGeneric.getGadget(player), itemStack);
         InventoryPlayer inv = player.inventory;
-        List<Integer> slots = findItem(itemStack.getItem(), itemStack.getMetadata(), inv);
+        List<Integer> slots = findItem(itemStack.getItem(), inv);
         List<IItemHandler> invContainers = findInvContainers(inv);
         if (slots.size() == 0 && invContainers.size() == 0 && count == 0) {
             return 0;
         }
         if (invContainers.size() > 0) {
             for (IItemHandler container : invContainers) {
-                count += countInContainer(container, itemStack.getItem(), itemStack.getMetadata());
+                count += countInContainer(container, itemStack.getItem());
             }
         }
 
@@ -146,25 +149,26 @@ public class InventoryManipulation {
     }
 
     public static int countPaste(EntityPlayer player) {
-        if (player.capabilities.isCreativeMode) {
+        if (player.isCreative())
             return Integer.MAX_VALUE;
-        }
+
         long count = 0;
         InventoryPlayer inv = player.inventory;
-        Item item = ModItems.constructionPaste;
-        List<Integer> slots = findItem(item, 0, inv);
+        Item item = BGItems.constructionPaste;
+        List<Integer> slots = findItem(item, inv);
         if (slots.size() > 0) {
             for (int slot : slots) {
                 ItemStack stackInSlot = inv.getStackInSlot(slot);
                 count += stackInSlot.getCount();
             }
         }
-        List<Integer> containerSlots = findItemClass(GenericPasteContainer.class, inv);
+
+        List<Integer> containerSlots = findItemClass(ConstructionPasteContainer.class, inv);
         if (containerSlots.size() > 0) {
             for (int slot : containerSlots) {
                 ItemStack stackInSlot = inv.getStackInSlot(slot);
-                if (stackInSlot.getItem() instanceof GenericPasteContainer) {
-                    count += GenericPasteContainer.getPasteAmount(stackInSlot);
+                if (stackInSlot.getItem() instanceof ConstructionPasteContainer) {
+                    count = count + ConstructionPasteContainer.getPasteAmount(stackInSlot);
                 }
             }
         }
@@ -185,14 +189,14 @@ public class InventoryManipulation {
             return itemStack;
         }
         InventoryPlayer inv = player.inventory;
-        List<Integer> slots = findItemClass(GenericPasteContainer.class, inv);
+        List<Integer> slots = findItemClass(ConstructionPasteContainer.class, inv);
         if (slots.size() == 0) {
             return itemStack;
         }
 
-        Map<Integer, Integer> slotMap = new HashMap<Integer, Integer>();
+        Map<Integer, Integer> slotMap = new HashMap<>();
         for (int slot : slots) {
-            slotMap.put(slot, GenericPasteContainer.getPasteAmount(inv.getStackInSlot(slot)));
+            slotMap.put(slot, ConstructionPasteContainer.getPasteAmount(inv.getStackInSlot(slot)));
         }
         List<Map.Entry<Integer, Integer>> list = new ArrayList<>(slotMap.entrySet());
         Comparator<Map.Entry<Integer, Integer>> comparator = Comparator.comparing(entry -> entry.getValue());
@@ -202,8 +206,8 @@ public class InventoryManipulation {
 
         for (Map.Entry<Integer, Integer> entry : list) {
             ItemStack containerStack = inv.getStackInSlot(entry.getKey());
-            int maxAmount = ((GenericPasteContainer) containerStack.getItem()).getMaxCapacity();
-            int pasteInContainer = GenericPasteContainer.getPasteAmount(containerStack);
+            int maxAmount = ((ConstructionPasteContainer) containerStack.getItem()).getMaxCapacity();
+            int pasteInContainer = ConstructionPasteContainer.getPasteAmount(containerStack);
             int freeSpace = maxAmount - pasteInContainer;
             int stackSize = itemStack.getCount();
             int remainingPaste = stackSize - freeSpace;
@@ -212,17 +216,17 @@ public class InventoryManipulation {
             }
             int usedPaste = Math.abs(stackSize - remainingPaste);
             itemStack.setCount(remainingPaste);
-            GenericPasteContainer.setPasteAmount(containerStack, pasteInContainer + usedPaste);
+            ConstructionPasteContainer.setPasteAmount(containerStack, pasteInContainer + usedPaste);
         }
         return itemStack;
     }
 
     public static boolean usePaste(EntityPlayer player, int count) {
-        if (player.capabilities.isCreativeMode) {
+        if (player.isCreative()) {
             return true;
         }
         InventoryPlayer inv = player.inventory;
-        List<Integer> slots = findItem(ModItems.constructionPaste, 0, inv);
+        List<Integer> slots = findItem(BGItems.constructionPaste, inv);
         if (slots.size() > 0) {
             for (int slot : slots) {
                 ItemStack pasteStack = inv.getStackInSlot(slot);
@@ -232,14 +236,14 @@ public class InventoryManipulation {
                 }
             }
         }
-        List<Integer> containerSlots = findItemClass(GenericPasteContainer.class, inv);
+        List<Integer> containerSlots = findItemClass(ConstructionPasteContainer.class, inv);
         if (containerSlots.size() > 0) {
             for (int slot : containerSlots) {
                 ItemStack containerStack = inv.getStackInSlot(slot);
-                if (containerStack.getItem() instanceof GenericPasteContainer) {
-                    int pasteAmt = GenericPasteContainer.getPasteAmount(containerStack);
+                if (containerStack.getItem() instanceof ConstructionPasteContainer) {
+                    int pasteAmt = ConstructionPasteContainer.getPasteAmount(containerStack);
                     if (pasteAmt >= count) {
-                        GenericPasteContainer.setPasteAmount(containerStack, pasteAmt - count);
+                        ConstructionPasteContainer.setPasteAmount(containerStack, pasteAmt - count);
                         return true;
                     }
 
@@ -250,33 +254,34 @@ public class InventoryManipulation {
     }
 
     private static List<IItemHandler> findInvContainers(InventoryPlayer inv) {
-        List<IItemHandler> containers = new ArrayList<IItemHandler>();
+        List<IItemHandler> containers = new ArrayList<>();
+
         for (int i = 0; i < 36; ++i) {
             ItemStack stack = inv.getStackInSlot(i);
-            if (stack.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null)) {
-                containers.add(stack.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null));
-            }
+            stack.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
+                    .ifPresent(containers::add);
         }
+
         return containers;
     }
 
-    public static int countInContainer(IItemHandler container, Item item, int meta) {
+    public static int countInContainer(IItemHandler container, Item item) {
         int count = 0;
         ItemStack tempItem;
         for (int i = 0; i < container.getSlots(); ++i) {
             tempItem = container.getStackInSlot(i);
-            if (tempItem.getItem() == item && tempItem.getMetadata() == meta) {
+            if (tempItem.getItem() == item) {
                 count += tempItem.getCount();
             }
         }
         return count;
     }
 
-    private static List<Integer> findItem(Item item, int meta, InventoryPlayer inv) {
-        List<Integer> slots = new ArrayList<Integer>();
+    private static List<Integer> findItem(Item item, InventoryPlayer inv) {
+        List<Integer> slots = new ArrayList<>();
         for (int i = 0; i < 36; ++i) {
             ItemStack stack = inv.getStackInSlot(i);
-            if (!stack.isEmpty() && stack.getItem() == item && meta == stack.getMetadata()) {
+            if (!stack.isEmpty() && stack.getItem() == item) {
                 slots.add(i);
             }
         }
@@ -284,7 +289,7 @@ public class InventoryManipulation {
     }
 
     public static List<Integer> findItemClass(Class c, InventoryPlayer inv) {
-        List<Integer> slots = new ArrayList<Integer>();
+        List<Integer> slots = new ArrayList<>();
         for (int i = 0; i < 36; ++i) {
             ItemStack stack = inv.getStackInSlot(i);
             if (!stack.isEmpty() && c.isInstance(stack.getItem())) {
@@ -295,43 +300,34 @@ public class InventoryManipulation {
     }
 
     public static ItemStack getSilkTouchDrop(IBlockState state) {
-        Item item = Item.getItemFromBlock(state.getBlock());
-        int i = 0;
-        if (item.getHasSubtypes()) {
-            i = state.getBlock().damageDropped(state);
-        }
-        return new ItemStack(item, 1, i);
+        return new ItemStack(state.getBlock());
     }
 
     public static IBlockState getSpecificStates(IBlockState originalState, World world, EntityPlayer player, BlockPos pos, ItemStack tool) {
-        IBlockState placeState = Blocks.AIR.getDefaultState();
+        IBlockState placeState;
         Block block = originalState.getBlock();
         ItemStack item = block.getPickBlock(originalState, null, world, pos, player);
-        int meta = item.getMetadata();
+
         try {
-            placeState = originalState.getBlock().getStateForPlacement(world, pos, EnumFacing.UP, 0, 0, 0, meta, player, EnumHand.MAIN_HAND);
+            placeState = originalState.getBlock().getStateForPlacement(
+                    new BlockItemUseContext(world, player, item, pos, EnumFacing.UP, 0.5F, 0.0F, 0.5F)
+            );
         } catch (Exception var8) {
             placeState = originalState.getBlock().getDefaultState();
         }
-        for (IProperty prop : placeState.getPropertyKeys()) {
+
+        for (IProperty prop : placeState.getProperties()) {
             if (tool.getItem() instanceof GadgetCopyPaste) {
                 if (SAFE_PROPERTIES_COPY_PASTE.contains(prop)) {
-                    placeState = placeState.withProperty(prop, originalState.getValue(prop));
+                    placeState = placeState.with(prop, originalState.get(prop));
                 }
             } else {
                 if (SAFE_PROPERTIES.contains(prop)) {
-                    placeState = placeState.withProperty(prop, originalState.getValue(prop));
+                    placeState = placeState.with(prop, originalState.get(prop));
                 }
             }
         }
         return placeState;
 
     }
-
-    /*public static IBlockState getBaseState(IBlockState originalState, World world, EntityPlayer player, BlockPos pos) {
-        IBlockState placeState = Blocks.AIR.getDefaultState();
-        Block block = originalState.getBlock();
-        placeState = originalState.getBlock().getDefaultState();
-        return placeState;
-    }*/
 }

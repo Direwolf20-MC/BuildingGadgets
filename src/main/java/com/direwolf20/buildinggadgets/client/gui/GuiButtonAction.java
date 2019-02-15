@@ -1,9 +1,7 @@
 package com.direwolf20.buildinggadgets.client.gui;
 
-import java.awt.Color;
+import java.awt.*;
 import java.util.function.Predicate;
-
-import net.minecraft.client.Minecraft;
 
 public class GuiButtonAction extends GuiButtonColor {
     private Predicate<Boolean> action;
@@ -19,12 +17,8 @@ public class GuiButtonAction extends GuiButtonColor {
     }
 
     @Override
-    public boolean mousePressed(Minecraft mc, int mouseX, int mouseY) {
-        boolean pressed = super.mousePressed(mc, mouseX, mouseY);
-        if (pressed) {
-            action.test(true);
-            toggleSelected();
-        }
-        return pressed;
+    public void onClick(double mouseX, double mouseY) {
+        action.test(true);
+        toggleSelected();
     }
 }

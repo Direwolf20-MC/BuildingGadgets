@@ -1,15 +1,14 @@
 package com.direwolf20.buildinggadgets.common.items.gadgets;
 
-import com.direwolf20.buildinggadgets.client.gui.GuiProxy;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
-import com.direwolf20.buildinggadgets.common.blocks.ModBlocks;
-import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
+import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
+import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
 import com.direwolf20.buildinggadgets.common.tools.BlockMapIntState;
-import com.direwolf20.buildinggadgets.common.tools.GadgetUtils;
-import com.direwolf20.buildinggadgets.common.tools.VectorTools;
-import com.direwolf20.buildinggadgets.common.tools.WorldSave;
+import com.direwolf20.buildinggadgets.common.utils.GadgetUtils;
+import com.direwolf20.buildinggadgets.common.utils.VectorUtil;
+import com.direwolf20.buildinggadgets.common.world.WorldSave;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
@@ -21,14 +20,12 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.*;
 import net.minecraft.util.EnumFacing.Axis;
-import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
@@ -43,52 +40,51 @@ import java.util.*;
 
 public class GadgetDestruction extends GadgetGeneric {
 
-    public GadgetDestruction() {
-        setRegistryName("destructiontool");        // The unique name (within your mod) that identifies this item
-        setUnlocalizedName(BuildingGadgets.MODID + ".destructiontool");     // Used for localization (en_US.lang)
-        setMaxStackSize(1);
-        setMaxDamage(SyncedConfig.durabilityDestruction);
-    }
+    public static final ResourceLocation REGISTRY_NAME = new ResourceLocation(BuildingGadgets.MODID,"gadgets/destruction");
 
-    @Override
-    public int getMaxDamage(ItemStack stack) {
-        return SyncedConfig.poweredByFE ? 0 : SyncedConfig.durabilityDestruction;
+    public GadgetDestruction(Builder builder) {
+        super(builder.defaultMaxDamage(Config.GADGETS.GADGET_DESTRUCTION.durability.get()));
     }
 
     @Override
     public int getEnergyMax() {
-        return SyncedConfig.energyMaxDestruction;
+        return Config.GADGETS.GADGET_DESTRUCTION.maxEnergy.get();
+    }
+
+    @Override
+    public int getMaxDamage(ItemStack stack) {
+        return Config.GADGETS.poweredByFE.get() ? 0 : Config.GADGETS.GADGET_DESTRUCTION.durability.get();
     }
 
     @Override
     public int getEnergyCost(ItemStack tool) {
-        return SyncedConfig.energyCostDestruction * getCostMultiplier(tool);
+        return Config.GADGETS.GADGET_DESTRUCTION.energyCost.get() * getCostMultiplier(tool);
     }
 
     @Override
     public int getDamageCost(ItemStack tool) {
-        return SyncedConfig.damageCostDestruction * getCostMultiplier(tool);
+        return Config.GADGETS.GADGET_DESTRUCTION.durabilityCost.get() * getCostMultiplier(tool);
     }
 
     private int getCostMultiplier(ItemStack tool) {
-        return (int) (SyncedConfig.nonFuzzyEnabledDestruction && !getFuzzy(tool) ? SyncedConfig.nonFuzzyMultiplierDestruction : 1);
+        return (int) (Config.GADGETS.poweredByFE.get() && !getFuzzy(tool) ? Config.GADGETS.GADGET_DESTRUCTION.nonFuzzyMultiplier.get() : 1);
     }
 
     @Override
-    public void addInformation(ItemStack stack, @Nullable World world, List<String> list, ITooltipFlag b) {
-        super.addInformation(stack, world, list, b);
-        list.add(TextFormatting.RED + I18n.format("tooltip.gadget.destroywarning"));
-        list.add(TextFormatting.AQUA + I18n.format("tooltip.gadget.destroyshowoverlay") + ": " + getOverlay(stack));
-        list.add(TextFormatting.YELLOW + I18n.format("tooltip.gadget.connectedarea") + ": " + getConnectedArea(stack));
-        if (SyncedConfig.nonFuzzyEnabledDestruction)
-            list.add(TextFormatting.GOLD + I18n.format("tooltip.gadget.fuzzy") + ": " + getFuzzy(stack));
+    public void addInformation(ItemStack stack, @Nullable World world, List<ITextComponent> tooltip, ITooltipFlag flag) {
+        super.addInformation(stack, world, tooltip, flag);
+        tooltip.add(new TextComponentString(TextFormatting.RED + I18n.format("tooltip.gadget.destroywarning")));
+        tooltip.add(new TextComponentString(TextFormatting.AQUA + I18n.format("tooltip.gadget.destroyshowoverlay") + ": " + getOverlay(stack)));
+        tooltip.add(new TextComponentString(TextFormatting.YELLOW + I18n.format("tooltip.gadget.connectedarea") + ": " + getConnectedArea(stack)));
+        if (Config.GADGETS.GADGET_DESTRUCTION.nonFuzzyEnabled.get())
+            tooltip.add(new TextComponentString(TextFormatting.GOLD + I18n.format("tooltip.gadget.fuzzy") + ": " + getFuzzy(stack)));
 
-        addEnergyInformation(list,stack);
+        addEnergyInformation(tooltip, stack);
     }
 
     @Nullable
     public static String getUUID(ItemStack stack) {
-        NBTTagCompound tagCompound = stack.getTagCompound();
+        NBTTagCompound tagCompound = stack.getTag();
         if (tagCompound == null) {
             tagCompound = new NBTTagCompound();
         }
@@ -96,7 +92,7 @@ public class GadgetDestruction extends GadgetGeneric {
         if (uuid.isEmpty()) {
             UUID uid = UUID.randomUUID();
             tagCompound.setString("UUID", uid.toString());
-            stack.setTagCompound(tagCompound);
+            stack.setTag(tagCompound);
             uuid = uid.toString();
         }
         return uuid;
@@ -111,23 +107,23 @@ public class GadgetDestruction extends GadgetGeneric {
     }
 
     public static void setAnchorSide(ItemStack stack, EnumFacing side) {
-        NBTTagCompound tagCompound = stack.getTagCompound();
+        NBTTagCompound tagCompound = stack.getTag();
         if (tagCompound == null) {
             tagCompound = new NBTTagCompound();
         }
         if (side == null) {
             if (tagCompound.getTag("anchorSide") != null) {
                 tagCompound.removeTag("anchorSide");
-                stack.setTagCompound(tagCompound);
+                stack.setTag(tagCompound);
             }
             return;
         }
         tagCompound.setString("anchorSide", side.getName());
-        stack.setTagCompound(tagCompound);
+        stack.setTag(tagCompound);
     }
 
     public static EnumFacing getAnchorSide(ItemStack stack) {
-        NBTTagCompound tagCompound = stack.getTagCompound();
+        NBTTagCompound tagCompound = stack.getTag();
         if (tagCompound == null) {
             return null;
         }
@@ -138,47 +134,47 @@ public class GadgetDestruction extends GadgetGeneric {
 
     public static void setToolValue(ItemStack stack, int value, String valueName) {
         //Store the tool's range in NBT as an Integer
-        NBTTagCompound tagCompound = stack.getTagCompound();
+        NBTTagCompound tagCompound = stack.getTag();
         if (tagCompound == null) {
             tagCompound = new NBTTagCompound();
         }
-        tagCompound.setInteger(valueName, value);
-        stack.setTagCompound(tagCompound);
+        tagCompound.setInt(valueName, value);
+        stack.setTag(tagCompound);
     }
 
     public static int getToolValue(ItemStack stack, String valueName) {
         //Store the tool's range in NBT as an Integer
-        NBTTagCompound tagCompound = stack.getTagCompound();
+        NBTTagCompound tagCompound = stack.getTag();
         if (tagCompound == null) {
             tagCompound = new NBTTagCompound();
         }
-        return tagCompound.getInteger(valueName);
+        return tagCompound.getInt(valueName);
     }
 
     public static boolean getOverlay(ItemStack stack) {
-        NBTTagCompound tagCompound = stack.getTagCompound();
+        NBTTagCompound tagCompound = stack.getTag();
         if (tagCompound == null) {
             tagCompound = new NBTTagCompound();
             tagCompound.setBoolean("overlay", true);
             tagCompound.setBoolean("fuzzy", true);
-            stack.setTagCompound(tagCompound);
+            stack.setTag(tagCompound);
             return true;
         }
         if (tagCompound.hasKey("overlay")) {
             return tagCompound.getBoolean("overlay");
         }
         tagCompound.setBoolean("overlay", true);
-        stack.setTagCompound(tagCompound);
+        stack.setTag(tagCompound);
         return true;
     }
 
     public static void setOverlay(ItemStack stack, boolean showOverlay) {
-        NBTTagCompound tagCompound = stack.getTagCompound();
+        NBTTagCompound tagCompound = stack.getTag();
         if (tagCompound == null) {
             tagCompound = new NBTTagCompound();
         }
         tagCompound.setBoolean("overlay", showOverlay);
-        stack.setTagCompound(tagCompound);
+        stack.setTag(tagCompound);
     }
 
     public void switchOverlay(EntityPlayer player, ItemStack stack) {
@@ -212,7 +208,7 @@ public class GadgetDestruction extends GadgetGeneric {
         player.setActiveHand(hand);
         if (!world.isRemote) {
             if (!player.isSneaking()) {
-                RayTraceResult lookingAt = VectorTools.getLookingAt(player);
+                RayTraceResult lookingAt = VectorUtil.getLookingAt(player);
                 if (lookingAt == null && getAnchor(stack) == null) { //If we aren't looking at anything, exit
                     return new ActionResult<ItemStack>(EnumActionResult.FAIL, stack);
                 }
@@ -227,7 +223,8 @@ public class GadgetDestruction extends GadgetGeneric {
             }
         } else {
             if (player.isSneaking()) {
-                player.openGui(BuildingGadgets.instance, GuiProxy.DestructionID, world, hand.ordinal(), 0, 0);
+// @todo: reimplement @since 1.13.x
+                //                player.openGui(BuildingGadgets.instance, GuiProxy.DestructionID, world, hand.ordinal(), 0, 0);
                 return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);
             }
         }
@@ -237,7 +234,7 @@ public class GadgetDestruction extends GadgetGeneric {
     public static void anchorBlocks(EntityPlayer player, ItemStack stack) {
         BlockPos currentAnchor = getAnchor(stack);
         if (currentAnchor == null) {
-            RayTraceResult lookingAt = VectorTools.getLookingAt(player);
+            RayTraceResult lookingAt = VectorUtil.getLookingAt(player);
             if (lookingAt == null) {
                 return;
             }
@@ -257,7 +254,7 @@ public class GadgetDestruction extends GadgetGeneric {
         BlockPos startPos = (getAnchor(stack) == null) ? pos : getAnchor(stack);
         EnumFacing side = (getAnchorSide(stack) == null) ? incomingSide : getAnchorSide(stack);
         ArrayList<EnumFacing> directions = assignDirections(side, player);
-        IBlockState stateTarget = !SyncedConfig.nonFuzzyEnabledDestruction || GadgetGeneric.getFuzzy(stack) ? null : world.getBlockState(pos);
+        IBlockState stateTarget = !Config.GADGETS.GADGET_DESTRUCTION.nonFuzzyEnabled.get() || GadgetGeneric.getFuzzy(stack) ? null : world.getBlockState(pos);
         if (GadgetGeneric.getConnectedArea(stack)) {
             String[] directionNames = new String[] {"right", "left", "up", "down", "depth"};
             AxisAlignedBB area = new AxisAlignedBB(pos);
@@ -307,7 +304,7 @@ public class GadgetDestruction extends GadgetGeneric {
         TileEntity te = world.getTileEntity(voidPos);
         if (currentBlock.getMaterial() == Material.AIR) return false;
         //if (currentBlock.getBlock().getMaterial(currentBlock).isLiquid()) return false;
-        if (currentBlock.equals(ModBlocks.effectBlock.getDefaultState())) return false;
+        if (currentBlock.equals(BGBlocks.effectBlock.getDefaultState())) return false;
         if ((te != null) && !(te instanceof ConstructionBlockTileEntity)) return false;
         if (currentBlock.getBlockHardness(world, voidPos) < 0) return false;
 
@@ -340,7 +337,7 @@ public class GadgetDestruction extends GadgetGeneric {
         for (BlockPos voidPos : voidPosArray) {
             IBlockState blockState = world.getBlockState(voidPos);
             IBlockState pasteState = Blocks.AIR.getDefaultState();
-            if (blockState.getBlock() == ModBlocks.constructionBlock) {
+            if (blockState.getBlock() == BGBlocks.constructionBlock) {
                 TileEntity te = world.getTileEntity(voidPos);
                 if (te instanceof ConstructionBlockTileEntity) {
                     pasteState = ((ConstructionBlockTileEntity) te).getActualBlockState();
@@ -389,19 +386,19 @@ public class GadgetDestruction extends GadgetGeneric {
         tagCompound.setIntArray("stateIntArray", stateIntArray);
         tagCompound.setIntArray("posPasteArray", posPasteArray);
         tagCompound.setIntArray("statePasteArray", statePasteArray);
-        tagCompound.setTag("startPos", NBTUtil.createPosTag(startBlock));
-        tagCompound.setInteger("dim", player.dimension);
+        tagCompound.setTag("startPos", NBTUtil.writeBlockPos(startBlock));
+        tagCompound.setInt("dim", player.dimension);
         tagCompound.setString("UUID", UUID);
         worldSave.addToMap(UUID, tagCompound);
         worldSave.markForSaving();
     }
 
-    public void undo(EntityPlayer player, ItemStack stack) {
+    public static void undo(EntityPlayer player, ItemStack stack) {
         World world = player.world;
         WorldSave worldSave = WorldSave.getWorldSaveDestruction(world);
         NBTTagCompound tagCompound = worldSave.getCompoundFromUUID(getUUID(stack));
         if (tagCompound == null) return;
-        BlockPos startPos = NBTUtil.getPosFromTag(tagCompound.getCompoundTag("startPos"));
+        BlockPos startPos = NBTUtil.readBlockPos(tagCompound.getCompound("startPos"));
         if (startPos == null) return;
         int[] posIntArray = tagCompound.getIntArray("posIntArray");
         int[] stateIntArray = tagCompound.getIntArray("stateIntArray");
@@ -420,7 +417,7 @@ public class GadgetDestruction extends GadgetGeneric {
             IBlockState currentState = world.getBlockState(placePos);
             if (currentState.getMaterial() == Material.AIR || currentState.getMaterial().isLiquid()) {
                 IBlockState placeState = MapIntState.getStateFromSlot((short) stateIntArray[i]);
-                if (placeState.getBlock() == ModBlocks.constructionBlock) {
+                if (placeState.getBlock() == BGBlocks.constructionBlock) {
                     IBlockState pasteState = Blocks.AIR.getDefaultState();
                     for (int j = 0; j < posPasteArray.length; j++) {
                         if (posPasteArray[j] == posIntArray[i]) {

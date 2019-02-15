@@ -1,16 +1,16 @@
 package com.direwolf20.buildinggadgets.common.items.gadgets;
 
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
-import com.direwolf20.buildinggadgets.common.blocks.ModBlocks;
-import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
+import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
-import com.direwolf20.buildinggadgets.common.items.FakeBuilderWorld;
-import com.direwolf20.buildinggadgets.common.items.ModItems;
+import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
+import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
 import com.direwolf20.buildinggadgets.common.tools.BuildingModes;
 import com.direwolf20.buildinggadgets.common.tools.InventoryManipulation;
 import com.direwolf20.buildinggadgets.common.tools.ToolRenders;
 import com.direwolf20.buildinggadgets.common.tools.UndoState;
-import com.direwolf20.buildinggadgets.common.tools.VectorTools;
+import com.direwolf20.buildinggadgets.common.utils.VectorUtil;
+import com.direwolf20.buildinggadgets.common.world.FakeBuilderWorld;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
@@ -23,6 +23,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
@@ -39,7 +40,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static com.direwolf20.buildinggadgets.common.tools.GadgetUtils.*;
+import static com.direwolf20.buildinggadgets.common.utils.GadgetUtils.*;
 
 
 public class GadgetBuilding extends GadgetGeneric {
@@ -59,40 +60,44 @@ public class GadgetBuilding extends GadgetGeneric {
         }
     }
 
-    public GadgetBuilding() {
-        setRegistryName("buildingtool");        // The unique name (within your mod) that identifies this item
-        setUnlocalizedName(BuildingGadgets.MODID + ".buildingtool");     // Used for localization (en_US.lang)
-        setMaxStackSize(1);
-        setMaxDamage(SyncedConfig.durabilityBuilder);
+    public static final ResourceLocation REGISTRY_NAME = new ResourceLocation(BuildingGadgets.MODID,"gadgets/building");
+
+    public GadgetBuilding(Builder builder) {
+        super(builder.defaultMaxDamage(Config.GADGETS.GADGET_BUILDING.durability.get()));
+    }
+
+    @Override
+    public int getEnergyMax() {
+        return Config.GADGETS.GADGET_BUILDING.maxEnergy.get();
     }
 
     @Override
     public int getMaxDamage(ItemStack stack) {
-        return SyncedConfig.poweredByFE ? 0 : SyncedConfig.durabilityBuilder;
+        return Config.GADGETS.poweredByFE.get() ? 0 : Config.GADGETS.GADGET_BUILDING.durability.get();
     }
 
     @Override
     public int getEnergyCost(ItemStack tool) {
-        return SyncedConfig.energyCostBuilder;
+        return Config.GADGETS.GADGET_DESTRUCTION.energyCost.get();
     }
 
     @Override
     public int getDamageCost(ItemStack tool) {
-        return SyncedConfig.damageCostBuilder;
+        return Config.GADGETS.GADGET_BUILDING.durabilityCost.get();
     }
 
     private static void setToolMode(ItemStack stack, ToolMode mode) {
         //Store the tool's mode in NBT as a string
-        NBTTagCompound tagCompound = stack.getTagCompound();
+        NBTTagCompound tagCompound = stack.getTag();
         if (tagCompound == null) {
             tagCompound = new NBTTagCompound();
         }
         tagCompound.setString("mode", mode.name());
-        stack.setTagCompound(tagCompound);
+        stack.setTag(tagCompound);
     }
 
     public static ToolMode getToolMode(ItemStack stack) {
-        NBTTagCompound tagCompound = stack.getTagCompound();
+        NBTTagCompound tagCompound = stack.getTag();
         ToolMode mode = ToolMode.BuildToMe;
         if (tagCompound == null) {
             setToolMode(stack, mode);
@@ -107,26 +112,25 @@ public class GadgetBuilding extends GadgetGeneric {
     }
 
     @Override
-    public void addInformation(ItemStack stack, @Nullable World world, List<String> list, ITooltipFlag b) {
-        //Add tool information to the tooltip
-        super.addInformation(stack, world, list, b);
-        list.add(TextFormatting.DARK_GREEN + I18n.format("tooltip.gadget.block") + ": " + getToolBlock(stack).getBlock().getLocalizedName());
+    public void addInformation(ItemStack stack, @Nullable World world, List<ITextComponent> tooltip, ITooltipFlag flag) {
+        super.addInformation(stack, world, tooltip, flag);
+        tooltip.add(new TextComponentString(TextFormatting.DARK_GREEN + I18n.format("tooltip.gadget.block") + ": " + getToolBlock(stack).getBlock().getRegistryName()));
         ToolMode mode = getToolMode(stack);
-        list.add(TextFormatting.AQUA + I18n.format("tooltip.gadget.mode") + ": " + (mode == ToolMode.Surface && getConnectedArea(stack) ? I18n.format("tooltip.gadget.connected") + " " : "") + mode);
+        tooltip.add(new TextComponentString(TextFormatting.AQUA + I18n.format("tooltip.gadget.mode") + ": " + (mode == ToolMode.Surface && getConnectedArea(stack) ? I18n.format("tooltip.gadget.connected") + " " : "") + mode));
         if (getToolMode(stack) != ToolMode.BuildToMe)
-            list.add(TextFormatting.LIGHT_PURPLE + I18n.format("tooltip.gadget.range") + ": " + getToolRange(stack));
+            tooltip.add(new TextComponentString(TextFormatting.LIGHT_PURPLE + I18n.format("tooltip.gadget.range") + ": " + getToolRange(stack)));
 
         if (getToolMode(stack) == ToolMode.Surface)
-            list.add(TextFormatting.GOLD + I18n.format("tooltip.gadget.fuzzy") + ": " + getFuzzy(stack));
+            tooltip.add(new TextComponentString(TextFormatting.GOLD + I18n.format("tooltip.gadget.fuzzy") + ": " + getFuzzy(stack)));
 
-        addEnergyInformation(list, stack);
+        addEnergyInformation(tooltip, stack);
     }
 
     @Override
     public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
         //On item use, if sneaking, select the block clicked on, else build -- This is called when you right click a tool NOT on a block.
         ItemStack itemstack = player.getHeldItem(hand);
-        /*NBTTagCompound tagCompound = itemstack.getTagCompound();
+        /*NBTTagCompound tagCompound = itemstack.getTag();
         ByteBuf buf = Unpooled.buffer(16);
         ByteBufUtils.writeTag(buf,tagCompound);
         System.out.println(buf.readableBytes());*/
@@ -135,7 +139,7 @@ public class GadgetBuilding extends GadgetGeneric {
             if (player.isSneaking()) {
                 selectBlock(itemstack, player);
             } else {
-                build(player, itemstack);
+//                build(player, itemstack, itemstack.getItem().);
             }
         } else if (!player.isSneaking()) {
             ToolRenders.updateInventoryCache();
@@ -154,15 +158,14 @@ public class GadgetBuilding extends GadgetGeneric {
         player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.toolmode").getUnformattedComponentText() + ": " + mode), true);
     }
 
-    public void rangeChange(EntityPlayer player, ItemStack heldItem) {
+    public static void rangeChange(EntityPlayer player, ItemStack heldItem) {
         //Called when the range change hotkey is pressed
         int range = getToolRange(heldItem);
-        int changeAmount = (getToolMode(heldItem) != ToolMode.Surface || (range % 2 == 0)) ? 1 : 2;
-        if (player.isSneaking())
-            range = (range == 1) ? SyncedConfig.maxRange : range - changeAmount;
-        else
-            range = (range >= SyncedConfig.maxRange) ? 1 : range + changeAmount;
-
+        if (player.isSneaking()) {
+            range = (range == 1) ? Config.GADGETS.maxRange.get() : range - 1;
+        } else {
+            range = (range >= Config.GADGETS.maxRange.get()) ? 1 : range + 1;
+        }
         setToolRange(heldItem, range);
         player.sendStatusMessage(new TextComponentString(TextFormatting.DARK_AQUA + new TextComponentTranslation("message.gadget.toolrange").getUnformattedComponentText() + ": " + range), true);
     }
@@ -173,7 +176,7 @@ public class GadgetBuilding extends GadgetGeneric {
         List<BlockPos> coords = getAnchor(stack);
 
         if (coords.size() == 0) {  //If we don't have an anchor, build in the current spot
-            RayTraceResult lookingAt = VectorTools.getLookingAt(player);
+            RayTraceResult lookingAt = VectorUtil.getLookingAt(player);
             if (lookingAt == null) { //If we aren't looking at anything, exit
                 return false;
             }
@@ -198,7 +201,8 @@ public class GadgetBuilding extends GadgetGeneric {
             for (BlockPos coordinate : coords) {
                 if (fakeWorld.getWorldType() != WorldType.DEBUG_ALL_BLOCK_STATES) {
                     try { //Get the state of the block in the fake world (This lets fences be connected, etc)
-                        state = blockState.getActualState(fakeWorld, coordinate);
+// @todo: reimplement @since 1.13.x
+                        //                        state = blockState.getExtendedState(fakeWorld, coordinate);
                     } catch (Exception var8) {
                     }
                 }
@@ -218,7 +222,7 @@ public class GadgetBuilding extends GadgetGeneric {
         return true;
     }
 
-    public boolean undoBuild(EntityPlayer player) {
+    public static boolean undoBuild(EntityPlayer player) {
         ItemStack heldItem = getGadget(player);
         if (heldItem.isEmpty())
             return false;
@@ -243,7 +247,7 @@ public class GadgetBuilding extends GadgetGeneric {
                 boolean sameDim = (player.dimension == dimension);
                 BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(world, coord, currentBlock, player);
                 boolean cancelled = MinecraftForge.EVENT_BUS.post(e);
-                if (distance < 64 && sameDim && currentBlock != ModBlocks.effectBlock.getDefaultState() && !cancelled) { //Don't allow us to undo a block while its still being placed or too far away
+                if (distance < 64 && sameDim && currentBlock != BGBlocks.effectBlock.getDefaultState() && !cancelled) { //Don't allow us to undo a block while its still being placed or too far away
                     if (currentBlock != Blocks.AIR.getDefaultState()) {
                         currentBlock.getBlock().harvestBlock(world, player, coord, currentBlock, world.getTileEntity(coord), silkTool);
                         world.spawnEntity(new BlockBuildEntity(world, coord, player, currentBlock, 2, getToolActualBlock(heldItem), false));
@@ -272,7 +276,7 @@ public class GadgetBuilding extends GadgetGeneric {
         boolean useConstructionPaste = false;
 
         ItemStack itemStack;
-        if (setBlock.getBlock().canSilkHarvest(world, pos, setBlock, player)) {
+        if (setBlock.getBlock().canSilkHarvest(setBlock, world, pos, player)) {
             itemStack = InventoryManipulation.getSilkTouchDrop(setBlock);
         } else {
             itemStack = setBlock.getBlock().getPickBlock(setBlock, null, world, pos, player);
@@ -282,7 +286,7 @@ public class GadgetBuilding extends GadgetGeneric {
         }
 
         NonNullList<ItemStack> drops = NonNullList.create();
-        setBlock.getBlock().getDrops(drops, world, pos, setBlock, 0);
+        setBlock.getBlock().getDrops(setBlock, drops, world, pos, 0);
         int neededItems = 0;
         for (ItemStack drop : drops) {
             if (drop.getItem().equals(itemStack.getItem())) {
@@ -299,7 +303,7 @@ public class GadgetBuilding extends GadgetGeneric {
         if (ForgeEventFactory.onPlayerBlockPlace(player, blockSnapshot, EnumFacing.UP, EnumHand.MAIN_HAND).isCanceled()) {
             return false;
         }
-        ItemStack constructionPaste = new ItemStack(ModItems.constructionPaste);
+        ItemStack constructionPaste = new ItemStack(BGItems.constructionPaste);
         if (InventoryManipulation.countItem(itemStack, player, world) < neededItems) {
             //if (InventoryManipulation.countItem(constructionStack, player) == 0) {
             if (InventoryManipulation.countPaste(player) < neededItems) {
@@ -337,8 +341,7 @@ public class GadgetBuilding extends GadgetGeneric {
     }
 
     @Override
-    public int getMaxItemUseDuration(ItemStack stack) {
+    public int getUseDuration(ItemStack stack) {
         return 20;
     }
-
 }

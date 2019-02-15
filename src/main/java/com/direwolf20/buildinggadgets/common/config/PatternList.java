@@ -1,15 +1,13 @@
 package com.direwolf20.buildinggadgets.common.config;
 
 import com.google.common.collect.ImmutableList;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.registries.IForgeRegistryEntry;
 
 import javax.annotation.Nonnull;
 import java.util.Collection;
+import java.util.List;
 import java.util.regex.Pattern;
-import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public final class PatternList {
@@ -33,11 +31,11 @@ public final class PatternList {
         return of(Stream.of(regex),true);
     }
 
-    public static PatternList ofResourcePattern(Collection<String> regex) {
+    public static PatternList ofResourcePattern(Collection<? extends String> regex) {
         return of(regex.stream(),true);
     }
 
-    public static PatternList of(Stream<String> strings, boolean convertToResourceLocations) {
+    public static PatternList of(Stream<? extends String> strings, boolean convertToResourceLocations) {
         if (convertToResourceLocations) //this is done, so that users can continue omitting the Minecraft namespace, etc.
             strings = strings.map(ResourceLocation::new).map(ResourceLocation::toString);
         return new PatternList(strings.map(Pattern::compile).collect(ImmutableList.toImmutableList()));
@@ -45,10 +43,6 @@ public final class PatternList {
 
     private PatternList(ImmutableList<Pattern> patterns) {
         this.patterns = patterns;
-    }
-
-    public boolean containsOre(ItemStack stack) {
-        return !stack.isEmpty() && (contains(stack.getItem()) || IntStream.of(OreDictionary.getOreIDs(stack)).mapToObj(OreDictionary::getOreName).anyMatch(this::contains));
     }
 
     public boolean contains(IForgeRegistryEntry<?> object) {
@@ -59,7 +53,7 @@ public final class PatternList {
         return patterns.stream().anyMatch(p -> p.matcher(s).matches());
     }
 
-    public String[] toArray(){
-        return patterns.stream().map(Pattern::toString).toArray(String[]::new);
+    public List<String> toList() {
+        return patterns.stream().map(Pattern::toString).collect(ImmutableList.toImmutableList());
     }
 }

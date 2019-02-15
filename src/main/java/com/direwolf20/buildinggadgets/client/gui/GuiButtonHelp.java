@@ -18,11 +18,11 @@ public class GuiButtonHelp extends GuiButtonSelect {
     }
 
     @Override
-    public void drawButton(Minecraft mc, int mouseX, int mouseY, float partialTicks) {
+    public void render(int mouseX, int mouseY, float partialTicks) {
         if (!visible)
             return;
 
-        GlStateManager.color(1, 1, 1, 1);
+        GlStateManager.color4f(1, 1, 1, 1);
         hovered = mouseX >= x && mouseY >= y && mouseX < x + width && mouseY < y + height;
 
         float x = this.x + 5.5F;
@@ -39,7 +39,7 @@ public class GuiButtonHelp extends GuiButtonSelect {
         BufferBuilder buffer = tessellator.getBuffer();
         GlStateManager.enableBlend();
         GlStateManager.disableTexture2D();
-        GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA,
+        GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA,
                 GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
         buffer.begin(GL11.GL_TRIANGLE_FAN, DefaultVertexFormats.POSITION_COLOR);
         buffer.pos(x, y, 0).color(red, green, blue, 255).endVertex();
@@ -52,16 +52,18 @@ public class GuiButtonHelp extends GuiButtonSelect {
         GlStateManager.enableTexture2D();
         GlStateManager.disableBlend();
 
-        mouseDragged(mc, mouseX, mouseY);
+// REIMPLEMENT
+//        mouseDragged(Minecraft.getInstance(), mouseX, mouseY);
         int colorText = -1;
-        if (packedFGColour != 0)
-            colorText = packedFGColour;
+        if (this.packedFGColor != 0)
+            colorText = this.packedFGColor;
         else if (!enabled)
             colorText = 10526880;
         else if (hovered)
             colorText = 16777120;
 
-        mc.fontRenderer.drawString(displayString, this.x + width / 2 - mc.fontRenderer.getStringWidth(displayString) / 2, this.y + (height - 8) / 2, colorText);
+        Minecraft.getInstance().fontRenderer.drawString(displayString, this.x + width / 2 - Minecraft.getInstance().fontRenderer.getStringWidth(displayString) / 2, this.y + (height - 8) / 2, colorText);
+        super.render(mouseX, mouseY, partialTicks);
     }
 
 }

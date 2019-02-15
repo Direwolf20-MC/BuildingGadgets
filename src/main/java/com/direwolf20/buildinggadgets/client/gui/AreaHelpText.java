@@ -2,14 +2,14 @@ package com.direwolf20.buildinggadgets.client.gui;
 
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiTextField;
+import net.minecraft.client.renderer.Rectangle2d;
 import net.minecraft.inventory.Slot;
-import org.lwjgl.util.Rectangle;
 
 public class AreaHelpText implements IHoverHelpText {
     private int minX, minY, maxX, maxY;
     private String helpTextKey;
 
-    public AreaHelpText(Rectangle rect, int guiLeft, int guiTop, String helpTextKey) {
+    public AreaHelpText(Rectangle2d rect, int guiLeft, int guiTop, String helpTextKey) {
         this(guiLeft + rect.getX(), guiTop + rect.getX(), rect.getWidth(), rect.getHeight(), helpTextKey);
     }
 
@@ -41,7 +41,7 @@ public class AreaHelpText implements IHoverHelpText {
 
     @Override
     public void drawRect(Gui gui, int color) {
-        gui.drawRect(minX, minY, maxX, maxY, color);
+        Gui.drawRect(minX, minY, maxX, maxY, color);
     }
 
 }

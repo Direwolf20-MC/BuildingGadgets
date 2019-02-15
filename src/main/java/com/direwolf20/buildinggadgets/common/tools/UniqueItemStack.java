@@ -8,8 +8,8 @@ public final class UniqueItemStack {
     public final NBTTagCompound nbt;
 
     public UniqueItemStack(ItemStack stack) {
-        uniqueItem = new UniqueItem(stack.getItem(), stack.getMetadata());
-        nbt = stack.getTagCompound();
+        uniqueItem = new UniqueItem(stack.getItem());
+        nbt = stack.getTag();
     }
 
     @Override

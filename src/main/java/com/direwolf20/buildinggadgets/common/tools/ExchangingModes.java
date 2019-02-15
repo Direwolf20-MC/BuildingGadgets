@@ -1,10 +1,10 @@
 package com.direwolf20.buildinggadgets.common.tools;
 
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
-import com.direwolf20.buildinggadgets.common.blocks.ModBlocks;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetExchanger;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
-
+import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
+import com.direwolf20.buildinggadgets.common.utils.GadgetUtils;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
@@ -25,7 +25,7 @@ public class ExchangingModes {
         if (worldBlockState != currentBlock && !fuzzyMode) {
             return false;
         }
-        if (worldBlockState == ModBlocks.effectBlock.getDefaultState()) {
+        if (worldBlockState == BGBlocks.effectBlock.getDefaultState()) {
             return false;
         }
         if (worldBlockState == setBlock) {
@@ -34,8 +34,8 @@ public class ExchangingModes {
         if (te != null && !(te instanceof ConstructionBlockTileEntity)) {
             return false;
         }
-        if (te instanceof ConstructionBlockTileEntity) {
-            if (((ConstructionBlockTileEntity) te).getBlockState() == setBlock) {
+        if (te != null) {
+            if (te.getBlockState() == setBlock) {
                 return false;
             }
         }
@@ -79,8 +79,8 @@ public class ExchangingModes {
         int range = GadgetUtils.getToolRange(tool);
         boolean fuzzyMode = GadgetGeneric.getFuzzy(tool);
 
-        List<BlockPos> coordinates = new ArrayList<BlockPos>();
-//        BlockPos playerPos = new BlockPos(Math.floor(player.posX), Math.floor(player.posY), Math.floor(player.posZ));
+        List<BlockPos> coordinates = new ArrayList<>();
+
         BlockPos pos = startBlock;
         int bound = (range - 1) / 2;
         EnumFacing playerFacing = player.getHorizontalFacing();
@@ -107,8 +107,8 @@ public class ExchangingModes {
         //***************************************************
         if (mode == GadgetExchanger.ToolMode.Surface) {
             if (GadgetGeneric.getConnectedArea(tool)) {
-                AxisAlignedBB area = new AxisAlignedBB(pos).grow(bound * (1 - Math.abs(sideHit.getFrontOffsetX())),
-                        bound * (1 - Math.abs(sideHit.getFrontOffsetY())), bound * (1 - Math.abs(sideHit.getFrontOffsetZ())));
+                AxisAlignedBB area = new AxisAlignedBB(pos).grow(bound * (1 - Math.abs(sideHit.getXOffset())),
+                        bound * (1 - Math.abs(sideHit.getYOffset())), bound * (1 - Math.abs(sideHit.getZOffset())));
                 addConnectedCoords(world, pos, currentBlock, setBlock, fuzzyMode, coordinates,
                         (int) area.minX, (int) area.minY, (int) area.minZ, (int) area.maxX - 1, (int) area.maxY - 1, (int) area.maxZ - 1);
             } else {

@@ -8,65 +8,61 @@ package com.direwolf20.buildinggadgets.client.gui;
 
 import com.direwolf20.buildinggadgets.client.KeyBindings;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
-import com.direwolf20.buildinggadgets.common.ModSounds;
-import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
+import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.items.gadgets.*;
-import com.direwolf20.buildinggadgets.common.network.PacketChangeRange;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
-import com.direwolf20.buildinggadgets.common.network.PacketToggleConnectedArea;
-import com.direwolf20.buildinggadgets.common.network.PacketToggleFuzzy;
-import com.direwolf20.buildinggadgets.common.network.PacketToggleMode;
+import com.direwolf20.buildinggadgets.common.network.packets.PacketChangeRange;
+import com.direwolf20.buildinggadgets.common.network.packets.PacketToggleConnectedArea;
+import com.direwolf20.buildinggadgets.common.network.packets.PacketToggleFuzzy;
+import com.direwolf20.buildinggadgets.common.network.packets.PacketToggleMode;
+import com.direwolf20.buildinggadgets.common.registry.objects.BGSounds;
 import com.google.common.collect.ImmutableSet;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.resources.I18n;
-import net.minecraft.client.settings.GameSettings;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.Vec3d;
-
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.util.vector.Vector2f;
 
+import javax.vecmath.Vector2f;
 import java.awt.*;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ModeRadialMenu extends GuiScreen {
 
     private static final ResourceLocation[] signsBuilding = new ResourceLocation[]{
-            new ResourceLocation(BuildingGadgets.MODID,"textures/ui/build_to_me.png"),
-            new ResourceLocation(BuildingGadgets.MODID,"textures/ui/vertical_column.png"),
-            new ResourceLocation(BuildingGadgets.MODID,"textures/ui/horizontal_column.png"),
-            new ResourceLocation(BuildingGadgets.MODID,"textures/ui/vertical_wall.png"),
-            new ResourceLocation(BuildingGadgets.MODID,"textures/ui/horizontal_wall.png"),
-            new ResourceLocation(BuildingGadgets.MODID,"textures/ui/stairs.png"),
-            new ResourceLocation(BuildingGadgets.MODID,"textures/ui/grid.png"),
-            new ResourceLocation(BuildingGadgets.MODID,"textures/ui/surface.png")
+        new ResourceLocation(BuildingGadgets.MODID, "textures/ui/build_to_me.png"),
+        new ResourceLocation(BuildingGadgets.MODID, "textures/ui/vertical_column.png"),
+        new ResourceLocation(BuildingGadgets.MODID, "textures/ui/horizontal_column.png"),
+        new ResourceLocation(BuildingGadgets.MODID, "textures/ui/vertical_wall.png"),
+        new ResourceLocation(BuildingGadgets.MODID, "textures/ui/horizontal_wall.png"),
+        new ResourceLocation(BuildingGadgets.MODID, "textures/ui/stairs.png"),
+        new ResourceLocation(BuildingGadgets.MODID, "textures/ui/grid.png"),
+        new ResourceLocation(BuildingGadgets.MODID, "textures/ui/surface.png")
     };
     private static final ResourceLocation[] signsExchanger = new ResourceLocation[]{
-            new ResourceLocation(BuildingGadgets.MODID,"textures/ui/surface.png"),
-            new ResourceLocation(BuildingGadgets.MODID,"textures/ui/vertical_column.png"),
-            new ResourceLocation(BuildingGadgets.MODID,"textures/ui/horizontal_column.png"),
-            new ResourceLocation(BuildingGadgets.MODID,"textures/ui/grid.png")
+        new ResourceLocation(BuildingGadgets.MODID, "textures/ui/surface.png"),
+        new ResourceLocation(BuildingGadgets.MODID, "textures/ui/vertical_column.png"),
+        new ResourceLocation(BuildingGadgets.MODID, "textures/ui/horizontal_column.png"),
+        new ResourceLocation(BuildingGadgets.MODID, "textures/ui/grid.png")
     };
     private static final ResourceLocation[] signsCopyPaste = new ResourceLocation[]{
-            new ResourceLocation(BuildingGadgets.MODID,"textures/ui/copy.png"),
-            new ResourceLocation(BuildingGadgets.MODID,"textures/ui/paste.png")
+        new ResourceLocation(BuildingGadgets.MODID, "textures/ui/copy.png"),
+        new ResourceLocation(BuildingGadgets.MODID, "textures/ui/paste.png")
     };
     private int timeIn = 0;
     private int slotSelected = -1;
     private int segments;
 
     public ModeRadialMenu(ItemStack stack) {
-        mc = Minecraft.getMinecraft();
+        mc = Minecraft.getInstance();
         if (stack.getItem() instanceof GadgetGeneric)
             setSocketable(stack);
     }
@@ -86,25 +82,25 @@ public class ModeRadialMenu extends GuiScreen {
         boolean destruction = false;
         if (tool.getItem() instanceof GadgetDestruction) {
             destruction = true;
-            buttonList.add(new GuiButtonAction(I18n.format("tooltip.gadget.destroy.overlay"), send -> {
+            buttons.add(new GuiButtonAction(I18n.format("tooltip.gadget.destroy.overlay"), send -> {
                 if (send)
-                    PacketHandler.INSTANCE.sendToServer(new PacketChangeRange());
+                    PacketHandler.sendToServer(new PacketChangeRange());
 
                 return GadgetDestruction.getOverlay(getGadget());
             }));
         }
         if (!(tool.getItem() instanceof GadgetCopyPaste)) {
-            if (!destruction || SyncedConfig.nonFuzzyEnabledDestruction) {
-                buttonList.add(new GuiButtonAction(I18n.format("tooltip.gadget.fuzzy"), send -> {
+            if (!destruction || Config.GADGETS.GADGET_DESTRUCTION.nonFuzzyEnabled.get()) {
+                buttons.add(new GuiButtonAction(I18n.format("tooltip.gadget.fuzzy"), send -> {
                     if (send)
-                        PacketHandler.INSTANCE.sendToServer(new PacketToggleFuzzy());
+                        PacketHandler.sendToServer(new PacketToggleFuzzy());
 
                     return GadgetGeneric.getFuzzy(getGadget());
                 }));
             }
-            buttonList.add(new GuiButtonAction(I18n.format("message.gadget.connected" + (destruction ? "area" : "surface")), send -> {
+            buttons.add(new GuiButtonAction(I18n.format("message.gadget.connected" + (destruction ? "area" : "surface")), send -> {
                 if (send)
-                    PacketHandler.INSTANCE.sendToServer(new PacketToggleConnectedArea());
+                    PacketHandler.sendToServer(new PacketToggleConnectedArea());
 
                 return GadgetGeneric.getConnectedArea(getGadget());
             }));
@@ -114,9 +110,9 @@ public class ModeRadialMenu extends GuiScreen {
 
     private void updateButtons(ItemStack tool) {
         int x = 0;
-        for (int i = 0; i < buttonList.size(); i++) {
-            GuiButtonSound button = (GuiButtonSound) buttonList.get(i);
-            SoundEvent sound = ModSounds.BEEP.getSound();
+        for (int i = 0; i < buttons.size(); i++) {
+            GuiButtonSound button = (GuiButtonSound) buttons.get(i);
+            SoundEvent sound = BGSounds.BEEP.getSound();
             button.setSounds(sound, sound, 0.6F, 1F);
             if (!button.visible) continue;
             int len = mc.fontRenderer.getStringWidth(button.displayString) + 6;
@@ -126,7 +122,7 @@ public class ModeRadialMenu extends GuiScreen {
             button.y = height / 2 - (tool.getItem() instanceof GadgetDestruction ? button.height + 4 : 110);
         }
         x = width / 2 - (x - 10) / 2;
-        for (GuiButton button : buttonList) {
+        for (GuiButton button : buttons) {
             if (!button.visible) continue;
             button.x = x;
             x += button.width + 10;
@@ -134,19 +130,19 @@ public class ModeRadialMenu extends GuiScreen {
     }
 
     private ItemStack getGadget() {
-        return GadgetGeneric.getGadget(Minecraft.getMinecraft().player);
+        return GadgetGeneric.getGadget(Minecraft.getInstance().player);
     }
 
     @Override
-    public void drawScreen(int mx, int my, float partialTicks) {
+    public void render(int mx, int my, float partialTicks) {
         float stime = 5F;
         float fract = Math.min(stime, timeIn + partialTicks) / stime;
         int x = width / 2;
         int y = height / 2;
         GlStateManager.pushMatrix();
-        GlStateManager.translate((1 - fract) * x, (1 - fract) * y, 0);
-        GlStateManager.scale(fract, fract, fract);
-        super.drawScreen(mx, my, partialTicks);
+        GlStateManager.translatef((1 - fract) * x, (1 - fract) * y, 0);
+        GlStateManager.scalef(fract, fract, fract);
+        super.render(mx, my, partialTicks);
         GlStateManager.popMatrix();
         if (segments == 0)
             return;
@@ -166,7 +162,7 @@ public class ModeRadialMenu extends GuiScreen {
         float totalDeg = 0;
         float degPer = 360F / segments;
 
-        List<int[]> stringPositions = new ArrayList();
+        List<int[]> stringPositions = new ArrayList<>();
 
         ItemStack tool = getGadget();
         if (tool.isEmpty())
@@ -207,7 +203,7 @@ public class ModeRadialMenu extends GuiScreen {
                 r = g = b = 1F;
             }
 
-            GlStateManager.color(r, g, b, a);
+            GlStateManager.color4f(r, g, b, a);
 
             for (float i = degPer; i >= 0; i--) {
                 float rad = (float) ((i + totalDeg) / 180F * Math.PI);
@@ -264,20 +260,20 @@ public class ModeRadialMenu extends GuiScreen {
             xdp = (int) ((xp - x) * mod + x);
             ydp = (int) ((yp - y) * mod + y);
 
-            mc.renderEngine.bindTexture(signs[i]);
+            mc.getTextureManager().bindTexture(signs[i]);
             drawModalRectWithCustomSizedTexture(xdp - 8, ydp - 8, 0, 0, 16, 16, 16, 16);
 
         }
 
         GlStateManager.enableRescaleNormal();
         GlStateManager.enableBlend();
-        GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
+        GlStateManager.blendFuncSeparate(770, 771, 1, 0);
         RenderHelper.enableGUIStandardItemLighting();
 
         float s = 3F * fract;
-        GlStateManager.scale(s, s, s);
-        GlStateManager.translate(x / s - offset, y / s - 8, 0);
-        mc.getRenderItem().renderItemAndEffectIntoGUI(tool, 0, 0);
+        GlStateManager.scalef(s, s, s);
+        GlStateManager.translatef(x / s - offset, y / s - 8, 0);
+        mc.getItemRenderer().renderItemAndEffectIntoGUI(tool, 0, 0);
         RenderHelper.disableStandardItemLighting();
         GlStateManager.disableBlend();
         GlStateManager.disableRescaleNormal();
@@ -287,27 +283,30 @@ public class ModeRadialMenu extends GuiScreen {
 
     private void changeMode() {
         if (slotSelected >= 0) {
-            PacketHandler.INSTANCE.sendToServer(new PacketToggleMode(slotSelected));
-            ModSounds.BEEP.playSound();
+            PacketHandler.sendToServer(new PacketToggleMode(slotSelected));
+            BGSounds.BEEP.playSound();
         }
     }
 
     @Override
-    protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
-        super.mouseClicked(mouseX, mouseY, mouseButton);
-        changeMode();
+    public boolean mouseClicked(double mouseX, double mouseY, int mouseButton) {
+        boolean clicked = super.mouseClicked(mouseX, mouseY, mouseButton);
+        if (clicked)
+            changeMode();
+
+        return clicked;
     }
 
     @Override
-    public void updateScreen() {
-        if (!GameSettings.isKeyDown(KeyBindings.modeSwitch)) {
+    public void tick() {
+        if (!KeyBindings.modeSwitch.isKeyDown()) {
             mc.displayGuiScreen(null);
             changeMode();
         }
 
         ImmutableSet<KeyBinding> set = ImmutableSet.of(mc.gameSettings.keyBindForward, mc.gameSettings.keyBindLeft, mc.gameSettings.keyBindBack, mc.gameSettings.keyBindRight, mc.gameSettings.keyBindSneak, mc.gameSettings.keyBindSprint, mc.gameSettings.keyBindJump);
         for (KeyBinding k : set)
-            KeyBinding.setKeyBindState(k.getKeyCode(), GameSettings.isKeyDown(k));
+            KeyBinding.setKeyBindState(k.getKey(), k.isKeyDown());
 
         timeIn++;
         ItemStack tool = getGadget();
@@ -318,7 +317,7 @@ public class ModeRadialMenu extends GuiScreen {
         boolean curent;
         boolean changed = false;
         for (int i = 0; i < 2; i++) {
-            GuiButton button = buttonList.get(i);
+            GuiButton button = buttons.get(i);
             if (builder)
                 curent = GadgetBuilding.getToolMode(tool) == GadgetBuilding.ToolMode.Surface;
             else
@@ -342,7 +341,7 @@ public class ModeRadialMenu extends GuiScreen {
         Vector2f baseVec = new Vector2f(1F, 0F);
         Vector2f mouseVec = new Vector2f(mx - x, my - y);
 
-        float ang = (float) (Math.acos(Vector2f.dot(baseVec, mouseVec) / (baseVec.length() * mouseVec.length())) * (180F / Math.PI));
+        float ang = (float) (Math.acos(baseVec.dot(mouseVec) / (baseVec.length() * mouseVec.length())) * (180F / Math.PI));
         return my < y ? 360F - ang : ang;
     }
 }

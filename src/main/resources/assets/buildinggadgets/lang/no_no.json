@@ -1,0 +1,20 @@
+{
+  "item.buildinggadgets.buildingtool": "Byggeapparat",
+  "item.buildinggadgets.exchangertool": "Erstatningsapparat",
+  "block.buildinggadgets.effectblock": "(Ubrukt)Effekt Blokk",
+  "key.categories.buildingGadgets": "Byggeapparater",
+  "key.anchorKey": "Forankring",
+  "key.modeSwitch": "Bytte Modus",
+  "key.rangeChange": "Rekkevidde",
+  "key.undoKey": "Angre",
+  "tooltip.gadget.block": "Blokk",
+  "tooltip.gadget.mode": "Modus",
+  "tooltip.gadget.range": "Rekkevidde",
+  "message.gadget.invalidblock": "Ugyldig Blokk",
+  "message.gadget.toolmode": "Apparatmodus",
+  "message.gadget.toolrange": "Apparatrekkevidde",
+  "message.gadget.anchorrender": "Forankret planen",
+  "message.gadget.anchorremove": "Forankring fjernet",
+  "message.gadget.nothingtoundo": "Ingenting å angre",
+  "message.gadget.undofailed": "Angring mislyktes (For langt unna?)"
+}

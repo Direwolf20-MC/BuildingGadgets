@@ -1,8 +1,8 @@
 package com.direwolf20.buildinggadgets.client.gui;
 
-import java.awt.Color;
-
 import net.minecraft.client.Minecraft;
+
+import java.awt.*;
 
 public class GuiButtonColor extends GuiButtonSound {
     private Color colorSelected, colorDeselected;
@@ -18,13 +18,14 @@ public class GuiButtonColor extends GuiButtonSound {
     }
 
     @Override
-    public void drawButton(Minecraft mc, int mouseX, int mouseY, float partialTicks) {
+    public void render(int mouseX, int mouseY, float partialTicks) {
         if (!visible)
             return;
 
+        Minecraft mc = Minecraft.getInstance();
         hovered = mouseX >= x && mouseY >= y && mouseX < x + width && mouseY < y + height;
         drawRect(x, y, x + width, y + height, (selected ? colorSelected : colorDeselected).getRGB());
-        mouseDragged(mc, mouseX, mouseY);
+        renderBg(mc, mouseX, mouseY);
         int textColor = !enabled ? 10526880 : (hovered ? 16777120 : -1);
         mc.fontRenderer.drawString(displayString, x + width / 2 - mc.fontRenderer.getStringWidth(displayString) / 2, y + (height - 8) / 2, textColor);
     }

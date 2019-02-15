@@ -1,0 +1,20 @@
+{
+  "item.buildinggadgets.buildingtool": "Herramienta de construcción",
+  "item.buildinggadgets.exchangertool": "Herramienta de intercambio",
+  "block.buildinggadgets.effectblock": "(Sin uso)Bloque de efecto",
+  "key.categories.buildingGadgets": "Building Gadgets",
+  "key.anchorKey": "Anclaje",
+  "key.modeSwitch": "Cambiar de modo",
+  "key.rangeChange": "Rango",
+  "key.undoKey": "Deshacer",
+  "tooltip.gadget.block": "Bloque",
+  "tooltip.gadget.mode": "Modo",
+  "tooltip.gadget.range": "Rango",
+  "message.gadget.invalidblock": "Bloque invalido",
+  "message.gadget.toolmode": "Modo",
+  "message.gadget.toolrange": "Rango",
+  "message.gadget.anchorrender": "Mostrar anclaje",
+  "message.gadget.anchorremove": "Anclaje eliminado",
+  "message.gadget.nothingtoundo": "Nada que deshacer",
+  "message.gadget.undofailed": "Fallo al deshacer (¿Demasiado lejos?)"
+}

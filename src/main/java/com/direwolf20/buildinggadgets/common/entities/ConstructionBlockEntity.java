@@ -3,7 +3,8 @@ package com.direwolf20.buildinggadgets.common.entities;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlock;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockPowder;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
-import com.direwolf20.buildinggadgets.common.blocks.ModBlocks;
+import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
+import com.direwolf20.buildinggadgets.common.registry.objects.BuildingObjects;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NBTTagCompound;
@@ -21,19 +22,20 @@ public class ConstructionBlockEntity extends Entity {
     private static final DataParameter<Boolean> MAKING = EntityDataManager.createKey(ConstructionBlockEntity.class, DataSerializers.BOOLEAN);
 
     private int despawning = -1;
-    public int maxLife = 80;
+
     private BlockPos setPos;
-    //    private EntityLivingBase spawnedBy;
     private World world;
 
+    int maxLife = 80;
+
     public ConstructionBlockEntity(World worldIn) {
-        super(worldIn);
+        super(BuildingObjects.CONSTRUCTION_BLOCK, worldIn);
         setSize(0.1F, 0.1F);
         world = worldIn;
     }
 
     public ConstructionBlockEntity(World worldIn, BlockPos spawnPos, boolean makePaste) {
-        super(worldIn);
+        super(BuildingObjects.CONSTRUCTION_BLOCK, worldIn);
         setSize(0.1F, 0.1F);
         world = worldIn;
         setPosition(spawnPos.getX(), spawnPos.getY(), spawnPos.getZ());
@@ -41,14 +43,22 @@ public class ConstructionBlockEntity extends Entity {
         setMakingPaste(makePaste);
     }
 
-    public int getTicksExisted() {
+    int getTicksExisted() {
         return ticksExisted;
     }
 
     @Override
-    public void onUpdate() {
-        super.onUpdate();
+    protected void registerData() {
+        this.dataManager.register(FIXED, BlockPos.ORIGIN);
+        this.dataManager.register(MAKING, false);
+    }
 
+    /**
+     * Gets called every tick from main Entity class
+     */
+    @Override
+    public void baseTick() {
+        super.baseTick();
         if (ticksExisted > maxLife) {
             setDespawning();
         }
@@ -58,14 +68,12 @@ public class ConstructionBlockEntity extends Entity {
             }
         }
 
-        if (!isDespawning()) {
-
-        } else {
+        if (isDespawning()) {
             despawnTick();
         }
     }
 
-    public boolean isDespawning() {
+    private boolean isDespawning() {
         return despawning != -1;
     }
 
@@ -76,28 +84,25 @@ public class ConstructionBlockEntity extends Entity {
                 if (!getMakingPaste()) {
                     TileEntity te = world.getTileEntity(setPos);
                     if (te instanceof ConstructionBlockTileEntity) {
-                        IBlockState tempState = ((ConstructionBlockTileEntity) te).getBlockState();
-                        if (tempState == null)
-                            return;
+                        IBlockState tempState = te.getBlockState();
 
-                        int opacity = tempState.getBlock().getLightOpacity(tempState, world, setPos);
-                        boolean neighborBrightness = tempState.getBlock().getUseNeighborBrightness(tempState);
+                        int opacity = tempState.getOpacity(world, setPos);
+                        boolean neighborBrightness = tempState.useNeighborBrightness(world, setPos);
                         if (opacity == 255 || neighborBrightness) {
-                            IBlockState tempSetBlock = ((ConstructionBlockTileEntity) te).getBlockState();
+                            IBlockState tempSetBlock = te.getBlockState();
                             IBlockState tempActualSetBlock = ((ConstructionBlockTileEntity) te).getActualBlockState();
-                            world.setBlockState(setPos, ModBlocks.constructionBlock.getDefaultState()
-                                    .withProperty(ConstructionBlock.BRIGHT, opacity != 255)
-                                    .withProperty(ConstructionBlock.NEIGHBOR_BRIGHTNESS, neighborBrightness));
+                            world.setBlockState(setPos, BGBlocks.constructionBlock.getDefaultState()
+                                    .with(ConstructionBlock.BRIGHT, opacity != 255)
+                                    .with(ConstructionBlock.NEIGHBOR_BRIGHTNESS, neighborBrightness));
                             te = world.getTileEntity(setPos);
                             if (te instanceof ConstructionBlockTileEntity) {
-                                ((ConstructionBlockTileEntity) te).setBlockState(tempSetBlock);
-                                ((ConstructionBlockTileEntity) te).setActualBlockState(tempActualSetBlock);
+                                ((ConstructionBlockTileEntity) te).setBlockState(tempSetBlock, tempActualSetBlock);
                             }
                         }
                     }
                 } else {
-                    if (world.getBlockState(setPos) == ModBlocks.constructionBlockPowder.getDefaultState()) {
-                        world.setBlockState(setPos, ModBlocks.constructionBlock.getDefaultState().withProperty(ConstructionBlock.BRIGHT, false));
+                    if (world.getBlockState(setPos) == BGBlocks.constructionBlockPowder.getDefaultState()) {
+                        world.setBlockState(setPos, BGBlocks.constructionBlock.getDefaultState().with(ConstructionBlock.BRIGHT, false));
                     }
                 }
             }
@@ -107,13 +112,8 @@ public class ConstructionBlockEntity extends Entity {
     private void despawnTick() {
         despawning++;
         if (despawning > 1) {
-            setDead();
+            this.remove();
         }
-    }
-
-    @Override
-    public void setDead() {
-        this.isDead = true;
     }
 
     public void setMakingPaste(Boolean paste) {
@@ -125,31 +125,24 @@ public class ConstructionBlockEntity extends Entity {
     }
 
     @Override
-    public void writeEntityToNBT(NBTTagCompound compound) {
-        compound.setInteger("despawning", despawning);
-        compound.setInteger("ticksExisted", ticksExisted);
-        compound.setTag("setPos", NBTUtil.createPosTag(setPos));
-        compound.setBoolean("makingPaste", getMakingPaste());
+    public boolean isInRangeToRender3d(double x, double y, double z) {
+        return true;
     }
 
     @Override
-    public void readEntityFromNBT(NBTTagCompound compound) {
-        //System.out.println(compound);
-        despawning = compound.getInteger("despawning");
-        ticksExisted = compound.getInteger("ticksExisted");
-        setPos = NBTUtil.getPosFromTag(compound.getCompoundTag("setPos"));
+    protected void readAdditional(NBTTagCompound compound) {
+        despawning = compound.getInt("despawning");
+        ticksExisted = compound.getInt("ticksExisted");
+        setPos = NBTUtil.readBlockPos(compound.getCompound("setPos"));
         setMakingPaste(compound.getBoolean("makingPaste"));
     }
 
     @Override
-    protected void entityInit() {
-        this.dataManager.register(FIXED, BlockPos.ORIGIN);
-        this.dataManager.register(MAKING, false);
-    }
-
-    @Override
-    public boolean isInRangeToRender3d(double x, double y, double z) {
-        return true;
+    protected void writeAdditional(NBTTagCompound compound) {
+        compound.setInt("despawning", despawning);
+        compound.setInt("ticksExisted", ticksExisted);
+        compound.setTag("setPos", NBTUtil.writeBlockPos(setPos));
+        compound.setBoolean("makingPaste", getMakingPaste());
     }
 
     @Override

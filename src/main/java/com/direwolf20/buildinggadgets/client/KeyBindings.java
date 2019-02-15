@@ -3,14 +3,12 @@ package com.direwolf20.buildinggadgets.client;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
+import net.minecraft.client.util.InputMappings;
 import net.minecraftforge.client.settings.IKeyConflictContext;
 import net.minecraftforge.client.settings.KeyConflictContext;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-import org.lwjgl.input.Keyboard;
+import org.lwjgl.glfw.GLFW;
 
-@SideOnly(Side.CLIENT)
 public class KeyBindings {
 
     private static final KeyConflictContextGadget CONFLICT_CONTEXT_GADGET = new KeyConflictContextGadget();
@@ -22,16 +20,16 @@ public class KeyBindings {
     public static KeyBinding connectedAreaKey;
 
     public static void init() {
-        modeSwitch = createBinding("key.modeSwitch", Keyboard.KEY_G);
-        rangeChange = createBinding("key.rangeChange", Keyboard.KEY_R);
-        undoKey = createBinding("key.undoKey", Keyboard.KEY_U);
-        anchorKey = createBinding("key.anchorKey", Keyboard.KEY_H);
-        fuzzyKey = createBinding("key.fuzzyKey", Keyboard.KEY_NONE);
-        connectedAreaKey = createBinding("key.connectedarea", Keyboard.KEY_NONE);
+        modeSwitch = createBinding("key.modeSwitch", GLFW.GLFW_KEY_G);
+        rangeChange = createBinding("key.rangeChange", GLFW.GLFW_KEY_R);
+        undoKey = createBinding("key.undoKey", GLFW.GLFW_KEY_U);
+        anchorKey = createBinding("key.anchorKey", GLFW.GLFW_KEY_H);
+        fuzzyKey = createBinding("key.fuzzyKey", GLFW.GLFW_KEY_UNKNOWN);
+        connectedAreaKey = createBinding("key.connectedarea", GLFW.GLFW_KEY_UNKNOWN);
     }
 
     private static KeyBinding createBinding(String name, int key) {
-        KeyBinding keyBinding = new KeyBinding(name, CONFLICT_CONTEXT_GADGET, key, "key.categories.buildingGadgets");
+        KeyBinding keyBinding = new KeyBinding("key" + name, CONFLICT_CONTEXT_GADGET, InputMappings.Type.KEYSYM.getOrMakeInput(key), "key.categories.buildingGadgets");
         ClientRegistry.registerKeyBinding(keyBinding);
         return keyBinding;
     }
@@ -40,8 +38,8 @@ public class KeyBindings {
     {
         @Override
         public boolean isActive() {
-            return !KeyConflictContext.GUI.isActive() && Minecraft.getMinecraft().player != null
-                    && !GadgetGeneric.getGadget(Minecraft.getMinecraft().player).isEmpty();
+            return !KeyConflictContext.GUI.isActive() && Minecraft.getInstance().player != null
+                    && !GadgetGeneric.getGadget(Minecraft.getInstance().player).isEmpty();
         }
 
         @Override

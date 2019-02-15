@@ -1,27 +1,21 @@
 package com.direwolf20.buildinggadgets.client;
 
-import java.util.concurrent.TimeUnit;
-
-import javax.annotation.Nullable;
-
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
-
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
-import com.direwolf20.buildinggadgets.common.network.PacketSetRemoteInventoryCache;
-import com.direwolf20.buildinggadgets.common.tools.GadgetUtils;
+import com.direwolf20.buildinggadgets.common.network.packets.PacketSetRemoteInventoryCache;
 import com.direwolf20.buildinggadgets.common.tools.InventoryManipulation.IRemoteInventoryProvider;
 import com.direwolf20.buildinggadgets.common.tools.UniqueItem;
+import com.direwolf20.buildinggadgets.common.utils.GadgetUtils;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.Multiset;
-
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.BlockPos;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 
-@SideOnly(Side.CLIENT)
+import javax.annotation.Nullable;
+import java.util.concurrent.TimeUnit;
+
 public class RemoteInventoryCache implements IRemoteInventoryProvider {
     private boolean isCopyPaste, forceUpdate;
     private Pair<Integer, BlockPos> locCached;
@@ -46,15 +40,16 @@ public class RemoteInventoryCache implements IRemoteInventoryProvider {
         if (isCacheOld(loc))
             updateCache(loc);
 
-        return cache == null ? 0 : cache.count(new UniqueItem(stack.getItem(), stack.getMetadata()));
+        return cache == null ? 0 : cache.count(new UniqueItem(stack.getItem()));
     }
 
     private void updateCache(Pair<Integer, BlockPos> loc) {
         locCached = loc;
         if (loc == null)
             cache = null;
-        else
-            PacketHandler.INSTANCE.sendToServer(new PacketSetRemoteInventoryCache(loc, isCopyPaste));
+        else {
+            PacketHandler.sendToServer(new PacketSetRemoteInventoryCache(loc, isCopyPaste));
+        }
     }
 
     private boolean isCacheOld(@Nullable Pair<Integer, BlockPos> loc) {
@@ -76,7 +71,7 @@ public class RemoteInventoryCache implements IRemoteInventoryProvider {
 
     @Nullable
     private Pair<Integer, BlockPos> getInventoryLocation(ItemStack stack) {
-        NBTTagCompound nbt = stack.getTagCompound();
+        NBTTagCompound nbt = stack.getTag();
         if (nbt == null)
             return null;
 

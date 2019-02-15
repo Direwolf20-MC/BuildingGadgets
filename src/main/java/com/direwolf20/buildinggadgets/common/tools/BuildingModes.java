@@ -1,12 +1,13 @@
 package com.direwolf20.buildinggadgets.common.tools;
 
-import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
+import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetBuilding;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
-
+import com.direwolf20.buildinggadgets.common.utils.GadgetUtils;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -16,15 +17,19 @@ import net.minecraft.world.World;
 import java.util.*;
 
 public class BuildingModes {
-    private static boolean isReplaceable(World world, BlockPos pos, IBlockState setBlock) {
-        if (!setBlock.getBlock().canPlaceBlockAt(world, pos)) {
+
+//  TODO: Fix this
+    private static boolean isReplaceable(World world, EntityPlayer player, BlockPos pos, IBlockState setBlock) {
+        if (!setBlock.isValidPosition(world, pos)) {
             return false;
         }
         if (pos.getY() < 0) {
             return false;
         }
-        if (SyncedConfig.canOverwriteBlocks) {
-            if (!world.getBlockState(pos).getBlock().isReplaceable(world, pos)) {
+        if (Config.GENERAL.allowOverwriteBlocks.get()) {
+            if (!world.getBlockState(pos).isReplaceable(new BlockItemUseContext(
+                    world, player, new ItemStack(setBlock.getBlock()), pos, EnumFacing.UP, 0.5F, 0.0F, 0.5F
+            ))) {
                 return false;
             }
         } else {
@@ -32,7 +37,7 @@ public class BuildingModes {
                 return false;
             }
         }
-        return true;
+        return false;
     }
 
     public static List<BlockPos> getBuildOrders(World world, EntityPlayer player, BlockPos startBlock, EnumFacing sideHit, ItemStack tool) {
@@ -53,6 +58,8 @@ public class BuildingModes {
             boundX = 0;
             boundZ = bound;
         }
+
+
         //***************************************************
         //Build to me
         //***************************************************
@@ -60,42 +67,42 @@ public class BuildingModes {
             if (sideHit == EnumFacing.SOUTH) {
                 for (int i = startBlock.getZ() + 1; i <= playerPos.getZ() - 1; i++) {
                     pos = new BlockPos(startBlock.getX(), startBlock.getY(), i);
-                    if (isReplaceable(world, pos, setBlock)) {
+                    if (isReplaceable(world, player, pos, setBlock)) {
                         coordinates.add(pos);
                     }
                 }
             } else if (sideHit == EnumFacing.NORTH) {
                 for (int i = startBlock.getZ() - 1; i >= playerPos.getZ() + 1; i--) {
                     pos = new BlockPos(startBlock.getX(), startBlock.getY(), i);
-                    if (isReplaceable(world, pos, setBlock)) {
+                    if (isReplaceable(world, player, pos, setBlock)) {
                         coordinates.add(pos);
                     }
                 }
             } else if (sideHit == EnumFacing.EAST) {
                 for (int i = startBlock.getX() + 1; i <= playerPos.getX() - 1; i++) {
                     pos = new BlockPos(i, startBlock.getY(), startBlock.getZ());
-                    if (isReplaceable(world, pos, setBlock)) {
+                    if (isReplaceable(world, player, pos, setBlock)) {
                         coordinates.add(pos);
                     }
                 }
             } else if (sideHit == EnumFacing.WEST) {
                 for (int i = startBlock.getX() - 1; i >= playerPos.getX() + 1; i--) {
                     pos = new BlockPos(i, startBlock.getY(), startBlock.getZ());
-                    if (isReplaceable(world, pos, setBlock)) {
+                    if (isReplaceable(world, player, pos, setBlock)) {
                         coordinates.add(pos);
                     }
                 }
             } else if (sideHit == EnumFacing.UP) {
                 for (int i = startBlock.getY() + 1; i <= playerPos.getY() - 1; i++) {
                     pos = new BlockPos(startBlock.getX(), i, startBlock.getZ());
-                    if (isReplaceable(world, pos, setBlock)) {
+                    if (isReplaceable(world, player, pos, setBlock)) {
                         coordinates.add(pos);
                     }
                 }
             } else if (sideHit == EnumFacing.DOWN) {
                 for (int i = startBlock.getY() - 1; i >= playerPos.getY() + 1; i--) {
                     pos = new BlockPos(startBlock.getX(), i, startBlock.getZ());
-                    if (isReplaceable(world, pos, setBlock)) {
+                    if (isReplaceable(world, player, pos, setBlock)) {
                         coordinates.add(pos);
                     }
                 }
@@ -110,7 +117,7 @@ public class BuildingModes {
                     for (int x = boundX * -1; x <= boundX; x++) {
                         for (int z = boundZ * -1; z <= boundZ; z++) {
                             pos = new BlockPos(startBlock.getX() + x, startBlock.getY() + y, startBlock.getZ() + z);
-                            if (isReplaceable(world, pos, setBlock)) {
+                            if (isReplaceable(world, player, pos, setBlock)) {
                                 coordinates.add(pos);
                             }
                         }
@@ -121,7 +128,7 @@ public class BuildingModes {
                     for (int x = boundX * -1; x <= boundX; x++) {
                         for (int z = boundZ * -1; z <= boundZ; z++) {
                             pos = new BlockPos(startBlock.getX() + x, startBlock.getY() - y, startBlock.getZ() + z);
-                            if (isReplaceable(world, pos, setBlock)) {
+                            if (isReplaceable(world, player, pos, setBlock)) {
                                 coordinates.add(pos);
                             }
                         }
@@ -132,7 +139,7 @@ public class BuildingModes {
                     for (int x = boundX * -1; x <= boundX; x++) {
                         for (int z = boundZ * -1; z <= boundZ; z++) {
                             pos = new BlockPos(startBlock.getX() + x, startBlock.getY() - y, startBlock.getZ() + z);
-                            if (isReplaceable(world, pos, setBlock)) {
+                            if (isReplaceable(world, player, pos, setBlock)) {
                                 coordinates.add(pos);
                             }
                         }
@@ -147,21 +154,21 @@ public class BuildingModes {
             if (sideHit == EnumFacing.UP) {
                 for (int y = 1; y <= range; y++) {
                     pos = new BlockPos(startBlock.getX(), startBlock.getY() + y, startBlock.getZ());
-                    if (isReplaceable(world, pos, setBlock)) {
+                    if (isReplaceable(world, player, pos, setBlock)) {
                         coordinates.add(pos);
                     }
                 }
             } else if (sideHit == EnumFacing.DOWN) {
                 for (int y = 1; y <= range; y++) {
                     pos = new BlockPos(startBlock.getX(), startBlock.getY() - y, startBlock.getZ());
-                    if (isReplaceable(world, pos, setBlock)) {
+                    if (isReplaceable(world, player, pos, setBlock)) {
                         coordinates.add(pos);
                     }
                 }
             } else {
                 for (int y = bound * -1; y <= bound; y++) {
                     pos = new BlockPos(startBlock.getX(), startBlock.getY() - y, startBlock.getZ());
-                    if (isReplaceable(world, pos, setBlock)) {
+                    if (isReplaceable(world, player, pos, setBlock)) {
                         coordinates.add(pos);
                     }
                 }
@@ -177,28 +184,28 @@ public class BuildingModes {
             if (sideHit == EnumFacing.NORTH) {
                 for (int z = 1; z <= range; z++) {
                     pos = new BlockPos(startBlock.getX(), startBlock.getY(), startBlock.getZ() + z);
-                    if (isReplaceable(world, pos, setBlock)) {
+                    if (isReplaceable(world, player, pos, setBlock)) {
                         coordinates.add(pos);
                     }
                 }
             } else if (sideHit == EnumFacing.SOUTH) {
                 for (int z = 1; z <= range; z++) {
                     pos = new BlockPos(startBlock.getX(), startBlock.getY(), startBlock.getZ() - z);
-                    if (isReplaceable(world, pos, setBlock)) {
+                    if (isReplaceable(world, player, pos, setBlock)) {
                         coordinates.add(pos);
                     }
                 }
             } else if (sideHit == EnumFacing.EAST) {
                 for (int x = 1; x <= range; x++) {
                     pos = new BlockPos(startBlock.getX() - x, startBlock.getY(), startBlock.getZ());
-                    if (isReplaceable(world, pos, setBlock)) {
+                    if (isReplaceable(world, player, pos, setBlock)) {
                         coordinates.add(pos);
                     }
                 }
             } else if (sideHit == EnumFacing.WEST) {
                 for (int x = 1; x <= range; x++) {
                     pos = new BlockPos(startBlock.getX() + x, startBlock.getY(), startBlock.getZ());
-                    if (isReplaceable(world, pos, setBlock)) {
+                    if (isReplaceable(world, player, pos, setBlock)) {
                         coordinates.add(pos);
                     }
                 }
@@ -215,7 +222,7 @@ public class BuildingModes {
                 for (int z = 1; z <= range; z++) {
                     for (int x = bound * -1; x <= bound; x++) {
                         pos = new BlockPos(startBlock.getX() + x, startBlock.getY(), startBlock.getZ() - z);
-                        if (isReplaceable(world, pos, setBlock)) {
+                        if (isReplaceable(world, player, pos, setBlock)) {
                             coordinates.add(pos);
                         }
                     }
@@ -224,7 +231,7 @@ public class BuildingModes {
                 for (int z = 1; z <= range; z++) {
                     for (int x = bound * -1; x <= bound; x++) {
                         pos = new BlockPos(startBlock.getX() + x, startBlock.getY(), startBlock.getZ() + z);
-                        if (isReplaceable(world, pos, setBlock)) {
+                        if (isReplaceable(world, player, pos, setBlock)) {
                             coordinates.add(pos);
                         }
                     }
@@ -233,7 +240,7 @@ public class BuildingModes {
                 for (int x = 1; x <= range; x++) {
                     for (int z = bound * -1; z <= bound; z++) {
                         pos = new BlockPos(startBlock.getX() + x, startBlock.getY(), startBlock.getZ() + z);
-                        if (isReplaceable(world, pos, setBlock)) {
+                        if (isReplaceable(world, player, pos, setBlock)) {
                             coordinates.add(pos);
                         }
                     }
@@ -242,7 +249,7 @@ public class BuildingModes {
                 for (int x = 1; x <= range; x++) {
                     for (int z = bound * -1; z <= bound; z++) {
                         pos = new BlockPos(startBlock.getX() - x, startBlock.getY(), startBlock.getZ() + z);
-                        if (isReplaceable(world, pos, setBlock)) {
+                        if (isReplaceable(world, player, pos, setBlock)) {
                             coordinates.add(pos);
                         }
                     }
@@ -251,7 +258,7 @@ public class BuildingModes {
                 for (int x = bound * -1; x <= bound; x++) {
                     for (int z = bound * -1; z <= bound; z++) {
                         pos = new BlockPos(startBlock.getX() - x, startBlock.getY(), startBlock.getZ() + z);
-                        if (isReplaceable(world, pos, setBlock)) {
+                        if (isReplaceable(world, player, pos, setBlock)) {
                             coordinates.add(pos);
                         }
                     }
@@ -274,7 +281,7 @@ public class BuildingModes {
                     } else {
                         pos = new BlockPos(startBlock.getX(), startBlock.getY() + z, startBlock.getZ() + z - 1);
                     }
-                    if (isReplaceable(world, pos, setBlock)) {
+                    if (isReplaceable(world, player, pos, setBlock)) {
                         coordinates.add(pos);
                     }
                 }
@@ -287,7 +294,7 @@ public class BuildingModes {
                     } else {
                         pos = new BlockPos(startBlock.getX(), startBlock.getY() + z, startBlock.getZ() - z + 1);
                     }
-                    if (isReplaceable(world, pos, setBlock)) {
+                    if (isReplaceable(world, player, pos, setBlock)) {
                         coordinates.add(pos);
                     }
                 }
@@ -300,7 +307,7 @@ public class BuildingModes {
                     } else {
                         pos = new BlockPos(startBlock.getX() - x + 1, startBlock.getY() + x, startBlock.getZ());
                     }
-                    if (isReplaceable(world, pos, setBlock)) {
+                    if (isReplaceable(world, player, pos, setBlock)) {
                         coordinates.add(pos);
                     }
                 }
@@ -313,7 +320,7 @@ public class BuildingModes {
                     } else {
                         pos = new BlockPos(startBlock.getX() + x - 1, startBlock.getY() + x, startBlock.getZ());
                     }
-                    if (isReplaceable(world, pos, setBlock)) {
+                    if (isReplaceable(world, player, pos, setBlock)) {
                         coordinates.add(pos);
                     }
                 }
@@ -328,7 +335,7 @@ public class BuildingModes {
                 for (int z = range * -7 / 5; z <= range * 7 / 5; z++) {
                     if (x % (((range - 2) % 6) + 2) == 0 && z % (((range - 2) % 6) + 2) == 0) {
                         pos = new BlockPos(startBlock.getX() + x, startBlock.getY() + 1, startBlock.getZ() + z);
-                        if (isReplaceable(world, pos, setBlock)) {
+                        if (isReplaceable(world, player, pos, setBlock)) {
                             coordinates.add(pos);
                         }
                     }
@@ -340,17 +347,17 @@ public class BuildingModes {
         //***************************************************
         else if (mode == GadgetBuilding.ToolMode.Surface) {
             IBlockState startState = world.getBlockState(startBlock);
-            AxisAlignedBB area = new AxisAlignedBB(pos).grow(bound * (1 - Math.abs(sideHit.getFrontOffsetX())),
-                    bound * (1 - Math.abs(sideHit.getFrontOffsetY())), bound * (1 - Math.abs(sideHit.getFrontOffsetZ())));
+            AxisAlignedBB area = new AxisAlignedBB(pos).grow(bound * (1 - Math.abs(sideHit.getXOffset())),
+                    bound * (1 - Math.abs(sideHit.getYOffset())), bound * (1 - Math.abs(sideHit.getZOffset())));
             BlockPos locOffset;
             boolean fuzzyMode = GadgetGeneric.getFuzzy(tool);
             if (GadgetGeneric.getConnectedArea(tool)) {
-                addConnectedCoords(world, pos, startState, setBlock, sideHit, fuzzyMode, coordinates, new HashSet<>(),
+                addConnectedCoords(world, player, pos, startState, setBlock, sideHit, fuzzyMode, coordinates, new HashSet<>(),
                         (int) area.minX, (int) area.minY, (int) area.minZ, (int) area.maxX - 1, (int) area.maxY - 1, (int) area.maxZ - 1);
             } else {
                 for (BlockPos loc : BlockPos.getAllInBox((int) area.minX, (int) area.minY, (int) area.minZ, (int) area.maxX - 1, (int) area.maxY - 1, (int) area.maxZ - 1)) {
                     locOffset = loc.offset(sideHit);
-                    if ((fuzzyMode ? !world.isAirBlock(loc) : world.getBlockState(loc) == startState) && isReplaceable(world, locOffset, setBlock))
+                    if ((fuzzyMode ? !world.isAirBlock(loc) : world.getBlockState(loc) == startState) && isReplaceable(world, player, locOffset, setBlock))
                         coordinates.add(locOffset);
                 }
             }
@@ -358,13 +365,13 @@ public class BuildingModes {
         return coordinates;
     }
 
-    private static void addConnectedCoords(World world, BlockPos loc, IBlockState state, IBlockState setBlock, EnumFacing sideHit,
+    private static void addConnectedCoords(World world, EntityPlayer player, BlockPos loc, IBlockState state, IBlockState setBlock, EnumFacing sideHit,
             boolean fuzzyMode, List<BlockPos> coords, Set<BlockPos> coordsSearched, int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
         if (coordsSearched.contains(loc) || loc.getX() < minX || loc.getY() < minY || loc.getZ() < minZ || loc.getX() > maxX || loc.getY() > maxY || loc.getZ() > maxZ)
             return;
 
         BlockPos locOffset = loc.offset(sideHit);
-        if ((fuzzyMode ? world.isAirBlock(loc) : world.getBlockState(loc) != state) || !isReplaceable(world, locOffset, setBlock))
+        if ((fuzzyMode ? world.isAirBlock(loc) : world.getBlockState(loc) != state) || !isReplaceable(world, player, locOffset, setBlock))
             return;
 
         coords.add(locOffset);
@@ -372,7 +379,7 @@ public class BuildingModes {
         for (int x = -1; x <= 1; x++) {
             for (int y = -1; y <= 1; y++) {
                 for (int z = -1; z <= 1; z++) {
-                    addConnectedCoords(world, loc.add(x, y, z), state, setBlock, sideHit, fuzzyMode, coords, coordsSearched, minX, minY, minZ, maxX, maxY, maxZ);
+                    addConnectedCoords(world, player, loc.add(x, y, z), state, setBlock, sideHit, fuzzyMode, coords, coordsSearched, minX, minY, minZ, maxX, maxY, maxZ);
                 }
             }
         }
@@ -394,7 +401,7 @@ public class BuildingModes {
             i++;
         }
         Arrays.sort(distances);
-        //ArrayUtils.reverse(distances);
+        //BoxedArray.reverse(distances);
 
         for (Double dist : distances) {
             //System.out.println(dist);
@@ -432,7 +439,7 @@ public class BuildingModes {
             i++;
         }
         Arrays.sort(distances);
-        //ArrayUtils.reverse(distances);
+        //BoxedArray.reverse(distances);
 
         for (Double dist : distances) {
             //System.out.println(dist);

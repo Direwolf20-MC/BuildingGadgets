@@ -8,9 +8,8 @@ import net.minecraft.util.text.TextFormatting;
 
 public abstract class GenericPasteContainer extends Item {
 
-    public GenericPasteContainer() {
-        setCreativeTab(BuildingGadgets.BUILDING_CREATIVE_TAB);
-        setMaxStackSize(1);
+    public GenericPasteContainer(Builder builder) {
+        super(builder.maxStackSize(1));
     }
 
     /**
@@ -21,7 +20,7 @@ public abstract class GenericPasteContainer extends Item {
         if (item instanceof GenericPasteContainer) {
             ((GenericPasteContainer) item).setPasteCount(stack, amount);
         } else {
-            BuildingGadgets.logger.warn("Potential abuse of GenericPasteContainer#setPasteAmount(ItemStack, int) where the given ItemStack does not contain a GenericPasteContainer.");
+            BuildingGadgets.LOG.warn("Potential abuse of GenericPasteContainer#setPasteAmount(ItemStack, int) where the given ItemStack does not contain a GenericPasteContainer.");
         }
     }
 
@@ -33,7 +32,7 @@ public abstract class GenericPasteContainer extends Item {
         if (item instanceof GenericPasteContainer) {
             return ((GenericPasteContainer) item).getPasteCount(stack);
         }
-        BuildingGadgets.logger.warn("Potential abuse of GenericPasteContainer#getPasteAmount(ItemStack) where the given ItemStack does not contain a GenericPasteContainer.");
+        BuildingGadgets.LOG.warn("Potential abuse of GenericPasteContainer#getPasteAmount(ItemStack) where the given ItemStack does not contain a GenericPasteContainer.");
         return 0;
     }
 

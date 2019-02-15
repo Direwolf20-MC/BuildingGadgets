@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.common.tools;
 
-import com.direwolf20.buildinggadgets.common.items.ModItems;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
+import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockRendererDispatcher;
@@ -15,8 +15,8 @@ import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.BlockPos;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import org.lwjgl.opengl.GL11;
 
 import javax.annotation.Nullable;
@@ -24,24 +24,25 @@ import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
-@SideOnly(Side.CLIENT)
+@OnlyIn(Dist.CLIENT)
 public class PasteToolBufferBuilder {
 
     private static Map<String, NBTTagCompound> tagMap = new HashMap<String, NBTTagCompound>();
-    private static Map<String, ToolDireBuffer> bufferMap = new HashMap<String, ToolDireBuffer>();
+    private static Map<String, ToolBufferBuilder> bufferMap = new HashMap<String, ToolBufferBuilder>();
 
 
     private static int getCopyCounter(String UUID) {
         if (tagMap.containsKey(UUID)) {
-            return tagMap.get(UUID).getInteger("copycounter");
+            return tagMap.get(UUID).getInt("copycounter");
         }
         return -1;
     }
 
     public static void clearMaps() {
         tagMap = new HashMap<String, NBTTagCompound>();
-        bufferMap = new HashMap<String, ToolDireBuffer>();
+        bufferMap = new HashMap<String, ToolBufferBuilder>();
     }
 
     public static void addToMap(String UUID, NBTTagCompound tag) {
@@ -57,7 +58,7 @@ public class PasteToolBufferBuilder {
     }
 
     @Nullable
-    public static ToolDireBuffer getBufferFromMap(String UUID) {
+    public static ToolBufferBuilder getBufferFromMap(String UUID) {
         if (bufferMap.containsKey(UUID)) {
             return bufferMap.get(UUID);
         }
@@ -67,14 +68,14 @@ public class PasteToolBufferBuilder {
     public static void addMapToBuffer(String UUID) {
 //        long time = System.nanoTime();
         List<BlockMap> blockMapList = GadgetCopyPaste.getBlockMapList(tagMap.get(UUID));
-        BlockRendererDispatcher dispatcher = Minecraft.getMinecraft().getBlockRendererDispatcher();
-        ToolDireBuffer bufferBuilder = new ToolDireBuffer(2097152);
+        BlockRendererDispatcher dispatcher = Minecraft.getInstance().getBlockRendererDispatcher();
+        ToolBufferBuilder bufferBuilder = new ToolBufferBuilder(2097152);
         bufferBuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
         for (BlockMap blockMap : blockMapList) {
             IBlockState renderBlockState = blockMap.state;
             if (!(renderBlockState.equals(Blocks.AIR.getDefaultState()))) {
                 IBakedModel model = dispatcher.getModelForState(renderBlockState);
-                dispatcher.getBlockModelRenderer().renderModelFlat(Minecraft.getMinecraft().world, model, renderBlockState, new BlockPos(blockMap.xOffset, blockMap.yOffset, blockMap.zOffset), bufferBuilder, false, 0L);
+                dispatcher.getBlockModelRenderer().renderModelFlat(Minecraft.getInstance().world, model, renderBlockState, new BlockPos(blockMap.xOffset, blockMap.yOffset, blockMap.zOffset), bufferBuilder, false, new Random(), 0L);
             }
         }
         bufferBuilder.finishDrawing();
@@ -84,12 +85,12 @@ public class PasteToolBufferBuilder {
 
     public static void draw(EntityPlayer player, double x, double y, double z, BlockPos startPos, String UUID) {
 //        long time = System.nanoTime();
-        ToolDireBuffer bufferBuilder = bufferMap.get(UUID);
+        ToolBufferBuilder bufferBuilder = bufferMap.get(UUID);
         bufferBuilder.sortVertexData((float) (x - startPos.getX()), (float) ((y + player.getEyeHeight()) - startPos.getY()), (float) (z - startPos.getZ()));
         //System.out.printf("Sorted %d Vertexes in %.2f ms%n", bufferBuilder.getVertexCount(), (System.nanoTime() - time) * 1e-6);
         if (bufferBuilder.getVertexCount() > 0) {
             VertexFormat vertexformat = bufferBuilder.getVertexFormat();
-            int i = vertexformat.getNextOffset();
+            int i = vertexformat.getSize();
             ByteBuffer bytebuffer = bufferBuilder.getByteBuffer();
             List<VertexFormatElement> list = vertexformat.getElements();
 
@@ -104,7 +105,7 @@ public class PasteToolBufferBuilder {
                 vertexformatelement.getUsage().preDraw(vertexformat, j, i, bytebuffer);
             }
 
-            GlStateManager.glDrawArrays(bufferBuilder.getDrawMode(), 0, bufferBuilder.getVertexCount());
+            GlStateManager.drawArrays(bufferBuilder.getDrawMode(), 0, bufferBuilder.getVertexCount());
             int i1 = 0;
 
             for (int j1 = list.size(); i1 < j1; ++i1) {
@@ -119,6 +120,6 @@ public class PasteToolBufferBuilder {
     }
 
     public static boolean isUpdateNeeded(String UUID, ItemStack stack) {
-        return ((ModItems.gadgetCopyPaste.getCopyCounter(stack) != getCopyCounter(UUID) || PasteToolBufferBuilder.getTagFromUUID(UUID) == null));
+        return ((((GadgetCopyPaste) BGItems.gadgetCopyPaste).getCopyCounter(stack) != getCopyCounter(UUID) || PasteToolBufferBuilder.getTagFromUUID(UUID) == null));
     }
 }
