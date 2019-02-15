@@ -1,7 +1,8 @@
 package com.direwolf20.buildinggadgets.common.entities;
 
-import com.direwolf20.buildinggadgets.common.BuildingObjects;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
+import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
+import com.direwolf20.buildinggadgets.common.registry.objects.BuildingObjects;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -83,7 +84,7 @@ public class BlockBuildEntity extends Entity {
         setToolMode(toolMode);
         spawnedBy = player;
         actualSetBlock = actualSpawnBlock;
-        world.setBlockState(spawnPos, BuildingObjects.effectBlock.getDefaultState());
+        world.setBlockState(spawnPos, BGBlocks.effectBlock.getDefaultState());
         setUsingConstructionPaste(constrPaste);
     }
 
@@ -189,7 +190,7 @@ public class BlockBuildEntity extends Entity {
             despawning = 0;
             if (setPos != null && setBlock != null && (getToolMode() == 1)) {
                 if (getUsingConstructionPaste()) {
-                    world.setBlockState(setPos, BuildingObjects.constructionBlock.getDefaultState());
+                    world.setBlockState(setPos, BGBlocks.constructionBlock.getDefaultState());
                     TileEntity te = world.getTileEntity(setPos);
                     if (te instanceof ConstructionBlockTileEntity) {
                         ((ConstructionBlockTileEntity) te).setBlockState(setBlock, actualSetBlock);

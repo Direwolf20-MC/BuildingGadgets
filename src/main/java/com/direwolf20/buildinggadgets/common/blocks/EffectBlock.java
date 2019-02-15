@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.common.blocks;
 
+import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.EnumPushReaction;
 import net.minecraft.block.state.IBlockState;
@@ -7,12 +8,14 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.NonNullList;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 
 public class EffectBlock extends Block {
 
+    public static final ResourceLocation REGISTRY_NAME = new ResourceLocation(BuildingGadgets.MODID,"effect_block");
     public EffectBlock(Builder builder) {
         super(builder);
     }

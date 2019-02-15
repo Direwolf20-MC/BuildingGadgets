@@ -1,9 +1,10 @@
 package com.direwolf20.buildinggadgets.common.entities;
 
-import com.direwolf20.buildinggadgets.common.BuildingObjects;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlock;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockPowder;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
+import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
+import com.direwolf20.buildinggadgets.common.registry.objects.BuildingObjects;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NBTTagCompound;
@@ -90,7 +91,7 @@ public class ConstructionBlockEntity extends Entity {
                         if (opacity == 255 || neighborBrightness) {
                             IBlockState tempSetBlock = te.getBlockState();
                             IBlockState tempActualSetBlock = ((ConstructionBlockTileEntity) te).getActualBlockState();
-                            world.setBlockState(setPos, BuildingObjects.constructionBlock.getDefaultState()
+                            world.setBlockState(setPos, BGBlocks.constructionBlock.getDefaultState()
                                     .with(ConstructionBlock.BRIGHT, opacity != 255)
                                     .with(ConstructionBlock.NEIGHBOR_BRIGHTNESS, neighborBrightness));
                             te = world.getTileEntity(setPos);
@@ -100,8 +101,8 @@ public class ConstructionBlockEntity extends Entity {
                         }
                     }
                 } else {
-                    if (world.getBlockState(setPos) == BuildingObjects.constructionBlockPowder.getDefaultState()) {
-                        world.setBlockState(setPos, BuildingObjects.constructionBlock.getDefaultState().with(ConstructionBlock.BRIGHT, false));
+                    if (world.getBlockState(setPos) == BGBlocks.constructionBlockPowder.getDefaultState()) {
+                        world.setBlockState(setPos, BGBlocks.constructionBlock.getDefaultState().with(ConstructionBlock.BRIGHT, false));
                     }
                 }
             }

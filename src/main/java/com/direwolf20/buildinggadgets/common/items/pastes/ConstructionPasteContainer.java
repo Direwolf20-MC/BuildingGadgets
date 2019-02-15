@@ -2,7 +2,6 @@ package com.direwolf20.buildinggadgets.common.items.pastes;
 
 import com.direwolf20.buildinggadgets.common.tools.InventoryManipulation;
 import com.direwolf20.buildinggadgets.common.utils.NBTUtil;
-
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -26,9 +25,9 @@ public class ConstructionPasteContainer extends GenericPasteContainer {
 
     private IntSupplier maxCapacity;
 
-    public ConstructionPasteContainer(Builder builder, RegularPasteContainerTypes type) {
-        super(builder, type.itemSuffix);
-        maxCapacity = type.capacitySupplier;
+    public ConstructionPasteContainer(Builder builder, IntSupplier maxCapacity) {
+        super(builder);
+        this.maxCapacity = maxCapacity;
     }
 
     @OnlyIn(Dist.CLIENT)

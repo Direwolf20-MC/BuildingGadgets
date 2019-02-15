@@ -1,13 +1,14 @@
 package com.direwolf20.buildinggadgets.common.items.gadgets;
 
-import com.direwolf20.buildinggadgets.common.BuildingObjects;
+import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
+import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
 import com.direwolf20.buildinggadgets.common.tools.ExchangingModes;
 import com.direwolf20.buildinggadgets.common.tools.InventoryManipulation;
+import com.direwolf20.buildinggadgets.common.tools.ToolRenders;
 import com.direwolf20.buildinggadgets.common.utils.VectorUtil;
 import com.direwolf20.buildinggadgets.common.world.FakeBuilderWorld;
-import com.direwolf20.buildinggadgets.common.tools.ToolRenders;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
@@ -59,8 +60,10 @@ public class GadgetExchanger extends GadgetGeneric {
         }
     }
 
-    public GadgetExchanger(Builder builder, String name) {
-        super(builder.defaultMaxDamage(Config.GADGETS.GADGET_EXCHANGER.durability.get()), name);
+    public static final ResourceLocation REGISTRY_NAME = new ResourceLocation(BuildingGadgets.MODID,"gadgets/exchanging");
+
+    public GadgetExchanger(Builder builder) {
+        super(builder.defaultMaxDamage(Config.GADGETS.GADGET_EXCHANGER.durability.get()));
     }
 
     @Override
@@ -256,7 +259,7 @@ public class GadgetExchanger extends GadgetGeneric {
             neededItems = 1;
         }
         if (InventoryManipulation.countItem(itemStack, player, world) < neededItems) {
-            ItemStack constructionPaste = new ItemStack(BuildingObjects.constructionPaste);
+            ItemStack constructionPaste = new ItemStack(BGItems.constructionPaste);
             if (InventoryManipulation.countPaste(player) < neededItems) {
                 return false;
             }

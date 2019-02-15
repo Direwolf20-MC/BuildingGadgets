@@ -1,17 +1,16 @@
 package com.direwolf20.buildinggadgets.common.tools;
 
-import java.util.Collection;
-import java.util.List;
+import com.google.common.collect.ImmutableList;
+import net.minecraft.item.ItemStack;
+import net.minecraftforge.items.IItemHandler;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.Collection;
+import java.util.List;
 
-import com.google.common.collect.ImmutableList;
 //import com.raoulvdberge.refinedstorage.api.network.INetwork;
 //import com.raoulvdberge.refinedstorage.api.util.Action;
-
-import net.minecraft.item.ItemStack;
-import net.minecraftforge.items.IItemHandler;
 
 public abstract class NetworkExtractor implements IItemHandler {// TODO 1.13
     private final List<ItemStack> stacks;

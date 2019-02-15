@@ -8,7 +8,6 @@ package com.direwolf20.buildinggadgets.client.gui;
 
 import com.direwolf20.buildinggadgets.client.KeyBindings;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
-import com.direwolf20.buildinggadgets.common.ModSounds;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.items.gadgets.*;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
@@ -16,8 +15,8 @@ import com.direwolf20.buildinggadgets.common.network.packets.PacketChangeRange;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketToggleConnectedArea;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketToggleFuzzy;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketToggleMode;
+import com.direwolf20.buildinggadgets.common.registry.objects.BGSounds;
 import com.google.common.collect.ImmutableSet;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
@@ -29,7 +28,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.Vec3d;
-
 import org.lwjgl.opengl.GL11;
 
 import javax.vecmath.Vector2f;
@@ -114,7 +112,7 @@ public class ModeRadialMenu extends GuiScreen {
         int x = 0;
         for (int i = 0; i < buttons.size(); i++) {
             GuiButtonSound button = (GuiButtonSound) buttons.get(i);
-            SoundEvent sound = ModSounds.BEEP.getSound();
+            SoundEvent sound = BGSounds.BEEP.getSound();
             button.setSounds(sound, sound, 0.6F, 1F);
             if (!button.visible) continue;
             int len = mc.fontRenderer.getStringWidth(button.displayString) + 6;
@@ -286,7 +284,7 @@ public class ModeRadialMenu extends GuiScreen {
     private void changeMode() {
         if (slotSelected >= 0) {
             PacketHandler.sendToServer(new PacketToggleMode(slotSelected));
-            ModSounds.BEEP.playSound();
+            BGSounds.BEEP.playSound();
         }
     }
 

@@ -1,9 +1,10 @@
 package com.direwolf20.buildinggadgets.common.items.gadgets;
 
-import com.direwolf20.buildinggadgets.common.BuildingObjects;
+import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
+import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
 import com.direwolf20.buildinggadgets.common.tools.BlockMapIntState;
 import com.direwolf20.buildinggadgets.common.utils.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.utils.VectorUtil;
@@ -19,11 +20,8 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.*;
 import net.minecraft.util.EnumFacing.Axis;
-import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
@@ -42,8 +40,10 @@ import java.util.*;
 
 public class GadgetDestruction extends GadgetGeneric {
 
-    public GadgetDestruction(Builder builder, String name) {
-        super(builder.defaultMaxDamage(Config.GADGETS.GADGET_DESTRUCTION.durability.get()), name);
+    public static final ResourceLocation REGISTRY_NAME = new ResourceLocation(BuildingGadgets.MODID,"gadgets/destruction");
+
+    public GadgetDestruction(Builder builder) {
+        super(builder.defaultMaxDamage(Config.GADGETS.GADGET_DESTRUCTION.durability.get()));
     }
 
     @Override
@@ -304,7 +304,7 @@ public class GadgetDestruction extends GadgetGeneric {
         TileEntity te = world.getTileEntity(voidPos);
         if (currentBlock.getMaterial() == Material.AIR) return false;
         //if (currentBlock.getBlock().getMaterial(currentBlock).isLiquid()) return false;
-        if (currentBlock.equals(BuildingObjects.effectBlock.getDefaultState())) return false;
+        if (currentBlock.equals(BGBlocks.effectBlock.getDefaultState())) return false;
         if ((te != null) && !(te instanceof ConstructionBlockTileEntity)) return false;
         if (currentBlock.getBlockHardness(world, voidPos) < 0) return false;
 
@@ -337,7 +337,7 @@ public class GadgetDestruction extends GadgetGeneric {
         for (BlockPos voidPos : voidPosArray) {
             IBlockState blockState = world.getBlockState(voidPos);
             IBlockState pasteState = Blocks.AIR.getDefaultState();
-            if (blockState.getBlock() == BuildingObjects.constructionBlock) {
+            if (blockState.getBlock() == BGBlocks.constructionBlock) {
                 TileEntity te = world.getTileEntity(voidPos);
                 if (te instanceof ConstructionBlockTileEntity) {
                     pasteState = ((ConstructionBlockTileEntity) te).getActualBlockState();
@@ -417,7 +417,7 @@ public class GadgetDestruction extends GadgetGeneric {
             IBlockState currentState = world.getBlockState(placePos);
             if (currentState.getMaterial() == Material.AIR || currentState.getMaterial().isLiquid()) {
                 IBlockState placeState = MapIntState.getStateFromSlot((short) stateIntArray[i]);
-                if (placeState.getBlock() == BuildingObjects.constructionBlock) {
+                if (placeState.getBlock() == BGBlocks.constructionBlock) {
                     IBlockState pasteState = Blocks.AIR.getDefaultState();
                     for (int j = 0; j < posPasteArray.length; j++) {
                         if (posPasteArray[j] == posIntArray[i]) {

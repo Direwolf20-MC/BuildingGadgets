@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.common.tools;
 
-import com.direwolf20.buildinggadgets.common.BuildingObjects;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
+import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockRendererDispatcher;
@@ -120,6 +120,6 @@ public class PasteToolBufferBuilder {
     }
 
     public static boolean isUpdateNeeded(String UUID, ItemStack stack) {
-        return ((((GadgetCopyPaste) BuildingObjects.gadgetCopyPaste).getCopyCounter(stack) != getCopyCounter(UUID) || PasteToolBufferBuilder.getTagFromUUID(UUID) == null));
+        return ((((GadgetCopyPaste) BGItems.gadgetCopyPaste).getCopyCounter(stack) != getCopyCounter(UUID) || PasteToolBufferBuilder.getTagFromUUID(UUID) == null));
     }
 }

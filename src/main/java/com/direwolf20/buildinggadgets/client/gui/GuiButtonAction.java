@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.client.gui;
 
-import java.awt.Color;
+import java.awt.*;
 import java.util.function.Predicate;
 
 public class GuiButtonAction extends GuiButtonColor {

@@ -6,11 +6,11 @@
 package com.direwolf20.buildinggadgets.client.gui;
 
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
-import com.direwolf20.buildinggadgets.common.BuildingObjects;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketCopyCoords;
+import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
@@ -54,8 +54,8 @@ public class CopyPasteGUI extends GuiScreen {
     public void initGui() {
         super.initGui();
 
-        startPos = ((GadgetCopyPaste) BuildingObjects.gadgetCopyPaste).getStartPos(copyPasteTool);
-        endPos = ((GadgetCopyPaste) BuildingObjects.gadgetCopyPaste).getEndPos(copyPasteTool);
+        startPos = ((GadgetCopyPaste) BGItems.gadgetCopyPaste).getStartPos(copyPasteTool);
+        endPos = ((GadgetCopyPaste) BGItems.gadgetCopyPaste).getEndPos(copyPasteTool);
 
         if (startPos == null) startPos = new BlockPos(0, 0, 0);
         if (endPos == null) endPos = new BlockPos(0, 0, 0);

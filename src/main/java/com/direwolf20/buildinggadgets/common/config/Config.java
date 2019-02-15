@@ -8,7 +8,6 @@ import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.config.ModConfig;
 
-import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.Objects;
 
@@ -280,10 +279,10 @@ public class Config {
         public final ConfigValue<List<? extends String>> blockBlacklist; //TODO convert to a tag (or at least make compatible with) - I don't know whether this might or might not work
 
         public final ConfigValue<List<? extends String>> blockWhitelist;
-        @Nonnull
-        private PatternList parsedBlacklist;
-        @Nonnull
-        private PatternList parsedWhitelist;
+
+        private PatternList parsedBlacklist = null;
+
+        private PatternList parsedWhitelist = null;
 
         private CategoryBlacklist() {
             SERVER_BUILDER.comment("Configure your Blacklist-Settings here")/*.translation(LANG_KEY_BLACKLIST)*/.push("Blacklist Settings");
@@ -300,8 +299,6 @@ public class Config {
                     .translation(LANG_KEY_BLACKLIST + ".blockWhitelist")
                     .defineList("Whitelisted Blocks",ImmutableList.of("*"),obj -> obj instanceof String);
 
-            parseBlacklists();
-
             SERVER_BUILDER.pop();
         }
 
@@ -311,7 +308,9 @@ public class Config {
         }
 
         public boolean isAllowedBlock(Block block) {
-            return parsedWhitelist.contains(Objects.requireNonNull(block.getRegistryName()).toString()) && !parsedBlacklist.contains(block);
+            if (parsedBlacklist == null || parsedWhitelist == null) parseBlacklists();
+            String regName = Objects.requireNonNull(block.getRegistryName()).toString();
+            return parsedWhitelist.contains(regName) && !parsedBlacklist.contains(regName);
         }
     }
 

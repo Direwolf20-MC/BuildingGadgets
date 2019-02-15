@@ -1,6 +1,7 @@
 package com.direwolf20.buildinggadgets.common.blocks;
 
-import com.direwolf20.buildinggadgets.common.BuildingObjects;
+import com.direwolf20.buildinggadgets.common.BuildingGadgets;
+import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
 import com.direwolf20.buildinggadgets.common.world.FakeRenderWorld;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.EnumPushReaction;
@@ -30,7 +31,7 @@ import java.util.Random;
 
 //@Optional.Interface(iface = "team.chisel.ctm.api.IFacade", modid = "ctm-api")
 public class ConstructionBlock extends Block /*implements IFacade*/ {
-
+    public static final ResourceLocation REGISTRY_NAME = new ResourceLocation(BuildingGadgets.MODID,"construction/block");
     //public static final ConstructionProperty FACADEID = new ConstructionProperty("facadeid");
     public static final IProperty<Boolean> BRIGHT = BooleanProperty.create("bright");
     public static final IProperty<Boolean> NEIGHBOR_BRIGHTNESS = BooleanProperty.create("neighbor_brightness");
@@ -66,7 +67,7 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
     @Override
     @Nonnull
     public IItemProvider getItemDropped(IBlockState state, World worldIn, BlockPos pos, int fortune) {
-        return BuildingObjects.constructionPaste;
+        return BGItems.constructionPaste;
     }
 
     @Override

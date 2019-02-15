@@ -12,6 +12,7 @@ import com.direwolf20.buildinggadgets.common.entities.ConstructionBlockEntityRen
 import com.direwolf20.buildinggadgets.common.events.AnvilRepairHandler;
 import com.direwolf20.buildinggadgets.common.items.gadgets.*;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
+import com.direwolf20.buildinggadgets.common.registry.objects.BuildingObjects;
 import com.direwolf20.buildinggadgets.common.tools.ToolRenders;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.PositionedSoundRecord;
@@ -77,6 +78,8 @@ public class BuildingGadgets {
         DistExecutor.runWhenOn(Dist.CLIENT, () -> () -> {
             eventBus.addListener((Consumer<FMLClientSetupEvent>) (event -> clientInit(event, eventBus)));
         });
+
+        BuildingObjects.init();
     }
 
     @Nonnull

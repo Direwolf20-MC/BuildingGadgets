@@ -1,8 +1,10 @@
 package com.direwolf20.buildinggadgets.common.items.gadgets;
 
-import com.direwolf20.buildinggadgets.common.BuildingObjects;
+import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
+import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
+import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
 import com.direwolf20.buildinggadgets.common.tools.BuildingModes;
 import com.direwolf20.buildinggadgets.common.tools.InventoryManipulation;
 import com.direwolf20.buildinggadgets.common.tools.ToolRenders;
@@ -58,10 +60,10 @@ public class GadgetBuilding extends GadgetGeneric {
         }
     }
 
-    public static final ResourceLocation REGISTRY_NAME = new ResourceLocation("buildingtool");
+    public static final ResourceLocation REGISTRY_NAME = new ResourceLocation(BuildingGadgets.MODID,"gadgets/building");
 
-    public GadgetBuilding(Builder builder, String name) {
-        super(builder.defaultMaxDamage(Config.GADGETS.GADGET_BUILDING.durability.get()), name);
+    public GadgetBuilding(Builder builder) {
+        super(builder.defaultMaxDamage(Config.GADGETS.GADGET_BUILDING.durability.get()));
     }
 
     @Override
@@ -245,7 +247,7 @@ public class GadgetBuilding extends GadgetGeneric {
                 boolean sameDim = (player.dimension == dimension);
                 BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(world, coord, currentBlock, player);
                 boolean cancelled = MinecraftForge.EVENT_BUS.post(e);
-                if (distance < 64 && sameDim && currentBlock != BuildingObjects.effectBlock.getDefaultState() && !cancelled) { //Don't allow us to undo a block while its still being placed or too far away
+                if (distance < 64 && sameDim && currentBlock != BGBlocks.effectBlock.getDefaultState() && !cancelled) { //Don't allow us to undo a block while its still being placed or too far away
                     if (currentBlock != Blocks.AIR.getDefaultState()) {
                         currentBlock.getBlock().harvestBlock(world, player, coord, currentBlock, world.getTileEntity(coord), silkTool);
                         world.spawnEntity(new BlockBuildEntity(world, coord, player, currentBlock, 2, getToolActualBlock(heldItem), false));
@@ -301,7 +303,7 @@ public class GadgetBuilding extends GadgetGeneric {
         if (ForgeEventFactory.onPlayerBlockPlace(player, blockSnapshot, EnumFacing.UP, EnumHand.MAIN_HAND).isCanceled()) {
             return false;
         }
-        ItemStack constructionPaste = new ItemStack(BuildingObjects.constructionPaste);
+        ItemStack constructionPaste = new ItemStack(BGItems.constructionPaste);
         if (InventoryManipulation.countItem(itemStack, player, world) < neededItems) {
             //if (InventoryManipulation.countItem(constructionStack, player) == 0) {
             if (InventoryManipulation.countPaste(player) < neededItems) {

@@ -1,16 +1,16 @@
-package com.direwolf20.buildinggadgets.common;
+package com.direwolf20.buildinggadgets.common.registry.objects;
 
+import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets.ClientProxy;
-
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
 
-public enum ModSounds {
+public enum BGSounds {
     BEEP("beep");
 
     private SoundEvent sound;
 
-    private ModSounds(String name) {
+    BGSounds(String name) {
         ResourceLocation loc = new ResourceLocation(BuildingGadgets.MODID, name);
         sound = new SoundEvent(loc).setRegistryName(name);
     }

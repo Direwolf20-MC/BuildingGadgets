@@ -1,8 +1,8 @@
 package com.direwolf20.buildinggadgets.client.gui;
 
-import java.awt.Color;
-
 import net.minecraft.client.Minecraft;
+
+import java.awt.*;
 
 public class GuiButtonColor extends GuiButtonSound {
     private Color colorSelected, colorDeselected;

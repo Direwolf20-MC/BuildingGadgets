@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.common.entities;
 
-import com.direwolf20.buildinggadgets.common.BuildingObjects;
+import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockRendererDispatcher;
@@ -46,7 +46,7 @@ public class ConstructionBlockEntityRender extends Render<ConstructionBlockEntit
         GlStateManager.rotatef(-90.0F, 0.0F, 1.0F, 0.0F);
 
         GL14.glBlendColor(1F, 1F, 1F, scale); //Set the alpha of the blocks we are rendering
-        IBlockState renderBlockState = BuildingObjects.constructionBlock.getDefaultState();
+        IBlockState renderBlockState = BGBlocks.constructionBlock.getDefaultState();
 
         blockrendererdispatcher.renderBlockBrightness(renderBlockState, 1.0f);
         GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);

@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.common.blocks.templatemanager;
 
+import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.items.ITemplate;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketBlockMap;
@@ -17,6 +18,7 @@ import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
@@ -26,8 +28,7 @@ import javax.annotation.Nullable;
 
 public class TemplateManager extends Block {
     private static final int GUI_ID = 1;
-
-
+    public static final ResourceLocation REGISTRY_NAME = new ResourceLocation(BuildingGadgets.MODID,"template_manager");
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
 
     public TemplateManager(Builder builder) {

@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.common.blocks;
 
-import com.direwolf20.buildinggadgets.common.BuildingObjects;
+import com.direwolf20.buildinggadgets.common.registry.objects.BuildingObjects;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;

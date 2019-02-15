@@ -1,18 +1,13 @@
 package com.direwolf20.buildinggadgets.common.network.packets;
 
-import java.util.function.Supplier;
-
-import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetBuilding;
-import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
-import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetDestruction;
-import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetExchanger;
-import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
+import com.direwolf20.buildinggadgets.common.items.gadgets.*;
 import com.direwolf20.buildinggadgets.common.utils.GadgetUtils;
-
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;
+
+import java.util.function.Supplier;
 
 public class PacketAnchorKey {
 

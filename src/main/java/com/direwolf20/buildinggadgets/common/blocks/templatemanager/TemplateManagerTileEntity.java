@@ -1,6 +1,7 @@
 package com.direwolf20.buildinggadgets.common.blocks.templatemanager;
 
-import com.direwolf20.buildinggadgets.common.BuildingObjects;
+import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
+import com.direwolf20.buildinggadgets.common.registry.objects.BuildingObjects;
 import com.google.common.collect.ImmutableSet;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
@@ -19,8 +20,8 @@ import java.util.Set;
 
 public class TemplateManagerTileEntity extends TileEntity {
 
-    private static final Set<Item> allowedItemsLeft = ImmutableSet.of(BuildingObjects.gadgetCopyPaste, BuildingObjects.template);
-    private static final Set<Item> allowedItemsRight = ImmutableSet.of(Items.PAPER, BuildingObjects.template);
+    private static final Set<Item> allowedItemsLeft = ImmutableSet.of(BGItems.gadgetCopyPaste, BGItems.template);
+    private static final Set<Item> allowedItemsRight = ImmutableSet.of(Items.PAPER, BGItems.template);
 
     public static final int SIZE = 2;
 

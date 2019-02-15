@@ -1,13 +1,14 @@
 package com.direwolf20.buildinggadgets.common.tools;
 
 import com.direwolf20.buildinggadgets.client.RemoteInventoryCache;
-import com.direwolf20.buildinggadgets.common.BuildingObjects;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.items.capability.CapabilityProviderEnergy;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetBuilding;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetDestruction;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetExchanger;
+import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
+import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
 import com.direwolf20.buildinggadgets.common.utils.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.utils.VectorUtil;
 import com.direwolf20.buildinggadgets.common.world.FakeBuilderWorld;
@@ -16,11 +17,7 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Multiset;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.BlockRendererDispatcher;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GLAllocation;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.player.EntityPlayer;
@@ -38,7 +35,6 @@ import net.minecraftforge.client.ForgeHooksClient;
 import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.energy.IEnergyStorage;
-
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.lwjgl.opengl.GL11;
@@ -111,7 +107,7 @@ public class ToolRenders {
             if (!(lookingAt == null)) {
                 startBlock = world.getBlockState(lookingAt.getBlockPos());
             }
-            if (startBlock != BuildingObjects.effectBlock.getDefaultState()) {
+            if (startBlock != BGBlocks.effectBlock.getDefaultState()) {
 
                 IBlockState renderBlockState = getToolBlock(heldItem);
                 if (renderBlockState == Blocks.AIR.getDefaultState()) {//Don't render anything if there is no block selected (Air)
@@ -194,9 +190,9 @@ public class ToolRenders {
                     GL14.glBlendColor(1F, 1F, 1F, 0.35f); //Set the alpha of the blocks we are rendering
                     hasBlocks--;
                     if (energy != null) {
-                        hasEnergy -= BuildingObjects.gadgetBuilding.getEnergyCost(heldItem);
+                        hasEnergy -= ((GadgetBuilding) BGItems.gadgetBuilding).getEnergyCost(heldItem);
                     } else {
-                        hasEnergy -= BuildingObjects.gadgetBuilding.getDamageCost(heldItem);
+                        hasEnergy -= ((GadgetBuilding) BGItems.gadgetBuilding).getDamageCost(heldItem);
                     }
                     if (hasBlocks < 0 || hasEnergy < 0) {
                         dispatcher.renderBlockBrightness(Blocks.RED_STAINED_GLASS.getDefaultState(), 1f);
@@ -254,7 +250,7 @@ public class ToolRenders {
             if (!(lookingAt == null)) {
                 startBlock = world.getBlockState(lookingAt.getBlockPos());
             }
-            if (startBlock != BuildingObjects.effectBlock.getDefaultState()) {
+            if (startBlock != BGBlocks.effectBlock.getDefaultState()) {
                 IBlockState renderBlockState = getToolBlock(heldItem);
                 Minecraft mc = Minecraft.getInstance();
                 mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
@@ -349,9 +345,9 @@ public class ToolRenders {
                     GL14.glBlendColor(1F, 1F, 1F, 0.55f); //Set the alpha of the blocks we are rendering
                     hasBlocks--;
                     if (energy != null) {
-                        hasEnergy -= BuildingObjects.gadgetExchanger.getEnergyCost(heldItem);
+                        hasEnergy -= ((GadgetExchanger) BGItems.gadgetExchanger).getEnergyCost(heldItem);
                     } else {
-                        hasEnergy -= BuildingObjects.gadgetExchanger.getDamageCost(heldItem);
+                        hasEnergy -= ((GadgetExchanger) BGItems.gadgetExchanger).getDamageCost(heldItem);
                     }
                     if (hasBlocks < 0 || hasEnergy < 0) {
                         dispatcher.renderBlockBrightness(Blocks.RED_STAINED_GLASS.getDefaultState(), 1f);
@@ -378,7 +374,7 @@ public class ToolRenders {
         World world = player.world;
         BlockPos startBlock = (GadgetDestruction.getAnchor(stack) == null) ? lookingAt.getBlockPos() : GadgetDestruction.getAnchor(stack);
         EnumFacing facing = (GadgetDestruction.getAnchorSide(stack) == null) ? lookingAt.sideHit : GadgetDestruction.getAnchorSide(stack);
-        if (startBlock == BuildingObjects.effectBlock.getDefaultState()) return;
+        if (startBlock == BGBlocks.effectBlock.getDefaultState()) return;
 
         ItemStack heldItem = GadgetDestruction.getGadget(player);
         if (heldItem.isEmpty()) return;
@@ -498,10 +494,10 @@ public class ToolRenders {
             GlStateManager.popMatrix();
         }
 
-        String UUID = BuildingObjects.gadgetCopyPaste.getUUID(stack);
+        String UUID = ((GadgetCopyPaste) BGItems.gadgetCopyPaste).getUUID(stack);
         World world = player.world;
-        if (((GadgetCopyPaste) BuildingObjects.gadgetCopyPaste).getStartPos(stack) == null) return;
-        if (((GadgetCopyPaste) BuildingObjects.gadgetCopyPaste).getEndPos(stack) == null) return;
+        if (((GadgetCopyPaste) BGItems.gadgetCopyPaste).getStartPos(stack) == null) return;
+        if (((GadgetCopyPaste) BGItems.gadgetCopyPaste).getEndPos(stack) == null) return;
         if (GadgetCopyPaste.getToolMode(stack) == GadgetCopyPaste.ToolMode.Paste) {
             //First check if we have an anchor, if not check if we're looking at a block, if not, exit
             BlockPos startPos = GadgetCopyPaste.getAnchor(stack);
@@ -530,7 +526,7 @@ public class ToolRenders {
 
             //Don't draw on top of blocks being built by our tools.
             IBlockState startBlock = world.getBlockState(startPos);
-            if (startBlock == BuildingObjects.effectBlock.getDefaultState()) return;
+            if (startBlock == BGBlocks.effectBlock.getDefaultState()) return;
 
             //Prepare the block rendering
             //BlockRendererDispatcher dispatcher = Minecraft.getInstance().getBlockRendererDispatcher();
@@ -564,8 +560,8 @@ public class ToolRenders {
             GlStateManager.popMatrix();
 
         } else {
-            BlockPos startPos = ((GadgetCopyPaste) BuildingObjects.gadgetCopyPaste).getStartPos(stack);
-            BlockPos endPos = ((GadgetCopyPaste) BuildingObjects.gadgetCopyPaste).getEndPos(stack);
+            BlockPos startPos = ((GadgetCopyPaste) BGItems.gadgetCopyPaste).getStartPos(stack);
+            BlockPos endPos = ((GadgetCopyPaste) BGItems.gadgetCopyPaste).getEndPos(stack);
             BlockPos blankPos = new BlockPos(0, 0, 0);
             if (startPos == null || endPos == null || startPos.equals(blankPos) || endPos.equals(blankPos)) {
                 return;

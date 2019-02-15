@@ -1,6 +1,5 @@
 package com.direwolf20.buildinggadgets.common.items.gadgets;
 
-import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.items.capability.CapabilityProviderEnergy;
 import com.direwolf20.buildinggadgets.common.utils.NBTUtil;
@@ -20,16 +19,14 @@ import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
 
 import javax.annotation.Nullable;
+import java.util.List;
 
 import static com.direwolf20.buildinggadgets.common.utils.GadgetUtils.withSuffix;
 
-import java.util.List;
-
 public abstract class GadgetGeneric extends Item {
 
-    public GadgetGeneric(Builder builder, String name) {
+    public GadgetGeneric(Builder builder) {
         super(builder.maxStackSize(1));
-        setRegistryName(BuildingGadgets.MODID, name);
         // @todo: reimplement @since 1.13.x
 //        setUnlocalizedName(BuildingGadgets.MODID + "." + name);     // Used for localization (en_US.lang)
     }

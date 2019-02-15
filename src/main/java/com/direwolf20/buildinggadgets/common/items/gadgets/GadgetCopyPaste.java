@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.common.items.gadgets;
 
 import com.direwolf20.buildinggadgets.client.events.EventTooltip;
-import com.direwolf20.buildinggadgets.common.BuildingObjects;
+import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlock;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.config.Config;
@@ -9,11 +9,8 @@ import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.common.items.ITemplate;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketBlockMap;
-import com.direwolf20.buildinggadgets.common.tools.BlockMap;
-import com.direwolf20.buildinggadgets.common.tools.BlockMapIntState;
-import com.direwolf20.buildinggadgets.common.tools.InventoryManipulation;
-import com.direwolf20.buildinggadgets.common.tools.ToolRenders;
-import com.direwolf20.buildinggadgets.common.tools.UniqueItem;
+import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
+import com.direwolf20.buildinggadgets.common.tools.*;
 import com.direwolf20.buildinggadgets.common.utils.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.utils.VectorUtil;
 import com.direwolf20.buildinggadgets.common.world.WorldSave;
@@ -64,8 +61,10 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
         }
     }
 
-    public GadgetCopyPaste(Builder builder, String name) {
-        super(builder.defaultMaxDamage(Config.GADGETS.GADGET_COPY_PASTE.durability.get()), name);
+    public static final ResourceLocation REGISTRY_NAME = new ResourceLocation(BuildingGadgets.MODID,"gadgets/copy_paste");
+
+    public GadgetCopyPaste(Builder builder) {
+        super(builder.defaultMaxDamage(Config.GADGETS.GADGET_COPY_PASTE.durability.get()));
     }
 
     @Override
@@ -316,7 +315,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
             return;
         }
 
-        GadgetCopyPaste tool = (GadgetCopyPaste) BuildingObjects.gadgetCopyPaste;
+        GadgetCopyPaste tool = (GadgetCopyPaste) BGItems.gadgetCopyPaste;
 
         List<BlockMap> blockMapList;
         WorldSave worldSave = WorldSave.getWorldSave(player.world);
@@ -361,7 +360,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
 
     public static void copyBlocks(ItemStack stack, EntityPlayer player, World world, BlockPos startPos, BlockPos endPos) {
         if (startPos != null && endPos != null) {
-            GadgetCopyPaste tool = (GadgetCopyPaste) BuildingObjects.gadgetCopyPaste;
+            GadgetCopyPaste tool = (GadgetCopyPaste) BGItems.gadgetCopyPaste;
             if (findBlocks(world, startPos, endPos, stack, player, tool)) {
                 tool.setStartPos(stack, startPos);
                 tool.setEndPos(stack, endPos);
@@ -510,7 +509,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
         if (heldItem.isEmpty())
             return;
 
-        if (((GadgetCopyPaste) BuildingObjects.gadgetCopyPaste).getStartPos(heldItem) == null ||((GadgetCopyPaste) BuildingObjects.gadgetCopyPaste).getEndPos(heldItem) == null)
+        if (((GadgetCopyPaste) BGItems.gadgetCopyPaste).getStartPos(heldItem) == null ||((GadgetCopyPaste) BGItems.gadgetCopyPaste).getEndPos(heldItem) == null)
             return;
 
         UniqueItem uniqueItem = IntStackMap.get(state);
@@ -534,7 +533,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
         if (ForgeEventFactory.onPlayerBlockPlace(player, blockSnapshot, EnumFacing.UP, EnumHand.MAIN_HAND).isCanceled()) {
             return;
         }
-        ItemStack constructionPaste = new ItemStack(BuildingObjects.constructionPaste);
+        ItemStack constructionPaste = new ItemStack(BGItems.constructionPaste);
         boolean useConstructionPaste = false;
         if (InventoryManipulation.countItem(itemStack, player, world) < neededItems) {
             if (InventoryManipulation.countPaste(player) < neededItems) {
@@ -579,7 +578,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
 
     public static void undoBuild(EntityPlayer player, ItemStack heldItem) {
 //        long time = System.nanoTime();
-        NBTTagCompound tagCompound = WorldSave.getWorldSave(player.world).getCompoundFromUUID(((GadgetCopyPaste) BuildingObjects.gadgetCopyPaste).getUUID(heldItem));
+        NBTTagCompound tagCompound = WorldSave.getWorldSave(player.world).getCompoundFromUUID(((GadgetCopyPaste) BGItems.gadgetCopyPaste).getUUID(heldItem));
         World world = player.world;
         if (world.isRemote) {
             return;

@@ -1,11 +1,9 @@
 package com.direwolf20.buildinggadgets.common.items.pastes;
 
-import java.util.List;
-
-import javax.annotation.Nullable;
-
+import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.Style;
 import net.minecraft.util.text.TextComponentTranslation;
@@ -14,10 +12,13 @@ import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-public class ConstructionPasteContainerCreative extends GenericPasteContainer {
+import javax.annotation.Nullable;
+import java.util.List;
 
+public class ConstructionPasteContainerCreative extends GenericPasteContainer {
+    public static final ResourceLocation REGISTRY_NAME = new ResourceLocation(BuildingGadgets.MODID,"construction/paste/container/creative");
     public ConstructionPasteContainerCreative(Builder builder) {
-        super(builder, "creative");
+        super(builder);
     }
 
     @OnlyIn(Dist.CLIENT)
@@ -33,8 +34,7 @@ public class ConstructionPasteContainerCreative extends GenericPasteContainer {
     }
 
     @Override
-    public void setPasteCount(ItemStack stack, int amount) {
-    }
+    public void setPasteCount(ItemStack stack, int amount) {}
 
     @Override
     public int getPasteCount(ItemStack stack) {
