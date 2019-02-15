@@ -8,6 +8,7 @@ import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.config.ModConfig;
 
+import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.Objects;
 
@@ -278,6 +279,12 @@ public class Config {
     public static final class CategoryBlacklist {
         public final ConfigValue<List<? extends String>> blockBlacklist; //TODO convert to a tag (or at least make compatible with) - I don't know whether this might or might not work
 
+        public final ConfigValue<List<? extends String>> blockWhitelist;
+        @Nonnull
+        private PatternList parsedBlacklist;
+        @Nonnull
+        private PatternList parsedWhitelist;
+
         private CategoryBlacklist() {
             SERVER_BUILDER.comment("Configure your Blacklist-Settings here")/*.translation(LANG_KEY_BLACKLIST)*/.push("Blacklist Settings");
 
@@ -288,13 +295,23 @@ public class Config {
                     .translation(LANG_KEY_BLACKLIST + ".blockBlacklist")
                     .defineList("Blacklisted Blocks", ImmutableList.of("minecraft:.*_door.*", PatternList.getName(Blocks.PISTON_HEAD)), obj -> obj instanceof String);
 
-            SERVER_BUILDER.pop();
+            blockWhitelist = SERVER_BUILDER
+                    .comment("Allows you to define a whitelist, allowing Patterns to be defined in the same way as the blacklist.")
+                    .translation(LANG_KEY_BLACKLIST + ".blockWhitelist")
+                    .defineList("Whitelisted Blocks",ImmutableList.of("*"),obj -> obj instanceof String);
 
+            parseBlacklists();
+
+            SERVER_BUILDER.pop();
+        }
+
+        private void parseBlacklists() {
+            parsedBlacklist = PatternList.ofResourcePattern(blockBlacklist.get());
+            parsedWhitelist = PatternList.ofResourcePattern(blockWhitelist.get());
         }
 
         public boolean isAllowedBlock(Block block) {
-            //TODO replace with Patternlist
-            return blockBlacklist.get().contains(Objects.requireNonNull(block.getRegistryName()).toString());
+            return parsedWhitelist.contains(Objects.requireNonNull(block.getRegistryName()).toString()) && !parsedBlacklist.contains(block);
         }
     }
 
@@ -303,6 +320,7 @@ public class Config {
 
     @SubscribeEvent
     public static void onLoad(final ModConfig.Loading configEvent) {
+        BLACKLIST.parseBlacklists();
         BuildingGadgets.LOG.debug("Loaded {} config file {}", BuildingGadgets.MODID, configEvent.getConfig().getFileName());
     }
 

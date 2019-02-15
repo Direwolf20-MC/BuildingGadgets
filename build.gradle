@@ -50,10 +50,10 @@ minecraft {
             source sourceSets.main
         }
     }
-	maven {
+	/*maven {
         name 'Raoulvdberge Repo' // RS
         url 'https://repo.raoulvdberge.com/'
-    }
+    }*/
 }
 
 dependencies {
