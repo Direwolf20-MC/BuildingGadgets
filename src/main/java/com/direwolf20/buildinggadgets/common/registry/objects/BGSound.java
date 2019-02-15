@@ -31,7 +31,6 @@ public enum BGSound {
         ClientProxy.playSound(sound, pitch);
     }
 
-
     @SubscribeEvent
     public static void registerSounds(RegistryEvent.Register<SoundEvent> event) {
         for (BGSound sound : values()) {

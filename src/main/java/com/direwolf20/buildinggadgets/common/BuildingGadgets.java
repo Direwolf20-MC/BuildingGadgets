@@ -38,16 +38,15 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig.Type;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 import net.minecraftforge.fml.javafmlmod.FMLModLoadingContext;
 import net.minecraftforge.fml.loading.FMLPaths;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import javax.annotation.Nonnull;
 import java.nio.file.Path;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 @Mod(value = BuildingGadgets.MODID)
 public class BuildingGadgets {
@@ -64,11 +63,7 @@ public class BuildingGadgets {
         assert theMod != null;
         return theMod;
     }
-
-    private Supplier<Minecraft> mcSupplier;
     public BuildingGadgets() {
-        theMod = (BuildingGadgets) FMLModLoadingContext.get().getActiveContainer().getMod();
-        mcSupplier = null;
         IEventBus eventBus = FMLModLoadingContext.get().getModEventBus();
 
         //TODO handle Config properly as soon as Forge fixes it's "I dont load Server Config" bug
@@ -76,6 +71,7 @@ public class BuildingGadgets {
         FMLModLoadingContext.get().registerConfig(Type.SERVER, Config.SERVER_CONFIG);
         eventBus.addListener(this::setup);
         eventBus.addListener(this::serverLoad);
+        eventBus.addListener(this::finishLoad);
 
         MinecraftForge.EVENT_BUS.register(new AnvilRepairHandler());
 
@@ -102,15 +98,8 @@ public class BuildingGadgets {
         spec.setConfig(configData);
     }
 
-    @Nonnull
-    public Minecraft getMinecraft() {
-        if (mcSupplier == null) throw new RuntimeException("Attempted to access Minecraft instance server Side");
-        Minecraft mc = mcSupplier.get();
-        assert mc != null;
-        return mc;
-    }
-
     private void setup(final FMLCommonSetupEvent event) {
+        theMod = (BuildingGadgets) FMLModLoadingContext.get().getActiveContainer().getMod();
         DeferredWorkQueue.runLater(PacketHandler::register);
 
 // @todo: reimplement @since 1.13.x
@@ -118,18 +107,19 @@ public class BuildingGadgets {
     }
 
     private void clientInit(final FMLClientSetupEvent event, final IEventBus eventBus) {
-        mcSupplier = event.getMinecraftSupplier();
         ClientProxy.clientSetup(event, eventBus);
     }
 
     private void serverLoad(FMLServerStartingEvent event) {
-
         event.getCommandDispatcher().register(
                 Commands.literal(MODID)
                     .then(BlockMapCommand.registerList())
                     .then(BlockMapCommand.registerDelete())
         );
+    }
 
+    private void finishLoad(FMLLoadCompleteEvent event) {
+        BuildingObjects.cleanup();
     }
 
     public static class ClientProxy {

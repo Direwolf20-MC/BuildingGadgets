@@ -5,6 +5,7 @@ import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlock;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.color.BlockColors;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
@@ -25,7 +26,7 @@ public class BuildingObjects {
 
 
     public static void initColorHandlers() { //TODO ItemBlock Creative Tabs
-        BlockColors blockColors = BuildingGadgets.getInstance().getMinecraft().getBlockColors();
+        BlockColors blockColors = Minecraft.getInstance().getBlockColors();
         //TODO non conditional registry
         if (Config.GENERAL.enablePaste.get()) ((ConstructionBlock) BGBlocks.constructionBlock).initColorHandler(blockColors);
     }
@@ -35,5 +36,12 @@ public class BuildingObjects {
         BGItems.init();
         BGEntities.init();
         BGTileEntities.init();
+    }
+
+    public static void cleanup() {
+        BGBlocks.cleanup();
+        BGItems.cleanup();
+        BGEntities.cleanup();
+        BGTileEntities.cleanup();
     }
 }

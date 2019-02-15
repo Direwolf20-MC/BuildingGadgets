@@ -31,4 +31,8 @@ public class RegistryContainer <T extends IForgeRegistryEntry<T>, B extends IReg
         }
         BuildingGadgets.LOG.debug("Finished Registering {} BuildingGadgets objects to {}.",getBuilders().size(),event.getName());
     }
+
+    public void clear() {
+        builders.clear();
+    }
 }

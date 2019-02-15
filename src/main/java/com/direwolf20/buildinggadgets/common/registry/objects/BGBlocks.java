@@ -64,4 +64,8 @@ public final class BGBlocks {
     public static void registerItemBlocks(RegistryEvent.Register<Item> event) {
         container.registerItemBlocks(event);
     }
+
+    public static void cleanup() {
+        container.clear();
+    }
 }

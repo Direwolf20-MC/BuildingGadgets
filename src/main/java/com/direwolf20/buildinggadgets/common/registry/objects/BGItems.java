@@ -72,4 +72,8 @@ public final class BGItems {
     static Item.Builder itemBuilder() {
         return new Item.Builder().group(BuildingObjects.creativeTab);
     }
+
+    public static void cleanup() {
+        container.clear();
+    }
 }

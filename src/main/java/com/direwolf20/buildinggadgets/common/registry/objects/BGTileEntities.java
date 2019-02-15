@@ -34,4 +34,8 @@ public class BGTileEntities {
     public static void registerTiles(RegistryEvent.Register<TileEntityType<?>> event) {
         container.register(event);
     }
+
+    public static void cleanup() {
+        container.clear();
+    }
 }

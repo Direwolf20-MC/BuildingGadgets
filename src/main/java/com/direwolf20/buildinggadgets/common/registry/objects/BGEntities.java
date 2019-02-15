@@ -37,4 +37,8 @@ public class BGEntities {
     public static void registerEntities(RegistryEvent.Register<EntityType<?>> event) {
         container.register(event);
     }
+
+    public static void cleanup() {
+        container.clear();
+    }
 }
