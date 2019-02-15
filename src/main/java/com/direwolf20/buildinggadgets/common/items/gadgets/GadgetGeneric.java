@@ -26,9 +26,7 @@ import static com.direwolf20.buildinggadgets.common.utils.GadgetUtils.withSuffix
 public abstract class GadgetGeneric extends Item {
 
     public GadgetGeneric(Builder builder) {
-        super(builder.maxStackSize(1));
-        // @todo: reimplement @since 1.13.x
-//        setUnlocalizedName(BuildingGadgets.MODID + "." + name);     // Used for localization (en_US.lang)
+        super(builder);
     }
 
     public abstract int getEnergyMax();

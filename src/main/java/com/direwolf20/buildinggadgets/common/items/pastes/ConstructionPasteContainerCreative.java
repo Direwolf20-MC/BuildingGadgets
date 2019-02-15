@@ -16,7 +16,7 @@ import javax.annotation.Nullable;
 import java.util.List;
 
 public class ConstructionPasteContainerCreative extends GenericPasteContainer {
-    public static final ResourceLocation REGISTRY_NAME = new ResourceLocation(BuildingGadgets.MODID,"construction/paste/container/creative");
+    public static final ResourceLocation REGISTRY_NAME = new ResourceLocation(BuildingGadgets.MODID,"construction_paste_container_creative");
     public ConstructionPasteContainerCreative(Builder builder) {
         super(builder);
     }

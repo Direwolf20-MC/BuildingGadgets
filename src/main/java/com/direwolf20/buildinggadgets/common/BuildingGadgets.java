@@ -14,6 +14,8 @@ import com.direwolf20.buildinggadgets.common.items.gadgets.*;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.registry.objects.BuildingObjects;
 import com.direwolf20.buildinggadgets.common.tools.ToolRenders;
+import com.electronwill.nightconfig.core.file.CommentedFileConfig;
+import com.electronwill.nightconfig.core.io.WritingMode;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.command.Commands;
@@ -26,6 +28,7 @@ import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
+import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.DeferredWorkQueue;
@@ -37,10 +40,12 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 import net.minecraftforge.fml.javafmlmod.FMLModLoadingContext;
+import net.minecraftforge.fml.loading.FMLPaths;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nonnull;
+import java.nio.file.Path;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -66,6 +71,7 @@ public class BuildingGadgets {
         mcSupplier = null;
         IEventBus eventBus = FMLModLoadingContext.get().getModEventBus();
 
+        //TODO handle Config properly as soon as Forge fixes it's "I dont load Server Config" bug
         FMLModLoadingContext.get().registerConfig(Type.CLIENT, Config.CLIENT_CONFIG);
         FMLModLoadingContext.get().registerConfig(Type.SERVER, Config.SERVER_CONFIG);
         eventBus.addListener(this::setup);
@@ -78,8 +84,22 @@ public class BuildingGadgets {
         DistExecutor.runWhenOn(Dist.CLIENT, () -> () -> {
             eventBus.addListener((Consumer<FMLClientSetupEvent>) (event -> clientInit(event, eventBus)));
         });
-
+        loadConfig(Config.CLIENT_CONFIG, FMLPaths.CONFIGDIR.get().resolve("buildinggadgets-client.toml"));
+        loadConfig(Config.SERVER_CONFIG, FMLPaths.CONFIGDIR.get().resolve("buildinggadgets-server.toml"));
         BuildingObjects.init();
+    }
+
+    private void loadConfig(ForgeConfigSpec spec, Path path) {
+        LOG.debug("Loading config file {}", path);
+        final CommentedFileConfig configData = CommentedFileConfig.builder(path)
+                .sync()
+                .autosave()
+                .writingMode(WritingMode.REPLACE)
+                .build();
+        LOG.debug("Built TOML config for {}", path.toString());
+        configData.load();
+        LOG.debug("Loaded TOML config file {}", path.toString());
+        spec.setConfig(configData);
     }
 
     @Nonnull

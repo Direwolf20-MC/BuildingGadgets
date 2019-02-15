@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.common.blocks.templatemanager;
 
 import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
-import com.direwolf20.buildinggadgets.common.registry.objects.BuildingObjects;
+import com.direwolf20.buildinggadgets.common.registry.objects.BGTileEntities;
 import com.google.common.collect.ImmutableSet;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
@@ -58,7 +58,7 @@ public class TemplateManagerTileEntity extends TileEntity {
     };
 
     public TemplateManagerTileEntity() {
-        super(BuildingObjects.TEMPLATE_MANAGER_TYPE);
+        super(BGTileEntities.TEMPLATE_MANAGER_TYPE);
     }
 
     @Override

@@ -2,7 +2,7 @@ package com.direwolf20.buildinggadgets.common.entities;
 
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
-import com.direwolf20.buildinggadgets.common.registry.objects.BuildingObjects;
+import com.direwolf20.buildinggadgets.common.registry.objects.BGEntities;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -40,14 +40,14 @@ public class BlockBuildEntity extends Entity {
     int maxLife = 20;
 
     public BlockBuildEntity(World world) {
-        super(BuildingObjects.BLOCK_BUILD, world);
+        super(BGEntities.BLOCK_BUILD, world);
 
         setSize(0.1F, 0.1F);
         this.world = world;
     }
 
     public BlockBuildEntity(World worldIn, BlockPos spawnPos, EntityLivingBase player, IBlockState spawnBlock, int toolMode, IBlockState actualSpawnBlock, boolean constrPaste) {
-        super(BuildingObjects.BLOCK_BUILD, worldIn);
+        super(BGEntities.BLOCK_BUILD, worldIn);
         setSize(0.1F, 0.1F);
         setPosition(spawnPos.getX(), spawnPos.getY(), spawnPos.getZ());
         IBlockState currentBlock = worldIn.getBlockState(spawnPos);

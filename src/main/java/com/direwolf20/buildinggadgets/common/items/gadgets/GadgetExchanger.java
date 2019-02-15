@@ -60,7 +60,7 @@ public class GadgetExchanger extends GadgetGeneric {
         }
     }
 
-    public static final ResourceLocation REGISTRY_NAME = new ResourceLocation(BuildingGadgets.MODID,"gadgets/exchanging");
+    public static final ResourceLocation REGISTRY_NAME = new ResourceLocation(BuildingGadgets.MODID,"gadgets_exchanging");
 
     public GadgetExchanger(Builder builder) {
         super(builder.defaultMaxDamage(Config.GADGETS.GADGET_EXCHANGER.durability.get()));

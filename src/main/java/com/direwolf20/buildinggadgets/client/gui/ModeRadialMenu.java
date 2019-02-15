@@ -15,7 +15,7 @@ import com.direwolf20.buildinggadgets.common.network.packets.PacketChangeRange;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketToggleConnectedArea;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketToggleFuzzy;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketToggleMode;
-import com.direwolf20.buildinggadgets.common.registry.objects.BGSounds;
+import com.direwolf20.buildinggadgets.common.registry.objects.BGSound;
 import com.google.common.collect.ImmutableSet;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
@@ -112,7 +112,7 @@ public class ModeRadialMenu extends GuiScreen {
         int x = 0;
         for (int i = 0; i < buttons.size(); i++) {
             GuiButtonSound button = (GuiButtonSound) buttons.get(i);
-            SoundEvent sound = BGSounds.BEEP.getSound();
+            SoundEvent sound = BGSound.BEEP.getSound();
             button.setSounds(sound, sound, 0.6F, 1F);
             if (!button.visible) continue;
             int len = mc.fontRenderer.getStringWidth(button.displayString) + 6;
@@ -284,7 +284,7 @@ public class ModeRadialMenu extends GuiScreen {
     private void changeMode() {
         if (slotSelected >= 0) {
             PacketHandler.sendToServer(new PacketToggleMode(slotSelected));
-            BGSounds.BEEP.playSound();
+            BGSound.BEEP.playSound();
         }
     }
 

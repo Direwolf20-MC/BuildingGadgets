@@ -4,7 +4,7 @@ import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlock;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockPowder;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
-import com.direwolf20.buildinggadgets.common.registry.objects.BuildingObjects;
+import com.direwolf20.buildinggadgets.common.registry.objects.BGEntities;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NBTTagCompound;
@@ -29,13 +29,13 @@ public class ConstructionBlockEntity extends Entity {
     int maxLife = 80;
 
     public ConstructionBlockEntity(World worldIn) {
-        super(BuildingObjects.CONSTRUCTION_BLOCK, worldIn);
+        super(BGEntities.CONSTRUCTION_BLOCK, worldIn);
         setSize(0.1F, 0.1F);
         world = worldIn;
     }
 
     public ConstructionBlockEntity(World worldIn, BlockPos spawnPos, boolean makePaste) {
-        super(BuildingObjects.CONSTRUCTION_BLOCK, worldIn);
+        super(BGEntities.CONSTRUCTION_BLOCK, worldIn);
         setSize(0.1F, 0.1F);
         world = worldIn;
         setPosition(spawnPos.getX(), spawnPos.getY(), spawnPos.getZ());

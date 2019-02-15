@@ -13,37 +13,42 @@ import com.direwolf20.buildinggadgets.common.registry.RegistryContainer;
 import com.direwolf20.buildinggadgets.common.registry.RegistryObjectBuilder;
 import net.minecraft.item.Item;
 import net.minecraft.item.Item.Builder;
+import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
+import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
 import net.minecraftforge.registries.ObjectHolder;
 
 @ObjectHolder(BuildingGadgets.MODID)
+@EventBusSubscriber(modid = BuildingGadgets.MODID, bus = Bus.MOD)
 public final class BGItems {
     private BGItems() {}
 
     private static final RegistryContainer<Item, RegistryObjectBuilder<Item, Builder>> container = new RegistryContainer<>();
     // Gadgets
-    @ObjectHolder("gadgets/building")
+    @ObjectHolder("gadgets_building")
     public static Item gadgetBuilding;
-    @ObjectHolder("gadgets/copy_paste")
+    @ObjectHolder("gadgets_copy_paste")
     public static Item gadgetCopyPaste;
-    @ObjectHolder("gadgets/exchanging")
+    @ObjectHolder("gadgets_exchanging")
     public static Item gadgetExchanger;
-    @ObjectHolder("gadgets/destruction")
+    @ObjectHolder("gadgets_destruction")
     public static Item gadgetDestruction  ;
 
     // Building Items
-    @ObjectHolder("construction/paste")
+    @ObjectHolder("construction_paste")
     public static Item constructionPaste;
     @ObjectHolder("template")
     public static Item template  ;
 
     // Construction Paste Containers
-    @ObjectHolder("construction/paste/container/t1")
+    @ObjectHolder("construction_paste_container_t1")
     public static Item ConstructionPasteContainer;
-    @ObjectHolder("construction/paste/container/t2")
+    @ObjectHolder("construction_paste_container_t2")
     public static Item ConstructionPasteContainer2;
-    @ObjectHolder("construction/paste/container/t3")
+    @ObjectHolder("construction_paste_container_t3")
     public static Item ConstructionPasteContainer3;
-    @ObjectHolder("construction/paste/container/creative")
+    @ObjectHolder("construction_paste_container_creative")
     public static Item CreativeConstructionPasteContainer;
 
     public static void init() {
@@ -59,7 +64,12 @@ public final class BGItems {
         container.add(new RegistryObjectBuilder<Item, Item.Builder>(Template.REGISTRY_NAME).builder(itemBuilder()).factory(Template::new));
     }
 
-    private static Item.Builder itemBuilder() {
+    @SubscribeEvent
+    public static void registerItems(RegistryEvent.Register<Item> event) {
+        container.register(event);
+    }
+
+    static Item.Builder itemBuilder() {
         return new Item.Builder().group(BuildingObjects.creativeTab);
     }
 }
