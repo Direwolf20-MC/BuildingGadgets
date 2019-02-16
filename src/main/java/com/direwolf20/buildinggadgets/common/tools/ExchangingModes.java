@@ -2,9 +2,8 @@ package com.direwolf20.buildinggadgets.common.tools;
 
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.blocks.ModBlocks;
-import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetExchanger;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
-
+import com.direwolf20.buildinggadgets.common.tools.gadget.building.IBuildingMode;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
@@ -16,26 +15,152 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-public class ExchangingModes {
-    private static boolean isReplaceable(World world, BlockPos pos, IBlockState currentBlock, IBlockState setBlock, boolean fuzzyMode) {
+public enum ExchangingModes {
+
+    Surface((world, player, hit, sideHit, tool) -> {
+        List<BlockPos> coordinates = new ArrayList<>();
+        IBlockState target = GadgetUtils.getToolActualBlock(tool);
+        IBlockState current = world.getBlockState(hit);
+        int range = GadgetUtils.getToolRange(tool);
+        int radius = (range - 1) / 2;
+        boolean fuzzyMode = GadgetGeneric.getFuzzy(tool);
+
+        AxisAlignedBB area = new AxisAlignedBB(hit).grow(radius * (1 - Math.abs(sideHit.getFrontOffsetX())),
+                radius * (1 - Math.abs(sideHit.getFrontOffsetY())), radius * (1 - Math.abs(sideHit.getFrontOffsetZ())));
+        if (GadgetGeneric.getConnectedArea(tool)) {
+            addConnectedCoords(world, hit, current, target, fuzzyMode, coordinates,
+                    (int) area.minX, (int) area.minY, (int) area.minZ, (int) area.maxX - 1, (int) area.maxY - 1, (int) area.maxZ - 1);
+        } else {
+            for (BlockPos pos : BlockPos.getAllInBox((int) area.minX, (int) area.minY, (int) area.minZ, (int) area.maxX - 1, (int) area.maxY - 1, (int) area.maxZ - 1)) {
+                if (isReplaceable(world, pos, current, target, fuzzyMode)) {
+                    coordinates.add(pos);
+                }
+            }
+        }
+
+        return coordinates;
+    }),
+    VerticalColumn((world, player, hit, sideHit, tool) -> {
+        List<BlockPos> coordinates = new ArrayList<>();
+        IBlockState target = GadgetUtils.getToolActualBlock(tool);
+        IBlockState current = world.getBlockState(hit);
+        int range = GadgetUtils.getToolRange(tool);
+        int radius = (range - 1) / 2;
+        boolean fuzzyMode = GadgetGeneric.getFuzzy(tool);
+
+        BlockPos base;
+        EnumFacing extension;
+        if (sideHit.getAxis().isVertical()) {
+            EnumFacing playerFacing = player.getHorizontalFacing();
+            base = hit.offset(playerFacing.getOpposite(), radius);
+            extension = playerFacing;
+        } else {
+            base = hit.down(radius);
+            extension = EnumFacing.UP;
+        }
+
+        for (int i = 0; i < range; i++) {
+            BlockPos pos = base.offset(extension, i);
+            if (isReplaceable(world, pos, current, target, fuzzyMode)) {
+                coordinates.add(pos);
+            }
+        }
+
+        return coordinates;
+    }),
+    HorizontalColumn((world, player, hit, sideHit, tool) -> {
+        List<BlockPos> coordinates = new ArrayList<>();
+        IBlockState target = GadgetUtils.getToolActualBlock(tool);
+        IBlockState current = world.getBlockState(hit);
+        int range = GadgetUtils.getToolRange(tool);
+        int radius = (range - 1) / 2;
+        boolean fuzzyMode = GadgetGeneric.getFuzzy(tool);
+
+        EnumFacing playerFacing = player.getHorizontalFacing();
+        EnumFacing extension = playerFacing.rotateY();
+        BlockPos base = hit.offset(extension.getOpposite(), radius);
+
+        for (int i = 0; i < range; i++) {
+            BlockPos pos = base.offset(extension, i);
+            if (isReplaceable(world, pos, current, target, fuzzyMode)) {
+                coordinates.add(pos);
+            }
+        }
+
+        return coordinates;
+    }),
+    Grid((world, player, hit, sideHit, tool) -> {
+        List<BlockPos> coordinates = new ArrayList<>();
+        IBlockState target = GadgetUtils.getToolActualBlock(tool);
+        IBlockState current = world.getBlockState(hit);
+        int range = GadgetUtils.getToolRange(tool) + 1;
+        boolean fuzzyMode = GadgetGeneric.getFuzzy(tool);
+
+        for (int x = range * -7 / 5; x <= range * 7 / 5; x++) {
+            for (int z = range * -7 / 5; z <= range * 7 / 5; z++) {
+                if (x % (((range - 2) % 6) + 2) == 0 && z % (((range - 2) % 6) + 2) == 0) {
+                    BlockPos pos = new BlockPos(hit.getX() + x, hit.getY(), hit.getZ() + z);
+                    if (isReplaceable(world, pos, current, target, fuzzyMode)) {
+                        coordinates.add(pos);
+                    }
+                }
+            }
+        }
+
+        return coordinates;
+    });
+
+    private final String displayName;
+    private final IBuildingMode modeImpl;
+
+    ExchangingModes(IBuildingMode modeImpl) {
+        this.displayName = GadgetGeneric.formatName(name());
+        this.modeImpl = modeImpl;
+    }
+
+    @Override
+    public String toString() {
+        return GadgetGeneric.formatName(name());
+    }
+
+    public ExchangingModes next() {//TODO unused
+        ExchangingModes[] values = values();
+        return values[(this.ordinal() + 1) % values.length];
+    }
+
+    public static IBuildingMode byName(String name) {
+        return Arrays.stream(values())
+                .filter(mode -> mode.name().equals(name))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Unable to find exchanging mode with name " + name))
+                .modeImpl;
+    }
+
+    public static List<BlockPos> getBuildCoords(World world, EntityPlayer player, BlockPos hit, EnumFacing sideHit, ItemStack tool) {
+        IBuildingMode mode = byName(NBTTool.getOrNewTag(tool).getString("mode"));
+        return mode.computeCoordinates(world, player, hit, sideHit, tool);
+    }
+
+    private static boolean isReplaceable(World world, BlockPos pos, IBlockState current, IBlockState target, boolean fuzzyMode) {
         IBlockState worldBlockState = world.getBlockState(pos);
         TileEntity te = world.getTileEntity(pos);
-        if (worldBlockState != currentBlock && !fuzzyMode) {
+        if (worldBlockState != current && !fuzzyMode) {
             return false;
         }
         if (worldBlockState == ModBlocks.effectBlock.getDefaultState()) {
             return false;
         }
-        if (worldBlockState == setBlock) {
+        if (worldBlockState == target) {
             return false;
         }
         if (te != null && !(te instanceof ConstructionBlockTileEntity)) {
             return false;
         }
-        if (te instanceof ConstructionBlockTileEntity) {
-            if (((ConstructionBlockTileEntity) te).getBlockState() == setBlock) {
+        if (te != null) {
+            if (((ConstructionBlockTileEntity) te).getBlockState() == target) {
                 return false;
             }
         }
@@ -45,17 +170,11 @@ public class ExchangingModes {
         if (worldBlockState.getMaterial() == Material.AIR) {
             return false;
         }
-        if (worldBlockState.getMaterial().isLiquid()) {
-            return false;
-        }
-        /*if (world.getBlockState(pos) != currentBlock || world.getBlockState(pos) == ModBlocks.effectBlock.getDefaultState() || world.getBlockState(pos) == setBlock || world.getTileEntity(pos) != null || currentBlock.getBlock().getBlockHardness(currentBlock, world, pos) < 0) {
-            return false;
-        }*/
-        return true;
+        return !worldBlockState.getMaterial().isLiquid();
     }
 
     public static void addConnectedCoords(World world, BlockPos loc, IBlockState state, IBlockState setBlock,
-            boolean fuzzyMode, List<BlockPos> coords, int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
+                                          boolean fuzzyMode, List<BlockPos> coords, int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
         if (coords.contains(loc) || loc.getX() < minX || loc.getY() < minY || loc.getZ() < minZ || loc.getX() > maxX || loc.getY() > maxY || loc.getZ() > maxZ)
             return;
 
@@ -72,137 +191,4 @@ public class ExchangingModes {
         }
     }
 
-    public static List<BlockPos> getBuildOrders(World world, EntityPlayer player, BlockPos startBlock, EnumFacing sideHit, ItemStack tool) {
-
-        GadgetExchanger.ToolMode mode = GadgetExchanger.getToolMode(tool);
-        IBlockState setBlock = GadgetUtils.getToolBlock(tool);
-        int range = GadgetUtils.getToolRange(tool);
-        boolean fuzzyMode = GadgetGeneric.getFuzzy(tool);
-
-        List<BlockPos> coordinates = new ArrayList<BlockPos>();
-//        BlockPos playerPos = new BlockPos(Math.floor(player.posX), Math.floor(player.posY), Math.floor(player.posZ));
-        BlockPos pos = startBlock;
-        int bound = (range - 1) / 2;
-        EnumFacing playerFacing = player.getHorizontalFacing();
-        int boundX, boundZ, boundXS, boundZS;
-        if (playerFacing == EnumFacing.SOUTH || playerFacing == EnumFacing.NORTH) {
-            boundX = bound;
-            boundZ = 0;
-        } else {
-            boundX = 0;
-            boundZ = bound;
-        }
-        if (sideHit == EnumFacing.SOUTH || sideHit == EnumFacing.NORTH) {
-            boundXS = bound;
-            boundZS = 0;
-        } else {
-            boundXS = 0;
-            boundZS = bound;
-        }
-
-        IBlockState currentBlock = world.getBlockState(startBlock);
-
-        //***************************************************
-        //Surface
-        //***************************************************
-        if (mode == GadgetExchanger.ToolMode.Surface) {
-            if (GadgetGeneric.getConnectedArea(tool)) {
-                AxisAlignedBB area = new AxisAlignedBB(pos).grow(bound * (1 - Math.abs(sideHit.getFrontOffsetX())),
-                        bound * (1 - Math.abs(sideHit.getFrontOffsetY())), bound * (1 - Math.abs(sideHit.getFrontOffsetZ())));
-                addConnectedCoords(world, pos, currentBlock, setBlock, fuzzyMode, coordinates,
-                        (int) area.minX, (int) area.minY, (int) area.minZ, (int) area.maxX - 1, (int) area.maxY - 1, (int) area.maxZ - 1);
-            } else {
-                if (sideHit == EnumFacing.UP || sideHit == EnumFacing.DOWN) {
-                    for (int x = bound * -1; x <= bound; x++) {
-                        for (int z = bound * -1; z <= bound; z++) {
-                            pos = new BlockPos(startBlock.getX() - x, startBlock.getY(), startBlock.getZ() + z);
-                            if (isReplaceable(world, pos, currentBlock, setBlock, fuzzyMode)) {
-                                coordinates.add(pos);
-                            }
-                        }
-                    }
-                } else {
-                    for (int y = bound; y >= bound * -1; y--) {
-                        for (int x = boundXS * -1; x <= boundXS; x++) {
-                            for (int z = boundZS * -1; z <= boundZS; z++) {
-                                pos = new BlockPos(startBlock.getX() + x, startBlock.getY() - y, startBlock.getZ() + z);
-                                //System.out.println(pos);
-                                if (isReplaceable(world, pos, currentBlock, setBlock, fuzzyMode)) {
-                                    coordinates.add(pos);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        //***************************************************
-        //VerticalColumn
-        //***************************************************
-        if (mode == GadgetExchanger.ToolMode.VerticalColumn) {
-            if (sideHit == EnumFacing.UP || sideHit == EnumFacing.DOWN) {
-                for (int x = boundZ * -1; x <= boundZ; x++) {
-                    for (int z = boundX * -1; z <= boundX; z++) {
-                        pos = new BlockPos(startBlock.getX() - x, startBlock.getY(), startBlock.getZ() + z);
-                        if (isReplaceable(world, pos, currentBlock, setBlock, fuzzyMode)) {
-                            coordinates.add(pos);
-                        }
-                    }
-                }
-            } else {
-                for (int y = bound; y >= bound * -1; y--) {
-                    pos = new BlockPos(startBlock.getX(), startBlock.getY() - y, startBlock.getZ());
-                    if (isReplaceable(world, pos, currentBlock, setBlock, fuzzyMode)) {
-                        coordinates.add(pos);
-                    }
-                }
-            }
-        }
-        //***************************************************
-        //HorizontalColumn
-        //***************************************************
-        if (mode == GadgetExchanger.ToolMode.HorizontalColumn) {
-            if (sideHit == EnumFacing.UP || sideHit == EnumFacing.DOWN) {
-                for (int x = boundX * -1; x <= boundX; x++) {
-                    for (int z = boundZ * -1; z <= boundZ; z++) {
-                        pos = new BlockPos(startBlock.getX() - x, startBlock.getY(), startBlock.getZ() + z);
-                        if (isReplaceable(world, pos, currentBlock, setBlock, fuzzyMode)) {
-                            coordinates.add(pos);
-                        }
-                    }
-                }
-            } else if (sideHit == EnumFacing.NORTH || sideHit == EnumFacing.SOUTH) {
-                for (int x = bound * -1; x <= bound; x++) {
-                    pos = new BlockPos(startBlock.getX() + x, startBlock.getY(), startBlock.getZ());
-                    if (isReplaceable(world, pos, currentBlock, setBlock, fuzzyMode)) {
-                        coordinates.add(pos);
-                    }
-                }
-            } else if (sideHit == EnumFacing.EAST || sideHit == EnumFacing.WEST) {
-                for (int z = bound * -1; z <= bound; z++) {
-                    pos = new BlockPos(startBlock.getX(), startBlock.getY(), startBlock.getZ() + z);
-                    if (isReplaceable(world, pos, currentBlock, setBlock, fuzzyMode)) {
-                        coordinates.add(pos);
-                    }
-                }
-            }
-        }
-        //***************************************************
-        //TorchPlacer
-        //***************************************************
-        else if (mode == GadgetExchanger.ToolMode.Grid) {
-            range++;
-            for (int x = range * -7 / 5; x <= range * 7 / 5; x++) {
-                for (int z = range * -7 / 5; z <= range * 7 / 5; z++) {
-                    if (x % (((range - 2) % 6) + 2) == 0 && z % (((range - 2) % 6) + 2) == 0) {
-                        pos = new BlockPos(startBlock.getX() + x, startBlock.getY(), startBlock.getZ() + z);
-                        if (isReplaceable(world, pos, currentBlock, setBlock, fuzzyMode)) {
-                            coordinates.add(pos);
-                        }
-                    }
-                }
-            }
-        }
-        return coordinates;
-    }
 }

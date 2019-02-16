@@ -17,6 +17,7 @@ import com.direwolf20.buildinggadgets.common.network.PacketToggleConnectedArea;
 import com.direwolf20.buildinggadgets.common.network.PacketToggleFuzzy;
 import com.direwolf20.buildinggadgets.common.network.PacketToggleMode;
 import com.direwolf20.buildinggadgets.common.tools.BuildingModes;
+import com.direwolf20.buildinggadgets.common.tools.ExchangingModes;
 import com.google.common.collect.ImmutableSet;
 
 import net.minecraft.client.Minecraft;
@@ -76,7 +77,7 @@ public class ModeRadialMenu extends GuiScreen {
         if (stack.getItem() instanceof GadgetBuilding)
             segments = BuildingModes.values().length;
         else if (stack.getItem() instanceof GadgetExchanger)
-            segments = GadgetExchanger.ToolMode.values().length;
+            segments = ExchangingModes.values().length;
         else if (stack.getItem() instanceof GadgetCopyPaste)
             segments = GadgetCopyPaste.ToolMode.values().length;
     }
@@ -240,7 +241,7 @@ public class ModeRadialMenu extends GuiScreen {
             if (tool.getItem() instanceof GadgetBuilding)
                 name = BuildingModes.values()[i].toString();
             else if (tool.getItem() instanceof GadgetExchanger)
-                name = GadgetExchanger.ToolMode.values()[i].toString();
+                name = ExchangingModes.values()[i].toString();
             else
                 name = GadgetCopyPaste.ToolMode.values()[i].toString();
 
@@ -323,7 +324,7 @@ public class ModeRadialMenu extends GuiScreen {
             if (builder)
                 curent = GadgetBuilding.getToolMode(tool) == BuildingModes.Surface;
             else
-                curent = i == 0 || GadgetExchanger.getToolMode(tool) == GadgetExchanger.ToolMode.Surface;
+                curent = i == 0 || GadgetExchanger.getToolMode(tool) == ExchangingModes.Surface;
 
             if (button.visible != curent) {
                 button.visible = curent;

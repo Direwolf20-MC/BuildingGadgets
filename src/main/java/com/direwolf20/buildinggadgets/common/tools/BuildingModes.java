@@ -254,16 +254,15 @@ public enum BuildingModes implements IStringSerializable {
     }
 
     public static IBuildingMode byName(String name) {
-        for (BuildingModes value : values()) {
-            if (value.name().equals(name)) {
-                return value.modeImpl;
-            }
-        }
-        throw new IllegalArgumentException("Unable to find building mode with displayName " + name);
+        return Arrays.stream(values())
+                .filter(mode -> mode.name().equals(name))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Unable to find building mode with name " + name))
+                .modeImpl;
     }
 
-    private static boolean isReplaceable(World world, BlockPos pos, IBlockState setBlock) {
-        if (!setBlock.getBlock().canPlaceBlockAt(world, pos) || world.isOutsideBuildHeight(pos)) {
+    private static boolean isReplaceable(World world, BlockPos pos, IBlockState target) {
+        if (!target.getBlock().canPlaceBlockAt(world, pos) || world.isOutsideBuildHeight(pos)) {
             return false;
         }
         if (SyncedConfig.canOverwriteBlocks) {
