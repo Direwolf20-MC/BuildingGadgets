@@ -200,7 +200,7 @@ public enum BuildingModes implements IStringSerializable {
         int range = GadgetUtils.getToolRange(tool);
         int radius = (range - 1) / 2;
 
-        AxisAlignedBB area = new AxisAlignedBB(hit).grow(
+        Region area = new Region(hit).grow(
                 radius * (1 - Math.abs(sideHit.getFrontOffsetX())),
                 radius * (1 - Math.abs(sideHit.getFrontOffsetY())),
                 radius * (1 - Math.abs(sideHit.getFrontOffsetZ())));
@@ -209,9 +209,9 @@ public enum BuildingModes implements IStringSerializable {
 
         if (GadgetGeneric.getConnectedArea(tool)) {
             addConnectedCoords(world, hit, filter, target, sideHit, fuzzyMode, coordinates, new HashSet<>(),
-                    (int) area.minX, (int) area.minY, (int) area.minZ, (int) area.maxX - 1, (int) area.maxY - 1, (int) area.maxZ - 1);
+                    area.minX, area.minY, area.minZ, area.maxX, area.maxY, area.maxZ);
         } else {
-            for (BlockPos loc : BlockPos.getAllInBox((int) area.minX, (int) area.minY, (int) area.minZ, (int) area.maxX - 1, (int) area.maxY - 1, (int) area.maxZ - 1)) {
+            for (BlockPos loc : BlockPos.getAllInBox(area.minX, area.minY, area.minZ, area.maxX, area.maxY, area.maxZ)) {
                 locOffset = loc.offset(sideHit);
                 if ((fuzzyMode ? !world.isAirBlock(loc) : world.getBlockState(loc) == filter) && isReplaceable(world, locOffset, target)) {
                     coordinates.add(locOffset);

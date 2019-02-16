@@ -28,13 +28,15 @@ public enum ExchangingModes {
         int radius = (range - 1) / 2;
         boolean fuzzyMode = GadgetGeneric.getFuzzy(tool);
 
-        AxisAlignedBB area = new AxisAlignedBB(hit).grow(radius * (1 - Math.abs(sideHit.getFrontOffsetX())),
-                radius * (1 - Math.abs(sideHit.getFrontOffsetY())), radius * (1 - Math.abs(sideHit.getFrontOffsetZ())));
+        Region area = new Region(hit).grow(
+                radius * (1 - Math.abs(sideHit.getFrontOffsetX())),
+                radius * (1 - Math.abs(sideHit.getFrontOffsetY())),
+                radius * (1 - Math.abs(sideHit.getFrontOffsetZ())));
         if (GadgetGeneric.getConnectedArea(tool)) {
             addConnectedCoords(world, hit, current, target, fuzzyMode, coordinates,
-                    (int) area.minX, (int) area.minY, (int) area.minZ, (int) area.maxX - 1, (int) area.maxY - 1, (int) area.maxZ - 1);
+                    area.minX, area.minY, area.minZ, area.maxX, area.maxY, area.maxZ);
         } else {
-            for (BlockPos pos : BlockPos.getAllInBox((int) area.minX, (int) area.minY, (int) area.minZ, (int) area.maxX - 1, (int) area.maxY - 1, (int) area.maxZ - 1)) {
+            for (BlockPos pos : BlockPos.getAllInBox(area.minX, area.minY, area.minZ, area.maxX, area.maxY, area.maxZ)) {
                 if (isReplaceable(world, pos, current, target, fuzzyMode)) {
                     coordinates.add(pos);
                 }
@@ -123,7 +125,7 @@ public enum ExchangingModes {
 
     @Override
     public String toString() {
-        return GadgetGeneric.formatName(name());
+        return displayName;
     }
 
     public ExchangingModes next() {//TODO unused
