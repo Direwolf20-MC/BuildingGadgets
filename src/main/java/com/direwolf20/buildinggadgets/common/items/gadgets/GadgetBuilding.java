@@ -195,7 +195,8 @@ public class GadgetBuilding extends GadgetGeneric {
                 pushUndoList(heldItem, undoState);
             }
         }
-        com.direwolf20.buildinggadgets.common.tools.BuildingModes.sortByDistance(coords, player);
+
+        Sorter.Blocks.byDistance(coords, player);
         return true;
     }
 

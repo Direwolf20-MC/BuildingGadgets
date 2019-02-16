@@ -29,6 +29,7 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.Vec3i;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
@@ -187,8 +188,8 @@ public class GadgetDestruction extends GadgetGeneric {
         player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("tooltip.gadget.destroyshowoverlay").getUnformattedComponentText() + ": " + overlay), true);
     }
 
-    public static ArrayList<EnumFacing> assignDirections(EnumFacing side, EntityPlayer player) {
-        ArrayList<EnumFacing> dirs = new ArrayList<EnumFacing>();
+    public static List<EnumFacing> assignDirections(EnumFacing side, EntityPlayer player) {
+        List<EnumFacing> dirs = new ArrayList<EnumFacing>();
         EnumFacing depth = side.getOpposite();
         boolean vertical = side.getAxis() == Axis.Y;
         EnumFacing up = vertical ? player.getHorizontalFacing() : EnumFacing.UP;
@@ -252,11 +253,11 @@ public class GadgetDestruction extends GadgetGeneric {
         }
     }
 
-    public static ArrayList<BlockPos> getArea(World world, BlockPos pos, EnumFacing incomingSide, EntityPlayer player, ItemStack stack) {
-        ArrayList<BlockPos> voidPosArray = new ArrayList<BlockPos>();
+    public static SortedSet<BlockPos> getArea(World world, BlockPos pos, EnumFacing incomingSide, EntityPlayer player, ItemStack stack) {
+        SortedSet<BlockPos> voidPositions = new TreeSet<>(Comparator.comparingInt(Vec3i::getX).thenComparingInt(Vec3i::getY).thenComparingInt(Vec3i::getZ));
         BlockPos startPos = (getAnchor(stack) == null) ? pos : getAnchor(stack);
         EnumFacing side = (getAnchorSide(stack) == null) ? incomingSide : getAnchorSide(stack);
-        ArrayList<EnumFacing> directions = assignDirections(side, player);
+        List<EnumFacing> directions = assignDirections(side, player);
         IBlockState stateTarget = !SyncedConfig.nonFuzzyEnabledDestruction || GadgetGeneric.getFuzzy(stack) ? null : world.getBlockState(pos);
         if (GadgetGeneric.getConnectedArea(stack)) {
             String[] directionNames = new String[] {"right", "left", "up", "down", "depth"};
@@ -264,7 +265,7 @@ public class GadgetDestruction extends GadgetGeneric {
             for (int i = 0; i < directionNames.length; i++)
                 area = area.union(new AxisAlignedBB(pos.offset(directions.get(i), getToolValue(stack, directionNames[i]) - (i == 4 ? 1 : 0))));
 
-            addConnectedCoords(world, player, startPos, stateTarget, voidPosArray,
+            addConnectedCoords(world, player, startPos, stateTarget, voidPositions,
                     (int) area.minX, (int) area.minY, (int) area.minZ, (int) area.maxX - 1, (int) area.maxY - 1, (int) area.maxZ - 1);
         } else {
             for (int d = 0; d < getToolValue(stack, "depth"); d++) {
@@ -275,16 +276,16 @@ public class GadgetDestruction extends GadgetGeneric {
                         voidPos = voidPos.offset(directions.get(2), y);
                         voidPos = voidPos.offset(directions.get(4), d);
                         if (validBlock(world, voidPos, player, stateTarget))
-                            voidPosArray.add(voidPos);
+                            voidPositions.add(voidPos);
                     }
                 }
             }
         }
-        return voidPosArray;
+        return voidPositions;
     }
 
     public static void addConnectedCoords(World world, EntityPlayer player, BlockPos loc, IBlockState state,
-            List<BlockPos> coords, int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
+            SortedSet<BlockPos> coords, int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
         if (coords.contains(loc) || loc.getX() < minX || loc.getY() < minY || loc.getZ() < minZ || loc.getX() > maxX || loc.getY() > maxY || loc.getZ() > maxZ)
             return;
 
@@ -334,7 +335,7 @@ public class GadgetDestruction extends GadgetGeneric {
     }
 
     public void clearArea(World world, BlockPos pos, EnumFacing side, EntityPlayer player, ItemStack stack) {
-        ArrayList<BlockPos> voidPosArray = getArea(world, pos, side, player, stack);
+        SortedSet<BlockPos> voidPosArray = getArea(world, pos, side, player, stack);
         Map<BlockPos, IBlockState> posStateMap = new HashMap<BlockPos, IBlockState>();
         Map<BlockPos, IBlockState> pasteStateMap = new HashMap<BlockPos, IBlockState>();
         for (BlockPos voidPos : voidPosArray) {

@@ -7,9 +7,11 @@
 # files
 !/.gitignore
 !/README.md
+!/CONTRIBUTION.md
 !/License.md
 !/build.gradle
 !/gradlew
 !/gradlew.bat
 !/gradle.properties
 !/update.json
+!/CHANGELOG.md
