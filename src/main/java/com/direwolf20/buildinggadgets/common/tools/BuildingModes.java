@@ -381,25 +381,6 @@ public class BuildingModes {
         }
     }
 
-    public static List<BlockPos> sortByDistance(Collection<BlockPos> unSortedList, EntityPlayer player) {
-        List<BlockPos> sortedList = new ArrayList<>();
-        Double2ObjectMap<BlockPos> rangeMap = new Double2ObjectArrayMap<>(unSortedList.size());
-        DoubleSortedSet distances = new DoubleRBTreeSet();
-        double x = player.posX;
-        double y = player.posY + player.getEyeHeight();
-        double z = player.posZ;
-        for (BlockPos pos : unSortedList) {
-            double distance = pos.distanceSqToCenter(x, y, z);
-            rangeMap.put(distance, pos);
-            distances.add(distance);
-        }
-        for (double dist : distances) {
-            //System.out.println(dist);
-            sortedList.add(rangeMap.get(dist));
-        }
-        return sortedList;
-    }
-
     public static List<BlockMap> sortMapByDistance(List<BlockMap> unSortedMap, EntityPlayer player) {//TODO unused
         List<BlockPos> unSortedList = new ArrayList<BlockPos>();
 //        List<BlockPos> sortedList = new ArrayList<BlockPos>();

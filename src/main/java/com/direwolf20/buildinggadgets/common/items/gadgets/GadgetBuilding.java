@@ -6,11 +6,7 @@ import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.common.items.FakeBuilderWorld;
 import com.direwolf20.buildinggadgets.common.items.ModItems;
-import com.direwolf20.buildinggadgets.common.tools.BuildingModes;
-import com.direwolf20.buildinggadgets.common.tools.InventoryManipulation;
-import com.direwolf20.buildinggadgets.common.tools.ToolRenders;
-import com.direwolf20.buildinggadgets.common.tools.UndoState;
-import com.direwolf20.buildinggadgets.common.tools.VectorTools;
+import com.direwolf20.buildinggadgets.common.tools.*;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
@@ -214,7 +210,8 @@ public class GadgetBuilding extends GadgetGeneric {
                 pushUndoList(heldItem, undoState);
             }
         }
-        BuildingModes.sortByDistance(coords, player);
+
+        Sorter.Blocks.byDistance(coords, player);
         return true;
     }
 
