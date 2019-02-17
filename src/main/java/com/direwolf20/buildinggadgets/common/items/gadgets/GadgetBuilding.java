@@ -60,7 +60,7 @@ public class GadgetBuilding extends GadgetGeneric {
 
     public static final ResourceLocation REGISTRY_NAME = new ResourceLocation(BuildingGadgets.MODID,"gadgets_building");
 
-    public GadgetBuilding(Builder builder) {
+    public GadgetBuilding(Properties builder) {
         super(builder.defaultMaxDamage(Config.GADGETS.GADGET_BUILDING.durability.get()));
     }
 
@@ -235,17 +235,19 @@ public class GadgetBuilding extends GadgetGeneric {
         if (!world.isRemote) {
             IBlockState currentBlock = Blocks.AIR.getDefaultState();
             List<BlockPos> undoCoords = undoState.coordinates; //Get the Coords to undo
-            int dimension = undoState.dimension; //Get the Dimension to undo
+
             List<BlockPos> failedRemovals = new ArrayList<BlockPos>(); //Build a list of removals that fail
             ItemStack silkTool = heldItem.copy(); //Setup a Silk Touch version of the tool so we can return stone instead of cobblestone, etc.
             silkTool.addEnchantment(Enchantments.SILK_TOUCH, 1);
             for (BlockPos coord : undoCoords) {
                 currentBlock = world.getBlockState(coord);
-//                ItemStack itemStack = currentBlock.getBlock().getPickBlock(currentBlock, null, world, coord, player);
+
                 double distance = coord.getDistance(player.getPosition().getX(), player.getPosition().getY(), player.getPosition().getZ());
-                boolean sameDim = (player.dimension == dimension);
+                boolean sameDim = (player.dimension == undoState.dimension);
+
                 BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(world, coord, currentBlock, player);
                 boolean cancelled = MinecraftForge.EVENT_BUS.post(e);
+
                 if (distance < 64 && sameDim && currentBlock != BGBlocks.effectBlock.getDefaultState() && !cancelled) { //Don't allow us to undo a block while its still being placed or too far away
                     if (currentBlock != Blocks.AIR.getDefaultState()) {
                         currentBlock.getBlock().harvestBlock(world, player, coord, currentBlock, world.getTileEntity(coord), silkTool);

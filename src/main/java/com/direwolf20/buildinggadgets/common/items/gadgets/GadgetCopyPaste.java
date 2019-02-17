@@ -19,6 +19,7 @@ import com.google.common.collect.Multiset;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.material.Material.Builder;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
@@ -40,6 +41,7 @@ import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
+import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.BlockSnapshot;
 import net.minecraftforge.event.ForgeEventFactory;
@@ -64,7 +66,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
 
     public static final ResourceLocation REGISTRY_NAME = new ResourceLocation(BuildingGadgets.MODID,"gadgets_copy_paste");
 
-    public GadgetCopyPaste(Builder builder) {
+    public GadgetCopyPaste(Properties builder) {
         super(builder.defaultMaxDamage(Config.GADGETS.GADGET_COPY_PASTE.durability.get()));
     }
 
@@ -159,7 +161,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
         stack.setTag(tagCompound);
     }
 
-    private static void setLastBuild(ItemStack stack, BlockPos anchorPos, Integer dim) {
+    private static void setLastBuild(ItemStack stack, BlockPos anchorPos, int dim) {
         GadgetUtils.writePOSToNBT(stack, anchorPos, "lastBuild", dim);
     }
 
@@ -457,7 +459,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
 
         tagCompound.setTag("startPos", NBTUtil.writeBlockPos(start));
         tagCompound.setTag("endPos", NBTUtil.writeBlockPos(end));
-        tagCompound.setInt("dim", player.dimension);
+        tagCompound.setInt("dim", player.dimension.getId());
         tagCompound.setString("UUID", tool.getUUID(stack));
         tagCompound.setString("owner", player.getName().getString());
         tool.incrementCopyCounter(stack);
@@ -487,7 +489,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
         pos = pos.south(GadgetCopyPaste.getZ(stack));
 
         List<BlockMap> blockMapList = getBlockMapList(tagCompound, pos);
-        setLastBuild(stack, pos, player.dimension);
+        setLastBuild(stack, pos, player.dimension.getId());
 
         for (BlockMap blockMap : blockMapList)
             placeBlock(world, blockMap.pos, player, blockMap.state, getBlockMapIntState(tagCompound).getIntStackMap());
@@ -588,7 +590,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
         if (startPos == null)
             return;
 
-        Integer dimension = getLastBuildDim(heldItem);
+        DimensionType dimension = DimensionType.getById(getLastBuildDim(heldItem));
         ItemStack silkTool = heldItem.copy(); //Setup a Silk Touch version of the tool so we can return stone instead of cobblestone, etc.
         silkTool.addEnchantment(Enchantments.SILK_TOUCH, 1);
         List<BlockMap> blockMapList = getBlockMapList(tagCompound, startPos);
@@ -596,8 +598,10 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
         for (BlockMap blockMap : blockMapList) {
             double distance = blockMap.pos.getDistance(player.getPosition().getX(), player.getPosition().getY(), player.getPosition().getZ());
             boolean sameDim = (player.dimension == dimension);
+
             IBlockState currentBlock = world.getBlockState(blockMap.pos);
             BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(world, blockMap.pos, currentBlock, player);
+
             boolean cancelled = MinecraftForge.EVENT_BUS.post(e);
             if (distance < 256 && !cancelled && sameDim) { //Don't allow us to undo a block while its still being placed or too far away
                 if (currentBlock.getBlock() == blockMap.state.getBlock() || currentBlock.getBlock() instanceof ConstructionBlock) {
