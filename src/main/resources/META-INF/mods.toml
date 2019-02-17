@@ -21,7 +21,7 @@ The Destruction Gadget will help you clear out large Areas for your complex buil
     # Does this dependency have to exist - if not, ordering below must be specified
     mandatory=true #mandatory
     # The version range of the dependency
-    versionRange="[24,)" #mandatory
+    versionRange="[25,)" #mandatory
     # An ordering relationship for the dependency - BEFORE or AFTER required if the relationship is not mandatory
     ordering="BEFORE"
     # Side this dependency is applied on - BOTH, CLIENT or SERVER
