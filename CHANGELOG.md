@@ -8,7 +8,7 @@ The format of this document is based on [Keep a Changelog](https://keepachangelo
 ## [2.6.3] - 2019-02-17
 ### Fixed
 - Fixed server crashing on startup due to beep sound being unavailable server side
--Fixed the yellow box rendering around chests to always render if the tool is in your hand, not only when other renders are occurring (Like if you're looking at nothing).
+- Fixed the yellow box rendering around chests to always render if the tool is in your hand, not only when other renders are occurring (Like if you're looking at nothing).
 
 ## [2.6.2] - 2019-02-11
 ### Note
