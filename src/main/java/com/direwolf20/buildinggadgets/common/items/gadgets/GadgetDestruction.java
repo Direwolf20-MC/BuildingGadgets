@@ -45,8 +45,8 @@ import java.util.*;
 public class GadgetDestruction extends GadgetGeneric {
 
     public GadgetDestruction() {
-        setRegistryName("destructiontool");        // The unique name (within your mod) that identifies this item
-        setUnlocalizedName(BuildingGadgets.MODID + ".destructiontool");     // Used for localization (en_US.lang)
+        setRegistryName("destructiontool");
+        setUnlocalizedName(BuildingGadgets.MODID + ".destructiontool");
         setMaxStackSize(1);
         setMaxDamage(SyncedConfig.durabilityDestruction);
     }

@@ -300,7 +300,7 @@ public class GadgetUtils {
             }
             List<BlockPos> coords = new ArrayList<BlockPos>();
             if (stack.getItem() instanceof GadgetBuilding) {
-                coords = BuildingModes.getBuildCoords(world, player, startBlock, sideHit, stack); //Build the positions list based on tool mode and range
+                coords = BuildingModes.getAffectiveBuildingPositions(world, player, startBlock, sideHit, stack); //Build the positions list based on tool mode and range
             } else if (stack.getItem() instanceof GadgetExchanger) {
                 coords = ExchangingModes.getBuildCoords(world, player, startBlock, sideHit, stack); //Build the positions list based on tool mode and range
             }

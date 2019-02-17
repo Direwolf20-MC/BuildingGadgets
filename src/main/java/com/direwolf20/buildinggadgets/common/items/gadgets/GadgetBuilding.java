@@ -37,12 +37,13 @@ import java.util.Set;
 
 import static com.direwolf20.buildinggadgets.common.tools.GadgetUtils.*;
 
-
 public class GadgetBuilding extends GadgetGeneric {
+
     private static final FakeBuilderWorld fakeWorld = new FakeBuilderWorld();
+
     public GadgetBuilding() {
-        setRegistryName("buildingtool");        // The unique name (within your mod) that identifies this item
-        setUnlocalizedName(BuildingGadgets.MODID + ".buildingtool");     // Used for localization (en_US.lang)
+        setRegistryName("buildingtool");
+        setUnlocalizedName(BuildingGadgets.MODID + ".buildingtool");
         setMaxStackSize(1);
         setMaxDamage(SyncedConfig.durabilityBuilder);
     }
@@ -72,9 +73,9 @@ public class GadgetBuilding extends GadgetGeneric {
         stack.setTagCompound(tagCompound);
     }
 
-    public static com.direwolf20.buildinggadgets.common.tools.BuildingModes getToolMode(ItemStack stack) {
+    public static BuildingModes getToolMode(ItemStack stack) {
         NBTTagCompound tagCompound = stack.getTagCompound();
-        com.direwolf20.buildinggadgets.common.tools.BuildingModes mode = com.direwolf20.buildinggadgets.common.tools.BuildingModes.BuildToMe;
+        BuildingModes mode = BuildingModes.BuildToMe;
         if (tagCompound == null) {
             setToolMode(stack, mode);
             return mode;
@@ -160,7 +161,7 @@ public class GadgetBuilding extends GadgetGeneric {
             }
             BlockPos startBlock = lookingAt.getBlockPos();
             EnumFacing sideHit = lookingAt.sideHit;
-            coords = com.direwolf20.buildinggadgets.common.tools.BuildingModes.getBuildCoords(world, player, startBlock, sideHit, stack);
+            coords = com.direwolf20.buildinggadgets.common.tools.BuildingModes.getAffectiveBuildingPositions(world, player, startBlock, sideHit, stack);
         } else { //If we do have an anchor, erase it (Even if the build fails)
             setAnchor(stack, new ArrayList<BlockPos>());
         }
@@ -291,7 +292,7 @@ public class GadgetBuilding extends GadgetGeneric {
             useConstructionPaste = true;
         }
 
-        if( !this.canUse(heldItem, player) )
+        if (!this.canUse(heldItem, player))
             return false;
 
         this.applyDamage(heldItem, player);

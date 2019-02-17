@@ -10,7 +10,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.IStringSerializable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public enum ExchangingModes {
+public enum ExchangingModes implements IStringSerializable {
 
     Surface((world, player, hit, sideHit, tool) -> {
         List<BlockPos> coordinates = new ArrayList<>();
@@ -123,9 +123,17 @@ public enum ExchangingModes {
         this.modeImpl = modeImpl;
     }
 
+    /**
+     * Human-readable display display name.
+     */
+    @Override
+    public String getName() {
+        return displayName;
+    }
+
     @Override
     public String toString() {
-        return displayName;
+        return getName();
     }
 
     public ExchangingModes next() {//TODO unused
@@ -176,7 +184,7 @@ public enum ExchangingModes {
     }
 
     public static void addConnectedCoords(World world, BlockPos loc, IBlockState state, IBlockState setBlock,
-                                          boolean fuzzyMode, List<BlockPos> coords, int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
+            boolean fuzzyMode, List<BlockPos> coords, int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
         if (coords.contains(loc) || loc.getX() < minX || loc.getY() < minY || loc.getZ() < minZ || loc.getX() > maxX || loc.getY() > maxY || loc.getZ() > maxZ)
             return;
 
@@ -192,5 +200,4 @@ public enum ExchangingModes {
             }
         }
     }
-
 }

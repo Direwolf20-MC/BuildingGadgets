@@ -47,8 +47,8 @@ public class GadgetExchanger extends GadgetGeneric {
     private static final FakeBuilderWorld fakeWorld = new FakeBuilderWorld();
 
     public GadgetExchanger() {
-        setRegistryName("exchangertool");        // The unique name (within your mod) that identifies this item
-        setUnlocalizedName(BuildingGadgets.MODID + ".exchangertool");     // Used for localization (en_US.lang)
+        setRegistryName("exchangertool");
+        setUnlocalizedName(BuildingGadgets.MODID + ".exchangertool");
         setMaxStackSize(1);
         setMaxDamage(SyncedConfig.durabilityExchanger);
     }

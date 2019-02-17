@@ -254,7 +254,7 @@ public enum BuildingModes implements IStringSerializable {
         return values[(this.ordinal() + 1) % values.length];
     }
 
-    public static List<BlockPos> getBuildCoords(World world, EntityPlayer player, BlockPos hit, EnumFacing sideHit, ItemStack tool) {
+    public static List<BlockPos> getAffectiveBuildingPositions(World world, EntityPlayer player, BlockPos hit, EnumFacing sideHit, ItemStack tool) {
         IBuildingMode mode = byName(NBTTool.getOrNewTag(tool).getString("mode"));
         return mode.computeCoordinates(world, player, hit, sideHit, tool);
     }

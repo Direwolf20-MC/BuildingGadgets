@@ -55,8 +55,8 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
     }
 
     public GadgetCopyPaste() {
-        setRegistryName("copypastetool");        // The unique name (within your mod) that identifies this item
-        setUnlocalizedName(BuildingGadgets.MODID + ".copypastetool");     // Used for localization (en_US.lang)
+        setRegistryName("copypastetool");
+        setUnlocalizedName(BuildingGadgets.MODID + ".copypastetool");
         setMaxStackSize(1);
         setMaxDamage(SyncedConfig.durabilityCopyPaste);
     }
