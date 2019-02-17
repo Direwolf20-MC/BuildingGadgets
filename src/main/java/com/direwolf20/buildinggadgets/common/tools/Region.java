@@ -1,13 +1,19 @@
 package com.direwolf20.buildinggadgets.common.tools;
 
+import com.google.common.collect.AbstractIterator;
 import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.gen.structure.StructureBoundingBox;
+
+import java.util.Iterator;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 /**
  * <p>Javadoc are copied from {@link AxisAlignedBB} with some modifications.</p>
  */
-public final class Region extends StructureBoundingBox {
+public final class Region extends StructureBoundingBox implements Iterable<BlockPos> {
 
     public Region(int[] vertexes) {
         super(vertexes);
@@ -48,10 +54,10 @@ public final class Region extends StructureBoundingBox {
      * <h3>Samples:</h3>
      * <table>
      * <tr><th>Input</th><th>Result</th></tr>
-     * <tr><td><pre><code>new AxisAlignedBB(0, 0, 0, 1, 1, 1).grow(2, 2, 2)</code></pre></td><td><pre><samp>box[-2.0, -2.0, -2.0 -> 3.0, 3.0, 3.0]</samp></pre></td></tr>
-     * <tr><td><pre><code>new AxisAlignedBB(0, 0, 0, 6, 6, 6).grow(-2, -2, -2)</code></pre></td><td><pre><samp>box[2.0, 2.0, 2.0 -> 4.0, 4.0, 4.0]</samp></pre></td></tr>
-     * <tr><td><pre><code>new AxisAlignedBB(5, 5, 5, 7, 7, 7).grow(0, 1, -1)</code></pre></td><td><pre><samp>box[5.0, 4.0, 6.0 -> 7.0, 8.0, 6.0]</samp></pre></td></tr>
-     * <tr><td><pre><code>new AxisAlignedBB(1, 1, 1, 3, 3, 3).grow(-4, -2, -3)</code></pre></td><td><pre><samp>box[-1.0, 1.0, 0.0 -> 5.0, 3.0, 4.0]</samp></pre></td></tr>
+     * <tr><td><pre><code>new Region(0, 0, 0, 1, 1, 1).grow(2, 2, 2)</code></pre></td><td><pre><samp>box[-2, -2, -2 -> 3, 3, 3]</samp></pre></td></tr>
+     * <tr><td><pre><code>new Region(0, 0, 0, 6, 6, 6).grow(-2, -2, -2)</code></pre></td><td><pre><samp>box[2, 2, 2 -> 4, 4, 4]</samp></pre></td></tr>
+     * <tr><td><pre><code>new Region(5, 5, 5, 7, 7, 7).grow(0, 1, -1)</code></pre></td><td><pre><samp>box[5, 4, 6 -> 7, 8, 6]</samp></pre></td></tr>
+     * <tr><td><pre><code>new Region(1, 1, 1, 3, 3, 3).grow(-4, -2, -3)</code></pre></td><td><pre><samp>box[-1, 1, 0 -> 5, 3, 4]</samp></pre></td></tr>
      * </table>
      *
      * <h3>See Also:</h3>
@@ -108,6 +114,7 @@ public final class Region extends StructureBoundingBox {
 
     /**
      * Create a new region with the intersecting part between the two regions.
+     *
      * @return a new region
      */
     public Region intersect(Region other) {
@@ -122,6 +129,7 @@ public final class Region extends StructureBoundingBox {
 
     /**
      * Create a new region that encloses both regions that has the minimum volume.
+     *
      * @return a new region
      */
     public Region union(Region other) {
@@ -132,6 +140,70 @@ public final class Region extends StructureBoundingBox {
         this.maxY = Math.max(this.maxY, other.maxY);
         this.maxZ = Math.max(this.maxZ, other.maxZ);
         return this;
+    }
+
+    @Override
+    public Iterator<BlockPos> iterator() {
+        return new AbstractIterator<BlockPos>() {
+            private int posX = minX;
+            private int posY = minY;
+            private int posZ = minZ;
+
+            @Override
+            protected BlockPos computeNext() {
+                if (this.isTerminated()) {
+                    return endOfData();
+                }
+
+                if (!isXOverflowed()) {
+                    posX++;
+                } else if (!isZOverflowed()) {
+                    posX = minX;
+                    posZ++;
+                } else if (!isYOverflowed()) {
+                    posX = minX;
+                    posZ = minZ;
+                    posY++;
+                }
+
+                return new BlockPos(this.posX, this.posY, this.posZ);
+            }
+
+            private boolean isXOverflowed() {
+                return posX == maxX;
+            }
+
+            private boolean isYOverflowed() {
+                return posY == maxY;
+            }
+
+            private boolean isZOverflowed() {
+                return posZ == maxZ;
+            }
+
+            private boolean isTerminated() {
+                return isXOverflowed() && isYOverflowed() && isZOverflowed();
+            }
+        };
+    }
+
+    /**
+     * Composes the result of the plain iterator with a custom value.
+     */
+    public <T> Iterator<T> iterator(Predicate<BlockPos> validator, Function<BlockPos, T> composer) {
+        Iterator<BlockPos> original = iterator();
+        return new AbstractIterator<T>() {
+            @Override
+            protected T computeNext() {
+                while (original.hasNext()) {
+                    BlockPos pos = original.next();
+                    if (validator.test(pos)) {
+                        return composer.apply(pos);
+                    }
+                }
+                return endOfData();
+            }
+        };
     }
 
     /**
