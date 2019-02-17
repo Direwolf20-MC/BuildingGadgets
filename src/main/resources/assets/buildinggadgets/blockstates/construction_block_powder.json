@@ -3,8 +3,5 @@
   "defaults": {
     "model": "buildinggadgets:constructionblockpowder"
   },
-  "variants": {
-    "normal": [{}],
-    "inventory": [{}]
-  }
+  "variants": {}
 }
