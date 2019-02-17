@@ -38,7 +38,7 @@ The format of this document is based on [Keep a Changelog](https://keepachangelo
 - Fixes energy not updating when the Max Energy setting is changed in Game
 
 ## [2.6.0] - 2019-02-01
-###Note
+### Note
 Please let me know if you run into anything weird!
 ### Added
 - Bind any tool to a chest - Sneak-Right click any tool on any chest (Including modded chests) to bind it. The tool will pull items out of that chest now. Thanks @Phylogeny for helping with the rendering portions of this!!
@@ -54,7 +54,7 @@ Please let me know if you run into anything weird!
 - This release sees a few minor bug fixes and issues with the copy tool failing to copy an area. 
 
 ## [2.4.6] - 2018-11-12
-###Note
+### Note
 - This version contains a crash possibilty, when the newly added UI is faced by empty values!
 ### Added
 - Added a UI that lets you change the Paste offset position. Shift-right click the Copy/Paste tool while in Paste mode. 
@@ -222,7 +222,7 @@ Please let me know if you run into anything weird!
 - Minor Z-Fighting fix
 
 ## [1.1.3] - 2018-07-17
-###Added
+### Added
 - Added a few more languages (Thanks Pull request people!)
 - Added localization to a lot of the messages / tooltips
 - Added support for tools in the offhand
@@ -237,7 +237,7 @@ Please let me know if you run into anything weird!
 - Minor Undo improvement (If blocks no longer exist, they are still properly removed from the undo list)
 
 ## [1.1.2] - 2018-07-15
-###Added
+### Added
 - Initial release
 
 ---
