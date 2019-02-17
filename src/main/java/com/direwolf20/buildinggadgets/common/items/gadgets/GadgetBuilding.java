@@ -111,7 +111,7 @@ public class GadgetBuilding extends GadgetGeneric {
     @Override
     public void addInformation(ItemStack stack, @Nullable World world, List<ITextComponent> tooltip, ITooltipFlag flag) {
         super.addInformation(stack, world, tooltip, flag);
-        tooltip.add(new TextComponentString(TextFormatting.DARK_GREEN + I18n.format("tooltip.gadget.block") + ": " + getToolBlock(stack).getBlock().getRegistryName()));
+        tooltip.add(new TextComponentString(TextFormatting.DARK_GREEN + I18n.format("tooltip.gadget.block") + ": " + getToolBlock(stack).getBlock().getNameTextComponent().getFormattedText()));
         ToolMode mode = getToolMode(stack);
         tooltip.add(new TextComponentString(TextFormatting.AQUA + I18n.format("tooltip.gadget.mode") + ": " + (mode == ToolMode.Surface && getConnectedArea(stack) ? I18n.format("tooltip.gadget.connected") + " " : "") + mode));
         if (getToolMode(stack) != ToolMode.BuildToMe)
@@ -136,12 +136,12 @@ public class GadgetBuilding extends GadgetGeneric {
             if (player.isSneaking()) {
                 selectBlock(itemstack, player);
             } else {
-//                build(player, itemstack, itemstack.getItem().);
+                build(player, itemstack);
             }
         } else if (!player.isSneaking()) {
             ToolRenders.updateInventoryCache();
         }
-        return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, itemstack);
+        return new ActionResult<>(EnumActionResult.SUCCESS, itemstack);
     }
 
     public void toggleMode(EntityPlayer player, ItemStack heldItem) {//TODO unused
