@@ -9,6 +9,7 @@ buildscript {
     }
 }
 apply plugin: 'net.minecraftforge.gradle'
+
 //Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
 apply plugin: 'eclipse'
 apply plugin: 'idea'
@@ -60,7 +61,7 @@ dependencies {
     // Specify the version of Minecraft to use, If this is any group other then 'net.minecraft' it is assumed
     // that the dep is a ForgeGradle 'patcher' dependency. And it's patches will be applied.
     // The userdev artifact is a special name and will get all sorts of transformations applied to it.
-    minecraft "net.minecraftforge.test:forge:$minecraft_version-$forge_version"
+    minecraft "net.minecraftforge:forge:$minecraft_version-$forge_version"
 
     // deobfCompile "team.chisel.ctm:CTM:MC${minecraft_version}-${ctm_version}:api"
     // deobfCompile "refinedstorage:refinedstorage:${rs_version}:api"

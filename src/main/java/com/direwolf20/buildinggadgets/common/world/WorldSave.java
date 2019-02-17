@@ -3,6 +3,7 @@ package com.direwolf20.buildinggadgets.common.world;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.world.World;
+import net.minecraft.world.storage.DimensionSavedDataManager;
 import net.minecraft.world.storage.WorldSavedData;
 import net.minecraft.world.storage.WorldSavedDataStorage;
 import net.minecraftforge.common.util.Constants;
@@ -61,7 +62,7 @@ public class WorldSave extends WorldSavedData {
         String name = MODID;
 
         WorldSave instance = null;
-        WorldSavedDataStorage storage = world.getMapStorage();
+        DimensionSavedDataManager storage = new DimensionSavedDataManager(world.getDimension().getType(), world.getSaveHandler());
 
         if (storage == null)
             throw new IllegalStateException("World#getMapStorage returned null. The following WorldSave failed to save data: " + name);

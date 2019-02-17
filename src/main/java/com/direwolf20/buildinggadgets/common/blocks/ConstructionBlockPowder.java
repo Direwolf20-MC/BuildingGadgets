@@ -22,7 +22,7 @@ import java.util.List;
 
 public class ConstructionBlockPowder extends BlockFalling {
     public static final ResourceLocation REGISTRY_NAME = new ResourceLocation(BuildingGadgets.MODID,"construction_block_powder");
-    public ConstructionBlockPowder(Builder builder) {
+    public ConstructionBlockPowder(Properties builder) {
         super(builder);
     }
 

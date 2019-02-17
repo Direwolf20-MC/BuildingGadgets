@@ -1,7 +1,6 @@
 package com.direwolf20.buildinggadgets.common.registry;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.Block.Builder;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.util.ResourceLocation;
@@ -10,10 +9,10 @@ import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-public class BlockBuilder extends RegistryObjectBuilder<Block,Block.Builder> {
+public class BlockBuilder extends RegistryObjectBuilder<Block,Block.Properties> {
     private Block block;
-    private BiFunction<Block, Item.Builder, Item> itemBlockFactory;
-    private Item.Builder itemBuilder;
+    private BiFunction<Block, Item.Properties, Item> itemBlockFactory;
+    private Item.Properties itemBuilder;
 
     public static BlockBuilder create(String registryName) {
         return new BlockBuilder(registryName);
@@ -26,32 +25,32 @@ public class BlockBuilder extends RegistryObjectBuilder<Block,Block.Builder> {
     public BlockBuilder(String registryName) {
         super(registryName);
         this.itemBlockFactory = ItemBlock::new;
-        this.itemBuilder = new Item.Builder();
+        this.itemBuilder = new Item.Properties();
     }
 
     public BlockBuilder(ResourceLocation registryName) {
         super(registryName);
         this.itemBlockFactory = ItemBlock::new;
-        this.itemBuilder = new Item.Builder();
+        this.itemBuilder = new Item.Properties();
     }
 
-    public BlockBuilder item(Item.Builder itemBuilder, BiFunction<Block, Item.Builder, Item> itemBlockFactory) {
+    public BlockBuilder item(Item.Properties itemBuilder, BiFunction<Block, Item.Properties, Item> itemBlockFactory) {
         this.itemBuilder = Objects.requireNonNull(itemBuilder);
         this.itemBlockFactory = Objects.requireNonNull(itemBlockFactory);
         return this;
     }
 
-    public BlockBuilder item(Item.Builder itemBuilder) {
+    public BlockBuilder item(Item.Properties itemBuilder) {
         return item(itemBuilder,itemBlockFactory);
     }
 
     @Override
-    public BlockBuilder factory(Function<Builder, Block> factory) {
+    public BlockBuilder factory(Function<Block.Properties, Block> factory) {
         return (BlockBuilder) super.factory(factory);
     }
 
     @Override
-    public BlockBuilder builder(Builder builder) {
+    public BlockBuilder builder(Block.Properties builder) {
         return (BlockBuilder) super.builder(builder);
     }
 

@@ -3,8 +3,5 @@
   "defaults": {
     "model": "buildinggadgets:constructionblock"
   },
-  "variants": {
-    "normal": [{}],
-    "inventory": [{}]
-  }
+  "variants": {}
 }

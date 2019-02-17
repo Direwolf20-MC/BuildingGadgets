@@ -43,7 +43,7 @@ public enum RegularPasteContainerTypes {
         return capacitySupplier;
     }
 
-    public ConstructionPasteContainer create(Item.Builder builder) {
+    public ConstructionPasteContainer create(Item.Properties builder) {
         return new ConstructionPasteContainer(builder,getCapacitySupplier());
     }
 }

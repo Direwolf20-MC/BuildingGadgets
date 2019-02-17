@@ -2,8 +2,8 @@ package com.direwolf20.buildinggadgets.common.blocks.Models;
 
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.google.common.collect.ImmutableSet;
-import net.minecraft.client.renderer.block.model.IUnbakedModel;
-import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.client.renderer.model.IUnbakedModel;
+import net.minecraft.client.renderer.model.ModelResourceLocation;
 import net.minecraft.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.ICustomModelLoader;

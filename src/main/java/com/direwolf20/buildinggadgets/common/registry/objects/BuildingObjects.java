@@ -3,8 +3,8 @@ package com.direwolf20.buildinggadgets.common.registry.objects;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlock;
 import com.direwolf20.buildinggadgets.common.config.Config;
-import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.material.MaterialColor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.color.BlockColors;
 import net.minecraft.item.ItemGroup;
@@ -22,7 +22,7 @@ public class BuildingObjects {
     };
 
     // Materials
-    public static final Material EFFECT_BLOCK_MATERIAL = new Material.Builder(MapColor.AIR).notSolid().build();
+    public static final Material EFFECT_BLOCK_MATERIAL = new Material.Builder(MaterialColor.AIR).notSolid().build();
 
 
     public static void initColorHandlers() { //TODO ItemBlock Creative Tabs

@@ -27,7 +27,7 @@ import java.util.UUID;
 
 public class Template extends Item implements ITemplate {
     public static final ResourceLocation REGISTRY_NAME = new ResourceLocation(BuildingGadgets.MODID,"template");
-    public Template(Builder builder) {
+    public Template(Properties builder) {
         super(builder.maxStackSize(1));
     }
 

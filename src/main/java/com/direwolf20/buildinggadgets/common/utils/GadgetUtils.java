@@ -26,6 +26,7 @@ import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
+import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 
@@ -274,7 +275,7 @@ public class GadgetUtils {
             setToolActualBlock(stack, ((ConstructionBlockTileEntity) te).getActualBlockState());
             return EnumActionResult.SUCCESS;
         }
-        if (setRemoteInventory(player, stack, pos, world.getDimension().getId(), world))
+        if (setRemoteInventory(player, stack, pos, world))
             return EnumActionResult.SUCCESS;
 
         return EnumActionResult.FAIL;
@@ -309,10 +310,10 @@ public class GadgetUtils {
         return true;
     }
 
-    public static boolean setRemoteInventory(EntityPlayer player, ItemStack tool, BlockPos pos, int dim, World world) {
-        if (getRemoteInventory(pos, dim, world) != null) {
+    public static boolean setRemoteInventory(EntityPlayer player, ItemStack tool, BlockPos pos, World world) {
+        if (getRemoteInventory(pos, player.dimension, world) != null) {
             boolean same = pos.equals(getPOSFromNBT(tool, "boundTE"));
-            writePOSToNBT(tool, same ? null : pos, "boundTE", dim);
+            writePOSToNBT(tool, same ? null : pos, "boundTE", player.dimension.getId());
             player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget." + (same ? "unboundTE" : "boundTE")).getUnformattedComponentText()), true);
             return true;
         }
@@ -324,11 +325,11 @@ public class GadgetUtils {
         Integer dim = getDIMFromNBT(tool, "boundTE");
         if (dim == null) return null;
         BlockPos pos = getPOSFromNBT(tool, "boundTE");
-        return pos == null ? null : getRemoteInventory(pos, dim, world);
+        return pos == null ? null : getRemoteInventory(pos, world.getDimension().getType(), world);
     }
 
     @Nullable
-    public static IItemHandler getRemoteInventory(BlockPos pos, int dim, World world) {
+    public static IItemHandler getRemoteInventory(BlockPos pos, DimensionType dim, World world) {
         MinecraftServer server = world.getServer();
         if (server == null) return null;
         World worldServer = server.getWorld(dim);

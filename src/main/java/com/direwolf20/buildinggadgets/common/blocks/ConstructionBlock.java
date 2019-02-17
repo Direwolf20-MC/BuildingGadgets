@@ -5,7 +5,7 @@ import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
 import com.direwolf20.buildinggadgets.common.world.FakeRenderWorld;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.EnumPushReaction;
-import net.minecraft.block.material.MapColor;
+import net.minecraft.block.material.MaterialColor;
 import net.minecraft.block.state.BlockFaceShape;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.color.BlockColors;
@@ -40,7 +40,7 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
     public static final IUnlistedProperty<IBlockState> FACADE_ID = new BlockStateProperty("facadestate");
     public static final IUnlistedProperty<IBlockState> FACADE_EXT_STATE = new BlockStateProperty("facadeextstate");
 */
-    public ConstructionBlock(Builder builder) {
+    public ConstructionBlock(Properties builder) {
         super(builder);
 
         setDefaultState(this.getStateContainer().getBaseState().with(BRIGHT, false).with(NEIGHBOR_BRIGHTNESS, false));
@@ -232,14 +232,11 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
     /**
      * Get the MapColor for this Block and the given BlockState
      *
-     * @param state
-     * @param worldIn
-     * @param pos
-//     * @deprecated call via {@link IBlockState#(, BlockPos)} whenever possible.
+     * @deprecated call via {@link IBlockState#(, BlockPos)} whenever possible.
      * Implementing/overriding is fine.
      */
     @Override
-    public MapColor getMapColor(IBlockState state, IBlockReader worldIn, BlockPos pos) {
+    public MaterialColor getMapColor(IBlockState state, IBlockReader worldIn, BlockPos pos) {
         IBlockState mimic = getActualMimicBlock(worldIn, pos);
         return mimic != null ? mimic.getMapColor(worldIn, pos) : super.getMapColor(state, worldIn, pos);
     }

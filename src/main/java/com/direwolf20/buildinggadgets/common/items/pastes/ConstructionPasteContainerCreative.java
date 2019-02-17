@@ -17,7 +17,7 @@ import java.util.List;
 
 public class ConstructionPasteContainerCreative extends GenericPasteContainer {
     public static final ResourceLocation REGISTRY_NAME = new ResourceLocation(BuildingGadgets.MODID,"construction_paste_container_creative");
-    public ConstructionPasteContainerCreative(Builder builder) {
+    public ConstructionPasteContainerCreative(Properties builder) {
         super(builder);
     }
 

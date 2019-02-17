@@ -15,7 +15,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class ConstructionPaste extends Item {
     public static final ResourceLocation REGISTRY_NAME = new ResourceLocation(BuildingGadgets.MODID,"construction_paste");
-    public ConstructionPaste(Builder builder) {
+    public ConstructionPaste(Properties builder) {
         super(builder);
     }
 
