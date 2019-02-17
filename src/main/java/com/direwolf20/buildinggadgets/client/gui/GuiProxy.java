@@ -1,23 +1,33 @@
 package com.direwolf20.buildinggadgets.client.gui;
 
+import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManagerContainer;
 import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManagerGUI;
 import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManagerTileEntity;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetDestruction;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.IGuiHandler;
+import net.minecraftforge.fml.network.FMLPlayMessages;
 
-public class GuiProxy implements IGuiHandler {
+public class GuiProxy {
 
     public static final int CopyPasteID = 0;
     public static final int DestructionID = 1;
     public static final int PasteID = 2;
 
-    @Override
+    public static GuiScreen openGui(FMLPlayMessages.OpenContainer msg) {
+        EntityPlayer player = Minecraft.getInstance().player;
+
+        BuildingGadgets.LOG.debug(msg.getId().getPath());
+        return null;
+    }
+
     public Object getServerGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
         BlockPos pos = new BlockPos(x, y, z);
         TileEntity te = world.getTileEntity(pos);
@@ -29,7 +39,6 @@ public class GuiProxy implements IGuiHandler {
         return null;
     }
 
-    @Override
     public Object getClientGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
         BlockPos pos = new BlockPos(x, y, z);
         TileEntity te = world.getTileEntity(pos);
