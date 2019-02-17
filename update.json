@@ -1,7 +1,7 @@
 {
   "homepage": "https://minecraft.curseforge.com/projects/building-gadgets",
   "1.12.2": {
-    "2.6.3": "Changelog: https://minecraft.curseforge.com/projects/building-gadgets/files/2670027"
+    "2.6.3": "Changelog: https://github.com/Direwolf20-MC/BuildingGadgets/blob/master/CHANGELOG.md"
   },
   "promos": {
     "1.12.2-latest": "2.6.3",
