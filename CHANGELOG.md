@@ -3,7 +3,7 @@ The format of this document is based on [Keep a Changelog](https://keepachangelo
 
 ## [Unreleased]
 ### Fixed
-- Drastically improve Performance of Destruction Gadget in connected Blocks mode when moving the mouse a lot within a small space of time.
+- Drastically improved rendering performance of Destruction Gadget in Connected Area mode when set to a large area
 
 ## [2.6.3] - 2019-02-17
 ### Fixed
