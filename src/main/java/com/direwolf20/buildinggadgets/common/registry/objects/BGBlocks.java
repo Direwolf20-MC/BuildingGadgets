@@ -17,6 +17,7 @@ import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
 import net.minecraftforge.registries.ObjectHolder;
 
 import static com.direwolf20.buildinggadgets.common.registry.objects.BGItems.itemProperties;
+import static com.direwolf20.buildinggadgets.common.registry.objects.BGItems.itemPropertiesWithoutGroup;
 import static com.direwolf20.buildinggadgets.common.registry.objects.BuildingObjects.EFFECT_BLOCK_MATERIAL;
 
 @ObjectHolder(BuildingGadgets.MODID)
@@ -38,11 +39,11 @@ public final class BGBlocks {
     public static void init() {
         container.add(new BlockBuilder(EffectBlock.REGISTRY_NAME)
                 .builder(Block.Properties.create(EFFECT_BLOCK_MATERIAL).hardnessAndResistance(20f))
-                .item(itemProperties())
+                .item(itemPropertiesWithoutGroup())
                 .factory(EffectBlock::new));
         container.add(new BlockBuilder(ConstructionBlock.REGISTRY_NAME)
                 .builder(Block.Properties.create(Material.ROCK).hardnessAndResistance(0.5f,0f))
-                .item(itemProperties())
+                .item(itemPropertiesWithoutGroup())
                 .factory(ConstructionBlock::new));
         container.add(new BlockBuilder(ConstructionBlockPowder.REGISTRY_NAME)
                 .builder(Block.Properties.create(Material.SAND).hardnessAndResistance(20f))

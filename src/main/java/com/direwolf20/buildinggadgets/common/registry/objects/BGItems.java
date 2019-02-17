@@ -72,6 +72,10 @@ public final class BGItems {
         return new Item.Properties().group(BuildingObjects.creativeTab);
     }
 
+    static Item.Properties itemPropertiesWithoutGroup() {
+        return new Item.Properties();
+    }
+
     public static void cleanup() {
         container.clear();
     }
