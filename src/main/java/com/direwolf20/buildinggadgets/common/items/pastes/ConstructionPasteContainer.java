@@ -25,7 +25,7 @@ public class ConstructionPasteContainer extends GenericPasteContainer {
 
     private IntSupplier maxCapacity;
 
-    public ConstructionPasteContainer(Builder builder, IntSupplier maxCapacity) {
+    public ConstructionPasteContainer(Properties builder, IntSupplier maxCapacity) {
         super(builder);
         this.maxCapacity = maxCapacity;
     }

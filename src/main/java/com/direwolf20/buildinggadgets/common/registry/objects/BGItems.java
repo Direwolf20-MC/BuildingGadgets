@@ -12,7 +12,6 @@ import com.direwolf20.buildinggadgets.common.items.pastes.RegularPasteContainerT
 import com.direwolf20.buildinggadgets.common.registry.RegistryContainer;
 import com.direwolf20.buildinggadgets.common.registry.RegistryObjectBuilder;
 import net.minecraft.item.Item;
-import net.minecraft.item.Item.Builder;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
@@ -24,7 +23,7 @@ import net.minecraftforge.registries.ObjectHolder;
 public final class BGItems {
     private BGItems() {}
 
-    private static final RegistryContainer<Item, RegistryObjectBuilder<Item, Builder>> container = new RegistryContainer<>();
+    private static final RegistryContainer<Item, RegistryObjectBuilder<Item, Item.Properties>> container = new RegistryContainer<>();
     // Gadgets
     @ObjectHolder("gadgets_building")
     public static Item gadgetBuilding;
@@ -52,16 +51,16 @@ public final class BGItems {
     public static Item CreativeConstructionPasteContainer;
 
     public static void init() {
-        container.add(new RegistryObjectBuilder<Item, Item.Builder>(GadgetExchanger.REGISTRY_NAME).builder(itemBuilder()).factory(GadgetExchanger::new));
-        container.add(new RegistryObjectBuilder<Item, Item.Builder>(GadgetBuilding.REGISTRY_NAME).builder(itemBuilder()).factory(GadgetBuilding::new));
-        container.add(new RegistryObjectBuilder<Item, Item.Builder>(GadgetDestruction.REGISTRY_NAME).builder(itemBuilder()).factory(GadgetDestruction::new));
-        container.add(new RegistryObjectBuilder<Item, Item.Builder>(GadgetCopyPaste.REGISTRY_NAME).builder(itemBuilder()).factory(GadgetCopyPaste::new));
-        container.add(new RegistryObjectBuilder<Item, Item.Builder>(RegularPasteContainerTypes.T1.getRegistryName()).builder(itemBuilder()).factory(RegularPasteContainerTypes.T1::create));
-        container.add(new RegistryObjectBuilder<Item, Item.Builder>(RegularPasteContainerTypes.T2.getRegistryName()).builder(itemBuilder()).factory(RegularPasteContainerTypes.T2::create));
-        container.add(new RegistryObjectBuilder<Item, Item.Builder>(RegularPasteContainerTypes.T3.getRegistryName()).builder(itemBuilder()).factory(RegularPasteContainerTypes.T3::create));
-        container.add(new RegistryObjectBuilder<Item, Item.Builder>(ConstructionPasteContainerCreative.REGISTRY_NAME).builder(itemBuilder()).factory(ConstructionPasteContainerCreative::new));
-        container.add(new RegistryObjectBuilder<Item, Item.Builder>(ConstructionPaste.REGISTRY_NAME).builder(itemBuilder()).factory(ConstructionPaste::new));
-        container.add(new RegistryObjectBuilder<Item, Item.Builder>(Template.REGISTRY_NAME).builder(itemBuilder()).factory(Template::new));
+        container.add(new RegistryObjectBuilder<Item, Item.Properties>(GadgetExchanger.REGISTRY_NAME).builder(itemProperties()).factory(GadgetExchanger::new));
+        container.add(new RegistryObjectBuilder<Item, Item.Properties>(GadgetBuilding.REGISTRY_NAME).builder(itemProperties()).factory(GadgetBuilding::new));
+        container.add(new RegistryObjectBuilder<Item, Item.Properties>(GadgetDestruction.REGISTRY_NAME).builder(itemProperties()).factory(GadgetDestruction::new));
+        container.add(new RegistryObjectBuilder<Item, Item.Properties>(GadgetCopyPaste.REGISTRY_NAME).builder(itemProperties()).factory(GadgetCopyPaste::new));
+        container.add(new RegistryObjectBuilder<Item, Item.Properties>(RegularPasteContainerTypes.T1.getRegistryName()).builder(itemProperties()).factory(RegularPasteContainerTypes.T1::create));
+        container.add(new RegistryObjectBuilder<Item, Item.Properties>(RegularPasteContainerTypes.T2.getRegistryName()).builder(itemProperties()).factory(RegularPasteContainerTypes.T2::create));
+        container.add(new RegistryObjectBuilder<Item, Item.Properties>(RegularPasteContainerTypes.T3.getRegistryName()).builder(itemProperties()).factory(RegularPasteContainerTypes.T3::create));
+        container.add(new RegistryObjectBuilder<Item, Item.Properties>(ConstructionPasteContainerCreative.REGISTRY_NAME).builder(itemProperties()).factory(ConstructionPasteContainerCreative::new));
+        container.add(new RegistryObjectBuilder<Item, Item.Properties>(ConstructionPaste.REGISTRY_NAME).builder(itemProperties()).factory(ConstructionPaste::new));
+        container.add(new RegistryObjectBuilder<Item, Item.Properties>(Template.REGISTRY_NAME).builder(itemProperties()).factory(Template::new));
     }
 
     @SubscribeEvent
@@ -69,8 +68,8 @@ public final class BGItems {
         container.register(event);
     }
 
-    static Item.Builder itemBuilder() {
-        return new Item.Builder().group(BuildingObjects.creativeTab);
+    static Item.Properties itemProperties() {
+        return new Item.Properties().group(BuildingObjects.creativeTab);
     }
 
     public static void cleanup() {

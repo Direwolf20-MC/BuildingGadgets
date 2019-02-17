@@ -63,7 +63,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
 
     public static final ResourceLocation REGISTRY_NAME = new ResourceLocation(BuildingGadgets.MODID,"gadgets_copy_paste");
 
-    public GadgetCopyPaste(Builder builder) {
+    public GadgetCopyPaste(Properties builder) {
         super(builder.defaultMaxDamage(Config.GADGETS.GADGET_COPY_PASTE.durability.get()));
     }
 
@@ -456,7 +456,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
 
         tagCompound.setTag("startPos", NBTUtil.writeBlockPos(start));
         tagCompound.setTag("endPos", NBTUtil.writeBlockPos(end));
-        tagCompound.setInt("dim", player.dimension);
+        tagCompound.setInt("dim", player.dimension.getId());
         tagCompound.setString("UUID", tool.getUUID(stack));
         tagCompound.setString("owner", player.getName().getString());
         tool.incrementCopyCounter(stack);
@@ -486,7 +486,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
         pos = pos.south(GadgetCopyPaste.getZ(stack));
 
         List<BlockMap> blockMapList = getBlockMapList(tagCompound, pos);
-        setLastBuild(stack, pos, player.dimension);
+        setLastBuild(stack, pos, player.dimension.getId());
 
         for (BlockMap blockMap : blockMapList)
             placeBlock(world, blockMap.pos, player, blockMap.state, getBlockMapIntState(tagCompound).getIntStackMap());
@@ -594,7 +594,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
         boolean success = true;
         for (BlockMap blockMap : blockMapList) {
             double distance = blockMap.pos.getDistance(player.getPosition().getX(), player.getPosition().getY(), player.getPosition().getZ());
-            boolean sameDim = (player.dimension == dimension);
+            boolean sameDim = (player.dimension.getId() == dimension);
             IBlockState currentBlock = world.getBlockState(blockMap.pos);
             BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(world, blockMap.pos, currentBlock, player);
             boolean cancelled = MinecraftForge.EVENT_BUS.post(e);

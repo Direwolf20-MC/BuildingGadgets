@@ -17,7 +17,7 @@ import com.direwolf20.buildinggadgets.common.tools.ToolRenders;
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import com.electronwill.nightconfig.core.io.WritingMode;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.audio.PositionedSoundRecord;
+import net.minecraft.client.audio.SimpleSound;
 import net.minecraft.command.Commands;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -33,6 +33,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.DeferredWorkQueue;
 import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig.Type;
@@ -40,8 +41,9 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
-import net.minecraftforge.fml.javafmlmod.FMLModLoadingContext;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLPaths;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -64,11 +66,11 @@ public class BuildingGadgets {
         return theMod;
     }
     public BuildingGadgets() {
-        IEventBus eventBus = FMLModLoadingContext.get().getModEventBus();
+        IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus();
 
         //TODO handle Config properly as soon as Forge fixes it's "I dont load Server Config" bug
-        FMLModLoadingContext.get().registerConfig(Type.CLIENT, Config.CLIENT_CONFIG);
-        FMLModLoadingContext.get().registerConfig(Type.SERVER, Config.SERVER_CONFIG);
+        ModLoadingContext.get().registerConfig(Type.CLIENT, Config.CLIENT_CONFIG);
+        ModLoadingContext.get().registerConfig(Type.SERVER, Config.SERVER_CONFIG);
         eventBus.addListener(this::setup);
         eventBus.addListener(this::serverLoad);
         eventBus.addListener(this::finishLoad);
@@ -80,8 +82,10 @@ public class BuildingGadgets {
         DistExecutor.runWhenOn(Dist.CLIENT, () -> () -> {
             eventBus.addListener((Consumer<FMLClientSetupEvent>) (event -> clientInit(event, eventBus)));
         });
+
         loadConfig(Config.CLIENT_CONFIG, FMLPaths.CONFIGDIR.get().resolve("buildinggadgets-client.toml"));
         loadConfig(Config.SERVER_CONFIG, FMLPaths.CONFIGDIR.get().resolve("buildinggadgets-server.toml"));
+
         BuildingObjects.init();
     }
 
@@ -99,7 +103,7 @@ public class BuildingGadgets {
     }
 
     private void setup(final FMLCommonSetupEvent event) {
-        theMod = (BuildingGadgets) FMLModLoadingContext.get().getActiveContainer().getMod();
+        theMod = (BuildingGadgets) ModLoadingContext.get().getActiveContainer().getMod();
         DeferredWorkQueue.runLater(PacketHandler::register);
 
 // @todo: reimplement @since 1.13.x
@@ -201,7 +205,7 @@ public class BuildingGadgets {
         }
  
         public static void playSound(SoundEvent sound, float pitch) {
-            Minecraft.getInstance().getSoundHandler().play(PositionedSoundRecord.getMasterRecord(sound, pitch));
+            Minecraft.getInstance().getSoundHandler().play(SimpleSound.getMasterRecord(sound, pitch));
         }
     }
 }

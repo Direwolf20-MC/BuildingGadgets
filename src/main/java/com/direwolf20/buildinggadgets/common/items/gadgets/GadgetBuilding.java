@@ -59,7 +59,7 @@ public class GadgetBuilding extends GadgetGeneric {
 
     public static final ResourceLocation REGISTRY_NAME = new ResourceLocation(BuildingGadgets.MODID,"gadgets_building");
 
-    public GadgetBuilding(Builder builder) {
+    public GadgetBuilding(Properties builder) {
         super(builder.defaultMaxDamage(Config.GADGETS.GADGET_BUILDING.durability.get()));
     }
 
@@ -211,7 +211,7 @@ public class GadgetBuilding extends GadgetGeneric {
                 }
             }
             if (undoCoords.size() > 0) { //If the undo list has any data in it, add it to NBT on the tool.
-                UndoState undoState = new UndoState(player.dimension, undoCoords);
+                UndoState undoState = new UndoState(player.dimension.getId(), undoCoords);
                 pushUndoList(heldItem, undoState);
             }
         }
@@ -242,7 +242,7 @@ public class GadgetBuilding extends GadgetGeneric {
                 currentBlock = world.getBlockState(coord);
 //                ItemStack itemStack = currentBlock.getBlock().getPickBlock(currentBlock, null, world, coord, player);
                 double distance = coord.getDistance(player.getPosition().getX(), player.getPosition().getY(), player.getPosition().getZ());
-                boolean sameDim = (player.dimension == dimension);
+                boolean sameDim = (player.dimension.getId() == dimension);
                 BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(world, coord, currentBlock, player);
                 boolean cancelled = MinecraftForge.EVENT_BUS.post(e);
                 if (distance < 64 && sameDim && currentBlock != BGBlocks.effectBlock.getDefaultState() && !cancelled) { //Don't allow us to undo a block while its still being placed or too far away
@@ -256,7 +256,7 @@ public class GadgetBuilding extends GadgetGeneric {
                 }
             }
             if (failedRemovals.size() != 0) { //Add any failed undo blocks to the undo stack.
-                UndoState failedState = new UndoState(player.dimension, failedRemovals);
+                UndoState failedState = new UndoState(player.dimension.getId(), failedRemovals);
                 pushUndoList(heldItem, failedState);
             }
         }

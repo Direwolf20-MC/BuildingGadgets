@@ -3,7 +3,7 @@ package com.direwolf20.buildinggadgets.common.blocks.Models;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.block.model.*;
+import net.minecraft.client.renderer.model.*;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.EnumFacing;
 

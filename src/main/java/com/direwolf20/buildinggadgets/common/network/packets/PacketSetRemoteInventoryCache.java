@@ -14,6 +14,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.fml.network.NetworkEvent.Context;
 import net.minecraftforge.items.IItemHandler;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -91,7 +92,7 @@ public class PacketSetRemoteInventoryCache {
                 if (player != null) {
                     Set<UniqueItem> itemTypes = new HashSet<>();
                     ImmutableMultiset.Builder<UniqueItem> builder = ImmutableMultiset.builder();
-                    IItemHandler remoteInventory = GadgetUtils.getRemoteInventory(msg.loc.getRight(), msg.loc.getLeft(), player.world);
+                    IItemHandler remoteInventory = GadgetUtils.getRemoteInventory(msg.loc.getRight(), DimensionType.getById(msg.loc.getLeft()), player.world);
                     if (remoteInventory != null) {
                         for (int i = 0; i < remoteInventory.getSlots(); i++) {
                             ItemStack stack = remoteInventory.getStackInSlot(i);

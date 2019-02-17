@@ -25,7 +25,7 @@ import static com.direwolf20.buildinggadgets.common.utils.GadgetUtils.withSuffix
 
 public abstract class GadgetGeneric extends Item {
 
-    public GadgetGeneric(Builder builder) {
+    public GadgetGeneric(Properties builder) {
         super(builder);
     }
 

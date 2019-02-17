@@ -16,7 +16,7 @@ import net.minecraft.world.World;
 public class EffectBlock extends Block {
 
     public static final ResourceLocation REGISTRY_NAME = new ResourceLocation(BuildingGadgets.MODID,"effect_block");
-    public EffectBlock(Builder builder) {
+    public EffectBlock(Properties builder) {
         super(builder);
     }
 

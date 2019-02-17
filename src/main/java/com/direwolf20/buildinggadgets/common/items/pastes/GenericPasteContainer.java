@@ -8,7 +8,7 @@ import net.minecraft.util.text.TextFormatting;
 
 public abstract class GenericPasteContainer extends Item {
 
-    public GenericPasteContainer(Builder builder) {
+    public GenericPasteContainer(Properties builder) {
         super(builder.maxStackSize(1));
     }
 

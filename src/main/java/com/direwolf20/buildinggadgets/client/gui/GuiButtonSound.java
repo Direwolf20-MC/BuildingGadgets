@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.client.gui;
 
-import net.minecraft.client.audio.PositionedSoundRecord;
+import net.minecraft.client.audio.SimpleSound;
 import net.minecraft.client.audio.SoundHandler;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.util.SoundEvent;
@@ -37,6 +37,6 @@ public class GuiButtonSound extends GuiButtonSelect {
             return;
 
         SoundEvent sound = soundSelect == null ? SoundEvents.UI_BUTTON_CLICK : (selected ? soundDeselect : soundSelect);
-        soundHandler.play(PositionedSoundRecord.getMasterRecord(sound, selected ? pitchDeselect : pitchSelect));
+        soundHandler.play(SimpleSound.getMasterRecord(sound, selected ? pitchDeselect : pitchSelect));
     }
 }

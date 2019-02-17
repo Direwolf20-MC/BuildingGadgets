@@ -31,7 +31,7 @@ public class TemplateManager extends Block {
     public static final ResourceLocation REGISTRY_NAME = new ResourceLocation(BuildingGadgets.MODID,"template_manager");
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
 
-    public TemplateManager(Builder builder) {
+    public TemplateManager(Properties builder) {
         super(builder);
 
         this.setDefaultState(this.getStateContainer().getBaseState().with(FACING, EnumFacing.NORTH));

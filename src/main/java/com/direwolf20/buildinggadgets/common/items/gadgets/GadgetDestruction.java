@@ -45,7 +45,7 @@ public class GadgetDestruction extends GadgetGeneric {
 
     public static final ResourceLocation REGISTRY_NAME = new ResourceLocation(BuildingGadgets.MODID,"gadgets_destruction");
 
-    public GadgetDestruction(Builder builder) {
+    public GadgetDestruction(Properties builder) {
         super(builder.defaultMaxDamage(Config.GADGETS.GADGET_DESTRUCTION.durability.get()));
     }
 
@@ -392,7 +392,7 @@ public class GadgetDestruction extends GadgetGeneric {
         tagCompound.setIntArray("posPasteArray", posPasteArray);
         tagCompound.setIntArray("statePasteArray", statePasteArray);
         tagCompound.setTag("startPos", NBTUtil.writeBlockPos(startBlock));
-        tagCompound.setInt("dim", player.dimension);
+        tagCompound.setInt("dim", player.dimension.getId());
         tagCompound.setString("UUID", UUID);
         worldSave.addToMap(UUID, tagCompound);
         worldSave.markForSaving();
