@@ -3,6 +3,13 @@ package com.direwolf20.buildinggadgets.common.tools;
 import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
 import com.direwolf20.buildinggadgets.common.tools.gadget.building.IBuildingMode;
+
+import it.unimi.dsi.fastutil.doubles.Double2ObjectArrayMap;
+import it.unimi.dsi.fastutil.doubles.Double2ObjectMap;
+import it.unimi.dsi.fastutil.doubles.DoubleRBTreeSet;
+import it.unimi.dsi.fastutil.doubles.DoubleSortedSet;
+
+import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -291,31 +298,6 @@ public enum BuildingModes implements IStringSerializable {
         }
     }
 
-    public static List<BlockPos> sortByDistance(List<BlockPos> unSortedList, EntityPlayer player) {
-        List<BlockPos> sortedList = new ArrayList<BlockPos>();
-        Map<Double, BlockPos> rangeMap = new HashMap<Double, BlockPos>();
-        Double distances[] = new Double[unSortedList.size()];
-        Double distance;
-        double x = player.posX;
-        double y = player.posY + player.getEyeHeight();
-        double z = player.posZ;
-        int i = 0;
-        for (BlockPos pos : unSortedList) {
-            distance = pos.distanceSqToCenter(x, y, z);
-            rangeMap.put(distance, pos);
-            distances[i] = distance;
-            i++;
-        }
-        Arrays.sort(distances);
-        //ArrayUtils.reverse(distances);
-
-        for (Double dist : distances) {
-            //System.out.println(dist);
-            sortedList.add(rangeMap.get(dist));
-        }
-        return sortedList;
-    }
-
     public static List<BlockMap> sortMapByDistance(List<BlockMap> unSortedMap, EntityPlayer player) {//TODO unused
         List<BlockPos> unSortedList = new ArrayList<BlockPos>();
 //        List<BlockPos> sortedList = new ArrayList<BlockPos>();
@@ -331,25 +313,18 @@ public enum BuildingModes implements IStringSerializable {
             unSortedList.add(blockMap.pos);
         }
         List<BlockMap> sortedMap = new ArrayList<BlockMap>();
-        Map<Double, BlockPos> rangeMap = new HashMap<Double, BlockPos>();
-        Double distances[] = new Double[unSortedList.size()];
-        Double distance;
+        Double2ObjectMap<BlockPos> rangeMap = new Double2ObjectArrayMap<>(unSortedList.size());
+        DoubleSortedSet distances = new DoubleRBTreeSet();
         double x = player.posX;
         double y = player.posY + player.getEyeHeight();
         double z = player.posZ;
-        int i = 0;
         for (BlockPos pos : unSortedList) {
-            distance = pos.distanceSqToCenter(x, y, z);
+            double distance = pos.distanceSqToCenter(x, y, z);
             rangeMap.put(distance, pos);
-            distances[i] = distance;
-            i++;
+            distances.add(distance);
         }
-        Arrays.sort(distances);
-        //ArrayUtils.reverse(distances);
-
-        for (Double dist : distances) {
+        for (double dist : distances) {
             //System.out.println(dist);
-            //sortedList.add(rangeMap.get(dist));
             BlockPos pos = new BlockPos(rangeMap.get(dist));
             sortedMap.add(new BlockMap(pos, PosToStateMap.get(pos), PosToX.get(pos), PosToY.get(pos), PosToZ.get(pos)));
         }
