@@ -1,5 +1,6 @@
-package com.direwolf20.buildinggadgets.common.tools;
+package com.direwolf20.buildinggadgets.common.building;
 
+import com.direwolf20.buildinggadgets.common.building.placement.IPlacementSequence;
 import com.google.common.collect.AbstractIterator;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
@@ -11,9 +12,10 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 /**
+ * Represents a region in the world with a finite and nonzero size.
  * <p>Javadoc are copied from {@link AxisAlignedBB} with some modifications.</p>
  */
-public final class Region extends StructureBoundingBox implements Iterable<BlockPos> {
+public final class Region extends StructureBoundingBox implements IPlacementSequence {
 
     public Region(int[] vertexes) {
         super(vertexes);
@@ -36,6 +38,9 @@ public final class Region extends StructureBoundingBox implements Iterable<Block
         return this;
     }
 
+    /**
+     * @see #offsetBy(Vec3i)
+     */
     public Region offsetBy(Vec3i direction) {
         return this.offsetBy(direction.getX(), direction.getY(), direction.getZ());
     }
@@ -118,13 +123,13 @@ public final class Region extends StructureBoundingBox implements Iterable<Block
      * @return a new region
      */
     public Region intersect(Region other) {
-        this.minX = Math.max(this.minX, other.minX);
-        this.minY = Math.max(this.minY, other.minY);
-        this.minZ = Math.max(this.minZ, other.minZ);
-        this.maxX = Math.min(this.maxX, other.maxX);
-        this.maxY = Math.min(this.maxY, other.maxY);
-        this.maxZ = Math.min(this.maxZ, other.maxZ);
-        return this;
+        int minX = Math.max(this.minX, other.minX);
+        int minY = Math.max(this.minY, other.minY);
+        int minZ = Math.max(this.minZ, other.minZ);
+        int maxX = Math.min(this.maxX, other.maxX);
+        int maxY = Math.min(this.maxY, other.maxY);
+        int maxZ = Math.min(this.maxZ, other.maxZ);
+        return new Region(minX, minY, minZ, maxX, maxY, maxZ);
     }
 
     /**
@@ -133,15 +138,32 @@ public final class Region extends StructureBoundingBox implements Iterable<Block
      * @return a new region
      */
     public Region union(Region other) {
-        this.minX = Math.min(this.minX, other.minX);
-        this.minY = Math.min(this.minY, other.minY);
-        this.minZ = Math.min(this.minZ, other.minZ);
-        this.maxX = Math.max(this.maxX, other.maxX);
-        this.maxY = Math.max(this.maxY, other.maxY);
-        this.maxZ = Math.max(this.maxZ, other.maxZ);
+        int minX = Math.min(this.minX, other.minX);
+        int minY = Math.min(this.minY, other.minY);
+        int minZ = Math.min(this.minZ, other.minZ);
+        int maxX = Math.max(this.maxX, other.maxX);
+        int maxY = Math.max(this.maxY, other.maxY);
+        int maxZ = Math.max(this.maxZ, other.maxZ);
+        return new Region(minX, minY, minZ, maxX, maxY, maxZ);
+    }
+
+    /**
+     * @return this
+     */
+    @Override
+    public Region getBoundingBox() {
         return this;
     }
 
+    /**
+     * <p>
+     * The first result will have the minimum x, y, and z value. In the process it will advance first in positive z, and then x, and then y direction.
+     * In other words it will cover the first row with minimum x and y value, and then sweep through the lowest plane and work its way up.
+     * </p>
+     *
+     * @return {@link AbstractIterator}
+     * @implSpec starts at (minX, minY, minZ), ends at (maxX, maxY, maxZ)
+     */
     @Override
     public Iterator<BlockPos> iterator() {
         return new AbstractIterator<BlockPos>() {
@@ -189,6 +211,8 @@ public final class Region extends StructureBoundingBox implements Iterable<Block
 
     /**
      * Composes the result of the plain iterator with a custom value.
+     *
+     * @see #iterator()
      */
     public <T> Iterator<T> iterator(Predicate<BlockPos> validator, Function<BlockPos, T> composer) {
         Iterator<BlockPos> original = iterator();
