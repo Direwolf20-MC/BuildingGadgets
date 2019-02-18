@@ -6,6 +6,7 @@ import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.config.ModConfig;
 
 import java.util.List;
@@ -14,6 +15,7 @@ import java.util.Objects;
 import static net.minecraftforge.common.ForgeConfigSpec.*;
 import static net.minecraftforge.fml.Logging.CORE;
 
+@EventBusSubscriber
 public class Config {
 
     private static final String CATEGORY_GENERAL = "general";
