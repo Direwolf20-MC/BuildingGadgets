@@ -106,19 +106,19 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
      * @param world
      * @param pos
      */
-    @Override
+    /*@Override
     public IBlockState getExtendedState(IBlockState state, IBlockReader world, BlockPos pos) {
         IExtendedBlockState extendedBlockState = (IExtendedBlockState) super.getExtendedState(state, world, pos);
         IBlockState mimicBlock = getActualMimicBlock(world, pos);
+        if (mimicBlock != null) {
             FakeRenderWorld fakeRenderWorld = new FakeRenderWorld();
             fakeRenderWorld.setState((World) world, mimicBlock, pos);
             IBlockState extState = mimicBlock.getBlock().getExtendedState(mimicBlock, fakeRenderWorld, pos);
-// @todo: reimplement @since 1.13.x
-//            ConstructionID mimicID = new ConstructionID(mimicBlock);
-//            return extendedBlockState.withProperty(FACADE_ID, mimicBlock).withProperty(FACADE_EXT_STATE, extState);
-
+            //ConstructionID mimicID = new ConstructionID(mimicBlock);
+            return extendedBlockState.withProperty(FACADE_ID, mimicBlock).withProperty(FACADE_EXT_STATE, extState);
+        }
         return extendedBlockState;
-    }
+    }*/
 
     @Nullable
     private IBlockState getActualMimicBlock(IBlockReader blockAccess, BlockPos pos) {
