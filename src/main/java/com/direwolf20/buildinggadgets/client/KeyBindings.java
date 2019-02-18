@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.client;
 
+import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
@@ -20,18 +21,22 @@ public class KeyBindings {
     public static KeyBinding connectedAreaKey;
 
     public static void init() {
-        modeSwitch = createBinding("key.modeSwitch", GLFW.GLFW_KEY_G);
-        rangeChange = createBinding("key.rangeChange", GLFW.GLFW_KEY_R);
-        undoKey = createBinding("key.undoKey", GLFW.GLFW_KEY_U);
-        anchorKey = createBinding("key.anchorKey", GLFW.GLFW_KEY_H);
-        fuzzyKey = createBinding("key.fuzzyKey", GLFW.GLFW_KEY_UNKNOWN);
-        connectedAreaKey = createBinding("key.connectedarea", GLFW.GLFW_KEY_UNKNOWN);
+        modeSwitch = createBinding("mode_switch", GLFW.GLFW_KEY_G);
+        rangeChange = createBinding("range_change", GLFW.GLFW_KEY_R);
+        undoKey = createBinding("undo", GLFW.GLFW_KEY_U);
+        anchorKey = createBinding("anchor", GLFW.GLFW_KEY_H);
+        fuzzyKey = createBinding("fuzzy", GLFW.GLFW_KEY_UNKNOWN);
+        connectedAreaKey = createBinding("connected_area", GLFW.GLFW_KEY_UNKNOWN);
     }
 
     private static KeyBinding createBinding(String name, int key) {
-        KeyBinding keyBinding = new KeyBinding("key" + name, CONFLICT_CONTEXT_GADGET, InputMappings.Type.KEYSYM.getOrMakeInput(key), "key.categories.buildingGadgets");
+        KeyBinding keyBinding = new KeyBinding(getKey(name), CONFLICT_CONTEXT_GADGET, InputMappings.Type.KEYSYM.getOrMakeInput(key), getKey("category"));
         ClientRegistry.registerKeyBinding(keyBinding);
         return keyBinding;
+    }
+
+    private static String getKey(String name) {
+        return String.format("key.%s.%s", BuildingGadgets.MODID, name);
     }
 
     public static class KeyConflictContextGadget implements IKeyConflictContext
