@@ -2,6 +2,7 @@ package com.direwolf20.buildinggadgets.common.tools;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumFacing.Axis;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
@@ -30,7 +31,7 @@ public class VectorTools {
         return pos;
     }
 
-    public static int getAxisValue(BlockPos pos, EnumFacing.Axis axis) {
+    public static int getAxisValue(BlockPos pos, Axis axis) {
         switch (axis) {
             case X:
                 return pos.getX();
@@ -40,6 +41,22 @@ public class VectorTools {
                 return pos.getZ();
         }
         throw new IllegalArgumentException("Trying to find the value a imaginary axis of a BlockPos");
+    }
+
+    public static BlockPos perpendicularSurfaceOffset(BlockPos pos, EnumFacing intersector, int i, int j) {
+        return perpendicularSurfaceOffset(pos, intersector.getAxis(), i, j);
+    }
+
+    public static BlockPos perpendicularSurfaceOffset(BlockPos pos, Axis intersector, int i, int j) {
+        switch (intersector) {
+            case X:
+                return pos.add(0, i, j);
+            case Y:
+                return pos.add(i, 0, j);
+            case Z:
+                return pos.add(i, j, 0);
+        }
+        throw new IllegalArgumentException("Unknown facing " + intersector);
     }
 
 }

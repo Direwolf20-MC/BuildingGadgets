@@ -30,7 +30,6 @@ public final class OriginWrapper implements IBlockProvider {
      */
     @Override
     public IBlockState at(BlockPos pos) {
-        // This should be fine since the parameter is @NoBorrow
         return provider.at(pos.add(origin));
     }
 

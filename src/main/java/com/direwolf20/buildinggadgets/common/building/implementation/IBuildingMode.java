@@ -1,39 +1,59 @@
 package com.direwolf20.buildinggadgets.common.building.implementation;
 
+import com.direwolf20.buildinggadgets.common.building.placement.Context;
+import com.direwolf20.buildinggadgets.common.building.placement.IBlockProvider;
+import com.direwolf20.buildinggadgets.common.building.placement.IPlacementSequence;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-import java.util.List;
+import java.util.function.BiPredicate;
 
 /**
  * Represents a mode that can be used by some gadget,
  */
 public interface IBuildingMode {
 
-    //TODO move to iterator system
-    List<BlockPos> computeCoordinates(World world, EntityPlayer player, BlockPos hit, EnumFacing sideHit, ItemStack tool);
+    /**
+     * Iterator that supplies raw coordinates that hasn't been filtered yet.
+     */
+    IPlacementSequence computeCoordinates(EntityPlayer player, BlockPos hit, EnumFacing sideHit, ItemStack tool);
 
-    //TODO move to IBuildMode so that these can be applied
-//    /**
-//     * Registry name used for mapping.
-//     */
-//    //TODO implement mode registry system
-//    ResourceLocation getRegistryName();
-//
-//    /**
-//     * Translation key that vanilla's {@link I18n} can recognize.
-//     */
-//    String getTranslationKey();
-//
-//    /**
-//     * Locale translated from {@code I18n.format(getTranslationKey()}.
-//     * <p>Implementations can override this method to use formatting features.</p>
-//     */
-//    default String getLocale() {
-//        return I18n.format(getTranslationKey());
-//    }
+    IBlockProvider getBlockProvider(ItemStack tool);
+
+    BiPredicate<BlockPos, IBlockState> createValidatorFor(World world);
+
+    /**
+     * @see Context#getPositionSequence()
+     */
+    default Context createExecutionContext(EntityPlayer player, BlockPos hit, EnumFacing sideHit, ItemStack tool) {
+        return new Context(computeCoordinates(player, hit, sideHit, tool), getBlockProvider(tool), this::createValidatorFor);
+    }
+
+    /**
+     * Registry name used for mapping.
+     */
+    //TODO implement mode registry system
+    ResourceLocation getRegistryName();
+
+    /**
+     * Translation key that vanilla's {@link I18n} can recognize.
+     */
+    default String getTranslationKey() {
+        return "modes." + getRegistryName();
+    }
+
+    /**
+     * Locale translated from {@code I18n.format(getTranslationKey()}.
+     * <p>Implementations can override this method to use formatting features.</p>
+     */
+    default String getLocale() {
+        return I18n.format(getTranslationKey());
+    }
 
 }

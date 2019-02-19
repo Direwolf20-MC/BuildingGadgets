@@ -11,16 +11,13 @@ import net.minecraft.util.math.BlockPos;
  * the given position is out of boundary.
  * All positions passed as parameter are relative to a specific point which can be accessed by {@link #getOrigin()}.
  * </p>
- * <p>
- * Implementations should kept the object
- * </p>
  */
 public interface IBlockProvider {
 
     /**
      * @param origin the new origin
      * @return <p>a new object that wraps the current block provider. All calls on {@link #at(BlockPos)} will be translated by the parameter. </p>
-     * <p>{@code pos.add(this.getOrigin())}</p>
+     * @implSpec {@code pos.add(this.getOrigin())} should be applied when accessing the current object.
      */
     default IBlockProvider origin(BlockPos origin) {
         return new OriginWrapper(this, origin);
@@ -37,7 +34,6 @@ public interface IBlockProvider {
     /**
      * <p>
      * Implementations should translate the parameter by {@link #getOrigin()}.
-     * In most cases, {@code pos.add(this.getOrigin())} should be sufficient.
      * </p>
      * <p>
      * The {@link NoBorrow} annotation for the parameter is to ensure that implementations can work with optimization done
@@ -45,6 +41,7 @@ public interface IBlockProvider {
      * </p>
      *
      * @return block that should be place at the position
+     * @implNote In most cases, {@code pos.add(this.getOrigin())} should be sufficient.
      */
     IBlockState at(@NoBorrow BlockPos pos);
 

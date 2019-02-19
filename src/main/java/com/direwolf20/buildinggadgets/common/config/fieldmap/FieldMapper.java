@@ -18,7 +18,7 @@ public class FieldMapper<FieldVal, SyncedVal> {
     /*@SuppressWarnings("unchecked")
     public static final FieldMapper<ImmutableList, String[]> BLOCK_LIST_MAPPER = of(
             (list) -> ((ImmutableList<Block>)list).stream().map((b) -> Objects.requireNonNull(b.getRegistryName()).toString()).toArray(String[]::new),
-            (strings) -> Stream.of(strings).map(ResourceLocation::new).map(ForgeRegistries.BLOCKS::getValue).collect(ImmutableList.toImmutableList()),
+            (strings) -> Stream.of(strings).map(ResourceLocation::new).map(ForgeRegistries.BLOCKS::getValue).collectCoordinates(ImmutableList.toImmutableList()),
             ImmutableList.class,String[].class);*/
     public static final FieldMapper<PatternList, String[]> PATTERN_LIST_MAPPER = of(
             PatternList::toArray, PatternList::ofResourcePattern,

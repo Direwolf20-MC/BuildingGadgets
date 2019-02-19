@@ -155,6 +155,26 @@ public final class Region extends StructureBoundingBox implements IPlacementSequ
         return this;
     }
 
+    public boolean isXInBound(int x) {
+        return x >= minX && x <= maxX;
+    }
+
+    public boolean isYInBound(int y) {
+        return y >= minY && y <= maxY;
+    }
+
+    public boolean isZInBound(int z) {
+        return z >= minZ && z <= maxZ;
+    }
+
+    public boolean isInBound(int x, int y, int z) {
+        return isXInBound(x) && isYInBound(y) && isZInBound(z);
+    }
+
+    public int getSize() {
+        return getXSize() * getYSize() * getZSize();
+    }
+
     /**
      * <p>
      * The first result will have the minimum x, y, and z value. In the process it will advance first in positive z, and then x, and then y direction.

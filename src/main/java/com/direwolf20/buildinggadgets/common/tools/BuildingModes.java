@@ -256,7 +256,7 @@ public enum BuildingModes implements IStringSerializable {
 
     public static List<BlockPos> getAffectiveBuildingPositions(World world, EntityPlayer player, BlockPos hit, EnumFacing sideHit, ItemStack tool) {
         IBuildingMode mode = byName(NBTTool.getOrNewTag(tool).getString("mode"));
-        return mode.computeCoordinates(world, player, hit, sideHit, tool);
+        return mode.computeCoordinates(player, hit, sideHit, tool).collect();
     }
 
     public static IBuildingMode byName(String name) {
@@ -267,7 +267,7 @@ public enum BuildingModes implements IStringSerializable {
                 .modeImpl;
     }
 
-    private static boolean isReplaceable(World world, BlockPos pos, IBlockState target) {
+    public static boolean isReplaceable(World world, BlockPos pos, IBlockState target) {
         if (!target.getBlock().canPlaceBlockAt(world, pos) || world.isOutsideBuildHeight(pos)) {
             return false;
         }

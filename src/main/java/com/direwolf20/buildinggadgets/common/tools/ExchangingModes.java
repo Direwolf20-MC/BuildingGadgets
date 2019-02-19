@@ -152,7 +152,7 @@ public enum ExchangingModes implements IStringSerializable {
 
     public static List<BlockPos> getBuildCoords(World world, EntityPlayer player, BlockPos hit, EnumFacing sideHit, ItemStack tool) {
         IBuildingMode mode = byName(NBTTool.getOrNewTag(tool).getString("mode"));
-        return mode.computeCoordinates(world, player, hit, sideHit, tool);
+        return mode.computeCoordinates(player, hit, sideHit, tool).collect();
     }
 
     private static boolean isReplaceable(World world, BlockPos pos, IBlockState current, IBlockState target, boolean fuzzyMode) {
