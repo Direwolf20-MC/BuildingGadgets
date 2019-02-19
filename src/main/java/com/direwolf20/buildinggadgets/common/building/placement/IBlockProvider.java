@@ -35,14 +35,10 @@ public interface IBlockProvider {
      * <p>
      * Implementations should translate the parameter by {@link #getOrigin()}.
      * </p>
-     * <p>
-     * The {@link NoBorrow} annotation for the parameter is to ensure that implementations can work with optimization done
-     * with {@link AbstractTargetIterator} where the resulting position is a direct reference to the internal counter.
-     * </p>
      *
      * @return block that should be place at the position
      * @implNote In most cases, {@code pos.add(this.getOrigin())} should be sufficient.
      */
-    IBlockState at(@NoBorrow BlockPos pos);
+    IBlockState at(BlockPos pos);
 
 }

@@ -4,7 +4,6 @@ import com.google.common.collect.AbstractIterator;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.world.World;
 
 import java.util.Iterator;
@@ -44,29 +43,10 @@ public class Context {
      * Set block states in the world at positions provided by the {@link #getPositionSequence()}.
      *
      * @param world the world that is affected
-     * @implNote optimizes object creation if the IPlacementSequence supports {@link NoBorrow} mutable BlockPos output.
      */
     public void placeIn(World world) {
         Iterator<BlockPos> it = positions.iterator();
         BiPredicate<BlockPos, IBlockState> validator = validatorFactory.apply(world);
-        if (it instanceof AbstractTargetIterator) {
-            this.mutablePlacement(world, (AbstractTargetIterator) it, validator);
-        } else {
-            this.immutablePlacement(world, it, validator);
-        }
-    }
-
-    private void mutablePlacement(World world, AbstractTargetIterator it, BiPredicate<BlockPos, IBlockState> validator) {
-        while (it.hasNext()) {
-            MutableBlockPos pos = it.poll();
-            IBlockState state = blocks.at(pos);
-            if (validator.test(pos, state)) {
-                world.setBlockState(pos, state);
-            }
-        }
-    }
-
-    private void immutablePlacement(World world, Iterator<BlockPos> it, BiPredicate<BlockPos, IBlockState> validator) {
         while (it.hasNext()) {
             BlockPos pos = it.next();
             IBlockState target = blocks.at(pos);
