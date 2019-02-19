@@ -303,7 +303,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
             }
             if (getToolMode(stack) == ToolMode.Copy) {
                 if (pos == null && player.isSneaking())
-                    GuiMod.COPY_PASTE.openScreen(player);
+                    GuiMod.COPY.openScreen(player);
             } else if (player.isSneaking()) {
                 GuiMod.PASTE.openScreen(player);
             } else {

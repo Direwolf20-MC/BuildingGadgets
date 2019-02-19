@@ -25,7 +25,7 @@ import net.minecraft.util.text.TextFormatting;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CopyPasteGUI extends GuiScreen {
+public class CopyGUI extends GuiScreen {
     private GuiTextFieldWithDefault startX;
     private GuiTextFieldWithDefault startY;
     private GuiTextFieldWithDefault startZ;
@@ -45,7 +45,7 @@ public class CopyPasteGUI extends GuiScreen {
     private static final ResourceLocation background = new ResourceLocation(BuildingGadgets.MODID, "textures/gui/testcontainer.png");
     private List<GuiTextFieldWithDefault> guiList = new ArrayList<>();
 
-    public CopyPasteGUI(ItemStack tool) {
+    public CopyGUI(ItemStack tool) {
         super();
         this.copyPasteTool = tool;
     }

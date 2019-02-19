@@ -28,9 +28,9 @@ import net.minecraftforge.fml.network.FMLPlayMessages.OpenContainer;
 import net.minecraftforge.fml.network.NetworkHooks;
 
 public enum GuiMod {
-    COPY_PASTE(tool -> tool.getItem() instanceof GadgetCopyPaste ? new CopyPasteGUI(tool) : null),
-    DESTRUCTION(tool -> tool.getItem() instanceof GadgetDestruction ? new DestructionGUI(tool) : null),
+    COPY(tool -> tool.getItem() instanceof GadgetCopyPaste ? new CopyGUI(tool) : null),
     PASTE(tool -> tool.getItem() instanceof GadgetCopyPaste ? new PasteGUI(tool) : null),
+    DESTRUCTION(tool -> tool.getItem() instanceof GadgetDestruction ? new DestructionGUI(tool) : null),
     TEMPLATE_MANAGER("template_manager", message -> {
         TileEntity te = Minecraft.getInstance().world.getTileEntity(message.getAdditionalData().readBlockPos());
         return te instanceof TemplateManagerTileEntity ? new TemplateManagerGUI((TemplateManagerTileEntity) te,
