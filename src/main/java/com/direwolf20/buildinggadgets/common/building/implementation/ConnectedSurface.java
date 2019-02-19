@@ -30,9 +30,29 @@ public class ConnectedSurface implements IPlacementSequence {
         this.sideHit = sideHit;
     }
 
+    private ConnectedSurface(Region region, BlockPos posHit, EnumFacing sideHit) {
+        this.region = region;
+        this.posHit = posHit;
+        this.sideHit = sideHit;
+    }
+
     @Override
     public Region getBoundingBox() {
         return region;
+    }
+
+    @Override
+    public boolean contains(int x, int y, int z) {
+        return false;
+    }
+
+    /**
+     * @deprecated ConnectedSurface should be immutable, so this is not needed
+     */
+    @Deprecated
+    @Override
+    public IPlacementSequence copy() {
+        return new ConnectedSurface(region, posHit, sideHit);
     }
 
     /**
@@ -42,7 +62,7 @@ public class ConnectedSurface implements IPlacementSequence {
     @Override
     public Iterator<BlockPos> iterator() {
         return new AbstractIterator<BlockPos>() {
-            private Queue<BlockPos> queue = new ArrayDeque<>(region.getSize());
+            private Queue<BlockPos> queue = new ArrayDeque<>(region.size());
             private BitSet visited = new BitSet();
 
             {
@@ -68,7 +88,7 @@ public class ConnectedSurface implements IPlacementSequence {
                         }
                         visited.set(planer);
 
-                        if (region.isVecInside(neighbor)) {
+                        if (region.contains(neighbor)) {
                             queue.add(neighbor);
                         }
                     }

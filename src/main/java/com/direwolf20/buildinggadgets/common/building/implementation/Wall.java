@@ -38,9 +38,27 @@ public class Wall implements IPlacementSequence {
                 radius * (1 - Math.abs(side.getFrontOffsetZ())));
     }
 
+    protected Wall(Region region) {
+        this.region = region;
+    }
+
     @Override
     public Region getBoundingBox() {
         return region;
+    }
+
+    @Override
+    public boolean contains(int x, int y, int z) {
+        return false;
+    }
+
+    /**
+     * @deprecated Wall should be immutable, so this is not needed
+     */
+    @Deprecated
+    @Override
+    public IPlacementSequence copy() {
+        return new Wall(region);
     }
 
     @Override

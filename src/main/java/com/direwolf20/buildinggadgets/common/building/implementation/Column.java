@@ -28,9 +28,27 @@ public class Column implements IPlacementSequence {
         this.region = new Region(base, base.offset(sideHit, range));
     }
 
+    private Column(Region region) {
+        this.region = region;
+    }
+
     @Override
     public Region getBoundingBox() {
         return region;
+    }
+
+    @Override
+    public boolean contains(int x, int y, int z) {
+        return false;
+    }
+
+    /**
+     * @deprecated Column should be immutable, so this is not needed
+     */
+    @Deprecated
+    @Override
+    public IPlacementSequence copy() {
+        return new Column(region);
     }
 
     @Override

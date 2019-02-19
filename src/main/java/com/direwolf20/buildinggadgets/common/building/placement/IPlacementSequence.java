@@ -23,6 +23,12 @@ public interface IPlacementSequence extends Iterable<BlockPos> {
     Region getBoundingBox();
 
     /**
+     * @return {@code false} if this PlacementSequence definitely doesn't contain the specified Position. Otherwise {@link true}.
+     * @implSpec If the computation is costly, then this {@code IPlacementSequence} may choose to return always true
+     */
+    boolean contains(int x, int y, int z);
+
+    /**
      * Collect the elements provided by the object to the given list.
      *
      * @return the parameter
@@ -39,8 +45,27 @@ public interface IPlacementSequence extends Iterable<BlockPos> {
         return ImmutableList.copyOf(this);
     }
 
+    /**
+     * @return a {@link Stream} representing all positions in this IPlacementSequence
+     */
     default Stream<BlockPos> stream() {
         return StreamSupport.stream(this.spliterator(), false);
     }
+
+    /**
+     * @return a copy of the object
+     * @implSpec if the object is immutable, this method should be labeled as {@link Deprecated} and state its immutability in its Javadoc.
+     * <pre>{@code
+     *     /**
+     *      * @deprecated Foo should be immutable, so this is not needed
+     *      * / //Trick in include a Javadoc sample in a Javadoc
+     *     @Deprecated
+     *     @Override
+     *     public IPlacementSequence copy() {
+     *         return new Foo(bar);
+     *     }
+     * }</pre>
+     */
+    IPlacementSequence copy();
 
 }

@@ -1,68 +1,94 @@
 package com.direwolf20.buildinggadgets.common.building;
 
 import com.direwolf20.buildinggadgets.common.building.placement.IPlacementSequence;
-import com.google.common.base.MoreObjects;
-import com.google.common.collect.AbstractIterator;
+import com.direwolf20.buildinggadgets.common.tools.GadgetUtils;
+import com.google.common.collect.PeekingIterator;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
-import net.minecraft.world.gen.structure.StructureBoundingBox;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-import java.util.Iterator;
-import java.util.Objects;
-import java.util.function.Function;
-import java.util.function.Predicate;
+import java.util.Spliterator;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 /**
  * Represents a region in the world with a finite and nonzero size.
  * <p>Javadoc are copied from {@link AxisAlignedBB} with some modifications.</p>
  */
-public final class Region implements IPlacementSequence, Comparable<Region> {
+public final class Region implements IPlacementSequence {
 
-    private int minX, minY, minZ;
-    private int maxX, maxY, maxZ;
-
-    public Region(int[] vertexes) {
-        this(vertexes[0], vertexes[1], vertexes[2], vertexes[3], vertexes[4], vertexes[5]);
-    }
+    private final int minX;
+    private final int minY;
+    private final int minZ;
+    private final int maxX;
+    private final int maxY;
+    private final int maxZ;
 
     public Region(int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
-        this.minX = minX;
-        this.minY = minY;
-        this.minZ = minZ;
-        this.maxX = maxX;
-        this.maxY = maxY;
-        this.maxZ = maxZ;
+        this.minX = Math.min(minX, maxX);
+        this.minY = Math.min(minY, maxY);
+        this.minZ = Math.min(minZ, maxZ);
+        this.maxX = Math.max(minX, maxX);
+        this.maxY = Math.max(minY, maxY);
+        this.maxZ = Math.max(minZ, maxZ);
     }
 
     public Region(Vec3i vertex) {
         this(vertex, vertex);
     }
 
-    public Region(Vec3i minVertex, Vec3i maxVertex) {
-        this(minVertex.getX(), minVertex.getY(), minVertex.getZ(), maxVertex.getX(), maxVertex.getY(), maxVertex.getZ());
+    public Region(Vec3i min, Vec3i max) {
+        this(min.getX(), min.getY(), min.getZ(), max.getX(), max.getY(), max.getZ());
     }
 
     /**
-     * @return this
+     * Translates this Region by the given amount
+     *
+     * @param x how much to translate x
+     * @param y how much to translate y
+     * @param z how much to translate z
+     * @return A new Region, translated by the given coordinates
      */
-    public Region offsetBy(int x, int y, int z) {
-        this.minX += x;
-        this.minY += y;
-        this.minZ += z;
-        this.maxX += x;
-        this.maxY += y;
-        this.maxZ += z;
-        return this;
+    public Region translate(int x, int y, int z) {
+        return new Region(minX + x, minY + y, minZ + z, maxX + x, maxY + y, maxZ + z);
     }
 
     /**
-     * @see #offsetBy(int, int, int)
+     * @see #translate(int, int, int)
      */
-    public Region offsetBy(Vec3i direction) {
-        return this.offsetBy(direction.getX(), direction.getY(), direction.getZ());
+    public Region translate(Vec3i direction) {
+        return this.translate(direction.getX(), direction.getY(), direction.getZ());
+    }
+
+    /**
+     * @param x x-growth
+     * @param y y-growth
+     * @param z z-growth
+     * @return A new Region who's max coordinates are increased by the given amount
+     */
+    public Region grow(int x, int y, int z) {
+        return new Region(minX, minY, minZ, maxX + x, maxY + y, maxZ + z);
+    }
+
+    /**
+     * See {@link #grow(int, int, int)} - grow on all three axises.
+     */
+    public Region grow(int size) {
+        return this.grow(size, size, size);
+    }
+
+    /**
+     * See {@link #grow(int, int, int)} - subtracting instead of adding.
+     */
+    public Region shrink(int x, int y, int z) {
+        return this.grow(-x, -y, -z);
+    }
+
+    /**
+     * See {@link #grow(int)} - subtracting instead of adding.
+     */
+    public Region shrink(int size) {
+        return this.grow(-size);
     }
 
     /**
@@ -90,51 +116,38 @@ public final class Region implements IPlacementSequence, Comparable<Region> {
      * <li>{@link #grow(int)} - version of this that expands in all directions from one parameter.</li>
      * <li>{@link #shrink(int)} - contracts in all directions</li>
      * </ul>
-     *
-     * @return this
      */
-    public Region grow(int x, int y, int z) {
-        this.minX -= x;
-        this.minY -= y;
-        this.minZ -= z;
-        this.maxX += x;
-        this.maxY += y;
-        this.maxZ += z;
-        return this;
+    public Region expand(int x, int y, int z) {
+        return new Region(minX - x, minY - y, minZ - z, maxX + x, maxY + y, maxZ + z);
+    }
+
+    public Region expand(Vec3i vec) {
+        return expand(vec.getX(), vec.getY(), vec.getZ());
     }
 
     /**
-     * Expand the current region by the given value in all directions. Equivalent to {@link
-     * #grow(int, int, int)} with the given value for all 3 params. Negative values will shrink the region.
+     * Expand the current region by the given value in the max values. Equivalent to {@link
+     * #expand(int)}  with the given value for all 3 params. Negative values will shrink the region.
      * <br/>
      * Side lengths will be increased by 2 times the value of the parameter, since both min and max are changed.
      * <br/>
      * If contracting and the amount to contract by is larger than the length of a side, then the side will wrap (still
      * creating a valid region - see samples on {@link #grow(int, int, int)}).
-     *
-     * @return this
      */
-    public Region grow(int size) {
-        this.grow(size, size, size);
-        return this;
+    public Region expand(int size) {
+        return expand(size, size, size);
     }
 
-    /**
-     * See {@link #grow(int, int, int)} subtracting instead of adding.
-     *
-     * @return this
-     */
-    public Region shrink(int x, int y, int z) {
-        return this.grow(-x, -y, -z);
+    public Region collapse(int x, int y, int z) {
+        return expand(-x, -y, -z);
     }
 
-    /**
-     * See {@link #grow(int)} subtracting instead of adding.
-     *
-     * @return this
-     */
-    public Region shrink(int size) {
-        return this.grow(-size);
+    public Region collapse(Vec3i vec) {
+        return collapse(vec.getX(), vec.getY(), vec.getZ());
+    }
+
+    public Region collapse(int size) {
+        return expand(-size);
     }
 
     /**
@@ -152,17 +165,8 @@ public final class Region implements IPlacementSequence, Comparable<Region> {
         return new Region(minX, minY, minZ, maxX, maxY, maxZ);
     }
 
-    public boolean intersectsWith(Region other) {
-        return this.maxX >= other.minX &&
-                this.minX <= other.maxX &&
-                this.maxZ >= other.minZ &&
-                this.minZ <= other.maxZ &&
-                this.maxY >= other.minY &&
-                this.minY <= other.maxY;
-    }
-
     /**
-     * Create a new region that encloses both regions that has the minimum volume.
+     * Create a new region that encloses both regions
      *
      * @return a new region
      */
@@ -174,38 +178,6 @@ public final class Region implements IPlacementSequence, Comparable<Region> {
         int maxY = Math.max(this.maxY, other.maxY);
         int maxZ = Math.max(this.maxZ, other.maxZ);
         return new Region(minX, minY, minZ, maxX, maxY, maxZ);
-    }
-
-    /**
-     * @return this
-     */
-    @Override
-    public Region getBoundingBox() {
-        return this;
-    }
-
-    public StructureBoundingBox toStructureBoundingBox() {
-        return new StructureBoundingBox(minX, minY, minZ, maxX, maxY, maxZ);
-    }
-
-    public boolean isXInBound(int x) {
-        return x >= minX && x <= maxX;
-    }
-
-    public boolean isYInBound(int y) {
-        return y >= minY && y <= maxY;
-    }
-
-    public boolean isZInBound(int z) {
-        return z >= minZ && z <= maxZ;
-    }
-
-    public boolean isInBound(int x, int y, int z) {
-        return isXInBound(x) && isYInBound(y) && isZInBound(z);
-    }
-
-    public boolean isInBound(Vec3i vec) {
-        return isInBound(vec.getX(), vec.getY(), vec.getZ());
     }
 
     public int getMinX() {
@@ -232,11 +204,11 @@ public final class Region implements IPlacementSequence, Comparable<Region> {
         return maxZ;
     }
 
-    public BlockPos getMinVec() {
+    public BlockPos getMin() {
         return new BlockPos(minX, minY, minZ);
     }
 
-    public BlockPos getMaxVec() {
+    public BlockPos getMax() {
         return new BlockPos(maxX, maxY, maxZ);
     }
 
@@ -252,160 +224,94 @@ public final class Region implements IPlacementSequence, Comparable<Region> {
         return maxZ - minZ + 1;
     }
 
-    public int getSize() {
+    public int size() {
         return getXSize() * getYSize() * getZSize();
     }
 
-    /**
-     * <p>
-     * The first result will have the minimum x, y, and z value. In the process it will advance first in positive z, and then x, and then y direction.
-     * In other words it will cover the first row with minimum x and y value, and then sweep through the lowest plane and work its way up.
-     * </p>
-     *
-     * @return {@link AbstractIterator}
-     * @implSpec starts at (minX, minY, minZ), ends at (maxX, maxY, maxZ)
-     */
-    @Override
-    public Iterator<BlockPos> iterator() {
-        return new AbstractIterator<BlockPos>() {
-            private int posX = minX;
-            private int posY = minY;
-            private int posZ = minZ;
+    public boolean containsX(int x) {
+        return x >= minX && x <= maxX;
+    }
 
-            @Override
-            protected BlockPos computeNext() {
-                if (this.isTerminated()) {
-                    return endOfData();
-                }
+    public boolean containsY(int y) {
+        return y >= minY && y <= maxY;
+    }
 
-                if (!isXOverflowed()) {
-                    posX++;
-                } else if (!isZOverflowed()) {
-                    posX = minX;
-                    posZ++;
-                } else if (!isYOverflowed()) {
-                    posX = minX;
-                    posZ = minZ;
-                    posY++;
-                }
-
-                return new BlockPos(this.posX, this.posY, this.posZ);
-            }
-
-            private boolean isXOverflowed() {
-                return posX == maxX;
-            }
-
-            private boolean isYOverflowed() {
-                return posY == maxY;
-            }
-
-            private boolean isZOverflowed() {
-                return posZ == maxZ;
-            }
-
-            private boolean isTerminated() {
-                return isXOverflowed() && isYOverflowed() && isZOverflowed();
-            }
-        };
+    public boolean containsZ(int z) {
+        return z >= minZ && z <= maxZ;
     }
 
     /**
-     * Composes the result of the plain iterator with a custom value.
-     *
-     * @see #iterator()
+     * @return whether or not this {@link BlockPos} lies within this Region
      */
-    public <T> Iterator<T> iterator(Predicate<BlockPos> validator, Function<BlockPos, T> composer) {
-        Iterator<BlockPos> original = iterator();
-        return new AbstractIterator<T>() {
-            @Override
-            protected T computeNext() {
-                while (original.hasNext()) {
-                    BlockPos pos = original.next();
-                    if (validator.test(pos)) {
-                        return composer.apply(pos);
-                    }
-                }
-                return endOfData();
-            }
-        };
+    @Override
+    public boolean contains(int x, int y, int z) {
+        return containsX(x) && containsY(y) && containsZ(z);
+    }
+
+    public boolean contains(Vec3i vec) {
+        return contains(vec.getX(), vec.getY(), vec.getZ());
+    }
+
+    public boolean intersectsWith(Region other) {
+        return this.maxX >= other.minX &&
+                this.minX <= other.maxX &&
+                this.maxZ >= other.minZ &&
+                this.minZ <= other.maxZ &&
+                this.maxY >= other.minY &&
+                this.minY <= other.maxY;
     }
 
     /**
      * @return a new Region with the exact same properties
+     * @deprecated Since Region is immutable, this is not needed
      */
+    @Deprecated
+    @Override
     public Region copy() {
         return new Region(minX, minY, minZ, maxX, maxY, maxZ);
     }
 
+    /**
+     * @return this
+     */
     @Override
-    public String toString() {
-        return MoreObjects.toStringHelper(this)
-                .add("minX", minX)
-                .add("minY", minY)
-                .add("minZ", minZ)
-                .add("maxX", maxX)
-                .add("maxY", maxY)
-                .add("maxZ", maxZ)
-                .toString();
+    public Region getBoundingBox() {
+        return this;
     }
 
+    /**
+     * <p>
+     * The first result will have the minimum x, y, and z value. In the process it will advance in positive z-y-x order as used in BG-Code on various other places.
+     * Positions provided by this Iterator may be considered ordered.
+     * </p>
+     *
+     * @return A {@link PeekingIterator} over all positions in this Region
+     * @implSpec starts at (minX, minY, minZ), ends at (maxX, maxY, maxZ)
+     * @implNote This Iterator cannot support Removal Operations
+     * @see GadgetUtils#POSITION_COMPARATOR
+     */
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Region blockPos = (Region) o;
-        return minX == blockPos.minX &&
-                minY == blockPos.minY &&
-                minZ == blockPos.minZ &&
-                maxX == blockPos.maxX &&
-                maxY == blockPos.maxY &&
-                maxZ == blockPos.maxZ;
+    public PeekingIterator<BlockPos> iterator() {
+        return new RegionIterator(this);
     }
 
+    /**
+     * @return a Stream representing the Positions in this IPlacementSequence
+     */
     @Override
-    public int hashCode() {
-        return Objects.hash(minX, minY, minZ, maxX, maxY, maxZ);
+    public Stream<BlockPos> stream() {
+        return StreamSupport.stream(spliterator(), false);
     }
 
+    /**
+     * Creates a {@link Spliterator} over the positions described by this {@code Region}.
+     *
+     * @return a {@link Spliterator} over the positions described by this {@code Region}.
+     * @implSpec The returned {@link Spliterator} will be Immutable, Sorted and Sized
+     */
     @Override
-    public int compareTo(Region that) {
-        if (this.minX < that.minX) {
-            return -1;
-        } else if (this.minX > that.minX) {
-            return 1;
-        }
-
-        if (this.minZ < that.minZ) {
-            return -1;
-        } else if (this.minZ > that.minZ) {
-            return 1;
-        }
-
-        if (this.minY < that.minY) {
-            return -1;
-        } else if (this.minY > that.minY) {
-            return 1;
-        }
-
-        if (this.maxX < that.maxX) {
-            return -1;
-        } else if (this.maxX > that.maxX) {
-            return 1;
-        }
-
-        if (this.maxZ < that.maxZ) {
-            return -1;
-        } else if (this.maxZ > that.maxZ) {
-            return 1;
-        }
-
-        if (this.maxY < that.maxY) {
-            return -1;
-        } else if (this.maxY > that.maxY) {
-            return 1;
-        }
-        return 0;
+    public Spliterator<BlockPos> spliterator() {
+        return new RegionSpliterator(this);
     }
 
 }
