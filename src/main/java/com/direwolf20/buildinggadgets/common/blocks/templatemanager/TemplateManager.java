@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.common.blocks.templatemanager;
 
+import com.direwolf20.buildinggadgets.client.gui.GuiMod;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.items.ITemplate;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
@@ -27,7 +28,6 @@ import net.minecraftforge.items.CapabilityItemHandler;
 import javax.annotation.Nullable;
 
 public class TemplateManager extends Block {
-    private static final int GUI_ID = 1;
     public static final ResourceLocation REGISTRY_NAME = new ResourceLocation(BuildingGadgets.MODID,"template_manager");
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
 
@@ -70,23 +70,22 @@ public class TemplateManager extends Block {
         if (!(te instanceof TemplateManagerTileEntity)) {
             return false;
         }
-        TemplateManagerContainer container = ((TemplateManagerTileEntity) te).getContainer(player);
-        for (int i = 0; i <= 1; i++) {
-            ItemStack itemStack = container.getSlot(i).getStack();
-            if (!(itemStack.getItem() instanceof ITemplate)) continue;
-
-            ITemplate template = (ITemplate) itemStack.getItem();
-            String UUID = template.getUUID(itemStack);
-            if (UUID == null) continue;
-
-            NBTTagCompound tagCompound = template.getWorldSave(worldIn).getCompoundFromUUID(UUID);
-            if (tagCompound != null) {
-                PacketHandler.sendTo(new PacketBlockMap(tagCompound), (EntityPlayerMP) player);
-            }
-        }
-
-//  @fixme: reimplement
-//        player.gui(BuildingGadgets.instance, GUI_ID, world, pos.getX(), pos.getY(), pos.getZ());
+//      TODO 1.13
+//        TemplateManagerContainer container = ((TemplateManagerTileEntity) te).getContainer(player);
+//        for (int i = 0; i <= 1; i++) {
+//            ItemStack itemStack = container.getSlot(i).getStack();
+//            if (!(itemStack.getItem() instanceof ITemplate)) continue;
+//
+//            ITemplate template = (ITemplate) itemStack.getItem();
+//            String UUID = template.getUUID(itemStack);
+//            if (UUID == null) continue;
+//
+//            NBTTagCompound tagCompound = template.getWorldSave(worldIn).getCompoundFromUUID(UUID);
+//            if (tagCompound != null) {
+//                PacketHandler.sendTo(new PacketBlockMap(tagCompound), (EntityPlayerMP) player);
+//            }
+//        }
+        GuiMod.TEMPLATE_MANAGER.openContainer(player, worldIn, pos);
         return true;
     }
 

@@ -1,6 +1,7 @@
 package com.direwolf20.buildinggadgets.common.items.gadgets;
 
 import com.direwolf20.buildinggadgets.client.events.EventTooltip;
+import com.direwolf20.buildinggadgets.client.gui.GuiMod;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlock;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
@@ -301,10 +302,10 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
                     return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);
             }
             if (getToolMode(stack) == ToolMode.Copy) {
-                //if (pos == null && player.isSneaking()) TODO @since 1.13.x GUI!
-                //player.openGui(BuildingGadgets.instance, GuiProxy.CopyPasteID, world, hand.ordinal(), 0, 0);
+                if (pos == null && player.isSneaking())
+                    GuiMod.COPY_PASTE.openScreen(player);
             } else if (player.isSneaking()) {
-//                player.openGui(BuildingGadgets.instance, GuiProxy.PasteID, world, hand.ordinal(), 0, 0);
+                GuiMod.PASTE.openScreen(player);
             } else {
                 ToolRenders.updateInventoryCache();
             }

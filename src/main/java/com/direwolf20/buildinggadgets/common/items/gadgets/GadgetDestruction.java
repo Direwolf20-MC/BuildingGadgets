@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.common.items.gadgets;
 
+import com.direwolf20.buildinggadgets.client.gui.GuiMod;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.config.Config;
@@ -224,8 +225,7 @@ public class GadgetDestruction extends GadgetGeneric {
             }
         } else {
             if (player.isSneaking()) {
-// @todo: reimplement @since 1.13.x
-                //                player.openGui(BuildingGadgets.instance, GuiProxy.DestructionID, world, hand.ordinal(), 0, 0);
+                GuiMod.DESTRUCTION.openScreen(player);
                 return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);
             }
         }

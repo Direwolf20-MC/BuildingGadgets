@@ -12,7 +12,7 @@ import java.util.function.Supplier;
 public class PacketAnchorKey {
 
     public static void encode(PacketAnchorKey msg, PacketBuffer buffer) {}
-    public static PacketAnchorKey decode(PacketBuffer buffer) { return null; }
+    public static PacketAnchorKey decode(PacketBuffer buffer) { return new PacketAnchorKey(); }
 
     public static class Handler {
         public static void handle(final PacketAnchorKey msg, Supplier<NetworkEvent.Context> ctx) {
