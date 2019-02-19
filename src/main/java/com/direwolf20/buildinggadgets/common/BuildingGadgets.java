@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.common;
 
 import com.direwolf20.buildinggadgets.client.KeyBindings;
-import com.direwolf20.buildinggadgets.client.gui.GuiProxy;
+import com.direwolf20.buildinggadgets.client.gui.GuiMod;
 import com.direwolf20.buildinggadgets.common.blocks.Models.BakedModelLoader;
 import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManagerContainer;
 import com.direwolf20.buildinggadgets.common.commands.BlockMapCommand;
@@ -46,7 +46,6 @@ import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLPaths;
 
-import net.minecraftforge.fml.network.NetworkRegistry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -85,7 +84,7 @@ public class BuildingGadgets {
         // Client only registering
         DistExecutor.runWhenOn(Dist.CLIENT, () -> () -> {
             eventBus.addListener((Consumer<FMLClientSetupEvent>) (event -> clientInit(event, eventBus)));
-            ModLoadingContext.get().registerExtensionPoint(ExtensionPoint.GUIFACTORY, () -> GuiProxy::openGui);
+            ModLoadingContext.get().registerExtensionPoint(ExtensionPoint.GUIFACTORY, () -> GuiMod::openScreen);
         });
 
         loadConfig(Config.CLIENT_CONFIG, FMLPaths.CONFIGDIR.get().resolve("buildinggadgets-client.toml"));

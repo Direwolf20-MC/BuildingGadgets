@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.common.blocks.templatemanager;
 
+import com.direwolf20.buildinggadgets.client.gui.GuiMod;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.items.ITemplate;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
@@ -27,7 +28,6 @@ import net.minecraftforge.items.CapabilityItemHandler;
 import javax.annotation.Nullable;
 
 public class TemplateManager extends Block {
-    private static final int GUI_ID = 1;
     public static final ResourceLocation REGISTRY_NAME = new ResourceLocation(BuildingGadgets.MODID,"template_manager");
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
 
@@ -84,9 +84,7 @@ public class TemplateManager extends Block {
                 PacketHandler.sendTo(new PacketBlockMap(tagCompound), (EntityPlayerMP) player);
             }
         }
-
-//  @fixme: reimplement
-//        player.gui(BuildingGadgets.instance, GUI_ID, world, pos.getX(), pos.getY(), pos.getZ());
+        GuiMod.TEMPLATE_MANAGER.openContainer(player, worldIn, pos);
         return true;
     }
 
