@@ -103,8 +103,9 @@ public class TemplateManagerGUI extends GuiContainer {
         this.nameField.setVisible(true);
 
         helpTextProviders.add(new AreaHelpText(nameField, "field.template_name"));
-        helpTextProviders.add(new AreaHelpText(inventorySlots.getSlot(0), guiLeft, guiTop, "slot.gadget"));
-        helpTextProviders.add(new AreaHelpText(inventorySlots.getSlot(1), guiLeft, guiTop, "slot.template"));
+//      TODO 1.13
+//        helpTextProviders.add(new AreaHelpText(inventorySlots.getSlot(0), guiLeft, guiTop, "slot.gadget"));
+//        helpTextProviders.add(new AreaHelpText(inventorySlots.getSlot(1), guiLeft, guiTop, "slot.template"));
         helpTextProviders.add(new AreaHelpText(guiLeft + 112, guiTop + 41, 22, 15, "arrow.data_flow"));
         helpTextProviders.add(new AreaHelpText(panel, guiLeft, guiTop + 10, "preview"));
     }
@@ -124,7 +125,8 @@ public class TemplateManagerGUI extends GuiContainer {
             drawTexturedModalRectReverseX(guiLeft + 112, guiTop + 41, 176, 0, 22, 15, buttonLoad.isMouseOver());
 
         this.nameField.drawTextField(mouseX, mouseY, partialTicks);
-        drawStructure();
+//      TODO 1.13
+//        drawStructure();
     }
 
     public void drawTexturedModalRectReverseX(int x, int y, int textureX, int textureY, int width, int height, boolean reverse) {
@@ -373,8 +375,9 @@ public class TemplateManagerGUI extends GuiContainer {
         if (!nameField.isFocused() && nameField.getText().isEmpty())
             fontRenderer.drawString("template name", nameField.x - guiLeft + 4, nameField.y - guiTop, -10197916);
 
-        if (buttonSave.isMouseOver() || buttonLoad.isMouseOver() || buttonPaste.isMouseOver())
-            drawSlotOverlay(buttonLoad.isMouseOver() ? container.getSlot(0) : container.getSlot(1));
+//        TODO 1.13
+//        if (buttonSave.isMouseOver() || buttonLoad.isMouseOver() || buttonPaste.isMouseOver())
+//            drawSlotOverlay(buttonLoad.isMouseOver() ? container.getSlot(0) : container.getSlot(1));
     }
 
     private void drawSlotOverlay(Slot slot) {

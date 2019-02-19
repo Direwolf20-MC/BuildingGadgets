@@ -70,20 +70,21 @@ public class TemplateManager extends Block {
         if (!(te instanceof TemplateManagerTileEntity)) {
             return false;
         }
-        TemplateManagerContainer container = ((TemplateManagerTileEntity) te).getContainer(player);
-        for (int i = 0; i <= 1; i++) {
-            ItemStack itemStack = container.getSlot(i).getStack();
-            if (!(itemStack.getItem() instanceof ITemplate)) continue;
-
-            ITemplate template = (ITemplate) itemStack.getItem();
-            String UUID = template.getUUID(itemStack);
-            if (UUID == null) continue;
-
-            NBTTagCompound tagCompound = template.getWorldSave(worldIn).getCompoundFromUUID(UUID);
-            if (tagCompound != null) {
-                PacketHandler.sendTo(new PacketBlockMap(tagCompound), (EntityPlayerMP) player);
-            }
-        }
+//      TODO 1.13
+//        TemplateManagerContainer container = ((TemplateManagerTileEntity) te).getContainer(player);
+//        for (int i = 0; i <= 1; i++) {
+//            ItemStack itemStack = container.getSlot(i).getStack();
+//            if (!(itemStack.getItem() instanceof ITemplate)) continue;
+//
+//            ITemplate template = (ITemplate) itemStack.getItem();
+//            String UUID = template.getUUID(itemStack);
+//            if (UUID == null) continue;
+//
+//            NBTTagCompound tagCompound = template.getWorldSave(worldIn).getCompoundFromUUID(UUID);
+//            if (tagCompound != null) {
+//                PacketHandler.sendTo(new PacketBlockMap(tagCompound), (EntityPlayerMP) player);
+//            }
+//        }
         GuiMod.TEMPLATE_MANAGER.openContainer(player, worldIn, pos);
         return true;
     }

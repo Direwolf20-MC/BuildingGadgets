@@ -16,9 +16,9 @@ public class TemplateManagerContainer extends Container {
 
     public TemplateManagerContainer(IInventory playerInventory, TemplateManagerTileEntity te) {
         this.te = te;
-
-        addOwnSlots();
-        addPlayerSlots(playerInventory);
+//      TODO 1.13
+//        addOwnSlots();
+//        addPlayerSlots(playerInventory);
     }
 
     private void addPlayerSlots(IInventory playerInventory) {
