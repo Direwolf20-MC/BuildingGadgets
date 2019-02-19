@@ -15,7 +15,7 @@ import java.util.function.Supplier;
 public class PacketToggleFuzzy {
 
     public static void encode(PacketToggleFuzzy msg, PacketBuffer buffer) {}
-    public static PacketToggleFuzzy decode(PacketBuffer buffer) { return null; }
+    public static PacketToggleFuzzy decode(PacketBuffer buffer) { return new PacketToggleFuzzy(); }
 
     public static class Handler {
         public static void handle(final PacketToggleFuzzy msg, Supplier<NetworkEvent.Context> ctx) {

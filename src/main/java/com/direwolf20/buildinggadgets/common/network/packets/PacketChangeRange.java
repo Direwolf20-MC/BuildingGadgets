@@ -14,7 +14,7 @@ import java.util.function.Supplier;
 public class PacketChangeRange {
 
     public static void encode(PacketChangeRange msg, PacketBuffer buffer) {}
-    public static PacketChangeRange decode(PacketBuffer buffer) { return null; }
+    public static PacketChangeRange decode(PacketBuffer buffer) { return new PacketChangeRange(); }
 
     public static class Handler {
         public static void handle(final PacketChangeRange msg, Supplier<NetworkEvent.Context> ctx) {

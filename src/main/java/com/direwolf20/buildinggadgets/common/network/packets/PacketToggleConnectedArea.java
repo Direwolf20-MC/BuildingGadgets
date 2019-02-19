@@ -14,7 +14,7 @@ import java.util.function.Supplier;
 public class PacketToggleConnectedArea {
 
     public static void encode(PacketToggleConnectedArea msg, PacketBuffer buffer) {}
-    public static PacketToggleConnectedArea decode(PacketBuffer buffer) { return null; }
+    public static PacketToggleConnectedArea decode(PacketBuffer buffer) { return new PacketToggleConnectedArea(); }
 
     public static class Handler {
         public static void handle(final PacketToggleConnectedArea msg, Supplier<NetworkEvent.Context> ctx) {

@@ -24,6 +24,7 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.settings.KeyBinding;
+import net.minecraft.client.util.InputMappings;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
@@ -299,8 +300,9 @@ public class ModeRadialMenu extends GuiScreen {
 
     @Override
     public void tick() {
-        if (!KeyBindings.modeSwitch.isKeyDown()) {
-            mc.displayGuiScreen(null);
+//    TODO 1.13 only works for bound keys; not bound mouse buttons
+        if (!InputMappings.isKeyDown(KeyBindings.modeSwitch.getKey().getKeyCode())) {
+            close();
             changeMode();
         }
 
