@@ -6,6 +6,7 @@ import com.direwolf20.buildinggadgets.common.integration.RefinedStorage;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetBuilding;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetExchanger;
 import com.google.common.collect.HashMultiset;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multiset;
 
 import net.minecraft.block.state.IBlockState;
@@ -38,6 +39,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GadgetUtils {
+    private static final ImmutableList<String> LINK_STARTS = ImmutableList.of("http","www");
+
+    public static boolean mightBeLink(final String s) {
+        return LINK_STARTS.stream().anyMatch(s::startsWith);
+    }
 
     public static String getStackErrorSuffix(ItemStack stack) {
         return getStackErrorText(stack) + " with NBT tag: " + stack.getTagCompound();

@@ -65,6 +65,7 @@ message.gadget.fuzzymode=Ungenauerer Modus
 message.gadget.invalidblock=Block ungültig
 message.gadget.nothingtoundo=Nichts zum Rückgängigmachen
 message.gadget.pastefailed=Einfügen fehlgeschlagen, ungültiges JSON
+message.gadget.pastefailed.linkcopied=Einfügen fehlgeschlagen. Bitte kopiere die tatsächlichen JSON-Daten und nicht den Link.
 message.gadget.pastesuccess=Einfügen aus Zwischenablage erfolgreich
 message.gadget.pastetoobig=Einzufügender Datensatz ist zu groß
 message.gadget.rotated=Blöcke rotiert
