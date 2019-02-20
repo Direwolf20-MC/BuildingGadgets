@@ -41,8 +41,8 @@ public abstract class NetworkIO implements IItemHandler {
 
     @Override
     @Nonnull
-    public ItemStack insertItem(int slot, @Nonnull ItemStack stack1, boolean simulate) {
-        return getNonNullStack(insertItemInternal(stack1, simulate));
+    public ItemStack insertItem(int slot, @Nonnull ItemStack stack, boolean simulate) {
+        return getNonNullStack(insertItemInternal(stack, simulate));
     }
 
     @Nullable
