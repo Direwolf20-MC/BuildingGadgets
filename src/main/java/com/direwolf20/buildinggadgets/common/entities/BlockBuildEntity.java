@@ -40,14 +40,14 @@ public class BlockBuildEntity extends Entity {
     int maxLife = 20;
 
     public BlockBuildEntity(World world) {
-        super(BGEntities.BLOCK_BUILD, world);
+        super(BGEntities.BUILD_BLOCK, world);
 
         setSize(0.1F, 0.1F);
         this.world = world;
     }
 
     public BlockBuildEntity(World worldIn, BlockPos spawnPos, EntityLivingBase player, IBlockState spawnBlock, int toolMode, IBlockState actualSpawnBlock, boolean constrPaste) {
-        super(BGEntities.BLOCK_BUILD, worldIn);
+        super(BGEntities.BUILD_BLOCK, worldIn);
         setSize(0.1F, 0.1F);
         setPosition(spawnPos.getX(), spawnPos.getY(), spawnPos.getZ());
         IBlockState currentBlock = worldIn.getBlockState(spawnPos);

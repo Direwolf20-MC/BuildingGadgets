@@ -19,18 +19,18 @@ import net.minecraftforge.registries.ObjectHolder;
 public class BGEntities {
     private static final RegistryContainer<EntityType<?>, RegistryObjectBuilder<EntityType<?>, Builder<?>>> container = new RegistryContainer<>();
 
-    @ObjectHolder("build_block")
-    public static EntityType<?> BLOCK_BUILD ;
-    @ObjectHolder("construction_block")
-    public static EntityType<?> CONSTRUCTION_BLOCK ;
+    @ObjectHolder("build_block_entity")
+    public static EntityType<?> BUILD_BLOCK;
+    @ObjectHolder("construction_block_entity")
+    public static EntityType<?> CONSTRUCTION_BLOCK;
 
     public static void init() {
-        container.add(new RegistryObjectBuilder<EntityType<?>, Builder<?>>(new ResourceLocation(BuildingGadgets.MODID,"build_block"))
+        container.add(new RegistryObjectBuilder<EntityType<?>, Builder<?>>(new ResourceLocation(BuildingGadgets.MODID, "build_block_entity"))
                 .builder(Builder.create(BlockBuildEntity.class, BlockBuildEntity::new))
-                .factory((b) -> b.build("")));
-        container.add(new RegistryObjectBuilder<EntityType<?>, Builder<?>>(new ResourceLocation(BuildingGadgets.MODID,"construction_block"))
+                .factory(b -> b.build("")));
+        container.add(new RegistryObjectBuilder<EntityType<?>, Builder<?>>(new ResourceLocation(BuildingGadgets.MODID, "construction_block_entity"))
                 .builder(Builder.create(ConstructionBlockEntity.class, ConstructionBlockEntity::new))
-                .factory((b) -> b.build("")));
+                .factory(b -> b.build("")));
     }
 
     @SubscribeEvent
