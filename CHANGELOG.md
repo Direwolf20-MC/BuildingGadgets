@@ -1,6 +1,11 @@
 # Building Gadgets Changelog
 The format of this document is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and should continue to adhere to the conventions outlined in the Keep a Changelog guidelines.
 
+## [Unreleased] 
+### Changed
+- The Template Manager now displays a special Error-Message if someone tries to paste a link instead of JSON-Data
+
+
 ## [2.6.4] - 2019-02-17
 ### Fixed
 - Drastically improved rendering performance of Destruction Gadget in Connected Area mode when set to a large area
