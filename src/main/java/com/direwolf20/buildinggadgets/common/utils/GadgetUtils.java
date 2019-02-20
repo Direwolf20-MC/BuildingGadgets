@@ -19,6 +19,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.text.TextComponentString;
@@ -102,7 +103,7 @@ public class GadgetUtils {
     private static NBTTagCompound undoStateToNBT(UndoState undoState) {
         //Convert an UndoState object into NBT data. Uses ints to store relative positions to a start block for data compression..
         NBTTagCompound compound = new NBTTagCompound();
-        compound.setInt("dim", undoState.dimension.getId());
+        compound.setString("dim", undoState.dimension.toString());
         BlockPos startBlock = undoState.coordinates.get(0);
         int[] array = new int[undoState.coordinates.size()];
         int idx = 0;
@@ -119,9 +120,13 @@ public class GadgetUtils {
         return compound;
     }
 
+    @Nullable
     private static UndoState NBTToUndoState(NBTTagCompound compound) {
         //Convert an integer list stored in NBT into UndoState
-        DimensionType dim = DimensionType.getById(compound.getInt("dim"));
+        DimensionType dim = DimensionType.byName(new ResourceLocation(compound.getString("dim")));
+        if (dim == null)
+            return null;
+ 
         List<BlockPos> coordinates = new ArrayList<BlockPos>();
         int[] array = compound.getIntArray("undoIntCoords");
         BlockPos startBlock = NBTUtil.readBlockPos(compound.getCompound("startBlock"));
@@ -311,9 +316,9 @@ public class GadgetUtils {
     }
 
     public static boolean setRemoteInventory(EntityPlayer player, ItemStack tool, BlockPos pos, World world) {
-        if (getRemoteInventory(pos, player.dimension, world) != null) {
+        if (getRemoteInventory(pos, DimensionType.func_212678_a(player.dimension), world) != null) {
             boolean same = pos.equals(getPOSFromNBT(tool, "boundTE"));
-            writePOSToNBT(tool, same ? null : pos, "boundTE", player.dimension.getId());
+            writePOSToNBT(tool, same ? null : pos, "boundTE", player.dimension);
             player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget." + (same ? "unboundTE" : "boundTE")).getUnformattedComponentText()), true);
             return true;
         }
@@ -322,14 +327,16 @@ public class GadgetUtils {
 
     @Nullable
     public static IItemHandler getRemoteInventory(ItemStack tool, World world) {
-        Integer dim = getDIMFromNBT(tool, "boundTE");
+        ResourceLocation dim = getDIMFromNBT(tool, "boundTE");
         if (dim == null) return null;
         BlockPos pos = getPOSFromNBT(tool, "boundTE");
-        return pos == null ? null : getRemoteInventory(pos, world.getDimension().getType(), world);
+        return pos == null ? null : getRemoteInventory(pos, dim, world);
     }
 
     @Nullable
-    public static IItemHandler getRemoteInventory(BlockPos pos, DimensionType dim, World world) {
+    public static IItemHandler getRemoteInventory(BlockPos pos, @Nullable ResourceLocation dimName, World world) {
+        DimensionType dim = DimensionType.byName(dimName);
+        if (dim == null) return null;
         MinecraftServer server = world.getServer();
         if (server == null) return null;
         World worldServer = server.getWorld(dim);
@@ -366,7 +373,7 @@ public class GadgetUtils {
         stack.setTag(tagCompound);
     }
 
-    public static void writePOSToNBT(ItemStack stack, @Nullable BlockPos pos, String tagName, Integer dim) {
+    public static void writePOSToNBT(ItemStack stack, @Nullable BlockPos pos, String tagName, DimensionType dimension) {
         NBTTagCompound tagCompound = stack.getTag();
         if (tagCompound == null) {
             tagCompound = new NBTTagCompound();
@@ -378,12 +385,12 @@ public class GadgetUtils {
             return;
         }
         NBTTagCompound posTag = NBTUtil.writeBlockPos(pos);
-        posTag.setInt("dim", dim);
+        posTag.setString("dim", DimensionType.func_212678_a(dimension).toString());
         tagCompound.setTag(tagName, posTag);
         stack.setTag(tagCompound);
     }
 
-    public static void writePOSToNBT(NBTTagCompound tagCompound, @Nullable BlockPos pos, String tagName, Integer dim) {
+    public static void writePOSToNBT(NBTTagCompound tagCompound, @Nullable BlockPos pos, String tagName, DimensionType dimension) {
         if (tagCompound == null) {
             tagCompound = new NBTTagCompound();
         }
@@ -393,7 +400,7 @@ public class GadgetUtils {
             return;
         }
         tagCompound.setTag(tagName, NBTUtil.writeBlockPos(pos));
-        tagCompound.setInt("dim", dim);
+        tagCompound.setString("dim", DimensionType.func_212678_a(dimension).toString());
     }
 
     @Nullable
@@ -472,7 +479,7 @@ public class GadgetUtils {
     }
 
     @Nullable
-    public static Integer getDIMFromNBT(ItemStack stack, String tagName) {
+    public static ResourceLocation getDIMFromNBT(ItemStack stack, String tagName) {
         NBTTagCompound tagCompound = stack.getTag();
         if (tagCompound == null) {
             return null;
@@ -481,7 +488,7 @@ public class GadgetUtils {
         if (posTag.equals(new NBTTagCompound())) {
             return null;
         }
-        return posTag.getInt("dim");
+        return new ResourceLocation(posTag.getString("dim"));
     }
 
     public static NBTTagCompound stateToCompound(IBlockState state) {

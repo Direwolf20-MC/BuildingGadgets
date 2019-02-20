@@ -13,6 +13,7 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.fml.network.NetworkEvent.Context;
@@ -28,14 +29,14 @@ public class PacketSetRemoteInventoryCache {
 
     private boolean isCopyPaste;
     private Multiset<UniqueItem> cache;
-    private Pair<Integer, BlockPos> loc;
+    private Pair<ResourceLocation, BlockPos> loc;
 
     public PacketSetRemoteInventoryCache(Multiset<UniqueItem> cache, boolean isCopyPaste) {
         this.cache = cache;
         this.isCopyPaste = isCopyPaste;
     }
 
-    public PacketSetRemoteInventoryCache(Pair<Integer, BlockPos> loc, boolean isCopyPaste) {
+    public PacketSetRemoteInventoryCache(Pair<ResourceLocation, BlockPos> loc, boolean isCopyPaste) {
         this.loc = loc;
         this.isCopyPaste = isCopyPaste;
     }
@@ -43,7 +44,7 @@ public class PacketSetRemoteInventoryCache {
     public static PacketSetRemoteInventoryCache decode(PacketBuffer buf) {
         boolean isCopyPaste = buf.readBoolean();
         if (buf.readBoolean()) {
-            Pair<Integer, BlockPos> loc = new ImmutablePair<>(buf.readInt(), BlockPos.fromLong(buf.readLong()));
+            Pair<ResourceLocation, BlockPos> loc = new ImmutablePair<>(buf.readResourceLocation(), buf.readBlockPos());
             return new PacketSetRemoteInventoryCache(loc, isCopyPaste);
         }
         int len = buf.readInt();
@@ -60,7 +61,7 @@ public class PacketSetRemoteInventoryCache {
         boolean isRequest = msg.getCache() == null;
         buf.writeBoolean(isRequest);
         if (isRequest) {
-            buf.writeInt(msg.getLoc().getLeft());
+            buf.writeResourceLocation(msg.getLoc().getLeft());
             buf.writeLong(msg.getLoc().getRight().toLong());
             return;
         }
@@ -81,7 +82,7 @@ public class PacketSetRemoteInventoryCache {
         return cache;
     }
 
-    public Pair<Integer, BlockPos> getLoc() {
+    public Pair<ResourceLocation, BlockPos> getLoc() {
         return loc;
     }
 
@@ -92,7 +93,7 @@ public class PacketSetRemoteInventoryCache {
                 if (player != null) {
                     Set<UniqueItem> itemTypes = new HashSet<>();
                     ImmutableMultiset.Builder<UniqueItem> builder = ImmutableMultiset.builder();
-                    IItemHandler remoteInventory = GadgetUtils.getRemoteInventory(msg.loc.getRight(), DimensionType.getById(msg.loc.getLeft()), player.world);
+                    IItemHandler remoteInventory = GadgetUtils.getRemoteInventory(msg.loc.getRight(), msg.loc.getLeft(), player.world);
                     if (remoteInventory != null) {
                         for (int i = 0; i < remoteInventory.getSlots(); i++) {
                             ItemStack stack = remoteInventory.getStackInSlot(i);

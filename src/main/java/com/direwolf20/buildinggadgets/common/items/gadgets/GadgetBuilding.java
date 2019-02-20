@@ -238,11 +238,11 @@ public class GadgetBuilding extends GadgetGeneric {
             List<BlockPos> failedRemovals = new ArrayList<BlockPos>(); //Build a list of removals that fail
             ItemStack silkTool = heldItem.copy(); //Setup a Silk Touch version of the tool so we can return stone instead of cobblestone, etc.
             silkTool.addEnchantment(Enchantments.SILK_TOUCH, 1);
+            boolean sameDim = player.dimension == undoState.dimension;
             for (BlockPos coord : undoCoords) {
                 currentBlock = world.getBlockState(coord);
 
-                double distance = coord.getDistance(player.getPosition().getX(), player.getPosition().getY(), player.getPosition().getZ());
-                boolean sameDim = (player.dimension == undoState.dimension);
+                double distance = coord.getDistance(player.getPosition());
 
                 BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(world, coord, currentBlock, player);
                 boolean cancelled = MinecraftForge.EVENT_BUS.post(e);

@@ -27,6 +27,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
@@ -80,7 +81,7 @@ public class ToolRenders {
         BlockRendererDispatcher dispatcher = Minecraft.getInstance().getBlockRendererDispatcher();
         BlockRenderLayer origLayer = MinecraftForgeClient.getRenderLayer();
 
-        Integer dim = GadgetUtils.getDIMFromNBT(heldItem, "boundTE");
+        ResourceLocation dim = GadgetUtils.getDIMFromNBT(heldItem, "boundTE");
         BlockPos pos = GadgetUtils.getPOSFromNBT(heldItem, "boundTE");
 
         if (dim != null && pos != null) {
@@ -222,7 +223,7 @@ public class ToolRenders {
         double doubleZ = player.lastTickPosZ + (player.posZ - player.lastTickPosZ) * evt.getPartialTicks();
 
         BlockRendererDispatcher dispatcher = Minecraft.getInstance().getBlockRendererDispatcher();
-        Integer dim = GadgetUtils.getDIMFromNBT(heldItem, "boundTE");
+        ResourceLocation dim = GadgetUtils.getDIMFromNBT(heldItem, "boundTE");
         BlockPos pos = GadgetUtils.getPOSFromNBT(heldItem, "boundTE");
 
         if (dim != null && pos != null) {
@@ -467,7 +468,7 @@ public class ToolRenders {
     }
 
     public static void renderPasteOverlay(RenderWorldLastEvent evt, EntityPlayer player, ItemStack stack) {
-        Integer dim = GadgetUtils.getDIMFromNBT(stack, "boundTE");
+        ResourceLocation dim = GadgetUtils.getDIMFromNBT(stack, "boundTE");
         BlockPos pos = GadgetUtils.getPOSFromNBT(stack, "boundTE");
 
         //Calculate the players current position, which is needed later

@@ -388,7 +388,7 @@ public class GadgetDestruction extends GadgetGeneric {
         tagCompound.setIntArray("posPasteArray", posPasteArray);
         tagCompound.setIntArray("statePasteArray", statePasteArray);
         tagCompound.setTag("startPos", NBTUtil.writeBlockPos(startBlock));
-        tagCompound.setInt("dim", player.dimension.getId());
+        tagCompound.setString("dim", player.dimension.toString());
         tagCompound.setString("UUID", UUID);
         worldSave.addToMap(UUID, tagCompound);
         worldSave.markForSaving();

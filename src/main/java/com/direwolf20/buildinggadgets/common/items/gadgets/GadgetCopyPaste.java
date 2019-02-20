@@ -162,7 +162,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
         stack.setTag(tagCompound);
     }
 
-    private static void setLastBuild(ItemStack stack, BlockPos anchorPos, int dim) {
+    private static void setLastBuild(ItemStack stack, BlockPos anchorPos, DimensionType dim) {
         GadgetUtils.writePOSToNBT(stack, anchorPos, "lastBuild", dim);
     }
 
@@ -170,7 +170,8 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
         return GadgetUtils.getPOSFromNBT(stack, "lastBuild");
     }
 
-    private static Integer getLastBuildDim(ItemStack stack) {
+    @Nullable
+    private static ResourceLocation getLastBuildDim(ItemStack stack) {
         return GadgetUtils.getDIMFromNBT(stack, "lastBuild");
     }
 
@@ -373,7 +374,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
     }
 
     private static boolean findBlocks(World world, BlockPos start, BlockPos end, ItemStack stack, EntityPlayer player, GadgetCopyPaste tool) {
-        setLastBuild(stack, null, 0);
+        setLastBuild(stack, null, DimensionType.OVERWORLD);
         int foundTE = 0;
         int startX = start.getX();
         int startY = start.getY();
@@ -460,7 +461,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
 
         tagCompound.setTag("startPos", NBTUtil.writeBlockPos(start));
         tagCompound.setTag("endPos", NBTUtil.writeBlockPos(end));
-        tagCompound.setInt("dim", player.dimension.getId());
+        tagCompound.setString("dim", player.dimension.toString());
         tagCompound.setString("UUID", tool.getUUID(stack));
         tagCompound.setString("owner", player.getName().getString());
         tool.incrementCopyCounter(stack);
@@ -490,7 +491,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
         pos = pos.south(GadgetCopyPaste.getZ(stack));
 
         List<BlockMap> blockMapList = getBlockMapList(tagCompound, pos);
-        setLastBuild(stack, pos, player.dimension.getId());
+        setLastBuild(stack, pos, player.dimension);
 
         for (BlockMap blockMap : blockMapList)
             placeBlock(world, blockMap.pos, player, blockMap.state, getBlockMapIntState(tagCompound).getIntStackMap());
@@ -591,14 +592,13 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
         if (startPos == null)
             return;
 
-        DimensionType dimension = DimensionType.getById(getLastBuildDim(heldItem));
         ItemStack silkTool = heldItem.copy(); //Setup a Silk Touch version of the tool so we can return stone instead of cobblestone, etc.
         silkTool.addEnchantment(Enchantments.SILK_TOUCH, 1);
         List<BlockMap> blockMapList = getBlockMapList(tagCompound, startPos);
         boolean success = true;
+        boolean sameDim = (player.dimension == DimensionType.byName(getLastBuildDim(heldItem)));
         for (BlockMap blockMap : blockMapList) {
-            double distance = blockMap.pos.getDistance(player.getPosition().getX(), player.getPosition().getY(), player.getPosition().getZ());
-            boolean sameDim = (player.dimension == dimension);
+            double distance = blockMap.pos.getDistance(player.getPosition());
 
             IBlockState currentBlock = world.getBlockState(blockMap.pos);
             BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(world, blockMap.pos, currentBlock, player);
@@ -617,7 +617,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
             }
             //System.out.printf("Undid %d Blocks in %.2f ms%n", blockMapList.size(), (System.nanoTime() - time) * 1e-6);
         }
-        if (success) setLastBuild(heldItem, null, 0);
+        if (success) setLastBuild(heldItem, null, DimensionType.OVERWORLD);
     }
 
     public static ItemStack getGadget(EntityPlayer player) {
