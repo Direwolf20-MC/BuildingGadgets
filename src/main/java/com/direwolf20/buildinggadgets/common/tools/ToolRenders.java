@@ -150,7 +150,7 @@ public class ToolRenders {
                 //Enable Blending (So we can have transparent effect)
                 GlStateManager.enableBlend();
                 //This blend function allows you to use a constant alpha, which is defined later
-                GlStateManager.blendFunc(GL11.GL_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+                GlStateManager.blendFunc(GL14.GL_CONSTANT_ALPHA, GL14.GL_ONE_MINUS_CONSTANT_ALPHA);
 
                 List<BlockPos> sortedCoordinates = Sorter.Blocks.byDistance(coordinates, player); //Sort the coords by distance to player.
 
