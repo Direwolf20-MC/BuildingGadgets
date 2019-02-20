@@ -13,7 +13,7 @@ import java.util.Set;
 public class BakedModelLoader implements ICustomModelLoader {
     private static final IUnbakedModel CONSTRUCTION_MODEL = new ConstructionModel();
     private static final Set<String> NAMES = ImmutableSet.of(
-            "constructionblock");
+            "construction_block");
 
     @Override
     public void onResourceManagerReload(IResourceManager resourceManager) {

@@ -21,7 +21,7 @@ import java.util.Set;
 import java.util.function.Function;
 
 public class ConstructionModel implements IUnbakedModel {
-    private static final ResourceLocation MODEL_CONSTRUCTION_BLOCK = new ModelResourceLocation(BuildingGadgets.MODID + ":blankconstblock");
+    private static final ResourceLocation MODEL_CONSTRUCTION_BLOCK = new ModelResourceLocation(BuildingGadgets.MODID + ":blank_const_block");
 
     @Override
     public Collection<ResourceLocation> getOverrideLocations() {

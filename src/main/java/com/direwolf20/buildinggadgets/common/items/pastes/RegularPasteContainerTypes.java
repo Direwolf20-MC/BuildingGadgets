@@ -25,9 +25,10 @@ public enum RegularPasteContainerTypes {
     private final String itemSuffix;
     private final IntSupplier capacitySupplier;
     private final ResourceLocation registryName;
+
     RegularPasteContainerTypes(String itemSuffix, IntSupplier capacitySupplier) {
         this.itemSuffix = itemSuffix;
-        this.registryName = new ResourceLocation(BuildingGadgets.MODID,"construction_paste_container_"+itemSuffix);
+        this.registryName = new ResourceLocation(BuildingGadgets.MODID, "construction_paste_container_" + itemSuffix);
         this.capacitySupplier = capacitySupplier;
     }
 
@@ -44,6 +45,6 @@ public enum RegularPasteContainerTypes {
     }
 
     public ConstructionPasteContainer create(Item.Properties builder) {
-        return new ConstructionPasteContainer(builder,getCapacitySupplier());
+        return new ConstructionPasteContainer(builder, getCapacitySupplier());
     }
 }

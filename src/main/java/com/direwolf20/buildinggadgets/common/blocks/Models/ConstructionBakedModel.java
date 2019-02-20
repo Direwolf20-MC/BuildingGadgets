@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Random;
 
 public class ConstructionBakedModel implements IBakedModel {
-    public static final ModelResourceLocation modelFacade = new ModelResourceLocation(BuildingGadgets.MODID + ":" + "constructionblock");
+    public static final ModelResourceLocation modelFacade = new ModelResourceLocation(BuildingGadgets.MODID + ":" + "construction_block");
 
     private static TextureAtlasSprite spriteCable;
     private IBakedModel blankConstructionModel;
