@@ -5,6 +5,8 @@ import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.client.resources.I18n;
+
 import org.lwjgl.opengl.GL11;
 
 public class GuiButtonHelp extends GuiButtonSelect {
@@ -14,7 +16,7 @@ public class GuiButtonHelp extends GuiButtonSelect {
     }
 
     public String getHoverText() {
-        return IHoverHelpText.get("button." + (selected ? "help.exit" : "help.enter"));
+        return I18n.format(GuiMod.getLangKeyButton("help", selected ? "help.exit" : "help.enter"));
     }
 
     @Override

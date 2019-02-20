@@ -68,7 +68,7 @@ public class DestructionGUI extends GuiScreen {
 
         nullCheckTextBoxes();
 
-        this.addButton(new GuiButton(1, this.guiLeft + 145, this.guiTop + 125, 40, 20, I18n.format("singles.buildinggadgets.confirm")){
+        this.addButton(new GuiButton(1, this.guiLeft + 145, this.guiTop + 125, 40, 20, I18n.format(GuiMod.getLangKeyField("destruction", "confirm"))){
             @Override
             public void onClick(double mouseX, double mouseY) {
                 nullCheckTextBoxes();
@@ -82,7 +82,7 @@ public class DestructionGUI extends GuiScreen {
                 super.onClick(mouseX, mouseY);
             }
         });
-        this.addButton(new GuiButton(2, this.guiLeft + 245, this.guiTop + 125, 40, 20, I18n.format("singles.buildinggadgets.cancel")){
+        this.addButton(new GuiButton(2, this.guiLeft + 245, this.guiTop + 125, 40, 20, I18n.format(GuiMod.getLangKeyField("destruction", "cancel"))){
             @Override
             public void onClick(double mouseX, double mouseY) {
                 mc.displayGuiScreen(null);
@@ -185,13 +185,17 @@ public class DestructionGUI extends GuiScreen {
         this.down.drawTextField(mouseX, mouseY, partialTicks);
         this.depth.drawTextField(mouseX, mouseY, partialTicks);
 
-        fontRenderer.drawStringWithShadow(I18n.format("singles.buildinggadgets.left"), this.guiLeft + 35, this.guiTop + 60, 0xFFFFFF);
-        fontRenderer.drawStringWithShadow(I18n.format("singles.buildinggadgets.right"), this.guiLeft + 278, this.guiTop + 60, 0xFFFFFF);
-        fontRenderer.drawStringWithShadow(I18n.format("singles.buildinggadgets.up"), this.guiLeft + 170, this.guiTop + 30, 0xFFFFFF);
-        fontRenderer.drawStringWithShadow(I18n.format("singles.buildinggadgets.down"), this.guiLeft + 158, this.guiTop + 90, 0xFFFFFF);
-        fontRenderer.drawStringWithShadow(I18n.format("singles.buildinggadgets.depth"), this.guiLeft + 155, this.guiTop + 60, 0xFFFFFF);
+        drawFieldLable("left", 35, 60);
+        drawFieldLable("right", 278, 60);
+        drawFieldLable("up", 170, 30);
+        drawFieldLable("down", 158, 90);
+        drawFieldLable("depth", 155, 60);
 
         super.render(mouseX, mouseY, partialTicks);
+    }
+
+    private void drawFieldLable(String name, int x, int y) {
+        fontRenderer.drawStringWithShadow(I18n.format(GuiMod.getLangKeyField("destruction", name)), this.guiLeft + x, this.guiTop + y, 0xFFFFFF);
     }
 
     private void nullCheckTextBoxes() {

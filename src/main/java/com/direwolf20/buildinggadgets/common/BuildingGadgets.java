@@ -124,6 +124,14 @@ public class BuildingGadgets {
         BuildingObjects.cleanup();
     }
 
+    public static String getLangKeyPrefix(String type, String... args) {
+        return getLangKey(type, args) + ".";
+    }
+
+    public static String getLangKey(String type, String... args) {
+        return String.join(".", type, MODID, String.join(".", args));
+    }
+
     public static class ClientProxy {
 
         private static void clientSetup(final FMLClientSetupEvent event, final IEventBus eventBus) {

@@ -115,4 +115,20 @@ public enum GuiMod {
             }
         }, extraDataWriter);
     }
+
+    public static String getLangKeyField(String prefix, String name) {
+        return getLangKey(prefix, "field", name);
+    }
+
+    public static String getLangKeyButton(String prefix, String name) {
+        return getLangKey(prefix, "button", name);
+    }
+
+    public static String getLangKeyArea(String prefix, String name) {
+        return getLangKey(prefix, "area", name);
+    }
+
+    public static String getLangKey(String prefix, String type, String name) {
+        return BuildingGadgets.getLangKey("gui", prefix, type, name);
+    }
 }
