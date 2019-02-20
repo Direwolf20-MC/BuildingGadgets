@@ -307,9 +307,9 @@ public class GadgetUtils {
             }
             List<BlockPos> coords = new ArrayList<BlockPos>();
             if (stack.getItem() instanceof GadgetBuilding) {
-                coords = BuildingModes.getAffectiveBuildingPositions(world, player, startBlock, sideHit, stack); //Build the positions list based on tool mode and range
+                coords = BuildingModes.collectPlacementPos(world, player, startBlock, sideHit, stack); //Build the positions list based on tool mode and range
             } else if (stack.getItem() instanceof GadgetExchanger) {
-                coords = ExchangingModes.getBuildCoords(world, player, startBlock, sideHit, stack); //Build the positions list based on tool mode and range
+                coords = ExchangingModes.collectPlacementPos(world, player, startBlock, sideHit, stack); //Build the positions list based on tool mode and range
             }
             setAnchor(stack, coords); //Set the anchor NBT
             player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.anchorrender").getUnformattedComponentText()), true);

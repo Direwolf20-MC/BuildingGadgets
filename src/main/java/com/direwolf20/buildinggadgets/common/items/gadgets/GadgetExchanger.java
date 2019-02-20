@@ -180,7 +180,7 @@ public class GadgetExchanger extends GadgetGeneric {
             BlockPos startBlock = lookingAt.getBlockPos();
             EnumFacing sideHit = lookingAt.sideHit;
 //            IBlockState setBlock = getToolBlock(stack);
-            coords = ExchangingModes.getBuildCoords(world, player, startBlock, sideHit, stack);
+            coords = ExchangingModes.collectPlacementPos(world, player, startBlock, sideHit, stack);
         } else { //If we do have an anchor, erase it (Even if the build fails)
             setAnchor(stack, new ArrayList<BlockPos>());
         }

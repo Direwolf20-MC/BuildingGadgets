@@ -116,7 +116,7 @@ public class ToolRenders {
                     return;
                 }
                 if (coordinates.size() == 0 && lookingAt != null) { //Build a list of coordinates based on the tool mode and range
-                    coordinates = BuildingModes.getAffectiveBuildingPositions(world, player, lookingAt.getBlockPos(), lookingAt.sideHit, heldItem);
+                    coordinates = BuildingModes.collectPlacementPos(world, player, lookingAt.getBlockPos(), lookingAt.sideHit, heldItem);
                 }
 
                 //Figure out how many of the block we're rendering we have in the inventory of the player.
@@ -261,7 +261,7 @@ public class ToolRenders {
                     return;
                 }
                 if (coordinates.size() == 0 && lookingAt != null) { //Build a list of coordinates based on the tool mode and range
-                    coordinates = ExchangingModes.getBuildCoords(world, player, lookingAt.getBlockPos(), lookingAt.sideHit, stack);
+                    coordinates = ExchangingModes.collectPlacementPos(world, player, lookingAt.getBlockPos(), lookingAt.sideHit, stack);
                 }
 
                 //Figure out how many of the block we're rendering we have in the inventory of the player.
