@@ -114,7 +114,7 @@ public class ModeRadialMenu extends GuiScreen {
         for (int i = 0; i < buttons.size(); i++) {
             GuiButtonSound button = (GuiButtonSound) buttons.get(i);
             SoundEvent sound = BGSound.BEEP.getSound();
-            button.setSounds(sound, sound, 0.6F, 1F);
+            button.setSounds(sound, sound, 1F, 0.6F);
             if (!button.visible) continue;
             int len = mc.fontRenderer.getStringWidth(button.displayString) + 6;
             x += len + 10;
@@ -219,6 +219,7 @@ public class ModeRadialMenu extends GuiScreen {
             totalDeg += degPer;
 
             GL11.glEnd();
+            GlStateManager.color4f(1, 1, 1, 1);
 
             if (mouseInSector)
                 radius -= highlight;
@@ -246,24 +247,21 @@ public class ModeRadialMenu extends GuiScreen {
             int ysp = yp;
             int width = fontRenderer.getStringWidth(name);
 
-            double mod = 0.6;
-            int xdp = (int) ((xp - x) * mod + x);
-            int ydp = (int) ((yp - y) * mod + y);
-
             if (xsp < x)
                 xsp -= width - 8;
             if (ysp < y)
                 ysp -= 9;
 
-            fontRenderer.drawStringWithShadow(name, xsp, ysp, i == modeIndex ? Color.GREEN.getRGB() : Color.WHITE.getRGB());
+            Color color = i == modeIndex ? Color.GREEN : Color.WHITE;
+            fontRenderer.drawStringWithShadow(name, xsp, ysp, color.getRGB());
 
-            mod = 0.7;
-            xdp = (int) ((xp - x) * mod + x);
-            ydp = (int) ((yp - y) * mod + y);
+            double mod = 0.7;
+            int xdp = (int) ((xp - x) * mod + x);
+            int ydp = (int) ((yp - y) * mod + y);
 
+            GlStateManager.color4f(color.getRed() / 255, color.getGreen() / 255, color.getBlue() / 255F, 1);
             mc.getTextureManager().bindTexture(signs[i]);
             drawModalRectWithCustomSizedTexture(xdp - 8, ydp - 8, 0, 0, 16, 16, 16, 16);
-
         }
 
         GlStateManager.enableRescaleNormal();
@@ -291,11 +289,8 @@ public class ModeRadialMenu extends GuiScreen {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int mouseButton) {
-        boolean clicked = super.mouseClicked(mouseX, mouseY, mouseButton);
-        if (clicked)
-            changeMode();
-
-        return clicked;
+        changeMode();
+        return super.mouseClicked(mouseX, mouseY, mouseButton);
     }
 
     @Override

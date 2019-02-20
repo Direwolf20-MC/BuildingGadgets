@@ -20,5 +20,6 @@ public class GuiButtonAction extends GuiButtonColor {
     public void onClick(double mouseX, double mouseY) {
         action.test(true);
         toggleSelected();
+        super.onClick(mouseX, mouseY);
     }
 }
