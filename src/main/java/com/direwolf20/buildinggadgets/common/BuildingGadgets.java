@@ -131,7 +131,7 @@ public class BuildingGadgets {
                 KeyBindings.init();
                 //            BuildingObjects.initColorHandlers();
             });
-            eventBus.addListener(ClientProxy::renderWorldLastEvent);
+            //eventBus.addListener(ClientProxy::renderWorldLastEvent);
             eventBus.addListener(ClientProxy::registerSprites);
             MinecraftForge.EVENT_BUS.addListener(ClientProxy::registerModels);
         }
