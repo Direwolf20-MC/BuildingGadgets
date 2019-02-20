@@ -46,7 +46,6 @@ public class CapabilityProviderEnergy implements ICapabilityProvider {
         return energy.isPresent() ? energy.orElseThrow(CapabilityNotPresentException::new) : null;
     }
 
-    @Nullable
     public static boolean hasCap(ItemStack stack) {
         return stack.getCapability(CapabilityEnergy.ENERGY).isPresent();
     }
