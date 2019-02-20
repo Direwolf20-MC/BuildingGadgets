@@ -11,22 +11,17 @@ import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntityRender;
 import com.direwolf20.buildinggadgets.common.entities.ConstructionBlockEntity;
 import com.direwolf20.buildinggadgets.common.entities.ConstructionBlockEntityRender;
 import com.direwolf20.buildinggadgets.common.events.AnvilRepairHandler;
-import com.direwolf20.buildinggadgets.common.items.gadgets.*;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.registry.objects.BuildingObjects;
-import com.direwolf20.buildinggadgets.common.tools.ToolRenders;
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import com.electronwill.nightconfig.core.io.WritingMode;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.SimpleSound;
 import net.minecraft.command.Commands;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.ModelRegistryEvent;
-import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.common.ForgeConfigSpec;
@@ -45,7 +40,6 @@ import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLPaths;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -179,7 +173,7 @@ public class BuildingGadgets {
             RenderingRegistry.registerEntityRenderingHandler(ConstructionBlockEntity.class, new ConstructionBlockEntityRender.Factory());
         }
 
-        static void renderWorldLastEvent(RenderWorldLastEvent evt) {
+        /*static void renderWorldLastEvent(RenderWorldLastEvent evt) {
             Minecraft mc = Minecraft.getInstance();
             EntityPlayer player = mc.player;
             ItemStack heldItem = GadgetGeneric.getGadget(player);
@@ -197,7 +191,7 @@ public class BuildingGadgets {
                 ToolRenders.renderDestructionOverlay(evt, player, heldItem);
             }
 
-        }
+        }*/
 
         static void registerSprites(TextureStitchEvent.Pre event) {
             registerSprite(event, TemplateManagerContainer.TEXTURE_LOC_SLOT_TOOL);
