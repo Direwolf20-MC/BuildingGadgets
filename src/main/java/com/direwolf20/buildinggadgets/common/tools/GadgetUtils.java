@@ -331,21 +331,31 @@ public class GadgetUtils {
 
     @Nullable
     public static IItemHandler getRemoteInventory(ItemStack tool, World world) {
+        return getRemoteInventory(tool, world, NetworkIO.Operation.EXTRACT);
+    }
+
+    @Nullable
+    public static IItemHandler getRemoteInventory(ItemStack tool, World world, NetworkIO.Operation operation) {
         Integer dim = getDIMFromNBT(tool, "boundTE");
         if (dim == null) return null;
         BlockPos pos = getPOSFromNBT(tool, "boundTE");
-        return pos == null ? null : getRemoteInventory(pos, dim, world);
+        return pos == null ? null : getRemoteInventory(pos, dim, world, operation);
     }
 
     @Nullable
     public static IItemHandler getRemoteInventory(BlockPos pos, int dim, World world) {
+        return getRemoteInventory(pos, dim, world, NetworkIO.Operation.EXTRACT);
+    }
+
+    @Nullable
+    public static IItemHandler getRemoteInventory(BlockPos pos, int dim, World world, NetworkIO.Operation operation) {
         MinecraftServer server = world.getMinecraftServer();
         if (server == null) return null;
         World worldServer = server.getWorld(dim);
         if (worldServer == null) return null;
         TileEntity te = world.getTileEntity(pos);
         if (te == null) return null;
-        IItemHandler network = RefinedStorage.getWrappedNetwork(te);
+        IItemHandler network = RefinedStorage.getWrappedNetwork(te, operation);
         if (network != null) return network;
         IItemHandler cap = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
         return cap != null ? cap : null;

@@ -1,16 +1,16 @@
 # Building Gadgets Changelog
 The format of this document is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and should continue to adhere to the conventions outlined in the Keep a Changelog guidelines.
 
-## [Unreleased]
+## [2.6.4] - 2019-02-17
 ### Fixed
-- Drastically improve Performance of Destruction Gadget in connected Blocks mode when moving the mouse a lot within a small space of time.
+- Drastically improved rendering performance of Destruction Gadget in Connected Area mode when set to a large area
 
-## [2.6.3] - 2019-02-17
+## [2.6.3] - 2019-02-11
 ### Fixed
 - Fixed server crashing on startup due to beep sound being unavailable server side
 - Fixed the yellow box rendering around chests to always render if the tool is in your hand, not only when other renders are occurring (Like if you're looking at nothing).
 
-## [2.6.2] - 2019-02-11
+## [2.6.2] - 2019-02-12
 ### Note
 - The Performance of the DestructionGadget was very poor when being in the (by default active) connected-Blocks mode. You can always disable that by assigning a corresponding keybinding and toggling it to inactive.
 ### Added
@@ -29,7 +29,7 @@ The format of this document is based on [Keep a Changelog](https://keepachangelo
 ### Fixed
 - Fixes a longstanding bug where relative up/down directions are inverted when interacting with the bottom sides of blocks.
 
-## [2.6.1] - 2019-02-07
+## [2.6.1] - 2019-02-06
 ### Added
 - Added the ability to bind inventories to Refined Storage Interfaces. 
 ### Fixed
@@ -47,7 +47,7 @@ Please let me know if you run into anything weird!
 ### Fixed
 - Misc bug fixes. 
 
-## [2.5.0] - 2018-12-30
+## [2.5.0] - 2018-12-29
 ### Changed
 - It also features a rather significant refactor effort made by the community. Shoutout to MichaelHillcox and Phylogeny and MajorTuvok for all the help with suggestions and making the mod cleaner and easier to read! :) I flagged this as beta due to the fact there are MAJOR refactors in the code. I did a good amount of testing and didn't find too many bugs, but I wanted to flag it as beta until its been tested a bit more :).
 ### Fixed
@@ -72,20 +72,20 @@ Please let me know if you run into anything weird!
 - Improved the FPS hit caused by a very large (16x16x16) destruction tool render. Reminder: If this bothers you, you can press the 'range' hotkey to hide the render completely, and the tool will still work. 
 - Minor crash fixes (XNet cable rendering). 
 
-## [2.4.3] - 2018-10-30
+## [2.4.3] - 2018-10-29
 ### Changed
 - Copy/Paste from the template manager buttons give a message to the player on success as well as fail. 
 ### Fixed
 - Fixed a server side crash with the destruction gadget. 
 
-## [2.4.2] - 2018-10-27
+## [2.4.2] - 2018-10-26
 ### Added
 - Added a config option to prevent overwriting blocks like a player can (Water/lava/tall grass, etc) - At the request of Darkosto for evil modpack reasons.
 ### Fixed
 - DoubleSlab blocks not copy/pasting variants properly.
 - Trying to build below Y=0 wouldn't build, but took items from your inventory. This no longer happens.
 
-## [2.4.1] - 2018-10-25
+## [2.4.1] - 2018-10-24
 ### Added
 - Added a config option to completely disable the destruction tool, in case you don't want it available on your server for example :).
 
@@ -109,12 +109,12 @@ Please let me know if you run into anything weird!
 - Fixed lighting bugs with half-slabs and construction paste. 
 - Misc minor fixes
 
-## [2.3.5] - 2018-10-02
+## [2.3.5] - 2018-10-01
 ### Added
 - Added a GUI to the Copy/paste tool -- Shift Right Click on empty air to access it.
 - Added redstone repeat delay state to the allowed blockstates for copying. 
 
-## [2.3.4] - 2018-10-01
+## [2.3.4] - 2018-09-30
 ### Note
 - Making this beta so more people test it :). Let me know if you run into any bugs please, by reporting them on the Github!
 ### Changed
@@ -126,7 +126,7 @@ Please let me know if you run into anything weird!
 ### Fixed
 - Fixed glass rendering
 
-## [2.3.1] - 2018-09-24
+## [2.3.1] - 2018-09-23
 ### Added
 - Added recipe for the Template Manager
 
@@ -171,7 +171,7 @@ Please let me know if you run into anything weird!
     - Some attributes like light opacity and bounding box are copied to the construction paste block
     - Some are not - Like light / redstone output
 
-## [1.6.2] - 2018-07-28
+## [1.6.2] - 2018-07-27
 ### Changed
 - Exchanger and Builder(During Undo) now properly fire BlockBreakEvents for modders to cancel if need be. 
 
@@ -182,7 +182,7 @@ Please let me know if you run into anything weird!
   - Can be fully repaired with a single diamond in an anvil. 
   - Can accept the normal suite of tool enchants (Unbreaking/Mending/etc).
 
-## [1.5.1] - Date of release in [yyyy-mm-dd]
+## [1.5.1] - 2018-07-25
 ### Added
 - Added radial menu for Mode Select. 
 ### Removed
@@ -204,7 +204,7 @@ Please let me know if you run into anything weird!
 - Added 'Checkerboard' mode to both the builder and exchanger.
 - Added 'Fuzzy mode' to the exchanger (will swap blocks that don't match the block you're looking at if true).
 
-## [1.1.5] - 2018-07-19
+## [1.1.5] - 2018-07-18
 ### Changed
 - More better BlockState copying
 - Plants are allowed again. 
@@ -252,7 +252,7 @@ Types of changes include:
 
 Please do not include your own or edit the heading of these. If something somehow does not fit into these types then add a `Note:` to the top of your version heading. 
 
-## [Full Version] - Date of release in [yyyy-mm-dd]
+## [Full Version] - Date of release in Eastern Standard Time [yyyy-mm-dd]
 ### Added
 - Example Line
 ### Changed
