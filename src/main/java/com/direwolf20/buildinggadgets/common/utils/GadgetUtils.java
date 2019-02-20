@@ -1,7 +1,6 @@
 package com.direwolf20.buildinggadgets.common.utils;
 
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
-import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetBuilding;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetExchanger;
 import com.direwolf20.buildinggadgets.common.tools.*;
@@ -254,7 +253,8 @@ public class GadgetUtils {
             return;
 
         IBlockState state = world.getBlockState(pos);
-        if (result == EnumActionResult.FAIL || !Config.BLACKLIST.isAllowedBlock(state.getBlock())) {
+        //if (result == EnumActionResult.FAIL || !Config.BLACKLIST.isAllowedBlock(state.getBlock())) {
+        if (result == EnumActionResult.FAIL) {
             player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.invalidblock").getUnformattedComponentText()), true);
             return;
         }

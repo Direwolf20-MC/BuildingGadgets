@@ -3,11 +3,11 @@ package com.direwolf20.buildinggadgets.common.items.gadgets;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
-import com.direwolf20.buildinggadgets.common.tools.*;
-import com.direwolf20.buildinggadgets.common.world.FakeBuilderWorld;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
+import com.direwolf20.buildinggadgets.common.tools.*;
 import com.direwolf20.buildinggadgets.common.utils.VectorUtil;
+import com.direwolf20.buildinggadgets.common.world.FakeBuilderWorld;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
@@ -27,7 +27,6 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldType;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.property.Properties;
 import net.minecraftforge.common.util.BlockSnapshot;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.world.BlockEvent;
@@ -58,7 +57,7 @@ public class GadgetBuilding extends GadgetGeneric {
         }
     }
 
-    public static final ResourceLocation REGISTRY_NAME = new ResourceLocation(BuildingGadgets.MODID,"gadgets_building");
+    public static final ResourceLocation REGISTRY_NAME = new ResourceLocation(BuildingGadgets.MODID, "gadgets_building");
 
     public GadgetBuilding(Properties builder) {
         super(builder.defaultMaxDamage(Config.GADGETS.GADGET_BUILDING.durability.get()));
@@ -200,7 +199,7 @@ public class GadgetBuilding extends GadgetGeneric {
                 if (fakeWorld.getWorldType() != WorldType.DEBUG_ALL_BLOCK_STATES) {
                     try { //Get the state of the block in the fake world (This lets fences be connected, etc)
 // @todo: reimplement @since 1.13.x
-                        //                        state = blockState.getExtendedState(fakeWorld, coordinate);
+                        state = blockState.getExtendedState(fakeWorld, coordinate);
                     } catch (Exception var8) {
                     }
                 }
@@ -314,7 +313,7 @@ public class GadgetBuilding extends GadgetGeneric {
             useConstructionPaste = true;
         }
 
-        if( !this.canUse(heldItem, player) )
+        if (!this.canUse(heldItem, player))
             return false;
 
         this.applyDamage(heldItem, player);

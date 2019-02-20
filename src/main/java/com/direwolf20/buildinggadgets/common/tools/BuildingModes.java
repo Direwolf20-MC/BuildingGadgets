@@ -41,7 +41,7 @@ public class BuildingModes {
                 return false;
             }
         }
-        return false;
+        return true;
     }
 
     public static List<BlockPos> getBuildOrders(World world, EntityPlayer player, BlockPos startBlock, EnumFacing sideHit, ItemStack tool) {
