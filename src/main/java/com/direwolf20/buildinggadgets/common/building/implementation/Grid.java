@@ -9,7 +9,7 @@ import net.minecraft.util.math.BlockPos;
 import javax.annotation.Nonnull;
 import java.util.Iterator;
 
-public class Grid implements IPlacementSequence {
+public final class Grid implements IPlacementSequence {
 
     public static Grid create(BlockPos base, int range, int periodSize) {
         return new Grid(base, range, periodSize);

@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.common.items.capability;
 
+import com.direwolf20.buildinggadgets.common.building.placement.CapabilityBlockProvider;
 import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
 import com.direwolf20.buildinggadgets.common.tools.GadgetUtils;
 import net.minecraft.item.ItemStack;
@@ -13,23 +14,31 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.function.IntSupplier;
 
-public class CapabilityProviderEnergy implements ICapabilityProvider {
+public class GadgetCapabilityProvider implements ICapabilityProvider {
+
     private ItemStack stack;
     private IntSupplier energyCapacity;
 
-    public CapabilityProviderEnergy(ItemStack stack, IntSupplier energyCapacity) {
+    public GadgetCapabilityProvider(ItemStack stack, IntSupplier energyCapacity) {
         this.stack = stack;
         this.energyCapacity = energyCapacity;
     }
 
     @Override
     public boolean hasCapability(@Nonnull Capability<?> capability, @Nullable EnumFacing facing) {
-        return capability == CapabilityEnergy.ENERGY && SyncedConfig.poweredByFE ;
+        return (capability == CapabilityEnergy.ENERGY && SyncedConfig.poweredByFE) ||
+                capability == CapabilityBlockProvider.BLOCK_PROVIDER;
     }
 
     @Override
     public <T> T getCapability(@Nonnull Capability<T> capability, @Nullable EnumFacing facing) {
-        return capability == CapabilityEnergy.ENERGY && SyncedConfig.poweredByFE ? CapabilityEnergy.ENERGY.cast(new ItemEnergyForge(stack, energyCapacity)) : null;
+        if (capability == CapabilityEnergy.ENERGY && SyncedConfig.poweredByFE) {
+            return CapabilityEnergy.ENERGY.cast(new ItemEnergyForge(stack, energyCapacity));
+        }
+        if (capability == CapabilityBlockProvider.BLOCK_PROVIDER) {
+            return CapabilityBlockProvider.BLOCK_PROVIDER.cast(new LinkedBlockProvider(stack));
+        }
+        return null;
     }
 
     @Nonnull
@@ -40,4 +49,5 @@ public class CapabilityProviderEnergy implements ICapabilityProvider {
 
         return energy;
     }
+
 }

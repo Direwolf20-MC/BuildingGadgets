@@ -12,7 +12,7 @@ import javax.annotation.Nonnull;
 import java.util.Iterator;
 import java.util.Spliterator;
 
-public class Column implements IPlacementSequence {
+public final class Column implements IPlacementSequence {
 
     public static Column extendFrom(BlockPos hit, EnumFacing side, int range) {
         return new Column(hit.offset(side), side, range);
@@ -26,7 +26,8 @@ public class Column implements IPlacementSequence {
     }
 
     /**
-     * From the base position to the entity's position on the given axis (parameter {@code EnumFacing sideHit})
+     * A placement sequence from {@code BlockPos hit} position to the entity's position on the given axis (parameter {@code EnumFacing sideHit})
+     * @implNote will not place a block at entity's position
      */
     public static Column chaseAxisToEntity(Entity entity, BlockPos hit, EnumFacing sideHit) {
         BlockPos entityPos = new BlockPos(Math.floor(entity.posX), Math.floor(entity.posY), Math.floor(entity.posZ));

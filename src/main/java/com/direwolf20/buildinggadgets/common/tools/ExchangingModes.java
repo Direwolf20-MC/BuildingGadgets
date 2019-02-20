@@ -3,8 +3,7 @@ package com.direwolf20.buildinggadgets.common.tools;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.blocks.ModBlocks;
-import com.direwolf20.buildinggadgets.common.building.Region;
-import com.direwolf20.buildinggadgets.common.building.implementation.IBuildingMode;
+import com.direwolf20.buildinggadgets.common.building.placement.IBuildingMode;
 import com.direwolf20.buildinggadgets.common.building.modes.GridMode;
 import com.direwolf20.buildinggadgets.common.building.modes.HorizontalColumnMode;
 import com.direwolf20.buildinggadgets.common.building.modes.SurfaceMode;
@@ -20,7 +19,6 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.BiPredicate;

@@ -7,7 +7,7 @@ import com.direwolf20.buildinggadgets.common.building.modes.StairMode;
 import com.direwolf20.buildinggadgets.common.building.modes.SurfaceMode;
 import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
-import com.direwolf20.buildinggadgets.common.building.implementation.IBuildingMode;
+import com.direwolf20.buildinggadgets.common.building.placement.IBuildingMode;
 
 import it.unimi.dsi.fastutil.doubles.Double2ObjectArrayMap;
 import it.unimi.dsi.fastutil.doubles.Double2ObjectMap;

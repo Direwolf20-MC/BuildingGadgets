@@ -5,7 +5,7 @@ import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.blocks.ModBlocks;
 import com.direwolf20.buildinggadgets.common.items.FakeBuilderWorld;
 import com.direwolf20.buildinggadgets.common.items.ModItems;
-import com.direwolf20.buildinggadgets.common.items.capability.CapabilityProviderEnergy;
+import com.direwolf20.buildinggadgets.common.items.capability.GadgetCapabilityProvider;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetBuilding;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetDestruction;
@@ -134,7 +134,7 @@ public class ToolRenders {
                 hasBlocks = hasBlocks + InventoryManipulation.countPaste(player);
                 int hasEnergy = 0;
                 if (stack.hasCapability(CapabilityEnergy.ENERGY, null)) {
-                    hasEnergy = CapabilityProviderEnergy.getCap(stack).getEnergyStored();
+                    hasEnergy = GadgetCapabilityProvider.getCap(stack).getEnergyStored();
                 } else {
                     hasEnergy = stack.getMaxDamage() - stack.getItemDamage();
                 }
@@ -280,7 +280,7 @@ public class ToolRenders {
                 hasBlocks = hasBlocks + InventoryManipulation.countPaste(player);
                 int hasEnergy = 0;
                 if (stack.hasCapability(CapabilityEnergy.ENERGY, null)) {
-                    hasEnergy = CapabilityProviderEnergy.getCap(stack).getEnergyStored();
+                    hasEnergy = GadgetCapabilityProvider.getCap(stack).getEnergyStored();
                 } else {
                     hasEnergy = stack.getMaxDamage() - stack.getItemDamage();
                 }

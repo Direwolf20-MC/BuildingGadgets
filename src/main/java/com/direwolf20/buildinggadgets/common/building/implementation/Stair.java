@@ -9,7 +9,7 @@ import net.minecraft.util.math.BlockPos;
 import javax.annotation.Nonnull;
 import java.util.Iterator;
 
-public class Stair implements IPlacementSequence {
+public final class Stair implements IPlacementSequence {
 
     public static Stair create(BlockPos base, EnumFacing horizontalAdvance, EnumFacing verticalAdvance, int range) {
         return new Stair(base, horizontalAdvance, verticalAdvance, range);

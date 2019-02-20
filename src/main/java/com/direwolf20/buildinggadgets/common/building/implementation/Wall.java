@@ -9,7 +9,7 @@ import javax.annotation.Nonnull;
 import java.util.Iterator;
 import java.util.Spliterator;
 
-public class Wall implements IPlacementSequence {
+public final class Wall implements IPlacementSequence {
 
     public static Wall clickedSide(BlockPos posHit, EnumFacing sideHit, int range) {
         return new Wall(posHit, sideHit, toRadius(range));
@@ -27,7 +27,6 @@ public class Wall implements IPlacementSequence {
     private final Region region;
 
     /**
-     *
      * @param posHit the center of the wall
      * @param side the side to be become a flat surface
      * @param radius radius of the wall

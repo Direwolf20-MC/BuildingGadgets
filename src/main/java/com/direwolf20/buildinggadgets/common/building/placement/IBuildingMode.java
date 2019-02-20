@@ -1,8 +1,5 @@
-package com.direwolf20.buildinggadgets.common.building.implementation;
+package com.direwolf20.buildinggadgets.common.building.placement;
 
-import com.direwolf20.buildinggadgets.common.building.placement.Context;
-import com.direwolf20.buildinggadgets.common.building.placement.IBlockProvider;
-import com.direwolf20.buildinggadgets.common.building.placement.IPlacementSequence;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
@@ -24,7 +21,16 @@ public interface IBuildingMode {
      */
     IPlacementSequence computeCoordinates(EntityPlayer player, BlockPos hit, EnumFacing sideHit, ItemStack tool);
 
-    IBlockProvider getBlockProvider(ItemStack tool);
+    /**
+     * <p>Get the the block provider that can be accessed by using ItemStack capability system.</p>
+     */
+    default IBlockProvider getBlockProvider(ItemStack tool) {
+        IBlockProvider capability = tool.getCapability(CapabilityBlockProvider.BLOCK_PROVIDER, null);
+        if (capability != null) {
+            return capability;
+        }
+        return CapabilityBlockProvider.DEFAULT_AIR_PROVIDER;
+    }
 
     BiPredicate<BlockPos, IBlockState> createValidatorFor(World world);
 

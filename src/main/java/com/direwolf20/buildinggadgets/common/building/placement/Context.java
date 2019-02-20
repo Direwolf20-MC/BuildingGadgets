@@ -30,7 +30,7 @@ public class Context {
 
     /**
      * <p>
-     * Note that it is assumed that this method will return a block provider uses the first value returned by the first value by {@link #positions} as its origin.
+     * Note that it is assumed that this method will return a block provider uses the first value returned by the first value by {@link #positions} as its translate.
      * </p>
      */
     public Context(IPlacementSequence positions, IBlockProvider blocks, Function<World, BiPredicate<BlockPos, IBlockState>> validatorFactory) {

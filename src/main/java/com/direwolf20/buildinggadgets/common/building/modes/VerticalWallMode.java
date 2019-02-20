@@ -1,11 +1,7 @@
 package com.direwolf20.buildinggadgets.common.building.modes;
 
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
-import com.direwolf20.buildinggadgets.common.building.implementation.IBuildingMode;
-import com.direwolf20.buildinggadgets.common.building.implementation.SingleTypeProvider;
 import com.direwolf20.buildinggadgets.common.building.implementation.Wall;
-import com.direwolf20.buildinggadgets.common.building.placement.Context;
-import com.direwolf20.buildinggadgets.common.building.placement.IBlockProvider;
 import com.direwolf20.buildinggadgets.common.building.placement.IPlacementSequence;
 import com.direwolf20.buildinggadgets.common.tools.GadgetUtils;
 import net.minecraft.block.state.IBlockState;

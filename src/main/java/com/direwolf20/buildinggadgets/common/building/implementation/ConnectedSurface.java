@@ -14,7 +14,7 @@ import java.util.BitSet;
 import java.util.Iterator;
 import java.util.Queue;
 
-public class ConnectedSurface implements IPlacementSequence {
+public final class ConnectedSurface implements IPlacementSequence {
 
     public static ConnectedSurface create(BlockPos posHit, EnumFacing sideHit, int range) {
         return new ConnectedSurface(posHit, sideHit, range);
