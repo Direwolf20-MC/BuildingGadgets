@@ -83,7 +83,7 @@ public class ModeRadialMenu extends GuiScreen {
         boolean destruction = false;
         if (tool.getItem() instanceof GadgetDestruction) {
             destruction = true;
-            buttons.add(new GuiButtonAction(I18n.format("tooltip.gadget.destroy.overlay"), send -> {
+            addButton(new GuiButtonAction(I18n.format("tooltip.gadget.destroy.overlay"), send -> {
                 if (send)
                     PacketHandler.sendToServer(new PacketChangeRange());
 
@@ -92,14 +92,14 @@ public class ModeRadialMenu extends GuiScreen {
         }
         if (!(tool.getItem() instanceof GadgetCopyPaste)) {
             if (!destruction || Config.GADGETS.GADGET_DESTRUCTION.nonFuzzyEnabled.get()) {
-                buttons.add(new GuiButtonAction(I18n.format("tooltip.gadget.fuzzy"), send -> {
+                addButton(new GuiButtonAction(I18n.format("tooltip.gadget.fuzzy"), send -> {
                     if (send)
                         PacketHandler.sendToServer(new PacketToggleFuzzy());
 
                     return GadgetGeneric.getFuzzy(getGadget());
                 }));
             }
-            buttons.add(new GuiButtonAction(I18n.format("message.gadget.connected" + (destruction ? "area" : "surface")), send -> {
+            addButton(new GuiButtonAction(I18n.format("message.gadget.connected" + (destruction ? "area" : "surface")), send -> {
                 if (send)
                     PacketHandler.sendToServer(new PacketToggleConnectedArea());
 

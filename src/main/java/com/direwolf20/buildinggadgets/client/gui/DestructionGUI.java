@@ -68,7 +68,7 @@ public class DestructionGUI extends GuiScreen {
 
         nullCheckTextBoxes();
 
-        this.addButton(new GuiButton(1, this.guiLeft + 145, this.guiTop + 125, 40, 20, I18n.format(GuiMod.getLangKeyField("destruction", "confirm"))){
+        this.addButton(new GuiButton(1, this.guiLeft + 145, this.guiTop + 125, 40, 20, I18n.format(GuiMod.getLangKeyButton("destruction", "confirm"))){
             @Override
             public void onClick(double mouseX, double mouseY) {
                 nullCheckTextBoxes();
@@ -82,7 +82,7 @@ public class DestructionGUI extends GuiScreen {
                 super.onClick(mouseX, mouseY);
             }
         });
-        this.addButton(new GuiButton(2, this.guiLeft + 245, this.guiTop + 125, 40, 20, I18n.format(GuiMod.getLangKeyField("destruction", "cancel"))){
+        this.addButton(new GuiButton(2, this.guiLeft + 245, this.guiTop + 125, 40, 20, I18n.format(GuiMod.getLangKeyButton("destruction", "cancel"))){
             @Override
             public void onClick(double mouseX, double mouseY) {
                 mc.displayGuiScreen(null);

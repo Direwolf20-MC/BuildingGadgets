@@ -58,7 +58,7 @@ public class PasteGUI extends GuiScreen {
 
         nullCheckTextBoxes();
 
-        this.buttons.add(new GuiButton(1, this.guiLeft + 80, this.guiTop + 125, 40, 20, "Ok") {
+        addButton(new GuiButton(1, this.guiLeft + 80, this.guiTop + 125, 40, 20, "Ok") {
             @Override
             public void onClick(double mouseX, double mouseY) {
                 nullCheckTextBoxes();
@@ -72,7 +72,7 @@ public class PasteGUI extends GuiScreen {
             }
         });
         //this.buttonList.add(new GuiButton(2, this.guiLeft + 200, this.guiTop + 125, 40, 20, "Cancel"));
-        this.buttons.add(new DireButton(3, this.guiLeft + 65, this.guiTop + 99, 10, 10, "-") {
+        addButton(new DireButton(3, this.guiLeft + 65, this.guiTop + 99, 10, 10, "-") {
             @Override
             public void onClick(double mouseX, double mouseY) {
                 fieldChange(X, -1);
@@ -80,7 +80,7 @@ public class PasteGUI extends GuiScreen {
                 super.onClick(mouseX, mouseY);
             }
         });
-        this.buttons.add(new DireButton(4, this.guiLeft + 125, this.guiTop + 99, 10, 10, "+"){
+        addButton(new DireButton(4, this.guiLeft + 125, this.guiTop + 99, 10, 10, "+"){
             @Override
             public void onClick(double mouseX, double mouseY) {
                 fieldChange(X, 1);
@@ -88,7 +88,7 @@ public class PasteGUI extends GuiScreen {
                 super.onClick(mouseX, mouseY);
             }
         });
-        this.buttons.add(new DireButton(5, this.guiLeft + 185, this.guiTop + 99, 10, 10, "-"){
+        addButton(new DireButton(5, this.guiLeft + 185, this.guiTop + 99, 10, 10, "-"){
             @Override
             public void onClick(double mouseX, double mouseY) {
                 fieldChange(Y, -1);
@@ -96,7 +96,7 @@ public class PasteGUI extends GuiScreen {
                 super.onClick(mouseX, mouseY);
             }
         });
-        this.buttons.add(new DireButton(6, this.guiLeft + 245, this.guiTop + 99, 10, 10, "+"){
+        addButton(new DireButton(6, this.guiLeft + 245, this.guiTop + 99, 10, 10, "+"){
             @Override
             public void onClick(double mouseX, double mouseY) {
                 fieldChange(X, 1);
@@ -104,7 +104,7 @@ public class PasteGUI extends GuiScreen {
                 super.onClick(mouseX, mouseY);
             }
         });
-        this.buttons.add(new DireButton(7, this.guiLeft + 305, this.guiTop + 99, 10, 10, "-"){
+        addButton(new DireButton(7, this.guiLeft + 305, this.guiTop + 99, 10, 10, "-"){
             @Override
             public void onClick(double mouseX, double mouseY) {
                 fieldChange(Z, -1);
@@ -112,7 +112,7 @@ public class PasteGUI extends GuiScreen {
                 super.onClick(mouseX, mouseY);
             }
         });
-        this.buttons.add(new DireButton(8, this.guiLeft + 365, this.guiTop + 99, 10, 10, "+"){
+        addButton(new DireButton(8, this.guiLeft + 365, this.guiTop + 99, 10, 10, "+"){
             @Override
             public void onClick(double mouseX, double mouseY) {
                 fieldChange(Z, 1);
@@ -120,7 +120,7 @@ public class PasteGUI extends GuiScreen {
                 super.onClick(mouseX, mouseY);
             }
         });
-        this.buttons.add(new GuiButton(9, this.guiLeft + 320, this.guiTop + 125, 40, 20, "Reset") {
+        addButton(new GuiButton(9, this.guiLeft + 320, this.guiTop + 125, 40, 20, "Reset") {
             @Override
             public void onClick(double mouseX, double mouseY) {
                 X.setText(String.valueOf(0));

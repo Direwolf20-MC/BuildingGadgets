@@ -92,11 +92,11 @@ public class TemplateManagerGUI extends GuiContainer {
     public void initGui() {
         super.initGui();
         helpTextProviders.clear();
-        this.buttons.add(buttonHelp = new GuiButtonHelp(100, this.guiLeft + this.xSize - 16, this.guiTop + 4));
-        this.buttons.add(buttonSave = createAndAddButton(0, 79, 17, 30, 20, "Save"));
-        this.buttons.add(buttonLoad = createAndAddButton(1, 137, 17, 30, 20, "Load"));
-        this.buttons.add(buttonCopy = createAndAddButton(2, 79, 61, 30, 20, "Copy"));
-        this.buttons.add(buttonPaste = createAndAddButton(3, 135, 61, 34, 20, "Paste"));
+        buttonHelp = addButton(new GuiButtonHelp(100, this.guiLeft + this.xSize - 16, this.guiTop + 4));
+        buttonSave = addButton(createAndAddButton(0, 79, 17, 30, 20, "Save"));
+        buttonLoad = addButton(createAndAddButton(1, 137, 17, 30, 20, "Load"));
+        buttonCopy = addButton(createAndAddButton(2, 79, 61, 30, 20, "Copy"));
+        buttonPaste = addButton(createAndAddButton(3, 135, 61, 34, 20, "Paste"));
 
         this.nameField = new GuiTextField(0, this.fontRenderer, this.guiLeft + 8, this.guiTop + 6, 149, this.fontRenderer.FONT_HEIGHT);
         this.nameField.setMaxStringLength(50);
