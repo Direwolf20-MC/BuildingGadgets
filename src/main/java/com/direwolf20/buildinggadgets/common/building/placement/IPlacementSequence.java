@@ -23,8 +23,8 @@ public interface IPlacementSequence extends Iterable<BlockPos> {
     Region getBoundingBox();
 
     /**
-     * @return {@code false} if this PlacementSequence definitely doesn't contain the specified Position. Otherwise {@link true}.
-     * @implSpec If the computation is costly, then this {@code IPlacementSequence} may choose to return always true
+     * @return {@code false} if this PlacementSequence definitely doesn't contain the specified Position. Otherwise {@code true}.
+     * @implSpec If the computation is costly, then this {@code IPlacementSequence} may choose to return always {@code true}
      */
     boolean contains(int x, int y, int z);
 

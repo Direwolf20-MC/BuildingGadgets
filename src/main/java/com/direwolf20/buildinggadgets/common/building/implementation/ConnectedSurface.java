@@ -17,19 +17,22 @@ import java.util.Queue;
 public class ConnectedSurface implements IPlacementSequence {
 
     public static ConnectedSurface create(BlockPos posHit, EnumFacing sideHit, int range) {
-        return new ConnectedSurface(posHit, sideHit, (range - 1) / 2);
+        return new ConnectedSurface(posHit, sideHit, range);
     }
 
     private final Region region;
     private final BlockPos posHit;
     private final EnumFacing sideHit;
 
-    protected ConnectedSurface(BlockPos posHit, EnumFacing sideHit, int radius) {
-        this.region = Wall.clickedSide(posHit, sideHit, radius).getBoundingBox();
+    protected ConnectedSurface(BlockPos posHit, EnumFacing sideHit, int range) {
+        this.region = Wall.clickedSide(posHit, sideHit, range).getBoundingBox();
         this.posHit = posHit.toImmutable();
         this.sideHit = sideHit;
     }
 
+    /**
+     * For {@link #copy()}
+     */
     private ConnectedSurface(Region region, BlockPos posHit, EnumFacing sideHit) {
         this.region = region;
         this.posHit = posHit;
@@ -41,9 +44,13 @@ public class ConnectedSurface implements IPlacementSequence {
         return region;
     }
 
+    /**
+     * {@inheritDoc}
+     * @return {@code getBoundingBox().contains(x, y, z)} since it would be costly to check each position
+     */
     @Override
     public boolean contains(int x, int y, int z) {
-        return false;
+        return region.contains(x, y, z);
     }
 
     /**

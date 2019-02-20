@@ -7,6 +7,7 @@ import net.minecraft.util.math.BlockPos;
 
 import javax.annotation.Nonnull;
 import java.util.Iterator;
+import java.util.Spliterator;
 
 public class Wall implements IPlacementSequence {
 
@@ -38,7 +39,10 @@ public class Wall implements IPlacementSequence {
                 radius * (1 - Math.abs(side.getFrontOffsetZ())));
     }
 
-    protected Wall(Region region) {
+    /**
+     * For {@link #copy()}
+     */
+    private Wall(Region region) {
         this.region = region;
     }
 
@@ -49,7 +53,7 @@ public class Wall implements IPlacementSequence {
 
     @Override
     public boolean contains(int x, int y, int z) {
-        return false;
+        return region.contains(x, y, z);
     }
 
     /**
@@ -65,6 +69,11 @@ public class Wall implements IPlacementSequence {
     @Nonnull
     public Iterator<BlockPos> iterator() {
         return region.iterator();
+    }
+
+    @Override
+    public Spliterator<BlockPos> spliterator() {
+        return region.spliterator();
     }
 
 }

@@ -78,7 +78,7 @@ class RegionSpliterator implements Spliterator<BlockPos> {
         int oldMinZ = minZ;
 
         //construct new min coordinates, so that at least one can be split of: max - min >= 1
-        if (maxX > minX) { //as Region's coordinates are inclusive, the amount of blocks along one axis is max-min+1
+        if (maxX > minX) { //as Region's coordinates are inclusive, the amount of blocks along one axis is max - min + 1
             minX = (maxX - minX + 1) / 2 + minX + 1;
             resetPos();
             return new RegionSpliterator(oldMinX, oldMinY, oldMinZ, minX - 1, maxY, maxZ, posX, posY, posZ, allowYZSplit);
@@ -96,7 +96,7 @@ class RegionSpliterator implements Spliterator<BlockPos> {
 
     @Override
     public long estimateSize() {
-        return (long) (maxX - posX) * (long) (maxY - posY) * (long) (maxZ - posZ);
+        return (long) (maxX - posX + 1) * (long) (maxY - posY + 1) * (long) (maxZ - posZ + 1);
     }
 
     @Override

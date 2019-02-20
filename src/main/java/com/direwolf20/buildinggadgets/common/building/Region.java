@@ -287,20 +287,12 @@ public final class Region implements IPlacementSequence {
      *
      * @return A {@link PeekingIterator} over all positions in this Region
      * @implSpec starts at (minX, minY, minZ), ends at (maxX, maxY, maxZ)
-     * @implNote This Iterator cannot support Removal Operations
+     * @implNote the Iterator does not support removal Operations
      * @see GadgetUtils#POSITION_COMPARATOR
      */
     @Override
     public PeekingIterator<BlockPos> iterator() {
         return new RegionIterator(this);
-    }
-
-    /**
-     * @return a Stream representing the Positions in this IPlacementSequence
-     */
-    @Override
-    public Stream<BlockPos> stream() {
-        return StreamSupport.stream(spliterator(), false);
     }
 
     /**

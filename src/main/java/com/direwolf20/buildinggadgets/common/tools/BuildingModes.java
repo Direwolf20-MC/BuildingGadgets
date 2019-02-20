@@ -19,6 +19,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 import java.util.*;
+import java.util.function.BiPredicate;
+import java.util.function.Function;
 
 public enum BuildingModes implements IStringSerializable {
 
@@ -277,6 +279,8 @@ public enum BuildingModes implements IStringSerializable {
             return world.isAirBlock(pos);
         }
     }
+
+    private static final Function<World, BiPredicate<BlockPos, IBlockState>> VALIDATOR_FACTORY = world -> (pos, state) -> isReplaceable(world, pos, state);
 
     private static void addConnectedCoords(World world, BlockPos loc, IBlockState state, IBlockState setBlock, EnumFacing sideHit,
                                            boolean fuzzyMode, List<BlockPos> coords, Set<BlockPos> coordsSearched, int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
