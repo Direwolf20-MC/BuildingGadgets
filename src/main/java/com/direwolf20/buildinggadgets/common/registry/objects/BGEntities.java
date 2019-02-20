@@ -19,7 +19,7 @@ import net.minecraftforge.registries.ObjectHolder;
 public class BGEntities {
     private static final RegistryContainer<EntityType<?>, RegistryObjectBuilder<EntityType<?>, Builder<?>>> container = new RegistryContainer<>();
 
-    @ObjectHolder("block_build")
+    @ObjectHolder("build_block")
     public static EntityType<?> BLOCK_BUILD ;
     @ObjectHolder("construction_block")
     public static EntityType<?> CONSTRUCTION_BLOCK ;
