@@ -1,13 +1,13 @@
 package com.direwolf20.buildinggadgets.common.tools;
 
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
-import com.direwolf20.buildinggadgets.common.building.modes.GridMode;
-import com.direwolf20.buildinggadgets.common.building.modes.HorizontalColumnMode;
-import com.direwolf20.buildinggadgets.common.building.modes.StairMode;
-import com.direwolf20.buildinggadgets.common.building.modes.SurfaceMode;
+import com.direwolf20.buildinggadgets.building.modes.GridMode;
+import com.direwolf20.buildinggadgets.building.modes.HorizontalColumnMode;
+import com.direwolf20.buildinggadgets.building.modes.StairMode;
+import com.direwolf20.buildinggadgets.building.modes.SurfaceMode;
 import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
-import com.direwolf20.buildinggadgets.common.building.placement.IBuildingMode;
+import com.direwolf20.buildinggadgets.building.IBuildingMode;
 
 import com.google.common.collect.ImmutableList;
 import it.unimi.dsi.fastutil.doubles.Double2ObjectArrayMap;

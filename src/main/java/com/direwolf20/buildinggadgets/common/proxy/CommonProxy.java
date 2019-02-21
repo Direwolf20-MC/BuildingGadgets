@@ -6,7 +6,7 @@ import com.direwolf20.buildinggadgets.common.ModSounds;
 import com.direwolf20.buildinggadgets.common.blocks.*;
 import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManager;
 import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManagerTileEntity;
-import com.direwolf20.buildinggadgets.common.building.placement.CapabilityBlockProvider;
+import com.direwolf20.buildinggadgets.building.CapabilityBlockProvider;
 import com.direwolf20.buildinggadgets.common.config.CompatConfig;
 import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
 import com.direwolf20.buildinggadgets.common.entities.ModEntities;
