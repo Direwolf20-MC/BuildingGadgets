@@ -11,7 +11,6 @@ import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketDestructionGUI;
 import com.direwolf20.buildinggadgets.common.utils.Utils;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.resources.I18n;
@@ -68,97 +67,26 @@ public class DestructionGUI extends GuiScreen {
 
         nullCheckTextBoxes();
 
-        this.addButton(new GuiButton(1, this.guiLeft + 145, this.guiTop + 125, 40, 20, I18n.format(GuiMod.getLangKeyButton("destruction", "confirm"))){
-            @Override
-            public void onClick(double mouseX, double mouseY) {
-                nullCheckTextBoxes();
-                if (sizeCheckBoxes()) {
-                    PacketHandler.sendToServer(new PacketDestructionGUI(Integer.parseInt(left.getText()), Integer.parseInt(right.getText()), Integer.parseInt(up.getText()), Integer.parseInt(down.getText()), Integer.parseInt(depth.getText())));
-                    mc.displayGuiScreen(null);
-                } else {
-                    Minecraft.getInstance().player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.destroysizeerror").getUnformattedComponentText()), true);
-                }
-
-                super.onClick(mouseX, mouseY);
-            }
-        });
-        this.addButton(new GuiButton(2, this.guiLeft + 245, this.guiTop + 125, 40, 20, I18n.format(GuiMod.getLangKeyButton("destruction", "cancel"))){
-            @Override
-            public void onClick(double mouseX, double mouseY) {
+        addButton(new GuiButtonAction(guiLeft + 145, guiTop + 125, 40, 20, I18n.format(GuiMod.getLangKeyButton("destruction", "confirm")), () -> {
+            nullCheckTextBoxes();
+            if (sizeCheckBoxes()) {
+                PacketHandler.sendToServer(new PacketDestructionGUI(Integer.parseInt(left.getText()), Integer.parseInt(right.getText()), Integer.parseInt(up.getText()), Integer.parseInt(down.getText()), Integer.parseInt(depth.getText())));
                 mc.displayGuiScreen(null);
-                super.onClick(mouseX, mouseY);
+            } else {
+                Minecraft.getInstance().player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.destroysizeerror").getUnformattedComponentText()), true);
             }
-        });
-        this.addButton(new DireButton(5, this.guiLeft + 65, this.guiTop + 59, 10, 10, "-"){
-            @Override
-            public void onClick(double mouseX, double mouseY) {
-                fieldChange(left, -1);
-                super.onClick(mouseX, mouseY);
-            }
-        });
-        this.addButton(new DireButton(6, this.guiLeft + 125, this.guiTop + 59, 10, 10, "+"){
-            @Override
-            public void onClick(double mouseX, double mouseY) {
-                fieldChange(left, 1);
-                super.onClick(mouseX, mouseY);
-            }
-        });
-        this.addButton(new DireButton(7, this.guiLeft + 305, this.guiTop + 59, 10, 10, "-"){
-            @Override
-            public void onClick(double mouseX, double mouseY) {
-                fieldChange(right, -1);
-                super.onClick(mouseX, mouseY);
-            }
-        });
-        this.addButton(new DireButton(8, this.guiLeft + 365, this.guiTop + 59, 10, 10, "+"){
-            @Override
-            public void onClick(double mouseX, double mouseY) {
-                fieldChange(right, 1);
-                super.onClick(mouseX, mouseY);
-            }
-        });
-        this.addButton(new DireButton(9, this.guiLeft + 185, this.guiTop + 29, 10, 10, "-"){
-            @Override
-            public void onClick(double mouseX, double mouseY) {
-                fieldChange(up, -1);
-                super.onClick(mouseX, mouseY);
-            }
-        });
-        this.addButton(new DireButton(10, this.guiLeft + 245, this.guiTop + 29, 10, 10, "+"){
-            @Override
-            public void onClick(double mouseX, double mouseY) {
-                fieldChange(up, 1);
-                super.onClick(mouseX, mouseY);
-            }
-        });
-        this.addButton(new DireButton(11, this.guiLeft + 185, this.guiTop + 89, 10, 10, "-"){
-            @Override
-            public void onClick(double mouseX, double mouseY) {
-                fieldChange(down, -1);
-                super.onClick(mouseX, mouseY);
-            }
-        });
-        this.addButton(new DireButton(12, this.guiLeft + 245, this.guiTop + 89, 10, 10, "+"){
-            @Override
-            public void onClick(double mouseX, double mouseY) {
-                fieldChange(down, 1);
-                super.onClick(mouseX, mouseY);
-            }
-        });
-        this.addButton(new DireButton(13, this.guiLeft + 185, this.guiTop + 59, 10, 10, "-"){
-            @Override
-            public void onClick(double mouseX, double mouseY) {
-                fieldChange(depth, -1);
-                super.onClick(mouseX, mouseY);
-            }
-        });
-        this.addButton(new DireButton(14, this.guiLeft + 245, this.guiTop + 59, 10, 10, "+"){
-            @Override
-            public void onClick(double mouseX, double mouseY) {
-                fieldChange(depth, 1);
-                super.onClick(mouseX, mouseY);
-            }
-        });
+        }));
+        addButton(new GuiButtonAction(guiLeft + 245, guiTop + 125, 40, 20, I18n.format(GuiMod.getLangKeyButton("destruction", "cancel")), () -> close()));
+        addButton(new DireButton(guiLeft + 65, guiTop + 59, 10, 10, "-", () -> fieldChange(left, -1)));
+        addButton(new DireButton(guiLeft + 125, guiTop + 59, 10, 10, "+", () -> fieldChange(left, 1)));
+        addButton(new DireButton(guiLeft + 305, guiTop + 59, 10, 10, "-", () -> fieldChange(right, -1)));
+        addButton(new DireButton(guiLeft + 365, guiTop + 59, 10, 10, "+", () -> fieldChange(right, 1)));
+        addButton(new DireButton(guiLeft + 185, guiTop + 29, 10, 10, "-", () -> fieldChange(up, -1)));
+        addButton(new DireButton(guiLeft + 245, guiTop + 29, 10, 10, "+", () -> fieldChange(up, 1)));
+        addButton(new DireButton(guiLeft + 185, guiTop + 89, 10, 10, "-", () -> fieldChange(down, -1)));
+        addButton(new DireButton(guiLeft + 245, guiTop + 89, 10, 10, "+", () -> fieldChange(down, 1)));
+        addButton(new DireButton(guiLeft + 185, guiTop + 59, 10, 10, "-", () -> fieldChange(depth, -1)));
+        addButton(new DireButton(guiLeft + 245, guiTop + 59, 10, 10, "+", () -> fieldChange(depth, 1)));
     }
 
     private void fieldChange(GuiTextField textField, int amount) {

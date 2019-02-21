@@ -10,7 +10,6 @@ import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketPasteGUI;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.item.ItemStack;
@@ -58,79 +57,45 @@ public class PasteGUI extends GuiScreen {
 
         nullCheckTextBoxes();
 
-        addButton(new GuiButton(1, this.guiLeft + 80, this.guiTop + 125, 40, 20, "Ok") {
-            @Override
-            public void onClick(double mouseX, double mouseY) {
-                nullCheckTextBoxes();
-                if (sizeCheckBoxes()) {
-                PacketHandler.sendToServer(new PacketPasteGUI(Integer.parseInt(X.getText()), Integer.parseInt(Y.getText()), Integer.parseInt(Z.getText())));
-                    mc.displayGuiScreen(null);
-                } else {
-                    Minecraft.getInstance().player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.destroysizeerror").getUnformattedComponentText()), true);
-                }
-                super.onClick(mouseX, mouseY);
+        addButton(new GuiButtonAction(guiLeft + 80, guiTop + 125, 40, 20, "Ok", () -> {
+            nullCheckTextBoxes();
+            if (sizeCheckBoxes()) {
+            PacketHandler.sendToServer(new PacketPasteGUI(Integer.parseInt(X.getText()), Integer.parseInt(Y.getText()), Integer.parseInt(Z.getText())));
+                mc.displayGuiScreen(null);
+            } else {
+                Minecraft.getInstance().player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.destroysizeerror").getUnformattedComponentText()), true);
             }
-        });
-        //this.buttonList.add(new GuiButton(2, this.guiLeft + 200, this.guiTop + 125, 40, 20, "Cancel"));
-        addButton(new DireButton(3, this.guiLeft + 65, this.guiTop + 99, 10, 10, "-") {
-            @Override
-            public void onClick(double mouseX, double mouseY) {
-                fieldChange(X, -1);
-                PacketHandler.sendToServer(new PacketPasteGUI(Integer.parseInt(X.getText()), Integer.parseInt(Y.getText()), Integer.parseInt(Z.getText())));
-                super.onClick(mouseX, mouseY);
-            }
-        });
-        addButton(new DireButton(4, this.guiLeft + 125, this.guiTop + 99, 10, 10, "+"){
-            @Override
-            public void onClick(double mouseX, double mouseY) {
-                fieldChange(X, 1);
-                PacketHandler.sendToServer(new PacketPasteGUI(Integer.parseInt(X.getText()), Integer.parseInt(Y.getText()), Integer.parseInt(Z.getText())));
-                super.onClick(mouseX, mouseY);
-            }
-        });
-        addButton(new DireButton(5, this.guiLeft + 185, this.guiTop + 99, 10, 10, "-"){
-            @Override
-            public void onClick(double mouseX, double mouseY) {
-                fieldChange(Y, -1);
-                PacketHandler.sendToServer(new PacketPasteGUI(Integer.parseInt(X.getText()), Integer.parseInt(Y.getText()), Integer.parseInt(Z.getText())));
-                super.onClick(mouseX, mouseY);
-            }
-        });
-        addButton(new DireButton(6, this.guiLeft + 245, this.guiTop + 99, 10, 10, "+"){
-            @Override
-            public void onClick(double mouseX, double mouseY) {
-                fieldChange(X, 1);
-                PacketHandler.sendToServer(new PacketPasteGUI(Integer.parseInt(X.getText()), Integer.parseInt(Y.getText()), Integer.parseInt(Z.getText())));
-                super.onClick(mouseX, mouseY);
-            }
-        });
-        addButton(new DireButton(7, this.guiLeft + 305, this.guiTop + 99, 10, 10, "-"){
-            @Override
-            public void onClick(double mouseX, double mouseY) {
-                fieldChange(Z, -1);
-                PacketHandler.sendToServer(new PacketPasteGUI(Integer.parseInt(X.getText()), Integer.parseInt(Y.getText()), Integer.parseInt(Z.getText())));
-                super.onClick(mouseX, mouseY);
-            }
-        });
-        addButton(new DireButton(8, this.guiLeft + 365, this.guiTop + 99, 10, 10, "+"){
-            @Override
-            public void onClick(double mouseX, double mouseY) {
-                fieldChange(Z, 1);
-                PacketHandler.sendToServer(new PacketPasteGUI(Integer.parseInt(X.getText()), Integer.parseInt(Y.getText()), Integer.parseInt(Z.getText())));
-                super.onClick(mouseX, mouseY);
-            }
-        });
-        addButton(new GuiButton(9, this.guiLeft + 320, this.guiTop + 125, 40, 20, "Reset") {
-            @Override
-            public void onClick(double mouseX, double mouseY) {
-                X.setText(String.valueOf(0));
-                Y.setText(String.valueOf(1));
-                Z.setText(String.valueOf(0));
-                PacketHandler.sendToServer(new PacketPasteGUI(Integer.parseInt(X.getText()), Integer.parseInt(Y.getText()), Integer.parseInt(Z.getText())));
-
-                super.onClick(mouseX, mouseY);
-            }
-        });
+        }));
+        addButton(new DireButton(guiLeft + 65, guiTop + 99, 10, 10, "-", () -> {
+            fieldChange(X, -1);
+            PacketHandler.sendToServer(new PacketPasteGUI(Integer.parseInt(X.getText()), Integer.parseInt(Y.getText()), Integer.parseInt(Z.getText())));
+        }));
+        addButton(new DireButton(guiLeft + 125, guiTop + 99, 10, 10, "+", () -> {
+            fieldChange(X, 1);
+            PacketHandler.sendToServer(new PacketPasteGUI(Integer.parseInt(X.getText()), Integer.parseInt(Y.getText()), Integer.parseInt(Z.getText())));
+        }));
+        addButton(new DireButton(guiLeft + 185, guiTop + 99, 10, 10, "-", () -> {
+            fieldChange(Y, -1);
+            PacketHandler.sendToServer(new PacketPasteGUI(Integer.parseInt(X.getText()), Integer.parseInt(Y.getText()), Integer.parseInt(Z.getText())));
+        }));
+        addButton(new DireButton(guiLeft + 245, guiTop + 99, 10, 10, "+", () -> {
+            fieldChange(Y, 1);
+            PacketHandler.sendToServer(new PacketPasteGUI(Integer.parseInt(X.getText()), Integer.parseInt(Y.getText()), Integer.parseInt(Z.getText())));
+        }));
+        addButton(new DireButton(guiLeft + 305, guiTop + 99, 10, 10, "-", () -> {
+            fieldChange(Z, -1);
+            PacketHandler.sendToServer(new PacketPasteGUI(Integer.parseInt(X.getText()), Integer.parseInt(Y.getText()), Integer.parseInt(Z.getText())));
+        }));
+        addButton(new DireButton(guiLeft + 365, guiTop + 99, 10, 10, "+", () -> {
+            fieldChange(Z, 1);
+            PacketHandler.sendToServer(new PacketPasteGUI(Integer.parseInt(X.getText()), Integer.parseInt(Y.getText()), Integer.parseInt(Z.getText())));
+        }));
+        addButton(new GuiButtonAction(guiLeft + 320, guiTop + 125, 40, 20, "Reset", () -> {
+            X.setText(String.valueOf(0));
+            Y.setText(String.valueOf(1));
+            Z.setText(String.valueOf(0));
+            PacketHandler.sendToServer(new PacketPasteGUI(Integer.parseInt(X.getText()), Integer.parseInt(Y.getText()), Integer.parseInt(Z.getText())));
+        }));
     }
 
     public void fieldChange(GuiTextField textField, int amount) {
@@ -183,11 +148,10 @@ public class PasteGUI extends GuiScreen {
 
     @Override
     public boolean keyPressed(int p1, int p2, int p3) {
-        if (this.X.keyPressed(p1, p2, p3) || this.Y.keyPressed(p1, p2, p3) || this.Z.keyPressed(p1, p2, p3)) {
+        if (this.X.keyPressed(p1, p2, p3) || this.Y.keyPressed(p1, p2, p3) || this.Z.keyPressed(p1, p2, p3))
             return false;
-        } else {
-            return super.keyPressed(p1, p2, p3);
-        }
+
+        return super.keyPressed(p1, p2, p3);
     }
 
     @Override
