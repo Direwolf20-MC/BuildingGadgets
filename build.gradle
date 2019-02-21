@@ -51,6 +51,9 @@ dependencies {
     deobfCompile "team.chisel.ctm:CTM:MC${minecraft_version}-${ctm_version}:api"
     deobfCompile "refinedstorage:refinedstorage:${rs_version}:api"
     runtime "team.chisel.ctm:CTM:MC${minecraft_version}-${ctm_version}"
+    
+    testCompile "org.junit.jupiter:junit-jupiter-api:5.4.0"
+    
     // you may put jars on which you depend on in ./libs
     // or you may define them like so..
     //compile "some.group:artifact:version:classifier"

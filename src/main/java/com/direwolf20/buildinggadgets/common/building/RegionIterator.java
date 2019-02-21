@@ -6,7 +6,7 @@ import net.minecraft.util.math.BlockPos;
 
 class RegionIterator extends AbstractIterator<BlockPos> implements PeekingIterator<BlockPos> {
 
-    //minX does not exist because it is not used here
+    //minX does not exist since it is not needed
     private final int minY;
     private final int minZ;
 
@@ -19,15 +19,21 @@ class RegionIterator extends AbstractIterator<BlockPos> implements PeekingIterat
     private int posZ;
 
     RegionIterator(Region region) {
-        this(region.getMinY(), region.getMinZ(), region.getMaxX(), region.getMaxY(), region.getMaxZ());
+        this(region.getMinX(), region.getMinY(), region.getMinZ(), region.getMaxX(), region.getMaxY(), region.getMaxZ());
     }
 
-    private RegionIterator(int minY, int minZ, int maxX, int maxY, int maxZ) {
+    private RegionIterator(int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
+        //this.minX = minX //Does not need minX
         this.minY = minY;
         this.minZ = minZ;
         this.maxX = maxX;
         this.maxY = maxY;
         this.maxZ = maxZ;
+
+        this.posX = minX;
+        this.posY = minY;
+        //Hack fix for first yield
+        this.posZ = minZ - 1;
     }
 
     @Override
