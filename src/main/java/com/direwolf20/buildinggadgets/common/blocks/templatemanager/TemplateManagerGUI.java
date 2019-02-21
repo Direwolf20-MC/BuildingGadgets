@@ -290,6 +290,10 @@ public class TemplateManagerGUI extends GuiContainer {
 //            TemplateManagerCommands.copyTemplate(container);
 //        } else if (b.id == 3) {
 //            String CBString = mc.keyboardListener.getClipboardString();
+//            if (GadgetUtils.mightBeLink(CBString)) {
+//                Minecraft.getMinecraft().player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.pastefailed.linkcopied").getUnformattedComponentText()),false);
+//                return;
+//            }
 //            try {
 //                //Anything larger than below is likely to overflow the max packet size, crashing your client.
 //                ByteArrayOutputStream pasteStream = GadgetUtils.getPasteStream(JsonToNBT.getTagFromJson(CBString), nameField.getText());

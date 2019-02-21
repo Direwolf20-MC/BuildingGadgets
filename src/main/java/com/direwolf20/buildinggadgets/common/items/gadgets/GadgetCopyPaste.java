@@ -273,7 +273,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
                     //setStartPos(stack, null);
                     //setEndPos(stack, null);
                     //player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.areareset").getUnformattedComponentText()), true);
-                    return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);
+                    return new ActionResult<>(EnumActionResult.SUCCESS, stack);
                 }
                 if (player.isSneaking()) {
                     if (getStartPos(stack) != null)
@@ -299,8 +299,8 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
             }
         } else {
             if (pos != null && player.isSneaking()) {
-                if (GadgetUtils.getRemoteInventory(stack, world) != null)
-                    return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);
+                if (GadgetUtils.getRemoteInventory(pos, world, NetworkIO.Operation.EXTRACT) != null)
+                    return new ActionResult<>(EnumActionResult.SUCCESS, stack);
             }
             if (getToolMode(stack) == ToolMode.Copy) {
                 if (pos == null && player.isSneaking())
@@ -311,7 +311,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
                 ToolRenders.updateInventoryCache();
             }
         }
-        return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);
+        return new ActionResult<>(EnumActionResult.SUCCESS, stack);
     }
 
     public static void rotateBlocks(ItemStack stack, EntityPlayer player) {

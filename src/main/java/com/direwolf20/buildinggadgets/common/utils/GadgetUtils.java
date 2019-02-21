@@ -5,6 +5,7 @@ import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetBuilding;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetExchanger;
 import com.direwolf20.buildinggadgets.common.tools.*;
 import com.google.common.collect.HashMultiset;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multiset;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
@@ -38,6 +39,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GadgetUtils {
+    private static final ImmutableList<String> LINK_STARTS = ImmutableList.of("http","www");
+
+    public static boolean mightBeLink(final String s) {
+        return LINK_STARTS.stream().anyMatch(s::startsWith);
+    }
 
     public static String getStackErrorSuffix(ItemStack stack) {
         return getStackErrorText(stack) + " with NBT tag: " + stack.getTag();
@@ -126,7 +132,7 @@ public class GadgetUtils {
         DimensionType dim = DimensionType.byName(new ResourceLocation(compound.getString("dim")));
         if (dim == null)
             return null;
- 
+
         List<BlockPos> coordinates = new ArrayList<BlockPos>();
         int[] array = compound.getIntArray("undoIntCoords");
         BlockPos startBlock = NBTUtil.readBlockPos(compound.getCompound("startBlock"));
@@ -258,7 +264,7 @@ public class GadgetUtils {
             return;
 
         IBlockState state = world.getBlockState(pos);
-        //if (result == EnumActionResult.FAIL || !Config.BLACKLIST.isAllowedBlock(state.getBlock())) {
+        //if (result == EnumActionResult.FAIL || !Config.BLACKLIST.isAllowedBlock(state.getBlock())) { //TODO Config Blacklist
         if (result == EnumActionResult.FAIL) {
             player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.invalidblock").getUnformattedComponentText()), true);
             return;
@@ -327,25 +333,41 @@ public class GadgetUtils {
 
     @Nullable
     public static IItemHandler getRemoteInventory(ItemStack tool, World world) {
-        ResourceLocation dim = getDIMFromNBT(tool, "boundTE");
-        if (dim == null) return null;
-        BlockPos pos = getPOSFromNBT(tool, "boundTE");
-        return pos == null ? null : getRemoteInventory(pos, dim, world);
+         return getRemoteInventory(tool, world, NetworkIO.Operation.EXTRACT);
+
     }
 
     @Nullable
-    public static IItemHandler getRemoteInventory(BlockPos pos, @Nullable ResourceLocation dimName, World world) {
+    public static IItemHandler getRemoteInventory(ItemStack tool, World world, NetworkIO.Operation operation) {
+        ResourceLocation dim = getDIMFromNBT(tool, "boundTE");
+        if (dim == null) return null;
+        BlockPos pos = getPOSFromNBT(tool, "boundTE");
+        return pos == null ? null : getRemoteInventory(pos, dim, world /*, operation*/);
+    }
+    @Nullable
+    public static IItemHandler getRemoteInventory(BlockPos pos, ResourceLocation dim, World world) {
+        return getRemoteInventory(pos, dim, world, NetworkIO.Operation.EXTRACT);
+    }
+    @Nullable
+    public static IItemHandler getRemoteInventory(BlockPos pos, ResourceLocation dimName, World world, NetworkIO.Operation operation) {
+
         DimensionType dim = DimensionType.byName(dimName);
         if (dim == null) return null;
         MinecraftServer server = world.getServer();
         if (server == null) return null;
         World worldServer = server.getWorld(dim);
         if (worldServer == null) return null;
+        return getRemoteInventory(pos, worldServer, operation);
+    }
+
+    @Nullable
+    public static IItemHandler getRemoteInventory(BlockPos pos, World world, NetworkIO.Operation operation) {
+
         TileEntity te = world.getTileEntity(pos);
         if (te == null) return null;
-//        IItemHandler network = RefinedStorage.getWrappedNetwork(te);// TODO 1.13
-//        if (network != null) return network;
-        IItemHandler cap = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null).orElseThrow(NullPointerException::new);
+        //IItemHandler network = RefinedStorage.getWrappedNetwork(te, operation);
+        //if (network != null) return network;
+            IItemHandler cap = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null).orElseThrow(CapabilityNotPresentException::new);
         return cap != null ? cap : null;
     }
 
