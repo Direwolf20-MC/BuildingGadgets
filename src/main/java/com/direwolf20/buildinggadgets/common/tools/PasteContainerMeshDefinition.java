@@ -14,13 +14,13 @@ package com.direwolf20.buildinggadgets.common.tools;
 //        if (pasteAmt < maxCapacity / 4) {
 //            return new ModelResourceLocation(stack.getItem().getRegistryName(), "inventory");
 //        } else if (pasteAmt >= maxCapacity / 4 && pasteAmt < maxCapacity / 2) {
-//            return new ModelResourceLocation(stack.getItem().getRegistryName() + "-quarter", "inventory");
+//            return new ModelResourceLocation(stack.getItem().getRegistryName() + "_quarter", "inventory");
 //        } else if (pasteAmt >= maxCapacity / 2 && pasteAmt < maxCapacity * 3 / 4) {
-//            return new ModelResourceLocation(stack.getItem().getRegistryName() + "-half", "inventory");
+//            return new ModelResourceLocation(stack.getItem().getRegistryName() + "_half", "inventory");
 //        } else if (pasteAmt >= maxCapacity * 3 / 4 && pasteAmt < maxCapacity) {
-//            return new ModelResourceLocation(stack.getItem().getRegistryName() + "-3quarter", "inventory");
+//            return new ModelResourceLocation(stack.getItem().getRegistryName() + "_3quarter", "inventory");
 //        } else {
-//            return new ModelResourceLocation(stack.getItem().getRegistryName() + "-full", "inventory");
+//            return new ModelResourceLocation(stack.getItem().getRegistryName() + "_full", "inventory");
 //        }
 //    }
 //}

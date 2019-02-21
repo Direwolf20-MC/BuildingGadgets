@@ -18,14 +18,17 @@ import net.minecraftforge.registries.ObjectHolder;
 @EventBusSubscriber(modid = BuildingGadgets.MODID, bus = Bus.MOD)
 public class BGTileEntities {
     private static final RegistryContainer<TileEntityType<?>, RegistryObjectBuilder<TileEntityType<?>, Builder<?>>> container = new RegistryContainer<>();
+
+    @ObjectHolder("construction_tile")
     public static TileEntityType<?> CONSTRUCTION_BLOCK_TYPE;
+    @ObjectHolder("template_manager_tile")
     public static TileEntityType<?> TEMPLATE_MANAGER_TYPE;
 
     public static void init() {
         container.add(new RegistryObjectBuilder<TileEntityType<?>, Builder<?>>(new ResourceLocation(BuildingGadgets.MODID,"construction_tile"))
                 .builder(Builder.create(ConstructionBlockTileEntity::new))
                 .factory((b) -> b.build(null)));
-        container.add(new RegistryObjectBuilder<TileEntityType<?>, Builder<?>>(new ResourceLocation(BuildingGadgets.MODID,"template_manager_tile"))
+        container.add(new RegistryObjectBuilder<TileEntityType<?>, Builder<?>>(new ResourceLocation(BuildingGadgets.MODID, "template_manager_tile"))
                 .builder(Builder.create(TemplateManagerTileEntity::new))
                 .factory((b) -> b.build(null)));
     }

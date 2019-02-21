@@ -4,15 +4,17 @@ import net.minecraft.client.Minecraft;
 
 import java.awt.*;
 
+import javax.annotation.Nullable;
+
 public class GuiButtonColor extends GuiButtonSound {
     private Color colorSelected, colorDeselected;
 
-    public GuiButtonColor(int buttonId, int x, int y, int width, int height, String text) {
-        this(buttonId, x, y, width, height, text, Color.GREEN, Color.LIGHT_GRAY);
+    public GuiButtonColor(int x, int y, int width, int height, String text, @Nullable Runnable action) {
+        this(x, y, width, height, text, Color.GREEN, Color.LIGHT_GRAY, action);
     }
 
-    public GuiButtonColor(int buttonId, int x, int y, int width, int height, String text, Color colorSelected, Color colorDeselected) {
-        super(buttonId, x, y, width, height, text);
+    public GuiButtonColor(int x, int y, int width, int height, String text, Color colorSelected, Color colorDeselected, @Nullable Runnable action) {
+        super(x, y, width, height, text, action);
         this.colorSelected = colorSelected;
         this.colorDeselected = colorDeselected;
     }

@@ -42,7 +42,7 @@ import java.util.*;
 
 public class GadgetDestruction extends GadgetGeneric {
 
-    public static final ResourceLocation REGISTRY_NAME = new ResourceLocation(BuildingGadgets.MODID,"gadgets_destruction");
+    public static final ResourceLocation REGISTRY_NAME = new ResourceLocation(BuildingGadgets.MODID,"gadget_destruction");
 
     public GadgetDestruction(Properties builder) {
         super(builder.defaultMaxDamage(Config.GADGETS.GADGET_DESTRUCTION.durability.get()));

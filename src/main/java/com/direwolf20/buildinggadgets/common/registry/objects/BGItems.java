@@ -25,14 +25,14 @@ public final class BGItems {
 
     private static final RegistryContainer<Item, RegistryObjectBuilder<Item, Item.Properties>> container = new RegistryContainer<>();
     // Gadgets
-    @ObjectHolder("gadgets_building")
+    @ObjectHolder("gadget_building")
     public static Item gadgetBuilding;
-    @ObjectHolder("gadgets_copy_paste")
+    @ObjectHolder("gadget_copy_paste")
     public static Item gadgetCopyPaste;
-    @ObjectHolder("gadgets_exchanging")
+    @ObjectHolder("gadget_exchanging")
     public static Item gadgetExchanger;
-    @ObjectHolder("gadgets_destruction")
-    public static Item gadgetDestruction  ;
+    @ObjectHolder("gadget_destruction")
+    public static Item gadgetDestruction;
 
     // Building Items
     @ObjectHolder("construction_paste")

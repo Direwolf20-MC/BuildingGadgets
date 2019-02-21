@@ -12,7 +12,6 @@ import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketCopyCoords;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.item.ItemStack;
@@ -69,116 +68,42 @@ public class CopyGUI extends GuiScreen {
 
         updateTextFields();
         //NOTE: the id always has to be different or else it might get called twice or never!
-        this.addButton(new GuiButton(1, this.guiLeft + 45, this.guiTop + 60, 40, 20, "Ok"){
-            @Override
-            public void onClick(double mouseX, double mouseY) {
-                clearTextBoxes();
-                try {
-                    if (absoluteCoords) {
-                        startPos = new BlockPos(Integer.parseInt(startX.getText()), Integer.parseInt(startY.getText()), Integer.parseInt(startZ.getText()));
-                        endPos = new BlockPos(Integer.parseInt(endX.getText()), Integer.parseInt(endY.getText()), Integer.parseInt(endZ.getText()));
-                    } else {
-                        startPos = new BlockPos(startPos.getX() + Integer.parseInt(startX.getText()), startPos.getY() + Integer.parseInt(startY.getText()), startPos.getZ() + Integer.parseInt(startZ.getText()));
-                        endPos = new BlockPos(startPos.getX() + Integer.parseInt(endX.getText()), startPos.getY() + Integer.parseInt(endY.getText()), startPos.getZ() + Integer.parseInt(endZ.getText()));
-                    }
-                    PacketHandler.sendToServer(new PacketCopyCoords(startPos, endPos));
-                } catch (Throwable t) {
-                    Minecraft.getInstance().player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.copyguierror").getUnformattedComponentText()), true);
+        addButton(new GuiButtonAction(guiLeft + 45, guiTop + 60, 40, 20, "Ok", () -> {
+            clearTextBoxes();
+            try {
+                if (absoluteCoords) {
+                    startPos = new BlockPos(Integer.parseInt(startX.getText()), Integer.parseInt(startY.getText()), Integer.parseInt(startZ.getText()));
+                    endPos = new BlockPos(Integer.parseInt(endX.getText()), Integer.parseInt(endY.getText()), Integer.parseInt(endZ.getText()));
+                } else {
+                    startPos = new BlockPos(startPos.getX() + Integer.parseInt(startX.getText()), startPos.getY() + Integer.parseInt(startY.getText()), startPos.getZ() + Integer.parseInt(startZ.getText()));
+                    endPos = new BlockPos(startPos.getX() + Integer.parseInt(endX.getText()), startPos.getY() + Integer.parseInt(endY.getText()), startPos.getZ() + Integer.parseInt(endZ.getText()));
                 }
+                PacketHandler.sendToServer(new PacketCopyCoords(startPos, endPos));
+            } catch (Throwable t) {
+                Minecraft.getInstance().player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.copyguierror").getUnformattedComponentText()), true);
             }
-        });
-        this.addButton(new GuiButton(2, this.guiLeft + 145, this.guiTop + 60, 40, 20, "Cancel"){
-            @Override
-            public void onClick(double mouseX, double mouseY) {
-                mc.displayGuiScreen(null);
-            }
-        });
-        this.addButton(new GuiButton(3, this.guiLeft + 245, this.guiTop + 60, 40, 20, "Clear"){
-            @Override
-            public void onClick(double mouseX, double mouseY) {
-                PacketHandler.sendToServer(new PacketCopyCoords(BlockPos.ORIGIN, BlockPos.ORIGIN));
-                mc.displayGuiScreen(null);
-            }
-        });
-        this.addButton(new GuiButton(4, this.guiLeft + 325, this.guiTop + 60, 80, 20, "CoordsMode"){
-            @Override
-            public void onClick(double mouseX, double mouseY) {
-                coordsModeSwitch();
-                updateTextFields();
-            }
-        });
-        this.addButton(new DireButton(5, this.guiLeft + 50, this.guiTop + 14, 10, 10, "-"){
-            @Override
-            public void onClick(double mouseX, double mouseY) {
-                fieldChange(startX, -1);
-            }
-        });
-        this.addButton(new DireButton(6, this.guiLeft + 110, this.guiTop + 14, 10, 10, "+"){
-            @Override
-            public void onClick(double mouseX, double mouseY) {
-                fieldChange(startX, 1);
-            }
-        });
-        this.addButton(new DireButton(7, this.guiLeft + 150, this.guiTop + 14, 10, 10, "-"){
-            @Override
-            public void onClick(double mouseX, double mouseY) {
-                fieldChange(startY, -1);
-            }
-        });
-        this.addButton(new DireButton(8, this.guiLeft + 210, this.guiTop + 14, 10, 10, "+"){
-            @Override
-            public void onClick(double mouseX, double mouseY) {
-                fieldChange(startY, 1);
-            }
-        });
-        this.addButton(new DireButton(9, this.guiLeft + 250, this.guiTop + 14, 10, 10, "-"){
-            @Override
-            public void onClick(double mouseX, double mouseY) {
-                fieldChange(startZ, -1);
-            }
-        });
-        this.addButton(new DireButton(10, this.guiLeft + 310, this.guiTop + 14, 10, 10, "+"){
-            @Override
-            public void onClick(double mouseX, double mouseY) {
-                fieldChange(startZ, 1);
-            }
-        });
-        this.addButton(new DireButton(11, this.guiLeft + 50, this.guiTop + 34, 10, 10, "-"){
-            @Override
-            public void onClick(double mouseX, double mouseY) {
-                fieldChange(endX, -1);
-            }
-        });
-        this.addButton(new DireButton(12, this.guiLeft + 110, this.guiTop + 34, 10, 10, "+"){
-            @Override
-            public void onClick(double mouseX, double mouseY) {
-                fieldChange(endX, 1);
-            }
-        });
-        this.addButton(new DireButton(13, this.guiLeft + 150, this.guiTop + 34, 10, 10, "-"){
-            @Override
-            public void onClick(double mouseX, double mouseY) {
-                fieldChange(endY, -1);
-            }
-        });
-        this.addButton(new DireButton(14, this.guiLeft + 210, this.guiTop + 34, 10, 10, "+"){
-            @Override
-            public void onClick(double mouseX, double mouseY) {
-                fieldChange(endY, 1);
-            }
-        });
-        this.addButton(new DireButton(15, this.guiLeft + 250, this.guiTop + 34, 10, 10, "-"){
-            @Override
-            public void onClick(double mouseX, double mouseY) {
-                fieldChange(endZ, -1);
-            }
-        });
-        this.addButton(new DireButton(16, this.guiLeft + 310, this.guiTop + 34, 10, 10, "+"){
-            @Override
-            public void onClick(double mouseX, double mouseY) {
-                fieldChange(endZ, 1);
-            }
-        });
+        }));
+        addButton(new GuiButtonAction(guiLeft + 145, guiTop + 60, 40, 20, "Cancel", () -> close()));
+        addButton(new GuiButtonAction(guiLeft + 245, guiTop + 60, 40, 20, "Clear", () -> {
+            PacketHandler.sendToServer(new PacketCopyCoords(BlockPos.ORIGIN, BlockPos.ORIGIN));
+            close();
+        }));
+        addButton(new GuiButtonAction(guiLeft + 325, guiTop + 60, 80, 20, "CoordsMode", () -> {
+            coordsModeSwitch();
+            updateTextFields();
+        }));
+        addButton(new DireButton(guiLeft + 50, guiTop + 14, 10, 10, "-", () -> fieldChange(startX, -1)));
+        addButton(new DireButton(guiLeft + 110, guiTop + 14, 10, 10, "+", () -> fieldChange(startX, 1)));
+        addButton(new DireButton(guiLeft + 150, guiTop + 14, 10, 10, "-", () -> fieldChange(startY, -1)));
+        addButton(new DireButton(guiLeft + 210, guiTop + 14, 10, 10, "+", () -> fieldChange(startY, 1)));
+        addButton(new DireButton(guiLeft + 250, guiTop + 14, 10, 10, "-", () -> fieldChange(startZ, -1)));
+        addButton(new DireButton(guiLeft + 310, guiTop + 14, 10, 10, "+", () -> fieldChange(startZ, 1)));
+        addButton(new DireButton(guiLeft + 50, guiTop + 34, 10, 10, "-", () -> fieldChange(endX, -1)));
+        addButton(new DireButton(guiLeft + 110, guiTop + 34, 10, 10, "+", () -> fieldChange(endX, 1)));
+        addButton(new DireButton(guiLeft + 150, guiTop + 34, 10, 10, "-", () -> fieldChange(endY, -1)));
+        addButton(new DireButton(guiLeft + 210, guiTop + 34, 10, 10, "+", () -> fieldChange(endY, 1)));
+        addButton(new DireButton(guiLeft + 250, guiTop + 34, 10, 10, "-", () -> fieldChange(endZ, -1)));
+        addButton(new DireButton(guiLeft + 310, guiTop + 34, 10, 10, "+", () -> fieldChange(endZ, 1)));
     }
 
     private void fieldChange(GuiTextField textField, int amount) {

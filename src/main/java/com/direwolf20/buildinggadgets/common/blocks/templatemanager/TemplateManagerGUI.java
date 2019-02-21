@@ -11,9 +11,16 @@ import com.direwolf20.buildinggadgets.client.gui.GuiButtonHelpText;
 import com.direwolf20.buildinggadgets.client.gui.IHoverHelpText;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
+import com.direwolf20.buildinggadgets.common.network.PacketHandler;
+import com.direwolf20.buildinggadgets.common.network.packets.PacketTemplateManagerLoad;
+import com.direwolf20.buildinggadgets.common.network.packets.PacketTemplateManagerPaste;
+import com.direwolf20.buildinggadgets.common.network.packets.PacketTemplateManagerSave;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
 import com.direwolf20.buildinggadgets.common.tools.PasteToolBufferBuilder;
 import com.direwolf20.buildinggadgets.common.tools.ToolBufferBuilder;
+import com.direwolf20.buildinggadgets.common.utils.GadgetUtils;
+
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.gui.inventory.GuiContainer;
@@ -24,13 +31,21 @@ import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.client.renderer.vertex.VertexFormatElement;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.JsonToNBT;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TextFormatting;
+
 import org.lwjgl.opengl.GL11;
 
+import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.annotation.Nullable;
 
 public class TemplateManagerGUI extends GuiContainer {
     public static final int HELP_TEXT_BACKGROUNG_COLOR = 1694460416;
@@ -92,11 +107,30 @@ public class TemplateManagerGUI extends GuiContainer {
     public void initGui() {
         super.initGui();
         helpTextProviders.clear();
-        this.buttons.add(buttonHelp = new GuiButtonHelp(100, this.guiLeft + this.xSize - 16, this.guiTop + 4));
-        this.buttons.add(buttonSave = createAndAddButton(0, 79, 17, 30, 20, "Save"));
-        this.buttons.add(buttonLoad = createAndAddButton(1, 137, 17, 30, 20, "Load"));
-        this.buttons.add(buttonCopy = createAndAddButton(2, 79, 61, 30, 20, "Copy"));
-        this.buttons.add(buttonPaste = createAndAddButton(3, 135, 61, 34, 20, "Paste"));
+        buttonHelp = addButton(new GuiButtonHelp(this.guiLeft + this.xSize - 16, this.guiTop + 4, () -> buttonHelp.toggleSelected()));
+        buttonSave = addButton(createAndAddButton(79, 17, 30, 20, "Save", () -> PacketHandler.sendToServer(new PacketTemplateManagerSave(te.getPos(), nameField.getText()))));
+        buttonLoad = addButton(createAndAddButton(137, 17, 30, 20, "Load", () -> PacketHandler.sendToServer(new PacketTemplateManagerLoad(te.getPos()))));
+        buttonCopy = addButton(createAndAddButton(79, 61, 30, 20, "Copy", () -> TemplateManagerCommands.copyTemplate(container)));
+        buttonPaste = addButton(createAndAddButton(135, 61, 34, 20, "Paste", () -> {
+            String CBString = mc.keyboardListener.getClipboardString();
+            if (GadgetUtils.mightBeLink(CBString)) {
+                Minecraft.getInstance().player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.pastefailed.linkcopied").getUnformattedComponentText()),false);
+                return;
+            }
+            try {
+                //Anything larger than below is likely to overflow the max packet size, crashing your client.
+                ByteArrayOutputStream pasteStream = GadgetUtils.getPasteStream(JsonToNBT.getTagFromJson(CBString), nameField.getText());
+                if (pasteStream != null) {
+                    PacketHandler.sendToServer(new PacketTemplateManagerPaste(pasteStream, te.getPos(), nameField.getText()));
+                    Minecraft.getInstance().player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.pastesuccess").getUnformattedComponentText()), false);
+                } else {
+                    Minecraft.getInstance().player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.pastetoobig").getUnformattedComponentText()), false);
+                }
+            } catch (Throwable t) {
+                BuildingGadgets.LOG.error(t);
+                Minecraft.getInstance().player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.pastefailed").getUnformattedComponentText()), false);
+            }
+        }));
 
         this.nameField = new GuiTextField(0, this.fontRenderer, this.guiLeft + 8, this.guiTop + 6, 149, this.fontRenderer.FONT_HEIGHT);
         this.nameField.setMaxStringLength(50);
@@ -110,8 +144,8 @@ public class TemplateManagerGUI extends GuiContainer {
         helpTextProviders.add(new AreaHelpText(panel, guiLeft, guiTop + 10, "preview"));
     }
 
-    private GuiButton createAndAddButton(int id, int x, int y, int witdth, int height, String text) {
-        GuiButtonHelpText button = new GuiButtonHelpText(id, this.guiLeft + x, this.guiTop + y, witdth, height, text, text.toLowerCase());
+    private GuiButton createAndAddButton(int x, int y, int witdth, int height, String text, @Nullable Runnable action) {
+        GuiButtonHelpText button = new GuiButtonHelpText(guiLeft + x, guiTop + y, witdth, height, text, text.toLowerCase(), action);
         helpTextProviders.add(button);
         return button;
     }
@@ -273,44 +307,6 @@ public class TemplateManagerGUI extends GuiContainer {
             panY = 0;
         }
     }
-
-
-    // @fixme: reimplement @since 1.13.x
-//    @Override
-//    protected void actionPerformed(GuiButton b) {
-//        if (b.id == buttonHelp.id) {
-//            buttonHelp.toggleSelected();
-//        } else if (b.id == 0) {
-//            // @todo: reimplement @since 1.13.x
-//            PacketHandler.sendToServer(new PacketTemplateManagerSave(te.getPos(), nameField.getText()));
-//        } else if (b.id == 1) {
-//            // @todo: reimplement @since 1.13.x
-//            PacketHandler.sendToServer(new PacketTemplateManagerLoad(te.getPos()));
-//        } else if (b.id == 2) {
-//            TemplateManagerCommands.copyTemplate(container);
-//        } else if (b.id == 3) {
-//            String CBString = mc.keyboardListener.getClipboardString();
-//            if (GadgetUtils.mightBeLink(CBString)) {
-//                Minecraft.getMinecraft().player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.pastefailed.linkcopied").getUnformattedComponentText()),false);
-//                return;
-//            }
-//            try {
-//                //Anything larger than below is likely to overflow the max packet size, crashing your client.
-//                ByteArrayOutputStream pasteStream = GadgetUtils.getPasteStream(JsonToNBT.getTagFromJson(CBString), nameField.getText());
-//                if (pasteStream != null) {
-//                    // @todo: reimplement @since 1.13.x
-////                    PacketHandler.sendToServer(new PacketTemplateManagerPaste(pasteStream, te.getPos(), nameField.getText()));
-//                    Minecraft.getInstance().player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.pastesuccess").getUnformattedComponentText()), false);
-//                } else {
-//                    Minecraft.getInstance().player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.pastetoobig").getUnformattedComponentText()), false);
-//                }
-//            } catch (Throwable t) {
-//                BuildingGadgets.LOG.error(t);
-//                Minecraft.getInstance().player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.pastefailed").getUnformattedComponentText()), false);
-//            }
-//        }
-//    }
-
 
     @Override
     public boolean keyPressed(int p_keyPressed_1_, int p_keyPressed_2_, int p_keyPressed_3_) {

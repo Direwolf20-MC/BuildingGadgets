@@ -299,7 +299,7 @@ public class ToolRenders {
                 //Enable Blending (So we can have transparent effect)
                 GlStateManager.enableBlend();
                 //This blend function allows you to use a constant alpha, which is defined later
-                GlStateManager.blendFunc(GL11.GL_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+                GlStateManager.blendFunc(GL14.GL_CONSTANT_ALPHA, GL14.GL_ONE_MINUS_CONSTANT_ALPHA);
 
                 //List<BlockPos> sortedCoordinates = ExchangingModes.sortByDistance(coordinates, player); //Sort the coords by distance to player.
 
@@ -433,7 +433,7 @@ public class ToolRenders {
             boolean invisible = true;
             IBlockState state = world.getBlockState(coordinate);
             for (EnumFacing side : EnumFacing.values()) {
-                if (state.isSideInvisible(state, side)) {
+                if (!state.isSideInvisible(state, side)) {
                     invisible = false;
                     break;
                 }
@@ -538,7 +538,7 @@ public class ToolRenders {
             //Enable Blending (So we can have transparent effect)
             GlStateManager.enableBlend();
             //This blend function allows you to use a constant alpha, which is defined later
-            GlStateManager.blendFunc(GL11.GL_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+            GlStateManager.blendFunc(GL14.GL_CONSTANT_ALPHA, GL14.GL_ONE_MINUS_CONSTANT_ALPHA);
 
             GlStateManager.pushMatrix();//Push matrix again just because
             GlStateManager.translatef((float)-doubleX, (float)-doubleY, (float)-doubleZ);//The render starts at the player, so we subtract the player coords and move the render to 0,0,0
