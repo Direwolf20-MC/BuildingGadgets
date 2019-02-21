@@ -81,7 +81,7 @@ public class GadgetBuilding extends GadgetGeneric {
             return mode;
         }
         try {
-            mode = com.direwolf20.buildinggadgets.common.tools.BuildingModes.valueOf(tagCompound.getString("mode"));
+            mode = BuildingModes.valueOf(tagCompound.getString("mode"));
         } catch (Exception e) {
             setToolMode(stack, mode);
         }

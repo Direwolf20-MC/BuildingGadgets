@@ -303,6 +303,10 @@ public class TemplateManagerGUI extends GuiContainer {
             String CBString = getClipboardString();
             //System.out.println("CBString Length: " + CBString.length());
             //System.out.println(CBString);
+            if (GadgetUtils.mightBeLink(CBString)) {
+                Minecraft.getMinecraft().player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.pastefailed.linkcopied").getUnformattedComponentText()),false);
+                return;
+            }
             try {
                 //Anything larger than below is likely to overflow the max packet size, crashing your client.
                 ByteArrayOutputStream pasteStream = GadgetUtils.getPasteStream(JsonToNBT.getTagFromJson(CBString), nameField.getText());

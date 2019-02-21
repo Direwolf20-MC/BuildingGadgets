@@ -6,6 +6,7 @@ import com.direwolf20.buildinggadgets.common.integration.RefinedStorage;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetBuilding;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetExchanger;
 import com.google.common.collect.HashMultiset;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multiset;
 
 import net.minecraft.block.state.IBlockState;
@@ -40,6 +41,11 @@ import java.util.Comparator;
 import java.util.List;
 
 public class GadgetUtils {
+    private static final ImmutableList<String> LINK_STARTS = ImmutableList.of("http","www");
+
+    public static boolean mightBeLink(final String s) {
+        return LINK_STARTS.stream().anyMatch(s::startsWith);
+    }
 
     public static final Comparator<Vec3i> POSITION_COMPARATOR = Comparator
             .comparingInt(Vec3i::getX)
@@ -332,21 +338,31 @@ public class GadgetUtils {
 
     @Nullable
     public static IItemHandler getRemoteInventory(ItemStack tool, World world) {
+        return getRemoteInventory(tool, world, NetworkIO.Operation.EXTRACT);
+    }
+
+    @Nullable
+    public static IItemHandler getRemoteInventory(ItemStack tool, World world, NetworkIO.Operation operation) {
         Integer dim = getDIMFromNBT(tool, "boundTE");
         if (dim == null) return null;
         BlockPos pos = getPOSFromNBT(tool, "boundTE");
-        return pos == null ? null : getRemoteInventory(pos, dim, world);
+        return pos == null ? null : getRemoteInventory(pos, dim, world, operation);
     }
 
     @Nullable
     public static IItemHandler getRemoteInventory(BlockPos pos, int dim, World world) {
+        return getRemoteInventory(pos, dim, world, NetworkIO.Operation.EXTRACT);
+    }
+
+    @Nullable
+    public static IItemHandler getRemoteInventory(BlockPos pos, int dim, World world, NetworkIO.Operation operation) {
         MinecraftServer server = world.getMinecraftServer();
         if (server == null) return null;
         World worldServer = server.getWorld(dim);
         if (worldServer == null) return null;
         TileEntity te = world.getTileEntity(pos);
         if (te == null) return null;
-        IItemHandler network = RefinedStorage.getWrappedNetwork(te);
+        IItemHandler network = RefinedStorage.getWrappedNetwork(te, operation);
         if (network != null) return network;
         IItemHandler cap = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
         return cap != null ? cap : null;

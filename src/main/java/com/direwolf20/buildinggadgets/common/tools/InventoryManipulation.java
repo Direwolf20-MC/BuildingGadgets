@@ -58,18 +58,17 @@ public class InventoryManipulation {
 
         //Try to insert into the remote inventory.
         ItemStack tool = GadgetGeneric.getGadget(player);
-        IItemHandler remoteInventory = GadgetUtils.getRemoteInventory(tool, world);
+        IItemHandler remoteInventory = GadgetUtils.getRemoteInventory(tool, world, NetworkIO.Operation.INSERT);
         if (remoteInventory != null) {
             for (int i = 0; i < remoteInventory.getSlots(); i++) {
                 ItemStack containerItem = remoteInventory.getStackInSlot(i);
                 ItemStack giveItemStack = itemStack.copy();
                 if ((containerItem.getItem() == itemStack.getItem() && containerItem.getMetadata() == itemStack.getMetadata()) || containerItem.isEmpty()) {
                     giveItemStack = remoteInventory.insertItem(i, giveItemStack, false);
-                    if (giveItemStack.isEmpty()) {
+                    if (giveItemStack.isEmpty())
                         return true;
-                    } else {
-                        itemStack = giveItemStack.copy();
-                    }
+
+                    itemStack = giveItemStack.copy();
                 }
             }
         }
@@ -83,11 +82,10 @@ public class InventoryManipulation {
                     ItemStack giveItemStack = itemStack.copy();
                     if (containerItem.getItem() == giveItemStack.getItem() && containerItem.getMetadata() == giveItemStack.getMetadata()) {
                         giveItemStack = container.insertItem(i, giveItemStack, false);
-                        if (giveItemStack.isEmpty()) {
+                        if (giveItemStack.isEmpty())
                             return true;
-                        } else {
-                            itemStack = giveItemStack.copy();
-                        }
+
+                        itemStack = giveItemStack.copy();
                     }
                 }
             }
