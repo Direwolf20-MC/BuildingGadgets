@@ -9,6 +9,7 @@ import com.direwolf20.buildinggadgets.common.building.modes.HorizontalColumnMode
 import com.direwolf20.buildinggadgets.common.building.modes.SurfaceMode;
 import com.direwolf20.buildinggadgets.common.building.modes.VerticalColumnMode;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
+import com.google.common.collect.ImmutableList;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
@@ -68,6 +69,14 @@ public enum ExchangingModes {
                 .findFirst()
                 .orElse(Surface)
                 .getModeImplementation();
+    }
+
+    private static final ImmutableList<ResourceLocation> ICONS = Arrays.stream(values())
+            .map(ExchangingModes::getIcon)
+            .collect(ImmutableList.toImmutableList());
+
+    public static ImmutableList<ResourceLocation> getIcons() {
+        return ICONS;
     }
 
     public static List<BlockPos> collectPlacementPos(World world, EntityPlayer player, BlockPos hit, EnumFacing sideHit, ItemStack tool) {

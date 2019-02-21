@@ -4,9 +4,11 @@
  * Psi License: http://psi.vazkii.us/license.php
  */
 
-package com.direwolf20.buildinggadgets.client.gui;
+package com.direwolf20.buildinggadgets.client.gui.radialmenu;
 
 import com.direwolf20.buildinggadgets.client.KeyBindings;
+import com.direwolf20.buildinggadgets.client.gui.GuiButtonAction;
+import com.direwolf20.buildinggadgets.client.gui.GuiButtonSound;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.ModSounds;
 import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
@@ -18,6 +20,7 @@ import com.direwolf20.buildinggadgets.common.network.PacketToggleFuzzy;
 import com.direwolf20.buildinggadgets.common.network.PacketToggleMode;
 import com.direwolf20.buildinggadgets.common.tools.BuildingModes;
 import com.direwolf20.buildinggadgets.common.tools.ExchangingModes;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 
 import net.minecraft.client.Minecraft;
@@ -43,26 +46,12 @@ import java.util.List;
 
 public class ModeRadialMenu extends GuiScreen {
 
-    private static final ResourceLocation[] signsBuilding = new ResourceLocation[]{
-            new ResourceLocation(BuildingGadgets.MODID,"textures/ui/build_to_me.png"),
-            new ResourceLocation(BuildingGadgets.MODID,"textures/ui/vertical_column.png"),
-            new ResourceLocation(BuildingGadgets.MODID,"textures/ui/horizontal_column.png"),
-            new ResourceLocation(BuildingGadgets.MODID,"textures/ui/vertical_wall.png"),
-            new ResourceLocation(BuildingGadgets.MODID,"textures/ui/horizontal_wall.png"),
-            new ResourceLocation(BuildingGadgets.MODID,"textures/ui/stairs.png"),
-            new ResourceLocation(BuildingGadgets.MODID,"textures/ui/grid.png"),
-            new ResourceLocation(BuildingGadgets.MODID,"textures/ui/surface.png")
-    };
-    private static final ResourceLocation[] signsExchanger = new ResourceLocation[]{
-            new ResourceLocation(BuildingGadgets.MODID,"textures/ui/surface.png"),
-            new ResourceLocation(BuildingGadgets.MODID,"textures/ui/vertical_column.png"),
-            new ResourceLocation(BuildingGadgets.MODID,"textures/ui/horizontal_column.png"),
-            new ResourceLocation(BuildingGadgets.MODID,"textures/ui/grid.png")
-    };
-    private static final ResourceLocation[] signsCopyPaste = new ResourceLocation[]{
+    //TODO move to a enum
+    private static final ImmutableList<ResourceLocation> signsCopyPaste = ImmutableList.of(
             new ResourceLocation(BuildingGadgets.MODID,"textures/ui/copy.png"),
             new ResourceLocation(BuildingGadgets.MODID,"textures/ui/paste.png")
-    };
+    );
+
     private int timeIn = 0;
     private int slotSelected = -1;
     private int segments;
@@ -116,8 +105,8 @@ public class ModeRadialMenu extends GuiScreen {
 
     private void updateButtons(ItemStack tool) {
         int x = 0;
-        for (int i = 0; i < buttonList.size(); i++) {
-            GuiButtonSound button = (GuiButtonSound) buttonList.get(i);
+        for (GuiButton guiButton : buttonList) {
+            GuiButtonSound button = (GuiButtonSound) guiButton;
             SoundEvent sound = ModSounds.BEEP.getSound();
             button.setSounds(sound, sound, 0.6F, 1F);
             if (!button.visible) continue;
@@ -168,7 +157,7 @@ public class ModeRadialMenu extends GuiScreen {
         float totalDeg = 0;
         float degPer = 360F / segments;
 
-        List<int[]> stringPositions = new ArrayList();
+        List<NameDisplayData> nameData = new ArrayList<>();
 
         ItemStack tool = getGadget();
         if (tool.isEmpty())
@@ -178,14 +167,14 @@ public class ModeRadialMenu extends GuiScreen {
         float offset = 8.5F;
         double dist = new Vec3d(x, y, 0).distanceTo(new Vec3d(mx, my, 0));
         boolean inRange = dist > 35 && dist < 81;
-        ResourceLocation[] signs;
+        ImmutableList<ResourceLocation> signs;
         int modeIndex;
         if (tool.getItem() instanceof GadgetBuilding) {
             modeIndex = GadgetBuilding.getToolMode(tool).ordinal();
-            signs = signsBuilding;
+            signs = BuildingModes.getIcons();
         } else if (tool.getItem() instanceof GadgetExchanger) {
             modeIndex = GadgetExchanger.getToolMode(tool).ordinal();
-            signs = signsExchanger;
+            signs = ExchangingModes.getIcons();
         } else {
             modeIndex = GadgetCopyPaste.getToolMode(tool).ordinal();
             signs = signsCopyPaste;
@@ -216,7 +205,7 @@ public class ModeRadialMenu extends GuiScreen {
                 double xp = x + Math.cos(rad) * radius;
                 double yp = y + Math.sin(rad) * radius;
                 if ((int) i == (int) (degPer / 2))
-                    stringPositions.add(new int[]{(int) xp, (int) yp, mouseInSector ? 'n' : 'r'});
+                    nameData.add(new NameDisplayData((int) xp, (int) yp, mouseInSector));
 
                 GL11.glVertex2d(x + Math.cos(rad) * radius / 2.3F, y + Math.sin(rad) * radius / 2.3F);
                 GL11.glVertex2d(xp, yp);
@@ -224,36 +213,27 @@ public class ModeRadialMenu extends GuiScreen {
             totalDeg += degPer;
 
             GL11.glEnd();
-
-            if (mouseInSector)
-                radius -= highlight;
         }
         GlStateManager.shadeModel(GL11.GL_FLAT);
         GlStateManager.enableTexture2D();
 
-        for (int i = 0; i < stringPositions.size(); i++) {
-            int[] pos = stringPositions.get(i);
-            int xp = pos[0];
-            int yp = pos[1];
-            char c = (char) pos[2];
+        for (int i = 0; i < nameData.size(); i++) {
+            NameDisplayData data = nameData.get(i);
+            int xp = data.getX();
+            int yp = data.getY();
+            char style = data.getStylePrefix();
 
-            String name = "";
+            String name = "\u00a7" + style;
             if (tool.getItem() instanceof GadgetBuilding)
-                name = BuildingModes.values()[i].toString();
+                name += BuildingModes.values()[i].toString();
             else if (tool.getItem() instanceof GadgetExchanger)
-                name = ExchangingModes.values()[i].toString();
+                name += ExchangingModes.values()[i].toString();
             else
-                name = GadgetCopyPaste.ToolMode.values()[i].toString();
-
-            name = "\u00a7" + c + name;
+                name += GadgetCopyPaste.ToolMode.values()[i].toString();
 
             int xsp = xp - 4;
             int ysp = yp;
             int width = fontRenderer.getStringWidth(name);
-
-            double mod = 0.6;
-            int xdp = (int) ((xp - x) * mod + x);
-            int ydp = (int) ((yp - y) * mod + y);
 
             if (xsp < x)
                 xsp -= width - 8;
@@ -262,11 +242,11 @@ public class ModeRadialMenu extends GuiScreen {
 
             fontRenderer.drawStringWithShadow(name, xsp, ysp, i == modeIndex ? Color.GREEN.getRGB() : Color.WHITE.getRGB());
 
-            mod = 0.7;
-            xdp = (int) ((xp - x) * mod + x);
-            ydp = (int) ((yp - y) * mod + y);
+            double mod = 0.7;
+            int xdp = (int) ((xp - x) * mod + x);
+            int ydp = (int) ((yp - y) * mod + y);
 
-            mc.renderEngine.bindTexture(signs[i]);
+            mc.renderEngine.bindTexture(signs.get(i));
             drawModalRectWithCustomSizedTexture(xdp - 8, ydp - 8, 0, 0, 16, 16, 16, 16);
 
         }
