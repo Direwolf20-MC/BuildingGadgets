@@ -353,6 +353,11 @@ public class GadgetUtils {
         if (server == null) return null;
         World worldServer = server.getWorld(dim);
         if (worldServer == null) return null;
+        return getRemoteInventory(pos, worldServer, operation);
+    }
+
+    @Nullable
+    public static IItemHandler getRemoteInventory(BlockPos pos, World world, NetworkIO.Operation operation) {
         TileEntity te = world.getTileEntity(pos);
         if (te == null) return null;
         IItemHandler network = RefinedStorage.getWrappedNetwork(te, operation);
