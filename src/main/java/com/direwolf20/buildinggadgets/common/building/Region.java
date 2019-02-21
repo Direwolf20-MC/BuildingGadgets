@@ -2,11 +2,13 @@ package com.direwolf20.buildinggadgets.common.building;
 
 import com.direwolf20.buildinggadgets.common.building.placement.IPlacementSequence;
 import com.direwolf20.buildinggadgets.common.tools.GadgetUtils;
+import com.google.common.base.MoreObjects;
 import com.google.common.collect.PeekingIterator;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 
+import java.util.Objects;
 import java.util.Spliterator;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -213,15 +215,15 @@ public final class Region implements IPlacementSequence {
     }
 
     public int getXSize() {
-        return maxX - minX + 1;
+        return Math.abs(maxX - minX) + 1;
     }
 
     public int getYSize() {
-        return maxY - minY + 1;
+        return Math.abs(maxY - minY) + 1;
     }
 
     public int getZSize() {
-        return maxZ - minZ + 1;
+        return Math.abs(maxZ - minZ) + 1;
     }
 
     public int size() {
@@ -305,5 +307,37 @@ public final class Region implements IPlacementSequence {
     public Spliterator<BlockPos> spliterator() {
         return new RegionSpliterator(this);
     }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("minX", minX)
+                .add("minY", minY)
+                .add("minZ", minZ)
+                .add("maxX", maxX)
+                .add("maxY", maxY)
+                .add("maxZ", maxZ)
+                .toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Region region = (Region) o;
+        return minX == region.minX &&
+                minY == region.minY &&
+                minZ == region.minZ &&
+                maxX == region.maxX &&
+                maxY == region.maxY &&
+                maxZ == region.maxZ;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(minX, minY, minZ, maxX, maxY, maxZ);
+    }
+
+
 
 }
