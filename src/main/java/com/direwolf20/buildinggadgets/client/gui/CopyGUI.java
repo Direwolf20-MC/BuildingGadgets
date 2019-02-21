@@ -59,13 +59,14 @@ public class CopyGUI extends GuiScreen {
         if (startPos == null) startPos = new BlockPos(0, 0, 0);
         if (endPos == null) endPos = new BlockPos(0, 0, 0);
 
-        guiList.add( startX = new GuiTextFieldWithDefault(0, this.fontRenderer, this.guiLeft + 65, this.guiTop + 15, 40, this.fontRenderer.FONT_HEIGHT, String.valueOf(startPos.getX())) );
-        guiList.add( startY = new GuiTextFieldWithDefault(1, this.fontRenderer, this.guiLeft + 165, this.guiTop + 15, 40, this.fontRenderer.FONT_HEIGHT, String.valueOf(startPos.getY())) );
-        guiList.add( startZ = new GuiTextFieldWithDefault(2, this.fontRenderer, this.guiLeft + 265, this.guiTop + 15, 40, this.fontRenderer.FONT_HEIGHT, String.valueOf(startPos.getZ())) );
-        guiList.add( endX = new GuiTextFieldWithDefault(3, this.fontRenderer, this.guiLeft + 65, this.guiTop + 35, 40, this.fontRenderer.FONT_HEIGHT, String.valueOf(endPos.getX())) );
-        guiList.add( endY = new GuiTextFieldWithDefault(4, this.fontRenderer, this.guiLeft + 165, this.guiTop + 35, 40, this.fontRenderer.FONT_HEIGHT, String.valueOf(startPos.getY())) );
-        guiList.add( endZ = new GuiTextFieldWithDefault(5, this.fontRenderer, this.guiLeft + 265, this.guiTop + 35, 40, this.fontRenderer.FONT_HEIGHT, String.valueOf(startPos.getZ())) );
+        guiList.add(startX = new GuiTextFieldWithDefault(0, this.fontRenderer, this.guiLeft + 65, this.guiTop + 15, 40, this.fontRenderer.FONT_HEIGHT, String.valueOf(startPos.getX())));
+        guiList.add(startY = new GuiTextFieldWithDefault(1, this.fontRenderer, this.guiLeft + 165, this.guiTop + 15, 40, this.fontRenderer.FONT_HEIGHT, String.valueOf(startPos.getY())));
+        guiList.add(startZ = new GuiTextFieldWithDefault(2, this.fontRenderer, this.guiLeft + 265, this.guiTop + 15, 40, this.fontRenderer.FONT_HEIGHT, String.valueOf(startPos.getZ())));
+        guiList.add(endX = new GuiTextFieldWithDefault(3, this.fontRenderer, this.guiLeft + 65, this.guiTop + 35, 40, this.fontRenderer.FONT_HEIGHT, String.valueOf(endPos.getX())) );
+        guiList.add(endY = new GuiTextFieldWithDefault(4, this.fontRenderer, this.guiLeft + 165, this.guiTop + 35, 40, this.fontRenderer.FONT_HEIGHT, String.valueOf(startPos.getY())));
+        guiList.add(endZ = new GuiTextFieldWithDefault(5, this.fontRenderer, this.guiLeft + 265, this.guiTop + 35, 40, this.fontRenderer.FONT_HEIGHT, String.valueOf(startPos.getZ())));
 
+        guiList.forEach(field -> children.add(field));
         updateTextFields();
         //NOTE: the id always has to be different or else it might get called twice or never!
         addButton(new GuiButtonAction(guiLeft + 45, guiTop + 60, 40, 20, "Ok", () -> {
@@ -190,9 +191,6 @@ public class CopyGUI extends GuiScreen {
                 endY.setText("");
             } else if (this.endZ.mouseClicked(mouseX, mouseY, 0)) {
                 endZ.setText("");
-            } else {
-                //startX.setFocused(false);
-                super.mouseClicked(mouseX, mouseY, mouseButton);
             }
         } else {
             if (this.startX.mouseClicked(mouseX, mouseY, mouseButton)) {
@@ -207,16 +205,24 @@ public class CopyGUI extends GuiScreen {
                 endY.setFocused(true);
             } else if (this.endZ.mouseClicked(mouseX, mouseY, mouseButton)) {
                 endZ.setFocused(true);
-            } else {
-                //startX.setFocused(false);
-                super.mouseClicked(mouseX, mouseY, mouseButton);
             }
         }
-        return true;
+        return super.mouseClicked(mouseX, mouseY, mouseButton);
     }
 
     @Override
     public boolean doesGuiPauseGame() {
         return false;
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+        startX.tick();
+        startY.tick();
+        startZ.tick();
+        endX.tick();
+        endY.tick();
+        endZ.tick();
     }
 }

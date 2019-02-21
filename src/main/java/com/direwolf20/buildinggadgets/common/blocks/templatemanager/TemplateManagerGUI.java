@@ -135,6 +135,7 @@ public class TemplateManagerGUI extends GuiContainer {
         this.nameField = new GuiTextField(0, this.fontRenderer, this.guiLeft + 8, this.guiTop + 6, 149, this.fontRenderer.FONT_HEIGHT);
         this.nameField.setMaxStringLength(50);
         this.nameField.setVisible(true);
+        children.add(nameField);
 
         helpTextProviders.add(new AreaHelpText(nameField, "field.template_name"));
 //      TODO 1.13
@@ -309,13 +310,6 @@ public class TemplateManagerGUI extends GuiContainer {
     }
 
     @Override
-    public boolean keyPressed(int p_keyPressed_1_, int p_keyPressed_2_, int p_keyPressed_3_) {
-        this.nameField.keyPressed(p_keyPressed_1_, p_keyPressed_2_, p_keyPressed_3_);
-
-        return super.keyPressed(p_keyPressed_1_, p_keyPressed_2_, p_keyPressed_3_);
-    }
-
-    @Override
     public boolean mouseClicked(double mouseX, double mouseY, int mouseButton) {
         if (this.nameField.mouseClicked(mouseX, mouseY, mouseButton)) {
             nameField.setFocused(true);
@@ -396,11 +390,10 @@ public class TemplateManagerGUI extends GuiContainer {
         return super.mouseScrolled(p_mouseScrolled_1_);
     }
 
-
     @Override
     public void tick() {
         super.tick();
-
+        nameField.tick();
         if (!panelClicked) {
             initRotX = rotX;
             initRotY = rotY;

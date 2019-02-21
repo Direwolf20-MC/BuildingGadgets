@@ -46,14 +46,17 @@ public class PasteGUI extends GuiScreen {
         X = new GuiTextField(0, this.fontRenderer, this.guiLeft + 80, this.guiTop + 100, 40, this.fontRenderer.FONT_HEIGHT);
         X.setMaxStringLength(50);
         X.setVisible(true);
+        children.add(X);
 
         Y = new GuiTextField(1, this.fontRenderer, this.guiLeft + 200, this.guiTop + 100, 40, this.fontRenderer.FONT_HEIGHT);
         Y.setMaxStringLength(50);
         Y.setVisible(true);
+        children.add(Y);
 
         Z = new GuiTextField(2, this.fontRenderer, this.guiLeft + 320, this.guiTop + 100, 40, this.fontRenderer.FONT_HEIGHT);
         Z.setMaxStringLength(50);
         Z.setVisible(true);
+        children.add(Z);
 
         nullCheckTextBoxes();
 
@@ -147,14 +150,6 @@ public class PasteGUI extends GuiScreen {
     }
 
     @Override
-    public boolean keyPressed(int p1, int p2, int p3) {
-        if (this.X.keyPressed(p1, p2, p3) || this.Y.keyPressed(p1, p2, p3) || this.Z.keyPressed(p1, p2, p3))
-            return false;
-
-        return super.keyPressed(p1, p2, p3);
-    }
-
-    @Override
     public boolean mouseClicked(double mouseX, double mouseY, int mouseButton) {
         if (mouseButton == 1) {
             if (this.X.mouseClicked(mouseX, mouseY, 0)) {
@@ -163,9 +158,6 @@ public class PasteGUI extends GuiScreen {
                 Y.setText("");
             } else if (this.Z.mouseClicked(mouseX, mouseY, 0)) {
                 Z.setText("");
-            } else {
-                //startX.setFocused(false);
-                super.mouseClicked(mouseX, mouseY, mouseButton);
             }
         } else {
             if (this.X.mouseClicked(mouseX, mouseY, mouseButton)) {
@@ -174,17 +166,21 @@ public class PasteGUI extends GuiScreen {
                 Y.setFocused(true);
             } else if (this.Z.mouseClicked(mouseX, mouseY, mouseButton)) {
                 Z.setFocused(true);
-            } else {
-                //startX.setFocused(false);
-                super.mouseClicked(mouseX, mouseY, mouseButton);
             }
         }
-
-        return true;
+        return super.mouseClicked(mouseX, mouseY, mouseButton);
     }
 
     @Override
     public boolean doesGuiPauseGame() {
         return false;
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+        X.tick();
+        Y.tick();
+        Z.tick();
     }
 }

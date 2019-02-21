@@ -47,23 +47,28 @@ public class DestructionGUI extends GuiScreen {
         left = new GuiTextField(0, this.fontRenderer, this.guiLeft + 80, this.guiTop + 60, 40, this.fontRenderer.FONT_HEIGHT);
         left.setMaxStringLength(50);
         left.setVisible(true);
+        children.add(left);
 
         right = new GuiTextField(1, this.fontRenderer, this.guiLeft + 320, this.guiTop + 60, 40, this.fontRenderer.FONT_HEIGHT);
         right.setMaxStringLength(50);
         right.setVisible(true);
+        children.add(right);
 
         up = new GuiTextField(2, this.fontRenderer, this.guiLeft + 200, this.guiTop + 30, 40, this.fontRenderer.FONT_HEIGHT);
         up.setMaxStringLength(50);
         up.setVisible(true);
+        children.add(up);
 
 
         down = new GuiTextField(3, this.fontRenderer, this.guiLeft + 200, this.guiTop + 90, 40, this.fontRenderer.FONT_HEIGHT);
         down.setMaxStringLength(50);
         down.setVisible(true);
+        children.add(down);
 
         depth = new GuiTextField(4, this.fontRenderer, this.guiLeft + 200, this.guiTop + 60, 40, this.fontRenderer.FONT_HEIGHT);
         depth.setMaxStringLength(50);
         depth.setVisible(true);
+        children.add(depth);
 
         nullCheckTextBoxes();
 
@@ -173,8 +178,6 @@ public class DestructionGUI extends GuiScreen {
                 down.setText("");
             } else if (this.depth.mouseClicked(mouseX, mouseY, 0)) {
                 depth.setText("");
-            } else {
-                super.mouseClicked(mouseX, mouseY, mouseButton);
             }
         } else {
             if (this.left.mouseClicked(mouseX, mouseY, mouseButton)) {
@@ -187,16 +190,23 @@ public class DestructionGUI extends GuiScreen {
                 down.setFocused(true);
             } else if (this.depth.mouseClicked(mouseX, mouseY, mouseButton)) {
                 depth.setFocused(true);
-            } else {
-                super.mouseClicked(mouseX, mouseY, mouseButton);
             }
         }
-
-        return true;
+        return super.mouseClicked(mouseX, mouseY, mouseButton);
     }
 
     @Override
     public boolean doesGuiPauseGame() {
         return false;
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+        left.tick();
+        right.tick();
+        up.tick();
+        down.tick();
+        depth.tick();
     }
 }
