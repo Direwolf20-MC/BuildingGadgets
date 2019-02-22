@@ -18,14 +18,11 @@ import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 
-public class PasteGUI extends GuiScreen {
+public class PasteGUI extends GuiScreenTextFields {
     public static final int WIDTH = 256;
     public static final int HEIGHT = 256;
 
-    private GuiTextField X;
-    private GuiTextField Y;
-    private GuiTextField Z;
-
+    private GuiTextFieldBase X, Y, Z;
 
     private int guiLeft = 15;
     private int guiTop = 50;
@@ -43,20 +40,9 @@ public class PasteGUI extends GuiScreen {
     public void initGui() {
         super.initGui();
 
-        X = new GuiTextField(0, this.fontRenderer, this.guiLeft + 80, this.guiTop + 100, 40, this.fontRenderer.FONT_HEIGHT);
-        X.setMaxStringLength(50);
-        X.setVisible(true);
-        children.add(X);
-
-        Y = new GuiTextField(1, this.fontRenderer, this.guiLeft + 200, this.guiTop + 100, 40, this.fontRenderer.FONT_HEIGHT);
-        Y.setMaxStringLength(50);
-        Y.setVisible(true);
-        children.add(Y);
-
-        Z = new GuiTextField(2, this.fontRenderer, this.guiLeft + 320, this.guiTop + 100, 40, this.fontRenderer.FONT_HEIGHT);
-        Z.setMaxStringLength(50);
-        Z.setVisible(true);
-        children.add(Z);
+        X = addField(80);
+        Y = addField(200);
+        Z = addField(320);
 
         nullCheckTextBoxes();
 
@@ -101,6 +87,10 @@ public class PasteGUI extends GuiScreen {
         }));
     }
 
+    private GuiTextFieldBase addField(int x) {
+        return addField(new GuiTextFieldBase(fontRenderer, guiLeft + x, guiTop + 100, 40));
+    }
+
     public void fieldChange(GuiTextField textField, int amount) {
         nullCheckTextBoxes();
         if (GuiScreen.isShiftKeyDown()) amount = amount * 10;
@@ -117,15 +107,15 @@ public class PasteGUI extends GuiScreen {
     @Override
     public void render(int mouseX, int mouseY, float partialTicks) {
         mc.getTextureManager().bindTexture(background);
-        //drawTexturedModalRect(guiLeft, guiTop, 0, 0, xSize, ySize);
-        this.X.drawTextField(mouseX, mouseY, partialTicks);
-        this.Y.drawTextField(mouseX, mouseY, partialTicks);
-        this.Z.drawTextField(mouseX, mouseY, partialTicks);
-        fontRenderer.drawStringWithShadow("X", this.guiLeft + 55, this.guiTop + 100, 0xFFFFFF);
-        fontRenderer.drawStringWithShadow("Y", this.guiLeft + 175, this.guiTop + 100, 0xFFFFFF);
-        fontRenderer.drawStringWithShadow("Z", this.guiLeft + 296, this.guiTop + 100, 0xFFFFFF);
+        drawFieldLable("X", 55);
+        drawFieldLable("Y", 175);
+        drawFieldLable("Z", 296);
 
         super.render(mouseX, mouseY, partialTicks);
+    }
+
+    private void drawFieldLable(String name, int x) {
+        fontRenderer.drawStringWithShadow(name, guiLeft + x, guiTop + 100, 0xFFFFFF);
     }
 
     protected void nullCheckTextBoxes() {
@@ -147,40 +137,5 @@ public class PasteGUI extends GuiScreen {
         if (Integer.parseInt(Y.getText()) > 16) return false;
         if (Integer.parseInt(X.getText()) < -16) return false;
         return Integer.parseInt(X.getText()) <= 16;
-    }
-
-    @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int mouseButton) {
-        if (mouseButton == 1) {
-            if (this.X.mouseClicked(mouseX, mouseY, 0)) {
-                X.setText("");
-            } else if (this.Y.mouseClicked(mouseX, mouseY, 0)) {
-                Y.setText("");
-            } else if (this.Z.mouseClicked(mouseX, mouseY, 0)) {
-                Z.setText("");
-            }
-        } else {
-            if (this.X.mouseClicked(mouseX, mouseY, mouseButton)) {
-                X.setFocused(true);
-            } else if (this.Y.mouseClicked(mouseX, mouseY, mouseButton)) {
-                Y.setFocused(true);
-            } else if (this.Z.mouseClicked(mouseX, mouseY, mouseButton)) {
-                Z.setFocused(true);
-            }
-        }
-        return super.mouseClicked(mouseX, mouseY, mouseButton);
-    }
-
-    @Override
-    public boolean doesGuiPauseGame() {
-        return false;
-    }
-
-    @Override
-    public void tick() {
-        super.tick();
-        X.tick();
-        Y.tick();
-        Z.tick();
     }
 }

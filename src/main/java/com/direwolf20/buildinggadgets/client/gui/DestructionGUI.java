@@ -20,13 +20,9 @@ import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 
-public class DestructionGUI extends GuiScreen {
+public class DestructionGUI extends GuiScreenTextFields {
 
-    private GuiTextField left;
-    private GuiTextField right;
-    private GuiTextField up;
-    private GuiTextField down;
-    private GuiTextField depth;
+    private GuiTextFieldBase left, right, up, down, depth;
 
     private int guiLeft = 15;
     private int guiTop = 50;
@@ -44,31 +40,11 @@ public class DestructionGUI extends GuiScreen {
     public void initGui() {
         super.initGui();
 
-        left = new GuiTextField(0, this.fontRenderer, this.guiLeft + 80, this.guiTop + 60, 40, this.fontRenderer.FONT_HEIGHT);
-        left.setMaxStringLength(50);
-        left.setVisible(true);
-        children.add(left);
-
-        right = new GuiTextField(1, this.fontRenderer, this.guiLeft + 320, this.guiTop + 60, 40, this.fontRenderer.FONT_HEIGHT);
-        right.setMaxStringLength(50);
-        right.setVisible(true);
-        children.add(right);
-
-        up = new GuiTextField(2, this.fontRenderer, this.guiLeft + 200, this.guiTop + 30, 40, this.fontRenderer.FONT_HEIGHT);
-        up.setMaxStringLength(50);
-        up.setVisible(true);
-        children.add(up);
-
-
-        down = new GuiTextField(3, this.fontRenderer, this.guiLeft + 200, this.guiTop + 90, 40, this.fontRenderer.FONT_HEIGHT);
-        down.setMaxStringLength(50);
-        down.setVisible(true);
-        children.add(down);
-
-        depth = new GuiTextField(4, this.fontRenderer, this.guiLeft + 200, this.guiTop + 60, 40, this.fontRenderer.FONT_HEIGHT);
-        depth.setMaxStringLength(50);
-        depth.setVisible(true);
-        children.add(depth);
+        left = addField(80, 60);
+        right = addField(320, 60);
+        up = addField(200, 30);
+        down = addField(200, 90);
+        depth = addField(200, 60);
 
         nullCheckTextBoxes();
 
@@ -82,16 +58,24 @@ public class DestructionGUI extends GuiScreen {
             }
         }));
         addButton(new GuiButtonAction(guiLeft + 245, guiTop + 125, 40, 20, I18n.format(GuiMod.getLangKeyButton("destruction", "cancel")), () -> close()));
-        addButton(new DireButton(guiLeft + 65, guiTop + 59, 10, 10, "-", () -> fieldChange(left, -1)));
-        addButton(new DireButton(guiLeft + 125, guiTop + 59, 10, 10, "+", () -> fieldChange(left, 1)));
-        addButton(new DireButton(guiLeft + 305, guiTop + 59, 10, 10, "-", () -> fieldChange(right, -1)));
-        addButton(new DireButton(guiLeft + 365, guiTop + 59, 10, 10, "+", () -> fieldChange(right, 1)));
-        addButton(new DireButton(guiLeft + 185, guiTop + 29, 10, 10, "-", () -> fieldChange(up, -1)));
-        addButton(new DireButton(guiLeft + 245, guiTop + 29, 10, 10, "+", () -> fieldChange(up, 1)));
-        addButton(new DireButton(guiLeft + 185, guiTop + 89, 10, 10, "-", () -> fieldChange(down, -1)));
-        addButton(new DireButton(guiLeft + 245, guiTop + 89, 10, 10, "+", () -> fieldChange(down, 1)));
-        addButton(new DireButton(guiLeft + 185, guiTop + 59, 10, 10, "-", () -> fieldChange(depth, -1)));
-        addButton(new DireButton(guiLeft + 245, guiTop + 59, 10, 10, "+", () -> fieldChange(depth, 1)));
+        addButton(65, 59, "-", () -> fieldChange(left, -1));
+        addButton(125, 59, "+", () -> fieldChange(left, 1));
+        addButton(305, 59, "-", () -> fieldChange(right, -1));
+        addButton(365, 59, "+", () -> fieldChange(right, 1));
+        addButton(185, 29, "-", () -> fieldChange(up, -1));
+        addButton(245, 29, "+", () -> fieldChange(up, 1));
+        addButton(185, 89, "-", () -> fieldChange(down, -1));
+        addButton(245, 89, "+", () -> fieldChange(down, 1));
+        addButton(185, 59, "-", () -> fieldChange(depth, -1));
+        addButton(245, 59, "+", () -> fieldChange(depth, 1));
+    }
+
+    private void addButton(int x, int y, String text, Runnable action) {
+        addButton(new DireButton(guiLeft + x, guiTop + y, 10, 10, text, action));
+    }
+
+    private GuiTextFieldBase addField(int x, int y) {
+        return addField(new GuiTextFieldBase(fontRenderer, guiLeft + x, guiTop + y, 40));
     }
 
     private void fieldChange(GuiTextField textField, int amount) {
@@ -111,12 +95,6 @@ public class DestructionGUI extends GuiScreen {
     @Override
     public void render(int mouseX, int mouseY, float partialTicks) {
         mc.getTextureManager().bindTexture(background);
-
-        this.left.drawTextField(mouseX, mouseY, partialTicks);
-        this.right.drawTextField(mouseX, mouseY, partialTicks);
-        this.up.drawTextField(mouseX, mouseY, partialTicks);
-        this.down.drawTextField(mouseX, mouseY, partialTicks);
-        this.depth.drawTextField(mouseX, mouseY, partialTicks);
 
         drawFieldLable("left", 35, 60);
         drawFieldLable("right", 278, 60);
@@ -163,50 +141,5 @@ public class DestructionGUI extends GuiScreen {
         if (Integer.parseInt(depth.getText()) < 0) return false;
 
         return true;
-    }
-
-    @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int mouseButton) {
-        if (mouseButton == 1) {
-            if (this.left.mouseClicked(mouseX, mouseY, 0)) {
-                left.setText("");
-            } else if (this.right.mouseClicked(mouseX, mouseY, 0)) {
-                right.setText("");
-            } else if (this.up.mouseClicked(mouseX, mouseY, 0)) {
-                up.setText("");
-            } else if (this.down.mouseClicked(mouseX, mouseY, 0)) {
-                down.setText("");
-            } else if (this.depth.mouseClicked(mouseX, mouseY, 0)) {
-                depth.setText("");
-            }
-        } else {
-            if (this.left.mouseClicked(mouseX, mouseY, mouseButton)) {
-                left.setFocused(true);
-            } else if (this.right.mouseClicked(mouseX, mouseY, mouseButton)) {
-                right.setFocused(true);
-            } else if (this.up.mouseClicked(mouseX, mouseY, mouseButton)) {
-                up.setFocused(true);
-            } else if (this.down.mouseClicked(mouseX, mouseY, mouseButton)) {
-                down.setFocused(true);
-            } else if (this.depth.mouseClicked(mouseX, mouseY, mouseButton)) {
-                depth.setFocused(true);
-            }
-        }
-        return super.mouseClicked(mouseX, mouseY, mouseButton);
-    }
-
-    @Override
-    public boolean doesGuiPauseGame() {
-        return false;
-    }
-
-    @Override
-    public void tick() {
-        super.tick();
-        left.tick();
-        right.tick();
-        up.tick();
-        down.tick();
-        depth.tick();
     }
 }

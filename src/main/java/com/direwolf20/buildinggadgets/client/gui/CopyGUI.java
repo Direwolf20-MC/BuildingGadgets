@@ -21,16 +21,8 @@ import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class CopyGUI extends GuiScreen {
-    private GuiTextFieldWithDefault startX;
-    private GuiTextFieldWithDefault startY;
-    private GuiTextFieldWithDefault startZ;
-    private GuiTextFieldWithDefault endX;
-    private GuiTextFieldWithDefault endY;
-    private GuiTextFieldWithDefault endZ;
+public class CopyGUI extends GuiScreenTextFields {
+    private GuiTextFieldBase startX, startY, startZ, endX, endY, endZ;
 
     private boolean absoluteCoords = Config.GENERAL.absoluteCoordDefault.get();
 
@@ -42,7 +34,6 @@ public class CopyGUI extends GuiScreen {
     private BlockPos endPos;
 
     private static final ResourceLocation background = new ResourceLocation(BuildingGadgets.MODID, "textures/gui/testcontainer.png");
-    private List<GuiTextFieldWithDefault> guiList = new ArrayList<>();
 
     public CopyGUI(ItemStack tool) {
         super();
@@ -59,14 +50,13 @@ public class CopyGUI extends GuiScreen {
         if (startPos == null) startPos = new BlockPos(0, 0, 0);
         if (endPos == null) endPos = new BlockPos(0, 0, 0);
 
-        guiList.add(startX = new GuiTextFieldWithDefault(0, this.fontRenderer, this.guiLeft + 65, this.guiTop + 15, 40, this.fontRenderer.FONT_HEIGHT, String.valueOf(startPos.getX())));
-        guiList.add(startY = new GuiTextFieldWithDefault(1, this.fontRenderer, this.guiLeft + 165, this.guiTop + 15, 40, this.fontRenderer.FONT_HEIGHT, String.valueOf(startPos.getY())));
-        guiList.add(startZ = new GuiTextFieldWithDefault(2, this.fontRenderer, this.guiLeft + 265, this.guiTop + 15, 40, this.fontRenderer.FONT_HEIGHT, String.valueOf(startPos.getZ())));
-        guiList.add(endX = new GuiTextFieldWithDefault(3, this.fontRenderer, this.guiLeft + 65, this.guiTop + 35, 40, this.fontRenderer.FONT_HEIGHT, String.valueOf(endPos.getX())) );
-        guiList.add(endY = new GuiTextFieldWithDefault(4, this.fontRenderer, this.guiLeft + 165, this.guiTop + 35, 40, this.fontRenderer.FONT_HEIGHT, String.valueOf(startPos.getY())));
-        guiList.add(endZ = new GuiTextFieldWithDefault(5, this.fontRenderer, this.guiLeft + 265, this.guiTop + 35, 40, this.fontRenderer.FONT_HEIGHT, String.valueOf(startPos.getZ())));
+        startX = addField(65, 15, startPos.getX());
+        startY = addField(165, 15, startPos.getY());
+        startZ = addField(265, 15, startPos.getZ());
+        endX = addField(65, 35, endPos.getX());
+        endY = addField(165, 35, endPos.getY());
+        endZ = addField(265, 35, endPos.getZ());
 
-        guiList.forEach(field -> children.add(field));
         updateTextFields();
         //NOTE: the id always has to be different or else it might get called twice or never!
         addButton(new GuiButtonAction(guiLeft + 45, guiTop + 60, 40, 20, "Ok", () -> {
@@ -93,18 +83,26 @@ public class CopyGUI extends GuiScreen {
             coordsModeSwitch();
             updateTextFields();
         }));
-        addButton(new DireButton(guiLeft + 50, guiTop + 14, 10, 10, "-", () -> fieldChange(startX, -1)));
-        addButton(new DireButton(guiLeft + 110, guiTop + 14, 10, 10, "+", () -> fieldChange(startX, 1)));
-        addButton(new DireButton(guiLeft + 150, guiTop + 14, 10, 10, "-", () -> fieldChange(startY, -1)));
-        addButton(new DireButton(guiLeft + 210, guiTop + 14, 10, 10, "+", () -> fieldChange(startY, 1)));
-        addButton(new DireButton(guiLeft + 250, guiTop + 14, 10, 10, "-", () -> fieldChange(startZ, -1)));
-        addButton(new DireButton(guiLeft + 310, guiTop + 14, 10, 10, "+", () -> fieldChange(startZ, 1)));
-        addButton(new DireButton(guiLeft + 50, guiTop + 34, 10, 10, "-", () -> fieldChange(endX, -1)));
-        addButton(new DireButton(guiLeft + 110, guiTop + 34, 10, 10, "+", () -> fieldChange(endX, 1)));
-        addButton(new DireButton(guiLeft + 150, guiTop + 34, 10, 10, "-", () -> fieldChange(endY, -1)));
-        addButton(new DireButton(guiLeft + 210, guiTop + 34, 10, 10, "+", () -> fieldChange(endY, 1)));
-        addButton(new DireButton(guiLeft + 250, guiTop + 34, 10, 10, "-", () -> fieldChange(endZ, -1)));
-        addButton(new DireButton(guiLeft + 310, guiTop + 34, 10, 10, "+", () -> fieldChange(endZ, 1)));
+        addButton(50, 14, "-", () -> fieldChange(startX, -1));
+        addButton(110, 14, "+", () -> fieldChange(startX, 1));
+        addButton(150, 14, "-", () -> fieldChange(startY, -1));
+        addButton(210, 14, "+", () -> fieldChange(startY, 1));
+        addButton(250, 14, "-", () -> fieldChange(startZ, -1));
+        addButton(310, 14, "+", () -> fieldChange(startZ, 1));
+        addButton(50, 34, "-", () -> fieldChange(endX, -1));
+        addButton(110, 34, "+", () -> fieldChange(endX, 1));
+        addButton(150, 34, "-", () -> fieldChange(endY, -1));
+        addButton(210, 34, "+", () -> fieldChange(endY, 1));
+        addButton(250, 34, "-", () -> fieldChange(endZ, -1));
+        addButton(310, 34, "+", () -> fieldChange(endZ, 1));
+    }
+
+    private void addButton(int x, int y, String text, Runnable action) {
+        addButton(new DireButton(guiLeft + x, guiTop + y, 10, 10, text, action));
+    }
+
+    private GuiTextFieldBase addField(int x, int y, int defaultint) {
+        return addField(new GuiTextFieldBase(fontRenderer, guiLeft + x, guiTop + y, 40).setDefaultInt(defaultint));
     }
 
     private void fieldChange(GuiTextField textField, int amount) {
@@ -122,26 +120,23 @@ public class CopyGUI extends GuiScreen {
     @Override
     public void render(int mouseX, int mouseY, float partialTicks) {
         mc.getTextureManager().bindTexture(background);
-        //drawTexturedModalRect(guiLeft, guiTop, 0, 0, xSize, ySize);
-        this.startX.drawTextField(mouseX, mouseY, partialTicks);
-        this.startY.drawTextField(mouseX, mouseY, partialTicks);
-        this.startZ.drawTextField(mouseX, mouseY, partialTicks);
-        this.endX.drawTextField(mouseX, mouseY, partialTicks);
-        this.endY.drawTextField(mouseX, mouseY, partialTicks);
-        this.endZ.drawTextField(mouseX, mouseY, partialTicks);
-        fontRenderer.drawStringWithShadow("Start X", this.guiLeft, this.guiTop + 15, 0xFFFFFF);
-        fontRenderer.drawStringWithShadow("Y", this.guiLeft + 131, this.guiTop + 15, 0xFFFFFF);
-        fontRenderer.drawStringWithShadow("Z", this.guiLeft + 231, this.guiTop + 15, 0xFFFFFF);
-        fontRenderer.drawStringWithShadow("End X", this.guiLeft + 8, this.guiTop + 35, 0xFFFFFF);
-        fontRenderer.drawStringWithShadow("Y", this.guiLeft + 131, this.guiTop + 35, 0xFFFFFF);
-        fontRenderer.drawStringWithShadow("Z", this.guiLeft + 231, this.guiTop + 35, 0xFFFFFF);
+        drawFieldLable("Start X", 0, 15);
+        drawFieldLable("Y", 131, 15);
+        drawFieldLable("Z", 231, 15);
+        drawFieldLable("End X", 8, 35);
+        drawFieldLable("Y", 131, 35);
+        drawFieldLable("Z", 231, 35);
         super.render(mouseX, mouseY, partialTicks);
     }
 
+    private void drawFieldLable(String name, int x, int y) {
+        fontRenderer.drawStringWithShadow(name, guiLeft + x, guiTop + y, 0xFFFFFF);
+    }
+
     private void clearTextBoxes() {
-        guiList.forEach(item -> {
-            if (item.getText().equals(""))
-                item.setText(String.valueOf(absoluteCoords ? item.getDefaultValue() : "0"));
+        forEachField(field -> {
+            if (field.getText().equals(""))
+                field.setText(String.valueOf(absoluteCoords ? field.getDefaultValue() : "0"));
         });
     }
 
@@ -174,55 +169,5 @@ public class CopyGUI extends GuiScreen {
             z = endZ.getText() != "" ? String.valueOf(Integer.parseInt(endZ.getText()) - startPos.getZ()) : String.valueOf(endPos.getZ() - startPos.getZ());
             endZ.setText(z);
         }
-    }
-
-    @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int mouseButton) {
-        if (mouseButton == 1) {
-            if (this.startX.mouseClicked(mouseX, mouseY, 0)) {
-                startX.setText("");
-            } else if (this.startY.mouseClicked(mouseX, mouseY, 0)) {
-                startY.setText("");
-            } else if (this.startZ.mouseClicked(mouseX, mouseY, 0)) {
-                startZ.setText("");
-            } else if (this.endX.mouseClicked(mouseX, mouseY, 0)) {
-                endX.setText("");
-            } else if (this.endY.mouseClicked(mouseX, mouseY, 0)) {
-                endY.setText("");
-            } else if (this.endZ.mouseClicked(mouseX, mouseY, 0)) {
-                endZ.setText("");
-            }
-        } else {
-            if (this.startX.mouseClicked(mouseX, mouseY, mouseButton)) {
-                startX.setFocused(true);
-            } else if (this.startY.mouseClicked(mouseX, mouseY, mouseButton)) {
-                startY.setFocused(true);
-            } else if (this.startZ.mouseClicked(mouseX, mouseY, mouseButton)) {
-                startZ.setFocused(true);
-            } else if (this.endX.mouseClicked(mouseX, mouseY, mouseButton)) {
-                endX.setFocused(true);
-            } else if (this.endY.mouseClicked(mouseX, mouseY, mouseButton)) {
-                endY.setFocused(true);
-            } else if (this.endZ.mouseClicked(mouseX, mouseY, mouseButton)) {
-                endZ.setFocused(true);
-            }
-        }
-        return super.mouseClicked(mouseX, mouseY, mouseButton);
-    }
-
-    @Override
-    public boolean doesGuiPauseGame() {
-        return false;
-    }
-
-    @Override
-    public void tick() {
-        super.tick();
-        startX.tick();
-        startY.tick();
-        startZ.tick();
-        endX.tick();
-        endY.tick();
-        endZ.tick();
     }
 }
