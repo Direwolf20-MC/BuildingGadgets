@@ -1,6 +1,5 @@
 package com.direwolf20.buildinggadgets.common.items.gadgets;
 
-import com.direwolf20.buildinggadgets.client.gui.FluidPlacementMode;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.items.capability.CapabilityProviderEnergy;
 import com.direwolf20.buildinggadgets.common.tools.LiquidInteractions;
