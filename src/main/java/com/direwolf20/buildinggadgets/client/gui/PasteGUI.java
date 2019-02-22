@@ -49,8 +49,8 @@ public class PasteGUI extends GuiScreenTextFields {
         addButton(new GuiButtonAction(guiLeft + 80, guiTop + 125, 40, 20, "Ok", () -> {
             nullCheckTextBoxes();
             if (sizeCheckBoxes()) {
-            PacketHandler.sendToServer(new PacketPasteGUI(Integer.parseInt(X.getText()), Integer.parseInt(Y.getText()), Integer.parseInt(Z.getText())));
-                mc.displayGuiScreen(null);
+                PacketHandler.sendToServer(new PacketPasteGUI(Integer.parseInt(X.getText()), Integer.parseInt(Y.getText()), Integer.parseInt(Z.getText())));
+                close();
             } else {
                 Minecraft.getInstance().player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.destroysizeerror").getUnformattedComponentText()), true);
             }
@@ -100,7 +100,7 @@ public class PasteGUI extends GuiScreenTextFields {
             if (i > 16) i = 16;
             textField.setText(String.valueOf(i));
         } catch (NumberFormatException t) {
-            this.mc.displayGuiScreen(null);
+            close();
         }
     }
 

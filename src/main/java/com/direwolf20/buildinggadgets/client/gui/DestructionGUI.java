@@ -88,7 +88,7 @@ public class DestructionGUI extends GuiScreenTextFields {
             if (i > 16) i = 16;
             textField.setText(String.valueOf(i));
         } catch (NumberFormatException t) {
-            this.mc.displayGuiScreen(null);
+            close();
         }
     }
 

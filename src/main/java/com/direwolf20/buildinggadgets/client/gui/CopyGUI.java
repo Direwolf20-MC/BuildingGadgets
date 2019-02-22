@@ -113,7 +113,7 @@ public class CopyGUI extends GuiScreenTextFields {
             i = i + amount;
             textField.setText(String.valueOf(i));
         } catch (Throwable t) {
-            this.mc.displayGuiScreen(null);
+            close();
         }
     }
 
