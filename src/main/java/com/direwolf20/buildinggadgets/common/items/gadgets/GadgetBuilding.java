@@ -22,7 +22,6 @@ import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceFluidMode;
 import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.Vec3i;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
@@ -31,7 +30,6 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldType;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.BlockSnapshot;
-import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.world.BlockEvent;
 
@@ -178,7 +176,7 @@ public class GadgetBuilding extends GadgetGeneric {
         List<BlockPos> coords = getAnchor(stack);
 
         if (coords.size() == 0) {  //If we don't have an anchor, build in the current spot
-            LiquidInteractions.GadgetBuilding fluidPlacementMode = this.getFluidPlacementMode(stack);
+            LiquidInteractions.GadgetBuilding fluidPlacementMode = getFluidPlacementMode(stack);
             RayTraceResult lookingAt;
             if (fluidPlacementMode == LiquidInteractions.GadgetBuilding.IGNORE) {
                 lookingAt = VectorUtil.getLookingAt(player);
@@ -217,9 +215,8 @@ public class GadgetBuilding extends GadgetGeneric {
                     } catch (Exception var8) {
                     }
                 }
-                //Get the extended block state in the fake world
-                //Disabled to fix Chisel
-                //state = state.getBlock().getExtendedState(state, fakeWorld, coordinate);
+                //Get the extended block state in the fake world, Disabled to fix Chisel, state = state.getBlock().getExtendedState(state, fakeWorld, coordinate);
+
                 if (placeBlock(world, player, coordinate, state)) {
                     undoCoords.add(coordinate);//If we successfully place the block, add the location to the undo list.
                 }
@@ -362,8 +359,6 @@ public class GadgetBuilding extends GadgetGeneric {
     public static void setFluidInteractionMode(ItemStack stack, Byte mode) {
         NBTUtil.getOrNewTag(stack).setByte("fluidInteractionMode", mode);
     }
-
-
 
     @Override
     public int getUseDuration(ItemStack stack) {
