@@ -178,9 +178,9 @@ public class GadgetBuilding extends GadgetGeneric {
         List<BlockPos> coords = getAnchor(stack);
 
         if (coords.size() == 0) {  //If we don't have an anchor, build in the current spot
-            byte fluidPlacementMode = NBTUtil.getOrNewTag(stack).getByte("fluidInteractionMode");
+            LiquidInteractions.GadgetBuilding fluidPlacementMode = this.getFluidPlacementMode(stack);
             RayTraceResult lookingAt;
-            if (fluidPlacementMode == 0) {
+            if (fluidPlacementMode == LiquidInteractions.GadgetBuilding.IGNORE) {
                 lookingAt = VectorUtil.getLookingAt(player);
             } else {
                 lookingAt = VectorUtil.getLookingAt(player, RayTraceFluidMode.ALWAYS);
@@ -189,8 +189,8 @@ public class GadgetBuilding extends GadgetGeneric {
                 return false;
             }
             BlockPos startBlock = lookingAt.getBlockPos();
-            if (fluidPlacementMode == 1) {
-                startBlock = new BlockPos(startBlock.getX(), startBlock.getY()-1, startBlock.getZ());
+            if (fluidPlacementMode == LiquidInteractions.GadgetBuilding.REPLACE_TOP) {
+                startBlock = new BlockPos(startBlock.getX(), startBlock.getY() - 1, startBlock.getZ());
             }
             EnumFacing sideHit = lookingAt.sideHit;
             coords = BuildingModes.getBuildOrders(world, player, startBlock, sideHit, stack);
@@ -233,7 +233,12 @@ public class GadgetBuilding extends GadgetGeneric {
         Sorter.Blocks.byDistance(coords, player);
         return true;
     }
-
+    public static void setFluidPlacementMode(LiquidInteractions.GadgetBuilding mode, ItemStack stack) {
+        NBTUtil.getOrNewTag(stack).setByte("fluidInteractionMode", LiquidInteractions.GadgetBuilding.getID(mode));
+    }
+    public static LiquidInteractions.GadgetBuilding getFluidPlacementMode(ItemStack stack) {
+        return LiquidInteractions.GadgetBuilding.idToEnum(NBTUtil.getOrNewTag(stack).getByte("fluidInteractionMode"));
+    }
     public static boolean undoBuild(EntityPlayer player) {
         ItemStack heldItem = getGadget(player);
         if (heldItem.isEmpty())

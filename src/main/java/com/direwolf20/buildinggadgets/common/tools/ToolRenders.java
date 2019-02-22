@@ -100,9 +100,9 @@ public class ToolRenders {
             dispatcher.renderBlockBrightness(Blocks.YELLOW_STAINED_GLASS.getDefaultState(), 1f);
             GlStateManager.popMatrix();
         }
-        byte flIntState = NBTUtil.getOrNewTag(heldItem).getByte("fluidInteractionMode");
+        LiquidInteractions.GadgetBuilding flIntState = GadgetBuilding.getFluidPlacementMode(heldItem);
         RayTraceResult lookingAt;
-        if (flIntState == 0) {
+        if (flIntState == LiquidInteractions.GadgetBuilding.IGNORE) {
             lookingAt = VectorUtil.getLookingAt(player);
         } else {
             lookingAt = VectorUtil.getLookingAt(player, RayTraceFluidMode.ALWAYS);
@@ -113,7 +113,7 @@ public class ToolRenders {
             World world = player.world;
             IBlockState startBlock = Blocks.AIR.getDefaultState();
             if (!(lookingAt == null)) {
-                if (flIntState == 1) {
+                if (flIntState == LiquidInteractions.GadgetBuilding.REPLACE_TOP) {
                     startBlock = world.getBlockState(lookingAt.getBlockPos().add(0, -1, 0));
                 } else {
                     startBlock = world.getBlockState(lookingAt.getBlockPos());
@@ -127,7 +127,7 @@ public class ToolRenders {
                 }
                 if (coordinates.size() == 0 && lookingAt != null) { //Build a list of coordinates based on the tool mode and range
                     BlockPos block;
-                    if (flIntState == 1) {
+                    if (flIntState == LiquidInteractions.GadgetBuilding.REPLACE_TOP) {
                         block = lookingAt.getBlockPos().add(0, -1, 0);
                     } else {
                         block = lookingAt.getBlockPos();

@@ -3,6 +3,7 @@ package com.direwolf20.buildinggadgets.common.items.gadgets;
 import com.direwolf20.buildinggadgets.client.gui.FluidPlacementMode;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.items.capability.CapabilityProviderEnergy;
+import com.direwolf20.buildinggadgets.common.tools.LiquidInteractions;
 import com.direwolf20.buildinggadgets.common.utils.NBTUtil;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
@@ -132,8 +133,8 @@ public abstract class GadgetGeneric extends Item {
         return NBTUtil.getOrNewTag(stack).getBoolean("fuzzy");
     }
 
-    public static byte getFluidInteractionMode(ItemStack stack) {
-        return NBTUtil.getOrNewTag(stack).getByte("fluidInteractionMode");
+    public static LiquidInteractions.GadgetGeneric getFluidInteractionMode(ItemStack stack) {
+        return LiquidInteractions.GadgetGeneric.idToEnum(NBTUtil.getOrNewTag(stack).getByte("fluidInteractionMode"));
     }
 
     public static void toggleFuzzy(EntityPlayer player, ItemStack stack) {
@@ -145,7 +146,7 @@ public abstract class GadgetGeneric extends Item {
         return !NBTUtil.getOrNewTag(stack).getBoolean("unconnectedarea");
     }
 
-    public static void setFluidPlacementMode(ItemStack stack, byte mode) { NBTUtil.getOrNewTag(stack).setByte("fluidInteractionMode", mode); }
+    public static void setFluidPlacementMode(ItemStack stack, LiquidInteractions.GadgetGeneric mode) { NBTUtil.getOrNewTag(stack).setByte("fluidInteractionMode", LiquidInteractions.GadgetGeneric.getID(mode)); }
 
     public static void toggleConnectedArea(EntityPlayer player, ItemStack stack) {
         NBTUtil.getOrNewTag(stack).setBoolean("unconnectedarea", getConnectedArea(stack));
