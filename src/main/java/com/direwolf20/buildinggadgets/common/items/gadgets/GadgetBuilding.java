@@ -158,11 +158,12 @@ public class GadgetBuilding extends GadgetGeneric {
     public static void rangeChange(EntityPlayer player, ItemStack heldItem) {
         //Called when the range change hotkey is pressed
         int range = getToolRange(heldItem);
-        if (player.isSneaking()) {
-            range = (range == 1) ? Config.GADGETS.maxRange.get() : range - 1;
-        } else {
-            range = (range >= Config.GADGETS.maxRange.get()) ? 1 : range + 1;
-        }
+        int changeAmount = (getToolMode(heldItem) != ToolMode.Surface || (range % 2 == 0)) ? 1 : 2;
+        if (player.isSneaking())
+            range = (range == 1) ? Config.GADGETS.maxRange.get() : range - changeAmount;
+        else
+            range = (range >= Config.GADGETS.maxRange.get()) ? 1 : range + changeAmount;
+
         setToolRange(heldItem, range);
         player.sendStatusMessage(new TextComponentString(TextFormatting.DARK_AQUA + new TextComponentTranslation("message.gadget.toolrange").getUnformattedComponentText() + ": " + range), true);
     }
