@@ -74,11 +74,13 @@ public class BuildingGadgets {
 
         MinecraftForge.EVENT_BUS.register(new AnvilRepairHandler());
 
+
         MinecraftForge.EVENT_BUS.register(this);
         // Client only registering
         DistExecutor.runWhenOn(Dist.CLIENT, () -> () -> {
             eventBus.addListener((Consumer<FMLClientSetupEvent>) (event -> clientInit(event, eventBus)));
             ModLoadingContext.get().registerExtensionPoint(ExtensionPoint.GUIFACTORY, () -> GuiMod::openScreen);
+            MinecraftForge.EVENT_BUS.addListener((Consumer<ModelRegistryEvent>) ClientProxy::registerModels);
         });
 
         loadConfig(Config.CLIENT_CONFIG, FMLPaths.CONFIGDIR.get().resolve("buildinggadgets-client.toml"));
