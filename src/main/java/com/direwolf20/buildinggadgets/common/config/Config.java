@@ -299,14 +299,15 @@ public class Config {
             blockWhitelist = SERVER_BUILDER
                     .comment("Allows you to define a whitelist, allowing Patterns to be defined in the same way as the blacklist.")
                     .translation(LANG_KEY_BLACKLIST + ".blockWhitelist")
-                    .defineList("Whitelisted Blocks",ImmutableList.of("*"),obj -> obj instanceof String);
+                    .defineList("Whitelisted Blocks",ImmutableList.of(".*"),obj -> obj instanceof String);
 
             SERVER_BUILDER.pop();
         }
 
         private void parseBlacklists() {
             parsedBlacklist = PatternList.ofResourcePattern(blockBlacklist.get());
-            parsedWhitelist = PatternList.ofResourcePattern(blockWhitelist.get());
+            //TODO update once Forge allows trailing .'s
+            parsedWhitelist = PatternList.ofResourcePattern(ImmutableList.of(".*")/*blockWhitelist.get()*/);
         }
 
         public boolean isAllowedBlock(Block block) {

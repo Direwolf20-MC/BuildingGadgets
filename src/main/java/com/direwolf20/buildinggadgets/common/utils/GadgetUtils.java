@@ -1,6 +1,7 @@
 package com.direwolf20.buildinggadgets.common.utils;
 
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
+import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetBuilding;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetExchanger;
 import com.direwolf20.buildinggadgets.common.tools.*;
@@ -264,8 +265,7 @@ public class GadgetUtils {
             return;
 
         IBlockState state = world.getBlockState(pos);
-        //if (result == EnumActionResult.FAIL || !Config.BLACKLIST.isAllowedBlock(state.getBlock())) { //TODO Config Blacklist
-        if (result == EnumActionResult.FAIL) {
+        if (result == EnumActionResult.FAIL || !Config.BLACKLIST.isAllowedBlock(state.getBlock())) {
             player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.invalidblock").getUnformattedComponentText()), true);
             return;
         }
@@ -344,13 +344,14 @@ public class GadgetUtils {
         BlockPos pos = getPOSFromNBT(tool, "boundTE");
         return pos == null ? null : getRemoteInventory(pos, dim, world /*, operation*/);
     }
+
     @Nullable
     public static IItemHandler getRemoteInventory(BlockPos pos, ResourceLocation dim, World world) {
         return getRemoteInventory(pos, dim, world, NetworkIO.Operation.EXTRACT);
     }
+
     @Nullable
     public static IItemHandler getRemoteInventory(BlockPos pos, ResourceLocation dimName, World world, NetworkIO.Operation operation) {
-
         DimensionType dim = DimensionType.byName(dimName);
         if (dim == null) return null;
         MinecraftServer server = world.getServer();
