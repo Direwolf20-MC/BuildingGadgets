@@ -9,13 +9,12 @@ import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetDestruction;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketDestructionGUI;
-import com.direwolf20.buildinggadgets.common.utils.Utils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
@@ -51,7 +50,7 @@ public class DestructionGUI extends GuiScreenTextFields {
         addButton(new GuiButtonAction(guiLeft + 145, guiTop + 125, 40, 20, I18n.format(GuiMod.getLangKeyButton("destruction", "confirm")), () -> {
             nullCheckTextBoxes();
             if (sizeCheckBoxes()) {
-                PacketHandler.sendToServer(new PacketDestructionGUI(Integer.parseInt(left.getText()), Integer.parseInt(right.getText()), Integer.parseInt(up.getText()), Integer.parseInt(down.getText()), Integer.parseInt(depth.getText())));
+                PacketHandler.sendToServer(new PacketDestructionGUI(left.getInt(), right.getInt(), up.getInt(), down.getInt(), depth.getInt()));
                 mc.displayGuiScreen(null);
             } else {
                 Minecraft.getInstance().player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.destroysizeerror").getUnformattedComponentText()), true);
@@ -75,21 +74,20 @@ public class DestructionGUI extends GuiScreenTextFields {
     }
 
     private GuiTextFieldBase addField(int x, int y) {
-        return addField(new GuiTextFieldBase(fontRenderer, guiLeft + x, guiTop + y, 40));
+        return addField(new GuiTextFieldBase(fontRenderer, guiLeft + x, guiTop + y, 40).restrictToNumeric().onPostModification((field, valueOld) -> {
+            if (!sizeCheckBoxes() && valueOld != null)
+                field.setText(valueOld);
+        }));
     }
 
-    private void fieldChange(GuiTextField textField, int amount) {
+    private void fieldChange(GuiTextFieldBase field, int amount) {
         nullCheckTextBoxes();
-        if (GuiScreen.isShiftKeyDown()) amount = amount * 10;
-        try {
-            int i = Integer.valueOf(textField.getText());
-            i = i + amount;
-            if (i < 0) i = 0;
-            if (i > 16) i = 16;
-            textField.setText(String.valueOf(i));
-        } catch (NumberFormatException t) {
-            close();
-        }
+        if (GuiScreen.isShiftKeyDown()) amount *= 10;
+        int n = field.getInt();
+        int i = MathHelper.clamp(n + amount, -16, 16);
+        field.setText(String.valueOf(i));
+        if (!sizeCheckBoxes())
+            field.setText(String.valueOf(n));
     }
 
     @Override
@@ -110,36 +108,17 @@ public class DestructionGUI extends GuiScreenTextFields {
     }
 
     private void nullCheckTextBoxes() {
-        if (left.getText().isEmpty()) {
-            left.setText(String.valueOf(GadgetDestruction.getToolValue(destructionTool, "left")));
-        }
-        if (right.getText().isEmpty()) {
-            right.setText(String.valueOf(GadgetDestruction.getToolValue(destructionTool, "right")));
-        }
-        if (up.getText().isEmpty()) {
-            up.setText(String.valueOf(GadgetDestruction.getToolValue(destructionTool, "up")));
-        }
-        if (down.getText().isEmpty()) {
-            down.setText(String.valueOf(GadgetDestruction.getToolValue(destructionTool, "down")));
-        }
-        if (depth.getText().isEmpty()) {
-            depth.setText(String.valueOf(GadgetDestruction.getToolValue(destructionTool, "depth")));
-        }
+        GuiMod.setEmptyField(left, () -> GadgetDestruction.getToolValue(destructionTool, "left"));
+        GuiMod.setEmptyField(right, () -> GadgetDestruction.getToolValue(destructionTool, "right"));
+        GuiMod.setEmptyField(up, () -> GadgetDestruction.getToolValue(destructionTool, "up"));
+        GuiMod.setEmptyField(down, () -> GadgetDestruction.getToolValue(destructionTool, "down"));
+        GuiMod.setEmptyField(depth, () -> GadgetDestruction.getToolValue(destructionTool, "depth"));
     }
 
     private boolean sizeCheckBoxes() {
-        if( !Utils.isStringNumeric(left.getText()) || !Utils.isStringNumeric(right.getText()) || !Utils.isStringNumeric(up.getText()) || !Utils.isStringNumeric(down.getText()) || !Utils.isStringNumeric(depth.getText()) )
+        if (depth.getInt() > 16 || left.getInt() + right.getInt() > 16 || up.getInt() + down.getInt() > 16)
             return false;
 
-        if (Integer.parseInt(left.getText()) + Integer.parseInt(right.getText()) > 16) return false;
-        if (Integer.parseInt(up.getText()) + Integer.parseInt(down.getText()) > 16) return false;
-        if (Integer.parseInt(depth.getText()) > 16) return false;
-        if (Integer.parseInt(left.getText()) < 0) return false;
-        if (Integer.parseInt(right.getText()) < 0) return false;
-        if (Integer.parseInt(up.getText()) < 0) return false;
-        if (Integer.parseInt(down.getText()) < 0) return false;
-        if (Integer.parseInt(depth.getText()) < 0) return false;
-
-        return true;
+        return GuiMod.sizeCheckBoxes(getFieldIterator(), 0, Integer.MAX_VALUE);
     }
 }
