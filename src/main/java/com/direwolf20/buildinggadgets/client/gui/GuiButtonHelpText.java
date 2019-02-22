@@ -1,13 +1,15 @@
 package com.direwolf20.buildinggadgets.client.gui;
 
-import net.minecraft.client.gui.Gui;
-import net.minecraft.client.gui.GuiButton;
+import javax.annotation.Nullable;
 
-public class GuiButtonHelpText extends GuiButton implements IHoverHelpText {
+import net.minecraft.client.gui.Gui;
+import net.minecraft.client.resources.I18n;
+
+public class GuiButtonHelpText extends GuiButtonAction implements IHoverHelpText {
     private String helpTextKey;
 
-    public GuiButtonHelpText(int buttonId, int x, int y, int widthIn, int heightIn, String buttonText, String helpTextKey) {
-        super(buttonId, x, y, widthIn, heightIn, buttonText);
+    public GuiButtonHelpText(int x, int y, int widthIn, int heightIn, String buttonText, String helpTextKey, @Nullable Runnable action) {
+        super(x, y, widthIn, heightIn, buttonText, action);
         this.helpTextKey = helpTextKey;
     }
 
@@ -18,7 +20,7 @@ public class GuiButtonHelpText extends GuiButton implements IHoverHelpText {
 
     @Override
     public String getHoverHelpText() {
-        return IHoverHelpText.get("button." + helpTextKey);
+        return I18n.format(GuiMod.getLangKeyButton("help", helpTextKey));
     }
 
     @Override

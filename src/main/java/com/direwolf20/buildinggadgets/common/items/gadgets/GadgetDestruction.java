@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.common.items.gadgets;
 
+import com.direwolf20.buildinggadgets.client.gui.GuiMod;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.config.Config;
@@ -41,7 +42,7 @@ import java.util.*;
 
 public class GadgetDestruction extends GadgetGeneric {
 
-    public static final ResourceLocation REGISTRY_NAME = new ResourceLocation(BuildingGadgets.MODID,"gadgets_destruction");
+    public static final ResourceLocation REGISTRY_NAME = new ResourceLocation(BuildingGadgets.MODID,"gadget_destruction");
 
     public GadgetDestruction(Properties builder) {
         super(builder.defaultMaxDamage(Config.GADGETS.GADGET_DESTRUCTION.durability.get()));
@@ -224,8 +225,7 @@ public class GadgetDestruction extends GadgetGeneric {
             }
         } else {
             if (player.isSneaking()) {
-// @todo: reimplement @since 1.13.x
-                //                player.openGui(BuildingGadgets.instance, GuiProxy.DestructionID, world, hand.ordinal(), 0, 0);
+                GuiMod.DESTRUCTION.openScreen(player);
                 return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);
             }
         }
@@ -388,7 +388,7 @@ public class GadgetDestruction extends GadgetGeneric {
         tagCompound.setIntArray("posPasteArray", posPasteArray);
         tagCompound.setIntArray("statePasteArray", statePasteArray);
         tagCompound.setTag("startPos", NBTUtil.writeBlockPos(startBlock));
-        tagCompound.setInt("dim", player.dimension.getId());
+        tagCompound.setString("dim", player.dimension.toString());
         tagCompound.setString("UUID", UUID);
         worldSave.addToMap(UUID, tagCompound);
         worldSave.markForSaving();

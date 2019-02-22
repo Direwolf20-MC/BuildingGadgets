@@ -1,17 +1,19 @@
 package com.direwolf20.buildinggadgets.client.gui;
 
+import javax.annotation.Nullable;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.GlStateManager;
 
-public abstract class DireButton extends GuiButtonHelpText {
+public class DireButton extends GuiButtonHelpText {
 
-    public DireButton(int buttonId, int x, int y, int widthIn, int heightIn, String buttonText) {
-        this(buttonId, x, y, widthIn, heightIn, buttonText, "");
+    public DireButton(int x, int y, int widthIn, int heightIn, String buttonText, @Nullable Runnable action) {
+        this(x, y, widthIn, heightIn, buttonText, "", action);
     }
 
-    public DireButton(int buttonId, int x, int y, int widthIn, int heightIn, String buttonText, String helpTextKey) {
-        super(buttonId, x, y, widthIn, heightIn, buttonText, helpTextKey);
+    public DireButton(int x, int y, int widthIn, int heightIn, String buttonText, String helpTextKey, @Nullable Runnable action) {
+        super(x, y, widthIn, heightIn, buttonText, helpTextKey, action);
     }
 
     @Override
@@ -33,8 +35,6 @@ public abstract class DireButton extends GuiButtonHelpText {
             this.drawTexturedModalRect(this.x, this.y + this.height - bottomToDraw, 0, 66 - bottomToDraw + i * 20, this.width / 2, bottomToDraw);
             this.drawTexturedModalRect(this.x + this.width / 2, this.y + this.height - bottomToDraw, 200 - this.width / 2, 66 - bottomToDraw + i * 20, this.width / 2, bottomToDraw);
 
-// REIMPLEMENT ? unknown arguments
-//            this.mouseDragged(mouseX, mouseY, 0, mouseX, mouseY);
             int j = 14737632;
 
             if (this.packedFGColor != 0) {

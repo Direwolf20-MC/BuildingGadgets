@@ -18,6 +18,7 @@ import net.minecraft.state.EnumProperty;
 import net.minecraft.state.IProperty;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
@@ -37,7 +38,7 @@ public class InventoryManipulation {
     private static final Set<IProperty> SAFE_PROPERTIES_COPY_PASTE =
             ImmutableSet.<IProperty>builder().addAll(SAFE_PROPERTIES).addAll(ImmutableSet.of(BlockRail.SHAPE, BlockRailPowered.SHAPE)).build();
 
-    public static boolean giveItem(ItemStack itemStack, EntityPlayer player) {
+    public static boolean giveItem(ItemStack itemStack, EntityPlayer player, IWorld world) {
         if (player.isCreative()) {
             return true;
         }
@@ -47,7 +48,37 @@ public class InventoryManipulation {
         if (itemStack.getCount() == 0) {
             return true;
         }
+
+        //Fill any unfilled stacks in the player's inventory first
         InventoryPlayer inv = player.inventory;
+        List<Integer> slots = findItem(itemStack.getItem(), inv);
+        for (int slot : slots) {
+            ItemStack stackInSlot = inv.getStackInSlot(slot);
+            if (stackInSlot.getCount() < stackInSlot.getItem().getItemStackLimit(stackInSlot)) {
+                ItemStack giveItemStack = itemStack.copy();
+                boolean success = inv.addItemStackToInventory(giveItemStack);
+                if (success) return true;
+            }
+        }
+
+        //Try to insert into the remote inventory.
+        ItemStack tool = GadgetGeneric.getGadget(player);
+        IItemHandler remoteInventory = GadgetUtils.getRemoteInventory(tool,world.getWorld());
+        if (remoteInventory != null) {
+            for (int i = 0; i < remoteInventory.getSlots(); i++) {
+                ItemStack containerItem = remoteInventory.getStackInSlot(i);
+                ItemStack giveItemStack = itemStack.copy();
+                if (containerItem.getItem() == itemStack.getItem() || containerItem.isEmpty()) {
+                    giveItemStack = remoteInventory.insertItem(i, giveItemStack, false);
+                    if (giveItemStack.isEmpty())
+                        return true;
+
+                    itemStack = giveItemStack.copy();
+                }
+            }
+        }
+
+
         List<IItemHandler> invContainers = findInvContainers(inv);
         if (invContainers.size() > 0) {
             for (IItemHandler container : invContainers) {
@@ -56,9 +87,10 @@ public class InventoryManipulation {
                     ItemStack giveItemStack = itemStack.copy();
                     if (containerItem.getItem() == giveItemStack.getItem()) {
                         giveItemStack = container.insertItem(i, giveItemStack, false);
-                        if (giveItemStack.isEmpty()) {
+                        if (giveItemStack.isEmpty())
                             return true;
-                        }
+
+                        itemStack = giveItemStack.copy();
                     }
                 }
             }

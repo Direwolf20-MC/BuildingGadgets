@@ -3,6 +3,7 @@ package com.direwolf20.buildinggadgets.client.gui;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.renderer.Rectangle2d;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.inventory.Slot;
 
 public class AreaHelpText implements IHoverHelpText {
@@ -36,7 +37,7 @@ public class AreaHelpText implements IHoverHelpText {
 
     @Override
     public String getHoverHelpText() {
-        return IHoverHelpText.get("area." + helpTextKey);
+        return I18n.format(GuiMod.getLangKeyArea("help", helpTextKey));
     }
 
     @Override

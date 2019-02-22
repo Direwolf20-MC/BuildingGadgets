@@ -1,5 +1,7 @@
 package com.direwolf20.buildinggadgets.client.gui;
 
+import javax.annotation.Nullable;
+
 import net.minecraft.client.audio.SimpleSound;
 import net.minecraft.client.audio.SoundHandler;
 import net.minecraft.init.SoundEvents;
@@ -10,8 +12,8 @@ public class GuiButtonSound extends GuiButtonSelect {
     private float pitchSelect, pitchDeselect;
     private boolean silent;
 
-    public GuiButtonSound(int buttonId, int x, int y, int width, int height, String text) {
-        super(buttonId, x, y, width, height, text);
+    public GuiButtonSound(int x, int y, int width, int height, String text, @Nullable Runnable action) {
+        super(x, y, width, height, text, action);
         pitchSelect = pitchDeselect = 1;
     }
 

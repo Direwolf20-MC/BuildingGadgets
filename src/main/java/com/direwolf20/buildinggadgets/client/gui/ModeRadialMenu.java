@@ -24,6 +24,7 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.settings.KeyBinding;
+import net.minecraft.client.util.InputMappings;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
@@ -82,7 +83,7 @@ public class ModeRadialMenu extends GuiScreen {
         boolean destruction = false;
         if (tool.getItem() instanceof GadgetDestruction) {
             destruction = true;
-            buttons.add(new GuiButtonAction(I18n.format("tooltip.gadget.destroy.overlay"), send -> {
+            addButton(new GuiButtonActionCallback(I18n.format("tooltip.gadget.destroy.overlay"), send -> {
                 if (send)
                     PacketHandler.sendToServer(new PacketChangeRange());
 
@@ -91,14 +92,14 @@ public class ModeRadialMenu extends GuiScreen {
         }
         if (!(tool.getItem() instanceof GadgetCopyPaste)) {
             if (!destruction || Config.GADGETS.GADGET_DESTRUCTION.nonFuzzyEnabled.get()) {
-                buttons.add(new GuiButtonAction(I18n.format("tooltip.gadget.fuzzy"), send -> {
+                addButton(new GuiButtonActionCallback(I18n.format("tooltip.gadget.fuzzy"), send -> {
                     if (send)
                         PacketHandler.sendToServer(new PacketToggleFuzzy());
 
                     return GadgetGeneric.getFuzzy(getGadget());
                 }));
             }
-            buttons.add(new GuiButtonAction(I18n.format("message.gadget.connected" + (destruction ? "area" : "surface")), send -> {
+            addButton(new GuiButtonActionCallback(I18n.format("message.gadget.connected" + (destruction ? "area" : "surface")), send -> {
                 if (send)
                     PacketHandler.sendToServer(new PacketToggleConnectedArea());
 
@@ -113,7 +114,7 @@ public class ModeRadialMenu extends GuiScreen {
         for (int i = 0; i < buttons.size(); i++) {
             GuiButtonSound button = (GuiButtonSound) buttons.get(i);
             SoundEvent sound = BGSound.BEEP.getSound();
-            button.setSounds(sound, sound, 0.6F, 1F);
+            button.setSounds(sound, sound, 1F, 0.6F);
             if (!button.visible) continue;
             int len = mc.fontRenderer.getStringWidth(button.displayString) + 6;
             x += len + 10;
@@ -218,6 +219,7 @@ public class ModeRadialMenu extends GuiScreen {
             totalDeg += degPer;
 
             GL11.glEnd();
+            GlStateManager.color4f(1, 1, 1, 1);
 
             if (mouseInSector)
                 radius -= highlight;
@@ -245,24 +247,21 @@ public class ModeRadialMenu extends GuiScreen {
             int ysp = yp;
             int width = fontRenderer.getStringWidth(name);
 
-            double mod = 0.6;
-            int xdp = (int) ((xp - x) * mod + x);
-            int ydp = (int) ((yp - y) * mod + y);
-
             if (xsp < x)
                 xsp -= width - 8;
             if (ysp < y)
                 ysp -= 9;
 
-            fontRenderer.drawStringWithShadow(name, xsp, ysp, i == modeIndex ? Color.GREEN.getRGB() : Color.WHITE.getRGB());
+            Color color = i == modeIndex ? Color.GREEN : Color.WHITE;
+            fontRenderer.drawStringWithShadow(name, xsp, ysp, color.getRGB());
 
-            mod = 0.7;
-            xdp = (int) ((xp - x) * mod + x);
-            ydp = (int) ((yp - y) * mod + y);
+            double mod = 0.7;
+            int xdp = (int) ((xp - x) * mod + x);
+            int ydp = (int) ((yp - y) * mod + y);
 
+            GlStateManager.color4f(color.getRed() / 255, color.getGreen() / 255, color.getBlue() / 255F, 1);
             mc.getTextureManager().bindTexture(signs[i]);
             drawModalRectWithCustomSizedTexture(xdp - 8, ydp - 8, 0, 0, 16, 16, 16, 16);
-
         }
 
         GlStateManager.enableRescaleNormal();
@@ -290,17 +289,15 @@ public class ModeRadialMenu extends GuiScreen {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int mouseButton) {
-        boolean clicked = super.mouseClicked(mouseX, mouseY, mouseButton);
-        if (clicked)
-            changeMode();
-
-        return clicked;
+        changeMode();
+        return super.mouseClicked(mouseX, mouseY, mouseButton);
     }
 
     @Override
     public void tick() {
-        if (!KeyBindings.modeSwitch.isKeyDown()) {
-            mc.displayGuiScreen(null);
+//    TODO 1.13 only works for bound keys; not bound mouse buttons
+        if (!InputMappings.isKeyDown(KeyBindings.modeSwitch.getKey().getKeyCode())) {
+            close();
             changeMode();
         }
 

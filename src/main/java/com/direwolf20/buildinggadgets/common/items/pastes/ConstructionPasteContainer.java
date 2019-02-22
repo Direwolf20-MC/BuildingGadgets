@@ -34,10 +34,10 @@ public class ConstructionPasteContainer extends GenericPasteContainer {
     public void initModel() {
 //        ModelBakery.registerItemVariants(this,
 //                new ModelResourceLocation(getRegistryName(), "inventory"),
-//                new ModelResourceLocation(getRegistryName() + "-half", "inventory"),
-//                new ModelResourceLocation(getRegistryName() + "-full", "inventory"),
-//                new ModelResourceLocation(getRegistryName() + "-quarter", "inventory"),
-//                new ModelResourceLocation(getRegistryName() + "-3quarter", "inventory"));
+//                new ModelResourceLocation(getRegistryName() + "_half", "inventory"),
+//                new ModelResourceLocation(getRegistryName() + "_full", "inventory"),
+//                new ModelResourceLocation(getRegistryName() + "_quarter", "inventory"),
+//                new ModelResourceLocation(getRegistryName() + "_3quarter", "inventory"));
     }
 
     @Override

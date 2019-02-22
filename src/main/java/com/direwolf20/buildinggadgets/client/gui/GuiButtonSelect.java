@@ -1,12 +1,12 @@
 package com.direwolf20.buildinggadgets.client.gui;
 
-import net.minecraft.client.gui.GuiButton;
+import javax.annotation.Nullable;
 
-public class GuiButtonSelect extends GuiButton {
+public class GuiButtonSelect extends GuiButtonAction {
     protected boolean selected;
 
-    public GuiButtonSelect(int buttonId, int x, int y, int width, int height, String text) {
-        super(buttonId, x, y, width, height, text);
+    public GuiButtonSelect(int x, int y, int width, int height, String text, @Nullable Runnable action) {
+        super(x, y, width, height, text, action);
     }
 
     public boolean isSelected() {

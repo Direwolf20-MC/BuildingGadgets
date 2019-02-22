@@ -30,6 +30,7 @@ import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
+import net.minecraft.world.dimension.DimensionType;
 
 import java.io.IOException;
 import java.util.List;
@@ -231,8 +232,8 @@ public class TemplateManagerCommands {
             newCompound.setIntArray("stateIntArray", tagCompound.getIntArray("stateIntArray"));
             newCompound.setIntArray("posIntArray", tagCompound.getIntArray("posIntArray"));
             newCompound.setTag("mapIntState", tagCompound.getTag("mapIntState"));
-            GadgetUtils.writePOSToNBT(newCompound, GadgetUtils.getPOSFromNBT(tagCompound, "startPos"), "startPos", 0);
-            GadgetUtils.writePOSToNBT(newCompound, GadgetUtils.getPOSFromNBT(tagCompound, "endPos"), "endPos", 0);
+            GadgetUtils.writePOSToNBT(newCompound, GadgetUtils.getPOSFromNBT(tagCompound, "startPos"), "startPos", DimensionType.OVERWORLD);
+            GadgetUtils.writePOSToNBT(newCompound, GadgetUtils.getPOSFromNBT(tagCompound, "endPos"), "endPos", DimensionType.OVERWORLD);
             //Map<UniqueItem, Integer> tagMap = GadgetCopyPaste.getItemCountMap(itemStack0);
             //NBTTagList tagList = GadgetUtils.itemCountToNBT(tagMap);
             //newCompound.setTag("itemcountmap", tagList);
