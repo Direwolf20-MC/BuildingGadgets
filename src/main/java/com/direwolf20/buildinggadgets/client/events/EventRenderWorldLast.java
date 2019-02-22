@@ -3,6 +3,7 @@ package com.direwolf20.buildinggadgets.client.events;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.items.gadgets.*;
 import com.direwolf20.buildinggadgets.common.tools.ToolRenders;
+import com.direwolf20.buildinggadgets.common.utils.NBTUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;

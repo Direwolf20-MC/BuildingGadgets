@@ -10,6 +10,7 @@ import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetExchanger;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
 import com.direwolf20.buildinggadgets.common.utils.GadgetUtils;
+import com.direwolf20.buildinggadgets.common.utils.NBTUtil;
 import com.direwolf20.buildinggadgets.common.utils.VectorUtil;
 import com.direwolf20.buildinggadgets.common.world.FakeBuilderWorld;
 import com.google.common.cache.Cache;
@@ -29,6 +30,7 @@ import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceFluidMode;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldType;
@@ -98,15 +100,24 @@ public class ToolRenders {
             dispatcher.renderBlockBrightness(Blocks.YELLOW_STAINED_GLASS.getDefaultState(), 1f);
             GlStateManager.popMatrix();
         }
-
-        RayTraceResult lookingAt = VectorUtil.getLookingAt(player);
+        byte flIntState = NBTUtil.getOrNewTag(heldItem).getByte("fluidInteractionMode");
+        RayTraceResult lookingAt;
+        if (flIntState == 0) {
+            lookingAt = VectorUtil.getLookingAt(player);
+        } else {
+            lookingAt = VectorUtil.getLookingAt(player, RayTraceFluidMode.ALWAYS);
+        }
         IBlockState state = Blocks.AIR.getDefaultState();
         List<BlockPos> coordinates = getAnchor(stack);
         if (lookingAt != null || coordinates.size() > 0) {
             World world = player.world;
             IBlockState startBlock = Blocks.AIR.getDefaultState();
             if (!(lookingAt == null)) {
-                startBlock = world.getBlockState(lookingAt.getBlockPos());
+                if (flIntState == 1) {
+                    startBlock = world.getBlockState(lookingAt.getBlockPos().add(0, -1, 0));
+                } else {
+                    startBlock = world.getBlockState(lookingAt.getBlockPos());
+                }
             }
             if (startBlock != BGBlocks.effectBlock.getDefaultState()) {
 
@@ -115,7 +126,13 @@ public class ToolRenders {
                     return;
                 }
                 if (coordinates.size() == 0 && lookingAt != null) { //Build a list of coordinates based on the tool mode and range
-                    coordinates = BuildingModes.getBuildOrders(world, player, lookingAt.getBlockPos(), lookingAt.sideHit, heldItem);
+                    BlockPos block;
+                    if (flIntState == 1) {
+                        block = lookingAt.getBlockPos().add(0, -1, 0);
+                    } else {
+                        block = lookingAt.getBlockPos();
+                    }
+                    coordinates = BuildingModes.getBuildOrders(world, player, block, lookingAt.sideHit, heldItem);
                 }
 
                 //Figure out how many of the block we're rendering we have in the inventory of the player.

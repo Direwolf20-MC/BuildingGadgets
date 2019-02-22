@@ -6,6 +6,7 @@ import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
 import com.direwolf20.buildinggadgets.common.tools.*;
+import com.direwolf20.buildinggadgets.common.utils.NBTUtil;
 import com.direwolf20.buildinggadgets.common.utils.VectorUtil;
 import com.direwolf20.buildinggadgets.common.world.FakeBuilderWorld;
 import net.minecraft.block.state.IBlockState;
@@ -19,7 +20,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceFluidMode;
 import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.Vec3i;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
@@ -28,6 +31,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldType;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.BlockSnapshot;
+import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.world.BlockEvent;
 
@@ -61,6 +65,7 @@ public class GadgetBuilding extends GadgetGeneric {
 
     public GadgetBuilding(Properties builder) {
         super(builder.defaultMaxDamage(Config.GADGETS.GADGET_BUILDING.durability.get()));
+
     }
 
     @Override
@@ -173,11 +178,20 @@ public class GadgetBuilding extends GadgetGeneric {
         List<BlockPos> coords = getAnchor(stack);
 
         if (coords.size() == 0) {  //If we don't have an anchor, build in the current spot
-            RayTraceResult lookingAt = VectorUtil.getLookingAt(player);
+            byte fluidPlacementMode = NBTUtil.getOrNewTag(stack).getByte("fluidInteractionMode");
+            RayTraceResult lookingAt;
+            if (fluidPlacementMode == 0) {
+                lookingAt = VectorUtil.getLookingAt(player);
+            } else {
+                lookingAt = VectorUtil.getLookingAt(player, RayTraceFluidMode.ALWAYS);
+            }
             if (lookingAt == null) { //If we aren't looking at anything, exit
                 return false;
             }
             BlockPos startBlock = lookingAt.getBlockPos();
+            if (fluidPlacementMode == 1) {
+                startBlock = new BlockPos(startBlock.getX(), startBlock.getY()-1, startBlock.getZ());
+            }
             EnumFacing sideHit = lookingAt.sideHit;
             coords = BuildingModes.getBuildOrders(world, player, startBlock, sideHit, stack);
         } else { //If we do have an anchor, erase it (Even if the build fails)
@@ -339,6 +353,12 @@ public class GadgetBuilding extends GadgetGeneric {
 
         return stack;
     }
+
+    public static void setFluidInteractionMode(ItemStack stack, Byte mode) {
+        NBTUtil.getOrNewTag(stack).setByte("fluidInteractionMode", mode);
+    }
+
+
 
     @Override
     public int getUseDuration(ItemStack stack) {

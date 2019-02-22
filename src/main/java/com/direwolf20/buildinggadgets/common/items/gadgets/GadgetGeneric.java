@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.common.items.gadgets;
 
+import com.direwolf20.buildinggadgets.client.gui.FluidPlacementMode;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.items.capability.CapabilityProviderEnergy;
 import com.direwolf20.buildinggadgets.common.utils.NBTUtil;
@@ -117,8 +118,7 @@ public abstract class GadgetGeneric extends Item {
         if (poweredByFE()) {
             IEnergyStorage energy = CapabilityProviderEnergy.getCap(tool).orElseThrow(IllegalStateException::new);
             energy.extractEnergy(getEnergyCost(tool), false);
-        }
-        else
+        } else
             tool.damageItem(getDamageCost(tool), player);
     }
 
@@ -132,6 +132,10 @@ public abstract class GadgetGeneric extends Item {
         return NBTUtil.getOrNewTag(stack).getBoolean("fuzzy");
     }
 
+    public static byte getFluidInteractionMode(ItemStack stack) {
+        return NBTUtil.getOrNewTag(stack).getByte("fluidInteractionMode");
+    }
+
     public static void toggleFuzzy(EntityPlayer player, ItemStack stack) {
         NBTUtil.getOrNewTag(stack).setBoolean("fuzzy", !getFuzzy(stack));
         player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.fuzzymode").getUnformattedComponentText() + ": " + getFuzzy(stack)), true);
@@ -140,6 +144,8 @@ public abstract class GadgetGeneric extends Item {
     public static boolean getConnectedArea(ItemStack stack) {
         return !NBTUtil.getOrNewTag(stack).getBoolean("unconnectedarea");
     }
+
+    public static void setFluidPlacementMode(ItemStack stack, byte mode) { NBTUtil.getOrNewTag(stack).setByte("fluidInteractionMode", mode); }
 
     public static void toggleConnectedArea(EntityPlayer player, ItemStack stack) {
         NBTUtil.getOrNewTag(stack).setBoolean("unconnectedarea", getConnectedArea(stack));
