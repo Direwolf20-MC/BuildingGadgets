@@ -1,6 +1,7 @@
 package com.direwolf20.buildinggadgets.common.tools;
 
-import com.direwolf20.buildinggadgets.common.items.pastes.ConstructionPasteContainer;
+import com.direwolf20.buildinggadgets.common.items.pastes.GenericPasteContainer;
+
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.Ingredient;
@@ -24,11 +25,11 @@ public class ConstructionPasteRecipeHandler extends ShapedRecipe {
             for (int i = 0; i < inv.getSizeInventory(); i++) { // For each slot in the crafting inventory,
                 final ItemStack ingredient = inv.getStackInSlot(i); // Get the ingredient in the slot
 
-                if (!ingredient.isEmpty() && ingredient.getItem() instanceof ConstructionPasteContainer) { // If it's a Paste Container,
-                    totalPaste += ConstructionPasteContainer.getPasteAmount(ingredient);
+                if (!ingredient.isEmpty() && ingredient.getItem() instanceof GenericPasteContainer) { // If it's a Paste Container,
+                    totalPaste += GenericPasteContainer.getPasteAmount(ingredient);
                 }
             }
-            ConstructionPasteContainer.setPasteAmount(output, totalPaste);
+            GenericPasteContainer.setPasteAmount(output, totalPaste);
         }
 
         return output; // Return the modified output
