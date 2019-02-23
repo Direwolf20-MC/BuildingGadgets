@@ -259,6 +259,10 @@ public class GadgetDestruction extends GadgetGeneric {
 
     public static SortedSet<BlockPos> getArea(World world, BlockPos pos, EnumFacing incomingSide, EntityPlayer player, ItemStack stack) {
         SortedSet<BlockPos> voidPositions = new TreeSet<>(Comparator.comparingInt(Vec3i::getX).thenComparingInt(Vec3i::getY).thenComparingInt(Vec3i::getZ));
+        int depth = getToolValue(stack, "depth");
+        if (depth == 0)
+            return voidPositions;
+
         BlockPos startPos = (getAnchor(stack) == null) ? pos : getAnchor(stack);
         EnumFacing side = (getAnchorSide(stack) == null) ? incomingSide : getAnchorSide(stack);
         List<EnumFacing> directions = assignDirections(side, player);
@@ -272,9 +276,13 @@ public class GadgetDestruction extends GadgetGeneric {
             addConnectedCoords(world, player, startPos, stateTarget, voidPositions,
                     (int) area.minX, (int) area.minY, (int) area.minZ, (int) area.maxX - 1, (int) area.maxY - 1, (int) area.maxZ - 1);
         } else {
-            for (int d = 0; d < getToolValue(stack, "depth"); d++) {
-                for (int x = getToolValue(stack, "left") * -1; x <= getToolValue(stack, "right"); x++) {
-                    for (int y = getToolValue(stack, "down") * -1; y <= getToolValue(stack, "up"); y++) {
+            int left = -getToolValue(stack, "left");
+            int right = getToolValue(stack, "right");
+            int down = -getToolValue(stack, "down");
+            int up = getToolValue(stack, "up");
+            for (int d = 0; d < depth; d++) {
+                for (int x = left; x <= right; x++) {
+                    for (int y = down; y <= up; y++) {
                         BlockPos voidPos = new BlockPos(startPos);
                         voidPos = voidPos.offset(directions.get(0), x);
                         voidPos = voidPos.offset(directions.get(2), y);
