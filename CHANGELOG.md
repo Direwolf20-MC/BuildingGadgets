@@ -2,10 +2,11 @@
 The format of this document is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and should continue to adhere to the conventions outlined in the Keep a Changelog guidelines.
 
 ## [Unreleased] 
+### Added
+- More German localisation
 ### Changed
 - In addition to extracting items from bound Refined Storage networks when using the building/exchanging/copy-paste gadgets, items can now also be inserted into them when using, and undoing the use of, the building/copy-paste gadgets.
 - The Template Manager now displays a special Error-Message if someone tries to paste a link instead of JSON-Data
-
 
 ## [2.6.4] - 2019-02-17
 ### Fixed
