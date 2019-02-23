@@ -3,6 +3,7 @@ package com.direwolf20.buildinggadgets.common.blocks;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.EnumPushReaction;
 import net.minecraft.block.material.MaterialColor;
 import net.minecraft.block.state.BlockFaceShape;
@@ -28,7 +29,7 @@ import javax.annotation.Nullable;
 import java.util.Random;
 
 //@Optional.Interface(iface = "team.chisel.ctm.api.IFacade", modid = "ctm-api")
-public class ConstructionBlock extends Block /*implements IFacade*/ {
+public class ConstructionBlock extends BlockContainer /*implements IFacade*/ {
     public static final ResourceLocation REGISTRY_NAME = new ResourceLocation(BuildingGadgets.MODID,"construction_block");
     //public static final ConstructionProperty FACADEID = new ConstructionProperty("facadeid");
     public static final IProperty<Boolean> BRIGHT = BooleanProperty.create("bright");
@@ -76,6 +77,11 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
     @Override
     public boolean hasTileEntity(IBlockState state) {
         return true;
+    }
+
+    @Override
+    public TileEntity createNewTileEntity(IBlockReader worldIn) {
+        return new ConstructionBlockTileEntity();
     }
 
     /*private static ConstructionBlockTileEntity getTE(World world, BlockPos pos) {
@@ -460,6 +466,7 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
     @Override
     public boolean onBlockActivated(IBlockState state, World worldIn, BlockPos pos, EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
         IBlockState mimic = getActualMimicBlock(worldIn, pos);
+        System.out.println(mimic);
         return mimic != null ? mimic.onBlockActivated(worldIn, pos, player, hand, side, hitX, hitY, hitZ) : super.onBlockActivated(state, worldIn, pos, player, hand, side, hitX, hitY, hitZ);
     }
 
