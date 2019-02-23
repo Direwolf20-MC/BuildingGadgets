@@ -174,9 +174,9 @@ public class ConstructionBlock extends BlockContainer /*implements IFacade*/ {
         if (bright) {
             return 0;
         }
-        //return 255;
-        IBlockState mimic = getActualMimicBlock(worldIn, pos);
-        return mimic != null ? mimic.getOpacity(worldIn, pos) : super.getOpacity(state, worldIn, pos);
+        return 255;
+        //IBlockState mimic = getActualMimicBlock(worldIn, pos);
+        //return mimic != null ? mimic.getOpacity(worldIn, pos) : super.getOpacity(state, worldIn, pos);
     }
 
     @Override
