@@ -26,10 +26,10 @@ public class BGEntities {
 
     public static void init() {
         container.add(new RegistryObjectBuilder<EntityType<?>, Builder<?>>(new ResourceLocation(BuildingGadgets.MODID, "build_block_entity"))
-                .builder(Builder.create(BlockBuildEntity.class, BlockBuildEntity::new))
+                .builder(Builder.create(BlockBuildEntity.class, BlockBuildEntity::new).tracker(64, 1, true))
                 .factory(b -> b.build("")));
         container.add(new RegistryObjectBuilder<EntityType<?>, Builder<?>>(new ResourceLocation(BuildingGadgets.MODID, "construction_block_entity"))
-                .builder(Builder.create(ConstructionBlockEntity.class, ConstructionBlockEntity::new))
+                .builder(Builder.create(ConstructionBlockEntity.class, ConstructionBlockEntity::new).tracker(64, 1, true))
                 .factory(b -> b.build("")));
     }
 

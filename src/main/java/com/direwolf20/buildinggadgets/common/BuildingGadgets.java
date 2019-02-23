@@ -80,7 +80,7 @@ public class BuildingGadgets {
         DistExecutor.runWhenOn(Dist.CLIENT, () -> () -> {
             eventBus.addListener((Consumer<FMLClientSetupEvent>) (event -> clientInit(event, eventBus)));
             ModLoadingContext.get().registerExtensionPoint(ExtensionPoint.GUIFACTORY, () -> GuiMod::openScreen);
-            MinecraftForge.EVENT_BUS.addListener((Consumer<ModelRegistryEvent>) ClientProxy::registerModels);
+            MinecraftForge.EVENT_BUS.addListener(ClientProxy::registerModels);
         });
 
         loadConfig(Config.CLIENT_CONFIG, FMLPaths.CONFIGDIR.get().resolve("buildinggadgets-client.toml"));
@@ -179,8 +179,8 @@ public class BuildingGadgets {
             ////            ModelLoader.setCustomMeshDefinition(ModItems.constructionPasteContainert3, new PasteContainerMeshDefinition());
             //        }
 
-            RenderingRegistry.registerEntityRenderingHandler(BlockBuildEntity.class, new BlockBuildEntityRender.Factory());
-            RenderingRegistry.registerEntityRenderingHandler(ConstructionBlockEntity.class, new ConstructionBlockEntityRender.Factory());
+//            RenderingRegistry.registerEntityRenderingHandler(BlockBuildEntity.class, new BlockBuildEntityRender.Factory());
+//            RenderingRegistry.registerEntityRenderingHandler(ConstructionBlockEntity.class, new ConstructionBlockEntityRender.Factory());
         }
 
         /*static void renderWorldLastEvent(RenderWorldLastEvent evt) {
