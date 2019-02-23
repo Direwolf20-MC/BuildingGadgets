@@ -118,7 +118,7 @@ public class Config {
             maxRange = SERVER_BUILDER
                     .comment("The max range of the Gadgets")
                     .translation(LANG_KEY_GADGETS + ".maxRange")
-                    .defineInRange("Maximum allowed Range", 16, 1, 32);
+                    .defineInRange("Maximum allowed Range", 15, 1, 32);
 
             poweredByFE = SERVER_BUILDER
                     .comment("Set to true for Forge Energy Support, set to False for vanilla Item Damage")
