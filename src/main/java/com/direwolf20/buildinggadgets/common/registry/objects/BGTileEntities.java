@@ -24,7 +24,7 @@ public class BGTileEntities {
     @ObjectHolder("template_manager_tile")
     public static TileEntityType<?> TEMPLATE_MANAGER_TYPE;
 
-    public static void init() {
+    static void init() {
         container.add(new RegistryObjectBuilder<TileEntityType<?>, Builder<?>>(new ResourceLocation(BuildingGadgets.MODID,"construction_tile"))
                 .builder(Builder.create(ConstructionBlockTileEntity::new))
                 .factory((b) -> b.build(null)));
@@ -38,7 +38,7 @@ public class BGTileEntities {
         container.register(event);
     }
 
-    public static void cleanup() {
+    static void cleanup() {
         container.clear();
     }
 }

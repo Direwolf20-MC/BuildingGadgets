@@ -50,7 +50,7 @@ public final class BGItems {
     @ObjectHolder("construction_paste_container_creative")
     public static Item CreativeConstructionPasteContainer;
 
-    public static void init() {
+    static void init() {
         container.add(new RegistryObjectBuilder<Item, Item.Properties>(GadgetExchanger.REGISTRY_NAME).builder(itemProperties()).factory(GadgetExchanger::new));
         container.add(new RegistryObjectBuilder<Item, Item.Properties>(GadgetBuilding.REGISTRY_NAME).builder(itemProperties()).factory(GadgetBuilding::new));
         container.add(new RegistryObjectBuilder<Item, Item.Properties>(GadgetDestruction.REGISTRY_NAME).builder(itemProperties()).factory(GadgetDestruction::new));
@@ -76,7 +76,7 @@ public final class BGItems {
         return new Item.Properties();
     }
 
-    public static void cleanup() {
+    static void cleanup() {
         container.clear();
     }
 }

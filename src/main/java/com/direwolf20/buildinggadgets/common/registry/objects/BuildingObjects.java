@@ -9,6 +9,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.color.BlockColors;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.fml.DistExecutor;
 
 //@Mod.EventBusSubscriber(modid = BuildingGadgets.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class BuildingObjects {
@@ -36,6 +38,7 @@ public class BuildingObjects {
         BGItems.init();
         BGEntities.init();
         BGTileEntities.init();
+        DistExecutor.runWhenOn(Dist.CLIENT,() -> BGEntities::clientInit);
     }
 
     public static void cleanup() {

@@ -36,7 +36,7 @@ public final class BGBlocks {
     @ObjectHolder("template_manager")
     public static Block templateManger;
 
-    public static void init() {
+    static void init() {
         container.add(new BlockBuilder(EffectBlock.REGISTRY_NAME)
                 .builder(Block.Properties.create(EFFECT_BLOCK_MATERIAL).hardnessAndResistance(20f))
                 .item(itemPropertiesWithoutGroup())
@@ -65,7 +65,7 @@ public final class BGBlocks {
         container.registerItemBlocks(event);
     }
 
-    public static void cleanup() {
+    static void cleanup() {
         container.clear();
     }
 }
