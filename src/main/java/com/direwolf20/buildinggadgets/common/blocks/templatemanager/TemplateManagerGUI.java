@@ -20,6 +20,7 @@ import com.direwolf20.buildinggadgets.common.tools.PasteToolBufferBuilder;
 import com.direwolf20.buildinggadgets.common.tools.ToolBufferBuilder;
 import com.direwolf20.buildinggadgets.common.utils.GadgetUtils;
 
+import com.direwolf20.buildinggadgets.common.utils.Reference;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiTextField;
@@ -73,7 +74,7 @@ public class TemplateManagerGUI extends GuiContainer {
     private TemplateManagerTileEntity te;
     private TemplateManagerContainer container;
 
-    private static final ResourceLocation background = new ResourceLocation(BuildingGadgets.MODID, "textures/gui/testcontainer.png");
+    private static final ResourceLocation background = new ResourceLocation(Reference.MODID, "textures/gui/testcontainer.png");
 
     public TemplateManagerGUI(TemplateManagerTileEntity tileEntity, TemplateManagerContainer container) {
         super(container);

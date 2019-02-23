@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.common.blocks.Models;
 
-import com.direwolf20.buildinggadgets.common.BuildingGadgets;
+import com.direwolf20.buildinggadgets.common.utils.Reference;
 import com.google.common.collect.ImmutableSet;
 import net.minecraft.client.renderer.model.IUnbakedModel;
 import net.minecraft.client.renderer.model.ModelResourceLocation;
@@ -22,7 +22,7 @@ public class BakedModelLoader implements ICustomModelLoader {
 
     @Override
     public boolean accepts(ResourceLocation modelLocation) {
-        if (!modelLocation.getNamespace().equals(BuildingGadgets.MODID)) {
+        if (!modelLocation.getNamespace().equals(Reference.MODID)) {
             return false;
         }
         if (modelLocation instanceof ModelResourceLocation && ((ModelResourceLocation) modelLocation).getVariant().equals("inventory")) {

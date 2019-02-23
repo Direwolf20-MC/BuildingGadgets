@@ -1,4 +1,4 @@
-package com.direwolf20.buildinggadgets.common.utils;
+package com.direwolf20.buildinggadgets.common.utils.helpers;
 
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
@@ -12,7 +12,7 @@ import java.util.function.Function;
 /**
  * Utility class providing additional Methods for reading and writing array's which are not normally provided as NBT-Objects by Minecraft.
  */
-public class NBTUtil {
+public class NBTHelper {
 
     public static NBTTagByteArray createBooleanList(boolean[] booleans) {
         byte[] bytes = new byte[booleans.length];

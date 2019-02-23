@@ -1,4 +1,4 @@
-package com.direwolf20.buildinggadgets.common.utils;
+package com.direwolf20.buildinggadgets.common.utils.helpers;
 
 import com.direwolf20.buildinggadgets.common.config.Config;
 import net.minecraft.entity.player.EntityPlayer;
@@ -10,7 +10,7 @@ import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
 
-public class VectorUtil {
+public class VectorHelper {
 
     public static RayTraceResult getLookingAt(EntityPlayer player) {
         World world = player.world;
@@ -25,7 +25,7 @@ public class VectorUtil {
 
     @Nullable
     public static BlockPos getPosLookingAt(EntityPlayer player) {
-        RayTraceResult lookingAt = VectorUtil.getLookingAt(player);
+        RayTraceResult lookingAt = VectorHelper.getLookingAt(player);
         if (lookingAt == null)
             return null;
 

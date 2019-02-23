@@ -5,14 +5,13 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.world.World;
 import net.minecraft.world.storage.DimensionSavedDataManager;
 import net.minecraft.world.storage.WorldSavedData;
-import net.minecraft.world.storage.WorldSavedDataStorage;
 import net.minecraftforge.common.util.Constants;
 
 import javax.annotation.Nonnull;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.direwolf20.buildinggadgets.common.BuildingGadgets.MODID;
+import static com.direwolf20.buildinggadgets.common.utils.Reference.MODID;
 
 public class WorldSave extends WorldSavedData {
     private final String TAG_NAME;

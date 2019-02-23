@@ -1,8 +1,8 @@
 package com.direwolf20.buildinggadgets.common.items;
 
 import com.direwolf20.buildinggadgets.client.events.EventTooltip;
-import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.utils.GadgetUtils;
+import com.direwolf20.buildinggadgets.common.utils.Reference;
 import com.direwolf20.buildinggadgets.common.world.WorldSave;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.UUID;
 
 public class Template extends Item implements ITemplate {
-    public static final ResourceLocation REGISTRY_NAME = new ResourceLocation(BuildingGadgets.MODID,"template");
+    public static final ResourceLocation REGISTRY_NAME = new ResourceLocation(Reference.MODID,"template");
     public Template(Properties builder) {
         super(builder.maxStackSize(1));
     }

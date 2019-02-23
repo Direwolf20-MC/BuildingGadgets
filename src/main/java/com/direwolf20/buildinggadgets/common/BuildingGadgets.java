@@ -1,11 +1,13 @@
 package com.direwolf20.buildinggadgets.common;
 
+import com.direwolf20.buildinggadgets.client.ClientProxy;
 import com.direwolf20.buildinggadgets.client.gui.GuiMod;
 import com.direwolf20.buildinggadgets.common.commands.BlockMapCommand;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.events.AnvilRepairHandler;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.registry.objects.BuildingObjects;
+import com.direwolf20.buildinggadgets.common.utils.Reference;
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import com.electronwill.nightconfig.core.io.WritingMode;
 import net.minecraft.command.Commands;
@@ -31,13 +33,8 @@ import org.apache.logging.log4j.Logger;
 import java.nio.file.Path;
 import java.util.function.Consumer;
 
-@Mod(value = BuildingGadgets.MODID)
+@Mod(value = Reference.MODID)
 public class BuildingGadgets {
-    public static final String MODID = "buildinggadgets";
-    public static final String MODNAME = "Building Gadgets";
-    public static final String VERSION = "@VERSION@";
-    public static final String UPDATE_JSON = "@UPDATE@";
-    public static final String DEPENDENCIES = "required-after:forge@[14.23.3.2694,)";
 
     public static Logger LOG = LogManager.getLogger();
     private static BuildingGadgets theMod = null;
@@ -46,10 +43,11 @@ public class BuildingGadgets {
         assert theMod != null;
         return theMod;
     }
+
     public BuildingGadgets() {
         IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus();
 
-        //TODO handle Config properly as soon as Forge fixes it's "I dont load Server Config" bug
+        // @todo handle Config properly as soon as Forge fixes it's "I dont load Server Config" bug
         ModLoadingContext.get().registerConfig(Type.CLIENT, Config.CLIENT_CONFIG);
         ModLoadingContext.get().registerConfig(Type.SERVER, Config.SERVER_CONFIG);
 
@@ -58,13 +56,13 @@ public class BuildingGadgets {
         eventBus.addListener(this::finishLoad);
 
         MinecraftForge.EVENT_BUS.register(new AnvilRepairHandler());
-
-
         MinecraftForge.EVENT_BUS.register(this);
+
         // Client only registering
         DistExecutor.runWhenOn(Dist.CLIENT, () -> () -> {
-            eventBus.addListener((Consumer<FMLClientSetupEvent>) (event -> clientInit(event, eventBus)));
+            eventBus.addListener((Consumer<FMLClientSetupEvent>) event -> ClientProxy.clientSetup(event, eventBus));
             ModLoadingContext.get().registerExtensionPoint(ExtensionPoint.GUIFACTORY, () -> GuiMod::openScreen);
+
             MinecraftForge.EVENT_BUS.addListener(ClientProxy::registerModels);
         });
 
@@ -95,13 +93,9 @@ public class BuildingGadgets {
         DeferredWorkQueue.runLater(PacketHandler::register);
     }
 
-    private void clientInit(final FMLClientSetupEvent event, final IEventBus eventBus) {
-        ClientProxy.clientSetup(event, eventBus);
-    }
-
     private void serverLoad(FMLServerStartingEvent event) {
         event.getCommandDispatcher().register(
-                Commands.literal(MODID)
+                Commands.literal(Reference.MODID)
                     .then(BlockMapCommand.registerList())
                     .then(BlockMapCommand.registerDelete())
         );
@@ -109,14 +103,6 @@ public class BuildingGadgets {
 
     private void finishLoad(FMLLoadCompleteEvent event) {
         BuildingObjects.cleanup();
-    }
-
-    public static String getLangKeyPrefix(String type, String... args) {
-        return getLangKey(type, args) + ".";
-    }
-
-    public static String getLangKey(String type, String... args) {
-        return String.join(".", type, MODID, String.join(".", args));
     }
 
 }

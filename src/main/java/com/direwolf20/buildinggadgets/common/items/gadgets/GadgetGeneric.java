@@ -2,7 +2,7 @@ package com.direwolf20.buildinggadgets.common.items.gadgets;
 
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.items.capability.CapabilityProviderEnergy;
-import com.direwolf20.buildinggadgets.common.utils.NBTUtil;
+import com.direwolf20.buildinggadgets.common.utils.helpers.NBTHelper;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
@@ -129,20 +129,20 @@ public abstract class GadgetGeneric extends Item {
     }
 
     public static boolean getFuzzy(ItemStack stack) {
-        return NBTUtil.getOrNewTag(stack).getBoolean("fuzzy");
+        return NBTHelper.getOrNewTag(stack).getBoolean("fuzzy");
     }
 
     public static void toggleFuzzy(EntityPlayer player, ItemStack stack) {
-        NBTUtil.getOrNewTag(stack).setBoolean("fuzzy", !getFuzzy(stack));
+        NBTHelper.getOrNewTag(stack).setBoolean("fuzzy", !getFuzzy(stack));
         player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.fuzzymode").getUnformattedComponentText() + ": " + getFuzzy(stack)), true);
     }
 
     public static boolean getConnectedArea(ItemStack stack) {
-        return !NBTUtil.getOrNewTag(stack).getBoolean("unconnectedarea");
+        return !NBTHelper.getOrNewTag(stack).getBoolean("unconnectedarea");
     }
 
     public static void toggleConnectedArea(EntityPlayer player, ItemStack stack) {
-        NBTUtil.getOrNewTag(stack).setBoolean("unconnectedarea", getConnectedArea(stack));
+        NBTHelper.getOrNewTag(stack).setBoolean("unconnectedarea", getConnectedArea(stack));
         String suffix = stack.getItem() instanceof GadgetDestruction ? "area" : "surface";
         player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.connected" + suffix).getUnformattedComponentText() + ": " + getConnectedArea(stack)), true);
     }

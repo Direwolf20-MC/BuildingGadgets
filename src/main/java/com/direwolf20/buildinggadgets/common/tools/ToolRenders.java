@@ -10,7 +10,8 @@ import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetExchanger;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
 import com.direwolf20.buildinggadgets.common.utils.GadgetUtils;
-import com.direwolf20.buildinggadgets.common.utils.VectorUtil;
+import com.direwolf20.buildinggadgets.common.utils.helpers.SortingHelper;
+import com.direwolf20.buildinggadgets.common.utils.helpers.VectorHelper;
 import com.direwolf20.buildinggadgets.common.world.FakeBuilderWorld;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -99,7 +100,7 @@ public class ToolRenders {
             GlStateManager.popMatrix();
         }
 
-        RayTraceResult lookingAt = VectorUtil.getLookingAt(player);
+        RayTraceResult lookingAt = VectorHelper.getLookingAt(player);
         IBlockState state = Blocks.AIR.getDefaultState();
         List<BlockPos> coordinates = getAnchor(stack);
         if (lookingAt != null || coordinates.size() > 0) {
@@ -153,7 +154,7 @@ public class ToolRenders {
                 //This blend function allows you to use a constant alpha, which is defined later
                 GlStateManager.blendFunc(GL14.GL_CONSTANT_ALPHA, GL14.GL_ONE_MINUS_CONSTANT_ALPHA);
 
-                List<BlockPos> sortedCoordinates = Sorter.Blocks.byDistance(coordinates, player); //Sort the coords by distance to player.
+                List<BlockPos> sortedCoordinates = SortingHelper.Blocks.byDistance(coordinates, player); //Sort the coords by distance to player.
 
                 for (BlockPos coordinate : sortedCoordinates) {
                     GlStateManager.pushMatrix();//Push matrix again just because
@@ -242,7 +243,7 @@ public class ToolRenders {
             GlStateManager.popMatrix();
         }
 
-        RayTraceResult lookingAt = VectorUtil.getLookingAt(player);
+        RayTraceResult lookingAt = VectorHelper.getLookingAt(player);
         IBlockState state = Blocks.AIR.getDefaultState();
         List<BlockPos> coordinates = getAnchor(stack);
         if (lookingAt != null || coordinates.size() > 0) {
@@ -370,7 +371,7 @@ public class ToolRenders {
     }
 
     public static void renderDestructionOverlay(RenderWorldLastEvent evt, EntityPlayer player, ItemStack stack) {
-        RayTraceResult lookingAt = VectorUtil.getLookingAt(player);
+        RayTraceResult lookingAt = VectorHelper.getLookingAt(player);
         if (lookingAt == null && GadgetDestruction.getAnchor(stack) == null) return;
         World world = player.world;
         BlockPos startBlock = (GadgetDestruction.getAnchor(stack) == null) ? lookingAt.getBlockPos() : GadgetDestruction.getAnchor(stack);
@@ -416,7 +417,7 @@ public class ToolRenders {
         //This blend function allows you to use a constant alpha, which is defined later
         //GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
         GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
-        List<BlockPos> sortedCoordinates = Sorter.Blocks.byDistance(coordinates, player); //Sort the coords by distance to player.
+        List<BlockPos> sortedCoordinates = SortingHelper.Blocks.byDistance(coordinates, player); //Sort the coords by distance to player.
 
         Tessellator t = Tessellator.getInstance();
         BufferBuilder bufferBuilder = t.getBuffer();
@@ -503,7 +504,7 @@ public class ToolRenders {
             //First check if we have an anchor, if not check if we're looking at a block, if not, exit
             BlockPos startPos = GadgetCopyPaste.getAnchor(stack);
             if (startPos == null) {
-                startPos = VectorUtil.getPosLookingAt(player);
+                startPos = VectorHelper.getPosLookingAt(player);
                 if (startPos == null) return;
                 startPos = startPos.up(GadgetCopyPaste.getY(stack));
                 startPos = startPos.east(GadgetCopyPaste.getX(stack));

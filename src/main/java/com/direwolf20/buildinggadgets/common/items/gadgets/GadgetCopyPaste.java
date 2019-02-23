@@ -2,7 +2,6 @@ package com.direwolf20.buildinggadgets.common.items.gadgets;
 
 import com.direwolf20.buildinggadgets.client.events.EventTooltip;
 import com.direwolf20.buildinggadgets.client.gui.GuiMod;
-import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlock;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.config.Config;
@@ -14,7 +13,8 @@ import com.direwolf20.buildinggadgets.common.network.packets.PacketBlockMap;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
 import com.direwolf20.buildinggadgets.common.tools.*;
 import com.direwolf20.buildinggadgets.common.utils.GadgetUtils;
-import com.direwolf20.buildinggadgets.common.utils.VectorUtil;
+import com.direwolf20.buildinggadgets.common.utils.Reference;
+import com.direwolf20.buildinggadgets.common.utils.helpers.VectorHelper;
 import com.direwolf20.buildinggadgets.common.world.WorldSave;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
@@ -65,7 +65,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
         }
     }
 
-    public static final ResourceLocation REGISTRY_NAME = new ResourceLocation(BuildingGadgets.MODID,"gadget_copy_paste");
+    public static final ResourceLocation REGISTRY_NAME = new ResourceLocation(Reference.MODID,"gadget_copy_paste");
 
     public GadgetCopyPaste(Properties builder) {
         super(builder.defaultMaxDamage(Config.GADGETS.GADGET_COPY_PASTE.durability.get()));
@@ -263,7 +263,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
     public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
         ItemStack stack = player.getHeldItem(hand);
         player.setActiveHand(hand);
-        BlockPos pos = VectorUtil.getPosLookingAt(player);
+        BlockPos pos = VectorHelper.getPosLookingAt(player);
         if (!world.isRemote) {
             if (pos != null && player.isSneaking() && GadgetUtils.setRemoteInventory(stack, player, world, pos, false) == EnumActionResult.SUCCESS)
                 return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);
@@ -571,7 +571,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
     public static void anchorBlocks(EntityPlayer player, ItemStack stack) {
         BlockPos currentAnchor = getAnchor(stack);
         if (currentAnchor == null) {
-            RayTraceResult lookingAt = VectorUtil.getLookingAt(player);
+            RayTraceResult lookingAt = VectorHelper.getLookingAt(player);
             if (lookingAt == null) {
                 return;
             }

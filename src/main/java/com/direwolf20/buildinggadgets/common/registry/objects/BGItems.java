@@ -1,6 +1,5 @@
 package com.direwolf20.buildinggadgets.common.registry.objects;
 
-import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.items.Template;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetBuilding;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
@@ -11,6 +10,7 @@ import com.direwolf20.buildinggadgets.common.items.pastes.ConstructionPasteConta
 import com.direwolf20.buildinggadgets.common.items.pastes.RegularPasteContainerTypes;
 import com.direwolf20.buildinggadgets.common.registry.RegistryContainer;
 import com.direwolf20.buildinggadgets.common.registry.RegistryObjectBuilder;
+import com.direwolf20.buildinggadgets.common.utils.Reference;
 import net.minecraft.item.Item;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -18,8 +18,8 @@ import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
 import net.minecraftforge.registries.ObjectHolder;
 
-@ObjectHolder(BuildingGadgets.MODID)
-@EventBusSubscriber(modid = BuildingGadgets.MODID, bus = Bus.MOD)
+@ObjectHolder(Reference.MODID)
+@EventBusSubscriber(modid = Reference.MODID, bus = Bus.MOD)
 public final class BGItems {
     private BGItems() {}
 

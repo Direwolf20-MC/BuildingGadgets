@@ -5,11 +5,11 @@
 
 package com.direwolf20.buildinggadgets.client.gui;
 
-import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketPasteGUI;
 
+import com.direwolf20.buildinggadgets.common.utils.Reference;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.item.ItemStack;
@@ -30,7 +30,7 @@ public class PasteGUI extends GuiScreenTextFields {
 
     private ItemStack tool;
 
-    private static final ResourceLocation background = new ResourceLocation(BuildingGadgets.MODID, "textures/gui/testcontainer.png");
+    private static final ResourceLocation background = new ResourceLocation(Reference.MODID, "textures/gui/testcontainer.png");
 
     PasteGUI(ItemStack tool) {
         super();

@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.common.items.pastes;
 
 import com.direwolf20.buildinggadgets.common.tools.InventoryManipulation;
-import com.direwolf20.buildinggadgets.common.utils.NBTUtil;
+import com.direwolf20.buildinggadgets.common.utils.helpers.NBTHelper;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -42,7 +42,7 @@ public class ConstructionPasteContainer extends GenericPasteContainer {
 
     @Override
     public void setPasteCount(ItemStack stack, int amount) {
-        NBTUtil.getOrNewTag(stack).setInt("amount", amount);
+        NBTHelper.getOrNewTag(stack).setInt("amount", amount);
     }
 
     @Override

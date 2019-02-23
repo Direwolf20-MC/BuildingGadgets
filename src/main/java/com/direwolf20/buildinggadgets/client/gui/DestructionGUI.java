@@ -5,10 +5,10 @@
 
 package com.direwolf20.buildinggadgets.client.gui;
 
-import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetDestruction;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketDestructionGUI;
+import com.direwolf20.buildinggadgets.common.utils.Reference;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.resources.I18n;
@@ -28,7 +28,7 @@ public class DestructionGUI extends GuiScreenTextFields {
 
     private ItemStack destructionTool;
 
-    private static final ResourceLocation background = new ResourceLocation(BuildingGadgets.MODID, "textures/gui/testcontainer.png");
+    private static final ResourceLocation background = new ResourceLocation(Reference.MODID, "textures/gui/testcontainer.png");
 
     DestructionGUI(ItemStack tool) {
         super();

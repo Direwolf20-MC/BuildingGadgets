@@ -1,8 +1,8 @@
 package com.direwolf20.buildinggadgets.common.registry.objects;
 
-import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlock;
 import com.direwolf20.buildinggadgets.common.config.Config;
+import com.direwolf20.buildinggadgets.common.utils.Reference;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.material.MaterialColor;
 import net.minecraft.client.Minecraft;
@@ -16,7 +16,7 @@ import net.minecraftforge.fml.DistExecutor;
 public class BuildingObjects {
 
     // Creative tab
-    public static ItemGroup creativeTab = new ItemGroup(BuildingGadgets.MODID){
+    public static ItemGroup creativeTab = new ItemGroup(Reference.MODID){
         @Override
         public ItemStack createIcon() {
             return new ItemStack(BGItems.gadgetBuilding);

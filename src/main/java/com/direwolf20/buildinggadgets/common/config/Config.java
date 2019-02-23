@@ -1,6 +1,7 @@
 package com.direwolf20.buildinggadgets.common.config;
 
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
+import com.direwolf20.buildinggadgets.common.utils.Reference;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
@@ -20,7 +21,7 @@ public class Config {
 
     private static final String CATEGORY_GENERAL = "general";
 
-    private static final String LANG_KEY_ROOT = "config." + BuildingGadgets.MODID;
+    private static final String LANG_KEY_ROOT = "config." + Reference.MODID;
 
     private static final String LANG_KEY_GENERAL = LANG_KEY_ROOT + "." + CATEGORY_GENERAL;
 
@@ -323,12 +324,12 @@ public class Config {
     @SubscribeEvent
     public static void onLoad(final ModConfig.Loading configEvent) {
         BLACKLIST.parseBlacklists();
-        BuildingGadgets.LOG.debug("Loaded {} config file {}", BuildingGadgets.MODID, configEvent.getConfig().getFileName());
+        BuildingGadgets.LOG.debug("Loaded {} config file {}", Reference.MODID, configEvent.getConfig().getFileName());
     }
 
     @SubscribeEvent
     public static void onFileChange(final ModConfig.ConfigReloading configEvent) {
-        BuildingGadgets.LOG.fatal(CORE, "{} config just got changed on the file system!", BuildingGadgets.MODID);
+        BuildingGadgets.LOG.fatal(CORE, "{} config just got changed on the file system!", Reference.MODID);
     }
 
 }

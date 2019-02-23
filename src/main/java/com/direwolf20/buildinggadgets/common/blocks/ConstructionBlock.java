@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.common.blocks;
 
-import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
+import com.direwolf20.buildinggadgets.common.utils.Reference;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.EnumPushReaction;
@@ -31,7 +31,7 @@ import java.util.Random;
 
 //@Optional.Interface(iface = "team.chisel.ctm.api.IFacade", modid = "ctm-api")
 public class ConstructionBlock extends BlockContainer /*implements IFacade*/ {
-    public static final ResourceLocation REGISTRY_NAME = new ResourceLocation(BuildingGadgets.MODID,"construction_block");
+    public static final ResourceLocation REGISTRY_NAME = new ResourceLocation(Reference.MODID,"construction_block");
     //public static final ConstructionProperty FACADEID = new ConstructionProperty("facadeid");
     public static final IProperty<Boolean> BRIGHT = BooleanProperty.create("bright");
     public static final IProperty<Boolean> NEIGHBOR_BRIGHTNESS = BooleanProperty.create("neighbor_brightness");

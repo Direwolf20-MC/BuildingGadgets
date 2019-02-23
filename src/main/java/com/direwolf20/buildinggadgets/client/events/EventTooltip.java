@@ -1,11 +1,11 @@
 package com.direwolf20.buildinggadgets.client.events;
 
 import com.direwolf20.buildinggadgets.client.RemoteInventoryCache;
-import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.items.ITemplate;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
 import com.direwolf20.buildinggadgets.common.tools.InventoryManipulation;
 import com.direwolf20.buildinggadgets.common.tools.UniqueItem;
+import com.direwolf20.buildinggadgets.common.utils.Reference;
 import com.google.common.collect.Multiset;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
@@ -28,7 +28,7 @@ import java.util.*;
  * Thanks Vazkii!!
  */
 
-@Mod.EventBusSubscriber(modid = BuildingGadgets.MODID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+@Mod.EventBusSubscriber(modid = Reference.MODID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public class EventTooltip {
 
     private static final int STACKS_PER_LINE = 8;

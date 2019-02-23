@@ -1,13 +1,14 @@
 package com.direwolf20.buildinggadgets.common.items.gadgets;
 
-import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.common.items.capability.CapabilityProviderEnergy;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
 import com.direwolf20.buildinggadgets.common.tools.*;
-import com.direwolf20.buildinggadgets.common.utils.VectorUtil;
+import com.direwolf20.buildinggadgets.common.utils.Reference;
+import com.direwolf20.buildinggadgets.common.utils.helpers.SortingHelper;
+import com.direwolf20.buildinggadgets.common.utils.helpers.VectorHelper;
 import com.direwolf20.buildinggadgets.common.world.FakeBuilderWorld;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
@@ -59,7 +60,7 @@ public class GadgetBuilding extends GadgetGeneric {
         }
     }
 
-    public static final ResourceLocation REGISTRY_NAME = new ResourceLocation(BuildingGadgets.MODID, "gadget_building");
+    public static final ResourceLocation REGISTRY_NAME = new ResourceLocation(Reference.MODID, "gadget_building");
 
     public GadgetBuilding(Properties builder) {
         super(builder.defaultMaxDamage(Config.GADGETS.GADGET_BUILDING.durability.get()));
@@ -179,7 +180,7 @@ public class GadgetBuilding extends GadgetGeneric {
         List<BlockPos> coords = getAnchor(stack);
 
         if (coords.size() == 0) {  //If we don't have an anchor, build in the current spot
-            RayTraceResult lookingAt = VectorUtil.getLookingAt(player);
+            RayTraceResult lookingAt = VectorHelper.getLookingAt(player);
             if (lookingAt == null) { //If we aren't looking at anything, exit
                 return false;
             }
@@ -222,7 +223,7 @@ public class GadgetBuilding extends GadgetGeneric {
             }
         }
 
-        Sorter.Blocks.byDistance(coords, player);
+        SortingHelper.Blocks.byDistance(coords, player);
         return true;
     }
 

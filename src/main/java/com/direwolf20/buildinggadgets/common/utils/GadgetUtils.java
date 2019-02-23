@@ -5,6 +5,7 @@ import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetBuilding;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetExchanger;
 import com.direwolf20.buildinggadgets.common.tools.*;
+import com.direwolf20.buildinggadgets.common.utils.helpers.VectorHelper;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multiset;
@@ -265,7 +266,7 @@ public class GadgetUtils {
     public static void selectBlock(ItemStack stack, EntityPlayer player) {
         //Used to find which block the player is looking at, and store it in NBT on the tool.
         World world = player.world;
-        RayTraceResult lookingAt = VectorUtil.getLookingAt(player);
+        RayTraceResult lookingAt = VectorHelper.getLookingAt(player);
         if (lookingAt == null)
             return;
 
@@ -307,7 +308,7 @@ public class GadgetUtils {
         World world = player.world;
         List<BlockPos> currentCoords = getAnchor(stack);
         if (currentCoords.size() == 0) {  //If we don't have an anchor, find the block we're supposed to anchor to
-            RayTraceResult lookingAt = VectorUtil.getLookingAt(player);
+            RayTraceResult lookingAt = VectorHelper.getLookingAt(player);
             if (lookingAt == null) {  //If we aren't looking at anything, exit
                 return false;
             }

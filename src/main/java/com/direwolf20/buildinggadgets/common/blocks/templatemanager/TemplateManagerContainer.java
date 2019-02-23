@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.common.blocks.templatemanager;
 
-import com.direwolf20.buildinggadgets.common.BuildingGadgets;
+import com.direwolf20.buildinggadgets.common.utils.Reference;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
@@ -10,8 +10,8 @@ import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 
 public class TemplateManagerContainer extends Container {
-    public static final String TEXTURE_LOC_SLOT_TOOL = BuildingGadgets.MODID + ":gui/slot_copypastetool";
-    public static final String TEXTURE_LOC_SLOT_TEMPLATE = BuildingGadgets.MODID + ":gui/slot_template";
+    public static final String TEXTURE_LOC_SLOT_TOOL = Reference.MODID + ":gui/slot_copypastetool";
+    public static final String TEXTURE_LOC_SLOT_TEMPLATE = Reference.MODID + ":gui/slot_template";
     private TemplateManagerTileEntity te;
 
     public TemplateManagerContainer(IInventory playerInventory, TemplateManagerTileEntity te) {

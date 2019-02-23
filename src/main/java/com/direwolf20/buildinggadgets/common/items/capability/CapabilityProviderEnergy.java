@@ -23,12 +23,6 @@ public class CapabilityProviderEnergy implements ICapabilityProvider {
         this.energyCapability = LazyOptional.of(() -> energyItem);
     }
 
-    // @todo: reimplement @since 1.13.x removed as of 1.13?
-//    @Override
-//    public boolean hasCapability(@Nonnull Capability<?> capability, @Nullable EnumFacing facing) {
-//        return capability == CapabilityEnergy.ENERGY && SyncedConfig.poweredByFE ;
-//    }
-
     @Nonnull
     @Override
     public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable EnumFacing side) {

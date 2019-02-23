@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.common.blocks;
 
-import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.entities.ConstructionBlockEntity;
+import com.direwolf20.buildinggadgets.common.utils.Reference;
 import net.minecraft.block.BlockFalling;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.util.ITooltipFlag;
@@ -21,7 +21,7 @@ import javax.annotation.Nullable;
 import java.util.List;
 
 public class ConstructionBlockPowder extends BlockFalling {
-    public static final ResourceLocation REGISTRY_NAME = new ResourceLocation(BuildingGadgets.MODID,"construction_block_powder");
+    public static final ResourceLocation REGISTRY_NAME = new ResourceLocation(Reference.MODID,"construction_block_powder");
     public ConstructionBlockPowder(Properties builder) {
         super(builder);
     }

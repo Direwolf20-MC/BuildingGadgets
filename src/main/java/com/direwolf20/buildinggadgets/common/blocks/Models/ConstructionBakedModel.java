@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.common.blocks.Models;
 
-import com.direwolf20.buildinggadgets.common.BuildingGadgets;
+import com.direwolf20.buildinggadgets.common.utils.Reference;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.model.*;
@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Random;
 
 public class ConstructionBakedModel implements IBakedModel {
-    public static final ModelResourceLocation modelFacade = new ModelResourceLocation(BuildingGadgets.MODID + ":" + "construction_block");
+    public static final ModelResourceLocation modelFacade = new ModelResourceLocation(Reference.MODID + ":" + "construction_block");
 
     private static TextureAtlasSprite spriteCable;
     private IBakedModel blankConstructionModel;
@@ -25,7 +25,7 @@ public class ConstructionBakedModel implements IBakedModel {
 
     private static void initTextures() {
         if (spriteCable == null) {
-            spriteCable = Minecraft.getInstance().getTextureMap().getAtlasSprite(BuildingGadgets.MODID + ":blocks/constructionblock");
+            spriteCable = Minecraft.getInstance().getTextureMap().getAtlasSprite(Reference.MODID + ":blocks/constructionblock");
         }
     }
 

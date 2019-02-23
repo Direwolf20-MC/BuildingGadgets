@@ -1,6 +1,5 @@
 package com.direwolf20.buildinggadgets.common.items.gadgets;
 
-import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.common.items.capability.CapabilityProviderEnergy;
@@ -8,7 +7,8 @@ import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
 import com.direwolf20.buildinggadgets.common.tools.ExchangingModes;
 import com.direwolf20.buildinggadgets.common.tools.InventoryManipulation;
 import com.direwolf20.buildinggadgets.common.tools.ToolRenders;
-import com.direwolf20.buildinggadgets.common.utils.VectorUtil;
+import com.direwolf20.buildinggadgets.common.utils.Reference;
+import com.direwolf20.buildinggadgets.common.utils.helpers.VectorHelper;
 import com.direwolf20.buildinggadgets.common.world.FakeBuilderWorld;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
@@ -62,7 +62,7 @@ public class GadgetExchanger extends GadgetGeneric {
         }
     }
 
-    public static final ResourceLocation REGISTRY_NAME = new ResourceLocation(BuildingGadgets.MODID, "gadget_exchanging");
+    public static final ResourceLocation REGISTRY_NAME = new ResourceLocation(Reference.MODID, "gadget_exchanging");
 
     public GadgetExchanger(Properties builder) {
         super(builder.defaultMaxDamage(Config.GADGETS.GADGET_EXCHANGER.durability.get()));
@@ -196,7 +196,7 @@ public class GadgetExchanger extends GadgetGeneric {
         List<BlockPos> coords = getAnchor(stack);
 
         if (coords.size() == 0) { //If we don't have an anchor, build in the current spot
-            RayTraceResult lookingAt = VectorUtil.getLookingAt(player);
+            RayTraceResult lookingAt = VectorHelper.getLookingAt(player);
             if (lookingAt == null) { //If we aren't looking at anything, exit
                 return false;
             }

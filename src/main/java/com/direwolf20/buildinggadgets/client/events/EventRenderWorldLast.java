@@ -1,8 +1,8 @@
 package com.direwolf20.buildinggadgets.client.events;
 
-import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.items.gadgets.*;
 import com.direwolf20.buildinggadgets.common.tools.ToolRenders;
+import com.direwolf20.buildinggadgets.common.utils.Reference;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -11,7 +11,7 @@ import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
-@Mod.EventBusSubscriber(modid = BuildingGadgets.MODID, value = Dist.CLIENT)
+@Mod.EventBusSubscriber(modid = Reference.MODID, value = Dist.CLIENT)
 public class EventRenderWorldLast {
 
     @SubscribeEvent

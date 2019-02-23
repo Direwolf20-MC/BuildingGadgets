@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.common.blocks;
 
-import com.direwolf20.buildinggadgets.common.BuildingGadgets;
+import com.direwolf20.buildinggadgets.common.utils.Reference;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.EnumPushReaction;
 import net.minecraft.block.state.IBlockState;
@@ -15,7 +15,7 @@ import net.minecraft.world.World;
 
 public class EffectBlock extends Block {
 
-    public static final ResourceLocation REGISTRY_NAME = new ResourceLocation(BuildingGadgets.MODID,"effect_block");
+    public static final ResourceLocation REGISTRY_NAME = new ResourceLocation(Reference.MODID,"effect_block");
     public EffectBlock(Properties builder) {
         super(builder);
     }

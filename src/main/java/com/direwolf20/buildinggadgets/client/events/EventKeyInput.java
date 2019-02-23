@@ -2,7 +2,6 @@ package com.direwolf20.buildinggadgets.client.events;
 
 import com.direwolf20.buildinggadgets.client.KeyBindings;
 import com.direwolf20.buildinggadgets.client.gui.ModeRadialMenu;
-import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketAnchorKey;
@@ -11,6 +10,7 @@ import com.direwolf20.buildinggadgets.common.network.packets.PacketToggleConnect
 import com.direwolf20.buildinggadgets.common.network.packets.PacketToggleFuzzy;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketUndoKey;
 
+import com.direwolf20.buildinggadgets.common.utils.Reference;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.item.ItemStack;
@@ -21,7 +21,7 @@ import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 
-@EventBusSubscriber(modid = BuildingGadgets.MODID, value = Dist.CLIENT)
+@EventBusSubscriber(modid = Reference.MODID, value = Dist.CLIENT)
 public class EventKeyInput {
 
     @SubscribeEvent

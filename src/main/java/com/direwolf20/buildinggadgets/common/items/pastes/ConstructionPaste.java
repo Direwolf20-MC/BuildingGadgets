@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.common.items.pastes;
 
-import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.tools.InventoryManipulation;
+import com.direwolf20.buildinggadgets.common.utils.Reference;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -14,7 +14,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class ConstructionPaste extends Item {
-    public static final ResourceLocation REGISTRY_NAME = new ResourceLocation(BuildingGadgets.MODID, "construction_paste");
+    public static final ResourceLocation REGISTRY_NAME = new ResourceLocation(Reference.MODID, "construction_paste");
     public ConstructionPaste(Properties builder) {
         super(builder);
     }
