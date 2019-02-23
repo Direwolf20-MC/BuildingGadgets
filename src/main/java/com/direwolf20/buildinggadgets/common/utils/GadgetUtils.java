@@ -54,6 +54,15 @@ public class GadgetUtils {
         return "the following stack: [" + stack + "]";
     }
 
+    public static NBTTagCompound enforceHasTag(ItemStack stack) {
+        NBTTagCompound nbt = stack.getTag();
+        if (nbt == null) {
+            nbt = new NBTTagCompound();
+            stack.setTag(nbt);
+        }
+        return nbt;
+    }
+
     @Nullable
     public static ByteArrayOutputStream getPasteStream(@Nonnull NBTTagCompound compound, @Nullable String name) throws IOException{
         NBTTagCompound withText = name != null && !name.isEmpty() ? compound.copy() : compound;
