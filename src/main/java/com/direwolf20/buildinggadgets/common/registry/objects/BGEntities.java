@@ -28,11 +28,11 @@ public class BGEntities {
 
     public static void init() {
         container.add(new EntityBuilder<BlockBuildEntity>(new ResourceLocation(BuildingGadgets.MODID, "build_block_entity"))
-                .builder(Builder.create(BlockBuildEntity.class, BlockBuildEntity::new).tracker(64, 1, true))
+                .builder(Builder.create(BlockBuildEntity.class, BlockBuildEntity::new).tracker(64, 1, false))
                 .renderer(BlockBuildEntityRender::new)
                 .factory(b -> b.build("")));
         container.add(new EntityBuilder<ConstructionBlockEntity>(new ResourceLocation(BuildingGadgets.MODID, "construction_block_entity"))
-                .builder(Builder.create(ConstructionBlockEntity.class, ConstructionBlockEntity::new).tracker(64, 1, true))
+                .builder(Builder.create(ConstructionBlockEntity.class, ConstructionBlockEntity::new).tracker(64, 1, false))
                 .renderer(ConstructionBlockEntityRender::new)
                 .factory(b -> b.build("")));
     }
