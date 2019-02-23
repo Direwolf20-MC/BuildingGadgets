@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.common.items.pastes;
 
-import com.direwolf20.buildinggadgets.common.tools.InventoryManipulation;
+import com.direwolf20.buildinggadgets.common.utils.helpers.InventoryHelper;
 import com.direwolf20.buildinggadgets.common.utils.helpers.NBTHelper;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
@@ -59,7 +59,7 @@ public class ConstructionPasteContainer extends GenericPasteContainer {
             for (int i = 0; i < 36; ++i) {
                 ItemStack itemStack = inv.getStackInSlot(i);
                 if (itemStack.getItem() instanceof ConstructionPaste) {
-                    InventoryManipulation.addPasteToContainer(player, itemStack);
+                    InventoryHelper.addPasteToContainer(player, itemStack);
                 }
             }
         }

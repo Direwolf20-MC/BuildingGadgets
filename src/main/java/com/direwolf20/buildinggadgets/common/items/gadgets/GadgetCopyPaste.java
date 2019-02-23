@@ -12,8 +12,11 @@ import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketBlockMap;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
 import com.direwolf20.buildinggadgets.common.tools.*;
+import com.direwolf20.buildinggadgets.common.utils.blocks.BlockMap;
+import com.direwolf20.buildinggadgets.common.utils.blocks.BlockMapIntState;
 import com.direwolf20.buildinggadgets.common.utils.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.utils.Reference;
+import com.direwolf20.buildinggadgets.common.utils.helpers.InventoryHelper;
 import com.direwolf20.buildinggadgets.common.utils.helpers.VectorHelper;
 import com.direwolf20.buildinggadgets.common.world.WorldSave;
 import com.google.common.collect.HashMultiset;
@@ -414,7 +417,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
                     IBlockState tempState = world.getBlockState(tempPos);
                     if (tempState != Blocks.AIR.getDefaultState() && (world.getTileEntity(tempPos) == null || world.getTileEntity(tempPos) instanceof ConstructionBlockTileEntity) && !tempState.getMaterial().isLiquid() && Config.BLACKLIST.isAllowedBlock(tempState.getBlock())) {
                         TileEntity te = world.getTileEntity(tempPos);
-                        IBlockState assignState = InventoryManipulation.getSpecificStates(tempState, world, player, tempPos, stack);
+                        IBlockState assignState = InventoryHelper.getSpecificStates(tempState, world, player, tempPos, stack);
                         IBlockState actualState = assignState.getExtendedState(world, tempPos);
                         if (te instanceof ConstructionBlockTileEntity) {
                             actualState = ((ConstructionBlockTileEntity) te).getActualBlockState();
@@ -543,8 +546,8 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
         }
         ItemStack constructionPaste = new ItemStack(BGItems.constructionPaste);
         boolean useConstructionPaste = false;
-        if (InventoryManipulation.countItem(itemStack, player, world) < neededItems) {
-            if (InventoryManipulation.countPaste(player) < neededItems) {
+        if (InventoryHelper.countItem(itemStack, player, world) < neededItems) {
+            if (InventoryHelper.countPaste(player) < neededItems) {
                 return;
             }
             itemStack = constructionPaste.copy();
@@ -558,9 +561,9 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
 
         boolean useItemSuccess;
         if (useConstructionPaste) {
-            useItemSuccess = InventoryManipulation.usePaste(player, 1);
+            useItemSuccess = InventoryHelper.usePaste(player, 1);
         } else {
-            useItemSuccess = InventoryManipulation.useItem(itemStack, player, neededItems, world);
+            useItemSuccess = InventoryHelper.useItem(itemStack, player, neededItems, world);
         }
         if (useItemSuccess) {
             world.spawnEntity(new BlockBuildEntity(world, pos, player, state, 1, state, useConstructionPaste));

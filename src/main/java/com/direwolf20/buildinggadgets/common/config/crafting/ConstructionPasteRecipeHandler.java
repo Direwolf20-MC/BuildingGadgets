@@ -1,4 +1,4 @@
-package com.direwolf20.buildinggadgets.common.tools;
+package com.direwolf20.buildinggadgets.common.config.crafting;
 
 import com.direwolf20.buildinggadgets.common.items.pastes.GenericPasteContainer;
 

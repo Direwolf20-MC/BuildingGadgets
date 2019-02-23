@@ -9,7 +9,13 @@ import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetDestruction;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetExchanger;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
+import com.direwolf20.buildinggadgets.common.utils.blocks.BlockMap;
+import com.direwolf20.buildinggadgets.common.tools.modes.BuildingModes;
+import com.direwolf20.buildinggadgets.common.tools.modes.ExchangingModes;
 import com.direwolf20.buildinggadgets.common.utils.GadgetUtils;
+import com.direwolf20.buildinggadgets.common.utils.buffers.PasteToolBufferBuilder;
+import com.direwolf20.buildinggadgets.common.utils.buffers.ToolBufferBuilder;
+import com.direwolf20.buildinggadgets.common.utils.helpers.InventoryHelper;
 import com.direwolf20.buildinggadgets.common.utils.helpers.SortingHelper;
 import com.direwolf20.buildinggadgets.common.utils.helpers.VectorHelper;
 import com.direwolf20.buildinggadgets.common.world.FakeBuilderWorld;
@@ -122,7 +128,7 @@ public class ToolRenders {
                 //Figure out how many of the block we're rendering we have in the inventory of the player.
                 ItemStack itemStack;
                 if (renderBlockState.getBlock().canSilkHarvest(renderBlockState, world, new BlockPos(0, 0, 0), player)) {
-                    itemStack = InventoryManipulation.getSilkTouchDrop(renderBlockState);
+                    itemStack = InventoryHelper.getSilkTouchDrop(renderBlockState);
                 } else {
                     itemStack = renderBlockState.getBlock().getPickBlock(renderBlockState, null, world, new BlockPos(0, 0, 0), player);
                 }
@@ -130,8 +136,8 @@ public class ToolRenders {
                     itemStack = renderBlockState.getBlock().getPickBlock(renderBlockState, null, world, new BlockPos(0, 0, 0), player);
                 }
 
-                long hasBlocks = InventoryManipulation.countItem(itemStack, player, cacheInventory);
-                hasBlocks = hasBlocks + InventoryManipulation.countPaste(player);
+                long hasBlocks = InventoryHelper.countItem(itemStack, player, cacheInventory);
+                hasBlocks = hasBlocks + InventoryHelper.countPaste(player);
                 int hasEnergy = 0;
                 IEnergyStorage energy = CapabilityProviderEnergy.getCapOrNull(stack);
                 if (energy != null) {
@@ -265,18 +271,18 @@ public class ToolRenders {
 
                 //Figure out how many of the block we're rendering we have in the inventory of the player.
                 //ItemStack itemStack = renderBlockState.getBlock().getPickBlock(renderBlockState, null, world, new BlockPos(0, 0, 0), player);
-                //ItemStack itemStack = InventoryManipulation.getSilkTouchDrop(renderBlockState);
+                //ItemStack itemStack = InventoryHelper.getSilkTouchDrop(renderBlockState);
                 ItemStack itemStack;
                 if (renderBlockState.getBlock().canSilkHarvest(renderBlockState, world, new BlockPos(0, 0, 0), player)) {
-                    itemStack = InventoryManipulation.getSilkTouchDrop(renderBlockState);
+                    itemStack = InventoryHelper.getSilkTouchDrop(renderBlockState);
                 } else {
                     itemStack = renderBlockState.getBlock().getPickBlock(renderBlockState, null, world, new BlockPos(0, 0, 0), player);
                 }
                 if (itemStack.getItem().equals(Items.AIR)) {
                     itemStack = renderBlockState.getBlock().getPickBlock(renderBlockState, null, world, new BlockPos(0, 0, 0), player);
                 }
-                long hasBlocks = InventoryManipulation.countItem(itemStack, player, cacheInventory);
-                hasBlocks = hasBlocks + InventoryManipulation.countPaste(player);
+                long hasBlocks = InventoryHelper.countItem(itemStack, player, cacheInventory);
+                hasBlocks = hasBlocks + InventoryHelper.countPaste(player);
                 int hasEnergy = 0;
 
                 IEnergyStorage energy = CapabilityProviderEnergy.getCapOrNull(stack);

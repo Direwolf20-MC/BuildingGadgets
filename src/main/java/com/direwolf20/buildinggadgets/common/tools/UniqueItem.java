@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.common.tools;
 
+import com.direwolf20.buildinggadgets.common.utils.helpers.InventoryHelper;
 import com.google.common.base.Preconditions;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
@@ -24,16 +25,16 @@ public final class UniqueItem { //TODO @since 1.13.x can this be replaced with I
     public static UniqueItem fromBlockState(IBlockState state, EntityPlayer player, BlockPos pos) {
         ItemStack itemStack;
         //if (state.getBlock().canSilkHarvest(player.world, pos, state, player)) {
-        //    itemStack = InventoryManipulation.getSilkTouchDrop(state);
+        //    itemStack = InventoryHelper.getSilkTouchDrop(state);
         //} else {
         //}
         try {
             itemStack = state.getBlock().getPickBlock(state, null, player.world, pos, player);
         } catch (Exception e) {
-            itemStack = InventoryManipulation.getSilkTouchDrop(state);
+            itemStack = InventoryHelper.getSilkTouchDrop(state);
         }
         if (itemStack.isEmpty()) {
-            itemStack = InventoryManipulation.getSilkTouchDrop(state);
+            itemStack = InventoryHelper.getSilkTouchDrop(state);
         }
         if (!itemStack.isEmpty()) {
             return new UniqueItem(itemStack.getItem());

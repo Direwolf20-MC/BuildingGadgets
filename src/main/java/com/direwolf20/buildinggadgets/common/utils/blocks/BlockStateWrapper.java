@@ -1,4 +1,4 @@
-package com.direwolf20.buildinggadgets.common.tools;
+package com.direwolf20.buildinggadgets.common.utils.blocks;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;

@@ -4,8 +4,8 @@ import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.common.items.capability.CapabilityProviderEnergy;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
-import com.direwolf20.buildinggadgets.common.tools.ExchangingModes;
-import com.direwolf20.buildinggadgets.common.tools.InventoryManipulation;
+import com.direwolf20.buildinggadgets.common.tools.modes.ExchangingModes;
+import com.direwolf20.buildinggadgets.common.utils.helpers.InventoryHelper;
 import com.direwolf20.buildinggadgets.common.tools.ToolRenders;
 import com.direwolf20.buildinggadgets.common.utils.Reference;
 import com.direwolf20.buildinggadgets.common.utils.helpers.VectorHelper;
@@ -240,7 +240,7 @@ public class GadgetExchanger extends GadgetGeneric {
         boolean useConstructionPaste = false;
         //ItemStack itemStack = setBlock.getBlock().getPickBlock(setBlock, null, world, pos, player);
         if (setBlock.getBlock().canSilkHarvest(setBlock, world, pos, player)) {
-            itemStack = InventoryManipulation.getSilkTouchDrop(setBlock);
+            itemStack = InventoryHelper.getSilkTouchDrop(setBlock);
         } else {
             itemStack = setBlock.getBlock().getPickBlock(setBlock, null, world, pos, player);
         }
@@ -263,9 +263,9 @@ public class GadgetExchanger extends GadgetGeneric {
         if (neededItems == 0) {
             neededItems = 1;
         }
-        if (InventoryManipulation.countItem(itemStack, player, world) < neededItems) {
+        if (InventoryHelper.countItem(itemStack, player, world) < neededItems) {
             ItemStack constructionPaste = new ItemStack(BGItems.constructionPaste);
-            if (InventoryManipulation.countPaste(player) < neededItems) {
+            if (InventoryHelper.countPaste(player) < neededItems) {
                 return false;
             }
             itemStack = constructionPaste.copy();
@@ -294,9 +294,9 @@ public class GadgetExchanger extends GadgetGeneric {
         currentBlock.getBlock().harvestBlock(world, player, pos, currentBlock, world.getTileEntity(pos), tool);
         boolean useItemSuccess;
         if (useConstructionPaste) {
-            useItemSuccess = InventoryManipulation.usePaste(player, 1);
+            useItemSuccess = InventoryHelper.usePaste(player, 1);
         } else {
-            useItemSuccess = InventoryManipulation.useItem(itemStack, player, neededItems, world);
+            useItemSuccess = InventoryHelper.useItem(itemStack, player, neededItems, world);
         }
         if (useItemSuccess) {
             world.spawnEntity(new BlockBuildEntity(world, pos, player, setBlock, 3, getToolActualBlock(tool), useConstructionPaste));

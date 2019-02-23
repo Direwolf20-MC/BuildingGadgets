@@ -16,8 +16,8 @@ import com.direwolf20.buildinggadgets.common.network.packets.PacketTemplateManag
 import com.direwolf20.buildinggadgets.common.network.packets.PacketTemplateManagerPaste;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketTemplateManagerSave;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
-import com.direwolf20.buildinggadgets.common.tools.PasteToolBufferBuilder;
-import com.direwolf20.buildinggadgets.common.tools.ToolBufferBuilder;
+import com.direwolf20.buildinggadgets.common.utils.buffers.PasteToolBufferBuilder;
+import com.direwolf20.buildinggadgets.common.utils.buffers.ToolBufferBuilder;
 import com.direwolf20.buildinggadgets.common.utils.GadgetUtils;
 
 import com.direwolf20.buildinggadgets.common.utils.Reference;

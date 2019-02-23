@@ -6,7 +6,9 @@ import com.direwolf20.buildinggadgets.common.items.capability.CapabilityProvider
 import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
 import com.direwolf20.buildinggadgets.common.tools.*;
+import com.direwolf20.buildinggadgets.common.tools.modes.BuildingModes;
 import com.direwolf20.buildinggadgets.common.utils.Reference;
+import com.direwolf20.buildinggadgets.common.utils.helpers.InventoryHelper;
 import com.direwolf20.buildinggadgets.common.utils.helpers.SortingHelper;
 import com.direwolf20.buildinggadgets.common.utils.helpers.VectorHelper;
 import com.direwolf20.buildinggadgets.common.world.FakeBuilderWorld;
@@ -284,7 +286,7 @@ public class GadgetBuilding extends GadgetGeneric {
 
         ItemStack itemStack;
         if (setBlock.getBlock().canSilkHarvest(setBlock, world, pos, player)) {
-            itemStack = InventoryManipulation.getSilkTouchDrop(setBlock);
+            itemStack = InventoryHelper.getSilkTouchDrop(setBlock);
         } else {
             itemStack = setBlock.getBlock().getPickBlock(setBlock, null, world, pos, player);
         }
@@ -311,9 +313,9 @@ public class GadgetBuilding extends GadgetGeneric {
             return false;
         }
         ItemStack constructionPaste = new ItemStack(BGItems.constructionPaste);
-        if (InventoryManipulation.countItem(itemStack, player, world) < neededItems) {
-            //if (InventoryManipulation.countItem(constructionStack, player) == 0) {
-            if (InventoryManipulation.countPaste(player) < neededItems) {
+        if (InventoryHelper.countItem(itemStack, player, world) < neededItems) {
+            //if (InventoryHelper.countItem(constructionStack, player) == 0) {
+            if (InventoryHelper.countPaste(player) < neededItems) {
                 return false;
             }
             itemStack = constructionPaste.copy();
@@ -325,12 +327,12 @@ public class GadgetBuilding extends GadgetGeneric {
 
         this.applyDamage(heldItem, player);
 
-        //ItemStack constructionStack = InventoryManipulation.getSilkTouchDrop(ModBlocks.constructionBlock.getDefaultState());
+        //ItemStack constructionStack = InventoryHelper.getSilkTouchDrop(ModBlocks.constructionBlock.getDefaultState());
         boolean useItemSuccess;
         if (useConstructionPaste) {
-            useItemSuccess = InventoryManipulation.usePaste(player, 1);
+            useItemSuccess = InventoryHelper.usePaste(player, 1);
         } else {
-            useItemSuccess = InventoryManipulation.useItem(itemStack, player, neededItems, world);
+            useItemSuccess = InventoryHelper.useItem(itemStack, player, neededItems, world);
         }
         if (useItemSuccess) {
             world.spawnEntity(new BlockBuildEntity(world, pos, player, setBlock, 1, getToolActualBlock(heldItem), useConstructionPaste));

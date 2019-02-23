@@ -5,6 +5,10 @@ import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetBuilding;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetExchanger;
 import com.direwolf20.buildinggadgets.common.tools.*;
+import com.direwolf20.buildinggadgets.common.tools.modes.BuildingModes;
+import com.direwolf20.buildinggadgets.common.tools.modes.ExchangingModes;
+import com.direwolf20.buildinggadgets.common.utils.exceptions.CapabilityNotPresentException;
+import com.direwolf20.buildinggadgets.common.utils.helpers.InventoryHelper;
 import com.direwolf20.buildinggadgets.common.utils.helpers.VectorHelper;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.ImmutableList;
@@ -280,7 +284,7 @@ public class GadgetUtils {
             player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.invalidblock").getUnformattedComponentText()), true);
             return;
         }
-        IBlockState placeState = InventoryManipulation.getSpecificStates(state, world, player, pos, stack);
+        IBlockState placeState = InventoryHelper.getSpecificStates(state, world, player, pos, stack);
         IBlockState actualState = placeState.getExtendedState(world, pos);
 
         setToolBlock(stack, placeState);

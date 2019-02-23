@@ -1,6 +1,8 @@
-package com.direwolf20.buildinggadgets.common.tools;
+package com.direwolf20.buildinggadgets.common.utils.blocks;
 
+import com.direwolf20.buildinggadgets.common.tools.UniqueItem;
 import com.direwolf20.buildinggadgets.common.utils.GadgetUtils;
+import com.direwolf20.buildinggadgets.common.utils.helpers.InventoryHelper;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
@@ -115,10 +117,10 @@ public class BlockMapIntState {
         try {
             itemStack = state.getBlock().getPickBlock(state, null, player.world, pos, player);
         } catch (Exception e) {
-            itemStack = InventoryManipulation.getSilkTouchDrop(state);
+            itemStack = InventoryHelper.getSilkTouchDrop(state);
         }
         if (itemStack.isEmpty()) {
-            itemStack = InventoryManipulation.getSilkTouchDrop(state);
+            itemStack = InventoryHelper.getSilkTouchDrop(state);
         }
         if (!itemStack.isEmpty()) {
             return new UniqueItem(itemStack.getItem());

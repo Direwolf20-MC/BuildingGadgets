@@ -1,4 +1,4 @@
-package com.direwolf20.buildinggadgets.common.tools;
+package com.direwolf20.buildinggadgets.common.config.crafting;
 
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.google.gson.JsonObject;
@@ -6,9 +6,9 @@ import net.minecraftforge.common.crafting.IConditionSerializer;
 
 import java.util.function.BooleanSupplier;
 
-public class CraftingConditionDestruction implements IConditionSerializer {
+public class CraftingConditionPaste implements IConditionSerializer {
     @Override
     public BooleanSupplier parse(JsonObject json) {
-        return Config.GENERAL.enableDestructionGadget::get;
+        return Config.GENERAL.enablePaste::get;
     }
 }

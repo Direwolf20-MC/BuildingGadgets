@@ -1,4 +1,4 @@
-package com.direwolf20.buildinggadgets.common.tools;
+package com.direwolf20.buildinggadgets.common.utils.helpers;
 
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
@@ -28,8 +28,11 @@ import java.util.*;
 /**
  * @MajorTuvok
  * Please check of the changes with the Sets as I've had to to some guess work
+ *
+ * @MichaelHillcox
+ * This entire class could do with some refactoring and cleaning :grin:
  */
-public class InventoryManipulation {
+public class InventoryHelper {
     private static IProperty AXIS = EnumProperty.create("axis", EnumFacing.Axis.class);
 
     private static final Set<IProperty> SAFE_PROPERTIES =
