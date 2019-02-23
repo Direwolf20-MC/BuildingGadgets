@@ -2,7 +2,6 @@ package com.direwolf20.buildinggadgets.common.blocks;
 
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
-import com.direwolf20.buildinggadgets.common.world.FakeRenderWorld;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.EnumPushReaction;
 import net.minecraft.block.material.MaterialColor;
@@ -23,7 +22,6 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.world.*;
 import net.minecraftforge.common.IPlantable;
-import net.minecraftforge.common.property.IExtendedBlockState;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -43,7 +41,7 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
     public ConstructionBlock(Properties builder) {
         super(builder);
 
-        setDefaultState(this.getStateContainer().getBaseState().with(BRIGHT, false).with(NEIGHBOR_BRIGHTNESS, false));
+        setDefaultState(this.getStateContainer().getBaseState().with(BRIGHT, true).with(NEIGHBOR_BRIGHTNESS, false));
     }
 
     @Override
@@ -166,6 +164,11 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
 
     @Override
     public int getOpacity(IBlockState state, IBlockReader worldIn, BlockPos pos) {
+        Boolean bright = state.get(ConstructionBlock.BRIGHT);
+        if (bright) {
+            return 0;
+        }
+        //return 255;
         IBlockState mimic = getActualMimicBlock(worldIn, pos);
         return mimic != null ? mimic.getOpacity(worldIn, pos) : super.getOpacity(state, worldIn, pos);
     }
