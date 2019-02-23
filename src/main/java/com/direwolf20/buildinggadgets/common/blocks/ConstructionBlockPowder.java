@@ -104,5 +104,9 @@ public class ConstructionBlockPowder extends BlockFalling {
         return false;
     }
 
+    @Override
+    public int getOpacity(IBlockState state, IBlockReader worldIn, BlockPos pos) {
+        return 0;
+    }
 
 }

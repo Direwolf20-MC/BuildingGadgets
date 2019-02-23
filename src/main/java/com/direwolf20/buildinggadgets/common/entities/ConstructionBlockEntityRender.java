@@ -28,7 +28,7 @@ public class ConstructionBlockEntityRender extends Render<ConstructionBlockEntit
         Minecraft mc = Minecraft.getInstance();
         GlStateManager.pushMatrix();
         GlStateManager.enableBlend();
-        GlStateManager.blendFunc(GL11.GL_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+        GlStateManager.blendFunc(GL14.GL_CONSTANT_ALPHA, GL14.GL_ONE_MINUS_CONSTANT_ALPHA);
 
         mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
         int teCounter = entity.getTicksExisted();
@@ -47,8 +47,7 @@ public class ConstructionBlockEntityRender extends Render<ConstructionBlockEntit
 
         GL14.glBlendColor(1F, 1F, 1F, scale); //Set the alpha of the blocks we are rendering
         IBlockState renderBlockState = BGBlocks.constructionBlock.getDefaultState();
-
-        blockrendererdispatcher.renderBlockBrightness(renderBlockState, 1.0f);
+        blockrendererdispatcher.renderBlockBrightness(renderBlockState, 1f);
         GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
         GlStateManager.disableBlend();
         GlStateManager.popMatrix();

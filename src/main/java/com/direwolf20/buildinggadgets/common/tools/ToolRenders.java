@@ -88,7 +88,7 @@ public class ToolRenders {
             GlStateManager.pushMatrix();//Push matrix again just because
             GlStateManager.enableBlend();
             //This blend function allows you to use a constant alpha, which is defined later
-            GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+            GlStateManager.blendFunc(GL14.GL_CONSTANT_ALPHA, GL14.GL_ONE_MINUS_CONSTANT_ALPHA);
             GlStateManager.translated(-doubleX, -doubleY, -doubleZ);//The render starts at the player, so we subtract the player coords and move the render to 0,0,0
             GlStateManager.translatef(pos.getX(), pos.getY(), pos.getZ());//Now move the render position to the coordinates we want to render at
             GlStateManager.rotatef(-90.0F, 0.0F, 1.0F, 0.0F); //Rotate it because i'm not sure why but we need to
