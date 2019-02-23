@@ -398,6 +398,7 @@ public class ToolRenders {
         } catch (ExecutionException e) {
             BuildingGadgets.logger.error("Error encountered while rendering destruction gadget overlay", e);
         }
+        GlStateManager.enableLighting();
         GlStateManager.popMatrix();
     }
 
