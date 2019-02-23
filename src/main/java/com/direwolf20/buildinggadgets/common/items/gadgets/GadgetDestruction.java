@@ -33,6 +33,7 @@ import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
+import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.BlockSnapshot;
 import net.minecraftforge.energy.IEnergyStorage;
@@ -394,7 +395,7 @@ public class GadgetDestruction extends GadgetGeneric {
         tagCompound.setIntArray("posPasteArray", posPasteArray);
         tagCompound.setIntArray("statePasteArray", statePasteArray);
         tagCompound.setTag("startPos", NBTUtil.writeBlockPos(startBlock));
-        tagCompound.setString("dim", player.dimension.toString());
+        tagCompound.setString("dim", DimensionType.func_212678_a(player.dimension).toString());
         tagCompound.setString("UUID", UUID);
         worldSave.addToMap(UUID, tagCompound);
         worldSave.markForSaving();
