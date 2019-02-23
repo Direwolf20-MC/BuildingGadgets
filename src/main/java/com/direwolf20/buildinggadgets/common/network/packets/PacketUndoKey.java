@@ -14,7 +14,10 @@ import java.util.function.Supplier;
 public class PacketUndoKey {
 
     public static void encode(PacketUndoKey msg, PacketBuffer buf) {}
-    public static PacketUndoKey decode(PacketBuffer buf) { return null; }
+
+    public static PacketUndoKey decode(PacketBuffer buf) {
+        return new PacketUndoKey();
+    }
 
     public static class Handler {
         public static void handle(PacketUndoKey msg, Supplier<NetworkEvent.Context> ctx) {

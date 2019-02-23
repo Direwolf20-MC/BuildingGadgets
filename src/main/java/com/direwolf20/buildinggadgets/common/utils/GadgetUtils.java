@@ -110,7 +110,8 @@ public class GadgetUtils {
     private static NBTTagCompound undoStateToNBT(UndoState undoState) {
         //Convert an UndoState object into NBT data. Uses ints to store relative positions to a start block for data compression..
         NBTTagCompound compound = new NBTTagCompound();
-        compound.setString("dim", undoState.dimension.toString());
+        compound.setString("dim", DimensionType.func_212678_a(undoState.dimension).toString());
+
         BlockPos startBlock = undoState.coordinates.get(0);
         int[] array = new int[undoState.coordinates.size()];
         int idx = 0;
