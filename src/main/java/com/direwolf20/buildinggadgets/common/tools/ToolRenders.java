@@ -9,10 +9,10 @@ import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetDestruction;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetExchanger;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
-import com.direwolf20.buildinggadgets.common.utils.blocks.BlockMap;
 import com.direwolf20.buildinggadgets.common.tools.modes.BuildingModes;
 import com.direwolf20.buildinggadgets.common.tools.modes.ExchangingModes;
 import com.direwolf20.buildinggadgets.common.utils.GadgetUtils;
+import com.direwolf20.buildinggadgets.common.utils.blocks.BlockMap;
 import com.direwolf20.buildinggadgets.common.utils.buffers.PasteToolBufferBuilder;
 import com.direwolf20.buildinggadgets.common.utils.buffers.ToolBufferBuilder;
 import com.direwolf20.buildinggadgets.common.utils.helpers.InventoryHelper;
@@ -237,7 +237,7 @@ public class ToolRenders {
             GlStateManager.pushMatrix();//Push matrix again just because
             //This blend function allows you to use a constant alpha, which is defined later
             GlStateManager.enableBlend();
-            GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+            GlStateManager.blendFunc(GL14.GL_CONSTANT_ALPHA, GL14.GL_ONE_MINUS_CONSTANT_ALPHA);
 
             GlStateManager.translated(-doubleX, -doubleY, -doubleZ);//The render starts at the player, so we subtract the player coords and move the render to 0,0,0
             GlStateManager.translatef(pos.getX(), pos.getY(), pos.getZ());//Now move the render position to the coordinates we want to render at
@@ -490,7 +490,7 @@ public class ToolRenders {
             BlockRendererDispatcher dispatcher = Minecraft.getInstance().getBlockRendererDispatcher();
             GlStateManager.enableBlend();
             //This blend function allows you to use a constant alpha, which is defined later
-            GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+            GlStateManager.blendFunc(GL14.GL_CONSTANT_ALPHA, GL14.GL_ONE_MINUS_CONSTANT_ALPHA);
             GlStateManager.pushMatrix();//Push matrix again just because
             GlStateManager.translated(-doubleX, -doubleY, -doubleZ);//The render starts at the player, so we subtract the player coords and move the render to 0,0,0
             GlStateManager.translatef(pos.getX(), pos.getY(), pos.getZ());//Now move the render position to the coordinates we want to render at
