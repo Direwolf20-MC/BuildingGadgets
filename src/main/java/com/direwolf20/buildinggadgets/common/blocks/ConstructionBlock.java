@@ -466,7 +466,7 @@ public class ConstructionBlock extends BlockContainer /*implements IFacade*/ {
     @Override
     public boolean onBlockActivated(IBlockState state, World worldIn, BlockPos pos, EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
         IBlockState mimic = getActualMimicBlock(worldIn, pos);
-        System.out.println(mimic);
+        //System.out.println(mimic);
         return mimic != null ? mimic.onBlockActivated(worldIn, pos, player, hand, side, hitX, hitY, hitZ) : super.onBlockActivated(state, worldIn, pos, player, hand, side, hitX, hitY, hitZ);
     }
 
