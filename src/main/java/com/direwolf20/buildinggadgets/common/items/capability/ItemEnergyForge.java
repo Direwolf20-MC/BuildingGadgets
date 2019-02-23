@@ -35,23 +35,36 @@ public class ItemEnergyForge extends EnergyStorage {
     @Override
     public int receiveEnergy(int maxReceive, boolean simulate) {
         updateEnergy();
-        return changeEnergy(super.receiveEnergy(maxReceive, simulate), simulate);
+        return addEnergy(super.receiveEnergy(maxReceive, simulate), simulate);
     }
 
     @Override
     public int extractEnergy(int maxExtract, boolean simulate) {
         updateEnergy();
-        return changeEnergy(super.extractEnergy(maxExtract, simulate), simulate);
+        return removeEnergy(super.extractEnergy(maxExtract, simulate), simulate);
     }
 
-    private int changeEnergy(int amount, boolean simulate) {
+    //TODO De-Dire this code.
+    private int addEnergy(int amount, boolean simulate) {
         if (amount > 0 && !simulate) {
             NBTTagCompound nbt = stack.getTag();
             if (nbt == null) {
                 stack.setTag(nbt = new NBTTagCompound());
             }
 
-            nbt.setInt(NBT_ENERGY, getEnergyStored());
+            nbt.setInt(NBT_ENERGY, getEnergyStored() + amount);
+        }
+        return amount;
+    }
+
+    private int removeEnergy(int amount, boolean simulate) {
+        if (amount > 0 && !simulate) {
+            NBTTagCompound nbt = stack.getTag();
+            if (nbt == null) {
+                stack.setTag(nbt = new NBTTagCompound());
+            }
+
+            nbt.setInt(NBT_ENERGY, getEnergyStored() - amount);
         }
         return amount;
     }

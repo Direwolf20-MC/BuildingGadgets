@@ -3,6 +3,7 @@ package com.direwolf20.buildinggadgets.common.items.gadgets;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
+import com.direwolf20.buildinggadgets.common.items.capability.CapabilityProviderEnergy;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
 import com.direwolf20.buildinggadgets.common.tools.*;
@@ -28,6 +29,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldType;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.BlockSnapshot;
+import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.world.BlockEvent;
 
@@ -134,6 +136,9 @@ public class GadgetBuilding extends GadgetGeneric {
         player.setActiveHand(hand);
         if (!world.isRemote) {
             if (player.isSneaking()) {
+                //TODO Remove debug code
+                IEnergyStorage energy = CapabilityProviderEnergy.getCap(itemstack).orElseThrow(NullPointerException::new);
+                int accepted = energy.receiveEnergy(105000, false);
                 selectBlock(itemstack, player);
             } else {
                 build(player, itemstack);
