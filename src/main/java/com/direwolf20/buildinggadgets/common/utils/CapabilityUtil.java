@@ -19,7 +19,8 @@ public final class CapabilityUtil {
 
     public static <C> double returnDoubleIfPresent(ICapabilityProvider provider, Capability<C> capability, ToDoubleFunction<C> function, DoubleSupplier def) {
         LazyOptional<C> cap = provider.getCapability(capability);
-        if (cap.isPresent()) { return function.applyAsDouble(cap.orElseThrow(CapabilityNotPresentException::new)); }
+        if (cap.isPresent())
+            return function.applyAsDouble(cap.orElseThrow(CapabilityNotPresentException::new));
         return def.getAsDouble();
     }
 
@@ -29,7 +30,8 @@ public final class CapabilityUtil {
 
     public static <C> int returnIntIfPresent(ICapabilityProvider provider, Capability<C> capability, ToIntFunction<C> function, IntSupplier def) {
         LazyOptional<C> cap = provider.getCapability(capability);
-        if (cap.isPresent()) { return function.applyAsInt(cap.orElseThrow(CapabilityNotPresentException::new)); }
+        if (cap.isPresent())
+            return function.applyAsInt(cap.orElseThrow(CapabilityNotPresentException::new));
         return def.getAsInt();
     }
 
@@ -39,7 +41,8 @@ public final class CapabilityUtil {
 
     public static <C> boolean returnBooleanIfPresent(ICapabilityProvider provider, Capability<C> capability, Predicate<C> function, BooleanSupplier def) {
         LazyOptional<C> cap = provider.getCapability(capability);
-        if (cap.isPresent()) { return function.test(cap.orElseThrow(CapabilityNotPresentException::new)); }
+        if (cap.isPresent())
+            return function.test(cap.orElseThrow(CapabilityNotPresentException::new));
         return def.getAsBoolean();
     }
 
@@ -49,7 +52,8 @@ public final class CapabilityUtil {
 
     public static <C, R> R returnIfPresent(ICapabilityProvider provider, Capability<C> capability, Function<C, R> function, Supplier<R> def) {
         LazyOptional<C> cap = provider.getCapability(capability);
-        if (cap.isPresent()) { return function.apply(cap.orElseThrow(CapabilityNotPresentException::new)); }
+        if (cap.isPresent())
+            return function.apply(cap.orElseThrow(CapabilityNotPresentException::new));
         return def.get();
     }
 
