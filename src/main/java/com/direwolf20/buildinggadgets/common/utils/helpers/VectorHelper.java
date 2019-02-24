@@ -46,7 +46,7 @@ public class VectorHelper {
 
     //again, for more options
     public static BlockPos getPosLookingAt(EntityPlayer player, RayTraceFluidMode fMode) {
-        RayTraceResult lookingAt = VectorUtil.getLookingAt(player, fMode);
+        RayTraceResult lookingAt = VectorHelper.getLookingAt(player, fMode);
         if (lookingAt == null)
             return null;
 

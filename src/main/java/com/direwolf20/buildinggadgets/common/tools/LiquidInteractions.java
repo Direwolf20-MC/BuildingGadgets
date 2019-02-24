@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.common.tools;
 
-import com.direwolf20.buildinggadgets.common.utils.VectorUtil;
+import com.direwolf20.buildinggadgets.common.utils.helpers.VectorHelper;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
@@ -15,12 +15,12 @@ public class LiquidInteractions {
     public enum GadgetGeneric {
         IGNORE(0) {
             public RayTraceResult getLookingAt(EntityPlayer player) {
-                return VectorUtil.getLookingAt(player);
+                return VectorHelper.getLookingAt(player);
             }
         },
         REPLACE_TOP(1) {
             public RayTraceResult getLookingAt(EntityPlayer player) {
-                return VectorUtil.getLookingAt(player, RayTraceFluidMode.ALWAYS);
+                return VectorHelper.getLookingAt(player, RayTraceFluidMode.ALWAYS);
             }
         };
         public abstract RayTraceResult getLookingAt(EntityPlayer player);
@@ -36,7 +36,7 @@ public class LiquidInteractions {
 
         IGNORE(0) {
             public RayTraceResult getLookingAt(EntityPlayer player) {
-                return VectorUtil.getLookingAt(player);
+                return VectorHelper.getLookingAt(player);
             }
             public BlockPos getLookingPos(EntityPlayer player) {
                 return getLookingAt(player).getBlockPos();
@@ -45,7 +45,7 @@ public class LiquidInteractions {
 
         REPLACE_TOP(1) {
             public RayTraceResult getLookingAt(EntityPlayer player) {
-                return VectorUtil.getLookingAt(player, RayTraceFluidMode.ALWAYS);
+                return VectorHelper.getLookingAt(player, RayTraceFluidMode.ALWAYS);
             }
             public BlockPos getLookingPos(EntityPlayer player) {
                 BlockPos pos = getLookingAt(player).getBlockPos();
@@ -60,7 +60,7 @@ public class LiquidInteractions {
 
         PLACE_ABOVE(2) {
             public RayTraceResult getLookingAt(EntityPlayer player) {
-                return VectorUtil.getLookingAt(player, RayTraceFluidMode.ALWAYS);
+                return VectorHelper.getLookingAt(player, RayTraceFluidMode.ALWAYS);
             }
             public BlockPos getLookingPos(EntityPlayer player) {
                 return getLookingAt(player).getBlockPos();

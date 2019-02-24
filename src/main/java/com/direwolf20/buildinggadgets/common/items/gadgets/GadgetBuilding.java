@@ -1,13 +1,17 @@
 package com.direwolf20.buildinggadgets.common.items.gadgets;
 
-import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
-import com.direwolf20.buildinggadgets.common.tools.*;
-import com.direwolf20.buildinggadgets.common.utils.VectorUtil;
-import com.direwolf20.buildinggadgets.common.utils.NBTUtil;
+import com.direwolf20.buildinggadgets.common.tools.LiquidInteractions;
+import com.direwolf20.buildinggadgets.common.tools.ToolRenders;
+import com.direwolf20.buildinggadgets.common.tools.UndoState;
+import com.direwolf20.buildinggadgets.common.tools.modes.BuildingModes;
+import com.direwolf20.buildinggadgets.common.utils.Reference;
+import com.direwolf20.buildinggadgets.common.utils.helpers.InventoryHelper;
+import com.direwolf20.buildinggadgets.common.utils.helpers.NBTHelper;
+import com.direwolf20.buildinggadgets.common.utils.helpers.SortingHelper;
 import com.direwolf20.buildinggadgets.common.world.FakeBuilderWorld;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
@@ -29,7 +33,6 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldType;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.BlockSnapshot;
-import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.world.BlockEvent;
 
@@ -59,7 +62,7 @@ public class GadgetBuilding extends GadgetGeneric {
         }
     }
 
-    public static final ResourceLocation REGISTRY_NAME = new ResourceLocation(BuildingGadgets.MODID, "gadget_building");
+    public static final ResourceLocation REGISTRY_NAME = new ResourceLocation(Reference.MODID, "gadget_building");
 
     public GadgetBuilding(Properties builder) {
         super(builder.defaultMaxDamage(Config.GADGETS.GADGET_BUILDING.durability.get()));
@@ -224,16 +227,16 @@ public class GadgetBuilding extends GadgetGeneric {
             }
         }
 
-        Sorter.Blocks.byDistance(coords, player);
+        SortingHelper.Blocks.byDistance(coords, player);
         return true;
     }
 
     public static void setFluidPlacementMode(LiquidInteractions.GadgetBuilding mode, ItemStack stack) {
-        NBTUtil.getOrNewTag(stack).setByte("fluidInteractionMode", mode.id);
+        NBTHelper.getOrNewTag(stack).setByte("fluidInteractionMode", mode.id);
     }
 
     public static LiquidInteractions.GadgetBuilding getFluidPlacementMode(ItemStack stack) {
-        return LiquidInteractions.GadgetBuilding.fromNBT(NBTUtil.getOrNewTag(stack).getByte("fluidInteractionMode"));
+        return LiquidInteractions.GadgetBuilding.fromNBT(NBTHelper.getOrNewTag(stack).getByte("fluidInteractionMode"));
     }
 
     public static boolean undoBuild(EntityPlayer player) {
@@ -293,7 +296,7 @@ public class GadgetBuilding extends GadgetGeneric {
 
         ItemStack itemStack;
         if (setBlock.getBlock().canSilkHarvest(setBlock, world, pos, player)) {
-            itemStack = InventoryManipulation.getSilkTouchDrop(setBlock);
+            itemStack = InventoryHelper.getSilkTouchDrop(setBlock);
         } else {
             itemStack = setBlock.getBlock().getPickBlock(setBlock, null, world, pos, player);
         }
@@ -320,9 +323,9 @@ public class GadgetBuilding extends GadgetGeneric {
             return false;
         }
         ItemStack constructionPaste = new ItemStack(BGItems.constructionPaste);
-        if (InventoryManipulation.countItem(itemStack, player, world) < neededItems) {
+        if (InventoryHelper.countItem(itemStack, player, world) < neededItems) {
             //if (InventoryManipulation.countItem(constructionStack, player) == 0) {
-            if (InventoryManipulation.countPaste(player) < neededItems) {
+            if (InventoryHelper.countPaste(player) < neededItems) {
                 return false;
             }
             itemStack = constructionPaste.copy();
@@ -337,9 +340,9 @@ public class GadgetBuilding extends GadgetGeneric {
         //ItemStack constructionStack = InventoryManipulation.getSilkTouchDrop(ModBlocks.constructionBlock.getDefaultState());
         boolean useItemSuccess;
         if (useConstructionPaste) {
-            useItemSuccess = InventoryManipulation.usePaste(player, 1);
+            useItemSuccess = InventoryHelper.usePaste(player, 1);
         } else {
-            useItemSuccess = InventoryManipulation.useItem(itemStack, player, neededItems, world);
+            useItemSuccess = InventoryHelper.useItem(itemStack, player, neededItems, world);
         }
         if (useItemSuccess) {
             world.spawnEntity(new BlockBuildEntity(world, pos, player, setBlock, 1, getToolActualBlock(heldItem), useConstructionPaste));
@@ -357,7 +360,7 @@ public class GadgetBuilding extends GadgetGeneric {
     }
 
     public static void setFluidInteractionMode(ItemStack stack, Byte mode) {
-        NBTUtil.getOrNewTag(stack).setByte("fluidInteractionMode", mode);
+        NBTHelper.getOrNewTag(stack).setByte("fluidInteractionMode", mode);
     }
 
     @Override
