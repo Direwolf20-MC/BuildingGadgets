@@ -4,11 +4,11 @@ import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.common.items.capability.CapabilityProviderEnergy;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
-import com.direwolf20.buildinggadgets.common.tools.modes.ExchangingModes;
-import com.direwolf20.buildinggadgets.common.utils.helpers.InventoryHelper;
+import com.direwolf20.buildinggadgets.common.tools.LiquidInteractions;
 import com.direwolf20.buildinggadgets.common.tools.ToolRenders;
+import com.direwolf20.buildinggadgets.common.tools.modes.ExchangingModes;
 import com.direwolf20.buildinggadgets.common.utils.Reference;
-import com.direwolf20.buildinggadgets.common.utils.helpers.VectorHelper;
+import com.direwolf20.buildinggadgets.common.utils.helpers.InventoryHelper;
 import com.direwolf20.buildinggadgets.common.world.FakeBuilderWorld;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
@@ -194,9 +194,9 @@ public class GadgetExchanger extends GadgetGeneric {
     private boolean exchange(EntityPlayer player, ItemStack stack) {
         World world = player.world;
         List<BlockPos> coords = getAnchor(stack);
-
+        LiquidInteractions.GadgetGeneric fluidPlacementMode = getFluidInteractionMode(stack);
         if (coords.size() == 0) { //If we don't have an anchor, build in the current spot
-            RayTraceResult lookingAt = VectorHelper.getLookingAt(player);
+            RayTraceResult lookingAt = fluidPlacementMode.getLookingAt(player);
             if (lookingAt == null) { //If we aren't looking at anything, exit
                 return false;
             }

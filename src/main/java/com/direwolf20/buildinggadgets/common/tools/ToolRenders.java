@@ -255,7 +255,8 @@ public class ToolRenders {
             GlStateManager.popMatrix();
         }
 
-        RayTraceResult lookingAt = VectorHelper.getLookingAt(player);
+        LiquidInteractions.GadgetGeneric fluidIntMode = GadgetExchanger.getFluidInteractionMode(stack);
+        RayTraceResult lookingAt = fluidIntMode.getLookingAt(player);
         IBlockState state = Blocks.AIR.getDefaultState();
         List<BlockPos> coordinates = getAnchor(stack);
         if (lookingAt != null || coordinates.size() > 0) {
