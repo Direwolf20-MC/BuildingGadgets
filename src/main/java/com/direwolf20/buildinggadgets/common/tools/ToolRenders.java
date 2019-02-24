@@ -10,7 +10,6 @@ import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetExchanger;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
 import com.direwolf20.buildinggadgets.common.utils.GadgetUtils;
-import com.direwolf20.buildinggadgets.common.utils.NBTUtil;
 import com.direwolf20.buildinggadgets.common.utils.VectorUtil;
 import com.direwolf20.buildinggadgets.common.world.FakeBuilderWorld;
 import com.google.common.cache.Cache;
@@ -387,7 +386,7 @@ public class ToolRenders {
     }
 
     public static void renderDestructionOverlay(RenderWorldLastEvent evt, EntityPlayer player, ItemStack stack) {
-        RayTraceResult lookingAt = VectorUtil.getLookingAt(player);
+        RayTraceResult lookingAt = GadgetDestruction.getLookingAt(player, stack);
         if (lookingAt == null && GadgetDestruction.getAnchor(stack) == null) return;
         World world = player.world;
         BlockPos startBlock = (GadgetDestruction.getAnchor(stack) == null) ? lookingAt.getBlockPos() : GadgetDestruction.getAnchor(stack);

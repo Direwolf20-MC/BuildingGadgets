@@ -7,6 +7,7 @@ import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
 import com.direwolf20.buildinggadgets.common.tools.BlockMapIntState;
+import com.direwolf20.buildinggadgets.common.tools.LiquidInteractions;
 import com.direwolf20.buildinggadgets.common.utils.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.utils.VectorUtil;
 import com.direwolf20.buildinggadgets.common.world.WorldSave;
@@ -23,11 +24,8 @@ import net.minecraft.nbt.NBTUtil;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
 import net.minecraft.util.EnumFacing.Axis;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.*;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.math.Vec3i;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
@@ -42,7 +40,7 @@ import java.util.*;
 
 public class GadgetDestruction extends GadgetGeneric {
 
-    public static final ResourceLocation REGISTRY_NAME = new ResourceLocation(BuildingGadgets.MODID,"gadget_destruction");
+    public static final ResourceLocation REGISTRY_NAME = new ResourceLocation(BuildingGadgets.MODID, "gadget_destruction");
 
     public GadgetDestruction(Properties builder) {
         super(builder.defaultMaxDamage(Config.GADGETS.GADGET_DESTRUCTION.durability.get()));
@@ -210,7 +208,7 @@ public class GadgetDestruction extends GadgetGeneric {
         player.setActiveHand(hand);
         if (!world.isRemote) {
             if (!player.isSneaking()) {
-                RayTraceResult lookingAt = VectorUtil.getLookingAt(player);
+                RayTraceResult lookingAt = getLookingAt(player, stack);
                 if (lookingAt == null && getAnchor(stack) == null) { //If we aren't looking at anything, exit
                     return new ActionResult<ItemStack>(EnumActionResult.FAIL, stack);
                 }
@@ -230,6 +228,14 @@ public class GadgetDestruction extends GadgetGeneric {
             }
         }
         return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);
+    }
+
+    public static RayTraceResult getLookingAt(EntityPlayer player, ItemStack stack) {
+        LiquidInteractions.GadgetGeneric FluidIntState = getFluidInteractionMode(stack);
+        if (FluidIntState == LiquidInteractions.GadgetGeneric.IGNORE) { //this is a binary system, so an if/else covers everything
+            return VectorUtil.getLookingAt(player);
+        }
+        return VectorUtil.getLookingAt(player, RayTraceFluidMode.ALWAYS);
     }
 
     public static void anchorBlocks(EntityPlayer player, ItemStack stack) {
@@ -324,9 +330,7 @@ public class GadgetDestruction extends GadgetGeneric {
                 return false;
             }
             BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(world, voidPos, currentBlock, player);
-            if (MinecraftForge.EVENT_BUS.post(e)) {
-                return false;
-            }
+            return !MinecraftForge.EVENT_BUS.post(e);
         }
         return true;
     }
