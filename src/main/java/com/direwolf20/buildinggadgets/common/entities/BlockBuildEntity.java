@@ -55,7 +55,6 @@ public class BlockBuildEntity extends Entity {
         TileEntity te = worldIn.getTileEntity(spawnPos);
 
         setPos = spawnPos;
-            setBlock = ((ConstructionBlockTileEntity) te).getBlockState();
         setBlock = te instanceof ConstructionBlockTileEntity ? te.getBlockState() : spawnBlock;
         originalSetBlock = spawnBlock;
 
