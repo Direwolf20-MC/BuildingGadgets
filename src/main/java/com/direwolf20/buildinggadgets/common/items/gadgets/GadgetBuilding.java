@@ -5,7 +5,8 @@ import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.common.items.capability.CapabilityProviderEnergy;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
-import com.direwolf20.buildinggadgets.common.tools.*;
+import com.direwolf20.buildinggadgets.common.tools.ToolRenders;
+import com.direwolf20.buildinggadgets.common.tools.UndoState;
 import com.direwolf20.buildinggadgets.common.tools.modes.BuildingModes;
 import com.direwolf20.buildinggadgets.common.utils.Reference;
 import com.direwolf20.buildinggadgets.common.utils.helpers.InventoryHelper;
@@ -80,7 +81,7 @@ public class GadgetBuilding extends GadgetGeneric {
 
     @Override
     public int getEnergyCost(ItemStack tool) {
-        return Config.GADGETS.GADGET_DESTRUCTION.energyCost.get();
+        return Config.GADGETS.GADGET_BUILDING.energyCost.get();
     }
 
     @Override
