@@ -80,11 +80,9 @@ public class BlockMapIntState {
     public NBTTagList putIntStateMapIntoNBT() {
         NBTTagList tagList = new NBTTagList();
         for (Map.Entry<Short, IBlockState> entry : intStateMap.entrySet()) {
-            NBTTagCompound compound = NBTUtil.writeBlockState(entry.getValue());
-            NBTTagCompound state = new NBTTagCompound();
-
+            NBTTagCompound compound = new NBTTagCompound();
             compound.setShort("mapSlot", entry.getKey());
-            compound.setTag("mapState", state);
+            compound.setTag("mapState", NBTUtil.writeBlockState(entry.getValue()));
             tagList.add(compound);
         }
         return tagList;
