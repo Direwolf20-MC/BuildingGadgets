@@ -13,7 +13,7 @@ import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
 import com.direwolf20.buildinggadgets.common.tools.NetworkIO;
 import com.direwolf20.buildinggadgets.common.tools.ToolRenders;
 import com.direwolf20.buildinggadgets.common.tools.UniqueItem;
-import com.direwolf20.buildinggadgets.common.utils.CapabilityUtil.Energy;
+import com.direwolf20.buildinggadgets.common.utils.CapabilityUtil.EnergyUtil;
 import com.direwolf20.buildinggadgets.common.utils.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.utils.Reference;
 import com.direwolf20.buildinggadgets.common.utils.blocks.BlockMap;
@@ -276,7 +276,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
             if (getToolMode(stack) == ToolMode.Copy) {
                 if (pos == null) {
                     //TODO Remove debug code
-                    IEnergyStorage energy = Energy.getCap(stack).orElseThrow(NullPointerException::new);
+                    IEnergyStorage energy = EnergyUtil.getCap(stack).orElseThrow(NullPointerException::new);
                     int accepted = energy.receiveEnergy(105000, false);
                     //setStartPos(stack, null);
                     //setEndPos(stack, null);

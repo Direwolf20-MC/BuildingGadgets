@@ -7,7 +7,7 @@ import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
 import com.direwolf20.buildinggadgets.common.tools.modes.BuildingModes;
 import com.direwolf20.buildinggadgets.common.tools.modes.ExchangingModes;
-import com.direwolf20.buildinggadgets.common.utils.CapabilityUtil.Energy;
+import com.direwolf20.buildinggadgets.common.utils.CapabilityUtil.EnergyUtil;
 import com.direwolf20.buildinggadgets.common.utils.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.utils.blocks.BlockMap;
 import com.direwolf20.buildinggadgets.common.utils.buffers.PasteToolBufferBuilder;
@@ -138,7 +138,7 @@ public class ToolRenders {
                 long hasBlocks = InventoryHelper.countItem(itemStack, player, cacheInventory);
                 hasBlocks = hasBlocks + InventoryHelper.countPaste(player);
                 int hasEnergy = 0;
-                LazyOptional<IEnergyStorage> energy = Energy.getCap(stack);
+                LazyOptional<IEnergyStorage> energy = EnergyUtil.getCap(stack);
                 if (energy.isPresent()) {
                     hasEnergy = energy.orElseThrow(CapabilityNotPresentException::new).getEnergyStored();
                 } else {
@@ -284,7 +284,7 @@ public class ToolRenders {
                 hasBlocks = hasBlocks + InventoryHelper.countPaste(player);
                 int hasEnergy = 0;
 
-                LazyOptional<IEnergyStorage> energy = Energy.getCap(stack);
+                LazyOptional<IEnergyStorage> energy = EnergyUtil.getCap(stack);
                 if (energy.isPresent()) {
                     hasEnergy = energy.orElseThrow(CapabilityNotPresentException::new).getEnergyStored();
                 } else {

@@ -57,8 +57,8 @@ public final class CapabilityUtil {
         return def.get();
     }
 
-    public static final class Energy {
-        private Energy() {}
+    public static final class EnergyUtil {
+        private EnergyUtil() {}
 
         public static double returnDoubleIfPresent(ICapabilityProvider provider, ToDoubleFunction<IEnergyStorage> function, final double def) {
             return CapabilityUtil.returnDoubleIfPresent(provider, CapabilityEnergy.ENERGY, function, () -> def);
