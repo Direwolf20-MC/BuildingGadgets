@@ -18,6 +18,7 @@ import com.direwolf20.buildinggadgets.common.utils.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.utils.Reference;
 import com.direwolf20.buildinggadgets.common.utils.blocks.BlockMap;
 import com.direwolf20.buildinggadgets.common.utils.blocks.BlockMapIntState;
+import com.direwolf20.buildinggadgets.common.utils.exceptions.CapabilityNotPresentException;
 import com.direwolf20.buildinggadgets.common.utils.helpers.InventoryHelper;
 import com.direwolf20.buildinggadgets.common.utils.helpers.VectorHelper;
 import com.direwolf20.buildinggadgets.common.world.WorldSave;
@@ -276,7 +277,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
             if (getToolMode(stack) == ToolMode.Copy) {
                 if (pos == null) {
                     //TODO Remove debug code
-                    IEnergyStorage energy = EnergyUtil.getCap(stack).orElseThrow(NullPointerException::new);
+                    IEnergyStorage energy = EnergyUtil.getCap(stack).orElseThrow(CapabilityNotPresentException::new);
                     int accepted = energy.receiveEnergy(105000, false);
                     //setStartPos(stack, null);
                     //setEndPos(stack, null);

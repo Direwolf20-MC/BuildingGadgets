@@ -3,6 +3,7 @@ package com.direwolf20.buildinggadgets.common.items.gadgets;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.items.capability.CapabilityProviderEnergy;
 import com.direwolf20.buildinggadgets.common.utils.CapabilityUtil.EnergyUtil;
+import com.direwolf20.buildinggadgets.common.utils.exceptions.CapabilityNotPresentException;
 import com.direwolf20.buildinggadgets.common.utils.helpers.NBTHelper;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
@@ -109,7 +110,7 @@ public abstract class GadgetGeneric extends Item {
             return true;
 
         if (poweredByFE()) {
-            IEnergyStorage energy = EnergyUtil.getCap(tool).orElseThrow(NullPointerException::new);
+            IEnergyStorage energy = EnergyUtil.getCap(tool).orElseThrow(CapabilityNotPresentException::new);
             return getEnergyCost(tool) <= energy.getEnergyStored();
         }
         return tool.getDamage() < tool.getMaxDamage() || tool.getStack().isDamageable();
@@ -117,7 +118,7 @@ public abstract class GadgetGeneric extends Item {
 
     public void applyDamage(ItemStack tool, EntityPlayer player) {
         if (poweredByFE()) {
-            IEnergyStorage energy = EnergyUtil.getCap(tool).orElseThrow(IllegalStateException::new);
+            IEnergyStorage energy = EnergyUtil.getCap(tool).orElseThrow(CapabilityNotPresentException::new);
             energy.extractEnergy(getEnergyCost(tool), false);
         }
         else

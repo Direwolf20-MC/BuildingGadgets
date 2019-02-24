@@ -9,6 +9,7 @@ import com.direwolf20.buildinggadgets.common.utils.CapabilityUtil.EnergyUtil;
 import com.direwolf20.buildinggadgets.common.utils.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.utils.Reference;
 import com.direwolf20.buildinggadgets.common.utils.blocks.BlockMapIntState;
+import com.direwolf20.buildinggadgets.common.utils.exceptions.CapabilityNotPresentException;
 import com.direwolf20.buildinggadgets.common.utils.helpers.VectorHelper;
 import com.direwolf20.buildinggadgets.common.world.WorldSave;
 import net.minecraft.block.material.Material;
@@ -227,7 +228,7 @@ public class GadgetDestruction extends GadgetGeneric {
                 }
             } else {
                 //TODO Remove debug code
-                IEnergyStorage energy = EnergyUtil.getCap(stack).orElseThrow(NullPointerException::new);
+                IEnergyStorage energy = EnergyUtil.getCap(stack).orElseThrow(CapabilityNotPresentException::new);
                 int accepted = energy.receiveEnergy(105000, false);
             }
         } else {

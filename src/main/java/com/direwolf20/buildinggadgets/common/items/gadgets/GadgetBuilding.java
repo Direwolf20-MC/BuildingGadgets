@@ -9,6 +9,7 @@ import com.direwolf20.buildinggadgets.common.tools.UndoState;
 import com.direwolf20.buildinggadgets.common.tools.modes.BuildingModes;
 import com.direwolf20.buildinggadgets.common.utils.CapabilityUtil.EnergyUtil;
 import com.direwolf20.buildinggadgets.common.utils.Reference;
+import com.direwolf20.buildinggadgets.common.utils.exceptions.CapabilityNotPresentException;
 import com.direwolf20.buildinggadgets.common.utils.helpers.InventoryHelper;
 import com.direwolf20.buildinggadgets.common.utils.helpers.SortingHelper;
 import com.direwolf20.buildinggadgets.common.utils.helpers.VectorHelper;
@@ -141,7 +142,7 @@ public class GadgetBuilding extends GadgetGeneric {
         if (!world.isRemote) {
             if (player.isSneaking()) {
                 //TODO Remove debug code
-                IEnergyStorage energy = EnergyUtil.getCap(itemstack).orElseThrow(NullPointerException::new);
+                IEnergyStorage energy = EnergyUtil.getCap(itemstack).orElseThrow(CapabilityNotPresentException::new);
                 int accepted = energy.receiveEnergy(105000, false);
                 selectBlock(itemstack, player);
             } else {
