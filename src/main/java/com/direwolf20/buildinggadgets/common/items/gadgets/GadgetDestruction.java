@@ -4,11 +4,11 @@ import com.direwolf20.buildinggadgets.client.gui.GuiMod;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
-import com.direwolf20.buildinggadgets.common.items.capability.CapabilityProviderEnergy;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
-import com.direwolf20.buildinggadgets.common.utils.blocks.BlockMapIntState;
+import com.direwolf20.buildinggadgets.common.utils.CapabilityUtil.Energy;
 import com.direwolf20.buildinggadgets.common.utils.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.utils.Reference;
+import com.direwolf20.buildinggadgets.common.utils.blocks.BlockMapIntState;
 import com.direwolf20.buildinggadgets.common.utils.helpers.VectorHelper;
 import com.direwolf20.buildinggadgets.common.world.WorldSave;
 import net.minecraft.block.material.Material;
@@ -227,7 +227,7 @@ public class GadgetDestruction extends GadgetGeneric {
                 }
             } else {
                 //TODO Remove debug code
-                IEnergyStorage energy = CapabilityProviderEnergy.getCap(stack).orElseThrow(NullPointerException::new);
+                IEnergyStorage energy = Energy.getCap(stack).orElseThrow(NullPointerException::new);
                 int accepted = energy.receiveEnergy(105000, false);
             }
         } else {

@@ -2,19 +2,17 @@ package com.direwolf20.buildinggadgets.common.tools;
 
 import com.direwolf20.buildinggadgets.client.RemoteInventoryCache;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
-import com.direwolf20.buildinggadgets.common.items.capability.CapabilityProviderEnergy;
-import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetBuilding;
-import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
-import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetDestruction;
-import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetExchanger;
+import com.direwolf20.buildinggadgets.common.items.gadgets.*;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
 import com.direwolf20.buildinggadgets.common.tools.modes.BuildingModes;
 import com.direwolf20.buildinggadgets.common.tools.modes.ExchangingModes;
+import com.direwolf20.buildinggadgets.common.utils.CapabilityUtil.Energy;
 import com.direwolf20.buildinggadgets.common.utils.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.utils.blocks.BlockMap;
 import com.direwolf20.buildinggadgets.common.utils.buffers.PasteToolBufferBuilder;
 import com.direwolf20.buildinggadgets.common.utils.buffers.ToolBufferBuilder;
+import com.direwolf20.buildinggadgets.common.utils.exceptions.CapabilityNotPresentException;
 import com.direwolf20.buildinggadgets.common.utils.helpers.InventoryHelper;
 import com.direwolf20.buildinggadgets.common.utils.helpers.SortingHelper;
 import com.direwolf20.buildinggadgets.common.utils.helpers.VectorHelper;
@@ -42,6 +40,7 @@ import net.minecraft.world.WorldType;
 import net.minecraftforge.client.ForgeHooksClient;
 import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
+import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.IEnergyStorage;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -139,13 +138,13 @@ public class ToolRenders {
                 long hasBlocks = InventoryHelper.countItem(itemStack, player, cacheInventory);
                 hasBlocks = hasBlocks + InventoryHelper.countPaste(player);
                 int hasEnergy = 0;
-                IEnergyStorage energy = CapabilityProviderEnergy.getCapOrNull(stack);
-                if (energy != null) {
-                    hasEnergy = energy.getEnergyStored();
+                LazyOptional<IEnergyStorage> energy = Energy.getCap(stack);
+                if (energy.isPresent()) {
+                    hasEnergy = energy.orElseThrow(CapabilityNotPresentException::new).getEnergyStored();
                 } else {
                     hasEnergy = stack.getMaxDamage() - stack.getDamage();
                 }
-                if (player.isCreative() || (energy == null && !stack.isDamageable())) {
+                if (player.isCreative() || (energy.isPresent() && ! stack.isDamageable())) {
                     hasEnergy = 1000000;
                 }
 
@@ -197,10 +196,10 @@ public class ToolRenders {
                     GlStateManager.scalef(1.01f, 1.01f, 1.01f);
                     GL14.glBlendColor(1F, 1F, 1F, 0.35f); //Set the alpha of the blocks we are rendering
                     hasBlocks--;
-                    if (energy != null) {
-                        hasEnergy -= ((GadgetBuilding) BGItems.gadgetBuilding).getEnergyCost(heldItem);
+                    if (energy.isPresent()) {
+                        hasEnergy -= ((GadgetGeneric) stack.getItem()).getEnergyCost(heldItem);
                     } else {
-                        hasEnergy -= ((GadgetBuilding) BGItems.gadgetBuilding).getDamageCost(heldItem);
+                        hasEnergy -= ((GadgetGeneric) stack.getItem()).getDamageCost(heldItem);
                     }
                     if (hasBlocks < 0 || hasEnergy < 0) {
                         dispatcher.renderBlockBrightness(Blocks.RED_STAINED_GLASS.getDefaultState(), 1f);
@@ -285,13 +284,13 @@ public class ToolRenders {
                 hasBlocks = hasBlocks + InventoryHelper.countPaste(player);
                 int hasEnergy = 0;
 
-                IEnergyStorage energy = CapabilityProviderEnergy.getCapOrNull(stack);
-                if (energy != null) {
-                    hasEnergy = energy.getEnergyStored();
+                LazyOptional<IEnergyStorage> energy = Energy.getCap(stack);
+                if (energy.isPresent()) {
+                    hasEnergy = energy.orElseThrow(CapabilityNotPresentException::new).getEnergyStored();
                 } else {
                     hasEnergy = stack.getMaxDamage() - stack.getDamage();
                 }
-                if (player.isCreative() || (energy == null && !stack.isDamageable())) {
+                if (player.isCreative() || (energy.isPresent() && ! stack.isDamageable())) {
                     hasEnergy = 1000000;
                 }
                 //Prepare the block rendering
@@ -352,10 +351,10 @@ public class ToolRenders {
                     GlStateManager.scalef(1.02f, 1.02f, 1.02f);//Slightly Larger block to avoid z-fighting.
                     GL14.glBlendColor(1F, 1F, 1F, 0.55f); //Set the alpha of the blocks we are rendering
                     hasBlocks--;
-                    if (energy != null) {
-                        hasEnergy -= ((GadgetExchanger) BGItems.gadgetExchanger).getEnergyCost(heldItem);
+                    if (energy.isPresent()) {
+                        hasEnergy -= (((GadgetGeneric) stack.getItem())).getEnergyCost(heldItem);
                     } else {
-                        hasEnergy -= ((GadgetExchanger) BGItems.gadgetExchanger).getDamageCost(heldItem);
+                        hasEnergy -= (((GadgetGeneric) stack.getItem())).getDamageCost(heldItem);
                     }
                     if (hasBlocks < 0 || hasEnergy < 0) {
                         dispatcher.renderBlockBrightness(Blocks.RED_STAINED_GLASS.getDefaultState(), 1f);

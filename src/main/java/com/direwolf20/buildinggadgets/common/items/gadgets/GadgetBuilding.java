@@ -2,12 +2,12 @@ package com.direwolf20.buildinggadgets.common.items.gadgets;
 
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
-import com.direwolf20.buildinggadgets.common.items.capability.CapabilityProviderEnergy;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
 import com.direwolf20.buildinggadgets.common.tools.ToolRenders;
 import com.direwolf20.buildinggadgets.common.tools.UndoState;
 import com.direwolf20.buildinggadgets.common.tools.modes.BuildingModes;
+import com.direwolf20.buildinggadgets.common.utils.CapabilityUtil.Energy;
 import com.direwolf20.buildinggadgets.common.utils.Reference;
 import com.direwolf20.buildinggadgets.common.utils.helpers.InventoryHelper;
 import com.direwolf20.buildinggadgets.common.utils.helpers.SortingHelper;
@@ -141,7 +141,7 @@ public class GadgetBuilding extends GadgetGeneric {
         if (!world.isRemote) {
             if (player.isSneaking()) {
                 //TODO Remove debug code
-                IEnergyStorage energy = CapabilityProviderEnergy.getCap(itemstack).orElseThrow(NullPointerException::new);
+                IEnergyStorage energy = Energy.getCap(itemstack).orElseThrow(NullPointerException::new);
                 int accepted = energy.receiveEnergy(105000, false);
                 selectBlock(itemstack, player);
             } else {
