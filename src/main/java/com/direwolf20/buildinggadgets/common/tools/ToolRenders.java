@@ -29,7 +29,6 @@ import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.RayTraceFluidMode;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldType;
@@ -100,26 +99,16 @@ public class ToolRenders {
             GlStateManager.popMatrix();
         }
         LiquidInteractions.GadgetBuilding flIntState = GadgetBuilding.getFluidPlacementMode(heldItem);
-        RayTraceResult lookingAt;
-        if (flIntState == LiquidInteractions.GadgetBuilding.IGNORE) {
-            lookingAt = VectorUtil.getLookingAt(player);
-        } else {
-            lookingAt = VectorUtil.getLookingAt(player, RayTraceFluidMode.ALWAYS);
-        }
+        RayTraceResult lookingAt = flIntState.getLookingAt(player);
         IBlockState state = Blocks.AIR.getDefaultState();
         List<BlockPos> coordinates = getAnchor(stack);
         if (lookingAt != null || coordinates.size() > 0) {
             World world = player.world;
             IBlockState startBlock = Blocks.AIR.getDefaultState();
             if (!(lookingAt == null)) {
-                if (flIntState == LiquidInteractions.GadgetBuilding.REPLACE_TOP) {
-                    startBlock = world.getBlockState(lookingAt.getBlockPos().add(0, -1, 0));
-                } else {
-                    startBlock = world.getBlockState(lookingAt.getBlockPos());
-                }
+                startBlock = world.getBlockState(flIntState.getLookingPos(player));
             }
             if (startBlock != BGBlocks.effectBlock.getDefaultState()) {
-
                 IBlockState renderBlockState = getToolBlock(heldItem);
                 if (renderBlockState == Blocks.AIR.getDefaultState()) {//Don't render anything if there is no block selected (Air)
                     return;
@@ -386,7 +375,8 @@ public class ToolRenders {
     }
 
     public static void renderDestructionOverlay(RenderWorldLastEvent evt, EntityPlayer player, ItemStack stack) {
-        RayTraceResult lookingAt = GadgetDestruction.getLookingAt(player, stack);
+        LiquidInteractions.GadgetGeneric fluidIntMode = GadgetDestruction.getFluidInteractionMode(stack);
+        RayTraceResult lookingAt = fluidIntMode.getLookingAt(player);
         if (lookingAt == null && GadgetDestruction.getAnchor(stack) == null) return;
         World world = player.world;
         BlockPos startBlock = (GadgetDestruction.getAnchor(stack) == null) ? lookingAt.getBlockPos() : GadgetDestruction.getAnchor(stack);

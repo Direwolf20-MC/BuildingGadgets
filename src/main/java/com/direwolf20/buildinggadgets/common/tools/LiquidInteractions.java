@@ -1,56 +1,82 @@
 package com.direwolf20.buildinggadgets.common.tools;
 
+import com.direwolf20.buildinggadgets.common.utils.VectorUtil;
+import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceFluidMode;
+import net.minecraft.util.math.RayTraceResult;
+import net.minecraftforge.fluids.IFluidBlock;
+
+import java.util.Arrays;
+
 public class LiquidInteractions {
     public enum GadgetGeneric {
-        IGNORE, REPLACE_TOP;
-
-        public static byte getID(LiquidInteractions.GadgetGeneric mode) {
-            switch (mode) {
-                case IGNORE:
-                    return (byte) 0;
-                case REPLACE_TOP:
-                    return (byte) 1;
-                default:
-                    return (byte) 0;
+        IGNORE(0) {
+            public RayTraceResult getLookingAt(EntityPlayer player) {
+                return VectorUtil.getLookingAt(player);
             }
+        },
+        REPLACE_TOP(1) {
+            public RayTraceResult getLookingAt(EntityPlayer player) {
+                return VectorUtil.getLookingAt(player, RayTraceFluidMode.ALWAYS);
+            }
+        };
+        public abstract RayTraceResult getLookingAt(EntityPlayer player);
+        public byte id;
+        GadgetGeneric(int id) {
+            this.id = (byte) id;
         }
-        public static LiquidInteractions.GadgetGeneric idToEnum(byte id) {
-            switch (id) {
-                case 0:
-                    return IGNORE;
-                case 1:
-                    return REPLACE_TOP;
-                default:
-                    return IGNORE;
-            }
+        public static GadgetGeneric fromNBT(byte ID) {
+            return Arrays.stream(values()).filter(val -> val.id == ID).findFirst().get();
         }
     }
     public enum GadgetBuilding {
-        IGNORE, REPLACE_TOP, PLACE_ABOVE;
 
-        public static byte getID(LiquidInteractions.GadgetBuilding mode) {
-            switch(mode) {
-                case IGNORE:
-                    return (byte)0;
-                case REPLACE_TOP:
-                    return (byte)1;
-                 case PLACE_ABOVE:
-                     return (byte)2;
-                 default:
-                     return (byte)0;
+        IGNORE(0) {
+            public RayTraceResult getLookingAt(EntityPlayer player) {
+                return VectorUtil.getLookingAt(player);
+            }
+            public BlockPos getLookingPos(EntityPlayer player) {
+                return getLookingAt(player).getBlockPos();
+            }
+        },
+
+        REPLACE_TOP(1) {
+            public RayTraceResult getLookingAt(EntityPlayer player) {
+                return VectorUtil.getLookingAt(player, RayTraceFluidMode.ALWAYS);
+            }
+            public BlockPos getLookingPos(EntityPlayer player) {
+                BlockPos pos = getLookingAt(player).getBlockPos();
+                IBlockState state = player.world.getBlockState(pos);
+                Block b = state.getBlock();
+                if (b instanceof IFluidBlock) {
+                    pos.add(0, -1, 0);
+                }
+                return pos;
+            }
+        },
+
+        PLACE_ABOVE(2) {
+            public RayTraceResult getLookingAt(EntityPlayer player) {
+                return VectorUtil.getLookingAt(player, RayTraceFluidMode.ALWAYS);
+            }
+            public BlockPos getLookingPos(EntityPlayer player) {
+                return getLookingAt(player).getBlockPos();
             }
         };
-        public static LiquidInteractions.GadgetBuilding idToEnum(byte id) {
-            switch(id) {
-                case 0:
-                    return IGNORE;
-                case 1:
-                    return REPLACE_TOP;
-                case 2:
-                    return PLACE_ABOVE;
-                default:
-                    return IGNORE;
-            }
+
+        public byte id;
+
+        GadgetBuilding(int id) {
+            this.id = (byte)id;
+        }
+
+        public abstract BlockPos getLookingPos(EntityPlayer player);
+        public abstract RayTraceResult getLookingAt(EntityPlayer player);
+        public static GadgetBuilding fromNBT(byte ID) {
+            return Arrays.stream(values()).filter(val -> val.id == ID).findFirst().get();
         }
     }
 }

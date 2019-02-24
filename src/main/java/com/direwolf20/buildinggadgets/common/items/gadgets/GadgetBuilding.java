@@ -7,7 +7,6 @@ import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
 import com.direwolf20.buildinggadgets.common.tools.*;
 import com.direwolf20.buildinggadgets.common.utils.NBTUtil;
-import com.direwolf20.buildinggadgets.common.utils.VectorUtil;
 import com.direwolf20.buildinggadgets.common.world.FakeBuilderWorld;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
@@ -20,7 +19,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.RayTraceFluidMode;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
@@ -177,16 +175,11 @@ public class GadgetBuilding extends GadgetGeneric {
 
         if (coords.size() == 0) {  //If we don't have an anchor, build in the current spot
             LiquidInteractions.GadgetBuilding fluidPlacementMode = getFluidPlacementMode(stack);
-            RayTraceResult lookingAt;
-            if (fluidPlacementMode == LiquidInteractions.GadgetBuilding.IGNORE) {
-                lookingAt = VectorUtil.getLookingAt(player);
-            } else {
-                lookingAt = VectorUtil.getLookingAt(player, RayTraceFluidMode.ALWAYS);
-            }
+            RayTraceResult lookingAt = fluidPlacementMode.getLookingAt(player);
             if (lookingAt == null) { //If we aren't looking at anything, exit
                 return false;
             }
-            BlockPos startBlock = lookingAt.getBlockPos();
+            BlockPos startBlock = fluidPlacementMode.getLookingPos(player);
             if (fluidPlacementMode == LiquidInteractions.GadgetBuilding.REPLACE_TOP) {
                 startBlock = new BlockPos(startBlock.getX(), startBlock.getY() - 1, startBlock.getZ());
             }
@@ -230,12 +223,15 @@ public class GadgetBuilding extends GadgetGeneric {
         Sorter.Blocks.byDistance(coords, player);
         return true;
     }
+
     public static void setFluidPlacementMode(LiquidInteractions.GadgetBuilding mode, ItemStack stack) {
-        NBTUtil.getOrNewTag(stack).setByte("fluidInteractionMode", LiquidInteractions.GadgetBuilding.getID(mode));
+        NBTUtil.getOrNewTag(stack).setByte("fluidInteractionMode", mode.id);
     }
+
     public static LiquidInteractions.GadgetBuilding getFluidPlacementMode(ItemStack stack) {
-        return LiquidInteractions.GadgetBuilding.idToEnum(NBTUtil.getOrNewTag(stack).getByte("fluidInteractionMode"));
+        return LiquidInteractions.GadgetBuilding.fromNBT(NBTUtil.getOrNewTag(stack).getByte("fluidInteractionMode"));
     }
+
     public static boolean undoBuild(EntityPlayer player) {
         ItemStack heldItem = getGadget(player);
         if (heldItem.isEmpty())

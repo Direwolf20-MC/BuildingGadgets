@@ -136,7 +136,7 @@ public abstract class GadgetGeneric extends Item {
     }
 
     public static LiquidInteractions.GadgetGeneric getFluidInteractionMode(ItemStack stack) {
-        return LiquidInteractions.GadgetGeneric.idToEnum(NBTUtil.getOrNewTag(stack).getByte("fluidInteractionMode"));
+        return LiquidInteractions.GadgetGeneric.fromNBT(NBTUtil.getOrNewTag(stack).getByte("fluidInteractionMode"));
     }
 
     public static void toggleFuzzy(EntityPlayer player, ItemStack stack) {
@@ -148,7 +148,7 @@ public abstract class GadgetGeneric extends Item {
         return !NBTUtil.getOrNewTag(stack).getBoolean("unconnectedarea");
     }
 
-    public static void setFluidPlacementMode(ItemStack stack, LiquidInteractions.GadgetGeneric mode) { NBTUtil.getOrNewTag(stack).setByte("fluidInteractionMode", LiquidInteractions.GadgetGeneric.getID(mode)); }
+    public static void setFluidPlacementMode(ItemStack stack, LiquidInteractions.GadgetGeneric mode) { NBTUtil.getOrNewTag(stack).setByte("fluidInteractionMode", mode.id); }
 
     public static RayTraceResult getLookingAt(EntityPlayer player, ItemStack stack) {
         LiquidInteractions.GadgetGeneric FluidIntState = getFluidInteractionMode(stack);
