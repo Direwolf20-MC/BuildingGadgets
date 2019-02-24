@@ -4,6 +4,7 @@ import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.items.capability.CapabilityProviderEnergy;
 import com.direwolf20.buildinggadgets.common.tools.LiquidInteractions;
 import com.direwolf20.buildinggadgets.common.utils.NBTUtil;
+import com.direwolf20.buildinggadgets.common.utils.VectorUtil;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
@@ -11,6 +12,8 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.RayTraceFluidMode;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
@@ -146,6 +149,14 @@ public abstract class GadgetGeneric extends Item {
     }
 
     public static void setFluidPlacementMode(ItemStack stack, LiquidInteractions.GadgetGeneric mode) { NBTUtil.getOrNewTag(stack).setByte("fluidInteractionMode", LiquidInteractions.GadgetGeneric.getID(mode)); }
+
+    public static RayTraceResult getLookingAt(EntityPlayer player, ItemStack stack) {
+        LiquidInteractions.GadgetGeneric FluidIntState = getFluidInteractionMode(stack);
+        if (FluidIntState == LiquidInteractions.GadgetGeneric.IGNORE) { //this is a binary system, so an if/else covers everything
+            return VectorUtil.getLookingAt(player);
+        }
+        return VectorUtil.getLookingAt(player, RayTraceFluidMode.ALWAYS);
+    }
 
     public static void toggleConnectedArea(EntityPlayer player, ItemStack stack) {
         NBTUtil.getOrNewTag(stack).setBoolean("unconnectedarea", getConnectedArea(stack));
