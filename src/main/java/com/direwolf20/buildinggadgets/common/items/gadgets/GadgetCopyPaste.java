@@ -2,25 +2,27 @@ package com.direwolf20.buildinggadgets.common.items.gadgets;
 
 import com.direwolf20.buildinggadgets.client.events.EventTooltip;
 import com.direwolf20.buildinggadgets.client.gui.GuiMod;
-import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlock;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.common.items.ITemplate;
+import com.direwolf20.buildinggadgets.common.items.capability.CapabilityProviderEnergy;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketBlockMap;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
 import com.direwolf20.buildinggadgets.common.tools.*;
+import com.direwolf20.buildinggadgets.common.utils.blocks.BlockMap;
+import com.direwolf20.buildinggadgets.common.utils.blocks.BlockMapIntState;
 import com.direwolf20.buildinggadgets.common.utils.GadgetUtils;
-import com.direwolf20.buildinggadgets.common.utils.VectorUtil;
+import com.direwolf20.buildinggadgets.common.utils.Reference;
+import com.direwolf20.buildinggadgets.common.utils.helpers.InventoryHelper;
+import com.direwolf20.buildinggadgets.common.utils.helpers.VectorHelper;
 import com.direwolf20.buildinggadgets.common.world.WorldSave;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.material.Material.Builder;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
@@ -45,6 +47,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.BlockSnapshot;
+import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.world.BlockEvent;
 
@@ -65,7 +68,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
         }
     }
 
-    public static final ResourceLocation REGISTRY_NAME = new ResourceLocation(BuildingGadgets.MODID,"gadget_copy_paste");
+    public static final ResourceLocation REGISTRY_NAME = new ResourceLocation(Reference.MODID,"gadget_copy_paste");
 
     public GadgetCopyPaste(Properties builder) {
         super(builder.defaultMaxDamage(Config.GADGETS.GADGET_COPY_PASTE.durability.get()));
@@ -263,13 +266,16 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
     public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
         ItemStack stack = player.getHeldItem(hand);
         player.setActiveHand(hand);
-        BlockPos pos = VectorUtil.getPosLookingAt(player);
+        BlockPos pos = VectorHelper.getPosLookingAt(player);
         if (!world.isRemote) {
             if (pos != null && player.isSneaking() && GadgetUtils.setRemoteInventory(stack, player, world, pos, false) == EnumActionResult.SUCCESS)
                 return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);
 
             if (getToolMode(stack) == ToolMode.Copy) {
                 if (pos == null) {
+                    //TODO Remove debug code
+                    IEnergyStorage energy = CapabilityProviderEnergy.getCap(stack).orElseThrow(NullPointerException::new);
+                    int accepted = energy.receiveEnergy(105000, false);
                     //setStartPos(stack, null);
                     //setEndPos(stack, null);
                     //player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.areareset").getUnformattedComponentText()), true);
@@ -411,7 +417,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
                     IBlockState tempState = world.getBlockState(tempPos);
                     if (tempState != Blocks.AIR.getDefaultState() && (world.getTileEntity(tempPos) == null || world.getTileEntity(tempPos) instanceof ConstructionBlockTileEntity) && !tempState.getMaterial().isLiquid() && Config.BLACKLIST.isAllowedBlock(tempState.getBlock())) {
                         TileEntity te = world.getTileEntity(tempPos);
-                        IBlockState assignState = InventoryManipulation.getSpecificStates(tempState, world, player, tempPos, stack);
+                        IBlockState assignState = InventoryHelper.getSpecificStates(tempState, world, player, tempPos, stack);
                         IBlockState actualState = assignState.getExtendedState(world, tempPos);
                         if (te instanceof ConstructionBlockTileEntity) {
                             actualState = ((ConstructionBlockTileEntity) te).getActualBlockState();
@@ -540,8 +546,8 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
         }
         ItemStack constructionPaste = new ItemStack(BGItems.constructionPaste);
         boolean useConstructionPaste = false;
-        if (InventoryManipulation.countItem(itemStack, player, world) < neededItems) {
-            if (InventoryManipulation.countPaste(player) < neededItems) {
+        if (InventoryHelper.countItem(itemStack, player, world) < neededItems) {
+            if (InventoryHelper.countPaste(player) < neededItems) {
                 return;
             }
             itemStack = constructionPaste.copy();
@@ -555,9 +561,9 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
 
         boolean useItemSuccess;
         if (useConstructionPaste) {
-            useItemSuccess = InventoryManipulation.usePaste(player, 1);
+            useItemSuccess = InventoryHelper.usePaste(player, 1);
         } else {
-            useItemSuccess = InventoryManipulation.useItem(itemStack, player, neededItems, world);
+            useItemSuccess = InventoryHelper.useItem(itemStack, player, neededItems, world);
         }
         if (useItemSuccess) {
             world.spawnEntity(new BlockBuildEntity(world, pos, player, state, 1, state, useConstructionPaste));
@@ -568,7 +574,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
     public static void anchorBlocks(EntityPlayer player, ItemStack stack) {
         BlockPos currentAnchor = getAnchor(stack);
         if (currentAnchor == null) {
-            RayTraceResult lookingAt = VectorUtil.getLookingAt(player);
+            RayTraceResult lookingAt = VectorHelper.getLookingAt(player);
             if (lookingAt == null) {
                 return;
             }

@@ -28,11 +28,11 @@ public final class PatternList {
     }
 
     public static PatternList ofResourcePattern(String... regex) {
-        return of(Stream.of(regex),true);
+        return of(Stream.of(regex),false);
     }
 
     public static PatternList ofResourcePattern(Collection<? extends String> regex) {
-        return of(regex.stream(),true);
+        return of(regex.stream(),false);
     }
 
     public static PatternList of(Stream<? extends String> strings, boolean convertToResourceLocations) {

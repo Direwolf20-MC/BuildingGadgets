@@ -1,15 +1,17 @@
 package com.direwolf20.buildinggadgets.client.gui;
 
+import java.util.Iterator;
 import java.util.function.Consumer;
 
-import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManagerContainer;
 import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManagerGUI;
 import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManagerTileEntity;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetDestruction;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
+import com.direwolf20.buildinggadgets.common.utils.Reference;
 import com.google.common.base.Function;
+import com.google.common.base.Supplier;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
@@ -106,7 +108,7 @@ public enum GuiMod {
 
             @Override
             public String getGuiID() {
-                return String.format("%s:%s", BuildingGadgets.MODID, id);
+                return String.format("%s:%s", Reference.MODID, id);
             }
 
             @Override
@@ -129,6 +131,20 @@ public enum GuiMod {
     }
 
     public static String getLangKey(String prefix, String type, String name) {
-        return BuildingGadgets.getLangKey("gui", prefix, type, name);
+        return Reference.getLangKey("gui", prefix, type, name);
+    }
+
+    public static void setEmptyField(GuiTextFieldBase field, Supplier<Integer> value) {
+        if (field.getText().isEmpty())
+            field.setText(String.valueOf(value.get()));
+    }
+
+    public static boolean sizeCheckBoxes(Iterator<GuiTextFieldBase> fields, int min, int max) {
+        while (fields.hasNext()) {
+            int n = fields.next().getInt();
+            if (n < min || n > max)
+                return false;
+        }
+        return true;
     }
 }

@@ -1,6 +1,7 @@
 package com.direwolf20.buildinggadgets.client.gui;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -17,6 +18,10 @@ public class GuiScreenTextFields extends GuiScreen {
 
     protected void forEachField(Consumer<GuiTextFieldBase> action) {
         fields.forEach(field -> action.accept(field));
+    }
+
+    protected Iterator<GuiTextFieldBase> getFieldIterator() {
+        return fields.iterator();
     }
 
     @Override

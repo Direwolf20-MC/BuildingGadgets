@@ -1,9 +1,9 @@
-package com.direwolf20.buildinggadgets.common.tools;
+package com.direwolf20.buildinggadgets.common.utils.helpers;
 
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
 import com.direwolf20.buildinggadgets.common.items.pastes.ConstructionPaste;
-import com.direwolf20.buildinggadgets.common.items.pastes.ConstructionPasteContainer;
+import com.direwolf20.buildinggadgets.common.items.pastes.GenericPasteContainer;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
 import com.direwolf20.buildinggadgets.common.utils.GadgetUtils;
 import com.google.common.collect.ImmutableSet;
@@ -28,8 +28,11 @@ import java.util.*;
 /**
  * @MajorTuvok
  * Please check of the changes with the Sets as I've had to to some guess work
+ *
+ * @MichaelHillcox
+ * This entire class could do with some refactoring and cleaning :grin:
  */
-public class InventoryManipulation {
+public class InventoryHelper {
     private static IProperty AXIS = EnumProperty.create("axis", EnumFacing.Axis.class);
 
     private static final Set<IProperty> SAFE_PROPERTIES =
@@ -195,12 +198,12 @@ public class InventoryManipulation {
             }
         }
 
-        List<Integer> containerSlots = findItemClass(ConstructionPasteContainer.class, inv);
+        List<Integer> containerSlots = findItemClass(GenericPasteContainer.class, inv);
         if (containerSlots.size() > 0) {
             for (int slot : containerSlots) {
                 ItemStack stackInSlot = inv.getStackInSlot(slot);
-                if (stackInSlot.getItem() instanceof ConstructionPasteContainer) {
-                    count = count + ConstructionPasteContainer.getPasteAmount(stackInSlot);
+                if (stackInSlot.getItem() instanceof GenericPasteContainer) {
+                    count = count + GenericPasteContainer.getPasteAmount(stackInSlot);
                 }
             }
         }
@@ -221,14 +224,14 @@ public class InventoryManipulation {
             return itemStack;
         }
         InventoryPlayer inv = player.inventory;
-        List<Integer> slots = findItemClass(ConstructionPasteContainer.class, inv);
+        List<Integer> slots = findItemClass(GenericPasteContainer.class, inv);
         if (slots.size() == 0) {
             return itemStack;
         }
 
         Map<Integer, Integer> slotMap = new HashMap<>();
         for (int slot : slots) {
-            slotMap.put(slot, ConstructionPasteContainer.getPasteAmount(inv.getStackInSlot(slot)));
+            slotMap.put(slot, GenericPasteContainer.getPasteAmount(inv.getStackInSlot(slot)));
         }
         List<Map.Entry<Integer, Integer>> list = new ArrayList<>(slotMap.entrySet());
         Comparator<Map.Entry<Integer, Integer>> comparator = Comparator.comparing(entry -> entry.getValue());
@@ -238,8 +241,8 @@ public class InventoryManipulation {
 
         for (Map.Entry<Integer, Integer> entry : list) {
             ItemStack containerStack = inv.getStackInSlot(entry.getKey());
-            int maxAmount = ((ConstructionPasteContainer) containerStack.getItem()).getMaxCapacity();
-            int pasteInContainer = ConstructionPasteContainer.getPasteAmount(containerStack);
+            int maxAmount = ((GenericPasteContainer) containerStack.getItem()).getMaxCapacity();
+            int pasteInContainer = GenericPasteContainer.getPasteAmount(containerStack);
             int freeSpace = maxAmount - pasteInContainer;
             int stackSize = itemStack.getCount();
             int remainingPaste = stackSize - freeSpace;
@@ -248,7 +251,7 @@ public class InventoryManipulation {
             }
             int usedPaste = Math.abs(stackSize - remainingPaste);
             itemStack.setCount(remainingPaste);
-            ConstructionPasteContainer.setPasteAmount(containerStack, pasteInContainer + usedPaste);
+            GenericPasteContainer.setPasteAmount(containerStack, pasteInContainer + usedPaste);
         }
         return itemStack;
     }
@@ -268,14 +271,14 @@ public class InventoryManipulation {
                 }
             }
         }
-        List<Integer> containerSlots = findItemClass(ConstructionPasteContainer.class, inv);
+        List<Integer> containerSlots = findItemClass(GenericPasteContainer.class, inv);
         if (containerSlots.size() > 0) {
             for (int slot : containerSlots) {
                 ItemStack containerStack = inv.getStackInSlot(slot);
-                if (containerStack.getItem() instanceof ConstructionPasteContainer) {
-                    int pasteAmt = ConstructionPasteContainer.getPasteAmount(containerStack);
+                if (containerStack.getItem() instanceof GenericPasteContainer) {
+                    int pasteAmt = GenericPasteContainer.getPasteAmount(containerStack);
                     if (pasteAmt >= count) {
-                        ConstructionPasteContainer.setPasteAmount(containerStack, pasteAmt - count);
+                        GenericPasteContainer.setPasteAmount(containerStack, pasteAmt - count);
                         return true;
                     }
 

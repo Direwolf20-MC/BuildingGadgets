@@ -5,21 +5,16 @@
 
 package com.direwolf20.buildinggadgets.client.gui;
 
-import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketCopyCoords;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
-import net.minecraft.client.Minecraft;
+import com.direwolf20.buildinggadgets.common.utils.Reference;
 import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.util.text.TextComponentTranslation;
-import net.minecraft.util.text.TextFormatting;
 
 public class CopyGUI extends GuiScreenTextFields {
     private GuiTextFieldBase startX, startY, startZ, endX, endY, endZ;
@@ -33,7 +28,7 @@ public class CopyGUI extends GuiScreenTextFields {
     private BlockPos startPos;
     private BlockPos endPos;
 
-    private static final ResourceLocation background = new ResourceLocation(BuildingGadgets.MODID, "textures/gui/testcontainer.png");
+    private static final ResourceLocation background = new ResourceLocation(Reference.MODID, "textures/gui/testcontainer.png");
 
     public CopyGUI(ItemStack tool) {
         super();
@@ -61,18 +56,14 @@ public class CopyGUI extends GuiScreenTextFields {
         //NOTE: the id always has to be different or else it might get called twice or never!
         addButton(new GuiButtonAction(guiLeft + 45, guiTop + 60, 40, 20, "Ok", () -> {
             clearTextBoxes();
-            try {
-                if (absoluteCoords) {
-                    startPos = new BlockPos(Integer.parseInt(startX.getText()), Integer.parseInt(startY.getText()), Integer.parseInt(startZ.getText()));
-                    endPos = new BlockPos(Integer.parseInt(endX.getText()), Integer.parseInt(endY.getText()), Integer.parseInt(endZ.getText()));
-                } else {
-                    startPos = new BlockPos(startPos.getX() + Integer.parseInt(startX.getText()), startPos.getY() + Integer.parseInt(startY.getText()), startPos.getZ() + Integer.parseInt(startZ.getText()));
-                    endPos = new BlockPos(startPos.getX() + Integer.parseInt(endX.getText()), startPos.getY() + Integer.parseInt(endY.getText()), startPos.getZ() + Integer.parseInt(endZ.getText()));
-                }
-                PacketHandler.sendToServer(new PacketCopyCoords(startPos, endPos));
-            } catch (Throwable t) {
-                Minecraft.getInstance().player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.copyguierror").getUnformattedComponentText()), true);
+            if (absoluteCoords) {
+                startPos = new BlockPos(startX.getInt(), startY.getInt(), startZ.getInt());
+                endPos = new BlockPos(endX.getInt(), endY.getInt(), endZ.getInt());
+            } else {
+                startPos = new BlockPos(startPos.getX() + startX.getInt(), startPos.getY() + startY.getInt(), startPos.getZ() + startZ.getInt());
+                endPos = new BlockPos(startPos.getX() + endX.getInt(), startPos.getY() + endY.getInt(), startPos.getZ() + endZ.getInt());
             }
+            PacketHandler.sendToServer(new PacketCopyCoords(startPos, endPos));
         }));
         addButton(new GuiButtonAction(guiLeft + 145, guiTop + 60, 40, 20, "Cancel", () -> close()));
         addButton(new GuiButtonAction(guiLeft + 245, guiTop + 60, 40, 20, "Clear", () -> {
@@ -102,19 +93,13 @@ public class CopyGUI extends GuiScreenTextFields {
     }
 
     private GuiTextFieldBase addField(int x, int y, int defaultint) {
-        return addField(new GuiTextFieldBase(fontRenderer, guiLeft + x, guiTop + y, 40).setDefaultInt(defaultint));
+        return addField(new GuiTextFieldBase(fontRenderer, guiLeft + x, guiTop + y, 40).setDefaultInt(defaultint).restrictToNumeric());
     }
 
-    private void fieldChange(GuiTextField textField, int amount) {
+    private void fieldChange(GuiTextFieldBase textField, int amount) {
         clearTextBoxes();
-        if (GuiScreen.isShiftKeyDown()) amount = amount * 10;
-        try {
-            int i = Integer.valueOf(textField.getText());
-            i = i + amount;
-            textField.setText(String.valueOf(i));
-        } catch (Throwable t) {
-            close();
-        }
+        if (GuiScreen.isShiftKeyDown()) amount *= 10;
+        textField.setText(String.valueOf(textField.getInt() + amount));
     }
 
     @Override
@@ -147,8 +132,8 @@ public class CopyGUI extends GuiScreenTextFields {
     private void updateTextFields() {
         String x, y, z;
         if (absoluteCoords) {
-            BlockPos start = startX.getText() != "" ? new BlockPos(startPos.getX() + Integer.parseInt(startX.getText()), startPos.getY() + Integer.parseInt(startY.getText()), startPos.getZ() + Integer.parseInt(startZ.getText())) : startPos;
-            BlockPos end = endX.getText() != "" ? new BlockPos(startPos.getX() + Integer.parseInt(endX.getText()), startPos.getY() + Integer.parseInt(endY.getText()), startPos.getZ() + Integer.parseInt(endZ.getText())) : endPos;
+            BlockPos start = startX.getText() != "" ? new BlockPos(startPos.getX() + startX.getInt(), startPos.getY() + startY.getInt(), startPos.getZ() + startZ.getInt()) : startPos;
+            BlockPos end = endX.getText() != "" ? new BlockPos(startPos.getX() + endX.getInt(), startPos.getY() + endY.getInt(), startPos.getZ() + endZ.getInt()) : endPos;
             startX.setText(String.valueOf(start.getX()));
             startY.setText(String.valueOf(start.getY()));
             startZ.setText(String.valueOf(start.getZ()));
@@ -156,17 +141,17 @@ public class CopyGUI extends GuiScreenTextFields {
             endY.setText(String.valueOf(end.getY()));
             endZ.setText(String.valueOf(end.getZ()));
         } else {
-            x = startX.getText() != "" ? String.valueOf(Integer.parseInt(startX.getText()) - startPos.getX()) : "0";
+            x = startX.getText() != "" ? String.valueOf(startX.getInt() - startPos.getX()) : "0";
             startX.setText(x);
-            y = startY.getText() != "" ? String.valueOf(Integer.parseInt(startY.getText()) - startPos.getY()) : "0";
+            y = startY.getText() != "" ? String.valueOf(startY.getInt() - startPos.getY()) : "0";
             startY.setText(y);
-            z = startZ.getText() != "" ? String.valueOf(Integer.parseInt(startZ.getText()) - startPos.getZ()) : "0";
+            z = startZ.getText() != "" ? String.valueOf(startZ.getInt() - startPos.getZ()) : "0";
             startZ.setText(z);
-            x = endX.getText() != "" ? String.valueOf(Integer.parseInt(endX.getText()) - startPos.getX()) : String.valueOf(endPos.getX() - startPos.getX());
+            x = endX.getText() != "" ? String.valueOf(endX.getInt() - startPos.getX()) : String.valueOf(endPos.getX() - startPos.getX());
             endX.setText(x);
-            y = endY.getText() != "" ? String.valueOf(Integer.parseInt(endY.getText()) - startPos.getY()) : String.valueOf(endPos.getY() - startPos.getY());
+            y = endY.getText() != "" ? String.valueOf(endY.getInt() - startPos.getY()) : String.valueOf(endPos.getY() - startPos.getY());
             endY.setText(y);
-            z = endZ.getText() != "" ? String.valueOf(Integer.parseInt(endZ.getText()) - startPos.getZ()) : String.valueOf(endPos.getZ() - startPos.getZ());
+            z = endZ.getText() != "" ? String.valueOf(endZ.getInt() - startPos.getZ()) : String.valueOf(endPos.getZ() - startPos.getZ());
             endZ.setText(z);
         }
     }

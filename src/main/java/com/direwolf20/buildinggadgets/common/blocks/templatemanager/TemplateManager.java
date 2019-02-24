@@ -1,18 +1,13 @@
 package com.direwolf20.buildinggadgets.common.blocks.templatemanager;
 
 import com.direwolf20.buildinggadgets.client.gui.GuiMod;
-import com.direwolf20.buildinggadgets.common.BuildingGadgets;
-import com.direwolf20.buildinggadgets.common.items.ITemplate;
-import com.direwolf20.buildinggadgets.common.network.PacketHandler;
-import com.direwolf20.buildinggadgets.common.network.packets.PacketBlockMap;
+import com.direwolf20.buildinggadgets.common.utils.Reference;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.state.DirectionProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.state.properties.BlockStateProperties;
@@ -28,7 +23,7 @@ import net.minecraftforge.items.CapabilityItemHandler;
 import javax.annotation.Nullable;
 
 public class TemplateManager extends Block {
-    public static final ResourceLocation REGISTRY_NAME = new ResourceLocation(BuildingGadgets.MODID,"template_manager");
+    public static final ResourceLocation REGISTRY_NAME = new ResourceLocation(Reference.MODID,"template_manager");
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
 
     public TemplateManager(Properties builder) {

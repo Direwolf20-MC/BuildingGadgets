@@ -1,12 +1,12 @@
 package com.direwolf20.buildinggadgets.common.registry.objects;
 
-import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlock;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockPowder;
 import com.direwolf20.buildinggadgets.common.blocks.EffectBlock;
 import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManager;
 import com.direwolf20.buildinggadgets.common.registry.BlockBuilder;
 import com.direwolf20.buildinggadgets.common.registry.BlockRegistryContainer;
+import com.direwolf20.buildinggadgets.common.utils.Reference;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.item.Item;
@@ -20,8 +20,8 @@ import static com.direwolf20.buildinggadgets.common.registry.objects.BGItems.ite
 import static com.direwolf20.buildinggadgets.common.registry.objects.BGItems.itemPropertiesWithoutGroup;
 import static com.direwolf20.buildinggadgets.common.registry.objects.BuildingObjects.EFFECT_BLOCK_MATERIAL;
 
-@ObjectHolder(BuildingGadgets.MODID)
-@EventBusSubscriber(modid = BuildingGadgets.MODID, bus = Bus.MOD)
+@ObjectHolder(Reference.MODID)
+@EventBusSubscriber(modid = Reference.MODID, bus = Bus.MOD)
 public final class BGBlocks {
     private BGBlocks() {}
 
@@ -36,7 +36,7 @@ public final class BGBlocks {
     @ObjectHolder("template_manager")
     public static Block templateManger;
 
-    public static void init() {
+    static void init() {
         container.add(new BlockBuilder(EffectBlock.REGISTRY_NAME)
                 .builder(Block.Properties.create(EFFECT_BLOCK_MATERIAL).hardnessAndResistance(20f))
                 .item(itemPropertiesWithoutGroup())
@@ -65,7 +65,7 @@ public final class BGBlocks {
         container.registerItemBlocks(event);
     }
 
-    public static void cleanup() {
+    static void cleanup() {
         container.clear();
     }
 }

@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.common.items.capability;
 
 import com.direwolf20.buildinggadgets.common.config.Config;
-import com.direwolf20.buildinggadgets.common.tools.CapabilityNotPresentException;
+import com.direwolf20.buildinggadgets.common.utils.exceptions.CapabilityNotPresentException;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.capabilities.Capability;
@@ -22,12 +22,6 @@ public class CapabilityProviderEnergy implements ICapabilityProvider {
         this.energyItem = new ItemEnergyForge(stack,energyCapacity);
         this.energyCapability = LazyOptional.of(() -> energyItem);
     }
-
-    // @todo: reimplement @since 1.13.x removed as of 1.13?
-//    @Override
-//    public boolean hasCapability(@Nonnull Capability<?> capability, @Nullable EnumFacing facing) {
-//        return capability == CapabilityEnergy.ENERGY && SyncedConfig.poweredByFE ;
-//    }
 
     @Nonnull
     @Override

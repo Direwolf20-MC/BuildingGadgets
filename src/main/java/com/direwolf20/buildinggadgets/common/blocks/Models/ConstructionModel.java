@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.common.blocks.Models;
 
-import com.direwolf20.buildinggadgets.common.BuildingGadgets;
+import com.direwolf20.buildinggadgets.common.utils.Reference;
 import com.google.common.collect.ImmutableMap;
 import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.model.IUnbakedModel;
@@ -21,7 +21,7 @@ import java.util.Set;
 import java.util.function.Function;
 
 public class ConstructionModel implements IUnbakedModel {
-    private static final ResourceLocation MODEL_CONSTRUCTION_BLOCK = new ModelResourceLocation(BuildingGadgets.MODID + ":blank_const_block");
+    private static final ResourceLocation MODEL_CONSTRUCTION_BLOCK = new ModelResourceLocation(Reference.MODID + ":blank_const_block");
 
     @Override
     public Collection<ResourceLocation> getOverrideLocations() {

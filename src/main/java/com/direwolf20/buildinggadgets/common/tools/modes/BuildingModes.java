@@ -1,4 +1,4 @@
-package com.direwolf20.buildinggadgets.common.tools;
+package com.direwolf20.buildinggadgets.common.tools.modes;
 
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetBuilding;
@@ -387,40 +387,5 @@ public class BuildingModes {
                 }
             }
         }
-    }
-
-    public static List<BlockMap> sortMapByDistance(List<BlockMap> unSortedMap, EntityPlayer player) {//TODO unused
-        List<BlockPos> unSortedList = new ArrayList<BlockPos>();
-//        List<BlockPos> sortedList = new ArrayList<BlockPos>();
-        Map<BlockPos, IBlockState> PosToStateMap = new HashMap<BlockPos, IBlockState>();
-        Map<BlockPos, Integer> PosToX = new HashMap<BlockPos, Integer>();
-        Map<BlockPos, Integer> PosToY = new HashMap<BlockPos, Integer>();
-        Map<BlockPos, Integer> PosToZ = new HashMap<BlockPos, Integer>();
-        for (BlockMap blockMap : unSortedMap) {
-            PosToStateMap.put(blockMap.pos, blockMap.state);
-            PosToX.put(blockMap.pos, blockMap.xOffset);
-            PosToY.put(blockMap.pos, blockMap.yOffset);
-            PosToZ.put(blockMap.pos, blockMap.zOffset);
-            unSortedList.add(blockMap.pos);
-        }
-        List<BlockMap> sortedMap = new ArrayList<BlockMap>();
-        Double2ObjectMap<BlockPos> rangeMap = new Double2ObjectArrayMap<>(unSortedList.size());
-        DoubleSortedSet distances = new DoubleRBTreeSet();
-        double x = player.posX;
-        double y = player.posY + player.getEyeHeight();
-        double z = player.posZ;
-        for (BlockPos pos : unSortedList) {
-            double distance = pos.distanceSqToCenter(x, y, z);
-            rangeMap.put(distance, pos);
-            distances.add(distance);
-        }
-        for (double dist : distances) {
-            //System.out.println(dist);
-            BlockPos pos = new BlockPos(rangeMap.get(dist));
-            sortedMap.add(new BlockMap(pos, PosToStateMap.get(pos), PosToX.get(pos), PosToY.get(pos), PosToZ.get(pos)));
-        }
-        //System.out.println(unSortedList);
-        //System.out.println(sortedList);
-        return sortedMap;
     }
 }

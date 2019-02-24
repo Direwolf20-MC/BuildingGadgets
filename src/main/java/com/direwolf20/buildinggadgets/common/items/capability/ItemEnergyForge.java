@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.common.items.capability;
 
+import com.direwolf20.buildinggadgets.common.utils.GadgetUtils;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.energy.EnergyStorage;
@@ -26,6 +27,11 @@ public class ItemEnergyForge extends EnergyStorage {
         return super.getEnergyStored();
     }
 
+    public int getEnergyStoredNoUpdate() {
+        updateMaxEnergy();
+        return super.getEnergyStored();
+    }
+
     @Override
     public int getMaxEnergyStored() {
         updateMaxEnergy();
@@ -35,30 +41,27 @@ public class ItemEnergyForge extends EnergyStorage {
     @Override
     public int receiveEnergy(int maxReceive, boolean simulate) {
         updateEnergy();
-        return changeEnergy(super.receiveEnergy(maxReceive, simulate), simulate);
+        return updateEnergy(super.receiveEnergy(maxReceive, simulate), simulate);
     }
 
     @Override
     public int extractEnergy(int maxExtract, boolean simulate) {
         updateEnergy();
-        return changeEnergy(super.extractEnergy(maxExtract, simulate), simulate);
+        return updateEnergy(-super.extractEnergy(maxExtract, simulate), simulate);
     }
 
-    private int changeEnergy(int amount, boolean simulate) {
+    private int updateEnergy(int amount, boolean simulate) {
         if (amount > 0 && !simulate) {
-            NBTTagCompound nbt = stack.getTag();
-            if (nbt == null) {
-                stack.setTag(nbt = new NBTTagCompound());
-            }
-
-            nbt.setInt(NBT_ENERGY, getEnergyStored());
+            NBTTagCompound nbt = GadgetUtils.enforceHasTag(stack);
+            nbt.setInt(NBT_ENERGY, getEnergyStoredNoUpdate());
         }
         return amount;
     }
 
     private void updateEnergy() {
-        NBTTagCompound nbt = stack.getTag();
-        this.energy = nbt != null && nbt.hasKey(NBT_ENERGY) ? nbt.getInt(NBT_ENERGY) : 0;
+        NBTTagCompound nbt = GadgetUtils.enforceHasTag(stack);
+        if (nbt.hasKey(NBT_ENERGY))
+            this.energy = nbt.getInt(NBT_ENERGY) ;
         updateMaxEnergy();
     }
 

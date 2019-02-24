@@ -2,7 +2,7 @@ package com.direwolf20.buildinggadgets.common.network.packets;
 
 import com.direwolf20.buildinggadgets.client.events.EventTooltip;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
-import com.direwolf20.buildinggadgets.common.tools.InventoryManipulation;
+import com.direwolf20.buildinggadgets.common.utils.helpers.InventoryHelper;
 import com.direwolf20.buildinggadgets.common.tools.ToolRenders;
 import com.direwolf20.buildinggadgets.common.tools.UniqueItem;
 import com.direwolf20.buildinggadgets.common.utils.GadgetUtils;
@@ -15,7 +15,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.fml.network.NetworkEvent.Context;
 import net.minecraftforge.items.IItemHandler;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -102,7 +101,7 @@ public class PacketSetRemoteInventoryCache {
                                 UniqueItem uniqueItem = new UniqueItem(item);
                                 if (!itemTypes.contains(uniqueItem)) {
                                     itemTypes.add(uniqueItem);
-                                    builder.addCopies(uniqueItem, InventoryManipulation.countInContainer(remoteInventory, item));
+                                    builder.addCopies(uniqueItem, InventoryHelper.countInContainer(remoteInventory, item));
                                 }
                             }
                         }

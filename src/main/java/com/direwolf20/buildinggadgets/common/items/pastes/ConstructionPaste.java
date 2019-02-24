@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.common.items.pastes;
 
-import com.direwolf20.buildinggadgets.common.BuildingGadgets;
-import com.direwolf20.buildinggadgets.common.tools.InventoryManipulation;
+import com.direwolf20.buildinggadgets.common.utils.helpers.InventoryHelper;
+import com.direwolf20.buildinggadgets.common.utils.Reference;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -14,7 +14,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class ConstructionPaste extends Item {
-    public static final ResourceLocation REGISTRY_NAME = new ResourceLocation(BuildingGadgets.MODID, "construction_paste");
+    public static final ResourceLocation REGISTRY_NAME = new ResourceLocation(Reference.MODID, "construction_paste");
     public ConstructionPaste(Properties builder) {
         super(builder);
     }
@@ -27,7 +27,7 @@ public class ConstructionPaste extends Item {
     @Override
     public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
         ItemStack itemstack = player.getHeldItem(hand);
-        itemstack = InventoryManipulation.addPasteToContainer(player, itemstack);
+        itemstack = InventoryHelper.addPasteToContainer(player, itemstack);
 
         return new ActionResult<>(EnumActionResult.SUCCESS, itemstack);
     }

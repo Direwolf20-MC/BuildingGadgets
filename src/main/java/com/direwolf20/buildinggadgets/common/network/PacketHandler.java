@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.common.network;
 
-import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.network.packets.*;
+import com.direwolf20.buildinggadgets.common.utils.Reference;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ResourceLocation;
@@ -20,7 +20,7 @@ public class PacketHandler {
     private static short index = 0;
 
     public static final SimpleChannel HANDLER = NetworkRegistry.ChannelBuilder
-            .named(new ResourceLocation(BuildingGadgets.MODID, "main_network_channel"))
+            .named(new ResourceLocation(Reference.MODID, "main_network_channel"))
             .clientAcceptedVersions(PROTOCOL_VERSION::equals)
             .serverAcceptedVersions(PROTOCOL_VERSION::equals)
             .networkProtocolVersion(() -> PROTOCOL_VERSION)

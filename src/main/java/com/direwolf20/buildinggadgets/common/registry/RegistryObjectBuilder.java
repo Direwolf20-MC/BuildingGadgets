@@ -12,14 +12,6 @@ public class RegistryObjectBuilder<T extends IForgeRegistryEntry<T>, B> implemen
     private Function<B,T> factory;
     private B builder;
 
-    public static<T extends IForgeRegistryEntry<T>, B> RegistryObjectBuilder<T,B> create(String registryName) {
-        return new RegistryObjectBuilder<>(registryName);
-    }
-
-    public static<T extends IForgeRegistryEntry<T>, B> RegistryObjectBuilder<T,B> create(ResourceLocation registryName) {
-        return new RegistryObjectBuilder<>(registryName);
-    }
-
     public RegistryObjectBuilder(String registryName) {
         this(new ResourceLocation(Objects.requireNonNull(registryName)));
     }

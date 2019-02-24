@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.common.items.pastes;
 
-import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.config.Config;
+import com.direwolf20.buildinggadgets.common.utils.Reference;
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
 
@@ -28,7 +28,7 @@ public enum RegularPasteContainerTypes {
 
     RegularPasteContainerTypes(String itemSuffix, IntSupplier capacitySupplier) {
         this.itemSuffix = itemSuffix;
-        this.registryName = new ResourceLocation(BuildingGadgets.MODID, "construction_paste_container_" + itemSuffix);
+        this.registryName = new ResourceLocation(Reference.MODID, "construction_paste_container_" + itemSuffix);
         this.capacitySupplier = capacitySupplier;
     }
 

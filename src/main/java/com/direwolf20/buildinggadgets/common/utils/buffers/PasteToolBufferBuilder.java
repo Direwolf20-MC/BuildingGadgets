@@ -1,7 +1,8 @@
-package com.direwolf20.buildinggadgets.common.tools;
+package com.direwolf20.buildinggadgets.common.utils.buffers;
 
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
+import com.direwolf20.buildinggadgets.common.utils.blocks.BlockMap;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockRendererDispatcher;

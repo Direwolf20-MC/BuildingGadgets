@@ -2,9 +2,7 @@ package com.direwolf20.buildinggadgets.common.items.gadgets;
 
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.items.capability.CapabilityProviderEnergy;
-import com.direwolf20.buildinggadgets.common.tools.LiquidInteractions;
 import com.direwolf20.buildinggadgets.common.utils.NBTUtil;
-import com.direwolf20.buildinggadgets.common.utils.VectorUtil;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;

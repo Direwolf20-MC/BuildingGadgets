@@ -1,4 +1,4 @@
-package com.direwolf20.buildinggadgets.common.tools;
+package com.direwolf20.buildinggadgets.common.utils.blocks;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.math.BlockPos;

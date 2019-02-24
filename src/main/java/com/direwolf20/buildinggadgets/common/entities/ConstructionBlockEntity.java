@@ -88,11 +88,11 @@ public class ConstructionBlockEntity extends Entity {
 
                         int opacity = tempState.getOpacity(world, setPos);
                         boolean neighborBrightness = tempState.useNeighborBrightness(world, setPos);
-                        if (opacity == 255 || neighborBrightness) {
+                        if (opacity > 0 || neighborBrightness) {
                             IBlockState tempSetBlock = te.getBlockState();
                             IBlockState tempActualSetBlock = ((ConstructionBlockTileEntity) te).getActualBlockState();
                             world.setBlockState(setPos, BGBlocks.constructionBlock.getDefaultState()
-                                    .with(ConstructionBlock.BRIGHT, opacity != 255)
+                                    .with(ConstructionBlock.BRIGHT, opacity == 0)
                                     .with(ConstructionBlock.NEIGHBOR_BRIGHTNESS, neighborBrightness));
                             te = world.getTileEntity(setPos);
                             if (te instanceof ConstructionBlockTileEntity) {

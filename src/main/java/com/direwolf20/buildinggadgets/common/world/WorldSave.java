@@ -3,16 +3,17 @@ package com.direwolf20.buildinggadgets.common.world;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.world.World;
-import net.minecraft.world.storage.DimensionSavedDataManager;
+import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.storage.WorldSavedData;
-import net.minecraft.world.storage.WorldSavedDataStorage;
 import net.minecraftforge.common.util.Constants;
 
 import javax.annotation.Nonnull;
+
+import com.direwolf20.buildinggadgets.common.utils.Reference;
+
 import java.util.HashMap;
 import java.util.Map;
-
-import static com.direwolf20.buildinggadgets.common.BuildingGadgets.MODID;
+import java.util.function.Function;
 
 public class WorldSave extends WorldSavedData {
     private final String TAG_NAME;
@@ -46,44 +47,25 @@ public class WorldSave extends WorldSavedData {
     }
 
     public static WorldSave getWorldSave(World world) {
-        return get(world, WorldSaveBlockMap.class);
+        return get(world, WorldSaveBlockMap.NAME, WorldSaveBlockMap::new);
     }
 
     public static WorldSave getTemplateWorldSave(World world) {
-        return get(world, WorldSaveTemplate.class);
+        return get(world, WorldSaveTemplate.NAME, WorldSaveTemplate::new);
     }
 
     public static WorldSave getWorldSaveDestruction(World world) {
-        return get(world, WorldSaveDestruction.class);
+        return get(world, WorldSaveDestruction.NAME, WorldSaveDestruction::new);
     }
 
     @Nonnull
-    private static WorldSave get(World world, Class<? extends WorldSave> clazz) {
-        String name = MODID;
-
-        WorldSave instance = null;
-        DimensionSavedDataManager storage = new DimensionSavedDataManager(world.getDimension().getType(), world.getSaveHandler());
-
-        if (storage == null)
-            throw new IllegalStateException("World#getMapStorage returned null. The following WorldSave failed to save data: " + name);
-
-        if (clazz == WorldSaveBlockMap.class)
-            instance = storage.getOrLoadData(WorldSaveBlockMap::new, name);
-        else if (clazz == WorldSaveTemplate.class)
-            instance = storage.getOrLoadData(WorldSaveTemplate::new, name);
-        else if (clazz == WorldSaveDestruction.class)
-            instance = storage.getOrLoadData(WorldSaveDestruction::new, name);
-
+    private static <T extends WorldSave> WorldSave get(World world, String name, Function<String, T> factory) {
+        name = String.join("_", Reference.MODID, name);
+        DimensionType dim = world.getDimension().getType();
+        WorldSave instance = world.func_212411_a(dim, factory, name);
         if (instance == null) {
-            if (clazz == WorldSaveBlockMap.class) {
-                instance = new WorldSaveBlockMap(name);
-            } else if (clazz == WorldSaveTemplate.class) {
-                instance = new WorldSaveTemplate(name);
-            } else if (clazz == WorldSaveDestruction.class) {
-                instance = new WorldSaveDestruction(name);
-            }
-
-            storage.setData(name, instance);
+            instance = factory.apply(name);
+            world.func_212409_a(dim, name, instance);
         }
         return instance;
     }
@@ -117,20 +99,23 @@ public class WorldSave extends WorldSavedData {
     }
 
     public static class WorldSaveBlockMap extends WorldSave {
+        public static final String NAME = "block_map_data";
         public WorldSaveBlockMap(String name) {
-            super(name, "tagmap");
+            super(name, NAME);
         }
     }
 
     public static class WorldSaveTemplate extends WorldSave {
+        public static final String NAME = "template_data";
         public WorldSaveTemplate(String name) {
-            super(name, "templatedata");
+            super(name, NAME);
         }
     }
 
     public static class WorldSaveDestruction extends WorldSave {
+        public static final String NAME = "destruction_undo";
         public WorldSaveDestruction(String name) {
-            super(name, "destructionundo");
+            super(name, NAME);
         }
     }
 }

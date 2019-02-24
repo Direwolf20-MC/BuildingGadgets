@@ -1,4 +1,4 @@
-package com.direwolf20.buildinggadgets.common.tools;
+package com.direwolf20.buildinggadgets.common.utils.helpers;
 
 import it.unimi.dsi.fastutil.doubles.Double2ObjectArrayMap;
 import it.unimi.dsi.fastutil.doubles.Double2ObjectMap;
@@ -12,7 +12,7 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * Sorter
+ * SortingHelper
  *
  * The sorter class is made to contain all sorts of different sorting algorithms
  *
@@ -20,7 +20,7 @@ import java.util.List;
  * specific data type / class. For example our static Blocks class used
  * for sorting any data related to a Minecraft Block
  */
-public class Sorter {
+public class SortingHelper {
 
     public static class Blocks {
 

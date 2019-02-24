@@ -6,6 +6,7 @@ import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
 import com.direwolf20.buildinggadgets.common.tools.*;
+import com.direwolf20.buildinggadgets.common.utils.VectorUtil;
 import com.direwolf20.buildinggadgets.common.utils.NBTUtil;
 import com.direwolf20.buildinggadgets.common.world.FakeBuilderWorld;
 import net.minecraft.block.state.IBlockState;
@@ -28,6 +29,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldType;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.BlockSnapshot;
+import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.world.BlockEvent;
 
@@ -159,11 +161,12 @@ public class GadgetBuilding extends GadgetGeneric {
     public static void rangeChange(EntityPlayer player, ItemStack heldItem) {
         //Called when the range change hotkey is pressed
         int range = getToolRange(heldItem);
-        if (player.isSneaking()) {
-            range = (range == 1) ? Config.GADGETS.maxRange.get() : range - 1;
-        } else {
-            range = (range >= Config.GADGETS.maxRange.get()) ? 1 : range + 1;
-        }
+        int changeAmount = (getToolMode(heldItem) != ToolMode.Surface || (range % 2 == 0)) ? 1 : 2;
+        if (player.isSneaking())
+            range = (range == 1) ? Config.GADGETS.maxRange.get() : range - changeAmount;
+        else
+            range = (range >= Config.GADGETS.maxRange.get()) ? 1 : range + changeAmount;
+
         setToolRange(heldItem, range);
         player.sendStatusMessage(new TextComponentString(TextFormatting.DARK_AQUA + new TextComponentTranslation("message.gadget.toolrange").getUnformattedComponentText() + ": " + range), true);
     }
@@ -208,8 +211,9 @@ public class GadgetBuilding extends GadgetGeneric {
                     } catch (Exception var8) {
                     }
                 }
-                //Get the extended block state in the fake world, Disabled to fix Chisel, state = state.getBlock().getExtendedState(state, fakeWorld, coordinate);
-
+                //Get the extended block state in the fake world
+                //Disabled to fix Chisel
+                //state = state.getBlock().getExtendedState(state, fakeWorld, coordinate);
                 if (placeBlock(world, player, coordinate, state)) {
                     undoCoords.add(coordinate);//If we successfully place the block, add the location to the undo list.
                 }

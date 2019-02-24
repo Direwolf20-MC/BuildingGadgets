@@ -1,11 +1,11 @@
 package com.direwolf20.buildinggadgets.client.events;
 
 import com.direwolf20.buildinggadgets.client.RemoteInventoryCache;
-import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.items.ITemplate;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
-import com.direwolf20.buildinggadgets.common.tools.InventoryManipulation;
+import com.direwolf20.buildinggadgets.common.utils.helpers.InventoryHelper;
 import com.direwolf20.buildinggadgets.common.tools.UniqueItem;
+import com.direwolf20.buildinggadgets.common.utils.Reference;
 import com.google.common.collect.Multiset;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
@@ -28,7 +28,7 @@ import java.util.*;
  * Thanks Vazkii!!
  */
 
-@Mod.EventBusSubscriber(modid = BuildingGadgets.MODID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+@Mod.EventBusSubscriber(modid = Reference.MODID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public class EventTooltip {
 
     private static final int STACKS_PER_LINE = 8;
@@ -63,7 +63,7 @@ public class EventTooltip {
             int totalMissing = 0;
             //Look through all the ItemStacks and draw each one in the specified X/Y position
             for (Map.Entry<ItemStack, Integer> entry : list) {
-                int hasAmt = InventoryManipulation.countItem(entry.getKey(), Minecraft.getInstance().player, cache);
+                int hasAmt = InventoryHelper.countItem(entry.getKey(), Minecraft.getInstance().player, cache);
                 if (hasAmt < entry.getValue())
                     totalMissing = totalMissing + Math.abs(entry.getValue() - hasAmt);
             }
@@ -128,7 +128,7 @@ public class EventTooltip {
             int j = 0;
             //Look through all the ItemStacks and draw each one in the specified X/Y position
             for (Map.Entry<ItemStack, Integer> entry : list) {
-                int hasAmt = InventoryManipulation.countItem(entry.getKey(), Minecraft.getInstance().player, cache);
+                int hasAmt = InventoryHelper.countItem(entry.getKey(), Minecraft.getInstance().player, cache);
                 int x = bx + (j % STACKS_PER_LINE) * 18;
                 int y = by + (j / STACKS_PER_LINE) * 20;
                 totalMissing += renderRequiredBlocks(entry.getKey(), x, y, hasAmt, entry.getValue());
@@ -136,10 +136,10 @@ public class EventTooltip {
             }
             if (totalMissing > 0) {
                 ItemStack pasteItemStack = new ItemStack(BGItems.constructionPaste);
-                int hasAmt = InventoryManipulation.countPaste(Minecraft.getInstance().player);
+                int hasAmt = InventoryHelper.countPaste(Minecraft.getInstance().player);
                 int x = bx + (j % STACKS_PER_LINE) * 18;
                 int y = by + (j / STACKS_PER_LINE) * 20;
-                renderRequiredBlocks(pasteItemStack, x, y, hasAmt, InventoryManipulation.longToInt(totalMissing));
+                renderRequiredBlocks(pasteItemStack, x, y, hasAmt, InventoryHelper.longToInt(totalMissing));
                 j++;
             }
         }

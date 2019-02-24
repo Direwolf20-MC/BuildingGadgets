@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.common.network.packets;
 
-import com.direwolf20.buildinggadgets.common.tools.PasteToolBufferBuilder;
+import com.direwolf20.buildinggadgets.common.utils.buffers.PasteToolBufferBuilder;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;

@@ -1,4 +1,4 @@
-package com.direwolf20.buildinggadgets.common.tools;
+package com.direwolf20.buildinggadgets.common.utils.buffers;
 
 import com.google.common.primitives.Floats;
 import net.minecraft.client.renderer.BufferBuilder;

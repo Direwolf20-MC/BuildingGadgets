@@ -11,6 +11,7 @@ import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
 import com.direwolf20.buildinggadgets.common.utils.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.utils.VectorUtil;
+import com.direwolf20.buildinggadgets.common.tools.LiquidInteractions.*;
 import com.direwolf20.buildinggadgets.common.world.FakeBuilderWorld;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -109,6 +110,7 @@ public class ToolRenders {
                 startBlock = world.getBlockState(flIntState.getLookingPos(player));
             }
             if (startBlock != BGBlocks.effectBlock.getDefaultState()) {
+
                 IBlockState renderBlockState = getToolBlock(heldItem);
                 if (renderBlockState == Blocks.AIR.getDefaultState()) {//Don't render anything if there is no block selected (Air)
                     return;
@@ -403,6 +405,7 @@ public class ToolRenders {
         } catch (ExecutionException e) {
             BuildingGadgets.LOG.error("Error encountered while rendering destruction gadget overlay", e);
         }
+        GlStateManager.enableLighting();
         GlStateManager.popMatrix();
     }
 

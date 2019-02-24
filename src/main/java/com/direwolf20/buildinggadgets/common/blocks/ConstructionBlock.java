@@ -1,9 +1,9 @@
 package com.direwolf20.buildinggadgets.common.blocks;
 
-import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
-import com.direwolf20.buildinggadgets.common.world.FakeRenderWorld;
+import com.direwolf20.buildinggadgets.common.utils.Reference;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.EnumPushReaction;
 import net.minecraft.block.material.MaterialColor;
 import net.minecraft.block.state.BlockFaceShape;
@@ -11,6 +11,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.color.BlockColors;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.pathfinding.PathType;
 import net.minecraft.state.BooleanProperty;
@@ -23,15 +24,14 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.world.*;
 import net.minecraftforge.common.IPlantable;
-import net.minecraftforge.common.property.IExtendedBlockState;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Random;
 
 //@Optional.Interface(iface = "team.chisel.ctm.api.IFacade", modid = "ctm-api")
-public class ConstructionBlock extends Block /*implements IFacade*/ {
-    public static final ResourceLocation REGISTRY_NAME = new ResourceLocation(BuildingGadgets.MODID,"construction_block");
+public class ConstructionBlock extends BlockContainer /*implements IFacade*/ {
+    public static final ResourceLocation REGISTRY_NAME = new ResourceLocation(Reference.MODID,"construction_block");
     //public static final ConstructionProperty FACADEID = new ConstructionProperty("facadeid");
     public static final IProperty<Boolean> BRIGHT = BooleanProperty.create("bright");
     public static final IProperty<Boolean> NEIGHBOR_BRIGHTNESS = BooleanProperty.create("neighbor_brightness");
@@ -43,7 +43,7 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
     public ConstructionBlock(Properties builder) {
         super(builder);
 
-        setDefaultState(this.getStateContainer().getBaseState().with(BRIGHT, false).with(NEIGHBOR_BRIGHTNESS, false));
+        setDefaultState(this.getStateContainer().getBaseState().with(BRIGHT, true).with(NEIGHBOR_BRIGHTNESS, false));
     }
 
     @Override
@@ -80,6 +80,14 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
         return true;
     }
 
+    @Override
+    public TileEntity createNewTileEntity(IBlockReader worldIn) {
+        return new ConstructionBlockTileEntity();
+    }
+
+    public boolean isMimicNull(IBlockState mimicBlock) {
+        return (mimicBlock == null || mimicBlock == Blocks.AIR.getDefaultState());
+    }
     /*private static ConstructionBlockTileEntity getTE(World world, BlockPos pos) {
         return (ConstructionBlockTileEntity) world.getTileEntity(pos);
     }
@@ -160,20 +168,25 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
     @Override
     public boolean isNormalCube(IBlockState state, IBlockReader world, BlockPos pos) {
         IBlockState mimic = getActualMimicBlock(world, pos);
-        return mimic != null ? mimic.isNormalCube(world, pos) : super.isNormalCube(state, world, pos);
+        return !isMimicNull(mimic) ? mimic.isNormalCube(world, pos) : super.isNormalCube(state, world, pos);
     }
 
 
     @Override
     public int getOpacity(IBlockState state, IBlockReader worldIn, BlockPos pos) {
-        IBlockState mimic = getActualMimicBlock(worldIn, pos);
-        return mimic != null ? mimic.getOpacity(worldIn, pos) : super.getOpacity(state, worldIn, pos);
+        Boolean bright = state.get(ConstructionBlock.BRIGHT);
+        if (bright) {
+            return 0;
+        }
+        return 255;
+        //IBlockState mimic = getActualMimicBlock(worldIn, pos);
+        //return mimic != null ? mimic.getOpacity(worldIn, pos) : super.getOpacity(state, worldIn, pos);
     }
 
     @Override
     public boolean doesSideBlockRendering(IBlockState state, IWorldReader world, BlockPos pos, EnumFacing face) {
         IBlockState mimic = getActualMimicBlock(world, pos);
-        return mimic != null ? mimic.doesSideBlockRendering(world, pos, face) : super.doesSideBlockRendering(state, world, pos, face);
+        return !isMimicNull(mimic) ? mimic.doesSideBlockRendering(world, pos, face) : super.doesSideBlockRendering(state, world, pos, face);
     }
 
 
@@ -216,13 +229,13 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
     @Override
     public VoxelShape getCollisionShape(IBlockState state, IBlockReader worldIn, BlockPos pos) {
         IBlockState mimic = getActualMimicBlock(worldIn, pos);
-        return mimic != null ? mimic.getCollisionShape(worldIn, pos) : super.getCollisionShape(state, worldIn, pos);
+        return !isMimicNull(mimic) ? mimic.getCollisionShape(worldIn, pos) : super.getCollisionShape(state, worldIn, pos);
     }
 
     @Override
     public void onEntityCollision(IBlockState state, World worldIn, BlockPos pos, Entity entityIn) {
         IBlockState mimic = getActualMimicBlock(worldIn, pos);
-        if (mimic != null) {
+        if (!isMimicNull(mimic)) {
             mimic.onEntityCollision(worldIn, pos, entityIn);
         } else {
             super.onEntityCollision(state, worldIn, pos, entityIn);
@@ -238,7 +251,7 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
     @Override
     public MaterialColor getMapColor(IBlockState state, IBlockReader worldIn, BlockPos pos) {
         IBlockState mimic = getActualMimicBlock(worldIn, pos);
-        return mimic != null ? mimic.getMapColor(worldIn, pos) : super.getMapColor(state, worldIn, pos);
+        return !isMimicNull(mimic) ? mimic.getMapColor(worldIn, pos) : super.getMapColor(state, worldIn, pos);
     }
 
     /**
@@ -254,7 +267,7 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
     @Override
     public void updateNeighbors(IBlockState stateIn, IWorld worldIn, BlockPos pos, int flags) {
         IBlockState mimic = getActualMimicBlock(worldIn, pos);
-        if (mimic != null) {
+        if (!isMimicNull(mimic)) {
             mimic.updateNeighbors(worldIn, pos, flags);
         } else {
             super.updateNeighbors(stateIn, worldIn, pos, flags);
@@ -273,7 +286,7 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
     @Override
     public void updateDiagonalNeighbors(IBlockState state, IWorld worldIn, BlockPos pos, int flags) {
         IBlockState mimic = getActualMimicBlock(worldIn, pos);
-        if (mimic != null) {
+        if (!isMimicNull(mimic)) {
             mimic.updateDiagonalNeighbors(worldIn, pos, flags);
         } else {
             super.updateDiagonalNeighbors(state, worldIn, pos, flags);
@@ -327,7 +340,7 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
     public boolean allowsMovement(IBlockState state, IBlockReader worldIn, BlockPos pos, PathType type) {
 
         IBlockState mimic = getActualMimicBlock(worldIn, pos);
-        return mimic != null ? mimic.allowsMovement(worldIn, pos, type) : super.allowsMovement(state, worldIn, pos, type);
+        return !isMimicNull(mimic) ? mimic.allowsMovement(worldIn, pos, type) : super.allowsMovement(state, worldIn, pos, type);
     }
 
     /**
@@ -340,7 +353,7 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
     @Override
     public float getBlockHardness(IBlockState blockState, IBlockReader worldIn, BlockPos pos) {
         IBlockState mimic = getActualMimicBlock(worldIn, pos);
-        return mimic != null ? mimic.getBlockHardness(worldIn, pos) : super.getBlockHardness(blockState, worldIn, pos);
+        return !isMimicNull(mimic) ? mimic.getBlockHardness(worldIn, pos) : super.getBlockHardness(blockState, worldIn, pos);
     }
 
     @Override
@@ -356,31 +369,31 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
     @Override
     public VoxelShape getShape(IBlockState state, IBlockReader worldIn, BlockPos pos) {
         IBlockState mimic = getActualMimicBlock(worldIn, pos);
-        return mimic != null ? mimic.getShape(worldIn, pos) : super.getShape(state, worldIn, pos);
+        return !isMimicNull(mimic) ? mimic.getShape(worldIn, pos) : super.getShape(state, worldIn, pos);
     }
 
     @Override
     public VoxelShape getRenderShape(IBlockState state, IBlockReader worldIn, BlockPos pos) {
         IBlockState mimic = getActualMimicBlock(worldIn, pos);
-        return mimic != null ? mimic.getRenderShape(worldIn, pos) : super.getRenderShape(state, worldIn, pos);
+        return !isMimicNull(mimic) ? mimic.getRenderShape(worldIn, pos) : super.getRenderShape(state, worldIn, pos);
     }
 
     @Override
     public VoxelShape getRaytraceShape(IBlockState state, IBlockReader worldIn, BlockPos pos) {
         IBlockState mimic = getActualMimicBlock(worldIn, pos);
-        return mimic != null ? mimic.getRaytraceShape(worldIn, pos) : super.getRaytraceShape(state, worldIn, pos);
+        return !isMimicNull(mimic) ? mimic.getRaytraceShape(worldIn, pos) : super.getRaytraceShape(state, worldIn, pos);
     }
 
     @Override
     public boolean propagatesSkylightDown(IBlockState state, IBlockReader reader, BlockPos pos) {
         IBlockState mimic = getActualMimicBlock(reader, pos);
-        return mimic != null ? mimic.propagatesSkylightDown(reader, pos) : super.propagatesSkylightDown(state, reader, pos);
+        return !isMimicNull(mimic) ? mimic.propagatesSkylightDown(reader, pos) : super.propagatesSkylightDown(state, reader, pos);
     }
 
     @Override
     public void randomTick(IBlockState state, World worldIn, BlockPos pos, Random random) {
         IBlockState mimic = getActualMimicBlock(worldIn, pos);
-        if (mimic != null) {
+        if (!isMimicNull(mimic)) {
             mimic.randomTick(worldIn, pos, random);
         } else {
             super.randomTick(state, worldIn, pos, random);
@@ -390,7 +403,7 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
     @Override
     public void tick(IBlockState state, World worldIn, BlockPos pos, Random random) {
         IBlockState mimic = getActualMimicBlock(worldIn, pos);
-        if (mimic != null) {
+        if (!isMimicNull(mimic)) {
             mimic.randomTick(worldIn, pos, random);
         } else {
             super.tick(state, worldIn, pos, random);
@@ -410,7 +423,7 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
     @Override
     public void animateTick(IBlockState stateIn, World worldIn, BlockPos pos, Random rand) {
         IBlockState mimic = getActualMimicBlock(worldIn, pos);
-        if (mimic != null) {
+        if (!isMimicNull(mimic)) {
             mimic.randomTick(worldIn, pos, rand);
         } else {
             super.animateTick(stateIn, worldIn, pos, rand);
@@ -431,7 +444,7 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
     @Override
     public void neighborChanged(IBlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos fromPos) {
         IBlockState mimic = getActualMimicBlock(worldIn, pos);
-        if (mimic != null) {
+        if (!isMimicNull(mimic)) {
             mimic.neighborChanged(worldIn, pos, blockIn, fromPos);
         } else {
             super.neighborChanged(state, worldIn, pos, blockIn, fromPos);
@@ -451,13 +464,14 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
     @Override
     public float getPlayerRelativeBlockHardness(IBlockState state, EntityPlayer player, IBlockReader worldIn, BlockPos pos) {
         IBlockState mimic = getActualMimicBlock(worldIn, pos);
-        return mimic != null ? mimic.getPlayerRelativeBlockHardness(player, worldIn, pos) : super.getPlayerRelativeBlockHardness(state, player, worldIn, pos);
+        return !isMimicNull(mimic) ? mimic.getPlayerRelativeBlockHardness(player, worldIn, pos) : super.getPlayerRelativeBlockHardness(state, player, worldIn, pos);
     }
 
     @Override
     public boolean onBlockActivated(IBlockState state, World worldIn, BlockPos pos, EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
         IBlockState mimic = getActualMimicBlock(worldIn, pos);
-        return mimic != null ? mimic.onBlockActivated(worldIn, pos, player, hand, side, hitX, hitY, hitZ) : super.onBlockActivated(state, worldIn, pos, player, hand, side, hitX, hitY, hitZ);
+        //System.out.println(mimic);
+        return !isMimicNull(mimic) ? mimic.onBlockActivated(worldIn, pos, player, hand, side, hitX, hitY, hitZ) : super.onBlockActivated(state, worldIn, pos, player, hand, side, hitX, hitY, hitZ);
     }
 
     /**
@@ -470,7 +484,7 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
     @Override
     public void onEntityWalk(World worldIn, BlockPos pos, Entity entityIn) {
         IBlockState mimic = getActualMimicBlock(worldIn, pos);
-        if (mimic != null) {
+        if (!isMimicNull(mimic)) {
             mimic.getBlock().onEntityWalk(worldIn, pos, entityIn);
         } else {
             super.onEntityWalk(worldIn, pos, entityIn);
@@ -486,7 +500,7 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
     @Override
     public void onBlockClicked(IBlockState state, World worldIn, BlockPos pos, EntityPlayer player) {
         IBlockState mimic = getActualMimicBlock(worldIn, pos);
-        if (mimic != null) {
+        if (!isMimicNull(mimic)) {
             mimic.onBlockClicked(worldIn, pos, player);
         } else {
             super.onBlockClicked(state, worldIn, pos, player);
@@ -504,7 +518,7 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
     @Override
     public int getWeakPower(IBlockState blockState, IBlockReader blockAccess, BlockPos pos, EnumFacing side) {
         IBlockState mimic = getActualMimicBlock(blockAccess, pos);
-        return mimic != null ? mimic.getWeakPower(blockAccess, pos, side) : super.getWeakPower(blockState, blockAccess, pos, side);
+        return !isMimicNull(mimic) ? mimic.getWeakPower(blockAccess, pos, side) : super.getWeakPower(blockState, blockAccess, pos, side);
     }
 
     /**
@@ -518,7 +532,7 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
     @Override
     public int getStrongPower(IBlockState blockState, IBlockReader blockAccess, BlockPos pos, EnumFacing side) {
         IBlockState mimic = getActualMimicBlock(blockAccess, pos);
-        return mimic != null ? mimic.getStrongPower(blockAccess, pos, side) : super.getStrongPower(blockState, blockAccess, pos, side);
+        return !isMimicNull(mimic) ? mimic.getStrongPower(blockAccess, pos, side) : super.getStrongPower(blockState, blockAccess, pos, side);
     }
 
     /**
@@ -541,7 +555,7 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
     @Override
     public void onFallenUpon(World worldIn, BlockPos pos, Entity entityIn, float fallDistance) {
         IBlockState mimic = getActualMimicBlock(worldIn, pos);
-        if (mimic != null) {
+        if (!isMimicNull(mimic)) {
             mimic.getBlock().onFallenUpon(worldIn, pos, entityIn, fallDistance);
         } else {
             super.onFallenUpon(worldIn, pos, entityIn, fallDistance);
@@ -557,7 +571,7 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
     @Override
     public void fillWithRain(World worldIn, BlockPos pos) {
         IBlockState mimic = getActualMimicBlock(worldIn, pos);
-        if (mimic != null) {
+        if (!isMimicNull(mimic)) {
             mimic.getBlock().fillWithRain(worldIn, pos);
         } else {
             super.fillWithRain(worldIn, pos);
@@ -574,13 +588,13 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
     @Override
     public Vec3d getOffset(IBlockState state, IBlockReader worldIn, BlockPos pos) {
         IBlockState mimic = getActualMimicBlock(worldIn, pos);
-        return mimic != null ? mimic.getOffset(worldIn, pos) : super.getOffset(state, worldIn, pos);
+        return !isMimicNull(mimic) ? mimic.getOffset(worldIn, pos) : super.getOffset(state, worldIn, pos);
     }
 
     @Override
     public boolean canSustainPlant(IBlockState state, IBlockReader world, BlockPos pos, EnumFacing facing, IPlantable plantable) {
         IBlockState mimic = getActualMimicBlock(world, pos);
-        return mimic != null ? mimic.canSustainPlant(world, pos, facing, plantable) : super.canSustainPlant(state, world, pos, facing, plantable);
+        return !isMimicNull(mimic) ? mimic.canSustainPlant(world, pos, facing, plantable) : super.canSustainPlant(state, world, pos, facing, plantable);
     }
  /* Todo reeval
     public boolean shouldSideBeRendered(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, EnumFacing side) {

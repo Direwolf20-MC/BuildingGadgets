@@ -5,15 +5,16 @@
 
 package com.direwolf20.buildinggadgets.client.gui;
 
-import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketPasteGUI;
+
+import com.direwolf20.buildinggadgets.common.utils.Reference;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
@@ -29,7 +30,7 @@ public class PasteGUI extends GuiScreenTextFields {
 
     private ItemStack tool;
 
-    private static final ResourceLocation background = new ResourceLocation(BuildingGadgets.MODID, "textures/gui/testcontainer.png");
+    private static final ResourceLocation background = new ResourceLocation(Reference.MODID, "textures/gui/testcontainer.png");
 
     PasteGUI(ItemStack tool) {
         super();
@@ -48,60 +49,45 @@ public class PasteGUI extends GuiScreenTextFields {
 
         addButton(new GuiButtonAction(guiLeft + 80, guiTop + 125, 40, 20, "Ok", () -> {
             nullCheckTextBoxes();
-            if (sizeCheckBoxes()) {
+            if (GuiMod.sizeCheckBoxes(getFieldIterator(), -16, 16)) {
                 PacketHandler.sendToServer(new PacketPasteGUI(Integer.parseInt(X.getText()), Integer.parseInt(Y.getText()), Integer.parseInt(Z.getText())));
                 close();
             } else {
                 Minecraft.getInstance().player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.destroysizeerror").getUnformattedComponentText()), true);
             }
         }));
-        addButton(new DireButton(guiLeft + 65, guiTop + 99, 10, 10, "-", () -> {
-            fieldChange(X, -1);
-            PacketHandler.sendToServer(new PacketPasteGUI(Integer.parseInt(X.getText()), Integer.parseInt(Y.getText()), Integer.parseInt(Z.getText())));
-        }));
-        addButton(new DireButton(guiLeft + 125, guiTop + 99, 10, 10, "+", () -> {
-            fieldChange(X, 1);
-            PacketHandler.sendToServer(new PacketPasteGUI(Integer.parseInt(X.getText()), Integer.parseInt(Y.getText()), Integer.parseInt(Z.getText())));
-        }));
-        addButton(new DireButton(guiLeft + 185, guiTop + 99, 10, 10, "-", () -> {
-            fieldChange(Y, -1);
-            PacketHandler.sendToServer(new PacketPasteGUI(Integer.parseInt(X.getText()), Integer.parseInt(Y.getText()), Integer.parseInt(Z.getText())));
-        }));
-        addButton(new DireButton(guiLeft + 245, guiTop + 99, 10, 10, "+", () -> {
-            fieldChange(Y, 1);
-            PacketHandler.sendToServer(new PacketPasteGUI(Integer.parseInt(X.getText()), Integer.parseInt(Y.getText()), Integer.parseInt(Z.getText())));
-        }));
-        addButton(new DireButton(guiLeft + 305, guiTop + 99, 10, 10, "-", () -> {
-            fieldChange(Z, -1);
-            PacketHandler.sendToServer(new PacketPasteGUI(Integer.parseInt(X.getText()), Integer.parseInt(Y.getText()), Integer.parseInt(Z.getText())));
-        }));
-        addButton(new DireButton(guiLeft + 365, guiTop + 99, 10, 10, "+", () -> {
-            fieldChange(Z, 1);
-            PacketHandler.sendToServer(new PacketPasteGUI(Integer.parseInt(X.getText()), Integer.parseInt(Y.getText()), Integer.parseInt(Z.getText())));
-        }));
+        addButton(65, "-", () -> fieldChange(X, -1));
+        addButton(125, "+", () -> fieldChange(X, 1));
+        addButton(185, "-", () -> fieldChange(Y, -1));
+        addButton(245, "+", () -> fieldChange(Y, 1));
+        addButton(305, "-", () -> fieldChange(Z, -1));
+        addButton(365, "+", () -> fieldChange(Z, 1));
         addButton(new GuiButtonAction(guiLeft + 320, guiTop + 125, 40, 20, "Reset", () -> {
-            X.setText(String.valueOf(0));
-            Y.setText(String.valueOf(1));
-            Z.setText(String.valueOf(0));
-            PacketHandler.sendToServer(new PacketPasteGUI(Integer.parseInt(X.getText()), Integer.parseInt(Y.getText()), Integer.parseInt(Z.getText())));
+            X.setText("0");
+            Y.setText("1");
+            Z.setText("0");
+            sendPacket();
         }));
+    }
+
+    private void addButton(int x, String text, Runnable action) {
+        addButton(new DireButton(guiLeft + x, guiTop + 99, 10, 10, text, action));
     }
 
     private GuiTextFieldBase addField(int x) {
-        return addField(new GuiTextFieldBase(fontRenderer, guiLeft + x, guiTop + 100, 40));
+        return addField(new GuiTextFieldBase(fontRenderer, guiLeft + x, guiTop + 100, 40).restrictToNumeric());
     }
 
-    public void fieldChange(GuiTextField textField, int amount) {
+    private void sendPacket() {
+        PacketHandler.sendToServer(new PacketPasteGUI(X.getInt(), Y.getInt(), Z.getInt()));
+    }
+
+    public void fieldChange(GuiTextFieldBase field, int amount) {
         nullCheckTextBoxes();
-        if (GuiScreen.isShiftKeyDown()) amount = amount * 10;
-        try {
-            int i = Integer.valueOf(textField.getText()) + amount;
-            if (i < -16) i = -16;
-            if (i > 16) i = 16;
-            textField.setText(String.valueOf(i));
-        } catch (NumberFormatException t) {
-            close();
-        }
+        if (GuiScreen.isShiftKeyDown()) amount *= 10;
+        int i = MathHelper.clamp(field.getInt() + amount, -16, 16);
+        field.setText(String.valueOf(i));
+        sendPacket();
     }
 
     @Override
@@ -119,23 +105,8 @@ public class PasteGUI extends GuiScreenTextFields {
     }
 
     protected void nullCheckTextBoxes() {
-        if (X.getText().isEmpty()) {
-            X.setText(String.valueOf(GadgetCopyPaste.getX(tool)));
-        }
-        if (Y.getText().isEmpty()) {
-            Y.setText(String.valueOf(GadgetCopyPaste.getY(tool)));
-        }
-        if (Z.getText().isEmpty()) {
-            Z.setText(String.valueOf(GadgetCopyPaste.getZ(tool)));
-        }
-    }
-
-    private boolean sizeCheckBoxes() {
-        if (Integer.parseInt(Z.getText()) > 16) return false;
-        if (Integer.parseInt(Z.getText()) < -16) return false;
-        if (Integer.parseInt(Y.getText()) < -16) return false;
-        if (Integer.parseInt(Y.getText()) > 16) return false;
-        if (Integer.parseInt(X.getText()) < -16) return false;
-        return Integer.parseInt(X.getText()) <= 16;
+        GuiMod.setEmptyField(X, () -> GadgetCopyPaste.getX(tool));
+        GuiMod.setEmptyField(Y, () -> GadgetCopyPaste.getY(tool));
+        GuiMod.setEmptyField(Z, () -> GadgetCopyPaste.getZ(tool));
     }
 }

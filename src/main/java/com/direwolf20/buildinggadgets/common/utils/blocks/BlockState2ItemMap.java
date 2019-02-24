@@ -1,5 +1,6 @@
-package com.direwolf20.buildinggadgets.common.tools;
+package com.direwolf20.buildinggadgets.common.utils.blocks;
 
+import com.direwolf20.buildinggadgets.common.tools.UniqueItem;
 import com.direwolf20.buildinggadgets.common.utils.GadgetUtils;
 import com.google.common.collect.BiMap;
 import net.minecraft.block.state.IBlockState;
