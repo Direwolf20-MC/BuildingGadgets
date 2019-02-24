@@ -50,41 +50,29 @@ public class BlockBuildEntity extends Entity {
         super(BGEntities.BUILD_BLOCK, worldIn);
         setSize(0.1F, 0.1F);
         setPosition(spawnPos.getX(), spawnPos.getY(), spawnPos.getZ());
+
         IBlockState currentBlock = worldIn.getBlockState(spawnPos);
         TileEntity te = worldIn.getTileEntity(spawnPos);
+
         setPos = spawnPos;
-        if (te instanceof ConstructionBlockTileEntity) {
-            setBlock = ((ConstructionBlockTileEntity) te).getBlockState();
-            if (setBlock == null) {
-                setBlock = spawnBlock;
-            }
-        } else {
-            setBlock = spawnBlock;
-        }
+        setBlock = te instanceof ConstructionBlockTileEntity ? te.getBlockState() : spawnBlock;
         originalSetBlock = spawnBlock;
+
         setSetBlock(setBlock);
+
         if (toolMode == 3) {
-            if (currentBlock != null) {
-                if (te instanceof ConstructionBlockTileEntity) {
-                    setBlock = ((ConstructionBlockTileEntity) te).getBlockState();
-                    if (setBlock == null) {
-                        setBlock = currentBlock;
-                    }
-                } else {
-                    setBlock = currentBlock;
-                }
-                setSetBlock(setBlock);
-            } else {
-                setBlock = Blocks.AIR.getDefaultState();
-                setSetBlock(setBlock);
-            }
+            setBlock = te instanceof ConstructionBlockTileEntity ? te.getBlockState() : currentBlock;
+            setSetBlock(setBlock);
         }
+
         world = worldIn;
         mode = toolMode;
         setToolMode(toolMode);
+
         spawnedBy = player;
         actualSetBlock = actualSpawnBlock;
         world.setBlockState(spawnPos, BGBlocks.effectBlock.getDefaultState());
+
         setUsingConstructionPaste(constrPaste);
     }
 
@@ -98,7 +86,7 @@ public class BlockBuildEntity extends Entity {
 
     @Nullable
     public IBlockState getSetBlock() {
-        return (IBlockState) ((Optional) this.dataManager.get(SET_BLOCK)).orElse(null);
+        return this.dataManager.get(SET_BLOCK).orElse(null);
     }
 
     public void setSetBlock(@Nullable IBlockState state) {
@@ -170,15 +158,11 @@ public class BlockBuildEntity extends Entity {
     public void tick() {
         super.tick();
 
-        if (ticksExisted > maxLife) {
+        if (ticksExisted > maxLife)
             setDespawning();
-        }
 
-        if (!isDespawning()) {
-
-        } else {
+        if (isDespawning())
             despawnTick();
-        }
     }
 
     public boolean isDespawning() {
