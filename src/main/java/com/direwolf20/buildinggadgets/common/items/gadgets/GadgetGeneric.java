@@ -150,6 +150,19 @@ public abstract class GadgetGeneric extends Item {
         player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.connected" + suffix).getUnformattedComponentText() + ": " + getConnectedArea(stack)), true);
     }
 
+    public static boolean shouldRayTraceFluid(ItemStack stack) {
+        return NBTHelper.getOrNewTag(stack).getBoolean("raytrace_fluid");
+    }
+
+    public static void toggleRayTraceFluid(EntityPlayer player, ItemStack stack) {
+        NBTHelper.getOrNewTag(stack).setBoolean("raytrace_fluid", !shouldRayTraceFluid(stack));
+        player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.raytrace_fluid").getUnformattedComponentText() + ": " + shouldRayTraceFluid(stack)), true);
+    }
+
+    public static void addInformationRayTraceFluid(List<ITextComponent> tooltip, ItemStack stack) {
+        tooltip.add(new TextComponentString(TextFormatting.BLUE + I18n.format("tooltip.gadget.raytrace_fluid") + ": " + shouldRayTraceFluid(stack)));
+    }
+    
     protected static String formatName(String name) {
         return name.replaceAll("(?=[A-Z])", " ").trim();
     }
