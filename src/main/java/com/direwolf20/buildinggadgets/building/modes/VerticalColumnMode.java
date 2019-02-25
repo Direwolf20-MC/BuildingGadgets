@@ -29,7 +29,8 @@ public class VerticalColumnMode extends AbstractMode {
         if (sideHit.getAxis().isVertical()) {
             return Column.extendFrom(hit, sideHit, range);
         }
-        return Column.centerAt(hit, EnumFacing.Axis.Y, range);
+        //To simulate behavior of build start at the adjacent block of the target position
+        return Column.centerAt(hit, EnumFacing.Axis.Y, range + 1);
     }
 
     @Override

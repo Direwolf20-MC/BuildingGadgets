@@ -29,7 +29,8 @@ public class HorizontalColumnMode extends AbstractMode {
         if (sideHit.getAxis().isVertical()) {
             return Column.centerAt(hit, player.getHorizontalFacing().rotateY().getAxis(), range);
         }
-        return Column.extendFrom(hit, sideHit, range);
+        //To simulate behavior of build start at the adjacent block of the target position
+        return Column.extendFrom(hit, sideHit, range + 1);
     }
 
     @Override

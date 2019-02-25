@@ -9,7 +9,31 @@ public final class MathTool {
     }
 
     public static boolean isOdd(int i) {
-        return !isEven(i);
+        return i % 2 == 1;
+    }
+
+    private static int addForNonEven(int i, int c) {
+        return isEven(i) ? i : i + c;
+    }
+
+    private static int addForNonOdd(int i, int c) {
+        return isOdd(i) ? i : i + c;
+    }
+
+    public static int floorToEven(int i) {
+        return addForNonEven(i, -1);
+    }
+
+    public static int floorToOdd(int i) {
+        return addForNonOdd(i, -1);
+    }
+
+    public static int ceilToEven(int i) {
+        return addForNonEven(i, 1);
+    }
+
+    public static int ceilToOdd(int i) {
+        return addForNonOdd(i, 1);
     }
 
 }

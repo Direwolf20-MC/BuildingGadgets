@@ -17,9 +17,9 @@ class RegionSpliterator implements Spliterator<BlockPos> {
     private int maxY;
     private int maxZ;
 
-    private int posX;
-    private int posY;
-    private int posZ;
+    private int nextPosX;
+    private int nextPosY;
+    private int nextPosZ;
 
     /**
      * Note that as soon as this spliterator advanced once, it can no longer be guarantee that the given blocks have not yet been visited
@@ -41,30 +41,40 @@ class RegionSpliterator implements Spliterator<BlockPos> {
         this.maxX = maxX;
         this.maxY = maxY;
         this.maxZ = maxZ;
-        this.posX = posX;
-        this.posY = posY;
-        this.posZ = posZ;
+
+        this.nextPosX = posX;
+        this.nextPosY = posY;
+        this.nextPosZ = posZ;
         this.allowYZSplit = allowYZSplit;
     }
 
     @Override
     public boolean tryAdvance(Consumer<? super BlockPos> action) {
-        if (this.isTerminated())
+        if (isXOverflowed())
             return false;
 
         this.allowYZSplit = false;
-        if (!isZOverflowed()) {
-            posZ++;
-        } else if (!isYOverflowed()) {
-            posZ = minZ;
-            posY++;
-        } else if (!isXOverflowed()) {
-            posZ = minZ;
-            posY = minY;
-            posX++;
+        BlockPos pos = new BlockPos(nextPosX, nextPosY, nextPosZ);
+
+        nextPosZ++;
+        if (isZOverflowed()) {
+            nextPosZ = minZ;
+            nextPosY++;
+        } else {
+            action.accept(pos);
+            return true;
         }
 
-        action.accept(new BlockPos(posX, posY, posZ));
+        if (isYOverflowed()) {
+            nextPosY = minY;
+            nextPosX++;
+        } else {
+            action.accept(pos);
+            return true;
+        }
+
+        //(maxX, maxY, maxZ)
+        action.accept(pos);
         return true;
     }
 
@@ -76,27 +86,32 @@ class RegionSpliterator implements Spliterator<BlockPos> {
         int oldMinX = minX;
         int oldMinY = minY;
         int oldMinZ = minZ;
+        int oldPosX = nextPosX;
+        int oldPosY = nextPosY;
+        int oldPosZ = nextPosZ;
 
-        //construct new min coordinates, so that at least one can be split of: max - min >= 1
-        if (maxX > minX) { //as Region's coordinates are inclusive, the amount of blocks along one axis is max - min + 1
+        //Construct new min coordinates, so that at least one can be split of: max - min >= 1
+        if (maxX > minX) {
+            //As Region's coordinates are inclusive, the amount of blocks along one axis is max - min + 1
+            //Half the length + base x
             minX = (maxX - minX + 1) / 2 + minX + 1;
             resetPos();
-            return new RegionSpliterator(oldMinX, oldMinY, oldMinZ, minX - 1, maxY, maxZ, posX, posY, posZ, allowYZSplit);
+            return new RegionSpliterator(oldMinX, oldMinY, oldMinZ, minX - 1, maxY, maxZ, oldPosX, oldPosY, oldPosZ, allowYZSplit);
         } else if (maxY > minY && allowYZSplit) {
             minY = (maxY - minY + 1) / 2 + minY + 1;
             resetPos();
-            return new RegionSpliterator(oldMinX, oldMinY, oldMinZ, maxX, minY - 1, maxZ, posX, posY, posZ, allowYZSplit);
+            return new RegionSpliterator(oldMinX, oldMinY, oldMinZ, maxX, minY - 1, maxZ, oldPosX, oldPosY, oldPosZ, allowYZSplit);
         } else if (maxZ > minZ && allowYZSplit) {
             minZ = (maxZ - minZ + 1) / 2 + minZ + 1;
             resetPos();
-            return new RegionSpliterator(oldMinX, oldMinY, oldMinZ, maxX, maxY, minZ - 1, posX, posY, posZ, allowYZSplit);
+            return new RegionSpliterator(oldMinX, oldMinY, oldMinZ, maxX, maxY, minZ - 1, oldPosX, oldPosY, oldPosZ, allowYZSplit);
         }
         return null;
     }
 
     @Override
     public long estimateSize() {
-        return (long) (maxX - posX + 1) * (long) (maxY - posY + 1) * (long) (maxZ - posZ + 1);
+        return (long) (Math.abs(maxX - nextPosX) + 1) * (long) (Math.abs(maxY - nextPosY) + 1) * (long) (Math.abs(maxZ - nextPosZ + 1));
     }
 
     @Override
@@ -113,15 +128,15 @@ class RegionSpliterator implements Spliterator<BlockPos> {
     }
 
     private boolean isXOverflowed() {
-        return posX >= maxX;
+        return nextPosX > maxX;
     }
 
     private boolean isYOverflowed() {
-        return posY >= maxY;
+        return nextPosY > maxY;
     }
 
     private boolean isZOverflowed() {
-        return posZ >= maxZ;
+        return nextPosZ > maxZ;
     }
 
     private boolean isTerminated() {
@@ -129,9 +144,9 @@ class RegionSpliterator implements Spliterator<BlockPos> {
     }
 
     private void resetPos() {
-        this.posX = minX;
-        this.posY = minY;
-        this.posZ = minZ;
+        this.nextPosX = minX;
+        this.nextPosY = minY;
+        this.nextPosZ = minZ;
     }
 
 }

@@ -4,6 +4,7 @@ import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.building.placement.Column;
 import com.direwolf20.buildinggadgets.building.IPlacementSequence;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
@@ -27,7 +28,8 @@ public class TargetedAxisChasingMode extends AbstractMode {
 
     @Override
     public IPlacementSequence computeCoordinates(EntityPlayer player, BlockPos hit, EnumFacing sideHit, ItemStack tool) {
-        return Column.chaseAxisToEntity(player, hit, sideHit);
+        BlockPos entityPos = new BlockPos(Math.floor(player.posX), Math.floor(player.posY), Math.floor(player.posZ));
+        return Column.chaseAxisTo(entityPos, hit, sideHit);
     }
 
     @Override

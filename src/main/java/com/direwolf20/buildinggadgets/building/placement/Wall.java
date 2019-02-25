@@ -12,13 +12,21 @@ import java.util.Spliterator;
 
 public final class Wall implements IPlacementSequence {
 
-    public static Wall clickedSide(BlockPos posHit, EnumFacing sideHit, int range) {
-        return new Wall(posHit, sideHit, toRadius(range));
+    /**
+     * @param center the center of the wall
+     * @param side the side to be become a flat surface
+     * @param range length of the wall, which is floored to the nearest odd number
+     */
+    public static Wall clickedSide(BlockPos center, EnumFacing side, int range) {
+        return new Wall(center, side, toRadius(range));
     }
 
-    public static Wall extendingSide(BlockPos posHit, EnumFacing sideHit, EnumFacing top, int range) {
+    public static Wall extendingFrom(BlockPos posHit, EnumFacing extension, EnumFacing flatSide, int range) {
+        if (extension == flatSide) {
+            throw new IllegalArgumentException("Cannot have a wall extending to " + extension + " and flat at " + flatSide);
+        }
         int radius = toRadius(range);
-        return new Wall(posHit.offset(sideHit, radius + 1), top, radius);
+        return new Wall(posHit.offset(extension, radius + 1), flatSide, radius);
     }
 
     private static int toRadius(int range) {
@@ -27,14 +35,9 @@ public final class Wall implements IPlacementSequence {
 
     private final Region region;
 
-    /**
-     * @param posHit the center of the wall
-     * @param side the side to be become a flat surface
-     * @param radius radius of the wall
-     */
     @VisibleForTesting
     private Wall(BlockPos posHit, EnumFacing side, int radius) {
-        this.region = new Region(posHit).grow(
+        this.region = new Region(posHit).expand(
                 radius * (1 - Math.abs(side.getFrontOffsetX())),
                 radius * (1 - Math.abs(side.getFrontOffsetY())),
                 radius * (1 - Math.abs(side.getFrontOffsetZ())));

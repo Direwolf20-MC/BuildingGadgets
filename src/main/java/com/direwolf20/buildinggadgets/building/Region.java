@@ -335,6 +335,4 @@ public final class Region implements IPlacementSequence {
         return Objects.hash(minX, minY, minZ, maxX, maxY, maxZ);
     }
 
-
-
 }

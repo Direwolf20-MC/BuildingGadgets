@@ -33,8 +33,8 @@ public final class TranslationWrapper implements IBlockProvider {
     /**
      * Calculate and return all translation done with the wrapper and its underlying block provider.
      *
-     * @implNote this method uses recursion to stack the translations together, which means it will create a lot of overhead.
      * @return a new BlockPos every time
+     * @implNote this method uses recursion to stack the translations together, which means it will create a lot of overhead.
      */
     public BlockPos getAccumulatedTranslation() {
         return translation.add(handle.getTranslation());

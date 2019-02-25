@@ -27,7 +27,7 @@ public class VerticalWallMode extends AbstractMode {
     public IPlacementSequence computeCoordinates(EntityPlayer player, BlockPos hit, EnumFacing sideHit, ItemStack tool) {
         int range = GadgetUtils.getToolRange(tool);
         if (sideHit.getAxis().isVertical()) {
-            return Wall.extendingSide(hit, sideHit, player.getHorizontalFacing(), range);
+            return Wall.extendingFrom(hit, sideHit, player.getHorizontalFacing(), range);
         } else {
             return Wall.clickedSide(hit, sideHit, range);
         }

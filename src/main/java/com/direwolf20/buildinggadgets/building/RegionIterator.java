@@ -32,38 +32,45 @@ class RegionIterator extends AbstractIterator<BlockPos> implements PeekingIterat
 
         this.posX = minX;
         this.posY = minY;
-        //Hack fix for first yield
-        this.posZ = minZ - 1;
+        this.posZ = minZ;
     }
 
     @Override
     protected BlockPos computeNext() {
-        if (this.isTerminated())
+        if (isXOverflowed())
             return endOfData();
 
-        if (!isZOverflowed()) {
-            posZ++;
-        } else if (!isYOverflowed()) {
+        BlockPos pos = new BlockPos(posX, posY, posZ);
+
+        posZ++;
+        if (isZOverflowed()) {
             posZ = minZ;
             posY++;
-        } else if (!isXOverflowed()) {
-            posZ = minZ;
+        } else {
+            return pos;
+        }
+
+        if (isYOverflowed()) {
             posY = minY;
             posX++;
+        } else {
+            return pos;
         }
-        return new BlockPos(posX, posY, posZ);
+
+        //(maxX, maxY, maxZ)
+        return pos;
     }
 
     private boolean isXOverflowed() {
-        return posX >= maxX;
+        return posX > maxX;
     }
 
     private boolean isYOverflowed() {
-        return posY >= maxY;
+        return posY > maxY;
     }
 
     private boolean isZOverflowed() {
-        return posZ >= maxZ;
+        return posZ > maxZ;
     }
 
     private boolean isTerminated() {

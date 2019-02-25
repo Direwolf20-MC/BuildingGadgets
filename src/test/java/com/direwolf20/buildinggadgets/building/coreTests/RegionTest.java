@@ -60,7 +60,64 @@ public class RegionTest {
         assertEquals(expected, region.collapse(2));
     }
 
-    //TODO grow and shrink test
-    //TODO intersect and union test
+    @Test
+    public void growShouldIncreaseAndOnlyIncreaseMaxCoordinates() {
+        Region region = new Region(-4, -4, -4, 4, 4, 4);
+        Region expected = new Region(-4, -4, -4, 6, 6, 6);
+        assertEquals(expected, region.grow(2));
+    }
+
+    @Test
+    public void shrinkShouldDecreaseAndOnlyDecreaseMaxCoordinates() {
+        Region region = new Region(-4, -4, -4, 4, 4, 4);
+        Region expected = new Region(-4, -4, -4, 2, 2, 2);
+        assertEquals(expected, region.shrink(2));
+    }
+
+    @Test
+    public void intersectShouldReturnIntersectionBoxThatsSmallerThanSources() {
+        Region region1 = new Region(-2, -2, -2, 4, 4, 4);
+        Region region2 = new Region(-4, -4, -4, 2, 2, 2);
+        Region expected = new Region(-2, -2, -2, 2, 2, 2);
+        assertEquals(expected, region1.intersect(region2));
+    }
+
+    @Test
+    public void intersectShouldReturnSelfWhenParameterIsSelf() {
+        Region region = new Region(-4, -4, -4, 4, 4, 4);
+        assertEquals(region, region.intersect(region));
+    }
+
+    @Test
+    public void unionShouldReturnUnionBoxThatsLargerThanSources() {
+        Region region1 = new Region(-2, -2, -2, 4, 4, 4);
+        Region region2 = new Region(-4, -4, -4, 2, 2, 2);
+        Region expected = new Region(-4, -4, -4, 4, 4, 4);
+        assertEquals(expected, region1.union(region2));
+    }
+
+    @Test
+    public void unionShouldReturnSelfWhenParameterIsSelf() {
+        Region region = new Region(-4, -4, -4, 4, 4, 4);
+        assertEquals(region, region.union(region));
+    }
+
+    @Test
+    public void xSizeShouldReturnDifferenceBetweenInputsPlus1Hardcoded() {
+        Region region = new Region(-4, -4, -4, 4, 4, 4);
+        assertEquals(Math.abs(4 - -4) + 1, region.getXSize());
+    }
+
+    @Test
+    public void ySizeShouldReturnDifferenceBetweenInputsPlus1Hardcoded() {
+        Region region = new Region(-4, -4, -4, 4, 4, 4);
+        assertEquals(Math.abs(4 - -4) + 1, region.getYSize());
+    }
+
+    @Test
+    public void zSizeShouldReturnDifferenceBetweenInputsPlus1Hardcoded() {
+        Region region = new Region(-4, -4, -4, 4, 4, 4);
+        assertEquals(Math.abs(4 - -4) + 1, region.getZSize());
+    }
 
 }

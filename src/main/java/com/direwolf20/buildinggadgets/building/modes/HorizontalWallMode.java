@@ -29,7 +29,7 @@ public abstract class HorizontalWallMode extends AbstractMode {
         if (sideHit.getAxis().isVertical()) {
             return Wall.clickedSide(hit, sideHit, range);
         } else {
-            return Wall.extendingSide(hit, sideHit, EnumFacing.UP, range);
+            return Wall.extendingFrom(hit, sideHit, EnumFacing.UP, range);
         }
     }
 
