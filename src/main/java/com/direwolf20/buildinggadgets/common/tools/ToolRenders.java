@@ -34,8 +34,8 @@ import net.minecraftforge.client.ForgeHooksClient;
 import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.energy.CapabilityEnergy;
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.lang3.tuple.ImmutableTriple;
+import org.apache.commons.lang3.tuple.Triple;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL14;
 
@@ -53,7 +53,7 @@ import static net.minecraft.block.BlockStainedGlass.COLOR;
 public class ToolRenders {
     private static final FakeBuilderWorld fakeWorld = new FakeBuilderWorld();
     private static RemoteInventoryCache cacheInventory = new RemoteInventoryCache(false);
-    private static Cache<Pair<UniqueItemStack, BlockPos>, Integer> cacheDestructionOverlay = CacheBuilder.newBuilder().maximumSize(1).
+    private static Cache<Triple<UniqueItemStack, BlockPos, Integer>, Integer> cacheDestructionOverlay = CacheBuilder.newBuilder().maximumSize(1).
             expireAfterWrite(1, TimeUnit.SECONDS).removalListener(removal -> GLAllocation.deleteDisplayLists((int) removal.getValue())).build();
 
     public static void setInventoryCache(Multiset<UniqueItem> cache) {
@@ -388,7 +388,7 @@ public class ToolRenders {
         double doubleZ = player.lastTickPosZ + (player.posZ - player.lastTickPosZ) * evt.getPartialTicks();
         GlStateManager.translate(-doubleX, -doubleY, -doubleZ);
         try {
-            GlStateManager.callList(cacheDestructionOverlay.get(new ImmutablePair<UniqueItemStack, BlockPos>(new UniqueItemStack(heldItem), startBlock), () -> {
+            GlStateManager.callList(cacheDestructionOverlay.get(new ImmutableTriple<UniqueItemStack, BlockPos, Integer>(new UniqueItemStack(heldItem), startBlock, facing.ordinal()), () -> {
                 int displayList = GLAllocation.generateDisplayLists(1);
                 GlStateManager.glNewList(displayList, GL11.GL_COMPILE);
                 renderDestructionOverlay(player, world, startBlock, facing, heldItem);
