@@ -3,6 +3,8 @@ package com.direwolf20.buildinggadgets.common.items.gadgets;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.items.capability.CapabilityProviderEnergy;
 import com.direwolf20.buildinggadgets.common.tools.LiquidInteractions;
+import com.direwolf20.buildinggadgets.common.utils.CapabilityUtil.EnergyUtil;
+import com.direwolf20.buildinggadgets.common.utils.exceptions.CapabilityNotPresentException;
 import com.direwolf20.buildinggadgets.common.utils.helpers.NBTHelper;
 import com.direwolf20.buildinggadgets.common.utils.helpers.VectorHelper;
 import net.minecraft.client.resources.I18n;
@@ -65,34 +67,35 @@ public abstract class GadgetGeneric extends Item {
 
     @Override
     public double getDurabilityForDisplay(ItemStack stack) {
-        IEnergyStorage energy = CapabilityProviderEnergy.getCapOrNull(stack);
-        return energy != null ? 1D - (energy.getEnergyStored() / (double) energy.getMaxEnergyStored()) : super.getDurabilityForDisplay(stack);
+        return EnergyUtil.returnDoubleIfPresent(stack,
+                (energy -> 1D - (energy.getEnergyStored() / (double) energy.getMaxEnergyStored())),
+                () -> super.getDurabilityForDisplay(stack));
     }
 
     @Override
     public int getRGBDurabilityForDisplay(ItemStack stack) {
-        IEnergyStorage energy = CapabilityProviderEnergy.getCapOrNull(stack);
-        if (energy != null)
-            return MathHelper.hsvToRGB(Math.max(0.0F, energy.getEnergyStored() / (float) energy.getMaxEnergyStored()) / 3.0F, 1.0F, 1.0F);
-
-        return super.getRGBDurabilityForDisplay(stack);
+        return EnergyUtil.returnIntIfPresent(stack,
+                (energy -> MathHelper.hsvToRGB(Math.max(0.0F, energy.getEnergyStored() / (float) energy.getMaxEnergyStored()) / 3.0F, 1.0F, 1.0F)),
+                () -> super.getRGBDurabilityForDisplay(stack));
     }
 
     @Override
     public boolean isDamaged(ItemStack stack) {
-        IEnergyStorage energy = CapabilityProviderEnergy.getCapOrNull(stack);
-        return energy != null ? energy.getEnergyStored() != energy.getMaxEnergyStored() : super.isDamaged(stack);
+        return EnergyUtil.returnBooleanIfPresent(stack,
+                energy -> energy.getEnergyStored() != energy.getMaxEnergyStored(),
+                () -> super.isDamaged(stack));
     }
 
     @Override
     public boolean showDurabilityBar(ItemStack stack) {
-        IEnergyStorage energy = CapabilityProviderEnergy.getCapOrNull(stack);
-        return energy != null ? energy.getEnergyStored() != energy.getMaxEnergyStored() : super.showDurabilityBar(stack);
+        return EnergyUtil.returnBooleanIfPresent(stack,
+                energy -> energy.getEnergyStored() != energy.getMaxEnergyStored(),
+                () -> super.showDurabilityBar(stack));
     }
 
     @Override
     public boolean getIsRepairable(ItemStack toRepair, ItemStack repair) {
-        return !CapabilityProviderEnergy.hasCap(toRepair) && repair.getItem() == Items.DIAMOND;
+        return ! EnergyUtil.hasCap(toRepair) && repair.getItem() == Items.DIAMOND;
     }
 
     public static ItemStack getGadget(EntityPlayer player) {
@@ -111,7 +114,7 @@ public abstract class GadgetGeneric extends Item {
             return true;
 
         if (poweredByFE()) {
-            IEnergyStorage energy = CapabilityProviderEnergy.getCap(tool).orElseThrow(NullPointerException::new);
+            IEnergyStorage energy = EnergyUtil.getCap(tool).orElseThrow(CapabilityNotPresentException::new);
             return getEnergyCost(tool) <= energy.getEnergyStored();
         }
         return tool.getDamage() < tool.getMaxDamage() || tool.getStack().isDamageable();
@@ -119,7 +122,7 @@ public abstract class GadgetGeneric extends Item {
 
     public void applyDamage(ItemStack tool, EntityPlayer player) {
         if (poweredByFE()) {
-            IEnergyStorage energy = CapabilityProviderEnergy.getCap(tool).orElseThrow(IllegalStateException::new);
+            IEnergyStorage energy = EnergyUtil.getCap(tool).orElseThrow(CapabilityNotPresentException::new);
             energy.extractEnergy(getEnergyCost(tool), false);
         } else
             tool.damageItem(getDamageCost(tool), player);

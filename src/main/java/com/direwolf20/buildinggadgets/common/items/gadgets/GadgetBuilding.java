@@ -81,7 +81,7 @@ public class GadgetBuilding extends GadgetGeneric {
 
     @Override
     public int getEnergyCost(ItemStack tool) {
-        return Config.GADGETS.GADGET_DESTRUCTION.energyCost.get();
+        return Config.GADGETS.GADGET_BUILDING.energyCost.get();
     }
 
     @Override

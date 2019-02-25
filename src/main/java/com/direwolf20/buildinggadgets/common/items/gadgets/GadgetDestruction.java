@@ -222,6 +222,10 @@ public class GadgetDestruction extends GadgetGeneric {
                     setAnchorSide(stack, null);
                     player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.anchorremove").getUnformattedComponentText()), true);
                 }
+            } else {
+                //TODO Remove debug code
+                IEnergyStorage energy = EnergyUtil.getCap(stack).orElseThrow(CapabilityNotPresentException::new);
+                int accepted = energy.receiveEnergy(105000, false);
             }
         } else {
             if (player.isSneaking()) {
