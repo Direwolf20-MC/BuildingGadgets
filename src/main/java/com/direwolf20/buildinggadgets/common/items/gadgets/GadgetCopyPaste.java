@@ -231,6 +231,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
     public void addInformation(ItemStack stack, @Nullable World world, List<String> list, ITooltipFlag b) {
         super.addInformation(stack, world, list, b);
         list.add(TextFormatting.AQUA + I18n.format("tooltip.gadget.mode") + ": " + getToolMode(stack));
+        addInformationRayTraceFluid(list, stack);
         addEnergyInformation(list, stack);
         EventTooltip.addTemplatePadding(stack, list);
     }
@@ -246,7 +247,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
     public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
         ItemStack stack = player.getHeldItem(hand);
         player.setActiveHand(hand);
-        BlockPos pos = VectorTools.getPosLookingAt(player);
+        BlockPos pos = VectorTools.getPosLookingAt(player, stack);
         if (!world.isRemote) {
             if (pos != null && player.isSneaking() && GadgetUtils.setRemoteInventory(stack, player, world, pos, false) == EnumActionResult.SUCCESS)
                 return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);
@@ -548,7 +549,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
     public static void anchorBlocks(EntityPlayer player, ItemStack stack) {
         BlockPos currentAnchor = getAnchor(stack);
         if (currentAnchor == null) {
-            RayTraceResult lookingAt = VectorTools.getLookingAt(player);
+            RayTraceResult lookingAt = VectorTools.getLookingAt(player, stack);
             if (lookingAt == null) {
                 return;
             }
