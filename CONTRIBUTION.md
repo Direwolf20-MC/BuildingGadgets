@@ -55,3 +55,12 @@ In general apply common sense to the Code you write. "Effective Java" is also al
 * enforce Immutability where possible
     * use ImmutableTypes for immutable values (`ImmutableList`, `ImmutableSet`, `ImmutableMap`, etc.)
     * avoid public properties
+    
+### Packages
+* Don't use packages like there is a limited allowed amount, for the sake of code readability and maintainabilty make as may packages as logically makes sense. Attempt to group as much common functionality as possible within a package. Use our `common.utils` package as an example of functionality grouping. 
+* Respect the 3 base packages: `common`, `client` and `api`. If you ever feel that something doesn't fit in these packages then you're likely thinking about it wrong. 
+  - `common` is used for everything that isn't `client` specific or part of our `api`.
+  - `client` is used for everything that isn't common funcionality and is purely for the client side of the mod.
+  - `api` our api package is for all api related functionality, it's rare you should be using this package unless you're specifically working on api specific additions.
+* Use sensible and logical naming for your packages and avoid prefixing or sufixing your package names. For example `common.items.gadgets` is good, `common.itemGadgets` is bad as a sub-package should have been used. 
+* Always use lower case and respect the official Java guide to creating packages which can be found [here](https://docs.oracle.com/javase/tutorial/java/package/namingpkgs.html)
