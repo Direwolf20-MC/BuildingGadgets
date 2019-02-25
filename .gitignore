@@ -3,6 +3,9 @@
 # folders
 !/gradle
 !/src
+!/api/src
+!/api/build.gradle
+!/api/gradle.properties
 
 # files
 !/.gitignore
