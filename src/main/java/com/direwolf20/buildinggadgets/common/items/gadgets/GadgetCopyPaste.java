@@ -33,7 +33,6 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Enchantments;
 import net.minecraft.init.Items;
-import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -512,8 +511,10 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
     private void placeBlock(World world, BlockPos pos, EntityPlayer player, IBlockState state, Map<IBlockState, UniqueItem> IntStackMap) {
         IBlockState testState = world.getBlockState(pos);
         // @warning: this has been replaced without knowing how to construct a BlockItemUseContent
-        if ((Config.GENERAL.allowOverwriteBlocks.get() && !testState.isReplaceable(new BlockItemUseContext(world, player, new ItemStack(testState.getBlock()), pos, EnumFacing.DOWN, 0.5F, 0.0F, 0.5F))) ||
-            (!Config.GENERAL.allowOverwriteBlocks.get() && world.getBlockState(pos).getMaterial() != Material.AIR))
+        //TODO Put this back into place once someone figures out how its supposed to work :)
+        // if ((Config.GENERAL.allowOverwriteBlocks.get() && !testState.isReplaceable(new BlockItemUseContext(world, player, new ItemStack(testState.getBlock()), pos, EnumFacing.DOWN, 0.5F, 0.0F, 0.5F))) ||
+        //     (!Config.GENERAL.allowOverwriteBlocks.get() && world.getBlockState(pos).getMaterial() != Material.AIR))
+        if (world.getBlockState(pos).getMaterial() != Material.AIR)
             return;
 
         if (pos.getY() < 0 || state.equals(Blocks.AIR.getDefaultState()) || !player.isAllowEdit())
