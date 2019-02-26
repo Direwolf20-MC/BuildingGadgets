@@ -1,10 +1,8 @@
 package com.direwolf20.buildinggadgets.common.utils;
 
-import com.direwolf20.buildinggadgets.api.BuildingGadgetsApi;
-
 public class Reference {
 
-    public static final String MODID = BuildingGadgetsApi.MODID;
+    public static final String MODID = "buildinggadgets";
     public static final String MODNAME = "Building Gadgets";
     public static final String VERSION = "@VERSION@";
     public static final String UPDATE_JSON = "@UPDATE@";
