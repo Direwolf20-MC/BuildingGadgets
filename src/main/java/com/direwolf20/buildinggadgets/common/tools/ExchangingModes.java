@@ -3,11 +3,11 @@ package com.direwolf20.buildinggadgets.common.tools;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.blocks.ModBlocks;
-import com.direwolf20.buildinggadgets.building.IBuildingMode;
-import com.direwolf20.buildinggadgets.building.modes.GridMode;
-import com.direwolf20.buildinggadgets.building.modes.HorizontalColumnMode;
-import com.direwolf20.buildinggadgets.building.modes.SurfaceMode;
-import com.direwolf20.buildinggadgets.building.modes.VerticalColumnMode;
+import com.direwolf20.buildinggadgets.common.building.IBuildingMode;
+import com.direwolf20.buildinggadgets.common.building.modes.GridMode;
+import com.direwolf20.buildinggadgets.common.building.modes.HorizontalColumnMode;
+import com.direwolf20.buildinggadgets.common.building.modes.SurfaceMode;
+import com.direwolf20.buildinggadgets.common.building.modes.VerticalColumnMode;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.block.material.Material;
@@ -63,12 +63,11 @@ public enum ExchangingModes {
         return values[(this.ordinal() + 1) % values.length];
     }
 
-    public static IBuildingMode byName(String name) {
+    public static ExchangingModes byName(String name) {
         return Arrays.stream(values())
                 .filter(mode -> mode.getRegistryName().equals(name))
                 .findFirst()
-                .orElse(Surface)
-                .getModeImplementation();
+                .orElse(Surface);
     }
 
     private static final ImmutableList<ResourceLocation> ICONS = Arrays.stream(values())
@@ -80,8 +79,8 @@ public enum ExchangingModes {
     }
 
     public static List<BlockPos> collectPlacementPos(World world, EntityPlayer player, BlockPos hit, EnumFacing sideHit, ItemStack tool) {
-        IBuildingMode mode = byName(NBTTool.getOrNewTag(tool).getString("mode"));
-        return mode.computeCoordinates(player, hit, sideHit, tool).collect();
+        IBuildingMode mode = byName(NBTTool.getOrNewTag(tool).getString("mode")).getModeImplementation();
+        return mode.createExecutionContext(player, hit, sideHit, tool).collectFilteredSequence(world);
     }
 
     public static BiPredicate<BlockPos, IBlockState> combineTester(World world) {

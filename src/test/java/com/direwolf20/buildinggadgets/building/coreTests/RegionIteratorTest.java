@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.building.coreTests;
 
-import com.direwolf20.buildinggadgets.building.Region;
+import com.direwolf20.buildinggadgets.common.building.Region;
 import com.direwolf20.buildinggadgets.common.tools.GadgetUtils;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.util.math.BlockPos;
@@ -14,13 +14,13 @@ import static org.junit.jupiter.api.Assertions.*;
 public class RegionIteratorTest {
 
     @Test
-    public void iteratorShouldHaveSameNumberOfElementsAsSizeMethod() {
+    void iteratorShouldHaveSameNumberOfElementsAsSizeMethod() {
         Region region = new Region(-3, -3, -3, 3, 3, 3);
         assertEquals(region.size(), ImmutableList.copyOf(region.iterator()).size());
     }
 
     @Test
-    public void iteratorShouldHave1PositionWhenTwoVertexesAreTheSame() {
+    void iteratorShouldHave1PositionWhenTwoVertexesAreTheSame() {
         Region region = new Region(1, 1, 1, 1, 1, 1);
         Iterator<BlockPos> it = region.iterator();
         assertEquals(new BlockPos(1, 1, 1), it.next());
@@ -28,7 +28,7 @@ public class RegionIteratorTest {
     }
 
     @Test
-    public void iteratorShouldGoInAccentingOrderWhereZFirstYSecondXThirdAllPositiveCaseHardcoded() {
+    void iteratorShouldGoInAccentingOrderWhereZFirstYSecondXThirdAllPositiveCaseHardcoded() {
         Region region = new Region(1, 1, 1, 2, 2, 2);
         Iterator<BlockPos> it = region.iterator();
 
@@ -44,7 +44,7 @@ public class RegionIteratorTest {
     }
 
     @Test
-    public void iteratorShouldGoInAccentingOrderWhereZFirstYSecondXThirdAllNegativeCaseHardcoded() {
+    void iteratorShouldGoInAccentingOrderWhereZFirstYSecondXThirdAllNegativeCaseHardcoded() {
         Region region = new Region(-2, -2, -2, -1, -1, -1);
         Iterator<BlockPos> it = region.iterator();
 
@@ -58,9 +58,9 @@ public class RegionIteratorTest {
         assertEquals(new BlockPos(-1, -1, -1), it.next());
         assertFalse(it.hasNext());
     }
-    
+
     @Test
-    public void iteratorShouldBehaveSimilarlyInNegativeRegionAsPositiveRegionWhereStartsInMinEndsInMax() {
+    void iteratorShouldBehaveSimilarlyInNegativeRegionAsPositiveRegionWhereStartsInMinEndsInMax() {
         Region region = new Region(0, 0, 0, 0, -8, 0);
         Iterator<BlockPos> it = region.iterator();
 
@@ -84,13 +84,13 @@ public class RegionIteratorTest {
     }
 
     @Test
-    public void iteratorShouldGoInAccentingOrderWhereZFirstYSecondXThirdAllPositiveCaseSortedComparision() {
+    void iteratorShouldGoInAccentingOrderWhereZFirstYSecondXThirdAllPositiveCaseSortedComparision() {
         Region region = new Region(-2, -2, -2, -1, -1, -1);
         iteratorYieldingOrderSortedComparisionBase(region);
     }
 
     @Test
-    public void iteratorShouldGoInAccentingOrderWhereZFirstYSecondXThirdAllNegativeCaseSortedComparision() {
+    void iteratorShouldGoInAccentingOrderWhereZFirstYSecondXThirdAllNegativeCaseSortedComparision() {
         Region region = new Region(1, 1, 1, 2, 2, 2);
         iteratorYieldingOrderSortedComparisionBase(region);
     }
@@ -106,7 +106,7 @@ public class RegionIteratorTest {
     private final int upperBound = maxCoordinate * 2 + 1;
 
     @RepeatedTest(4)
-    public void iteratorShouldGoInAccentingOrderWhereZFirstYSecondXThirdRandomSortedComparision() {
+    void iteratorShouldGoInAccentingOrderWhereZFirstYSecondXThirdRandomSortedComparision() {
         int minX = random.nextInt(upperBound) - maxCoordinate;
         int minY = random.nextInt(upperBound) - maxCoordinate;
         int minZ = random.nextInt(upperBound) - maxCoordinate;

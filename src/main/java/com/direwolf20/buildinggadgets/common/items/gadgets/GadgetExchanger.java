@@ -5,10 +5,7 @@ import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.common.items.FakeBuilderWorld;
 import com.direwolf20.buildinggadgets.common.items.ModItems;
-import com.direwolf20.buildinggadgets.common.tools.ExchangingModes;
-import com.direwolf20.buildinggadgets.common.tools.InventoryManipulation;
-import com.direwolf20.buildinggadgets.common.tools.ToolRenders;
-import com.direwolf20.buildinggadgets.common.tools.VectorTools;
+import com.direwolf20.buildinggadgets.common.tools.*;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
@@ -94,28 +91,15 @@ public class GadgetExchanger extends GadgetGeneric {
         return super.canApplyAtEnchantingTable(stack, enchantment);
     }
 
-    private static void setToolMode(ItemStack stack, ExchangingModes mode) {
-        NBTTagCompound tagCompound = stack.getTagCompound();
-        if (tagCompound == null) {
-            tagCompound = new NBTTagCompound();
-        }
-        tagCompound.setString("mode", mode.name());
-        stack.setTagCompound(tagCompound);
+    private static void setToolMode(ItemStack tool, ExchangingModes mode) {
+        //Store the tool's mode in NBT as a string
+        NBTTagCompound tagCompound = NBTTool.getOrNewTag(tool);
+        tagCompound.setString("mode", mode.getRegistryName());
     }
 
-    public static ExchangingModes getToolMode(ItemStack stack) {
-        NBTTagCompound tagCompound = stack.getTagCompound();
-        ExchangingModes mode = ExchangingModes.Surface;
-        if (tagCompound == null) {
-            setToolMode(stack, mode);
-            return mode;
-        }
-        try {
-            mode = ExchangingModes.valueOf(tagCompound.getString("mode"));
-        } catch (Exception e) {
-            setToolMode(stack, mode);
-        }
-        return mode;
+    public static ExchangingModes getToolMode(ItemStack tool) {
+        NBTTagCompound tagCompound = NBTTool.getOrNewTag(tool);
+        return ExchangingModes.byName(tagCompound.getString("mode"));
     }
 
     @Override

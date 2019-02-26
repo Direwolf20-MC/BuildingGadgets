@@ -1,20 +1,15 @@
 package com.direwolf20.buildinggadgets.common.tools;
 
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
-import com.direwolf20.buildinggadgets.building.modes.GridMode;
-import com.direwolf20.buildinggadgets.building.modes.HorizontalColumnMode;
-import com.direwolf20.buildinggadgets.building.modes.StairMode;
-import com.direwolf20.buildinggadgets.building.modes.SurfaceMode;
+import com.direwolf20.buildinggadgets.common.building.IBuildingMode;
+import com.direwolf20.buildinggadgets.common.building.modes.*;
 import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
-import com.direwolf20.buildinggadgets.building.IBuildingMode;
-
 import com.google.common.collect.ImmutableList;
 import it.unimi.dsi.fastutil.doubles.Double2ObjectArrayMap;
 import it.unimi.dsi.fastutil.doubles.Double2ObjectMap;
 import it.unimi.dsi.fastutil.doubles.DoubleRBTreeSet;
 import it.unimi.dsi.fastutil.doubles.DoubleSortedSet;
-
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -28,11 +23,11 @@ import java.util.function.BiPredicate;
 
 public enum BuildingModes {
 
-    BuildToMe("build_to_me.png", new HorizontalColumnMode(BuildingModes::combineTester)),
-    VerticalColumn("vertical_column.png", new HorizontalColumnMode(BuildingModes::combineTester)),
+    BuildToMe("build_to_me.png", new TargetedAxisChasingMode(BuildingModes::combineTester)),
+    VerticalColumn("vertical_column.png", new VerticalColumnMode(BuildingModes::combineTester)),
     HorizontalColumn("horizontal_column.png", new HorizontalColumnMode(BuildingModes::combineTester)),
-    VerticalWall("vertical_wall.png", new HorizontalColumnMode(BuildingModes::combineTester)),
-    HorizontalWall("horizontal_wall.png", new HorizontalColumnMode(BuildingModes::combineTester)),
+    VerticalWall("vertical_wall.png", new VerticalWallMode(BuildingModes::combineTester)),
+    HorizontalWall("horizontal_wall.png", new HorizontalWallMode(BuildingModes::combineTester)),
     Stair("stairs.png", new StairMode(BuildingModes::combineTester)),
     Grid("grid.png", new GridMode(BuildingModes::combineTester)),
     Surface("surface.png", new SurfaceMode(BuildingModes::combineTester));
@@ -70,16 +65,15 @@ public enum BuildingModes {
     }
 
     public static List<BlockPos> collectPlacementPos(World world, EntityPlayer player, BlockPos hit, EnumFacing sideHit, ItemStack tool) {
-        IBuildingMode mode = byName(NBTTool.getOrNewTag(tool).getString("mode"));
-        return mode.computeCoordinates(player, hit, sideHit, tool).collect();
+        IBuildingMode mode = byName(NBTTool.getOrNewTag(tool).getString("mode")).getModeImplementation();
+        return mode.createExecutionContext(player, hit, sideHit, tool).collectFilteredSequence(world);
     }
 
-    public static IBuildingMode byName(String name) {
+    public static BuildingModes byName(String name) {
         return Arrays.stream(values())
                 .filter(mode -> mode.getRegistryName().equals(name))
                 .findFirst()
-                .orElse(BuildToMe)
-                .getModeImplementation();
+                .orElse(BuildToMe);
     }
 
     private static final ImmutableList<ResourceLocation> ICONS = Arrays.stream(values())

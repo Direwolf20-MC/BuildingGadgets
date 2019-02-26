@@ -23,6 +23,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.util.text.TextComponentString;
@@ -190,22 +191,13 @@ public class GadgetUtils {
 
     public static void setToolRange(ItemStack stack, int range) {
         //Store the tool's range in NBT as an Integer
-        NBTTagCompound tagCompound = stack.getTagCompound();
-        if (tagCompound == null) {
-            tagCompound = new NBTTagCompound();
-        }
+        NBTTagCompound tagCompound = NBTTool.getOrNewTag(stack);
         tagCompound.setInteger("range", range);
-        stack.setTagCompound(tagCompound);
     }
 
     public static int getToolRange(ItemStack stack) {
-        NBTTagCompound tagCompound = stack.getTagCompound();
-        if (tagCompound == null || tagCompound.getInteger("range") == 0) {
-            setToolRange(stack, 1);
-            tagCompound = stack.getTagCompound();
-            return 1;
-        }
-        return tagCompound.getInteger("range");
+        NBTTagCompound tagCompound = NBTTool.getOrNewTag(stack);
+        return MathHelper.clamp(tagCompound.getInteger("range"), 1, 15);
     }
 
     private static void setToolBlock(ItemStack stack, @Nullable IBlockState state) {

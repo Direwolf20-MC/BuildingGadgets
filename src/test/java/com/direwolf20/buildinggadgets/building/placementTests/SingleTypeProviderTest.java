@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.building.placementTests;
 
-import com.direwolf20.buildinggadgets.building.placement.SingleTypeProvider;
+import com.direwolf20.buildinggadgets.common.building.placement.SingleTypeProvider;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -22,14 +22,14 @@ public class SingleTypeProviderTest {
     private final Random random = new Random();
 
     @Test
-    public void stateAfterSerializationShouldRemainSameAsBeforeSerialization() {
+    void stateAfterSerializationShouldRemainSameAsBeforeSerialization() {
         NBTTagCompound serialized = provider.serializeNBT();
         SingleTypeProvider deserialized = new SingleTypeProvider(null).deserializeNBT(serialized);
         assertEquals(provider.at(BlockPos.ORIGIN), deserialized.at(BlockPos.ORIGIN));
     }
 
     @Test
-    public void accessResultsShouldRemainConstantHardcoded() {
+    void accessResultsShouldRemainConstantHardcoded() {
         assertEquals(state, provider.at(new BlockPos(0, 0, 0)));
         assertEquals(state, provider.at(new BlockPos(-0, -0, -0)));
         assertEquals(state, provider.at(new BlockPos(64, 64, 64)));
@@ -38,7 +38,7 @@ public class SingleTypeProviderTest {
     }
 
     @RepeatedTest(16)
-    public void accessResultsShouldRemainConstantRandom() {
+    void accessResultsShouldRemainConstantRandom() {
         int x = random.nextInt(Integer.MAX_VALUE);
         int y = random.nextInt(Integer.MAX_VALUE);
         int z = random.nextInt(Integer.MAX_VALUE);

@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.common.items.capability;
 
-import com.direwolf20.buildinggadgets.building.CapabilityBlockProvider;
+import com.direwolf20.buildinggadgets.common.building.CapabilityBlockProvider;
 import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
 import com.direwolf20.buildinggadgets.common.tools.GadgetUtils;
 import net.minecraft.item.ItemStack;

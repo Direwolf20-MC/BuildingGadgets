@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.building.coreTests;
 
-import com.direwolf20.buildinggadgets.building.Region;
+import com.direwolf20.buildinggadgets.common.building.Region;
 import org.junit.jupiter.api.*;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class RegionTest {
 
     @Test
-    public void sizeMethodShouldReturnPositiveInteger() {
+    void sizeMethodShouldReturnPositiveInteger() {
         Region region = new Region(-1, -1, -1, -16, -16, -16);
         assertEquals(4096, region.size());
 
@@ -17,7 +17,7 @@ public class RegionTest {
     }
 
     @Test
-    public void sizeMethodShouldReturnPositiveIntegerCaseAwayFromOrigin() {
+    void sizeMethodShouldReturnPositiveIntegerCaseAwayFromOrigin() {
         Region region = new Region(-33, -33, -33, -48, -48, -48);
         assertEquals(4096, region.size());
 
@@ -26,56 +26,56 @@ public class RegionTest {
     }
 
     @Test
-    public void translationShouldAddAllVertexesToTranslationCaseAllPositive() {
+    void translationShouldAddAllVertexesToTranslationCaseAllPositive() {
         Region region = new Region(1, 1, 1, 8, 8, 8);
         Region expected = new Region(9, 9, 9, 16, 16, 16);
         assertEquals(expected, region.translate(8, 8, 8));
     }
 
     @Test
-    public void translationShouldAddAllVertexesToTranslationCaseAllNegative() {
+    void translationShouldAddAllVertexesToTranslationCaseAllNegative() {
         Region region = new Region(-1, -1, -1, -8, -8, -8);
         Region expected = new Region(-9, -9, -9, -16, -16, -16);
         assertEquals(expected, region.translate(-8, -8, -8));
     }
 
     @Test
-    public void translationShouldAddAllVertexesToTranslationCaseOrigin() {
+    void translationShouldAddAllVertexesToTranslationCaseOrigin() {
         Region region = new Region(-4, -4, -4, 4, 4, 4);
         Region expected = new Region(0, 0, 0, 8, 8, 8);
         assertEquals(expected, region.translate(4, 4, 4));
     }
 
     @Test
-    public void expandShouldDecreaseRegionSizeCaseOrigin() {
+    void expandShouldDecreaseRegionSizeCaseOrigin() {
         Region region = new Region(-4, -4, -4, 4, 4, 4);
         Region expected = new Region(-6, -6, -6, 6, 6, 6);
         assertEquals(expected, region.expand(2));
     }
 
     @Test
-    public void collapseShouldDecreaseRegionSizeCaseOrigin() {
+    void collapseShouldDecreaseRegionSizeCaseOrigin() {
         Region region = new Region(-4, -4, -4, 4, 4, 4);
         Region expected = new Region(-2, -2, -2, 2, 2, 2);
         assertEquals(expected, region.collapse(2));
     }
 
     @Test
-    public void growShouldIncreaseAndOnlyIncreaseMaxCoordinates() {
+    void growShouldIncreaseAndOnlyIncreaseMaxCoordinates() {
         Region region = new Region(-4, -4, -4, 4, 4, 4);
         Region expected = new Region(-4, -4, -4, 6, 6, 6);
         assertEquals(expected, region.grow(2));
     }
 
     @Test
-    public void shrinkShouldDecreaseAndOnlyDecreaseMaxCoordinates() {
+    void shrinkShouldDecreaseAndOnlyDecreaseMaxCoordinates() {
         Region region = new Region(-4, -4, -4, 4, 4, 4);
         Region expected = new Region(-4, -4, -4, 2, 2, 2);
         assertEquals(expected, region.shrink(2));
     }
 
     @Test
-    public void intersectShouldReturnIntersectionBoxThatsSmallerThanSources() {
+    void intersectShouldReturnIntersectionBoxThatsSmallerThanSources() {
         Region region1 = new Region(-2, -2, -2, 4, 4, 4);
         Region region2 = new Region(-4, -4, -4, 2, 2, 2);
         Region expected = new Region(-2, -2, -2, 2, 2, 2);
@@ -83,13 +83,13 @@ public class RegionTest {
     }
 
     @Test
-    public void intersectShouldReturnSelfWhenParameterIsSelf() {
+    void intersectShouldReturnSelfWhenParameterIsSelf() {
         Region region = new Region(-4, -4, -4, 4, 4, 4);
         assertEquals(region, region.intersect(region));
     }
 
     @Test
-    public void unionShouldReturnUnionBoxThatsLargerThanSources() {
+    void unionShouldReturnUnionBoxThatsLargerThanSources() {
         Region region1 = new Region(-2, -2, -2, 4, 4, 4);
         Region region2 = new Region(-4, -4, -4, 2, 2, 2);
         Region expected = new Region(-4, -4, -4, 4, 4, 4);
@@ -97,25 +97,25 @@ public class RegionTest {
     }
 
     @Test
-    public void unionShouldReturnSelfWhenParameterIsSelf() {
+    void unionShouldReturnSelfWhenParameterIsSelf() {
         Region region = new Region(-4, -4, -4, 4, 4, 4);
         assertEquals(region, region.union(region));
     }
 
     @Test
-    public void xSizeShouldReturnDifferenceBetweenInputsPlus1Hardcoded() {
+    void xSizeShouldReturnDifferenceBetweenInputsPlus1Hardcoded() {
         Region region = new Region(-4, -4, -4, 4, 4, 4);
         assertEquals(Math.abs(4 - -4) + 1, region.getXSize());
     }
 
     @Test
-    public void ySizeShouldReturnDifferenceBetweenInputsPlus1Hardcoded() {
+    void ySizeShouldReturnDifferenceBetweenInputsPlus1Hardcoded() {
         Region region = new Region(-4, -4, -4, 4, 4, 4);
         assertEquals(Math.abs(4 - -4) + 1, region.getYSize());
     }
 
     @Test
-    public void zSizeShouldReturnDifferenceBetweenInputsPlus1Hardcoded() {
+    void zSizeShouldReturnDifferenceBetweenInputsPlus1Hardcoded() {
         Region region = new Region(-4, -4, -4, 4, 4, 4);
         assertEquals(Math.abs(4 - -4) + 1, region.getZSize());
     }

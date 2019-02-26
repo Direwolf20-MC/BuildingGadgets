@@ -43,6 +43,18 @@ public class VectorTools {
         throw new IllegalArgumentException("Trying to find the value a imaginary axis of a BlockPos");
     }
 
+    public static int getAxisValue(int x, int y, int z, Axis axis) {
+        switch (axis) {
+            case X:
+                return x;
+            case Y:
+                return y;
+            case Z:
+                return z;
+        }
+        throw new IllegalArgumentException("Trying to find the value a imaginary axis of a set of 3 values");
+    }
+
     public static BlockPos perpendicularSurfaceOffset(BlockPos pos, EnumFacing intersector, int i, int j) {
         return perpendicularSurfaceOffset(pos, intersector.getAxis(), i, j);
     }

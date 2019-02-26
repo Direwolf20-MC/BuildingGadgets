@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.building.coreTests;
 
-import com.direwolf20.buildinggadgets.building.Region;
+import com.direwolf20.buildinggadgets.common.building.Region;
 import com.google.common.collect.ImmutableList;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import it.unimi.dsi.fastutil.longs.LongSet;
@@ -22,20 +22,20 @@ public class RegionSpliteratorTest {
      * No need for comparision between iterator size and spliterator size, since they should both be the same as {@link Region#size()}.
      */
     @Test
-    public void spliteratorShouldHaveSameAmountOfElementsAsRegionSizeMethod() {
+    void spliteratorShouldHaveSameAmountOfElementsAsRegionSizeMethod() {
         Region region = new Region(-8, -8, -8, 8, 8, 8);
 
         assertEquals(region.size(), region.stream().toArray().length);
     }
 
     @Test
-    public void spliteratorShouldHaveSameAmountOfElementsAsRegionSizeMethodPositiveCase() {
+    void spliteratorShouldHaveSameAmountOfElementsAsRegionSizeMethodPositiveCase() {
         Region region = new Region(1, 1, 1, 8, 8, 8);
         assertEquals(region.size(), region.stream().toArray().length);
     }
 
     @Test
-    public void estimateSizeShouldBeSameAsActualSize() {
+    void estimateSizeShouldBeSameAsActualSize() {
         Region region = new Region(-8, -8, -8, 8, 8, 8);
         Spliterator<BlockPos> spliterator = region.spliterator();
         long estimate = spliterator.estimateSize();
@@ -45,7 +45,7 @@ public class RegionSpliteratorTest {
     }
 
     @Test
-    public void spliteratorShouldHaveSameSizeAsIterator() {
+    void spliteratorShouldHaveSameSizeAsIterator() {
         Region region = new Region(-8, -8, -8, 8, 8, 8);
         Iterator<BlockPos> iterator = region.iterator();
 
@@ -54,7 +54,7 @@ public class RegionSpliteratorTest {
     }
 
     @Test
-    public void spliteratorShouldHaveSameOrderAsIterator() {
+    void spliteratorShouldHaveSameOrderAsIterator() {
         Region region = new Region(-8, -8, -8, 8, 8, 8);
         Iterator<BlockPos> iterator = region.iterator();
         Spliterator<BlockPos> spliterator = region.spliterator();
@@ -66,7 +66,7 @@ public class RegionSpliteratorTest {
     }
 
     @Test
-    public void doesNotProduceSamePosition() {
+    void doesNotProduceSamePosition() {
         Region region = new Region(-4, -4, -4, 4, 4, 4);
         Spliterator<BlockPos> spliterator = region.spliterator();
         LongSet visited = new LongOpenHashSet();
@@ -79,7 +79,7 @@ public class RegionSpliteratorTest {
     }
 
     @Test
-    public void splittingDoesNotProduceSamePositionCaseSplitting2Times() {
+    void splittingDoesNotProduceSamePositionCaseSplitting2Times() {
         Region region = new Region(-8, -8, -8, 8, 8, 8);
         Spliterator<BlockPos> spliterator = region.spliterator();
         LongSet visited = new LongOpenHashSet();
@@ -99,7 +99,7 @@ public class RegionSpliteratorTest {
     }
 
     @Test
-    public void splittingDoesNotProduceSamePositionCaseSplittingInHalf() {
+    void splittingDoesNotProduceSamePositionCaseSplittingInHalf() {
         Region region = new Region(-8, -8, -8, 8, 8, 8);
         Spliterator<BlockPos> spliterator = region.spliterator();
         LongSet visited = new LongOpenHashSet();
