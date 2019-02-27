@@ -112,7 +112,7 @@ class RegionSpliterator implements Spliterator<BlockPos> {
 
     @Override
     public long estimateSize() {
-        return (long) (Math.abs(maxX - nextPosX) + 1) * (long) (Math.abs(maxY - nextPosY) + 1) * (long) (Math.abs(maxZ - nextPosZ + 1));
+        return (Math.abs((long) maxX - nextPosX) + 1) * (Math.abs((long) maxY - nextPosY) + 1) * (Math.abs((long) maxZ - nextPosZ + 1));
     }
 
     @Override

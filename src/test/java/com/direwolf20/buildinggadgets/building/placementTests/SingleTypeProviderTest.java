@@ -1,8 +1,7 @@
 package com.direwolf20.buildinggadgets.building.placementTests;
 
 import com.direwolf20.buildinggadgets.common.building.placement.SingleTypeProvider;
-import net.minecraft.block.Block;
-import net.minecraft.block.material.Material;
+import com.direwolf20.buildinggadgets.util.UniqueBlockState;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.BlockPos;
@@ -12,19 +11,20 @@ import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@Disabled("requires custom runner with minecraft started")
 public class SingleTypeProviderTest {
 
-    //TODO implement custom runner and add tests
-    //this will not work since initializing a block instance requires sound engine and texture engine
-    private final IBlockState state = new Block(Material.AIR).getDefaultState();
+    private final IBlockState state = UniqueBlockState.createNew();
     private final SingleTypeProvider provider = new SingleTypeProvider(state);
     private final Random random = new Random();
 
+    //TODO implement custom runner that launches minecraft
+    //  this does not work since NBTUtil.readBlockState(IBlockState) accesses block registry, and using
+    //  UniqueBlockState losses the point of testing
+    @Disabled("requires custom runner with minecraft started")
     @Test
     void stateAfterSerializationShouldRemainSameAsBeforeSerialization() {
-        NBTTagCompound serialized = provider.serializeNBT();
-        SingleTypeProvider deserialized = new SingleTypeProvider(null).deserializeNBT(serialized);
+        NBTTagCompound serialized = provider.serialize();
+        SingleTypeProvider deserialized = new SingleTypeProvider(null).deserialize(serialized);
         assertEquals(provider.at(BlockPos.ORIGIN), deserialized.at(BlockPos.ORIGIN));
     }
 
@@ -39,10 +39,13 @@ public class SingleTypeProviderTest {
 
     @RepeatedTest(16)
     void accessResultsShouldRemainConstantRandom() {
-        int x = random.nextInt(Integer.MAX_VALUE);
-        int y = random.nextInt(Integer.MAX_VALUE);
-        int z = random.nextInt(Integer.MAX_VALUE);
+        int x = random.nextInt();
+        int y = random.nextInt();
+        int z = random.nextInt();
         assertEquals(state, provider.at(new BlockPos(x, y, z)));
     }
 
 }
+
+
+

@@ -4,40 +4,25 @@ import com.direwolf20.buildinggadgets.common.building.Region;
 import com.direwolf20.buildinggadgets.common.building.placement.ConnectedSurface;
 import com.direwolf20.buildinggadgets.common.tools.VectorTools;
 import com.direwolf20.buildinggadgets.util.CasedBlockView;
-import com.direwolf20.buildinggadgets.util.UniqueBlockState;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import org.junit.jupiter.api.*;
 
-import java.util.Iterator;
 import java.util.Random;
 import java.util.Set;
 
+import static com.direwolf20.buildinggadgets.util.CasedBlockView.regionAtOriginWithRandomTargets;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ConnectedSurfaceTest {
 
     private final Random random = new Random();
-    private final IBlockState base = UniqueBlockState.createNew();
-    private final IBlockState target = UniqueBlockState.createNew();
-
-    private CasedBlockView regionAtOriginWithRandomTargets(int size, int amountTargets) {
-        int radius = (size - 1) / 2;
-        CasedBlockView world = new CasedBlockView(new Region(-radius, 0, -radius, radius, 0, radius), base, target);
-        for (Iterator<Integer> it = random.ints(amountTargets * 2, 0, size + 1).iterator(); it.hasNext(); ) {
-            int x = it.next() - radius - 1;
-            int z = it.next() - radius - 1;
-            world.setOtherAt(new BlockPos(x, 0, z));
-        }
-
-        return world;
-    }
 
     @Test
     void connectedSurfaceShouldUseFuzzyMayContainsToRegion5By5() {
-        CasedBlockView world = new CasedBlockView(new Region(-2, 0, -2, 2, 0, 2), base, target);
+        CasedBlockView world = new CasedBlockView(new Region(-2, 0, -2, 2, 0, 2), CasedBlockView.base, CasedBlockView.target);
         ConnectedSurface surface = ConnectedSurface.create(world, BlockPos.ORIGIN, EnumFacing.UP, 5, false);
 
         //5 + 1 = 6, (5 / 2) + 1 = 3
@@ -80,7 +65,7 @@ public class ConnectedSurfaceTest {
     @Test
     void connectedSurfaceShouldFindAllConnectedBlocksHardcoded() {
         int radius = 3;
-        CasedBlockView world = new CasedBlockView(new Region(-radius, 0, -radius, radius, 0, radius), base, target)
+        CasedBlockView world = new CasedBlockView(new Region(-radius, 0, -radius, radius, 0, radius), CasedBlockView.base, CasedBlockView.target)
                 //Connected
                 .setOtherAt(BlockPos.ORIGIN)
                 .setOtherAt(BlockPos.ORIGIN.north())

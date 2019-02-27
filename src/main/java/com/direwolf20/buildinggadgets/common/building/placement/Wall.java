@@ -3,6 +3,7 @@ package com.direwolf20.buildinggadgets.common.building.placement;
 import com.direwolf20.buildinggadgets.common.building.IPlacementSequence;
 import com.direwolf20.buildinggadgets.common.building.Region;
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Preconditions;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 
@@ -22,9 +23,8 @@ public final class Wall implements IPlacementSequence {
     }
 
     public static Wall extendingFrom(BlockPos posHit, EnumFacing extension, EnumFacing flatSide, int range) {
-        if (extension == flatSide) {
-            throw new IllegalArgumentException("Cannot have a wall extending to " + extension + " and flat at " + flatSide);
-        }
+        Preconditions.checkArgument(extension != flatSide, "Cannot have a wall extending to " + extension + " and flat at " + flatSide);
+
         int radius = toRadius(range);
         return new Wall(posHit.offset(extension, radius + 1), flatSide, radius);
     }

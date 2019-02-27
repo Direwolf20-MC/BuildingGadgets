@@ -134,7 +134,7 @@ public class ToolRenders {
                 hasBlocks = hasBlocks + InventoryManipulation.countPaste(player);
                 int hasEnergy = 0;
                 if (stack.hasCapability(CapabilityEnergy.ENERGY, null)) {
-                    hasEnergy = GadgetCapabilityProvider.getCap(stack).getEnergyStored();
+                    hasEnergy = GadgetCapabilityProvider.getEnergyCapability(stack).getEnergyStored();
                 } else {
                     hasEnergy = stack.getMaxDamage() - stack.getItemDamage();
                 }
@@ -280,7 +280,7 @@ public class ToolRenders {
                 hasBlocks = hasBlocks + InventoryManipulation.countPaste(player);
                 int hasEnergy = 0;
                 if (stack.hasCapability(CapabilityEnergy.ENERGY, null)) {
-                    hasEnergy = GadgetCapabilityProvider.getCap(stack).getEnergyStored();
+                    hasEnergy = GadgetCapabilityProvider.getEnergyCapability(stack).getEnergyStored();
                 } else {
                     hasEnergy = stack.getMaxDamage() - stack.getItemDamage();
                 }

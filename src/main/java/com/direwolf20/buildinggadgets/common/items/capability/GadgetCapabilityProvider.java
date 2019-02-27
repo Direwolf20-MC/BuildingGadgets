@@ -1,8 +1,10 @@
 package com.direwolf20.buildinggadgets.common.items.capability;
 
 import com.direwolf20.buildinggadgets.common.building.CapabilityBlockProvider;
+import com.direwolf20.buildinggadgets.common.building.IBlockProvider;
 import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
 import com.direwolf20.buildinggadgets.common.tools.GadgetUtils;
+import com.google.common.base.Preconditions;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.capabilities.Capability;
@@ -42,12 +44,17 @@ public class GadgetCapabilityProvider implements ICapabilityProvider {
     }
 
     @Nonnull
-    public static IEnergyStorage getCap(ItemStack stack) {
+    public static IEnergyStorage getEnergyCapability(ItemStack stack) {
         IEnergyStorage energy = stack.getCapability(CapabilityEnergy.ENERGY, null);
-        if (energy == null)
-            throw new IllegalArgumentException("CapabilityEnergy could not be retrieved for " + GadgetUtils.getStackErrorSuffix(stack));
-
+        Preconditions.checkNotNull(energy, "CapabilityEnergy could not be retrieved for " + GadgetUtils.getStackErrorSuffix(stack));
         return energy;
+    }
+
+    @Nonnull
+    public static IBlockProvider getBlockProviderCapability(ItemStack stack) {
+        IBlockProvider blockProvider = stack.getCapability(CapabilityBlockProvider.BLOCK_PROVIDER, null);
+        Preconditions.checkNotNull(blockProvider, "CapabilityBlockProvider could not be retrieved for " + GadgetUtils.getStackErrorSuffix(stack));
+        return blockProvider;
     }
 
 }

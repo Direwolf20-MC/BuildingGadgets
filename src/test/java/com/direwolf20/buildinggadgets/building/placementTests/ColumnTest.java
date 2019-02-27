@@ -39,9 +39,7 @@ public class ColumnTest {
 
             if (facing.getAxisDirection() == EnumFacing.AxisDirection.NEGATIVE) {
                 for (int i = 15; i >= 1; i--) {
-                    BlockPos pos = it.next();
-                    System.out.println(pos);
-                    assertEquals(BlockPos.ORIGIN.offset(facing, i), pos);
+                    assertEquals(BlockPos.ORIGIN.offset(facing, i), it.next());
                 }
             } else {
                 for (int i = 1; i <= 15; i++) {

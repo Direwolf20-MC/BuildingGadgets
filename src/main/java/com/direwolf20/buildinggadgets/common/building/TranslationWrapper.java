@@ -1,7 +1,11 @@
 package com.direwolf20.buildinggadgets.common.building;
 
+import com.direwolf20.buildinggadgets.common.building.placement.SingleTypeProvider;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.nbt.NBTBase;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.BlockPos;
+import net.minecraftforge.common.util.INBTSerializable;
 
 /**
  * Wraps an {@link IBlockProvider} such that all access to the handle will be translated by the given amount as the
@@ -10,7 +14,14 @@ import net.minecraft.util.math.BlockPos;
 public final class TranslationWrapper implements IBlockProvider {
 
     private final IBlockProvider handle;
+    /**
+     * Translation done by the current wrapper.
+     */
     private final BlockPos translation;
+    /**
+     * Translation done by the current wrapper and its handle.
+     */
+    private final BlockPos accumulatedTranslation;
 
     /**
      * @implNote you cannot create a object and pass itself as a parameter of the constructor, so we are safe from looping
@@ -18,26 +29,28 @@ public final class TranslationWrapper implements IBlockProvider {
     public TranslationWrapper(IBlockProvider handle, BlockPos origin) {
         this.handle = handle;
         this.translation = origin;
+        this.accumulatedTranslation = handle.getTranslation().add(origin);
     }
 
     @Override
     public IBlockProvider translate(BlockPos origin) {
-        return new TranslationWrapper(handle, getAccumulatedTranslation());
-    }
-
-    @Override
-    public BlockPos getTranslation() {
-        return translation;
+        //Since handle is the same, just adding the two translation together would be sufficient
+        return new TranslationWrapper(handle, translation.add(origin));
     }
 
     /**
-     * Calculate and return all translation done with the wrapper and its underlying block provider.
-     *
-     * @return a new BlockPos every time
-     * @implNote this method uses recursion to stack the translations together, which means it will create a lot of overhead.
+     * @return all translation done with the wrapper and its underlying block provider.
      */
-    public BlockPos getAccumulatedTranslation() {
-        return translation.add(handle.getTranslation());
+    @Override
+    public BlockPos getTranslation() {
+        return accumulatedTranslation;
+    }
+
+    /**
+     * @return the translation applied by the current wrapper
+     */
+    public BlockPos getAppliedTranslation() {
+        return translation;
     }
 
     /**
@@ -53,6 +66,44 @@ public final class TranslationWrapper implements IBlockProvider {
     @Override
     public IBlockState at(BlockPos pos) {
         return handle.at(pos.add(translation));
+    }
+
+    /**
+     * @see #serialize(NBTTagCompound)
+     */
+    public NBTTagCompound serialize() {
+        return serialize(new NBTTagCompound());
+    }
+
+    /**
+     * @return tag itself when serialization fails
+     */
+    @SuppressWarnings("unchecked") //Safe raw type usage since INBTSerializable<T extends NBTBase> and NBTTagCompound is subclass of it
+    public NBTTagCompound serialize(NBTTagCompound tag) {
+        if (handle instanceof INBTSerializable) {
+            tag.merge(((INBTSerializable<NBTTagCompound>) handle).serializeNBT());
+            return tag;
+        }
+        if (handle instanceof SingleTypeProvider) {
+            ((SingleTypeProvider) handle).deserialize(tag);
+        }
+        return tag;
+    }
+
+    /**
+     * @return this when deserialization fails
+     */
+    @SuppressWarnings("unchecked") //Safe raw type usage since INBTSerializable<T extends NBTBase> and NBTTagCompound is subclass of it
+    public TranslationWrapper deserialize(NBTTagCompound tag) {
+        if (handle instanceof INBTSerializable) {
+            //This operation mutates the handle
+            ((INBTSerializable<NBTTagCompound>) handle).deserializeNBT(tag);
+            return this;
+        }
+        if (handle instanceof SingleTypeProvider) {
+            return new TranslationWrapper(((SingleTypeProvider) handle).deserialize(tag), translation);
+        }
+        return this;
     }
 
 }

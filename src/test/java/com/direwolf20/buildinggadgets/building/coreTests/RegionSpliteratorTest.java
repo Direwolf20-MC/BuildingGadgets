@@ -66,6 +66,27 @@ public class RegionSpliteratorTest {
     }
 
     @Test
+    void spliteratorShouldHaveSameOrderAsIteratorAfterSplittingInHalf() {
+        Region region = new Region(-8, -8, -8, 8, 8, 8);
+        Iterator<BlockPos> it = region.iterator();
+        Spliterator<BlockPos> spliterator = region.spliterator();
+
+        //Iteration 1, including the original one
+        Spliterator<BlockPos> sp1 = spliterator.trySplit();
+
+        //Iteration 2, produces 2 more + 2 from iteration 1
+        Spliterator<BlockPos> sp1_1 = sp1.trySplit();
+        Spliterator<BlockPos> sp0_1 = spliterator.trySplit();
+
+        //Yielding spliterator inherits the state from parent, and parent starts working somewhere else
+        //Yielding spliterator always have smaller coordinates than parent
+        sp1_1.forEachRemaining(pos -> assertEquals(it.next(), pos));
+        sp1.forEachRemaining(pos -> assertEquals(it.next(), pos));
+        sp0_1.forEachRemaining(pos -> assertEquals(it.next(), pos));
+        spliterator.forEachRemaining(pos -> assertEquals(it.next(), pos));
+    }
+
+    @Test
     void doesNotProduceSamePosition() {
         Region region = new Region(-4, -4, -4, 4, 4, 4);
         Spliterator<BlockPos> spliterator = region.spliterator();
@@ -122,6 +143,28 @@ public class RegionSpliteratorTest {
 
         sp1_1.forEachRemaining(test);
         sp0_1.forEachRemaining(test);
+    }
+
+    @Test
+    void splittingDoesNotChangeTheOverallSizeCaseSplittingInHalf() {
+        Region region = new Region(-16, -6, -18, 17, 8, 20);
+        Spliterator<BlockPos> spliterator = region.spliterator();
+
+        long originalSize = spliterator.estimateSize();
+
+        //Iteration 1, including the original one
+        Spliterator<BlockPos> sp1 = spliterator.trySplit();
+
+        //Iteration 2, produces 2 more + 2 from iteration 1
+        Spliterator<BlockPos> sp1_1 = sp1.trySplit();
+        Spliterator<BlockPos> sp0_1 = spliterator.trySplit();
+
+        long actualSize = sp1.estimateSize() +
+                spliterator.estimateSize() +
+                sp1_1.estimateSize() +
+                sp0_1.estimateSize();
+
+        assertEquals(originalSize, actualSize);
     }
 
 }

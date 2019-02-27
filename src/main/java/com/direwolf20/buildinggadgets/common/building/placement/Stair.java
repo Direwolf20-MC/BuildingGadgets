@@ -6,6 +6,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.AbstractIterator;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockPos.MutableBlockPos;
 
 import javax.annotation.Nonnull;
 import java.util.Iterator;
@@ -69,6 +70,7 @@ public final class Stair implements IPlacementSequence {
     @Nonnull
     public Iterator<BlockPos> iterator() {
         return new AbstractIterator<BlockPos>() {
+            private MutableBlockPos current = new MutableBlockPos(base);
             private int i = -1;
 
             @Override
@@ -76,9 +78,10 @@ public final class Stair implements IPlacementSequence {
                 if (i >= range) {
                     return endOfData();
                 }
-
                 i++;
-                return new BlockPos(base).offset(horizontalAdvance, i).offset(verticalAdvance, i);
+
+                current.move(horizontalAdvance, 1).move(verticalAdvance, 1);
+                return current.toImmutable();
             }
         };
     }

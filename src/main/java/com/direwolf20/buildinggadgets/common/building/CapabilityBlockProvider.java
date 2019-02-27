@@ -10,17 +10,18 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.Capability.IStorage;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.capabilities.CapabilityManager;
+import net.minecraftforge.common.util.INBTSerializable;
 
 import javax.annotation.Nonnull;
 
-public class CapabilityBlockProvider {
+public final class CapabilityBlockProvider {
 
     @CapabilityInject(IBlockProvider.class)
     public static Capability<IBlockProvider> BLOCK_PROVIDER = null;
 
     static IBlockProvider DEFAULT_AIR_PROVIDER = new SingleTypeProvider(Blocks.AIR.getDefaultState());
 
-    public CapabilityBlockProvider() {}
+    private CapabilityBlockProvider() {}
 
     public static void register() {
         CapabilityManager.INSTANCE.register(IBlockProvider.class, new IStorage<IBlockProvider>() {
@@ -28,9 +29,14 @@ public class CapabilityBlockProvider {
             @Override
             public NBTBase writeNBT(Capability<IBlockProvider> capability, IBlockProvider provider, EnumFacing facing) {
                 if (provider instanceof TranslationWrapper) {
-                    provider = ((TranslationWrapper) provider).getHandle();
+                    return ((TranslationWrapper) provider).serialize();
                 }
 
+                if (provider instanceof INBTSerializable) {
+//                    @SuppressWarnings("unchecked") //Safe covariant cast
+                    INBTSerializable serializable = (INBTSerializable<NBTBase>) provider;
+                    return serializable.serializeNBT();
+                }
                 if (provider instanceof SingleTypeProvider) {
                     return NBTUtil.writeBlockState(new NBTTagCompound(), ((SingleTypeProvider) provider).getBlockState());
                 }
@@ -40,11 +46,17 @@ public class CapabilityBlockProvider {
             @Override
             public void readNBT(Capability<IBlockProvider> capability, IBlockProvider provider, EnumFacing facing, NBTBase nbt) {
                 if (provider instanceof TranslationWrapper) {
-                    provider = ((TranslationWrapper) provider).getHandle();
+                    ((TranslationWrapper) provider).deserialize((NBTTagCompound) nbt);
                 }
 
+                if (provider instanceof INBTSerializable) {
+//                    @SuppressWarnings("unchecked") //Safe covariant cast
+                    INBTSerializable serializable = (INBTSerializable<NBTBase>) provider;
+
+                    serializable.deserializeNBT(nbt);
+                }
                 if (provider instanceof SingleTypeProvider) {
-                    ((SingleTypeProvider) provider).deserializeNBT((NBTTagCompound) nbt);
+                    ((SingleTypeProvider) provider).deserialize((NBTTagCompound) nbt);
                 }
                 throw new IllegalArgumentException("Cannot serialize a non-default implementation.");
             }

@@ -29,11 +29,15 @@ public class SingleTypeProvider implements IBlockProvider {
         return state;
     }
 
-    public NBTTagCompound serializeNBT() {
-        return NBTUtil.writeBlockState(new NBTTagCompound(), state);
+    public NBTTagCompound serialize() {
+        return serialize(new NBTTagCompound());
     }
 
-    public SingleTypeProvider deserializeNBT(NBTTagCompound tag) {
+    public NBTTagCompound serialize(NBTTagCompound tag) {
+        return NBTUtil.writeBlockState(tag, state);
+    }
+
+    public SingleTypeProvider deserialize(NBTTagCompound tag) {
         return new SingleTypeProvider(NBTUtil.readBlockState(tag));
     }
 

@@ -34,7 +34,7 @@ public class RegionBlockView implements IBlockAccess {
 
     @Override
     public IBlockState getBlockState(BlockPos pos) {
-        return state;
+        return region.contains(pos) ? state : UniqueBlockState.AIR;
     }
 
     @Override

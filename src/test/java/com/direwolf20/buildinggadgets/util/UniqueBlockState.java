@@ -28,6 +28,8 @@ import java.util.Objects;
 
 public class UniqueBlockState implements IBlockState {
 
+    public static final IBlockState AIR = createNew();
+
     private static int lastId = -1;
 
     public static UniqueBlockState createWithId(int id) {
