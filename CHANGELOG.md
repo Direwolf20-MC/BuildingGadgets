@@ -7,7 +7,10 @@ The format of this document is based on [Keep a Changelog](https://keepachangelo
 - More German localisation
 
 ### Fixed
-Refined Storage network IO now respects security permissions.
+- Refined Storage network IO now respects security permissions.
+- Fixed destruction overlay rendering bug when in F1 mode.
+- When in connected area mode, the destruction gadget now does nothing when set to 0 depth, just as it does otherwise.
+- Allowed destruction overlay render cache to update when the side of the observed block changes.
 
 ## [2.6.5] - 2019-02-22
 ### Changed
