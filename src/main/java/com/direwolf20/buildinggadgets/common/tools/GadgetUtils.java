@@ -1,7 +1,16 @@
 package com.direwolf20.buildinggadgets.common.tools;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
+import com.direwolf20.buildinggadgets.common.integration.AppliedEnergistics2;
 import com.direwolf20.buildinggadgets.common.integration.RefinedStorage;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetBuilding;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetExchanger;
@@ -30,13 +39,6 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 public class GadgetUtils {
     private static final ImmutableList<String> LINK_STARTS = ImmutableList.of("http","www");
@@ -320,7 +322,7 @@ public class GadgetUtils {
     }
 
     public static boolean setRemoteInventory(EntityPlayer player, ItemStack tool, BlockPos pos, int dim, World world) {
-        if (getRemoteInventory(pos, dim, world) != null) {
+        if (getRemoteInventory(pos, dim, world, player) != null) {
             boolean same = pos.equals(getPOSFromNBT(tool, "boundTE"));
             writePOSToNBT(tool, same ? null : pos, "boundTE", dim);
             player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget." + (same ? "unboundTE" : "boundTE")).getUnformattedComponentText()), true);
@@ -330,37 +332,39 @@ public class GadgetUtils {
     }
 
     @Nullable
-    public static IItemHandler getRemoteInventory(ItemStack tool, World world) {
-        return getRemoteInventory(tool, world, NetworkIO.Operation.EXTRACT);
+    public static IItemHandler getRemoteInventory(ItemStack tool, World world, EntityPlayer player) {
+        return getRemoteInventory(tool, world, player, NetworkIO.Operation.EXTRACT);
     }
 
     @Nullable
-    public static IItemHandler getRemoteInventory(ItemStack tool, World world, NetworkIO.Operation operation) {
+    public static IItemHandler getRemoteInventory(ItemStack tool, World world, EntityPlayer player, NetworkIO.Operation operation) {
         Integer dim = getDIMFromNBT(tool, "boundTE");
         if (dim == null) return null;
         BlockPos pos = getPOSFromNBT(tool, "boundTE");
-        return pos == null ? null : getRemoteInventory(pos, dim, world, operation);
+        return pos == null ? null : getRemoteInventory(pos, dim, world, player, operation);
     }
 
     @Nullable
-    public static IItemHandler getRemoteInventory(BlockPos pos, int dim, World world) {
-        return getRemoteInventory(pos, dim, world, NetworkIO.Operation.EXTRACT);
+    public static IItemHandler getRemoteInventory(BlockPos pos, int dim, World world, EntityPlayer player) {
+        return getRemoteInventory(pos, dim, world, player, NetworkIO.Operation.EXTRACT);
     }
 
     @Nullable
-    public static IItemHandler getRemoteInventory(BlockPos pos, int dim, World world, NetworkIO.Operation operation) {
+    public static IItemHandler getRemoteInventory(BlockPos pos, int dim, World world, EntityPlayer player, NetworkIO.Operation operation) {
         MinecraftServer server = world.getMinecraftServer();
         if (server == null) return null;
         World worldServer = server.getWorld(dim);
         if (worldServer == null) return null;
-        return getRemoteInventory(pos, worldServer, operation);
+        return getRemoteInventory(pos, worldServer, player, operation);
     }
 
     @Nullable
-    public static IItemHandler getRemoteInventory(BlockPos pos, World world, NetworkIO.Operation operation) {
+    public static IItemHandler getRemoteInventory(BlockPos pos, World world, EntityPlayer player, NetworkIO.Operation operation) {
         TileEntity te = world.getTileEntity(pos);
         if (te == null) return null;
-        IItemHandler network = RefinedStorage.getWrappedNetwork(te, operation);
+        IItemHandler network = RefinedStorage.getWrappedNetwork(te, player, operation);
+        if (network != null) return network;
+        network = AppliedEnergistics2.getWrappedNetwork(te, player, operation);
         if (network != null) return network;
         IItemHandler cap = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
         return cap != null ? cap : null;

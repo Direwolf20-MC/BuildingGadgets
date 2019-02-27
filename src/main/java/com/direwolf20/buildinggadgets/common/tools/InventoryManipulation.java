@@ -58,7 +58,7 @@ public class InventoryManipulation {
 
         //Try to insert into the remote inventory.
         ItemStack tool = GadgetGeneric.getGadget(player);
-        IItemHandler remoteInventory = GadgetUtils.getRemoteInventory(tool, world, NetworkIO.Operation.INSERT);
+        IItemHandler remoteInventory = GadgetUtils.getRemoteInventory(tool, world, player, NetworkIO.Operation.INSERT);
         if (remoteInventory != null) {
             for (int i = 0; i < remoteInventory.getSlots(); i++) {
                 ItemStack containerItem = remoteInventory.getStackInSlot(i);
@@ -101,7 +101,7 @@ public class InventoryManipulation {
         }
 
         ItemStack tool = GadgetGeneric.getGadget(player);
-        IItemHandler remoteInventory = GadgetUtils.getRemoteInventory(tool, world);
+        IItemHandler remoteInventory = GadgetUtils.getRemoteInventory(tool, world, player);
         if (remoteInventory != null) {
             for (int i = 0; i < remoteInventory.getSlots(); i++) {
                 ItemStack containerItem = remoteInventory.getStackInSlot(i);
@@ -147,7 +147,7 @@ public class InventoryManipulation {
 
     public static int countItem(ItemStack itemStack, EntityPlayer player, World world) {
         return countItem(itemStack, player, (tool, stack) -> {
-            IItemHandler remoteInventory = GadgetUtils.getRemoteInventory(tool, world);
+            IItemHandler remoteInventory = GadgetUtils.getRemoteInventory(tool, world, player);
             return remoteInventory == null ? 0 : countInContainer(remoteInventory, stack.getItem(), stack.getMetadata());
         });
     }
