@@ -11,6 +11,7 @@ import com.direwolf20.buildinggadgets.common.utils.CapabilityUtil.EnergyUtil;
 import com.direwolf20.buildinggadgets.common.utils.Reference;
 import com.direwolf20.buildinggadgets.common.utils.exceptions.CapabilityNotPresentException;
 import com.direwolf20.buildinggadgets.common.utils.helpers.InventoryHelper;
+import com.direwolf20.buildinggadgets.common.utils.helpers.NBTHelper;
 import com.direwolf20.buildinggadgets.common.utils.helpers.SortingHelper;
 import com.direwolf20.buildinggadgets.common.utils.helpers.VectorHelper;
 import com.direwolf20.buildinggadgets.common.world.FakeBuilderWorld;
@@ -115,6 +116,16 @@ public class GadgetBuilding extends GadgetGeneric {
         return mode;
     }
 
+    public static boolean shouldPlaceAtop(ItemStack stack) {
+        return !NBTHelper.getOrNewTag(stack).getBoolean("start_inside");
+    }
+
+    public static void togglePlaceAtop(EntityPlayer player, ItemStack stack) {
+        NBTHelper.getOrNewTag(stack).setBoolean("start_inside", shouldPlaceAtop(stack));
+        String prefix = "message.gadget.building.placement";
+        player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation(prefix, new TextComponentTranslation(prefix + (shouldPlaceAtop(stack) ? ".atop" : ".inside"))).getUnformattedComponentText()), true);
+    }
+
     @Override
     public void addInformation(ItemStack stack, @Nullable World world, List<ITextComponent> tooltip, ITooltipFlag flag) {
         super.addInformation(stack, world, tooltip, flag);
@@ -127,6 +138,8 @@ public class GadgetBuilding extends GadgetGeneric {
         if (getToolMode(stack) == ToolMode.Surface)
             tooltip.add(new TextComponentString(TextFormatting.GOLD + I18n.format("tooltip.gadget.fuzzy") + ": " + getFuzzy(stack)));
 
+        addInformationRayTraceFluid(tooltip, stack);
+        tooltip.add(new TextComponentString(TextFormatting.YELLOW + I18n.format("tooltip.gadget.building.place_atop") + ": " + shouldPlaceAtop(stack)));
         addEnergyInformation(tooltip, stack);
     }
 
@@ -184,7 +197,7 @@ public class GadgetBuilding extends GadgetGeneric {
         List<BlockPos> coords = getAnchor(stack);
 
         if (coords.size() == 0) {  //If we don't have an anchor, build in the current spot
-            RayTraceResult lookingAt = VectorHelper.getLookingAt(player);
+            RayTraceResult lookingAt = VectorHelper.getLookingAt(player, stack);
             if (lookingAt == null) { //If we aren't looking at anything, exit
                 return false;
             }

@@ -105,7 +105,7 @@ public class ToolRenders {
             GlStateManager.popMatrix();
         }
 
-        RayTraceResult lookingAt = VectorHelper.getLookingAt(player);
+        RayTraceResult lookingAt = VectorHelper.getLookingAt(player, heldItem);
         IBlockState state = Blocks.AIR.getDefaultState();
         List<BlockPos> coordinates = getAnchor(stack);
         if (lookingAt != null || coordinates.size() > 0) {
@@ -220,17 +220,14 @@ public class ToolRenders {
     }
 
     public static void renderExchangerOverlay(RenderWorldLastEvent evt, EntityPlayer player, ItemStack stack) {
-        ItemStack heldItem = GadgetExchanger.getGadget(player);
-        if (heldItem.isEmpty()) return;
-
         //Calculate the players current position, which is needed later
         double doubleX = player.lastTickPosX + (player.posX - player.lastTickPosX) * evt.getPartialTicks();
         double doubleY = player.lastTickPosY + (player.posY - player.lastTickPosY) * evt.getPartialTicks();
         double doubleZ = player.lastTickPosZ + (player.posZ - player.lastTickPosZ) * evt.getPartialTicks();
 
         BlockRendererDispatcher dispatcher = Minecraft.getInstance().getBlockRendererDispatcher();
-        ResourceLocation dim = GadgetUtils.getDIMFromNBT(heldItem, "boundTE");
-        BlockPos pos = GadgetUtils.getPOSFromNBT(heldItem, "boundTE");
+        ResourceLocation dim = GadgetUtils.getDIMFromNBT(stack, "boundTE");
+        BlockPos pos = GadgetUtils.getPOSFromNBT(stack, "boundTE");
 
         if (dim != null && pos != null) {
             GlStateManager.pushMatrix();//Push matrix again just because
@@ -248,7 +245,7 @@ public class ToolRenders {
             GlStateManager.popMatrix();
         }
 
-        RayTraceResult lookingAt = VectorHelper.getLookingAt(player);
+        RayTraceResult lookingAt = VectorHelper.getLookingAt(player, stack);
         IBlockState state = Blocks.AIR.getDefaultState();
         List<BlockPos> coordinates = getAnchor(stack);
         if (lookingAt != null || coordinates.size() > 0) {
@@ -258,7 +255,7 @@ public class ToolRenders {
                 startBlock = world.getBlockState(lookingAt.getBlockPos());
             }
             if (startBlock != BGBlocks.effectBlock.getDefaultState()) {
-                IBlockState renderBlockState = getToolBlock(heldItem);
+                IBlockState renderBlockState = getToolBlock(stack);
                 Minecraft mc = Minecraft.getInstance();
                 mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
                 if (renderBlockState == Blocks.AIR.getDefaultState()) {//Don't render anything if there is no block selected (Air)
@@ -352,9 +349,9 @@ public class ToolRenders {
                     GL14.glBlendColor(1F, 1F, 1F, 0.55f); //Set the alpha of the blocks we are rendering
                     hasBlocks--;
                     if (energy.isPresent()) {
-                        hasEnergy -= (((GadgetGeneric) stack.getItem())).getEnergyCost(heldItem);
+                        hasEnergy -= (((GadgetGeneric) stack.getItem())).getEnergyCost(stack);
                     } else {
-                        hasEnergy -= (((GadgetGeneric) stack.getItem())).getDamageCost(heldItem);
+                        hasEnergy -= (((GadgetGeneric) stack.getItem())).getDamageCost(stack);
                     }
                     if (hasBlocks < 0 || hasEnergy < 0) {
                         dispatcher.renderBlockBrightness(Blocks.RED_STAINED_GLASS.getDefaultState(), 1f);
@@ -376,27 +373,24 @@ public class ToolRenders {
     }
 
     public static void renderDestructionOverlay(RenderWorldLastEvent evt, EntityPlayer player, ItemStack stack) {
-        RayTraceResult lookingAt = VectorHelper.getLookingAt(player);
+        RayTraceResult lookingAt = VectorHelper.getLookingAt(player, stack);
         if (lookingAt == null && GadgetDestruction.getAnchor(stack) == null) return;
         World world = player.world;
         BlockPos startBlock = (GadgetDestruction.getAnchor(stack) == null) ? lookingAt.getBlockPos() : GadgetDestruction.getAnchor(stack);
         EnumFacing facing = (GadgetDestruction.getAnchorSide(stack) == null) ? lookingAt.sideHit : GadgetDestruction.getAnchorSide(stack);
         if (startBlock == BGBlocks.effectBlock.getDefaultState()) return;
 
-        ItemStack heldItem = GadgetDestruction.getGadget(player);
-        if (heldItem.isEmpty()) return;
-
-        if (!GadgetDestruction.getOverlay(heldItem)) return;
+        if (!GadgetDestruction.getOverlay(stack)) return;
         GlStateManager.pushMatrix();
         double doubleX = player.lastTickPosX + (player.posX - player.lastTickPosX) * evt.getPartialTicks();
         double doubleY = player.lastTickPosY + (player.posY - player.lastTickPosY) * evt.getPartialTicks();
         double doubleZ = player.lastTickPosZ + (player.posZ - player.lastTickPosZ) * evt.getPartialTicks();
         GlStateManager.translated(-doubleX, -doubleY, -doubleZ);
         try {
-            GlStateManager.callList(cacheDestructionOverlay.get(new ImmutableTriple<UniqueItemStack, BlockPos, Integer>(new UniqueItemStack(heldItem), startBlock, facing.ordinal()), () -> {
+            GlStateManager.callList(cacheDestructionOverlay.get(new ImmutableTriple<UniqueItemStack, BlockPos, Integer>(new UniqueItemStack(stack), startBlock, facing.ordinal()), () -> {
                 int displayList = GLAllocation.generateDisplayLists(1);
                 GlStateManager.newList(displayList, GL11.GL_COMPILE);
-                renderDestructionOverlay(player, world, startBlock, facing, heldItem);
+                renderDestructionOverlay(player, world, startBlock, facing, stack);
                 GlStateManager.endList();
                 return displayList;
             }));
@@ -510,7 +504,7 @@ public class ToolRenders {
             //First check if we have an anchor, if not check if we're looking at a block, if not, exit
             BlockPos startPos = GadgetCopyPaste.getAnchor(stack);
             if (startPos == null) {
-                startPos = VectorHelper.getPosLookingAt(player);
+                startPos = VectorHelper.getPosLookingAt(player, stack);
                 if (startPos == null) return;
                 startPos = startPos.up(GadgetCopyPaste.getY(stack));
                 startPos = startPos.east(GadgetCopyPaste.getX(stack));
