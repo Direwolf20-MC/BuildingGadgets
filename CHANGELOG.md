@@ -3,7 +3,11 @@ The format of this document is based on [Keep a Changelog](https://keepachangelo
 
 ## [Unreleased] 
 ### Added
+- Allowed gadgets to bind Applied Energistics 2 networks as a remote inventories.
 - More German localisation
+
+### Fixed
+Refined Storage network IO now respects security permissions.
 
 ## [2.6.5] - 2019-02-22
 ### Changed
