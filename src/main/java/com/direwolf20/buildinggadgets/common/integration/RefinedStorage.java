@@ -10,6 +10,7 @@ import com.direwolf20.buildinggadgets.common.tools.NetworkIO;
 import com.direwolf20.buildinggadgets.common.tools.NetworkIO.Operation;
 import com.raoulvdberge.refinedstorage.api.network.INetwork;
 import com.raoulvdberge.refinedstorage.api.network.node.INetworkNodeProxy;
+import com.raoulvdberge.refinedstorage.api.network.security.Permission;
 import com.raoulvdberge.refinedstorage.api.util.Action;
 
 import net.minecraft.entity.player.EntityPlayer;
@@ -30,7 +31,7 @@ public class RefinedStorage implements IIntegratedMod {
     public static IItemHandler getWrappedNetwork(TileEntity te, EntityPlayer player, Operation operation) {
         if (isLoaded && te instanceof INetworkNodeProxy) {
             INetwork network = ((INetworkNodeProxy) te).getNode().getNetwork();
-            if (network != null)
+            if (network != null && network.getSecurityManager().hasPermission(operation == Operation.EXTRACT ? Permission.EXTRACT : Permission.INSERT, player))
                 return new NetworkRefinedStorageIO(player, network, operation);
         }
         return null;
