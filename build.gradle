@@ -56,6 +56,7 @@ dependencies {
     deobfCompile "refinedstorage:refinedstorage:${rs_version}:api"
     deobfCompile "appeng:appliedenergistics2:${ae2_version}"
     runtime "team.chisel.ctm:CTM:MC${minecraft_version}-${ctm_version}"
+	compile files ("lib/SimpleStorageNetwork-${ssn_version}.jar")
     // you may put jars on which you depend on in ./libs
     // or you may define them like so..
     //compile "some.group:artifact:version:classifier"

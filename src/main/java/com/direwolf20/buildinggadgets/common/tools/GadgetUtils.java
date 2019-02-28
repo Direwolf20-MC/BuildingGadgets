@@ -10,8 +10,7 @@ import javax.annotation.Nullable;
 
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
-import com.direwolf20.buildinggadgets.common.integration.AppliedEnergistics2;
-import com.direwolf20.buildinggadgets.common.integration.RefinedStorage;
+import com.direwolf20.buildinggadgets.common.integration.NetworkProvider;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetBuilding;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetExchanger;
 import com.google.common.collect.HashMultiset;
@@ -362,9 +361,7 @@ public class GadgetUtils {
     public static IItemHandler getRemoteInventory(BlockPos pos, World world, EntityPlayer player, NetworkIO.Operation operation) {
         TileEntity te = world.getTileEntity(pos);
         if (te == null) return null;
-        IItemHandler network = RefinedStorage.getWrappedNetwork(te, player, operation);
-        if (network != null) return network;
-        network = AppliedEnergistics2.getWrappedNetwork(te, player, operation);
+        IItemHandler network = NetworkProvider.getWrappedNetwork(te, player, operation);
         if (network != null) return network;
         IItemHandler cap = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
         return cap != null ? cap : null;

@@ -4,7 +4,6 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
-import com.direwolf20.buildinggadgets.common.integration.IntegrationHandler.IIntegratedMod;
 import com.direwolf20.buildinggadgets.common.integration.IntegrationHandler.IntegratedMod;
 import com.direwolf20.buildinggadgets.common.tools.NetworkIO;
 import com.direwolf20.buildinggadgets.common.tools.NetworkIO.Operation;
@@ -19,17 +18,12 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.items.IItemHandler;
 
 @IntegratedMod("refinedstorage")
-public class RefinedStorage implements IIntegratedMod {
-    private static boolean isLoaded;
+public class RefinedStorage extends NetworkProvider {
 
     @Override
-    public void initialize() {
-        isLoaded = true;
-    }
-
     @Nullable
-    public static IItemHandler getWrappedNetwork(TileEntity te, EntityPlayer player, Operation operation) {
-        if (isLoaded && te instanceof INetworkNodeProxy) {
+    protected IItemHandler getWrappedNetworkInternal(TileEntity te, EntityPlayer player, Operation operation) {
+        if (te instanceof INetworkNodeProxy) {
             INetwork network = ((INetworkNodeProxy) te).getNode().getNetwork();
             if (network != null && network.getSecurityManager().hasPermission(operation == Operation.EXTRACT ? Permission.EXTRACT : Permission.INSERT, player))
                 return new NetworkRefinedStorageIO(player, network, operation);

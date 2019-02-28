@@ -5,7 +5,6 @@ import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import com.direwolf20.buildinggadgets.common.integration.IntegrationHandler.IIntegratedMod;
 import com.direwolf20.buildinggadgets.common.integration.IntegrationHandler.IntegratedMod;
 import com.direwolf20.buildinggadgets.common.tools.NetworkIO;
 import com.direwolf20.buildinggadgets.common.tools.NetworkIO.IStackProvider;
@@ -31,17 +30,12 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.items.IItemHandler;
 
 @IntegratedMod("appliedenergistics2")
-public class AppliedEnergistics2 implements IIntegratedMod {
-    private static boolean isLoaded;
+public class AppliedEnergistics2 extends NetworkProvider {
 
     @Override
-    public void initialize() {
-        isLoaded = true;
-    }
-
     @Nullable
-    public static IItemHandler getWrappedNetwork(TileEntity te, EntityPlayer player, Operation operation) {
-        if (isLoaded && te instanceof IGridHost) {
+    protected IItemHandler getWrappedNetworkInternal(TileEntity te, EntityPlayer player, Operation operation) {
+        if (te instanceof IGridHost) {
             IGridNode node = ((IGridHost) te).getGridNode(AEPartLocation.INTERNAL);
             if (node != null) {
                 ISecurityGrid security = node.getGrid().getCache(ISecurityGrid.class);
