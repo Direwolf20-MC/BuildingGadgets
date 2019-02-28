@@ -25,12 +25,9 @@ import net.minecraftforge.items.IItemHandler;
 
 import java.util.*;
 
-/**
- * @MajorTuvok
- * Please check of the changes with the Sets as I've had to to some guess work
- *
+/*
  * @MichaelHillcox
- * This entire class could do with some refactoring and cleaning :grin:
+ *  This entire class could do with some refactoring and cleaning :grin:
  */
 public class InventoryHelper {
     private static IProperty AXIS = EnumProperty.create("axis", EnumFacing.Axis.class);

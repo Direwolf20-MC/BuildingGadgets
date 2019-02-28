@@ -22,7 +22,10 @@ import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.world.*;
+import net.minecraft.world.IBlockReader;
+import net.minecraft.world.IWorld;
+import net.minecraft.world.IWorldReader;
+import net.minecraft.world.World;
 import net.minecraftforge.common.IPlantable;
 
 import javax.annotation.Nonnull;
@@ -245,7 +248,7 @@ public class ConstructionBlock extends BlockContainer /*implements IFacade*/ {
     /**
      * Get the MapColor for this Block and the given BlockState
      *
-     * @deprecated call via {@link IBlockState#(, BlockPos)} whenever possible.
+     * @deprecated call via {@link IBlockState#getMapColor(IBlockReader, BlockPos)} whenever possible.
      * Implementing/overriding is fine.
      */
     @Override
@@ -276,7 +279,7 @@ public class ConstructionBlock extends BlockContainer /*implements IFacade*/ {
 
     /**
      * performs updates on diagonal neighbors of the target position and passes in the flags. The flags can be referenced
-     * from the docs for {@link IWorldWriter#(IBlockState, BlockPos, int)}.
+     * from the docs for {@link IBlockState#updateDiagonalNeighbors(IWorld, BlockPos, int)}.
      *
      * @param state
      * @param worldIn
@@ -347,7 +350,7 @@ public class ConstructionBlock extends BlockContainer /*implements IFacade*/ {
      * @param blockState
      * @param worldIn
      * @param pos
-     * @deprecated call via {@link IBlockState#(World, BlockPos)} whenever possible.
+     * @deprecated call via {@link IBlockState#getBlockHardness(IBlockReader, BlockPos)} whenever possible.
      * Implementing/overriding is fine.
      */
     @Override
@@ -458,7 +461,7 @@ public class ConstructionBlock extends BlockContainer /*implements IFacade*/ {
      * @param player
      * @param worldIn
      * @param pos
-     * @deprecated call via {@link IBlockState#(EntityPlayer, World, BlockPos)} whenever
+     * @deprecated call via {@link IBlockState#getPlayerRelativeBlockHardness(EntityPlayer, IBlockReader, BlockPos)} whenever
      * possible. Implementing/overriding is fine.
      */
     @Override
@@ -512,7 +515,7 @@ public class ConstructionBlock extends BlockContainer /*implements IFacade*/ {
      * @param blockAccess
      * @param pos
      * @param side
-     * @deprecated call via {@link IBlockState#(, BlockPos, EnumFacing)} whenever possible.
+     * @deprecated call via {@link IBlockState#getWeakPower(IBlockReader, BlockPos, EnumFacing)} whenever possible.
      * Implementing/overriding is fine.
      */
     @Override
@@ -526,7 +529,7 @@ public class ConstructionBlock extends BlockContainer /*implements IFacade*/ {
      * @param blockAccess
      * @param pos
      * @param side
-     * @deprecated call via {@link IBlockState#(, BlockPos, EnumFacing)} whenever possible.
+     * @deprecated call via {@link IBlockState#getStrongPower(IBlockReader, BlockPos, EnumFacing)} whenever possible.
      * Implementing/overriding is fine.
      */
     @Override
@@ -537,7 +540,7 @@ public class ConstructionBlock extends BlockContainer /*implements IFacade*/ {
 
     /**
      * @param state
-     * @deprecated call via {@link IBlockState#()} whenever possible. Implementing/overriding is fine.
+     * @deprecated call via {@link IBlockState#getPushReaction()} whenever possible. Implementing/overriding is fine.
      */
     @Override
     public EnumPushReaction getPushReaction(IBlockState state) {
