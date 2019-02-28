@@ -28,6 +28,7 @@ import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceFluidMode;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
@@ -270,7 +271,7 @@ public class GadgetUtils {
     public static void selectBlock(ItemStack stack, EntityPlayer player) {
         //Used to find which block the player is looking at, and store it in NBT on the tool.
         World world = player.world;
-        RayTraceResult lookingAt = VectorHelper.getLookingAt(player);
+        RayTraceResult lookingAt = VectorHelper.getLookingAt(player, RayTraceFluidMode.NEVER);
         if (lookingAt == null)
             return;
 
@@ -312,7 +313,7 @@ public class GadgetUtils {
         World world = player.world;
         List<BlockPos> currentCoords = getAnchor(stack);
         if (currentCoords.size() == 0) {  //If we don't have an anchor, find the block we're supposed to anchor to
-            RayTraceResult lookingAt = VectorHelper.getLookingAt(player);
+            RayTraceResult lookingAt = VectorHelper.getLookingAt(player, stack);
             if (lookingAt == null) {  //If we aren't looking at anything, exit
                 return false;
             }

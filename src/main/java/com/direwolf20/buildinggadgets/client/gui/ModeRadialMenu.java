@@ -11,9 +11,11 @@ import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.items.gadgets.*;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketChangeRange;
+import com.direwolf20.buildinggadgets.common.network.packets.PacketToggleBlockPlacement;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketToggleConnectedArea;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketToggleFuzzy;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketToggleMode;
+import com.direwolf20.buildinggadgets.common.network.packets.PacketToggleRayTraceFluid;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGSound;
 import com.direwolf20.buildinggadgets.common.utils.Reference;
 import com.google.common.collect.ImmutableSet;
@@ -104,6 +106,20 @@ public class ModeRadialMenu extends GuiScreen {
                     PacketHandler.sendToServer(new PacketToggleConnectedArea());
 
                 return GadgetGeneric.getConnectedArea(getGadget());
+            }));
+        }
+        addButton(new GuiButtonActionCallback(I18n.format("tooltip.gadget.raytrace_fluid"), send -> {
+            if (send)
+                PacketHandler.sendToServer(new PacketToggleRayTraceFluid());
+
+            return GadgetGeneric.shouldRayTraceFluid(getGadget());
+        }));
+        if (tool.getItem() instanceof GadgetBuilding) {
+            addButton(new GuiButtonActionCallback(I18n.format("tooltip.gadget.building.place_atop"), send -> {
+                if (send)
+                    PacketHandler.sendToServer(new PacketToggleBlockPlacement());
+
+                return GadgetBuilding.shouldPlaceAtop(getGadget());
             }));
         }
         updateButtons(tool);

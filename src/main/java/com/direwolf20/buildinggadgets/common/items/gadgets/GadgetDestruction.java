@@ -85,6 +85,7 @@ public class GadgetDestruction extends GadgetGeneric {
         if (Config.GADGETS.GADGET_DESTRUCTION.nonFuzzyEnabled.get())
             tooltip.add(new TextComponentString(TextFormatting.GOLD + I18n.format("tooltip.gadget.fuzzy") + ": " + getFuzzy(stack)));
 
+        addInformationRayTraceFluid(tooltip, stack);
         addEnergyInformation(tooltip, stack);
     }
 
@@ -214,7 +215,7 @@ public class GadgetDestruction extends GadgetGeneric {
         player.setActiveHand(hand);
         if (!world.isRemote) {
             if (!player.isSneaking()) {
-                RayTraceResult lookingAt = VectorHelper.getLookingAt(player);
+                RayTraceResult lookingAt = VectorHelper.getLookingAt(player, stack);
                 if (lookingAt == null && getAnchor(stack) == null) { //If we aren't looking at anything, exit
                     return new ActionResult<ItemStack>(EnumActionResult.FAIL, stack);
                 }
@@ -243,7 +244,7 @@ public class GadgetDestruction extends GadgetGeneric {
     public static void anchorBlocks(EntityPlayer player, ItemStack stack) {
         BlockPos currentAnchor = getAnchor(stack);
         if (currentAnchor == null) {
-            RayTraceResult lookingAt = VectorHelper.getLookingAt(player);
+            RayTraceResult lookingAt = VectorHelper.getLookingAt(player, stack);
             if (lookingAt == null) {
                 return;
             }

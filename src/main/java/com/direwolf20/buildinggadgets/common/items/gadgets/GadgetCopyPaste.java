@@ -33,7 +33,6 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Enchantments;
 import net.minecraft.init.Items;
-import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -254,6 +253,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
         super.addInformation(stack, world, tooltip, flag);
         tooltip.add(new TextComponentString(TextFormatting.AQUA + I18n.format("tooltip.gadget.mode") + ": " + getToolMode(stack)));
         addEnergyInformation(tooltip, stack);
+        addInformationRayTraceFluid(tooltip, stack);
         EventTooltip.addTemplatePadding(stack, tooltip);
     }
 
@@ -269,7 +269,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
     public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
         ItemStack stack = player.getHeldItem(hand);
         player.setActiveHand(hand);
-        BlockPos pos = VectorHelper.getPosLookingAt(player);
+        BlockPos pos = VectorHelper.getPosLookingAt(player, stack);
         if (!world.isRemote) {
             if (pos != null && player.isSneaking() && GadgetUtils.setRemoteInventory(stack, player, world, pos, false) == EnumActionResult.SUCCESS)
                 return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);
@@ -512,8 +512,10 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
     private void placeBlock(World world, BlockPos pos, EntityPlayer player, IBlockState state, Map<IBlockState, UniqueItem> IntStackMap) {
         IBlockState testState = world.getBlockState(pos);
         // @warning: this has been replaced without knowing how to construct a BlockItemUseContent
-        if ((Config.GENERAL.allowOverwriteBlocks.get() && !testState.isReplaceable(new BlockItemUseContext(world, player, new ItemStack(testState.getBlock()), pos, EnumFacing.DOWN, 0.5F, 0.0F, 0.5F))) ||
-            (!Config.GENERAL.allowOverwriteBlocks.get() && world.getBlockState(pos).getMaterial() != Material.AIR))
+        //TODO Put this back into place once someone figures out how its supposed to work :)
+        // if ((Config.GENERAL.allowOverwriteBlocks.get() && !testState.isReplaceable(new BlockItemUseContext(world, player, new ItemStack(testState.getBlock()), pos, EnumFacing.DOWN, 0.5F, 0.0F, 0.5F))) ||
+        //     (!Config.GENERAL.allowOverwriteBlocks.get() && world.getBlockState(pos).getMaterial() != Material.AIR))
+        if (world.getBlockState(pos).getMaterial() != Material.AIR)
             return;
 
         if (pos.getY() < 0 || state.equals(Blocks.AIR.getDefaultState()) || !player.isAllowEdit())
@@ -577,7 +579,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
     public static void anchorBlocks(EntityPlayer player, ItemStack stack) {
         BlockPos currentAnchor = getAnchor(stack);
         if (currentAnchor == null) {
-            RayTraceResult lookingAt = VectorHelper.getLookingAt(player);
+            RayTraceResult lookingAt = VectorHelper.getLookingAt(player, stack);
             if (lookingAt == null) {
                 return;
             }
