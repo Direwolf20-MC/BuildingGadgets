@@ -102,7 +102,7 @@ minecraft {
             // recommended logging level for the console
             properties 'forge.logging.console.level': 'debug'
             workingDirectory project.file('run').canonicalPath
-            sources sourceSets.api, sourceSets.main
+            sources sourceSets.main, sourceSets.api
         }
         server = {
             // recommended logging data for a userdev environment
@@ -110,7 +110,7 @@ minecraft {
             // recommended logging level for the console
             properties 'forge.logging.console.level': 'debug'
             workingDirectory project.file('run').canonicalPath
-            sources sourceSets.api, sourceSets.main
+            sources sourceSets.main, sourceSets.api
         }
     }
 	/*maven {
@@ -155,11 +155,17 @@ dependencies {
 processResources { //Processes main only resouces
     from(sourceSets.main.resources.srcDirs) {
         include 'META-INF/mods.toml'
-        expand 'version':project.version,'forge_version':forgeVersion,'update_json':project.update_json
+        expand 'version':project.version,'forge_major':project.forge_major,'update_json':project.update_json
     }
 
     from(sourceSets.main.resources.srcDirs) {
         exclude 'META-INF/mods.toml'
+    }
+}
+
+processApiResources {
+    from(sourceSets.api.resources.srcDirs) {
+        expand 'api_version':project.api_version, 'forge_major':project.forge_major
     }
 }
 
@@ -170,7 +176,7 @@ task clearDoc (type: Delete) {
 jar {
     manifest {
         attributes(["Specification-Title": "Buildinggadgets",
-                    "Specification-Version": forgeVersion, // We are version 1 of the modlauncher specification
+                    "Specification-Version": forge_major, // We are version 1 of the modlauncher specification
                     "Implementation-Title": project.archivesBaseName,
                     "Implementation-Version": project.version,
                     "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")],)
@@ -194,7 +200,7 @@ task sourcesJar(type: Jar, dependsOn: classes) {
 task apiJar (type:Jar, dependsOn:apiClasses) {
     manifest {
         attributes(["Specification-Title": "Buildinggadgets-API",
-                    "Specification-Version": forgeVersion, 
+                    "Specification-Version": forge_major, 
                     "Implementation-Title": project.archivesBaseName+'-api',
                     "Implementation-Version": project.api_version,
                     "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")],)
@@ -267,7 +273,14 @@ publishing {
                 developers  {
                     'Direwolf20'
                 }
-                
+                contributors {
+                    'Phylogeny'
+                    'MichaelHillcox'
+                    'MajorTuvok'
+                }
+                licenses {
+                    'MIT License'
+                }
             }
         }
         mavenJava(MavenPublication) {
@@ -282,6 +295,14 @@ publishing {
                 url = "https://github.com/Direwolf20-MC/BuildingGadgets"
                 developers  {
                     'Direwolf20'
+                }
+                contributors {
+                    'Phylogeny'
+                    'MichaelHillcox'
+                    'MajorTuvok'
+                }
+                licenses {
+                    'MIT License'
                 }
             }
         }

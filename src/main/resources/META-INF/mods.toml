@@ -1,8 +1,9 @@
 modLoader="javafml" #mandatory
-loaderVersion="[25,)" #mandatory (25 is current forge version)
+loaderVersion="[${forge_major},)" #mandatory (25 is current forge version)
 updateJSONURL="${update_json}" #optional
 issueTrackerURL="https://github.com/Direwolf20-MC/BuildingGadgets/issues" #optional
 displayURL="https://diresbg.com/" #optional
+logoFile="buildinggadgets_logo.png"
 credits="The Forge and FML guys, McJty, Vazkii, CPW, and Pahimar for helping me learn java/forge modding.  Rorax for the textures!" #optional
 authors="Direwolf20" #The man himself
 [[mods]] #mandatory
@@ -21,7 +22,7 @@ authors="Direwolf20" #The man himself
     # Does this dependency have to exist - if not, ordering below must be specified
     mandatory=true #mandatory
     # The version range of the dependency
-    versionRange="[25,)" #mandatory
+    versionRange="[${forge_major},)" #mandatory
     # An ordering relationship for the dependency - BEFORE or AFTER required if the relationship is not mandatory
     ordering="BEFORE"
     # Side this dependency is applied on - BOTH, CLIENT or SERVER
