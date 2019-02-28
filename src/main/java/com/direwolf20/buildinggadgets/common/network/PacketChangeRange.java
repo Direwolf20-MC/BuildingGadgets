@@ -31,7 +31,7 @@ public class PacketChangeRange extends PacketEmpty {
                 gadgetExchanger.rangeChange(playerEntity, heldItem);
             } else if (heldItem.getItem() instanceof GadgetCopyPaste) {
                 GadgetCopyPaste gadgetCopyPaste = (GadgetCopyPaste) (heldItem.getItem());
-                gadgetCopyPaste.rotateBlocks(heldItem, playerEntity);
+                gadgetCopyPaste.rotateOrMirrorBlocks(heldItem, playerEntity);
             } else if (heldItem.getItem() instanceof GadgetDestruction) {
                 GadgetDestruction gadgetDestruction = (GadgetDestruction) (heldItem.getItem());
                 gadgetDestruction.switchOverlay(playerEntity, heldItem);

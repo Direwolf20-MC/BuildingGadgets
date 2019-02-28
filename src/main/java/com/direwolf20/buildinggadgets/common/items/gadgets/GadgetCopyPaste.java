@@ -29,6 +29,8 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
+import net.minecraft.util.EnumFacing.Axis;
+import net.minecraft.util.EnumFacing.AxisDirection;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.text.TextComponentString;
@@ -298,7 +300,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
         return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);
     }
 
-    public static void rotateBlocks(ItemStack stack, EntityPlayer player) {
+    public static void rotateOrMirrorBlocks(ItemStack stack, EntityPlayer player) {
         if (!(getToolMode(stack) == ToolMode.Paste)) return;
         if (player.world.isRemote) {
             return;
@@ -320,11 +322,26 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
             int px = (tempPos.getX() - startPos.getX());
             int pz = (tempPos.getZ() - startPos.getZ());
 
-            int nx = -pz;
-            int nz = px;
-
+            int nx, nz;
+            IBlockState rotatedState;
+            if (player.isSneaking()) {
+                Mirror mirror;
+                if (player.getHorizontalFacing().getAxis() == Axis.X) {
+                    nx = px;
+                    nz = -pz;
+                    mirror = Mirror.LEFT_RIGHT;
+                } else {
+                    nx = -px;
+                    nz = pz;
+                    mirror = Mirror.FRONT_BACK;
+                }
+                rotatedState = blockMap.state.withMirror(mirror);
+            } else {
+                nx = -pz;
+                nz = px;
+                rotatedState = blockMap.state.withRotation(Rotation.CLOCKWISE_90);
+            }
             BlockPos newPos = new BlockPos(startPos.getX() + nx, tempPos.getY(), startPos.getZ() + nz);
-            IBlockState rotatedState = blockMap.state.withRotation(Rotation.CLOCKWISE_90);
             posIntArrayList.add(GadgetUtils.relPosToInt(startPos, newPos));
             blockMapIntState.addToMap(rotatedState);
             stateIntArrayList.add((int) blockMapIntState.findSlot(rotatedState));

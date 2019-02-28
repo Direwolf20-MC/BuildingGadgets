@@ -1,7 +1,11 @@
 # Building Gadgets Changelog
 The format of this document is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and should continue to adhere to the conventions outlined in the Keep a Changelog guidelines.
 
-## [Unreleased] 
+## [Unreleased]
+### Added
+- The copy/paste gadget can now mirror pastes, as well as rotate them. Sneak while pressing the keybind that previously just rotated them to mirror them left-to-right instead.
+
+## [2.6.6] - 2019-02-27
 ### Added
 - Allowed gadgets to bind Applied Energistics 2 networks as a remote inventories.
 - Added gadget modes for:
