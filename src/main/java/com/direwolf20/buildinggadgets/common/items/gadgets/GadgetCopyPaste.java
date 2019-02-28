@@ -321,9 +321,8 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
 
             int px = (tempPos.getX() - startPos.getX());
             int pz = (tempPos.getZ() - startPos.getZ());
-
             int nx, nz;
-            IBlockState rotatedState;
+            IBlockState alteredState;
             if (player.isSneaking()) {
                 Mirror mirror;
                 if (player.getHorizontalFacing().getAxis() == Axis.X) {
@@ -335,18 +334,18 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
                     nz = pz;
                     mirror = Mirror.FRONT_BACK;
                 }
-                rotatedState = blockMap.state.withMirror(mirror);
+                alteredState = blockMap.state.withMirror(mirror);
             } else {
                 nx = -pz;
                 nz = px;
-                rotatedState = blockMap.state.withRotation(Rotation.CLOCKWISE_90);
+                alteredState = blockMap.state.withRotation(Rotation.CLOCKWISE_90);
             }
             BlockPos newPos = new BlockPos(startPos.getX() + nx, tempPos.getY(), startPos.getZ() + nz);
             posIntArrayList.add(GadgetUtils.relPosToInt(startPos, newPos));
-            blockMapIntState.addToMap(rotatedState);
-            stateIntArrayList.add((int) blockMapIntState.findSlot(rotatedState));
-            UniqueItem uniqueItem = BlockMapIntState.blockStateToUniqueItem(rotatedState, player, tempPos);
-            blockMapIntState.addToStackMap(uniqueItem, rotatedState);
+            blockMapIntState.addToMap(alteredState);
+            stateIntArrayList.add((int) blockMapIntState.findSlot(alteredState));
+            UniqueItem uniqueItem = BlockMapIntState.blockStateToUniqueItem(alteredState, player, tempPos);
+            blockMapIntState.addToStackMap(uniqueItem, alteredState);
         }
         int[] posIntArray = posIntArrayList.stream().mapToInt(i -> i).toArray();
         int[] stateIntArray = stateIntArrayList.stream().mapToInt(i -> i).toArray();
@@ -359,7 +358,8 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
         worldSave.addToMap(tool.getUUID(stack), tagCompound);
         worldSave.markForSaving();
         PacketHandler.INSTANCE.sendTo(new PacketBlockMap(tagCompound), (EntityPlayerMP) player);
-        player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.rotated").getUnformattedComponentText()), true);
+        player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA
+                + new TextComponentTranslation("message.gadget." + (player.isSneaking() ? "mirrored" : "rotated")).getUnformattedComponentText()), true);
     }
 
     public static void copyBlocks(ItemStack stack, EntityPlayer player, World world, BlockPos startPos, BlockPos endPos) {

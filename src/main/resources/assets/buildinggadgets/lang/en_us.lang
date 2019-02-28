@@ -85,6 +85,7 @@ message.gadget.pastefailed.linkcopied=Paste Failed. Please copy the raw json dat
 message.gadget.pastesuccess=Paste from Clipboard successful
 message.gadget.pastetoobig=Paste is too large
 message.gadget.rotated=Blocks Rotated
+message.gadget.mirrored=Blocks Mirrored
 message.gadget.toobigarea=Area too Large, max area is 125x125x125 (Right click empty air to reset)
 message.gadget.toolmode=Tool Mode
 message.gadget.toolrange= Tool Range
