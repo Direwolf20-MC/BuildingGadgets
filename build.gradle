@@ -8,17 +8,22 @@ buildscript {
         classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
     }
 }
+plugins {
+    id 'eclipse'
+    id 'idea'
+    id 'java'
+    id 'maven-publish'
+}
 apply plugin: 'net.minecraftforge.gradle'
-
-//Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
-apply plugin: 'eclipse'
-apply plugin: 'idea'
-
 version = "$version"
+def env = System.getenv()
+if (env.BUILD_NUMBER) {
+    version = version + "-" + "${env.BUILD_NUMBER}"
+}
 group = 'com.direwolf20.buildinggadgets' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'buildinggadgets'
-String forgeName = "$forge_base:$minecraft_version-$forge_version"
-String launcherName = "$forge_base:launcher:$minecraft_version-$forge_version"
+String forgeVersion = "$minecraft_version-${forge_major}.$forge_minor"
+String forgeName = "$forge_base:$forgeVersion"
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
 
 sourceSets {
@@ -147,30 +152,143 @@ dependencies {
 
 }
 
-/*
-processResources {
+processResources { //Processes main only resouces
     from(sourceSets.main.resources.srcDirs) {
         include 'META-INF/mods.toml'
-
-        expand 'version':"$version", 'mcversion':project.minecraft.version, 'updatejson':update_json
+        expand 'version':project.version,'forge_version':forgeVersion,'update_json':project.update_json
     }
 
     from(sourceSets.main.resources.srcDirs) {
         exclude 'META-INF/mods.toml'
     }
-}*/
+}
 
+task clearDoc (type: Delete) {
+    delete javadoc.destinationDir
+}
 // Example for how to get properties into the manifest for reading by the runtime..
 jar {
     manifest {
         attributes(["Specification-Title": "Buildinggadgets",
-                    //"Specification-Vendor": "examplemodsareus",
-                    "Specification-Version": "25.0", // We are version 1 of the modlauncher specification
-                    "Implementation-Title": project.name,
-                    "Implementation-Version": "${version}",
-                    //"Implementation-Vendor" :"examplemodsareus",
+                    "Specification-Version": forgeVersion, // We are version 1 of the modlauncher specification
+                    "Implementation-Title": project.archivesBaseName,
+                    "Implementation-Version": project.version,
                     "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")],)
     }
+    from sourceSets.main.output, sourceSets.api.output
+    dependsOn classes
+}
+
+task docJar(type: Jar, dependsOn: javadoc) {
+    manifest = jar.manifest
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    manifest = jar.manifest
+    classifier = 'sources'
+    from sourceSets.main.allSource, sourceSets.api.allSource
+}
+
+task apiJar (type:Jar, dependsOn:apiClasses) {
+    manifest {
+        attributes(["Specification-Title": "Buildinggadgets-API",
+                    "Specification-Version": forgeVersion, 
+                    "Implementation-Title": project.archivesBaseName+'-api',
+                    "Implementation-Version": project.api_version,
+                    "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")],)
+    }
+    version = project.api_version
+    appendix = 'api'
     from sourceSets.api.output
-    dependsOn apiClasses
+}
+
+task apiSourcesJar(type: Jar, dependsOn: apiClasses) {
+    manifest = apiJar.manifest
+    version = project.api_version
+    appendix = 'api'
+    classifier = 'sources'
+    from sourceSets.api.allSource
+}
+
+task apiDoc (type: Javadoc, dependsOn: clearDoc){
+    classpath = sourceSets.api.compileClasspath
+    exclude('com/dirwolf20/buildinggadgets/api') //no idea why, but this results in only the api doc being created - I thought this would be done by include
+    source = sourceSets.api.allJava
+}
+
+task apiDocJar(type: Jar, dependsOn: apiDoc) {
+    manifest = apiJar.manifest
+    version = project.api_version
+    appendix = 'api'
+    classifier = 'javadoc'
+    from apiDoc.destinationDir
+}
+
+task allApiJars {
+    dependsOn apiJar
+    dependsOn apiDocJar
+    dependsOn apiSourcesJar
+}
+
+task allImplementationJars {
+    dependsOn jar
+    dependsOn sourcesJar
+    dependsOn docJar
+}
+
+task allJars {
+    dependsOn allApiJars
+    dependsOn allImplementationJars
+}
+
+artifacts {
+    archives apiJar
+    archives apiDocJar
+    archives apiSourcesJar
+    archives jar
+    archives docJar
+    archives sourcesJar
+}
+
+publishing {
+    publications {
+        mavenApiJava(MavenPublication) {
+            groupId = project.group
+            artifactId = project.archivesBaseName+'-api'
+            version = project.api_version
+            artifact apiJar
+            artifact apiDocJar
+            artifact apiSourcesJar
+            pom {
+                name = "Buildinggadgets-API"
+                url = "https://github.com/Direwolf20-MC/BuildingGadgets"
+                developers  {
+                    'Direwolf20'
+                }
+                
+            }
+        }
+        mavenJava(MavenPublication) {
+            groupId = project.group
+            artifactId = project.archivesBaseName
+            version = project.version
+            artifact jar
+            artifact docJar
+            artifact sourcesJar
+            pom {
+                name = "Buildinggadgets"
+                url = "https://github.com/Direwolf20-MC/BuildingGadgets"
+                developers  {
+                    'Direwolf20'
+                }
+            }
+        }
+    }
+    repositories {
+        maven {
+            mavenCentral()
+        }
+    }
 }
