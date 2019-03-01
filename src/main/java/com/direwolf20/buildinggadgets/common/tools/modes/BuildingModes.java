@@ -54,6 +54,9 @@ public class BuildingModes {
         BlockPos pos = startBlock;
         boolean onTop = GadgetBuilding.shouldPlaceAtop(tool);
         int offset = onTop ? 1 : 0;
+        if (mode != GadgetBuilding.ToolMode.BuildToMe && mode != GadgetBuilding.ToolMode.Grid && mode != GadgetBuilding.ToolMode.Surface)
+            range -= 1 - offset;
+
         int bound = (range - 1) / 2;
         EnumFacing playerFacing = player.getHorizontalFacing();
         int boundX, boundZ;

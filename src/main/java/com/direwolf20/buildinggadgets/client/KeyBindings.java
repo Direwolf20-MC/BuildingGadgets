@@ -36,7 +36,7 @@ public class KeyBindings {
     }
 
     private static String getKey(String name) {
-        return String.format("key.%s.%s", Reference.MODID, name);
+        return String.join(".", "key", Reference.MODID, name);
     }
 
     public static class KeyConflictContextGadget implements IKeyConflictContext

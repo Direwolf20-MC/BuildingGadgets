@@ -108,7 +108,7 @@ public enum GuiMod {
 
             @Override
             public String getGuiID() {
-                return String.format("%s:%s", Reference.MODID, id);
+                return String.join(":", Reference.MODID, id);
             }
 
             @Override
