@@ -2,6 +2,7 @@ package com.direwolf20.buildinggadgets.common.building.modes;
 
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.building.IPlacementSequence;
+import com.direwolf20.buildinggadgets.common.building.IValidatorFactory;
 import com.direwolf20.buildinggadgets.common.building.placement.Grid;
 import com.direwolf20.buildinggadgets.common.tools.GadgetUtils;
 import net.minecraft.block.state.IBlockState;
@@ -12,6 +13,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
+import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
 
@@ -22,7 +24,7 @@ public class GridMode extends AbstractMode {
     private static final int DEFAULT_PERIOD_SIZE = 6;
     private static final ResourceLocation NAME = new ResourceLocation(BuildingGadgets.MODID, "grid");
 
-    public GridMode(Function<World, BiPredicate<BlockPos, IBlockState>> validatorFactory) {
+    public GridMode(IValidatorFactory validatorFactory) {
         super(validatorFactory);
     }
 

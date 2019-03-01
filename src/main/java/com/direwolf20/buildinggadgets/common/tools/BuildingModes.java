@@ -30,7 +30,7 @@ public enum BuildingModes {
     HorizontalWall("horizontal_wall.png", new HorizontalWallMode(BuildingModes::combineTester)),
     Stair("stairs.png", new StairMode(BuildingModes::combineTester)),
     Grid("grid.png", new GridMode(BuildingModes::combineTester)),
-    Surface("surface.png", new SurfaceMode(BuildingModes::combineTester));
+    Surface("surface.png", new BuildingSurfaceMode(BuildingModes::combineTester));
 
     private final String displayName;
     private final ResourceLocation icon;
@@ -64,9 +64,9 @@ public enum BuildingModes {
         return values[(this.ordinal() + 1) % values.length];
     }
 
-    public static List<BlockPos> collectPlacementPos(World world, EntityPlayer player, BlockPos hit, EnumFacing sideHit, ItemStack tool) {
+    public static List<BlockPos> collectPlacementPos(World world, EntityPlayer player, BlockPos hit, EnumFacing sideHit, ItemStack tool, BlockPos initial) {
         IBuildingMode mode = byName(NBTTool.getOrNewTag(tool).getString("mode")).getModeImplementation();
-        return mode.createExecutionContext(player, hit, sideHit, tool).collectFilteredSequence(world);
+        return mode.createExecutionContext(player, hit, sideHit, tool).collectFilteredSequence(world, tool, player, initial);
     }
 
     public static BuildingModes byName(String name) {
@@ -84,7 +84,7 @@ public enum BuildingModes {
         return ICONS;
     }
 
-    public static BiPredicate<BlockPos, IBlockState> combineTester(World world) {
+    public static BiPredicate<BlockPos, IBlockState> combineTester(World world, ItemStack tool, EntityPlayer player, BlockPos initial) {
         return (pos, state) -> {
             if (!state.getBlock().canPlaceBlockAt(world, pos) || world.isOutsideBuildHeight(pos)) {
                 return false;

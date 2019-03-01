@@ -2,7 +2,8 @@ package com.direwolf20.buildinggadgets.common.building.modes;
 
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.building.IPlacementSequence;
-import com.direwolf20.buildinggadgets.common.building.placement.ConditionlessSurface;
+import com.direwolf20.buildinggadgets.common.building.IValidatorFactory;
+import com.direwolf20.buildinggadgets.common.building.placement.Surface;
 import com.direwolf20.buildinggadgets.common.building.placement.ConnectedSurface;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
 import com.direwolf20.buildinggadgets.common.tools.GadgetUtils;
@@ -14,14 +15,14 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
+import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
-import java.util.function.Function;
 
-public class SurfaceMode extends AbstractMode {
+public class BuildingSurfaceMode extends AbstractMode {
 
     private static final ResourceLocation NAME = new ResourceLocation(BuildingGadgets.MODID, "surface");
 
-    public SurfaceMode(Function<World, BiPredicate<BlockPos, IBlockState>> validatorFactory) {
+    public BuildingSurfaceMode(IValidatorFactory validatorFactory) {
         super(validatorFactory);
     }
 
@@ -30,9 +31,9 @@ public class SurfaceMode extends AbstractMode {
         int range = GadgetUtils.getToolRange(tool);
         boolean fuzzy = GadgetGeneric.getFuzzy(tool);
         if (GadgetGeneric.getConnectedArea(tool)) {
-            return ConnectedSurface.create(player.world, hit, sideHit, range, fuzzy);
+            return ConnectedSurface.create(player.world, hit.offset(sideHit), sideHit.getOpposite(), range, fuzzy);
         }
-        return ConditionlessSurface.create(player.world, hit, sideHit, range, fuzzy);
+        return Surface.create(player.world, hit.offset(sideHit), sideHit.getOpposite(), range, fuzzy);
     }
 
     @Override

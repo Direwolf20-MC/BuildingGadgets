@@ -3,10 +3,13 @@ package com.direwolf20.buildinggadgets.common.building;
 import com.google.common.collect.AbstractIterator;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 import java.util.Iterator;
+import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
 
@@ -19,13 +22,13 @@ public class Context {
 
     private final IPlacementSequence positions;
     private final IBlockProvider blocks;
-    private final Function<World, BiPredicate<BlockPos, IBlockState>> validatorFactory;
+    private final IValidatorFactory validatorFactory;
 
     /**
-     * @see Context#Context(IPlacementSequence, IBlockProvider, Function)
+     * @see Context#Context(IPlacementSequence, IBlockProvider, IValidatorFactory)
      */
     public Context(IPlacementSequence positions, IBlockProvider blocks) {
-        this(positions, blocks, world -> (pos, state) -> true);
+        this(positions, blocks, (world, stack, player, initial) -> (pos, state) -> true);
     }
 
     /**
@@ -33,28 +36,12 @@ public class Context {
      * Note that it is assumed that this method will return a block provider uses the first value returned by the first value by {@link #positions} as its translate.
      * </p>
      */
-    public Context(IPlacementSequence positions, IBlockProvider blocks, Function<World, BiPredicate<BlockPos, IBlockState>> validatorFactory) {
+    public Context(IPlacementSequence positions, IBlockProvider blocks, IValidatorFactory validatorFactory) {
         this.positions = positions;
         this.blocks = blocks;
         this.validatorFactory = validatorFactory;
     }
 
-    /**
-     * Set block states in the world at positions provided by the {@link #getPositionSequence()}.
-     *
-     * @param world the world that is affected
-     */
-    public void placeIn(World world) {
-        Iterator<BlockPos> it = positions.iterator();
-        BiPredicate<BlockPos, IBlockState> validator = validatorFactory.apply(world);
-        while (it.hasNext()) {
-            BlockPos pos = it.next();
-            IBlockState target = blocks.at(pos);
-            if (validator.test(pos, target)) {
-                world.setBlockState(pos, target);
-            }
-        }
-    }
 
     public IPlacementSequence getPositionSequence() {
         return positions;
@@ -66,9 +53,9 @@ public class Context {
      *
      * @return {@link AbstractIterator} that wraps {@code getPositionSequence().iterator()}
      */
-    public Iterator<BlockPos> getFilteredSequence(World world) {
+    public Iterator<BlockPos> getFilteredSequence(World world, ItemStack stack, EntityPlayer player, BlockPos initial) {
         Iterator<BlockPos> positions = getPositionSequence().iterator();
-        BiPredicate<BlockPos, IBlockState> validator = validatorFactory.apply(world);
+        BiPredicate<BlockPos, IBlockState> validator = validatorFactory.createValidatorFor(world, stack, player, initial);
         return new AbstractIterator<BlockPos>() {
             @Override
             protected BlockPos computeNext() {
@@ -86,15 +73,15 @@ public class Context {
     /**
      * @see IPlacementSequence#collect()
      */
-    public ImmutableList<BlockPos> collectFilteredSequence(World world) {
-        return ImmutableList.copyOf(getFilteredSequence(world));
+    public ImmutableList<BlockPos> collectFilteredSequence(World world, ItemStack stack, EntityPlayer player, BlockPos initial) {
+        return ImmutableList.copyOf(getFilteredSequence(world, stack, player, initial));
     }
 
     public IBlockProvider getBlockProvider() {
         return blocks;
     }
 
-    public Function<World, BiPredicate<BlockPos, IBlockState>> getValidatorFactory() {
+    public IValidatorFactory getValidatorFactory() {
         return validatorFactory;
     }
 

@@ -52,7 +52,7 @@ public class ConnectedSurfaceTest {
         CasedBlockView world = regionAtOriginWithRandomTargets(5, 30);
 
         for (EnumFacing side : EnumFacing.VALUES) {
-            ConnectedSurface surface = ConnectedSurface.create(world, BlockPos.ORIGIN, side, 5, false);
+            ConnectedSurface surface = ConnectedSurface.create(world, BlockPos.ORIGIN.offset(side), side.getOpposite(), 5, false);
             Set<BlockPos> calculated = surface.collect(new ObjectOpenHashSet<>());
 
             int expected = VectorTools.getAxisValue(BlockPos.ORIGIN.offset(side), side.getAxis());

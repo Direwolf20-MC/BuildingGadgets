@@ -4,6 +4,14 @@ public final class MathTool {
 
     private MathTool() {}
 
+    public static int floorMultiple(int i, int factor) {
+        return i - (i % factor);
+    }
+
+    public static int ceilMultiple(int i, int factor) {
+        return i + (i % factor);
+    }
+
     public static boolean isEven(int i) {
         return (i & 1) == 0;
     }

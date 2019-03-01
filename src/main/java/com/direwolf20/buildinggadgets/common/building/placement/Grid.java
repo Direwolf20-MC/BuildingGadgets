@@ -2,6 +2,7 @@ package com.direwolf20.buildinggadgets.common.building.placement;
 
 import com.direwolf20.buildinggadgets.common.building.IPlacementSequence;
 import com.direwolf20.buildinggadgets.common.building.Region;
+import com.direwolf20.buildinggadgets.common.tools.MathTool;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.AbstractIterator;
 import net.minecraft.util.EnumFacing;
@@ -66,17 +67,15 @@ public final class Grid implements IPlacementSequence {
     @Override
     @Nonnull
     public Iterator<BlockPos> iterator() {
-        //In parenthesis: arithmetic sequence to periodic sequence (-1 to shift the sequence to start at 0, +1 to shift the sequence back to staring at 1)
-        int distance = (range - 1) % periodSize + 1;
         //Distance between blocks + block itself
-        int change = distance + 1;
+        //Arithmetic sequence of [2,7]
+        //-1 for range being 1~15, +2 to shift the sequence from [0,6] to [2,7]
+        int period = (range - 1) % periodSize + 2;
 
-        //TODO better size calculation that isn't funky
-//        //-1 for periodSize being inclusive
-//        int period = (range - 1) % periodSize;
-
-        int start = -range - 1;
-        int end = range + 1;
+        //Random design choice by Dire
+        int end = (range + 1) * 7 / 5;
+        //Floor to the nearest multiple of period
+        int start = MathTool.floorMultiple(-end, period);
 
         return new AbstractIterator<BlockPos>() {
             private int x = start;
@@ -90,10 +89,10 @@ public final class Grid implements IPlacementSequence {
 
                 BlockPos pos = new BlockPos(center.getX() + x, center.getY(), center.getZ() + z);
 
-                x += change;
+                x += period;
                 if (x > end) {
                     x = start;
-                    z += change;
+                    z += period;
                 }
 
                 return pos;

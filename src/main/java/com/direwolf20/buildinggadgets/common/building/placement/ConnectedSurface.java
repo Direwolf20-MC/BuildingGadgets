@@ -17,51 +17,47 @@ import javax.annotation.Nonnull;
 import java.util.ArrayDeque;
 import java.util.Iterator;
 import java.util.Queue;
+import java.util.function.Function;
 
 public final class ConnectedSurface implements IPlacementSequence {
 
     /**
-     * @param world  Block access for searching reference
-     * @param center Center of the region for reference
-     * @param side   Facing to offset from the {@code center} to get to the region to search
+     * @param world           Block access for searching reference
+     * @param searchingCenter Center of the searching region
+     * @param side            Facing to offset from the {@code searchingCenter} to get to the reference region center
      */
-    public static ConnectedSurface create(IBlockAccess world, BlockPos center, EnumFacing side, int range, boolean fuzzy) {
-        return new ConnectedSurface(world, center, side, range, fuzzy);
+    public static ConnectedSurface create(IBlockAccess world, BlockPos searchingCenter, EnumFacing side, int range, boolean fuzzy) {
+        Region searchingRegion = Wall.clickedSide(searchingCenter, side, range).getBoundingBox();
+        return create(world, searchingRegion, pos -> pos.offset(side), searchingCenter, side, fuzzy);
+    }
+
+    public static ConnectedSurface create(IBlockAccess world, Region searchingRegion, Function<BlockPos, BlockPos> searching2referenceMapper, BlockPos searchingCenter, EnumFacing side, boolean fuzzy) {
+        return new ConnectedSurface(world, searchingRegion, searching2referenceMapper, searchingCenter, side, fuzzy);
     }
 
     private final IBlockAccess world;
-    private final Region region;
-    private final BlockPos center;
+    private final Region searchingRegion;
+    private final Function<BlockPos, BlockPos> searching2referenceMapper;
+    private final BlockPos searchingCenter;
     private final EnumFacing side;
     private final boolean fuzzy;
 
     @VisibleForTesting
-    private ConnectedSurface(IBlockAccess world, BlockPos center, EnumFacing side, int range, boolean fuzzy) {
+    private ConnectedSurface(IBlockAccess world, Region searchingRegion, Function<BlockPos, BlockPos> searching2referenceMapper, BlockPos searchingCenter, EnumFacing side, boolean fuzzy) {
         this.world = world;
-        this.region = Wall.clickedSide(center.offset(side), side, range).getBoundingBox();
-        this.center = center.toImmutable();
+        this.searchingRegion = searchingRegion;
+        this.searching2referenceMapper = searching2referenceMapper;
+        this.searchingCenter = searchingCenter;
         this.side = side;
         this.fuzzy = fuzzy;
     }
 
     /**
-     * For {@link #copy()}
-     */
-    @VisibleForTesting
-    private ConnectedSurface(IBlockAccess world, Region region, BlockPos center, EnumFacing side, boolean fuzzy) {
-        this.world = world;
-        this.region = region;
-        this.center = center;
-        this.side = side;
-        this.fuzzy = fuzzy;
-    }
-
-    /**
-     * The bounding box of the region that is being searched.
+     * The bounding box of the searchingRegion that is being searched.
      */
     @Override
     public Region getBoundingBox() {
-        return region;
+        return searchingRegion;
     }
 
     /**
@@ -72,7 +68,7 @@ public final class ConnectedSurface implements IPlacementSequence {
      */
     @Override
     public boolean mayContain(int x, int y, int z) {
-        return region.mayContain(x, y, z);
+        return searchingRegion.mayContain(x, y, z);
     }
 
     /**
@@ -81,7 +77,7 @@ public final class ConnectedSurface implements IPlacementSequence {
     @Deprecated
     @Override
     public IPlacementSequence copy() {
-        return new ConnectedSurface(world, region, center, side, fuzzy);
+        return new ConnectedSurface(world, searchingRegion, searching2referenceMapper, searchingCenter, side, fuzzy);
     }
 
     /**
@@ -90,16 +86,15 @@ public final class ConnectedSurface implements IPlacementSequence {
     @Nonnull
     @Override
     public Iterator<BlockPos> iterator() {
-        IBlockState selectedBlock = world.getBlockState(center);
-        BlockPos searchCenter = center.offset(side);
+        IBlockState selectedBlock = getReferenceFor(searchingCenter);
 
         return new AbstractIterator<BlockPos>() {
-            private Queue<BlockPos> queue = new ArrayDeque<>(region.size());
+            private Queue<BlockPos> queue = new ArrayDeque<>(searchingRegion.size());
             private ObjectSet<BlockPos> searched = new ObjectOpenHashSet<>();
 
             {
-                queue.add(searchCenter);
-                searched.add(searchCenter);
+                queue.add(searchingCenter);
+                searched.add(searchingCenter);
             }
 
             @Override
@@ -118,8 +113,7 @@ public final class ConnectedSurface implements IPlacementSequence {
                         boolean isSearched = searched.contains(neighbor);
                         searched.add(neighbor);
 
-                        //If fuzzy=true, we ignore the block for reference
-                        if (isSearched || !region.contains(neighbor) || !isStateValid(selectedBlock, getReferenceFor(neighbor))) {
+                        if (isSearched || !searchingRegion.contains(neighbor) || !isStateValid(selectedBlock, getReferenceFor(neighbor))) {
                             continue;
                         }
 
@@ -134,14 +128,15 @@ public final class ConnectedSurface implements IPlacementSequence {
 
     private boolean isStateValid(IBlockState filter, IBlockState reference) {
         boolean isAir = reference.getMaterial() == Material.AIR;
+        //If fuzzy=true, we ignore the block for reference
         if (fuzzy) {
             return !isAir;
         }
         return !isAir && filter == reference;
     }
 
-    private IBlockState getReferenceFor(BlockPos searchPos) {
-        return world.getBlockState(searchPos.offset(side.getOpposite()));
+    private IBlockState getReferenceFor(BlockPos pos) {
+        return world.getBlockState(searching2referenceMapper.apply(pos));
     }
 
     //TODO use a bit set for iterator
@@ -153,11 +148,11 @@ public final class ConnectedSurface implements IPlacementSequence {
 //        Axis ignore = side.getAxis();
 //        switch (ignore) {
 //            case X:
-//                return relative.getY() * region.getZSize() + relative.getZ();
+//                return relative.getY() * searchingRegion.getZSize() + relative.getZ();
 //            case Y:
-//                return relative.getX() * region.getZSize() + relative.getZ();
+//                return relative.getX() * searchingRegion.getZSize() + relative.getZ();
 //            case Z:
-//                return relative.getY() * region.getXSize() + relative.getX();
+//                return relative.getY() * searchingRegion.getXSize() + relative.getX();
 //        }
 //        throw new IllegalArgumentException();
 //    }

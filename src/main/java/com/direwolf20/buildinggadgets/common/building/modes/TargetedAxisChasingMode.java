@@ -2,6 +2,7 @@ package com.direwolf20.buildinggadgets.common.building.modes;
 
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.building.IPlacementSequence;
+import com.direwolf20.buildinggadgets.common.building.IValidatorFactory;
 import com.direwolf20.buildinggadgets.common.building.placement.Column;
 import com.direwolf20.buildinggadgets.common.building.placement.ExclusiveAxisChasing;
 import net.minecraft.block.state.IBlockState;
@@ -12,6 +13,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
+import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
 
@@ -22,7 +24,7 @@ public class TargetedAxisChasingMode extends AbstractMode {
 
     private static final ResourceLocation NAME = new ResourceLocation(BuildingGadgets.MODID, "axis_chasing");
 
-    public TargetedAxisChasingMode(Function<World, BiPredicate<BlockPos, IBlockState>> validatorFactory) {
+    public TargetedAxisChasingMode(IValidatorFactory validatorFactory) {
         super(validatorFactory);
     }
 

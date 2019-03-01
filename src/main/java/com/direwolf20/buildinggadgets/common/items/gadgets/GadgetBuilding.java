@@ -147,7 +147,7 @@ public class GadgetBuilding extends GadgetGeneric {
             }
             BlockPos startBlock = lookingAt.getBlockPos();
             EnumFacing sideHit = lookingAt.sideHit;
-            coords = BuildingModes.collectPlacementPos(world, player, startBlock, sideHit, stack);
+            coords = BuildingModes.collectPlacementPos(world, player, startBlock, sideHit, stack, startBlock);
         } else { //If we do have an anchor, erase it (Even if the build fails)
             setAnchor(stack, new ArrayList<BlockPos>());
         }

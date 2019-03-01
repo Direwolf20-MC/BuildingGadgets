@@ -12,38 +12,47 @@ import net.minecraft.world.IBlockAccess;
 
 import javax.annotation.Nonnull;
 import java.util.Iterator;
+import java.util.function.Function;
 
-public final class ConditionlessSurface implements IPlacementSequence {
+public final class Surface implements IPlacementSequence {
 
     /**
-     * @param world  Block access for searching reference
-     * @param center Center of the region for reference
-     * @param side   Facing to offset from the {@code center} to get to the center of the region to search
+     * @param world           Block access for searching reference
+     * @param searchingCenter Center of the searching region
+     * @param side            Facing to offset from the {@code searchingCenter} to get to the reference region center
      */
-    public static ConditionlessSurface create(IBlockAccess world, BlockPos center, EnumFacing side, int range, boolean fuzzy) {
-        return new ConditionlessSurface(world, center, side, range, fuzzy);
+    public static Surface create(IBlockAccess world, BlockPos searchingCenter, EnumFacing side, int range, boolean fuzzy) {
+        Region searchingRegion = Wall.clickedSide(searchingCenter, side, range).getBoundingBox();
+        return create(world, searchingCenter, searchingRegion, pos -> pos.offset(side), fuzzy);
+    }
+
+    public static Surface create(IBlockAccess world, BlockPos center, Region searchingRegion, Function<BlockPos, BlockPos> searching2referenceMapper, boolean fuzzy) {
+        return new Surface(world, center, searchingRegion, searching2referenceMapper, fuzzy);
     }
 
     private final IBlockAccess world;
     private final IBlockState selectedBase;
+    private final Function<BlockPos, BlockPos> searching2referenceMapper;
     private final Region searchingRegion;
-    private final EnumFacing side;
     private final boolean fuzzy;
 
     @VisibleForTesting
-    private ConditionlessSurface(IBlockAccess world, BlockPos center, EnumFacing side, int range, boolean fuzzy) {
+    private Surface(IBlockAccess world, BlockPos center, Region searchingRegion, Function<BlockPos, BlockPos> searching2referenceMapper, boolean fuzzy) {
         this.world = world;
-        this.selectedBase = world.getBlockState(center);
-        this.searchingRegion = Wall.clickedSide(center.offset(side), side, range).getBoundingBox();
-        this.side = side;
+        this.selectedBase = world.getBlockState(searching2referenceMapper.apply(center));
+        this.searchingRegion = searchingRegion;
+        this.searching2referenceMapper = searching2referenceMapper;
         this.fuzzy = fuzzy;
     }
 
-    private ConditionlessSurface(IBlockAccess world, IBlockState selectedBase, Region searchingRegion, EnumFacing side, boolean fuzzy) {
+    /**
+     * For {@link #copy()}
+     */
+    private Surface(IBlockAccess world, IBlockState selectedBase, Function<BlockPos, BlockPos> searching2referenceMapper, Region searchingRegion, boolean fuzzy) {
         this.world = world;
         this.selectedBase = selectedBase;
+        this.searching2referenceMapper = searching2referenceMapper;
         this.searchingRegion = searchingRegion;
-        this.side = side;
         this.fuzzy = fuzzy;
     }
 
@@ -62,12 +71,12 @@ public final class ConditionlessSurface implements IPlacementSequence {
     }
 
     /**
-     * @deprecated ConditionlessSurface should be immutable, so this is not needed
+     * @deprecated Surface should be immutable, so this is not needed
      */
     @Deprecated
     @Override
     public IPlacementSequence copy() {
-        return new ConditionlessSurface(world, selectedBase, searchingRegion, side, fuzzy);
+        return new Surface(world, selectedBase, searching2referenceMapper, searchingRegion, fuzzy);
     }
 
     @Nonnull
@@ -80,7 +89,7 @@ public final class ConditionlessSurface implements IPlacementSequence {
             protected BlockPos computeNext() {
                 while (it.hasNext()) {
                     BlockPos pos = it.next();
-                    IBlockState baseBlock = getBaseBlockFor(pos);
+                    IBlockState baseBlock = world.getBlockState(searching2referenceMapper.apply(pos));
                     if ((fuzzy || baseBlock == selectedBase) && baseBlock.getMaterial() != Material.AIR) {
                         return pos;
                     }
@@ -88,10 +97,6 @@ public final class ConditionlessSurface implements IPlacementSequence {
                 return endOfData();
             }
         };
-    }
-
-    private IBlockState getBaseBlockFor(BlockPos pos) {
-        return world.getBlockState(pos.offset(side.getOpposite()));
     }
 
 }

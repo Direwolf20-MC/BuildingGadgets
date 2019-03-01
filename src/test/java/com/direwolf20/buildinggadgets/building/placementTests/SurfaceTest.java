@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.building.placementTests;
 
 import com.direwolf20.buildinggadgets.common.building.Region;
-import com.direwolf20.buildinggadgets.common.building.placement.ConditionlessSurface;
+import com.direwolf20.buildinggadgets.common.building.placement.Surface;
 import com.direwolf20.buildinggadgets.util.CasedBlockView;
 import com.google.common.collect.Sets;
 import net.minecraft.util.EnumFacing;
@@ -13,7 +13,7 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class ConditionlessSurfaceTest {
+public class SurfaceTest {
 
     private static final Random random = new Random();
 
@@ -21,7 +21,7 @@ public class ConditionlessSurfaceTest {
     void iteratorShouldIgnoreBaseBlock() {
         Region region = new Region(-2, 0, -2, 2, 0, 2);
         CasedBlockView world = new CasedBlockView(region, CasedBlockView.base, CasedBlockView.target);
-        ConditionlessSurface surface = ConditionlessSurface.create(world, BlockPos.ORIGIN, EnumFacing.UP, 5, false);
+        Surface surface = Surface.create(world, BlockPos.ORIGIN, EnumFacing.UP, 5, false);
 
         Set<BlockPos> expected = Sets.newHashSet(region);
         for (BlockPos pos : surface) {
