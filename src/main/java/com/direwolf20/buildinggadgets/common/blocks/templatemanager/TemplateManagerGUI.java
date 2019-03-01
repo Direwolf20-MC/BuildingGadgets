@@ -16,11 +16,10 @@ import com.direwolf20.buildinggadgets.common.network.packets.PacketTemplateManag
 import com.direwolf20.buildinggadgets.common.network.packets.PacketTemplateManagerPaste;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketTemplateManagerSave;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
+import com.direwolf20.buildinggadgets.common.utils.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.utils.buffers.PasteToolBufferBuilder;
 import com.direwolf20.buildinggadgets.common.utils.buffers.ToolBufferBuilder;
-import com.direwolf20.buildinggadgets.common.utils.GadgetUtils;
-
-import com.direwolf20.buildinggadgets.common.utils.Reference;
+import com.direwolf20.buildinggadgets.common.utils.ref.Reference;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiTextField;
@@ -38,15 +37,13 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
-
 import org.lwjgl.opengl.GL11;
 
+import javax.annotation.Nullable;
 import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.annotation.Nullable;
 
 public class TemplateManagerGUI extends GuiContainer {
     public static final int HELP_TEXT_BACKGROUNG_COLOR = 1694460416;

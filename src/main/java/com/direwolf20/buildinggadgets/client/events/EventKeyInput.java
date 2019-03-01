@@ -4,13 +4,8 @@ import com.direwolf20.buildinggadgets.client.KeyBindings;
 import com.direwolf20.buildinggadgets.client.gui.ModeRadialMenu;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
-import com.direwolf20.buildinggadgets.common.network.packets.PacketAnchorKey;
-import com.direwolf20.buildinggadgets.common.network.packets.PacketChangeRange;
-import com.direwolf20.buildinggadgets.common.network.packets.PacketToggleConnectedArea;
-import com.direwolf20.buildinggadgets.common.network.packets.PacketToggleFuzzy;
-import com.direwolf20.buildinggadgets.common.network.packets.PacketUndoKey;
-
-import com.direwolf20.buildinggadgets.common.utils.Reference;
+import com.direwolf20.buildinggadgets.common.network.packets.*;
+import com.direwolf20.buildinggadgets.common.utils.ref.Reference;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.item.ItemStack;

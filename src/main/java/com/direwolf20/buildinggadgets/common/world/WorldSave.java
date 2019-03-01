@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.common.world;
 
+import com.direwolf20.buildinggadgets.common.utils.ref.Reference;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.world.World;
@@ -8,9 +9,6 @@ import net.minecraft.world.storage.WorldSavedData;
 import net.minecraftforge.common.util.Constants;
 
 import javax.annotation.Nonnull;
-
-import com.direwolf20.buildinggadgets.common.utils.Reference;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;

@@ -14,7 +14,6 @@ import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.client.registry.IRenderFactory;
 
 import javax.annotation.Nullable;
 
@@ -157,16 +156,6 @@ public class BlockBuildEntityRender extends Render<BlockBuildEntity> {
     @Override
     protected ResourceLocation getEntityTexture(BlockBuildEntity entity) {
         return null;
-    }
-
-
-    public static class Factory implements IRenderFactory<BlockBuildEntity> {
-
-        @Override
-        public Render<? super BlockBuildEntity> createRenderFor(RenderManager manager) {
-            return new BlockBuildEntityRender(manager);
-        }
-
     }
 
 }

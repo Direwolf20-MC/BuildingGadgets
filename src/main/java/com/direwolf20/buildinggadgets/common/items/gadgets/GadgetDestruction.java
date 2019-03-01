@@ -7,7 +7,6 @@ import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
 import com.direwolf20.buildinggadgets.common.utils.CapabilityUtil.EnergyUtil;
 import com.direwolf20.buildinggadgets.common.utils.GadgetUtils;
-import com.direwolf20.buildinggadgets.common.utils.Reference;
 import com.direwolf20.buildinggadgets.common.utils.blocks.BlockMapIntState;
 import com.direwolf20.buildinggadgets.common.utils.exceptions.CapabilityNotPresentException;
 import com.direwolf20.buildinggadgets.common.utils.helpers.VectorHelper;
@@ -23,8 +22,11 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.*;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.EnumActionResult;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumFacing.Axis;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
@@ -45,8 +47,6 @@ import javax.annotation.Nullable;
 import java.util.*;
 
 public class GadgetDestruction extends GadgetGeneric {
-
-    public static final ResourceLocation REGISTRY_NAME = new ResourceLocation(Reference.MODID,"gadget_destruction");
 
     public GadgetDestruction(Properties builder) {
         super(builder.defaultMaxDamage(Config.GADGETS.GADGET_DESTRUCTION.durability.get()));
