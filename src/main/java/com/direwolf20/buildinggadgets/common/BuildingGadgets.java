@@ -4,6 +4,7 @@ import com.direwolf20.buildinggadgets.api.APIProxy;
 import com.direwolf20.buildinggadgets.client.ClientProxy;
 import com.direwolf20.buildinggadgets.client.gui.GuiMod;
 import com.direwolf20.buildinggadgets.common.commands.BlockMapCommand;
+import com.direwolf20.buildinggadgets.common.config.ApiConfig;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.events.AnvilRepairHandler;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
@@ -48,10 +49,13 @@ public class BuildingGadgets {
 
     public BuildingGadgets() {
         IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus();
-        theApi = new APIProxy(eventBus, MinecraftForge.EVENT_BUS);
         // @todo handle Config properly as soon as Forge fixes it's "I dont load Server Config" bug
         ModLoadingContext.get().registerConfig(Type.CLIENT, Config.CLIENT_CONFIG);
         ModLoadingContext.get().registerConfig(Type.SERVER, Config.SERVER_CONFIG);
+
+        loadConfig(Config.CLIENT_CONFIG, FMLPaths.CONFIGDIR.get().resolve("buildinggadgets-client.toml"));
+        loadConfig(Config.SERVER_CONFIG, FMLPaths.CONFIGDIR.get().resolve("buildinggadgets-server.toml"));
+        theApi = new APIProxy(eventBus, MinecraftForge.EVENT_BUS, new ApiConfig());
 
         eventBus.addListener(this::setup);
         eventBus.addListener(this::serverLoad);
@@ -65,9 +69,6 @@ public class BuildingGadgets {
             eventBus.addListener((Consumer<FMLClientSetupEvent>) event -> ClientProxy.clientSetup());
             ModLoadingContext.get().registerExtensionPoint(ExtensionPoint.GUIFACTORY, () -> GuiMod::openScreen);
         });
-
-        loadConfig(Config.CLIENT_CONFIG, FMLPaths.CONFIGDIR.get().resolve("buildinggadgets-client.toml"));
-        loadConfig(Config.SERVER_CONFIG, FMLPaths.CONFIGDIR.get().resolve("buildinggadgets-server.toml"));
 
         BuildingObjects.init();
     }
