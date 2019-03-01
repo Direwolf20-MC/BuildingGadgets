@@ -1,4 +1,4 @@
-package com.direwolf20.buildinggadgets.common.integration;
+package com.direwolf20.buildinggadgets.common.integration.mods;
 
 import mrriegel.storagenetwork.api.IStorageNetworkHelpers;
 import mrriegel.storagenetwork.api.IStorageNetworkPlugin;
