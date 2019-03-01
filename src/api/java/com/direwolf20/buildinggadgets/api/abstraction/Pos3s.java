@@ -2,6 +2,8 @@ package com.direwolf20.buildinggadgets.api.abstraction;
 
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.Rotation;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.util.math.Vec3i;
 
 import static com.google.common.primitives.Shorts.checkedCast;
@@ -166,6 +168,14 @@ public class Pos3s implements Comparable<Pos3s> {
      */
     public ImmutablePos3s toImmutable() {
         return new ImmutablePos3s(x, y, z);
+    }
+
+    public BlockPos toBlockPos() {
+        return new BlockPos(x, y, z);
+    }
+
+    public MutableBlockPos toMutableBlockPos() {
+        return new MutableBlockPos(x, y, z);
     }
 
     /**
