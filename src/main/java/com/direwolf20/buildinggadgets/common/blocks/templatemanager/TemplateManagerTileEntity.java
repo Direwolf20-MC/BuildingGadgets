@@ -9,6 +9,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
@@ -16,6 +17,8 @@ import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.items.ItemStackHandler;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import java.util.Set;
 
 public class TemplateManagerTileEntity extends TileEntity {
@@ -24,6 +27,10 @@ public class TemplateManagerTileEntity extends TileEntity {
     private static final Set<Item> allowedItemsRight = ImmutableSet.of(Items.PAPER, BGItems.template);
 
     public static final int SIZE = 2;
+
+    public TemplateManagerTileEntity() {
+        super(BGTileEntities.TEMPLATE_MANAGER_TYPE);
+    }
 
     // This item handler will hold our inventory slots
     private ItemStackHandler itemStackHandler = new ItemStackHandler(SIZE) {
@@ -57,10 +64,6 @@ public class TemplateManagerTileEntity extends TileEntity {
         }
     };
 
-    public TemplateManagerTileEntity() {
-        super(BGTileEntities.TEMPLATE_MANAGER_TYPE);
-    }
-
     @Override
     public void read(NBTTagCompound compound) {
         super.read(compound);
@@ -83,12 +86,12 @@ public class TemplateManagerTileEntity extends TileEntity {
 
     @Nonnull
     @Override
-    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap) {
+    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, final @Nullable EnumFacing side) {
         if (cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
             return LazyOptional.of(() -> itemStackHandler).cast();
         }
 
-        return LazyOptional.empty();
+        return super.getCapability(cap, side);
     }
 
     public TemplateManagerContainer getContainer(EntityPlayer playerIn) {

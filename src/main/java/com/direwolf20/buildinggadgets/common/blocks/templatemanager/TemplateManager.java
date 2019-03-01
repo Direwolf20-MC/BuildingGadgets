@@ -1,13 +1,18 @@
 package com.direwolf20.buildinggadgets.common.blocks.templatemanager;
 
 import com.direwolf20.buildinggadgets.client.gui.GuiMod;
+import com.direwolf20.buildinggadgets.common.items.ITemplate;
+import com.direwolf20.buildinggadgets.common.network.PacketHandler;
+import com.direwolf20.buildinggadgets.common.network.packets.PacketBlockMap;
 import com.direwolf20.buildinggadgets.common.utils.Reference;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.state.DirectionProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.state.properties.BlockStateProperties;
@@ -28,8 +33,7 @@ public class TemplateManager extends Block {
 
     public TemplateManager(Properties builder) {
         super(builder);
-
-        this.setDefaultState(this.getStateContainer().getBaseState().with(FACING, EnumFacing.NORTH));
+        setDefaultState(getStateContainer().getBaseState().with(FACING, EnumFacing.NORTH));
     }
 
     @Override
@@ -41,7 +45,7 @@ public class TemplateManager extends Block {
     @Nullable
     @Override
     public IBlockState getStateForPlacement(BlockItemUseContext context) {
-        return this.getDefaultState().with(FACING, context.getPlayer().getHorizontalFacing().getOpposite());
+        return getDefaultState().with(FACING, context.getPlacementHorizontalFacing().getOpposite());
     }
 
     @Override
@@ -65,40 +69,38 @@ public class TemplateManager extends Block {
         if (!(te instanceof TemplateManagerTileEntity)) {
             return false;
         }
-//      TODO 1.13
-//        TemplateManagerContainer container = ((TemplateManagerTileEntity) te).getContainer(player);
-//        for (int i = 0; i <= 1; i++) {
-//            ItemStack itemStack = container.getSlot(i).getStack();
-//            if (!(itemStack.getItem() instanceof ITemplate)) continue;
-//
-//            ITemplate template = (ITemplate) itemStack.getItem();
-//            String UUID = template.getUUID(itemStack);
-//            if (UUID == null) continue;
-//
-//            NBTTagCompound tagCompound = template.getWorldSave(worldIn).getCompoundFromUUID(UUID);
-//            if (tagCompound != null) {
-//                PacketHandler.sendTo(new PacketBlockMap(tagCompound), (EntityPlayerMP) player);
-//            }
-//        }
+        TemplateManagerContainer container = ((TemplateManagerTileEntity) te).getContainer(player);
+        for (int i = 0; i <= 1; i++) {
+            ItemStack itemStack = container.getSlot(i).getStack();
+            if (!(itemStack.getItem() instanceof ITemplate)) continue;
+
+            ITemplate template = (ITemplate) itemStack.getItem();
+            String UUID = template.getUUID(itemStack);
+            if (UUID == null) continue;
+
+            NBTTagCompound tagCompound = template.getWorldSave(worldIn).getCompoundFromUUID(UUID);
+            if (tagCompound != null) {
+                PacketHandler.sendTo(new PacketBlockMap(tagCompound), (EntityPlayerMP) player);
+            }
+        }
         GuiMod.TEMPLATE_MANAGER.openContainer(player, worldIn, pos);
         return true;
     }
 
     @Override
-    public void onBlockHarvested(World worldIn, BlockPos pos, IBlockState state, EntityPlayer player) {
-        TileEntity tileEntity = worldIn.getTileEntity(pos);
-        if (tileEntity instanceof TemplateManagerTileEntity)
-        {
-            tileEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).ifPresent(iItemHandler -> {
-                for (int i = 0; i < iItemHandler.getSlots(); i++)
-                {
-                    ItemStack stack = iItemHandler.getStackInSlot(i);
-                    if (!stack.isEmpty())
-                        InventoryHelper.spawnItemStack(worldIn, pos.getX(), pos.getY(), pos.getZ(), stack);
-                }
-            });
+    public void onReplaced(IBlockState state, World world, BlockPos pos, IBlockState newState, boolean isMoving) {
+        if (state.getBlock() != newState.getBlock()) {
+            TileEntity tileEntity = world.getTileEntity(pos);
+            if (tileEntity instanceof TemplateManagerTileEntity) {
+                tileEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).ifPresent(iItemHandler -> {
+                    for (int i = 0; i < iItemHandler.getSlots(); i++) {
+                        ItemStack stack = iItemHandler.getStackInSlot(i);
+                        if (!stack.isEmpty())
+                            InventoryHelper.spawnItemStack(world, pos.getX(), pos.getY(), pos.getZ(), stack);
+                    }
+                });
+            }
         }
-
-        super.onBlockHarvested(worldIn, pos, state, player);
+        super.onReplaced(state, world, pos, newState, isMoving);
     }
 }

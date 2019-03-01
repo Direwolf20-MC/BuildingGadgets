@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.common.network.packets;
 
+import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManagerCommands;
 import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManagerContainer;
 import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManagerTileEntity;
@@ -14,6 +15,7 @@ import net.minecraftforge.fml.network.NetworkEvent;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.function.Supplier;
 
 public class PacketTemplateManagerPaste {
@@ -33,9 +35,9 @@ public class PacketTemplateManagerPaste {
     }
 
     public static void encode(PacketTemplateManagerPaste msg, PacketBuffer buffer) {
+        buffer.writeByteArray(msg.data);
         buffer.writeBlockPos(msg.pos);
-        buffer.writeBytes(msg.data);
-        buffer.writeString(msg.templateName);
+        buffer.writeString(msg.templateName, 125);
     }
 
     public static PacketTemplateManagerPaste decode(PacketBuffer buffer) {
@@ -61,7 +63,9 @@ public class PacketTemplateManagerPaste {
 
                     TemplateManagerContainer container = ((TemplateManagerTileEntity) te).getContainer(player);
                     TemplateManagerCommands.pasteTemplate(container, player, newTag, msg.templateName);
-                } catch (Throwable t) { System.out.println(t); }
+                } catch (IOException e) {
+                    BuildingGadgets.LOG.error("Template Manager paste failed", e);
+                }
             });
             ctx.get().setPacketHandled(true);
         }

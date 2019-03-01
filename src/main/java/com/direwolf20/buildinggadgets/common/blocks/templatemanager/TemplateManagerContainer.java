@@ -11,15 +11,14 @@ import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 
 public class TemplateManagerContainer extends Container {
-    public static final String TEXTURE_LOC_SLOT_TOOL = Reference.MODID + ":gui/slot_copypastetool";
+    public static final String TEXTURE_LOC_SLOT_TOOL = Reference.MODID + ":gui/slot_copy_paste_gadget";
     public static final String TEXTURE_LOC_SLOT_TEMPLATE = Reference.MODID + ":gui/slot_template";
     private TemplateManagerTileEntity te;
 
     public TemplateManagerContainer(IInventory playerInventory, TemplateManagerTileEntity te) {
         this.te = te;
-//      TODO 1.13
-//        addOwnSlots();
-//        addPlayerSlots(playerInventory);
+        addOwnSlots();
+        addPlayerSlots(playerInventory);
     }
 
     private void addPlayerSlots(IInventory playerInventory) {
@@ -28,7 +27,7 @@ public class TemplateManagerContainer extends Container {
             for (int col = 0; col < 9; ++col) {
                 int x = 8 + col * 18;
                 int y = row * 18 + 84;
-                this.inventorySlots.add(new Slot(playerInventory, col + row * 9 + 9, x, y));
+                addSlot(new Slot(playerInventory, col + row * 9 + 9, x, y));
             }
         }
 
@@ -36,7 +35,7 @@ public class TemplateManagerContainer extends Container {
         for (int row = 0; row < 9; ++row) {
             int x = 8 + row * 18;
             int y = 58 + 84;
-            this.inventorySlots.add(new Slot(playerInventory, row, x, y));
+            addSlot(new Slot(playerInventory, row, x, y));
         }
     }
 
@@ -45,9 +44,9 @@ public class TemplateManagerContainer extends Container {
         int x = 86;
         int y = 41;
 
-        this.inventorySlots.add(new SlotTemplateManager(itemHandler, 0, x, y, TEXTURE_LOC_SLOT_TOOL));
+        addSlot(new SlotTemplateManager(itemHandler, 0, x, y, TEXTURE_LOC_SLOT_TOOL));
         x = 144;
-        this.inventorySlots.add(new SlotTemplateManager(itemHandler, 1, x, y, TEXTURE_LOC_SLOT_TEMPLATE));
+        addSlot(new SlotTemplateManager(itemHandler, 1, x, y, TEXTURE_LOC_SLOT_TEMPLATE));
     }
 
     @Override

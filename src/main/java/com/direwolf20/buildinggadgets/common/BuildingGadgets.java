@@ -60,10 +60,8 @@ public class BuildingGadgets {
 
         // Client only registering
         DistExecutor.runWhenOn(Dist.CLIENT, () -> () -> {
-            eventBus.addListener((Consumer<FMLClientSetupEvent>) event -> ClientProxy.clientSetup(event, eventBus));
+            eventBus.addListener((Consumer<FMLClientSetupEvent>) event -> ClientProxy.clientSetup());
             ModLoadingContext.get().registerExtensionPoint(ExtensionPoint.GUIFACTORY, () -> GuiMod::openScreen);
-
-            MinecraftForge.EVENT_BUS.addListener(ClientProxy::registerModels);
         });
 
         loadConfig(Config.CLIENT_CONFIG, FMLPaths.CONFIGDIR.get().resolve("buildinggadgets-client.toml"));

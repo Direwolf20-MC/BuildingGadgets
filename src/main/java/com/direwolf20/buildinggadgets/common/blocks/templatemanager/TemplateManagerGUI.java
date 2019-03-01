@@ -74,7 +74,7 @@ public class TemplateManagerGUI extends GuiContainer {
     private TemplateManagerTileEntity te;
     private TemplateManagerContainer container;
 
-    private static final ResourceLocation background = new ResourceLocation(Reference.MODID, "textures/gui/testcontainer.png");
+    private static final ResourceLocation background = new ResourceLocation(Reference.MODID, "textures/gui/template_manager.png");
 
     public TemplateManagerGUI(TemplateManagerTileEntity tileEntity, TemplateManagerContainer container) {
         super(container);
@@ -139,9 +139,8 @@ public class TemplateManagerGUI extends GuiContainer {
         children.add(nameField);
 
         helpTextProviders.add(new AreaHelpText(nameField, "field.template_name"));
-//      TODO 1.13
-//        helpTextProviders.add(new AreaHelpText(inventorySlots.getSlot(0), guiLeft, guiTop, "slot.gadget"));
-//        helpTextProviders.add(new AreaHelpText(inventorySlots.getSlot(1), guiLeft, guiTop, "slot.template"));
+        helpTextProviders.add(new AreaHelpText(inventorySlots.getSlot(0), guiLeft, guiTop, "slot.gadget"));
+        helpTextProviders.add(new AreaHelpText(inventorySlots.getSlot(1), guiLeft, guiTop, "slot.template"));
         helpTextProviders.add(new AreaHelpText(guiLeft + 112, guiTop + 41, 22, 15, "arrow.data_flow"));
         helpTextProviders.add(new AreaHelpText(panel, guiLeft, guiTop + 10, "preview"));
     }
@@ -161,8 +160,7 @@ public class TemplateManagerGUI extends GuiContainer {
             drawTexturedModalRectReverseX(guiLeft + 112, guiTop + 41, 176, 0, 22, 15, buttonLoad.isMouseOver());
 
         this.nameField.drawTextField(mouseX, mouseY, partialTicks);
-//      TODO 1.13
-//        drawStructure();
+        drawStructure();
     }
 
     public void drawTexturedModalRectReverseX(int x, int y, int textureX, int textureY, int width, int height, boolean reverse) {
@@ -185,7 +183,6 @@ public class TemplateManagerGUI extends GuiContainer {
 
     private void drawStructure() {
         int scale = mc.mainWindow.getScaleFactor(this.mc.gameSettings.guiScale);
-
         drawRect(guiLeft + panel.getX() - 1, guiTop + panel.getY() - 1, guiLeft + panel.getX() + panel.getWidth() + 1, guiTop + panel.getY() + panel.getHeight() + 1, 0xFF8A8A8A);
         ItemStack itemstack = this.container.getSlot(0).getStack();
 //        BlockRendererDispatcher dispatcher = this.mc.getBlockRendererDispatcher();
@@ -220,7 +217,6 @@ public class TemplateManagerGUI extends GuiContainer {
                     zoomScale = overH / 40;
                 }
 
-
                 //System.out.println(distance);
                 GlStateManager.pushMatrix();
                 //GlStateManager.translate(panel.getX() + (panel.getWidth() / 2), panel.getY() + (panel.getHeight() / 2), 100);
@@ -232,7 +228,7 @@ public class TemplateManagerGUI extends GuiContainer {
                 Matrix4f.perspective(60, (float) panel.getWidth() / panel.getHeight(), 0.01F, 4000);
                 GlStateManager.matrixMode(GL11.GL_MODELVIEW);
                 //GlStateManager.translate(-panel.getX() - panel.getWidth() / 2, -panel.getY() - panel.getHeight() / 2, 0);
-                GlStateManager.viewport((guiLeft + panel.getX()) * scale, this.height - (guiTop + panel.getY() + panel.getHeight()) * scale, panel.getWidth() * scale, panel.getHeight() * scale);
+                GlStateManager.viewport((guiLeft + panel.getX()) * scale, mc.mainWindow.getFramebufferHeight() - (guiTop + panel.getY() + panel.getHeight()) * scale, panel.getWidth() * scale, panel.getHeight() * scale);
                 GlStateManager.clear(GL11.GL_DEPTH_BUFFER_BIT);
 
                 //double sc = 300 + 8 * 0.0125 * (Math.sqrt(zoom + 99) - 9);
@@ -296,8 +292,7 @@ public class TemplateManagerGUI extends GuiContainer {
                 GlStateManager.matrixMode(GL11.GL_PROJECTION);
                 GlStateManager.popMatrix();
                 GlStateManager.matrixMode(GL11.GL_MODELVIEW);
-                GlStateManager.viewport(0, 0, this.width, this.height);
-
+                GlStateManager.viewport(0, 0, mc.mainWindow.getFramebufferWidth(), mc.mainWindow.getFramebufferHeight());
             }
         } else {
             rotX = 0;
@@ -370,9 +365,8 @@ public class TemplateManagerGUI extends GuiContainer {
         if (!nameField.isFocused() && nameField.getText().isEmpty())
             fontRenderer.drawString("template name", nameField.x - guiLeft + 4, nameField.y - guiTop, -10197916);
 
-//        TODO 1.13
-//        if (buttonSave.isMouseOver() || buttonLoad.isMouseOver() || buttonPaste.isMouseOver())
-//            drawSlotOverlay(buttonLoad.isMouseOver() ? container.getSlot(0) : container.getSlot(1));
+        if (buttonSave.isMouseOver() || buttonLoad.isMouseOver() || buttonPaste.isMouseOver())
+            drawSlotOverlay(buttonLoad.isMouseOver() ? container.getSlot(0) : container.getSlot(1));
     }
 
     private void drawSlotOverlay(Slot slot) {
@@ -402,6 +396,5 @@ public class TemplateManagerGUI extends GuiContainer {
             initPanX = panX;
             initPanY = panY;
         }
-
     }
 }
