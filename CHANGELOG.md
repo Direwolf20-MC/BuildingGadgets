@@ -4,6 +4,7 @@ The format of this document is based on [Keep a Changelog](https://keepachangelo
 ## [Unreleased]
 ### Added
 - The copy/paste gadget can now mirror pastes, as well as rotate them. Sneak while pressing the keybind that previously just rotated them to mirror them left-to-right instead.
+- Allowed gadgets to bind Simple Storage Network networks as a remote inventories (you can only bind the Storage Network Master block).
 
 ## [2.6.6] - 2019-02-27
 ### Added

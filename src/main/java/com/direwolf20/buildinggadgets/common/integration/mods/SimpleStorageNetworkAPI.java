@@ -16,6 +16,6 @@ public class SimpleStorageNetworkAPI implements IStorageNetworkPlugin {
     }
 
     public static IItemStackMatcher createItemStackMatcher(ItemStack stack) {
-        return helpers.createItemStackMatcher(stack, true, true, true);
+        return helpers.createItemStackMatcher(stack, false, true, true);
     }
 }
