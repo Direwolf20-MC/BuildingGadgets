@@ -1,9 +1,7 @@
 package com.direwolf20.buildinggadgets.common.items.pastes;
 
-import com.direwolf20.buildinggadgets.common.utils.Reference;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.Style;
 import net.minecraft.util.text.TextComponentTranslation;
@@ -16,7 +14,6 @@ import javax.annotation.Nullable;
 import java.util.List;
 
 public class ConstructionPasteContainerCreative extends GenericPasteContainer {
-    public static final ResourceLocation REGISTRY_NAME = new ResourceLocation(Reference.MODID,"construction_paste_container_creative");
     public ConstructionPasteContainerCreative(Properties builder) {
         super(builder);
     }

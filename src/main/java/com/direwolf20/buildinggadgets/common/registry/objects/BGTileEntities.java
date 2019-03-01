@@ -4,10 +4,10 @@ import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManagerTileEntity;
 import com.direwolf20.buildinggadgets.common.registry.RegistryContainer;
 import com.direwolf20.buildinggadgets.common.registry.RegistryObjectBuilder;
-import com.direwolf20.buildinggadgets.common.utils.Reference;
+import com.direwolf20.buildinggadgets.common.utils.ref.Reference;
+import com.direwolf20.buildinggadgets.common.utils.ref.Reference.TileEntityReference;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.tileentity.TileEntityType.Builder;
-import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
@@ -19,16 +19,16 @@ import net.minecraftforge.registries.ObjectHolder;
 public class BGTileEntities {
     private static final RegistryContainer<TileEntityType<?>, RegistryObjectBuilder<TileEntityType<?>, Builder<?>>> container = new RegistryContainer<>();
 
-    @ObjectHolder("construction_tile")
+    @ObjectHolder(TileEntityReference.CONSTRUCTION_TILE)
     public static TileEntityType<?> CONSTRUCTION_BLOCK_TYPE;
-    @ObjectHolder("template_manager_tile")
+    @ObjectHolder(TileEntityReference.TEMPLATE_MANAGER_TILE)
     public static TileEntityType<?> TEMPLATE_MANAGER_TYPE;
 
     static void init() {
-        container.add(new RegistryObjectBuilder<TileEntityType<?>, Builder<?>>(new ResourceLocation(Reference.MODID,"construction_tile"))
+        container.add(new RegistryObjectBuilder<TileEntityType<?>, Builder<?>>(TileEntityReference.CONSTRUCTION_TILE_RL)
                 .builder(Builder.create(ConstructionBlockTileEntity::new))
                 .factory((b) -> b.build(null)));
-        container.add(new RegistryObjectBuilder<TileEntityType<?>, Builder<?>>(new ResourceLocation(Reference.MODID, "template_manager_tile"))
+        container.add(new RegistryObjectBuilder<TileEntityType<?>, Builder<?>>(TileEntityReference.TEMPLATE_MANAGER_TILE_RL)
                 .builder(Builder.create(TemplateManagerTileEntity::new))
                 .factory((b) -> b.build(null)));
     }

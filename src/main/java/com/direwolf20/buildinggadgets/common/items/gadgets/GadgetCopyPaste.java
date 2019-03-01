@@ -15,7 +15,6 @@ import com.direwolf20.buildinggadgets.common.tools.ToolRenders;
 import com.direwolf20.buildinggadgets.common.tools.UniqueItem;
 import com.direwolf20.buildinggadgets.common.utils.CapabilityUtil.EnergyUtil;
 import com.direwolf20.buildinggadgets.common.utils.GadgetUtils;
-import com.direwolf20.buildinggadgets.common.utils.Reference;
 import com.direwolf20.buildinggadgets.common.utils.blocks.BlockMap;
 import com.direwolf20.buildinggadgets.common.utils.blocks.BlockMapIntState;
 import com.direwolf20.buildinggadgets.common.utils.exceptions.CapabilityNotPresentException;
@@ -69,8 +68,6 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
             return vals[(this.ordinal() + 1) % vals.length];
         }
     }
-
-    public static final ResourceLocation REGISTRY_NAME = new ResourceLocation(Reference.MODID,"gadget_copy_paste");
 
     public GadgetCopyPaste(Properties builder) {
         super(builder.defaultMaxDamage(Config.GADGETS.GADGET_COPY_PASTE.durability.get()));

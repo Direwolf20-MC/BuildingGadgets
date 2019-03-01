@@ -1,18 +1,15 @@
 package com.direwolf20.buildinggadgets.client.gui;
 
-import java.util.Iterator;
-import java.util.function.Consumer;
-
 import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManagerContainer;
 import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManagerGUI;
 import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManagerTileEntity;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetDestruction;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
-import com.direwolf20.buildinggadgets.common.utils.Reference;
+import com.direwolf20.buildinggadgets.common.utils.lang.LangUtil;
+import com.direwolf20.buildinggadgets.common.utils.ref.Reference;
 import com.google.common.base.Function;
 import com.google.common.base.Supplier;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.entity.player.EntityPlayer;
@@ -28,6 +25,9 @@ import net.minecraft.world.IInteractionObject;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.network.FMLPlayMessages.OpenContainer;
 import net.minecraftforge.fml.network.NetworkHooks;
+
+import java.util.Iterator;
+import java.util.function.Consumer;
 
 public enum GuiMod {
     COPY(tool -> tool.getItem() instanceof GadgetCopyPaste ? new CopyGUI(tool) : null),
@@ -131,7 +131,7 @@ public enum GuiMod {
     }
 
     public static String getLangKey(String prefix, String type, String name) {
-        return Reference.getLangKey("gui", prefix, type, name);
+        return LangUtil.getLangKey("gui", prefix, type, name);
     }
 
     public static void setEmptyField(GuiTextFieldBase field, Supplier<Integer> value) {

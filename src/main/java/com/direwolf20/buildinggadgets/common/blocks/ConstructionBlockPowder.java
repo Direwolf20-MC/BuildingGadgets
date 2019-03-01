@@ -1,13 +1,11 @@
 package com.direwolf20.buildinggadgets.common.blocks;
 
 import com.direwolf20.buildinggadgets.common.entities.ConstructionBlockEntity;
-import com.direwolf20.buildinggadgets.common.utils.Reference;
 import net.minecraft.block.BlockFalling;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
@@ -21,7 +19,6 @@ import javax.annotation.Nullable;
 import java.util.List;
 
 public class ConstructionBlockPowder extends BlockFalling {
-    public static final ResourceLocation REGISTRY_NAME = new ResourceLocation(Reference.MODID,"construction_block_powder");
     public ConstructionBlockPowder(Properties builder) {
         super(builder);
     }

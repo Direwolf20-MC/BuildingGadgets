@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.common.blocks.templatemanager;
 
-import com.direwolf20.buildinggadgets.common.utils.Reference;
 import com.direwolf20.buildinggadgets.common.utils.exceptions.CapabilityNotPresentException;
+import com.direwolf20.buildinggadgets.common.utils.ref.Reference;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;

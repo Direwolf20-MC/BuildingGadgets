@@ -6,7 +6,6 @@ import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
 import com.direwolf20.buildinggadgets.common.tools.ToolRenders;
 import com.direwolf20.buildinggadgets.common.tools.modes.ExchangingModes;
 import com.direwolf20.buildinggadgets.common.utils.CapabilityUtil.EnergyUtil;
-import com.direwolf20.buildinggadgets.common.utils.Reference;
 import com.direwolf20.buildinggadgets.common.utils.exceptions.CapabilityNotPresentException;
 import com.direwolf20.buildinggadgets.common.utils.helpers.InventoryHelper;
 import com.direwolf20.buildinggadgets.common.utils.helpers.VectorHelper;
@@ -62,8 +61,6 @@ public class GadgetExchanger extends GadgetGeneric {
             return vals[(this.ordinal() + 1) % vals.length];
         }
     }
-
-    public static final ResourceLocation REGISTRY_NAME = new ResourceLocation(Reference.MODID, "gadget_exchanging");
 
     public GadgetExchanger(Properties builder) {
         super(builder.defaultMaxDamage(Config.GADGETS.GADGET_EXCHANGER.durability.get()));

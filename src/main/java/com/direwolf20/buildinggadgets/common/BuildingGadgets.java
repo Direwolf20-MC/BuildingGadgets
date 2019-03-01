@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.common;
 
+import com.direwolf20.buildinggadgets.api.APIProxy;
 import com.direwolf20.buildinggadgets.client.ClientProxy;
 import com.direwolf20.buildinggadgets.client.gui.GuiMod;
 import com.direwolf20.buildinggadgets.common.commands.BlockMapCommand;
@@ -7,7 +8,7 @@ import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.events.AnvilRepairHandler;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.registry.objects.BuildingObjects;
-import com.direwolf20.buildinggadgets.common.utils.Reference;
+import com.direwolf20.buildinggadgets.common.utils.ref.Reference;
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import com.electronwill.nightconfig.core.io.WritingMode;
 import net.minecraft.command.Commands;
@@ -38,6 +39,7 @@ public class BuildingGadgets {
 
     public static Logger LOG = LogManager.getLogger();
     private static BuildingGadgets theMod = null;
+    private final APIProxy theApi;
 
     public static BuildingGadgets getInstance() {
         assert theMod != null;
@@ -46,7 +48,7 @@ public class BuildingGadgets {
 
     public BuildingGadgets() {
         IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus();
-
+        theApi = new APIProxy(eventBus, MinecraftForge.EVENT_BUS);
         // @todo handle Config properly as soon as Forge fixes it's "I dont load Server Config" bug
         ModLoadingContext.get().registerConfig(Type.CLIENT, Config.CLIENT_CONFIG);
         ModLoadingContext.get().registerConfig(Type.SERVER, Config.SERVER_CONFIG);
@@ -87,7 +89,7 @@ public class BuildingGadgets {
 
     private void setup(final FMLCommonSetupEvent event) {
         theMod = (BuildingGadgets) ModLoadingContext.get().getActiveContainer().getMod();
-
+        theApi.onSetup();
         DeferredWorkQueue.runLater(PacketHandler::register);
     }
 
@@ -100,6 +102,7 @@ public class BuildingGadgets {
     }
 
     private void finishLoad(FMLLoadCompleteEvent event) {
+        theApi.onLoadComplete();
         BuildingObjects.cleanup();
     }
 
