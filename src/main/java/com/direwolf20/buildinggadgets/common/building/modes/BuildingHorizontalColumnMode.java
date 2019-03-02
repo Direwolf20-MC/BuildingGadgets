@@ -11,11 +11,11 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 
-public class VerticalColumnMode extends AbstractMode {
+public class BuildingHorizontalColumnMode extends AbstractMode {
 
-    private static final ResourceLocation NAME = new ResourceLocation(BuildingGadgets.MODID, "vertical_column");
+    private static final ResourceLocation NAME = new ResourceLocation(BuildingGadgets.MODID, "horizontal_column");
 
-    public VerticalColumnMode(IValidatorFactory validatorFactory) {
+    public BuildingHorizontalColumnMode(IValidatorFactory validatorFactory) {
         super(validatorFactory);
     }
 
@@ -23,8 +23,8 @@ public class VerticalColumnMode extends AbstractMode {
     public IPlacementSequence computeCoordinates(EntityPlayer player, BlockPos hit, EnumFacing sideHit, ItemStack tool) {
         int range = GadgetUtils.getToolRange(tool);
         if (sideHit.getAxis().isVertical())
-            return Column.extendFrom(hit, sideHit, range);
-        return Column.centerAt(hit, EnumFacing.Axis.Y, range);
+            return Column.centerAt(hit, player.getHorizontalFacing().rotateY().getAxis(), range);
+        return Column.extendFrom(hit, sideHit, range);
     }
 
     @Override

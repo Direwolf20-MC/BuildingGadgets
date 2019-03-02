@@ -58,9 +58,8 @@ public class Context {
             protected BlockPos computeNext() {
                 while (positions.hasNext()) {
                     BlockPos next = positions.next();
-                    if (validator.test(next, blocks.at(next))) {
+                    if (validator.test(next, blocks.at(next)))
                         return next;
-                    }
                 }
                 return endOfData();
             }

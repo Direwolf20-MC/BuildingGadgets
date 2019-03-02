@@ -37,9 +37,8 @@ class RegionIterator extends AbstractIterator<BlockPos> implements PeekingIterat
 
     @Override
     protected BlockPos computeNext() {
-        if (isXOverflowed()) {
+        if (isXOverflowed())
             return endOfData();
-        }
 
         BlockPos pos = new BlockPos(posX, posY, posZ);
 

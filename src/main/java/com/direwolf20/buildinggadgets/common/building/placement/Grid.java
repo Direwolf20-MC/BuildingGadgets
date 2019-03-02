@@ -83,9 +83,8 @@ public final class Grid implements IPlacementSequence {
 
             @Override
             protected BlockPos computeNext() {
-                if (z > end) {
+                if (z > end)
                     return endOfData();
-                }
 
                 BlockPos pos = new BlockPos(center.getX() + x, center.getY(), center.getZ() + z);
 

@@ -4,13 +4,11 @@ import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.building.IBuildingMode;
 import com.direwolf20.buildinggadgets.common.building.modes.*;
 import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
-import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
 import com.google.common.collect.ImmutableList;
 import it.unimi.dsi.fastutil.doubles.Double2ObjectArrayMap;
 import it.unimi.dsi.fastutil.doubles.Double2ObjectMap;
 import it.unimi.dsi.fastutil.doubles.DoubleRBTreeSet;
 import it.unimi.dsi.fastutil.doubles.DoubleSortedSet;
-import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -26,7 +24,7 @@ public enum BuildingModes {
 
     BuildToMe("build_to_me.png", new TargetedAxisChasingMode(BuildingModes::combineTester)),
     VerticalColumn("vertical_column.png", new VerticalColumnMode(BuildingModes::combineTester)),
-    HorizontalColumn("horizontal_column.png", new HorizontalColumnMode(BuildingModes::combineTester)),
+    HorizontalColumn("horizontal_column.png", new BuildingHorizontalColumnMode(BuildingModes::combineTester)),
     VerticalWall("vertical_wall.png", new VerticalWallMode(BuildingModes::combineTester)),
     HorizontalWall("horizontal_wall.png", new HorizontalWallMode(BuildingModes::combineTester)),
     Stair("stairs.png", new StairMode(BuildingModes::combineTester)),
@@ -89,17 +87,13 @@ public enum BuildingModes {
         IBlockState target = GadgetUtils.getToolBlock(tool);
         return (pos, state) -> {
             IBlockState current = world.getBlockState(pos);
-            if (!target.getBlock().canPlaceBlockAt(world, pos)) {
+            if (!target.getBlock().canPlaceBlockAt(world, pos))
                 return false;
-            }
-            if (pos.getY() < 0) {
+            if (pos.getY() < 0)
                 return false;
-            }
-            if (SyncedConfig.canOverwriteBlocks) {
+            if (SyncedConfig.canOverwriteBlocks)
                 return current.getBlock().isReplaceable(world, pos);
-            }
             return current.getBlock().isAir(current, world, pos);
-
         };
     }
 

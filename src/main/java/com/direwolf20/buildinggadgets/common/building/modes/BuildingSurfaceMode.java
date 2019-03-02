@@ -25,9 +25,8 @@ public class BuildingSurfaceMode extends AbstractMode {
     public IPlacementSequence computeCoordinates(EntityPlayer player, BlockPos hit, EnumFacing sideHit, ItemStack tool) {
         int range = GadgetUtils.getToolRange(tool);
         boolean fuzzy = GadgetGeneric.getFuzzy(tool);
-        if (GadgetGeneric.getConnectedArea(tool)) {
+        if (GadgetGeneric.getConnectedArea(tool))
             return ConnectedSurface.create(player.world, hit.offset(sideHit), sideHit.getOpposite(), range, fuzzy);
-        }
         return Surface.create(player.world, hit.offset(sideHit), sideHit.getOpposite(), range, fuzzy);
     }
 

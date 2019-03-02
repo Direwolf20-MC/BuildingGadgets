@@ -50,9 +50,8 @@ class RegionSpliterator implements Spliterator<BlockPos> {
 
     @Override
     public boolean tryAdvance(Consumer<? super BlockPos> action) {
-        if (isXOverflowed()) {
+        if (isXOverflowed())
             return false;
-        }
 
         this.allowYZSplit = false;
         BlockPos pos = new BlockPos(nextPosX, nextPosY, nextPosZ);

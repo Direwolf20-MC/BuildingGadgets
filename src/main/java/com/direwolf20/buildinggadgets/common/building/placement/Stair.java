@@ -75,9 +75,8 @@ public final class Stair implements IPlacementSequence {
 
             @Override
             protected BlockPos computeNext() {
-                if (i >= range) {
+                if (i >= range)
                     return endOfData();
-                }
                 i++;
 
                 current.move(horizontalAdvance, 1).move(verticalAdvance, 1);

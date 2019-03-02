@@ -26,9 +26,8 @@ public interface IBuildingMode {
      */
     default IBlockProvider getBlockProvider(ItemStack tool) {
         IBlockProvider capability = tool.getCapability(CapabilityBlockProvider.BLOCK_PROVIDER, null);
-        if (capability != null) {
+        if (capability != null)
             return capability;
-        }
         return CapabilityBlockProvider.DEFAULT_AIR_PROVIDER;
     }
 

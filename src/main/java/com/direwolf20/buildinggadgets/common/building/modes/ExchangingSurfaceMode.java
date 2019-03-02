@@ -33,9 +33,8 @@ public class ExchangingSurfaceMode extends AbstractMode {
         int range = GadgetUtils.getToolRange(tool);
         boolean fuzzy = GadgetGeneric.getFuzzy(tool);
         Region region = Wall.clickedSide(hit, sideHit, range).getBoundingBox();
-        if (GadgetGeneric.getConnectedArea(tool)) {
+        if (GadgetGeneric.getConnectedArea(tool))
             return ConnectedSurface.create(player.world, region, pos -> pos, hit, sideHit, fuzzy);
-        }
         return Surface.create(player.world, hit, region, pos -> pos, fuzzy);
     }
 

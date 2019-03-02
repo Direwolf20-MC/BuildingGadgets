@@ -22,11 +22,8 @@ public class HorizontalWallMode extends AbstractMode {
     @Override
     public IPlacementSequence computeCoordinates(EntityPlayer player, BlockPos hit, EnumFacing sideHit, ItemStack tool) {
         int range = GadgetUtils.getToolRange(tool);
-        if (sideHit.getAxis().isVertical()) {
-            return Wall.clickedSide(hit, sideHit, range);
-        }
+        if (sideHit.getAxis().isVertical()) return Wall.clickedSide(hit, sideHit, range);
         return Wall.extendingFrom(hit, sideHit, EnumFacing.UP, range);
-
     }
 
     @Override

@@ -26,9 +26,8 @@ public class TargetedAxisChasingMode extends AbstractMode {
     public IPlacementSequence computeCoordinates(EntityPlayer player, BlockPos hit, EnumFacing sideHit, ItemStack tool) {
         BlockPos entityPos = new BlockPos(Math.floor(player.posX), Math.floor(player.posY), Math.floor(player.posZ));
         //TODO add config "inclusivePlacementForBuildToMe" as a config option
-        if (false) {
+        if (false)
             return Column.inclusiveAxisChasing(entityPos, hit, sideHit);
-        }
         return ExclusiveAxisChasing.create(hit, entityPos, sideHit);
     }
 

@@ -23,7 +23,7 @@ public final class TranslationWrapper implements IBlockProvider {
     private final BlockPos accumulatedTranslation;
 
     /**
-     * @implNote you cannot create a object and pass itself as a parameter of the constructor, so we are safe from looping
+     * @implNote you cannot create an object and pass itself as a parameter of the constructor, so we are safe from looping
      */
     public TranslationWrapper(IBlockProvider handle, BlockPos origin) {
         this.handle = handle;
@@ -84,9 +84,8 @@ public final class TranslationWrapper implements IBlockProvider {
             tag.merge(((INBTSerializable<NBTTagCompound>) handle).serializeNBT());
             return tag;
         }
-        if (handle instanceof SingleTypeProvider) {
+        if (handle instanceof SingleTypeProvider)
             ((SingleTypeProvider) handle).deserialize(tag);
-        }
         return tag;
     }
 
@@ -101,9 +100,8 @@ public final class TranslationWrapper implements IBlockProvider {
             ((INBTSerializable<NBTTagCompound>) handle).deserializeNBT(tag);
             return this;
         }
-        if (handle instanceof SingleTypeProvider) {
+        if (handle instanceof SingleTypeProvider)
             return new TranslationWrapper(((SingleTypeProvider) handle).deserialize(tag), translation);
-        }
         return this;
     }
 

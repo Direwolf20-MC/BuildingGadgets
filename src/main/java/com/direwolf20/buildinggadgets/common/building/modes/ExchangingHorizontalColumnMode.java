@@ -11,21 +11,18 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 
-public class HorizontalColumnMode extends AbstractMode {
+public class ExchangingHorizontalColumnMode extends AbstractMode {
 
     private static final ResourceLocation NAME = new ResourceLocation(BuildingGadgets.MODID, "horizontal_column");
 
-    public HorizontalColumnMode(IValidatorFactory validatorFactory) {
+    public ExchangingHorizontalColumnMode(IValidatorFactory validatorFactory) {
         super(validatorFactory);
     }
 
     @Override
     public IPlacementSequence computeCoordinates(EntityPlayer player, BlockPos hit, EnumFacing sideHit, ItemStack tool) {
         int range = GadgetUtils.getToolRange(tool);
-        if (sideHit.getAxis().isVertical()) {
-            return Column.centerAt(hit, player.getHorizontalFacing().rotateY().getAxis(), range);
-        }
-        return Column.extendFrom(hit, sideHit, range);
+        return Column.centerAt(hit, player.getHorizontalFacing().rotateY().getAxis(), range);
     }
 
     @Override

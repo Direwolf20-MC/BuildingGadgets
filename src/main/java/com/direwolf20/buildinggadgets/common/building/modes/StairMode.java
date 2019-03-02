@@ -24,11 +24,10 @@ public class StairMode extends AbstractMode {
         int range = GadgetUtils.getToolRange(tool);
         EnumFacing side = sideHit.getAxis().isVertical() ? player.getHorizontalFacing() : sideHit;
 
-        if (hit.getY() > player.posY + 1) {
+        if (hit.getY() > player.posY + 1)
             return Stair.create(hit.down().offset(side), side, EnumFacing.DOWN, range);
-        } else if (hit.getY() < player.posY - 2) {
+        else if (hit.getY() < player.posY - 2)
             return Stair.create(hit.up(), side, EnumFacing.UP, range);
-        }
         return Stair.create(hit.up(), side.getOpposite(), EnumFacing.UP, range);
     }
 

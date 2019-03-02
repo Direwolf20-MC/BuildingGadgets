@@ -90,9 +90,8 @@ public final class Surface implements IPlacementSequence {
                     BlockPos pos = it.next();
                     BlockPos referencePos = searching2referenceMapper.apply(pos);
                     IBlockState baseBlock = world.getBlockState(referencePos);
-                    if ((fuzzy || baseBlock == selectedBase) && !baseBlock.getBlock().isAir(baseBlock, world, referencePos)) {
+                    if ((fuzzy || baseBlock == selectedBase) && !baseBlock.getBlock().isAir(baseBlock, world, referencePos))
                         return pos;
-                    }
                 }
                 return endOfData();
             }

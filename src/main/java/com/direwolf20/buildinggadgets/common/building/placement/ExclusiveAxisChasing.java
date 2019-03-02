@@ -20,9 +20,8 @@ public final class ExclusiveAxisChasing implements IPlacementSequence {
 
     public static ExclusiveAxisChasing create(BlockPos source, BlockPos target, Axis axis) {
         int difference = VectorTools.getAxisValue(target, axis) - VectorTools.getAxisValue(source, axis);
-        if (difference < 0) {
+        if (difference < 0)
             return create(source, target, EnumFacing.getFacingFromAxis(AxisDirection.NEGATIVE, axis));
-        }
         return create(source, target, EnumFacing.getFacingFromAxis(AxisDirection.POSITIVE, axis));
     }
 
@@ -78,9 +77,8 @@ public final class ExclusiveAxisChasing implements IPlacementSequence {
 
             @Override
             protected BlockPos computeNext() {
-                if (progression >= maxProgression) {
+                if (progression >= maxProgression)
                     return endOfData();
-                }
 
                 return source.offset(offsetDirection, progression++);
             }

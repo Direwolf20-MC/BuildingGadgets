@@ -109,12 +109,10 @@ public final class ConnectedSurface implements IPlacementSequence {
                     for (int j = -1; j <= 1; j++) {
                         BlockPos neighbor = VectorTools.perpendicularSurfaceOffset(current, side, i, j);
 
-                        boolean isSearched = searched.contains(neighbor);
-                        searched.add(neighbor);
+                        boolean isSearched = !searched.add(neighbor);
 
-                        if (isSearched || !searchingRegion.contains(neighbor) || !isStateValid(selectedBlock, neighbor)) {
+                        if (isSearched || !searchingRegion.contains(neighbor) || !isStateValid(selectedBlock, neighbor))
                             continue;
-                        }
 
                         queue.add(neighbor);
                     }
@@ -129,9 +127,8 @@ public final class ConnectedSurface implements IPlacementSequence {
         IBlockState reference = getReferenceFor(pos);
         boolean isAir = reference.getBlock().isAir(reference, world, pos);
         //If fuzzy=true, we ignore the block for reference
-        if (fuzzy) {
+        if (fuzzy)
             return !isAir;
-        }
         return !isAir && filter == reference;
     }
 

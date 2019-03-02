@@ -34,7 +34,7 @@ public interface IBlockProvider {
      * Implementations should translate the parameter by {@link #getTranslation()}.
      * </p>
      *
-     * @return block that should be place at the position
+     * @return block that should be placed at the position
      * @implNote In most cases, {@code pos.add(this.getTranslation())} should be sufficient.
      */
     IBlockState at(BlockPos pos);
