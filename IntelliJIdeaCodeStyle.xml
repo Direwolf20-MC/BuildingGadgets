@@ -1,14 +1,4 @@
 <code_scheme name="Project" version="173">
-  <JavaCodeStyleSettings>
-    <option name="PACKAGES_TO_USE_IMPORT_ON_DEMAND">
-      <value>
-        <package name="java.awt" withSubpackages="false" static="false" />
-        <package name="org.junit.jupiter.api" withSubpackages="false" static="false" />
-        <package name="org.junit.jupiter.api.Assertions" withSubpackages="false" static="true" />
-        <package name="javax.swing" withSubpackages="false" static="false" />
-      </value>
-    </option>
-  </JavaCodeStyleSettings>
   <codeStyleSettings language="JAVA">
     <option name="KEEP_BLANK_LINES_IN_DECLARATIONS" value="1" />
     <option name="KEEP_BLANK_LINES_IN_CODE" value="1" />
