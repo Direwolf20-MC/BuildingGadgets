@@ -502,7 +502,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
     private void placeBlock(World world, BlockPos pos, EntityPlayer player, IBlockState state, Map<IBlockState, UniqueItem> IntStackMap) {
         IBlockState testState = world.getBlockState(pos);
         if ((SyncedConfig.canOverwriteBlocks && !testState.getBlock().isReplaceable(world, pos)) ||
-            (!SyncedConfig.canOverwriteBlocks && world.getBlockState(pos).getMaterial() != Material.AIR))
+            (!SyncedConfig.canOverwriteBlocks && testState.getBlock().isAir(testState, world, pos)))
             return;
 
         if (pos.getY() < 0 || state.equals(Blocks.AIR.getDefaultState()) || !player.isAllowEdit())

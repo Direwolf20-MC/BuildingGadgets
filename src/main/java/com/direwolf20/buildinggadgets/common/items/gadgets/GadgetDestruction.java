@@ -315,7 +315,7 @@ public class GadgetDestruction extends GadgetGeneric {
         IBlockState currentBlock = world.getBlockState(voidPos);
         if (stateTarget != null && currentBlock != stateTarget) return false;
         TileEntity te = world.getTileEntity(voidPos);
-        if (currentBlock.getMaterial() == Material.AIR) return false;
+        if (currentBlock.getBlock().isAir(currentBlock, world, voidPos)) return false;
         //if (currentBlock.getBlock().getMaterial(currentBlock).isLiquid()) return false;
         if (currentBlock.equals(ModBlocks.effectBlock.getDefaultState())) return false;
         if ((te != null) && !(te instanceof ConstructionBlockTileEntity)) return false;
@@ -428,7 +428,7 @@ public class GadgetDestruction extends GadgetGeneric {
         for (int i = 0; i < posIntArray.length; i++) {
             BlockPos placePos = GadgetUtils.relIntToPos(startPos, posIntArray[i]);
             IBlockState currentState = world.getBlockState(placePos);
-            if (currentState.getMaterial() == Material.AIR || currentState.getMaterial().isLiquid()) {
+            if (currentState.getBlock().isAir(currentState, world, placePos) || currentState.getMaterial().isLiquid()) {
                 IBlockState placeState = MapIntState.getStateFromSlot((short) stateIntArray[i]);
                 if (placeState.getBlock() == ModBlocks.constructionBlock) {
                     IBlockState pasteState = Blocks.AIR.getDefaultState();

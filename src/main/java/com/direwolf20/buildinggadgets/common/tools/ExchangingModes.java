@@ -104,7 +104,7 @@ public enum ExchangingModes {
                 return false;
             }
             //Only replace existing blocks, don't place more
-            if (worldBlockState.getMaterial() == Material.AIR) {
+            if (worldBlockState.getBlock().isAir(worldBlockState, world, pos)) {
                 return false;
             }
 

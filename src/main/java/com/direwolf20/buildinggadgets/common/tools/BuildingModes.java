@@ -88,6 +88,7 @@ public enum BuildingModes {
     public static BiPredicate<BlockPos, IBlockState> combineTester(World world, ItemStack tool, EntityPlayer player, BlockPos initial) {
         IBlockState target = GadgetUtils.getToolBlock(tool);
         return (pos, state) -> {
+            IBlockState current = world.getBlockState(pos);
             if (!target.getBlock().canPlaceBlockAt(world, pos)) {
                 return false;
             }
@@ -95,9 +96,9 @@ public enum BuildingModes {
                 return false;
             }
             if (SyncedConfig.canOverwriteBlocks) {
-                return world.getBlockState(pos).getBlock().isReplaceable(world, pos);
+                return current.getBlock().isReplaceable(world, pos);
             }
-            return world.getBlockState(pos).getMaterial() == Material.AIR;
+            return current.getBlock().isAir(current, world, pos);
 
         };
     }
