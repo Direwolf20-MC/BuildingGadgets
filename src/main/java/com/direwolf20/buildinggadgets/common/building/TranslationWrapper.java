@@ -2,7 +2,6 @@ package com.direwolf20.buildinggadgets.common.building;
 
 import com.direwolf20.buildinggadgets.common.building.placement.SingleTypeProvider;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.util.INBTSerializable;
@@ -78,7 +77,8 @@ public final class TranslationWrapper implements IBlockProvider {
     /**
      * @return tag itself when serialization fails
      */
-    @SuppressWarnings("unchecked") //Safe raw type usage since INBTSerializable<T extends NBTBase> and NBTTagCompound is subclass of it
+    @SuppressWarnings("unchecked")
+    //Safe raw type usage since INBTSerializable<T extends NBTBase> and NBTTagCompound is subclass of it
     public NBTTagCompound serialize(NBTTagCompound tag) {
         if (handle instanceof INBTSerializable) {
             tag.merge(((INBTSerializable<NBTTagCompound>) handle).serializeNBT());
@@ -93,7 +93,8 @@ public final class TranslationWrapper implements IBlockProvider {
     /**
      * @return this when deserialization fails
      */
-    @SuppressWarnings("unchecked") //Safe raw type usage since INBTSerializable<T extends NBTBase> and NBTTagCompound is subclass of it
+    @SuppressWarnings("unchecked")
+    //Safe raw type usage since INBTSerializable<T extends NBTBase> and NBTTagCompound is subclass of it
     public TranslationWrapper deserialize(NBTTagCompound tag) {
         if (handle instanceof INBTSerializable) {
             //This operation mutates the handle

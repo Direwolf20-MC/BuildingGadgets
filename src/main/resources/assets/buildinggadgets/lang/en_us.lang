@@ -1,4 +1,4 @@
-#PARSE_ESCAPES
+﻿#PARSE_ESCAPES
 #itemGroup:
 itemGroup.buildingGadgets=Building Gadgets
 
@@ -35,11 +35,22 @@ block.buildinggadgets.constructionblockpowder.name=Construction Block Powder
 block.buildinggadgets.effectblock.name=(Unused)Effect Block
 block.buildinggadgets.templatemanager.name=Template Manager
 
+#modes:
+modes.buildinggadgets:surface=Surface
+modes.buildinggadgets:grid=Grid
+modes.buildinggadgets:horizontal_column=Horizontal Column
+modes.buildinggadgets:horizontal_wall=Horizontal Wall
+modes.buildinggadgets:vertical_column=Vertical Column
+modes.buildinggadgets:vertical_wall=Vertical Wall
+modes.buildinggadgets:stair=Stair
+modes.buildinggadgets:axis_chasing=Build To Me
+
+
 #key: 
 key.anchorKey=Anchor
 key.categories.buildingGadgets=Building Gadgets
 key.modeSwitch=Mode Switch
-key.rangeChange=Range / Rotate / Overlay
+key.rangeChange=Range / Rotate/Mirror / Overlay
 key.undoKey=Undo
 key.fuzzyKey=Fuzzy
 key.connectedarea=Connected Area
@@ -47,13 +58,15 @@ key.connectedarea=Connected Area
 #tooltip: 
 tooltip.constructionblockpowder.helptext=Place next to water
 tooltip.gadget.block=Block
-tooltip.gadget.destroyshowoverlay=Showing Overlay
 tooltip.gadget.destroy.overlay=Overlay
+tooltip.gadget.destroyshowoverlay=Showing Overlay
 tooltip.gadget.destroywarning=WARNING: This tool voids blocks.
 tooltip.gadget.energy=Energy
 tooltip.gadget.mode=Mode
 tooltip.gadget.range=Range
 tooltip.gadget.fuzzy=Fuzzy
+tooltip.gadget.raytrace_fluid=Raytrace Fluid
+tooltip.gadget.building.place_atop=Place On Top
 tooltip.gadget.connected=Connected
 tooltip.gadget.connectedarea=Connected Area
 tooltip.pasteContainer.amount=Amount
@@ -70,15 +83,20 @@ message.gadget.copyguierror=Copy Area Failed
 message.gadget.copysuccess=Copy to Clipboard successful
 message.gadget.destroysizeerror=Maximum Destruction size is 16x16x16, negative numbers are invalid
 message.gadget.fuzzymode=Fuzzy Mode
+message.gadget.raytrace_fluid=Raytracing Fluid
+message.gadget.building.placement=Block Placement: %s
+message.gadget.building.placement.atop=On Top
+message.gadget.building.placement.inside=Inside
 message.gadget.connectedarea=Connected Area
 message.gadget.connectedsurface=Connected Surface
 message.gadget.invalidblock=Invalid Block
 message.gadget.nothingtoundo=Nothing To Undo
 message.gadget.pastefailed=Paste Failed, Invalid JSON
-message.gadget.pastefailed.linkcopied=Paste Failed. Please copy the raw json data, instead of an Link.
+message.gadget.pastefailed.linkcopied=Paste Failed. Please copy the raw json data, instead of an Link
 message.gadget.pastesuccess=Paste from Clipboard successful
 message.gadget.pastetoobig=Paste is too large
 message.gadget.rotated=Blocks Rotated
+message.gadget.mirrored=Blocks Mirrored
 message.gadget.toobigarea=Area too Large, max area is 125x125x125 (Right click empty air to reset)
 message.gadget.toolmode=Tool Mode
 message.gadget.toolrange= Tool Range
@@ -117,7 +135,7 @@ config.buildinggadgets.general.canOverwriteBlocks.tooltip=Whether the Building /
 config.buildinggadgets.general.subCategoryBlacklist=Blacklist Settings
 config.buildinggadgets.general.subCategoryBlacklist.tooltip=Configure your Blacklist-Settings here
 config.buildinggadgets.general.subCategoryBlacklist.blockBlacklist=Blacklisted Blocks
-config.buildinggadgets.general.subCategoryBlacklist.blockBlacklist.tooltip=All Blocks added to this will be treated similar to TileEntities. Not at all. \nNotice that you can use Regular Expressions as defined by Java Patterns to express more complex name combinations. \nUse for example "awfulmod:.*" to blacklist all awfulmod Blocks..
+config.buildinggadgets.general.subCategoryBlacklist.blockBlacklist.tooltip=All Blocks added to this will be treated similar to TileEntities. Not at all. \nNotice that you can use Regular Expressions as defined by Java Patterns to express more complex name combinations. \nUse for example "awfulmod:.*" to blacklist all awfulmod Blocks.
 config.buildinggadgets.general.subCategoryGadgets=Gadgets
 config.buildinggadgets.general.subCategoryGadgets.tooltip=Configure the Gadgets here
 config.buildinggadgets.general.subCategoryGadgets.maxRange=Maximum allowed Range
@@ -146,6 +164,7 @@ config.buildinggadgets.general.subCategoryGadgets.gadgetCopyPaste=Copy-Paste Gad
 config.buildinggadgets.general.subCategoryGadgets.gadgetCopyPaste.tooltip=Energy Cost & Durability of the Copy-Paste Gadget
 config.buildinggadgets.general.subCategoryPasteContainers=Construction Paste Containers
 config.buildinggadgets.general.subCategoryPasteContainers.tooltip=Configure the Construction Paste Containers here
+config.buildinggadgets.general.subCategoryPasteContainers.capacity.t1=T1 Paste Container Capacity
 config.buildinggadgets.general.subCategoryPasteContainers.capacity.t1.tooltip=The maximum capacity of a tier 1 (iron) Construction Paste Container
 config.buildinggadgets.general.subCategoryPasteContainers.capacity.t2=T2 Paste Container Capacity
 config.buildinggadgets.general.subCategoryPasteContainers.capacity.t2.tooltip=The maximum capacity of a tier 2 (gold) Construction Paste Container

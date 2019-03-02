@@ -10,6 +10,7 @@ import it.unimi.dsi.fastutil.doubles.Double2ObjectArrayMap;
 import it.unimi.dsi.fastutil.doubles.Double2ObjectMap;
 import it.unimi.dsi.fastutil.doubles.DoubleRBTreeSet;
 import it.unimi.dsi.fastutil.doubles.DoubleSortedSet;
+import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -37,7 +38,7 @@ public enum BuildingModes {
     private final IBuildingMode modeImpl;
 
     BuildingModes(String iconFile, IBuildingMode modeImpl) {
-        this.displayName = GadgetGeneric.formatName(name());
+        this.displayName = modeImpl.getLocalized();
         this.icon = new ResourceLocation(BuildingGadgets.MODID, "textures/ui/" + iconFile);
         this.modeImpl = modeImpl;
     }
@@ -85,15 +86,19 @@ public enum BuildingModes {
     }
 
     public static BiPredicate<BlockPos, IBlockState> combineTester(World world, ItemStack tool, EntityPlayer player, BlockPos initial) {
+        IBlockState target = GadgetUtils.getToolBlock(tool);
         return (pos, state) -> {
-            if (!state.getBlock().canPlaceBlockAt(world, pos) || world.isOutsideBuildHeight(pos)) {
+            if (!target.getBlock().canPlaceBlockAt(world, pos)) {
+                return false;
+            }
+            if (pos.getY() < 0) {
                 return false;
             }
             if (SyncedConfig.canOverwriteBlocks) {
                 return world.getBlockState(pos).getBlock().isReplaceable(world, pos);
-            } else {
-                return world.isAirBlock(pos);
             }
+            return world.getBlockState(pos).getMaterial() == Material.AIR;
+
         };
     }
 

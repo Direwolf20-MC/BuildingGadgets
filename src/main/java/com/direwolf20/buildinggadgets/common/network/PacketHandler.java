@@ -21,6 +21,8 @@ public class PacketHandler {
         registerMessage(PacketAnchorKey.Handler.class, PacketAnchorKey.class, Side.SERVER);
         registerMessage(PacketToggleFuzzy.Handler.class, PacketToggleFuzzy.class, Side.SERVER);
         registerMessage(PacketToggleConnectedArea.Handler.class, PacketToggleConnectedArea.class, Side.SERVER);
+        registerMessage(PacketToggleRayTraceFluid.Handler.class, PacketToggleRayTraceFluid.class, Side.SERVER);
+        registerMessage(PacketToggleBlockPlacement.Handler.class, PacketToggleBlockPlacement.class, Side.SERVER);
         registerMessage(PacketRequestBlockMap.Handler.class, PacketRequestBlockMap.class, Side.SERVER);
         registerMessage(PacketTemplateManagerSave.Handler.class, PacketTemplateManagerSave.class, Side.SERVER);
         registerMessage(PacketTemplateManagerLoad.Handler.class, PacketTemplateManagerLoad.class, Side.SERVER);

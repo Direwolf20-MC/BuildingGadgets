@@ -13,6 +13,7 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@Disabled("requires custom runner with minecraft started")
 public class SurfaceTest {
 
     private static final Random random = new Random();

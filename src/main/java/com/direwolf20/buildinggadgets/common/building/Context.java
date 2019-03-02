@@ -9,9 +9,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 import java.util.Iterator;
-import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
-import java.util.function.Function;
 
 /**
  * Execution context that uses {@link IPlacementSequence}, {@link IBlockProvider} in combination.
@@ -41,7 +39,6 @@ public class Context {
         this.blocks = blocks;
         this.validatorFactory = validatorFactory;
     }
-
 
     public IPlacementSequence getPositionSequence() {
         return positions;

@@ -7,7 +7,6 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.AbstractIterator;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import it.unimi.dsi.fastutil.objects.ObjectSet;
-import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
@@ -113,7 +112,7 @@ public final class ConnectedSurface implements IPlacementSequence {
                         boolean isSearched = searched.contains(neighbor);
                         searched.add(neighbor);
 
-                        if (isSearched || !searchingRegion.contains(neighbor) || !isStateValid(selectedBlock, getReferenceFor(neighbor))) {
+                        if (isSearched || !searchingRegion.contains(neighbor) || !isStateValid(selectedBlock, neighbor)) {
                             continue;
                         }
 
@@ -126,8 +125,9 @@ public final class ConnectedSurface implements IPlacementSequence {
         };
     }
 
-    private boolean isStateValid(IBlockState filter, IBlockState reference) {
-        boolean isAir = reference.getMaterial() == Material.AIR;
+    private boolean isStateValid(IBlockState filter, BlockPos pos) {
+        IBlockState reference = getReferenceFor(pos);
+        boolean isAir = reference.getBlock().isAir(reference, world, pos);
         //If fuzzy=true, we ignore the block for reference
         if (fuzzy) {
             return !isAir;

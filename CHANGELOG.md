@@ -1,10 +1,29 @@
 # Building Gadgets Changelog
 The format of this document is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and should continue to adhere to the conventions outlined in the Keep a Changelog guidelines.
 
-## [Unreleased] 
-### Changed
-- The Template Manager now displays a special Error-Message if someone tries to paste a link instead of JSON-Data
+## [Unreleased]
+### Added
+- The copy/paste gadget can now mirror pastes, as well as rotate them. Sneak while pressing the keybind that previously just rotated them to mirror them left-to-right instead.
+- Allowed gadgets to bind Simple Storage Network networks as a remote inventories (you can only bind the Storage Network Master block).
 
+## [2.6.6] - 2019-02-27
+### Added
+- Allowed gadgets to bind Applied Energistics 2 networks as a remote inventories.
+- Added gadget modes for:
+    - [all gadgets] raytracing fluids
+    - [building gadget] placing in or on blocks
+- More German localisation
+
+### Fixed
+- Refined Storage network IO now respects security permissions.
+- Fixed destruction overlay rendering bug when in F1 mode.
+- When in connected area mode, the destruction gadget now does nothing when set to 0 depth, just as it does otherwise.
+- Allowed destruction overlay render cache to update when the side of the observed block changes.
+
+## [2.6.5] - 2019-02-22
+### Changed
+- In addition to extracting items from bound Refined Storage networks when using the building/exchanging/copy-paste gadgets, items can now also be inserted into them when using, and undoing the use of, the building/copy-paste gadgets.
+- The Template Manager now displays a special Error-Message if someone tries to paste a link instead of JSON-Data
 
 ## [2.6.4] - 2019-02-17
 ### Fixed

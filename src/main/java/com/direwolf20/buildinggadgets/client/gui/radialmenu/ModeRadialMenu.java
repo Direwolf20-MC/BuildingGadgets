@@ -1,9 +1,3 @@
-/**
- * This class was adapted from code written by Vazkii for the PSI mod: https://github.com/Vazkii/Psi
- * Psi is Open Source and distributed under the
- * Psi License: http://psi.vazkii.us/license.php
- */
-
 package com.direwolf20.buildinggadgets.client.gui.radialmenu;
 
 import com.direwolf20.buildinggadgets.client.KeyBindings;
@@ -13,16 +7,11 @@ import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.ModSounds;
 import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
 import com.direwolf20.buildinggadgets.common.items.gadgets.*;
-import com.direwolf20.buildinggadgets.common.network.PacketChangeRange;
-import com.direwolf20.buildinggadgets.common.network.PacketHandler;
-import com.direwolf20.buildinggadgets.common.network.PacketToggleConnectedArea;
-import com.direwolf20.buildinggadgets.common.network.PacketToggleFuzzy;
-import com.direwolf20.buildinggadgets.common.network.PacketToggleMode;
+import com.direwolf20.buildinggadgets.common.network.*;
 import com.direwolf20.buildinggadgets.common.tools.BuildingModes;
 import com.direwolf20.buildinggadgets.common.tools.ExchangingModes;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
@@ -35,7 +24,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.Vec3d;
-
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.vector.Vector2f;
 
@@ -44,12 +32,17 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * This class was adapted from code written by Vazkii for the PSI mod: https://github.com/Vazkii/Psi
+ * Psi is Open Source and distributed under the
+ * Psi License: http://psi.vazkii.us/license.php
+ */
 public class ModeRadialMenu extends GuiScreen {
 
     //TODO move to a enum
     private static final ImmutableList<ResourceLocation> signsCopyPaste = ImmutableList.of(
-            new ResourceLocation(BuildingGadgets.MODID,"textures/ui/copy.png"),
-            new ResourceLocation(BuildingGadgets.MODID,"textures/ui/paste.png")
+            new ResourceLocation(BuildingGadgets.MODID, "textures/ui/copy.png"),
+            new ResourceLocation(BuildingGadgets.MODID, "textures/ui/paste.png")
     );
 
     private int timeIn = 0;
@@ -58,17 +51,19 @@ public class ModeRadialMenu extends GuiScreen {
 
     public ModeRadialMenu(ItemStack stack) {
         mc = Minecraft.getMinecraft();
-        if (stack.getItem() instanceof GadgetGeneric)
+        if (stack.getItem() instanceof GadgetGeneric) {
             setSocketable(stack);
+        }
     }
 
     public void setSocketable(ItemStack stack) {
-        if (stack.getItem() instanceof GadgetBuilding)
+        if (stack.getItem() instanceof GadgetBuilding) {
             segments = BuildingModes.values().length;
-        else if (stack.getItem() instanceof GadgetExchanger)
+        } else if (stack.getItem() instanceof GadgetExchanger) {
             segments = ExchangingModes.values().length;
-        else if (stack.getItem() instanceof GadgetCopyPaste)
+        } else if (stack.getItem() instanceof GadgetCopyPaste) {
             segments = GadgetCopyPaste.ToolMode.values().length;
+        }
     }
 
     @Override
@@ -78,8 +73,9 @@ public class ModeRadialMenu extends GuiScreen {
         if (tool.getItem() instanceof GadgetDestruction) {
             destruction = true;
             buttonList.add(new GuiButtonAction(I18n.format("tooltip.gadget.destroy.overlay"), send -> {
-                if (send)
+                if (send) {
                     PacketHandler.INSTANCE.sendToServer(new PacketChangeRange());
+                }
 
                 return GadgetDestruction.getOverlay(getGadget());
             }));
@@ -87,17 +83,35 @@ public class ModeRadialMenu extends GuiScreen {
         if (!(tool.getItem() instanceof GadgetCopyPaste)) {
             if (!destruction || SyncedConfig.nonFuzzyEnabledDestruction) {
                 buttonList.add(new GuiButtonAction(I18n.format("tooltip.gadget.fuzzy"), send -> {
-                    if (send)
+                    if (send) {
                         PacketHandler.INSTANCE.sendToServer(new PacketToggleFuzzy());
+                    }
 
                     return GadgetGeneric.getFuzzy(getGadget());
                 }));
             }
             buttonList.add(new GuiButtonAction(I18n.format("message.gadget.connected" + (destruction ? "area" : "surface")), send -> {
-                if (send)
+                if (send) {
                     PacketHandler.INSTANCE.sendToServer(new PacketToggleConnectedArea());
+                }
 
                 return GadgetGeneric.getConnectedArea(getGadget());
+            }));
+        }
+        addButton(new GuiButtonAction(I18n.format("tooltip.gadget.raytrace_fluid"), send -> {
+            if (send) {
+                PacketHandler.INSTANCE.sendToServer(new PacketToggleRayTraceFluid());
+            }
+
+            return GadgetGeneric.shouldRayTraceFluid(getGadget());
+        }));
+        if (tool.getItem() instanceof GadgetBuilding) {
+            addButton(new GuiButtonAction(I18n.format("tooltip.gadget.building.place_atop"), send -> {
+                if (send) {
+                    PacketHandler.INSTANCE.sendToServer(new PacketToggleBlockPlacement());
+                }
+
+                return GadgetBuilding.shouldPlaceAtop(getGadget());
             }));
         }
         updateButtons(tool);
@@ -139,18 +153,18 @@ public class ModeRadialMenu extends GuiScreen {
         GlStateManager.scale(fract, fract, fract);
         super.drawScreen(mx, my, partialTicks);
         GlStateManager.popMatrix();
-        if (segments == 0)
+        if (segments == 0) {
             return;
+        }
 
         GlStateManager.pushMatrix();
         GlStateManager.disableTexture2D();
 
-        
         int maxRadius = 80;
 
         float angle = mouseAngle(x, y, mx, my);
 
-        int highlight = 5;
+//        int highlight = 5;
 
         GlStateManager.enableBlend();
         GlStateManager.shadeModel(GL11.GL_SMOOTH);
@@ -160,8 +174,9 @@ public class ModeRadialMenu extends GuiScreen {
         List<NameDisplayData> nameData = new ArrayList<>();
 
         ItemStack tool = getGadget();
-        if (tool.isEmpty())
+        if (tool.isEmpty()) {
             return;
+        }
 
         slotSelected = -1;
         float offset = 8.5F;
@@ -187,8 +202,9 @@ public class ModeRadialMenu extends GuiScreen {
             GL11.glBegin(GL11.GL_TRIANGLE_STRIP);
 
             float gs = 0.25F;
-            if (seg % 2 == 0)
+            if (seg % 2 == 0) {
                 gs += 0.1F;
+            }
             float r = gs;
             float g = gs + (seg == modeIndex ? 1F : 0.0F);
             float b = gs;
@@ -204,8 +220,9 @@ public class ModeRadialMenu extends GuiScreen {
                 float rad = (float) ((i + totalDeg) / 180F * Math.PI);
                 double xp = x + Math.cos(rad) * radius;
                 double yp = y + Math.sin(rad) * radius;
-                if ((int) i == (int) (degPer / 2))
+                if ((int) i == (int) (degPer / 2)) {
                     nameData.add(new NameDisplayData((int) xp, (int) yp, mouseInSector));
+                }
 
                 GL11.glVertex2d(x + Math.cos(rad) * radius / 2.3F, y + Math.sin(rad) * radius / 2.3F);
                 GL11.glVertex2d(xp, yp);
@@ -213,6 +230,9 @@ public class ModeRadialMenu extends GuiScreen {
             totalDeg += degPer;
 
             GL11.glEnd();
+
+//            if (mouseInSector)
+//                radius -= highlight;
         }
         GlStateManager.shadeModel(GL11.GL_FLAT);
         GlStateManager.enableTexture2D();
@@ -224,21 +244,24 @@ public class ModeRadialMenu extends GuiScreen {
             char style = data.getStylePrefix();
 
             String name = "\u00a7" + style;
-            if (tool.getItem() instanceof GadgetBuilding)
+            if (tool.getItem() instanceof GadgetBuilding) {
                 name += BuildingModes.values()[i].toString();
-            else if (tool.getItem() instanceof GadgetExchanger)
+            } else if (tool.getItem() instanceof GadgetExchanger) {
                 name += ExchangingModes.values()[i].toString();
-            else
+            } else {
                 name += GadgetCopyPaste.ToolMode.values()[i].toString();
+            }
 
             int xsp = xp - 4;
             int ysp = yp;
             int width = fontRenderer.getStringWidth(name);
 
-            if (xsp < x)
+            if (xsp < x) {
                 xsp -= width - 8;
-            if (ysp < y)
+            }
+            if (ysp < y) {
                 ysp -= 9;
+            }
 
             fontRenderer.drawStringWithShadow(name, xsp, ysp, i == modeIndex ? Color.GREEN.getRGB() : Color.WHITE.getRGB());
 
@@ -294,25 +317,28 @@ public class ModeRadialMenu extends GuiScreen {
         timeIn++;
         ItemStack tool = getGadget();
         boolean builder = tool.getItem() instanceof GadgetBuilding;
-        if (!builder && !(tool.getItem() instanceof GadgetExchanger))
+        if (!builder && !(tool.getItem() instanceof GadgetExchanger)) {
             return;
+        }
 
         boolean curent;
         boolean changed = false;
         for (int i = 0; i < 2; i++) {
             GuiButton button = buttonList.get(i);
-            if (builder)
+            if (builder) {
                 curent = GadgetBuilding.getToolMode(tool) == BuildingModes.Surface;
-            else
+            } else {
                 curent = i == 0 || GadgetExchanger.getToolMode(tool) == ExchangingModes.Surface;
+            }
 
             if (button.visible != curent) {
                 button.visible = curent;
                 changed = true;
             }
         }
-        if (changed)
+        if (changed) {
             updateButtons(tool);
+        }
     }
 
     @Override
@@ -327,4 +353,5 @@ public class ModeRadialMenu extends GuiScreen {
         float ang = (float) (Math.acos(Vector2f.dot(baseVec, mouseVec) / (baseVec.length() * mouseVec.length())) * (180F / Math.PI));
         return my < y ? 360F - ang : ang;
     }
+
 }

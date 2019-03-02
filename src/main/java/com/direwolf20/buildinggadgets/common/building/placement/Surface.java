@@ -4,7 +4,6 @@ import com.direwolf20.buildinggadgets.common.building.IPlacementSequence;
 import com.direwolf20.buildinggadgets.common.building.Region;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.AbstractIterator;
-import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
@@ -89,8 +88,9 @@ public final class Surface implements IPlacementSequence {
             protected BlockPos computeNext() {
                 while (it.hasNext()) {
                     BlockPos pos = it.next();
-                    IBlockState baseBlock = world.getBlockState(searching2referenceMapper.apply(pos));
-                    if ((fuzzy || baseBlock == selectedBase) && baseBlock.getMaterial() != Material.AIR) {
+                    BlockPos referencePos = searching2referenceMapper.apply(pos);
+                    IBlockState baseBlock = world.getBlockState(referencePos);
+                    if ((fuzzy || baseBlock == selectedBase) && !baseBlock.getBlock().isAir(baseBlock, world, referencePos)) {
                         return pos;
                     }
                 }

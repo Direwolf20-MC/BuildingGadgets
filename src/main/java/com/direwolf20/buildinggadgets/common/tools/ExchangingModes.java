@@ -43,7 +43,7 @@ public enum ExchangingModes {
     private final IBuildingMode modeImpl;
 
     ExchangingModes(String iconFile, IBuildingMode modeImpl) {
-        this.displayName = GadgetGeneric.formatName(name());
+        this.displayName = modeImpl.getLocalized();
         this.icon = new ResourceLocation(BuildingGadgets.MODID, "textures/ui/" + iconFile);
         this.modeImpl = modeImpl;
     }

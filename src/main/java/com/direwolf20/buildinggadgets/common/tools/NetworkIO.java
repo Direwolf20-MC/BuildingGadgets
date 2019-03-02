@@ -1,24 +1,25 @@
 package com.direwolf20.buildinggadgets.common.tools;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.google.common.collect.ImmutableList;
-import com.raoulvdberge.refinedstorage.api.network.INetwork;
-import com.raoulvdberge.refinedstorage.api.util.Action;
 
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.items.IItemHandler;
 
-public abstract class NetworkIO implements IItemHandler {
-    private final List<ItemStack> stacks;
+public abstract class NetworkIO<P extends NetworkIO.IStackProvider> implements IItemHandler {
+    private final List<P> stackProviders;
+    protected final EntityPlayer player;
 
-    protected NetworkIO(Collection<ItemStack> stacks) {
-        this.stacks = ImmutableList.copyOf(stacks);
+    protected NetworkIO(EntityPlayer player, @Nullable Collection<P> stackProviders) {
+        this.player = player;
+        this.stackProviders = stackProviders != null ? ImmutableList.copyOf(stackProviders)
+                : (ImmutableList<P>) ImmutableList.of(new StackProviderVanilla(ItemStack.EMPTY));
     }
 
     public static enum Operation {
@@ -27,13 +28,17 @@ public abstract class NetworkIO implements IItemHandler {
 
     @Override
     public int getSlots() {
-        return stacks.size();
+        return stackProviders.size();
     }
 
     @Override
     @Nonnull
     public ItemStack getStackInSlot(int slot) {
-        return stacks.get(slot);
+        return getStackProviderInSlot(slot).getStack();
+    }
+
+    protected P getStackProviderInSlot(int slot) {
+        return stackProviders.get(slot);
     }
 
     @Nullable
@@ -54,6 +59,7 @@ public abstract class NetworkIO implements IItemHandler {
         return getNonNullStack(extractItemInternal(slot, amount, simulate));
     }
 
+    @Nonnull
     private ItemStack getNonNullStack(@Nullable ItemStack stack) {
         return stack == null ? ItemStack.EMPTY : stack;
     }
@@ -63,28 +69,23 @@ public abstract class NetworkIO implements IItemHandler {
         return Integer.MAX_VALUE;
     }
 
-    public static class NetworkRefinedStorageIO extends NetworkIO {
-        private INetwork network;
+    public static interface IStackProvider {
+        @Nonnull
+        ItemStack getStack();
+    }
 
-        public NetworkRefinedStorageIO(INetwork network, Operation operation) {
-            super(operation == Operation.EXTRACT ? network.getItemStorageCache().getList().getStacks() : Collections.singletonList(ItemStack.EMPTY));
-            this.network = network;
+    public static class StackProviderVanilla implements IStackProvider {
+        @Nonnull
+        private ItemStack stack;
+
+        public StackProviderVanilla(@Nonnull ItemStack stack) {
+            this.stack = stack;
         }
 
         @Override
-        @Nullable
-        public ItemStack insertItemInternal(ItemStack stack, boolean simulate) {
-            return network.insertItem(stack, stack.getCount(), getAction(simulate));
-        }
-
-        @Override
-        @Nullable
-        public ItemStack extractItemInternal(int slot, int amount, boolean simulate) {
-            return network.extractItem(getStackInSlot(slot), amount, getAction(simulate));
-        }
-
-        private Action getAction(boolean simulate) {
-            return simulate ? Action.SIMULATE : Action.PERFORM;
+        @Nonnull
+        public ItemStack getStack() {
+            return stack;
         }
     }
 }

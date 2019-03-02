@@ -1,6 +1,9 @@
 package com.direwolf20.buildinggadgets.common.tools;
 
+import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
+
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumFacing.Axis;
 import net.minecraft.util.math.BlockPos;
@@ -14,21 +17,26 @@ import static com.direwolf20.buildinggadgets.common.config.SyncedConfig.rayTrace
 
 public class VectorTools {
 
-    public static RayTraceResult getLookingAt(EntityPlayer player) {
+    public static RayTraceResult getLookingAt(EntityPlayer player, ItemStack tool) {
+        return getLookingAt(player, GadgetGeneric.shouldRayTraceFluid(tool));
+    }
+
+    public static RayTraceResult getLookingAt(EntityPlayer player, boolean rayTraceFluid) {
         World world = player.world;
         Vec3d look = player.getLookVec();
         Vec3d start = new Vec3d(player.posX, player.posY + player.getEyeHeight(), player.posZ);
         //rayTraceRange here refers to SyncedConfig.rayTraceRange
         Vec3d end = new Vec3d(player.posX + look.x * rayTraceRange, player.posY + player.getEyeHeight() + look.y * rayTraceRange, player.posZ + look.z * rayTraceRange);
-        return world.rayTraceBlocks(start, end, false, false, false);
+        return world.rayTraceBlocks(start, end, rayTraceFluid, false, false);
     }
 
     @Nullable
-    public static BlockPos getPosLookingAt(EntityPlayer player) {
-        RayTraceResult lookingAt = VectorTools.getLookingAt(player);
-        if (lookingAt == null) return null;
-        BlockPos pos = lookingAt.getBlockPos();
-        return pos;
+    public static BlockPos getPosLookingAt(EntityPlayer player, ItemStack tool) {
+        RayTraceResult lookingAt = VectorTools.getLookingAt(player, tool);
+        if (lookingAt == null)
+            return null;
+
+        return lookingAt.getBlockPos();
     }
 
     public static int getAxisValue(BlockPos pos, Axis axis) {

@@ -8,6 +8,7 @@ import net.minecraft.world.World;
 
 import java.util.function.BiPredicate;
 
+@FunctionalInterface
 public interface IValidatorFactory {
 
     BiPredicate<BlockPos, IBlockState> createValidatorFor(World world, ItemStack tool, EntityPlayer player, BlockPos initial);

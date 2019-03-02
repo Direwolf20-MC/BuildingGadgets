@@ -16,6 +16,7 @@ import java.util.Set;
 import static com.direwolf20.buildinggadgets.util.CasedBlockView.regionAtOriginWithRandomTargets;
 import static org.junit.jupiter.api.Assertions.*;
 
+@Disabled("requires custom runner with minecraft started")
 public class ConnectedSurfaceTest {
 
     private final Random random = new Random();

@@ -74,6 +74,16 @@ public class GadgetBuilding extends GadgetGeneric {
         return BuildingModes.byName(tagCompound.getString("mode"));
     }
 
+    public static boolean shouldPlaceAtop(ItemStack stack) {
+        return !NBTTool.getOrNewTag(stack).getBoolean("start_inside");
+    }
+
+    public static void togglePlaceAtop(EntityPlayer player, ItemStack stack) {
+        NBTTool.getOrNewTag(stack).setBoolean("start_inside", shouldPlaceAtop(stack));
+        String prefix = "message.gadget.building.placement";
+        player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation(prefix, new TextComponentTranslation(prefix + (shouldPlaceAtop(stack) ? ".atop" : ".inside"))).getUnformattedComponentText()), true);
+    }
+
     @Override
     public void addInformation(ItemStack stack, @Nullable World world, List<String> list, ITooltipFlag b) {
         //Add tool information to the tooltip
@@ -87,6 +97,8 @@ public class GadgetBuilding extends GadgetGeneric {
         if (getToolMode(stack) == BuildingModes.Surface)
             list.add(TextFormatting.GOLD + I18n.format("tooltip.gadget.fuzzy") + ": " + getFuzzy(stack));
 
+        addInformationRayTraceFluid(list, stack);
+        list.add(TextFormatting.YELLOW + I18n.format("tooltip.gadget.building.place_atop") + ": " + shouldPlaceAtop(stack));
         addEnergyInformation(list, stack);
     }
 
@@ -141,7 +153,7 @@ public class GadgetBuilding extends GadgetGeneric {
         List<BlockPos> coords = getAnchor(stack);
 
         if (coords.size() == 0) {  //If we don't have an anchor, build in the current spot
-            RayTraceResult lookingAt = VectorTools.getLookingAt(player);
+            RayTraceResult lookingAt = VectorTools.getLookingAt(player, stack);
             if (lookingAt == null) { //If we aren't looking at anything, exit
                 return false;
             }
