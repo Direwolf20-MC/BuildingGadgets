@@ -49,14 +49,18 @@ repositories {
         name = 'DVS1 Maven' // AE2
         url = "http://dvs1.progwml6.com/files/maven"
     }
+    maven {
+        name = "CurseForge" // SSN
+        url = "https://minecraft.curseforge.com/api/maven/"
+    }
 }
 
 dependencies {
     deobfCompile "team.chisel.ctm:CTM:MC${minecraft_version}-${ctm_version}:api"
     deobfCompile "refinedstorage:refinedstorage:${rs_version}:api"
     deobfCompile "appeng:appliedenergistics2:${ae2_version}"
+	deobfCompile "simple-storage-network:SimpleStorageNetwork:${ssn_version}"
     runtime "team.chisel.ctm:CTM:MC${minecraft_version}-${ctm_version}"
-	compile files ("lib/SimpleStorageNetwork-${ssn_version}.jar")
     // you may put jars on which you depend on in ./libs
     // or you may define them like so..
     //compile "some.group:artifact:version:classifier"
