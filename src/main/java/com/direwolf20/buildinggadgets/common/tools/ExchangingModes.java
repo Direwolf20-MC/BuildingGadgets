@@ -4,9 +4,8 @@ import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.blocks.ModBlocks;
 import com.direwolf20.buildinggadgets.common.building.IBuildingMode;
-import com.direwolf20.buildinggadgets.common.building.IPlacementSequence;
+import com.direwolf20.buildinggadgets.common.building.modes.ExchangingGridMode;
 import com.direwolf20.buildinggadgets.common.building.modes.ExchangingSurfaceMode;
-import com.direwolf20.buildinggadgets.common.building.modes.GridMode;
 import com.direwolf20.buildinggadgets.common.building.modes.HorizontalColumnMode;
 import com.direwolf20.buildinggadgets.common.building.modes.VerticalColumnMode;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
@@ -30,13 +29,7 @@ public enum ExchangingModes {
     Surface("surface.png", new ExchangingSurfaceMode(ExchangingModes::combineTester)),
     VerticalColumn("vertical_column.png", new VerticalColumnMode(ExchangingModes::combineTester)),
     HorizontalColumn("horizontal_column.png", new HorizontalColumnMode(ExchangingModes::combineTester)),
-    Grid("grid.png", new GridMode(ExchangingModes::combineTester) {
-        @Override
-        public IPlacementSequence computeCoordinates(EntityPlayer player, BlockPos hit, EnumFacing sideHit, ItemStack tool) {
-            //Exchanger replace at the same level, Building gadget build on top of the level
-            return super.computeCoordinates(player, hit.offset(EnumFacing.DOWN), sideHit, tool);
-        }
-    });
+    Grid("grid.png", new ExchangingGridMode(ExchangingModes::combineTester));
 
     private final String displayName;
     private final ResourceLocation icon;
