@@ -46,14 +46,16 @@ class RegionIterator extends AbstractIterator<BlockPos> implements PeekingIterat
         if (isZOverflowed()) {
             posZ = minZ;
             posY++;
-        } else {
+        }
+        else {
             return pos;
         }
 
         if (isYOverflowed()) {
             posY = minY;
             posX++;
-        } else {
+        }
+        else {
             return pos;
         }
 
@@ -71,10 +73,6 @@ class RegionIterator extends AbstractIterator<BlockPos> implements PeekingIterat
 
     private boolean isZOverflowed() {
         return posZ > maxZ;
-    }
-
-    private boolean isTerminated() {
-        return isXOverflowed() && isYOverflowed() && isZOverflowed();
     }
 
 }

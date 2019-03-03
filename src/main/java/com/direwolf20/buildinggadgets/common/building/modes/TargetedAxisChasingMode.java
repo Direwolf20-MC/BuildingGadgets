@@ -5,6 +5,7 @@ import com.direwolf20.buildinggadgets.common.building.IPlacementSequence;
 import com.direwolf20.buildinggadgets.common.building.IValidatorFactory;
 import com.direwolf20.buildinggadgets.common.building.placement.Column;
 import com.direwolf20.buildinggadgets.common.building.placement.ExclusiveAxisChasing;
+import com.direwolf20.buildinggadgets.common.tools.IAtopSupport;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
@@ -14,7 +15,7 @@ import net.minecraft.util.math.BlockPos;
 /**
  * <p>Formal "Build to Me"</p>
  */
-public class TargetedAxisChasingMode extends AbstractMode {
+public class TargetedAxisChasingMode extends AbstractMode implements IAtopSupport {
 
     private static final ResourceLocation NAME = new ResourceLocation(BuildingGadgets.MODID, "axis_chasing");
 
@@ -34,6 +35,11 @@ public class TargetedAxisChasingMode extends AbstractMode {
     @Override
     public ResourceLocation getRegistryName() {
         return NAME;
+    }
+
+    @Override
+    public BlockPos transformAtop(EntityPlayer player, BlockPos hit, EnumFacing sideHit, ItemStack tool, int offset) {
+        return hit.offset(sideHit, offset);
     }
 
 }

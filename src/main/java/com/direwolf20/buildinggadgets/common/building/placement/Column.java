@@ -21,7 +21,7 @@ public final class Column implements IPlacementSequence {
      * @implSpec this sequence does <b>not</b> include the source position
      */
     public static Column extendFrom(BlockPos hit, EnumFacing side, int range) {
-        //-1 Region's vertexes are inclusive
+        //don't -1: Region's vertexes are inclusive
         return new Column(hit.offset(side), hit.offset(side, range));
     }
 

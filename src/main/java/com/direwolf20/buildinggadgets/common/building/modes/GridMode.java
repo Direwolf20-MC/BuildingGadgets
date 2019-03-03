@@ -5,13 +5,14 @@ import com.direwolf20.buildinggadgets.common.building.IPlacementSequence;
 import com.direwolf20.buildinggadgets.common.building.IValidatorFactory;
 import com.direwolf20.buildinggadgets.common.building.placement.Grid;
 import com.direwolf20.buildinggadgets.common.tools.GadgetUtils;
+import com.direwolf20.buildinggadgets.common.tools.IAtopSupport;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 
-public class GridMode extends AbstractMode {
+public class GridMode extends AbstractMode implements IAtopSupport {
 
     //TODO give config option
     //     min = 1, max = 15 (tool range)
@@ -31,6 +32,11 @@ public class GridMode extends AbstractMode {
     @Override
     public ResourceLocation getRegistryName() {
         return NAME;
+    }
+
+    @Override
+    public BlockPos transformAtop(EntityPlayer player, BlockPos hit, EnumFacing sideHit, ItemStack tool, int offset) {
+        return hit.up(offset);
     }
 
 }

@@ -71,7 +71,11 @@ public final class Stair implements IPlacementSequence {
     public Iterator<BlockPos> iterator() {
         return new AbstractIterator<BlockPos>() {
             private MutableBlockPos current = new MutableBlockPos(base);
-            private int i = -1;
+            private int i = 0;
+
+            {
+                current.move(horizontalAdvance, -1).move(verticalAdvance, -1);
+            }
 
             @Override
             protected BlockPos computeNext() {

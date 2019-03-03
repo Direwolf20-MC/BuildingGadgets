@@ -33,12 +33,13 @@ public enum BuildingModes {
 
     private final String displayName;
     private final ResourceLocation icon;
-    private final IBuildingMode modeImpl;
+    private final BuildingModeWrapper modeImpl;
 
     BuildingModes(String iconFile, IBuildingMode modeImpl) {
         this.displayName = modeImpl.getLocalized();
         this.icon = new ResourceLocation(BuildingGadgets.MODID, "textures/ui/" + iconFile);
-        this.modeImpl = modeImpl;
+        boolean supportAtop = modeImpl instanceof IAtopSupport;
+        this.modeImpl = new BuildingModeWrapper(modeImpl, supportAtop ? (IAtopSupport) modeImpl : BuildingModeWrapper.NONE);
     }
 
     public ResourceLocation getIcon() {
@@ -47,6 +48,10 @@ public enum BuildingModes {
 
     public IBuildingMode getModeImplementation() {
         return modeImpl;
+    }
+
+    public boolean doesSupportAtop() {
+        return modeImpl.doesSupportAtop();
     }
 
     public String getRegistryName() {

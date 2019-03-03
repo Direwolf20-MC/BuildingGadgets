@@ -7,13 +7,14 @@ import com.direwolf20.buildinggadgets.common.building.placement.ConnectedSurface
 import com.direwolf20.buildinggadgets.common.building.placement.Surface;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
 import com.direwolf20.buildinggadgets.common.tools.GadgetUtils;
+import com.direwolf20.buildinggadgets.common.tools.IAtopSupport;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 
-public class BuildingSurfaceMode extends AbstractMode {
+public class BuildingSurfaceMode extends AbstractMode implements IAtopSupport {
 
     private static final ResourceLocation NAME = new ResourceLocation(BuildingGadgets.MODID, "surface");
 
@@ -33,6 +34,11 @@ public class BuildingSurfaceMode extends AbstractMode {
     @Override
     public ResourceLocation getRegistryName() {
         return NAME;
+    }
+
+    @Override
+    public BlockPos transformAtop(EntityPlayer player, BlockPos hit, EnumFacing sideHit, ItemStack tool, int offset) {
+        return hit.offset(sideHit, offset);
     }
 
 }
