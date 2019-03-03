@@ -58,7 +58,7 @@ repositories {
 dependencies {
     deobfCompile "team.chisel.ctm:CTM:MC${minecraft_version}-${ctm_version}:api"
     deobfCompile "refinedstorage:refinedstorage:${rs_version}:api"
-    deobfCompile "appeng:appliedenergistics2:${ae2_version}"
+    deobfCompile "appeng:appliedenergistics2:${ae2_version}:api"
 	deobfCompile "simple-storage-network:SimpleStorageNetwork:${ssn_version}"
     runtime "team.chisel.ctm:CTM:MC${minecraft_version}-${ctm_version}"
     // you may put jars on which you depend on in ./libs

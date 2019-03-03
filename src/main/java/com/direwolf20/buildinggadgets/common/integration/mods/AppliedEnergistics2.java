@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.common.integration.mods;
 
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
@@ -10,6 +11,7 @@ import com.direwolf20.buildinggadgets.common.integration.IntegrationHandler.Inte
 import com.direwolf20.buildinggadgets.common.tools.NetworkIO;
 import com.direwolf20.buildinggadgets.common.tools.NetworkIO.IStackProvider;
 import com.direwolf20.buildinggadgets.common.tools.NetworkIO.Operation;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Streams;
 
 import appeng.api.AEApi;
@@ -17,14 +19,14 @@ import appeng.api.config.Actionable;
 import appeng.api.config.SecurityPermissions;
 import appeng.api.networking.IGridHost;
 import appeng.api.networking.IGridNode;
+import appeng.api.networking.security.IActionHost;
+import appeng.api.networking.security.IActionSource;
 import appeng.api.networking.security.ISecurityGrid;
 import appeng.api.networking.storage.IStorageGrid;
 import appeng.api.storage.IMEMonitor;
 import appeng.api.storage.channels.IItemStorageChannel;
 import appeng.api.storage.data.IAEItemStack;
 import appeng.api.util.AEPartLocation;
-import appeng.me.helpers.PlayerSource;
-import appeng.util.item.AEItemStack;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -71,33 +73,59 @@ public class AppliedEnergistics2 extends NetworkProvider {
 
     private static class NetworkAppliedEnergistics2IO extends NetworkIO<StackProviderAE2> {
         private IMEMonitor<IAEItemStack> network;
+        private IItemStorageChannel storageChannel;
 
         public NetworkAppliedEnergistics2IO(EntityPlayer player, IMEMonitor<IAEItemStack> network, Operation operation) {
             super(player, operation == Operation.INSERT ? null :
                 Streams.stream(network.getStorageList()).map(aeStack -> new StackProviderAE2(aeStack)).collect(Collectors.toList()));
             this.network = network;
+            storageChannel = AEApi.instance().storage().getStorageChannel(IItemStorageChannel.class);
         }
 
         @Override
         @Nullable
         public ItemStack insertItemInternal(ItemStack stack, boolean simulate) {
-            AEItemStack aeStack = AEItemStack.fromItemStack(stack);
+            IAEItemStack aeStack = storageChannel.createStack(stack);
             if (aeStack == null)
                 return ItemStack.EMPTY;
 
-            IAEItemStack remainder = network.injectItems(aeStack, getAction(simulate), new PlayerSource(player, null));
+            IAEItemStack remainder = network.injectItems(aeStack, getAction(simulate), new PlayerSource(player));
             return remainder == null ? null : remainder.createItemStack();
         }
 
         @Override
         @Nullable
         public ItemStack extractItemInternal(int slot, int amount, boolean simulate) {
-            IAEItemStack remainder = network.extractItems(getStackProviderInSlot(slot).withSize(amount), getAction(simulate), new PlayerSource(player, null));
+            IAEItemStack remainder = network.extractItems(getStackProviderInSlot(slot).withSize(amount), getAction(simulate), new PlayerSource(player));
             return remainder == null ? null : remainder.createItemStack();
         }
 
         private Actionable getAction(boolean simulate) {
             return simulate ? Actionable.SIMULATE : Actionable.MODULATE;
+        }
+    }
+
+    public static class PlayerSource implements IActionSource {
+        private final EntityPlayer player;
+
+        public PlayerSource(EntityPlayer player) {
+            Preconditions.checkNotNull(player);
+            this.player = player;
+        }
+
+        @Override
+        public Optional<EntityPlayer> player() {
+            return Optional.of(player);
+        }
+
+        @Override
+        public Optional<IActionHost> machine() {
+            return Optional.empty();
+        }
+
+        @Override
+        public <T> Optional<T> context(Class<T> key) {
+            return Optional.empty();
         }
     }
 }
