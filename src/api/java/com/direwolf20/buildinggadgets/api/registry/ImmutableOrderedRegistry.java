@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import net.minecraft.util.ResourceLocation;
 
+import javax.annotation.Nullable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -21,6 +22,7 @@ final class ImmutableOrderedRegistry<T> implements IOrderedRegistry<T> {
     }
 
     @Override
+    @Nullable
     public T get(ResourceLocation key) {
         return backingMap.get(key);
     }

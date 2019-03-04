@@ -5,6 +5,7 @@ import net.minecraft.util.Rotation;
 import net.minecraft.util.math.Vec3i;
 
 public final class ImmutablePos3s extends Pos3s {
+    public static final ImmutablePos3s ORIGIN = new ImmutablePos3s(0, 0, 0);
     public ImmutablePos3s(Pos3s pos) {
         super(pos);
     }
@@ -49,7 +50,7 @@ public final class ImmutablePos3s extends Pos3s {
      */
     @Override
     public ImmutablePos3s add(Vec3i vec) {
-        return new ImmutablePos3s(getX() + vec.getX(), getY() + vec.getY(), getZ() + vec.getZ());
+        return setTo(getX() + vec.getX(), getY() + vec.getY(), getZ() + vec.getZ());
     }
 
     /**
@@ -60,7 +61,7 @@ public final class ImmutablePos3s extends Pos3s {
      */
     @Override
     public ImmutablePos3s add(Pos3s vec) {
-        return new ImmutablePos3s(getX() + vec.getX(), getY() + vec.getY(), getZ() + vec.getZ());
+        return setTo(getX() + vec.getX(), getY() + vec.getY(), getZ() + vec.getZ());
     }
 
     /**
@@ -72,7 +73,7 @@ public final class ImmutablePos3s extends Pos3s {
      */
     @Override
     public ImmutablePos3s add(int x, int y, int z) {
-        return new ImmutablePos3s(getX() + x, getY() + y, getZ() + z);
+        return setTo(getX() + x, getY() + y, getZ() + z);
     }
 
     /**
@@ -85,7 +86,7 @@ public final class ImmutablePos3s extends Pos3s {
      */
     @Override
     public ImmutablePos3s add(short x, short y, short z) {
-        return new ImmutablePos3s(getX() + x, getY() + y, getZ() + z);
+        return setTo(getX() + x, getY() + y, getZ() + z);
     }
 
     /**
@@ -95,7 +96,7 @@ public final class ImmutablePos3s extends Pos3s {
      */
     @Override
     public ImmutablePos3s subtract(Pos3s vec) {
-        return new ImmutablePos3s(getX() - vec.getX(), getY() - vec.getY(), getZ() - vec.getZ());
+        return setTo(getX() - vec.getX(), getY() - vec.getY(), getZ() - vec.getZ());
     }
 
     /**
@@ -105,7 +106,7 @@ public final class ImmutablePos3s extends Pos3s {
      */
     @Override
     public ImmutablePos3s subtract(Vec3i vec) {
-        return new ImmutablePos3s(getX() - vec.getX(), getY() - vec.getY(), getZ() - vec.getZ());
+        return setTo(getX() - vec.getX(), getY() - vec.getY(), getZ() - vec.getZ());
     }
 
     /**
@@ -117,7 +118,7 @@ public final class ImmutablePos3s extends Pos3s {
      */
     @Override
     public ImmutablePos3s subtract(int x, int y, int z) {
-        return new ImmutablePos3s(getX() - x, getY() - y, getZ() - z);
+        return setTo(getX() - x, getY() - y, getZ() - z);
     }
 
     /**
@@ -129,7 +130,7 @@ public final class ImmutablePos3s extends Pos3s {
      */
     @Override
     public ImmutablePos3s subtract(short x, short y, short z) {
-        return new ImmutablePos3s(getX() - x, getY() - y, getZ() - z);
+        return setTo(getX() - x, getY() - y, getZ() - z);
     }
 
     /**
@@ -297,7 +298,7 @@ public final class ImmutablePos3s extends Pos3s {
      */
     @Override
     public ImmutablePos3s crossProduct(int x, int y, int z) {
-        return new ImmutablePos3s(getX() * z - getZ() * y, getZ() * x - getX() * z, getX() * y - getY() * x);
+        return setTo(getX() * z - getZ() * y, getZ() * x - getX() * z, getX() * y - getY() * x);
     }
 
     /**
@@ -307,7 +308,7 @@ public final class ImmutablePos3s extends Pos3s {
      */
     @Override
     public ImmutablePos3s crossProduct(short x, short y, short z) {
-        return new ImmutablePos3s(getX() * z - getZ() * y, getZ() * x - getX() * z, getX() * y - getY() * x);
+        return setTo(getX() * z - getZ() * y, getZ() * x - getX() * z, getX() * y - getY() * x);
     }
 
     /**
@@ -332,21 +333,46 @@ public final class ImmutablePos3s extends Pos3s {
     }
 
     /**
-     * Rotates this Pos3s by the given {@link Rotation}
-     *
+     * Rotates this Pos3s by the given {@link Rotation} around the x-Axis
      * @param rotationIn The rotation to perform
+     * @see #rotate(Rotation, EnumFacing.Axis)
      */
     @Override
-    public ImmutablePos3s rotate(Rotation rotationIn) {
-        switch (rotationIn) {
-            case CLOCKWISE_90:
-                return new ImmutablePos3s(- getZ(), getY(), getX());
-            case CLOCKWISE_180:
-                return new ImmutablePos3s(- getX(), getY(), - getZ());
-            case COUNTERCLOCKWISE_90:
-                return new ImmutablePos3s(getZ(), getY(), - getX());
-            default:
-                return this;
-        }
+    public ImmutablePos3s rotateX(Rotation rotationIn) {
+        return (ImmutablePos3s) super.rotateX(rotationIn);
+    }
+
+    /**
+     * Rotates this Pos3s by the given {@link Rotation} around the y-Axis
+     * @param rotationIn The rotation to perform
+     * @see #rotate(Rotation, EnumFacing.Axis)
+     */
+    @Override
+    public ImmutablePos3s rotateY(Rotation rotationIn) {
+        return (ImmutablePos3s) super.rotateY(rotationIn);
+    }
+
+    /**
+     * Rotates this Pos3s by the given {@link Rotation} around the z-Axis
+     * @param rotationIn The rotation to perform
+     * @see #rotate(Rotation, EnumFacing.Axis)
+     */
+    @Override
+    public ImmutablePos3s rotateZ(Rotation rotationIn) {
+        return (ImmutablePos3s) super.rotateZ(rotationIn);
+    }
+
+    /**
+     * Rotates this Pos3s by the given {@link Rotation} around the specified {@link EnumFacing.Axis}.
+     * The Rotation is treated as if looking towards the negative values of the specified {@code Axis}.
+     * Axis are treated as MC axis, so that negative z becomes north and positive x east, when looking at 2D plane, which
+     * would be given by the y-Axis as Normal.
+     * @param rotation The {@link Rotation} to perform
+     * @param axis The {@link EnumFacing.Axis} around which to rotate
+     * @return a Pos3s rotated around the specified axis by the specified rotation
+     */
+    @Override
+    public ImmutablePos3s rotate(Rotation rotation, EnumFacing.Axis axis) {
+        return (ImmutablePos3s) super.rotate(rotation, axis);
     }
 }

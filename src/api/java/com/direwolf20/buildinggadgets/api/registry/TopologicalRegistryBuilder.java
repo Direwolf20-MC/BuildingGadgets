@@ -26,12 +26,26 @@ public final class TopologicalRegistryBuilder<T> {
         this.build = false;
     }
 
+    public TopologicalRegistryBuilder<T> addAllValues(Map<ResourceLocation, T> values) {
+        for (Map.Entry<ResourceLocation, T> entry : values.entrySet()) {
+            addValue(entry.getKey(), entry.getValue());
+        }
+        return this;
+    }
+
     public TopologicalRegistryBuilder<T> addValue(ResourceLocation key, T value) {
         validateUnbuild();
         validateNotRegisteredTwice(Objects.requireNonNull(key));
         ValueObject<T> obj = new ValueObject<>(key, Objects.requireNonNull(value));
         values.put(key, obj);
         theGraph.addNode(obj);
+        return this;
+    }
+
+    public TopologicalRegistryBuilder<T> addAllMarkers(Iterable<ResourceLocation> markers) {
+        for (ResourceLocation marker : markers) {
+            addMarker(marker);
+        }
         return this;
     }
 

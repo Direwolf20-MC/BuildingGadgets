@@ -62,15 +62,10 @@ sourceSets {
 }
 
 configurations {
-    apiImplementation {
-        extendsFrom minecraft
-    }
-    apiTestImplementation {
-        extendsFrom apiImplementation
-    }
-    implementation {
-        extendsFrom apiImplementation
-    }
+    apiImplementation.extendsFrom minecraft
+    apiTestImplementation.extendsFrom apiImplementation
+    implementation.extendsFrom apiImplementation
+    testImplementaion.extendsFrom apiTestImplementation, implementation
 }
 
 idea {
@@ -125,8 +120,12 @@ dependencies {
     // The userdev artifact is a special name and will get all sorts of transformations applied to it.
     minecraft forgeName
     apiTestImplementation sourceSets.api.output
+    apiTestImplementation 'org.junit.jupiter:junit-jupiter:'+project.junit_version
+    apiTestImplementation 'org.hamcrest:hamcrest:'+project.hamcrest_version
     implementation sourceSets.api.output
     testImplementation sourceSets.apiTest.output
+    testImplementation 'org.junit.jupiter:junit-jupiter:'+project.junit_version
+    testImplementation 'org.hamcrest:hamcrest:'+project.hamcrest_version
     // deobfCompile "team.chisel.ctm:CTM:MC${minecraft_version}-${ctm_version}:api"
     // deobfCompile "refinedstorage:refinedstorage:${rs_version}:api"
     // runtime "team.chisel.ctm:CTM:MC${minecraft_version}-${ctm_version}"
@@ -150,6 +149,13 @@ dependencies {
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
 
+}
+
+test {
+    useJUnitPlatform()
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
 }
 
 processResources { //Processes main only resouces
