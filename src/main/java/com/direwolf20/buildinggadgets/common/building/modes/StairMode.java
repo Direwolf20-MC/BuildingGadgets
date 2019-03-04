@@ -24,7 +24,7 @@ public class StairMode extends AbstractMode implements IAtopSupport {
     @Override
     public IPlacementSequence computeCoordinates(EntityPlayer player, BlockPos hit, EnumFacing sideHit, ItemStack tool) {
         int range = GadgetUtils.getToolRange(tool);
-        EnumFacing side = sideHit.getAxis().isVertical() ? player.getHorizontalFacing() : sideHit;
+        EnumFacing side = sideHit.getAxis().isVertical() ? player.getHorizontalFacing().getOpposite() : sideHit;
 
         //TODO do it properly instead of a hack fix
         //  and then remove 'original'

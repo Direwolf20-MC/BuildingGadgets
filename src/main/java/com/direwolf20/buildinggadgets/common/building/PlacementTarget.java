@@ -14,7 +14,7 @@ public final class PlacementTarget {
         this.pos = pos;
     }
 
-    public IBlockState getBlockState() {
+    public IBlockState getState() {
         return state;
     }
 

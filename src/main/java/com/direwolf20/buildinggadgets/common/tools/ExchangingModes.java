@@ -4,10 +4,7 @@ import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.blocks.ModBlocks;
 import com.direwolf20.buildinggadgets.common.building.IBuildingMode;
-import com.direwolf20.buildinggadgets.common.building.modes.ExchangingGridMode;
-import com.direwolf20.buildinggadgets.common.building.modes.ExchangingHorizontalColumnMode;
-import com.direwolf20.buildinggadgets.common.building.modes.ExchangingSurfaceMode;
-import com.direwolf20.buildinggadgets.common.building.modes.VerticalColumnMode;
+import com.direwolf20.buildinggadgets.common.building.modes.*;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.block.state.IBlockState;
@@ -26,7 +23,7 @@ import java.util.function.BiPredicate;
 public enum ExchangingModes {
 
     Surface("surface.png", new ExchangingSurfaceMode(ExchangingModes::combineTester)),
-    VerticalColumn("vertical_column.png", new VerticalColumnMode(ExchangingModes::combineTester)),
+    VerticalColumn("vertical_column.png", new ExchangingVerticalMode(ExchangingModes::combineTester)),
     HorizontalColumn("horizontal_column.png", new ExchangingHorizontalColumnMode(ExchangingModes::combineTester)),
     Grid("grid.png", new ExchangingGridMode(ExchangingModes::combineTester));
 

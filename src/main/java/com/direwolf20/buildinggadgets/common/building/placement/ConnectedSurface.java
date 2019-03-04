@@ -136,22 +136,4 @@ public final class ConnectedSurface implements IPlacementSequence {
         return world.getBlockState(searching2referenceMapper.apply(pos));
     }
 
-    //TODO use a bit set for iterator
-    //  note: this should be handled by a custom class containing an origin, an axis to be ignored
-    //  this should enable support for negative relative coordinates
-
-//    @VisibleForTesting
-//    private int toPlaner(BlockPos relative) {
-//        Axis ignore = side.getAxis();
-//        switch (ignore) {
-//            case X:
-//                return relative.getY() * searchingRegion.getZSize() + relative.getZ();
-//            case Y:
-//                return relative.getX() * searchingRegion.getZSize() + relative.getZ();
-//            case Z:
-//                return relative.getY() * searchingRegion.getXSize() + relative.getX();
-//        }
-//        throw new IllegalArgumentException();
-//    }
-
 }

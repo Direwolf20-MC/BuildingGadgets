@@ -12,11 +12,11 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 
-public class BuildingHorizontalColumnMode extends AbstractMode implements IAtopSupport {
+public class BuildingVerticalColumnMode extends AbstractMode implements IAtopSupport {
 
-    private static final ResourceLocation NAME = new ResourceLocation(BuildingGadgets.MODID, "horizontal_column");
+    private static final ResourceLocation NAME = new ResourceLocation(BuildingGadgets.MODID, "vertical_column");
 
-    public BuildingHorizontalColumnMode(IValidatorFactory validatorFactory) {
+    public BuildingVerticalColumnMode(IValidatorFactory validatorFactory) {
         super(validatorFactory);
     }
 
@@ -24,8 +24,8 @@ public class BuildingHorizontalColumnMode extends AbstractMode implements IAtopS
     public IPlacementSequence computeCoordinates(EntityPlayer player, BlockPos hit, EnumFacing sideHit, ItemStack tool) {
         int range = GadgetUtils.getToolRange(tool);
         if (sideHit.getAxis().isVertical())
-            return Column.extendFrom(hit, player.getHorizontalFacing(), range);
-        return Column.extendFrom(hit, sideHit.getOpposite(), range);
+            return Column.extendFrom(hit, sideHit, range);
+        return Column.centerAt(hit, EnumFacing.Axis.Y, range);
     }
 
     @Override
@@ -35,7 +35,7 @@ public class BuildingHorizontalColumnMode extends AbstractMode implements IAtopS
 
     @Override
     public BlockPos transformAtop(EntityPlayer player, BlockPos hit, EnumFacing sideHit, ItemStack tool, int offset) {
-        return sideHit.getAxis().isVertical() ? hit.offset(player.getHorizontalFacing(), offset) : hit.offset(sideHit.getOpposite(), offset);
+        return sideHit.getAxis().isHorizontal() ? hit : hit.offset(sideHit, offset);
     }
 
 }

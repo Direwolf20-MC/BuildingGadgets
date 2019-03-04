@@ -21,15 +21,11 @@ import java.util.function.BiPredicate;
 abstract class AbstractMode implements IBuildingMode {
 
     protected final IValidatorFactory validatorFactory;
+    private final String translationKey;
 
     AbstractMode(IValidatorFactory validatorFactory) {
         this.validatorFactory = validatorFactory;
-    }
-
-    //TODO use capability system
-    @Override
-    public IBlockProvider getBlockProvider(ItemStack tool) {
-        return new SingleTypeProvider(GadgetUtils.getToolBlock(tool));
+        this.translationKey = "modes." + getRegistryName().toString().replace(':', '.');
     }
 
     @Override
@@ -40,6 +36,11 @@ abstract class AbstractMode implements IBuildingMode {
     @Override
     public Context createExecutionContext(EntityPlayer player, BlockPos hit, EnumFacing sideHit, ItemStack tool) {
         return new Context(computeCoordinates(player, hit, sideHit, tool), getBlockProvider(tool), validatorFactory);
+    }
+
+    @Override
+    public String getTranslationKey() {
+        return translationKey;
     }
 
 }

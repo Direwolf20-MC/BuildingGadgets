@@ -23,7 +23,7 @@ import java.util.function.BiPredicate;
 public enum BuildingModes {
 
     BuildToMe("build_to_me.png", new TargetedAxisChasingMode(BuildingModes::combineTester)),
-    VerticalColumn("vertical_column.png", new VerticalColumnMode(BuildingModes::combineTester)),
+    VerticalColumn("vertical_column.png", new BuildingVerticalColumnMode(BuildingModes::combineTester)),
     HorizontalColumn("horizontal_column.png", new BuildingHorizontalColumnMode(BuildingModes::combineTester)),
     VerticalWall("vertical_wall.png", new VerticalWallMode(BuildingModes::combineTester)),
     HorizontalWall("horizontal_wall.png", new HorizontalWallMode(BuildingModes::combineTester)),

@@ -39,7 +39,7 @@ import java.util.List;
  */
 public class ModeRadialMenu extends GuiScreen {
 
-    //TODO move to a enum
+    //TODO move to a enum of modes of Copy-Paste Gadget
     private static final ImmutableList<ResourceLocation> signsCopyPaste = ImmutableList.of(
             new ResourceLocation(BuildingGadgets.MODID, "textures/ui/copy.png"),
             new ResourceLocation(BuildingGadgets.MODID, "textures/ui/paste.png")
@@ -146,9 +146,8 @@ public class ModeRadialMenu extends GuiScreen {
         GlStateManager.scale(fract, fract, fract);
         super.drawScreen(mx, my, partialTicks);
         GlStateManager.popMatrix();
-        if (segments == 0) {
+        if (segments == 0)
             return;
-        }
 
         GlStateManager.pushMatrix();
         GlStateManager.disableTexture2D();
@@ -167,9 +166,8 @@ public class ModeRadialMenu extends GuiScreen {
         List<NameDisplayData> nameData = new ArrayList<>();
 
         ItemStack tool = getGadget();
-        if (tool.isEmpty()) {
+        if (tool.isEmpty())
             return;
-        }
 
         slotSelected = -1;
         float offset = 8.5F;
@@ -242,7 +240,6 @@ public class ModeRadialMenu extends GuiScreen {
                 name += ExchangingModes.values()[i].toString();
             else
                 name += GadgetCopyPaste.ToolMode.values()[i].toString();
-
 
             int xsp = xp - 4;
             int ysp = yp;

@@ -26,13 +26,11 @@ public final class Column implements IPlacementSequence {
     }
 
     public static Column centerAt(BlockPos hit, Axis axis, int range) {
-        int oddRange = MathTool.floorToOdd(range);
-        int radius = (range - 1) / 2;
         EnumFacing positive = EnumFacing.getFacingFromAxis(EnumFacing.AxisDirection.POSITIVE, axis);
         EnumFacing negative = positive.getOpposite();
-        BlockPos base = hit.offset(negative, radius);
+        BlockPos base = hit.offset(negative, (range - 1) / 2);
         //-1 because Region's vertexes are inclusive
-        return new Column(base, base.offset(positive, oddRange - 1));
+        return new Column(base, base.offset(positive, MathTool.floorToOdd(range) - 1));
     }
 
     /**

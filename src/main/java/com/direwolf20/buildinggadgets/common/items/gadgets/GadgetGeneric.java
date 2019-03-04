@@ -2,7 +2,9 @@ package com.direwolf20.buildinggadgets.common.items.gadgets;
 
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
-import com.direwolf20.buildinggadgets.common.items.capability.GadgetCapabilityProvider;
+import com.direwolf20.buildinggadgets.common.items.capability.CapabilityProviderBlockProvider;
+import com.direwolf20.buildinggadgets.common.items.capability.CapabilityProviderEnergy;
+import com.direwolf20.buildinggadgets.common.items.capability.MultiCapabilityProvider;
 import com.direwolf20.buildinggadgets.common.tools.NBTTool;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.resources.I18n;
@@ -45,7 +47,7 @@ public abstract class GadgetGeneric extends Item {
     @Override
     @Nullable
     public ICapabilityProvider initCapabilities(ItemStack stack, @Nullable NBTTagCompound tag) {
-        return new GadgetCapabilityProvider(stack, this::getEnergyMax);
+        return new MultiCapabilityProvider(new CapabilityProviderEnergy(stack, this::getEnergyMax), new CapabilityProviderBlockProvider(stack));
     }
 
     @Override
@@ -61,7 +63,7 @@ public abstract class GadgetGeneric extends Item {
     @Override
     public double getDurabilityForDisplay(ItemStack stack) {
         if (stack.hasCapability(CapabilityEnergy.ENERGY, null)) {
-            IEnergyStorage energy = GadgetCapabilityProvider.getEnergyCapability(stack);
+            IEnergyStorage energy = CapabilityProviderEnergy.getCap(stack);
             return 1D - ((double) energy.getEnergyStored() / (double) energy.getMaxEnergyStored());
         }
         //return (double)stack.getItemDamage() / (double)stack.getMaxDamage();
@@ -71,7 +73,7 @@ public abstract class GadgetGeneric extends Item {
     @Override
     public int getRGBDurabilityForDisplay(ItemStack stack) {
         if (stack.hasCapability(CapabilityEnergy.ENERGY, null)) {
-            IEnergyStorage energy = GadgetCapabilityProvider.getEnergyCapability(stack);
+            IEnergyStorage energy = CapabilityProviderEnergy.getCap(stack);
             return MathHelper.hsvToRGB(Math.max(0.0F, (float) energy.getEnergyStored() / (float) energy.getMaxEnergyStored()) / 3.0F, 1.0F, 1.0F);
         }
         //return MathHelper.hsvToRGB(Math.max(0.0F, (float) (1.0F - getDurabilityForDisplay(stack))) / 3.0F, 1.0F, 1.0F);
@@ -81,7 +83,7 @@ public abstract class GadgetGeneric extends Item {
     @Override
     public boolean isDamaged(ItemStack stack) {
         if (stack.hasCapability(CapabilityEnergy.ENERGY, null)) {
-            IEnergyStorage energy = GadgetCapabilityProvider.getEnergyCapability(stack);
+            IEnergyStorage energy = CapabilityProviderEnergy.getCap(stack);
             return energy.getEnergyStored() != energy.getMaxEnergyStored();
         }
         //return (stack.getItemDamage() > 0);
@@ -91,7 +93,7 @@ public abstract class GadgetGeneric extends Item {
     @Override
     public boolean showDurabilityBar(ItemStack stack) {
         if (stack.hasCapability(CapabilityEnergy.ENERGY, null)) {
-            IEnergyStorage energy = GadgetCapabilityProvider.getEnergyCapability(stack);
+            IEnergyStorage energy = CapabilityProviderEnergy.getCap(stack);
             return energy.getEnergyStored() != energy.getMaxEnergyStored();
         }
         //return stack.isItemDamaged();
@@ -128,7 +130,7 @@ public abstract class GadgetGeneric extends Item {
             return true;
 
         if (tool.hasCapability(CapabilityEnergy.ENERGY, null)) {
-            IEnergyStorage energy = GadgetCapabilityProvider.getEnergyCapability(tool);
+            IEnergyStorage energy = CapabilityProviderEnergy.getCap(tool);
             return getEnergyCost(tool) <= energy.getEnergyStored();
         }
         return tool.getMaxDamage() <= 0 || tool.getItemDamage() < tool.getMaxDamage() || tool.isItemStackDamageable();
@@ -136,7 +138,7 @@ public abstract class GadgetGeneric extends Item {
 
     public void applyDamage(ItemStack tool, EntityPlayer player) {
         if(tool.hasCapability(CapabilityEnergy.ENERGY, null)) {
-            IEnergyStorage energy = GadgetCapabilityProvider.getEnergyCapability(tool);
+            IEnergyStorage energy = CapabilityProviderEnergy.getCap(tool);
             energy.extractEnergy(getEnergyCost(tool), false);
         }
         else
@@ -145,7 +147,7 @@ public abstract class GadgetGeneric extends Item {
 
     protected void addEnergyInformation(List<String> list, ItemStack stack) {
         if (stack.hasCapability(CapabilityEnergy.ENERGY, null)) {
-            IEnergyStorage energy = GadgetCapabilityProvider.getEnergyCapability(stack);
+            IEnergyStorage energy = CapabilityProviderEnergy.getCap(stack);
             list.add(TextFormatting.WHITE + I18n.format("tooltip.gadget.energy") + ": " + withSuffix(energy.getEnergyStored()) + "/" + withSuffix(energy.getMaxEnergyStored()));
         }
     }
@@ -182,7 +184,4 @@ public abstract class GadgetGeneric extends Item {
         tooltip.add(TextFormatting.BLUE + I18n.format("tooltip.gadget.raytrace_fluid") + ": " + shouldRayTraceFluid(stack));
     }
 
-//    protected static String formatName(String name) {
-//        return name.replaceAll("(?=[A-Z])", " ").trim();
-//    }
 }
