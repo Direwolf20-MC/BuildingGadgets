@@ -1,11 +1,8 @@
 package com.direwolf20.buildinggadgets.common.building.modes;
 
 import com.direwolf20.buildinggadgets.common.building.Context;
-import com.direwolf20.buildinggadgets.common.building.IBlockProvider;
 import com.direwolf20.buildinggadgets.common.building.IBuildingMode;
 import com.direwolf20.buildinggadgets.common.building.IValidatorFactory;
-import com.direwolf20.buildinggadgets.common.building.placement.SingleTypeProvider;
-import com.direwolf20.buildinggadgets.common.tools.GadgetUtils;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;

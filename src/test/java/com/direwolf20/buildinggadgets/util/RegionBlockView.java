@@ -21,17 +21,6 @@ public class RegionBlockView implements IBlockAccess {
         this.state = state;
     }
 
-    @Nullable
-    @Override
-    public TileEntity getTileEntity(BlockPos pos) {
-        return null;
-    }
-
-    @Override
-    public int getCombinedLight(BlockPos pos, int i) {
-        return 0;
-    }
-
     @Override
     public IBlockState getBlockState(BlockPos pos) {
         return region.contains(pos) ? state : UniqueBlockState.AIR;
@@ -39,17 +28,12 @@ public class RegionBlockView implements IBlockAccess {
 
     @Override
     public boolean isAirBlock(BlockPos pos) {
-        return false;
-    }
-
-    @Override
-    public Biome getBiome(BlockPos pos) {
-        return null;
+        return !region.contains(pos);
     }
 
     @Override
     public int getStrongPower(BlockPos pos, EnumFacing facing) {
-        return 0;
+        return getBlockState(pos).getStrongPower(this, pos, facing);
     }
 
     @Override
@@ -58,8 +42,27 @@ public class RegionBlockView implements IBlockAccess {
     }
 
     @Override
-    public boolean isSideSolid(BlockPos pos, EnumFacing enumFacing, boolean b) {
-        return false;
+    public boolean isSideSolid(BlockPos pos, EnumFacing facing, boolean b) {
+        return getBlockState(pos).isSideSolid(this, pos, facing);
+    }
+
+    @Deprecated
+    @Nullable
+    @Override
+    public TileEntity getTileEntity(BlockPos pos) {
+        return null;
+    }
+
+    @Deprecated
+    @Override
+    public int getCombinedLight(BlockPos pos, int i) {
+        return 0;
+    }
+
+    @Deprecated
+    @Override
+    public Biome getBiome(BlockPos pos) {
+        return null;
     }
 
 }

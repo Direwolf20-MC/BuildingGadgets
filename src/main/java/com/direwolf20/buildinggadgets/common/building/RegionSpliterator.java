@@ -60,8 +60,7 @@ class RegionSpliterator implements Spliterator<BlockPos> {
         if (isZOverflowed()) {
             nextPosZ = minZ;
             nextPosY++;
-        }
-        else {
+        } else {
             action.accept(pos);
             return true;
         }
@@ -69,8 +68,7 @@ class RegionSpliterator implements Spliterator<BlockPos> {
         if (isYOverflowed()) {
             nextPosY = minY;
             nextPosX++;
-        }
-        else {
+        } else {
             action.accept(pos);
             return true;
         }
@@ -99,13 +97,11 @@ class RegionSpliterator implements Spliterator<BlockPos> {
             minX = (maxX - minX + 1) / 2 + minX + 1;
             resetPos();
             return new RegionSpliterator(oldMinX, oldMinY, oldMinZ, minX - 1, maxY, maxZ, oldPosX, oldPosY, oldPosZ, allowYZSplit);
-        }
-        else if (maxY > minY && allowYZSplit) {
+        } else if (maxY > minY && allowYZSplit) {
             minY = (maxY - minY + 1) / 2 + minY + 1;
             resetPos();
             return new RegionSpliterator(oldMinX, oldMinY, oldMinZ, maxX, minY - 1, maxZ, oldPosX, oldPosY, oldPosZ, allowYZSplit);
-        }
-        else if (maxZ > minZ && allowYZSplit) {
+        } else if (maxZ > minZ && allowYZSplit) {
             minZ = (maxZ - minZ + 1) / 2 + minZ + 1;
             resetPos();
             return new RegionSpliterator(oldMinX, oldMinY, oldMinZ, maxX, maxY, minZ - 1, oldPosX, oldPosY, oldPosZ, allowYZSplit);

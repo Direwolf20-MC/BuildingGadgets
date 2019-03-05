@@ -28,7 +28,12 @@ import java.util.Objects;
 
 public class UniqueBlockState implements IBlockState {
 
-    public static final IBlockState AIR = createNew();
+    public static final IBlockState AIR = new UniqueBlockState(-1) {
+        @Override
+        public Material getMaterial() {
+            return Material.AIR;
+        }
+    };
 
     private static int lastId = -1;
 
@@ -52,6 +57,11 @@ public class UniqueBlockState implements IBlockState {
     }
 
     @Override
+    public Material getMaterial() {
+        return Material.ROCK;
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -64,7 +74,7 @@ public class UniqueBlockState implements IBlockState {
         return Objects.hash(id);
     }
 
-    //All of these methods should not be used
+    //All of these methods should not be used as testing the placement logic should only need to access blockstates
 
     @Override
     public Collection<IProperty<?>> getPropertyKeys() {
@@ -104,11 +114,6 @@ public class UniqueBlockState implements IBlockState {
     @Override
     public void neighborChanged(World world, BlockPos blockPos, Block block, BlockPos blockPos1) {
 
-    }
-
-    @Override
-    public Material getMaterial() {
-        return null;
     }
 
     @Override
