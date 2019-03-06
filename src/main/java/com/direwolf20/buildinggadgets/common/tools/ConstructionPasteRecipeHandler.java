@@ -47,11 +47,6 @@ public class ConstructionPasteRecipeHandler extends ShapedOreRecipe {
         return output; // Return the modified output
     }
 
-    @Override
-    public String getGroup() {
-        return group == null ? "" : group.toString();
-    }
-
     public static class Factory implements IRecipeFactory {
 
         @Override
