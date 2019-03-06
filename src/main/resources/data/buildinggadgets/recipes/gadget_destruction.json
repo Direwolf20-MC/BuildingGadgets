@@ -1,0 +1,30 @@
+{
+  "result": {
+    "item": "buildinggadgets:gadget_destruction"
+  },
+  "pattern": [
+    "iri",
+    "ere",
+    "ili"
+  ],
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "i": {
+      "tag": "forge:ingots/iron"
+    },
+    "r": {
+      "tag": "forge:dusts/redstone"
+    },
+    "l": {
+      "tag": "forge:gems/lapis"
+    },
+    "e": {
+      "item": "minecraft:ender_pearl"
+    }
+  },
+  "conditions": [
+    {
+      "type": "buildinggadgets:enable_destruction"
+    }
+  ]
+}
