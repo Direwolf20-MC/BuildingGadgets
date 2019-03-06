@@ -1,0 +1,8 @@
+{
+  "forge_marker": 1,
+  "variants": {
+    "": {
+	  "model": "buildinggadgets:construction_block_dense"
+	}
+  }
+}

@@ -42,11 +42,13 @@ public final class Reference {
     public static final class BlockReference {
         public static final String EFFECT_BLOCK = MODID + ":effect_block";
         public static final String CONSTRUCTION_BLOCK = MODID + ":construction_block";
+        public static final String CONSTRUCTION_BLOCK_DENSE = MODID + ":construction_block_dense";
         public static final String CONSTRUCTION_BLOCK_POWDER = MODID + ":construction_block_powder";
         public static final String TEMPLATE_MANAGER = MODID + ":template_manager";
 
         public static final ResourceLocation EFFECT_BLOCK_RL = new ResourceLocation(EFFECT_BLOCK);
         public static final ResourceLocation CONSTRUCTION_BLOCK_RL = new ResourceLocation(CONSTRUCTION_BLOCK);
+        public static final ResourceLocation CONSTRUCTION_BLOCK_DENSE_RL = new ResourceLocation(CONSTRUCTION_BLOCK_DENSE);
         public static final ResourceLocation CONSTRUCTION_BLOCK_POWDER_RL = new ResourceLocation(CONSTRUCTION_BLOCK_POWDER);
         public static final ResourceLocation TEMPLATE_MANAGER_RL = new ResourceLocation(TEMPLATE_MANAGER);
 
