@@ -2,12 +2,14 @@ package com.direwolf20.buildinggadgets.common.integration.mods;
 
 import java.util.stream.Collectors;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import com.direwolf20.buildinggadgets.common.integration.NetworkProvider;
 import com.direwolf20.buildinggadgets.common.integration.IntegrationHandler.IntegratedMod;
+import com.direwolf20.buildinggadgets.common.integration.NetworkProvider;
 import com.direwolf20.buildinggadgets.common.tools.NetworkIO;
 import com.direwolf20.buildinggadgets.common.tools.NetworkIO.Operation;
+import com.direwolf20.buildinggadgets.common.tools.NetworkIO.StackProviderVanilla;
 import com.raoulvdberge.refinedstorage.api.network.INetwork;
 import com.raoulvdberge.refinedstorage.api.network.node.INetworkNodeProxy;
 import com.raoulvdberge.refinedstorage.api.network.security.Permission;
@@ -32,12 +34,12 @@ public class RefinedStorage extends NetworkProvider {
         return null;
     }
 
-    private static class NetworkRefinedStorageIO extends NetworkIO {
+    private static class NetworkRefinedStorageIO extends NetworkIO<StackProviderVanilla> {
         private INetwork network;
 
         public NetworkRefinedStorageIO(EntityPlayer player, INetwork network, Operation operation) {
             super(player, operation == Operation.INSERT ? null :
-                network.getItemStorageCache().getList().getStacks().stream().map(stack -> new StackProviderVanilla(stack)).collect(Collectors.toList()));
+                network.getItemStorageCache().getList().getStacks().stream().map(stack -> new StackProviderVanilla(stack.copy())).collect(Collectors.toList()));
             this.network = network;
         }
 
@@ -48,9 +50,9 @@ public class RefinedStorage extends NetworkProvider {
         }
 
         @Override
-        @Nullable
-        public ItemStack extractItemInternal(int slot, int amount, boolean simulate) {
-            return network.extractItem(getStackInSlot(slot), amount, getAction(simulate));
+        @Nonnull
+        protected IStackProvider extractItemInternal(StackProviderVanilla stackProvider, int amount, boolean simulate) {
+            return new StackProviderVanilla(network.extractItem(stackProvider.getStack(), amount, getAction(simulate)));
         }
 
         private Action getAction(boolean simulate) {

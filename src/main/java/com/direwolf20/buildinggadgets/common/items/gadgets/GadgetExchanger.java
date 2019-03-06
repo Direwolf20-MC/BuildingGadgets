@@ -6,6 +6,7 @@ import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.common.items.FakeBuilderWorld;
 import com.direwolf20.buildinggadgets.common.items.ModItems;
 import com.direwolf20.buildinggadgets.common.tools.ExchangingModes;
+import com.direwolf20.buildinggadgets.common.tools.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.tools.InventoryManipulation;
 import com.direwolf20.buildinggadgets.common.tools.ToolRenders;
 import com.direwolf20.buildinggadgets.common.tools.VectorTools;
@@ -221,6 +222,7 @@ public class GadgetExchanger extends GadgetGeneric {
                 //state = state.getBlock().getExtendedState(state, fakeWorld, coordinate);
                 exchangeBlock(world, player, coordinate, state);
             }
+            GadgetUtils.clearCachedRemoteInventory();
         }
         return true;
     }

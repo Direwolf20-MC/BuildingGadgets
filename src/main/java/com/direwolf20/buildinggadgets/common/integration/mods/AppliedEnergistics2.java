@@ -6,8 +6,8 @@ import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import com.direwolf20.buildinggadgets.common.integration.NetworkProvider;
 import com.direwolf20.buildinggadgets.common.integration.IntegrationHandler.IntegratedMod;
+import com.direwolf20.buildinggadgets.common.integration.NetworkProvider;
 import com.direwolf20.buildinggadgets.common.tools.NetworkIO;
 import com.direwolf20.buildinggadgets.common.tools.NetworkIO.IStackProvider;
 import com.direwolf20.buildinggadgets.common.tools.NetworkIO.Operation;
@@ -66,6 +66,11 @@ public class AppliedEnergistics2 extends NetworkProvider {
             return aeStack.createItemStack();
         }
 
+        @Override
+        public void shrinkStack(int amount) {
+            aeStack.setStackSize(aeStack.getStackSize() - amount);
+        }
+
         public IAEItemStack withSize(int amount) {
             return aeStack.copy().setStackSize(amount);
         }
@@ -77,7 +82,7 @@ public class AppliedEnergistics2 extends NetworkProvider {
 
         public NetworkAppliedEnergistics2IO(EntityPlayer player, IMEMonitor<IAEItemStack> network, Operation operation) {
             super(player, operation == Operation.INSERT ? null :
-                Streams.stream(network.getStorageList()).map(aeStack -> new StackProviderAE2(aeStack)).collect(Collectors.toList()));
+                Streams.stream(network.getStorageList()).map(aeStack -> new StackProviderAE2(aeStack.copy())).collect(Collectors.toList()));
             this.network = network;
             storageChannel = AEApi.instance().storage().getStorageChannel(IItemStorageChannel.class);
         }
@@ -94,10 +99,9 @@ public class AppliedEnergistics2 extends NetworkProvider {
         }
 
         @Override
-        @Nullable
-        public ItemStack extractItemInternal(int slot, int amount, boolean simulate) {
-            IAEItemStack remainder = network.extractItems(getStackProviderInSlot(slot).withSize(amount), getAction(simulate), new PlayerSource(player));
-            return remainder == null ? null : remainder.createItemStack();
+        @Nonnull
+        protected IStackProvider extractItemInternal(StackProviderAE2 stackProvider, int amount, boolean simulate) {
+            return new StackProviderAE2(network.extractItems(stackProvider.withSize(amount), getAction(simulate), new PlayerSource(player)));
         }
 
         private Actionable getAction(boolean simulate) {

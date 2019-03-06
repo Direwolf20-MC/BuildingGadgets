@@ -2,12 +2,14 @@ package com.direwolf20.buildinggadgets.common.integration.mods;
 
 import java.util.stream.Collectors;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import com.direwolf20.buildinggadgets.common.integration.NetworkProvider;
 import com.direwolf20.buildinggadgets.common.integration.IntegrationHandler.IntegratedMod;
+import com.direwolf20.buildinggadgets.common.integration.NetworkProvider;
 import com.direwolf20.buildinggadgets.common.tools.NetworkIO;
 import com.direwolf20.buildinggadgets.common.tools.NetworkIO.Operation;
+import com.direwolf20.buildinggadgets.common.tools.NetworkIO.StackProviderVanilla;
 
 import mrriegel.storagenetwork.api.network.INetworkMaster;
 import net.minecraft.entity.player.EntityPlayer;
@@ -27,12 +29,12 @@ public class SimpleStorageNetwork extends NetworkProvider {
         return null;
     }
 
-    public static class NetworkSimpleStorageNetworkIO extends NetworkIO {
+    public static class NetworkSimpleStorageNetworkIO extends NetworkIO<StackProviderVanilla> {
         private INetworkMaster network;
 
         public NetworkSimpleStorageNetworkIO(EntityPlayer player, INetworkMaster network, Operation operation) {
             super(player, operation == Operation.INSERT ? null :
-                network.getStacks().stream().map(stack -> new StackProviderVanilla(stack)).collect(Collectors.toList()));
+                network.getStacks().stream().map(stack -> new StackProviderVanilla(stack.copy())).collect(Collectors.toList()));
             this.network = network;
         }
 
@@ -49,9 +51,9 @@ public class SimpleStorageNetwork extends NetworkProvider {
         }
 
         @Override
-        @Nullable
-        public ItemStack extractItemInternal(int slot, int amount, boolean simulate) {
-            return network.request(SimpleStorageNetworkAPI.createItemStackMatcher(getStackInSlot(slot)), amount, simulate);
+        @Nonnull
+        protected IStackProvider extractItemInternal(StackProviderVanilla stackProvider, int amount, boolean simulate) {
+            return new StackProviderVanilla(network.request(SimpleStorageNetworkAPI.createItemStackMatcher(stackProvider.getStack()), amount, simulate));
         }
     }
 }

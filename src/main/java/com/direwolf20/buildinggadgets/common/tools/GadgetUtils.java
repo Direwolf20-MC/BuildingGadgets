@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -13,6 +14,8 @@ import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
 import com.direwolf20.buildinggadgets.common.integration.NetworkProvider;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetBuilding;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetExchanger;
+import com.google.common.base.Supplier;
+import com.google.common.base.Suppliers;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multiset;
@@ -41,6 +44,7 @@ import net.minecraftforge.items.IItemHandler;
 
 public class GadgetUtils {
     private static final ImmutableList<String> LINK_STARTS = ImmutableList.of("http","www");
+    private static Supplier<IItemHandler> remoteInventorySupplier;
 
     public static boolean mightBeLink(final String s) {
         return LINK_STARTS.stream().anyMatch(s::startsWith);
@@ -330,9 +334,20 @@ public class GadgetUtils {
         return false;
     }
 
+    public static void clearCachedRemoteInventory() {
+        remoteInventorySupplier = null;
+    }
+
+    /**
+     * Call {@link clearCachedRemoteInventory clearCachedRemoteInventory} when done using this method
+     */
     @Nullable
     public static IItemHandler getRemoteInventory(ItemStack tool, World world, EntityPlayer player) {
-        return getRemoteInventory(tool, world, player, NetworkIO.Operation.EXTRACT);
+        if (remoteInventorySupplier == null) {
+            remoteInventorySupplier = Suppliers.memoizeWithExpiration(
+                    () -> getRemoteInventory(tool, world, player, NetworkIO.Operation.EXTRACT), 500, TimeUnit.MILLISECONDS);
+        }
+        return remoteInventorySupplier.get();
     }
 
     @Nullable

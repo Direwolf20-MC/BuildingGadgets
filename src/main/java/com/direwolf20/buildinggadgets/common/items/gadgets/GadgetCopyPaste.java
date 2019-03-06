@@ -495,6 +495,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
         for (BlockMap blockMap : blockMapList)
             placeBlock(world, blockMap.pos, player, blockMap.state, getBlockMapIntState(tagCompound).getIntStackMap());
 
+        GadgetUtils.clearCachedRemoteInventory();
         setAnchor(stack, null);
         //System.out.printf("Built %d Blocks in %.2f ms%n", blockMapList.size(), (System.nanoTime() - time) * 1e-6);
     }
