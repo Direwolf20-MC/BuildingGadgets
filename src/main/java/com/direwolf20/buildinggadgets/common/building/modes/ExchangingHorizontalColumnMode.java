@@ -22,7 +22,7 @@ public class ExchangingHorizontalColumnMode extends AbstractMode {
     @Override
     public IPlacementSequence computeCoordinates(EntityPlayer player, BlockPos hit, EnumFacing sideHit, ItemStack tool) {
         int range = GadgetUtils.getToolRange(tool);
-        return Column.centerAt(hit, player.getHorizontalFacing().rotateY().getAxis(), range);
+        return Column.centerAt(hit, sideHit.rotateY().getAxis(), range);
     }
 
     @Override
