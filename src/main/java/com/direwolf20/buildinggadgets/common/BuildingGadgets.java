@@ -56,6 +56,7 @@ public class BuildingGadgets {
         eventBus.addListener(this::setup);
         eventBus.addListener(this::serverLoad);
         eventBus.addListener(this::finishLoad);
+        eventBus.addListener(Config::onLoad);
 
         MinecraftForge.EVENT_BUS.register(new AnvilRepairHandler());
         MinecraftForge.EVENT_BUS.register(this);

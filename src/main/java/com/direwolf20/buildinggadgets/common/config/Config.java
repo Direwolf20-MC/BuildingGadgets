@@ -321,7 +321,6 @@ public class Config {
     public static final ForgeConfigSpec SERVER_CONFIG = SERVER_BUILDER.build();
     public static final ForgeConfigSpec CLIENT_CONFIG = CLIENT_BUILDER.build();
 
-    @SubscribeEvent
     public static void onLoad(final ModConfig.Loading configEvent) {
         BLACKLIST.parseBlacklists();
         BuildingGadgets.LOG.debug("Loaded {} config file {}", Reference.MODID, configEvent.getConfig().getFileName());
