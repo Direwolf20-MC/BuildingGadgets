@@ -1,0 +1,19 @@
+{
+  "result": {
+    "item": "buildinggadgets:construction_paste_container_t1"
+  },
+  "pattern": [
+    "iii",
+    "iri",
+    "iii"
+  ],
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "i": {
+      "tag": "forge:ingots/iron"
+    },
+    "r": {
+      "item": "buildinggadgets:construction_paste"
+    }
+  }
+}

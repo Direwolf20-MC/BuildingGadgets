@@ -1,6 +1,7 @@
 package com.direwolf20.buildinggadgets.common.registry.objects;
 
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlock;
+import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockDense;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockPowder;
 import com.direwolf20.buildinggadgets.common.blocks.EffectBlock;
 import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManager;
@@ -33,6 +34,8 @@ public final class BGBlocks {
     public static Block effectBlock;
     @ObjectHolder(BlockReference.CONSTRUCTION_BLOCK)
     public static Block constructionBlock;
+    @ObjectHolder(BlockReference.CONSTRUCTION_BLOCK_DENSE)
+    public static Block constructionBlockDense;
     @ObjectHolder(BlockReference.CONSTRUCTION_BLOCK_POWDER)
     public static Block constructionBlockPowder;
     @ObjectHolder(BlockReference.TEMPLATE_MANAGER)
@@ -44,9 +47,13 @@ public final class BGBlocks {
                 .item(itemPropertiesWithoutGroup())
                 .factory(EffectBlock::new));
         container.add(new BlockBuilder(BlockReference.CONSTRUCTION_BLOCK_RL)
-                .builder(Block.Properties.create(Material.ROCK).hardnessAndResistance(0.5f,0f))
-                .item(itemPropertiesWithoutGroup())
+                .builder(Block.Properties.create(Material.ROCK).hardnessAndResistance(2f, 0f))
+                .item(itemProperties())
                 .factory(ConstructionBlock::new));
+        container.add(new BlockBuilder(BlockReference.CONSTRUCTION_BLOCK_DENSE_RL)
+                .builder(Block.Properties.create(Material.ROCK).hardnessAndResistance(3f, 0f))
+                .item(itemProperties())
+                .factory(ConstructionBlockDense::new));
         container.add(new BlockBuilder(BlockReference.CONSTRUCTION_BLOCK_POWDER_RL)
                 .builder(Block.Properties.create(Material.SAND).hardnessAndResistance(20f))
                 .item(itemProperties())

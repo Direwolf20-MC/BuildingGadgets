@@ -1,16 +1,14 @@
 {
   "result": {
-    "item": "buildinggadgets:constructionblockpowder"
+    "item": "buildinggadgets:construction_block_powder"
   },
   "type": "minecraft:crafting_shapeless",
   "ingredients": [
     {
-      "item": "minecraft:sand",
-      "data": 0
+      "item": "minecraft:sand"
     },
     {
-      "item": "minecraft:dye",
-      "data": 4
+      "tag": "forge:gems/lapis"
     },
     {
       "item": "minecraft:clay_ball"
@@ -18,7 +16,7 @@
   ],
   "conditions": [
     {
-      "type": "buildinggadgets:enablePaste"
+      "type": "buildinggadgets:enable_paste"
     }
   ]
 }

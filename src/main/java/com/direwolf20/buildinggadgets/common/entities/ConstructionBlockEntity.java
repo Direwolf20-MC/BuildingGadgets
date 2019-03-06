@@ -100,10 +100,8 @@ public class ConstructionBlockEntity extends Entity {
                             }
                         }
                     }
-                } else {
-                    if (world.getBlockState(setPos) == BGBlocks.constructionBlockPowder.getDefaultState()) {
-                        world.setBlockState(setPos, BGBlocks.constructionBlock.getDefaultState().with(ConstructionBlock.BRIGHT, false));
-                    }
+                } else if (world.getBlockState(setPos) == BGBlocks.constructionBlockPowder.getDefaultState()) {
+                    world.setBlockState(setPos, BGBlocks.constructionBlockDense.getDefaultState());
                 }
             }
         }

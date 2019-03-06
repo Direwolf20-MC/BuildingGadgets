@@ -6,6 +6,9 @@ import com.direwolf20.buildinggadgets.client.gui.GuiMod;
 import com.direwolf20.buildinggadgets.common.commands.BlockMapCommand;
 import com.direwolf20.buildinggadgets.common.config.ApiConfig;
 import com.direwolf20.buildinggadgets.common.config.Config;
+import com.direwolf20.buildinggadgets.common.config.crafting.ConstructionPasteRecipeHandler;
+import com.direwolf20.buildinggadgets.common.config.crafting.CraftingConditionDestruction;
+import com.direwolf20.buildinggadgets.common.config.crafting.CraftingConditionPaste;
 import com.direwolf20.buildinggadgets.common.events.AnvilRepairHandler;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.registry.objects.BuildingObjects;
@@ -13,9 +16,12 @@ import com.direwolf20.buildinggadgets.common.utils.ref.Reference;
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import com.electronwill.nightconfig.core.io.WritingMode;
 import net.minecraft.command.Commands;
+import net.minecraft.item.crafting.RecipeSerializers;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.DeferredWorkQueue;
 import net.minecraftforge.fml.DistExecutor;
@@ -60,13 +66,14 @@ public class BuildingGadgets {
         eventBus.addListener(this::setup);
         eventBus.addListener(this::serverLoad);
         eventBus.addListener(this::finishLoad);
+        eventBus.addListener(Config::onLoad);
 
         MinecraftForge.EVENT_BUS.register(new AnvilRepairHandler());
         MinecraftForge.EVENT_BUS.register(this);
 
         // Client only registering
         DistExecutor.runWhenOn(Dist.CLIENT, () -> () -> {
-            eventBus.addListener((Consumer<FMLClientSetupEvent>) event -> ClientProxy.clientSetup());
+            eventBus.addListener((Consumer<FMLClientSetupEvent>) event -> ClientProxy.clientSetup(eventBus));
             ModLoadingContext.get().registerExtensionPoint(ExtensionPoint.GUIFACTORY, () -> GuiMod::openScreen);
         });
 
@@ -91,7 +98,12 @@ public class BuildingGadgets {
     private void setup(final FMLCommonSetupEvent event) {
         theMod = (BuildingGadgets) ModLoadingContext.get().getActiveContainer().getMod();
         theApi.onSetup();
-        DeferredWorkQueue.runLater(PacketHandler::register);
+        DeferredWorkQueue.runLater(() -> {
+            PacketHandler.register();
+            CraftingHelper.register(new ResourceLocation(Reference.MODID, "enable_paste"), new CraftingConditionPaste());
+            CraftingHelper.register(new ResourceLocation(Reference.MODID, "enable_destruction"), new CraftingConditionDestruction());
+            RecipeSerializers.register(new ConstructionPasteRecipeHandler.Serializer());
+        });
     }
 
     private void serverLoad(FMLServerStartingEvent event) {

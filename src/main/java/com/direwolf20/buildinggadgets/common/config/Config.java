@@ -58,6 +58,8 @@ public class Config {
 
         public final BooleanValue enablePaste;
 
+        public final IntValue pastePerPowder;
+
         public final BooleanValue enableDestructionGadget;
 
         /* Client Only!*/
@@ -75,8 +77,13 @@ public class Config {
 
             enablePaste = SERVER_BUILDER
                     .comment("Set to false to disable the recipe for construction paste.")
-                    .translation(LANG_KEY_GENERAL + ".enablePaste")
+                    .translation(LANG_KEY_GENERAL + ".paste.enabled")
                     .define("Enable Construction Paste", true);
+
+            pastePerPowder = SERVER_BUILDER
+                    .comment("The number of paste items dropped by a dense construction block obtained from a construction powder block.")
+                    .translation(LANG_KEY_GENERAL + ".paste.per_powder")
+                    .defineInRange("Paste Per Construction Powder", 4, 0, Integer.MAX_VALUE);
 
             enableDestructionGadget = SERVER_BUILDER
                     .comment("Set to false to disable the Destruction Gadget.")
@@ -321,7 +328,6 @@ public class Config {
     public static final ForgeConfigSpec SERVER_CONFIG = SERVER_BUILDER.build();
     public static final ForgeConfigSpec CLIENT_CONFIG = CLIENT_BUILDER.build();
 
-    @SubscribeEvent
     public static void onLoad(final ModConfig.Loading configEvent) {
         BLACKLIST.parseBlacklists();
         BuildingGadgets.LOG.debug("Loaded {} config file {}", Reference.MODID, configEvent.getConfig().getFileName());
