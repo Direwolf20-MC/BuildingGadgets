@@ -56,8 +56,13 @@ public class Config {
     @RequiresWorldRestart
     @Name("Enable Construction Paste")
     @Comment("Set to false to disable the recipe for construction paste.")
-    @LangKey(LANG_KEY_ROOT + ".enablePaste")
+    @LangKey(LANG_KEY_ROOT + ".paste.enabled")
     public static boolean enablePaste = true;
+
+    @Name("Paste Per Construction Powder")
+    @Comment("The number of paste items dropped by a dense construction block obtained from a construction powder block.")
+    @LangKey(LANG_KEY_ROOT + ".paste.per_powder")
+    public static int pastePerPowder = 4;
 
     @RequiresMcRestart
     @RequiresWorldRestart

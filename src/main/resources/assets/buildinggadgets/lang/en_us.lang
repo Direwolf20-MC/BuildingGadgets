@@ -24,16 +24,11 @@ item.buildinggadgets.exchangertool.name=Exchanging Gadget
 item.buildinggadgets.template.name=Template
 
 #tile: 
+tile.buildinggadgets.constructionblock_dense.name=Dense Construction Block
 tile.buildinggadgets.constructionblock.name=Construction Block
 tile.buildinggadgets.constructionblockpowder.name=Construction Block Powder
 tile.buildinggadgets.effectblock.name=(Unused)Effect Block
 tile.buildinggadgets.templatemanager.name=Template Manager
-
-#block: 
-block.buildinggadgets.constructionblock.name=Construction Block
-block.buildinggadgets.constructionblockpowder.name=Construction Block Powder
-block.buildinggadgets.effectblock.name=(Unused)Effect Block
-block.buildinggadgets.templatemanager.name=Template Manager
 
 #key: 
 key.anchorKey=Anchor
@@ -113,8 +108,10 @@ config.buildinggadgets.general.rayTraceRange=Max Build Distance
 config.buildinggadgets.general.rayTraceRange.tooltip=Defines how far away you can build
 config.buildinggadgets.general.poweredByFE=Powered by Forge Energy
 config.buildinggadgets.general.poweredByFE.tooltip=Set to true for Forge Energy Support, set to False for vanilla Item Damage
-config.buildinggadgets.general.enablePaste=Enable Construction Paste
-config.buildinggadgets.general.enablePaste.tooltip=Set to false to disable the recipe for construction paste.
+config.buildinggadgets.general.paste.enabled=Enable Construction Paste
+config.buildinggadgets.general.paste.enabled.tooltip=Set to false to disable the recipe for construction paste.
+config.buildinggadgets.general.paste.per_powder=Paste Per Construction Powder
+config.buildinggadgets.general.paste.per_powder.tooltip=The number of paste items dropped by a dense construction block obtained from a construction powder block.
 config.buildinggadgets.general.enableDestructionGadget=Enable Destruction Gadget
 config.buildinggadgets.general.enableDestructionGadget.tooltip=Set to false to disable the Destruction Gadget.
 config.buildinggadgets.general.absoluteCoordDefault=Default to absolute Coord-Mode

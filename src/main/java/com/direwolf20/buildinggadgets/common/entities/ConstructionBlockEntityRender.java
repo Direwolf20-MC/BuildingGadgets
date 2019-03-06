@@ -47,7 +47,7 @@ public class ConstructionBlockEntityRender extends Render<ConstructionBlockEntit
         GlStateManager.rotate(-90.0F, 0.0F, 1.0F, 0.0F);
 
         GL14.glBlendColor(1F, 1F, 1F, scale); //Set the alpha of the blocks we are rendering
-        IBlockState renderBlockState = ModBlocks.constructionBlock.getDefaultState();
+        IBlockState renderBlockState = ModBlocks.constructionBlockDense.getDefaultState();
         if (renderBlockState == null) {
             renderBlockState = Blocks.COBBLESTONE.getDefaultState();
         }

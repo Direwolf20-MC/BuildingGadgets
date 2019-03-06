@@ -63,6 +63,7 @@ public class ClientProxy extends CommonProxy {
             ModItems.constructionPasteContainert2.initModel();
             ModItems.constructionPasteContainert3.initModel();
             ModItems.constructionPasteContainerCreative.initModel();
+            ModBlocks.constructionBlockDense.initModel();
             ModBlocks.constructionBlock.initModel();
             ModBlocks.constructionBlockPowder.initModel();
             ModelLoader.setCustomMeshDefinition(ModItems.constructionPasteContainer, new PasteContainerMeshDefinition());

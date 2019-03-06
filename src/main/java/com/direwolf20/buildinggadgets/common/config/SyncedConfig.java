@@ -99,6 +99,9 @@ public class SyncedConfig {
     public static boolean enablePaste;
 
     @AutoSync
+    public static int pastePerPowder;
+
+    @AutoSync
     public static int t1ContainerCapacity;
 
     @AutoSync
@@ -121,6 +124,7 @@ public class SyncedConfig {
         absoluteCoordDefault = Config.absoluteCoordDefault;
         canOverwriteBlocks = Config.canOverwriteBlocks;
         enablePaste = Config.enablePaste;
+        pastePerPowder = Config.pastePerPowder;
 
         blockBlacklist = FieldMapper.PATTERN_LIST_MAPPER.mapToField(Config.subCategoryBlacklist.blockBlacklist);
 

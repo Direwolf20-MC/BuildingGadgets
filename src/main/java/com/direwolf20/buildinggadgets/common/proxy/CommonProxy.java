@@ -67,6 +67,7 @@ public class CommonProxy {
         event.getRegistry().register(new TemplateManager());
         GameRegistry.registerTileEntity(TemplateManagerTileEntity.class, new ResourceLocation(BuildingGadgets.MODID, "templateManager"));
         if (SyncedConfig.enablePaste) {
+            event.getRegistry().register(new ConstructionBlockDense());
             event.getRegistry().register(new ConstructionBlock());
             event.getRegistry().register(new ConstructionBlockPowder());
             GameRegistry.registerTileEntity(ConstructionBlockTileEntity.class, new ResourceLocation(BuildingGadgets.MODID, "_constructionBlock"));
@@ -84,6 +85,7 @@ public class CommonProxy {
             event.getRegistry().register(new GadgetDestruction());
         }
         if (SyncedConfig.enablePaste) {
+            event.getRegistry().register(new ItemBlock(ModBlocks.constructionBlockDense).setRegistryName(ModBlocks.constructionBlockDense.getRegistryName()));
             event.getRegistry().register(new ItemBlock(ModBlocks.constructionBlock).setRegistryName(ModBlocks.constructionBlock.getRegistryName()));
             event.getRegistry().register(new ItemBlock(ModBlocks.constructionBlockPowder).setRegistryName(ModBlocks.constructionBlockPowder.getRegistryName()));
             event.getRegistry().register(new ConstructionPaste());
