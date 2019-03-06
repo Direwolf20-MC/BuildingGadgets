@@ -10,6 +10,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
+import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DeferredWorkQueue;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
@@ -17,14 +18,14 @@ import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 @EventBusSubscriber(Dist.CLIENT)
 public class ClientProxy {
 
-    public static void clientSetup() {
+    public static void clientSetup(final IEventBus eventBus) {
         DeferredWorkQueue.runLater(KeyBindings::init);
         //BuildingObjects.initColorHandlers();
         //eventBus.addListener(ClientProxy::renderWorldLastEvent);
+        eventBus.addListener(ClientProxy::registerModels);
     }
 
-    @SubscribeEvent
-    public static void registerModels(@SuppressWarnings("unused") ModelRegistryEvent event) {
+    private static void registerModels(@SuppressWarnings("unused") ModelRegistryEvent event) {
         ModelLoaderRegistry.registerLoader(new BakedModelLoader());
 
         //RenderingRegistry.registerEntityRenderingHandler(BlockBuildEntity.class, BlockBuildEntityRender::new);

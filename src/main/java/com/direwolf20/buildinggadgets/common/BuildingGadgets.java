@@ -62,7 +62,7 @@ public class BuildingGadgets {
 
         // Client only registering
         DistExecutor.runWhenOn(Dist.CLIENT, () -> () -> {
-            eventBus.addListener((Consumer<FMLClientSetupEvent>) event -> ClientProxy.clientSetup());
+            eventBus.addListener((Consumer<FMLClientSetupEvent>) event -> ClientProxy.clientSetup(eventBus));
             ModLoadingContext.get().registerExtensionPoint(ExtensionPoint.GUIFACTORY, () -> GuiMod::openScreen);
         });
 
