@@ -263,6 +263,7 @@ public class GadgetBuilding extends GadgetGeneric {
                     failedRemovals.add(coord);
                 }
             }
+            GadgetUtils.clearCachedRemoteInventory();
             if (failedRemovals.size() != 0) { //Add any failed undo blocks to the undo stack.
                 UndoState failedState = new UndoState(player.dimension, failedRemovals);
                 pushUndoList(heldItem, failedState);

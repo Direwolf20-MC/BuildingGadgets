@@ -338,24 +338,26 @@ public class GadgetUtils {
         remoteInventorySupplier = null;
     }
 
+    @Nullable
+    public static IItemHandler getRemoteInventory(ItemStack tool, World world, EntityPlayer player) {
+        return getRemoteInventory(tool, world, player, NetworkIO.Operation.EXTRACT);
+    }
+
     /**
      * Call {@link clearCachedRemoteInventory clearCachedRemoteInventory} when done using this method
      */
     @Nullable
-    public static IItemHandler getRemoteInventory(ItemStack tool, World world, EntityPlayer player) {
+    public static IItemHandler getRemoteInventory(ItemStack tool, World world, EntityPlayer player, NetworkIO.Operation operation) {
         if (remoteInventorySupplier == null) {
-            remoteInventorySupplier = Suppliers.memoizeWithExpiration(
-                    () -> getRemoteInventory(tool, world, player, NetworkIO.Operation.EXTRACT), 500, TimeUnit.MILLISECONDS);
+            remoteInventorySupplier = Suppliers.memoizeWithExpiration(() -> {
+                        Integer dim = getDIMFromNBT(tool, "boundTE");
+                        System.out.println("fffff");
+                        if (dim == null) return null;
+                        BlockPos pos = getPOSFromNBT(tool, "boundTE");
+                        return pos == null ? null : getRemoteInventory(pos, dim, world, player, operation);
+                    }, 500, TimeUnit.MILLISECONDS);
         }
         return remoteInventorySupplier.get();
-    }
-
-    @Nullable
-    public static IItemHandler getRemoteInventory(ItemStack tool, World world, EntityPlayer player, NetworkIO.Operation operation) {
-        Integer dim = getDIMFromNBT(tool, "boundTE");
-        if (dim == null) return null;
-        BlockPos pos = getPOSFromNBT(tool, "boundTE");
-        return pos == null ? null : getRemoteInventory(pos, dim, world, player, operation);
     }
 
     @Nullable
