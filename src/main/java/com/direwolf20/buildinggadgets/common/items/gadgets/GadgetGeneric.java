@@ -37,10 +37,6 @@ public abstract class GadgetGeneric extends Item {
 
     public abstract int getDamageCost(ItemStack tool);
 
-//    public void initModel() {
-//        ModelLoader.setCustomModelResourceLocation(this, 0, new ModelResourceLocation(getRegistryName(), "inventory"));
-//    }
-
     @Override
     @Nullable
     public ICapabilityProvider initCapabilities(ItemStack stack, @Nullable NBTTagCompound tag) {

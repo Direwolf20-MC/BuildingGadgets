@@ -17,11 +17,6 @@ public class EffectBlock extends Block {
         super(builder);
     }
 
-    // @fixme: reimplement @since 1.13.x
-//    public void initModel() {
-//        //ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(this), 0, new ModelResourceLocation(getRegistryName(), "inventory"));
-//    }
-
     /**
      * @param state blockState
      * @return Render Type
