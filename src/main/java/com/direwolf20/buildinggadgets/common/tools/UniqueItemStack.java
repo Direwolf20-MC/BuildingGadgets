@@ -21,7 +21,7 @@ public final class UniqueItemStack {
             return false;
 
         UniqueItemStack other = (UniqueItemStack) obj;
-        return uniqueItem.equals(other.uniqueItem) && (nbt != null ? nbt.equals(other.nbt) : (other.nbt != null ? other.nbt.equals(nbt) : true));
+        return uniqueItem.equals(other.uniqueItem) && (nbt != null ? nbt.equals(other.nbt) : (other.nbt == null || other.nbt.equals(nbt)));
     }
 
     @Override

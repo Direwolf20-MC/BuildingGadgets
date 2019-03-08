@@ -1,17 +1,19 @@
 package com.direwolf20.buildinggadgets.api.template;
 
-import net.minecraft.nbt.NBTTagCompound;
+import com.direwolf20.buildinggadgets.api.abstraction.IUniqueItem;
+import com.google.common.collect.Multiset;
 import net.minecraft.util.math.BlockPos;
-import net.minecraftforge.common.util.INBTSerializable;
 
 import javax.annotation.Nullable;
 import java.util.stream.Stream;
 
-public interface ITemplate extends Iterable<PlacementTarget>, INBTSerializable<NBTTagCompound> {
+public interface ITemplate extends Iterable<PlacementTarget> {
     public Stream<PlacementTarget> stream();
 
     @Nullable
     public ITemplateTransaction startTransaction();
 
-    public void translateTo(BlockPos pos);
+    public boolean translateTo(BlockPos pos);
+
+    public Multiset<IUniqueItem> getRequiredItems();
 }

@@ -61,7 +61,7 @@ public class BuildingGadgets {
 
         loadConfig(Config.CLIENT_CONFIG, FMLPaths.CONFIGDIR.get().resolve("buildinggadgets-client.toml"));
         loadConfig(Config.SERVER_CONFIG, FMLPaths.CONFIGDIR.get().resolve("buildinggadgets-server.toml"));
-        theApi = new APIProxy(eventBus, MinecraftForge.EVENT_BUS, new ApiConfig());
+        theApi = APIProxy.INSTANCE.onCreate(eventBus, MinecraftForge.EVENT_BUS, new ApiConfig());
 
         eventBus.addListener(this::setup);
         eventBus.addListener(this::serverLoad);

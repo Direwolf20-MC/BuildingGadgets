@@ -2,11 +2,8 @@ package com.direwolf20.buildinggadgets.common.utils.blocks;
 
 import com.direwolf20.buildinggadgets.common.tools.UniqueItem;
 import com.direwolf20.buildinggadgets.common.utils.GadgetUtils;
-import com.direwolf20.buildinggadgets.common.utils.helpers.InventoryHelper;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Items;
-import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTUtil;
@@ -110,20 +107,7 @@ public class BlockMapIntState {
 
     @Nonnull
     public static UniqueItem blockStateToUniqueItem(IBlockState state, EntityPlayer player, BlockPos pos) {
-        ItemStack itemStack;
-
-        try {
-            itemStack = state.getBlock().getPickBlock(state, null, player.world, pos, player);
-        } catch (Exception e) {
-            itemStack = InventoryHelper.getSilkTouchDrop(state);
-        }
-        if (itemStack.isEmpty()) {
-            itemStack = InventoryHelper.getSilkTouchDrop(state);
-        }
-        if (!itemStack.isEmpty()) {
-            return new UniqueItem(itemStack.getItem());
-        }
-        return new UniqueItem(Items.AIR);
+        return UniqueItem.fromBlockState(state, player, pos);
     }
 
     public void makeStackMapFromStateMap(EntityPlayer player) {
