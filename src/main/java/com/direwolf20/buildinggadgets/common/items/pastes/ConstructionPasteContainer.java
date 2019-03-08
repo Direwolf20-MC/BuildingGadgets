@@ -11,6 +11,7 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.Style;
 import net.minecraft.util.text.TextComponentTranslation;
@@ -29,8 +30,8 @@ public class ConstructionPasteContainer extends GenericPasteContainer {
         super(builder);
         this.maxCapacity = maxCapacity;
         addPropertyOverride(new ResourceLocation("level"), (stack, world, entity) -> {
-            double percent = ConstructionPasteContainer.getPasteAmount(stack) / (double) maxCapacity.getAsInt();
-            return (float) Math.floor(percent * 4) / 4F;
+            float percent = ConstructionPasteContainer.getPasteAmount(stack) / (float) this.maxCapacity.getAsInt();
+            return MathHelper.floor(percent * 4) / 4F;
         });
     }
 
