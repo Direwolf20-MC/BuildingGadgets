@@ -7,8 +7,6 @@ import net.minecraft.util.text.Style;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -16,13 +14,6 @@ import java.util.List;
 public class ConstructionPasteContainerCreative extends GenericPasteContainer {
     public ConstructionPasteContainerCreative(Properties builder) {
         super(builder);
-    }
-
-    @OnlyIn(Dist.CLIENT)
-    public void initModel() {
-//        // We don't use custom item mesh definition since creative container will be always full, and there is no need to register mesh
-//        // definition for the item in CommonProxy
-//        ModelLoader.setCustomModelResourceLocation(this, 0, new ModelResourceLocation(getRegistryName(), "inventory"));
     }
 
     @Override

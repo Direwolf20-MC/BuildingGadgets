@@ -27,35 +27,9 @@ public class ClientProxy {
 
     private static void registerModels(@SuppressWarnings("unused") ModelRegistryEvent event) {
         ModelLoaderRegistry.registerLoader(new BakedModelLoader());
-
-        //RenderingRegistry.registerEntityRenderingHandler(BlockBuildEntity.class, BlockBuildEntityRender::new);
-        //RenderingRegistry.registerEntityRenderingHandler(ConstructionBlockEntity.class, ConstructionBlockEntityRender::new);
-
         // @todo: reimplement? @since 1.13.x
-        //        ModBlocks.effectBlock.initModel();
-        //        ModBlocks.templateManager.initModel();
-        //
-        //        BuildingObjects.gadgetBuilding.initModel();
-        //        BuildingObjects.gadgetExchanger.initModel();
-        //        BuildingObjects.gadgetCopyPaste.initModel();
-        //        BuildingObjects.template.initModel();
-        //
-        //        if (SyncedConfig.enableDestructionGadget) {
-        //            BuildingObjects.gadgetDestruction.initModel();
-        //        }
-        //
         //        if (SyncedConfig.enablePaste) {
-        //            BuildingObjects.ConstructionPasteContainer.initModel();
-        //            BuildingObjects.constructionPasteContainerCreative.initModel();
-        //            BuildingObjects.constructionPaste.initModel();
-        //
         //            ModBlocks.constructionBlock.initModel();
-        //            ModBlocks.constructionBlockPowder.initModel();
-        //
-        //        // REIMPLEMENT
-        ////            ModelLoader.setCustomMeshDefinition(ModItems.constructionPasteContainer, new PasteContainerMeshDefinition());
-        ////            ModelLoader.setCustomMeshDefinition(ModItems.constructionPasteContainert2, new PasteContainerMeshDefinition());
-        ////            ModelLoader.setCustomMeshDefinition(ModItems.constructionPasteContainert3, new PasteContainerMeshDefinition());
         //        }
     }
 
