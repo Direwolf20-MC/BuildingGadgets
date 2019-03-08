@@ -11,9 +11,9 @@ import net.minecraft.item.crafting.ShapedRecipe;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 
-public class ConstructionPasteRecipeHandler extends ShapedRecipe {
+public class RecipeConstructionPaste extends ShapedRecipe {
 
-    public ConstructionPasteRecipeHandler(ResourceLocation id, String group, int recipeWidth,
+    public RecipeConstructionPaste(ResourceLocation id, String group, int recipeWidth,
             int recipeHeight, NonNullList<Ingredient> recipeItems, ItemStack recipeOutput) {
         super(id, group, recipeWidth, recipeHeight, recipeItems, recipeOutput);
     }
@@ -44,7 +44,7 @@ public class ConstructionPasteRecipeHandler extends ShapedRecipe {
         @Override
         public ShapedRecipe read(ResourceLocation recipeId, JsonObject json) {
             ShapedRecipe recipe = super.read(recipeId, json);
-            return new ConstructionPasteRecipeHandler(recipe.getId(), recipe.getGroup(), recipe.getRecipeWidth(),
+            return new RecipeConstructionPaste(recipe.getId(), recipe.getGroup(), recipe.getRecipeWidth(),
                     recipe.getRecipeHeight(), recipe.getIngredients(), recipe.getRecipeOutput());
         }
     }
