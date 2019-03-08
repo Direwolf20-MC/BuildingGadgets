@@ -1,6 +1,5 @@
 package com.direwolf20.buildinggadgets.common.items.gadgets;
 
-import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.common.items.FakeBuilderWorld;
@@ -61,9 +60,7 @@ public class GadgetExchanger extends GadgetGeneric {
     }
 
     public GadgetExchanger() {
-        setRegistryName("exchangertool");        // The unique name (within your mod) that identifies this item
-        setUnlocalizedName(BuildingGadgets.MODID + ".exchangertool");     // Used for localization (en_US.lang)
-        setMaxStackSize(1);
+        super("exchangertool");
         setMaxDamage(SyncedConfig.durabilityExchanger);
     }
 

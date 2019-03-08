@@ -17,11 +17,11 @@ public class ConstructionBlockDense extends BlockModBase {
 
     @Override
     public Item getItemDropped(IBlockState state, Random rand, int fortune) {
-        return ModItems.constructionPaste;
+        return rand.nextDouble() < SyncedConfig.denseConstructionChunkFraction ? ModItems.constructionChunkDense : ModItems.constructionPaste;
     }
 
     @Override
     public int quantityDropped(IBlockState state, int fortune, Random random) {
-        return SyncedConfig.pastePerPowder;
+        return SyncedConfig.denseConstructionDropCount;
     }
 }

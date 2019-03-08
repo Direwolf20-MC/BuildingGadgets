@@ -38,29 +38,55 @@ minecraft {
 
 repositories {
     maven {
-        name 'tterrag\'s Maven' // CTM
-        url 'http://maven.tterrag.com/'
-    }
-	maven {
-        name 'Raoulvdberge Repo' // RS
-        url 'https://repo.raoulvdberge.com/'
-    }
-	maven {
-        name = 'DVS1 Maven' // AE2
-        url = "http://dvs1.progwml6.com/files/maven"
+        name "tterrag's Maven" // CTM
+        url "https://maven.tterrag.com/"
     }
     maven {
-        name = "CurseForge" // SSN
+        name "Raoulvdberge Repo" // RS
+        url "https://repo.raoulvdberge.com/"
+    }
+    maven {
+        name = "DVS1 Maven" // AE2
+        url = "https://dvs1.progwml6.com/files/maven/"
+    }
+    maven {
+        name = "CurseForge" // SSN, Mekanism, Cyclic
         url = "https://minecraft.curseforge.com/api/maven/"
+    }
+    maven {
+        name = "Covers" // CoFH
+        url = "https://maven.covers1624.net/"
+    }
+    maven {
+        name = "Mod Maven" // AA
+        url = "https://modmaven.k-4u.nl/"
+    }
+    maven {
+        name "Jared's Repo" // EI
+        url "https://maven.blamejared.com/"
+    }
+    maven {
+        name "IC2" // IC2, Forestry
+        url "http://maven.ic2.player.to/"
     }
 }
 
+
+
 dependencies {
+    runtime "team.chisel.ctm:CTM:MC${minecraft_version}-${ctm_version}"
     deobfCompile "team.chisel.ctm:CTM:MC${minecraft_version}-${ctm_version}:api"
     deobfCompile "refinedstorage:refinedstorage:${rs_version}:api"
     deobfCompile "appeng:appliedenergistics2:${ae2_version}:api"
-	deobfCompile "simple-storage-network:SimpleStorageNetwork:${ssn_version}"
-    runtime "team.chisel.ctm:CTM:MC${minecraft_version}-${ctm_version}"
+    deobfCompile "simple-storage-network:SimpleStorageNetwork:${ssn_version}"
+    deobfCompile "cofh:CoFHCore:${cofh_core_version}:universal"
+    deobfCompile "de.ellpeck.actuallyadditions:ActuallyAdditions:${aa_version}:api"
+    deobfCompile "blusunrize:ImmersiveEngineering:${ei_version}"
+    deobfCompile "net.industrial-craft:industrialcraft-2:${ic2_version}:api"
+    deobfCompile "net.sengir.forestry:forestry_${forestry_version}:api"
+    deobfCompile "mekanism:Mekanism:${mekanism_version}"
+    deobfCompile "cyclic:Cyclic:${cyclic_version}"
+    
     // you may put jars on which you depend on in ./libs
     // or you may define them like so..
     //compile "some.group:artifact:version:classifier"

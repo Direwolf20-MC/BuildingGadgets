@@ -14,14 +14,22 @@ public class BlockModBase extends Block {
 
     public BlockModBase(Material material, float hardness, String name) {
         super(material);
-        setHardness(hardness);
-        setCreativeTab(BuildingGadgets.BUILDING_CREATIVE_TAB);
-        setUnlocalizedName(String.join(".", BuildingGadgets.MODID, name));
-        setRegistryName(name);
+        init(this, hardness, name);
+    }
+
+    public static void init(Block block, float hardness, String name) {
+        block.setHardness(hardness);
+        block.setCreativeTab(BuildingGadgets.BUILDING_CREATIVE_TAB);
+        block.setUnlocalizedName(String.join(".", BuildingGadgets.MODID, name));
+        block.setRegistryName(name);
     }
 
     @SideOnly(Side.CLIENT)
     public void initModel() {
-        ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(this), 0, new ModelResourceLocation(getRegistryName(), "inventory"));
+        initModel(this);
+    }
+ 
+    public static void initModel(Block block) {
+        ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(block), 0, new ModelResourceLocation(block.getRegistryName(), "inventory"));
     }
 }

@@ -17,7 +17,7 @@ public abstract class NetworkProvider implements IIntegratedMod {
     private static final Set<NetworkProvider> PROVIDERS = new HashSet<>();
 
     @Override
-    public void initialize() {
+    public void preInit() {
         isLoaded = true;
         PROVIDERS.add(this);
     }

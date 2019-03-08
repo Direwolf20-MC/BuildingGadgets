@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.direwolf20.buildinggadgets.common.integration.IPasteRecipeRegistry;
 import com.direwolf20.buildinggadgets.common.integration.IntegrationHandler.IntegratedMod;
 import com.direwolf20.buildinggadgets.common.integration.NetworkProvider;
 import com.direwolf20.buildinggadgets.common.tools.NetworkIO;
@@ -17,6 +18,7 @@ import com.google.common.collect.Streams;
 import appeng.api.AEApi;
 import appeng.api.config.Actionable;
 import appeng.api.config.SecurityPermissions;
+import appeng.api.features.IGrinderRecipe;
 import appeng.api.networking.IGridHost;
 import appeng.api.networking.IGridNode;
 import appeng.api.networking.security.IActionHost;
@@ -33,7 +35,12 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.items.IItemHandler;
 
 @IntegratedMod("appliedenergistics2")
-public class AppliedEnergistics2 extends NetworkProvider {
+public class AppliedEnergistics2 extends NetworkProvider implements IPasteRecipeRegistry {
+
+    @Override
+    public void registerDeconstructRecipe(RecipieType type, ItemStack input, ItemStack output) {
+        AEApi.instance().registries().grinder().addRecipe(new GrinderRecipe(type == RecipieType.BLOCK_TO_CHUNKS ? 4 : 1, input, output));
+    }
 
     @Override
     @Nullable
@@ -109,7 +116,7 @@ public class AppliedEnergistics2 extends NetworkProvider {
         }
     }
 
-    public static class PlayerSource implements IActionSource {
+    private static class PlayerSource implements IActionSource {
         private final EntityPlayer player;
 
         public PlayerSource(EntityPlayer player) {
@@ -131,5 +138,56 @@ public class AppliedEnergistics2 extends NetworkProvider {
         public <T> Optional<T> context(Class<T> key) {
             return Optional.empty();
         }
+    }
+
+    private static class GrinderRecipe implements IGrinderRecipe {
+        private final ItemStack input, output;
+        private final int turns;
+
+        public GrinderRecipe(int turns, ItemStack input, ItemStack output) {
+            this.input = input;
+            this.output = output;
+            this.turns = turns;
+        }
+
+        @Override
+        @Nonnull
+        public ItemStack getInput() {
+            return input;
+        }
+
+        @Override
+        @Nonnull
+        public ItemStack getOutput() {
+            return output;
+        }
+
+        @Override
+        @Nonnull
+        public Optional<ItemStack> getOptionalOutput() {
+            return Optional.empty();
+        }
+
+        @Override
+        public Optional<ItemStack> getSecondOptionalOutput() {
+            return Optional.empty();
+        }
+
+        @Override
+        @Nonnull
+        public float getOptionalChance() {
+            return 0;
+        }
+
+        @Override
+        public float getSecondOptionalChance() {
+            return 0;
+        }
+
+        @Override
+        public int getRequiredTurns() {
+            return turns;
+        }
+        
     }
 }

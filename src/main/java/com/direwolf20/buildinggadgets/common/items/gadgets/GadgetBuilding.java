@@ -1,6 +1,5 @@
 package com.direwolf20.buildinggadgets.common.items.gadgets;
 
-import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.blocks.ModBlocks;
 import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
@@ -56,9 +55,7 @@ public class GadgetBuilding extends GadgetGeneric {
     }
 
     public GadgetBuilding() {
-        setRegistryName("buildingtool");        // The unique name (within your mod) that identifies this item
-        setUnlocalizedName(BuildingGadgets.MODID + ".buildingtool");     // Used for localization (en_US.lang)
-        setMaxStackSize(1);
+        super("buildingtool");
         setMaxDamage(SyncedConfig.durabilityBuilder);
     }
 
