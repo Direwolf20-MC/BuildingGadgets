@@ -18,7 +18,6 @@ public class ConstructionPaste extends Item {
     public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
         ItemStack itemstack = player.getHeldItem(hand);
         itemstack = InventoryHelper.addPasteToContainer(player, itemstack);
-
         return new ActionResult<>(EnumActionResult.SUCCESS, itemstack);
     }
 
