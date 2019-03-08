@@ -288,7 +288,7 @@ public class Config {
             return SERVER_BUILDER
                     .comment(String.format("The maximum capacity of a tier %s (iron) Construction Paste Container", tier))
                     .translation(LANG_KEY_PASTE_CONTAINERS_CAPACITY + ".t" + tier)
-                    .defineInRange(String.format("T%s Container Capacity", tier), (int) (512 * Math.pow(2, tier - 1)), 1, Integer.MAX_VALUE);
+                    .defineInRange(String.format("T%s Container Capacity", tier), (int) (512 * Math.pow(4, tier - 1)), 1, Integer.MAX_VALUE);
         }
     }
 

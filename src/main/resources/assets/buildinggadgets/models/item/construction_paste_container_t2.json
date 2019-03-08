@@ -2,5 +2,12 @@
   "parent": "item/generated",
   "textures": {
     "layer0": "buildinggadgets:items/construction_paste_container_t2"
-  }
+  },
+  "overrides": [
+    { "predicate": { "level": 0.0 }, "model": "buildinggadgets:item/construction_paste_container_t2" },
+    { "predicate": { "level": 0.25 }, "model": "buildinggadgets:item/construction_paste_container_t2_quarter" },
+    { "predicate": { "level": 0.5 }, "model": "buildinggadgets:item/construction_paste_container_t2_half" },
+    { "predicate": { "level": 0.75 }, "model": "buildinggadgets:item/construction_paste_container_t2_3quarter" },
+    { "predicate": { "level": 1.0 }, "model": "buildinggadgets:item/construction_paste_container_t2_full" }
+  ]
 }
