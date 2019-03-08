@@ -5,6 +5,24 @@ The format of this document is based on [Keep a Changelog](https://keepachangelo
 ### Added
 - The copy/paste gadget can now mirror pastes, as well as rotate them. Sneak while pressing the keybind that previously just rotated them to mirror them left-to-right instead.
 - Allowed gadgets to bind Simple Storage Network networks as a remote inventories (you can only bind the Storage Network Master block).
+- Dense construction blocks now drop 4 items (configurable), with a 50:50 chance (configurable) of a given item being construction paste or a dense construction chunk. Without other mods, the chunks are just useless byproduct.
+- The process of generating construction paste is now as follows:
+    1. Craft a construction powder block.
+    2. Convert the powder into a dense construction block by either placing it in the word next to water, or using one of the following machines:
+        - Fluid Transposer *[Thermal Expansion]*
+        - Hydrator *[Cyclic]*    
+        - Moistener *[Forestry]*
+    3. Convert the block into dense construction chunks either by breaking it (also getting paste directly), or using one of the following machines (1 block -> 4 chunks):
+        - Pulverizer *[Thermal Expansion]*
+        - Macerator *[Industrial Craft 2]*
+        - Grinder *[Applied Energistics 2]*
+        - Crusher *[Mekanism]*
+        - Crusher *[Immersive Engineering]*
+        - Crusher *[Actually Additions]*
+    4. Convert the chunks into paste using any of the machines listed in step 3 (1 chunk -> 1 paste).
+
+### Changed
+- Remote networks are now only wrapped once build/exchange/undo operation, rather than twice per placed block.
 
 ## [2.6.6] - 2019-02-27
 ### Added
