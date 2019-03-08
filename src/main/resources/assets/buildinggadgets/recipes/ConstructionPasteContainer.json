@@ -10,7 +10,8 @@
   "type": "forge:ore_shaped",
   "key": {
     "i": {
-      "item": "minecraft:iron_ingot"
+      "type": "forge:ore_dict",
+      "ore": "ingotIron"
     },
     "r": {
       "item": "buildinggadgets:constructionpaste"

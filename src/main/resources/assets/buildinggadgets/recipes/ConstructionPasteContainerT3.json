@@ -10,7 +10,8 @@
   "type": "buildinggadgets:constructionpaste",
   "key": {
     "g": {
-      "item": "minecraft:diamond"
+      "type": "forge:ore_dict",
+      "ore": "gemDiamond"
     },
     "c": {
       "item": "buildinggadgets:constructionpastecontainert2"

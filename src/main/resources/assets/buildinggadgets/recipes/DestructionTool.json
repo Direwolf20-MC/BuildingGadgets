@@ -10,17 +10,20 @@
   "type": "forge:ore_shaped",
   "key": {
     "i": {
-      "item": "minecraft:iron_ingot"
+      "type": "forge:ore_dict",
+      "ore": "ingotIron"
     },
     "r": {
-      "item": "minecraft:redstone"
+      "type": "forge:ore_dict",
+      "ore": "dustRedstone"
     },
     "l": {
-      "item": "minecraft:dye",
-      "data": 4
+      "type": "forge:ore_dict",
+      "ore": "gemLapis"
     },
     "e": {
-      "item": "minecraft:ender_pearl"
+      "type": "forge:ore_dict",
+      "ore": "enderpearl"
     }
   },
   "conditions": [

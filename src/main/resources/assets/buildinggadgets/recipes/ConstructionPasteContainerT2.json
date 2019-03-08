@@ -10,7 +10,8 @@
   "type": "buildinggadgets:constructionpaste",
   "key": {
     "g": {
-      "item": "minecraft:gold_ingot"
+      "type": "forge:ore_dict",
+      "ore": "ingotGold"
     },
     "c": {
       "item": "buildinggadgets:constructionpastecontainer"
