@@ -321,7 +321,8 @@ public class Config {
 
         private void parseBlacklists() {
             parsedBlacklist = PatternList.ofResourcePattern(blockBlacklist.get());
-            parsedWhitelist = PatternList.ofResourcePattern(blockWhitelist.get());
+            //TODO fix once Forge fixes it's I don't sync leading/trailing .'s bug
+            parsedWhitelist = PatternList.ofResourcePattern(/*blockWhitelist.get()*/ ImmutableList.of(".*"));
         }
 
         public boolean isAllowedBlock(Block block) {
