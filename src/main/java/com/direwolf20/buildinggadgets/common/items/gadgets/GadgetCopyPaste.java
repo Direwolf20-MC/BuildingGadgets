@@ -17,7 +17,6 @@ import com.direwolf20.buildinggadgets.common.utils.CapabilityUtil.EnergyUtil;
 import com.direwolf20.buildinggadgets.common.utils.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.utils.blocks.BlockMap;
 import com.direwolf20.buildinggadgets.common.utils.blocks.BlockMapIntState;
-import com.direwolf20.buildinggadgets.common.utils.exceptions.CapabilityNotPresentException;
 import com.direwolf20.buildinggadgets.common.utils.helpers.InventoryHelper;
 import com.direwolf20.buildinggadgets.common.utils.helpers.VectorHelper;
 import com.direwolf20.buildinggadgets.common.world.WorldSave;
@@ -48,7 +47,6 @@ import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.BlockSnapshot;
-import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.world.BlockEvent;
 
@@ -274,8 +272,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
             if (getToolMode(stack) == ToolMode.Copy) {
                 if (pos == null) {
                     //TODO Remove debug code
-                    IEnergyStorage energy = EnergyUtil.getCap(stack).orElseThrow(CapabilityNotPresentException::new);
-                    int accepted = energy.receiveEnergy(105000, false);
+                    EnergyUtil.getCap(stack).ifPresent(energy -> energy.receiveEnergy(105000, false));
                     //setStartPos(stack, null);
                     //setEndPos(stack, null);
                     //player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.areareset").getUnformattedComponentText()), true);
