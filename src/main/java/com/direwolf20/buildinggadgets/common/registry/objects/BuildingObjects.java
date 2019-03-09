@@ -19,7 +19,9 @@ public class BuildingObjects {
     public static ItemGroup creativeTab = new ItemGroup(Reference.MODID){
         @Override
         public ItemStack createIcon() {
-            return new ItemStack(BGItems.gadgetBuilding);
+            ItemStack stack = new ItemStack(BGItems.gadgetBuilding);
+            stack.getOrCreateTag().setByte("creative", (byte) 0); 
+            return stack;
         }
     };
 
