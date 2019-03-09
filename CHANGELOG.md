@@ -22,6 +22,8 @@ The format of this document is based on [Keep a Changelog](https://keepachangelo
     4. Convert the chunks into paste using any of the machines listed in step 3 (1 chunk -> 1 paste).
 
 ### Changed
+- Nearly every ingredient of every recipe now uses the ore dictionary.
+- Templates can be copied to the clipboard from template items, as well as copy/paste gadgets in the Template Manager GUI.
 - Remote networks are now only wrapped once build/exchange/undo operation, rather than twice per placed block.
 
 ## [2.6.6] - 2019-02-27
