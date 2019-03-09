@@ -59,8 +59,8 @@ public class GadgetExchanger extends GadgetGeneric {
         }
     }
 
-    public GadgetExchanger() {
-        super("exchangertool");
+    public GadgetExchanger(String name) {
+        super(name);
         setMaxDamage(SyncedConfig.durabilityExchanger);
     }
 
