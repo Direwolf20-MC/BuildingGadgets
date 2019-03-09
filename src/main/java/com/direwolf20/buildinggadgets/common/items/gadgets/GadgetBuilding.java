@@ -54,8 +54,8 @@ public class GadgetBuilding extends GadgetGeneric {
         }
     }
 
-    public GadgetBuilding() {
-        super("buildingtool");
+    public GadgetBuilding(String name) {
+        super(name);
         setMaxDamage(SyncedConfig.durabilityBuilder);
     }
 
