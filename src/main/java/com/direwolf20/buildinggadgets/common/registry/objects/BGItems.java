@@ -38,8 +38,10 @@ public final class BGItems {
     // Building Items
     @ObjectHolder(ItemReference.CONSTRUCTION_PASTE)
     public static Item constructionPaste;
+    @ObjectHolder(ItemReference.CONSTRUCTION_CHUNK_DENSE)
+    public static Item constructionChunkDense;
     @ObjectHolder(ItemReference.TEMPLATE)
-    public static Item template  ;
+    public static Item template;
 
     // Construction Paste Containers
     @ObjectHolder(ItemReference.PASTE_CONTAINER_T1)
@@ -61,6 +63,7 @@ public final class BGItems {
         container.add(new RegistryObjectBuilder<Item, Item.Properties>(ItemReference.PASTE_CONTAINER_T3_RL).builder(itemProperties()).factory(RegularPasteContainerTypes.T3::create));
         container.add(new RegistryObjectBuilder<Item, Item.Properties>(ItemReference.PASTE_CONTAINER_CREATIVE_RL).builder(itemProperties()).factory(ConstructionPasteContainerCreative::new));
         container.add(new RegistryObjectBuilder<Item, Item.Properties>(ItemReference.CONSTRUCTION_PASTE_RL).builder(itemProperties()).factory(ConstructionPaste::new));
+        container.add(new RegistryObjectBuilder<Item, Item.Properties>(ItemReference.CONSTRUCTION_CHUNK_DENSE_RL).builder(itemProperties()).factory(Item::new));
         container.add(new RegistryObjectBuilder<Item, Item.Properties>(ItemReference.TEMPLATE_RL).builder(itemProperties()).factory(Template::new));
     }
 

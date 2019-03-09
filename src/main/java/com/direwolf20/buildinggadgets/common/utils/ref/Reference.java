@@ -15,6 +15,7 @@ public final class Reference {
         public static final String GADGET_EXCHANGING = MODID + ":gadget_exchanging";
         // Building Items
         public static final String CONSTRUCTION_PASTE = MODID + ":construction_paste";
+        public static final String CONSTRUCTION_CHUNK_DENSE = MODID + ":construction_chunk_dense";
         public static final String TEMPLATE = MODID + ":template";
         // Construction Paste Containers
         public static final String PASTE_CONTAINER_T1 = MODID + ":construction_paste_container_t1";
@@ -29,6 +30,7 @@ public final class Reference {
         public static final ResourceLocation GADGET_EXCHANGING_RL = new ResourceLocation(GADGET_EXCHANGING);
         // Building Items
         public static final ResourceLocation CONSTRUCTION_PASTE_RL = new ResourceLocation(CONSTRUCTION_PASTE);
+        public static final ResourceLocation CONSTRUCTION_CHUNK_DENSE_RL = new ResourceLocation(CONSTRUCTION_CHUNK_DENSE);
         public static final ResourceLocation TEMPLATE_RL = new ResourceLocation(TEMPLATE);
         // Construction Paste Containers
         public static final ResourceLocation PASTE_CONTAINER_T1_RL = new ResourceLocation(PASTE_CONTAINER_T1);
@@ -42,11 +44,13 @@ public final class Reference {
     public static final class BlockReference {
         public static final String EFFECT_BLOCK = MODID + ":effect_block";
         public static final String CONSTRUCTION_BLOCK = MODID + ":construction_block";
+        public static final String CONSTRUCTION_BLOCK_DENSE = MODID + ":construction_block_dense";
         public static final String CONSTRUCTION_BLOCK_POWDER = MODID + ":construction_block_powder";
         public static final String TEMPLATE_MANAGER = MODID + ":template_manager";
 
         public static final ResourceLocation EFFECT_BLOCK_RL = new ResourceLocation(EFFECT_BLOCK);
         public static final ResourceLocation CONSTRUCTION_BLOCK_RL = new ResourceLocation(CONSTRUCTION_BLOCK);
+        public static final ResourceLocation CONSTRUCTION_BLOCK_DENSE_RL = new ResourceLocation(CONSTRUCTION_BLOCK_DENSE);
         public static final ResourceLocation CONSTRUCTION_BLOCK_POWDER_RL = new ResourceLocation(CONSTRUCTION_BLOCK_POWDER);
         public static final ResourceLocation TEMPLATE_MANAGER_RL = new ResourceLocation(TEMPLATE_MANAGER);
 

@@ -16,8 +16,6 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -64,12 +62,6 @@ public class Template extends Item implements ITemplate {
 
         tooltip.add(new TextComponentString(TextFormatting.AQUA + I18n.format("tooltip.template.name") + ": " + getName(stack)));
         EventTooltip.addTemplatePadding(stack, tooltip);
-    }
-
-    @OnlyIn(Dist.CLIENT)
-    public void initModel() {
-// @todo: reimplement @since 1.13.x
-        //        ModelLoader.setCustomModelResourceLocation(this, 0, new ModelResourceLocation(getRegistryName(), "inventory"));
     }
 
     @Override

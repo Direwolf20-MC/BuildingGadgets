@@ -1,10 +1,13 @@
 package com.direwolf20.buildinggadgets.common.blocks;
 
 import com.direwolf20.buildinggadgets.common.entities.ConstructionBlockEntity;
+
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockFalling;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.ItemStack;
+import net.minecraft.tags.FluidTags;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
@@ -12,7 +15,6 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
-import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
@@ -23,11 +25,6 @@ public class ConstructionBlockPowder extends BlockFalling {
         super(builder);
     }
 
-    /*
-    public void initModel() {
-        ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(this), 0, new ModelResourceLocation(getRegistryName(), "inventory"));
-    }*/
-
     @Override
     public void addInformation(ItemStack stack, @Nullable IBlockReader worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
         super.addInformation(stack, worldIn, tooltip, flagIn);
@@ -36,22 +33,17 @@ public class ConstructionBlockPowder extends BlockFalling {
 
     @Override
     public void onEndFalling(World worldIn, BlockPos pos, IBlockState p_176502_3_, IBlockState p_176502_4_) {
-        if (p_176502_4_.getMaterial().isLiquid()) {
+        if (worldIn.getFluidState(pos).isTagged(FluidTags.WATER))
             worldIn.spawnEntity(new ConstructionBlockEntity(worldIn, pos, true));
-        }
     }
 
     private boolean tryTouchWater(IWorld worldIn, BlockPos pos) {
         boolean foundWater = false;
 
         for (EnumFacing enumfacing : EnumFacing.values()) {
-            if (enumfacing != EnumFacing.DOWN) {
-                BlockPos blockpos = pos.offset(enumfacing);
-
-                if (worldIn.getBlockState(blockpos).getMaterial().isLiquid()) {
-                    foundWater = true;
-                    break;
-                }
+            if (enumfacing != EnumFacing.DOWN && worldIn.getFluidState(pos.offset(enumfacing)).isTagged(FluidTags.WATER)) {
+                foundWater = true;
+                break;
             }
         }
 
@@ -64,19 +56,9 @@ public class ConstructionBlockPowder extends BlockFalling {
         return foundWater;
     }
 
-    /**
-     * Called when a tile entity on a side of this block changes is created or is destroyed.
-     *
-     * @param state
-     * @param world    The world
-     * @param pos      Block position in world
-     * @param neighbor Block position of neighbor
-     */
     @Override
-    public void onNeighborChange(IBlockState state, IWorldReader world, BlockPos pos, BlockPos neighbor) {
-        if (world instanceof IWorld) {
-            this.tryTouchWater((IWorld) world, pos);
-        }
+    public void neighborChanged(IBlockState state, World world, BlockPos pos, Block block, BlockPos fromPos) {
+        tryTouchWater(world, pos);
     }
 
     @Override

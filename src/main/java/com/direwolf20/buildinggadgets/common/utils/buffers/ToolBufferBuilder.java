@@ -1,6 +1,14 @@
 package com.direwolf20.buildinggadgets.common.utils.buffers;
 
 import com.google.common.primitives.Floats;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
+import java.nio.ShortBuffer;
+import java.util.Arrays;
+import java.util.BitSet;
+
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GLAllocation;
 import net.minecraft.client.renderer.vertex.VertexFormat;
@@ -11,12 +19,11 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.nio.*;
-import java.util.Arrays;
-import java.util.BitSet;
-
+/**
+ * This class differs from {@link BufferBuilder BufferBuilder} only in that the Comparator arguments of {@link Arrays#sort(Integer[], Comparator) Arrays#sort}
+ * are compared in reverse order in {@link ToolDireBuffer#sortVertexData sortVertexData}
+ */
 public class ToolBufferBuilder extends BufferBuilder {
-
     private static final Logger LOGGER = LogManager.getLogger();
     private ByteBuffer byteBuffer;
     private IntBuffer rawIntBuffer;
@@ -44,10 +51,10 @@ public class ToolBufferBuilder extends BufferBuilder {
         this.rawFloatBuffer = this.byteBuffer.asFloatBuffer();
     }
 
-    private void growBuffer(int p_181670_1_) {
-        if (MathHelper.roundUp(p_181670_1_, 4) / 4 > this.rawIntBuffer.remaining() || this.vertexCount * this.vertexFormat.getSize() + p_181670_1_ > this.byteBuffer.capacity()) {
+    private void growBuffer(int increaseAmount) {
+        if (this.vertexCount * this.vertexFormat.getSize() + increaseAmount > this.byteBuffer.capacity()) {
             int i = this.byteBuffer.capacity();
-            int j = i + MathHelper.roundUp(p_181670_1_, 2097152);
+            int j = i + MathHelper.roundUp(increaseAmount, 2097152);
             LOGGER.debug("Needed to grow BufferBuilder buffer: Old size {} bytes, new size {} bytes.", i, j);
             int k = this.rawIntBuffer.position();
             ByteBuffer bytebuffer = GLAllocation.createDirectByteBuffer(j);
@@ -64,12 +71,12 @@ public class ToolBufferBuilder extends BufferBuilder {
     }
 
     @Override
-    public void sortVertexData(float p_181674_1_, float p_181674_2_, float p_181674_3_) {
+    public void sortVertexData(float cameraX, float cameraY, float cameraZ) {
         int i = this.vertexCount / 4;
-        final float[] afloat = new float[i];
+        float[] afloat = new float[i];
 
         for (int j = 0; j < i; ++j) {
-            afloat[j] = getDistanceSq(this.rawFloatBuffer, (float) (p_181674_1_ + this.xOffset), (float) (p_181674_2_ + this.yOffset), (float) (p_181674_3_ + this.zOffset), this.vertexFormat.getSize(), j * this.vertexFormat.getSize());
+            afloat[j] = getDistanceSq(this.rawFloatBuffer, (float) (cameraX + this.xOffset), (float) (cameraY + this.yOffset), (float) (cameraZ + this.zOffset), this.vertexFormat.getIntegerSize(), j * this.vertexFormat.getSize());
         }
 
         Integer[] ainteger = new Integer[i];
@@ -86,7 +93,6 @@ public class ToolBufferBuilder extends BufferBuilder {
 
         for (int i1 = bitset.nextClearBit(0); i1 < ainteger.length; i1 = bitset.nextClearBit(i1 + 1)) {
             int j1 = ainteger[i1];
-
             if (j1 != i1) {
                 this.rawIntBuffer.limit(j1 * l + l);
                 this.rawIntBuffer.position(j1 * l);
@@ -128,25 +134,25 @@ public class ToolBufferBuilder extends BufferBuilder {
     }
 
     private int getBufferSize() {
-        return this.vertexCount * this.vertexFormat.getSize();
+        return this.vertexCount * this.vertexFormat.getIntegerSize();
     }
 
-    private static float getDistanceSq(FloatBuffer p_181665_0_, float p_181665_1_, float p_181665_2_, float p_181665_3_, int p_181665_4_, int p_181665_5_) {
-        float f = p_181665_0_.get(p_181665_5_ + p_181665_4_ * 0);
-        float f1 = p_181665_0_.get(p_181665_5_ + p_181665_4_ * 0 + 1);
-        float f2 = p_181665_0_.get(p_181665_5_ + p_181665_4_ * 0 + 2);
-        float f3 = p_181665_0_.get(p_181665_5_ + p_181665_4_ * 1);
-        float f4 = p_181665_0_.get(p_181665_5_ + p_181665_4_ * 1 + 1);
-        float f5 = p_181665_0_.get(p_181665_5_ + p_181665_4_ * 1 + 2);
-        float f6 = p_181665_0_.get(p_181665_5_ + p_181665_4_ * 2);
-        float f7 = p_181665_0_.get(p_181665_5_ + p_181665_4_ * 2 + 1);
-        float f8 = p_181665_0_.get(p_181665_5_ + p_181665_4_ * 2 + 2);
-        float f9 = p_181665_0_.get(p_181665_5_ + p_181665_4_ * 3);
-        float f10 = p_181665_0_.get(p_181665_5_ + p_181665_4_ * 3 + 1);
-        float f11 = p_181665_0_.get(p_181665_5_ + p_181665_4_ * 3 + 2);
-        float f12 = (f + f3 + f6 + f9) * 0.25F - p_181665_1_;
-        float f13 = (f1 + f4 + f7 + f10) * 0.25F - p_181665_2_;
-        float f14 = (f2 + f5 + f8 + f11) * 0.25F - p_181665_3_;
+    private static float getDistanceSq(FloatBuffer floatBufferIn, float x, float y, float z, int integerSize, int offset) {
+        float f = floatBufferIn.get(offset + integerSize * 0 + 0);
+        float f1 = floatBufferIn.get(offset + integerSize * 0 + 1);
+        float f2 = floatBufferIn.get(offset + integerSize * 0 + 2);
+        float f3 = floatBufferIn.get(offset + integerSize * 1 + 0);
+        float f4 = floatBufferIn.get(offset + integerSize * 1 + 1);
+        float f5 = floatBufferIn.get(offset + integerSize * 1 + 2);
+        float f6 = floatBufferIn.get(offset + integerSize * 2 + 0);
+        float f7 = floatBufferIn.get(offset + integerSize * 2 + 1);
+        float f8 = floatBufferIn.get(offset + integerSize * 2 + 2);
+        float f9 = floatBufferIn.get(offset + integerSize * 3 + 0);
+        float f10 = floatBufferIn.get(offset + integerSize * 3 + 1);
+        float f11 = floatBufferIn.get(offset + integerSize * 3 + 2);
+        float f12 = (f + f3 + f6 + f9) * 0.25F - x;
+        float f13 = (f1 + f4 + f7 + f10) * 0.25F - y;
+        float f14 = (f2 + f5 + f8 + f11) * 0.25F - z;
         return f12 * f12 + f13 * f13 + f14 * f14;
     }
 
@@ -183,7 +189,6 @@ public class ToolBufferBuilder extends BufferBuilder {
     @Override
     public BufferBuilder tex(double u, double v) {
         int i = this.vertexCount * this.vertexFormat.getSize() + this.vertexFormat.getOffset(this.vertexFormatIndex);
-
         switch (this.vertexFormatElement.getType()) {
             case FLOAT:
                 this.byteBuffer.putFloat(i, (float) u);
@@ -210,47 +215,49 @@ public class ToolBufferBuilder extends BufferBuilder {
     }
 
     @Override
-    public BufferBuilder lightmap(int p_187314_1_, int p_187314_2_) {
+    public BufferBuilder lightmap(int skyLight, int blockLight) {
         int i = this.vertexCount * this.vertexFormat.getSize() + this.vertexFormat.getOffset(this.vertexFormatIndex);
-
         switch (this.vertexFormatElement.getType()) {
             case FLOAT:
-                this.byteBuffer.putFloat(i, p_187314_1_);
-                this.byteBuffer.putFloat(i + 4, p_187314_2_);
+                this.byteBuffer.putFloat(i, skyLight);
+                this.byteBuffer.putFloat(i + 4, blockLight);
                 break;
             case UINT:
             case INT:
-                this.byteBuffer.putInt(i, p_187314_1_);
-                this.byteBuffer.putInt(i + 4, p_187314_2_);
+                this.byteBuffer.putInt(i, skyLight);
+                this.byteBuffer.putInt(i + 4, blockLight);
                 break;
             case USHORT:
             case SHORT:
-                this.byteBuffer.putShort(i, (short) p_187314_2_);
-                this.byteBuffer.putShort(i + 2, (short) p_187314_1_);
+                this.byteBuffer.putShort(i, (short) blockLight);
+                this.byteBuffer.putShort(i + 2, (short) skyLight);
                 break;
             case UBYTE:
             case BYTE:
-                this.byteBuffer.put(i, (byte) p_187314_2_);
-                this.byteBuffer.put(i + 1, (byte) p_187314_1_);
+                this.byteBuffer.put(i, (byte) blockLight);
+                this.byteBuffer.put(i + 1, (byte) skyLight);
         }
 
         this.nextVertexFormatIndex();
         return this;
     }
 
+    /**
+     * Set the brightness for the previously stored quad (4 vertices)
+     */
     @Override
-    public void putBrightness4(int p_178962_1_, int p_178962_2_, int p_178962_3_, int p_178962_4_) {
-        int i = (this.vertexCount - 4) * this.vertexFormat.getSize() + this.vertexFormat.getUvOffsetById(1) / 4;
+    public void putBrightness4(int vertex0, int vertex1, int vertex2, int vertex3) {
+        int i = (this.vertexCount - 4) * this.vertexFormat.getIntegerSize() + this.vertexFormat.getUvOffsetById(1) / 4;
         int j = this.vertexFormat.getSize() >> 2;
-        this.rawIntBuffer.put(i, p_178962_1_);
-        this.rawIntBuffer.put(i + j, p_178962_2_);
-        this.rawIntBuffer.put(i + j * 2, p_178962_3_);
-        this.rawIntBuffer.put(i + j * 3, p_178962_4_);
+        this.rawIntBuffer.put(i, vertex0);
+        this.rawIntBuffer.put(i + j, vertex1);
+        this.rawIntBuffer.put(i + j * 2, vertex2);
+        this.rawIntBuffer.put(i + j * 3, vertex3);
     }
 
     @Override
     public void putPosition(double x, double y, double z) {
-        int i = this.vertexFormat.getSize();
+        int i = this.vertexFormat.getIntegerSize();
         int j = (this.vertexCount - 4) * i;
 
         for (int k = 0; k < 4; ++k) {
@@ -279,10 +286,8 @@ public class ToolBufferBuilder extends BufferBuilder {
     public void putColorMultiplier(float red, float green, float blue, int vertexIndex) {
         int i = this.getColorIndex(vertexIndex);
         int j = -1;
-
         if (!this.noColor) {
             j = this.rawIntBuffer.get(i);
-
             if (ByteOrder.nativeOrder() == ByteOrder.LITTLE_ENDIAN) {
                 int k = (int) ((j & 255) * red);
                 int l = (int) ((j >> 8 & 255) * green);
@@ -319,8 +324,8 @@ public class ToolBufferBuilder extends BufferBuilder {
     }
 
     /**
-     * Write the given color data of 4 bytes at the given index into the vertex data buffer, accounting for system
-     * endianness.
+     * Write the given color data of 4 bytes at the given index into the vertex
+     * data buffer, accounting for system endianness.
      */
     @Override
     public void putColorRGBA(int index, int red, int green, int blue) {
@@ -350,7 +355,6 @@ public class ToolBufferBuilder extends BufferBuilder {
             return this;
         }
         int i = this.vertexCount * this.vertexFormat.getSize() + this.vertexFormat.getOffset(this.vertexFormatIndex);
-
         switch (this.vertexFormatElement.getType()) {
             case FLOAT:
                 this.byteBuffer.putFloat(i, red / 255.0F);
@@ -374,7 +378,6 @@ public class ToolBufferBuilder extends BufferBuilder {
                 break;
             case UBYTE:
             case BYTE:
-
                 if (ByteOrder.nativeOrder() == ByteOrder.LITTLE_ENDIAN) {
                     this.byteBuffer.put(i, (byte) red);
                     this.byteBuffer.put(i + 1, (byte) green);
@@ -394,10 +397,10 @@ public class ToolBufferBuilder extends BufferBuilder {
 
     @Override
     public void addVertexData(int[] vertexData) {
-        this.growBuffer(vertexData.length * 4 + this.vertexFormat.getSize());//Forge, fix MC-122110
+        this.growBuffer(vertexData.length * 4 + this.vertexFormat.getSize());
         this.rawIntBuffer.position(this.getBufferSize());
         this.rawIntBuffer.put(vertexData);
-        this.vertexCount += vertexData.length / this.vertexFormat.getSize();
+        this.vertexCount += vertexData.length / this.vertexFormat.getIntegerSize();
     }
 
     @Override
@@ -409,7 +412,6 @@ public class ToolBufferBuilder extends BufferBuilder {
     @Override
     public BufferBuilder pos(double x, double y, double z) {
         int i = this.vertexCount * this.vertexFormat.getSize() + this.vertexFormat.getOffset(this.vertexFormatIndex);
-
         switch (this.vertexFormatElement.getType()) {
             case FLOAT:
                 this.byteBuffer.putFloat(i, (float) (x + this.xOffset));
@@ -457,16 +459,15 @@ public class ToolBufferBuilder extends BufferBuilder {
         ++this.vertexFormatIndex;
         this.vertexFormatIndex %= this.vertexFormat.getElementCount();
         this.vertexFormatElement = this.vertexFormat.getElement(this.vertexFormatIndex);
-
         if (this.vertexFormatElement.getUsage() == VertexFormatElement.EnumUsage.PADDING) {
             this.nextVertexFormatIndex();
         }
+
     }
 
     @Override
     public BufferBuilder normal(float x, float y, float z) {
         int i = this.vertexCount * this.vertexFormat.getSize() + this.vertexFormat.getOffset(this.vertexFormatIndex);
-
         switch (this.vertexFormatElement.getType()) {
             case FLOAT:
                 this.byteBuffer.putFloat(i, x);
@@ -481,15 +482,15 @@ public class ToolBufferBuilder extends BufferBuilder {
                 break;
             case USHORT:
             case SHORT:
-                this.byteBuffer.putShort(i, (short) ((int) (x * 32767) & 65535));
-                this.byteBuffer.putShort(i + 2, (short) ((int) (y * 32767) & 65535));
-                this.byteBuffer.putShort(i + 4, (short) ((int) (z * 32767) & 65535));
+                this.byteBuffer.putShort(i, (short) ((int) (x * Short.MAX_VALUE) & 0xFFFF));
+                this.byteBuffer.putShort(i + 2, (short) ((int) (y * Short.MAX_VALUE) & 0xFFFF));
+                this.byteBuffer.putShort(i + 4, (short) ((int) (z * Short.MAX_VALUE) & 0xFFFF));
                 break;
             case UBYTE:
             case BYTE:
-                this.byteBuffer.put(i, (byte) ((int) (x * 127) & 255));
-                this.byteBuffer.put(i + 1, (byte) ((int) (y * 127) & 255));
-                this.byteBuffer.put(i + 2, (byte) ((int) (z * 127) & 255));
+                this.byteBuffer.put(i, (byte) ((int) (x * Byte.MAX_VALUE) & 0xFF));
+                this.byteBuffer.put(i + 1, (byte) ((int) (y * Byte.MAX_VALUE) & 0xFF));
+                this.byteBuffer.put(i + 2, (byte) ((int) (z * Byte.MAX_VALUE) & 0xFF));
         }
 
         this.nextVertexFormatIndex();
@@ -562,7 +563,7 @@ public class ToolBufferBuilder extends BufferBuilder {
         }
 
         public int getVertexCount() {
-            return this.stateRawBuffer.length / this.stateVertexFormat.getSize();
+            return this.stateRawBuffer.length / this.stateVertexFormat.getIntegerSize();
         }
 
         public VertexFormat getVertexFormat() {
@@ -570,8 +571,8 @@ public class ToolBufferBuilder extends BufferBuilder {
         }
     }
 
-
-    //For some unknown reason Mojang changed the vanilla function to hardcode alpha as 255.... So lets re-add the parameter -.-
+    // For some unknown reason Mojang changed the vanilla function to hardcode
+    // alpha as 255.... So lets re-add the parameter -.-
     @Override
     public void putColorRGBA(int index, int red, int green, int blue, int alpha) {
         if (ByteOrder.nativeOrder() == ByteOrder.LITTLE_ENDIAN)

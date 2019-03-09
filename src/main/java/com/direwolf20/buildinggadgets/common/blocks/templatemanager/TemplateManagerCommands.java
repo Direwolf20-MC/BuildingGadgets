@@ -222,7 +222,7 @@ public class TemplateManagerCommands {
 
     public static void copyTemplate(TemplateManagerContainer container) {
         ItemStack itemStack0 = container.getSlot(0).getStack();
-        if (itemStack0.getItem() instanceof GadgetCopyPaste) {
+        if (itemStack0.getItem() instanceof ITemplate) {
             NBTTagCompound tagCompound = PasteToolBufferBuilder.getTagFromUUID(((GadgetCopyPaste) BGItems.gadgetCopyPaste).getUUID(itemStack0));
             if (tagCompound == null) {
                 Minecraft.getInstance().player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.copyfailed").getUnformattedComponentText()), false);

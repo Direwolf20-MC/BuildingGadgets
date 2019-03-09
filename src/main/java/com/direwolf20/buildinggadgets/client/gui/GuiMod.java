@@ -80,7 +80,7 @@ public enum GuiMod {
 
     public static GuiScreen openScreen(OpenContainer message) {
         if (message.getId().getPath().equals(TEMPLATE_MANAGER.id))
-            Minecraft.getInstance().displayGuiScreen(TEMPLATE_MANAGER.commonScreenProvider.apply(message));
+            return TEMPLATE_MANAGER.commonScreenProvider.apply(message);
 
         return null;
     }

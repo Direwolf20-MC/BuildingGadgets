@@ -1,6 +1,3 @@
 {
-  "parent": "block/cube_all",
-  "textures": {
-    "all": "buildinggadgets:blocks/construction_block_powder"
-  }
+  "parent": "buildinggadgets:block/construction_block_powder"
 }

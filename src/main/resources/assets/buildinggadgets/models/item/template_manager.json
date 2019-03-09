@@ -1,6 +1,3 @@
 {
-  "parent": "block/cube_all",
-  "textures": {
-    "all": "buildinggadgets:blocks/template_manager"
-  }
+  "parent": "buildinggadgets:block/template_manager"
 }

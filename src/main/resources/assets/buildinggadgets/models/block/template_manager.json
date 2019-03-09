@@ -1,12 +1,10 @@
 {
-  "parent": "block/orientable",
+  "parent": "buildinggadgets:block/orientable",
   "textures": {
-    "particle": "buildinggadgets:blocks/template_manager",
-    "north": "buildinggadgets:blocks/template_manager_front",
+    "particle": "buildinggadgets:blocks/template_manager_side",
+    "front": "buildinggadgets:blocks/template_manager_front",
     "top": "buildinggadgets:blocks/template_manager_top",
     "bottom": "buildinggadgets:blocks/template_manager_bottom",
-    "south": "buildinggadgets:blocks/template_manager",
-    "east": "buildinggadgets:blocks/template_manager",
-    "west": "buildinggadgets:blocks/template_manager"
+    "side": "buildinggadgets:blocks/template_manager_side"
   }
 }

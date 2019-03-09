@@ -10,6 +10,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
+import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DeferredWorkQueue;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
@@ -17,44 +18,18 @@ import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 @EventBusSubscriber(Dist.CLIENT)
 public class ClientProxy {
 
-    public static void clientSetup() {
+    public static void clientSetup(final IEventBus eventBus) {
         DeferredWorkQueue.runLater(KeyBindings::init);
         //BuildingObjects.initColorHandlers();
         //eventBus.addListener(ClientProxy::renderWorldLastEvent);
+        eventBus.addListener(ClientProxy::registerModels);
     }
 
-    @SubscribeEvent
-    public static void registerModels(@SuppressWarnings("unused") ModelRegistryEvent event) {
+    private static void registerModels(@SuppressWarnings("unused") ModelRegistryEvent event) {
         ModelLoaderRegistry.registerLoader(new BakedModelLoader());
-
-        //RenderingRegistry.registerEntityRenderingHandler(BlockBuildEntity.class, BlockBuildEntityRender::new);
-        //RenderingRegistry.registerEntityRenderingHandler(ConstructionBlockEntity.class, ConstructionBlockEntityRender::new);
-
         // @todo: reimplement? @since 1.13.x
-        //        ModBlocks.effectBlock.initModel();
-        //        ModBlocks.templateManager.initModel();
-        //
-        //        BuildingObjects.gadgetBuilding.initModel();
-        //        BuildingObjects.gadgetExchanger.initModel();
-        //        BuildingObjects.gadgetCopyPaste.initModel();
-        //        BuildingObjects.template.initModel();
-        //
-        //        if (SyncedConfig.enableDestructionGadget) {
-        //            BuildingObjects.gadgetDestruction.initModel();
-        //        }
-        //
         //        if (SyncedConfig.enablePaste) {
-        //            BuildingObjects.ConstructionPasteContainer.initModel();
-        //            BuildingObjects.constructionPasteContainerCreative.initModel();
-        //            BuildingObjects.constructionPaste.initModel();
-        //
         //            ModBlocks.constructionBlock.initModel();
-        //            ModBlocks.constructionBlockPowder.initModel();
-        //
-        //        // REIMPLEMENT
-        ////            ModelLoader.setCustomMeshDefinition(ModItems.constructionPasteContainer, new PasteContainerMeshDefinition());
-        ////            ModelLoader.setCustomMeshDefinition(ModItems.constructionPasteContainert2, new PasteContainerMeshDefinition());
-        ////            ModelLoader.setCustomMeshDefinition(ModItems.constructionPasteContainert3, new PasteContainerMeshDefinition());
         //        }
     }
 

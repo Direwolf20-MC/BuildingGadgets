@@ -17,6 +17,7 @@ import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
+import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
 
@@ -36,10 +37,6 @@ public abstract class GadgetGeneric extends Item {
     public abstract int getEnergyCost(ItemStack tool);
 
     public abstract int getDamageCost(ItemStack tool);
-
-//    public void initModel() {
-//        ModelLoader.setCustomModelResourceLocation(this, 0, new ModelResourceLocation(getRegistryName(), "inventory"));
-//    }
 
     @Override
     @Nullable
@@ -84,6 +81,9 @@ public abstract class GadgetGeneric extends Item {
 
     @Override
     public boolean showDurabilityBar(ItemStack stack) {
+        if (stack.hasTag() && stack.getTag().contains("creative", Constants.NBT.TAG_BYTE))
+            return false;
+
         return EnergyUtil.returnBooleanIfPresent(stack,
                 energy -> energy.getEnergyStored() != energy.getMaxEnergyStored(),
                 () -> super.showDurabilityBar(stack));

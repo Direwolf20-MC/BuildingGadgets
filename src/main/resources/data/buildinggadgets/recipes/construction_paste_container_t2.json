@@ -1,0 +1,24 @@
+{
+  "result": {
+    "item": "buildinggadgets:construction_paste_container_t2"
+  },
+  "pattern": [
+    "cgc",
+    "ggg",
+    "cgc"
+  ],
+  "type": "buildinggadgets:construction_paste",
+  "key": {
+    "g": {
+      "tag": "forge:ingots/gold"
+    },
+    "c": {
+      "item": "buildinggadgets:construction_paste_container_t1"
+    }
+  },
+  "conditions": [
+    {
+      "type": "buildinggadgets:enable_paste"
+    }
+  ]
+}

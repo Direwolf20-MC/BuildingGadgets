@@ -1,0 +1,25 @@
+{
+  "result": {
+    "item": "buildinggadgets:gadget_building"
+  },
+  "pattern": [
+    "iri",
+    "drd",
+    "ili"
+  ],
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "i": {
+      "tag": "forge:ingots/iron"
+    },
+    "r": {
+      "tag": "forge:dusts/redstone"
+    },
+    "l": {
+      "tag": "forge:gems/lapis"
+    },
+    "d": {
+      "tag": "forge:gems/diamond"
+    }
+  }
+}

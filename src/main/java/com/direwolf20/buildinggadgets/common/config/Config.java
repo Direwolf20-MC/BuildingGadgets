@@ -58,6 +58,10 @@ public class Config {
 
         public final BooleanValue enablePaste;
 
+        public final IntValue denseConstructionDropCount;
+
+        public final DoubleValue denseConstructionChunkFraction;
+
         public final BooleanValue enableDestructionGadget;
 
         /* Client Only!*/
@@ -75,8 +79,18 @@ public class Config {
 
             enablePaste = SERVER_BUILDER
                     .comment("Set to false to disable the recipe for construction paste.")
-                    .translation(LANG_KEY_GENERAL + ".enablePaste")
+                    .translation(LANG_KEY_GENERAL + ".paste.enabled")
                     .define("Enable Construction Paste", true);
+
+            denseConstructionDropCount = SERVER_BUILDER
+                    .comment("The number of items (either paste or dense construction chunks) dropped by a dense construction block.")
+                    .translation(LANG_KEY_GENERAL + ".paste.dense_construction.drops.count")
+                    .defineInRange("Dense Construction Drop Count", 4, 0, Integer.MAX_VALUE);
+
+            denseConstructionChunkFraction = SERVER_BUILDER
+                    .comment("Of the items dropped by a dense construction block, this fraction of them will be dense construction chunks (the remainder will be construction paste).")
+                    .translation(LANG_KEY_GENERAL + ".paste.dense_construction.drops.chunk_fraction")
+                    .defineInRange("Dense Construction Chunk Fraction", 0.5, 0.0, 1.0);
 
             enableDestructionGadget = SERVER_BUILDER
                     .comment("Set to false to disable the Destruction Gadget.")
@@ -274,7 +288,7 @@ public class Config {
             return SERVER_BUILDER
                     .comment(String.format("The maximum capacity of a tier %s (iron) Construction Paste Container", tier))
                     .translation(LANG_KEY_PASTE_CONTAINERS_CAPACITY + ".t" + tier)
-                    .defineInRange(String.format("T%s Container Capacity", tier), (int) (512 * Math.pow(2, tier - 1)), 1, Integer.MAX_VALUE);
+                    .defineInRange(String.format("T%s Container Capacity", tier), (int) (512 * Math.pow(4, tier - 1)), 1, Integer.MAX_VALUE);
         }
     }
 
@@ -320,7 +334,6 @@ public class Config {
     public static final ForgeConfigSpec SERVER_CONFIG = SERVER_BUILDER.build();
     public static final ForgeConfigSpec CLIENT_CONFIG = CLIENT_BUILDER.build();
 
-    @SubscribeEvent
     public static void onLoad(final ModConfig.Loading configEvent) {
         BLACKLIST.parseBlacklists();
         BuildingGadgets.LOG.debug("Loaded {} config file {}", Reference.MODID, configEvent.getConfig().getFileName());

@@ -2,6 +2,7 @@ package com.direwolf20.buildinggadgets.common.items.pastes;
 
 import com.direwolf20.buildinggadgets.common.utils.helpers.InventoryHelper;
 import com.direwolf20.buildinggadgets.common.utils.helpers.NBTHelper;
+
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -9,13 +10,13 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.Style;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -28,16 +29,10 @@ public class ConstructionPasteContainer extends GenericPasteContainer {
     public ConstructionPasteContainer(Properties builder, IntSupplier maxCapacity) {
         super(builder);
         this.maxCapacity = maxCapacity;
-    }
-
-    @OnlyIn(Dist.CLIENT)
-    public void initModel() {
-//        ModelBakery.registerItemVariants(this,
-//                new ModelResourceLocation(getRegistryName(), "inventory"),
-//                new ModelResourceLocation(getRegistryName() + "_half", "inventory"),
-//                new ModelResourceLocation(getRegistryName() + "_full", "inventory"),
-//                new ModelResourceLocation(getRegistryName() + "_quarter", "inventory"),
-//                new ModelResourceLocation(getRegistryName() + "_3quarter", "inventory"));
+        addPropertyOverride(new ResourceLocation("level"), (stack, world, entity) -> {
+            float percent = ConstructionPasteContainer.getPasteAmount(stack) / (float) this.maxCapacity.getAsInt();
+            return MathHelper.floor(percent * 4) / 4F;
+        });
     }
 
     @Override
