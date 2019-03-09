@@ -6,7 +6,7 @@ import com.direwolf20.buildinggadgets.client.gui.GuiMod;
 import com.direwolf20.buildinggadgets.common.commands.BlockMapCommand;
 import com.direwolf20.buildinggadgets.common.config.ApiConfig;
 import com.direwolf20.buildinggadgets.common.config.Config;
-import com.direwolf20.buildinggadgets.common.config.crafting.ConstructionPasteRecipeHandler;
+import com.direwolf20.buildinggadgets.common.config.crafting.RecipeConstructionPaste;
 import com.direwolf20.buildinggadgets.common.config.crafting.CraftingConditionDestruction;
 import com.direwolf20.buildinggadgets.common.config.crafting.CraftingConditionPaste;
 import com.direwolf20.buildinggadgets.common.events.AnvilRepairHandler;
@@ -102,7 +102,7 @@ public class BuildingGadgets {
             PacketHandler.register();
             CraftingHelper.register(new ResourceLocation(Reference.MODID, "enable_paste"), new CraftingConditionPaste());
             CraftingHelper.register(new ResourceLocation(Reference.MODID, "enable_destruction"), new CraftingConditionDestruction());
-            RecipeSerializers.register(new ConstructionPasteRecipeHandler.Serializer());
+            RecipeSerializers.register(new RecipeConstructionPaste.Serializer());
         });
     }
 

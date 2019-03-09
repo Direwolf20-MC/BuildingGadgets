@@ -8,7 +8,6 @@ import com.direwolf20.buildinggadgets.common.tools.ToolRenders;
 import com.direwolf20.buildinggadgets.common.tools.UndoState;
 import com.direwolf20.buildinggadgets.common.tools.modes.BuildingModes;
 import com.direwolf20.buildinggadgets.common.utils.CapabilityUtil.EnergyUtil;
-import com.direwolf20.buildinggadgets.common.utils.exceptions.CapabilityNotPresentException;
 import com.direwolf20.buildinggadgets.common.utils.helpers.InventoryHelper;
 import com.direwolf20.buildinggadgets.common.utils.helpers.NBTHelper;
 import com.direwolf20.buildinggadgets.common.utils.helpers.SortingHelper;
@@ -34,7 +33,6 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldType;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.BlockSnapshot;
-import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.world.BlockEvent;
 
@@ -152,8 +150,7 @@ public class GadgetBuilding extends GadgetGeneric {
         if (!world.isRemote) {
             if (player.isSneaking()) {
                 //TODO Remove debug code
-                IEnergyStorage energy = EnergyUtil.getCap(itemstack).orElseThrow(CapabilityNotPresentException::new);
-                int accepted = energy.receiveEnergy(105000, false);
+                EnergyUtil.getCap(itemstack).ifPresent(energy -> energy.receiveEnergy(105000, false));
                 selectBlock(itemstack, player);
             } else {
                 build(player, itemstack);
