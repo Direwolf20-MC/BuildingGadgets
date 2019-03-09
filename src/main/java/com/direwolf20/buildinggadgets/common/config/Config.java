@@ -307,8 +307,7 @@ public class Config {
 
         private void parseBlacklists() {
             parsedBlacklist = PatternList.ofResourcePattern(blockBlacklist.get());
-            //TODO update once Forge allows trailing .'s
-            parsedWhitelist = PatternList.ofResourcePattern(ImmutableList.of(".*")/*blockWhitelist.get()*/);
+            parsedWhitelist = PatternList.ofResourcePattern(blockWhitelist.get());
         }
 
         public boolean isAllowedBlock(Block block) {

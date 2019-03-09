@@ -56,6 +56,8 @@ public class BuildingGadgets {
         eventBus.addListener(this::setup);
         eventBus.addListener(this::serverLoad);
         eventBus.addListener(this::finishLoad);
+        eventBus.addListener(Config::onLoad);
+        eventBus.addListener(Config::onFileChange);
 
         MinecraftForge.EVENT_BUS.register(new AnvilRepairHandler());
         MinecraftForge.EVENT_BUS.register(this);
@@ -73,7 +75,7 @@ public class BuildingGadgets {
     }
 
     private void loadConfig(ForgeConfigSpec spec, Path path) {
-        LOG.debug("Loading config file {}", path);
+        LOG.debug("Preparing config file {}", path);
         
         final CommentedFileConfig configData = CommentedFileConfig.builder(path)
                 .sync()
@@ -81,10 +83,8 @@ public class BuildingGadgets {
                 .writingMode(WritingMode.REPLACE)
                 .build();
 
-        LOG.debug("Built TOML config for {}", path.toString());
-        configData.load();
-        LOG.debug("Loaded TOML config file {}", path.toString());
         spec.setConfig(configData);
+        LOG.debug("Built TOML config for {}", path.toString());
     }
 
     private void setup(final FMLCommonSetupEvent event) {
