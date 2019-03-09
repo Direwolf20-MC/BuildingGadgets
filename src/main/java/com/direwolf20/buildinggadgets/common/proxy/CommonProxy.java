@@ -80,13 +80,13 @@ public class CommonProxy {
 
     @SubscribeEvent
     public static void registerItems(RegistryEvent.Register<Item> event) {
-        event.getRegistry().register(new GadgetBuilding());
-        event.getRegistry().register(new GadgetExchanger());
-        event.getRegistry().register(new GadgetCopyPaste());
+        event.getRegistry().register(new GadgetBuilding("buildingtool"));
+        event.getRegistry().register(new GadgetExchanger("exchangertool"));
+        event.getRegistry().register(new GadgetCopyPaste("copypastetool"));
         event.getRegistry().register(new ItemBlock(ModBlocks.templateManager).setRegistryName(ModBlocks.templateManager.getRegistryName()));
         event.getRegistry().register(new Template());
         if (SyncedConfig.enableDestructionGadget) {
-            event.getRegistry().register(new GadgetDestruction());
+            event.getRegistry().register(new GadgetDestruction("destructiontool"));
         }
         if (SyncedConfig.enablePaste) {
             event.getRegistry().register(new ItemBlock(ModBlocks.constructionBlockDense).setRegistryName(ModBlocks.constructionBlockDense.getRegistryName()));
