@@ -55,8 +55,8 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
         }
     }
 
-    public GadgetCopyPaste() {
-        super("copypastetool");
+    public GadgetCopyPaste(String name) {
+        super(name);
         setMaxDamage(SyncedConfig.durabilityCopyPaste);
     }
 
