@@ -31,15 +31,15 @@ public final class BGBlocks {
     private static final BlockRegistryContainer container = new BlockRegistryContainer();
     // Blocks
     @ObjectHolder(BlockReference.EFFECT_BLOCK)
-    public static Block effectBlock;
+    public static EffectBlock effectBlock;
     @ObjectHolder(BlockReference.CONSTRUCTION_BLOCK)
-    public static Block constructionBlock;
+    public static ConstructionBlock constructionBlock;
     @ObjectHolder(BlockReference.CONSTRUCTION_BLOCK_DENSE)
-    public static Block constructionBlockDense;
+    public static ConstructionBlockDense constructionBlockDense;
     @ObjectHolder(BlockReference.CONSTRUCTION_BLOCK_POWDER)
-    public static Block constructionBlockPowder;
+    public static ConstructionBlockPowder constructionBlockPowder;
     @ObjectHolder(BlockReference.TEMPLATE_MANAGER)
-    public static Block templateManger;
+    public static TemplateManager templateManger;
 
     static void init() {
         container.add(new BlockBuilder(BlockReference.EFFECT_BLOCK_RL)

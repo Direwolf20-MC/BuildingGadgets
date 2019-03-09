@@ -49,7 +49,7 @@ public class PacketCopyCoords {
 
                 BlockPos startPos = msg.start;
                 BlockPos endPos = msg.end;
-                GadgetCopyPaste tool = (GadgetCopyPaste) BGItems.gadgetCopyPaste;
+                GadgetCopyPaste tool = BGItems.gadgetCopyPaste;
                 if (startPos.equals(BlockPos.ORIGIN) && endPos.equals(BlockPos.ORIGIN)) {
                     tool.setStartPos(heldItem, null);
                     tool.setEndPos(heldItem, null);
