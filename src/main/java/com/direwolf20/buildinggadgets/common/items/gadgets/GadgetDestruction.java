@@ -44,8 +44,8 @@ import java.util.*;
 
 public class GadgetDestruction extends GadgetGeneric {
 
-    public GadgetDestruction() {
-        super("destructiontool");
+    public GadgetDestruction(String name) {
+        super(name);
         setMaxDamage(SyncedConfig.durabilityDestruction);
     }
 
