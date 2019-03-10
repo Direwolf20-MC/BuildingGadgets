@@ -35,7 +35,7 @@ public class BuildingVerticalColumnMode extends AbstractMode implements IAtopSup
 
     @Override
     public BlockPos transformAtop(EntityPlayer player, BlockPos hit, EnumFacing sideHit, ItemStack tool, int offset) {
-        return sideHit.getAxis().isHorizontal() ? hit : hit.offset(sideHit, offset);
+        return hit.offset(sideHit, offset);
     }
 
 }

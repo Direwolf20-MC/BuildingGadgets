@@ -23,7 +23,8 @@ public class HorizontalWallMode extends AbstractMode implements IAtopSupport {
     @Override
     public IPlacementSequence computeCoordinates(EntityPlayer player, BlockPos hit, EnumFacing sideHit, ItemStack tool) {
         int range = GadgetUtils.getToolRange(tool);
-        if (sideHit.getAxis().isVertical()) return Wall.clickedSide(hit, sideHit, range);
+        if (sideHit.getAxis().isVertical())
+            return Wall.clickedSide(hit, sideHit, range);
         return Wall.extendingFrom(hit, sideHit, EnumFacing.UP, range);
     }
 
@@ -34,7 +35,7 @@ public class HorizontalWallMode extends AbstractMode implements IAtopSupport {
 
     @Override
     public BlockPos transformAtop(EntityPlayer player, BlockPos hit, EnumFacing sideHit, ItemStack tool, int offset) {
-        return sideHit.getAxis().isVertical() ? hit : hit.offset(sideHit, offset);
+        return hit.offset(sideHit, offset);
     }
 
 }

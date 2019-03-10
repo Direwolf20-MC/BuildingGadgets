@@ -23,7 +23,7 @@ import java.util.function.BiPredicate;
 public enum ExchangingModes {
 
     Surface("surface.png", new ExchangingSurfaceMode(ExchangingModes::combineTester)),
-    VerticalColumn("vertical_column.png", new ExchangingVerticalMode(ExchangingModes::combineTester)),
+    VerticalColumn("vertical_column.png", new ExchangingVerticalColumnMode(ExchangingModes::combineTester)),
     HorizontalColumn("horizontal_column.png", new ExchangingHorizontalColumnMode(ExchangingModes::combineTester)),
     Grid("grid.png", new ExchangingGridMode(ExchangingModes::combineTester));
 
