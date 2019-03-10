@@ -2,7 +2,8 @@ package com.direwolf20.buildinggadgets.common.items.pastes;
 
 import com.direwolf20.buildinggadgets.common.utils.helpers.InventoryHelper;
 import com.direwolf20.buildinggadgets.common.utils.helpers.NBTHelper;
-
+import com.direwolf20.buildinggadgets.common.utils.ref.NBTKeys;
+import com.direwolf20.buildinggadgets.common.utils.ref.Reference;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -10,7 +11,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.Style;
@@ -29,7 +29,7 @@ public class ConstructionPasteContainer extends GenericPasteContainer {
     public ConstructionPasteContainer(Properties builder, IntSupplier maxCapacity) {
         super(builder);
         this.maxCapacity = maxCapacity;
-        addPropertyOverride(new ResourceLocation("level"), (stack, world, entity) -> {
+        addPropertyOverride(Reference.PROPERTY_OVERRIDE_LEVEL, (stack, world, entity) -> {
             float percent = ConstructionPasteContainer.getPasteAmount(stack) / (float) this.maxCapacity.getAsInt();
             return MathHelper.floor(percent * 4) / 4F;
         });
@@ -37,12 +37,14 @@ public class ConstructionPasteContainer extends GenericPasteContainer {
 
     @Override
     public void setPasteCount(ItemStack stack, int amount) {
-        NBTHelper.getOrNewTag(stack).setInt("amount", amount);
+        NBTHelper.getOrNewTag(stack)
+                .setInt(NBTKeys.PASTE_COUNT, amount);
     }
 
     @Override
     public int getPasteCount(ItemStack stack) {
-        return !stack.hasTag() ? 0 : stack.getTag().getInt("amount");
+        return ! stack.hasTag() ? 0 : stack.getTag()
+                .getInt(NBTKeys.PASTE_COUNT);
     }
 
     @Override

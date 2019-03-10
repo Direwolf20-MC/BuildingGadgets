@@ -2,6 +2,7 @@ package com.direwolf20.buildinggadgets.common.items;
 
 import com.direwolf20.buildinggadgets.client.events.EventTooltip;
 import com.direwolf20.buildinggadgets.common.utils.GadgetUtils;
+import com.direwolf20.buildinggadgets.common.utils.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.world.WorldSave;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
@@ -38,10 +39,10 @@ public class Template extends Item implements ITemplate {
         if (tagCompound == null) {
             tagCompound = new NBTTagCompound();
         }
-        String uuid = tagCompound.getString("UUID");
+        String uuid = tagCompound.getString(NBTKeys.TEMPLATE_UUID);
         if (uuid.isEmpty()) {
             UUID uid = UUID.randomUUID();
-            tagCompound.setString("UUID", uid.toString());
+            tagCompound.setString(NBTKeys.TEMPLATE_UUID, uid.toString());
             stack.setTag(tagCompound);
             uuid = uid.toString();
         }
@@ -49,11 +50,11 @@ public class Template extends Item implements ITemplate {
     }
 
     public static void setName(ItemStack stack, String name) {
-        GadgetUtils.writeStringToNBT(stack, name, "TemplateName");
+        GadgetUtils.writeStringToNBT(stack, name, NBTKeys.TEMPLATE_NAME);
     }
 
     public static String getName(ItemStack stack) {
-        return GadgetUtils.getStringFromNBT(stack, "TemplateName");
+        return GadgetUtils.getStringFromNBT(stack, NBTKeys.TEMPLATE_NAME);
     }
 
     @Override

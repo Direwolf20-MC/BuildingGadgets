@@ -43,6 +43,9 @@ public class Config {
 
     private static final Builder SERVER_BUILDER = new Builder();
     private static final Builder CLIENT_BUILDER = new Builder();
+    private static final Builder API_BUILDER = new Builder();
+
+    public static final ApiConfig API = new ApiConfig();
 
     public static final CategoryGeneral GENERAL = new CategoryGeneral();
 
@@ -332,8 +335,13 @@ public class Config {
         }
     }
 
+    public static final class ApiConfig {
+
+    }
+
     public static final ForgeConfigSpec SERVER_CONFIG = SERVER_BUILDER.build();
     public static final ForgeConfigSpec CLIENT_CONFIG = CLIENT_BUILDER.build();
+    public static final ForgeConfigSpec API_CONFIG = API_BUILDER.build();
 
     public static void onLoad(final ModConfig.Loading configEvent) {
         BLACKLIST.parseBlacklists();

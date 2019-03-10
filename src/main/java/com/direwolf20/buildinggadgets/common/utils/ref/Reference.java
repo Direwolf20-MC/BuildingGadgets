@@ -4,6 +4,14 @@ import net.minecraft.util.ResourceLocation;
 
 public final class Reference {
     public static final String MODID = "buildinggadgets";
+    public static final String CONFIG_FILE_SERVER = MODID + "-server.toml";
+    public static final String CONFIG_FILE_CLIENT = MODID + "-client.toml";
+    public static final String CONFIG_FILE_API = MODID + "-api.toml";
+
+    public static final ResourceLocation CONDITION_PASTE_ID = new ResourceLocation(Reference.MODID, "enable_paste");
+    public static final ResourceLocation CONDITION_DESTRUCTION_ID = new ResourceLocation(Reference.MODID, "enable_destruction");
+
+    public static final ResourceLocation PROPERTY_OVERRIDE_LEVEL = new ResourceLocation("level");
 
     private Reference() {}
 
