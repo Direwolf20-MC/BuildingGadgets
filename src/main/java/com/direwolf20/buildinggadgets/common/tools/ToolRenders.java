@@ -496,10 +496,10 @@ public class ToolRenders {
             GlStateManager.popMatrix();
         }
 
-        String UUID = ((GadgetCopyPaste) BGItems.gadgetCopyPaste).getUUID(stack);
+        String UUID = BGItems.gadgetCopyPaste.getUUID(stack);
         World world = player.world;
-        if (((GadgetCopyPaste) BGItems.gadgetCopyPaste).getStartPos(stack) == null) return;
-        if (((GadgetCopyPaste) BGItems.gadgetCopyPaste).getEndPos(stack) == null) return;
+        if (BGItems.gadgetCopyPaste.getStartPos(stack) == null) return;
+        if (BGItems.gadgetCopyPaste.getEndPos(stack) == null) return;
         if (GadgetCopyPaste.getToolMode(stack) == GadgetCopyPaste.ToolMode.Paste) {
             //First check if we have an anchor, if not check if we're looking at a block, if not, exit
             BlockPos startPos = GadgetCopyPaste.getAnchor(stack);
@@ -562,8 +562,8 @@ public class ToolRenders {
             GlStateManager.popMatrix();
 
         } else {
-            BlockPos startPos = ((GadgetCopyPaste) BGItems.gadgetCopyPaste).getStartPos(stack);
-            BlockPos endPos = ((GadgetCopyPaste) BGItems.gadgetCopyPaste).getEndPos(stack);
+            BlockPos startPos = BGItems.gadgetCopyPaste.getStartPos(stack);
+            BlockPos endPos = BGItems.gadgetCopyPaste.getEndPos(stack);
             BlockPos blankPos = new BlockPos(0, 0, 0);
             if (startPos == null || endPos == null || startPos.equals(blankPos) || endPos.equals(blankPos)) {
                 return;

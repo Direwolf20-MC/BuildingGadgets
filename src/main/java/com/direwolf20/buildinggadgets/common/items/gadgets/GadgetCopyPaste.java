@@ -313,7 +313,7 @@ public class GadgetCopyPaste extends GadgetPlacing implements ITemplate {
             return;
         }
 
-        GadgetCopyPaste tool = (GadgetCopyPaste) BGItems.gadgetCopyPaste;
+        GadgetCopyPaste tool = BGItems.gadgetCopyPaste;
 
         List<BlockMap> blockMapList;
         WorldSave worldSave = WorldSave.getWorldSave(player.world);
@@ -358,7 +358,7 @@ public class GadgetCopyPaste extends GadgetPlacing implements ITemplate {
 
     public static void copyBlocks(ItemStack stack, EntityPlayer player, World world, BlockPos startPos, BlockPos endPos) {
         if (startPos != null && endPos != null) {
-            GadgetCopyPaste tool = (GadgetCopyPaste) BGItems.gadgetCopyPaste;
+            GadgetCopyPaste tool = BGItems.gadgetCopyPaste;
             if (findBlocks(world, startPos, endPos, stack, player, tool)) {
                 tool.setStartPos(stack, startPos);
                 tool.setEndPos(stack, endPos);
@@ -508,7 +508,7 @@ public class GadgetCopyPaste extends GadgetPlacing implements ITemplate {
         if (heldItem.isEmpty())
             return;
 
-        if (((GadgetCopyPaste) BGItems.gadgetCopyPaste).getStartPos(heldItem) == null ||((GadgetCopyPaste) BGItems.gadgetCopyPaste).getEndPos(heldItem) == null)
+        if (BGItems.gadgetCopyPaste.getStartPos(heldItem) == null ||BGItems.gadgetCopyPaste.getEndPos(heldItem) == null)
             return;
 
         UniqueItem uniqueItem = IntStackMap.get(state);
@@ -577,7 +577,7 @@ public class GadgetCopyPaste extends GadgetPlacing implements ITemplate {
 
     public static void undoBuild(EntityPlayer player, ItemStack heldItem) {
 //        long time = System.nanoTime();
-        NBTTagCompound tagCompound = WorldSave.getWorldSave(player.world).getCompoundFromUUID(((GadgetCopyPaste) BGItems.gadgetCopyPaste).getUUID(heldItem));
+        NBTTagCompound tagCompound = WorldSave.getWorldSave(player.world).getCompoundFromUUID(BGItems.gadgetCopyPaste.getUUID(heldItem));
         World world = player.world;
         if (world.isRemote) {
             return;
