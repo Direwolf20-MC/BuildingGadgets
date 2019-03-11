@@ -53,9 +53,9 @@ public class BlockMapCommand {
         int counter = 0;
         for (Map.Entry<String, NBTTagCompound> entry : tagMap.entrySet()) {
             NBTTagCompound tagCompound = entry.getValue();
-            if (tagCompound.getString("owner").equals(entity.getName().getString())) {
+            if (tagCompound.getString(NBTKeys.TEMPLATE_OWNER).equals(entity.getName().getString())) {
                 //TODO Missing localisation
-                sender.sendMessage(new TextComponentString(TextFormatting.RED + "Deleted stored map for " + tagCompound.getString("owner") + " with UUID:" + tagCompound.getString(NBTKeys.GADGET_UUID)));
+                sender.sendMessage(new TextComponentString(TextFormatting.RED + "Deleted stored map for " + tagCompound.getString(NBTKeys.TEMPLATE_OWNER) + " with UUID:" + tagCompound.getString(NBTKeys.GADGET_UUID)));
                 counter++;
                 if (removeData) newMap.remove(entry.getKey());
             }

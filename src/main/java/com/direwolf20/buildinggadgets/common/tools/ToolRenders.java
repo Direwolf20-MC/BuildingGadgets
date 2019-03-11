@@ -88,8 +88,8 @@ public class ToolRenders {
         BlockRendererDispatcher dispatcher = Minecraft.getInstance().getBlockRendererDispatcher();
         BlockRenderLayer origLayer = MinecraftForgeClient.getRenderLayer();
 
-        ResourceLocation dim = GadgetUtils.getDIMFromNBT(heldItem, "boundTE");
-        BlockPos pos = GadgetUtils.getPOSFromNBT(heldItem, "boundTE");
+        ResourceLocation dim = GadgetUtils.getDIMFromNBT(heldItem, NBTKeys.REMOTE_INVENTORY_DIM);
+        BlockPos pos = GadgetUtils.getPOSFromNBT(heldItem, NBTKeys.REMOTE_INVENTORY_POS);
 
         if (dim != null && pos != null) {
             GlStateManager.pushMatrix();//Push matrix again just because
@@ -227,8 +227,8 @@ public class ToolRenders {
         double doubleZ = player.lastTickPosZ + (player.posZ - player.lastTickPosZ) * evt.getPartialTicks();
 
         BlockRendererDispatcher dispatcher = Minecraft.getInstance().getBlockRendererDispatcher();
-        ResourceLocation dim = GadgetUtils.getDIMFromNBT(stack, "boundTE");
-        BlockPos pos = GadgetUtils.getPOSFromNBT(stack, "boundTE");
+        ResourceLocation dim = GadgetUtils.getDIMFromNBT(stack, NBTKeys.REMOTE_INVENTORY_DIM);
+        BlockPos pos = GadgetUtils.getPOSFromNBT(stack, NBTKeys.REMOTE_INVENTORY_POS);
 
         if (dim != null && pos != null) {
             GlStateManager.pushMatrix();//Push matrix again just because
@@ -470,8 +470,8 @@ public class ToolRenders {
     }
 
     public static void renderPasteOverlay(RenderWorldLastEvent evt, EntityPlayer player, ItemStack stack) {
-        ResourceLocation dim = GadgetUtils.getDIMFromNBT(stack, "boundTE");
-        BlockPos pos = GadgetUtils.getPOSFromNBT(stack, "boundTE");
+        ResourceLocation dim = GadgetUtils.getDIMFromNBT(stack, NBTKeys.REMOTE_INVENTORY_DIM);
+        BlockPos pos = GadgetUtils.getPOSFromNBT(stack, NBTKeys.REMOTE_INVENTORY_POS);
 
         //Calculate the players current position, which is needed later
         double doubleX = player.lastTickPosX + (player.posX - player.lastTickPosX) * evt.getPartialTicks();

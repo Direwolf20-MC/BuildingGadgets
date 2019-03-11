@@ -118,31 +118,31 @@ public class BlockBuildEntity extends Entity {
 
     @Override
     protected void readAdditional(NBTTagCompound compound) {
-        despawning = compound.getInt("despawning");
-        ticksExisted = compound.getInt("ticksExisted");
-        setPos = NBTUtil.readBlockPos(compound.getCompound("setPos"));
-        setBlock = NBTUtil.readBlockState(compound.getCompound("setBlock"));
-        originalSetBlock = NBTUtil.readBlockState(compound.getCompound("originalBlock"));
-        actualSetBlock = NBTUtil.readBlockState(compound.getCompound("actualSetBlock"));
+        despawning = compound.getInt(NBTKeys.ENTITY_DESPAWNING);
+        ticksExisted = compound.getInt(NBTKeys.ENTITY_TICKS_EXISTED);
+        setPos = NBTUtil.readBlockPos(compound.getCompound(NBTKeys.ENTITY_SET_POS));
+        setBlock = NBTUtil.readBlockState(compound.getCompound(NBTKeys.ENTITY_BUILD_SET_BLOCK));
+        actualSetBlock = NBTUtil.readBlockState(compound.getCompound(NBTKeys.ENTITY_BUILD_SET_BLOCK));
+        originalSetBlock = NBTUtil.readBlockState(compound.getCompound(NBTKeys.ENTITY_BUILD_ORIGINAL_BLOCK));
         mode = compound.getInt(NBTKeys.GADGET_MODE);
         useConstructionPaste = compound.getBoolean("paste");
     }
 
     @Override
     protected void writeAdditional(NBTTagCompound compound) {
-        compound.setInt("despawning", despawning);
-        compound.setInt("ticksExisted", ticksExisted);
-        compound.setTag("setPos", NBTUtil.writeBlockPos(setPos));
+        compound.setInt(NBTKeys.ENTITY_DESPAWNING, despawning);
+        compound.setInt(NBTKeys.ENTITY_TICKS_EXISTED, ticksExisted);
+        compound.setTag(NBTKeys.ENTITY_SET_POS, NBTUtil.writeBlockPos(setPos));
 
         NBTTagCompound blockStateTag = NBTUtil.writeBlockState(setBlock);
-        compound.setTag("setBlock", blockStateTag);
+        compound.setTag(NBTKeys.ENTITY_BUILD_SET_BLOCK, blockStateTag);
 
         NBTTagCompound actualBlockStateTag = NBTUtil.writeBlockState(actualSetBlock);
-        compound.setTag("actualSetBlock", actualBlockStateTag);
+        compound.setTag(NBTKeys.ENTITY_BUILD_SET_BLOCK_ACTUAL, actualBlockStateTag);
 
         blockStateTag = NBTUtil.writeBlockState(originalSetBlock);
 
-        compound.setTag("originalBlock", blockStateTag);
+        compound.setTag(NBTKeys.ENTITY_BUILD_ORIGINAL_BLOCK, blockStateTag);
         compound.setInt(NBTKeys.GADGET_MODE, mode);
         compound.setBoolean("paste", useConstructionPaste);
     }

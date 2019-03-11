@@ -10,6 +10,7 @@ public final class NBTKeys {
     public static final String CREATIVE_MARKER = "creative";
 
     public static final String GADGET_MODE = "mode";
+    public static final String GADGET_RANGE = "range";
     public static final String GADGET_OVERLAY = "overlay";
     public static final String GADGET_FUZZY = "fuzzy";
     public static final String GADGET_RAYTRACE_FLUID = "raytrace_fluid";
@@ -17,6 +18,10 @@ public final class NBTKeys {
     public static final String GADGET_CONNECTED_AREA = "connected_area";
     public static final String GADGET_ANCHOR = "anchor";
     public static final String GADGET_ANCHOR_SIDE = "anchor_side";
+    public static final String GADGET_ANCHOR_COORDS = "anchor_coords";
+    public static final String GADGET_UNDO_STACK = "undo_stack";
+    public static final String GADGET_UNDO_INT_COORDS = "undo_int_coords";
+    public static final String GADGET_UNDO_START_POS = "undo_start_pos";
     public static final String GADGET_LAST_BUILD_POS = "last_build_pos";
     public static final String GADGET_LAST_BUILD_DIM = "last_build_dim";
     public static final String GADGET_UUID = "uuid";
@@ -39,10 +44,38 @@ public final class NBTKeys {
     public static final String MAP_STATE_INT = "state_int_array";
     public static final String MAP_POS_PASTE = "pos_paste_array";
     public static final String MAP_STATE_PASTE = "state_paste_array";
+    public static final String MAP_SERIALIZE_KEY = "key";
+    public static final String MAP_SERIALIZE_VALUE = "val";
 
     public static final String TEMPLATE_COPY_COUNT = "copy_count";
     public static final String TEMPLATE_UUID = GADGET_UUID;
     public static final String TEMPLATE_NAME = "template_name";
+    public static final String TEMPLATE_OWNER = "owner";
 
     public static final String PASTE_COUNT = "amount";
+
+    public static final String WORLD_SAVE_UUID = GADGET_UUID;
+    public static final String WORLD_SAVE_TAG = "tag";
+
+    public static final String REMOTE_INVENTORY_POS = "bound_te_pos";
+    public static final String REMOTE_INVENTORY_DIM = "bound_te_dim";
+
+    public static final String ENERGY = "energy";
+
+    public static final String UNIQUE_ITEM_ITEM = "item";
+    public static final String UNIQUE_ITEM_COUNT = "count";
+
+    public static final String TE_CONSTRUCTION_STATE = MAP_STATE;
+    public static final String TE_CONSTRUCTION_STATE_ACTUAL = "state_actual";
+    public static final String TE_TEMPLATE_MANAGER_ITEMS = "items";
+
+    public static final String ENTITY_DESPAWNING = "despawning";
+    public static final String ENTITY_TICKS_EXISTED = "ticks_existed";
+    public static final String ENTITY_SET_POS = "set_pos";
+
+    public static final String ENTITY_CONSTRUCTION_MAKING_PASTE = "makingPaste";
+
+    public static final String ENTITY_BUILD_SET_BLOCK = "setBlock";
+    public static final String ENTITY_BUILD_SET_BLOCK_ACTUAL = "setBlockActual";
+    public static final String ENTITY_BUILD_ORIGINAL_BLOCK = "originalBlock";
 }

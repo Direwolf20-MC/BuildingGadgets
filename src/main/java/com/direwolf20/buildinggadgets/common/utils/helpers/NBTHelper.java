@@ -6,6 +6,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.*;
 
 import javax.annotation.Nonnull;
+
+import com.direwolf20.buildinggadgets.common.utils.ref.NBTKeys;
+
 import java.util.Map;
 import java.util.function.Function;
 
@@ -303,8 +306,8 @@ public class NBTHelper {
         NBTTagList list = new NBTTagList();
         for (Map.Entry<K, V> entry : map.entrySet()) {
             NBTTagCompound compound = new NBTTagCompound();
-            compound.setTag("key", keySerializer.apply(entry.getKey()));
-            compound.setTag("val", valueSerializer.apply(entry.getValue()));
+            compound.setTag(NBTKeys.MAP_SERIALIZE_KEY, keySerializer.apply(entry.getKey()));
+            compound.setTag(NBTKeys.MAP_SERIALIZE_VALUE, valueSerializer.apply(entry.getValue()));
             list.add(compound);
         }
         return list;
@@ -315,8 +318,8 @@ public class NBTHelper {
             if (nbt instanceof NBTTagCompound) {
                 NBTTagCompound compound = (NBTTagCompound) nbt;
                 toAppendTo.put(
-                        keyDeserializer.apply(compound.getTag("key")),
-                        valueDeserializer.apply(compound.getTag("val"))
+                        keyDeserializer.apply(compound.getTag(NBTKeys.MAP_SERIALIZE_KEY)),
+                        valueDeserializer.apply(compound.getTag(NBTKeys.MAP_SERIALIZE_VALUE))
                 );
             }
         }

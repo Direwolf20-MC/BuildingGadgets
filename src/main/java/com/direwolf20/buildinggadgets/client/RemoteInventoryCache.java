@@ -3,6 +3,7 @@ package com.direwolf20.buildinggadgets.client;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketSetRemoteInventoryCache;
 import com.direwolf20.buildinggadgets.common.utils.helpers.InventoryHelper.IRemoteInventoryProvider;
+import com.direwolf20.buildinggadgets.common.utils.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.tools.UniqueItem;
 import com.direwolf20.buildinggadgets.common.utils.GadgetUtils;
 import com.google.common.base.Stopwatch;
@@ -76,8 +77,8 @@ public class RemoteInventoryCache implements IRemoteInventoryProvider {
         if (nbt == null)
             return null;
 
-        ResourceLocation dim = GadgetUtils.getDIMFromNBT(stack, "boundTE");
-        BlockPos pos = GadgetUtils.getPOSFromNBT(stack, "boundTE");
+        ResourceLocation dim = GadgetUtils.getDIMFromNBT(stack, NBTKeys.REMOTE_INVENTORY_DIM);
+        BlockPos pos = GadgetUtils.getPOSFromNBT(stack, NBTKeys.REMOTE_INVENTORY_POS);
         return dim == null || pos == null ? null : new ImmutablePair<>(dim, pos);
     }
 }

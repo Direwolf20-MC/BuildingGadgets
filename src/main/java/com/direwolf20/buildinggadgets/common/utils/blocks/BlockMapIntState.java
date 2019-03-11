@@ -94,7 +94,7 @@ public class BlockMapIntState {
         intStackMap = new HashMap<>();
         for (int i = 0; i < tagList.size(); i++) {
             NBTTagCompound compound = tagList.getCompound(i);
-            intStackMap.put(GadgetUtils.compoundToState(compound.getCompound("state")), UniqueItem.readFromNBT(compound));
+            intStackMap.put(GadgetUtils.compoundToState(compound.getCompound(NBTKeys.MAP_STATE)), UniqueItem.readFromNBT(compound));
         }
         return intStackMap;
     }
@@ -104,7 +104,7 @@ public class BlockMapIntState {
         for (Map.Entry<IBlockState, UniqueItem> entry : intStackMap.entrySet()) {
             NBTTagCompound compound = new NBTTagCompound();
             entry.getValue().writeToNBT(compound);
-            compound.setTag("state", GadgetUtils.stateToCompound(entry.getKey()));
+            compound.setTag(NBTKeys.MAP_STATE, GadgetUtils.stateToCompound(entry.getKey()));
             tagList.add(compound);
         }
         return tagList;
