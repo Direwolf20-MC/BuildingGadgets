@@ -1,6 +1,8 @@
 package com.direwolf20.buildinggadgets.common.network.packets;
 
 import com.direwolf20.buildinggadgets.common.utils.buffers.PasteToolBufferBuilder;
+import com.direwolf20.buildinggadgets.common.utils.ref.NBTKeys;
+
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;
@@ -30,7 +32,7 @@ public class PacketBlockMap {
                     PasteToolBufferBuilder.clearMaps();
                 }
 
-                String UUID = msg.compound.getString("UUID");
+                String UUID = msg.compound.getString(NBTKeys.GADGET_UUID);
                 PasteToolBufferBuilder.addToMap(UUID, msg.compound);
                 PasteToolBufferBuilder.addMapToBuffer(UUID);
             });

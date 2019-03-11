@@ -1,6 +1,8 @@
 package com.direwolf20.buildinggadgets.common.network.packets;
 
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetDestruction;
+import com.direwolf20.buildinggadgets.common.utils.ref.NBTKeys;
+
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;
@@ -43,11 +45,11 @@ public class PacketDestructionGUI {
                 ItemStack heldItem = GadgetDestruction.getGadget(ctx.get().getSender());
                 if (heldItem.isEmpty()) return;
 
-                GadgetDestruction.setToolValue(heldItem, msg.left, "left");
-                GadgetDestruction.setToolValue(heldItem, msg.right, "right");
-                GadgetDestruction.setToolValue(heldItem, msg.up, "up");
-                GadgetDestruction.setToolValue(heldItem, msg.down, "down");
-                GadgetDestruction.setToolValue(heldItem, msg.depth, "depth");
+                GadgetDestruction.setToolValue(heldItem, msg.left, NBTKeys.GADGET_VALUE_LEFT);
+                GadgetDestruction.setToolValue(heldItem, msg.right, NBTKeys.GADGET_VALUE_RIGHT);
+                GadgetDestruction.setToolValue(heldItem, msg.up, NBTKeys.GADGET_VALUE_UP);
+                GadgetDestruction.setToolValue(heldItem, msg.down, NBTKeys.GADGET_VALUE_DOWN);
+                GadgetDestruction.setToolValue(heldItem, msg.depth, NBTKeys.GADGET_VALUE_DEPTH);
             });
 
             ctx.get().setPacketHandled(true);

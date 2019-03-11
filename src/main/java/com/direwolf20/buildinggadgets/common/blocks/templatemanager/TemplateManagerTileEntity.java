@@ -2,6 +2,7 @@ package com.direwolf20.buildinggadgets.common.blocks.templatemanager;
 
 import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGTileEntities;
+import com.direwolf20.buildinggadgets.common.utils.ref.NBTKeys;
 import com.google.common.collect.ImmutableSet;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
@@ -68,14 +69,13 @@ public class TemplateManagerTileEntity extends TileEntity {
     public void read(NBTTagCompound compound) {
         super.read(compound);
 
-        if (compound.hasKey("items")) {
-            itemStackHandler.deserializeNBT((NBTTagCompound) compound.getTag("items"));
-        }
+        if (compound.hasKey(NBTKeys.TE_TEMPLATE_MANAGER_ITEMS))
+            itemStackHandler.deserializeNBT((NBTTagCompound) compound.getTag(NBTKeys.TE_TEMPLATE_MANAGER_ITEMS));
     }
 
     @Override
     public NBTTagCompound write(NBTTagCompound compound) {
-        compound.setTag("items", itemStackHandler.serializeNBT());
+        compound.setTag(NBTKeys.TE_TEMPLATE_MANAGER_ITEMS, itemStackHandler.serializeNBT());
         return super.write(compound);
     }
 

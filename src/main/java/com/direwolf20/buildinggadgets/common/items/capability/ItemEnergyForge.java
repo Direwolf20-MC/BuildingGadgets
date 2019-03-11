@@ -1,6 +1,8 @@
 package com.direwolf20.buildinggadgets.common.items.capability;
 
 import com.direwolf20.buildinggadgets.common.utils.GadgetUtils;
+import com.direwolf20.buildinggadgets.common.utils.ref.NBTKeys;
+
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.energy.IEnergyStorage;
@@ -8,7 +10,6 @@ import net.minecraftforge.energy.IEnergyStorage;
 import java.util.function.IntSupplier;
 
 public final class ItemEnergyForge implements IEnergyStorage {
-    private static final String NBT_ENERGY = "Energy";
     private final ItemStack stack;
     private final IntSupplier capacitySupplier;
     private int energy;
@@ -75,13 +76,13 @@ public final class ItemEnergyForge implements IEnergyStorage {
 
     private void writeEnergy() {
         NBTTagCompound nbt = GadgetUtils.enforceHasTag(stack);
-        nbt.setInt(NBT_ENERGY,getEnergyStoredCache());
+        nbt.setInt(NBTKeys.ENERGY,getEnergyStoredCache());
     }
 
     private void updateEnergy() {
         NBTTagCompound nbt = GadgetUtils.enforceHasTag(stack);
-        if (nbt.hasKey(NBT_ENERGY))
-            this.energy = nbt.getInt(NBT_ENERGY) ;
+        if (nbt.hasKey(NBTKeys.ENERGY))
+            this.energy = nbt.getInt(NBTKeys.ENERGY) ;
         updateMaxEnergy();
     }
 

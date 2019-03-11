@@ -5,6 +5,8 @@ import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockPowder;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGEntities;
+import com.direwolf20.buildinggadgets.common.utils.ref.NBTKeys;
+
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NBTTagCompound;
@@ -129,17 +131,17 @@ public class ConstructionBlockEntity extends Entity {
 
     @Override
     protected void readAdditional(NBTTagCompound compound) {
-        despawning = compound.getInt("despawning");
-        ticksExisted = compound.getInt("ticksExisted");
-        setPos = NBTUtil.readBlockPos(compound.getCompound("setPos"));
+        despawning = compound.getInt(NBTKeys.ENTITY_DESPAWNING);
+        ticksExisted = compound.getInt(NBTKeys.ENTITY_TICKS_EXISTED);
+        setPos = NBTUtil.readBlockPos(compound.getCompound(NBTKeys.ENTITY_SET_POS));
         setMakingPaste(compound.getBoolean("makingPaste"));
     }
 
     @Override
     protected void writeAdditional(NBTTagCompound compound) {
-        compound.setInt("despawning", despawning);
-        compound.setInt("ticksExisted", ticksExisted);
-        compound.setTag("setPos", NBTUtil.writeBlockPos(setPos));
+        compound.setInt(NBTKeys.ENTITY_DESPAWNING, despawning);
+        compound.setInt(NBTKeys.ENTITY_TICKS_EXISTED, ticksExisted);
+        compound.setTag(NBTKeys.ENTITY_SET_POS, NBTUtil.writeBlockPos(setPos));
         compound.setBoolean("makingPaste", getMakingPaste());
     }
 

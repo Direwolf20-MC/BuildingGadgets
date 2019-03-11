@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.common.utils.blocks;
 
+import com.direwolf20.buildinggadgets.common.utils.ref.NBTKeys;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import net.minecraft.block.state.IBlockState;
@@ -12,9 +13,6 @@ import javax.annotation.Nullable;
 import java.util.Map;
 
 public class BlockState2ShortMap {
-    public static final String KEY_STATE_MAP = "mapIntState";
-    private static final String KEY_MAP_SLOT = "mapSlot";
-    private static final String KEY_MAP_STATE = "mapState";
     private final BiMap<Short, IBlockState> shortStateMap;
 
     public BlockState2ShortMap(BiMap<Short, IBlockState> shortStateMap) {
@@ -54,13 +52,13 @@ public class BlockState2ShortMap {
     }
 
     public void writeToNBT(@Nonnull NBTTagCompound tagCompound) {
-        tagCompound.setTag(KEY_STATE_MAP, writeShortStateMapToNBT());
+        tagCompound.setTag(NBTKeys.MAP_INT_STATE, writeShortStateMapToNBT());
     }
 
     public void readNBT(@Nonnull NBTTagCompound tagCompound) {
         clear();
-        if (tagCompound.hasKey(KEY_STATE_MAP)) {
-            NBTTagList mapIntStateTag = (NBTTagList) tagCompound.getTag(KEY_STATE_MAP);
+        if (tagCompound.hasKey(NBTKeys.MAP_INT_STATE)) {
+            NBTTagList mapIntStateTag = (NBTTagList) tagCompound.getTag(NBTKeys.MAP_INT_STATE);
             readShortStateMapFromNBT(mapIntStateTag);
         }
     }
@@ -74,8 +72,8 @@ public class BlockState2ShortMap {
         for (Map.Entry<Short, IBlockState> entry : shortStateMap.entrySet()) {
             NBTTagCompound compound = new NBTTagCompound();
             NBTTagCompound state = NBTUtil.writeBlockState(entry.getValue());
-            compound.setShort(KEY_MAP_SLOT, entry.getKey());
-            compound.setTag(KEY_MAP_STATE, state);
+            compound.setShort(NBTKeys.MAP_SLOT, entry.getKey());
+            compound.setTag(NBTKeys.MAP_STATE, state);
             tagList.add(compound);
         }
         return tagList;
@@ -85,7 +83,7 @@ public class BlockState2ShortMap {
         shortStateMap.clear();
         for (int i = 0; i < tagList.size(); i++) {
             NBTTagCompound compound = tagList.getCompound(i);
-            shortStateMap.put(compound.getShort(KEY_MAP_SLOT), NBTUtil.readBlockState(compound.getCompound(KEY_MAP_STATE)));
+            shortStateMap.put(compound.getShort(NBTKeys.MAP_SLOT), NBTUtil.readBlockState(compound.getCompound(NBTKeys.MAP_STATE)));
         }
     }
 }

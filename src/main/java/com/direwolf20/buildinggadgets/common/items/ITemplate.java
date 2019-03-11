@@ -2,6 +2,7 @@ package com.direwolf20.buildinggadgets.common.items;
 
 import com.direwolf20.buildinggadgets.common.tools.UniqueItem;
 import com.direwolf20.buildinggadgets.common.utils.GadgetUtils;
+import com.direwolf20.buildinggadgets.common.utils.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.world.WorldSave;
 import com.google.common.collect.Multiset;
 import net.minecraft.item.ItemStack;
@@ -41,37 +42,35 @@ public interface ITemplate {
     }
 
     default int getCopyCounter(ItemStack stack) {
-        return GadgetUtils.getStackTag(stack).getInt("copycounter");
+        return GadgetUtils.getStackTag(stack).getInt(NBTKeys.TEMPLATE_COPY_COUNT);
     }
 
-    default void setCopyCounter(ItemStack stack, int counter) {//TODO unused
+    default void setCopyCounter(ItemStack stack, int counter) {
         NBTTagCompound tagCompound = GadgetUtils.getStackTag(stack);
-        tagCompound.setInt("copycounter", counter);
+        tagCompound.setInt(NBTKeys.TEMPLATE_COPY_COUNT, counter);
         stack.setTag(tagCompound);
     }
 
     default void incrementCopyCounter(ItemStack stack) {
-        NBTTagCompound tagCompound = GadgetUtils.getStackTag(stack);
-        tagCompound.setInt("copycounter", tagCompound.getInt("copycounter") + 1);
-        stack.setTag(tagCompound);
+        setCopyCounter(stack, getCopyCounter(stack) + 1);
     }
 
     default void setStartPos(ItemStack stack, BlockPos startPos) {
-        GadgetUtils.writePOSToNBT(stack, startPos, "startPos");
+        GadgetUtils.writePOSToNBT(stack, startPos, NBTKeys.GADGET_START_POS);
     }
 
     @Nullable
     default BlockPos getStartPos(ItemStack stack) {
-        return GadgetUtils.getPOSFromNBT(stack, "startPos");
+        return GadgetUtils.getPOSFromNBT(stack, NBTKeys.GADGET_START_POS);
     }
 
     default void setEndPos(ItemStack stack, BlockPos startPos) {
-        GadgetUtils.writePOSToNBT(stack, startPos, "endPos");
+        GadgetUtils.writePOSToNBT(stack, startPos, NBTKeys.GADGET_END_POS);
     }
 
     @Nullable
     default BlockPos getEndPos(ItemStack stack) {
-        return GadgetUtils.getPOSFromNBT(stack, "endPos");
+        return GadgetUtils.getPOSFromNBT(stack, NBTKeys.GADGET_END_POS);
     }
 
 }

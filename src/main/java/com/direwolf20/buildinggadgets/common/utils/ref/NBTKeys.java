@@ -10,18 +10,23 @@ public final class NBTKeys {
     public static final String CREATIVE_MARKER = "creative";
 
     public static final String GADGET_MODE = "mode";
+    public static final String GADGET_RANGE = "range";
     public static final String GADGET_OVERLAY = "overlay";
     public static final String GADGET_FUZZY = "fuzzy";
     public static final String GADGET_RAYTRACE_FLUID = "raytrace_fluid";
     public static final String GADGET_PLACE_INSIDE = "start_inside";
-    public static final String GADGET_CONNECTED_AREA = "connectedArea";
+    public static final String GADGET_CONNECTED_AREA = "connected_area";
     public static final String GADGET_ANCHOR = "anchor";
-    public static final String GADGET_ANCHOR_SIDE = "anchorSide";
-    public static final String GADGET_LAST_BUILD_POS = "lastBuild_pos";
-    public static final String GADGET_LAST_BUILD_DIM = "lastBuild_dim";
-    public static final String GADGET_UUID = "UUID";
-    public static final String GADGET_START_POS = "startPos";
-    public static final String GADGET_END_POS = "endPos";
+    public static final String GADGET_ANCHOR_SIDE = "anchor_side";
+    public static final String GADGET_ANCHOR_COORDS = "anchor_coords";
+    public static final String GADGET_UNDO_STACK = "undo_stack";
+    public static final String GADGET_UNDO_INT_COORDS = "undo_int_coords";
+    public static final String GADGET_UNDO_START_POS = "undo_start_pos";
+    public static final String GADGET_LAST_BUILD_POS = "last_build_pos";
+    public static final String GADGET_LAST_BUILD_DIM = "last_build_dim";
+    public static final String GADGET_UUID = "uuid";
+    public static final String GADGET_START_POS = "start_pos";
+    public static final String GADGET_END_POS = "end_pos";
     public static final String GADGET_DIM = "dim";
     public static final String GADGET_VALUE_UP = "up";
     public static final String GADGET_VALUE_DOWN = "down";
@@ -30,15 +35,47 @@ public final class NBTKeys {
     public static final String GADGET_VALUE_DEPTH = "depth";
     public static final String[] GADGET_VALUES = new String[]{GADGET_VALUE_RIGHT, GADGET_VALUE_LEFT, GADGET_VALUE_UP, GADGET_VALUE_DOWN, GADGET_VALUE_DEPTH};
 
-    public static final String TEMPLATE_MAP_INT_STATE = "mapIntState";
-    public static final String TEMPLATE_MAP_INT_STACK = "mapIntStack";
-    public static final String TEMPLATE_MAP_POS_INT = "posIntArray";
-    public static final String TEMPLATE_MAP_STATE_INT = "stateIntArray";
-    public static final String TEMPLATE_MAP_POS_PASTE = "posPasteArray";
-    public static final String TEMPLATE_MAP_STATE_PASTE = "statePasteArray";
-    public static final String TEMPLATE_COPY_COUNT = "copy_counter";
+    public static final String MAP_INT_STATE = "map_int_state";
+    public static final String MAP_SLOT = "slot";
+    public static final String MAP_STATE = "state";
+    public static final String MAP_STATE_ID = "state_id";
+    public static final String MAP_INT_STACK = "map_int_stack";
+    public static final String MAP_POS_INT = "pos_int_array";
+    public static final String MAP_STATE_INT = "state_int_array";
+    public static final String MAP_POS_PASTE = "pos_paste_array";
+    public static final String MAP_STATE_PASTE = "state_paste_array";
+    public static final String MAP_SERIALIZE_KEY = "key";
+    public static final String MAP_SERIALIZE_VALUE = "val";
+
+    public static final String TEMPLATE_COPY_COUNT = "copy_count";
     public static final String TEMPLATE_UUID = GADGET_UUID;
-    public static final String TEMPLATE_NAME = "templateName";
+    public static final String TEMPLATE_NAME = "template_name";
+    public static final String TEMPLATE_OWNER = "owner";
 
     public static final String PASTE_COUNT = "amount";
+
+    public static final String WORLD_SAVE_UUID = GADGET_UUID;
+    public static final String WORLD_SAVE_TAG = "tag";
+
+    public static final String REMOTE_INVENTORY_POS = "bound_te_pos";
+    public static final String REMOTE_INVENTORY_DIM = "bound_te_dim";
+
+    public static final String ENERGY = "energy";
+
+    public static final String UNIQUE_ITEM_ITEM = "item";
+    public static final String UNIQUE_ITEM_COUNT = "count";
+
+    public static final String TE_CONSTRUCTION_STATE = MAP_STATE;
+    public static final String TE_CONSTRUCTION_STATE_ACTUAL = "state_actual";
+    public static final String TE_TEMPLATE_MANAGER_ITEMS = "items";
+
+    public static final String ENTITY_DESPAWNING = "despawning";
+    public static final String ENTITY_TICKS_EXISTED = "ticks_existed";
+    public static final String ENTITY_SET_POS = "set_pos";
+
+    public static final String ENTITY_CONSTRUCTION_MAKING_PASTE = "makingPaste";
+
+    public static final String ENTITY_BUILD_SET_BLOCK = "setBlock";
+    public static final String ENTITY_BUILD_SET_BLOCK_ACTUAL = "setBlockActual";
+    public static final String ENTITY_BUILD_ORIGINAL_BLOCK = "originalBlock";
 }

@@ -1,6 +1,7 @@
 package com.direwolf20.buildinggadgets.common.tools;
 
 import com.direwolf20.buildinggadgets.common.utils.helpers.InventoryHelper;
+import com.direwolf20.buildinggadgets.common.utils.ref.NBTKeys;
 import com.google.common.base.Preconditions;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
@@ -19,7 +20,7 @@ public final class UniqueItem { //TODO @since 1.13.x can this be replaced with I
     private final Item item;
 
     public static UniqueItem readFromNBT(NBTTagCompound compound) {
-        return new UniqueItem(ForgeRegistries.ITEMS.getValue(new ResourceLocation(compound.getString("item"))));
+        return new UniqueItem(ForgeRegistries.ITEMS.getValue(new ResourceLocation(compound.getString(NBTKeys.UNIQUE_ITEM_ITEM))));
     }
 
     public static UniqueItem fromBlockState(IBlockState state, EntityPlayer player, BlockPos pos) {
@@ -60,7 +61,7 @@ public final class UniqueItem { //TODO @since 1.13.x can this be replaced with I
 
     public void writeToNBT(NBTTagCompound compound) {
         assert item.getRegistryName() != null; //An Item without registry name cannot exist in here... Construction would have failed otherwise...
-        compound.setString("item", this.getItem().getRegistryName().toString());
+        compound.setString(NBTKeys.UNIQUE_ITEM_ITEM, this.getItem().getRegistryName().toString());
     }
 
     @Override

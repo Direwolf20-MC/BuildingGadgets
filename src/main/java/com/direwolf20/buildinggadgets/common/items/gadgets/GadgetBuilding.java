@@ -112,13 +112,11 @@ public class GadgetBuilding extends GadgetPlacing {
     }
 
     public static boolean shouldPlaceAtop(ItemStack stack) {
-        return ! NBTHelper.getOrNewTag(stack)
-                .getBoolean(NBTKeys.GADGET_PLACE_INSIDE);
+        return !NBTHelper.getOrNewTag(stack).getBoolean(NBTKeys.GADGET_PLACE_INSIDE);
     }
 
     public static void togglePlaceAtop(EntityPlayer player, ItemStack stack) {
-        NBTHelper.getOrNewTag(stack)
-                .setBoolean(NBTKeys.GADGET_PLACE_INSIDE, shouldPlaceAtop(stack));
+        NBTHelper.getOrNewTag(stack).setBoolean(NBTKeys.GADGET_PLACE_INSIDE, shouldPlaceAtop(stack));
         String prefix = "message.gadget.building.placement";
         player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation(prefix, new TextComponentTranslation(prefix + (shouldPlaceAtop(stack) ? ".atop" : ".inside"))).getUnformattedComponentText()), true);
     }

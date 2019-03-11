@@ -1,6 +1,8 @@
 package com.direwolf20.buildinggadgets.common.blocks;
 
 import com.direwolf20.buildinggadgets.common.registry.objects.BGTileEntities;
+import com.direwolf20.buildinggadgets.common.utils.ref.NBTKeys;
+
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
@@ -44,18 +46,17 @@ public class ConstructionBlockTileEntity extends TileEntity {
     @Override
     public void read(NBTTagCompound compound) {
         super.read(compound);
-        blockState = NBTUtil.readBlockState(compound.getCompound("blockState"));
-        actualBlockState = NBTUtil.readBlockState(compound.getCompound("actualBlockState"));
+        blockState = NBTUtil.readBlockState(compound.getCompound(NBTKeys.TE_CONSTRUCTION_STATE));
+        actualBlockState = NBTUtil.readBlockState(compound.getCompound(NBTKeys.TE_CONSTRUCTION_STATE_ACTUAL));
         markDirtyClient();
     }
 
     @Override
     public NBTTagCompound write(NBTTagCompound compound) {
         if (blockState != null) {
-            compound.setTag("blockState", NBTUtil.writeBlockState(blockState));
-            if (actualBlockState != null) {
-                compound.setTag("actualBlockState", NBTUtil.writeBlockState(actualBlockState));
-            }
+            compound.setTag(NBTKeys.TE_CONSTRUCTION_STATE, NBTUtil.writeBlockState(blockState));
+            if (actualBlockState != null)
+                compound.setTag(NBTKeys.TE_CONSTRUCTION_STATE_ACTUAL, NBTUtil.writeBlockState(actualBlockState));
         }
         return super.write(compound);
     }

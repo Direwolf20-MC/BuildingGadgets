@@ -81,8 +81,7 @@ public abstract class GadgetGeneric extends Item {
 
     @Override
     public boolean showDurabilityBar(ItemStack stack) {
-        if (stack.hasTag() && stack.getTag()
-                .hasKey(NBTKeys.CREATIVE_MARKER))
+        if (stack.hasTag() && stack.getTag().hasKey(NBTKeys.CREATIVE_MARKER))
             return false;
 
         return EnergyUtil.returnBooleanIfPresent(stack,
@@ -92,7 +91,7 @@ public abstract class GadgetGeneric extends Item {
 
     @Override
     public boolean getIsRepairable(ItemStack toRepair, ItemStack repair) {
-        return ! EnergyUtil.hasCap(toRepair) && repair.getItem() == Items.DIAMOND;
+        return !EnergyUtil.hasCap(toRepair) && repair.getItem() == Items.DIAMOND;
     }
 
     public static ItemStack getGadget(EntityPlayer player) {
@@ -133,36 +132,30 @@ public abstract class GadgetGeneric extends Item {
     }
 
     public static boolean getFuzzy(ItemStack stack) {
-        return NBTHelper.getOrNewTag(stack)
-                .getBoolean(NBTKeys.GADGET_FUZZY);
+        return NBTHelper.getOrNewTag(stack).getBoolean(NBTKeys.GADGET_FUZZY);
     }
 
     public static void toggleFuzzy(EntityPlayer player, ItemStack stack) {
-        NBTHelper.getOrNewTag(stack)
-                .setBoolean(NBTKeys.GADGET_FUZZY, ! getFuzzy(stack));
+        NBTHelper.getOrNewTag(stack).setBoolean(NBTKeys.GADGET_FUZZY, !getFuzzy(stack));
         player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.fuzzymode").getUnformattedComponentText() + ": " + getFuzzy(stack)), true);
     }
 
     public static boolean getConnectedArea(ItemStack stack) {
-        return NBTHelper.getOrNewTag(stack)
-                .getBoolean(NBTKeys.GADGET_CONNECTED_AREA);
+        return NBTHelper.getOrNewTag(stack).getBoolean(NBTKeys.GADGET_CONNECTED_AREA);
     }
 
     public static void toggleConnectedArea(EntityPlayer player, ItemStack stack) {
-        NBTHelper.getOrNewTag(stack)
-                .setBoolean(NBTKeys.GADGET_CONNECTED_AREA, ! getConnectedArea(stack));
+        NBTHelper.getOrNewTag(stack).setBoolean(NBTKeys.GADGET_CONNECTED_AREA, !getConnectedArea(stack));
         String suffix = stack.getItem() instanceof GadgetDestruction ? "area" : "surface";
         player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.connected" + suffix).getUnformattedComponentText() + ": " + getConnectedArea(stack)), true);
     }
 
     public static boolean shouldRayTraceFluid(ItemStack stack) {
-        return NBTHelper.getOrNewTag(stack)
-                .getBoolean(NBTKeys.GADGET_RAYTRACE_FLUID);
+        return NBTHelper.getOrNewTag(stack).getBoolean(NBTKeys.GADGET_RAYTRACE_FLUID);
     }
 
     public static void toggleRayTraceFluid(EntityPlayer player, ItemStack stack) {
-        NBTHelper.getOrNewTag(stack)
-                .setBoolean(NBTKeys.GADGET_RAYTRACE_FLUID, ! shouldRayTraceFluid(stack));
+        NBTHelper.getOrNewTag(stack).setBoolean(NBTKeys.GADGET_RAYTRACE_FLUID, !shouldRayTraceFluid(stack));
         player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.raytrace_fluid").getUnformattedComponentText() + ": " + shouldRayTraceFluid(stack)), true);
     }
 

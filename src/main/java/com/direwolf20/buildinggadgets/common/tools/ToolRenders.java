@@ -16,6 +16,7 @@ import com.direwolf20.buildinggadgets.common.utils.exceptions.CapabilityNotPrese
 import com.direwolf20.buildinggadgets.common.utils.helpers.InventoryHelper;
 import com.direwolf20.buildinggadgets.common.utils.helpers.SortingHelper;
 import com.direwolf20.buildinggadgets.common.utils.helpers.VectorHelper;
+import com.direwolf20.buildinggadgets.common.utils.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.world.FakeBuilderWorld;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -87,8 +88,8 @@ public class ToolRenders {
         BlockRendererDispatcher dispatcher = Minecraft.getInstance().getBlockRendererDispatcher();
         BlockRenderLayer origLayer = MinecraftForgeClient.getRenderLayer();
 
-        ResourceLocation dim = GadgetUtils.getDIMFromNBT(heldItem, "boundTE");
-        BlockPos pos = GadgetUtils.getPOSFromNBT(heldItem, "boundTE");
+        ResourceLocation dim = GadgetUtils.getDIMFromNBT(heldItem, NBTKeys.REMOTE_INVENTORY_DIM);
+        BlockPos pos = GadgetUtils.getPOSFromNBT(heldItem, NBTKeys.REMOTE_INVENTORY_POS);
 
         if (dim != null && pos != null) {
             GlStateManager.pushMatrix();//Push matrix again just because
@@ -144,7 +145,7 @@ public class ToolRenders {
                 } else {
                     hasEnergy = stack.getMaxDamage() - stack.getDamage();
                 }
-                if (player.isCreative() || (energy.isPresent() && ! stack.isDamageable())) {
+                if (player.isCreative() || (energy.isPresent() && !stack.isDamageable())) {
                     hasEnergy = 1000000;
                 }
 
@@ -226,8 +227,8 @@ public class ToolRenders {
         double doubleZ = player.lastTickPosZ + (player.posZ - player.lastTickPosZ) * evt.getPartialTicks();
 
         BlockRendererDispatcher dispatcher = Minecraft.getInstance().getBlockRendererDispatcher();
-        ResourceLocation dim = GadgetUtils.getDIMFromNBT(stack, "boundTE");
-        BlockPos pos = GadgetUtils.getPOSFromNBT(stack, "boundTE");
+        ResourceLocation dim = GadgetUtils.getDIMFromNBT(stack, NBTKeys.REMOTE_INVENTORY_DIM);
+        BlockPos pos = GadgetUtils.getPOSFromNBT(stack, NBTKeys.REMOTE_INVENTORY_POS);
 
         if (dim != null && pos != null) {
             GlStateManager.pushMatrix();//Push matrix again just because
@@ -287,7 +288,7 @@ public class ToolRenders {
                 } else {
                     hasEnergy = stack.getMaxDamage() - stack.getDamage();
                 }
-                if (player.isCreative() || (energy.isPresent() && ! stack.isDamageable())) {
+                if (player.isCreative() || (energy.isPresent() && !stack.isDamageable())) {
                     hasEnergy = 1000000;
                 }
                 //Prepare the block rendering
@@ -423,12 +424,12 @@ public class ToolRenders {
         BufferBuilder bufferBuilder = t.getBuffer();
         /*ArrayList<EnumFacing> directions = GadgetDestruction.assignDirections(facing, player);
         BlockPos a = new BlockPos(0,0,0);
-        a = a.offset(directions.get(0), GadgetDestruction.getToolValue(stack, "left"));
-        a = a.offset(directions.get(2), GadgetDestruction.getToolValue(stack, "up"));
+        a = a.offset(directions.get(0), GadgetDestruction.getToolValue(stack, NBTKeys.GADGET_VALUE_LEFT));
+        a = a.offset(directions.get(2), GadgetDestruction.getToolValue(stack, NBTKeys.GADGET_VALUE_UP));
         BlockPos b = new BlockPos(0,0,0);
-        b = b.offset(directions.get(1), GadgetDestruction.getToolValue(stack, "right"));
-        b = b.offset(directions.get(2), GadgetDestruction.getToolValue(stack, "down"));
-        b = b.offset(directions.get(4), GadgetDestruction.getToolValue(stack, "depth"));*/
+        b = b.offset(directions.get(1), GadgetDestruction.getToolValue(stack, NBTKeys.GADGET_VALUE_RIGHT));
+        b = b.offset(directions.get(2), GadgetDestruction.getToolValue(stack, NBTKeys.GADGET_VALUE_DOWN));
+        b = b.offset(directions.get(4), GadgetDestruction.getToolValue(stack, NBTKeys.GADGET_VALUE_DEPTH));*/
 
         for (BlockPos coordinate : sortedCoordinates) {
             boolean invisible = true;
@@ -469,8 +470,8 @@ public class ToolRenders {
     }
 
     public static void renderPasteOverlay(RenderWorldLastEvent evt, EntityPlayer player, ItemStack stack) {
-        ResourceLocation dim = GadgetUtils.getDIMFromNBT(stack, "boundTE");
-        BlockPos pos = GadgetUtils.getPOSFromNBT(stack, "boundTE");
+        ResourceLocation dim = GadgetUtils.getDIMFromNBT(stack, NBTKeys.REMOTE_INVENTORY_DIM);
+        BlockPos pos = GadgetUtils.getPOSFromNBT(stack, NBTKeys.REMOTE_INVENTORY_POS);
 
         //Calculate the players current position, which is needed later
         double doubleX = player.lastTickPosX + (player.posX - player.lastTickPosX) * evt.getPartialTicks();
@@ -609,7 +610,7 @@ public class ToolRenders {
 
     private static void renderBox(Tessellator tessellator, BufferBuilder bufferBuilder, double startX, double startY, double startZ, double endX, double endY, double endZ, int R, int G, int B) {
         GlStateManager.lineWidth(2.0F);
-        bufferBuilder.begin(3, DefaultVertexFormats.POSITION_COLOR);
+        bufferBuilder.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION_COLOR);
         bufferBuilder.pos(startX, startY, startZ).color(G, G, G, 0.0F).endVertex();
         bufferBuilder.pos(startX, startY, startZ).color(G, G, G, R).endVertex();
         bufferBuilder.pos(endX, startY, startZ).color(G, B, B, R).endVertex();
@@ -633,7 +634,7 @@ public class ToolRenders {
     }
 
     private static void renderBoxSolid(Tessellator tessellator, BufferBuilder bufferBuilder, double startX, double startY, double startZ, double endX, double endY, double endZ, float red, float green, float blue, float alpha) {
-        bufferBuilder.begin(7, DefaultVertexFormats.POSITION_COLOR);
+        bufferBuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
 
         //down
         bufferBuilder.pos(startX, startY, startZ).color(red, green, blue, alpha).endVertex();

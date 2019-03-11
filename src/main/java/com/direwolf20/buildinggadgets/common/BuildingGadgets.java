@@ -72,12 +72,9 @@ public class BuildingGadgets {
             ModLoadingContext.get().registerExtensionPoint(ExtensionPoint.GUIFACTORY, () -> GuiMod::openScreen);
         });
 
-        loadConfig(Config.API_CONFIG, FMLPaths.CONFIGDIR.get()
-                .resolve(Reference.CONFIG_FILE_API));
-        loadConfig(Config.SERVER_CONFIG, FMLPaths.CONFIGDIR.get()
-                .resolve(Reference.CONFIG_FILE_SERVER));
-        loadConfig(Config.CLIENT_CONFIG, FMLPaths.CONFIGDIR.get()
-                .resolve(Reference.CONFIG_FILE_CLIENT));
+        loadConfig(Config.API_CONFIG, FMLPaths.CONFIGDIR.get().resolve(Reference.CONFIG_FILE_API));
+        loadConfig(Config.SERVER_CONFIG, FMLPaths.CONFIGDIR.get().resolve(Reference.CONFIG_FILE_SERVER));
+        loadConfig(Config.CLIENT_CONFIG, FMLPaths.CONFIGDIR.get().resolve(Reference.CONFIG_FILE_CLIENT));
         theApi = APIProxy.INSTANCE.onCreate(eventBus, MinecraftForge.EVENT_BUS, Config.API);
         BuildingObjects.init();
     }
