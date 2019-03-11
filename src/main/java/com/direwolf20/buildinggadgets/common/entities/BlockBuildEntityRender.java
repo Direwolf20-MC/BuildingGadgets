@@ -17,6 +17,8 @@ import net.minecraft.util.ResourceLocation;
 
 import javax.annotation.Nullable;
 
+import org.lwjgl.opengl.GL11;
+
 
 public class BlockBuildEntityRender extends Render<BlockBuildEntity> {
 
@@ -86,7 +88,7 @@ public class BlockBuildEntityRender extends Render<BlockBuildEntity> {
         GlStateManager.depthMask(false);
         Tessellator t = Tessellator.getInstance();
         BufferBuilder bufferBuilder = t.getBuffer();
-        bufferBuilder.begin(7, DefaultVertexFormats.POSITION_COLOR);
+        bufferBuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
 
         double maxX = x + 1;
         double maxY = y + 1;

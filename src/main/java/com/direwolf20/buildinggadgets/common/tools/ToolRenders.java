@@ -609,7 +609,7 @@ public class ToolRenders {
 
     private static void renderBox(Tessellator tessellator, BufferBuilder bufferBuilder, double startX, double startY, double startZ, double endX, double endY, double endZ, int R, int G, int B) {
         GlStateManager.lineWidth(2.0F);
-        bufferBuilder.begin(3, DefaultVertexFormats.POSITION_COLOR);
+        bufferBuilder.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION_COLOR);
         bufferBuilder.pos(startX, startY, startZ).color(G, G, G, 0.0F).endVertex();
         bufferBuilder.pos(startX, startY, startZ).color(G, G, G, R).endVertex();
         bufferBuilder.pos(endX, startY, startZ).color(G, B, B, R).endVertex();
@@ -633,7 +633,7 @@ public class ToolRenders {
     }
 
     private static void renderBoxSolid(Tessellator tessellator, BufferBuilder bufferBuilder, double startX, double startY, double startZ, double endX, double endY, double endZ, float red, float green, float blue, float alpha) {
-        bufferBuilder.begin(7, DefaultVertexFormats.POSITION_COLOR);
+        bufferBuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
 
         //down
         bufferBuilder.pos(startX, startY, startZ).color(red, green, blue, alpha).endVertex();
