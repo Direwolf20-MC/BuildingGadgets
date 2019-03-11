@@ -3,6 +3,8 @@ package com.direwolf20.buildinggadgets.common.utils.buffers;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
 import com.direwolf20.buildinggadgets.common.utils.blocks.BlockMap;
+import com.direwolf20.buildinggadgets.common.utils.ref.NBTKeys;
+
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockRendererDispatcher;
@@ -36,7 +38,7 @@ public class PasteToolBufferBuilder {
 
     private static int getCopyCounter(String UUID) {
         if (tagMap.containsKey(UUID)) {
-            return tagMap.get(UUID).getInt("copycounter");
+            return tagMap.get(UUID).getInt(NBTKeys.TEMPLATE_COPY_COUNT);
         }
         return -1;
     }

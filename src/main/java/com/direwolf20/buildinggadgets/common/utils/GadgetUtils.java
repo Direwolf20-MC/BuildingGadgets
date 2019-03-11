@@ -10,6 +10,7 @@ import com.direwolf20.buildinggadgets.common.tools.modes.ExchangingModes;
 import com.direwolf20.buildinggadgets.common.utils.exceptions.CapabilityNotPresentException;
 import com.direwolf20.buildinggadgets.common.utils.helpers.InventoryHelper;
 import com.direwolf20.buildinggadgets.common.utils.helpers.VectorHelper;
+import com.direwolf20.buildinggadgets.common.utils.ref.NBTKeys;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multiset;
@@ -125,7 +126,7 @@ public class GadgetUtils {
     private static NBTTagCompound undoStateToNBT(UndoState undoState) {
         //Convert an UndoState object into NBT data. Uses ints to store relative positions to a start block for data compression..
         NBTTagCompound compound = new NBTTagCompound();
-        compound.setString("dim", DimensionType.func_212678_a(undoState.dimension).toString());
+        compound.setString(NBTKeys.GADGET_DIM, DimensionType.func_212678_a(undoState.dimension).toString());
 
         BlockPos startBlock = undoState.coordinates.get(0);
         int[] array = new int[undoState.coordinates.size()];
@@ -146,7 +147,7 @@ public class GadgetUtils {
     @Nullable
     private static UndoState NBTToUndoState(NBTTagCompound compound) {
         //Convert an integer list stored in NBT into UndoState
-        DimensionType dim = DimensionType.byName(new ResourceLocation(compound.getString("dim")));
+        DimensionType dim = DimensionType.byName(new ResourceLocation(compound.getString(NBTKeys.GADGET_DIM)));
         if (dim == null)
             return null;
 
@@ -424,7 +425,7 @@ public class GadgetUtils {
             return;
         }
         NBTTagCompound posTag = NBTUtil.writeBlockPos(pos);
-        posTag.setString("dim", DimensionType.func_212678_a(dimension).toString());
+        posTag.setString(NBTKeys.GADGET_DIM, DimensionType.func_212678_a(dimension).toString());
         tagCompound.setTag(tagName, posTag);
         stack.setTag(tagCompound);
     }
@@ -439,7 +440,7 @@ public class GadgetUtils {
             return;
         }
         tagCompound.setTag(tagName, NBTUtil.writeBlockPos(pos));
-        tagCompound.setString("dim", DimensionType.func_212678_a(dimension).toString());
+        tagCompound.setString(NBTKeys.GADGET_DIM, DimensionType.func_212678_a(dimension).toString());
     }
 
     @Nullable
@@ -527,7 +528,7 @@ public class GadgetUtils {
         if (posTag.equals(new NBTTagCompound())) {
             return null;
         }
-        return new ResourceLocation(posTag.getString("dim"));
+        return new ResourceLocation(posTag.getString(NBTKeys.GADGET_DIM));
     }
 
     public static NBTTagCompound stateToCompound(IBlockState state) {

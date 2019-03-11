@@ -8,6 +8,7 @@ package com.direwolf20.buildinggadgets.client.gui;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetDestruction;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketDestructionGUI;
+import com.direwolf20.buildinggadgets.common.utils.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.utils.ref.Reference;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
@@ -108,11 +109,11 @@ public class DestructionGUI extends GuiScreenTextFields {
     }
 
     private void nullCheckTextBoxes() {
-        GuiMod.setEmptyField(left, () -> GadgetDestruction.getToolValue(destructionTool, "left"));
-        GuiMod.setEmptyField(right, () -> GadgetDestruction.getToolValue(destructionTool, "right"));
-        GuiMod.setEmptyField(up, () -> GadgetDestruction.getToolValue(destructionTool, "up"));
-        GuiMod.setEmptyField(down, () -> GadgetDestruction.getToolValue(destructionTool, "down"));
-        GuiMod.setEmptyField(depth, () -> GadgetDestruction.getToolValue(destructionTool, "depth"));
+        GuiMod.setEmptyField(left, () -> GadgetDestruction.getToolValue(destructionTool, NBTKeys.GADGET_VALUE_LEFT));
+        GuiMod.setEmptyField(right, () -> GadgetDestruction.getToolValue(destructionTool, NBTKeys.GADGET_VALUE_RIGHT));
+        GuiMod.setEmptyField(up, () -> GadgetDestruction.getToolValue(destructionTool, NBTKeys.GADGET_VALUE_UP));
+        GuiMod.setEmptyField(down, () -> GadgetDestruction.getToolValue(destructionTool, NBTKeys.GADGET_VALUE_DOWN));
+        GuiMod.setEmptyField(depth, () -> GadgetDestruction.getToolValue(destructionTool, NBTKeys.GADGET_VALUE_DEPTH));
     }
 
     private boolean sizeCheckBoxes() {

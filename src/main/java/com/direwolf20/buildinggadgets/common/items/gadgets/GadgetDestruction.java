@@ -259,7 +259,7 @@ public class GadgetDestruction extends GadgetSwapping {
 
     public static SortedSet<BlockPos> getArea(World world, BlockPos pos, EnumFacing incomingSide, EntityPlayer player, ItemStack stack) {
         SortedSet<BlockPos> voidPositions = new TreeSet<>(Comparator.comparingInt(Vec3i::getX).thenComparingInt(Vec3i::getY).thenComparingInt(Vec3i::getZ));
-        int depth = getToolValue(stack, "depth");
+        int depth = getToolValue(stack, NBTKeys.GADGET_VALUE_DEPTH);
         if (depth == 0)
             return voidPositions;
 
@@ -393,15 +393,15 @@ public class GadgetDestruction extends GadgetSwapping {
                 pasteStateArrayList.add((int) blockMapIntState.findSlot(pasteBlockState));
             }
         }
-        tagCompound.setTag(NBTKeys.TEMPLATE_MAP_STATE_INT, blockMapIntState.putIntStateMapIntoNBT());
+        tagCompound.setTag(NBTKeys.MAP_STATE_INT, blockMapIntState.putIntStateMapIntoNBT());
         int[] posIntArray = posIntArrayList.stream().mapToInt(i -> i).toArray();
         int[] stateIntArray = stateIntArrayList.stream().mapToInt(i -> i).toArray();
         int[] posPasteArray = pastePosArrayList.stream().mapToInt(i -> i).toArray();
         int[] statePasteArray = pasteStateArrayList.stream().mapToInt(i -> i).toArray();
-        tagCompound.setIntArray(NBTKeys.TEMPLATE_MAP_POS_INT, posIntArray);
-        tagCompound.setIntArray(NBTKeys.TEMPLATE_MAP_STATE_INT, stateIntArray);
-        tagCompound.setIntArray(NBTKeys.TEMPLATE_MAP_POS_PASTE, posPasteArray);
-        tagCompound.setIntArray(NBTKeys.TEMPLATE_MAP_STATE_PASTE, statePasteArray);
+        tagCompound.setIntArray(NBTKeys.MAP_POS_INT, posIntArray);
+        tagCompound.setIntArray(NBTKeys.MAP_STATE_INT, stateIntArray);
+        tagCompound.setIntArray(NBTKeys.MAP_POS_PASTE, posPasteArray);
+        tagCompound.setIntArray(NBTKeys.MAP_STATE_PASTE, statePasteArray);
         tagCompound.setTag(NBTKeys.GADGET_START_POS, NBTUtil.writeBlockPos(startBlock));
         tagCompound.setString(NBTKeys.GADGET_DIM, DimensionType.func_212678_a(player.dimension).toString());
         tagCompound.setString(NBTKeys.GADGET_UUID, UUID);
@@ -416,12 +416,12 @@ public class GadgetDestruction extends GadgetSwapping {
         if (tagCompound == null) return;
         BlockPos startPos = NBTUtil.readBlockPos(tagCompound.getCompound(NBTKeys.GADGET_START_POS));
         if (startPos == null) return;
-        int[] posIntArray = tagCompound.getIntArray(NBTKeys.TEMPLATE_MAP_POS_INT);
-        int[] stateIntArray = tagCompound.getIntArray(NBTKeys.TEMPLATE_MAP_STATE_INT);
-        int[] posPasteArray = tagCompound.getIntArray(NBTKeys.TEMPLATE_MAP_POS_PASTE);
-        int[] statePasteArray = tagCompound.getIntArray(NBTKeys.TEMPLATE_MAP_STATE_PASTE);
+        int[] posIntArray = tagCompound.getIntArray(NBTKeys.MAP_POS_INT);
+        int[] stateIntArray = tagCompound.getIntArray(NBTKeys.MAP_STATE_INT);
+        int[] posPasteArray = tagCompound.getIntArray(NBTKeys.MAP_POS_PASTE);
+        int[] statePasteArray = tagCompound.getIntArray(NBTKeys.MAP_STATE_PASTE);
 
-        NBTTagList MapIntStateTag = (NBTTagList) tagCompound.getTag(NBTKeys.TEMPLATE_MAP_INT_STATE);
+        NBTTagList MapIntStateTag = (NBTTagList) tagCompound.getTag(NBTKeys.MAP_INT_STATE);
         if (MapIntStateTag == null) {
             return;
         }

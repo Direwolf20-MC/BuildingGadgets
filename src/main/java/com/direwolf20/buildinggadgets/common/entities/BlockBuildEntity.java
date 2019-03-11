@@ -3,6 +3,8 @@ package com.direwolf20.buildinggadgets.common.entities;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGEntities;
+import com.direwolf20.buildinggadgets.common.utils.ref.NBTKeys;
+
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -122,7 +124,7 @@ public class BlockBuildEntity extends Entity {
         setBlock = NBTUtil.readBlockState(compound.getCompound("setBlock"));
         originalSetBlock = NBTUtil.readBlockState(compound.getCompound("originalBlock"));
         actualSetBlock = NBTUtil.readBlockState(compound.getCompound("actualSetBlock"));
-        mode = compound.getInt("mode");
+        mode = compound.getInt(NBTKeys.GADGET_MODE);
         useConstructionPaste = compound.getBoolean("paste");
     }
 
@@ -141,7 +143,7 @@ public class BlockBuildEntity extends Entity {
         blockStateTag = NBTUtil.writeBlockState(originalSetBlock);
 
         compound.setTag("originalBlock", blockStateTag);
-        compound.setInt("mode", mode);
+        compound.setInt(NBTKeys.GADGET_MODE, mode);
         compound.setBoolean("paste", useConstructionPaste);
     }
 

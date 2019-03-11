@@ -1,6 +1,7 @@
 package com.direwolf20.buildinggadgets.common.registry.objects;
 
 import com.direwolf20.buildinggadgets.common.config.Config;
+import com.direwolf20.buildinggadgets.common.utils.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.utils.ref.Reference;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.material.MaterialColor;
@@ -19,7 +20,7 @@ public class BuildingObjects {
         @Override
         public ItemStack createIcon() {
             ItemStack stack = new ItemStack(BGItems.gadgetBuilding);
-            stack.getOrCreateTag().setByte("creative", (byte) 0); 
+            stack.getOrCreateTag().setByte(NBTKeys.CREATIVE_MARKER, (byte) 0); 
             return stack;
         }
     };

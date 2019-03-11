@@ -10,6 +10,7 @@ import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
 import com.direwolf20.buildinggadgets.common.utils.blocks.BlockMap;
 import com.direwolf20.buildinggadgets.common.utils.blocks.BlockMapIntState;
 import com.direwolf20.buildinggadgets.common.utils.buffers.PasteToolBufferBuilder;
+import com.direwolf20.buildinggadgets.common.utils.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.tools.UniqueItem;
 import com.direwolf20.buildinggadgets.common.utils.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.world.WorldSave;
@@ -72,8 +73,8 @@ public class TemplateManagerCommands {
         NBTTagCompound templateTagCompound = templateWorldSave.getCompoundFromUUID(UUIDTemplate);
         tagCompound = templateTagCompound.copy();
         template.incrementCopyCounter(itemStack0);
-        tagCompound.setInt("copycounter", template.getCopyCounter(itemStack0));
-        tagCompound.setString("UUID", template.getUUID(itemStack0));
+        tagCompound.setInt(NBTKeys.TEMPLATE_COPY_COUNT, template.getCopyCounter(itemStack0));
+        tagCompound.setString(NBTKeys.GADGET_UUID, template.getUUID(itemStack0));
         tagCompound.setString("owner", player.getName().getString());
         if (template.equals(BGItems.gadgetCopyPaste)) {
             worldSave.addToMap(UUID, tagCompound);
@@ -120,8 +121,8 @@ public class TemplateManagerCommands {
         NBTTagCompound tagCompound = isTool ? worldSave.getCompoundFromUUID(UUID) : templateWorldSave.getCompoundFromUUID(UUID);
         templateTagCompound = tagCompound.copy();
         template.incrementCopyCounter(templateStack);
-        templateTagCompound.setInt("copycounter", template.getCopyCounter(templateStack));
-        templateTagCompound.setString("UUID", BGItems.template.getUUID(templateStack));
+        templateTagCompound.setInt(NBTKeys.TEMPLATE_COPY_COUNT, template.getCopyCounter(templateStack));
+        templateTagCompound.setString(NBTKeys.GADGET_UUID, BGItems.template.getUUID(templateStack));
 
         templateWorldSave.addToMap(UUIDTemplate, templateTagCompound);
         BlockPos startPos = template.getStartPos(itemStack0);
@@ -167,22 +168,22 @@ public class TemplateManagerCommands {
         NBTTagCompound templateTagCompound;
 
         templateTagCompound = sentTagCompound.copy();
-        BlockPos startPos = GadgetUtils.getPOSFromNBT(templateTagCompound, "startPos");
-        BlockPos endPos = GadgetUtils.getPOSFromNBT(templateTagCompound, "endPos");
+        BlockPos startPos = GadgetUtils.getPOSFromNBT(templateTagCompound, NBTKeys.GADGET_START_POS);
+        BlockPos endPos = GadgetUtils.getPOSFromNBT(templateTagCompound, NBTKeys.GADGET_END_POS);
         template.incrementCopyCounter(templateStack);
-        templateTagCompound.setInt("copycounter", template.getCopyCounter(templateStack));
-        templateTagCompound.setString("UUID", template.getUUID(templateStack));
-        //GadgetUtils.writePOSToNBT(templateTagCompound, startPos, "startPos", 0);
-        //GadgetUtils.writePOSToNBT(templateTagCompound, endPos, "startPos", 0);
+        templateTagCompound.setInt(NBTKeys.TEMPLATE_COPY_COUNT, template.getCopyCounter(templateStack));
+        templateTagCompound.setString(NBTKeys.GADGET_UUID, template.getUUID(templateStack));
+        //GadgetUtils.writePOSToNBT(templateTagCompound, startPos, NBTKeys.GADGET_START_POS, 0);
+        //GadgetUtils.writePOSToNBT(templateTagCompound, endPos, NBTKeys.GADGET_START_POS, 0);
         //Map<UniqueItem, Integer> tagMap = GadgetUtils.nbtToItemCount((NBTTagList) templateTagCompound.getTag("itemcountmap"));
         //templateTagCompound.removeTag("itemcountmap");
 
-        NBTTagList MapIntStateTag = (NBTTagList) templateTagCompound.getTag("mapIntState");
+        NBTTagList MapIntStateTag = (NBTTagList) templateTagCompound.getTag(NBTKeys.MAP_INT_STATE);
 
         BlockMapIntState mapIntState = new BlockMapIntState();
         mapIntState.getIntStateMapFromNBT(MapIntStateTag);
         mapIntState.makeStackMapFromStateMap(player);
-        templateTagCompound.setTag("mapIntStack", mapIntState.putIntStackMapIntoNBT());
+        templateTagCompound.setTag(NBTKeys.MAP_INT_STACK, mapIntState.putIntStackMapIntoNBT());
         templateTagCompound.setString("owner", player.getName().getString());
 
         Multiset<UniqueItem> itemCountMap = HashMultiset.create();
@@ -229,11 +230,11 @@ public class TemplateManagerCommands {
                 return;
             }
             NBTTagCompound newCompound = new NBTTagCompound();
-            newCompound.setIntArray("stateIntArray", tagCompound.getIntArray("stateIntArray"));
-            newCompound.setIntArray("posIntArray", tagCompound.getIntArray("posIntArray"));
-            newCompound.setTag("mapIntState", tagCompound.getTag("mapIntState"));
-            GadgetUtils.writePOSToNBT(newCompound, GadgetUtils.getPOSFromNBT(tagCompound, "startPos"), "startPos", DimensionType.OVERWORLD);
-            GadgetUtils.writePOSToNBT(newCompound, GadgetUtils.getPOSFromNBT(tagCompound, "endPos"), "endPos", DimensionType.OVERWORLD);
+            newCompound.setIntArray(NBTKeys.MAP_STATE_INT, tagCompound.getIntArray(NBTKeys.MAP_STATE_INT));
+            newCompound.setIntArray(NBTKeys.MAP_POS_INT, tagCompound.getIntArray(NBTKeys.MAP_POS_INT));
+            newCompound.setTag(NBTKeys.MAP_INT_STATE, tagCompound.getTag(NBTKeys.MAP_INT_STATE));
+            GadgetUtils.writePOSToNBT(newCompound, GadgetUtils.getPOSFromNBT(tagCompound, NBTKeys.GADGET_START_POS), NBTKeys.GADGET_START_POS, DimensionType.OVERWORLD);
+            GadgetUtils.writePOSToNBT(newCompound, GadgetUtils.getPOSFromNBT(tagCompound, NBTKeys.GADGET_END_POS), NBTKeys.GADGET_END_POS, DimensionType.OVERWORLD);
             //Map<UniqueItem, Integer> tagMap = GadgetCopyPaste.getItemCountMap(itemStack0);
             //NBTTagList tagList = GadgetUtils.itemCountToNBT(tagMap);
             //newCompound.setTag("itemcountmap", tagList);

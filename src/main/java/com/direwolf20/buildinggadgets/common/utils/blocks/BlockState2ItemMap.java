@@ -2,6 +2,7 @@ package com.direwolf20.buildinggadgets.common.utils.blocks;
 
 import com.direwolf20.buildinggadgets.common.tools.UniqueItem;
 import com.direwolf20.buildinggadgets.common.utils.GadgetUtils;
+import com.direwolf20.buildinggadgets.common.utils.ref.NBTKeys;
 import com.google.common.collect.BiMap;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
@@ -15,9 +16,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public final class BlockState2ItemMap extends BlockState2ShortMap {
-    private static final String KEY_ITEM_MAP = "mapIntStack";
-    private static final String KEY_STATE_ID = "id";
-    private static final String KEY_STATE = "state";
     private final Map<IBlockState, UniqueItem> stateItemMap;
 
     public BlockState2ItemMap(BiMap<Short, IBlockState> shortStateMap, Map<IBlockState, UniqueItem> stateItemMap) {
@@ -62,14 +60,14 @@ public final class BlockState2ItemMap extends BlockState2ShortMap {
     @Override
     public void writeToNBT(@Nonnull NBTTagCompound tagCompound) {
         super.writeToNBT(tagCompound);
-        tagCompound.setTag(KEY_ITEM_MAP, writeStateItemMapToNBT());
+        tagCompound.setTag(NBTKeys.MAP_INT_STACK, writeStateItemMapToNBT());
     }
 
     @Override
     public void readNBT(@Nonnull NBTTagCompound tagCompound) {
         super.readNBT(tagCompound);
-        if (tagCompound.hasKey(KEY_ITEM_MAP)) {
-            NBTTagList mapIntStackTag = (NBTTagList) tagCompound.getTag(KEY_ITEM_MAP);
+        if (tagCompound.hasKey(NBTKeys.MAP_INT_STACK)) {
+            NBTTagList mapIntStackTag = (NBTTagList) tagCompound.getTag(NBTKeys.MAP_INT_STACK);
             readStateItemMapFromNBT(mapIntStackTag);
         }
     }
@@ -91,9 +89,9 @@ public final class BlockState2ItemMap extends BlockState2ShortMap {
             entry.getValue().writeToNBT(compound);
             short slot = getSlot(entry.getKey());
             if (slot >= 0) {
-                compound.setShort(KEY_STATE_ID, slot);
+                compound.setShort(NBTKeys.MAP_STATE_ID, slot);
             } else {
-                compound.setTag(KEY_STATE, GadgetUtils.stateToCompound(entry.getKey()));
+                compound.setTag(NBTKeys.MAP_STATE, GadgetUtils.stateToCompound(entry.getKey()));
             }
             tagList.add(compound);
         }
@@ -106,11 +104,11 @@ public final class BlockState2ItemMap extends BlockState2ShortMap {
             NBTTagCompound compound = tagList.getCompound(i);
             UniqueItem item = UniqueItem.readFromNBT(compound);
             IBlockState state = null;
-            if (compound.hasKey(KEY_STATE_ID)) {
-                state = getStateFromSlot(compound.getShort(KEY_STATE_ID));
+            if (compound.hasKey(NBTKeys.MAP_STATE_ID)) {
+                state = getStateFromSlot(compound.getShort(NBTKeys.MAP_STATE_ID));
             }
             if (state == null) {
-                state = GadgetUtils.compoundToState(compound.getCompound(KEY_STATE));
+                state = GadgetUtils.compoundToState(compound.getCompound(NBTKeys.MAP_STATE));
             }
             stateItemMap.put(state, item);
         }

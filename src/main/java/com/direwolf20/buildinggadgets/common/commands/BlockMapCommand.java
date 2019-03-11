@@ -2,6 +2,7 @@ package com.direwolf20.buildinggadgets.common.commands;
 
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketBlockMap;
+import com.direwolf20.buildinggadgets.common.utils.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.world.WorldSave;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
@@ -54,7 +55,7 @@ public class BlockMapCommand {
             NBTTagCompound tagCompound = entry.getValue();
             if (tagCompound.getString("owner").equals(entity.getName().getString())) {
                 //TODO Missing localisation
-                sender.sendMessage(new TextComponentString(TextFormatting.RED + "Deleted stored map for " + tagCompound.getString("owner") + " with UUID:" + tagCompound.getString("UUID")));
+                sender.sendMessage(new TextComponentString(TextFormatting.RED + "Deleted stored map for " + tagCompound.getString("owner") + " with UUID:" + tagCompound.getString(NBTKeys.GADGET_UUID)));
                 counter++;
                 if (removeData) newMap.remove(entry.getKey());
             }

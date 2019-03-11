@@ -3,6 +3,8 @@ package com.direwolf20.buildinggadgets.common.utils.blocks;
 import com.direwolf20.buildinggadgets.common.tools.UniqueItem;
 import com.direwolf20.buildinggadgets.common.utils.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.utils.helpers.InventoryHelper;
+import com.direwolf20.buildinggadgets.common.utils.ref.NBTKeys;
+
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
@@ -72,7 +74,7 @@ public class BlockMapIntState {
         intStateMap = new HashMap<>();
         for (int i = 0; i < tagList.size(); i++) {
             NBTTagCompound compound = tagList.getCompound(i);
-            intStateMap.put(compound.getShort("mapSlot"), NBTUtil.readBlockState(compound.getCompound("mapState")));
+            intStateMap.put(compound.getShort(NBTKeys.MAP_SLOT), NBTUtil.readBlockState(compound.getCompound(NBTKeys.MAP_STATE)));
         }
         return intStateMap;
     }
@@ -81,8 +83,8 @@ public class BlockMapIntState {
         NBTTagList tagList = new NBTTagList();
         for (Map.Entry<Short, IBlockState> entry : intStateMap.entrySet()) {
             NBTTagCompound compound = new NBTTagCompound();
-            compound.setShort("mapSlot", entry.getKey());
-            compound.setTag("mapState", NBTUtil.writeBlockState(entry.getValue()));
+            compound.setShort(NBTKeys.MAP_SLOT, entry.getKey());
+            compound.setTag(NBTKeys.MAP_STATE, NBTUtil.writeBlockState(entry.getValue()));
             tagList.add(compound);
         }
         return tagList;

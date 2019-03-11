@@ -16,6 +16,7 @@ import com.direwolf20.buildinggadgets.common.utils.exceptions.CapabilityNotPrese
 import com.direwolf20.buildinggadgets.common.utils.helpers.InventoryHelper;
 import com.direwolf20.buildinggadgets.common.utils.helpers.SortingHelper;
 import com.direwolf20.buildinggadgets.common.utils.helpers.VectorHelper;
+import com.direwolf20.buildinggadgets.common.utils.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.world.FakeBuilderWorld;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -423,12 +424,12 @@ public class ToolRenders {
         BufferBuilder bufferBuilder = t.getBuffer();
         /*ArrayList<EnumFacing> directions = GadgetDestruction.assignDirections(facing, player);
         BlockPos a = new BlockPos(0,0,0);
-        a = a.offset(directions.get(0), GadgetDestruction.getToolValue(stack, "left"));
-        a = a.offset(directions.get(2), GadgetDestruction.getToolValue(stack, "up"));
+        a = a.offset(directions.get(0), GadgetDestruction.getToolValue(stack, NBTKeys.GADGET_VALUE_LEFT));
+        a = a.offset(directions.get(2), GadgetDestruction.getToolValue(stack, NBTKeys.GADGET_VALUE_UP));
         BlockPos b = new BlockPos(0,0,0);
-        b = b.offset(directions.get(1), GadgetDestruction.getToolValue(stack, "right"));
-        b = b.offset(directions.get(2), GadgetDestruction.getToolValue(stack, "down"));
-        b = b.offset(directions.get(4), GadgetDestruction.getToolValue(stack, "depth"));*/
+        b = b.offset(directions.get(1), GadgetDestruction.getToolValue(stack, NBTKeys.GADGET_VALUE_RIGHT));
+        b = b.offset(directions.get(2), GadgetDestruction.getToolValue(stack, NBTKeys.GADGET_VALUE_DOWN));
+        b = b.offset(directions.get(4), GadgetDestruction.getToolValue(stack, NBTKeys.GADGET_VALUE_DEPTH));*/
 
         for (BlockPos coordinate : sortedCoordinates) {
             boolean invisible = true;
