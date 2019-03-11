@@ -144,7 +144,7 @@ public class ToolRenders {
                 } else {
                     hasEnergy = stack.getMaxDamage() - stack.getDamage();
                 }
-                if (player.isCreative() || (energy.isPresent() && ! stack.isDamageable())) {
+                if (player.isCreative() || (energy.isPresent() && !stack.isDamageable())) {
                     hasEnergy = 1000000;
                 }
 
@@ -287,7 +287,7 @@ public class ToolRenders {
                 } else {
                     hasEnergy = stack.getMaxDamage() - stack.getDamage();
                 }
-                if (player.isCreative() || (energy.isPresent() && ! stack.isDamageable())) {
+                if (player.isCreative() || (energy.isPresent() && !stack.isDamageable())) {
                     hasEnergy = 1000000;
                 }
                 //Prepare the block rendering

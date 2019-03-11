@@ -114,9 +114,7 @@ public class GadgetCopyPaste extends GadgetPlacing implements ITemplate {
 
     public static int getY(ItemStack stack) {
         NBTTagCompound tagCompound = stack.getTag();
-        if (tagCompound == null) return 1;
-        if (! tagCompound.hasKey(NBTKeys.POSITION_Y)) return 1;
-        return tagCompound.getInt(NBTKeys.POSITION_Y);
+        return (tagCompound == null || !tagCompound.hasKey(NBTKeys.POSITION_Y)) ? 1 : tagCompound.getInt(NBTKeys.POSITION_Y);
     }
 
     public static int getZ(ItemStack stack) {

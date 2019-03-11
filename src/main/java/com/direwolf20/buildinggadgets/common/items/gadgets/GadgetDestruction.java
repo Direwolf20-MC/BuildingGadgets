@@ -276,9 +276,9 @@ public class GadgetDestruction extends GadgetSwapping {
             addConnectedCoords(world, player, startPos, stateTarget, voidPositions,
                     (int) area.minX, (int) area.minY, (int) area.minZ, (int) area.maxX - 1, (int) area.maxY - 1, (int) area.maxZ - 1);
         } else {
-            int left = - getToolValue(stack, NBTKeys.GADGET_VALUE_LEFT);
+            int left = -getToolValue(stack, NBTKeys.GADGET_VALUE_LEFT);
             int right = getToolValue(stack, NBTKeys.GADGET_VALUE_RIGHT);
-            int down = - getToolValue(stack, NBTKeys.GADGET_VALUE_DOWN);
+            int down = -getToolValue(stack, NBTKeys.GADGET_VALUE_DOWN);
             int up = getToolValue(stack, NBTKeys.GADGET_VALUE_UP);
             for (int d = 0; d < depth; d++) {
                 for (int x = left; x <= right; x++) {
@@ -403,8 +403,7 @@ public class GadgetDestruction extends GadgetSwapping {
         tagCompound.setIntArray(NBTKeys.TEMPLATE_MAP_POS_PASTE, posPasteArray);
         tagCompound.setIntArray(NBTKeys.TEMPLATE_MAP_STATE_PASTE, statePasteArray);
         tagCompound.setTag(NBTKeys.GADGET_START_POS, NBTUtil.writeBlockPos(startBlock));
-        tagCompound.setString(NBTKeys.GADGET_DIM, DimensionType.func_212678_a(player.dimension)
-                .toString());
+        tagCompound.setString(NBTKeys.GADGET_DIM, DimensionType.func_212678_a(player.dimension).toString());
         tagCompound.setString(NBTKeys.GADGET_UUID, UUID);
         worldSave.addToMap(UUID, tagCompound);
         worldSave.markForSaving();
