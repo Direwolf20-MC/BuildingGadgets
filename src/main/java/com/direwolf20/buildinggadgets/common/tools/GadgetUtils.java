@@ -5,6 +5,8 @@ import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
 import com.direwolf20.buildinggadgets.common.integration.NetworkProvider;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetBuilding;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetExchanger;
+import com.google.common.base.Supplier;
+import com.google.common.base.Suppliers;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multiset;
@@ -39,10 +41,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class GadgetUtils {
 
     private static final ImmutableList<String> LINK_STARTS = ImmutableList.of("http", "www");
+    private static Supplier<IItemHandler> remoteInventorySupplier;
 
     public static boolean mightBeLink(final String s) {
         return LINK_STARTS.stream().anyMatch(s::startsWith);
@@ -73,9 +77,8 @@ public class GadgetUtils {
     @Nonnull
     public static NBTTagCompound getStackTag(ItemStack stack) {
         NBTTagCompound tag = stack.getTagCompound();
-        if (tag == null) {
+        if (tag == null)
             throw new IllegalArgumentException("An NBT tag could net be retrieved from " + getStackErrorText(stack));
-        }
 
         return tag;
     }
@@ -260,9 +263,8 @@ public class GadgetUtils {
 
         BlockPos pos = lookingAt.getBlockPos();
         EnumActionResult result = setRemoteInventory(stack, player, world, pos, true);
-        if (result == EnumActionResult.SUCCESS) {
+        if (result == EnumActionResult.SUCCESS)
             return;
-        }
 
         IBlockState state = world.getBlockState(pos);
         if (result == EnumActionResult.FAIL || SyncedConfig.blockBlacklist.contains(state.getBlock())) {
@@ -277,18 +279,16 @@ public class GadgetUtils {
 
     public static EnumActionResult setRemoteInventory(ItemStack stack, EntityPlayer player, World world, BlockPos pos, boolean setTool) {
         TileEntity te = world.getTileEntity(pos);
-        if (te == null) {
+        if (te == null)
             return EnumActionResult.PASS;
-        }
 
         if (setTool && te instanceof ConstructionBlockTileEntity && ((ConstructionBlockTileEntity) te).getBlockState() != null) {
             setToolBlock(stack, ((ConstructionBlockTileEntity) te).getActualBlockState());
             setToolActualBlock(stack, ((ConstructionBlockTileEntity) te).getActualBlockState());
             return EnumActionResult.SUCCESS;
         }
-        if (setRemoteInventory(player, stack, pos, world.provider.getDimension(), world)) {
+        if (setRemoteInventory(player, stack, pos, world.provider.getDimension(), world))
             return EnumActionResult.SUCCESS;
-        }
 
         return EnumActionResult.FAIL;
     }
@@ -332,17 +332,30 @@ public class GadgetUtils {
         return false;
     }
 
+    public static void clearCachedRemoteInventory() {
+        remoteInventorySupplier = null;
+    }
+
     @Nullable
     public static IItemHandler getRemoteInventory(ItemStack tool, World world, EntityPlayer player) {
         return getRemoteInventory(tool, world, player, NetworkIO.Operation.EXTRACT);
     }
 
+    /**
+     * Call {@link clearCachedRemoteInventory clearCachedRemoteInventory} when done using this method
+     */
     @Nullable
     public static IItemHandler getRemoteInventory(ItemStack tool, World world, EntityPlayer player, NetworkIO.Operation operation) {
-        Integer dim = getDIMFromNBT(tool, "boundTE");
-        if (dim == null) return null;
-        BlockPos pos = getPOSFromNBT(tool, "boundTE");
-        return pos == null ? null : getRemoteInventory(pos, dim, world, player, operation);
+        if (remoteInventorySupplier == null) {
+            remoteInventorySupplier = Suppliers.memoizeWithExpiration(() -> {
+                Integer dim = getDIMFromNBT(tool, "boundTE");
+                System.out.println("fffff");
+                if (dim == null) return null;
+                BlockPos pos = getPOSFromNBT(tool, "boundTE");
+                return pos == null ? null : getRemoteInventory(pos, dim, world, player, operation);
+            }, 500, TimeUnit.MILLISECONDS);
+        }
+        return remoteInventorySupplier.get();
     }
 
     @Nullable

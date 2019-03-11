@@ -59,10 +59,12 @@ public class ClientProxy extends CommonProxy {
         }
         if (SyncedConfig.enablePaste) {
             ModItems.constructionPaste.initModel();
+            ModItems.constructionChunkDense.initModel();
             ModItems.constructionPasteContainer.initModel();
             ModItems.constructionPasteContainert2.initModel();
             ModItems.constructionPasteContainert3.initModel();
             ModItems.constructionPasteContainerCreative.initModel();
+            ModBlocks.constructionBlockDense.initModel();
             ModBlocks.constructionBlock.initModel();
             ModBlocks.constructionBlockPowder.initModel();
             ModelLoader.setCustomMeshDefinition(ModItems.constructionPasteContainer, new PasteContainerMeshDefinition());

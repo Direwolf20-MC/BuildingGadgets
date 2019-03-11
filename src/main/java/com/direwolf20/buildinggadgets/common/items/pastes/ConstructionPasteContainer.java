@@ -1,6 +1,5 @@
 package com.direwolf20.buildinggadgets.common.items.pastes;
 
-import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.tools.InventoryManipulation;
 import com.direwolf20.buildinggadgets.common.tools.NBTTool;
 import net.minecraft.client.renderer.block.model.ModelBakery;
@@ -25,12 +24,11 @@ public class ConstructionPasteContainer extends GenericPasteContainer {
     private IntSupplier maxCapacity;
 
     public ConstructionPasteContainer(String suffix, IntSupplier maxCapacity) {
+        super("constructionpastecontainer" + suffix);
         this.maxCapacity = maxCapacity;
-
-        setRegistryName("constructionpastecontainer" + suffix);
-        setUnlocalizedName(BuildingGadgets.MODID + ".constructionpastecontainer" + suffix);
     }
 
+    @Override
     @SideOnly(Side.CLIENT)
     public void initModel() {
         ModelBakery.registerItemVariants(this,

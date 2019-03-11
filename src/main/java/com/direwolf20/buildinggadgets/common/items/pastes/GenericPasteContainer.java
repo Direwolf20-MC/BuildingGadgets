@@ -1,15 +1,17 @@
 package com.direwolf20.buildinggadgets.common.items.pastes;
 
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
+import com.direwolf20.buildinggadgets.common.items.ItemModBase;
+
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.TextFormatting;
 
-public abstract class GenericPasteContainer extends Item {
+public abstract class GenericPasteContainer extends ItemModBase {
 
-    public GenericPasteContainer() {
-        setCreativeTab(BuildingGadgets.BUILDING_CREATIVE_TAB);
+    public GenericPasteContainer(String name) {
+        super(name);
         setMaxStackSize(1);
     }
 

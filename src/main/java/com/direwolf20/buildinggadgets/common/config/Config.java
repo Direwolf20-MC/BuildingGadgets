@@ -56,8 +56,20 @@ public class Config {
     @RequiresWorldRestart
     @Name("Enable Construction Paste")
     @Comment("Set to false to disable the recipe for construction paste.")
-    @LangKey(LANG_KEY_ROOT + ".enablePaste")
+    @LangKey(LANG_KEY_ROOT + ".paste.enabled")
     public static boolean enablePaste = true;
+
+    @RangeInt(min = 0)
+    @Name("Dense Construction Drop Count")
+    @Comment("The number of items (either paste or dense construction chunks) dropped by a dense construction block.")
+    @LangKey(LANG_KEY_ROOT + ".paste.dense_construction.drops.count")
+    public static int denseConstructionDropCount = 4;
+
+    @RangeDouble(min = 0.0, max = 1.0)
+    @Name("Dense Construction Chunk Fraction")
+    @Comment("Of the items dropped by a dense construction block, this fraction of them will be dense construction chunks (the remainder will be construction paste).")
+    @LangKey(LANG_KEY_ROOT + ".paste.dense_construction.drops.chunk_fraction")
+    public static double denseConstructionChunkFraction = 0.5;
 
     @RequiresMcRestart
     @RequiresWorldRestart

@@ -45,9 +45,7 @@ import java.util.*;
 public class GadgetDestruction extends GadgetGeneric {
 
     public GadgetDestruction() {
-        setRegistryName("destructiontool");
-        setUnlocalizedName(BuildingGadgets.MODID + ".destructiontool");
-        setMaxStackSize(1);
+        super("destructiontool");
         setMaxDamage(SyncedConfig.durabilityDestruction);
     }
 

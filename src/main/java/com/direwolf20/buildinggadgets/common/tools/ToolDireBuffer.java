@@ -15,6 +15,10 @@ import java.nio.*;
 import java.util.Arrays;
 import java.util.BitSet;
 
+/**
+ * This class differs from {@link BufferBuilder BufferBuilder} only in that the Comparator arguments of {@link Arrays#sort(Integer[], Comparator) Arrays#sort}
+ * are compared in reverse order in {@link ToolDireBuffer#sortVertexData sortVertexData}
+ */
 public class ToolDireBuffer extends BufferBuilder {
 
     private static final Logger LOGGER = LogManager.getLogger();

@@ -1,21 +1,17 @@
 package com.direwolf20.buildinggadgets.common.blocks;
 
-import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.entities.ConstructionBlockEntity;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockFalling;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -26,15 +22,12 @@ public class ConstructionBlockPowder extends BlockFalling {
 
     public ConstructionBlockPowder() {
         super(Material.SAND);
-        setHardness(0.5f);
-        setUnlocalizedName(BuildingGadgets.MODID + ".constructionblockpowder");     // Used for localization (en_US.lang)
-        setRegistryName("constructionblockpowder");        // The unique name (within your mod) that identifies this block
-        setCreativeTab(BuildingGadgets.BUILDING_CREATIVE_TAB);
+        BlockModBase.init(this, 0.5F, "constructionblockpowder");
     }
 
     @SideOnly(Side.CLIENT)
     public void initModel() {
-        ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(this), 0, new ModelResourceLocation(getRegistryName(), "inventory"));
+        BlockModBase.initModel(this);
     }
 
     @Override

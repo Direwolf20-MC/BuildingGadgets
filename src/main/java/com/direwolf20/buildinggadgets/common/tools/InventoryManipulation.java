@@ -95,6 +95,9 @@ public class InventoryManipulation {
         return success;
     }
 
+    /**
+     * Call {@link GadgetUtils#clearCachedRemoteInventory GadgetUtils#clearCachedRemoteInventory} when done using this method
+     */
     public static boolean useItem(ItemStack itemStack, EntityPlayer player, int count, World world) {
         if (player.capabilities.isCreativeMode) {
             return true;
@@ -145,6 +148,9 @@ public class InventoryManipulation {
         int countItem(ItemStack tool, ItemStack stack);
     }
 
+    /**
+     * Call {@link GadgetUtils#clearCachedRemoteInventory GadgetUtils#clearCachedRemoteInventory} when done using this method
+     */
     public static int countItem(ItemStack itemStack, EntityPlayer player, World world) {
         return countItem(itemStack, player, (tool, stack) -> {
             IItemHandler remoteInventory = GadgetUtils.getRemoteInventory(tool, world, player);

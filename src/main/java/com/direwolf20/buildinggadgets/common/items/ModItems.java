@@ -5,9 +5,11 @@ import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetBuilding;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetDestruction;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetExchanger;
+import com.direwolf20.buildinggadgets.common.items.pastes.ConstructionChunkDense;
 import com.direwolf20.buildinggadgets.common.items.pastes.ConstructionPaste;
 import com.direwolf20.buildinggadgets.common.items.pastes.ConstructionPasteContainer;
 import com.direwolf20.buildinggadgets.common.items.pastes.ConstructionPasteContainerCreative;
+
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
 @GameRegistry.ObjectHolder(BuildingGadgets.MODID)
@@ -20,6 +22,9 @@ public class ModItems {
 
     @GameRegistry.ObjectHolder("constructionpaste")
     public static ConstructionPaste constructionPaste;
+
+    @GameRegistry.ObjectHolder("construction_chunk_dense")
+    public static ConstructionChunkDense constructionChunkDense;
 
     @GameRegistry.ObjectHolder("constructionpastecontainer")
     public static ConstructionPasteContainer constructionPasteContainer;

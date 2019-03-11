@@ -42,7 +42,7 @@ public abstract class NetworkIO<P extends NetworkIO.IStackProvider> implements I
     }
 
     @Nullable
-    public abstract ItemStack insertItemInternal(ItemStack stack, boolean simulate);
+    protected abstract ItemStack insertItemInternal(ItemStack stack, boolean simulate);
 
     @Override
     @Nonnull
@@ -50,13 +50,16 @@ public abstract class NetworkIO<P extends NetworkIO.IStackProvider> implements I
         return getNonNullStack(insertItemInternal(stack, simulate));
     }
 
-    @Nullable
-    public abstract ItemStack extractItemInternal(int slot, int amount, boolean simulate);
+    @Nonnull
+    protected abstract IStackProvider extractItemInternal(P stackProvider, int amount, boolean simulate);
 
     @Override
     @Nonnull
     public ItemStack extractItem(int slot, int amount, boolean simulate) {
-        return getNonNullStack(extractItemInternal(slot, amount, simulate));
+        P stackProvider = getStackProviderInSlot(slot);
+        IStackProvider result = extractItemInternal(stackProvider, amount, simulate);
+        stackProvider.shrinkStack(amount);
+        return getNonNullStack(result.getStack());
     }
 
     @Nonnull
@@ -72,6 +75,9 @@ public abstract class NetworkIO<P extends NetworkIO.IStackProvider> implements I
     public static interface IStackProvider {
         @Nonnull
         ItemStack getStack();
+
+        @Nonnull
+        void shrinkStack(int amount);
     }
 
     public static class StackProviderVanilla implements IStackProvider {
@@ -86,6 +92,11 @@ public abstract class NetworkIO<P extends NetworkIO.IStackProvider> implements I
         @Nonnull
         public ItemStack getStack() {
             return stack;
+        }
+
+        @Override
+        public void shrinkStack(int amount) {
+            stack.grow(-amount);
         }
     }
 }

@@ -16,6 +16,8 @@ public class ModBlocks {
     public static EffectBlock effectBlock;
     @GameRegistry.ObjectHolder("constructionblock")
     public static ConstructionBlock constructionBlock;
+    @GameRegistry.ObjectHolder("constructionblock_dense")
+    public static ConstructionBlockDense constructionBlockDense;
     @GameRegistry.ObjectHolder("constructionblockpowder")
     public static ConstructionBlockPowder constructionBlockPowder;
     @GameRegistry.ObjectHolder("templatemanager")

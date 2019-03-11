@@ -1,6 +1,5 @@
 package com.direwolf20.buildinggadgets.common.items.gadgets;
 
-import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.common.items.FakeBuilderWorld;
@@ -44,9 +43,7 @@ public class GadgetExchanger extends GadgetGeneric {
     private static final FakeBuilderWorld fakeWorld = new FakeBuilderWorld();
 
     public GadgetExchanger() {
-        setRegistryName("exchangertool");
-        setUnlocalizedName(BuildingGadgets.MODID + ".exchangertool");
-        setMaxStackSize(1);
+        super("exchangertool");
         setMaxDamage(SyncedConfig.durabilityExchanger);
     }
 
@@ -192,6 +189,7 @@ public class GadgetExchanger extends GadgetGeneric {
                 //state = state.getBlock().getExtendedState(state, fakeWorld, coordinate);
                 exchangeBlock(world, player, coordinate, state);
             }
+            GadgetUtils.clearCachedRemoteInventory();
         }
         return true;
     }

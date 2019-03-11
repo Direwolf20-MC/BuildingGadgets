@@ -2,15 +2,15 @@
   "result": {
     "item": "buildinggadgets:constructionblockpowder"
   },
-  "type": "minecraft:crafting_shapeless",
+  "type": "forge:ore_shapeless",
   "ingredients": [
     {
       "item": "minecraft:sand",
       "data": 0
     },
     {
-      "item": "minecraft:dye",
-      "data": 4
+      "type": "forge:ore_dict",
+      "ore": "gemLapis"
     },
     {
       "item": "minecraft:clay_ball"

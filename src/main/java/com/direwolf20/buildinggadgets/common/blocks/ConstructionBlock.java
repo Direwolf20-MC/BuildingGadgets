@@ -1,11 +1,9 @@
 package com.direwolf20.buildinggadgets.common.blocks;
 
-import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.blocks.Models.BlockstateProperty;
 import com.direwolf20.buildinggadgets.common.blocks.Models.ConstructionBakedModel;
 import com.direwolf20.buildinggadgets.common.items.FakeRenderWorld;
 import com.direwolf20.buildinggadgets.common.items.ModItems;
-import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyBool;
@@ -41,7 +39,7 @@ import java.util.List;
 import java.util.Random;
 
 @Optional.Interface(iface = "team.chisel.ctm.api.IFacade", modid = "ctm-api")
-public class ConstructionBlock extends Block implements IFacade {
+public class ConstructionBlock extends BlockModBase implements IFacade {
 
     //public static final ConstructionProperty FACADEID = new ConstructionProperty("facadeid");
     public static final PropertyBool BRIGHT = PropertyBool.create("bright");
@@ -51,17 +49,14 @@ public class ConstructionBlock extends Block implements IFacade {
     public static final IUnlistedProperty<IBlockState> FACADE_EXT_STATE = new BlockstateProperty("facadeextstate");
 
     public ConstructionBlock() {
-        super(Material.ROCK);
-        setHardness(2.0f);
-        setCreativeTab(BuildingGadgets.BUILDING_CREATIVE_TAB);
-        setUnlocalizedName(BuildingGadgets.MODID + ".constructionblock");     // Used for localization (en_US.lang)
-        setRegistryName("constructionblock");        // The unique name (within your mod) that identifies this block
+        super(Material.ROCK, 2F, "constructionblock");
         setDefaultState(blockState.getBaseState().withProperty(BRIGHT, true).withProperty(NEIGHBOR_BRIGHTNESS, false));
     }
 
+    @Override
     @SideOnly(Side.CLIENT)
     public void initModel() {
-        ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(this), 0, new ModelResourceLocation(getRegistryName(), "inventory"));
+        super.initModel();
         StateMapperBase ignoreState = new StateMapperBase() {
             @Override
             protected ModelResourceLocation getModelResourceLocation(IBlockState iBlockState) {

@@ -25,7 +25,7 @@ public class VerticalWallMode extends AbstractMode implements IAtopSupport {
         int range = GadgetUtils.getToolRange(tool);
         if (sideHit.getAxis().isVertical())
             return Wall.extendingFrom(hit, sideHit, player.getHorizontalFacing(), range);
-        return Wall.clickedSide(hit, sideHit, range);
+        return Wall.clickedSide(hit.offset(sideHit), sideHit, range);
     }
 
     @Override

@@ -25,7 +25,7 @@ public class BuildingVerticalColumnMode extends AbstractMode implements IAtopSup
         int range = GadgetUtils.getToolRange(tool);
         if (sideHit.getAxis().isVertical())
             return Column.extendFrom(hit, sideHit, range);
-        return Column.centerAt(hit, EnumFacing.Axis.Y, range);
+        return Column.centerAt(hit.offset(sideHit), EnumFacing.Axis.Y, range);
     }
 
     @Override
