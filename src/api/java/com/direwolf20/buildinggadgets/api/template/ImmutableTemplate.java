@@ -49,9 +49,8 @@ public final class ImmutableTemplate implements ITemplate {
     }
 
     @Override
-    public boolean translateTo(BlockPos pos) {
-        APIProxy.LOG.trace("Attempted to translate ImmutableTemplate at {} to position {}. As an ImmutableTemplate may not be modified this is ignored.", translation, pos);
-        return false;
+    public ImmutableTemplate translateTo(BlockPos pos) {
+        return new ImmutableTemplate(pos, posToStateId, idToData, requiredItems);
     }
 
     /**
@@ -74,7 +73,8 @@ public final class ImmutableTemplate implements ITemplate {
         return requiredItems;
     }
 
-    ImmutableTemplate withTranslation(BlockPos pos) {
-        return new ImmutableTemplate(pos, posToStateId, idToData, requiredItems);
+    @Override
+    public int estimateSize() {
+        return 0;
     }
 }

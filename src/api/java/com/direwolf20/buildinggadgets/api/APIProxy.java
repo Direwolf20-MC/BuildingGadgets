@@ -1,6 +1,7 @@
 package com.direwolf20.buildinggadgets.api;
 
 import com.direwolf20.buildinggadgets.api.abstraction.IApiConfig;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import net.minecraftforge.eventbus.api.IEventBus;
 import org.apache.logging.log4j.LogManager;
@@ -15,6 +16,11 @@ public enum APIProxy {
 
     public APIProxy onCreate(IEventBus modEventbus, IEventBus forgeEventbus, IApiConfig config) {
         Preconditions.checkState(this.modEventbus == null && this.forgeEventbus == null && this.config == null);
+        return createState(modEventbus,forgeEventbus,config);
+    }
+
+    @VisibleForTesting
+    APIProxy createState(IEventBus modEventbus, IEventBus forgeEventbus, IApiConfig config) {
         this.modEventbus = modEventbus;
         this.forgeEventbus = forgeEventbus;
         this.config = config;

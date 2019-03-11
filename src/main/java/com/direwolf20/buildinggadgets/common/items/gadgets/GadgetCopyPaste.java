@@ -19,6 +19,7 @@ import com.direwolf20.buildinggadgets.common.utils.blocks.BlockMap;
 import com.direwolf20.buildinggadgets.common.utils.blocks.BlockMapIntState;
 import com.direwolf20.buildinggadgets.common.utils.helpers.InventoryHelper;
 import com.direwolf20.buildinggadgets.common.utils.helpers.VectorHelper;
+import com.direwolf20.buildinggadgets.common.utils.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.world.WorldSave;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
@@ -56,7 +57,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
+public class GadgetCopyPaste extends GadgetPlacing implements ITemplate {
 
     public enum ToolMode {
         Copy, Paste;
@@ -92,39 +93,38 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
     }
 
     private static void setAnchor(ItemStack stack, BlockPos anchorPos) {
-        GadgetUtils.writePOSToNBT(stack, anchorPos, "anchor");
+        GadgetUtils.writePOSToNBT(stack, anchorPos, NBTKeys.GADGET_ANCHOR);
     }
 
     public static void setX(ItemStack stack, int horz) {
-        GadgetUtils.writeIntToNBT(stack, horz, "X");
+        GadgetUtils.writeIntToNBT(stack, horz, NBTKeys.POSITION_X);
     }
 
     public static void setY(ItemStack stack, int vert) {
-        GadgetUtils.writeIntToNBT(stack, vert, "Y");
+        GadgetUtils.writeIntToNBT(stack, vert, NBTKeys.POSITION_Y);
     }
 
     public static void setZ(ItemStack stack, int depth) {
-        GadgetUtils.writeIntToNBT(stack, depth, "Z");
+        GadgetUtils.writeIntToNBT(stack, depth, NBTKeys.POSITION_Z);
     }
 
     public static int getX(ItemStack stack) {
-        return GadgetUtils.getIntFromNBT(stack, "X");
+        return GadgetUtils.getIntFromNBT(stack, NBTKeys.POSITION_X);
     }
 
     public static int getY(ItemStack stack) {
         NBTTagCompound tagCompound = stack.getTag();
         if (tagCompound == null) return 1;
-        if (!tagCompound.hasKey("Y")) return 1;
-        Integer tagInt = tagCompound.getInt("Y");
-        return tagInt;
+        if (! tagCompound.hasKey(NBTKeys.POSITION_Y)) return 1;
+        return tagCompound.getInt(NBTKeys.POSITION_Y);
     }
 
     public static int getZ(ItemStack stack) {
-        return GadgetUtils.getIntFromNBT(stack, "Z");
+        return GadgetUtils.getIntFromNBT(stack, NBTKeys.POSITION_Z);
     }
 
     public static BlockPos getAnchor(ItemStack stack) {
-        return GadgetUtils.getPOSFromNBT(stack, "anchor");
+        return GadgetUtils.getPOSFromNBT(stack, NBTKeys.GADGET_ANCHOR);
     }
 
     @Override
@@ -139,44 +139,34 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
         if (tagCompound == null) {
             return null;
         }
-        String uuid = tagCompound.getString("UUID");
+        String uuid = tagCompound.getString(NBTKeys.GADGET_UUID);
         if (uuid.isEmpty()) {
             if (getStartPos(stack) == null && getEndPos(stack) == null) {
                 return null;
             }
             UUID uid = UUID.randomUUID();
-            tagCompound.setString("UUID", uid.toString());
+            tagCompound.setString(NBTKeys.GADGET_UUID, uid.toString());
             stack.setTag(tagCompound);
             uuid = uid.toString();
         }
         return uuid;
     }
 
-    public static String getOwner(ItemStack stack) {//TODO unused
-        return GadgetUtils.getStackTag(stack).getString("owner");
-    }
-
-    public static void setOwner(ItemStack stack, String owner) {//TODO unused
-        NBTTagCompound tagCompound = GadgetUtils.getStackTag(stack);
-        tagCompound.setString("owner", owner);
-        stack.setTag(tagCompound);
-    }
-
     private static void setLastBuild(ItemStack stack, BlockPos anchorPos, DimensionType dim) {
-        GadgetUtils.writePOSToNBT(stack, anchorPos, "lastBuild", dim);
+        GadgetUtils.writePOSToNBT(stack, anchorPos, NBTKeys.GADGET_LAST_BUILD_POS, dim);
     }
 
     private static BlockPos getLastBuild(ItemStack stack) {
-        return GadgetUtils.getPOSFromNBT(stack, "lastBuild");
+        return GadgetUtils.getPOSFromNBT(stack, NBTKeys.GADGET_LAST_BUILD_POS);
     }
 
     @Nullable
     private static ResourceLocation getLastBuildDim(ItemStack stack) {
-        return GadgetUtils.getDIMFromNBT(stack, "lastBuild");
+        return GadgetUtils.getDIMFromNBT(stack, NBTKeys.GADGET_LAST_BUILD_DIM);
     }
 
     public static List<BlockMap> getBlockMapList(@Nullable NBTTagCompound tagCompound) {
-        return getBlockMapList(tagCompound, GadgetUtils.getPOSFromNBT(tagCompound, "startPos"));
+        return getBlockMapList(tagCompound, GadgetUtils.getPOSFromNBT(tagCompound, NBTKeys.GADGET_START_POS));
     }
 
     private static List<BlockMap> getBlockMapList(@Nullable NBTTagCompound tagCompound, BlockPos startBlock) {
@@ -184,14 +174,14 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
         if (tagCompound == null) {
             tagCompound = new NBTTagCompound();
         }
-        NBTTagList MapIntStateTag = (NBTTagList) tagCompound.getTag("mapIntState");
+        NBTTagList MapIntStateTag = (NBTTagList) tagCompound.getTag(NBTKeys.TEMPLATE_MAP_INT_STATE);
         if (MapIntStateTag == null) {
             MapIntStateTag = new NBTTagList();
         }
         BlockMapIntState MapIntState = new BlockMapIntState();
         MapIntState.getIntStateMapFromNBT(MapIntStateTag);
-        int[] posIntArray = tagCompound.getIntArray("posIntArray");
-        int[] stateIntArray = tagCompound.getIntArray("stateIntArray");
+        int[] posIntArray = tagCompound.getIntArray(NBTKeys.TEMPLATE_MAP_POS_INT);
+        int[] stateIntArray = tagCompound.getIntArray(NBTKeys.TEMPLATE_MAP_STATE_INT);
         for (int i = 0; i < posIntArray.length; i++) {
             int p = posIntArray[i];
             BlockPos pos = GadgetUtils.relIntToPos(startBlock, p);
@@ -205,11 +195,11 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
         if (tagCompound == null) {
             tagCompound = new NBTTagCompound();
         }
-        NBTTagList MapIntStateTag = (NBTTagList) tagCompound.getTag("mapIntState");
+        NBTTagList MapIntStateTag = (NBTTagList) tagCompound.getTag(NBTKeys.TEMPLATE_MAP_INT_STATE);
         if (MapIntStateTag == null) {
             MapIntStateTag = new NBTTagList();
         }
-        NBTTagList MapIntStackTag = (NBTTagList) tagCompound.getTag("mapIntStack");
+        NBTTagList MapIntStackTag = (NBTTagList) tagCompound.getTag(NBTKeys.TEMPLATE_MAP_INT_STACK);
         if (MapIntStackTag == null) {
             MapIntStackTag = new NBTTagList();
         }
@@ -224,7 +214,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
         if (tagCompound == null) {
             tagCompound = new NBTTagCompound();
         }
-        tagCompound.setString("mode", mode.name());
+        tagCompound.setString(NBTKeys.GADGET_MODE, mode.name());
         stack.setTag(tagCompound);
     }
 
@@ -236,7 +226,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
             return mode;
         }
         try {
-            mode = ToolMode.valueOf(tagCompound.getString("mode"));
+            mode = ToolMode.valueOf(tagCompound.getString(NBTKeys.GADGET_MODE));
         } catch (Exception e) {
             setToolMode(stack, mode);
         }
@@ -323,7 +313,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
             return;
         }
 
-        GadgetCopyPaste tool = (GadgetCopyPaste) BGItems.gadgetCopyPaste;
+        GadgetCopyPaste tool = BGItems.gadgetCopyPaste;
 
         List<BlockMap> blockMapList;
         WorldSave worldSave = WorldSave.getWorldSave(player.world);
@@ -354,12 +344,12 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
         }
         int[] posIntArray = posIntArrayList.stream().mapToInt(i -> i).toArray();
         int[] stateIntArray = stateIntArrayList.stream().mapToInt(i -> i).toArray();
-        tagCompound.setTag("mapIntState", blockMapIntState.putIntStateMapIntoNBT());
-        tagCompound.setTag("mapIntStack", blockMapIntState.putIntStackMapIntoNBT());
-        tagCompound.setIntArray("posIntArray", posIntArray);
-        tagCompound.setIntArray("stateIntArray", stateIntArray);
+        tagCompound.setTag(NBTKeys.TEMPLATE_MAP_INT_STATE, blockMapIntState.putIntStateMapIntoNBT());
+        tagCompound.setTag(NBTKeys.TEMPLATE_MAP_INT_STACK, blockMapIntState.putIntStackMapIntoNBT());
+        tagCompound.setIntArray(NBTKeys.TEMPLATE_MAP_POS_INT, posIntArray);
+        tagCompound.setIntArray(NBTKeys.TEMPLATE_MAP_STATE_INT, stateIntArray);
         tool.incrementCopyCounter(stack);
-        tagCompound.setInt("copycounter", tool.getCopyCounter(stack));
+        tagCompound.setInt(NBTKeys.TEMPLATE_COPY_COUNT, tool.getCopyCounter(stack));
         worldSave.addToMap(tool.getUUID(stack), tagCompound);
         worldSave.markForSaving();
         PacketHandler.sendTo(new PacketBlockMap(tagCompound), (EntityPlayerMP) player);
@@ -368,7 +358,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
 
     public static void copyBlocks(ItemStack stack, EntityPlayer player, World world, BlockPos startPos, BlockPos endPos) {
         if (startPos != null && endPos != null) {
-            GadgetCopyPaste tool = (GadgetCopyPaste) BGItems.gadgetCopyPaste;
+            GadgetCopyPaste tool = BGItems.gadgetCopyPaste;
             if (findBlocks(world, startPos, endPos, stack, player, tool)) {
                 tool.setStartPos(stack, startPos);
                 tool.setEndPos(stack, endPos);
@@ -455,20 +445,19 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
             }
         }
         tool.setItemCountMap(stack, itemCountMap);
-        tagCompound.setTag("mapIntState", blockMapIntState.putIntStateMapIntoNBT());
-        tagCompound.setTag("mapIntStack", blockMapIntState.putIntStackMapIntoNBT());
+        tagCompound.setTag(NBTKeys.TEMPLATE_MAP_INT_STATE, blockMapIntState.putIntStateMapIntoNBT());
+        tagCompound.setTag(NBTKeys.TEMPLATE_MAP_INT_STACK, blockMapIntState.putIntStackMapIntoNBT());
         int[] posIntArray = posIntArrayList.stream().mapToInt(i -> i).toArray();
         int[] stateIntArray = stateIntArrayList.stream().mapToInt(i -> i).toArray();
-        tagCompound.setIntArray("posIntArray", posIntArray);
-        tagCompound.setIntArray("stateIntArray", stateIntArray);
+        tagCompound.setIntArray(NBTKeys.TEMPLATE_MAP_POS_INT, posIntArray);
+        tagCompound.setIntArray(NBTKeys.TEMPLATE_MAP_STATE_INT, stateIntArray);
 
-        tagCompound.setTag("startPos", NBTUtil.writeBlockPos(start));
-        tagCompound.setTag("endPos", NBTUtil.writeBlockPos(end));
-        tagCompound.setString("dim", player.dimension.toString());
-        tagCompound.setString("UUID", tool.getUUID(stack));
-        tagCompound.setString("owner", player.getName().getString());
+        tagCompound.setTag(NBTKeys.GADGET_START_POS, NBTUtil.writeBlockPos(start));
+        tagCompound.setTag(NBTKeys.GADGET_END_POS, NBTUtil.writeBlockPos(end));
+        tagCompound.setString(NBTKeys.GADGET_DIM, player.dimension.toString());
+        tagCompound.setString(NBTKeys.GADGET_UUID, tool.getUUID(stack));
         tool.incrementCopyCounter(stack);
-        tagCompound.setInt("copycounter", tool.getCopyCounter(stack));
+        tagCompound.setInt(NBTKeys.TEMPLATE_COPY_COUNT, tool.getCopyCounter(stack));
 
         worldSave.addToMap(tool.getUUID(stack), tagCompound);
         worldSave.markForSaving();
@@ -519,7 +508,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
         if (heldItem.isEmpty())
             return;
 
-        if (((GadgetCopyPaste) BGItems.gadgetCopyPaste).getStartPos(heldItem) == null ||((GadgetCopyPaste) BGItems.gadgetCopyPaste).getEndPos(heldItem) == null)
+        if (BGItems.gadgetCopyPaste.getStartPos(heldItem) == null ||BGItems.gadgetCopyPaste.getEndPos(heldItem) == null)
             return;
 
         UniqueItem uniqueItem = IntStackMap.get(state);
@@ -588,7 +577,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
 
     public static void undoBuild(EntityPlayer player, ItemStack heldItem) {
 //        long time = System.nanoTime();
-        NBTTagCompound tagCompound = WorldSave.getWorldSave(player.world).getCompoundFromUUID(((GadgetCopyPaste) BGItems.gadgetCopyPaste).getUUID(heldItem));
+        NBTTagCompound tagCompound = WorldSave.getWorldSave(player.world).getCompoundFromUUID(BGItems.gadgetCopyPaste.getUUID(heldItem));
         World world = player.world;
         if (world.isRemote) {
             return;

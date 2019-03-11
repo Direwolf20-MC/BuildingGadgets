@@ -10,7 +10,6 @@ import com.direwolf20.buildinggadgets.client.gui.GuiButtonHelp;
 import com.direwolf20.buildinggadgets.client.gui.GuiButtonHelpText;
 import com.direwolf20.buildinggadgets.client.gui.IHoverHelpText;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
-import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketTemplateManagerLoad;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketTemplateManagerPaste;
@@ -187,11 +186,11 @@ public class TemplateManagerGUI extends GuiContainer {
 
         //float rotX = 165, rotY = 0, zoom = 1;
         if (!itemstack.isEmpty()) {
-            String UUID = ((GadgetCopyPaste) BGItems.gadgetCopyPaste).getUUID(itemstack);
+            String UUID = BGItems.gadgetCopyPaste.getUUID(itemstack);
             ToolBufferBuilder bufferBuilder = PasteToolBufferBuilder.getBufferFromMap(UUID);
             if (bufferBuilder != null) {
-                BlockPos startPos = ((GadgetCopyPaste) BGItems.gadgetCopyPaste).getStartPos(itemstack);
-                BlockPos endPos = ((GadgetCopyPaste) BGItems.gadgetCopyPaste).getEndPos(itemstack);
+                BlockPos startPos = BGItems.gadgetCopyPaste.getStartPos(itemstack);
+                BlockPos endPos = BGItems.gadgetCopyPaste.getEndPos(itemstack);
                 if (startPos == null || endPos == null) return;
                 double lengthX = Math.abs(startPos.getX() - endPos.getX());
                 double lengthY = Math.abs(startPos.getY() - endPos.getY());
@@ -222,7 +221,7 @@ public class TemplateManagerGUI extends GuiContainer {
                 GlStateManager.pushMatrix();
                 GlStateManager.loadIdentity();
                 //int scale = new ScaledResolution(mc).getScaleFactor();
-                Matrix4f.perspective(60, (float) panel.getWidth() / panel.getHeight(), 0.01F, 4000);
+                GlStateManager.multMatrixf(Matrix4f.perspective(60, (float) panel.getWidth() / panel.getHeight(), 0.01F, 4000));
                 GlStateManager.matrixMode(GL11.GL_MODELVIEW);
                 //GlStateManager.translate(-panel.getX() - panel.getWidth() / 2, -panel.getY() - panel.getHeight() / 2, 0);
                 GlStateManager.viewport((guiLeft + panel.getX()) * scale, mc.mainWindow.getFramebufferHeight() - (guiTop + panel.getY() + panel.getHeight()) * scale, panel.getWidth() * scale, panel.getHeight() * scale);
@@ -240,10 +239,10 @@ public class TemplateManagerGUI extends GuiContainer {
                 }
 
                 GlStateManager.translated((moveX) / 1.75, -Math.abs(startPos.getY() - endPos.getY()) / 1.75, 0);
-                GlStateManager.translated(panX, panY, 0);
+                GlStateManager.translated(panX, -panY, 0);
 //System.out.println(((startPos.getX() - endPos.getX()) / 2) * -1 + ":" + ((startPos.getY() - endPos.getY()) / 2) * -1 + ":" + ((startPos.getZ() - endPos.getZ()) / 2) * -1);
                 GlStateManager.translated(((startPos.getX() - endPos.getX()) / 2) * -1, ((startPos.getY() - endPos.getY()) / 2) * -1, ((startPos.getZ() - endPos.getZ()) / 2) * -1);
-                GlStateManager.rotatef(rotX, 1, 0, 0);
+                GlStateManager.rotatef(-rotX, 1, 0, 0);
                 GlStateManager.rotatef(rotY, 0, 1, 0);
                 GlStateManager.translated(((startPos.getX() - endPos.getX()) / 2), ((startPos.getY() - endPos.getY()) / 2), ((startPos.getZ() - endPos.getZ()) / 2));
 

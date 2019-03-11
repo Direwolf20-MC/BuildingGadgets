@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.common.config;
 
+import com.direwolf20.buildinggadgets.api.abstraction.IApiConfig;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.utils.ref.Reference;
 import com.google.common.collect.ImmutableList;
@@ -43,6 +44,9 @@ public class Config {
 
     private static final Builder SERVER_BUILDER = new Builder();
     private static final Builder CLIENT_BUILDER = new Builder();
+    private static final Builder API_BUILDER = new Builder();
+
+    public static final IApiConfig API = new ApiConfig();
 
     public static final CategoryGeneral GENERAL = new CategoryGeneral();
 
@@ -321,8 +325,8 @@ public class Config {
 
         private void parseBlacklists() {
             parsedBlacklist = PatternList.ofResourcePattern(blockBlacklist.get());
-            //TODO update once Forge allows trailing .'s
-            parsedWhitelist = PatternList.ofResourcePattern(ImmutableList.of(".*")/*blockWhitelist.get()*/);
+            //TODO fix once Forge fixes it's I don't sync leading/trailing .'s bug
+            parsedWhitelist = PatternList.ofResourcePattern(/*blockWhitelist.get()*/ ImmutableList.of(".*"));
         }
 
         public boolean isAllowedBlock(Block block) {
@@ -332,8 +336,13 @@ public class Config {
         }
     }
 
+    private static final class ApiConfig implements IApiConfig {
+
+    }
+
     public static final ForgeConfigSpec SERVER_CONFIG = SERVER_BUILDER.build();
     public static final ForgeConfigSpec CLIENT_CONFIG = CLIENT_BUILDER.build();
+    public static final ForgeConfigSpec API_CONFIG = API_BUILDER.build();
 
     public static void onLoad(final ModConfig.Loading configEvent) {
         BLACKLIST.parseBlacklists();

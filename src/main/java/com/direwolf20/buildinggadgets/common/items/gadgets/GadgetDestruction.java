@@ -9,6 +9,7 @@ import com.direwolf20.buildinggadgets.common.utils.CapabilityUtil.EnergyUtil;
 import com.direwolf20.buildinggadgets.common.utils.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.utils.blocks.BlockMapIntState;
 import com.direwolf20.buildinggadgets.common.utils.helpers.VectorHelper;
+import com.direwolf20.buildinggadgets.common.utils.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.world.WorldSave;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -44,7 +45,7 @@ import net.minecraftforge.event.world.BlockEvent;
 import javax.annotation.Nullable;
 import java.util.*;
 
-public class GadgetDestruction extends GadgetGeneric {
+public class GadgetDestruction extends GadgetSwapping {
 
     public GadgetDestruction(Properties builder) {
         super(builder.defaultMaxDamage(Config.GADGETS.GADGET_DESTRUCTION.durability.get()));
@@ -93,10 +94,10 @@ public class GadgetDestruction extends GadgetGeneric {
         if (tagCompound == null) {
             tagCompound = new NBTTagCompound();
         }
-        String uuid = tagCompound.getString("UUID");
+        String uuid = tagCompound.getString(NBTKeys.GADGET_UUID);
         if (uuid.isEmpty()) {
             UUID uid = UUID.randomUUID();
-            tagCompound.setString("UUID", uid.toString());
+            tagCompound.setString(NBTKeys.GADGET_UUID, uid.toString());
             stack.setTag(tagCompound);
             uuid = uid.toString();
         }
@@ -104,11 +105,11 @@ public class GadgetDestruction extends GadgetGeneric {
     }
 
     public static void setAnchor(ItemStack stack, BlockPos pos) {
-        GadgetUtils.writePOSToNBT(stack, pos, "anchor");
+        GadgetUtils.writePOSToNBT(stack, pos, NBTKeys.GADGET_ANCHOR);
     }
 
     public static BlockPos getAnchor(ItemStack stack) {
-        return GadgetUtils.getPOSFromNBT(stack, "anchor");
+        return GadgetUtils.getPOSFromNBT(stack, NBTKeys.GADGET_ANCHOR);
     }
 
     public static void setAnchorSide(ItemStack stack, EnumFacing side) {
@@ -117,13 +118,13 @@ public class GadgetDestruction extends GadgetGeneric {
             tagCompound = new NBTTagCompound();
         }
         if (side == null) {
-            if (tagCompound.getTag("anchorSide") != null) {
-                tagCompound.removeTag("anchorSide");
+            if (tagCompound.getTag(NBTKeys.GADGET_ANCHOR_SIDE) != null) {
+                tagCompound.removeTag(NBTKeys.GADGET_ANCHOR_SIDE);
                 stack.setTag(tagCompound);
             }
             return;
         }
-        tagCompound.setString("anchorSide", side.getName());
+        tagCompound.setString(NBTKeys.GADGET_ANCHOR_SIDE, side.getName());
         stack.setTag(tagCompound);
     }
 
@@ -132,7 +133,7 @@ public class GadgetDestruction extends GadgetGeneric {
         if (tagCompound == null) {
             return null;
         }
-        String facing = tagCompound.getString("anchorSide");
+        String facing = tagCompound.getString(NBTKeys.GADGET_ANCHOR_SIDE);
         if (facing.isEmpty()) return null;
         return EnumFacing.byName(facing);
     }
@@ -160,15 +161,15 @@ public class GadgetDestruction extends GadgetGeneric {
         NBTTagCompound tagCompound = stack.getTag();
         if (tagCompound == null) {
             tagCompound = new NBTTagCompound();
-            tagCompound.setBoolean("overlay", true);
-            tagCompound.setBoolean("fuzzy", true);
+            tagCompound.setBoolean(NBTKeys.GADGET_OVERLAY, true);
+            tagCompound.setBoolean(NBTKeys.GADGET_FUZZY, true);
             stack.setTag(tagCompound);
             return true;
         }
-        if (tagCompound.hasKey("overlay")) {
-            return tagCompound.getBoolean("overlay");
+        if (tagCompound.hasKey(NBTKeys.GADGET_OVERLAY)) {
+            return tagCompound.getBoolean(NBTKeys.GADGET_OVERLAY);
         }
-        tagCompound.setBoolean("overlay", true);
+        tagCompound.setBoolean(NBTKeys.GADGET_OVERLAY, true);
         stack.setTag(tagCompound);
         return true;
     }
@@ -178,7 +179,7 @@ public class GadgetDestruction extends GadgetGeneric {
         if (tagCompound == null) {
             tagCompound = new NBTTagCompound();
         }
-        tagCompound.setBoolean("overlay", showOverlay);
+        tagCompound.setBoolean(NBTKeys.GADGET_OVERLAY, showOverlay);
         stack.setTag(tagCompound);
     }
 
@@ -267,7 +268,7 @@ public class GadgetDestruction extends GadgetGeneric {
         List<EnumFacing> directions = assignDirections(side, player);
         IBlockState stateTarget = !Config.GADGETS.GADGET_DESTRUCTION.nonFuzzyEnabled.get() || GadgetGeneric.getFuzzy(stack) ? null : world.getBlockState(pos);
         if (GadgetGeneric.getConnectedArea(stack)) {
-            String[] directionNames = new String[] {"right", "left", "up", "down", "depth"};
+            String[] directionNames = NBTKeys.GADGET_VALUES;
             AxisAlignedBB area = new AxisAlignedBB(pos);
             for (int i = 0; i < directionNames.length; i++)
                 area = area.union(new AxisAlignedBB(pos.offset(directions.get(i), getToolValue(stack, directionNames[i]) - (i == 4 ? 1 : 0))));
@@ -275,10 +276,10 @@ public class GadgetDestruction extends GadgetGeneric {
             addConnectedCoords(world, player, startPos, stateTarget, voidPositions,
                     (int) area.minX, (int) area.minY, (int) area.minZ, (int) area.maxX - 1, (int) area.maxY - 1, (int) area.maxZ - 1);
         } else {
-            int left = -getToolValue(stack, "left");
-            int right = getToolValue(stack, "right");
-            int down = -getToolValue(stack, "down");
-            int up = getToolValue(stack, "up");
+            int left = - getToolValue(stack, NBTKeys.GADGET_VALUE_LEFT);
+            int right = getToolValue(stack, NBTKeys.GADGET_VALUE_RIGHT);
+            int down = - getToolValue(stack, NBTKeys.GADGET_VALUE_DOWN);
+            int up = getToolValue(stack, NBTKeys.GADGET_VALUE_UP);
             for (int d = 0; d < depth; d++) {
                 for (int x = left; x <= right; x++) {
                     for (int y = down; y <= up; y++) {
@@ -392,18 +393,19 @@ public class GadgetDestruction extends GadgetGeneric {
                 pasteStateArrayList.add((int) blockMapIntState.findSlot(pasteBlockState));
             }
         }
-        tagCompound.setTag("mapIntState", blockMapIntState.putIntStateMapIntoNBT());
+        tagCompound.setTag(NBTKeys.TEMPLATE_MAP_STATE_INT, blockMapIntState.putIntStateMapIntoNBT());
         int[] posIntArray = posIntArrayList.stream().mapToInt(i -> i).toArray();
         int[] stateIntArray = stateIntArrayList.stream().mapToInt(i -> i).toArray();
         int[] posPasteArray = pastePosArrayList.stream().mapToInt(i -> i).toArray();
         int[] statePasteArray = pasteStateArrayList.stream().mapToInt(i -> i).toArray();
-        tagCompound.setIntArray("posIntArray", posIntArray);
-        tagCompound.setIntArray("stateIntArray", stateIntArray);
-        tagCompound.setIntArray("posPasteArray", posPasteArray);
-        tagCompound.setIntArray("statePasteArray", statePasteArray);
-        tagCompound.setTag("startPos", NBTUtil.writeBlockPos(startBlock));
-        tagCompound.setString("dim", DimensionType.func_212678_a(player.dimension).toString());
-        tagCompound.setString("UUID", UUID);
+        tagCompound.setIntArray(NBTKeys.TEMPLATE_MAP_POS_INT, posIntArray);
+        tagCompound.setIntArray(NBTKeys.TEMPLATE_MAP_STATE_INT, stateIntArray);
+        tagCompound.setIntArray(NBTKeys.TEMPLATE_MAP_POS_PASTE, posPasteArray);
+        tagCompound.setIntArray(NBTKeys.TEMPLATE_MAP_STATE_PASTE, statePasteArray);
+        tagCompound.setTag(NBTKeys.GADGET_START_POS, NBTUtil.writeBlockPos(startBlock));
+        tagCompound.setString(NBTKeys.GADGET_DIM, DimensionType.func_212678_a(player.dimension)
+                .toString());
+        tagCompound.setString(NBTKeys.GADGET_UUID, UUID);
         worldSave.addToMap(UUID, tagCompound);
         worldSave.markForSaving();
     }
@@ -413,14 +415,14 @@ public class GadgetDestruction extends GadgetGeneric {
         WorldSave worldSave = WorldSave.getWorldSaveDestruction(world);
         NBTTagCompound tagCompound = worldSave.getCompoundFromUUID(getUUID(stack));
         if (tagCompound == null) return;
-        BlockPos startPos = NBTUtil.readBlockPos(tagCompound.getCompound("startPos"));
+        BlockPos startPos = NBTUtil.readBlockPos(tagCompound.getCompound(NBTKeys.GADGET_START_POS));
         if (startPos == null) return;
-        int[] posIntArray = tagCompound.getIntArray("posIntArray");
-        int[] stateIntArray = tagCompound.getIntArray("stateIntArray");
-        int[] posPasteArray = tagCompound.getIntArray("posPasteArray");
-        int[] statePasteArray = tagCompound.getIntArray("statePasteArray");
+        int[] posIntArray = tagCompound.getIntArray(NBTKeys.TEMPLATE_MAP_POS_INT);
+        int[] stateIntArray = tagCompound.getIntArray(NBTKeys.TEMPLATE_MAP_STATE_INT);
+        int[] posPasteArray = tagCompound.getIntArray(NBTKeys.TEMPLATE_MAP_POS_PASTE);
+        int[] statePasteArray = tagCompound.getIntArray(NBTKeys.TEMPLATE_MAP_STATE_PASTE);
 
-        NBTTagList MapIntStateTag = (NBTTagList) tagCompound.getTag("mapIntState");
+        NBTTagList MapIntStateTag = (NBTTagList) tagCompound.getTag(NBTKeys.TEMPLATE_MAP_INT_STATE);
         if (MapIntStateTag == null) {
             return;
         }

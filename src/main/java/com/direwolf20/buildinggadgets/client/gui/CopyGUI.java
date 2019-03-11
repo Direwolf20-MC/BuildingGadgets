@@ -6,7 +6,6 @@
 package com.direwolf20.buildinggadgets.client.gui;
 
 import com.direwolf20.buildinggadgets.common.config.Config;
-import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketCopyCoords;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
@@ -39,8 +38,8 @@ public class CopyGUI extends GuiScreenTextFields {
     public void initGui() {
         super.initGui();
 
-        startPos = ((GadgetCopyPaste) BGItems.gadgetCopyPaste).getStartPos(copyPasteTool);
-        endPos = ((GadgetCopyPaste) BGItems.gadgetCopyPaste).getEndPos(copyPasteTool);
+        startPos = BGItems.gadgetCopyPaste.getStartPos(copyPasteTool);
+        endPos = BGItems.gadgetCopyPaste.getEndPos(copyPasteTool);
 
         if (startPos == null) startPos = new BlockPos(0, 0, 0);
         if (endPos == null) endPos = new BlockPos(0, 0, 0);

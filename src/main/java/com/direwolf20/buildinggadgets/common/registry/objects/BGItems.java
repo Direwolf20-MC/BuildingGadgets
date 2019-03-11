@@ -27,31 +27,31 @@ public final class BGItems {
     private static final RegistryContainer<Item, RegistryObjectBuilder<Item, Item.Properties>> container = new RegistryContainer<>();
     // Gadgets
     @ObjectHolder(ItemReference.GADGET_BUILDING)
-    public static Item gadgetBuilding;
+    public static GadgetBuilding gadgetBuilding;
     @ObjectHolder(ItemReference.GADGET_COPY_PASTE)
-    public static Item gadgetCopyPaste;
+    public static GadgetCopyPaste gadgetCopyPaste;
     @ObjectHolder(ItemReference.GADGET_EXCHANGING)
-    public static Item gadgetExchanger;
+    public static GadgetExchanger gadgetExchanger;
     @ObjectHolder(ItemReference.GADGET_DESTRUCTION)
-    public static Item gadgetDestruction;
+    public static GadgetDestruction gadgetDestruction;
 
     // Building Items
     @ObjectHolder(ItemReference.CONSTRUCTION_PASTE)
-    public static Item constructionPaste;
+    public static ConstructionPaste constructionPaste;
     @ObjectHolder(ItemReference.CONSTRUCTION_CHUNK_DENSE)
     public static Item constructionChunkDense;
     @ObjectHolder(ItemReference.TEMPLATE)
-    public static Item template;
+    public static Template template;
 
     // Construction Paste Containers
     @ObjectHolder(ItemReference.PASTE_CONTAINER_T1)
-    public static Item ConstructionPasteContainer;
+    public static ConstructionPaste ConstructionPasteContainer;
     @ObjectHolder(ItemReference.PASTE_CONTAINER_T2)
-    public static Item ConstructionPasteContainer2;
+    public static ConstructionPaste ConstructionPasteContainer2;
     @ObjectHolder(ItemReference.PASTE_CONTAINER_T3)
-    public static Item ConstructionPasteContainer3;
+    public static ConstructionPaste ConstructionPasteContainer3;
     @ObjectHolder(ItemReference.PASTE_CONTAINER_CREATIVE)
-    public static Item CreativeConstructionPasteContainer;
+    public static ConstructionPasteContainerCreative CreativeConstructionPasteContainer;
 
     static void init() {
         container.add(new RegistryObjectBuilder<Item, Item.Properties>(ItemReference.GADGET_EXCHANGING_RL).builder(itemProperties()).factory(GadgetExchanger::new));

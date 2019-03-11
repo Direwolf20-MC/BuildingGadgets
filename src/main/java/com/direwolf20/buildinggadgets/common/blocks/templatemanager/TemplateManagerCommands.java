@@ -55,7 +55,7 @@ public class TemplateManagerCommands {
         BlockPos startPos = template.getStartPos(itemStack1);
         BlockPos endPos = template.getEndPos(itemStack1);
         Multiset<UniqueItem> tagMap = template.getItemCountMap(itemStack1);
-        String UUIDTemplate = ((Template) BGItems.template).getUUID(itemStack1);
+        String UUIDTemplate = BGItems.template.getUUID(itemStack1);
         if (UUIDTemplate == null) return;
 
         WorldSave worldSave = WorldSave.getWorldSave(world);
@@ -112,7 +112,7 @@ public class TemplateManagerCommands {
         NBTTagCompound templateTagCompound;
 
         String UUID = template.getUUID(itemStack0);
-        String UUIDTemplate = ((Template) BGItems.template).getUUID(templateStack);
+        String UUIDTemplate = BGItems.template.getUUID(templateStack);
         if (UUID == null) return;
         if (UUIDTemplate == null) return;
 
@@ -121,7 +121,7 @@ public class TemplateManagerCommands {
         templateTagCompound = tagCompound.copy();
         template.incrementCopyCounter(templateStack);
         templateTagCompound.setInt("copycounter", template.getCopyCounter(templateStack));
-        templateTagCompound.setString("UUID", ((Template) BGItems.template).getUUID(templateStack));
+        templateTagCompound.setString("UUID", BGItems.template.getUUID(templateStack));
 
         templateWorldSave.addToMap(UUIDTemplate, templateTagCompound);
         BlockPos startPos = template.getStartPos(itemStack0);
@@ -160,7 +160,7 @@ public class TemplateManagerCommands {
         templateStack = container.getSlot(1).getStack();
 
         WorldSave templateWorldSave = WorldSave.getTemplateWorldSave(world);
-        Template template = (Template) BGItems.template;
+        Template template = BGItems.template;
         String UUIDTemplate = template.getUUID(templateStack);
         if (UUIDTemplate == null) return;
 
@@ -222,8 +222,8 @@ public class TemplateManagerCommands {
 
     public static void copyTemplate(TemplateManagerContainer container) {
         ItemStack itemStack0 = container.getSlot(0).getStack();
-        if (itemStack0.getItem() instanceof GadgetCopyPaste) {
-            NBTTagCompound tagCompound = PasteToolBufferBuilder.getTagFromUUID(((GadgetCopyPaste) BGItems.gadgetCopyPaste).getUUID(itemStack0));
+        if (itemStack0.getItem() instanceof ITemplate) {
+            NBTTagCompound tagCompound = PasteToolBufferBuilder.getTagFromUUID(BGItems.gadgetCopyPaste.getUUID(itemStack0));
             if (tagCompound == null) {
                 Minecraft.getInstance().player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.copyfailed").getUnformattedComponentText()), false);
                 return;

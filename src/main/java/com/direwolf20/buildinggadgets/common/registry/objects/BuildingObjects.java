@@ -1,6 +1,5 @@
 package com.direwolf20.buildinggadgets.common.registry.objects;
 
-import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlock;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.utils.ref.Reference;
 import net.minecraft.block.material.Material;
@@ -32,7 +31,7 @@ public class BuildingObjects {
     public static void initColorHandlers() { //TODO ItemBlock Creative Tabs
         BlockColors blockColors = Minecraft.getInstance().getBlockColors();
         //TODO non conditional registry
-        if (Config.GENERAL.enablePaste.get()) ((ConstructionBlock) BGBlocks.constructionBlock).initColorHandler(blockColors);
+        if (Config.GENERAL.enablePaste.get()) BGBlocks.constructionBlock.initColorHandler(blockColors);
     }
 
     public static void init() {

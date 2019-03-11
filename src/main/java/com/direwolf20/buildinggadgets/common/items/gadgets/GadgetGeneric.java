@@ -5,6 +5,7 @@ import com.direwolf20.buildinggadgets.common.items.capability.CapabilityProvider
 import com.direwolf20.buildinggadgets.common.utils.CapabilityUtil.EnergyUtil;
 import com.direwolf20.buildinggadgets.common.utils.exceptions.CapabilityNotPresentException;
 import com.direwolf20.buildinggadgets.common.utils.helpers.NBTHelper;
+import com.direwolf20.buildinggadgets.common.utils.ref.NBTKeys;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
@@ -17,7 +18,6 @@ import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
 
@@ -81,7 +81,8 @@ public abstract class GadgetGeneric extends Item {
 
     @Override
     public boolean showDurabilityBar(ItemStack stack) {
-        if (stack.hasTag() && stack.getTag().contains("creative", Constants.NBT.TAG_BYTE))
+        if (stack.hasTag() && stack.getTag()
+                .hasKey(NBTKeys.CREATIVE_MARKER))
             return false;
 
         return EnergyUtil.returnBooleanIfPresent(stack,
@@ -132,30 +133,36 @@ public abstract class GadgetGeneric extends Item {
     }
 
     public static boolean getFuzzy(ItemStack stack) {
-        return NBTHelper.getOrNewTag(stack).getBoolean("fuzzy");
+        return NBTHelper.getOrNewTag(stack)
+                .getBoolean(NBTKeys.GADGET_FUZZY);
     }
 
     public static void toggleFuzzy(EntityPlayer player, ItemStack stack) {
-        NBTHelper.getOrNewTag(stack).setBoolean("fuzzy", !getFuzzy(stack));
+        NBTHelper.getOrNewTag(stack)
+                .setBoolean(NBTKeys.GADGET_FUZZY, ! getFuzzy(stack));
         player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.fuzzymode").getUnformattedComponentText() + ": " + getFuzzy(stack)), true);
     }
 
     public static boolean getConnectedArea(ItemStack stack) {
-        return !NBTHelper.getOrNewTag(stack).getBoolean("unconnectedarea");
+        return NBTHelper.getOrNewTag(stack)
+                .getBoolean(NBTKeys.GADGET_CONNECTED_AREA);
     }
 
     public static void toggleConnectedArea(EntityPlayer player, ItemStack stack) {
-        NBTHelper.getOrNewTag(stack).setBoolean("unconnectedarea", getConnectedArea(stack));
+        NBTHelper.getOrNewTag(stack)
+                .setBoolean(NBTKeys.GADGET_CONNECTED_AREA, ! getConnectedArea(stack));
         String suffix = stack.getItem() instanceof GadgetDestruction ? "area" : "surface";
         player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.connected" + suffix).getUnformattedComponentText() + ": " + getConnectedArea(stack)), true);
     }
 
     public static boolean shouldRayTraceFluid(ItemStack stack) {
-        return NBTHelper.getOrNewTag(stack).getBoolean("raytrace_fluid");
+        return NBTHelper.getOrNewTag(stack)
+                .getBoolean(NBTKeys.GADGET_RAYTRACE_FLUID);
     }
 
     public static void toggleRayTraceFluid(EntityPlayer player, ItemStack stack) {
-        NBTHelper.getOrNewTag(stack).setBoolean("raytrace_fluid", !shouldRayTraceFluid(stack));
+        NBTHelper.getOrNewTag(stack)
+                .setBoolean(NBTKeys.GADGET_RAYTRACE_FLUID, ! shouldRayTraceFluid(stack));
         player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.raytrace_fluid").getUnformattedComponentText() + ": " + shouldRayTraceFluid(stack)), true);
     }
 

@@ -33,9 +33,9 @@ public class MutableTemplate implements ITemplate {
     }
 
     @Override
-    public boolean translateTo(BlockPos pos) {
-        delegate = delegate.withTranslation(pos);
-        return true;
+    public MutableTemplate translateTo(BlockPos pos) {
+        delegate = delegate.translateTo(pos);
+        return this;
     }
 
     /**
@@ -60,12 +60,13 @@ public class MutableTemplate implements ITemplate {
         return delegate.getRequiredItems();
     }
 
-    public ImmutableTemplate withTranslation(BlockPos pos) {
-        return delegate.withTranslation(pos);
-    }
-
     @Override
     public Spliterator<PlacementTarget> spliterator() {
         return delegate.spliterator();
+    }
+
+    @Override
+    public int estimateSize() {
+        return delegate.estimateSize();
     }
 }

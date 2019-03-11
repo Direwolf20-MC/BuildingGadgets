@@ -8,6 +8,7 @@ import com.direwolf20.buildinggadgets.common.tools.modes.ExchangingModes;
 import com.direwolf20.buildinggadgets.common.utils.CapabilityUtil.EnergyUtil;
 import com.direwolf20.buildinggadgets.common.utils.helpers.InventoryHelper;
 import com.direwolf20.buildinggadgets.common.utils.helpers.VectorHelper;
+import com.direwolf20.buildinggadgets.common.utils.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.world.FakeBuilderWorld;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
@@ -43,7 +44,7 @@ import java.util.Set;
 
 import static com.direwolf20.buildinggadgets.common.utils.GadgetUtils.*;
 
-public class GadgetExchanger extends GadgetGeneric {
+public class GadgetExchanger extends GadgetSwapping {
     private static final FakeBuilderWorld fakeWorld = new FakeBuilderWorld();
 
     public enum ToolMode {
@@ -115,7 +116,7 @@ public class GadgetExchanger extends GadgetGeneric {
         if (tagCompound == null) {
             tagCompound = new NBTTagCompound();
         }
-        tagCompound.setString("mode", mode.name());
+        tagCompound.setString(NBTKeys.GADGET_MODE, mode.name());
         stack.setTag(tagCompound);
     }
 
@@ -127,7 +128,7 @@ public class GadgetExchanger extends GadgetGeneric {
             return mode;
         }
         try {
-            mode = ToolMode.valueOf(tagCompound.getString("mode"));
+            mode = ToolMode.valueOf(tagCompound.getString(NBTKeys.GADGET_MODE));
         } catch (Exception e) {
             setToolMode(stack, mode);
         }

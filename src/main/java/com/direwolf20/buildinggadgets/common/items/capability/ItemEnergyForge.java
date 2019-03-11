@@ -33,8 +33,7 @@ public final class ItemEnergyForge implements IEnergyStorage {
 
     @Override
     public int receiveEnergy(int maxReceive, boolean simulate) {
-        updateEnergy();
-        int energyReceived = Math.min(getMaxEnergyStored() - getEnergyStoredCache(), maxReceive);
+        int energyReceived = Math.min(getMaxEnergyStored() - getEnergyStored(), maxReceive);
         if (!simulate) {
             energy += energyReceived;
             writeEnergy();
@@ -44,8 +43,7 @@ public final class ItemEnergyForge implements IEnergyStorage {
 
     @Override
     public int extractEnergy(int maxExtract, boolean simulate) {
-        updateEnergy();
-        int energyExtracted = Math.min(getEnergyStoredCache(), maxExtract);
+        int energyExtracted = Math.min(getEnergyStored(), maxExtract);
         if (!simulate) {
             energy -= energyExtracted;
             writeEnergy();

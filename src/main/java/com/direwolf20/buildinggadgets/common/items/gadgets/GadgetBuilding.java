@@ -12,6 +12,7 @@ import com.direwolf20.buildinggadgets.common.utils.helpers.InventoryHelper;
 import com.direwolf20.buildinggadgets.common.utils.helpers.NBTHelper;
 import com.direwolf20.buildinggadgets.common.utils.helpers.SortingHelper;
 import com.direwolf20.buildinggadgets.common.utils.helpers.VectorHelper;
+import com.direwolf20.buildinggadgets.common.utils.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.world.FakeBuilderWorld;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
@@ -44,8 +45,7 @@ import java.util.Set;
 
 import static com.direwolf20.buildinggadgets.common.utils.GadgetUtils.*;
 
-
-public class GadgetBuilding extends GadgetGeneric {
+public class GadgetBuilding extends GadgetPlacing {
     private static final FakeBuilderWorld fakeWorld = new FakeBuilderWorld();
 
     public enum ToolMode {
@@ -92,7 +92,7 @@ public class GadgetBuilding extends GadgetGeneric {
         if (tagCompound == null) {
             tagCompound = new NBTTagCompound();
         }
-        tagCompound.setString("mode", mode.name());
+        tagCompound.setString(NBTKeys.GADGET_MODE, mode.name());
         stack.setTag(tagCompound);
     }
 
@@ -104,7 +104,7 @@ public class GadgetBuilding extends GadgetGeneric {
             return mode;
         }
         try {
-            mode = ToolMode.valueOf(tagCompound.getString("mode"));
+            mode = ToolMode.valueOf(tagCompound.getString(NBTKeys.GADGET_MODE));
         } catch (Exception e) {
             setToolMode(stack, mode);
         }
@@ -112,11 +112,13 @@ public class GadgetBuilding extends GadgetGeneric {
     }
 
     public static boolean shouldPlaceAtop(ItemStack stack) {
-        return !NBTHelper.getOrNewTag(stack).getBoolean("start_inside");
+        return ! NBTHelper.getOrNewTag(stack)
+                .getBoolean(NBTKeys.GADGET_PLACE_INSIDE);
     }
 
     public static void togglePlaceAtop(EntityPlayer player, ItemStack stack) {
-        NBTHelper.getOrNewTag(stack).setBoolean("start_inside", shouldPlaceAtop(stack));
+        NBTHelper.getOrNewTag(stack)
+                .setBoolean(NBTKeys.GADGET_PLACE_INSIDE, shouldPlaceAtop(stack));
         String prefix = "message.gadget.building.placement";
         player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation(prefix, new TextComponentTranslation(prefix + (shouldPlaceAtop(stack) ? ".atop" : ".inside"))).getUnformattedComponentText()), true);
     }

@@ -4,11 +4,10 @@ import com.direwolf20.buildinggadgets.api.APIProxy;
 import com.direwolf20.buildinggadgets.client.ClientProxy;
 import com.direwolf20.buildinggadgets.client.gui.GuiMod;
 import com.direwolf20.buildinggadgets.common.commands.BlockMapCommand;
-import com.direwolf20.buildinggadgets.common.config.ApiConfig;
 import com.direwolf20.buildinggadgets.common.config.Config;
-import com.direwolf20.buildinggadgets.common.config.crafting.RecipeConstructionPaste;
 import com.direwolf20.buildinggadgets.common.config.crafting.CraftingConditionDestruction;
 import com.direwolf20.buildinggadgets.common.config.crafting.CraftingConditionPaste;
+import com.direwolf20.buildinggadgets.common.config.crafting.RecipeConstructionPaste;
 import com.direwolf20.buildinggadgets.common.events.AnvilRepairHandler;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.registry.objects.BuildingObjects;
@@ -17,7 +16,6 @@ import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import com.electronwill.nightconfig.core.io.WritingMode;
 import net.minecraft.command.Commands;
 import net.minecraft.item.crafting.RecipeSerializers;
-import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.MinecraftForge;
@@ -59,14 +57,11 @@ public class BuildingGadgets {
         ModLoadingContext.get().registerConfig(Type.CLIENT, Config.CLIENT_CONFIG);
         ModLoadingContext.get().registerConfig(Type.SERVER, Config.SERVER_CONFIG);
 
-        loadConfig(Config.CLIENT_CONFIG, FMLPaths.CONFIGDIR.get().resolve("buildinggadgets-client.toml"));
-        loadConfig(Config.SERVER_CONFIG, FMLPaths.CONFIGDIR.get().resolve("buildinggadgets-server.toml"));
-        theApi = APIProxy.INSTANCE.onCreate(eventBus, MinecraftForge.EVENT_BUS, new ApiConfig());
-
         eventBus.addListener(this::setup);
         eventBus.addListener(this::serverLoad);
         eventBus.addListener(this::finishLoad);
         eventBus.addListener(Config::onLoad);
+        eventBus.addListener(Config::onFileChange);
 
         MinecraftForge.EVENT_BUS.register(new AnvilRepairHandler());
         MinecraftForge.EVENT_BUS.register(this);
@@ -77,11 +72,18 @@ public class BuildingGadgets {
             ModLoadingContext.get().registerExtensionPoint(ExtensionPoint.GUIFACTORY, () -> GuiMod::openScreen);
         });
 
+        loadConfig(Config.API_CONFIG, FMLPaths.CONFIGDIR.get()
+                .resolve(Reference.CONFIG_FILE_API));
+        loadConfig(Config.SERVER_CONFIG, FMLPaths.CONFIGDIR.get()
+                .resolve(Reference.CONFIG_FILE_SERVER));
+        loadConfig(Config.CLIENT_CONFIG, FMLPaths.CONFIGDIR.get()
+                .resolve(Reference.CONFIG_FILE_CLIENT));
+        theApi = APIProxy.INSTANCE.onCreate(eventBus, MinecraftForge.EVENT_BUS, Config.API);
         BuildingObjects.init();
     }
 
     private void loadConfig(ForgeConfigSpec spec, Path path) {
-        LOG.debug("Loading config file {}", path);
+        LOG.debug("Preparing config file {}", path);
         
         final CommentedFileConfig configData = CommentedFileConfig.builder(path)
                 .sync()
@@ -89,10 +91,8 @@ public class BuildingGadgets {
                 .writingMode(WritingMode.REPLACE)
                 .build();
 
-        LOG.debug("Built TOML config for {}", path.toString());
-        configData.load();
-        LOG.debug("Loaded TOML config file {}", path.toString());
         spec.setConfig(configData);
+        LOG.debug("Built TOML config for {}", path.toString());
     }
 
     private void setup(final FMLCommonSetupEvent event) {
@@ -100,8 +100,8 @@ public class BuildingGadgets {
         theApi.onSetup();
         DeferredWorkQueue.runLater(() -> {
             PacketHandler.register();
-            CraftingHelper.register(new ResourceLocation(Reference.MODID, "enable_paste"), new CraftingConditionPaste());
-            CraftingHelper.register(new ResourceLocation(Reference.MODID, "enable_destruction"), new CraftingConditionDestruction());
+            CraftingHelper.register(Reference.CONDITION_PASTE_ID, new CraftingConditionPaste());
+            CraftingHelper.register(Reference.CONDITION_DESTRUCTION_ID, new CraftingConditionDestruction());
             RecipeSerializers.register(new RecipeConstructionPaste.Serializer());
         });
     }
