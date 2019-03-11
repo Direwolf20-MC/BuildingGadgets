@@ -257,9 +257,8 @@ public class GadgetUtils {
         //Used to find which block the player is looking at, and store it in NBT on the tool.
         World world = player.world;
         RayTraceResult lookingAt = VectorTools.getLookingAt(player, false);
-        if (lookingAt == null) {
+        if (lookingAt == null)
             return;
-        }
 
         BlockPos pos = lookingAt.getBlockPos();
         EnumActionResult result = setRemoteInventory(stack, player, world, pos, true);
@@ -342,7 +341,7 @@ public class GadgetUtils {
     }
 
     /**
-     * Call {@link clearCachedRemoteInventory clearCachedRemoteInventory} when done using this method
+     * Call {@link #clearCachedRemoteInventory clearCachedRemoteInventory} when done using this method
      */
     @Nullable
     public static IItemHandler getRemoteInventory(ItemStack tool, World world, EntityPlayer player, NetworkIO.Operation operation) {

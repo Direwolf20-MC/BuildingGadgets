@@ -71,7 +71,6 @@ repositories {
     }
 }
 
-
 dependencies {
     runtime "team.chisel.ctm:CTM:MC${minecraft_version}-${ctm_version}"
     deobfCompile "team.chisel.ctm:CTM:MC${minecraft_version}-${ctm_version}:api"
