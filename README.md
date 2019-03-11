@@ -4,9 +4,12 @@
 </p>
 <p align="center">
     <a href="https://minecraft.curseforge.com/projects/building-gadgets"><img src="http://cf.way2muchnoise.eu/full_298187_downloads.svg" /></a>
+    <a href="https://minecraft.curseforge.com/projects/building-gadgets"><img src="http://cf.way2muchnoise.eu/packs/full_298187_in_packs.svg" /></a>
 </p>    
 
-<h2 align="center">Welcome to Dire's Building Gadgets!</h2>
+<p data-comment="this fakes a line break">&zwnj;</p>
+
+## Welcome to Dire's Building Gadgets!
 
 `Dire's Building Gadgets` aims to make building a little bit easier. At this time there are `four` tools, and they are described below. Alternatively, watch the following mod spotlight for instructions!
 
