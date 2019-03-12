@@ -6,6 +6,7 @@ import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetDestruction;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetExchanger;
 import com.direwolf20.buildinggadgets.common.items.pastes.ConstructionPaste;
+import com.direwolf20.buildinggadgets.common.items.pastes.ConstructionPasteContainer;
 import com.direwolf20.buildinggadgets.common.items.pastes.ConstructionPasteContainerCreative;
 import com.direwolf20.buildinggadgets.common.items.pastes.RegularPasteContainerTypes;
 import com.direwolf20.buildinggadgets.common.registry.RegistryContainer;
@@ -45,11 +46,11 @@ public final class BGItems {
 
     // Construction Paste Containers
     @ObjectHolder(ItemReference.PASTE_CONTAINER_T1)
-    public static ConstructionPaste ConstructionPasteContainer;
+    public static ConstructionPasteContainer ConstructionPasteContainer;
     @ObjectHolder(ItemReference.PASTE_CONTAINER_T2)
-    public static ConstructionPaste ConstructionPasteContainer2;
+    public static ConstructionPasteContainer ConstructionPasteContainer2;
     @ObjectHolder(ItemReference.PASTE_CONTAINER_T3)
-    public static ConstructionPaste ConstructionPasteContainer3;
+    public static ConstructionPasteContainer ConstructionPasteContainer3;
     @ObjectHolder(ItemReference.PASTE_CONTAINER_CREATIVE)
     public static ConstructionPasteContainerCreative CreativeConstructionPasteContainer;
 
