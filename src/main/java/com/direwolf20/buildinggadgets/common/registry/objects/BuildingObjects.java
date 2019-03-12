@@ -40,7 +40,7 @@ public class BuildingObjects {
         BGItems.init();
         BGEntities.init();
         BGTileEntities.init();
-        DistExecutor.runWhenOn(Dist.CLIENT,() -> BGEntities::clientInit);
+        DistExecutor.runWhenOn(Dist.CLIENT, () -> BuildingObjects::clientInit);
     }
 
     public static void cleanup() {
@@ -48,5 +48,10 @@ public class BuildingObjects {
         BGItems.cleanup();
         BGEntities.cleanup();
         BGTileEntities.cleanup();
+    }
+
+    private static void clientInit() {
+        BGEntities.clientInit();
+        BGTileEntities.clientInit();
     }
 }

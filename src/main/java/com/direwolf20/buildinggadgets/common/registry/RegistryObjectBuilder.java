@@ -7,7 +7,7 @@ import net.minecraftforge.registries.IForgeRegistryEntry;
 import java.util.Objects;
 import java.util.function.Function;
 
-public class RegistryObjectBuilder<T extends IForgeRegistryEntry<T>, B> implements IRegistryObjectBuilder<T> {
+public class RegistryObjectBuilder<T extends IForgeRegistryEntry<T>, B> {
     private final ResourceLocation registryName;
     private Function<B,T> factory;
     private B builder;
@@ -30,12 +30,11 @@ public class RegistryObjectBuilder<T extends IForgeRegistryEntry<T>, B> implemen
         return this;
     }
 
-    public ResourceLocation getRegistryName() {
+    protected ResourceLocation getRegistryName() {
         return registryName;
     }
 
-    @Override
-    public T construct() {
+    protected T construct() {
         Preconditions.checkState(factory!=null,"Cannot construct %s without a Factory function!",getRegistryName());
         Preconditions.checkState(builder!=null,"Cannot construct %s without a Builder!",getRegistryName());
         return factory.apply(builder).setRegistryName(getRegistryName());
