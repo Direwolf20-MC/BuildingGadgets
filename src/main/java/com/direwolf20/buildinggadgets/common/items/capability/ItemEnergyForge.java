@@ -2,7 +2,6 @@ package com.direwolf20.buildinggadgets.common.items.capability;
 
 import com.direwolf20.buildinggadgets.common.utils.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.utils.ref.NBTKeys;
-
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.energy.IEnergyStorage;
@@ -18,7 +17,6 @@ public final class ItemEnergyForge implements IEnergyStorage {
         this.capacitySupplier = capacity;
         this.stack = stack;
         this.energy = 0;
-        updateEnergy();
     }
 
     @Override

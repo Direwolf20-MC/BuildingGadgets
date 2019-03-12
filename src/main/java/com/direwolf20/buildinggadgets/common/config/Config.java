@@ -6,12 +6,12 @@ import com.google.common.collect.ImmutableList;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.config.ModConfig;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.regex.PatternSyntaxException;
 
 import static net.minecraftforge.common.ForgeConfigSpec.*;
 import static net.minecraftforge.fml.Logging.CORE;
@@ -41,9 +41,9 @@ public class Config {
 
     private static final String LANG_KEY_GADGET_COPY_PASTE = LANG_KEY_GADGETS + ".gadgetCopyPaste";
 
+    private static final Builder COMMON_BUILDER = new Builder();
     private static final Builder SERVER_BUILDER = new Builder();
     private static final Builder CLIENT_BUILDER = new Builder();
-    private static final Builder API_BUILDER = new Builder();
 
     public static final ApiConfig API = new ApiConfig();
 
@@ -74,6 +74,7 @@ public class Config {
 
         private CategoryGeneral() {
             SERVER_BUILDER.comment("General mod settings")/*.translation(LANG_KEY_GENERAL)*/.push("general");
+            COMMON_BUILDER.comment("General mod settings")/*.translation(LANG_KEY_GENERAL)*/.push("general");
             CLIENT_BUILDER.comment("General mod settings")/*.translation(LANG_KEY_GENERAL)*/.push("general");
             rayTraceRange = SERVER_BUILDER
                     .comment("Defines how far away you can build")
@@ -111,6 +112,7 @@ public class Config {
                     .translation(LANG_KEY_GENERAL + ".allowOverwriteBlocks")
                     .define("Allow non-Air-Block-Overwrite", true);
             CLIENT_BUILDER.pop();
+            COMMON_BUILDER.pop();
             SERVER_BUILDER.pop();
         }
     }
@@ -132,7 +134,7 @@ public class Config {
 
         private CategoryGadgets() {
             SERVER_BUILDER.comment("Configure the Gadgets")/*.translation(LANG_KEY_GADGETS)*/.push("Gadgets");
-
+            COMMON_BUILDER.comment("Configure the Gadgets")/*.translation(LANG_KEY_GADGETS)*/.push("Gadgets");
             maxRange = SERVER_BUILDER
                     .comment("The max range of the Gadgets")
                     .translation(LANG_KEY_GADGETS + ".maxRange")
@@ -148,6 +150,7 @@ public class Config {
             GADGET_DESTRUCTION = new CategoryGadgetDestruction();
             GADGET_COPY_PASTE = new CategoryGadgetCopyPaste();
 
+            COMMON_BUILDER.pop();
             SERVER_BUILDER.pop();
         }
 
@@ -322,10 +325,20 @@ public class Config {
             SERVER_BUILDER.pop();
         }
 
+        private PatternList parsePatternListSafe(ConfigValue<List<? extends String>> value, List<String> def) {
+            try {
+                return PatternList.ofResourcePattern(value.get());
+            } catch (PatternSyntaxException e) {
+                BuildingGadgets.LOG
+                        .error("The config value {}={} contains non-valid Pattern-Syntax. Defaulting to {}.", value
+                                .getPath(), value.get(), def);
+                return PatternList.ofResourcePattern(def);
+            }
+        }
+
         private void parseBlacklists() {
-            parsedBlacklist = PatternList.ofResourcePattern(blockBlacklist.get());
-            //TODO fix once Forge fixes it's I don't sync leading/trailing .'s bug
-            parsedWhitelist = PatternList.ofResourcePattern(/*blockWhitelist.get()*/ ImmutableList.of(".*"));
+            parsedBlacklist = parsePatternListSafe(blockBlacklist, ImmutableList.of());
+            parsedWhitelist = parsePatternListSafe(blockWhitelist, ImmutableList.of(".*"));
         }
 
         public boolean isAllowedBlock(Block block) {
@@ -339,18 +352,27 @@ public class Config {
 
     }
 
+    public static final ForgeConfigSpec COMMON_CONFIG = COMMON_BUILDER.build();
     public static final ForgeConfigSpec SERVER_CONFIG = SERVER_BUILDER.build();
     public static final ForgeConfigSpec CLIENT_CONFIG = CLIENT_BUILDER.build();
-    public static final ForgeConfigSpec API_CONFIG = API_BUILDER.build();
+    private static boolean serverCfgLoaded = false;
+
+    private static void loadServerConfig() {
+        BLACKLIST.parseBlacklists();
+        serverCfgLoaded = true;
+    }
 
     public static void onLoad(final ModConfig.Loading configEvent) {
-        BLACKLIST.parseBlacklists();
+        if (configEvent.getConfig().getSpec() == Config.SERVER_CONFIG)
+            loadServerConfig();
         BuildingGadgets.LOG.debug("Loaded {} config file {}", Reference.MODID, configEvent.getConfig().getFileName());
     }
 
-    @SubscribeEvent
     public static void onFileChange(final ModConfig.ConfigReloading configEvent) {
         BuildingGadgets.LOG.fatal(CORE, "{} config just got changed on the file system!", Reference.MODID);
     }
 
+    public static boolean isServerConfigLoaded() {
+        return serverCfgLoaded;
+    }
 }

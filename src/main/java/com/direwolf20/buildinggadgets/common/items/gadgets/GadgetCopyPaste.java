@@ -69,7 +69,7 @@ public class GadgetCopyPaste extends GadgetPlacing implements ITemplate {
     }
 
     public GadgetCopyPaste(Properties builder) {
-        super(builder.defaultMaxDamage(Config.GADGETS.GADGET_COPY_PASTE.durability.get()));
+        super(builder);
     }
 
     @Override
