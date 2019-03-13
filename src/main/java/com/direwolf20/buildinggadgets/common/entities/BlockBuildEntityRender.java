@@ -36,17 +36,13 @@ public class BlockBuildEntityRender extends Render<BlockBuildEntity> {
         int toolMode = entity.getToolMode();
         mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
         int teCounter = entity.getTicksExisted();
-        int maxLife = entity.maxLife;
-        if (teCounter > maxLife) {
-            teCounter = maxLife;
-        }
+        int maxLife = entity.getMaxLife();
+        teCounter = teCounter > maxLife ? maxLife : teCounter;
         float scale = (float) (teCounter) / (float) maxLife;
-        if (scale >= 1.0f) {
+        if (scale >= 1.0f)
             scale = 0.99f;
-        }
-        if (toolMode == 2 || toolMode == 3) {
+        if (toolMode == 2 || toolMode == 3)
             scale = (float) (maxLife - teCounter) / maxLife;
-        }
         float trans = (1 - scale) / 2;
         GlStateManager.translated(x, y, z);
         GlStateManager.translatef(trans, trans, trans);
@@ -57,9 +53,8 @@ public class BlockBuildEntityRender extends Render<BlockBuildEntity> {
         //IBlockState renderBlockState = blocks.COBBLESTONE.getDefaultState();
 
         IBlockState renderBlockState = entity.getSetBlock();
-        if (entity.getUsingConstructionPaste() && toolMode == 1) {
+        if (entity.getUsingConstructionPaste() && toolMode == 1)
             renderBlockState = BGBlocks.constructionBlock.getDefaultState();
-        }
         if (renderBlockState == null) {
             renderBlockState = Blocks.COBBLESTONE.getDefaultState();
         }
