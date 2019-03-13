@@ -19,11 +19,12 @@ public class ConstructionBlockDense extends Block {
 
     @Override
     public IItemProvider getItemDropped(IBlockState state, World world, BlockPos pos, int fortune) {
-        return world.rand.nextDouble() < Config.GENERAL.denseConstructionChunkFraction.get() ? BGItems.constructionChunkDense : BGItems.constructionPaste;
+        return BGItems.constructionPaste;
     }
 
     @Override
     public int getItemsToDropCount(IBlockState state, int fortune, World world, BlockPos pos, Random random) {
-        return Config.GENERAL.denseConstructionDropCount.get();
+        int min = Config.GENERAL.pasteDroppedMin.get();
+        return min + random.nextInt(Config.GENERAL.pasteDroppedMax.get() - min + 1);
     }
 }

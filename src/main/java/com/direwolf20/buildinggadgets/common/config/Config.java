@@ -61,9 +61,9 @@ public class Config {
 
         public final BooleanValue enablePaste;
 
-        public final IntValue denseConstructionDropCount;
+        public final IntValue pasteDroppedMin;
 
-        public final DoubleValue denseConstructionChunkFraction;
+        public final IntValue pasteDroppedMax;
 
         public final BooleanValue enableDestructionGadget;
 
@@ -86,15 +86,15 @@ public class Config {
                     .translation(LANG_KEY_GENERAL + ".paste.enabled")
                     .define("Enable Construction Paste", true);
 
-            denseConstructionDropCount = SERVER_BUILDER
-                    .comment("The number of items (either paste or dense construction chunks) dropped by a dense construction block.")
-                    .translation(LANG_KEY_GENERAL + ".paste.dense_construction.drops.count")
-                    .defineInRange("Dense Construction Drop Count", 4, 0, Integer.MAX_VALUE);
+            pasteDroppedMin = SERVER_BUILDER
+                    .comment("The minimum number of construction paste items dropped by a dense construction block.")
+                    .translation(LANG_KEY_GENERAL + ".paste.dropped.min")
+                    .defineInRange("Construction Paste Drop Count - Min", 1, 0, Integer.MAX_VALUE);
 
-            denseConstructionChunkFraction = SERVER_BUILDER
-                    .comment("Of the items dropped by a dense construction block, this fraction of them will be dense construction chunks (the remainder will be construction paste).")
-                    .translation(LANG_KEY_GENERAL + ".paste.dense_construction.drops.chunk_fraction")
-                    .defineInRange("Dense Construction Chunk Fraction", 0.5, 0.0, 1.0);
+            pasteDroppedMax = SERVER_BUILDER
+                    .comment("The maximum number of construction paste items dropped by a dense construction block.")
+                    .translation(LANG_KEY_GENERAL + ".paste.dropped.max")
+                    .defineInRange("Construction Paste Drop Count - Max", 3, 0, Integer.MAX_VALUE);
 
             enableDestructionGadget = SERVER_BUILDER
                     .comment("Set to false to disable the Destruction Gadget.")
