@@ -9,15 +9,13 @@ import net.minecraft.nbt.NBTUtil;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-public abstract class EntityModBase extends Entity {
+public abstract class EntityBase extends Entity {
     private int despawning = -1;
-    protected int maxLife;
-    protected BlockPos setPos;
+    private BlockPos targetPos;
 
-    public EntityModBase(EntityType<?> entityType, World world) {
+    public EntityBase(EntityType<?> entityType, World world) {
         super(entityType, world);
         setSize(0.1F, 0.1F);
-        maxLife = getMaxLife();
     }
 
     protected abstract int getMaxLife();
@@ -39,25 +37,33 @@ public abstract class EntityModBase extends Entity {
     }
 
     protected boolean shouldSetDespawning() {
-        return ticksExisted > maxLife;
+        return ticksExisted > getMaxLife();
     }
 
     @Override
     protected void readAdditional(NBTTagCompound compound) {
         despawning = compound.getInt(NBTKeys.ENTITY_DESPAWNING);
         ticksExisted = compound.getInt(NBTKeys.ENTITY_TICKS_EXISTED);
-        setPos = NBTUtil.readBlockPos(compound.getCompound(NBTKeys.ENTITY_SET_POS));
+        targetPos = NBTUtil.readBlockPos(compound.getCompound(NBTKeys.ENTITY_SET_POS));
     }
 
     @Override
     protected void writeAdditional(NBTTagCompound compound) {
         compound.setInt(NBTKeys.ENTITY_DESPAWNING, despawning);
         compound.setInt(NBTKeys.ENTITY_TICKS_EXISTED, ticksExisted);
-        compound.setTag(NBTKeys.ENTITY_SET_POS, NBTUtil.writeBlockPos(setPos));
+        compound.setTag(NBTKeys.ENTITY_SET_POS, NBTUtil.writeBlockPos(targetPos));
     }
 
     @Override
     public boolean isInRangeToRender3d(double x, double y, double z) {
         return true;
+    }
+
+    protected BlockPos getTargetPos() {
+        return targetPos;
+    }
+
+    protected void setTargetPos(BlockPos targetPos) {
+        this.targetPos = targetPos;
     }
 }

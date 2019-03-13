@@ -32,14 +32,11 @@ public class ConstructionBlockEntityRender extends Render<ConstructionBlockEntit
 
         mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
         int teCounter = entity.getTicksExisted();
-        int maxLife = entity.maxLife;
-        if (teCounter > maxLife) {
-            teCounter = maxLife;
-        }
+        int maxLife = entity.getMaxLife();
+        teCounter = teCounter > maxLife ? maxLife : teCounter;
         float scale = (float) (maxLife - teCounter) / maxLife;
-        if (entity.getMakingPaste()) {
+        if (entity.getMakingPaste())
             scale = (float) teCounter / maxLife;
-        }
         GlStateManager.translated(x, y, z);
         GlStateManager.translatef(-0.0005f, -0.0005f, -0.0005f);
         GlStateManager.scalef(1.001f, 1.001f, 1.001f);//Slightly Larger block to avoid z-fighting.
@@ -57,15 +54,5 @@ public class ConstructionBlockEntityRender extends Render<ConstructionBlockEntit
     @Override
     protected ResourceLocation getEntityTexture(ConstructionBlockEntity entity) {
         return null;
-    }
-
-
-    public static class Factory implements IRenderFactory<ConstructionBlockEntity> {
-
-        @Override
-        public Render<? super ConstructionBlockEntity> createRenderFor(RenderManager manager) {
-            return new ConstructionBlockEntityRender(manager);
-        }
-
     }
 }

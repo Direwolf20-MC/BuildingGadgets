@@ -20,7 +20,7 @@ import net.minecraft.world.World;
 import javax.annotation.Nullable;
 import java.util.Optional;
 
-public class BlockBuildEntity extends EntityModBase {
+public class BlockBuildEntity extends EntityBase {
     private static final DataParameter<Integer> toolMode = EntityDataManager.<Integer>createKey(BlockBuildEntity.class, DataSerializers.VARINT);
     private static final DataParameter<Optional<IBlockState>> SET_BLOCK = EntityDataManager.createKey(BlockBuildEntity.class, DataSerializers.OPTIONAL_BLOCK_STATE);
     private static final DataParameter<BlockPos> FIXED = EntityDataManager.createKey(BlockBuildEntity.class, DataSerializers.BLOCK_POS);
@@ -45,7 +45,7 @@ public class BlockBuildEntity extends EntityModBase {
         IBlockState currentBlock = world.getBlockState(spawnPos);
         TileEntity te = world.getTileEntity(spawnPos);
 
-        setPos = spawnPos;
+        setTargetPos(spawnPos);
         setBlock = te instanceof ConstructionBlockTileEntity ? te.getBlockState() : spawnBlock;
         originalSetBlock = spawnBlock;
 
@@ -133,22 +133,23 @@ public class BlockBuildEntity extends EntityModBase {
 
     @Override
     protected void onSetDespawning() {
-        if (setPos != null && setBlock != null && (getToolMode() == 1)) {
+        if (getTargetPos() != null && setBlock != null && (getToolMode() == 1)) {
             if (getUsingConstructionPaste()) {
-                world.setBlockState(setPos, BGBlocks.constructionBlock.getDefaultState());
-                TileEntity te = world.getTileEntity(setPos);
+                world.setBlockState(getTargetPos(), BGBlocks.constructionBlock.getDefaultState());
+                TileEntity te = world.getTileEntity(getTargetPos());
                 if (te instanceof ConstructionBlockTileEntity) {
                     ((ConstructionBlockTileEntity) te).setBlockState(setBlock, actualSetBlock);
                 }
-                world.spawnEntity(new ConstructionBlockEntity(world, setPos, false));
+                world.spawnEntity(new ConstructionBlockEntity(world, getTargetPos(), false));
             } else {
-                world.setBlockState(setPos, setBlock);
-                world.getBlockState(setPos).neighborChanged(world, setPos, world.getBlockState(setPos.up()).getBlock(), setPos.up());
+                world.setBlockState(getTargetPos(), setBlock);
+                BlockPos upPos = getTargetPos().up();
+                world.getBlockState(getTargetPos()).neighborChanged(world, getTargetPos(), world.getBlockState(upPos).getBlock(), upPos);
             }
-        } else if (setPos != null && setBlock != null && getToolMode() == 2) {
-            world.setBlockState(setPos, Blocks.AIR.getDefaultState());
-        } else if (setPos != null && setBlock != null && getToolMode() == 3) {
-            world.spawnEntity(new BlockBuildEntity(world, setPos, spawnedBy, originalSetBlock, 1, actualSetBlock, getUsingConstructionPaste()));
+        } else if (getTargetPos() != null && setBlock != null && getToolMode() == 2) {
+            world.setBlockState(getTargetPos(), Blocks.AIR.getDefaultState());
+        } else if (getTargetPos() != null && setBlock != null && getToolMode() == 3) {
+            world.spawnEntity(new BlockBuildEntity(world, getTargetPos(), spawnedBy, originalSetBlock, 1, actualSetBlock, getUsingConstructionPaste()));
         }
     }
 }
