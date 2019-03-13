@@ -1,5 +1,6 @@
-package com.direwolf20.buildinggadgets.common.registry;
+package com.direwolf20.buildinggadgets.common.registry.block;
 
+import com.direwolf20.buildinggadgets.common.registry.RegistryObjectBuilder;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
@@ -9,7 +10,7 @@ import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-public class BlockBuilder extends RegistryObjectBuilder<Block,Block.Properties> {
+public final class BlockBuilder extends RegistryObjectBuilder<Block, Block.Properties> {
     private Block block;
     private BiFunction<Block, Item.Properties, Item> itemBlockFactory;
     private Item.Properties itemBuilder;
@@ -55,12 +56,12 @@ public class BlockBuilder extends RegistryObjectBuilder<Block,Block.Properties> 
     }
 
     @Override
-    public Block construct() {
+    protected Block construct() {
         block =  super.construct();
         return block;
     }
 
-    public Item createItemFromBlock() {
+    Item createItemFromBlock() {
         return itemBlockFactory.apply(block,itemBuilder).setRegistryName(getRegistryName());
     }
 

@@ -63,7 +63,7 @@ public class GadgetBuilding extends GadgetPlacing {
     }
 
     public GadgetBuilding(Properties builder) {
-        super(builder.defaultMaxDamage(Config.GADGETS.GADGET_BUILDING.durability.get()));
+        super(builder);
     }
 
     @Override

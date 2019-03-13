@@ -62,7 +62,7 @@ public class GadgetExchanger extends GadgetSwapping {
     }
 
     public GadgetExchanger(Properties builder) {
-        super(builder.defaultMaxDamage(Config.GADGETS.GADGET_EXCHANGER.durability.get()));
+        super(builder);
     }
 
     @Override

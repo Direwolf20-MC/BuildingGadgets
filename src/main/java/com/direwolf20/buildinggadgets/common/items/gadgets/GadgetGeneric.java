@@ -9,9 +9,11 @@ import com.direwolf20.buildinggadgets.common.utils.ref.NBTKeys;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
+import net.minecraft.item.IItemPropertyGetter;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
@@ -27,9 +29,16 @@ import java.util.List;
 import static com.direwolf20.buildinggadgets.common.utils.GadgetUtils.withSuffix;
 
 public abstract class GadgetGeneric extends Item {
+    private static final IItemPropertyGetter DAMAGED_GETTER =
+            (p_210306_0_, p_210306_1_, p_210306_2_) -> p_210306_0_.isDamaged() ? 1.0F : 0.0F;
+    private static final IItemPropertyGetter DAMAGE_GETTER =
+            (p_210307_0_, p_210307_1_, p_210307_2_) -> MathHelper
+                    .clamp((float) p_210307_0_.getDamage() / (float) p_210307_0_.getMaxDamage(), 0.0F, 1.0F);
 
     public GadgetGeneric(Properties builder) {
         super(builder);
+        this.addPropertyOverride(new ResourceLocation("damaged"), DAMAGED_GETTER);
+        this.addPropertyOverride(new ResourceLocation("damage"), DAMAGE_GETTER);
     }
 
     public abstract int getEnergyMax();
@@ -46,7 +55,7 @@ public abstract class GadgetGeneric extends Item {
 
     @Override
     public boolean isDamageable() {
-        return true;
+        return getMaxDamage() > 0;
     }
 
     @Override
@@ -126,9 +135,11 @@ public abstract class GadgetGeneric extends Item {
     }
 
     protected void addEnergyInformation(List<ITextComponent> tooltip, ItemStack stack) {
-        stack.getCapability(CapabilityEnergy.ENERGY).ifPresent(energy -> {
-            tooltip.add(new TextComponentString(TextFormatting.WHITE + I18n.format("tooltip.gadget.energy") + ": " + withSuffix(energy.getEnergyStored()) + "/" + withSuffix(energy.getMaxEnergyStored())));
-        });
+        if (Config.isServerConfigLoaded())
+            stack.getCapability(CapabilityEnergy.ENERGY).ifPresent(energy -> {
+                tooltip.add(new TextComponentString(TextFormatting.WHITE + I18n
+                        .format("tooltip.gadget.energy") + ": " + withSuffix(energy.getEnergyStored()) + "/" + withSuffix(energy.getMaxEnergyStored())));
+            });
     }
 
     public static boolean getFuzzy(ItemStack stack) {

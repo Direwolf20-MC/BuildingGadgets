@@ -46,9 +46,8 @@ import javax.annotation.Nullable;
 import java.util.*;
 
 public class GadgetDestruction extends GadgetSwapping {
-
     public GadgetDestruction(Properties builder) {
-        super(builder.defaultMaxDamage(Config.GADGETS.GADGET_DESTRUCTION.durability.get()));
+        super(builder);
     }
 
     @Override
@@ -81,7 +80,7 @@ public class GadgetDestruction extends GadgetSwapping {
         tooltip.add(new TextComponentString(TextFormatting.RED + I18n.format("tooltip.gadget.destroywarning")));
         tooltip.add(new TextComponentString(TextFormatting.AQUA + I18n.format("tooltip.gadget.destroyshowoverlay") + ": " + getOverlay(stack)));
         tooltip.add(new TextComponentString(TextFormatting.YELLOW + I18n.format("tooltip.gadget.connectedarea") + ": " + getConnectedArea(stack)));
-        if (Config.GADGETS.GADGET_DESTRUCTION.nonFuzzyEnabled.get())
+        if (Config.isServerConfigLoaded() && Config.GADGETS.GADGET_DESTRUCTION.nonFuzzyEnabled.get())
             tooltip.add(new TextComponentString(TextFormatting.GOLD + I18n.format("tooltip.gadget.fuzzy") + ": " + getFuzzy(stack)));
 
         addInformationRayTraceFluid(tooltip, stack);
