@@ -63,7 +63,7 @@ In general apply common sense to the Code you write. "Effective Java" is also al
 * Validate `@NonNull` values with `Objects.requireNonNull` if necessary
 * use getters and setters, even in the declaring class
 * avoid getters and setters for protected methods
-* use protected methods where external classes do not require access or in instances where you have a private var without getters or setters.
+* In general try to use the smallest visibility-scope possible, expcept if it's likely that others will want access to the given method.
 * enforce Immutability where possible
     * use ImmutableTypes for immutable values (`ImmutableList`, `ImmutableSet`, `ImmutableMap`, etc.)
     * avoid public properties
