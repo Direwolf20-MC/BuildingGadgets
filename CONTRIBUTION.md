@@ -62,7 +62,8 @@ In general apply common sense to the Code you write. "Effective Java" is also al
 * Use Guava's `Preconditions` class for Argument validation
 * Validate `@NonNull` values with `Objects.requireNonNull` if necessary
 * use getters and setters, even in the declaring class
-* avoid getters and setters for protected methods
+* Avoid getters and setters for protected fields in non API-Code. 
+* Avoid non-private variables in API-Code and provide getters/setters instead. Bear in mind that this does not apply to constants (`public static final type xyz = ...`) though.
 * In general try to use the smallest visibility-scope possible, expcept if it's likely that others will want access to the given method.
 * enforce Immutability where possible
     * use ImmutableTypes for immutable values (`ImmutableList`, `ImmutableSet`, `ImmutableMap`, etc.)
