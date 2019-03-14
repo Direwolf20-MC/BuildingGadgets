@@ -5,14 +5,26 @@ import com.direwolf20.buildinggadgets.common.building.IPlacementSequence;
 import com.direwolf20.buildinggadgets.common.building.IValidatorFactory;
 import com.direwolf20.buildinggadgets.common.building.placement.Column;
 import com.direwolf20.buildinggadgets.common.tools.GadgetUtils;
-import com.direwolf20.buildinggadgets.common.tools.IAtopSupport;
+import com.direwolf20.buildinggadgets.common.tools.MathTool;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 
-public class BuildingVerticalColumnMode extends AbstractMode implements IAtopSupport {
+/**
+ * Vertical column mode for Building Gadget.
+ * <p>
+ * When the player selects top or bottom of a block, it will build a column perpendicular to the ground with length of
+ * tool range.
+ * </p><p>
+ * When the player selects any horizontal side of a block, it will build a column centered at the selected block with a
+ * length of floored tool range.
+ * </p>
+ *
+ * @see Column
+ */
+public class BuildingVerticalColumnMode extends AtopSupportedMode {
 
     private static final ResourceLocation NAME = new ResourceLocation(BuildingGadgets.MODID, "vertical_column");
 
@@ -21,21 +33,22 @@ public class BuildingVerticalColumnMode extends AbstractMode implements IAtopSup
     }
 
     @Override
-    public IPlacementSequence computeCoordinates(EntityPlayer player, BlockPos hit, EnumFacing sideHit, ItemStack tool) {
+    public IPlacementSequence computeWithTransformed(EntityPlayer player, BlockPos transformed, BlockPos original, EnumFacing sideHit, ItemStack tool) {
         int range = GadgetUtils.getToolRange(tool);
         if (sideHit.getAxis().isVertical())
-            return Column.extendFrom(hit, sideHit, range);
-        return Column.centerAt(hit.offset(sideHit), EnumFacing.Axis.Y, range);
+            return Column.extendFrom(transformed, sideHit, range);
+        int radius = MathTool.floorToOdd(range);
+        return Column.centerAt(transformed, EnumFacing.Axis.Y, radius);
+    }
+
+    @Override
+    public BlockPos transformAtop(EntityPlayer player, BlockPos hit, EnumFacing sideHit, ItemStack tool) {
+        return hit.offset(sideHit);
     }
 
     @Override
     public ResourceLocation getRegistryName() {
         return NAME;
-    }
-
-    @Override
-    public BlockPos transformAtop(EntityPlayer player, BlockPos hit, EnumFacing sideHit, ItemStack tool, int offset) {
-        return hit.offset(sideHit, offset);
     }
 
 }

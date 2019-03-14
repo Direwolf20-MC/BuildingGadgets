@@ -4,6 +4,9 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
+/**
+ * Indicates the position and type of block to use for placing something in a {@link World}.
+ */
 public final class PlacementTarget {
 
     private final IBlockState state;
@@ -22,6 +25,11 @@ public final class PlacementTarget {
         return pos;
     }
 
+    /**
+     * Sets the block state of the {@link #getPos()} to {@link #getState()}.
+     *
+     * @param world the world to place block
+     */
     public void placeIn(World world) {
         world.setBlockState(pos, state);
     }

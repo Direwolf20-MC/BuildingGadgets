@@ -13,6 +13,12 @@ import javax.annotation.Nonnull;
 import java.util.Iterator;
 import java.util.function.Function;
 
+/**
+ * Surface mode where no connectivity is required. All blocks within the region (wall centered at some position) will
+ * be selected if it fulfills the requirement -- has its underside same as the starting position.
+ *
+ * @see ConnectedSurface
+ */
 public final class Surface implements IPlacementSequence {
 
     /**
@@ -69,10 +75,6 @@ public final class Surface implements IPlacementSequence {
         return searchingRegion.contains(x, y, z);
     }
 
-    /**
-     * @deprecated Surface should be immutable, so this is not needed
-     */
-    @Deprecated
     @Override
     public IPlacementSequence copy() {
         return new Surface(world, selectedBase, searching2referenceMapper, searchingRegion, fuzzy);

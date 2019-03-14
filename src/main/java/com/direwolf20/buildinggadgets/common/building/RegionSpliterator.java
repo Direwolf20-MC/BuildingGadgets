@@ -73,7 +73,7 @@ class RegionSpliterator implements Spliterator<BlockPos> {
             return true;
         }
 
-        //(maxX, maxY, maxZ)
+        // Returns (maxX, maxY, maxZ)
         action.accept(pos);
         return true;
     }
@@ -90,10 +90,11 @@ class RegionSpliterator implements Spliterator<BlockPos> {
         int oldPosY = nextPosY;
         int oldPosZ = nextPosZ;
 
-        //Construct new min coordinates, so that at least one can be split of: max - min >= 1
+        // Construct new min coordinates, so that at least one can be split of: max - min >= 1
         if (maxX > minX) {
-            //As Region's coordinates are inclusive, the amount of blocks along one axis is max - min + 1
-            //Half the length + base x
+            /* As Region's coordinates are inclusive, the amount of blocks along one axis is max - min + 1
+             * half the length + base x
+             */
             minX = (maxX - minX + 1) / 2 + minX + 1;
             resetPos();
             return new RegionSpliterator(oldMinX, oldMinY, oldMinZ, minX - 1, maxY, maxZ, oldPosX, oldPosY, oldPosZ, allowYZSplit);

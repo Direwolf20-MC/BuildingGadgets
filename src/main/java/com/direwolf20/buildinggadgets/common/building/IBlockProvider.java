@@ -1,18 +1,21 @@
 package com.direwolf20.buildinggadgets.common.building;
 
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.BlockPos;
 
 /**
- * Abstract representation the mapping from a position to a block state.
+ * Abstract representation mapping from position to block state.
  * <p>
  * "abstract" means such block provider can be used for constant mapper (fill with certain type), or some sort of complex
  * structure. It does not specify a boundary and implementation should return {@code Blocks.AIR.getDefaultState()} when
  * the given position is out of boundary.
- * All positions passed as parameter are relative to a specific point which can be accessed by {@link #getTranslation()}.
+ * All positions passed as parameter will translated by a specific vector which can be accessed by {@link #getTranslation()}.
  * </p>
+ *
+ * @param <T>
  */
-public interface IBlockProvider {
+public interface IBlockProvider<T extends IBlockProvider<T>> {
 
     /**
      * @param origin the new origin
@@ -23,7 +26,7 @@ public interface IBlockProvider {
 
     /**
      * @return the translation used for translation done to the parameter of {@link #at(BlockPos)}
-     * @implSpec the value should remain constant in the whole life of such object
+     * @implSpec the value should remain constant in the whole life of the object
      */
     default BlockPos getTranslation() {
         return BlockPos.ORIGIN;
@@ -31,12 +34,33 @@ public interface IBlockProvider {
 
     /**
      * <p>
-     * Implementations should translate the parameter by {@link #getTranslation()}.
+     * The parameter will be translated by {@link #getTranslation} before used to read a block state.
      * </p>
      *
      * @return block that should be placed at the position
      * @implNote In most cases, {@code pos.add(this.getTranslation())} should be sufficient.
      */
     IBlockState at(BlockPos pos);
+
+    /**
+     * Write the containing data into the given tag.
+     */
+    void serialize(NBTTagCompound tag);
+
+    /**
+     * @see #serialize(NBTTagCompound) - create a new {@link NBTTagCompound} instead of write into an existing one.
+     */
+    default NBTTagCompound serialize() {
+        NBTTagCompound tag = new NBTTagCompound();
+        this.serialize(tag);
+        return tag;
+    }
+
+    /**
+     * Reads the data contained in the given tag and write them into a new object.
+     *
+     * @implSpec The returning object should have the same type. Neither a child nor a parent.
+     */
+    T deserialize(NBTTagCompound tag);
 
 }

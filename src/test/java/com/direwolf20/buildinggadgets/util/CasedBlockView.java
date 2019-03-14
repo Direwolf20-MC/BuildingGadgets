@@ -9,6 +9,10 @@ import java.util.Iterator;
 import java.util.Random;
 import java.util.Set;
 
+/**
+ * A fake world that has a finite set of positions filled with a certain type of block and others, which can be specified
+ * with {@link #setOtherAt(BlockPos)}, to be another type of block.
+ */
 public class CasedBlockView extends RegionBlockView {
 
     public static final IBlockState base = UniqueBlockState.createNew();

@@ -12,7 +12,7 @@ import net.minecraft.world.World;
 import java.util.function.BiPredicate;
 
 /**
- * Represents a mode that can be used by some gadget,
+ * Represents a mode that can be used for building by some gadget.
  */
 public interface IBuildingMode {
 

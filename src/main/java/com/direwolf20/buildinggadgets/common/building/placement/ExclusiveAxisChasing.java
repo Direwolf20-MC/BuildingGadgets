@@ -8,13 +8,12 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumFacing.Axis;
 import net.minecraft.util.EnumFacing.AxisDirection;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
 
 import javax.annotation.Nonnull;
 import java.util.Iterator;
 
 /**
- * @see Column#inclusiveAxisChasing(BlockPos, BlockPos, EnumFacing)
+ * Starts from the selected position, and extend a column of blocks towards player on the axis of the selected face.
  */
 public final class ExclusiveAxisChasing implements IPlacementSequence {
 
@@ -31,7 +30,8 @@ public final class ExclusiveAxisChasing implements IPlacementSequence {
     public static ExclusiveAxisChasing create(BlockPos source, BlockPos target, EnumFacing offsetDirection) {
         Axis axis = offsetDirection.getAxis();
         int difference = VectorTools.getAxisValue(target, axis) - VectorTools.getAxisValue(source, axis);
-        int maxProgression = MathHelper.clamp(Math.abs(difference), 1, Integer.MAX_VALUE);
+        // int maxProgression = MathHelper.clamp(Math.abs(difference), 1, Integer.MAX_VALUE);
+        int maxProgression = Math.abs(difference);
 
         return new ExclusiveAxisChasing(source, offsetDirection, maxProgression);
     }
@@ -60,10 +60,6 @@ public final class ExclusiveAxisChasing implements IPlacementSequence {
         return difference > 0 && difference < maxProgression;
     }
 
-    /**
-     * @deprecated ExclusiveAxisChasing should be immutable, so this is not needed
-     */
-    @Deprecated
     @Override
     public IPlacementSequence copy() {
         return new ExclusiveAxisChasing(source, offsetDirection, maxProgression);
@@ -73,7 +69,7 @@ public final class ExclusiveAxisChasing implements IPlacementSequence {
     @Override
     public Iterator<BlockPos> iterator() {
         return new AbstractIterator<BlockPos>() {
-            private int progression = 1;
+            private int progression = 0;
 
             @Override
             protected BlockPos computeNext() {

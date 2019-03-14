@@ -22,7 +22,7 @@ import java.util.function.BiPredicate;
 
 public enum BuildingModes {
 
-    BuildToMe("build_to_me.png", new TargetedAxisChasingMode(BuildingModes::combineTester)),
+    TargetedAxisChasing("build_to_me.png", new TargetedAxisChasingMode(BuildingModes::combineTester)),
     VerticalColumn("vertical_column.png", new BuildingVerticalColumnMode(BuildingModes::combineTester)),
     HorizontalColumn("horizontal_column.png", new BuildingHorizontalColumnMode(BuildingModes::combineTester)),
     VerticalWall("vertical_wall.png", new VerticalWallMode(BuildingModes::combineTester)),
@@ -33,13 +33,12 @@ public enum BuildingModes {
 
     private final String displayName;
     private final ResourceLocation icon;
-    private final BuildingModeWrapper modeImpl;
+    private final IBuildingMode modeImpl;
 
     BuildingModes(String iconFile, IBuildingMode modeImpl) {
         this.displayName = modeImpl.getLocalized();
         this.icon = new ResourceLocation(BuildingGadgets.MODID, "textures/ui/" + iconFile);
-        boolean supportAtop = modeImpl instanceof IAtopSupport;
-        this.modeImpl = new BuildingModeWrapper(modeImpl, supportAtop ? (IAtopSupport) modeImpl : BuildingModeWrapper.NONE);
+        this.modeImpl = modeImpl;
     }
 
     public ResourceLocation getIcon() {
@@ -48,10 +47,6 @@ public enum BuildingModes {
 
     public IBuildingMode getModeImplementation() {
         return modeImpl;
-    }
-
-    public boolean doesSupportAtop() {
-        return modeImpl.doesSupportAtop();
     }
 
     public String getRegistryName() {
@@ -77,7 +72,7 @@ public enum BuildingModes {
         return Arrays.stream(values())
                 .filter(mode -> mode.getRegistryName().equals(name))
                 .findFirst()
-                .orElse(BuildToMe);
+                .orElse(TargetedAxisChasing);
     }
 
     private static final ImmutableList<ResourceLocation> ICONS = Arrays.stream(values())

@@ -78,37 +78,4 @@ public class ColumnTest {
 
     private final Random random = new Random();
 
-    @RepeatedTest(4)
-    void inclusiveAxisChasingShouldStopBeforeEntityPositionRandomSideRandomDistance() {
-        EnumFacing side = EnumFacing.random(random);
-        int distance = 0;
-        Column column = Column.inclusiveAxisChasing(BlockPos.ORIGIN.offset(side, distance), BlockPos.ORIGIN, side);
-        Iterator<BlockPos> it = column.iterator();
-
-        if (side.getAxisDirection() == EnumFacing.AxisDirection.NEGATIVE) {
-            for (int i = distance; i >= 0; i--) {
-                assertEquals(BlockPos.ORIGIN.offset(side, i), it.next());
-            }
-        } else {
-            for (int i = 0; i <= distance; i++) {
-                assertEquals(BlockPos.ORIGIN.offset(side, i), it.next());
-            }
-        }
-        assertFalse(it.hasNext());
-    }
-
-    @Test
-    void inclusiveAxisChasingShouldIgnoreNonParametrizedAxisValuesHardcoded() {
-        Column column = Column.inclusiveAxisChasing(new BlockPos(8, 4, -9), BlockPos.ORIGIN, EnumFacing.UP);
-        Iterator<BlockPos> it = column.iterator();
-
-        //Note that this position will be invalid for the most cases, since this block, the source block, will be a non-air
-        assertEquals(new BlockPos(0, 0, 0), it.next());
-        assertEquals(new BlockPos(0, 1, 0), it.next());
-        assertEquals(new BlockPos(0, 2, 0), it.next());
-        assertEquals(new BlockPos(0, 3, 0), it.next());
-        assertEquals(new BlockPos(0, 4, 0), it.next());
-        assertFalse(it.hasNext());
-    }
-
 }

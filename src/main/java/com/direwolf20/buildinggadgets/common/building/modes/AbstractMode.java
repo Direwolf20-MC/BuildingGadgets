@@ -13,14 +13,15 @@ import net.minecraft.world.World;
 import java.util.function.BiPredicate;
 
 /**
- * Base class for Building Gadget's native mode implementations.
+ * Base class for Building Gadget's native mode implementations to allow reuse validator implementation
+ * All ':' in the translation key with '.'.
  */
-abstract class AbstractMode implements IBuildingMode {
+public abstract class AbstractMode implements IBuildingMode {
 
     protected final IValidatorFactory validatorFactory;
     private final String translationKey;
 
-    AbstractMode(IValidatorFactory validatorFactory) {
+    public AbstractMode(IValidatorFactory validatorFactory) {
         this.validatorFactory = validatorFactory;
         this.translationKey = "modes." + getRegistryName().toString().replace(':', '.');
     }

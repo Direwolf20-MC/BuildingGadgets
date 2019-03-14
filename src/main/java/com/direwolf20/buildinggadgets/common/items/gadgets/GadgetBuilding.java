@@ -88,7 +88,7 @@ public class GadgetBuilding extends GadgetGeneric {
         list.add(TextFormatting.DARK_GREEN + I18n.format("tooltip.gadget.block") + ": " + getToolBlock(stack).getBlock().getLocalizedName());
         BuildingModes mode = getToolMode(stack);
         list.add(TextFormatting.AQUA + I18n.format("tooltip.gadget.mode") + ": " + (mode == BuildingModes.Surface && getConnectedArea(stack) ? I18n.format("tooltip.gadget.connected") + " " : "") + mode);
-        if (getToolMode(stack) != BuildingModes.BuildToMe)
+        if (getToolMode(stack) != BuildingModes.TargetedAxisChasing)
             list.add(TextFormatting.LIGHT_PURPLE + I18n.format("tooltip.gadget.range") + ": " + getToolRange(stack));
 
         if (getToolMode(stack) == BuildingModes.Surface)

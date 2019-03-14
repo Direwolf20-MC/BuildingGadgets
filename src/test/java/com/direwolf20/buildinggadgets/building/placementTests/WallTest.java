@@ -51,7 +51,7 @@ public class WallTest {
 
     @Test
     void extendingFromWithExtensionUpFlatSideNorthRange5ShouldHaveAllPositionsWithSameZHardcoded() {
-        Wall wall = Wall.extendingFrom(BlockPos.ORIGIN, EnumFacing.UP, EnumFacing.NORTH, 5);
+        Wall wall = Wall.extendingFrom(BlockPos.ORIGIN, EnumFacing.UP, EnumFacing.NORTH, 5, 0);
         for (BlockPos pos : wall) {
             assertEquals(0, pos.getZ());
         }
@@ -60,7 +60,7 @@ public class WallTest {
     @Test
     void extendingFromShouldRejectRequestWithSameExtensionAndFlatSide() {
         for (EnumFacing side : EnumFacing.VALUES) {
-            assertThrows(IllegalArgumentException.class, () -> Wall.extendingFrom(BlockPos.ORIGIN, side, side, 5));
+            assertThrows(IllegalArgumentException.class, () -> Wall.extendingFrom(BlockPos.ORIGIN, side, side, 5, 0));
         }
     }
 

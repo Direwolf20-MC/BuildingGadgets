@@ -11,6 +11,12 @@ import net.minecraft.world.biome.Biome;
 
 import javax.annotation.Nullable;
 
+/**
+ * A fake world that has a set of positions "filled" with some type of block and the rest will be air ({@link UniqueBlockState#AIR}).
+ * This class should be used for tests that checks for range overflow or need a world for reference.
+ *
+ * <p>"Region" means the effective range is limited and "View" indicates this class is immutable.</p>
+ */
 public class RegionBlockView implements IBlockAccess {
 
     private Region region;

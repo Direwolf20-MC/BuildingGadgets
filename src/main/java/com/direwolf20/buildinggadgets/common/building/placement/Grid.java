@@ -11,6 +11,10 @@ import net.minecraft.util.math.BlockPos;
 import javax.annotation.Nonnull;
 import java.util.Iterator;
 
+/**
+ * Grid is a set of blocks where each block is equidistant from its neighboring blocks. The distance between the blocks
+ * is a periodic sequence with a certain size.
+ */
 public final class Grid implements IPlacementSequence {
 
     public static Grid create(BlockPos base, int range, int periodSize) {
@@ -55,10 +59,6 @@ public final class Grid implements IPlacementSequence {
         return region.contains(x, y, z);
     }
 
-    /**
-     * @deprecated Grid should be immutable, so this is not needed
-     */
-    @Deprecated
     @Override
     public IPlacementSequence copy() {
         return new Grid(region, center, range, periodSize);
@@ -67,14 +67,14 @@ public final class Grid implements IPlacementSequence {
     @Override
     @Nonnull
     public Iterator<BlockPos> iterator() {
-        //Distance between blocks + block itself
-        //Arithmetic sequence of [2,7]
-        //-1 for range being 1~15, +2 to shift the sequence from [0,6] to [2,7]
+        /* Distance between blocks + block itself
+         * arithmetic sequence of [2,7] where -1 for range being 1~15, +2 to shift the sequence from [0,6] to [2,7]
+         */
         int period = (range - 1) % periodSize + 2;
 
-        //Random design choice by Dire
+        // Random design choice by Dire
         int end = (range + 1) * 7 / 5;
-        //Floor to the nearest multiple of period
+        // Floor to the nearest multiple of period
         int start = MathTool.floorMultiple(-end, period);
 
         return new AbstractIterator<BlockPos>() {

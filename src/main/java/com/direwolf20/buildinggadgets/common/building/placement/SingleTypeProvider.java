@@ -29,14 +29,12 @@ public class SingleTypeProvider implements IBlockProvider {
         return state;
     }
 
-    public NBTTagCompound serialize() {
-        return serialize(new NBTTagCompound());
+    @Override
+    public void serialize(NBTTagCompound tag) {
+        NBTUtil.writeBlockState(tag, state);
     }
 
-    public NBTTagCompound serialize(NBTTagCompound tag) {
-        return NBTUtil.writeBlockState(tag, state);
-    }
-
+    @Override
     public SingleTypeProvider deserialize(NBTTagCompound tag) {
         return new SingleTypeProvider(NBTUtil.readBlockState(tag));
     }

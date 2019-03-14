@@ -3,7 +3,6 @@ package com.direwolf20.buildinggadgets.common.building;
 import com.direwolf20.buildinggadgets.common.tools.GadgetUtils;
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.PeekingIterator;
-import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 
@@ -12,7 +11,6 @@ import java.util.Spliterator;
 
 /**
  * Represents a region in the world with a finite and nonzero size.
- * <p>Javadoc are copied from {@link AxisAlignedBB} with some modifications.</p>
  */
 public final class Region implements IPlacementSequence {
 
@@ -70,7 +68,7 @@ public final class Region implements IPlacementSequence {
     }
 
     /**
-     * See {@link #grow(int, int, int)} - grow on all three axises.
+     * See {@link #grow(int, int, int)} - grown on all three axes.
      */
     public Region grow(int size) {
         return this.grow(size, size, size);
@@ -98,16 +96,16 @@ public final class Region implements IPlacementSequence {
      * </p>
      * <p>
      * If contracting and the amount to contract by is larger than the length of a side, then the side will wrap (still
-     * creating a valid region - see last ample).
+     * creating a valid region - see last sample).
      * </p>
      *
      * <h3>Samples:</h3>
      * <table>
      * <tr><th>Input</th><th>Result</th></tr>
-     * <tr><td><pre><code>new Region(0, 0, 0, 1, 1, 1).grow(2, 2, 2)</code></pre></td><td><pre><samp>box[-2, -2, -2 -> 3, 3, 3]</samp></pre></td></tr>
-     * <tr><td><pre><code>new Region(0, 0, 0, 6, 6, 6).grow(-2, -2, -2)</code></pre></td><td><pre><samp>box[2, 2, 2 -> 4, 4, 4]</samp></pre></td></tr>
-     * <tr><td><pre><code>new Region(5, 5, 5, 7, 7, 7).grow(0, 1, -1)</code></pre></td><td><pre><samp>box[5, 4, 6 -> 7, 8, 6]</samp></pre></td></tr>
-     * <tr><td><pre><code>new Region(1, 1, 1, 3, 3, 3).grow(-4, -2, -3)</code></pre></td><td><pre><samp>box[-1, 1, 0 -> 5, 3, 4]</samp></pre></td></tr>
+     * <tr><td><pre>{@code new Region(0, 0, 0, 1, 1, 1).grow(2, 2, 2)}</pre></td><td><pre><samp>box[-2, -2, -2 -> 3, 3, 3]</samp></pre></td></tr>
+     * <tr><td><pre>{@code new Region(0, 0, 0, 6, 6, 6).grow(-2, -2, -2)}</pre></td><td><pre><samp>box[2, 2, 2 -> 4, 4, 4]</samp></pre></td></tr>
+     * <tr><td><pre>{@code new Region(5, 5, 5, 7, 7, 7).grow(0, 1, -1)}</pre></td><td><pre><samp>box[5, 4, 6 -> 7, 8, 6]</samp></pre></td></tr>
+     * <tr><td><pre>{@code new Region(1, 1, 1, 3, 3, 3).grow(-4, -2, -3)}</pre></td><td><pre><samp>box[-1, 1, 0 -> 5, 3, 4]</samp></pre></td></tr>
      * </table>
      *
      * <h3>See Also:</h3>
@@ -137,14 +135,23 @@ public final class Region implements IPlacementSequence {
         return expand(size, size, size);
     }
 
+    /**
+     * @see #expand(int, int, int) - substracting instead of adding.
+     */
     public Region collapse(int x, int y, int z) {
         return expand(-x, -y, -z);
     }
 
+    /**
+     * @see #collapse(int, int, int) - read x, y, and z from the {@link Vec3i}.
+     */
     public Region collapse(Vec3i vec) {
         return collapse(vec.getX(), vec.getY(), vec.getZ());
     }
 
+    /**
+     * @see #collapse(int, int, int) - collapse on all three axes.
+     */
     public Region collapse(int size) {
         return expand(-size);
     }
@@ -240,6 +247,8 @@ public final class Region implements IPlacementSequence {
     }
 
     /**
+     * Accurate representation of whether the position is a part the structure or not.
+     *
      * @see #contains(int, int, int)
      */
     @Override

@@ -8,6 +8,14 @@ import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+/**
+ * Universal capability provider that links multiple capability provider to share all of their properties.
+ * <p>
+ * If any of the child providers returns {@code true} on {@link ICapabilityProvider#hasCapability(Capability, EnumFacing)}, it will return true.
+ * If any of the child providers return a nonnull result for {@link ICapabilityProvider#getCapability(Capability, EnumFacing)}, it will return it.
+ * </p>
+ * <p>This means the order of providers matters, where it determines the first capability you will get if multiple child providers works some set of parameters.</p>
+ */
 public class MultiCapabilityProvider implements ICapabilityProvider {
 
     private final ImmutableList<ICapabilityProvider> childProviders;

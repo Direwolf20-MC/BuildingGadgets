@@ -11,6 +11,13 @@ import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import javax.annotation.Nonnull;
 import java.util.Iterator;
 
+/**
+ * A sequence of blocks that offsets in 2 different directions where one is vertical, one is horizontal.
+ * <p>
+ * For example, a regular climbing up stair facing north would have (UP, NORTH) as its parameter. This also applies to
+ * descending stair like (DOWN, SOUTH) where each block is lower than the latter.
+ * </p>
+ */
 public final class Stair implements IPlacementSequence {
 
     public static Stair create(BlockPos base, EnumFacing horizontalAdvance, EnumFacing verticalAdvance, int range) {
@@ -57,10 +64,6 @@ public final class Stair implements IPlacementSequence {
         return region.mayContain(x, y, z);
     }
 
-    /**
-     * @deprecated Stair should be immutable, so this is not needed
-     */
-    @Deprecated
     @Override
     public IPlacementSequence copy() {
         return new Stair(base, target, horizontalAdvance, verticalAdvance, region, range);

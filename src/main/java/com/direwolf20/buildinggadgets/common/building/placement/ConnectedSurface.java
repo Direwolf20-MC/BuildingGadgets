@@ -18,6 +18,13 @@ import java.util.Iterator;
 import java.util.Queue;
 import java.util.function.Function;
 
+/**
+ * Surface that limits its attempt to blocks that is connected through either on its sides or corners. Candidates are
+ * selected from a wall region centered at a point and filtered with a 8-way adjacent flood fill.
+ *
+ * @implSpec Uses a 8-way adjacent flood fill algorithm with Breath-First Search.
+ * @see Surface
+ */
 public final class ConnectedSurface implements IPlacementSequence {
 
     /**
@@ -70,10 +77,6 @@ public final class ConnectedSurface implements IPlacementSequence {
         return searchingRegion.mayContain(x, y, z);
     }
 
-    /**
-     * @deprecated ConnectedSurface should be immutable, so this is not needed
-     */
-    @Deprecated
     @Override
     public IPlacementSequence copy() {
         return new ConnectedSurface(world, searchingRegion, searching2referenceMapper, searchingCenter, side, fuzzy);
@@ -126,7 +129,7 @@ public final class ConnectedSurface implements IPlacementSequence {
     private boolean isStateValid(IBlockState filter, BlockPos pos) {
         IBlockState reference = getReferenceFor(pos);
         boolean isAir = reference.getBlock().isAir(reference, world, pos);
-        //If fuzzy=true, we ignore the block for reference
+        // If fuzzy=true, we ignore the block for reference
         if (fuzzy)
             return !isAir;
         return !isAir && filter == reference;

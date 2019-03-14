@@ -348,7 +348,6 @@ public class GadgetUtils {
         if (remoteInventorySupplier == null) {
             remoteInventorySupplier = Suppliers.memoizeWithExpiration(() -> {
                 Integer dim = getDIMFromNBT(tool, "boundTE");
-                System.out.println("fffff");
                 if (dim == null) return null;
                 BlockPos pos = getPOSFromNBT(tool, "boundTE");
                 return pos == null ? null : getRemoteInventory(pos, dim, world, player, operation);

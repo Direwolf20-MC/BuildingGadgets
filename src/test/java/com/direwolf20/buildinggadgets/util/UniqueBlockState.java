@@ -26,6 +26,17 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Fake block state without launching Minecraft. This should be used as an identifier and most of the functions and block
+ * attributes are broken.
+ * <p>
+ * All block states created has {@link Material#ROCK} as its material, only {@link #AIR} has {@link Material#AIR}. If a
+ * air block state is needed, the pre made air block state should be used instead of creating another one.
+ * </p><p>
+ * Each newly created block state should have a different ID. The ID that block states have is the only thing it cares
+ * about identity and hashing even if they are different objects.
+ * </p>
+ */
 public class UniqueBlockState implements IBlockState {
 
     public static final IBlockState AIR = new UniqueBlockState(-1) {
@@ -37,10 +48,17 @@ public class UniqueBlockState implements IBlockState {
 
     private static int lastId = -1;
 
+    /**
+     * Create a new block state object with a specified ID.
+     */
     public static UniqueBlockState createWithId(int id) {
         return new UniqueBlockState(id);
     }
 
+    /**
+     * Create a new block state object with a new ID. Note that this method does not gardened the ID used haven't
+     * been used as a parameter in {@link #createWithId(int)}.
+     */
     public static UniqueBlockState createNew() {
         return new UniqueBlockState(++lastId);
     }

@@ -5,8 +5,14 @@ import com.direwolf20.buildinggadgets.common.building.TranslationWrapper;
 import com.direwolf20.buildinggadgets.common.tools.GadgetUtils;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTUtil;
 import net.minecraft.util.math.BlockPos;
 
+/**
+ * Block provider that reads block state from a gadget item. No snapshots will be created therefore it will always be
+ * synced to the gadget item.
+ */
 public class LinkedBlockProvider implements IBlockProvider {
 
     private ItemStack stack;
@@ -27,6 +33,16 @@ public class LinkedBlockProvider implements IBlockProvider {
     @Override
     public IBlockState at(BlockPos pos) {
         return GadgetUtils.getToolBlock(stack);
+    }
+
+    @Override
+    public void serialize(NBTTagCompound tag) {
+        stack.writeToNBT(tag);
+    }
+
+    @Override
+    public IBlockProvider deserialize(NBTTagCompound tag) {
+        return new LinkedBlockProvider(new ItemStack(tag));
     }
 
 }

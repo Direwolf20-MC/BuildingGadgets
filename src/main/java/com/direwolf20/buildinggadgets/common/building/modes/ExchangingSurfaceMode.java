@@ -16,7 +16,11 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 
 /**
- * Reference region and searching region are the same.
+ * Surface mode for Exchanging Gadget.
+ * <p>
+ * Selects blocks that is same as the selected block. Reference region and searching region are the same
+ * if compared to {@link BuildingSurfaceMode}.
+ * </p>
  *
  * @see BuildingSurfaceMode
  */
