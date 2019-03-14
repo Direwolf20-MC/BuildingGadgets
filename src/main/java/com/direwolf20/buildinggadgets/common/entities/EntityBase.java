@@ -11,7 +11,7 @@ import net.minecraft.world.World;
 
 public abstract class EntityBase extends Entity {
     private int despawning = -1;
-    private BlockPos targetPos;
+    protected BlockPos targetPos;
 
     public EntityBase(EntityType<?> entityType, World world) {
         super(entityType, world);
@@ -57,13 +57,5 @@ public abstract class EntityBase extends Entity {
     @Override
     public boolean isInRangeToRender3d(double x, double y, double z) {
         return true;
-    }
-
-    protected BlockPos getTargetPos() {
-        return targetPos;
-    }
-
-    protected void setTargetPos(BlockPos targetPos) {
-        this.targetPos = targetPos;
     }
 }

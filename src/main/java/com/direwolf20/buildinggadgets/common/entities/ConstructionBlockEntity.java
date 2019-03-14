@@ -28,7 +28,7 @@ public class ConstructionBlockEntity extends EntityBase {
     public ConstructionBlockEntity(World world, BlockPos spawnPos, boolean makePaste) {
         this(world);
         setPosition(spawnPos.getX(), spawnPos.getY(), spawnPos.getZ());
-        setTargetPos(spawnPos);
+        targetPos = spawnPos;
         setMakingPaste(makePaste);
     }
 
@@ -48,37 +48,37 @@ public class ConstructionBlockEntity extends EntityBase {
         if (super.shouldSetDespawning())
             return true;
 
-        if (getTargetPos() == null)
+        if (targetPos == null)
             return false;
 
-        Block block = world.getBlockState(getTargetPos()).getBlock();
+        Block block = world.getBlockState(targetPos).getBlock();
         return !(block instanceof ConstructionBlock) && !(block instanceof ConstructionBlockPowder);
     }
 
     @Override
     protected void onSetDespawning() {
-        if (getTargetPos() != null) {
+        if (targetPos != null) {
             if (!getMakingPaste()) {
-                TileEntity te = world.getTileEntity(getTargetPos());
+                TileEntity te = world.getTileEntity(targetPos);
                 if (te instanceof ConstructionBlockTileEntity) {
                     IBlockState tempState = te.getBlockState();
 
-                    int opacity = tempState.getOpacity(world, getTargetPos());
-                    boolean neighborBrightness = tempState.useNeighborBrightness(world, getTargetPos());
+                    int opacity = tempState.getOpacity(world, targetPos);
+                    boolean neighborBrightness = tempState.useNeighborBrightness(world, targetPos);
                     if (opacity > 0 || neighborBrightness) {
                         IBlockState tempSetBlock = te.getBlockState();
                         IBlockState tempActualSetBlock = ((ConstructionBlockTileEntity) te).getActualBlockState();
-                        world.setBlockState(getTargetPos(), BGBlocks.constructionBlock.getDefaultState()
+                        world.setBlockState(targetPos, BGBlocks.constructionBlock.getDefaultState()
                                 .with(ConstructionBlock.BRIGHT, opacity == 0)
                                 .with(ConstructionBlock.NEIGHBOR_BRIGHTNESS, neighborBrightness));
-                        te = world.getTileEntity(getTargetPos());
+                        te = world.getTileEntity(targetPos);
                         if (te instanceof ConstructionBlockTileEntity) {
                             ((ConstructionBlockTileEntity) te).setBlockState(tempSetBlock, tempActualSetBlock);
                         }
                     }
                 }
-            } else if (world.getBlockState(getTargetPos()) == BGBlocks.constructionBlockPowder.getDefaultState()) {
-                world.setBlockState(getTargetPos(), BGBlocks.constructionBlockDense.getDefaultState());
+            } else if (world.getBlockState(targetPos) == BGBlocks.constructionBlockPowder.getDefaultState()) {
+                world.setBlockState(targetPos, BGBlocks.constructionBlockDense.getDefaultState());
             }
         }
     }
