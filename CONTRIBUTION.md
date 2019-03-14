@@ -46,7 +46,7 @@ Unless your Pr is directly related to code cleaning then your PR should not cont
 ### Code Style
 In general apply common sense to the Code you write. "Effective Java" is also always a good start.
 * Avoid unnecessary else clauses
-* Avoid large case statements and it's likely not needed. If you find yourself requiring a large case statement block then try to think about how you might be able to refactor your code in a way that avoids the requirement. Small case statements are fine.
+* Avoid large case statements as it's likely not needed. If you find yourself requiring a large case statement block then try to think about how you might be able to refactor your code in a way that avoids the requirement. Small case statements are fine.
 * Prefix Interfaces with `I` - like `ITemplate`
 * `@SupressWarnings("...")` should be avoided in General
     * if it needs to be applied, limit it to the smallest possible scope (and create a new variable for it if necessary)
