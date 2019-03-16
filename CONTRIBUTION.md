@@ -74,7 +74,10 @@ In general apply common sense to the Code you write. "Effective Java" is also al
 * enforce Immutability where possible
     * use ImmutableTypes for immutable values (`ImmutableList`, `ImmutableSet`, `ImmutableMap`, etc.)
     * avoid public properties
-    
+* Only use `this` when necessary with the exception of:
+  * In constructors, always use `this` for assignments and accessments
+  * If calling a method on a member field as a standalone statement (ex. `this.someObject.printMessage()`)
+
 ### Packages
 * Don't use packages like there is a limited allowed amount, for the sake of code readability and maintainabilty make as may packages as logically makes sense. Attempt to group as much common functionality as possible within a package. Use our `common.utils` package as an example of functionality grouping. 
 * Respect the 3 base packages: `common`, `client` and `api`. If you ever feel that something doesn't fit in these packages then you're likely thinking about it wrong. 
@@ -83,3 +86,63 @@ In general apply common sense to the Code you write. "Effective Java" is also al
   - `api` our api package is for all api related functionality, it's rare you should be using this package unless you're specifically working on api specific additions.
 * Use sensible and logical naming for your packages and avoid prefixing or sufixing your package names. For example `common.items.gadgets` is good, `common.itemGadgets` is bad as a sub-package should have been used. 
 * Always use lower case and respect the official Java guide to creating packages which can be found [here](https://docs.oracle.com/javase/tutorial/java/package/namingpkgs.html)
+
+### Class Structure
+* Classes should have static methods and fields on top, and member methods and fields on the bottom.
+  * Fields always exist before methods in their (static/member) region.
+  * Constructor always exist before other member methods.
+  * Getters and setters should be at end of a class definition, where setters follow getters.
+* A good example:
+```java
+public class Foo {
+
+    // Static fields before static methods
+    private static final int ID = 0xBEEF;
+
+    public static Foo create(int i) {
+        return new Foo(i, true);
+    }
+
+    // Member fields/methods after static fields/methods
+    // Member fields before member methods
+    private int i;
+    private boolean bar;
+
+    // Constructors before member methods
+    public Foo(int i, boolean bar) {
+        // Always use 'this' in constructors
+        this.i = i;
+        this.bar = bar;
+    }
+
+    // Getters are in the order of their backed fields
+
+    public int getNumber() {
+        // No 'this' and it is not necessary
+        return i;
+    }
+
+    public int getID() {
+        return ID;
+    }
+
+    // Special getters can live anywhere reasonable
+    public boolean getBoolean() {
+        boolean positive = i > 0;
+        return positive && bar;
+    }
+
+    // Setters are always after getters
+
+    public void setNumber(int i) {
+        // Use 'this' because necessary
+        this.i = i;
+    }
+
+    public void setBoolean(boolean target) {
+        // Always use 'this' in setters even if not necessary
+        this.bar = target || i > 0;
+    }
+
+}
+```
