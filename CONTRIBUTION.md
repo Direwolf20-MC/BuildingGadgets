@@ -92,9 +92,7 @@ In general apply common sense to the Code you write. "Effective Java" is also al
   * Only apply this to **class** and **enum**, *interfaces* and *annotations* should never be an inner.
   * If an inner class is splitted out from its parent due to it being too long and still has close relation to its parents, make it package private (internal).
   * One exception is when inner class is used to group utility methods, where the inner class can be any length but has to be an utility class (`final` and private constructor)
-* Only use `this` when necessary with the exception of:
-  * In constructors, always use `this` for assignments and accessments
-  * If calling a method on a member field as a standalone statement (ex. `this.someObject.printMessage()`)
+* Only use `this` when necessary.
 
 ### Packages
 * Don't use packages like there is a limited allowed amount, for the sake of code readability and maintainabilty make as may packages as logically makes sense. Attempt to group as much common functionality as possible within a package. Use our `common.utils` package as an example of functionality grouping. 
@@ -128,7 +126,7 @@ public class Foo {
 
     // Constructors before member methods
     public Foo(int i, boolean bar) {
-        // Always use 'this' in constructors
+        // 'this' because necessary (parameter/local variable and field name duplicates)
         this.i = i;
         this.bar = bar;
     }
@@ -158,8 +156,8 @@ public class Foo {
     }
 
     public void setBoolean(boolean target) {
-        // Always use 'this' in setters even if not necessary
-        this.bar = target || i > 0;
+        // No 'this' and it is not necessary
+        bar = target || i > 0;
     }
 
 }
