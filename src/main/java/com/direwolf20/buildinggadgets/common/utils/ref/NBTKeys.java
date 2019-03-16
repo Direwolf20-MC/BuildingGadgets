@@ -15,7 +15,7 @@ public final class NBTKeys {
     public static final String GADGET_FUZZY = "fuzzy";
     public static final String GADGET_RAYTRACE_FLUID = "raytrace_fluid";
     public static final String GADGET_PLACE_INSIDE = "start_inside";
-    public static final String GADGET_CONNECTED_AREA = "connected_area";
+    public static final String GADGET_UNCONNECTED_AREA = "unconnected_area";
     public static final String GADGET_ANCHOR = "anchor";
     public static final String GADGET_ANCHOR_SIDE = "anchor_side";
     public static final String GADGET_ANCHOR_COORDS = "anchor_coords";
