@@ -42,6 +42,14 @@ Unless your PR is directly related to code cleaning then your PR should not cont
 * Method/Class annotations should gain their own lines in front of the definition
 * Parameter Annotations should be surrounded by exactly one space
 * Comments should always start with a single space `// Comment`
+* Import statments should be ordered in sections with exactly 1 empty line between them. Regular imports go in the front and static imports follow them.
+  * If you are using IntelliJ, this is the default order.
+  * If you are using Eclipse, you need to reorder them under `Preferences -> Java -> Code Style -> Organize Imports`.
+    1. `com.`, `.net`, and other imports, should be in alphebetical order
+    2. (empty line)
+    3. `java.`, `javax.`, etc.
+    4. (empty line)
+    5. All other static imports
 
 ### Code Style
 In general apply common sense to the Code you write. "Effective Java" is also always a good start.
