@@ -74,6 +74,12 @@ In general apply common sense to the Code you write. "Effective Java" is also al
 * enforce Immutability where possible
     * use ImmutableTypes for immutable values (`ImmutableList`, `ImmutableSet`, `ImmutableMap`, etc.)
     * avoid public properties
+* Always use capital letters for format suffixes
+  * Bad format suffix: `0.5f`, `1000l`
+  * Good format suffiz: `0.5F`, `1000L`
+* Always use lower case letters for int literals
+  * Bad value: `0xFFF`, `0xBEEF`
+  * Good value: `0xfff`, `0xbeef`
 * Only use `this` when necessary with the exception of:
   * In constructors, always use `this` for assignments and accessments
   * If calling a method on a member field as a standalone statement (ex. `this.someObject.printMessage()`)
