@@ -30,6 +30,8 @@ import net.minecraftforge.fml.relauncher.Side;
 
 import static com.direwolf20.buildinggadgets.common.items.ModItems.gadgetBuilding;
 
+import java.awt.Color;
+
 @Mod.EventBusSubscriber(value = Side.CLIENT)
 public class ClientProxy extends CommonProxy {
     @Override
@@ -110,5 +112,9 @@ public class ClientProxy extends CommonProxy {
 
     public static void playSound(SoundEvent sound, float pitch) {
         Minecraft.getMinecraft().getSoundHandler().playSound(PositionedSoundRecord.getMasterRecord(sound, pitch));
+    }
+
+    public static Color getColor(Color color, int alpha) {
+        return new Color(color.getRed(), color.getGreen(), color.getBlue(), alpha);
     }
 }

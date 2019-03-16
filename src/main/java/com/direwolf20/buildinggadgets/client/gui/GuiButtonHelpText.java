@@ -4,7 +4,7 @@ import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiButton;
 
 public class GuiButtonHelpText extends GuiButton implements IHoverHelpText {
-    private String helpTextKey;
+    protected String helpTextKey;
 
     public GuiButtonHelpText(int buttonId, int x, int y, int widthIn, int heightIn, String buttonText, String helpTextKey) {
         super(buttonId, x, y, widthIn, heightIn, buttonText);

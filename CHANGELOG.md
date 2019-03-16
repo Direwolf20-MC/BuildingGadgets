@@ -4,6 +4,10 @@ The format of this document is based on [Keep a Changelog](https://keepachangelo
 ## [Unreleased]
 ### Added
 - The copy/paste gadget can now mirror pastes, as well as rotate them. Sneak while pressing the keybind that previously just rotated them to mirror them left-to-right instead.
+- Added/changed radial menu functionality/aesthetics:
+    - Converted text-based settings controls to icon-based ones.
+    - Prevented mode strings from rendering when the cursor is not over its corresponding slice.
+    - Added range slider.
 - Allowed gadgets to bind Simple Storage Network networks as a remote inventories (you can only bind the Storage Network Master block).
 - Dense construction blocks now drop 1-3 (configurable) construction paste items.
 - The process of generating construction paste is now as follows:
