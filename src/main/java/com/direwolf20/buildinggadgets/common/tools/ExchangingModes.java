@@ -105,12 +105,9 @@ public enum ExchangingModes {
 
             TileEntity tile = world.getTileEntity(pos);
             // Only replace construction block with same block state
-            if (tile instanceof ConstructionBlockTileEntity)
-                if (((ConstructionBlockTileEntity) tile).getBlockState() == state)
-                    return false;
-
-            // Otherwise if the block has a tile entity, ignore it
-            if (tile != null)
+            if (tile instanceof ConstructionBlockTileEntity && ((ConstructionBlockTileEntity) tile).getBlockState() == state)
+                return false;
+            else if (tile != null) // Otherwise if the block has a tile entity, ignore it
                 return false;
 
             // Bedrock, End Portal Frame, etc.

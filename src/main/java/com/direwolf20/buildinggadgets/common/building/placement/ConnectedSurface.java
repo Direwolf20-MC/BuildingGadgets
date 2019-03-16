@@ -86,7 +86,7 @@ public final class ConnectedSurface implements IPlacementSequence {
      * Uses a 8-way adjacent flood fill algorithm with Breath-First Search to identify blocks with a valid path. A position
      * is valid if and only if it connects to the center and its underside block is the same as the underside of the center.
      *
-     * @implNote Uses a 8-way adjacent flood fill algorithm with Breath-First Search to identify blocks with a valid path.
+     * @implNote Uses a 8-way adjacent flood fill algorithm with Breadth-First Search to identify blocks with a valid path.
      */
     @Nonnull
     @Override

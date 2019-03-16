@@ -8,7 +8,7 @@ import net.minecraft.nbt.NBTUtil;
 import net.minecraft.util.math.BlockPos;
 
 /**
- * Immutable block provider that always give the same block state regardless of what position it requested.
+ * Immutable block provider that always return the same block state regardless of which position is requested.
  */
 public class SingleTypeProvider implements IBlockProvider {
 
