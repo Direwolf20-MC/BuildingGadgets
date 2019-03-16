@@ -2,6 +2,7 @@ package com.direwolf20.buildinggadgets.common.network.packets;
 
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetBuilding;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
+import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetDestruction;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetExchanger;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -30,6 +31,8 @@ public class PacketChangeRange {
                     GadgetExchanger.rangeChange(player, stack);
                 else if (stack.getItem() instanceof GadgetCopyPaste)
                     GadgetCopyPaste.rotateBlocks(stack, player);
+                else if (stack.getItem() instanceof GadgetDestruction)
+                    GadgetDestruction.switchOverlay(player, stack);
             });
             ctx.get().setPacketHandled(true);
         }
