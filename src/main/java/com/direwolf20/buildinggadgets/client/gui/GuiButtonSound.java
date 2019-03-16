@@ -12,8 +12,8 @@ public class GuiButtonSound extends GuiButtonSelect {
     private float pitchSelect, pitchDeselect;
     private boolean silent;
 
-    public GuiButtonSound(int x, int y, int width, int height, String text, @Nullable Runnable action) {
-        super(x, y, width, height, text, action);
+    public GuiButtonSound(int x, int y, int width, int height, String text, String helpTextKey, @Nullable Runnable action) {
+        super(x, y, width, height, text, helpTextKey, action);
         pitchSelect = pitchDeselect = 1;
     }
 

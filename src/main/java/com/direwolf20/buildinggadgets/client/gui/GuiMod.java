@@ -26,6 +26,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.network.FMLPlayMessages.OpenContainer;
 import net.minecraftforge.fml.network.NetworkHooks;
 
+import java.awt.Color;
 import java.util.Iterator;
 import java.util.function.Consumer;
 
@@ -146,5 +147,9 @@ public enum GuiMod {
                 return false;
         }
         return true;
+    }
+
+    public static Color getColor(Color color, int alpha) {
+        return new Color(color.getRed(), color.getGreen(), color.getBlue(), alpha);
     }
 }

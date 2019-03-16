@@ -79,7 +79,7 @@ public class GadgetDestruction extends GadgetSwapping {
         super.addInformation(stack, world, tooltip, flag);
         tooltip.add(new TextComponentString(TextFormatting.RED + I18n.format("tooltip.gadget.destroywarning")));
         tooltip.add(new TextComponentString(TextFormatting.AQUA + I18n.format("tooltip.gadget.destroyshowoverlay") + ": " + getOverlay(stack)));
-        tooltip.add(new TextComponentString(TextFormatting.YELLOW + I18n.format("tooltip.gadget.connectedarea") + ": " + getConnectedArea(stack)));
+        tooltip.add(new TextComponentString(TextFormatting.YELLOW + I18n.format("tooltip.gadget.connected_area") + ": " + getConnectedArea(stack)));
         if (Config.isServerConfigLoaded() && Config.GADGETS.GADGET_DESTRUCTION.nonFuzzyEnabled.get())
             tooltip.add(new TextComponentString(TextFormatting.GOLD + I18n.format("tooltip.gadget.fuzzy") + ": " + getFuzzy(stack)));
 
@@ -182,7 +182,7 @@ public class GadgetDestruction extends GadgetSwapping {
         stack.setTag(tagCompound);
     }
 
-    public void switchOverlay(EntityPlayer player, ItemStack stack) {
+    public static void switchOverlay(EntityPlayer player, ItemStack stack) {
         boolean overlay = !getOverlay(stack);
         setOverlay(stack, overlay);
         player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("tooltip.gadget.destroyshowoverlay").getUnformattedComponentText() + ": " + overlay), true);

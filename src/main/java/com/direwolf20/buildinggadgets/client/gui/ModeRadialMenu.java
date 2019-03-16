@@ -12,6 +12,7 @@ import com.direwolf20.buildinggadgets.common.items.gadgets.*;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.*;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGSound;
+import com.direwolf20.buildinggadgets.common.utils.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.utils.ref.Reference;
 import com.google.common.collect.ImmutableSet;
 import net.minecraft.client.Minecraft;
@@ -19,13 +20,14 @@ import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.client.util.InputMappings;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+
 import org.lwjgl.opengl.GL11;
 
 import javax.vecmath.Vector2f;
@@ -36,28 +38,29 @@ import java.util.List;
 public class ModeRadialMenu extends GuiScreen {
 
     private static final ResourceLocation[] signsBuilding = new ResourceLocation[]{
-        new ResourceLocation(Reference.MODID, "textures/ui/build_to_me.png"),
-        new ResourceLocation(Reference.MODID, "textures/ui/vertical_column.png"),
-        new ResourceLocation(Reference.MODID, "textures/ui/horizontal_column.png"),
-        new ResourceLocation(Reference.MODID, "textures/ui/vertical_wall.png"),
-        new ResourceLocation(Reference.MODID, "textures/ui/horizontal_wall.png"),
-        new ResourceLocation(Reference.MODID, "textures/ui/stairs.png"),
-        new ResourceLocation(Reference.MODID, "textures/ui/grid.png"),
-        new ResourceLocation(Reference.MODID, "textures/ui/surface.png")
+        new ResourceLocation(Reference.MODID, "textures/gui/mode/build_to_me.png"),
+        new ResourceLocation(Reference.MODID, "textures/gui/mode/vertical_column.png"),
+        new ResourceLocation(Reference.MODID, "textures/gui/mode/horizontal_column.png"),
+        new ResourceLocation(Reference.MODID, "textures/gui/mode/vertical_wall.png"),
+        new ResourceLocation(Reference.MODID, "textures/gui/mode/horizontal_wall.png"),
+        new ResourceLocation(Reference.MODID, "textures/gui/mode/stairs.png"),
+        new ResourceLocation(Reference.MODID, "textures/gui/mode/grid.png"),
+        new ResourceLocation(Reference.MODID, "textures/gui/mode/surface.png")
     };
     private static final ResourceLocation[] signsExchanger = new ResourceLocation[]{
-        new ResourceLocation(Reference.MODID, "textures/ui/surface.png"),
-        new ResourceLocation(Reference.MODID, "textures/ui/vertical_column.png"),
-        new ResourceLocation(Reference.MODID, "textures/ui/horizontal_column.png"),
-        new ResourceLocation(Reference.MODID, "textures/ui/grid.png")
+        new ResourceLocation(Reference.MODID, "textures/gui/mode/surface.png"),
+        new ResourceLocation(Reference.MODID, "textures/gui/mode/vertical_column.png"),
+        new ResourceLocation(Reference.MODID, "textures/gui/mode/horizontal_column.png"),
+        new ResourceLocation(Reference.MODID, "textures/gui/mode/grid.png")
     };
     private static final ResourceLocation[] signsCopyPaste = new ResourceLocation[]{
-        new ResourceLocation(Reference.MODID, "textures/ui/copy.png"),
-        new ResourceLocation(Reference.MODID, "textures/ui/paste.png")
+        new ResourceLocation(Reference.MODID, "textures/gui/mode/copy.png"),
+        new ResourceLocation(Reference.MODID, "textures/gui/mode/paste.png")
     };
     private int timeIn = 0;
     private int slotSelected = -1;
     private int segments;
+    private GuiSliderInt sliderRange;
 
     public ModeRadialMenu(ItemStack stack) {
         mc = Minecraft.getInstance();
@@ -80,7 +83,7 @@ public class ModeRadialMenu extends GuiScreen {
         boolean destruction = false;
         if (tool.getItem() instanceof GadgetDestruction) {
             destruction = true;
-            addButton(new GuiButtonActionCallback(I18n.format("tooltip.gadget.destroy.overlay"), send -> {
+            addButton(new GuiButtonActionCallback("destroy.overlay", send -> {
                 if (send)
                     PacketHandler.sendToServer(new PacketChangeRange());
 
@@ -89,28 +92,43 @@ public class ModeRadialMenu extends GuiScreen {
         }
         if (!(tool.getItem() instanceof GadgetCopyPaste)) {
             if (!destruction || Config.GADGETS.GADGET_DESTRUCTION.nonFuzzyEnabled.get()) {
-                addButton(new GuiButtonActionCallback(I18n.format("tooltip.gadget.fuzzy"), send -> {
+                addButton(new GuiButtonActionCallback("fuzzy", send -> {
                     if (send)
                         PacketHandler.sendToServer(new PacketToggleFuzzy());
 
                     return GadgetGeneric.getFuzzy(getGadget());
                 }));
             }
-            addButton(new GuiButtonActionCallback(I18n.format("message.gadget.connected" + (destruction ? "area" : "surface")), send -> {
+            addButton(new GuiButtonActionCallback("connected_" + (destruction ? "area" : "surface"), send -> {
                 if (send)
                     PacketHandler.sendToServer(new PacketToggleConnectedArea());
 
                 return GadgetGeneric.getConnectedArea(getGadget());
             }));
+            if (!destruction) {
+                int widthSlider = 82;
+                sliderRange = new GuiSliderInt(width / 2 - widthSlider / 2, height / 2 + 72, widthSlider, 14, "Range ", "", 1, Config.GADGETS.maxRange.get(),
+                    GadgetUtils.getToolRange(tool), false, true, Color.DARK_GRAY, slider -> {
+                        if (slider.getValueInt() != GadgetUtils.getToolRange(getGadget()))
+                            PacketHandler.sendToServer(new PacketChangeRange(slider.getValueInt()));
+                    }, (slider, amount) -> {
+                        int value = slider.getValueInt();
+                        int valueNew = MathHelper.clamp(value + amount, 1, Config.GADGETS.maxRange.get());
+                        slider.setValue(valueNew);
+                        slider.updateSlider();
+                    });
+                sliderRange.precision = 1;
+                sliderRange.getComponents().forEach(component -> addButton(component));
+            }
         }
-        addButton(new GuiButtonActionCallback(I18n.format("tooltip.gadget.raytrace_fluid"), send -> {
+        addButton(new GuiButtonActionCallback("raytrace_fluid", send -> {
             if (send)
                 PacketHandler.sendToServer(new PacketToggleRayTraceFluid());
 
             return GadgetGeneric.shouldRayTraceFluid(getGadget());
         }));
         if (tool.getItem() instanceof GadgetBuilding) {
-            addButton(new GuiButtonActionCallback(I18n.format("tooltip.gadget.building.place_atop"), send -> {
+            addButton(new GuiButtonActionCallback("building.place_atop", send -> {
                 if (send)
                     PacketHandler.sendToServer(new PacketToggleBlockPlacement());
 
@@ -121,23 +139,37 @@ public class ModeRadialMenu extends GuiScreen {
     }
 
     private void updateButtons(ItemStack tool) {
-        int x = 0;
+        int pos = 0;
+        int dim = 24;
+        int padding = 10;
         for (int i = 0; i < buttons.size(); i++) {
+            if (!(buttons.get(i) instanceof GuiButtonSound))
+                continue;
+
             GuiButtonSound button = (GuiButtonSound) buttons.get(i);
             SoundEvent sound = BGSound.BEEP.getSound();
             button.setSounds(sound, sound, 1F, 0.6F);
             if (!button.visible) continue;
-            int len = mc.fontRenderer.getStringWidth(button.displayString) + 6;
-            x += len + 10;
-            button.width = len;
-            button.height = mc.fontRenderer.FONT_HEIGHT + 3;
-            button.y = height / 2 - (tool.getItem() instanceof GadgetDestruction ? button.height + 4 : 110);
+            pos += dim + padding;
+            button.width = dim;
+            button.height = dim;
+            if (tool.getItem() instanceof GadgetDestruction)
+                button.y = height / 2 - button.height - 5;
+            else
+                button.x = width / 2 + 70;
         }
-        x = width / 2 - (x - 10) / 2;
+        pos = (tool.getItem() instanceof GadgetDestruction ? width / 2 - (pos - padding) / 2 : height / 2 - (pos - padding) / 2);
         for (GuiButton button : buttons) {
+            if (!(button instanceof GuiButtonSound))
+                continue;
+
             if (!button.visible) continue;
-            button.x = x;
-            x += button.width + 10;
+            if (tool.getItem() instanceof GadgetDestruction)
+                button.x = pos;
+            else
+                button.y = pos;
+
+            pos += dim + padding;
         }
     }
 
@@ -151,19 +183,29 @@ public class ModeRadialMenu extends GuiScreen {
         float fract = Math.min(stime, timeIn + partialTicks) / stime;
         int x = width / 2;
         int y = height / 2;
+
+        int radiusMin = 26;
+        int radiusMax = 60;
+        double dist = new Vec3d(x, y, 0).distanceTo(new Vec3d(mx, my, 0));
+        boolean inRange = false;
+        if (segments != 0) {
+            inRange = dist > radiusMin && dist < radiusMax;
+            for (GuiButton button : buttons) {
+                if (button instanceof GuiButtonActionCallback)
+                    ((GuiButtonActionCallback) button).setFaded(inRange);
+            }
+        }
         GlStateManager.pushMatrix();
         GlStateManager.translatef((1 - fract) * x, (1 - fract) * y, 0);
         GlStateManager.scalef(fract, fract, fract);
         super.render(mx, my, partialTicks);
         GlStateManager.popMatrix();
-        if (segments == 0)
+        if (segments == 0) {
+            renderHoverHelpText(mx, my);
             return;
-
+        }
         GlStateManager.pushMatrix();
         GlStateManager.disableTexture2D();
-
-        
-        int maxRadius = 80;
 
         float angle = mouseAngle(x, y, mx, my);
 
@@ -182,8 +224,8 @@ public class ModeRadialMenu extends GuiScreen {
 
         slotSelected = -1;
         float offset = 8.5F;
-        double dist = new Vec3d(x, y, 0).distanceTo(new Vec3d(mx, my, 0));
-        boolean inRange = dist > 35 && dist < 81;
+        
+
         ResourceLocation[] signs;
         int modeIndex;
         if (tool.getItem() instanceof GadgetBuilding) {
@@ -198,8 +240,8 @@ public class ModeRadialMenu extends GuiScreen {
         }
 
         for (int seg = 0; seg < segments; seg++) {
-            boolean mouseInSector = inRange && angle > totalDeg && angle < totalDeg + degPer;
-            float radius = Math.max(0F, Math.min((timeIn + partialTicks - seg * 6F / segments) * 40F, maxRadius));
+            boolean mouseInSector = isCursorInSlice(angle, totalDeg, degPer, inRange);
+            float radius = Math.max(0F, Math.min((timeIn + partialTicks - seg * 6F / segments) * 40F, radiusMax));
 
             GL11.glBegin(GL11.GL_TRIANGLE_STRIP);
 
@@ -222,7 +264,7 @@ public class ModeRadialMenu extends GuiScreen {
                 double xp = x + Math.cos(rad) * radius;
                 double yp = y + Math.sin(rad) * radius;
                 if ((int) i == (int) (degPer / 2))
-                    stringPositions.add(new int[]{(int) xp, (int) yp, mouseInSector ? 'n' : 'r'});
+                    stringPositions.add(new int[]{(int) xp, (int) yp, mouseInSector ? 1 : 0});
 
                 GL11.glVertex2d(x + Math.cos(rad) * radius / 2.3F, y + Math.sin(rad) * radius / 2.3F);
                 GL11.glVertex2d(xp, yp);
@@ -242,7 +284,6 @@ public class ModeRadialMenu extends GuiScreen {
             int[] pos = stringPositions.get(i);
             int xp = pos[0];
             int yp = pos[1];
-            char c = (char) pos[2];
 
             String name = "";
             if (tool.getItem() instanceof GadgetBuilding)
@@ -251,8 +292,6 @@ public class ModeRadialMenu extends GuiScreen {
                 name = GadgetExchanger.ToolMode.values()[i].toString();
             else
                 name = GadgetCopyPaste.ToolMode.values()[i].toString();
-
-            name = "\u00a7" + c + name;
 
             int xsp = xp - 4;
             int ysp = yp;
@@ -264,7 +303,8 @@ public class ModeRadialMenu extends GuiScreen {
                 ysp -= 9;
 
             Color color = i == modeIndex ? Color.GREEN : Color.WHITE;
-            fontRenderer.drawStringWithShadow(name, xsp, ysp, color.getRGB());
+            if (pos[2] > 0)
+                fontRenderer.drawStringWithShadow(name, xsp, ysp, color.getRGB());
 
             double mod = 0.7;
             int xdp = (int) ((xp - x) * mod + x);
@@ -280,7 +320,7 @@ public class ModeRadialMenu extends GuiScreen {
         GlStateManager.blendFuncSeparate(770, 771, 1, 0);
         RenderHelper.enableGUIStandardItemLighting();
 
-        float s = 3F * fract;
+        float s = 2.25F * fract;
         GlStateManager.scalef(s, s, s);
         GlStateManager.translatef(x / s - offset, y / s - 8, 0);
         mc.getItemRenderer().renderItemAndEffectIntoGUI(tool, 0, 0);
@@ -289,6 +329,24 @@ public class ModeRadialMenu extends GuiScreen {
         GlStateManager.disableRescaleNormal();
 
         GlStateManager.popMatrix();
+        renderHoverHelpText(mx, my);
+    }
+
+    private boolean isCursorInSlice(float angle, float totalDeg, float degPer, boolean inRange) {
+        return inRange && angle > totalDeg && angle < totalDeg + degPer;
+    }
+
+    private void renderHoverHelpText(int mx, int my) {
+        buttons.forEach(button -> {
+            if (!(button instanceof IHoverHelpText))
+                return;
+
+            IHoverHelpText helpTextProvider = (IHoverHelpText) button;
+            if (helpTextProvider.isHovered(mx, my)) {
+                Color color = button instanceof GuiButtonSelect && ((GuiButtonSelect) button).isSelected() ? Color.GREEN : Color.WHITE;
+                fontRenderer.drawStringWithShadow(helpTextProvider.getHoverHelpText(), mx, my - fontRenderer.FONT_HEIGHT, color.getRGB());
+            }
+        });
     }
 
     private void changeMode() {
