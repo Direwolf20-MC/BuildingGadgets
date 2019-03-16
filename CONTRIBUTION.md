@@ -103,7 +103,7 @@ In general apply common sense to the Code you write. "Effective Java" is also al
 public class Foo {
 
     // Static fields before static methods
-    private static final int ID = 0xBEEF;
+    private static final int ID = 0xbeef;
 
     public static Foo create(int i) {
         return new Foo(i, true);
