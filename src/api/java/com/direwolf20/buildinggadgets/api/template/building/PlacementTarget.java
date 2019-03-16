@@ -1,4 +1,4 @@
-package com.direwolf20.buildinggadgets.api.template;
+package com.direwolf20.buildinggadgets.api.template.building;
 
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;

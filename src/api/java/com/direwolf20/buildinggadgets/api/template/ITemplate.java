@@ -1,13 +1,16 @@
 package com.direwolf20.buildinggadgets.api.template;
 
 import com.direwolf20.buildinggadgets.api.abstraction.IUniqueItem;
+import com.direwolf20.buildinggadgets.api.template.building.IBuildContext;
+import com.direwolf20.buildinggadgets.api.template.building.ITemplateView;
+import com.direwolf20.buildinggadgets.api.template.building.PlacementTarget;
+import com.direwolf20.buildinggadgets.api.template.serialisation.ITemplateSerializer;
+import com.direwolf20.buildinggadgets.api.template.transaction.ITemplateTransaction;
 import com.google.common.collect.Multiset;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockReader;
 
 import javax.annotation.Nullable;
-import java.util.Spliterator;
-import java.util.stream.Stream;
 
 /**
  * Instances of this class represent a 3D-Template for any kind of structure in the Form of an {@link Iterable} of {@link PlacementTarget}'s.
@@ -33,16 +36,13 @@ import java.util.stream.Stream;
  * @implSpec Notice further that no guarantees are made for the order in which {@link PlacementTarget}'s are produced by this {@code ITemplate}.
  *           Order may be arbitrary or sorted, consult the documentation of the implementation you are currently faced with for information about traversal order.
  */
-public interface ITemplate extends Iterable<PlacementTarget> {
+public interface ITemplate {
     //TODO add Boundingbox (Region) as soon as @hnOsmium's PR comes in
 
-    /**
-     * Creates a {@link Stream} backed by the {@link #spliterator()} of this {@code ITemplate}.
-     * @return A {@link Stream} representing all positions produced by this {@code ITemplate}.
-     * @implSpec The {@link Stream} produced by this method must not be parallel. A user wishing for parallel traversal
-     *           should take a look at {@link java.util.stream.StreamSupport#stream(Spliterator, boolean)}.
-     */
-    Stream<PlacementTarget> stream();
+    ITemplateSerializer getSerializer();
+
+    ITemplateView createViewInContext(IBuildContext buildContext);
+
 
     /**
      * Creates a new {@link ITemplateTransaction} for modifying this {@code ITemplate}. The created {@link ITemplateTransaction}
@@ -60,20 +60,11 @@ public interface ITemplate extends Iterable<PlacementTarget> {
     @Nullable
     ITemplateTransaction startTransaction();
 
-    /**
-     * Translates this {@code ITemplate} to the specified position.
-     * @param pos The position to translate to. May not be null.
-     * @return The new translated {@link ITemplate}. May be the same or a new instance depending on implementation.
-     * @throws NullPointerException if the given Position was null
-     * @implSpec This Method may not accumulate multiple translations, but instead always set the absolute Translation performed
-     *           to the specified value.
-     */
-    ITemplate translateTo(BlockPos pos);
 
     /**
      * @return A {@link Multiset} representing the Item Requirements to build this {@code ITemplate}
      */
-    Multiset<IUniqueItem> getRequiredItems();
+    Multiset<IUniqueItem> estimateRequiredItems();
 
     /**
      * Attempts to compute an estimate of how many {@link PlacementTarget}'s this {@code ITemplate} will produce.
@@ -84,4 +75,5 @@ public interface ITemplate extends Iterable<PlacementTarget> {
      *         Negative if unknown of expensive to compute
      */
     int estimateSize();
+
 }

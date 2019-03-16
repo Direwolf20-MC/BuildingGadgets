@@ -1,6 +1,8 @@
-package com.direwolf20.buildinggadgets.api.template;
+package com.direwolf20.buildinggadgets.api.template.transaction;
 
 import com.direwolf20.buildinggadgets.api.exceptions.TransactionExecutionException;
+import com.direwolf20.buildinggadgets.api.template.ITemplate;
+import com.direwolf20.buildinggadgets.api.template.building.BlockData;
 import net.minecraft.util.math.BlockPos;
 
 /**
@@ -30,20 +32,20 @@ public interface ITemplateTransaction {
      * <p>
      *     The required execution order for the specified Operations is as follows:
      *     <ol>
-     *         <li>Call {@link ITransactionOperator#createPos()} until it returns null. The resulting positions must exist in the resulting {@link ITemplate}.</li>
-     *         <li>Call {@link ITransactionOperator#createDataForPos(BlockPos)} for each Position previously returned by {@link ITransactionOperator#createPos()}</li>
-     *         <li>Call {@link ITransactionOperator#transformData(BlockData)} <b>for each BlockData in the {@link ITemplate}.</b></li>
-     *         <li>Call {@link ITransactionOperator#transformPos(BlockPos, BlockData)} <b>for each Position in the {@link ITemplate}.</b></li>
+     *         <li>Call {@link ITransactionOperator#createPos(ITransactionExecutionContext)} until it returns null. The resulting positions must exist in the resulting {@link ITemplate}.</li>
+     *         <li>Call {@link ITransactionOperator#createDataForPos(ITransactionExecutionContext, BlockPos)} for each Position previously returned by {@link ITransactionOperator#createPos(ITransactionExecutionContext)}</li>
+     *         <li>Call {@link ITransactionOperator#transformData(ITransactionExecutionContext, BlockData)} <b>for each BlockData in the {@link ITemplate}.</b></li>
+     *         <li>Call {@link ITransactionOperator#transformPos(ITransactionExecutionContext, BlockPos, BlockData)} <b>for each Position in the {@link ITemplate}.</b></li>
      *     </ol>
      * </p>
      * @implSpec Notice that an {@code ITemplateTransaction} is considered invalid as soon as {@code execute()} has been called.
      *           Any further calls should throw {@link UnsupportedOperationException}.
-     * @implNote Note that {@link ITransactionOperator#createPos()} may produce Positions already contained in the backing {@link ITemplate}.
-     *           This indicates that current Data should be replaced by whatever {@link ITransactionOperator#createDataForPos(BlockPos)} returns.
-     * @implNote Note that {@link ITransactionOperator#createDataForPos(BlockPos)} may also return null in cases where data is already present in the backing
+     * @implNote Note that {@link ITransactionOperator#createPos(ITransactionExecutionContext)} may produce Positions already contained in the backing {@link ITemplate}.
+     *           This indicates that current Data should be replaced by whatever {@link ITransactionOperator#createDataForPos(ITransactionExecutionContext, BlockPos)} returns.
+     * @implNote Note that {@link ITransactionOperator#createDataForPos(ITransactionExecutionContext, BlockPos)} may also return null in cases where data is already present in the backing
      *           {@link ITemplate}. Returning null from this method, when no data is present for the given Position is considered an error and
      *           should therefore throw an {@link com.direwolf20.buildinggadgets.api.exceptions.OperatorExecutionFailedException}.
-     * @implNote Note that {@link ITransactionOperator#transformData(BlockData)} and {@link ITransactionOperator#transformPos(BlockPos, BlockData)} may
+     * @implNote Note that {@link ITransactionOperator#transformData(ITransactionExecutionContext, BlockData)} and {@link ITransactionOperator#transformPos(ITransactionExecutionContext, BlockPos, BlockData)} may
      *           return null to indicate that a certain position or <b>all positions referenced by a specific {@link BlockData}</b> should be removed from
      *           the backing {@link ITemplate}.
      * @return The transformed Template, as specified by the passed in {@link ITransactionOperator}'s. May be the original or a new instance.

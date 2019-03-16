@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.api.exceptions;
 
-import com.direwolf20.buildinggadgets.api.template.ITransactionOperator;
+import com.direwolf20.buildinggadgets.api.template.transaction.ITransactionOperator;
 
 public class OperatorExecutionFailedException extends TransactionExecutionException{
     private final ITransactionOperator failingOperator;

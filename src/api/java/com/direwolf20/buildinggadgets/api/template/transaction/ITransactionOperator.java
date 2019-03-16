@@ -1,5 +1,7 @@
-package com.direwolf20.buildinggadgets.api.template;
+package com.direwolf20.buildinggadgets.api.template.transaction;
 
+import com.direwolf20.buildinggadgets.api.template.ITemplate;
+import com.direwolf20.buildinggadgets.api.template.building.BlockData;
 import com.google.common.collect.ImmutableSet;
 import net.minecraft.util.math.BlockPos;
 
@@ -28,17 +30,17 @@ public interface ITransactionOperator {
     enum Characteristic {
         /**
          * This {@code Characteristic} represents the ability of an {@code ITransactionOperator} to transform positions via
-         * {@link #transformPos(BlockPos, BlockData)}.
+         * {@link #transformPos(ITransactionExecutionContext, BlockPos, BlockData)}.
          */
         TRANSFORM_POSITION,
         /**
          * This {@code Characteristic} represents the ability of an {@code ITransactionOperator} to transform data via
-         * {@link #transformData(BlockData)}.
+         * {@link #transformData(ITransactionExecutionContext, BlockData)}.
          */
         TRANSFORM_DATA,
         /**
          * This {@code Characteristic} represents the ability of an {@code ITransactionOperator} to create new data via
-         * {@link #createPos()} and {@link #createDataForPos(BlockPos)}.
+         * {@link #createPos(ITransactionExecutionContext)} and {@link #createDataForPos(ITransactionExecutionContext, BlockPos)}.
          */
         CREATE_DATA
     }
@@ -46,16 +48,16 @@ public interface ITransactionOperator {
     /**
      * Allows this {@code ITransactionOperator} to add arbitrary {@link BlockPos} to a given {@link ITemplate}. Notice that returning a
      * {@link BlockPos} which is already contained in a given {@link ITemplate} will effectively replace the previous data with whatever
-     * {@link BlockData} {@link #createDataForPos(BlockPos)} returns.
+     * {@link BlockData} {@link #createDataForPos(ITransactionExecutionContext, BlockPos)} returns.
      * @return A new {@link BlockPos} to add to a given {@link ITemplate} or null if no more positions should be added
      */
     @Nullable
-    default BlockPos createPos() {
+    default BlockPos createPos(ITransactionExecutionContext context) {
         return null;
     }
 
     /**
-     * This method creates arbitrary {@link BlockData} for a given {@link BlockPos} returned by {@link #createPos()},
+     * This method creates arbitrary {@link BlockData} for a given {@link BlockPos} returned by {@link #createPos(ITransactionExecutionContext)},
      * overwriting previous data in the process.
      * <p>
      * Notice that even though you may return null from this Method, doing so for an {@link BlockPos} which is not already present in
@@ -66,33 +68,33 @@ public interface ITransactionOperator {
      * @return A new {@link BlockData} for a given {@link BlockPos} or null if none can or should be created.
      */
     @Nullable
-    default BlockData createDataForPos(BlockPos pos) {
+    default BlockData createDataForPos(ITransactionExecutionContext context, BlockPos pos) {
         throw new UnsupportedOperationException("Default implementation does not support creating BlockData!");
     }
 
     /**
      * Performs arbitrary operations on the given {@link BlockData}. <br>
-     * Will be called after {@link #createPos()} and {@link #createDataForPos(BlockPos)} are finished executing.
+     * Will be called after {@link #createPos(ITransactionExecutionContext)} and {@link #createDataForPos(ITransactionExecutionContext, BlockPos)} are finished executing.
      * @param data The {@link BlockData} to be transformed by this {@code ITransactionOperator}'s
      * @return The transformed {@link BlockData} or null to remove it <b>and all referencing positions</b> from the Template.
      * @implNote The default implementation is the identity function.
      */
     @Nullable
-    default BlockData transformData(BlockData data) {
+    default BlockData transformData(ITransactionExecutionContext context, BlockData data) {
         return data;
     }
 
     /**
      * Performs arbitrary operations on the given {@link BlockPos}. The {@link BlockData} associated with this position is passed into this Method
      * in order to provide more context. <br>
-     * Will be called after {@link #transformData(BlockData)} is finished executing for the {@link BlockData} associated with this {@link BlockPos}.
+     * Will be called after {@link #transformData(ITransactionExecutionContext, BlockData)} is finished executing for the {@link BlockData} associated with this {@link BlockPos}.
      * @param pos The position to transform
      * @param data The {@link BlockData} associated with this position
      * @return The new transformed {@link BlockPos} or null if it should be removed from the given {@link ITemplate}
      * @implNote The default implementation just returns the given position
      */
     @Nullable
-    default BlockPos transformPos(BlockPos pos, BlockData data) {
+    default BlockPos transformPos(ITransactionExecutionContext context, BlockPos pos, BlockData data) {
         return pos;
     }
 

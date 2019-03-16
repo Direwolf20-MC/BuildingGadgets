@@ -1,6 +1,6 @@
-package com.direwolf20.buildinggadgets.api.template;
+package com.direwolf20.buildinggadgets.api.template.building;
 
-import com.direwolf20.buildinggadgets.api.template.tilesupport.ITileEntityData;
+import com.direwolf20.buildinggadgets.api.template.building.tilesupport.ITileEntityData;
 import net.minecraft.block.state.IBlockState;
 
 public final class BlockData {

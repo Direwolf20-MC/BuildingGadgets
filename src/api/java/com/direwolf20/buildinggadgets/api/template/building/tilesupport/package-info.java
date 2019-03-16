@@ -1,6 +1,6 @@
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-package com.direwolf20.buildinggadgets.api.template.tilesupport;
+package com.direwolf20.buildinggadgets.api.template.building.tilesupport;
 
 import mcp.MethodsReturnNonnullByDefault;
 
