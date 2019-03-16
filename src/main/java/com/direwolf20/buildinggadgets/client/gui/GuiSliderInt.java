@@ -1,8 +1,6 @@
-package com.direwolf20.buildinggadgets.common.network.packets;
+package com.direwolf20.buildinggadgets.client.gui;
 
 import com.direwolf20.buildinggadgets.client.ClientProxy;
-import com.direwolf20.buildinggadgets.client.gui.GuiButtonAction;
-import com.direwolf20.buildinggadgets.client.gui.GuiMod;
 import com.google.common.collect.ImmutableSet;
 
 import net.minecraft.client.Minecraft;
