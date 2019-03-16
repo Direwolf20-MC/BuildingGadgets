@@ -14,6 +14,11 @@ public class ThermalExpansion implements IPasteRecipeRegistry {
     public static final FluidStack WATER = new FluidStack(FluidRegistry.WATER, Fluid.BUCKET_VOLUME);
 
     @Override
+    public Phase getPhase() {
+        return Phase.INIT;
+    }
+
+    @Override
     public void registerHydrationRecipe(RecipieType type, ItemStack input, ItemStack output) {
         ThermalExpansionHelper.addTransposerFill(400, input, output, WATER, false);
     }

@@ -10,7 +10,7 @@ import org.lwjgl.opengl.GL11;
 public class GuiButtonHelp extends GuiButtonSelect {
 
     public GuiButtonHelp(int buttonId, int x, int y) {
-        super(buttonId, x, y, 12, 12, "?");
+        super(buttonId, x, y, 12, 12, "?", "");
     }
 
     public String getHoverText() {

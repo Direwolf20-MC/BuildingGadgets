@@ -1,9 +1,6 @@
-package com.direwolf20.buildinggadgets.client.gui.radialmenu;
+package com.direwolf20.buildinggadgets.client.gui;
 
 final class NameDisplayData {
-
-    private static final char NONE = 'n';
-    private static final char UNDERLINED = 'r';
 
     private final int x;
     private final int y;
@@ -25,10 +22,6 @@ final class NameDisplayData {
 
     public boolean isSelected() {
         return selected;
-    }
-
-    public char getStylePrefix() {
-        return selected ? UNDERLINED : NONE;
     }
 
 }
