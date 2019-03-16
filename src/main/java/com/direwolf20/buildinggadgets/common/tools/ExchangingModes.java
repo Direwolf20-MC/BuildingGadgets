@@ -4,7 +4,10 @@ import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.blocks.ModBlocks;
 import com.direwolf20.buildinggadgets.common.building.IBuildingMode;
-import com.direwolf20.buildinggadgets.common.building.modes.*;
+import com.direwolf20.buildinggadgets.common.building.modes.ExchangingGridMode;
+import com.direwolf20.buildinggadgets.common.building.modes.ExchangingHorizontalColumnMode;
+import com.direwolf20.buildinggadgets.common.building.modes.ExchangingSurfaceMode;
+import com.direwolf20.buildinggadgets.common.building.modes.ExchangingVerticalColumnMode;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.block.state.IBlockState;
@@ -85,36 +88,36 @@ public enum ExchangingModes {
         return (pos, state) -> {
             IBlockState worldBlockState = world.getBlockState(pos);
 
-            //Don't try to replace for the same block
+            // Don't try to replace for the same block
             if (worldBlockState == target)
                 return false;
 
-            //No need to replace if source and target are the same if fuzzy mode is off
+            // No need to replace if source and target are the same if fuzzy mode is off
             if (!GadgetGeneric.getFuzzy(tool) && worldBlockState != initialBlockState)
                 return false;
 
-            //If the target is already enqueued, don't replace it
+            // If the target is already enqueued, don't replace it
             if (worldBlockState == ModBlocks.effectBlock.getDefaultState())
                 return false;
-            //Only replace existing blocks, don't place more
+            // Only replace existing blocks, don't place more
             if (worldBlockState.getBlock().isAir(worldBlockState, world, pos))
                 return false;
 
             TileEntity tile = world.getTileEntity(pos);
-            //Only replace construction block with same block state
+            // Only replace construction block with same block state
             if (tile instanceof ConstructionBlockTileEntity)
                 if (((ConstructionBlockTileEntity) tile).getBlockState() == state)
                     return false;
 
-            //Otherwise if the block has a tile entity, ignore it
+            // Otherwise if the block has a tile entity, ignore it
             if (tile != null)
                 return false;
 
-            //Bedrock, End Portal Frame, etc.
+            // Bedrock, End Portal Frame, etc.
             if (worldBlockState.getBlockHardness(world, pos) < 0)
                 return false;
 
-            //Don't replace liquids
+            // Don't replace liquids
             return !worldBlockState.getMaterial().isLiquid();
         };
     }

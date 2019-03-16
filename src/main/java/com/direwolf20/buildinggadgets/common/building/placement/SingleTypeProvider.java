@@ -7,10 +7,16 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.util.math.BlockPos;
 
+/**
+ * Immutable block provider that always give the same block state regardless of what position it requested.
+ */
 public class SingleTypeProvider implements IBlockProvider {
 
     private final IBlockState state;
 
+    /**
+     * @param state value that {@link #at(BlockPos)} will return
+     */
     public SingleTypeProvider(IBlockState state) {
         this.state = state;
     }
@@ -20,6 +26,9 @@ public class SingleTypeProvider implements IBlockProvider {
         return new TranslationWrapper(this, origin);
     }
 
+    /**
+     * @return {@link #state}, which is initialized in the constructor, regardless of the parameter.
+     */
     @Override
     public IBlockState at(BlockPos pos) {
         return state;

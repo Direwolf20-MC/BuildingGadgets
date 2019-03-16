@@ -22,7 +22,7 @@ import java.util.function.Function;
  * Surface that limits its attempt to blocks that is connected through either on its sides or corners. Candidates are
  * selected from a wall region centered at a point and filtered with a 8-way adjacent flood fill.
  *
- * @implSpec Uses a 8-way adjacent flood fill algorithm with Breath-First Search.
+ * @see #iterator()
  * @see Surface
  */
 public final class ConnectedSurface implements IPlacementSequence {
@@ -83,7 +83,10 @@ public final class ConnectedSurface implements IPlacementSequence {
     }
 
     /**
-     * @implNote technically BFS fits better with a flood fill algorithm and it simpler to implement with a generator
+     * Uses a 8-way adjacent flood fill algorithm with Breath-First Search to identify blocks with a valid path. A position
+     * is valid if and only if it connects to the center and its underside block is the same as the underside of the center.
+     *
+     * @implNote Uses a 8-way adjacent flood fill algorithm with Breath-First Search to identify blocks with a valid path.
      */
     @Nonnull
     @Override
@@ -105,7 +108,7 @@ public final class ConnectedSurface implements IPlacementSequence {
                     return endOfData();
                 }
 
-                //The position is guaranteed to be valid
+                // The position is guaranteed to be valid
                 BlockPos current = queue.remove();
 
                 for (int i = -1; i <= 1; i++) {
