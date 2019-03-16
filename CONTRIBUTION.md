@@ -87,12 +87,8 @@ In general apply common sense to the Code you write. "Effective Java" is also al
   * Good format suffiz: `0.5F`, `1000L`
 * Always use lower case letters for int literals
   * Bad value: `0xFFF`, `0xBEEF`
-  * Good value: `0xfff`, `0xbeef`
-* Only use inner class then they are super short and closely coupled with the outer class. For example a 5 line inner class is fine but probably not a 20 line inner class.
-  * Only apply this to **class** and **enum**, *interfaces* and *annotations* should never be an inner.
-  * If an inner class is splitted out from its parent due to it being too long and still has close relation to its parents, make it package private (internal).
-  * One exception is when inner class is used to group utility methods, where the inner class can be any length but has to be an utility class (`final` and private constructor)
-* Only use `this` when necessary.
+  * Good value: `0xfff`, `0xbeef`.
+* No nested classes with 2 levels or deeper.
 
 ### Packages
 * Don't use packages like there is a limited allowed amount, for the sake of code readability and maintainabilty make as may packages as logically makes sense. Attempt to group as much common functionality as possible within a package. Use our `common.utils` package as an example of functionality grouping. 
