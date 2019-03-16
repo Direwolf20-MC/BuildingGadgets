@@ -2,11 +2,11 @@ package com.direwolf20.buildinggadgets.client.gui;
 
 import javax.annotation.Nullable;
 
-public class GuiButtonSelect extends GuiButtonAction {
+public class GuiButtonSelect extends GuiButtonHelpText {
     protected boolean selected;
 
-    public GuiButtonSelect(int x, int y, int width, int height, String text, @Nullable Runnable action) {
-        super(x, y, width, height, text, action);
+    public GuiButtonSelect(int x, int y, int width, int height, String text, String helpTextKey, @Nullable Runnable action) {
+        super(x, y, width, height, text, helpTextKey, action);
     }
 
     public boolean isSelected() {

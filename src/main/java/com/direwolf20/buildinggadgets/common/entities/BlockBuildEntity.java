@@ -45,7 +45,7 @@ public class BlockBuildEntity extends EntityBase {
         IBlockState currentBlock = world.getBlockState(spawnPos);
         TileEntity te = world.getTileEntity(spawnPos);
 
-        setTargetPos(spawnPos);
+        targetPos = spawnPos;
         setBlock = te instanceof ConstructionBlockTileEntity ? te.getBlockState() : spawnBlock;
         originalSetBlock = spawnBlock;
 
@@ -133,23 +133,23 @@ public class BlockBuildEntity extends EntityBase {
 
     @Override
     protected void onSetDespawning() {
-        if (getTargetPos() != null && setBlock != null && (getToolMode() == 1)) {
+        if (targetPos != null && setBlock != null && (getToolMode() == 1)) {
             if (getUsingConstructionPaste()) {
-                world.setBlockState(getTargetPos(), BGBlocks.constructionBlock.getDefaultState());
-                TileEntity te = world.getTileEntity(getTargetPos());
+                world.setBlockState(targetPos, BGBlocks.constructionBlock.getDefaultState());
+                TileEntity te = world.getTileEntity(targetPos);
                 if (te instanceof ConstructionBlockTileEntity) {
                     ((ConstructionBlockTileEntity) te).setBlockState(setBlock, actualSetBlock);
                 }
-                world.spawnEntity(new ConstructionBlockEntity(world, getTargetPos(), false));
+                world.spawnEntity(new ConstructionBlockEntity(world, targetPos, false));
             } else {
-                world.setBlockState(getTargetPos(), setBlock);
-                BlockPos upPos = getTargetPos().up();
-                world.getBlockState(getTargetPos()).neighborChanged(world, getTargetPos(), world.getBlockState(upPos).getBlock(), upPos);
+                world.setBlockState(targetPos, setBlock);
+                BlockPos upPos = targetPos.up();
+                world.getBlockState(targetPos).neighborChanged(world, targetPos, world.getBlockState(upPos).getBlock(), upPos);
             }
-        } else if (getTargetPos() != null && setBlock != null && getToolMode() == 2) {
-            world.setBlockState(getTargetPos(), Blocks.AIR.getDefaultState());
-        } else if (getTargetPos() != null && setBlock != null && getToolMode() == 3) {
-            world.spawnEntity(new BlockBuildEntity(world, getTargetPos(), spawnedBy, originalSetBlock, 1, actualSetBlock, getUsingConstructionPaste()));
+        } else if (targetPos != null && setBlock != null && getToolMode() == 2) {
+            world.setBlockState(targetPos, Blocks.AIR.getDefaultState());
+        } else if (targetPos != null && setBlock != null && getToolMode() == 3) {
+            world.spawnEntity(new BlockBuildEntity(world, targetPos, spawnedBy, originalSetBlock, 1, actualSetBlock, getUsingConstructionPaste()));
         }
     }
 }

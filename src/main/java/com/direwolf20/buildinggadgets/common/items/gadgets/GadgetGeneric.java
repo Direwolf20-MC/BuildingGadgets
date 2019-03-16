@@ -152,11 +152,11 @@ public abstract class GadgetGeneric extends Item {
     }
 
     public static boolean getConnectedArea(ItemStack stack) {
-        return NBTHelper.getOrNewTag(stack).getBoolean(NBTKeys.GADGET_CONNECTED_AREA);
+        return !NBTHelper.getOrNewTag(stack).getBoolean(NBTKeys.GADGET_UNCONNECTED_AREA);
     }
 
     public static void toggleConnectedArea(EntityPlayer player, ItemStack stack) {
-        NBTHelper.getOrNewTag(stack).setBoolean(NBTKeys.GADGET_CONNECTED_AREA, !getConnectedArea(stack));
+        NBTHelper.getOrNewTag(stack).setBoolean(NBTKeys.GADGET_UNCONNECTED_AREA, getConnectedArea(stack));
         String suffix = stack.getItem() instanceof GadgetDestruction ? "area" : "surface";
         player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.connected" + suffix).getUnformattedComponentText() + ": " + getConnectedArea(stack)), true);
     }
