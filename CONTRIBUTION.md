@@ -82,12 +82,11 @@ In general apply common sense to the Code you write. "Effective Java" is also al
 * Enforce immutability where possible
   * Use immutablet types for immutable values (`ImmutableList`, `ImmutableSet`, `ImmutableMap`, etc.)
   * Avoid public properties
-* Always use capital letters for format suffixes
+* Always use capital letters for format suffixes and literals
   * Bad format suffix: `0.5f`, `1000l`
   * Good format suffiz: `0.5F`, `1000L`
-* Always use lower case letters for int literals
-  * Bad value: `0xFFF`, `0xBEEF`
-  * Good value: `0xfff`, `0xbeef`.
+  * Bad iteral: `0xfff`, `0xbeef`
+  * Good literal: `0xFFF`, `0xBEEF`.
 * No nested classes with 2 levels or deeper.
 
 ### Packages
@@ -103,13 +102,13 @@ In general apply common sense to the Code you write. "Effective Java" is also al
 * Classes should have static methods and fields on top, and member methods and fields on the bottom:
   * Fields always exist before methods in their (static/member) region.
   * Constructor always exist before other member methods.
-  * Getters and setters should be at end of a class definition, where setters follow getters.
+  * Getters and setters should be at end of a class definition, where setters follow its coorsponding getter.
 * A good example:
 ```java
 public class Foo {
 
     // Static fields before static methods
-    private static final int ID = 0xbeef;
+    public static final int ID = 0xbeef;
 
     public static Foo create(int i) {
         return new Foo(i, true);
@@ -128,27 +127,21 @@ public class Foo {
     }
 
     // Getters are in the order of their backed fields
-
     public int getNumber() {
         // No 'this' and it is not necessary
         return i;
     }
 
-    public int getID() {
-        return ID;
+    // Setters follow their coorsponding getter
+    public void setNumber(int i) {
+        // Use 'this' because necessary
+        this.i = i;
     }
 
     // Special getters can live anywhere reasonable
     public boolean getBoolean() {
         boolean positive = i > 0;
         return positive && bar;
-    }
-
-    // Setters are always after getters
-
-    public void setNumber(int i) {
-        // Use 'this' because necessary
-        this.i = i;
     }
 
     public void setBoolean(boolean target) {
