@@ -80,6 +80,10 @@ In general apply common sense to the Code you write. "Effective Java" is also al
 * Always use lower case letters for int literals
   * Bad value: `0xFFF`, `0xBEEF`
   * Good value: `0xfff`, `0xbeef`
+* Only use inner class then they are super short and closely coupled with the outer class. For example a 5 line inner class is fine but probably not a 20 line inner class.
+  * Only apply this to **class** and **enum**, *interfaces* and *annotations* should never be an inner.
+  * If an inner class is splitted out from its parent due to it being too long and still has close relation to its parents, make it package private (internal).
+  * One exception is when inner class is used to group utility methods, where the inner class can be any length but has to be an utility class (`final` and private constructor)
 * Only use `this` when necessary with the exception of:
   * In constructors, always use `this` for assignments and accessments
   * If calling a method on a member field as a standalone statement (ex. `this.someObject.printMessage()`)
