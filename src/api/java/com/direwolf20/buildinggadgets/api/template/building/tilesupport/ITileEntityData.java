@@ -3,6 +3,7 @@ package com.direwolf20.buildinggadgets.api.template.building.tilesupport;
 import com.direwolf20.buildinggadgets.api.APIProxy;
 import com.direwolf20.buildinggadgets.api.abstraction.IUniqueItem;
 import com.direwolf20.buildinggadgets.api.abstraction.impl.UniqueItemAdapter;
+import com.direwolf20.buildinggadgets.api.template.building.IBuildContext;
 import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.Multiset;
 import net.minecraft.block.state.IBlockState;
@@ -17,13 +18,13 @@ import javax.annotation.Nullable;
 public interface ITileEntityData {
     ITileDataSerializer getSerializer();
 
-    default boolean allowPlacement(IBlockState state, IWorld world, BlockPos position) {
-        return state.isAir(world, position);
+    default boolean allowPlacement(IBuildContext context, IBlockState state, BlockPos position) {
+        return state.isAir(context.getWorld(), position);
     }
 
-    void placeIn(IWorld world, IBlockState state, BlockPos pos);
+    boolean placeIn(IBuildContext context, IBlockState state, BlockPos pos);
 
-    default Multiset<IUniqueItem> getRequiredItems(IBlockState state, IWorld world, @Nullable RayTraceResult target, @Nullable BlockPos pos, @Nullable EntityPlayer player) {
+    default Multiset<IUniqueItem> getRequiredItems(IWorld world, IBlockState state, @Nullable RayTraceResult target, @Nullable BlockPos pos, @Nullable EntityPlayer player) {
         ItemStack stack = null;
         try {
             stack = state.getBlock().getPickBlock(state, target, world, pos, player);

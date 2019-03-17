@@ -51,7 +51,16 @@ public class DelegatingTemplate implements ITemplate {
         return delegate.createViewInContext(buildContext);
     }
 
+    @Override
+    public int estimateSize() {
+        return delegate.estimateSize();
+    }
+
     public ITemplate getDelegate() {
         return delegate;
+    }
+
+    protected void setDelegate(ITemplate delegate) {
+        this.delegate = delegate;
     }
 }

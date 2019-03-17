@@ -4,7 +4,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.registries.IForgeRegistryEntry;
 
 public interface ITileDataSerializer extends IForgeRegistryEntry<ITileDataSerializer> {
-    NBTTagCompound serialize(ITileEntityData data);
+    NBTTagCompound serialize(ITileEntityData data, boolean persisted);
 
-    ITileEntityData deserialize(NBTTagCompound nbt);
+    ITileEntityData deserialize(NBTTagCompound nbt, boolean persisted);
 }

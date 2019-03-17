@@ -1,7 +1,6 @@
 package com.direwolf20.buildinggadgets.api.template.building;
 
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IWorld;
 
 import javax.annotation.Nonnull;
 import java.util.Objects;
@@ -23,7 +22,7 @@ public final class PlacementTarget {
         return data;
     }
 
-    public boolean placeIn(IWorld world) {
-        return false;
+    public boolean placeIn(IBuildContext context) {
+        return data.placeIn(context, pos);
     }
 }

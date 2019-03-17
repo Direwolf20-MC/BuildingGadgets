@@ -9,18 +9,21 @@ import javax.annotation.Nullable;
 import java.util.Set;
 
 /**
- * Represents an operation which can be performed by an {@link ITemplateTransaction} in order to change a given {@link ITemplate}.
- * The following 3 types of operations are supported
+ * <p>
+ * Represents an operation which can be performed by an {@link ITemplateTransaction} in order to modify a given {@link ITemplate}.
+ * The following 3 types of operations are supported:
  * <ul>
  *     <li>Transforming or removing Block-Positions</li>
  *     <li>Transforming or removing Block-Data</li>
  *     <li>Attaching new Blocks and the Data to this Template.</li>
  * </ul>
- * @implNote All implementations of this class are expected to throw {@link NullPointerException} when any argument passed to any method was null.
+ * </p>
  */
 public interface ITransactionOperator {
     /**
+     * <p>
      * Represents characteristics (operations) an {@code ITransactionOperator} might have.
+     * </p>
      * <p>
      * <b>It is not guaranteed that the order of this {@link Enum}'s values will remain consistend nor is
      * it guaranteed that no values will be added.</b> Users switch casing over this enum should therefore always provide
@@ -66,6 +69,8 @@ public interface ITransactionOperator {
      * </p>
      * @param pos The pos for which to create {@link BlockData} for.
      * @return A new {@link BlockData} for a given {@link BlockPos} or null if none can or should be created.
+     * @implNote The default implementation throws {@link UnsupportedOperationException} as this cannot be supported. Bear in mind that returning a
+     *           non-null value from {@link #createPos(ITransactionExecutionContext)} will require you to overwrite this Method, as it will fail otherwise.
      */
     @Nullable
     default BlockData createDataForPos(ITransactionExecutionContext context, BlockPos pos) {
@@ -103,7 +108,7 @@ public interface ITransactionOperator {
      * All {@link Characteristic} returned by this Method are guaranteed to be executed.
      * @return A {@link Set} representing the {@link Characteristic} of this {@code ITransactionOperator}
      */
-    default Set<Characteristic> characteristics() {
+    default Set<Characteristic> characteristics(ITransactionExecutionContext context) {
         return ImmutableSet.of();
     }
 }

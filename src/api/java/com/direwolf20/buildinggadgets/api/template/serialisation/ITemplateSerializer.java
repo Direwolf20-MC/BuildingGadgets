@@ -7,7 +7,7 @@ import net.minecraftforge.registries.IForgeRegistryEntry;
 public interface ITemplateSerializer extends IForgeRegistryEntry<ITemplateSerializer> {
     TemplateHeader createHeaderFor(ITemplate template);
 
-    NBTTagCompound serialize(ITemplate template);
+    NBTTagCompound serialize(ITemplate template, boolean persisted);
 
-    ITemplate deserialize(NBTTagCompound tagCompound);
+    ITemplate deserialize(NBTTagCompound tagCompound, boolean persisted);
 }

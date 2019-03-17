@@ -1,6 +1,7 @@
 package com.direwolf20.buildinggadgets.api.template.serialisation;
 
 import com.direwolf20.buildinggadgets.api.abstraction.IUniqueItem;
+import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.Multiset;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -10,6 +11,10 @@ import javax.annotation.Nullable;
 import java.util.Objects;
 
 public final class TemplateHeader {
+    public static Builder builder(ITemplateSerializer serializer, BlockPos boundingBox) {
+        return builder(Objects.requireNonNull(serializer.getRegistryName()), boundingBox);
+    }
+
     public static Builder builder(ResourceLocation serializer, BlockPos boundingBox) {
         return new Builder(serializer, boundingBox);
     }
@@ -18,7 +23,7 @@ public final class TemplateHeader {
     private final String name;
     @Nullable
     private final String author;
-    @Nullable
+    @Nonnull
     private final Multiset<IUniqueItem> requiredItems;
     @Nonnull
     private final ResourceLocation serializer;
@@ -28,7 +33,7 @@ public final class TemplateHeader {
     private TemplateHeader(@Nullable String name, @Nullable String author, @Nullable Multiset<IUniqueItem> requiredItems, @Nonnull ResourceLocation serializer, @Nonnull BlockPos boundingBox) {
         this.name = name;
         this.author = author;
-        this.requiredItems = requiredItems;
+        this.requiredItems = requiredItems != null ? requiredItems : ImmutableMultiset.of();
         this.serializer = Objects.requireNonNull(serializer);
         this.boundingBox = Objects.requireNonNull(boundingBox);
     }
@@ -43,7 +48,7 @@ public final class TemplateHeader {
         return author;
     }
 
-    @Nullable
+    @Nonnull
     public Multiset<IUniqueItem> getRequiredItems() {
         return requiredItems;
     }

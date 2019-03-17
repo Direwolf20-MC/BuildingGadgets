@@ -9,6 +9,10 @@ import java.util.Spliterators;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+/**
+ * @implSpec Notice fthat no guarantees are made for the order in which {@link PlacementTarget}'s are produced by this {@code ITemplateView}.
+ * Order may be arbitrary or sorted, consult the documentation of the implementation you are currently faced with for information about traversal order.
+ */
 public interface ITemplateView extends Iterable<PlacementTarget> {
     /**
      * Creates a {@link Stream} backed by the {@link #spliterator()} of this {@code ITemplate}.

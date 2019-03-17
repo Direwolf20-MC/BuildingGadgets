@@ -20,7 +20,7 @@ public final class ImmutableTemplate implements ITemplate {
     private final BlockPos translation;
     private final Long2ShortMap posToStateId;
     private final Short2ObjectMap<BlockData> idToData;
-    private final Multiset<IUniqueItem> requiredItems;
+    private final ImmutableMultiset<IUniqueItem> requiredItems;
 
     public static ImmutableTemplate create() { //TODO here until this can be implemented properly
         return new ImmutableTemplate();
@@ -30,7 +30,7 @@ public final class ImmutableTemplate implements ITemplate {
         this.translation = translation;
         this.posToStateId = posToStateId;
         this.idToData = idToData;
-        this.requiredItems = requiredItems;
+        this.requiredItems = ImmutableMultiset.copyOf(requiredItems);
     }
 
     private ImmutableTemplate() {
@@ -57,5 +57,10 @@ public final class ImmutableTemplate implements ITemplate {
     @Override
     public ITemplateView createViewInContext(IBuildContext buildContext) {
         return null;
+    }
+
+    @Override
+    public int estimateSize() {
+        return posToStateId.size();
     }
 }
