@@ -2,6 +2,9 @@
 The format of this document is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and should continue to adhere to the conventions outlined in the Keep a Changelog guidelines.
 
 ## [Unreleased]
+
+
+## [2.6.7] - 2019-03-18
 ### Added
 - The copy/paste gadget can now mirror pastes, as well as rotate them. Sneak while pressing the keybind that previously just rotated them to mirror them left-to-right instead.
 - Added/changed radial menu functionality/aesthetics:
