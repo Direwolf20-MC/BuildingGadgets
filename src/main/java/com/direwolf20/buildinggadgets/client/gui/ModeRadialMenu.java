@@ -242,6 +242,9 @@ public class ModeRadialMenu extends GuiScreen {
             signs = signsCopyPaste;
         }
 
+        boolean shouldCenter = (segments + 2) % 4 == 0;
+        int indexBottom = segments / 4;
+        int indexTop = indexBottom + segments / 2;
         for (int seg = 0; seg < segments; seg++) {
             boolean mouseInSector = isCursorInSlice(angle, totalDeg, degPer, inRange);
             float radius = Math.max(0F, Math.min((timeIn + partialTicks - seg * 6F / segments) * 40F, radiusMax));
@@ -267,7 +270,7 @@ public class ModeRadialMenu extends GuiScreen {
                 double xp = x + Math.cos(rad) * radius;
                 double yp = y + Math.sin(rad) * radius;
                 if ((int) i == (int) (degPer / 2))
-                    stringPositions.add(new int[]{(int) xp, (int) yp, mouseInSector ? 1 : 0});
+                    stringPositions.add(new int[]{(int) xp, (int) yp, mouseInSector ? 1 : 0, shouldCenter && (seg == indexBottom || seg == indexTop) ? 1 : 0});
 
                 GL11.glVertex2d(x + Math.cos(rad) * radius / 2.3F, y + Math.sin(rad) * radius / 2.3F);
                 GL11.glVertex2d(xp, yp);
@@ -310,7 +313,7 @@ public class ModeRadialMenu extends GuiScreen {
 
             Color color = i == modeIndex ? Color.GREEN : Color.WHITE;
             if (pos[2] > 0)
-                fontRenderer.drawStringWithShadow(name, xsp, ysp, color.getRGB());
+                fontRenderer.drawStringWithShadow(name, xsp + (pos[3] > 0 ? width / 2 - 4 : 0), ysp, color.getRGB());
 
             mod = 0.7;
             xdp = (int) ((xp - x) * mod + x);
