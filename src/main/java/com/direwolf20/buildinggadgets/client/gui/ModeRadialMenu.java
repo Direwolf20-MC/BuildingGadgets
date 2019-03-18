@@ -223,8 +223,6 @@ public class ModeRadialMenu extends GuiScreen {
             return;
 
         slotSelected = -1;
-        float offset = 8.5F;
-        
 
         ResourceLocation[] signs;
         int modeIndex;
@@ -325,7 +323,7 @@ public class ModeRadialMenu extends GuiScreen {
 
         float s = 2.25F * fract;
         GlStateManager.scalef(s, s, s);
-        GlStateManager.translatef(x / s - offset, y / s - 8, 0);
+        GlStateManager.translatef(x / s - (tool.getItem() instanceof GadgetCopyPaste ? 8F : 8.5F), y / s - 8, 0);
         mc.getItemRenderer().renderItemAndEffectIntoGUI(tool, 0, 0);
         RenderHelper.disableStandardItemLighting();
         GlStateManager.disableBlend();
