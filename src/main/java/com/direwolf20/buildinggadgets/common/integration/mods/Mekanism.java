@@ -2,6 +2,7 @@ package com.direwolf20.buildinggadgets.common.integration.mods;
 
 import com.direwolf20.buildinggadgets.common.integration.IPasteRecipeRegistry;
 import com.direwolf20.buildinggadgets.common.integration.IntegrationHandler.IntegratedMod;
+import com.direwolf20.buildinggadgets.common.integration.IntegrationHandler.Phase;
 
 import mekanism.api.MekanismAPI;
 import net.minecraft.item.ItemStack;
