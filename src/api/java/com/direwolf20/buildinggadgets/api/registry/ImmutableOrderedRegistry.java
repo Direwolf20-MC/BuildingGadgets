@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.api.registry;
 
+import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import net.minecraft.util.ResourceLocation;
 
 import javax.annotation.Nullable;
@@ -13,11 +13,11 @@ import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 final class ImmutableOrderedRegistry<T> implements IOrderedRegistry<T> {
-    private final ImmutableMap<ResourceLocation, T> backingMap;
+    private final ImmutableBiMap<ResourceLocation, T> backingMap;
     private final ImmutableList<T> orderedValues;
 
     ImmutableOrderedRegistry(Map<ResourceLocation, T> backingMap, List<T> orderedValues) {
-        this.backingMap = ImmutableMap.copyOf(backingMap);
+        this.backingMap = ImmutableBiMap.copyOf(backingMap);
         this.orderedValues = ImmutableList.copyOf(orderedValues);
     }
 
@@ -47,15 +47,19 @@ final class ImmutableOrderedRegistry<T> implements IOrderedRegistry<T> {
         return orderedValues.iterator();
     }
 
-
     @Override
     public void forEach(Consumer<? super T> action) {
         orderedValues.forEach(action);
     }
 
-
     @Override
     public Spliterator<T> spliterator() {
         return orderedValues.spliterator();
+    }
+
+    @Nullable
+    @Override
+    public ResourceLocation getKey(T value) {
+        return backingMap.inverse().get(value);
     }
 }

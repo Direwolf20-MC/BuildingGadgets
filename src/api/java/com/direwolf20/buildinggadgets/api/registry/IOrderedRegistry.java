@@ -5,7 +5,7 @@ import com.google.common.collect.ImmutableList;
 import java.util.stream.Stream;
 
 public interface IOrderedRegistry<T> extends ISimpleRegistry<T>, Iterable<T> {
-    public ImmutableList<T> getValuesInOrder();
+    ImmutableList<T> getValuesInOrder();
 
-    public Stream<T> values();
+    Stream<T> values();
 }

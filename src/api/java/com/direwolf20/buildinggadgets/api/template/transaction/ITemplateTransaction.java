@@ -59,8 +59,8 @@ public interface ITemplateTransaction {
      * @throws com.direwolf20.buildinggadgets.api.exceptions.ConcurrentTransactionExecutionException If this method is attempted to be used concurrently, but
      *         concurrent execution is not supported by this {@code ITemplateTransaction}
      * @throws com.direwolf20.buildinggadgets.api.exceptions.OperatorExecutionFailedException If an {@link ITransactionOperator} throws an {@link Exception}
+     * @throws com.direwolf20.buildinggadgets.api.exceptions.TransactionInvalidException If the {@code ITemplateTransaction} has already been executed.
      * @throws TransactionExecutionException If any other {@link Exception} is encountered or the implementation specifies additional subclasses
-     * @throws UnsupportedOperationException If {@code execute} has already been called on this {@code ITemplateTransaction}
      */
     ITemplate execute() throws TransactionExecutionException;
 }

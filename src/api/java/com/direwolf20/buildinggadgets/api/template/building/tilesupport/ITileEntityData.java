@@ -4,6 +4,7 @@ import com.direwolf20.buildinggadgets.api.APIProxy;
 import com.direwolf20.buildinggadgets.api.abstraction.IUniqueItem;
 import com.direwolf20.buildinggadgets.api.abstraction.impl.UniqueItemAdapter;
 import com.direwolf20.buildinggadgets.api.template.building.IBuildContext;
+import com.direwolf20.buildinggadgets.api.template.serialisation.ITileDataSerializer;
 import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.Multiset;
 import net.minecraft.block.state.IBlockState;

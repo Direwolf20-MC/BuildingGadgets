@@ -6,7 +6,10 @@ import javax.annotation.Nullable;
 
 public interface ISimpleRegistry<T> {
     @Nullable
-    public T get(ResourceLocation key);
+    T get(ResourceLocation key);
 
-    public boolean contains(ResourceLocation key);
+    @Nullable
+    ResourceLocation getKey(T value);
+
+    boolean contains(ResourceLocation key);
 }
