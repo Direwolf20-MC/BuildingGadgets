@@ -48,7 +48,7 @@ public class PacketChangeRange {
                 else if (stack.getItem() instanceof GadgetExchanger)
                     GadgetExchanger.rangeChange(player, stack);
                 else if (stack.getItem() instanceof GadgetCopyPaste)
-                    GadgetCopyPaste.rotateBlocks(stack, player);
+                    GadgetCopyPaste.rotateOrMirrorBlocks(stack, player);
                 else if (stack.getItem() instanceof GadgetDestruction)
                     GadgetDestruction.switchOverlay(player, stack);
             });

@@ -38,6 +38,7 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
+import net.minecraft.util.EnumFacing.Axis;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.text.ITextComponent;
@@ -305,7 +306,7 @@ public class GadgetCopyPaste extends GadgetPlacing implements ITemplate {
         return new ActionResult<>(EnumActionResult.SUCCESS, stack);
     }
 
-    public static void rotateBlocks(ItemStack stack, EntityPlayer player) {
+    public static void rotateOrMirrorBlocks(ItemStack stack, EntityPlayer player) {
         if (!(getToolMode(stack) == ToolMode.Paste)) return;
         if (player.world.isRemote) {
             return;
@@ -328,17 +329,31 @@ public class GadgetCopyPaste extends GadgetPlacing implements ITemplate {
 
             int px = (tempPos.getX() - startPos.getX());
             int pz = (tempPos.getZ() - startPos.getZ());
-
-            int nx = -pz;
-            int nz = px;
-
+            int nx, nz;
+            IBlockState alteredState;
+            if (player.isSneaking()) {
+                Mirror mirror;
+                if (player.getHorizontalFacing().getAxis() == Axis.X) {
+                    nx = px;
+                    nz = -pz;
+                    mirror = Mirror.LEFT_RIGHT;
+                } else {
+                    nx = -px;
+                    nz = pz;
+                    mirror = Mirror.FRONT_BACK;
+                }
+                alteredState = blockMap.state.mirror(mirror);
+            } else {
+                nx = -pz;
+                nz = px;
+                alteredState = blockMap.state.rotate(Rotation.CLOCKWISE_90);
+            }
             BlockPos newPos = new BlockPos(startPos.getX() + nx, tempPos.getY(), startPos.getZ() + nz);
-            IBlockState rotatedState = blockMap.state.rotate(player.world, newPos, Rotation.CLOCKWISE_90);
             posIntArrayList.add(GadgetUtils.relPosToInt(startPos, newPos));
-            blockMapIntState.addToMap(rotatedState);
-            stateIntArrayList.add((int) blockMapIntState.findSlot(rotatedState));
-            UniqueItem uniqueItem = BlockMapIntState.blockStateToUniqueItem(rotatedState, player, tempPos);
-            blockMapIntState.addToStackMap(uniqueItem, rotatedState);
+            blockMapIntState.addToMap(alteredState);
+            stateIntArrayList.add((int) blockMapIntState.findSlot(alteredState));
+            UniqueItem uniqueItem = BlockMapIntState.blockStateToUniqueItem(alteredState, player, tempPos);
+            blockMapIntState.addToStackMap(uniqueItem, alteredState);
         }
         int[] posIntArray = posIntArrayList.stream().mapToInt(i -> i).toArray();
         int[] stateIntArray = stateIntArrayList.stream().mapToInt(i -> i).toArray();
@@ -351,7 +366,8 @@ public class GadgetCopyPaste extends GadgetPlacing implements ITemplate {
         worldSave.addToMap(tool.getUUID(stack), tagCompound);
         worldSave.markForSaving();
         PacketHandler.sendTo(new PacketBlockMap(tagCompound), (EntityPlayerMP) player);
-        player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.rotated").getUnformattedComponentText()), true);
+        player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA
+                + new TextComponentTranslation("message.gadget." + (player.isSneaking() ? "mirrored" : "rotated")).getUnformattedComponentText()), true);
     }
 
     public static void copyBlocks(ItemStack stack, EntityPlayer player, World world, BlockPos startPos, BlockPos endPos) {
