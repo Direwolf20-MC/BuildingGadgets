@@ -14,24 +14,26 @@ import org.lwjgl.input.Keyboard;
 public class KeyBindings {
 
     private static final KeyConflictContextGadget CONFLICT_CONTEXT_GADGET = new KeyConflictContextGadget();
-    public static KeyBinding modeSwitch;
-    public static KeyBinding rangeChange;
-    public static KeyBinding undoKey;
-    public static KeyBinding anchorKey;
-    public static KeyBinding fuzzyKey;
-    public static KeyBinding connectedAreaKey;
+    public static KeyBinding menuSettings;
+    public static KeyBinding range;
+    public static KeyBinding rotateMirror;
+    public static KeyBinding undo;
+    public static KeyBinding anchor;
+    public static KeyBinding fuzzy;
+    public static KeyBinding connectedArea;
 
     public static void init() {
-        modeSwitch = createBinding("key.modeSwitch", Keyboard.KEY_G);
-        rangeChange = createBinding("key.rangeChange", Keyboard.KEY_R);
-        undoKey = createBinding("key.undoKey", Keyboard.KEY_U);
-        anchorKey = createBinding("key.anchorKey", Keyboard.KEY_H);
-        fuzzyKey = createBinding("key.fuzzyKey", Keyboard.KEY_NONE);
-        connectedAreaKey = createBinding("key.connectedarea", Keyboard.KEY_NONE);
+        menuSettings = createBinding("settings_menu", Keyboard.KEY_G);
+        range = createBinding("range", Keyboard.KEY_R);
+        rotateMirror = createBinding("rotate_mirror", Keyboard.KEY_Y);
+        undo = createBinding("undo", Keyboard.KEY_U);
+        anchor = createBinding("anchor", Keyboard.KEY_H);
+        fuzzy = createBinding("fuzzy", Keyboard.KEY_NONE);
+        connectedArea = createBinding("connected_area", Keyboard.KEY_NONE);
     }
 
     private static KeyBinding createBinding(String name, int key) {
-        KeyBinding keyBinding = new KeyBinding(name, CONFLICT_CONTEXT_GADGET, key, "key.categories.buildingGadgets");
+        KeyBinding keyBinding = new KeyBinding("key." + name, CONFLICT_CONTEXT_GADGET, key, "key.categories.buildingGadgets");
         ClientRegistry.registerKeyBinding(keyBinding);
         return keyBinding;
     }

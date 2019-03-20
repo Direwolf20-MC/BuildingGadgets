@@ -371,7 +371,7 @@ public class ModeRadialMenu extends GuiScreen {
 
     @Override
     public void updateScreen() {
-        if (!GameSettings.isKeyDown(KeyBindings.modeSwitch)) {
+        if (!GameSettings.isKeyDown(KeyBindings.menuSettings)) {
             mc.displayGuiScreen(null);
             changeMode();
         }

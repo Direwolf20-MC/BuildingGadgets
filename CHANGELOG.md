@@ -2,7 +2,12 @@
 The format of this document is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and should continue to adhere to the conventions outlined in the Keep a Changelog guidelines.
 
 ## [Unreleased]
+### Changed
+### Added
+- Building and Exchanging gadgets can now rotate/mirror their set blocks.
 
+### Changed
+- Separated rotation/mirror keybind from range.
 
 ## [2.6.7] - 2019-03-18
 ### Added
