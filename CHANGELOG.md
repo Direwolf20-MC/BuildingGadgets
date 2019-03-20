@@ -5,6 +5,7 @@ The format of this document is based on [Keep a Changelog](https://keepachangelo
 ### Changed
 ### Added
 - Building and Exchanging gadgets can now rotate/mirror their set blocks.
+- Added settings to the radial menu for rotation, mirroring, undoing, and anchoring. All operations that can be performed by a keybind can now be performed via the radial menu.
 
 ### Changed
 - Separated rotation/mirror keybind from range.
