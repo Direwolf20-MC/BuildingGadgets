@@ -25,9 +25,8 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.*;
+import net.minecraft.util.EnumFacing.Axis;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceFluidMode;
 import net.minecraft.util.math.RayTraceResult;
@@ -218,6 +217,18 @@ public class GadgetUtils {
             return 1;
         }
         return tagCompound.getInt(NBTKeys.GADGET_RANGE);
+    }
+
+    public static IBlockState rotateOrMirrorBlock(EntityPlayer player, IBlockState state) {
+        if (player.isSneaking())
+            return state.mirror(player.getHorizontalFacing().getAxis() == Axis.X ? Mirror.LEFT_RIGHT : Mirror.FRONT_BACK);
+
+        return state.rotate(Rotation.CLOCKWISE_90);
+    }
+
+    public static void rotateOrMirrorToolBlock(ItemStack stack, EntityPlayer player) {
+        setToolBlock(stack, rotateOrMirrorBlock(player, getToolBlock(stack)));
+        setToolActualBlock(stack, rotateOrMirrorBlock(player, getToolActualBlock(stack)));
     }
 
     private static void setToolBlock(ItemStack stack, @Nullable IBlockState state) {

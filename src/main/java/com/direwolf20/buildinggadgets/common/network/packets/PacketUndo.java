@@ -11,16 +11,16 @@ import net.minecraftforge.fml.network.NetworkEvent;
 
 import java.util.function.Supplier;
 
-public class PacketUndoKey {
+public class PacketUndo {
 
-    public static void encode(PacketUndoKey msg, PacketBuffer buf) {}
+    public static void encode(PacketUndo msg, PacketBuffer buf) {}
 
-    public static PacketUndoKey decode(PacketBuffer buf) {
-        return new PacketUndoKey();
+    public static PacketUndo decode(PacketBuffer buf) {
+        return new PacketUndo();
     }
 
     public static class Handler {
-        public static void handle(PacketUndoKey msg, Supplier<NetworkEvent.Context> ctx) {
+        public static void handle(PacketUndo msg, Supplier<NetworkEvent.Context> ctx) {
             EntityPlayerMP player = ctx.get().getSender();
             if (player == null)
                 return;

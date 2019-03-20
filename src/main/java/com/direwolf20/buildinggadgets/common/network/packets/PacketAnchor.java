@@ -9,13 +9,13 @@ import net.minecraftforge.fml.network.NetworkEvent;
 
 import java.util.function.Supplier;
 
-public class PacketAnchorKey {
+public class PacketAnchor {
 
-    public static void encode(PacketAnchorKey msg, PacketBuffer buffer) {}
-    public static PacketAnchorKey decode(PacketBuffer buffer) { return new PacketAnchorKey(); }
+    public static void encode(PacketAnchor msg, PacketBuffer buffer) {}
+    public static PacketAnchor decode(PacketBuffer buffer) { return new PacketAnchor(); }
 
     public static class Handler {
-        public static void handle(final PacketAnchorKey msg, Supplier<NetworkEvent.Context> ctx) {
+        public static void handle(final PacketAnchor msg, Supplier<NetworkEvent.Context> ctx) {
             ctx.get().enqueueWork(() -> {
                 EntityPlayerMP player = ctx.get().getSender();
                 if (player == null)

@@ -330,23 +330,18 @@ public class GadgetCopyPaste extends GadgetPlacing implements ITemplate {
             int px = (tempPos.getX() - startPos.getX());
             int pz = (tempPos.getZ() - startPos.getZ());
             int nx, nz;
-            IBlockState alteredState;
+            IBlockState alteredState = GadgetUtils.rotateOrMirrorBlock(player, blockMap.state);
             if (player.isSneaking()) {
-                Mirror mirror;
                 if (player.getHorizontalFacing().getAxis() == Axis.X) {
                     nx = px;
                     nz = -pz;
-                    mirror = Mirror.LEFT_RIGHT;
                 } else {
                     nx = -px;
                     nz = pz;
-                    mirror = Mirror.FRONT_BACK;
                 }
-                alteredState = blockMap.state.mirror(mirror);
             } else {
                 nx = -pz;
                 nz = px;
-                alteredState = blockMap.state.rotate(Rotation.CLOCKWISE_90);
             }
             BlockPos newPos = new BlockPos(startPos.getX() + nx, tempPos.getY(), startPos.getZ() + nz);
             posIntArrayList.add(GadgetUtils.relPosToInt(startPos, newPos));

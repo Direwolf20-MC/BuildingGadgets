@@ -366,7 +366,7 @@ public class ModeRadialMenu extends GuiScreen {
     @Override
     public void tick() {
 //    TODO 1.13 only works for bound keys; not bound mouse buttons
-        if (!InputMappings.isKeyDown(KeyBindings.modeSwitch.getKey().getKeyCode())) {
+        if (!InputMappings.isKeyDown(KeyBindings.menuSettings.getKey().getKeyCode())) {
             close();
             changeMode();
         }
