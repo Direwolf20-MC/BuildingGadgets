@@ -14,6 +14,7 @@ import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
 import com.direwolf20.buildinggadgets.common.integration.NetworkProvider;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetBuilding;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetExchanger;
+import com.direwolf20.buildinggadgets.common.network.PacketRotateMirror;
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
 import com.google.common.collect.HashMultiset;
@@ -209,16 +210,16 @@ public class GadgetUtils {
         return tagCompound.getInteger("range");
     }
 
-    public static IBlockState rotateOrMirrorBlock(EntityPlayer player, IBlockState state) {
-        if (player.isSneaking())
+    public static IBlockState rotateOrMirrorBlock(EntityPlayer player, PacketRotateMirror.Operation operation, IBlockState state) {
+        if (operation == PacketRotateMirror.Operation.MIRROR)
             return state.withMirror(player.getHorizontalFacing().getAxis() == Axis.X ? Mirror.LEFT_RIGHT : Mirror.FRONT_BACK);
 
         return state.withRotation(Rotation.CLOCKWISE_90);
     }
 
-    public static void rotateOrMirrorToolBlock(ItemStack stack, EntityPlayer player) {
-        setToolBlock(stack, rotateOrMirrorBlock(player, getToolBlock(stack)));
-        setToolActualBlock(stack, rotateOrMirrorBlock(player, getToolActualBlock(stack)));
+    public static void rotateOrMirrorToolBlock(ItemStack stack, EntityPlayer player, PacketRotateMirror.Operation operation) {
+        setToolBlock(stack, rotateOrMirrorBlock(player, operation, getToolBlock(stack)));
+        setToolActualBlock(stack, rotateOrMirrorBlock(player, operation, getToolActualBlock(stack)));
     }
 
     private static void setToolBlock(ItemStack stack, @Nullable IBlockState state) {

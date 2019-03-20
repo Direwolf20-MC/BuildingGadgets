@@ -25,11 +25,11 @@ public class KeyBindings {
     public static void init() {
         menuSettings = createBinding("settings_menu", Keyboard.KEY_G);
         range = createBinding("range", Keyboard.KEY_R);
-        rotateMirror = createBinding("rotate_mirror", Keyboard.KEY_Y);
         undo = createBinding("undo", Keyboard.KEY_U);
         anchor = createBinding("anchor", Keyboard.KEY_H);
         fuzzy = createBinding("fuzzy", Keyboard.KEY_NONE);
         connectedArea = createBinding("connected_area", Keyboard.KEY_NONE);
+        rotateMirror = createBinding("rotate_mirror", Keyboard.KEY_NONE);
     }
 
     private static KeyBinding createBinding(String name, int key) {
