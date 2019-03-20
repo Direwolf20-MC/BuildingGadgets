@@ -29,7 +29,7 @@ public interface ITileDataSerializer extends IForgeRegistryEntry<ITileDataSerial
      * Deserializes an {@link ITileEntityData} from the given {@link NBTTagCompound}.
      * @param tagCompound The {@link NBTTagCompound} to deserialize an {@link ITileEntityData} for.
      * @param persisted Whether or not this data was previously persisted. It can be expected that this flag matches
-     *        whatever was passed into {@link #serialize(ITileEntityData, boolean)} to create the {@link NBTTagCompound}.
+     *         whatever was passed into {@link #serialize(ITileEntityData, boolean)} to create the {@link NBTTagCompound}.
      * @return The {@link ITileEntityData} representing the serialized data in the {@link NBTTagCompound}.
      * @throws IllegalArgumentException If the data does not match the format of this serializer or if a persisted save is attempted to be retrieved non-persistently or vice-versa.
      */

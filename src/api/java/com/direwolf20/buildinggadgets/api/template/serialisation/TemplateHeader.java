@@ -138,7 +138,7 @@ public final class TemplateHeader {
         /**
          * Set's the requiredItems for the resulting {@link TemplateHeader}
          * @param requiredItems The requiredItems of the corresponding {@link com.direwolf20.buildinggadgets.api.template.ITemplate}.
-         *        Null values will be converted to an empty {@link Multiset}.
+         *         Null values will be converted to an empty {@link Multiset}.
          * @return The {@code Builder} instance to allow for method chaining
          */
         public Builder requiredItems(@Nullable Multiset<IUniqueItem> requiredItems) {

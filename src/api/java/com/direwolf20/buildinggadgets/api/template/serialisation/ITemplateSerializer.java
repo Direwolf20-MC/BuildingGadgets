@@ -44,7 +44,7 @@ public interface ITemplateSerializer extends IForgeRegistryEntry<ITemplateSerial
      * @param tagCompound The {@link NBTTagCompound} to deserialize an {@link ITemplate} for.
      * @param header The {@link TemplateHeader} for the corresponding {@link NBTTagCompound} or null if not present.
      * @param persisted Whether or not this data was previously persisted. It can be expected that this flag matches
-     *        whatever was passed into {@link #serialize(ITemplate, boolean)} to create the {@link NBTTagCompound}.
+     *         whatever was passed into {@link #serialize(ITemplate, boolean)} to create the {@link NBTTagCompound}.
      * @return The {@link ITemplate} representing the serialized data in the {@link NBTTagCompound}.
      * @throws IllegalArgumentException If the data does not match the format of this serializer or if a persisted save is attempted to be retrieved non-persistently or vice-versa.
      */

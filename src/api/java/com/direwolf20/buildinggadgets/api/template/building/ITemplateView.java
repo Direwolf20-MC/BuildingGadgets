@@ -11,14 +11,14 @@ import java.util.stream.StreamSupport;
 
 /**
  * @implSpec Notice that no guarantees are made for the order in which {@link PlacementTarget}'s are produced by this {@code ITemplateView}.
- * Order may be arbitrary or sorted, consult the documentation of the implementation you are currently faced with for information about traversal order.
+ *         Order may be arbitrary or sorted, consult the documentation of the implementation you are currently faced with for information about traversal order.
  */
 public interface ITemplateView extends Iterable<PlacementTarget> {
     /**
      * Creates a {@link Stream} backed by the {@link #spliterator()} of this {@code ITemplate}.
      * @return A {@link Stream} representing all positions produced by this {@code ITemplate}.
      * @implSpec The {@link Stream} produced by this method must not be parallel. A user wishing for parallel traversal
-     * should take a look at {@link java.util.stream.StreamSupport#stream(Spliterator, boolean)}.
+     *         should take a look at {@link java.util.stream.StreamSupport#stream(Spliterator, boolean)}.
      */
     default Stream<PlacementTarget> stream() {
         return StreamSupport.stream(spliterator(), false);
@@ -38,7 +38,7 @@ public interface ITemplateView extends Iterable<PlacementTarget> {
      * @return The new translated {@link ITemplate}. May be the same or a new instance depending on implementation.
      * @throws NullPointerException if the given Position was null
      * @implSpec This Method may not accumulate multiple translations, but instead always set the absolute Translation performed
-     * to the specified value.
+     *         to the specified value.
      */
     ITemplate translateTo(BlockPos pos);
 }

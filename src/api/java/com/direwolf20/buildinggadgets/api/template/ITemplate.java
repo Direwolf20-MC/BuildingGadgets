@@ -16,11 +16,11 @@ import javax.annotation.Nullable;
  * Instances of this class represent a 3D-Template for any kind of structure.
  * An {@code ITemplate} therefore has the following responsibilities:
  * <ul>
- *     <li>Provide a possibility to iterate over all placement information contained in this {@code ITemplate} via {@link #createViewInContext(IBuildContext)}.
- *     <li>Optionally an {@code ITemplate} may choose to provide a possibility for modifying the represented structure
- *         via an {@link ITemplateTransaction} created by {@link #startTransaction()}.
- *     <li>Provide a boundingBox, which will enclose all positions produced by this {@code ITemplate} via [TODO].
- *     <li>Provide a possibility to serialize this ITemplate via an corresponding {@link ITemplateSerializer}.
+ * <li>Provide a possibility to iterate over all placement information contained in this {@code ITemplate} via {@link #createViewInContext(IBuildContext)}.
+ * <li>Optionally an {@code ITemplate} may choose to provide a possibility for modifying the represented structure
+ * via an {@link ITemplateTransaction} created by {@link #startTransaction()}.
+ * <li>Provide a boundingBox, which will enclose all positions produced by this {@code ITemplate} via [TODO].
+ * <li>Provide a possibility to serialize this ITemplate via an corresponding {@link ITemplateSerializer}.
  * </ul>
  * <p>
  * Furthermore an {@code ITemplate} should provide a hint for users to check the amount of blocks an {@link ITemplateView} of this {@code ITemplate} is going to
@@ -44,7 +44,6 @@ public interface ITemplate {
     ITemplateSerializer getSerializer();
 
     /**
-     * <p>
      * Creates a new {@link ITemplateView} for iteration over this {@code ITemplate}. The returned {@link ITemplateView} may be used on a
      * different {@link Thread} then the one it was created on. Additionally parallel iteration on multiple {@link ITemplateView} is explicitly supported,
      * and an implementation must perform any required synchronisation.<br>
@@ -56,7 +55,6 @@ public interface ITemplate {
     ITemplateView createViewInContext(IBuildContext buildContext);
 
     /**
-     * <p>
      * Creates a new {@link ITemplateTransaction} for modifying this {@code ITemplate}. The created {@link ITemplateTransaction}
      * will only modify modify this {@code ITemplate} when {@link ITemplateTransaction#execute()} is called.
      * Therefore iteration on an {@link ITemplateView} of this {@code ITemplate} must still be permitted even when an {@link ITemplateTransaction} has been created.
@@ -71,9 +69,7 @@ public interface ITemplate {
     @Nullable
     ITemplateTransaction startTransaction();
 
-
     /**
-     * <p>
      * Attempts to compute the amount of required {@link IUniqueItem}'s. Should never be more than might be needed,
      * but may be fewer if exact requirements are hard or expensive to compute.
      * @return A {@link Multiset} representing the Item Requirements to build this {@code ITemplate}.
@@ -83,7 +79,6 @@ public interface ITemplate {
     Multiset<IUniqueItem> estimateRequiredItems();
 
     /**
-     * <p>
      * Attempts to compute an estimate of how many {@link PlacementTarget}'s this {@code ITemplate} will produce.
      * Should never be smaller than the amount produced by iterating over this, but may be larger if an exact size
      * is hard or expensive to compute.

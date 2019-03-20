@@ -12,9 +12,9 @@ import java.util.Set;
  * Represents an operation which can be performed by an {@link ITemplateTransaction} in order to modify a given {@link ITemplate}.
  * The following 3 types of operations are supported:
  * <ul>
- *     <li>Transforming or removing Block-Positions
- *     <li>Transforming or removing Block-Data
- *     <li>Attaching new Blocks and the Data to this Template.
+ * <li>Transforming or removing Block-Positions
+ * <li>Transforming or removing Block-Data
+ * <li>Attaching new Blocks and the Data to this Template.
  * </ul>
  */
 public interface ITransactionOperator {
@@ -65,7 +65,7 @@ public interface ITransactionOperator {
      * @param pos The pos for which to create {@link BlockData} for.
      * @return A new {@link BlockData} for a given {@link BlockPos} or null if none can or should be created.
      * @implNote The default implementation throws {@link UnsupportedOperationException} as this cannot be supported. Bear in mind that returning a
-     *           non-null value from {@link #createPos(ITransactionExecutionContext)} will require you to overwrite this Method, as it will fail otherwise.
+     *         non-null value from {@link #createPos(ITransactionExecutionContext)} will require you to overwrite this Method, as it will fail otherwise.
      */
     @Nullable
     default BlockData createDataForPos(ITransactionExecutionContext context, BlockPos pos) {
