@@ -9,6 +9,7 @@ import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.common.items.ITemplate;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketBlockMap;
+import com.direwolf20.buildinggadgets.common.network.packets.PacketRotateMirror;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
 import com.direwolf20.buildinggadgets.common.tools.NetworkIO;
 import com.direwolf20.buildinggadgets.common.tools.ToolRenders;
@@ -306,14 +307,12 @@ public class GadgetCopyPaste extends GadgetPlacing implements ITemplate {
         return new ActionResult<>(EnumActionResult.SUCCESS, stack);
     }
 
-    public static void rotateOrMirrorBlocks(ItemStack stack, EntityPlayer player) {
+    public static void rotateOrMirrorBlocks(ItemStack stack, EntityPlayer player, PacketRotateMirror.Operation operation) {
         if (!(getToolMode(stack) == ToolMode.Paste)) return;
         if (player.world.isRemote) {
             return;
         }
-
         GadgetCopyPaste tool = BGItems.gadgetCopyPaste;
-
         List<BlockMap> blockMapList;
         WorldSave worldSave = WorldSave.getWorldSave(player.world);
         NBTTagCompound tagCompound = worldSave.getCompoundFromUUID(tool.getUUID(stack));
@@ -330,8 +329,8 @@ public class GadgetCopyPaste extends GadgetPlacing implements ITemplate {
             int px = (tempPos.getX() - startPos.getX());
             int pz = (tempPos.getZ() - startPos.getZ());
             int nx, nz;
-            IBlockState alteredState = GadgetUtils.rotateOrMirrorBlock(player, blockMap.state);
-            if (player.isSneaking()) {
+            IBlockState alteredState = GadgetUtils.rotateOrMirrorBlock(player, operation, blockMap.state);
+            if (operation == PacketRotateMirror.Operation.MIRROR) {
                 if (player.getHorizontalFacing().getAxis() == Axis.X) {
                     nx = px;
                     nz = -pz;

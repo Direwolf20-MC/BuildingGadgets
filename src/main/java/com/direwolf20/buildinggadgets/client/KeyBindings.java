@@ -24,11 +24,11 @@ public class KeyBindings {
     public static void init() {
         menuSettings = createBinding("settings_menu", GLFW.GLFW_KEY_G);
         range = createBinding("range", GLFW.GLFW_KEY_R);
-        rotateMirror = createBinding("rotate_mirror", GLFW.GLFW_KEY_Y);
         undo = createBinding("undo", GLFW.GLFW_KEY_U);
         anchor = createBinding("anchor", GLFW.GLFW_KEY_H);
         fuzzy = createBinding("fuzzy", GLFW.GLFW_KEY_UNKNOWN);
         connectedArea = createBinding("connected_area", GLFW.GLFW_KEY_UNKNOWN);
+        rotateMirror = createBinding("rotate_mirror", GLFW.GLFW_KEY_UNKNOWN);
     }
 
     private static KeyBinding createBinding(String name, int key) {
