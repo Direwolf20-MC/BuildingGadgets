@@ -11,13 +11,11 @@ import javax.annotation.Nullable;
 import java.util.Objects;
 
 /**
- * <p>
  * In-Memory representation of the '.th' (TemplateHeader) written in json Format to disk, in order to allow users to have some more general Information about the
  * {@link com.direwolf20.buildinggadgets.api.template.ITemplate}. Only the registryName of the {@link ITemplateSerializer} used to create the
  * {@link com.direwolf20.buildinggadgets.api.template.ITemplate} and some boundingBox information is required. However it is advised to provide Users with as
  * much information as possible about the {@link com.direwolf20.buildinggadgets.api.template.ITemplate} they would like to use. This class is likely to be
  * expanded over time, as we get informed about other useful things to be put in here.
- * </p>
  */
 public final class TemplateHeader {
     /**

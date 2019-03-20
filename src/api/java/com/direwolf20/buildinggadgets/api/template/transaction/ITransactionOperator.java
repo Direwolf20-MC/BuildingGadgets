@@ -9,26 +9,21 @@ import javax.annotation.Nullable;
 import java.util.Set;
 
 /**
- * <p>
  * Represents an operation which can be performed by an {@link ITemplateTransaction} in order to modify a given {@link ITemplate}.
  * The following 3 types of operations are supported:
  * <ul>
- *     <li>Transforming or removing Block-Positions</li>
- *     <li>Transforming or removing Block-Data</li>
- *     <li>Attaching new Blocks and the Data to this Template.</li>
+ *     <li>Transforming or removing Block-Positions
+ *     <li>Transforming or removing Block-Data
+ *     <li>Attaching new Blocks and the Data to this Template.
  * </ul>
- * </p>
  */
 public interface ITransactionOperator {
     /**
-     * <p>
      * Represents characteristics (operations) an {@code ITransactionOperator} might have.
-     * </p>
      * <p>
      * <b>It is not guaranteed that the order of this {@link Enum}'s values will remain consistend nor is
      * it guaranteed that no values will be added.</b> Users switch casing over this enum should therefore always provide
      * a default case. Users may furthermore not depend on this Enum's ordinal for serialisation.
-     * </p>
      */
     enum Characteristic {
         /**
@@ -66,7 +61,7 @@ public interface ITransactionOperator {
      * Notice that even though you may return null from this Method, doing so for an {@link BlockPos} which is not already present in
      * the backing {@link ITemplate} is considered an Exceptional-Condition and will result in Runtime-Failure of the executing
      * {@link ITemplateTransaction}.
-     * </p>
+     * @param context The {@link ITransactionExecutionContext} used during this transaction.
      * @param pos The pos for which to create {@link BlockData} for.
      * @return A new {@link BlockData} for a given {@link BlockPos} or null if none can or should be created.
      * @implNote The default implementation throws {@link UnsupportedOperationException} as this cannot be supported. Bear in mind that returning a
@@ -80,6 +75,7 @@ public interface ITransactionOperator {
     /**
      * Performs arbitrary operations on the given {@link BlockData}. <br>
      * Will be called after {@link #createPos(ITransactionExecutionContext)} and {@link #createDataForPos(ITransactionExecutionContext, BlockPos)} are finished executing.
+     * @param context The {@link ITransactionExecutionContext} used during this transaction.
      * @param data The {@link BlockData} to be transformed by this {@code ITransactionOperator}'s
      * @return The transformed {@link BlockData} or null to remove it <b>and all referencing positions</b> from the Template.
      * @implNote The default implementation is the identity function.
@@ -93,8 +89,9 @@ public interface ITransactionOperator {
      * Performs arbitrary operations on the given {@link BlockPos}. The {@link BlockData} associated with this position is passed into this Method
      * in order to provide more context. <br>
      * Will be called after {@link #transformData(ITransactionExecutionContext, BlockData)} is finished executing for the {@link BlockData} associated with this {@link BlockPos}.
+     * @param context The {@link ITransactionExecutionContext} used during this transaction.
      * @param pos The position to transform
-     * @param data The {@link BlockData} associated with this position
+     * @param data The {@link BlockData} associated with this position.
      * @return The new transformed {@link BlockPos} or null if it should be removed from the given {@link ITemplate}
      * @implNote The default implementation just returns the given position
      */
@@ -108,7 +105,7 @@ public interface ITransactionOperator {
      * All {@link Characteristic} returned by this Method are guaranteed to be executed.
      * @return A {@link Set} representing the {@link Characteristic} of this {@code ITransactionOperator}
      */
-    default Set<Characteristic> characteristics(ITransactionExecutionContext context) {
+    default Set<Characteristic> characteristics() {
         return ImmutableSet.of();
     }
 }
