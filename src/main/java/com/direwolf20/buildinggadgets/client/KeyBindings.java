@@ -13,20 +13,22 @@ import org.lwjgl.glfw.GLFW;
 public class KeyBindings {
 
     private static final KeyConflictContextGadget CONFLICT_CONTEXT_GADGET = new KeyConflictContextGadget();
-    public static KeyBinding modeSwitch;
-    public static KeyBinding rangeChange;
-    public static KeyBinding undoKey;
-    public static KeyBinding anchorKey;
-    public static KeyBinding fuzzyKey;
-    public static KeyBinding connectedAreaKey;
+    public static KeyBinding menuSettings;
+    public static KeyBinding range;
+    public static KeyBinding rotateMirror;
+    public static KeyBinding undo;
+    public static KeyBinding anchor;
+    public static KeyBinding fuzzy;
+    public static KeyBinding connectedArea;
 
     public static void init() {
-        modeSwitch = createBinding("mode_switch", GLFW.GLFW_KEY_G);
-        rangeChange = createBinding("range_change", GLFW.GLFW_KEY_R);
-        undoKey = createBinding("undo", GLFW.GLFW_KEY_U);
-        anchorKey = createBinding("anchor", GLFW.GLFW_KEY_H);
-        fuzzyKey = createBinding("fuzzy", GLFW.GLFW_KEY_UNKNOWN);
-        connectedAreaKey = createBinding("connected_area", GLFW.GLFW_KEY_UNKNOWN);
+        menuSettings = createBinding("settings_menu", GLFW.GLFW_KEY_G);
+        range = createBinding("range", GLFW.GLFW_KEY_R);
+        undo = createBinding("undo", GLFW.GLFW_KEY_U);
+        anchor = createBinding("anchor", GLFW.GLFW_KEY_H);
+        fuzzy = createBinding("fuzzy", GLFW.GLFW_KEY_UNKNOWN);
+        connectedArea = createBinding("connected_area", GLFW.GLFW_KEY_UNKNOWN);
+        rotateMirror = createBinding("rotate_mirror", GLFW.GLFW_KEY_UNKNOWN);
     }
 
     private static KeyBinding createBinding(String name, int key) {

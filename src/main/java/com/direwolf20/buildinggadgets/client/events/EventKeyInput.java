@@ -25,21 +25,23 @@ public class EventKeyInput {
         if (mc.player == null || event.phase == Phase.START)
             return;
 
-        KeyBinding mode = KeyBindings.modeSwitch;
+        KeyBinding mode = KeyBindings.menuSettings;
         if (!(mc.currentScreen instanceof ModeRadialMenu) && mode.isPressed() && ((mode.getKeyModifier() == KeyModifier.NONE
                 && KeyModifier.getActiveModifier() == KeyModifier.NONE) || mode.getKeyModifier() != KeyModifier.NONE)) {
             ItemStack tool = GadgetGeneric.getGadget(mc.player);
             if (!tool.isEmpty())
                 mc.displayGuiScreen(new ModeRadialMenu(tool));
-        } else if (KeyBindings.rangeChange.isPressed()) {
+        } else if (KeyBindings.range.isPressed()) {
             PacketHandler.sendToServer(new PacketChangeRange());
-        } else if (KeyBindings.undoKey.isPressed()) {
-            PacketHandler.sendToServer(new PacketUndoKey());
-        } else if (KeyBindings.anchorKey.isPressed()) {
-            PacketHandler.sendToServer(new PacketAnchorKey());
-        } else if (KeyBindings.fuzzyKey.isPressed()) {
+        } else if (KeyBindings.rotateMirror.isPressed()) {
+            PacketHandler.sendToServer(new PacketRotateMirror());
+        } else if (KeyBindings.undo.isPressed()) {
+            PacketHandler.sendToServer(new PacketUndo());
+        } else if (KeyBindings.anchor.isPressed()) {
+            PacketHandler.sendToServer(new PacketAnchor());
+        } else if (KeyBindings.fuzzy.isPressed()) {
             PacketHandler.sendToServer(new PacketToggleFuzzy());
-        } else if (KeyBindings.connectedAreaKey.isPressed()) {
+        } else if (KeyBindings.connectedArea.isPressed()) {
             PacketHandler.sendToServer(new PacketToggleConnectedArea());
         }
     }
