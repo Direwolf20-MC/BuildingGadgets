@@ -14,15 +14,52 @@ import net.minecraft.util.math.RayTraceResult;
 
 import javax.annotation.Nullable;
 
+/**
+ * Represents the serializable data of an {@link net.minecraft.tileentity.TileEntity}. It also provides actions which can be performed on the
+ * underlying data, to either:
+ * <ul>
+ * <li>Check whether placement should be permitted via {@link #allowPlacement(IBuildContext, IBlockState, BlockPos)}
+ * <li>Place this data with a given {@link IBlockState} in an {@link IBuildContext} via {@link #placeIn(IBuildContext, IBlockState, BlockPos)}
+ * <li>Query the requiredItems to build this {@link ITileEntityData} via {@link #getRequiredItems(IBuildContext, IBlockState, RayTraceResult, BlockPos)}.
+ * </ul>
+ */
 public interface ITileEntityData {
+    /**
+     * @return The {@link ITileDataSerializer} which can be used for serializing this {@link ITileEntityData} instance.
+     */
     ITileDataSerializer getSerializer();
 
+    /**
+     * Checks whether this {@link ITileEntityData} permits being placed at the given position.
+     * @param context The {@link IBuildContext} to place in.
+     * @param state The {@link IBlockState} to place.
+     * @param position The {@link BlockPos} at which to place
+     * @return Whether or not placement should be allowed for this {@link ITileEntityData}. Returning false can be as trivial as the position being in the wrong
+     *         Biome for this type of liquid for example...
+     * @implNote The default implementation checks whether the given position is air.
+     */
     default boolean allowPlacement(IBuildContext context, IBlockState state, BlockPos position) {
         return state.isAir(context.getWorld(), position);
     }
 
-    boolean placeIn(IBuildContext context, IBlockState state, BlockPos pos);
+    /**
+     * Attempts to place this {@link ITileEntityData} in the given {@link IBuildContext}. If this is called but {@link #allowPlacement(IBuildContext, IBlockState, BlockPos)}
+     * would have returned false, placement should still be attempted and counted as a "forced placement".
+     * @param context The {@link IBuildContext} to place in.
+     * @param state The {@link IBlockState} to place.
+     * @param position The {@link BlockPos} at which to place
+     * @return Whether or not placement was performed by this {@link ITileEntityData}. This should only return false if some really hard requirements would not be met,
+     *         like for example a required block not being present next to the given position.
+     */
+    boolean placeIn(IBuildContext context, IBlockState state, BlockPos position);
 
+    /**
+     * @param context The context in which to query required items.
+     * @param state The {@link IBlockState} to retrieve items for
+     * @param target {@link RayTraceResult} the target at which a click is simulated
+     * @param pos The {@link BlockPos} where a block is simulated for this Method
+     * @return A {@link Multiset} of required Items.
+     */
     default Multiset<IUniqueItem> getRequiredItems(IBuildContext context, IBlockState state, @Nullable RayTraceResult target, @Nullable BlockPos pos) {
         ItemStack stack = null;
         try {
