@@ -15,10 +15,12 @@ import it.unimi.dsi.fastutil.longs.Long2IntMap;
 import net.minecraft.util.math.BlockPos;
 
 import javax.annotation.Nullable;
+import javax.annotation.concurrent.Immutable;
 
 /**
  * An immutable implementation of {@link ITemplate}. It supports {@link ITemplateTransaction}, but those will always create a new instance.
  */
+@Immutable
 public final class ImmutableTemplate implements ITemplate {
     private final BlockPos translation;
     private final Long2IntMap posToStateId;

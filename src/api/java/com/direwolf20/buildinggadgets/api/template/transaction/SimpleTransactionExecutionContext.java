@@ -1,14 +1,25 @@
 package com.direwolf20.buildinggadgets.api.template.transaction;
 
+import javax.annotation.concurrent.Immutable;
+
 /**
  * Simple implementation of {@link ITransactionExecutionContext} providing a {@link Builder} for creation.
  */
+@Immutable
 public final class SimpleTransactionExecutionContext implements ITransactionExecutionContext {
     /**
-     * @return Create a new {@link Builder}.
+     * @return A new {@link Builder}.
      */
     public static Builder builder() {
         return new Builder();
+    }
+
+    /**
+     * @param context The context to copy
+     * @return A new {@link Builder}, with all values copied from the specified context.
+     */
+    public static Builder builderOf(ITransactionExecutionContext context) {
+        return builder().size(context.getEstimatedTemplateSize());
     }
 
     private int size;
@@ -19,14 +30,17 @@ public final class SimpleTransactionExecutionContext implements ITransactionExec
 
     /**
      * {@inheritDoc}
-     * @return The estimated {@link com.direwolf20.buildinggadgets.api.template.ITemplate}-size. Negative if unkown.
+     * @return The estimated {@link com.direwolf20.buildinggadgets.api.template.ITemplate}-size. Negative if unknown.
      */
     @Override
     public int getEstimatedTemplateSize() {
         return size;
     }
 
-    public static class Builder {
+    /**
+     * Builder for creating {@link SimpleTransactionExecutionContext}'s
+     */
+    public static final class Builder {
         private int size;
 
         private Builder() {
