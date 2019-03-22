@@ -9,7 +9,9 @@ The format of this document is based on [Keep a Changelog](https://keepachangelo
 
 ### Changed
 - Separated rotation/mirror keybind from range.
-- Raised the energy costs of the pulverizer and fluid extractor recipes from 400/100 to 4000/1000.
+- Raised the energy costs in recipes to 4000/1000 from
+    - 400/100 in the pulverizer and fluid extractor *[Thermal Expansion]*
+    - 1600/400 in the crusher *[Immersive Engineering]*
 
 ## [2.6.7] - 2019-03-18
 ### Added

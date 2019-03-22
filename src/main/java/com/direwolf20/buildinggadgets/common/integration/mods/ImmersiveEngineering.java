@@ -12,6 +12,6 @@ public class ImmersiveEngineering implements IPasteRecipeRegistry {
 
     @Override
     public void registerDeconstructRecipe(RecipieType type, ItemStack input, ItemStack output) {
-        CrusherRecipe.addRecipe(output, input, type == RecipieType.BLOCK_TO_CHUNKS ? 1600 : 400);
+        CrusherRecipe.addRecipe(output, input, type == RecipieType.BLOCK_TO_CHUNKS ? 4000 : 1000);
     }
 }
