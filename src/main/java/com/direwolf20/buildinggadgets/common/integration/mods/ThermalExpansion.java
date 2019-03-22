@@ -21,11 +21,11 @@ public class ThermalExpansion implements IPasteRecipeRegistry {
 
     @Override
     public void registerHydrationRecipe(RecipieType type, ItemStack input, ItemStack output) {
-        ThermalExpansionHelper.addTransposerFill(400, input, output, WATER, false);
+        ThermalExpansionHelper.addTransposerFill(4000, input, output, WATER, false);
     }
 
     @Override
     public void registerDeconstructRecipe(RecipieType type, ItemStack input, ItemStack output) {
-        ThermalExpansionHelper.addPulverizerRecipe(type == RecipieType.BLOCK_TO_CHUNKS ? 400 : 100, input, output);
+        ThermalExpansionHelper.addPulverizerRecipe(type == RecipieType.BLOCK_TO_CHUNKS ? 4000 : 1000, input, output);
     }
 }
