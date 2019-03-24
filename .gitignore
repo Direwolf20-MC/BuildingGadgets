@@ -15,3 +15,5 @@
 !/gradle.properties
 !/update.json
 !/CHANGELOG.md
+!/EclipseCodeStyle.xml
+!/IntelliJIdeaCodeStyle.xml
