@@ -42,14 +42,10 @@ Unless your PR is directly related to code cleaning then your PR should not cont
 * Method/Class annotations should gain their own lines in front of the definition.
 * Parameter Annotations should be surrounded by exactly one space.
 * Comments should always start with a single space `// Comment`.
-* Import statments should be ordered in sections with exactly 1 empty line between them. Regular imports go in the front and static imports follow them.
-  * If you are using IntelliJ, this is the default order.
-  * If you are using Eclipse, you need to reorder them under `Preferences -> Java -> Code Style -> Organize Imports`.
-    1. `com.`, `.net`, and other imports, should be in alphebetical order
-    2. (empty line)
-    3. `java.`, `javax.`, etc.
-    4. (empty line)
-    5. All other static imports
+* Import statments should be ordered in sections with exactly 1 empty line between them.
+  1. All other unmatched imports, should be in alphebetical order
+  2. `java.`, `javax.`, etc.
+  3. All static imports
 
 ### Code Style
 In general apply common sense to the Code you write. "Effective Java" is also always a good start.
@@ -82,12 +78,6 @@ In general apply common sense to the Code you write. "Effective Java" is also al
 * Enforce immutability where possible
   * Use immutablet types for immutable values (`ImmutableList`, `ImmutableSet`, `ImmutableMap`, etc.)
   * Avoid public properties
-* Always use capital letters for format suffixes and literals
-  * Bad format suffix: `0.5f`, `1000l`
-  * Good format suffiz: `0.5F`, `1000L`
-  * Bad iteral: `0xfff`, `0xbeef`
-  * Good literal: `0xFFF`, `0xBEEF`.
-* No nested classes with 2 levels or deeper.
 
 ### Packages
 * Don't use packages like there is a limited allowed amount, for the sake of code readability and maintainabilty make as may packages as logically makes sense. Attempt to group as much common functionality as possible within a package. Use our `common.utils` package as an example of functionality grouping. 
@@ -97,57 +87,3 @@ In general apply common sense to the Code you write. "Effective Java" is also al
   * `api` our api package is for all api related functionality, it's rare you should be using this package unless you're specifically working on api specific additions.
 * Use sensible and logical naming for your packages and avoid prefixing or sufixing your package names. For example `common.items.gadgets` is good, `common.itemGadgets` is bad as a sub-package should have been used. 
 * Always use lower case and respect the official Java guide to creating packages which can be found [here](https://docs.oracle.com/javase/tutorial/java/package/namingpkgs.html).
-
-### Class Structure
-* Classes should have static methods and fields on top, and member methods and fields on the bottom:
-  * Fields always exist before methods in their (static/member) region.
-  * Constructor always exist before other member methods.
-  * Getters and setters should be at end of a class definition, where setters follow its coorsponding getter.
-* A good example:
-```java
-public class Foo {
-
-    // Static fields before static methods
-    public static final int ID = 0xbeef;
-
-    public static Foo create(int i) {
-        return new Foo(i, true);
-    }
-
-    // Member fields/methods after static fields/methods
-    // Member fields before member methods
-    private int i;
-    private boolean bar;
-
-    // Constructors before member methods
-    public Foo(int i, boolean bar) {
-        // 'this' because necessary (parameter/local variable and field name duplicates)
-        this.i = i;
-        this.bar = bar;
-    }
-
-    // Getters are in the order of their backed fields
-    public int getNumber() {
-        // No 'this' and it is not necessary
-        return i;
-    }
-
-    // Setters follow their coorsponding getter
-    public void setNumber(int i) {
-        // Use 'this' because necessary
-        this.i = i;
-    }
-
-    // Special getters can live anywhere reasonable
-    public boolean getBoolean() {
-        boolean positive = i > 0;
-        return positive && bar;
-    }
-
-    public void setBoolean(boolean target) {
-        // No 'this' and it is not necessary
-        bar = target || i > 0;
-    }
-
-}
-```
