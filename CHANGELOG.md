@@ -2,13 +2,14 @@
 The format of this document is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and should continue to adhere to the conventions outlined in the Keep a Changelog guidelines.
 
 ## [Unreleased]
-### Changed
+
+## [2.6.8] - 2019-03-24
 ### Added
-- Building and Exchanging gadgets can now rotate/mirror their set blocks.
 - Added settings to the radial menu for rotation, mirroring, undoing, and anchoring. All operations that can be performed by a keybind can now be performed via the radial menu.
+- Building and Exchanging gadgets can now rotate/mirror their set blocks (using either its new keybind, which is not set by default, or using the radial menu).
 
 ### Changed
-- Separated rotation/mirror keybind from range.
+- Separated rotation/mirror keybind (not set by default) from range (still default of **R**).
 - Raised the energy costs in recipes to 4000/1000 from
     - 400/100 in the pulverizer and fluid extractor *[Thermal Expansion]*
     - 1600/400 in the crusher *[Immersive Engineering]*
