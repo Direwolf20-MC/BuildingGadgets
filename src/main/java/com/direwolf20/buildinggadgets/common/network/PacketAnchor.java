@@ -9,11 +9,11 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
-public class PacketAnchorKey extends PacketEmpty {
+public class PacketAnchor extends PacketEmpty {
 
-    public static class Handler implements IMessageHandler<PacketAnchorKey, IMessage> {
+    public static class Handler implements IMessageHandler<PacketAnchor, IMessage> {
         @Override
-        public IMessage onMessage(PacketAnchorKey message, MessageContext ctx) {
+        public IMessage onMessage(PacketAnchor message, MessageContext ctx) {
             FMLCommonHandler.instance().getWorldThread(ctx.netHandler).addScheduledTask(() -> handle(ctx));
             return null;
         }

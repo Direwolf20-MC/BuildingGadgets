@@ -16,7 +16,6 @@ import net.minecraft.util.math.BlockPos;
  * <p>
  * If the player clicks on any horizontal side of the target position, it will start from the there and build column
  * towards the side clicked. If the player clicks on the top side, however, it will use player's facing instead.
- * </p>
  *
  * @see Column
  */

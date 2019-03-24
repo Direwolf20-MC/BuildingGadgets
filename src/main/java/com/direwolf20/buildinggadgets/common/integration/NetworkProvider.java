@@ -6,6 +6,7 @@ import java.util.Set;
 import javax.annotation.Nullable;
 
 import com.direwolf20.buildinggadgets.common.integration.IntegrationHandler.IIntegratedMod;
+import com.direwolf20.buildinggadgets.common.integration.IntegrationHandler.Phase;
 import com.direwolf20.buildinggadgets.common.tools.NetworkIO.Operation;
 
 import net.minecraft.entity.player.EntityPlayer;
@@ -17,9 +18,11 @@ public abstract class NetworkProvider implements IIntegratedMod {
     private static final Set<NetworkProvider> PROVIDERS = new HashSet<>();
 
     @Override
-    public void preInit() {
-        isLoaded = true;
-        PROVIDERS.add(this);
+    public void initialize(Phase phase) {
+        if (phase == Phase.PRE_INIT) {
+            isLoaded = true;
+            PROVIDERS.add(this);
+        }
     }
 
     @Nullable

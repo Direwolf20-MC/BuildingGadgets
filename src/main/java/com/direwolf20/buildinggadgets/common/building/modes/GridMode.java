@@ -13,8 +13,8 @@ import net.minecraft.util.math.BlockPos;
 
 /**
  * Grid mode for Building Gadget.
- *
- * <p>See {@link Grid} for more information. Period size is can be changed though config, default is {@code 6}</p>
+ * <p>
+ * See {@link Grid} for more information. Period size is can be changed though config, default is {@code 6}
  */
 public class GridMode extends AtopSupportedMode {
 

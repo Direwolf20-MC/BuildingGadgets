@@ -17,7 +17,6 @@ import java.util.function.BiPredicate;
  * Testing is done with the predicate produced with {@link #validatorFactory}. If the predicate returns {@code true},
  * the position will be kept and returned in the iterator. If the predicate returns {@code false} on the other hand, the
  * position will be voided.
- * </p>
  *
  * @implNote Execution context in Strategy Pattern
  */
@@ -35,9 +34,7 @@ public class Context {
     }
 
     /**
-     * <p>
      * Note that it is assumed that this method will return a block provider uses the first value returned by the first value by {@link #positions} as its translate.
-     * </p>
      *
      * @param validatorFactory Creates predicate for determining whether a position should be used or not
      */

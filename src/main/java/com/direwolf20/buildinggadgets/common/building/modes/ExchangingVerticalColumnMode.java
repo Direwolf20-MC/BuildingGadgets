@@ -20,7 +20,6 @@ import net.minecraft.util.math.BlockPos;
  * Y axis in the plane.
  * The column will be centered at the origin. Length of the column will be the tool range that is floored to an odd
  * number with a lower bound of 1.
- * </p>
  *
  * @see Column
  */

@@ -15,10 +15,8 @@ import java.util.Spliterator;
 /**
  * A wall is a plane of blocks described with a starting and an ending position. The positions will and must have 1
  * coordinate that is the same.
- *
  * <p>
  * See the static factory methods for more information.
- * </p>
  */
 public final class Wall implements IPlacementSequence {
 

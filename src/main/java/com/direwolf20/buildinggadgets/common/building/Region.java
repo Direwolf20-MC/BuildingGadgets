@@ -93,11 +93,9 @@ public final class Region implements IPlacementSequence {
      * values will shrink the region instead of expanding it.
      * <p>
      * Side lengths will be increased by 2 times the value of the parameters, since both min and max are changed.
-     * </p>
      * <p>
      * If contracting and the amount to contract by is larger than the length of a side, then the side will wrap (still
      * creating a valid region - see last sample).
-     * </p>
      *
      * <h3>Samples:</h3>
      * <table>
@@ -110,8 +108,8 @@ public final class Region implements IPlacementSequence {
      *
      * <h3>See Also:</h3>
      * <ul>
-     * <li>{@link #grow(int)} - version of this that expands in all directions from one parameter.</li>
-     * <li>{@link #shrink(int)} - contracts in all directions</li>
+     * <li>{@link #grow(int)} - version of this that expands in all directions from one parameter.
+     * <li>{@link #shrink(int)} - contracts in all directions
      * </ul>
      */
     public Region expand(int x, int y, int z) {
@@ -125,9 +123,9 @@ public final class Region implements IPlacementSequence {
     /**
      * Expand the current region by the given value in the max values. Equivalent to {@link
      * #expand(int)}  with the given value for all 3 params. Negative values will shrink the region.
-     * <br/>
+     * <p>
      * Side lengths will be increased by 2 times the value of the parameter, since both min and max are changed.
-     * <br/>
+     * <p>
      * If contracting and the amount to contract by is larger than the length of a side, then the side will wrap (still
      * creating a valid region - see samples on {@link #grow(int, int, int)}).
      */
@@ -295,10 +293,8 @@ public final class Region implements IPlacementSequence {
     }
 
     /**
-     * <p>
      * The first result will have the minimum x, y, and z value. In the process it will advance in positive z-y-x order as used in BG-Code on various other places.
      * Positions provided by this Iterator may be considered ordered.
-     * </p>
      *
      * @return A {@link PeekingIterator} over all positions in this Region
      * @implSpec starts at (minX, minY, minZ), ends at (maxX, maxY, maxZ)

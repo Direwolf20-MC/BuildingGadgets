@@ -20,7 +20,6 @@ import net.minecraft.util.math.BlockPos;
  * <p>
  * Selects blocks that is same as the selected block. Reference region and searching region are the same
  * if compared to {@link BuildingSurfaceMode}.
- * </p>
  *
  * @see BuildingSurfaceMode
  */

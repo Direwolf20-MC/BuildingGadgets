@@ -8,11 +8,11 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
-public class PacketUndoKey extends PacketEmpty {
+public class PacketUndo extends PacketEmpty {
 
-    public static class Handler implements IMessageHandler<PacketUndoKey, IMessage> {
+    public static class Handler implements IMessageHandler<PacketUndo, IMessage> {
         @Override
-        public IMessage onMessage(PacketUndoKey message, MessageContext ctx) {
+        public IMessage onMessage(PacketUndo message, MessageContext ctx) {
             FMLCommonHandler.instance().getWorldThread(ctx.netHandler).addScheduledTask(() -> handle(ctx));
             return null;
         }

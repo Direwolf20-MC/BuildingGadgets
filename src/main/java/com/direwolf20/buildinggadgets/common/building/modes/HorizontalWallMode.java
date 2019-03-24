@@ -18,10 +18,9 @@ import net.minecraft.util.math.BlockPos;
  * When the player selects any horizontal side of a block, it will build a wall sitting on clicked side of the target
  * position with a length of tool range.
  * The wall will be a square when tool range is an even number, and 1 higher if tool range is an odd number.
- * </p><p>
+ * <p>
  * When the player selects top or bottom of a block, it will build a wall centered at the target position with tool range.
  * Range used as its side length will be rounded down towards the nearest odd number that is at least 1.
- * </p>
  *
  * @see Wall
  */

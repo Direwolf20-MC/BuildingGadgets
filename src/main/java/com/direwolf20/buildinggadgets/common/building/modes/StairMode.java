@@ -13,9 +13,10 @@ import net.minecraft.util.math.BlockPos;
 
 /**
  * Stair mode for Building Gadget.
- * <p>When the target position is higher than player's head, it will extend downwards and towards the player.</p>
- * <p>When the target position is 2 lower than player's feet, it will extend upwards and towards the player.</p>
- * <p>Otherwise, it will extend upwards and away from the player.</p>
+ * <p>
+ * When the target position is higher than player's head, it will extend downwards and towards the player.
+ * When the target position is 2 lower than player's feet, it will extend upwards and towards the player.
+ * Otherwise, it will extend upwards and away from the player.
  *
  * @see Stair
  */

@@ -49,6 +49,7 @@ public class ModeRadialMenu extends GuiScreen {
     private int slotSelected = -1;
     private int segments;
     private GuiSliderInt sliderRange;
+    private final List<GuiButton> conditionalButtons = new ArrayList<>();
 
     public ModeRadialMenu(ItemStack stack) {
         mc = Minecraft.getMinecraft();
@@ -67,98 +68,160 @@ public class ModeRadialMenu extends GuiScreen {
 
     @Override
     public void initGui() {
+        conditionalButtons.clear();
         ItemStack tool = getGadget();
-        boolean destruction = false;
-        if (tool.getItem() instanceof GadgetDestruction) {
-            destruction = true;
-            addButton(new GuiButtonActionCallback("destroy.overlay", send -> {
+        boolean isDestruction = tool.getItem() instanceof GadgetDestruction;
+        ScreenPosition right = isDestruction ? ScreenPosition.TOP : ScreenPosition.RIGHT;
+        ScreenPosition left = isDestruction ? ScreenPosition.BOTTOM : ScreenPosition.LEFT;
+        if (isDestruction) {
+            addButton(new GuiButtonActionCallback("destroy.overlay", right, send -> {
                 if (send)
                     PacketHandler.INSTANCE.sendToServer(new PacketChangeRange());
 
                 return GadgetDestruction.getOverlay(getGadget());
             }));
+        } else {
+            addButton(new GuiButtonActionCallback("rotate", left, send -> {
+                if (send)
+                    PacketHandler.INSTANCE.sendToServer(new PacketRotateMirror(PacketRotateMirror.Operation.ROTATE));
+
+                return false;
+            }).setTogglable(false));
+            addButton(new GuiButtonActionCallback("mirror", left, send -> {
+                if (send)
+                    PacketHandler.INSTANCE.sendToServer(new PacketRotateMirror(PacketRotateMirror.Operation.MIRROR));
+
+                return false;
+            }).setTogglable(false));
         }
         if (!(tool.getItem() instanceof GadgetCopyPaste)) {
-            if (!destruction || SyncedConfig.nonFuzzyEnabledDestruction) {
-                addButton(new GuiButtonActionCallback("fuzzy", send -> {
+            if (!isDestruction || SyncedConfig.nonFuzzyEnabledDestruction) {
+                GuiButton button = new GuiButtonActionCallback("fuzzy", right, send -> {
                     if (send)
                         PacketHandler.INSTANCE.sendToServer(new PacketToggleFuzzy());
 
                     return GadgetGeneric.getFuzzy(getGadget());
-                }));
+                });
+                addButton(button);
+                conditionalButtons.add(button);
             }
-            addButton(new GuiButtonActionCallback("connected_" + (destruction ? "area" : "surface"), send -> {
+            GuiButton button = new GuiButtonActionCallback("connected_" + (isDestruction ? "area" : "surface"), right, send -> {
                 if (send)
                     PacketHandler.INSTANCE.sendToServer(new PacketToggleConnectedArea());
 
                 return GadgetGeneric.getConnectedArea(getGadget());
-            }));
-            if (!destruction) {
+            });
+            addButton(button);
+            conditionalButtons.add(button);
+            if (!isDestruction) {
                 int widthSlider = 82;
                 sliderRange = new GuiSliderInt(width / 2 - widthSlider / 2, height / 2 + 72, widthSlider, 14, "Range ", "", 1, SyncedConfig.maxRange,
-                        GadgetUtils.getToolRange(tool), false, true, Color.DARK_GRAY, slider -> {
-                    if (slider.getValueInt() != GadgetUtils.getToolRange(getGadget()))
-                        PacketHandler.INSTANCE.sendToServer(new PacketChangeRange(slider.getValueInt()));
-                }, (slider, amount) -> {
-                    int value = slider.getValueInt();
-                    int valueNew = MathHelper.clamp(value + amount, 1, SyncedConfig.maxRange);
-                    slider.setValue(valueNew);
-                    slider.updateSlider();
-                });
+                    GadgetUtils.getToolRange(tool), false, true, Color.DARK_GRAY, slider -> {
+                        if (slider.getValueInt() != GadgetUtils.getToolRange(getGadget()))
+                            PacketHandler.INSTANCE.sendToServer(new PacketChangeRange(slider.getValueInt()));
+                    }, (slider, amount) -> {
+                        int value = slider.getValueInt();
+                        int valueNew = MathHelper.clamp(value + amount, 1, SyncedConfig.maxRange);
+                        slider.setValue(valueNew);
+                        slider.updateSlider();
+                    });
                 sliderRange.precision = 1;
                 sliderRange.getComponents().forEach(component -> addButton(component));
             }
         }
-        addButton(new GuiButtonActionCallback("raytrace_fluid", send -> {
+        addButton(new GuiButtonActionCallback("raytrace_fluid", right, send -> {
             if (send)
                 PacketHandler.INSTANCE.sendToServer(new PacketToggleRayTraceFluid());
 
             return GadgetGeneric.shouldRayTraceFluid(getGadget());
         }));
         if (tool.getItem() instanceof GadgetBuilding) {
-            addButton(new GuiButtonActionCallback("building.place_atop", send -> {
+            addButton(new GuiButtonActionCallback("building.place_atop", right, send -> {
                 if (send)
                     PacketHandler.INSTANCE.sendToServer(new PacketToggleBlockPlacement());
 
                 return GadgetBuilding.shouldPlaceAtop(getGadget());
             }));
         }
+        addButton(new GuiButtonActionCallback("anchor", left, send -> {
+            if (send)
+                PacketHandler.INSTANCE.sendToServer(new PacketAnchor());
+
+            ItemStack stack = getGadget();
+            if (stack.getItem() instanceof GadgetCopyPaste)
+                return GadgetCopyPaste.getAnchor(stack) != null;
+            else if (stack.getItem() instanceof GadgetDestruction)
+                return GadgetDestruction.getAnchor(stack) != null;
+
+            return !GadgetUtils.getAnchor(stack).isEmpty();
+        }));
+        if (!(tool.getItem() instanceof GadgetExchanger)) {
+            addButton(new GuiButtonActionCallback("undo", left, send -> {
+                if (send)
+                    PacketHandler.INSTANCE.sendToServer(new PacketUndo());
+
+                return false;
+            }).setTogglable(false));
+        }
         updateButtons(tool);
     }
 
     private void updateButtons(ItemStack tool) {
-        int pos = 0;
-        int dim = 24;
+        int posRight = 0;
+        int posLeft = 0;
+        int dim = 22;
         int padding = 10;
+        boolean isDestruction = tool.getItem() instanceof GadgetDestruction;
+        ScreenPosition right = isDestruction ? ScreenPosition.BOTTOM : ScreenPosition.RIGHT;
+
         for (GuiButton guiButton : buttonList) {
-            if (!(guiButton instanceof GuiButtonSound))
+            if (!(guiButton instanceof GuiButtonActionCallback))
                 continue;
 
-            GuiButtonSound button = (GuiButtonSound) guiButton;
+            GuiButtonActionCallback button = (GuiButtonActionCallback) guiButton;
             SoundEvent sound = ModSounds.BEEP.getSound();
-            button.setSounds(sound, sound, 0.6F, 1F);
+            button.setSounds(sound, sound, 1F, 0.6F);
             if (!button.visible) continue;
-            pos += dim + padding;
+            int offset;
+            boolean isRight = button.getScreenPosition() == right;
+            if (isRight) {
+                posRight += dim + padding;
+                offset = 70;
+            } else {
+                posLeft += dim + padding;
+                offset = -70 - dim;
+            }
             button.width = dim;
             button.height = dim;
-            if (tool.getItem() instanceof GadgetDestruction)
-                button.y = height / 2 - button.height - 5;
+            if (isDestruction)
+                button.y = height / 2 + (isRight ? 10 : -button.height - 10);
             else
-                button.x = width / 2 + 70;
+                button.x = width / 2 + offset;
         }
-        pos = (tool.getItem() instanceof GadgetDestruction ? width / 2 - (pos - padding) / 2 : height / 2 - (pos - padding) / 2);
-        for (GuiButton button : buttonList) {
-            if (!(button instanceof GuiButtonSound))
+        posRight = resetPos(tool, padding, posRight);
+        posLeft = resetPos(tool, padding, posLeft);
+        for (GuiButton guiButton : buttonList) {
+            if (!(guiButton instanceof GuiButtonActionCallback))
                 continue;
 
+            GuiButtonActionCallback button = (GuiButtonActionCallback) guiButton;
             if (!button.visible) continue;
-            if (tool.getItem() instanceof GadgetDestruction)
+            boolean isRight = button.getScreenPosition() == right;
+            int pos = isRight ? posRight : posLeft;
+            if (isDestruction)
                 button.x = pos;
             else
                 button.y = pos;
 
-            pos += dim + padding;
+            if (isRight)
+                posRight += dim + padding;
+            else
+                posLeft += dim + padding;
         }
+    }
+
+    private int resetPos(ItemStack tool, int padding, int pos) {
+        return tool.getItem() instanceof GadgetDestruction ? width / 2 - (pos - padding) / 2 : height / 2 - (pos - padding) / 2;
     }
 
     private ItemStack getGadget() {
@@ -226,6 +289,9 @@ public class ModeRadialMenu extends GuiScreen {
             signs = signsCopyPaste;
         }
 
+        boolean shouldCenter = (segments + 2) % 4 == 0;
+        int indexBottom = segments / 4;
+        int indexTop = indexBottom + segments / 2;
         for (int seg = 0; seg < segments; seg++) {
             boolean mouseInSector = isCursorInSlice(angle, totalDeg, degPer, inRange);
             float radius = Math.max(0F, Math.min((timeIn + partialTicks - seg * 6F / segments) * 40F, radiusMax));
@@ -252,7 +318,7 @@ public class ModeRadialMenu extends GuiScreen {
                 double xp = x + Math.cos(rad) * radius;
                 double yp = y + Math.sin(rad) * radius;
                 if ((int) i == (int) (degPer / 2))
-                    nameData.add(new NameDisplayData((int) xp, (int) yp, mouseInSector));
+                    nameData.add(new NameDisplayData((int) xp, (int) yp, mouseInSector, shouldCenter && (seg == indexBottom || seg == indexTop)));
 
                 GL11.glVertex2d(x + Math.cos(rad) * radius / 2.3F, y + Math.sin(rad) * radius / 2.3F);
                 GL11.glVertex2d(xp, yp);
@@ -291,7 +357,7 @@ public class ModeRadialMenu extends GuiScreen {
 
             Color color = i == modeIndex ? Color.GREEN : Color.WHITE;
             if (data.isSelected())
-                fontRenderer.drawStringWithShadow(name, xsp, ysp, color.getRGB());
+                fontRenderer.drawStringWithShadow(name, xsp + (data.doesCentralize() ? width / 2 - 4 : 0), ysp, color.getRGB());
 
             double mod = 0.7;
             int xdp = (int) ((xp - x) * mod + x);
@@ -311,7 +377,7 @@ public class ModeRadialMenu extends GuiScreen {
 
         float s = 2.25F * fract;
         GlStateManager.scale(s, s, s);
-        GlStateManager.translate(x / s - offset, y / s - 8, 0);
+        GlStateManager.translate(x / s - (tool.getItem() instanceof GadgetCopyPaste ? 8F : 8.5F), y / s - 8, 0);
         mc.getRenderItem().renderItemAndEffectIntoGUI(tool, 0, 0);
 
         RenderHelper.disableStandardItemLighting();
@@ -328,13 +394,15 @@ public class ModeRadialMenu extends GuiScreen {
 
     private void renderHoverHelpText(int mx, int my) {
         buttonList.forEach(button -> {
-            if (!(button instanceof IHoverHelpText))
+            if (!(button instanceof GuiButtonActionCallback))
                 return;
 
-            IHoverHelpText helpTextProvider = (IHoverHelpText) button;
+            GuiButtonActionCallback helpTextProvider = (GuiButtonActionCallback) button;
             if (helpTextProvider.isHovered(mx, my)) {
                 Color color = button instanceof GuiButtonSelect && ((GuiButtonSelect) button).isSelected() ? Color.GREEN : Color.WHITE;
-                fontRenderer.drawStringWithShadow(helpTextProvider.getHoverHelpText(), mx, my - fontRenderer.FONT_HEIGHT, color.getRGB());
+                String text = helpTextProvider.getHoverHelpText();
+                int x = helpTextProvider.getScreenPosition() == ScreenPosition.LEFT ? mx - fontRenderer.getStringWidth(text): mx;
+                fontRenderer.drawStringWithShadow(text, x, my - fontRenderer.FONT_HEIGHT, color.getRGB());
             }
         });
     }
@@ -354,7 +422,7 @@ public class ModeRadialMenu extends GuiScreen {
 
     @Override
     public void updateScreen() {
-        if (!GameSettings.isKeyDown(KeyBindings.modeSwitch)) {
+        if (!GameSettings.isKeyDown(KeyBindings.menuSettings)) {
             mc.displayGuiScreen(null);
             changeMode();
         }
@@ -371,8 +439,8 @@ public class ModeRadialMenu extends GuiScreen {
 
         boolean curent;
         boolean changed = false;
-        for (int i = 0; i < 2; i++) {
-            GuiButton button = buttonList.get(i);
+        for (int i = 0; i < conditionalButtons.size(); i++) {
+            GuiButton button = conditionalButtons.get(i);
             if (builder)
                 curent = GadgetBuilding.getToolMode(tool) == BuildingModes.Surface;
             else
@@ -400,4 +468,7 @@ public class ModeRadialMenu extends GuiScreen {
         return my < y ? 360F - ang : ang;
     }
 
+    public static enum ScreenPosition {
+        RIGHT, LEFT, BOTTOM, TOP;
+    }
 }

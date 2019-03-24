@@ -20,7 +20,7 @@ public class IntegrationHandler {
             try {
                 if (Loader.isModLoaded((String) asmData.getAnnotationInfo().get("value"))) {
                     IIntegratedMod mod = Class.forName(name).asSubclass(IIntegratedMod.class).newInstance();
-                    mod.preInit();
+                    mod.initialize(Phase.PRE_INIT);
                     MODS.add(mod);
                 }
             } catch (Exception e) {
@@ -30,11 +30,11 @@ public class IntegrationHandler {
     }
 
     public static void init() {
-        MODS.forEach(mod -> mod.init());
+        MODS.forEach(mod -> mod.initialize(Phase.INIT));
     }
 
     public static void postInit() {
-        MODS.forEach(mod -> mod.postInit());
+        MODS.forEach(mod -> mod.initialize(Phase.POST_INIT));
     }
 
     @Retention(RetentionPolicy.RUNTIME)
@@ -42,12 +42,12 @@ public class IntegrationHandler {
         String value();
     }
 
+    public static enum Phase {
+        PRE_INIT, INIT, POST_INIT;
+    }
+
     public static interface IIntegratedMod {
 
-        default void preInit() {}
-
-        default void init() {}
- 
-        default void postInit() {}
+        void initialize(Phase phase);
     }
 }

@@ -13,7 +13,8 @@ import net.minecraft.util.math.BlockPos;
 /**
  * Former "<i>Build to Me</i>".
  * Logic is backed with {@link ExclusiveAxisChasing} where no attempt will be made at the ending (player) position.
- * <p>This mode is designed for Building Gadget and does not guarantee to work with other gadgets.</p>
+ * <p>
+ * This mode is designed for Building Gadget and does not guarantee to work with other gadgets.
  */
 public class TargetedAxisChasingMode extends AtopSupportedMode {
 

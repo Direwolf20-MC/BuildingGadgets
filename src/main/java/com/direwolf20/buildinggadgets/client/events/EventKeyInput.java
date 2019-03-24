@@ -3,12 +3,13 @@ package com.direwolf20.buildinggadgets.client.events;
 import com.direwolf20.buildinggadgets.client.KeyBindings;
 import com.direwolf20.buildinggadgets.client.gui.ModeRadialMenu;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
-import com.direwolf20.buildinggadgets.common.network.PacketAnchorKey;
+import com.direwolf20.buildinggadgets.common.network.PacketAnchor;
 import com.direwolf20.buildinggadgets.common.network.PacketChangeRange;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
+import com.direwolf20.buildinggadgets.common.network.PacketRotateMirror;
 import com.direwolf20.buildinggadgets.common.network.PacketToggleConnectedArea;
 import com.direwolf20.buildinggadgets.common.network.PacketToggleFuzzy;
-import com.direwolf20.buildinggadgets.common.network.PacketUndoKey;
+import com.direwolf20.buildinggadgets.common.network.PacketUndo;
 import net.minecraft.client.Minecraft;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.client.settings.KeyModifier;
@@ -31,22 +32,23 @@ public class EventKeyInput {
     }
 
     private static void handleEventInput() {
-        if (KeyBindings.modeSwitch.isKeyDown() && ((KeyBindings.modeSwitch.getKeyModifier() == KeyModifier.NONE && KeyModifier.getActiveModifier() == KeyModifier.NONE) || KeyBindings.modeSwitch.getKeyModifier() != KeyModifier.NONE)) {
+        if (KeyBindings.menuSettings.isKeyDown() && ((KeyBindings.menuSettings.getKeyModifier() == KeyModifier.NONE && KeyModifier.getActiveModifier() == KeyModifier.NONE) || KeyBindings.menuSettings.getKeyModifier() != KeyModifier.NONE)) {
             //PacketHandler.INSTANCE.sendToServer(new PacketToggleMode());
             Minecraft mc = Minecraft.getMinecraft();
             ItemStack tool = GadgetGeneric.getGadget(mc.player);
             if (!tool.isEmpty())
                 mc.displayGuiScreen(new ModeRadialMenu(tool));
-        } else if (KeyBindings.rangeChange.isPressed()) {
+        } else if (KeyBindings.range.isPressed())
             PacketHandler.INSTANCE.sendToServer(new PacketChangeRange());
-        } else if (KeyBindings.undoKey.isPressed()) {
-            PacketHandler.INSTANCE.sendToServer(new PacketUndoKey());
-        } else if (KeyBindings.anchorKey.isPressed()) {
-            PacketHandler.INSTANCE.sendToServer(new PacketAnchorKey());
-        } else if (KeyBindings.fuzzyKey.isPressed()) {
+        else if (KeyBindings.rotateMirror.isPressed())
+            PacketHandler.INSTANCE.sendToServer(new PacketRotateMirror());
+        else if (KeyBindings.undo.isPressed())
+            PacketHandler.INSTANCE.sendToServer(new PacketUndo());
+        else if (KeyBindings.anchor.isPressed())
+            PacketHandler.INSTANCE.sendToServer(new PacketAnchor());
+        else if (KeyBindings.fuzzy.isPressed())
             PacketHandler.INSTANCE.sendToServer(new PacketToggleFuzzy());
-        } else if (KeyBindings.connectedAreaKey.isPressed()) {
+        else if (KeyBindings.connectedArea.isPressed())
             PacketHandler.INSTANCE.sendToServer(new PacketToggleConnectedArea());
-        }
     }
 }

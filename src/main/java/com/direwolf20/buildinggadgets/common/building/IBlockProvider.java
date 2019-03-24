@@ -11,7 +11,6 @@ import net.minecraft.util.math.BlockPos;
  * structure. It does not specify a boundary and implementation should return {@code Blocks.AIR.getDefaultState()} when
  * the given position is out of boundary.
  * All positions passed as parameter will translated by a specific vector which can be accessed by {@link #getTranslation()}.
- * </p>
  *
  * @param <T>
  */
@@ -33,9 +32,7 @@ public interface IBlockProvider<T extends IBlockProvider<T>> {
     }
 
     /**
-     * <p>
      * The parameter will be translated by {@link #getTranslation} before used to read a block state.
-     * </p>
      *
      * @return block that should be placed at the position
      * @implNote In most cases, {@code pos.add(this.getTranslation())} should be sufficient.

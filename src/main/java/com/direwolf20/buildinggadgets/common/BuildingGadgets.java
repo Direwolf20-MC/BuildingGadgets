@@ -6,6 +6,7 @@ import com.direwolf20.buildinggadgets.common.items.ModItems;
 import com.direwolf20.buildinggadgets.common.proxy.CommonProxy;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
@@ -27,7 +28,10 @@ public class BuildingGadgets {
     public static final CreativeTabs BUILDING_CREATIVE_TAB = new CreativeTabs(new TextComponentTranslation("buildingGadgets").getUnformattedComponentText()) {
         @Override
         public ItemStack getTabIconItem() {
-            return new ItemStack(ModItems.gadgetBuilding);
+            ItemStack stack = new ItemStack(ModItems.gadgetBuilding);
+            stack.setTagCompound(new NBTTagCompound());
+            stack.getTagCompound().setByte("creative", (byte) 0); 
+            return stack;
         }
     };
 

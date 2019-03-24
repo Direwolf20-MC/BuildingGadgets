@@ -16,7 +16,6 @@ import java.util.Iterator;
  * <p>
  * For example, a regular climbing up stair facing north would have (UP, NORTH) as its parameter. This also applies to
  * descending stair like (DOWN, SOUTH) where each block is lower than the latter.
- * </p>
  */
 public final class Stair implements IPlacementSequence {
 

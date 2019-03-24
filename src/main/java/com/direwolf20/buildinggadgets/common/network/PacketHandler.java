@@ -17,8 +17,9 @@ public class PacketHandler {
         // Server side
         registerMessage(PacketToggleMode.Handler.class, PacketToggleMode.class, Side.SERVER);
         registerMessage(PacketChangeRange.Handler.class, PacketChangeRange.class, Side.SERVER);
-        registerMessage(PacketUndoKey.Handler.class, PacketUndoKey.class, Side.SERVER);
-        registerMessage(PacketAnchorKey.Handler.class, PacketAnchorKey.class, Side.SERVER);
+        registerMessage(PacketRotateMirror.Handler.class, PacketRotateMirror.class, Side.SERVER);
+        registerMessage(PacketUndo.Handler.class, PacketUndo.class, Side.SERVER);
+        registerMessage(PacketAnchor.Handler.class, PacketAnchor.class, Side.SERVER);
         registerMessage(PacketToggleFuzzy.Handler.class, PacketToggleFuzzy.class, Side.SERVER);
         registerMessage(PacketToggleConnectedArea.Handler.class, PacketToggleConnectedArea.class, Side.SERVER);
         registerMessage(PacketToggleRayTraceFluid.Handler.class, PacketToggleRayTraceFluid.class, Side.SERVER);

@@ -3,6 +3,7 @@ package com.direwolf20.buildinggadgets.common.integration;
 import com.direwolf20.buildinggadgets.common.blocks.ModBlocks;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.integration.IntegrationHandler.IIntegratedMod;
+import com.direwolf20.buildinggadgets.common.integration.IntegrationHandler.Phase;
 import com.direwolf20.buildinggadgets.common.items.ModItems;
 
 import net.minecraft.item.ItemStack;
@@ -14,21 +15,7 @@ public interface IPasteRecipeRegistry extends IIntegratedMod {
     }
 
     @Override
-    default void preInit() {
-        registerAllRecipes(Phase.PRE_INIT);
-    }
-
-    @Override
-    default void init() {
-        registerAllRecipes(Phase.INIT);
-    }
-
-    @Override
-    default void postInit() {
-        registerAllRecipes(Phase.POST_INIT);
-    }
-
-    default void registerAllRecipes(Phase phase) {
+    default void initialize(Phase phase) {
         if (getPhase() == phase && Config.enablePaste)
             registerAllRecipes();
     }
@@ -42,10 +29,6 @@ public interface IPasteRecipeRegistry extends IIntegratedMod {
     default void registerHydrationRecipe(RecipieType type, ItemStack input, ItemStack output) {}
 
     default void registerDeconstructRecipe(RecipieType type, ItemStack input, ItemStack output) {}
-
-    public static enum Phase {
-        PRE_INIT, INIT, POST_INIT;
-    }
 
     public static enum RecipieType {
         POWDER_TO_BLOCK, BLOCK_TO_CHUNKS, CHUNK_TO_PASTE;

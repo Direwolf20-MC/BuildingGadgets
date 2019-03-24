@@ -19,11 +19,10 @@ import net.minecraft.util.math.BlockPos;
  * locate at the neighboring position from the target.
  * If range is an even number, the wall will be 1 taller than usual. Otherwise the wall will be a square with range as its
  * side length.
- * </p><p>
+ * <p>
  * When the player selects any horizontal side of a block, it will build a plane facing the player and centered at
  * the target position.
  * Range used as its side length will be rounded down towards the nearest odd number that is at least 1.
- * </p>
  *
  * @see Wall
  */

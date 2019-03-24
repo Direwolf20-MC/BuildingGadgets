@@ -17,10 +17,9 @@ import net.minecraft.util.math.BlockPos;
  * <p>
  * When the player selects top or bottom of a block, it will build a column perpendicular to the ground with length of
  * tool range.
- * </p><p>
+ * <p>
  * When the player selects any horizontal side of a block, it will build a column centered at the selected block with a
  * length of floored tool range.
- * </p>
  *
  * @see Column
  */

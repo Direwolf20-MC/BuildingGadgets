@@ -19,7 +19,6 @@ import net.minecraft.util.math.BlockPos;
  * It will build on top of every block that has a valid path to the target position if its underside (the block offset
  * towards the side clicked) is same as the underside of the target position.
  * What is a valid path depends on whether the tool uses connected surface mode or not.
- * </p>
  *
  * @see ConnectedSurface
  * @see Surface

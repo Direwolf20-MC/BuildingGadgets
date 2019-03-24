@@ -2,6 +2,7 @@ package com.direwolf20.buildinggadgets.common.integration.mods;
 
 import com.direwolf20.buildinggadgets.common.integration.IPasteRecipeRegistry;
 import com.direwolf20.buildinggadgets.common.integration.IntegrationHandler.IntegratedMod;
+import com.direwolf20.buildinggadgets.common.integration.IntegrationHandler.Phase;
 
 import cofh.api.util.ThermalExpansionHelper;
 import net.minecraft.item.ItemStack;
@@ -20,11 +21,11 @@ public class ThermalExpansion implements IPasteRecipeRegistry {
 
     @Override
     public void registerHydrationRecipe(RecipieType type, ItemStack input, ItemStack output) {
-        ThermalExpansionHelper.addTransposerFill(400, input, output, WATER, false);
+        ThermalExpansionHelper.addTransposerFill(4000, input, output, WATER, false);
     }
 
     @Override
     public void registerDeconstructRecipe(RecipieType type, ItemStack input, ItemStack output) {
-        ThermalExpansionHelper.addPulverizerRecipe(type == RecipieType.BLOCK_TO_CHUNKS ? 400 : 100, input, output);
+        ThermalExpansionHelper.addPulverizerRecipe(type == RecipieType.BLOCK_TO_CHUNKS ? 4000 : 1000, input, output);
     }
 }
