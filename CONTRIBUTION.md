@@ -46,6 +46,7 @@ Unless your PR is directly related to code cleaning then your PR should not cont
   1. All other unmatched imports, should be in alphebetical order
   2. `java.`, `javax.`, etc.
   3. All static imports
+* Use `*` wildcard when more than 3 classes are imported from the same package, except when doing this would create a naming conflict
 
 ### Code Style
 In general apply common sense to the Code you write. "Effective Java" is also always a good start.
