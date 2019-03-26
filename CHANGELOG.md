@@ -6,7 +6,8 @@ The format of this document is based on [Keep a Changelog](https://keepachangelo
 ## [2.6.8] - 2019-03-24
 ### Added
 - Added settings to the radial menu for rotation, mirroring, undoing, and anchoring. All operations that can be performed by a keybind can now be performed via the radial menu.
-- Building and Exchanging gadgets can now rotate/mirror their set blocks (using either its new keybind, which is not set by default, or using the radial menu).
+- A Building or Exchanging gadget can now rotate/mirror its selected blockstate (using either its new keybind, which is not set by default, or using the radial menu).
+    - **Example:** Selecting a stair block, then rotating it.
 
 ### Changed
 - Separated rotation/mirror keybind (not set by default) from range (still default of **R**).
