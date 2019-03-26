@@ -44,7 +44,7 @@ Unless your PR is directly related to code cleaning then your PR should not cont
 * Comments should always start with a single space `// Comment`.
 * Import statments should be ordered in sections with exactly 1 empty line between them.
     1. All other unmatched imports, should be in alphebetical order
-    2. `java.`, `javax.`, etc.
+    2. `java.` & `javax.`
     3. All static imports
 * Use `*` wildcard when more than 3 classes are imported from the same package, except when doing this would create a naming conflict
 
