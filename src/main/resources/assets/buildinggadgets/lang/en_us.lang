@@ -110,6 +110,18 @@ help.gui.buildinggadgets.button.load=Loads data onto a gadget/template from a te
 help.gui.buildinggadgets.button.paste=Pastes data on your computer's clipboard to a pre-existing template, or to a piece of paper, creating a template
 help.gui.buildinggadgets.button.save=Saves the data in the gadget/template to a pre-existing template, or to a piece of paper, creating a template
 
+#gui button name:
+gui.buildinggadgets.materialList.button.close=Close
+gui.buildinggadgets.materialList.button.refreshCount=Refresh Count
+gui.buildinggadgets.materialList.button.sortingMode.countReversed=Count ↑
+gui.buildinggadgets.materialList.button.sortingMode.name=Name ↓
+gui.buildinggadgets.materialList.button.sortingMode.nameReversed=Name ↑
+gui.buildinggadgets.materialList.button.sortingMode.count=Count ↓
+gui.buildinggadgets.materialList.button.sortingMode.countReversed=Count ↑
+
+#gui title:
+gui.buildinggadgets.materialList.title=Material List
+
 #config:
 config.buildinggadgets.general.rayTraceRange=Max Build Distance
 config.buildinggadgets.general.rayTraceRange.tooltip=Defines how far away you can build
