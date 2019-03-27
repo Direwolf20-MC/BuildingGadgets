@@ -6,6 +6,8 @@ import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
 import com.direwolf20.buildinggadgets.common.items.pastes.ConstructionPaste;
 import com.direwolf20.buildinggadgets.common.items.pastes.GenericPasteContainer;
 import com.google.common.collect.ImmutableSet;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.ints.IntList;
 import net.minecraft.block.*;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyEnum;
@@ -180,6 +182,14 @@ public class InventoryManipulation {
             count += stackInSlot.getCount();
         }
         return longToInt(count);
+    }
+
+    public static IntList countItems(List<ItemStack> items, EntityPlayer player) {
+        IntList result = new IntArrayList();
+        for (ItemStack item : items) {
+            result.add(countItem(item, player, player.world));
+        }
+        return result;
     }
 
     public static int countPaste(EntityPlayer player) {
@@ -363,6 +373,25 @@ public class InventoryManipulation {
         }
         return placeState;
 
+    }
+
+    /**
+     * Find an item stack in either hand that delegates to the given {@code itemClass}.
+     * <p>
+     * This method will prioritize primary hand, which means if player hold the desired item on both hands, it will
+     * choose his primary hand first. If neither hands have the desired item stack, it will return {@link
+     * ItemStack#EMPTY}.
+     *
+     * @return {@link ItemStack#EMPTY} when neither hands met the parameter.
+     */
+    public static ItemStack getStackInEitherHand(EntityPlayer player, Class<?> itemClass) {
+        ItemStack mainHand = player.getHeldItemMainhand();
+        if (itemClass.isInstance(mainHand.getItem()))
+            return mainHand;
+        ItemStack offhand = player.getHeldItemOffhand();
+        if (itemClass.isInstance(offhand.getItem()))
+            return offhand;
+        return ItemStack.EMPTY;
     }
 
     /*public static IBlockState getBaseState(IBlockState originalState, World world, EntityPlayer player, BlockPos pos) {
