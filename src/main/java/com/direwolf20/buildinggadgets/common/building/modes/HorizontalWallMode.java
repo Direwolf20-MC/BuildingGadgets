@@ -15,7 +15,7 @@ import net.minecraft.util.math.BlockPos;
 /**
  * Building mode where such wall will always be perpendicular to the XZ world plane.
  * <p>
- * When the player selects any horizontal side of a block, it will build a wall sitting on clicked side of the target
+ * When the player selects any horizontal side of a block, a wall sitting on clicked side of the target will be build
  * position with a length of tool range.
  * The wall will be a square when tool range is an even number, and 1 higher if tool range is an odd number.
  * <p>

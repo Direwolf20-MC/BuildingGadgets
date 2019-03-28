@@ -39,7 +39,7 @@ public interface IPlacementSequence extends Iterable<BlockPos> {
      * When the method returns {@code false}, it guaranteed that the position is not a part of the structure. When the
      * the method returns {@code true}, the region may contain the position but it is not guaranteed to be a part of it.
      * <p>
-     * In other cases where the process is not costly (ex. does not require loops), implementation should return the exact representation straight up.
+     * In other cases where the process is not costly, implementation should return the exact representation straight up.
      * <p>
      * Please consult the Javadoc of a given implementation for accurate information.
      *
@@ -73,17 +73,6 @@ public interface IPlacementSequence extends Iterable<BlockPos> {
 
     /**
      * @return a copy of the object
-     * @implSpec if the object is immutable, this method should be labeled as {@link Deprecated} and state its immutability in its Javadoc.
-     * <pre>{@code
-     *     /**
-     *      * @deprecated Foo should be immutable, so this is not needed
-     *      * /
-     *     @Deprecated
-     *     @Override
-     *     public IPlacementSequence copy() {
-     *         return new Foo(bar);
-     *     }
-     * }</pre>
      */
     IPlacementSequence copy();
 

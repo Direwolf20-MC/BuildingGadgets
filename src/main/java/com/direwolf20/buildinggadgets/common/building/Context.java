@@ -12,7 +12,8 @@ import java.util.Iterator;
 import java.util.function.BiPredicate;
 
 /**
- * Execution context that uses {@link IPlacementSequence} and {@link IBlockProvider} in combination to filter the unusable positions.
+ * Execution context that uses {@link IPlacementSequence} and {@link IBlockProvider} in combination to filter the
+ * unusable positions.
  * <p>
  * Testing is done with the predicate produced with {@link #validatorFactory}. If the predicate returns {@code true},
  * the position will be kept and returned in the iterator. If the predicate returns {@code false} on the other hand, the
@@ -34,7 +35,8 @@ public class Context {
     }
 
     /**
-     * Note that it is assumed that this method will return a block provider uses the first value returned by the first value by {@link #positions} as its translate.
+     * Note that it is assumed that this method will return a block provider which uses the first value returned by
+     * {@link #positions} as translation.
      *
      * @param validatorFactory Creates predicate for determining whether a position should be used or not
      */
@@ -49,7 +51,7 @@ public class Context {
     }
 
     /**
-     * Wrap raw sequence ({@link #getPositionSequence()}) so that the new iterator only returns positions passes the
+     * Wrap raw sequence ({@link #getPositionSequence()}) so that the new iterator only returns positions passing the
      * test of {@link #getValidatorFactory()} with the given World object.
      *
      * @return {@link AbstractIterator} that wraps {@code getPositionSequence().iterator()}

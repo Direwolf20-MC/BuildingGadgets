@@ -11,16 +11,15 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 
 /**
- * Former "<i>Build to Me</i>".
  * Logic is backed with {@link ExclusiveAxisChasing} where no attempt will be made at the ending (player) position.
  * <p>
  * This mode is designed for Building Gadget and does not guarantee to work with other gadgets.
  */
-public class TargetedAxisChasingMode extends AtopSupportedMode {
+public class BuildToMeMode extends AtopSupportedMode {
 
     private static final ResourceLocation NAME = new ResourceLocation(BuildingGadgets.MODID, "axis_chasing");
 
-    public TargetedAxisChasingMode(IValidatorFactory validatorFactory) {
+    public BuildToMeMode(IValidatorFactory validatorFactory) {
         super(validatorFactory);
     }
 

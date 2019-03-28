@@ -13,7 +13,7 @@ import javax.annotation.Nonnull;
 import java.util.Iterator;
 
 /**
- * Starts from the selected position, and extend a column of blocks towards player on the axis of the selected face.
+ * Starts from the selected position, and extend a column of blocks towards a target position on the axis of the selected face.
  */
 public final class ExclusiveAxisChasing implements IPlacementSequence {
 
@@ -25,12 +25,11 @@ public final class ExclusiveAxisChasing implements IPlacementSequence {
     }
 
     /**
-     * <p>Note that this factory method does not ensure {@code offsetDirection} is appropriate. Use {@link #create(BlockPos, BlockPos, Axis)} if this is required.</p>
+     * <p>Note that this factory method does not verify that {@code offsetDirection} is appropriate. Use {@link #create(BlockPos, BlockPos, Axis)} if this is required.</p>
      */
     public static ExclusiveAxisChasing create(BlockPos source, BlockPos target, EnumFacing offsetDirection) {
         Axis axis = offsetDirection.getAxis();
         int difference = VectorTools.getAxisValue(target, axis) - VectorTools.getAxisValue(source, axis);
-        // int maxProgression = MathHelper.clamp(Math.abs(difference), 1, Integer.MAX_VALUE);
         int maxProgression = Math.abs(difference);
 
         return new ExclusiveAxisChasing(source, offsetDirection, maxProgression);

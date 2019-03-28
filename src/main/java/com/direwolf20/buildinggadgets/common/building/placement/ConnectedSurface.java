@@ -19,7 +19,7 @@ import java.util.Queue;
 import java.util.function.Function;
 
 /**
- * Surface that limits its attempt to blocks that is connected through either on its sides or corners. Candidates are
+ * Surface that limits its attempt to blocks that are connected through either on its sides or corners. Candidates are
  * selected from a wall region centered at a point and filtered with a 8-way adjacent flood fill.
  *
  * @see #iterator()

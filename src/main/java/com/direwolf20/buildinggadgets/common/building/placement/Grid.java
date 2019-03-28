@@ -68,7 +68,7 @@ public final class Grid implements IPlacementSequence {
     @Nonnull
     public Iterator<BlockPos> iterator() {
         /* Distance between blocks + block itself
-         * arithmetic sequence of [2,7] where -1 for range being 1~15, +2 to shift the sequence from [0,6] to [2,7]
+         * arithmetic sequence of [2,7] where -1 for range being 1~15, +2 to shift the sequence from [0,5] to [2,7]
          */
         int period = (range - 1) % periodSize + 2;
 

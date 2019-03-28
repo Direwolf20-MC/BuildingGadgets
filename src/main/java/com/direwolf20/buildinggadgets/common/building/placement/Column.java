@@ -20,7 +20,7 @@ import java.util.Spliterator;
 public final class Column implements IPlacementSequence {
 
     /**
-     * Construct a column object with a starting point such that it will include {@code range} amount of elements.
+     * Construct a column object with a starting point, including {@code range} amount of elements.
      *
      * @param hit   the source position, will not be included
      * @param side  side to grow the column into
@@ -32,7 +32,7 @@ public final class Column implements IPlacementSequence {
     }
 
     /**
-     * Construct a column object centered at a point with certain length, and aligned to the given axis.
+     * Construct a column object of the specified length, centered at a point and aligned to the given axis.
      *
      * @param center center of the column
      * @param axis   which axis will the column align to
@@ -42,7 +42,7 @@ public final class Column implements IPlacementSequence {
         EnumFacing positive = EnumFacing.getFacingFromAxis(EnumFacing.AxisDirection.POSITIVE, axis);
         EnumFacing negative = positive.getOpposite();
         BlockPos base = center.offset(negative, (length - 1) / 2);
-        //-1 because Region's vertexes are inclusive
+        // -1 because Region's vertexes are inclusive
         return new Column(base, base.offset(positive, MathTool.floorToOdd(length) - 1));
     }
 

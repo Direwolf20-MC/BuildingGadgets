@@ -17,7 +17,7 @@ import java.util.function.BiPredicate;
 public interface IBuildingMode {
 
     /**
-     * Iterator that supplies raw coordinates that hasn't been filtered yet.
+     * Iterator that supplies raw coordinates that haven't been filtered yet.
      */
     IPlacementSequence computeCoordinates(EntityPlayer player, BlockPos hit, EnumFacing sideHit, ItemStack tool);
 

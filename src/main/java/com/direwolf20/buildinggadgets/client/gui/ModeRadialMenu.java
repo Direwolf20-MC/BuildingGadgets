@@ -357,7 +357,7 @@ public class ModeRadialMenu extends GuiScreen {
 
             Color color = i == modeIndex ? Color.GREEN : Color.WHITE;
             if (data.isSelected())
-                fontRenderer.drawStringWithShadow(name, xsp + (data.doesCentralize() ? width / 2 - 4 : 0), ysp, color.getRGB());
+                fontRenderer.drawStringWithShadow(name, xsp + (data.isCentralized() ? width / 2 - 4 : 0), ysp, color.getRGB());
 
             double mod = 0.7;
             int xdp = (int) ((xp - x) * mod + x);
@@ -471,4 +471,37 @@ public class ModeRadialMenu extends GuiScreen {
     public static enum ScreenPosition {
         RIGHT, LEFT, BOTTOM, TOP;
     }
+
+    private static final class NameDisplayData {
+    
+        private final int x;
+        private final int y;
+        private final boolean selected;
+        private final boolean centralize;
+    
+        private NameDisplayData(int x, int y, boolean selected, boolean centralize) {
+            this.x = x;
+            this.y = y;
+            this.selected = selected;
+            this.centralize = centralize;
+        }
+    
+        private int getX() {
+            return x;
+        }
+    
+        private int getY() {
+            return y;
+        }
+    
+        private boolean isSelected() {
+            return selected;
+        }
+    
+        private boolean isCentralized() {
+            return centralize;
+        }
+    
+    }
+
 }
