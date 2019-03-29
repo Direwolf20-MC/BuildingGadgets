@@ -24,7 +24,7 @@ public interface IBlockProvider<T extends IBlockProvider<T>> {
     IBlockProvider translate(BlockPos origin);
 
     /**
-     * @@return the translation used as translation of the parameter of {@link #at(BlockPos)}
+     * @return the translation used as translation of the parameter of {@link #at(BlockPos)}
      * @implSpec the value should remain constant in the whole life of the object
      */
     default BlockPos getTranslation() {
