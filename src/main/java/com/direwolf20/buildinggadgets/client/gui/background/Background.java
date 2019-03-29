@@ -4,6 +4,7 @@ import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.google.common.base.Preconditions;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ResourceLocation;
@@ -16,7 +17,7 @@ public class Background {
 
     private static final ResourceLocation TEXTURE = new ResourceLocation(BuildingGadgets.MODID, "textures/gui/generic_gui_components.png");
     private static final int UNIT_LENGTH = 4;
-    private static final float UV_MULTIPLIER = 1f / 256;
+    private static final float UV_MULTIPLIER = 0.00390625f;
 
     /**
      * Draw a vanilla styled GUI background on the given position with the given width and height.
@@ -35,12 +36,11 @@ public class Background {
     public static void drawVanillaStyle(int x, int y, int width, int height) {
         Preconditions.checkArgument(width >= 8 && height >= 8);
 
-        // BUFFER.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
-        BUFFER.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
+        BUFFER.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
 
         Minecraft.getMinecraft().getTextureManager().bindTexture(TEXTURE);
         int cornerXRight = x + width - UNIT_LENGTH;
-        int cornerYBottom = y + width - UNIT_LENGTH;
+        int cornerYBottom = y + height - UNIT_LENGTH;
         CornerPiece.drawTopLeft(x, y);
         CornerPiece.drawTopRight(cornerXRight, y);
         CornerPiece.drawBottomLeft(x, cornerYBottom);
@@ -53,22 +53,22 @@ public class Background {
 
         if (bodyWidth > 0) {
             EdgePiece.drawTop(bodyX, y, bodyWidth);
-            EdgePiece.drawBottom(bodyX, y + bodyHeight, bodyWidth);
+            EdgePiece.drawBottom(bodyX, bodyY + bodyHeight, bodyWidth);
         }
-
         if (bodyHeight > 0) {
             EdgePiece.drawLeft(x, bodyY, bodyHeight);
-            EdgePiece.drawRight(x + bodyWidth, bodyY, bodyHeight);
+            EdgePiece.drawRight(bodyX + bodyWidth, bodyY, bodyHeight);
         }
-        
-        // TESSELLATOR.draw();
-        
-        if (bodyWidth > 0 && bodyHeight > 0) {
-            // BUFFER.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
-            BodyPiece.draw(bodyX, bodyY, bodyWidth, bodyHeight);
-            // TESSELLATOR.draw();
-        }
+
         TESSELLATOR.draw();
+
+        if (bodyWidth > 0 && bodyHeight > 0) {
+            GlStateManager.disableTexture2D();
+            BUFFER.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
+            BodyPiece.draw(bodyX, bodyY, bodyWidth, bodyHeight);
+            TESSELLATOR.draw();
+            GlStateManager.enableTexture2D();
+        }
     }
 
     /**
@@ -77,9 +77,9 @@ public class Background {
     private static class CornerPiece {
 
         private static final int TX_TOP_LEFT = 0;
-        private static final int TX_TOP_RIGHT = TX_TOP_LEFT + UNIT_LENGTH * 3;
+        private static final int TX_TOP_RIGHT = TX_TOP_LEFT + UNIT_LENGTH;
         private static final int TX_BOTTOM_LEFT = TX_TOP_LEFT + UNIT_LENGTH * 2;
-        private static final int TX_BOTTOM_RIGHT = TX_TOP_LEFT + UNIT_LENGTH;
+        private static final int TX_BOTTOM_RIGHT = TX_TOP_LEFT + UNIT_LENGTH * 3;
         private static final int TY = 0;
 
         private static void drawTopLeft(int x, int y) {
