@@ -4,7 +4,9 @@ import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.google.common.base.Preconditions;
 import net.minecraft.util.ResourceLocation;
 
-public class AlignmentUtil {
+public final class AlignmentUtil {
+
+    private AlignmentUtil() { }
 
     /**
      * Size in pixels of an vanilla slot background

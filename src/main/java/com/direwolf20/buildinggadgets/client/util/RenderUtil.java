@@ -2,11 +2,17 @@ package com.direwolf20.buildinggadgets.client.util;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.texture.TextureManager;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import org.lwjgl.opengl.GL11;
 
 import static com.direwolf20.buildinggadgets.client.util.AlignmentUtil.*;
 
-public class RenderUtil {
+public final class RenderUtil {
+    
+    private RenderUtil() { }
 
     public static FontRenderer getFontRenderer() {
         return Minecraft.getMinecraft().fontRenderer;
@@ -38,6 +44,17 @@ public class RenderUtil {
 
     public static void renderTextVerticalCenter(String text, int x, int topY, int bottomY, int color) {
         getFontRenderer().drawString(text, x, getYForAlignedCenter(getFontRenderer().FONT_HEIGHT, topY, bottomY), color);
+    }
+
+    public static void drawTexturedModalRect(int x, int y, int width, int height) {
+        Tessellator tessellator = Tessellator.getInstance();
+        BufferBuilder buffer = tessellator.getBuffer();
+        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+        buffer.pos(x, y + height, 0).tex(0, 1).endVertex();
+        buffer.pos(x + width, y + height, 0).tex(1, 1).endVertex();
+        buffer.pos(x + width, y, 0).tex(1, 0).endVertex();
+        buffer.pos(x, y, 0).tex(0, 0).endVertex();
+        tessellator.draw();
     }
 
 }

@@ -2,6 +2,8 @@ package com.direwolf20.buildinggadgets.client.gui.materiallist;
 
 import com.direwolf20.buildinggadgets.client.gui.DireButton;
 import com.direwolf20.buildinggadgets.client.util.AlignmentUtil;
+import com.direwolf20.buildinggadgets.client.util.RenderUtil;
+import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.items.Template;
 import com.direwolf20.buildinggadgets.common.tools.InventoryManipulation;
 import com.direwolf20.buildinggadgets.common.tools.UniqueItem;
@@ -12,7 +14,9 @@ import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
+import org.lwjgl.input.Mouse;
 
 import java.awt.*;
 import java.io.IOException;
@@ -27,9 +31,15 @@ import java.util.List;
 public class MaterialListGUI extends GuiScreen {
 
     public static final int BUTTON_HEIGHT = 20;
-    public static final int BUTTON_WIDTH_MAX = 128;
     public static final int BUTTONS_PADDING = 4;
-    public static final int BUTTONS_SIDE_MARGIN_MIN = 32;
+
+    public static final ResourceLocation BACKGROUND_TEXTURE = new ResourceLocation(BuildingGadgets.MODID, "textures/gui/material_list.png");
+    public static final int BACKGROUND_WIDTH = 256;
+    public static final int BACKGROUND_HEIGHT = 200;
+    public static final int BORDER_SIZE = 4;
+
+    public static final int WINDOW_WIDTH = BACKGROUND_WIDTH - BORDER_SIZE * 2;
+    public static final int WINDOW_HEIGHT = BACKGROUND_HEIGHT - BORDER_SIZE * 2;
 
     private static List<ItemStack> toInternalMaterialList(Multiset<UniqueItem> templateList) {
         List<ItemStack> result = new ArrayList<>();
@@ -41,20 +51,22 @@ public class MaterialListGUI extends GuiScreen {
         return result;
     }
 
-    private ItemStack template;
-    List<ItemStack> materials;
-    IntList available;
-    private ScrollingMaterialList scrollingList;
-
-    private DireButton buttonClose;
-    private DireButton buttonRefreshCount;
-    private DireButton buttonSortingModes;
-
-    private SortingModes sortingMode = SortingModes.NAME;
+    int backgroundX;
+    int backgroundY;
 
     private String title;
     private int titleLeft;
     private int titleTop;
+
+    private ItemStack template;
+    List<ItemStack> materials;
+    IntList available;
+    private ScrollingMaterialList scrollingList;
+    private SortingModes sortingMode = SortingModes.NAME;
+
+    private DireButton buttonClose;
+    private DireButton buttonRefreshCount;
+    private DireButton buttonSortingModes;
 
     public MaterialListGUI(ItemStack template) {
         this.template = template;
@@ -64,31 +76,36 @@ public class MaterialListGUI extends GuiScreen {
     public void initGui() {
         Template item = (Template) template.getItem();
 
+        this.backgroundX = AlignmentUtil.getXForAlignedCenter(BACKGROUND_WIDTH, 0, width);
+        this.backgroundY = AlignmentUtil.getYForAlignedCenter(BACKGROUND_HEIGHT, 0, height);
+
+        this.title = I18n.format("gui.buildinggadgets.materialList.title");
+        this.titleTop = AlignmentUtil.getYForAlignedCenter(fontRenderer.FONT_HEIGHT, backgroundY, getWindowTopY() + ScrollingMaterialList.TOP);
+        this.titleLeft = AlignmentUtil.getXForAlignedCenter(fontRenderer.getStringWidth(title), backgroundX, getWindowRightX());
+
         this.materials = toInternalMaterialList(item.getItemCountMap(template));
         this.sortMaterialList();
         this.updateAvailableMaterials();
-        this.scrollingList = new ScrollingMaterialList(this, width, height);
-
-        this.title = I18n.format("gui.buildinggadgets.materialList.title");
-        this.titleTop = AlignmentUtil.getYForAlignedCenter(fontRenderer.FONT_HEIGHT, 0, ScrollingMaterialList.TOP);
-        this.titleLeft = AlignmentUtil.getXForAlignedCenter(fontRenderer.getStringWidth(title), 0, width);
+        this.scrollingList = new ScrollingMaterialList(this, BACKGROUND_WIDTH, BACKGROUND_HEIGHT);
 
         int buttonID = -1;
-        int buttonY = height - (ScrollingMaterialList.BOTTOM / 2 + BUTTON_HEIGHT / 2);
-        this.buttonClose = new DireButton(++buttonID, 0, buttonY, 50, BUTTON_HEIGHT, I18n.format("gui.buildinggadgets.materialList.button.close"));
-        this.buttonRefreshCount = new DireButton(++buttonID, 0, buttonY, 50, BUTTON_HEIGHT, I18n.format("gui.buildinggadgets.materialList.button.refreshCount"));
-        this.buttonSortingModes = new DireButton(++buttonID, 0, buttonY, 50, BUTTON_HEIGHT, sortingMode.getLocalizedName());
-
+        int buttonY = getWindowBottomY() - (ScrollingMaterialList.BOTTOM / 2 + BUTTON_HEIGHT / 2);
+        this.buttonClose = new DireButton(++buttonID, 0, buttonY, 0, BUTTON_HEIGHT, I18n.format("gui.buildinggadgets.materialList.button.close"));
+        this.buttonRefreshCount = new DireButton(++buttonID, 0, buttonY, 0, BUTTON_HEIGHT, I18n.format("gui.buildinggadgets.materialList.button.refreshCount"));
+        this.buttonSortingModes = new DireButton(++buttonID, 0, buttonY, 0, BUTTON_HEIGHT, sortingMode.getLocalizedName());
         this.addButton(buttonSortingModes);
         this.addButton(buttonRefreshCount);
         this.addButton(buttonClose);
 
-        this.calculateWidthAndX();
+        this.calculateButtonsWidthAndX();
     }
 
     @Override
     public void drawScreen(int mouseX, int mouseY, float particleTicks) {
-        drawDefaultBackground();
+        // drawDefaultBackground();
+
+        Minecraft.getMinecraft().getTextureManager().bindTexture(BACKGROUND_TEXTURE);
+        RenderUtil.drawTexturedModalRect(backgroundX, backgroundY, BACKGROUND_WIDTH, BACKGROUND_HEIGHT);
 
         this.scrollingList.drawScreen(mouseX, mouseY, particleTicks);
         this.drawString(fontRenderer, title, titleLeft, titleTop, Color.WHITE.getRGB());
@@ -98,7 +115,10 @@ public class MaterialListGUI extends GuiScreen {
     @Override
     public void handleMouseInput() throws IOException {
         super.handleMouseInput();
-        this.scrollingList.handleMouseInput();
+
+        int mx = Mouse.getEventX() * this.width / this.mc.displayWidth;
+        int my = this.height - Mouse.getEventY() * this.height / this.mc.displayHeight - 1;
+        this.scrollingList.handleMouseInput(mx, my);
     }
 
     @Override
@@ -140,16 +160,17 @@ public class MaterialListGUI extends GuiScreen {
         this.available = InventoryManipulation.countItems(materials, Minecraft.getMinecraft().player);
     }
 
-    private void calculateWidthAndX() {
-        int availableWidth = width - BUTTONS_SIDE_MARGIN_MIN * 2;
-
+    private void calculateButtonsWidthAndX() {
+        // This part would can create narrower buttons when there are too few of them, due to the vanilla button texture is 200 pixels wide
         int amountButtons = buttonList.size();
-        int amountPadding = amountButtons - 1;
-        int paddingWidth = amountPadding * BUTTONS_PADDING;
-        int buttonWidth = MathHelper.clamp((availableWidth - paddingWidth) / amountButtons, 1, BUTTON_WIDTH_MAX);
+        int amountMargins = amountButtons - 1;
+        int totalMarginWidth = amountMargins * BUTTONS_PADDING;
+        int usableWidth = getWindowWidth() ;
+        int buttonWidth = (usableWidth - totalMarginWidth) / amountButtons;
 
-        int boxWidth = buttonWidth * amountButtons + paddingWidth * amountPadding;
-        int nextX = AlignmentUtil.getXForAlignedCenter(boxWidth, 0, width);
+        // Align the box of buttons in the center, and start from the left
+        int nextX = getWindowLeftX();
+
         for (GuiButton button : buttonList) {
             button.width = buttonWidth;
             button.x = nextX;
@@ -164,6 +185,30 @@ public class MaterialListGUI extends GuiScreen {
     @Override
     public boolean doesGuiPauseGame() {
         return false;
+    }
+
+    int getWindowLeftX() {
+        return backgroundX + BORDER_SIZE;
+    }
+
+    int getWindowRightX() {
+        return backgroundX + BACKGROUND_WIDTH - BORDER_SIZE;
+    }
+
+    int getWindowTopY() {
+        return backgroundY + BORDER_SIZE;
+    }
+
+    int getWindowBottomY() {
+        return backgroundY + BACKGROUND_HEIGHT - BORDER_SIZE;
+    }
+
+    int getWindowWidth() {
+        return WINDOW_WIDTH;
+    }
+
+    int getWindowHeight() {
+        return WINDOW_HEIGHT;
     }
 
 }

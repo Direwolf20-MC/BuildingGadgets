@@ -3,11 +3,12 @@ package com.direwolf20.buildinggadgets.client.gui.materiallist;
 import com.direwolf20.buildinggadgets.client.util.AlignmentUtil;
 import com.direwolf20.buildinggadgets.client.util.RenderUtil;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiSlot;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.MathHelper;
+import net.minecraftforge.fml.client.GuiScrollingList;
 
 import java.awt.*;
 
@@ -16,7 +17,7 @@ import static com.direwolf20.buildinggadgets.client.util.RenderUtil.getFontRende
 import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
 import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
 
-public class ScrollingMaterialList extends GuiSlot {
+class ScrollingMaterialList extends GuiScrollingList {
 
     static final int MARGIN = 2;
     static final int ENTRY_HEIGHT = Math.max(SLOT_SIZE + MARGIN * 2, getFontRenderer().FONT_HEIGHT * 2 + MARGIN * 3);
@@ -31,7 +32,15 @@ public class ScrollingMaterialList extends GuiSlot {
     private MaterialListGUI parent;
 
     public ScrollingMaterialList(MaterialListGUI parent, int width, int height) {
-        super(Minecraft.getMinecraft(), width, height, TOP, height - BOTTOM, ENTRY_HEIGHT);
+        super(Minecraft.getMinecraft(),
+                parent.getWindowWidth(),
+                height,
+                parent.getWindowTopY() + TOP,
+                parent.getWindowBottomY() - BOTTOM,
+                parent.getWindowLeftX(),
+                ENTRY_HEIGHT,
+                parent.width,
+                parent.height);
         this.parent = parent;
     }
 
@@ -41,13 +50,21 @@ public class ScrollingMaterialList extends GuiSlot {
     }
 
     @Override
-    protected void elementClicked(int slotIndex, boolean isDoubleClick, int mouseX, int mouseY) {
-        selectedElement = slotIndex;
+    protected void elementClicked(int index, boolean doubleClick) {
+        selectedIndex = index;
     }
 
     @Override
     protected boolean isSelected(int slotIndex) {
-        return selectedElement == slotIndex;
+        return selectedIndex == slotIndex;
+    }
+
+    @Override
+    public void drawScreen(int mouseXIn, int mouseYIn, float partialTicks) {
+        // GlStateManager.translate(0, parent.backgroundY, 0);
+        // GL11.glScissor(left, top, width, height);
+        super.drawScreen(mouseXIn, mouseYIn, partialTicks);
+        // GL11.glScissor(0, 0, 0, 0);
     }
 
     @Override
@@ -55,48 +72,65 @@ public class ScrollingMaterialList extends GuiSlot {
     }
 
     @Override
-    protected void drawSlot(int id, int left, int top, int height, int mouseX, int mouseY, float partialTicks) {
-        ItemStack item = parent.materials.get(id);
-        // For some reason selection box is the width as entryWidth (did not consider border)
-        int right = left + getListWidth() - 5;
-        int bottom = top + ENTRY_HEIGHT;
-
+    protected void drawSlot(int index, int right, int top, int entryHeight, Tessellator tess) {
+        ItemStack item = parent.materials.get(index);
+        int bottom = top + entryHeight;
         int slotX = left + MARGIN;
         int slotY = top + MARGIN;
 
-        GlStateManager.pushMatrix();
-        RenderHelper.enableGUIStandardItemLighting();
-        Minecraft.getMinecraft().getRenderItem().renderItemAndEffectIntoGUI(item, slotX, slotY);
-        GlStateManager.disableLighting();
-        GlStateManager.color(1, 1, 1);
-        GlStateManager.popMatrix();
+        drawIcon(item, slotX, slotY);
+        drawTextOverlay(index, right, top, item, bottom, slotX);
+        drawHoveringText(item, slotX, slotY);
+    }
 
+    private void drawTextOverlay(int index, int right, int top, ItemStack item, int bottom, int slotX) {
         String itemName = item.getDisplayName();
         int itemNameX = slotX + SLOT_SIZE + MARGIN;
         // -1 because the bottom x coordinate is exclusive
         RenderUtil.renderTextVerticalCenter(itemName, itemNameX, top, bottom - 1, Color.WHITE.getRGB());
 
         int required = item.getCount();
-        int available = MathHelper.clamp(parent.available.getInt(id), 0, required);
+        int available = MathHelper.clamp(parent.available.getInt(index), 0, required);
         boolean fulfilled = available == required;
         int color = fulfilled ? Color.GREEN.getRGB() : Color.RED.getRGB();
         String amount = available + "/" + required;
         String status = fulfilled ? "Available" : "Missing";
+
         RenderUtil.renderTextHorizontalRight(status, right, top + TEXT_STATUS_Y_OFFSET, color);
         RenderUtil.renderTextHorizontalRight(amount, right, top + TEXT_AMOUNT_Y_OFFSET, Color.WHITE.getRGB());
 
-        int lineXStart = itemNameX + Minecraft.getMinecraft().fontRenderer.getStringWidth(itemName) + LINE_SIDE_MARGIN;
-        int lineXEnd = right - Math.max(Minecraft.getMinecraft().fontRenderer.getStringWidth(amount), Minecraft.getMinecraft().fontRenderer.getStringWidth(status)) - LINE_SIDE_MARGIN;
-        int lineY = AlignmentUtil.getYForAlignedCenter(1, top, bottom - 1) - 1;
-        GlStateManager.enableAlpha();
-        GlStateManager.enableBlend();
-        GlStateManager.blendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        parent.drawHorizontalLine(lineXStart, lineXEnd, lineY, 0x22FFFFFF);
+        int widthItemName = Minecraft.getMinecraft().fontRenderer.getStringWidth(itemName);
+        int widthAmount = Minecraft.getMinecraft().fontRenderer.getStringWidth(amount);
+        int widthStatus = Minecraft.getMinecraft().fontRenderer.getStringWidth(status);
+        drawGuidingLine(index, right, top, bottom, itemNameX, widthItemName, widthAmount, widthStatus);
+    }
 
+    private void drawGuidingLine(int index, int right, int top, int bottom, int itemNameX, int widthItemName, int widthAmount, int widthStatus) {
+        if (!isSelected(index)) {
+            int lineXStart = itemNameX + widthItemName + LINE_SIDE_MARGIN;
+            int lineXEnd = right - Math.max(widthAmount, widthStatus) - LINE_SIDE_MARGIN;
+            int lineY = AlignmentUtil.getYForAlignedCenter(1, top, bottom - 1) - 1;
+            GlStateManager.enableAlpha();
+            GlStateManager.enableBlend();
+            GlStateManager.blendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+            parent.drawHorizontalLine(lineXStart, lineXEnd, lineY, 0x22FFFFFF);
+        }
+    }
+
+    private void drawHoveringText(ItemStack item, int slotX, int slotY) {
         if (mouseX > slotX && mouseY > slotY && mouseX <= slotX + 18 && mouseY <= slotY + 18) {
             parent.renderToolTip(item, mouseX, mouseY);
             GlStateManager.disableLighting();
         }
+    }
+
+    private void drawIcon(ItemStack item, int slotX, int slotY) {
+        GlStateManager.pushMatrix();
+        RenderHelper.enableGUIStandardItemLighting();
+        Minecraft.getMinecraft().getRenderItem().renderItemAndEffectIntoGUI(item, slotX, slotY);
+        GlStateManager.disableLighting();
+        GlStateManager.color(1, 1, 1);
+        GlStateManager.popMatrix();
     }
 
 }
