@@ -6,6 +6,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.fml.client.GuiScrollingList;
@@ -29,7 +30,13 @@ class ScrollingMaterialList extends GuiScrollingList {
     private static final int TEXT_STATUS_Y_OFFSET = 0;
     private static final int TEXT_AMOUNT_Y_OFFSET = 12;
 
+    private static final String TRANSLATION_KEY_AVAILABLE = "gui.buildinggadgets.materialList.message.available";
+    public static final String TRANSLATION_KEU_MISSING = "gui.buildinggadgets.materialList.message.missing";
+
     private MaterialListGUI parent;
+
+    private String messageAvailable;
+    private String messageMissing;
 
     public ScrollingMaterialList(MaterialListGUI parent, int width, int height) {
         super(Minecraft.getMinecraft(),
@@ -42,6 +49,8 @@ class ScrollingMaterialList extends GuiScrollingList {
                 parent.width,
                 parent.height);
         this.parent = parent;
+        this.messageAvailable = I18n.format(TRANSLATION_KEY_AVAILABLE);
+        this.messageMissing = I18n.format(TRANSLATION_KEU_MISSING);
     }
 
     @Override
@@ -94,8 +103,7 @@ class ScrollingMaterialList extends GuiScrollingList {
         boolean fulfilled = available == required;
         int color = fulfilled ? Color.GREEN.getRGB() : Color.RED.getRGB();
         String amount = available + "/" + required;
-        String status = fulfilled ? "Available" : "Missing";
-
+        String status = fulfilled ? messageAvailable : messageMissing;
         RenderUtil.renderTextHorizontalRight(status, right, top + TEXT_STATUS_Y_OFFSET, color);
         RenderUtil.renderTextHorizontalRight(amount, right, top + TEXT_AMOUNT_Y_OFFSET, Color.WHITE.getRGB());
 
