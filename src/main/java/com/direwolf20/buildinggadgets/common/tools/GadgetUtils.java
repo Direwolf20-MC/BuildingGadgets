@@ -1,14 +1,5 @@
 package com.direwolf20.buildinggadgets.common.tools;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
 import com.direwolf20.buildinggadgets.common.integration.NetworkProvider;
@@ -20,7 +11,6 @@ import com.google.common.base.Suppliers;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multiset;
-
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
@@ -38,7 +28,9 @@ import net.minecraft.util.EnumFacing.Axis;
 import net.minecraft.util.Mirror;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.Vec3i;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
@@ -46,13 +38,28 @@ import net.minecraft.world.World;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
 public class GadgetUtils {
-    private static final ImmutableList<String> LINK_STARTS = ImmutableList.of("http","www");
+
+    private static final ImmutableList<String> LINK_STARTS = ImmutableList.of("http", "www");
     private static Supplier<IItemHandler> remoteInventorySupplier;
 
     public static boolean mightBeLink(final String s) {
         return LINK_STARTS.stream().anyMatch(s::startsWith);
     }
+
+    public static final Comparator<Vec3i> POSITION_COMPARATOR = Comparator
+            .comparingInt(Vec3i::getX)
+            .thenComparingInt(Vec3i::getY)
+            .thenComparingInt(Vec3i::getZ);
 
     public static String getStackErrorSuffix(ItemStack stack) {
         return getStackErrorText(stack) + " with NBT tag: " + stack.getTagCompound();
@@ -63,7 +70,7 @@ public class GadgetUtils {
     }
 
     @Nullable
-    public static ByteArrayOutputStream getPasteStream(@Nonnull NBTTagCompound compound, @Nullable String name) throws IOException{
+    public static ByteArrayOutputStream getPasteStream(@Nonnull NBTTagCompound compound, @Nullable String name) throws IOException {
         NBTTagCompound withText = name != null && !name.isEmpty() ? compound.copy() : compound;
         if (name != null && !name.isEmpty()) withText.setString("name", name);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -192,22 +199,13 @@ public class GadgetUtils {
 
     public static void setToolRange(ItemStack stack, int range) {
         //Store the tool's range in NBT as an Integer
-        NBTTagCompound tagCompound = stack.getTagCompound();
-        if (tagCompound == null) {
-            tagCompound = new NBTTagCompound();
-        }
+        NBTTagCompound tagCompound = NBTTool.getOrNewTag(stack);
         tagCompound.setInteger("range", range);
-        stack.setTagCompound(tagCompound);
     }
 
     public static int getToolRange(ItemStack stack) {
-        NBTTagCompound tagCompound = stack.getTagCompound();
-        if (tagCompound == null || tagCompound.getInteger("range") == 0) {
-            setToolRange(stack, 1);
-            tagCompound = stack.getTagCompound();
-            return 1;
-        }
-        return tagCompound.getInteger("range");
+        NBTTagCompound tagCompound = NBTTool.getOrNewTag(stack);
+        return MathHelper.clamp(tagCompound.getInteger("range"), 1, 15);
     }
 
     public static IBlockState rotateOrMirrorBlock(EntityPlayer player, PacketRotateMirror.Operation operation, IBlockState state) {
@@ -251,7 +249,6 @@ public class GadgetUtils {
         tagCompound.setTag("actualblockstate", stateTag);
         stack.setTagCompound(tagCompound);
     }
-
 
     public static IBlockState getToolBlock(ItemStack stack) {
         NBTTagCompound tagCompound = stack.getTagCompound();
@@ -327,9 +324,9 @@ public class GadgetUtils {
             }
             List<BlockPos> coords = new ArrayList<BlockPos>();
             if (stack.getItem() instanceof GadgetBuilding) {
-                coords = BuildingModes.getBuildOrders(world, player, startBlock, sideHit, stack); //Build the positions list based on tool mode and range
+                coords = BuildingModes.collectPlacementPos(world, player, startBlock, sideHit, stack, startBlock); // Build the positions list based on tool mode and range
             } else if (stack.getItem() instanceof GadgetExchanger) {
-                coords = ExchangingModes.getBuildOrders(world, player, startBlock, sideHit, stack); //Build the positions list based on tool mode and range
+                coords = ExchangingModes.collectPlacementPos(world, player, startBlock, sideHit, stack, startBlock); // Build the positions list based on tool mode and range
             }
             setAnchor(stack, coords); //Set the anchor NBT
             player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.anchorrender").getUnformattedComponentText()), true);
@@ -360,18 +357,17 @@ public class GadgetUtils {
     }
 
     /**
-     * Call {@link clearCachedRemoteInventory clearCachedRemoteInventory} when done using this method
+     * Call {@link #clearCachedRemoteInventory clearCachedRemoteInventory} when done using this method
      */
     @Nullable
     public static IItemHandler getRemoteInventory(ItemStack tool, World world, EntityPlayer player, NetworkIO.Operation operation) {
         if (remoteInventorySupplier == null) {
             remoteInventorySupplier = Suppliers.memoizeWithExpiration(() -> {
-                        Integer dim = getDIMFromNBT(tool, "boundTE");
-                        System.out.println("fffff");
-                        if (dim == null) return null;
-                        BlockPos pos = getPOSFromNBT(tool, "boundTE");
-                        return pos == null ? null : getRemoteInventory(pos, dim, world, player, operation);
-                    }, 500, TimeUnit.MILLISECONDS);
+                Integer dim = getDIMFromNBT(tool, "boundTE");
+                if (dim == null) return null;
+                BlockPos pos = getPOSFromNBT(tool, "boundTE");
+                return pos == null ? null : getRemoteInventory(pos, dim, world, player, operation);
+            }, 500, TimeUnit.MILLISECONDS);
         }
         return remoteInventorySupplier.get();
     }
@@ -602,4 +598,5 @@ public class GadgetUtils {
 
         return itemCountMap;
     }
+
 }

@@ -2,9 +2,10 @@ package com.direwolf20.buildinggadgets.common.items.gadgets;
 
 import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
 import com.direwolf20.buildinggadgets.common.items.ItemModBase;
+import com.direwolf20.buildinggadgets.common.items.capability.CapabilityProviderBlockProvider;
 import com.direwolf20.buildinggadgets.common.items.capability.CapabilityProviderEnergy;
+import com.direwolf20.buildinggadgets.common.items.capability.MultiCapabilityProvider;
 import com.direwolf20.buildinggadgets.common.tools.NBTTool;
-
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
@@ -38,7 +39,7 @@ public abstract class GadgetGeneric extends ItemModBase {
     @Override
     @Nullable
     public ICapabilityProvider initCapabilities(ItemStack stack, @Nullable NBTTagCompound tag) {
-        return new CapabilityProviderEnergy(stack, this::getEnergyMax);
+        return new MultiCapabilityProvider(new CapabilityProviderEnergy(stack, this::getEnergyMax), new CapabilityProviderBlockProvider(stack));
     }
 
     @Override
@@ -131,11 +132,10 @@ public abstract class GadgetGeneric extends ItemModBase {
     }
 
     public void applyDamage(ItemStack tool, EntityPlayer player) {
-        if(tool.hasCapability(CapabilityEnergy.ENERGY, null)) {
+        if (tool.hasCapability(CapabilityEnergy.ENERGY, null)) {
             IEnergyStorage energy = CapabilityProviderEnergy.getCap(tool);
             energy.extractEnergy(getEnergyCost(tool), false);
-        }
-        else
+        } else
             tool.damageItem(getDamageCost(tool), player);
     }
 
@@ -177,8 +177,5 @@ public abstract class GadgetGeneric extends ItemModBase {
     public static void addInformationRayTraceFluid(List<String> tooltip, ItemStack stack) {
         tooltip.add(TextFormatting.BLUE + I18n.format("tooltip.gadget.raytrace_fluid") + ": " + shouldRayTraceFluid(stack));
     }
-    
-    protected static String formatName(String name) {
-        return name.replaceAll("(?=[A-Z])", " ").trim();
-    }
+
 }
