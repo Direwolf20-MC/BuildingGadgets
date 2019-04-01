@@ -6,6 +6,7 @@ import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateMana
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetDestruction;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
+import com.direwolf20.buildinggadgets.common.utils.helpers.InventoryHelper;
 import com.direwolf20.buildinggadgets.common.utils.lang.LangUtil;
 import com.direwolf20.buildinggadgets.common.utils.ref.Reference;
 import com.google.common.base.Function;
@@ -16,6 +17,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
@@ -31,9 +33,9 @@ import java.util.Iterator;
 import java.util.function.Consumer;
 
 public enum GuiMod {
-    COPY(tool -> tool.getItem() instanceof GadgetCopyPaste ? new CopyGUI(tool) : null),
-    PASTE(tool -> tool.getItem() instanceof GadgetCopyPaste ? new PasteGUI(tool) : null),
-    DESTRUCTION(tool -> tool.getItem() instanceof GadgetDestruction ? new DestructionGUI(tool) : null),
+    COPY(GadgetGeneric::getGadget, CopyGUI::new),
+    PASTE(GadgetGeneric::getGadget, PasteGUI::new),
+    DESTRUCTION(GadgetGeneric::getGadget, DestructionGUI::new),
     TEMPLATE_MANAGER("template_manager", message -> {
         TileEntity te = Minecraft.getInstance().world.getTileEntity(message.getAdditionalData().readBlockPos());
         return te instanceof TemplateManagerTileEntity ? new TemplateManagerGUI((TemplateManagerTileEntity) te,
@@ -51,12 +53,14 @@ public enum GuiMod {
         boolean open(String id, EntityPlayerMP player, World world, BlockPos pos);
     }
 
+    private Function<EntityPlayer, ItemStack> stackReader;
     private Function<ItemStack, GuiScreen> clientScreenProvider;
     private Function<OpenContainer, GuiScreen> commonScreenProvider;
     private IContainerOpener containerOpener;
     private String id;
 
-    private GuiMod(Function<ItemStack, GuiScreen> clientScreenProvider) {
+    private GuiMod(Function<EntityPlayer, ItemStack> stackReader, Function<ItemStack, GuiScreen> clientScreenProvider) {
+        this.stackReader = stackReader;
         this.clientScreenProvider = clientScreenProvider;
     }
 
@@ -70,7 +74,7 @@ public enum GuiMod {
         if (clientScreenProvider == null)
             return false;
 
-        GuiScreen screen = clientScreenProvider.apply(GadgetGeneric.getGadget(player));
+        GuiScreen screen = clientScreenProvider.apply(stackReader.apply(player));
         Minecraft.getInstance().displayGuiScreen(screen);
         return screen == null;
     }

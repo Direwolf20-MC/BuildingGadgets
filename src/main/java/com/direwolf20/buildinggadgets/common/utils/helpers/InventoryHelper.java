@@ -362,4 +362,23 @@ public class InventoryHelper {
         return placeState;
 
     }
+
+    /**
+     * Find an item stack in either hand that delegates to the given {@code itemClass}.
+     * <p>
+     * This method will prioritize primary hand, which means if player hold the desired item on both hands, it will
+     * choose his primary hand first. If neither hands have the desired item stack, it will return {@link
+     * ItemStack#EMPTY}.
+     *
+     * @return {@link ItemStack#EMPTY} when neither hands met the parameter.
+     */
+    public static ItemStack getStackInEitherHand(EntityPlayer player, Class<?> itemClass) {
+        ItemStack mainHand = player.getHeldItemMainhand();
+        if (itemClass.isInstance(mainHand.getItem()))
+            return mainHand;
+        ItemStack offhand = player.getHeldItemOffhand();
+        if (itemClass.isInstance(offhand.getItem()))
+            return offhand;
+        return ItemStack.EMPTY;
+    }
 }
