@@ -142,7 +142,8 @@ class ScrollingMaterialList extends GuiListExtended<Entry> {
 
             this.stack = new ItemStack(item.getItem());
             this.itemName = stack.getDisplayName().getString();
-            this.amount = available + "/" + required;
+            // Use this.available since the parameter is not clamped
+            this.amount = this.available + "/" + required;
             this.status = hasEnoughItems() ? parent.messageAvailable : parent.messageMissing;
             this.widthItemName = Minecraft.getInstance().fontRenderer.getStringWidth(itemName);
             this.widthAmount = Minecraft.getInstance().fontRenderer.getStringWidth(amount);
@@ -153,7 +154,7 @@ class ScrollingMaterialList extends GuiListExtended<Entry> {
         public void drawEntry(int entryWidth, int entryHeight, int mouseX, int mouseY, boolean selected, float partialTicks) {
             int left = getX();
             int top = getY();
-            int right = left + entryWidth + 5;
+            int right = left + entryWidth - 5;
             int bottom = top + entryHeight;
 
             int slotX = left + MARGIN;
