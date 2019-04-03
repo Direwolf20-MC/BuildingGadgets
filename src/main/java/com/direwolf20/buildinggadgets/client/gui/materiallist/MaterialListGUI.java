@@ -3,7 +3,9 @@ package com.direwolf20.buildinggadgets.client.gui.materiallist;
 import com.direwolf20.buildinggadgets.client.gui.DireButton;
 import com.direwolf20.buildinggadgets.client.utils.AlignmentUtil;
 import com.direwolf20.buildinggadgets.client.utils.RenderUtil;
+import com.direwolf20.buildinggadgets.common.items.Template;
 import com.direwolf20.buildinggadgets.common.utils.ref.Reference;
+import com.google.common.base.Preconditions;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
@@ -26,9 +28,9 @@ public class MaterialListGUI extends GuiScreen {
     public static final int WINDOW_WIDTH = BACKGROUND_WIDTH - BORDER_SIZE * 2;
     public static final int WINDOW_HEIGHT = BACKGROUND_HEIGHT - BORDER_SIZE * 2;
 
-    int backgroundX;
-    int backgroundY;
-    ItemStack template;
+    private int backgroundX;
+    private int backgroundY;
+    private ItemStack template;
 
     private String title;
     private int titleLeft;
@@ -41,6 +43,7 @@ public class MaterialListGUI extends GuiScreen {
     private DireButton buttonSortingModes;
 
     public MaterialListGUI(ItemStack template) {
+        Preconditions.checkArgument(template.getItem() instanceof Template);
         this.template = template;
     }
 
@@ -106,10 +109,6 @@ public class MaterialListGUI extends GuiScreen {
         super.drawHorizontalLine(startX, endX, y, color);
     }
 
-    // private void updateAvailableMaterials() {
-    //     this.available = InventoryHelper.countItems(materials, Minecraft.getInstance().player);
-    // }
-
     private void calculateButtonsWidthAndX() {
         // This part would can create narrower buttons when there are too few of them, due to the vanilla button texture is 200 pixels wide
         int amountButtons = buttons.size();
@@ -133,28 +132,36 @@ public class MaterialListGUI extends GuiScreen {
         return false;
     }
 
-    int getWindowLeftX() {
+    public int getWindowLeftX() {
         return backgroundX + BORDER_SIZE;
     }
 
-    int getWindowRightX() {
+    public int getWindowRightX() {
         return backgroundX + BACKGROUND_WIDTH - BORDER_SIZE;
     }
 
-    int getWindowTopY() {
+    public int getWindowTopY() {
         return backgroundY + BORDER_SIZE;
     }
 
-    int getWindowBottomY() {
+    public int getWindowBottomY() {
         return backgroundY + BACKGROUND_HEIGHT - BORDER_SIZE;
     }
 
-    int getWindowWidth() {
+    public int getWindowWidth() {
         return WINDOW_WIDTH;
     }
 
-    int getWindowHeight() {
+    public int getWindowHeight() {
         return WINDOW_HEIGHT;
+    }
+
+    public ItemStack getTemplate() {
+        return template;
+    }
+
+    public Template getTemplateItem() {
+        return (Template) template.getItem();
     }
 
 }

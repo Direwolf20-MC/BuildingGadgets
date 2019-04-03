@@ -3,7 +3,6 @@ package com.direwolf20.buildinggadgets.client.gui.materiallist;
 import com.direwolf20.buildinggadgets.client.gui.base.ListExtended;
 import com.direwolf20.buildinggadgets.client.utils.AlignmentUtil;
 import com.direwolf20.buildinggadgets.client.utils.RenderUtil;
-import com.direwolf20.buildinggadgets.common.items.Template;
 import com.direwolf20.buildinggadgets.common.tools.UniqueItem;
 import com.direwolf20.buildinggadgets.common.utils.helpers.InventoryHelper;
 import com.google.common.collect.Multiset;
@@ -11,7 +10,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiListExtended;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -60,7 +58,7 @@ class ScrollingMaterialList extends ListExtended<Entry> {
         this.messageAvailable = I18n.format(TRANSLATION_KEY_AVAILABLE);
         this.messageMissing = I18n.format(TRANSLATION_KEU_MISSING);
 
-        Multiset<UniqueItem> materials = ((Template) gui.template.getItem()).getItemCountMap(gui.template);
+        Multiset<UniqueItem> materials = gui.getTemplateItem().getItemCountMap(gui.getTemplate());
         EntityPlayer player = Minecraft.getInstance().player;
         World world = Minecraft.getInstance().world;
         for (Multiset.Entry<UniqueItem> entry : materials.entrySet()) {
@@ -78,7 +76,6 @@ class ScrollingMaterialList extends ListExtended<Entry> {
     static class Entry extends GuiListExtended.IGuiListEntry<Entry> {
 
         private ScrollingMaterialList parent;
-        private UniqueItem item;
         private int required;
         private int available;
 
@@ -94,7 +91,6 @@ class ScrollingMaterialList extends ListExtended<Entry> {
 
         public Entry(ScrollingMaterialList parent, UniqueItem item, int required, int available) {
             this.parent = parent;
-            this.item = item;
             this.required = required;
             this.available = MathHelper.clamp(available, 0, required);
 
@@ -135,7 +131,7 @@ class ScrollingMaterialList extends ListExtended<Entry> {
         }
 
         private void drawGuidingLine(boolean selected, int right, int top, int bottom, int itemNameX, int widthItemName, int widthAmount, int widthStatus) {
-            if (!parent.isSelected(index)) {
+            if (selected) {
                 int lineXStart = itemNameX + widthItemName + LINE_SIDE_MARGIN;
                 int lineXEnd = right - Math.max(widthAmount, widthStatus) - LINE_SIDE_MARGIN;
                 int lineY = AlignmentUtil.getYForAlignedCenter(1, top, bottom - 1) - 1;
