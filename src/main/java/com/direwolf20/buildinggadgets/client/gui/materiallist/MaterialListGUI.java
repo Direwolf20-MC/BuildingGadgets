@@ -64,9 +64,8 @@ public class MaterialListGUI extends GuiScreen {
             // scrollingList.re
         });
         this.buttonSortingModes = new DireButton(0, buttonY, 0, BUTTON_HEIGHT, scrollingList.getSortingMode().getLocalizedName(), () -> {
-            SortingModes lastMode = scrollingList.getSortingMode();
-            scrollingList.setSortingMode(lastMode.next());
-            buttonSortingModes.displayString = lastMode.getLocalizedName();
+            scrollingList.setSortingMode(scrollingList.getSortingMode().next());
+            buttonSortingModes.displayString = scrollingList.getSortingMode().getLocalizedName();
         });
         this.addButton(buttonSortingModes);
         this.addButton(buttonRefreshCount);

@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.client.gui.materiallist;
 
+import com.direwolf20.buildinggadgets.client.gui.base.ListExtended;
 import com.direwolf20.buildinggadgets.client.utils.AlignmentUtil;
 import com.direwolf20.buildinggadgets.client.utils.RenderUtil;
 import com.direwolf20.buildinggadgets.common.items.Template;
@@ -16,7 +17,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
-import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
 
@@ -25,7 +25,7 @@ import static com.direwolf20.buildinggadgets.client.utils.RenderUtil.getFontRend
 import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
 import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
 
-class ScrollingMaterialList extends GuiListExtended<Entry> {
+class ScrollingMaterialList extends ListExtended<Entry> {
 
     private static final int SLOT_SIZE = 18;
     private static final int MARGIN = 2;
@@ -51,17 +51,14 @@ class ScrollingMaterialList extends GuiListExtended<Entry> {
     private String messageMissing;
 
     public ScrollingMaterialList(MaterialListGUI gui) {
-        super(Minecraft.getInstance(),
+        super(gui.getWindowLeftX(),
+                gui.getWindowTopY() + TOP,
                 gui.getWindowWidth(),
                 gui.getWindowHeight() - TOP - BOTTOM,
-                gui.getWindowTopY() + TOP,
-                gui.getWindowBottomY() - BOTTOM,
                 ENTRY_HEIGHT);
         this.gui = gui;
         this.messageAvailable = I18n.format(TRANSLATION_KEY_AVAILABLE);
         this.messageMissing = I18n.format(TRANSLATION_KEU_MISSING);
-
-        this.setSlotXBoundsFromLeft(gui.getWindowLeftX());
 
         Multiset<UniqueItem> materials = ((Template) gui.template.getItem()).getItemCountMap(gui.template);
         EntityPlayer player = Minecraft.getInstance().player;
@@ -74,49 +71,8 @@ class ScrollingMaterialList extends GuiListExtended<Entry> {
     }
 
     @Override
-    protected boolean isSelected(int slotIndex) {
-        return selectedElement == slotIndex;
-    }
-
-    @Override
-    public void setSelectedEntry(int index) {
-        selectedElement = index;
-    }
-
-    @Override
     protected int getScrollBarX() {
         return right - MARGIN - SCROLL_BAR_WIDTH;
-    }
-
-    @Override
-    public void drawScreen(int mouseXIn, int mouseYIn, float partialTicks) {
-        GL11.glEnable(GL11.GL_SCISSOR_TEST);
-        double scale = Minecraft.getInstance().mainWindow.getScaleFactor(Minecraft.getInstance().gameSettings.guiScale);
-        GL11.glScissor((int) (left * scale),
-                (int) (Minecraft.getInstance().mainWindow.getHeight() - (bottom * scale)),
-                (int) (width * scale),
-                (int) (height * scale));
-        super.drawScreen(mouseXIn, mouseYIn, partialTicks);
-        GL11.glDisable(GL11.GL_SCISSOR_TEST);
-    }
-
-    @Override
-    protected void drawBackground() {
-    }
-
-    /**
-     * Center background.
-     */
-    @Override
-    protected void drawContainerBackground(Tessellator tessellator) {
-        drawGradientRect(left, top, right, bottom, 0xC0101010, 0xD0101010);
-    }
-
-    /**
-     * Top and bottom overlay pieces.
-     */
-    @Override
-    protected void overlayBackground(int startY, int endY, int startAlpha, int endAlpha) {
     }
 
     static class Entry extends GuiListExtended.IGuiListEntry<Entry> {
