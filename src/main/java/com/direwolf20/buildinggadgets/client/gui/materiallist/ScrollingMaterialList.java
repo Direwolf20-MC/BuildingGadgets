@@ -7,20 +7,18 @@ import com.direwolf20.buildinggadgets.common.tools.UniqueItem;
 import com.direwolf20.buildinggadgets.common.utils.helpers.InventoryHelper;
 import com.google.common.collect.Multiset;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.GuiListExtended;
-import net.minecraft.client.multiplayer.WorldClient;
-import net.minecraft.client.renderer.*;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL20;
 
 import java.awt.*;
-import java.nio.Buffer;
 
 import static com.direwolf20.buildinggadgets.client.gui.materiallist.ScrollingMaterialList.Entry;
 import static com.direwolf20.buildinggadgets.client.utils.RenderUtil.getFontRenderer;
@@ -92,10 +90,14 @@ class ScrollingMaterialList extends GuiListExtended<Entry> {
 
     @Override
     public void drawScreen(int mouseXIn, int mouseYIn, float partialTicks) {
-        // GL11.glEnable(GL11.GL_SCISSOR_TEST);
-        // GL11.glScissor(left, bottom, width, height);
+        GL11.glEnable(GL11.GL_SCISSOR_TEST);
+        double scale = Minecraft.getInstance().mainWindow.getScaleFactor(Minecraft.getInstance().gameSettings.guiScale);
+        GL11.glScissor((int) (left * scale),
+                (int) (Minecraft.getInstance().mainWindow.getHeight() - (bottom * scale)),
+                (int) (width * scale),
+                (int) (height * scale));
         super.drawScreen(mouseXIn, mouseYIn, partialTicks);
-        // GL11.glDisable(GL11.GL_SCISSOR_TEST);
+        GL11.glDisable(GL11.GL_SCISSOR_TEST);
     }
 
     @Override

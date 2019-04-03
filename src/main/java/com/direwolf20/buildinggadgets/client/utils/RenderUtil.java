@@ -6,6 +6,7 @@ import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.util.math.MathHelper;
 import org.lwjgl.opengl.GL11;
 
 import static com.direwolf20.buildinggadgets.client.utils.AlignmentUtil.*;
