@@ -25,21 +25,28 @@ import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
 
 class ScrollingMaterialList extends ListExtended<Entry> {
 
+    static final int TOP = 16;
+    static final int BOTTOM = 32;
+
     private static final int SLOT_SIZE = 18;
     private static final int MARGIN = 2;
     private static final int ENTRY_HEIGHT = Math.max(SLOT_SIZE + MARGIN * 2, getFontRenderer().FONT_HEIGHT * 2 + MARGIN * 3);
-    static final int TOP = 24;
-    static final int BOTTOM = 32;
     private static final int LINE_SIDE_MARGIN = 8;
 
-    //TODO calculate them based on font height
-    private static final int TEXT_STATUS_Y_OFFSET = 0;
-    private static final int TEXT_AMOUNT_Y_OFFSET = 12;
+    private static final int TEXT_STATUS_Y_OFFSET;
+    private static final int TEXT_AMOUNT_Y_OFFSET;
 
     private static final int SCROLL_BAR_WIDTH = 6;
 
     private static final String TRANSLATION_KEY_AVAILABLE = "gui.buildinggadgets.materialList.message.available";
     private static final String TRANSLATION_KEU_MISSING = "gui.buildinggadgets.materialList.message.missing";
+
+    static {
+        int usableHeight = ENTRY_HEIGHT - MARGIN * 2;
+        int centerX = usableHeight / 2;
+        TEXT_STATUS_Y_OFFSET = centerX - MARGIN / 2 - getFontRenderer().FONT_HEIGHT;
+        TEXT_AMOUNT_Y_OFFSET = centerX + MARGIN / 2;
+    }
 
     private MaterialListGUI gui;
 
@@ -107,19 +114,21 @@ class ScrollingMaterialList extends ListExtended<Entry> {
         @Override
         public void drawEntry(int entryWidth, int entryHeight, int mouseX, int mouseY, boolean selected, float partialTicks) {
             int left = getX();
-            int top = getY();
-            int right = left + entryWidth - 5;
+            // Centralize entry vertically, for some reason this.getY() is not inclusive on the bottom
+            int top = getY() + 1;
+            // Weird render issue with GuiSlot, MARGIN * 2 is just a magic number that makes it look nice
+            int right = left + entryWidth - MARGIN * 2;
             int bottom = top + entryHeight;
 
             int slotX = left + MARGIN;
             int slotY = top + MARGIN;
 
             drawIcon(stack, slotX, slotY);
-            drawTextOverlay(selected, right, top, bottom, slotX);
+            drawTextOverlay(right, top, bottom, slotX);
             drawHoveringText(stack, slotX, slotY, mouseX, mouseY);
         }
 
-        private void drawTextOverlay(boolean selected, int right, int top, int bottom, int slotX) {
+        private void drawTextOverlay(int right, int top, int bottom, int slotX) {
             int itemNameX = slotX + SLOT_SIZE + MARGIN;
             // -1 because the bottom x coordinate is exclusive
             RenderUtil.renderTextVerticalCenter(itemName, itemNameX, top, bottom - 1, Color.WHITE.getRGB());
@@ -127,11 +136,11 @@ class ScrollingMaterialList extends ListExtended<Entry> {
             RenderUtil.renderTextHorizontalRight(status, right, top + TEXT_STATUS_Y_OFFSET, getTextStatusColor());
             RenderUtil.renderTextHorizontalRight(amount, right, top + TEXT_AMOUNT_Y_OFFSET, Color.WHITE.getRGB());
 
-            drawGuidingLine(selected, right, top, bottom, itemNameX, widthItemName, widthAmount, widthStatus);
+            drawGuidingLine(right, top, bottom, itemNameX, widthItemName, widthAmount, widthStatus);
         }
 
-        private void drawGuidingLine(boolean selected, int right, int top, int bottom, int itemNameX, int widthItemName, int widthAmount, int widthStatus) {
-            if (selected) {
+        private void drawGuidingLine(int right, int top, int bottom, int itemNameX, int widthItemName, int widthAmount, int widthStatus) {
+            if (!parent.isSelected(index)) {
                 int lineXStart = itemNameX + widthItemName + LINE_SIDE_MARGIN;
                 int lineXEnd = right - Math.max(widthAmount, widthStatus) - LINE_SIDE_MARGIN;
                 int lineY = AlignmentUtil.getYForAlignedCenter(1, top, bottom - 1) - 1;
