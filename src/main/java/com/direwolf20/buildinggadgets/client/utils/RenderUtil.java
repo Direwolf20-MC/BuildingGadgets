@@ -13,8 +13,7 @@ import static com.direwolf20.buildinggadgets.client.utils.AlignmentUtil.*;
 
 public final class RenderUtil {
 
-    private RenderUtil() {
-    }
+    private RenderUtil() { }
 
     public static FontRenderer getFontRenderer() {
         return Minecraft.getInstance().fontRenderer;

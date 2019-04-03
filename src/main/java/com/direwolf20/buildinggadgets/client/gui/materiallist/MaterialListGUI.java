@@ -59,9 +59,7 @@ public class MaterialListGUI extends GuiScreen {
         this.children.add(scrollingList);
 
         int buttonY = getWindowBottomY() - (ScrollingMaterialList.BOTTOM / 2 + BUTTON_HEIGHT / 2);
-        this.buttonClose = new DireButton(0, buttonY, 0, BUTTON_HEIGHT, I18n.format("gui.buildinggadgets.materialList.button.close"), () -> {
-            Minecraft.getInstance().player.closeScreen();
-        });
+        this.buttonClose = new DireButton(0, buttonY, 0, BUTTON_HEIGHT, I18n.format("gui.buildinggadgets.materialList.button.close"), () -> Minecraft.getInstance().player.closeScreen());
         this.buttonSortingModes = new DireButton(0, buttonY, 0, BUTTON_HEIGHT, scrollingList.getSortingMode().getLocalizedName(), () -> {
             scrollingList.setSortingMode(scrollingList.getSortingMode().next());
             buttonSortingModes.displayString = scrollingList.getSortingMode().getLocalizedName();

@@ -4,8 +4,7 @@ import com.google.common.base.Preconditions;
 
 public final class AlignmentUtil {
 
-    private AlignmentUtil() {
-    }
+    private AlignmentUtil() { }
 
     /**
      * @return Left x value if the box is be aligned to the right

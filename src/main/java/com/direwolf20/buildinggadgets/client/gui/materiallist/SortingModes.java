@@ -9,12 +9,12 @@ import static com.direwolf20.buildinggadgets.client.gui.materiallist.ScrollingMa
 
 enum SortingModes {
 
-    NAME(Comparator.comparing(Entry::getItemName), "name"),
-    NAME_REVERSED(NAME.getComparator().reversed(), "nameReversed"),
-    REQUIRED(Comparator.comparingInt(Entry::getRequired), "required"),
-    REQUIRED_REVERSED(REQUIRED.getComparator().reversed(), "requiredReversed"),
-    MISSING(Comparator.comparingInt(Entry::getRequired), "missing"),
-    MISSING_REVERSED(MISSING.getComparator().reversed(), "missingReversed");
+    NAME(Comparator.comparing(Entry::getItemName), "nameAZ"),
+    NAME_REVERSED(NAME.getComparator().reversed(), "nameZA"),
+    REQUIRED(Comparator.comparingInt(Entry::getRequired), "requiredAcse"),
+    REQUIRED_REVERSED(REQUIRED.getComparator().reversed(), "requiredDesc"),
+    MISSING(Comparator.comparingInt(Entry::getRequired), "missingAcse"),
+    MISSING_REVERSED(MISSING.getComparator().reversed(), "missingDesc");
 
     private final Comparator<Entry> comparator;
     private final String translationKey;

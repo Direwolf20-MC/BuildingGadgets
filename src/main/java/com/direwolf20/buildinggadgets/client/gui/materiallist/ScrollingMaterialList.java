@@ -114,11 +114,11 @@ class ScrollingMaterialList extends ListExtended<Entry> {
         @Override
         public void drawEntry(int entryWidth, int entryHeight, int mouseX, int mouseY, boolean selected, float partialTicks) {
             int left = getX();
-            // Centralize entry vertically, for some reason this.getY() is not inclusive on the bottom
-            int top = getY() + 1;
+            int top = getY();
             // Weird render issue with GuiSlot, MARGIN * 2 is just a magic number that makes it look nice
             int right = left + entryWidth - MARGIN * 2;
-            int bottom = top + entryHeight;
+            // Centralize entry vertically, for some reason this.getY() is not inclusive on the bottom
+            int bottom = top + entryHeight + 1;
 
             int slotX = left + MARGIN;
             int slotY = top + MARGIN;
