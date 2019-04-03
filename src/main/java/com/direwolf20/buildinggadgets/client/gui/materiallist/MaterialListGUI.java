@@ -39,7 +39,6 @@ public class MaterialListGUI extends GuiScreen {
     private ScrollingMaterialList scrollingList;
 
     private DireButton buttonClose;
-    private DireButton buttonRefreshCount;
     private DireButton buttonSortingModes;
 
     public MaterialListGUI(ItemStack template) {
@@ -63,15 +62,11 @@ public class MaterialListGUI extends GuiScreen {
         this.buttonClose = new DireButton(0, buttonY, 0, BUTTON_HEIGHT, I18n.format("gui.buildinggadgets.materialList.button.close"), () -> {
             Minecraft.getInstance().player.closeScreen();
         });
-        this.buttonRefreshCount = new DireButton(0, buttonY, 0, BUTTON_HEIGHT, I18n.format("gui.buildinggadgets.materialList.button.refresh"), () -> {
-            // scrollingList.re
-        });
         this.buttonSortingModes = new DireButton(0, buttonY, 0, BUTTON_HEIGHT, scrollingList.getSortingMode().getLocalizedName(), () -> {
             scrollingList.setSortingMode(scrollingList.getSortingMode().next());
             buttonSortingModes.displayString = scrollingList.getSortingMode().getLocalizedName();
         });
         this.addButton(buttonSortingModes);
-        this.addButton(buttonRefreshCount);
         this.addButton(buttonClose);
         this.calculateButtonsWidthAndX();
     }
