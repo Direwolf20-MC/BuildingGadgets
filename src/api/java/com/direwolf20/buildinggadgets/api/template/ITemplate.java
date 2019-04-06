@@ -1,12 +1,9 @@
 package com.direwolf20.buildinggadgets.api.template;
 
-import com.direwolf20.buildinggadgets.api.abstraction.IUniqueItem;
 import com.direwolf20.buildinggadgets.api.template.building.IBuildContext;
 import com.direwolf20.buildinggadgets.api.template.building.ITemplateView;
-import com.direwolf20.buildinggadgets.api.template.building.PlacementTarget;
 import com.direwolf20.buildinggadgets.api.template.serialisation.ITemplateSerializer;
 import com.direwolf20.buildinggadgets.api.template.transaction.ITemplateTransaction;
-import com.google.common.collect.Multiset;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockReader;
 
@@ -23,9 +20,6 @@ import javax.annotation.Nullable;
  * <li>Provide a possibility to serialize this ITemplate via an corresponding {@link ITemplateSerializer}.
  * </ul>
  * <p>
- * Furthermore an {@code ITemplate} should provide a hint for users to check the amount of blocks an {@link ITemplateView} of this {@code ITemplate} is going to
- * produce at most via {@link #estimateSize()} in combination with hinting the amount of required {@link IUniqueItem}'s required.
- * However this is not strictly necessary and when computation might be costly it is not advised to return an accurate value. <br>
  * Here is a small example of how to iterate over all non-Air Blocks. Of course if a world is available the alternative {@link net.minecraft.block.state.IBlockState#isAir(IBlockReader, BlockPos)}
  * should be used in conjunction with passing it to the {@link com.direwolf20.buildinggadgets.api.template.building.SimpleBuildContext}.<br>
  * {@code
@@ -68,25 +62,5 @@ public interface ITemplate {
      */
     @Nullable
     ITemplateTransaction startTransaction();
-
-    /**
-     * Attempts to compute the amount of required {@link IUniqueItem}'s. Should never be more than might be needed,
-     * but may be fewer if exact requirements are hard or expensive to compute.
-     * @return A {@link Multiset} representing the Item Requirements to build this {@code ITemplate}.
-     *         Will be null if unknown or expensive to compute.
-     */
-    @Nullable
-    Multiset<IUniqueItem> estimateRequiredItems();
-
-    /**
-     * Attempts to compute an estimate of how many {@link PlacementTarget}'s this {@code ITemplate} will produce.
-     * Should never be smaller than the amount produced by iterating over this, but may be larger if an exact size
-     * is hard or expensive to compute.
-     * <p>
-     * A negative value indicates that the size cannot be determined easily.
-     * @return A prediction of how many {@link PlacementTarget} this {@code ITemplate} is going to produce.
-     *         Negative if unknown or expensive to compute
-     */
-    int estimateSize();
 
 }
