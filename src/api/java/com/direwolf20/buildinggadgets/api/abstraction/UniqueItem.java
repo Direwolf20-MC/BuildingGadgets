@@ -1,6 +1,5 @@
-package com.direwolf20.buildinggadgets.api.abstraction.impl;
+package com.direwolf20.buildinggadgets.api.abstraction;
 
-import com.direwolf20.buildinggadgets.api.abstraction.IUniqueItem;
 import net.minecraft.item.Item;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
@@ -8,13 +7,13 @@ import net.minecraft.util.ResourceLocation;
 import javax.annotation.Nullable;
 import java.util.Objects;
 
-public final class UniqueItemAdapter implements IUniqueItem {
+public final class UniqueItem {
     private final Item item;
     @Nullable
     private final NBTTagCompound tagCompound;
     private final int hash;
 
-    public UniqueItemAdapter(Item item, @Nullable NBTTagCompound tagCompound) {
+    public UniqueItem(Item item, @Nullable NBTTagCompound tagCompound) {
         this.item = Objects.requireNonNull(item);
         this.tagCompound = tagCompound;
         int hash = tagCompound != null ? tagCompound.hashCode() : 0;
@@ -26,14 +25,12 @@ public final class UniqueItemAdapter implements IUniqueItem {
         return item;
     }
 
-    @Override
     public ResourceLocation getRegistryName() {
         assert item.getRegistryName() != null; //tested in constructor
         return item.getRegistryName();
     }
 
     @Nullable
-    @Override
     public NBTTagCompound getTag() {
         return tagCompound != null ? tagCompound.copy() : null;
     }
@@ -41,9 +38,9 @@ public final class UniqueItemAdapter implements IUniqueItem {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (! (o instanceof UniqueItemAdapter)) return false;
+        if (! (o instanceof UniqueItem)) return false;
 
-        UniqueItemAdapter that = (UniqueItemAdapter) o;
+        UniqueItem that = (UniqueItem) o;
 
         if (! getRegistryName().equals(that.getRegistryName())) return false;
         return Objects.equals(tagCompound, that.tagCompound);

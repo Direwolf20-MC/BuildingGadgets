@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.api.template;
 
-import com.direwolf20.buildinggadgets.api.abstraction.IUniqueItem;
+import com.direwolf20.buildinggadgets.api.abstraction.UniqueItem;
 import com.direwolf20.buildinggadgets.api.template.building.BlockData;
 import com.direwolf20.buildinggadgets.api.template.building.IBuildContext;
 import com.direwolf20.buildinggadgets.api.template.building.ITemplateView;
@@ -25,7 +25,7 @@ public final class ImmutableTemplate implements ITemplate {
     private final BlockPos translation;
     private final Long2IntMap posToStateId;
     private final Int2ObjectMap<BlockData> idToData;
-    private final ImmutableMultiset<IUniqueItem> requiredItems;
+    private final ImmutableMultiset<UniqueItem> requiredItems;
 
     /**
      * @return A new {@code ImmutableTemplate}
@@ -34,7 +34,7 @@ public final class ImmutableTemplate implements ITemplate {
         return new ImmutableTemplate();
     }
 
-    private ImmutableTemplate(BlockPos translation, Long2IntMap posToStateId, Int2ObjectMap<BlockData> idToData, Multiset<IUniqueItem> requiredItems) {
+    private ImmutableTemplate(BlockPos translation, Long2IntMap posToStateId, Int2ObjectMap<BlockData> idToData, Multiset<UniqueItem> requiredItems) {
         this.translation = translation;
         this.posToStateId = posToStateId;
         this.idToData = idToData;
@@ -58,14 +58,6 @@ public final class ImmutableTemplate implements ITemplate {
      * {@inheritDoc}
      */
     @Override
-    public Multiset<IUniqueItem> estimateRequiredItems() {
-        return requiredItems;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public ITemplateSerializer getSerializer() {
         return null;
     }
@@ -76,13 +68,5 @@ public final class ImmutableTemplate implements ITemplate {
     @Override
     public ITemplateView createViewInContext(IBuildContext buildContext) {
         return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int estimateSize() {
-        return posToStateId.size();
     }
 }

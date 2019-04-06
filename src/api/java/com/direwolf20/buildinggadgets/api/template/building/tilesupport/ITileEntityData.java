@@ -1,8 +1,7 @@
 package com.direwolf20.buildinggadgets.api.template.building.tilesupport;
 
 import com.direwolf20.buildinggadgets.api.APIProxy;
-import com.direwolf20.buildinggadgets.api.abstraction.IUniqueItem;
-import com.direwolf20.buildinggadgets.api.abstraction.impl.UniqueItemAdapter;
+import com.direwolf20.buildinggadgets.api.abstraction.UniqueItem;
 import com.direwolf20.buildinggadgets.api.template.building.IBuildContext;
 import com.direwolf20.buildinggadgets.api.template.serialisation.ITileDataSerializer;
 import com.google.common.collect.ImmutableMultiset;
@@ -61,7 +60,7 @@ public interface ITileEntityData {
      * @param pos The {@link BlockPos} where a block is simulated for this Method
      * @return A {@link Multiset} of required Items.
      */
-    default Multiset<IUniqueItem> getRequiredItems(IBuildContext context, IBlockState state, @Nullable RayTraceResult target, @Nullable BlockPos pos) {
+    default Multiset<UniqueItem> getRequiredItems(IBuildContext context, IBlockState state, @Nullable RayTraceResult target, @Nullable BlockPos pos) {
         ItemStack stack = null;
         try {
             stack = state.getBlock().getPickBlock(state, target, context.getWorld(), pos, context.getBuildingPlayer());
@@ -72,6 +71,6 @@ public interface ITileEntityData {
             stack = new ItemStack(state.getBlock().asItem());
         if (stack.isEmpty())
             return ImmutableMultiset.of();
-        return ImmutableMultiset.of(new UniqueItemAdapter(stack.getItem(), stack.getTag()));
+        return ImmutableMultiset.of(new UniqueItem(stack.getItem(), stack.getTag()));
     }
 }

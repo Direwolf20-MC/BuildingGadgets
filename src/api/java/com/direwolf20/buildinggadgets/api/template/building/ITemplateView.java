@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.api.template.building;
 
-import com.direwolf20.buildinggadgets.api.abstraction.IUniqueItem;
+import com.direwolf20.buildinggadgets.api.abstraction.UniqueItem;
 import com.direwolf20.buildinggadgets.api.template.ITemplate;
 import com.google.common.collect.Multiset;
 import net.minecraft.util.math.BlockPos;
@@ -16,7 +16,7 @@ import java.util.stream.StreamSupport;
  * A "snapshot" view of a specific {@link ITemplate} providing the ability to iterate over the represented {@link PlacementTarget}'s.
  * It also allows for translating to a specific position via {@link #translateTo(BlockPos)}.<br>
  * Furthermore an {@code ITemplateView} should provide a hint for users to check the amount of blocks an {@link ITemplateView} of this {@code ITemplate} is going to
- * produce at most via {@link #estimateSize()} in combination with hinting the amount of {@link IUniqueItem}'s required.
+ * produce at most via {@link #estimateSize()} in combination with hinting the amount of {@link UniqueItem}'s required.
  * However this is not strictly necessary and when computation might be costly it is not advised to return an accurate value.
  * <p>
  * The {@code ITemplateView} is constructed given an instance of {@link IBuildContext} in {@link ITemplate#createViewInContext(IBuildContext)}. This
@@ -63,13 +63,13 @@ public interface ITemplateView extends Iterable<PlacementTarget> {
     ITemplateView translateTo(BlockPos pos);
 
     /**
-     * Attempts to compute the amount of required {@link IUniqueItem}'s. Should never be more than might be needed,
+     * Attempts to compute the amount of required {@link UniqueItem}'s. Should never be more than might be needed,
      * but may be fewer if exact requirements are hard or expensive to compute.
      * @return A {@link Multiset} representing the Item Requirements to build this {@code ITemplateView}.
      *         Will be null if unknown or expensive to compute.
      */
     @Nullable
-    Multiset<IUniqueItem> estimateRequiredItems();
+    Multiset<UniqueItem> estimateRequiredItems();
 
     /**
      * Attempts to compute an estimate of how many {@link PlacementTarget}'s this {@code ITemplateView} will produce.

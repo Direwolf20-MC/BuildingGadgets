@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.api.template.serialisation;
 
-import com.direwolf20.buildinggadgets.api.abstraction.IUniqueItem;
+import com.direwolf20.buildinggadgets.api.abstraction.UniqueItem;
 import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.Multiset;
 import net.minecraft.util.ResourceLocation;
@@ -41,13 +41,13 @@ public final class TemplateHeader {
     @Nullable
     private final String author;
     @Nonnull
-    private final Multiset<IUniqueItem> requiredItems;
+    private final Multiset<UniqueItem> requiredItems;
     @Nonnull
     private final ResourceLocation serializer;
     @Nonnull // Todo replace with Region
     private final BlockPos boundingBox;
 
-    private TemplateHeader(@Nullable String name, @Nullable String author, @Nullable Multiset<IUniqueItem> requiredItems, @Nonnull ResourceLocation serializer, @Nonnull BlockPos boundingBox) {
+    private TemplateHeader(@Nullable String name, @Nullable String author, @Nullable Multiset<UniqueItem> requiredItems, @Nonnull ResourceLocation serializer, @Nonnull BlockPos boundingBox) {
         this.name = name;
         this.author = author;
         this.requiredItems = requiredItems != null ? requiredItems : ImmutableMultiset.of();
@@ -75,7 +75,7 @@ public final class TemplateHeader {
      * @return The optional set of required Items of the corresponding {@link com.direwolf20.buildinggadgets.api.template.ITemplate}. Empty if not present.
      */
     @Nonnull
-    public Multiset<IUniqueItem> getRequiredItems() {
+    public Multiset<UniqueItem> getRequiredItems() {
         return requiredItems;
     }
 
@@ -104,7 +104,7 @@ public final class TemplateHeader {
         @Nullable
         private String author;
         @Nullable
-        private Multiset<IUniqueItem> requiredItems;
+        private Multiset<UniqueItem> requiredItems;
         @Nonnull
         private final ResourceLocation serializer;
         @Nonnull //Todo replace with Region
@@ -141,7 +141,7 @@ public final class TemplateHeader {
          *         Null values will be converted to an empty {@link Multiset}.
          * @return The {@code Builder} instance to allow for method chaining
          */
-        public Builder requiredItems(@Nullable Multiset<IUniqueItem> requiredItems) {
+        public Builder requiredItems(@Nullable Multiset<UniqueItem> requiredItems) {
             this.requiredItems = requiredItems;
             return this;
         }
