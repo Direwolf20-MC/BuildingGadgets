@@ -115,10 +115,11 @@ class ScrollingMaterialList extends ListExtended<Entry> {
         public void drawEntry(int entryWidth, int entryHeight, int mouseX, int mouseY, boolean selected, float partialTicks) {
             int left = getX();
             int top = getY();
-            // Weird render issue with GuiSlot, MARGIN * 2 is just a magic number that makes it look nice
+            // Weird render issue with GuiSlot where the right border is slightly offset
+            // MARGIN * 2 is just a magic number that made it look nice
             int right = left + entryWidth - MARGIN * 2;
             // Centralize entry vertically, for some reason this.getY() is not inclusive on the bottom
-            int bottom = top + entryHeight + 1;
+            int bottom = top + entryHeight;
 
             int slotX = left + MARGIN;
             int slotY = top + MARGIN;
@@ -131,7 +132,7 @@ class ScrollingMaterialList extends ListExtended<Entry> {
         private void drawTextOverlay(int right, int top, int bottom, int slotX) {
             int itemNameX = slotX + SLOT_SIZE + MARGIN;
             // -1 because the bottom x coordinate is exclusive
-            RenderUtil.renderTextVerticalCenter(itemName, itemNameX, top, bottom - 1, Color.WHITE.getRGB());
+            RenderUtil.renderTextVerticalCenter(itemName, itemNameX, top, bottom, Color.WHITE.getRGB());
 
             RenderUtil.renderTextHorizontalRight(status, right, top + TEXT_STATUS_Y_OFFSET, getTextStatusColor());
             RenderUtil.renderTextHorizontalRight(amount, right, top + TEXT_AMOUNT_Y_OFFSET, Color.WHITE.getRGB());
@@ -143,7 +144,7 @@ class ScrollingMaterialList extends ListExtended<Entry> {
             if (!parent.isSelected(index)) {
                 int lineXStart = itemNameX + widthItemName + LINE_SIDE_MARGIN;
                 int lineXEnd = right - Math.max(widthAmount, widthStatus) - LINE_SIDE_MARGIN;
-                int lineY = AlignmentUtil.getYForAlignedCenter(1, top, bottom - 1) - 1;
+                int lineY = AlignmentUtil.getYForAlignedCenter(1, top, bottom - 1);
                 GlStateManager.enableAlphaTest();
                 GlStateManager.enableBlend();
                 GlStateManager.blendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -181,6 +182,10 @@ class ScrollingMaterialList extends ListExtended<Entry> {
 
         public int getAvailable() {
             return available;
+        }
+
+        public int getMissing() {
+            return required - available;
         }
 
         public ItemStack getStack() {

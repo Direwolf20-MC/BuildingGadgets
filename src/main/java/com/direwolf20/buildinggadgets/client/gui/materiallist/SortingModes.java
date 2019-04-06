@@ -13,7 +13,7 @@ enum SortingModes {
     NAME_REVERSED(NAME.getComparator().reversed(), "nameZA"),
     REQUIRED(Comparator.comparingInt(Entry::getRequired), "requiredAcse"),
     REQUIRED_REVERSED(REQUIRED.getComparator().reversed(), "requiredDesc"),
-    MISSING(Comparator.comparingInt(Entry::getRequired), "missingAcse"),
+    MISSING(Comparator.comparingInt(Entry::getMissing), "missingAcse"),
     MISSING_REVERSED(MISSING.getComparator().reversed(), "missingDesc");
 
     private final Comparator<Entry> comparator;
