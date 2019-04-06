@@ -34,9 +34,9 @@ import java.util.Iterator;
 import java.util.function.Consumer;
 
 public enum GuiMod {
-    COPY(GadgetGeneric::getGadget, CopyGUI::new),
-    PASTE(GadgetGeneric::getGadget, PasteGUI::new),
-    DESTRUCTION(GadgetGeneric::getGadget, DestructionGUI::new),
+    COPY(GadgetCopyPaste::getGadget, CopyGUI::new),
+    PASTE(GadgetCopyPaste::getGadget, PasteGUI::new),
+    DESTRUCTION(GadgetDestruction::getGadget, DestructionGUI::new),
     TEMPLATE_MANAGER("template_manager", message -> {
         TileEntity te = Minecraft.getInstance().world.getTileEntity(message.getAdditionalData().readBlockPos());
         return te instanceof TemplateManagerTileEntity ? new TemplateManagerGUI((TemplateManagerTileEntity) te,
