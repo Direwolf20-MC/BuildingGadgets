@@ -13,7 +13,7 @@ public final class MathUtils {
 
     public static long posToLong(BlockPos pos) {
         long res = (long) (pos.getX() & SHORT_BYTE_MASK) << 24;
-        res |= (pos.getY() & BYTE_BYTE_MASK) << 16; //y-Positions are in [0,255] inclusive
+        res |= (pos.getY() & BYTE_BYTE_MASK) << 16; // y-Positions are in [0,255] inclusive
         res |= (pos.getZ() & SHORT_BYTE_MASK);
         return res;
     }

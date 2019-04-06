@@ -21,11 +21,14 @@ public final class SimpleBuildContext implements IBuildContext {
     }
 
     /**
-     * @param context The context to copy.
+     * @param context The context to copy. If null, then this Method acts as if calling {@link #builder()}.
      * @return A new {@link Builder} with all values copied from the specified {@link IBuildContext}.
      */
-    public static Builder builderOf(IBuildContext context) {
-        return builder().world(context.getWorld()).buildingPlayer(context.getBuildingPlayer());
+    public static Builder builderOf(@Nullable IBuildContext context) {
+        Builder builder = builder();
+        if (context == null)
+            return builder;
+        return builder.world(context.getWorld()).buildingPlayer(context.getBuildingPlayer());
     }
 
     @Nullable

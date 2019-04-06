@@ -37,28 +37,4 @@ public class FakeRenderWorld implements IBlockReader {
         return null;
     }
 
-    /* TODO remove unused?
-    @OnlyIn(Dist.CLIENT)
-    public int getCombinedLight(BlockPos pos, int lightValue) {
-        return realWorld.getCombinedLight(pos, lightValue);
-    }
-
-    public boolean isAirBlock(BlockPos pos) {
-        if (posMap.containsKey(pos)) {
-            return posMap.get(pos).equals(Blocks.AIR.getDefaultState());
-        }
-        return realWorld.isAirBlock(pos);
-    }
-
-    public Biome getBiome(BlockPos pos) {
-        return realWorld.getBiome(pos);
-    }
-
-    public int getStrongPower(BlockPos pos, EnumFacing direction) {
-        return 0;
-    }
-
-    public WorldType getWorldType() {
-        return realWorld.getWorldType();
-    }*/
 }

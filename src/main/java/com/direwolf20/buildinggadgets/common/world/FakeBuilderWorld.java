@@ -40,20 +40,6 @@ public class FakeBuilderWorld implements IBlockReader {
         return null;
     }
 
-    /* TODO remove unused?
-    @OnlyIn(Dist.CLIENT)
-    public int getCombinedLight(BlockPos pos, int lightValue) {
-        return realWorld.getCombinedLight(pos, lightValue);
-    }
-
-    public boolean isAirBlock(BlockPos pos) {
-        return !positions.contains(pos);
-    }
-
-    public Biome getBiome(BlockPos pos) {
-        return realWorld.getBiome(pos);
-    }
-    */
     public WorldType getWorldType() {
         return realWorld.getWorldType();
     }

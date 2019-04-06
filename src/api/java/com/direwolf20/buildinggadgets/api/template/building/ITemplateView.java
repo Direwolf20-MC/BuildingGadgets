@@ -15,13 +15,13 @@ import java.util.stream.StreamSupport;
 /**
  * A "snapshot" view of a specific {@link ITemplate} providing the ability to iterate over the represented {@link PlacementTarget}'s.
  * It also allows for translating to a specific position via {@link #translateTo(BlockPos)}.<br>
- * Furthermore an {@code ITemplate} should provide a hint for users to check the amount of blocks an {@link ITemplateView} of this {@code ITemplate} is going to
+ * Furthermore an {@code ITemplateView} should provide a hint for users to check the amount of blocks an {@link ITemplateView} of this {@code ITemplate} is going to
  * produce at most via {@link #estimateSize()} in combination with hinting the amount of {@link IUniqueItem}'s required.
  * However this is not strictly necessary and when computation might be costly it is not advised to return an accurate value.
  * <p>
  * The {@code ITemplateView} is constructed given an instance of {@link IBuildContext} in {@link ITemplate#createViewInContext(IBuildContext)}. This
  * context allows the {@link ITemplateView} to adapt itself to the environment in which it is viewed. Therefore no assumptions may be made, that
- * 2 distinct instances of {@code ITemplateView} will produce the same results even if they were constructed by the same {@link ITemplate}.
+ * 2 distinct instances of {@code ITemplateView} will produce the same results even if they were constructed by the same {@link ITemplate} and {@link IBuildContext}.
  * @implSpec Notice that no guarantees are made for the order in which {@link PlacementTarget}'s are produced by this {@code ITemplateView}.
  *         Order may be arbitrary or sorted, consult the documentation of the implementation you are currently faced with for information about traversal order.
  */

@@ -278,13 +278,9 @@ task apiSourcesJar(type: Jar, dependsOn: apiClasses) {
 
 task apiDoc (type: Javadoc, dependsOn: clearDoc){
     classpath = sourceSets.api.compileClasspath
-    exclude('com/dirwolf20/buildinggadgets/api') //no idea why, but this results in only the api doc being created - I thought this would be done by include
+    exclude('com/dirwolf20/buildinggadgets/api') // no idea why, but this results in only the api doc being created - I thought this would be done by include
     source = sourceSets.api.allJava
     setApiDocOptions(options)
-    /*options.addStringOption('tag','apiNote:a:API Note:')
-    options.addStringOption('tag','implSpec:a:Implementation Requirements:')
-    options.addStringOption('tag',"implNote:a:Implementation Note:\' -tag \'implSpec:a:Implementation Requirements:")
-    */
 }
 
 task apiDocJar(type: Jar, dependsOn: apiDoc) {

@@ -44,7 +44,8 @@ public interface ITileEntityData {
 
     /**
      * Attempts to place this {@link ITileEntityData} in the given {@link IBuildContext}. If this is called but {@link #allowPlacement(IBuildContext, IBlockState, BlockPos)}
-     * would have returned false, placement should still be attempted and counted as a "forced placement".
+     * would have returned false, placement should still be attempted and counted as a "forced placement".<br>
+     * This Method should also set any data on the {@link net.minecraft.tileentity.TileEntity} represented by this {@code ITileEntityData}.
      * @param context The {@link IBuildContext} to place in.
      * @param state The {@link IBlockState} to place.
      * @param position The {@link BlockPos} at which to place
@@ -67,8 +68,10 @@ public interface ITileEntityData {
         } catch (Exception e) {
             APIProxy.LOG.trace("Failed to retrieve pickBlock for {}.", state, e);
         }
-        if (stack == null) stack = new ItemStack(state.getBlock().asItem());
-        if (stack.isEmpty()) return ImmutableMultiset.of();
+        if (stack == null)
+            stack = new ItemStack(state.getBlock().asItem());
+        if (stack.isEmpty())
+            return ImmutableMultiset.of();
         return ImmutableMultiset.of(new UniqueItemAdapter(stack.getItem(), stack.getTag()));
     }
 }

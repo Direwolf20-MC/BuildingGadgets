@@ -30,7 +30,7 @@ import javax.annotation.Nullable;
  * @implSpec Notice that it is not a responsibility of this class to handle placement or modification in any way.
  */
 public interface ITemplate {
-    //TODO add Boundingbox (Region) as soon as @hnOsmium's PR comes in
+    // TODO add Boundingbox (Region) as soon as @hnOsmium's PR comes in
 
     /**
      * @return The {@link ITemplateSerializer} responsible for serializing this Template.

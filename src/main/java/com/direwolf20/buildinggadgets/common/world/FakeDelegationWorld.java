@@ -1,5 +1,8 @@
 package com.direwolf20.buildinggadgets.common.world;
 
+import com.direwolf20.buildinggadgets.api.template.building.BlockData;
+import com.direwolf20.buildinggadgets.api.template.building.IBuildContext;
+import com.direwolf20.buildinggadgets.api.template.building.SimpleBuildContext;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
@@ -7,6 +10,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.IFluidState;
+import net.minecraft.init.Blocks;
 import net.minecraft.particles.IParticleData;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
@@ -36,23 +40,24 @@ import java.util.Random;
 import java.util.function.Predicate;
 
 @MethodsReturnNonnullByDefault
-public class FakeDelegatingWorld implements IWorld {
+public class FakeDelegationWorld implements IWorld {
     private final IWorld world;
     private Map<BlockPos, IBlockState> posToState;
     private Map<BlockPos, TileEntity> posToTile;
 
-    public FakeDelegatingWorld(IWorld world) {
+    public FakeDelegationWorld(IWorld world) {
         this.world = Objects.requireNonNull(world);
         posToState = new HashMap<>();
         posToTile = new HashMap<>();
     }
 
-    public void addBlock(@Nonnull BlockPos pos, IBlockState state, TileEntity entity) {
-        if (state != null) {
-            posToState.put(Objects.requireNonNull(pos), state);
-            if (entity != null)
-                posToTile.put(pos, entity);
-        }
+    public void addBlock(@Nonnull BlockPos pos, BlockData data) {
+        addBlock(null, pos, data);
+    }
+
+    public void addBlock(@Nullable IBuildContext context, @Nonnull BlockPos pos, BlockData data) {
+        if (data != null)
+            data.placeIn(SimpleBuildContext.builderOf(context).build(this), pos);
     }
 
     public IWorld getDelegate() {
@@ -299,19 +304,36 @@ public class FakeDelegatingWorld implements IWorld {
     @Override
     @Nullable
     public TileEntity getTileEntity(BlockPos pos) {
+        if (World.isOutsideBuildHeight(pos))
+            return null;
         TileEntity tile = getOverriddenTile(pos);
-        return tile != null ? tile : world.getTileEntity(pos);
+        if (tile != null) return tile;
+        IBlockState state = getOverriddenState(pos);
+        if (state != null) {
+            if (! state.hasTileEntity())
+                return null; //if it's overridden, but does not have a tile... well then there is no tile
+            tile = state.createTileEntity(this);
+            if (tile != null) {
+                tile.setPos(pos);
+                //tile.setWorld(getWorld());
+                posToTile.put(pos, tile);
+                return tile;
+            }
+        }
+        return world.getTileEntity(pos);
     }
 
     @Override
     public IBlockState getBlockState(BlockPos pos) {
+        if (World.isOutsideBuildHeight(pos))
+            return Blocks.VOID_AIR.getDefaultState();
         IBlockState state = getOverriddenState(pos);
         return state != null ? state : world.getBlockState(pos);
     }
 
     @Override
     public IFluidState getFluidState(BlockPos pos) {
-        return world.getFluidState(pos);
+        return getBlockState(pos).getFluidState(); // In the end that's what mc does
     }
 
     @Override
@@ -338,12 +360,10 @@ public class FakeDelegatingWorld implements IWorld {
      */
     @Override
     public boolean setBlockState(BlockPos pos, IBlockState newState, int flags) {
-        IBlockState overridenState = getOverriddenState(pos);
-        if (overridenState != null) {
-            posToState.put(pos, newState);
-            return true;
-        }
-        return world.setBlockState(pos, newState, flags);
+        if (World.isOutsideBuildHeight(pos))
+            return false;
+        posToState.put(pos, newState);
+        return true;
     }
 
     /**
@@ -358,7 +378,7 @@ public class FakeDelegatingWorld implements IWorld {
     public boolean removeBlock(BlockPos pos) {
         IFluidState state = getFluidState(pos);
         boolean res = this.setBlockState(pos, state.getBlockState(), 3);
-        if (res)
+        if (res && posToTile.containsKey(pos))
             posToTile.remove(pos)
                     .remove();
         return res;
@@ -374,8 +394,7 @@ public class FakeDelegatingWorld implements IWorld {
      */
     @Override
     public boolean destroyBlock(BlockPos pos, boolean dropBlock) {
-        //adapted from World
-        IBlockState state = this.getBlockState(pos);
-        return ! state.isAir(this, pos) && removeBlock(pos);
+        // adapted from World
+        return ! this.getBlockState(pos).isAir(this, pos) && removeBlock(pos);
     }
 }

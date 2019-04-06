@@ -44,7 +44,7 @@ public final class TemplateHeader {
     private final Multiset<IUniqueItem> requiredItems;
     @Nonnull
     private final ResourceLocation serializer;
-    @Nonnull //Todo replace with Region
+    @Nonnull // Todo replace with Region
     private final BlockPos boundingBox;
 
     private TemplateHeader(@Nullable String name, @Nullable String author, @Nullable Multiset<IUniqueItem> requiredItems, @Nonnull ResourceLocation serializer, @Nonnull BlockPos boundingBox) {
