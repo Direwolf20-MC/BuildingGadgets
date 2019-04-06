@@ -39,7 +39,7 @@ class ScrollingMaterialList extends ListExtended<Entry> {
     private static final int SCROLL_BAR_WIDTH = 6;
 
     private static final String TRANSLATION_KEY_AVAILABLE = "gui.buildinggadgets.materialList.message.available";
-    private static final String TRANSLATION_KEU_MISSING = "gui.buildinggadgets.materialList.message.missing";
+    private static final String TRANSLATION_KEY_MISSING = "gui.buildinggadgets.materialList.message.missing";
 
     static {
         int usableHeight = ENTRY_HEIGHT - MARGIN * 2;
@@ -63,7 +63,7 @@ class ScrollingMaterialList extends ListExtended<Entry> {
                 ENTRY_HEIGHT);
         this.gui = gui;
         this.messageAvailable = I18n.format(TRANSLATION_KEY_AVAILABLE);
-        this.messageMissing = I18n.format(TRANSLATION_KEU_MISSING);
+        this.messageMissing = I18n.format(TRANSLATION_KEY_MISSING);
 
         Multiset<UniqueItem> materials = gui.getTemplateItem().getItemCountMap(gui.getTemplate());
         EntityPlayer player = Minecraft.getInstance().player;

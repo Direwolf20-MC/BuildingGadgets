@@ -4,7 +4,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiListExtended;
 import net.minecraft.client.gui.GuiListExtended.IGuiListEntry;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.util.math.MathHelper;
 import org.lwjgl.opengl.GL11;
 
 /**

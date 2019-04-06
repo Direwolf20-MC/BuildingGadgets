@@ -42,7 +42,9 @@ enum SortingModes {
 
     public SortingModes next() {
         int nextIndex = ordinal() + 1;
-        return values()[nextIndex >= values().length ? 0 : nextIndex];
+        return VALUES[nextIndex >= VALUES.length ? 0 : nextIndex];
     }
+    
+    public static final SortingModes[] VALUES = values();
 
 }
