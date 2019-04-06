@@ -2,6 +2,7 @@ package com.direwolf20.buildinggadgets.api.template.transaction;
 
 import com.direwolf20.buildinggadgets.api.template.ITemplate;
 import com.direwolf20.buildinggadgets.api.template.building.BlockData;
+import com.direwolf20.buildinggadgets.api.template.serialisation.TemplateHeader;
 import com.google.common.collect.ImmutableSet;
 import net.minecraft.util.math.BlockPos;
 
@@ -23,24 +24,40 @@ public interface ITransactionOperator {
      * <p>
      * <b>It is not guaranteed that the order of this {@link Enum}'s values will remain consistend nor is
      * it guaranteed that no values will be added.</b> Users switch casing over this enum should therefore always provide
-     * a default case. Users may furthermore not depend on this Enum's ordinal for serialisation.
+     * a default case. Users may furthermore not depend on this Enum's ordinal for serialisation. <br>
+     * However it is guaranteed, that the id field will remain the same across all non-major releases.
      */
     enum Characteristic {
+        /**
+         * This {@code Characteristic} represents the ability of an {@code ITransactionOperator} to transform the
+         * {@link TemplateHeader} of a given {@link ITemplate}.
+         */
+        TRANSFORM_HEADER(0),
         /**
          * This {@code Characteristic} represents the ability of an {@code ITransactionOperator} to transform positions via
          * {@link #transformPos(ITransactionExecutionContext, BlockPos, BlockData)}.
          */
-        TRANSFORM_POSITION,
+        TRANSFORM_POSITION(1),
         /**
          * This {@code Characteristic} represents the ability of an {@code ITransactionOperator} to transform data via
          * {@link #transformData(ITransactionExecutionContext, BlockData)}.
          */
-        TRANSFORM_DATA,
+        TRANSFORM_DATA(2),
         /**
          * This {@code Characteristic} represents the ability of an {@code ITransactionOperator} to create new data via
          * {@link #createPos(ITransactionExecutionContext)} and {@link #createDataForPos(ITransactionExecutionContext, BlockPos)}.
          */
-        CREATE_DATA
+        CREATE_DATA(3);
+
+        private final byte id;
+
+        Characteristic(int id) {
+            this.id = (byte) id;
+        }
+
+        public byte getId() {
+            return id;
+        }
     }
 
     /**
@@ -70,6 +87,15 @@ public interface ITransactionOperator {
     @Nullable
     default BlockData createDataForPos(ITransactionExecutionContext context, BlockPos pos) {
         throw new UnsupportedOperationException("Default implementation does not support creating BlockData!");
+    }
+
+    /**
+     * @param context The {@link ITransactionExecutionContext} used during this transaction.
+     * @param header The {@link TemplateHeader} to transform. Will never be null.
+     * @return The transformed {@link TemplateHeader}. This may not be null, as an {@link ITemplate} may never be without a header.
+     */
+    default TemplateHeader transformHeader(ITransactionExecutionContext context, TemplateHeader header) {
+        return header;
     }
 
     /**

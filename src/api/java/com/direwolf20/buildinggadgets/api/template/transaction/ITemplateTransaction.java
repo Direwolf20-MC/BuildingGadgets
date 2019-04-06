@@ -3,6 +3,7 @@ package com.direwolf20.buildinggadgets.api.template.transaction;
 import com.direwolf20.buildinggadgets.api.exceptions.TransactionExecutionException;
 import com.direwolf20.buildinggadgets.api.template.ITemplate;
 import com.direwolf20.buildinggadgets.api.template.building.BlockData;
+import com.direwolf20.buildinggadgets.api.template.serialisation.TemplateHeader;
 import net.minecraft.util.math.BlockPos;
 
 /**
@@ -36,6 +37,8 @@ public interface ITemplateTransaction {
      * <li>Call {@link ITransactionOperator#createDataForPos(ITransactionExecutionContext, BlockPos)} for each Position previously returned by {@link ITransactionOperator#createPos(ITransactionExecutionContext)}
      * <li>Call {@link ITransactionOperator#transformData(ITransactionExecutionContext, BlockData)} <b>for each BlockData in the {@link ITemplate}.</b>
      * <li>Call {@link ITransactionOperator#transformPos(ITransactionExecutionContext, BlockPos, BlockData)} <b>for each Position in the {@link ITemplate}.</b>
+     * <li>Call {@link ITransactionOperator#transformHeader(ITransactionExecutionContext, TemplateHeader)} for all {@link ITransactionOperator ITransactionOperators} with the
+     *     {@link ITransactionOperator.Characteristic#TRANSFORM_HEADER} characteristic
      * </ol>
      * <p>
      * It is upon this method to create the {@link ITransactionExecutionContext} required to execute a given {@link ITransactionOperator}.
