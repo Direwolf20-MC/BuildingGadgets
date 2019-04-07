@@ -106,8 +106,6 @@
     "gui.buildinggadgets.materialList.button.sorting.requiredDesc": "Required ↑",
     "gui.buildinggadgets.materialList.button.sorting.missingAcse": "Missing ↓",
     "gui.buildinggadgets.materialList.button.sorting.missingDesc": "Missing ↑",
-    "gui.buildinggadgets.materialList.message.available": "Available",
-    "gui.buildinggadgets.materialList.message.missing": "Missing",
     "gui.buildinggadgets.materialList.title": "Material List",
 
     "_comment": "gui - help:",

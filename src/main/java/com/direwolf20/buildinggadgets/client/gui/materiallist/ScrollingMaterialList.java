@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.client.gui.materiallist;
 
-import com.direwolf20.buildinggadgets.client.gui.base.ListExtended;
+import com.direwolf20.buildinggadgets.client.gui.base.GuiEntryList;
 import com.direwolf20.buildinggadgets.client.utils.AlignmentUtil;
 import com.direwolf20.buildinggadgets.client.utils.RenderUtil;
 import com.direwolf20.buildinggadgets.common.tools.UniqueItem;
@@ -8,9 +8,7 @@ import com.direwolf20.buildinggadgets.common.utils.helpers.InventoryHelper;
 import com.google.common.collect.Multiset;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiListExtended;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.resources.I18n;
+import net.minecraft.client.renderer.*;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.MathHelper;
@@ -23,7 +21,7 @@ import static com.direwolf20.buildinggadgets.client.utils.RenderUtil.getFontRend
 import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
 import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
 
-class ScrollingMaterialList extends ListExtended<Entry> {
+class ScrollingMaterialList extends GuiEntryList<Entry> {
 
     static final int TOP = 16;
     static final int BOTTOM = 32;
@@ -33,27 +31,11 @@ class ScrollingMaterialList extends ListExtended<Entry> {
     private static final int ENTRY_HEIGHT = Math.max(SLOT_SIZE + MARGIN * 2, getFontRenderer().FONT_HEIGHT * 2 + MARGIN * 3);
     private static final int LINE_SIDE_MARGIN = 8;
 
-    private static final int TEXT_STATUS_Y_OFFSET;
-    private static final int TEXT_AMOUNT_Y_OFFSET;
-
     private static final int SCROLL_BAR_WIDTH = 6;
-
-    private static final String TRANSLATION_KEY_AVAILABLE = "gui.buildinggadgets.materialList.message.available";
-    private static final String TRANSLATION_KEY_MISSING = "gui.buildinggadgets.materialList.message.missing";
-
-    static {
-        int usableHeight = ENTRY_HEIGHT - MARGIN * 2;
-        int centerX = usableHeight / 2;
-        TEXT_STATUS_Y_OFFSET = centerX - MARGIN / 2 - getFontRenderer().FONT_HEIGHT;
-        TEXT_AMOUNT_Y_OFFSET = centerX + MARGIN / 2;
-    }
 
     private MaterialListGUI gui;
 
     private SortingModes sortingMode;
-
-    private String messageAvailable;
-    private String messageMissing;
 
     public ScrollingMaterialList(MaterialListGUI gui) {
         super(gui.getWindowLeftX(),
@@ -62,8 +44,6 @@ class ScrollingMaterialList extends ListExtended<Entry> {
                 gui.getWindowHeight() - TOP - BOTTOM,
                 ENTRY_HEIGHT);
         this.gui = gui;
-        this.messageAvailable = I18n.format(TRANSLATION_KEY_AVAILABLE);
-        this.messageMissing = I18n.format(TRANSLATION_KEY_MISSING);
 
         Multiset<UniqueItem> materials = gui.getTemplateItem().getItemCountMap(gui.getTemplate());
         EntityPlayer player = Minecraft.getInstance().player;
@@ -73,6 +53,8 @@ class ScrollingMaterialList extends ListExtended<Entry> {
             addEntry(new Entry(this, item, entry.getCount(), InventoryHelper.countItem(item.toItemStack(), player, world)));
         }
         this.setSortingMode(SortingModes.NAME);
+
+        this.selectedElement = -1;
     }
 
     @Override
@@ -90,11 +72,9 @@ class ScrollingMaterialList extends ListExtended<Entry> {
 
         private String itemName;
         private String amount;
-        private String status;
 
         private int widthItemName;
         private int widthAmount;
-        private int widthStatus;
 
         public Entry(ScrollingMaterialList parent, UniqueItem item, int required, int available) {
             this.parent = parent;
@@ -105,10 +85,8 @@ class ScrollingMaterialList extends ListExtended<Entry> {
             this.itemName = stack.getDisplayName().getString();
             // Use this.available since the parameter is not clamped
             this.amount = this.available + "/" + required;
-            this.status = hasEnoughItems() ? parent.messageAvailable : parent.messageMissing;
             this.widthItemName = Minecraft.getInstance().fontRenderer.getStringWidth(itemName);
             this.widthAmount = Minecraft.getInstance().fontRenderer.getStringWidth(amount);
-            this.widthStatus = Minecraft.getInstance().fontRenderer.getStringWidth(status);
         }
 
         @Override
@@ -134,16 +112,15 @@ class ScrollingMaterialList extends ListExtended<Entry> {
             // -1 because the bottom x coordinate is exclusive
             RenderUtil.renderTextVerticalCenter(itemName, itemNameX, top, bottom, Color.WHITE.getRGB());
 
-            RenderUtil.renderTextHorizontalRight(status, right, top + TEXT_STATUS_Y_OFFSET, getTextStatusColor());
-            RenderUtil.renderTextHorizontalRight(amount, right, top + TEXT_AMOUNT_Y_OFFSET, Color.WHITE.getRGB());
+            RenderUtil.renderTextHorizontalRight(amount, right, AlignmentUtil.getYForAlignedCenter(getFontRenderer().FONT_HEIGHT, top, bottom), getTextColor());
 
-            drawGuidingLine(right, top, bottom, itemNameX, widthItemName, widthAmount, widthStatus);
+            drawGuidingLine(right, top, bottom, itemNameX, widthItemName, widthAmount);
         }
 
-        private void drawGuidingLine(int right, int top, int bottom, int itemNameX, int widthItemName, int widthAmount, int widthStatus) {
+        private void drawGuidingLine(int right, int top, int bottom, int itemNameX, int widthItemName, int widthAmount) {
             if (!parent.isSelected(index)) {
                 int lineXStart = itemNameX + widthItemName + LINE_SIDE_MARGIN;
-                int lineXEnd = right - Math.max(widthAmount, widthStatus) - LINE_SIDE_MARGIN;
+                int lineXEnd = right - widthAmount - LINE_SIDE_MARGIN;
                 int lineY = AlignmentUtil.getYForAlignedCenter(1, top, bottom - 1);
                 GlStateManager.enableAlphaTest();
                 GlStateManager.enableBlend();
@@ -153,10 +130,8 @@ class ScrollingMaterialList extends ListExtended<Entry> {
         }
 
         private void drawHoveringText(ItemStack item, int slotX, int slotY, int mouseX, int mouseY) {
-            if (mouseX > slotX && mouseY > slotY && mouseX <= slotX + 18 && mouseY <= slotY + 18) {
-                parent.gui.renderToolTip(item, mouseX, mouseY);
-                GlStateManager.disableLighting();
-            }
+            if (mouseX > slotX && mouseY > slotY && mouseX <= slotX + 18 && mouseY <= slotY + 18)
+                parent.gui.setTaskHoveringText(mouseX, mouseY, parent.gui.getItemToolTip(item));
         }
 
         private void drawIcon(ItemStack item, int slotX, int slotY) {
@@ -172,7 +147,7 @@ class ScrollingMaterialList extends ListExtended<Entry> {
             return required == available;
         }
 
-        private int getTextStatusColor() {
+        private int getTextColor() {
             return hasEnoughItems() ? Color.GREEN.getRGB() : Color.RED.getRGB();
         }
 
@@ -196,6 +171,22 @@ class ScrollingMaterialList extends ListExtended<Entry> {
             return itemName;
         }
 
+        @Override
+        public boolean mouseClicked(double x, double y, int button) {
+            // Select the entry
+            return true;
+        }
+
+    }
+
+    @Override
+    protected void drawTransition(Tessellator tessellator, BufferBuilder buffer, int transitionTop, int transitionBottom) {
+    }
+
+    //TODO add replacement function and make entries selectable
+    @Override
+    protected boolean isSelected(int slotIndex) {
+        return false;
     }
 
     public SortingModes getSortingMode() {
