@@ -1,7 +1,6 @@
 package com.direwolf20.buildinggadgets.api.exceptions;
 
-
-public class TransactionExecutionException extends Exception{
+public class TransactionExecutionException extends TemplateException {
     public TransactionExecutionException(String message) {
         super(message);
     }

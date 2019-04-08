@@ -1,6 +1,7 @@
 package com.direwolf20.buildinggadgets.api.template.building;
 
 import com.direwolf20.buildinggadgets.api.abstraction.UniqueItem;
+import com.direwolf20.buildinggadgets.api.exceptions.TemplateException;
 import com.direwolf20.buildinggadgets.api.template.ITemplate;
 import com.google.common.collect.Multiset;
 import net.minecraft.util.math.BlockPos;
@@ -96,5 +97,5 @@ public interface ITemplateView extends Iterable<PlacementTarget>, AutoCloseable 
      * Any calls to {@link #iterator()}, {@link #spliterator()} or {@link #stream()} will throw an {@link UnsupportedOperationException} in this case.
      */
     @Override
-    void close() throws Exception;
+    void close() throws TemplateException;
 }
