@@ -16,7 +16,7 @@ import javax.annotation.Nullable;
  * <li>Provide a possibility to iterate over all placement information contained in this {@code ITemplate} via {@link #createViewInContext(IBuildContext)}.
  * <li>Optionally an {@code ITemplate} may choose to provide a possibility for modifying the represented structure
  * via an {@link ITemplateTransaction} created by {@link #startTransaction()}.
- * <li>Provide a boundingBox, which will enclose all positions produced by this {@code ITemplate} via [TODO].
+ * <li>Provide a boundingBox, which will enclose all positions produced by this {@code ITemplate} via {@link ITemplateView}.
  * <li>Provide a possibility to serialize this ITemplate via an corresponding {@link ITemplateSerializer}.
  * </ul>
  * <p>
@@ -30,7 +30,6 @@ import javax.annotation.Nullable;
  * @implSpec Notice that it is not a responsibility of this class to handle placement or modification in any way.
  */
 public interface ITemplate {
-    // TODO add Boundingbox (Region) as soon as @hnOsmium's PR comes in
 
     /**
      * @return The {@link ITemplateSerializer} responsible for serializing this Template.

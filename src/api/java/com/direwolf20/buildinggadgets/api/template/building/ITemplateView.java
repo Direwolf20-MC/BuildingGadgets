@@ -25,10 +25,13 @@ import java.util.stream.StreamSupport;
  * @implSpec Notice that no guarantees are made for the order in which {@link PlacementTarget}'s are produced by this {@code ITemplateView}.
  *         Order may be arbitrary or sorted, consult the documentation of the implementation you are currently faced with for information about traversal order.
  */
-public interface ITemplateView extends Iterable<PlacementTarget> {
+public interface ITemplateView extends Iterable<PlacementTarget>, AutoCloseable {
+    // TODO add Boundingbox (Region) as soon as @hnOsmium's PR comes in
     /**
      * Creates a {@link Stream} backed by the {@link #spliterator()} of this {@code ITemplateView}.
      * @return A {@link Stream} representing all positions produced by this {@code ITemplateView}.
+     * @throws UnsupportedOperationException if {@link #close()}  was called and concurrent Transaction execution is not permitted
+     *         by the underlying {@link ITemplate}
      * @implSpec The {@link Stream} produced by this method must not be parallel. A user wishing for parallel traversal
      *         should take a look at {@link java.util.stream.StreamSupport#stream(Spliterator, boolean)}.
      * @implNote The default implementation is equivalent to calling {@code StreamSupport.stream(view.spliterator(), false);}.
@@ -39,6 +42,8 @@ public interface ITemplateView extends Iterable<PlacementTarget> {
 
     /**
      * @return An {@link Iterator} over the {@link PlacementTarget}'s of this {@code ITemplateView}.
+     * @throws UnsupportedOperationException if {@link #close()} was called and concurrent Transaction execution is not permitted
+     *         by the underlying {@link ITemplate}
      * @implNote The default implementation is equivalent to calling {@code Spliterators.iterator(view.spliterator());}.
      */
     @Override
@@ -48,6 +53,8 @@ public interface ITemplateView extends Iterable<PlacementTarget> {
 
     /**
      * @return An {@link Spliterator} over the {@link PlacementTarget}'s of this {@code ITemplateView}.
+     * @throws UnsupportedOperationException if {@link #close()} was called and concurrent Transaction execution is not permitted
+     *         by the underlying {@link ITemplate}
      */
     @Override
     Spliterator<PlacementTarget> spliterator();
@@ -81,4 +88,13 @@ public interface ITemplateView extends Iterable<PlacementTarget> {
      *         Negative if unknown or expensive to compute.
      */
     int estimateSize();
+
+    /**
+     * Calling this Method will invalidate this {@code TemplateView}. Invalidation both frees this {@code TemplateViews} execution lock on any
+     * {@link com.direwolf20.buildinggadgets.api.template.transaction.ITemplateTransaction} and prevents further iteration over this views content if the
+     * backing {@link ITemplate} does not support concurrent {@link com.direwolf20.buildinggadgets.api.template.transaction.ITemplateTransaction} execution.
+     * Any calls to {@link #iterator()}, {@link #spliterator()} or {@link #stream()} will throw an {@link UnsupportedOperationException} in this case.
+     */
+    @Override
+    void close() throws Exception;
 }
