@@ -4,6 +4,7 @@ import com.direwolf20.buildinggadgets.client.gui.materiallist.MaterialListGUI;
 import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManagerContainer;
 import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManagerGUI;
 import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManagerTileEntity;
+import com.direwolf20.buildinggadgets.common.items.ITemplate;
 import com.direwolf20.buildinggadgets.common.items.Template;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetDestruction;
@@ -49,7 +50,7 @@ public enum GuiMod {
         }
         return false;
     }),
-    MATERIAL_LIST(Template::getTemplate, MaterialListGUI::new);
+    MATERIAL_LIST(ITemplate::getTemplate, MaterialListGUI::new);
 
     private static interface IContainerOpener {
         boolean open(String id, EntityPlayerMP player, World world, BlockPos pos);
@@ -76,7 +77,11 @@ public enum GuiMod {
         if (clientScreenProvider == null)
             return false;
 
-        GuiScreen screen = clientScreenProvider.apply(stackReader.apply(player));
+        ItemStack stack = stackReader.apply(player);
+        if (stack == null || stack == ItemStack.EMPTY)
+            return false;
+
+        GuiScreen screen = clientScreenProvider.apply(stack);
         Minecraft.getInstance().displayGuiScreen(screen);
         return screen == null;
     }

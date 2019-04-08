@@ -5,6 +5,7 @@ import com.direwolf20.buildinggadgets.client.gui.GuiButtonAction;
 import com.direwolf20.buildinggadgets.client.gui.base.BasicGUIBase;
 import com.direwolf20.buildinggadgets.client.utils.AlignmentUtil;
 import com.direwolf20.buildinggadgets.client.utils.RenderUtil;
+import com.direwolf20.buildinggadgets.common.items.ITemplate;
 import com.direwolf20.buildinggadgets.common.items.Template;
 import com.direwolf20.buildinggadgets.common.utils.ref.Reference;
 import com.google.common.base.Preconditions;
@@ -51,7 +52,7 @@ public class MaterialListGUI extends BasicGUIBase {
     private List<String> hoveringText;
 
     public MaterialListGUI(ItemStack template) {
-        Preconditions.checkArgument(template.getItem() instanceof Template);
+        Preconditions.checkArgument(template.getItem() instanceof ITemplate);
         this.template = template;
     }
 
@@ -82,8 +83,6 @@ public class MaterialListGUI extends BasicGUIBase {
 
     @Override
     public void render(int mouseX, int mouseY, float particleTicks) {
-        // drawDefaultBackground();
-
         Minecraft.getInstance().getTextureManager().bindTexture(BACKGROUND_TEXTURE);
         RenderUtil.drawCompleteTexture(backgroundX, backgroundY, BACKGROUND_WIDTH, BACKGROUND_HEIGHT);
 
@@ -153,8 +152,8 @@ public class MaterialListGUI extends BasicGUIBase {
         return template;
     }
 
-    public Template getTemplateItem() {
-        return (Template) template.getItem();
+    public ITemplate getTemplateItem() {
+        return (ITemplate) template.getItem();
     }
 
     public void setTaskHoveringText(int x, int y, List<String> text) {

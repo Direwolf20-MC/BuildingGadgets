@@ -144,7 +144,7 @@ public class GuiEntryList<E extends IGuiListEntry<E>> extends GuiListExtended<E>
     }
 
     /**
-     * Triggers when the player clicks on an entry
+     * Triggers when the player clicks on an entry.
      */
     @Override
     protected boolean mouseClicked(int index, int button, double x, double y) {

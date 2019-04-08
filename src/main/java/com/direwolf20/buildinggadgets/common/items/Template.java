@@ -26,18 +26,6 @@ import java.util.UUID;
 
 public class Template extends Item implements ITemplate {
 
-    public static ItemStack getTemplate(EntityPlayer player) {
-        ItemStack mainhand = player.getHeldItemMainhand();
-        if (mainhand.getItem() instanceof Template)
-            return mainhand;
-
-        ItemStack offhand = player.getHeldItemOffhand();
-        if (offhand.getItem() instanceof Template)
-            return offhand;
-
-        return ItemStack.EMPTY;
-    }
-
     public Template(Properties builder) {
         super(builder.maxStackSize(1));
     }
