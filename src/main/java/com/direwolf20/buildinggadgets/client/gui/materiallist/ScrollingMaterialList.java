@@ -130,7 +130,7 @@ class ScrollingMaterialList extends GuiEntryList<Entry> {
         }
 
         private void drawHoveringText(ItemStack item, int slotX, int slotY, int mouseX, int mouseY) {
-            if (mouseX > slotX && mouseY > slotY && mouseX <= slotX + 18 && mouseY <= slotY + 18)
+            if (parent.isMouseInList(mouseX, mouseY) && AlignmentUtil.isPointInBox(mouseX, mouseY, slotX, slotY, 18, 18))
                 parent.gui.setTaskHoveringText(mouseX, mouseY, parent.gui.getItemToolTip(item));
         }
 
@@ -173,7 +173,7 @@ class ScrollingMaterialList extends GuiEntryList<Entry> {
 
         @Override
         public boolean mouseClicked(double x, double y, int button) {
-            // Select the entry
+            // Always select the entry
             return true;
         }
 

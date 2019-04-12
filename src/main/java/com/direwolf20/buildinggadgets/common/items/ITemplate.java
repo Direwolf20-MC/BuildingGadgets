@@ -90,9 +90,4 @@ public interface ITemplate {
         return GadgetUtils.getPOSFromNBT(stack, NBTKeys.GADGET_END_POS);
     }
 
-    @OnlyIn(Dist.CLIENT)
-    default void openGui() {
-        GuiMod.MATERIAL_LIST.openScreen(Minecraft.getInstance().player);
-    }
-
 }

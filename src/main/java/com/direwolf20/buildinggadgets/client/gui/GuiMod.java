@@ -78,7 +78,7 @@ public enum GuiMod {
             return false;
 
         ItemStack stack = stackReader.apply(player);
-        if (stack == null || stack == ItemStack.EMPTY)
+        if (stack == null || stack.isEmpty())
             return false;
 
         GuiScreen screen = clientScreenProvider.apply(stack);

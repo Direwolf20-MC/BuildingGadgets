@@ -40,11 +40,11 @@ public class GuiEntryList<E extends IGuiListEntry<E>> extends GuiListExtended<E>
                 (int) (Minecraft.getInstance().mainWindow.getHeight() - (bottom * scaleFactor)),
                 (int) (width * scaleFactor),
                 (int) (height * scaleFactor));
-        drawScreenNoTransition(mouseX, mouseY, partialTicks);
+        renderParts(mouseX, mouseY, partialTicks);
         GL11.glDisable(GL11.GL_SCISSOR_TEST);
     }
 
-    private void drawScreenNoTransition(int mouseX, int mouseY, float partialTicks) {
+    private void renderParts(int mouseX, int mouseY, float partialTicks) {
         if (visible) {
             drawBackground();
             int i = getScrollBarX();
@@ -116,6 +116,43 @@ public class GuiEntryList<E extends IGuiListEntry<E>> extends GuiListExtended<E>
         buffer.pos((double) this.right, transitionBottom, 0.0D).tex(1.0D, 0.0D).color(0, 0, 0, 0).endVertex();
         buffer.pos((double) this.left, transitionBottom, 0.0D).tex(0.0D, 0.0D).color(0, 0, 0, 0).endVertex();
         tessellator.draw();
+    }
+
+    @Override
+    protected void drawSelectionBox(int insideLeft, int insideTop, int mouseXIn, int mouseYIn, float partialTicks) {
+        Tessellator tessellator = Tessellator.getInstance();
+        BufferBuilder buffer = tessellator.getBuffer();
+
+        for (int i = 0; i < getSize(); ++i) {
+            int entryY = insideTop + i * slotHeight + headerPadding;
+            // Height of an entry without the borders
+            int actualHeight = slotHeight - 4;
+
+            if (entryY + actualHeight < top || entryY > bottom) {
+                updateItemPos(i, insideLeft, entryY, partialTicks);
+                continue;
+            }
+
+            if (showSelectionBox && isSelected(i)) {
+                int i1 = left + width / 2 - getListWidth() / 2;
+                int j1 = left + width / 2 + getListWidth() / 2;
+                GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+                GlStateManager.disableTexture2D();
+                buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
+                buffer.pos((double) i1, (double) (entryY + actualHeight + 2), 0.0D).tex(0.0D, 1.0D).color(128, 128, 128, 255).endVertex();
+                buffer.pos((double) j1, (double) (entryY + actualHeight + 2), 0.0D).tex(1.0D, 1.0D).color(128, 128, 128, 255).endVertex();
+                buffer.pos((double) j1, (double) (entryY - 2), 0.0D).tex(1.0D, 0.0D).color(128, 128, 128, 255).endVertex();
+                buffer.pos((double) i1, (double) (entryY - 2), 0.0D).tex(0.0D, 0.0D).color(128, 128, 128, 255).endVertex();
+                buffer.pos((double) (i1 + 1), (double) (entryY + actualHeight + 1), 0.0D).tex(0.0D, 1.0D).color(0, 0, 0, 255).endVertex();
+                buffer.pos((double) (j1 - 1), (double) (entryY + actualHeight + 1), 0.0D).tex(1.0D, 1.0D).color(0, 0, 0, 255).endVertex();
+                buffer.pos((double) (j1 - 1), (double) (entryY - 1), 0.0D).tex(1.0D, 0.0D).color(0, 0, 0, 255).endVertex();
+                buffer.pos((double) (i1 + 1), (double) (entryY - 1), 0.0D).tex(0.0D, 0.0D).color(0, 0, 0, 255).endVertex();
+                tessellator.draw();
+                GlStateManager.enableTexture2D();
+            }
+
+            drawSlot(i, insideLeft, entryY, actualHeight, mouseXIn, mouseYIn, partialTicks);
+        }
     }
 
     @Override
