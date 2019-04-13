@@ -31,6 +31,7 @@
     "key.buildinggadgets.undo": "Undo",
     "key.buildinggadgets.fuzzy": "Fuzzy",
     "key.buildinggadgets.connected_area": "Connected Area",
+    "key.buildinggadgets.material_list": "Open Material List",
 
     "_comment": "tooltip:",
     "tooltip.constructionblockpowder.helptext": "Place next to water",
@@ -96,6 +97,17 @@
     "gui.buildinggadgets.destruction.field.up": "Up",
     "gui.buildinggadgets.destruction.button.confirm": "Ok",
     "gui.buildinggadgets.destruction.button.cancel": "Cancel",
+
+    "_comment": "gui - material list:",
+    "gui.buildinggadgets.materialList.button.close": "Close",
+    "gui.buildinggadgets.materialList.button.refresh": "Refresh",
+    "gui.buildinggadgets.materialList.button.sorting.nameAZ": "A-Z",
+    "gui.buildinggadgets.materialList.button.sorting.nameZA": "Z-A",
+    "gui.buildinggadgets.materialList.button.sorting.requiredAcse": "Required ↓",
+    "gui.buildinggadgets.materialList.button.sorting.requiredDesc": "Required ↑",
+    "gui.buildinggadgets.materialList.button.sorting.missingAcse": "Missing ↓",
+    "gui.buildinggadgets.materialList.button.sorting.missingDesc": "Missing ↑",
+    "gui.buildinggadgets.materialList.title": "Material List",
 
     "_comment": "gui - help:",
     "gui.buildinggadgets.help.area.arrow.data_flow": "Represents the flow of data from one item to another; either from a template to a gadget/template, or from a gadget/template to a template or piece of paper",

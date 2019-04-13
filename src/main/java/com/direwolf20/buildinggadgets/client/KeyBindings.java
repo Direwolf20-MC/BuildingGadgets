@@ -20,6 +20,7 @@ public class KeyBindings {
     public static KeyBinding anchor;
     public static KeyBinding fuzzy;
     public static KeyBinding connectedArea;
+    public static KeyBinding materialList;
 
     public static void init() {
         menuSettings = createBinding("settings_menu", GLFW.GLFW_KEY_G);
@@ -29,6 +30,7 @@ public class KeyBindings {
         fuzzy = createBinding("fuzzy", GLFW.GLFW_KEY_UNKNOWN);
         connectedArea = createBinding("connected_area", GLFW.GLFW_KEY_UNKNOWN);
         rotateMirror = createBinding("rotate_mirror", GLFW.GLFW_KEY_UNKNOWN);
+        materialList = createBinding("material_list", GLFW.GLFW_KEY_M);
     }
 
     private static KeyBinding createBinding(String name, int key) {

@@ -1,6 +1,8 @@
 package com.direwolf20.buildinggadgets.common.items;
 
 import com.direwolf20.buildinggadgets.client.events.EventTooltip;
+import com.direwolf20.buildinggadgets.client.gui.GuiMod;
+import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
 import com.direwolf20.buildinggadgets.common.utils.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.utils.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.world.WorldSave;
@@ -23,6 +25,7 @@ import java.util.List;
 import java.util.UUID;
 
 public class Template extends Item implements ITemplate {
+
     public Template(Properties builder) {
         super(builder.maxStackSize(1));
     }
@@ -67,6 +70,8 @@ public class Template extends Item implements ITemplate {
 
     @Override
     public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
+        if (world.isRemote)
+            GuiMod.MATERIAL_LIST.openScreen(player);
         ItemStack itemstack = player.getHeldItem(hand);
         return new ActionResult<>(EnumActionResult.SUCCESS, itemstack);
     }

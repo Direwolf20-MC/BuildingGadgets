@@ -54,6 +54,10 @@ public final class UniqueItem { //TODO @since 1.13.x can this be replaced with I
         return item;
     }
 
+    public ItemStack toItemStack() {
+        return new ItemStack(getItem());
+    }
+
     public boolean equals(UniqueItem uniqueItem) {
         //item.equals will fall back to reference Equality
         return (uniqueItem.item.equals(item));

@@ -1,14 +1,18 @@
 package com.direwolf20.buildinggadgets.client.gui;
 
+import com.direwolf20.buildinggadgets.client.gui.materiallist.MaterialListGUI;
 import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManagerContainer;
 import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManagerGUI;
 import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManagerTileEntity;
+import com.direwolf20.buildinggadgets.common.items.ITemplate;
+import com.direwolf20.buildinggadgets.common.items.Template;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetDestruction;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
 import com.direwolf20.buildinggadgets.common.utils.lang.LangUtil;
 import com.direwolf20.buildinggadgets.common.utils.ref.Reference;
 import com.google.common.base.Function;
+import com.google.common.base.Preconditions;
 import com.google.common.base.Supplier;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
@@ -31,9 +35,9 @@ import java.util.Iterator;
 import java.util.function.Consumer;
 
 public enum GuiMod {
-    COPY(tool -> tool.getItem() instanceof GadgetCopyPaste ? new CopyGUI(tool) : null),
-    PASTE(tool -> tool.getItem() instanceof GadgetCopyPaste ? new PasteGUI(tool) : null),
-    DESTRUCTION(tool -> tool.getItem() instanceof GadgetDestruction ? new DestructionGUI(tool) : null),
+    COPY(GadgetCopyPaste::getGadget, CopyGUI::new),
+    PASTE(GadgetCopyPaste::getGadget, PasteGUI::new),
+    DESTRUCTION(GadgetDestruction::getGadget, DestructionGUI::new),
     TEMPLATE_MANAGER("template_manager", message -> {
         TileEntity te = Minecraft.getInstance().world.getTileEntity(message.getAdditionalData().readBlockPos());
         return te instanceof TemplateManagerTileEntity ? new TemplateManagerGUI((TemplateManagerTileEntity) te,
@@ -45,18 +49,21 @@ public enum GuiMod {
             return true;
         }
         return false;
-    });
+    }),
+    MATERIAL_LIST(ITemplate::getTemplate, MaterialListGUI::new);
 
     private static interface IContainerOpener {
         boolean open(String id, EntityPlayerMP player, World world, BlockPos pos);
     }
 
+    private Function<EntityPlayer, ItemStack> stackReader;
     private Function<ItemStack, GuiScreen> clientScreenProvider;
     private Function<OpenContainer, GuiScreen> commonScreenProvider;
     private IContainerOpener containerOpener;
     private String id;
 
-    private GuiMod(Function<ItemStack, GuiScreen> clientScreenProvider) {
+    private GuiMod(Function<EntityPlayer, ItemStack> stackReader, Function<ItemStack, GuiScreen> clientScreenProvider) {
+        this.stackReader = stackReader;
         this.clientScreenProvider = clientScreenProvider;
     }
 
@@ -70,7 +77,11 @@ public enum GuiMod {
         if (clientScreenProvider == null)
             return false;
 
-        GuiScreen screen = clientScreenProvider.apply(GadgetGeneric.getGadget(player));
+        ItemStack stack = stackReader.apply(player);
+        if (stack == null || stack.isEmpty())
+            return false;
+
+        GuiScreen screen = clientScreenProvider.apply(stack);
         Minecraft.getInstance().displayGuiScreen(screen);
         return screen == null;
     }
