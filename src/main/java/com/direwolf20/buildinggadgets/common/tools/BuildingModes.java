@@ -21,7 +21,6 @@ import java.util.*;
 import java.util.function.BiPredicate;
 
 public enum BuildingModes {
-
     TargetedAxisChasing("build_to_me.png", new BuildToMeMode(BuildingModes::combineTester)),
     VerticalColumn("vertical_column.png", new BuildingVerticalColumnMode(BuildingModes::combineTester)),
     HorizontalColumn("horizontal_column.png", new BuildingHorizontalColumnMode(BuildingModes::combineTester)),
@@ -30,13 +29,11 @@ public enum BuildingModes {
     Stair("stairs.png", new StairMode(BuildingModes::combineTester)),
     Grid("grid.png", new GridMode(BuildingModes::combineTester)),
     Surface("surface.png", new BuildingSurfaceMode(BuildingModes::combineTester));
-
-    private final String displayName;
+    private static final BuildingModes[] VALUES = values();
     private final ResourceLocation icon;
     private final IBuildingMode modeImpl;
 
     BuildingModes(String iconFile, IBuildingMode modeImpl) {
-        this.displayName = modeImpl.getLocalized();
         this.icon = new ResourceLocation(BuildingGadgets.MODID, "textures/gui/mode/" + iconFile);
         this.modeImpl = modeImpl;
     }
@@ -50,22 +47,22 @@ public enum BuildingModes {
     }
 
     public String getRegistryName() {
-        return modeImpl.getRegistryName().toString() + "/BuildingGadget";
+        return getModeImplementation().getRegistryName().toString() + "/BuildingGadget";
     }
 
     @Override
     public String toString() {
-        return displayName;
+        return getModeImplementation().getLocalized();
     }
 
     public BuildingModes next() {
-        BuildingModes[] values = values();
-        return values[(this.ordinal() + 1) % values.length];
+        return VALUES[(this.ordinal() + 1) % VALUES.length];
     }
 
     public static List<BlockPos> collectPlacementPos(World world, EntityPlayer player, BlockPos hit, EnumFacing sideHit, ItemStack tool, BlockPos initial) {
         IBuildingMode mode = byName(NBTTool.getOrNewTag(tool).getString("mode")).getModeImplementation();
-        return mode.createExecutionContext(player, hit, sideHit, tool).collectFilteredSequence(world, tool, player, initial);
+        return mode.createExecutionContext(player, hit, sideHit, tool)
+                .collectFilteredSequence(world, tool, player, initial);
     }
 
     public static BuildingModes byName(String name) {
@@ -87,7 +84,7 @@ public enum BuildingModes {
         IBlockState target = GadgetUtils.getToolBlock(tool);
         return (pos, state) -> {
             IBlockState current = world.getBlockState(pos);
-            if (!target.getBlock().canPlaceBlockAt(world, pos))
+            if (! target.getBlock().canPlaceBlockAt(world, pos))
                 return false;
             if (pos.getY() < 0)
                 return false;
@@ -98,12 +95,11 @@ public enum BuildingModes {
     }
 
     public static List<BlockMap> sortMapByDistance(List<BlockMap> unSortedMap, EntityPlayer player) {//TODO unused
-        List<BlockPos> unSortedList = new ArrayList<BlockPos>();
-//        List<BlockPos> sortedList = new ArrayList<BlockPos>();
-        Map<BlockPos, IBlockState> PosToStateMap = new HashMap<BlockPos, IBlockState>();
-        Map<BlockPos, Integer> PosToX = new HashMap<BlockPos, Integer>();
-        Map<BlockPos, Integer> PosToY = new HashMap<BlockPos, Integer>();
-        Map<BlockPos, Integer> PosToZ = new HashMap<BlockPos, Integer>();
+        List<BlockPos> unSortedList = new ArrayList<>();
+        Map<BlockPos, IBlockState> PosToStateMap = new HashMap<>();
+        Map<BlockPos, Integer> PosToX = new HashMap<>();
+        Map<BlockPos, Integer> PosToY = new HashMap<>();
+        Map<BlockPos, Integer> PosToZ = new HashMap<>();
         for (BlockMap blockMap : unSortedMap) {
             PosToStateMap.put(blockMap.pos, blockMap.state);
             PosToX.put(blockMap.pos, blockMap.xOffset);

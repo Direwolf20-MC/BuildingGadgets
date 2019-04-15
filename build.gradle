@@ -69,9 +69,14 @@ repositories {
         name "IC2" // IC2, Forestry
         url "http://maven.ic2.player.to/"
     }
+    maven {
+        name = "CoFH Maven"
+        url = "http://maven.covers1624.net"
+    }
 }
 
 dependencies {
+    runtime "cofh:RedstoneFlux:1.12-${rf_version}:universal"
     runtime "team.chisel.ctm:CTM:MC${minecraft_version}-${ctm_version}"
     deobfCompile "team.chisel.ctm:CTM:MC${minecraft_version}-${ctm_version}:api"
     deobfCompile "refinedstorage:refinedstorage:${rs_version}:api"

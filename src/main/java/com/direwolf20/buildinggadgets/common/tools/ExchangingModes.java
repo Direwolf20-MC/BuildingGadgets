@@ -24,18 +24,15 @@ import java.util.List;
 import java.util.function.BiPredicate;
 
 public enum ExchangingModes {
-
     Surface("surface.png", new ExchangingSurfaceMode(ExchangingModes::combineTester)),
     VerticalColumn("vertical_column.png", new ExchangingVerticalColumnMode(ExchangingModes::combineTester)),
     HorizontalColumn("horizontal_column.png", new ExchangingHorizontalColumnMode(ExchangingModes::combineTester)),
     Grid("grid.png", new ExchangingGridMode(ExchangingModes::combineTester));
-
-    private final String displayName;
+    private static final ExchangingModes[] VALUES = values();
     private final ResourceLocation icon;
     private final IBuildingMode modeImpl;
 
     ExchangingModes(String iconFile, IBuildingMode modeImpl) {
-        this.displayName = modeImpl.getLocalized();
         this.icon = new ResourceLocation(BuildingGadgets.MODID, "textures/gui/mode/" + iconFile);
         this.modeImpl = modeImpl;
     }
@@ -49,17 +46,16 @@ public enum ExchangingModes {
     }
 
     public String getRegistryName() {
-        return modeImpl.getRegistryName().toString() + "/ExchangingGadget";
+        return getModeImplementation().getRegistryName().toString() + "/ExchangingGadget";
     }
 
     @Override
     public String toString() {
-        return displayName;
+        return getModeImplementation().getLocalized();
     }
 
     public ExchangingModes next() {
-        ExchangingModes[] values = values();
-        return values[(this.ordinal() + 1) % values.length];
+        return VALUES[(this.ordinal() + 1) % VALUES.length];
     }
 
     public static ExchangingModes byName(String name) {
