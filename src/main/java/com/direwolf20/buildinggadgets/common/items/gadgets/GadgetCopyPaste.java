@@ -20,13 +20,14 @@ import com.direwolf20.buildinggadgets.common.utils.blocks.BlockMap;
 import com.direwolf20.buildinggadgets.common.utils.blocks.BlockMapIntState;
 import com.direwolf20.buildinggadgets.common.utils.helpers.InventoryHelper;
 import com.direwolf20.buildinggadgets.common.utils.helpers.VectorHelper;
+import com.direwolf20.buildinggadgets.common.utils.lang.Styles;
+import com.direwolf20.buildinggadgets.common.utils.lang.TooltipTranslation;
 import com.direwolf20.buildinggadgets.common.utils.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.world.WorldSave;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -236,7 +237,7 @@ public class GadgetCopyPaste extends GadgetPlacing implements ITemplate {
     @Override
     public void addInformation(ItemStack stack, @Nullable World world, List<ITextComponent> tooltip, ITooltipFlag flag) {
         super.addInformation(stack, world, tooltip, flag);
-        tooltip.add(new TextComponentString(TextFormatting.AQUA + I18n.format("tooltip.gadget.mode") + ": " + getToolMode(stack)));
+        tooltip.add(TooltipTranslation.GADGET_MODE.componentTranslation(getToolMode(stack)).setStyle(Styles.AQUA));
         addEnergyInformation(tooltip, stack);
         addInformationRayTraceFluid(tooltip, stack);
         EventTooltip.addTemplatePadding(stack, tooltip);

@@ -2,11 +2,11 @@ package com.direwolf20.buildinggadgets.common.items;
 
 import com.direwolf20.buildinggadgets.client.events.EventTooltip;
 import com.direwolf20.buildinggadgets.client.gui.GuiMod;
-import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
 import com.direwolf20.buildinggadgets.common.utils.GadgetUtils;
+import com.direwolf20.buildinggadgets.common.utils.lang.Styles;
+import com.direwolf20.buildinggadgets.common.utils.lang.TooltipTranslation;
 import com.direwolf20.buildinggadgets.common.utils.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.world.WorldSave;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
@@ -16,8 +16,6 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
@@ -64,7 +62,7 @@ public class Template extends Item implements ITemplate {
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
         super.addInformation(stack, worldIn, tooltip, flagIn);
 
-        tooltip.add(new TextComponentString(TextFormatting.AQUA + I18n.format("tooltip.template.name") + ": " + getName(stack)));
+        tooltip.add(TooltipTranslation.TEMPLATE_NAME.componentTranslation(getName(stack)).setStyle(Styles.AQUA));
         EventTooltip.addTemplatePadding(stack, tooltip);
     }
 

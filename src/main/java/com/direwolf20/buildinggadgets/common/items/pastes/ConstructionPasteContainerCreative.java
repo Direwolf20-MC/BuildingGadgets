@@ -1,11 +1,10 @@
 package com.direwolf20.buildinggadgets.common.items.pastes;
 
+import com.direwolf20.buildinggadgets.common.utils.lang.Styles;
+import com.direwolf20.buildinggadgets.common.utils.lang.TooltipTranslation;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.Style;
-import net.minecraft.util.text.TextComponentTranslation;
-import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
@@ -18,7 +17,7 @@ public class ConstructionPasteContainerCreative extends GenericPasteContainer {
 
     @Override
     public void addInformation(ItemStack stack, @Nullable World world, List<ITextComponent> list, ITooltipFlag flag) {
-        list.add(new TextComponentTranslation("tooltip.pasteContainer.creative.amountMsg").setStyle(new Style().setColor(TextFormatting.WHITE)));
+        list.add(TooltipTranslation.PASTECONTAINER_CREATIVE_AMOUNT.componentTranslation().setStyle(Styles.WHITE));
     }
 
     @Override

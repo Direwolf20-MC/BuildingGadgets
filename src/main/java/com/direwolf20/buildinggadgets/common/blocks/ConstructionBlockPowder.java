@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.common.blocks;
 
 import com.direwolf20.buildinggadgets.common.entities.ConstructionBlockEntity;
-
+import com.direwolf20.buildinggadgets.common.utils.lang.TooltipTranslation;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockFalling;
 import net.minecraft.block.state.IBlockState;
@@ -12,7 +12,6 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
@@ -28,7 +27,7 @@ public class ConstructionBlockPowder extends BlockFalling {
     @Override
     public void addInformation(ItemStack stack, @Nullable IBlockReader worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
         super.addInformation(stack, worldIn, tooltip, flagIn);
-        tooltip.add(new TextComponentTranslation("tooltip.constructionblockpowder.helptext"));
+        tooltip.add(TooltipTranslation.CONSTRUCTIONBLOCKPOWDER_HELPTEXT.componentTranslation());
     }
 
     @Override

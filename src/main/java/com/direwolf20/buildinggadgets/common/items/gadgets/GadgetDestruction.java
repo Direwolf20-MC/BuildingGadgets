@@ -9,11 +9,12 @@ import com.direwolf20.buildinggadgets.common.utils.CapabilityUtil.EnergyUtil;
 import com.direwolf20.buildinggadgets.common.utils.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.utils.blocks.BlockMapIntState;
 import com.direwolf20.buildinggadgets.common.utils.helpers.VectorHelper;
+import com.direwolf20.buildinggadgets.common.utils.lang.Styles;
+import com.direwolf20.buildinggadgets.common.utils.lang.TooltipTranslation;
 import com.direwolf20.buildinggadgets.common.utils.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.world.WorldSave;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
@@ -77,11 +78,14 @@ public class GadgetDestruction extends GadgetSwapping {
     @Override
     public void addInformation(ItemStack stack, @Nullable World world, List<ITextComponent> tooltip, ITooltipFlag flag) {
         super.addInformation(stack, world, tooltip, flag);
-        tooltip.add(new TextComponentString(TextFormatting.RED + I18n.format("tooltip.gadget.destroywarning")));
-        tooltip.add(new TextComponentString(TextFormatting.AQUA + I18n.format("tooltip.gadget.destroyshowoverlay") + ": " + getOverlay(stack)));
-        tooltip.add(new TextComponentString(TextFormatting.YELLOW + I18n.format("tooltip.gadget.connected_area") + ": " + getConnectedArea(stack)));
+        tooltip.add(TooltipTranslation.GADGET_DESTROYWARNING.componentTranslation().setStyle(Styles.RED));
+        tooltip.add(TooltipTranslation.GADGET_DESTROYSHOWOVERLAY.componentTranslation(String.valueOf(getOverlay(stack)))
+                            .setStyle(Styles.AQUA));
+        tooltip.add(TooltipTranslation.GADGET_BUILDING_PLACE_ATOP
+                            .componentTranslation(String.valueOf(getConnectedArea(stack))).setStyle(Styles.YELLOW));
         if (Config.isServerConfigLoaded() && Config.GADGETS.GADGET_DESTRUCTION.nonFuzzyEnabled.get())
-            tooltip.add(new TextComponentString(TextFormatting.GOLD + I18n.format("tooltip.gadget.fuzzy") + ": " + getFuzzy(stack)));
+            tooltip.add(TooltipTranslation.GADGET_FUZZY.componentTranslation(String.valueOf(getFuzzy(stack)))
+                                .setStyle(Styles.GOLD));
 
         addInformationRayTraceFluid(tooltip, stack);
         addEnergyInformation(tooltip, stack);
@@ -185,7 +189,8 @@ public class GadgetDestruction extends GadgetSwapping {
     public static void switchOverlay(EntityPlayer player, ItemStack stack) {
         boolean overlay = !getOverlay(stack);
         setOverlay(stack, overlay);
-        player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("tooltip.gadget.destroyshowoverlay").getUnformattedComponentText() + ": " + overlay), true);
+        player.sendStatusMessage(TooltipTranslation.GADGET_DESTROYSHOWOVERLAY
+                                         .componentTranslation(String.valueOf(overlay)).setStyle(Styles.AQUA), true);
     }
 
     public static List<EnumFacing> assignDirections(EnumFacing side, EntityPlayer player) {

@@ -8,10 +8,12 @@ import com.direwolf20.buildinggadgets.common.tools.modes.ExchangingModes;
 import com.direwolf20.buildinggadgets.common.utils.CapabilityUtil.EnergyUtil;
 import com.direwolf20.buildinggadgets.common.utils.helpers.InventoryHelper;
 import com.direwolf20.buildinggadgets.common.utils.helpers.VectorHelper;
+import com.direwolf20.buildinggadgets.common.utils.lang.LangUtil;
+import com.direwolf20.buildinggadgets.common.utils.lang.Styles;
+import com.direwolf20.buildinggadgets.common.utils.lang.TooltipTranslation;
 import com.direwolf20.buildinggadgets.common.utils.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.world.FakeBuilderWorld;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.player.EntityPlayer;
@@ -138,11 +140,17 @@ public class GadgetExchanger extends GadgetSwapping {
     @Override
     public void addInformation(ItemStack stack, @Nullable World world, List<ITextComponent> tooltip, ITooltipFlag flag) {
         super.addInformation(stack, world, tooltip, flag);
-        tooltip.add(new TextComponentString(TextFormatting.DARK_GREEN + I18n.format("tooltip.gadget.block") + ": " + getToolBlock(stack).getBlock().getNameTextComponent().getFormattedText()));
+        tooltip.add(TooltipTranslation.GADGET_BLOCK
+                            .componentTranslation(LangUtil.getFormattedBlockName(getToolBlock(stack)))
+                            .setStyle(Styles.DK_GREEN));
         ToolMode mode = getToolMode(stack);
-        tooltip.add(new TextComponentString(TextFormatting.AQUA + I18n.format("tooltip.gadget.mode") + ": " + (mode == ToolMode.Surface && getConnectedArea(stack) ? I18n.format("tooltip.gadget.connected") + " " : "") + mode));
-        tooltip.add(new TextComponentString(TextFormatting.LIGHT_PURPLE + I18n.format("tooltip.gadget.range") + ": " + getToolRange(stack)));
-        tooltip.add(new TextComponentString(TextFormatting.GOLD + I18n.format("tooltip.gadget.fuzzy") + ": " + getFuzzy(stack)));
+        tooltip.add(TooltipTranslation.GADGET_MODE
+                            .componentTranslation((mode == ToolMode.Surface && getConnectedArea(stack) ? TooltipTranslation.GADGET_CONNECTED
+                                    .format(mode) : mode)).setStyle(Styles.AQUA));
+        tooltip.add(TooltipTranslation.GADGET_RANGE.componentTranslation(getToolRange(stack))
+                            .setStyle(Styles.LT_PURPLE));
+        tooltip.add(TooltipTranslation.GADGET_FUZZY.componentTranslation(String.valueOf(getFuzzy(stack)))
+                            .setStyle(Styles.GOLD));
         addInformationRayTraceFluid(tooltip, stack);
         addEnergyInformation(tooltip, stack);
     }

@@ -5,8 +5,9 @@ import com.direwolf20.buildinggadgets.common.items.capability.CapabilityProvider
 import com.direwolf20.buildinggadgets.common.utils.CapabilityUtil.EnergyUtil;
 import com.direwolf20.buildinggadgets.common.utils.exceptions.CapabilityNotPresentException;
 import com.direwolf20.buildinggadgets.common.utils.helpers.NBTHelper;
+import com.direwolf20.buildinggadgets.common.utils.lang.Styles;
+import com.direwolf20.buildinggadgets.common.utils.lang.TooltipTranslation;
 import com.direwolf20.buildinggadgets.common.utils.ref.NBTKeys;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.IItemPropertyGetter;
@@ -137,8 +138,9 @@ public abstract class GadgetGeneric extends Item {
     protected void addEnergyInformation(List<ITextComponent> tooltip, ItemStack stack) {
         if (Config.isServerConfigLoaded())
             stack.getCapability(CapabilityEnergy.ENERGY).ifPresent(energy -> {
-                tooltip.add(new TextComponentString(TextFormatting.WHITE + I18n
-                        .format("tooltip.gadget.energy") + ": " + withSuffix(energy.getEnergyStored()) + "/" + withSuffix(energy.getMaxEnergyStored())));
+                tooltip.add(TooltipTranslation.GADGET_ENERGY
+                                    .componentTranslation(withSuffix(energy.getEnergyStored()), withSuffix(energy.getMaxEnergyStored()))
+                                    .setStyle(Styles.WHITE));
             });
     }
 
@@ -171,7 +173,8 @@ public abstract class GadgetGeneric extends Item {
     }
 
     public static void addInformationRayTraceFluid(List<ITextComponent> tooltip, ItemStack stack) {
-        tooltip.add(new TextComponentString(TextFormatting.BLUE + I18n.format("tooltip.gadget.raytrace_fluid") + ": " + shouldRayTraceFluid(stack)));
+        tooltip.add(TooltipTranslation.GADGET_RAYTRACE_FLUID
+                            .componentTranslation(String.valueOf(shouldRayTraceFluid(stack))).setStyle(Styles.BLUE));
     }
     
     protected static String formatName(String name) {

@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.common.items.pastes;
 
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
-import net.minecraft.client.resources.I18n;
+import com.direwolf20.buildinggadgets.common.utils.lang.TooltipTranslation;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.TextFormatting;
@@ -37,7 +37,7 @@ public abstract class GenericPasteContainer extends Item {
     }
 
     protected static String getAmountDisplayLocalized() {
-        return TextFormatting.WHITE + I18n.format("tooltip.pasteContainer.amount");
+        return TextFormatting.WHITE + TooltipTranslation.PASTECONTAINER_AMOUNT.format();
     }
 
     /**
