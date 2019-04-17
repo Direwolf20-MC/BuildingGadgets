@@ -174,7 +174,8 @@ public abstract class GadgetGeneric extends Item {
 
     public static void addInformationRayTraceFluid(List<ITextComponent> tooltip, ItemStack stack) {
         tooltip.add(TooltipTranslation.GADGET_RAYTRACE_FLUID
-                            .componentTranslation(String.valueOf(shouldRayTraceFluid(stack))).setStyle(Styles.BLUE));
+                            .componentTranslation(String.valueOf(shouldRayTraceFluid(stack)))
+                            .setStyle(Styles.BLUE));
     }
     
     protected static String formatName(String name) {

@@ -131,20 +131,23 @@ public class GadgetBuilding extends GadgetPlacing {
                             .setStyle(Styles.DK_GREEN));
         ToolMode mode = getToolMode(stack);
         tooltip.add(TooltipTranslation.GADGET_MODE
-                            .componentTranslation((mode == ToolMode.Surface && getConnectedArea(stack) ? TooltipTranslation.GADGET_CONNECTED
-                                    .format(mode) : mode)).setStyle(Styles.AQUA));
+                            .componentTranslation((mode == ToolMode.Surface && getConnectedArea(stack) ? TooltipTranslation.GADGET_CONNECTED.format(mode) : mode))
+                            .setStyle(Styles.AQUA));
         if (getToolMode(stack) != ToolMode.BuildToMe)
-            tooltip.add(TooltipTranslation.GADGET_RANGE.componentTranslation(getToolRange(stack))
-                                .setStyle(Styles.LT_PURPLE));
+            tooltip.add(TooltipTranslation.GADGET_RANGE
+                        .componentTranslation(getToolRange(stack))
+                         .setStyle(Styles.LT_PURPLE));
 
         if (getToolMode(stack) == ToolMode.Surface)
-            tooltip.add(TooltipTranslation.GADGET_FUZZY.componentTranslation(String.valueOf(getFuzzy(stack)))
+            tooltip.add(TooltipTranslation.GADGET_FUZZY
+                                .componentTranslation(String.valueOf(getFuzzy(stack)))
                                 .setStyle(Styles.GOLD));
 
         addInformationRayTraceFluid(tooltip, stack);
 
         tooltip.add(TooltipTranslation.GADGET_BUILDING_PLACE_ATOP
-                            .componentTranslation(String.valueOf(shouldPlaceAtop(stack))).setStyle(Styles.YELLOW));
+                            .componentTranslation(String.valueOf(shouldPlaceAtop(stack)))
+                            .setStyle(Styles.YELLOW));
         addEnergyInformation(tooltip, stack);
     }
 

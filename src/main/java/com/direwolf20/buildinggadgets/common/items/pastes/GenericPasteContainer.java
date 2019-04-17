@@ -36,10 +36,6 @@ public abstract class GenericPasteContainer extends Item {
         return 0;
     }
 
-    protected static String getAmountDisplayLocalized() {
-        return TextFormatting.WHITE + TooltipTranslation.PASTECONTAINER_AMOUNT.format();
-    }
-
     /**
      * Set and store the amount of construction pastes in item nbt. Additionally it will clamp the parameter between {@link
      * #getMaxCapacity()} and 0 inclusively.

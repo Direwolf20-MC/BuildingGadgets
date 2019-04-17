@@ -78,13 +78,18 @@ public class GadgetDestruction extends GadgetSwapping {
     @Override
     public void addInformation(ItemStack stack, @Nullable World world, List<ITextComponent> tooltip, ITooltipFlag flag) {
         super.addInformation(stack, world, tooltip, flag);
-        tooltip.add(TooltipTranslation.GADGET_DESTROYWARNING.componentTranslation().setStyle(Styles.RED));
-        tooltip.add(TooltipTranslation.GADGET_DESTROYSHOWOVERLAY.componentTranslation(String.valueOf(getOverlay(stack)))
+        tooltip.add(TooltipTranslation.GADGET_DESTROYWARNING
+                            .componentTranslation()
+                            .setStyle(Styles.RED));
+        tooltip.add(TooltipTranslation.GADGET_DESTROYSHOWOVERLAY
+                            .componentTranslation(String.valueOf(getOverlay(stack)))
                             .setStyle(Styles.AQUA));
         tooltip.add(TooltipTranslation.GADGET_BUILDING_PLACE_ATOP
-                            .componentTranslation(String.valueOf(getConnectedArea(stack))).setStyle(Styles.YELLOW));
+                            .componentTranslation(String.valueOf(getConnectedArea(stack)))
+                            .setStyle(Styles.YELLOW));
         if (Config.isServerConfigLoaded() && Config.GADGETS.GADGET_DESTRUCTION.nonFuzzyEnabled.get())
-            tooltip.add(TooltipTranslation.GADGET_FUZZY.componentTranslation(String.valueOf(getFuzzy(stack)))
+            tooltip.add(TooltipTranslation.GADGET_FUZZY
+                                .componentTranslation(String.valueOf(getFuzzy(stack)))
                                 .setStyle(Styles.GOLD));
 
         addInformationRayTraceFluid(tooltip, stack);
