@@ -1,0 +1,10 @@
+{
+  "forge_marker": 1,
+  "defaults": {
+    "model": "buildinggadgets:constructionblock_dense"
+  },
+  "variants": {
+    "normal": [{}],
+    "inventory": [{}]
+  }
+}

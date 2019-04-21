@@ -7,11 +7,11 @@ import com.direwolf20.buildinggadgets.common.tools.ToolRenders;
 import com.direwolf20.buildinggadgets.common.tools.modes.ExchangingModes;
 import com.direwolf20.buildinggadgets.common.utils.CapabilityUtil.EnergyUtil;
 import com.direwolf20.buildinggadgets.common.utils.helpers.InventoryHelper;
+import com.direwolf20.buildinggadgets.common.utils.helpers.NBTHelper;
 import com.direwolf20.buildinggadgets.common.utils.helpers.VectorHelper;
 import com.direwolf20.buildinggadgets.common.utils.lang.LangUtil;
 import com.direwolf20.buildinggadgets.common.utils.lang.Styles;
 import com.direwolf20.buildinggadgets.common.utils.lang.TooltipTranslation;
-import com.direwolf20.buildinggadgets.common.utils.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.world.FakeBuilderWorld;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.util.ITooltipFlag;
@@ -48,20 +48,6 @@ import static com.direwolf20.buildinggadgets.common.utils.GadgetUtils.*;
 
 public class GadgetExchanger extends GadgetSwapping {
     private static final FakeBuilderWorld fakeWorld = new FakeBuilderWorld();
-
-    public enum ToolMode {
-        Surface, VerticalColumn, HorizontalColumn, Grid;
-        private static ToolMode[] vals = values();//TODO unused
-
-        @Override
-        public String toString() {
-            return formatName(name());
-        }
-
-        public ToolMode next() {//TODO unused
-            return vals[(this.ordinal() + 1) % vals.length];
-        }
-    }
 
     public GadgetExchanger(Properties builder) {
         super(builder);
@@ -113,28 +99,15 @@ public class GadgetExchanger extends GadgetSwapping {
         return super.canApplyAtEnchantingTable(stack, enchantment);
     }
 
-    private static void setToolMode(ItemStack stack, ToolMode mode) {
-        NBTTagCompound tagCompound = stack.getTag();
-        if (tagCompound == null) {
-            tagCompound = new NBTTagCompound();
-        }
-        tagCompound.setString(NBTKeys.GADGET_MODE, mode.name());
-        stack.setTag(tagCompound);
+    private static void setToolMode(ItemStack tool, ExchangingModes mode) {
+        //Store the tool's mode in NBT as a string
+        NBTTagCompound tagCompound = NBTHelper.getOrNewTag(tool);
+        tagCompound.setString("mode", mode.getRegistryName());
     }
 
-    public static ToolMode getToolMode(ItemStack stack) {
-        NBTTagCompound tagCompound = stack.getTag();
-        ToolMode mode = ToolMode.Surface;
-        if (tagCompound == null) {
-            setToolMode(stack, mode);
-            return mode;
-        }
-        try {
-            mode = ToolMode.valueOf(tagCompound.getString(NBTKeys.GADGET_MODE));
-        } catch (Exception e) {
-            setToolMode(stack, mode);
-        }
-        return mode;
+    public static ExchangingModes getToolMode(ItemStack tool) {
+        NBTTagCompound tagCompound = NBTHelper.getOrNewTag(tool);
+        return ExchangingModes.byName(tagCompound.getString("mode"));
     }
 
     @Override
@@ -143,9 +116,9 @@ public class GadgetExchanger extends GadgetSwapping {
         tooltip.add(TooltipTranslation.GADGET_BLOCK
                             .componentTranslation(LangUtil.getFormattedBlockName(getToolBlock(stack)))
                             .setStyle(Styles.DK_GREEN));
-        ToolMode mode = getToolMode(stack);
+        ExchangingModes mode = getToolMode(stack);
         tooltip.add(TooltipTranslation.GADGET_MODE
-                            .componentTranslation((mode == ToolMode.Surface && getConnectedArea(stack) ? TooltipTranslation.GADGET_CONNECTED.format(mode) : mode))
+                            .componentTranslation((mode == ExchangingModes.Surface && getConnectedArea(stack) ? TooltipTranslation.GADGET_CONNECTED.format(mode) : mode))
                             .setStyle(Styles.AQUA));
         tooltip.add(TooltipTranslation.GADGET_RANGE
                             .componentTranslation(getToolRange(stack))
@@ -181,14 +154,14 @@ public class GadgetExchanger extends GadgetSwapping {
 
     public void setMode(EntityPlayer player, ItemStack heldItem, int modeInt) {
         //Called when we specify a mode with the radial menu
-        ToolMode mode = ToolMode.values()[modeInt];
+        ExchangingModes mode = ExchangingModes.values()[modeInt];
         setToolMode(heldItem, mode);
         player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.toolmode").getUnformattedComponentText() + ": " + mode), true);
     }
 
     public static void rangeChange(EntityPlayer player, ItemStack heldItem) {
         int range = getToolRange(heldItem);
-        int changeAmount = (getToolMode(heldItem) == ToolMode.Grid || (range % 2 == 0)) ? 1 : 2;
+        int changeAmount = (getToolMode(heldItem) == ExchangingModes.Grid || (range % 2 == 0)) ? 1 : 2;
         if (player.isSneaking()) {
             range = (range <= 1) ? Config.GADGETS.maxRange.get() : range - changeAmount;
         } else {
@@ -210,7 +183,7 @@ public class GadgetExchanger extends GadgetSwapping {
             BlockPos startBlock = lookingAt.getBlockPos();
             EnumFacing sideHit = lookingAt.sideHit;
 //            IBlockState setBlock = getToolBlock(stack);
-            coords = ExchangingModes.getBuildOrders(world, player, startBlock, sideHit, stack);
+            coords = ExchangingModes.collectPlacementPos(world, player, startBlock, sideHit, stack, startBlock);
         } else { //If we do have an anchor, erase it (Even if the build fails)
             setAnchor(stack, new ArrayList<BlockPos>());
         }
@@ -293,7 +266,7 @@ public class GadgetExchanger extends GadgetSwapping {
             return false;
         }
 
-        if( !this.canUse(tool, player) )
+        if (!this.canUse(tool, player))
             return false;
 
         this.applyDamage(tool, player);

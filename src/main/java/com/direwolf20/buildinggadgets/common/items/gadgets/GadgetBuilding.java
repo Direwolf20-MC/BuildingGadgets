@@ -50,20 +50,6 @@ import static com.direwolf20.buildinggadgets.common.utils.GadgetUtils.*;
 public class GadgetBuilding extends GadgetPlacing {
     private static final FakeBuilderWorld fakeWorld = new FakeBuilderWorld();
 
-    public enum ToolMode {
-        BuildToMe, VerticalColumn, HorizontalColumn, VerticalWall, HorizontalWall, Stairs, Grid, Surface;
-        private static ToolMode[] vals = values();
-
-        @Override
-        public String toString() {
-            return formatName(name());
-        }
-
-        public ToolMode next() {
-            return vals[(this.ordinal() + 1) % vals.length];
-        }
-    }
-
     public GadgetBuilding(Properties builder) {
         super(builder);
     }
@@ -88,29 +74,15 @@ public class GadgetBuilding extends GadgetPlacing {
         return Config.GADGETS.GADGET_BUILDING.durabilityCost.get();
     }
 
-    private static void setToolMode(ItemStack stack, ToolMode mode) {
+    private static void setToolMode(ItemStack tool, BuildingModes mode) {
         //Store the tool's mode in NBT as a string
-        NBTTagCompound tagCompound = stack.getTag();
-        if (tagCompound == null) {
-            tagCompound = new NBTTagCompound();
-        }
-        tagCompound.setString(NBTKeys.GADGET_MODE, mode.name());
-        stack.setTag(tagCompound);
+        NBTTagCompound tagCompound = NBTHelper.getOrNewTag(tool);
+        tagCompound.setString("mode", mode.getRegistryName());
     }
 
-    public static ToolMode getToolMode(ItemStack stack) {
-        NBTTagCompound tagCompound = stack.getTag();
-        ToolMode mode = ToolMode.BuildToMe;
-        if (tagCompound == null) {
-            setToolMode(stack, mode);
-            return mode;
-        }
-        try {
-            mode = ToolMode.valueOf(tagCompound.getString(NBTKeys.GADGET_MODE));
-        } catch (Exception e) {
-            setToolMode(stack, mode);
-        }
-        return mode;
+    public static BuildingModes getToolMode(ItemStack tool) {
+        NBTTagCompound tagCompound = NBTHelper.getOrNewTag(tool);
+        return BuildingModes.byName(tagCompound.getString("mode"));
     }
 
     public static boolean shouldPlaceAtop(ItemStack stack) {
@@ -129,16 +101,16 @@ public class GadgetBuilding extends GadgetPlacing {
         tooltip.add(TooltipTranslation.GADGET_BLOCK
                             .componentTranslation(LangUtil.getFormattedBlockName(getToolBlock(stack)))
                             .setStyle(Styles.DK_GREEN));
-        ToolMode mode = getToolMode(stack);
+        BuildingModes mode = getToolMode(stack);
         tooltip.add(TooltipTranslation.GADGET_MODE
-                            .componentTranslation((mode == ToolMode.Surface && getConnectedArea(stack) ? TooltipTranslation.GADGET_CONNECTED.format(mode) : mode))
+                            .componentTranslation((mode == BuildingModes.Surface && getConnectedArea(stack) ? TooltipTranslation.GADGET_CONNECTED.format(mode) : mode))
                             .setStyle(Styles.AQUA));
-        if (getToolMode(stack) != ToolMode.BuildToMe)
+        if (getToolMode(stack) != BuildingModes.TargetedAxisChasing)
             tooltip.add(TooltipTranslation.GADGET_RANGE
                         .componentTranslation(getToolRange(stack))
                          .setStyle(Styles.LT_PURPLE));
 
-        if (getToolMode(stack) == ToolMode.Surface)
+        if (getToolMode(stack) == BuildingModes.Surface)
             tooltip.add(TooltipTranslation.GADGET_FUZZY
                                 .componentTranslation(String.valueOf(getFuzzy(stack)))
                                 .setStyle(Styles.GOLD));
@@ -180,7 +152,7 @@ public class GadgetBuilding extends GadgetPlacing {
 
     public void setMode(EntityPlayer player, ItemStack heldItem, int modeInt) {
         //Called when we specify a mode with the radial menu
-        ToolMode mode = ToolMode.values()[modeInt];
+        BuildingModes mode = BuildingModes.values()[modeInt];
         setToolMode(heldItem, mode);
         player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.toolmode").getUnformattedComponentText() + ": " + mode), true);
     }
@@ -188,7 +160,7 @@ public class GadgetBuilding extends GadgetPlacing {
     public static void rangeChange(EntityPlayer player, ItemStack heldItem) {
         //Called when the range change hotkey is pressed
         int range = getToolRange(heldItem);
-        int changeAmount = (getToolMode(heldItem) != ToolMode.Surface || (range % 2 == 0)) ? 1 : 2;
+        int changeAmount = (getToolMode(heldItem) != BuildingModes.Surface || (range % 2 == 0)) ? 1 : 2;
         if (player.isSneaking())
             range = (range == 1) ? Config.GADGETS.maxRange.get() : range - changeAmount;
         else
@@ -210,7 +182,7 @@ public class GadgetBuilding extends GadgetPlacing {
             }
             BlockPos startBlock = lookingAt.getBlockPos();
             EnumFacing sideHit = lookingAt.sideHit;
-            coords = BuildingModes.getBuildOrders(world, player, startBlock, sideHit, stack);
+            coords = BuildingModes.collectPlacementPos(world, player, startBlock, sideHit, stack, startBlock);
         } else { //If we do have an anchor, erase it (Even if the build fails)
             setAnchor(stack, new ArrayList<BlockPos>());
         }

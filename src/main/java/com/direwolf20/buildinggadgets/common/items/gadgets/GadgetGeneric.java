@@ -1,7 +1,11 @@
 package com.direwolf20.buildinggadgets.common.items.gadgets;
 
+
+import com.direwolf20.buildinggadgets.common.items.capability.CapabilityProviderBlockProvider;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.items.capability.CapabilityProviderEnergy;
+import com.direwolf20.buildinggadgets.common.items.capability.MultiCapabilityProvider;
+import net.minecraft.client.resources.I18n;
 import com.direwolf20.buildinggadgets.common.utils.CapabilityUtil.EnergyUtil;
 import com.direwolf20.buildinggadgets.common.utils.exceptions.CapabilityNotPresentException;
 import com.direwolf20.buildinggadgets.common.utils.helpers.NBTHelper;
@@ -21,6 +25,7 @@ import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
+import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
 
@@ -51,7 +56,7 @@ public abstract class GadgetGeneric extends Item {
     @Override
     @Nullable
     public ICapabilityProvider initCapabilities(ItemStack stack, @Nullable NBTTagCompound tag) {
-        return new CapabilityProviderEnergy(stack, this::getEnergyMax);
+        return new MultiCapabilityProvider(new CapabilityProviderEnergy(stack, this::getEnergyMax), new CapabilityProviderBlockProvider(stack));
     }
 
     @Override
@@ -130,8 +135,7 @@ public abstract class GadgetGeneric extends Item {
         if (poweredByFE()) {
             IEnergyStorage energy = EnergyUtil.getCap(tool).orElseThrow(CapabilityNotPresentException::new);
             energy.extractEnergy(getEnergyCost(tool), false);
-        }
-        else
+        } else
             tool.damageItem(getDamageCost(tool), player);
     }
 
@@ -177,7 +181,7 @@ public abstract class GadgetGeneric extends Item {
                             .componentTranslation(String.valueOf(shouldRayTraceFluid(stack)))
                             .setStyle(Styles.BLUE));
     }
-    
+
     protected static String formatName(String name) {
         return name.replaceAll("(?=[A-Z])", " ").trim();
     }

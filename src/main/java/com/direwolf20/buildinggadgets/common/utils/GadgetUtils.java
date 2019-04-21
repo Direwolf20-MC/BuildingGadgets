@@ -12,6 +12,7 @@ import com.direwolf20.buildinggadgets.common.tools.modes.BuildingModes;
 import com.direwolf20.buildinggadgets.common.tools.modes.ExchangingModes;
 import com.direwolf20.buildinggadgets.common.utils.exceptions.CapabilityNotPresentException;
 import com.direwolf20.buildinggadgets.common.utils.helpers.InventoryHelper;
+import com.direwolf20.buildinggadgets.common.utils.helpers.NBTHelper;
 import com.direwolf20.buildinggadgets.common.utils.helpers.VectorHelper;
 import com.direwolf20.buildinggadgets.common.utils.ref.NBTKeys;
 import com.google.common.collect.HashMultiset;
@@ -28,11 +29,17 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.*;
+import net.minecraft.util.EnumActionResult;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumFacing.Axis;
+import net.minecraft.util.Mirror;
+import net.minecraft.util.Rotation;
+import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceFluidMode;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.Vec3i;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
@@ -46,6 +53,7 @@ import javax.annotation.Nullable;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public class GadgetUtils {
@@ -54,6 +62,11 @@ public class GadgetUtils {
     public static boolean mightBeLink(final String s) {
         return LINK_STARTS.stream().anyMatch(s::startsWith);
     }
+
+    public static final Comparator<Vec3i> POSITION_COMPARATOR = Comparator
+            .comparingInt(Vec3i::getX)
+            .thenComparingInt(Vec3i::getY)
+            .thenComparingInt(Vec3i::getZ);
 
     public static String getStackErrorSuffix(ItemStack stack) {
         return getStackErrorText(stack) + " with NBT tag: " + stack.getTag();
@@ -73,7 +86,7 @@ public class GadgetUtils {
     }
 
     @Nullable
-    public static ByteArrayOutputStream getPasteStream(@Nonnull NBTTagCompound compound, @Nullable String name) throws IOException{
+    public static ByteArrayOutputStream getPasteStream(@Nonnull NBTTagCompound compound, @Nullable String name) throws IOException {
         NBTTagCompound withText = name != null && !name.isEmpty() ? compound.copy() : compound;
         if (name != null && !name.isEmpty()) withText.setString(NBTKeys.TEMPLATE_NAME, name);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -205,21 +218,13 @@ public class GadgetUtils {
 
     public static void setToolRange(ItemStack stack, int range) {
         //Store the tool's range in NBT as an Integer
-        NBTTagCompound tagCompound = stack.getTag();
-        if (tagCompound == null) {
-            tagCompound = new NBTTagCompound();
-        }
-        tagCompound.setInt(NBTKeys.GADGET_RANGE, range);
-        stack.setTag(tagCompound);
+        NBTTagCompound tagCompound = NBTHelper.getOrNewTag(stack);
+        tagCompound.setInt("range", range);
     }
 
     public static int getToolRange(ItemStack stack) {
-        NBTTagCompound tagCompound = stack.getTag();
-        if (tagCompound == null || tagCompound.getInt(NBTKeys.GADGET_RANGE) == 0) {
-            setToolRange(stack, 1);
-            return 1;
-        }
-        return tagCompound.getInt(NBTKeys.GADGET_RANGE);
+        NBTTagCompound tagCompound = NBTHelper.getOrNewTag(stack);
+        return MathHelper.clamp(tagCompound.getInt("range"), 1, 15);
     }
 
     public static IBlockState rotateOrMirrorBlock(EntityPlayer player, PacketRotateMirror.Operation operation, IBlockState state) {
@@ -263,7 +268,6 @@ public class GadgetUtils {
         tagCompound.setTag(NBTKeys.TE_CONSTRUCTION_STATE_ACTUAL, stateTag);
         stack.setTag(tagCompound);
     }
-
 
     public static IBlockState getToolBlock(ItemStack stack) {
         NBTTagCompound tagCompound = stack.getTag();
@@ -339,9 +343,9 @@ public class GadgetUtils {
             }
             List<BlockPos> coords = new ArrayList<BlockPos>();
             if (stack.getItem() instanceof GadgetBuilding) {
-                coords = BuildingModes.getBuildOrders(world, player, startBlock, sideHit, stack); //Build the positions list based on tool mode and range
+                coords = BuildingModes.collectPlacementPos(world, player, startBlock, sideHit, stack, startBlock); // Build the positions list based on tool mode and range
             } else if (stack.getItem() instanceof GadgetExchanger) {
-                coords = ExchangingModes.getBuildOrders(world, player, startBlock, sideHit, stack); //Build the positions list based on tool mode and range
+                coords = ExchangingModes.collectPlacementPos(world, player, startBlock, sideHit, stack, startBlock); // Build the positions list based on tool mode and range
             }
             setAnchor(stack, coords); //Set the anchor NBT
             player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.anchorrender").getUnformattedComponentText()), true);
@@ -367,7 +371,6 @@ public class GadgetUtils {
          return getRemoteInventory(tool, world, NetworkIO.Operation.EXTRACT);
 
     }
-
     @Nullable
     public static IItemHandler getRemoteInventory(ItemStack tool, World world, NetworkIO.Operation operation) {
         ResourceLocation dim = getDIMFromNBT(tool, NBTKeys.REMOTE_INVENTORY_DIM);
@@ -599,4 +602,5 @@ public class GadgetUtils {
 
         return itemCountMap;
     }
+
 }

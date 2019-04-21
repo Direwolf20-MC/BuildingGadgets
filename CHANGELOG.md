@@ -1,9 +1,65 @@
 # Building Gadgets Changelog
 The format of this document is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and should continue to adhere to the conventions outlined in the Keep a Changelog guidelines.
 
-## [Unreleased] 
+## [Unreleased]
+
+## [2.6.8] - 2019-03-24
 ### Added
+- Added settings to the radial menu for rotation, mirroring, undoing, and anchoring. All operations that can be performed by a keybind can now be performed via the radial menu.
+- A Building or Exchanging gadget can now rotate/mirror its selected blockstate (using either its new keybind, which is not set by default, or using the radial menu).
+    - **Example:** Selecting a stair block, then rotating it.
+
+### Changed
+- Separated rotation/mirror keybind (not set by default) from range (still default of **R**).
+- Raised the energy costs in recipes to 4000/1000 from
+    - 400/100 in the pulverizer and fluid extractor *[Thermal Expansion]*
+    - 1600/400 in the crusher *[Immersive Engineering]*
+
+## [2.6.7] - 2019-03-18
+### Added
+- The copy/paste gadget can now mirror pastes, as well as rotate them. Sneak while pressing the keybind that previously just rotated them to mirror them left-to-right instead.
+- Added/changed radial menu functionality/aesthetics:
+    - Converted text-based settings controls to icon-based ones.
+    - Prevented mode strings from rendering when the cursor is not over its corresponding slice.
+    - Added range slider.
+- Allowed gadgets to bind Simple Storage Network networks as a remote inventories (you can only bind the Storage Network Master block).
+- Dense construction blocks now drop 1-3 (configurable) construction paste items.
+- The process of generating construction paste is now as follows:
+    1. Craft a construction powder block.
+    2. Convert the powder into a dense construction block by either placing it in the word next to water, or using one of the following machines:
+        - Fluid Transposer *[Thermal Expansion]*
+        - Hydrator *[Cyclic]*    
+        - Moistener *[Forestry]*
+    3. Get paste from the block by either:
+        - Breaking it, yielding 1-3 paste.
+        - Using machines:
+            1. Convert it into dense construction chunks (1 block -> 4 chunks):
+                - Pulverizer *[Thermal Expansion]*
+                - Macerator *[Industrial Craft 2]*
+                - Grinder *[Applied Energistics 2]*
+                - Crusher *[Mekanism]*
+                - Crusher *[Immersive Engineering]*
+                - Crusher *[Actually Additions]*
+            2. Convert the chunks into paste using any of the machines listed in step 3 (1 chunk -> 1 paste).
+
+### Changed
+- Nearly every ingredient of every recipe now uses the ore dictionary.
+- Templates can be copied to the clipboard from template items, as well as copy/paste gadgets in the Template Manager GUI.
+- Remote networks are now only wrapped once build/exchange/undo operation, rather than twice per placed block.
+
+## [2.6.6] - 2019-02-27
+### Added
+- Allowed gadgets to bind Applied Energistics 2 networks as a remote inventories.
+- Added gadget modes for:
+    - [all gadgets] raytracing fluids
+    - [building gadget] placing in or on blocks
 - More German localisation
+
+### Fixed
+- Refined Storage network IO now respects security permissions.
+- Fixed destruction overlay rendering bug when in F1 mode.
+- When in connected area mode, the destruction gadget now does nothing when set to 0 depth, just as it does otherwise.
+- Allowed destruction overlay render cache to update when the side of the observed block changes.
 
 ## [2.6.5] - 2019-02-22
 ### Changed

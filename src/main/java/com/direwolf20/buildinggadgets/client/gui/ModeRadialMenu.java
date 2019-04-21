@@ -3,12 +3,14 @@
  * Psi is Open Source and distributed under the
  * Psi License: http://psi.vazkii.us/license.php
  */
-
 package com.direwolf20.buildinggadgets.client.gui;
 
 import com.direwolf20.buildinggadgets.client.KeyBindings;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.items.gadgets.*;
+import com.direwolf20.buildinggadgets.common.tools.modes.BuildingModes;
+import com.direwolf20.buildinggadgets.common.tools.modes.ExchangingModes;
+import com.google.common.collect.ImmutableList;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.*;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGSound;
@@ -27,7 +29,6 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
-
 import org.lwjgl.opengl.GL11;
 
 import javax.vecmath.Vector2f;
@@ -37,26 +38,12 @@ import java.util.List;
 
 public class ModeRadialMenu extends GuiScreen {
 
-    private static final ResourceLocation[] signsBuilding = new ResourceLocation[]{
-        new ResourceLocation(Reference.MODID, "textures/gui/mode/build_to_me.png"),
-        new ResourceLocation(Reference.MODID, "textures/gui/mode/vertical_column.png"),
-        new ResourceLocation(Reference.MODID, "textures/gui/mode/horizontal_column.png"),
-        new ResourceLocation(Reference.MODID, "textures/gui/mode/vertical_wall.png"),
-        new ResourceLocation(Reference.MODID, "textures/gui/mode/horizontal_wall.png"),
-        new ResourceLocation(Reference.MODID, "textures/gui/mode/stairs.png"),
-        new ResourceLocation(Reference.MODID, "textures/gui/mode/grid.png"),
-        new ResourceLocation(Reference.MODID, "textures/gui/mode/surface.png")
-    };
-    private static final ResourceLocation[] signsExchanger = new ResourceLocation[]{
-        new ResourceLocation(Reference.MODID, "textures/gui/mode/surface.png"),
-        new ResourceLocation(Reference.MODID, "textures/gui/mode/vertical_column.png"),
-        new ResourceLocation(Reference.MODID, "textures/gui/mode/horizontal_column.png"),
-        new ResourceLocation(Reference.MODID, "textures/gui/mode/grid.png")
-    };
-    private static final ResourceLocation[] signsCopyPaste = new ResourceLocation[]{
-        new ResourceLocation(Reference.MODID, "textures/gui/mode/copy.png"),
-        new ResourceLocation(Reference.MODID, "textures/gui/mode/paste.png")
-    };
+    //TODO move to a enum of modes of Copy-Paste Gadget
+    private static final ImmutableList<ResourceLocation> signsCopyPaste = ImmutableList.of(
+            new ResourceLocation(Reference.MODID, "textures/gui/mode/copy.png"),
+            new ResourceLocation(Reference.MODID, "textures/gui/mode/paste.png")
+    );
+
     private int timeIn = 0;
     private int slotSelected = -1;
     private int segments;
@@ -71,9 +58,9 @@ public class ModeRadialMenu extends GuiScreen {
 
     public void setSocketable(ItemStack stack) {
         if (stack.getItem() instanceof GadgetBuilding)
-            segments = GadgetBuilding.ToolMode.values().length;
+            segments = BuildingModes.values().length;
         else if (stack.getItem() instanceof GadgetExchanger)
-            segments = GadgetExchanger.ToolMode.values().length;
+            segments = ExchangingModes.values().length;
         else if (stack.getItem() instanceof GadgetCopyPaste)
             segments = GadgetCopyPaste.ToolMode.values().length;
     }
@@ -271,29 +258,30 @@ public class ModeRadialMenu extends GuiScreen {
 
         float angle = mouseAngle(x, y, mx, my);
 
-        int highlight = 5;
+//        int highlight = 5;
 
         GlStateManager.enableBlend();
         GlStateManager.shadeModel(GL11.GL_SMOOTH);
         float totalDeg = 0;
         float degPer = 360F / segments;
 
-        List<int[]> stringPositions = new ArrayList<>();
+        List<NameDisplayData> nameData = new ArrayList<>();
 
         ItemStack tool = getGadget();
         if (tool.isEmpty())
             return;
 
         slotSelected = -1;
+        float offset = 8.5F;
 
-        ResourceLocation[] signs;
+        ImmutableList<ResourceLocation> signs;
         int modeIndex;
         if (tool.getItem() instanceof GadgetBuilding) {
             modeIndex = GadgetBuilding.getToolMode(tool).ordinal();
-            signs = signsBuilding;
+            signs = BuildingModes.getIcons();
         } else if (tool.getItem() instanceof GadgetExchanger) {
             modeIndex = GadgetExchanger.getToolMode(tool).ordinal();
-            signs = signsExchanger;
+            signs = ExchangingModes.getIcons();
         } else {
             modeIndex = GadgetCopyPaste.getToolMode(tool).ordinal();
             signs = signsCopyPaste;
@@ -311,6 +299,7 @@ public class ModeRadialMenu extends GuiScreen {
             float gs = 0.25F;
             if (seg % 2 == 0)
                 gs += 0.1F;
+
             float r = gs;
             float g = gs + (seg == modeIndex ? 1F : 0.0F);
             float b = gs;
@@ -327,7 +316,7 @@ public class ModeRadialMenu extends GuiScreen {
                 double xp = x + Math.cos(rad) * radius;
                 double yp = y + Math.sin(rad) * radius;
                 if ((int) i == (int) (degPer / 2))
-                    stringPositions.add(new int[]{(int) xp, (int) yp, mouseInSector ? 1 : 0, shouldCenter && (seg == indexBottom || seg == indexTop) ? 1 : 0});
+                    nameData.add(new NameDisplayData((int) xp, (int) yp, mouseInSector, shouldCenter && (seg == indexBottom || seg == indexTop)));
 
                 GL11.glVertex2d(x + Math.cos(rad) * radius / 2.3F, y + Math.sin(rad) * radius / 2.3F);
                 GL11.glVertex2d(xp, yp);
@@ -337,22 +326,22 @@ public class ModeRadialMenu extends GuiScreen {
             GL11.glEnd();
             GlStateManager.color4f(1, 1, 1, 1);
 
-            if (mouseInSector)
-                radius -= highlight;
+//            if (mouseInSector)
+//                radius -= highlight;
         }
         GlStateManager.shadeModel(GL11.GL_FLAT);
         GlStateManager.enableTexture2D();
 
-        for (int i = 0; i < stringPositions.size(); i++) {
-            int[] pos = stringPositions.get(i);
-            int xp = pos[0];
-            int yp = pos[1];
+        for (int i = 0; i < nameData.size(); i++) {
+            NameDisplayData data = nameData.get(i);
+            int xp = data.getX();
+            int yp = data.getY();
 
-            String name = "";
+            String name;
             if (tool.getItem() instanceof GadgetBuilding)
-                name = GadgetBuilding.ToolMode.values()[i].toString();
+                name = BuildingModes.values()[i].toString();
             else if (tool.getItem() instanceof GadgetExchanger)
-                name = GadgetExchanger.ToolMode.values()[i].toString();
+                name = ExchangingModes.values()[i].toString();
             else
                 name = GadgetCopyPaste.ToolMode.values()[i].toString();
 
@@ -366,15 +355,16 @@ public class ModeRadialMenu extends GuiScreen {
                 ysp -= 9;
 
             Color color = i == modeIndex ? Color.GREEN : Color.WHITE;
-            if (pos[2] > 0)
-                fontRenderer.drawStringWithShadow(name, xsp + (pos[3] > 0 ? width / 2 - 4 : 0), ysp, color.getRGB());
+            if (data.isSelected())
+                fontRenderer.drawStringWithShadow(name, xsp + (data.isCentralized() ? width / 2 - 4 : 0), ysp, color.getRGB());
 
             double mod = 0.7;
             int xdp = (int) ((xp - x) * mod + x);
             int ydp = (int) ((yp - y) * mod + y);
 
-            GlStateManager.color4f(color.getRed() / 255, color.getGreen() / 255, color.getBlue() / 255F, 1);
-            mc.getTextureManager().bindTexture(signs[i]);
+            mc.getTextureManager().bindTexture(signs.get(i));
+            GlStateManager.color4f(color.getRed() / 255F, color.getGreen() / 255F, color.getBlue() / 255F,1);
+            mc.getTextureManager().bindTexture(signs.get(i));
             drawModalRectWithCustomSizedTexture(xdp - 8, ydp - 8, 0, 0, 16, 16, 16, 16);
         }
 
@@ -387,6 +377,7 @@ public class ModeRadialMenu extends GuiScreen {
         GlStateManager.scalef(s, s, s);
         GlStateManager.translatef(x / s - (tool.getItem() instanceof GadgetCopyPaste ? 8F : 8.5F), y / s - 8, 0);
         mc.getItemRenderer().renderItemAndEffectIntoGUI(tool, 0, 0);
+
         RenderHelper.disableStandardItemLighting();
         GlStateManager.disableBlend();
         GlStateManager.disableRescaleNormal();
@@ -450,9 +441,9 @@ public class ModeRadialMenu extends GuiScreen {
         for (int i = 0; i < conditionalButtons.size(); i++) {
             GuiButton button = conditionalButtons.get(i);
             if (builder)
-                curent = GadgetBuilding.getToolMode(tool) == GadgetBuilding.ToolMode.Surface;
+                curent = GadgetBuilding.getToolMode(tool) == BuildingModes.Surface;
             else
-                curent = i == 0 || GadgetExchanger.getToolMode(tool) == GadgetExchanger.ToolMode.Surface;
+                curent = i == 0 || GadgetExchanger.getToolMode(tool) == ExchangingModes.Surface;
 
             if (button.visible != curent) {
                 button.visible = curent;
@@ -476,7 +467,40 @@ public class ModeRadialMenu extends GuiScreen {
         return my < y ? 360F - ang : ang;
     }
 
-    public static enum ScreenPosition {
+    public enum ScreenPosition {
         RIGHT, LEFT, BOTTOM, TOP;
     }
+
+    private static final class NameDisplayData {
+
+        private final int x;
+        private final int y;
+        private final boolean selected;
+        private final boolean centralize;
+
+        private NameDisplayData(int x, int y, boolean selected, boolean centralize) {
+            this.x = x;
+            this.y = y;
+            this.selected = selected;
+            this.centralize = centralize;
+        }
+
+        private int getX() {
+            return x;
+        }
+
+        private int getY() {
+            return y;
+        }
+
+        private boolean isSelected() {
+            return selected;
+        }
+
+        private boolean isCentralized() {
+            return centralize;
+        }
+
+    }
+
 }
