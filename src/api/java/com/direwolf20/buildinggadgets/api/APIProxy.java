@@ -1,17 +1,32 @@
 package com.direwolf20.buildinggadgets.api;
 
-
+import com.direwolf20.buildinggadgets.api.abstraction.IApiConfig;
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Preconditions;
+import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-import java.util.Objects;
+public enum APIProxy {
+    INSTANCE;
+    public static final Logger LOG = LogManager.getLogger();
+    private IEventBus modEventbus = null;
+    private IEventBus forgeEventbus = null;
+    private IApiConfig config = null;
 
-public final class APIProxy {
-    private final IEventBus modEventbus;
-    private final IEventBus forgeEventbus;
+    public APIProxy onCreate(IEventBus modEventbus, IEventBus forgeEventbus, IApiConfig config) {
+        Preconditions.checkState(this.modEventbus == null && this.forgeEventbus == null && this.config == null);
+        return createState(modEventbus,forgeEventbus,config);
+    }
 
-    public APIProxy(IEventBus modEventbus, IEventBus forgeEventbus) {
-        this.modEventbus = Objects.requireNonNull(modEventbus);
-        this.forgeEventbus = Objects.requireNonNull(forgeEventbus);
+    @VisibleForTesting
+    APIProxy createState(IEventBus modEventbus, IEventBus forgeEventbus, IApiConfig config) {
+        this.modEventbus = modEventbus;
+        this.forgeEventbus = forgeEventbus;
+        this.config = config;
+        modEventbus.addListener(this::registerRegistries);
+        return this;
     }
 
     public void onSetup() {
@@ -20,5 +35,13 @@ public final class APIProxy {
 
     public void onLoadComplete() {
 
+    }
+
+    private void registerRegistries(RegistryEvent.NewRegistry newRegistry) {
+        Registries.onCreateRegistries(forgeEventbus);
+    }
+
+    public IApiConfig getConfig() {
+        return config;
     }
 }

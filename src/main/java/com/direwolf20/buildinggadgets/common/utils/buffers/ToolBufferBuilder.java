@@ -1,14 +1,6 @@
 package com.direwolf20.buildinggadgets.common.utils.buffers;
 
 import com.google.common.primitives.Floats;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
-import java.nio.ShortBuffer;
-import java.util.Arrays;
-import java.util.BitSet;
-
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GLAllocation;
 import net.minecraft.client.renderer.vertex.VertexFormat;
@@ -19,9 +11,14 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.nio.*;
+import java.util.Arrays;
+import java.util.BitSet;
+import java.util.Comparator;
+
 /**
- * This class differs from {@link BufferBuilder BufferBuilder} only in that the Comparator arguments of {@link Arrays#sort(Integer[], Comparator) Arrays#sort}
- * are compared in reverse order in {@link ToolDireBuffer#sortVertexData sortVertexData}
+ * This class differs from {@link BufferBuilder BufferBuilder} only in that the Comparator arguments of {@link Arrays#sort(Object[], Comparator)}  Arrays#sort}
+ * are compared in reverse order in {@link ToolBufferBuilder#sortVertexData(float, float, float)}  sortVertexData}
  */
 public class ToolBufferBuilder extends BufferBuilder {
     private static final Logger LOGGER = LogManager.getLogger();

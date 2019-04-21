@@ -155,6 +155,8 @@ dependencies {
     // The userdev artifact is a special name and will get all sorts of transformations applied to it.
     minecraft forgeName
     apiTestImplementation sourceSets.api.output
+    apiTestImplementation 'org.junit.jupiter:junit-jupiter:'+project.junit_version
+    apiTestImplementation 'org.hamcrest:hamcrest:'+project.hamcrest_version
     implementation sourceSets.api.output
     testImplementation sourceSets.apiTest.output
     // deobfCompile "team.chisel.ctm:CTM:MC${minecraft_version}-${ctm_version}:api"
@@ -180,6 +182,13 @@ dependencies {
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
 
+}
+
+test {
+    useJUnitPlatform()
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
 }
 
 processResources { //Processes main only resouces
@@ -213,6 +222,25 @@ jar {
     }
     from sourceSets.main.output, sourceSets.api.output
     dependsOn classes
+}
+
+void manipulateDocTags(List<String> tags) {
+    tags.add("implNote:a:Implementation Note:")
+    tags.add('implSpec:a:Implementation Requirements:')
+    tags.add('apiNote:a:API Note:')
+}
+
+void setApiDocOptions(StandardJavadocDocletOptions options) {
+    manipulateDocTags(options.getTags())
+}
+
+void setRegularDocOptions(StandardJavadocDocletOptions options) {
+    manipulateDocTags(options.getTags())
+}
+
+javadoc {
+    setRegularDocOptions(options)
+    source = sourceSets.main.allJava.plus(sourceSets.api.allJava)
 }
 
 task docJar(type: Jar, dependsOn: javadoc) {
@@ -250,8 +278,9 @@ task apiSourcesJar(type: Jar, dependsOn: apiClasses) {
 
 task apiDoc (type: Javadoc, dependsOn: clearDoc){
     classpath = sourceSets.api.compileClasspath
-    exclude('com/dirwolf20/buildinggadgets/api') //no idea why, but this results in only the api doc being created - I thought this would be done by include
+    exclude('com/dirwolf20/buildinggadgets/api') // no idea why, but this results in only the api doc being created - I thought this would be done by include
     source = sourceSets.api.allJava
+    setApiDocOptions(options)
 }
 
 task apiDocJar(type: Jar, dependsOn: apiDoc) {

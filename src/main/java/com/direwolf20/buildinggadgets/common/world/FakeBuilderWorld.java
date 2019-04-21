@@ -8,9 +8,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldType;
-import net.minecraft.world.biome.Biome;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 
 import javax.annotation.Nullable;
 import java.util.Set;
@@ -41,19 +38,6 @@ public class FakeBuilderWorld implements IBlockReader {
     @Override
     public IFluidState getFluidState(BlockPos pos) {
         return null;
-    }
-
-    @OnlyIn(Dist.CLIENT)
-    public int getCombinedLight(BlockPos pos, int lightValue) {
-        return realWorld.getCombinedLight(pos, lightValue);
-    }
-
-    public boolean isAirBlock(BlockPos pos) {
-        return !positions.contains(pos);
-    }
-
-    public Biome getBiome(BlockPos pos) {
-        return realWorld.getBiome(pos);
     }
 
     public WorldType getWorldType() {

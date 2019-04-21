@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.common.config;
 
+import com.direwolf20.buildinggadgets.api.abstraction.IApiConfig;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.utils.ref.Reference;
 import com.google.common.collect.ImmutableList;
@@ -45,7 +46,7 @@ public class Config {
     private static final Builder SERVER_BUILDER = new Builder();
     private static final Builder CLIENT_BUILDER = new Builder();
 
-    public static final ApiConfig API = new ApiConfig();
+    public static final IApiConfig API = new ApiConfig();
 
     public static final CategoryGeneral GENERAL = new CategoryGeneral();
 
@@ -348,7 +349,7 @@ public class Config {
         }
     }
 
-    public static final class ApiConfig {
+    private static final class ApiConfig implements IApiConfig {
 
     }
 

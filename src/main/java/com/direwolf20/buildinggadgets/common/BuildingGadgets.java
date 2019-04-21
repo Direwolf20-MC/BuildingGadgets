@@ -48,7 +48,6 @@ public class BuildingGadgets {
 
     public BuildingGadgets() {
         IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus();
-        theApi = new APIProxy(eventBus, MinecraftForge.EVENT_BUS);
 
         ModLoadingContext.get().registerConfig(Type.SERVER, Config.SERVER_CONFIG);
         ModLoadingContext.get().registerConfig(Type.COMMON, Config.COMMON_CONFIG);
@@ -69,6 +68,7 @@ public class BuildingGadgets {
             ModLoadingContext.get().registerExtensionPoint(ExtensionPoint.GUIFACTORY, () -> GuiMod::openScreen);
         });
 
+        theApi = APIProxy.INSTANCE.onCreate(eventBus, MinecraftForge.EVENT_BUS, Config.API);
         BuildingObjects.init();
     }
 
