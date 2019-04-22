@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.api.building.placement;
 
-import com.direwolf20.buildinggadgets.api.building.IPlacementSequence;
+import com.direwolf20.buildinggadgets.api.building.IPositionPlacementSequence;
 import com.direwolf20.buildinggadgets.api.building.Region;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
@@ -18,7 +18,7 @@ import java.util.Spliterator;
  * <p>
  * See the static factory methods for more information.
  */
-public final class Wall implements IPlacementSequence {
+public final class Wall implements IPositionPlacementSequence {
 
     /**
      * Creates a wall centered at the given position.
@@ -45,21 +45,23 @@ public final class Wall implements IPlacementSequence {
         return new Wall(posHit.offset(extension, radius + 1), flatSide, radius, extension, extra);
     }
 
-    private Region region;
+    private final Region region;
 
     @VisibleForTesting
     private Wall(BlockPos posHit, EnumFacing side, int radius, EnumFacing extendingSide, int extendingSize) {
-        this.region = new Region(posHit).expand(
+        Region createdRegion = new Region(posHit).expand(
                 radius * (1 - Math.abs(side.getXOffset())),
                 radius * (1 - Math.abs(side.getYOffset())),
                 radius * (1 - Math.abs(side.getZOffset())));
 
         if (extendingSize != 0) {
             if (extendingSide.getAxisDirection() == AxisDirection.POSITIVE)
-                this.region = new Region(region.getMin(), region.getMax().offset(extendingSide, extendingSize));
+                this.region = new Region(createdRegion.getMin(), createdRegion.getMax().offset(extendingSide, extendingSize));
             else
-                this.region = new Region(region.getMin().offset(extendingSide, extendingSize), region.getMax());
+                this.region = new Region(createdRegion.getMin().offset(extendingSide, extendingSize), createdRegion.getMax());
         }
+        else
+            this.region = createdRegion;
     }
 
     /**
@@ -81,7 +83,7 @@ public final class Wall implements IPlacementSequence {
     }
 
     @Override
-    public IPlacementSequence copy() {
+    public IPositionPlacementSequence copy() {
         return new Wall(region);
     }
 

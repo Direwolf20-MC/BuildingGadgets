@@ -1,6 +1,7 @@
 package com.direwolf20.buildinggadgets.api.template.serialisation;
 
 import com.direwolf20.buildinggadgets.api.abstraction.UniqueItem;
+import com.direwolf20.buildinggadgets.api.building.Region;
 import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.Multiset;
 import net.minecraft.util.ResourceLocation;
@@ -20,9 +21,9 @@ import java.util.Objects;
 public final class TemplateHeader {
     /**
      * Convenience overload taking an {@link ITemplateSerializer} instead of it's registryName-
-     * @see #builder(ResourceLocation, BlockPos)
+     * @see #builder(ResourceLocation, Region)
      */
-    public static Builder builder(ITemplateSerializer serializer, BlockPos boundingBox) {
+    public static Builder builder(ITemplateSerializer serializer, Region boundingBox) {
         return builder(Objects.requireNonNull(serializer.getRegistryName()), boundingBox);
     }
 
@@ -32,7 +33,7 @@ public final class TemplateHeader {
      * @param boundingBox a {@link BlockPos} representing the x-y-z size of the corresponding {@link com.direwolf20.buildinggadgets.api.template.ITemplate}.
      * @return A new {@link Builder} for the specified serializer and boundingBox.
      */
-    public static Builder builder(ResourceLocation serializer, BlockPos boundingBox) {
+    public static Builder builder(ResourceLocation serializer, Region boundingBox) {
         return new Builder(serializer, boundingBox);
     }
 
@@ -45,9 +46,9 @@ public final class TemplateHeader {
     @Nonnull
     private final ResourceLocation serializer;
     @Nonnull // Todo replace with Region
-    private final BlockPos boundingBox;
+    private final Region boundingBox;
 
-    private TemplateHeader(@Nullable String name, @Nullable String author, @Nullable Multiset<UniqueItem> requiredItems, @Nonnull ResourceLocation serializer, @Nonnull BlockPos boundingBox) {
+    private TemplateHeader(@Nullable String name, @Nullable String author, @Nullable Multiset<UniqueItem> requiredItems, @Nonnull ResourceLocation serializer, @Nonnull Region boundingBox) {
         this.name = name;
         this.author = author;
         this.requiredItems = requiredItems != null ? requiredItems : ImmutableMultiset.of();
@@ -91,12 +92,12 @@ public final class TemplateHeader {
      * @return The boundingBox of the corresponding {@link com.direwolf20.buildinggadgets.api.template.ITemplate}.
      */
     @Nonnull
-    public BlockPos getBoundingBox() {
+    public Region getBoundingBox() {
         return boundingBox;
     }
 
     /**
-     * Builder for {@link TemplateHeader}. An instance of this class can be acquired via {@link #builder(ResourceLocation, BlockPos)}.
+     * Builder for {@link TemplateHeader}. An instance of this class can be acquired via {@link #builder(ResourceLocation, Region)}.
      */
     public static final class Builder {
         @Nullable
@@ -108,9 +109,9 @@ public final class TemplateHeader {
         @Nonnull
         private final ResourceLocation serializer;
         @Nonnull //Todo replace with Region
-        private final BlockPos boundingBox;
+        private final Region boundingBox;
 
-        private Builder(@Nonnull ResourceLocation serializer, @Nonnull BlockPos boundingBox) {
+        private Builder(@Nonnull ResourceLocation serializer, @Nonnull Region boundingBox) {
             this.serializer = Objects.requireNonNull(serializer);
             this.boundingBox = Objects.requireNonNull(boundingBox);
         }

@@ -1,12 +1,10 @@
 package com.direwolf20.buildinggadgets.common.items.gadgets;
 
+import com.direwolf20.buildinggadgets.api.building.IAtopPlacingGadget;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
-import com.direwolf20.buildinggadgets.common.util.tools.ToolRenders;
-import com.direwolf20.buildinggadgets.common.util.tools.UndoState;
-import com.direwolf20.buildinggadgets.common.util.tools.modes.BuildingMode;
 import com.direwolf20.buildinggadgets.common.util.CapabilityUtil.EnergyUtil;
 import com.direwolf20.buildinggadgets.common.util.helpers.InventoryHelper;
 import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
@@ -16,6 +14,9 @@ import com.direwolf20.buildinggadgets.common.util.lang.LangUtil;
 import com.direwolf20.buildinggadgets.common.util.lang.Styles;
 import com.direwolf20.buildinggadgets.common.util.lang.TooltipTranslation;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
+import com.direwolf20.buildinggadgets.common.util.tools.ToolRenders;
+import com.direwolf20.buildinggadgets.common.util.tools.UndoState;
+import com.direwolf20.buildinggadgets.common.util.tools.modes.BuildingMode;
 import com.direwolf20.buildinggadgets.common.world.FakeBuilderWorld;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.util.ITooltipFlag;
@@ -47,7 +48,7 @@ import java.util.Set;
 
 import static com.direwolf20.buildinggadgets.common.util.GadgetUtils.*;
 
-public class GadgetBuilding extends GadgetPlacing {
+public class GadgetBuilding extends GadgetPlacing implements IAtopPlacingGadget {
     private static final FakeBuilderWorld fakeWorld = new FakeBuilderWorld();
 
     public GadgetBuilding(Properties builder) {
@@ -72,6 +73,11 @@ public class GadgetBuilding extends GadgetPlacing {
     @Override
     public int getDamageCost(ItemStack tool) {
         return Config.GADGETS.GADGET_BUILDING.durabilityCost.get();
+    }
+
+    @Override
+    public boolean placeAtop(ItemStack stack) {
+        return shouldPlaceAtop(stack);
     }
 
     private static void setToolMode(ItemStack tool, BuildingMode mode) {

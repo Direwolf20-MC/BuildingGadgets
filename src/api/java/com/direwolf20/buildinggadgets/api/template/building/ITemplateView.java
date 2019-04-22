@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.api.template.building;
 
+import com.direwolf20.buildinggadgets.api.abstraction.IPlacementSequence;
 import com.direwolf20.buildinggadgets.api.abstraction.PlacementTarget;
 import com.direwolf20.buildinggadgets.api.abstraction.UniqueItem;
 import com.direwolf20.buildinggadgets.api.exceptions.TemplateException;
@@ -27,8 +28,7 @@ import java.util.stream.StreamSupport;
  * @implSpec Notice that no guarantees are made for the order in which {@link PlacementTarget}'s are produced by this {@code ITemplateView}.
  *         Order may be arbitrary or sorted, consult the documentation of the implementation you are currently faced with for information about traversal order.
  */
-public interface ITemplateView extends Iterable<PlacementTarget>, AutoCloseable {
-    // TODO add Boundingbox (Region) as soon as @hnOsmium's PR comes in
+public interface ITemplateView extends IPlacementSequence<PlacementTarget>, AutoCloseable {
     /**
      * Creates a {@link Stream} backed by the {@link #spliterator()} of this {@code ITemplateView}.
      * @return A {@link Stream} representing all positions produced by this {@code ITemplateView}.
@@ -99,4 +99,26 @@ public interface ITemplateView extends Iterable<PlacementTarget>, AutoCloseable 
      */
     @Override
     void close() throws TemplateException;
+
+    /**
+     * Performs a deep copy of this {@code TemplateView} iterating over all positions if necessary. The resulting {@code TemplateView} should not care about
+     * the behaviour of the backing {@link ITemplate} and instead be independent of any resource lock's this {@code TemplateView} imposes as well as not imposing any
+     * resource locks itself.
+     * <p>
+     * Calling
+     * {@code
+     *    ITemplateView view = template.createViewInContext(ctx);
+     *    ITemplateView copy = view.copy();
+     *    view.close();
+     * }
+     * should ensure that the {@link ITemplate} is no longer restricted because of an open {@code TemplateView}, whilst at the same time providing access to all the positions via
+     * {@code copy} in the original {@code TemplateView} in a non-lazy manner.
+     * <p>
+     * <b>However: be warned that this might require O(n) execution time for this Method on some implementations (with n being the total number of
+     * {@link PlacementTarget PlacementTargets} produced) and will almost certainly nullify any benefits that the original {@code TemplateView} may have had by
+     * using a lazy implementation.</b>
+     * @return A full copy of this {@code TemplateView}. Iterating over the whole {@code TemplateView} if necessary.
+     */
+    @Override
+    ITemplateView copy(); //Todo implement default Method which copies the whole TemplateView into a Collection...
 }

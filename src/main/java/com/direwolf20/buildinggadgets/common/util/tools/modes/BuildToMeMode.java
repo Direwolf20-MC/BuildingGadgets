@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.common.util.tools.modes;
 
-import com.direwolf20.buildinggadgets.api.building.IPlacementSequence;
+import com.direwolf20.buildinggadgets.api.building.IPositionPlacementSequence;
 import com.direwolf20.buildinggadgets.api.building.IValidatorFactory;
 import com.direwolf20.buildinggadgets.api.building.modes.AtopSupportedMode;
 import com.direwolf20.buildinggadgets.api.building.placement.ExclusiveAxisChasing;
@@ -25,7 +25,7 @@ public class BuildToMeMode extends AtopSupportedMode {
     }
 
     @Override
-    public IPlacementSequence computeWithTransformed(EntityPlayer player, BlockPos transformed, BlockPos original, EnumFacing sideHit, ItemStack tool) {
+    public IPositionPlacementSequence computeWithTransformed(EntityPlayer player, BlockPos transformed, BlockPos original, EnumFacing sideHit, ItemStack tool) {
         return ExclusiveAxisChasing.create(transformed, new BlockPos(Math.floor(player.posX), Math.floor(player.posY), Math.floor(player.posZ)), sideHit);
     }
 

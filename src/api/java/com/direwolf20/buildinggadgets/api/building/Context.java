@@ -12,7 +12,7 @@ import java.util.Iterator;
 import java.util.function.BiPredicate;
 
 /**
- * Execution context that uses {@link IPlacementSequence} and {@link IBlockProvider} in combination to filter the
+ * Execution context that uses {@link IPositionPlacementSequence} and {@link IBlockProvider} in combination to filter the
  * unusable positions.
  * <p>
  * Testing is done with the predicate produced with {@link #validatorFactory}. If the predicate returns {@code true},
@@ -23,14 +23,14 @@ import java.util.function.BiPredicate;
  */
 public class Context {
 
-    private final IPlacementSequence positions;
+    private final IPositionPlacementSequence positions;
     private final IBlockProvider blocks;
     private final IValidatorFactory validatorFactory;
 
     /**
-     * @see Context#Context(IPlacementSequence, IBlockProvider, IValidatorFactory)
+     * @see Context#Context(IPositionPlacementSequence, IBlockProvider, IValidatorFactory)
      */
-    public Context(IPlacementSequence positions, IBlockProvider blocks) {
+    public Context(IPositionPlacementSequence positions, IBlockProvider blocks) {
         this(positions, blocks, (world, stack, player, initial) -> (pos, state) -> true);
     }
 
@@ -40,13 +40,13 @@ public class Context {
      *
      * @param validatorFactory Creates predicate for determining whether a position should be used or not
      */
-    public Context(IPlacementSequence positions, IBlockProvider blocks, IValidatorFactory validatorFactory) {
+    public Context(IPositionPlacementSequence positions, IBlockProvider blocks, IValidatorFactory validatorFactory) {
         this.positions = positions;
         this.blocks = blocks;
         this.validatorFactory = validatorFactory;
     }
 
-    public IPlacementSequence getPositionSequence() {
+    public IPositionPlacementSequence getPositionSequence() {
         return positions;
     }
 
@@ -73,7 +73,7 @@ public class Context {
     }
 
     /**
-     * @see IPlacementSequence#collect()
+     * @see IPositionPlacementSequence#collect()
      */
     public ImmutableList<BlockPos> collectFilteredSequence(World world, ItemStack stack, EntityPlayer player, BlockPos initial) {
         return ImmutableList.copyOf(getFilteredSequence(world, stack, player, initial));

@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.api.building.placement;
 
-import com.direwolf20.buildinggadgets.api.building.IPlacementSequence;
+import com.direwolf20.buildinggadgets.api.building.IPositionPlacementSequence;
 import com.direwolf20.buildinggadgets.api.building.Region;
 import com.direwolf20.buildinggadgets.api.util.MathUtils;
 import com.google.common.annotations.VisibleForTesting;
@@ -17,7 +17,7 @@ import java.util.Spliterator;
  * are the same. Whether the resulting {@link BlockPos}es include the start/end position is up to the factory methods'
  * specification.
  */
-public final class Column implements IPlacementSequence {
+public final class Column implements IPositionPlacementSequence {
 
     /**
      * Construct a column object with a starting point, including {@code range} amount of elements.
@@ -71,7 +71,7 @@ public final class Column implements IPlacementSequence {
     }
 
     @Override
-    public IPlacementSequence copy() {
+    public IPositionPlacementSequence copy() {
         return new Column(region);
     }
 

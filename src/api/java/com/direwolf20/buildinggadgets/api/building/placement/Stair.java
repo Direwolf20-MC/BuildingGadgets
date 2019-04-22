@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.api.building.placement;
 
-import com.direwolf20.buildinggadgets.api.building.IPlacementSequence;
+import com.direwolf20.buildinggadgets.api.building.IPositionPlacementSequence;
 import com.direwolf20.buildinggadgets.api.building.Region;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.AbstractIterator;
@@ -17,7 +17,7 @@ import java.util.Iterator;
  * For example, a regular climbing up stair facing north would have (UP, NORTH) as its parameter. This also applies to
  * descending stair like (DOWN, SOUTH) where each block is lower than the latter.
  */
-public final class Stair implements IPlacementSequence {
+public final class Stair implements IPositionPlacementSequence {
 
     public static Stair create(BlockPos base, EnumFacing horizontalAdvance, EnumFacing verticalAdvance, int range) {
         return new Stair(base, horizontalAdvance, verticalAdvance, range);
@@ -64,7 +64,7 @@ public final class Stair implements IPlacementSequence {
     }
 
     @Override
-    public IPlacementSequence copy() {
+    public IPositionPlacementSequence copy() {
         return new Stair(base, target, horizontalAdvance, verticalAdvance, region, range);
     }
 

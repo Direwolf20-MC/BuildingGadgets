@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.common.util.tools.modes;
 
-import com.direwolf20.buildinggadgets.api.building.IPlacementSequence;
+import com.direwolf20.buildinggadgets.api.building.IPositionPlacementSequence;
 import com.direwolf20.buildinggadgets.api.building.IValidatorFactory;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -23,7 +23,7 @@ public class ExchangingGridMode extends GridMode {
      * @implNote Exchanger replace at the same level, Building gadget build on top of the level
      */
     @Override
-    public IPlacementSequence computeCoordinates(EntityPlayer player, BlockPos hit, EnumFacing sideHit, ItemStack tool) {
+    public IPositionPlacementSequence computeCoordinates(EntityPlayer player, BlockPos hit, EnumFacing sideHit, ItemStack tool) {
         return super.computeCoordinates(player, hit.offset(EnumFacing.DOWN), sideHit, tool);
     }
 

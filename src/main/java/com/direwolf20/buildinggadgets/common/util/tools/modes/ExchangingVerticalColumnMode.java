@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.common.util.tools.modes;
 
-import com.direwolf20.buildinggadgets.api.building.IPlacementSequence;
+import com.direwolf20.buildinggadgets.api.building.IPositionPlacementSequence;
 import com.direwolf20.buildinggadgets.api.building.IValidatorFactory;
 import com.direwolf20.buildinggadgets.api.building.modes.AbstractMode;
 import com.direwolf20.buildinggadgets.api.building.placement.Column;
@@ -33,7 +33,7 @@ public class ExchangingVerticalColumnMode extends AbstractMode {
     }
 
     @Override
-    public IPlacementSequence computeCoordinates(EntityPlayer player, BlockPos hit, EnumFacing sideHit, ItemStack tool) {
+    public IPositionPlacementSequence computeCoordinates(EntityPlayer player, BlockPos hit, EnumFacing sideHit, ItemStack tool) {
         int range = GadgetUtils.getToolRange(tool);
         int radius = MathUtils.floorToOdd(range);
         return Column.centerAt(hit, (sideHit.getAxis().isVertical() ? player.getHorizontalFacing().getAxis() : Axis.Y), radius);

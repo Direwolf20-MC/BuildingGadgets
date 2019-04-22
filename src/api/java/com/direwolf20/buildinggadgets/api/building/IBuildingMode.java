@@ -21,7 +21,7 @@ public interface IBuildingMode {
     /**
      * Iterator that supplies raw coordinates that haven't been filtered yet.
      */
-    IPlacementSequence computeCoordinates(EntityPlayer player, BlockPos hit, EnumFacing sideHit, ItemStack tool);
+    IPositionPlacementSequence computeCoordinates(EntityPlayer player, BlockPos hit, EnumFacing sideHit, ItemStack tool);
 
     /**
      * <p>Get the the block provider that can be accessed by using ItemStack capability system.</p>

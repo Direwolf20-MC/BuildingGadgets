@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.common.util.tools.modes;
 
-import com.direwolf20.buildinggadgets.api.building.IPlacementSequence;
+import com.direwolf20.buildinggadgets.api.building.IPositionPlacementSequence;
 import com.direwolf20.buildinggadgets.api.building.IValidatorFactory;
 import com.direwolf20.buildinggadgets.api.building.Region;
 import com.direwolf20.buildinggadgets.api.building.modes.AbstractMode;
@@ -33,7 +33,7 @@ public class ExchangingSurfaceMode extends AbstractMode {
     }
 
     @Override
-    public IPlacementSequence computeCoordinates(EntityPlayer player, BlockPos hit, EnumFacing sideHit, ItemStack tool) {
+    public IPositionPlacementSequence computeCoordinates(EntityPlayer player, BlockPos hit, EnumFacing sideHit, ItemStack tool) {
         int range = GadgetUtils.getToolRange(tool);
         boolean fuzzy = GadgetGeneric.getFuzzy(tool);
         Region region = Wall.clickedSide(hit, sideHit, range).getBoundingBox();

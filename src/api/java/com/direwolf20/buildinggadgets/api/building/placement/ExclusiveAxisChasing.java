@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.api.building.placement;
 
-import com.direwolf20.buildinggadgets.api.building.IPlacementSequence;
+import com.direwolf20.buildinggadgets.api.building.IPositionPlacementSequence;
 import com.direwolf20.buildinggadgets.api.building.Region;
 import com.direwolf20.buildinggadgets.api.util.VectorUtils;
 import com.google.common.collect.AbstractIterator;
@@ -15,7 +15,7 @@ import java.util.Iterator;
 /**
  * Starts from the selected position, and extend a column of blocks towards a target position on the axis of the selected face.
  */
-public final class ExclusiveAxisChasing implements IPlacementSequence {
+public final class ExclusiveAxisChasing implements IPositionPlacementSequence {
 
     public static ExclusiveAxisChasing create(BlockPos source, BlockPos target, Axis axis) {
         int difference = VectorUtils.getAxisValue(target, axis) - VectorUtils.getAxisValue(source, axis);
@@ -60,7 +60,7 @@ public final class ExclusiveAxisChasing implements IPlacementSequence {
     }
 
     @Override
-    public IPlacementSequence copy() {
+    public IPositionPlacementSequence copy() {
         return new ExclusiveAxisChasing(source, offsetDirection, maxProgression);
     }
 

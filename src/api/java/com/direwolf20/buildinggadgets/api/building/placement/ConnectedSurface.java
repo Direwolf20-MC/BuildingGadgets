@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.api.building.placement;
 
-import com.direwolf20.buildinggadgets.api.building.IPlacementSequence;
+import com.direwolf20.buildinggadgets.api.building.IPositionPlacementSequence;
 import com.direwolf20.buildinggadgets.api.building.Region;
 import com.direwolf20.buildinggadgets.api.util.VectorUtils;
 import com.google.common.annotations.VisibleForTesting;
@@ -10,7 +10,7 @@ import it.unimi.dsi.fastutil.objects.ObjectSet;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IWorldReaderBase;
+import net.minecraft.world.IBlockReader;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayDeque;
@@ -25,23 +25,23 @@ import java.util.function.Function;
  * @see #iterator()
  * @see Surface
  */
-public final class ConnectedSurface implements IPlacementSequence {
+public final class ConnectedSurface implements IPositionPlacementSequence {
 
     /**
      * @param world           Block access for searching reference
      * @param searchingCenter Center of the searching region
      * @param side            Facing to offset from the {@code searchingCenter} to get to the reference region center
      */
-    public static ConnectedSurface create(IWorldReaderBase world, BlockPos searchingCenter, EnumFacing side, int range, boolean fuzzy) {
+    public static ConnectedSurface create(IBlockReader world, BlockPos searchingCenter, EnumFacing side, int range, boolean fuzzy) {
         Region searchingRegion = Wall.clickedSide(searchingCenter, side, range).getBoundingBox();
         return create(world, searchingRegion, pos -> pos.offset(side), searchingCenter, side, fuzzy);
     }
 
-    public static ConnectedSurface create(IWorldReaderBase world, Region searchingRegion, Function<BlockPos, BlockPos> searching2referenceMapper, BlockPos searchingCenter, EnumFacing side, boolean fuzzy) {
+    public static ConnectedSurface create(IBlockReader world, Region searchingRegion, Function<BlockPos, BlockPos> searching2referenceMapper, BlockPos searchingCenter, EnumFacing side, boolean fuzzy) {
         return new ConnectedSurface(world, searchingRegion, searching2referenceMapper, searchingCenter, side, fuzzy);
     }
 
-    private final IWorldReaderBase world;
+    private final IBlockReader world;
     private final Region searchingRegion;
     private final Function<BlockPos, BlockPos> searching2referenceMapper;
     private final BlockPos searchingCenter;
@@ -49,7 +49,7 @@ public final class ConnectedSurface implements IPlacementSequence {
     private final boolean fuzzy;
 
     @VisibleForTesting
-    private ConnectedSurface(IWorldReaderBase world, Region searchingRegion, Function<BlockPos, BlockPos> searching2referenceMapper, BlockPos searchingCenter, EnumFacing side, boolean fuzzy) {
+    private ConnectedSurface(IBlockReader world, Region searchingRegion, Function<BlockPos, BlockPos> searching2referenceMapper, BlockPos searchingCenter, EnumFacing side, boolean fuzzy) {
         this.world = world;
         this.searchingRegion = searchingRegion;
         this.searching2referenceMapper = searching2referenceMapper;
@@ -78,7 +78,7 @@ public final class ConnectedSurface implements IPlacementSequence {
     }
 
     @Override
-    public IPlacementSequence copy() {
+    public IPositionPlacementSequence copy() {
         return new ConnectedSurface(world, searchingRegion, searching2referenceMapper, searchingCenter, side, fuzzy);
     }
 

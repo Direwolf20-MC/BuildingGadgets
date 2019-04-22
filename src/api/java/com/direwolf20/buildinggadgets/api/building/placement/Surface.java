@@ -1,16 +1,17 @@
 package com.direwolf20.buildinggadgets.api.building.placement;
 
-import com.direwolf20.buildinggadgets.api.building.IPlacementSequence;
+import com.direwolf20.buildinggadgets.api.building.IPositionPlacementSequence;
 import com.direwolf20.buildinggadgets.api.building.Region;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.AbstractIterator;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IWorldReaderBase;
+import net.minecraft.world.IBlockReader;
 
 import javax.annotation.Nonnull;
 import java.util.Iterator;
+import java.util.Objects;
 import java.util.function.Function;
 
 /**
@@ -19,41 +20,41 @@ import java.util.function.Function;
  *
  * @see ConnectedSurface
  */
-public final class Surface implements IPlacementSequence {
+public final class Surface implements IPositionPlacementSequence {
 
     /**
      * @param world           Block access for searching reference
      * @param searchingCenter Center of the searching region
      * @param side            Facing to offset from the {@code searchingCenter} to get to the reference region center
      */
-    public static Surface create(IWorldReaderBase world, BlockPos searchingCenter, EnumFacing side, int range, boolean fuzzy) {
+    public static Surface create(IBlockReader world, BlockPos searchingCenter, EnumFacing side, int range, boolean fuzzy) {
         Region searchingRegion = Wall.clickedSide(searchingCenter, side, range).getBoundingBox();
         return create(world, searchingCenter, searchingRegion, pos -> pos.offset(side), fuzzy);
     }
 
-    public static Surface create(IWorldReaderBase world, BlockPos center, Region searchingRegion, Function<BlockPos, BlockPos> searching2referenceMapper, boolean fuzzy) {
-        return new Surface(world, center, searchingRegion, searching2referenceMapper, fuzzy);
+    public static Surface create(IBlockReader world, BlockPos center, Region searchingRegion, Function<BlockPos, BlockPos> searching2referenceMapper, boolean fuzzy) {
+        return new Surface(Objects.requireNonNull(world,"Surface mode is required to have at least an IBlockReader"),
+                           Objects.requireNonNull(center),
+                           Objects.requireNonNull(searchingRegion),
+                           Objects.requireNonNull(searching2referenceMapper),
+                           fuzzy);
     }
 
-    private final IWorldReaderBase world;
+    private final IBlockReader world;
     private final IBlockState selectedBase;
     private final Function<BlockPos, BlockPos> searching2referenceMapper;
     private final Region searchingRegion;
     private final boolean fuzzy;
 
     @VisibleForTesting
-    private Surface(IWorldReaderBase world, BlockPos center, Region searchingRegion, Function<BlockPos, BlockPos> searching2referenceMapper, boolean fuzzy) {
-        this.world = world;
-        this.selectedBase = world.getBlockState(searching2referenceMapper.apply(center));
-        this.searchingRegion = searchingRegion;
-        this.searching2referenceMapper = searching2referenceMapper;
-        this.fuzzy = fuzzy;
+    private Surface(IBlockReader world, BlockPos center, Region searchingRegion, Function<BlockPos, BlockPos> searching2referenceMapper, boolean fuzzy) {
+        this(world,world.getBlockState(searching2referenceMapper.apply(center)),searching2referenceMapper,searchingRegion,fuzzy);
     }
 
     /**
      * For {@link #copy()}
      */
-    private Surface(IWorldReaderBase world, IBlockState selectedBase, Function<BlockPos, BlockPos> searching2referenceMapper, Region searchingRegion, boolean fuzzy) {
+    private Surface(IBlockReader world, IBlockState selectedBase, Function<BlockPos, BlockPos> searching2referenceMapper, Region searchingRegion, boolean fuzzy) {
         this.world = world;
         this.selectedBase = selectedBase;
         this.searching2referenceMapper = searching2referenceMapper;
@@ -76,7 +77,7 @@ public final class Surface implements IPlacementSequence {
     }
 
     @Override
-    public IPlacementSequence copy() {
+    public IPositionPlacementSequence copy() {
         return new Surface(world, selectedBase, searching2referenceMapper, searchingRegion, fuzzy);
     }
 

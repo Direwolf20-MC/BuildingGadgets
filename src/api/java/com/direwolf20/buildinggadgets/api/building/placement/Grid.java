@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.api.building.placement;
 
-import com.direwolf20.buildinggadgets.api.building.IPlacementSequence;
+import com.direwolf20.buildinggadgets.api.building.IPositionPlacementSequence;
 import com.direwolf20.buildinggadgets.api.building.Region;
 import com.direwolf20.buildinggadgets.api.util.MathUtils;
 import com.google.common.annotations.VisibleForTesting;
@@ -15,7 +15,7 @@ import java.util.Iterator;
  * Grid is a set of blocks where each block is equidistant from its neighboring blocks. The distance between the blocks
  * is a periodic sequence with a certain size.
  */
-public final class Grid implements IPlacementSequence {
+public final class Grid implements IPositionPlacementSequence {
 
     public static Grid create(BlockPos base, int range, int periodSize) {
         return new Grid(base, range, periodSize);
@@ -60,7 +60,7 @@ public final class Grid implements IPlacementSequence {
     }
 
     @Override
-    public IPlacementSequence copy() {
+    public IPositionPlacementSequence copy() {
         return new Grid(region, center, range, periodSize);
     }
 
