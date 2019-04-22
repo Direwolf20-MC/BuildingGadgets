@@ -1,8 +1,8 @@
 package com.direwolf20.buildinggadgets.building.placementTests;
 
-import com.direwolf20.buildinggadgets.common.building.Region;
-import com.direwolf20.buildinggadgets.common.building.placement.ConnectedSurface;
-import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
+import com.direwolf20.buildinggadgets.api.building.Region;
+import com.direwolf20.buildinggadgets.api.building.placement.ConnectedSurface;
+import com.direwolf20.buildinggadgets.api.util.VectorUtils;
 import com.direwolf20.buildinggadgets.util.CasedBlockView;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.minecraft.block.state.IBlockState;
@@ -56,9 +56,9 @@ public class ConnectedSurfaceTest {
             ConnectedSurface surface = ConnectedSurface.create(world, BlockPos.ORIGIN.offset(side), side.getOpposite(), 5, false);
             Set<BlockPos> calculated = surface.collect(new ObjectOpenHashSet<>());
 
-            int expected = VectorHelper.getAxisValue(BlockPos.ORIGIN.offset(side), side.getAxis());
+            int expected = VectorUtils.getAxisValue(BlockPos.ORIGIN.offset(side), side.getAxis());
             for (BlockPos pos : calculated) {
-                assertEquals(expected, VectorHelper.getAxisValue(pos, side.getAxis()));
+                assertEquals(expected, VectorUtils.getAxisValue(pos, side.getAxis()));
             }
         }
     }

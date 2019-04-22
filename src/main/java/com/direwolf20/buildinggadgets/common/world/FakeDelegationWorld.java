@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.common.world;
 
-import com.direwolf20.buildinggadgets.api.template.building.BlockData;
+import com.direwolf20.buildinggadgets.api.abstraction.BlockData;
 import com.direwolf20.buildinggadgets.api.template.building.IBuildContext;
 import com.direwolf20.buildinggadgets.api.template.building.SimpleBuildContext;
 import mcp.MethodsReturnNonnullByDefault;

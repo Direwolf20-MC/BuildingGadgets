@@ -55,11 +55,6 @@ public class GadgetUtils {
         return LINK_STARTS.stream().anyMatch(s::startsWith);
     }
 
-    public static final Comparator<Vec3i> POSITION_COMPARATOR = Comparator
-            .comparingInt(Vec3i::getX)
-            .thenComparingInt(Vec3i::getY)
-            .thenComparingInt(Vec3i::getZ);
-
     public static String getStackErrorSuffix(ItemStack stack) {
         return getStackErrorText(stack) + " with NBT tag: " + stack.getTag();
     }

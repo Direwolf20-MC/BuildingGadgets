@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.building.placementTests;
 
-import com.direwolf20.buildinggadgets.common.building.placement.Stair;
+import com.direwolf20.buildinggadgets.api.building.placement.Stair;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import org.junit.jupiter.api.*;

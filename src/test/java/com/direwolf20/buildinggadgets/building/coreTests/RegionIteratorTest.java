@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.building.coreTests;
 
-import com.direwolf20.buildinggadgets.common.building.Region;
-import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
+import com.direwolf20.buildinggadgets.api.building.Region;
+import com.direwolf20.buildinggadgets.api.util.CommonUtils;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.util.math.BlockPos;
 import org.junit.jupiter.api.*;
@@ -77,7 +77,7 @@ public class RegionIteratorTest {
     }
 
     private void iteratorYieldingOrderSortedComparisionBase(Region region) {
-        ImmutableList<BlockPos> sorted = ImmutableList.sortedCopyOf(GadgetUtils.POSITION_COMPARATOR, region);
+        ImmutableList<BlockPos> sorted = ImmutableList.sortedCopyOf(CommonUtils.POSITION_COMPARATOR, region);
         ImmutableList<BlockPos> actual = ImmutableList.copyOf(region);
 
         assertEquals(sorted, actual);

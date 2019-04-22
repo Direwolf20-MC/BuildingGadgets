@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.building.placementTests;
 
-import com.direwolf20.buildinggadgets.common.building.Region;
-import com.direwolf20.buildinggadgets.common.building.placement.Surface;
+import com.direwolf20.buildinggadgets.api.building.Region;
+import com.direwolf20.buildinggadgets.api.building.placement.Surface;
 import com.direwolf20.buildinggadgets.util.CasedBlockView;
 import com.google.common.collect.Sets;
 import net.minecraft.util.EnumFacing;

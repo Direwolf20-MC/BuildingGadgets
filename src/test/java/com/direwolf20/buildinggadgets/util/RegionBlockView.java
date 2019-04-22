@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.util;
 
-import com.direwolf20.buildinggadgets.common.building.Region;
+import com.direwolf20.buildinggadgets.api.building.Region;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;

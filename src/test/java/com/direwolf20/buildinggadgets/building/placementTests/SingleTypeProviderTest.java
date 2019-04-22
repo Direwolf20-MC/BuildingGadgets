@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.building.placementTests;
 
-import com.direwolf20.buildinggadgets.common.building.placement.SingleTypeProvider;
+import com.direwolf20.buildinggadgets.api.building.SingleTypeProvider;
 import com.direwolf20.buildinggadgets.util.UniqueBlockState;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.nbt.NBTTagCompound;

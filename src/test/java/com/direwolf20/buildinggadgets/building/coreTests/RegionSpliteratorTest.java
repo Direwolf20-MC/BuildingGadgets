@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.building.coreTests;
 
-import com.direwolf20.buildinggadgets.common.building.Region;
+import com.direwolf20.buildinggadgets.api.building.Region;
 import com.google.common.collect.ImmutableList;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import it.unimi.dsi.fastutil.longs.LongSet;

@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.api.template.building;
 
+import com.direwolf20.buildinggadgets.api.abstraction.PlacementTarget;
 import com.direwolf20.buildinggadgets.api.abstraction.UniqueItem;
 import com.direwolf20.buildinggadgets.api.exceptions.TemplateException;
 import com.direwolf20.buildinggadgets.api.template.ITemplate;

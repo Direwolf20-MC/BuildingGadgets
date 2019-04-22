@@ -1,11 +1,7 @@
 package com.direwolf20.buildinggadgets.common.util.tools.modes;
 
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
-import com.direwolf20.buildinggadgets.common.building.IBuildingMode;
-import com.direwolf20.buildinggadgets.common.building.modes.ExchangingGridMode;
-import com.direwolf20.buildinggadgets.common.building.modes.ExchangingHorizontalColumnMode;
-import com.direwolf20.buildinggadgets.common.building.modes.ExchangingSurfaceMode;
-import com.direwolf20.buildinggadgets.common.building.modes.ExchangingVerticalColumnMode;
+import com.direwolf20.buildinggadgets.api.building.IBuildingMode;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;

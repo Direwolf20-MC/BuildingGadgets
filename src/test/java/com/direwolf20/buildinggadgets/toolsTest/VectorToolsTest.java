@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.toolsTest;
 
-import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
+import com.direwolf20.buildinggadgets.api.util.VectorUtils;
 import net.minecraft.util.math.BlockPos;
 import org.junit.jupiter.api.*;
 
@@ -20,16 +20,16 @@ public class VectorToolsTest {
         int z = random.nextInt();
         BlockPos pos = new BlockPos(x, y, z);
 
-        assertEquals(pos.getX(), VectorHelper.getAxisValue(pos, Axis.X));
-        assertEquals(pos.getY(), VectorHelper.getAxisValue(pos, Axis.Y));
-        assertEquals(pos.getZ(), VectorHelper.getAxisValue(pos, Axis.Z));
+        assertEquals(pos.getX(), VectorUtils.getAxisValue(pos, Axis.X));
+        assertEquals(pos.getY(), VectorUtils.getAxisValue(pos, Axis.Y));
+        assertEquals(pos.getZ(), VectorUtils.getAxisValue(pos, Axis.Z));
     }
 
     @RepeatedTest(2)
     void perpendicularSurfaceOffsetShouldChangeXAndZWithAxisY() {
         int i = random.nextInt();
         int j = random.nextInt();
-        BlockPos offset = VectorHelper.perpendicularSurfaceOffset(BlockPos.ORIGIN, Axis.Y, i, j);
+        BlockPos offset = VectorUtils.perpendicularSurfaceOffset(BlockPos.ORIGIN, Axis.Y, i, j);
         assertEquals(BlockPos.ORIGIN.add(i, 0, j), offset);
     }
 
@@ -37,7 +37,7 @@ public class VectorToolsTest {
     void perpendicularSurfaceOffsetShouldChangeYAndZWithAxisX() {
         int i = random.nextInt();
         int j = random.nextInt();
-        BlockPos offset = VectorHelper.perpendicularSurfaceOffset(BlockPos.ORIGIN, Axis.X, i, j);
+        BlockPos offset = VectorUtils.perpendicularSurfaceOffset(BlockPos.ORIGIN, Axis.X, i, j);
         assertEquals(BlockPos.ORIGIN.add(0, i, j), offset);
     }
 
@@ -45,7 +45,7 @@ public class VectorToolsTest {
     void perpendicularSurfaceOffsetShouldChangeXAndYWithAxisZ() {
         int i = random.nextInt();
         int j = random.nextInt();
-        BlockPos offset = VectorHelper.perpendicularSurfaceOffset(BlockPos.ORIGIN, Axis.Z, i, j);
+        BlockPos offset = VectorUtils.perpendicularSurfaceOffset(BlockPos.ORIGIN, Axis.Z, i, j);
         assertEquals(BlockPos.ORIGIN.add(i, j, 0), offset);
     }
 

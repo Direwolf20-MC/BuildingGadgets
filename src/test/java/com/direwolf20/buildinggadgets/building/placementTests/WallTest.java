@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.building.placementTests;
 
-import com.direwolf20.buildinggadgets.common.building.placement.Wall;
-import com.direwolf20.buildinggadgets.common.util.tools.MathTool;
+import com.direwolf20.buildinggadgets.api.building.placement.Wall;
+import com.direwolf20.buildinggadgets.api.util.MathUtils;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -18,7 +18,7 @@ public class WallTest {
     @RepeatedTest(8)
     void clickedSideShouldReturnWallWithFlooredNearestOddNumberAsLengthCaseFacingUpRandomInputAndValidatesWithMathTool() {
         int range = random.nextInt(16);
-        int floored = MathHelper.clamp(MathTool.floorToOdd(range), 1, 15);
+        int floored = MathHelper.clamp(MathUtils.floorToOdd(range), 1, 15);
         Wall wall = Wall.clickedSide(BlockPos.ORIGIN, EnumFacing.UP, range);
 
         assertEquals(floored, wall.getBoundingBox().getXSize());

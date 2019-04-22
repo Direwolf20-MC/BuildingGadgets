@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.building.coreTests;
 
-import com.direwolf20.buildinggadgets.common.building.IBlockProvider;
-import com.direwolf20.buildinggadgets.common.building.placement.SingleTypeProvider;
+import com.direwolf20.buildinggadgets.api.building.IBlockProvider;
+import com.direwolf20.buildinggadgets.api.building.SingleTypeProvider;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.math.BlockPos;
 import org.junit.jupiter.api.*;

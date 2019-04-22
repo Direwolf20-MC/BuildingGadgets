@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.building.placementTests;
 
-import com.direwolf20.buildinggadgets.common.building.placement.Grid;
+import com.direwolf20.buildinggadgets.api.building.placement.Grid;
 import net.minecraft.util.math.BlockPos;
 import org.junit.jupiter.api.*;
 

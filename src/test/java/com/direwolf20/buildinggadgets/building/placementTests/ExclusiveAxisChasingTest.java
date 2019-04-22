@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.building.placementTests;
 
-import com.direwolf20.buildinggadgets.common.building.placement.ExclusiveAxisChasing;
-import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
+import com.direwolf20.buildinggadgets.api.building.placement.ExclusiveAxisChasing;
+import com.direwolf20.buildinggadgets.api.util.VectorUtils;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumFacing.Axis;
 import net.minecraft.util.math.BlockPos;
@@ -37,7 +37,7 @@ public class ExclusiveAxisChasingTest {
         BlockPos source = new BlockPos(random.nextInt(3) - 2, random.nextInt(3) - 2, random.nextInt(3) - 2);
         BlockPos target = new BlockPos(random.nextInt(3) - 2, random.nextInt(3) - 2, random.nextInt(3) - 2);
         Axis axis = randomAxis();
-        int difference = VectorHelper.getAxisValue(source, axis) - VectorHelper.getAxisValue(target, axis);
+        int difference = VectorUtils.getAxisValue(source, axis) - VectorUtils.getAxisValue(target, axis);
         int expected = difference <= 1 ? 0 : Math.abs(difference);
 
         ExclusiveAxisChasing sequence = ExclusiveAxisChasing.create(source, target, randomAxis());

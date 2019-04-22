@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.building.coreTests;
 
-import com.direwolf20.buildinggadgets.common.building.Region;
+import com.direwolf20.buildinggadgets.api.building.Region;
 import org.junit.jupiter.api.*;
 
 import static org.junit.jupiter.api.Assertions.*;
