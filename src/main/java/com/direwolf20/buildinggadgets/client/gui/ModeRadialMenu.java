@@ -8,14 +8,14 @@ package com.direwolf20.buildinggadgets.client.gui;
 import com.direwolf20.buildinggadgets.client.KeyBindings;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.items.gadgets.*;
-import com.direwolf20.buildinggadgets.common.tools.modes.BuildingModes;
-import com.direwolf20.buildinggadgets.common.tools.modes.ExchangingModes;
-import com.google.common.collect.ImmutableList;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.*;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGSound;
+import com.direwolf20.buildinggadgets.common.tools.modes.BuildingMode;
+import com.direwolf20.buildinggadgets.common.tools.modes.ExchangingMode;
 import com.direwolf20.buildinggadgets.common.utils.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.utils.ref.Reference;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
@@ -58,9 +58,9 @@ public class ModeRadialMenu extends GuiScreen {
 
     public void setSocketable(ItemStack stack) {
         if (stack.getItem() instanceof GadgetBuilding)
-            segments = BuildingModes.values().length;
+            segments = BuildingMode.values().length;
         else if (stack.getItem() instanceof GadgetExchanger)
-            segments = ExchangingModes.values().length;
+            segments = ExchangingMode.values().length;
         else if (stack.getItem() instanceof GadgetCopyPaste)
             segments = GadgetCopyPaste.ToolMode.values().length;
     }
@@ -278,10 +278,10 @@ public class ModeRadialMenu extends GuiScreen {
         int modeIndex;
         if (tool.getItem() instanceof GadgetBuilding) {
             modeIndex = GadgetBuilding.getToolMode(tool).ordinal();
-            signs = BuildingModes.getIcons();
+            signs = BuildingMode.getIcons();
         } else if (tool.getItem() instanceof GadgetExchanger) {
             modeIndex = GadgetExchanger.getToolMode(tool).ordinal();
-            signs = ExchangingModes.getIcons();
+            signs = ExchangingMode.getIcons();
         } else {
             modeIndex = GadgetCopyPaste.getToolMode(tool).ordinal();
             signs = signsCopyPaste;
@@ -339,9 +339,9 @@ public class ModeRadialMenu extends GuiScreen {
 
             String name;
             if (tool.getItem() instanceof GadgetBuilding)
-                name = BuildingModes.values()[i].toString();
+                name = BuildingMode.values()[i].toString();
             else if (tool.getItem() instanceof GadgetExchanger)
-                name = ExchangingModes.values()[i].toString();
+                name = ExchangingMode.values()[i].toString();
             else
                 name = GadgetCopyPaste.ToolMode.values()[i].toString();
 
@@ -441,9 +441,9 @@ public class ModeRadialMenu extends GuiScreen {
         for (int i = 0; i < conditionalButtons.size(); i++) {
             GuiButton button = conditionalButtons.get(i);
             if (builder)
-                curent = GadgetBuilding.getToolMode(tool) == BuildingModes.Surface;
+                curent = GadgetBuilding.getToolMode(tool) == BuildingMode.SURFACE;
             else
-                curent = i == 0 || GadgetExchanger.getToolMode(tool) == ExchangingModes.Surface;
+                curent = i == 0 || GadgetExchanger.getToolMode(tool) == ExchangingMode.SURFACE;
 
             if (button.visible != curent) {
                 button.visible = curent;

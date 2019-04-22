@@ -1,6 +1,5 @@
 package com.direwolf20.buildinggadgets.common.tools.modes;
 
-import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.building.IBuildingMode;
 import com.direwolf20.buildinggadgets.common.building.modes.ExchangingGridMode;
@@ -26,16 +25,16 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.BiPredicate;
 
-public enum ExchangingModes {
-    Surface("surface.png", new ExchangingSurfaceMode(ExchangingModes::combineTester)),
-    VerticalColumn("vertical_column.png", new ExchangingVerticalColumnMode(ExchangingModes::combineTester)),
-    HorizontalColumn("horizontal_column.png", new ExchangingHorizontalColumnMode(ExchangingModes::combineTester)),
-    Grid("grid.png", new ExchangingGridMode(ExchangingModes::combineTester));
-    private static final ExchangingModes[] VALUES = values();
+public enum ExchangingMode {
+    SURFACE("surface.png", new ExchangingSurfaceMode(ExchangingMode::combineTester)),
+    VERTICAL_COLUMN("vertical_column.png", new ExchangingVerticalColumnMode(ExchangingMode::combineTester)),
+    HORIZONTAL_COLUMN("horizontal_column.png", new ExchangingHorizontalColumnMode(ExchangingMode::combineTester)),
+    GRID("grid.png", new ExchangingGridMode(ExchangingMode::combineTester));
+    private static final ExchangingMode[] VALUES = values();
     private final ResourceLocation icon;
     private final IBuildingMode modeImpl;
 
-    ExchangingModes(String iconFile, IBuildingMode modeImpl) {
+    ExchangingMode(String iconFile, IBuildingMode modeImpl) {
         this.icon = new ResourceLocation(Reference.MODID, "textures/gui/mode/" + iconFile);
         this.modeImpl = modeImpl;
     }
@@ -57,19 +56,19 @@ public enum ExchangingModes {
         return getModeImplementation().getLocalized();
     }
 
-    public ExchangingModes next() {
+    public ExchangingMode next() {
         return VALUES[(this.ordinal() + 1) % VALUES.length];
     }
 
-    public static ExchangingModes byName(String name) {
-        return Arrays.stream(values())
+    public static ExchangingMode byName(String name) {
+        return Arrays.stream(VALUES)
                 .filter(mode -> mode.getRegistryName().equals(name))
                 .findFirst()
-                .orElse(Surface);
+                .orElse(SURFACE);
     }
 
-    private static final ImmutableList<ResourceLocation> ICONS = Arrays.stream(values())
-            .map(ExchangingModes::getIcon)
+    private static final ImmutableList<ResourceLocation> ICONS = Arrays.stream(VALUES)
+            .map(ExchangingMode::getIcon)
             .collect(ImmutableList.toImmutableList());
 
     public static ImmutableList<ResourceLocation> getIcons() {

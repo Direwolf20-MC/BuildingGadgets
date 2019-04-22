@@ -6,7 +6,7 @@ import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
 import com.direwolf20.buildinggadgets.common.tools.ToolRenders;
 import com.direwolf20.buildinggadgets.common.tools.UndoState;
-import com.direwolf20.buildinggadgets.common.tools.modes.BuildingModes;
+import com.direwolf20.buildinggadgets.common.tools.modes.BuildingMode;
 import com.direwolf20.buildinggadgets.common.utils.CapabilityUtil.EnergyUtil;
 import com.direwolf20.buildinggadgets.common.utils.helpers.InventoryHelper;
 import com.direwolf20.buildinggadgets.common.utils.helpers.NBTHelper;
@@ -74,15 +74,15 @@ public class GadgetBuilding extends GadgetPlacing {
         return Config.GADGETS.GADGET_BUILDING.durabilityCost.get();
     }
 
-    private static void setToolMode(ItemStack tool, BuildingModes mode) {
+    private static void setToolMode(ItemStack tool, BuildingMode mode) {
         //Store the tool's mode in NBT as a string
         NBTTagCompound tagCompound = NBTHelper.getOrNewTag(tool);
         tagCompound.setString("mode", mode.getRegistryName());
     }
 
-    public static BuildingModes getToolMode(ItemStack tool) {
+    public static BuildingMode getToolMode(ItemStack tool) {
         NBTTagCompound tagCompound = NBTHelper.getOrNewTag(tool);
-        return BuildingModes.byName(tagCompound.getString("mode"));
+        return BuildingMode.byName(tagCompound.getString("mode"));
     }
 
     public static boolean shouldPlaceAtop(ItemStack stack) {
@@ -101,16 +101,17 @@ public class GadgetBuilding extends GadgetPlacing {
         tooltip.add(TooltipTranslation.GADGET_BLOCK
                             .componentTranslation(LangUtil.getFormattedBlockName(getToolBlock(stack)))
                             .setStyle(Styles.DK_GREEN));
-        BuildingModes mode = getToolMode(stack);
+        BuildingMode mode = getToolMode(stack);
         tooltip.add(TooltipTranslation.GADGET_MODE
-                            .componentTranslation((mode == BuildingModes.Surface && getConnectedArea(stack) ? TooltipTranslation.GADGET_CONNECTED.format(mode) : mode))
+                            .componentTranslation((mode == BuildingMode.SURFACE && getConnectedArea(stack) ? TooltipTranslation.GADGET_CONNECTED
+                                    .format(mode) : mode))
                             .setStyle(Styles.AQUA));
-        if (getToolMode(stack) != BuildingModes.TargetedAxisChasing)
+        if (getToolMode(stack) != BuildingMode.TARGETED_AXIS_CHASING)
             tooltip.add(TooltipTranslation.GADGET_RANGE
                         .componentTranslation(getToolRange(stack))
                          .setStyle(Styles.LT_PURPLE));
 
-        if (getToolMode(stack) == BuildingModes.Surface)
+        if (getToolMode(stack) == BuildingMode.SURFACE)
             tooltip.add(TooltipTranslation.GADGET_FUZZY
                                 .componentTranslation(String.valueOf(getFuzzy(stack)))
                                 .setStyle(Styles.GOLD));
@@ -152,7 +153,7 @@ public class GadgetBuilding extends GadgetPlacing {
 
     public void setMode(EntityPlayer player, ItemStack heldItem, int modeInt) {
         //Called when we specify a mode with the radial menu
-        BuildingModes mode = BuildingModes.values()[modeInt];
+        BuildingMode mode = BuildingMode.values()[modeInt];
         setToolMode(heldItem, mode);
         player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.toolmode").getUnformattedComponentText() + ": " + mode), true);
     }
@@ -160,7 +161,7 @@ public class GadgetBuilding extends GadgetPlacing {
     public static void rangeChange(EntityPlayer player, ItemStack heldItem) {
         //Called when the range change hotkey is pressed
         int range = getToolRange(heldItem);
-        int changeAmount = (getToolMode(heldItem) != BuildingModes.Surface || (range % 2 == 0)) ? 1 : 2;
+        int changeAmount = (getToolMode(heldItem) != BuildingMode.SURFACE || (range % 2 == 0)) ? 1 : 2;
         if (player.isSneaking())
             range = (range == 1) ? Config.GADGETS.maxRange.get() : range - changeAmount;
         else
@@ -182,7 +183,7 @@ public class GadgetBuilding extends GadgetPlacing {
             }
             BlockPos startBlock = lookingAt.getBlockPos();
             EnumFacing sideHit = lookingAt.sideHit;
-            coords = BuildingModes.collectPlacementPos(world, player, startBlock, sideHit, stack, startBlock);
+            coords = BuildingMode.collectPlacementPos(world, player, startBlock, sideHit, stack, startBlock);
         } else { //If we do have an anchor, erase it (Even if the build fails)
             setAnchor(stack, new ArrayList<BlockPos>());
         }

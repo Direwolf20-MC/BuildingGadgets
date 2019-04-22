@@ -2,12 +2,12 @@ package com.direwolf20.buildinggadgets.common.tools.modes;
 
 import com.direwolf20.buildinggadgets.common.building.IBuildingMode;
 import com.direwolf20.buildinggadgets.common.building.modes.*;
+import com.direwolf20.buildinggadgets.common.config.Config;
+import com.direwolf20.buildinggadgets.common.utils.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.utils.blocks.BlockMap;
 import com.direwolf20.buildinggadgets.common.utils.helpers.NBTHelper;
 import com.direwolf20.buildinggadgets.common.utils.ref.Reference;
 import com.google.common.collect.ImmutableList;
-import com.direwolf20.buildinggadgets.common.config.Config;
-import com.direwolf20.buildinggadgets.common.utils.GadgetUtils;
 import it.unimi.dsi.fastutil.doubles.Double2ObjectArrayMap;
 import it.unimi.dsi.fastutil.doubles.Double2ObjectMap;
 import it.unimi.dsi.fastutil.doubles.DoubleRBTreeSet;
@@ -24,20 +24,20 @@ import net.minecraft.world.World;
 import java.util.*;
 import java.util.function.BiPredicate;
 
-public enum BuildingModes {
-    TargetedAxisChasing("build_to_me.png", new BuildToMeMode(BuildingModes::combineTester)),
-    VerticalColumn("vertical_column.png", new BuildingVerticalColumnMode(BuildingModes::combineTester)),
-    HorizontalColumn("horizontal_column.png", new BuildingHorizontalColumnMode(BuildingModes::combineTester)),
-    VerticalWall("vertical_wall.png", new VerticalWallMode(BuildingModes::combineTester)),
-    HorizontalWall("horizontal_wall.png", new HorizontalWallMode(BuildingModes::combineTester)),
-    Stair("stairs.png", new StairMode(BuildingModes::combineTester)),
-    Grid("grid.png", new GridMode(BuildingModes::combineTester)),
-    Surface("surface.png", new BuildingSurfaceMode(BuildingModes::combineTester));
-    private static final BuildingModes[] VALUES = values();
+public enum BuildingMode {
+    TARGETED_AXIS_CHASING("build_to_me.png", new BuildToMeMode(BuildingMode::combineTester)),
+    VERTICAL_COLUMN("vertical_column.png", new BuildingVerticalColumnMode(BuildingMode::combineTester)),
+    HORIZONTAL_COLUMN("horizontal_column.png", new BuildingHorizontalColumnMode(BuildingMode::combineTester)),
+    VERTICAL_WALL("vertical_wall.png", new VerticalWallMode(BuildingMode::combineTester)),
+    HORIZONTAL_WALL("horizontal_wall.png", new HorizontalWallMode(BuildingMode::combineTester)),
+    STAIR("stairs.png", new StairMode(BuildingMode::combineTester)),
+    GRID("grid.png", new GridMode(BuildingMode::combineTester)),
+    SURFACE("surface.png", new BuildingSurfaceMode(BuildingMode::combineTester));
+    private static final BuildingMode[] VALUES = values();
     private final ResourceLocation icon;
     private final IBuildingMode modeImpl;
 
-    BuildingModes(String iconFile, IBuildingMode modeImpl) {
+    BuildingMode(String iconFile, IBuildingMode modeImpl) {
         this.icon = new ResourceLocation(Reference.MODID, "textures/gui/mode/" + iconFile);
         this.modeImpl = modeImpl;
     }
@@ -59,7 +59,7 @@ public enum BuildingModes {
         return getModeImplementation().getLocalized();
     }
 
-    public BuildingModes next() {
+    public BuildingMode next() {
         return VALUES[(this.ordinal() + 1) % VALUES.length];
     }
 
@@ -69,15 +69,15 @@ public enum BuildingModes {
                 .collectFilteredSequence(world, tool, player, initial);
     }
 
-    public static BuildingModes byName(String name) {
-        return Arrays.stream(values())
+    public static BuildingMode byName(String name) {
+        return Arrays.stream(VALUES)
                 .filter(mode -> mode.getRegistryName().equals(name))
                 .findFirst()
-                .orElse(TargetedAxisChasing);
+                .orElse(TARGETED_AXIS_CHASING);
     }
 
     private static final ImmutableList<ResourceLocation> ICONS = Arrays.stream(values())
-            .map(BuildingModes::getIcon)
+            .map(BuildingMode::getIcon)
             .collect(ImmutableList.toImmutableList());
 
     public static ImmutableList<ResourceLocation> getIcons() {

@@ -4,7 +4,7 @@ import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
 import com.direwolf20.buildinggadgets.common.tools.ToolRenders;
-import com.direwolf20.buildinggadgets.common.tools.modes.ExchangingModes;
+import com.direwolf20.buildinggadgets.common.tools.modes.ExchangingMode;
 import com.direwolf20.buildinggadgets.common.utils.CapabilityUtil.EnergyUtil;
 import com.direwolf20.buildinggadgets.common.utils.helpers.InventoryHelper;
 import com.direwolf20.buildinggadgets.common.utils.helpers.NBTHelper;
@@ -99,15 +99,15 @@ public class GadgetExchanger extends GadgetSwapping {
         return super.canApplyAtEnchantingTable(stack, enchantment);
     }
 
-    private static void setToolMode(ItemStack tool, ExchangingModes mode) {
+    private static void setToolMode(ItemStack tool, ExchangingMode mode) {
         //Store the tool's mode in NBT as a string
         NBTTagCompound tagCompound = NBTHelper.getOrNewTag(tool);
         tagCompound.setString("mode", mode.getRegistryName());
     }
 
-    public static ExchangingModes getToolMode(ItemStack tool) {
+    public static ExchangingMode getToolMode(ItemStack tool) {
         NBTTagCompound tagCompound = NBTHelper.getOrNewTag(tool);
-        return ExchangingModes.byName(tagCompound.getString("mode"));
+        return ExchangingMode.byName(tagCompound.getString("mode"));
     }
 
     @Override
@@ -116,9 +116,10 @@ public class GadgetExchanger extends GadgetSwapping {
         tooltip.add(TooltipTranslation.GADGET_BLOCK
                             .componentTranslation(LangUtil.getFormattedBlockName(getToolBlock(stack)))
                             .setStyle(Styles.DK_GREEN));
-        ExchangingModes mode = getToolMode(stack);
+        ExchangingMode mode = getToolMode(stack);
         tooltip.add(TooltipTranslation.GADGET_MODE
-                            .componentTranslation((mode == ExchangingModes.Surface && getConnectedArea(stack) ? TooltipTranslation.GADGET_CONNECTED.format(mode) : mode))
+                            .componentTranslation((mode == ExchangingMode.SURFACE && getConnectedArea(stack) ? TooltipTranslation.GADGET_CONNECTED
+                                    .format(mode) : mode))
                             .setStyle(Styles.AQUA));
         tooltip.add(TooltipTranslation.GADGET_RANGE
                             .componentTranslation(getToolRange(stack))
@@ -154,14 +155,14 @@ public class GadgetExchanger extends GadgetSwapping {
 
     public void setMode(EntityPlayer player, ItemStack heldItem, int modeInt) {
         //Called when we specify a mode with the radial menu
-        ExchangingModes mode = ExchangingModes.values()[modeInt];
+        ExchangingMode mode = ExchangingMode.values()[modeInt];
         setToolMode(heldItem, mode);
         player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.toolmode").getUnformattedComponentText() + ": " + mode), true);
     }
 
     public static void rangeChange(EntityPlayer player, ItemStack heldItem) {
         int range = getToolRange(heldItem);
-        int changeAmount = (getToolMode(heldItem) == ExchangingModes.Grid || (range % 2 == 0)) ? 1 : 2;
+        int changeAmount = (getToolMode(heldItem) == ExchangingMode.GRID || (range % 2 == 0)) ? 1 : 2;
         if (player.isSneaking()) {
             range = (range <= 1) ? Config.GADGETS.maxRange.get() : range - changeAmount;
         } else {
@@ -183,7 +184,7 @@ public class GadgetExchanger extends GadgetSwapping {
             BlockPos startBlock = lookingAt.getBlockPos();
             EnumFacing sideHit = lookingAt.sideHit;
 //            IBlockState setBlock = getToolBlock(stack);
-            coords = ExchangingModes.collectPlacementPos(world, player, startBlock, sideHit, stack, startBlock);
+            coords = ExchangingMode.collectPlacementPos(world, player, startBlock, sideHit, stack, startBlock);
         } else { //If we do have an anchor, erase it (Even if the build fails)
             setAnchor(stack, new ArrayList<BlockPos>());
         }
