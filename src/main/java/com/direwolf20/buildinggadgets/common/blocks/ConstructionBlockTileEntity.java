@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.common.blocks;
 
 import com.direwolf20.buildinggadgets.common.registry.objects.BGTileEntities;
-import com.direwolf20.buildinggadgets.common.utils.ref.NBTKeys;
+import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;

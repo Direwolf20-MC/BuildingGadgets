@@ -1,10 +1,9 @@
 package com.direwolf20.buildinggadgets.common.building.modes;
 
-import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.building.IPlacementSequence;
 import com.direwolf20.buildinggadgets.common.building.IValidatorFactory;
 import com.direwolf20.buildinggadgets.common.building.placement.ExclusiveAxisChasing;
-import com.direwolf20.buildinggadgets.common.utils.ref.Reference;
+import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;

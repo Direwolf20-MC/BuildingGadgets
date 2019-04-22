@@ -11,7 +11,7 @@ import com.direwolf20.buildinggadgets.common.config.crafting.RecipeConstructionP
 import com.direwolf20.buildinggadgets.common.events.AnvilRepairHandler;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.registry.objects.BuildingObjects;
-import com.direwolf20.buildinggadgets.common.utils.ref.Reference;
+import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import net.minecraft.command.Commands;
 import net.minecraft.item.crafting.RecipeSerializers;
 import net.minecraftforge.api.distmarker.Dist;

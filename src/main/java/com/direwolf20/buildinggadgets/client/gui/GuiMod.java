@@ -5,14 +5,11 @@ import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateMana
 import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManagerGUI;
 import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManagerTileEntity;
 import com.direwolf20.buildinggadgets.common.items.ITemplate;
-import com.direwolf20.buildinggadgets.common.items.Template;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetDestruction;
-import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
-import com.direwolf20.buildinggadgets.common.utils.lang.LangUtil;
-import com.direwolf20.buildinggadgets.common.utils.ref.Reference;
+import com.direwolf20.buildinggadgets.common.util.lang.LangUtil;
+import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.google.common.base.Function;
-import com.google.common.base.Preconditions;
 import com.google.common.base.Supplier;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;

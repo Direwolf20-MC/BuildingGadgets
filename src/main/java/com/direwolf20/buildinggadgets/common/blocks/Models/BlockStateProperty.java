@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.common.blocks.Models;
 
-import com.direwolf20.buildinggadgets.common.utils.blocks.BlockStateWrapper;
+import com.direwolf20.buildinggadgets.common.util.blocks.BlockStateWrapper;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.block.Block;
 import net.minecraft.state.AbstractProperty;

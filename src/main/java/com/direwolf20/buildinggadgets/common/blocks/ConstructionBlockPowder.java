@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.common.blocks;
 
 import com.direwolf20.buildinggadgets.common.entities.ConstructionBlockEntity;
-import com.direwolf20.buildinggadgets.common.utils.lang.TooltipTranslation;
+import com.direwolf20.buildinggadgets.common.util.lang.TooltipTranslation;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockFalling;
 import net.minecraft.block.state.IBlockState;

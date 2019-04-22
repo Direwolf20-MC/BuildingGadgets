@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.common.network;
 
 import com.direwolf20.buildinggadgets.common.network.packets.*;
-import com.direwolf20.buildinggadgets.common.utils.ref.Reference;
+import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ResourceLocation;

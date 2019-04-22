@@ -1,17 +1,14 @@
 package com.direwolf20.buildinggadgets.client.gui.materiallist;
 
-import com.direwolf20.buildinggadgets.client.gui.DireButton;
 import com.direwolf20.buildinggadgets.client.gui.GuiButtonAction;
 import com.direwolf20.buildinggadgets.client.gui.base.BasicGUIBase;
 import com.direwolf20.buildinggadgets.client.utils.AlignmentUtil;
 import com.direwolf20.buildinggadgets.client.utils.RenderUtil;
 import com.direwolf20.buildinggadgets.common.items.ITemplate;
-import com.direwolf20.buildinggadgets.common.items.Template;
-import com.direwolf20.buildinggadgets.common.utils.ref.Reference;
+import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.google.common.base.Preconditions;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
-import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.resources.I18n;

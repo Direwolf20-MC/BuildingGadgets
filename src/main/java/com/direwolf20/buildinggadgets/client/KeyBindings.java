@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.client;
 
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
-import com.direwolf20.buildinggadgets.common.utils.ref.Reference;
+import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.client.util.InputMappings;

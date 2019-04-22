@@ -1,6 +1,5 @@
 package com.direwolf20.buildinggadgets.common.building.modes;
 
-import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.building.IPlacementSequence;
 import com.direwolf20.buildinggadgets.common.building.IValidatorFactory;
 import com.direwolf20.buildinggadgets.common.building.Region;
@@ -8,8 +7,8 @@ import com.direwolf20.buildinggadgets.common.building.placement.ConnectedSurface
 import com.direwolf20.buildinggadgets.common.building.placement.Surface;
 import com.direwolf20.buildinggadgets.common.building.placement.Wall;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
-import com.direwolf20.buildinggadgets.common.utils.GadgetUtils;
-import com.direwolf20.buildinggadgets.common.utils.ref.Reference;
+import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
+import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;

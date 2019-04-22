@@ -2,7 +2,7 @@ package com.direwolf20.buildinggadgets.common.building.placement;
 
 import com.direwolf20.buildinggadgets.common.building.IPlacementSequence;
 import com.direwolf20.buildinggadgets.common.building.Region;
-import com.direwolf20.buildinggadgets.common.utils.helpers.VectorHelper;
+import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
 import com.google.common.collect.AbstractIterator;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumFacing.Axis;

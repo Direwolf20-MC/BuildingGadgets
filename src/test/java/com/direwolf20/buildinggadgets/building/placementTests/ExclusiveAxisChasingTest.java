@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.building.placementTests;
 
 import com.direwolf20.buildinggadgets.common.building.placement.ExclusiveAxisChasing;
-import com.direwolf20.buildinggadgets.common.utils.helpers.VectorHelper;
+import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumFacing.Axis;
 import net.minecraft.util.math.BlockPos;

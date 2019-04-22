@@ -2,7 +2,7 @@ package com.direwolf20.buildinggadgets.common.commands;
 
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketBlockMap;
-import com.direwolf20.buildinggadgets.common.utils.ref.NBTKeys;
+import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.world.WorldSave;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;

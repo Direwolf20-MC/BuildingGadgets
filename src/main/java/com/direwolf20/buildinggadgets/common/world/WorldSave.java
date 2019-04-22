@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.common.world;
 
-import com.direwolf20.buildinggadgets.common.utils.ref.NBTKeys;
-import com.direwolf20.buildinggadgets.common.utils.ref.Reference;
+import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
+import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.world.World;

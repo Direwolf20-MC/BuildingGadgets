@@ -5,13 +5,12 @@ import com.direwolf20.buildinggadgets.common.items.capability.CapabilityProvider
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.items.capability.CapabilityProviderEnergy;
 import com.direwolf20.buildinggadgets.common.items.capability.MultiCapabilityProvider;
-import net.minecraft.client.resources.I18n;
-import com.direwolf20.buildinggadgets.common.utils.CapabilityUtil.EnergyUtil;
-import com.direwolf20.buildinggadgets.common.utils.exceptions.CapabilityNotPresentException;
-import com.direwolf20.buildinggadgets.common.utils.helpers.NBTHelper;
-import com.direwolf20.buildinggadgets.common.utils.lang.Styles;
-import com.direwolf20.buildinggadgets.common.utils.lang.TooltipTranslation;
-import com.direwolf20.buildinggadgets.common.utils.ref.NBTKeys;
+import com.direwolf20.buildinggadgets.common.util.CapabilityUtil.EnergyUtil;
+import com.direwolf20.buildinggadgets.common.util.exceptions.CapabilityNotPresentException;
+import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
+import com.direwolf20.buildinggadgets.common.util.lang.Styles;
+import com.direwolf20.buildinggadgets.common.util.lang.TooltipTranslation;
+import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.IItemPropertyGetter;
@@ -25,14 +24,13 @@ import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
 
 import javax.annotation.Nullable;
 import java.util.List;
 
-import static com.direwolf20.buildinggadgets.common.utils.GadgetUtils.withSuffix;
+import static com.direwolf20.buildinggadgets.common.util.GadgetUtils.withSuffix;
 
 public abstract class GadgetGeneric extends Item {
     private static final IItemPropertyGetter DAMAGED_GETTER =

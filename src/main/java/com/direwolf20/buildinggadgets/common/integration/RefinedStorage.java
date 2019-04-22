@@ -4,9 +4,9 @@ import javax.annotation.Nullable;
 
 import com.direwolf20.buildinggadgets.common.integration.IntegrationHandler.IntegratedMod;
 import com.direwolf20.buildinggadgets.common.integration.IntegrationHandler.IIntegratedMod;
-import com.direwolf20.buildinggadgets.common.tools.NetworkIO;
+import com.direwolf20.buildinggadgets.common.util.tools.NetworkIO;
 /*
-import com.direwolf20.buildinggadgets.common.tools.NetworkIO.NetworkRefinedStorageIO;
+import com.direwolf20.buildinggadgets.common.util.tools.NetworkIO.NetworkRefinedStorageIO;
 import com.raoulvdberge.refinedstorage.api.network.INetwork;
 import com.raoulvdberge.refinedstorage.api.network.node.INetworkNodeProxy;
 */

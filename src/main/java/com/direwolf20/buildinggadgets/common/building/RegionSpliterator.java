@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.common.building;
 
-import com.direwolf20.buildinggadgets.common.utils.GadgetUtils;
+import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import net.minecraft.util.math.BlockPos;
 
 import java.util.Comparator;
@@ -121,7 +121,7 @@ class RegionSpliterator implements Spliterator<BlockPos> {
     }
 
     /**
-     * @return {@link com.direwolf20.buildinggadgets.common.utils.GadgetUtils#POSITION_COMPARATOR}
+     * @return {@link com.direwolf20.buildinggadgets.common.util.GadgetUtils#POSITION_COMPARATOR}
      */
     @Override
     public Comparator<? super BlockPos> getComparator() {

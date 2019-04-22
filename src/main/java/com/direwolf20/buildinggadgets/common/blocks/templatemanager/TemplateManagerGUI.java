@@ -15,10 +15,10 @@ import com.direwolf20.buildinggadgets.common.network.packets.PacketTemplateManag
 import com.direwolf20.buildinggadgets.common.network.packets.PacketTemplateManagerPaste;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketTemplateManagerSave;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
-import com.direwolf20.buildinggadgets.common.utils.GadgetUtils;
-import com.direwolf20.buildinggadgets.common.utils.buffers.PasteToolBufferBuilder;
-import com.direwolf20.buildinggadgets.common.utils.buffers.ToolBufferBuilder;
-import com.direwolf20.buildinggadgets.common.utils.ref.Reference;
+import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
+import com.direwolf20.buildinggadgets.common.util.buffers.PasteToolBufferBuilder;
+import com.direwolf20.buildinggadgets.common.util.buffers.ToolBufferBuilder;
+import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiTextField;

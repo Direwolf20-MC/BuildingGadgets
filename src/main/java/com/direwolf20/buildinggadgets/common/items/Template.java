@@ -2,10 +2,10 @@ package com.direwolf20.buildinggadgets.common.items;
 
 import com.direwolf20.buildinggadgets.client.events.EventTooltip;
 import com.direwolf20.buildinggadgets.client.gui.GuiMod;
-import com.direwolf20.buildinggadgets.common.utils.GadgetUtils;
-import com.direwolf20.buildinggadgets.common.utils.lang.Styles;
-import com.direwolf20.buildinggadgets.common.utils.lang.TooltipTranslation;
-import com.direwolf20.buildinggadgets.common.utils.ref.NBTKeys;
+import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
+import com.direwolf20.buildinggadgets.common.util.lang.Styles;
+import com.direwolf20.buildinggadgets.common.util.lang.TooltipTranslation;
+import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.world.WorldSave;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;

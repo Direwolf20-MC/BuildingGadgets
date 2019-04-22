@@ -3,15 +3,15 @@ package com.direwolf20.buildinggadgets.common.items.gadgets;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
-import com.direwolf20.buildinggadgets.common.tools.ToolRenders;
-import com.direwolf20.buildinggadgets.common.tools.modes.ExchangingMode;
-import com.direwolf20.buildinggadgets.common.utils.CapabilityUtil.EnergyUtil;
-import com.direwolf20.buildinggadgets.common.utils.helpers.InventoryHelper;
-import com.direwolf20.buildinggadgets.common.utils.helpers.NBTHelper;
-import com.direwolf20.buildinggadgets.common.utils.helpers.VectorHelper;
-import com.direwolf20.buildinggadgets.common.utils.lang.LangUtil;
-import com.direwolf20.buildinggadgets.common.utils.lang.Styles;
-import com.direwolf20.buildinggadgets.common.utils.lang.TooltipTranslation;
+import com.direwolf20.buildinggadgets.common.util.tools.ToolRenders;
+import com.direwolf20.buildinggadgets.common.util.tools.modes.ExchangingMode;
+import com.direwolf20.buildinggadgets.common.util.CapabilityUtil.EnergyUtil;
+import com.direwolf20.buildinggadgets.common.util.helpers.InventoryHelper;
+import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
+import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
+import com.direwolf20.buildinggadgets.common.util.lang.LangUtil;
+import com.direwolf20.buildinggadgets.common.util.lang.Styles;
+import com.direwolf20.buildinggadgets.common.util.lang.TooltipTranslation;
 import com.direwolf20.buildinggadgets.common.world.FakeBuilderWorld;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.util.ITooltipFlag;
@@ -44,7 +44,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static com.direwolf20.buildinggadgets.common.utils.GadgetUtils.*;
+import static com.direwolf20.buildinggadgets.common.util.GadgetUtils.*;
 
 public class GadgetExchanger extends GadgetSwapping {
     private static final FakeBuilderWorld fakeWorld = new FakeBuilderWorld();

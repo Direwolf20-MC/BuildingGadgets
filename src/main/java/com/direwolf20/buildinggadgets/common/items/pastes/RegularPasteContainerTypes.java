@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.common.items.pastes;
 
 import com.direwolf20.buildinggadgets.common.config.Config;
-import com.direwolf20.buildinggadgets.common.utils.ref.Reference.ItemReference;
+import com.direwolf20.buildinggadgets.common.util.ref.Reference.ItemReference;
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
 

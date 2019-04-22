@@ -2,7 +2,7 @@ package com.direwolf20.buildinggadgets.common.building.placement;
 
 import com.direwolf20.buildinggadgets.common.building.IPlacementSequence;
 import com.direwolf20.buildinggadgets.common.building.Region;
-import com.direwolf20.buildinggadgets.common.tools.MathTool;
+import com.direwolf20.buildinggadgets.common.util.tools.MathTool;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.AbstractIterator;
 import net.minecraft.util.EnumFacing;

@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.common.registry.objects;
 
 import com.direwolf20.buildinggadgets.client.ClientProxy;
-import com.direwolf20.buildinggadgets.common.utils.ref.Reference;
+import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
 import net.minecraftforge.event.RegistryEvent;

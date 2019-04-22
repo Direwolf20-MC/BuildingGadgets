@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.building.placementTests;
 
 import com.direwolf20.buildinggadgets.common.building.placement.Wall;
-import com.direwolf20.buildinggadgets.common.tools.MathTool;
+import com.direwolf20.buildinggadgets.common.util.tools.MathTool;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;

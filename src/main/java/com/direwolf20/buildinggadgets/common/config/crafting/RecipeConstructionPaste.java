@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.common.config.crafting;
 
 import com.direwolf20.buildinggadgets.common.items.pastes.GenericPasteContainer;
-import com.direwolf20.buildinggadgets.common.utils.ref.Reference;
+import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.google.gson.JsonObject;
 
 import net.minecraft.inventory.IInventory;

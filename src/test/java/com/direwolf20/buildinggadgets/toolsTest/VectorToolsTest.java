@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.toolsTest;
 
-import com.direwolf20.buildinggadgets.common.utils.helpers.VectorHelper;
+import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
 import net.minecraft.util.math.BlockPos;
 import org.junit.jupiter.api.*;
 

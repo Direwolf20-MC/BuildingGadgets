@@ -2,7 +2,7 @@ package com.direwolf20.buildinggadgets.common.config;
 
 import com.direwolf20.buildinggadgets.api.abstraction.IApiConfig;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
-import com.direwolf20.buildinggadgets.common.utils.ref.Reference;
+import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;

@@ -2,10 +2,10 @@ package com.direwolf20.buildinggadgets.client;
 
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketSetRemoteInventoryCache;
-import com.direwolf20.buildinggadgets.common.utils.helpers.InventoryHelper.IRemoteInventoryProvider;
-import com.direwolf20.buildinggadgets.common.utils.ref.NBTKeys;
-import com.direwolf20.buildinggadgets.common.tools.UniqueItem;
-import com.direwolf20.buildinggadgets.common.utils.GadgetUtils;
+import com.direwolf20.buildinggadgets.common.util.helpers.InventoryHelper.IRemoteInventoryProvider;
+import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
+import com.direwolf20.buildinggadgets.common.util.tools.UniqueItem;
+import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.Multiset;
 import net.minecraft.item.ItemStack;

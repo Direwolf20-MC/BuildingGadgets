@@ -1,11 +1,11 @@
 package com.direwolf20.buildinggadgets.common.items.pastes;
 
-import com.direwolf20.buildinggadgets.common.utils.helpers.InventoryHelper;
-import com.direwolf20.buildinggadgets.common.utils.helpers.NBTHelper;
-import com.direwolf20.buildinggadgets.common.utils.lang.Styles;
-import com.direwolf20.buildinggadgets.common.utils.lang.TooltipTranslation;
-import com.direwolf20.buildinggadgets.common.utils.ref.NBTKeys;
-import com.direwolf20.buildinggadgets.common.utils.ref.Reference;
+import com.direwolf20.buildinggadgets.common.util.helpers.InventoryHelper;
+import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
+import com.direwolf20.buildinggadgets.common.util.lang.Styles;
+import com.direwolf20.buildinggadgets.common.util.lang.TooltipTranslation;
+import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
+import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;

@@ -2,10 +2,10 @@ package com.direwolf20.buildinggadgets.common.network.packets;
 
 import com.direwolf20.buildinggadgets.client.events.EventTooltip;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
-import com.direwolf20.buildinggadgets.common.utils.helpers.InventoryHelper;
-import com.direwolf20.buildinggadgets.common.tools.ToolRenders;
-import com.direwolf20.buildinggadgets.common.tools.UniqueItem;
-import com.direwolf20.buildinggadgets.common.utils.GadgetUtils;
+import com.direwolf20.buildinggadgets.common.util.helpers.InventoryHelper;
+import com.direwolf20.buildinggadgets.common.util.tools.ToolRenders;
+import com.direwolf20.buildinggadgets.common.util.tools.UniqueItem;
+import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.Multiset.Entry;

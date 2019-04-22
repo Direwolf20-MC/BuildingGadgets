@@ -11,8 +11,8 @@ import com.direwolf20.buildinggadgets.common.items.pastes.ConstructionPasteConta
 import com.direwolf20.buildinggadgets.common.items.pastes.RegularPasteContainerTypes;
 import com.direwolf20.buildinggadgets.common.registry.RegistryContainer;
 import com.direwolf20.buildinggadgets.common.registry.RegistryObjectBuilder;
-import com.direwolf20.buildinggadgets.common.utils.ref.Reference;
-import com.direwolf20.buildinggadgets.common.utils.ref.Reference.ItemReference;
+import com.direwolf20.buildinggadgets.common.util.ref.Reference;
+import com.direwolf20.buildinggadgets.common.util.ref.Reference.ItemReference;
 import net.minecraft.item.Item;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;

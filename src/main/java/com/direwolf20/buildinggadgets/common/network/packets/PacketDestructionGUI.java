@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.common.network.packets;
 
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetDestruction;
-import com.direwolf20.buildinggadgets.common.utils.ref.NBTKeys;
+import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;

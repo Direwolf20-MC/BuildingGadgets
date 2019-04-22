@@ -298,7 +298,7 @@ public final class Region implements IPlacementSequence {
      * @return A {@link PeekingIterator} over all positions in this Region
      * @implSpec starts at (minX, minY, minZ), ends at (maxX, maxY, maxZ)
      * @implNote the Iterator does not support removal Operations
-     * @see com.direwolf20.buildinggadgets.common.utils.GadgetUtils#POSITION_COMPARATOR
+     * @see com.direwolf20.buildinggadgets.common.util.GadgetUtils#POSITION_COMPARATOR
      */
     @Override
     public PeekingIterator<BlockPos> iterator() {

@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.building.coreTests;
 
 import com.direwolf20.buildinggadgets.common.building.Region;
-import com.direwolf20.buildinggadgets.common.utils.GadgetUtils;
+import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.util.math.BlockPos;
 import org.junit.jupiter.api.*;
