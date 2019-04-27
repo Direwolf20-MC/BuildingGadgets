@@ -98,7 +98,7 @@ public class ToolRenders {
         if (coordinates.size() == 0 && lookingAt != null)
             coordinates = BuildingModes.collectPlacementPos(player.world, player, lookingAt.getBlockPos(), lookingAt.sideHit, heldItem, lookingAt.getBlockPos());
 
-        // Figure out how many of the block we're rendering we have in the inventory of the player.
+        // Figure out how many of the block we're rendering are in the player inventory.
         ItemStack itemStack = ToolRenders.Utils.getSilkDropIfPresent(player.world, renderBlockState, player);
 
         // Check if we have the blocks required
@@ -117,6 +117,7 @@ public class ToolRenders {
         List<BlockPos> sortedCoordinates = Sorter.Blocks.byDistance(coordinates, player); //Sort the coords by distance to player.
 
         for (BlockPos coordinate : sortedCoordinates) {
+            GlStateManager.pushMatrix();
             ToolRenders.Utils.stateManagerPrepare(playerPos, coordinate, false, null);
             GL14.glBlendColor(1F, 1F, 1F, 0.55f); //Set the alpha of the blocks we are rendering
 
@@ -129,6 +130,7 @@ public class ToolRenders {
         }
 
         for (BlockPos coordinate : coordinates) { //Now run through the UNSORTED list of coords, to show which blocks won't place if you don't have enough of them.
+            GlStateManager.pushMatrix();
             ToolRenders.Utils.stateManagerPrepare(playerPos, coordinate, true, 0.005f);
             GL14.glBlendColor(1F, 1F, 1F, 0.35f); //Set the alpha of the blocks we are rendering
             hasBlocks--;
@@ -198,6 +200,7 @@ public class ToolRenders {
         //List<BlockPos> sortedCoordinates = ExchangingModes.sortByDistance(coordinates, player); //Sort the coords by distance to player.
 
         for (BlockPos coordinate : coordinates) {
+            GlStateManager.pushMatrix();
             ToolRenders.Utils.stateManagerPrepare(playerPos, coordinate, true, 0.0005f);
             GL14.glBlendColor(1F, 1F, 1F, 0.55f); //Set the alpha of the blocks we are rendering
 
@@ -216,6 +219,7 @@ public class ToolRenders {
         }
 
         for (BlockPos coordinate : coordinates) { //Now run through the UNSORTED list of coords, to show which blocks won't place if you don't have enough of them.
+            GlStateManager.pushMatrix();
             ToolRenders.Utils.stateManagerPrepare(playerPos, coordinate, true, 0.01f);
 
             GlStateManager.scale(1.02f, 1.02f, 1.02f); //Slightly Larger block to avoid z-fighting.
@@ -320,8 +324,7 @@ public class ToolRenders {
         GlStateManager.popMatrix();
     }
 
-    public static void renderPasteOverlay(RenderWorldLastEvent evt, EntityPlayer player, ItemStack stack)
-    {
+    public static void renderPasteOverlay(RenderWorldLastEvent evt, EntityPlayer player, ItemStack stack) {
         //Calculate the players current position, which is needed later
         Vec3d playerPos = ToolRenders.Utils.getPlayerTranslate(player, evt.getPartialTicks());
 
@@ -428,12 +431,12 @@ public class ToolRenders {
         }
     }
 
-    private static void renderLinkedInventoryOutline(ItemStack item, Vec3d playerPos)
-    {
+    private static void renderLinkedInventoryOutline(ItemStack item, Vec3d playerPos) {
         Integer dim = GadgetUtils.getDIMFromNBT(item, "boundTE");
         BlockPos pos = GadgetUtils.getPOSFromNBT(item, "boundTE");
 
         if (dim != null && pos != null) {
+            GlStateManager.pushMatrix();
             ToolRenders.Utils.stateManagerPrepare(playerPos, pos, true, 0.0005f);
             ToolRenders.Utils.stateManagerPrepareBlend();
             GL14.glBlendColor(1F, 1F, 1F, 0.35f);
@@ -444,8 +447,7 @@ public class ToolRenders {
         }
     }
 
-    private static void renderBox(Tessellator tessellator, BufferBuilder bufferBuilder, double startX, double startY, double startZ, double endX, double endY, double endZ, int R, int G, int B)
-    {
+    private static void renderBox(Tessellator tessellator, BufferBuilder bufferBuilder, double startX, double startY, double startZ, double endX, double endY, double endZ, int R, int G, int B) {
         GlStateManager.glLineWidth(2.0F);
         bufferBuilder.begin(3, DefaultVertexFormats.POSITION_COLOR);
         bufferBuilder.pos(startX, startY, startZ).color(G, G, G, 0.0F).endVertex();
@@ -470,8 +472,7 @@ public class ToolRenders {
         GlStateManager.glLineWidth(1.0F);
     }
 
-    private static void renderBoxSolid(Tessellator tessellator, BufferBuilder bufferBuilder, double startX, double startY, double startZ, double endX, double endY, double endZ, float red, float green, float blue, float alpha)
-    {
+    private static void renderBoxSolid(Tessellator tessellator, BufferBuilder bufferBuilder, double startX, double startY, double startZ, double endX, double endY, double endZ, float red, float green, float blue, float alpha) {
         bufferBuilder.begin(7, DefaultVertexFormats.POSITION_COLOR);
 
         //down
@@ -512,10 +513,9 @@ public class ToolRenders {
         tessellator.draw();
     }
 
-    private static class Utils
-    {
-        static IBlockState getStartBlock(RayTraceResult lookingAt, EntityPlayer player)
-        {
+    private static class Utils {
+
+        private static IBlockState getStartBlock(RayTraceResult lookingAt, EntityPlayer player) {
             IBlockState startBlock = Blocks.AIR.getDefaultState();
             if (lookingAt != null)
                 startBlock = player.world.getBlockState(lookingAt.getBlockPos());
@@ -523,8 +523,7 @@ public class ToolRenders {
             return startBlock;
         }
 
-        static int getStackEnergy(ItemStack stack, EntityPlayer player)
-        {
+        private static int getStackEnergy(ItemStack stack, EntityPlayer player) {
             if (player.capabilities.isCreativeMode || (!stack.hasCapability(CapabilityEnergy.ENERGY, null) && !stack.isItemStackDamageable()))
                 return 1000000;
 
@@ -538,8 +537,7 @@ public class ToolRenders {
          * Returns a Vec3i of the players position based on partial tick.
          * Used for Render translation.
          */
-        static Vec3d getPlayerTranslate(EntityPlayer player, float partialTick)
-        {
+        private static Vec3d getPlayerTranslate(EntityPlayer player, float partialTick) {
             return new Vec3d(
                     player.lastTickPosX + (player.posX - player.lastTickPosX) * partialTick,
                     player.lastTickPosY + (player.posY - player.lastTickPosY) * partialTick,
@@ -551,8 +549,7 @@ public class ToolRenders {
          * Attempts to get the Silk Touch Drop item but if it fails it'll return the original
          * non-silk touch ItemStack.
          */
-        static ItemStack getSilkDropIfPresent(World world, IBlockState state, EntityPlayer player)
-        {
+        private static ItemStack getSilkDropIfPresent(World world, IBlockState state, EntityPlayer player) {
             ItemStack itemStack = ItemStack.EMPTY;
             if (state.getBlock().canSilkHarvest(world, BlockPos.ORIGIN, state, player))
                 itemStack = InventoryManipulation.getSilkTouchDrop(state);
@@ -563,8 +560,7 @@ public class ToolRenders {
             return itemStack;
         }
 
-        static void stateManagerPrepareBlend()
-        {
+        private static void stateManagerPrepareBlend() {
             GlStateManager.enableBlend();
             GlStateManager.blendFunc(GL11.GL_CONSTANT_ALPHA, GL11.GL_ONE_MINUS_CONSTANT_ALPHA);
         }
@@ -573,9 +569,7 @@ public class ToolRenders {
          * Prepares our render using base properties
          * @param shouldShift if we should scale and shift the render to not cause issues with z-index
          */
-        static void stateManagerPrepare(Vec3d playerPos, BlockPos blockPos, boolean shouldShift, @Nullable Float shiftValue)
-        {
-            GlStateManager.pushMatrix();
+        private static void stateManagerPrepare(Vec3d playerPos, BlockPos blockPos, boolean shouldShift, @Nullable Float shiftValue) {
             GlStateManager.translate(blockPos.getX()-playerPos.x, blockPos.getY() - playerPos.y, blockPos.getZ() - playerPos.z);//Now move the render position to the coordinates we want to render at
             // Rotate it because i'm not sure why but we need to
             GlStateManager.rotate(-90.0F, 0.0F, 1.0F, 0.0F);
