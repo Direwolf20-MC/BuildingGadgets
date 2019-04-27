@@ -144,7 +144,7 @@ public class InventoryManipulation {
         return true;
     }
 
-    public static interface IRemoteInventoryProvider {
+    public interface IRemoteInventoryProvider {
         int countItem(ItemStack tool, ItemStack stack);
     }
 
@@ -159,9 +159,9 @@ public class InventoryManipulation {
     }
 
     public static int countItem(ItemStack itemStack, EntityPlayer player, IRemoteInventoryProvider remoteInventory) {
-        if (player.capabilities.isCreativeMode) {
+        if (player.capabilities.isCreativeMode)
             return Integer.MAX_VALUE;
-        }
+
         long count = remoteInventory.countItem(GadgetGeneric.getGadget(player), itemStack);
         InventoryPlayer inv = player.inventory;
         List<Integer> slots = findItem(itemStack.getItem(), itemStack.getMetadata(), inv);
@@ -287,13 +287,12 @@ public class InventoryManipulation {
     }
 
     private static List<IItemHandler> findInvContainers(InventoryPlayer inv) {
-        List<IItemHandler> containers = new ArrayList<IItemHandler>();
-        for (int i = 0; i < 36; ++i) {
-            ItemStack stack = inv.getStackInSlot(i);
-            if (stack.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null)) {
-                containers.add(stack.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null));
+        List<IItemHandler> containers = new ArrayList<>();
+        inv.mainInventory.forEach( itemStack -> {
+            if (itemStack.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null)) {
+                containers.add(itemStack.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null));
             }
-        }
+        } );
         return containers;
     }
 
@@ -311,8 +310,8 @@ public class InventoryManipulation {
 
     private static List<Integer> findItem(Item item, int meta, InventoryPlayer inv) {
         List<Integer> slots = new ArrayList<Integer>();
-        for (int i = 0; i < 36; ++i) {
-            ItemStack stack = inv.getStackInSlot(i);
+        for (int i = 0; i < inv.mainInventory.size(); ++i) {
+            ItemStack stack = inv.mainInventory.get(i);
             if (!stack.isEmpty() && stack.getItem() == item && meta == stack.getMetadata()) {
                 slots.add(i);
             }
@@ -322,8 +321,8 @@ public class InventoryManipulation {
 
     public static List<Integer> findItemClass(Class c, InventoryPlayer inv) {
         List<Integer> slots = new ArrayList<Integer>();
-        for (int i = 0; i < 36; ++i) {
-            ItemStack stack = inv.getStackInSlot(i);
+        for (int i = 0; i < inv.mainInventory.size(); ++i) {
+            ItemStack stack = inv.mainInventory.get(i);
             if (!stack.isEmpty() && c.isInstance(stack.getItem())) {
                 slots.add(i);
             }
@@ -341,7 +340,7 @@ public class InventoryManipulation {
     }
 
     public static IBlockState getSpecificStates(IBlockState originalState, World world, EntityPlayer player, BlockPos pos, ItemStack tool) {
-        IBlockState placeState = Blocks.AIR.getDefaultState();
+        IBlockState placeState;
         Block block = originalState.getBlock();
         ItemStack item = block.getPickBlock(originalState, null, world, pos, player);
         int meta = item.getMetadata();
