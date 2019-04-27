@@ -299,7 +299,7 @@ public class InventoryManipulation {
     public static int countInContainer(IItemHandler container, Item item, int meta) {
         int count = 0;
         ItemStack tempItem;
-        for (int i = 0; i < container.getSlots(); ++i) {
+        for (int i = 0; i < container.getSlots(); i++) {
             tempItem = container.getStackInSlot(i);
             if (tempItem.getItem() == item && tempItem.getMetadata() == meta) {
                 count += tempItem.getCount();
@@ -309,8 +309,8 @@ public class InventoryManipulation {
     }
 
     private static List<Integer> findItem(Item item, int meta, InventoryPlayer inv) {
-        List<Integer> slots = new ArrayList<Integer>();
-        for (int i = 0; i < inv.mainInventory.size(); ++i) {
+        List<Integer> slots = new ArrayList<>();
+        for (int i = 0; i < inv.mainInventory.size(); i++) {
             ItemStack stack = inv.mainInventory.get(i);
             if (!stack.isEmpty() && stack.getItem() == item && meta == stack.getMetadata()) {
                 slots.add(i);
@@ -320,8 +320,8 @@ public class InventoryManipulation {
     }
 
     public static List<Integer> findItemClass(Class c, InventoryPlayer inv) {
-        List<Integer> slots = new ArrayList<Integer>();
-        for (int i = 0; i < inv.mainInventory.size(); ++i) {
+        List<Integer> slots = new ArrayList<>();
+        for (int i = 0; i < inv.mainInventory.size(); i++) {
             ItemStack stack = inv.mainInventory.get(i);
             if (!stack.isEmpty() && c.isInstance(stack.getItem())) {
                 slots.add(i);
