@@ -59,7 +59,10 @@ public class ToolRenders {
     private static Cache<Triple<UniqueItemStack, BlockPos, Integer>, Integer> cacheDestructionOverlay = CacheBuilder.newBuilder().maximumSize(1).
             expireAfterWrite(1, TimeUnit.SECONDS).removalListener(removal -> GLAllocation.deleteDisplayLists((int) removal.getValue())).build();
 
+    // We use these as highlighters
     private static final IBlockState stainedGlassYellow = Blocks.STAINED_GLASS.getDefaultState().withProperty(COLOR, EnumDyeColor.YELLOW);
+    private static final IBlockState stainedGlassRed    = Blocks.STAINED_GLASS.getDefaultState().withProperty(COLOR, EnumDyeColor.RED);
+    private static final IBlockState stainedGlassWhite  = Blocks.STAINED_GLASS.getDefaultState().withProperty(COLOR, EnumDyeColor.WHITE);
 
     public static void setInventoryCache(Multiset<UniqueItem> cache) {
         ToolRenders.cacheInventory.setCache(cache);
@@ -125,24 +128,23 @@ public class ToolRenders {
                 state = renderBlockState.getActualState(fakeWorld, coordinate);
 
             mc.getBlockRendererDispatcher().renderBlockBrightness(state, 1f);//Render the defined block
-
             GlStateManager.popMatrix();
-        }
 
-        for (BlockPos coordinate : coordinates) { //Now run through the UNSORTED list of coords, to show which blocks won't place if you don't have enough of them.
             GlStateManager.pushMatrix();
-            ToolRenders.Utils.stateManagerPrepare(playerPos, coordinate, true, 0.005f);
-            GL14.glBlendColor(1F, 1F, 1F, 0.35f); //Set the alpha of the blocks we are rendering
+            ToolRenders.Utils.stateManagerPrepare(playerPos, coordinate, true, 0.01f);
+            GlStateManager.scale(1.006f, 1.006f, 1.006f);
+            GL14.glBlendColor(1F, 1F, 1F, 0.35f);
+
             hasBlocks--;
-            if (heldItem.hasCapability(CapabilityEnergy.ENERGY, null)) {
+            if (heldItem.hasCapability(CapabilityEnergy.ENERGY, null))
                 hasEnergy -= ModItems.gadgetBuilding.getEnergyCost(heldItem);
-            } else {
+            else
                 hasEnergy -= ModItems.gadgetBuilding.getDamageCost(heldItem);
-            }
-            if (hasBlocks < 0 || hasEnergy < 0) {
-                mc.getBlockRendererDispatcher().renderBlockBrightness(Blocks.STAINED_GLASS.getDefaultState().withProperty(COLOR, EnumDyeColor.RED), 1f);
-            }
-            //Move the render position back to where it was
+
+            if (hasBlocks < 0 || hasEnergy < 0)
+                mc.getBlockRendererDispatcher().renderBlockBrightness(stainedGlassRed, 1f);
+
+            // Move the render position back to where it was
             GlStateManager.popMatrix();
         }
 
@@ -197,11 +199,9 @@ public class ToolRenders {
         GlStateManager.pushMatrix();
         ToolRenders.Utils.stateManagerPrepareBlend();
 
-        //List<BlockPos> sortedCoordinates = ExchangingModes.sortByDistance(coordinates, player); //Sort the coords by distance to player.
-
         for (BlockPos coordinate : coordinates) {
             GlStateManager.pushMatrix();
-            ToolRenders.Utils.stateManagerPrepare(playerPos, coordinate, true, 0.0005f);
+            ToolRenders.Utils.stateManagerPrepare(playerPos, coordinate, true, 0.001f);
             GL14.glBlendColor(1F, 1F, 1F, 0.55f); //Set the alpha of the blocks we are rendering
 
             // Get the block state in the fake world
@@ -214,13 +214,11 @@ public class ToolRenders {
             }
 
             GL14.glBlendColor(1F, 1F, 1F, 0.1f); //Set the alpha of the blocks we are rendering
-            dispatcher.renderBlockBrightness(Blocks.STAINED_GLASS.getDefaultState().withProperty(COLOR, EnumDyeColor.WHITE), 1f);//Render the defined block - White glass to show non-full block renders (Example: Torch)
+            dispatcher.renderBlockBrightness(stainedGlassWhite, 1f);//Render the defined block - White glass to show non-full block renders (Example: Torch)
             GlStateManager.popMatrix();
-        }
 
-        for (BlockPos coordinate : coordinates) { //Now run through the UNSORTED list of coords, to show which blocks won't place if you don't have enough of them.
             GlStateManager.pushMatrix();
-            ToolRenders.Utils.stateManagerPrepare(playerPos, coordinate, true, 0.01f);
+            ToolRenders.Utils.stateManagerPrepare(playerPos, coordinate, true, 0.002f);
 
             GlStateManager.scale(1.02f, 1.02f, 1.02f); //Slightly Larger block to avoid z-fighting.
             GL14.glBlendColor(1F, 1F, 1F, 0.55f); //Set the alpha of the blocks we are rendering
@@ -232,7 +230,7 @@ public class ToolRenders {
                 hasEnergy -= ModItems.gadgetExchanger.getDamageCost(heldItem);
 
             if (hasBlocks < 0 || hasEnergy < 0)
-                dispatcher.renderBlockBrightness(Blocks.STAINED_GLASS.getDefaultState().withProperty(COLOR, EnumDyeColor.RED), 1f);
+                dispatcher.renderBlockBrightness(stainedGlassRed, 1f);
 
             // Move the render position back to where it was
             GlStateManager.popMatrix();
@@ -577,7 +575,7 @@ public class ToolRenders {
             if( shouldShift && shiftValue != null ) {
                 // Slightly Larger block to avoid z-fighting.
                 GlStateManager.translate(-shiftValue, -shiftValue, shiftValue);
-                GlStateManager.scale(1.01f, 1.01f, 1.01f);
+                GlStateManager.scale(1.005f, 1.005f, 1.005f);
             }
             else
                 GlStateManager.scale(1f, 1f, 1f);
