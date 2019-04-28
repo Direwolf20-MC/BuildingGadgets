@@ -40,10 +40,7 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL14;
 
 import javax.annotation.Nullable;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.SortedSet;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
@@ -566,18 +563,17 @@ public class ToolRenders {
         /**
          * Prepares our render using base properties
          */
-        private static void stateManagerPrepare(Vec3d playerPos, BlockPos blockPos, @Nullable Float shiftValue) {
+        private static void stateManagerPrepare(Vec3d playerPos, BlockPos blockPos, Float shift) {
             GlStateManager.translate(blockPos.getX()-playerPos.x, blockPos.getY() - playerPos.y, blockPos.getZ() - playerPos.z);//Now move the render position to the coordinates we want to render at
             // Rotate it because i'm not sure why but we need to
             GlStateManager.rotate(-90.0F, 0.0F, 1.0F, 0.0F);
+            GlStateManager.scale(1f, 1f, 1f);
 
-            if( shiftValue != null ) {
-                // Slightly Larger block to avoid z-fighting.
-                GlStateManager.translate(-shiftValue, -shiftValue, shiftValue);
+            // Slightly Larger block to avoid z-fighting.
+            if( shift != null ) {
+                GlStateManager.translate(-shift, -shift, shift);
                 GlStateManager.scale(1.005f, 1.005f, 1.005f);
             }
-            else
-                GlStateManager.scale(1f, 1f, 1f);
         }
     }
 }
