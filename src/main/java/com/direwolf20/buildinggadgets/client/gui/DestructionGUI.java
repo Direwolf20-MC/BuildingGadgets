@@ -7,31 +7,32 @@ package com.direwolf20.buildinggadgets.client.gui;
 
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetDestruction;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
+
 import com.direwolf20.buildinggadgets.common.network.packets.PacketDestructionGUI;
-import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
-import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 
-public class DestructionGUI extends GuiScreenTextFields {
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 
-    private GuiTextFieldBase left, right, up, down, depth;
+public class DestructionGUI extends GuiScreen {
 
-    private int guiLeft = 15;
-    private int guiTop = 50;
+    private GuiDestructionSlider left;
+    private GuiDestructionSlider right;
+    private GuiDestructionSlider up;
+    private GuiDestructionSlider down;
+    private GuiDestructionSlider depth;
 
     private ItemStack destructionTool;
 
-    private static final ResourceLocation background = new ResourceLocation(Reference.MODID, "textures/gui/testcontainer.png");
-
-    DestructionGUI(ItemStack tool) {
+    public DestructionGUI(ItemStack tool) {
         super();
         this.destructionTool = tool;
     }
@@ -40,86 +41,59 @@ public class DestructionGUI extends GuiScreenTextFields {
     public void initGui() {
         super.initGui();
 
-        left = addField(80, 60);
-        right = addField(320, 60);
-        up = addField(200, 30);
-        down = addField(200, 90);
-        depth = addField(200, 60);
+        int x = width / 2;
+        int y = height / 2;
 
-        nullCheckTextBoxes();
-
-        addButton(new GuiButtonAction(guiLeft + 145, guiTop + 125, 40, 20, I18n.format(GuiMod.getLangKeyButton("destruction", "confirm")), () -> {
-            nullCheckTextBoxes();
-            if (sizeCheckBoxes()) {
-                PacketHandler.sendToServer(new PacketDestructionGUI(left.getInt(), right.getInt(), up.getInt(), down.getInt(), depth.getInt()));
-                mc.displayGuiScreen(null);
-            } else {
-                Minecraft.getInstance().player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.destroysizeerror").getUnformattedComponentText()), true);
+        this.addButton(new GuiButtonAction((x - 30) + 32, y + 60, 60, 20, I18n.format(GuiMod.getLangKeyButton("destruction", "confirm")), () -> {
+            if (isWithinBounds()) {
+                PacketHandler.sendToServer(new PacketDestructionGUI(left.getValueInt(), right.getValueInt(), up.getValueInt(), down.getValueInt(), depth.getValueInt()));
+                this.close();
             }
+            else
+                Minecraft.getInstance().player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.destroysizeerror").getUnformattedComponentText()), true);
         }));
-        addButton(new GuiButtonAction(guiLeft + 245, guiTop + 125, 40, 20, I18n.format(GuiMod.getLangKeyButton("destruction", "cancel")), () -> close()));
-        addButton(65, 59, "-", () -> fieldChange(left, -1));
-        addButton(125, 59, "+", () -> fieldChange(left, 1));
-        addButton(305, 59, "-", () -> fieldChange(right, -1));
-        addButton(365, 59, "+", () -> fieldChange(right, 1));
-        addButton(185, 29, "-", () -> fieldChange(up, -1));
-        addButton(245, 29, "+", () -> fieldChange(up, 1));
-        addButton(185, 89, "-", () -> fieldChange(down, -1));
-        addButton(245, 89, "+", () -> fieldChange(down, 1));
-        addButton(185, 59, "-", () -> fieldChange(depth, -1));
-        addButton(245, 59, "+", () -> fieldChange(depth, 1));
+
+        this.addButton(new GuiButtonAction((x - 30) - 32, y + 60, 60, 20, I18n.format(GuiMod.getLangKeyButton("destruction", "cancel")), this::close));
+
+        List<GuiDestructionSlider> sliders = new ArrayList<>();
+
+        sliders.add(depth   = new GuiDestructionSlider(x - (GuiDestructionSlider.width / 2), y - (GuiDestructionSlider.height / 2), "Depth", GadgetDestruction.getToolValue(destructionTool, "depth")));
+        sliders.add(left    = new GuiDestructionSlider(x - (GuiDestructionSlider.width * 2) - 5, y - (GuiDestructionSlider.height / 2), "Left", GadgetDestruction.getToolValue(destructionTool, "left")));
+        sliders.add(right   = new GuiDestructionSlider(x + (GuiDestructionSlider.width + 5), y - (GuiDestructionSlider.height / 2), "Right", GadgetDestruction.getToolValue(destructionTool, "right")));
+        sliders.add(up      = new GuiDestructionSlider(x - (GuiDestructionSlider.width / 2), y - 35, "Up", GadgetDestruction.getToolValue(destructionTool, "up")));
+        sliders.add(down    = new GuiDestructionSlider(x - (GuiDestructionSlider.width / 2), y + 20, "Down", GadgetDestruction.getToolValue(destructionTool, "down")));
+
+        sliders.forEach( gui -> gui.getComponents().forEach(this::addButton));
     }
 
-    private void addButton(int x, int y, String text, Runnable action) {
-        addButton(new DireButton(guiLeft + x, guiTop + y, 10, 10, text, action));
-    }
+    private boolean isWithinBounds() {
+        int x = left.getValueInt() + right.getValueInt();
+        int y = up.getValueInt() + down.getValueInt();
 
-    private GuiTextFieldBase addField(int x, int y) {
-        return addField(new GuiTextFieldBase(fontRenderer, guiLeft + x, guiTop + y, 40).restrictToNumeric().onPostModification((field, valueOld) -> {
-            if (!sizeCheckBoxes() && valueOld != null)
-                field.setText(valueOld);
-        }));
-    }
-
-    private void fieldChange(GuiTextFieldBase field, int amount) {
-        nullCheckTextBoxes();
-        if (GuiScreen.isShiftKeyDown()) amount *= 10;
-        int n = field.getInt();
-        int i = MathHelper.clamp(n + amount, -16, 16);
-        field.setText(String.valueOf(i));
-        if (!sizeCheckBoxes())
-            field.setText(String.valueOf(n));
+        return x <= 16 && y <= 16;
     }
 
     @Override
-    public void render(int mouseX, int mouseY, float partialTicks) {
-        mc.getTextureManager().bindTexture(background);
-
-        drawFieldLable("left", 35, 60);
-        drawFieldLable("right", 278, 60);
-        drawFieldLable("up", 170, 30);
-        drawFieldLable("down", 158, 90);
-        drawFieldLable("depth", 155, 60);
-
-        super.render(mouseX, mouseY, partialTicks);
+    public boolean doesGuiPauseGame() {
+        return false;
     }
 
-    private void drawFieldLable(String name, int x, int y) {
-        fontRenderer.drawStringWithShadow(I18n.format(GuiMod.getLangKeyField("destruction", name)), this.guiLeft + x, this.guiTop + y, 0xFFFFFF);
-    }
+    // This is only done to reduce code dupe in this class.
+    private static class GuiDestructionSlider extends GuiSliderInt {
+        public static final int width = 70;
+        public static final int height = 14;
 
-    private void nullCheckTextBoxes() {
-        GuiMod.setEmptyField(left, () -> GadgetDestruction.getToolValue(destructionTool, NBTKeys.GADGET_VALUE_LEFT));
-        GuiMod.setEmptyField(right, () -> GadgetDestruction.getToolValue(destructionTool, NBTKeys.GADGET_VALUE_RIGHT));
-        GuiMod.setEmptyField(up, () -> GadgetDestruction.getToolValue(destructionTool, NBTKeys.GADGET_VALUE_UP));
-        GuiMod.setEmptyField(down, () -> GadgetDestruction.getToolValue(destructionTool, NBTKeys.GADGET_VALUE_DOWN));
-        GuiMod.setEmptyField(depth, () -> GadgetDestruction.getToolValue(destructionTool, NBTKeys.GADGET_VALUE_DEPTH));
-    }
+        private static final int min = 0;
+        private static final int max = 16;
 
-    private boolean sizeCheckBoxes() {
-        if (depth.getInt() > 16 || left.getInt() + right.getInt() > 16 || up.getInt() + down.getInt() > 16)
-            return false;
-
-        return GuiMod.sizeCheckBoxes(getFieldIterator(), 0, Integer.MAX_VALUE);
+        GuiDestructionSlider(int x, int y, String prefix, int current) {
+            super(
+                    x, y, width, height, String.format("%s ", prefix), "", min, max, current, false, true, Color.DARK_GRAY, null,
+                    (slider, amount) -> {
+                        slider.setValue(MathHelper.clamp(slider.getValueInt() + amount, min, max));
+                        slider.updateSlider();
+                    }
+            );
+        }
     }
 }

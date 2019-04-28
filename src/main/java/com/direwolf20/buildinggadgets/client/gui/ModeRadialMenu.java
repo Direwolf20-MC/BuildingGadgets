@@ -125,7 +125,7 @@ public class ModeRadialMenu extends GuiScreen {
                         slider.updateSlider();
                     });
                 sliderRange.precision = 1;
-                sliderRange.getComponents().forEach(component -> addButton(component));
+                sliderRange.getComponents().forEach(this::addButton);
             }
         }
         addButton(new GuiButtonActionCallback("raytrace_fluid", right, send -> {
