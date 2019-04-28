@@ -52,9 +52,9 @@ import static com.direwolf20.buildinggadgets.common.tools.GadgetUtils.getToolBlo
 import static net.minecraft.block.BlockStainedGlass.COLOR;
 
 public class ToolRenders {
-    private static Minecraft mc = Minecraft.getMinecraft();
-
     private static final FakeBuilderWorld fakeWorld = new FakeBuilderWorld();
+
+    private static Minecraft mc = Minecraft.getMinecraft();
     private static RemoteInventoryCache cacheInventory = new RemoteInventoryCache(false);
     private static Cache<Triple<UniqueItemStack, BlockPos, Integer>, Integer> cacheDestructionOverlay = CacheBuilder.newBuilder().maximumSize(1).
             expireAfterWrite(1, TimeUnit.SECONDS).removalListener(removal -> GLAllocation.deleteDisplayLists((int) removal.getValue())).build();
