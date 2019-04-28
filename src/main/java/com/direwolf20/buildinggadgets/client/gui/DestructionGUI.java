@@ -5,262 +5,79 @@
 
 package com.direwolf20.buildinggadgets.client.gui;
 
-import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetDestruction;
 import com.direwolf20.buildinggadgets.common.network.PacketDestructionGUI;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 
-import java.io.IOException;
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DestructionGUI extends GuiScreen {
-    public static final int WIDTH = 256;
-    public static final int HEIGHT = 256;
 
-    private GuiTextField left;
-    private GuiTextField right;
-    private GuiTextField up;
-    private GuiTextField down;
-    private GuiTextField depth;
-    //private GuiTextField endZ;
+    private GuiDestructionSlider left;
+    private GuiDestructionSlider right;
+    private GuiDestructionSlider up;
+    private GuiDestructionSlider down;
+    private GuiDestructionSlider depth;
 
-    //private boolean absoluteCoords = Config.absoluteCoordDefault;
-
-    int guiLeft = 15;
-    int guiTop = 50;
-
-    ItemStack destructionTool;
-
-    private static final ResourceLocation background = new ResourceLocation(BuildingGadgets.MODID, "textures/gui/testcontainer.png");
+    private ItemStack destructionTool;
 
     public DestructionGUI(ItemStack tool) {
         super();
         this.destructionTool = tool;
     }
 
-    /*@Override
-    public void drawScreen(int mouseX, int mouseY, float partialTicks) {
-        super.drawScreen(mouseX, mouseY, partialTicks);
-    }*/
-
     @Override
     public void initGui() {
         super.initGui();
 
-        left = new GuiTextField(0, this.fontRenderer, this.guiLeft + 80, this.guiTop + 60, 40, this.fontRenderer.FONT_HEIGHT);
-        left.setMaxStringLength(50);
-        left.setVisible(true);
+        int x = width / 2;
+        int y = height / 2;
 
-        right = new GuiTextField(1, this.fontRenderer, this.guiLeft + 320, this.guiTop + 60, 40, this.fontRenderer.FONT_HEIGHT);
-        right.setMaxStringLength(50);
-        right.setVisible(true);
+        this.addButton(new GuiButton(1, (x - 30) + 32, y + 50, 60, 20, I18n.format("singles.buildinggadgets.confirm")));
+        this.addButton(new GuiButton(2, (x - 30) - 32, y + 50, 60, 20, I18n.format("singles.buildinggadgets.cancel")));
 
-        up = new GuiTextField(2, this.fontRenderer, this.guiLeft + 200, this.guiTop + 30, 40, this.fontRenderer.FONT_HEIGHT);
-        up.setMaxStringLength(50);
-        up.setVisible(true);
+        List<GuiDestructionSlider> sliders = new ArrayList<>();
 
+        sliders.add(depth   = new GuiDestructionSlider(x - (GuiDestructionSlider.width / 2), y - (GuiDestructionSlider.height / 2), "Depth", GadgetDestruction.getToolValue(destructionTool, "depth")));
+        sliders.add(left    = new GuiDestructionSlider(x - (GuiDestructionSlider.width * 2) - 5, y - (GuiDestructionSlider.height / 2), "Left", GadgetDestruction.getToolValue(destructionTool, "left")));
+        sliders.add(right   = new GuiDestructionSlider(x + (GuiDestructionSlider.width + 5), y - (GuiDestructionSlider.height / 2), "Right", GadgetDestruction.getToolValue(destructionTool, "right")));
+        sliders.add(up      = new GuiDestructionSlider(x - (GuiDestructionSlider.width / 2), y - 35, "Up", GadgetDestruction.getToolValue(destructionTool, "up")));
+        sliders.add(down    = new GuiDestructionSlider(x - (GuiDestructionSlider.width / 2), y + 20, "Down", GadgetDestruction.getToolValue(destructionTool, "down")));
 
-        down = new GuiTextField(3, this.fontRenderer, this.guiLeft + 200, this.guiTop + 90, 40, this.fontRenderer.FONT_HEIGHT);
-        down.setMaxStringLength(50);
-        down.setVisible(true);
-
-        depth = new GuiTextField(4, this.fontRenderer, this.guiLeft + 200, this.guiTop + 60, 40, this.fontRenderer.FONT_HEIGHT);
-        depth.setMaxStringLength(50);
-        depth.setVisible(true);
-
-        nullCheckTextBoxes();
-
-        //NOTE: the id always has to be different or else it might get called twice or never!
-        this.buttonList.add(new GuiButton(1, this.guiLeft + 145, this.guiTop + 125, 40, 20, I18n.format("singles.buildinggadgets.confirm")));
-        this.buttonList.add(new GuiButton(2, this.guiLeft + 245, this.guiTop + 125, 40, 20, I18n.format("singles.buildinggadgets.cancel")));
-        //this.buttonList.add(new GuiButton(3, this.guiLeft + 245, this.guiTop + 60, 40, 20, "Clear"));
-        //this.buttonList.add(new GuiButton(4, this.guiLeft + 325, this.guiTop + 60, 80, 20, "CoordsMode"));
-        this.buttonList.add(new DireButton(5, this.guiLeft + 65, this.guiTop + 59, 10, 10, "-"));
-        this.buttonList.add(new DireButton(6, this.guiLeft + 125, this.guiTop + 59, 10, 10, "+"));
-        this.buttonList.add(new DireButton(7, this.guiLeft + 305, this.guiTop + 59, 10, 10, "-"));
-        this.buttonList.add(new DireButton(8, this.guiLeft + 365, this.guiTop + 59, 10, 10, "+"));
-        this.buttonList.add(new DireButton(9, this.guiLeft + 185, this.guiTop + 29, 10, 10, "-"));
-        this.buttonList.add(new DireButton(10, this.guiLeft + 245, this.guiTop + 29, 10, 10, "+"));
-        this.buttonList.add(new DireButton(11, this.guiLeft + 185, this.guiTop + 89, 10, 10, "-"));
-        this.buttonList.add(new DireButton(12, this.guiLeft + 245, this.guiTop + 89, 10, 10, "+"));
-        this.buttonList.add(new DireButton(13, this.guiLeft + 185, this.guiTop + 59, 10, 10, "-"));
-        this.buttonList.add(new DireButton(14, this.guiLeft + 245, this.guiTop + 59, 10, 10, "+"));
-        //this.buttonList.add(new DireButton(15, this.guiLeft + 250, this.guiTop + 34, 10, 10, "-"));
-        //this.buttonList.add(new DireButton(16, this.guiLeft + 310, this.guiTop + 34, 10, 10, "+"));
+        sliders.forEach( gui -> gui.getComponents().forEach(this::addButton));
     }
 
-    public void fieldChange(GuiTextField textField, int amount) {
-        nullCheckTextBoxes();
-        if (GuiScreen.isShiftKeyDown()) amount = amount * 10;
-        try {
-            int i = Integer.valueOf(textField.getText());
-            i = i + amount;
-            if (i < 0) i = 0;
-            if (i > 16) i = 16;
-            textField.setText(String.valueOf(i));
-        } catch (NumberFormatException t) {
-            this.mc.displayGuiScreen(null);
-        }
-    }
+    private boolean isWithinBounds() {
+        int x = left.getValueInt() + right.getValueInt();
+        int y = up.getValueInt() + down.getValueInt();
 
-    @Override
-    public void drawScreen(int mouseX, int mouseY, float partialTicks) {
-        mc.getTextureManager().bindTexture(background);
-        //drawTexturedModalRect(guiLeft, guiTop, 0, 0, xSize, ySize);
-        this.left.drawTextBox();
-        this.right.drawTextBox();
-        this.up.drawTextBox();
-        this.down.drawTextBox();
-        this.depth.drawTextBox();
-        fontRenderer.drawStringWithShadow(I18n.format("singles.buildinggadgets.left"), this.guiLeft + 35, this.guiTop + 60, 0xFFFFFF);
-        fontRenderer.drawStringWithShadow(I18n.format("singles.buildinggadgets.right"), this.guiLeft + 278, this.guiTop + 60, 0xFFFFFF);
-        fontRenderer.drawStringWithShadow(I18n.format("singles.buildinggadgets.up"), this.guiLeft + 170, this.guiTop + 30, 0xFFFFFF);
-        fontRenderer.drawStringWithShadow(I18n.format("singles.buildinggadgets.down"), this.guiLeft + 158, this.guiTop + 90, 0xFFFFFF);
-        fontRenderer.drawStringWithShadow(I18n.format("singles.buildinggadgets.depth"), this.guiLeft + 155, this.guiTop + 60, 0xFFFFFF);
-        super.drawScreen(mouseX, mouseY, partialTicks);
-    }
-
-    private void nullCheckTextBoxes() {
-        if (left.getText().isEmpty()) {
-            left.setText(String.valueOf(GadgetDestruction.getToolValue(destructionTool, "left")));
-        }
-        if (right.getText().isEmpty()) {
-            right.setText(String.valueOf(GadgetDestruction.getToolValue(destructionTool, "right")));
-        }
-        if (up.getText().isEmpty()) {
-            up.setText(String.valueOf(GadgetDestruction.getToolValue(destructionTool, "up")));
-        }
-        if (down.getText().isEmpty()) {
-            down.setText(String.valueOf(GadgetDestruction.getToolValue(destructionTool, "down")));
-        }
-        if (depth.getText().isEmpty()) {
-            depth.setText(String.valueOf(GadgetDestruction.getToolValue(destructionTool, "depth")));
-        }
-    }
-
-    private boolean sizeCheckBoxes() {
-        if( !isNumeric(left.getText()) || !isNumeric(right.getText()) || !isNumeric(up.getText()) || !isNumeric(down.getText()) || !isNumeric(depth.getText()) )
-            return false;
-
-        if (Integer.parseInt(left.getText()) + Integer.parseInt(right.getText()) > 16) return false;
-        if (Integer.parseInt(up.getText()) + Integer.parseInt(down.getText()) > 16) return false;
-        if (Integer.parseInt(depth.getText()) > 16) return false;
-        if (Integer.parseInt(left.getText()) < 0) return false;
-        if (Integer.parseInt(right.getText()) < 0) return false;
-        if (Integer.parseInt(up.getText()) < 0) return false;
-        if (Integer.parseInt(down.getText()) < 0) return false;
-        if (Integer.parseInt(depth.getText()) < 0) return false;
-
-        return true;
+        return x <= 16 && y <= 16;
     }
 
     @Override
     protected void actionPerformed(GuiButton b) {
         if (b.id == 1) {
-            nullCheckTextBoxes();
-            if (sizeCheckBoxes()) {
-                PacketHandler.INSTANCE.sendToServer(new PacketDestructionGUI(Integer.parseInt(left.getText()), Integer.parseInt(right.getText()), Integer.parseInt(up.getText()), Integer.parseInt(down.getText()), Integer.parseInt(depth.getText())));
+            if (isWithinBounds()) {
+                PacketHandler.INSTANCE.sendToServer(new PacketDestructionGUI(left.getValueInt(), right.getValueInt(), up.getValueInt(), down.getValueInt(), depth.getValueInt()));
                 this.mc.displayGuiScreen(null);
-            } else {
+            }
+            else
                 Minecraft.getMinecraft().player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.destroysizeerror").getUnformattedComponentText()), true);
-            }
-
-        } else if (b.id == 2) {
+        }
+        else if (b.id == 2)
             this.mc.displayGuiScreen(null);
-        } else if (b.id == 5) {
-            fieldChange(left, -1);
-        } else if (b.id == 6) {
-            fieldChange(left, 1);
-        } else if (b.id == 7) {
-            fieldChange(right, -1);
-        } else if (b.id == 8) {
-            fieldChange(right, 1);
-        } else if (b.id == 9) {
-            fieldChange(up, -1);
-        } else if (b.id == 10) {
-            fieldChange(up, 1);
-        } else if (b.id == 11) {
-            fieldChange(down, -1);
-        } else if (b.id == 12) {
-            fieldChange(down, 1);
-        } else if (b.id == 13) {
-            fieldChange(depth, -1);
-        } else if (b.id == 14) {
-            fieldChange(depth, 1);
-        }
-
-    }
-
-    @Override
-    protected void keyTyped(char typedChar, int keyCode) throws IOException {
-        if (this.left.textboxKeyTyped(typedChar, keyCode) || this.right.textboxKeyTyped(typedChar, keyCode) || this.up.textboxKeyTyped(typedChar, keyCode) || this.down.textboxKeyTyped(typedChar, keyCode) || this.depth.textboxKeyTyped(typedChar, keyCode)) {
-
-        } else {
-            super.keyTyped(typedChar, keyCode);
-        }
-    }
-
-    @Override
-    protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
-        if (mouseButton == 1) {
-            if (this.left.mouseClicked(mouseX, mouseY, 0)) {
-                left.setText("");
-            } else if (this.right.mouseClicked(mouseX, mouseY, 0)) {
-                right.setText("");
-            } else if (this.up.mouseClicked(mouseX, mouseY, 0)) {
-                up.setText("");
-            } else if (this.down.mouseClicked(mouseX, mouseY, 0)) {
-                down.setText("");
-            } else if (this.depth.mouseClicked(mouseX, mouseY, 0)) {
-                depth.setText("");
-            } else {
-                //startX.setFocused(false);
-                super.mouseClicked(mouseX, mouseY, mouseButton);
-            }
-        } else {
-            if (this.left.mouseClicked(mouseX, mouseY, mouseButton)) {
-                left.setFocused(true);
-            } else if (this.right.mouseClicked(mouseX, mouseY, mouseButton)) {
-                right.setFocused(true);
-            } else if (this.up.mouseClicked(mouseX, mouseY, mouseButton)) {
-                up.setFocused(true);
-            } else if (this.down.mouseClicked(mouseX, mouseY, mouseButton)) {
-                down.setFocused(true);
-            } else if (this.depth.mouseClicked(mouseX, mouseY, mouseButton)) {
-                depth.setFocused(true);
-            } else {
-                //startX.setFocused(false);
-                super.mouseClicked(mouseX, mouseY, mouseButton);
-            }
-        }
-    }
-
-    @Override
-    protected void mouseReleased(int mouseX, int mouseY, int state) {
-        super.mouseReleased(mouseX, mouseY, state);
-    }
-
-
-    @Override
-    public void handleMouseInput() throws IOException {
-        super.handleMouseInput();
-        //System.out.println(Mouse.getEventDWheel());
-        //System.out.println(zoom);
-
-    }
-
-    @Override
-    public void updateScreen() {
-        super.updateScreen();
     }
 
     @Override
@@ -268,12 +85,22 @@ public class DestructionGUI extends GuiScreen {
         return false;
     }
 
-    // Todo: Move this to a utils package logically
-    private static boolean isNumeric(String str)
-    {
-        for (char c : str.toCharArray())
-            if (!Character.isDigit(c)) return false;
+    // This is only done to reduce code dupe in this class.
+    private static class GuiDestructionSlider extends GuiSliderInt {
+        public static final int width = 70;
+        public static final int height = 14;
 
-        return true;
+        private static final int min = 0;
+        private static final int max = 16;
+
+        GuiDestructionSlider(int x, int y, String prefix, int current) {
+            super(
+                    x, y, width, height, String.format("%s ", prefix), "", min, max, current, false, true, Color.DARK_GRAY, null,
+                    (slider, amount) -> {
+                        slider.setValue(MathHelper.clamp(slider.getValueInt() + amount, min, max));
+                        slider.updateSlider();
+                    }
+            );
+        }
     }
 }
