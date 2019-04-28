@@ -141,8 +141,6 @@ public class GadgetBuilding extends GadgetPlacing implements IAtopPlacingGadget 
         player.setActiveHand(hand);
         if (!world.isRemote) {
             if (player.isSneaking()) {
-                //TODO Remove debug code
-                EnergyUtil.getCap(itemstack).ifPresent(energy -> energy.receiveEnergy(105000, false));
                 selectBlock(itemstack, player);
             } else {
                 build(player, itemstack);
