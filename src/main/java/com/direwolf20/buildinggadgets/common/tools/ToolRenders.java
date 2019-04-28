@@ -121,7 +121,7 @@ public class ToolRenders {
 
         for (BlockPos coordinate : sortedCoordinates) {
             GlStateManager.pushMatrix();
-            ToolRenders.Utils.stateManagerPrepare(playerPos, coordinate, false, null);
+            ToolRenders.Utils.stateManagerPrepare(playerPos, coordinate, null);
             GL14.glBlendColor(1F, 1F, 1F, 0.55f); //Set the alpha of the blocks we are rendering
 
             if (fakeWorld.getWorldType() != WorldType.DEBUG_ALL_BLOCK_STATES)
@@ -131,7 +131,7 @@ public class ToolRenders {
             GlStateManager.popMatrix();
 
             GlStateManager.pushMatrix();
-            ToolRenders.Utils.stateManagerPrepare(playerPos, coordinate, true, 0.01f);
+            ToolRenders.Utils.stateManagerPrepare(playerPos, coordinate, 0.01f);
             GlStateManager.scale(1.006f, 1.006f, 1.006f);
             GL14.glBlendColor(1F, 1F, 1F, 0.35f);
 
@@ -201,7 +201,7 @@ public class ToolRenders {
 
         for (BlockPos coordinate : coordinates) {
             GlStateManager.pushMatrix();
-            ToolRenders.Utils.stateManagerPrepare(playerPos, coordinate, true, 0.001f);
+            ToolRenders.Utils.stateManagerPrepare(playerPos, coordinate, 0.001f);
             GL14.glBlendColor(1F, 1F, 1F, 0.55f); //Set the alpha of the blocks we are rendering
 
             // Get the block state in the fake world
@@ -218,7 +218,7 @@ public class ToolRenders {
             GlStateManager.popMatrix();
 
             GlStateManager.pushMatrix();
-            ToolRenders.Utils.stateManagerPrepare(playerPos, coordinate, true, 0.002f);
+            ToolRenders.Utils.stateManagerPrepare(playerPos, coordinate, 0.002f);
 
             GlStateManager.scale(1.02f, 1.02f, 1.02f); //Slightly Larger block to avoid z-fighting.
             GL14.glBlendColor(1F, 1F, 1F, 0.55f); //Set the alpha of the blocks we are rendering
@@ -435,7 +435,7 @@ public class ToolRenders {
 
         if (dim != null && pos != null) {
             GlStateManager.pushMatrix();
-            ToolRenders.Utils.stateManagerPrepare(playerPos, pos, true, 0.0005f);
+            ToolRenders.Utils.stateManagerPrepare(playerPos, pos, 0.0005f);
             ToolRenders.Utils.stateManagerPrepareBlend();
             GL14.glBlendColor(1F, 1F, 1F, 0.35f);
 
@@ -523,7 +523,7 @@ public class ToolRenders {
 
         private static int getStackEnergy(ItemStack stack, EntityPlayer player) {
             if (player.capabilities.isCreativeMode || (!stack.hasCapability(CapabilityEnergy.ENERGY, null) && !stack.isItemStackDamageable()))
-                return 1000000;
+                return Integer.MAX_VALUE;
 
             if (stack.hasCapability(CapabilityEnergy.ENERGY, null))
                 return  CapabilityProviderEnergy.getCap(stack).getEnergyStored();
@@ -565,14 +565,13 @@ public class ToolRenders {
 
         /**
          * Prepares our render using base properties
-         * @param shouldShift if we should scale and shift the render to not cause issues with z-index
          */
-        private static void stateManagerPrepare(Vec3d playerPos, BlockPos blockPos, boolean shouldShift, @Nullable Float shiftValue) {
+        private static void stateManagerPrepare(Vec3d playerPos, BlockPos blockPos, @Nullable Float shiftValue) {
             GlStateManager.translate(blockPos.getX()-playerPos.x, blockPos.getY() - playerPos.y, blockPos.getZ() - playerPos.z);//Now move the render position to the coordinates we want to render at
             // Rotate it because i'm not sure why but we need to
             GlStateManager.rotate(-90.0F, 0.0F, 1.0F, 0.0F);
 
-            if( shouldShift && shiftValue != null ) {
+            if( shiftValue != null ) {
                 // Slightly Larger block to avoid z-fighting.
                 GlStateManager.translate(-shiftValue, -shiftValue, shiftValue);
                 GlStateManager.scale(1.005f, 1.005f, 1.005f);
