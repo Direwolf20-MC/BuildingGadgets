@@ -12,11 +12,11 @@ import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.items.CapabilityItemHandler;
@@ -44,18 +44,6 @@ public class InventoryManipulation {
             return true;
         }
 
-        //Fill any unfilled stacks in the player's inventory first
-        InventoryPlayer inv = player.inventory;
-        List<Integer> slots = findItem(itemStack.getItem(), itemStack.getMetadata(), inv);
-        for (int slot : slots) {
-            ItemStack stackInSlot = inv.getStackInSlot(slot);
-            if (stackInSlot.getCount() < stackInSlot.getItem().getItemStackLimit(stackInSlot)) {
-                ItemStack giveItemStack = itemStack.copy();
-                boolean success = inv.addItemStackToInventory(giveItemStack);
-                if (success) return true;
-            }
-        }
-
         //Try to insert into the remote inventory.
         ItemStack tool = GadgetGeneric.getGadget(player);
         IItemHandler remoteInventory = GadgetUtils.getRemoteInventory(tool, world, player, NetworkIO.Operation.INSERT);
@@ -73,8 +61,22 @@ public class InventoryManipulation {
             }
         }
 
+        //Fill any unfilled stacks in the player's inventory first
+        IItemHandler currentInv = player.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
+        if( currentInv == null )
+            return false;
 
-        List<IItemHandler> invContainers = findInvContainers(inv);
+        List<Integer> slots = findItem(itemStack.getItem(), itemStack.getMetadata(), currentInv);
+        for (int slot : slots) {
+            ItemStack stackInSlot = currentInv.getStackInSlot(slot);
+            if (stackInSlot.getCount() < stackInSlot.getItem().getItemStackLimit(stackInSlot)) {
+                ItemStack giveItemStack = itemStack.copy();
+                boolean success = player.inventory.addItemStackToInventory(giveItemStack);
+                if (success) return true;
+            }
+        }
+
+        List<IItemHandler> invContainers = findInvContainers(player);
         if (invContainers.size() > 0) {
             for (IItemHandler container : invContainers) {
                 for (int i = 0; i < container.getSlots(); i++) {
@@ -91,8 +93,7 @@ public class InventoryManipulation {
             }
         }
         ItemStack giveItemStack = itemStack.copy();
-        boolean success = inv.addItemStackToInventory(giveItemStack);
-        return success;
+        return player.inventory.addItemStackToInventory(giveItemStack);
     }
 
     /**
@@ -116,10 +117,12 @@ public class InventoryManipulation {
         }
 
 
-        InventoryPlayer inv = player.inventory;
+        IItemHandler currentInv = player.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
+        if( currentInv == null )
+            return false;
 
-        List<Integer> slots = findItem(itemStack.getItem(), itemStack.getMetadata(), inv);
-        List<IItemHandler> invContainers = findInvContainers(inv);
+        List<Integer> slots = findItem(itemStack.getItem(), itemStack.getMetadata(), currentInv);
+        List<IItemHandler> invContainers = findInvContainers(player);
 
         if (invContainers.size() > 0) {
             for (IItemHandler container : invContainers) {
@@ -136,7 +139,7 @@ public class InventoryManipulation {
             return false;
         }
         int slot = slots.get(0);
-        ItemStack stackInSlot = inv.getStackInSlot(slot);
+        ItemStack stackInSlot = currentInv.getStackInSlot(slot);
         if (stackInSlot.getCount() < count) {
             return false;
         }
@@ -144,7 +147,7 @@ public class InventoryManipulation {
         return true;
     }
 
-    public static interface IRemoteInventoryProvider {
+    public interface IRemoteInventoryProvider {
         int countItem(ItemStack tool, ItemStack stack);
     }
 
@@ -159,16 +162,21 @@ public class InventoryManipulation {
     }
 
     public static int countItem(ItemStack itemStack, EntityPlayer player, IRemoteInventoryProvider remoteInventory) {
-        if (player.capabilities.isCreativeMode) {
+        if (player.capabilities.isCreativeMode)
             return Integer.MAX_VALUE;
-        }
+
         long count = remoteInventory.countItem(GadgetGeneric.getGadget(player), itemStack);
-        InventoryPlayer inv = player.inventory;
-        List<Integer> slots = findItem(itemStack.getItem(), itemStack.getMetadata(), inv);
-        List<IItemHandler> invContainers = findInvContainers(inv);
+
+        IItemHandler currentInv = player.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
+        if( currentInv == null )
+            return 0;
+
+        List<Integer> slots = findItem(itemStack.getItem(), itemStack.getMetadata(), currentInv);
+        List<IItemHandler> invContainers = findInvContainers(player);
         if (slots.size() == 0 && invContainers.size() == 0 && count == 0) {
             return 0;
         }
+
         if (invContainers.size() > 0) {
             for (IItemHandler container : invContainers) {
                 count += countInContainer(container, itemStack.getItem(), itemStack.getMetadata());
@@ -176,7 +184,7 @@ public class InventoryManipulation {
         }
 
         for (int slot : slots) {
-            ItemStack stackInSlot = inv.getStackInSlot(slot);
+            ItemStack stackInSlot = currentInv.getStackInSlot(slot);
             count += stackInSlot.getCount();
         }
         return longToInt(count);
@@ -186,20 +194,24 @@ public class InventoryManipulation {
         if (player.capabilities.isCreativeMode) {
             return Integer.MAX_VALUE;
         }
+
+        IItemHandler currentInv = player.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
+        if( currentInv == null )
+            return 0;
+
         long count = 0;
-        InventoryPlayer inv = player.inventory;
         Item item = ModItems.constructionPaste;
-        List<Integer> slots = findItem(item, 0, inv);
+        List<Integer> slots = findItem(item, 0, currentInv);
         if (slots.size() > 0) {
             for (int slot : slots) {
-                ItemStack stackInSlot = inv.getStackInSlot(slot);
+                ItemStack stackInSlot = currentInv.getStackInSlot(slot);
                 count += stackInSlot.getCount();
             }
         }
-        List<Integer> containerSlots = findItemClass(GenericPasteContainer.class, inv);
+        List<Integer> containerSlots = findItemClass(GenericPasteContainer.class, currentInv);
         if (containerSlots.size() > 0) {
             for (int slot : containerSlots) {
-                ItemStack stackInSlot = inv.getStackInSlot(slot);
+                ItemStack stackInSlot = currentInv.getStackInSlot(slot);
                 if (stackInSlot.getItem() instanceof GenericPasteContainer) {
                     count += GenericPasteContainer.getPasteAmount(stackInSlot);
                 }
@@ -218,27 +230,29 @@ public class InventoryManipulation {
     }
 
     public static ItemStack addPasteToContainer(EntityPlayer player, ItemStack itemStack) {
-        if (!(itemStack.getItem() instanceof ConstructionPaste)) {
+        if (!(itemStack.getItem() instanceof ConstructionPaste))
             return itemStack;
-        }
-        InventoryPlayer inv = player.inventory;
-        List<Integer> slots = findItemClass(GenericPasteContainer.class, inv);
-        if (slots.size() == 0) {
-            return itemStack;
-        }
 
-        Map<Integer, Integer> slotMap = new HashMap<Integer, Integer>();
+        IItemHandler currentInv = player.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
+        if( currentInv == null )
+            return itemStack;
+
+        List<Integer> slots = findItemClass(GenericPasteContainer.class, currentInv);
+        if (slots.size() == 0)
+            return itemStack;
+
+        Map<Integer, Integer> slotMap = new HashMap<>();
         for (int slot : slots) {
-            slotMap.put(slot, GenericPasteContainer.getPasteAmount(inv.getStackInSlot(slot)));
+            slotMap.put(slot, GenericPasteContainer.getPasteAmount(currentInv.getStackInSlot(slot)));
         }
         List<Map.Entry<Integer, Integer>> list = new ArrayList<>(slotMap.entrySet());
-        Comparator<Map.Entry<Integer, Integer>> comparator = Comparator.comparing(entry -> entry.getValue());
+        Comparator<Map.Entry<Integer, Integer>> comparator = Comparator.comparing(Map.Entry::getValue);
         comparator = comparator.reversed();
         list.sort(comparator);
 
 
         for (Map.Entry<Integer, Integer> entry : list) {
-            ItemStack containerStack = inv.getStackInSlot(entry.getKey());
+            ItemStack containerStack = currentInv.getStackInSlot(entry.getKey());
             int maxAmount = ((GenericPasteContainer) containerStack.getItem()).getMaxCapacity();
             int pasteInContainer = GenericPasteContainer.getPasteAmount(containerStack);
             int freeSpace = maxAmount - pasteInContainer;
@@ -258,21 +272,26 @@ public class InventoryManipulation {
         if (player.capabilities.isCreativeMode) {
             return true;
         }
-        InventoryPlayer inv = player.inventory;
-        List<Integer> slots = findItem(ModItems.constructionPaste, 0, inv);
+
+        IItemHandler currentInv = player.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
+        if( currentInv == null )
+            return false;
+
+        List<Integer> slots = findItem(ModItems.constructionPaste, 0, currentInv);
         if (slots.size() > 0) {
             for (int slot : slots) {
-                ItemStack pasteStack = inv.getStackInSlot(slot);
+                ItemStack pasteStack = currentInv.getStackInSlot(slot);
                 if (pasteStack.getCount() >= count) {
                     pasteStack.shrink(count);
                     return true;
                 }
             }
         }
-        List<Integer> containerSlots = findItemClass(GenericPasteContainer.class, inv);
+
+        List<Integer> containerSlots = findItemClass(GenericPasteContainer.class, currentInv);
         if (containerSlots.size() > 0) {
             for (int slot : containerSlots) {
-                ItemStack containerStack = inv.getStackInSlot(slot);
+                ItemStack containerStack = currentInv.getStackInSlot(slot);
                 if (containerStack.getItem() instanceof GenericPasteContainer) {
                     int pasteAmt = GenericPasteContainer.getPasteAmount(containerStack);
                     if (pasteAmt >= count) {
@@ -283,24 +302,30 @@ public class InventoryManipulation {
                 }
             }
         }
+
         return false;
     }
 
-    private static List<IItemHandler> findInvContainers(InventoryPlayer inv) {
-        List<IItemHandler> containers = new ArrayList<IItemHandler>();
-        for (int i = 0; i < 36; ++i) {
-            ItemStack stack = inv.getStackInSlot(i);
-            if (stack.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null)) {
-                containers.add(stack.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null));
-            }
+    private static List<IItemHandler> findInvContainers(EntityPlayer player) {
+        List<IItemHandler> containers = new ArrayList<>();
+
+        IItemHandler currentInv = player.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
+        if( currentInv == null )
+            return containers;
+
+        for (int i = 0; i < currentInv.getSlots(); ++i) {
+            ItemStack itemStack = currentInv.getStackInSlot(i);
+            if (itemStack.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null))
+                containers.add(itemStack.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null));
         }
+
         return containers;
     }
 
     public static int countInContainer(IItemHandler container, Item item, int meta) {
         int count = 0;
         ItemStack tempItem;
-        for (int i = 0; i < container.getSlots(); ++i) {
+        for (int i = 0; i < container.getSlots(); i++) {
             tempItem = container.getStackInSlot(i);
             if (tempItem.getItem() == item && tempItem.getMetadata() == meta) {
                 count += tempItem.getCount();
@@ -309,21 +334,24 @@ public class InventoryManipulation {
         return count;
     }
 
-    private static List<Integer> findItem(Item item, int meta, InventoryPlayer inv) {
-        List<Integer> slots = new ArrayList<Integer>();
-        for (int i = 0; i < 36; ++i) {
-            ItemStack stack = inv.getStackInSlot(i);
-            if (!stack.isEmpty() && stack.getItem() == item && meta == stack.getMetadata()) {
+    private static List<Integer> findItem(Item item, int meta, IItemHandler itemHandler) {
+        List<Integer> slots = new ArrayList<>();
+        if( itemHandler == null )
+            return slots;
+
+        for (int i = 0; i < itemHandler.getSlots(); i++) {
+            ItemStack stack = itemHandler.getStackInSlot(i);
+            if (!stack.isEmpty() && stack.getItem() == item && meta == stack.getMetadata())
                 slots.add(i);
-            }
         }
         return slots;
     }
 
-    public static List<Integer> findItemClass(Class c, InventoryPlayer inv) {
-        List<Integer> slots = new ArrayList<Integer>();
-        for (int i = 0; i < 36; ++i) {
-            ItemStack stack = inv.getStackInSlot(i);
+    public static List<Integer> findItemClass(Class c, IItemHandler itemHandler) {
+        List<Integer> slots = new ArrayList<>();
+
+        for (int i = 0; i < itemHandler.getSlots(); i++) {
+            ItemStack stack = itemHandler.getStackInSlot(i);
             if (!stack.isEmpty() && c.isInstance(stack.getItem())) {
                 slots.add(i);
             }
@@ -341,7 +369,7 @@ public class InventoryManipulation {
     }
 
     public static IBlockState getSpecificStates(IBlockState originalState, World world, EntityPlayer player, BlockPos pos, ItemStack tool) {
-        IBlockState placeState = Blocks.AIR.getDefaultState();
+        IBlockState placeState;
         Block block = originalState.getBlock();
         ItemStack item = block.getPickBlock(originalState, null, world, pos, player);
         int meta = item.getMetadata();
