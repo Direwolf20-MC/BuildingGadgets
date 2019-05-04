@@ -1,16 +1,14 @@
 package com.direwolf20.buildinggadgets.common.util.tools.modes;
 
 import com.direwolf20.buildinggadgets.api.building.IBuildingMode;
+import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.blocks.BlockMap;
 import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.google.common.collect.ImmutableList;
-import it.unimi.dsi.fastutil.doubles.Double2ObjectArrayMap;
-import it.unimi.dsi.fastutil.doubles.Double2ObjectMap;
-import it.unimi.dsi.fastutil.doubles.DoubleRBTreeSet;
-import it.unimi.dsi.fastutil.doubles.DoubleSortedSet;
+import it.unimi.dsi.fastutil.doubles.*;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.BlockItemUseContext;
@@ -75,7 +73,7 @@ public enum BuildingMode {
                 .orElse(TARGETED_AXIS_CHASING);
     }
 
-    private static final ImmutableList<ResourceLocation> ICONS = Arrays.stream(values())
+    private static final ImmutableList<ResourceLocation> ICONS = Arrays.stream(VALUES)
             .map(BuildingMode::getIcon)
             .collect(ImmutableList.toImmutableList());
 
@@ -83,34 +81,25 @@ public enum BuildingMode {
         return ICONS;
     }
 
-    public static BiPredicate<BlockPos, IBlockState> combineTester(World world, ItemStack tool, EntityPlayer player, BlockPos initial) {
+    public static BiPredicate<BlockPos, IBlockState> combineTester(World world, ItemStack tool, EntityPlayer player, BlockPos original) {
         IBlockState target = GadgetUtils.getToolBlock(tool);
         return (pos, state) -> {
             IBlockState current = world.getBlockState(pos);
-            BlockItemUseContext context = new BlockItemUseContext(world,player,tool,initial,EnumFacing.DOWN,0,0,0);
-            if (!target.isReplaceable(context))
+            // Filter out situations where people try to create floating grass (etc.)
+            if (!target.isValidPosition(world, pos))
                 return false;
+
+            // World boundary check
             if (pos.getY() < 0)
                 return false;
+
+            // If we allow overrides, replaceable blocks (e.g. grass, water) will return true
             if (Config.GENERAL.allowOverwriteBlocks.get())
-                return current.isReplaceable(context);
+                // Is the current block replaceable by the target block in the given context?
+                return current.isReplaceable(new BlockItemUseContext(world, player, new ItemStack(target.getBlock()), pos, EnumFacing.UP, 0.5F, 0.0F, 0.5F));
+            // If we don't allow overrides, replacement only happens when the current position is air
             return current.getBlock().isAir(current, world, pos);
         };
-    }
-
-    //  TODO: Fix this
-    private static boolean isReplaceable(World world, EntityPlayer player, BlockPos pos, IBlockState setBlock) {
-        if (! setBlock.isValidPosition(world, pos)) {
-            return false;
-        }
-        if (pos.getY() < 0) {
-            return false;
-        }
-        if (Config.GENERAL.allowOverwriteBlocks.get() && !world.getBlockState(pos).isReplaceable(
-                new BlockItemUseContext(world, player, new ItemStack(setBlock.getBlock()), pos, EnumFacing.UP, 0.5F, 0.0F, 0.5F))) {
-            return false;
-        }
-        return true;
     }
 
     public static List<BlockMap> sortMapByDistance(List<BlockMap> unSortedMap, EntityPlayer player) {//TODO unused
