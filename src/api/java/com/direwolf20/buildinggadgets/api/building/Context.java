@@ -22,7 +22,6 @@ import java.util.function.BiPredicate;
  * @implNote Execution context in Strategy Pattern
  */
 public class Context {
-
     private final IPositionPlacementSequence positions;
     private final IBlockProvider blocks;
     private final IValidatorFactory validatorFactory;

@@ -310,7 +310,7 @@ public class GadgetBuilding extends GadgetPlacing implements IAtopPlacingGadget 
             return false;
         }
         BlockSnapshot blockSnapshot = BlockSnapshot.getBlockSnapshot(world, pos);
-        if (ForgeEventFactory.onPlayerBlockPlace(player, blockSnapshot, EnumFacing.UP, EnumHand.MAIN_HAND).isCanceled()) {
+        if (!ForgeEventFactory.onBlockPlace(player, blockSnapshot, EnumFacing.UP)) {
             return false;
         }
         ItemStack constructionPaste = new ItemStack(BGItems.constructionPaste);
