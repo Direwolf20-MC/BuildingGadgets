@@ -55,14 +55,14 @@ public final class BGItems {
     public static ConstructionPasteContainerCreative CreativeConstructionPasteContainer;
 
     static void init() {
-        container.add(new RegistryObjectBuilder<Item, Item.Properties>(ItemReference.GADGET_EXCHANGING_RL).builder(itemProperties()).factory(GadgetExchanger::new));
-        container.add(new RegistryObjectBuilder<Item, Item.Properties>(ItemReference.GADGET_BUILDING_RL).builder(itemProperties()).factory(GadgetBuilding::new));
-        container.add(new RegistryObjectBuilder<Item, Item.Properties>(ItemReference.GADGET_DESTRUCTION_RL).builder(itemProperties()).factory(GadgetDestruction::new));
-        container.add(new RegistryObjectBuilder<Item, Item.Properties>(ItemReference.GADGET_COPY_PASTE_RL).builder(itemProperties()).factory(GadgetCopyPaste::new));
-        container.add(new RegistryObjectBuilder<Item, Item.Properties>(ItemReference.PASTE_CONTAINER_T1_RL).builder(itemProperties()).factory(RegularPasteContainerTypes.T1::create));
-        container.add(new RegistryObjectBuilder<Item, Item.Properties>(ItemReference.PASTE_CONTAINER_T2_RL).builder(itemProperties()).factory(RegularPasteContainerTypes.T2::create));
-        container.add(new RegistryObjectBuilder<Item, Item.Properties>(ItemReference.PASTE_CONTAINER_T3_RL).builder(itemProperties()).factory(RegularPasteContainerTypes.T3::create));
-        container.add(new RegistryObjectBuilder<Item, Item.Properties>(ItemReference.PASTE_CONTAINER_CREATIVE_RL).builder(itemProperties()).factory(ConstructionPasteContainerCreative::new));
+        container.add(new RegistryObjectBuilder<Item, Item.Properties>(ItemReference.GADGET_EXCHANGING_RL).builder(unstackableItemProperties()).factory(GadgetExchanger::new));
+        container.add(new RegistryObjectBuilder<Item, Item.Properties>(ItemReference.GADGET_BUILDING_RL).builder(unstackableItemProperties()).factory(GadgetBuilding::new));
+        container.add(new RegistryObjectBuilder<Item, Item.Properties>(ItemReference.GADGET_DESTRUCTION_RL).builder(unstackableItemProperties()).factory(GadgetDestruction::new));
+        container.add(new RegistryObjectBuilder<Item, Item.Properties>(ItemReference.GADGET_COPY_PASTE_RL).builder(unstackableItemProperties()).factory(GadgetCopyPaste::new));
+        container.add(new RegistryObjectBuilder<Item, Item.Properties>(ItemReference.PASTE_CONTAINER_T1_RL).builder(unstackableItemProperties()).factory(RegularPasteContainerTypes.T1::create));
+        container.add(new RegistryObjectBuilder<Item, Item.Properties>(ItemReference.PASTE_CONTAINER_T2_RL).builder(unstackableItemProperties()).factory(RegularPasteContainerTypes.T2::create));
+        container.add(new RegistryObjectBuilder<Item, Item.Properties>(ItemReference.PASTE_CONTAINER_T3_RL).builder(unstackableItemProperties()).factory(RegularPasteContainerTypes.T3::create));
+        container.add(new RegistryObjectBuilder<Item, Item.Properties>(ItemReference.PASTE_CONTAINER_CREATIVE_RL).builder(unstackableItemProperties()).factory(ConstructionPasteContainerCreative::new));
         container.add(new RegistryObjectBuilder<Item, Item.Properties>(ItemReference.CONSTRUCTION_PASTE_RL).builder(itemProperties()).factory(ConstructionPaste::new));
         container.add(new RegistryObjectBuilder<Item, Item.Properties>(ItemReference.CONSTRUCTION_CHUNK_DENSE_RL).builder(itemProperties()).factory(Item::new));
         container.add(new RegistryObjectBuilder<Item, Item.Properties>(ItemReference.TEMPLATE_RL).builder(itemProperties()).factory(Template::new));
@@ -73,12 +73,16 @@ public final class BGItems {
         container.register(event);
     }
 
+    static Item.Properties itemPropertiesWithoutGroup() {
+        return new Item.Properties();
+    }
+
     static Item.Properties itemProperties() {
         return new Item.Properties().group(BuildingObjects.creativeTab);
     }
 
-    static Item.Properties itemPropertiesWithoutGroup() {
-        return new Item.Properties();
+    static Item.Properties unstackableItemProperties() {
+        return itemProperties().maxStackSize(1);
     }
 
     static void cleanup() {
