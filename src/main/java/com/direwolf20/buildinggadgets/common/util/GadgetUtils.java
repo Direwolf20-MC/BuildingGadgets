@@ -37,6 +37,7 @@ import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
+import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 
@@ -391,8 +392,12 @@ public class GadgetUtils {
         if (te == null) return null;
         //IItemHandler network = RefinedStorage.getWrappedNetwork(te, operation);
         //if (network != null) return network;
-            IItemHandler cap = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null).orElseThrow(CapabilityNotPresentException::new);
-        return cap != null ? cap : null;
+
+        LazyOptional<IItemHandler> cap = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
+        if( !cap.isPresent() )
+            return null;
+
+        return cap.orElseThrow(CapabilityNotPresentException::new);
     }
 
     public static String withSuffix(int count) {
