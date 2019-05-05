@@ -538,7 +538,7 @@ public class GadgetCopyPaste extends GadgetPlacing implements ITemplate {
             return;
         }
         BlockSnapshot blockSnapshot = BlockSnapshot.getBlockSnapshot(world, pos);
-        if (!ForgeEventFactory.onBlockPlace(player, blockSnapshot, EnumFacing.UP)) {
+        if (ForgeEventFactory.onBlockPlace(player, blockSnapshot, EnumFacing.UP)) {
             return;
         }
         ItemStack constructionPaste = new ItemStack(BGItems.constructionPaste);
