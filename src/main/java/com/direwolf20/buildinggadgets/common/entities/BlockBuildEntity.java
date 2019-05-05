@@ -32,7 +32,6 @@ public class BlockBuildEntity extends EntityBase {
 
     private IBlockState setBlock;
     private IBlockState originalSetBlock;
-    private IBlockState actualSetBlock;
     private EntityLivingBase spawnedBy;
 
     private int mode;
@@ -42,7 +41,7 @@ public class BlockBuildEntity extends EntityBase {
         super(BGEntities.BUILD_BLOCK, world);
     }
 
-    public BlockBuildEntity(World world, BlockPos spawnPos, EntityLivingBase player, IBlockState spawnBlock, int toolMode, IBlockState actualSpawnBlock, boolean usePaste) {
+    public BlockBuildEntity(World world, BlockPos spawnPos, EntityLivingBase player, IBlockState spawnBlock, int toolMode, boolean usePaste) {
         this(world);
         setPosition(spawnPos.getX(), spawnPos.getY(), spawnPos.getZ());
 
@@ -61,7 +60,6 @@ public class BlockBuildEntity extends EntityBase {
         setToolMode(toolMode);
 
         spawnedBy = player;
-        actualSetBlock = actualSpawnBlock;
         world.setBlockState(spawnPos, BGBlocks.effectBlock.getDefaultState());
 
         setUsingPaste(usePaste);
@@ -108,7 +106,6 @@ public class BlockBuildEntity extends EntityBase {
     protected void readAdditional(NBTTagCompound compound) {
         super.readAdditional(compound);
         setBlock = NBTUtil.readBlockState(compound.getCompound(NBTKeys.ENTITY_BUILD_SET_BLOCK));
-        actualSetBlock = NBTUtil.readBlockState(compound.getCompound(NBTKeys.ENTITY_BUILD_SET_BLOCK));
         originalSetBlock = NBTUtil.readBlockState(compound.getCompound(NBTKeys.ENTITY_BUILD_ORIGINAL_BLOCK));
         mode = compound.getInt(NBTKeys.GADGET_MODE);
         useConstructionPaste = compound.getBoolean(NBTKeys.ENTITY_BUILD_USE_PASTE);
@@ -120,9 +117,6 @@ public class BlockBuildEntity extends EntityBase {
 
         NBTTagCompound blockStateTag = NBTUtil.writeBlockState(setBlock);
         compound.setTag(NBTKeys.ENTITY_BUILD_SET_BLOCK, blockStateTag);
-
-        NBTTagCompound actualBlockStateTag = NBTUtil.writeBlockState(actualSetBlock);
-        compound.setTag(NBTKeys.ENTITY_BUILD_SET_BLOCK_ACTUAL, actualBlockStateTag);
 
         blockStateTag = NBTUtil.writeBlockState(originalSetBlock);
 
@@ -142,7 +136,7 @@ public class BlockBuildEntity extends EntityBase {
                     world.setBlockState(targetPos, BGBlocks.constructionBlock.getDefaultState());
                     TileEntity te = world.getTileEntity(targetPos);
                     if (te instanceof ConstructionBlockTileEntity) {
-                        ((ConstructionBlockTileEntity) te).setBlockState(setBlock, actualSetBlock);
+                        ((ConstructionBlockTileEntity) te).setBlockState(setBlock, setBlock);
                     }
                     world.spawnEntity(new ConstructionBlockEntity(world, targetPos, false));
                 } else {
@@ -155,7 +149,7 @@ public class BlockBuildEntity extends EntityBase {
                 world.setBlockState(targetPos, Blocks.AIR.getDefaultState());
                 break;
             case MODE_REPLACE:
-                world.spawnEntity(new BlockBuildEntity(world, targetPos, spawnedBy, originalSetBlock, MODE_PLACE, actualSetBlock, isUsingPaste()));
+                world.spawnEntity(new BlockBuildEntity(world, targetPos, spawnedBy, originalSetBlock, MODE_PLACE, isUsingPaste()));
                 break;
         }
     }
