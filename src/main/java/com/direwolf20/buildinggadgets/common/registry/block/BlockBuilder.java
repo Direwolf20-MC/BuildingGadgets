@@ -14,6 +14,7 @@ public final class BlockBuilder extends RegistryObjectBuilder<Block, Block.Prope
     private Block block;
     private BiFunction<Block, Item.Properties, Item> itemBlockFactory;
     private Item.Properties itemBuilder;
+    private boolean hasItem;
 
     public static BlockBuilder create(String registryName) {
         return new BlockBuilder(registryName);
@@ -27,12 +28,14 @@ public final class BlockBuilder extends RegistryObjectBuilder<Block, Block.Prope
         super(registryName);
         this.itemBlockFactory = ItemBlock::new;
         this.itemBuilder = new Item.Properties();
+        hasItem = true;
     }
 
     public BlockBuilder(ResourceLocation registryName) {
         super(registryName);
         this.itemBlockFactory = ItemBlock::new;
         this.itemBuilder = new Item.Properties();
+        hasItem = true;
     }
 
     public BlockBuilder item(Item.Properties itemBuilder, BiFunction<Block, Item.Properties, Item> itemBlockFactory) {
@@ -43,6 +46,11 @@ public final class BlockBuilder extends RegistryObjectBuilder<Block, Block.Prope
 
     public BlockBuilder item(Item.Properties itemBuilder) {
         return item(itemBuilder,itemBlockFactory);
+    }
+
+    public BlockBuilder setHasNoItem() {
+        hasItem = false;
+        return this;
     }
 
     @Override
@@ -63,6 +71,10 @@ public final class BlockBuilder extends RegistryObjectBuilder<Block, Block.Prope
 
     Item createItemFromBlock() {
         return itemBlockFactory.apply(block,itemBuilder).setRegistryName(getRegistryName());
+    }
+
+    boolean hasItem() {
+        return hasItem;
     }
 
 }
