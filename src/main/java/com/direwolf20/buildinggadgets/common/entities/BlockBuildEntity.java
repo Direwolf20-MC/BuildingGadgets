@@ -1,10 +1,10 @@
 package com.direwolf20.buildinggadgets.common.entities;
 
+import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGEntities;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
-
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.init.Blocks;
@@ -21,10 +21,14 @@ import javax.annotation.Nullable;
 import java.util.Optional;
 
 public class BlockBuildEntity extends EntityBase {
-    private static final DataParameter<Integer> toolMode = EntityDataManager.<Integer>createKey(BlockBuildEntity.class, DataSerializers.VARINT);
+
+    public static final int MODE_PLACE = 1;
+    public static final int MODE_REMOVE = 2;
+    public static final int MODE_REPLACE = 3;
+
+    private static final DataParameter<Integer> TOOL_MODE = EntityDataManager.createKey(BlockBuildEntity.class, DataSerializers.VARINT);
     private static final DataParameter<Optional<IBlockState>> SET_BLOCK = EntityDataManager.createKey(BlockBuildEntity.class, DataSerializers.OPTIONAL_BLOCK_STATE);
-    private static final DataParameter<BlockPos> FIXED = EntityDataManager.createKey(BlockBuildEntity.class, DataSerializers.BLOCK_POS);
-    private static final DataParameter<Boolean> usePaste = EntityDataManager.createKey(BlockBuildEntity.class, DataSerializers.BOOLEAN);
+    private static final DataParameter<Boolean> USE_PASTE = EntityDataManager.createKey(BlockBuildEntity.class, DataSerializers.BOOLEAN);
 
     private IBlockState setBlock;
     private IBlockState originalSetBlock;
@@ -38,23 +42,20 @@ public class BlockBuildEntity extends EntityBase {
         super(BGEntities.BUILD_BLOCK, world);
     }
 
-    public BlockBuildEntity(World world, BlockPos spawnPos, EntityLivingBase player, IBlockState spawnBlock, int toolMode, IBlockState actualSpawnBlock, boolean constrPaste) {
+    public BlockBuildEntity(World world, BlockPos spawnPos, EntityLivingBase player, IBlockState spawnBlock, int toolMode, IBlockState actualSpawnBlock, boolean usePaste) {
         this(world);
         setPosition(spawnPos.getX(), spawnPos.getY(), spawnPos.getZ());
 
         IBlockState currentBlock = world.getBlockState(spawnPos);
         TileEntity te = world.getTileEntity(spawnPos);
-
         targetPos = spawnPos;
-        setBlock = te instanceof ConstructionBlockTileEntity ? te.getBlockState() : spawnBlock;
         originalSetBlock = spawnBlock;
 
-        setSetBlock(setBlock);
-
-        if (toolMode == 3) {
+        if (toolMode == MODE_REPLACE)
             setBlock = te instanceof ConstructionBlockTileEntity ? te.getBlockState() : currentBlock;
-            setSetBlock(setBlock);
-        }
+        else
+            setBlock = te instanceof ConstructionBlockTileEntity ? te.getBlockState() : spawnBlock;
+        setSetBlock(setBlock);
 
         mode = toolMode;
         setToolMode(toolMode);
@@ -63,7 +64,7 @@ public class BlockBuildEntity extends EntityBase {
         actualSetBlock = actualSpawnBlock;
         world.setBlockState(spawnPos, BGBlocks.effectBlock.getDefaultState());
 
-        setUsingConstructionPaste(constrPaste);
+        setUsingPaste(usePaste);
     }
 
     @Override
@@ -72,11 +73,11 @@ public class BlockBuildEntity extends EntityBase {
     }
 
     public int getToolMode() {
-        return dataManager.get(toolMode);
+        return dataManager.get(TOOL_MODE);
     }
 
     public void setToolMode(int mode) {
-        dataManager.set(toolMode, mode);
+        dataManager.set(TOOL_MODE, mode);
     }
 
     @Nullable
@@ -88,20 +89,19 @@ public class BlockBuildEntity extends EntityBase {
         dataManager.set(SET_BLOCK, Optional.ofNullable(state));
     }
 
-    public void setUsingConstructionPaste(Boolean paste) {
-        dataManager.set(usePaste, paste);
+    public void setUsingPaste(Boolean paste) {
+        dataManager.set(USE_PASTE, paste);
     }
 
-    public boolean getUsingConstructionPaste() {
-        return dataManager.get(usePaste);
+    public boolean isUsingPaste() {
+        return dataManager.get(USE_PASTE);
     }
 
     @Override
     protected void registerData() {
-        dataManager.register(FIXED, BlockPos.ORIGIN);
-        dataManager.register(toolMode, 1);
+        dataManager.register(TOOL_MODE, 1);
         dataManager.register(SET_BLOCK, Optional.empty());
-        dataManager.register(usePaste, useConstructionPaste);
+        dataManager.register(USE_PASTE, useConstructionPaste);
     }
 
     @Override
@@ -133,23 +133,31 @@ public class BlockBuildEntity extends EntityBase {
 
     @Override
     protected void onSetDespawning() {
-        if (targetPos != null && setBlock != null && (getToolMode() == 1)) {
-            if (getUsingConstructionPaste()) {
-                world.setBlockState(targetPos, BGBlocks.constructionBlock.getDefaultState());
-                TileEntity te = world.getTileEntity(targetPos);
-                if (te instanceof ConstructionBlockTileEntity) {
-                    ((ConstructionBlockTileEntity) te).setBlockState(setBlock, actualSetBlock);
+        if (world.isRemote || targetPos == null || setBlock == null)
+            return;
+
+        switch (getToolMode()) {
+            case MODE_PLACE:
+                if (isUsingPaste()) {
+                    world.setBlockState(targetPos, BGBlocks.constructionBlock.getDefaultState());
+                    TileEntity te = world.getTileEntity(targetPos);
+                    if (te instanceof ConstructionBlockTileEntity) {
+                        ((ConstructionBlockTileEntity) te).setBlockState(setBlock, actualSetBlock);
+                    }
+                    world.spawnEntity(new ConstructionBlockEntity(world, targetPos, false));
+                } else {
+                    world.setBlockState(targetPos, setBlock);
+                    BlockPos upPos = targetPos.up();
+                    world.getBlockState(targetPos).neighborChanged(world, targetPos, world.getBlockState(upPos).getBlock(), upPos);
                 }
-                world.spawnEntity(new ConstructionBlockEntity(world, targetPos, false));
-            } else {
-                world.setBlockState(targetPos, setBlock);
-                BlockPos upPos = targetPos.up();
-                world.getBlockState(targetPos).neighborChanged(world, targetPos, world.getBlockState(upPos).getBlock(), upPos);
-            }
-        } else if (targetPos != null && setBlock != null && getToolMode() == 2) {
-            world.setBlockState(targetPos, Blocks.AIR.getDefaultState());
-        } else if (targetPos != null && setBlock != null && getToolMode() == 3) {
-            world.spawnEntity(new BlockBuildEntity(world, targetPos, spawnedBy, originalSetBlock, 1, actualSetBlock, getUsingConstructionPaste()));
+                break;
+            case MODE_REMOVE:
+                world.setBlockState(targetPos, Blocks.AIR.getDefaultState());
+                break;
+            case MODE_REPLACE:
+                world.spawnEntity(new BlockBuildEntity(world, targetPos, spawnedBy, originalSetBlock, MODE_PLACE, actualSetBlock, isUsingPaste()));
+                break;
         }
     }
+
 }

@@ -5,7 +5,6 @@ import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
-import com.direwolf20.buildinggadgets.common.util.CapabilityUtil.EnergyUtil;
 import com.direwolf20.buildinggadgets.common.util.helpers.InventoryHelper;
 import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
 import com.direwolf20.buildinggadgets.common.util.helpers.SortingHelper;
@@ -258,7 +257,7 @@ public class GadgetBuilding extends GadgetPlacing implements IAtopPlacingGadget 
                 if (distance < 64 && sameDim && currentBlock != BGBlocks.effectBlock.getDefaultState() && !cancelled) { //Don't allow us to undo a block while its still being placed or too far away
                     if (currentBlock != Blocks.AIR.getDefaultState()) {
                         currentBlock.getBlock().harvestBlock(world, player, coord, currentBlock, world.getTileEntity(coord), silkTool);
-                        world.spawnEntity(new BlockBuildEntity(world, coord, player, currentBlock, 2, getToolActualBlock(heldItem), false));
+                        world.spawnEntity(new BlockBuildEntity(world, coord, player, currentBlock, BlockBuildEntity.MODE_REMOVE, getToolActualBlock(heldItem), false));
                     }
                 } else { //If you're in the wrong dimension or too far away, fail the undo.
                     player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.undofailed").getUnformattedComponentText()), true);
@@ -308,7 +307,7 @@ public class GadgetBuilding extends GadgetPlacing implements IAtopPlacingGadget 
             return false;
         }
         BlockSnapshot blockSnapshot = BlockSnapshot.getBlockSnapshot(world, pos);
-        if (!ForgeEventFactory.onBlockPlace(player, blockSnapshot, EnumFacing.UP)) {
+        if (ForgeEventFactory.onBlockPlace(player, blockSnapshot, EnumFacing.UP)) {
             return false;
         }
         ItemStack constructionPaste = new ItemStack(BGItems.constructionPaste);
@@ -334,7 +333,7 @@ public class GadgetBuilding extends GadgetPlacing implements IAtopPlacingGadget 
             useItemSuccess = InventoryHelper.useItem(itemStack, player, neededItems, world);
         }
         if (useItemSuccess) {
-            world.spawnEntity(new BlockBuildEntity(world, pos, player, setBlock, 1, getToolActualBlock(heldItem), useConstructionPaste));
+            world.spawnEntity(new BlockBuildEntity(world, pos, player, setBlock, BlockBuildEntity.MODE_PLACE, getToolActualBlock(heldItem), useConstructionPaste));
             return true;
         }
         return false;

@@ -19,7 +19,6 @@ import javax.annotation.Nullable;
 
 import org.lwjgl.opengl.GL11;
 
-
 public class BlockBuildEntityRender extends Render<BlockBuildEntity> {
 
     public BlockBuildEntityRender(RenderManager renderManager) {
@@ -41,7 +40,7 @@ public class BlockBuildEntityRender extends Render<BlockBuildEntity> {
         float scale = (float) (teCounter) / (float) maxLife;
         if (scale >= 1.0f)
             scale = 0.99f;
-        if (toolMode == 2 || toolMode == 3)
+        if (toolMode == BlockBuildEntity.MODE_REMOVE || toolMode == BlockBuildEntity.MODE_REPLACE)
             scale = (float) (maxLife - teCounter) / maxLife;
         float trans = (1 - scale) / 2;
         GlStateManager.translated(x, y, z);
@@ -53,7 +52,7 @@ public class BlockBuildEntityRender extends Render<BlockBuildEntity> {
         //IBlockState renderBlockState = blocks.COBBLESTONE.getDefaultState();
 
         IBlockState renderBlockState = entity.getSetBlock();
-        if (entity.getUsingConstructionPaste() && toolMode == 1)
+        if (entity.isUsingPaste() && toolMode == BlockBuildEntity.MODE_PLACE)
             renderBlockState = BGBlocks.constructionBlock.getDefaultState();
         if (renderBlockState == null) {
             renderBlockState = Blocks.COBBLESTONE.getDefaultState();

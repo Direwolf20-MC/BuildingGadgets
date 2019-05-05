@@ -3,6 +3,7 @@ package com.direwolf20.buildinggadgets.client.events;
 import com.direwolf20.buildinggadgets.client.KeyBindings;
 import com.direwolf20.buildinggadgets.client.gui.GuiMod;
 import com.direwolf20.buildinggadgets.client.gui.ModeRadialMenu;
+import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.*;
@@ -46,6 +47,8 @@ public class EventKeyInput {
             PacketHandler.sendToServer(new PacketToggleConnectedArea());
         } else if (KeyBindings.materialList.isPressed()) {
             GuiMod.MATERIAL_LIST.openScreen(mc.player);
+        } else if (KeyBindings.printNBT.isPressed()) {
+            BuildingGadgets.LOG.debug(Minecraft.getInstance().player.getHeldItemMainhand().getTag());
         }
     }
 }

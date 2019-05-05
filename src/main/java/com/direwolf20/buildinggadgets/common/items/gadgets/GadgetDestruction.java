@@ -450,11 +450,11 @@ public class GadgetDestruction extends GadgetSwapping {
                         }
                     }
                     if (pasteState != Blocks.AIR.getDefaultState()) {
-                        world.spawnEntity(new BlockBuildEntity(world, placePos, player, pasteState, 1, pasteState, true));
+                        world.spawnEntity(new BlockBuildEntity(world, placePos, player, pasteState, BlockBuildEntity.MODE_PLACE, pasteState, true));
                         success = true;
                     }
                 } else {
-                    world.spawnEntity(new BlockBuildEntity(world, placePos, player, placeState, 1, placeState, false));
+                    world.spawnEntity(new BlockBuildEntity(world, placePos, player, placeState, BlockBuildEntity.MODE_PLACE, placeState, false));
                     success = true;
                 }
             }
@@ -476,7 +476,7 @@ public class GadgetDestruction extends GadgetSwapping {
 
         this.applyDamage(tool, player);
 
-        world.spawnEntity(new BlockBuildEntity(world, voidPos, player, world.getBlockState(voidPos), 2, Blocks.AIR.getDefaultState(), false));
+        world.spawnEntity(new BlockBuildEntity(world, voidPos, player, world.getBlockState(voidPos), BlockBuildEntity.MODE_REMOVE, Blocks.AIR.getDefaultState(), false));
         return true;
     }
 
