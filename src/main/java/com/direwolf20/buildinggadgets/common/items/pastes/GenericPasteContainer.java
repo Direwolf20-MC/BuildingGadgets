@@ -7,7 +7,7 @@ import net.minecraft.item.ItemStack;
 public abstract class GenericPasteContainer extends Item {
 
     public GenericPasteContainer(Properties builder) {
-        super(builder.maxStackSize(1));
+        super(builder);
     }
 
     /**

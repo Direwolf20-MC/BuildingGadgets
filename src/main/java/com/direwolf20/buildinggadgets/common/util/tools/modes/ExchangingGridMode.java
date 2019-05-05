@@ -24,7 +24,7 @@ public class ExchangingGridMode extends GridMode {
      */
     @Override
     public IPositionPlacementSequence computeCoordinates(EntityPlayer player, BlockPos hit, EnumFacing sideHit, ItemStack tool) {
-        return super.computeCoordinates(player, hit.offset(EnumFacing.DOWN), sideHit, tool);
+        return super.computeCoordinates(player, hit, sideHit, tool);
     }
 
 }
