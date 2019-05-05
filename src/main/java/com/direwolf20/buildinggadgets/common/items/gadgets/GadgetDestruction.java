@@ -343,7 +343,7 @@ public class GadgetDestruction extends GadgetSwapping {
         }
         if (!world.isRemote) {
             BlockSnapshot blockSnapshot = BlockSnapshot.getBlockSnapshot(world, voidPos);
-            if (!ForgeEventFactory.onBlockPlace(player, blockSnapshot, EnumFacing.UP)) {
+            if (ForgeEventFactory.onBlockPlace(player, blockSnapshot, EnumFacing.UP)) {
                 return false;
             }
             BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(world, voidPos, currentBlock, player);
