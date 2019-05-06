@@ -178,7 +178,7 @@ public class TemplateManagerCommands {
         //Map<UniqueItem, Integer> tagMap = GadgetUtils.nbtToItemCount((NBTTagList) templateTagCompound.getTag("itemcountmap"));
         //templateTagCompound.removeTag("itemcountmap");
 
-        NBTTagList MapIntStateTag = (NBTTagList) templateTagCompound.getTag(NBTKeys.MAP_INT_STATE);
+        NBTTagList MapIntStateTag = (NBTTagList) templateTagCompound.getTag(NBTKeys.MAP_PALETTE);
 
         BlockMapIntState mapIntState = new BlockMapIntState();
         mapIntState.getIntStateMapFromNBT(MapIntStateTag);
@@ -230,9 +230,9 @@ public class TemplateManagerCommands {
                 return;
             }
             NBTTagCompound newCompound = new NBTTagCompound();
-            newCompound.setIntArray(NBTKeys.MAP_STATE_INT, tagCompound.getIntArray(NBTKeys.MAP_STATE_INT));
-            newCompound.setIntArray(NBTKeys.MAP_POS_INT, tagCompound.getIntArray(NBTKeys.MAP_POS_INT));
-            newCompound.setTag(NBTKeys.MAP_INT_STATE, tagCompound.getTag(NBTKeys.MAP_INT_STATE));
+            newCompound.setIntArray(NBTKeys.MAP_INDEX2STATE_ID, tagCompound.getIntArray(NBTKeys.MAP_INDEX2STATE_ID));
+            newCompound.setIntArray(NBTKeys.MAP_INDEX2POS, tagCompound.getIntArray(NBTKeys.MAP_INDEX2POS));
+            newCompound.setTag(NBTKeys.MAP_PALETTE, tagCompound.getTag(NBTKeys.MAP_PALETTE));
             GadgetUtils.writePOSToNBT(newCompound, GadgetUtils.getPOSFromNBT(tagCompound, NBTKeys.GADGET_START_POS), NBTKeys.GADGET_START_POS, DimensionType.OVERWORLD);
             GadgetUtils.writePOSToNBT(newCompound, GadgetUtils.getPOSFromNBT(tagCompound, NBTKeys.GADGET_END_POS), NBTKeys.GADGET_END_POS, DimensionType.OVERWORLD);
             //Map<UniqueItem, Integer> tagMap = GadgetCopyPaste.getItemCountMap(itemStack0);

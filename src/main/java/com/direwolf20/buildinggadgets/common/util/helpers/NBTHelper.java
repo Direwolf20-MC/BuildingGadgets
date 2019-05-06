@@ -1,19 +1,18 @@
 package com.direwolf20.buildinggadgets.common.util.helpers;
 
+import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.*;
 
 import javax.annotation.Nonnull;
-
-import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
-
 import java.util.Map;
 import java.util.function.Function;
 
 /**
- * Utility class providing additional Methods for reading and writing array's which are not normally provided as NBT-Objects by Minecraft.
+ * Utility class providing additional Methods for reading and writing array's which are not normally provided as
+ * NBT-Objects by Minecraft.
  */
 public class NBTHelper {
 
@@ -138,7 +137,6 @@ public class NBTHelper {
         }
         return res;
     }
-
 
     @Nonnull
     public static NBTTagList createStringList(String[] strings) {
@@ -327,8 +325,31 @@ public class NBTHelper {
     }
 
     /**
-     * If the given stack has a tag, returns it. If the given stack does not have a tag, it will set a reference and return the new tag
-     * compound.
+     * Connect two {@link NBTTagList} together to create a new one. This process has no side effects, which means it
+     * will not modify two parameters.
+     * <p>
+     * Additionally, if any of the lists are empty, the method will directly return the empty one. If both of them are
+     * empty, it will directly return the first list.
+     */
+    public static NBTTagList concat(NBTTagList first, NBTTagList second) {
+        if (first.isEmpty())
+            return first;
+        if (second.isEmpty())
+            return second;
+
+        NBTTagList connected = new NBTTagList();
+        for (int i = 0; i < first.size(); i++) {
+            connected.add(first.getCompound(i));
+        }
+        for (int i = 0; i < second.size(); i++) {
+            connected.add(second.getCompound(i));
+        }
+        return connected;
+    }
+
+    /**
+     * If the given stack has a tag, returns it. If the given stack does not have a tag, it will set a reference and
+     * return the new tag compound.
      */
     public static NBTTagCompound getOrNewTag(ItemStack stack) {
         if (stack.hasTag()) {

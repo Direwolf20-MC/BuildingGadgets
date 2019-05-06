@@ -175,14 +175,14 @@ public class GadgetCopyPaste extends GadgetPlacing implements ITemplate {
         if (tagCompound == null) {
             tagCompound = new NBTTagCompound();
         }
-        NBTTagList MapIntStateTag = (NBTTagList) tagCompound.getTag(NBTKeys.MAP_INT_STATE);
+        NBTTagList MapIntStateTag = (NBTTagList) tagCompound.getTag(NBTKeys.MAP_PALETTE);
         if (MapIntStateTag == null) {
             MapIntStateTag = new NBTTagList();
         }
         BlockMapIntState MapIntState = new BlockMapIntState();
         MapIntState.getIntStateMapFromNBT(MapIntStateTag);
-        int[] posIntArray = tagCompound.getIntArray(NBTKeys.MAP_POS_INT);
-        int[] stateIntArray = tagCompound.getIntArray(NBTKeys.MAP_STATE_INT);
+        int[] posIntArray = tagCompound.getIntArray(NBTKeys.MAP_INDEX2POS);
+        int[] stateIntArray = tagCompound.getIntArray(NBTKeys.MAP_INDEX2STATE_ID);
         for (int i = 0; i < posIntArray.length; i++) {
             int p = posIntArray[i];
             BlockPos pos = GadgetUtils.relIntToPos(startBlock, p);
@@ -196,7 +196,7 @@ public class GadgetCopyPaste extends GadgetPlacing implements ITemplate {
         if (tagCompound == null) {
             tagCompound = new NBTTagCompound();
         }
-        NBTTagList MapIntStateTag = (NBTTagList) tagCompound.getTag(NBTKeys.MAP_INT_STATE);
+        NBTTagList MapIntStateTag = (NBTTagList) tagCompound.getTag(NBTKeys.MAP_PALETTE);
         if (MapIntStateTag == null) {
             MapIntStateTag = new NBTTagList();
         }
@@ -352,10 +352,10 @@ public class GadgetCopyPaste extends GadgetPlacing implements ITemplate {
         }
         int[] posIntArray = posIntArrayList.stream().mapToInt(i -> i).toArray();
         int[] stateIntArray = stateIntArrayList.stream().mapToInt(i -> i).toArray();
-        tagCompound.setTag(NBTKeys.MAP_INT_STATE, blockMapIntState.putIntStateMapIntoNBT());
+        tagCompound.setTag(NBTKeys.MAP_PALETTE, blockMapIntState.putIntStateMapIntoNBT());
         tagCompound.setTag(NBTKeys.MAP_INT_STACK, blockMapIntState.putIntStackMapIntoNBT());
-        tagCompound.setIntArray(NBTKeys.MAP_POS_INT, posIntArray);
-        tagCompound.setIntArray(NBTKeys.MAP_STATE_INT, stateIntArray);
+        tagCompound.setIntArray(NBTKeys.MAP_INDEX2POS, posIntArray);
+        tagCompound.setIntArray(NBTKeys.MAP_INDEX2STATE_ID, stateIntArray);
         tool.incrementCopyCounter(stack);
         tagCompound.setInt(NBTKeys.TEMPLATE_COPY_COUNT, tool.getCopyCounter(stack));
         worldSave.addToMap(tool.getUUID(stack), tagCompound);
@@ -454,12 +454,12 @@ public class GadgetCopyPaste extends GadgetPlacing implements ITemplate {
             }
         }
         tool.setItemCountMap(stack, itemCountMap);
-        tagCompound.setTag(NBTKeys.MAP_INT_STATE, blockMapIntState.putIntStateMapIntoNBT());
+        tagCompound.setTag(NBTKeys.MAP_PALETTE, blockMapIntState.putIntStateMapIntoNBT());
         tagCompound.setTag(NBTKeys.MAP_INT_STACK, blockMapIntState.putIntStackMapIntoNBT());
         int[] posIntArray = posIntArrayList.stream().mapToInt(i -> i).toArray();
         int[] stateIntArray = stateIntArrayList.stream().mapToInt(i -> i).toArray();
-        tagCompound.setIntArray(NBTKeys.MAP_POS_INT, posIntArray);
-        tagCompound.setIntArray(NBTKeys.MAP_STATE_INT, stateIntArray);
+        tagCompound.setIntArray(NBTKeys.MAP_INDEX2POS, posIntArray);
+        tagCompound.setIntArray(NBTKeys.MAP_INDEX2STATE_ID, stateIntArray);
 
         tagCompound.setTag(NBTKeys.GADGET_START_POS, NBTUtil.writeBlockPos(start));
         tagCompound.setTag(NBTKeys.GADGET_END_POS, NBTUtil.writeBlockPos(end));

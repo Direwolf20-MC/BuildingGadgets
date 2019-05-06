@@ -35,13 +35,22 @@ public final class NBTKeys {
     public static final String GADGET_VALUE_DEPTH = "depth";
     public static final String[] GADGET_VALUES = new String[]{GADGET_VALUE_RIGHT, GADGET_VALUE_LEFT, GADGET_VALUE_UP, GADGET_VALUE_DOWN, GADGET_VALUE_DEPTH};
 
-    public static final String MAP_INT_STATE = "map_int_state";
+    /**
+     * The mapping between an internal block state ID and a block state.
+     */
+    public static final String MAP_PALETTE = "block_palette";
     public static final String MAP_SLOT = "slot";
     public static final String MAP_STATE = "state";
     public static final String MAP_STATE_ID = "state_id";
     public static final String MAP_INT_STACK = "map_int_stack";
-    public static final String MAP_POS_INT = "pos_int_array";
-    public static final String MAP_STATE_INT = "state_int_array";
+    /**
+     * The mapping between a position index and an actual position relative to the start position.
+     */
+    public static final String MAP_INDEX2POS = "i2pos";
+    /**
+     * The mapping between a position index and an internal block state ID.
+     */
+    public static final String MAP_INDEX2STATE_ID = "i2state_id";
     public static final String MAP_POS_PASTE = "pos_paste_array";
     public static final String MAP_STATE_PASTE = "state_paste_array";
     public static final String MAP_SERIALIZE_KEY = "key";
