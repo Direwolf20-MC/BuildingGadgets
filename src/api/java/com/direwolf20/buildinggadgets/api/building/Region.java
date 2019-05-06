@@ -4,9 +4,11 @@ import com.direwolf20.buildinggadgets.api.util.CommonUtils;
 import com.direwolf20.buildinggadgets.api.util.SpliteratorBackedPeekingIterator;
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.PeekingIterator;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 
+import java.io.Serializable;
 import java.util.Comparator;
 import java.util.Objects;
 import java.util.Spliterator;
@@ -15,7 +17,18 @@ import java.util.function.Consumer;
 /**
  * Represents a region in the world with a finite and nonzero size.
  */
-public final class Region implements IPositionPlacementSequence {
+public final class Region implements IPositionPlacementSequence, Serializable {
+
+    public static Region deserializeFrom(NBTTagCompound tag) {
+        return new Region(
+                tag.getInt("minX"),
+                tag.getInt("minY"),
+                tag.getInt("minZ"),
+                tag.getInt("maxX"),
+                tag.getInt("maxY"),
+                tag.getInt("maxZ")
+        );
+    }
 
     private final int minX;
     private final int minY;
@@ -348,6 +361,20 @@ public final class Region implements IPositionPlacementSequence {
     @Override
     public int hashCode() {
         return Objects.hash(minX, minY, minZ, maxX, maxY, maxZ);
+    }
+
+    public NBTTagCompound serialize() {
+        return serializeTo(new NBTTagCompound());
+    }
+
+    public NBTTagCompound serializeTo(NBTTagCompound tag) {
+        tag.setInt("minX", minX);
+        tag.setInt("minY", minY);
+        tag.setInt("minZ", minZ);
+        tag.setInt("maxX", maxX);
+        tag.setInt("maxY", maxY);
+        tag.setInt("maxZ", maxZ);
+        return tag;
     }
 
     private static class RegionSpliterator implements Spliterator<BlockPos> {
