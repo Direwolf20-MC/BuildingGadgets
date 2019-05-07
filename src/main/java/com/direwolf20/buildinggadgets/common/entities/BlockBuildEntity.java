@@ -87,7 +87,7 @@ public class BlockBuildEntity extends EntityBase {
         dataManager.set(SET_BLOCK, Optional.ofNullable(state));
     }
 
-    public void setUsingPaste(Boolean paste) {
+    public void setUsingPaste(boolean paste) {
         dataManager.set(USE_PASTE, paste);
     }
 
