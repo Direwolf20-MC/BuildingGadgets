@@ -78,7 +78,7 @@ public class RegionSnapshot {
 
                 // If it didn't show up and this block is not by itself, record the streak frame
                 // The first one represents the ID of the streaking block state, the second one, which is negative, represents the amount of streaking block states
-                if (streak != 0) {
+                if (streak > 1) {
                     // ID of the block state that is streaking
                     frames.add(mapPalettes.getInt(lastStreak));
                     // Number of streaks
@@ -90,7 +90,7 @@ public class RegionSnapshot {
             }
 
             // Regardless of which situation, we reset the counter
-            streak = 0;
+            streak = 1;
             lastStreak = state;
         }
 

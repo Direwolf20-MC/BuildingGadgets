@@ -19,14 +19,22 @@ import java.util.function.Consumer;
  */
 public final class Region implements IPositionPlacementSequence, Serializable {
 
+    private static final long serialVersionUID = 8391481277782374853L;
+    public static final String KEY_MIN_X = "minX";
+    public static final String KEY_MIN_Y = "minY";
+    public static final String KEY_MIN_Z = "minZ";
+    public static final String KEY_MAX_X = "maxX";
+    public static final String KEY_MAX_Y = "maxY";
+    public static final String KEY_MAX_Z = "maxZ";
+
     public static Region deserializeFrom(NBTTagCompound tag) {
         return new Region(
-                tag.getInt("minX"),
-                tag.getInt("minY"),
-                tag.getInt("minZ"),
-                tag.getInt("maxX"),
-                tag.getInt("maxY"),
-                tag.getInt("maxZ")
+                tag.getInt(KEY_MIN_X),
+                tag.getInt(KEY_MIN_Y),
+                tag.getInt(KEY_MIN_Z),
+                tag.getInt(KEY_MAX_X),
+                tag.getInt(KEY_MAX_Y),
+                tag.getInt(KEY_MAX_Z)
         );
     }
 
@@ -368,12 +376,12 @@ public final class Region implements IPositionPlacementSequence, Serializable {
     }
 
     public NBTTagCompound serializeTo(NBTTagCompound tag) {
-        tag.setInt("minX", minX);
-        tag.setInt("minY", minY);
-        tag.setInt("minZ", minZ);
-        tag.setInt("maxX", maxX);
-        tag.setInt("maxY", maxY);
-        tag.setInt("maxZ", maxZ);
+        tag.setInt(KEY_MIN_X, minX);
+        tag.setInt(KEY_MIN_Y, minY);
+        tag.setInt(KEY_MIN_Z, minZ);
+        tag.setInt(KEY_MAX_X, maxX);
+        tag.setInt(KEY_MAX_Y, maxY);
+        tag.setInt(KEY_MAX_Z, maxZ);
         return tag;
     }
 
