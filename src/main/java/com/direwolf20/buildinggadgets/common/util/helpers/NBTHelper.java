@@ -1,14 +1,14 @@
 package com.direwolf20.buildinggadgets.common.util.helpers;
 
+import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.*;
 
 import javax.annotation.Nonnull;
-
-import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
-
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -265,24 +265,26 @@ public class NBTHelper {
             INBTBase nbt = strings.get(i);
             if (nbt instanceof NBTTagString) {
                 res[i] = nbt.getString();
-            } else {
+            }
+            else {
                 res[i] = "";
                 failed.add(i);
             }
         }
-        if (!failed.isEmpty()) {
+        if (! failed.isEmpty()) {
             String[] shortened = new String[res.length - failed.size()];
             int shortenedCount = 0;
             for (int i = 0; i < res.length; i++) {
                 if (failed.contains(i))
                     continue;
                 shortened[shortenedCount] = res[i];
-                ++shortenedCount;
+                ++ shortenedCount;
             }
             res = shortened;
         }
         return res;
     }
+
 
     public static boolean[] readBooleanList(NBTTagByteArray booleans) {
         byte[] bytes = booleans.getByteArray();
@@ -302,7 +304,23 @@ public class NBTHelper {
         return res;
     }
 
-    public static <K, V> NBTTagList serializeMap(Map<K, V> map, Function<K, INBTBase> keySerializer, Function<V, INBTBase> valueSerializer) {
+    public static <T> NBTTagList writeIterable(Iterable<T> iterable, Function<? super T, ? extends INBTBase> serializer) {
+        NBTTagList list = new NBTTagList();
+        for (T val : iterable) {
+            list.add(serializer.apply(val));
+        }
+        return list;
+    }
+
+    public static <V, T extends INBTBase> List<V> readList(NBTTagCollection<T> list, Function<T, ? extends V> deserializer) {
+        List<V> res = new ArrayList<>(list.size());
+        for (T nbt:list) {
+            res.add(deserializer.apply(nbt));
+        }
+        return res;
+    }
+
+    public static <K, V> NBTTagList serializeMap(Map<K, V> map, Function<? super K, ? extends INBTBase> keySerializer, Function<? super V, ? extends INBTBase> valueSerializer) {
         NBTTagList list = new NBTTagList();
         for (Map.Entry<K, V> entry : map.entrySet()) {
             NBTTagCompound compound = new NBTTagCompound();
@@ -313,7 +331,7 @@ public class NBTHelper {
         return list;
     }
 
-    public static <K, V> Map<K, V> deserializeMap(NBTTagList list, Map<K, V> toAppendTo, Function<INBTBase, K> keyDeserializer, Function<INBTBase, V> valueDeserializer) {
+    public static <K, V> Map<K, V> deserializeMap(NBTTagList list, Map<K, V> toAppendTo, Function<INBTBase, ? extends K> keyDeserializer, Function<INBTBase, ? extends V> valueDeserializer) {
         for (INBTBase nbt : list) {
             if (nbt instanceof NBTTagCompound) {
                 NBTTagCompound compound = (NBTTagCompound) nbt;
