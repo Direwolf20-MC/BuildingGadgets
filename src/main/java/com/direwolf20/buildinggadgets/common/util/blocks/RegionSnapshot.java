@@ -41,9 +41,9 @@ public class RegionSnapshot {
         // Palette serialization end
 
         // Streaking: a way to record a number of repeating block states, using only 2 integers
-        // Storage frame: one or two integers indicating a sequence of block states
-        // Regular frame: a type of storage frame; 1 integer, representing the ID of the block state recorded
-        // Streak frame: a type of storage frame; 2 integers, where the first one is positive, representing the ID of the repeating block state; the second one is negative, representing the number of repeating block states
+        // Storage frame: one or two numbers indicating a sequence of block states
+        // Regular frame: a type of storage frame; 1 number, representing the ID of the block state recorded
+        // Streak frame: a type of storage frame; 2 numbers, where the first one is positive, representing the ID of the repeating block state; the second one is negative, representing the number of repeating block states
 
         // Complete storage frames, will be serialized into a NBTTagList later
         IntList frames = new IntArrayList();
@@ -69,7 +69,8 @@ public class RegionSnapshot {
                 firstIteration = false;
             else {
                 // If the same block state showed up again, increase the number of streaks
-                if (state == lastStreak) {
+                // If we have more than 255 streaks (maximum integer that can be stored in 8 bits), we force start a new streak, because the current storage frame won't fit that many of them
+                if (state == lastStreak && streak < 255) {
                     streak++;
                     continue;
                 }
@@ -79,14 +80,12 @@ public class RegionSnapshot {
                 // If it didn't show up and this block is not by itself, record the streak frame
                 // The first one represents the ID of the streaking block state, the second one, which is negative, represents the amount of streaking block states
                 if (streak > 1) {
-                    // ID of the block state that is streaking
-                    frames.add(mapPalettes.getInt(lastStreak));
-                    // Number of streaks
-                    // Stored in negative to differentiate with a block state ID
-                    frames.add(-streak);
+                    // Number of streaks and the ID of the block state that is streaking
+                    int frame = ((streak & 0xff) << 24) | (mapPalettes.getInt(lastStreak) & 0xffffff);
+                    frames.add(frame);
                 } else
                     // Otherwise just add the block state ID, since there is only one of it
-                    frames.add(mapPalettes.getInt(lastStreak));
+                    frames.add(mapPalettes.getInt(lastStreak) & 0xffffff);
             }
 
             // Regardless of which situation, we reset the counter
@@ -126,28 +125,14 @@ public class RegionSnapshot {
         // See the serialization algorithm for vocabulary definitions, including "frame", "streak", etc.
         List<IBlockState> blockStates = new ArrayList<>();
         int[] frames = tag.getIntArray(BLOCK_FRAMES);
-        for (int i = 0; i < frames.length; i++) {
-            int stateID = frames[i];
-            // If this is the last item, there will be no more items to indicate this is a streak
-            // Therefore we do the streak-scanning process only if this is not the last item
-            if (i != frames.length - 1) {
-                int nextItem = frames[i + 1];
-                if (nextItem < 0) {
-                    // Streak is represented in a negative number. See the serialization algorithm for more information
-                    int streak = -nextItem;
+        for (int frame : frames) {
+            int stateID = frame & 0xffffff;
+            int streaks = frame >> 24;
 
-                    IBlockState state = palettes.get(stateID);
-                    for (int j = 0; j < streak; j++) {
-                        blockStates.add(state);
-                    }
-
-                    // We already used the item afterwards, so we can skip it
-                    i++;
-                    continue;
-                }
-            }
             IBlockState state = palettes.get(stateID);
-            blockStates.add(state);
+            for (int j = 0; j < streaks; j++) {
+                blockStates.add(state);
+            }
         }
 
         NBTTagList blockSnapshotsNBT = tag.getList(BLOCK_SNAPSHOTS, Constants.NBT.TAG_COMPOUND);
