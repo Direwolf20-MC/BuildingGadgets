@@ -1,13 +1,16 @@
 package com.direwolf20.buildinggadgets.common.util.blocks;
 
 import com.direwolf20.buildinggadgets.api.building.Region;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.minecraft.block.Block;
+import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -19,8 +22,10 @@ import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.common.util.BlockSnapshot;
 import net.minecraftforge.common.util.Constants;
+import net.minecraftforge.common.util.TriPredicate;
 import net.minecraftforge.fml.server.ServerLifecycleHooks;
 
+import javax.annotation.Nonnull;
 import java.util.*;
 import java.util.function.BiPredicate;
 
@@ -148,47 +153,34 @@ public class RegionSnapshot {
         return new RegionSnapshot(world, region, blockStates.build(), blockSnapshots.build());
     }
 
-    public static RegionSnapshot takeWithoutTiles(World world, Region region, BiPredicate<BlockPos, IBlockState> validator) {
-        return take(world, region, validator, false);
+    /**
+     * Create a {@link RegionSnapshot} builder.
+     * <p>
+     * Predicate for whether record blocks or not can be customized through the builder. If no extra conditions are
+     * needed, use {@link #take(World, Region)} instead.
+     */
+    public static Builder select(World world, Region region) {
+        return new Builder(world, region);
     }
 
-    public static RegionSnapshot take(World world, Region region, BiPredicate<BlockPos, IBlockState> validator, boolean recordTileEntities) {
-        ImmutableList.Builder<IBlockState> blockStates = ImmutableList.builder();
-        ImmutableList.Builder<BlockSnapshot> tileSnapshots = ImmutableList.builder();
-        for (BlockPos pos : region) {
-            TileEntity tile = world.getTileEntity(pos);
-            if (recordTileEntities && tile != null) {
-                IBlockState state = world.getBlockState(pos);
-                if (validator.test(pos, state))
-                    tileSnapshots.add(new BlockSnapshot(world, pos, state));
-            } else {
-                IBlockState state = world.getBlockState(pos);
-                if (validator.test(pos, state))
-                    blockStates.add(state);
-                else
-                    blockStates.add(DummyBlockState.INSTANCE);
-            }
-        }
-        return new RegionSnapshot(world, region, blockStates.build(), tileSnapshots.build());
+    /**
+     * Directly take a snapshot of the area, <b>without</b> tile entities.
+     *
+     * @see #select(World, Region)
+     */
+    public static RegionSnapshot take(World world, Region region) {
+        return select(world, region).build();
     }
 
     private World world;
     private Region region;
 
-    /**
-     * From minimum Z to maximum Z; then from minimum Y to maximum Y; then from minimum X to maximum X; each entry are
-     * stored in the above order and represent the block state in that position. If an entry is {@code null}, it means
-     * that position should not be replaced regularly: it might be replaced with a {@link BlockSnapshot}, or it should
-     * be left untouched.
-     */
     private ImmutableList<IBlockState> blockStates;
-
-    /**
-     * The indices of the entries of this list is unrelated to any positions, instead, the entry stores the affected
-     * coordinate.
-     */
     private ImmutableList<BlockSnapshot> tileSnapshots;
 
+    /**
+     * Cached serialized form. This is reliable because {@link RegionSnapshot} is <i>immutable</i>.
+     */
     private NBTTagCompound serializedForm;
 
     private RegionSnapshot(World world, Region region, ImmutableList<IBlockState> blockStates, ImmutableList<BlockSnapshot> tileSnapshots) {
@@ -223,6 +215,24 @@ public class RegionSnapshot {
         return region;
     }
 
+    /**
+     * From minimum Z to maximum Z; then from minimum Y to maximum Y; then from minimum X to maximum X; each entry are
+     * stored in the above order and represent the block state in that position. If an entry is {@code null}, it means
+     * that position should not be replaced regularly: it might be replaced with a {@link BlockSnapshot}, or it should
+     * be left untouched.
+     */
+    public ImmutableList<IBlockState> getBlockStates() {
+        return blockStates;
+    }
+
+    /**
+     * The indices of the entries of this list is unrelated to any positions, instead, the entry stores the affected
+     * coordinate.
+     */
+    public ImmutableList<BlockSnapshot> getTileEntities() {
+        return tileSnapshots;
+    }
+
     public NBTTagCompound serialize() {
         return serializeTo(new NBTTagCompound());
     }
@@ -231,6 +241,115 @@ public class RegionSnapshot {
         if (serializedForm == null)
             serializedForm = serialize(tag, this);
         return serializedForm;
+    }
+
+    private static final class Builder {
+
+        private static final BiPredicate<BlockPos, IBlockState> AIR_CHECK = (pos, state) -> state.getMaterial() != Material.AIR;
+
+        private World world;
+        private Region region;
+        private BiPredicate<BlockPos, IBlockState> normalValidator;
+        private TriPredicate<BlockPos, IBlockState, TileEntity> tileValidator;
+
+        private boolean built = false;
+
+        private Builder(World world, Region region) {
+            this.world = world;
+            this.region = region;
+        }
+
+        /**
+         * Set validator for normal blocks (non tile entities).
+         *
+         * @return this
+         */
+        public Builder checkBlocks(BiPredicate<BlockPos, IBlockState> normalValidator) {
+            Preconditions.checkState(!built);
+
+            this.normalValidator = normalValidator;
+            return this;
+        }
+
+        public Builder exclude(IBlockState... statesToExclude) {
+            ImmutableSet<IBlockState> statesSet = ImmutableSet.copyOf(statesToExclude);
+            if (normalValidator == null)
+                return checkBlocks((pos, state) -> !statesSet.contains(state));
+            else {
+                return checkBlocks(normalValidator.and((pos, state) -> !statesSet.contains(state)));
+            }
+        }
+
+        public Builder excludeAir() {
+            if (normalValidator == null)
+                return checkBlocks(AIR_CHECK);
+            else {
+                return checkBlocks(normalValidator.and(AIR_CHECK));
+            }
+        }
+
+        /**
+         * Set validator for tile entities. If want to record tile entities regardless of its condition, use
+         *
+         * @return this
+         */
+        public Builder checkTiles(TriPredicate<BlockPos, IBlockState, TileEntity> tileValidator) {
+            Preconditions.checkState(!built);
+
+            this.tileValidator = tileValidator;
+            return this;
+        }
+
+        /**
+         * Record the tile entities regardless of its condition.
+         *
+         * @see #checkTiles(TriPredicate)
+         */
+        public Builder recordTiles() {
+            return checkTiles((pos, state, tile) -> true);
+        }
+
+        public RegionSnapshot build() {
+            Preconditions.checkState(!built);
+
+            ImmutableList.Builder<IBlockState> blockStates = ImmutableList.builder();
+            ImmutableList.Builder<BlockSnapshot> tileSnapshots = ImmutableList.builder();
+            if (tileValidator != null)
+                buildWithTiles(blockStates, tileSnapshots);
+            else
+                buildWithoutTiles(blockStates);
+
+            built = true;
+            return new RegionSnapshot(world, region, blockStates.build(), tileSnapshots.build());
+        }
+
+        private void buildWithTiles(ImmutableList.Builder<IBlockState> blockStates, ImmutableList.Builder<BlockSnapshot> tileSnapshots) {
+            for (BlockPos pos : region) {
+                TileEntity tile = world.getTileEntity(pos);
+                if (tile != null) {
+                    IBlockState state = world.getBlockState(pos);
+                    if (tileValidator.test(pos, state, tile))
+                        tileSnapshots.add(new BlockSnapshot(world, pos, state));
+                } else {
+                    IBlockState state = world.getBlockState(pos);
+                    if (normalValidator.test(pos, state))
+                        blockStates.add(state);
+                    else
+                        blockStates.add(DummyBlockState.INSTANCE);
+                }
+            }
+        }
+
+        private void buildWithoutTiles(ImmutableList.Builder<IBlockState> blockStates) {
+            for (BlockPos pos : region) {
+                IBlockState state = world.getBlockState(pos);
+                if (normalValidator.test(pos, state))
+                    blockStates.add(state);
+                else
+                    blockStates.add(DummyBlockState.INSTANCE);
+            }
+        }
+
     }
 
     /**
@@ -246,39 +365,45 @@ public class RegionSnapshot {
         private DummyBlockState() {
         }
 
+        @Nonnull
         @Override
         public Block getBlock() {
-            throw new IllegalStateException("Dummy block state!");
+            throw new IllegalStateException("Dummy block state, no operation should be applied");
         }
 
+        @Nonnull
         @Override
         public Collection<IProperty<?>> getProperties() {
-            throw new IllegalStateException("Dummy block state!");
+            throw new IllegalStateException("Dummy block state, no operation should be applied");
         }
 
         @Override
-        public <T extends Comparable<T>> boolean has(IProperty<T> iProperty) {
-            throw new IllegalStateException("Dummy block state!");
+        public <T extends Comparable<T>> boolean has(@Nonnull IProperty<T> property) {
+            throw new IllegalStateException("Dummy block state, no operation should be applied");
+        }
+
+        @Nonnull
+        @Override
+        public <T extends Comparable<T>> T get(@Nonnull IProperty<T> property) {
+            throw new IllegalStateException("Dummy block state, no operation should be applied");
+        }
+
+        @Nonnull
+        @Override
+        public <T extends Comparable<T>, V extends T> IBlockState with(@Nonnull IProperty<T> property, @Nonnull V value) {
+            throw new IllegalStateException("Dummy block state, no operation should be applied");
         }
 
         @Override
-        public <T extends Comparable<T>> T get(IProperty<T> iProperty) {
-            throw new IllegalStateException("Dummy block state!");
+        @Nonnull
+        public <T extends Comparable<T>> IBlockState cycle(@Nonnull IProperty<T> property) {
+            throw new IllegalStateException("Dummy block state, no operation should be applied");
         }
 
-        @Override
-        public <T extends Comparable<T>, V extends T> IBlockState with(IProperty<T> iProperty, V v) {
-            throw new IllegalStateException("Dummy block state!");
-        }
-
-        @Override
-        public <T extends Comparable<T>> IBlockState cycle(IProperty<T> iProperty) {
-            throw new IllegalStateException("Dummy block state!");
-        }
-
+        @Nonnull
         @Override
         public ImmutableMap<IProperty<?>, Comparable<?>> getValues() {
-            throw new IllegalStateException("Dummy block state!");
+            throw new IllegalStateException("Dummy block state, no operation should be applied");
         }
 
     }
