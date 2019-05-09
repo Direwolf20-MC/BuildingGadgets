@@ -1,14 +1,18 @@
 package com.direwolf20.buildinggadgets.common.util.blocks;
 
 import com.direwolf20.buildinggadgets.api.building.Region;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTUtil;
+import net.minecraft.state.IProperty;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -123,7 +127,7 @@ public class RegionSnapshot {
         assert palettes.size() == palettesNBT.size() + 1;
 
         // See the serialization algorithm for vocabulary definitions, including "frame", "streak", etc.
-        List<IBlockState> blockStates = new ArrayList<>();
+        ImmutableList.Builder<IBlockState> blockStates = ImmutableList.builder();
         int[] frames = tag.getIntArray(BLOCK_FRAMES);
         for (int frame : frames) {
             int stateID = frame & 0xffffff;
@@ -136,12 +140,12 @@ public class RegionSnapshot {
         }
 
         NBTTagList blockSnapshotsNBT = tag.getList(BLOCK_SNAPSHOTS, Constants.NBT.TAG_COMPOUND);
-        List<BlockSnapshot> blockSnapshots = new ArrayList<>();
+        ImmutableList.Builder<BlockSnapshot> blockSnapshots = ImmutableList.builder();
         for (int i = 0; i < blockSnapshotsNBT.size(); i++) {
             blockSnapshots.add(BlockSnapshot.readFromNBT(blockSnapshotsNBT.getCompound(i)));
         }
 
-        return new RegionSnapshot(world, region, blockStates, blockSnapshots);
+        return new RegionSnapshot(world, region, blockStates.build(), blockSnapshots.build());
     }
 
     public static RegionSnapshot takeWithoutTiles(World world, Region region, BiPredicate<BlockPos, IBlockState> validator) {
@@ -149,8 +153,8 @@ public class RegionSnapshot {
     }
 
     public static RegionSnapshot take(World world, Region region, BiPredicate<BlockPos, IBlockState> validator, boolean recordTileEntities) {
-        List<IBlockState> blockStates = new ArrayList<>();
-        List<BlockSnapshot> tileSnapshots = new ArrayList<>();
+        ImmutableList.Builder<IBlockState> blockStates = ImmutableList.builder();
+        ImmutableList.Builder<BlockSnapshot> tileSnapshots = ImmutableList.builder();
         for (BlockPos pos : region) {
             TileEntity tile = world.getTileEntity(pos);
             if (recordTileEntities && tile != null) {
@@ -162,10 +166,10 @@ public class RegionSnapshot {
                 if (validator.test(pos, state))
                     blockStates.add(state);
                 else
-                    blockStates.add(null);
+                    blockStates.add(DummyBlockState.INSTANCE);
             }
         }
-        return new RegionSnapshot(world, region, blockStates, tileSnapshots);
+        return new RegionSnapshot(world, region, blockStates.build(), tileSnapshots.build());
     }
 
     private World world;
@@ -177,17 +181,17 @@ public class RegionSnapshot {
      * that position should not be replaced regularly: it might be replaced with a {@link BlockSnapshot}, or it should
      * be left untouched.
      */
-    private List<IBlockState> blockStates;
+    private ImmutableList<IBlockState> blockStates;
 
     /**
      * The indices of the entries of this list is unrelated to any positions, instead, the entry stores the affected
      * coordinate.
      */
-    private List<BlockSnapshot> tileSnapshots;
+    private ImmutableList<BlockSnapshot> tileSnapshots;
 
     private NBTTagCompound serializedForm;
 
-    public RegionSnapshot(World world, Region region, List<IBlockState> blockStates, List<BlockSnapshot> tileSnapshots) {
+    private RegionSnapshot(World world, Region region, ImmutableList<IBlockState> blockStates, ImmutableList<BlockSnapshot> tileSnapshots) {
         this.world = world;
         this.region = region;
         this.blockStates = blockStates;
@@ -199,7 +203,7 @@ public class RegionSnapshot {
         int index = 0;
         for (BlockPos pos : region) {
             IBlockState state = blockStates.get(index);
-            if (state == null)
+            if (state == DummyBlockState.INSTANCE)
                 continue;
 
             statesSucceeded &= world.setBlockState(pos, state);
@@ -227,6 +231,56 @@ public class RegionSnapshot {
         if (serializedForm == null)
             serializedForm = serialize(tag, this);
         return serializedForm;
+    }
+
+    /**
+     * Dummy, singleton block state class used to represent "nothing here". In other words, coordinate containing this
+     * block state will be left untouched.
+     * <p>
+     * {@code null} were not used because we cannot have {@code null} values in {@link ImmutableList}.
+     */
+    private static class DummyBlockState implements IBlockState {
+
+        public static final DummyBlockState INSTANCE = new DummyBlockState();
+
+        private DummyBlockState() {
+        }
+
+        @Override
+        public Block getBlock() {
+            throw new IllegalStateException("Dummy block state!");
+        }
+
+        @Override
+        public Collection<IProperty<?>> getProperties() {
+            throw new IllegalStateException("Dummy block state!");
+        }
+
+        @Override
+        public <T extends Comparable<T>> boolean has(IProperty<T> iProperty) {
+            throw new IllegalStateException("Dummy block state!");
+        }
+
+        @Override
+        public <T extends Comparable<T>> T get(IProperty<T> iProperty) {
+            throw new IllegalStateException("Dummy block state!");
+        }
+
+        @Override
+        public <T extends Comparable<T>, V extends T> IBlockState with(IProperty<T> iProperty, V v) {
+            throw new IllegalStateException("Dummy block state!");
+        }
+
+        @Override
+        public <T extends Comparable<T>> IBlockState cycle(IProperty<T> iProperty) {
+            throw new IllegalStateException("Dummy block state!");
+        }
+
+        @Override
+        public ImmutableMap<IProperty<?>, Comparable<?>> getValues() {
+            throw new IllegalStateException("Dummy block state!");
+        }
+
     }
 
 }
