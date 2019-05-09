@@ -1,6 +1,9 @@
 package com.direwolf20.buildinggadgets.common.registry.objects;
 
-import com.direwolf20.buildinggadgets.common.blocks.*;
+import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlock;
+import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockDense;
+import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockPowder;
+import com.direwolf20.buildinggadgets.common.blocks.EffectBlock;
 import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManager;
 import com.direwolf20.buildinggadgets.common.registry.block.BlockBuilder;
 import com.direwolf20.buildinggadgets.common.registry.block.BlockRegistryContainer;
@@ -16,7 +19,6 @@ import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
 import net.minecraftforge.registries.ObjectHolder;
 
 import static com.direwolf20.buildinggadgets.common.registry.objects.BGItems.itemProperties;
-import static com.direwolf20.buildinggadgets.common.registry.objects.BGItems.itemPropertiesWithGroup;
 import static com.direwolf20.buildinggadgets.common.registry.objects.BuildingObjects.EFFECT_BLOCK_MATERIAL;
 
 @ObjectHolder(Reference.MODID)
@@ -44,23 +46,23 @@ public final class BGBlocks {
     static void init() {
         container.add(new BlockBuilder(BlockReference.EFFECT_BLOCK_RL)
                 .builder(Block.Properties.create(EFFECT_BLOCK_MATERIAL).hardnessAndResistance(20f))
-                .item(itemProperties())
+                .setHasNoItem()
                 .factory(EffectBlock::new));
         container.add(new BlockBuilder(BlockReference.CONSTRUCTION_BLOCK_RL)
                 .builder(Block.Properties.create(Material.ROCK).hardnessAndResistance(2f, 0f))
-                .item(itemPropertiesWithGroup())
+                .item(itemProperties())
                 .factory(ConstructionBlock::new));
         container.add(new BlockBuilder(BlockReference.CONSTRUCTION_BLOCK_DENSE_RL)
                 .builder(Block.Properties.create(Material.ROCK).hardnessAndResistance(3f, 0f))
-                .item(itemPropertiesWithGroup())
+                .item(itemProperties())
                 .factory(ConstructionBlockDense::new));
         container.add(new BlockBuilder(BlockReference.CONSTRUCTION_BLOCK_POWDER_RL)
                 .builder(Block.Properties.create(Material.SAND).hardnessAndResistance(20f))
-                .item(itemPropertiesWithGroup())
+                .item(itemProperties())
                 .factory(ConstructionBlockPowder::new));
         container.add(new BlockBuilder(BlockReference.TEMPLATE_MANAGER_RL)
                 .builder(Block.Properties.create(Material.ROCK).hardnessAndResistance(2f))
-                .item(itemPropertiesWithGroup())
+                .item(itemProperties())
                 .factory(TemplateManager::new));
     }
 

@@ -1,8 +1,14 @@
 package com.direwolf20.buildinggadgets.common.registry.objects;
 
 import com.direwolf20.buildinggadgets.common.items.Template;
-import com.direwolf20.buildinggadgets.common.items.gadgets.*;
-import com.direwolf20.buildinggadgets.common.items.pastes.*;
+import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetBuilding;
+import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
+import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetDestruction;
+import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetExchanger;
+import com.direwolf20.buildinggadgets.common.items.pastes.ConstructionPaste;
+import com.direwolf20.buildinggadgets.common.items.pastes.ConstructionPasteContainer;
+import com.direwolf20.buildinggadgets.common.items.pastes.ConstructionPasteContainerCreative;
+import com.direwolf20.buildinggadgets.common.items.pastes.RegularPasteContainerTypes;
 import com.direwolf20.buildinggadgets.common.registry.RegistryContainer;
 import com.direwolf20.buildinggadgets.common.registry.RegistryObjectBuilder;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
@@ -63,9 +69,9 @@ public final class BGItems {
         addItemBuilder(ItemReference.PASTE_CONTAINER_T2_RL, unstackableItemProperties(), RegularPasteContainerTypes.T2::create);
         addItemBuilder(ItemReference.PASTE_CONTAINER_T3_RL, unstackableItemProperties(), RegularPasteContainerTypes.T3::create);
         addItemBuilder(ItemReference.PASTE_CONTAINER_CREATIVE_RL, unstackableItemProperties(), ConstructionPasteContainerCreative::new);
-        addItemBuilder(ItemReference.CONSTRUCTION_PASTE_RL, itemPropertiesWithGroup(), ConstructionPaste::new);
-        addItemBuilder(ItemReference.CONSTRUCTION_CHUNK_DENSE_RL, itemPropertiesWithGroup(), Item::new);
-        addItemBuilder(ItemReference.TEMPLATE_RL, itemPropertiesWithGroup(), Template::new);
+        addItemBuilder(ItemReference.CONSTRUCTION_PASTE_RL, itemProperties(), ConstructionPaste::new);
+        addItemBuilder(ItemReference.CONSTRUCTION_CHUNK_DENSE_RL, itemProperties(), Item::new);
+        addItemBuilder(ItemReference.TEMPLATE_RL, itemProperties(), Template::new);
     }
 
     /**
@@ -83,15 +89,11 @@ public final class BGItems {
     }
 
     static Item.Properties itemProperties() {
-        return new Item.Properties();
-    }
-
-    static Item.Properties itemPropertiesWithGroup() {
-        return itemProperties().group(BuildingObjects.creativeTab);
+        return new Item.Properties().group(BuildingObjects.creativeTab);
     }
 
     static Item.Properties unstackableItemProperties() {
-        return itemPropertiesWithGroup().maxStackSize(1);
+        return itemProperties().maxStackSize(1);
     }
 
     static void cleanup() {

@@ -563,7 +563,7 @@ public class GadgetCopyPaste extends GadgetPlacing implements ITemplate {
             useItemSuccess = InventoryHelper.useItem(itemStack, player, neededItems, world);
         }
         if (useItemSuccess) {
-            world.spawnEntity(new BlockBuildEntity(world, pos, player, state, BlockBuildEntity.MODE_PLACE, useConstructionPaste));
+            world.spawnEntity(new BlockBuildEntity(world, pos, player, state, BlockBuildEntity.Mode.PLACE, useConstructionPaste));
         }
 
     }
@@ -611,7 +611,7 @@ public class GadgetCopyPaste extends GadgetPlacing implements ITemplate {
                 if (currentBlock.getBlock() == blockMap.state.getBlock() || currentBlock.getBlock() instanceof ConstructionBlock) {
                     if (currentBlock.getBlockHardness(world, blockMap.pos) >= 0) {
                         currentBlock.getBlock().harvestBlock(world, player, blockMap.pos, currentBlock, world.getTileEntity(blockMap.pos), silkTool);
-                        world.spawnEntity(new BlockBuildEntity(world, blockMap.pos, player, currentBlock, BlockBuildEntity.MODE_REMOVE, false));
+                        world.spawnEntity(new BlockBuildEntity(world, blockMap.pos, player, currentBlock, BlockBuildEntity.Mode.REMOVE, false));
                     }
                 }
             } else {

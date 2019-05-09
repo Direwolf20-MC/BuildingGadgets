@@ -280,7 +280,7 @@ public class GadgetExchanger extends GadgetSwapping {
             useItemSuccess = InventoryHelper.useItem(itemStack, player, neededItems, world);
         }
         if (useItemSuccess) {
-            world.spawnEntity(new BlockBuildEntity(world, pos, player, setBlock, BlockBuildEntity.MODE_REPLACE, useConstructionPaste));
+            world.spawnEntity(new BlockBuildEntity(world, pos, player, setBlock, BlockBuildEntity.Mode.REPLACE, useConstructionPaste));
             return true;
         }
         return false;

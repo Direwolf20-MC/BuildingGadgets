@@ -7,8 +7,12 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.*;
 
 import javax.annotation.Nonnull;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.function.IntFunction;
 
 /**
  * Utility class providing additional Methods for reading and writing array's which are not normally provided as
@@ -300,7 +304,25 @@ public class NBTHelper {
         return res;
     }
 
-    public static <K, V> NBTTagList serializeMap(Map<K, V> map, Function<K, INBTBase> keySerializer, Function<V, INBTBase> valueSerializer) {
+    public static <T> NBTTagList writeIterable(Iterable<T> iterable, BiFunction<? super T, Integer, ? extends INBTBase> serializer) {
+        NBTTagList list = new NBTTagList();
+        int i = 0;
+        for (T val : iterable) {
+            list.add(serializer.apply(val, i));
+            i++;
+        }
+        return list;
+    }
+
+    public static <V, T extends INBTBase> List<V> readList(NBTTagCollection<T> list, Function<T, ? extends V> deserializer) {
+        List<V> res = new ArrayList<>(list.size());
+        for (T nbt : list) {
+            res.add(deserializer.apply(nbt));
+        }
+        return res;
+    }
+
+    public static <K, V> NBTTagList serializeMap(Map<K, V> map, Function<? super K, ? extends INBTBase> keySerializer, Function<? super V, ? extends INBTBase> valueSerializer) {
         NBTTagList list = new NBTTagList();
         for (Map.Entry<K, V> entry : map.entrySet()) {
             NBTTagCompound compound = new NBTTagCompound();
@@ -311,7 +333,7 @@ public class NBTHelper {
         return list;
     }
 
-    public static <K, V> Map<K, V> deserializeMap(NBTTagList list, Map<K, V> toAppendTo, Function<INBTBase, K> keyDeserializer, Function<INBTBase, V> valueDeserializer) {
+    public static <K, V> Map<K, V> deserializeMap(NBTTagList list, Map<K, V> toAppendTo, Function<INBTBase, ? extends K> keyDeserializer, Function<INBTBase, ? extends V> valueDeserializer) {
         for (INBTBase nbt : list) {
             if (nbt instanceof NBTTagCompound) {
                 NBTTagCompound compound = (NBTTagCompound) nbt;
