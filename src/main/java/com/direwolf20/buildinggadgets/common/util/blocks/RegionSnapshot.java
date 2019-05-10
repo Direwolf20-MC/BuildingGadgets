@@ -24,6 +24,7 @@ import net.minecraftforge.common.util.BlockSnapshot;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.TriPredicate;
 import net.minecraftforge.fml.server.ServerLifecycleHooks;
+import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nonnull;
 import java.util.*;
@@ -34,7 +35,9 @@ public class RegionSnapshot {
     private static final String DIMENSION = "dim";
     private static final String BLOCK_FRAMES = "frames";
     private static final String BLOCK_PALETTES = "palettes";
-    private static final String BLOCK_SNAPSHOTS = "block_snapshots";
+    private static final String TILE_DATA = "block_snapshots";
+    private static final String TILE_POS = "block_pos";
+    private static final String TILE_NBT = "block_nbt";
 
     private static NBTTagCompound serialize(NBTTagCompound tag, RegionSnapshot snapshot) {
         tag.setInt(DIMENSION, snapshot.world.getDimension().getType().getId());
@@ -86,15 +89,10 @@ public class RegionSnapshot {
 
                 // Note: if the program reached here, it means the current storage frame is completed
 
-                // If it didn't show up and this block is not by itself, record the streak frame
-                // The first one represents the ID of the streaking block state, the second one, which is negative, represents the amount of streaking block states
-                if (streak > 1) {
-                    // Number of streaks and the ID of the block state that is streaking
-                    int frame = ((streak & 0xff) << 24) | (mapPalettes.getInt(lastStreak) & 0xffffff);
-                    frames.add(frame);
-                } else
-                    // Otherwise just add the block state ID, since there is only one of it
-                    frames.add(mapPalettes.getInt(lastStreak) & 0xffffff);
+                // Number of streaks and the ID of the block state that is streaking
+                // No need to differentiate between single and repeating block states, since the number at the larger endian represents how many repeating block states are there
+                int frame = ((streak & 0xff) << 24) | (mapPalettes.getInt(lastStreak) & 0xffffff);
+                frames.add(frame);
             }
 
             // Regardless of which situation, we reset the counter
@@ -105,13 +103,14 @@ public class RegionSnapshot {
         tag.setIntArray(BLOCK_FRAMES, frames.toIntArray());
         tag.setTag(BLOCK_PALETTES, palettes);
 
-        NBTTagList blockSnapshots = new NBTTagList();
-        for (BlockSnapshot blockSnapshot : snapshot.tileSnapshots) {
-            NBTTagCompound serializedSnapshot = new NBTTagCompound();
-            blockSnapshot.writeToNBT(serializedSnapshot);
-            blockSnapshots.add(serializedSnapshot);
+        NBTTagList tileData = new NBTTagList();
+        for (Pair<BlockPos, NBTTagCompound> data : snapshot.tileData) {
+            NBTTagCompound serializedData = new NBTTagCompound();
+            serializedData.setTag(TILE_POS, NBTUtil.writeBlockPos(data.getLeft()));
+            serializedData.setTag(TILE_NBT, data.getRight());
+            tileData.add(serializedData);
         }
-        tag.setTag(BLOCK_SNAPSHOTS, blockSnapshots);
+        tag.setTag(TILE_DATA, tileData);
 
         return tag;
     }
@@ -144,13 +143,14 @@ public class RegionSnapshot {
             }
         }
 
-        NBTTagList blockSnapshotsNBT = tag.getList(BLOCK_SNAPSHOTS, Constants.NBT.TAG_COMPOUND);
-        ImmutableList.Builder<BlockSnapshot> blockSnapshots = ImmutableList.builder();
-        for (int i = 0; i < blockSnapshotsNBT.size(); i++) {
-            blockSnapshots.add(BlockSnapshot.readFromNBT(blockSnapshotsNBT.getCompound(i)));
+        NBTTagList tileDataNBT = tag.getList(TILE_DATA, Constants.NBT.TAG_COMPOUND);
+        ImmutableList.Builder<Pair<BlockPos, NBTTagCompound>> tileData = ImmutableList.builder();
+        for (int i = 0; i < tileDataNBT.size(); i++) {
+            NBTTagCompound serializedData = tileDataNBT.getCompound(i);
+            tileData.add(Pair.of(NBTUtil.readBlockPos(serializedData.getCompound(TILE_POS)), serializedData.getCompound(TILE_NBT)));
         }
 
-        return new RegionSnapshot(world, region, blockStates.build(), blockSnapshots.build());
+        return new RegionSnapshot(world, region, blockStates.build(), tileData.build());
     }
 
     /**
@@ -176,39 +176,40 @@ public class RegionSnapshot {
     private Region region;
 
     private ImmutableList<IBlockState> blockStates;
-    private ImmutableList<BlockSnapshot> tileSnapshots;
+    private ImmutableList<Pair<BlockPos, NBTTagCompound>> tileData;
 
     /**
      * Cached serialized form. This is reliable because {@link RegionSnapshot} is <i>immutable</i>.
      */
     private NBTTagCompound serializedForm;
 
-    private RegionSnapshot(World world, Region region, ImmutableList<IBlockState> blockStates, ImmutableList<BlockSnapshot> tileSnapshots) {
+    private RegionSnapshot(World world, Region region, ImmutableList<IBlockState> blockStates, ImmutableList<Pair<BlockPos, NBTTagCompound>> tileData) {
         this.world = world;
         this.region = region;
         this.blockStates = blockStates;
-        this.tileSnapshots = tileSnapshots;
+        this.tileData = tileData;
     }
 
-    public boolean restore() {
-        boolean statesSucceeded = true;
+    public void restore() {
         int index = 0;
         for (BlockPos pos : region) {
             IBlockState state = blockStates.get(index);
-            if (state == DummyBlockState.INSTANCE)
+            if (state == DummyBlockState.NOTHING)
                 continue;
 
-            statesSucceeded &= world.setBlockState(pos, state);
-
+            world.setBlockState(pos, state);
             index++;
         }
 
-        boolean snapshotsSucceeded = true;
-        for (BlockSnapshot snapshot : tileSnapshots) {
-            snapshotsSucceeded &= snapshot.restore();
+        for (Pair<BlockPos, NBTTagCompound> data : tileData) {
+            // Assume the blocks are replaced already, which should be the case
+            TileEntity tile = world.getTileEntity(data.getLeft());
+            if (tile != null) {
+                tile.read(data.getRight());
+                tile.markDirty();
+            } else
+                throw new IllegalStateException("Unable to find expected tile entity at " + data.getLeft() + " that can read " + data.getRight());
         }
-
-        return statesSucceeded && snapshotsSucceeded;
     }
 
     public Region getRegion() {
@@ -229,8 +230,8 @@ public class RegionSnapshot {
      * The indices of the entries of this list is unrelated to any positions, instead, the entry stores the affected
      * coordinate.
      */
-    public ImmutableList<BlockSnapshot> getTileEntities() {
-        return tileSnapshots;
+    public ImmutableList<Pair<BlockPos, NBTTagCompound>> getTileData() {
+        return tileData;
     }
 
     public NBTTagCompound serialize() {
@@ -243,7 +244,7 @@ public class RegionSnapshot {
         return serializedForm;
     }
 
-    private static final class Builder {
+    public static final class Builder {
 
         private static final BiPredicate<BlockPos, IBlockState> AIR_CHECK = (pos, state) -> state.getMaterial() != Material.AIR;
 
@@ -301,41 +302,46 @@ public class RegionSnapshot {
         }
 
         /**
-         * Record the tile entities regardless of its condition.
+         * Set whether record tile entities or not. Will force override the predicate.
          *
          * @see #checkTiles(TriPredicate)
          */
-        public Builder recordTiles() {
-            return checkTiles((pos, state, tile) -> true);
+        public Builder recordTiles(boolean flag) {
+            if (flag)
+                return checkTiles((pos, state, tile) -> true);
+            else
+                return checkTiles(null);
         }
 
         public RegionSnapshot build() {
             Preconditions.checkState(!built);
 
-            ImmutableList.Builder<IBlockState> blockStates = ImmutableList.builder();
-            ImmutableList.Builder<BlockSnapshot> tileSnapshots = ImmutableList.builder();
+            ImmutableList.Builder<IBlockState> tileData = ImmutableList.builder();
+            ImmutableList.Builder<Pair<BlockPos, NBTTagCompound>> tileSnapshots = ImmutableList.builder();
             if (tileValidator != null)
-                buildWithTiles(blockStates, tileSnapshots);
+                buildWithTiles(tileData, tileSnapshots);
             else
-                buildWithoutTiles(blockStates);
+                buildWithoutTiles(tileData);
 
             built = true;
-            return new RegionSnapshot(world, region, blockStates.build(), tileSnapshots.build());
+            return new RegionSnapshot(world, region, tileData.build(), tileSnapshots.build());
         }
 
-        private void buildWithTiles(ImmutableList.Builder<IBlockState> blockStates, ImmutableList.Builder<BlockSnapshot> tileSnapshots) {
+        private void buildWithTiles(ImmutableList.Builder<IBlockState> blockStates, ImmutableList.Builder<Pair<BlockPos, NBTTagCompound>> tileData) {
             for (BlockPos pos : region) {
                 TileEntity tile = world.getTileEntity(pos);
                 if (tile != null) {
                     IBlockState state = world.getBlockState(pos);
-                    if (tileValidator.test(pos, state, tile))
-                        tileSnapshots.add(new BlockSnapshot(world, pos, state));
+                    if (tileValidator.test(pos, state, tile)) {
+                        tileData.add(Pair.of(pos, tile.serializeNBT()));
+                        blockStates.add(state);
+                    }
                 } else {
                     IBlockState state = world.getBlockState(pos);
                     if (normalValidator.test(pos, state))
                         blockStates.add(state);
                     else
-                        blockStates.add(DummyBlockState.INSTANCE);
+                        blockStates.add(DummyBlockState.NOTHING);
                 }
             }
         }
@@ -346,7 +352,7 @@ public class RegionSnapshot {
                 if (normalValidator.test(pos, state))
                     blockStates.add(state);
                 else
-                    blockStates.add(DummyBlockState.INSTANCE);
+                    blockStates.add(DummyBlockState.NOTHING);
             }
         }
 
@@ -360,7 +366,7 @@ public class RegionSnapshot {
      */
     private static class DummyBlockState implements IBlockState {
 
-        public static final DummyBlockState INSTANCE = new DummyBlockState();
+        public static final DummyBlockState NOTHING = new DummyBlockState();
 
         private DummyBlockState() {
         }
