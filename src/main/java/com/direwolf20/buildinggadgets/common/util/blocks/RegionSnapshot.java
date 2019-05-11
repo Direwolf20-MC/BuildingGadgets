@@ -1,21 +1,19 @@
 package com.direwolf20.buildinggadgets.common.util.blocks;
 
 import com.direwolf20.buildinggadgets.api.building.Region;
+import com.direwolf20.buildinggadgets.common.util.helpers.LambdaHelper;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Verify;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
-import net.minecraft.block.Block;
-import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTUtil;
-import net.minecraft.state.IProperty;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -26,7 +24,6 @@ import net.minecraftforge.common.util.TriPredicate;
 import net.minecraftforge.fml.server.ServerLifecycleHooks;
 import org.apache.commons.lang3.tuple.Pair;
 
-import javax.annotation.Nonnull;
 import java.util.*;
 import java.util.function.BiPredicate;
 
@@ -38,6 +35,15 @@ public class RegionSnapshot {
     private static final String TILE_DATA = "block_snapshots";
     private static final String TILE_POS = "block_pos";
     private static final String TILE_NBT = "block_nbt";
+
+    private static int nextPaletteeID(Object2IntMap<IBlockState> mapPalettes) {
+        // ID 0 is preoccupied for "nothing should be placed here", which is represented as Optional.empty()
+        return mapPalettes.size() + 1;
+    }
+
+    private static Optional<IBlockState> getPalettee(List<IBlockState> palettes, int id) {
+        return id == 0 ? Optional.empty() : Optional.of(palettes.get(id - 1));
+    }
 
     private static NBTTagCompound serialize(NBTTagCompound tag, RegionSnapshot snapshot) {
         tag.setInt(DIMENSION, snapshot.world.getDimension().getType().getId());
@@ -61,37 +67,41 @@ public class RegionSnapshot {
         IntList frames = new IntArrayList();
 
         // The repeating block state, if any
-        IBlockState lastStreak = null;
+        Optional<IBlockState> lastStreak = Optional.empty();
         // Number of repeating block states
         int streak = 0;
 
         boolean firstIteration = true;
-        for (IBlockState state : snapshot.blockStates) {
+        for (Optional<IBlockState> state : snapshot.blockStates) {
             // Palette serialization begin
-            if (!recordedPalettes.contains(state)) {
-                recordedPalettes.add(state);
-                // ID 0 is preoccupied for "nothing should be placed here", which is represented in 'null'
-                mapPalettes.put(state, mapPalettes.size() + 1);
-                palettes.add(NBTUtil.writeBlockState(state));
+            if (state.isPresent()) {
+                // This statement should never throw an exception
+                IBlockState nonnullState = state.orElseThrow(RuntimeException::new);
+                if (!recordedPalettes.contains(nonnullState)) {
+                    recordedPalettes.add(nonnullState);
+                    mapPalettes.put(nonnullState, nextPaletteeID(mapPalettes));
+                    palettes.add(NBTUtil.writeBlockState(nonnullState));
+                }
             }
             // Palette serialization ends
 
-            // Hence we record the storage frame after it is completed, the inital values of the counter would be used as a storage frame regardless, therefore we need to skip inorder for this algorithm to function correctly
+            // Hence we record the storage frame after it is completed, the initial values of the counter would be used as a storage frame regardless, therefore we need to skip inorder for this algorithm to function correctly
             if (firstIteration)
                 firstIteration = false;
             else {
                 // If the same block state showed up again, increase the number of streaks
                 // If we have more than 255 streaks (maximum integer that can be stored in 8 bits), we force start a new streak, because the current storage frame won't fit that many of them
-                if (state == lastStreak && streak < 255) {
+                if (state.equals(lastStreak) && streak < 255) {
                     streak++;
                     continue;
                 }
 
                 // Note: if the program reached here, it means the current storage frame is completed
 
-                // Number of streaks and the ID of the block state that is streaking
-                // No need to differentiate between single and repeating block states, since the number at the larger endian represents how many repeating block states are there
-                int frame = ((streak & 0xff) << 24) | (mapPalettes.getInt(lastStreak) & 0xffffff);
+                // - Number of streaks and the ID of the block state that is streaking
+                // - No need to differentiate between single and repeating block states, since the number at the larger endian represents how many repeating block states are there
+                // - If the streaking block state is empty, we use the preoccupied ID 0
+                int frame = ((streak & 0xff) << 24) | (mapPalettes.getOrDefault(lastStreak, 0) & 0xffffff);
                 frames.add(frame);
             }
 
@@ -131,13 +141,14 @@ public class RegionSnapshot {
         assert palettes.size() == palettesNBT.size() + 1;
 
         // See the serialization algorithm for vocabulary definitions, including "frame", "streak", etc.
-        ImmutableList.Builder<IBlockState> blockStates = ImmutableList.builder();
+        ImmutableList.Builder<Optional<IBlockState>> blockStates = ImmutableList.builder();
         int[] frames = tag.getIntArray(BLOCK_FRAMES);
         for (int frame : frames) {
             int stateID = frame & 0xffffff;
             int streaks = frame >> 24;
 
-            IBlockState state = palettes.get(stateID);
+            // ID 0 is preoccupied for empty block
+            Optional<IBlockState> state = getPalettee(palettes, stateID);
             for (int j = 0; j < streaks; j++) {
                 blockStates.add(state);
             }
@@ -147,7 +158,9 @@ public class RegionSnapshot {
         ImmutableList.Builder<Pair<BlockPos, NBTTagCompound>> tileData = ImmutableList.builder();
         for (int i = 0; i < tileDataNBT.size(); i++) {
             NBTTagCompound serializedData = tileDataNBT.getCompound(i);
-            tileData.add(Pair.of(NBTUtil.readBlockPos(serializedData.getCompound(TILE_POS)), serializedData.getCompound(TILE_NBT)));
+            tileData.add(Pair.of(
+                    NBTUtil.readBlockPos(serializedData.getCompound(TILE_POS)),
+                    serializedData.getCompound(TILE_NBT)));
         }
 
         return new RegionSnapshot(world, region, blockStates.build(), tileData.build());
@@ -168,14 +181,14 @@ public class RegionSnapshot {
      *
      * @see #select(World, Region)
      */
-    public static RegionSnapshot take(World world, Region region) {
+    public static RegionSnapshot take(World world, Region region) throws PaletteOverflowException {
         return select(world, region).build();
     }
 
     private World world;
     private Region region;
 
-    private ImmutableList<IBlockState> blockStates;
+    private ImmutableList<Optional<IBlockState>> blockStates;
     private ImmutableList<Pair<BlockPos, NBTTagCompound>> tileData;
 
     /**
@@ -183,7 +196,7 @@ public class RegionSnapshot {
      */
     private NBTTagCompound serializedForm;
 
-    private RegionSnapshot(World world, Region region, ImmutableList<IBlockState> blockStates, ImmutableList<Pair<BlockPos, NBTTagCompound>> tileData) {
+    private RegionSnapshot(World world, Region region, ImmutableList<Optional<IBlockState>> blockStates, ImmutableList<Pair<BlockPos, NBTTagCompound>> tileData) {
         this.world = world;
         this.region = region;
         this.blockStates = blockStates;
@@ -193,11 +206,7 @@ public class RegionSnapshot {
     public void restore() {
         int index = 0;
         for (BlockPos pos : region) {
-            IBlockState state = blockStates.get(index);
-            if (state == DummyBlockState.NOTHING)
-                continue;
-
-            world.setBlockState(pos, state);
+            blockStates.get(index).ifPresent(state -> world.setBlockState(pos, state));
             index++;
         }
 
@@ -222,7 +231,7 @@ public class RegionSnapshot {
      * that position should not be replaced regularly: it might be replaced with a {@link BlockSnapshot}, or it should
      * be left untouched.
      */
-    public ImmutableList<IBlockState> getBlockStates() {
+    public ImmutableList<Optional<IBlockState>> getBlockStates() {
         return blockStates;
     }
 
@@ -246,8 +255,6 @@ public class RegionSnapshot {
 
     public static final class Builder {
 
-        private static final BiPredicate<BlockPos, IBlockState> AIR_CHECK = (pos, state) -> state.getMaterial() != Material.AIR;
-
         private World world;
         private Region region;
         private BiPredicate<BlockPos, IBlockState> normalValidator;
@@ -264,152 +271,99 @@ public class RegionSnapshot {
          * Set validator for normal blocks (non tile entities).
          *
          * @return this
+         * @throws IllegalStateException When trying to invoke this method when this builder has build someone already.
          */
         public Builder checkBlocks(BiPredicate<BlockPos, IBlockState> normalValidator) {
             Preconditions.checkState(!built);
-
-            this.normalValidator = normalValidator;
+            this.normalValidator = LambdaHelper.and(this.normalValidator, normalValidator);
             return this;
         }
 
+        /**
+         * @throws IllegalStateException When trying to invoke this method when this builder has build someone already.
+         */
         public Builder exclude(IBlockState... statesToExclude) {
             ImmutableSet<IBlockState> statesSet = ImmutableSet.copyOf(statesToExclude);
-            if (normalValidator == null)
-                return checkBlocks((pos, state) -> !statesSet.contains(state));
-            else {
-                return checkBlocks(normalValidator.and((pos, state) -> !statesSet.contains(state)));
-            }
+            return checkBlocks((pos, state) -> !statesSet.contains(state));
         }
 
+        /**
+         * @throws IllegalStateException When trying to invoke this method when this builder has build someone already.
+         */
         public Builder excludeAir() {
-            if (normalValidator == null)
-                return checkBlocks(AIR_CHECK);
-            else {
-                return checkBlocks(normalValidator.and(AIR_CHECK));
-            }
+            return checkBlocks((pos, state) -> state.isAir(world, pos));
         }
 
         /**
          * Set validator for tile entities. If want to record tile entities regardless of its condition, use
          *
          * @return this
+         * @throws IllegalStateException When trying to invoke this method when this builder has build someone already.
          */
         public Builder checkTiles(TriPredicate<BlockPos, IBlockState, TileEntity> tileValidator) {
             Preconditions.checkState(!built);
-
-            this.tileValidator = tileValidator;
+            this.tileValidator = LambdaHelper.and(this.tileValidator, tileValidator);
             return this;
         }
 
         /**
          * Set whether record tile entities or not. Will force override the predicate.
          *
+         * @throws IllegalStateException When trying to invoke this method when this builder has build someone already.
          * @see #checkTiles(TriPredicate)
          */
         public Builder recordTiles(boolean flag) {
             if (flag)
                 return checkTiles((pos, state, tile) -> true);
-            else
-                return checkTiles(null);
+            else {
+                tileValidator = null;
+                return this;
+            }
         }
 
-        public RegionSnapshot build() {
+        /**
+         * @throws IllegalStateException    When trying to invoke this method when this builder has build someone
+         *                                  already.
+         * @throws PaletteOverflowException When there are more than 16777216, or {@code 2^24}, unique block states in
+         *                                  the given region. This is because the serialization format only uses the
+         *                                  first 24 bits of an integer to store the palette ID.
+         */
+        public RegionSnapshot build() throws IllegalStateException, PaletteOverflowException {
             Preconditions.checkState(!built);
 
-            ImmutableList.Builder<IBlockState> tileData = ImmutableList.builder();
-            ImmutableList.Builder<Pair<BlockPos, NBTTagCompound>> tileSnapshots = ImmutableList.builder();
-            if (tileValidator != null)
-                buildWithTiles(tileData, tileSnapshots);
-            else
-                buildWithoutTiles(tileData);
-
-            built = true;
-            return new RegionSnapshot(world, region, tileData.build(), tileSnapshots.build());
-        }
-
-        private void buildWithTiles(ImmutableList.Builder<IBlockState> blockStates, ImmutableList.Builder<Pair<BlockPos, NBTTagCompound>> tileData) {
+            ImmutableList.Builder<Optional<IBlockState>> blockStatesBuilder = ImmutableList.builder();
+            ImmutableList.Builder<Pair<BlockPos, NBTTagCompound>> tileDataBuilder = ImmutableList.builder();
             for (BlockPos pos : region) {
                 TileEntity tile = world.getTileEntity(pos);
-                if (tile != null) {
-                    IBlockState state = world.getBlockState(pos);
-                    if (tileValidator.test(pos, state, tile)) {
-                        tileData.add(Pair.of(pos, tile.serializeNBT()));
-                        blockStates.add(state);
-                    }
-                } else {
-                    IBlockState state = world.getBlockState(pos);
-                    if (normalValidator.test(pos, state))
-                        blockStates.add(state);
-                    else
-                        blockStates.add(DummyBlockState.NOTHING);
-                }
-            }
-        }
-
-        private void buildWithoutTiles(ImmutableList.Builder<IBlockState> blockStates) {
-            for (BlockPos pos : region) {
                 IBlockState state = world.getBlockState(pos);
-                if (normalValidator.test(pos, state))
-                    blockStates.add(state);
+                if (tile != null && tileValidator.test(pos, state, tile)) {
+                    tileDataBuilder.add(Pair.of(pos, tile.serializeNBT()));
+                    blockStatesBuilder.add(Optional.of(state));
+                } else if (normalValidator.test(pos, state))
+                    blockStatesBuilder.add(Optional.of(state));
                 else
-                    blockStates.add(DummyBlockState.NOTHING);
+                    blockStatesBuilder.add(Optional.empty());
             }
+
+            ImmutableList<Optional<IBlockState>> blockStates = blockStatesBuilder.build();
+
+            ImmutableSet<Optional<IBlockState>> uniqueBlocksStates = ImmutableSet.copyOf(blockStates);
+            // 16777216 == 2^24
+            if (uniqueBlocksStates.size() >= 16777216)
+                throw new PaletteOverflowException(region, uniqueBlocksStates.size());
+
+            built = true;
+            return new RegionSnapshot(world, region, blockStates, tileDataBuilder.build());
         }
 
     }
 
-    /**
-     * Dummy, singleton block state class used to represent "nothing here". In other words, coordinate containing this
-     * block state will be left untouched.
-     * <p>
-     * {@code null} were not used because we cannot have {@code null} values in {@link ImmutableList}.
-     */
-    private static class DummyBlockState implements IBlockState {
+    public static class PaletteOverflowException extends Exception {
 
-        public static final DummyBlockState NOTHING = new DummyBlockState();
+        private static final long serialVersionUID = 6588933909692330592L;
 
-        private DummyBlockState() {
-        }
-
-        @Nonnull
-        @Override
-        public Block getBlock() {
-            throw new IllegalStateException("Dummy block state, no operation should be applied");
-        }
-
-        @Nonnull
-        @Override
-        public Collection<IProperty<?>> getProperties() {
-            throw new IllegalStateException("Dummy block state, no operation should be applied");
-        }
-
-        @Override
-        public <T extends Comparable<T>> boolean has(@Nonnull IProperty<T> property) {
-            throw new IllegalStateException("Dummy block state, no operation should be applied");
-        }
-
-        @Nonnull
-        @Override
-        public <T extends Comparable<T>> T get(@Nonnull IProperty<T> property) {
-            throw new IllegalStateException("Dummy block state, no operation should be applied");
-        }
-
-        @Nonnull
-        @Override
-        public <T extends Comparable<T>, V extends T> IBlockState with(@Nonnull IProperty<T> property, @Nonnull V value) {
-            throw new IllegalStateException("Dummy block state, no operation should be applied");
-        }
-
-        @Override
-        @Nonnull
-        public <T extends Comparable<T>> IBlockState cycle(@Nonnull IProperty<T> property) {
-            throw new IllegalStateException("Dummy block state, no operation should be applied");
-        }
-
-        @Nonnull
-        @Override
-        public ImmutableMap<IProperty<?>, Comparable<?>> getValues() {
-            throw new IllegalStateException("Dummy block state, no operation should be applied");
+        public PaletteOverflowException(Region region, int finalPalettes) {
+            super("The number of unique block states in " + region + " exceeded 16777216, in total there are " + finalPalettes + " of them.");
         }
 
     }
