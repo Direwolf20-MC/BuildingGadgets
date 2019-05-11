@@ -6,8 +6,15 @@ public class PaletteOverflowException extends Exception {
 
     private static final long serialVersionUID = 6588933909692330592L;
 
-    public PaletteOverflowException(Region region, int finalPalettes) {
-        super("The number of unique block states in " + region + " exceeded 16777216, in total there are " + finalPalettes + " of them.");
+    private final int amountPalettes;
+
+    public PaletteOverflowException(Region region, int amountPalettes) {
+        super("The number of unique block states in " + region + " exceeded 16777216, in total there are " + amountPalettes + " of them.");
+        this.amountPalettes = amountPalettes;
+    }
+
+    public int getAmountPalettes() {
+        return amountPalettes;
     }
 
 }
