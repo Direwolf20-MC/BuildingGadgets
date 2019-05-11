@@ -37,12 +37,7 @@ public class RegionSnapshot {
     private static final String TILE_NBT = "block_nbt";
 
     private static int nextPaletteeID(Object2IntMap<IBlockState> mapPalettes) {
-        // ID 0 is preoccupied for "nothing should be placed here", which is represented as Optional.empty()
-        return mapPalettes.size() + 1;
-    }
-
-    private static Optional<IBlockState> getPalettee(List<IBlockState> palettes, int id) {
-        return id == 0 ? Optional.empty() : Optional.of(palettes.get(id - 1));
+        
     }
 
     private static NBTTagCompound serialize(NBTTagCompound tag, RegionSnapshot snapshot) {
@@ -50,18 +45,20 @@ public class RegionSnapshot {
         snapshot.region.serializeTo(tag);
 
         // Palette serialization begin
+        // The serialized palettes only include actual block states, empty block state should be added, regardlessly, during deserialization
         NBTTagList palettes = new NBTTagList();
         Object2IntMap<IBlockState> mapPalettes = new Object2IntOpenHashMap<>();
+        {
+            // ID 0 is preoccupied for "nothing should be placed here", which is represented as Optional.empty()
+            // This way whenever we access the size of this map, we always get the correct state ID to be used next
+            mapPalettes.put(null, 0);
+        }
         Set<IBlockState> recordedPalettes = new HashSet<>();
-
-        // "nothing should be here" block state
-        palettes.add(new NBTTagCompound());
         // Palette serialization end
 
-        // Streaking: a way to record a number of repeating block states, using only 2 integers
-        // Storage frame: one or two numbers indicating a sequence of block states
-        // Regular frame: a type of storage frame; 1 number, representing the ID of the block state recorded
-        // Streak frame: a type of storage frame; 2 numbers, where the first one is positive, representing the ID of the repeating block state; the second one is negative, representing the number of repeating block states
+        // Streaking: a way to record a number of repeating block states, using only 1 integer
+        // Storage frame: an integer indicating a sequence of block states and the streaking block state ID; the first 24 bits are used to stored the ID, and the former 8 bits are used to store the number of repeating block states.
+        //   If there are more than 256, or 2^8 repeating block states, it will force start a new storage frame
 
         // Complete storage frames, will be serialized into a NBTTagList later
         IntList frames = new IntArrayList();
@@ -79,7 +76,7 @@ public class RegionSnapshot {
                 IBlockState nonnullState = state.orElseThrow(RuntimeException::new);
                 if (!recordedPalettes.contains(nonnullState)) {
                     recordedPalettes.add(nonnullState);
-                    mapPalettes.put(nonnullState, nextPaletteeID(mapPalettes));
+                    mapPalettes.put(nonnullState, mapPalettes.size());
                     palettes.add(NBTUtil.writeBlockState(nonnullState));
                 }
             }
@@ -98,17 +95,19 @@ public class RegionSnapshot {
 
                 // Note: if the program reached here, it means the current storage frame is completed
 
-                // - Number of streaks and the ID of the block state that is streaking
-                // - No need to differentiate between single and repeating block states, since the number at the larger endian represents how many repeating block states are there
-                // - If the streaking block state is empty, we use the preoccupied ID 0
-                int frame = ((streak & 0xff) << 24) | (mapPalettes.getOrDefault(lastStreak, 0) & 0xffffff);
-                frames.add(frame);
+                // Number of streaks and the ID of the block state that is streaking
+                // - no need to differentiate between single and repeating block states, since the number at the larger endian represents how many repeating block states are there
+                // - if the streaking block state is empty (returns `null` when `get()` is called), it will be mapped to ID 0.
+                //   - see initialization of `mapPalettes`
+                frames.add(((streak & 0xff) << 24) | (mapPalettes.get(lastStreak.get()) & 0xffffff));
             }
 
             // Regardless of which situation, we reset the counter
             streak = 1;
             lastStreak = state;
         }
+        // Force add a frame here -- even if we pushed a new frame on the last block state, itself hasn't been stored yet
+        frames.add(((streak & 0xff) << 24) | (mapPalettes.get(lastStreak.get()) & 0xffffff));
 
         tag.setIntArray(BLOCK_FRAMES, frames.toIntArray());
         tag.setTag(BLOCK_PALETTES, palettes);
@@ -131,9 +130,11 @@ public class RegionSnapshot {
 
         Region region = Region.deserializeFrom(tag);
 
-        List<IBlockState> palettes = new ArrayList<>();
-        // "nothing should be here" block state, represented with 'null'
-        palettes.add(null);
+        List<Optional<IBlockState>> palettes = new ArrayList<>();
+        {
+            // Empty block state, indicating "do not replace here"
+            palettes.add(Optional.empty());
+        }
         NBTTagList palettesNBT = tag.getList(BLOCK_PALETTES, Constants.NBT.TAG_COMPOUND);
         for (int i = 0; i < palettesNBT.size(); i++) {
             palettes.add(NBTUtil.readBlockState(palettesNBT.getCompound(i)));
@@ -147,9 +148,9 @@ public class RegionSnapshot {
             int stateID = frame & 0xffffff;
             int streaks = frame >> 24;
 
-            // ID 0 is preoccupied for empty block
-            Optional<IBlockState> state = getPalettee(palettes, stateID);
-            for (int j = 0; j < streaks; j++) {
+            // ID 0 is preoccupied for empty block. See initialization of `palettes`
+            Optional<IBlockState> state = palettes.get(stateID);
+            for (int j = 0; j <= streaks; j++) {
                 blockStates.add(state);
             }
         }
@@ -313,12 +314,9 @@ public class RegionSnapshot {
          * @see #checkTiles(TriPredicate)
          */
         public Builder recordTiles(boolean flag) {
-            if (flag)
-                return checkTiles((pos, state, tile) -> true);
-            else {
-                tileValidator = null;
-                return this;
-            }
+            Preconditions.checkState(!built);
+            tileValidator = flag ? (pos, state, tile) -> true : null;
+            return this;
         }
 
         /**
