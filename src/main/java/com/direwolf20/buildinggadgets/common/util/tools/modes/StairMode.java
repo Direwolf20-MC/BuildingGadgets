@@ -5,12 +5,15 @@ import com.direwolf20.buildinggadgets.api.building.IValidatorFactory;
 import com.direwolf20.buildinggadgets.api.building.modes.AtopSupportedMode;
 import com.direwolf20.buildinggadgets.api.building.placement.Stair;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
+import com.direwolf20.buildinggadgets.common.util.lang.ModeTranslation;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+
+import javax.annotation.Nonnull;
 
 /**
  * Stair mode for Building Gadget.
@@ -55,4 +58,9 @@ public class StairMode extends AtopSupportedMode {
         return NAME;
     }
 
+    @Override
+    @Nonnull
+    public String getLocalizedName() {
+        return ModeTranslation.STAIR.format();
+    }
 }

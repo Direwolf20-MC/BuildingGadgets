@@ -1,7 +1,6 @@
 package com.direwolf20.buildinggadgets.common.util.tools.modes;
 
 import com.direwolf20.buildinggadgets.api.building.IBuildingMode;
-import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.blocks.BlockMap;
@@ -53,7 +52,7 @@ public enum BuildingMode {
 
     @Override
     public String toString() {
-        return getModeImplementation().getLocalized();
+        return getModeImplementation().getLocalizedName();
     }
 
     public BuildingMode next() {

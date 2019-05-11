@@ -9,12 +9,15 @@ import com.direwolf20.buildinggadgets.api.building.placement.Surface;
 import com.direwolf20.buildinggadgets.api.building.placement.Wall;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
+import com.direwolf20.buildinggadgets.common.util.lang.ModeTranslation;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+
+import javax.annotation.Nonnull;
 
 /**
  * Surface mode for Exchanging Gadget.
@@ -47,4 +50,9 @@ public class ExchangingSurfaceMode extends AbstractMode {
         return NAME;
     }
 
+    @Override
+    @Nonnull
+    public String getLocalizedName() {
+        return ModeTranslation.SURFACE.format();
+    }
 }

@@ -47,18 +47,9 @@ public interface IBuildingMode {
     ResourceLocation getRegistryName();
 
     /**
-     * Translation key that vanilla's {@link I18n} can recognize.
+     * A localized user-readable textual representation of this {@code IBuildingMode}
+     * <p>Implementations should override this method and use formatting features.</p>
      */
-    default String getTranslationKey() {
-        return "modes." + getRegistryName();
-    }
-
-    /**
-     * Locale translated from {@code I18n.format(getTranslationKey()}.
-     * <p>Implementations may override this method to use formatting features.</p>
-     */
-    default String getLocalized() {
-        return I18n.format(getTranslationKey());
-    }
+    String getLocalizedName();
 
 }

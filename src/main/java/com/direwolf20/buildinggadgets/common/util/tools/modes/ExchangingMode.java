@@ -49,7 +49,7 @@ public enum ExchangingMode {
 
     @Override
     public String toString() {
-        return getModeImplementation().getLocalized();
+        return getModeImplementation().getLocalizedName();
     }
 
     public ExchangingMode next() {

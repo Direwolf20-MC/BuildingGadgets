@@ -19,11 +19,9 @@ import java.util.function.BiPredicate;
 public abstract class AbstractMode implements IBuildingMode {
 
     protected final IValidatorFactory validatorFactory;
-    private final String translationKey;
 
     public AbstractMode(IValidatorFactory validatorFactory) {
         this.validatorFactory = validatorFactory;
-        this.translationKey = "modes." + getRegistryName().toString().replace(':', '.');
     }
 
     @Override
@@ -34,11 +32,6 @@ public abstract class AbstractMode implements IBuildingMode {
     @Override
     public Context createExecutionContext(EntityPlayer player, BlockPos hit, EnumFacing sideHit, ItemStack tool) {
         return new Context(computeCoordinates(player, hit, sideHit, tool), getBlockProvider(tool), validatorFactory);
-    }
-
-    @Override
-    public String getTranslationKey() {
-        return translationKey;
     }
 
 }

@@ -6,12 +6,15 @@ import com.direwolf20.buildinggadgets.api.building.modes.AbstractMode;
 import com.direwolf20.buildinggadgets.api.building.placement.Column;
 import com.direwolf20.buildinggadgets.api.util.MathUtils;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
+import com.direwolf20.buildinggadgets.common.util.lang.ModeTranslation;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+
+import javax.annotation.Nonnull;
 
 /**
  * Horizontal column mode for Exchanging Gadget.
@@ -41,6 +44,12 @@ public class ExchangingHorizontalColumnMode extends AbstractMode {
     @Override
     public ResourceLocation getRegistryName() {
         return NAME;
+    }
+
+    @Override
+    @Nonnull
+    public String getLocalizedName() {
+        return ModeTranslation.HORIZONTAL_COLUMN.format();
     }
 
 }
