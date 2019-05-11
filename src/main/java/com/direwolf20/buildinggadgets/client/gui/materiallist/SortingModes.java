@@ -1,5 +1,7 @@
 package com.direwolf20.buildinggadgets.client.gui.materiallist;
 
+import com.direwolf20.buildinggadgets.common.util.lang.ITranslationProvider;
+import com.direwolf20.buildinggadgets.common.util.lang.MaterialListTranslation;
 import net.minecraft.client.resources.I18n;
 
 import java.util.Comparator;
@@ -9,35 +11,27 @@ import static com.direwolf20.buildinggadgets.client.gui.materiallist.ScrollingMa
 
 enum SortingModes {
 
-    NAME(Comparator.comparing(Entry::getItemName), "nameAZ"),
-    NAME_REVERSED(NAME.getComparator().reversed(), "nameZA"),
-    REQUIRED(Comparator.comparingInt(Entry::getRequired), "requiredAcse"),
-    REQUIRED_REVERSED(REQUIRED.getComparator().reversed(), "requiredDesc"),
-    MISSING(Comparator.comparingInt(Entry::getMissing), "missingAcse"),
-    MISSING_REVERSED(MISSING.getComparator().reversed(), "missingDesc");
+    NAME(Comparator.comparing(Entry::getItemName), MaterialListTranslation.BUTTON_SORTING_NAMEAZ),
+    NAME_REVERSED(NAME.getComparator().reversed(), MaterialListTranslation.BUTTON_SORTING_NAMEZA),
+    REQUIRED(Comparator.comparingInt(Entry::getRequired), MaterialListTranslation.BUTTON_SORTING_REQUIREDACSE),
+    REQUIRED_REVERSED(REQUIRED.getComparator().reversed(), MaterialListTranslation.BUTTON_SORTING_MISSINGDESC),
+    MISSING(Comparator.comparingInt(Entry::getMissing), MaterialListTranslation.BUTTON_SORTING_MISSINGACSE),
+    MISSING_REVERSED(MISSING.getComparator().reversed(), MaterialListTranslation.BUTTON_SORTING_MISSINGDESC);
 
     private final Comparator<Entry> comparator;
-    private final String translationKey;
+    private final ITranslationProvider translationProvider;
 
-    SortingModes(Comparator<Entry> comparator, String translationKey) {
+    SortingModes(Comparator<Entry> comparator, ITranslationProvider provider) {
         this.comparator = comparator;
-        this.translationKey = "gui.buildinggadgets.materialList.button.sorting." + translationKey;
-    }
-
-    public void sortInplace(List<Entry> unsorted) {
-        unsorted.sort(comparator);
+        this.translationProvider = provider;
     }
 
     public Comparator<Entry> getComparator() {
         return comparator;
     }
 
-    public String getTranslationKey() {
-        return translationKey;
-    }
-
     public String getLocalizedName() {
-        return I18n.format(translationKey);
+        return translationProvider.format();
     }
 
     public SortingModes next() {
