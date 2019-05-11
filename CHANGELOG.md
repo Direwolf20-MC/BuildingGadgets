@@ -2,6 +2,11 @@
 The format of this document is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and should continue to adhere to the conventions outlined in the Keep a Changelog guidelines.
 
 ## [Unreleased]
+## Changed
+- The Building and Exchanging Gadgets mode System, to make it more open for future additions. Thanks @hnOsmium001 for #263.
+    - This also resulted in a lot of changes - please report any bugs you might encounter
+### Fixed
+- Fix typo when pasting a link (#302)
 
 ## [2.6.8] - 2019-03-24
 ### Added
