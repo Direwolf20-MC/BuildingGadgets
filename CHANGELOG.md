@@ -3,10 +3,10 @@ The format of this document is based on [Keep a Changelog](https://keepachangelo
 
 ## [Unreleased]
 ## Changed
-- The Building and Exchanging Gadgets mode System, to make it more open for future additions. Thanks @hnOsmium001 for #263.
+- The Building and Exchanging Gadgets mode System, to make it more open for future additions. Thanks @hnOsmium001 for his PR.
     - This also resulted in a lot of changes - please report any bugs you might encounter
 ### Fixed
-- Fix typo when pasting a link (#302)
+- Fix typo when pasting **a** link 
 
 ## [2.6.8] - 2019-03-24
 ### Added
