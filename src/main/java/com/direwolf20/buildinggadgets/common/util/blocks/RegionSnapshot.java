@@ -1,9 +1,9 @@
 package com.direwolf20.buildinggadgets.common.util.blocks;
 
 import com.direwolf20.buildinggadgets.api.building.Region;
+import com.direwolf20.buildinggadgets.common.util.exceptions.PaletteOverflowException;
 import com.direwolf20.buildinggadgets.common.util.helpers.LambdaHelper;
 import com.google.common.base.Preconditions;
-import com.google.common.base.Verify;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
@@ -354,16 +354,6 @@ public class RegionSnapshot {
 
             built = true;
             return new RegionSnapshot(world, region, blockStates, tileDataBuilder.build());
-        }
-
-    }
-
-    public static class PaletteOverflowException extends Exception {
-
-        private static final long serialVersionUID = 6588933909692330592L;
-
-        public PaletteOverflowException(Region region, int finalPalettes) {
-            super("The number of unique block states in " + region + " exceeded 16777216, in total there are " + finalPalettes + " of them.");
         }
 
     }
