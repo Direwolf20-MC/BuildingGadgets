@@ -36,10 +36,6 @@ public class RegionSnapshot {
     private static final String TILE_POS = "block_pos";
     private static final String TILE_NBT = "block_nbt";
 
-    private static int nextPaletteeID(Object2IntMap<IBlockState> mapPalettes) {
-        
-    }
-
     private static NBTTagCompound serialize(NBTTagCompound tag, RegionSnapshot snapshot) {
         tag.setInt(DIMENSION, snapshot.world.getDimension().getType().getId());
         snapshot.region.serializeTo(tag);
@@ -64,11 +60,11 @@ public class RegionSnapshot {
         IntList frames = new IntArrayList();
 
         // The repeating block state, if any
-        Optional<IBlockState> lastStreak = Optional.empty();
+        // - similar logic as counter resetting for initializing as the first block state
+        Optional<IBlockState> lastStreak = snapshot.blockStates.get(0);
         // Number of repeating block states
         int streak = 0;
 
-        boolean firstIteration = true;
         for (Optional<IBlockState> state : snapshot.blockStates) {
             // Palette serialization begin
             if (state.isPresent()) {
@@ -82,32 +78,29 @@ public class RegionSnapshot {
             }
             // Palette serialization ends
 
-            // Hence we record the storage frame after it is completed, the initial values of the counter would be used as a storage frame regardless, therefore we need to skip inorder for this algorithm to function correctly
-            if (firstIteration)
-                firstIteration = false;
-            else {
-                // If the same block state showed up again, increase the number of streaks
-                // If we have more than 255 streaks (maximum integer that can be stored in 8 bits), we force start a new streak, because the current storage frame won't fit that many of them
-                if (state.equals(lastStreak) && streak < 255) {
-                    streak++;
-                    continue;
-                }
-
-                // Note: if the program reached here, it means the current storage frame is completed
-
-                // Number of streaks and the ID of the block state that is streaking
-                // - no need to differentiate between single and repeating block states, since the number at the larger endian represents how many repeating block states are there
-                // - if the streaking block state is empty (returns `null` when `get()` is called), it will be mapped to ID 0.
-                //   - see initialization of `mapPalettes`
-                frames.add(((streak & 0xff) << 24) | (mapPalettes.get(lastStreak.get()) & 0xffffff));
+            // If the same block state showed up again, increase the number of streaks
+            // If we have more than 255 streaks (maximum integer that can be stored in 8 bits), we force start a new streak, because the current storage frame won't fit that many of them
+            if (state.equals(lastStreak) && streak < 255) {
+                streak++;
+                continue;
             }
 
+            // Note: if the program reached here, it means the current storage frame is completed
+
+            // Number of streaks and the ID of the block state that is streaking
+            // - no need to differentiate between single and repeating block states, since the number at the larger endian represents how many repeating block states are there
+            // - if the streaking block state is empty (returns `null` when `get()` is called), it will be mapped to ID 0.
+            //   - see initialization of `mapPalettes`
+            // - when serializing, the stored number will be ONE FEWER then the actual amount
+            //   - this is for squeezing space efficiency of the serialized format (even though it is not very necessary)
+            frames.add((((streak - 1) & 0xff) << 24) | (mapPalettes.getInt(lastStreak.get()) & 0xffffff));
+
             // Regardless of which situation, we reset the counter
-            streak = 1;
+            streak = 0;
             lastStreak = state;
         }
         // Force add a frame here -- even if we pushed a new frame on the last block state, itself hasn't been stored yet
-        frames.add(((streak & 0xff) << 24) | (mapPalettes.get(lastStreak.get()) & 0xffffff));
+        frames.add((((streak - 1) & 0xff) << 24) | (mapPalettes.getInt(lastStreak.get()) & 0xffffff));
 
         tag.setIntArray(BLOCK_FRAMES, frames.toIntArray());
         tag.setTag(BLOCK_PALETTES, palettes);
@@ -137,7 +130,7 @@ public class RegionSnapshot {
         }
         NBTTagList palettesNBT = tag.getList(BLOCK_PALETTES, Constants.NBT.TAG_COMPOUND);
         for (int i = 0; i < palettesNBT.size(); i++) {
-            palettes.add(NBTUtil.readBlockState(palettesNBT.getCompound(i)));
+            palettes.add(Optional.of(NBTUtil.readBlockState(palettesNBT.getCompound(i))));
         }
         assert palettes.size() == palettesNBT.size() + 1;
 
@@ -146,11 +139,13 @@ public class RegionSnapshot {
         int[] frames = tag.getIntArray(BLOCK_FRAMES);
         for (int frame : frames) {
             int stateID = frame & 0xffffff;
-            int streaks = frame >> 24;
+            // The serialized number will be ONE FEWER then the actual amount
+            // - see the serialization for +1
+            int streaks = (frame >> 24) + 1;
 
-            // ID 0 is preoccupied for empty block. See initialization of `palettes`
             Optional<IBlockState> state = palettes.get(stateID);
-            for (int j = 0; j <= streaks; j++) {
+            // Add `streaks` amount of the same block state
+            for (int j = 0; j < streaks; j++) {
                 blockStates.add(state);
             }
         }
