@@ -22,7 +22,8 @@ import java.util.Optional;
 public class BlockBuildEntity extends EntityBase {
 
     public static enum Mode {
-        PLACE("place") {
+        // Serialization and networking based on `ordinal()`, please DO NOT CHANGE THE ORDER of the enums
+        PLACE() {
             @Override
             public void onBuilderEntityDespawn(BlockBuildEntity builder) {
                 World world = builder.world;
@@ -42,13 +43,13 @@ public class BlockBuildEntity extends EntityBase {
                 }
             }
         },
-        REMOVE("remove") {
+        REMOVE() {
             @Override
             public void onBuilderEntityDespawn(BlockBuildEntity builder) {
                 builder.world.setBlockState(builder.targetPos, Blocks.AIR.getDefaultState());
             }
         },
-        REPLACE("replace") {
+        REPLACE() {
             @Override
             public void onBuilderEntityDespawn(BlockBuildEntity builder) {
                 World world = builder.world;
@@ -56,20 +57,12 @@ public class BlockBuildEntity extends EntityBase {
             }
         };
 
-        private final String id;
-
-        Mode(String id) {
-            this.id = id;
-        }
-
-        public String getID() {
-            return id;
-        }
+        public static final Mode[] VALUES = values();
 
         public abstract void onBuilderEntityDespawn(BlockBuildEntity builder);
     }
 
-    private static final DataParameter<String> MODE = EntityDataManager.createKey(BlockBuildEntity.class, DataSerializers.STRING);
+    private static final DataParameter<Integer> MODE = EntityDataManager.createKey(BlockBuildEntity.class, DataSerializers.VARINT);
     private static final DataParameter<Optional<IBlockState>> SET_BLOCK = EntityDataManager.createKey(BlockBuildEntity.class, DataSerializers.OPTIONAL_BLOCK_STATE);
     private static final DataParameter<Boolean> USE_PASTE = EntityDataManager.createKey(BlockBuildEntity.class, DataSerializers.BOOLEAN);
 
@@ -114,11 +107,11 @@ public class BlockBuildEntity extends EntityBase {
     }
 
     public Mode getToolMode() {
-        return Mode.valueOf(dataManager.get(MODE));
+        return Mode.VALUES[dataManager.get(MODE)];
     }
 
     public void setToolMode(Mode mode) {
-        dataManager.set(MODE, mode.getID());
+        dataManager.set(MODE, mode.ordinal());
     }
 
     @Nullable
@@ -140,7 +133,7 @@ public class BlockBuildEntity extends EntityBase {
 
     @Override
     protected void registerData() {
-        dataManager.register(MODE, Mode.PLACE.getID());
+        dataManager.register(MODE, Mode.PLACE.ordinal());
         dataManager.register(SET_BLOCK, Optional.empty());
         dataManager.register(USE_PASTE, useConstructionPaste);
     }
@@ -150,7 +143,7 @@ public class BlockBuildEntity extends EntityBase {
         super.readAdditional(compound);
         setBlock = NBTUtil.readBlockState(compound.getCompound(NBTKeys.ENTITY_BUILD_SET_BLOCK));
         originalSetBlock = NBTUtil.readBlockState(compound.getCompound(NBTKeys.ENTITY_BUILD_ORIGINAL_BLOCK));
-        mode = Mode.valueOf(compound.getString(NBTKeys.GADGET_MODE));
+        mode = Mode.VALUES[compound.getInt(NBTKeys.GADGET_MODE)];
         useConstructionPaste = compound.getBoolean(NBTKeys.ENTITY_BUILD_USE_PASTE);
     }
 
@@ -164,7 +157,7 @@ public class BlockBuildEntity extends EntityBase {
         blockStateTag = NBTUtil.writeBlockState(originalSetBlock);
 
         compound.setTag(NBTKeys.ENTITY_BUILD_ORIGINAL_BLOCK, blockStateTag);
-        compound.setString(NBTKeys.GADGET_MODE, mode.getID());
+        compound.setInt(NBTKeys.GADGET_MODE, mode.ordinal());
         compound.setBoolean(NBTKeys.ENTITY_BUILD_USE_PASTE, useConstructionPaste);
     }
 
