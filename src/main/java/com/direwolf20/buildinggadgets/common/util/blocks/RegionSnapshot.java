@@ -3,6 +3,7 @@ package com.direwolf20.buildinggadgets.common.util.blocks;
 import com.direwolf20.buildinggadgets.api.building.Region;
 import com.direwolf20.buildinggadgets.common.util.exceptions.PaletteOverflowException;
 import com.direwolf20.buildinggadgets.common.util.helpers.LambdaHelper;
+import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -15,6 +16,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
@@ -37,7 +39,7 @@ public class RegionSnapshot {
     private static final String TILE_NBT = "block_nbt";
 
     private static NBTTagCompound serialize(NBTTagCompound tag, RegionSnapshot snapshot) {
-        tag.setInt(DIMENSION, snapshot.world.getDimension().getType().getId());
+        tag.setString(DIMENSION, snapshot.world.getDimension().getType().getRegistryName().toString());
         snapshot.region.serializeTo(tag);
 
         // Palette serialization begin
@@ -118,8 +120,8 @@ public class RegionSnapshot {
     }
 
     private static RegionSnapshot deserialize(NBTTagCompound tag) {
-        int dimension = tag.getInt(DIMENSION);
-        World world = ServerLifecycleHooks.getCurrentServer().getWorld(Objects.requireNonNull(DimensionType.getById(dimension)));
+        ResourceLocation dimension = new ResourceLocation(tag.getString(DIMENSION));
+        World world = ServerLifecycleHooks.getCurrentServer().getWorld(Objects.requireNonNull(DimensionType.byName(dimension)));
 
         Region region = Region.deserializeFrom(tag);
 
