@@ -7,10 +7,11 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.*;
 
 import javax.annotation.Nonnull;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
+import java.util.*;
+import java.util.function.*;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 /**
  * Utility class providing additional Methods for reading and writing array's which are not normally provided as NBT-Objects by Minecraft.
@@ -305,17 +306,29 @@ public class NBTHelper {
     }
 
     public static <T> NBTTagList writeIterable(Iterable<T> iterable, Function<? super T, ? extends INBTBase> serializer) {
-        NBTTagList list = new NBTTagList();
-        for (T val : iterable) {
-            list.add(serializer.apply(val));
-        }
-        return list;
+        return StreamSupport.stream(iterable.spliterator(), false).map(serializer).collect(toNBTTagList());
     }
 
-    public static <V, T extends INBTBase> List<V> readList(NBTTagCollection<T> list, Function<T, ? extends V> deserializer) {
+    public static <T> NBTTagList writeIterable(Iterable<T> iterable, BiFunction<? super T, Integer, ? extends INBTBase> serializer) {
+        int index = 0;
+        NBTTagList res = new NBTTagList();
+        for (T element : iterable) {
+            res.add(serializer.apply(element, index));
+            index++;
+        }
+        return res;
+    }
+
+    public static <V, T extends INBTBase> List<V> readList(NBTTagCollection<T> list, Function<? super T, ? extends V> deserializer) {
+        return list.stream().map(deserializer).collect(Collectors.toList());
+    }
+
+    public static <V, T extends INBTBase> List<V> readList(NBTTagCollection<T> list, BiFunction<? super T, Integer, ? extends V> deserializer) {
         List<V> res = new ArrayList<>(list.size());
-        for (T nbt:list) {
-            res.add(deserializer.apply(nbt));
+        int index = 0;
+        for (T element : list) {
+            res.add(deserializer.apply(element, index));
+            index++;
         }
         return res;
     }
@@ -355,6 +368,38 @@ public class NBTHelper {
         NBTTagCompound tag = new NBTTagCompound();
         stack.setTag(tag);
         return tag;
+    }
+
+    public static <T extends INBTBase> Collector<T, NBTTagList, NBTTagList> toNBTTagList() {
+        return new Collector<T, NBTTagList, NBTTagList>() {
+            @Override
+            public Supplier<NBTTagList> supplier() {
+                return NBTTagList::new;
+            }
+
+            @Override
+            public BiConsumer<NBTTagList, T> accumulator() {
+                return NBTTagList::add;
+            }
+
+            @Override
+            public BinaryOperator<NBTTagList> combiner() {
+                return (l1, l2) -> {
+                    l1.addAll(l2);
+                    return l1;
+                };
+            }
+
+            @Override
+            public Function<NBTTagList, NBTTagList> finisher() {
+                return Function.identity();
+            }
+
+            @Override
+            public Set<Characteristics> characteristics() {
+                return EnumSet.of(Characteristics.IDENTITY_FINISH, Characteristics.UNORDERED);
+            }
+        };
     }
 
 }
