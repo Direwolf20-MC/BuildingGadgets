@@ -15,9 +15,7 @@ import java.util.function.Function;
 import java.util.function.IntFunction;
 import java.util.*;
 import java.util.function.*;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
+import java.util.stream.*;
 
 /**
  * Utility class providing additional Methods for reading and writing array's which are not normally provided as
@@ -374,14 +372,7 @@ public class NBTHelper {
         if (second.isEmpty())
             return first;
 
-        NBTTagList connected = new NBTTagList();
-        for (int i = 0; i < first.size(); i++) {
-            connected.add(first.getCompound(i));
-        }
-        for (int i = 0; i < second.size(); i++) {
-            connected.add(second.getCompound(i));
-        }
-        return connected;
+        return Stream.concat(first.stream(), second.stream()).collect(toNBTTagList());
     }
 
     /**
