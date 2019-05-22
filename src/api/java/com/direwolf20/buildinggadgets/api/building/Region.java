@@ -4,9 +4,11 @@ import com.direwolf20.buildinggadgets.api.util.CommonUtils;
 import com.direwolf20.buildinggadgets.api.util.SpliteratorBackedPeekingIterator;
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.PeekingIterator;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 
+import java.io.Serializable;
 import java.util.Comparator;
 import java.util.Objects;
 import java.util.Spliterator;
@@ -15,7 +17,26 @@ import java.util.function.Consumer;
 /**
  * Represents a region in the world with a finite and nonzero size.
  */
-public final class Region implements IPositionPlacementSequence {
+public final class Region implements IPositionPlacementSequence, Serializable {
+
+    private static final long serialVersionUID = 8391481277782374853L;
+    public static final String KEY_MIN_X = "minX";
+    public static final String KEY_MIN_Y = "minY";
+    public static final String KEY_MIN_Z = "minZ";
+    public static final String KEY_MAX_X = "maxX";
+    public static final String KEY_MAX_Y = "maxY";
+    public static final String KEY_MAX_Z = "maxZ";
+
+    public static Region deserializeFrom(NBTTagCompound tag) {
+        return new Region(
+                tag.getInt(KEY_MIN_X),
+                tag.getInt(KEY_MIN_Y),
+                tag.getInt(KEY_MIN_Z),
+                tag.getInt(KEY_MAX_X),
+                tag.getInt(KEY_MAX_Y),
+                tag.getInt(KEY_MAX_Z)
+        );
+    }
 
     private final int minX;
     private final int minY;
@@ -348,6 +369,20 @@ public final class Region implements IPositionPlacementSequence {
     @Override
     public int hashCode() {
         return Objects.hash(minX, minY, minZ, maxX, maxY, maxZ);
+    }
+
+    public NBTTagCompound serialize() {
+        return serializeTo(new NBTTagCompound());
+    }
+
+    public NBTTagCompound serializeTo(NBTTagCompound tag) {
+        tag.setInt(KEY_MIN_X, minX);
+        tag.setInt(KEY_MIN_Y, minY);
+        tag.setInt(KEY_MIN_Z, minZ);
+        tag.setInt(KEY_MAX_X, maxX);
+        tag.setInt(KEY_MAX_Y, maxY);
+        tag.setInt(KEY_MAX_Z, maxZ);
+        return tag;
     }
 
     private static class RegionSpliterator implements Spliterator<BlockPos> {
