@@ -95,14 +95,14 @@ public class RegionSnapshot {
             //   - see initialization of `mapPalettes`
             // - when serializing, the stored number will be ONE FEWER then the actual amount
             //   - this is for squeezing space efficiency of the serialized format (even though it is not very necessary)
-            frames.add((((streak - 1) & 0xff) << 24) | (mapPalettes.getInt(lastStreak.get()) & 0xffffff));
+            frames.add((((streak - 1) & 0xff) << 24) | (mapPalettes.getInt(lastStreak.orElse(null)) & 0xffffff));
 
             // Regardless of which situation, we reset the counter
             streak = 0;
             lastStreak = state;
         }
         // Force add a frame here -- even if we pushed a new frame on the last block state, itself hasn't been stored yet
-        frames.add((((streak - 1) & 0xff) << 24) | (mapPalettes.getInt(lastStreak.get()) & 0xffffff));
+        frames.add((((streak - 1) & 0xff) << 24) | (mapPalettes.getInt(lastStreak.orElse(null)) & 0xffffff));
 
         tag.setIntArray(BLOCK_FRAMES, frames.toIntArray());
         tag.setTag(BLOCK_PALETTES, palettes);
