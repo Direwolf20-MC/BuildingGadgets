@@ -16,7 +16,7 @@ import java.util.function.IntFunction;
 
 /**
  * Utility class providing additional Methods for reading and writing array's which are not normally provided as
- * NBT-Objects by Minecraft.
+ * NBT-Objects from Minecraft.
  */
 public class NBTHelper {
 
