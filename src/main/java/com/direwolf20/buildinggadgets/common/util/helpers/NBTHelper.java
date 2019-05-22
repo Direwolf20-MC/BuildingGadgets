@@ -350,14 +350,14 @@ public class NBTHelper {
      * Connect two {@link NBTTagList} together to create a new one. This process has no side effects, which means it
      * will not modify two parameters.
      * <p>
-     * Additionally, if any of the lists are empty, the method will directly return the empty one. If both of them are
-     * empty, it will directly return the first list.
+     * Additionally, if any of the lists are empty, the method will directly return the nonempty one. If both of them are
+     * empty, it will directly return the second list.
      */
     public static NBTTagList concat(NBTTagList first, NBTTagList second) {
         if (first.isEmpty())
-            return first;
-        if (second.isEmpty())
             return second;
+        if (second.isEmpty())
+            return first;
 
         NBTTagList connected = new NBTTagList();
         for (int i = 0; i < first.size(); i++) {
