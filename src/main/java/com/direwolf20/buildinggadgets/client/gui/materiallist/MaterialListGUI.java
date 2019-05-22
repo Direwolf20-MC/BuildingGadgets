@@ -5,6 +5,7 @@ import com.direwolf20.buildinggadgets.client.gui.base.BasicGUIBase;
 import com.direwolf20.buildinggadgets.client.utils.AlignmentUtil;
 import com.direwolf20.buildinggadgets.client.utils.RenderUtil;
 import com.direwolf20.buildinggadgets.common.items.ITemplate;
+import com.direwolf20.buildinggadgets.common.util.lang.MaterialListTranslation;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.google.common.base.Preconditions;
 import net.minecraft.client.Minecraft;
@@ -58,7 +59,7 @@ public class MaterialListGUI extends BasicGUIBase {
         this.backgroundX = AlignmentUtil.getXForAlignedCenter(BACKGROUND_WIDTH, 0, width);
         this.backgroundY = AlignmentUtil.getYForAlignedCenter(BACKGROUND_HEIGHT, 0, height);
 
-        this.title = I18n.format("gui.buildinggadgets.materialList.title");
+        this.title = MaterialListTranslation.TITLE.format();
         this.titleTop = AlignmentUtil.getYForAlignedCenter(fontRenderer.FONT_HEIGHT, backgroundY, getWindowTopY() + ScrollingMaterialList.TOP);
         this.titleLeft = AlignmentUtil.getXForAlignedCenter(fontRenderer.getStringWidth(title), backgroundX, getWindowRightX());
 
@@ -68,7 +69,7 @@ public class MaterialListGUI extends BasicGUIBase {
         this.children.add(scrollingList);
 
         int buttonY = getWindowBottomY() - (ScrollingMaterialList.BOTTOM / 2 + BUTTON_HEIGHT / 2);
-        this.buttonClose = new GuiButtonAction(0, buttonY, 0, BUTTON_HEIGHT, I18n.format("gui.buildinggadgets.materialList.button.close"), () -> Minecraft.getInstance().player.closeScreen());
+        this.buttonClose = new GuiButtonAction(0, buttonY, 0, BUTTON_HEIGHT, MaterialListTranslation.BUTTON_CLOSE.format(), () -> Minecraft.getInstance().player.closeScreen());
         this.buttonSortingModes = new GuiButtonAction(0, buttonY, 0, BUTTON_HEIGHT, scrollingList.getSortingMode().getLocalizedName(), () -> {
             scrollingList.setSortingMode(scrollingList.getSortingMode().next());
             buttonSortingModes.displayString = scrollingList.getSortingMode().getLocalizedName();

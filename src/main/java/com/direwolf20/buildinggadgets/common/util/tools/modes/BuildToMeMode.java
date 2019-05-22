@@ -4,12 +4,15 @@ import com.direwolf20.buildinggadgets.api.building.IPositionPlacementSequence;
 import com.direwolf20.buildinggadgets.api.building.IValidatorFactory;
 import com.direwolf20.buildinggadgets.api.building.modes.AtopSupportedMode;
 import com.direwolf20.buildinggadgets.api.building.placement.ExclusiveAxisChasing;
+import com.direwolf20.buildinggadgets.common.util.lang.ModeTranslation;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+
+import javax.annotation.Nonnull;
 
 /**
  * Logic is backed with {@link ExclusiveAxisChasing} where no attempt will be made at the ending (player) position.
@@ -37,6 +40,12 @@ public class BuildToMeMode extends AtopSupportedMode {
     @Override
     public ResourceLocation getRegistryName() {
         return NAME;
+    }
+
+    @Override
+    @Nonnull
+    public String getLocalizedName() {
+        return ModeTranslation.AXIS_CHASING.format();
     }
 
 }

@@ -20,6 +20,7 @@ public enum TooltipTranslation implements ITranslationProvider {
     GADGET_MIRROR("gadget.mirror", 0),
     GADGET_ANCHOR("gadget.anchor", 0),
     GADGET_UNDO("gadget.undo", 0),
+    GADGET_ROTATE("gadget.rotate", 0),
     PASTECONTAINER_AMOUNT("pasteContainer.amount", 1),
     PASTECONTAINER_CREATIVE_AMOUNT("pasteContainer.creative.amountMsg", 0),
     TEMPLATE_NAME("template.name", 1);
