@@ -52,13 +52,13 @@ public class BlockState2ShortMap {
     }
 
     public void writeToNBT(@Nonnull NBTTagCompound tagCompound) {
-        tagCompound.setTag(NBTKeys.MAP_INT_STATE, writeShortStateMapToNBT());
+        tagCompound.setTag(NBTKeys.MAP_PALETTE, writeShortStateMapToNBT());
     }
 
     public void readNBT(@Nonnull NBTTagCompound tagCompound) {
         clear();
-        if (tagCompound.hasKey(NBTKeys.MAP_INT_STATE)) {
-            NBTTagList mapIntStateTag = (NBTTagList) tagCompound.getTag(NBTKeys.MAP_INT_STATE);
+        if (tagCompound.hasKey(NBTKeys.MAP_PALETTE)) {
+            NBTTagList mapIntStateTag = (NBTTagList) tagCompound.getTag(NBTKeys.MAP_PALETTE);
             readShortStateMapFromNBT(mapIntStateTag);
         }
     }

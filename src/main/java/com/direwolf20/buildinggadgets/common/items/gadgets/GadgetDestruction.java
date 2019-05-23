@@ -8,11 +8,14 @@ import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
 import com.direwolf20.buildinggadgets.common.util.CapabilityUtil.EnergyUtil;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.blocks.BlockMapIntState;
+import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
 import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
 import com.direwolf20.buildinggadgets.common.util.lang.Styles;
 import com.direwolf20.buildinggadgets.common.util.lang.TooltipTranslation;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.world.WorldSave;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.ints.IntList;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
@@ -22,19 +25,10 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.*;
 import net.minecraft.util.EnumFacing.Axis;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.Vec3i;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.util.text.TextComponentTranslation;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.math.*;
+import net.minecraft.util.text.*;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.common.MinecraftForge;
@@ -383,10 +377,11 @@ public class GadgetDestruction extends GadgetSwapping {
     public static void storeUndo(World world, Map<BlockPos, IBlockState> posStateMap, Map<BlockPos, IBlockState> pasteStateMap, BlockPos startBlock, ItemStack stack, EntityPlayer player) {
         WorldSave worldSave = WorldSave.getWorldSaveDestruction(world);
         NBTTagCompound tagCompound = new NBTTagCompound();
-        List<Integer> posIntArrayList = new ArrayList<Integer>();
-        List<Integer> stateIntArrayList = new ArrayList<Integer>();
-        List<Integer> pastePosArrayList = new ArrayList<Integer>();
-        List<Integer> pasteStateArrayList = new ArrayList<Integer>();
+        IntList posIntArrayList = new IntArrayList();
+        List<IBlockState> intStateArrayList = new ArrayList<>();
+        IntList stateIntArrayList = new IntArrayList();
+        IntList pastePosArrayList = new IntArrayList();
+        IntList pasteStateArrayList = new IntArrayList();
         BlockMapIntState blockMapIntState = new BlockMapIntState();
         String UUID = getUUID(stack);
 
@@ -394,6 +389,7 @@ public class GadgetDestruction extends GadgetSwapping {
             posIntArrayList.add(GadgetUtils.relPosToInt(startBlock, entry.getKey()));
             blockMapIntState.addToMap(entry.getValue());
             stateIntArrayList.add((int) blockMapIntState.findSlot(entry.getValue()));
+            intStateArrayList.add(entry.getValue());
             if (pasteStateMap.containsKey(entry.getKey())) {
                 pastePosArrayList.add(GadgetUtils.relPosToInt(startBlock, entry.getKey()));
                 IBlockState pasteBlockState = pasteStateMap.get(entry.getKey());
@@ -401,15 +397,17 @@ public class GadgetDestruction extends GadgetSwapping {
                 pasteStateArrayList.add((int) blockMapIntState.findSlot(pasteBlockState));
             }
         }
-        tagCompound.setTag(NBTKeys.MAP_STATE_INT, blockMapIntState.putIntStateMapIntoNBT());
-        int[] posIntArray = posIntArrayList.stream().mapToInt(i -> i).toArray();
-        int[] stateIntArray = stateIntArrayList.stream().mapToInt(i -> i).toArray();
-        int[] posPasteArray = pastePosArrayList.stream().mapToInt(i -> i).toArray();
-        int[] statePasteArray = pasteStateArrayList.stream().mapToInt(i -> i).toArray();
-        tagCompound.setIntArray(NBTKeys.MAP_POS_INT, posIntArray);
-        tagCompound.setIntArray(NBTKeys.MAP_STATE_INT, stateIntArray);
-        tagCompound.setIntArray(NBTKeys.MAP_POS_PASTE, posPasteArray);
-        tagCompound.setIntArray(NBTKeys.MAP_STATE_PASTE, statePasteArray);
+        tagCompound.setTag(NBTKeys.MAP_INDEX2STATE_ID, blockMapIntState.putIntStateMapIntoNBT());
+        tagCompound.setIntArray(NBTKeys.MAP_INDEX2POS, posIntArrayList.toIntArray());
+        tagCompound.setIntArray(NBTKeys.MAP_INDEX2STATE_ID, stateIntArrayList.toIntArray());
+        tagCompound.setTag(NBTKeys.MAP_PALETTE, NBTHelper.writeIterable(intStateArrayList, (state, i) -> {
+            NBTTagCompound entry = new NBTTagCompound();
+            entry.setInt(NBTKeys.MAP_SLOT, i);
+            entry.setTag(NBTKeys.MAP_STATE, NBTUtil.writeBlockState(intStateArrayList.get(i)));
+            return entry;
+        }));
+        tagCompound.setIntArray(NBTKeys.MAP_POS_PASTE, pastePosArrayList.toIntArray());
+        tagCompound.setIntArray(NBTKeys.MAP_STATE_PASTE, pasteStateArrayList.toIntArray());
         tagCompound.setTag(NBTKeys.GADGET_START_POS, NBTUtil.writeBlockPos(startBlock));
         tagCompound.setString(NBTKeys.GADGET_DIM, DimensionType.func_212678_a(player.dimension).toString());
         tagCompound.setString(NBTKeys.GADGET_UUID, UUID);
@@ -420,41 +418,38 @@ public class GadgetDestruction extends GadgetSwapping {
     public static void undo(EntityPlayer player, ItemStack stack) {
         World world = player.world;
         WorldSave worldSave = WorldSave.getWorldSaveDestruction(world);
-        NBTTagCompound tagCompound = worldSave.getCompoundFromUUID(getUUID(stack));
-        if (tagCompound == null) return;
-        BlockPos startPos = NBTUtil.readBlockPos(tagCompound.getCompound(NBTKeys.GADGET_START_POS));
-        if (startPos == null) return;
-        int[] posIntArray = tagCompound.getIntArray(NBTKeys.MAP_POS_INT);
-        int[] stateIntArray = tagCompound.getIntArray(NBTKeys.MAP_STATE_INT);
-        int[] posPasteArray = tagCompound.getIntArray(NBTKeys.MAP_POS_PASTE);
-        int[] statePasteArray = tagCompound.getIntArray(NBTKeys.MAP_STATE_PASTE);
+        NBTTagCompound tag = worldSave.getCompoundFromUUID(getUUID(stack));
+        if (tag == null) return;
 
-        NBTTagList MapIntStateTag = (NBTTagList) tagCompound.getTag(NBTKeys.MAP_INT_STATE);
-        if (MapIntStateTag == null) {
-            return;
-        }
-        BlockMapIntState MapIntState = new BlockMapIntState();
-        MapIntState.getIntStateMapFromNBT(MapIntStateTag);
+        BlockPos startPos = NBTUtil.readBlockPos(tag.getCompound(NBTKeys.GADGET_START_POS));
+        int[] indexPosArray = tag.getIntArray(NBTKeys.MAP_INDEX2POS);
+        int[] indexStateIDArray = tag.getIntArray(NBTKeys.MAP_INDEX2STATE_ID);
+        int[] posPasteArray = tag.getIntArray(NBTKeys.MAP_POS_PASTE);
+        int[] statePasteArray = tag.getIntArray(NBTKeys.MAP_STATE_PASTE);
+
+        BlockMapIntState intState = new BlockMapIntState();
+        intState.getIntStateMapFromNBT((NBTTagList) tag.getTag(NBTKeys.MAP_PALETTE));
+
         boolean success = false;
-        for (int i = 0; i < posIntArray.length; i++) {
-            BlockPos placePos = GadgetUtils.relIntToPos(startPos, posIntArray[i]);
+        for (int i = 0; i < indexPosArray.length; i++) {
+            BlockPos placePos = GadgetUtils.relIntToPos(startPos, indexPosArray[i]);
             IBlockState currentState = world.getBlockState(placePos);
             if (currentState.getBlock().isAir(currentState, world, placePos) || currentState.getMaterial().isLiquid()) {
-                IBlockState placeState = MapIntState.getStateFromSlot((short) stateIntArray[i]);
+                IBlockState placeState = intState.getStateFromSlot((short) indexStateIDArray[i]);
                 if (placeState.getBlock() == BGBlocks.constructionBlock) {
                     IBlockState pasteState = Blocks.AIR.getDefaultState();
                     for (int j = 0; j < posPasteArray.length; j++) {
-                        if (posPasteArray[j] == posIntArray[i]) {
-                            pasteState = MapIntState.getStateFromSlot((short) statePasteArray[j]);
+                        if (posPasteArray[j] == indexPosArray[i]) {
+                            pasteState = intState.getStateFromSlot((short) statePasteArray[j]);
                             break;
                         }
                     }
                     if (pasteState != Blocks.AIR.getDefaultState()) {
-                        world.spawnEntity(new BlockBuildEntity(world, placePos, player, pasteState, 1, pasteState, true));
+                        world.spawnEntity(new BlockBuildEntity(world, placePos, player, pasteState, BlockBuildEntity.Mode.PLACE, true));
                         success = true;
                     }
                 } else {
-                    world.spawnEntity(new BlockBuildEntity(world, placePos, player, placeState, 1, placeState, false));
+                    world.spawnEntity(new BlockBuildEntity(world, placePos, player, placeState, BlockBuildEntity.Mode.PLACE, false));
                     success = true;
                 }
             }
@@ -471,12 +466,12 @@ public class GadgetDestruction extends GadgetSwapping {
         if (tool.isEmpty())
             return false;
 
-        if( !this.canUse(tool, player) )
+        if(!this.canUse(tool, player))
             return false;
 
         this.applyDamage(tool, player);
 
-        world.spawnEntity(new BlockBuildEntity(world, voidPos, player, world.getBlockState(voidPos), 2, Blocks.AIR.getDefaultState(), false));
+        world.spawnEntity(new BlockBuildEntity(world, voidPos, player, world.getBlockState(voidPos), BlockBuildEntity.Mode.REMOVE, false));
         return true;
     }
 
