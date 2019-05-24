@@ -75,7 +75,7 @@ public class ToolRenders {
         Vec3d playerPos = ToolRenders.Utils.getPlayerTranslate(player, evt.getPartialTicks());
 
         // Render if we have a remote inventory selected
-        renderLinkedInventoryOutline(heldItem, playerPos);
+        renderLinkedInventoryOutline(heldItem, playerPos, player);
 
         RayTraceResult lookingAt = VectorTools.getLookingAt(player, heldItem);
         IBlockState state = Blocks.AIR.getDefaultState();
@@ -159,7 +159,7 @@ public class ToolRenders {
         Vec3d playerPos = ToolRenders.Utils.getPlayerTranslate(player, evt.getPartialTicks());
 
         BlockRendererDispatcher dispatcher = mc.getBlockRendererDispatcher();
-        renderLinkedInventoryOutline(heldItem, playerPos);
+        renderLinkedInventoryOutline(heldItem, playerPos, player);
 
         RayTraceResult lookingAt = VectorTools.getLookingAt(player, heldItem);
         IBlockState state = Blocks.AIR.getDefaultState();
@@ -323,7 +323,7 @@ public class ToolRenders {
         //Calculate the players current position, which is needed later
         Vec3d playerPos = ToolRenders.Utils.getPlayerTranslate(player, evt.getPartialTicks());
 
-        renderLinkedInventoryOutline(stack, playerPos);
+        renderLinkedInventoryOutline(stack, playerPos, player);
         if (ModItems.gadgetCopyPaste.getStartPos(stack) == null || ModItems.gadgetCopyPaste.getEndPos(stack) == null)
             return;
 
@@ -426,20 +426,24 @@ public class ToolRenders {
         }
     }
 
-    private static void renderLinkedInventoryOutline(ItemStack item, Vec3d playerPos) {
+    private static void renderLinkedInventoryOutline(ItemStack item, Vec3d playerPos, EntityPlayer player) {
         Integer dim = GadgetUtils.getDIMFromNBT(item, "boundTE");
         BlockPos pos = GadgetUtils.getPOSFromNBT(item, "boundTE");
 
-        if (dim != null && pos != null) {
-            GlStateManager.pushMatrix();
-            ToolRenders.Utils.stateManagerPrepare(playerPos, pos, 0.0005f);
-            ToolRenders.Utils.stateManagerPrepareBlend();
-            GL14.glBlendColor(1F, 1F, 1F, 0.35f);
+        if (dim == null || pos == null)
+            return;
 
-            // Render the overlay
-            mc.getBlockRendererDispatcher().renderBlockBrightness(stainedGlassYellow, 1f);
-            GlStateManager.popMatrix();
-        }
+        if( player.dimension != dim )
+            return;
+
+        GlStateManager.pushMatrix();
+        ToolRenders.Utils.stateManagerPrepare(playerPos, pos, 0.0005f);
+        ToolRenders.Utils.stateManagerPrepareBlend();
+        GL14.glBlendColor(1F, 1F, 1F, 0.35f);
+
+        // Render the overlay
+        mc.getBlockRendererDispatcher().renderBlockBrightness(stainedGlassYellow, 1f);
+        GlStateManager.popMatrix();
     }
 
     private static void renderBox(Tessellator tessellator, BufferBuilder bufferBuilder, double startX, double startY, double startZ, double endX, double endY, double endZ, int R, int G, int B) {
