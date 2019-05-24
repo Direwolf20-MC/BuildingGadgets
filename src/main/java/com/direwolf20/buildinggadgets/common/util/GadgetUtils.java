@@ -276,7 +276,7 @@ public class GadgetUtils {
     }
 
     public static void selectBlock(ItemStack stack, EntityPlayer player) {
-        //Used to find which block the player is looking at, and store it in NBT on the tool.
+        // Used to find which block the player is looking at, and store it in NBT on the tool.
         World world = player.world;
         RayTraceResult lookingAt = VectorHelper.getLookingAt(player, RayTraceFluidMode.NEVER);
         if (lookingAt == null)
