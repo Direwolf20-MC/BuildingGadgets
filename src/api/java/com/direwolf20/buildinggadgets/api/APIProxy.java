@@ -5,6 +5,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.InterModComms;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -34,7 +35,11 @@ public enum APIProxy {
     }
 
     public void onLoadComplete() {
+        Registries.createOrderedRegistries();
+    }
 
+    public boolean handleIMC(InterModComms.IMCMessage message) {
+        return Registries.handleIMC(message);
     }
 
     private void registerRegistries(RegistryEvent.NewRegistry newRegistry) {

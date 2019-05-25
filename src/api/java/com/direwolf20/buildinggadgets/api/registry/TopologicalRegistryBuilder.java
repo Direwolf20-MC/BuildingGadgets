@@ -2,6 +2,7 @@ package com.direwolf20.buildinggadgets.api.registry;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
+import com.google.common.graph.EndpointPair;
 import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.MutableGraph;
 import net.minecraft.util.ResourceLocation;
@@ -36,7 +37,7 @@ public final class TopologicalRegistryBuilder<T> {
     public TopologicalRegistryBuilder<T> addValue(ResourceLocation key, T value) {
         validateUnbuild();
         validateNotRegisteredTwice(Objects.requireNonNull(key));
-        ValueObject<T> obj = new ValueObject<>(key, Objects.requireNonNull(value));
+        ValueObject<T> obj = new ValueObject<>(key, value);
         values.put(key, obj);
         theGraph.addNode(obj);
         return this;
@@ -68,6 +69,17 @@ public final class TopologicalRegistryBuilder<T> {
         return this;
     }
 
+    public TopologicalRegistryBuilder<T> merge(TopologicalRegistryBuilder<T> other) {
+        validateUnbuild();
+        for (ValueObject<T> node : other.theGraph.nodes()) {
+            addValue(node.getKey(), node.getValue());
+        }
+        for (EndpointPair<ValueObject<T>> edge : other.theGraph.edges()) {
+            addDependency(edge.source().getKey(), edge.target().getKey());
+        }
+        return this;
+    }
+
     public IOrderedRegistry<T> build() {
         validateUnbuild();
         build = true;
@@ -75,12 +87,10 @@ public final class TopologicalRegistryBuilder<T> {
         List<ValueObject<T>> sorted = TopologicalSort.topologicalSort(theGraph, Comparator.naturalOrder());
         final List<T> objs = new ArrayList<>(sorted.size());
         final Map<ResourceLocation, T> map = new HashMap<>();
-        sorted.stream()
-                .filter(obj -> obj.getValue() != null)
-                .forEach(obj -> {
+        sorted.forEach(obj -> {
                     objs.add(obj.getValue());
                     map.put(obj.getKey(), obj.getValue());
-                });
+        });
         return new ImmutableOrderedRegistry<>(map, objs);
     }
 
@@ -95,12 +105,12 @@ public final class TopologicalRegistryBuilder<T> {
     private static final class ValueObject<T> implements Comparable<ValueObject<?>> {
         @Nonnull
         private final ResourceLocation key;
-        @Nullable
+        @Nonnull
         private final T value;
 
         private ValueObject(@Nonnull ResourceLocation key, @Nullable T value) {
             this.key = key;
-            this.value = value;
+            this.value = Objects.requireNonNull(value);
         }
 
         @Nonnull
@@ -108,7 +118,7 @@ public final class TopologicalRegistryBuilder<T> {
             return key;
         }
 
-        @Nullable
+        @Nonnull
         private T getValue() {
             return value;
         }

@@ -81,6 +81,7 @@ public class BuildingGadgets {
             CraftingHelper.register(Reference.CONDITION_DESTRUCTION_ID, new CraftingConditionDestruction());
             RecipeSerializers.register(new RecipeConstructionPaste.Serializer());
         });
+        event.getIMCStream().forEach(APIProxy.INSTANCE::handleIMC);
     }
 
     private void serverLoad(FMLServerStartingEvent event) {

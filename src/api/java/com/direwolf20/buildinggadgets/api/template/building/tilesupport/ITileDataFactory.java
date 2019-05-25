@@ -8,8 +8,7 @@ import javax.annotation.Nullable;
 /**
  * Function creating {@link ITileEntityData} from a given {@link TileEntity}.
  * <p>
- * The implementations registered to {@link Registries#getTileDataFactories()} (in
- * {@link com.direwolf20.buildinggadgets.api.registry.OrderedRegistryEvent OrderedRegistryEvent&lt;ITileDataFactory&gt;}) will be sorted
+ * The implementations registered to {@link Registries#getTileDataFactories()} (via {@link net.minecraftforge.fml.InterModComms.IMCMessage}'s) will be sorted
  * according to the specified topological boundaries. When queried, they will be called successively until the first implementation returns a
  * non-null value. Therefore overriding an existing {@code ITileDataFactory} is as easy as requiring it to be run after your own implementation.
  * <p>
