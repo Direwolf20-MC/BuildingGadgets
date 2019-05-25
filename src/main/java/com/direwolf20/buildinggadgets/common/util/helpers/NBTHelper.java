@@ -7,14 +7,19 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.*;
 
 import javax.annotation.Nonnull;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.function.BiFunction;
+import java.util.function.Function;
+import java.util.function.IntFunction;
 import java.util.*;
 import java.util.function.*;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
+import java.util.stream.*;
 
 /**
- * Utility class providing additional Methods for reading and writing array's which are not normally provided as NBT-Objects by Minecraft.
+ * Utility class providing additional Methods for reading and writing array's which are not normally provided as
+ * NBT-Objects from Minecraft.
  */
 public class NBTHelper {
 
@@ -139,7 +144,6 @@ public class NBTHelper {
         }
         return res;
     }
-
 
     @Nonnull
     public static NBTTagList createStringList(String[] strings) {
@@ -266,26 +270,24 @@ public class NBTHelper {
             INBTBase nbt = strings.get(i);
             if (nbt instanceof NBTTagString) {
                 res[i] = nbt.getString();
-            }
-            else {
+            } else {
                 res[i] = "";
                 failed.add(i);
             }
         }
-        if (! failed.isEmpty()) {
+        if (!failed.isEmpty()) {
             String[] shortened = new String[res.length - failed.size()];
             int shortenedCount = 0;
             for (int i = 0; i < res.length; i++) {
                 if (failed.contains(i))
                     continue;
                 shortened[shortenedCount] = res[i];
-                ++ shortenedCount;
+                ++shortenedCount;
             }
             res = shortened;
         }
         return res;
     }
-
 
     public static boolean[] readBooleanList(NBTTagByteArray booleans) {
         byte[] bytes = booleans.getByteArray();
@@ -358,8 +360,24 @@ public class NBTHelper {
     }
 
     /**
-     * If the given stack has a tag, returns it. If the given stack does not have a tag, it will set a reference and return the new tag
-     * compound.
+     * Connect two {@link NBTTagList} together to create a new one. This process has no side effects, which means it
+     * will not modify two parameters.
+     * <p>
+     * Additionally, if any of the lists are empty, the method will directly return the nonempty one. If both of them are
+     * empty, it will directly return the second list.
+     */
+    public static NBTTagList concat(NBTTagList first, NBTTagList second) {
+        if (first.isEmpty())
+            return second;
+        if (second.isEmpty())
+            return first;
+
+        return Stream.concat(first.stream(), second.stream()).collect(toNBTTagList());
+    }
+
+    /**
+     * If the given stack has a tag, returns it. If the given stack does not have a tag, it will set a reference and
+     * return the new tag compound.
      */
     public static NBTTagCompound getOrNewTag(ItemStack stack) {
         if (stack.hasTag()) {
