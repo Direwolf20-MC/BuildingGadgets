@@ -16,6 +16,7 @@ public final class TopologicalRegistryBuilder<T> {
     private final MutableGraph<ValueObject<T>> theGraph;
     private final SortedMap<ResourceLocation, ValueObject<T>> values;
     private boolean build;
+    private List<ValueObject<T>> sorted;
 
     public static <T> TopologicalRegistryBuilder<T> create() {
         return new TopologicalRegistryBuilder<>();
@@ -36,10 +37,16 @@ public final class TopologicalRegistryBuilder<T> {
 
     public TopologicalRegistryBuilder<T> addValue(ResourceLocation key, T value) {
         validateUnbuild();
-        validateNotRegisteredTwice(Objects.requireNonNull(key));
-        ValueObject<T> obj = new ValueObject<>(key, value);
-        values.put(key, obj);
-        theGraph.addNode(obj);
+        ValueObject<T> obj;
+        if (values.containsKey(Objects.requireNonNull(key))) {
+            obj = values.get(key);
+            obj.setValue(value);//override existing value
+        }
+        else {
+            obj = new ValueObject<>(key, value);
+            values.put(key, obj);
+            theGraph.addNode(obj);
+        }
         return this;
     }
 
@@ -52,7 +59,8 @@ public final class TopologicalRegistryBuilder<T> {
 
     public TopologicalRegistryBuilder<T> addMarker(ResourceLocation marker) {
         validateUnbuild();
-        validateNotRegisteredTwice(Objects.requireNonNull(marker));
+        if (values.containsKey(Objects.requireNonNull(marker)))
+            return this;
         ValueObject<T> obj = new ValueObject<>(marker, null);
         values.put(marker, obj);
         theGraph.addNode(obj);
@@ -61,10 +69,12 @@ public final class TopologicalRegistryBuilder<T> {
 
     public TopologicalRegistryBuilder<T> addDependency(ResourceLocation source, ResourceLocation dependent) {
         validateUnbuild();
+        if (! values.containsKey(source))
+            addMarker(source);
+        if (! values.containsKey(dependent))
+            addMarker(dependent);
         ValueObject<T> sourceObj = values.get(Objects.requireNonNull(source));
         ValueObject<T> dependentObj = values.get(Objects.requireNonNull(dependent));
-        Preconditions.checkArgument(sourceObj != null, "Cannot add dependency on unknown source key %s", source.toString());
-        Preconditions.checkArgument(dependentObj != null, "Cannot add dependency for unknown dependent key %s", dependent.toString());
         theGraph.putEdge(sourceObj, dependentObj);
         return this;
     }
@@ -72,7 +82,10 @@ public final class TopologicalRegistryBuilder<T> {
     public TopologicalRegistryBuilder<T> merge(TopologicalRegistryBuilder<T> other) {
         validateUnbuild();
         for (ValueObject<T> node : other.theGraph.nodes()) {
-            addValue(node.getKey(), node.getValue());
+            if (node.getValue() != null)
+                addValue(node.getKey(), node.getValue());//perform a copy... values are mutable...
+            else
+                addMarker(node.getKey());
         }
         for (EndpointPair<ValueObject<T>> edge : other.theGraph.edges()) {
             addDependency(edge.source().getKey(), edge.target().getKey());
@@ -84,18 +97,14 @@ public final class TopologicalRegistryBuilder<T> {
         validateUnbuild();
         build = true;
         values.clear();
-        List<ValueObject<T>> sorted = TopologicalSort.topologicalSort(theGraph, Comparator.naturalOrder());
+        sorted = TopologicalSort.topologicalSort(theGraph, Comparator.naturalOrder());
         final List<T> objs = new ArrayList<>(sorted.size());
         final Map<ResourceLocation, T> map = new HashMap<>();
-        sorted.forEach(obj -> {
+        sorted.stream().filter(val -> val.getValue() != null).forEach(obj -> {
                     objs.add(obj.getValue());
                     map.put(obj.getKey(), obj.getValue());
         });
         return new ImmutableOrderedRegistry<>(map, objs);
-    }
-
-    private void validateNotRegisteredTwice(ResourceLocation key) {
-        Preconditions.checkArgument(! values.containsKey(key), "Cannot register %s twice!", key.toString());
     }
 
     private void validateUnbuild() {
@@ -105,12 +114,12 @@ public final class TopologicalRegistryBuilder<T> {
     private static final class ValueObject<T> implements Comparable<ValueObject<?>> {
         @Nonnull
         private final ResourceLocation key;
-        @Nonnull
-        private final T value;
+        @Nullable
+        private T value;
 
         private ValueObject(@Nonnull ResourceLocation key, @Nullable T value) {
             this.key = key;
-            this.value = Objects.requireNonNull(value);
+            this.value = value;
         }
 
         @Nonnull
@@ -118,9 +127,13 @@ public final class TopologicalRegistryBuilder<T> {
             return key;
         }
 
-        @Nonnull
+        @Nullable
         private T getValue() {
             return value;
+        }
+
+        public void setValue(@Nonnull T value) {
+            this.value = Objects.requireNonNull(value);
         }
 
         @Override
