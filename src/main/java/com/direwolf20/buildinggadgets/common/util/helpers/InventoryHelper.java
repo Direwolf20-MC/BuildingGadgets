@@ -1,5 +1,8 @@
 package com.direwolf20.buildinggadgets.common.util.helpers;
 
+import com.direwolf20.buildinggadgets.api.Registries;
+import com.direwolf20.buildinggadgets.api.inventory.IStackProvider;
+import com.direwolf20.buildinggadgets.api.registry.IOrderedRegistry;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
 import com.direwolf20.buildinggadgets.common.items.pastes.ConstructionPaste;
@@ -17,6 +20,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.state.EnumProperty;
 import net.minecraft.state.IProperty;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
@@ -145,7 +149,7 @@ public class InventoryHelper {
         return true;
     }
 
-    public static interface IRemoteInventoryProvider {
+    public interface IRemoteInventoryProvider {
         int countItem(ItemStack tool, ItemStack stack);
     }
 
@@ -343,7 +347,7 @@ public class InventoryHelper {
         try {
             placeState = originalState.getBlock().getStateForPlacement(
                     new BlockItemUseContext(world, player, item, pos, EnumFacing.UP, 0.5F, 0.0F, 0.5F)
-            );
+                                                                      );
         } catch (Exception var8) {
             placeState = originalState.getBlock().getDefaultState();
         }
@@ -361,5 +365,30 @@ public class InventoryHelper {
         }
         return placeState;
 
+    }
+
+    public static NonNullList<ItemStack> getInventory(EntityPlayer player) {
+        IOrderedRegistry<IStackProvider> providers = Registries.getStackProviders();
+        NonNullList<ItemStack> toProcess = playerInv(player);
+        NonNullList<ItemStack> newStacks = NonNullList.create();
+        NonNullList<ItemStack> results = NonNullList.create();
+        while (! toProcess.isEmpty()) {
+            for (ItemStack stack : toProcess) {
+                for (IStackProvider provider : providers) {
+                    newStacks.addAll(provider.getStacksFromStack(stack));
+                }
+            }
+            results.addAll(toProcess);
+            toProcess = newStacks;
+            newStacks = NonNullList.create();
+        }
+        return results;
+    }
+
+    private static NonNullList<ItemStack> playerInv(EntityPlayer player) {
+        NonNullList<ItemStack> wholeInv = new NonNullList<>(player.inventory.mainInventory, ItemStack.EMPTY);
+        wholeInv.addAll(player.inventory.offHandInventory);
+        wholeInv.addAll(player.inventory.armorInventory);
+        return wholeInv;
     }
 }

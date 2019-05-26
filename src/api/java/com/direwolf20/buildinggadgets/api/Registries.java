@@ -7,15 +7,22 @@ import com.direwolf20.buildinggadgets.api.template.building.tilesupport.ITileDat
 import com.direwolf20.buildinggadgets.api.template.serialisation.ITemplateSerializer;
 import com.direwolf20.buildinggadgets.api.template.serialisation.ITileDataSerializer;
 import com.google.common.base.Preconditions;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.InterModComms;
+import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.RegistryBuilder;
 
 public final class Registries {
     public static final ResourceLocation REGISTRY_ID_TEMPLATE_SERIALIZER = new ResourceLocation("buildinggadgets:template/serializer");
     public static final ResourceLocation REGISTRY_ID_TILE_DATA_SERIALIZER = new ResourceLocation("buildinggadgets:tile_data/serializer");
+
+    public static final ResourceLocation STACK_PROVIDER_ITEM_HANDLER = new ResourceLocation("buildinggadgets:stack_provider/item_handler");
 
     public static final String IMC_METHOD_TILEDATA_FACTORY = "imc_tile_data_factory";
     public static final String IMC_METHOD_STACK_PROVIDER = "imc_stack_provider";
@@ -30,6 +37,10 @@ public final class Registries {
     private static IForgeRegistry<ITileDataSerializer> tileDataSerializers = null;
     private static IOrderedRegistry<ITileDataFactory> tileDataFactories = null;
     private static IOrderedRegistry<IStackProvider> stackProviders = null;
+
+    static {
+        addDefaultStackProviders();
+    }
 
     public static IForgeRegistry<ITemplateSerializer> getTemplateSerializers() {
         Preconditions
@@ -88,5 +99,23 @@ public final class Registries {
             return true;
         }
         return false;
+    }
+
+    private static void addDefaultStackProviders() {
+        stackProviderBuilder.addValue(STACK_PROVIDER_ITEM_HANDLER, stack -> {
+            if (! stack.isEmpty()) {
+                LazyOptional<IItemHandler> handlerCap = stack
+                        .getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY);
+                if (handlerCap.isPresent()) {
+                    IItemHandler itemHandler = handlerCap.orElseThrow(IllegalStateException::new);
+                    NonNullList<ItemStack> res = NonNullList.create();
+                    for (int i = 0; i < itemHandler.getSlots(); i++) {
+                        res.add(itemHandler.getStackInSlot(i));
+                    }
+                    return res;
+                }
+            }
+            return NonNullList.withSize(0, ItemStack.EMPTY);
+        });
     }
 }
