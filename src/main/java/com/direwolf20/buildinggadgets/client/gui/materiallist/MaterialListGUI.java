@@ -6,22 +6,21 @@ import com.direwolf20.buildinggadgets.client.util.RenderUtil;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.items.Template;
 import com.direwolf20.buildinggadgets.common.tools.InventoryManipulation;
-import com.direwolf20.buildinggadgets.common.tools.UniqueItem;
-import com.google.common.collect.Multiset;
 import it.unimi.dsi.fastutil.ints.IntList;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.MathHelper;
 import org.lwjgl.input.Mouse;
 
 import java.awt.*;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * This class is adapted from Lunatrius's Schematica mod, 1.12.2 version.
@@ -41,16 +40,6 @@ public class MaterialListGUI extends GuiScreen {
     public static final int WINDOW_WIDTH = BACKGROUND_WIDTH - BORDER_SIZE * 2;
     public static final int WINDOW_HEIGHT = BACKGROUND_HEIGHT - BORDER_SIZE * 2;
 
-    private static List<ItemStack> toInternalMaterialList(Multiset<UniqueItem> templateList) {
-        List<ItemStack> result = new ArrayList<>();
-        return templateList.entrySet().stream().map(e -> new ItemStack(e.getElement().item, e.getCount(), e.getElement().meta)).collect(Collectors.toList());
-            // ItemStack implementation ignores the stack limit
-            ItemStack itemStack = new ItemStack(entry.getElement().item, entry.getCount(), entry.getElement().meta);
-            result.add(itemStack);
-        }
-        return result;
-    }
-
     int backgroundX;
     int backgroundY;
 
@@ -65,8 +54,11 @@ public class MaterialListGUI extends GuiScreen {
     private SortingModes sortingMode = SortingModes.NAME;
 
     private DireButton buttonClose;
-    private DireButton buttonRefreshCount;
     private DireButton buttonSortingModes;
+
+    private int hoveringTextX;
+    private int hoveringTextY;
+    private List<String> hoveringText;
 
     public MaterialListGUI(ItemStack template) {
         this.template = template;
@@ -83,7 +75,9 @@ public class MaterialListGUI extends GuiScreen {
         this.titleTop = AlignmentUtil.getYForAlignedCenter(fontRenderer.FONT_HEIGHT, backgroundY, getWindowTopY() + ScrollingMaterialList.TOP);
         this.titleLeft = AlignmentUtil.getXForAlignedCenter(fontRenderer.getStringWidth(title), backgroundX, getWindowRightX());
 
-        this.materials = toInternalMaterialList(item.getItemCountMap(template));
+        this.materials = item.getItemCountMap(template).entrySet().stream()
+                .map(e -> new ItemStack(e.getElement().item, e.getCount(), e.getElement().meta))
+                .collect(Collectors.toList());
         this.sortMaterialList();
         this.updateAvailableMaterials();
         this.scrollingList = new ScrollingMaterialList(this, BACKGROUND_WIDTH, BACKGROUND_HEIGHT);
@@ -91,10 +85,8 @@ public class MaterialListGUI extends GuiScreen {
         int buttonID = -1;
         int buttonY = getWindowBottomY() - (ScrollingMaterialList.BOTTOM / 2 + BUTTON_HEIGHT / 2);
         this.buttonClose = new DireButton(++buttonID, 0, buttonY, 0, BUTTON_HEIGHT, I18n.format("gui.buildinggadgets.materialList.button.close"));
-        this.buttonRefreshCount = new DireButton(++buttonID, 0, buttonY, 0, BUTTON_HEIGHT, I18n.format("gui.buildinggadgets.materialList.button.refreshCount"));
         this.buttonSortingModes = new DireButton(++buttonID, 0, buttonY, 0, BUTTON_HEIGHT, sortingMode.getLocalizedName());
         this.addButton(buttonSortingModes);
-        this.addButton(buttonRefreshCount);
         this.addButton(buttonClose);
 
         this.calculateButtonsWidthAndX();
@@ -110,6 +102,13 @@ public class MaterialListGUI extends GuiScreen {
         this.scrollingList.drawScreen(mouseX, mouseY, particleTicks);
         this.drawString(fontRenderer, title, titleLeft, titleTop, Color.WHITE.getRGB());
         super.drawScreen(mouseX, mouseY, particleTicks);
+
+        if (hoveringText != null) {
+            RenderHelper.enableGUIStandardItemLighting();
+            drawHoveringText(hoveringText, hoveringTextX, hoveringTextY);
+            GlStateManager.disableLighting();
+            hoveringText = null;
+        }
     }
 
     @Override
@@ -128,9 +127,6 @@ public class MaterialListGUI extends GuiScreen {
                 Minecraft.getMinecraft().player.closeScreen();
                 return;
             case 1:
-                updateAvailableMaterials();
-                return;
-            case 2:
                 sortingMode = sortingMode.next();
                 buttonSortingModes.displayString = sortingMode.getLocalizedName();
                 sortMaterialList();
@@ -138,14 +134,6 @@ public class MaterialListGUI extends GuiScreen {
                 return;
         }
         this.scrollingList.actionPerformed(button);
-    }
-
-    /**
-     * {@inheritDoc} Override to make it visible to outside.
-     */
-    @Override
-    public void renderToolTip(ItemStack stack, int x, int y) {
-        super.renderToolTip(stack, x, y);
     }
 
     /**
@@ -187,28 +175,34 @@ public class MaterialListGUI extends GuiScreen {
         return false;
     }
 
-    int getWindowLeftX() {
+    public int getWindowLeftX() {
         return backgroundX + BORDER_SIZE;
     }
 
-    int getWindowRightX() {
+    public int getWindowRightX() {
         return backgroundX + BACKGROUND_WIDTH - BORDER_SIZE;
     }
 
-    int getWindowTopY() {
+    public int getWindowTopY() {
         return backgroundY + BORDER_SIZE;
     }
 
-    int getWindowBottomY() {
+    public int getWindowBottomY() {
         return backgroundY + BACKGROUND_HEIGHT - BORDER_SIZE;
     }
 
-    int getWindowWidth() {
+    public int getWindowWidth() {
         return WINDOW_WIDTH;
     }
 
-    int getWindowHeight() {
+    public int getWindowHeight() {
         return WINDOW_HEIGHT;
+    }
+
+    public void setTaskHoveringText(int x, int y, List<String> text) {
+        hoveringTextX = x;
+        hoveringTextY = y;
+        hoveringText = text;
     }
 
 }

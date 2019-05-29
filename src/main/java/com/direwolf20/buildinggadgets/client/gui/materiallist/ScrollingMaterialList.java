@@ -10,6 +10,7 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.fml.client.GuiScrollingList;
+import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
 
@@ -26,11 +27,9 @@ class ScrollingMaterialList extends GuiScrollingList {
     static final int BOTTOM = 32;
     static final int LINE_SIDE_MARGIN = 8;
 
-    //TODO calculate them based on font height
-    private static final int TEXT_STATUS_Y_OFFSET = 0;
-    private static final int TEXT_AMOUNT_Y_OFFSET = 12;
+    static final int TEXT_AMOUNT_OFFSET_TOP = (ENTRY_HEIGHT - getFontRenderer().FONT_HEIGHT) / 2 - 8;
 
-    private static final String TRANSLATION_KEY_AVAILABLE = "gui.buildinggadgets.materialList.message.available";
+    public static final String TRANSLATION_KEY_AVAILABLE = "gui.buildinggadgets.materialList.message.available";
     public static final String TRANSLATION_KEU_MISSING = "gui.buildinggadgets.materialList.message.missing";
 
     private MaterialListGUI parent;
@@ -69,20 +68,14 @@ class ScrollingMaterialList extends GuiScrollingList {
     }
 
     @Override
-    public void drawScreen(int mouseXIn, int mouseYIn, float partialTicks) {
-        // GlStateManager.translate(0, parent.backgroundY, 0);
-        // GL11.glScissor(left, top, width, height);
-        super.drawScreen(mouseXIn, mouseYIn, partialTicks);
-        // GL11.glScissor(0, 0, 0, 0);
-    }
-
-    @Override
     protected void drawBackground() {
     }
 
     @Override
-    protected void drawSlot(int index, int right, int top, int entryHeight, Tessellator tess) {
+    protected void drawSlot(int index, int rightIn, int top, int entryHeight, Tessellator tess) {
         ItemStack item = parent.materials.get(index);
+        // We don't want our content to be exactly aligned with the border
+        int right = rightIn - 2;
         int bottom = top + entryHeight;
         int slotX = left + MARGIN;
         int slotY = top + MARGIN;
@@ -103,21 +96,18 @@ class ScrollingMaterialList extends GuiScrollingList {
         boolean fulfilled = available == required;
         int color = fulfilled ? Color.GREEN.getRGB() : Color.RED.getRGB();
         String amount = available + "/" + required;
-        String status = fulfilled ? messageAvailable : messageMissing;
-        RenderUtil.renderTextHorizontalRight(status, right, top + TEXT_STATUS_Y_OFFSET, color);
-        RenderUtil.renderTextHorizontalRight(amount, right, top + TEXT_AMOUNT_Y_OFFSET, Color.WHITE.getRGB());
+        RenderUtil.renderTextHorizontalRight(amount, right, AlignmentUtil.getYForAlignedCenter(getFontRenderer().FONT_HEIGHT, top, bottom), color);
 
         int widthItemName = Minecraft.getMinecraft().fontRenderer.getStringWidth(itemName);
         int widthAmount = Minecraft.getMinecraft().fontRenderer.getStringWidth(amount);
-        int widthStatus = Minecraft.getMinecraft().fontRenderer.getStringWidth(status);
-        drawGuidingLine(index, right, top, bottom, itemNameX, widthItemName, widthAmount, widthStatus);
+        drawGuidingLine(index, right, top, bottom, itemNameX, widthItemName, widthAmount);
     }
 
-    private void drawGuidingLine(int index, int right, int top, int bottom, int itemNameX, int widthItemName, int widthAmount, int widthStatus) {
+    private void drawGuidingLine(int index, int right, int top, int bottom, int itemNameX, int widthItemName, int widthAmount) {
         if (!isSelected(index)) {
             int lineXStart = itemNameX + widthItemName + LINE_SIDE_MARGIN;
-            int lineXEnd = right - Math.max(widthAmount, widthStatus) - LINE_SIDE_MARGIN;
-            int lineY = AlignmentUtil.getYForAlignedCenter(1, top, bottom - 1) - 1;
+            int lineXEnd = right - widthAmount - LINE_SIDE_MARGIN;
+            int lineY = AlignmentUtil.getYForAlignedCenter(1, top, bottom) - 1;
             GlStateManager.enableAlpha();
             GlStateManager.enableBlend();
             GlStateManager.blendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -127,8 +117,7 @@ class ScrollingMaterialList extends GuiScrollingList {
 
     private void drawHoveringText(ItemStack item, int slotX, int slotY) {
         if (mouseX > slotX && mouseY > slotY && mouseX <= slotX + 18 && mouseY <= slotY + 18) {
-            parent.renderToolTip(item, mouseX, mouseY);
-            GlStateManager.disableLighting();
+            parent.setTaskHoveringText(mouseX, mouseY, parent.getItemToolTip(item));
         }
     }
 
