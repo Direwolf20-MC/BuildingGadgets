@@ -43,7 +43,7 @@ public class MaterialListGUI extends GuiScreen {
 
     private static List<ItemStack> toInternalMaterialList(Multiset<UniqueItem> templateList) {
         List<ItemStack> result = new ArrayList<>();
-        for (Multiset.Entry<UniqueItem> entry : templateList.entrySet()) {
+        return templateList.entrySet().stream().map(e -> new ItemStack(e.getElement().item, e.getCount(), e.getElement().meta)).collect(Collectors.toList());
             // ItemStack implementation ignores the stack limit
             ItemStack itemStack = new ItemStack(entry.getElement().item, entry.getCount(), entry.getElement().meta);
             result.add(itemStack);
