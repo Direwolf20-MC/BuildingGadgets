@@ -135,10 +135,6 @@ gui.buildinggadgets.materialList.button.sortingMode.nameReversed=Name ↑
 gui.buildinggadgets.materialList.button.sortingMode.count=Count ↓
 gui.buildinggadgets.materialList.button.sortingMode.countReversed=Count ↑
 
-#gui message
-gui.buildinggadgets.materialList.message.available=Available
-gui.buildinggadgets.materialList.message.missing=Missing
-
 #gui title:
 gui.buildinggadgets.materialList.title=Material List
 

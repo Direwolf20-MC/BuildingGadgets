@@ -27,15 +27,7 @@ class ScrollingMaterialList extends GuiScrollingList {
     static final int BOTTOM = 32;
     static final int LINE_SIDE_MARGIN = 8;
 
-    static final int TEXT_AMOUNT_OFFSET_TOP = (ENTRY_HEIGHT - getFontRenderer().FONT_HEIGHT) / 2 - 8;
-
-    public static final String TRANSLATION_KEY_AVAILABLE = "gui.buildinggadgets.materialList.message.available";
-    public static final String TRANSLATION_KEU_MISSING = "gui.buildinggadgets.materialList.message.missing";
-
     private MaterialListGUI parent;
-
-    private String messageAvailable;
-    private String messageMissing;
 
     public ScrollingMaterialList(MaterialListGUI parent, int width, int height) {
         super(Minecraft.getMinecraft(),
@@ -48,8 +40,6 @@ class ScrollingMaterialList extends GuiScrollingList {
                 parent.width,
                 parent.height);
         this.parent = parent;
-        this.messageAvailable = I18n.format(TRANSLATION_KEY_AVAILABLE);
-        this.messageMissing = I18n.format(TRANSLATION_KEU_MISSING);
     }
 
     @Override
@@ -64,7 +54,8 @@ class ScrollingMaterialList extends GuiScrollingList {
 
     @Override
     protected boolean isSelected(int slotIndex) {
-        return selectedIndex == slotIndex;
+        // No need to select entries because there is no use for it yet
+        return false;
     }
 
     @Override
