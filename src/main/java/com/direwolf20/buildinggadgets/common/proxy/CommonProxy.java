@@ -1,12 +1,12 @@
 package com.direwolf20.buildinggadgets.common.proxy;
 
-
 import com.direwolf20.buildinggadgets.client.gui.GuiProxy;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.ModSounds;
 import com.direwolf20.buildinggadgets.common.blocks.*;
 import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManager;
 import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManagerTileEntity;
+import com.direwolf20.buildinggadgets.common.building.CapabilityBlockProvider;
 import com.direwolf20.buildinggadgets.common.config.CompatConfig;
 import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
 import com.direwolf20.buildinggadgets.common.entities.ModEntities;
@@ -36,9 +36,9 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 
 import java.io.File;
 
-
 @Mod.EventBusSubscriber
 public class CommonProxy {
+
     private boolean applyCompatConfig = false;
 
     public void preInit(FMLPreInitializationEvent e) {
@@ -53,6 +53,8 @@ public class CommonProxy {
     }
 
     public void init() {
+        CapabilityBlockProvider.register();
+
         NetworkRegistry.INSTANCE.registerGuiHandler(BuildingGadgets.instance, new GuiProxy());
         if (applyCompatConfig) {
             BuildingGadgets.logger.info("Migrating old config Data.");
@@ -107,4 +109,5 @@ public class CommonProxy {
             event.getRegistry().register(sound.getSound());
         }
     }
+
 }

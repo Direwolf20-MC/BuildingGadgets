@@ -31,6 +31,22 @@ tile.buildinggadgets.constructionblockpowder.name=Construction Block Powder
 tile.buildinggadgets.effectblock.name=(Unused)Effect Block
 tile.buildinggadgets.templatemanager.name=Template Manager
 
+#block: 
+block.buildinggadgets.constructionblock.name=Construction Block
+block.buildinggadgets.constructionblockpowder.name=Construction Block Powder
+block.buildinggadgets.effectblock.name=(Unused)Effect Block
+block.buildinggadgets.templatemanager.name=Template Manager
+
+#modes:
+modes.buildinggadgets.surface=Surface
+modes.buildinggadgets.grid=Grid
+modes.buildinggadgets.horizontal_column=Horizontal Column
+modes.buildinggadgets.horizontal_wall=Horizontal Wall
+modes.buildinggadgets.vertical_column=Vertical Column
+modes.buildinggadgets.vertical_wall=Vertical Wall
+modes.buildinggadgets.stair=Stair
+modes.buildinggadgets.axis_chasing=Build To Me
+
 #key: 
 key.categories.buildingGadgets=Building Gadgets
 key.anchor=Anchor
@@ -83,7 +99,7 @@ message.gadget.connectedsurface=Connected Surface
 message.gadget.invalidblock=Invalid Block
 message.gadget.nothingtoundo=Nothing To Undo
 message.gadget.pastefailed=Paste Failed, Invalid JSON
-message.gadget.pastefailed.linkcopied=Paste Failed. Please copy the raw json data, instead of an Link
+message.gadget.pastefailed.linkcopied=Paste Failed. Please copy the raw json data, instead of a Link
 message.gadget.pastesuccess=Paste from Clipboard successful
 message.gadget.pastetoobig=Paste is too large
 message.gadget.rotated=Blocks Rotated

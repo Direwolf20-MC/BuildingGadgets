@@ -14,6 +14,7 @@ import javax.annotation.Nullable;
 import java.util.function.IntSupplier;
 
 public class CapabilityProviderEnergy implements ICapabilityProvider {
+
     private ItemStack stack;
     private IntSupplier energyCapacity;
 
@@ -24,7 +25,7 @@ public class CapabilityProviderEnergy implements ICapabilityProvider {
 
     @Override
     public boolean hasCapability(@Nonnull Capability<?> capability, @Nullable EnumFacing facing) {
-        return capability == CapabilityEnergy.ENERGY && SyncedConfig.poweredByFE ;
+        return capability == CapabilityEnergy.ENERGY && SyncedConfig.poweredByFE;
     }
 
     @Override
@@ -40,4 +41,5 @@ public class CapabilityProviderEnergy implements ICapabilityProvider {
 
         return energy;
     }
+
 }

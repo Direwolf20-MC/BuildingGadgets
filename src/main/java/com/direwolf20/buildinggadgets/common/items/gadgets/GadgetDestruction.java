@@ -6,10 +6,7 @@ import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.blocks.ModBlocks;
 import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
-import com.direwolf20.buildinggadgets.common.tools.BlockMapIntState;
-import com.direwolf20.buildinggadgets.common.tools.GadgetUtils;
-import com.direwolf20.buildinggadgets.common.tools.VectorTools;
-import com.direwolf20.buildinggadgets.common.tools.WorldSave;
+import com.direwolf20.buildinggadgets.common.tools.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
@@ -36,8 +33,10 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.BlockSnapshot;
+import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.world.BlockEvent;
+import org.lwjgl.Sys;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -313,7 +312,7 @@ public class GadgetDestruction extends GadgetGeneric {
         IBlockState currentBlock = world.getBlockState(voidPos);
         if (stateTarget != null && currentBlock != stateTarget) return false;
         TileEntity te = world.getTileEntity(voidPos);
-        if (currentBlock.getMaterial() == Material.AIR) return false;
+        if (currentBlock.getBlock().isAir(currentBlock, world, voidPos)) return false;
         //if (currentBlock.getBlock().getMaterial(currentBlock).isLiquid()) return false;
         if (currentBlock.equals(ModBlocks.effectBlock.getDefaultState())) return false;
         if ((te != null) && !(te instanceof ConstructionBlockTileEntity)) return false;
@@ -343,109 +342,81 @@ public class GadgetDestruction extends GadgetGeneric {
 
     public void clearArea(World world, BlockPos pos, EnumFacing side, EntityPlayer player, ItemStack stack) {
         SortedSet<BlockPos> voidPosArray = getArea(world, pos, side, player, stack);
-        Map<BlockPos, IBlockState> posStateMap = new HashMap<BlockPos, IBlockState>();
-        Map<BlockPos, IBlockState> pasteStateMap = new HashMap<BlockPos, IBlockState>();
+        List<BlockPosState> blockList = new ArrayList<>();
+
         for (BlockPos voidPos : voidPosArray) {
+            boolean isPaste;
+
             IBlockState blockState = world.getBlockState(voidPos);
             IBlockState pasteState = Blocks.AIR.getDefaultState();
+            if( blockState == Blocks.AIR.getDefaultState() )
+                continue;
+
             if (blockState.getBlock() == ModBlocks.constructionBlock) {
                 TileEntity te = world.getTileEntity(voidPos);
-                if (te instanceof ConstructionBlockTileEntity) {
+                if (te instanceof ConstructionBlockTileEntity)
                     pasteState = ((ConstructionBlockTileEntity) te).getActualBlockState();
-                }
             }
-            boolean success = destroyBlock(world, voidPos, player);
-            if (success)
-                posStateMap.put(voidPos, blockState);
-            if (pasteState != Blocks.AIR.getDefaultState()) {
-                pasteStateMap.put(voidPos, pasteState);
-            }
+
+            isPaste = pasteState != Blocks.AIR.getDefaultState() && pasteState != null;
+            if (!destroyBlock(world, voidPos, player))
+                continue;
+
+            blockList.add(new BlockPosState(voidPos, isPaste ? pasteState : blockState, isPaste));
         }
-        if (posStateMap.size() > 0) {
-            BlockPos startPos = (getAnchor(stack) == null) ? pos : getAnchor(stack);
-            storeUndo(world, posStateMap, pasteStateMap, startPos, stack, player);
-        }
+
+        if (blockList.size() > 0)
+            storeUndo(world, blockList, stack, player);
     }
 
-    public static void storeUndo(World world, Map<BlockPos, IBlockState> posStateMap, Map<BlockPos, IBlockState> pasteStateMap, BlockPos startBlock, ItemStack stack, EntityPlayer player) {
+    public static void storeUndo(World world, List<BlockPosState> blockList, ItemStack stack, EntityPlayer player) {
         WorldSave worldSave = WorldSave.getWorldSaveDestruction(world);
-        NBTTagCompound tagCompound = new NBTTagCompound();
-        List<Integer> posIntArrayList = new ArrayList<Integer>();
-        List<Integer> stateIntArrayList = new ArrayList<Integer>();
-        List<Integer> pastePosArrayList = new ArrayList<Integer>();
-        List<Integer> pasteStateArrayList = new ArrayList<Integer>();
-        BlockMapIntState blockMapIntState = new BlockMapIntState();
-        String UUID = getUUID(stack);
 
-        for (Map.Entry<BlockPos, IBlockState> entry : posStateMap.entrySet()) {
-            posIntArrayList.add(GadgetUtils.relPosToInt(startBlock, entry.getKey()));
-            blockMapIntState.addToMap(entry.getValue());
-            stateIntArrayList.add((int) blockMapIntState.findSlot(entry.getValue()));
-            if (pasteStateMap.containsKey(entry.getKey())) {
-                pastePosArrayList.add(GadgetUtils.relPosToInt(startBlock, entry.getKey()));
-                IBlockState pasteBlockState = pasteStateMap.get(entry.getKey());
-                blockMapIntState.addToMap(pasteBlockState);
-                pasteStateArrayList.add((int) blockMapIntState.findSlot(pasteBlockState));
-            }
-        }
-        tagCompound.setTag("mapIntState", blockMapIntState.putIntStateMapIntoNBT());
-        int[] posIntArray = posIntArrayList.stream().mapToInt(i -> i).toArray();
-        int[] stateIntArray = stateIntArrayList.stream().mapToInt(i -> i).toArray();
-        int[] posPasteArray = pastePosArrayList.stream().mapToInt(i -> i).toArray();
-        int[] statePasteArray = pasteStateArrayList.stream().mapToInt(i -> i).toArray();
-        tagCompound.setIntArray("posIntArray", posIntArray);
-        tagCompound.setIntArray("stateIntArray", stateIntArray);
-        tagCompound.setIntArray("posPasteArray", posPasteArray);
-        tagCompound.setIntArray("statePasteArray", statePasteArray);
-        tagCompound.setTag("startPos", NBTUtil.createPosTag(startBlock));
-        tagCompound.setInteger("dim", player.dimension);
-        tagCompound.setString("UUID", UUID);
-        worldSave.addToMap(UUID, tagCompound);
+        NBTTagCompound tagCompound = new NBTTagCompound();
+        NBTTagList list = new NBTTagList();
+
+        blockList.forEach( e -> list.appendTag( e.toCompound() ) );
+
+        tagCompound.setTag("mapping", list);
+        tagCompound.setInteger("dimension", player.dimension);
+
+        worldSave.addToMap(getUUID(stack), tagCompound);
         worldSave.markForSaving();
     }
 
     public void undo(EntityPlayer player, ItemStack stack) {
         World world = player.world;
         WorldSave worldSave = WorldSave.getWorldSaveDestruction(world);
-        NBTTagCompound tagCompound = worldSave.getCompoundFromUUID(getUUID(stack));
-        if (tagCompound == null) return;
-        BlockPos startPos = NBTUtil.getPosFromTag(tagCompound.getCompoundTag("startPos"));
-        if (startPos == null) return;
-        int[] posIntArray = tagCompound.getIntArray("posIntArray");
-        int[] stateIntArray = tagCompound.getIntArray("stateIntArray");
-        int[] posPasteArray = tagCompound.getIntArray("posPasteArray");
-        int[] statePasteArray = tagCompound.getIntArray("statePasteArray");
 
-        NBTTagList MapIntStateTag = (NBTTagList) tagCompound.getTag("mapIntState");
-        if (MapIntStateTag == null) {
+        NBTTagCompound saveCompound = worldSave.getCompoundFromUUID(getUUID(stack));
+        if (saveCompound == null)
             return;
-        }
-        BlockMapIntState MapIntState = new BlockMapIntState();
-        MapIntState.getIntStateMapFromNBT(MapIntStateTag);
+
+        int dimension = saveCompound.getInteger("dimension");
+        if( dimension != player.dimension )
+            return;
+
+        NBTTagList list = saveCompound.getTagList("mapping", Constants.NBT.TAG_COMPOUND);
+        if( list.tagCount() == 0 )
+            return;
+
         boolean success = false;
-        for (int i = 0; i < posIntArray.length; i++) {
-            BlockPos placePos = GadgetUtils.relIntToPos(startPos, posIntArray[i]);
-            IBlockState currentState = world.getBlockState(placePos);
-            if (currentState.getMaterial() == Material.AIR || currentState.getMaterial().isLiquid()) {
-                IBlockState placeState = MapIntState.getStateFromSlot((short) stateIntArray[i]);
-                if (placeState.getBlock() == ModBlocks.constructionBlock) {
-                    IBlockState pasteState = Blocks.AIR.getDefaultState();
-                    for (int j = 0; j < posPasteArray.length; j++) {
-                        if (posPasteArray[j] == posIntArray[i]) {
-                            pasteState = MapIntState.getStateFromSlot((short) statePasteArray[j]);
-                            break;
-                        }
-                    }
-                    if (pasteState != Blocks.AIR.getDefaultState()) {
-                        world.spawnEntity(new BlockBuildEntity(world, placePos, player, pasteState, 1, pasteState, true));
-                        success = true;
-                    }
-                } else {
-                    world.spawnEntity(new BlockBuildEntity(world, placePos, player, placeState, 1, placeState, false));
-                    success = true;
-                }
-            }
+        for( int i = 0; i < list.tagCount(); i ++ ) {
+            NBTTagCompound compound = list.getCompoundTagAt( i );
+            BlockPosState posState = BlockPosState.fromCompound(compound);
+
+            if (posState == null)
+                return;
+
+            // Check that there is no blocks where we want to put the new blocks.
+            IBlockState state = world.getBlockState(posState.getPos());
+            if (!state.getBlock().isAir(state, world, posState.getPos()) && !state.getMaterial().isLiquid())
+                return;
+
+            world.spawnEntity(new BlockBuildEntity(world, posState.getPos(), player, posState.getState(), 1, posState.getState(), posState.isPaste()));
+            success = true;
         }
+
         if (success) {
             NBTTagCompound newTag = new NBTTagCompound();
             worldSave.addToMap(getUUID(stack), newTag);
