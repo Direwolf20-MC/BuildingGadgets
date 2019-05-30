@@ -4,7 +4,7 @@ import com.direwolf20.buildinggadgets.client.gui.materiallist.MaterialListGUI;
 import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManagerContainer;
 import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManagerGUI;
 import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManagerTileEntity;
-import com.direwolf20.buildinggadgets.common.items.Template;
+import com.direwolf20.buildinggadgets.common.items.ITemplate;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetDestruction;
 import com.direwolf20.buildinggadgets.common.tools.InventoryManipulation;
@@ -63,7 +63,7 @@ public class GuiProxy implements IGuiHandler {
             else
                 return null;
         } else if (ID == MaterialListID) {
-            ItemStack template = InventoryManipulation.getStackInEitherHand(player, Template.class);
+            ItemStack template = InventoryManipulation.getStackInEitherHand(player, ITemplate.class);
             if (template != ItemStack.EMPTY)
                 return new MaterialListGUI(template);
             return null;

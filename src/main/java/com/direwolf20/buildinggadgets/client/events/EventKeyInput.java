@@ -2,6 +2,9 @@ package com.direwolf20.buildinggadgets.client.events;
 
 import com.direwolf20.buildinggadgets.client.KeyBindings;
 import com.direwolf20.buildinggadgets.client.gui.ModeRadialMenu;
+import com.direwolf20.buildinggadgets.client.gui.materiallist.MaterialListGUI;
+import com.direwolf20.buildinggadgets.common.items.ITemplate;
+import com.direwolf20.buildinggadgets.common.items.ModItems;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
 import com.direwolf20.buildinggadgets.common.network.PacketAnchor;
 import com.direwolf20.buildinggadgets.common.network.PacketChangeRange;
@@ -10,6 +13,7 @@ import com.direwolf20.buildinggadgets.common.network.PacketRotateMirror;
 import com.direwolf20.buildinggadgets.common.network.PacketToggleConnectedArea;
 import com.direwolf20.buildinggadgets.common.network.PacketToggleFuzzy;
 import com.direwolf20.buildinggadgets.common.network.PacketUndo;
+import com.direwolf20.buildinggadgets.common.tools.InventoryManipulation;
 import net.minecraft.client.Minecraft;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.client.settings.KeyModifier;
@@ -50,5 +54,9 @@ public class EventKeyInput {
             PacketHandler.INSTANCE.sendToServer(new PacketToggleFuzzy());
         else if (KeyBindings.connectedArea.isPressed())
             PacketHandler.INSTANCE.sendToServer(new PacketToggleConnectedArea());
+        else if (KeyBindings.materialList.isPressed()) {
+            ItemStack held = InventoryManipulation.getStackInEitherHand(Minecraft.getMinecraft().player, ITemplate.class);
+            Minecraft.getMinecraft().displayGuiScreen(new MaterialListGUI(held));
+        }
     }
 }

@@ -21,6 +21,7 @@ public class KeyBindings {
     public static KeyBinding anchor;
     public static KeyBinding fuzzy;
     public static KeyBinding connectedArea;
+    public static KeyBinding materialList;
 
     public static void init() {
         menuSettings = createBinding("settings_menu", Keyboard.KEY_G);
@@ -30,6 +31,7 @@ public class KeyBindings {
         fuzzy = createBinding("fuzzy", Keyboard.KEY_NONE);
         connectedArea = createBinding("connected_area", Keyboard.KEY_NONE);
         rotateMirror = createBinding("rotate_mirror", Keyboard.KEY_NONE);
+        materialList = createBinding("material_list", Keyboard.KEY_M);
     }
 
     private static KeyBinding createBinding(String name, int key) {

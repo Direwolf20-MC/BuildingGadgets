@@ -4,6 +4,7 @@ import com.direwolf20.buildinggadgets.client.gui.DireButton;
 import com.direwolf20.buildinggadgets.client.util.AlignmentUtil;
 import com.direwolf20.buildinggadgets.client.util.RenderUtil;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
+import com.direwolf20.buildinggadgets.common.items.ITemplate;
 import com.direwolf20.buildinggadgets.common.items.Template;
 import com.direwolf20.buildinggadgets.common.tools.InventoryManipulation;
 import it.unimi.dsi.fastutil.ints.IntList;
@@ -66,7 +67,7 @@ public class MaterialListGUI extends GuiScreen {
 
     @Override
     public void initGui() {
-        Template item = (Template) template.getItem();
+        ITemplate item = (ITemplate) template.getItem();
 
         this.backgroundX = AlignmentUtil.getXForAlignedCenter(BACKGROUND_WIDTH, 0, width);
         this.backgroundY = AlignmentUtil.getYForAlignedCenter(BACKGROUND_HEIGHT, 0, height);
