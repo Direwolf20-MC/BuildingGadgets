@@ -86,7 +86,7 @@ class ScrollingMaterialList extends GuiScrollingList {
         int available = MathHelper.clamp(parent.available.getInt(index), 0, required);
         boolean fulfilled = available == required;
         int color = fulfilled ? Color.GREEN.getRGB() : Color.RED.getRGB();
-        String amount = available + "/" + required;
+        String amount = I18n.format("gui.buildinggadgets.materialList.text.statusTemplate", available, required);
         RenderUtil.renderTextHorizontalRight(amount, right, AlignmentUtil.getYForAlignedCenter(getFontRenderer().FONT_HEIGHT, top, bottom), color);
 
         int widthItemName = Minecraft.getMinecraft().fontRenderer.getStringWidth(itemName);

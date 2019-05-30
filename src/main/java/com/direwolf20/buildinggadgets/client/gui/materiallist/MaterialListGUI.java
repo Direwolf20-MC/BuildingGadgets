@@ -1,6 +1,7 @@
 package com.direwolf20.buildinggadgets.client.gui.materiallist;
 
 import com.direwolf20.buildinggadgets.client.gui.DireButton;
+import com.direwolf20.buildinggadgets.client.gui.base.GuiBase;
 import com.direwolf20.buildinggadgets.client.util.AlignmentUtil;
 import com.direwolf20.buildinggadgets.client.util.RenderUtil;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
@@ -28,7 +29,7 @@ import java.util.stream.Collectors;
  * <a href="github.com/Lunatrius/Schematica/blob/master/src/main/java/com/github/lunatrius/schematica/client/gui/control/GuiSchematicMaterials.java">Github</a>
  */
 
-public class MaterialListGUI extends GuiScreen {
+public class MaterialListGUI extends GuiBase {
 
     public static final int BUTTON_HEIGHT = 20;
     public static final int BUTTONS_PADDING = 4;
