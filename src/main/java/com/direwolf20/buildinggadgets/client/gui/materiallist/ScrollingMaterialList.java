@@ -10,7 +10,6 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.fml.client.GuiScrollingList;
-import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
 
@@ -44,7 +43,7 @@ class ScrollingMaterialList extends GuiScrollingList {
 
     @Override
     protected int getSize() {
-        return parent.materials.size();
+        return parent.getMaterials().size();
     }
 
     @Override
@@ -64,7 +63,7 @@ class ScrollingMaterialList extends GuiScrollingList {
 
     @Override
     protected void drawSlot(int index, int rightIn, int top, int entryHeight, Tessellator tess) {
-        ItemStack item = parent.materials.get(index);
+        ItemStack item = parent.getMaterials().get(index);
         // We don't want our content to be exactly aligned with the border
         int right = rightIn - 2;
         int bottom = top + entryHeight;
@@ -83,7 +82,7 @@ class ScrollingMaterialList extends GuiScrollingList {
         RenderUtil.renderTextVerticalCenter(itemName, itemNameX, top, bottom - 1, Color.WHITE.getRGB());
 
         int required = item.getCount();
-        int available = MathHelper.clamp(parent.available.getInt(index), 0, required);
+        int available = MathHelper.clamp(parent.getAvailable().getInt(index), 0, required);
         boolean fulfilled = available == required;
         int color = fulfilled ? Color.GREEN.getRGB() : Color.RED.getRGB();
         String amount = I18n.format("gui.buildinggadgets.materialList.text.statusTemplate", available, required);

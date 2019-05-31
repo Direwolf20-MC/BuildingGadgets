@@ -42,16 +42,16 @@ public class MaterialListGUI extends GuiBase {
     public static final int WINDOW_WIDTH = BACKGROUND_WIDTH - BORDER_SIZE * 2;
     public static final int WINDOW_HEIGHT = BACKGROUND_HEIGHT - BORDER_SIZE * 2;
 
-    int backgroundX;
-    int backgroundY;
+    private int backgroundX;
+    private int backgroundY;
 
     private String title;
     private int titleLeft;
     private int titleTop;
 
     private ItemStack template;
-    List<ItemStack> materials;
-    IntList available;
+    private List<ItemStack> materials;
+    private IntList available;
     private ScrollingMaterialList scrollingList;
     private SortingModes sortingMode = SortingModes.NAME;
 
@@ -199,6 +199,14 @@ public class MaterialListGUI extends GuiBase {
 
     public int getWindowHeight() {
         return WINDOW_HEIGHT;
+    }
+
+    public List<ItemStack> getMaterials() {
+        return materials;
+    }
+
+    public IntList getAvailable() {
+        return available;
     }
 
     public void setTaskHoveringText(int x, int y, List<String> text) {
