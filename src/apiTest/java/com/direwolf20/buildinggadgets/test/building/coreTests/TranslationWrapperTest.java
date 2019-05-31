@@ -1,14 +1,14 @@
-package com.direwolf20.buildinggadgets.building.coreTests;
+package com.direwolf20.buildinggadgets.test.building.coreTests;
 
 import com.direwolf20.buildinggadgets.api.building.IBlockProvider;
 import com.direwolf20.buildinggadgets.api.building.SingleTypeProvider;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.math.BlockPos;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Test;
 
 import java.util.Random;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TranslationWrapperTest {
 

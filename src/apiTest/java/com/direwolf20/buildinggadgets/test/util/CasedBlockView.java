@@ -1,4 +1,4 @@
-package com.direwolf20.buildinggadgets.util;
+package com.direwolf20.buildinggadgets.test.util;
 
 import com.direwolf20.buildinggadgets.api.building.Region;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;

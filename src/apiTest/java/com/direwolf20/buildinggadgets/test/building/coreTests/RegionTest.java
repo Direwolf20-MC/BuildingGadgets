@@ -1,9 +1,9 @@
-package com.direwolf20.buildinggadgets.building.coreTests;
+package com.direwolf20.buildinggadgets.test.building.coreTests;
 
 import com.direwolf20.buildinggadgets.api.building.Region;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class RegionTest {
 

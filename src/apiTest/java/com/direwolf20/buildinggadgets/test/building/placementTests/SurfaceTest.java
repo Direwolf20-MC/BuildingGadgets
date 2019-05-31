@@ -1,17 +1,18 @@
-package com.direwolf20.buildinggadgets.building.placementTests;
+package com.direwolf20.buildinggadgets.test.building.placementTests;
 
 import com.direwolf20.buildinggadgets.api.building.Region;
 import com.direwolf20.buildinggadgets.api.building.placement.Surface;
-import com.direwolf20.buildinggadgets.util.CasedBlockView;
+import com.direwolf20.buildinggadgets.test.util.CasedBlockView;
 import com.google.common.collect.Sets;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import java.util.Random;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Disabled("requires custom runner with minecraft started")
 public class SurfaceTest {

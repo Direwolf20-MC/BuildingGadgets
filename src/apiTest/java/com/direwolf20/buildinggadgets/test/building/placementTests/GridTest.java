@@ -1,12 +1,12 @@
-package com.direwolf20.buildinggadgets.building.placementTests;
+package com.direwolf20.buildinggadgets.test.building.placementTests;
 
 import com.direwolf20.buildinggadgets.api.building.placement.Grid;
 import net.minecraft.util.math.BlockPos;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Test;
 
 import java.util.Iterator;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 public class GridTest {
 

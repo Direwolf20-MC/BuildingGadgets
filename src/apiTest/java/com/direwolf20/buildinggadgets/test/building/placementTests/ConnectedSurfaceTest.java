@@ -1,20 +1,21 @@
-package com.direwolf20.buildinggadgets.building.placementTests;
+package com.direwolf20.buildinggadgets.test.building.placementTests;
 
 import com.direwolf20.buildinggadgets.api.building.Region;
 import com.direwolf20.buildinggadgets.api.building.placement.ConnectedSurface;
 import com.direwolf20.buildinggadgets.api.util.VectorUtils;
-import com.direwolf20.buildinggadgets.util.CasedBlockView;
+import com.direwolf20.buildinggadgets.test.util.CasedBlockView;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import java.util.Random;
 import java.util.Set;
 
-import static com.direwolf20.buildinggadgets.util.CasedBlockView.regionAtOriginWithRandomTargets;
-import static org.junit.jupiter.api.Assertions.*;
+import static com.direwolf20.buildinggadgets.test.util.CasedBlockView.regionAtOriginWithRandomTargets;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Disabled("requires custom runner with minecraft started")
 public class ConnectedSurfaceTest {

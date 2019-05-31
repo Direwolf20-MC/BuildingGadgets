@@ -32,7 +32,7 @@ public class TopologicalRegistryTest {
 
     private <T> void verifyContainsNone(IOrderedRegistry<T> reg, ImmutableList<ResourceLocation> values) {
         for (ResourceLocation key : values) {
-            assertTrue(! reg.contains(key), () -> "Registry was expected not to contain " + key);
+            assertFalse(reg.contains(key), () -> "Registry was expected not to contain " + key);
         }
     }
 
@@ -49,8 +49,8 @@ public class TopologicalRegistryTest {
         ResourceLocation obj7 = new ResourceLocation("obj7");
         ImmutableMap<ResourceLocation, String> objects = ImmutableMap.<ResourceLocation, String>builder()
                 .put(obj1, "firstAfterStart")
-                .put(obj2, "After1")
-                .put(obj3, "After1")
+                .put(obj2, "After1_1")
+                .put(obj3, "After1_2")
                 .put(obj4, "After2Before3AndMid")
                 .put(obj5, "Before4")
                 .put(obj6, "AfterMid")
@@ -77,11 +77,18 @@ public class TopologicalRegistryTest {
     }
 
     @SingleTest
-    public void throwsOnNull() {
+    public void throwsOnDuplicateValueTest() {
         TopologicalRegistryBuilder<String> builder = TopologicalRegistryBuilder.create();
-        assertThrows(NullPointerException.class, () -> builder.addValue(null, null));
-        assertThrows(NullPointerException.class, () -> builder.addValue(new ResourceLocation("a"), null));
+        builder.addValue(new ResourceLocation("a"), "a");
+        assertThrows(IllegalArgumentException.class, () -> builder.addValue(new ResourceLocation("b"), "a"));
+    }
+
+    @SingleTest
+    public void throwsOnNullKey() {
+        TopologicalRegistryBuilder<String> builder = TopologicalRegistryBuilder.create();
+        assertThrows(NullPointerException.class, () -> builder.addValue(null, ""));
         assertThrows(NullPointerException.class, () -> builder.addMarker(null));
+        assertThrows(NullPointerException.class, () -> builder.addDependency(null, null));
     }
 
     @SingleTest
@@ -90,17 +97,9 @@ public class TopologicalRegistryTest {
         builder.build();
         assertThrows(IllegalStateException.class, () -> builder.addValue(new ResourceLocation("a"), "c"));
         assertThrows(IllegalStateException.class, () -> builder.addMarker(new ResourceLocation("a")));
+        assertThrows(IllegalStateException.class, () -> builder.addAllValues(ImmutableMap.of(new ResourceLocation("a"), "a")));
+        assertThrows(IllegalStateException.class, () -> builder.addAllMarkers(ImmutableList.of(new ResourceLocation("a"))));
+        assertThrows(IllegalStateException.class, () -> builder.addDependency(new ResourceLocation("a"), new ResourceLocation("b")));
         assertThrows(IllegalStateException.class, builder::build);
-    }
-
-    @SingleTest
-    public void throwsOnDuplicate() {
-        TopologicalRegistryBuilder<String> builder = TopologicalRegistryBuilder.create();
-        builder.addMarker(new ResourceLocation("a"));
-        builder.addValue(new ResourceLocation("b"), "b");
-        assertThrows(IllegalArgumentException.class, () -> builder.addValue(new ResourceLocation("b"), "b"));
-        assertThrows(IllegalArgumentException.class, () -> builder.addValue(new ResourceLocation("a"), "a"));
-        assertThrows(IllegalArgumentException.class, () -> builder.addMarker(new ResourceLocation("b")));
-        assertThrows(IllegalArgumentException.class, () -> builder.addMarker(new ResourceLocation("a")));
     }
 }

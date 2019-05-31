@@ -1,4 +1,4 @@
-package com.direwolf20.buildinggadgets.util;
+package com.direwolf20.buildinggadgets.test.util;
 
 import com.google.common.collect.ImmutableMap;
 import net.minecraft.block.Block;
@@ -31,7 +31,6 @@ import net.minecraftforge.common.ToolType;
 
 import javax.annotation.Nullable;
 import java.util.Collection;
-import java.util.List;
 import java.util.Objects;
 import java.util.Random;
 import java.util.function.Predicate;

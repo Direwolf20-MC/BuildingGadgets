@@ -143,7 +143,7 @@ minecraft {
             sources sourceSets.main, sourceSets.api
         }
     }
-	/*maven {
+    /*maven {
         name 'Raoulvdberge Repo' // RS
         url 'https://repo.raoulvdberge.com/'
     }*/
@@ -258,7 +258,7 @@ task sourcesJar(type: Jar, dependsOn: classes) {
 task apiJar (type:Jar, dependsOn:apiClasses) {
     manifest {
         attributes(["Specification-Title": "Buildinggadgets-API",
-                    "Specification-Version": forge_major, 
+                    "Specification-Version": forge_major,
                     "Implementation-Title": project.archivesBaseName+'-api',
                     "Implementation-Version": project.api_version,
                     "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")],)
@@ -306,6 +306,10 @@ task allImplementationJars {
 task allJars {
     dependsOn allApiJars
     dependsOn allImplementationJars
+}
+
+test {
+    useJUnitPlatform()
 }
 
 artifacts {

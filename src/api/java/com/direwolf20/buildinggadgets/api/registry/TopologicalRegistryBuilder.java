@@ -14,7 +14,7 @@ import java.util.*;
 
 public final class TopologicalRegistryBuilder<T> {
     private final MutableGraph<ValueObject<T>> theGraph;
-    private final SortedMap<ResourceLocation, ValueObject<T>> values;
+    private final Map<ResourceLocation, ValueObject<T>> values;
     private boolean build;
     private List<ValueObject<T>> sorted;
 
@@ -41,9 +41,9 @@ public final class TopologicalRegistryBuilder<T> {
         if (values.containsKey(Objects.requireNonNull(key))) {
             obj = values.get(key);
             obj.setValue(value);//override existing value
-        }
-        else {
+        } else {
             obj = new ValueObject<>(key, value);
+            Preconditions.checkArgument(! containsValue(value), "Cannot have duplicate values, as the mapping needs to be bijective!");
             values.put(key, obj);
             theGraph.addNode(obj);
         }
@@ -101,14 +101,23 @@ public final class TopologicalRegistryBuilder<T> {
         final List<T> objs = new ArrayList<>(sorted.size());
         final Map<ResourceLocation, T> map = new HashMap<>();
         sorted.stream().filter(val -> val.getValue() != null).forEach(obj -> {
-                    objs.add(obj.getValue());
-                    map.put(obj.getKey(), obj.getValue());
+            objs.add(obj.getValue());
+            map.put(obj.getKey(), obj.getValue());
         });
         return new ImmutableOrderedRegistry<>(map, objs);
     }
 
     private void validateUnbuild() {
         Preconditions.checkState(! build, "Cannot access already created Builder!");
+    }
+
+    private boolean containsValue(T value) {
+        //needs iterating as we cannot use a BiMap here, because we cannot do a value check on ValueObject, as this would contradict equals transitivity
+        for (ValueObject<T> existing : values.values()) {
+            if (existing.getValue() == value || (existing.getValue() != null && existing.getValue().equals(value)))
+                return true;
+        }
+        return false;
     }
 
     private static final class ValueObject<T> implements Comparable<ValueObject<?>> {
@@ -145,7 +154,6 @@ public final class TopologicalRegistryBuilder<T> {
         public boolean equals(Object o) {
             if (this == o) return true;
             if (! (o instanceof ValueObject)) return false;
-
             ValueObject<?> that = (ValueObject<?>) o;
 
             return getKey().equals(that.getKey());
