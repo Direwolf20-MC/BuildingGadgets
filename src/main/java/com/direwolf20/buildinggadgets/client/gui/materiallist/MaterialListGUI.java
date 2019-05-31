@@ -10,6 +10,7 @@ import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.google.common.base.Preconditions;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.item.ItemStack;
@@ -33,7 +34,22 @@ public class MaterialListGUI extends BasicGUIBase {
     public static final int WINDOW_WIDTH = BACKGROUND_WIDTH - BORDER_SIZE * 2;
     public static final int WINDOW_HEIGHT = BACKGROUND_HEIGHT - BORDER_SIZE * 2;
 
-    public static final String PATTERN = "%s (%s), %d";
+    /**
+     * <ol>
+     * <li>Item name (localized)
+     * <li>Item count
+     * </ol>
+     */
+    public static final String PATTERN_SIMPLE = "%s: %d";
+    /**
+     * <ol>
+     * <li>Item name (localized)
+     * <li>Item count
+     * <li>Item registry name
+     * <li>Formatted stack count, e.g. 5x64+2
+     * </ol>
+     */
+    public static final String PATTERN_DETAILED = "%s: %d (%s, %s)";
 
     private int backgroundX;
     private int backgroundY;
@@ -52,15 +68,6 @@ public class MaterialListGUI extends BasicGUIBase {
     private int hoveringTextX;
     private int hoveringTextY;
     private List<String> hoveringText;
-
-    private String dump() {
-        return scrollingList.getChildren().stream()
-                .map(entry -> String.format(PATTERN,
-                        entry.getItemName(),
-                        entry.getStack().getItem().getRegistryName(),
-                        entry.getRequired()))
-                .collect(Collectors.joining("\n"));
-    }
 
     public MaterialListGUI(ItemStack template) {
         Preconditions.checkArgument(template.getItem() instanceof ITemplate);
@@ -88,7 +95,7 @@ public class MaterialListGUI extends BasicGUIBase {
             buttonSortingModes.displayString = scrollingList.getSortingMode().getLocalizedName();
         });
         this.buttonCopyList = new GuiButtonAction(0, buttonY, 0, BUTTON_HEIGHT, MaterialListTranslation.BUTTON_COPY.format(), () -> {
-            mc.keyboardListener.setClipboardString(dump());
+            mc.keyboardListener.setClipboardString(stringify(GuiScreen.isCtrlKeyDown()));
             mc.player.sendStatusMessage(new TextComponentTranslation(MaterialListTranslation.MESSAGE_COPY_SUCCESS.getTranslationKey()), true);
         });
 
@@ -97,6 +104,30 @@ public class MaterialListGUI extends BasicGUIBase {
         this.addButton(buttonCopyList);
         this.addButton(buttonClose);
         this.calculateButtonsWidthAndX();
+    }
+
+    private String stringify(boolean detailed) {
+        if (detailed)
+            return stringifyDetailed();
+        return stringifySimple();
+    }
+
+    private String stringifyDetailed() {
+        return scrollingList.getChildren().stream()
+                .map(entry -> String.format(PATTERN_DETAILED,
+                        entry.getItemName(),
+                        entry.getRequired(),
+                        entry.getStack().getItem().getRegistryName(),
+                        entry.getFormattedRequired()))
+                .collect(Collectors.joining("\n"));
+    }
+
+    private String stringifySimple() {
+        return scrollingList.getChildren().stream()
+                .map(entry -> String.format(PATTERN_SIMPLE,
+                        entry.getItemName(),
+                        entry.getRequired()))
+                .collect(Collectors.joining("\n"));
     }
 
     @Override

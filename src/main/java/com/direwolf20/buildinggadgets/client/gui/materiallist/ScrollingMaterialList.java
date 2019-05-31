@@ -171,6 +171,15 @@ class ScrollingMaterialList extends GuiEntryList<Entry> {
             return itemName;
         }
 
+        public String getFormattedRequired() {
+            int maxSize = stack.getMaxStackSize();
+            int stacks = required / maxSize; // Integer division automatically floors
+            int leftover = required % maxSize;
+            if (stacks == 0)
+                return String.valueOf(leftover);
+            return stacks + "×" + maxSize + "+" + leftover;
+        }
+
         @Override
         public boolean mouseClicked(double x, double y, int button) {
             // Always select the entry
