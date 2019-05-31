@@ -1,74 +1,47 @@
 package com.direwolf20.buildinggadgets.test.building.placementTests;
 
+import com.direwolf20.buildinggadgets.api.building.Region;
 import com.direwolf20.buildinggadgets.api.building.placement.ExclusiveAxisChasing;
-import com.direwolf20.buildinggadgets.api.util.VectorUtils;
+import com.direwolf20.buildinggadgets.test.util.BlockTestUtils;
+import com.direwolf20.buildinggadgets.test.util.annotations.LargeTest;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumFacing.Axis;
 import net.minecraft.util.math.BlockPos;
-import org.junit.jupiter.api.RepeatedTest;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeAll;
 
+import java.util.List;
 import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ExclusiveAxisChasingTest {
 
-    private final Random random = new Random();
+    private Random random;
 
-    private Axis randomAxis() {
-        Axis[] axises = Axis.values();
-        return axises[random.nextInt(axises.length)];
+    @BeforeAll
+    void init() {
+        random = new Random();
     }
 
-    @RepeatedTest(10)
-    void sequenceShouldNotContainSourceAndTargetPositionRandom() {
-        BlockPos source = new BlockPos(random.nextInt(3) - 2, random.nextInt(3) - 2, random.nextInt(3) - 2);
-        BlockPos target = new BlockPos(random.nextInt(3) - 2, random.nextInt(3) - 2, random.nextInt(3) - 2);
-
-        ExclusiveAxisChasing sequence = ExclusiveAxisChasing.create(source, target, randomAxis());
-        for (BlockPos pos : sequence) {
-            assertNotEquals(source, pos);
-            assertNotEquals(target, pos);
+    private void verify(ExclusiveAxisChasing axisChasing, BlockPos source, BlockPos end, EnumFacing dir, int max) {
+        List<BlockPos> positions = axisChasing.collect();
+        assertEquals(positions.size(), max, () -> "Expected exactly " + max + " positions to be present, but found " + positions.size());
+        for (int i = 0; i < max; i++) {
+            BlockPos pos = source.offset(dir, i);
+            assertTrue(positions.contains(pos), () -> "Expected positions between " + source + " and " + end + " in dir" + false + " to contain " + pos);
         }
     }
 
-    @Test
-    void sequenceShouldHaveDifferenceAndMinimum0AsSizeCaseRandom() {
-        BlockPos source = new BlockPos(random.nextInt(3) - 2, random.nextInt(3) - 2, random.nextInt(3) - 2);
-        BlockPos target = new BlockPos(random.nextInt(3) - 2, random.nextInt(3) - 2, random.nextInt(3) - 2);
-        Axis axis = randomAxis();
-        int difference = VectorUtils.getAxisValue(source, axis) - VectorUtils.getAxisValue(target, axis);
-        int expected = difference <= 1 ? 0 : Math.abs(difference);
-
-        ExclusiveAxisChasing sequence = ExclusiveAxisChasing.create(source, target, randomAxis());
-        assertEquals(expected, sequence.collect().size());
-    }
-
-    @Test
-    void sequenceShouldHaveDifferenceMinus1AndMinimum0SizeCaseSourceAndTargetOffsetBy1HardCoded() {
+    @LargeTest
+    void testAllFacingsRandomly() {
+        Region testRegion = BlockTestUtils.randomRegion();
+        BlockPos p1 = BlockTestUtils.randomBlockPosIn(testRegion);
+        BlockPos p2 = BlockTestUtils.randomBlockPosIn(testRegion);
+        int max = random.nextInt(15);
         for (EnumFacing facing : EnumFacing.values()) {
-            //X changed by 1
-            ExclusiveAxisChasing sequence = ExclusiveAxisChasing.create(new BlockPos(13, 43, -424), new BlockPos(14, 43, -424), facing);
-            assertEquals(0, sequence.collect().size());
+            ExclusiveAxisChasing seq = ExclusiveAxisChasing.create(p1, p2, facing, max);
+            verify(seq, p1, p2, facing, max);
         }
-    }
-
-    @Test
-    void sequenceShouldHaveDifferenceMinus1AndMinimum0SizeCaseSourceAndTargetOffsetBy1Random() {
-        EnumFacing facing = EnumFacing.random(random);
-        ExclusiveAxisChasing sequence = ExclusiveAxisChasing.create(BlockPos.ORIGIN, BlockPos.ORIGIN.offset(facing), facing);
-        assertEquals(0, sequence.collect().size());
-    }
-
-    @Test
-    void sequenceShouldHaveDifferenceMinus1AndMinimum0SizeCaseSameSourceAndTargetRandom() {
-        EnumFacing facing = EnumFacing.random(random);
-        int i = random.nextInt(32);
-        BlockPos pos = BlockPos.ORIGIN.offset(facing, i);
-        ExclusiveAxisChasing sequence = ExclusiveAxisChasing.create(pos, pos, facing);
-        assertEquals(0, sequence.collect().size());
     }
 
 }

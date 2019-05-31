@@ -4,6 +4,7 @@ import com.direwolf20.buildinggadgets.api.building.IPositionPlacementSequence;
 import com.direwolf20.buildinggadgets.api.building.IValidatorFactory;
 import com.direwolf20.buildinggadgets.api.building.modes.AtopSupportedMode;
 import com.direwolf20.buildinggadgets.api.building.placement.ExclusiveAxisChasing;
+import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.lang.ModeTranslation;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import net.minecraft.entity.player.EntityPlayer;
@@ -29,7 +30,8 @@ public class BuildToMeMode extends AtopSupportedMode {
 
     @Override
     public IPositionPlacementSequence computeWithTransformed(EntityPlayer player, BlockPos transformed, BlockPos original, EnumFacing sideHit, ItemStack tool) {
-        return ExclusiveAxisChasing.create(transformed, new BlockPos(Math.floor(player.posX), Math.floor(player.posY), Math.floor(player.posZ)), sideHit);
+        int range = GadgetUtils.getToolRange(tool);
+        return ExclusiveAxisChasing.create(transformed, new BlockPos(Math.floor(player.posX), Math.floor(player.posY), Math.floor(player.posZ)), sideHit, range);
     }
 
     @Override
