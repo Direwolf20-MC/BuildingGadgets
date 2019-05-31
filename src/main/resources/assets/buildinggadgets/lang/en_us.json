@@ -109,13 +109,14 @@
 
     "_comment": "gui - material list:",
     "gui.buildinggadgets.materialList.button.close": "Close",
-    "gui.buildinggadgets.materialList.button.refresh": "Refresh",
+    "gui.buildinggadgets.materialList.button.copyList": "Copy",
     "gui.buildinggadgets.materialList.button.sorting.nameAZ": "A-Z",
     "gui.buildinggadgets.materialList.button.sorting.nameZA": "Z-A",
     "gui.buildinggadgets.materialList.button.sorting.requiredAcse": "Required ↓",
     "gui.buildinggadgets.materialList.button.sorting.requiredDesc": "Required ↑",
     "gui.buildinggadgets.materialList.button.sorting.missingAcse": "Missing ↓",
     "gui.buildinggadgets.materialList.button.sorting.missingDesc": "Missing ↑",
+    "gui.buildinggadgets.materialList.message.copyList.success": "Successfully copied material list",
     "gui.buildinggadgets.materialList.title": "Material List",
 
     "_comment": "gui - help:",

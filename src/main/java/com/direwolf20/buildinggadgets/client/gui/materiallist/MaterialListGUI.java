@@ -12,12 +12,13 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.TextComponentTranslation;
 
 import java.awt.*;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class MaterialListGUI extends BasicGUIBase {
 
@@ -32,6 +33,8 @@ public class MaterialListGUI extends BasicGUIBase {
     public static final int WINDOW_WIDTH = BACKGROUND_WIDTH - BORDER_SIZE * 2;
     public static final int WINDOW_HEIGHT = BACKGROUND_HEIGHT - BORDER_SIZE * 2;
 
+    public static final String PATTERN = "%s (%s), %d";
+
     private int backgroundX;
     private int backgroundY;
     private ItemStack template;
@@ -44,10 +47,20 @@ public class MaterialListGUI extends BasicGUIBase {
 
     private GuiButtonAction buttonClose;
     private GuiButtonAction buttonSortingModes;
+    private GuiButtonAction buttonCopyList;
 
     private int hoveringTextX;
     private int hoveringTextY;
     private List<String> hoveringText;
+
+    private String dump() {
+        return scrollingList.getChildren().stream()
+                .map(entry -> String.format(PATTERN,
+                        entry.getItemName(),
+                        entry.getStack().getItem().getRegistryName(),
+                        entry.getRequired()))
+                .collect(Collectors.joining("\n"));
+    }
 
     public MaterialListGUI(ItemStack template) {
         Preconditions.checkArgument(template.getItem() instanceof ITemplate);
@@ -74,7 +87,14 @@ public class MaterialListGUI extends BasicGUIBase {
             scrollingList.setSortingMode(scrollingList.getSortingMode().next());
             buttonSortingModes.displayString = scrollingList.getSortingMode().getLocalizedName();
         });
+        this.buttonCopyList = new GuiButtonAction(0, buttonY, 0, BUTTON_HEIGHT, MaterialListTranslation.BUTTON_COPY.format(), () -> {
+            mc.keyboardListener.setClipboardString(dump());
+            mc.player.sendStatusMessage(new TextComponentTranslation(MaterialListTranslation.MESSAGE_COPY_SUCCESS.getTranslationKey()), true);
+        });
+
+        // Buttons will be placed left to right in this order
         this.addButton(buttonSortingModes);
+        this.addButton(buttonCopyList);
         this.addButton(buttonClose);
         this.calculateButtonsWidthAndX();
     }

@@ -3,8 +3,8 @@ package com.direwolf20.buildinggadgets.client.gui.materiallist;
 import com.direwolf20.buildinggadgets.client.gui.base.GuiEntryList;
 import com.direwolf20.buildinggadgets.client.utils.AlignmentUtil;
 import com.direwolf20.buildinggadgets.client.utils.RenderUtil;
-import com.direwolf20.buildinggadgets.common.util.tools.UniqueItem;
 import com.direwolf20.buildinggadgets.common.util.helpers.InventoryHelper;
+import com.direwolf20.buildinggadgets.common.util.tools.UniqueItem;
 import com.google.common.collect.Multiset;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiListExtended;
@@ -46,15 +46,15 @@ class ScrollingMaterialList extends GuiEntryList<Entry> {
         this.gui = gui;
 
         Multiset<UniqueItem> materials = gui.getTemplateItem().getItemCountMap(gui.getTemplate());
+        this.setSortingMode(SortingModes.NAME);
+        this.selectedElement = -1;
+
         EntityPlayer player = Minecraft.getInstance().player;
         World world = Minecraft.getInstance().world;
         for (Multiset.Entry<UniqueItem> entry : materials.entrySet()) {
             UniqueItem item = entry.getElement();
             addEntry(new Entry(this, item, entry.getCount(), InventoryHelper.countItem(item.toItemStack(), player, world)));
         }
-        this.setSortingMode(SortingModes.NAME);
-
-        this.selectedElement = -1;
     }
 
     @Override
