@@ -131,7 +131,7 @@ public final class ConnectedSurface implements IPositionPlacementSequence {
 
     private boolean isStateValid(IBlockState filter, BlockPos pos) {
         IBlockState reference = getReferenceFor(pos);
-        boolean isAir = reference.getBlock().isAir(reference, world, pos);
+        boolean isAir = reference.isAir(world, pos);
         // If fuzzy=true, we ignore the block for reference
         if (fuzzy)
             return !isAir;

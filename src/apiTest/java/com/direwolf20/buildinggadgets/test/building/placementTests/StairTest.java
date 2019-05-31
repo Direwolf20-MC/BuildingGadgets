@@ -15,11 +15,11 @@ public class StairTest {
     private final Random random = new Random();
 
     @RepeatedTest(4)
-    void stairShouldContainSameAmountOfBlocksPlus1AsSizeParameter() {
+    void stairShouldContainSameAmountOfBlocksAsSizeParameter() {
         int size = random.nextInt(16);
         Stair stair = Stair.create(BlockPos.ORIGIN, EnumFacing.NORTH, EnumFacing.UP, size);
 
-        assertEquals(size + 1, stair.collect().size());
+        assertEquals(size, stair.collect().size());
     }
 
     @RepeatedTest(4)

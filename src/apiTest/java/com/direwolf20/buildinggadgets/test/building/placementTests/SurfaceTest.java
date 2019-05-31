@@ -14,7 +14,7 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@Disabled("requires custom runner with minecraft started")
+@Disabled("needs improvements of the UniqueBlockState to handle air properly")
 public class SurfaceTest {
 
     private static final Random random = new Random();

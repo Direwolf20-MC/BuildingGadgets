@@ -9,6 +9,7 @@ import net.minecraft.util.EnumFacing.AxisDirection;
 import net.minecraft.util.math.BlockPos;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Iterator;
 import java.util.Spliterator;
 
@@ -48,13 +49,13 @@ public final class Wall implements IPositionPlacementSequence {
     private final Region region;
 
     @VisibleForTesting
-    private Wall(BlockPos posHit, EnumFacing side, int radius, EnumFacing extendingSide, int extendingSize) {
+    private Wall(BlockPos posHit, EnumFacing side, int radius, @Nullable EnumFacing extendingSide, int extendingSize) {
         Region createdRegion = new Region(posHit).expand(
                 radius * (1 - Math.abs(side.getXOffset())),
                 radius * (1 - Math.abs(side.getYOffset())),
                 radius * (1 - Math.abs(side.getZOffset())));
 
-        if (extendingSize != 0) {
+        if (extendingSize != 0 && extendingSide != null) {
             if (extendingSide.getAxisDirection() == AxisDirection.POSITIVE)
                 this.region = new Region(createdRegion.getMin(), createdRegion.getMax().offset(extendingSide, extendingSize));
             else

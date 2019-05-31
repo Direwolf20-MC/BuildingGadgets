@@ -17,7 +17,7 @@ import java.util.Set;
 import static com.direwolf20.buildinggadgets.test.util.CasedBlockView.regionAtOriginWithRandomTargets;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@Disabled("requires custom runner with minecraft started")
+@Disabled("needs improvements of the UniqueBlockState to handle air properly")
 public class ConnectedSurfaceTest {
 
     private final Random random = new Random();
@@ -35,7 +35,7 @@ public class ConnectedSurfaceTest {
     }
 
     @Test
-    void connectedSurfaceShouldOnlyIncludeBlocksThatHasSameBlockUnderAsStartingPosition5By5RandomSelected30DifferPositions() {
+    void connectedSurfaceShouldOnlyIncludeBlocksThatHaveSameBlockAsStartingPosition5By5RandomSelected30DifferPositions() {
         CasedBlockView world = regionAtOriginWithRandomTargets(5, 30);
         IBlockState selectedBlock = world.getBlockState(BlockPos.ORIGIN);
 

@@ -5,6 +5,7 @@ import com.direwolf20.buildinggadgets.api.util.VectorUtils;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumFacing.Axis;
 import net.minecraft.util.math.BlockPos;
+import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 
 import java.util.Random;
@@ -21,7 +22,7 @@ public class ExclusiveAxisChasingTest {
         return axises[random.nextInt(axises.length)];
     }
 
-    @Test
+    @RepeatedTest(10)
     void sequenceShouldNotContainSourceAndTargetPositionRandom() {
         BlockPos source = new BlockPos(random.nextInt(3) - 2, random.nextInt(3) - 2, random.nextInt(3) - 2);
         BlockPos target = new BlockPos(random.nextInt(3) - 2, random.nextInt(3) - 2, random.nextInt(3) - 2);

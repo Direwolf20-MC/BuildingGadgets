@@ -1,30 +1,33 @@
 package com.direwolf20.buildinggadgets.test.building.placementTests;
 
 import com.direwolf20.buildinggadgets.api.building.placement.Wall;
-import com.direwolf20.buildinggadgets.api.util.MathUtils;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 
 import java.util.Random;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class WallTest {
 
     private final Random random = new Random();
 
     @RepeatedTest(8)
-    void clickedSideShouldReturnWallWithFlooredNearestOddNumberAsLengthCaseFacingUpRandomInputAndValidatesWithMathTool() {
+    void clickedSideReturnsCorrectWall() {
         int range = random.nextInt(16);
-        int floored = MathHelper.clamp(MathUtils.floorToOdd(range), 1, 15);
+        int size = 2 * range + 1;
         Wall wall = Wall.clickedSide(BlockPos.ORIGIN, EnumFacing.UP, range);
 
-        assertEquals(floored, wall.getBoundingBox().getXSize());
-        assertEquals(floored, wall.getBoundingBox().getZSize());
+        assertEquals(size, wall.getBoundingBox().getXSize());
+        assertEquals(size, wall.getBoundingBox().getZSize());
+        assertEquals(1, wall.getBoundingBox().getYSize());
+        for (BlockPos pos : wall) {
+            assertTrue(pos.getX() <= range);
+            assertTrue(pos.getZ() <= range);
+            assertEquals(0, pos.getY());
+        }
     }
 
     @Test

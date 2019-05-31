@@ -2,38 +2,30 @@ package com.direwolf20.buildinggadgets.test.util;
 
 import com.google.common.collect.ImmutableMap;
 import net.minecraft.block.Block;
-import net.minecraft.block.SoundType;
 import net.minecraft.block.material.EnumPushReaction;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.material.MaterialColor;
 import net.minecraft.block.state.BlockFaceShape;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.particle.ParticleManager;
-import net.minecraft.entity.*;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.IFluidState;
 import net.minecraft.item.BlockItemUseContext;
-import net.minecraft.item.EnumDyeColor;
-import net.minecraft.item.ItemStack;
-import net.minecraft.pathfinding.PathNodeType;
 import net.minecraft.pathfinding.PathType;
 import net.minecraft.state.IProperty;
 import net.minecraft.tags.Tag;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.shapes.VoxelShape;
+import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.world.*;
-import net.minecraftforge.common.IPlantable;
-import net.minecraftforge.common.ToolType;
 
-import javax.annotation.Nullable;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Objects;
 import java.util.Random;
-import java.util.function.Predicate;
 
 /**
  * Fake block state without launching Minecraft. This should be used as an identifier and most of the functions and block
@@ -52,6 +44,43 @@ public class UniqueBlockState implements IBlockState {
         @Override
         public Material getMaterial() {
             return Material.AIR;
+        }
+    };
+
+    public static final IFluidState EMPTY_FLUID = new IFluidState() {
+        @Override
+        public Fluid getFluid() {
+            throw new AssertionError("Did not expect Fluid access");
+        }
+
+        @Override
+        public Collection<IProperty<?>> getProperties() {
+            return Collections.emptyList();
+        }
+
+        @Override
+        public <T extends Comparable<T>> boolean has(IProperty<T> property) {
+            return false;
+        }
+
+        @Override
+        public <T extends Comparable<T>> T get(IProperty<T> property) {
+            return null;
+        }
+
+        @Override
+        public <T extends Comparable<T>, V extends T> IFluidState with(IProperty<T> property, V value) {
+            return this;
+        }
+
+        @Override
+        public <T extends Comparable<T>> IFluidState cycle(IProperty<T> property) {
+            return this;
+        }
+
+        @Override
+        public ImmutableMap<IProperty<?>, Comparable<?>> getValues() {
+            return ImmutableMap.of();
         }
     };
 
@@ -103,12 +132,12 @@ public class UniqueBlockState implements IBlockState {
 
     @Override
     public Block getBlock() {
-        return null;
+        throw new AssertionError("Expected access to BlockState Methods instead of the backing Block!");
     }
 
     @Override
     public Collection<IProperty<?>> getProperties() {
-        return null;
+        return Collections.emptyList();
     }
 
     @Override
@@ -118,7 +147,7 @@ public class UniqueBlockState implements IBlockState {
 
     @Override
     public <T extends Comparable<T>> IBlockState cycle(IProperty<T> property) {
-        return null;
+        return this;
     }
 
     @Override
@@ -153,22 +182,22 @@ public class UniqueBlockState implements IBlockState {
 
     @Override
     public MaterialColor getMapColor(IBlockReader worldIn, BlockPos pos) {
-        return null;
+        return MaterialColor.AIR;
     }
 
     @Override
     public IBlockState rotate(Rotation rot) {
-        return null;
+        return this;
     }
 
     @Override
     public IBlockState mirror(Mirror mirrorIn) {
-        return null;
+        return this;
     }
 
     @Override
     public boolean isFullCube() {
-        return false;
+        return true;
     }
 
     @Override
@@ -178,7 +207,7 @@ public class UniqueBlockState implements IBlockState {
 
     @Override
     public EnumBlockRenderType getRenderType() {
-        return null;
+        return EnumBlockRenderType.MODEL;
     }
 
     @Override
@@ -193,12 +222,12 @@ public class UniqueBlockState implements IBlockState {
 
     @Override
     public boolean isBlockNormalCube() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isNormalCube() {
-        return false;
+        return true;
     }
 
     @Override
@@ -238,17 +267,17 @@ public class UniqueBlockState implements IBlockState {
 
     @Override
     public EnumPushReaction getPushReaction() {
-        return null;
+        return EnumPushReaction.NORMAL;
     }
 
     @Override
     public boolean isOpaqueCube(IBlockReader worldIn, BlockPos pos) {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isSolid() {
-        return false;
+        return true;
     }
 
     @Override
@@ -258,32 +287,32 @@ public class UniqueBlockState implements IBlockState {
 
     @Override
     public VoxelShape getShape(IBlockReader worldIn, BlockPos pos) {
-        return null;
+        return VoxelShapes.fullCube();
     }
 
     @Override
     public VoxelShape getCollisionShape(IBlockReader worldIn, BlockPos pos) {
-        return null;
+        return VoxelShapes.fullCube();
     }
 
     @Override
     public VoxelShape getRenderShape(IBlockReader worldIn, BlockPos pos) {
-        return null;
+        return VoxelShapes.fullCube();
     }
 
     @Override
     public VoxelShape getRaytraceShape(IBlockReader worldIn, BlockPos pos) {
-        return null;
+        return VoxelShapes.fullCube();
     }
 
     @Override
     public boolean isTopSolid() {
-        return false;
+        return true;
     }
 
     @Override
     public Vec3d getOffset(IBlockReader access, BlockPos pos) {
-        return null;
+        return new Vec3d(pos);
     }
 
     @Override
@@ -363,7 +392,7 @@ public class UniqueBlockState implements IBlockState {
 
     @Override
     public IBlockState updatePostPlacement(EnumFacing face, IBlockState queried, IWorld worldIn, BlockPos currentPos, BlockPos offsetPos) {
-        return null;
+        return this;
     }
 
     @Override
@@ -393,7 +422,7 @@ public class UniqueBlockState implements IBlockState {
 
     @Override
     public IFluidState getFluidState() {
-        return null;
+        return EMPTY_FLUID;
     }
 
     @Override
@@ -415,346 +444,16 @@ public class UniqueBlockState implements IBlockState {
 
     @Override
     public <T extends Comparable<T>, V extends T> IBlockState with(IProperty<T> property, V value) {
-        return null;
+        return this;
     }
 
     @Override
     public ImmutableMap<IProperty<?>, Comparable<?>> getValues() {
-        return null;
+        return ImmutableMap.of();
     }
 
     @Override
     public IBlockState getBlockState() {
-        return null;
-    }
-
-    @Override
-    public float getSlipperiness(IWorldReader world, BlockPos pos, @Nullable Entity entity) {
-        return 0;
-    }
-
-    @Override
-    public int getLightValue(IWorldReader world, BlockPos pos) {
-        return 0;
-    }
-
-    @Override
-    public boolean isLadder(IWorldReader world, BlockPos pos, EntityLivingBase entity) {
-        return false;
-    }
-
-    @Override
-    public boolean isNormalCube(IBlockReader world, BlockPos pos) {
-        return false;
-    }
-
-    @Override
-    public boolean doesSideBlockRendering(IWorldReader world, BlockPos pos, EnumFacing face) {
-        return false;
-    }
-
-    @Override
-    public boolean hasTileEntity() {
-        return false;
-    }
-
-    @Nullable
-    @Override
-    public TileEntity createTileEntity(IBlockReader world) {
-        return null;
-    }
-
-    @Override
-    public boolean canSilkHarvest(IWorldReader world, BlockPos pos, EntityPlayer player) {
-        return false;
-    }
-
-    @Override
-    public boolean canHarvestBlock(IBlockReader world, BlockPos pos, EntityPlayer player) {
-        return false;
-    }
-
-    @Override
-    public boolean removedByPlayer(World world, BlockPos pos, EntityPlayer player, boolean willHarvest, IFluidState fluid) {
-        return false;
-    }
-
-    @Override
-    public boolean isBed(IBlockReader world, BlockPos pos, @Nullable EntityPlayer player) {
-        return false;
-    }
-
-    @Override
-    public boolean canCreatureSpawn(IWorldReaderBase world, BlockPos pos, EntitySpawnPlacementRegistry.SpawnPlacementType type, EntityType<? extends EntityLiving> entityType) {
-        return false;
-    }
-
-    @Nullable
-    @Override
-    public BlockPos getBedSpawnPosition(IBlockReader world, BlockPos pos, @Nullable EntityPlayer player) {
-        return null;
-    }
-
-    @Override
-    public void setBedOccupied(IWorldReader world, BlockPos pos, EntityPlayer player, boolean occupied) {
-
-    }
-
-    @Override
-    public EnumFacing getBedDirection(IWorldReader world, BlockPos pos) {
-        return null;
-    }
-
-    @Override
-    public boolean isBedFoot(IWorldReader world, BlockPos pos) {
-        return false;
-    }
-
-    @Override
-    public void beginLeaveDecay(IWorldReader world, BlockPos pos) {
-
-    }
-
-    @Override
-    public boolean isAir(IBlockReader world, BlockPos pos) {
-        return false;
-    }
-
-    @Override
-    public boolean canBeReplacedByLeaves(IWorldReaderBase world, BlockPos pos) {
-        return false;
-    }
-
-    @Override
-    public boolean isReplaceableOreGen(IWorldReader world, BlockPos pos, Predicate<IBlockState> target) {
-        return false;
-    }
-
-    @Override
-    public float getExplosionResistance(IWorldReader world, BlockPos pos, @Nullable Entity exploder, Explosion explosion) {
-        return 0;
-    }
-
-    @Override
-    public void onBlockExploded(World world, BlockPos pos, Explosion explosion) {
-
-    }
-
-    @Override
-    public boolean canConnectRedstone(IBlockReader world, BlockPos pos, @Nullable EnumFacing side) {
-        return false;
-    }
-
-    @Override
-    public boolean canPlaceTorchOnTop(IWorldReaderBase world, BlockPos pos) {
-        return false;
-    }
-
-    @Override
-    public ItemStack getPickBlock(RayTraceResult target, IBlockReader world, BlockPos pos, EntityPlayer player) {
-        return null;
-    }
-
-    @Override
-    public boolean isFoliage(IWorldReader world, BlockPos pos) {
-        return false;
-    }
-
-    @Override
-    public boolean addLandingEffects(WorldServer worldserver, BlockPos pos, IBlockState state2, EntityLivingBase entity, int numberOfParticles) {
-        return false;
-    }
-
-    @Override
-    public boolean addRunningEffects(World world, BlockPos pos, Entity entity) {
-        return false;
-    }
-
-    @Override
-    public boolean addHitEffects(World world, RayTraceResult target, ParticleManager manager) {
-        return false;
-    }
-
-    @Override
-    public boolean addDestroyEffects(World world, BlockPos pos, ParticleManager manager) {
-        return false;
-    }
-
-    @Override
-    public boolean canSustainPlant(IBlockReader world, BlockPos pos, EnumFacing facing, IPlantable plantable) {
-        return false;
-    }
-
-    @Override
-    public void onPlantGrow(IWorld world, BlockPos pos, BlockPos source) {
-
-    }
-
-    @Override
-    public boolean isFertile(IBlockReader world, BlockPos pos) {
-        return false;
-    }
-
-    @Override
-    public boolean isBeaconBase(IWorldReader world, BlockPos pos, BlockPos beacon) {
-        return false;
-    }
-
-    @Override
-    public int getExpDrop(IWorldReader world, BlockPos pos, int fortune) {
-        return 0;
-    }
-
-    @Override
-    public IBlockState rotate(IWorld world, BlockPos pos, Rotation direction) {
-        return null;
-    }
-
-    @Override
-    public float getEnchantPowerBonus(IWorldReader world, BlockPos pos) {
-        return 0;
-    }
-
-    @Override
-    public boolean recolorBlock(IWorld world, BlockPos pos, EnumFacing facing, EnumDyeColor color) {
-        return false;
-    }
-
-    @Override
-    public void onNeighborChange(IWorldReader world, BlockPos pos, BlockPos neighbor) {
-
-    }
-
-    @Override
-    public void observedNeighborChange(World world, BlockPos pos, Block changed, BlockPos changedPos) {
-
-    }
-
-    @Override
-    public boolean shouldCheckWeakPower(IWorldReader world, BlockPos pos, EnumFacing side) {
-        return false;
-    }
-
-    @Override
-    public boolean getWeakChanges(IWorldReader world, BlockPos pos) {
-        return false;
-    }
-
-    @Override
-    public ToolType getHarvestTool() {
-        return null;
-    }
-
-    @Override
-    public int getHarvestLevel() {
-        return 0;
-    }
-
-    @Override
-    public boolean isToolEffective(ToolType tool) {
-        return false;
-    }
-
-    @Override
-    public IBlockState getExtendedState(IBlockReader world, BlockPos pos) {
-        return null;
-    }
-
-    @Override
-    public boolean canRenderInLayer(BlockRenderLayer layer) {
-        return false;
-    }
-
-    @Override
-    public SoundType getSoundType(IWorldReader world, BlockPos pos, @Nullable Entity entity) {
-        return null;
-    }
-
-    @Nullable
-    @Override
-    public float[] getBeaconColorMultiplier(IWorldReader world, BlockPos pos, BlockPos beacon) {
-        return new float[0];
-    }
-
-    @Override
-    public Vec3d getFogColor(IWorldReader world, BlockPos pos, Entity entity, Vec3d originalColor, float partialTicks) {
-        return null;
-    }
-
-    @Override
-    public IBlockState getStateAtViewpoint(IWorldReader world, BlockPos pos, Vec3d viewpoint) {
-        return null;
-    }
-
-    @Override
-    public IBlockState getStateForPlacement(EnumFacing facing, IBlockState state2, IWorld world, BlockPos pos1, BlockPos pos2, EnumHand hand) {
-        return null;
-    }
-
-    @Override
-    public boolean canBeConnectedTo(IBlockReader world, BlockPos pos, EnumFacing facing) {
-        return false;
-    }
-
-    @Override
-    public boolean doesSideBlockChestOpening(IBlockReader world, BlockPos pos, EnumFacing side) {
-        return false;
-    }
-
-    @Override
-    public boolean isStickyBlock() {
-        return false;
-    }
-
-    @Override
-    public void getDrops(NonNullList<ItemStack> drops, World world, BlockPos pos, int fortune) {
-
-    }
-
-    @Override
-    public int getFlammability(IBlockReader world, BlockPos pos, EnumFacing face) {
-        return 0;
-    }
-
-    @Override
-    public boolean isFlammable(IBlockReader world, BlockPos pos, EnumFacing face) {
-        return false;
-    }
-
-    @Override
-    public int getFireSpreadSpeed(IBlockReader world, BlockPos pos, EnumFacing face) {
-        return 0;
-    }
-
-    @Override
-    public boolean isFireSource(IBlockReader world, BlockPos pos, EnumFacing side) {
-        return false;
-    }
-
-    @Override
-    public boolean canEntityDestroy(IBlockReader world, BlockPos pos, Entity entity) {
-        return false;
-    }
-
-    @Nullable
-    @Override
-    public EnumFacing[] getValidRotations(IBlockReader world, BlockPos pos) {
-        return new EnumFacing[0];
-    }
-
-    @Override
-    public boolean isBurning(IBlockReader world, BlockPos pos) {
-        return false;
-    }
-
-    @Override
-    public boolean isTopSolid(IWorldReader world, BlockPos pos) {
-        return false;
-    }
-
-    @Nullable
-    @Override
-    public PathNodeType getAiPathNodeType(IBlockReader world, BlockPos pos, @Nullable EntityLiving entity) {
-        return null;
+        return this;
     }
 }

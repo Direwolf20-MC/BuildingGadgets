@@ -40,11 +40,11 @@ public class ColumnTest {
             Iterator<BlockPos> it = column.iterator();
 
             if (facing.getAxisDirection() == EnumFacing.AxisDirection.NEGATIVE) {
-                for (int i = 15; i >= 1; i--) {
+                for (int i = 14; i >= 0; i--) {
                     assertEquals(BlockPos.ORIGIN.offset(facing, i), it.next());
                 }
             } else {
-                for (int i = 1; i <= 15; i++) {
+                for (int i = 0; i <= 14; i++) {
                     assertEquals(BlockPos.ORIGIN.offset(facing, i), it.next());
                 }
             }

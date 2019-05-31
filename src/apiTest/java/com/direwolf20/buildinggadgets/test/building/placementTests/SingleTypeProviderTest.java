@@ -21,7 +21,7 @@ public class SingleTypeProviderTest {
 
     //TODO implement custom runner that launches minecraft
     //  this does not work since NBTUtil.readBlockState(IBlockState) accesses block registry, and using
-    //  UniqueBlockState losses the point of testing
+    //  UniqueBlockState looses the point of testing
     @Disabled("requires custom runner with minecraft started")
     @Test
     void stateAfterSerializationShouldRemainSameAsBeforeSerialization() {
