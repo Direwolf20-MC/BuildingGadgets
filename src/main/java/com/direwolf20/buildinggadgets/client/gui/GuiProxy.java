@@ -1,11 +1,15 @@
 package com.direwolf20.buildinggadgets.client.gui;
 
+import com.direwolf20.buildinggadgets.client.gui.materiallist.MaterialListGUI;
 import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManagerContainer;
 import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManagerGUI;
 import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManagerTileEntity;
+import com.direwolf20.buildinggadgets.common.items.ITemplate;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetDestruction;
+import com.direwolf20.buildinggadgets.common.tools.InventoryManipulation;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -16,6 +20,7 @@ public class GuiProxy implements IGuiHandler {
     public static final int CopyPasteID = 0;
     public static final int DestructionID = 1;
     public static final int PasteID = 2;
+    public static final int MaterialListID = 3;
 
     @Override
     public Object getServerGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
@@ -24,7 +29,6 @@ public class GuiProxy implements IGuiHandler {
         if (te instanceof TemplateManagerTileEntity) {
             return new TemplateManagerContainer(player.inventory, (TemplateManagerTileEntity) te);
         }
-
 
         return null;
     }
@@ -58,7 +62,13 @@ public class GuiProxy implements IGuiHandler {
                 return new PasteGUI(player.getHeldItemOffhand());
             else
                 return null;
+        } else if (ID == MaterialListID) {
+            ItemStack template = InventoryManipulation.getStackInEitherHand(player, ITemplate.class);
+            if (template != ItemStack.EMPTY)
+                return new MaterialListGUI(template);
+            return null;
         }
         return null;
     }
+
 }

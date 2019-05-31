@@ -56,6 +56,7 @@ key.rotate_mirror=Rotate / Mirror
 key.undo=Undo
 key.fuzzy=Fuzzy
 key.connected_area=Connected Area
+key.material_list=Material List
 
 #tooltip: 
 tooltip.constructionblockpowder.helptext=Place next to water
@@ -125,6 +126,21 @@ help.gui.buildinggadgets.button.help.exit=Exit help mode
 help.gui.buildinggadgets.button.load=Loads data onto a gadget/template from a template
 help.gui.buildinggadgets.button.paste=Pastes data on your computer's clipboard to a pre-existing template, or to a piece of paper, creating a template
 help.gui.buildinggadgets.button.save=Saves the data in the gadget/template to a pre-existing template, or to a piece of paper, creating a template
+
+#gui button name:
+gui.buildinggadgets.materialList.button.close=Close
+gui.buildinggadgets.materialList.button.refreshCount=Refresh Count
+gui.buildinggadgets.materialList.button.sortingMode.countReversed=Count ↑
+gui.buildinggadgets.materialList.button.sortingMode.name=Name ↓
+gui.buildinggadgets.materialList.button.sortingMode.nameReversed=Name ↑
+gui.buildinggadgets.materialList.button.sortingMode.count=Count ↓
+gui.buildinggadgets.materialList.button.sortingMode.countReversed=Count ↑
+
+#gui texts
+gui.buildinggadgets.materialList.text.statusTemplate=%s/%s
+
+#gui title:
+gui.buildinggadgets.materialList.title=Material List
 
 #config:
 config.buildinggadgets.general.rayTraceRange=Max Build Distance
