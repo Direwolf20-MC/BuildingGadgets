@@ -386,7 +386,7 @@ public class InventoryHelper {
     }
 
     private static NonNullList<ItemStack> playerInv(EntityPlayer player) {
-        NonNullList<ItemStack> wholeInv = new NonNullList<>(player.inventory.mainInventory, ItemStack.EMPTY);
+        NonNullList<ItemStack> wholeInv = NonNullList.from(ItemStack.EMPTY, (ItemStack[]) player.inventory.mainInventory.toArray());
         wholeInv.addAll(player.inventory.offHandInventory);
         wholeInv.addAll(player.inventory.armorInventory);
         return wholeInv;

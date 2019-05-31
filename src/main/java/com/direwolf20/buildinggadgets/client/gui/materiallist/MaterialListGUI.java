@@ -10,14 +10,16 @@ import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.google.common.base.Preconditions;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.TextComponentTranslation;
 
 import java.awt.*;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class MaterialListGUI extends BasicGUIBase {
 
@@ -32,6 +34,23 @@ public class MaterialListGUI extends BasicGUIBase {
     public static final int WINDOW_WIDTH = BACKGROUND_WIDTH - BORDER_SIZE * 2;
     public static final int WINDOW_HEIGHT = BACKGROUND_HEIGHT - BORDER_SIZE * 2;
 
+    /**
+     * <ol>
+     * <li>Item name (localized)
+     * <li>Item count
+     * </ol>
+     */
+    public static final String PATTERN_SIMPLE = "%s: %d";
+    /**
+     * <ol>
+     * <li>Item name (localized)
+     * <li>Item count
+     * <li>Item registry name
+     * <li>Formatted stack count, e.g. 5x64+2
+     * </ol>
+     */
+    public static final String PATTERN_DETAILED = "%s: %d (%s, %s)";
+
     private int backgroundX;
     private int backgroundY;
     private ItemStack template;
@@ -44,6 +63,7 @@ public class MaterialListGUI extends BasicGUIBase {
 
     private GuiButtonAction buttonClose;
     private GuiButtonAction buttonSortingModes;
+    private GuiButtonAction buttonCopyList;
 
     private int hoveringTextX;
     private int hoveringTextY;
@@ -74,9 +94,40 @@ public class MaterialListGUI extends BasicGUIBase {
             scrollingList.setSortingMode(scrollingList.getSortingMode().next());
             buttonSortingModes.displayString = scrollingList.getSortingMode().getLocalizedName();
         });
+        this.buttonCopyList = new GuiButtonAction(0, buttonY, 0, BUTTON_HEIGHT, MaterialListTranslation.BUTTON_COPY.format(), () -> {
+            mc.keyboardListener.setClipboardString(stringify(GuiScreen.isCtrlKeyDown()));
+            mc.player.sendStatusMessage(new TextComponentTranslation(MaterialListTranslation.MESSAGE_COPY_SUCCESS.getTranslationKey()), true);
+        });
+
+        // Buttons will be placed left to right in this order
         this.addButton(buttonSortingModes);
+        this.addButton(buttonCopyList);
         this.addButton(buttonClose);
         this.calculateButtonsWidthAndX();
+    }
+
+    private String stringify(boolean detailed) {
+        if (detailed)
+            return stringifyDetailed();
+        return stringifySimple();
+    }
+
+    private String stringifyDetailed() {
+        return scrollingList.getChildren().stream()
+                .map(entry -> String.format(PATTERN_DETAILED,
+                        entry.getItemName(),
+                        entry.getRequired(),
+                        entry.getStack().getItem().getRegistryName(),
+                        entry.getFormattedRequired()))
+                .collect(Collectors.joining("\n"));
+    }
+
+    private String stringifySimple() {
+        return scrollingList.getChildren().stream()
+                .map(entry -> String.format(PATTERN_SIMPLE,
+                        entry.getItemName(),
+                        entry.getRequired()))
+                .collect(Collectors.joining("\n"));
     }
 
     @Override

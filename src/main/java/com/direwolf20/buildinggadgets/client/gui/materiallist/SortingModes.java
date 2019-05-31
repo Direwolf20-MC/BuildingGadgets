@@ -2,10 +2,8 @@ package com.direwolf20.buildinggadgets.client.gui.materiallist;
 
 import com.direwolf20.buildinggadgets.common.util.lang.ITranslationProvider;
 import com.direwolf20.buildinggadgets.common.util.lang.MaterialListTranslation;
-import net.minecraft.client.resources.I18n;
 
 import java.util.Comparator;
-import java.util.List;
 
 import static com.direwolf20.buildinggadgets.client.gui.materiallist.ScrollingMaterialList.Entry;
 
@@ -38,7 +36,7 @@ enum SortingModes {
         int nextIndex = ordinal() + 1;
         return VALUES[nextIndex >= VALUES.length ? 0 : nextIndex];
     }
-    
+
     public static final SortingModes[] VALUES = values();
 
 }
