@@ -16,10 +16,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ExclusiveAxisChasingTest {
 
-    private Random random;
+    private static Random random;
 
     @BeforeAll
-    void init() {
+    static void init() {
         random = new Random();
     }
 

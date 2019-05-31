@@ -155,8 +155,10 @@ dependencies {
     // The userdev artifact is a special name and will get all sorts of transformations applied to it.
     minecraft forgeName
     apiTestImplementation sourceSets.api.output
-    apiTestImplementation 'org.junit.jupiter:junit-jupiter:'+project.junit_version
-    apiTestImplementation 'org.hamcrest:hamcrest:'+project.hamcrest_version
+    apiTestImplementation "org.junit.jupiter:junit-jupiter-api:${project.junit_version}"
+    apiTestImplementation "org.junit.jupiter:junit-jupiter:${project.junit_version}"
+    apiTestImplementation "org.hamcrest:hamcrest:$project.hamcrest_version"
+    apiTestRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${project.junit_version}"
     implementation sourceSets.api.output
     testImplementation sourceSets.apiTest.output
     // deobfCompile "team.chisel.ctm:CTM:MC${minecraft_version}-${ctm_version}:api"
@@ -213,6 +215,7 @@ task clearDoc (type: Delete) {
 }
 // Example for how to get properties into the manifest for reading by the runtime..
 jar {
+    group = project.artifactGroup
     manifest {
         attributes(["Specification-Title": "Buildinggadgets",
                     "Specification-Version": forge_major, // We are version 1 of the modlauncher specification
@@ -244,18 +247,21 @@ javadoc {
 }
 
 task docJar(type: Jar, dependsOn: javadoc) {
+    group = project.artifactGroup
     manifest = jar.manifest
     classifier = 'javadoc'
     from javadoc.destinationDir
 }
 
 task sourcesJar(type: Jar, dependsOn: classes) {
+    group = project.artifactGroup
     manifest = jar.manifest
     classifier = 'sources'
     from sourceSets.main.allSource, sourceSets.api.allSource
 }
 
 task apiJar (type:Jar, dependsOn:apiClasses) {
+    group = project.artifactGroup
     manifest {
         attributes(["Specification-Title": "Buildinggadgets-API",
                     "Specification-Version": forge_major,
@@ -269,6 +275,7 @@ task apiJar (type:Jar, dependsOn:apiClasses) {
 }
 
 task apiSourcesJar(type: Jar, dependsOn: apiClasses) {
+    group = project.artifactGroup
     manifest = apiJar.manifest
     version = project.api_version
     appendix = 'api'
@@ -284,6 +291,7 @@ task apiDoc (type: Javadoc, dependsOn: clearDoc){
 }
 
 task apiDocJar(type: Jar, dependsOn: apiDoc) {
+    group = project.artifactGroup
     manifest = apiJar.manifest
     version = project.api_version
     appendix = 'api'
@@ -292,24 +300,36 @@ task apiDocJar(type: Jar, dependsOn: apiDoc) {
 }
 
 task allApiJars {
+    group = project.artifactGroup
     dependsOn apiJar
     dependsOn apiDocJar
     dependsOn apiSourcesJar
 }
 
 task allImplementationJars {
+    group = project.artifactGroup
     dependsOn jar
     dependsOn sourcesJar
     dependsOn docJar
 }
 
 task allJars {
+    group = project.artifactGroup
     dependsOn allApiJars
     dependsOn allImplementationJars
 }
 
+task apiTestTask(type: Test) {
+    description = 'Runs all api Tests.'
+    group = 'verification'
+    testClassesDirs = sourceSets.apiTest.output.classesDirs
+    classpath = sourceSets.apiTest.runtimeClasspath
+    useJUnitPlatform()
+}
+
 test {
     useJUnitPlatform()
+    dependsOn apiTestTask
 }
 
 artifacts {

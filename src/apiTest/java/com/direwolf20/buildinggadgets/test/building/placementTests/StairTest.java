@@ -9,6 +9,7 @@ import java.util.Iterator;
 import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class StairTest {
 
@@ -27,6 +28,7 @@ public class StairTest {
         int size = random.nextInt(16);
         Stair stair = Stair.create(BlockPos.ORIGIN, EnumFacing.NORTH, EnumFacing.UP, size);
         Iterator<BlockPos> it = stair.iterator();
+        assertTrue(it.hasNext());
         BlockPos last = it.next();
         if (!it.hasNext()) {
             return;
