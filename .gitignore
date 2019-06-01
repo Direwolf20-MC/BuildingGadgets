@@ -3,6 +3,7 @@
 # folders
 !/gradle
 !/src
+!/wiki
 
 # files
 !/.gitignore
