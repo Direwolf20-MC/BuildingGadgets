@@ -173,7 +173,7 @@ public class Config {
             @Name("Durability")
             @Comment(LANG_KEY_GADGETS_DURABILITY_COMMENT)
             @LangKey(LANG_KEY_GADGETS_DURABILITY)
-            public int durabilityBuilder = 500;
+            public int durabilityBuilder = 10000;
         }
 
         public static final class CategoryGadgetExchanger {
@@ -196,7 +196,7 @@ public class Config {
             @Name("Durability")
             @Comment(LANG_KEY_GADGETS_DURABILITY_COMMENT)
             @LangKey(LANG_KEY_GADGETS_DURABILITY)
-            public int durabilityExchanger = 500;
+            public int durabilityExchanger = 10000;
         }
 
         public static final class CategoryGadgetDestruction {
@@ -217,14 +217,14 @@ public class Config {
             @Name("Damage Cost")
             @Comment(LANG_KEY_GADGETS_DAMAGE_COMMENT)
             @LangKey(LANG_KEY_GADGETS_DAMAGE)
-            public int damageCostDestruction = 4;
+            public int damageCostDestruction = 2;
 
             @RequiresWorldRestart
             @RangeInt(min = 0, max = 100000)
             @Name("Durability")
             @Comment(LANG_KEY_GADGETS_DURABILITY_COMMENT)
             @LangKey(LANG_KEY_GADGETS_DURABILITY)
-            public int durabilityDestruction = 500;
+            public int durabilityDestruction = 10000;
 
             @RangeDouble(min = 0)
             @Name("Non-Fuzzy Mode Multiplier")
@@ -259,7 +259,7 @@ public class Config {
             @Name("Durability")
             @Comment(LANG_KEY_GADGETS_DURABILITY_COMMENT)
             @LangKey(LANG_KEY_GADGETS_DURABILITY)
-            public int durabilityCopyPaste = 500;
+            public int durabilityCopyPaste = 10000;
         }
     }
 
