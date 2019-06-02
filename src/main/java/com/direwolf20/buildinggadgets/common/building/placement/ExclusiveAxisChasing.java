@@ -17,20 +17,20 @@ import java.util.Iterator;
  */
 public final class ExclusiveAxisChasing implements IPlacementSequence {
 
-    public static ExclusiveAxisChasing create(BlockPos source, BlockPos target, Axis axis) {
+    public static ExclusiveAxisChasing create(BlockPos source, BlockPos target, Axis axis, int maxProgression) {
         int difference = VectorTools.getAxisValue(target, axis) - VectorTools.getAxisValue(source, axis);
         if (difference < 0)
-            return create(source, target, EnumFacing.getFacingFromAxis(AxisDirection.NEGATIVE, axis));
-        return create(source, target, EnumFacing.getFacingFromAxis(AxisDirection.POSITIVE, axis));
+            return create(source, target, EnumFacing.getFacingFromAxis(AxisDirection.NEGATIVE, axis), maxProgression);
+        return create(source, target, EnumFacing.getFacingFromAxis(AxisDirection.POSITIVE, axis), maxProgression);
     }
 
     /**
-     * <p>Note that this factory method does not verify that {@code offsetDirection} is appropriate. Use {@link #create(BlockPos, BlockPos, Axis)} if this is required.</p>
+     * <p>Note that this factory method does not verify that {@code offsetDirection} is appropriate. Use {@link #create(BlockPos, BlockPos, Axis, int)} if this is required.</p>
      */
-    public static ExclusiveAxisChasing create(BlockPos source, BlockPos target, EnumFacing offsetDirection) {
+    public static ExclusiveAxisChasing create(BlockPos source, BlockPos target, EnumFacing offsetDirection, int maxProgression) {
         Axis axis = offsetDirection.getAxis();
         int difference = VectorTools.getAxisValue(target, axis) - VectorTools.getAxisValue(source, axis);
-        int maxProgression = Math.abs(difference);
+        maxProgression = Math.min(Math.abs(difference), maxProgression);
 
         return new ExclusiveAxisChasing(source, offsetDirection, maxProgression);
     }
