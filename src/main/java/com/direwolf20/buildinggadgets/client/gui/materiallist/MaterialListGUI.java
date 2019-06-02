@@ -6,7 +6,6 @@ import com.direwolf20.buildinggadgets.client.util.AlignmentUtil;
 import com.direwolf20.buildinggadgets.client.util.RenderUtil;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.items.ITemplate;
-import com.direwolf20.buildinggadgets.common.items.Template;
 import com.direwolf20.buildinggadgets.common.tools.InventoryManipulation;
 import it.unimi.dsi.fastutil.ints.IntList;
 import net.minecraft.client.Minecraft;
@@ -17,6 +16,7 @@ import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.TextComponentTranslation;
 import org.lwjgl.input.Mouse;
 
 import java.awt.*;
@@ -42,6 +42,27 @@ public class MaterialListGUI extends GuiBase {
     public static final int WINDOW_WIDTH = BACKGROUND_WIDTH - BORDER_SIZE * 2;
     public static final int WINDOW_HEIGHT = BACKGROUND_HEIGHT - BORDER_SIZE * 2;
 
+    public static final int BUTTON_CLOSE_ID = 0;
+    public static final int BUTTON_SORTING_MODES_ID = 1;
+    public static final int BUTTON_COPY_LIST_ID = 2;
+
+    /**
+     * <ol>
+     * <li>Item name (localized)
+     * <li>Item count
+     * </ol>
+     */
+    public static final String PATTERN_SIMPLE = "%s: %d";
+    /**
+     * <ol>
+     * <li>Item name (localized)
+     * <li>Item count
+     * <li>Item registry name
+     * <li>Formatted stack count, e.g. 5x64+2
+     * </ol>
+     */
+    public static final String PATTERN_DETAILED = "%s: %d (%s, %s)";
+
     private int backgroundX;
     private int backgroundY;
 
@@ -57,6 +78,7 @@ public class MaterialListGUI extends GuiBase {
 
     private DireButton buttonClose;
     private DireButton buttonSortingModes;
+    private DireButton buttonCopyList;
 
     private int hoveringTextX;
     private int hoveringTextY;
@@ -84,14 +106,39 @@ public class MaterialListGUI extends GuiBase {
         this.updateAvailableMaterials();
         this.scrollingList = new ScrollingMaterialList(this, BACKGROUND_WIDTH, BACKGROUND_HEIGHT);
 
-        int buttonID = -1;
         int buttonY = getWindowBottomY() - (ScrollingMaterialList.BOTTOM / 2 + BUTTON_HEIGHT / 2);
-        this.buttonClose = new DireButton(++buttonID, 0, buttonY, 0, BUTTON_HEIGHT, I18n.format("gui.buildinggadgets.materialList.button.close"));
-        this.buttonSortingModes = new DireButton(++buttonID, 0, buttonY, 0, BUTTON_HEIGHT, sortingMode.getLocalizedName());
-        this.addButton(buttonSortingModes);
-        this.addButton(buttonClose);
+        this.buttonClose = new DireButton(BUTTON_CLOSE_ID, 0, buttonY, 0, BUTTON_HEIGHT, I18n.format("gui.buildinggadgets.materialList.button.close"));
+        this.buttonSortingModes = new DireButton(BUTTON_SORTING_MODES_ID, 0, buttonY, 0, BUTTON_HEIGHT, sortingMode.getLocalizedName());
+        this.buttonCopyList = new DireButton(BUTTON_COPY_LIST_ID, 0, buttonY, 0, BUTTON_HEIGHT, I18n.format("gui.buildinggadgets.materialList.button.copyList"));
 
+        this.addButton(buttonSortingModes);
+        this.addButton(buttonCopyList);
+        this.addButton(buttonClose);
         this.calculateButtonsWidthAndX();
+    }
+
+    private String stringify(boolean detailed) {
+        if (detailed)
+            return stringifyDetailed();
+        return stringifySimple();
+    }
+
+    private String stringifyDetailed() {
+        return materials.stream()
+                .map(item -> String.format(PATTERN_DETAILED,
+                        item.getDisplayName(),
+                        item.getCount(),
+                        item.getItem().getRegistryName(),
+                        InventoryManipulation.formatItemCount(item.getMaxStackSize(), item.getCount())))
+                .collect(Collectors.joining("\n"));
+    }
+
+    private String stringifySimple() {
+        return materials.stream()
+                .map(item -> String.format(PATTERN_SIMPLE,
+                        item.getDisplayName(),
+                        item.getCount()))
+                .collect(Collectors.joining("\n"));
     }
 
     @Override
@@ -125,14 +172,24 @@ public class MaterialListGUI extends GuiBase {
     @Override
     protected void actionPerformed(GuiButton button) throws IOException {
         switch (button.id) {
-            case 0:
+            case BUTTON_CLOSE_ID:
                 Minecraft.getMinecraft().player.closeScreen();
                 return;
-            case 1:
+            case BUTTON_SORTING_MODES_ID:
                 sortingMode = sortingMode.next();
                 buttonSortingModes.displayString = sortingMode.getLocalizedName();
                 sortMaterialList();
                 updateAvailableMaterials();
+                return;
+            case BUTTON_COPY_LIST_ID:
+                boolean detailed = GuiScreen.isCtrlKeyDown();
+                GuiScreen.setClipboardString(stringify(detailed));
+                String type;
+                if (detailed)
+                    type = I18n.format("gui.buildinggadgets.materialList.message.copiedMaterialList.detailed");
+                else
+                    type = I18n.format("gui.buildinggadgets.materialList.message.copiedMaterialList.simple");
+                mc.player.sendStatusMessage(new TextComponentTranslation("gui.buildinggadgets.materialList.message.copiedMaterialList", type), true);
                 return;
         }
         this.scrollingList.actionPerformed(button);
@@ -155,7 +212,7 @@ public class MaterialListGUI extends GuiBase {
         int amountButtons = buttonList.size();
         int amountMargins = amountButtons - 1;
         int totalMarginWidth = amountMargins * BUTTONS_PADDING;
-        int usableWidth = getWindowWidth() ;
+        int usableWidth = getWindowWidth();
         int buttonWidth = (usableWidth - totalMarginWidth) / amountButtons;
 
         // Align the box of buttons in the center, and start from the left

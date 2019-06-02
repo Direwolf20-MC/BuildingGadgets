@@ -422,6 +422,14 @@ public class InventoryManipulation {
         return ItemStack.EMPTY;
     }
 
+    public static String formatItemCount(int maxSize, int count) {
+        int stacks = count / maxSize; // Integer division automatically floors
+        int leftover = count % maxSize;
+        if (stacks == 0)
+            return String.valueOf(leftover);
+        return stacks + "×" + maxSize + "+" + leftover;
+    }
+
     /*public static IBlockState getBaseState(IBlockState originalState, World world, EntityPlayer player, BlockPos pos) {
         IBlockState placeState = Blocks.AIR.getDefaultState();
         Block block = originalState.getBlock();
