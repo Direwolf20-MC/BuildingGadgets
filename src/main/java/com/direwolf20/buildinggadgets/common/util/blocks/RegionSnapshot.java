@@ -119,7 +119,7 @@ public class RegionSnapshot {
         return tag;
     }
 
-    private static RegionSnapshot deserialize(NBTTagCompound tag) {
+    public static RegionSnapshot deserialize(NBTTagCompound tag) {
         ResourceLocation dimension = new ResourceLocation(tag.getString(DIMENSION));
         World world = ServerLifecycleHooks.getCurrentServer().getWorld(Objects.requireNonNull(DimensionType.byName(dimension)));
 

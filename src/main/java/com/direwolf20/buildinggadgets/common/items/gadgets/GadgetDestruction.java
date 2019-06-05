@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.common.items.gadgets;
 
+import com.direwolf20.buildinggadgets.api.building.Region;
 import com.direwolf20.buildinggadgets.client.gui.GuiMod;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.config.Config;
@@ -8,12 +9,16 @@ import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
 import com.direwolf20.buildinggadgets.common.util.CapabilityUtil.EnergyUtil;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.blocks.BlockMapIntState;
+import com.direwolf20.buildinggadgets.common.util.blocks.RegionSnapshot;
+import com.direwolf20.buildinggadgets.common.util.exceptions.PaletteOverflowException;
 import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
 import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
 import com.direwolf20.buildinggadgets.common.util.lang.Styles;
 import com.direwolf20.buildinggadgets.common.util.lang.TooltipTranslation;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.world.WorldSave;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import net.minecraft.block.state.IBlockState;
@@ -35,11 +40,26 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.BlockSnapshot;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.world.BlockEvent;
+import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nullable;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class GadgetDestruction extends GadgetSwapping {
+
+    public static void restoreSnapshotWithBuilder(World world, RegionSnapshot snapshot) {
+        Set<BlockPos> pastePositions = snapshot.getTileData().stream()
+                .map(Pair::getLeft)
+                .collect(Collectors.toSet());
+        int index = 0;
+        for (BlockPos pos : snapshot.getRegion()) {
+            // TODO remove spawnBy field in BlockBuildEntity
+            snapshot.getBlockStates().get(index).ifPresent(state -> world.spawnEntity(new BlockBuildEntity(world, pos, null, state, BlockBuildEntity.Mode.PLACE, pastePositions.contains(pos))));
+            index++;
+        }
+    }
+
     public GadgetDestruction(Properties builder) {
         super(builder);
     }
@@ -349,29 +369,58 @@ public class GadgetDestruction extends GadgetSwapping {
     }
 
     public void clearArea(World world, BlockPos pos, EnumFacing side, EntityPlayer player, ItemStack stack) {
-        SortedSet<BlockPos> voidPosArray = getArea(world, pos, side, player, stack);
-        Map<BlockPos, IBlockState> posStateMap = new HashMap<BlockPos, IBlockState>();
-        Map<BlockPos, IBlockState> pasteStateMap = new HashMap<BlockPos, IBlockState>();
-        for (BlockPos voidPos : voidPosArray) {
-            IBlockState blockState = world.getBlockState(voidPos);
-            IBlockState pasteState = Blocks.AIR.getDefaultState();
-            if (blockState.getBlock() == BGBlocks.constructionBlock) {
-                TileEntity te = world.getTileEntity(voidPos);
-                if (te instanceof ConstructionBlockTileEntity) {
-                    pasteState = ((ConstructionBlockTileEntity) te).getActualBlockState();
-                }
-            }
-            boolean success = destroyBlock(world, voidPos, player);
-            if (success)
-                posStateMap.put(voidPos, blockState);
-            if (pasteState != Blocks.AIR.getDefaultState()) {
-                pasteStateMap.put(voidPos, pasteState);
-            }
+        EnumFacing directionLeft = side.rotateYCCW();
+        EnumFacing directionRight = side.rotateY();
+        BlockPos first = pos.offset(directionLeft, getToolValue(stack, NBTKeys.GADGET_VALUE_LEFT));
+        BlockPos second = pos.offset(directionRight, getToolValue(stack, NBTKeys.GADGET_VALUE_RIGHT))
+                .offset(side, getToolValue(stack, NBTKeys.GADGET_VALUE_DEPTH));
+        // The number are not necessarily sorted min and max, but the constructor will do it for us
+        Region region = new Region(
+                first.getX(),
+                pos.getY() - getToolValue(stack, NBTKeys.GADGET_VALUE_DOWN),
+                first.getZ(),
+                second.getX(),
+                pos.getY() + getToolValue(stack, NBTKeys.GADGET_VALUE_UP),
+                second.getZ());
+
+        RegionSnapshot snapshot;
+        try {
+            snapshot = RegionSnapshot.select(world, region)
+                    .excludeAir()
+                    .checkTiles((p, state, tile) -> state.getBlock() == BGBlocks.constructionBlock && tile instanceof ConstructionBlockTileEntity)
+                    .build();
+        } catch (PaletteOverflowException e) {
+            player.sendMessage(new TextComponentTranslation(TooltipTranslation.GADGET_PALETTE_OVERFLOW.getTranslationKey()));
+            return;
         }
-        if (posStateMap.size() > 0) {
-            BlockPos startPos = (getAnchor(stack) == null) ? pos : getAnchor(stack);
-            storeUndo(world, posStateMap, pasteStateMap, startPos, stack, player);
-        }
+        snapshot.getRegion().forEach(p -> world.setBlockState(p, Blocks.AIR.getDefaultState()));
+
+        WorldSave worldSave = WorldSave.getWorldSaveDestruction(world);
+        worldSave.addToMap(getUUID(stack), snapshot.serialize());
+
+        // SortedSet<BlockPos> voidPosArray = getArea(world, pos, side, player, stack);
+        // Map<BlockPos, IBlockState> posStateMap = new HashMap<BlockPos, IBlockState>();
+        // Map<BlockPos, IBlockState> pasteStateMap = new HashMap<BlockPos, IBlockState>();
+        // for (BlockPos voidPos : voidPosArray) {
+        //     IBlockState blockState = world.getBlockState(voidPos);
+        //     IBlockState pasteState = Blocks.AIR.getDefaultState();
+        //     if (blockState.getBlock() == BGBlocks.constructionBlock) {
+        //         TileEntity te = world.getTileEntity(voidPos);
+        //         if (te instanceof ConstructionBlockTileEntity) {
+        //             pasteState = ((ConstructionBlockTileEntity) te).getActualBlockState();
+        //         }
+        //     }
+        //     boolean success = destroyBlock(world, voidPos, player);
+        //     if (success)
+        //         posStateMap.put(voidPos, blockState);
+        //     if (pasteState != Blocks.AIR.getDefaultState()) {
+        //         pasteStateMap.put(voidPos, pasteState);
+        //     }
+        // }
+        // if (posStateMap.size() > 0) {
+        //     BlockPos startPos = (getAnchor(stack) == null) ? pos : getAnchor(stack);
+        //     storeUndo(world, posStateMap, pasteStateMap, startPos, stack, player);
+        // }
     }
 
     public static void storeUndo(World world, Map<BlockPos, IBlockState> posStateMap, Map<BlockPos, IBlockState> pasteStateMap, BlockPos startBlock, ItemStack stack, EntityPlayer player) {
@@ -418,47 +467,47 @@ public class GadgetDestruction extends GadgetSwapping {
     public static void undo(EntityPlayer player, ItemStack stack) {
         World world = player.world;
         WorldSave worldSave = WorldSave.getWorldSaveDestruction(world);
-        NBTTagCompound tag = worldSave.getCompoundFromUUID(getUUID(stack));
-        if (tag == null) return;
-
-        BlockPos startPos = NBTUtil.readBlockPos(tag.getCompound(NBTKeys.GADGET_START_POS));
-        int[] indexPosArray = tag.getIntArray(NBTKeys.MAP_INDEX2POS);
-        int[] indexStateIDArray = tag.getIntArray(NBTKeys.MAP_INDEX2STATE_ID);
-        int[] posPasteArray = tag.getIntArray(NBTKeys.MAP_POS_PASTE);
-        int[] statePasteArray = tag.getIntArray(NBTKeys.MAP_STATE_PASTE);
-
-        BlockMapIntState intState = new BlockMapIntState();
-        intState.getIntStateMapFromNBT((NBTTagList) tag.getTag(NBTKeys.MAP_PALETTE));
-
-        boolean success = false;
-        for (int i = 0; i < indexPosArray.length; i++) {
-            BlockPos placePos = GadgetUtils.relIntToPos(startPos, indexPosArray[i]);
-            IBlockState currentState = world.getBlockState(placePos);
-            if (currentState.getBlock().isAir(currentState, world, placePos) || currentState.getMaterial().isLiquid()) {
-                IBlockState placeState = intState.getStateFromSlot((short) indexStateIDArray[i]);
-                if (placeState.getBlock() == BGBlocks.constructionBlock) {
-                    IBlockState pasteState = Blocks.AIR.getDefaultState();
-                    for (int j = 0; j < posPasteArray.length; j++) {
-                        if (posPasteArray[j] == indexPosArray[i]) {
-                            pasteState = intState.getStateFromSlot((short) statePasteArray[j]);
-                            break;
-                        }
-                    }
-                    if (pasteState != Blocks.AIR.getDefaultState()) {
-                        world.spawnEntity(new BlockBuildEntity(world, placePos, player, pasteState, BlockBuildEntity.Mode.PLACE, true));
-                        success = true;
-                    }
-                } else {
-                    world.spawnEntity(new BlockBuildEntity(world, placePos, player, placeState, BlockBuildEntity.Mode.PLACE, false));
-                    success = true;
-                }
-            }
-        }
-        if (success) {
-            NBTTagCompound newTag = new NBTTagCompound();
-            worldSave.addToMap(getUUID(stack), newTag);
-            worldSave.markForSaving();
-        }
+        // NBTTagCompound tag = worldSave.getCompoundFromUUID(getUUID(stack));
+        // if (tag == null) return;
+        //
+        // BlockPos startPos = NBTUtil.readBlockPos(tag.getCompound(NBTKeys.GADGET_START_POS));
+        // int[] indexPosArray = tag.getIntArray(NBTKeys.MAP_INDEX2POS);
+        // int[] indexStateIDArray = tag.getIntArray(NBTKeys.MAP_INDEX2STATE_ID);
+        // int[] posPasteArray = tag.getIntArray(NBTKeys.MAP_POS_PASTE);
+        // int[] statePasteArray = tag.getIntArray(NBTKeys.MAP_STATE_PASTE);
+        //
+        // BlockMapIntState intState = new BlockMapIntState();
+        // intState.getIntStateMapFromNBT((NBTTagList) tag.getTag(NBTKeys.MAP_PALETTE));
+        //
+        // boolean success = false;
+        // for (int i = 0; i < indexPosArray.length; i++) {
+        //     BlockPos placePos = GadgetUtils.relIntToPos(startPos, indexPosArray[i]);
+        //     IBlockState currentState = world.getBlockState(placePos);
+        //     if (currentState.getBlock().isAir(currentState, world, placePos) || currentState.getMaterial().isLiquid()) {
+        //         IBlockState placeState = intState.getStateFromSlot((short) indexStateIDArray[i]);
+        //         if (placeState.getBlock() == BGBlocks.constructionBlock) {
+        //             IBlockState pasteState = Blocks.AIR.getDefaultState();
+        //             for (int j = 0; j < posPasteArray.length; j++) {
+        //                 if (posPasteArray[j] == indexPosArray[i]) {
+        //                     pasteState = intState.getStateFromSlot((short) statePasteArray[j]);
+        //                     break;
+        //                 }
+        //             }
+        //             if (pasteState != Blocks.AIR.getDefaultState()) {
+        //                 world.spawnEntity(new BlockBuildEntity(world, placePos, player, pasteState, BlockBuildEntity.Mode.PLACE, true));
+        //                 success = true;
+        //             }
+        //         } else {
+        //             world.spawnEntity(new BlockBuildEntity(world, placePos, player, placeState, BlockBuildEntity.Mode.PLACE, false));
+        //             success = true;
+        //         }
+        //     }
+        // }
+        NBTTagCompound serializedSnapshot = worldSave.getCompoundFromUUID(getUUID(stack));
+        RegionSnapshot snapshot = RegionSnapshot.deserialize(serializedSnapshot);
+        restoreSnapshotWithBuilder(world, snapshot);
+        worldSave.addToMap(getUUID(stack), new NBTTagCompound());
+        worldSave.markDirty();
     }
 
     private boolean destroyBlock(World world, BlockPos voidPos, EntityPlayer player) {
