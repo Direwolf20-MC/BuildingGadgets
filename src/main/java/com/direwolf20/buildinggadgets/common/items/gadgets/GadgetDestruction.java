@@ -17,17 +17,13 @@ import com.direwolf20.buildinggadgets.common.util.lang.Styles;
 import com.direwolf20.buildinggadgets.common.util.lang.TooltipTranslation;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.world.WorldSave;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Sets;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
@@ -214,7 +210,7 @@ public class GadgetDestruction extends GadgetSwapping {
     public static List<EnumFacing> assignDirections(EnumFacing side, EntityPlayer player) {
         List<EnumFacing> dirs = new ArrayList<EnumFacing>();
         EnumFacing depth = side.getOpposite();
-        boolean vertical = side.getAxis() == Axis.Y;
+        boolean vertical = side.getAxis().isVertical();
         EnumFacing up = vertical ? player.getHorizontalFacing() : EnumFacing.UP;
         EnumFacing left = vertical ? up.rotateY() : side.rotateYCCW();
         EnumFacing right = left.getOpposite();
@@ -369,18 +365,25 @@ public class GadgetDestruction extends GadgetSwapping {
     }
 
     public void clearArea(World world, BlockPos pos, EnumFacing side, EntityPlayer player, ItemStack stack) {
-        EnumFacing directionLeft = side.rotateYCCW();
-        EnumFacing directionRight = side.rotateY();
-        BlockPos first = pos.offset(directionLeft, getToolValue(stack, NBTKeys.GADGET_VALUE_LEFT));
-        BlockPos second = pos.offset(directionRight, getToolValue(stack, NBTKeys.GADGET_VALUE_RIGHT))
-                .offset(side, getToolValue(stack, NBTKeys.GADGET_VALUE_DEPTH));
+        EnumFacing depth = side.getOpposite();
+        boolean vertical = side.getAxis().isVertical();
+        EnumFacing up = vertical ? player.getHorizontalFacing() : EnumFacing.UP;
+        EnumFacing down = up.getOpposite();
+        EnumFacing left = vertical ? up.rotateY() : side.rotateYCCW();
+        EnumFacing right = left.getOpposite();
+
+        BlockPos first = pos.offset(left, getToolValue(stack, NBTKeys.GADGET_VALUE_LEFT))
+                .offset(up, getToolValue(stack, NBTKeys.GADGET_VALUE_UP));
+        BlockPos second = pos.offset(right, getToolValue(stack, NBTKeys.GADGET_VALUE_RIGHT))
+                .offset(down, getToolValue(stack, NBTKeys.GADGET_VALUE_DOWN))
+                .offset(depth, getToolValue(stack, NBTKeys.GADGET_VALUE_DEPTH) - 1);
         // The number are not necessarily sorted min and max, but the constructor will do it for us
         Region region = new Region(
                 first.getX(),
-                pos.getY() - getToolValue(stack, NBTKeys.GADGET_VALUE_DOWN),
+                first.getY(),
                 first.getZ(),
                 second.getX(),
-                pos.getY() + getToolValue(stack, NBTKeys.GADGET_VALUE_UP),
+                second.getY(),
                 second.getZ());
 
         RegionSnapshot snapshot;
@@ -393,7 +396,7 @@ public class GadgetDestruction extends GadgetSwapping {
             player.sendMessage(new TextComponentTranslation(TooltipTranslation.GADGET_PALETTE_OVERFLOW.getTranslationKey()));
             return;
         }
-        snapshot.getRegion().forEach(p -> world.setBlockState(p, Blocks.AIR.getDefaultState()));
+        region.forEach(voidPos -> destroyBlock(world, voidPos, player));
 
         WorldSave worldSave = WorldSave.getWorldSaveDestruction(world);
         worldSave.addToMap(getUUID(stack), snapshot.serialize());
@@ -504,6 +507,9 @@ public class GadgetDestruction extends GadgetSwapping {
         //     }
         // }
         NBTTagCompound serializedSnapshot = worldSave.getCompoundFromUUID(getUUID(stack));
+        if(serializedSnapshot.isEmpty())
+            return;
+
         RegionSnapshot snapshot = RegionSnapshot.deserialize(serializedSnapshot);
         restoreSnapshotWithBuilder(world, snapshot);
         worldSave.addToMap(getUUID(stack), new NBTTagCompound());
@@ -516,6 +522,9 @@ public class GadgetDestruction extends GadgetSwapping {
             return false;
 
         if(!this.canUse(tool, player))
+            return false;
+
+        if (world.isAirBlock(voidPos))
             return false;
 
         this.applyDamage(tool, player);
