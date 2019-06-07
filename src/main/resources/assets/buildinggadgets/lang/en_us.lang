@@ -129,15 +129,20 @@ help.gui.buildinggadgets.button.save=Saves the data in the gadget/template to a 
 
 #gui button name:
 gui.buildinggadgets.materialList.button.close=Close
-gui.buildinggadgets.materialList.button.refreshCount=Refresh Count
+gui.buildinggadgets.materialList.button.copyList=Copy
 gui.buildinggadgets.materialList.button.sortingMode.countReversed=Count ↑
 gui.buildinggadgets.materialList.button.sortingMode.name=Name ↓
 gui.buildinggadgets.materialList.button.sortingMode.nameReversed=Name ↑
 gui.buildinggadgets.materialList.button.sortingMode.count=Count ↓
 gui.buildinggadgets.materialList.button.sortingMode.countReversed=Count ↑
 
-#gui texts
+#gui texts:
 gui.buildinggadgets.materialList.text.statusTemplate=%s/%s
+
+#gui messages:
+gui.buildinggadgets.materialList.message.copiedMaterialList=Successfully copied %s material list
+gui.buildinggadgets.materialList.message.copiedMaterialList.simple=simple
+gui.buildinggadgets.materialList.message.copiedMaterialList.detailed=detailed
 
 #gui title:
 gui.buildinggadgets.materialList.title=Material List
