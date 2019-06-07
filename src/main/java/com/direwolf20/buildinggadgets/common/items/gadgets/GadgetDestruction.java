@@ -6,33 +6,25 @@ import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
-import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
 import com.direwolf20.buildinggadgets.common.util.CapabilityUtil.EnergyUtil;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
-import com.direwolf20.buildinggadgets.common.util.blocks.BlockMapIntState;
 import com.direwolf20.buildinggadgets.common.util.blocks.RegionSnapshot;
 import com.direwolf20.buildinggadgets.common.util.exceptions.PaletteOverflowException;
-import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
 import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
 import com.direwolf20.buildinggadgets.common.util.lang.Styles;
 import com.direwolf20.buildinggadgets.common.util.lang.TooltipTranslation;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.world.WorldSave;
-import it.unimi.dsi.fastutil.ints.IntArrayList;
-import it.unimi.dsi.fastutil.ints.IntList;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTUtil;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
-import net.minecraft.util.EnumFacing.Axis;
 import net.minecraft.util.math.*;
 import net.minecraft.util.text.*;
 import net.minecraft.world.World;
-import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.BlockSnapshot;
 import net.minecraftforge.event.ForgeEventFactory;
@@ -277,48 +269,45 @@ public class GadgetDestruction extends GadgetSwapping {
     }
 
     public static SortedSet<BlockPos> getClearingPositions(World world, BlockPos pos, EnumFacing incomingSide, EntityPlayer player, ItemStack stack) {
-        SortedSet<BlockPos> voidPositions = new TreeSet<>(Comparator.comparingInt(Vec3i::getX).thenComparingInt(Vec3i::getY).thenComparingInt(Vec3i::getZ));
-        int depth = getToolValue(stack, NBTKeys.GADGET_VALUE_DEPTH);
-        if (depth == 0)
-            return voidPositions;
-
-        BlockPos startPos = (getAnchor(stack) == null) ? pos : getAnchor(stack);
-        EnumFacing side = (getAnchorSide(stack) == null) ? incomingSide : getAnchorSide(stack);
-        List<EnumFacing> directions = assignDirections(side, player);
-        IBlockState stateTarget = !Config.GADGETS.GADGET_DESTRUCTION.nonFuzzyEnabled.get() || GadgetGeneric.getFuzzy(stack) ? null : world.getBlockState(pos);
         if (GadgetGeneric.getConnectedArea(stack)) {
-            String[] directionNames = NBTKeys.GADGET_VALUES;
-            AxisAlignedBB area = new AxisAlignedBB(pos);
-            for (int i = 0; i < directionNames.length; i++)
-                area = area.union(new AxisAlignedBB(pos.offset(directions.get(i), getToolValue(stack, directionNames[i]) - (i == 4 ? 1 : 0))));
+            SortedSet<BlockPos> voidPositions = new TreeSet<>(Comparator
+                    .comparingInt(Vec3i::getX)
+                    .thenComparingInt(Vec3i::getY)
+                    .thenComparingInt(Vec3i::getZ));
+            int depth = getToolValue(stack, NBTKeys.GADGET_VALUE_DEPTH);
+            if (depth == 0)
+                return voidPositions;
 
+            BlockPos startPos = (getAnchor(stack) == null) ? pos : getAnchor(stack);
+            IBlockState stateTarget = !Config.GADGETS.GADGET_DESTRUCTION.nonFuzzyEnabled.get() || GadgetGeneric.getFuzzy(stack) ? null : world.getBlockState(pos);
+            Region boundary = getClearingRegion(pos, incomingSide, player, stack);
             addConnectedCoords(world, player, startPos, stateTarget, voidPositions,
-                    (int) area.minX, (int) area.minY, (int) area.minZ, (int) area.maxX - 1, (int) area.maxY - 1, (int) area.maxZ - 1);
+                    boundary);
+
+            return voidPositions;
         } else {
             return getClearingRegion(pos, incomingSide, player, stack).stream().collect(Collectors.toCollection(TreeSet::new));
         }
-        return voidPositions;
     }
 
-    public static void addConnectedCoords(World world, EntityPlayer player, BlockPos loc, IBlockState state,
-            SortedSet<BlockPos> coords, int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
-        if (coords.contains(loc) || loc.getX() < minX || loc.getY() < minY || loc.getZ() < minZ || loc.getX() > maxX || loc.getY() > maxY || loc.getZ() > maxZ)
+    public static void addConnectedCoords(World world, EntityPlayer player, BlockPos loc, IBlockState state, SortedSet<BlockPos> coords, Region boundary) {
+        if (coords.contains(loc) || boundary.contains(loc))
             return;
 
-        if (!validBlock(world, loc, player, state))
+        if (!isValidBlock(world, loc, player, state))
             return;
 
         coords.add(loc);
         for (int x = -1; x <= 1; x++) {
             for (int y = -1; y <= 1; y++) {
                 for (int z = -1; z <= 1; z++) {
-                    addConnectedCoords(world, player, loc.add(x, y, z), state, coords, minX, minY, minZ, maxX, maxY, maxZ);
+                    addConnectedCoords(world, player, loc.add(x, y, z), state, coords, boundary);
                 }
             }
         }
     }
 
-    public static boolean validBlock(World world, BlockPos voidPos, EntityPlayer player, @Nullable IBlockState stateTarget) {
+    public static boolean isValidBlock(World world, BlockPos voidPos, EntityPlayer player, @Nullable IBlockState stateTarget) {
         IBlockState currentBlock = world.getBlockState(voidPos);
         if (stateTarget != null && currentBlock != stateTarget) return false;
         TileEntity te = world.getTileEntity(voidPos);
