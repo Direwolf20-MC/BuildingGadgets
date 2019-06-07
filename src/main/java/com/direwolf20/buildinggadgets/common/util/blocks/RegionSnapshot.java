@@ -39,7 +39,8 @@ public class RegionSnapshot {
     private static final String TILE_NBT = "block_nbt";
 
     private static NBTTagCompound serialize(NBTTagCompound tag, RegionSnapshot snapshot) {
-        tag.setString(DIMENSION, snapshot.world.getDimension().getType().getRegistryName().toString());
+        // func_212678_a == getKey
+        tag.setString(DIMENSION, DimensionType.func_212678_a(snapshot.world.getDimension().getType()).toString());
         snapshot.region.serializeTo(tag);
 
         // Palette serialization begin
@@ -71,7 +72,7 @@ public class RegionSnapshot {
             // Palette serialization begin
             if (state.isPresent()) {
                 // This statement should never throw an exception
-                IBlockState nonnullState = state.orElseThrow(RuntimeException::new);
+                IBlockState nonnullState = state.get();
                 if (!recordedPalettes.contains(nonnullState)) {
                     recordedPalettes.add(nonnullState);
                     mapPalettes.put(nonnullState, mapPalettes.size());
@@ -96,13 +97,15 @@ public class RegionSnapshot {
             // - when serializing, the stored number will be ONE FEWER then the actual amount
             //   - this is for squeezing space efficiency of the serialized format (even though it is not very necessary)
             frames.add((((streak - 1) & 0xff) << 24) | (mapPalettes.getInt(lastStreak.orElse(null)) & 0xffffff));
+            System.out.println(streak + " " + mapPalettes.getInt(lastStreak.orElse(null)));
 
             // Regardless of which situation, we reset the counter
-            streak = 0;
+            streak = 1;
             lastStreak = state;
         }
         // Force add a frame here -- even if we pushed a new frame on the last block state, itself hasn't been stored yet
         frames.add((((streak - 1) & 0xff) << 24) | (mapPalettes.getInt(lastStreak.orElse(null)) & 0xffffff));
+        System.out.println(streak + " " + mapPalettes.getInt(lastStreak.orElse(null)));
 
         tag.setIntArray(BLOCK_FRAMES, frames.toIntArray());
         tag.setTag(BLOCK_PALETTES, palettes);
@@ -289,7 +292,7 @@ public class RegionSnapshot {
          * @throws IllegalStateException When trying to invoke this method when this builder has build someone already.
          */
         public Builder excludeAir() {
-            return checkBlocks((pos, state) -> state.isAir(world, pos));
+            return checkBlocks((pos, state) -> !state.isAir(world, pos));
         }
 
         /**
