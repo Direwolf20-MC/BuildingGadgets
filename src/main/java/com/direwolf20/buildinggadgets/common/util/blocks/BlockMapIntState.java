@@ -7,7 +7,7 @@ import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.ListNBT;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.util.math.BlockPos;
 
@@ -67,7 +67,7 @@ public class BlockMapIntState {
         return intStackMap.get(blockState);
     }
 
-    public Map<Short, BlockState> getIntStateMapFromNBT(NBTTagList tagList) {
+    public Map<Short, BlockState> getIntStateMapFromNBT(ListNBT tagList) {
         intStateMap = new HashMap<>();
         for (int i = 0; i < tagList.size(); i++) {
             CompoundNBT compound = tagList.getCompound(i);
@@ -76,18 +76,18 @@ public class BlockMapIntState {
         return intStateMap;
     }
 
-    public NBTTagList putIntStateMapIntoNBT() {
-        NBTTagList tagList = new NBTTagList();
+    public ListNBT putIntStateMapIntoNBT() {
+        ListNBT tagList = new ListNBT();
         for (Map.Entry<Short, BlockState> entry : intStateMap.entrySet()) {
             CompoundNBT compound = new CompoundNBT();
-            compound.setShort(NBTKeys.MAP_SLOT, entry.getKey());
-            compound.setTag(NBTKeys.MAP_STATE, NBTUtil.writeBlockState(entry.getValue()));
+            compound.putShort(NBTKeys.MAP_SLOT, entry.getKey());
+            compound.put(NBTKeys.MAP_STATE, NBTUtil.writeBlockState(entry.getValue()));
             tagList.add(compound);
         }
         return tagList;
     }
 
-    public Map<BlockState, UniqueItem> getIntStackMapFromNBT(NBTTagList tagList) {
+    public Map<BlockState, UniqueItem> getIntStackMapFromNBT(ListNBT tagList) {
         intStackMap = new HashMap<>();
         for (int i = 0; i < tagList.size(); i++) {
             CompoundNBT compound = tagList.getCompound(i);
@@ -96,12 +96,12 @@ public class BlockMapIntState {
         return intStackMap;
     }
 
-    public NBTTagList putIntStackMapIntoNBT() {
-        NBTTagList tagList = new NBTTagList();
+    public ListNBT putIntStackMapIntoNBT() {
+        ListNBT tagList = new ListNBT();
         for (Map.Entry<BlockState, UniqueItem> entry : intStackMap.entrySet()) {
             CompoundNBT compound = new CompoundNBT();
             entry.getValue().writeToNBT(compound);
-            compound.setTag(NBTKeys.MAP_STATE, GadgetUtils.stateToCompound(entry.getKey()));
+            compound.put(NBTKeys.MAP_STATE, GadgetUtils.stateToCompound(entry.getKey()));
             tagList.add(compound);
         }
         return tagList;

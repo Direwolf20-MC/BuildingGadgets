@@ -4,11 +4,11 @@ import com.direwolf20.buildinggadgets.common.registry.objects.BGTileEntities;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 
 import net.minecraft.block.BlockState;
-import net.minecraft.init.Blocks;
+import net.minecraft.block.Blocks;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.network.NetworkManager;
-import net.minecraft.network.play.server.SPacketUpdateTileEntity;
+import net.minecraft.network.play.server.SUpdateTileEntityPacket;
 import net.minecraft.tileentity.TileEntity;
 
 import javax.annotation.Nonnull;
@@ -54,9 +54,9 @@ public class ConstructionBlockTileEntity extends TileEntity {
     @Override
     public CompoundNBT write(CompoundNBT compound) {
         if (blockState != null) {
-            compound.setTag(NBTKeys.TE_CONSTRUCTION_STATE, NBTUtil.writeBlockState(blockState));
+            compound.put(NBTKeys.TE_CONSTRUCTION_STATE, NBTUtil.writeBlockState(blockState));
             if (actualBlockState != null)
-                compound.setTag(NBTKeys.TE_CONSTRUCTION_STATE_ACTUAL, NBTUtil.writeBlockState(actualBlockState));
+                compound.put(NBTKeys.TE_CONSTRUCTION_STATE_ACTUAL, NBTUtil.writeBlockState(actualBlockState));
         }
         return super.write(compound);
     }
@@ -77,14 +77,14 @@ public class ConstructionBlockTileEntity extends TileEntity {
     }
 
     @Override
-    public SPacketUpdateTileEntity getUpdatePacket() {
+    public SUpdateTileEntityPacket getUpdatePacket() {
         CompoundNBT nbtTag = new CompoundNBT();
         write(nbtTag);
-        return new SPacketUpdateTileEntity(getPos(), 1, nbtTag);
+        return new SUpdateTileEntityPacket(getPos(), 1, nbtTag);
     }
 
     @Override
-    public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity packet) {
+    public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket packet) {
         BlockState oldMimicBlock = getBlockState();
         CompoundNBT tagCompound = packet.getNbtCompound();
         super.onDataPacket(net, packet);
@@ -92,7 +92,7 @@ public class ConstructionBlockTileEntity extends TileEntity {
         if (world.isRemote) {
             // If needed send a render update.
             if (!getBlockState().equals(oldMimicBlock)) {
-                world.markBlockRangeForRenderUpdate(getPos(), getPos());
+                world.markChunkDirty(getPos(), this.getTileEntity());
             }
         }
     }

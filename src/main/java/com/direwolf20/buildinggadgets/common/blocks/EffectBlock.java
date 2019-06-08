@@ -1,11 +1,11 @@
 package com.direwolf20.buildinggadgets.common.blocks;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.material.EnumPushReaction;
+import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.material.PushReaction;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockRenderLayer;
-import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockReader;
@@ -25,8 +25,8 @@ public class EffectBlock extends Block {
      */
     @Override
     @SuppressWarnings("deprecation")
-    public EnumBlockRenderType getRenderType(BlockState state) {
-        return EnumBlockRenderType.INVISIBLE;
+    public BlockRenderType getRenderType(BlockState state) {
+        return BlockRenderType.INVISIBLE;
     }
 
     /**
@@ -72,7 +72,7 @@ public class EffectBlock extends Block {
      * @deprecated call via {@link BlockState#getPushReaction()} whenever possible. Implementing/overriding is fine.
      */
     @Override
-    public EnumPushReaction getPushReaction(BlockState state) {
-        return EnumPushReaction.BLOCK;
+    public PushReaction getPushReaction(BlockState state) {
+        return PushReaction.BLOCK;
     }
 }

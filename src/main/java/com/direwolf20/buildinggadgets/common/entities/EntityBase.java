@@ -15,7 +15,8 @@ public abstract class EntityBase extends Entity {
 
     public EntityBase(EntityType<?> entityType, World world) {
         super(entityType, world);
-        setSize(0.1F, 0.1F);
+//  fixme: Removed as of 1.14
+//        getSize(0.1F, 0.1F);
     }
 
     protected abstract int getMaxLife();
@@ -49,9 +50,9 @@ public abstract class EntityBase extends Entity {
 
     @Override
     protected void writeAdditional(CompoundNBT compound) {
-        compound.setInt(NBTKeys.ENTITY_DESPAWNING, despawning);
-        compound.setInt(NBTKeys.ENTITY_TICKS_EXISTED, ticksExisted);
-        compound.setTag(NBTKeys.ENTITY_SET_POS, NBTUtil.writeBlockPos(targetPos));
+        compound.putInt(NBTKeys.ENTITY_DESPAWNING, despawning);
+        compound.putInt(NBTKeys.ENTITY_TICKS_EXISTED, ticksExisted);
+        compound.put(NBTKeys.ENTITY_SET_POS, NBTUtil.writeBlockPos(targetPos));
     }
 
     @Override

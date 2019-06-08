@@ -11,6 +11,7 @@ import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
+import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
@@ -81,7 +82,8 @@ public class TemplateManagerTileEntity extends TileEntity {
 
     public boolean canInteractWith(ClientPlayerEntity playerIn) {
         // If we are too far away from this tile entity you cannot use it
-        return !isRemoved() && playerIn.getDistanceSq(pos.add(0.5D, 0.5D, 0.5D)) <= 64D;
+        BlockPos pos = this.pos.add(0.5D, 0.5D, 0.5D);
+        return !isRemoved() && playerIn.getDistanceSq(pos.getX(), pos.getY(), pos.getZ()) <= 64D;
     }
 
     @Nonnull

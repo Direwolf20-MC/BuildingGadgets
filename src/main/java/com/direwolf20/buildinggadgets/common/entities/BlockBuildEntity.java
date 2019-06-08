@@ -5,10 +5,11 @@ import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGEntities;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import net.minecraft.block.BlockState;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.init.Blocks;
+import net.minecraft.block.Blocks;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.NBTUtil;
+import net.minecraft.network.IPacket;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
@@ -21,7 +22,7 @@ import java.util.Optional;
 
 public class BlockBuildEntity extends EntityBase {
 
-    public static enum Mode {
+    public enum Mode {
         // Serialization and networking based on `ordinal()`, please DO NOT CHANGE THE ORDER of the enums
         PLACE() {
             @Override
@@ -39,7 +40,7 @@ public class BlockBuildEntity extends EntityBase {
                 } else {
                     world.setBlockState(targetPos, targetBlock);
                     BlockPos upPos = targetPos.up();
-                    world.getBlockState(targetPos).neighborChanged(world, targetPos, world.getBlockState(upPos).getBlock(), upPos);
+                    world.getBlockState(targetPos).neighborChanged(world, targetPos, world.getBlockState(upPos).getBlock(), upPos, false);
                 }
             }
         },
@@ -68,7 +69,7 @@ public class BlockBuildEntity extends EntityBase {
 
     private BlockState setBlock;
     private BlockState originalSetBlock;
-    private EntityLivingBase spawnedBy;
+    private LivingEntity spawnedBy;
 
     private Mode mode;
     private boolean useConstructionPaste;
@@ -77,7 +78,7 @@ public class BlockBuildEntity extends EntityBase {
         super(BGEntities.BUILD_BLOCK, world);
     }
 
-    public BlockBuildEntity(World world, BlockPos spawnPos, EntityLivingBase player, BlockState spawnBlock, Mode mode, boolean usePaste) {
+    public BlockBuildEntity(World world, BlockPos spawnPos, LivingEntity player, BlockState spawnBlock, Mode mode, boolean usePaste) {
         this(world);
         setPosition(spawnPos.getX(), spawnPos.getY(), spawnPos.getZ());
 
@@ -152,13 +153,18 @@ public class BlockBuildEntity extends EntityBase {
         super.writeAdditional(compound);
 
         CompoundNBT blockStateTag = NBTUtil.writeBlockState(setBlock);
-        compound.setTag(NBTKeys.ENTITY_BUILD_SET_BLOCK, blockStateTag);
+        compound.put(NBTKeys.ENTITY_BUILD_SET_BLOCK, blockStateTag);
 
         blockStateTag = NBTUtil.writeBlockState(originalSetBlock);
 
-        compound.setTag(NBTKeys.ENTITY_BUILD_ORIGINAL_BLOCK, blockStateTag);
-        compound.setInt(NBTKeys.GADGET_MODE, mode.ordinal());
-        compound.setBoolean(NBTKeys.ENTITY_BUILD_USE_PASTE, useConstructionPaste);
+        compound.put(NBTKeys.ENTITY_BUILD_ORIGINAL_BLOCK, blockStateTag);
+        compound.putInt(NBTKeys.GADGET_MODE, mode.ordinal());
+        compound.putBoolean(NBTKeys.ENTITY_BUILD_USE_PASTE, useConstructionPaste);
+    }
+
+    @Override
+    public IPacket<?> createSpawnPacket() {
+        return null;
     }
 
     @Override

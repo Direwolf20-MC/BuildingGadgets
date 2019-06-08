@@ -1,17 +1,13 @@
 package com.direwolf20.buildinggadgets.common.blocks;
 
 import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockContainer;
-import net.minecraft.block.material.EnumPushReaction;
-import net.minecraft.block.material.MaterialColor;
-import net.minecraft.block.state.BlockFaceShape;
-import net.minecraft.block.BlockState;
+import net.minecraft.block.*;
+import net.minecraft.block.material.PushReaction;
 import net.minecraft.client.renderer.color.BlockColors;
 import net.minecraft.entity.Entity;
-import net.minecraft.client.entity.player.ClientPlayerEntity;
-import net.minecraft.init.Blocks;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItemUseContext;
+import net.minecraft.item.ItemStack;
 import net.minecraft.pathfinding.PathType;
 import net.minecraft.state.BooleanProperty;
 import net.minecraft.state.IProperty;
@@ -19,20 +15,22 @@ import net.minecraft.state.StateContainer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.IWorldReader;
-import net.minecraft.world.World;
+import net.minecraft.world.*;
+import net.minecraft.world.storage.loot.LootContext;
 import net.minecraftforge.common.IPlantable;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 //@Optional.Interface(iface = "team.chisel.ctm.api.IFacade", modid = "ctm-api")
-public class ConstructionBlock extends BlockContainer /*implements IFacade*/ {
+public class ConstructionBlock extends ContainerBlock /*implements IFacade*/ {
     //public static final ConstructionProperty FACADEID = new ConstructionProperty("facadeid");
     public static final IProperty<Boolean> BRIGHT = BooleanProperty.create("bright");
     public static final IProperty<Boolean> NEIGHBOR_BRIGHTNESS = BooleanProperty.create("neighbor_brightness");
@@ -66,14 +64,10 @@ public class ConstructionBlock extends BlockContainer /*implements IFacade*/ {
     }*/
 
     @Override
-    @Nonnull
-    public IItemProvider getItemDropped(BlockState state, World worldIn, BlockPos pos, int fortune) {
-        return BGItems.constructionPaste;
-    }
-
-    @Override
-    public boolean canSilkHarvest(BlockState state, IWorldReader world, BlockPos pos, ClientPlayerEntity player) {
-        return false;
+    public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
+        return new ArrayList<ItemStack>(){{
+            add(new ItemStack(BGItems.constructionPaste));
+        }};
     }
 
     @Override
@@ -110,10 +104,6 @@ public class ConstructionBlock extends BlockContainer /*implements IFacade*/ {
 
     /**
      * Can return IExtendedBlockState
-     *
-     * @param state
-     * @param world
-     * @param pos
      */
     /*@Override
     public BlockState getExtendedState(BlockState state, IBlockReader world, BlockPos pos) {
@@ -140,8 +130,8 @@ public class ConstructionBlock extends BlockContainer /*implements IFacade*/ {
 
     @Override
     @Deprecated
-    public EnumBlockRenderType getRenderType(BlockState state) {
-        return EnumBlockRenderType.MODEL;
+    public BlockRenderType getRenderType(BlockState state) {
+        return BlockRenderType.MODEL;
     }
 
     @Override
@@ -156,23 +146,6 @@ public class ConstructionBlock extends BlockContainer /*implements IFacade*/ {
         return mimicBlock == null ? true : mimicBlock.getBlock().shouldSideBeRendered(mimicBlock, blockAccess, pos, side);
     }*/
 
-    /**
-     * Return true if the block is a normal, solid cube.  This
-     * determines indirect power state, entity ejection from blocks, and a few
-     * others.
-     *
-     * @param state The current state
-     * @param world The current world
-     * @param pos   Block position in world
-     * @return True if the block is a full cube
-     */
-    @Override
-    public boolean isNormalCube(BlockState state, IBlockReader world, BlockPos pos) {
-        BlockState mimic = getActualMimicBlock(world, pos);
-        return !isMimicNull(mimic) ? mimic.isNormalCube(world, pos) : super.isNormalCube(state, world, pos);
-    }
-
-
     @Override
     public int getOpacity(BlockState state, IBlockReader worldIn, BlockPos pos) {
         Boolean bright = state.get(ConstructionBlock.BRIGHT);
@@ -185,52 +158,25 @@ public class ConstructionBlock extends BlockContainer /*implements IFacade*/ {
     }
 
     @Override
-    public boolean doesSideBlockRendering(BlockState state, IWorldReader world, BlockPos pos, Direction face) {
+    public boolean doesSideBlockRendering(BlockState state, IEnviromentBlockReader world, BlockPos pos, Direction face) {
         BlockState mimic = getActualMimicBlock(world, pos);
         return !isMimicNull(mimic) ? mimic.doesSideBlockRendering(world, pos, face) : super.doesSideBlockRendering(state, world, pos, face);
     }
-
 
     public void initColorHandler(BlockColors blockColors) {
         blockColors.register((state, world, pos, tintIndex) -> {
             if (world != null) {
                 BlockState mimicBlock = getActualMimicBlock(world, pos);
-                return blockColors.getColor(mimicBlock, world, pos, tintIndex);
+                return blockColors.getColor(mimicBlock, (World) world, pos);
             }
             return -1;
         }, this);
     }
 
-    /**
-     * Get the geometry of the queried face at the given position and state. This is used to decide whether things like
-     * buttons are allowed to be placed on the face, or how glass panes connect to the face, among other things.
-     * <p>
-     * Common values are {@code SOLID}, which is the default, and {@code UNDEFINED}, which represents something that does
-     * not fit the other descriptions and will generally cause other things not to connect to the face.
-     *
-     * @param worldIn
-     * @param state
-     * @param pos
-     * @param face
-     * @return an approximation of the form of the given face
-     * @deprecated call via {@link BlockState#getBlockFaceShape(IBlockReader, BlockPos, Direction)} whenever possible.
-     * Implementing/overriding is fine.
-     */
     @Override
-    @SuppressWarnings("deprecation")
-    public BlockFaceShape getBlockFaceShape(IBlockReader worldIn, BlockState state, BlockPos pos, Direction face) {
-        BlockState mimicBlock = getActualMimicBlock(worldIn, pos);
-        try {
-            return mimicBlock != null ? mimicBlock.getBlockFaceShape(worldIn, pos, face) : super.getBlockFaceShape(worldIn, state, pos, face);
-        } catch (Exception e) {
-            return BlockFaceShape.SOLID;
-        }
-    }
-
-    @Override
-    public VoxelShape getCollisionShape(BlockState state, IBlockReader worldIn, BlockPos pos) {
+    public VoxelShape getCollisionShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext selectionContext) {
         BlockState mimic = getActualMimicBlock(worldIn, pos);
-        return !isMimicNull(mimic) ? mimic.getCollisionShape(worldIn, pos) : super.getCollisionShape(state, worldIn, pos);
+        return !isMimicNull(mimic) ? mimic.getCollisionShape(worldIn, pos) : super.getCollisionShape(state, worldIn, pos, selectionContext);
     }
 
     @Override
@@ -244,26 +190,9 @@ public class ConstructionBlock extends BlockContainer /*implements IFacade*/ {
     }
 
     /**
-     * Get the MapColor for this Block and the given BlockState
-     *
-     * @deprecated call via {@link BlockState#getMapColor(IBlockReader, BlockPos)} whenever possible.
-     * Implementing/overriding is fine.
-     */
-    @Override
-    public MaterialColor getMapColor(BlockState state, IBlockReader worldIn, BlockPos pos) {
-        BlockState mimic = getActualMimicBlock(worldIn, pos);
-        return !isMimicNull(mimic) ? mimic.getMapColor(worldIn, pos) : super.getMapColor(state, worldIn, pos);
-    }
-
-    /**
      * For all neighbors, have them react to this block's existence, potentially updating their states as needed. For
      * example, fences make their connections to this block if possible and observers pulse if this block was placed in
      * front of their detector
-     *
-     * @param stateIn
-     * @param worldIn
-     * @param pos
-     * @param flags
      */
     @Override
     public void updateNeighbors(BlockState stateIn, IWorld worldIn, BlockPos pos, int flags) {
@@ -278,11 +207,6 @@ public class ConstructionBlock extends BlockContainer /*implements IFacade*/ {
     /**
      * performs updates on diagonal neighbors of the target position and passes in the flags. The flags can be referenced
      * from the docs for {@link BlockState#updateDiagonalNeighbors(IWorld, BlockPos, int)}.
-     *
-     * @param state
-     * @param worldIn
-     * @param pos
-     * @param flags
      */
     @Override
     public void updateDiagonalNeighbors(BlockState state, IWorld worldIn, BlockPos pos, int flags) {
@@ -294,49 +218,6 @@ public class ConstructionBlock extends BlockContainer /*implements IFacade*/ {
         }
     }
 
-    /**
-     * Indicate if a material is a normal solid opaque cube
-     *
-     * @param state
-     * @deprecated call via {@link BlockState#isBlockNormalCube()} whenever possible. Implementing/overriding is fine.
-     */
-    @Override
-    public boolean isBlockNormalCube(BlockState state) {
-        return false;
-    }
-
-    /**
-     * Used for nearly all game logic (non-rendering) purposes. Use Forge-provided isNormalCube(IBlockAccess, BlockPos)
-     * instead.
-     *
-     * @param state
-     * @deprecated call via {@link BlockState#isNormalCube()} whenever possible. Implementing/overriding is fine.
-     */
-    @Override
-    public boolean isNormalCube(BlockState state) {
-        return false;
-    }
-
-    /**
-     * @param state
-     * @deprecated call via {@link BlockState#isFullCube()} whenever possible. Implementing/overriding is fine.
-     */
-    @Override
-    public boolean isFullCube(BlockState state) {
-        return false;
-    }
-
-    /**
-     * Determines if the block is solid enough on the top side to support other blocks, like redstone components.
-     *
-     * @param state
-     * @deprecated prefer calling {@link BlockState#isTopSolid()} wherever possible
-     */
-    @Override
-    public boolean isTopSolid(BlockState state) {
-        return false;
-    }
-
     @Override
     public boolean allowsMovement(BlockState state, IBlockReader worldIn, BlockPos pos, PathType type) {
 
@@ -345,9 +226,6 @@ public class ConstructionBlock extends BlockContainer /*implements IFacade*/ {
     }
 
     /**
-     * @param blockState
-     * @param worldIn
-     * @param pos
      * @deprecated call via {@link BlockState#getBlockHardness(IBlockReader, BlockPos)} whenever possible.
      * Implementing/overriding is fine.
      */
@@ -368,9 +246,9 @@ public class ConstructionBlock extends BlockContainer /*implements IFacade*/ {
     }
 
     @Override
-    public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos) {
+    public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext selectionContext) {
         BlockState mimic = getActualMimicBlock(worldIn, pos);
-        return !isMimicNull(mimic) ? mimic.getShape(worldIn, pos) : super.getShape(state, worldIn, pos);
+        return !isMimicNull(mimic) ? mimic.getShape(worldIn, pos) : super.getShape(state, worldIn, pos, selectionContext);
     }
 
     @Override
@@ -413,13 +291,8 @@ public class ConstructionBlock extends BlockContainer /*implements IFacade*/ {
 
     /**
      * Called periodically clientside on blocks near the player to show effects (like furnace fire particles). Note that
-     * this method is unrelated to {@link } and {@link #needsRandomTick}, and will always be called regardless
+     * this method is unrelated to {@link } and {@link #?}, and will always be called regardless
      * of whether the block can receive random update ticks
-     *
-     * @param stateIn
-     * @param worldIn
-     * @param pos
-     * @param rand
      */
     @Override
     public void animateTick(BlockState stateIn, World worldIn, BlockPos pos, Random rand) {
@@ -435,52 +308,37 @@ public class ConstructionBlock extends BlockContainer /*implements IFacade*/ {
      * Called when a neighboring block was changed and marks that this state should perform any checks during a neighbor
      * change. Cases may include when redstone power is updated, cactus blocks popping off due to a neighboring solid
      * block, etc.
-     *
-     * @param state
-     * @param worldIn
-     * @param pos
-     * @param blockIn
-     * @param fromPos
      */
     @Override
-    public void neighborChanged(BlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos fromPos) {
+    public void neighborChanged(BlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos fromPos, boolean p_220069_6_) {
         BlockState mimic = getActualMimicBlock(worldIn, pos);
         if (!isMimicNull(mimic)) {
-            mimic.neighborChanged(worldIn, pos, blockIn, fromPos);
+            mimic.neighborChanged(worldIn, pos, blockIn, fromPos, p_220069_6_);
         } else {
-            super.neighborChanged(state, worldIn, pos, blockIn, fromPos);
+            super.neighborChanged(state, worldIn, pos, blockIn, fromPos, p_220069_6_);
         }
     }
 
     /**
      * Get the hardness of this Block relative to the ability of the given player
-     *
-     * @param state
-     * @param player
-     * @param worldIn
-     * @param pos
-     * @deprecated call via {@link BlockState#getPlayerRelativeBlockHardness(ClientPlayerEntity, IBlockReader, BlockPos)} whenever
+     * @deprecated call via {@link BlockState#getPlayerRelativeBlockHardness(PlayerEntity, IBlockReader, BlockPos)} whenever
      * possible. Implementing/overriding is fine.
      */
     @Override
-    public float getPlayerRelativeBlockHardness(BlockState state, ClientPlayerEntity player, IBlockReader worldIn, BlockPos pos) {
+    public float getPlayerRelativeBlockHardness(BlockState state, PlayerEntity player, IBlockReader worldIn, BlockPos pos) {
         BlockState mimic = getActualMimicBlock(worldIn, pos);
         return !isMimicNull(mimic) ? mimic.getPlayerRelativeBlockHardness(player, worldIn, pos) : super.getPlayerRelativeBlockHardness(state, player, worldIn, pos);
     }
 
     @Override
-    public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, ClientPlayerEntity player, Hand hand, Direction side, float hitX, float hitY, float hitZ) {
+    public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult rayTraceResult) {
         BlockState mimic = getActualMimicBlock(worldIn, pos);
         //System.out.println(mimic);
-        return !isMimicNull(mimic) ? mimic.onBlockActivated(worldIn, pos, player, hand, side, hitX, hitY, hitZ) : super.onBlockActivated(state, worldIn, pos, player, hand, side, hitX, hitY, hitZ);
+        return !isMimicNull(mimic) ? mimic.onBlockActivated(worldIn, player, hand, rayTraceResult) : super.onBlockActivated(state, worldIn, pos, player, hand, rayTraceResult);
     }
 
     /**
      * Called when the given entity walks on this Block
-     *
-     * @param worldIn
-     * @param pos
-     * @param entityIn
      */
     @Override
     public void onEntityWalk(World worldIn, BlockPos pos, Entity entityIn) {
@@ -499,7 +357,7 @@ public class ConstructionBlock extends BlockContainer /*implements IFacade*/ {
     }
 
     @Override
-    public void onBlockClicked(BlockState state, World worldIn, BlockPos pos, ClientPlayerEntity player) {
+    public void onBlockClicked(BlockState state, World worldIn, BlockPos pos, PlayerEntity player) {
         BlockState mimic = getActualMimicBlock(worldIn, pos);
         if (!isMimicNull(mimic)) {
             mimic.onBlockClicked(worldIn, pos, player);
@@ -509,10 +367,6 @@ public class ConstructionBlock extends BlockContainer /*implements IFacade*/ {
     }
 
     /**
-     * @param blockState
-     * @param blockAccess
-     * @param pos
-     * @param side
      * @deprecated call via {@link BlockState#getWeakPower(IBlockReader, BlockPos, Direction)} whenever possible.
      * Implementing/overriding is fine.
      */
@@ -523,10 +377,6 @@ public class ConstructionBlock extends BlockContainer /*implements IFacade*/ {
     }
 
     /**
-     * @param blockState
-     * @param blockAccess
-     * @param pos
-     * @param side
      * @deprecated call via {@link BlockState#getStrongPower(IBlockReader, BlockPos, Direction)} whenever possible.
      * Implementing/overriding is fine.
      */
@@ -537,21 +387,15 @@ public class ConstructionBlock extends BlockContainer /*implements IFacade*/ {
     }
 
     /**
-     * @param state
      * @deprecated call via {@link BlockState#getPushReaction()} whenever possible. Implementing/overriding is fine.
      */
     @Override
-    public EnumPushReaction getPushReaction(BlockState state) {
-        return EnumPushReaction.BLOCK;
+    public PushReaction getPushReaction(BlockState state) {
+        return PushReaction.BLOCK;
     }
 
     /**
      * Block's chance to react to a living entity falling on it.
-     *
-     * @param worldIn
-     * @param pos
-     * @param entityIn
-     * @param fallDistance
      */
     @Override
     public void onFallenUpon(World worldIn, BlockPos pos, Entity entityIn, float fallDistance) {
@@ -565,9 +409,6 @@ public class ConstructionBlock extends BlockContainer /*implements IFacade*/ {
 
     /**
      * Called similar to random ticks, but only when it is raining.
-     *
-     * @param worldIn
-     * @param pos
      */
     @Override
     public void fillWithRain(World worldIn, BlockPos pos) {
@@ -580,9 +421,6 @@ public class ConstructionBlock extends BlockContainer /*implements IFacade*/ {
     }
 
     /**
-     * @param state
-     * @param worldIn
-     * @param pos
      * @deprecated call via whenever possible.
      * Implementing/overriding is fine.
      */
@@ -597,6 +435,7 @@ public class ConstructionBlock extends BlockContainer /*implements IFacade*/ {
         BlockState mimic = getActualMimicBlock(world, pos);
         return !isMimicNull(mimic) ? mimic.canSustainPlant(world, pos, facing, plantable) : super.canSustainPlant(state, world, pos, facing, plantable);
     }
+
  /* Todo reeval
     public boolean shouldSideBeRendered(BlockState blockState, IBlockAccess blockAccess, BlockPos pos, Direction side) {
         FakeRenderWorld fakeWorld = new FakeRenderWorld();
@@ -636,14 +475,14 @@ public class ConstructionBlock extends BlockContainer /*implements IFacade*/ {
         }
     }*/
 
-    @Override
-    @Deprecated
-    public float getAmbientOcclusionLightValue(BlockState state) {
-        Boolean bright = state.get(ConstructionBlock.BRIGHT);
-        Boolean neighborBrightness = state.get(ConstructionBlock.NEIGHBOR_BRIGHTNESS);
-        if (bright || neighborBrightness) {
-            return 1f;
-        }
-        return 0.2f;
-    }
+// fixme: removed as of 1.14?
+//    @Deprecated
+//    public float getAmbientOcclusionLightValue(BlockState state) {
+//        Boolean bright = state.get(ConstructionBlock.BRIGHT);
+//        Boolean neighborBrightness = state.get(ConstructionBlock.NEIGHBOR_BRIGHTNESS);
+//        if (bright || neighborBrightness) {
+//            return 1f;
+//        }
+//        return 0.2f;
+//    }
 }

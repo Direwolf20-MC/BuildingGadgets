@@ -3,8 +3,8 @@ package com.direwolf20.buildinggadgets.common.blocks;
 import com.direwolf20.buildinggadgets.common.entities.ConstructionBlockEntity;
 import com.direwolf20.buildinggadgets.common.util.lang.TooltipTranslation;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockFalling;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.FallingBlock;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tags.FluidTags;
@@ -19,7 +19,7 @@ import net.minecraft.world.World;
 import javax.annotation.Nullable;
 import java.util.List;
 
-public class ConstructionBlockPowder extends BlockFalling {
+public class ConstructionBlockPowder extends FallingBlock {
     public ConstructionBlockPowder(Properties builder) {
         super(builder);
     }
@@ -56,30 +56,15 @@ public class ConstructionBlockPowder extends BlockFalling {
     }
 
     @Override
-    public void neighborChanged(BlockState state, World world, BlockPos pos, Block block, BlockPos fromPos) {
+    public void neighborChanged(BlockState state, World world, BlockPos pos, Block block, BlockPos fromPos, boolean __a) {
         tryTouchWater(world, pos);
     }
 
     @Override
-    public void onBlockAdded(BlockState state, World worldIn, BlockPos pos, BlockState oldState) {
+    public void onBlockAdded(BlockState state, World worldIn, BlockPos pos, BlockState oldState, boolean __a) {
         if (!this.tryTouchWater(worldIn, pos)) {
-            super.onBlockAdded(state, worldIn, pos, oldState);
+            super.onBlockAdded(state, worldIn, pos, oldState, __a);
         }
-    }
-
-    /**
-     * Return true if the block is a normal, solid cube.  This
-     * determines indirect power state, entity ejection from blocks, and a few
-     * others.
-     *
-     * @param state The current state
-     * @param world The current world
-     * @param pos   Block position in world
-     * @return True if the block is a full cube
-     */
-    @Override
-    public boolean isNormalCube(BlockState state, IBlockReader world, BlockPos pos) {
-        return false;
     }
 
     @Override
