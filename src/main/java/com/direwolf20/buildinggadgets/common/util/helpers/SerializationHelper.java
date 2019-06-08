@@ -1,14 +1,12 @@
 package com.direwolf20.buildinggadgets.common.util.helpers;
 
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraftforge.common.util.INBTSerializable;
-
 import javax.annotation.Nullable;
 import java.io.*;
 
 public final class SerializationHelper {
 
-    private SerializationHelper() { }
+    private SerializationHelper() {
+    }
 
     @Nullable
     public static byte[] serialize(Object object) {

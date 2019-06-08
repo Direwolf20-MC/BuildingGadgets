@@ -12,18 +12,17 @@ import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.blocks.RegionSnapshot;
 import com.direwolf20.buildinggadgets.common.util.exceptions.PaletteOverflowException;
 import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
-import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper.ITagSerializable;
 import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
 import com.direwolf20.buildinggadgets.common.util.lang.Styles;
 import com.direwolf20.buildinggadgets.common.util.lang.TooltipTranslation;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
+import com.direwolf20.buildinggadgets.common.util.tools.SetBackedPlacementSequence;
 import com.direwolf20.buildinggadgets.common.world.WorldSave;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTUtil;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
@@ -33,96 +32,15 @@ import net.minecraft.util.text.*;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.BlockSnapshot;
-import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.world.BlockEvent;
 import org.apache.commons.lang3.tuple.Pair;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class GadgetDestruction extends GadgetSwapping {
-
-    public static class SetBackedPlacementSequence implements IPositionPlacementSequence, ITagSerializable<SetBackedPlacementSequence> {
-
-        public static final String POS_SET = "Pos";
-
-        public static SetBackedPlacementSequence deserializeFrom(NBTTagCompound tag) {
-            HashSet<BlockPos> set = new HashSet<>();
-            NBTHelper.deserializeSet(tag.getList(POS_SET, Constants.NBT.TAG_COMPOUND), set, nbt -> NBTUtil.readBlockPos((NBTTagCompound) nbt));
-
-            Region boundingBox = Region.deserializeFrom(tag);
-
-            return new SetBackedPlacementSequence(set, boundingBox);
-        }
-
-        private final Region boundingBox;
-        private final HashSet<BlockPos> internalSet;
-
-        public SetBackedPlacementSequence(HashSet<BlockPos> internalSet, Region boundingBox) {
-            this.internalSet = internalSet;
-            this.boundingBox = boundingBox;
-        }
-
-        @Nonnull
-        @Override
-        public Iterator<BlockPos> iterator() {
-            return internalSet.iterator();
-        }
-
-        @Nonnull
-        @Override
-        public Region getBoundingBox() {
-            return boundingBox;
-        }
-
-        /**
-         * @deprecated Use {@link #contains(int, int, int)} instead.
-         */
-        @Deprecated
-        @Override
-        public boolean mayContain(int x, int y, int z) {
-            return contains(new BlockPos(x, y, z));
-        }
-
-        public boolean contains(int x, int y, int z) {
-            return contains(new BlockPos(x, y, z));
-        }
-
-        public boolean contains(BlockPos pos) {
-            return internalSet.contains(pos);
-        }
-
-        /**
-         * Warning: this method uses the copy constructor of {@link HashSet}, therefore it does not guarantee it will
-         * return the same type of set.
-         */
-        @Deprecated
-        @Nonnull
-        @Override
-        public IPositionPlacementSequence copy() {
-            return new SetBackedPlacementSequence(new HashSet<>(internalSet), boundingBox);
-        }
-
-        public HashSet<BlockPos> getInternalSet() {
-            return internalSet;
-        }
-
-        @Override
-        public SetBackedPlacementSequence deserialize(NBTTagCompound tag) {
-            return deserializeFrom(tag);
-        }
-
-        @Override
-        public NBTTagCompound serializeTo(NBTTagCompound tag) {
-            tag.setTag(POS_SET, NBTHelper.serializeSet(internalSet, NBTUtil::writeBlockPos));
-            boundingBox.serializeTo(tag);
-            return tag;
-        }
-
-    }
 
     public static void restoreSnapshotWithBuilder(World world, RegionSnapshot snapshot) {
         Set<BlockPos> pastePositions = snapshot.getTileData().stream()

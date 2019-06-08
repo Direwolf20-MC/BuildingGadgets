@@ -1,10 +1,8 @@
 package com.direwolf20.buildinggadgets.common.util.blocks;
 
 import com.direwolf20.buildinggadgets.api.building.IPositionPlacementSequence;
-import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.util.exceptions.PaletteOverflowException;
 import com.direwolf20.buildinggadgets.common.util.helpers.LambdaHelper;
-import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper.ITagSerializable;
 import com.direwolf20.buildinggadgets.common.util.helpers.SerializationHelper;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
@@ -28,8 +26,7 @@ import net.minecraftforge.common.util.TriPredicate;
 import net.minecraftforge.fml.server.ServerLifecycleHooks;
 import org.apache.commons.lang3.tuple.Pair;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import java.io.Serializable;
 import java.util.*;
 import java.util.function.BiPredicate;
 
@@ -45,17 +42,13 @@ public class RegionSnapshot {
     private static final String TILE_NBT = "block_nbt";
 
     private static NBTTagCompound serialize(NBTTagCompound tag, RegionSnapshot snapshot) {
-        // Preconditions.checkArgument(snapshot.positions instanceof Serializable, "Cannot serialize a pos provider that is not Serializable!");
+        Preconditions.checkArgument(snapshot.positions instanceof Serializable);
 
         // func_212678_a == getKey
         tag.setString(DIMENSION, DimensionType.func_212678_a(snapshot.world.getDimension().getType()).toString());
-        if (snapshot.positions instanceof ITagSerializable) {
-            tag.setTag(POSITIONS, ((ITagSerializable) snapshot.positions).serializeNBT());
-            tag.setString(POSITIONS_CLASS, snapshot.positions.getClass().getName());
-        } else {
-            byte[] serializedPositions = SerializationHelper.serialize(snapshot.positions);
-            tag.setByteArray(POSITIONS, Objects.requireNonNull(serializedPositions));
-        }
+
+        byte[] serializedPositions = SerializationHelper.serialize(snapshot.positions);
+        tag.setByteArray(POSITIONS, Objects.requireNonNull(serializedPositions));
 
         // Palette serialization begin
         // The serialized palettes only include actual block states, empty block state should be added, regardlessly, during deserialization
@@ -138,23 +131,7 @@ public class RegionSnapshot {
         ResourceLocation dimension = new ResourceLocation(tag.getString(DIMENSION));
         World world = ServerLifecycleHooks.getCurrentServer().getWorld(Objects.requireNonNull(DimensionType.byName(dimension)));
 
-        IPositionPlacementSequence positions;
-        if (tag.hasKey(POSITIONS_CLASS)) {
-            try {
-                Class<?> clazz = Class.forName(tag.getString(POSITIONS_CLASS));
-                if (!ITagSerializable.class.isAssignableFrom(clazz))
-                    return null;
-
-                Method deserializer = clazz.getDeclaredMethod("deserializeFrom", NBTTagCompound.class);
-                deserializer.setAccessible(true);
-                positions = (IPositionPlacementSequence) deserializer.invoke(null, tag.getCompound(POSITIONS));
-            } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-                BuildingGadgets.LOG.error(e);
-                return null;
-            }
-        } else {
-            positions = SerializationHelper.deserialize(tag.getByteArray(POSITIONS));
-        }
+        IPositionPlacementSequence positions = SerializationHelper.deserialize(tag.getByteArray(POSITIONS));
 
         List<Optional<IBlockState>> palettes = new ArrayList<>();
         {

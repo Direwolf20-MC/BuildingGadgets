@@ -430,28 +430,4 @@ public class NBTHelper {
         };
     }
 
-    /**
-     * Implementations needs a static method for deserialization for deserialization of subclasses of some interface.
-     *
-     * @param <T> The implementation itself.
-     */
-    public interface ITagSerializable<T extends ITagSerializable<T>> extends INBTSerializable<NBTTagCompound> {
-
-        T deserialize(NBTTagCompound tag);
-
-        NBTTagCompound serializeTo(NBTTagCompound tag);
-
-        @Override
-        default NBTTagCompound serializeNBT() {
-            return serializeTo(new NBTTagCompound());
-        }
-
-        @Deprecated
-        @Override
-        default void deserializeNBT(NBTTagCompound tag) {
-            throw new UnsupportedOperationException();
-        }
-
-    }
-
 }
