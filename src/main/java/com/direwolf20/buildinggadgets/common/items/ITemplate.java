@@ -1,13 +1,14 @@
 package com.direwolf20.buildinggadgets.common.items;
 
-import com.direwolf20.buildinggadgets.common.util.tools.UniqueItem;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
+import com.direwolf20.buildinggadgets.common.util.tools.UniqueItem;
 import com.direwolf20.buildinggadgets.common.world.WorldSave;
 import com.google.common.collect.Multiset;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.ListNBT;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -39,8 +40,8 @@ public interface ITemplate {
         if (tagCompound == null) {
             tagCompound = new CompoundNBT();
         }
-        NBTTagList tagList = GadgetUtils.itemCountToNBT(tagMap);
-        tagCompound.setTag("itemcountmap", tagList);
+        ListNBT tagList = GadgetUtils.itemCountToNBT(tagMap);
+        tagCompound.put("itemcountmap", tagList);
         stack.setTag(tagCompound);
     }
 

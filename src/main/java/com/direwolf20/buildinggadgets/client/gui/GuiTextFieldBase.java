@@ -1,26 +1,32 @@
 package com.direwolf20.buildinggadgets.client.gui;
 
+import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.widget.TextFieldWidget;
+
 import java.util.function.BiConsumer;
 
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.GuiTextField;
-
-public class GuiTextFieldBase extends GuiTextField {
+public class GuiTextFieldBase extends TextFieldWidget {
     private boolean suspended;
     private String valueDefault, valueOld;
     private BiConsumer<GuiTextFieldBase, String> postModification;
 
     public GuiTextFieldBase(FontRenderer fontRenderer, int x, int y, int width) {
-        super(0, fontRenderer, x, y, width, fontRenderer.FONT_HEIGHT);
+        super(fontRenderer, 0, x, y, width, "");//TODO find out messages
         setMaxStringLength(50);
-        setTextAcceptHandler(this::postModification);
         setValidator(s -> {
             valueOld = getText();
             return true;
         });
     }
 
-    public void postModification(Integer id, String text) {
+    @Override
+    public void setText(String textIn) {
+        super.setText(textIn);
+        postModification(textIn);//TODO validate that this is the correct place
+
+    }
+
+    public void postModification(String text) {
         if (!suspended && postModification != null) {
             suspended = true;
             postModification.accept(this, valueOld);
