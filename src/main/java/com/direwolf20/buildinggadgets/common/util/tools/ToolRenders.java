@@ -22,20 +22,19 @@ import com.direwolf20.buildinggadgets.common.util.tools.modes.BuildingMode;
 import com.direwolf20.buildinggadgets.common.util.tools.modes.ExchangingMode;
 import com.direwolf20.buildinggadgets.common.world.FakeBuilderWorld;
 
+import com.mojang.blaze3d.platform.GlStateManager;
+import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GLAllocation;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
-import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.util.BlockRenderLayer;
-import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -97,7 +96,7 @@ public class ToolRenders {
         if (heldItem.isEmpty()) return;
 
         Minecraft mc = Minecraft.getInstance();
-        mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+//        mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
 
         //Calculate the players current position, which is needed later
         double doubleX = player.lastTickPosX + (player.posX - player.lastTickPosX) * evt.getPartialTicks();
@@ -115,7 +114,7 @@ public class ToolRenders {
             World world = player.world;
             BlockState startBlock = Blocks.AIR.getDefaultState();
             if (!(lookingAt == null)) {
-                startBlock = world.getBlockState(lookingAt.getBlockPos());
+                startBlock = world.getBlockState(new BlockPos(lookingAt.getHitVec()));
             }
             if (startBlock != BGBlocks.effectBlock.getDefaultState()) {
 
@@ -239,19 +238,19 @@ public class ToolRenders {
             World world = player.world;
             BlockState startBlock = Blocks.AIR.getDefaultState();
             if (!(lookingAt == null)) {
-                startBlock = world.getBlockState(lookingAt.getBlockPos());
+                startBlock = world.getBlockState(new BlockPos(lookingAt.getHitVec()));
             }
             if (startBlock != BGBlocks.effectBlock.getDefaultState()) {
                 BlockState renderBlockState = getToolBlock(stack);
                 Minecraft mc = Minecraft.getInstance();
-                mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+//                mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
                 if (renderBlockState == Blocks.AIR.getDefaultState()) {//Don't render anything if there is no block selected (Air)
                     return;
                 }
                 if (coordinates.size() == 0 && lookingAt != null) { //Build a list of coordinates based on the tool mode and range
                     coordinates = ExchangingMode
                             .collectPlacementPos(world, player, lookingAt
-                                    .getBlockPos(), lookingAt.sideHit, stack, lookingAt.getBlockPos());
+                                    .getBlockPos(), lookingAt.sideHit, heldItem, lookingAt.getBlockPos());
                 }
 
                 //Figure out how many of the block we're rendering we have in the inventory of the player.
@@ -310,7 +309,7 @@ public class ToolRenders {
                         }
                     }
                     //state = state.getBlock().getExtendedState(state, fakeWorld, coordinate); //Get the extended block state in the fake world (Disabled to fix chisel, not sure why.)
-                    if (renderBlockState.getRenderType() != EnumBlockRenderType.INVISIBLE) {
+                    if (renderBlockState.getRenderType() != BlockRenderType.INVISIBLE) {
                         try {
                             mc.getBlockRendererDispatcher().renderBlockBrightness(state, 1f);//Render the defined block
                         } catch (Throwable t) {
@@ -392,7 +391,7 @@ public class ToolRenders {
 
     private static void renderDestructionOverlay(ClientPlayerEntity player, World world, BlockPos startBlock, Direction facing, ItemStack heldItem) {
         Minecraft mc = Minecraft.getInstance();
-        mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+//        mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
 
         SortedSet<BlockPos> coordinates = GadgetDestruction.getArea(world, startBlock, facing, player, heldItem);
 
@@ -438,10 +437,10 @@ public class ToolRenders {
             //GlStateManager.rotate(-90.0F, 0.0F, 1.0F, 0.0F); //Rotate it because i'm not sure why but we need to
             //GlStateManager.disableCull();
             GlStateManager.disableLighting();
-            GlStateManager.disableTexture2D();
+            GlStateManager.disableTexture();
             //renderBoxSolid(t, bufferBuilder, a.getX(), a.getY(), a.getZ()+1, b.getX()+1, b.getY()+1, b.getZ()+1, 1, 1, 1);
             renderBoxSolid(t, bufferBuilder, 0, 0, -1, 1, 1, 0, 1, 0, 0, 0.5f);
-            GlStateManager.enableTexture2D();
+            GlStateManager.enableTexture();
             GlStateManager.enableLighting();
             //GlStateManager.enableCull();
             //dispatcher.renderBlockBrightness(Blocks.STAINED_GLASS.getDefaultState().withProperty(COLOR, EnumDyeColor.RED), 1f);//Render the defined block - White glass to show non-full block renders (Example: Torch)
@@ -465,7 +464,7 @@ public class ToolRenders {
         double doubleZ = player.lastTickPosZ + (player.posZ - player.lastTickPosZ) * evt.getPartialTicks();
 
         Minecraft mc = Minecraft.getInstance();
-        mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+//        mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
 
         renderLinkedInventoryOutline(stack, player, doubleX, doubleY, doubleZ);
 
@@ -563,7 +562,7 @@ public class ToolRenders {
             GlStateManager.translatef((float) -doubleX, (float) -doubleY, (float) -doubleZ);//The render starts at the player, so we subtract the player coords and move the render to 0,0,0
 
             GlStateManager.disableLighting();
-            GlStateManager.disableTexture2D();
+            GlStateManager.disableTexture();
             GlStateManager.enableBlend();
             GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
 
@@ -571,7 +570,7 @@ public class ToolRenders {
 
             GlStateManager.lineWidth(1.0F);
             GlStateManager.enableLighting();
-            GlStateManager.enableTexture2D();
+            GlStateManager.disableTexture();
             GlStateManager.enableDepthTest();
             GlStateManager.depthMask(true);
 
