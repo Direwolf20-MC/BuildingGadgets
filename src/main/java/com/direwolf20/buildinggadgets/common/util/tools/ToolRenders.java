@@ -392,11 +392,7 @@ public class ToolRenders {
         Minecraft mc = Minecraft.getInstance();
         mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
 
-        SortedSet<BlockPos> coordinates = GadgetDestruction.getClearingPositions(world, startBlock, facing, player, heldItem).stream()
-                .collect(Collectors.toCollection(() -> new TreeSet<>(Comparator
-                        .comparingInt(Vec3i::getX)
-                        .thenComparingInt(Vec3i::getY)
-                        .thenComparingInt(Vec3i::getZ))));
+        SortedSet<BlockPos> coordinates = GadgetDestruction.getClearingPositionsSet(world, startBlock, facing, player, heldItem);
 
         //Prepare the block rendering
         BlockRenderLayer origLayer = MinecraftForgeClient.getRenderLayer();

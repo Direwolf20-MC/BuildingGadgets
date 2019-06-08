@@ -22,11 +22,13 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.*;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTUtil;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.Vec3i;
 import net.minecraft.util.text.*;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
@@ -36,6 +38,7 @@ import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.world.BlockEvent;
 import org.apache.commons.lang3.tuple.Pair;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -63,11 +66,13 @@ public class GadgetDestruction extends GadgetSwapping {
             this.boundingBox = boundingBox;
         }
 
+        @Nonnull
         @Override
         public Iterator<BlockPos> iterator() {
             return internalSet.iterator();
         }
 
+        @Nonnull
         @Override
         public Region getBoundingBox() {
             return boundingBox;
@@ -95,6 +100,7 @@ public class GadgetDestruction extends GadgetSwapping {
          * return the same type of set.
          */
         @Deprecated
+        @Nonnull
         @Override
         public IPositionPlacementSequence copy() {
             return new SetBackedPlacementSequence(new HashSet<>(internalSet), boundingBox);
@@ -115,6 +121,7 @@ public class GadgetDestruction extends GadgetSwapping {
             boundingBox.serializeTo(tag);
             return tag;
         }
+
     }
 
     public static void restoreSnapshotWithBuilder(World world, RegionSnapshot snapshot) {
@@ -161,34 +168,30 @@ public class GadgetDestruction extends GadgetSwapping {
     public void addInformation(ItemStack stack, @Nullable World world, List<ITextComponent> tooltip, ITooltipFlag flag) {
         super.addInformation(stack, world, tooltip, flag);
         tooltip.add(TooltipTranslation.GADGET_DESTROYWARNING
-                            .componentTranslation()
-                            .setStyle(Styles.RED));
+                .componentTranslation()
+                .setStyle(Styles.RED));
         tooltip.add(TooltipTranslation.GADGET_DESTROYSHOWOVERLAY
-                            .componentTranslation(String.valueOf(getOverlay(stack)))
-                            .setStyle(Styles.AQUA));
+                .componentTranslation(String.valueOf(getOverlay(stack)))
+                .setStyle(Styles.AQUA));
         tooltip.add(TooltipTranslation.GADGET_BUILDING_PLACE_ATOP
-                            .componentTranslation(String.valueOf(getConnectedArea(stack)))
-                            .setStyle(Styles.YELLOW));
+                .componentTranslation(String.valueOf(getConnectedArea(stack)))
+                .setStyle(Styles.YELLOW));
         if (Config.isServerConfigLoaded() && Config.GADGETS.GADGET_DESTRUCTION.nonFuzzyEnabled.get())
             tooltip.add(TooltipTranslation.GADGET_FUZZY
-                                .componentTranslation(String.valueOf(getFuzzy(stack)))
-                                .setStyle(Styles.GOLD));
+                    .componentTranslation(String.valueOf(getFuzzy(stack)))
+                    .setStyle(Styles.GOLD));
 
         addInformationRayTraceFluid(tooltip, stack);
         addEnergyInformation(tooltip, stack);
     }
 
-    @Nullable
     public static String getUUID(ItemStack stack) {
-        NBTTagCompound tagCompound = stack.getTag();
-        if (tagCompound == null) {
-            tagCompound = new NBTTagCompound();
-        }
-        String uuid = tagCompound.getString(NBTKeys.GADGET_UUID);
+        NBTTagCompound tag = NBTHelper.getOrNewTag(stack);
+        String uuid = tag.getString(NBTKeys.GADGET_UUID);
         if (uuid.isEmpty()) {
             UUID uid = UUID.randomUUID();
-            tagCompound.setString(NBTKeys.GADGET_UUID, uid.toString());
-            stack.setTag(tagCompound);
+            tag.setString(NBTKeys.GADGET_UUID, uid.toString());
+            stack.setTag(tag);
             uuid = uid.toString();
         }
         return uuid;
@@ -277,26 +280,7 @@ public class GadgetDestruction extends GadgetSwapping {
         boolean overlay = !getOverlay(stack);
         setOverlay(stack, overlay);
         player.sendStatusMessage(TooltipTranslation.GADGET_DESTROYSHOWOVERLAY
-                                         .componentTranslation(String.valueOf(overlay)).setStyle(Styles.AQUA), true);
-    }
-
-    public static List<EnumFacing> assignDirections(EnumFacing side, EntityPlayer player) {
-        List<EnumFacing> dirs = new ArrayList<EnumFacing>();
-        EnumFacing depth = side.getOpposite();
-        boolean vertical = side.getAxis().isVertical();
-        EnumFacing up = vertical ? player.getHorizontalFacing() : EnumFacing.UP;
-        EnumFacing left = vertical ? up.rotateY() : side.rotateYCCW();
-        EnumFacing right = left.getOpposite();
-        if (side == EnumFacing.DOWN)
-            up = up.getOpposite();
-
-        EnumFacing down = up.getOpposite();
-        dirs.add(left);
-        dirs.add(right);
-        dirs.add(up);
-        dirs.add(down);
-        dirs.add(depth);
-        return dirs;
+                .componentTranslation(String.valueOf(overlay)).setStyle(Styles.AQUA), true);
     }
 
     @Override
@@ -358,7 +342,7 @@ public class GadgetDestruction extends GadgetSwapping {
 
             BlockPos startPos = (getAnchor(stack) == null) ? pos : getAnchor(stack);
             IBlockState stateTarget = !Config.GADGETS.GADGET_DESTRUCTION.nonFuzzyEnabled.get() || GadgetGeneric.getFuzzy(stack) ? null : world.getBlockState(pos);
-            addConnectedCoords(world, player, startPos, stateTarget, voidPositions,
+            addConnectedCoordinates(world, player, startPos, stateTarget, voidPositions,
                     boundary);
 
             return new SetBackedPlacementSequence(voidPositions, boundary);
@@ -367,18 +351,25 @@ public class GadgetDestruction extends GadgetSwapping {
         }
     }
 
-    public static void addConnectedCoords(World world, EntityPlayer player, BlockPos loc, IBlockState state, Set<BlockPos> coords, Region boundary) {
-        if (coords.contains(loc) || !boundary.contains(loc))
+    public static SortedSet<BlockPos> getClearingPositionsSet(World world, BlockPos pos, EnumFacing incomingSide, EntityPlayer player, ItemStack stack) {
+        return getClearingPositions(world, pos, incomingSide, player, stack).stream()
+                .collect(Collectors.toCollection(() -> new TreeSet<>(Comparator
+                        .comparingInt(Vec3i::getX)
+                        .thenComparingInt(Vec3i::getY)
+                        .thenComparingInt(Vec3i::getZ))));
+    }
+
+    private static void addConnectedCoordinates(World world, EntityPlayer player, BlockPos pos, IBlockState state, Set<BlockPos> coords, Region boundary) {
+        if (coords.contains(pos) || !boundary.contains(pos))
+            return;
+        if (!isValidBlock(world, pos, player, state))
             return;
 
-        if (!isValidBlock(world, loc, player, state))
-            return;
-
-        coords.add(loc);
+        coords.add(pos);
         for (int x = -1; x <= 1; x++) {
             for (int y = -1; y <= 1; y++) {
                 for (int z = -1; z <= 1; z++) {
-                    addConnectedCoords(world, player, loc.add(x, y, z), state, coords, boundary);
+                    addConnectedCoordinates(world, player, pos.add(x, y, z), state, coords, boundary);
                 }
             }
         }
@@ -462,7 +453,7 @@ public class GadgetDestruction extends GadgetSwapping {
         WorldSave worldSave = WorldSave.getWorldSaveDestruction(world);
 
         NBTTagCompound serializedSnapshot = worldSave.getCompoundFromUUID(getUUID(stack));
-        if(serializedSnapshot.isEmpty())
+        if (serializedSnapshot.isEmpty())
             return;
 
         RegionSnapshot snapshot = RegionSnapshot.deserialize(serializedSnapshot);
@@ -476,7 +467,7 @@ public class GadgetDestruction extends GadgetSwapping {
         if (tool.isEmpty())
             return false;
 
-        if(!this.canUse(tool, player))
+        if (!this.canUse(tool, player))
             return false;
 
         if (world.isAirBlock(voidPos))
@@ -495,4 +486,5 @@ public class GadgetDestruction extends GadgetSwapping {
 
         return stack;
     }
+
 }
