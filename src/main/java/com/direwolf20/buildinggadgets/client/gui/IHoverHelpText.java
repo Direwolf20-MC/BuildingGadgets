@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.client.gui;
 
-import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.AbstractGui;
 
 public interface IHoverHelpText {
 
@@ -8,5 +8,5 @@ public interface IHoverHelpText {
 
     String getHoverHelpText();
 
-    void drawRect(Gui gui, int color);
+    void drawRect(AbstractGui gui, int color);
 }
