@@ -2,13 +2,15 @@ package com.direwolf20.buildinggadgets.common.blocks.templatemanager;
 
 import com.direwolf20.buildinggadgets.common.util.exceptions.CapabilityNotPresentException;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
-import net.minecraft.client.entity.player.ClientPlayerEntity;
-import net.minecraft.inventory.Container;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.Slot;
+import net.minecraft.inventory.container.Container;
+import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
+
+import javax.annotation.Nonnull;
 
 public class TemplateManagerContainer extends Container {
     public static final String TEXTURE_LOC_SLOT_TOOL = Reference.MODID + ":gui/slot_copy_paste_gadget";
@@ -16,9 +18,15 @@ public class TemplateManagerContainer extends Container {
     private TemplateManagerTileEntity te;
 
     public TemplateManagerContainer(IInventory playerInventory, TemplateManagerTileEntity te) {
-        this.te = te;
+        super(null, 5);//TODO fix once we get access to ContainerTypes
         addOwnSlots();
         addPlayerSlots(playerInventory);
+        this.te = te;
+    }
+
+    @Override
+    public boolean canInteractWith(PlayerEntity playerIn) {
+        return te.canInteractWith(playerIn);
     }
 
     private void addPlayerSlots(IInventory playerInventory) {
@@ -50,7 +58,8 @@ public class TemplateManagerContainer extends Container {
     }
 
     @Override
-    public ItemStack transferStackInSlot(ClientPlayerEntity playerIn, int index) {
+    @Nonnull
+    public ItemStack transferStackInSlot(PlayerEntity p_82846_1_, int index) {
         ItemStack itemstack = ItemStack.EMPTY;
         Slot slot = this.inventorySlots.get(index);
 
@@ -76,10 +85,5 @@ public class TemplateManagerContainer extends Container {
         }
 
         return itemstack;
-    }
-
-    @Override
-    public boolean canInteractWith(ClientPlayerEntity playerIn) {
-        return te.canInteractWith(playerIn);
     }
 }
