@@ -20,20 +20,20 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multiset;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
-import net.minecraft.init.Blocks;
+import net.minecraft.block.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.ListNBT;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
 import net.minecraft.util.Direction.Axis;
 import net.minecraft.util.math.*;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
@@ -76,7 +76,7 @@ public class GadgetUtils {
     @Nullable
     public static ByteArrayOutputStream getPasteStream(@Nonnull CompoundNBT compound, @Nullable String name) throws IOException {
         CompoundNBT withText = name != null && !name.isEmpty() ? compound.copy() : compound;
-        if (name != null && !name.isEmpty()) withText.setString(NBTKeys.TEMPLATE_NAME, name);
+        if (name != null && !name.isEmpty()) withText.putString(NBTKeys.TEMPLATE_NAME, name);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         CompressedStreamTools.writeCompressed(withText, baos);
         return baos.size() < Short.MAX_VALUE - 200 ? baos : null;
@@ -283,12 +283,12 @@ public class GadgetUtils {
             return;
 
         BlockPos pos = lookingAt.getBlockPos();
-        EnumActionResult result = setRemoteInventory(stack, player, world, pos, true);
-        if (result == EnumActionResult.SUCCESS)
+        ActionResultType result = setRemoteInventory(stack, player, world, pos, true);
+        if (result == ActionResultType.SUCCESS)
             return;
 
         BlockState state = world.getBlockState(pos);
-        if (result == EnumActionResult.FAIL || !Config.BLACKLIST.isAllowedBlock(state.getBlock())) {
+        if (result == ActionResultType.FAIL || !Config.BLACKLIST.isAllowedBlock(state.getBlock())) {
             player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.invalidblock").getUnformattedComponentText()), true);
             return;
         }
@@ -299,20 +299,20 @@ public class GadgetUtils {
         setToolActualBlock(stack, actualState);
     }
 
-    public static EnumActionResult setRemoteInventory(ItemStack stack, ClientPlayerEntity player, World world, BlockPos pos, boolean setTool) {
+    public static ActionResultType setRemoteInventory(ItemStack stack, ClientPlayerEntity player, World world, BlockPos pos, boolean setTool) {
         TileEntity te = world.getTileEntity(pos);
         if (te == null)
-            return EnumActionResult.PASS;
+            return ActionResultType.PASS;
 
         if (setTool && te instanceof ConstructionBlockTileEntity && ((ConstructionBlockTileEntity) te).getBlockState() != null) {
             setToolBlock(stack, ((ConstructionBlockTileEntity) te).getActualBlockState());
             setToolActualBlock(stack, ((ConstructionBlockTileEntity) te).getActualBlockState());
-            return EnumActionResult.SUCCESS;
+            return ActionResultType.SUCCESS;
         }
         if (setRemoteInventory(player, stack, pos, world))
-            return EnumActionResult.SUCCESS;
+            return ActionResultType.SUCCESS;
 
-        return EnumActionResult.FAIL;
+        return ActionResultType.FAIL;
     }
 
     public static boolean anchorBlocks(ClientPlayerEntity player, ItemStack stack) {

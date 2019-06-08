@@ -5,7 +5,7 @@ import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.google.common.base.Preconditions;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
-import net.minecraft.init.Items;
+import net.minecraft.item.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
@@ -65,7 +65,7 @@ public final class UniqueItem { //TODO @since 1.13.x can this be replaced with I
 
     public void writeToNBT(CompoundNBT compound) {
         assert item.getRegistryName() != null; //An Item without registry name cannot exist in here... Construction would have failed otherwise...
-        compound.setString(NBTKeys.UNIQUE_ITEM_ITEM, this.getItem().getRegistryName().toString());
+        compound.putString(NBTKeys.UNIQUE_ITEM_ITEM, this.getItem().getRegistryName().toString());
     }
 
     @Override

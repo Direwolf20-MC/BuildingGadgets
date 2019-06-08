@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.common.util.lang;
 
 import net.minecraft.client.resources.I18n;
-import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TranslationTextComponent;
 
 public interface ITranslationProvider {
     /*Client side only! */
@@ -10,9 +10,9 @@ public interface ITranslationProvider {
         return I18n.format(getTranslationKey(), args);
     }
 
-    default TextComponentTranslation componentTranslation(Object... args) {
+    default TranslationTextComponent componentTranslation(Object... args) {
         assert areValidArguments(args);
-        return new TextComponentTranslation(getTranslationKey(), args);
+        return new TranslationTextComponent(getTranslationKey(), args);
     }
 
     boolean areValidArguments(Object... args);
