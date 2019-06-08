@@ -9,7 +9,7 @@ import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.google.common.collect.Multiset;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.renderer.GlStateManager;
+import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.renderer.ItemRenderer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -39,7 +39,7 @@ public class EventTooltip {
     }
 
     private static void tooltipIfShift(@SuppressWarnings("unused") List<ITextComponent> tooltip, Runnable r) {
-        if (Screen.isShiftKeyDown())
+        if (Screen.hasShiftDown())
             r.run();
     }
 
@@ -88,7 +88,7 @@ public class EventTooltip {
         //This method will draw items on the tooltip
         ItemStack stack = event.getStack();
 
-        if ((stack.getItem() instanceof ITemplate) && Screen.isShiftKeyDown()) {
+        if ((stack.getItem() instanceof ITemplate) && Screen.hasShiftDown()) {
             long totalMissing = 0;
             Multiset<UniqueItem> itemCountMap = ((ITemplate) stack.getItem()).getItemCountMap(stack);
 
