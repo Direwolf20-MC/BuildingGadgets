@@ -6,11 +6,11 @@ import com.direwolf20.buildinggadgets.api.template.building.SimpleBuildContext;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.IFluidState;
-import net.minecraft.init.Blocks;
 import net.minecraft.particles.IParticleData;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
@@ -21,11 +21,11 @@ import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.world.*;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.border.WorldBorder;
+import net.minecraft.world.chunk.AbstractChunkProvider;
 import net.minecraft.world.chunk.IChunk;
-import net.minecraft.world.chunk.IChunkProvider;
 import net.minecraft.world.dimension.Dimension;
 import net.minecraft.world.gen.Heightmap;
-import net.minecraft.world.storage.ISaveHandler;
+import net.minecraft.world.storage.SaveHandler;
 import net.minecraft.world.storage.WorldInfo;
 import net.minecraft.world.storage.WorldSavedDataStorage;
 import net.minecraftforge.api.distmarker.Dist;
@@ -146,7 +146,7 @@ public class FakeDelegationWorld implements IWorld {
     }
 
     @Override
-    public EnumDifficulty getDifficulty() {
+    public Difficulty getDifficulty() {
         return world.getDifficulty();
     }
 
@@ -154,7 +154,7 @@ public class FakeDelegationWorld implements IWorld {
      * gets the world's chunk provider
      */
     @Override
-    public IChunkProvider getChunkProvider() {
+    public AbstractChunkProvider getChunkProvider() {
         return world.getChunkProvider();
     }
 
@@ -162,7 +162,7 @@ public class FakeDelegationWorld implements IWorld {
      * Returns this world's current save handler
      */
     @Override
-    public ISaveHandler getSaveHandler() {
+    public SaveHandler getSaveHandler() {
         return world.getSaveHandler();
     }
 
@@ -215,7 +215,7 @@ public class FakeDelegationWorld implements IWorld {
     }
 
     @Override
-    public int getLightFor(EnumLightType type, BlockPos pos) {
+    public int getLightFor(LightType type, BlockPos pos) {
         return world.getLightFor(type, pos);
     }
 
@@ -385,7 +385,7 @@ public class FakeDelegationWorld implements IWorld {
     }
 
     @Override
-    public void setLightFor(EnumLightType type, BlockPos pos, int lightValue) {
+    public void setLightFor(LightType type, BlockPos pos, int lightValue) {
         world.setLightFor(type, pos, lightValue);
     }
 

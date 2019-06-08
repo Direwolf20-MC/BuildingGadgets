@@ -14,20 +14,21 @@ import com.direwolf20.buildinggadgets.common.util.tools.ToolRenders;
 import com.direwolf20.buildinggadgets.common.util.tools.modes.ExchangingMode;
 import com.direwolf20.buildinggadgets.common.world.FakeBuilderWorld;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
-import net.minecraft.init.Blocks;
-import net.minecraft.init.Enchantments;
-import net.minecraft.init.Items;
+import net.minecraft.enchantment.Enchantments;
+import net.minecraft.item.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldType;
@@ -92,7 +93,7 @@ public class GadgetExchanger extends GadgetSwapping {
     }
 
     @Override
-    public boolean canApplyAtEnchantingTable(ItemStack stack, net.minecraft.enchantment.Enchantment enchantment) {
+    public boolean canApplyAtEnchantingTable(ItemStack stack, Enchantment enchantment) {
         if (enchantment == Enchantments.SILK_TOUCH) {
             return true;
         }
@@ -146,7 +147,7 @@ public class GadgetExchanger extends GadgetSwapping {
         } else if (!player.isSneaking()) {
             ToolRenders.updateInventoryCache();
         }
-        return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, itemstack);
+        return new ActionResult<ItemStack>(ActionResultType.SUCCESS, itemstack);
     }
 
     public void toggleMode(ClientPlayerEntity player, ItemStack heldItem) {//TODO unused
@@ -157,7 +158,7 @@ public class GadgetExchanger extends GadgetSwapping {
         //Called when we specify a mode with the radial menu
         ExchangingMode mode = ExchangingMode.values()[modeInt];
         setToolMode(heldItem, mode);
-        player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.toolmode").getUnformattedComponentText() + ": " + mode), true);
+        player.sendStatusMessage(new StringTextComponent(TextFormatting.AQUA + new TranslationTextComponent("message.gadget.toolmode").getUnformattedComponentText() + ": " + mode), true);
     }
 
     public static void rangeChange(ClientPlayerEntity player, ItemStack heldItem) {
@@ -169,7 +170,7 @@ public class GadgetExchanger extends GadgetSwapping {
             range = (range >= Config.GADGETS.maxRange.get()) ? 1 : range + changeAmount;
         }
         setToolRange(heldItem, range);
-        player.sendStatusMessage(new TextComponentString(TextFormatting.DARK_AQUA + new TextComponentTranslation("message.gadget.toolrange").getUnformattedComponentText() + ": " + range), true);
+        player.sendStatusMessage(new StringTextComponent(TextFormatting.DARK_AQUA + new TranslationTextComponent("message.gadget.toolrange").getUnformattedComponentText() + ": " + range), true);
     }
 
     private boolean exchange(ClientPlayerEntity player, ItemStack stack) {

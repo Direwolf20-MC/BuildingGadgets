@@ -13,7 +13,6 @@ import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.registry.objects.BuildingObjects;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import net.minecraft.command.Commands;
-import net.minecraft.item.crafting.RecipeSerializers;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.crafting.CraftingHelper;
@@ -65,7 +64,7 @@ public class BuildingGadgets {
         // Client only registering
         DistExecutor.runWhenOn(Dist.CLIENT, () -> () -> {
             eventBus.addListener((Consumer<FMLClientSetupEvent>) event -> ClientProxy.clientSetup(eventBus));
-            ModLoadingContext.get().registerExtensionPoint(ExtensionPoint.GUIFACTORY, () -> GuiMod::openScreen);
+            ModLoadingContext.get().registerExtensionPoint(ExtensionPoint.CONFIGGUIFACTORY, () -> GuiMod::openScreen);
         });
 
         theApi = APIProxy.INSTANCE.onCreate(eventBus, MinecraftForge.EVENT_BUS, Config.API);

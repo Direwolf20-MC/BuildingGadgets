@@ -3,7 +3,7 @@ package com.direwolf20.buildinggadgets.common.world;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.ListNBT;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.storage.WorldSavedData;
@@ -71,8 +71,8 @@ public class WorldSave extends WorldSavedData {
 
     @Override
     public void read(CompoundNBT nbt) {
-        if (nbt.hasKey(TAG_NAME)) {
-            NBTTagList tagList = nbt.getList(TAG_NAME, Constants.NBT.TAG_COMPOUND);
+        if (nbt.contains(TAG_NAME)) {
+            ListNBT tagList = nbt.getList(TAG_NAME, Constants.NBT.TAG_COMPOUND);
 
             for (int i = 0; i < tagList.size(); i++) {
                 CompoundNBT mapTag = tagList.getCompound(i);
@@ -85,15 +85,15 @@ public class WorldSave extends WorldSavedData {
 
     @Override
     public CompoundNBT write(CompoundNBT compound) {
-        NBTTagList tagList = new NBTTagList();
+        ListNBT tagList = new ListNBT();
 
         for (Map.Entry<String, CompoundNBT> entry : tagMap.entrySet()) {
             CompoundNBT map = new CompoundNBT();
-            map.setString(NBTKeys.WORLD_SAVE_UUID, entry.getKey());
-            map.setTag(NBTKeys.WORLD_SAVE_TAG, entry.getValue());
+            map.putString(NBTKeys.WORLD_SAVE_UUID, entry.getKey());
+            map.put(NBTKeys.WORLD_SAVE_TAG, entry.getValue());
             tagList.add(map);
         }
-        compound.setTag(TAG_NAME, tagList);
+        compound.put(TAG_NAME, tagList);
         return compound;
     }
 

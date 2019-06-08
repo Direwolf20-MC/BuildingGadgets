@@ -19,22 +19,23 @@ import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.buffers.PasteToolBufferBuilder;
 import com.direwolf20.buildinggadgets.common.util.buffers.ToolBufferBuilder;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
+import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiButton;
-import net.minecraft.client.gui.GuiTextField;
-import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.client.gui.widget.button.Button;
+import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.renderer.*;
-import net.minecraft.client.renderer.texture.TextureMap;
+import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.client.renderer.vertex.VertexFormatElement;
-import net.minecraft.inventory.Slot;
+import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.JsonToNBT;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import org.lwjgl.opengl.GL11;
 
@@ -44,7 +45,7 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TemplateManagerGUI extends GuiContainer {
+public class TemplateManagerGUI extends ContainerScreen {
     public static final int HELP_TEXT_BACKGROUNG_COLOR = 1694460416;
 
     private boolean panelClicked;
@@ -61,8 +62,8 @@ public class TemplateManagerGUI extends GuiContainer {
 
 //    private int scrollAcc;
 
-    private GuiTextField nameField;
-    private GuiButton buttonSave, buttonLoad, buttonCopy, buttonPaste;
+    private TextFieldWidget nameField;
+    private Button buttonSave, buttonLoad, buttonCopy, buttonPaste;
 
     private GuiButtonHelp buttonHelp;
     private List<IHoverHelpText> helpTextProviders = new ArrayList<>();
@@ -111,7 +112,7 @@ public class TemplateManagerGUI extends GuiContainer {
         buttonPaste = addButton(createAndAddButton(135, 61, 34, 20, "Paste", () -> {
             String CBString = mc.keyboardListener.getClipboardString();
             if (GadgetUtils.mightBeLink(CBString)) {
-                Minecraft.getInstance().player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.pastefailed.linkcopied").getUnformattedComponentText()),false);
+                Minecraft.getInstance().player.sendStatusMessage(new StringTextComponent(TextFormatting.RED + new TranslationTextComponent("message.gadget.pastefailed.linkcopied").getUnformattedComponentText()),false);
                 return;
             }
             try {
@@ -119,17 +120,17 @@ public class TemplateManagerGUI extends GuiContainer {
                 ByteArrayOutputStream pasteStream = GadgetUtils.getPasteStream(JsonToNBT.getTagFromJson(CBString), nameField.getText());
                 if (pasteStream != null) {
                     PacketHandler.sendToServer(new PacketTemplateManagerPaste(pasteStream, te.getPos(), nameField.getText()));
-                    Minecraft.getInstance().player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.pastesuccess").getUnformattedComponentText()), false);
+                    Minecraft.getInstance().player.sendStatusMessage(new StringTextComponent(TextFormatting.AQUA + new TranslationTextComponent("message.gadget.pastesuccess").getUnformattedComponentText()), false);
                 } else {
-                    Minecraft.getInstance().player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.pastetoobig").getUnformattedComponentText()), false);
+                    Minecraft.getInstance().player.sendStatusMessage(new StringTextComponent(TextFormatting.RED + new TranslationTextComponent("message.gadget.pastetoobig").getUnformattedComponentText()), false);
                 }
             } catch (Throwable t) {
                 BuildingGadgets.LOG.error(t);
-                Minecraft.getInstance().player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.pastefailed").getUnformattedComponentText()), false);
+                Minecraft.getInstance().player.sendStatusMessage(new StringTextComponent(TextFormatting.RED + new TranslationTextComponent("message.gadget.pastefailed").getUnformattedComponentText()), false);
             }
         }));
 
-        this.nameField = new GuiTextField(0, this.fontRenderer, this.guiLeft + 8, this.guiTop + 6, 149, this.fontRenderer.FONT_HEIGHT);
+        this.nameField = new TextFieldWidget(0, this.fontRenderer, this.guiLeft + 8, this.guiTop + 6, 149, this.fontRenderer.FONT_HEIGHT);
         this.nameField.setMaxStringLength(50);
         this.nameField.setVisible(true);
         children.add(nameField);
@@ -141,7 +142,7 @@ public class TemplateManagerGUI extends GuiContainer {
         helpTextProviders.add(new AreaHelpText(panel, guiLeft, guiTop + 10, "preview"));
     }
 
-    private GuiButton createAndAddButton(int x, int y, int witdth, int height, String text, @Nullable Runnable action) {
+    private Button createAndAddButton(int x, int y, int witdth, int height, String text, @Nullable Runnable action) {
         GuiButtonHelpText button = new GuiButtonHelpText(guiLeft + x, guiTop + y, witdth, height, text, text.toLowerCase(), action);
         helpTextProviders.add(button);
         return button;
@@ -246,7 +247,7 @@ public class TemplateManagerGUI extends GuiContainer {
                 GlStateManager.rotatef(rotY, 0, 1, 0);
                 GlStateManager.translated(((startPos.getX() - endPos.getX()) / 2), ((startPos.getY() - endPos.getY()) / 2), ((startPos.getZ() - endPos.getZ()) / 2));
 
-                mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+                mc.getTextureManager().bindTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
                 if ((startPos.getX() - endPos.getX()) == 0) {
                     //GlStateManager.rotate(270, 0, 1, 0);
                 }

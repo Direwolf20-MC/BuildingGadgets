@@ -12,11 +12,11 @@ import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.google.common.base.Function;
 import com.google.common.base.Supplier;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.Container;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.container.Container;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
@@ -54,17 +54,17 @@ public enum GuiMod {
     }
 
     private Function<ClientPlayerEntity, ItemStack> stackReader;
-    private Function<ItemStack, GuiScreen> clientScreenProvider;
-    private Function<OpenContainer, GuiScreen> commonScreenProvider;
+    private Function<ItemStack, Screen> clientScreenProvider;
+    private Function<OpenContainer, Screen> commonScreenProvider;
     private IContainerOpener containerOpener;
     private String id;
 
-    private GuiMod(Function<ClientPlayerEntity, ItemStack> stackReader, Function<ItemStack, GuiScreen> clientScreenProvider) {
+    private GuiMod(Function<ClientPlayerEntity, ItemStack> stackReader, Function<ItemStack, Screen> clientScreenProvider) {
         this.stackReader = stackReader;
         this.clientScreenProvider = clientScreenProvider;
     }
 
-    private GuiMod(String id, Function<OpenContainer, GuiScreen> commonScreenProvider, IContainerOpener containerOpener) {
+    private GuiMod(String id, Function<OpenContainer, Screen> commonScreenProvider, IContainerOpener containerOpener) {
         this.id = id;
         this.commonScreenProvider = commonScreenProvider;
         this.containerOpener = containerOpener;
@@ -78,7 +78,7 @@ public enum GuiMod {
         if (stack == null || stack.isEmpty())
             return false;
 
-        GuiScreen screen = clientScreenProvider.apply(stack);
+        Screen screen = clientScreenProvider.apply(stack);
         Minecraft.getInstance().displayGuiScreen(screen);
         return screen == null;
     }
@@ -87,7 +87,7 @@ public enum GuiMod {
         return containerOpener == null || !(player instanceof ServerPlayerEntity) ? false : containerOpener.open(id, (ServerPlayerEntity) player, world, pos);
     }
 
-    public static GuiScreen openScreen(OpenContainer message) {
+    public static Screen openScreen(OpenContainer message) {
         if (message.getId().getPath().equals(TEMPLATE_MANAGER.id))
             return TEMPLATE_MANAGER.commonScreenProvider.apply(message);
 
@@ -121,7 +121,7 @@ public enum GuiMod {
             }
 
             @Override
-            public Container createContainer(InventoryPlayer playerInventory, ClientPlayerEntity playerIn) {
+            public Container createContainer(PlayerInventory playerInventory, ClientPlayerEntity playerIn) {
                 return container;
             }
         }, extraDataWriter);

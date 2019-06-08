@@ -18,8 +18,8 @@ import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiButton;
-import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.settings.KeyBinding;
@@ -36,7 +36,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ModeRadialMenu extends GuiScreen {
+public class ModeRadialMenu extends Screen {
 
     //TODO move to a enum of modes of Copy-Paste Gadget
     private static final ImmutableList<ResourceLocation> signsCopyPaste = ImmutableList.of(
@@ -48,7 +48,7 @@ public class ModeRadialMenu extends GuiScreen {
     private int slotSelected = -1;
     private int segments;
     private GuiSliderInt sliderRange;
-    private final List<GuiButton> conditionalButtons = new ArrayList<>();
+    private final List<Button> conditionalButtons = new ArrayList<>();
 
     public ModeRadialMenu(ItemStack stack) {
         mc = Minecraft.getInstance();
@@ -95,7 +95,7 @@ public class ModeRadialMenu extends GuiScreen {
         }
         if (!(tool.getItem() instanceof GadgetCopyPaste)) {
             if (!isDestruction || Config.GADGETS.GADGET_DESTRUCTION.nonFuzzyEnabled.get()) {
-                GuiButton button = new GuiButtonActionCallback("fuzzy", right, send -> {
+                Button button = new GuiButtonActionCallback("fuzzy", right, send -> {
                     if (send)
                         PacketHandler.sendToServer(new PacketToggleFuzzy());
 
@@ -104,7 +104,7 @@ public class ModeRadialMenu extends GuiScreen {
                 addButton(button);
                 conditionalButtons.add(button);
             }
-            GuiButton button = new GuiButtonActionCallback("connected_" + (isDestruction ? "area" : "surface"), right, send -> {
+            Button button = new GuiButtonActionCallback("connected_" + (isDestruction ? "area" : "surface"), right, send -> {
                 if (send)
                     PacketHandler.sendToServer(new PacketToggleConnectedArea());
 
@@ -239,7 +239,7 @@ public class ModeRadialMenu extends GuiScreen {
         boolean inRange = false;
         if (segments != 0) {
             inRange = dist > radiusMin && dist < radiusMax;
-            for (GuiButton button : buttons) {
+            for (Button button : buttons) {
                 if (button instanceof GuiButtonActionCallback)
                     ((GuiButtonActionCallback) button).setFaded(inRange);
             }
@@ -439,7 +439,7 @@ public class ModeRadialMenu extends GuiScreen {
         boolean curent;
         boolean changed = false;
         for (int i = 0; i < conditionalButtons.size(); i++) {
-            GuiButton button = conditionalButtons.get(i);
+            Button button = conditionalButtons.get(i);
             if (builder)
                 curent = GadgetBuilding.getToolMode(tool) == BuildingMode.SURFACE;
             else

@@ -456,7 +456,7 @@ public class ToolBufferBuilder extends BufferBuilder {
         ++this.vertexFormatIndex;
         this.vertexFormatIndex %= this.vertexFormat.getElementCount();
         this.vertexFormatElement = this.vertexFormat.getElement(this.vertexFormatIndex);
-        if (this.vertexFormatElement.getUsage() == VertexFormatElement.EnumUsage.PADDING) {
+        if (this.vertexFormatElement.getUsage() == VertexFormatElement.Usage.PADDING) {
             this.nextVertexFormatIndex();
         }
 

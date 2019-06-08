@@ -3,25 +3,25 @@ package com.direwolf20.buildinggadgets.common.entities;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockRendererDispatcher;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.entity.Render;
-import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.client.renderer.texture.TextureMap;
+import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.renderer.entity.EntityRendererManager;
+import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.init.Blocks;
 import net.minecraft.util.ResourceLocation;
 
 import javax.annotation.Nullable;
 
 import org.lwjgl.opengl.GL11;
 
-public class BlockBuildEntityRender extends Render<BlockBuildEntity> {
+public class BlockBuildEntityRender extends EntityRenderer<BlockBuildEntity> {
 
-    public BlockBuildEntityRender(RenderManager renderManager) {
+    public BlockBuildEntityRender(EntityRendererManager renderManager) {
         super(renderManager);
         this.shadowSize = 0F;
     }
@@ -33,7 +33,7 @@ public class BlockBuildEntityRender extends Render<BlockBuildEntity> {
         GlStateManager.pushMatrix();
 
         BlockBuildEntity.Mode toolMode = entity.getToolMode();
-        mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+        mc.getTextureManager().bindTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
         int teCounter = entity.getTicksExisted();
         int maxLife = entity.getMaxLife();
         teCounter = teCounter > maxLife ? maxLife : teCounter;

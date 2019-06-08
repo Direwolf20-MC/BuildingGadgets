@@ -58,7 +58,6 @@ import org.apache.commons.lang3.tuple.Triple;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL14;
 
-import java.awt.*;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;

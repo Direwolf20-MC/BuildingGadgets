@@ -1,8 +1,8 @@
 package com.direwolf20.buildinggadgets.common.world;
 
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.fluid.IFluidState;
-import net.minecraft.init.Blocks;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockReader;

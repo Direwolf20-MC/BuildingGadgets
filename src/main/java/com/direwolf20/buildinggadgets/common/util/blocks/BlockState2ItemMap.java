@@ -7,7 +7,7 @@ import com.google.common.collect.BiMap;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.ListNBT;
 import net.minecraft.util.math.BlockPos;
 
 import javax.annotation.Nonnull;
@@ -60,14 +60,15 @@ public final class BlockState2ItemMap extends BlockState2ShortMap {
     @Override
     public void writeToNBT(@Nonnull CompoundNBT tagCompound) {
         super.writeToNBT(tagCompound);
-        tagCompound.setTag(NBTKeys.MAP_INT_STACK, writeStateItemMapToNBT());
+        tagCompound.put(NBTKeys.MAP_INT_STACK, writeStateItemMapToNBT());
     }
 
     @Override
     public void readNBT(@Nonnull CompoundNBT tagCompound) {
         super.readNBT(tagCompound);
-        if (tagCompound.hasKey(NBTKeys.MAP_INT_STACK)) {
-            NBTTagList mapIntStackTag = (NBTTagList) tagCompound.getTag(NBTKeys.MAP_INT_STACK);
+        if (tagCompound.contains(NBTKeys.MAP_INT_STACK)) {
+            // fixme: use getList?
+            ListNBT mapIntStackTag = (ListNBT) tagCompound.get(NBTKeys.MAP_INT_STACK);
             readStateItemMapFromNBT(mapIntStackTag);
         }
     }
@@ -82,29 +83,29 @@ public final class BlockState2ItemMap extends BlockState2ShortMap {
         }
     }
 
-    private NBTTagList writeStateItemMapToNBT() {
-        NBTTagList tagList = new NBTTagList();
+    private ListNBT writeStateItemMapToNBT() {
+        ListNBT tagList = new ListNBT();
         for (Map.Entry<BlockState, UniqueItem> entry : stateItemMap.entrySet()) {
             CompoundNBT compound = new CompoundNBT();
             entry.getValue().writeToNBT(compound);
             short slot = getSlot(entry.getKey());
             if (slot >= 0) {
-                compound.setShort(NBTKeys.MAP_STATE_ID, slot);
+                compound.putShort(NBTKeys.MAP_STATE_ID, slot);
             } else {
-                compound.setTag(NBTKeys.MAP_STATE, GadgetUtils.stateToCompound(entry.getKey()));
+                compound.put(NBTKeys.MAP_STATE, GadgetUtils.stateToCompound(entry.getKey()));
             }
             tagList.add(compound);
         }
         return tagList;
     }
 
-    private void readStateItemMapFromNBT(NBTTagList tagList) {
+    private void readStateItemMapFromNBT(ListNBT tagList) {
         stateItemMap.clear();
         for (int i = 0; i < tagList.size(); i++) {
             CompoundNBT compound = tagList.getCompound(i);
             UniqueItem item = UniqueItem.readFromNBT(compound);
             BlockState state = null;
-            if (compound.hasKey(NBTKeys.MAP_STATE_ID)) {
+            if (compound.contains(NBTKeys.MAP_STATE_ID)) {
                 state = getStateFromSlot(compound.getShort(NBTKeys.MAP_STATE_ID));
             }
             if (state == null) {

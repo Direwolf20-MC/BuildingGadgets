@@ -46,7 +46,6 @@ import javax.annotation.Nullable;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 public class GadgetUtils {
@@ -129,7 +128,7 @@ public class GadgetUtils {
     private static CompoundNBT undoStateToNBT(UndoState undoState) {
         //Convert an UndoState object into NBT data. Uses ints to store relative positions to a start block for data compression..
         CompoundNBT compound = new CompoundNBT();
-        compound.putString(NBTKeys.GADGET_DIM, DimensionType.func_212678_a(undoState.dimension).toString());
+        compound.putString(NBTKeys.GADGET_DIM, DimensionType.getKey(undoState.dimension).toString());
 
         BlockPos startBlock = undoState.coordinates.get(0);
         int[] array = new int[undoState.coordinates.size()];
@@ -278,7 +277,7 @@ public class GadgetUtils {
     public static void selectBlock(ItemStack stack, ClientPlayerEntity player) {
         // Used to find which block the player is looking at, and store it in NBT on the tool.
         World world = player.world;
-        RayTraceResult lookingAt = VectorHelper.getLookingAt(player, RayTraceFluidMode.NEVER);
+        RayTraceResult lookingAt = VectorHelper.getLookingAt(player, RayTraceContext.FluidMode.NONE);
         if (lookingAt == null)
             return;
 
@@ -347,7 +346,7 @@ public class GadgetUtils {
     }
 
     public static boolean setRemoteInventory(ClientPlayerEntity player, ItemStack tool, BlockPos pos, World world) {
-        if (getRemoteInventory(pos, DimensionType.func_212678_a(player.dimension), world) != null) {
+        if (getRemoteInventory(pos, DimensionType.getKey(player.dimension), world) != null) {
             boolean same = pos.equals(getPOSFromNBT(tool, NBTKeys.REMOTE_INVENTORY_POS));
             writePOSToNBT(tool, same ? null : pos, NBTKeys.REMOTE_INVENTORY_POS, player.dimension);
             player.sendStatusMessage(new StringTextComponent(TextFormatting.AQUA + new TranslationTextComponent("message.gadget." + (same ? "unboundTE" : "boundTE")).getUnformattedComponentText()), true);
@@ -436,7 +435,7 @@ public class GadgetUtils {
             return;
         }
         CompoundNBT posTag = NBTUtil.writeBlockPos(pos);
-        posTag.putString(NBTKeys.GADGET_DIM, DimensionType.func_212678_a(dimension).toString());
+        posTag.putString(NBTKeys.GADGET_DIM, DimensionType.getKey(dimension).toString());
         tagCompound.put(tagName, posTag);
         stack.setTag(tagCompound);
     }
@@ -451,7 +450,7 @@ public class GadgetUtils {
             return;
         }
         tagCompound.put(tagName, NBTUtil.writeBlockPos(pos));
-        tagCompound.putString(NBTKeys.GADGET_DIM, DimensionType.func_212678_a(dimension).toString());
+        tagCompound.putString(NBTKeys.GADGET_DIM, DimensionType.getKey(dimension).toString());
     }
 
     @Nullable

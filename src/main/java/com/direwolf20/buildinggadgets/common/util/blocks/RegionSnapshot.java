@@ -13,7 +13,7 @@ import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.ListNBT;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
@@ -39,12 +39,12 @@ public class RegionSnapshot {
     private static final String TILE_NBT = "block_nbt";
 
     private static CompoundNBT serialize(CompoundNBT tag, RegionSnapshot snapshot) {
-        tag.setString(DIMENSION, snapshot.world.getDimension().getType().getRegistryName().toString());
+        tag.putString(DIMENSION, snapshot.world.getDimension().getType().getRegistryName().toString());
         snapshot.region.serializeTo(tag);
 
         // Palette serialization begin
         // The serialized palettes only include actual block states, empty block state should be added, regardlessly, during deserialization
-        NBTTagList palettes = new NBTTagList();
+        ListNBT palettes = new ListNBT();
         Object2IntMap<BlockState> mapPalettes = new Object2IntOpenHashMap<>();
         {
             // ID 0 is preoccupied for "nothing should be placed here", which is represented as Optional.empty()
@@ -58,7 +58,7 @@ public class RegionSnapshot {
         // Storage frame: an integer indicating a sequence of block states and the streaking block state ID; the first 24 bits are used to stored the ID, and the former 8 bits are used to store the number of repeating block states.
         //   If there are more than 256, or 2^8 repeating block states, it will force start a new storage frame
 
-        // Complete storage frames, will be serialized into a NBTTagList later
+        // Complete storage frames, will be serialized into a ListNBT later
         IntList frames = new IntArrayList();
 
         // The repeating block state, if any
@@ -104,17 +104,17 @@ public class RegionSnapshot {
         // Force add a frame here -- even if we pushed a new frame on the last block state, itself hasn't been stored yet
         frames.add((((streak - 1) & 0xff) << 24) | (mapPalettes.getInt(lastStreak.orElse(null)) & 0xffffff));
 
-        tag.setIntArray(BLOCK_FRAMES, frames.toIntArray());
-        tag.setTag(BLOCK_PALETTES, palettes);
+        tag.putIntArray(BLOCK_FRAMES, frames.toIntArray());
+        tag.put(BLOCK_PALETTES, palettes);
 
-        NBTTagList tileData = new NBTTagList();
+        ListNBT tileData = new ListNBT();
         for (Pair<BlockPos, CompoundNBT> data : snapshot.tileData) {
             CompoundNBT serializedData = new CompoundNBT();
-            serializedData.setTag(TILE_POS, NBTUtil.writeBlockPos(data.getLeft()));
-            serializedData.setTag(TILE_NBT, data.getRight());
+            serializedData.put(TILE_POS, NBTUtil.writeBlockPos(data.getLeft()));
+            serializedData.put(TILE_NBT, data.getRight());
             tileData.add(serializedData);
         }
-        tag.setTag(TILE_DATA, tileData);
+        tag.put(TILE_DATA, tileData);
 
         return tag;
     }
@@ -130,7 +130,7 @@ public class RegionSnapshot {
             // Empty block state, indicating "do not replace here"
             palettes.add(Optional.empty());
         }
-        NBTTagList palettesNBT = tag.getList(BLOCK_PALETTES, Constants.NBT.TAG_COMPOUND);
+        ListNBT palettesNBT = tag.getList(BLOCK_PALETTES, Constants.NBT.TAG_COMPOUND);
         for (int i = 0; i < palettesNBT.size(); i++) {
             palettes.add(Optional.of(NBTUtil.readBlockState(palettesNBT.getCompound(i))));
         }
@@ -152,7 +152,7 @@ public class RegionSnapshot {
             }
         }
 
-        NBTTagList tileDataNBT = tag.getList(TILE_DATA, Constants.NBT.TAG_COMPOUND);
+        ListNBT tileDataNBT = tag.getList(TILE_DATA, Constants.NBT.TAG_COMPOUND);
         ImmutableList.Builder<Pair<BlockPos, CompoundNBT>> tileData = ImmutableList.builder();
         for (int i = 0; i < tileDataNBT.size(); i++) {
             CompoundNBT serializedData = tileDataNBT.getCompound(i);

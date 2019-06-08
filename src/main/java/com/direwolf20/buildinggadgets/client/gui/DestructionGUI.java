@@ -10,19 +10,19 @@ import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 
 import com.direwolf20.buildinggadgets.common.network.packets.PacketDestructionGUI;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.util.text.TextFormatting;
 
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DestructionGUI extends GuiScreen {
+public class DestructionGUI extends Screen {
 
     private GuiDestructionSlider left;
     private GuiDestructionSlider right;
@@ -50,7 +50,7 @@ public class DestructionGUI extends GuiScreen {
                 this.close();
             }
             else
-                Minecraft.getInstance().player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.destroysizeerror").getUnformattedComponentText()), true);
+                Minecraft.getInstance().player.sendStatusMessage(new StringTextComponent(TextFormatting.RED + new TranslationTextComponent("message.gadget.destroysizeerror").getUnformattedComponentText()), true);
         }));
 
         this.addButton(new GuiButtonAction((x - 30) - 32, y + 60, 60, 20, I18n.format(GuiMod.getLangKeyButton("destruction", "cancel")), this::close));

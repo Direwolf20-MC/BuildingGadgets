@@ -6,6 +6,7 @@ import it.unimi.dsi.fastutil.doubles.DoubleRBTreeSet;
 import it.unimi.dsi.fastutil.doubles.DoubleSortedSet;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3i;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -41,7 +42,7 @@ public class SortingHelper {
                     z = player.posZ;
 
             list.forEach(pos -> {
-                double distance = pos.distanceSqToCenter(x, y, z);
+                double distance = pos.distanceSq(new Vec3i(x, y, z));
 
                 rangeMap.put(distance, pos);
                 distances.add(distance);

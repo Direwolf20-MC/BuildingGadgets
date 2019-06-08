@@ -5,7 +5,7 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.ListNBT;
 import net.minecraft.nbt.NBTUtil;
 
 import javax.annotation.Nonnull;
@@ -52,13 +52,14 @@ public class BlockState2ShortMap {
     }
 
     public void writeToNBT(@Nonnull CompoundNBT tagCompound) {
-        tagCompound.setTag(NBTKeys.MAP_PALETTE, writeShortStateMapToNBT());
+        tagCompound.put(NBTKeys.MAP_PALETTE, writeShortStateMapToNBT());
     }
 
     public void readNBT(@Nonnull CompoundNBT tagCompound) {
         clear();
-        if (tagCompound.hasKey(NBTKeys.MAP_PALETTE)) {
-            NBTTagList mapIntStateTag = (NBTTagList) tagCompound.getTag(NBTKeys.MAP_PALETTE);
+        if (tagCompound.contains(NBTKeys.MAP_PALETTE)) {
+            // fixme: use getList?
+            ListNBT mapIntStateTag = (ListNBT) tagCompound.get(NBTKeys.MAP_PALETTE);
             readShortStateMapFromNBT(mapIntStateTag);
         }
     }
@@ -67,19 +68,19 @@ public class BlockState2ShortMap {
         shortStateMap.clear();
     }
 
-    protected NBTTagList writeShortStateMapToNBT() {
-        NBTTagList tagList = new NBTTagList();
+    protected ListNBT writeShortStateMapToNBT() {
+        ListNBT tagList = new ListNBT();
         for (Map.Entry<Short, BlockState> entry : shortStateMap.entrySet()) {
             CompoundNBT compound = new CompoundNBT();
             CompoundNBT state = NBTUtil.writeBlockState(entry.getValue());
-            compound.setShort(NBTKeys.MAP_SLOT, entry.getKey());
-            compound.setTag(NBTKeys.MAP_STATE, state);
+            compound.putShort(NBTKeys.MAP_SLOT, entry.getKey());
+            compound.put(NBTKeys.MAP_STATE, state);
             tagList.add(compound);
         }
         return tagList;
     }
 
-    private void readShortStateMapFromNBT(NBTTagList tagList) {
+    private void readShortStateMapFromNBT(ListNBT tagList) {
         shortStateMap.clear();
         for (int i = 0; i < tagList.size(); i++) {
             CompoundNBT compound = tagList.getCompound(i);
