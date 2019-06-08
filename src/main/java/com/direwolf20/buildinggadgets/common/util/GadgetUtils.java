@@ -20,20 +20,20 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multiset;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
-import net.minecraft.init.Blocks;
+import net.minecraft.block.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.ListNBT;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
 import net.minecraft.util.Direction.Axis;
 import net.minecraft.util.math.*;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
@@ -76,7 +76,7 @@ public class GadgetUtils {
     @Nullable
     public static ByteArrayOutputStream getPasteStream(@Nonnull CompoundNBT compound, @Nullable String name) throws IOException {
         CompoundNBT withText = name != null && !name.isEmpty() ? compound.copy() : compound;
-        if (name != null && !name.isEmpty()) withText.setString(NBTKeys.TEMPLATE_NAME, name);
+        if (name != null && !name.isEmpty()) withText.putString(NBTKeys.TEMPLATE_NAME, name);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         CompressedStreamTools.writeCompressed(withText, baos);
         return baos.size() < Short.MAX_VALUE - 200 ? baos : null;
@@ -97,15 +97,15 @@ public class GadgetUtils {
         if (tagCompound == null) {
             tagCompound = new CompoundNBT();
         }
-        NBTTagList undoStates = (NBTTagList) tagCompound.getTag(NBTKeys.GADGET_UNDO_STACK);
+        ListNBT undoStates = (ListNBT) tagCompound.get(NBTKeys.GADGET_UNDO_STACK);
         if (undoStates == null) {
-            undoStates = new NBTTagList();
+            undoStates = new ListNBT();
         }
         if (undoStates.size() >= 10) {
-            undoStates.removeTag(0);
+            undoStates.remove(0);
         }
         undoStates.add(undoStateToNBT(undoState));
-        tagCompound.setTag(NBTKeys.GADGET_UNDO_STACK, undoStates);
+        tagCompound.put(NBTKeys.GADGET_UNDO_STACK, undoStates);
         stack.setTag(tagCompound);
     }
 
@@ -116,20 +116,20 @@ public class GadgetUtils {
         if (tagCompound == null) {
             return null;
         }
-        NBTTagList undoStates = (NBTTagList) tagCompound.getTag(NBTKeys.GADGET_UNDO_STACK);
+        ListNBT undoStates = (ListNBT) tagCompound.get(NBTKeys.GADGET_UNDO_STACK);
         if (undoStates == null || undoStates.size() == 0) {
             return null;
         }
         UndoState undoState = NBTToUndoState(undoStates.getCompound(undoStates.size() - 1));
-        undoStates.removeTag(undoStates.size() - 1);
-        tagCompound.setTag(NBTKeys.GADGET_UNDO_STACK, undoStates);
+        undoStates.remove(undoStates.size() - 1);
+        tagCompound.put(NBTKeys.GADGET_UNDO_STACK, undoStates);
         return undoState;
     }
 
     private static CompoundNBT undoStateToNBT(UndoState undoState) {
         //Convert an UndoState object into NBT data. Uses ints to store relative positions to a start block for data compression..
         CompoundNBT compound = new CompoundNBT();
-        compound.setString(NBTKeys.GADGET_DIM, DimensionType.func_212678_a(undoState.dimension).toString());
+        compound.putString(NBTKeys.GADGET_DIM, DimensionType.func_212678_a(undoState.dimension).toString());
 
         BlockPos startBlock = undoState.coordinates.get(0);
         int[] array = new int[undoState.coordinates.size()];
@@ -142,8 +142,8 @@ public class GadgetUtils {
             int p = (px + py + pz);
             array[idx++] = p;
         }
-        compound.setTag(NBTKeys.GADGET_UNDO_START_POS, NBTUtil.writeBlockPos(startBlock));
-        compound.setIntArray(NBTKeys.GADGET_UNDO_INT_COORDS, array);
+        compound.put(NBTKeys.GADGET_UNDO_START_POS, NBTUtil.writeBlockPos(startBlock));
+        compound.putIntArray(NBTKeys.GADGET_UNDO_INT_COORDS, array);
         return compound;
     }
 
@@ -171,14 +171,14 @@ public class GadgetUtils {
     public static void setAnchor(ItemStack stack, List<BlockPos> coordinates) {
         //Store 1 set of BlockPos in NBT to anchor the Ghost Blocks in the world when the anchor key is pressed
         CompoundNBT tagCompound = stack.getTag();
-        NBTTagList coords = new NBTTagList();
+        ListNBT coords = new ListNBT();
         if (tagCompound == null) {
             tagCompound = new CompoundNBT();
         }
         for (BlockPos coord : coordinates) {
             coords.add(NBTUtil.writeBlockPos(coord));
         }
-        tagCompound.setTag(NBTKeys.GADGET_ANCHOR_COORDS, coords);
+        tagCompound.put(NBTKeys.GADGET_ANCHOR_COORDS, coords);
         stack.setTag(tagCompound);
     }
 
@@ -190,7 +190,7 @@ public class GadgetUtils {
             setAnchor(stack, coordinates);
             return coordinates;
         }
-        NBTTagList coordList = (NBTTagList) tagCompound.getTag(NBTKeys.GADGET_ANCHOR_COORDS);
+        ListNBT coordList = (ListNBT) tagCompound.get(NBTKeys.GADGET_ANCHOR_COORDS);
         if (coordList == null) {
             setAnchor(stack, coordinates);
             return coordinates;
@@ -207,7 +207,7 @@ public class GadgetUtils {
     public static void setToolRange(ItemStack stack, int range) {
         //Store the tool's range in NBT as an Integer
         CompoundNBT tagCompound = NBTHelper.getOrNewTag(stack);
-        tagCompound.setInt("range", range);
+        tagCompound.putInt("range", range);
     }
 
     public static int getToolRange(ItemStack stack) {
@@ -238,7 +238,7 @@ public class GadgetUtils {
         }
 
         CompoundNBT stateTag = NBTUtil.writeBlockState(state);
-        tagCompound.setTag(NBTKeys.TE_CONSTRUCTION_STATE, stateTag);
+        tagCompound.put(NBTKeys.TE_CONSTRUCTION_STATE, stateTag);
         stack.setTag(tagCompound);
     }
 
@@ -253,7 +253,7 @@ public class GadgetUtils {
         }
 
         CompoundNBT stateTag = NBTUtil.writeBlockState(state);
-        tagCompound.setTag(NBTKeys.TE_CONSTRUCTION_STATE_ACTUAL, stateTag);
+        tagCompound.put(NBTKeys.TE_CONSTRUCTION_STATE_ACTUAL, stateTag);
         stack.setTag(tagCompound);
     }
 
@@ -282,14 +282,14 @@ public class GadgetUtils {
         if (lookingAt == null)
             return;
 
-        BlockPos pos = lookingAt.getBlockPos();
-        EnumActionResult result = setRemoteInventory(stack, player, world, pos, true);
-        if (result == EnumActionResult.SUCCESS)
+        BlockPos pos = new BlockPos(lookingAt.getHitVec().x,lookingAt.getHitVec().y,lookingAt.getHitVec().z);
+        ActionResultType result = setRemoteInventory(stack, player, world, pos, true);
+        if (result == ActionResultType.SUCCESS)
             return;
 
         BlockState state = world.getBlockState(pos);
-        if (result == EnumActionResult.FAIL || !Config.BLACKLIST.isAllowedBlock(state.getBlock())) {
-            player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.invalidblock").getUnformattedComponentText()), true);
+        if (result == ActionResultType.FAIL || !Config.BLACKLIST.isAllowedBlock(state.getBlock())) {
+            player.sendStatusMessage(new StringTextComponent(TextFormatting.RED + new TranslationTextComponent("message.gadget.invalidblock").getUnformattedComponentText()), true);
             return;
         }
         BlockState placeState = InventoryHelper.getSpecificStates(state, world, player, pos, stack);
@@ -299,20 +299,20 @@ public class GadgetUtils {
         setToolActualBlock(stack, actualState);
     }
 
-    public static EnumActionResult setRemoteInventory(ItemStack stack, ClientPlayerEntity player, World world, BlockPos pos, boolean setTool) {
+    public static ActionResultType setRemoteInventory(ItemStack stack, ClientPlayerEntity player, World world, BlockPos pos, boolean setTool) {
         TileEntity te = world.getTileEntity(pos);
         if (te == null)
-            return EnumActionResult.PASS;
+            return ActionResultType.PASS;
 
         if (setTool && te instanceof ConstructionBlockTileEntity && ((ConstructionBlockTileEntity) te).getBlockState() != null) {
             setToolBlock(stack, ((ConstructionBlockTileEntity) te).getActualBlockState());
             setToolActualBlock(stack, ((ConstructionBlockTileEntity) te).getActualBlockState());
-            return EnumActionResult.SUCCESS;
+            return ActionResultType.SUCCESS;
         }
         if (setRemoteInventory(player, stack, pos, world))
-            return EnumActionResult.SUCCESS;
+            return ActionResultType.SUCCESS;
 
-        return EnumActionResult.FAIL;
+        return ActionResultType.FAIL;
     }
 
     public static boolean anchorBlocks(ClientPlayerEntity player, ItemStack stack) {
@@ -324,7 +324,7 @@ public class GadgetUtils {
             if (lookingAt == null) {  //If we aren't looking at anything, exit
                 return false;
             }
-            BlockPos startBlock = lookingAt.getBlockPos();
+            BlockPos startBlock = new BlockPos(lookingAt.getHitVec().x,lookingAt.getHitVec().y,lookingAt.getHitVec().z);;
             Direction sideHit = lookingAt.sideHit;
             if (startBlock == null || world.getBlockState(startBlock) == Blocks.AIR.getDefaultState()) { //If we are looking at air, exit
                 return false;
@@ -338,10 +338,10 @@ public class GadgetUtils {
                         .collectPlacementPos(world, player, startBlock, sideHit, stack, startBlock); // Build the positions list based on tool mode and range
             }
             setAnchor(stack, coords); //Set the anchor NBT
-            player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.anchorrender").getUnformattedComponentText()), true);
+            player.sendStatusMessage(new StringTextComponent(TextFormatting.AQUA + new TranslationTextComponent("message.gadget.anchorrender").getUnformattedComponentText()), true);
         } else {  //If theres already an anchor, remove it.
             setAnchor(stack, new ArrayList<BlockPos>());
-            player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.anchorremove").getUnformattedComponentText()), true);
+            player.sendStatusMessage(new StringTextComponent(TextFormatting.AQUA + new TranslationTextComponent("message.gadget.anchorremove").getUnformattedComponentText()), true);
         }
         return true;
     }
@@ -350,7 +350,7 @@ public class GadgetUtils {
         if (getRemoteInventory(pos, DimensionType.func_212678_a(player.dimension), world) != null) {
             boolean same = pos.equals(getPOSFromNBT(tool, NBTKeys.REMOTE_INVENTORY_POS));
             writePOSToNBT(tool, same ? null : pos, NBTKeys.REMOTE_INVENTORY_POS, player.dimension);
-            player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget." + (same ? "unboundTE" : "boundTE")).getUnformattedComponentText()), true);
+            player.sendStatusMessage(new StringTextComponent(TextFormatting.AQUA + new TranslationTextComponent("message.gadget." + (same ? "unboundTE" : "boundTE")).getUnformattedComponentText()), true);
             return true;
         }
         return false;
@@ -414,13 +414,13 @@ public class GadgetUtils {
             tagCompound = new CompoundNBT();
         }
         if (pos == null) {
-            if (tagCompound.getTag(tagName) != null) {
-                tagCompound.removeTag(tagName);
+            if (tagCompound.get(tagName) != null) {
+                tagCompound.remove(tagName);
                 stack.setTag(tagCompound);
             }
             return;
         }
-        tagCompound.setTag(tagName, NBTUtil.writeBlockPos(pos));
+        tagCompound.put(tagName, NBTUtil.writeBlockPos(pos));
         stack.setTag(tagCompound);
     }
 
@@ -430,14 +430,14 @@ public class GadgetUtils {
             tagCompound = new CompoundNBT();
         }
         if (pos == null) {
-            tagCompound.getTag(tagName);
-            tagCompound.removeTag(tagName);
+            tagCompound.get(tagName);
+            tagCompound.remove(tagName);
             stack.setTag(tagCompound);
             return;
         }
         CompoundNBT posTag = NBTUtil.writeBlockPos(pos);
-        posTag.setString(NBTKeys.GADGET_DIM, DimensionType.func_212678_a(dimension).toString());
-        tagCompound.setTag(tagName, posTag);
+        posTag.putString(NBTKeys.GADGET_DIM, DimensionType.func_212678_a(dimension).toString());
+        tagCompound.put(tagName, posTag);
         stack.setTag(tagCompound);
     }
 
@@ -446,12 +446,12 @@ public class GadgetUtils {
             tagCompound = new CompoundNBT();
         }
         if (pos == null) {
-            tagCompound.getTag(tagName);
-            tagCompound.removeTag(tagName);
+            tagCompound.get(tagName);
+            tagCompound.remove(tagName);
             return;
         }
-        tagCompound.setTag(tagName, NBTUtil.writeBlockPos(pos));
-        tagCompound.setString(NBTKeys.GADGET_DIM, DimensionType.func_212678_a(dimension).toString());
+        tagCompound.put(tagName, NBTUtil.writeBlockPos(pos));
+        tagCompound.putString(NBTKeys.GADGET_DIM, DimensionType.func_212678_a(dimension).toString());
     }
 
     @Nullable
@@ -472,7 +472,7 @@ public class GadgetUtils {
         if (tagCompound == null) {
             tagCompound = new CompoundNBT();
         }
-        tagCompound.setInt(tagName, tagInt);
+        tagCompound.putInt(tagName, tagInt);
         stack.setTag(tagCompound);
     }
 
@@ -487,12 +487,12 @@ public class GadgetUtils {
             tagCompound = new CompoundNBT();
         }
         if (string.equals(null)) {
-            if (tagCompound.getTag(tagName) != null) {
-                tagCompound.removeTag(tagName);
+            if (tagCompound.get(tagName) != null) {
+                tagCompound.remove(tagName);
             }
             return;
         }
-        tagCompound.setString(tagName, string);
+        tagCompound.putString(tagName, string);
     }
 
     public static void writeStringToNBT(CompoundNBT tagCompound, String string, String tagName) {//TODO unused
@@ -500,12 +500,12 @@ public class GadgetUtils {
             tagCompound = new CompoundNBT();
         }
         if (string.equals(null)) {
-            if (tagCompound.getTag(tagName) != null) {
-                tagCompound.removeTag(tagName);
+            if (tagCompound.get(tagName) != null) {
+                tagCompound.remove(tagName);
             }
             return;
         }
-        tagCompound.setString(tagName, string);
+        tagCompound.putString(tagName, string);
     }
 
     @Nullable
@@ -570,21 +570,21 @@ public class GadgetUtils {
         return new BlockPos(x, y, z);
     }
 
-    public static NBTTagList itemCountToNBT(Multiset<UniqueItem> itemCountMap) {
-        NBTTagList tagList = new NBTTagList();
+    public static ListNBT itemCountToNBT(Multiset<UniqueItem> itemCountMap) {
+        ListNBT tagList = new ListNBT();
 
         for (Multiset.Entry<UniqueItem> entry : itemCountMap.entrySet()) {
             int item = Item.getIdFromItem(entry.getElement().getItem());
             int count = entry.getCount();
             CompoundNBT tagCompound = new CompoundNBT();
-            tagCompound.setInt(NBTKeys.UNIQUE_ITEM_ITEM, item);
-            tagCompound.setInt(NBTKeys.UNIQUE_ITEM_COUNT, count);
+            tagCompound.putInt(NBTKeys.UNIQUE_ITEM_ITEM, item);
+            tagCompound.putInt(NBTKeys.UNIQUE_ITEM_COUNT, count);
             tagList.add(tagCompound);
         }
         return tagList;
     }
 
-    public static Multiset<UniqueItem> nbtToItemCount(@Nullable NBTTagList tagList) {
+    public static Multiset<UniqueItem> nbtToItemCount(@Nullable ListNBT tagList) {
         if (tagList == null) return HashMultiset.create();
         Multiset<UniqueItem> itemCountMap = HashMultiset.create(tagList.size());
         for (int i = 0; i < tagList.size(); i++) {

@@ -31,12 +31,13 @@ import net.minecraft.block.BlockState;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.init.Blocks;
-import net.minecraft.init.Enchantments;
-import net.minecraft.init.Items;
+import net.minecraft.block.Blocks;
+import net.minecraft.enchantment.Enchantments;
+import net.minecraft.item.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.ListNBT;
+//import net.minecraft.nbt.ListNBT;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
@@ -44,8 +45,10 @@ import net.minecraft.util.Direction.Axis;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.StringTextComponent;
+//import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TranslationTextComponent;
+//import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
@@ -117,7 +120,7 @@ public class GadgetCopyPaste extends GadgetPlacing implements ITemplate {
 
     public static int getY(ItemStack stack) {
         CompoundNBT tagCompound = stack.getTag();
-        return (tagCompound == null || !tagCompound.hasKey(NBTKeys.POSITION_Y)) ? 1 : tagCompound.getInt(NBTKeys.POSITION_Y);
+        return (tagCompound == null || !tagCompound.contains(NBTKeys.POSITION_Y)) ? 1 : tagCompound.getInt(NBTKeys.POSITION_Y);
     }
 
     public static int getZ(ItemStack stack) {
@@ -146,7 +149,7 @@ public class GadgetCopyPaste extends GadgetPlacing implements ITemplate {
                 return null;
             }
             UUID uid = UUID.randomUUID();
-            tagCompound.setString(NBTKeys.GADGET_UUID, uid.toString());
+            tagCompound.putString(NBTKeys.GADGET_UUID, uid.toString());
             stack.setTag(tagCompound);
             uuid = uid.toString();
         }
@@ -175,9 +178,9 @@ public class GadgetCopyPaste extends GadgetPlacing implements ITemplate {
         if (tagCompound == null) {
             tagCompound = new CompoundNBT();
         }
-        NBTTagList MapIntStateTag = (NBTTagList) tagCompound.getTag(NBTKeys.MAP_PALETTE);
+        ListNBT MapIntStateTag = (ListNBT) tagCompound.get(NBTKeys.MAP_PALETTE);
         if (MapIntStateTag == null) {
-            MapIntStateTag = new NBTTagList();
+            MapIntStateTag = new ListNBT();
         }
         BlockMapIntState MapIntState = new BlockMapIntState();
         MapIntState.getIntStateMapFromNBT(MapIntStateTag);
@@ -196,13 +199,13 @@ public class GadgetCopyPaste extends GadgetPlacing implements ITemplate {
         if (tagCompound == null) {
             tagCompound = new CompoundNBT();
         }
-        NBTTagList MapIntStateTag = (NBTTagList) tagCompound.getTag(NBTKeys.MAP_PALETTE);
+        ListNBT MapIntStateTag = (ListNBT) tagCompound.get(NBTKeys.MAP_PALETTE);
         if (MapIntStateTag == null) {
-            MapIntStateTag = new NBTTagList();
+            MapIntStateTag = new ListNBT();
         }
-        NBTTagList MapIntStackTag = (NBTTagList) tagCompound.getTag(NBTKeys.MAP_INT_STACK);
+        ListNBT MapIntStackTag = (ListNBT) tagCompound.get(NBTKeys.MAP_INT_STACK);
         if (MapIntStackTag == null) {
-            MapIntStackTag = new NBTTagList();
+            MapIntStackTag = new ListNBT();
         }
         BlockMapIntState MapIntState = new BlockMapIntState();
         MapIntState.getIntStateMapFromNBT(MapIntStateTag);
@@ -215,7 +218,7 @@ public class GadgetCopyPaste extends GadgetPlacing implements ITemplate {
         if (tagCompound == null) {
             tagCompound = new CompoundNBT();
         }
-        tagCompound.setString(NBTKeys.GADGET_MODE, mode.name());
+        tagCompound.putString(NBTKeys.GADGET_MODE, mode.name());
         stack.setTag(tagCompound);
     }
 
@@ -248,7 +251,7 @@ public class GadgetCopyPaste extends GadgetPlacing implements ITemplate {
         //Called when we specify a mode with the radial menu
         ToolMode mode = ToolMode.values()[modeInt];
         setToolMode(heldItem, mode);
-        player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.toolmode").getUnformattedComponentText() + ": " + mode), true);
+        player.sendStatusMessage(new StringTextComponent(TextFormatting.AQUA + new TranslationTextComponent("message.gadget.toolmode").getUnformattedComponentText() + ": " + mode), true);
     }
 
     @Override
@@ -257,8 +260,8 @@ public class GadgetCopyPaste extends GadgetPlacing implements ITemplate {
         player.setActiveHand(hand);
         BlockPos pos = VectorHelper.getPosLookingAt(player, stack);
         if (!world.isRemote) {
-            if (pos != null && player.isSneaking() && GadgetUtils.setRemoteInventory(stack, player, world, pos, false) == EnumActionResult.SUCCESS)
-                return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);
+            if (pos != null && player.isSneaking() && GadgetUtils.setRemoteInventory(stack, player, world, pos, false) == ActionResultType.SUCCESS)
+                return new ActionResult<ItemStack>(ActionResultType.SUCCESS, stack);
 
             if (getToolMode(stack) == ToolMode.Copy) {
                 if (pos == null) {
@@ -267,7 +270,7 @@ public class GadgetCopyPaste extends GadgetPlacing implements ITemplate {
                     //setStartPos(stack, null);
                     //setEndPos(stack, null);
                     //player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.areareset").getUnformattedComponentText()), true);
-                    return new ActionResult<>(EnumActionResult.SUCCESS, stack);
+                    return new ActionResult<>(ActionResultType.SUCCESS, stack);
                 }
                 if (player.isSneaking()) {
                     if (getStartPos(stack) != null)
@@ -283,7 +286,7 @@ public class GadgetCopyPaste extends GadgetPlacing implements ITemplate {
             } else if (getToolMode(stack) == ToolMode.Paste) {
                 if (!player.isSneaking()) {
                     if (getAnchor(stack) == null) {
-                        if (pos == null) return new ActionResult<ItemStack>(EnumActionResult.FAIL, stack);
+                        if (pos == null) return new ActionResult<ItemStack>(ActionResultType.FAIL, stack);
                         buildBlockMap(world, pos, stack, player);
                     } else {
                         BlockPos startPos = getAnchor(stack);
@@ -294,7 +297,7 @@ public class GadgetCopyPaste extends GadgetPlacing implements ITemplate {
         } else {
             if (pos != null && player.isSneaking()) {
                 if (GadgetUtils.getRemoteInventory(pos, world, NetworkIO.Operation.EXTRACT) != null)
-                    return new ActionResult<>(EnumActionResult.SUCCESS, stack);
+                    return new ActionResult<>(ActionResultType.SUCCESS, stack);
             }
             if (getToolMode(stack) == ToolMode.Copy) {
                 if (pos == null && player.isSneaking())
@@ -305,7 +308,7 @@ public class GadgetCopyPaste extends GadgetPlacing implements ITemplate {
                 ToolRenders.updateInventoryCache();
             }
         }
-        return new ActionResult<>(EnumActionResult.SUCCESS, stack);
+        return new ActionResult<>(ActionResultType.SUCCESS, stack);
     }
 
     public static void rotateOrMirrorBlocks(ItemStack stack, ClientPlayerEntity player, PacketRotateMirror.Operation operation) {
@@ -352,17 +355,17 @@ public class GadgetCopyPaste extends GadgetPlacing implements ITemplate {
         }
         int[] posIntArray = posIntArrayList.stream().mapToInt(i -> i).toArray();
         int[] stateIntArray = stateIntArrayList.stream().mapToInt(i -> i).toArray();
-        tagCompound.setTag(NBTKeys.MAP_PALETTE, blockMapIntState.putIntStateMapIntoNBT());
-        tagCompound.setTag(NBTKeys.MAP_INT_STACK, blockMapIntState.putIntStackMapIntoNBT());
-        tagCompound.setIntArray(NBTKeys.MAP_INDEX2POS, posIntArray);
-        tagCompound.setIntArray(NBTKeys.MAP_INDEX2STATE_ID, stateIntArray);
+        tagCompound.put(NBTKeys.MAP_PALETTE, blockMapIntState.putIntStateMapIntoNBT());
+        tagCompound.put(NBTKeys.MAP_INT_STACK, blockMapIntState.putIntStackMapIntoNBT());
+        tagCompound.putIntArray(NBTKeys.MAP_INDEX2POS, posIntArray);
+        tagCompound.putIntArray(NBTKeys.MAP_INDEX2STATE_ID, stateIntArray);
         tool.incrementCopyCounter(stack);
-        tagCompound.setInt(NBTKeys.TEMPLATE_COPY_COUNT, tool.getCopyCounter(stack));
+        tagCompound.putInt(NBTKeys.TEMPLATE_COPY_COUNT, tool.getCopyCounter(stack));
         worldSave.addToMap(tool.getUUID(stack), tagCompound);
         worldSave.markForSaving();
         PacketHandler.sendTo(new PacketBlockMap(tagCompound), (ServerPlayerEntity) player);
-        player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA
-                + new TextComponentTranslation("message.gadget." + (player.isSneaking() ? "mirrored" : "rotated")).getUnformattedComponentText()), true);
+        player.sendStatusMessage(new StringTextComponent(TextFormatting.AQUA
+                + new TranslationTextComponent("message.gadget." + (player.isSneaking() ? "mirrored" : "rotated")).getUnformattedComponentText()), true);
     }
 
     public static void copyBlocks(ItemStack stack, ClientPlayerEntity player, World world, BlockPos startPos, BlockPos endPos) {
@@ -387,7 +390,7 @@ public class GadgetCopyPaste extends GadgetPlacing implements ITemplate {
         int endZ = end.getZ();
 
         if (Math.abs(startX - endX) >= 125 || Math.abs(startY - endY) >= 125 || Math.abs(startZ - endZ) >= 125) {
-            player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.toobigarea").getUnformattedComponentText()), true);
+            player.sendStatusMessage(new StringTextComponent(TextFormatting.RED + new TranslationTextComponent("message.gadget.toobigarea").getUnformattedComponentText()), true);
             return false;
         }
 
@@ -428,7 +431,7 @@ public class GadgetCopyPaste extends GadgetPlacing implements ITemplate {
                                 blockMapIntState.addToStackMap(uniqueItem, actualState);
                                 blockCount++;
                                 if (blockCount > 32768) {
-                                    player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.toomanyblocks").getUnformattedComponentText()), true);
+                                    player.sendStatusMessage(new StringTextComponent(TextFormatting.RED + new TranslationTextComponent("message.gadget.toomanyblocks").getUnformattedComponentText()), true);
                                     return false;
                                 }
                                 NonNullList<ItemStack> drops = NonNullList.create();
@@ -454,28 +457,28 @@ public class GadgetCopyPaste extends GadgetPlacing implements ITemplate {
             }
         }
         tool.setItemCountMap(stack, itemCountMap);
-        tagCompound.setTag(NBTKeys.MAP_PALETTE, blockMapIntState.putIntStateMapIntoNBT());
-        tagCompound.setTag(NBTKeys.MAP_INT_STACK, blockMapIntState.putIntStackMapIntoNBT());
+        tagCompound.put(NBTKeys.MAP_PALETTE, blockMapIntState.putIntStateMapIntoNBT());
+        tagCompound.put(NBTKeys.MAP_INT_STACK, blockMapIntState.putIntStackMapIntoNBT());
         int[] posIntArray = posIntArrayList.stream().mapToInt(i -> i).toArray();
         int[] stateIntArray = stateIntArrayList.stream().mapToInt(i -> i).toArray();
-        tagCompound.setIntArray(NBTKeys.MAP_INDEX2POS, posIntArray);
-        tagCompound.setIntArray(NBTKeys.MAP_INDEX2STATE_ID, stateIntArray);
+        tagCompound.putIntArray(NBTKeys.MAP_INDEX2POS, posIntArray);
+        tagCompound.putIntArray(NBTKeys.MAP_INDEX2STATE_ID, stateIntArray);
 
-        tagCompound.setTag(NBTKeys.GADGET_START_POS, NBTUtil.writeBlockPos(start));
-        tagCompound.setTag(NBTKeys.GADGET_END_POS, NBTUtil.writeBlockPos(end));
-        tagCompound.setString(NBTKeys.GADGET_DIM, player.dimension.toString());
-        tagCompound.setString(NBTKeys.GADGET_UUID, tool.getUUID(stack));
+        tagCompound.put(NBTKeys.GADGET_START_POS, NBTUtil.writeBlockPos(start));
+        tagCompound.put(NBTKeys.GADGET_END_POS, NBTUtil.writeBlockPos(end));
+        tagCompound.putString(NBTKeys.GADGET_DIM, player.dimension.toString());
+        tagCompound.putString(NBTKeys.GADGET_UUID, tool.getUUID(stack));
         tool.incrementCopyCounter(stack);
-        tagCompound.setInt(NBTKeys.TEMPLATE_COPY_COUNT, tool.getCopyCounter(stack));
+        tagCompound.putInt(NBTKeys.TEMPLATE_COPY_COUNT, tool.getCopyCounter(stack));
 
         worldSave.addToMap(tool.getUUID(stack), tagCompound);
         worldSave.markForSaving();
         PacketHandler.sendTo(new PacketBlockMap(tagCompound), (ServerPlayerEntity) player);
 
         if (foundTE > 0) {
-            player.sendStatusMessage(new TextComponentString(TextFormatting.YELLOW + new TextComponentTranslation("message.gadget.TEinCopy").getUnformattedComponentText() + ": " + foundTE), true);
+            player.sendStatusMessage(new StringTextComponent(TextFormatting.YELLOW + new TranslationTextComponent("message.gadget.TEinCopy").getUnformattedComponentText() + ": " + foundTE), true);
         } else {
-            player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.copied").getUnformattedComponentText()), true);
+            player.sendStatusMessage(new StringTextComponent(TextFormatting.AQUA + new TranslationTextComponent("message.gadget.copied").getUnformattedComponentText()), true);
         }
         return true;
     }
@@ -575,12 +578,12 @@ public class GadgetCopyPaste extends GadgetPlacing implements ITemplate {
             if (lookingAt == null) {
                 return;
             }
-            currentAnchor = lookingAt.getBlockPos();
+            currentAnchor = new BlockPos(lookingAt.getHitVec().x,lookingAt.getHitVec().y,lookingAt.getHitVec().z);
             setAnchor(stack, currentAnchor);
-            player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.anchorrender").getUnformattedComponentText()), true);
+            player.sendStatusMessage(new StringTextComponent(TextFormatting.AQUA + new TranslationTextComponent("message.gadget.anchorrender").getUnformattedComponentText()), true);
         } else {
             setAnchor(stack, null);
-            player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.anchorremove").getUnformattedComponentText()), true);
+            player.sendStatusMessage(new StringTextComponent(TextFormatting.AQUA + new TranslationTextComponent("message.gadget.anchorremove").getUnformattedComponentText()), true);
         }
     }
 
@@ -601,7 +604,7 @@ public class GadgetCopyPaste extends GadgetPlacing implements ITemplate {
         boolean success = true;
         boolean sameDim = (player.dimension == DimensionType.byName(getLastBuildDim(heldItem)));
         for (BlockMap blockMap : blockMapList) {
-            double distance = blockMap.pos.getDistance(player.getPosition());
+            double distance = blockMap.pos.distanceSq(player.getPosition());
 
             BlockState currentBlock = world.getBlockState(blockMap.pos);
             BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(world, blockMap.pos, currentBlock, player);
@@ -615,7 +618,7 @@ public class GadgetCopyPaste extends GadgetPlacing implements ITemplate {
                     }
                 }
             } else {
-                player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.undofailed").getUnformattedComponentText()), true);
+                player.sendStatusMessage(new StringTextComponent(TextFormatting.RED + new TranslationTextComponent("message.gadget.undofailed").getUnformattedComponentText()), true);
                 success = false;
             }
             //System.out.printf("Undid %d Blocks in %.2f ms%n", blockMapList.size(), (System.nanoTime() - time) * 1e-6);

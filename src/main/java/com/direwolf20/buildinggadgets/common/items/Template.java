@@ -43,7 +43,7 @@ public class Template extends Item implements ITemplate {
         String uuid = tagCompound.getString(NBTKeys.TEMPLATE_UUID);
         if (uuid.isEmpty()) {
             UUID uid = UUID.randomUUID();
-            tagCompound.setString(NBTKeys.TEMPLATE_UUID, uid.toString());
+            tagCompound.putString(NBTKeys.TEMPLATE_UUID, uid.toString());
             stack.setTag(tagCompound);
             uuid = uid.toString();
         }
