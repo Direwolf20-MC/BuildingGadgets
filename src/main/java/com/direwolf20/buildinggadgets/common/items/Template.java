@@ -13,7 +13,8 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ActionResult;
-import net.minecraft.util.EnumActionResult;
+import net.minecraft.util.ActionResultType;
+//import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.World;
@@ -71,7 +72,7 @@ public class Template extends Item implements ITemplate {
         if (world.isRemote)
             GuiMod.MATERIAL_LIST.openScreen(player);
         ItemStack itemstack = player.getHeldItem(hand);
-        return new ActionResult<>(EnumActionResult.SUCCESS, itemstack);
+        return new ActionResult<>(ActionResultType.SUCCESS, itemstack);
     }
 
 }

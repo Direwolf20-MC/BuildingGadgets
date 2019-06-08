@@ -13,6 +13,7 @@ import com.google.common.collect.ImmutableSet;
 import net.minecraft.block.*;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.Item;
@@ -220,7 +221,7 @@ public class InventoryHelper {
         }
     }
 
-    public static ItemStack addPasteToContainer(ClientPlayerEntity player, ItemStack itemStack) {
+    public static ItemStack addPasteToContainer(PlayerEntity player, ItemStack itemStack) {
         if (!(itemStack.getItem() instanceof ConstructionPaste)) {
             return itemStack;
         }
