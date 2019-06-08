@@ -8,12 +8,11 @@ buildscript {
         classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
     }
 }
-plugins {
-    id 'eclipse'
-    id 'idea'
-    id 'java'
-    id 'maven-publish'
-}
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+apply plugin: 'maven-publish'
 apply plugin: 'net.minecraftforge.gradle'
 version = "$version"
 def env = System.getenv()
