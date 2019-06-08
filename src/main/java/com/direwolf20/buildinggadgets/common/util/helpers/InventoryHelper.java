@@ -13,7 +13,7 @@ import com.google.common.collect.ImmutableSet;
 import net.minecraft.block.*;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
-import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -37,10 +37,10 @@ public class InventoryHelper {
     private static IProperty AXIS = EnumProperty.create("axis", Direction.Axis.class);
 
     private static final Set<IProperty> SAFE_PROPERTIES =
-            ImmutableSet.of(BlockSlab.TYPE, BlockStairs.HALF, BlockLog.AXIS, AXIS, BlockDirectional.FACING, BlockStairs.FACING, BlockTrapDoor.HALF, BlockStairs.SHAPE, BlockLever.POWERED, BlockRedstoneRepeater.DELAY);
+            ImmutableSet.of(SlabBlock.TYPE, StairsBlock.HALF, LogBlock.AXIS, AXIS, DirectionalBlock.FACING, StairsBlock.FACING, TrapDoorBlock.HALF, StairsBlock.SHAPE, LeverBlock.POWERED, RepeaterBlock.DELAY);
 
     private static final Set<IProperty> SAFE_PROPERTIES_COPY_PASTE =
-            ImmutableSet.<IProperty>builder().addAll(SAFE_PROPERTIES).addAll(ImmutableSet.of(BlockRail.SHAPE, BlockRailPowered.SHAPE)).build();
+            ImmutableSet.<IProperty>builder().addAll(SAFE_PROPERTIES).addAll(ImmutableSet.of(RailBlock.SHAPE, PoweredRailBlock.SHAPE)).build();
 
     public static boolean giveItem(ItemStack itemStack, ClientPlayerEntity player, IWorld world) {
         if (player.isCreative()) {
@@ -54,7 +54,7 @@ public class InventoryHelper {
         }
 
         //Fill any unfilled stacks in the player's inventory first
-        InventoryPlayer inv = player.inventory;
+        PlayerInventory inv = player.inventory;
         List<Integer> slots = findItem(itemStack.getItem(), inv);
         for (int slot : slots) {
             ItemStack stackInSlot = inv.getStackInSlot(slot);
@@ -121,7 +121,7 @@ public class InventoryHelper {
         }
 
 
-        InventoryPlayer inv = player.inventory;
+        PlayerInventory inv = player.inventory;
 
         List<Integer> slots = findItem(itemStack.getItem(), inv);
         List<IItemHandler> invContainers = findInvContainers(inv);
@@ -165,7 +165,7 @@ public class InventoryHelper {
             return Integer.MAX_VALUE;
 
         long count = remoteInventory.countItem(GadgetGeneric.getGadget(player), itemStack);
-        InventoryPlayer inv = player.inventory;
+        PlayerInventory inv = player.inventory;
         List<Integer> slots = findItem(itemStack.getItem(), inv);
         List<IItemHandler> invContainers = findInvContainers(inv);
         if (slots.size() == 0 && invContainers.size() == 0 && count == 0) {
@@ -189,7 +189,7 @@ public class InventoryHelper {
             return Integer.MAX_VALUE;
 
         long count = 0;
-        InventoryPlayer inv = player.inventory;
+        PlayerInventory inv = player.inventory;
         Item item = BGItems.constructionPaste;
         List<Integer> slots = findItem(item, inv);
         if (slots.size() > 0) {
@@ -224,7 +224,7 @@ public class InventoryHelper {
         if (!(itemStack.getItem() instanceof ConstructionPaste)) {
             return itemStack;
         }
-        InventoryPlayer inv = player.inventory;
+        PlayerInventory inv = player.inventory;
         List<Integer> slots = findItemClass(GenericPasteContainer.class, inv);
         if (slots.size() == 0) {
             return itemStack;
@@ -261,7 +261,7 @@ public class InventoryHelper {
         if (player.isCreative()) {
             return true;
         }
-        InventoryPlayer inv = player.inventory;
+        PlayerInventory inv = player.inventory;
         List<Integer> slots = findItem(BGItems.constructionPaste, inv);
         if (slots.size() > 0) {
             for (int slot : slots) {
@@ -289,7 +289,7 @@ public class InventoryHelper {
         return false;
     }
 
-    private static List<IItemHandler> findInvContainers(InventoryPlayer inv) {
+    private static List<IItemHandler> findInvContainers(PlayerInventory inv) {
         List<IItemHandler> containers = new ArrayList<>();
 
         for (int i = 0; i < 36; ++i) {
@@ -313,7 +313,7 @@ public class InventoryHelper {
         return count;
     }
 
-    private static List<Integer> findItem(Item item, InventoryPlayer inv) {
+    private static List<Integer> findItem(Item item, PlayerInventory inv) {
         List<Integer> slots = new ArrayList<>();
         for (int i = 0; i < 36; ++i) {
             ItemStack stack = inv.getStackInSlot(i);
@@ -324,7 +324,7 @@ public class InventoryHelper {
         return slots;
     }
 
-    public static List<Integer> findItemClass(Class c, InventoryPlayer inv) {
+    public static List<Integer> findItemClass(Class c, PlayerInventory inv) {
         List<Integer> slots = new ArrayList<>();
         for (int i = 0; i < 36; ++i) {
             ItemStack stack = inv.getStackInSlot(i);
