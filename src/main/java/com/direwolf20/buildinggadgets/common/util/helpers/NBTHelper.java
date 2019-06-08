@@ -10,11 +10,8 @@ import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.function.BiFunction;
-import java.util.function.Function;
-import java.util.function.IntFunction;
-import java.util.*;
 import java.util.function.*;
+import java.util.*;
 import java.util.stream.*;
 
 /**
@@ -23,82 +20,82 @@ import java.util.stream.*;
  */
 public class NBTHelper {
 
-    public static NBTTagByteArray createBooleanList(boolean[] booleans) {
+    public static ByteArrayNBT createBooleanList(boolean[] booleans) {
         byte[] bytes = new byte[booleans.length];
         for (int i = 0; i < booleans.length; ++i) {
             bytes[i] = (byte) (booleans[i] ? 0 : 1);
         }
-        return new NBTTagByteArray(bytes);
+        return new ByteArrayNBT(bytes);
     }
 
-    public static NBTTagByteArray createBooleanList(Boolean[] booleans) {
+    public static ByteArrayNBT createBooleanList(Boolean[] booleans) {
         byte[] bytes = new byte[booleans.length];
         for (int i = 0; i < booleans.length; ++i) {
             bytes[i] = (byte) (booleans[i] ? 0 : 1);
         }
-        return new NBTTagByteArray(bytes);
+        return new ByteArrayNBT(bytes);
     }
 
-    public static NBTTagList createShortList(short[] shorts) {
-        NBTTagList list = new NBTTagList();
+    public static ListNBT createShortList(short[] shorts) {
+        ListNBT list = new ListNBT();
         for (short s : shorts) {
-            list.add(new NBTTagShort(s));
+            list.add(new ShortNBT(s));
         }
         return list;
     }
 
-    public static NBTTagList createShortList(Short[] shorts) {
-        NBTTagList list = new NBTTagList();
+    public static ListNBT createShortList(Short[] shorts) {
+        ListNBT list = new ListNBT();
         for (short s : shorts) {
-            list.add(new NBTTagShort(s));
+            list.add(new ShortNBT(s));
         }
         return list;
     }
 
     @Nonnull
-    public static NBTTagList createFloatList(float[] floats) {
-        NBTTagList list = new NBTTagList();
+    public static ListNBT createFloatList(float[] floats) {
+        ListNBT list = new ListNBT();
         for (float f : floats) {
-            list.add(new NBTTagFloat(f));
+            list.add(new FloatNBT(f));
         }
         return list;
     }
 
     @Nonnull
-    public static NBTTagList createFloatList(Float[] floats) {
-        NBTTagList list = new NBTTagList();
+    public static ListNBT createFloatList(Float[] floats) {
+        ListNBT list = new ListNBT();
         for (Float f : floats) {
-            list.add(new NBTTagFloat(f));
+            list.add(new FloatNBT(f));
         }
         return list;
     }
 
     @Nonnull
-    public static NBTTagList createDoubleList(double[] doubles) {
-        NBTTagList list = new NBTTagList();
+    public static ListNBT createDoubleList(double[] doubles) {
+        ListNBT list = new ListNBT();
         for (double d : doubles) {
-            list.add(new NBTTagDouble(d));
+            list.add(new DoubleNBT(d));
         }
         return list;
     }
 
     @Nonnull
-    public static NBTTagList createDoubleList(Double[] doubles) {
-        NBTTagList list = new NBTTagList();
+    public static ListNBT createDoubleList(Double[] doubles) {
+        ListNBT list = new ListNBT();
         for (Double d : doubles) {
-            list.add(new NBTTagDouble(d));
+            list.add(new DoubleNBT(d));
         }
         return list;
     }
 
     @Nonnull
-    public static short[] readShortList(NBTTagList shorts) {
+    public static short[] readShortList(ListNBT shorts) {
         short[] res = new short[shorts.size()];
         IntList failed = new IntArrayList();
         for (int i = 0; i < shorts.size(); i++) {
             INBT nbt = shorts.get(i);
-            if (nbt instanceof NBTTagShort) {
-                res[i] = ((NBTTagShort) nbt).getShort();
+            if (nbt instanceof ShortNBT) {
+                res[i] = ((ShortNBT) nbt).getShort();
             } else {
                 res[i] = 0;
                 failed.add(i);
@@ -119,13 +116,13 @@ public class NBTHelper {
     }
 
     @Nonnull
-    public static Short[] readBShortList(NBTTagList shorts) {
+    public static Short[] readBShortList(ListNBT shorts) {
         Short[] res = new Short[shorts.size()];
         IntList failed = new IntArrayList();
         for (int i = 0; i < shorts.size(); i++) {
             INBT nbt = shorts.get(i);
-            if (nbt instanceof NBTTagShort) {
-                res[i] = ((NBTTagShort) nbt).getShort();
+            if (nbt instanceof ShortNBT) {
+                res[i] = ((ShortNBT) nbt).getShort();
             } else {
                 res[i] = 0;
                 failed.add(i);
@@ -146,22 +143,22 @@ public class NBTHelper {
     }
 
     @Nonnull
-    public static NBTTagList createStringList(String[] strings) {
-        NBTTagList list = new NBTTagList();
+    public static ListNBT createStringList(String[] strings) {
+        ListNBT list = new ListNBT();
         for (String s : strings) {
-            list.add(new NBTTagString(s));
+            list.add(new StringNBT(s));
         }
         return list;
     }
 
     @Nonnull
-    public static float[] readFloatList(NBTTagList floats) {
+    public static float[] readFloatList(ListNBT floats) {
         float[] res = new float[floats.size()];
         IntList failed = new IntArrayList();
         for (int i = 0; i < floats.size(); i++) {
             INBT nbt = floats.get(i);
-            if (nbt instanceof NBTTagFloat) {
-                res[i] = ((NBTTagFloat) nbt).getFloat();
+            if (nbt instanceof FloatNBT) {
+                res[i] = ((FloatNBT) nbt).getFloat();
             } else {
                 res[i] = 0;
                 failed.add(i);
@@ -182,13 +179,13 @@ public class NBTHelper {
     }
 
     @Nonnull
-    public static Float[] readBFloatList(NBTTagList floats) {
+    public static Float[] readBFloatList(ListNBT floats) {
         Float[] res = new Float[floats.size()];
         IntList failed = new IntArrayList();
         for (int i = 0; i < floats.size(); i++) {
             INBT nbt = floats.get(i);
-            if (nbt instanceof NBTTagFloat) {
-                res[i] = ((NBTTagFloat) nbt).getFloat();
+            if (nbt instanceof FloatNBT) {
+                res[i] = ((FloatNBT) nbt).getFloat();
             } else {
                 res[i] = 0f;
                 failed.add(i);
@@ -209,13 +206,13 @@ public class NBTHelper {
     }
 
     @Nonnull
-    public static double[] readDoubleList(NBTTagList doubles) {
+    public static double[] readDoubleList(ListNBT doubles) {
         double[] res = new double[doubles.size()];
         IntList failed = new IntArrayList();
         for (int i = 0; i < doubles.size(); i++) {
             INBT nbt = doubles.get(i);
-            if (nbt instanceof NBTTagDouble) {
-                res[i] = ((NBTTagDouble) nbt).getDouble();
+            if (nbt instanceof DoubleNBT) {
+                res[i] = ((DoubleNBT) nbt).getDouble();
             } else {
                 res[i] = 0;
                 failed.add(i);
@@ -236,13 +233,13 @@ public class NBTHelper {
     }
 
     @Nonnull
-    public static Double[] readBDoubleList(NBTTagList doubles) {
+    public static Double[] readBDoubleList(ListNBT doubles) {
         Double[] res = new Double[doubles.size()];
         IntList failed = new IntArrayList();
         for (int i = 0; i < doubles.size(); i++) {
             INBT nbt = doubles.get(i);
-            if (nbt instanceof NBTTagDouble) {
-                res[i] = ((NBTTagDouble) nbt).getDouble();
+            if (nbt instanceof DoubleNBT) {
+                res[i] = ((DoubleNBT) nbt).getDouble();
             } else {
                 res[i] = 0.0;
                 failed.add(i);
@@ -263,12 +260,12 @@ public class NBTHelper {
     }
 
     @Nonnull
-    public static String[] readStringList(NBTTagList strings) {
+    public static String[] readStringList(ListNBT strings) {
         String[] res = new String[strings.size()];
         IntList failed = new IntArrayList();
         for (int i = 0; i < strings.size(); i++) {
             INBT nbt = strings.get(i);
-            if (nbt instanceof NBTTagString) {
+            if (nbt instanceof StringNBT) {
                 res[i] = nbt.getString();
             } else {
                 res[i] = "";
@@ -289,7 +286,7 @@ public class NBTHelper {
         return res;
     }
 
-    public static boolean[] readBooleanList(NBTTagByteArray booleans) {
+    public static boolean[] readBooleanList(ByteArrayNBT booleans) {
         byte[] bytes = booleans.getByteArray();
         boolean[] res = new boolean[bytes.length];
         for (int i = 0; i < bytes.length; ++i) {
@@ -298,7 +295,7 @@ public class NBTHelper {
         return res;
     }
 
-    public static Boolean[] readBBooleanList(NBTTagByteArray booleans) {
+    public static Boolean[] readBBooleanList(ByteArrayNBT booleans) {
         byte[] bytes = booleans.getByteArray();
         Boolean[] res = new Boolean[bytes.length];
         for (int i = 0; i < bytes.length; ++i) {
@@ -307,13 +304,13 @@ public class NBTHelper {
         return res;
     }
 
-    public static <T> NBTTagList writeIterable(Iterable<T> iterable, Function<? super T, ? extends INBT> serializer) {
-        return StreamSupport.stream(iterable.spliterator(), false).map(serializer).collect(toNBTTagList());
+    public static <T> ListNBT writeIterable(Iterable<T> iterable, Function<? super T, ? extends INBT> serializer) {
+        return StreamSupport.stream(iterable.spliterator(), false).map(serializer).collect(toListNBT());
     }
 
-    public static <T> NBTTagList writeIterable(Iterable<T> iterable, BiFunction<? super T, Integer, ? extends INBT> serializer) {
+    public static <T> ListNBT writeIterable(Iterable<T> iterable, BiFunction<? super T, Integer, ? extends INBT> serializer) {
         int index = 0;
-        NBTTagList res = new NBTTagList();
+        ListNBT res = new ListNBT();
         for (T element : iterable) {
             res.add(serializer.apply(element, index));
             index++;
@@ -321,11 +318,11 @@ public class NBTHelper {
         return res;
     }
 
-    public static <V, T extends INBT> List<V> readList(NBTTagCollection<T> list, Function<? super T, ? extends V> deserializer) {
+    public static <V, T extends INBT> List<V> readList(CollectionNBT<T> list, Function<? super T, ? extends V> deserializer) {
         return list.stream().map(deserializer).collect(Collectors.toList());
     }
 
-    public static <V, T extends INBT> List<V> readList(NBTTagCollection<T> list, BiFunction<? super T, Integer, ? extends V> deserializer) {
+    public static <V, T extends INBT> List<V> readList(CollectionNBT<T> list, BiFunction<? super T, Integer, ? extends V> deserializer) {
         List<V> res = new ArrayList<>(list.size());
         int index = 0;
         for (T element : list) {
@@ -335,24 +332,24 @@ public class NBTHelper {
         return res;
     }
 
-    public static <K, V> NBTTagList serializeMap(Map<K, V> map, Function<? super K, ? extends INBT> keySerializer, Function<? super V, ? extends INBT> valueSerializer) {
-        NBTTagList list = new NBTTagList();
+    public static <K, V> ListNBT serializeMap(Map<K, V> map, Function<? super K, ? extends INBT> keySerializer, Function<? super V, ? extends INBT> valueSerializer) {
+        ListNBT list = new ListNBT();
         for (Map.Entry<K, V> entry : map.entrySet()) {
             CompoundNBT compound = new CompoundNBT();
-            compound.setTag(NBTKeys.MAP_SERIALIZE_KEY, keySerializer.apply(entry.getKey()));
-            compound.setTag(NBTKeys.MAP_SERIALIZE_VALUE, valueSerializer.apply(entry.getValue()));
+            compound.put(NBTKeys.MAP_SERIALIZE_KEY, keySerializer.apply(entry.getKey()));
+            compound.put(NBTKeys.MAP_SERIALIZE_VALUE, valueSerializer.apply(entry.getValue()));
             list.add(compound);
         }
         return list;
     }
 
-    public static <K, V> Map<K, V> deserializeMap(NBTTagList list, Map<K, V> toAppendTo, Function<INBT, ? extends K> keyDeserializer, Function<INBT, ? extends V> valueDeserializer) {
+    public static <K, V> Map<K, V> deserializeMap(ListNBT list, Map<K, V> toAppendTo, Function<INBT, ? extends K> keyDeserializer, Function<INBT, ? extends V> valueDeserializer) {
         for (INBT nbt : list) {
             if (nbt instanceof CompoundNBT) {
                 CompoundNBT compound = (CompoundNBT) nbt;
                 toAppendTo.put(
-                        keyDeserializer.apply(compound.getTag(NBTKeys.MAP_SERIALIZE_KEY)),
-                        valueDeserializer.apply(compound.getTag(NBTKeys.MAP_SERIALIZE_VALUE))
+                        keyDeserializer.apply(compound.get(NBTKeys.MAP_SERIALIZE_KEY)),
+                        valueDeserializer.apply(compound.get(NBTKeys.MAP_SERIALIZE_VALUE))
                 );
             }
         }
@@ -360,19 +357,19 @@ public class NBTHelper {
     }
 
     /**
-     * Connect two {@link NBTTagList} together to create a new one. This process has no side effects, which means it
+     * Connect two {@link ListNBT} together to create a new one. This process has no side effects, which means it
      * will not modify two parameters.
      * <p>
      * Additionally, if any of the lists are empty, the method will directly return the nonempty one. If both of them are
      * empty, it will directly return the second list.
      */
-    public static NBTTagList concat(NBTTagList first, NBTTagList second) {
+    public static ListNBT concat(ListNBT first, ListNBT second) {
         if (first.isEmpty())
             return second;
         if (second.isEmpty())
             return first;
 
-        return Stream.concat(first.stream(), second.stream()).collect(toNBTTagList());
+        return Stream.concat(first.stream(), second.stream()).collect(toListNBT());
     }
 
     /**
@@ -388,20 +385,20 @@ public class NBTHelper {
         return tag;
     }
 
-    public static <T extends INBT> Collector<T, NBTTagList, NBTTagList> toNBTTagList() {
-        return new Collector<T, NBTTagList, NBTTagList>() {
+    public static <T extends INBT> Collector<T, ListNBT, ListNBT> toListNBT() {
+        return new Collector<T, ListNBT, ListNBT>() {
             @Override
-            public Supplier<NBTTagList> supplier() {
-                return NBTTagList::new;
+            public Supplier<ListNBT> supplier() {
+                return ListNBT::new;
             }
 
             @Override
-            public BiConsumer<NBTTagList, T> accumulator() {
-                return NBTTagList::add;
+            public BiConsumer<ListNBT, T> accumulator() {
+                return ListNBT::add;
             }
 
             @Override
-            public BinaryOperator<NBTTagList> combiner() {
+            public BinaryOperator<ListNBT> combiner() {
                 return (l1, l2) -> {
                     l1.addAll(l2);
                     return l1;
@@ -409,7 +406,7 @@ public class NBTHelper {
             }
 
             @Override
-            public Function<NBTTagList, NBTTagList> finisher() {
+            public Function<ListNBT, ListNBT> finisher() {
                 return Function.identity();
             }
 
