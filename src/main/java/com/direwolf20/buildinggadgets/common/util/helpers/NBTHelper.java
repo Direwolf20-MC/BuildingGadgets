@@ -5,6 +5,7 @@ import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.*;
+import net.minecraftforge.common.util.INBTSerializable;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
@@ -359,6 +360,21 @@ public class NBTHelper {
         return toAppendTo;
     }
 
+    public static <T> NBTTagList serializeSet(Set<T> set, Function<? super T, ? extends INBTBase> elementSerializer) {
+        NBTTagList list = new NBTTagList();
+        for (T element : set) {
+            list.add(elementSerializer.apply(element));
+        }
+        return list;
+    }
+
+    public static <T> Set<T> deserializeSet(NBTTagList list, Set<T> toAppendTo, Function<INBTBase, ? extends T> elementDeserializer) {
+        for (INBTBase nbt : list) {
+            toAppendTo.add(elementDeserializer.apply(nbt));
+        }
+        return toAppendTo;
+    }
+
     /**
      * Connect two {@link NBTTagList} together to create a new one. This process has no side effects, which means it
      * will not modify two parameters.
@@ -418,6 +434,30 @@ public class NBTHelper {
                 return EnumSet.of(Characteristics.IDENTITY_FINISH, Characteristics.UNORDERED);
             }
         };
+    }
+
+    /**
+     * Implementations needs a static method for deserialization for deserialization of subclasses of some interface.
+     *
+     * @param <T> The implementation itself.
+     */
+    public interface ITagSerializable<T extends ITagSerializable<T>> extends INBTSerializable<NBTTagCompound> {
+
+        T deserialize(NBTTagCompound tag);
+
+        NBTTagCompound serializeTo(NBTTagCompound tag);
+
+        @Override
+        default NBTTagCompound serializeNBT() {
+            return serializeTo(new NBTTagCompound());
+        }
+
+        @Deprecated
+        @Override
+        default void deserializeNBT(NBTTagCompound tag) {
+            throw new UnsupportedOperationException();
+        }
+
     }
 
 }

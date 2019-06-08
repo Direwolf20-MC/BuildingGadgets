@@ -1,9 +1,11 @@
 package com.direwolf20.buildinggadgets.common.util.blocks;
 
-import com.direwolf20.buildinggadgets.api.building.Region;
+import com.direwolf20.buildinggadgets.api.building.IPositionPlacementSequence;
+import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.util.exceptions.PaletteOverflowException;
 import com.direwolf20.buildinggadgets.common.util.helpers.LambdaHelper;
-import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
+import com.direwolf20.buildinggadgets.common.util.helpers.SerializationHelper;
+import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper.ITagSerializable;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -26,12 +28,16 @@ import net.minecraftforge.common.util.TriPredicate;
 import net.minecraftforge.fml.server.ServerLifecycleHooks;
 import org.apache.commons.lang3.tuple.Pair;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.*;
 import java.util.function.BiPredicate;
 
 public class RegionSnapshot {
 
     private static final String DIMENSION = "dim";
+    private static final String POSITIONS = "positions";
+    private static final String POSITIONS_CLASS = "positions_class";
     private static final String BLOCK_FRAMES = "frames";
     private static final String BLOCK_PALETTES = "palettes";
     private static final String TILE_DATA = "block_snapshots";
@@ -39,9 +45,17 @@ public class RegionSnapshot {
     private static final String TILE_NBT = "block_nbt";
 
     private static NBTTagCompound serialize(NBTTagCompound tag, RegionSnapshot snapshot) {
+        // Preconditions.checkArgument(snapshot.positions instanceof Serializable, "Cannot serialize a pos provider that is not Serializable!");
+
         // func_212678_a == getKey
         tag.setString(DIMENSION, DimensionType.func_212678_a(snapshot.world.getDimension().getType()).toString());
-        snapshot.region.serializeTo(tag);
+        if (snapshot.positions instanceof ITagSerializable) {
+            tag.setTag(POSITIONS, ((ITagSerializable) snapshot.positions).serializeNBT());
+            tag.setString(POSITIONS_CLASS, snapshot.positions.getClass().getName());
+        } else {
+            byte[] serializedPositions = SerializationHelper.serialize(snapshot.positions);
+            tag.setByteArray(POSITIONS, Objects.requireNonNull(serializedPositions));
+        }
 
         // Palette serialization begin
         // The serialized palettes only include actual block states, empty block state should be added, regardlessly, during deserialization
@@ -97,7 +111,6 @@ public class RegionSnapshot {
             // - when serializing, the stored number will be ONE FEWER then the actual amount
             //   - this is for squeezing space efficiency of the serialized format (even though it is not very necessary)
             frames.add((((streak - 1) & 0xff) << 24) | (mapPalettes.getInt(lastStreak.orElse(null)) & 0xffffff));
-            System.out.println(streak + " " + mapPalettes.getInt(lastStreak.orElse(null)));
 
             // Regardless of which situation, we reset the counter
             streak = 1;
@@ -105,7 +118,6 @@ public class RegionSnapshot {
         }
         // Force add a frame here -- even if we pushed a new frame on the last block state, itself hasn't been stored yet
         frames.add((((streak - 1) & 0xff) << 24) | (mapPalettes.getInt(lastStreak.orElse(null)) & 0xffffff));
-        System.out.println(streak + " " + mapPalettes.getInt(lastStreak.orElse(null)));
 
         tag.setIntArray(BLOCK_FRAMES, frames.toIntArray());
         tag.setTag(BLOCK_PALETTES, palettes);
@@ -126,7 +138,23 @@ public class RegionSnapshot {
         ResourceLocation dimension = new ResourceLocation(tag.getString(DIMENSION));
         World world = ServerLifecycleHooks.getCurrentServer().getWorld(Objects.requireNonNull(DimensionType.byName(dimension)));
 
-        Region region = Region.deserializeFrom(tag);
+        IPositionPlacementSequence positions;
+        if (tag.hasKey(POSITIONS_CLASS)) {
+            try {
+                Class<?> clazz = Class.forName(tag.getString(POSITIONS_CLASS));
+                if (!ITagSerializable.class.isAssignableFrom(clazz))
+                    return null;
+
+                Method deserializer = clazz.getDeclaredMethod("deserializeFrom", NBTTagCompound.class);
+                deserializer.setAccessible(true);
+                positions = (IPositionPlacementSequence) deserializer.invoke(null, tag.getCompound(POSITIONS));
+            } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+                BuildingGadgets.LOG.error(e);
+                return null;
+            }
+        } else {
+            positions = SerializationHelper.deserialize(tag.getByteArray(POSITIONS));
+        }
 
         List<Optional<IBlockState>> palettes = new ArrayList<>();
         {
@@ -164,30 +192,30 @@ public class RegionSnapshot {
                     serializedData.getCompound(TILE_NBT)));
         }
 
-        return new RegionSnapshot(world, region, blockStates.build(), tileData.build());
+        return new RegionSnapshot(world, positions, blockStates.build(), tileData.build());
     }
 
     /**
      * Create a {@link RegionSnapshot} builder.
      * <p>
      * Predicate for whether record blocks or not can be customized through the builder. If no extra conditions are
-     * needed, use {@link #take(World, Region)} instead.
+     * needed, use {@link #take(World, IPositionPlacementSequence)} instead.
      */
-    public static Builder select(World world, Region region) {
-        return new Builder(world, region);
+    public static Builder select(World world, IPositionPlacementSequence positions) {
+        return new Builder(world, positions);
     }
 
     /**
      * Directly take a snapshot of the area, <b>without</b> tile entities.
      *
-     * @see #select(World, Region)
+     * @see #select(World, IPositionPlacementSequence)
      */
-    public static RegionSnapshot take(World world, Region region) throws PaletteOverflowException {
-        return select(world, region).build();
+    public static RegionSnapshot take(World world, IPositionPlacementSequence positions) throws PaletteOverflowException {
+        return select(world, positions).build();
     }
 
     private World world;
-    private Region region;
+    private IPositionPlacementSequence positions;
 
     private ImmutableList<Optional<IBlockState>> blockStates;
     private ImmutableList<Pair<BlockPos, NBTTagCompound>> tileData;
@@ -197,16 +225,16 @@ public class RegionSnapshot {
      */
     private NBTTagCompound serializedForm;
 
-    private RegionSnapshot(World world, Region region, ImmutableList<Optional<IBlockState>> blockStates, ImmutableList<Pair<BlockPos, NBTTagCompound>> tileData) {
+    private RegionSnapshot(World world, IPositionPlacementSequence positions, ImmutableList<Optional<IBlockState>> blockStates, ImmutableList<Pair<BlockPos, NBTTagCompound>> tileData) {
         this.world = world;
-        this.region = region;
+        this.positions = positions;
         this.blockStates = blockStates;
         this.tileData = tileData;
     }
 
     public void restore() {
         int index = 0;
-        for (BlockPos pos : region) {
+        for (BlockPos pos : positions) {
             blockStates.get(index).ifPresent(state -> world.setBlockState(pos, state));
             index++;
         }
@@ -222,8 +250,8 @@ public class RegionSnapshot {
         }
     }
 
-    public Region getRegion() {
-        return region;
+    public IPositionPlacementSequence getPositions() {
+        return positions;
     }
 
     /**
@@ -257,15 +285,15 @@ public class RegionSnapshot {
     public static final class Builder {
 
         private World world;
-        private Region region;
+        private IPositionPlacementSequence positions;
         private BiPredicate<BlockPos, IBlockState> normalValidator;
         private TriPredicate<BlockPos, IBlockState, TileEntity> tileValidator;
 
         private boolean built = false;
 
-        private Builder(World world, Region region) {
+        private Builder(World world, IPositionPlacementSequence positions) {
             this.world = world;
-            this.region = region;
+            this.positions = positions;
         }
 
         /**
@@ -323,7 +351,7 @@ public class RegionSnapshot {
          * @throws IllegalStateException    When trying to invoke this method when this builder has build someone
          *                                  already.
          * @throws PaletteOverflowException When there are more than 16777216, or {@code 2^24}, unique block states in
-         *                                  the given region. This is because the serialization format only uses the
+         *                                  the given positions. This is because the serialization format only uses the
          *                                  first 24 bits of an integer to store the palette ID.
          */
         public RegionSnapshot build() throws IllegalStateException, PaletteOverflowException {
@@ -331,7 +359,7 @@ public class RegionSnapshot {
 
             ImmutableList.Builder<Optional<IBlockState>> blockStatesBuilder = ImmutableList.builder();
             ImmutableList.Builder<Pair<BlockPos, NBTTagCompound>> tileDataBuilder = ImmutableList.builder();
-            for (BlockPos pos : region) {
+            for (BlockPos pos : positions) {
                 TileEntity tile = world.getTileEntity(pos);
                 IBlockState state = world.getBlockState(pos);
                 if (tile != null && tileValidator.test(pos, state, tile)) {
@@ -348,10 +376,10 @@ public class RegionSnapshot {
             ImmutableSet<Optional<IBlockState>> uniqueBlocksStates = ImmutableSet.copyOf(blockStates);
             // 16777216 == 2^24
             if (uniqueBlocksStates.size() >= 16777216)
-                throw new PaletteOverflowException(region, uniqueBlocksStates.size());
+                throw new PaletteOverflowException(positions, uniqueBlocksStates.size());
 
             built = true;
-            return new RegionSnapshot(world, region, blockStates, tileDataBuilder.build());
+            return new RegionSnapshot(world, positions, blockStates, tileDataBuilder.build());
         }
 
     }

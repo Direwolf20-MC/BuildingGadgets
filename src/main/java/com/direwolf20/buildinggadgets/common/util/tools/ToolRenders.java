@@ -40,6 +40,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldType;
 import net.minecraft.world.dimension.DimensionType;
@@ -59,12 +60,10 @@ import org.apache.commons.lang3.tuple.Triple;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL14;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.SortedSet;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import static com.direwolf20.buildinggadgets.common.util.GadgetUtils.getAnchor;
 import static com.direwolf20.buildinggadgets.common.util.GadgetUtils.getToolBlock;
@@ -393,7 +392,11 @@ public class ToolRenders {
         Minecraft mc = Minecraft.getInstance();
         mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
 
-        SortedSet<BlockPos> coordinates = GadgetDestruction.getClearingPositions(world, startBlock, facing, player, heldItem);
+        SortedSet<BlockPos> coordinates = GadgetDestruction.getClearingPositions(world, startBlock, facing, player, heldItem).stream()
+                .collect(Collectors.toCollection(() -> new TreeSet<>(Comparator
+                        .comparingInt(Vec3i::getX)
+                        .thenComparingInt(Vec3i::getY)
+                        .thenComparingInt(Vec3i::getZ))));
 
         //Prepare the block rendering
         BlockRenderLayer origLayer = MinecraftForgeClient.getRenderLayer();

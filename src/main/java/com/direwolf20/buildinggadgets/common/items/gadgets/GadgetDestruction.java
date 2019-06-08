@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.common.items.gadgets;
 
+import com.direwolf20.buildinggadgets.api.building.IPositionPlacementSequence;
 import com.direwolf20.buildinggadgets.api.building.Region;
 import com.direwolf20.buildinggadgets.client.gui.GuiMod;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
@@ -10,6 +11,8 @@ import com.direwolf20.buildinggadgets.common.util.CapabilityUtil.EnergyUtil;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.blocks.RegionSnapshot;
 import com.direwolf20.buildinggadgets.common.util.exceptions.PaletteOverflowException;
+import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
+import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper.ITagSerializable;
 import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
 import com.direwolf20.buildinggadgets.common.util.lang.Styles;
 import com.direwolf20.buildinggadgets.common.util.lang.TooltipTranslation;
@@ -19,14 +22,16 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.*;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
-import net.minecraft.util.math.*;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.text.*;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.BlockSnapshot;
+import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.world.BlockEvent;
 import org.apache.commons.lang3.tuple.Pair;
@@ -37,12 +42,87 @@ import java.util.stream.Collectors;
 
 public class GadgetDestruction extends GadgetSwapping {
 
+    public static class SetBackedPlacementSequence implements IPositionPlacementSequence, ITagSerializable<SetBackedPlacementSequence> {
+
+        public static final String POS_SET = "Pos";
+
+        public static SetBackedPlacementSequence deserializeFrom(NBTTagCompound tag) {
+            HashSet<BlockPos> set = new HashSet<>();
+            NBTHelper.deserializeSet(tag.getList(POS_SET, Constants.NBT.TAG_COMPOUND), set, nbt -> NBTUtil.readBlockPos((NBTTagCompound) nbt));
+
+            Region boundingBox = Region.deserializeFrom(tag);
+
+            return new SetBackedPlacementSequence(set, boundingBox);
+        }
+
+        private final Region boundingBox;
+        private final HashSet<BlockPos> internalSet;
+
+        public SetBackedPlacementSequence(HashSet<BlockPos> internalSet, Region boundingBox) {
+            this.internalSet = internalSet;
+            this.boundingBox = boundingBox;
+        }
+
+        @Override
+        public Iterator<BlockPos> iterator() {
+            return internalSet.iterator();
+        }
+
+        @Override
+        public Region getBoundingBox() {
+            return boundingBox;
+        }
+
+        /**
+         * @deprecated Use {@link #contains(int, int, int)} instead.
+         */
+        @Deprecated
+        @Override
+        public boolean mayContain(int x, int y, int z) {
+            return contains(new BlockPos(x, y, z));
+        }
+
+        public boolean contains(int x, int y, int z) {
+            return contains(new BlockPos(x, y, z));
+        }
+
+        public boolean contains(BlockPos pos) {
+            return internalSet.contains(pos);
+        }
+
+        /**
+         * Warning: this method uses the copy constructor of {@link HashSet}, therefore it does not guarantee it will
+         * return the same type of set.
+         */
+        @Deprecated
+        @Override
+        public IPositionPlacementSequence copy() {
+            return new SetBackedPlacementSequence(new HashSet<>(internalSet), boundingBox);
+        }
+
+        public HashSet<BlockPos> getInternalSet() {
+            return internalSet;
+        }
+
+        @Override
+        public SetBackedPlacementSequence deserialize(NBTTagCompound tag) {
+            return deserializeFrom(tag);
+        }
+
+        @Override
+        public NBTTagCompound serializeTo(NBTTagCompound tag) {
+            tag.setTag(POS_SET, NBTHelper.serializeSet(internalSet, NBTUtil::writeBlockPos));
+            boundingBox.serializeTo(tag);
+            return tag;
+        }
+    }
+
     public static void restoreSnapshotWithBuilder(World world, RegionSnapshot snapshot) {
         Set<BlockPos> pastePositions = snapshot.getTileData().stream()
                 .map(Pair::getLeft)
                 .collect(Collectors.toSet());
         int index = 0;
-        for (BlockPos pos : snapshot.getRegion()) {
+        for (BlockPos pos : snapshot.getPositions()) {
             // TODO remove spawnBy field in BlockBuildEntity
             snapshot.getBlockStates().get(index).ifPresent(state -> world.spawnEntity(new BlockBuildEntity(world, pos, null, state, BlockBuildEntity.Mode.PLACE, pastePositions.contains(pos))));
             index++;
@@ -268,30 +348,27 @@ public class GadgetDestruction extends GadgetSwapping {
         }
     }
 
-    public static SortedSet<BlockPos> getClearingPositions(World world, BlockPos pos, EnumFacing incomingSide, EntityPlayer player, ItemStack stack) {
+    public static IPositionPlacementSequence getClearingPositions(World world, BlockPos pos, EnumFacing incomingSide, EntityPlayer player, ItemStack stack) {
         if (GadgetGeneric.getConnectedArea(stack)) {
-            SortedSet<BlockPos> voidPositions = new TreeSet<>(Comparator
-                    .comparingInt(Vec3i::getX)
-                    .thenComparingInt(Vec3i::getY)
-                    .thenComparingInt(Vec3i::getZ));
+            Region boundary = getClearingRegion(pos, incomingSide, player, stack);
+            HashSet<BlockPos> voidPositions = new HashSet<>();
             int depth = getToolValue(stack, NBTKeys.GADGET_VALUE_DEPTH);
             if (depth == 0)
-                return voidPositions;
+                return new SetBackedPlacementSequence(voidPositions, boundary);
 
             BlockPos startPos = (getAnchor(stack) == null) ? pos : getAnchor(stack);
             IBlockState stateTarget = !Config.GADGETS.GADGET_DESTRUCTION.nonFuzzyEnabled.get() || GadgetGeneric.getFuzzy(stack) ? null : world.getBlockState(pos);
-            Region boundary = getClearingRegion(pos, incomingSide, player, stack);
             addConnectedCoords(world, player, startPos, stateTarget, voidPositions,
                     boundary);
 
-            return voidPositions;
+            return new SetBackedPlacementSequence(voidPositions, boundary);
         } else {
-            return getClearingRegion(pos, incomingSide, player, stack).stream().collect(Collectors.toCollection(TreeSet::new));
+            return getClearingRegion(pos, incomingSide, player, stack);
         }
     }
 
-    public static void addConnectedCoords(World world, EntityPlayer player, BlockPos loc, IBlockState state, SortedSet<BlockPos> coords, Region boundary) {
-        if (coords.contains(loc) || boundary.contains(loc))
+    public static void addConnectedCoords(World world, EntityPlayer player, BlockPos loc, IBlockState state, Set<BlockPos> coords, Region boundary) {
+        if (coords.contains(loc) || !boundary.contains(loc))
             return;
 
         if (!isValidBlock(world, loc, player, state))
@@ -363,10 +440,10 @@ public class GadgetDestruction extends GadgetSwapping {
     }
 
     public void clearArea(World world, BlockPos pos, EnumFacing side, EntityPlayer player, ItemStack stack) {
-        Region region = getClearingRegion(pos, side, player, stack);
+        IPositionPlacementSequence positions = getClearingPositions(world, pos, side, player, stack);
         RegionSnapshot snapshot;
         try {
-            snapshot = RegionSnapshot.select(world, region)
+            snapshot = RegionSnapshot.select(world, positions)
                     .excludeAir()
                     .checkTiles((p, state, tile) -> state.getBlock() == BGBlocks.constructionBlock && tile instanceof ConstructionBlockTileEntity)
                     .build();
@@ -374,7 +451,7 @@ public class GadgetDestruction extends GadgetSwapping {
             player.sendMessage(new TextComponentTranslation(TooltipTranslation.GADGET_PALETTE_OVERFLOW.getTranslationKey()));
             return;
         }
-        region.forEach(voidPos -> destroyBlock(world, voidPos, player));
+        positions.forEach(voidPos -> destroyBlock(world, voidPos, player));
 
         WorldSave worldSave = WorldSave.getWorldSaveDestruction(world);
         worldSave.addToMap(getUUID(stack), snapshot.serialize());
