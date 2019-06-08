@@ -5,16 +5,16 @@ import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
 import com.direwolf20.buildinggadgets.common.util.blocks.BlockMap;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockRendererDispatcher;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.client.renderer.vertex.VertexFormatElement;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
-import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.math.BlockPos;

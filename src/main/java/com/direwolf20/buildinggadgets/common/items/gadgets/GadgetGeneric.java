@@ -12,7 +12,7 @@ import com.direwolf20.buildinggadgets.common.util.lang.Styles;
 import com.direwolf20.buildinggadgets.common.util.lang.TooltipTranslation;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
-import net.minecraft.init.Items;
+import net.minecraft.item.Items;
 import net.minecraft.item.IItemPropertyGetter;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -20,8 +20,8 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.energy.CapabilityEnergy;
@@ -94,7 +94,7 @@ public abstract class GadgetGeneric extends Item {
 
     @Override
     public boolean showDurabilityBar(ItemStack stack) {
-        if (stack.hasTag() && stack.getTag().hasKey(NBTKeys.CREATIVE_MARKER))
+        if (stack.hasTag() && stack.getTag().contains(NBTKeys.CREATIVE_MARKER))
             return false;
 
         return EnergyUtil.returnBooleanIfPresent(stack,
@@ -151,8 +151,8 @@ public abstract class GadgetGeneric extends Item {
     }
 
     public static void toggleFuzzy(ClientPlayerEntity player, ItemStack stack) {
-        NBTHelper.getOrNewTag(stack).setBoolean(NBTKeys.GADGET_FUZZY, !getFuzzy(stack));
-        player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.fuzzymode").getUnformattedComponentText() + ": " + getFuzzy(stack)), true);
+        NBTHelper.getOrNewTag(stack).putBoolean(NBTKeys.GADGET_FUZZY, !getFuzzy(stack));
+        player.sendStatusMessage(new StringTextComponent(TextFormatting.AQUA + new TranslationTextComponent("message.gadget.fuzzymode").getUnformattedComponentText() + ": " + getFuzzy(stack)), true);
     }
 
     public static boolean getConnectedArea(ItemStack stack) {
@@ -160,9 +160,9 @@ public abstract class GadgetGeneric extends Item {
     }
 
     public static void toggleConnectedArea(ClientPlayerEntity player, ItemStack stack) {
-        NBTHelper.getOrNewTag(stack).setBoolean(NBTKeys.GADGET_UNCONNECTED_AREA, getConnectedArea(stack));
+        NBTHelper.getOrNewTag(stack).putBoolean(NBTKeys.GADGET_UNCONNECTED_AREA, getConnectedArea(stack));
         String suffix = stack.getItem() instanceof GadgetDestruction ? "area" : "surface";
-        player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.connected" + suffix).getUnformattedComponentText() + ": " + getConnectedArea(stack)), true);
+        player.sendStatusMessage(new StringTextComponent(TextFormatting.AQUA + new TranslationTextComponent("message.gadget.connected" + suffix).getUnformattedComponentText() + ": " + getConnectedArea(stack)), true);
     }
 
     public static boolean shouldRayTraceFluid(ItemStack stack) {
@@ -170,8 +170,8 @@ public abstract class GadgetGeneric extends Item {
     }
 
     public static void toggleRayTraceFluid(ClientPlayerEntity player, ItemStack stack) {
-        NBTHelper.getOrNewTag(stack).setBoolean(NBTKeys.GADGET_RAYTRACE_FLUID, !shouldRayTraceFluid(stack));
-        player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.raytrace_fluid").getUnformattedComponentText() + ": " + shouldRayTraceFluid(stack)), true);
+        NBTHelper.getOrNewTag(stack).putBoolean(NBTKeys.GADGET_RAYTRACE_FLUID, !shouldRayTraceFluid(stack));
+        player.sendStatusMessage(new StringTextComponent(TextFormatting.AQUA + new TranslationTextComponent("message.gadget.raytrace_fluid").getUnformattedComponentText() + ": " + shouldRayTraceFluid(stack)), true);
     }
 
     public static void addInformationRayTraceFluid(List<ITextComponent> tooltip, ItemStack stack) {
