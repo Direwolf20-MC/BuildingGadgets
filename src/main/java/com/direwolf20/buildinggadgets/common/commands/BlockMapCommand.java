@@ -14,7 +14,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 
 import java.util.HashMap;
@@ -25,16 +25,16 @@ public class BlockMapCommand {
     public static LiteralArgumentBuilder<CommandSource> registerDelete() {
         return Commands.literal("DeleteBlockMaps")
                 .requires(commandSource -> commandSource.hasPermissionLevel(4))
-                .then(Commands.argument("targets", EntityArgument.singleEntity()))
-                .executes(context -> execute(context, EntityArgument.getSingleEntity(context, "targets"), true));
+                .then(Commands.argument("targets", EntityArgument.entity()))
+                .executes(context -> execute(context, EntityArgument.getEntity(context, "targets"), true));
     }
 
 
     public static LiteralArgumentBuilder<CommandSource> registerList() {
         return Commands.literal("FindBlockMaps")
                 .requires(commandSource -> commandSource.hasPermissionLevel(4))
-                .then(Commands.argument("targets", EntityArgument.singleEntity()))
-                .executes(context -> execute(context, EntityArgument.getSingleEntity(context, "targets"), false));
+                .then(Commands.argument("targets", EntityArgument.entity()))
+                .executes(context -> execute(context, EntityArgument.getEntity(context, "targets"), false));
     }
 
     // I don't get the logic going on here but this is basically what it was originally :P
@@ -42,7 +42,7 @@ public class BlockMapCommand {
         ServerPlayerEntity sender = ctx.getSource().asPlayer();
 
         if( !(entity instanceof ClientPlayerEntity)) {
-            sender.sendMessage(new TextComponentString("Entity not valid"));
+            sender.sendMessage(new StringTextComponent("Entity not valid"));
             return 0;
         }
 
@@ -55,7 +55,7 @@ public class BlockMapCommand {
             CompoundNBT tagCompound = entry.getValue();
             if (tagCompound.getString(NBTKeys.TEMPLATE_OWNER).equals(entity.getName().getString())) {
                 //TODO Missing localisation
-                sender.sendMessage(new TextComponentString(TextFormatting.RED + "Deleted stored map for " + tagCompound.getString(NBTKeys.TEMPLATE_OWNER) + " with UUID:" + tagCompound.getString(NBTKeys.GADGET_UUID)));
+                sender.sendMessage(new StringTextComponent(TextFormatting.RED + "Deleted stored map for " + tagCompound.getString(NBTKeys.TEMPLATE_OWNER) + " with UUID:" + tagCompound.getString(NBTKeys.GADGET_UUID)));
                 counter++;
                 if (removeData) newMap.remove(entry.getKey());
             }
@@ -70,7 +70,7 @@ public class BlockMapCommand {
         }
 
         //TODO Missing localisation
-        sender.sendMessage(new TextComponentString(TextFormatting.WHITE + "Deleted " + counter + " blockmaps in world data."));
+        sender.sendMessage(new StringTextComponent(TextFormatting.WHITE + "Deleted " + counter + " blockmaps in world data."));
 
         return 1;
     }
