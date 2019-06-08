@@ -4,6 +4,7 @@ import com.google.common.collect.AbstractIterator;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -55,7 +56,7 @@ public class Context {
      *
      * @return {@link AbstractIterator} that wraps {@code getPositionSequence().iterator()}
      */
-    public Iterator<BlockPos> getFilteredSequence(World world, ItemStack stack, ClientPlayerEntity player, BlockPos initial) {
+    public Iterator<BlockPos> getFilteredSequence(World world, ItemStack stack, PlayerEntity player, BlockPos initial) {
         Iterator<BlockPos> positions = getPositionSequence().iterator();
         BiPredicate<BlockPos, BlockState> validator = validatorFactory.createValidatorFor(world, stack, player, initial);
         return new AbstractIterator<BlockPos>() {
@@ -74,7 +75,7 @@ public class Context {
     /**
      * @see IPositionPlacementSequence#collect()
      */
-    public ImmutableList<BlockPos> collectFilteredSequence(World world, ItemStack stack, ClientPlayerEntity player, BlockPos initial) {
+    public ImmutableList<BlockPos> collectFilteredSequence(World world, ItemStack stack, PlayerEntity player, BlockPos initial) {
         return ImmutableList.copyOf(getFilteredSequence(world, stack, player, initial));
     }
 

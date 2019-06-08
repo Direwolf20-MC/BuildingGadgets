@@ -4,6 +4,7 @@ import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
 
 import net.minecraft.client.entity.player.ClientPlayerEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.*;
 //import net.minecraft.util.math.RayTraceFluidMode;
@@ -13,11 +14,11 @@ import javax.annotation.Nullable;
 
 public class VectorHelper {
 
-    public static RayTraceResult getLookingAt(ClientPlayerEntity player, ItemStack tool) {
+    public static RayTraceResult getLookingAt(PlayerEntity player, ItemStack tool) {
         return getLookingAt(player, GadgetGeneric.shouldRayTraceFluid(tool) ? RayTraceContext.FluidMode.ANY : RayTraceContext.FluidMode.NONE);
     }
 
-    public static RayTraceResult getLookingAt(ClientPlayerEntity player, RayTraceContext.FluidMode rayTraceFluid) {
+    public static RayTraceResult getLookingAt(PlayerEntity player, RayTraceContext.FluidMode rayTraceFluid) {
         World world = player.world;
 
         Vec3d look = player.getLookVec();

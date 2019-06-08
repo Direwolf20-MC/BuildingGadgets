@@ -4,6 +4,7 @@ import com.direwolf20.buildinggadgets.api.capability.CapabilityBlockProvider;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
@@ -21,7 +22,7 @@ public interface IBuildingMode {
     /**
      * Iterator that supplies raw coordinates that haven't been filtered yet.
      */
-    IPositionPlacementSequence computeCoordinates(ClientPlayerEntity player, BlockPos hit, Direction sideHit, ItemStack tool);
+    IPositionPlacementSequence computeCoordinates(PlayerEntity player, BlockPos hit, Direction sideHit, ItemStack tool);
 
     /**
      * <p>Get the the block provider that can be accessed by using ItemStack capability system.</p>
@@ -36,7 +37,7 @@ public interface IBuildingMode {
     /**
      * @see Context#getPositionSequence()
      */
-    default Context createExecutionContext(ClientPlayerEntity player, BlockPos hit, Direction sideHit, ItemStack tool) {
+    default Context createExecutionContext(PlayerEntity player, BlockPos hit, Direction sideHit, ItemStack tool) {
         return new Context(computeCoordinates(player, hit, sideHit, tool), getBlockProvider(tool), this::createValidatorFor);
     }
 

@@ -324,8 +324,8 @@ public class GadgetUtils {
             if (lookingAt == null) {  //If we aren't looking at anything, exit
                 return false;
             }
-            BlockPos startBlock = new BlockPos(lookingAt.getHitVec().x,lookingAt.getHitVec().y,lookingAt.getHitVec().z);;
-            Direction sideHit = lookingAt.sideHit;
+            BlockPos startBlock = ((BlockRayTraceResult) lookingAt).getPos();
+            Direction sideHit = ((BlockRayTraceResult) lookingAt).getFace();
             if (startBlock == null || world.getBlockState(startBlock) == Blocks.AIR.getDefaultState()) { //If we are looking at air, exit
                 return false;
             }
