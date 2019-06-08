@@ -12,6 +12,8 @@ import com.direwolf20.buildinggadgets.common.util.lang.Styles;
 import com.direwolf20.buildinggadgets.common.util.lang.TooltipTranslation;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.Items;
 import net.minecraft.item.IItemPropertyGetter;
 import net.minecraft.item.Item;
@@ -29,6 +31,7 @@ import net.minecraftforge.energy.IEnergyStorage;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Random;
 
 import static com.direwolf20.buildinggadgets.common.util.GadgetUtils.withSuffix;
 
@@ -129,12 +132,12 @@ public abstract class GadgetGeneric extends Item {
         return tool.getDamage() < tool.getMaxDamage() || tool.getStack().isDamageable();
     }
 
-    public void applyDamage(ItemStack tool, ClientPlayerEntity player) {
+    public void applyDamage(ItemStack tool, ServerPlayerEntity player) {
         if (poweredByFE()) {
             IEnergyStorage energy = EnergyUtil.getCap(tool).orElseThrow(CapabilityNotPresentException::new);
             energy.extractEnergy(getEnergyCost(tool), false);
         } else
-            tool.damageItem(getDamageCost(tool), player);
+            tool.attemptDamageItem(getDamageCost(tool), new Random(), player);
     }
 
     protected void addEnergyInformation(List<ITextComponent> tooltip, ItemStack stack) {
