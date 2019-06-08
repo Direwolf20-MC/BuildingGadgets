@@ -5,13 +5,14 @@ import com.direwolf20.buildinggadgets.common.registry.objects.BGTileEntities;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.google.common.collect.ImmutableSet;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
@@ -20,7 +21,6 @@ import net.minecraftforge.items.ItemStackHandler;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-
 import java.util.Set;
 
 public class TemplateManagerTileEntity extends TileEntity {
@@ -80,10 +80,10 @@ public class TemplateManagerTileEntity extends TileEntity {
         return super.write(compound);
     }
 
-    public boolean canInteractWith(ClientPlayerEntity playerIn) {
+    public boolean canInteractWith(PlayerEntity playerIn) {
         // If we are too far away from this tile entity you cannot use it
-        BlockPos pos = this.pos.add(0.5D, 0.5D, 0.5D);
-        return !isRemoved() && playerIn.getDistanceSq(pos.getX(), pos.getY(), pos.getZ()) <= 64D;
+        ;
+        return ! isRemoved() && playerIn.getDistanceSq(new Vec3d(pos).add(0.5D, 0.5D, 0.5D)) <= 64D;
     }
 
     @Nonnull

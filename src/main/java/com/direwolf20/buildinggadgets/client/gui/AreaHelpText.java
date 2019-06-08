@@ -1,10 +1,11 @@
 package com.direwolf20.buildinggadgets.client.gui;
 
-import net.minecraft.client.gui.Gui;
-import net.minecraft.client.gui.GuiTextField;
+//import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.AbstractGui;
+import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.renderer.Rectangle2d;
 import net.minecraft.client.resources.I18n;
-import net.minecraft.inventory.Slot;
+import net.minecraft.inventory.container.Slot;
 
 public class AreaHelpText implements IHoverHelpText {
     private int minX, minY, maxX, maxY;
@@ -18,8 +19,8 @@ public class AreaHelpText implements IHoverHelpText {
         this(guiLeft + slot.xPos, guiTop + slot.yPos, 16, 16, helpTextKey);
     }
 
-    public AreaHelpText(GuiTextField field, String helpTextKey) {
-        this(field.x, field.y, field.width, field.height, helpTextKey);
+    public AreaHelpText(TextFieldWidget field, String helpTextKey) {
+        this(field.x, field.y, field.getWidth(), field.getHeight(), helpTextKey);
     }
 
     public AreaHelpText(int x, int y, int width, int height, String helpTextKey) {
@@ -41,7 +42,7 @@ public class AreaHelpText implements IHoverHelpText {
     }
 
     @Override
-    public void drawRect(Gui gui, int color) {
+    public void drawRect(AbstractGui gui, int color) {
         Gui.drawRect(minX, minY, maxX, maxY, color);
     }
 
