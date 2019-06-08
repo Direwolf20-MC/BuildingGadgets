@@ -9,8 +9,6 @@ import com.direwolf20.buildinggadgets.client.gui.AreaHelpText;
 import com.direwolf20.buildinggadgets.client.gui.GuiButtonHelp;
 import com.direwolf20.buildinggadgets.client.gui.GuiButtonHelpText;
 import com.direwolf20.buildinggadgets.client.gui.IHoverHelpText;
-import com.direwolf20.buildinggadgets.common.BuildingGadgets;
-import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketTemplateManagerLoad;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketTemplateManagerPaste;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketTemplateManagerSave;
@@ -21,22 +19,23 @@ import com.direwolf20.buildinggadgets.common.util.buffers.ToolBufferBuilder;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.gui.widget.button.Button;
-import net.minecraft.client.gui.screen.inventory.ContainerScreen;
-import net.minecraft.client.renderer.*;
-import net.minecraft.client.renderer.texture.AtlasTexture;
+import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.Matrix4f;
+import net.minecraft.client.renderer.Rectangle2d;
+import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.client.renderer.vertex.VertexFormatElement;
-import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.JsonToNBT;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TranslationTextComponent;
 import org.lwjgl.opengl.GL11;
 
 import javax.annotation.Nullable;
@@ -45,7 +44,7 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TemplateManagerGUI extends ContainerScreen {
+public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer> {
     public static final int HELP_TEXT_BACKGROUNG_COLOR = 1694460416;
 
     private boolean panelClicked;
