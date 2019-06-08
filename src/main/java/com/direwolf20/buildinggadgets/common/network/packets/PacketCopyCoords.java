@@ -2,7 +2,7 @@ package com.direwolf20.buildinggadgets.common.network.packets;
 
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.math.BlockPos;
@@ -40,7 +40,7 @@ public class PacketCopyCoords {
 //        }
 
         public static void handle(final PacketCopyCoords msg, Supplier<NetworkEvent.Context> ctx) {
-            EntityPlayerMP playerEntity = ctx.get().getSender();
+            ServerPlayerEntity playerEntity = ctx.get().getSender();
             if( playerEntity == null ) return;
 
             ctx.get().enqueueWork(() -> {
@@ -50,7 +50,7 @@ public class PacketCopyCoords {
                 BlockPos startPos = msg.start;
                 BlockPos endPos = msg.end;
                 GadgetCopyPaste tool = BGItems.gadgetCopyPaste;
-                if (startPos.equals(BlockPos.ORIGIN) && endPos.equals(BlockPos.ORIGIN)) {
+                if (startPos.equals(BlockPos.ZERO) && endPos.equals(BlockPos.ZERO)) {
                     tool.setStartPos(heldItem, null);
                     tool.setEndPos(heldItem, null);
                     playerEntity.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.areareset").getUnformattedComponentText()), true);

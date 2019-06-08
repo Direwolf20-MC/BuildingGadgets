@@ -2,7 +2,7 @@ package com.direwolf20.buildinggadgets.test.util;
 
 import com.direwolf20.buildinggadgets.api.building.Region;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 
 import java.util.Iterator;
@@ -15,8 +15,8 @@ import java.util.Set;
  */
 public class CasedBlockView extends RegionBlockView {
 
-    public static final IBlockState base = UniqueBlockState.createNew();
-    public static final IBlockState target = UniqueBlockState.createNew();
+    public static final BlockState base = UniqueBlockState.createNew();
+    public static final BlockState target = UniqueBlockState.createNew();
 
     private static final Random random = new Random();
 
@@ -32,10 +32,10 @@ public class CasedBlockView extends RegionBlockView {
         return world;
     }
 
-    private IBlockState otherState;
+    private BlockState otherState;
     private Set<BlockPos> otherPositions;
 
-    public CasedBlockView(Region region, IBlockState state, IBlockState otherState) {
+    public CasedBlockView(Region region, BlockState state, BlockState otherState) {
         super(region, state);
         this.otherState = otherState;
         this.otherPositions = new ObjectOpenHashSet<>();
@@ -47,7 +47,7 @@ public class CasedBlockView extends RegionBlockView {
     }
 
     @Override
-    public IBlockState getBlockState(BlockPos pos) {
+    public BlockState getBlockState(BlockPos pos) {
         if (otherPositions.contains(pos)) {
             return otherState;
         }

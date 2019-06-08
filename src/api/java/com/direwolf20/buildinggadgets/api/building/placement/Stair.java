@@ -4,7 +4,7 @@ import com.direwolf20.buildinggadgets.api.building.IPositionPlacementSequence;
 import com.direwolf20.buildinggadgets.api.building.Region;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.AbstractIterator;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
 
@@ -19,19 +19,19 @@ import java.util.Iterator;
  */
 public final class Stair implements IPositionPlacementSequence {
 
-    public static Stair create(BlockPos base, EnumFacing horizontalAdvance, EnumFacing verticalAdvance, int range) {
+    public static Stair create(BlockPos base, Direction horizontalAdvance, Direction verticalAdvance, int range) {
         return new Stair(base, horizontalAdvance, verticalAdvance, range);
     }
 
     private final BlockPos base;
     private final BlockPos target;
-    private final EnumFacing horizontalAdvance;
-    private final EnumFacing verticalAdvance;
+    private final Direction horizontalAdvance;
+    private final Direction verticalAdvance;
     private final Region region;
     private final int range;
 
     @VisibleForTesting
-    private Stair(BlockPos base, EnumFacing horizontalAdvance, EnumFacing verticalAdvance, int range) {
+    private Stair(BlockPos base, Direction horizontalAdvance, Direction verticalAdvance, int range) {
         this.base = base;
         this.target = base.offset(horizontalAdvance, range - 1).offset(verticalAdvance, range - 1);
         this.horizontalAdvance = horizontalAdvance;
@@ -44,7 +44,7 @@ public final class Stair implements IPositionPlacementSequence {
      * For {@link #copy()}
      */
     @VisibleForTesting
-    private Stair(BlockPos base, BlockPos target, EnumFacing horizontalAdvance, EnumFacing verticalAdvance, Region region, int range) {
+    private Stair(BlockPos base, BlockPos target, Direction horizontalAdvance, Direction verticalAdvance, Region region, int range) {
         this.base = base;
         this.target = target;
         this.horizontalAdvance = horizontalAdvance;

@@ -1,11 +1,11 @@
 package com.direwolf20.buildinggadgets.common.util.tools;
 
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 
 public final class UniqueItemStack {
     public final UniqueItem uniqueItem;
-    public final NBTTagCompound nbt;
+    public final CompoundNBT nbt;
 
     public UniqueItemStack(ItemStack stack) {
         uniqueItem = new UniqueItem(stack.getItem());

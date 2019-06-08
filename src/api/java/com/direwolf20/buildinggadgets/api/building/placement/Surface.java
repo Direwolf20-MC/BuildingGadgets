@@ -4,8 +4,8 @@ import com.direwolf20.buildinggadgets.api.building.IPositionPlacementSequence;
 import com.direwolf20.buildinggadgets.api.building.Region;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.AbstractIterator;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.block.BlockState;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockReader;
 
@@ -27,7 +27,7 @@ public final class Surface implements IPositionPlacementSequence {
      * @param searchingCenter Center of the searching region
      * @param side            Facing to offset from the {@code searchingCenter} to get to the reference region center
      */
-    public static Surface create(IBlockReader world, BlockPos searchingCenter, EnumFacing side, int range, boolean fuzzy) {
+    public static Surface create(IBlockReader world, BlockPos searchingCenter, Direction side, int range, boolean fuzzy) {
         Region searchingRegion = Wall.clickedSide(searchingCenter, side, range).getBoundingBox();
         return create(world, searchingCenter, searchingRegion, pos -> pos.offset(side), fuzzy);
     }
@@ -41,7 +41,7 @@ public final class Surface implements IPositionPlacementSequence {
     }
 
     private final IBlockReader world;
-    private final IBlockState selectedBase;
+    private final BlockState selectedBase;
     private final Function<BlockPos, BlockPos> searching2referenceMapper;
     private final Region searchingRegion;
     private final boolean fuzzy;
@@ -54,7 +54,7 @@ public final class Surface implements IPositionPlacementSequence {
     /**
      * For {@link #copy()}
      */
-    private Surface(IBlockReader world, IBlockState selectedBase, Function<BlockPos, BlockPos> searching2referenceMapper, Region searchingRegion, boolean fuzzy) {
+    private Surface(IBlockReader world, BlockState selectedBase, Function<BlockPos, BlockPos> searching2referenceMapper, Region searchingRegion, boolean fuzzy) {
         this.world = world;
         this.selectedBase = selectedBase;
         this.searching2referenceMapper = searching2referenceMapper;
@@ -92,7 +92,7 @@ public final class Surface implements IPositionPlacementSequence {
                 while (it.hasNext()) {
                     BlockPos pos = it.next();
                     BlockPos referencePos = searching2referenceMapper.apply(pos);
-                    IBlockState baseBlock = world.getBlockState(referencePos);
+                    BlockState baseBlock = world.getBlockState(referencePos);
                     if ((fuzzy || baseBlock == selectedBase) && !baseBlock.getBlock().isAir(baseBlock, world, referencePos))
                         return pos;
                 }

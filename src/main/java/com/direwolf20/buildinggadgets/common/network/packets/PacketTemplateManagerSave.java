@@ -3,7 +3,7 @@ package com.direwolf20.buildinggadgets.common.network.packets;
 import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManagerCommands;
 import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManagerContainer;
 import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManagerTileEntity;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
@@ -34,7 +34,7 @@ public class PacketTemplateManagerSave {
     public static class Handler {
         public static void handle(PacketTemplateManagerSave msg, Supplier<NetworkEvent.Context> ctx) {
             ctx.get().enqueueWork(() -> {
-                EntityPlayerMP player = ctx.get().getSender();
+                ServerPlayerEntity player = ctx.get().getSender();
                 if( player == null ) return;
 
                 World world = player.world;

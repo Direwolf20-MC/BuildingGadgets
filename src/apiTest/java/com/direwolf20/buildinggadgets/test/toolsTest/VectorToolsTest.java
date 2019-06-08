@@ -6,7 +6,7 @@ import org.junit.jupiter.api.RepeatedTest;
 
 import java.util.Random;
 
-import static net.minecraft.util.EnumFacing.Axis;
+import static net.minecraft.util.Direction.Axis;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class VectorToolsTest {
@@ -29,24 +29,24 @@ public class VectorToolsTest {
     void perpendicularSurfaceOffsetShouldChangeXAndZWithAxisY() {
         int i = random.nextInt();
         int j = random.nextInt();
-        BlockPos offset = VectorUtils.perpendicularSurfaceOffset(BlockPos.ORIGIN, Axis.Y, i, j);
-        assertEquals(BlockPos.ORIGIN.add(i, 0, j), offset);
+        BlockPos offset = VectorUtils.perpendicularSurfaceOffset(BlockPos.ZERO, Axis.Y, i, j);
+        assertEquals(BlockPos.ZERO.add(i, 0, j), offset);
     }
 
     @RepeatedTest(2)
     void perpendicularSurfaceOffsetShouldChangeYAndZWithAxisX() {
         int i = random.nextInt();
         int j = random.nextInt();
-        BlockPos offset = VectorUtils.perpendicularSurfaceOffset(BlockPos.ORIGIN, Axis.X, i, j);
-        assertEquals(BlockPos.ORIGIN.add(0, i, j), offset);
+        BlockPos offset = VectorUtils.perpendicularSurfaceOffset(BlockPos.ZERO, Axis.X, i, j);
+        assertEquals(BlockPos.ZERO.add(0, i, j), offset);
     }
 
     @RepeatedTest(2)
     void perpendicularSurfaceOffsetShouldChangeXAndYWithAxisZ() {
         int i = random.nextInt();
         int j = random.nextInt();
-        BlockPos offset = VectorUtils.perpendicularSurfaceOffset(BlockPos.ORIGIN, Axis.Z, i, j);
-        assertEquals(BlockPos.ORIGIN.add(i, j, 0), offset);
+        BlockPos offset = VectorUtils.perpendicularSurfaceOffset(BlockPos.ZERO, Axis.Z, i, j);
+        assertEquals(BlockPos.ZERO.add(i, j, 0), offset);
     }
 
 }

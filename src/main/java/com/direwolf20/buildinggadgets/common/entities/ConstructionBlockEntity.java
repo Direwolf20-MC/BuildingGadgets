@@ -8,8 +8,8 @@ import com.direwolf20.buildinggadgets.common.registry.objects.BGEntities;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.block.BlockState;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
@@ -39,7 +39,7 @@ public class ConstructionBlockEntity extends EntityBase {
 
     @Override
     protected void registerData() {
-        dataManager.register(FIXED, BlockPos.ORIGIN);
+        dataManager.register(FIXED, BlockPos.ZERO);
         dataManager.register(MAKING, false);
     }
 
@@ -61,13 +61,13 @@ public class ConstructionBlockEntity extends EntityBase {
             if (!getMakingPaste()) {
                 TileEntity te = world.getTileEntity(targetPos);
                 if (te instanceof ConstructionBlockTileEntity) {
-                    IBlockState tempState = te.getBlockState();
+                    BlockState tempState = te.getBlockState();
 
                     int opacity = tempState.getOpacity(world, targetPos);
                     boolean neighborBrightness = tempState.useNeighborBrightness(world, targetPos);
                     if (opacity > 0 || neighborBrightness) {
-                        IBlockState tempSetBlock = te.getBlockState();
-                        IBlockState tempActualSetBlock = ((ConstructionBlockTileEntity) te).getActualBlockState();
+                        BlockState tempSetBlock = te.getBlockState();
+                        BlockState tempActualSetBlock = ((ConstructionBlockTileEntity) te).getActualBlockState();
                         world.setBlockState(targetPos, BGBlocks.constructionBlock.getDefaultState()
                                 .with(ConstructionBlock.BRIGHT, opacity == 0)
                                 .with(ConstructionBlock.NEIGHBOR_BRIGHTNESS, neighborBrightness));
@@ -92,13 +92,13 @@ public class ConstructionBlockEntity extends EntityBase {
     }
 
     @Override
-    protected void readAdditional(NBTTagCompound compound) {
+    protected void readAdditional(CompoundNBT compound) {
         super.readAdditional(compound);
         setMakingPaste(compound.getBoolean(NBTKeys.ENTITY_CONSTRUCTION_MAKING_PASTE));
     }
 
     @Override
-    protected void writeAdditional(NBTTagCompound compound) {
+    protected void writeAdditional(CompoundNBT compound) {
         super.writeAdditional(compound);
         compound.setBoolean(NBTKeys.ENTITY_CONSTRUCTION_MAKING_PASTE, getMakingPaste());
     }

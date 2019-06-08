@@ -1,12 +1,12 @@
 package com.direwolf20.buildinggadgets.common.items.pastes;
 
 import com.direwolf20.buildinggadgets.common.util.helpers.InventoryHelper;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.Hand;
 import net.minecraft.world.World;
 
 public class ConstructionPaste extends Item {
@@ -15,7 +15,7 @@ public class ConstructionPaste extends Item {
     }
 
     @Override
-    public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
+    public ActionResult<ItemStack> onItemRightClick(World world, ClientPlayerEntity player, Hand hand) {
         ItemStack itemstack = player.getHeldItem(hand);
         itemstack = InventoryHelper.addPasteToContainer(player, itemstack);
         return new ActionResult<>(EnumActionResult.SUCCESS, itemstack);

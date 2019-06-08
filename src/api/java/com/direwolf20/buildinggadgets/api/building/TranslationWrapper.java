@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.api.building;
 
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.block.BlockState;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.math.BlockPos;
 
 /**
@@ -58,17 +58,17 @@ public final class TranslationWrapper implements IBlockProvider {
      * Redirects the call to the wrapped IBlockProvider.
      */
     @Override
-    public IBlockState at(BlockPos pos) {
+    public BlockState at(BlockPos pos) {
         return provider.at(pos.add(translation));
     }
 
     @Override
-    public void serialize(NBTTagCompound tag) {
+    public void serialize(CompoundNBT tag) {
         this.provider.serialize(tag);
     }
 
     @Override
-    public TranslationWrapper deserialize(NBTTagCompound tag) {
+    public TranslationWrapper deserialize(CompoundNBT tag) {
         this.provider.deserialize(tag);
         return this;
     }

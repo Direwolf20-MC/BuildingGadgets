@@ -1,12 +1,12 @@
 package com.direwolf20.buildinggadgets.api.util;
 
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 
 public final class VectorUtils {
     private VectorUtils() {}
 
-    public static int getAxisValue(BlockPos pos, EnumFacing.Axis axis) {
+    public static int getAxisValue(BlockPos pos, Direction.Axis axis) {
         switch (axis) {
             case X:
                 return pos.getX();
@@ -18,7 +18,7 @@ public final class VectorUtils {
         throw new IllegalArgumentException("Trying to find the value an imaginary axis of a BlockPos");
     }
 
-    public static int getAxisValue(int x, int y, int z, EnumFacing.Axis axis) {
+    public static int getAxisValue(int x, int y, int z, Direction.Axis axis) {
         switch (axis) {
             case X:
                 return x;
@@ -30,11 +30,11 @@ public final class VectorUtils {
         throw new IllegalArgumentException("Trying to find the value an imaginary axis of a set of 3 values");
     }
 
-    public static BlockPos perpendicularSurfaceOffset(BlockPos pos, EnumFacing intersector, int i, int j) {
+    public static BlockPos perpendicularSurfaceOffset(BlockPos pos, Direction intersector, int i, int j) {
         return perpendicularSurfaceOffset(pos, intersector.getAxis(), i, j);
     }
 
-    public static BlockPos perpendicularSurfaceOffset(BlockPos pos, EnumFacing.Axis intersector, int i, int j) {
+    public static BlockPos perpendicularSurfaceOffset(BlockPos pos, Direction.Axis intersector, int i, int j) {
         switch (intersector) {
             case X:
                 return pos.add(0, i, j);

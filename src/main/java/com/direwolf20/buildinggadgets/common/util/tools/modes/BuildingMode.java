@@ -8,11 +8,11 @@ import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.google.common.collect.ImmutableList;
 import it.unimi.dsi.fastutil.doubles.*;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.block.BlockState;
+import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -59,7 +59,7 @@ public enum BuildingMode {
         return VALUES[(this.ordinal() + 1) % VALUES.length];
     }
 
-    public static List<BlockPos> collectPlacementPos(World world, EntityPlayer player, BlockPos hit, EnumFacing sideHit, ItemStack tool, BlockPos initial) {
+    public static List<BlockPos> collectPlacementPos(World world, ClientPlayerEntity player, BlockPos hit, Direction sideHit, ItemStack tool, BlockPos initial) {
         IBuildingMode mode = byName(NBTHelper.getOrNewTag(tool).getString("mode")).getModeImplementation();
         return mode.createExecutionContext(player, hit, sideHit, tool)
                 .collectFilteredSequence(world, tool, player, initial);
@@ -80,10 +80,10 @@ public enum BuildingMode {
         return ICONS;
     }
 
-    public static BiPredicate<BlockPos, IBlockState> combineTester(World world, ItemStack tool, EntityPlayer player, BlockPos original) {
-        IBlockState target = GadgetUtils.getToolBlock(tool);
+    public static BiPredicate<BlockPos, BlockState> combineTester(World world, ItemStack tool, ClientPlayerEntity player, BlockPos original) {
+        BlockState target = GadgetUtils.getToolBlock(tool);
         return (pos, state) -> {
-            IBlockState current = world.getBlockState(pos);
+            BlockState current = world.getBlockState(pos);
             // Filter out situations where people try to create floating grass (etc.)
             if (!target.isValidPosition(world, pos))
                 return false;
@@ -95,15 +95,15 @@ public enum BuildingMode {
             // If we allow overrides, replaceable blocks (e.g. grass, water) will return true
             if (Config.GENERAL.allowOverwriteBlocks.get())
                 // Is the current block replaceable by the target block in the given context?
-                return current.isReplaceable(new BlockItemUseContext(world, player, new ItemStack(target.getBlock()), pos, EnumFacing.UP, 0.5F, 0.0F, 0.5F));
+                return current.isReplaceable(new BlockItemUseContext(world, player, new ItemStack(target.getBlock()), pos, Direction.UP, 0.5F, 0.0F, 0.5F));
             // If we don't allow overrides, replacement only happens when the current position is air
             return current.getBlock().isAir(current, world, pos);
         };
     }
 
-    public static List<BlockMap> sortMapByDistance(List<BlockMap> unSortedMap, EntityPlayer player) {//TODO unused
+    public static List<BlockMap> sortMapByDistance(List<BlockMap> unSortedMap, ClientPlayerEntity player) {//TODO unused
         List<BlockPos> unSortedList = new ArrayList<>();
-        Map<BlockPos, IBlockState> PosToStateMap = new HashMap<>();
+        Map<BlockPos, BlockState> PosToStateMap = new HashMap<>();
         Map<BlockPos, Integer> PosToX = new HashMap<>();
         Map<BlockPos, Integer> PosToY = new HashMap<>();
         Map<BlockPos, Integer> PosToZ = new HashMap<>();

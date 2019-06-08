@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.api.abstraction;
 
 import net.minecraft.item.Item;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ResourceLocation;
 
 import javax.annotation.Nullable;
@@ -10,10 +10,10 @@ import java.util.Objects;
 public final class UniqueItem {
     private final Item item;
     @Nullable
-    private final NBTTagCompound tagCompound;
+    private final CompoundNBT tagCompound;
     private final int hash;
 
-    public UniqueItem(Item item, @Nullable NBTTagCompound tagCompound) {
+    public UniqueItem(Item item, @Nullable CompoundNBT tagCompound) {
         this.item = Objects.requireNonNull(item);
         this.tagCompound = tagCompound;
         int hash = tagCompound != null ? tagCompound.hashCode() : 0;
@@ -31,7 +31,7 @@ public final class UniqueItem {
     }
 
     @Nullable
-    public NBTTagCompound getTag() {
+    public CompoundNBT getTag() {
         return tagCompound != null ? tagCompound.copy() : null;
     }
 

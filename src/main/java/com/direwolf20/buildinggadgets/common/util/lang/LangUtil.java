@@ -2,7 +2,7 @@ package com.direwolf20.buildinggadgets.common.util.lang;
 
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 
 public final class LangUtil {
     private LangUtil() {}
@@ -14,7 +14,7 @@ public final class LangUtil {
         return String.join(".", type, Reference.MODID, String.join(".", args));
     }
 
-    public static String getFormattedBlockName(IBlockState block) {
+    public static String getFormattedBlockName(BlockState block) {
         return getFormattedBlockName(block.getBlock());
     }
 

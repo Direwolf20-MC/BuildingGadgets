@@ -20,7 +20,7 @@ import javax.annotation.Nullable;
  * <li>Provide a possibility to serialize this ITemplate via an corresponding {@link ITemplateSerializer}.
  * </ul>
  * <p>
- * Here is a small example of how to iterate over all non-Air Blocks. Of course if a world is available the alternative {@link net.minecraft.block.state.IBlockState#isAir(IBlockReader, BlockPos)}
+ * Here is a small example of how to iterate over all non-Air Blocks. Of course if a world is available the alternative {@link net.minecraft.block.BlockState#isAir(IBlockReader, BlockPos)}
  * should be used in conjunction with passing it to the {@link com.direwolf20.buildinggadgets.api.template.building.SimpleBuildContext}.<br>
  * {@code
  * ITemplate template = ...;

@@ -2,7 +2,7 @@ package com.direwolf20.buildinggadgets.common.entities;
 
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockRendererDispatcher;
 import net.minecraft.client.renderer.BufferBuilder;
@@ -49,9 +49,9 @@ public class BlockBuildEntityRender extends Render<BlockBuildEntity> {
         GlStateManager.scalef(scale, scale, scale);
 
 
-        //IBlockState renderBlockState = blocks.COBBLESTONE.getDefaultState();
+        //BlockState renderBlockState = blocks.COBBLESTONE.getDefaultState();
 
-        IBlockState renderBlockState = entity.getSetBlock();
+        BlockState renderBlockState = entity.getSetBlock();
         if (entity.isUsingPaste() && toolMode == BlockBuildEntity.Mode.PLACE)
             renderBlockState = BGBlocks.constructionBlock.getDefaultState();
         if (renderBlockState == null) {

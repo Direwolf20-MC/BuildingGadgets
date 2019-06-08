@@ -9,7 +9,7 @@ import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.Multiset;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -73,7 +73,7 @@ public class RemoteInventoryCache implements IRemoteInventoryProvider {
 
     @Nullable
     private Pair<ResourceLocation, BlockPos> getInventoryLocation(ItemStack stack) {
-        NBTTagCompound nbt = stack.getTag();
+        CompoundNBT nbt = stack.getTag();
         if (nbt == null)
             return null;
 

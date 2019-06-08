@@ -1,12 +1,12 @@
 package com.direwolf20.buildinggadgets.test.util;
 
 import com.direwolf20.buildinggadgets.api.building.Region;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.fluid.IFluidState;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.world.EnumLightType;
@@ -28,15 +28,15 @@ import java.util.function.Predicate;
 public class RegionBlockView implements IWorldReaderBase {
 
     private Region region;
-    private IBlockState state;
+    private BlockState state;
 
-    public RegionBlockView(Region region, IBlockState state) {
+    public RegionBlockView(Region region, BlockState state) {
         this.region = region;
         this.state = state;
     }
 
     @Override
-    public IBlockState getBlockState(BlockPos pos) {
+    public BlockState getBlockState(BlockPos pos) {
         return region.contains(pos) ? state : UniqueBlockState.AIR;
     }
 
@@ -46,7 +46,7 @@ public class RegionBlockView implements IWorldReaderBase {
     }
 
     @Override
-    public int getStrongPower(BlockPos pos, EnumFacing facing) {
+    public int getStrongPower(BlockPos pos, Direction facing) {
         return getBlockState(pos).getStrongPower(this, pos, facing);
     }
 
@@ -77,7 +77,7 @@ public class RegionBlockView implements IWorldReaderBase {
 
     @Nullable
     @Override
-    public EntityPlayer getClosestPlayer(double x, double y, double z, double distance, Predicate<Entity> predicate) {
+    public ClientPlayerEntity getClosestPlayer(double x, double y, double z, double distance, Predicate<Entity> predicate) {
         return null;
     }
 

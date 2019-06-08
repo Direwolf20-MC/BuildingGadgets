@@ -11,9 +11,9 @@ import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.lang.ModeTranslation;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 
@@ -36,7 +36,7 @@ public class ExchangingSurfaceMode extends AbstractMode {
     }
 
     @Override
-    public IPositionPlacementSequence computeCoordinates(EntityPlayer player, BlockPos hit, EnumFacing sideHit, ItemStack tool) {
+    public IPositionPlacementSequence computeCoordinates(ClientPlayerEntity player, BlockPos hit, Direction sideHit, ItemStack tool) {
         int range = GadgetUtils.getToolRange(tool);
         boolean fuzzy = GadgetGeneric.getFuzzy(tool);
         Region region = Wall.clickedSide(hit, sideHit, range).getBoundingBox();

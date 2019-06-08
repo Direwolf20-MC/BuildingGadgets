@@ -66,7 +66,7 @@ public class CopyGUI extends GuiScreenTextFields {
         }));
         addButton(new GuiButtonAction(guiLeft + 145, guiTop + 60, 40, 20, "Cancel", () -> close()));
         addButton(new GuiButtonAction(guiLeft + 245, guiTop + 60, 40, 20, "Clear", () -> {
-            PacketHandler.sendToServer(new PacketCopyCoords(BlockPos.ORIGIN, BlockPos.ORIGIN));
+            PacketHandler.sendToServer(new PacketCopyCoords(BlockPos.ZERO, BlockPos.ZERO));
             close();
         }));
         addButton(new GuiButtonAction(guiLeft + 325, guiTop + 60, 80, 20, "CoordsMode", () -> {

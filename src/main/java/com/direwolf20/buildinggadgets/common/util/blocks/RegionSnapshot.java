@@ -11,8 +11,8 @@ import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.block.BlockState;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.tileentity.TileEntity;
@@ -38,20 +38,20 @@ public class RegionSnapshot {
     private static final String TILE_POS = "block_pos";
     private static final String TILE_NBT = "block_nbt";
 
-    private static NBTTagCompound serialize(NBTTagCompound tag, RegionSnapshot snapshot) {
+    private static CompoundNBT serialize(CompoundNBT tag, RegionSnapshot snapshot) {
         tag.setString(DIMENSION, snapshot.world.getDimension().getType().getRegistryName().toString());
         snapshot.region.serializeTo(tag);
 
         // Palette serialization begin
         // The serialized palettes only include actual block states, empty block state should be added, regardlessly, during deserialization
         NBTTagList palettes = new NBTTagList();
-        Object2IntMap<IBlockState> mapPalettes = new Object2IntOpenHashMap<>();
+        Object2IntMap<BlockState> mapPalettes = new Object2IntOpenHashMap<>();
         {
             // ID 0 is preoccupied for "nothing should be placed here", which is represented as Optional.empty()
             // This way whenever we access the size of this map, we always get the correct state ID to be used next
             mapPalettes.put(null, 0);
         }
-        Set<IBlockState> recordedPalettes = new HashSet<>();
+        Set<BlockState> recordedPalettes = new HashSet<>();
         // Palette serialization end
 
         // Streaking: a way to record a number of repeating block states, using only 1 integer
@@ -63,15 +63,15 @@ public class RegionSnapshot {
 
         // The repeating block state, if any
         // - similar logic as counter resetting for initializing as the first block state
-        Optional<IBlockState> lastStreak = snapshot.blockStates.get(0);
+        Optional<BlockState> lastStreak = snapshot.blockStates.get(0);
         // Number of repeating block states
         int streak = 0;
 
-        for (Optional<IBlockState> state : snapshot.blockStates) {
+        for (Optional<BlockState> state : snapshot.blockStates) {
             // Palette serialization begin
             if (state.isPresent()) {
                 // This statement should never throw an exception
-                IBlockState nonnullState = state.orElseThrow(RuntimeException::new);
+                BlockState nonnullState = state.orElseThrow(RuntimeException::new);
                 if (!recordedPalettes.contains(nonnullState)) {
                     recordedPalettes.add(nonnullState);
                     mapPalettes.put(nonnullState, mapPalettes.size());
@@ -108,8 +108,8 @@ public class RegionSnapshot {
         tag.setTag(BLOCK_PALETTES, palettes);
 
         NBTTagList tileData = new NBTTagList();
-        for (Pair<BlockPos, NBTTagCompound> data : snapshot.tileData) {
-            NBTTagCompound serializedData = new NBTTagCompound();
+        for (Pair<BlockPos, CompoundNBT> data : snapshot.tileData) {
+            CompoundNBT serializedData = new CompoundNBT();
             serializedData.setTag(TILE_POS, NBTUtil.writeBlockPos(data.getLeft()));
             serializedData.setTag(TILE_NBT, data.getRight());
             tileData.add(serializedData);
@@ -119,13 +119,13 @@ public class RegionSnapshot {
         return tag;
     }
 
-    private static RegionSnapshot deserialize(NBTTagCompound tag) {
+    private static RegionSnapshot deserialize(CompoundNBT tag) {
         ResourceLocation dimension = new ResourceLocation(tag.getString(DIMENSION));
         World world = ServerLifecycleHooks.getCurrentServer().getWorld(Objects.requireNonNull(DimensionType.byName(dimension)));
 
         Region region = Region.deserializeFrom(tag);
 
-        List<Optional<IBlockState>> palettes = new ArrayList<>();
+        List<Optional<BlockState>> palettes = new ArrayList<>();
         {
             // Empty block state, indicating "do not replace here"
             palettes.add(Optional.empty());
@@ -137,7 +137,7 @@ public class RegionSnapshot {
         assert palettes.size() == palettesNBT.size() + 1;
 
         // See the serialization algorithm for vocabulary definitions, including "frame", "streak", etc.
-        ImmutableList.Builder<Optional<IBlockState>> blockStates = ImmutableList.builder();
+        ImmutableList.Builder<Optional<BlockState>> blockStates = ImmutableList.builder();
         int[] frames = tag.getIntArray(BLOCK_FRAMES);
         for (int frame : frames) {
             int stateID = frame & 0xffffff;
@@ -145,7 +145,7 @@ public class RegionSnapshot {
             // - see the serialization for +1
             int streaks = (frame >> 24) + 1;
 
-            Optional<IBlockState> state = palettes.get(stateID);
+            Optional<BlockState> state = palettes.get(stateID);
             // Add `streaks` amount of the same block state
             for (int j = 0; j < streaks; j++) {
                 blockStates.add(state);
@@ -153,9 +153,9 @@ public class RegionSnapshot {
         }
 
         NBTTagList tileDataNBT = tag.getList(TILE_DATA, Constants.NBT.TAG_COMPOUND);
-        ImmutableList.Builder<Pair<BlockPos, NBTTagCompound>> tileData = ImmutableList.builder();
+        ImmutableList.Builder<Pair<BlockPos, CompoundNBT>> tileData = ImmutableList.builder();
         for (int i = 0; i < tileDataNBT.size(); i++) {
-            NBTTagCompound serializedData = tileDataNBT.getCompound(i);
+            CompoundNBT serializedData = tileDataNBT.getCompound(i);
             tileData.add(Pair.of(
                     NBTUtil.readBlockPos(serializedData.getCompound(TILE_POS)),
                     serializedData.getCompound(TILE_NBT)));
@@ -186,15 +186,15 @@ public class RegionSnapshot {
     private World world;
     private Region region;
 
-    private ImmutableList<Optional<IBlockState>> blockStates;
-    private ImmutableList<Pair<BlockPos, NBTTagCompound>> tileData;
+    private ImmutableList<Optional<BlockState>> blockStates;
+    private ImmutableList<Pair<BlockPos, CompoundNBT>> tileData;
 
     /**
      * Cached serialized form. This is reliable because {@link RegionSnapshot} is <i>immutable</i>.
      */
-    private NBTTagCompound serializedForm;
+    private CompoundNBT serializedForm;
 
-    private RegionSnapshot(World world, Region region, ImmutableList<Optional<IBlockState>> blockStates, ImmutableList<Pair<BlockPos, NBTTagCompound>> tileData) {
+    private RegionSnapshot(World world, Region region, ImmutableList<Optional<BlockState>> blockStates, ImmutableList<Pair<BlockPos, CompoundNBT>> tileData) {
         this.world = world;
         this.region = region;
         this.blockStates = blockStates;
@@ -208,7 +208,7 @@ public class RegionSnapshot {
             index++;
         }
 
-        for (Pair<BlockPos, NBTTagCompound> data : tileData) {
+        for (Pair<BlockPos, CompoundNBT> data : tileData) {
             // Assume the blocks are replaced already, which should be the case
             TileEntity tile = world.getTileEntity(data.getLeft());
             if (tile != null) {
@@ -229,7 +229,7 @@ public class RegionSnapshot {
      * that position should not be replaced regularly: it might be replaced with a {@link BlockSnapshot}, or it should
      * be left untouched.
      */
-    public ImmutableList<Optional<IBlockState>> getBlockStates() {
+    public ImmutableList<Optional<BlockState>> getBlockStates() {
         return blockStates;
     }
 
@@ -237,15 +237,15 @@ public class RegionSnapshot {
      * The indices of the entries of this list is unrelated to any positions, instead, the entry stores the affected
      * coordinate.
      */
-    public ImmutableList<Pair<BlockPos, NBTTagCompound>> getTileData() {
+    public ImmutableList<Pair<BlockPos, CompoundNBT>> getTileData() {
         return tileData;
     }
 
-    public NBTTagCompound serialize() {
-        return serializeTo(new NBTTagCompound());
+    public CompoundNBT serialize() {
+        return serializeTo(new CompoundNBT());
     }
 
-    public NBTTagCompound serializeTo(NBTTagCompound tag) {
+    public CompoundNBT serializeTo(CompoundNBT tag) {
         if (serializedForm == null)
             serializedForm = serialize(tag, this);
         return serializedForm;
@@ -255,8 +255,8 @@ public class RegionSnapshot {
 
         private World world;
         private Region region;
-        private BiPredicate<BlockPos, IBlockState> normalValidator;
-        private TriPredicate<BlockPos, IBlockState, TileEntity> tileValidator;
+        private BiPredicate<BlockPos, BlockState> normalValidator;
+        private TriPredicate<BlockPos, BlockState, TileEntity> tileValidator;
 
         private boolean built = false;
 
@@ -271,7 +271,7 @@ public class RegionSnapshot {
          * @return this
          * @throws IllegalStateException When trying to invoke this method when this builder has build someone already.
          */
-        public Builder checkBlocks(BiPredicate<BlockPos, IBlockState> normalValidator) {
+        public Builder checkBlocks(BiPredicate<BlockPos, BlockState> normalValidator) {
             Preconditions.checkState(!built);
             this.normalValidator = LambdaHelper.and(this.normalValidator, normalValidator);
             return this;
@@ -280,8 +280,8 @@ public class RegionSnapshot {
         /**
          * @throws IllegalStateException When trying to invoke this method when this builder has build someone already.
          */
-        public Builder exclude(IBlockState... statesToExclude) {
-            ImmutableSet<IBlockState> statesSet = ImmutableSet.copyOf(statesToExclude);
+        public Builder exclude(BlockState... statesToExclude) {
+            ImmutableSet<BlockState> statesSet = ImmutableSet.copyOf(statesToExclude);
             return checkBlocks((pos, state) -> !statesSet.contains(state));
         }
 
@@ -298,7 +298,7 @@ public class RegionSnapshot {
          * @return this
          * @throws IllegalStateException When trying to invoke this method when this builder has build someone already.
          */
-        public Builder checkTiles(TriPredicate<BlockPos, IBlockState, TileEntity> tileValidator) {
+        public Builder checkTiles(TriPredicate<BlockPos, BlockState, TileEntity> tileValidator) {
             Preconditions.checkState(!built);
             this.tileValidator = LambdaHelper.and(this.tileValidator, tileValidator);
             return this;
@@ -326,11 +326,11 @@ public class RegionSnapshot {
         public RegionSnapshot build() throws IllegalStateException, PaletteOverflowException {
             Preconditions.checkState(!built);
 
-            ImmutableList.Builder<Optional<IBlockState>> blockStatesBuilder = ImmutableList.builder();
-            ImmutableList.Builder<Pair<BlockPos, NBTTagCompound>> tileDataBuilder = ImmutableList.builder();
+            ImmutableList.Builder<Optional<BlockState>> blockStatesBuilder = ImmutableList.builder();
+            ImmutableList.Builder<Pair<BlockPos, CompoundNBT>> tileDataBuilder = ImmutableList.builder();
             for (BlockPos pos : region) {
                 TileEntity tile = world.getTileEntity(pos);
-                IBlockState state = world.getBlockState(pos);
+                BlockState state = world.getBlockState(pos);
                 if (tile != null && tileValidator.test(pos, state, tile)) {
                     tileDataBuilder.add(Pair.of(pos, tile.serializeNBT()));
                     blockStatesBuilder.add(Optional.of(state));
@@ -340,9 +340,9 @@ public class RegionSnapshot {
                     blockStatesBuilder.add(Optional.empty());
             }
 
-            ImmutableList<Optional<IBlockState>> blockStates = blockStatesBuilder.build();
+            ImmutableList<Optional<BlockState>> blockStates = blockStatesBuilder.build();
 
-            ImmutableSet<Optional<IBlockState>> uniqueBlocksStates = ImmutableSet.copyOf(blockStates);
+            ImmutableSet<Optional<BlockState>> uniqueBlocksStates = ImmutableSet.copyOf(blockStates);
             // 16777216 == 2^24
             if (uniqueBlocksStates.size() >= 16777216)
                 throw new PaletteOverflowException(region, uniqueBlocksStates.size());

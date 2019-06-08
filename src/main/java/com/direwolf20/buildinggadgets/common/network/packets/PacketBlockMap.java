@@ -3,7 +3,7 @@ package com.direwolf20.buildinggadgets.common.network.packets;
 import com.direwolf20.buildinggadgets.common.util.buffers.PasteToolBufferBuilder;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;
 
@@ -11,9 +11,9 @@ import java.util.function.Supplier;
 
 public class PacketBlockMap {
 
-    private final NBTTagCompound compound;
+    private final CompoundNBT compound;
 
-    public PacketBlockMap(NBTTagCompound compound) {
+    public PacketBlockMap(CompoundNBT compound) {
         this.compound = compound;
     }
 
@@ -28,7 +28,7 @@ public class PacketBlockMap {
     public static class Handler {
         public static void handle(final PacketBlockMap msg, Supplier<NetworkEvent.Context> ctx) {
             ctx.get().enqueueWork(() -> {
-                if (msg.compound.equals(new NBTTagCompound())) {
+                if (msg.compound.equals(new CompoundNBT())) {
                     PasteToolBufferBuilder.clearMaps();
                 }
 

@@ -13,15 +13,15 @@ import com.direwolf20.buildinggadgets.common.util.lang.TooltipTranslation;
 import com.direwolf20.buildinggadgets.common.util.tools.ToolRenders;
 import com.direwolf20.buildinggadgets.common.util.tools.modes.ExchangingMode;
 import com.direwolf20.buildinggadgets.common.world.FakeBuilderWorld;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Enchantments;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
@@ -101,12 +101,12 @@ public class GadgetExchanger extends GadgetSwapping {
 
     private static void setToolMode(ItemStack tool, ExchangingMode mode) {
         //Store the tool's mode in NBT as a string
-        NBTTagCompound tagCompound = NBTHelper.getOrNewTag(tool);
+        CompoundNBT tagCompound = NBTHelper.getOrNewTag(tool);
         tagCompound.setString("mode", mode.getRegistryName());
     }
 
     public static ExchangingMode getToolMode(ItemStack tool) {
-        NBTTagCompound tagCompound = NBTHelper.getOrNewTag(tool);
+        CompoundNBT tagCompound = NBTHelper.getOrNewTag(tool);
         return ExchangingMode.byName(tagCompound.getString("mode"));
     }
 
@@ -132,7 +132,7 @@ public class GadgetExchanger extends GadgetSwapping {
     }
 
     @Override
-    public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
+    public ActionResult<ItemStack> onItemRightClick(World world, ClientPlayerEntity player, Hand hand) {
         ItemStack itemstack = player.getHeldItem(hand);
         player.setActiveHand(hand);
         if (!world.isRemote) {
@@ -149,18 +149,18 @@ public class GadgetExchanger extends GadgetSwapping {
         return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, itemstack);
     }
 
-    public void toggleMode(EntityPlayer player, ItemStack heldItem) {//TODO unused
+    public void toggleMode(ClientPlayerEntity player, ItemStack heldItem) {//TODO unused
         setToolMode(heldItem, getToolMode(heldItem).next());
     }
 
-    public void setMode(EntityPlayer player, ItemStack heldItem, int modeInt) {
+    public void setMode(ClientPlayerEntity player, ItemStack heldItem, int modeInt) {
         //Called when we specify a mode with the radial menu
         ExchangingMode mode = ExchangingMode.values()[modeInt];
         setToolMode(heldItem, mode);
         player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.toolmode").getUnformattedComponentText() + ": " + mode), true);
     }
 
-    public static void rangeChange(EntityPlayer player, ItemStack heldItem) {
+    public static void rangeChange(ClientPlayerEntity player, ItemStack heldItem) {
         int range = getToolRange(heldItem);
         int changeAmount = (getToolMode(heldItem) == ExchangingMode.GRID || (range % 2 == 0)) ? 1 : 2;
         if (player.isSneaking()) {
@@ -172,7 +172,7 @@ public class GadgetExchanger extends GadgetSwapping {
         player.sendStatusMessage(new TextComponentString(TextFormatting.DARK_AQUA + new TextComponentTranslation("message.gadget.toolrange").getUnformattedComponentText() + ": " + range), true);
     }
 
-    private boolean exchange(EntityPlayer player, ItemStack stack) {
+    private boolean exchange(ClientPlayerEntity player, ItemStack stack) {
         World world = player.world;
         List<BlockPos> coords = getAnchor(stack);
 
@@ -182,8 +182,8 @@ public class GadgetExchanger extends GadgetSwapping {
                 return false;
             }
             BlockPos startBlock = lookingAt.getBlockPos();
-            EnumFacing sideHit = lookingAt.sideHit;
-//            IBlockState setBlock = getToolBlock(stack);
+            Direction sideHit = lookingAt.sideHit;
+//            BlockState setBlock = getToolBlock(stack);
             coords = ExchangingMode.collectPlacementPos(world, player, startBlock, sideHit, stack, startBlock);
         } else { //If we do have an anchor, erase it (Even if the build fails)
             setAnchor(stack, new ArrayList<BlockPos>());
@@ -194,10 +194,10 @@ public class GadgetExchanger extends GadgetSwapping {
         if (heldItem.isEmpty())
             return false;
 
-        IBlockState blockState = getToolBlock(heldItem);
+        BlockState blockState = getToolBlock(heldItem);
 
         if (blockState != Blocks.AIR.getDefaultState()) {  //Don't attempt a build if a block is not chosen -- Typically only happens on a new tool.
-            IBlockState state = Blocks.AIR.getDefaultState(); //Initialize a new State Variable for use in the fake world
+            BlockState state = Blocks.AIR.getDefaultState(); //Initialize a new State Variable for use in the fake world
             fakeWorld.setWorldAndState(player.world, blockState, coordinates); // Initialize the fake world's blocks
             for (BlockPos coordinate : coords) {
                 if (fakeWorld.getWorldType() != WorldType.DEBUG_ALL_BLOCK_STATES) {
@@ -215,8 +215,8 @@ public class GadgetExchanger extends GadgetSwapping {
         return true;
     }
 
-    private boolean exchangeBlock(World world, EntityPlayer player, BlockPos pos, IBlockState setBlock) {
-        IBlockState currentBlock = world.getBlockState(pos);
+    private boolean exchangeBlock(World world, ClientPlayerEntity player, BlockPos pos, BlockState setBlock) {
+        BlockState currentBlock = world.getBlockState(pos);
         ItemStack itemStack;
         boolean useConstructionPaste = false;
         //ItemStack itemStack = setBlock.getBlock().getPickBlock(setBlock, null, world, pos, player);
@@ -259,7 +259,7 @@ public class GadgetExchanger extends GadgetSwapping {
             return false;
         }
         BlockSnapshot blockSnapshot = BlockSnapshot.getBlockSnapshot(world, pos);
-        if (ForgeEventFactory.onBlockPlace(player, blockSnapshot, EnumFacing.UP)) {
+        if (ForgeEventFactory.onBlockPlace(player, blockSnapshot, Direction.UP)) {
             return false;
         }
         BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(world, pos, currentBlock, player);
@@ -286,7 +286,7 @@ public class GadgetExchanger extends GadgetSwapping {
         return false;
     }
 
-    public static ItemStack getGadget(EntityPlayer player) {
+    public static ItemStack getGadget(ClientPlayerEntity player) {
         ItemStack stack = GadgetGeneric.getGadget(player);
         if (!(stack.getItem() instanceof GadgetExchanger))
             return ItemStack.EMPTY;

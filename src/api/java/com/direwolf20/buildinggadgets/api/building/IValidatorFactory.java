@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.api.building;
 
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.block.BlockState;
+import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -23,6 +23,6 @@ public interface IValidatorFactory {
      * @return BiPredicate where the first parameter is the attempt position, second parameter is the block that will be
      * placed there.
      */
-    BiPredicate<BlockPos, IBlockState> createValidatorFor(World world, ItemStack tool, EntityPlayer player, BlockPos initial);
+    BiPredicate<BlockPos, BlockState> createValidatorFor(World world, ItemStack tool, ClientPlayerEntity player, BlockPos initial);
 
 }

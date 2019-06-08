@@ -5,19 +5,19 @@ import com.direwolf20.buildinggadgets.common.items.ITemplate;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketBlockMap;
 import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.block.BlockState;
+import net.minecraft.client.entity.player.ClientPlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.state.DirectionProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.Direction;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
@@ -30,34 +30,34 @@ public class TemplateManager extends Block {
 
     public TemplateManager(Properties builder) {
         super(builder);
-        setDefaultState(getStateContainer().getBaseState().with(FACING, EnumFacing.NORTH));
+        setDefaultState(getStateContainer().getBaseState().with(FACING, Direction.NORTH));
     }
 
     @Override
-    protected void fillStateContainer(StateContainer.Builder<Block, IBlockState> builder) {
+    protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
         super.fillStateContainer(builder);
         builder.add(FACING);
     }
 
     @Nullable
     @Override
-    public IBlockState getStateForPlacement(BlockItemUseContext context) {
+    public BlockState getStateForPlacement(BlockItemUseContext context) {
         return getDefaultState().with(FACING, context.getPlacementHorizontalFacing().getOpposite());
     }
 
     @Override
-    public boolean hasTileEntity(IBlockState state) {
+    public boolean hasTileEntity(BlockState state) {
         return true;
     }
 
     @Nullable
     @Override
-    public TileEntity createTileEntity(IBlockState state, IBlockReader world) {
+    public TileEntity createTileEntity(BlockState state, IBlockReader world) {
         return new TemplateManagerTileEntity();
     }
 
     @Override
-    public boolean onBlockActivated(IBlockState state, World worldIn, BlockPos pos, EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
+    public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, ClientPlayerEntity player, Hand hand, Direction side, float hitX, float hitY, float hitZ) {
         // Only execute on the server
         if (worldIn.isRemote) {
             return true;
@@ -75,9 +75,9 @@ public class TemplateManager extends Block {
             String UUID = template.getUUID(itemStack);
             if (UUID == null) continue;
 
-            NBTTagCompound tagCompound = template.getWorldSave(worldIn).getCompoundFromUUID(UUID);
+            CompoundNBT tagCompound = template.getWorldSave(worldIn).getCompoundFromUUID(UUID);
             if (tagCompound != null) {
-                PacketHandler.sendTo(new PacketBlockMap(tagCompound), (EntityPlayerMP) player);
+                PacketHandler.sendTo(new PacketBlockMap(tagCompound), (ServerPlayerEntity) player);
             }
         }
         GuiMod.TEMPLATE_MANAGER.openContainer(player, worldIn, pos);
@@ -85,7 +85,7 @@ public class TemplateManager extends Block {
     }
 
     @Override
-    public void onReplaced(IBlockState state, World world, BlockPos pos, IBlockState newState, boolean isMoving) {
+    public void onReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean isMoving) {
         if (state.getBlock() != newState.getBlock()) {
             TileEntity tileEntity = world.getTileEntity(pos);
             if (tileEntity instanceof TemplateManagerTileEntity) {

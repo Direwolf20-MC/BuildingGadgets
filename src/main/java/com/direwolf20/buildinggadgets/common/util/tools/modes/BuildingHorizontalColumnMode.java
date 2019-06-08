@@ -7,9 +7,9 @@ import com.direwolf20.buildinggadgets.api.building.placement.Column;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.lang.ModeTranslation;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 
@@ -32,7 +32,7 @@ public class BuildingHorizontalColumnMode extends AtopSupportedMode {
     }
 
     @Override
-    public IPositionPlacementSequence computeWithTransformed(EntityPlayer player, BlockPos transformed, BlockPos original, EnumFacing sideHit, ItemStack tool) {
+    public IPositionPlacementSequence computeWithTransformed(ClientPlayerEntity player, BlockPos transformed, BlockPos original, Direction sideHit, ItemStack tool) {
         int range = GadgetUtils.getToolRange(tool);
         if (sideHit.getAxis().isVertical())
             return Column.extendFrom(transformed, player.getHorizontalFacing(), range);
@@ -40,7 +40,7 @@ public class BuildingHorizontalColumnMode extends AtopSupportedMode {
     }
 
     @Override
-    public BlockPos transformAtop(EntityPlayer player, BlockPos hit, EnumFacing sideHit, ItemStack tool) {
+    public BlockPos transformAtop(ClientPlayerEntity player, BlockPos hit, Direction sideHit, ItemStack tool) {
         return sideHit.getAxis().isVertical() ? hit.offset(player.getHorizontalFacing()) : hit.offset(sideHit.getOpposite());
     }
 

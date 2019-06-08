@@ -96,7 +96,7 @@ public class NBTHelper {
         short[] res = new short[shorts.size()];
         IntList failed = new IntArrayList();
         for (int i = 0; i < shorts.size(); i++) {
-            INBTBase nbt = shorts.get(i);
+            INBT nbt = shorts.get(i);
             if (nbt instanceof NBTTagShort) {
                 res[i] = ((NBTTagShort) nbt).getShort();
             } else {
@@ -123,7 +123,7 @@ public class NBTHelper {
         Short[] res = new Short[shorts.size()];
         IntList failed = new IntArrayList();
         for (int i = 0; i < shorts.size(); i++) {
-            INBTBase nbt = shorts.get(i);
+            INBT nbt = shorts.get(i);
             if (nbt instanceof NBTTagShort) {
                 res[i] = ((NBTTagShort) nbt).getShort();
             } else {
@@ -159,7 +159,7 @@ public class NBTHelper {
         float[] res = new float[floats.size()];
         IntList failed = new IntArrayList();
         for (int i = 0; i < floats.size(); i++) {
-            INBTBase nbt = floats.get(i);
+            INBT nbt = floats.get(i);
             if (nbt instanceof NBTTagFloat) {
                 res[i] = ((NBTTagFloat) nbt).getFloat();
             } else {
@@ -186,7 +186,7 @@ public class NBTHelper {
         Float[] res = new Float[floats.size()];
         IntList failed = new IntArrayList();
         for (int i = 0; i < floats.size(); i++) {
-            INBTBase nbt = floats.get(i);
+            INBT nbt = floats.get(i);
             if (nbt instanceof NBTTagFloat) {
                 res[i] = ((NBTTagFloat) nbt).getFloat();
             } else {
@@ -213,7 +213,7 @@ public class NBTHelper {
         double[] res = new double[doubles.size()];
         IntList failed = new IntArrayList();
         for (int i = 0; i < doubles.size(); i++) {
-            INBTBase nbt = doubles.get(i);
+            INBT nbt = doubles.get(i);
             if (nbt instanceof NBTTagDouble) {
                 res[i] = ((NBTTagDouble) nbt).getDouble();
             } else {
@@ -240,7 +240,7 @@ public class NBTHelper {
         Double[] res = new Double[doubles.size()];
         IntList failed = new IntArrayList();
         for (int i = 0; i < doubles.size(); i++) {
-            INBTBase nbt = doubles.get(i);
+            INBT nbt = doubles.get(i);
             if (nbt instanceof NBTTagDouble) {
                 res[i] = ((NBTTagDouble) nbt).getDouble();
             } else {
@@ -267,7 +267,7 @@ public class NBTHelper {
         String[] res = new String[strings.size()];
         IntList failed = new IntArrayList();
         for (int i = 0; i < strings.size(); i++) {
-            INBTBase nbt = strings.get(i);
+            INBT nbt = strings.get(i);
             if (nbt instanceof NBTTagString) {
                 res[i] = nbt.getString();
             } else {
@@ -307,11 +307,11 @@ public class NBTHelper {
         return res;
     }
 
-    public static <T> NBTTagList writeIterable(Iterable<T> iterable, Function<? super T, ? extends INBTBase> serializer) {
+    public static <T> NBTTagList writeIterable(Iterable<T> iterable, Function<? super T, ? extends INBT> serializer) {
         return StreamSupport.stream(iterable.spliterator(), false).map(serializer).collect(toNBTTagList());
     }
 
-    public static <T> NBTTagList writeIterable(Iterable<T> iterable, BiFunction<? super T, Integer, ? extends INBTBase> serializer) {
+    public static <T> NBTTagList writeIterable(Iterable<T> iterable, BiFunction<? super T, Integer, ? extends INBT> serializer) {
         int index = 0;
         NBTTagList res = new NBTTagList();
         for (T element : iterable) {
@@ -321,11 +321,11 @@ public class NBTHelper {
         return res;
     }
 
-    public static <V, T extends INBTBase> List<V> readList(NBTTagCollection<T> list, Function<? super T, ? extends V> deserializer) {
+    public static <V, T extends INBT> List<V> readList(NBTTagCollection<T> list, Function<? super T, ? extends V> deserializer) {
         return list.stream().map(deserializer).collect(Collectors.toList());
     }
 
-    public static <V, T extends INBTBase> List<V> readList(NBTTagCollection<T> list, BiFunction<? super T, Integer, ? extends V> deserializer) {
+    public static <V, T extends INBT> List<V> readList(NBTTagCollection<T> list, BiFunction<? super T, Integer, ? extends V> deserializer) {
         List<V> res = new ArrayList<>(list.size());
         int index = 0;
         for (T element : list) {
@@ -335,10 +335,10 @@ public class NBTHelper {
         return res;
     }
 
-    public static <K, V> NBTTagList serializeMap(Map<K, V> map, Function<? super K, ? extends INBTBase> keySerializer, Function<? super V, ? extends INBTBase> valueSerializer) {
+    public static <K, V> NBTTagList serializeMap(Map<K, V> map, Function<? super K, ? extends INBT> keySerializer, Function<? super V, ? extends INBT> valueSerializer) {
         NBTTagList list = new NBTTagList();
         for (Map.Entry<K, V> entry : map.entrySet()) {
-            NBTTagCompound compound = new NBTTagCompound();
+            CompoundNBT compound = new CompoundNBT();
             compound.setTag(NBTKeys.MAP_SERIALIZE_KEY, keySerializer.apply(entry.getKey()));
             compound.setTag(NBTKeys.MAP_SERIALIZE_VALUE, valueSerializer.apply(entry.getValue()));
             list.add(compound);
@@ -346,10 +346,10 @@ public class NBTHelper {
         return list;
     }
 
-    public static <K, V> Map<K, V> deserializeMap(NBTTagList list, Map<K, V> toAppendTo, Function<INBTBase, ? extends K> keyDeserializer, Function<INBTBase, ? extends V> valueDeserializer) {
-        for (INBTBase nbt : list) {
-            if (nbt instanceof NBTTagCompound) {
-                NBTTagCompound compound = (NBTTagCompound) nbt;
+    public static <K, V> Map<K, V> deserializeMap(NBTTagList list, Map<K, V> toAppendTo, Function<INBT, ? extends K> keyDeserializer, Function<INBT, ? extends V> valueDeserializer) {
+        for (INBT nbt : list) {
+            if (nbt instanceof CompoundNBT) {
+                CompoundNBT compound = (CompoundNBT) nbt;
                 toAppendTo.put(
                         keyDeserializer.apply(compound.getTag(NBTKeys.MAP_SERIALIZE_KEY)),
                         valueDeserializer.apply(compound.getTag(NBTKeys.MAP_SERIALIZE_VALUE))
@@ -379,16 +379,16 @@ public class NBTHelper {
      * If the given stack has a tag, returns it. If the given stack does not have a tag, it will set a reference and
      * return the new tag compound.
      */
-    public static NBTTagCompound getOrNewTag(ItemStack stack) {
+    public static CompoundNBT getOrNewTag(ItemStack stack) {
         if (stack.hasTag()) {
             return stack.getTag();
         }
-        NBTTagCompound tag = new NBTTagCompound();
+        CompoundNBT tag = new CompoundNBT();
         stack.setTag(tag);
         return tag;
     }
 
-    public static <T extends INBTBase> Collector<T, NBTTagList, NBTTagList> toNBTTagList() {
+    public static <T extends INBT> Collector<T, NBTTagList, NBTTagList> toNBTTagList() {
         return new Collector<T, NBTTagList, NBTTagList>() {
             @Override
             public Supplier<NBTTagList> supplier() {

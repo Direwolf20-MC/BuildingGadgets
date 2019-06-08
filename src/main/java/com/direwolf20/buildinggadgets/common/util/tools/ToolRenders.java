@@ -22,7 +22,7 @@ import com.direwolf20.buildinggadgets.common.util.tools.modes.BuildingMode;
 import com.direwolf20.buildinggadgets.common.util.tools.modes.ExchangingMode;
 import com.direwolf20.buildinggadgets.common.world.FakeBuilderWorld;
 
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GLAllocation;
@@ -30,13 +30,13 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumBlockRenderType;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
@@ -92,7 +92,7 @@ public class ToolRenders {
         cacheInventory.forceUpdate();
     }
 
-    public static void renderBuilderOverlay(RenderWorldLastEvent evt, EntityPlayer player, ItemStack stack) {
+    public static void renderBuilderOverlay(RenderWorldLastEvent evt, ClientPlayerEntity player, ItemStack stack) {
         ItemStack heldItem = GadgetBuilding.getGadget(player);
         if (heldItem.isEmpty()) return;
 
@@ -109,17 +109,17 @@ public class ToolRenders {
         renderLinkedInventoryOutline(stack, player, doubleX, doubleY, doubleZ);
 
         RayTraceResult lookingAt = VectorHelper.getLookingAt(player, heldItem);
-        IBlockState state = Blocks.AIR.getDefaultState();
+        BlockState state = Blocks.AIR.getDefaultState();
         List<BlockPos> coordinates = getAnchor(stack);
         if (lookingAt != null || coordinates.size() > 0) {
             World world = player.world;
-            IBlockState startBlock = Blocks.AIR.getDefaultState();
+            BlockState startBlock = Blocks.AIR.getDefaultState();
             if (!(lookingAt == null)) {
                 startBlock = world.getBlockState(lookingAt.getBlockPos());
             }
             if (startBlock != BGBlocks.effectBlock.getDefaultState()) {
 
-                IBlockState renderBlockState = getToolBlock(heldItem);
+                BlockState renderBlockState = getToolBlock(heldItem);
                 if (renderBlockState == Blocks.AIR.getDefaultState()) {//Don't render anything if there is no block selected (Air)
                     return;
                 }
@@ -224,7 +224,7 @@ public class ToolRenders {
         }
     }
 
-    public static void renderExchangerOverlay(RenderWorldLastEvent evt, EntityPlayer player, ItemStack stack) {
+    public static void renderExchangerOverlay(RenderWorldLastEvent evt, ClientPlayerEntity player, ItemStack stack) {
         //Calculate the players current position, which is needed later
         double doubleX = player.lastTickPosX + (player.posX - player.lastTickPosX) * evt.getPartialTicks();
         double doubleY = player.lastTickPosY + (player.posY - player.lastTickPosY) * evt.getPartialTicks();
@@ -233,16 +233,16 @@ public class ToolRenders {
         renderLinkedInventoryOutline(stack, player, doubleX, doubleY, doubleZ);
 
         RayTraceResult lookingAt = VectorHelper.getLookingAt(player, stack);
-        IBlockState state = Blocks.AIR.getDefaultState();
+        BlockState state = Blocks.AIR.getDefaultState();
         List<BlockPos> coordinates = getAnchor(stack);
         if (lookingAt != null || coordinates.size() > 0) {
             World world = player.world;
-            IBlockState startBlock = Blocks.AIR.getDefaultState();
+            BlockState startBlock = Blocks.AIR.getDefaultState();
             if (!(lookingAt == null)) {
                 startBlock = world.getBlockState(lookingAt.getBlockPos());
             }
             if (startBlock != BGBlocks.effectBlock.getDefaultState()) {
-                IBlockState renderBlockState = getToolBlock(stack);
+                BlockState renderBlockState = getToolBlock(stack);
                 Minecraft mc = Minecraft.getInstance();
                 mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
                 if (renderBlockState == Blocks.AIR.getDefaultState()) {//Don't render anything if there is no block selected (Air)
@@ -361,12 +361,12 @@ public class ToolRenders {
         }
     }
 
-    public static void renderDestructionOverlay(RenderWorldLastEvent evt, EntityPlayer player, ItemStack stack) {
+    public static void renderDestructionOverlay(RenderWorldLastEvent evt, ClientPlayerEntity player, ItemStack stack) {
         RayTraceResult lookingAt = VectorHelper.getLookingAt(player, stack);
         if (lookingAt == null && GadgetDestruction.getAnchor(stack) == null) return;
         World world = player.world;
         BlockPos startBlock = (GadgetDestruction.getAnchor(stack) == null) ? lookingAt.getBlockPos() : GadgetDestruction.getAnchor(stack);
-        EnumFacing facing = (GadgetDestruction.getAnchorSide(stack) == null) ? lookingAt.sideHit : GadgetDestruction.getAnchorSide(stack);
+        Direction facing = (GadgetDestruction.getAnchorSide(stack) == null) ? lookingAt.sideHit : GadgetDestruction.getAnchorSide(stack);
         if (startBlock == BGBlocks.effectBlock.getDefaultState()) return;
 
         if (!GadgetDestruction.getOverlay(stack)) return;
@@ -390,7 +390,7 @@ public class ToolRenders {
         GlStateManager.popMatrix();
     }
 
-    private static void renderDestructionOverlay(EntityPlayer player, World world, BlockPos startBlock, EnumFacing facing, ItemStack heldItem) {
+    private static void renderDestructionOverlay(ClientPlayerEntity player, World world, BlockPos startBlock, Direction facing, ItemStack heldItem) {
         Minecraft mc = Minecraft.getInstance();
         mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
 
@@ -410,7 +410,7 @@ public class ToolRenders {
 
         Tessellator t = Tessellator.getInstance();
         BufferBuilder bufferBuilder = t.getBuffer();
-        /*ArrayList<EnumFacing> directions = GadgetDestruction.assignDirections(facing, player);
+        /*ArrayList<Direction> directions = GadgetDestruction.assignDirections(facing, player);
         BlockPos a = new BlockPos(0,0,0);
         a = a.offset(directions.get(0), GadgetDestruction.getToolValue(stack, NBTKeys.GADGET_VALUE_LEFT));
         a = a.offset(directions.get(2), GadgetDestruction.getToolValue(stack, NBTKeys.GADGET_VALUE_UP));
@@ -421,8 +421,8 @@ public class ToolRenders {
 
         for (BlockPos coordinate : sortedCoordinates) {
             boolean invisible = true;
-            IBlockState state = world.getBlockState(coordinate);
-            for (EnumFacing side : EnumFacing.values()) {
+            BlockState state = world.getBlockState(coordinate);
+            for (Direction side : Direction.values()) {
                 if (!state.isSideInvisible(state, side)) {
                     invisible = false;
                     break;
@@ -457,7 +457,7 @@ public class ToolRenders {
         GlStateManager.popMatrix();
     }
 
-    public static void renderPasteOverlay(RenderWorldLastEvent evt, EntityPlayer player, ItemStack stack) {
+    public static void renderPasteOverlay(RenderWorldLastEvent evt, ClientPlayerEntity player, ItemStack stack) {
 
         //Calculate the players current position, which is needed later
         double doubleX = player.lastTickPosX + (player.posX - player.lastTickPosX) * evt.getPartialTicks();
@@ -500,7 +500,7 @@ public class ToolRenders {
             }
 
             //Don't draw on top of blocks being built by our tools.
-            IBlockState startBlock = world.getBlockState(startPos);
+            BlockState startBlock = world.getBlockState(startPos);
             if (startBlock == BGBlocks.effectBlock.getDefaultState()) return;
 
             //Prepare the block rendering
@@ -646,7 +646,7 @@ public class ToolRenders {
         tessellator.draw();
     }
 
-    private static void renderLinkedInventoryOutline(ItemStack item, EntityPlayer player, double x, double y, double z) {
+    private static void renderLinkedInventoryOutline(ItemStack item, ClientPlayerEntity player, double x, double y, double z) {
         // This is problematic as you use REMOTE_INVENTORY_POS to get the dimension instead of REMOTE_INVENTORY_DIM
         ResourceLocation dim = GadgetUtils.getDIMFromNBT(item, NBTKeys.REMOTE_INVENTORY_POS);
         BlockPos pos = GadgetUtils.getPOSFromNBT(item, NBTKeys.REMOTE_INVENTORY_POS);

@@ -4,7 +4,7 @@ import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetBuilding;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetDestruction;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;
@@ -21,7 +21,7 @@ public class PacketUndo {
 
     public static class Handler {
         public static void handle(PacketUndo msg, Supplier<NetworkEvent.Context> ctx) {
-            EntityPlayerMP player = ctx.get().getSender();
+            ServerPlayerEntity player = ctx.get().getSender();
             if (player == null)
                 return;
 

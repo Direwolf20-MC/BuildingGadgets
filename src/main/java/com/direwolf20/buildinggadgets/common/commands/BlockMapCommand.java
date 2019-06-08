@@ -11,9 +11,9 @@ import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
 import net.minecraft.command.arguments.EntityArgument;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.client.entity.player.ClientPlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
 
@@ -39,20 +39,20 @@ public class BlockMapCommand {
 
     // I don't get the logic going on here but this is basically what it was originally :P
     private static int execute(CommandContext<CommandSource> ctx, Entity entity, boolean removeData) throws CommandSyntaxException {
-        EntityPlayerMP sender = ctx.getSource().asPlayer();
+        ServerPlayerEntity sender = ctx.getSource().asPlayer();
 
-        if( !(entity instanceof EntityPlayer)) {
+        if( !(entity instanceof ClientPlayerEntity)) {
             sender.sendMessage(new TextComponentString("Entity not valid"));
             return 0;
         }
 
         WorldSave worldSave = WorldSave.getWorldSave(sender.getEntityWorld());
-        Map<String, NBTTagCompound> tagMap = worldSave.getTagMap();
-        Map<String, NBTTagCompound> newMap = new HashMap<>(tagMap);
+        Map<String, CompoundNBT> tagMap = worldSave.getTagMap();
+        Map<String, CompoundNBT> newMap = new HashMap<>(tagMap);
 
         int counter = 0;
-        for (Map.Entry<String, NBTTagCompound> entry : tagMap.entrySet()) {
-            NBTTagCompound tagCompound = entry.getValue();
+        for (Map.Entry<String, CompoundNBT> entry : tagMap.entrySet()) {
+            CompoundNBT tagCompound = entry.getValue();
             if (tagCompound.getString(NBTKeys.TEMPLATE_OWNER).equals(entity.getName().getString())) {
                 //TODO Missing localisation
                 sender.sendMessage(new TextComponentString(TextFormatting.RED + "Deleted stored map for " + tagCompound.getString(NBTKeys.TEMPLATE_OWNER) + " with UUID:" + tagCompound.getString(NBTKeys.GADGET_UUID)));
@@ -65,7 +65,7 @@ public class BlockMapCommand {
             worldSave.setTagMap(newMap);
             worldSave.markForSaving();
             if (entity.getName().equals(sender.getName())) {
-                PacketHandler.sendTo(new PacketBlockMap(new NBTTagCompound()), sender);
+                PacketHandler.sendTo(new PacketBlockMap(new CompoundNBT()), sender);
             }
         }
 

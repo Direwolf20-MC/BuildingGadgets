@@ -42,7 +42,7 @@ public final class ImmutableTemplate implements ITemplate {
     }
 
     private ImmutableTemplate() {
-        this(BlockPos.ORIGIN, new Long2IntAVLTreeMap(), new Int2ObjectAVLTreeMap<>(), ImmutableMultiset.of());
+        this(BlockPos.ZERO, new Long2IntAVLTreeMap(), new Int2ObjectAVLTreeMap<>(), ImmutableMultiset.of());
     }
 
     /**

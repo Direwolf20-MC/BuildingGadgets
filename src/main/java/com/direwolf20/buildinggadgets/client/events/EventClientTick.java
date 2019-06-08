@@ -7,7 +7,7 @@ import com.direwolf20.buildinggadgets.common.network.packets.PacketRequestBlockM
 import com.direwolf20.buildinggadgets.common.util.buffers.PasteToolBufferBuilder;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -28,7 +28,7 @@ public class EventClientTick {
                 joinedWorld = true;
 
             counter = 0;
-            EntityPlayer player = Minecraft.getInstance().player;
+            ClientPlayerEntity player = Minecraft.getInstance().player;
             if (player == null) return;
 
             for (int i = 0; i < 36; ++i) {

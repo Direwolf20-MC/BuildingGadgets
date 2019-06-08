@@ -16,17 +16,17 @@ import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.world.WorldSave;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
-import net.minecraft.util.EnumFacing.Axis;
+import net.minecraft.util.Direction.Axis;
 import net.minecraft.util.math.*;
 import net.minecraft.util.text.*;
 import net.minecraft.world.World;
@@ -91,9 +91,9 @@ public class GadgetDestruction extends GadgetSwapping {
 
     @Nullable
     public static String getUUID(ItemStack stack) {
-        NBTTagCompound tagCompound = stack.getTag();
+        CompoundNBT tagCompound = stack.getTag();
         if (tagCompound == null) {
-            tagCompound = new NBTTagCompound();
+            tagCompound = new CompoundNBT();
         }
         String uuid = tagCompound.getString(NBTKeys.GADGET_UUID);
         if (uuid.isEmpty()) {
@@ -113,10 +113,10 @@ public class GadgetDestruction extends GadgetSwapping {
         return GadgetUtils.getPOSFromNBT(stack, NBTKeys.GADGET_ANCHOR);
     }
 
-    public static void setAnchorSide(ItemStack stack, EnumFacing side) {
-        NBTTagCompound tagCompound = stack.getTag();
+    public static void setAnchorSide(ItemStack stack, Direction side) {
+        CompoundNBT tagCompound = stack.getTag();
         if (tagCompound == null) {
-            tagCompound = new NBTTagCompound();
+            tagCompound = new CompoundNBT();
         }
         if (side == null) {
             if (tagCompound.getTag(NBTKeys.GADGET_ANCHOR_SIDE) != null) {
@@ -129,21 +129,21 @@ public class GadgetDestruction extends GadgetSwapping {
         stack.setTag(tagCompound);
     }
 
-    public static EnumFacing getAnchorSide(ItemStack stack) {
-        NBTTagCompound tagCompound = stack.getTag();
+    public static Direction getAnchorSide(ItemStack stack) {
+        CompoundNBT tagCompound = stack.getTag();
         if (tagCompound == null) {
             return null;
         }
         String facing = tagCompound.getString(NBTKeys.GADGET_ANCHOR_SIDE);
         if (facing.isEmpty()) return null;
-        return EnumFacing.byName(facing);
+        return Direction.byName(facing);
     }
 
     public static void setToolValue(ItemStack stack, int value, String valueName) {
         //Store the tool's range in NBT as an Integer
-        NBTTagCompound tagCompound = stack.getTag();
+        CompoundNBT tagCompound = stack.getTag();
         if (tagCompound == null) {
-            tagCompound = new NBTTagCompound();
+            tagCompound = new CompoundNBT();
         }
         tagCompound.setInt(valueName, value);
         stack.setTag(tagCompound);
@@ -151,17 +151,17 @@ public class GadgetDestruction extends GadgetSwapping {
 
     public static int getToolValue(ItemStack stack, String valueName) {
         //Store the tool's range in NBT as an Integer
-        NBTTagCompound tagCompound = stack.getTag();
+        CompoundNBT tagCompound = stack.getTag();
         if (tagCompound == null) {
-            tagCompound = new NBTTagCompound();
+            tagCompound = new CompoundNBT();
         }
         return tagCompound.getInt(valueName);
     }
 
     public static boolean getOverlay(ItemStack stack) {
-        NBTTagCompound tagCompound = stack.getTag();
+        CompoundNBT tagCompound = stack.getTag();
         if (tagCompound == null) {
-            tagCompound = new NBTTagCompound();
+            tagCompound = new CompoundNBT();
             tagCompound.setBoolean(NBTKeys.GADGET_OVERLAY, true);
             tagCompound.setBoolean(NBTKeys.GADGET_FUZZY, true);
             stack.setTag(tagCompound);
@@ -176,32 +176,32 @@ public class GadgetDestruction extends GadgetSwapping {
     }
 
     public static void setOverlay(ItemStack stack, boolean showOverlay) {
-        NBTTagCompound tagCompound = stack.getTag();
+        CompoundNBT tagCompound = stack.getTag();
         if (tagCompound == null) {
-            tagCompound = new NBTTagCompound();
+            tagCompound = new CompoundNBT();
         }
         tagCompound.setBoolean(NBTKeys.GADGET_OVERLAY, showOverlay);
         stack.setTag(tagCompound);
     }
 
-    public static void switchOverlay(EntityPlayer player, ItemStack stack) {
+    public static void switchOverlay(ClientPlayerEntity player, ItemStack stack) {
         boolean overlay = !getOverlay(stack);
         setOverlay(stack, overlay);
         player.sendStatusMessage(TooltipTranslation.GADGET_DESTROYSHOWOVERLAY
                                          .componentTranslation(String.valueOf(overlay)).setStyle(Styles.AQUA), true);
     }
 
-    public static List<EnumFacing> assignDirections(EnumFacing side, EntityPlayer player) {
-        List<EnumFacing> dirs = new ArrayList<EnumFacing>();
-        EnumFacing depth = side.getOpposite();
+    public static List<Direction> assignDirections(Direction side, ClientPlayerEntity player) {
+        List<Direction> dirs = new ArrayList<Direction>();
+        Direction depth = side.getOpposite();
         boolean vertical = side.getAxis() == Axis.Y;
-        EnumFacing up = vertical ? player.getHorizontalFacing() : EnumFacing.UP;
-        EnumFacing left = vertical ? up.rotateY() : side.rotateYCCW();
-        EnumFacing right = left.getOpposite();
-        if (side == EnumFacing.DOWN)
+        Direction up = vertical ? player.getHorizontalFacing() : Direction.UP;
+        Direction left = vertical ? up.rotateY() : side.rotateYCCW();
+        Direction right = left.getOpposite();
+        if (side == Direction.DOWN)
             up = up.getOpposite();
 
-        EnumFacing down = up.getOpposite();
+        Direction down = up.getOpposite();
         dirs.add(left);
         dirs.add(right);
         dirs.add(up);
@@ -211,7 +211,7 @@ public class GadgetDestruction extends GadgetSwapping {
     }
 
     @Override
-    public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
+    public ActionResult<ItemStack> onItemRightClick(World world, ClientPlayerEntity player, Hand hand) {
         ItemStack stack = player.getHeldItem(hand);
         player.setActiveHand(hand);
         if (!world.isRemote) {
@@ -221,7 +221,7 @@ public class GadgetDestruction extends GadgetSwapping {
                     return new ActionResult<ItemStack>(EnumActionResult.FAIL, stack);
                 }
                 BlockPos startBlock = (getAnchor(stack) == null) ? lookingAt.getBlockPos() : getAnchor(stack);
-                EnumFacing sideHit = (getAnchorSide(stack) == null) ? lookingAt.sideHit : getAnchorSide(stack);
+                Direction sideHit = (getAnchorSide(stack) == null) ? lookingAt.sideHit : getAnchorSide(stack);
                 clearArea(world, startBlock, sideHit, player, stack);
                 if (getAnchor(stack) != null) {
                     setAnchor(stack, null);
@@ -241,7 +241,7 @@ public class GadgetDestruction extends GadgetSwapping {
         return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);
     }
 
-    public static void anchorBlocks(EntityPlayer player, ItemStack stack) {
+    public static void anchorBlocks(ClientPlayerEntity player, ItemStack stack) {
         BlockPos currentAnchor = getAnchor(stack);
         if (currentAnchor == null) {
             RayTraceResult lookingAt = VectorHelper.getLookingAt(player, stack);
@@ -259,16 +259,16 @@ public class GadgetDestruction extends GadgetSwapping {
         }
     }
 
-    public static SortedSet<BlockPos> getArea(World world, BlockPos pos, EnumFacing incomingSide, EntityPlayer player, ItemStack stack) {
+    public static SortedSet<BlockPos> getArea(World world, BlockPos pos, Direction incomingSide, ClientPlayerEntity player, ItemStack stack) {
         SortedSet<BlockPos> voidPositions = new TreeSet<>(Comparator.comparingInt(Vec3i::getX).thenComparingInt(Vec3i::getY).thenComparingInt(Vec3i::getZ));
         int depth = getToolValue(stack, NBTKeys.GADGET_VALUE_DEPTH);
         if (depth == 0)
             return voidPositions;
 
         BlockPos startPos = (getAnchor(stack) == null) ? pos : getAnchor(stack);
-        EnumFacing side = (getAnchorSide(stack) == null) ? incomingSide : getAnchorSide(stack);
-        List<EnumFacing> directions = assignDirections(side, player);
-        IBlockState stateTarget = !Config.GADGETS.GADGET_DESTRUCTION.nonFuzzyEnabled.get() || GadgetGeneric.getFuzzy(stack) ? null : world.getBlockState(pos);
+        Direction side = (getAnchorSide(stack) == null) ? incomingSide : getAnchorSide(stack);
+        List<Direction> directions = assignDirections(side, player);
+        BlockState stateTarget = !Config.GADGETS.GADGET_DESTRUCTION.nonFuzzyEnabled.get() || GadgetGeneric.getFuzzy(stack) ? null : world.getBlockState(pos);
         if (GadgetGeneric.getConnectedArea(stack)) {
             String[] directionNames = NBTKeys.GADGET_VALUES;
             AxisAlignedBB area = new AxisAlignedBB(pos);
@@ -298,7 +298,7 @@ public class GadgetDestruction extends GadgetSwapping {
         return voidPositions;
     }
 
-    public static void addConnectedCoords(World world, EntityPlayer player, BlockPos loc, IBlockState state,
+    public static void addConnectedCoords(World world, ClientPlayerEntity player, BlockPos loc, BlockState state,
             SortedSet<BlockPos> coords, int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
         if (coords.contains(loc) || loc.getX() < minX || loc.getY() < minY || loc.getZ() < minZ || loc.getX() > maxX || loc.getY() > maxY || loc.getZ() > maxZ)
             return;
@@ -316,8 +316,8 @@ public class GadgetDestruction extends GadgetSwapping {
         }
     }
 
-    public static boolean validBlock(World world, BlockPos voidPos, EntityPlayer player, @Nullable IBlockState stateTarget) {
-        IBlockState currentBlock = world.getBlockState(voidPos);
+    public static boolean validBlock(World world, BlockPos voidPos, ClientPlayerEntity player, @Nullable BlockState stateTarget) {
+        BlockState currentBlock = world.getBlockState(voidPos);
         if (stateTarget != null && currentBlock != stateTarget) return false;
         TileEntity te = world.getTileEntity(voidPos);
         if (currentBlock.getBlock().isAir(currentBlock, world, voidPos)) return false;
@@ -337,7 +337,7 @@ public class GadgetDestruction extends GadgetSwapping {
         }
         if (!world.isRemote) {
             BlockSnapshot blockSnapshot = BlockSnapshot.getBlockSnapshot(world, voidPos);
-            if (ForgeEventFactory.onBlockPlace(player, blockSnapshot, EnumFacing.UP)) {
+            if (ForgeEventFactory.onBlockPlace(player, blockSnapshot, Direction.UP)) {
                 return false;
             }
             BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(world, voidPos, currentBlock, player);
@@ -348,13 +348,13 @@ public class GadgetDestruction extends GadgetSwapping {
         return true;
     }
 
-    public void clearArea(World world, BlockPos pos, EnumFacing side, EntityPlayer player, ItemStack stack) {
+    public void clearArea(World world, BlockPos pos, Direction side, ClientPlayerEntity player, ItemStack stack) {
         SortedSet<BlockPos> voidPosArray = getArea(world, pos, side, player, stack);
-        Map<BlockPos, IBlockState> posStateMap = new HashMap<BlockPos, IBlockState>();
-        Map<BlockPos, IBlockState> pasteStateMap = new HashMap<BlockPos, IBlockState>();
+        Map<BlockPos, BlockState> posStateMap = new HashMap<BlockPos, BlockState>();
+        Map<BlockPos, BlockState> pasteStateMap = new HashMap<BlockPos, BlockState>();
         for (BlockPos voidPos : voidPosArray) {
-            IBlockState blockState = world.getBlockState(voidPos);
-            IBlockState pasteState = Blocks.AIR.getDefaultState();
+            BlockState blockState = world.getBlockState(voidPos);
+            BlockState pasteState = Blocks.AIR.getDefaultState();
             if (blockState.getBlock() == BGBlocks.constructionBlock) {
                 TileEntity te = world.getTileEntity(voidPos);
                 if (te instanceof ConstructionBlockTileEntity) {
@@ -374,25 +374,25 @@ public class GadgetDestruction extends GadgetSwapping {
         }
     }
 
-    public static void storeUndo(World world, Map<BlockPos, IBlockState> posStateMap, Map<BlockPos, IBlockState> pasteStateMap, BlockPos startBlock, ItemStack stack, EntityPlayer player) {
+    public static void storeUndo(World world, Map<BlockPos, BlockState> posStateMap, Map<BlockPos, BlockState> pasteStateMap, BlockPos startBlock, ItemStack stack, ClientPlayerEntity player) {
         WorldSave worldSave = WorldSave.getWorldSaveDestruction(world);
-        NBTTagCompound tagCompound = new NBTTagCompound();
+        CompoundNBT tagCompound = new CompoundNBT();
         IntList posIntArrayList = new IntArrayList();
-        List<IBlockState> intStateArrayList = new ArrayList<>();
+        List<BlockState> intStateArrayList = new ArrayList<>();
         IntList stateIntArrayList = new IntArrayList();
         IntList pastePosArrayList = new IntArrayList();
         IntList pasteStateArrayList = new IntArrayList();
         BlockMapIntState blockMapIntState = new BlockMapIntState();
         String UUID = getUUID(stack);
 
-        for (Map.Entry<BlockPos, IBlockState> entry : posStateMap.entrySet()) {
+        for (Map.Entry<BlockPos, BlockState> entry : posStateMap.entrySet()) {
             posIntArrayList.add(GadgetUtils.relPosToInt(startBlock, entry.getKey()));
             blockMapIntState.addToMap(entry.getValue());
             stateIntArrayList.add((int) blockMapIntState.findSlot(entry.getValue()));
             intStateArrayList.add(entry.getValue());
             if (pasteStateMap.containsKey(entry.getKey())) {
                 pastePosArrayList.add(GadgetUtils.relPosToInt(startBlock, entry.getKey()));
-                IBlockState pasteBlockState = pasteStateMap.get(entry.getKey());
+                BlockState pasteBlockState = pasteStateMap.get(entry.getKey());
                 blockMapIntState.addToMap(pasteBlockState);
                 pasteStateArrayList.add((int) blockMapIntState.findSlot(pasteBlockState));
             }
@@ -401,7 +401,7 @@ public class GadgetDestruction extends GadgetSwapping {
         tagCompound.setIntArray(NBTKeys.MAP_INDEX2POS, posIntArrayList.toIntArray());
         tagCompound.setIntArray(NBTKeys.MAP_INDEX2STATE_ID, stateIntArrayList.toIntArray());
         tagCompound.setTag(NBTKeys.MAP_PALETTE, NBTHelper.writeIterable(intStateArrayList, (state, i) -> {
-            NBTTagCompound entry = new NBTTagCompound();
+            CompoundNBT entry = new CompoundNBT();
             entry.setInt(NBTKeys.MAP_SLOT, i);
             entry.setTag(NBTKeys.MAP_STATE, NBTUtil.writeBlockState(intStateArrayList.get(i)));
             return entry;
@@ -415,10 +415,10 @@ public class GadgetDestruction extends GadgetSwapping {
         worldSave.markForSaving();
     }
 
-    public static void undo(EntityPlayer player, ItemStack stack) {
+    public static void undo(ClientPlayerEntity player, ItemStack stack) {
         World world = player.world;
         WorldSave worldSave = WorldSave.getWorldSaveDestruction(world);
-        NBTTagCompound tag = worldSave.getCompoundFromUUID(getUUID(stack));
+        CompoundNBT tag = worldSave.getCompoundFromUUID(getUUID(stack));
         if (tag == null) return;
 
         BlockPos startPos = NBTUtil.readBlockPos(tag.getCompound(NBTKeys.GADGET_START_POS));
@@ -433,11 +433,11 @@ public class GadgetDestruction extends GadgetSwapping {
         boolean success = false;
         for (int i = 0; i < indexPosArray.length; i++) {
             BlockPos placePos = GadgetUtils.relIntToPos(startPos, indexPosArray[i]);
-            IBlockState currentState = world.getBlockState(placePos);
+            BlockState currentState = world.getBlockState(placePos);
             if (currentState.getBlock().isAir(currentState, world, placePos) || currentState.getMaterial().isLiquid()) {
-                IBlockState placeState = intState.getStateFromSlot((short) indexStateIDArray[i]);
+                BlockState placeState = intState.getStateFromSlot((short) indexStateIDArray[i]);
                 if (placeState.getBlock() == BGBlocks.constructionBlock) {
-                    IBlockState pasteState = Blocks.AIR.getDefaultState();
+                    BlockState pasteState = Blocks.AIR.getDefaultState();
                     for (int j = 0; j < posPasteArray.length; j++) {
                         if (posPasteArray[j] == indexPosArray[i]) {
                             pasteState = intState.getStateFromSlot((short) statePasteArray[j]);
@@ -455,13 +455,13 @@ public class GadgetDestruction extends GadgetSwapping {
             }
         }
         if (success) {
-            NBTTagCompound newTag = new NBTTagCompound();
+            CompoundNBT newTag = new CompoundNBT();
             worldSave.addToMap(getUUID(stack), newTag);
             worldSave.markForSaving();
         }
     }
 
-    private boolean destroyBlock(World world, BlockPos voidPos, EntityPlayer player) {
+    private boolean destroyBlock(World world, BlockPos voidPos, ClientPlayerEntity player) {
         ItemStack tool = getGadget(player);
         if (tool.isEmpty())
             return false;
@@ -475,7 +475,7 @@ public class GadgetDestruction extends GadgetSwapping {
         return true;
     }
 
-    public static ItemStack getGadget(EntityPlayer player) {
+    public static ItemStack getGadget(ClientPlayerEntity player) {
         ItemStack stack = GadgetGeneric.getGadget(player);
         if (!(stack.getItem() instanceof GadgetDestruction))
             return ItemStack.EMPTY;

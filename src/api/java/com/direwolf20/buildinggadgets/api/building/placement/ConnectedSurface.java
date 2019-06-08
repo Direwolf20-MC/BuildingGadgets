@@ -7,8 +7,8 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.AbstractIterator;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import it.unimi.dsi.fastutil.objects.ObjectSet;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.block.BlockState;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockReader;
 
@@ -32,12 +32,12 @@ public final class ConnectedSurface implements IPositionPlacementSequence {
      * @param searchingCenter Center of the searching region
      * @param side            Facing to offset from the {@code searchingCenter} to get to the reference region center
      */
-    public static ConnectedSurface create(IBlockReader world, BlockPos searchingCenter, EnumFacing side, int range, boolean fuzzy) {
+    public static ConnectedSurface create(IBlockReader world, BlockPos searchingCenter, Direction side, int range, boolean fuzzy) {
         Region searchingRegion = Wall.clickedSide(searchingCenter, side, range).getBoundingBox();
         return create(world, searchingRegion, pos -> pos.offset(side), searchingCenter, side, fuzzy);
     }
 
-    public static ConnectedSurface create(IBlockReader world, Region searchingRegion, Function<BlockPos, BlockPos> searching2referenceMapper, BlockPos searchingCenter, EnumFacing side, boolean fuzzy) {
+    public static ConnectedSurface create(IBlockReader world, Region searchingRegion, Function<BlockPos, BlockPos> searching2referenceMapper, BlockPos searchingCenter, Direction side, boolean fuzzy) {
         return new ConnectedSurface(world, searchingRegion, searching2referenceMapper, searchingCenter, side, fuzzy);
     }
 
@@ -45,11 +45,11 @@ public final class ConnectedSurface implements IPositionPlacementSequence {
     private final Region searchingRegion;
     private final Function<BlockPos, BlockPos> searching2referenceMapper;
     private final BlockPos searchingCenter;
-    private final EnumFacing side;
+    private final Direction side;
     private final boolean fuzzy;
 
     @VisibleForTesting
-    private ConnectedSurface(IBlockReader world, Region searchingRegion, Function<BlockPos, BlockPos> searching2referenceMapper, BlockPos searchingCenter, EnumFacing side, boolean fuzzy) {
+    private ConnectedSurface(IBlockReader world, Region searchingRegion, Function<BlockPos, BlockPos> searching2referenceMapper, BlockPos searchingCenter, Direction side, boolean fuzzy) {
         this.world = world;
         this.searchingRegion = searchingRegion;
         this.searching2referenceMapper = searching2referenceMapper;
@@ -91,7 +91,7 @@ public final class ConnectedSurface implements IPositionPlacementSequence {
     @Nonnull
     @Override
     public Iterator<BlockPos> iterator() {
-        IBlockState selectedBlock = getReferenceFor(searchingCenter);
+        BlockState selectedBlock = getReferenceFor(searchingCenter);
 
         return new AbstractIterator<BlockPos>() {
             private Queue<BlockPos> queue = new ArrayDeque<>(searchingRegion.size());
@@ -129,8 +129,8 @@ public final class ConnectedSurface implements IPositionPlacementSequence {
         };
     }
 
-    private boolean isStateValid(IBlockState filter, BlockPos pos) {
-        IBlockState reference = getReferenceFor(pos);
+    private boolean isStateValid(BlockState filter, BlockPos pos) {
+        BlockState reference = getReferenceFor(pos);
         boolean isAir = reference.isAir(world, pos);
         // If fuzzy=true, we ignore the block for reference
         if (fuzzy)
@@ -138,7 +138,7 @@ public final class ConnectedSurface implements IPositionPlacementSequence {
         return !isAir && filter == reference;
     }
 
-    private IBlockState getReferenceFor(BlockPos pos) {
+    private BlockState getReferenceFor(BlockPos pos) {
         return world.getBlockState(searching2referenceMapper.apply(pos));
     }
 

@@ -4,9 +4,9 @@ import com.direwolf20.buildinggadgets.common.util.tools.UniqueItem;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.google.common.collect.BiMap;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.block.BlockState;
+import net.minecraft.client.entity.player.ClientPlayerEntity;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.math.BlockPos;
 
@@ -16,9 +16,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 public final class BlockState2ItemMap extends BlockState2ShortMap {
-    private final Map<IBlockState, UniqueItem> stateItemMap;
+    private final Map<BlockState, UniqueItem> stateItemMap;
 
-    public BlockState2ItemMap(BiMap<Short, IBlockState> shortStateMap, Map<IBlockState, UniqueItem> stateItemMap) {
+    public BlockState2ItemMap(BiMap<Short, BlockState> shortStateMap, Map<BlockState, UniqueItem> stateItemMap) {
         super(shortStateMap);
         this.stateItemMap = new HashMap<>(stateItemMap);
     }
@@ -28,26 +28,26 @@ public final class BlockState2ItemMap extends BlockState2ShortMap {
         stateItemMap = new HashMap<>();
     }
 
-    public Map<IBlockState, UniqueItem> getStateItemMap() {
+    public Map<BlockState, UniqueItem> getStateItemMap() {
         return stateItemMap;
     }
 
     @Nonnull
-    public static BlockState2ItemMap readFromNBT(@Nullable NBTTagCompound tagCompound) {
+    public static BlockState2ItemMap readFromNBT(@Nullable CompoundNBT tagCompound) {
         BlockState2ItemMap mapIntState = new BlockState2ItemMap();
         if (tagCompound == null) return mapIntState;
         mapIntState.readNBT(tagCompound);
         return mapIntState;
     }
 
-    public void addToMap(UniqueItem uniqueItem, IBlockState blockState) {
+    public void addToMap(UniqueItem uniqueItem, BlockState blockState) {
         addToMap(blockState);
         if (!stateItemMap.containsValue(uniqueItem)) {
             stateItemMap.put(blockState, uniqueItem);
         }
     }
 
-    public UniqueItem getItemForState(IBlockState state) {
+    public UniqueItem getItemForState(BlockState state) {
         return stateItemMap.get(state);
     }
 
@@ -58,13 +58,13 @@ public final class BlockState2ItemMap extends BlockState2ShortMap {
     }
 
     @Override
-    public void writeToNBT(@Nonnull NBTTagCompound tagCompound) {
+    public void writeToNBT(@Nonnull CompoundNBT tagCompound) {
         super.writeToNBT(tagCompound);
         tagCompound.setTag(NBTKeys.MAP_INT_STACK, writeStateItemMapToNBT());
     }
 
     @Override
-    public void readNBT(@Nonnull NBTTagCompound tagCompound) {
+    public void readNBT(@Nonnull CompoundNBT tagCompound) {
         super.readNBT(tagCompound);
         if (tagCompound.hasKey(NBTKeys.MAP_INT_STACK)) {
             NBTTagList mapIntStackTag = (NBTTagList) tagCompound.getTag(NBTKeys.MAP_INT_STACK);
@@ -72,9 +72,9 @@ public final class BlockState2ItemMap extends BlockState2ShortMap {
         }
     }
 
-    public void initStateItemMap(EntityPlayer player) {
+    public void initStateItemMap(ClientPlayerEntity player) {
         stateItemMap.clear();
-        for (Map.Entry<Short, IBlockState> entry : getShortStateMap().entrySet()) {
+        for (Map.Entry<Short, BlockState> entry : getShortStateMap().entrySet()) {
             try {
                 stateItemMap.put(entry.getValue(), UniqueItem.fromBlockState(entry.getValue(), player, new BlockPos(0, 0, 0)));
             } catch (IllegalArgumentException e) {
@@ -84,8 +84,8 @@ public final class BlockState2ItemMap extends BlockState2ShortMap {
 
     private NBTTagList writeStateItemMapToNBT() {
         NBTTagList tagList = new NBTTagList();
-        for (Map.Entry<IBlockState, UniqueItem> entry : stateItemMap.entrySet()) {
-            NBTTagCompound compound = new NBTTagCompound();
+        for (Map.Entry<BlockState, UniqueItem> entry : stateItemMap.entrySet()) {
+            CompoundNBT compound = new CompoundNBT();
             entry.getValue().writeToNBT(compound);
             short slot = getSlot(entry.getKey());
             if (slot >= 0) {
@@ -101,9 +101,9 @@ public final class BlockState2ItemMap extends BlockState2ShortMap {
     private void readStateItemMapFromNBT(NBTTagList tagList) {
         stateItemMap.clear();
         for (int i = 0; i < tagList.size(); i++) {
-            NBTTagCompound compound = tagList.getCompound(i);
+            CompoundNBT compound = tagList.getCompound(i);
             UniqueItem item = UniqueItem.readFromNBT(compound);
-            IBlockState state = null;
+            BlockState state = null;
             if (compound.hasKey(NBTKeys.MAP_STATE_ID)) {
                 state = getStateFromSlot(compound.getShort(NBTKeys.MAP_STATE_ID));
             }

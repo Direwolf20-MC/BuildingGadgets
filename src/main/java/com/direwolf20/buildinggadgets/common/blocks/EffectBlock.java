@@ -2,7 +2,7 @@ package com.direwolf20.buildinggadgets.common.blocks;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.material.EnumPushReaction;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumBlockRenderType;
@@ -21,11 +21,11 @@ public class EffectBlock extends Block {
      * @param state blockState
      * @return Render Type
      *
-     * @deprecated call via {@link IBlockState#getRenderType()} whenever possible. Implementing/overriding is fine.
+     * @deprecated call via {@link BlockState#getRenderType()} whenever possible. Implementing/overriding is fine.
      */
     @Override
     @SuppressWarnings("deprecation")
-    public EnumBlockRenderType getRenderType(IBlockState state) {
+    public EnumBlockRenderType getRenderType(BlockState state) {
         return EnumBlockRenderType.INVISIBLE;
     }
 
@@ -40,7 +40,7 @@ public class EffectBlock extends Block {
      * @return True if the block is a full cube
      */
     @Override
-    public boolean isNormalCube(IBlockState state, IBlockReader world, BlockPos pos) {
+    public boolean isNormalCube(BlockState state, IBlockReader world, BlockPos pos) {
         return false;
     }
 
@@ -63,16 +63,16 @@ public class EffectBlock extends Block {
      * @param fortune Breakers fortune level
      */
     @Override
-    public void getDrops(IBlockState state, NonNullList<ItemStack> drops, World world, BlockPos pos, int fortune) {
+    public void getDrops(BlockState state, NonNullList<ItemStack> drops, World world, BlockPos pos, int fortune) {
         drops.clear();
     }
 
     /**
      * @param state
-     * @deprecated call via {@link IBlockState#getPushReaction()} whenever possible. Implementing/overriding is fine.
+     * @deprecated call via {@link BlockState#getPushReaction()} whenever possible. Implementing/overriding is fine.
      */
     @Override
-    public EnumPushReaction getPushReaction(IBlockState state) {
+    public EnumPushReaction getPushReaction(BlockState state) {
         return EnumPushReaction.BLOCK;
     }
 }

@@ -13,8 +13,8 @@ import com.google.common.base.Function;
 import com.google.common.base.Supplier;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.client.entity.player.ClientPlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.item.ItemStack;
@@ -50,16 +50,16 @@ public enum GuiMod {
     MATERIAL_LIST(ITemplate::getTemplate, MaterialListGUI::new);
 
     private static interface IContainerOpener {
-        boolean open(String id, EntityPlayerMP player, World world, BlockPos pos);
+        boolean open(String id, ServerPlayerEntity player, World world, BlockPos pos);
     }
 
-    private Function<EntityPlayer, ItemStack> stackReader;
+    private Function<ClientPlayerEntity, ItemStack> stackReader;
     private Function<ItemStack, GuiScreen> clientScreenProvider;
     private Function<OpenContainer, GuiScreen> commonScreenProvider;
     private IContainerOpener containerOpener;
     private String id;
 
-    private GuiMod(Function<EntityPlayer, ItemStack> stackReader, Function<ItemStack, GuiScreen> clientScreenProvider) {
+    private GuiMod(Function<ClientPlayerEntity, ItemStack> stackReader, Function<ItemStack, GuiScreen> clientScreenProvider) {
         this.stackReader = stackReader;
         this.clientScreenProvider = clientScreenProvider;
     }
@@ -70,7 +70,7 @@ public enum GuiMod {
         this.containerOpener = containerOpener;
     }
 
-    public boolean openScreen(EntityPlayer player) {
+    public boolean openScreen(ClientPlayerEntity player) {
         if (clientScreenProvider == null)
             return false;
 
@@ -83,8 +83,8 @@ public enum GuiMod {
         return screen == null;
     }
 
-    public boolean openContainer(EntityPlayer player, World world, BlockPos pos) {
-        return containerOpener == null || !(player instanceof EntityPlayerMP) ? false : containerOpener.open(id, (EntityPlayerMP) player, world, pos);
+    public boolean openContainer(ClientPlayerEntity player, World world, BlockPos pos) {
+        return containerOpener == null || !(player instanceof ServerPlayerEntity) ? false : containerOpener.open(id, (ServerPlayerEntity) player, world, pos);
     }
 
     public static GuiScreen openScreen(OpenContainer message) {
@@ -94,11 +94,11 @@ public enum GuiMod {
         return null;
     }
 
-    private static TemplateManagerContainer getTemplateManagerContainer(EntityPlayer player, TileEntity te) {
+    private static TemplateManagerContainer getTemplateManagerContainer(ClientPlayerEntity player, TileEntity te) {
         return new TemplateManagerContainer(player.inventory, (TemplateManagerTileEntity) te);
     }
 
-    private static void openGuiContainer(String id, EntityPlayerMP player, Container container, Consumer<PacketBuffer> extraDataWriter) {
+    private static void openGuiContainer(String id, ServerPlayerEntity player, Container container, Consumer<PacketBuffer> extraDataWriter) {
         NetworkHooks.openGui(player, new IInteractionObject() {
             @Override
             public boolean hasCustomName() {
@@ -121,7 +121,7 @@ public enum GuiMod {
             }
 
             @Override
-            public Container createContainer(InventoryPlayer playerInventory, EntityPlayer playerIn) {
+            public Container createContainer(InventoryPlayer playerInventory, ClientPlayerEntity playerIn) {
                 return container;
             }
         }, extraDataWriter);

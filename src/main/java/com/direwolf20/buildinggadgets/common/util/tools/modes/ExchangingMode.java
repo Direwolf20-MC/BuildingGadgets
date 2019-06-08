@@ -8,11 +8,11 @@ import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.google.common.collect.ImmutableList;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.block.BlockState;
+import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -71,16 +71,16 @@ public enum ExchangingMode {
         return ICONS;
     }
 
-    public static List<BlockPos> collectPlacementPos(World world, EntityPlayer player, BlockPos hit, EnumFacing sideHit, ItemStack tool, BlockPos initial) {
+    public static List<BlockPos> collectPlacementPos(World world, ClientPlayerEntity player, BlockPos hit, Direction sideHit, ItemStack tool, BlockPos initial) {
         IBuildingMode mode = byName(NBTHelper.getOrNewTag(tool).getString("mode")).getModeImplementation();
         return mode.createExecutionContext(player, hit, sideHit, tool).collectFilteredSequence(world, tool, player, initial);
     }
 
-    public static BiPredicate<BlockPos, IBlockState> combineTester(World world, ItemStack tool, EntityPlayer player, BlockPos initial) {
-        IBlockState initialBlockState = world.getBlockState(initial);
-        IBlockState target = GadgetUtils.getToolBlock(tool);
+    public static BiPredicate<BlockPos, BlockState> combineTester(World world, ItemStack tool, ClientPlayerEntity player, BlockPos initial) {
+        BlockState initialBlockState = world.getBlockState(initial);
+        BlockState target = GadgetUtils.getToolBlock(tool);
         return (pos, state) -> {
-            IBlockState worldBlockState = world.getBlockState(pos);
+            BlockState worldBlockState = world.getBlockState(pos);
 
             // Don't try to replace for the same block
             if (worldBlockState == target)

@@ -7,9 +7,9 @@ import com.direwolf20.buildinggadgets.api.building.placement.Stair;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.lang.ModeTranslation;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 
@@ -33,21 +33,21 @@ public class StairMode extends AtopSupportedMode {
     }
 
     @Override
-    public IPositionPlacementSequence computeWithTransformed(EntityPlayer player, BlockPos transformed, BlockPos original, EnumFacing sideHit, ItemStack tool) {
+    public IPositionPlacementSequence computeWithTransformed(ClientPlayerEntity player, BlockPos transformed, BlockPos original, Direction sideHit, ItemStack tool) {
         int range = GadgetUtils.getToolRange(tool);
-        EnumFacing side = sideHit.getAxis().isVertical() ? player.getHorizontalFacing().getOpposite() : sideHit;
+        Direction side = sideHit.getAxis().isVertical() ? player.getHorizontalFacing().getOpposite() : sideHit;
 
         if (original.getY() > player.posY + 1)
-            return Stair.create(transformed, side, EnumFacing.DOWN, range);
+            return Stair.create(transformed, side, Direction.DOWN, range);
         else if (original.getY() < player.posY - 2)
-            return Stair.create(transformed, side, EnumFacing.UP, range);
-        return Stair.create(transformed, side.getOpposite(), EnumFacing.UP, range);
+            return Stair.create(transformed, side, Direction.UP, range);
+        return Stair.create(transformed, side.getOpposite(), Direction.UP, range);
     }
 
     @Override
-    public BlockPos transformAtop(EntityPlayer player, BlockPos hit, EnumFacing sideHit, ItemStack tool) {
+    public BlockPos transformAtop(ClientPlayerEntity player, BlockPos hit, Direction sideHit, ItemStack tool) {
         if (hit.getY() > player.posY + 1) {
-            EnumFacing side = sideHit.getAxis().isVertical() ? player.getHorizontalFacing() : sideHit;
+            Direction side = sideHit.getAxis().isVertical() ? player.getHorizontalFacing() : sideHit;
             return hit.down().offset(side);
         }
         return hit.up();

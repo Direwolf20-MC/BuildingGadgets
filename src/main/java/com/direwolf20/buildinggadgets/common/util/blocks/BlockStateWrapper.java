@@ -3,7 +3,7 @@ package com.direwolf20.buildinggadgets.common.util.blocks;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSortedSet;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.state.IProperty;
 
 import javax.annotation.Nonnull;
@@ -11,16 +11,16 @@ import java.util.Comparator;
 import java.util.HashMap;
 
 public class BlockStateWrapper implements Comparable<BlockStateWrapper> {
-    private final IBlockState state;
+    private final BlockState state;
     private final ImmutableSortedSet<IProperty<?>> propertiesByName;
 
-    public BlockStateWrapper(IBlockState state) {
+    public BlockStateWrapper(BlockState state) {
         Preconditions.checkArgument(state.getBlock().getRegistryName() != null, "Attempted to construct wrapper for unregistered Block!");
         this.state = state;
         this.propertiesByName = ImmutableSortedSet.copyOf(Comparator.comparing(IProperty::getName), state.getProperties());
     }
 
-    public IBlockState getState() {
+    public BlockState getState() {
         return state;
     }
 

@@ -3,9 +3,9 @@ package com.direwolf20.buildinggadgets.common.util.helpers;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
 
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceFluidMode;
 import net.minecraft.util.math.RayTraceResult;
@@ -16,11 +16,11 @@ import javax.annotation.Nullable;
 
 public class VectorHelper {
 
-    public static RayTraceResult getLookingAt(EntityPlayer player, ItemStack tool) {
+    public static RayTraceResult getLookingAt(ClientPlayerEntity player, ItemStack tool) {
         return getLookingAt(player, GadgetGeneric.shouldRayTraceFluid(tool) ? RayTraceFluidMode.ALWAYS : RayTraceFluidMode.NEVER);
     }
 
-    public static RayTraceResult getLookingAt(EntityPlayer player, RayTraceFluidMode rayTraceFluid) {
+    public static RayTraceResult getLookingAt(ClientPlayerEntity player, RayTraceFluidMode rayTraceFluid) {
         World world = player.world;
 
         Vec3d look = player.getLookVec();
@@ -32,7 +32,7 @@ public class VectorHelper {
     }
 
     @Nullable
-    public static BlockPos getPosLookingAt(EntityPlayer player, ItemStack tool) {
+    public static BlockPos getPosLookingAt(ClientPlayerEntity player, ItemStack tool) {
         RayTraceResult lookingAt = VectorHelper.getLookingAt(player, tool);
         if (lookingAt == null)
             return null;

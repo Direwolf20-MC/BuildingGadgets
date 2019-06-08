@@ -2,7 +2,7 @@ package com.direwolf20.buildinggadgets.test.building.coreTests;
 
 import com.direwolf20.buildinggadgets.api.building.IBlockProvider;
 import com.direwolf20.buildinggadgets.api.building.SingleTypeProvider;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import org.junit.jupiter.api.Test;
 
@@ -16,11 +16,11 @@ public class TranslationWrapperTest {
 
     private void wrapperShouldTranslateParameterByAddingMethodGetTranslation(BlockPos translation, BlockPos access, BlockPos expected) {
         BlockPos[] request = new BlockPos[1];
-        request[0] = BlockPos.ORIGIN;
+        request[0] = BlockPos.ZERO;
 
         IBlockProvider handle = new SingleTypeProvider(null) {
             @Override
-            public IBlockState at(BlockPos pos) {
+            public BlockState at(BlockPos pos) {
                 request[0] = pos;
                 return super.at(pos);
             }
@@ -33,7 +33,7 @@ public class TranslationWrapperTest {
 
     private void wrapperShouldAccumulateAllTranslations(BlockPos... translations) {
         IBlockProvider wrapper = new SingleTypeProvider(null);
-        BlockPos totalTranslation = BlockPos.ORIGIN;
+        BlockPos totalTranslation = BlockPos.ZERO;
         for (BlockPos translation : translations) {
             wrapper = wrapper.translate(translation);
             totalTranslation = totalTranslation.add(translation);

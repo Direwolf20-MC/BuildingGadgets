@@ -3,12 +3,12 @@ package com.direwolf20.buildinggadgets.common.util.tools;
 import com.direwolf20.buildinggadgets.common.util.helpers.InventoryHelper;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.google.common.base.Preconditions;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.block.BlockState;
+import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -19,11 +19,11 @@ public final class UniqueItem { //TODO @since 1.13.x can this be replaced with I
     public static final UniqueItem AIR = new UniqueItem(Items.AIR);
     private final Item item;
 
-    public static UniqueItem readFromNBT(NBTTagCompound compound) {
+    public static UniqueItem readFromNBT(CompoundNBT compound) {
         return new UniqueItem(ForgeRegistries.ITEMS.getValue(new ResourceLocation(compound.getString(NBTKeys.UNIQUE_ITEM_ITEM))));
     }
 
-    public static UniqueItem fromBlockState(IBlockState state, EntityPlayer player, BlockPos pos) {
+    public static UniqueItem fromBlockState(BlockState state, ClientPlayerEntity player, BlockPos pos) {
         ItemStack itemStack;
         //if (state.getBlock().canSilkHarvest(player.world, pos, state, player)) {
         //    itemStack = InventoryHelper.getSilkTouchDrop(state);
@@ -63,7 +63,7 @@ public final class UniqueItem { //TODO @since 1.13.x can this be replaced with I
         return (uniqueItem.item.equals(item));
     }
 
-    public void writeToNBT(NBTTagCompound compound) {
+    public void writeToNBT(CompoundNBT compound) {
         assert item.getRegistryName() != null; //An Item without registry name cannot exist in here... Construction would have failed otherwise...
         compound.setString(NBTKeys.UNIQUE_ITEM_ITEM, this.getItem().getRegistryName().toString());
     }

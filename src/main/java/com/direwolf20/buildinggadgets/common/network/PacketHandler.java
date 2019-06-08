@@ -2,7 +2,7 @@ package com.direwolf20.buildinggadgets.common.network;
 
 import com.direwolf20.buildinggadgets.common.network.packets.*;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.util.FakePlayer;
@@ -52,7 +52,7 @@ public class PacketHandler {
         registerMessage(PacketSetRemoteInventoryCache.class, PacketSetRemoteInventoryCache::encode, PacketSetRemoteInventoryCache::decode, PacketSetRemoteInventoryCache.Handler::handle);
     }
 
-    public static void sendTo(Object msg, EntityPlayerMP player) {
+    public static void sendTo(Object msg, ServerPlayerEntity player) {
         if (!(player instanceof FakePlayer))
             HANDLER.sendTo(msg, player.connection.netManager, NetworkDirection.PLAY_TO_CLIENT);
     }

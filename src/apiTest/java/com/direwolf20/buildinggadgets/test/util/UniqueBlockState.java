@@ -6,9 +6,9 @@ import net.minecraft.block.material.EnumPushReaction;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.material.MaterialColor;
 import net.minecraft.block.state.BlockFaceShape;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.IFluidState;
 import net.minecraft.item.BlockItemUseContext;
@@ -38,9 +38,9 @@ import java.util.Random;
  * about identity and hashing even if they are different objects.
  * </p>
  */
-public class UniqueBlockState implements IBlockState {
+public class UniqueBlockState implements BlockState {
 
-    public static final IBlockState AIR = new UniqueBlockState(-1) {
+    public static final BlockState AIR = new UniqueBlockState(-1) {
         @Override
         public Material getMaterial() {
             return Material.AIR;
@@ -146,7 +146,7 @@ public class UniqueBlockState implements IBlockState {
     }
 
     @Override
-    public <T extends Comparable<T>> IBlockState cycle(IProperty<T> property) {
+    public <T extends Comparable<T>> BlockState cycle(IProperty<T> property) {
         return this;
     }
 
@@ -186,12 +186,12 @@ public class UniqueBlockState implements IBlockState {
     }
 
     @Override
-    public IBlockState rotate(Rotation rot) {
+    public BlockState rotate(Rotation rot) {
         return this;
     }
 
     @Override
-    public IBlockState mirror(Mirror mirrorIn) {
+    public BlockState mirror(Mirror mirrorIn) {
         return this;
     }
 
@@ -236,7 +236,7 @@ public class UniqueBlockState implements IBlockState {
     }
 
     @Override
-    public int getWeakPower(IBlockReader blockAccess, BlockPos pos, EnumFacing side) {
+    public int getWeakPower(IBlockReader blockAccess, BlockPos pos, Direction side) {
         return 0;
     }
 
@@ -256,12 +256,12 @@ public class UniqueBlockState implements IBlockState {
     }
 
     @Override
-    public float getPlayerRelativeBlockHardness(EntityPlayer player, IBlockReader worldIn, BlockPos pos) {
+    public float getPlayerRelativeBlockHardness(ClientPlayerEntity player, IBlockReader worldIn, BlockPos pos) {
         return 0;
     }
 
     @Override
-    public int getStrongPower(IBlockReader blockAccess, BlockPos pos, EnumFacing side) {
+    public int getStrongPower(IBlockReader blockAccess, BlockPos pos, Direction side) {
         return 0;
     }
 
@@ -281,7 +281,7 @@ public class UniqueBlockState implements IBlockState {
     }
 
     @Override
-    public boolean isSideInvisible(IBlockState state, EnumFacing face) {
+    public boolean isSideInvisible(BlockState state, Direction face) {
         return false;
     }
 
@@ -336,12 +336,12 @@ public class UniqueBlockState implements IBlockState {
     }
 
     @Override
-    public void onBlockAdded(World worldIn, BlockPos pos, IBlockState oldState) {
+    public void onBlockAdded(World worldIn, BlockPos pos, BlockState oldState) {
 
     }
 
     @Override
-    public void onReplaced(World worldIn, BlockPos pos, IBlockState newState, boolean isMoving) {
+    public void onReplaced(World worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
 
     }
 
@@ -371,12 +371,12 @@ public class UniqueBlockState implements IBlockState {
     }
 
     @Override
-    public boolean onBlockActivated(World worldIn, BlockPos pos, EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
+    public boolean onBlockActivated(World worldIn, BlockPos pos, ClientPlayerEntity player, Hand hand, Direction side, float hitX, float hitY, float hitZ) {
         return false;
     }
 
     @Override
-    public void onBlockClicked(World worldIn, BlockPos pos, EntityPlayer player) {
+    public void onBlockClicked(World worldIn, BlockPos pos, ClientPlayerEntity player) {
 
     }
 
@@ -386,12 +386,12 @@ public class UniqueBlockState implements IBlockState {
     }
 
     @Override
-    public BlockFaceShape getBlockFaceShape(IBlockReader worldIn, BlockPos pos, EnumFacing facing) {
+    public BlockFaceShape getBlockFaceShape(IBlockReader worldIn, BlockPos pos, Direction facing) {
         return null;
     }
 
     @Override
-    public IBlockState updatePostPlacement(EnumFacing face, IBlockState queried, IWorld worldIn, BlockPos currentPos, BlockPos offsetPos) {
+    public BlockState updatePostPlacement(Direction face, BlockState queried, IWorld worldIn, BlockPos currentPos, BlockPos offsetPos) {
         return this;
     }
 
@@ -443,7 +443,7 @@ public class UniqueBlockState implements IBlockState {
     }
 
     @Override
-    public <T extends Comparable<T>, V extends T> IBlockState with(IProperty<T> property, V value) {
+    public <T extends Comparable<T>, V extends T> BlockState with(IProperty<T> property, V value) {
         return this;
     }
 
@@ -453,7 +453,7 @@ public class UniqueBlockState implements IBlockState {
     }
 
     @Override
-    public IBlockState getBlockState() {
+    public BlockState getBlockState() {
         return this;
     }
 }

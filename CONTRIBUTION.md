@@ -52,7 +52,7 @@ Unless your PR is directly related to code cleaning then your PR should not cont
 In general apply common sense to the Code you write. "Effective Java" is also always a good start.
 * Avoid unnecessary `else` clauses.
 * Avoid large case statements as it's likely not needed. If you find yourself requiring a large case statement block then try to think about how you might be able to refactor your code in a way that avoids the requirement. Small case statements are fine.
-    * In most cases this can be avoided by giving the object that's being tested on an abstract method to be overridden. For example, give Item and Block objects a method called `getGuiElement(EntityPlayer, int, int ,int)` and call it in `GuiProxy` instead of using a case statement.
+    * In most cases this can be avoided by giving the object that's being tested on an abstract method to be overridden. For example, give Item and Block objects a method called `getGuiElement(ClientPlayerEntity, int, int ,int)` and call it in `GuiProxy` instead of using a case statement.
     * The other approach would be using a `Map<SomePropertyOfMyObject, Consumer<MyObject>>` and setup all different cases as lambdas where the parameter is the object being tested.
 * Prefix Interfaces with `I` - like `ITemplate`.
 * `@SupressWarnings("...")` should be avoided in General:

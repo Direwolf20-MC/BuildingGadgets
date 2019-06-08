@@ -1,11 +1,11 @@
 package com.direwolf20.buildinggadgets.common.blocks.Models;
 
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.model.*;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -29,13 +29,13 @@ public class ConstructionBakedModel implements IBakedModel {
         }
     }
 
-    private IBakedModel getModel(@Nonnull IBlockState state) {
+    private IBakedModel getModel(@Nonnull BlockState state) {
         initTextures();
         return Minecraft.getInstance().getBlockRendererDispatcher().getBlockModelShapes().getModel(state);
     }
 
     @Override
-    public List<BakedQuad> getQuads(@Nullable IBlockState state, @Nullable EnumFacing side, Random rand) {
+    public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, Random rand) {
 //        IExtendedBlockState extendedBlockState = (IExtendedBlockState) state;
 //        if (extendedBlockState == null)
             return Collections.emptyList();
@@ -43,14 +43,14 @@ public class ConstructionBakedModel implements IBakedModel {
 //       @fixme: Reimplement
 //
 //        //ConstructionID facadeId = extendedBlockState.getValue(ConstructionBlock.FACADEID);
-//        IBlockState facadeState = extendedBlockState.getValue(ConstructionBlock.FACADE_ID);
-//        IBlockState extFacadeState = extendedBlockState.getValue(ConstructionBlock.FACADE_EXT_STATE);
+//        BlockState facadeState = extendedBlockState.getValue(ConstructionBlock.FACADE_ID);
+//        BlockState extFacadeState = extendedBlockState.getValue(ConstructionBlock.FACADE_EXT_STATE);
 //        IBakedModel model;
 //        if (facadeState == null) {
 //            return blankConstructionModel.getQuads(state, side, rand);
 //        }
 //
-//        //IBlockState facadeState = facadeId.getBlockState();
+//        //BlockState facadeState = facadeId.getBlockState();
 //
 //        BlockRenderLayer layer = MinecraftForgeClient.getRenderLayer();
 //
@@ -98,13 +98,13 @@ public class ConstructionBakedModel implements IBakedModel {
     }
 
     /*@Override //This is causing darkness on stairs, and I have no idea why.
-    public boolean isAmbientOcclusion(IBlockState state) {
+    public boolean isAmbientOcclusion(BlockState state) {
         IExtendedBlockState extendedBlockState = (IExtendedBlockState) state;
         ConstructionID facadeId = extendedBlockState.getValue(ConstructionBlock.FACADEID);
         if (facadeId == null) {
             return true;
         }
-        IBlockState facadeState = facadeId.getBlockState();
+        BlockState facadeState = facadeId.getBlockState();
         return facadeState.getBlock().isOpaqueCube(facadeState);
     }*/
 }

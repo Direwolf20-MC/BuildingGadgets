@@ -9,7 +9,7 @@ import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.Multiset.Entry;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
@@ -88,7 +88,7 @@ public class PacketSetRemoteInventoryCache {
     public static class Handler {
         public static void handle(final PacketSetRemoteInventoryCache msg, Supplier<Context> ctx) {
             ctx.get().enqueueWork(() -> {
-                EntityPlayerMP player = ctx.get().getSender();
+                ServerPlayerEntity player = ctx.get().getSender();
                 if (player != null) {
                     Set<UniqueItem> itemTypes = new HashSet<>();
                     ImmutableMultiset.Builder<UniqueItem> builder = ImmutableMultiset.builder();

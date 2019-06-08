@@ -2,7 +2,7 @@ package com.direwolf20.buildinggadgets.common.items.capability;
 
 import com.direwolf20.buildinggadgets.common.config.Config;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
@@ -23,7 +23,7 @@ public class CapabilityProviderEnergy implements ICapabilityProvider {
 
     @Nonnull
     @Override
-    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable EnumFacing side) {
+    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
         return cap == CapabilityEnergy.ENERGY && Config.GADGETS.poweredByFE.get() ? energyCapability.cast() : LazyOptional.empty();
     }
 

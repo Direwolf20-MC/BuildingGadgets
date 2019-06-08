@@ -1,11 +1,11 @@
 package com.direwolf20.buildinggadgets.api.building;
 
 import com.direwolf20.buildinggadgets.api.capability.CapabilityBlockProvider;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.client.resources.I18n;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -21,7 +21,7 @@ public interface IBuildingMode {
     /**
      * Iterator that supplies raw coordinates that haven't been filtered yet.
      */
-    IPositionPlacementSequence computeCoordinates(EntityPlayer player, BlockPos hit, EnumFacing sideHit, ItemStack tool);
+    IPositionPlacementSequence computeCoordinates(ClientPlayerEntity player, BlockPos hit, Direction sideHit, ItemStack tool);
 
     /**
      * <p>Get the the block provider that can be accessed by using ItemStack capability system.</p>
@@ -31,12 +31,12 @@ public interface IBuildingMode {
         return capability.orElse(CapabilityBlockProvider.getDefaultAirProvider());
     }
 
-    BiPredicate<BlockPos, IBlockState> createValidatorFor(World world, ItemStack tool, EntityPlayer player, BlockPos initial);
+    BiPredicate<BlockPos, BlockState> createValidatorFor(World world, ItemStack tool, ClientPlayerEntity player, BlockPos initial);
 
     /**
      * @see Context#getPositionSequence()
      */
-    default Context createExecutionContext(EntityPlayer player, BlockPos hit, EnumFacing sideHit, ItemStack tool) {
+    default Context createExecutionContext(ClientPlayerEntity player, BlockPos hit, Direction sideHit, ItemStack tool) {
         return new Context(computeCoordinates(player, hit, sideHit, tool), getBlockProvider(tool), this::createValidatorFor);
     }
 

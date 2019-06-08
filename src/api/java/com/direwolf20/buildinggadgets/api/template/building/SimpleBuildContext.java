@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.api.template.building;
 
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.world.IWorld;
 
 import javax.annotation.Nonnull;
@@ -34,9 +34,9 @@ public final class SimpleBuildContext implements IBuildContext {
     @Nullable
     private final IWorld world;
     @Nullable
-    private final EntityPlayer buildingPlayer;
+    private final ClientPlayerEntity buildingPlayer;
 
-    private SimpleBuildContext(@Nullable IWorld world, @Nullable EntityPlayer buildingPlayer) {
+    private SimpleBuildContext(@Nullable IWorld world, @Nullable ClientPlayerEntity buildingPlayer) {
         this.world = world;
         this.buildingPlayer = buildingPlayer;
     }
@@ -50,11 +50,11 @@ public final class SimpleBuildContext implements IBuildContext {
     }
 
     /**
-     * @return The {@link EntityPlayer} performing the build. May be null if unknown.
+     * @return The {@link ClientPlayerEntity} performing the build. May be null if unknown.
      */
     @Nullable
     @Override
-    public EntityPlayer getBuildingPlayer() {
+    public ClientPlayerEntity getBuildingPlayer() {
         return buildingPlayer;
     }
 
@@ -65,7 +65,7 @@ public final class SimpleBuildContext implements IBuildContext {
         @Nonnull
         private IWorld world;
         @Nullable
-        private EntityPlayer buildingPlayer;
+        private ClientPlayerEntity buildingPlayer;
 
         private Builder() {
             this.world = null;
@@ -84,12 +84,12 @@ public final class SimpleBuildContext implements IBuildContext {
         }
 
         /**
-         * Sets the {@link EntityPlayer} of the resulting {@link SimpleBuildContext}.
-         * @param buildingPlayer The {@link EntityPlayer} of the resulting {@link SimpleBuildContext}.
+         * Sets the {@link ClientPlayerEntity} of the resulting {@link SimpleBuildContext}.
+         * @param buildingPlayer The {@link ClientPlayerEntity} of the resulting {@link SimpleBuildContext}.
          * @return The {@code Builder} itself
          * @see SimpleBuildContext#getBuildingPlayer()
          */
-        public Builder buildingPlayer(@Nullable EntityPlayer buildingPlayer) {
+        public Builder buildingPlayer(@Nullable ClientPlayerEntity buildingPlayer) {
             this.buildingPlayer = buildingPlayer;
             return this;
         }

@@ -4,8 +4,8 @@ import com.direwolf20.buildinggadgets.api.building.IPositionPlacementSequence;
 import com.direwolf20.buildinggadgets.api.building.Region;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumFacing.AxisDirection;
+import net.minecraft.util.Direction;
+import net.minecraft.util.Direction.AxisDirection;
 import net.minecraft.util.math.BlockPos;
 
 import javax.annotation.Nonnull;
@@ -28,7 +28,7 @@ public final class Wall implements IPositionPlacementSequence {
      * @param side   front face of the wall
      * @param radius radius of the wall
      */
-    public static Wall clickedSide(BlockPos center, EnumFacing side, int radius) {
+    public static Wall clickedSide(BlockPos center, Direction side, int radius) {
         return new Wall(center, side, radius, null, 0);
     }
 
@@ -41,7 +41,7 @@ public final class Wall implements IPositionPlacementSequence {
      * @param radius    radius of the wall.
      * @param extra     amount of blocks to add beyond the radius
      */
-    public static Wall extendingFrom(BlockPos posHit, EnumFacing extension, EnumFacing flatSide, int radius, int extra) {
+    public static Wall extendingFrom(BlockPos posHit, Direction extension, Direction flatSide, int radius, int extra) {
         Preconditions.checkArgument(extension != flatSide, "Cannot have a wall extending to " + extension + " and flat at " + flatSide);
         return new Wall(posHit.offset(extension, radius + 1), flatSide, radius, extension, extra);
     }
@@ -49,7 +49,7 @@ public final class Wall implements IPositionPlacementSequence {
     private final Region region;
 
     @VisibleForTesting
-    private Wall(BlockPos posHit, EnumFacing side, int radius, @Nullable EnumFacing extendingSide, int extendingSize) {
+    private Wall(BlockPos posHit, Direction side, int radius, @Nullable Direction extendingSide, int extendingSize) {
         Region createdRegion = new Region(posHit).expand(
                 radius * (1 - Math.abs(side.getXOffset())),
                 radius * (1 - Math.abs(side.getYOffset())),

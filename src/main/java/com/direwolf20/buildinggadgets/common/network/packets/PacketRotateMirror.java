@@ -2,7 +2,7 @@ package com.direwolf20.buildinggadgets.common.network.packets;
 
 import com.direwolf20.buildinggadgets.common.items.gadgets.*;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;
@@ -38,7 +38,7 @@ public class PacketRotateMirror {
     public static class Handler {
         public static void handle(final PacketRotateMirror msg, Supplier<NetworkEvent.Context> ctx) {
             ctx.get().enqueueWork(() -> {
-                EntityPlayerMP player = ctx.get().getSender();
+                ServerPlayerEntity player = ctx.get().getSender();
                 if (player == null)
                     return;
 

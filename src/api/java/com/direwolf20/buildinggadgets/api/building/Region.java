@@ -4,7 +4,7 @@ import com.direwolf20.buildinggadgets.api.util.CommonUtils;
 import com.direwolf20.buildinggadgets.api.util.SpliteratorBackedPeekingIterator;
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.PeekingIterator;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 
@@ -27,7 +27,7 @@ public final class Region implements IPositionPlacementSequence, Serializable {
     public static final String KEY_MAX_Y = "maxY";
     public static final String KEY_MAX_Z = "maxZ";
 
-    public static Region deserializeFrom(NBTTagCompound tag) {
+    public static Region deserializeFrom(CompoundNBT tag) {
         return new Region(
                 tag.getInt(KEY_MIN_X),
                 tag.getInt(KEY_MIN_Y),
@@ -371,17 +371,17 @@ public final class Region implements IPositionPlacementSequence, Serializable {
         return Objects.hash(minX, minY, minZ, maxX, maxY, maxZ);
     }
 
-    public NBTTagCompound serialize() {
-        return serializeTo(new NBTTagCompound());
+    public CompoundNBT serialize() {
+        return serializeTo(new CompoundNBT());
     }
 
-    public NBTTagCompound serializeTo(NBTTagCompound tag) {
-        tag.setInt(KEY_MIN_X, minX);
-        tag.setInt(KEY_MIN_Y, minY);
-        tag.setInt(KEY_MIN_Z, minZ);
-        tag.setInt(KEY_MAX_X, maxX);
-        tag.setInt(KEY_MAX_Y, maxY);
-        tag.setInt(KEY_MAX_Z, maxZ);
+    public CompoundNBT serializeTo(CompoundNBT tag) {
+        tag.putInt(KEY_MIN_X, minX);
+        tag.putInt(KEY_MIN_Y, minY);
+        tag.putInt(KEY_MIN_Z, minZ);
+        tag.putInt(KEY_MAX_X, maxX);
+        tag.putInt(KEY_MAX_Y, maxY);
+        tag.putInt(KEY_MAX_Z, maxZ);
         return tag;
     }
 

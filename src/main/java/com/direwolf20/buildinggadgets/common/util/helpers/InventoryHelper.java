@@ -11,15 +11,15 @@ import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.google.common.collect.ImmutableSet;
 import net.minecraft.block.*;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.block.BlockState;
+import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.state.EnumProperty;
 import net.minecraft.state.IProperty;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
@@ -34,7 +34,7 @@ import java.util.*;
  *  This entire class could do with some refactoring and cleaning :grin:
  */
 public class InventoryHelper {
-    private static IProperty AXIS = EnumProperty.create("axis", EnumFacing.Axis.class);
+    private static IProperty AXIS = EnumProperty.create("axis", Direction.Axis.class);
 
     private static final Set<IProperty> SAFE_PROPERTIES =
             ImmutableSet.of(BlockSlab.TYPE, BlockStairs.HALF, BlockLog.AXIS, AXIS, BlockDirectional.FACING, BlockStairs.FACING, BlockTrapDoor.HALF, BlockStairs.SHAPE, BlockLever.POWERED, BlockRedstoneRepeater.DELAY);
@@ -42,7 +42,7 @@ public class InventoryHelper {
     private static final Set<IProperty> SAFE_PROPERTIES_COPY_PASTE =
             ImmutableSet.<IProperty>builder().addAll(SAFE_PROPERTIES).addAll(ImmutableSet.of(BlockRail.SHAPE, BlockRailPowered.SHAPE)).build();
 
-    public static boolean giveItem(ItemStack itemStack, EntityPlayer player, IWorld world) {
+    public static boolean giveItem(ItemStack itemStack, ClientPlayerEntity player, IWorld world) {
         if (player.isCreative()) {
             return true;
         }
@@ -103,7 +103,7 @@ public class InventoryHelper {
         return inv.addItemStackToInventory(giveItemStack);
     }
 
-    public static boolean useItem(ItemStack itemStack, EntityPlayer player, int count, World world) {
+    public static boolean useItem(ItemStack itemStack, ClientPlayerEntity player, int count, World world) {
         if (player.isCreative()) {
             return true;
         }
@@ -153,14 +153,14 @@ public class InventoryHelper {
         int countItem(ItemStack tool, ItemStack stack);
     }
 
-    public static int countItem(ItemStack itemStack, EntityPlayer player, World world) {
+    public static int countItem(ItemStack itemStack, ClientPlayerEntity player, World world) {
         return countItem(itemStack, player, (tool, stack) -> {
             IItemHandler remoteInventory = GadgetUtils.getRemoteInventory(tool, world);
             return remoteInventory == null ? 0 : countInContainer(remoteInventory, stack.getItem());
         });
     }
 
-    public static int countItem(ItemStack itemStack, EntityPlayer player, IRemoteInventoryProvider remoteInventory) {
+    public static int countItem(ItemStack itemStack, ClientPlayerEntity player, IRemoteInventoryProvider remoteInventory) {
         if (player.isCreative())
             return Integer.MAX_VALUE;
 
@@ -184,7 +184,7 @@ public class InventoryHelper {
         return longToInt(count);
     }
 
-    public static int countPaste(EntityPlayer player) {
+    public static int countPaste(ClientPlayerEntity player) {
         if (player.isCreative())
             return Integer.MAX_VALUE;
 
@@ -220,7 +220,7 @@ public class InventoryHelper {
         }
     }
 
-    public static ItemStack addPasteToContainer(EntityPlayer player, ItemStack itemStack) {
+    public static ItemStack addPasteToContainer(ClientPlayerEntity player, ItemStack itemStack) {
         if (!(itemStack.getItem() instanceof ConstructionPaste)) {
             return itemStack;
         }
@@ -257,7 +257,7 @@ public class InventoryHelper {
         return itemStack;
     }
 
-    public static boolean usePaste(EntityPlayer player, int count) {
+    public static boolean usePaste(ClientPlayerEntity player, int count) {
         if (player.isCreative()) {
             return true;
         }
@@ -335,18 +335,18 @@ public class InventoryHelper {
         return slots;
     }
 
-    public static ItemStack getSilkTouchDrop(IBlockState state) {
+    public static ItemStack getSilkTouchDrop(BlockState state) {
         return new ItemStack(state.getBlock());
     }
 
-    public static IBlockState getSpecificStates(IBlockState originalState, World world, EntityPlayer player, BlockPos pos, ItemStack tool) {
-        IBlockState placeState;
+    public static BlockState getSpecificStates(BlockState originalState, World world, ClientPlayerEntity player, BlockPos pos, ItemStack tool) {
+        BlockState placeState;
         Block block = originalState.getBlock();
         ItemStack item = block.getPickBlock(originalState, null, world, pos, player);
 
         try {
             placeState = originalState.getBlock().getStateForPlacement(
-                    new BlockItemUseContext(world, player, item, pos, EnumFacing.UP, 0.5F, 0.0F, 0.5F)
+                    new BlockItemUseContext(world, player, item, pos, Direction.UP, 0.5F, 0.0F, 0.5F)
                                                                       );
         } catch (Exception var8) {
             placeState = originalState.getBlock().getDefaultState();
@@ -367,7 +367,7 @@ public class InventoryHelper {
 
     }
 
-    public static NonNullList<ItemStack> getInventory(EntityPlayer player) {
+    public static NonNullList<ItemStack> getInventory(ClientPlayerEntity player) {
         IOrderedRegistry<IStackProvider> providers = Registries.getStackProviders();
         NonNullList<ItemStack> toProcess = playerInv(player);
         NonNullList<ItemStack> newStacks = NonNullList.create();
@@ -385,7 +385,7 @@ public class InventoryHelper {
         return results;
     }
 
-    private static NonNullList<ItemStack> playerInv(EntityPlayer player) {
+    private static NonNullList<ItemStack> playerInv(ClientPlayerEntity player) {
         NonNullList<ItemStack> wholeInv = NonNullList.from(ItemStack.EMPTY, (ItemStack[]) player.inventory.mainInventory.toArray());
         wholeInv.addAll(player.inventory.offHandInventory);
         wholeInv.addAll(player.inventory.armorInventory);

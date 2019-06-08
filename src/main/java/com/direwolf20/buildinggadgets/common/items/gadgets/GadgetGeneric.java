@@ -11,12 +11,12 @@ import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
 import com.direwolf20.buildinggadgets.common.util.lang.Styles;
 import com.direwolf20.buildinggadgets.common.util.lang.TooltipTranslation;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.init.Items;
 import net.minecraft.item.IItemPropertyGetter;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.ITextComponent;
@@ -53,7 +53,7 @@ public abstract class GadgetGeneric extends Item {
 
     @Override
     @Nullable
-    public ICapabilityProvider initCapabilities(ItemStack stack, @Nullable NBTTagCompound tag) {
+    public ICapabilityProvider initCapabilities(ItemStack stack, @Nullable CompoundNBT tag) {
         return new MultiCapabilityProvider(new CapabilityProviderEnergy(stack, this::getEnergyMax), new CapabilityProviderBlockProvider(stack));
     }
 
@@ -107,7 +107,7 @@ public abstract class GadgetGeneric extends Item {
         return !EnergyUtil.hasCap(toRepair) && repair.getItem() == Items.DIAMOND;
     }
 
-    public static ItemStack getGadget(EntityPlayer player) {
+    public static ItemStack getGadget(ClientPlayerEntity player) {
         ItemStack heldItem = player.getHeldItemMainhand();
         if (!(heldItem.getItem() instanceof GadgetGeneric)) {
             heldItem = player.getHeldItemOffhand();
@@ -118,7 +118,7 @@ public abstract class GadgetGeneric extends Item {
         return heldItem;
     }
 
-    public boolean canUse(ItemStack tool, EntityPlayer player) {
+    public boolean canUse(ItemStack tool, ClientPlayerEntity player) {
         if (player.isCreative())
             return true;
 
@@ -129,7 +129,7 @@ public abstract class GadgetGeneric extends Item {
         return tool.getDamage() < tool.getMaxDamage() || tool.getStack().isDamageable();
     }
 
-    public void applyDamage(ItemStack tool, EntityPlayer player) {
+    public void applyDamage(ItemStack tool, ClientPlayerEntity player) {
         if (poweredByFE()) {
             IEnergyStorage energy = EnergyUtil.getCap(tool).orElseThrow(CapabilityNotPresentException::new);
             energy.extractEnergy(getEnergyCost(tool), false);
@@ -150,7 +150,7 @@ public abstract class GadgetGeneric extends Item {
         return NBTHelper.getOrNewTag(stack).getBoolean(NBTKeys.GADGET_FUZZY);
     }
 
-    public static void toggleFuzzy(EntityPlayer player, ItemStack stack) {
+    public static void toggleFuzzy(ClientPlayerEntity player, ItemStack stack) {
         NBTHelper.getOrNewTag(stack).setBoolean(NBTKeys.GADGET_FUZZY, !getFuzzy(stack));
         player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.fuzzymode").getUnformattedComponentText() + ": " + getFuzzy(stack)), true);
     }
@@ -159,7 +159,7 @@ public abstract class GadgetGeneric extends Item {
         return !NBTHelper.getOrNewTag(stack).getBoolean(NBTKeys.GADGET_UNCONNECTED_AREA);
     }
 
-    public static void toggleConnectedArea(EntityPlayer player, ItemStack stack) {
+    public static void toggleConnectedArea(ClientPlayerEntity player, ItemStack stack) {
         NBTHelper.getOrNewTag(stack).setBoolean(NBTKeys.GADGET_UNCONNECTED_AREA, getConnectedArea(stack));
         String suffix = stack.getItem() instanceof GadgetDestruction ? "area" : "surface";
         player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.connected" + suffix).getUnformattedComponentText() + ": " + getConnectedArea(stack)), true);
@@ -169,7 +169,7 @@ public abstract class GadgetGeneric extends Item {
         return NBTHelper.getOrNewTag(stack).getBoolean(NBTKeys.GADGET_RAYTRACE_FLUID);
     }
 
-    public static void toggleRayTraceFluid(EntityPlayer player, ItemStack stack) {
+    public static void toggleRayTraceFluid(ClientPlayerEntity player, ItemStack stack) {
         NBTHelper.getOrNewTag(stack).setBoolean(NBTKeys.GADGET_RAYTRACE_FLUID, !shouldRayTraceFluid(stack));
         player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.raytrace_fluid").getUnformattedComponentText() + ": " + shouldRayTraceFluid(stack)), true);
     }

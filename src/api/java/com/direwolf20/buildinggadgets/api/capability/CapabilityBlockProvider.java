@@ -2,10 +2,10 @@ package com.direwolf20.buildinggadgets.api.capability;
 
 import com.direwolf20.buildinggadgets.api.building.IBlockProvider;
 import com.direwolf20.buildinggadgets.api.building.SingleTypeProvider;
-import net.minecraft.init.Blocks;
-import net.minecraft.nbt.INBTBase;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.block.Blocks;
+import net.minecraft.nbt.INBT;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.util.Direction;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.Capability.IStorage;
 import net.minecraftforge.common.capabilities.CapabilityInject;
@@ -31,13 +31,13 @@ public final class CapabilityBlockProvider {
         CapabilityManager.INSTANCE.register(IBlockProvider.class, new IStorage<IBlockProvider>() {
 
             @Override
-            public void readNBT(Capability<IBlockProvider> capability, IBlockProvider instance, EnumFacing side, INBTBase nbt) {
-                instance.deserialize((NBTTagCompound)nbt);
+            public void readNBT(Capability<IBlockProvider> capability, IBlockProvider instance, Direction side, INBT nbt) {
+                instance.deserialize((CompoundNBT)nbt);
             }
 
             @Nonnull
             @Override
-            public INBTBase writeNBT(Capability<IBlockProvider> capability, IBlockProvider provider, EnumFacing facing) {
+            public INBT writeNBT(Capability<IBlockProvider> capability, IBlockProvider provider, Direction facing) {
                 return provider.serialize();
             }
         }, () -> DEFAULT_AIR_PROVIDER);

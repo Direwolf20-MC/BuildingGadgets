@@ -17,14 +17,14 @@ import com.direwolf20.buildinggadgets.common.util.tools.ToolRenders;
 import com.direwolf20.buildinggadgets.common.util.tools.UndoState;
 import com.direwolf20.buildinggadgets.common.util.tools.modes.BuildingMode;
 import com.direwolf20.buildinggadgets.common.world.FakeBuilderWorld;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Enchantments;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
@@ -81,12 +81,12 @@ public class GadgetBuilding extends GadgetPlacing implements IAtopPlacingGadget 
 
     private static void setToolMode(ItemStack tool, BuildingMode mode) {
         //Store the tool's mode in NBT as a string
-        NBTTagCompound tagCompound = NBTHelper.getOrNewTag(tool);
+        CompoundNBT tagCompound = NBTHelper.getOrNewTag(tool);
         tagCompound.setString("mode", mode.getRegistryName());
     }
 
     public static BuildingMode getToolMode(ItemStack tool) {
-        NBTTagCompound tagCompound = NBTHelper.getOrNewTag(tool);
+        CompoundNBT tagCompound = NBTHelper.getOrNewTag(tool);
         return BuildingMode.byName(tagCompound.getString("mode"));
     }
 
@@ -94,7 +94,7 @@ public class GadgetBuilding extends GadgetPlacing implements IAtopPlacingGadget 
         return !NBTHelper.getOrNewTag(stack).getBoolean(NBTKeys.GADGET_PLACE_INSIDE);
     }
 
-    public static void togglePlaceAtop(EntityPlayer player, ItemStack stack) {
+    public static void togglePlaceAtop(ClientPlayerEntity player, ItemStack stack) {
         NBTHelper.getOrNewTag(stack).setBoolean(NBTKeys.GADGET_PLACE_INSIDE, shouldPlaceAtop(stack));
         String prefix = "message.gadget.building.placement";
         player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation(prefix, new TextComponentTranslation(prefix + (shouldPlaceAtop(stack) ? ".atop" : ".inside"))).getUnformattedComponentText()), true);
@@ -130,10 +130,10 @@ public class GadgetBuilding extends GadgetPlacing implements IAtopPlacingGadget 
     }
 
     @Override
-    public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
+    public ActionResult<ItemStack> onItemRightClick(World world, ClientPlayerEntity player, Hand hand) {
         //On item use, if sneaking, select the block clicked on, else build -- This is called when you right click a tool NOT on a block.
         ItemStack itemstack = player.getHeldItem(hand);
-        /*NBTTagCompound tagCompound = itemstack.getTag();
+        /*CompoundNBT tagCompound = itemstack.getTag();
         ByteBuf buf = Unpooled.buffer(16);
         ByteBufUtils.writeTag(buf,tagCompound);
         System.out.println(buf.readableBytes());*/
@@ -150,18 +150,18 @@ public class GadgetBuilding extends GadgetPlacing implements IAtopPlacingGadget 
         return new ActionResult<>(EnumActionResult.SUCCESS, itemstack);
     }
 
-    public void toggleMode(EntityPlayer player, ItemStack heldItem) {//TODO unused
+    public void toggleMode(ClientPlayerEntity player, ItemStack heldItem) {//TODO unused
         setMode(player, heldItem, getToolMode(heldItem).next().ordinal());
     }
 
-    public void setMode(EntityPlayer player, ItemStack heldItem, int modeInt) {
+    public void setMode(ClientPlayerEntity player, ItemStack heldItem, int modeInt) {
         //Called when we specify a mode with the radial menu
         BuildingMode mode = BuildingMode.values()[modeInt];
         setToolMode(heldItem, mode);
         player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.toolmode").getUnformattedComponentText() + ": " + mode), true);
     }
 
-    public static void rangeChange(EntityPlayer player, ItemStack heldItem) {
+    public static void rangeChange(ClientPlayerEntity player, ItemStack heldItem) {
         //Called when the range change hotkey is pressed
         int range = getToolRange(heldItem);
         int changeAmount = (getToolMode(heldItem) != BuildingMode.SURFACE || (range % 2 == 0)) ? 1 : 2;
@@ -174,7 +174,7 @@ public class GadgetBuilding extends GadgetPlacing implements IAtopPlacingGadget 
         player.sendStatusMessage(new TextComponentString(TextFormatting.DARK_AQUA + new TextComponentTranslation("message.gadget.toolrange").getUnformattedComponentText() + ": " + range), true);
     }
 
-    private boolean build(EntityPlayer player, ItemStack stack) {
+    private boolean build(ClientPlayerEntity player, ItemStack stack) {
         //Build the blocks as shown in the visual render
         World world = player.world;
         List<BlockPos> coords = getAnchor(stack);
@@ -185,7 +185,7 @@ public class GadgetBuilding extends GadgetPlacing implements IAtopPlacingGadget 
                 return false;
             }
             BlockPos startBlock = lookingAt.getBlockPos();
-            EnumFacing sideHit = lookingAt.sideHit;
+            Direction sideHit = lookingAt.sideHit;
             coords = BuildingMode.collectPlacementPos(world, player, startBlock, sideHit, stack, startBlock);
         } else { //If we do have an anchor, erase it (Even if the build fails)
             setAnchor(stack, new ArrayList<BlockPos>());
@@ -197,10 +197,10 @@ public class GadgetBuilding extends GadgetPlacing implements IAtopPlacingGadget 
         if (heldItem.isEmpty())
             return false;
 
-        IBlockState blockState = getToolBlock(heldItem);
+        BlockState blockState = getToolBlock(heldItem);
 
         if (blockState != Blocks.AIR.getDefaultState()) { //Don't attempt a build if a block is not chosen -- Typically only happens on a new tool.
-            IBlockState state = Blocks.AIR.getDefaultState(); //Initialize a new State Variable for use in the fake world
+            BlockState state = Blocks.AIR.getDefaultState(); //Initialize a new State Variable for use in the fake world
             fakeWorld.setWorldAndState(player.world, blockState, coordinates); // Initialize the fake world's blocks
             for (BlockPos coordinate : coords) {
                 if (fakeWorld.getWorldType() != WorldType.DEBUG_ALL_BLOCK_STATES) {
@@ -227,7 +227,7 @@ public class GadgetBuilding extends GadgetPlacing implements IAtopPlacingGadget 
         return true;
     }
 
-    public static boolean undoBuild(EntityPlayer player) {
+    public static boolean undoBuild(ClientPlayerEntity player) {
         ItemStack heldItem = getGadget(player);
         if (heldItem.isEmpty())
             return false;
@@ -239,7 +239,7 @@ public class GadgetBuilding extends GadgetPlacing implements IAtopPlacingGadget 
         }
         World world = player.world;
         if (!world.isRemote) {
-            IBlockState currentBlock = Blocks.AIR.getDefaultState();
+            BlockState currentBlock = Blocks.AIR.getDefaultState();
             List<BlockPos> undoCoords = undoState.coordinates; //Get the Coords to undo
 
             List<BlockPos> failedRemovals = new ArrayList<BlockPos>(); //Build a list of removals that fail
@@ -272,7 +272,7 @@ public class GadgetBuilding extends GadgetPlacing implements IAtopPlacingGadget 
         return true;
     }
 
-    private boolean placeBlock(World world, EntityPlayer player, BlockPos pos, IBlockState setBlock) {
+    private boolean placeBlock(World world, ClientPlayerEntity player, BlockPos pos, BlockState setBlock) {
         if (!player.isAllowEdit())
             return false;
 
@@ -307,7 +307,7 @@ public class GadgetBuilding extends GadgetPlacing implements IAtopPlacingGadget 
             return false;
         }
         BlockSnapshot blockSnapshot = BlockSnapshot.getBlockSnapshot(world, pos);
-        if (ForgeEventFactory.onBlockPlace(player, blockSnapshot, EnumFacing.UP)) {
+        if (ForgeEventFactory.onBlockPlace(player, blockSnapshot, Direction.UP)) {
             return false;
         }
         ItemStack constructionPaste = new ItemStack(BGItems.constructionPaste);
@@ -339,7 +339,7 @@ public class GadgetBuilding extends GadgetPlacing implements IAtopPlacingGadget 
         return false;
     }
 
-    public static ItemStack getGadget(EntityPlayer player) {
+    public static ItemStack getGadget(ClientPlayerEntity player) {
         ItemStack stack = GadgetGeneric.getGadget(player);
         if (!(stack.getItem() instanceof GadgetBuilding))
             return ItemStack.EMPTY;

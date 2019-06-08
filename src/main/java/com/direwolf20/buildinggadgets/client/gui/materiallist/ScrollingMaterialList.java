@@ -9,7 +9,7 @@ import com.google.common.collect.Multiset;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiListExtended;
 import net.minecraft.client.renderer.*;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
@@ -49,7 +49,7 @@ class ScrollingMaterialList extends GuiEntryList<Entry> {
         this.setSortingMode(SortingModes.NAME);
         this.selectedElement = -1;
 
-        EntityPlayer player = Minecraft.getInstance().player;
+        ClientPlayerEntity player = Minecraft.getInstance().player;
         World world = Minecraft.getInstance().world;
         for (Multiset.Entry<UniqueItem> entry : materials.entrySet()) {
             UniqueItem item = entry.getElement();

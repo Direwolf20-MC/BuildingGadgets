@@ -4,8 +4,8 @@ import com.direwolf20.buildinggadgets.api.building.IPositionPlacementSequence;
 import com.direwolf20.buildinggadgets.api.building.Region;
 import com.direwolf20.buildinggadgets.api.util.MathUtils;
 import com.google.common.annotations.VisibleForTesting;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumFacing.Axis;
+import net.minecraft.util.Direction;
+import net.minecraft.util.Direction.Axis;
 import net.minecraft.util.math.BlockPos;
 
 import javax.annotation.Nonnull;
@@ -27,7 +27,7 @@ public final class Column implements IPositionPlacementSequence {
      * @param range length of the column
      * @implSpec this sequence includes the source position
      */
-    public static Column extendFrom(BlockPos hit, EnumFacing side, int range) {
+    public static Column extendFrom(BlockPos hit, Direction side, int range) {
         return new Column(hit, hit.offset(side, range - 1));
     }
 
@@ -39,8 +39,8 @@ public final class Column implements IPositionPlacementSequence {
      * @param length length of the column, will be floored to an odd number if it is not one already
      */
     public static Column centerAt(BlockPos center, Axis axis, int length) {
-        EnumFacing positive = EnumFacing.getFacingFromAxis(EnumFacing.AxisDirection.POSITIVE, axis);
-        EnumFacing negative = positive.getOpposite();
+        Direction positive = Direction.getFacingFromAxis(Direction.AxisDirection.POSITIVE, axis);
+        Direction negative = positive.getOpposite();
         BlockPos base = center.offset(negative, (length - 1) / 2);
         // -1 because Region's vertexes are inclusive
         return new Column(base, base.offset(positive, MathUtils.floorToOdd(length) - 1));

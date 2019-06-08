@@ -5,7 +5,7 @@ import com.direwolf20.buildinggadgets.api.building.Region;
 import com.direwolf20.buildinggadgets.api.util.MathUtils;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.AbstractIterator;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 
 import javax.annotation.Nonnull;
@@ -28,7 +28,7 @@ public final class Grid implements IPositionPlacementSequence {
 
     @VisibleForTesting
     private Grid(BlockPos center, int range, int periodSize) {
-        this.region = Wall.clickedSide(center, EnumFacing.UP, range).getBoundingBox();
+        this.region = Wall.clickedSide(center, Direction.UP, range).getBoundingBox();
         this.range = range;
         this.center = center;
         this.periodSize = periodSize;

@@ -8,13 +8,13 @@ import com.direwolf20.buildinggadgets.common.util.lang.TooltipTranslation;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.world.WorldSave;
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.Hand;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.World;
 
@@ -36,9 +36,9 @@ public class Template extends Item implements ITemplate {
     @Override
     @Nullable
     public String getUUID(ItemStack stack) {
-        NBTTagCompound tagCompound = stack.getTag();
+        CompoundNBT tagCompound = stack.getTag();
         if (tagCompound == null) {
-            tagCompound = new NBTTagCompound();
+            tagCompound = new CompoundNBT();
         }
         String uuid = tagCompound.getString(NBTKeys.TEMPLATE_UUID);
         if (uuid.isEmpty()) {
@@ -67,7 +67,7 @@ public class Template extends Item implements ITemplate {
     }
 
     @Override
-    public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
+    public ActionResult<ItemStack> onItemRightClick(World world, ClientPlayerEntity player, Hand hand) {
         if (world.isRemote)
             GuiMod.MATERIAL_LIST.openScreen(player);
         ItemStack itemstack = player.getHeldItem(hand);

@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.test.building.placementTests;
 
 import com.direwolf20.buildinggadgets.api.building.placement.Stair;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import org.junit.jupiter.api.RepeatedTest;
 
@@ -18,7 +18,7 @@ public class StairTest {
     @RepeatedTest(4)
     void stairShouldContainSameAmountOfBlocksAsSizeParameter() {
         int size = random.nextInt(16);
-        Stair stair = Stair.create(BlockPos.ORIGIN, EnumFacing.NORTH, EnumFacing.UP, size);
+        Stair stair = Stair.create(BlockPos.ZERO, Direction.NORTH, Direction.UP, size);
 
         assertEquals(size, stair.collect().size());
     }
@@ -26,7 +26,7 @@ public class StairTest {
     @RepeatedTest(4)
     void positionShouldOffsetBy1InBothHorizontalAndVerticalDirectionCaseNorthUp() {
         int size = random.nextInt(16);
-        Stair stair = Stair.create(BlockPos.ORIGIN, EnumFacing.NORTH, EnumFacing.UP, size);
+        Stair stair = Stair.create(BlockPos.ZERO, Direction.NORTH, Direction.UP, size);
         Iterator<BlockPos> it = stair.iterator();
         assertTrue(it.hasNext());
         BlockPos last = it.next();

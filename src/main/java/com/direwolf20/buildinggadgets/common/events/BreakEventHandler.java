@@ -2,7 +2,7 @@ package com.direwolf20.buildinggadgets.common.events;
 
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
 import com.direwolf20.buildinggadgets.common.util.helpers.InventoryHelper;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -16,7 +16,7 @@ public class BreakEventHandler {
     public static void GetDrops(BlockEvent.HarvestDropsEvent event) {
         //If you are holding an exchanger gadget and break a block, put it into your inventory
         //This allows us to use the BreakBlock event on our exchanger, to properly remove blocks from the world.
-        EntityPlayer player = event.getHarvester();
+        ClientPlayerEntity player = event.getHarvester();
         if (player == null)
             return;
 

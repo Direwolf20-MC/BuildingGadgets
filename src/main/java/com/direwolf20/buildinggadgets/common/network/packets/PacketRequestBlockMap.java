@@ -2,8 +2,8 @@ package com.direwolf20.buildinggadgets.common.network.packets;
 
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.world.WorldSave;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.fml.network.NetworkEvent;
@@ -37,10 +37,10 @@ public class PacketRequestBlockMap {
                 return;
 
             ctx.get().enqueueWork(() -> {
-                EntityPlayerMP player = ctx.get().getSender();//TODO incorrect means of getting the player on the client
+                ServerPlayerEntity player = ctx.get().getSender();//TODO incorrect means of getting the player on the client
                 if (player == null) return;
 
-                NBTTagCompound tagCompound = (msg.isTemplate ? WorldSave.getTemplateWorldSave(player.world) : WorldSave.getWorldSave(player.world)).getCompoundFromUUID(msg.UUID);
+                CompoundNBT tagCompound = (msg.isTemplate ? WorldSave.getTemplateWorldSave(player.world) : WorldSave.getWorldSave(player.world)).getCompoundFromUUID(msg.UUID);
                 if (tagCompound != null)
                     PacketHandler.sendTo(new PacketBlockMap(tagCompound), player);
 

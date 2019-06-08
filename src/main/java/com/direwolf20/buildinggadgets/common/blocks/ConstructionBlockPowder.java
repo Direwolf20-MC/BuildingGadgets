@@ -4,11 +4,11 @@ import com.direwolf20.buildinggadgets.common.entities.ConstructionBlockEntity;
 import com.direwolf20.buildinggadgets.common.util.lang.TooltipTranslation;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockFalling;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tags.FluidTags;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
@@ -31,7 +31,7 @@ public class ConstructionBlockPowder extends BlockFalling {
     }
 
     @Override
-    public void onEndFalling(World worldIn, BlockPos pos, IBlockState p_176502_3_, IBlockState p_176502_4_) {
+    public void onEndFalling(World worldIn, BlockPos pos, BlockState p_176502_3_, BlockState p_176502_4_) {
         if (worldIn.getFluidState(pos).isTagged(FluidTags.WATER))
             worldIn.spawnEntity(new ConstructionBlockEntity(worldIn, pos, true));
     }
@@ -39,8 +39,8 @@ public class ConstructionBlockPowder extends BlockFalling {
     private boolean tryTouchWater(IWorld worldIn, BlockPos pos) {
         boolean foundWater = false;
 
-        for (EnumFacing enumfacing : EnumFacing.values()) {
-            if (enumfacing != EnumFacing.DOWN && worldIn.getFluidState(pos.offset(enumfacing)).isTagged(FluidTags.WATER)) {
+        for (Direction enumfacing : Direction.values()) {
+            if (enumfacing != Direction.DOWN && worldIn.getFluidState(pos.offset(enumfacing)).isTagged(FluidTags.WATER)) {
                 foundWater = true;
                 break;
             }
@@ -56,12 +56,12 @@ public class ConstructionBlockPowder extends BlockFalling {
     }
 
     @Override
-    public void neighborChanged(IBlockState state, World world, BlockPos pos, Block block, BlockPos fromPos) {
+    public void neighborChanged(BlockState state, World world, BlockPos pos, Block block, BlockPos fromPos) {
         tryTouchWater(world, pos);
     }
 
     @Override
-    public void onBlockAdded(IBlockState state, World worldIn, BlockPos pos, IBlockState oldState) {
+    public void onBlockAdded(BlockState state, World worldIn, BlockPos pos, BlockState oldState) {
         if (!this.tryTouchWater(worldIn, pos)) {
             super.onBlockAdded(state, worldIn, pos, oldState);
         }
@@ -78,12 +78,12 @@ public class ConstructionBlockPowder extends BlockFalling {
      * @return True if the block is a full cube
      */
     @Override
-    public boolean isNormalCube(IBlockState state, IBlockReader world, BlockPos pos) {
+    public boolean isNormalCube(BlockState state, IBlockReader world, BlockPos pos) {
         return false;
     }
 
     @Override
-    public int getOpacity(IBlockState state, IBlockReader worldIn, BlockPos pos) {
+    public int getOpacity(BlockState state, IBlockReader worldIn, BlockPos pos) {
         return 0;
     }
 

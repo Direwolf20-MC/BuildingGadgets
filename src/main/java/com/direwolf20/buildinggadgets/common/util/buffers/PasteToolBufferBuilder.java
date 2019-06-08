@@ -5,7 +5,7 @@ import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
 import com.direwolf20.buildinggadgets.common.util.blocks.BlockMap;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockRendererDispatcher;
 import net.minecraft.client.renderer.GlStateManager;
@@ -13,10 +13,10 @@ import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.client.renderer.vertex.VertexFormatElement;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -32,7 +32,7 @@ import java.util.Random;
 @OnlyIn(Dist.CLIENT)
 public class PasteToolBufferBuilder {
 
-    private static Map<String, NBTTagCompound> tagMap = new HashMap<String, NBTTagCompound>();
+    private static Map<String, CompoundNBT> tagMap = new HashMap<String, CompoundNBT>();
     private static Map<String, ToolBufferBuilder> bufferMap = new HashMap<String, ToolBufferBuilder>();
 
 
@@ -44,16 +44,16 @@ public class PasteToolBufferBuilder {
     }
 
     public static void clearMaps() {
-        tagMap = new HashMap<String, NBTTagCompound>();
+        tagMap = new HashMap<String, CompoundNBT>();
         bufferMap = new HashMap<String, ToolBufferBuilder>();
     }
 
-    public static void addToMap(String UUID, NBTTagCompound tag) {
+    public static void addToMap(String UUID, CompoundNBT tag) {
         tagMap.put(UUID, tag);
     }
 
     @Nullable
-    public static NBTTagCompound getTagFromUUID(String UUID) {
+    public static CompoundNBT getTagFromUUID(String UUID) {
         if (tagMap.containsKey(UUID)) {
             return tagMap.get(UUID);
         }
@@ -75,7 +75,7 @@ public class PasteToolBufferBuilder {
         ToolBufferBuilder bufferBuilder = new ToolBufferBuilder(2097152);
         bufferBuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
         for (BlockMap blockMap : blockMapList) {
-            IBlockState renderBlockState = blockMap.state;
+            BlockState renderBlockState = blockMap.state;
             if (!(renderBlockState.equals(Blocks.AIR.getDefaultState()))) {
                 IBakedModel model = dispatcher.getModelForState(renderBlockState);
                 dispatcher.getBlockModelRenderer().renderModelFlat(Minecraft.getInstance().world, model, renderBlockState, new BlockPos(blockMap.xOffset, blockMap.yOffset, blockMap.zOffset), bufferBuilder, false, new Random(), 0L);
@@ -86,7 +86,7 @@ public class PasteToolBufferBuilder {
         //System.out.printf("Created %d Vertexes for %d blocks in %.2f ms%n", bufferBuilder.getVertexCount(), blockMapList.size(), (System.nanoTime() - time) * 1e-6);
     }
 
-    public static void draw(EntityPlayer player, double x, double y, double z, BlockPos startPos, String UUID) {
+    public static void draw(ClientPlayerEntity player, double x, double y, double z, BlockPos startPos, String UUID) {
 //        long time = System.nanoTime();
         ToolBufferBuilder bufferBuilder = bufferMap.get(UUID);
         bufferBuilder.sortVertexData((float) (x - startPos.getX()), (float) ((y + player.getEyeHeight()) - startPos.getY()), (float) (z - startPos.getZ()));

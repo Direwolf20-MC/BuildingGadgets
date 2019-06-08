@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.api.building;
 
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.block.BlockState;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.math.BlockPos;
 
 /**
@@ -28,7 +28,7 @@ public interface IBlockProvider<T extends IBlockProvider<T>> {
      * @implSpec the value should remain constant in the whole life of the object
      */
     default BlockPos getTranslation() {
-        return BlockPos.ORIGIN;
+        return BlockPos.ZERO;
     }
 
     /**
@@ -37,18 +37,18 @@ public interface IBlockProvider<T extends IBlockProvider<T>> {
      * @return block that should be placed at the position
      * @implNote In most cases, {@code pos.add(this.getTranslation())} should be sufficient.
      */
-    IBlockState at(BlockPos pos);
+    BlockState at(BlockPos pos);
 
     /**
      * Write the containing data into the given tag.
      */
-    void serialize(NBTTagCompound tag);
+    void serialize(CompoundNBT tag);
 
     /**
-     * @see #serialize(NBTTagCompound) - create a new {@link NBTTagCompound} instead of writing into an existing one.
+     * @see #serialize(CompoundNBT) - create a new {@link CompoundNBT} instead of writing into an existing one.
      */
-    default NBTTagCompound serialize() {
-        NBTTagCompound tag = new NBTTagCompound();
+    default CompoundNBT serialize() {
+        CompoundNBT tag = new CompoundNBT();
         this.serialize(tag);
         return tag;
     }
@@ -58,6 +58,6 @@ public interface IBlockProvider<T extends IBlockProvider<T>> {
      *
      * @implSpec The returning object should have the same type. Neither a child nor a parent.
      */
-    T deserialize(NBTTagCompound tag);
+    T deserialize(CompoundNBT tag);
 
 }

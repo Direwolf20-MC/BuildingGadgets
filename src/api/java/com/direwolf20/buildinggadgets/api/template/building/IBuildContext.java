@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.api.template.building;
 
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.world.IWorld;
 
 import javax.annotation.Nullable;
@@ -16,8 +16,8 @@ public interface IBuildContext {
     IWorld getWorld();
 
     /**
-     * @return The {@link EntityPlayer} who would perform a build. This is optional and therefore may be null.
+     * @return The {@link ClientPlayerEntity} who would perform a build. This is optional and therefore may be null.
      */
     @Nullable
-    EntityPlayer getBuildingPlayer();
+    ClientPlayerEntity getBuildingPlayer();
 }

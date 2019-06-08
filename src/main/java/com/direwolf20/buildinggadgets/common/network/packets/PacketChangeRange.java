@@ -6,7 +6,7 @@ import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetExchanger;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;
@@ -35,7 +35,7 @@ public class PacketChangeRange {
     public static class Handler {
         public static void handle(final PacketChangeRange msg, Supplier<NetworkEvent.Context> ctx) {
             ctx.get().enqueueWork(() -> {
-                EntityPlayerMP player = ctx.get().getSender();
+                ServerPlayerEntity player = ctx.get().getSender();
                 if (player == null)
                     return;
 

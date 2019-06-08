@@ -5,9 +5,9 @@ import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.world.WorldSave;
 import com.google.common.collect.Multiset;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -17,7 +17,7 @@ import javax.annotation.Nullable;
 
 public interface ITemplate {
 
-    static ItemStack getTemplate(EntityPlayer player) {
+    static ItemStack getTemplate(ClientPlayerEntity player) {
         ItemStack mainhand = player.getHeldItemMainhand();
         if (mainhand.getItem() instanceof ITemplate)
             return mainhand;
@@ -35,9 +35,9 @@ public interface ITemplate {
     WorldSave getWorldSave(World world);
 
     default void setItemCountMap(ItemStack stack, Multiset<UniqueItem> tagMap) {
-        NBTTagCompound tagCompound = stack.getTag();
+        CompoundNBT tagCompound = stack.getTag();
         if (tagCompound == null) {
-            tagCompound = new NBTTagCompound();
+            tagCompound = new CompoundNBT();
         }
         NBTTagList tagList = GadgetUtils.itemCountToNBT(tagMap);
         tagCompound.setTag("itemcountmap", tagList);
@@ -46,7 +46,7 @@ public interface ITemplate {
 
     @Nonnull
     default Multiset<UniqueItem> getItemCountMap(ItemStack stack) {
-        NBTTagCompound tagCompound = stack.getTag();
+        CompoundNBT tagCompound = stack.getTag();
         Multiset<UniqueItem> tagMap = tagCompound == null ? null : GadgetUtils.nbtToItemCount((NBTTagList) tagCompound.getTag("itemcountmap"));
         if (tagMap == null)
             throw new IllegalArgumentException("ITemplate#getItemCountMap faild to retieve tag map from " + GadgetUtils.getStackErrorSuffix(stack));
@@ -59,7 +59,7 @@ public interface ITemplate {
     }
 
     default void setCopyCounter(ItemStack stack, int counter) {
-        NBTTagCompound tagCompound = GadgetUtils.getStackTag(stack);
+        CompoundNBT tagCompound = GadgetUtils.getStackTag(stack);
         tagCompound.setInt(NBTKeys.TEMPLATE_COPY_COUNT, counter);
         stack.setTag(tagCompound);
     }

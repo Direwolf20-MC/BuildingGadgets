@@ -4,13 +4,13 @@ import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGTileEntities;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.google.common.collect.ImmutableSet;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Items;
+import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.item.Items;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
@@ -66,27 +66,27 @@ public class TemplateManagerTileEntity extends TileEntity {
     };
 
     @Override
-    public void read(NBTTagCompound compound) {
+    public void read(CompoundNBT compound) {
         super.read(compound);
 
-        if (compound.hasKey(NBTKeys.TE_TEMPLATE_MANAGER_ITEMS))
-            itemStackHandler.deserializeNBT((NBTTagCompound) compound.getTag(NBTKeys.TE_TEMPLATE_MANAGER_ITEMS));
+        if (compound.contains(NBTKeys.TE_TEMPLATE_MANAGER_ITEMS))
+            itemStackHandler.deserializeNBT(compound.getCompound(NBTKeys.TE_TEMPLATE_MANAGER_ITEMS));
     }
 
     @Override
-    public NBTTagCompound write(NBTTagCompound compound) {
-        compound.setTag(NBTKeys.TE_TEMPLATE_MANAGER_ITEMS, itemStackHandler.serializeNBT());
+    public CompoundNBT write(CompoundNBT compound) {
+        compound.put(NBTKeys.TE_TEMPLATE_MANAGER_ITEMS, itemStackHandler.serializeNBT());
         return super.write(compound);
     }
 
-    public boolean canInteractWith(EntityPlayer playerIn) {
+    public boolean canInteractWith(ClientPlayerEntity playerIn) {
         // If we are too far away from this tile entity you cannot use it
         return !isRemoved() && playerIn.getDistanceSq(pos.add(0.5D, 0.5D, 0.5D)) <= 64D;
     }
 
     @Nonnull
     @Override
-    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, final @Nullable EnumFacing side) {
+    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, final @Nullable Direction side) {
         if (cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
             return LazyOptional.of(() -> itemStackHandler).cast();
         }
@@ -94,7 +94,7 @@ public class TemplateManagerTileEntity extends TileEntity {
         return super.getCapability(cap, side);
     }
 
-    public TemplateManagerContainer getContainer(EntityPlayer playerIn) {
+    public TemplateManagerContainer getContainer(ClientPlayerEntity playerIn) {
         return new TemplateManagerContainer(playerIn.inventory, this);
     }
 }

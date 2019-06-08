@@ -3,9 +3,9 @@ package com.direwolf20.buildinggadgets.common.blocks;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGTileEntities;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.init.Blocks;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
@@ -14,21 +14,21 @@ import net.minecraft.tileentity.TileEntity;
 import javax.annotation.Nonnull;
 
 public class ConstructionBlockTileEntity extends TileEntity {
-    private IBlockState blockState;
-    private IBlockState actualBlockState;
+    private BlockState blockState;
+    private BlockState actualBlockState;
 
     public ConstructionBlockTileEntity() {
         super(BGTileEntities.CONSTRUCTION_BLOCK_TYPE);
     }
 
-    public void setBlockState(IBlockState state, IBlockState actualState) {
+    public void setBlockState(BlockState state, BlockState actualState) {
         blockState = state;
         actualBlockState = state;
         markDirtyClient();
     }
 
     @Nonnull
-    public IBlockState getBlockState() {
+    public BlockState getBlockState() {
         if (blockState == null) {
             return Blocks.AIR.getDefaultState();
         }
@@ -36,7 +36,7 @@ public class ConstructionBlockTileEntity extends TileEntity {
     }
 
     @Nonnull
-    public IBlockState getActualBlockState() {
+    public BlockState getActualBlockState() {
         if (actualBlockState == null) {
             return Blocks.AIR.getDefaultState();
         }
@@ -44,7 +44,7 @@ public class ConstructionBlockTileEntity extends TileEntity {
     }
 
     @Override
-    public void read(NBTTagCompound compound) {
+    public void read(CompoundNBT compound) {
         super.read(compound);
         blockState = NBTUtil.readBlockState(compound.getCompound(NBTKeys.TE_CONSTRUCTION_STATE));
         actualBlockState = NBTUtil.readBlockState(compound.getCompound(NBTKeys.TE_CONSTRUCTION_STATE_ACTUAL));
@@ -52,7 +52,7 @@ public class ConstructionBlockTileEntity extends TileEntity {
     }
 
     @Override
-    public NBTTagCompound write(NBTTagCompound compound) {
+    public CompoundNBT write(CompoundNBT compound) {
         if (blockState != null) {
             compound.setTag(NBTKeys.TE_CONSTRUCTION_STATE, NBTUtil.writeBlockState(blockState));
             if (actualBlockState != null)
@@ -64,29 +64,29 @@ public class ConstructionBlockTileEntity extends TileEntity {
     private void markDirtyClient() {
         markDirty();
         if (getWorld() != null) {
-            IBlockState state = getWorld().getBlockState(getPos());
+            BlockState state = getWorld().getBlockState(getPos());
             getWorld().notifyBlockUpdate(getPos(), state, state, 3);
         }
     }
 
     @Override
-    public NBTTagCompound getUpdateTag() {
-        NBTTagCompound updateTag = super.getUpdateTag();
+    public CompoundNBT getUpdateTag() {
+        CompoundNBT updateTag = super.getUpdateTag();
         write(updateTag);
         return updateTag;
     }
 
     @Override
     public SPacketUpdateTileEntity getUpdatePacket() {
-        NBTTagCompound nbtTag = new NBTTagCompound();
+        CompoundNBT nbtTag = new CompoundNBT();
         write(nbtTag);
         return new SPacketUpdateTileEntity(getPos(), 1, nbtTag);
     }
 
     @Override
     public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity packet) {
-        IBlockState oldMimicBlock = getBlockState();
-        NBTTagCompound tagCompound = packet.getNbtCompound();
+        BlockState oldMimicBlock = getBlockState();
+        CompoundNBT tagCompound = packet.getNbtCompound();
         super.onDataPacket(net, packet);
         read(tagCompound);
         if (world.isRemote) {

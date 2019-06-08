@@ -6,7 +6,7 @@ import com.direwolf20.buildinggadgets.api.template.building.IBuildContext;
 import com.direwolf20.buildinggadgets.api.template.serialisation.ITileDataSerializer;
 import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.Multiset;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
@@ -17,9 +17,9 @@ import javax.annotation.Nullable;
  * Represents the serializable data of an {@link net.minecraft.tileentity.TileEntity}. It also provides actions which can be performed on the
  * underlying data, to either:
  * <ul>
- * <li>Check whether placement should be permitted via {@link #allowPlacement(IBuildContext, IBlockState, BlockPos)}
- * <li>Place this data with a given {@link IBlockState} in an {@link IBuildContext} via {@link #placeIn(IBuildContext, IBlockState, BlockPos)}
- * <li>Query the requiredItems to build this {@link ITileEntityData} via {@link #getRequiredItems(IBuildContext, IBlockState, RayTraceResult, BlockPos)}.
+ * <li>Check whether placement should be permitted via {@link #allowPlacement(IBuildContext, BlockState, BlockPos)}
+ * <li>Place this data with a given {@link BlockState} in an {@link IBuildContext} via {@link #placeIn(IBuildContext, BlockState, BlockPos)}
+ * <li>Query the requiredItems to build this {@link ITileEntityData} via {@link #getRequiredItems(IBuildContext, BlockState, RayTraceResult, BlockPos)}.
  * </ul>
  */
 public interface ITileEntityData {
@@ -31,36 +31,36 @@ public interface ITileEntityData {
     /**
      * Checks whether this {@link ITileEntityData} permits being placed at the given position.
      * @param context The {@link IBuildContext} to place in.
-     * @param state The {@link IBlockState} to place.
+     * @param state The {@link BlockState} to place.
      * @param position The {@link BlockPos} at which to place
      * @return Whether or not placement should be allowed for this {@link ITileEntityData}. Returning false can be as trivial as the position being in the wrong
      *         Biome for this type of liquid for example...
      * @implNote The default implementation checks whether the given position is air.
      */
-    default boolean allowPlacement(IBuildContext context, IBlockState state, BlockPos position) {
+    default boolean allowPlacement(IBuildContext context, BlockState state, BlockPos position) {
         return state.isAir(context.getWorld(), position);
     }
 
     /**
-     * Attempts to place this {@link ITileEntityData} in the given {@link IBuildContext}. If this is called but {@link #allowPlacement(IBuildContext, IBlockState, BlockPos)}
+     * Attempts to place this {@link ITileEntityData} in the given {@link IBuildContext}. If this is called but {@link #allowPlacement(IBuildContext, BlockState, BlockPos)}
      * would have returned false, placement should still be attempted and counted as a "forced placement".<br>
      * This Method should also set any data on the {@link net.minecraft.tileentity.TileEntity} represented by this {@code ITileEntityData}.
      * @param context The {@link IBuildContext} to place in.
-     * @param state The {@link IBlockState} to place.
+     * @param state The {@link BlockState} to place.
      * @param position The {@link BlockPos} at which to place
      * @return Whether or not placement was performed by this {@link ITileEntityData}. This should only return false if some really hard requirements would not be met,
      *         like for example a required block not being present next to the given position.
      */
-    boolean placeIn(IBuildContext context, IBlockState state, BlockPos position);
+    boolean placeIn(IBuildContext context, BlockState state, BlockPos position);
 
     /**
      * @param context The context in which to query required items.
-     * @param state The {@link IBlockState} to retrieve items for
+     * @param state The {@link BlockState} to retrieve items for
      * @param target {@link RayTraceResult} the target at which a click is simulated
      * @param pos The {@link BlockPos} where a block is simulated for this Method
      * @return A {@link Multiset} of required Items.
      */
-    default Multiset<UniqueItem> getRequiredItems(IBuildContext context, IBlockState state, @Nullable RayTraceResult target, @Nullable BlockPos pos) {
+    default Multiset<UniqueItem> getRequiredItems(IBuildContext context, BlockState state, @Nullable RayTraceResult target, @Nullable BlockPos pos) {
         ItemStack stack = null;
         try {
             stack = state.getBlock().getPickBlock(state, target, context.getWorld(), pos, context.getBuildingPlayer());

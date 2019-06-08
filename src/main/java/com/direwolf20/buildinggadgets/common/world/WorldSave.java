@@ -2,7 +2,7 @@ package com.direwolf20.buildinggadgets.common.world;
 
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
@@ -17,27 +17,27 @@ import java.util.function.Function;
 public class WorldSave extends WorldSavedData {
     private final String TAG_NAME;
 
-    private Map<String, NBTTagCompound> tagMap = new HashMap<String, NBTTagCompound>();
+    private Map<String, CompoundNBT> tagMap = new HashMap<String, CompoundNBT>();
 
     public WorldSave(String name, String tagName) {
         super(name);
         TAG_NAME = tagName;
     }
 
-    public void addToMap(String UUID, NBTTagCompound tagCompound) {
+    public void addToMap(String UUID, CompoundNBT tagCompound) {
         tagMap.put(UUID, tagCompound);
         markDirty();
     }
 
-    public Map<String, NBTTagCompound> getTagMap() {
+    public Map<String, CompoundNBT> getTagMap() {
         return tagMap;
     }
 
-    public void setTagMap(Map<String, NBTTagCompound> newMap) {
-        tagMap = new HashMap<String, NBTTagCompound>(newMap);
+    public void setTagMap(Map<String, CompoundNBT> newMap) {
+        tagMap = new HashMap<String, CompoundNBT>(newMap);
     }
 
-    public NBTTagCompound getCompoundFromUUID(String UUID) {
+    public CompoundNBT getCompoundFromUUID(String UUID) {
         return tagMap.get(UUID);
     }
 
@@ -70,25 +70,25 @@ public class WorldSave extends WorldSavedData {
     }
 
     @Override
-    public void read(NBTTagCompound nbt) {
+    public void read(CompoundNBT nbt) {
         if (nbt.hasKey(TAG_NAME)) {
             NBTTagList tagList = nbt.getList(TAG_NAME, Constants.NBT.TAG_COMPOUND);
 
             for (int i = 0; i < tagList.size(); i++) {
-                NBTTagCompound mapTag = tagList.getCompound(i);
+                CompoundNBT mapTag = tagList.getCompound(i);
                 String ID = mapTag.getString(NBTKeys.WORLD_SAVE_UUID);
-                NBTTagCompound tagCompound = mapTag.getCompound(NBTKeys.WORLD_SAVE_TAG);
+                CompoundNBT tagCompound = mapTag.getCompound(NBTKeys.WORLD_SAVE_TAG);
                 tagMap.put(ID, tagCompound);
             }
         }
     }
 
     @Override
-    public NBTTagCompound write(NBTTagCompound compound) {
+    public CompoundNBT write(CompoundNBT compound) {
         NBTTagList tagList = new NBTTagList();
 
-        for (Map.Entry<String, NBTTagCompound> entry : tagMap.entrySet()) {
-            NBTTagCompound map = new NBTTagCompound();
+        for (Map.Entry<String, CompoundNBT> entry : tagMap.entrySet()) {
+            CompoundNBT map = new CompoundNBT();
             map.setString(NBTKeys.WORLD_SAVE_UUID, entry.getKey());
             map.setTag(NBTKeys.WORLD_SAVE_TAG, entry.getValue());
             tagList.add(map);

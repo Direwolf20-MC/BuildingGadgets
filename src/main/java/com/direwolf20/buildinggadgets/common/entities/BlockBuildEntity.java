@@ -4,10 +4,10 @@ import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGEntities;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.init.Blocks;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
@@ -28,7 +28,7 @@ public class BlockBuildEntity extends EntityBase {
             public void onBuilderEntityDespawn(BlockBuildEntity builder) {
                 World world = builder.world;
                 BlockPos targetPos = builder.targetPos;
-                IBlockState targetBlock = builder.setBlock;
+                BlockState targetBlock = builder.setBlock;
                 if (builder.isUsingPaste()) {
                     world.setBlockState(targetPos, BGBlocks.constructionBlock.getDefaultState());
                     TileEntity te = world.getTileEntity(targetPos);
@@ -63,11 +63,11 @@ public class BlockBuildEntity extends EntityBase {
     }
 
     private static final DataParameter<Integer> MODE = EntityDataManager.createKey(BlockBuildEntity.class, DataSerializers.VARINT);
-    private static final DataParameter<Optional<IBlockState>> SET_BLOCK = EntityDataManager.createKey(BlockBuildEntity.class, DataSerializers.OPTIONAL_BLOCK_STATE);
+    private static final DataParameter<Optional<BlockState>> SET_BLOCK = EntityDataManager.createKey(BlockBuildEntity.class, DataSerializers.OPTIONAL_BLOCK_STATE);
     private static final DataParameter<Boolean> USE_PASTE = EntityDataManager.createKey(BlockBuildEntity.class, DataSerializers.BOOLEAN);
 
-    private IBlockState setBlock;
-    private IBlockState originalSetBlock;
+    private BlockState setBlock;
+    private BlockState originalSetBlock;
     private EntityLivingBase spawnedBy;
 
     private Mode mode;
@@ -77,11 +77,11 @@ public class BlockBuildEntity extends EntityBase {
         super(BGEntities.BUILD_BLOCK, world);
     }
 
-    public BlockBuildEntity(World world, BlockPos spawnPos, EntityLivingBase player, IBlockState spawnBlock, Mode mode, boolean usePaste) {
+    public BlockBuildEntity(World world, BlockPos spawnPos, EntityLivingBase player, BlockState spawnBlock, Mode mode, boolean usePaste) {
         this(world);
         setPosition(spawnPos.getX(), spawnPos.getY(), spawnPos.getZ());
 
-        IBlockState currentBlock = world.getBlockState(spawnPos);
+        BlockState currentBlock = world.getBlockState(spawnPos);
         TileEntity te = world.getTileEntity(spawnPos);
         targetPos = spawnPos;
         originalSetBlock = spawnBlock;
@@ -115,11 +115,11 @@ public class BlockBuildEntity extends EntityBase {
     }
 
     @Nullable
-    public IBlockState getSetBlock() {
+    public BlockState getSetBlock() {
         return dataManager.get(SET_BLOCK).orElse(null);
     }
 
-    public void setSetBlock(@Nullable IBlockState state) {
+    public void setSetBlock(@Nullable BlockState state) {
         dataManager.set(SET_BLOCK, Optional.ofNullable(state));
     }
 
@@ -139,7 +139,7 @@ public class BlockBuildEntity extends EntityBase {
     }
 
     @Override
-    protected void readAdditional(NBTTagCompound compound) {
+    protected void readAdditional(CompoundNBT compound) {
         super.readAdditional(compound);
         setBlock = NBTUtil.readBlockState(compound.getCompound(NBTKeys.ENTITY_BUILD_SET_BLOCK));
         originalSetBlock = NBTUtil.readBlockState(compound.getCompound(NBTKeys.ENTITY_BUILD_ORIGINAL_BLOCK));
@@ -148,10 +148,10 @@ public class BlockBuildEntity extends EntityBase {
     }
 
     @Override
-    protected void writeAdditional(NBTTagCompound compound) {
+    protected void writeAdditional(CompoundNBT compound) {
         super.writeAdditional(compound);
 
-        NBTTagCompound blockStateTag = NBTUtil.writeBlockState(setBlock);
+        CompoundNBT blockStateTag = NBTUtil.writeBlockState(setBlock);
         compound.setTag(NBTKeys.ENTITY_BUILD_SET_BLOCK, blockStateTag);
 
         blockStateTag = NBTUtil.writeBlockState(originalSetBlock);

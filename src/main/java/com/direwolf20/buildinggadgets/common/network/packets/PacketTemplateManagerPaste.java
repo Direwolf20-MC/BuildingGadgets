@@ -4,9 +4,9 @@ import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManagerCommands;
 import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManagerContainer;
 import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManagerTileEntity;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.nbt.CompressedStreamTools;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
@@ -50,10 +50,10 @@ public class PacketTemplateManagerPaste {
             ctx.get().enqueueWork(() -> {
                 ByteArrayInputStream inputStream = new ByteArrayInputStream(msg.data);
                 try {
-                    NBTTagCompound newTag = CompressedStreamTools.readCompressed(inputStream);
-                    if (newTag.equals(new NBTTagCompound())) return;
+                    CompoundNBT newTag = CompressedStreamTools.readCompressed(inputStream);
+                    if (newTag.equals(new CompoundNBT())) return;
 
-                    EntityPlayerMP player = ctx.get().getSender();
+                    ServerPlayerEntity player = ctx.get().getSender();
                     if( player == null ) return;
 
                     World world = player.world;

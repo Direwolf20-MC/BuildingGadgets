@@ -5,15 +5,15 @@ import com.direwolf20.buildinggadgets.api.template.building.IBuildContext;
 import com.direwolf20.buildinggadgets.api.template.building.SimpleBuildContext;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.IFluidState;
 import net.minecraft.init.Blocks;
 import net.minecraft.particles.IParticleData;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.BlockPos;
@@ -42,7 +42,7 @@ import java.util.function.Predicate;
 @MethodsReturnNonnullByDefault
 public class FakeDelegationWorld implements IWorld {
     private final IWorld world;
-    private Map<BlockPos, IBlockState> posToState;
+    private Map<BlockPos, BlockState> posToState;
     private Map<BlockPos, TileEntity> posToTile;
 
     public FakeDelegationWorld(IWorld world) {
@@ -65,7 +65,7 @@ public class FakeDelegationWorld implements IWorld {
     }
 
     @Nullable
-    private IBlockState getOverriddenState(BlockPos pos) {
+    private BlockState getOverriddenState(BlockPos pos) {
         return posToState.get(pos);
     }
 
@@ -191,7 +191,7 @@ public class FakeDelegationWorld implements IWorld {
      * Plays the specified sound for a player at the center of the given block position.
      */
     @Override
-    public void playSound(@Nullable EntityPlayer player, BlockPos pos, SoundEvent soundIn, SoundCategory category, float volume, float pitch) {
+    public void playSound(@Nullable ClientPlayerEntity player, BlockPos pos, SoundEvent soundIn, SoundCategory category, float volume, float pitch) {
         world.playSound(player, pos, soundIn, category, volume, pitch);
     }
 
@@ -244,25 +244,25 @@ public class FakeDelegationWorld implements IWorld {
      */
     @Override
     @Nullable
-    public EntityPlayer getClosestPlayerToEntity(Entity entityIn, double distance) {
+    public ClientPlayerEntity getClosestPlayerToEntity(Entity entityIn, double distance) {
         return world.getClosestPlayerToEntity(entityIn, distance);
     }
 
     @Override
     @Nullable
-    public EntityPlayer getNearestPlayerNotCreative(Entity entityIn, double distance) {
+    public ClientPlayerEntity getNearestPlayerNotCreative(Entity entityIn, double distance) {
         return world.getNearestPlayerNotCreative(entityIn, distance);
     }
 
     @Override
     @Nullable
-    public EntityPlayer getClosestPlayer(double posX, double posY, double posZ, double distance, boolean spectator) {
+    public ClientPlayerEntity getClosestPlayer(double posX, double posY, double posZ, double distance, boolean spectator) {
         return world.getClosestPlayer(posX, posY, posZ, distance, spectator);
     }
 
     @Override
     @Nullable
-    public EntityPlayer getClosestPlayer(double x, double y, double z, double distance, Predicate<Entity> predicate) {
+    public ClientPlayerEntity getClosestPlayer(double x, double y, double z, double distance, Predicate<Entity> predicate) {
         return world.getClosestPlayer(x, y, z, distance, predicate);
     }
 
@@ -282,7 +282,7 @@ public class FakeDelegationWorld implements IWorld {
     }
 
     @Override
-    public int getStrongPower(BlockPos pos, EnumFacing direction) {
+    public int getStrongPower(BlockPos pos, Direction direction) {
         return world.getStrongPower(pos, direction);
     }
 
@@ -308,7 +308,7 @@ public class FakeDelegationWorld implements IWorld {
             return null;
         TileEntity tile = getOverriddenTile(pos);
         if (tile != null) return tile;
-        IBlockState state = getOverriddenState(pos);
+        BlockState state = getOverriddenState(pos);
         if (state != null) {
             if (! state.hasTileEntity())
                 return null; //if it's overridden, but does not have a tile... well then there is no tile
@@ -324,10 +324,10 @@ public class FakeDelegationWorld implements IWorld {
     }
 
     @Override
-    public IBlockState getBlockState(BlockPos pos) {
+    public BlockState getBlockState(BlockPos pos) {
         if (World.isOutsideBuildHeight(pos))
             return Blocks.VOID_AIR.getDefaultState();
-        IBlockState state = getOverriddenState(pos);
+        BlockState state = getOverriddenState(pos);
         return state != null ? state : world.getBlockState(pos);
     }
 
@@ -359,7 +359,7 @@ public class FakeDelegationWorld implements IWorld {
      * Flags can be OR-ed
      */
     @Override
-    public boolean setBlockState(BlockPos pos, IBlockState newState, int flags) {
+    public boolean setBlockState(BlockPos pos, BlockState newState, int flags) {
         if (World.isOutsideBuildHeight(pos))
             return false;
         posToState.put(pos, newState);

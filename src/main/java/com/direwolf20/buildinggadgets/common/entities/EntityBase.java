@@ -4,7 +4,7 @@ import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -41,14 +41,14 @@ public abstract class EntityBase extends Entity {
     }
 
     @Override
-    protected void readAdditional(NBTTagCompound compound) {
+    protected void readAdditional(CompoundNBT compound) {
         despawning = compound.getInt(NBTKeys.ENTITY_DESPAWNING);
         ticksExisted = compound.getInt(NBTKeys.ENTITY_TICKS_EXISTED);
         targetPos = NBTUtil.readBlockPos(compound.getCompound(NBTKeys.ENTITY_SET_POS));
     }
 
     @Override
-    protected void writeAdditional(NBTTagCompound compound) {
+    protected void writeAdditional(CompoundNBT compound) {
         compound.setInt(NBTKeys.ENTITY_DESPAWNING, despawning);
         compound.setInt(NBTKeys.ENTITY_TICKS_EXISTED, ticksExisted);
         compound.setTag(NBTKeys.ENTITY_SET_POS, NBTUtil.writeBlockPos(targetPos));

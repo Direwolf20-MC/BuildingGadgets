@@ -2,8 +2,8 @@ package com.direwolf20.buildinggadgets.api.capability;
 
 import com.direwolf20.buildinggadgets.api.template.ITemplate;
 import com.direwolf20.buildinggadgets.api.template.ImmutableTemplate;
-import net.minecraft.nbt.INBTBase;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.nbt.INBT;
+import net.minecraft.util.Direction;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.capabilities.CapabilityManager;
@@ -15,12 +15,12 @@ public class CapabilityTemplate {
     public static void register() {
         CapabilityManager.INSTANCE.register(ITemplate.class, new Capability.IStorage<ITemplate>() {
             @Override
-            public INBTBase writeNBT(Capability<ITemplate> capability, ITemplate instance, EnumFacing side) {
+            public INBT writeNBT(Capability<ITemplate> capability, ITemplate instance, Direction side) {
                 return instance.getSerializer().serialize(instance, true);
             }
 
             @Override
-            public void readNBT(Capability<ITemplate> capability, ITemplate instance, EnumFacing side, INBTBase base) {
+            public void readNBT(Capability<ITemplate> capability, ITemplate instance, Direction side, INBT base) {
                 //TODO perform copy Transaction on the original instance
             }
         }, ImmutableTemplate::create);

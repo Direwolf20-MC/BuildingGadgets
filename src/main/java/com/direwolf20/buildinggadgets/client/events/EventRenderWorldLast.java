@@ -4,7 +4,7 @@ import com.direwolf20.buildinggadgets.common.items.gadgets.*;
 import com.direwolf20.buildinggadgets.common.util.tools.ToolRenders;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
@@ -17,7 +17,7 @@ public class EventRenderWorldLast {
     @SubscribeEvent
     static void renderWorldLastEvent(RenderWorldLastEvent evt) {
         Minecraft mc = Minecraft.getInstance();
-        EntityPlayer player = mc.player;
+        ClientPlayerEntity player = mc.player;
         ItemStack heldItem = GadgetGeneric.getGadget(player);
         if (heldItem.isEmpty()) {
             return;

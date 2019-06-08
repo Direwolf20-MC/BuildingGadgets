@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.test.building.placementTests;
 
 import com.direwolf20.buildinggadgets.api.building.placement.Column;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import org.junit.jupiter.api.RepeatedTest;
@@ -22,7 +22,7 @@ public class ColumnTest {
         Constructor<Column> constructor = Column.class.getDeclaredConstructor(BlockPos.class, BlockPos.class);
         constructor.setAccessible(true);
 
-        Column column = constructor.newInstance(BlockPos.ORIGIN, BlockPos.ORIGIN.up(4));
+        Column column = constructor.newInstance(BlockPos.ZERO, BlockPos.ZERO.up(4));
         Iterator<BlockPos> it = column.iterator();
 
         assertEquals(new BlockPos(0, 0, 0), it.next());
@@ -35,17 +35,17 @@ public class ColumnTest {
 
     @Test
     void columnCreatedWithFactoryMethodExtendFromShouldOffsetBaseBy1ToGivenFacing() {
-        for (EnumFacing facing : EnumFacing.values()) {
-            Column column = Column.extendFrom(BlockPos.ORIGIN, facing, 15);
+        for (Direction facing : Direction.values()) {
+            Column column = Column.extendFrom(BlockPos.ZERO, facing, 15);
             Iterator<BlockPos> it = column.iterator();
 
-            if (facing.getAxisDirection() == EnumFacing.AxisDirection.NEGATIVE) {
+            if (facing.getAxisDirection() == Direction.AxisDirection.NEGATIVE) {
                 for (int i = 14; i >= 0; i--) {
-                    assertEquals(BlockPos.ORIGIN.offset(facing, i), it.next());
+                    assertEquals(BlockPos.ZERO.offset(facing, i), it.next());
                 }
             } else {
                 for (int i = 0; i <= 14; i++) {
-                    assertEquals(BlockPos.ORIGIN.offset(facing, i), it.next());
+                    assertEquals(BlockPos.ZERO.offset(facing, i), it.next());
                 }
             }
 
@@ -55,7 +55,7 @@ public class ColumnTest {
 
     @Test
     void columnOnXAxisCenteredAtOriginShouldHaveAccentingX() {
-        Column column = Column.centerAt(BlockPos.ORIGIN, EnumFacing.Axis.X, 5);
+        Column column = Column.centerAt(BlockPos.ZERO, Direction.Axis.X, 5);
         Iterator<BlockPos> it = column.iterator();
 
         assertEquals(new BlockPos(-2, 0, 0), it.next());
@@ -69,7 +69,7 @@ public class ColumnTest {
     @RepeatedTest(4)
     void centerAtShouldCeilDownToNearestOddNumberAsSizeRandomParameterSize() {
         int size = MathHelper.clamp(random.nextInt(8), 1, Integer.MAX_VALUE) * 2;
-        Column column = Column.centerAt(BlockPos.ORIGIN, EnumFacing.Axis.Y, size);
+        Column column = Column.centerAt(BlockPos.ZERO, Direction.Axis.Y, size);
         Iterator<BlockPos> it = column.iterator();
 
         for (int i = 0; i < size - 1; i++) {

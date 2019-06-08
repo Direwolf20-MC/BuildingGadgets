@@ -2,8 +2,8 @@ package com.direwolf20.buildinggadgets.test.building.placementTests;
 
 import com.direwolf20.buildinggadgets.api.building.SingleTypeProvider;
 import com.direwolf20.buildinggadgets.test.util.UniqueBlockState;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.block.BlockState;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.math.BlockPos;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.RepeatedTest;
@@ -15,19 +15,19 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class SingleTypeProviderTest {
 
-    private final IBlockState state = UniqueBlockState.createNew();
+    private final BlockState state = UniqueBlockState.createNew();
     private final SingleTypeProvider provider = new SingleTypeProvider(state);
     private final Random random = new Random();
 
     //TODO implement custom runner that launches minecraft
-    //  this does not work since NBTUtil.readBlockState(IBlockState) accesses block registry, and using
+    //  this does not work since NBTUtil.readBlockState(BlockState) accesses block registry, and using
     //  UniqueBlockState looses the point of testing
     @Disabled("requires custom runner with minecraft started")
     @Test
     void stateAfterSerializationShouldRemainSameAsBeforeSerialization() {
-        NBTTagCompound serialized = provider.serialize();
+        CompoundNBT serialized = provider.serialize();
         SingleTypeProvider deserialized = new SingleTypeProvider(null).deserialize(serialized);
-        assertEquals(provider.at(BlockPos.ORIGIN), deserialized.at(BlockPos.ORIGIN));
+        assertEquals(provider.at(BlockPos.ZERO), deserialized.at(BlockPos.ZERO));
     }
 
     @Test

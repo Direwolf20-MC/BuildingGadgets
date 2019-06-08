@@ -3,7 +3,7 @@ package com.direwolf20.buildinggadgets.common.items.capability;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraftforge.energy.IEnergyStorage;
 
 import java.util.function.IntSupplier;
@@ -73,12 +73,12 @@ public final class ItemEnergyForge implements IEnergyStorage {
     }
 
     private void writeEnergy() {
-        NBTTagCompound nbt = GadgetUtils.enforceHasTag(stack);
+        CompoundNBT nbt = GadgetUtils.enforceHasTag(stack);
         nbt.setInt(NBTKeys.ENERGY,getEnergyStoredCache());
     }
 
     private void updateEnergy() {
-        NBTTagCompound nbt = GadgetUtils.enforceHasTag(stack);
+        CompoundNBT nbt = GadgetUtils.enforceHasTag(stack);
         if (nbt.hasKey(NBTKeys.ENERGY))
             this.energy = nbt.getInt(NBTKeys.ENERGY) ;
         updateMaxEnergy();

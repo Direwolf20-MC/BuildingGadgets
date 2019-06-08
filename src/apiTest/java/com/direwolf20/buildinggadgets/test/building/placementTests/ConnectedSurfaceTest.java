@@ -5,8 +5,8 @@ import com.direwolf20.buildinggadgets.api.building.placement.ConnectedSurface;
 import com.direwolf20.buildinggadgets.api.util.VectorUtils;
 import com.direwolf20.buildinggadgets.test.util.CasedBlockView;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.block.BlockState;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -25,7 +25,7 @@ public class ConnectedSurfaceTest {
     @Test
     void connectedSurfaceShouldUseFuzzyMayContainsToRegion5By5() {
         CasedBlockView world = new CasedBlockView(new Region(-2, 0, -2, 2, 0, 2), CasedBlockView.base, CasedBlockView.target);
-        ConnectedSurface surface = ConnectedSurface.create(world, BlockPos.ORIGIN, EnumFacing.UP, 5, false);
+        ConnectedSurface surface = ConnectedSurface.create(world, BlockPos.ZERO, Direction.UP, 5, false);
 
         //5 + 1 = 6, (5 / 2) + 1 = 3
         int x = random.nextInt(6) - 3;
@@ -37,10 +37,10 @@ public class ConnectedSurfaceTest {
     @Test
     void connectedSurfaceShouldOnlyIncludeBlocksThatHaveSameBlockAsStartingPosition5By5RandomSelected30DifferPositions() {
         CasedBlockView world = regionAtOriginWithRandomTargets(5, 30);
-        IBlockState selectedBlock = world.getBlockState(BlockPos.ORIGIN);
+        BlockState selectedBlock = world.getBlockState(BlockPos.ZERO);
 
-        for (EnumFacing side : EnumFacing.values()) {
-            ConnectedSurface surface = ConnectedSurface.create(world, BlockPos.ORIGIN, side, 5, false);
+        for (Direction side : Direction.values()) {
+            ConnectedSurface surface = ConnectedSurface.create(world, BlockPos.ZERO, side, 5, false);
             Set<BlockPos> calculated = surface.collect(new ObjectOpenHashSet<>());
 
             for (BlockPos pos : calculated) {
@@ -53,11 +53,11 @@ public class ConnectedSurfaceTest {
     void connectedSurfaceResultsShouldOnlyIncludeBlocksThatHasSameAxisValueAsStarted() {
         CasedBlockView world = regionAtOriginWithRandomTargets(5, 30);
 
-        for (EnumFacing side : EnumFacing.values()) {
-            ConnectedSurface surface = ConnectedSurface.create(world, BlockPos.ORIGIN.offset(side), side.getOpposite(), 5, false);
+        for (Direction side : Direction.values()) {
+            ConnectedSurface surface = ConnectedSurface.create(world, BlockPos.ZERO.offset(side), side.getOpposite(), 5, false);
             Set<BlockPos> calculated = surface.collect(new ObjectOpenHashSet<>());
 
-            int expected = VectorUtils.getAxisValue(BlockPos.ORIGIN.offset(side), side.getAxis());
+            int expected = VectorUtils.getAxisValue(BlockPos.ZERO.offset(side), side.getAxis());
             for (BlockPos pos : calculated) {
                 assertEquals(expected, VectorUtils.getAxisValue(pos, side.getAxis()));
             }
@@ -69,22 +69,22 @@ public class ConnectedSurfaceTest {
         int radius = 3;
         CasedBlockView world = new CasedBlockView(new Region(-radius, 0, -radius, radius, 0, radius), CasedBlockView.base, CasedBlockView.target)
                 //Connected
-                .setOtherAt(BlockPos.ORIGIN)
-                .setOtherAt(BlockPos.ORIGIN.north())
-                .setOtherAt(BlockPos.ORIGIN.east())
-                .setOtherAt(BlockPos.ORIGIN.south())
-                .setOtherAt(BlockPos.ORIGIN.west())
-                .setOtherAt(BlockPos.ORIGIN.north().east())
-                .setOtherAt(BlockPos.ORIGIN.east().south())
-                .setOtherAt(BlockPos.ORIGIN.south().west())
-                .setOtherAt(BlockPos.ORIGIN.west().north())
+                .setOtherAt(BlockPos.ZERO)
+                .setOtherAt(BlockPos.ZERO.north())
+                .setOtherAt(BlockPos.ZERO.east())
+                .setOtherAt(BlockPos.ZERO.south())
+                .setOtherAt(BlockPos.ZERO.west())
+                .setOtherAt(BlockPos.ZERO.north().east())
+                .setOtherAt(BlockPos.ZERO.east().south())
+                .setOtherAt(BlockPos.ZERO.south().west())
+                .setOtherAt(BlockPos.ZERO.west().north())
                 //Not connected
-                .setOtherAt(BlockPos.ORIGIN.north(3))
-                .setOtherAt(BlockPos.ORIGIN.east(3))
-                .setOtherAt(BlockPos.ORIGIN.south(3))
-                .setOtherAt(BlockPos.ORIGIN.west(3));
+                .setOtherAt(BlockPos.ZERO.north(3))
+                .setOtherAt(BlockPos.ZERO.east(3))
+                .setOtherAt(BlockPos.ZERO.south(3))
+                .setOtherAt(BlockPos.ZERO.west(3));
 
-        ConnectedSurface surface = ConnectedSurface.create(world, BlockPos.ORIGIN, EnumFacing.UP, 5, false);
+        ConnectedSurface surface = ConnectedSurface.create(world, BlockPos.ZERO, Direction.UP, 5, false);
         assertEquals(9, surface.collect().size());
     }
 

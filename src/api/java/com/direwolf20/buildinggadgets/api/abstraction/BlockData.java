@@ -6,15 +6,15 @@ import com.direwolf20.buildinggadgets.api.template.building.tilesupport.ITileEnt
 import com.direwolf20.buildinggadgets.api.template.serialisation.ITileDataSerializer;
 import com.direwolf20.buildinggadgets.api.util.RegistryUtils;
 import com.google.common.base.Preconditions;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.block.BlockState;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.util.math.BlockPos;
 
 import java.util.Objects;
 
 /**
- * Representation of the data one block can hold, in the form of an {@link IBlockState} and an instance of {@link ITileEntityData}.
+ * Representation of the data one block can hold, in the form of an {@link BlockState} and an instance of {@link ITileEntityData}.
  * This calls offers serialisation facilities as well as delegating placement through to the {@link ITileEntityData}.
  * <p>
  * Notice that this class is immutable as long as the {@link ITileEntityData} instance is immutable.
@@ -25,14 +25,14 @@ public final class BlockData {
     private static final String KEY_DATA = "data";
 
     /**
-     * @param tag The {@link NBTTagCompound} representing the serialized block data.
-     * @param persisted Whether or not the {@link NBTTagCompound} was created using an persisted save.
-     * @return A new instance of {@code BlockData} as represented by the {@link NBTTagCompound}.
+     * @param tag The {@link CompoundNBT} representing the serialized block data.
+     * @param persisted Whether or not the {@link CompoundNBT} was created using an persisted save.
+     * @return A new instance of {@code BlockData} as represented by the {@link CompoundNBT}.
      * @throws IllegalArgumentException if the persisted flag does not match how the tag was created.
      * @throws NullPointerException if an unknown serializer is referenced.
      */
-    public static BlockData deserialize(NBTTagCompound tag, boolean persisted) {
-        IBlockState state = NBTUtil.readBlockState(tag.getCompound(KEY_STATE));
+    public static BlockData deserialize(CompoundNBT tag, boolean persisted) {
+        BlockState state = NBTUtil.readBlockState(tag.getCompound(KEY_STATE));
         ITileDataSerializer serializer;
         try {
             if (persisted)
@@ -48,24 +48,24 @@ public final class BlockData {
         return new BlockData(state, data);
     }
 
-    private final IBlockState state;
+    private final BlockState state;
     private final ITileEntityData tileData;
 
     /**
      * Creates a new {@code BlockData} with the specified data.
-     * @param state The {@link IBlockState} of the resulting data.
+     * @param state The {@link BlockState} of the resulting data.
      * @param tileData The {@link ITileEntityData} of the resulting data.
      * @throws NullPointerException if state or tileData are null.
      */
-    public BlockData(IBlockState state, ITileEntityData tileData) {
+    public BlockData(BlockState state, ITileEntityData tileData) {
         this.state = Objects.requireNonNull(state);
         this.tileData = Objects.requireNonNull(tileData);
     }
 
     /**
-     * @return The {@link IBlockState} contained by this {@code BlockData}
+     * @return The {@link BlockState} contained by this {@code BlockData}
      */
-    public IBlockState getState() {
+    public BlockState getState() {
         return state;
     }
 
@@ -90,15 +90,15 @@ public final class BlockData {
      * @param persisted Whether or not this should be written as a persisted save.
      * @return The serialized form of this {@code BlockData}.
      */
-    public NBTTagCompound serialize(boolean persisted) {
-        NBTTagCompound tag = new NBTTagCompound();
-        tag.setTag(KEY_STATE, NBTUtil.writeBlockState(state));
+    public CompoundNBT serialize(boolean persisted) {
+        CompoundNBT tag = new CompoundNBT();
+        tag.put(KEY_STATE, NBTUtil.writeBlockState(state));
         if (persisted)
-            tag.setString(KEY_SERIALIZER, tileData.getSerializer().getRegistryName().toString());
+            tag.putString(KEY_SERIALIZER, tileData.getSerializer().getRegistryName().toString());
         else
-            tag.setInt(KEY_SERIALIZER, RegistryUtils
+            tag.putInt(KEY_SERIALIZER, RegistryUtils
                     .getId(Registries.getTileDataSerializers(), tileData.getSerializer()));
-        tag.setTag(KEY_DATA, tileData.getSerializer().serialize(tileData, persisted));
+        tag.put(KEY_DATA, tileData.getSerializer().serialize(tileData, persisted));
         return tag;
     }
 }

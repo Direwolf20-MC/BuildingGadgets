@@ -4,9 +4,9 @@ import com.direwolf20.buildinggadgets.api.building.IPositionPlacementSequence;
 import com.direwolf20.buildinggadgets.api.building.Region;
 import com.direwolf20.buildinggadgets.api.util.VectorUtils;
 import com.google.common.collect.AbstractIterator;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumFacing.Axis;
-import net.minecraft.util.EnumFacing.AxisDirection;
+import net.minecraft.util.Direction;
+import net.minecraft.util.Direction.Axis;
+import net.minecraft.util.Direction.AxisDirection;
 import net.minecraft.util.math.BlockPos;
 
 import javax.annotation.Nonnull;
@@ -20,14 +20,14 @@ public final class ExclusiveAxisChasing implements IPositionPlacementSequence {
     public static ExclusiveAxisChasing create(BlockPos source, BlockPos target, Axis axis, int maxProgression) {
         int difference = VectorUtils.getAxisValue(target, axis) - VectorUtils.getAxisValue(source, axis);
         if (difference < 0)
-            return create(source, target, EnumFacing.getFacingFromAxis(AxisDirection.NEGATIVE, axis), maxProgression);
-        return create(source, target, EnumFacing.getFacingFromAxis(AxisDirection.POSITIVE, axis), maxProgression);
+            return create(source, target, Direction.getFacingFromAxis(AxisDirection.NEGATIVE, axis), maxProgression);
+        return create(source, target, Direction.getFacingFromAxis(AxisDirection.POSITIVE, axis), maxProgression);
     }
 
     /**
      * <p>Note that this factory method does not verify that {@code offsetDirection} is appropriate. Use {@link #create(BlockPos, BlockPos, Axis, int)} if this is required.</p>
      */
-    public static ExclusiveAxisChasing create(BlockPos source, BlockPos target, EnumFacing offsetDirection, int maxProgression) {
+    public static ExclusiveAxisChasing create(BlockPos source, BlockPos target, Direction offsetDirection, int maxProgression) {
         Axis axis = offsetDirection.getAxis();
         int difference = VectorUtils.getAxisValue(target, axis) - VectorUtils.getAxisValue(source, axis);
         maxProgression = Math.min(Math.abs(difference), maxProgression);
@@ -36,10 +36,10 @@ public final class ExclusiveAxisChasing implements IPositionPlacementSequence {
     }
 
     private final BlockPos source;
-    private final EnumFacing offsetDirection;
+    private final Direction offsetDirection;
     private final int maxProgression;
 
-    public ExclusiveAxisChasing(BlockPos source, EnumFacing offsetDirection, int maxProgression) {
+    public ExclusiveAxisChasing(BlockPos source, Direction offsetDirection, int maxProgression) {
         this.source = source;
         this.offsetDirection = offsetDirection;
         this.maxProgression = maxProgression;

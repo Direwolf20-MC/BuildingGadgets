@@ -13,7 +13,7 @@ public class GridTest {
     @Test
     void iteratorShouldUse9BlocksInFirstPeriodCasePeriodSizeEquals6() {
         for (int i = 1; i <= 6; i++) {
-            Grid grid = Grid.create(BlockPos.ORIGIN, i, 6);
+            Grid grid = Grid.create(BlockPos.ZERO, i, 6);
             Iterator<BlockPos> it = grid.iterator();
             for (int j = 0; j < 9; j++) {
                 it.next();

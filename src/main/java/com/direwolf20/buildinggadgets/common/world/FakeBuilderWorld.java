@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.common.world;
 
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.fluid.IFluidState;
 import net.minecraft.init.Blocks;
 import net.minecraft.tileentity.TileEntity;
@@ -14,11 +14,11 @@ import java.util.Set;
 
 public class FakeBuilderWorld implements IBlockReader {
     private Set<BlockPos> positions;
-    private IBlockState state;
+    private BlockState state;
     private World realWorld;
-    private final IBlockState AIR = Blocks.AIR.getDefaultState();
+    private final BlockState AIR = Blocks.AIR.getDefaultState();
 
-    public void setWorldAndState(World rWorld, IBlockState setBlock, Set<BlockPos> coordinates) {
+    public void setWorldAndState(World rWorld, BlockState setBlock, Set<BlockPos> coordinates) {
         this.state = setBlock;
         this.realWorld = rWorld;
         positions = coordinates;
@@ -31,7 +31,7 @@ public class FakeBuilderWorld implements IBlockReader {
     }
 
     @Override
-    public IBlockState getBlockState(BlockPos pos) {
+    public BlockState getBlockState(BlockPos pos) {
         return positions.contains(pos) ? state : AIR;
     }
 

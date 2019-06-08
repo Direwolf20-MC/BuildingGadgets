@@ -2,7 +2,7 @@ package com.direwolf20.buildinggadgets.api.abstraction;
 
 import com.direwolf20.buildinggadgets.api.template.building.IBuildContext;
 import com.direwolf20.buildinggadgets.api.template.building.tilesupport.ITileEntityData;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.util.math.BlockPos;
 
@@ -20,14 +20,14 @@ public final class PlacementTarget {
     private static final String KEY_POS = "pos";
 
     /**
-     * @param nbt The {@link NBTTagCompound} representing the serialized form of this {@code PlacementTarget}.
+     * @param nbt The {@link CompoundNBT} representing the serialized form of this {@code PlacementTarget}.
      * @param persisted Flag indicating whether the data was created for an persisted save or not
      * @return A new {@code PlacementTarget} representing the serialized form of nbt.
      * @throws IllegalArgumentException if the persisted flag does not match the way the nbt was created
      * @throws NullPointerException if the serializer for the {@link ITileEntityData} could not be found
-     * @see BlockData#deserialize(NBTTagCompound, boolean)
+     * @see BlockData#deserialize(CompoundNBT, boolean)
      */
-    public static PlacementTarget deserialize(NBTTagCompound nbt, boolean persisted) {
+    public static PlacementTarget deserialize(CompoundNBT nbt, boolean persisted) {
         BlockPos pos = NBTUtil.readBlockPos(nbt.getCompound(KEY_POS));
         BlockData data = BlockData.deserialize(nbt.getCompound(KEY_DATA), persisted);
         return new PlacementTarget(pos, data);
@@ -73,15 +73,15 @@ public final class PlacementTarget {
 
     /**
      * Serializes the data contained by this {@link PlacementTarget}. The persisted flag is used as an hint, whether non-persistent formats (Registry-id's) may be used to
-     * reduce the size of the resulting {@link NBTTagCompound}.
+     * reduce the size of the resulting {@link CompoundNBT}.
      * @param persisted Whether or not this should be created as an persisted save.
-     * @return The serialized form of this {@code PlacementTarget} as an {@link NBTTagCompound}.
+     * @return The serialized form of this {@code PlacementTarget} as an {@link CompoundNBT}.
      * @see BlockData#serialize(boolean)
      */
-    public NBTTagCompound serialize(boolean persisted) {
-        NBTTagCompound compound = new NBTTagCompound();
-        compound.setTag(KEY_DATA, data.serialize(persisted));
-        compound.setTag(KEY_POS, NBTUtil.writeBlockPos(pos));
+    public CompoundNBT serialize(boolean persisted) {
+        CompoundNBT compound = new CompoundNBT();
+        compound.put(KEY_DATA, data.serialize(persisted));
+        compound.put(KEY_POS, NBTUtil.writeBlockPos(pos));
         return compound;
     }
 }

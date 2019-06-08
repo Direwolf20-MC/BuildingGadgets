@@ -2,8 +2,8 @@ package com.direwolf20.buildinggadgets.api.building;
 
 import com.google.common.collect.AbstractIterator;
 import com.google.common.collect.ImmutableList;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.block.BlockState;
+import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -55,9 +55,9 @@ public class Context {
      *
      * @return {@link AbstractIterator} that wraps {@code getPositionSequence().iterator()}
      */
-    public Iterator<BlockPos> getFilteredSequence(World world, ItemStack stack, EntityPlayer player, BlockPos initial) {
+    public Iterator<BlockPos> getFilteredSequence(World world, ItemStack stack, ClientPlayerEntity player, BlockPos initial) {
         Iterator<BlockPos> positions = getPositionSequence().iterator();
-        BiPredicate<BlockPos, IBlockState> validator = validatorFactory.createValidatorFor(world, stack, player, initial);
+        BiPredicate<BlockPos, BlockState> validator = validatorFactory.createValidatorFor(world, stack, player, initial);
         return new AbstractIterator<BlockPos>() {
             @Override
             protected BlockPos computeNext() {
@@ -74,7 +74,7 @@ public class Context {
     /**
      * @see IPositionPlacementSequence#collect()
      */
-    public ImmutableList<BlockPos> collectFilteredSequence(World world, ItemStack stack, EntityPlayer player, BlockPos initial) {
+    public ImmutableList<BlockPos> collectFilteredSequence(World world, ItemStack stack, ClientPlayerEntity player, BlockPos initial) {
         return ImmutableList.copyOf(getFilteredSequence(world, stack, player, initial));
     }
 
