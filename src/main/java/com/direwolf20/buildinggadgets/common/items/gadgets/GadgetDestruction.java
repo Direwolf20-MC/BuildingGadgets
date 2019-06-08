@@ -20,6 +20,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.block.Blocks;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
@@ -241,7 +242,7 @@ public class GadgetDestruction extends GadgetSwapping {
         return new ActionResult<ItemStack>(ActionResultType.SUCCESS, stack);
     }
 
-    public static void anchorBlocks(ClientPlayerEntity player, ItemStack stack) {
+    public static void anchorBlocks(PlayerEntity player, ItemStack stack) {
         BlockPos currentAnchor = getAnchor(stack);
         if (currentAnchor == null) {
             RayTraceResult lookingAt = VectorHelper.getLookingAt(player, stack);

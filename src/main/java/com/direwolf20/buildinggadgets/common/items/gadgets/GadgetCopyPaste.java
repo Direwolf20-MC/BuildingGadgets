@@ -30,6 +30,7 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.block.Blocks;
 import net.minecraft.enchantment.Enchantments;
@@ -571,7 +572,7 @@ public class GadgetCopyPaste extends GadgetPlacing implements ITemplate {
 
     }
 
-    public static void anchorBlocks(ClientPlayerEntity player, ItemStack stack) {
+    public static void anchorBlocks(PlayerEntity player, ItemStack stack) {
         BlockPos currentAnchor = getAnchor(stack);
         if (currentAnchor == null) {
             RayTraceResult lookingAt = VectorHelper.getLookingAt(player, stack);

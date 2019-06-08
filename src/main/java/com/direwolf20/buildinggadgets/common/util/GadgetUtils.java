@@ -21,6 +21,7 @@ import com.google.common.collect.Multiset;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.block.Blocks;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompressedStreamTools;
@@ -314,7 +315,7 @@ public class GadgetUtils {
         return ActionResultType.FAIL;
     }
 
-    public static boolean anchorBlocks(ClientPlayerEntity player, ItemStack stack) {
+    public static boolean anchorBlocks(PlayerEntity player, ItemStack stack) {
         //Stores the current visual blocks in NBT on the tool, so the player can look around without moving the visual render
         World world = player.world;
         List<BlockPos> currentCoords = getAnchor(stack);

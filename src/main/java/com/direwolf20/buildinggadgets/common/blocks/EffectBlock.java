@@ -39,10 +39,10 @@ public class EffectBlock extends Block {
      * @param pos   Block position in world
      * @return True if the block is a full cube
      */
-    @Override
+    /*@Override
     public boolean isNormalCube(BlockState state, IBlockReader world, BlockPos pos) {
         return false;
-    }
+    }*/
 
     /**
      * Gets the render layer this block will render on. SOLID for solid blocks, CUTOUT or CUTOUT_MIPPED for on-off

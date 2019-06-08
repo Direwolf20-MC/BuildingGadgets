@@ -110,7 +110,7 @@ public abstract class GadgetGeneric extends Item {
         return !EnergyUtil.hasCap(toRepair) && repair.getItem() == Items.DIAMOND;
     }
 
-    public static ItemStack getGadget(ClientPlayerEntity player) {
+    public static ItemStack getGadget(PlayerEntity player) {
         ItemStack heldItem = player.getHeldItemMainhand();
         if (!(heldItem.getItem() instanceof GadgetGeneric)) {
             heldItem = player.getHeldItemOffhand();

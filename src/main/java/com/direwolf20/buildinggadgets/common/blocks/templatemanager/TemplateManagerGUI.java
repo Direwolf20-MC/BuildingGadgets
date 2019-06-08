@@ -80,7 +80,7 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
 
     @Override
     public void render(int mouseX, int mouseY, float partialTicks) {
-        drawDefaultBackground();
+        drawGuiContainerBackgroundLayer(partialTicks,mouseX,mouseY);
         super.render(mouseX, mouseY, partialTicks);
         if (buttonHelp.isSelected()) {
             GlStateManager.color4f(1, 1, 1, 1);
