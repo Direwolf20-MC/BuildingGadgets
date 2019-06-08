@@ -1,8 +1,8 @@
 package com.direwolf20.buildinggadgets.client.gui.base;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiListExtended;
-import net.minecraft.client.gui.GuiListExtended.IGuiListEntry;
+import net.minecraft.client.gui.widget.list.ExtendedList;
+import net.minecraft.client.gui.widget.list.ExtendedList.AbstractListEntry;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
@@ -11,7 +11,7 @@ import net.minecraft.util.math.MathHelper;
 import org.lwjgl.opengl.GL11;
 
 /**
- * A preset of {@link GuiListExtended} where
+ * A preset of {@link ExtendedList} where
  * <ul>
  * <li>No overlays will be drawn
  * <li>No dirt background, but a gradient rectangle instead
@@ -21,7 +21,7 @@ import org.lwjgl.opengl.GL11;
  * BufferBuilder, int, int)}
  * </ul>
  */
-public class GuiEntryList<E extends IGuiListEntry<E>> extends GuiListExtended<E> {
+public class GuiEntryList<E extends AbstractListEntry<E>> extends ExtendedList<E> {
 
     private double scaleFactor;
 

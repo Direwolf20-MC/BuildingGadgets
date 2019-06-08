@@ -2,9 +2,9 @@ package com.direwolf20.buildinggadgets.client.gui;
 
 import javax.annotation.Nullable;
 
-import net.minecraft.client.gui.GuiButton;
+import net.minecraft.client.gui.widget.button.Button;
 
-public class GuiButtonAction extends GuiButton {
+public class GuiButtonAction extends Button {
     private Runnable action;
 
     public GuiButtonAction(int x, int y, int width, int height, String buttonText, @Nullable Runnable action) {

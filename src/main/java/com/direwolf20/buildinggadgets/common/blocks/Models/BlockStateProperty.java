@@ -3,12 +3,12 @@ package com.direwolf20.buildinggadgets.common.blocks.Models;
 import com.direwolf20.buildinggadgets.common.util.blocks.BlockStateWrapper;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.block.Block;
-import net.minecraft.state.AbstractProperty;
+import net.minecraft.state.Property;
 
 import java.util.Collection;
 import java.util.Optional;
 
-public class BlockStateProperty extends AbstractProperty<BlockStateWrapper> {
+public class BlockStateProperty extends Property<BlockStateWrapper> {
     private final Block theBlock;
     private ImmutableList<BlockStateWrapper> validValues = null;
 

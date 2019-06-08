@@ -9,8 +9,8 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.world.EnumLightType;
-import net.minecraft.world.IWorldReaderBase;
+import net.minecraft.world.IWorldReader;
+import net.minecraft.world.LightType;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.border.WorldBorder;
 import net.minecraft.world.dimension.Dimension;
@@ -25,7 +25,7 @@ import java.util.function.Predicate;
  *
  * <p>"Region" means the effective range is limited and "View" indicates this class is immutable.</p>
  */
-public class RegionBlockView implements IWorldReaderBase {
+public class RegionBlockView implements IWorldReader {
 
     private Region region;
     private BlockState state;
@@ -51,7 +51,7 @@ public class RegionBlockView implements IWorldReaderBase {
     }
 
     @Override
-    public int getLightFor(EnumLightType type, BlockPos pos) {
+    public int getLightFor(LightType type, BlockPos pos) {
         return 0;
     }
 

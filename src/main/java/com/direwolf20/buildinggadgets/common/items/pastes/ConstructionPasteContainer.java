@@ -8,10 +8,10 @@ import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
-import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ActionResult;
-import net.minecraft.util.EnumActionResult;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.ITextComponent;
@@ -48,7 +48,7 @@ public class ConstructionPasteContainer extends GenericPasteContainer {
     public ActionResult<ItemStack> onItemRightClick(World world, ClientPlayerEntity player, Hand hand) {
         ItemStack heldItem = player.getHeldItem(hand);
         player.setActiveHand(hand);
-        InventoryPlayer inv = player.inventory;
+        PlayerInventory inv = player.inventory;
         if (!world.isRemote) {
             for (int i = 0; i < 36; ++i) {
                 ItemStack itemStack = inv.getStackInSlot(i);
@@ -57,7 +57,7 @@ public class ConstructionPasteContainer extends GenericPasteContainer {
                 }
             }
         }
-        return new ActionResult<>(EnumActionResult.SUCCESS, heldItem);
+        return new ActionResult<>(ActionResultType.SUCCESS, heldItem);
     }
 
     @Override

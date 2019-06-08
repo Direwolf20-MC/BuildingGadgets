@@ -9,13 +9,13 @@ import com.direwolf20.buildinggadgets.common.util.lang.MaterialListTranslation;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.google.common.base.Preconditions;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiButton;
-import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TranslationTextComponent;
 
 import java.awt.*;
 import java.util.List;
@@ -95,8 +95,8 @@ public class MaterialListGUI extends BasicGUIBase {
             buttonSortingModes.displayString = scrollingList.getSortingMode().getLocalizedName();
         });
         this.buttonCopyList = new GuiButtonAction(0, buttonY, 0, BUTTON_HEIGHT, MaterialListTranslation.BUTTON_COPY.format(), () -> {
-            mc.keyboardListener.setClipboardString(stringify(GuiScreen.isCtrlKeyDown()));
-            mc.player.sendStatusMessage(new TextComponentTranslation(MaterialListTranslation.MESSAGE_COPY_SUCCESS.getTranslationKey()), true);
+            mc.keyboardListener.setClipboardString(stringify(Screen.isCtrlKeyDown()));
+            mc.player.sendStatusMessage(new TranslationTextComponent(MaterialListTranslation.MESSAGE_COPY_SUCCESS.getTranslationKey()), true);
         });
 
         // Buttons will be placed left to right in this order
@@ -166,7 +166,7 @@ public class MaterialListGUI extends BasicGUIBase {
         // Align the box of buttons in the center, and start from the left
         int nextX = getWindowLeftX();
 
-        for (GuiButton button : buttons) {
+        for (Button button : buttons) {
             button.width = buttonWidth;
             button.x = nextX;
             nextX += buttonWidth + BUTTONS_PADDING;

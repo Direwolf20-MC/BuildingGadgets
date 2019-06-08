@@ -4,7 +4,7 @@ import javax.annotation.Nullable;
 
 import net.minecraft.client.audio.SimpleSound;
 import net.minecraft.client.audio.SoundHandler;
-import net.minecraft.init.SoundEvents;
+import net.minecraft.util.SoundEvents;
 import net.minecraft.util.SoundEvent;
 
 public class GuiButtonSound extends GuiButtonSelect {

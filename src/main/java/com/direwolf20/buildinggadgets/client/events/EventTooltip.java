@@ -8,13 +8,13 @@ import com.direwolf20.buildinggadgets.common.util.helpers.InventoryHelper;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.google.common.collect.Multiset;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.ItemRenderer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RenderTooltipEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -39,7 +39,7 @@ public class EventTooltip {
     }
 
     private static void tooltipIfShift(@SuppressWarnings("unused") List<ITextComponent> tooltip, Runnable r) {
-        if (GuiScreen.isShiftKeyDown())
+        if (Screen.isShiftKeyDown())
             r.run();
     }
 
@@ -78,7 +78,7 @@ public class EventTooltip {
                         spaces += " ";
 
                     for (int j = 0; j < lines; j++)
-                        tooltip.add(new TextComponentString(spaces));
+                        tooltip.add(new StringTextComponent(spaces));
                 });
         }
     }
@@ -88,7 +88,7 @@ public class EventTooltip {
         //This method will draw items on the tooltip
         ItemStack stack = event.getStack();
 
-        if ((stack.getItem() instanceof ITemplate) && GuiScreen.isShiftKeyDown()) {
+        if ((stack.getItem() instanceof ITemplate) && Screen.isShiftKeyDown()) {
             long totalMissing = 0;
             Multiset<UniqueItem> itemCountMap = ((ITemplate) stack.getItem()).getItemCountMap(stack);
 

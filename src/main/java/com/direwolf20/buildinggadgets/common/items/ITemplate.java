@@ -8,7 +8,7 @@ import com.google.common.collect.Multiset;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.ListNBT;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -39,7 +39,7 @@ public interface ITemplate {
         if (tagCompound == null) {
             tagCompound = new CompoundNBT();
         }
-        NBTTagList tagList = GadgetUtils.itemCountToNBT(tagMap);
+        ListNBT tagList = GadgetUtils.itemCountToNBT(tagMap);
         tagCompound.setTag("itemcountmap", tagList);
         stack.setTag(tagCompound);
     }
@@ -47,7 +47,7 @@ public interface ITemplate {
     @Nonnull
     default Multiset<UniqueItem> getItemCountMap(ItemStack stack) {
         CompoundNBT tagCompound = stack.getTag();
-        Multiset<UniqueItem> tagMap = tagCompound == null ? null : GadgetUtils.nbtToItemCount((NBTTagList) tagCompound.getTag("itemcountmap"));
+        Multiset<UniqueItem> tagMap = tagCompound == null ? null : GadgetUtils.nbtToItemCount((ListNBT) tagCompound.getTag("itemcountmap"));
         if (tagMap == null)
             throw new IllegalArgumentException("ITemplate#getItemCountMap faild to retieve tag map from " + GadgetUtils.getStackErrorSuffix(stack));
 

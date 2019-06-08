@@ -6,19 +6,18 @@ import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockRendererDispatcher;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.entity.Render;
-import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.client.renderer.texture.TextureMap;
+import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.renderer.entity.EntityRendererManager;
+import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.client.registry.IRenderFactory;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL14;
 
 import javax.annotation.Nullable;
 
-public class ConstructionBlockEntityRender extends Render<ConstructionBlockEntity> {
+public class ConstructionBlockEntityRender extends EntityRenderer<ConstructionBlockEntity> {
 
-    public ConstructionBlockEntityRender(RenderManager renderManager) {
+    public ConstructionBlockEntityRender(EntityRendererManager renderManager) {
         super(renderManager);
         this.shadowSize = 0F;
     }
@@ -31,7 +30,7 @@ public class ConstructionBlockEntityRender extends Render<ConstructionBlockEntit
         GlStateManager.enableBlend();
         GlStateManager.blendFunc(GL14.GL_CONSTANT_ALPHA, GL14.GL_ONE_MINUS_CONSTANT_ALPHA);
 
-        mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+        mc.getTextureManager().bindTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
         int teCounter = entity.getTicksExisted();
         int maxLife = entity.getMaxLife();
         teCounter = teCounter > maxLife ? maxLife : teCounter;

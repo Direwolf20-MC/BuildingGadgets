@@ -10,7 +10,7 @@ import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketCopyCoords;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
-import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -97,7 +97,7 @@ public class CopyGUI extends GuiScreenTextFields {
 
     private void fieldChange(GuiTextFieldBase textField, int amount) {
         clearTextBoxes();
-        if (GuiScreen.isShiftKeyDown()) amount *= 10;
+        if (Screen.isShiftKeyDown()) amount *= 10;
         textField.setText(String.valueOf(textField.getInt() + amount));
     }
 

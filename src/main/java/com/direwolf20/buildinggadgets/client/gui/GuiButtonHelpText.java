@@ -2,7 +2,7 @@ package com.direwolf20.buildinggadgets.client.gui;
 
 import javax.annotation.Nullable;
 
-import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.AbstractGui;
 import net.minecraft.client.resources.I18n;
 
 public class GuiButtonHelpText extends GuiButtonAction implements IHoverHelpText {
@@ -24,7 +24,7 @@ public class GuiButtonHelpText extends GuiButtonAction implements IHoverHelpText
     }
 
     @Override
-    public void drawRect(Gui gui, int color) {
+    public void drawRect(AbstractGui gui, int color) {
         drawRect(x, y, x + width, y + height, color);
     }
 

@@ -23,7 +23,6 @@ import net.minecraft.world.*;
 import net.minecraft.world.storage.loot.LootContext;
 import net.minecraftforge.common.IPlantable;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;

@@ -1,9 +1,9 @@
 package com.direwolf20.buildinggadgets.client.gui.base;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.screen.Screen;
 
-public class BasicGUIBase extends GuiScreen {
+public class BasicGUIBase extends Screen {
 
     private static final char KEY_CLOSE_GUI = 'e';
 

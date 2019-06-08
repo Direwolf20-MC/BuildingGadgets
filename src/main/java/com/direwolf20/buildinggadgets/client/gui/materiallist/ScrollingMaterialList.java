@@ -7,7 +7,7 @@ import com.direwolf20.buildinggadgets.common.util.helpers.InventoryHelper;
 import com.direwolf20.buildinggadgets.common.util.tools.UniqueItem;
 import com.google.common.collect.Multiset;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiListExtended;
+import net.minecraft.client.gui.widget.list.ExtendedList;
 import net.minecraft.client.renderer.*;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -62,7 +62,7 @@ class ScrollingMaterialList extends GuiEntryList<Entry> {
         return right - MARGIN - SCROLL_BAR_WIDTH;
     }
 
-    static class Entry extends GuiListExtended.IGuiListEntry<Entry> {
+    static class Entry extends ExtendedList.IGuiListEntry<Entry> {
 
         private ScrollingMaterialList parent;
         private int required;

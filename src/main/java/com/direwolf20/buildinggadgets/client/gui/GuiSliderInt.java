@@ -5,8 +5,8 @@ import com.google.common.collect.ImmutableSet;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.SoundHandler;
-import net.minecraft.client.gui.GuiButton;
-import net.minecraft.init.SoundEvents;
+import net.minecraft.client.gui.widget.button.Button;
+import net.minecraft.util.SoundEvents;
 import net.minecraftforge.fml.client.config.GuiSlider;
 
 import java.awt.Color;
@@ -59,7 +59,7 @@ public class GuiSliderInt extends GuiSlider {
         renderText(mc, this);
     }
 
-    private void renderText(Minecraft mc, GuiButton component) {
+    private void renderText(Minecraft mc, Button component) {
         int color = !enabled ? 10526880 : (hovered ? 16777120 : -1);
         String buttonText = component.displayString;
         int strWidth = mc.fontRenderer.getStringWidth(buttonText);
@@ -90,7 +90,7 @@ public class GuiSliderInt extends GuiSlider {
         drawRect(++x, ++y, x + width - 2, y + height - 2, colorSlider); 
     }
 
-    public Collection<GuiButton> getComponents() {
+    public Collection<Button> getComponents() {
         return ImmutableSet.of(this,
                 new GuiButtonIncrement(this, x - height, y, height, height, "-", () -> increment.accept(this, -1)),
                 new GuiButtonIncrement(this, x + width, y, height, height, "+", () -> increment.accept(this, 1)));

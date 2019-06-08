@@ -10,12 +10,12 @@ import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketPasteGUI;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.util.text.TextFormatting;
 
 public class PasteGUI extends GuiScreenTextFields {
@@ -52,7 +52,7 @@ public class PasteGUI extends GuiScreenTextFields {
                 PacketHandler.sendToServer(new PacketPasteGUI(Integer.parseInt(X.getText()), Integer.parseInt(Y.getText()), Integer.parseInt(Z.getText())));
                 close();
             } else {
-                Minecraft.getInstance().player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.destroysizeerror").getUnformattedComponentText()), true);
+                Minecraft.getInstance().player.sendStatusMessage(new StringTextComponent(TextFormatting.RED + new TranslationTextComponent("message.gadget.destroysizeerror").getUnformattedComponentText()), true);
             }
         }));
         addButton(65, "-", () -> fieldChange(X, -1));
@@ -83,7 +83,7 @@ public class PasteGUI extends GuiScreenTextFields {
 
     public void fieldChange(GuiTextFieldBase field, int amount) {
         nullCheckTextBoxes();
-        if (GuiScreen.isShiftKeyDown()) amount *= 10;
+        if (Screen.isShiftKeyDown()) amount *= 10;
         int i = MathHelper.clamp(field.getInt() + amount, -16, 16);
         field.setText(String.valueOf(i));
         sendPacket();

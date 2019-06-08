@@ -2,8 +2,8 @@ package com.direwolf20.buildinggadgets.common.registry.block;
 
 import com.direwolf20.buildinggadgets.common.registry.RegistryObjectBuilder;
 import net.minecraft.block.Block;
+import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemBlock;
 import net.minecraft.util.ResourceLocation;
 
 import java.util.Objects;
@@ -26,14 +26,14 @@ public final class BlockBuilder extends RegistryObjectBuilder<Block, Block.Prope
 
     public BlockBuilder(String registryName) {
         super(registryName);
-        this.itemBlockFactory = ItemBlock::new;
+        this.itemBlockFactory = BlockItem::new;
         this.itemBuilder = new Item.Properties();
         hasItem = true;
     }
 
     public BlockBuilder(ResourceLocation registryName) {
         super(registryName);
-        this.itemBlockFactory = ItemBlock::new;
+        this.itemBlockFactory = BlockItem::new;
         this.itemBuilder = new Item.Properties();
         hasItem = true;
     }

@@ -2,7 +2,8 @@ package com.direwolf20.buildinggadgets.test.util;
 
 import com.google.common.collect.ImmutableMap;
 import net.minecraft.block.Block;
-import net.minecraft.block.material.EnumPushReaction;
+import net.minecraft.block.BlockRenderType;
+import net.minecraft.block.material.PushReaction;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.material.MaterialColor;
 import net.minecraft.block.state.BlockFaceShape;
@@ -206,8 +207,8 @@ public class UniqueBlockState implements BlockState {
     }
 
     @Override
-    public EnumBlockRenderType getRenderType() {
-        return EnumBlockRenderType.MODEL;
+    public BlockRenderType getRenderType() {
+        return BlockRenderType.MODEL;
     }
 
     @Override
@@ -266,8 +267,8 @@ public class UniqueBlockState implements BlockState {
     }
 
     @Override
-    public EnumPushReaction getPushReaction() {
-        return EnumPushReaction.NORMAL;
+    public PushReaction getPushReaction() {
+        return PushReaction.NORMAL;
     }
 
     @Override
@@ -406,7 +407,7 @@ public class UniqueBlockState implements BlockState {
     }
 
     @Override
-    public boolean isValidPosition(IWorldReaderBase worldIn, BlockPos pos) {
+    public boolean isValidPosition(IWorldReader worldIn, BlockPos pos) {
         return false;
     }
 

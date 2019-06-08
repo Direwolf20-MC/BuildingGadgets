@@ -3,9 +3,9 @@ package com.direwolf20.buildinggadgets.client.gui;
 import java.util.function.BiConsumer;
 
 import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.GuiTextField;
+import net.minecraft.client.gui.widget.TextFieldWidget;
 
-public class GuiTextFieldBase extends GuiTextField {
+public class GuiTextFieldBase extends TextFieldWidget {
     private boolean suspended;
     private String valueDefault, valueOld;
     private BiConsumer<GuiTextFieldBase, String> postModification;

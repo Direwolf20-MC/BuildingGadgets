@@ -19,10 +19,10 @@ import it.unimi.dsi.fastutil.ints.IntList;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
-import net.minecraft.init.Blocks;
+import net.minecraft.block.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.ListNBT;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
@@ -218,7 +218,7 @@ public class GadgetDestruction extends GadgetSwapping {
             if (!player.isSneaking()) {
                 RayTraceResult lookingAt = VectorHelper.getLookingAt(player, stack);
                 if (lookingAt == null && getAnchor(stack) == null) { //If we aren't looking at anything, exit
-                    return new ActionResult<ItemStack>(EnumActionResult.FAIL, stack);
+                    return new ActionResult<ItemStack>(ActionResultType.FAIL, stack);
                 }
                 BlockPos startBlock = (getAnchor(stack) == null) ? lookingAt.getBlockPos() : getAnchor(stack);
                 Direction sideHit = (getAnchorSide(stack) == null) ? lookingAt.sideHit : getAnchorSide(stack);
@@ -226,7 +226,7 @@ public class GadgetDestruction extends GadgetSwapping {
                 if (getAnchor(stack) != null) {
                     setAnchor(stack, null);
                     setAnchorSide(stack, null);
-                    player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.anchorremove").getUnformattedComponentText()), true);
+                    player.sendStatusMessage(new StringTextComponent(TextFormatting.AQUA + new TranslationTextComponent("message.gadget.anchorremove").getUnformattedComponentText()), true);
                 }
             } else {
                 //TODO Remove debug code
@@ -235,10 +235,10 @@ public class GadgetDestruction extends GadgetSwapping {
         } else {
             if (player.isSneaking()) {
                 GuiMod.DESTRUCTION.openScreen(player);
-                return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);
+                return new ActionResult<ItemStack>(ActionResultType.SUCCESS, stack);
             }
         }
-        return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);
+        return new ActionResult<ItemStack>(ActionResultType.SUCCESS, stack);
     }
 
     public static void anchorBlocks(ClientPlayerEntity player, ItemStack stack) {
@@ -251,11 +251,11 @@ public class GadgetDestruction extends GadgetSwapping {
             currentAnchor = lookingAt.getBlockPos();
             setAnchor(stack, currentAnchor);
             setAnchorSide(stack, lookingAt.sideHit);
-            player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.anchorrender").getUnformattedComponentText()), true);
+            player.sendStatusMessage(new StringTextComponent(TextFormatting.AQUA + new TranslationTextComponent("message.gadget.anchorrender").getUnformattedComponentText()), true);
         } else {
             setAnchor(stack, null);
             setAnchorSide(stack, null);
-            player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.anchorremove").getUnformattedComponentText()), true);
+            player.sendStatusMessage(new StringTextComponent(TextFormatting.AQUA + new TranslationTextComponent("message.gadget.anchorremove").getUnformattedComponentText()), true);
         }
     }
 
@@ -428,7 +428,7 @@ public class GadgetDestruction extends GadgetSwapping {
         int[] statePasteArray = tag.getIntArray(NBTKeys.MAP_STATE_PASTE);
 
         BlockMapIntState intState = new BlockMapIntState();
-        intState.getIntStateMapFromNBT((NBTTagList) tag.getTag(NBTKeys.MAP_PALETTE));
+        intState.getIntStateMapFromNBT((ListNBT) tag.getTag(NBTKeys.MAP_PALETTE));
 
         boolean success = false;
         for (int i = 0; i < indexPosArray.length; i++) {

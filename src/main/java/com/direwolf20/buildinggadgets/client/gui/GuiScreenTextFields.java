@@ -5,9 +5,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.function.Consumer;
 
-import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.screen.Screen;
 
-public class GuiScreenTextFields extends GuiScreen {
+public class GuiScreenTextFields extends Screen {
     private List<GuiTextFieldBase> fields = new ArrayList<>();
 
     protected GuiTextFieldBase addField(GuiTextFieldBase field) {
