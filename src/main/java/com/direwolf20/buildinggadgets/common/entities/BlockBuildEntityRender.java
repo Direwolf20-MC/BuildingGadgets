@@ -7,7 +7,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockRendererDispatcher;
 import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
+import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
@@ -74,11 +74,11 @@ public class BlockBuildEntityRender extends EntityRenderer<BlockBuildEntity> {
 
 
         GlStateManager.pushMatrix();
-        GlStateManager.pushLightingAttrib();
+        GlStateManager.pushLightingAttributes();
 
         GlStateManager.enableBlend();
         GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
-        GlStateManager.disableTexture2D();
+        GlStateManager.disableTexture();
         GlStateManager.depthMask(false);
         Tessellator t = Tessellator.getInstance();
         BufferBuilder bufferBuilder = t.getBuffer();
@@ -140,11 +140,11 @@ public class BlockBuildEntityRender extends EntityRenderer<BlockBuildEntity> {
         t.draw();
 
         GlStateManager.disableBlend();
-        GlStateManager.enableTexture2D();
+        GlStateManager.enableTexture();
         GlStateManager.depthMask(true);
 
         GlStateManager.popMatrix();
-        GlStateManager.popAttrib();
+        GlStateManager.popAttributes();
 
     }
 
