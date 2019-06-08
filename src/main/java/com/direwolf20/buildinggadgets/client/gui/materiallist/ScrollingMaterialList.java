@@ -13,7 +13,7 @@ import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
-
+import com.mojang.blaze3d.platform.GlStateManager;
 import java.awt.*;
 
 import static com.direwolf20.buildinggadgets.client.gui.materiallist.ScrollingMaterialList.Entry;
