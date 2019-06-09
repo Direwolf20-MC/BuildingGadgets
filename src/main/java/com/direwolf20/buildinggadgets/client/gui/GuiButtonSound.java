@@ -1,18 +1,18 @@
 package com.direwolf20.buildinggadgets.client.gui;
 
-import javax.annotation.Nullable;
-
 import net.minecraft.client.audio.SimpleSound;
 import net.minecraft.client.audio.SoundHandler;
-import net.minecraft.util.SoundEvents;
 import net.minecraft.util.SoundEvent;
+import net.minecraft.util.SoundEvents;
+
+import javax.annotation.Nullable;
 
 public class GuiButtonSound extends GuiButtonSelect {
     private SoundEvent soundSelect, soundDeselect;
     private float pitchSelect, pitchDeselect;
     private boolean silent;
 
-    public GuiButtonSound(int x, int y, int width, int height, String text, String helpTextKey, @Nullable Runnable action) {
+    public GuiButtonSound(int x, int y, int width, int height, String text, String helpTextKey, @Nullable IPressable action) {
         super(x, y, width, height, text, helpTextKey, action);
         pitchSelect = pitchDeselect = 1;
     }
@@ -34,11 +34,11 @@ public class GuiButtonSound extends GuiButtonSelect {
     }
 
     @Override
-    public void playPressSound(SoundHandler soundHandler) {
+    public void playDownSound(SoundHandler soundHandler) {
         if (silent)
             return;
 
         SoundEvent sound = soundSelect == null ? SoundEvents.UI_BUTTON_CLICK : (selected ? soundDeselect : soundSelect);
-        soundHandler.play(SimpleSound.getMasterRecord(sound, selected ? pitchDeselect : pitchSelect));
+        soundHandler.play(SimpleSound.master(sound, selected ? pitchDeselect : pitchSelect));
     }
 }

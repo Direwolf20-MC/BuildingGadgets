@@ -1,21 +1,22 @@
 package com.direwolf20.buildinggadgets.client.gui;
 
-import javax.annotation.Nullable;
-
 import net.minecraft.client.gui.AbstractGui;
+import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.client.resources.I18n;
 
-public class GuiButtonHelpText extends GuiButtonAction implements IHoverHelpText {
+import javax.annotation.Nullable;
+
+public class GuiButtonHelpText extends Button implements IHoverHelpText {
     protected String helpTextKey;
 
-    public GuiButtonHelpText(int x, int y, int widthIn, int heightIn, String buttonText, String helpTextKey, @Nullable Runnable action) {
+    public GuiButtonHelpText(int x, int y, int widthIn, int heightIn, String buttonText, String helpTextKey, @Nullable IPressable action) {
         super(x, y, widthIn, heightIn, buttonText, action);
         this.helpTextKey = helpTextKey;
     }
 
     @Override
     public boolean isHovered(int mouseX, int mouseY) {
-        return isMouseOver();
+        return isMouseOver(mouseX, mouseY);
     }
 
     @Override
@@ -25,7 +26,7 @@ public class GuiButtonHelpText extends GuiButtonAction implements IHoverHelpText
 
     @Override
     public void drawRect(AbstractGui gui, int color) {
-        drawRect(x, y, x + width, y + height, color);
+
     }
 
 }

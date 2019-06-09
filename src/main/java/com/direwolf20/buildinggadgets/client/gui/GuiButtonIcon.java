@@ -1,8 +1,6 @@
 package com.direwolf20.buildinggadgets.client.gui;
 
 import com.mojang.blaze3d.platform.GlStateManager;
-import org.lwjgl.opengl.GL11;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.Tessellator;
@@ -10,17 +8,17 @@ import net.minecraft.client.renderer.texture.MissingTextureSprite;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ResourceLocation;
-
-import java.awt.Color;
+import org.lwjgl.opengl.GL11;
 
 import javax.annotation.Nullable;
+import java.awt.*;
 
 public class GuiButtonIcon extends GuiButtonColor {
     private Icon iconSelected, iconDeselected;
     private float alpha = 1F;
 
     public GuiButtonIcon(int x, int y, int width, int height, String helpTextKey, Color colorSelected, Color colorDeselected,
-            @Nullable Color colorHovered, ResourceLocation textureSelected, @Nullable Runnable action) {
+                         @Nullable Color colorHovered, ResourceLocation textureSelected, @Nullable IPressable action) {
         super(x, y, width, height, "", helpTextKey, colorSelected, colorDeselected, colorHovered, action);
         iconDeselected = new Icon(textureSelected);
     }
@@ -62,10 +60,10 @@ public class GuiButtonIcon extends GuiButtonColor {
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.getBuffer();
         buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
-        buffer.pos(x + 0, y + height, zLevel).tex(0, 1).endVertex();
-        buffer.pos(x + width, y + height, zLevel).tex(1, 1).endVertex();
-        buffer.pos(x + width, y + 0, zLevel).tex(1, 0).endVertex();
-        buffer.pos(x + 0, y + 0, zLevel).tex(0, 0).endVertex();
+        buffer.pos(x, y + height, 0).tex(0, 1).endVertex();
+        buffer.pos(x + width, y + height, 0).tex(1, 1).endVertex();
+        buffer.pos(x + width, y, 0).tex(1, 0).endVertex();
+        buffer.pos(x, y, 0).tex(0, 0).endVertex();
         tessellator.draw();
     }
 

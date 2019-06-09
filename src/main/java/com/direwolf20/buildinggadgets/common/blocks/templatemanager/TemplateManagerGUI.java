@@ -5,41 +5,35 @@
 
 package com.direwolf20.buildinggadgets.common.blocks.templatemanager;
 
-import com.direwolf20.buildinggadgets.client.gui.AreaHelpText;
 import com.direwolf20.buildinggadgets.client.gui.GuiButtonHelp;
 import com.direwolf20.buildinggadgets.client.gui.GuiButtonHelpText;
 import com.direwolf20.buildinggadgets.client.gui.IHoverHelpText;
-import com.direwolf20.buildinggadgets.common.network.packets.PacketTemplateManagerLoad;
-import com.direwolf20.buildinggadgets.common.network.packets.PacketTemplateManagerPaste;
-import com.direwolf20.buildinggadgets.common.network.packets.PacketTemplateManagerSave;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
-import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.buffers.PasteToolBufferBuilder;
 import com.direwolf20.buildinggadgets.common.util.buffers.ToolBufferBuilder;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.mojang.blaze3d.platform.GlStateManager;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.gui.widget.button.Button;
+import net.minecraft.client.gui.widget.button.Button.IPressable;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.Matrix4f;
 import net.minecraft.client.renderer.Rectangle2d;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.client.renderer.vertex.VertexFormatElement;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.JsonToNBT;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
 import org.lwjgl.opengl.GL11;
 
 import javax.annotation.Nullable;
-import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
@@ -72,8 +66,8 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
 
     private static final ResourceLocation background = new ResourceLocation(Reference.MODID, "textures/gui/template_manager.png");
 
-    public TemplateManagerGUI(TemplateManagerTileEntity tileEntity, TemplateManagerContainer container) {
-        super(container);
+    public TemplateManagerGUI(TemplateManagerTileEntity tileEntity, TemplateManagerContainer container, PlayerInventory inv) {
+        super(container, inv, null); //TODO find out the usage of this TextComponent
         this.te = tileEntity;
         this.container = container;
     }
@@ -91,16 +85,17 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
             GlStateManager.enableLighting();
             for (IHoverHelpText helpTextProvider : helpTextProviders) {
                 if (helpTextProvider.isHovered(mouseX, mouseY))
-                    drawHoveringText(helpTextProvider.getHoverHelpText(), mouseX, mouseY);
+                    renderComponentHoverEffect(new StringTextComponent(helpTextProvider.getHoverHelpText()), mouseX, mouseY);
             }
         } else {
             this.renderHoveredToolTip(mouseX, mouseY);
         }
-        if (buttonHelp.isMouseOver())
-            drawHoveringText(buttonHelp.getHoverText(), mouseX, mouseY);
+        if (buttonHelp.isMouseOver(mouseX, mouseY))
+            renderComponentHoverEffect(new StringTextComponent(buttonHelp.getHoverText()), mouseX, mouseY);
     }
 
-    @Override
+    //TODO find replacements
+    /*
     public void initGui() {
         super.initGui();
         helpTextProviders.clear();
@@ -139,9 +134,9 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
         helpTextProviders.add(new AreaHelpText(inventorySlots.getSlot(1), guiLeft, guiTop, "slot.template"));
         helpTextProviders.add(new AreaHelpText(guiLeft + 112, guiTop + 41, 22, 15, "arrow.data_flow"));
         helpTextProviders.add(new AreaHelpText(panel, guiLeft, guiTop + 10, "preview"));
-    }
+    }*/
 
-    private Button createAndAddButton(int x, int y, int witdth, int height, String text, @Nullable Runnable action) {
+    private Button createAndAddButton(int x, int y, int witdth, int height, String text, @Nullable IPressable action) {
         GuiButtonHelpText button = new GuiButtonHelpText(guiLeft + x, guiTop + y, witdth, height, text, text.toLowerCase(), action);
         helpTextProviders.add(button);
         return button;
@@ -150,12 +145,12 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
     @Override
     protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
         GlStateManager.color4f(1, 1, 1, 1);
-        mc.getTextureManager().bindTexture(background);
-        drawTexturedModalRect(guiLeft, guiTop, 0, 0, xSize, ySize);
-        if (!buttonCopy.isMouseOver() && !buttonPaste.isMouseOver())
-            drawTexturedModalRectReverseX(guiLeft + 112, guiTop + 41, 176, 0, 22, 15, buttonLoad.isMouseOver());
+        getMinecraft().getTextureManager().bindTexture(background);
+        blit(guiLeft, guiTop, 0, 0, xSize, ySize);
+        if (! buttonCopy.isHovered() && ! buttonPaste.isHovered())
+            drawTexturedModalRectReverseX(guiLeft + 112, guiTop + 41, 176, 0, 22, 15, buttonLoad.isHovered());
 
-        this.nameField.drawTextField(mouseX, mouseY, partialTicks);
+        this.nameField.render(mouseX, mouseY, partialTicks);
         drawStructure();
     }
 
@@ -164,22 +159,22 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
         BufferBuilder bufferbuilder = tessellator.getBuffer();
         bufferbuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
         if (reverse) {
-            bufferbuilder.pos(x + 0, y + height, zLevel).tex((textureX + width) * 0.00390625F, textureY * 0.00390625F).endVertex();
-            bufferbuilder.pos(x + width, y + height, zLevel).tex(textureX * 0.00390625F, textureY * 0.00390625F).endVertex();
-            bufferbuilder.pos(x + width, y + 0, zLevel).tex(textureX * 0.00390625F, (textureY + height) * 0.00390625F).endVertex();
-            bufferbuilder.pos(x + 0, y + 0, zLevel).tex((textureX + width) * 0.00390625F, (textureY + height) * 0.00390625F).endVertex();
+            bufferbuilder.pos(x, y + height, 0).tex((textureX + width) * 0.00390625F, textureY * 0.00390625F).endVertex();
+            bufferbuilder.pos(x + width, y + height, 0).tex(textureX * 0.00390625F, textureY * 0.00390625F).endVertex();
+            bufferbuilder.pos(x + width, y, 0).tex(textureX * 0.00390625F, (textureY + height) * 0.00390625F).endVertex();
+            bufferbuilder.pos(x, y, 0).tex((textureX + width) * 0.00390625F, (textureY + height) * 0.00390625F).endVertex();
         } else {
-            bufferbuilder.pos(x + 0, y + height, zLevel).tex(textureX * 0.00390625F, (textureY + height) * 0.00390625F).endVertex();
-            bufferbuilder.pos(x + width, y + height, zLevel).tex((textureX + width) * 0.00390625F, (textureY + height) * 0.00390625F).endVertex();
-            bufferbuilder.pos(x + width, y + 0, zLevel).tex((textureX + width) * 0.00390625F, textureY * 0.00390625F).endVertex();
-            bufferbuilder.pos(x + 0, y + 0, zLevel).tex(textureX * 0.00390625F, textureY * 0.00390625F).endVertex();
+            bufferbuilder.pos(x, y + height, 0).tex(textureX * 0.00390625F, (textureY + height) * 0.00390625F).endVertex();
+            bufferbuilder.pos(x + width, y + height, 0).tex((textureX + width) * 0.00390625F, (textureY + height) * 0.00390625F).endVertex();
+            bufferbuilder.pos(x + width, y, 0).tex((textureX + width) * 0.00390625F, textureY * 0.00390625F).endVertex();
+            bufferbuilder.pos(x, y, 0).tex(textureX * 0.00390625F, textureY * 0.00390625F).endVertex();
         }
         tessellator.draw();
     }
 
     private void drawStructure() {
-        int scale = mc.mainWindow.getScaleFactor(this.mc.gameSettings.guiScale);
-        drawRect(guiLeft + panel.getX() - 1, guiTop + panel.getY() - 1, guiLeft + panel.getX() + panel.getWidth() + 1, guiTop + panel.getY() + panel.getHeight() + 1, 0xFF8A8A8A);
+        double scale = getMinecraft().mainWindow.getGuiScaleFactor();
+        fill(guiLeft + panel.getX() - 1, guiTop + panel.getY() - 1, guiLeft + panel.getX() + panel.getWidth() + 1, guiTop + panel.getY() + panel.getHeight() + 1, 0xFF8A8A8A);
         ItemStack itemstack = this.container.getSlot(0).getStack();
 //        BlockRendererDispatcher dispatcher = this.mc.getBlockRendererDispatcher();
         GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
@@ -221,11 +216,14 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
                 GlStateManager.pushMatrix();
                 GlStateManager.loadIdentity();
                 //int scale = new ScaledResolution(mc).getScaleFactor();
-                GlStateManager.multMatrixf(Matrix4f.perspective(60, (float) panel.getWidth() / panel.getHeight(), 0.01F, 4000));
+                GlStateManager.multMatrix(Matrix4f.perspective(60, (float) panel.getWidth() / panel.getHeight(), 0.01F, 4000));
                 GlStateManager.matrixMode(GL11.GL_MODELVIEW);
                 //GlStateManager.translate(-panel.getX() - panel.getWidth() / 2, -panel.getY() - panel.getHeight() / 2, 0);
-                GlStateManager.viewport((guiLeft + panel.getX()) * scale, mc.mainWindow.getFramebufferHeight() - (guiTop + panel.getY() + panel.getHeight()) * scale, panel.getWidth() * scale, panel.getHeight() * scale);
-                GlStateManager.clear(GL11.GL_DEPTH_BUFFER_BIT);
+                GlStateManager.viewport((int) Math.round((guiLeft + panel.getX()) * scale),
+                        (int) Math.round(getMinecraft().mainWindow.getFramebufferHeight() - (guiTop + panel.getY() + panel.getHeight()) * scale),
+                        (int) Math.round(panel.getWidth() * scale),
+                        (int) Math.round(panel.getHeight() * scale));
+                GlStateManager.clear(GL11.GL_DEPTH_BUFFER_BIT, true);
 
                 //double sc = 300 + 8 * 0.0125 * (Math.sqrt(zoom + 99) - 9);
                 sc = (293 * sc) + zoom / zoomScale;
@@ -246,7 +244,7 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
                 GlStateManager.rotatef(rotY, 0, 1, 0);
                 GlStateManager.translated(((startPos.getX() - endPos.getX()) / 2), ((startPos.getY() - endPos.getY()) / 2), ((startPos.getZ() - endPos.getZ()) / 2));
 
-                mc.getTextureManager().bindTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
+                getMinecraft().getTextureManager().bindTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
                 if ((startPos.getX() - endPos.getX()) == 0) {
                     //GlStateManager.rotate(270, 0, 1, 0);
                 }
@@ -288,7 +286,7 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
                 GlStateManager.matrixMode(GL11.GL_PROJECTION);
                 GlStateManager.popMatrix();
                 GlStateManager.matrixMode(GL11.GL_MODELVIEW);
-                GlStateManager.viewport(0, 0, mc.mainWindow.getFramebufferWidth(), mc.mainWindow.getFramebufferHeight());
+                GlStateManager.viewport(0, 0, getMinecraft().mainWindow.getFramebufferWidth(), getMinecraft().mainWindow.getFramebufferHeight());
             }
         } else {
             rotX = 0;
@@ -304,14 +302,14 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int mouseButton) {
         if (this.nameField.mouseClicked(mouseX, mouseY, mouseButton)) {
-            nameField.setFocused(true);
+            nameField.setFocused2(true);
         } else {
-            nameField.setFocused(false);
+            nameField.setFocused2(false);
             if (panel.contains((int) mouseX - guiLeft, (int) mouseY - guiTop)) {
                 clickButton = mouseButton;
                 panelClicked = true;
-                clickX = (int) mc.mouseHelper.getMouseX();
-                clickY = (int) mc.mouseHelper.getMouseY();
+                clickX = (int) getMinecraft().mouseHelper.getMouseX();
+                clickY = (int) getMinecraft().mouseHelper.getMouseY();
             }
         }
 
@@ -338,16 +336,16 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
             if (clickButton == 0) {
                 prevRotX = rotX;
                 prevRotY = rotY;
-                rotX = initRotX - ((int) mc.mouseHelper.getMouseY() - clickY);
-                rotY = initRotY + ((int) mc.mouseHelper.getMouseX() - clickX);
+                rotX = initRotX - ((int) getMinecraft().mouseHelper.getMouseY() - clickY);
+                rotY = initRotY + ((int) getMinecraft().mouseHelper.getMouseX() - clickX);
                 momentumX = rotX - prevRotX;
                 momentumY = rotY - prevRotY;
                 doMomentum = false;
             } else if (clickButton == 1) {
 //                prevPanX = panX;
 //                prevPanY = panY;
-                panX = initPanX + ((int) mc.mouseHelper.getMouseX() - clickX) / 8;
-                panY = initPanY + ((int) mc.mouseHelper.getMouseY() - clickY) / 8;
+                panX = initPanX + ((int) getMinecraft().mouseHelper.getMouseX() - clickX) / 8;
+                panY = initPanY + ((int) getMinecraft().mouseHelper.getMouseY() - clickY) / 8;
             }
         }
 
@@ -359,27 +357,27 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
         }
 
         if (!nameField.isFocused() && nameField.getText().isEmpty())
-            fontRenderer.drawString("template name", nameField.x - guiLeft + 4, nameField.y - guiTop, -10197916);
+            getMinecraft().fontRenderer.drawString("template name", nameField.x - guiLeft + 4, nameField.y - guiTop, - 10197916);
 
-        if (buttonSave.isMouseOver() || buttonLoad.isMouseOver() || buttonPaste.isMouseOver())
-            drawSlotOverlay(buttonLoad.isMouseOver() ? container.getSlot(0) : container.getSlot(1));
+        if (buttonSave.isHovered() || buttonLoad.isHovered() || buttonPaste.isHovered())
+            drawSlotOverlay(buttonLoad.isHovered() ? container.getSlot(0) : container.getSlot(1));
     }
 
     private void drawSlotOverlay(Slot slot) {
         GlStateManager.translated(0, 0, 1000);
-        drawRect(slot.xPos, slot.yPos, slot.xPos + 16, slot.yPos + 16, -1660903937);
+        fill(slot.xPos, slot.yPos, slot.xPos + 16, slot.yPos + 16, - 1660903937);
         GlStateManager.translated(0, 0, -1000);
     }
 
 
-    @Override
+    /*
     public boolean mouseScrolled(double p_mouseScrolled_1_) {
         zoom = initZoom + (float) p_mouseScrolled_1_ / 2;
         if (zoom < -200) zoom = -200;
         if (zoom > 1000) zoom = 1000;
 
         return super.mouseScrolled(p_mouseScrolled_1_);
-    }
+    }*/
 
     @Override
     public void tick() {
