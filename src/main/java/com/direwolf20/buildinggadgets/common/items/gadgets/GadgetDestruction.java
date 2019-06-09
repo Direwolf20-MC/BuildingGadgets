@@ -209,22 +209,23 @@ public class GadgetDestruction extends GadgetSwapping {
     }
 
     public static IPositionPlacementSequence getClearingPositions(World world, BlockPos pos, EnumFacing incomingSide, EntityPlayer player, ItemStack stack) {
+        Region boundary = getClearingRegion(pos, incomingSide, player, stack);
+        BlockPos startPos = (getAnchor(stack) == null) ? pos : getAnchor(stack);
+        IBlockState stateTarget = !Config.GADGETS.GADGET_DESTRUCTION.nonFuzzyEnabled.get() || GadgetGeneric.getFuzzy(stack) ? null : world.getBlockState(pos);
+
         if (GadgetGeneric.getConnectedArea(stack)) {
-            Region boundary = getClearingRegion(pos, incomingSide, player, stack);
             HashSet<BlockPos> voidPositions = new HashSet<>();
             int depth = getToolValue(stack, NBTKeys.GADGET_VALUE_DEPTH);
             if (depth == 0)
                 return new SetBackedPlacementSequence(voidPositions, boundary);
 
-            BlockPos startPos = (getAnchor(stack) == null) ? pos : getAnchor(stack);
-            IBlockState stateTarget = !Config.GADGETS.GADGET_DESTRUCTION.nonFuzzyEnabled.get() || GadgetGeneric.getFuzzy(stack) ? null : world.getBlockState(pos);
-            addConnectedCoordinates(world, player, startPos, stateTarget, voidPositions,
-                    boundary);
-
+            addConnectedCoordinates(world, player, startPos, stateTarget, voidPositions, boundary);
             return new SetBackedPlacementSequence(voidPositions, boundary);
-        } else {
-            return getClearingRegion(pos, incomingSide, player, stack);
         }
+
+        return new SetBackedPlacementSequence(boundary.stream()
+                .filter(p -> isValidBlock(world, p, player, stateTarget))
+                .collect(Collectors.toCollection(HashSet::new)), boundary);
     }
 
     public static SortedSet<BlockPos> getClearingPositionsSet(World world, BlockPos pos, EnumFacing incomingSide, EntityPlayer player, ItemStack stack) {
@@ -305,13 +306,13 @@ public class GadgetDestruction extends GadgetSwapping {
         try {
             snapshot = RegionSnapshot.select(world, positions)
                     .excludeAir()
+                    .checkBlocks((p, state) -> destroyBlock(world, p, player))
                     .checkTiles((p, state, tile) -> state.getBlock() == BGBlocks.constructionBlock && tile instanceof ConstructionBlockTileEntity)
                     .build();
         } catch (PaletteOverflowException e) {
             player.sendMessage(new TextComponentTranslation(TooltipTranslation.GADGET_PALETTE_OVERFLOW.getTranslationKey()));
             return;
         }
-        positions.forEach(voidPos -> destroyBlock(world, voidPos, player));
 
         WorldSave worldSave = WorldSave.getWorldSaveDestruction(world);
         worldSave.addToMap(getUUID(stack).toString(), snapshot.serialize());
@@ -354,7 +355,6 @@ public class GadgetDestruction extends GadgetSwapping {
             return false;
 
         this.applyDamage(tool, player);
-
         world.spawnEntity(new BlockBuildEntity(world, voidPos, world.getBlockState(voidPos), BlockBuildEntity.Mode.REMOVE, false));
         return true;
     }

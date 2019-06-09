@@ -15,8 +15,13 @@ public class SetBackedPlacementSequence implements IPositionPlacementSequence, S
     private Region boundingBox;
     private Set<BlockPos> internalSet;
 
-    public SetBackedPlacementSequence(Set<BlockPos> internalSet, Region boundingBox) {
-        this.internalSet = Objects.requireNonNull(internalSet);
+    /**
+     * @param internalSet The set that contains the {@link BlockPos}s this sequence contains. Notice this will be
+     *                    wrapped with {@link Collections#unmodifiableSet(Set)}.
+     * @param boundingBox Bounding box of all {@link BlockPos} contained in {@code internalSet}.
+     */
+    public SetBackedPlacementSequence(@Nonnull Set<BlockPos> internalSet, @Nonnull Region boundingBox) {
+        this.internalSet = Objects.requireNonNull(Collections.unmodifiableSet(internalSet));
         this.boundingBox = Objects.requireNonNull(boundingBox);
     }
 
@@ -50,15 +55,19 @@ public class SetBackedPlacementSequence implements IPositionPlacementSequence, S
     }
 
     /**
-     * <b>WARNING</b>: this method uses the copy constructor of {@link HashSet}, therefore it does not guarantee it will return
-     * the same type of set.
+     * <b>WARNING</b>: this method uses the copy constructor of {@link LinkedHashSet}, therefore it does not guarantee
+     * it will return the same type of set.
      */
     @Nonnull
     @Override
     public IPositionPlacementSequence copy() {
-        return new SetBackedPlacementSequence(new HashSet<>(internalSet), boundingBox);
+        return new SetBackedPlacementSequence(new LinkedHashSet<>(internalSet), boundingBox);
     }
 
+    /**
+     * Returns te set passed into the constructor as {@code internalSet} wrapped with {@link
+     * Collections#unmodifiableSet(Set)}.
+     */
     public Set<BlockPos> getInternalSet() {
         return internalSet;
     }

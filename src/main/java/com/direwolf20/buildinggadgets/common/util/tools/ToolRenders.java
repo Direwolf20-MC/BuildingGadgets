@@ -392,8 +392,6 @@ public class ToolRenders {
         Minecraft mc = Minecraft.getInstance();
         mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
 
-        SortedSet<BlockPos> coordinates = GadgetDestruction.getClearingPositionsSet(world, startBlock, facing, player, heldItem);
-
         //Prepare the block rendering
         BlockRenderLayer origLayer = MinecraftForgeClient.getRenderLayer();
 
@@ -404,7 +402,6 @@ public class ToolRenders {
         //This blend function allows you to use a constant alpha, which is defined later
         //GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
         GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
-        List<BlockPos> sortedCoordinates = SortingHelper.Blocks.byDistance(coordinates, player); //Sort the coords by distance to player.
 
         Tessellator t = Tessellator.getInstance();
         BufferBuilder bufferBuilder = t.getBuffer();
@@ -417,7 +414,7 @@ public class ToolRenders {
         b = b.offset(directions.get(2), GadgetDestruction.getToolValue(stack, NBTKeys.GADGET_VALUE_DOWN));
         b = b.offset(directions.get(4), GadgetDestruction.getToolValue(stack, NBTKeys.GADGET_VALUE_DEPTH));*/
 
-        for (BlockPos coordinate : sortedCoordinates) {
+        for (BlockPos coordinate : GadgetDestruction.getClearingPositionsSet(world, startBlock, facing, player, heldItem)) {
             boolean invisible = true;
             IBlockState state = world.getBlockState(coordinate);
             for (EnumFacing side : EnumFacing.values()) {
