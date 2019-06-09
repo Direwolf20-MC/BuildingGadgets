@@ -30,6 +30,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.text.StringTextComponent;
 import org.lwjgl.opengl.GL11;
 
 import javax.vecmath.Vector2f;
@@ -52,6 +53,7 @@ public class ModeRadialMenu extends Screen {
     private final List<Button> conditionalButtons = new ArrayList<>();
 
     public ModeRadialMenu(ItemStack stack) {
+        super(new StringTextComponent("Mode Radial Menu?!?"));
         //getMinecraft() = Minecraft.getInstance();
         if (stack.getItem() instanceof GadgetGeneric)
             setSocketable(stack);
@@ -117,8 +119,9 @@ public class ModeRadialMenu extends Screen {
                 int widthSlider = 82;
                 sliderRange = new GuiSliderInt(width / 2 - widthSlider / 2, height / 2 + 72, widthSlider, 14, "Range ", "", 1, Config.GADGETS.maxRange.get(),
                     GadgetUtils.getToolRange(tool), false, true, Color.DARK_GRAY, slider -> {
-                        if (slider.getValueInt() != GadgetUtils.getToolRange(getGadget()))
-                            PacketHandler.sendToServer(new PacketChangeRange(slider.getValueInt()));
+                    GuiSliderInt sliderI = (GuiSliderInt) slider;
+                    if (sliderI.getValueInt() != GadgetUtils.getToolRange(getGadget()))
+                        PacketHandler.sendToServer(new PacketChangeRange(sliderI.getValueInt()));
                     }, (slider, amount) -> {
                         int value = slider.getValueInt();
                         int valueNew = MathHelper.clamp(value + amount, 1, Config.GADGETS.maxRange.get());
@@ -366,7 +369,7 @@ public class ModeRadialMenu extends Screen {
             getMinecraft().getTextureManager().bindTexture(signs.get(i));
             GlStateManager.color4f(color.getRed() / 255F, color.getGreen() / 255F, color.getBlue() / 255F,1);
             getMinecraft().getTextureManager().bindTexture(signs.get(i));
-            drawModalRectWithCustomSizedTexture(xdp - 8, ydp - 8, 0, 0, 16, 16, 16, 16);
+            blit(xdp - 8, ydp - 8, 0, 0, 16, 16, 16, 16);
         }
 
         GlStateManager.enableRescaleNormal();
@@ -422,8 +425,8 @@ public class ModeRadialMenu extends Screen {
     @Override
     public void tick() {
 //    TODO 1.13 only works for bound keys; not bound mouse buttons
-        if (!InputMappings.isKeyDown(KeyBindings.menuSettings.getKey().getKeyCode())) {
-            close();
+        if (! InputMappings.getInputByName(KeyBindings.menuSettings.getKey().getKeyCode())) {
+            //close(); //TODO figure it out
             changeMode();
         }
 

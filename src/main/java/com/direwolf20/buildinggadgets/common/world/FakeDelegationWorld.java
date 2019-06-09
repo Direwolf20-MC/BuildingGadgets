@@ -8,7 +8,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
-import net.minecraft.client.entity.player.ClientPlayerEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.IFluidState;
 import net.minecraft.particles.IParticleData;
@@ -16,27 +16,25 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.world.*;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.border.WorldBorder;
 import net.minecraft.world.chunk.AbstractChunkProvider;
+import net.minecraft.world.chunk.ChunkStatus;
 import net.minecraft.world.chunk.IChunk;
 import net.minecraft.world.dimension.Dimension;
 import net.minecraft.world.gen.Heightmap;
-import net.minecraft.world.storage.SaveHandler;
+import net.minecraft.world.gen.Heightmap.Type;
 import net.minecraft.world.storage.WorldInfo;
-import net.minecraft.world.storage.WorldSavedDataStorage;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Random;
+import java.util.*;
 import java.util.function.Predicate;
 
 @MethodsReturnNonnullByDefault
@@ -62,6 +60,57 @@ public class FakeDelegationWorld implements IWorld {
 
     public IWorld getDelegate() {
         return world;
+    }
+
+    @Override
+    public void playSound(@Nullable PlayerEntity player, BlockPos pos, SoundEvent soundIn, SoundCategory category, float volume, float pitch) {
+
+    }
+
+    @Override
+    public void addParticle(IParticleData particleData, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
+
+    }
+
+    @Override
+    public void playEvent(@Nullable PlayerEntity p_217378_1_, int p_217378_2_, BlockPos p_217378_3_, int p_217378_4_) {
+
+    }
+
+    @Override
+    public List<Entity> getEntitiesInAABBexcluding(@Nullable Entity entity, AxisAlignedBB axisAlignedBB, @Nullable Predicate<? super Entity> predicate) {
+        return null;
+    }
+
+    @Override
+    public <T extends Entity> List<T> getEntitiesWithinAABB(Class<? extends T> aClass, AxisAlignedBB axisAlignedBB, @Nullable Predicate<? super T> predicate) {
+        return null;
+    }
+
+    @Override
+    public List<? extends PlayerEntity> getPlayers() {
+        return null;
+    }
+
+    @Nullable
+    @Override
+    public IChunk getChunk(int p_217353_1_, int p_217353_2_, ChunkStatus p_217353_3_, boolean p_217353_4_) {
+        return null;
+    }
+
+    @Override
+    public BlockPos getHeight(Type heightmapType, BlockPos pos) {
+        return null;
+    }
+
+    @Override
+    public boolean removeBlock(BlockPos blockPos, boolean b) {
+        return false;
+    }
+
+    @Override
+    public boolean func_217375_a(BlockPos p_217375_1_, Predicate<BlockState> p_217375_2_) {
+        return false;
     }
 
     @Nullable
@@ -114,11 +163,6 @@ public class FakeDelegationWorld implements IWorld {
         return world.getPendingFluidTicks();
     }
 
-    @Override
-    public IChunk getChunkDefault(BlockPos pos) {
-        return world.getChunkDefault(pos);
-    }
-
     /**
      * Gets the chunk at the specified location.
      */
@@ -158,13 +202,6 @@ public class FakeDelegationWorld implements IWorld {
         return world.getChunkProvider();
     }
 
-    /**
-     * Returns this world's current save handler
-     */
-    @Override
-    public SaveHandler getSaveHandler() {
-        return world.getSaveHandler();
-    }
 
     @Override
     public Random getRandom() {
@@ -187,18 +224,6 @@ public class FakeDelegationWorld implements IWorld {
         return world.getSpawnPoint();
     }
 
-    /**
-     * Plays the specified sound for a player at the center of the given block position.
-     */
-    @Override
-    public void playSound(@Nullable ClientPlayerEntity player, BlockPos pos, SoundEvent soundIn, SoundCategory category, float volume, float pitch) {
-        world.playSound(player, pos, soundIn, category, volume, pitch);
-    }
-
-    @Override
-    public void spawnParticle(IParticleData particleData, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
-        world.spawnParticle(particleData, x, y, z, xSpeed, ySpeed, zSpeed);
-    }
 
     /**
      * Checks to see if an air block exists at the provided location. Note that this only checks to see if the blocks
@@ -224,47 +249,13 @@ public class FakeDelegationWorld implements IWorld {
         return world.getLightSubtracted(pos, amount);
     }
 
-    @Override
-    public boolean isChunkLoaded(int x, int z, boolean allowEmpty) {
-        return world.isChunkLoaded(x, z, allowEmpty);
-    }
-
-    @Override
-    public boolean canSeeSky(BlockPos pos) {
-        return canBlockSeeSky(pos); //Delegate to default Method in IWorldReaderBase
-    }
 
     @Override
     public int getHeight(Heightmap.Type heightmapType, int x, int z) {
         return world.getHeight(heightmapType, x, z);
     }
 
-    /**
-     * Gets the closest player to the entity within the specified distance.
-     */
-    @Override
-    @Nullable
-    public ClientPlayerEntity getClosestPlayerToEntity(Entity entityIn, double distance) {
-        return world.getClosestPlayerToEntity(entityIn, distance);
-    }
 
-    @Override
-    @Nullable
-    public ClientPlayerEntity getNearestPlayerNotCreative(Entity entityIn, double distance) {
-        return world.getNearestPlayerNotCreative(entityIn, distance);
-    }
-
-    @Override
-    @Nullable
-    public ClientPlayerEntity getClosestPlayer(double posX, double posY, double posZ, double distance, boolean spectator) {
-        return world.getClosestPlayer(posX, posY, posZ, distance, spectator);
-    }
-
-    @Override
-    @Nullable
-    public ClientPlayerEntity getClosestPlayer(double x, double y, double z, double distance, Predicate<Entity> predicate) {
-        return world.getClosestPlayer(x, y, z, distance, predicate);
-    }
 
     @Override
     public int getSkylightSubtracted() {
@@ -341,12 +332,6 @@ public class FakeDelegationWorld implements IWorld {
         return world.getMaxLightLevel();
     }
 
-    @Override
-    @Nullable
-    public WorldSavedDataStorage getMapStorage() {
-        return world.getMapStorage();
-    }
-
     /**
      * Sets a block state into this world.Flags are as follows:
      * 1 will cause a block update.
@@ -366,23 +351,6 @@ public class FakeDelegationWorld implements IWorld {
         return true;
     }
 
-    /**
-     * Called when an entity is spawned in the world. This includes players.
-     */
-    @Override
-    public boolean spawnEntity(Entity entityIn) {
-        return false;
-    }
-
-    @Override
-    public boolean removeBlock(BlockPos pos) {
-        IFluidState state = getFluidState(pos);
-        boolean res = this.setBlockState(pos, state.getBlockState(), 3);
-        if (res && posToTile.containsKey(pos))
-            posToTile.remove(pos)
-                    .remove();
-        return res;
-    }
 
 
 //    fixme: removed in 1.14?
@@ -397,6 +365,6 @@ public class FakeDelegationWorld implements IWorld {
     @Override
     public boolean destroyBlock(BlockPos pos, boolean dropBlock) {
         // adapted from World
-        return ! this.getBlockState(pos).isAir(this, pos) && removeBlock(pos);
+        return ! this.getBlockState(pos).isAir(this, pos) && removeBlock(pos, true);
     }
 }

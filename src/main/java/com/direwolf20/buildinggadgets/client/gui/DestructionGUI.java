@@ -7,17 +7,16 @@ package com.direwolf20.buildinggadgets.client.gui;
 
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetDestruction;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
-
 import com.direwolf20.buildinggadgets.common.network.packets.PacketDestructionGUI;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TranslationTextComponent;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -34,7 +33,7 @@ public class DestructionGUI extends Screen {
     private ItemStack destructionTool;
 
     public DestructionGUI(ItemStack tool) {
-        super();
+        super(new StringTextComponent("Destruction Gui?!?"));
         this.destructionTool = tool;
     }
 
@@ -45,7 +44,7 @@ public class DestructionGUI extends Screen {
         int x = width / 2;
         int y = height / 2;
 
-        this.addButton(new GuiButtonAction((x - 30) + 32, y + 60, 60, 20, I18n.format(GuiMod.getLangKeyButton("destruction", "confirm")), () -> {
+        this.addButton(new Button((x - 30) + 32, y + 60, 60, 20, I18n.format(GuiMod.getLangKeyButton("destruction", "confirm")), b -> {
             if (isWithinBounds()) {
                 PacketHandler.sendToServer(new PacketDestructionGUI(left.getValueInt(), right.getValueInt(), up.getValueInt(), down.getValueInt(), depth.getValueInt()));
                 this.removed();
@@ -54,7 +53,7 @@ public class DestructionGUI extends Screen {
                 Minecraft.getInstance().player.sendStatusMessage(new StringTextComponent(TextFormatting.RED + new TranslationTextComponent("message.gadget.destroysizeerror").getUnformattedComponentText()), true);
         }));
 
-        this.addButton(new GuiButtonAction((x - 30) - 32, y + 60, 60, 20, I18n.format(GuiMod.getLangKeyButton("destruction", "cancel")), this::close));
+        this.addButton(new Button((x - 30) - 32, y + 60, 60, 20, I18n.format(GuiMod.getLangKeyButton("destruction", "cancel")), b -> {}));
 
         List<GuiDestructionSlider> sliders = new ArrayList<>();
 

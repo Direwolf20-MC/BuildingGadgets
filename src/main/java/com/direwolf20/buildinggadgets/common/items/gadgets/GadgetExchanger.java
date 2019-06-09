@@ -51,7 +51,7 @@ import java.util.Set;
 
 import static com.direwolf20.buildinggadgets.common.util.GadgetUtils.*;
 
-public class GadgetExchanger extends GadgetSwapping {
+public class GadgetExchanger extends GadgetGeneric {
     private static final FakeBuilderWorld fakeWorld = new FakeBuilderWorld();
 
     public GadgetExchanger(Properties builder) {

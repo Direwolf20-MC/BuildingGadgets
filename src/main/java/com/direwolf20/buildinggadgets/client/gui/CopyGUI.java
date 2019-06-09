@@ -6,11 +6,9 @@
 package com.direwolf20.buildinggadgets.client.gui;
 
 import com.direwolf20.buildinggadgets.common.config.Config;
-import com.direwolf20.buildinggadgets.common.network.PacketHandler;
-import com.direwolf20.buildinggadgets.common.network.packets.PacketCopyCoords;
-import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.widget.button.Button.IPressable;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -34,6 +32,8 @@ public class CopyGUI extends GuiScreenTextFields {
         this.copyPasteTool = tool;
     }
 
+    //TODO find replacement
+    /*
     @Override
     public void initGui() {
         super.initGui();
@@ -85,25 +85,25 @@ public class CopyGUI extends GuiScreenTextFields {
         addButton(210, 34, "+", () -> fieldChange(endY, 1));
         addButton(250, 34, "-", () -> fieldChange(endZ, -1));
         addButton(310, 34, "+", () -> fieldChange(endZ, 1));
-    }
+    }*/
 
-    private void addButton(int x, int y, String text, Runnable action) {
+    private void addButton(int x, int y, String text, IPressable action) {
         addButton(new DireButton(guiLeft + x, guiTop + y, 10, 10, text, action));
     }
 
     private GuiTextFieldBase addField(int x, int y, int defaultint) {
-        return addField(new GuiTextFieldBase(fontRenderer, guiLeft + x, guiTop + y, 40).setDefaultInt(defaultint).restrictToNumeric());
+        return addField(new GuiTextFieldBase(font, guiLeft + x, guiTop + y, 40).setDefaultInt(defaultint).restrictToNumeric());
     }
 
     private void fieldChange(GuiTextFieldBase textField, int amount) {
         clearTextBoxes();
-        if (Screen.isShiftKeyDown()) amount *= 10;
+        if (Screen.hasShiftDown()) amount *= 10;
         textField.setText(String.valueOf(textField.getInt() + amount));
     }
 
     @Override
     public void render(int mouseX, int mouseY, float partialTicks) {
-        mc.getTextureManager().bindTexture(background);
+        getMinecraft().getTextureManager().bindTexture(background);
         drawFieldLable("Start X", 0, 15);
         drawFieldLable("Y", 131, 15);
         drawFieldLable("Z", 231, 15);
@@ -114,7 +114,7 @@ public class CopyGUI extends GuiScreenTextFields {
     }
 
     private void drawFieldLable(String name, int x, int y) {
-        fontRenderer.drawStringWithShadow(name, guiLeft + x, guiTop + y, 0xFFFFFF);
+        font.drawStringWithShadow(name, guiLeft + x, guiTop + y, 0xFFFFFF);
     }
 
     private void clearTextBoxes() {

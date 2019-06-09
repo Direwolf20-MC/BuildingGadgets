@@ -49,7 +49,7 @@ import net.minecraftforge.event.world.BlockEvent;
 import javax.annotation.Nullable;
 import java.util.*;
 
-public class GadgetDestruction extends GadgetSwapping {
+public class GadgetDestruction extends GadgetGeneric {
     public GadgetDestruction(Properties builder) {
         super(builder);
     }

@@ -6,14 +6,17 @@ import com.direwolf20.buildinggadgets.client.utils.RenderUtil;
 import com.direwolf20.buildinggadgets.common.util.helpers.InventoryHelper;
 import com.direwolf20.buildinggadgets.common.util.tools.UniqueItem;
 import com.google.common.collect.Multiset;
+import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.widget.list.ExtendedList;
-import net.minecraft.client.renderer.*;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
+import net.minecraft.client.gui.widget.list.ExtendedList;
+import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
-import com.mojang.blaze3d.platform.GlStateManager;
+
 import java.awt.*;
 
 import static com.direwolf20.buildinggadgets.client.gui.materiallist.ScrollingMaterialList.Entry;
@@ -62,7 +65,7 @@ class ScrollingMaterialList extends GuiEntryList<Entry> {
         return right - MARGIN - SCROLL_BAR_WIDTH;
     }
 
-    static class Entry extends ExtendedList.IGuiListEntry<Entry> {
+    static class Entry extends ExtendedList.AbstractListEntry<Entry> {
 
         private ScrollingMaterialList parent;
         private int required;
@@ -90,7 +93,7 @@ class ScrollingMaterialList extends GuiEntryList<Entry> {
         }
 
         @Override
-        public void drawEntry(int entryWidth, int entryHeight, int mouseX, int mouseY, boolean selected, float partialTicks) {
+        public void render(int p_render_1_, int p_render_2_, int p_render_3_, int p_render_4_, int p_render_5_, int p_render_6_, int p_render_7_, boolean p_render_8_, float p_render_9_) {
             int left = getX();
             int top = getY();
             // Weird render issue with GuiSlot where the right border is slightly offset

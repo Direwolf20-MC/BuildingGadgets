@@ -9,14 +9,11 @@ import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketPasteGUI;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.widget.button.Button.IPressable;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.util.text.TextFormatting;
 
 public class PasteGUI extends GuiScreenTextFields {
     public static final int WIDTH = 256;
@@ -36,6 +33,8 @@ public class PasteGUI extends GuiScreenTextFields {
         this.tool = tool;
     }
 
+    //TODO find a replacement
+    /*
     @Override
     public void initGui() {
         super.initGui();
@@ -67,14 +66,14 @@ public class PasteGUI extends GuiScreenTextFields {
             Z.setText("0");
             sendPacket();
         }));
-    }
+    }*/
 
-    private void addButton(int x, String text, Runnable action) {
+    private void addButton(int x, String text, IPressable action) {
         addButton(new DireButton(guiLeft + x, guiTop + 99, 10, 10, text, action));
     }
 
     private GuiTextFieldBase addField(int x) {
-        return addField(new GuiTextFieldBase(fontRenderer, guiLeft + x, guiTop + 100, 40).restrictToNumeric());
+        return addField(new GuiTextFieldBase(font, guiLeft + x, guiTop + 100, 40).restrictToNumeric());
     }
 
     private void sendPacket() {
@@ -91,7 +90,7 @@ public class PasteGUI extends GuiScreenTextFields {
 
     @Override
     public void render(int mouseX, int mouseY, float partialTicks) {
-        mc.getTextureManager().bindTexture(background);
+        getMinecraft().getTextureManager().bindTexture(background);
         drawFieldLable("X", 55);
         drawFieldLable("Y", 175);
         drawFieldLable("Z", 296);
@@ -100,7 +99,7 @@ public class PasteGUI extends GuiScreenTextFields {
     }
 
     private void drawFieldLable(String name, int x) {
-        fontRenderer.drawStringWithShadow(name, guiLeft + x, guiTop + 100, 0xFFFFFF);
+        font.drawStringWithShadow(name, guiLeft + x, guiTop + 100, 0xFFFFFF);
     }
 
     protected void nullCheckTextBoxes() {

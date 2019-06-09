@@ -2,14 +2,13 @@ package com.direwolf20.buildinggadgets.client.gui;
 
 import com.direwolf20.buildinggadgets.client.ClientProxy;
 import com.google.common.collect.ImmutableSet;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.SoundHandler;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.util.SoundEvents;
 import net.minecraftforge.fml.client.config.GuiSlider;
 
-import java.awt.Color;
+import java.awt.*;
 import java.util.Collection;
 import java.util.function.BiConsumer;
 
@@ -19,8 +18,8 @@ public class GuiSliderInt extends GuiSlider {
     private int value;
 
     public GuiSliderInt(int xPos, int yPos, int width, int height, String prefix, String suf, double minVal, double maxVal,
-            double currentVal, boolean showDec, boolean drawStr, Color color, ISlider par, BiConsumer<GuiSliderInt, Integer> increment) {
-        super(0, xPos, yPos, width, height, prefix, suf, minVal, maxVal, currentVal, showDec, drawStr, par);
+                        double currentVal, boolean showDec, boolean drawStr, Color color, IPressable par, BiConsumer<GuiSliderInt, Integer> increment) {
+        super(xPos, yPos, width, height, prefix, suf, minVal, maxVal, currentVal, showDec, drawStr, par);
         colorBackground = GuiMod.getColor(color, 200).getRGB();
         colorSliderBackground = GuiMod.getColor(color.darker(), 200).getRGB();
         colorSlider = GuiMod.getColor(color.brighter().brighter(), 200).getRGB();
@@ -53,25 +52,27 @@ public class GuiSliderInt extends GuiSlider {
             return;
 
         Minecraft mc = Minecraft.getInstance();
-        hovered = mouseX >= x && mouseY >= y && mouseX < x + width && mouseY < y + height;
-        drawRect(x, y, x + width, y + height, colorBackground);
+        isHovered = mouseX >= x && mouseY >= y && mouseX < x + width && mouseY < y + height;
+        fill(x, y, x + width, y + height, colorBackground);
         renderBg(mc, mouseX, mouseY);
         renderText(mc, this);
     }
 
     private void renderText(Minecraft mc, Button component) {
-        int color = !enabled ? 10526880 : (hovered ? 16777120 : -1);
-        String buttonText = component.displayString;
+        int color = ! active ? 10526880 : (isHovered ? 16777120 : - 1);
+        String buttonText = component.getMessage();
         int strWidth = mc.fontRenderer.getStringWidth(buttonText);
         int ellipsisWidth = mc.fontRenderer.getStringWidth("...");
-        if (strWidth > component.width - 6 && strWidth > ellipsisWidth)
-            buttonText = mc.fontRenderer.trimStringToWidth(buttonText, component.width - 6 - ellipsisWidth).trim() + "...";
+        if (strWidth > component.getWidth() - 6 && strWidth > ellipsisWidth)
+            buttonText = mc.fontRenderer.trimStringToWidth(buttonText, component.getWidth() - 6 - ellipsisWidth).trim() + "...";
 
-        drawCenteredString(mc.fontRenderer, buttonText, component.x + component.width / 2, component.y + (component.height - 8) / 2, color);
+        drawCenteredString(mc.fontRenderer, buttonText, component.x + component.getWidth() / 2, component.y + (component.getHeight() - 8) / 2, color);
     }
 
     @Override
-    public void playPressSound(SoundHandler soundHandlerIn) {}
+    public void playDownSound(SoundHandler p_playDownSound_1_) {
+
+    }
 
     @Override
     protected void renderBg(Minecraft mc, int mouseX, int mouseY) {
@@ -86,20 +87,20 @@ public class GuiSliderInt extends GuiSlider {
     }
 
     private void drawBorderedRect(int x, int y, int width, int height) {
-        drawRect(x, y, x + width, y + height, colorSliderBackground);
-        drawRect(++x, ++y, x + width - 2, y + height - 2, colorSlider); 
+        fill(x, y, x + width, y + height, colorSliderBackground);
+        fill(++ x, ++ y, x + width - 2, y + height - 2, colorSlider);
     }
 
     public Collection<Button> getComponents() {
         return ImmutableSet.of(this,
-                new GuiButtonIncrement(this, x - height, y, height, height, "-", () -> increment.accept(this, -1)),
-                new GuiButtonIncrement(this, x + width, y, height, height, "+", () -> increment.accept(this, 1)));
+                new GuiButtonIncrement(this, x - height, y, height, height, "-", b -> increment.accept(this, - 1)),
+                new GuiButtonIncrement(this, x + width, y, height, height, "+", b -> increment.accept(this, 1)));
     }
 
-    private static class GuiButtonIncrement extends GuiButtonAction {
+    private static class GuiButtonIncrement extends Button {
         private GuiSliderInt parent;
 
-        public GuiButtonIncrement(GuiSliderInt parent, int x, int y, int width, int height, String buttonText, Runnable action) {
+        public GuiButtonIncrement(GuiSliderInt parent, int x, int y, int width, int height, String buttonText, IPressable action) {
             super(x, y, width, height, buttonText, action);
             this.parent = parent;
         }
@@ -110,13 +111,15 @@ public class GuiSliderInt extends GuiSlider {
                 return;
 
             Minecraft mc = Minecraft.getInstance();
-            hovered = mouseX >= x && mouseY >= y && mouseX < x + width && mouseY < y + height;
-            drawRect(x, y, x + width, y + height, parent.colorBackground);
+            isHovered = mouseX >= x && mouseY >= y && mouseX < x + width && mouseY < y + height;
+            fill(x, y, x + width, y + height, parent.colorBackground);
             parent.drawBorderedRect(x, y, width, height);
             parent.renderText(mc, this);
         }
 
         @Override
-        public void playPressSound(SoundHandler soundHandlerIn) {}
+        public void playDownSound(SoundHandler p_playDownSound_1_) {
+
+        }
     }
 }

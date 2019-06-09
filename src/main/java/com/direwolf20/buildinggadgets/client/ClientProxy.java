@@ -1,6 +1,5 @@
 package com.direwolf20.buildinggadgets.client;
 
-import com.direwolf20.buildinggadgets.common.blocks.Models.BakedModelLoader;
 import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManagerContainer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.SimpleSound;
@@ -9,11 +8,12 @@ import net.minecraft.util.SoundEvent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
-import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DeferredWorkQueue;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
+
+import java.util.Collections;
 
 @EventBusSubscriber(Dist.CLIENT)
 public class ClientProxy {
@@ -26,7 +26,8 @@ public class ClientProxy {
     }
 
     private static void registerModels(@SuppressWarnings("unused") ModelRegistryEvent event) {
-        ModelLoaderRegistry.registerLoader(new BakedModelLoader());
+        //TODO @since 1.14
+        //ModelLoaderRegistry.registerLoader(new BakedModelLoader());
         // @todo: reimplement? @since 1.13.x
         //        if (SyncedConfig.enablePaste) {
         //            ModBlocks.constructionBlock.initModel();
@@ -40,10 +41,10 @@ public class ClientProxy {
     }
 
     private static void registerSprite(TextureStitchEvent.Pre event, String loc) {
-        event.getMap().registerSprite(Minecraft.getInstance().getResourceManager(), new ResourceLocation(loc));
+        event.getMap().func_215254_a(Minecraft.getInstance().getResourceManager(), Collections.singleton(new ResourceLocation(loc)), null);
     }
 
     public static void playSound(SoundEvent sound, float pitch) {
-        Minecraft.getInstance().getSoundHandler().play(SimpleSound.getMasterRecord(sound, pitch));
+        Minecraft.getInstance().getSoundHandler().play(SimpleSound.master(sound, pitch));
     }
 }

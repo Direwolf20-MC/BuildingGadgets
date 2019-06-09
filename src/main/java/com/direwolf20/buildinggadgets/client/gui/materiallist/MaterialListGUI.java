@@ -1,6 +1,5 @@
 package com.direwolf20.buildinggadgets.client.gui.materiallist;
 
-import com.direwolf20.buildinggadgets.client.gui.GuiButtonAction;
 import com.direwolf20.buildinggadgets.client.gui.base.BasicGUIBase;
 import com.direwolf20.buildinggadgets.client.utils.AlignmentUtil;
 import com.direwolf20.buildinggadgets.client.utils.RenderUtil;
@@ -8,10 +7,11 @@ import com.direwolf20.buildinggadgets.common.items.ITemplate;
 import com.direwolf20.buildinggadgets.common.util.lang.MaterialListTranslation;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.google.common.base.Preconditions;
+import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.widget.Widget;
 import net.minecraft.client.gui.widget.button.Button;
-import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
@@ -61,9 +61,9 @@ public class MaterialListGUI extends BasicGUIBase {
 
     private ScrollingMaterialList scrollingList;
 
-    private GuiButtonAction buttonClose;
-    private GuiButtonAction buttonSortingModes;
-    private GuiButtonAction buttonCopyList;
+    private Button buttonClose;
+    private Button buttonSortingModes;
+    private Button buttonCopyList;
 
     private int hoveringTextX;
     private int hoveringTextY;
@@ -80,8 +80,8 @@ public class MaterialListGUI extends BasicGUIBase {
         this.backgroundY = AlignmentUtil.getYForAlignedCenter(BACKGROUND_HEIGHT, 0, height);
 
         this.title = MaterialListTranslation.TITLE.format();
-        this.titleTop = AlignmentUtil.getYForAlignedCenter(fontRenderer.FONT_HEIGHT, backgroundY, getWindowTopY() + ScrollingMaterialList.TOP);
-        this.titleLeft = AlignmentUtil.getXForAlignedCenter(fontRenderer.getStringWidth(title), backgroundX, getWindowRightX());
+        this.titleTop = AlignmentUtil.getYForAlignedCenter(font.FONT_HEIGHT, backgroundY, getWindowTopY() + ScrollingMaterialList.TOP);
+        this.titleLeft = AlignmentUtil.getXForAlignedCenter(font.getStringWidth(title), backgroundX, getWindowRightX());
 
         this.scrollingList = new ScrollingMaterialList(this);
         // Make it receive mouse scroll events, so that the player can use his mouse wheel at the start
@@ -89,14 +89,14 @@ public class MaterialListGUI extends BasicGUIBase {
         this.children.add(scrollingList);
 
         int buttonY = getWindowBottomY() - (ScrollingMaterialList.BOTTOM / 2 + BUTTON_HEIGHT / 2);
-        this.buttonClose = new GuiButtonAction(0, buttonY, 0, BUTTON_HEIGHT, MaterialListTranslation.BUTTON_CLOSE.format(), () -> Minecraft.getInstance().player.closeScreen());
-        this.buttonSortingModes = new GuiButtonAction(0, buttonY, 0, BUTTON_HEIGHT, scrollingList.getSortingMode().getLocalizedName(), () -> {
+        this.buttonClose = new Button(0, buttonY, 0, BUTTON_HEIGHT, MaterialListTranslation.BUTTON_CLOSE.format(), b -> Minecraft.getInstance().player.closeScreen());
+        this.buttonSortingModes = new Button(0, buttonY, 0, BUTTON_HEIGHT, scrollingList.getSortingMode().getLocalizedName(), () -> {
             scrollingList.setSortingMode(scrollingList.getSortingMode().next());
-            buttonSortingModes.displayString = scrollingList.getSortingMode().getLocalizedName();
+            buttonSortingModes.setMessage(scrollingList.getSortingMode().getLocalizedName());
         });
-        this.buttonCopyList = new GuiButtonAction(0, buttonY, 0, BUTTON_HEIGHT, MaterialListTranslation.BUTTON_COPY.format(), () -> {
-            mc.keyboardListener.setClipboardString(stringify(Screen.isCtrlKeyDown()));
-            mc.player.sendStatusMessage(new TranslationTextComponent(MaterialListTranslation.MESSAGE_COPY_SUCCESS.getTranslationKey()), true);
+        this.buttonCopyList = new Button(0, buttonY, 0, BUTTON_HEIGHT, MaterialListTranslation.BUTTON_COPY.format(), () -> {
+            getMinecraft().keyboardListener.setClipboardString(stringify(Screen.hasControlDown()));
+            getMinecraft().player.sendStatusMessage(new TranslationTextComponent(MaterialListTranslation.MESSAGE_COPY_SUCCESS.getTranslationKey()), true);
         });
 
         // Buttons will be placed left to right in this order
@@ -136,23 +136,24 @@ public class MaterialListGUI extends BasicGUIBase {
         RenderUtil.drawCompleteTexture(backgroundX, backgroundY, BACKGROUND_WIDTH, BACKGROUND_HEIGHT);
 
         scrollingList.drawScreen(mouseX, mouseY, particleTicks);
-        drawString(fontRenderer, title, titleLeft, titleTop, Color.WHITE.getRGB());
+        drawString(font, title, titleLeft, titleTop, Color.WHITE.getRGB());
         super.render(mouseX, mouseY, particleTicks);
 
         if (hoveringText != null) {
             RenderHelper.enableGUIStandardItemLighting();
-            drawHoveringText(hoveringText, hoveringTextX, hoveringTextY);
+            setTaskHoveringText(hoveringTextX, hoveringTextY, hoveringText);
             GlStateManager.disableLighting();
             hoveringText = null;
         }
     }
 
+
     /**
      * {@inheritDoc} Override to make it visible to outside.
      */
     @Override
-    public void drawHorizontalLine(int startX, int endX, int y, int color) {
-        super.drawHorizontalLine(startX, endX, y, color);
+    public void hLine(int p_hLine_1_, int p_hLine_2_, int p_hLine_3_, int p_hLine_4_) {
+        super.hLine(p_hLine_1_, p_hLine_2_, p_hLine_3_, p_hLine_4_);
     }
 
     private void calculateButtonsWidthAndX() {
@@ -166,9 +167,9 @@ public class MaterialListGUI extends BasicGUIBase {
         // Align the box of buttons in the center, and start from the left
         int nextX = getWindowLeftX();
 
-        for (Button button : buttons) {
-            button.width = buttonWidth;
-            button.x = nextX;
+        for (Widget widget : buttons) {
+            widget.setWidth(buttonWidth);
+            widget.x = nextX;
             nextX += buttonWidth + BUTTONS_PADDING;
         }
     }

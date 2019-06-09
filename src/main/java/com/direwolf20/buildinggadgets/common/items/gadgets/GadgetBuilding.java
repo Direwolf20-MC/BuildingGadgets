@@ -19,19 +19,19 @@ import com.direwolf20.buildinggadgets.common.util.tools.modes.BuildingMode;
 import com.direwolf20.buildinggadgets.common.world.FakeBuilderWorld;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.enchantment.Enchantments;
-import net.minecraft.item.Items;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldType;
 import net.minecraftforge.common.MinecraftForge;
@@ -47,7 +47,7 @@ import java.util.Set;
 
 import static com.direwolf20.buildinggadgets.common.util.GadgetUtils.*;
 
-public class GadgetBuilding extends GadgetPlacing implements IAtopPlacingGadget {
+public class GadgetBuilding extends GadgetGeneric implements IAtopPlacingGadget {
     private static final FakeBuilderWorld fakeWorld = new FakeBuilderWorld();
 
     public GadgetBuilding(Properties builder) {

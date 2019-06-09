@@ -62,7 +62,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-public class GadgetCopyPaste extends GadgetPlacing implements ITemplate {
+public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
 
     public enum ToolMode {
         Copy, Paste;

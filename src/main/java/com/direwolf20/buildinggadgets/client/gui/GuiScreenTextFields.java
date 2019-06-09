@@ -1,14 +1,19 @@
 package com.direwolf20.buildinggadgets.client.gui;
 
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.util.text.StringTextComponent;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.Consumer;
 
-import net.minecraft.client.gui.screen.Screen;
-
 public class GuiScreenTextFields extends Screen {
     private List<GuiTextFieldBase> fields = new ArrayList<>();
+
+    public GuiScreenTextFields() {
+        super(new StringTextComponent("The text has not been determned yet")); //TODO figure that one out
+    }
 
     protected GuiTextFieldBase addField(GuiTextFieldBase field) {
         fields.add(field);
@@ -33,11 +38,11 @@ public class GuiScreenTextFields extends Screen {
     @Override
     public void render(int mouseX, int mouseY, float partialTicks) {
         super.render(mouseX, mouseY, partialTicks);
-        fields.forEach(field -> field.drawTextField(mouseX, mouseY, partialTicks));
+        fields.forEach(field -> field.render(mouseX, mouseY, partialTicks));
     }
 
     @Override
-    public boolean doesGuiPauseGame() {
+    public boolean isPauseScreen() {
         return false;
     }
 }  
