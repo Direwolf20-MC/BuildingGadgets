@@ -11,16 +11,17 @@ import com.direwolf20.buildinggadgets.common.items.gadgets.*;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.*;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGSound;
-import com.direwolf20.buildinggadgets.common.util.tools.modes.BuildingMode;
-import com.direwolf20.buildinggadgets.common.util.tools.modes.ExchangingMode;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
+import com.direwolf20.buildinggadgets.common.util.tools.modes.BuildingMode;
+import com.direwolf20.buildinggadgets.common.util.tools.modes.ExchangingMode;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.widget.Widget;
 import net.minecraft.client.gui.widget.button.Button;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.client.util.InputMappings;
@@ -51,7 +52,7 @@ public class ModeRadialMenu extends Screen {
     private final List<Button> conditionalButtons = new ArrayList<>();
 
     public ModeRadialMenu(ItemStack stack) {
-        //mc = Minecraft.getInstance();
+        //getMinecraft() = Minecraft.getInstance();
         if (stack.getItem() instanceof GadgetGeneric)
             setSocketable(stack);
     }
@@ -189,10 +190,10 @@ public class ModeRadialMenu extends Screen {
                 posLeft += dim + padding;
                 offset = -70 - dim;
             }
-            button.width = dim;
-            button.height = dim;
+            button.setWidth(dim);
+            button.setHeight(dim);
             if (isDestruction)
-                button.y = height / 2 + (isRight ? 10 : -button.height - 10);
+                button.y = height / 2 + (isRight ? 10 : -button.getHeight() - 10);
             else
                 button.x = width / 2 + offset;
         }
@@ -239,7 +240,7 @@ public class ModeRadialMenu extends Screen {
         boolean inRange = false;
         if (segments != 0) {
             inRange = dist > radiusMin && dist < radiusMax;
-            for (Button button : buttons) {
+            for (Widget button : buttons) {
                 if (button instanceof GuiButtonActionCallback)
                     ((GuiButtonActionCallback) button).setFaded(inRange);
             }
@@ -254,7 +255,7 @@ public class ModeRadialMenu extends Screen {
             return;
         }
         GlStateManager.pushMatrix();
-        GlStateManager.disableTexture2D();
+        GlStateManager.disableTexture();
 
         float angle = mouseAngle(x, y, mx, my);
 
@@ -330,7 +331,7 @@ public class ModeRadialMenu extends Screen {
 //                radius -= highlight;
         }
         GlStateManager.shadeModel(GL11.GL_FLAT);
-        GlStateManager.enableTexture2D();
+        GlStateManager.enableTexture();
 
         for (int i = 0; i < nameData.size(); i++) {
             NameDisplayData data = nameData.get(i);
@@ -347,7 +348,7 @@ public class ModeRadialMenu extends Screen {
 
             int xsp = xp - 4;
             int ysp = yp;
-            int width = fontRenderer.getStringWidth(name);
+            int width = font.getStringWidth(name);
 
             if (xsp < x)
                 xsp -= width - 8;
@@ -356,15 +357,15 @@ public class ModeRadialMenu extends Screen {
 
             Color color = i == modeIndex ? Color.GREEN : Color.WHITE;
             if (data.isSelected())
-                fontRenderer.drawStringWithShadow(name, xsp + (data.isCentralized() ? width / 2 - 4 : 0), ysp, color.getRGB());
+                font.drawStringWithShadow(name, xsp + (data.isCentralized() ? width / 2 - 4 : 0), ysp, color.getRGB());
 
             double mod = 0.7;
             int xdp = (int) ((xp - x) * mod + x);
             int ydp = (int) ((yp - y) * mod + y);
 
-            mc.getTextureManager().bindTexture(signs.get(i));
+            getMinecraft().getTextureManager().bindTexture(signs.get(i));
             GlStateManager.color4f(color.getRed() / 255F, color.getGreen() / 255F, color.getBlue() / 255F,1);
-            mc.getTextureManager().bindTexture(signs.get(i));
+            getMinecraft().getTextureManager().bindTexture(signs.get(i));
             drawModalRectWithCustomSizedTexture(xdp - 8, ydp - 8, 0, 0, 16, 16, 16, 16);
         }
 
@@ -376,7 +377,7 @@ public class ModeRadialMenu extends Screen {
         float s = 2.25F * fract;
         GlStateManager.scalef(s, s, s);
         GlStateManager.translatef(x / s - (tool.getItem() instanceof GadgetCopyPaste ? 8F : 8.5F), y / s - 8, 0);
-        mc.getItemRenderer().renderItemAndEffectIntoGUI(tool, 0, 0);
+        itemRenderer.renderItemAndEffectIntoGUI(tool, 0, 0);
 
         RenderHelper.disableStandardItemLighting();
         GlStateManager.disableBlend();
@@ -399,8 +400,8 @@ public class ModeRadialMenu extends Screen {
             if (helpTextProvider.isHovered(mx, my)) {
                 Color color = button instanceof GuiButtonSelect && ((GuiButtonSelect) button).isSelected() ? Color.GREEN : Color.WHITE;
                 String text = helpTextProvider.getHoverHelpText();
-                int x = helpTextProvider.getScreenPosition() == ScreenPosition.LEFT ? mx - fontRenderer.getStringWidth(text): mx;
-                fontRenderer.drawStringWithShadow(text, x, my - fontRenderer.FONT_HEIGHT, color.getRGB());
+                int x = helpTextProvider.getScreenPosition() == ScreenPosition.LEFT ? mx - font.getStringWidth(text): mx;
+                font.drawStringWithShadow(text, x, my - font.FONT_HEIGHT, color.getRGB());
             }
         });
     }
@@ -426,7 +427,7 @@ public class ModeRadialMenu extends Screen {
             changeMode();
         }
 
-        ImmutableSet<KeyBinding> set = ImmutableSet.of(mc.gameSettings.keyBindForward, mc.gameSettings.keyBindLeft, mc.gameSettings.keyBindBack, mc.gameSettings.keyBindRight, mc.gameSettings.keyBindSneak, mc.gameSettings.keyBindSprint, mc.gameSettings.keyBindJump);
+        ImmutableSet<KeyBinding> set = ImmutableSet.of(getMinecraft().gameSettings.keyBindForward, getMinecraft().gameSettings.keyBindLeft, getMinecraft().gameSettings.keyBindBack, getMinecraft().gameSettings.keyBindRight, getMinecraft().gameSettings.keyBindSneak, getMinecraft().gameSettings.keyBindSprint, getMinecraft().gameSettings.keyBindJump);
         for (KeyBinding k : set)
             KeyBinding.setKeyBindState(k.getKey(), k.isKeyDown());
 
@@ -455,7 +456,7 @@ public class ModeRadialMenu extends Screen {
     }
 
     @Override
-    public boolean doesGuiPauseGame() {
+    public boolean isPauseScreen() {
         return false;
     }
 

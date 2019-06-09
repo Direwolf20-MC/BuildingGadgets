@@ -10,6 +10,7 @@ import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.network.IPacket;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
@@ -18,8 +19,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public class ConstructionBlockEntity extends EntityBase {
-    private static final DataParameter<BlockPos> FIXED = EntityDataManager.createKey(ConstructionBlockEntity.class, DataSerializers.BLOCK_POS);
-    private static final DataParameter<Boolean> MAKING = EntityDataManager.createKey(ConstructionBlockEntity.class, DataSerializers.BOOLEAN);
+    private static final DataParameter<BlockPos> FIXED = EntityDataManager.createKey(ConstructionBlockEntity.class, DataSerializers.field_187200_j);
+    private static final DataParameter<Boolean> MAKING = EntityDataManager.createKey(ConstructionBlockEntity.class, DataSerializers.field_187198_h);
 
     public ConstructionBlockEntity(World world) {
         super(BGEntities.CONSTRUCTION_BLOCK, world);
@@ -100,6 +101,11 @@ public class ConstructionBlockEntity extends EntityBase {
     @Override
     protected void writeAdditional(CompoundNBT compound) {
         super.writeAdditional(compound);
-        compound.setBoolean(NBTKeys.ENTITY_CONSTRUCTION_MAKING_PASTE, getMakingPaste());
+        compound.putBoolean(NBTKeys.ENTITY_CONSTRUCTION_MAKING_PASTE, getMakingPaste());
+    }
+
+    @Override
+    public IPacket<?> createSpawnPacket() {
+        return null;
     }
 }

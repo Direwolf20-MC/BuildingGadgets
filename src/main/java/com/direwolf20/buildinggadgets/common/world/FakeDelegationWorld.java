@@ -384,10 +384,12 @@ public class FakeDelegationWorld implements IWorld {
         return res;
     }
 
-    @Override
-    public void setLightFor(LightType type, BlockPos pos, int lightValue) {
-        world.setLightFor(type, pos, lightValue);
-    }
+
+//    fixme: removed in 1.14?
+//    @Override
+//    public void setLightFor(LightType type, BlockPos pos, int lightValue) {
+//        world.setLightFor(type, pos, lightValue);
+//    }
 
     /**
      * Sets a block to air, but also plays the sound and particles and can spawn drops

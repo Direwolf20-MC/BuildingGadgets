@@ -32,7 +32,7 @@ public interface IBuildingMode {
         return capability.orElse(CapabilityBlockProvider.getDefaultAirProvider());
     }
 
-    BiPredicate<BlockPos, BlockState> createValidatorFor(World world, ItemStack tool, ClientPlayerEntity player, BlockPos initial);
+    BiPredicate<BlockPos, BlockState> createValidatorFor(World world, ItemStack tool, PlayerEntity player, BlockPos initial);
 
     /**
      * @see Context#getPositionSequence()

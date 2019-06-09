@@ -1,9 +1,12 @@
 package com.direwolf20.buildinggadgets.client.gui;
 
+import com.direwolf20.buildinggadgets.client.gui.materiallist.MaterialListGUI;
 import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManagerContainer;
+import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManagerGUI;
 import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManagerTileEntity;
 import com.direwolf20.buildinggadgets.common.items.ITemplate;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
+import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetDestruction;
 import com.direwolf20.buildinggadgets.common.util.lang.LangUtil;
 import com.google.common.base.Function;
 import com.google.common.base.Supplier;
@@ -35,7 +38,7 @@ public enum GuiMod {
     DESTRUCTION(GadgetDestruction::getGadget, DestructionGUI::new),
     TEMPLATE_MANAGER("template_manager", message -> {
         TileEntity te = Minecraft.getInstance().world.getTileEntity(message.getAdditionalData().readBlockPos());
-        return te instanceof TemplateManagerTileEntity ? new Templa((TemplateManagerTileEntity) te,
+        return te instanceof TemplateManagerTileEntity ? new Templ((TemplateManagerTileEntity) te,
                 getTemplateManagerContainer(Minecraft.getInstance().player, te)) : null;
     }, (id, player, world, pos) -> {
         TileEntity te = world.getTileEntity(pos);
@@ -92,7 +95,7 @@ public enum GuiMod {
         return null;
     }
 
-    private static TemplateManagerContainer getTemplateManagerContainer(ClientPlayerEntity player, TileEntity te) {
+    private static TemplateManagerContainer getTemplateManagerContainer(ServerPlayerEntity player, TileEntity te) {
         return new TemplateManagerContainer(player.inventory, (TemplateManagerTileEntity) te);
     }
 

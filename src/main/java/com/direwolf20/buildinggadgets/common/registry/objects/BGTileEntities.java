@@ -26,10 +26,11 @@ public class BGTileEntities {
 
     static void init() {
         container.add(new TileEntityBuilder<>(TileEntityReference.CONSTRUCTION_TILE_RL)
-                .builder(Builder.create(ConstructionBlockTileEntity::new))
+                // 1.13 -> 1.14 mapping missing (used to be create() )
+                .builder(Builder.func_223042_a(ConstructionBlockTileEntity::new))
                 .factory((b) -> b.build(null)));
         container.add(new TileEntityBuilder<>(TileEntityReference.TEMPLATE_MANAGER_TILE_RL)
-                .builder(Builder.create(TemplateManagerTileEntity::new))
+                .builder(Builder.func_223042_a(TemplateManagerTileEntity::new))
                 .factory((b) -> b.build(null)));
     }
 

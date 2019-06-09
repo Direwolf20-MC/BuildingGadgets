@@ -2,10 +2,13 @@ package com.direwolf20.buildinggadgets.common.blocks.templatemanager;
 
 import com.direwolf20.buildinggadgets.client.gui.GuiMod;
 import com.direwolf20.buildinggadgets.common.items.ITemplate;
+import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketBlockMap;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemStack;
@@ -17,6 +20,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 import net.minecraftforge.items.CapabilityItemHandler;
@@ -55,7 +59,7 @@ public class TemplateManager extends Block {
     }
 
     @Override
-    public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, ClientPlayerEntity player, Hand hand, Direction side, float hitX, float hitY, float hitZ) {
+    public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult blockRayTraceResult) {
         // Only execute on the server
         if (worldIn.isRemote) {
             return true;
@@ -64,7 +68,7 @@ public class TemplateManager extends Block {
         if (!(te instanceof TemplateManagerTileEntity)) {
             return false;
         }
-        TemplateManagerContainer container = ((TemplateManagerTileEntity) te).getContainer(player);
+        TemplateManagerContainer container = ((TemplateManagerTileEntity) te).getContainer((ClientPlayerEntity) player);
         for (int i = 0; i <= 1; i++) {
             ItemStack itemStack = container.getSlot(i).getStack();
             if (!(itemStack.getItem() instanceof ITemplate)) continue;
@@ -75,7 +79,7 @@ public class TemplateManager extends Block {
 
             CompoundNBT tagCompound = template.getWorldSave(worldIn).getCompoundFromUUID(UUID);
             if (tagCompound != null) {
-                PacketHandler.sendTo(new PacketBlockMap(tagCompound), player);
+                PacketHandler.sendTo(new PacketBlockMap(tagCompound), (ServerPlayerEntity) player);
             }
         }
         GuiMod.TEMPLATE_MANAGER.openContainer(player, worldIn, pos);
