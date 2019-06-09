@@ -22,6 +22,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompressedStreamTools;
@@ -215,14 +216,14 @@ public class GadgetUtils {
         return MathHelper.clamp(tagCompound.getInt("range"), 1, 15);
     }
 
-    public static BlockState rotateOrMirrorBlock(ClientPlayerEntity player, PacketRotateMirror.Operation operation, BlockState state) {
+    public static BlockState rotateOrMirrorBlock(ServerPlayerEntity player, PacketRotateMirror.Operation operation, BlockState state) {
         if (operation == PacketRotateMirror.Operation.MIRROR)
             return state.mirror(player.getHorizontalFacing().getAxis() == Axis.X ? Mirror.LEFT_RIGHT : Mirror.FRONT_BACK);
 
         return state.rotate(Rotation.CLOCKWISE_90);
     }
 
-    public static void rotateOrMirrorToolBlock(ItemStack stack, ClientPlayerEntity player, PacketRotateMirror.Operation operation) {
+    public static void rotateOrMirrorToolBlock(ItemStack stack, ServerPlayerEntity player, PacketRotateMirror.Operation operation) {
         setToolBlock(stack, rotateOrMirrorBlock(player, operation, getToolBlock(stack)));
         setToolActualBlock(stack, rotateOrMirrorBlock(player, operation, getToolActualBlock(stack)));
     }

@@ -246,7 +246,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
     }
 
 
-    public void setMode(ClientPlayerEntity player, ItemStack heldItem, int modeInt) {
+    public void setMode(ServerPlayerEntity player, ItemStack heldItem, int modeInt) {
         //Called when we specify a mode with the radial menu
         ToolMode mode = ToolMode.values()[modeInt];
         setToolMode(heldItem, mode);

@@ -22,11 +22,14 @@ import net.minecraft.block.Blocks;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.enchantment.Enchantments;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
@@ -82,7 +85,7 @@ public class GadgetBuilding extends GadgetGeneric implements IAtopPlacingGadget 
     private static void setToolMode(ItemStack tool, BuildingMode mode) {
         //Store the tool's mode in NBT as a string
         CompoundNBT tagCompound = NBTHelper.getOrNewTag(tool);
-        tagCompound.setString("mode", mode.getRegistryName());
+        tagCompound.putString("mode", mode.getRegistryName());
     }
 
     public static BuildingMode getToolMode(ItemStack tool) {
@@ -95,7 +98,7 @@ public class GadgetBuilding extends GadgetGeneric implements IAtopPlacingGadget 
     }
 
     public static void togglePlaceAtop(ClientPlayerEntity player, ItemStack stack) {
-        NBTHelper.getOrNewTag(stack).setBoolean(NBTKeys.GADGET_PLACE_INSIDE, shouldPlaceAtop(stack));
+        NBTHelper.getOrNewTag(stack).putBoolean(NBTKeys.GADGET_PLACE_INSIDE, shouldPlaceAtop(stack));
         String prefix = "message.gadget.building.placement";
         player.sendStatusMessage(new StringTextComponent(TextFormatting.AQUA + new TranslationTextComponent(prefix, new TranslationTextComponent(prefix + (shouldPlaceAtop(stack) ? ".atop" : ".inside"))).getUnformattedComponentText()), true);
     }
@@ -150,11 +153,11 @@ public class GadgetBuilding extends GadgetGeneric implements IAtopPlacingGadget 
         return new ActionResult<>(ActionResultType.SUCCESS, itemstack);
     }
 
-    public void toggleMode(ClientPlayerEntity player, ItemStack heldItem) {//TODO unused
+    public void toggleMode(ServerPlayerEntity player, ItemStack heldItem) {//TODO unused
         setMode(player, heldItem, getToolMode(heldItem).next().ordinal());
     }
 
-    public void setMode(ClientPlayerEntity player, ItemStack heldItem, int modeInt) {
+    public void setMode(ServerPlayerEntity player, ItemStack heldItem, int modeInt) {
         //Called when we specify a mode with the radial menu
         BuildingMode mode = BuildingMode.values()[modeInt];
         setToolMode(heldItem, mode);
@@ -184,8 +187,8 @@ public class GadgetBuilding extends GadgetGeneric implements IAtopPlacingGadget 
             if (lookingAt == null) { //If we aren't looking at anything, exit
                 return false;
             }
-            BlockPos startBlock = lookingAt.getBlockPos();
-            Direction sideHit = lookingAt.sideHit;
+            BlockPos startBlock = ((BlockRayTraceResult) lookingAt).getPos();
+            Direction sideHit = ((BlockRayTraceResult) lookingAt).getFace();
             coords = BuildingMode.collectPlacementPos(world, player, startBlock, sideHit, stack, startBlock);
         } else { //If we do have an anchor, erase it (Even if the build fails)
             setAnchor(stack, new ArrayList<BlockPos>());
@@ -249,7 +252,7 @@ public class GadgetBuilding extends GadgetGeneric implements IAtopPlacingGadget 
             for (BlockPos coord : undoCoords) {
                 currentBlock = world.getBlockState(coord);
 
-                double distance = coord.getDistance(player.getPosition());
+                double distance = coord.distanceSq(player.getPosition());
 
                 BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(world, coord, currentBlock, player);
                 boolean cancelled = MinecraftForge.EVENT_BUS.post(e);

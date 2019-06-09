@@ -172,7 +172,7 @@ public abstract class GadgetGeneric extends Item {
         return NBTHelper.getOrNewTag(stack).getBoolean(NBTKeys.GADGET_RAYTRACE_FLUID);
     }
 
-    public static void toggleRayTraceFluid(ClientPlayerEntity player, ItemStack stack) {
+    public static void toggleRayTraceFluid(ServerPlayerEntity player, ItemStack stack) {
         NBTHelper.getOrNewTag(stack).putBoolean(NBTKeys.GADGET_RAYTRACE_FLUID, !shouldRayTraceFluid(stack));
         player.sendStatusMessage(new StringTextComponent(TextFormatting.AQUA + new TranslationTextComponent("message.gadget.raytrace_fluid").getUnformattedComponentText() + ": " + shouldRayTraceFluid(stack)), true);
     }

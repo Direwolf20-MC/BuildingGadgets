@@ -19,7 +19,7 @@ public class BuildingObjects {
         @Override
         public ItemStack createIcon() {
             ItemStack stack = new ItemStack(BGItems.gadgetBuilding);
-            stack.getOrCreateTag().setByte(NBTKeys.CREATIVE_MARKER, (byte) 0); 
+            stack.getOrCreateTag().putByte(NBTKeys.CREATIVE_MARKER, (byte) 0);
             return stack;
         }
     };
