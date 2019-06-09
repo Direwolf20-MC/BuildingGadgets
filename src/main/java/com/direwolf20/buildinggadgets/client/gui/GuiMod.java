@@ -38,8 +38,9 @@ public enum GuiMod {
     DESTRUCTION(GadgetDestruction::getGadget, DestructionGUI::new),
     TEMPLATE_MANAGER("template_manager", message -> {
         TileEntity te = Minecraft.getInstance().world.getTileEntity(message.getAdditionalData().readBlockPos());
-        return te instanceof TemplateManagerTileEntity ? new Templ((TemplateManagerTileEntity) te,
-                getTemplateManagerContainer(Minecraft.getInstance().player, te)) : null;
+        return te instanceof TemplateManagerTileEntity
+                ? new TemplateManagerGUI((TemplateManagerTileEntity) te, getTemplateManagerContainer(Minecraft.getInstance().player, te), Minecraft.getInstance().player.inventory)
+                : null;
     }, (id, player, world, pos) -> {
         TileEntity te = world.getTileEntity(pos);
         if (te instanceof TemplateManagerTileEntity) {
@@ -95,7 +96,7 @@ public enum GuiMod {
         return null;
     }
 
-    private static TemplateManagerContainer getTemplateManagerContainer(ServerPlayerEntity player, TileEntity te) {
+    private static TemplateManagerContainer getTemplateManagerContainer(PlayerEntity player, TileEntity te) {
         return new TemplateManagerContainer(player.inventory, (TemplateManagerTileEntity) te);
     }
 
