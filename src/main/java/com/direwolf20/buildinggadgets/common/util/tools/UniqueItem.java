@@ -5,6 +5,7 @@ import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.google.common.base.Preconditions;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -23,7 +24,7 @@ public final class UniqueItem { //TODO @since 1.13.x can this be replaced with I
         return new UniqueItem(ForgeRegistries.ITEMS.getValue(new ResourceLocation(compound.getString(NBTKeys.UNIQUE_ITEM_ITEM))));
     }
 
-    public static UniqueItem fromBlockState(BlockState state, ClientPlayerEntity player, BlockPos pos) {
+    public static UniqueItem fromBlockState(BlockState state, PlayerEntity player, BlockPos pos) {
         ItemStack itemStack;
         //if (state.getBlock().canSilkHarvest(player.world, pos, state, player)) {
         //    itemStack = InventoryHelper.getSilkTouchDrop(state);

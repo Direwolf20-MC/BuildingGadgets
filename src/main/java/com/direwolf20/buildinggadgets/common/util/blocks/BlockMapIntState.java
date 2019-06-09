@@ -6,6 +6,7 @@ import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.nbt.NBTUtil;
@@ -108,11 +109,11 @@ public class BlockMapIntState {
     }
 
     @Nonnull
-    public static UniqueItem blockStateToUniqueItem(BlockState state, ClientPlayerEntity player, BlockPos pos) {
+    public static UniqueItem blockStateToUniqueItem(BlockState state, PlayerEntity player, BlockPos pos) {
         return UniqueItem.fromBlockState(state, player, pos);
     }
 
-    public void makeStackMapFromStateMap(ClientPlayerEntity player) {
+    public void makeStackMapFromStateMap(PlayerEntity player) {
         intStackMap.clear();
         for (Map.Entry<Short, BlockState> entry : intStateMap.entrySet()) {
             try {
