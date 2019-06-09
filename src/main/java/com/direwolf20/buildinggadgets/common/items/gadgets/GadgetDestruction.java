@@ -7,7 +7,6 @@ import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
-import com.direwolf20.buildinggadgets.common.util.CapabilityUtil.EnergyUtil;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.blocks.RegionSnapshot;
 import com.direwolf20.buildinggadgets.common.util.exceptions.PaletteOverflowException;
@@ -178,9 +177,6 @@ public class GadgetDestruction extends GadgetSwapping {
                 }
 
                 return new ActionResult<>(EnumActionResult.FAIL, stack);
-            } else {
-                //TODO Remove debug code
-                EnergyUtil.getCap(stack).ifPresent(energy -> energy.receiveEnergy(105000, false));
             }
         } else if (player.isSneaking()) {
             GuiMod.DESTRUCTION.openScreen(player);
@@ -259,30 +255,29 @@ public class GadgetDestruction extends GadgetSwapping {
         IBlockState currentBlock = world.getBlockState(voidPos);
         if (stateTarget != null && currentBlock != stateTarget) return false;
         TileEntity te = world.getTileEntity(voidPos);
+
         if (currentBlock.getBlock().isAir(currentBlock, world, voidPos)) return false;
-        //if (currentBlock.getBlock().getMaterial(currentBlock).isLiquid()) return false;
         if (currentBlock.equals(BGBlocks.effectBlock.getDefaultState())) return false;
         if ((te != null) && !(te instanceof ConstructionBlockTileEntity)) return false;
         if (currentBlock.getBlockHardness(world, voidPos) < 0) return false;
 
         ItemStack tool = getGadget(player);
-        if (tool.isEmpty()) return false;
+        if (tool.isEmpty())
+            return false;
 
-        if (!player.isAllowEdit()) {
+        if (!player.isAllowEdit())
             return false;
-        }
-        if (!world.isBlockModifiable(player, voidPos)) {
+
+        if (!world.isBlockModifiable(player, voidPos))
             return false;
-        }
+
         if (!world.isRemote) {
             BlockSnapshot blockSnapshot = BlockSnapshot.getBlockSnapshot(world, voidPos);
             if (ForgeEventFactory.onBlockPlace(player, blockSnapshot, EnumFacing.UP)) {
                 return false;
             }
             BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(world, voidPos, currentBlock, player);
-            if (MinecraftForge.EVENT_BUS.post(e)) {
-                return false;
-            }
+            return !MinecraftForge.EVENT_BUS.post(e);
         }
         return true;
     }
@@ -301,13 +296,7 @@ public class GadgetDestruction extends GadgetSwapping {
                 .offset(down, getToolValue(stack, NBTKeys.GADGET_VALUE_DOWN))
                 .offset(depth, getToolValue(stack, NBTKeys.GADGET_VALUE_DEPTH) - 1);
         // The number are not necessarily sorted min and max, but the constructor will do it for us
-        return new Region(
-                first.getX(),
-                first.getY(),
-                first.getZ(),
-                second.getX(),
-                second.getY(),
-                second.getZ());
+        return new Region(first, second);
     }
 
     public void clearArea(World world, BlockPos pos, EnumFacing side, EntityPlayer player, ItemStack stack) {
