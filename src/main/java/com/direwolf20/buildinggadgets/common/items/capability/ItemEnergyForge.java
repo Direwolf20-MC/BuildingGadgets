@@ -74,12 +74,12 @@ public final class ItemEnergyForge implements IEnergyStorage {
 
     private void writeEnergy() {
         CompoundNBT nbt = GadgetUtils.enforceHasTag(stack);
-        nbt.setInt(NBTKeys.ENERGY,getEnergyStoredCache());
+        nbt.putInt(NBTKeys.ENERGY, getEnergyStoredCache());
     }
 
     private void updateEnergy() {
         CompoundNBT nbt = GadgetUtils.enforceHasTag(stack);
-        if (nbt.hasKey(NBTKeys.ENERGY))
+        if (nbt.contains(NBTKeys.ENERGY))
             this.energy = nbt.getInt(NBTKeys.ENERGY) ;
         updateMaxEnergy();
     }

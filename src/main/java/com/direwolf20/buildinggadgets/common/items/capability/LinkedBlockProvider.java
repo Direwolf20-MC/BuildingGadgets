@@ -12,7 +12,7 @@ import net.minecraft.util.math.BlockPos;
  * Block provider that reads block state from a gadget item. No snapshots will be created therefore it will always be
  * synced to the gadget item.
  */
-public class LinkedBlockProvider implements IBlockProvider {
+public final class LinkedBlockProvider implements IBlockProvider {
 
     private final ItemStack stack;
 

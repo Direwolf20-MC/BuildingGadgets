@@ -11,7 +11,6 @@ import com.direwolf20.buildinggadgets.common.util.lang.LangUtil;
 import com.google.common.base.Function;
 import com.google.common.base.Supplier;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -55,13 +54,13 @@ public enum GuiMod {
         boolean open(String id, ServerPlayerEntity player, World world, BlockPos pos);
     }
 
-    private Function<ClientPlayerEntity, ItemStack> stackReader;
+    private Function<PlayerEntity, ItemStack> stackReader;
     private Function<ItemStack, ? extends Screen> clientScreenProvider;
     private Function<OpenContainer, ? extends Screen> commonScreenProvider;
     private IContainerOpener containerOpener;
     private String id;
 
-    private GuiMod(Function<ClientPlayerEntity, ItemStack> stackReader, Function<ItemStack, ? extends Screen> clientScreenProvider) {
+    private GuiMod(Function<PlayerEntity, ItemStack> stackReader, Function<ItemStack, ? extends Screen> clientScreenProvider) {
         this.stackReader = stackReader;
         this.clientScreenProvider = clientScreenProvider;
     }
@@ -72,7 +71,7 @@ public enum GuiMod {
         this.containerOpener = containerOpener;
     }
 
-    public boolean openScreen(ClientPlayerEntity player) {
+    public boolean openScreen(PlayerEntity player) {
         if (clientScreenProvider == null)
             return false;
 

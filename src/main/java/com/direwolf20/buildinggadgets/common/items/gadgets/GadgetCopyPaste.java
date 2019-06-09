@@ -7,11 +7,9 @@ import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.common.items.ITemplate;
-import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketBlockMap;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketRotateMirror;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
-import com.direwolf20.buildinggadgets.common.util.CapabilityUtil.EnergyUtil;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.blocks.BlockMap;
 import com.direwolf20.buildinggadgets.common.util.blocks.BlockMapIntState;
@@ -26,31 +24,31 @@ import com.direwolf20.buildinggadgets.common.util.tools.UniqueItem;
 import com.direwolf20.buildinggadgets.common.world.WorldSave;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
-import net.minecraft.block.material.Material;
 import net.minecraft.block.BlockState;
-import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.material.Material;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
+import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.block.Blocks;
-import net.minecraft.enchantment.Enchantments;
-import net.minecraft.item.Items;
+import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemUseContext;
+import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
-//import net.minecraft.nbt.ListNBT;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
 import net.minecraft.util.Direction.Axis;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceContext.FluidMode;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
-//import net.minecraft.util.text.TextComponentString;
-import net.minecraft.util.text.TranslationTextComponent;
-//import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.common.MinecraftForge;
@@ -256,23 +254,15 @@ public class GadgetCopyPaste extends GadgetPlacing implements ITemplate {
     }
 
     @Override
-    public ActionResult<ItemStack> onItemRightClick(World world, ClientPlayerEntity player, Hand hand) {
+    public ActionResult<ItemStack> onItemRightClick(World world, PlayerEntity player, Hand hand) {
         ItemStack stack = player.getHeldItem(hand);
         player.setActiveHand(hand);
         BlockPos pos = VectorHelper.getPosLookingAt(player, stack);
         if (!world.isRemote) {
-            if (pos != null && player.isSneaking() && GadgetUtils.setRemoteInventory(stack, player, world, pos, false) == ActionResultType.SUCCESS)
+            if (player.isSneaking() && GadgetUtils.setRemoteInventory(stack, player, world, pos, false) == ActionResultType.SUCCESS)
                 return new ActionResult<ItemStack>(ActionResultType.SUCCESS, stack);
 
             if (getToolMode(stack) == ToolMode.Copy) {
-                if (pos == null) {
-                    //TODO Remove debug code
-                    EnergyUtil.getCap(stack).ifPresent(energy -> energy.receiveEnergy(105000, false));
-                    //setStartPos(stack, null);
-                    //setEndPos(stack, null);
-                    //player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.areareset").getUnformattedComponentText()), true);
-                    return new ActionResult<>(ActionResultType.SUCCESS, stack);
-                }
                 if (player.isSneaking()) {
                     if (getStartPos(stack) != null)
                         copyBlocks(stack, player, world, getStartPos(stack), pos);
@@ -287,7 +277,6 @@ public class GadgetCopyPaste extends GadgetPlacing implements ITemplate {
             } else if (getToolMode(stack) == ToolMode.Paste) {
                 if (!player.isSneaking()) {
                     if (getAnchor(stack) == null) {
-                        if (pos == null) return new ActionResult<ItemStack>(ActionResultType.FAIL, stack);
                         buildBlockMap(world, pos, stack, player);
                     } else {
                         BlockPos startPos = getAnchor(stack);
@@ -296,12 +285,12 @@ public class GadgetCopyPaste extends GadgetPlacing implements ITemplate {
                 }
             }
         } else {
-            if (pos != null && player.isSneaking()) {
+            if (player.isSneaking()) {
                 if (GadgetUtils.getRemoteInventory(pos, world, NetworkIO.Operation.EXTRACT) != null)
                     return new ActionResult<>(ActionResultType.SUCCESS, stack);
             }
             if (getToolMode(stack) == ToolMode.Copy) {
-                if (pos == null && player.isSneaking())
+                if (player.isSneaking())
                     GuiMod.COPY.openScreen(player);
             } else if (player.isSneaking()) {
                 GuiMod.PASTE.openScreen(player);
@@ -312,7 +301,7 @@ public class GadgetCopyPaste extends GadgetPlacing implements ITemplate {
         return new ActionResult<>(ActionResultType.SUCCESS, stack);
     }
 
-    public static void rotateOrMirrorBlocks(ItemStack stack, ClientPlayerEntity player, PacketRotateMirror.Operation operation) {
+    public static void rotateOrMirrorBlocks(ItemStack stack, PlayerEntity player, PacketRotateMirror.Operation operation) {
         if (!(getToolMode(stack) == ToolMode.Paste)) return;
         if (player.world.isRemote) {
             return;
@@ -369,7 +358,7 @@ public class GadgetCopyPaste extends GadgetPlacing implements ITemplate {
                 + new TranslationTextComponent("message.gadget." + (player.isSneaking() ? "mirrored" : "rotated")).getUnformattedComponentText()), true);
     }
 
-    public static void copyBlocks(ItemStack stack, ClientPlayerEntity player, World world, BlockPos startPos, BlockPos endPos) {
+    public static void copyBlocks(ItemStack stack, PlayerEntity player, World world, BlockPos startPos, BlockPos endPos) {
         if (startPos != null && endPos != null) {
             GadgetCopyPaste tool = BGItems.gadgetCopyPaste;
             if (findBlocks(world, startPos, endPos, stack, player, tool)) {
@@ -379,7 +368,7 @@ public class GadgetCopyPaste extends GadgetPlacing implements ITemplate {
         }
     }
 
-    private static boolean findBlocks(World world, BlockPos start, BlockPos end, ItemStack stack, ClientPlayerEntity player, GadgetCopyPaste tool) {
+    private static boolean findBlocks(World world, BlockPos start, BlockPos end, ItemStack stack, PlayerEntity player, GadgetCopyPaste tool) {
         setLastBuild(stack, null, DimensionType.OVERWORLD);
         int foundTE = 0;
         int startX = start.getX();
@@ -507,11 +496,8 @@ public class GadgetCopyPaste extends GadgetPlacing implements ITemplate {
 
     private void placeBlock(World world, BlockPos pos, ClientPlayerEntity player, BlockState state, Map<BlockState, UniqueItem> IntStackMap) {
         BlockState testState = world.getBlockState(pos);
-        // @warning: this has been replaced without knowing how to construct a BlockItemUseContent
-        //TODO Put this back into place once someone figures out how its supposed to work :)
-        // if ((Config.GENERAL.allowOverwriteBlocks.get() && !testState.isReplaceable(new BlockItemUseContext(world, player, new ItemStack(testState.getBlock()), pos, Direction.DOWN, 0.5F, 0.0F, 0.5F))) ||
-        //     (!Config.GENERAL.allowOverwriteBlocks.get() && world.getBlockState(pos).getMaterial() != Material.AIR))
-        if (world.getBlockState(pos).getMaterial() != Material.AIR)
+        if ((Config.GENERAL.allowOverwriteBlocks.get() && ! testState.isReplaceable(new BlockItemUseContext(new ItemUseContext(player, Hand.MAIN_HAND, VectorHelper.getLookingAt(player, FluidMode.NONE))))) ||
+                (! Config.GENERAL.allowOverwriteBlocks.get() && world.getBlockState(pos).getMaterial() != Material.AIR))
             return;
 
         if (pos.getY() < 0 || state.equals(Blocks.AIR.getDefaultState()) || !player.isAllowEdit())
@@ -567,7 +553,7 @@ public class GadgetCopyPaste extends GadgetPlacing implements ITemplate {
             useItemSuccess = InventoryHelper.useItem(itemStack, player, neededItems, world);
         }
         if (useItemSuccess) {
-            world.spawnEntity(new BlockBuildEntity(world, pos, player, state, BlockBuildEntity.Mode.PLACE, useConstructionPaste));
+            world.func_217376_c(new BlockBuildEntity(world, pos, player, state, BlockBuildEntity.Mode.PLACE, useConstructionPaste));
         }
 
     }
@@ -615,7 +601,7 @@ public class GadgetCopyPaste extends GadgetPlacing implements ITemplate {
                 if (currentBlock.getBlock() == blockMap.state.getBlock() || currentBlock.getBlock() instanceof ConstructionBlock) {
                     if (currentBlock.getBlockHardness(world, blockMap.pos) >= 0) {
                         currentBlock.getBlock().harvestBlock(world, player, blockMap.pos, currentBlock, world.getTileEntity(blockMap.pos), silkTool);
-                        world.spawnEntity(new BlockBuildEntity(world, blockMap.pos, player, currentBlock, BlockBuildEntity.Mode.REMOVE, false));
+                        world.func_217376_c(new BlockBuildEntity(world, blockMap.pos, player, currentBlock, BlockBuildEntity.Mode.REMOVE, false));
                     }
                 }
             } else {

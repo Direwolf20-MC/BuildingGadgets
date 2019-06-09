@@ -5,7 +5,7 @@ import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.util.tools.UniqueItem;
 import com.direwolf20.buildinggadgets.common.world.WorldSave;
 import com.google.common.collect.Multiset;
-import net.minecraft.client.entity.player.ClientPlayerEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
@@ -17,7 +17,7 @@ import javax.annotation.Nullable;
 
 public interface ITemplate {
 
-    static ItemStack getTemplate(ClientPlayerEntity player) {
+    static ItemStack getTemplate(PlayerEntity player) {
         ItemStack mainhand = player.getHeldItemMainhand();
         if (mainhand.getItem() instanceof ITemplate)
             return mainhand;
@@ -47,7 +47,7 @@ public interface ITemplate {
     @Nonnull
     default Multiset<UniqueItem> getItemCountMap(ItemStack stack) {
         CompoundNBT tagCompound = stack.getTag();
-        Multiset<UniqueItem> tagMap = tagCompound == null ? null : GadgetUtils.nbtToItemCount((ListNBT) tagCompound.getTag("itemcountmap"));
+        Multiset<UniqueItem> tagMap = tagCompound == null ? null : GadgetUtils.nbtToItemCount((ListNBT) tagCompound.get("itemcountmap"));
         if (tagMap == null)
             throw new IllegalArgumentException("ITemplate#getItemCountMap faild to retieve tag map from " + GadgetUtils.getStackErrorSuffix(stack));
 
@@ -60,7 +60,7 @@ public interface ITemplate {
 
     default void setCopyCounter(ItemStack stack, int counter) {
         CompoundNBT tagCompound = GadgetUtils.getStackTag(stack);
-        tagCompound.setInt(NBTKeys.TEMPLATE_COPY_COUNT, counter);
+        tagCompound.putInt(NBTKeys.TEMPLATE_COPY_COUNT, counter);
         stack.setTag(tagCompound);
     }
 

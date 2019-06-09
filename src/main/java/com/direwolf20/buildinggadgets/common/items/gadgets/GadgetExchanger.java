@@ -1,7 +1,6 @@
 package com.direwolf20.buildinggadgets.common.items.gadgets;
 
 import com.direwolf20.buildinggadgets.common.config.Config;
-import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
 import com.direwolf20.buildinggadgets.common.util.CapabilityUtil.EnergyUtil;
 import com.direwolf20.buildinggadgets.common.util.helpers.InventoryHelper;
@@ -15,23 +14,28 @@ import com.direwolf20.buildinggadgets.common.util.tools.modes.ExchangingMode;
 import com.direwolf20.buildinggadgets.common.world.FakeBuilderWorld;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.enchantment.Enchantments;
-import net.minecraft.item.Items;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.world.ServerWorld;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldType;
+import net.minecraft.world.storage.loot.LootContext;
+import net.minecraft.world.storage.loot.LootContext.Builder;
+import net.minecraft.world.storage.loot.LootParameterSet;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.MinecraftForge;
@@ -103,7 +107,7 @@ public class GadgetExchanger extends GadgetSwapping {
     private static void setToolMode(ItemStack tool, ExchangingMode mode) {
         //Store the tool's mode in NBT as a string
         CompoundNBT tagCompound = NBTHelper.getOrNewTag(tool);
-        tagCompound.setString("mode", mode.getRegistryName());
+        tagCompound.putString("mode", mode.getRegistryName());
     }
 
     public static ExchangingMode getToolMode(ItemStack tool) {
@@ -133,7 +137,7 @@ public class GadgetExchanger extends GadgetSwapping {
     }
 
     @Override
-    public ActionResult<ItemStack> onItemRightClick(World world, ClientPlayerEntity player, Hand hand) {
+    public ActionResult<ItemStack> onItemRightClick(World world, PlayerEntity player, Hand hand) {
         ItemStack itemstack = player.getHeldItem(hand);
         player.setActiveHand(hand);
         if (!world.isRemote) {
@@ -150,18 +154,18 @@ public class GadgetExchanger extends GadgetSwapping {
         return new ActionResult<ItemStack>(ActionResultType.SUCCESS, itemstack);
     }
 
-    public void toggleMode(ClientPlayerEntity player, ItemStack heldItem) {//TODO unused
+    public void toggleMode(PlayerEntity player, ItemStack heldItem) {//TODO unused
         setToolMode(heldItem, getToolMode(heldItem).next());
     }
 
-    public void setMode(ClientPlayerEntity player, ItemStack heldItem, int modeInt) {
+    public void setMode(PlayerEntity player, ItemStack heldItem, int modeInt) {
         //Called when we specify a mode with the radial menu
         ExchangingMode mode = ExchangingMode.values()[modeInt];
         setToolMode(heldItem, mode);
         player.sendStatusMessage(new StringTextComponent(TextFormatting.AQUA + new TranslationTextComponent("message.gadget.toolmode").getUnformattedComponentText() + ": " + mode), true);
     }
 
-    public static void rangeChange(ClientPlayerEntity player, ItemStack heldItem) {
+    public static void rangeChange(PlayerEntity player, ItemStack heldItem) {
         int range = getToolRange(heldItem);
         int changeAmount = (getToolMode(heldItem) == ExchangingMode.GRID || (range % 2 == 0)) ? 1 : 2;
         if (player.isSneaking()) {
@@ -221,7 +225,7 @@ public class GadgetExchanger extends GadgetSwapping {
         ItemStack itemStack;
         boolean useConstructionPaste = false;
         //ItemStack itemStack = setBlock.getBlock().getPickBlock(setBlock, null, world, pos, player);
-        if (setBlock.getBlock().canSilkHarvest(setBlock, world, pos, player)) {
+        if (setBlock.canHarvestBlock(world, pos, player)) {
             itemStack = InventoryHelper.getSilkTouchDrop(setBlock);
         } else {
             itemStack = setBlock.getBlock().getPickBlock(setBlock, null, world, pos, player);
@@ -235,7 +239,10 @@ public class GadgetExchanger extends GadgetSwapping {
             return false;
 
         NonNullList<ItemStack> drops = NonNullList.create();
-        setBlock.getBlock().getDrops(setBlock, drops, world, pos, 0);
+        Builder lootBuilder = new Builder((ServerWorld) world);
+        setBlock.getDrops(lootBuilder);
+        //TODO find out what to do with that and what loot parameters are supposed to be passed in there
+        LootContext ctx = lootBuilder.build(new LootParameterSet.Builder().build());
         int neededItems = 0;
         for (ItemStack drop : drops) {
             if (drop.getItem().equals(itemStack.getItem())) {
@@ -281,7 +288,8 @@ public class GadgetExchanger extends GadgetSwapping {
             useItemSuccess = InventoryHelper.useItem(itemStack, player, neededItems, world);
         }
         if (useItemSuccess) {
-            world.spawnEntity(new BlockBuildEntity(world, pos, player, setBlock, BlockBuildEntity.Mode.REPLACE, useConstructionPaste));
+            //TODO reimplement once we find a valid replacement
+            //world.spawnEntity(new BlockBuildEntity(world, pos, player, setBlock, BlockBuildEntity.Mode.REPLACE, useConstructionPaste));
             return true;
         }
         return false;
