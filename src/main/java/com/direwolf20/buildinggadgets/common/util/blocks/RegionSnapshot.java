@@ -90,7 +90,7 @@ public class RegionSnapshot {
 
             // If the same block state showed up again, increase the number of streaks
             // If we have more than 255 streaks (maximum integer that can be stored in 8 bits), we force start a new streak, because the current storage frame won't fit that many of them
-            if (state.equals(lastStreak) && streak < 255) {
+            if (state.equals(lastStreak) && streak < 256) {
                 streak++;
                 continue;
             }
@@ -151,7 +151,7 @@ public class RegionSnapshot {
             int stateID = frame & 0xffffff;
             // The serialized number will be ONE FEWER then the actual amount
             // - see the serialization for +1
-            int streaks = (frame >> 24) + 1;
+            int streaks = (frame >>> 24) + 1;
 
             Optional<IBlockState> state = palettes.get(stateID);
             // Add `streaks` amount of the same block state

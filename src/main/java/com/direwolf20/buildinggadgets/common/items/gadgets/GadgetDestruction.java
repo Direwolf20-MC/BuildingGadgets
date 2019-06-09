@@ -11,6 +11,7 @@ import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.blocks.RegionSnapshot;
 import com.direwolf20.buildinggadgets.common.util.exceptions.PaletteOverflowException;
 import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
+import com.direwolf20.buildinggadgets.common.util.helpers.SortingHelper;
 import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
 import com.direwolf20.buildinggadgets.common.util.lang.Styles;
 import com.direwolf20.buildinggadgets.common.util.lang.TooltipTranslation;
@@ -26,7 +27,6 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.Vec3i;
 import net.minecraft.util.text.*;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
@@ -163,16 +163,15 @@ public class GadgetDestruction extends GadgetSwapping {
                 EnumFacing anchorSide = getAnchorSide(stack);
                 if (anchorPos != null && anchorSide != null) {
                     clearArea(world, anchorPos, anchorSide, player, stack);
-                    clearSuccess(player, stack);
+                    clearSuccess(stack);
                     return new ActionResult<>(EnumActionResult.SUCCESS, stack);
                 }
 
                 RayTraceResult lookingAt = VectorHelper.getLookingAt(player, stack);
                 if (lookingAt != null) {
-                    BlockPos targetPos = lookingAt.getBlockPos();
-                    EnumFacing sideHit = lookingAt.sideHit;
-                    clearArea(world, targetPos, sideHit, player, stack);
-                    clearSuccess(player, stack);
+                    clearArea(world, lookingAt.getBlockPos(), lookingAt.sideHit, player, stack);
+                    clearSuccess(stack);
+                    player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.anchorremove").getUnformattedComponentText()), true);
                     return new ActionResult<>(EnumActionResult.SUCCESS, stack);
                 }
 
@@ -184,10 +183,9 @@ public class GadgetDestruction extends GadgetSwapping {
         return new ActionResult<>(EnumActionResult.SUCCESS, stack);
     }
 
-    public static void clearSuccess(EntityPlayer player, ItemStack stack) {
+    public static void clearSuccess(ItemStack stack) {
         setAnchor(stack, null);
         setAnchorSide(stack, null);
-        player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.anchorremove").getUnformattedComponentText()), true);
     }
 
     public static void anchorBlocks(EntityPlayer player, ItemStack stack) {
@@ -228,12 +226,10 @@ public class GadgetDestruction extends GadgetSwapping {
                 .collect(Collectors.toCollection(HashSet::new)), boundary);
     }
 
-    public static SortedSet<BlockPos> getClearingPositionsSet(World world, BlockPos pos, EnumFacing incomingSide, EntityPlayer player, ItemStack stack) {
-        return getClearingPositions(world, pos, incomingSide, player, stack).stream()
-                .collect(Collectors.toCollection(() -> new TreeSet<>(Comparator
-                        .comparingInt(Vec3i::getX)
-                        .thenComparingInt(Vec3i::getY)
-                        .thenComparingInt(Vec3i::getZ))));
+    public static List<BlockPos> getClearingPositionsForRendering(World world, BlockPos pos, EnumFacing incomingSide, EntityPlayer player, ItemStack stack) {
+        ArrayList<BlockPos> list = getClearingPositions(world, pos, incomingSide, player, stack).stream()
+                .collect(Collectors.toCollection(ArrayList::new));
+        return SortingHelper.Blocks.byDistance(list, player);
     }
 
     private static void addConnectedCoordinates(World world, EntityPlayer player, BlockPos pos, IBlockState state, Set<BlockPos> coords, Region boundary) {

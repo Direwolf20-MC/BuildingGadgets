@@ -40,7 +40,6 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldType;
 import net.minecraft.world.dimension.DimensionType;
@@ -63,7 +62,6 @@ import org.lwjgl.opengl.GL14;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 import static com.direwolf20.buildinggadgets.common.util.GadgetUtils.getAnchor;
 import static com.direwolf20.buildinggadgets.common.util.GadgetUtils.getToolBlock;
@@ -400,21 +398,12 @@ public class ToolRenders {
         //Enable Blending (So we can have transparent effect)
         GlStateManager.enableBlend();
         //This blend function allows you to use a constant alpha, which is defined later
-        //GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
         GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
 
         Tessellator t = Tessellator.getInstance();
         BufferBuilder bufferBuilder = t.getBuffer();
-        /*ArrayList<EnumFacing> directions = GadgetDestruction.assignDirections(facing, player);
-        BlockPos a = new BlockPos(0,0,0);
-        a = a.offset(directions.get(0), GadgetDestruction.getToolValue(stack, NBTKeys.GADGET_VALUE_LEFT));
-        a = a.offset(directions.get(2), GadgetDestruction.getToolValue(stack, NBTKeys.GADGET_VALUE_UP));
-        BlockPos b = new BlockPos(0,0,0);
-        b = b.offset(directions.get(1), GadgetDestruction.getToolValue(stack, NBTKeys.GADGET_VALUE_RIGHT));
-        b = b.offset(directions.get(2), GadgetDestruction.getToolValue(stack, NBTKeys.GADGET_VALUE_DOWN));
-        b = b.offset(directions.get(4), GadgetDestruction.getToolValue(stack, NBTKeys.GADGET_VALUE_DEPTH));*/
 
-        for (BlockPos coordinate : GadgetDestruction.getClearingPositionsSet(world, startBlock, facing, player, heldItem)) {
+        for (BlockPos coordinate : GadgetDestruction.getClearingPositionsForRendering(world, startBlock, facing, player, heldItem)) {
             boolean invisible = true;
             IBlockState state = world.getBlockState(coordinate);
             for (EnumFacing side : EnumFacing.values()) {
@@ -424,22 +413,20 @@ public class ToolRenders {
                 }
             }
             if (invisible) continue;
+
             GlStateManager.pushMatrix();//Push matrix again just because
             GlStateManager.translatef(coordinate.getX(), coordinate.getY(), coordinate.getZ());//Now move the render position to the coordinates we want to render at
             GlStateManager.rotatef(-90.0F, 0.0F, 1.0F, 0.0F); //Rotate it because i'm not sure why but we need to
             GlStateManager.translatef(-0.005f, -0.005f, 0.005f);
             GlStateManager.scalef(1.01f, 1.01f, 1.01f);//Slightly Larger block to avoid z-fighting.
-            //GL14.glBlendColor(1F, 1F, 1F, 0.55f); //Set the alpha of the blocks we are rendering
-            //GlStateManager.rotate(-90.0F, 0.0F, 1.0F, 0.0F); //Rotate it because i'm not sure why but we need to
-            //GlStateManager.disableCull();
+
             GlStateManager.disableLighting();
             GlStateManager.disableTexture2D();
-            //renderBoxSolid(t, bufferBuilder, a.getX(), a.getY(), a.getZ()+1, b.getX()+1, b.getY()+1, b.getZ()+1, 1, 1, 1);
+
             renderBoxSolid(t, bufferBuilder, 0, 0, -1, 1, 1, 0, 1, 0, 0, 0.5f);
+
             GlStateManager.enableTexture2D();
             GlStateManager.enableLighting();
-            //GlStateManager.enableCull();
-            //dispatcher.renderBlockBrightness(Blocks.STAINED_GLASS.getDefaultState().withProperty(COLOR, EnumDyeColor.RED), 1f);//Render the defined block - White glass to show non-full block renders (Example: Torch)
             //Move the render position back to where it was
             GlStateManager.popMatrix();
         }
