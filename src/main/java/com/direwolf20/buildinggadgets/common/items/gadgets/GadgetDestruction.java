@@ -42,18 +42,6 @@ import java.util.stream.Collectors;
 
 public class GadgetDestruction extends GadgetSwapping {
 
-    public static void restoreSnapshotWithBuilder(World world, RegionSnapshot snapshot) {
-        Set<BlockPos> pastePositions = snapshot.getTileData().stream()
-                .map(Pair::getLeft)
-                .collect(Collectors.toSet());
-        int index = 0;
-        for (BlockPos pos : snapshot.getPositions()) {
-            // TODO remove spawnBy field in BlockBuildEntity
-            snapshot.getBlockStates().get(index).ifPresent(state -> world.spawnEntity(new BlockBuildEntity(world, pos, null, state, BlockBuildEntity.Mode.PLACE, pastePositions.contains(pos))));
-            index++;
-        }
-    }
-
     public GadgetDestruction(Properties builder) {
         super(builder);
     }
@@ -103,16 +91,14 @@ public class GadgetDestruction extends GadgetSwapping {
         addEnergyInformation(tooltip, stack);
     }
 
-    public static String getUUID(ItemStack stack) {
+    public static UUID getUUID(ItemStack stack) {
         NBTTagCompound tag = NBTHelper.getOrNewTag(stack);
-        String uuid = tag.getString(NBTKeys.GADGET_UUID);
-        if (uuid.isEmpty()) {
-            UUID uid = UUID.randomUUID();
-            tag.setString(NBTKeys.GADGET_UUID, uid.toString());
-            stack.setTag(tag);
-            uuid = uid.toString();
+        if (!NBTHelper.hasUUID(tag)) {
+            UUID uuid = UUID.randomUUID();
+            NBTHelper.setUUID(tag, uuid);
+            return uuid;
         }
-        return uuid;
+        return NBTHelper.getUUID(tag);
     }
 
     public static void setAnchor(ItemStack stack, BlockPos pos) {
@@ -124,81 +110,48 @@ public class GadgetDestruction extends GadgetSwapping {
     }
 
     public static void setAnchorSide(ItemStack stack, EnumFacing side) {
-        NBTTagCompound tagCompound = stack.getTag();
-        if (tagCompound == null) {
-            tagCompound = new NBTTagCompound();
-        }
-        if (side == null) {
-            if (tagCompound.getTag(NBTKeys.GADGET_ANCHOR_SIDE) != null) {
-                tagCompound.removeTag(NBTKeys.GADGET_ANCHOR_SIDE);
-                stack.setTag(tagCompound);
-            }
-            return;
-        }
-        tagCompound.setString(NBTKeys.GADGET_ANCHOR_SIDE, side.getName());
-        stack.setTag(tagCompound);
+        NBTTagCompound tag = NBTHelper.getOrNewTag(stack);
+        if (side == null)
+            tag.removeTag(NBTKeys.GADGET_ANCHOR_SIDE);
+        else
+            tag.setString(NBTKeys.GADGET_ANCHOR_SIDE, side.getName());
     }
 
     public static EnumFacing getAnchorSide(ItemStack stack) {
-        NBTTagCompound tagCompound = stack.getTag();
-        if (tagCompound == null) {
+        NBTTagCompound tag = NBTHelper.getOrNewTag(stack);
+        String facing = tag.getString(NBTKeys.GADGET_ANCHOR_SIDE);
+        if (facing.isEmpty())
             return null;
-        }
-        String facing = tagCompound.getString(NBTKeys.GADGET_ANCHOR_SIDE);
-        if (facing.isEmpty()) return null;
         return EnumFacing.byName(facing);
     }
 
     public static void setToolValue(ItemStack stack, int value, String valueName) {
-        //Store the tool's range in NBT as an Integer
-        NBTTagCompound tagCompound = stack.getTag();
-        if (tagCompound == null) {
-            tagCompound = new NBTTagCompound();
-        }
-        tagCompound.setInt(valueName, value);
-        stack.setTag(tagCompound);
+        NBTHelper.getOrNewTag(stack).setInt(valueName, value);
     }
 
     public static int getToolValue(ItemStack stack, String valueName) {
-        //Store the tool's range in NBT as an Integer
-        NBTTagCompound tagCompound = stack.getTag();
-        if (tagCompound == null) {
-            tagCompound = new NBTTagCompound();
-        }
-        return tagCompound.getInt(valueName);
+        return NBTHelper.getOrNewTag(stack).getInt(valueName);
     }
 
     public static boolean getOverlay(ItemStack stack) {
-        NBTTagCompound tagCompound = stack.getTag();
-        if (tagCompound == null) {
-            tagCompound = new NBTTagCompound();
-            tagCompound.setBoolean(NBTKeys.GADGET_OVERLAY, true);
-            tagCompound.setBoolean(NBTKeys.GADGET_FUZZY, true);
-            stack.setTag(tagCompound);
-            return true;
-        }
-        if (tagCompound.hasKey(NBTKeys.GADGET_OVERLAY)) {
-            return tagCompound.getBoolean(NBTKeys.GADGET_OVERLAY);
-        }
-        tagCompound.setBoolean(NBTKeys.GADGET_OVERLAY, true);
-        stack.setTag(tagCompound);
+        NBTTagCompound tag = NBTHelper.getOrNewTag(stack);
+        if (tag.hasKey(NBTKeys.GADGET_OVERLAY))
+            return tag.getBoolean(NBTKeys.GADGET_OVERLAY);
+
+        tag.setBoolean(NBTKeys.GADGET_OVERLAY, true);
+        tag.setBoolean(NBTKeys.GADGET_FUZZY, true); // We want a Destruction Gadget to start with fuzzy=true
         return true;
     }
 
     public static void setOverlay(ItemStack stack, boolean showOverlay) {
-        NBTTagCompound tagCompound = stack.getTag();
-        if (tagCompound == null) {
-            tagCompound = new NBTTagCompound();
-        }
-        tagCompound.setBoolean(NBTKeys.GADGET_OVERLAY, showOverlay);
-        stack.setTag(tagCompound);
+        NBTHelper.getOrNewTag(stack).setBoolean(NBTKeys.GADGET_OVERLAY, showOverlay);
     }
 
     public static void switchOverlay(EntityPlayer player, ItemStack stack) {
-        boolean overlay = !getOverlay(stack);
-        setOverlay(stack, overlay);
+        boolean newOverlay = !getOverlay(stack);
+        setOverlay(stack, newOverlay);
         player.sendStatusMessage(TooltipTranslation.GADGET_DESTROYSHOWOVERLAY
-                .componentTranslation(String.valueOf(overlay)).setStyle(Styles.AQUA), true);
+                .componentTranslation(newOverlay).setStyle(Styles.AQUA), true);
     }
 
     @Override
@@ -207,29 +160,38 @@ public class GadgetDestruction extends GadgetSwapping {
         player.setActiveHand(hand);
         if (!world.isRemote) {
             if (!player.isSneaking()) {
+                BlockPos anchorPos = getAnchor(stack);
+                EnumFacing anchorSide = getAnchorSide(stack);
+                if (anchorPos != null && anchorSide != null) {
+                    clearArea(world, anchorPos, anchorSide, player, stack);
+                    clearSuccess(player, stack);
+                    return new ActionResult<>(EnumActionResult.SUCCESS, stack);
+                }
+
                 RayTraceResult lookingAt = VectorHelper.getLookingAt(player, stack);
-                if (lookingAt == null && getAnchor(stack) == null) { //If we aren't looking at anything, exit
-                    return new ActionResult<ItemStack>(EnumActionResult.FAIL, stack);
+                if (lookingAt != null) {
+                    BlockPos targetPos = lookingAt.getBlockPos();
+                    EnumFacing sideHit = lookingAt.sideHit;
+                    clearArea(world, targetPos, sideHit, player, stack);
+                    clearSuccess(player, stack);
+                    return new ActionResult<>(EnumActionResult.SUCCESS, stack);
                 }
-                BlockPos startBlock = (getAnchor(stack) == null) ? lookingAt.getBlockPos() : getAnchor(stack);
-                EnumFacing sideHit = (getAnchorSide(stack) == null) ? lookingAt.sideHit : getAnchorSide(stack);
-                clearArea(world, startBlock, sideHit, player, stack);
-                if (getAnchor(stack) != null) {
-                    setAnchor(stack, null);
-                    setAnchorSide(stack, null);
-                    player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.anchorremove").getUnformattedComponentText()), true);
-                }
+
+                return new ActionResult<>(EnumActionResult.FAIL, stack);
             } else {
                 //TODO Remove debug code
                 EnergyUtil.getCap(stack).ifPresent(energy -> energy.receiveEnergy(105000, false));
             }
-        } else {
-            if (player.isSneaking()) {
-                GuiMod.DESTRUCTION.openScreen(player);
-                return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);
-            }
+        } else if (player.isSneaking()) {
+            GuiMod.DESTRUCTION.openScreen(player);
         }
-        return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);
+        return new ActionResult<>(EnumActionResult.SUCCESS, stack);
+    }
+
+    public static void clearSuccess(EntityPlayer player, ItemStack stack) {
+        setAnchor(stack, null);
+        setAnchorSide(stack, null);
+        player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.anchorremove").getUnformattedComponentText()), true);
     }
 
     public static void anchorBlocks(EntityPlayer player, ItemStack stack) {
@@ -363,24 +325,38 @@ public class GadgetDestruction extends GadgetSwapping {
         positions.forEach(voidPos -> destroyBlock(world, voidPos, player));
 
         WorldSave worldSave = WorldSave.getWorldSaveDestruction(world);
-        worldSave.addToMap(getUUID(stack), snapshot.serialize());
+        worldSave.addToMap(getUUID(stack).toString(), snapshot.serialize());
     }
 
     public static void undo(EntityPlayer player, ItemStack stack) {
         World world = player.world;
         WorldSave worldSave = WorldSave.getWorldSaveDestruction(world);
 
-        NBTTagCompound serializedSnapshot = worldSave.getCompoundFromUUID(getUUID(stack));
+        NBTTagCompound serializedSnapshot = worldSave.getCompoundFromUUID(getUUID(stack).toString());
         if (serializedSnapshot.isEmpty())
             return;
 
         RegionSnapshot snapshot = RegionSnapshot.deserialize(serializedSnapshot);
         restoreSnapshotWithBuilder(world, snapshot);
-        worldSave.addToMap(getUUID(stack), new NBTTagCompound());
+        worldSave.addToMap(getUUID(stack).toString(), new NBTTagCompound());
         worldSave.markDirty();
     }
 
+    public static void restoreSnapshotWithBuilder(World world, RegionSnapshot snapshot) {
+        Set<BlockPos> pastePositions = snapshot.getTileData().stream()
+                .map(Pair::getLeft)
+                .collect(Collectors.toSet());
+        int index = 0;
+        for (BlockPos pos : snapshot.getPositions()) {
+            snapshot.getBlockStates().get(index).ifPresent(state -> world.spawnEntity(new BlockBuildEntity(world, pos, state, BlockBuildEntity.Mode.PLACE, pastePositions.contains(pos))));
+            index++;
+        }
+    }
+
     private boolean destroyBlock(World world, BlockPos voidPos, EntityPlayer player) {
+        if (world.isAirBlock(voidPos))
+            return false;
+
         ItemStack tool = getGadget(player);
         if (tool.isEmpty())
             return false;
@@ -388,12 +364,9 @@ public class GadgetDestruction extends GadgetSwapping {
         if (!this.canUse(tool, player))
             return false;
 
-        if (world.isAirBlock(voidPos))
-            return false;
-
         this.applyDamage(tool, player);
 
-        world.spawnEntity(new BlockBuildEntity(world, voidPos, player, world.getBlockState(voidPos), BlockBuildEntity.Mode.REMOVE, false));
+        world.spawnEntity(new BlockBuildEntity(world, voidPos, world.getBlockState(voidPos), BlockBuildEntity.Mode.REMOVE, false));
         return true;
     }
 

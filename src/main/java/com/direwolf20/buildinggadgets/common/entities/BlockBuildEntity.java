@@ -53,7 +53,7 @@ public class BlockBuildEntity extends EntityBase {
             @Override
             public void onBuilderEntityDespawn(BlockBuildEntity builder) {
                 World world = builder.world;
-                world.spawnEntity(new BlockBuildEntity(world, builder.targetPos, builder.spawnedBy, builder.originalSetBlock, PLACE, builder.isUsingPaste()));
+                world.spawnEntity(new BlockBuildEntity(world, builder.targetPos, builder.originalSetBlock, PLACE, builder.isUsingPaste()));
             }
         };
 
@@ -68,7 +68,6 @@ public class BlockBuildEntity extends EntityBase {
 
     private IBlockState setBlock;
     private IBlockState originalSetBlock;
-    private EntityLivingBase spawnedBy;
 
     private Mode mode;
     private boolean useConstructionPaste;
@@ -77,7 +76,7 @@ public class BlockBuildEntity extends EntityBase {
         super(BGEntities.BUILD_BLOCK, world);
     }
 
-    public BlockBuildEntity(World world, BlockPos spawnPos, EntityLivingBase player, IBlockState spawnBlock, Mode mode, boolean usePaste) {
+    public BlockBuildEntity(World world, BlockPos spawnPos, IBlockState spawnBlock, Mode mode, boolean usePaste) {
         this(world);
         setPosition(spawnPos.getX(), spawnPos.getY(), spawnPos.getZ());
 
@@ -95,7 +94,6 @@ public class BlockBuildEntity extends EntityBase {
         this.mode = mode;
         setToolMode(mode);
 
-        spawnedBy = player;
         world.setBlockState(spawnPos, BGBlocks.effectBlock.getDefaultState());
 
         setUsingPaste(usePaste);

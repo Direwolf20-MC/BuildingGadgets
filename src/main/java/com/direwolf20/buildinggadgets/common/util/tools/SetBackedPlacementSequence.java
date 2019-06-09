@@ -2,27 +2,22 @@ package com.direwolf20.buildinggadgets.common.util.tools;
 
 import com.direwolf20.buildinggadgets.api.building.IPositionPlacementSequence;
 import com.direwolf20.buildinggadgets.api.building.Region;
-import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTUtil;
 import net.minecraft.util.math.BlockPos;
-import net.minecraftforge.common.util.Constants;
 
 import javax.annotation.Nonnull;
 import java.io.*;
-import java.util.HashSet;
-import java.util.Iterator;
+import java.util.*;
 
 public class SetBackedPlacementSequence implements IPositionPlacementSequence, Serializable {
 
-    private static final long serialVersionUID = 5752016672792062860L;
+    private static final long serialVersionUID = 3372886441086287285L;
 
     private Region boundingBox;
-    private HashSet<BlockPos> internalSet;
+    private Set<BlockPos> internalSet;
 
-    public SetBackedPlacementSequence(HashSet<BlockPos> internalSet, Region boundingBox) {
-        this.internalSet = internalSet;
-        this.boundingBox = boundingBox;
+    public SetBackedPlacementSequence(Set<BlockPos> internalSet, Region boundingBox) {
+        this.internalSet = Objects.requireNonNull(internalSet);
+        this.boundingBox = Objects.requireNonNull(boundingBox);
     }
 
     @Nonnull
@@ -55,17 +50,16 @@ public class SetBackedPlacementSequence implements IPositionPlacementSequence, S
     }
 
     /**
-     * Warning: this method uses the copy constructor of {@link HashSet}, therefore it does not guarantee it will return
+     * <b>WARNING</b>: this method uses the copy constructor of {@link HashSet}, therefore it does not guarantee it will return
      * the same type of set.
      */
-    @Deprecated
     @Nonnull
     @Override
     public IPositionPlacementSequence copy() {
         return new SetBackedPlacementSequence(new HashSet<>(internalSet), boundingBox);
     }
 
-    public HashSet<BlockPos> getInternalSet() {
+    public Set<BlockPos> getInternalSet() {
         return internalSet;
     }
 

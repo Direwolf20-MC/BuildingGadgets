@@ -24,7 +24,7 @@ public final class SerializationHelper {
     public static <T> T deserialize(byte[] bytes) {
         try (ByteArrayInputStream bis = new ByteArrayInputStream(bytes)) {
             ObjectInput in = new ObjectInputStream(bis);
-            @SuppressWarnings("unchecked")
+            @SuppressWarnings("unchecked") // Casting to erased type (Object)
             T t = (T) in.readObject();
             return t;
         } catch (IOException | ClassNotFoundException ignored) {

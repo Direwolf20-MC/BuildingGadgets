@@ -5,7 +5,6 @@ import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.*;
-import net.minecraftforge.common.util.INBTSerializable;
 
 import javax.annotation.Nonnull;
 import java.util.*;
@@ -370,11 +369,34 @@ public class NBTHelper {
     }
 
     /**
+     * Write a UUID into the given tag.
+     */
+    public static void setUUID(NBTTagCompound tag, UUID uuid) {
+        tag.setLong("M", uuid.getMostSignificantBits());
+        tag.setLong("L", uuid.getLeastSignificantBits());
+    }
+
+    /**
+     * Try to read a UUID written by {@link #setUUID(NBTTagCompound, UUID)}. If it doesn't exist, the method will return
+     * {@code UUID(least=0,most=0)}.
+     */
+    public static UUID getUUID(NBTTagCompound tag) {
+        return new UUID(tag.getLong("M"), tag.getLong("L"));
+    }
+
+    /**
+     * Check if the given tag has a set UUID written by {@link #setUUID(NBTTagCompound, UUID)} or not.
+     */
+    public static boolean hasUUID(NBTTagCompound tag) {
+        return tag.hasKey("L") && tag.hasKey("M");
+    }
+
+    /**
      * Connect two {@link NBTTagList} together to create a new one. This process has no side effects, which means it
      * will not modify two parameters.
      * <p>
-     * Additionally, if any of the lists are empty, the method will directly return the nonempty one. If both of them are
-     * empty, it will directly return the second list.
+     * Additionally, if any of the lists are empty, the method will directly return the nonempty one. If both of them
+     * are empty, it will directly return the second list.
      */
     public static NBTTagList concat(NBTTagList first, NBTTagList second) {
         if (first.isEmpty())
