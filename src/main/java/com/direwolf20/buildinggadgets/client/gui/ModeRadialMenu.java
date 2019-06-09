@@ -51,7 +51,7 @@ public class ModeRadialMenu extends Screen {
     private final List<Button> conditionalButtons = new ArrayList<>();
 
     public ModeRadialMenu(ItemStack stack) {
-        mc = Minecraft.getInstance();
+        //mc = Minecraft.getInstance();
         if (stack.getItem() instanceof GadgetGeneric)
             setSocketable(stack);
     }
