@@ -14,6 +14,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.util.text.TextFormatting;
@@ -38,8 +39,8 @@ public class DestructionGUI extends Screen {
     }
 
     @Override
-    public void initGui() {
-        super.initGui();
+    public void init() {
+        super.init();
 
         int x = width / 2;
         int y = height / 2;
@@ -47,7 +48,7 @@ public class DestructionGUI extends Screen {
         this.addButton(new GuiButtonAction((x - 30) + 32, y + 60, 60, 20, I18n.format(GuiMod.getLangKeyButton("destruction", "confirm")), () -> {
             if (isWithinBounds()) {
                 PacketHandler.sendToServer(new PacketDestructionGUI(left.getValueInt(), right.getValueInt(), up.getValueInt(), down.getValueInt(), depth.getValueInt()));
-                this.close();
+                this.removed();
             }
             else
                 Minecraft.getInstance().player.sendStatusMessage(new StringTextComponent(TextFormatting.RED + new TranslationTextComponent("message.gadget.destroysizeerror").getUnformattedComponentText()), true);
@@ -74,7 +75,7 @@ public class DestructionGUI extends Screen {
     }
 
     @Override
-    public boolean doesGuiPauseGame() {
+    public boolean isPauseScreen() {
         return false;
     }
 
