@@ -2,6 +2,7 @@ package com.direwolf20.buildinggadgets.common.util.tools;
 
 import com.direwolf20.buildinggadgets.api.building.IPositionPlacementSequence;
 import com.direwolf20.buildinggadgets.api.building.Region;
+import com.google.common.collect.ImmutableSet;
 import net.minecraft.util.math.BlockPos;
 
 import javax.annotation.Nonnull;
@@ -16,12 +17,12 @@ public class SetBackedPlacementSequence implements IPositionPlacementSequence, S
     private Set<BlockPos> internalSet;
 
     /**
-     * @param internalSet The set that contains the {@link BlockPos}s this sequence contains. Notice this will be
-     *                    wrapped with {@link Collections#unmodifiableSet(Set)}.
+     * @param internalSet The set that contains the {@link BlockPos}s this sequence contains. Notice this implementation
+     *                    will take a copy of the set (using {@link ImmutableSet#copyOf(Collection)}) to avoid potential side effects.
      * @param boundingBox Bounding box of all {@link BlockPos} contained in {@code internalSet}.
      */
     public SetBackedPlacementSequence(@Nonnull Set<BlockPos> internalSet, @Nonnull Region boundingBox) {
-        this.internalSet = Objects.requireNonNull(Collections.unmodifiableSet(internalSet));
+        this.internalSet = ImmutableSet.copyOf(Objects.requireNonNull(internalSet));
         this.boundingBox = Objects.requireNonNull(boundingBox);
     }
 
@@ -64,10 +65,6 @@ public class SetBackedPlacementSequence implements IPositionPlacementSequence, S
         return new SetBackedPlacementSequence(new LinkedHashSet<>(internalSet), boundingBox);
     }
 
-    /**
-     * Returns te set passed into the constructor as {@code internalSet} wrapped with {@link
-     * Collections#unmodifiableSet(Set)}.
-     */
     public Set<BlockPos> getInternalSet() {
         return internalSet;
     }
