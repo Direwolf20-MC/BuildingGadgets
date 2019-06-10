@@ -20,6 +20,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
@@ -224,14 +225,14 @@ public class GadgetDestruction extends GadgetGeneric {
         ItemStack stack = player.getHeldItem(hand);
         player.setActiveHand(hand);
         if (!world.isRemote) {
-            if (!player.isSneaking()) {
+            if (! player.isSneaking() && player instanceof ServerPlayerEntity) {
                 BlockRayTraceResult lookingAt = VectorHelper.getLookingAt(player, stack);
                 if (getAnchor(stack) == null) { //If we aren't looking at anything, exit
                     return new ActionResult<ItemStack>(ActionResultType.FAIL, stack);
                 }
                 BlockPos startBlock = (getAnchor(stack) == null) ? new BlockPos(lookingAt.getHitVec()) : getAnchor(stack);
                 Direction sideHit = (getAnchorSide(stack) == null) ? lookingAt.getFace() : getAnchorSide(stack);
-                clearArea(world, startBlock, sideHit, player, stack);
+                clearArea(world, startBlock, sideHit, (ServerPlayerEntity) player, stack);
                 if (getAnchor(stack) != null) {
                     setAnchor(stack, null);
                     setAnchorSide(stack, null);
@@ -357,7 +358,7 @@ public class GadgetDestruction extends GadgetGeneric {
         return true;
     }
 
-    public void clearArea(World world, BlockPos pos, Direction side, PlayerEntity player, ItemStack stack) {
+    public void clearArea(World world, BlockPos pos, Direction side, ServerPlayerEntity player, ItemStack stack) {
         SortedSet<BlockPos> voidPosArray = getArea(world, pos, side, player, stack);
         Map<BlockPos, BlockState> posStateMap = new HashMap<BlockPos, BlockState>();
         Map<BlockPos, BlockState> pasteStateMap = new HashMap<BlockPos, BlockState>();
@@ -470,7 +471,7 @@ public class GadgetDestruction extends GadgetGeneric {
         }
     }
 
-    private boolean destroyBlock(World world, BlockPos voidPos, PlayerEntity player) {
+    private boolean destroyBlock(World world, BlockPos voidPos, ServerPlayerEntity player) {
         ItemStack tool = getGadget(player);
         if (tool.isEmpty())
             return false;

@@ -1,6 +1,5 @@
 package com.direwolf20.buildinggadgets.client.events;
 
-import PlayerEntity;
 import com.direwolf20.buildinggadgets.common.items.gadgets.*;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.direwolf20.buildinggadgets.common.util.tools.ToolRenders;

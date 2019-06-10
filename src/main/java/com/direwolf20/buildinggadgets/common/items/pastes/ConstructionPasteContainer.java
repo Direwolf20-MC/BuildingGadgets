@@ -36,7 +36,7 @@ public class ConstructionPasteContainer extends GenericPasteContainer {
 
     @Override
     public void setPasteCount(ItemStack stack, int amount) {
-        NBTHelper.getOrNewTag(stack).setInt(NBTKeys.PASTE_COUNT, amount);
+        NBTHelper.getOrNewTag(stack).putInt(NBTKeys.PASTE_COUNT, amount);
     }
 
     @Override

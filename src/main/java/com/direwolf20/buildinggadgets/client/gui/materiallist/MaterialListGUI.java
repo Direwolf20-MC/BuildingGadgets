@@ -1,21 +1,18 @@
 package com.direwolf20.buildinggadgets.client.gui.materiallist;
 
 import com.direwolf20.buildinggadgets.client.gui.base.BasicGUIBase;
-import com.direwolf20.buildinggadgets.client.utils.AlignmentUtil;
 import com.direwolf20.buildinggadgets.client.utils.RenderUtil;
 import com.direwolf20.buildinggadgets.common.items.ITemplate;
-import com.direwolf20.buildinggadgets.common.util.lang.MaterialListTranslation;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.google.common.base.Preconditions;
 import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.Widget;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.util.text.StringTextComponent;
 
 import java.awt.*;
 import java.util.List;
@@ -70,10 +67,12 @@ public class MaterialListGUI extends BasicGUIBase {
     private List<String> hoveringText;
 
     public MaterialListGUI(ItemStack template) {
+        super(new StringTextComponent("MaterialListGui"));
         Preconditions.checkArgument(template.getItem() instanceof ITemplate);
         this.template = template;
     }
 
+    /* //TODO find replacement
     @Override
     public void initGui() {
         this.backgroundX = AlignmentUtil.getXForAlignedCenter(BACKGROUND_WIDTH, 0, width);
@@ -104,7 +103,7 @@ public class MaterialListGUI extends BasicGUIBase {
         this.addButton(buttonCopyList);
         this.addButton(buttonClose);
         this.calculateButtonsWidthAndX();
-    }
+    }*/
 
     private String stringify(boolean detailed) {
         if (detailed)

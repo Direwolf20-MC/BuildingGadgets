@@ -23,6 +23,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
@@ -143,8 +144,8 @@ public class GadgetBuilding extends GadgetGeneric implements IAtopPlacingGadget 
         if (!world.isRemote) {
             if (player.isSneaking()) {
                 selectBlock(itemstack, player);
-            } else {
-                build(player, itemstack);
+            } else if (player instanceof ServerPlayerEntity) {
+                build((ServerPlayerEntity) player, itemstack);
             }
         } else if (!player.isSneaking()) {
             ToolRenders.updateInventoryCache();
@@ -176,7 +177,7 @@ public class GadgetBuilding extends GadgetGeneric implements IAtopPlacingGadget 
         player.sendStatusMessage(new StringTextComponent(TextFormatting.DARK_AQUA + new TranslationTextComponent("message.gadget.toolrange").getUnformattedComponentText() + ": " + range), true);
     }
 
-    private boolean build(PlayerEntity player, ItemStack stack) {
+    private boolean build(ServerPlayerEntity player, ItemStack stack) {
         //Build the blocks as shown in the visual render
         World world = player.world;
         List<BlockPos> coords = getAnchor(stack);
@@ -274,7 +275,7 @@ public class GadgetBuilding extends GadgetGeneric implements IAtopPlacingGadget 
         return true;
     }
 
-    private boolean placeBlock(World world, PlayerEntity player, BlockPos pos, BlockState setBlock) {
+    private boolean placeBlock(World world, ServerPlayerEntity player, BlockPos pos, BlockState setBlock) {
         if (!player.isAllowEdit())
             return false;
 

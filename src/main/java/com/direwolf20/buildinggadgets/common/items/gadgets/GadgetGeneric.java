@@ -1,8 +1,8 @@
 package com.direwolf20.buildinggadgets.common.items.gadgets;
 
 
-import com.direwolf20.buildinggadgets.api.capability.CapabilityBlockProvider;
 import com.direwolf20.buildinggadgets.common.config.Config;
+import com.direwolf20.buildinggadgets.common.items.capability.CapabilityProviderBlockProvider;
 import com.direwolf20.buildinggadgets.common.items.capability.CapabilityProviderEnergy;
 import com.direwolf20.buildinggadgets.common.items.capability.MultiCapabilityProvider;
 import com.direwolf20.buildinggadgets.common.util.CapabilityUtil.EnergyUtil;
@@ -56,7 +56,7 @@ public abstract class GadgetGeneric extends Item {
     @Override
     @Nullable
     public ICapabilityProvider initCapabilities(ItemStack stack, @Nullable CompoundNBT tag) {
-        return new MultiCapabilityProvider(new CapabilityProviderEnergy(stack, this::getEnergyMax), new CapabilityBlockProvider(stack));
+        return new MultiCapabilityProvider(new CapabilityProviderEnergy(stack, this::getEnergyMax), new CapabilityProviderBlockProvider(stack));
     }
 
     @Override

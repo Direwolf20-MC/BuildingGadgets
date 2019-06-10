@@ -19,12 +19,13 @@ import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
@@ -144,8 +145,8 @@ public class GadgetExchanger extends GadgetGeneric {
                 //TODO Remove debug code
                 EnergyUtil.getCap(itemstack).ifPresent(energy -> energy.receiveEnergy(105000, false));
                 selectBlock(itemstack, player);
-            } else {
-                exchange(player, itemstack);
+            } else if (player instanceof ServerPlayerEntity) {
+                exchange((ServerPlayerEntity) player, itemstack);
             }
         } else if (!player.isSneaking()) {
             ToolRenders.updateInventoryCache();
@@ -176,17 +177,14 @@ public class GadgetExchanger extends GadgetGeneric {
         player.sendStatusMessage(new StringTextComponent(TextFormatting.DARK_AQUA + new TranslationTextComponent("message.gadget.toolrange").getUnformattedComponentText() + ": " + range), true);
     }
 
-    private boolean exchange(PlayerEntity player, ItemStack stack) {
+    private boolean exchange(ServerPlayerEntity player, ItemStack stack) {
         World world = player.world;
         List<BlockPos> coords = getAnchor(stack);
 
         if (coords.size() == 0) { //If we don't have an anchor, build in the current spot
-            RayTraceResult lookingAt = VectorHelper.getLookingAt(player, stack);
-            if (lookingAt == null) { //If we aren't looking at anything, exit
-                return false;
-            }
-            BlockPos startBlock = lookingAt.getBlockPos();
-            Direction sideHit = lookingAt.sideHit;
+            BlockRayTraceResult lookingAt = VectorHelper.getLookingAt(player, stack);
+            BlockPos startBlock = lookingAt.getPos();
+            Direction sideHit = lookingAt.getFace();
 //            BlockState setBlock = getToolBlock(stack);
             coords = ExchangingMode.collectPlacementPos(world, player, startBlock, sideHit, stack, startBlock);
         } else { //If we do have an anchor, erase it (Even if the build fails)
@@ -219,7 +217,7 @@ public class GadgetExchanger extends GadgetGeneric {
         return true;
     }
 
-    private boolean exchangeBlock(World world, PlayerEntity player, BlockPos pos, BlockState setBlock) {
+    private boolean exchangeBlock(World world, ServerPlayerEntity player, BlockPos pos, BlockState setBlock) {
         BlockState currentBlock = world.getBlockState(pos);
         ItemStack itemStack;
         boolean useConstructionPaste = false;

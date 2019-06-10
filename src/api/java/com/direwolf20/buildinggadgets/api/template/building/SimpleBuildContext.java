@@ -1,6 +1,5 @@
 package com.direwolf20.buildinggadgets.api.template.building;
 
-import PlayerEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.world.IWorld;
 

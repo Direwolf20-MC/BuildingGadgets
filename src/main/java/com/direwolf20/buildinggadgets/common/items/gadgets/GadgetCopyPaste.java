@@ -7,6 +7,7 @@ import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.common.items.ITemplate;
+import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketBlockMap;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketRotateMirror;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
@@ -274,12 +275,12 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
                         setStartPos(stack, pos);
                 }
             } else if (getToolMode(stack) == ToolMode.Paste) {
-                if (!player.isSneaking()) {
+                if (! player.isSneaking() && player instanceof ServerPlayerEntity) {
                     if (getAnchor(stack) == null) {
-                        buildBlockMap(world, pos, stack, player);
+                        buildBlockMap(world, pos, stack, (ServerPlayerEntity) player);
                     } else {
                         BlockPos startPos = getAnchor(stack);
-                        buildBlockMap(world, startPos, stack, player);
+                        buildBlockMap(world, startPos, stack, (ServerPlayerEntity) player);
                     }
                 }
             }
@@ -424,9 +425,10 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
                                     return false;
                                 }
                                 NonNullList<ItemStack> drops = NonNullList.create();
-                                if (actualState != null)
+                                //TODO handle LootTables
+                                /*if (actualState != null)
                                     actualState.getBlock().getDrops(actualState, drops, world, new BlockPos(0, 0, 0), 0);
-
+                                */
                                 int neededItems = 0;
                                 for (ItemStack drop : drops) {
                                     if (drop.getItem().equals(uniqueItem.getItem())) {
@@ -472,7 +474,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
         return true;
     }
 
-    private void buildBlockMap(World world, BlockPos startPos, ItemStack stack, PlayerEntity player) {
+    private void buildBlockMap(World world, BlockPos startPos, ItemStack stack, ServerPlayerEntity player) {
 //        long time = System.nanoTime();
 
         BlockPos anchorPos = getAnchor(stack);
@@ -493,7 +495,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
         //System.out.printf("Built %d Blocks in %.2f ms%n", blockMapList.size(), (System.nanoTime() - time) * 1e-6);
     }
 
-    private void placeBlock(World world, BlockPos pos, PlayerEntity player, BlockState state, Map<BlockState, UniqueItem> IntStackMap) {
+    private void placeBlock(World world, BlockPos pos, ServerPlayerEntity player, BlockState state, Map<BlockState, UniqueItem> IntStackMap) {
         BlockState testState = world.getBlockState(pos);
         if ((Config.GENERAL.allowOverwriteBlocks.get() && ! testState.isReplaceable(new BlockItemUseContext(new ItemUseContext(player, Hand.MAIN_HAND, VectorHelper.getLookingAt(player, FluidMode.NONE))))) ||
                 (! Config.GENERAL.allowOverwriteBlocks.get() && world.getBlockState(pos).getMaterial() != Material.AIR))
@@ -513,7 +515,8 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
         if (uniqueItem == null) return; //This shouldn't happen I hope!
         ItemStack itemStack = new ItemStack(uniqueItem.getItem(), 1);
         NonNullList<ItemStack> drops = NonNullList.create();
-        state.getBlock().getDrops(state, drops, world, pos, 0);
+        //TODO handle loot tables
+        //state.getBlock().getDrops(state, drops, world, pos, 0);
         int neededItems = 0;
         for (ItemStack drop : drops) {
             if (drop.getItem().equals(itemStack.getItem())) {

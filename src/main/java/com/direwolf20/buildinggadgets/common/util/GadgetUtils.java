@@ -215,7 +215,7 @@ public class GadgetUtils {
         return MathHelper.clamp(tagCompound.getInt("range"), 1, 15);
     }
 
-    public static BlockState rotateOrMirrorBlock(ServerPlayerEntity player, PacketRotateMirror.Operation operation, BlockState state) {
+    public static BlockState rotateOrMirrorBlock(PlayerEntity player, PacketRotateMirror.Operation operation, BlockState state) {
         if (operation == PacketRotateMirror.Operation.MIRROR)
             return state.mirror(player.getHorizontalFacing().getAxis() == Axis.X ? Mirror.LEFT_RIGHT : Mirror.FRONT_BACK);
 

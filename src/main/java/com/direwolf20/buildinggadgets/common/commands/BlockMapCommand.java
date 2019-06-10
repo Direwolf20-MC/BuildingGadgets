@@ -1,6 +1,5 @@
 package com.direwolf20.buildinggadgets.common.commands;
 
-import PlayerEntity;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketBlockMap;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;

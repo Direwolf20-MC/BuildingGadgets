@@ -1,6 +1,5 @@
 package com.direwolf20.buildinggadgets.client.events;
 
-import PlayerEntity;
 import com.direwolf20.buildinggadgets.common.items.ITemplate;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;

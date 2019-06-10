@@ -43,7 +43,7 @@ public class AreaHelpText implements IHoverHelpText {
 
     @Override
     public void drawRect(AbstractGui gui, int color) {
-        Gui.drawRect(minX, minY, maxX, maxY, color);
+        AbstractGui.fill(minX, minY, maxX, maxY, color);
     }
 
 }
