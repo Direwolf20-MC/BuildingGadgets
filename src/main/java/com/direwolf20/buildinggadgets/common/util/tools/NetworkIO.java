@@ -1,14 +1,13 @@
 package com.direwolf20.buildinggadgets.common.util.tools;
 
-import java.util.Collection;
-import java.util.List;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
 import com.google.common.collect.ImmutableList;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.items.IItemHandler;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.Collection;
+import java.util.List;
 
 //import com.raoulvdberge.refinedstorage.api.network.INetwork;
 //import com.raoulvdberge.refinedstorage.api.util.Action;

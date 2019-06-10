@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.api.template;
 
-import com.direwolf20.buildinggadgets.api.abstraction.UniqueItem;
 import com.direwolf20.buildinggadgets.api.abstraction.BlockData;
+import com.direwolf20.buildinggadgets.api.abstraction.UniqueItem;
 import com.direwolf20.buildinggadgets.api.template.building.IBuildContext;
 import com.direwolf20.buildinggadgets.api.template.building.ITemplateView;
 import com.direwolf20.buildinggadgets.api.template.serialisation.ITemplateSerializer;

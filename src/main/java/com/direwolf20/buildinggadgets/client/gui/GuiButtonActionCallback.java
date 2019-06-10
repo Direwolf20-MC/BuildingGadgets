@@ -2,11 +2,10 @@ package com.direwolf20.buildinggadgets.client.gui;
 
 import com.direwolf20.buildinggadgets.client.gui.ModeRadialMenu.ScreenPosition;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
-
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.ResourceLocation;
 
-import java.awt.Color;
+import java.awt.*;
 import java.util.function.Predicate;
 
 public class GuiButtonActionCallback extends GuiButtonIcon {

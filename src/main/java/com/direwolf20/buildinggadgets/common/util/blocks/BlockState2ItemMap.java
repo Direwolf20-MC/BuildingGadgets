@@ -1,11 +1,10 @@
 package com.direwolf20.buildinggadgets.common.util.blocks;
 
-import com.direwolf20.buildinggadgets.common.util.tools.UniqueItem;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
+import com.direwolf20.buildinggadgets.common.util.tools.UniqueItem;
 import com.google.common.collect.BiMap;
 import net.minecraft.block.BlockState;
-import PlayerEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;

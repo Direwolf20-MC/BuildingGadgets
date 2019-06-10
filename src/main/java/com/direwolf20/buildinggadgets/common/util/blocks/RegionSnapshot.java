@@ -3,7 +3,6 @@ package com.direwolf20.buildinggadgets.common.util.blocks;
 import com.direwolf20.buildinggadgets.api.building.Region;
 import com.direwolf20.buildinggadgets.common.util.exceptions.PaletteOverflowException;
 import com.direwolf20.buildinggadgets.common.util.helpers.LambdaHelper;
-import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;

@@ -3,7 +3,6 @@ package com.direwolf20.buildinggadgets.test.util;
 import com.direwolf20.buildinggadgets.api.building.Region;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
-import PlayerEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.IFluidState;
 import net.minecraft.tileentity.TileEntity;

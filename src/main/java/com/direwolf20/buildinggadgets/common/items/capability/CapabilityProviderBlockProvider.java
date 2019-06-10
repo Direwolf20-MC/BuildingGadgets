@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.common.items.capability;
 
-import com.direwolf20.buildinggadgets.api.capability.CapabilityBlockProvider;
 import com.direwolf20.buildinggadgets.api.building.IBlockProvider;
+import com.direwolf20.buildinggadgets.api.capability.CapabilityBlockProvider;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Direction;
 import net.minecraftforge.common.capabilities.Capability;

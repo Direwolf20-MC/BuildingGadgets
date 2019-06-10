@@ -1,8 +1,8 @@
 package com.direwolf20.buildinggadgets.common.events;
 
+import PlayerEntity;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
 import com.direwolf20.buildinggadgets.common.util.helpers.InventoryHelper;
-import PlayerEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.event.world.BlockEvent;

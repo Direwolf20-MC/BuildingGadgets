@@ -1,15 +1,6 @@
 package com.direwolf20.buildinggadgets.common.blocks;
 
-import java.util.Random;
-
-import com.direwolf20.buildinggadgets.common.config.Config;
-import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
-
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.util.IItemProvider;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 
 public class ConstructionBlockDense extends Block {
 
