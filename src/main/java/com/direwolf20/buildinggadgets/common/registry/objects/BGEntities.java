@@ -33,14 +33,14 @@ public class BGEntities {
                         .setTrackingRange(64)
                         .setUpdateInterval(1)
                         .setShouldReceiveVelocityUpdates(false))
-                .renderer(BlockBuildEntityRender::new)
+                .renderer(BlockBuildEntity.class, BlockBuildEntityRender::new)
                 .factory(b -> b.build("")));
         container.add(new EntityBuilder<ConstructionBlockEntity>(EntityReference.CONSTRUCTION_BLOCK_ENTITY_RL)
                 .builder(Builder.<ConstructionBlockEntity>create(ConstructionBlockEntity::new, EntityClassification.MISC)
                         .setTrackingRange(64)
                         .setUpdateInterval(1)
                         .setShouldReceiveVelocityUpdates(false))
-                .renderer(ConstructionBlockEntityRender::new)
+                .renderer(ConstructionBlockEntity.class, ConstructionBlockEntityRender::new)
                 .factory(b -> b.build("")));
     }
 

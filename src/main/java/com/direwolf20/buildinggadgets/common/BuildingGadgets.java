@@ -58,7 +58,7 @@ public class BuildingGadgets {
         eventBus.addListener(this::setup);
         eventBus.addListener(this::serverLoad);
         eventBus.addListener(this::finishLoad);
-        eventBus.addListener(this::onRecipeRegister);
+        eventBus.addGenericListener(IRecipeSerializer.class, this::onRecipeRegister);
 
         eventBus.addListener(Config::onLoad);
         eventBus.addListener(Config::onFileChange);

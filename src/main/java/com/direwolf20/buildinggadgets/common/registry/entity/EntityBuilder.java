@@ -33,7 +33,8 @@ public final class EntityBuilder<T extends Entity> extends RegistryObjectBuilder
         return (EntityBuilder<T>) super.builder(builder);
     }
 
-    public EntityBuilder<T> renderer(IRenderFactory<? super T> renderFactory) {
+    public EntityBuilder<T> renderer(Class<T> entityClass, IRenderFactory<? super T> renderFactory) {
+        this.entityClass = Objects.requireNonNull(entityClass);
         this.renderFactory = Objects.requireNonNull(renderFactory);
         return this;
     }
@@ -41,11 +42,8 @@ public final class EntityBuilder<T extends Entity> extends RegistryObjectBuilder
     @Override
     public EntityType<?> construct() {
         Preconditions.checkState(renderFactory!=null,"Cannot construct an Entity without an Renderer!");
-        EntityType<?> type = super.construct();
-        @SuppressWarnings("unchecked") //I hope this is safe an people don't do things they shouldn't
-                Class<T> clazz = null;//TODO find out if this is truly needed anymore
-        entityClass = clazz;
-        return type;
+        Preconditions.checkState(entityClass != null, "Cannot construct an Entity of unknown class!");
+        return super.construct();
     }
 
     private Class<T> getEntityClass() {

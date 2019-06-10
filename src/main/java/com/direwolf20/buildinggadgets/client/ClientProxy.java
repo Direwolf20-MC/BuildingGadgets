@@ -1,9 +1,7 @@
 package com.direwolf20.buildinggadgets.client;
 
-import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManagerContainer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.SimpleSound;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.ModelRegistryEvent;
@@ -12,8 +10,6 @@ import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DeferredWorkQueue;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
-
-import java.util.Collections;
 
 @EventBusSubscriber(Dist.CLIENT)
 public class ClientProxy {
@@ -36,12 +32,13 @@ public class ClientProxy {
 
     @SubscribeEvent
     public static void registerSprites(TextureStitchEvent.Pre event) {
-        registerSprite(event, TemplateManagerContainer.TEXTURE_LOC_SLOT_TOOL);
-        registerSprite(event, TemplateManagerContainer.TEXTURE_LOC_SLOT_TEMPLATE);
+        //registerSprite(event, TemplateManagerContainer.TEXTURE_LOC_SLOT_TOOL);
+        //registerSprite(event, TemplateManagerContainer.TEXTURE_LOC_SLOT_TEMPLATE);
     }
 
     private static void registerSprite(TextureStitchEvent.Pre event, String loc) {
-        event.getMap().func_215254_a(Minecraft.getInstance().getResourceManager(), Collections.singleton(new ResourceLocation(loc)), null);
+        //TODO replace with something that doesn't result in an StackOverflow error
+        //event.getMap().func_215254_a(Minecraft.getInstance().getResourceManager(), Collections.singleton(new ResourceLocation(loc)), null);
     }
 
     public static void playSound(SoundEvent sound, float pitch) {
