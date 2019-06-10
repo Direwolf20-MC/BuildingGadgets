@@ -82,7 +82,7 @@ public class PasteGUI extends GuiScreenTextFields {
 
     public void fieldChange(GuiTextFieldBase field, int amount) {
         nullCheckTextBoxes();
-        if (Screen.isShiftKeyDown()) amount *= 10;
+        if (Screen.hasShiftDown()) amount *= 10;
         int i = MathHelper.clamp(field.getInt() + amount, -16, 16);
         field.setText(String.valueOf(i));
         sendPacket();

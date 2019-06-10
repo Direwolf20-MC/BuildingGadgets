@@ -1,6 +1,7 @@
 package com.direwolf20.buildinggadgets.common.blocks;
 
 import com.direwolf20.buildinggadgets.common.entities.ConstructionBlockEntity;
+import com.direwolf20.buildinggadgets.common.util.helpers.PortHelper;
 import com.direwolf20.buildinggadgets.common.util.lang.TooltipTranslation;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -33,7 +34,7 @@ public class ConstructionBlockPowder extends FallingBlock {
     @Override
     public void onEndFalling(World worldIn, BlockPos pos, BlockState p_176502_3_, BlockState p_176502_4_) {
         if (worldIn.getFluidState(pos).isTagged(FluidTags.WATER))
-            worldIn.spawnEntity(new ConstructionBlockEntity(worldIn, pos, true));
+            PortHelper.World.spawnEntity(worldIn, new ConstructionBlockEntity(worldIn, pos, true));
     }
 
     private boolean tryTouchWater(IWorld worldIn, BlockPos pos) {
@@ -48,7 +49,7 @@ public class ConstructionBlockPowder extends FallingBlock {
 
         if (foundWater) {
             if (worldIn.getWorld().getEntitiesWithinAABB(ConstructionBlockEntity.class, new AxisAlignedBB(pos.getX() - 0.5, pos.getY() - 0.5, pos.getZ() - 0.5, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5)).isEmpty()) {
-                worldIn.spawnEntity(new ConstructionBlockEntity(worldIn.getWorld(), pos, true));
+                PortHelper.World.spawnEntity(worldIn, new ConstructionBlockEntity(worldIn.getWorld(), pos, true));
             }
         }
 

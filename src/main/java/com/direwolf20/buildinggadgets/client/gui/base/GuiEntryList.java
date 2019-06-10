@@ -28,16 +28,16 @@ public class GuiEntryList<E extends AbstractListEntry<E>> extends ExtendedList<E
     public GuiEntryList(int left, int top, int width, int height, int slotHeight) {
         super(Minecraft.getInstance(), width, height, top, top + height, slotHeight);
         // Set left x and right x, somehow MCP gave it a weird name
-        this.setSlotXBoundsFromLeft(left);
+        this.setLeftPos(left);
         // Precomputed as it is pretty costly
-        this.scaleFactor = Minecraft.getInstance().mainWindow.getScaleFactor(Minecraft.getInstance().gameSettings.guiScale);
+        this.scaleFactor = Minecraft.getInstance().mainWindow.getGuiScaleFactor();
     }
 
     @Override
-    public void drawScreen(int mouseX, int mouseY, float partialTicks) {
+    public void render(int mouseX, int mouseY, float partialTicks) {
         GL11.glEnable(GL11.GL_SCISSOR_TEST);
-        GL11.glScissor((int) (left * scaleFactor),
-                (int) (Minecraft.getInstance().mainWindow.getHeight() - (bottom * scaleFactor)),
+        GL11.glScissor((int) (getLeft() * scaleFactor),
+                (int) (Minecraft.getInstance().mainWindow.getHeight() - (getBottom() * scaleFactor)),
                 (int) (width * scaleFactor),
                 (int) (height * scaleFactor));
         renderParts(mouseX, mouseY, partialTicks);
@@ -47,7 +47,7 @@ public class GuiEntryList<E extends AbstractListEntry<E>> extends ExtendedList<E
     private void renderParts(int mouseX, int mouseY, float partialTicks) {
         if (visible) {
             drawBackground();
-            int i = getScrollBarX();
+            int i = getScrollbarPosition();
             int j = i + 6;
             bindAmountScrolled();
             GlStateManager.disableLighting();
@@ -56,34 +56,34 @@ public class GuiEntryList<E extends AbstractListEntry<E>> extends ExtendedList<E
             BufferBuilder buffer = tessellator.getBuffer();
             // Forge: background rendering moved into separate method.
             drawContainerBackground(tessellator);
-            int k = left + width / 2 - getListWidth() / 2 + 2;
-            int l = top + 4 - (int) amountScrolled;
+            int k = getLeft() + width / 2 - getRowWidth() / 2 + 2;
+            int l = getTop() + 4 - (int) getScrollAmount();
             if (hasListHeader) {
-                drawListHeader(k, l, tessellator);
+                renderHeader(k, l, tessellator);
             }
 
             drawSelectionBox(k, l, mouseX, mouseY, partialTicks);
             GlStateManager.disableDepthTest();
-            overlayBackground(0, top, 255, 255);
-            overlayBackground(bottom, height, 255, 255);
-            GlStateManager.disableTexture2D();
-            drawTransition(tessellator, buffer, top, top + 4);
-            drawTransition(tessellator, buffer, bottom, bottom + 4);
+            overlayBackground(0, getTop(), 255, 255);
+            overlayBackground(getBottom(), height, 255, 255);
+            GlStateManager.disableTexture();
+            drawTransition(tessellator, buffer, getTop(), getTop() + 4);
+            drawTransition(tessellator, buffer, getBottom(), getBottom() + 4);
 
             int j1 = getMaxScroll();
             if (j1 > 0) {
-                int k1 = (int) ((float) ((bottom - top) * (bottom - top)) / (float) getContentHeight());
-                k1 = MathHelper.clamp(k1, 32, bottom - top - 8);
-                int l1 = (int) amountScrolled * (bottom - top - k1) / j1 + top;
-                if (l1 < top) {
-                    l1 = top;
+                int k1 = (int) ((float) ((getBottom() - getTop()) * (getBottom() - getTop())) / (float) getContentHeight());
+                k1 = MathHelper.clamp(k1, 32, getBottom() - getTop() - 8);
+                int l1 = (int) getScrollAmount() * (getBottom() - getTop() - k1) / j1 + getTop();
+                if (l1 < getTop()) {
+                    l1 = getTop();
                 }
 
                 buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
-                buffer.pos((double) i, (double) bottom, 0.0D).tex(0.0D, 1.0D).color(0, 0, 0, 255).endVertex();
-                buffer.pos((double) j, (double) bottom, 0.0D).tex(1.0D, 1.0D).color(0, 0, 0, 255).endVertex();
-                buffer.pos((double) j, (double) top, 0.0D).tex(1.0D, 0.0D).color(0, 0, 0, 255).endVertex();
-                buffer.pos((double) i, (double) top, 0.0D).tex(0.0D, 0.0D).color(0, 0, 0, 255).endVertex();
+                buffer.pos((double) i, (double) getBottom(), 0.0D).tex(0.0D, 1.0D).color(0, 0, 0, 255).endVertex();
+                buffer.pos((double) j, (double) getBottom(), 0.0D).tex(1.0D, 1.0D).color(0, 0, 0, 255).endVertex();
+                buffer.pos((double) j, (double) getTop(), 0.0D).tex(1.0D, 0.0D).color(0, 0, 0, 255).endVertex();
+                buffer.pos((double) i, (double) getTop(), 0.0D).tex(0.0D, 0.0D).color(0, 0, 0, 255).endVertex();
 
                 buffer.pos((double) i, (double) (l1 + k1), 0.0D).tex(0.0D, 1.0D).color(128, 128, 128, 255).endVertex();
                 buffer.pos((double) j, (double) (l1 + k1), 0.0D).tex(1.0D, 1.0D).color(128, 128, 128, 255).endVertex();
@@ -98,7 +98,7 @@ public class GuiEntryList<E extends AbstractListEntry<E>> extends ExtendedList<E
             }
 
             renderDecorations(mouseX, mouseY);
-            GlStateManager.enableTexture2D();
+            GlStateManager.enableTexture();
             GlStateManager.shadeModel(GL11.GL_FLAT);
             GlStateManager.enableAlphaTest();
             GlStateManager.disableBlend();
@@ -118,6 +118,7 @@ public class GuiEntryList<E extends AbstractListEntry<E>> extends ExtendedList<E
         tessellator.draw();
     }
 
+
     @Override
     protected void drawSelectionBox(int insideLeft, int insideTop, int mouseXIn, int mouseYIn, float partialTicks) {
         Tessellator tessellator = Tessellator.getInstance();
@@ -128,7 +129,7 @@ public class GuiEntryList<E extends AbstractListEntry<E>> extends ExtendedList<E
             // Height of an entry without the borders
             int actualHeight = slotHeight - 4;
 
-            if (entryY + actualHeight < top || entryY > bottom) {
+            if (entryY + actualHeight < getTop() || entryY > bottom) {
                 updateItemPos(i, insideLeft, entryY, partialTicks);
                 continue;
             }
@@ -165,7 +166,7 @@ public class GuiEntryList<E extends AbstractListEntry<E>> extends ExtendedList<E
      */
     @Override
     protected void drawContainerBackground(Tessellator tessellator) {
-        drawGradientRect(left, top, right, bottom, 0xC0101010, 0xD0101010);
+        drawGradientRect(left, getTop(), right, bottom, 0xC0101010, 0xD0101010);
     }
 
     /**
@@ -173,11 +174,6 @@ public class GuiEntryList<E extends AbstractListEntry<E>> extends ExtendedList<E
      */
     @Override
     protected void overlayBackground(int startY, int endY, int startAlpha, int endAlpha) {
-    }
-
-    @Override
-    protected boolean isSelected(int slotIndex) {
-        return selectedElement == slotIndex;
     }
 
     /**
@@ -227,9 +223,10 @@ public class GuiEntryList<E extends AbstractListEntry<E>> extends ExtendedList<E
         if (super.mouseDragged(x, y, button, dx, dy))
             return true;
 
-        if (isMouseInList(x, y)) {
-            amountScrolled -= dy;
-            bindAmountScrolled();
+        if (isMouseOver(x, y)) {
+            setScrollAmount( getScrollAmount() - dy );
+            // fixme: is this still needed in 1.14?
+            //            bindAmountScrolled();
         }
         return true;
     }

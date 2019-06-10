@@ -9,6 +9,10 @@ import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraft.world.storage.loot.LootContext;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class EffectBlock extends Block {
 
@@ -56,14 +60,10 @@ public class EffectBlock extends Block {
      * This gets a complete list of items dropped from this block.
      *
      * @param state   Current state
-     * @param drops   add all items this block drops to this drops list
-     * @param world   The current world, Currently hard 'World' and not 'IBlockReder' because vanilla needs it.
-     * @param pos     Block position in world
-     * @param fortune Breakers fortune level
      */
     @Override
-    public void getDrops(BlockState state, NonNullList<ItemStack> drops, World world, BlockPos pos, int fortune) {
-        drops.clear();
+    public List<ItemStack> getDrops(BlockState state, LootContext.Builder loot) {
+        return new ArrayList<>();
     }
 
     /**

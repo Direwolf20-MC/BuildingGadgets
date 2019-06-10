@@ -134,7 +134,7 @@ public class MaterialListGUI extends BasicGUIBase {
         Minecraft.getInstance().getTextureManager().bindTexture(BACKGROUND_TEXTURE);
         RenderUtil.drawCompleteTexture(backgroundX, backgroundY, BACKGROUND_WIDTH, BACKGROUND_HEIGHT);
 
-        scrollingList.drawScreen(mouseX, mouseY, particleTicks);
+        scrollingList.render(mouseX, mouseY, particleTicks);
         drawString(font, title, titleLeft, titleTop, Color.WHITE.getRGB());
         super.render(mouseX, mouseY, particleTicks);
 

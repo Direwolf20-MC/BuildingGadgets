@@ -71,6 +71,11 @@ public enum GuiMod {
         this.containerOpener = containerOpener;
     }
 
+    // fixme: 1.14 requires this but I'm not sure on how to implement it.
+    public static Screen openScreen(Minecraft minecraft, Screen screen) {
+        return null;
+    }
+
     public boolean openScreen(PlayerEntity player) {
         if (clientScreenProvider == null)
             return false;

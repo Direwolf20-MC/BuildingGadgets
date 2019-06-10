@@ -69,7 +69,7 @@ public class ModeRadialMenu extends Screen {
     }
 
     @Override
-    public void initGui() {
+    public void init() {
         conditionalButtons.clear();
         ItemStack tool = getGadget();
         boolean isDestruction = tool.getItem() instanceof GadgetDestruction;
@@ -425,7 +425,7 @@ public class ModeRadialMenu extends Screen {
     @Override
     public void tick() {
 //    TODO 1.13 only works for bound keys; not bound mouse buttons
-        if (! InputMappings.getInputByName(KeyBindings.menuSettings.getKey().getKeyCode())) {
+        if (! InputMappings.getInputByName(KeyBindings.menuSettings.getKey())) {
             //close(); //TODO figure it out
             changeMode();
         }

@@ -13,9 +13,12 @@ import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.registry.objects.BuildingObjects;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import net.minecraft.command.Commands;
+import net.minecraft.item.crafting.IRecipeSerializer;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.crafting.CraftingHelper;
+import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.DeferredWorkQueue;
 import net.minecraftforge.fml.DistExecutor;
@@ -55,6 +58,8 @@ public class BuildingGadgets {
         eventBus.addListener(this::setup);
         eventBus.addListener(this::serverLoad);
         eventBus.addListener(this::finishLoad);
+        eventBus.addListener(this::onRecipeRegister);
+
         eventBus.addListener(Config::onLoad);
         eventBus.addListener(Config::onFileChange);
 
@@ -78,7 +83,6 @@ public class BuildingGadgets {
             PacketHandler.register();
             CraftingHelper.register(Reference.CONDITION_PASTE_ID, new CraftingConditionPaste());
             CraftingHelper.register(Reference.CONDITION_DESTRUCTION_ID, new CraftingConditionDestruction());
-            RecipeSerializers.register(new RecipeConstructionPaste.Serializer());
         });
         event.getIMCStream().forEach(APIProxy.INSTANCE::handleIMC);
     }
@@ -94,6 +98,14 @@ public class BuildingGadgets {
     private void finishLoad(FMLLoadCompleteEvent event) {
         theApi.onLoadComplete();
         BuildingObjects.cleanup();
+    }
+
+    private void onRecipeRegister(final RegistryEvent.Register<IRecipeSerializer<?>> e) {
+        e.getRegistry().register(
+            new RecipeConstructionPaste.Serializer().setRegistryName(
+                    new ResourceLocation(Reference.MODID, "construction_paste")
+            )
+        );
     }
 
 }
