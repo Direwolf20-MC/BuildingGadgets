@@ -53,7 +53,7 @@ public class DestructionGUI extends Screen {
                 Minecraft.getInstance().player.sendStatusMessage(new StringTextComponent(TextFormatting.RED + new TranslationTextComponent("message.gadget.destroysizeerror").getUnformattedComponentText()), true);
         }));
 
-        this.addButton(new Button((x - 30) - 32, y + 60, 60, 20, I18n.format(GuiMod.getLangKeyButton("destruction", "cancel")), b -> {}));
+        this.addButton(new Button((x - 30) - 32, y + 60, 60, 20, I18n.format(GuiMod.getLangKeyButton("destruction", "cancel")), b -> onClose()));
 
         List<GuiDestructionSlider> sliders = new ArrayList<>();
 

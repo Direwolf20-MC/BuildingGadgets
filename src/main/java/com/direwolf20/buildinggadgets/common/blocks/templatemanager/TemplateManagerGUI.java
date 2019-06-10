@@ -5,14 +5,22 @@
 
 package com.direwolf20.buildinggadgets.common.blocks.templatemanager;
 
+import com.direwolf20.buildinggadgets.client.gui.AreaHelpText;
 import com.direwolf20.buildinggadgets.client.gui.GuiButtonHelp;
 import com.direwolf20.buildinggadgets.client.gui.GuiButtonHelpText;
 import com.direwolf20.buildinggadgets.client.gui.IHoverHelpText;
+import com.direwolf20.buildinggadgets.common.BuildingGadgets;
+import com.direwolf20.buildinggadgets.common.network.PacketHandler;
+import com.direwolf20.buildinggadgets.common.network.packets.PacketTemplateManagerLoad;
+import com.direwolf20.buildinggadgets.common.network.packets.PacketTemplateManagerPaste;
+import com.direwolf20.buildinggadgets.common.network.packets.PacketTemplateManagerSave;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
+import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.buffers.PasteToolBufferBuilder;
 import com.direwolf20.buildinggadgets.common.util.buffers.ToolBufferBuilder;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.mojang.blaze3d.platform.GlStateManager;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.gui.widget.button.Button;
@@ -28,12 +36,16 @@ import net.minecraft.client.renderer.vertex.VertexFormatElement;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.JsonToNBT;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TranslationTextComponent;
 import org.lwjgl.opengl.GL11;
 
 import javax.annotation.Nullable;
+import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
@@ -94,17 +106,16 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
             renderComponentHoverEffect(new StringTextComponent(buttonHelp.getHoverText()), mouseX, mouseY);
     }
 
-    //TODO find replacements
-    /*
-    public void initGui() {
-        super.initGui();
+    @Override
+    public void init() {
+        super.init();
         helpTextProviders.clear();
-        buttonHelp = addButton(new GuiButtonHelp(this.guiLeft + this.xSize - 16, this.guiTop + 4, () -> buttonHelp.toggleSelected()));
-        buttonSave = addButton(createAndAddButton(79, 17, 30, 20, "Save", () -> PacketHandler.sendToServer(new PacketTemplateManagerSave(te.getPos(), nameField.getText()))));
-        buttonLoad = addButton(createAndAddButton(137, 17, 30, 20, "Load", () -> PacketHandler.sendToServer(new PacketTemplateManagerLoad(te.getPos()))));
-        buttonCopy = addButton(createAndAddButton(79, 61, 30, 20, "Copy", () -> TemplateManagerCommands.copyTemplate(container)));
-        buttonPaste = addButton(createAndAddButton(135, 61, 34, 20, "Paste", () -> {
-            String CBString = mc.keyboardListener.getClipboardString();
+        buttonHelp = addButton(new GuiButtonHelp(this.guiLeft + this.xSize - 16, this.guiTop + 4, (button) -> buttonHelp.toggleSelected()));
+        buttonSave = addButton(createAndAddButton(79, 17, 30, 20, "Save", (button) -> PacketHandler.sendToServer(new PacketTemplateManagerSave(te.getPos(), nameField.getText()))));
+        buttonLoad = addButton(createAndAddButton(137, 17, 30, 20, "Load", (button) -> PacketHandler.sendToServer(new PacketTemplateManagerLoad(te.getPos()))));
+        buttonCopy = addButton(createAndAddButton(79, 61, 30, 20, "Copy", (button) -> TemplateManagerCommands.copyTemplate(container)));
+        buttonPaste = addButton(createAndAddButton(135, 61, 34, 20, "Paste", (button) -> {
+            String CBString = getMinecraft().keyboardListener.getClipboardString();
             if (GadgetUtils.mightBeLink(CBString)) {
                 Minecraft.getInstance().player.sendStatusMessage(new StringTextComponent(TextFormatting.RED + new TranslationTextComponent("message.gadget.pastefailed.linkcopied").getUnformattedComponentText()),false);
                 return;
@@ -124,17 +135,17 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
             }
         }));
 
-        this.nameField = new TextFieldWidget(0, this.fontRenderer, this.guiLeft + 8, this.guiTop + 6, 149, this.fontRenderer.FONT_HEIGHT);
+        this.nameField = new TextFieldWidget(this.font, this.guiLeft + 8, this.guiTop + 6, 149, this.font.FONT_HEIGHT, "name?");
         this.nameField.setMaxStringLength(50);
         this.nameField.setVisible(true);
         children.add(nameField);
 
         helpTextProviders.add(new AreaHelpText(nameField, "field.template_name"));
-        helpTextProviders.add(new AreaHelpText(inventorySlots.getSlot(0), guiLeft, guiTop, "slot.gadget"));
-        helpTextProviders.add(new AreaHelpText(inventorySlots.getSlot(1), guiLeft, guiTop, "slot.template"));
+        helpTextProviders.add(new AreaHelpText(this.getContainer().getSlot(0), guiLeft, guiTop, "slot.gadget"));
+        helpTextProviders.add(new AreaHelpText(this.getContainer().getSlot(1), guiLeft, guiTop, "slot.template"));
         helpTextProviders.add(new AreaHelpText(guiLeft + 112, guiTop + 41, 22, 15, "arrow.data_flow"));
         helpTextProviders.add(new AreaHelpText(panel, guiLeft, guiTop + 10, "preview"));
-    }*/
+    }
 
     private Button createAndAddButton(int x, int y, int witdth, int height, String text, @Nullable IPressable action) {
         GuiButtonHelpText button = new GuiButtonHelpText(guiLeft + x, guiTop + y, witdth, height, text, text.toLowerCase(), action);

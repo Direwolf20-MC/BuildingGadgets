@@ -13,6 +13,8 @@ import net.minecraft.world.IWorldReader;
 import net.minecraft.world.LightType;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.border.WorldBorder;
+import net.minecraft.world.chunk.ChunkStatus;
+import net.minecraft.world.chunk.IChunk;
 import net.minecraft.world.dimension.Dimension;
 import net.minecraft.world.gen.Heightmap;
 
@@ -60,25 +62,31 @@ public class RegionBlockView implements IWorldReader {
         return 0;
     }
 
+    @Nullable
     @Override
-    public boolean isChunkLoaded(int x, int z, boolean allowEmpty) {
+    public IChunk getChunk(int p_217353_1_, int p_217353_2_, ChunkStatus p_217353_3_, boolean p_217353_4_) {
+        return null;
+    }
+
+    @Override
+    public boolean chunkExists(int p_217354_1_, int p_217354_2_) {
         return false;
     }
 
     @Override
-    public boolean canSeeSky(BlockPos pos) {
+    public BlockPos getHeight(Heightmap.Type heightmapType, BlockPos pos) {
+        return null;
+    }
+
+
+    @Override
+    public boolean canBlockSeeSky(BlockPos p_175710_1_) {
         return false;
     }
 
     @Override
     public int getHeight(Heightmap.Type heightmapType, int x, int z) {
         return 0;
-    }
-
-    @Nullable
-    @Override
-    public PlayerEntity getClosestPlayer(double x, double y, double z, double distance, Predicate<Entity> predicate) {
-        return null;
     }
 
     @Override

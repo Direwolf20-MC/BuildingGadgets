@@ -1,8 +1,10 @@
 package com.direwolf20.buildinggadgets.common.util;
 
+import com.direwolf20.buildinggadgets.client.KeyBindings;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.util.InputMappings;
 import net.minecraft.entity.Entity;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.IDataSerializer;
@@ -33,6 +35,15 @@ public final class UnnamedCompat {
 
         public static Screen getCurrentScreen() {
             return minecraft.field_71462_r;
+        }
+    }
+
+    @Deprecated
+    public static class Input {
+        // This works but I think I'm using the raw method and not
+        // the actual isKeyDown method that we used in 1.13
+        public static boolean isKeyDown( long handle, int keyCode ) {
+            return InputMappings.func_216506_a( handle, keyCode );
         }
     }
 }

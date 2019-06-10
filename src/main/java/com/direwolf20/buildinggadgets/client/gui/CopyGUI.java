@@ -6,8 +6,12 @@
 package com.direwolf20.buildinggadgets.client.gui;
 
 import com.direwolf20.buildinggadgets.common.config.Config;
+import com.direwolf20.buildinggadgets.common.network.PacketHandler;
+import com.direwolf20.buildinggadgets.common.network.packets.PacketCopyCoords;
+import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.client.gui.widget.button.Button.IPressable;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
@@ -32,11 +36,9 @@ public class CopyGUI extends GuiScreenTextFields {
         this.copyPasteTool = tool;
     }
 
-    //TODO find replacement
-    /*
     @Override
-    public void initGui() {
-        super.initGui();
+    public void init() {
+        super.init();
 
         startPos = BGItems.gadgetCopyPaste.getStartPos(copyPasteTool);
         endPos = BGItems.gadgetCopyPaste.getEndPos(copyPasteTool);
@@ -53,7 +55,7 @@ public class CopyGUI extends GuiScreenTextFields {
 
         updateTextFields();
         //NOTE: the id always has to be different or else it might get called twice or never!
-        addButton(new GuiButtonAction(guiLeft + 45, guiTop + 60, 40, 20, "Ok", () -> {
+        addButton(new Button(guiLeft + 45, guiTop + 60, 40, 20, "Ok", (button) -> {
             clearTextBoxes();
             if (absoluteCoords) {
                 startPos = new BlockPos(startX.getInt(), startY.getInt(), startZ.getInt());
@@ -64,28 +66,28 @@ public class CopyGUI extends GuiScreenTextFields {
             }
             PacketHandler.sendToServer(new PacketCopyCoords(startPos, endPos));
         }));
-        addButton(new GuiButtonAction(guiLeft + 145, guiTop + 60, 40, 20, "Cancel", () -> close()));
-        addButton(new GuiButtonAction(guiLeft + 245, guiTop + 60, 40, 20, "Clear", () -> {
+        addButton(new Button(guiLeft + 145, guiTop + 60, 40, 20, "Cancel", (button) -> onClose()));
+        addButton(new Button(guiLeft + 245, guiTop + 60, 40, 20, "Clear", (button) -> {
             PacketHandler.sendToServer(new PacketCopyCoords(BlockPos.ZERO, BlockPos.ZERO));
-            close();
+            onClose();
         }));
-        addButton(new GuiButtonAction(guiLeft + 325, guiTop + 60, 80, 20, "CoordsMode", () -> {
+        addButton(new Button(guiLeft + 325, guiTop + 60, 80, 20, "CoordsMode", (button) -> {
             coordsModeSwitch();
             updateTextFields();
         }));
-        addButton(50, 14, "-", () -> fieldChange(startX, -1));
-        addButton(110, 14, "+", () -> fieldChange(startX, 1));
-        addButton(150, 14, "-", () -> fieldChange(startY, -1));
-        addButton(210, 14, "+", () -> fieldChange(startY, 1));
-        addButton(250, 14, "-", () -> fieldChange(startZ, -1));
-        addButton(310, 14, "+", () -> fieldChange(startZ, 1));
-        addButton(50, 34, "-", () -> fieldChange(endX, -1));
-        addButton(110, 34, "+", () -> fieldChange(endX, 1));
-        addButton(150, 34, "-", () -> fieldChange(endY, -1));
-        addButton(210, 34, "+", () -> fieldChange(endY, 1));
-        addButton(250, 34, "-", () -> fieldChange(endZ, -1));
-        addButton(310, 34, "+", () -> fieldChange(endZ, 1));
-    }*/
+        addButton(50, 14, "-", (button) -> fieldChange(startX, -1));
+        addButton(110, 14, "+", (button) -> fieldChange(startX, 1));
+        addButton(150, 14, "-", (button) -> fieldChange(startY, -1));
+        addButton(210, 14, "+", (button) -> fieldChange(startY, 1));
+        addButton(250, 14, "-", (button) -> fieldChange(startZ, -1));
+        addButton(310, 14, "+", (button) -> fieldChange(startZ, 1));
+        addButton(50, 34, "-", (button) -> fieldChange(endX, -1));
+        addButton(110, 34, "+", (button) -> fieldChange(endX, 1));
+        addButton(150, 34, "-", (button) -> fieldChange(endY, -1));
+        addButton(210, 34, "+", (button) -> fieldChange(endY, 1));
+        addButton(250, 34, "-", (button) -> fieldChange(endZ, -1));
+        addButton(310, 34, "+", (button) -> fieldChange(endZ, 1));
+    }
 
     private void addButton(int x, int y, String text, IPressable action) {
         addButton(new DireButton(guiLeft + x, guiTop + y, 10, 10, text, action));
@@ -140,17 +142,17 @@ public class CopyGUI extends GuiScreenTextFields {
             endY.setText(String.valueOf(end.getY()));
             endZ.setText(String.valueOf(end.getZ()));
         } else {
-            x = startX.getText() != "" ? String.valueOf(startX.getInt() - startPos.getX()) : "0";
+            x = !startX.getText().equals("") ? String.valueOf(startX.getInt() - startPos.getX()) : "0";
             startX.setText(x);
-            y = startY.getText() != "" ? String.valueOf(startY.getInt() - startPos.getY()) : "0";
+            y = !startY.getText().equals("") ? String.valueOf(startY.getInt() - startPos.getY()) : "0";
             startY.setText(y);
-            z = startZ.getText() != "" ? String.valueOf(startZ.getInt() - startPos.getZ()) : "0";
+            z = !startZ.getText().equals("") ? String.valueOf(startZ.getInt() - startPos.getZ()) : "0";
             startZ.setText(z);
-            x = endX.getText() != "" ? String.valueOf(endX.getInt() - startPos.getX()) : String.valueOf(endPos.getX() - startPos.getX());
+            x = !endX.getText().equals("") ? String.valueOf(endX.getInt() - startPos.getX()) : String.valueOf(endPos.getX() - startPos.getX());
             endX.setText(x);
-            y = endY.getText() != "" ? String.valueOf(endY.getInt() - startPos.getY()) : String.valueOf(endPos.getY() - startPos.getY());
+            y = !endY.getText().equals("") ? String.valueOf(endY.getInt() - startPos.getY()) : String.valueOf(endPos.getY() - startPos.getY());
             endY.setText(y);
-            z = endZ.getText() != "" ? String.valueOf(endZ.getInt() - startPos.getZ()) : String.valueOf(endPos.getZ() - startPos.getZ());
+            z = !endZ.getText().equals("") ? String.valueOf(endZ.getInt() - startPos.getZ()) : String.valueOf(endPos.getZ() - startPos.getZ());
             endZ.setText(z);
         }
     }
