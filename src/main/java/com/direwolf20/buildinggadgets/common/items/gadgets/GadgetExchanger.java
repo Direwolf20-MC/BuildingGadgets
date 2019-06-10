@@ -14,7 +14,7 @@ import com.direwolf20.buildinggadgets.common.util.tools.modes.ExchangingMode;
 import com.direwolf20.buildinggadgets.common.world.FakeBuilderWorld;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.client.entity.player.ClientPlayerEntity;
+import PlayerEntity;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -177,7 +177,7 @@ public class GadgetExchanger extends GadgetGeneric {
         player.sendStatusMessage(new StringTextComponent(TextFormatting.DARK_AQUA + new TranslationTextComponent("message.gadget.toolrange").getUnformattedComponentText() + ": " + range), true);
     }
 
-    private boolean exchange(ClientPlayerEntity player, ItemStack stack) {
+    private boolean exchange(PlayerEntity player, ItemStack stack) {
         World world = player.world;
         List<BlockPos> coords = getAnchor(stack);
 
@@ -220,7 +220,7 @@ public class GadgetExchanger extends GadgetGeneric {
         return true;
     }
 
-    private boolean exchangeBlock(World world, ClientPlayerEntity player, BlockPos pos, BlockState setBlock) {
+    private boolean exchangeBlock(World world, PlayerEntity player, BlockPos pos, BlockState setBlock) {
         BlockState currentBlock = world.getBlockState(pos);
         ItemStack itemStack;
         boolean useConstructionPaste = false;
@@ -295,7 +295,7 @@ public class GadgetExchanger extends GadgetGeneric {
         return false;
     }
 
-    public static ItemStack getGadget(ClientPlayerEntity player) {
+    public static ItemStack getGadget(PlayerEntity player) {
         ItemStack stack = GadgetGeneric.getGadget(player);
         if (!(stack.getItem() instanceof GadgetExchanger))
             return ItemStack.EMPTY;

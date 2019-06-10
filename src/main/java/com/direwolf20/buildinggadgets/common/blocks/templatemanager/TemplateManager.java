@@ -6,7 +6,7 @@ import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketBlockMap;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.client.entity.player.ClientPlayerEntity;
+import PlayerEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.inventory.InventoryHelper;
@@ -68,7 +68,7 @@ public class TemplateManager extends Block {
         if (!(te instanceof TemplateManagerTileEntity)) {
             return false;
         }
-        TemplateManagerContainer container = ((TemplateManagerTileEntity) te).getContainer((ClientPlayerEntity) player);
+        TemplateManagerContainer container = ((TemplateManagerTileEntity) te).getContainer((PlayerEntity) player);
         for (int i = 0; i <= 1; i++) {
             ItemStack itemStack = container.getSlot(i).getStack();
             if (!(itemStack.getItem() instanceof ITemplate)) continue;

@@ -4,7 +4,8 @@ import it.unimi.dsi.fastutil.doubles.Double2ObjectArrayMap;
 import it.unimi.dsi.fastutil.doubles.Double2ObjectMap;
 import it.unimi.dsi.fastutil.doubles.DoubleRBTreeSet;
 import it.unimi.dsi.fastutil.doubles.DoubleSortedSet;
-import net.minecraft.client.entity.player.ClientPlayerEntity;
+import PlayerEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 
@@ -31,7 +32,7 @@ public class SortingHelper {
          * @param player the player
          * @return a sorted by distance {@link List} of {@link BlockPos}
          */
-        public static List<BlockPos> byDistance(Collection<BlockPos> list, ClientPlayerEntity player) {
+        public static List<BlockPos> byDistance(Collection<BlockPos> list, PlayerEntity player) {
             List<BlockPos> sortedList = new ArrayList<>();
 
             Double2ObjectMap<BlockPos> rangeMap = new Double2ObjectArrayMap<>(list.size());

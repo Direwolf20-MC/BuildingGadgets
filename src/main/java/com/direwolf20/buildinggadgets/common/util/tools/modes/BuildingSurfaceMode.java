@@ -9,7 +9,8 @@ import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.lang.ModeTranslation;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
-import net.minecraft.client.entity.player.ClientPlayerEntity;
+import PlayerEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
@@ -36,7 +37,7 @@ public class BuildingSurfaceMode extends AtopSupportedMode {
     }
 
     @Override
-    public IPositionPlacementSequence computeWithTransformed(ClientPlayerEntity player, BlockPos transformed, BlockPos original, Direction sideHit, ItemStack tool) {
+    public IPositionPlacementSequence computeWithTransformed(PlayerEntity player, BlockPos transformed, BlockPos original, Direction sideHit, ItemStack tool) {
         int range = GadgetUtils.getToolRange(tool);
         boolean fuzzy = GadgetGeneric.getFuzzy(tool);
         if (GadgetGeneric.getConnectedArea(tool))
@@ -45,7 +46,7 @@ public class BuildingSurfaceMode extends AtopSupportedMode {
     }
 
     @Override
-    public BlockPos transformAtop(ClientPlayerEntity player, BlockPos hit, Direction sideHit, ItemStack tool) {
+    public BlockPos transformAtop(PlayerEntity player, BlockPos hit, Direction sideHit, ItemStack tool) {
         return hit.offset(sideHit);
     }
 

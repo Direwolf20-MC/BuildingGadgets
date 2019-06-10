@@ -11,7 +11,8 @@ import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
 import net.minecraft.command.arguments.EntityArgument;
 import net.minecraft.entity.Entity;
-import net.minecraft.client.entity.player.ClientPlayerEntity;
+import PlayerEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.text.StringTextComponent;
@@ -41,7 +42,7 @@ public class BlockMapCommand {
     private static int execute(CommandContext<CommandSource> ctx, Entity entity, boolean removeData) throws CommandSyntaxException {
         ServerPlayerEntity sender = ctx.getSource().asPlayer();
 
-        if( !(entity instanceof ClientPlayerEntity)) {
+        if( !(entity instanceof PlayerEntity)) {
             sender.sendMessage(new StringTextComponent("Entity not valid"));
             return 0;
         }

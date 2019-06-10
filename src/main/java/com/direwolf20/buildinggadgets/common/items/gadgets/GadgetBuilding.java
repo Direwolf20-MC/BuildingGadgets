@@ -20,7 +20,7 @@ import com.direwolf20.buildinggadgets.common.util.tools.modes.BuildingMode;
 import com.direwolf20.buildinggadgets.common.world.FakeBuilderWorld;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.client.entity.player.ClientPlayerEntity;
+import PlayerEntity;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.player.PlayerEntity;
@@ -97,7 +97,7 @@ public class GadgetBuilding extends GadgetGeneric implements IAtopPlacingGadget 
         return !NBTHelper.getOrNewTag(stack).getBoolean(NBTKeys.GADGET_PLACE_INSIDE);
     }
 
-    public static void togglePlaceAtop(ClientPlayerEntity player, ItemStack stack) {
+    public static void togglePlaceAtop(PlayerEntity player, ItemStack stack) {
         NBTHelper.getOrNewTag(stack).putBoolean(NBTKeys.GADGET_PLACE_INSIDE, shouldPlaceAtop(stack));
         String prefix = "message.gadget.building.placement";
         player.sendStatusMessage(new StringTextComponent(TextFormatting.AQUA + new TranslationTextComponent(prefix, new TranslationTextComponent(prefix + (shouldPlaceAtop(stack) ? ".atop" : ".inside"))).getUnformattedComponentText()), true);
@@ -275,7 +275,7 @@ public class GadgetBuilding extends GadgetGeneric implements IAtopPlacingGadget 
         return true;
     }
 
-    private boolean placeBlock(World world, ClientPlayerEntity player, BlockPos pos, BlockState setBlock) {
+    private boolean placeBlock(World world, PlayerEntity player, BlockPos pos, BlockState setBlock) {
         if (!player.isAllowEdit())
             return false;
 
@@ -343,7 +343,7 @@ public class GadgetBuilding extends GadgetGeneric implements IAtopPlacingGadget 
         return false;
     }
 
-    public static ItemStack getGadget(ClientPlayerEntity player) {
+    public static ItemStack getGadget(PlayerEntity player) {
         ItemStack stack = GadgetGeneric.getGadget(player);
         if (!(stack.getItem() instanceof GadgetBuilding))
             return ItemStack.EMPTY;

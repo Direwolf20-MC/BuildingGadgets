@@ -14,7 +14,8 @@ import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.client.renderer.vertex.VertexFormatElement;
-import net.minecraft.client.entity.player.ClientPlayerEntity;
+import PlayerEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.math.BlockPos;
@@ -86,7 +87,7 @@ public class PasteToolBufferBuilder {
         //System.out.printf("Created %d Vertexes for %d blocks in %.2f ms%n", bufferBuilder.getVertexCount(), blockMapList.size(), (System.nanoTime() - time) * 1e-6);
     }
 
-    public static void draw(ClientPlayerEntity player, double x, double y, double z, BlockPos startPos, String UUID) {
+    public static void draw(PlayerEntity player, double x, double y, double z, BlockPos startPos, String UUID) {
 //        long time = System.nanoTime();
         ToolBufferBuilder bufferBuilder = bufferMap.get(UUID);
         bufferBuilder.sortVertexData((float) (x - startPos.getX()), (float) ((y + player.getEyeHeight()) - startPos.getY()), (float) (z - startPos.getZ()));

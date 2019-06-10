@@ -7,7 +7,8 @@ import com.direwolf20.buildinggadgets.common.util.lang.TooltipTranslation;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.client.entity.player.ClientPlayerEntity;
+import PlayerEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ActionResult;
@@ -45,7 +46,7 @@ public class ConstructionPasteContainer extends GenericPasteContainer {
     }
 
     @Override
-    public ActionResult<ItemStack> onItemRightClick(World world, ClientPlayerEntity player, Hand hand) {
+    public ActionResult<ItemStack> onItemRightClick(World world, PlayerEntity player, Hand hand) {
         ItemStack heldItem = player.getHeldItem(hand);
         player.setActiveHand(hand);
         PlayerInventory inv = player.inventory;

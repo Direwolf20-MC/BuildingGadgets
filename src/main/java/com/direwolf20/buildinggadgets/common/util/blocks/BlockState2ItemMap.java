@@ -5,7 +5,8 @@ import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.google.common.collect.BiMap;
 import net.minecraft.block.BlockState;
-import net.minecraft.client.entity.player.ClientPlayerEntity;
+import PlayerEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.util.math.BlockPos;
@@ -73,7 +74,7 @@ public final class BlockState2ItemMap extends BlockState2ShortMap {
         }
     }
 
-    public void initStateItemMap(ClientPlayerEntity player) {
+    public void initStateItemMap(PlayerEntity player) {
         stateItemMap.clear();
         for (Map.Entry<Short, BlockState> entry : getShortStateMap().entrySet()) {
             try {

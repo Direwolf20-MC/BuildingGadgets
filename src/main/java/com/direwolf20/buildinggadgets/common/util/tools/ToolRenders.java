@@ -31,7 +31,8 @@ import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GLAllocation;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.client.entity.player.ClientPlayerEntity;
+import PlayerEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.util.BlockRenderLayer;
@@ -90,7 +91,7 @@ public class ToolRenders {
         cacheInventory.forceUpdate();
     }
 
-    public static void renderBuilderOverlay(RenderWorldLastEvent evt, ClientPlayerEntity player, ItemStack stack) {
+    public static void renderBuilderOverlay(RenderWorldLastEvent evt, PlayerEntity player, ItemStack stack) {
         ItemStack heldItem = GadgetBuilding.getGadget(player);
         if (heldItem.isEmpty()) return;
 
@@ -222,7 +223,7 @@ public class ToolRenders {
         }
     }
 
-    public static void renderExchangerOverlay(RenderWorldLastEvent evt, ClientPlayerEntity player, ItemStack stack) {
+    public static void renderExchangerOverlay(RenderWorldLastEvent evt, PlayerEntity player, ItemStack stack) {
         //Calculate the players current position, which is needed later
         double doubleX = player.lastTickPosX + (player.posX - player.lastTickPosX) * evt.getPartialTicks();
         double doubleY = player.lastTickPosY + (player.posY - player.lastTickPosY) * evt.getPartialTicks();
@@ -359,7 +360,7 @@ public class ToolRenders {
         }
     }
 
-    public static void renderDestructionOverlay(RenderWorldLastEvent evt, ClientPlayerEntity player, ItemStack stack) {
+    public static void renderDestructionOverlay(RenderWorldLastEvent evt, PlayerEntity player, ItemStack stack) {
         RayTraceResult lookingAt = VectorHelper.getLookingAt(player, stack);
         if (lookingAt == null && GadgetDestruction.getAnchor(stack) == null) return;
         World world = player.world;
@@ -388,7 +389,7 @@ public class ToolRenders {
         GlStateManager.popMatrix();
     }
 
-    private static void renderDestructionOverlay(ClientPlayerEntity player, World world, BlockPos startBlock, Direction facing, ItemStack heldItem) {
+    private static void renderDestructionOverlay(PlayerEntity player, World world, BlockPos startBlock, Direction facing, ItemStack heldItem) {
         Minecraft mc = Minecraft.getInstance();
 //        mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
 
@@ -455,7 +456,7 @@ public class ToolRenders {
         GlStateManager.popMatrix();
     }
 
-    public static void renderPasteOverlay(RenderWorldLastEvent evt, ClientPlayerEntity player, ItemStack stack) {
+    public static void renderPasteOverlay(RenderWorldLastEvent evt, PlayerEntity player, ItemStack stack) {
 
         //Calculate the players current position, which is needed later
         double doubleX = player.lastTickPosX + (player.posX - player.lastTickPosX) * evt.getPartialTicks();
@@ -644,7 +645,7 @@ public class ToolRenders {
         tessellator.draw();
     }
 
-    private static void renderLinkedInventoryOutline(ItemStack item, ClientPlayerEntity player, double x, double y, double z) {
+    private static void renderLinkedInventoryOutline(ItemStack item, PlayerEntity player, double x, double y, double z) {
         // This is problematic as you use REMOTE_INVENTORY_POS to get the dimension instead of REMOTE_INVENTORY_DIM
         ResourceLocation dim = GadgetUtils.getDIMFromNBT(item, NBTKeys.REMOTE_INVENTORY_POS);
         BlockPos pos = GadgetUtils.getPOSFromNBT(item, NBTKeys.REMOTE_INVENTORY_POS);

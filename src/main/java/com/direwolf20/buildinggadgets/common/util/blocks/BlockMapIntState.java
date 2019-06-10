@@ -5,7 +5,7 @@ import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 
 import net.minecraft.block.BlockState;
-import net.minecraft.client.entity.player.ClientPlayerEntity;
+import PlayerEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;

@@ -13,7 +13,7 @@ import it.unimi.dsi.fastutil.doubles.Double2ObjectMap;
 import it.unimi.dsi.fastutil.doubles.DoubleRBTreeSet;
 import it.unimi.dsi.fastutil.doubles.DoubleSortedSet;
 import net.minecraft.block.BlockState;
-import net.minecraft.client.entity.player.ClientPlayerEntity;
+import PlayerEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemStack;
@@ -109,7 +109,7 @@ public enum BuildingMode {
         };
     }
 
-    public static List<BlockMap> sortMapByDistance(List<BlockMap> unSortedMap, ClientPlayerEntity player) {//TODO unused
+    public static List<BlockMap> sortMapByDistance(List<BlockMap> unSortedMap, PlayerEntity player) {//TODO unused
         List<BlockPos> unSortedList = new ArrayList<>();
         Map<BlockPos, BlockState> PosToStateMap = new HashMap<>();
         Map<BlockPos, Integer> PosToX = new HashMap<>();

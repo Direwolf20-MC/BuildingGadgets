@@ -9,7 +9,8 @@ import net.minecraft.block.material.MaterialColor;
 import net.minecraft.block.state.BlockFaceShape;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
-import net.minecraft.client.entity.player.ClientPlayerEntity;
+import PlayerEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.IFluidState;
 import net.minecraft.item.BlockItemUseContext;
@@ -257,7 +258,7 @@ public class UniqueBlockState implements BlockState {
     }
 
     @Override
-    public float getPlayerRelativeBlockHardness(ClientPlayerEntity player, IBlockReader worldIn, BlockPos pos) {
+    public float getPlayerRelativeBlockHardness(PlayerEntity player, IBlockReader worldIn, BlockPos pos) {
         return 0;
     }
 
@@ -372,12 +373,12 @@ public class UniqueBlockState implements BlockState {
     }
 
     @Override
-    public boolean onBlockActivated(World worldIn, BlockPos pos, ClientPlayerEntity player, Hand hand, Direction side, float hitX, float hitY, float hitZ) {
+    public boolean onBlockActivated(World worldIn, BlockPos pos, PlayerEntity player, Hand hand, Direction side, float hitX, float hitY, float hitZ) {
         return false;
     }
 
     @Override
-    public void onBlockClicked(World worldIn, BlockPos pos, ClientPlayerEntity player) {
+    public void onBlockClicked(World worldIn, BlockPos pos, PlayerEntity player) {
 
     }
 

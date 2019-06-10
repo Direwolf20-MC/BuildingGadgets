@@ -11,7 +11,7 @@ import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
 import com.direwolf20.buildinggadgets.common.util.lang.Styles;
 import com.direwolf20.buildinggadgets.common.util.lang.TooltipTranslation;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
-import net.minecraft.client.entity.player.ClientPlayerEntity;
+import PlayerEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.IItemPropertyGetter;
@@ -121,7 +121,7 @@ public abstract class GadgetGeneric extends Item {
         return heldItem;
     }
 
-    public boolean canUse(ItemStack tool, ClientPlayerEntity player) {
+    public boolean canUse(ItemStack tool, PlayerEntity player) {
         if (player.isCreative())
             return true;
 
@@ -153,7 +153,7 @@ public abstract class GadgetGeneric extends Item {
         return NBTHelper.getOrNewTag(stack).getBoolean(NBTKeys.GADGET_FUZZY);
     }
 
-    public static void toggleFuzzy(ClientPlayerEntity player, ItemStack stack) {
+    public static void toggleFuzzy(PlayerEntity player, ItemStack stack) {
         NBTHelper.getOrNewTag(stack).putBoolean(NBTKeys.GADGET_FUZZY, !getFuzzy(stack));
         player.sendStatusMessage(new StringTextComponent(TextFormatting.AQUA + new TranslationTextComponent("message.gadget.fuzzymode").getUnformattedComponentText() + ": " + getFuzzy(stack)), true);
     }
@@ -162,7 +162,7 @@ public abstract class GadgetGeneric extends Item {
         return !NBTHelper.getOrNewTag(stack).getBoolean(NBTKeys.GADGET_UNCONNECTED_AREA);
     }
 
-    public static void toggleConnectedArea(ClientPlayerEntity player, ItemStack stack) {
+    public static void toggleConnectedArea(PlayerEntity player, ItemStack stack) {
         NBTHelper.getOrNewTag(stack).putBoolean(NBTKeys.GADGET_UNCONNECTED_AREA, getConnectedArea(stack));
         String suffix = stack.getItem() instanceof GadgetDestruction ? "area" : "surface";
         player.sendStatusMessage(new StringTextComponent(TextFormatting.AQUA + new TranslationTextComponent("message.gadget.connected" + suffix).getUnformattedComponentText() + ": " + getConnectedArea(stack)), true);

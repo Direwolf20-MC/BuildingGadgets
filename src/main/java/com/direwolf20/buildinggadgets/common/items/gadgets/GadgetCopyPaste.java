@@ -27,7 +27,7 @@ import com.google.common.collect.Multiset;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.material.Material;
-import net.minecraft.client.entity.player.ClientPlayerEntity;
+import PlayerEntity;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.player.PlayerEntity;
@@ -473,7 +473,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
         return true;
     }
 
-    private void buildBlockMap(World world, BlockPos startPos, ItemStack stack, ClientPlayerEntity player) {
+    private void buildBlockMap(World world, BlockPos startPos, ItemStack stack, PlayerEntity player) {
 //        long time = System.nanoTime();
 
         BlockPos anchorPos = getAnchor(stack);
@@ -494,7 +494,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
         //System.out.printf("Built %d Blocks in %.2f ms%n", blockMapList.size(), (System.nanoTime() - time) * 1e-6);
     }
 
-    private void placeBlock(World world, BlockPos pos, ClientPlayerEntity player, BlockState state, Map<BlockState, UniqueItem> IntStackMap) {
+    private void placeBlock(World world, BlockPos pos, PlayerEntity player, BlockState state, Map<BlockState, UniqueItem> IntStackMap) {
         BlockState testState = world.getBlockState(pos);
         if ((Config.GENERAL.allowOverwriteBlocks.get() && ! testState.isReplaceable(new BlockItemUseContext(new ItemUseContext(player, Hand.MAIN_HAND, VectorHelper.getLookingAt(player, FluidMode.NONE))))) ||
                 (! Config.GENERAL.allowOverwriteBlocks.get() && world.getBlockState(pos).getMaterial() != Material.AIR))
@@ -574,7 +574,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
         }
     }
 
-    public static void undoBuild(ClientPlayerEntity player, ItemStack heldItem) {
+    public static void undoBuild(PlayerEntity player, ItemStack heldItem) {
 //        long time = System.nanoTime();
         CompoundNBT tagCompound = WorldSave.getWorldSave(player.world).getCompoundFromUUID(BGItems.gadgetCopyPaste.getUUID(heldItem));
         World world = player.world;
@@ -613,7 +613,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
         if (success) setLastBuild(heldItem, null, DimensionType.OVERWORLD);
     }
 
-    public static ItemStack getGadget(ClientPlayerEntity player) {
+    public static ItemStack getGadget(PlayerEntity player) {
         ItemStack stack = GadgetGeneric.getGadget(player);
         if (!(stack.getItem() instanceof GadgetCopyPaste))
             return ItemStack.EMPTY;

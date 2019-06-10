@@ -11,7 +11,7 @@ import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.google.common.collect.ImmutableSet;
 import net.minecraft.block.*;
-import net.minecraft.client.entity.player.ClientPlayerEntity;
+import PlayerEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.BlockItemUseContext;
@@ -44,7 +44,7 @@ public class InventoryHelper {
     private static final Set<IProperty> SAFE_PROPERTIES_COPY_PASTE =
             ImmutableSet.<IProperty>builder().addAll(SAFE_PROPERTIES).addAll(ImmutableSet.of(RailBlock.SHAPE, PoweredRailBlock.SHAPE)).build();
 
-    public static boolean giveItem(ItemStack itemStack, ClientPlayerEntity player, IWorld world) {
+    public static boolean giveItem(ItemStack itemStack, PlayerEntity player, IWorld world) {
         if (player.isCreative()) {
             return true;
         }
@@ -105,7 +105,7 @@ public class InventoryHelper {
         return inv.addItemStackToInventory(giveItemStack);
     }
 
-    public static boolean useItem(ItemStack itemStack, ClientPlayerEntity player, int count, World world) {
+    public static boolean useItem(ItemStack itemStack, PlayerEntity player, int count, World world) {
         if (player.isCreative()) {
             return true;
         }
@@ -155,14 +155,14 @@ public class InventoryHelper {
         int countItem(ItemStack tool, ItemStack stack);
     }
 
-    public static int countItem(ItemStack itemStack, ClientPlayerEntity player, World world) {
+    public static int countItem(ItemStack itemStack, PlayerEntity player, World world) {
         return countItem(itemStack, player, (tool, stack) -> {
             IItemHandler remoteInventory = GadgetUtils.getRemoteInventory(tool, world);
             return remoteInventory == null ? 0 : countInContainer(remoteInventory, stack.getItem());
         });
     }
 
-    public static int countItem(ItemStack itemStack, ClientPlayerEntity player, IRemoteInventoryProvider remoteInventory) {
+    public static int countItem(ItemStack itemStack, PlayerEntity player, IRemoteInventoryProvider remoteInventory) {
         if (player.isCreative())
             return Integer.MAX_VALUE;
 
@@ -186,7 +186,7 @@ public class InventoryHelper {
         return longToInt(count);
     }
 
-    public static int countPaste(ClientPlayerEntity player) {
+    public static int countPaste(PlayerEntity player) {
         if (player.isCreative())
             return Integer.MAX_VALUE;
 
@@ -259,7 +259,7 @@ public class InventoryHelper {
         return itemStack;
     }
 
-    public static boolean usePaste(ClientPlayerEntity player, int count) {
+    public static boolean usePaste(PlayerEntity player, int count) {
         if (player.isCreative()) {
             return true;
         }
@@ -368,7 +368,7 @@ public class InventoryHelper {
 
     }
 
-    public static NonNullList<ItemStack> getInventory(ClientPlayerEntity player) {
+    public static NonNullList<ItemStack> getInventory(PlayerEntity player) {
         IOrderedRegistry<IStackProvider> providers = Registries.getStackProviders();
         NonNullList<ItemStack> toProcess = playerInv(player);
         NonNullList<ItemStack> newStacks = NonNullList.create();
@@ -386,7 +386,7 @@ public class InventoryHelper {
         return results;
     }
 
-    private static NonNullList<ItemStack> playerInv(ClientPlayerEntity player) {
+    private static NonNullList<ItemStack> playerInv(PlayerEntity player) {
         NonNullList<ItemStack> wholeInv = NonNullList.from(ItemStack.EMPTY, (ItemStack[]) player.inventory.mainInventory.toArray());
         wholeInv.addAll(player.inventory.offHandInventory);
         wholeInv.addAll(player.inventory.armorInventory);

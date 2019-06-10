@@ -19,7 +19,7 @@ import com.google.common.collect.HashMultiset;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multiset;
 import net.minecraft.block.BlockState;
-import net.minecraft.client.entity.player.ClientPlayerEntity;
+import PlayerEntity;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -276,7 +276,7 @@ public class GadgetUtils {
         return NBTUtil.readBlockState(tagCompound.getCompound(NBTKeys.TE_CONSTRUCTION_STATE_ACTUAL));
     }
 
-    public static void selectBlock(ItemStack stack, ClientPlayerEntity player) {
+    public static void selectBlock(ItemStack stack, PlayerEntity player) {
         // Used to find which block the player is looking at, and store it in NBT on the tool.
         World world = player.world;
         RayTraceResult lookingAt = VectorHelper.getLookingAt(player, RayTraceContext.FluidMode.NONE);
@@ -300,7 +300,7 @@ public class GadgetUtils {
         setToolActualBlock(stack, actualState);
     }
 
-    public static ActionResultType setRemoteInventory(ItemStack stack, ClientPlayerEntity player, World world, BlockPos pos, boolean setTool) {
+    public static ActionResultType setRemoteInventory(ItemStack stack, PlayerEntity player, World world, BlockPos pos, boolean setTool) {
         TileEntity te = world.getTileEntity(pos);
         if (te == null)
             return ActionResultType.PASS;
@@ -347,7 +347,7 @@ public class GadgetUtils {
         return true;
     }
 
-    public static boolean setRemoteInventory(ClientPlayerEntity player, ItemStack tool, BlockPos pos, World world) {
+    public static boolean setRemoteInventory(PlayerEntity player, ItemStack tool, BlockPos pos, World world) {
         if (getRemoteInventory(pos, DimensionType.getKey(player.dimension), world) != null) {
             boolean same = pos.equals(getPOSFromNBT(tool, NBTKeys.REMOTE_INVENTORY_POS));
             writePOSToNBT(tool, same ? null : pos, NBTKeys.REMOTE_INVENTORY_POS, player.dimension);

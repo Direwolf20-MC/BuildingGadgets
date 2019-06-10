@@ -3,7 +3,8 @@ package com.direwolf20.buildinggadgets.test.util;
 import com.direwolf20.buildinggadgets.api.building.Region;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
-import net.minecraft.client.entity.player.ClientPlayerEntity;
+import PlayerEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.IFluidState;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
@@ -77,7 +78,7 @@ public class RegionBlockView implements IWorldReader {
 
     @Nullable
     @Override
-    public ClientPlayerEntity getClosestPlayer(double x, double y, double z, double distance, Predicate<Entity> predicate) {
+    public PlayerEntity getClosestPlayer(double x, double y, double z, double distance, Predicate<Entity> predicate) {
         return null;
     }
 

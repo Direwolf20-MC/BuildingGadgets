@@ -3,7 +3,7 @@ package com.direwolf20.buildinggadgets.api.building;
 import com.google.common.collect.AbstractIterator;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.block.BlockState;
-import net.minecraft.client.entity.player.ClientPlayerEntity;
+import PlayerEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;

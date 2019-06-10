@@ -8,11 +8,12 @@ import com.direwolf20.buildinggadgets.common.util.tools.UniqueItem;
 import com.google.common.collect.Multiset;
 import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.player.ClientPlayerEntity;
+import PlayerEntity;
 import net.minecraft.client.gui.widget.list.ExtendedList;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
@@ -21,6 +22,7 @@ import java.awt.*;
 
 import static com.direwolf20.buildinggadgets.client.gui.materiallist.ScrollingMaterialList.Entry;
 import static com.direwolf20.buildinggadgets.client.utils.RenderUtil.getFontRenderer;
+import static net.minecraft.client.Minecraft.getInstance;
 import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
 import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
 
@@ -52,7 +54,7 @@ class ScrollingMaterialList extends GuiEntryList<Entry> {
         this.setSortingMode(SortingModes.NAME);
         this.selectedElement = -1;
 
-        ClientPlayerEntity player = Minecraft.getInstance().player;
+        PlayerEntity player = getInstance().player;
         World world = Minecraft.getInstance().world;
         for (Multiset.Entry<UniqueItem> entry : materials.entrySet()) {
             UniqueItem item = entry.getElement();

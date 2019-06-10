@@ -3,7 +3,7 @@ package com.direwolf20.buildinggadgets.api.building;
 import com.direwolf20.buildinggadgets.api.capability.CapabilityBlockProvider;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.resources.I18n;
-import net.minecraft.client.entity.player.ClientPlayerEntity;
+import PlayerEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Direction;

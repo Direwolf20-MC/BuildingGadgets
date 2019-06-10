@@ -8,7 +8,8 @@ import com.direwolf20.buildinggadgets.common.util.lang.TooltipTranslation;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.world.WorldSave;
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.client.entity.player.ClientPlayerEntity;
+import PlayerEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
@@ -68,7 +69,7 @@ public class Template extends Item implements ITemplate {
     }
 
     @Override
-    public ActionResult<ItemStack> onItemRightClick(World world, ClientPlayerEntity player, Hand hand) {
+    public ActionResult<ItemStack> onItemRightClick(World world, PlayerEntity player, Hand hand) {
         if (world.isRemote)
             GuiMod.MATERIAL_LIST.openScreen(player);
         ItemStack itemstack = player.getHeldItem(hand);

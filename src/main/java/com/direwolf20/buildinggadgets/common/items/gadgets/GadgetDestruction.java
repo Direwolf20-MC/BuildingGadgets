@@ -18,7 +18,7 @@ import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.client.entity.player.ClientPlayerEntity;
+import PlayerEntity;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -425,7 +425,7 @@ public class GadgetDestruction extends GadgetGeneric {
         worldSave.markForSaving();
     }
 
-    public static void undo(ClientPlayerEntity player, ItemStack stack) {
+    public static void undo(PlayerEntity player, ItemStack stack) {
         World world = player.world;
         WorldSave worldSave = WorldSave.getWorldSaveDestruction(world);
         CompoundNBT tag = worldSave.getCompoundFromUUID(getUUID(stack));
