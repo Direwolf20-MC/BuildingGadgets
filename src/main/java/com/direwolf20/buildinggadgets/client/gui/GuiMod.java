@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.client.gui;
 
-import com.direwolf20.buildinggadgets.client.gui.materiallist.MaterialListGUI;
+//import com.direwolf20.buildinggadgets.client.gui.materiallist.MaterialListGUI;
 import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManagerContainer;
 import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManagerGUI;
 import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManagerTileEntity;
@@ -47,8 +47,8 @@ public enum GuiMod {
             return true;
         }
         return false;
-    }),
-    MATERIAL_LIST(ITemplate::getTemplate, MaterialListGUI::new);
+    });
+//    MATERIAL_LIST(ITemplate::getTemplate, MaterialListGUI::new);
 
     private static interface IContainerOpener {
         boolean open(String id, ServerPlayerEntity player, World world, BlockPos pos);

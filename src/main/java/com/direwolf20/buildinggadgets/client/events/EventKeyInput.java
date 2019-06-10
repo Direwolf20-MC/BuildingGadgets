@@ -46,8 +46,9 @@ public class EventKeyInput {
             PacketHandler.sendToServer(new PacketToggleFuzzy());
         } else if (KeyBindings.connectedArea.isPressed()) {
             PacketHandler.sendToServer(new PacketToggleConnectedArea());
-        } else if (KeyBindings.materialList.isPressed()) {
-            GuiMod.MATERIAL_LIST.openScreen(mc.player);
         }
+            //        } else if (KeyBindings.materialList.isPressed()) {
+//            GuiMod.MATERIAL_LIST.openScreen(mc.player);
+//        }
     }
 }

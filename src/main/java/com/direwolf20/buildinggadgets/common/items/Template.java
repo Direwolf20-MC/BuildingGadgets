@@ -70,8 +70,8 @@ public class Template extends Item implements ITemplate {
 
     @Override
     public ActionResult<ItemStack> onItemRightClick(World world, PlayerEntity player, Hand hand) {
-        if (world.isRemote)
-            GuiMod.MATERIAL_LIST.openScreen(player);
+//        if (world.isRemote)
+//            GuiMod.MATERIAL_LIST.openScreen(player);
         ItemStack itemstack = player.getHeldItem(hand);
         return new ActionResult<>(ActionResultType.SUCCESS, itemstack);
     }
