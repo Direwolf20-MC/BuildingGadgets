@@ -138,7 +138,7 @@ public class GuiEntryList<E extends AbstractListEntry<E>> extends ExtendedList<E
                 int i1 = left + width / 2 - getListWidth() / 2;
                 int j1 = left + width / 2 + getListWidth() / 2;
                 GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-                GlStateManager.disableTexture2D();
+                GlStateManager.disableTexture();
                 buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
                 buffer.pos((double) i1, (double) (entryY + actualHeight + 2), 0.0D).tex(0.0D, 1.0D).color(128, 128, 128, 255).endVertex();
                 buffer.pos((double) j1, (double) (entryY + actualHeight + 2), 0.0D).tex(1.0D, 1.0D).color(128, 128, 128, 255).endVertex();
@@ -149,7 +149,7 @@ public class GuiEntryList<E extends AbstractListEntry<E>> extends ExtendedList<E
                 buffer.pos((double) (j1 - 1), (double) (entryY - 1), 0.0D).tex(1.0D, 0.0D).color(0, 0, 0, 255).endVertex();
                 buffer.pos((double) (i1 + 1), (double) (entryY - 1), 0.0D).tex(0.0D, 0.0D).color(0, 0, 0, 255).endVertex();
                 tessellator.draw();
-                GlStateManager.enableTexture2D();
+                GlStateManager.enableTexture();
             }
 
             drawSlot(i, insideLeft, entryY, actualHeight, mouseXIn, mouseYIn, partialTicks);
@@ -157,31 +157,8 @@ public class GuiEntryList<E extends AbstractListEntry<E>> extends ExtendedList<E
     }
 
     @Override
-    protected void drawBackground() {
-    }
-
-    /**
-     * Center background. Default setting is to draw a gradient rectangle from {@code 0xC0101010} to {@code
-     * 0xD0101010}.
-     */
-    @Override
-    protected void drawContainerBackground(Tessellator tessellator) {
-        drawGradientRect(left, getTop(), right, bottom, 0xC0101010, 0xD0101010);
-    }
-
-    /**
-     * Top and bottom overlay pieces. Default setting is draw nothing
-     */
-    @Override
-    protected void overlayBackground(int startY, int endY, int startAlpha, int endAlpha) {
-    }
-
-    /**
-     * Triggers when the player clicks on an entry.
-     */
-    @Override
-    protected boolean mouseClicked(int index, int button, double x, double y) {
-        return super.mouseClicked(index, button, x, y);
+    protected void renderBackground() {
+        fillGradient(getLeft(), getTop(), getRight(), getBottom(), 0xC0101010, 0xD0101010);
     }
 
     /**
@@ -194,7 +171,7 @@ public class GuiEntryList<E extends AbstractListEntry<E>> extends ExtendedList<E
     public boolean mouseClicked(double x, double y, int button) {
         setDragging(true);
         super.mouseClicked(x, y, button);
-        return isMouseInList(x, y);
+        return isMouseOver(x, y);
     }
 
     /**

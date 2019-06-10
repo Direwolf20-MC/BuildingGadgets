@@ -62,9 +62,10 @@ class ScrollingMaterialList extends GuiEntryList<Entry> {
     }
 
     @Override
-    protected int getScrollBarX() {
-        return right - MARGIN - SCROLL_BAR_WIDTH;
+    protected int getScrollbarPosition() {
+        return getRight() - MARGIN - SCROLL_BAR_WIDTH;
     }
+
 
     static class Entry extends ExtendedList.AbstractListEntry<Entry> {
 
@@ -129,13 +130,13 @@ class ScrollingMaterialList extends GuiEntryList<Entry> {
                 GlStateManager.enableAlphaTest();
                 GlStateManager.enableBlend();
                 GlStateManager.blendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-                parent.drawHorizontalLine(lineXStart, lineXEnd, lineY, 0x22FFFFFF);
+                parent.hLine(lineXStart, lineXEnd, lineY, 0x22FFFFFF);
             }
         }
 
         private void drawHoveringText(ItemStack item, int slotX, int slotY, int mouseX, int mouseY) {
-            if (parent.isMouseInList(mouseX, mouseY) && AlignmentUtil.isPointInBox(mouseX, mouseY, slotX, slotY, 18, 18))
-                parent.gui.setTaskHoveringText(mouseX, mouseY, parent.gui.getItemToolTip(item));
+            if (parent.isMouseOver(mouseX, mouseY) && AlignmentUtil.isPointInBox(mouseX, mouseY, slotX, slotY, 18, 18))
+                parent.gui.setTaskHoveringText(mouseX, mouseY, parent.gui.getTooltipFromItem(item));
         }
 
         private void drawIcon(ItemStack item, int slotX, int slotY) {
@@ -208,7 +209,7 @@ class ScrollingMaterialList extends GuiEntryList<Entry> {
 
     public void setSortingMode(SortingModes sortingMode) {
         this.sortingMode = sortingMode;
-        getChildren().sort(sortingMode.getComparator());
+        children().sort(sortingMode.getComparator());
     }
 
 }

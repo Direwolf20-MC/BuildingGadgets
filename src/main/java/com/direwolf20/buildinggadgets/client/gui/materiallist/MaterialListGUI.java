@@ -1,18 +1,22 @@
 package com.direwolf20.buildinggadgets.client.gui.materiallist;
 
 import com.direwolf20.buildinggadgets.client.gui.base.BasicGUIBase;
+import com.direwolf20.buildinggadgets.client.utils.AlignmentUtil;
 import com.direwolf20.buildinggadgets.client.utils.RenderUtil;
 import com.direwolf20.buildinggadgets.common.items.ITemplate;
+import com.direwolf20.buildinggadgets.common.util.lang.MaterialListTranslation;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.google.common.base.Preconditions;
 import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.Widget;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 
 import java.awt.*;
 import java.util.List;
@@ -72,9 +76,8 @@ public class MaterialListGUI extends BasicGUIBase {
         this.template = template;
     }
 
-    /* //TODO find replacement
     @Override
-    public void initGui() {
+    public void init() {
         this.backgroundX = AlignmentUtil.getXForAlignedCenter(BACKGROUND_WIDTH, 0, width);
         this.backgroundY = AlignmentUtil.getYForAlignedCenter(BACKGROUND_HEIGHT, 0, height);
 
@@ -89,11 +92,11 @@ public class MaterialListGUI extends BasicGUIBase {
 
         int buttonY = getWindowBottomY() - (ScrollingMaterialList.BOTTOM / 2 + BUTTON_HEIGHT / 2);
         this.buttonClose = new Button(0, buttonY, 0, BUTTON_HEIGHT, MaterialListTranslation.BUTTON_CLOSE.format(), b -> Minecraft.getInstance().player.closeScreen());
-        this.buttonSortingModes = new Button(0, buttonY, 0, BUTTON_HEIGHT, scrollingList.getSortingMode().getLocalizedName(), () -> {
+        this.buttonSortingModes = new Button(0, buttonY, 0, BUTTON_HEIGHT, scrollingList.getSortingMode().getLocalizedName(), (button) -> {
             scrollingList.setSortingMode(scrollingList.getSortingMode().next());
             buttonSortingModes.setMessage(scrollingList.getSortingMode().getLocalizedName());
         });
-        this.buttonCopyList = new Button(0, buttonY, 0, BUTTON_HEIGHT, MaterialListTranslation.BUTTON_COPY.format(), () -> {
+        this.buttonCopyList = new Button(0, buttonY, 0, BUTTON_HEIGHT, MaterialListTranslation.BUTTON_COPY.format(), (button) -> {
             getMinecraft().keyboardListener.setClipboardString(stringify(Screen.hasControlDown()));
             getMinecraft().player.sendStatusMessage(new TranslationTextComponent(MaterialListTranslation.MESSAGE_COPY_SUCCESS.getTranslationKey()), true);
         });
@@ -103,7 +106,7 @@ public class MaterialListGUI extends BasicGUIBase {
         this.addButton(buttonCopyList);
         this.addButton(buttonClose);
         this.calculateButtonsWidthAndX();
-    }*/
+    }
 
     private String stringify(boolean detailed) {
         if (detailed)
@@ -112,7 +115,7 @@ public class MaterialListGUI extends BasicGUIBase {
     }
 
     private String stringifyDetailed() {
-        return scrollingList.getChildren().stream()
+        return scrollingList.children().stream()
                 .map(entry -> String.format(PATTERN_DETAILED,
                         entry.getItemName(),
                         entry.getRequired(),
@@ -122,7 +125,7 @@ public class MaterialListGUI extends BasicGUIBase {
     }
 
     private String stringifySimple() {
-        return scrollingList.getChildren().stream()
+        return scrollingList.children().stream()
                 .map(entry -> String.format(PATTERN_SIMPLE,
                         entry.getItemName(),
                         entry.getRequired()))
