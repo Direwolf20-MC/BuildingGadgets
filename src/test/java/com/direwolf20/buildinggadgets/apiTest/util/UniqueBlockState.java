@@ -18,12 +18,10 @@ import net.minecraft.pathfinding.PathType;
 import net.minecraft.state.IProperty;
 import net.minecraft.tags.Tag;
 import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
 import net.minecraft.util.Mirror;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.world.*;
@@ -32,6 +30,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Objects;
 import java.util.Random;
+
+// fixme: as of 1.14 I have done some things to this that I'm not sure
+//        are completely correct. Please verify. See https://github.com/Direwolf20-MC/BuildingGadgets/commit/62c5180cb29d6184e0ce005336e8ea17c75cd1e0 for existing code
 
 /**
  * Fake block state without launching Minecraft. This should be used as an identifier and most of the functions and block

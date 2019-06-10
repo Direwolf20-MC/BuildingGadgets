@@ -35,6 +35,14 @@ sourceSets {
             'src/api/resources'
         }
     }
+    apiTest {
+        java {
+            'src/test/java/com/direworld20/buildinggagdgets/apiTest'
+        }
+        resources {
+            'src/apiTest/resources'
+        }
+    }
     main {
         java {
             'src/main/java'
