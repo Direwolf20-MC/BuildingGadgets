@@ -134,9 +134,9 @@ public class GuiEntryList<E extends AbstractListEntry<E>> extends ExtendedList<E
                 continue;
             }
 
-            if (showSelectionBox && isSelected(i)) {
-                int i1 = left + width / 2 - getListWidth() / 2;
-                int j1 = left + width / 2 + getListWidth() / 2;
+            if (renderSelection && isSelectedItem(i)) {
+                int i1 = left + width / 2 - getRowWidth() / 2;
+                int j1 = left + width / 2 + getRowWidth() / 2;
                 GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
                 GlStateManager.disableTexture();
                 buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
@@ -152,7 +152,7 @@ public class GuiEntryList<E extends AbstractListEntry<E>> extends ExtendedList<E
                 GlStateManager.enableTexture();
             }
 
-            drawSlot(i, insideLeft, entryY, actualHeight, mouseXIn, mouseYIn, partialTicks);
+            renderList(i, insideLeft, entryY, actualHeight, mouseXIn, mouseYIn, partialTicks);
         }
     }
 

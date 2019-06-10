@@ -51,7 +51,6 @@ class ScrollingMaterialList extends GuiEntryList<Entry> {
 
         Multiset<UniqueItem> materials = gui.getTemplateItem().getItemCountMap(gui.getTemplate());
         this.setSortingMode(SortingModes.NAME);
-        this.selectedElement = -1;
 
         PlayerEntity player = getInstance().player;
         World world = Minecraft.getInstance().world;

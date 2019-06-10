@@ -425,10 +425,11 @@ public class ModeRadialMenu extends Screen {
     @Override
     public void tick() {
 //    TODO 1.13 only works for bound keys; not bound mouse buttons
-        if (! InputMappings.getInputByName(KeyBindings.menuSettings.getKey())) {
-            //close(); //TODO figure it out
-            changeMode();
-        }
+//    fixme: implement back for 1.14
+//        if (! InputMappings.getInputByName(KeyBindings.menuSettings.getKey())) {
+//            //close(); //TODO figure it out
+//            changeMode();
+//        }
 
         ImmutableSet<KeyBinding> set = ImmutableSet.of(getMinecraft().gameSettings.keyBindForward, getMinecraft().gameSettings.keyBindLeft, getMinecraft().gameSettings.keyBindBack, getMinecraft().gameSettings.keyBindRight, getMinecraft().gameSettings.keyBindSneak, getMinecraft().gameSettings.keyBindSprint, getMinecraft().gameSettings.keyBindJump);
         for (KeyBinding k : set)
