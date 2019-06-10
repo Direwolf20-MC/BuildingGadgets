@@ -1,8 +1,8 @@
-package com.direwolf20.buildinggadgets.test.registry;
+package com.direwolf20.buildinggadgets.apiTest.registry;
 
 import com.direwolf20.buildinggadgets.api.registry.IOrderedRegistry;
 import com.direwolf20.buildinggadgets.api.registry.TopologicalRegistryBuilder;
-import com.direwolf20.buildinggadgets.test.util.annotations.SingleTest;
+import com.direwolf20.buildinggadgets.apiTest.util.annotations.SingleTest;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import net.minecraft.util.ResourceLocation;

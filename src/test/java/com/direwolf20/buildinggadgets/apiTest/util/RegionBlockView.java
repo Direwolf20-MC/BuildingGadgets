@@ -1,7 +1,8 @@
-package com.direwolf20.buildinggadgets.test.util;
+package com.direwolf20.buildinggadgets.apiTest.util;
 
 import com.direwolf20.buildinggadgets.api.building.Region;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.IFluidState;
@@ -39,7 +40,7 @@ public class RegionBlockView implements IWorldReader {
 
     @Override
     public BlockState getBlockState(BlockPos pos) {
-        return region.contains(pos) ? state : UniqueBlockState.AIR;
+        return region.contains(pos) ? state : Blocks.AIR.getDefaultState();
     }
 
     @Override

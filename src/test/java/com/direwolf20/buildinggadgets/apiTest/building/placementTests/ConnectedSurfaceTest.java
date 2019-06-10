@@ -1,9 +1,9 @@
-package com.direwolf20.buildinggadgets.test.building.placementTests;
+package com.direwolf20.buildinggadgets.apiTest.building.placementTests;
 
 import com.direwolf20.buildinggadgets.api.building.Region;
 import com.direwolf20.buildinggadgets.api.building.placement.ConnectedSurface;
 import com.direwolf20.buildinggadgets.api.util.VectorUtils;
-import com.direwolf20.buildinggadgets.test.util.CasedBlockView;
+import com.direwolf20.buildinggadgets.apiTest.util.CasedBlockView;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.Direction;
@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Random;
 import java.util.Set;
 
-import static com.direwolf20.buildinggadgets.test.util.CasedBlockView.regionAtOriginWithRandomTargets;
+import static com.direwolf20.buildinggadgets.apiTest.util.CasedBlockView.regionAtOriginWithRandomTargets;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Disabled("needs improvements of the UniqueBlockState to handle air properly")

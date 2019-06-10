@@ -1,4 +1,4 @@
-package com.direwolf20.buildinggadgets.test.util.annotations;
+package com.direwolf20.buildinggadgets.apiTest.util.annotations;
 
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Tag;

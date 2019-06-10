@@ -1,4 +1,4 @@
-package com.direwolf20.buildinggadgets.test.toolsTest;
+package com.direwolf20.buildinggadgets.apiTest.toolsTest;
 
 import com.direwolf20.buildinggadgets.api.util.VectorUtils;
 import net.minecraft.util.math.BlockPos;

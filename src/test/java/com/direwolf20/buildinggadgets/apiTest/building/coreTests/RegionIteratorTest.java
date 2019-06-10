@@ -1,4 +1,4 @@
-package com.direwolf20.buildinggadgets.test.building.coreTests;
+package com.direwolf20.buildinggadgets.apiTest.building.coreTests;
 
 import com.direwolf20.buildinggadgets.api.building.Region;
 import com.direwolf20.buildinggadgets.api.util.CommonUtils;

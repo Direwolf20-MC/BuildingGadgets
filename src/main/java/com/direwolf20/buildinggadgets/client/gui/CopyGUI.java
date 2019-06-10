@@ -46,7 +46,7 @@ public class CopyGUI extends GuiScreenTextFields {
         if (startPos == null) startPos = new BlockPos(0, 0, 0);
         if (endPos == null) endPos = new BlockPos(0, 0, 0);
 
-        startX = addField(65, 15, startPos.getX());
+        startX = addField(guiLeft + 65, 15, startPos.getX());
         startY = addField(165, 15, startPos.getY());
         startZ = addField(265, 15, startPos.getZ());
         endX = addField(65, 35, endPos.getX());

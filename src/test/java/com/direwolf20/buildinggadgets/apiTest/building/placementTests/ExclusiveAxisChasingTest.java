@@ -1,9 +1,9 @@
-package com.direwolf20.buildinggadgets.test.building.placementTests;
+package com.direwolf20.buildinggadgets.apiTest.building.placementTests;
 
 import com.direwolf20.buildinggadgets.api.building.Region;
 import com.direwolf20.buildinggadgets.api.building.placement.ExclusiveAxisChasing;
-import com.direwolf20.buildinggadgets.test.util.BlockTestUtils;
-import com.direwolf20.buildinggadgets.test.util.annotations.LargeTest;
+import com.direwolf20.buildinggadgets.apiTest.util.BlockTestUtils;
+import com.direwolf20.buildinggadgets.apiTest.util.annotations.LargeTest;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import org.junit.jupiter.api.BeforeAll;

@@ -1,4 +1,4 @@
-package com.direwolf20.buildinggadgets.test.building.placementTests;
+package com.direwolf20.buildinggadgets.apiTest.building.placementTests;
 
 import com.direwolf20.buildinggadgets.api.building.placement.Wall;
 import net.minecraft.util.Direction;
