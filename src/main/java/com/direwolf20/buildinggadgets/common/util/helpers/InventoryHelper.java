@@ -11,16 +11,17 @@ import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.google.common.collect.ImmutableSet;
 import net.minecraft.block.*;
-import net.minecraft.block.BlockState;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemUseContext;
 import net.minecraft.state.EnumProperty;
 import net.minecraft.state.IProperty;
 import net.minecraft.util.Direction;
+import net.minecraft.util.Hand;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
@@ -340,15 +341,14 @@ public class InventoryHelper {
         return new ItemStack(state.getBlock());
     }
 
-    public static BlockState getSpecificStates(BlockState originalState, World world, ClientPlayerEntity player, BlockPos pos, ItemStack tool) {
+    public static BlockState getSpecificStates(BlockState originalState, World world, PlayerEntity player, BlockPos pos, ItemStack tool) {
         BlockState placeState;
         Block block = originalState.getBlock();
         ItemStack item = block.getPickBlock(originalState, null, world, pos, player);
 
         try {
             placeState = originalState.getBlock().getStateForPlacement(
-                    new BlockItemUseContext(world, player, item, pos, Direction.UP, 0.5F, 0.0F, 0.5F)
-                                                                      );
+                    new BlockItemUseContext(new ItemUseContext(player, Hand.MAIN_HAND, VectorHelper.getLookingAt(player, tool))));
         } catch (Exception var8) {
             placeState = originalState.getBlock().getDefaultState();
         }
