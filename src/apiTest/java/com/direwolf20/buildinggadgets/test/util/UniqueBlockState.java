@@ -1,4 +1,4 @@
-package com.direwolf20.buildinggadgets.apiTest.util;
+package com.direwolf20.buildinggadgets.test.util;
 
 import com.google.common.collect.ImmutableMap;
 import net.minecraft.block.Block;

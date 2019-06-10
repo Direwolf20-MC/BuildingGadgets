@@ -1,8 +1,8 @@
-package com.direwolf20.buildinggadgets.apiTest.building.placementTests;
+package com.direwolf20.buildinggadgets.test.building.placementTests;
 
 import com.direwolf20.buildinggadgets.api.building.Region;
 import com.direwolf20.buildinggadgets.api.building.placement.Surface;
-import com.direwolf20.buildinggadgets.apiTest.util.CasedBlockView;
+import com.direwolf20.buildinggadgets.test.util.CasedBlockView;
 import com.google.common.collect.Sets;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
