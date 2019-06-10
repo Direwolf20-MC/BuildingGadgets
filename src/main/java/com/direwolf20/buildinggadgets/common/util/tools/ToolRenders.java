@@ -32,6 +32,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GLAllocation;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -90,8 +91,7 @@ public class ToolRenders {
         ItemStack heldItem = GadgetBuilding.getGadget(player);
         if (heldItem.isEmpty()) return;
 
-        Minecraft mc = Minecraft.getInstance();
-//        mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+        mc.getTextureManager().bindTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
 
         //Calculate the players current position, which is needed later
         double doubleX = player.lastTickPosX + (player.posX - player.lastTickPosX) * evt.getPartialTicks();
@@ -103,13 +103,14 @@ public class ToolRenders {
         renderLinkedInventoryOutline(stack, player, doubleX, doubleY, doubleZ);
 
         BlockRayTraceResult lookingAt = VectorHelper.getLookingAt(player, heldItem);
+
         BlockState state = Blocks.AIR.getDefaultState();
         List<BlockPos> coordinates = getAnchor(stack);
         if (lookingAt != null || coordinates.size() > 0) {
             World world = player.world;
             BlockState startBlock = Blocks.AIR.getDefaultState();
             if (!(lookingAt == null)) {
-                startBlock = world.getBlockState(new BlockPos(lookingAt.getHitVec()));
+                startBlock = world.getBlockState(lookingAt.getPos());
             }
             if (startBlock != BGBlocks.effectBlock.getDefaultState()) {
 
@@ -237,8 +238,8 @@ public class ToolRenders {
         startBlock = world.getBlockState(new BlockPos(lookingAt.getHitVec()));
         if (startBlock != BGBlocks.effectBlock.getDefaultState()) {
             BlockState renderBlockState = getToolBlock(stack);
-            Minecraft mc = Minecraft.getInstance();
-//                mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+
+            mc.getTextureManager().bindTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
             if (renderBlockState == Blocks.AIR.getDefaultState()) {//Don't render anything if there is no block selected (Air)
                 return;
             }
@@ -385,8 +386,7 @@ public class ToolRenders {
     }
 
     private static void renderDestructionOverlay(PlayerEntity player, World world, BlockPos startBlock, Direction facing, ItemStack heldItem) {
-        Minecraft mc = Minecraft.getInstance();
-//        mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+        mc.getTextureManager().bindTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
 
         SortedSet<BlockPos> coordinates = GadgetDestruction.getArea(world, startBlock, facing, player, heldItem);
 
@@ -458,8 +458,7 @@ public class ToolRenders {
         double doubleY = player.lastTickPosY + (player.posY - player.lastTickPosY) * evt.getPartialTicks();
         double doubleZ = player.lastTickPosZ + (player.posZ - player.lastTickPosZ) * evt.getPartialTicks();
 
-        Minecraft mc = Minecraft.getInstance();
-//        mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+        mc.getTextureManager().bindTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
 
         renderLinkedInventoryOutline(stack, player, doubleX, doubleY, doubleZ);
 

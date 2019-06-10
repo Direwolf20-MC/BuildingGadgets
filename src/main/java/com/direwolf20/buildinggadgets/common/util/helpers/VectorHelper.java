@@ -7,8 +7,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.*;
 import net.minecraft.world.World;
 
-//import net.minecraft.util.math.RayTraceFluidMode;
-
 public class VectorHelper {
 
     public static BlockRayTraceResult getLookingAt(PlayerEntity player, ItemStack tool) {

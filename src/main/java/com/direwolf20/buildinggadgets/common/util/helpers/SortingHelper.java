@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.common.util.helpers;
 
+import com.direwolf20.buildinggadgets.common.util.UnnamedCompat;
 import it.unimi.dsi.fastutil.doubles.Double2ObjectArrayMap;
 import it.unimi.dsi.fastutil.doubles.Double2ObjectMap;
 import it.unimi.dsi.fastutil.doubles.DoubleRBTreeSet;
@@ -42,7 +43,7 @@ public class SortingHelper {
                     z = player.posZ;
 
             list.forEach(pos -> {
-                double distance = pos.distanceSq(new Vec3i(x, y, z));
+                double distance = UnnamedCompat.BlockPosition.distanceSqToCenter(pos, x, y, z);
 
                 rangeMap.put(distance, pos);
                 distances.add(distance);
