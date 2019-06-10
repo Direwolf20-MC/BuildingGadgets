@@ -19,7 +19,6 @@ def env = System.getenv()
 if (env.BUILD_NUMBER) {
     version = version + "-" + "${env.BUILD_NUMBER}"
 }
-
 group = 'com.direwolf20.buildinggadgets' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'buildinggadgets'
 String forgeVersion = "$minecraft_version-${forge_major}.$forge_minor"
@@ -37,7 +36,7 @@ sourceSets {
     }
     apiTest {
         java {
-            'src/test/java/com/direworld20/buildinggagdgets/apiTest'
+            'src/apiTest/java'
         }
         resources {
             'src/apiTest/resources'
