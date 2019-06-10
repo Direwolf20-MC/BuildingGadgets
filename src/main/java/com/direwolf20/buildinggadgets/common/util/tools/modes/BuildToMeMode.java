@@ -7,7 +7,7 @@ import com.direwolf20.buildinggadgets.api.building.placement.ExclusiveAxisChasin
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.lang.ModeTranslation;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
-import net.minecraft.client.entity.player.ClientPlayerEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
@@ -29,13 +29,13 @@ public class BuildToMeMode extends AtopSupportedMode {
     }
 
     @Override
-    public IPositionPlacementSequence computeWithTransformed(ClientPlayerEntity player, BlockPos transformed, BlockPos original, Direction sideHit, ItemStack tool) {
+    public IPositionPlacementSequence computeWithTransformed(PlayerEntity player, BlockPos transformed, BlockPos original, Direction sideHit, ItemStack tool) {
         int range = GadgetUtils.getToolRange(tool);
         return ExclusiveAxisChasing.create(transformed, new BlockPos(Math.floor(player.posX), Math.floor(player.posY), Math.floor(player.posZ)), sideHit, range);
     }
 
     @Override
-    public BlockPos transformAtop(ClientPlayerEntity player, BlockPos hit, Direction sideHit, ItemStack tool) {
+    public BlockPos transformAtop(PlayerEntity player, BlockPos hit, Direction sideHit, ItemStack tool) {
         return hit.offset(sideHit);
     }
 

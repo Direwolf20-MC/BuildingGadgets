@@ -61,12 +61,14 @@ public class WorldSave extends WorldSavedData {
     private static <T extends WorldSave> WorldSave get(World world, String name, Function<String, T> factory) {
         name = String.join("_", Reference.MODID, name);
         DimensionType dim = world.getDimension().getType();
-        WorldSave instance = world.func_212411_a(dim, factory, name);
+        /*
+        WorldSave instance = world.func_212409_a(dim, factory, name);
         if (instance == null) {
             instance = factory.apply(name);
             world.func_212409_a(dim, name, instance);
         }
-        return instance;
+        return instance;*/
+        return null;//TODO fix once we find out, how to access worldSave's
     }
 
     @Override

@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.common.util.tools.modes;
 
-import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.api.building.IBuildingMode;
+import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
@@ -9,7 +9,6 @@ import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.block.BlockState;
-import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -77,7 +76,7 @@ public enum ExchangingMode {
         return mode.createExecutionContext(player, hit, sideHit, tool).collectFilteredSequence(world, tool, player, initial);
     }
 
-    public static BiPredicate<BlockPos, BlockState> combineTester(World world, ItemStack tool, ClientPlayerEntity player, BlockPos initial) {
+    public static BiPredicate<BlockPos, BlockState> combineTester(World world, ItemStack tool, PlayerEntity player, BlockPos initial) {
         BlockState initialBlockState = world.getBlockState(initial);
         BlockState target = GadgetUtils.getToolBlock(tool);
         return (pos, state) -> {

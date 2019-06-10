@@ -5,6 +5,7 @@ import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
+import com.direwolf20.buildinggadgets.common.util.UnnamedCompat;
 import com.direwolf20.buildinggadgets.common.util.helpers.InventoryHelper;
 import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
 import com.direwolf20.buildinggadgets.common.util.helpers.SortingHelper;
@@ -23,7 +24,6 @@ import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
@@ -133,7 +133,7 @@ public class GadgetBuilding extends GadgetGeneric implements IAtopPlacingGadget 
     }
 
     @Override
-    public ActionResult<ItemStack> onItemRightClick(World world, ClientPlayerEntity player, Hand hand) {
+    public ActionResult<ItemStack> onItemRightClick(World world, PlayerEntity player, Hand hand) {
         //On item use, if sneaking, select the block clicked on, else build -- This is called when you right click a tool NOT on a block.
         ItemStack itemstack = player.getHeldItem(hand);
         /*CompoundNBT tagCompound = itemstack.getTag();
@@ -153,18 +153,18 @@ public class GadgetBuilding extends GadgetGeneric implements IAtopPlacingGadget 
         return new ActionResult<>(ActionResultType.SUCCESS, itemstack);
     }
 
-    public void toggleMode(ServerPlayerEntity player, ItemStack heldItem) {//TODO unused
+    public void toggleMode(PlayerEntity player, ItemStack heldItem) {//TODO unused
         setMode(player, heldItem, getToolMode(heldItem).next().ordinal());
     }
 
-    public void setMode(ServerPlayerEntity player, ItemStack heldItem, int modeInt) {
+    public void setMode(PlayerEntity player, ItemStack heldItem, int modeInt) {
         //Called when we specify a mode with the radial menu
         BuildingMode mode = BuildingMode.values()[modeInt];
         setToolMode(heldItem, mode);
         player.sendStatusMessage(new StringTextComponent(TextFormatting.AQUA + new TranslationTextComponent("message.gadget.toolmode").getUnformattedComponentText() + ": " + mode), true);
     }
 
-    public static void rangeChange(ClientPlayerEntity player, ItemStack heldItem) {
+    public static void rangeChange(PlayerEntity player, ItemStack heldItem) {
         //Called when the range change hotkey is pressed
         int range = getToolRange(heldItem);
         int changeAmount = (getToolMode(heldItem) != BuildingMode.SURFACE || (range % 2 == 0)) ? 1 : 2;
@@ -177,7 +177,7 @@ public class GadgetBuilding extends GadgetGeneric implements IAtopPlacingGadget 
         player.sendStatusMessage(new StringTextComponent(TextFormatting.DARK_AQUA + new TranslationTextComponent("message.gadget.toolrange").getUnformattedComponentText() + ": " + range), true);
     }
 
-    private boolean build(ClientPlayerEntity player, ItemStack stack) {
+    private boolean build(PlayerEntity player, ItemStack stack) {
         //Build the blocks as shown in the visual render
         World world = player.world;
         List<BlockPos> coords = getAnchor(stack);
@@ -230,7 +230,7 @@ public class GadgetBuilding extends GadgetGeneric implements IAtopPlacingGadget 
         return true;
     }
 
-    public static boolean undoBuild(ClientPlayerEntity player) {
+    public static boolean undoBuild(PlayerEntity player) {
         ItemStack heldItem = getGadget(player);
         if (heldItem.isEmpty())
             return false;
@@ -260,7 +260,7 @@ public class GadgetBuilding extends GadgetGeneric implements IAtopPlacingGadget 
                 if (distance < 64 && sameDim && currentBlock != BGBlocks.effectBlock.getDefaultState() && !cancelled) { //Don't allow us to undo a block while its still being placed or too far away
                     if (currentBlock != Blocks.AIR.getDefaultState()) {
                         currentBlock.getBlock().harvestBlock(world, player, coord, currentBlock, world.getTileEntity(coord), silkTool);
-                        world.spawnEntity(new BlockBuildEntity(world, coord, player, currentBlock, BlockBuildEntity.Mode.REMOVE, false));
+                        UnnamedCompat.World.spawnEntity(world, new BlockBuildEntity(world, coord, player, currentBlock, BlockBuildEntity.Mode.REMOVE, false));
                     }
                 } else { //If you're in the wrong dimension or too far away, fail the undo.
                     player.sendStatusMessage(new StringTextComponent(TextFormatting.RED + new TranslationTextComponent("message.gadget.undofailed").getUnformattedComponentText()), true);
@@ -286,7 +286,7 @@ public class GadgetBuilding extends GadgetGeneric implements IAtopPlacingGadget 
         boolean useConstructionPaste = false;
 
         ItemStack itemStack;
-        if (setBlock.getBlock().canSilkHarvest(setBlock, world, pos, player)) {
+        if (true/*setBlock.getBlock().canSilkHarvest(setBlock, world, pos, player)*/) {//TODO figure LootTables out
             itemStack = InventoryHelper.getSilkTouchDrop(setBlock);
         } else {
             itemStack = setBlock.getBlock().getPickBlock(setBlock, null, world, pos, player);
@@ -296,7 +296,8 @@ public class GadgetBuilding extends GadgetGeneric implements IAtopPlacingGadget 
         }
 
         NonNullList<ItemStack> drops = NonNullList.create();
-        setBlock.getBlock().getDrops(setBlock, drops, world, pos, 0);
+        //TODO figure LootTables out
+        //setBlock.getBlock().getDrops(setBlock, drops, world, pos, 0);
         int neededItems = 0;
         for (ItemStack drop : drops) {
             if (drop.getItem().equals(itemStack.getItem())) {
@@ -336,7 +337,7 @@ public class GadgetBuilding extends GadgetGeneric implements IAtopPlacingGadget 
             useItemSuccess = InventoryHelper.useItem(itemStack, player, neededItems, world);
         }
         if (useItemSuccess) {
-            world.spawnEntity(new BlockBuildEntity(world, pos, player, setBlock, BlockBuildEntity.Mode.PLACE, useConstructionPaste));
+            UnnamedCompat.World.spawnEntity(world, new BlockBuildEntity(world, pos, player, setBlock, BlockBuildEntity.Mode.PLACE, useConstructionPaste));
             return true;
         }
         return false;

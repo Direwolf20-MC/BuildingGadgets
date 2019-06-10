@@ -5,17 +5,24 @@ import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.blocks.BlockMap;
 import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
+import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.google.common.collect.ImmutableList;
-import it.unimi.dsi.fastutil.doubles.*;
+import it.unimi.dsi.fastutil.doubles.Double2ObjectArrayMap;
+import it.unimi.dsi.fastutil.doubles.Double2ObjectMap;
+import it.unimi.dsi.fastutil.doubles.DoubleRBTreeSet;
+import it.unimi.dsi.fastutil.doubles.DoubleSortedSet;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemUseContext;
 import net.minecraft.util.Direction;
+import net.minecraft.util.Hand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 
 import java.util.*;
@@ -81,7 +88,7 @@ public enum BuildingMode {
         return ICONS;
     }
 
-    public static BiPredicate<BlockPos, BlockState> combineTester(World world, ItemStack tool, ClientPlayerEntity player, BlockPos original) {
+    public static BiPredicate<BlockPos, BlockState> combineTester(World world, ItemStack tool, PlayerEntity player, BlockPos original) {
         BlockState target = GadgetUtils.getToolBlock(tool);
         return (pos, state) -> {
             BlockState current = world.getBlockState(pos);
@@ -96,7 +103,7 @@ public enum BuildingMode {
             // If we allow overrides, replaceable blocks (e.g. grass, water) will return true
             if (Config.GENERAL.allowOverwriteBlocks.get())
                 // Is the current block replaceable by the target block in the given context?
-                return current.isReplaceable(new BlockItemUseContext(world, player, new ItemStack(target.getBlock()), pos, Direction.UP, 0.5F, 0.0F, 0.5F));
+                return current.isReplaceable(new BlockItemUseContext(new ItemUseContext(player, Hand.MAIN_HAND, VectorHelper.getLookingAt(player, tool))));
             // If we don't allow overrides, replacement only happens when the current position is air
             return current.getBlock().isAir(current, world, pos);
         };
@@ -122,7 +129,7 @@ public enum BuildingMode {
         double y = player.posY + player.getEyeHeight();
         double z = player.posZ;
         for (BlockPos pos : unSortedList) {
-            double distance = pos.distanceSqToCenter(x, y, z);
+            double distance = pos.distanceSq(new Vec3i(x, y, z));
             rangeMap.put(distance, pos);
             distances.add(distance);
         }

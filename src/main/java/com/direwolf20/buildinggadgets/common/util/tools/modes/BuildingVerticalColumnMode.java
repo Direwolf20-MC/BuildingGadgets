@@ -8,7 +8,7 @@ import com.direwolf20.buildinggadgets.api.util.MathUtils;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.lang.ModeTranslation;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
-import net.minecraft.client.entity.player.ClientPlayerEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
@@ -36,7 +36,7 @@ public class BuildingVerticalColumnMode extends AtopSupportedMode {
     }
 
     @Override
-    public IPositionPlacementSequence computeWithTransformed(ClientPlayerEntity player, BlockPos transformed, BlockPos original, Direction sideHit, ItemStack tool) {
+    public IPositionPlacementSequence computeWithTransformed(PlayerEntity player, BlockPos transformed, BlockPos original, Direction sideHit, ItemStack tool) {
         int range = GadgetUtils.getToolRange(tool);
         if (sideHit.getAxis().isVertical())
             return Column.extendFrom(transformed, sideHit, range);
@@ -45,7 +45,7 @@ public class BuildingVerticalColumnMode extends AtopSupportedMode {
     }
 
     @Override
-    public BlockPos transformAtop(ClientPlayerEntity player, BlockPos hit, Direction sideHit, ItemStack tool) {
+    public BlockPos transformAtop(PlayerEntity player, BlockPos hit, Direction sideHit, ItemStack tool) {
         return hit.offset(sideHit);
     }
 

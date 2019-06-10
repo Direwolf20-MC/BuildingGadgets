@@ -3,7 +3,6 @@ package com.direwolf20.buildinggadgets.api.building.modes;
 import com.direwolf20.buildinggadgets.api.building.IAtopPlacingGadget;
 import com.direwolf20.buildinggadgets.api.building.IPositionPlacementSequence;
 import com.direwolf20.buildinggadgets.api.building.IValidatorFactory;
-import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Direction;
@@ -26,7 +25,7 @@ public abstract class AtopSupportedMode extends AbstractMode {
     }
 
     /**
-     * @param transformed transformed starting position with {@link #transformAtop(ClientPlayerEntity, BlockPos, Direction, ItemStack)}
+     * @param transformed transformed starting position with {@link #transformAtop(PlayerEntity, BlockPos, Direction, ItemStack)}
      * @param original    original starting position
      * @implSpec Implementation should work with {@code transformed.equals(original)}
      */

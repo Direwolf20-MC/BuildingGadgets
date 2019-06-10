@@ -3,15 +3,16 @@ package com.direwolf20.buildinggadgets.common.entities;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGEntities;
+import com.direwolf20.buildinggadgets.common.util.UnnamedCompat;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.network.IPacket;
 import net.minecraft.network.datasync.DataParameter;
-import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
@@ -36,7 +37,7 @@ public class BlockBuildEntity extends EntityBase {
                     if (te instanceof ConstructionBlockTileEntity) {
                         ((ConstructionBlockTileEntity) te).setBlockState(targetBlock, targetBlock);
                     }
-                    world.spawnEntity(new ConstructionBlockEntity(world, targetPos, false));
+                    UnnamedCompat.World.spawnEntity(world, new ConstructionBlockEntity(world, targetPos, false));
                 } else {
                     world.setBlockState(targetPos, targetBlock);
                     BlockPos upPos = targetPos.up();
@@ -54,7 +55,7 @@ public class BlockBuildEntity extends EntityBase {
             @Override
             public void onBuilderEntityDespawn(BlockBuildEntity builder) {
                 World world = builder.world;
-                world.spawnEntity(new BlockBuildEntity(world, builder.targetPos, builder.spawnedBy, builder.originalSetBlock, PLACE, builder.isUsingPaste()));
+                UnnamedCompat.World.spawnEntity(world, new BlockBuildEntity(world, builder.targetPos, builder.spawnedBy, builder.originalSetBlock, PLACE, builder.isUsingPaste()));
             }
         };
 
@@ -63,9 +64,9 @@ public class BlockBuildEntity extends EntityBase {
         public abstract void onBuilderEntityDespawn(BlockBuildEntity builder);
     }
 
-    private static final DataParameter<Integer> MODE = EntityDataManager.createKey(BlockBuildEntity.class, DataSerializers.VARINT);
-    private static final DataParameter<Optional<BlockState>> SET_BLOCK = EntityDataManager.createKey(BlockBuildEntity.class, DataSerializers.OPTIONAL_BLOCK_STATE);
-    private static final DataParameter<Boolean> USE_PASTE = EntityDataManager.createKey(BlockBuildEntity.class, DataSerializers.BOOLEAN);
+    private static final DataParameter<Integer> MODE = EntityDataManager.createKey(BlockBuildEntity.class, UnnamedCompat.DataSerializer.VARINT);
+    private static final DataParameter<Optional<BlockState>> SET_BLOCK = EntityDataManager.createKey(BlockBuildEntity.class, UnnamedCompat.DataSerializer.OPTIONAL_BLOCK_STATE);
+    private static final DataParameter<Boolean> USE_PASTE = EntityDataManager.createKey(BlockBuildEntity.class, UnnamedCompat.DataSerializer.BOOLEAN);
 
     private BlockState setBlock;
     private BlockState originalSetBlock;
@@ -74,12 +75,12 @@ public class BlockBuildEntity extends EntityBase {
     private Mode mode;
     private boolean useConstructionPaste;
 
-    public BlockBuildEntity(World world) {
-        super(BGEntities.BUILD_BLOCK, world);
+    public BlockBuildEntity(EntityType<?> type, World world) {
+        super(type, world);
     }
 
     public BlockBuildEntity(World world, BlockPos spawnPos, LivingEntity player, BlockState spawnBlock, Mode mode, boolean usePaste) {
-        this(world);
+        this(BGEntities.BUILD_BLOCK, world);
         setPosition(spawnPos.getX(), spawnPos.getY(), spawnPos.getZ());
 
         BlockState currentBlock = world.getBlockState(spawnPos);

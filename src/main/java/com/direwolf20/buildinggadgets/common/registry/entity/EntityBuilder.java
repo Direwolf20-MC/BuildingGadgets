@@ -43,7 +43,7 @@ public final class EntityBuilder<T extends Entity> extends RegistryObjectBuilder
         Preconditions.checkState(renderFactory!=null,"Cannot construct an Entity without an Renderer!");
         EntityType<?> type = super.construct();
         @SuppressWarnings("unchecked") //I hope this is safe an people don't do things they shouldn't
-        Class<T> clazz = (Class<T>)Objects.requireNonNull(type.getEntityClass());
+                Class<T> clazz = null;//TODO find out if this is truly needed anymore
         entityClass = clazz;
         return type;
     }

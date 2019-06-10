@@ -14,10 +14,8 @@ import com.direwolf20.buildinggadgets.common.util.buffers.PasteToolBufferBuilder
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.util.tools.UniqueItem;
 import com.direwolf20.buildinggadgets.common.world.WorldSave;
-
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
-
 import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.PlayerEntity;
@@ -195,7 +193,8 @@ public class TemplateManagerCommands {
             UniqueItem uniqueItem = intStackMap.get(blockMap.state);
             if (!(uniqueItem == null)) {
                 NonNullList<ItemStack> drops = NonNullList.create();
-                blockMap.state.getBlock().getDrops(blockMap.state, drops, world, new BlockPos(0, 0, 0), 0);
+                //TODO fix Lootables
+                blockMap.state.getDrops(null);
                 int neededItems = 0;
                 for (ItemStack drop : drops) {
                     if (drop.getItem().equals(uniqueItem.getItem())) {

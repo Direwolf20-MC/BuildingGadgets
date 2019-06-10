@@ -4,7 +4,6 @@ import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGTileEntities;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.google.common.collect.ImmutableSet;
-import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -96,7 +95,7 @@ public class TemplateManagerTileEntity extends TileEntity {
         return super.getCapability(cap, side);
     }
 
-    public TemplateManagerContainer getContainer(ClientPlayerEntity playerIn) {
+    public TemplateManagerContainer getContainer(PlayerEntity playerIn) {
         return new TemplateManagerContainer(playerIn.inventory, this);
     }
 }

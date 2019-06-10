@@ -6,9 +6,9 @@ import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGEntities;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
-
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.entity.EntityType;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.IPacket;
 import net.minecraft.network.datasync.DataParameter;
@@ -22,12 +22,12 @@ public class ConstructionBlockEntity extends EntityBase {
     private static final DataParameter<BlockPos> FIXED = EntityDataManager.createKey(ConstructionBlockEntity.class, DataSerializers.field_187200_j);
     private static final DataParameter<Boolean> MAKING = EntityDataManager.createKey(ConstructionBlockEntity.class, DataSerializers.field_187198_h);
 
-    public ConstructionBlockEntity(World world) {
-        super(BGEntities.CONSTRUCTION_BLOCK, world);
+    public ConstructionBlockEntity(EntityType<?> type, World world) {
+        super(type, world);
     }
 
     public ConstructionBlockEntity(World world, BlockPos spawnPos, boolean makePaste) {
-        this(world);
+        this(BGEntities.CONSTRUCTION_BLOCK, world);
         setPosition(spawnPos.getX(), spawnPos.getY(), spawnPos.getZ());
         targetPos = spawnPos;
         setMakingPaste(makePaste);
@@ -65,7 +65,7 @@ public class ConstructionBlockEntity extends EntityBase {
                     BlockState tempState = te.getBlockState();
 
                     int opacity = tempState.getOpacity(world, targetPos);
-                    boolean neighborBrightness = tempState.useNeighborBrightness(world, targetPos);
+                    boolean neighborBrightness = false;//tempState.useNeighbourBrightness(world, targetPos); //TODO find replacement
                     if (opacity > 0 || neighborBrightness) {
                         BlockState tempSetBlock = te.getBlockState();
                         BlockState tempActualSetBlock = ((ConstructionBlockTileEntity) te).getActualBlockState();

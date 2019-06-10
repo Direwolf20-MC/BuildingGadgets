@@ -8,6 +8,7 @@ import com.direwolf20.buildinggadgets.common.registry.entity.EntityBuilder;
 import com.direwolf20.buildinggadgets.common.registry.entity.EntityRegistryContainer;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference.EntityReference;
+import net.minecraft.entity.EntityClassification;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EntityType.Builder;
 import net.minecraftforge.event.RegistryEvent;
@@ -28,11 +29,17 @@ public class BGEntities {
 
     public static void init() {
         container.add(new EntityBuilder<BlockBuildEntity>(EntityReference.BUILD_BLOCK_ENTITY_RL)
-                .builder(Builder.create(BlockBuildEntity.class, BlockBuildEntity::new).tracker(64, 1, false))
+                .builder(Builder.<BlockBuildEntity>create(BlockBuildEntity::new, EntityClassification.MISC)
+                        .setTrackingRange(64)
+                        .setUpdateInterval(1)
+                        .setShouldReceiveVelocityUpdates(false))
                 .renderer(BlockBuildEntityRender::new)
                 .factory(b -> b.build("")));
         container.add(new EntityBuilder<ConstructionBlockEntity>(EntityReference.CONSTRUCTION_BLOCK_ENTITY_RL)
-                .builder(Builder.create(ConstructionBlockEntity.class, ConstructionBlockEntity::new).tracker(64, 1, false))
+                .builder(Builder.<ConstructionBlockEntity>create(ConstructionBlockEntity::new, EntityClassification.MISC)
+                        .setTrackingRange(64)
+                        .setUpdateInterval(1)
+                        .setShouldReceiveVelocityUpdates(false))
                 .renderer(ConstructionBlockEntityRender::new)
                 .factory(b -> b.build("")));
     }
