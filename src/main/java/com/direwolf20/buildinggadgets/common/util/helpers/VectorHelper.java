@@ -22,14 +22,12 @@ public class VectorHelper {
         double rayTraceRange = Config.GENERAL.rayTraceRange.get();
         Vec3d end = new Vec3d(player.posX + look.x * rayTraceRange, player.posY + player.getEyeHeight() + look.y * rayTraceRange, player.posZ + look.z * rayTraceRange);
         //return world.rayTraceBlocks(start, end, rayTraceFluid, false, false);
-        RayTraceContext context = new RayTraceContext(start,end,RayTraceContext.BlockMode.COLLIDER,rayTraceFluid, player);
+        RayTraceContext context = new RayTraceContext(start,end,RayTraceContext.BlockMode.COLLIDER, rayTraceFluid, player);
         return world.func_217299_a(context);
     }
 
     public static BlockPos getPosLookingAt(PlayerEntity player, ItemStack tool) {
-        RayTraceResult lookingAt = VectorHelper.getLookingAt(player, tool);
-
-        return new BlockPos(lookingAt.getHitVec().x,lookingAt.getHitVec().y,lookingAt.getHitVec().z);
+        return VectorHelper.getLookingAt(player, tool).getPos();
     }
 
 }
