@@ -44,9 +44,7 @@ import net.minecraftforge.event.world.BlockEvent;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import static com.direwolf20.buildinggadgets.common.util.GadgetUtils.*;
 
@@ -194,7 +192,6 @@ public class GadgetBuilding extends GadgetGeneric implements IAtopPlacingGadget 
             setAnchor(stack, new ArrayList<BlockPos>());
         }
         List<BlockPos> undoCoords = new ArrayList<BlockPos>();
-        Set<BlockPos> coordinates = new HashSet<BlockPos>(coords);
 
         ItemStack heldItem = getGadget(player);
         if (heldItem.isEmpty())
@@ -204,7 +201,7 @@ public class GadgetBuilding extends GadgetGeneric implements IAtopPlacingGadget 
 
         if (blockState != Blocks.AIR.getDefaultState()) { //Don't attempt a build if a block is not chosen -- Typically only happens on a new tool.
             BlockState state = Blocks.AIR.getDefaultState(); //Initialize a new State Variable for use in the fake world
-            fakeWorld.setWorldAndState(player.world, blockState, coordinates); // Initialize the fake world's blocks
+            fakeWorld.setWorldAndState(player.world, blockState, coords); // Initialize the fake world's blocks
             for (BlockPos coordinate : coords) {
                 if (fakeWorld.getWorldType() != WorldType.DEBUG_ALL_BLOCK_STATES) {
                     try { //Get the state of the block in the fake world (This lets fences be connected, etc)

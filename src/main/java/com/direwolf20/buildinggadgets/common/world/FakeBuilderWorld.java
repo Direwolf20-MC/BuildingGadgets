@@ -10,6 +10,8 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldType;
 
 import javax.annotation.Nullable;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
 
 public class FakeBuilderWorld implements IBlockReader {
@@ -18,10 +20,13 @@ public class FakeBuilderWorld implements IBlockReader {
     private World realWorld;
     private final BlockState AIR = Blocks.AIR.getDefaultState();
 
-    public void setWorldAndState(World rWorld, BlockState setBlock, Set<BlockPos> coordinates) {
+    public void setWorldAndState(World rWorld, BlockState setBlock, Collection<BlockPos> coordinates) {
         this.state = setBlock;
         this.realWorld = rWorld;
-        positions = coordinates;
+        if (coordinates instanceof Set)
+            positions = (Set<BlockPos>) coordinates;
+        else
+            positions = new HashSet<>(coordinates);
     }
 
     @Nullable

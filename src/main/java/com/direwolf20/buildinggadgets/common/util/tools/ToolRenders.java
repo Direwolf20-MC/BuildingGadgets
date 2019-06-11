@@ -95,7 +95,7 @@ public class ToolRenders {
 
         //Calculate the players current position, which is needed later
         double doubleX = player.lastTickPosX + (player.posX - player.lastTickPosX) * evt.getPartialTicks();
-        double doubleY = player.lastTickPosY + (player.posY - player.lastTickPosY) * evt.getPartialTicks();
+        double doubleY = player.lastTickPosY + (player.posY - player.lastTickPosY) * evt.getPartialTicks() + player.getEyeHeight();
         double doubleZ = player.lastTickPosZ + (player.posZ - player.lastTickPosZ) * evt.getPartialTicks();
 
         BlockRenderLayer origLayer = MinecraftForgeClient.getRenderLayer();
@@ -149,8 +149,7 @@ public class ToolRenders {
                 }
 
                 //Prepare the fake world -- using a fake world lets us render things properly, like fences connecting.
-                Set<BlockPos> coords = new HashSet<BlockPos>(coordinates);
-                fakeWorld.setWorldAndState(player.world, renderBlockState, coords);
+                fakeWorld.setWorldAndState(player.world, renderBlockState, coordinates);
 
                 //Save the current position that is being rendered (I think)
                 GlStateManager.pushMatrix();
@@ -222,7 +221,7 @@ public class ToolRenders {
     public static void renderExchangerOverlay(RenderWorldLastEvent evt, PlayerEntity player, ItemStack stack) {
         //Calculate the players current position, which is needed later
         double doubleX = player.lastTickPosX + (player.posX - player.lastTickPosX) * evt.getPartialTicks();
-        double doubleY = player.lastTickPosY + (player.posY - player.lastTickPosY) * evt.getPartialTicks();
+        double doubleY = player.lastTickPosY + (player.posY - player.lastTickPosY) * evt.getPartialTicks() + player.getEyeHeight();
         double doubleZ = player.lastTickPosZ + (player.posZ - player.lastTickPosZ) * evt.getPartialTicks();
 
         renderLinkedInventoryOutline(stack, player, doubleX, doubleY, doubleZ);
@@ -367,7 +366,7 @@ public class ToolRenders {
         if (!GadgetDestruction.getOverlay(stack)) return;
         GlStateManager.pushMatrix();
         double doubleX = player.lastTickPosX + (player.posX - player.lastTickPosX) * evt.getPartialTicks();
-        double doubleY = player.lastTickPosY + (player.posY - player.lastTickPosY) * evt.getPartialTicks();
+        double doubleY = player.lastTickPosY + (player.posY - player.lastTickPosY) * evt.getPartialTicks() + player.getEyeHeight();
         double doubleZ = player.lastTickPosZ + (player.posZ - player.lastTickPosZ) * evt.getPartialTicks();
         GlStateManager.translated(-doubleX, -doubleY, -doubleZ);
         try {
@@ -455,7 +454,7 @@ public class ToolRenders {
 
         //Calculate the players current position, which is needed later
         double doubleX = player.lastTickPosX + (player.posX - player.lastTickPosX) * evt.getPartialTicks();
-        double doubleY = player.lastTickPosY + (player.posY - player.lastTickPosY) * evt.getPartialTicks();
+        double doubleY = player.lastTickPosY + (player.posY - player.lastTickPosY) * evt.getPartialTicks() + player.getEyeHeight();
         double doubleZ = player.lastTickPosZ + (player.posZ - player.lastTickPosZ) * evt.getPartialTicks();
 
         mc.getTextureManager().bindTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
