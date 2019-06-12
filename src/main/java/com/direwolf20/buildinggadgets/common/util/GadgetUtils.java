@@ -278,22 +278,19 @@ public class GadgetUtils {
     public static void selectBlock(ItemStack stack, PlayerEntity player) {
         // Used to find which block the player is looking at, and store it in NBT on the tool.
         World world = player.world;
-        RayTraceResult lookingAt = VectorHelper.getLookingAt(player, RayTraceContext.FluidMode.NONE);
-        if (lookingAt == null)
-            return;
+        BlockRayTraceResult lookingAt = VectorHelper.getLookingAt(player, RayTraceContext.FluidMode.NONE);
 
-        BlockPos pos = new BlockPos(lookingAt.getHitVec().x,lookingAt.getHitVec().y,lookingAt.getHitVec().z);
-        ActionResultType result = setRemoteInventory(stack, player, world, pos, true);
+        ActionResultType result = setRemoteInventory(stack, player, world, lookingAt.getPos(), true);
         if (result == ActionResultType.SUCCESS)
             return;
 
-        BlockState state = world.getBlockState(pos);
+        BlockState state = world.getBlockState(lookingAt.getPos());
         if (result == ActionResultType.FAIL || !Config.BLACKLIST.isAllowedBlock(state.getBlock())) {
             player.sendStatusMessage(new StringTextComponent(TextFormatting.RED + new TranslationTextComponent("message.gadget.invalidblock").getUnformattedComponentText()), true);
             return;
         }
-        BlockState placeState = InventoryHelper.getSpecificStates(state, world, player, pos, stack);
-        BlockState actualState = placeState.getExtendedState(world, pos);
+        BlockState placeState = InventoryHelper.getSpecificStates(state, world, player, lookingAt.getPos(), stack);
+        BlockState actualState = placeState.getExtendedState(world, lookingAt.getPos());
 
         setToolBlock(stack, placeState);
         setToolActualBlock(stack, actualState);
