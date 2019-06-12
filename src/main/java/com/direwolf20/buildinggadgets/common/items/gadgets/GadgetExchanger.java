@@ -155,7 +155,7 @@ public class GadgetExchanger extends GadgetGeneric {
         } else if (!player.isSneaking()) {
             ToolRenders.updateInventoryCache();
         }
-        return new ActionResult<ItemStack>(ActionResultType.SUCCESS, itemstack);
+        return new ActionResult<>(ActionResultType.SUCCESS, itemstack);
     }
 
     public void toggleMode(PlayerEntity player, ItemStack heldItem) {//TODO unused
