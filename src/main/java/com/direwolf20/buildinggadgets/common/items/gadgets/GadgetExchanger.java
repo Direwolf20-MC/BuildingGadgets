@@ -1,8 +1,10 @@
 package com.direwolf20.buildinggadgets.common.items.gadgets;
 
 import com.direwolf20.buildinggadgets.common.config.Config;
+import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
 import com.direwolf20.buildinggadgets.common.util.CapabilityUtil.EnergyUtil;
+import com.direwolf20.buildinggadgets.common.util.UnnamedCompat;
 import com.direwolf20.buildinggadgets.common.util.helpers.InventoryHelper;
 import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
 import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
@@ -35,7 +37,9 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldType;
 import net.minecraft.world.storage.loot.LootContext;
 import net.minecraft.world.storage.loot.LootContext.Builder;
+import net.minecraft.world.storage.loot.LootParameter;
 import net.minecraft.world.storage.loot.LootParameterSet;
+import net.minecraft.world.storage.loot.LootParameters;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.MinecraftForge;
@@ -235,11 +239,12 @@ public class GadgetExchanger extends GadgetGeneric {
         if (tool.isEmpty())
             return false;
 
-        NonNullList<ItemStack> drops = NonNullList.create();
-        Builder lootBuilder = new Builder((ServerWorld) world);
-        setBlock.getDrops(lootBuilder);
-        //TODO find out what to do with that and what loot parameters are supposed to be passed in there
-        LootContext ctx = lootBuilder.build(new LootParameterSet.Builder().build());
+        Builder lootBuilder = new Builder((ServerWorld) world)
+                                    .withParameter(LootParameters.field_216286_f, pos)
+                                    .withParameter(LootParameters.field_216289_i, itemStack);
+
+        List<ItemStack> drops = setBlock.getDrops(lootBuilder);
+
         int neededItems = 0;
         for (ItemStack drop : drops) {
             if (drop.getItem().equals(itemStack.getItem())) {
@@ -277,7 +282,10 @@ public class GadgetExchanger extends GadgetGeneric {
 
         this.applyDamage(tool, player);
 
-        currentBlock.getBlock().harvestBlock(world, player, pos, currentBlock, world.getTileEntity(pos), tool);
+//        currentBlock.getBlock().harvestBlock(world, player, pos, currentBlock, world.getTileEntity(pos), tool);
+        currentBlock.getBlock().removedByPlayer(currentBlock.getBlockState(), world, pos, player, false, null);
+        player.addItemStackToInventory(new ItemStack(currentBlock.getBlock(), 1));
+
         boolean useItemSuccess;
         if (useConstructionPaste) {
             useItemSuccess = InventoryHelper.usePaste(player, 1);
@@ -286,7 +294,7 @@ public class GadgetExchanger extends GadgetGeneric {
         }
         if (useItemSuccess) {
             //TODO reimplement once we find a valid replacement
-            //world.spawnEntity(new BlockBuildEntity(world, pos, player, setBlock, BlockBuildEntity.Mode.REPLACE, useConstructionPaste));
+            UnnamedCompat.World.spawnEntity(world, new BlockBuildEntity(world, pos, player, setBlock, BlockBuildEntity.Mode.REPLACE, useConstructionPaste));
             return true;
         }
         return false;

@@ -278,7 +278,7 @@ public class GadgetUtils {
     public static void selectBlock(ItemStack stack, PlayerEntity player) {
         // Used to find which block the player is looking at, and store it in NBT on the tool.
         World world = player.world;
-        BlockRayTraceResult lookingAt = VectorHelper.getLookingAt(player, RayTraceContext.FluidMode.NONE);
+        BlockRayTraceResult lookingAt = VectorHelper.getLookingAt(player, GadgetGeneric.shouldRayTraceFluid(stack) ? RayTraceContext.FluidMode.ANY : RayTraceContext.FluidMode.NONE);
 
         ActionResultType result = setRemoteInventory(stack, player, world, lookingAt.getPos(), true);
         if (result == ActionResultType.SUCCESS)
