@@ -1,17 +1,20 @@
 package com.direwolf20.buildinggadgets.common.registry.objects;
 
-import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlock;
-import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockDense;
-import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockPowder;
-import com.direwolf20.buildinggadgets.common.blocks.EffectBlock;
+import com.direwolf20.buildinggadgets.common.blocks.*;
 import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManager;
+import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManagerTileEntity;
 import com.direwolf20.buildinggadgets.common.registry.block.BlockBuilder;
 import com.direwolf20.buildinggadgets.common.registry.block.BlockRegistryContainer;
+import com.direwolf20.buildinggadgets.common.registry.block.tile.TileEntityBuilder;
+import com.direwolf20.buildinggadgets.common.registry.block.tile.TileEntityRegistryContainer;
+import com.direwolf20.buildinggadgets.common.registry.block.tile.TileEntityTypeBuilder;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference.BlockReference;
+import com.direwolf20.buildinggadgets.common.util.ref.Reference.TileEntityReference;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.item.Item;
+import net.minecraft.tileentity.TileEntityType;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
@@ -27,8 +30,6 @@ public final class BGBlocks {
 
     private BGBlocks() {
     }
-
-    private static final BlockRegistryContainer container = new BlockRegistryContainer();
 
     // Blocks
     @ObjectHolder(BlockReference.EFFECT_BLOCK)
@@ -51,6 +52,10 @@ public final class BGBlocks {
         container.add(new BlockBuilder(BlockReference.CONSTRUCTION_BLOCK_RL)
                 .builder(Block.Properties.create(Material.ROCK).hardnessAndResistance(2f, 0f))
                 .item(itemProperties())
+                .withTileEntity(new TileEntityBuilder<>(TileEntityReference.CONSTRUCTION_TILE_RL)
+                        // 1.13 -> 1.14 mapping missing (used to be create() )
+                        .builder(new TileEntityTypeBuilder<>(ConstructionBlockTileEntity::new))
+                        .factory(TileEntityTypeBuilder::build))
                 .factory(ConstructionBlock::new));
         container.add(new BlockBuilder(BlockReference.CONSTRUCTION_BLOCK_DENSE_RL)
                 .builder(Block.Properties.create(Material.ROCK).hardnessAndResistance(3f, 0f))
@@ -63,6 +68,9 @@ public final class BGBlocks {
         container.add(new BlockBuilder(BlockReference.TEMPLATE_MANAGER_RL)
                 .builder(Block.Properties.create(Material.ROCK).hardnessAndResistance(2f))
                 .item(itemProperties())
+                .withTileEntity(new TileEntityBuilder<>(TileEntityReference.TEMPLATE_MANAGER_TILE_RL)
+                        .builder(new TileEntityTypeBuilder<>(TemplateManagerTileEntity::new))
+                        .factory(TileEntityTypeBuilder::build))
                 .factory(TemplateManager::new));
     }
 
@@ -80,4 +88,33 @@ public final class BGBlocks {
         container.clear();
     }
 
+    @ObjectHolder(Reference.MODID)
+    @EventBusSubscriber(modid = Reference.MODID, bus = Bus.MOD)
+    public static class BGTileEntities {
+        private static final TileEntityRegistryContainer container = new TileEntityRegistryContainer();
+
+        @ObjectHolder(TileEntityReference.CONSTRUCTION_TILE)
+        public static TileEntityType<?> CONSTRUCTION_BLOCK_TYPE;
+        @ObjectHolder(TileEntityReference.TEMPLATE_MANAGER_TILE)
+        public static TileEntityType<?> TEMPLATE_MANAGER_TYPE;
+
+        static void init() {
+
+        }
+
+        @SubscribeEvent
+        public static void registerTiles(RegistryEvent.Register<TileEntityType<?>> event) {
+            container.register(event);
+        }
+
+        static void clientInit() {
+            container.clientInit();
+        }
+
+        static void cleanup() {
+            container.clear();
+        }
+    }
+
+    private static final BlockRegistryContainer container = new BlockRegistryContainer(BGTileEntities.container);
 }

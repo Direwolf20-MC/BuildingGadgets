@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.common.util;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
@@ -7,10 +8,12 @@ import net.minecraft.client.util.InputMappings;
 import net.minecraft.entity.Entity;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.IDataSerializer;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorldWriter;
 
 import java.util.Optional;
+import java.util.function.Supplier;
 
 @Deprecated //TODO remove once named
 public final class UnnamedCompat {
@@ -51,6 +54,13 @@ public final class UnnamedCompat {
         public static double distanceSqToCenter(BlockPos pos, double x, double y, double z) {
             // no clue what true does, but it keeps is the same as the old method so :+1:
             return pos.func_218140_a(x, y, z, true);
+        }
+    }
+
+    @Deprecated
+    public static class TileEntityType {
+        public static <T extends TileEntity> net.minecraft.tileentity.TileEntityType.Builder<T> builder(Supplier<? extends T> factory, Block... validBlocks) {
+            return net.minecraft.tileentity.TileEntityType.Builder.func_223042_a(factory, validBlocks);
         }
     }
 }

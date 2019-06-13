@@ -1,6 +1,7 @@
 package com.direwolf20.buildinggadgets.common.registry.block;
 
 import com.direwolf20.buildinggadgets.common.registry.RegistryObjectBuilder;
+import com.direwolf20.buildinggadgets.common.registry.block.tile.TileEntityBuilder;
 import net.minecraft.block.Block;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
@@ -15,6 +16,8 @@ public final class BlockBuilder extends RegistryObjectBuilder<Block, Block.Prope
     private BiFunction<Block, Item.Properties, Item> itemBlockFactory;
     private Item.Properties itemBuilder;
     private boolean hasItem;
+    private ResourceLocation tileEntityId;
+    private TileEntityBuilder<?> tileEntityBuilder;
 
     public static BlockBuilder create(String registryName) {
         return new BlockBuilder(registryName);
@@ -69,6 +72,18 @@ public final class BlockBuilder extends RegistryObjectBuilder<Block, Block.Prope
         return block;
     }
 
+    public BlockBuilder withTileEntity(ResourceLocation tileId) {
+        this.tileEntityId = Objects.requireNonNull(tileId);
+        return this;
+    }
+
+    public BlockBuilder withTileEntity(TileEntityBuilder<?> tileBuilder) {
+        this.tileEntityId = Objects.requireNonNull(tileBuilder.getRegistryName());
+        this.tileEntityBuilder = Objects.requireNonNull(tileBuilder);
+        this.tileEntityBuilder.addValidBlock(getRegistryName());
+        return this;
+    }
+
     Item createItemFromBlock() {
         return itemBlockFactory.apply(block,itemBuilder).setRegistryName(getRegistryName());
     }
@@ -77,4 +92,11 @@ public final class BlockBuilder extends RegistryObjectBuilder<Block, Block.Prope
         return hasItem;
     }
 
+    ResourceLocation getTileEntityId() {
+        return tileEntityId;
+    }
+
+    public TileEntityBuilder<?> getTileEntityBuilder() {
+        return tileEntityBuilder;
+    }
 }

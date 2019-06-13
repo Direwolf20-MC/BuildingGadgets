@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.common.blocks.templatemanager;
 
+import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks.BGTileEntities;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
-import com.direwolf20.buildinggadgets.common.registry.objects.BGTileEntities;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.google.common.collect.ImmutableSet;
 import net.minecraft.entity.player.PlayerEntity;
