@@ -92,12 +92,12 @@ public class GadgetDestruction extends GadgetSwapping {
 
     public static UUID getUUID(ItemStack stack) {
         NBTTagCompound tag = NBTHelper.getOrNewTag(stack);
-        if (!NBTHelper.hasUUID(tag)) {
+        if (!tag.hasKey("UUID")) {
             UUID uuid = UUID.randomUUID();
-            NBTHelper.setUUID(tag, uuid);
+            tag.setUniqueId("UUID", uuid);
             return uuid;
         }
-        return NBTHelper.getUUID(tag);
+        return tag.getUniqueId("UUID");
     }
 
     public static void setAnchor(ItemStack stack, BlockPos pos) {
@@ -212,7 +212,7 @@ public class GadgetDestruction extends GadgetSwapping {
         IBlockState stateTarget = !Config.GADGETS.GADGET_DESTRUCTION.nonFuzzyEnabled.get() || GadgetGeneric.getFuzzy(stack) ? null : world.getBlockState(pos);
 
         if (GadgetGeneric.getConnectedArea(stack)) {
-            HashSet<BlockPos> voidPositions = new HashSet<>();
+            Set<BlockPos> voidPositions = new HashSet<>();
             int depth = getToolValue(stack, NBTKeys.GADGET_VALUE_DEPTH);
             if (depth == 0)
                 return new SetBackedPlacementSequence(voidPositions, boundary);
@@ -227,7 +227,7 @@ public class GadgetDestruction extends GadgetSwapping {
     }
 
     public static List<BlockPos> getClearingPositionsForRendering(World world, BlockPos pos, EnumFacing incomingSide, EntityPlayer player, ItemStack stack) {
-        ArrayList<BlockPos> list = getClearingPositions(world, pos, incomingSide, player, stack).stream()
+        List<BlockPos> list = getClearingPositions(world, pos, incomingSide, player, stack).stream()
                 .collect(Collectors.toCollection(ArrayList::new));
         return SortingHelper.Blocks.byDistance(list, player);
     }

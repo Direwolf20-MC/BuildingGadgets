@@ -71,7 +71,7 @@ public class SetBackedPlacementSequence implements IPositionPlacementSequence, S
 
     private void readObject(ObjectInputStream in) throws ClassNotFoundException, IOException {
         boundingBox = (Region) in.readObject();
-        internalSet = new HashSet<>();
+        internalSet = new LinkedHashSet<>();
         int size = in.readInt();
         for (int i = 0; i < size; i++) {
             internalSet.add(new BlockPos(in.readInt(), in.readInt(), in.readInt()));

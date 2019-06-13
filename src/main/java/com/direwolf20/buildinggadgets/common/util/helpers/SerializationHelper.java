@@ -1,5 +1,7 @@
 package com.direwolf20.buildinggadgets.common.util.helpers;
 
+import com.direwolf20.buildinggadgets.common.BuildingGadgets;
+
 import javax.annotation.Nullable;
 import java.io.*;
 
@@ -15,7 +17,8 @@ public final class SerializationHelper {
             out.writeObject(object);
             out.flush();
             return bos.toByteArray();
-        } catch (IOException ignored) {
+        } catch (IOException e) {
+            BuildingGadgets.LOG.error("Exception when serializing object {}", object, e);
             return null;
         }
     }
@@ -27,7 +30,8 @@ public final class SerializationHelper {
             @SuppressWarnings("unchecked") // Casting to erased type (Object)
             T t = (T) in.readObject();
             return t;
-        } catch (IOException | ClassNotFoundException ignored) {
+        } catch (IOException | ClassNotFoundException e) {
+            BuildingGadgets.LOG.error("Exception when deserializing byte array {}", bytes, e);
             return null;
         }
     }
