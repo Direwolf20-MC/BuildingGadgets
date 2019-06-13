@@ -1,8 +1,10 @@
 package com.direwolf20.buildinggadgets.common.blocks.templatemanager;
 
+import com.direwolf20.buildinggadgets.common.registry.objects.BGContainers;
 import com.direwolf20.buildinggadgets.common.util.exceptions.CapabilityNotPresentException;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.Slot;
@@ -11,22 +13,27 @@ import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 
 import javax.annotation.Nonnull;
+import java.util.Objects;
 
 public class TemplateManagerContainer extends Container {
     public static final String TEXTURE_LOC_SLOT_TOOL = Reference.MODID + ":gui/slot_copy_paste_gadget";
     public static final String TEXTURE_LOC_SLOT_TEMPLATE = Reference.MODID + ":gui/slot_template";
     private TemplateManagerTileEntity te;
 
-    public TemplateManagerContainer(IInventory playerInventory, TemplateManagerTileEntity te) {
-        super(null, 5);//TODO fix once we get access to ContainerTypes
+    public TemplateManagerContainer(int windowId, PlayerInventory playerInventory) {
+        super(BGContainers.TEMPLATE_MANAGER_CONTAINER, windowId);//TODO fix once we get access to ContainerTypes
         addOwnSlots();
         addPlayerSlots(playerInventory);
-        this.te = te;
+    }
+
+    public TemplateManagerContainer(int windowId, PlayerInventory playerInventory, TemplateManagerTileEntity tileEntity) {
+        this(windowId, playerInventory);
+        this.te = Objects.requireNonNull(tileEntity);
     }
 
     @Override
     public boolean canInteractWith(PlayerEntity playerIn) {
-        return te.canInteractWith(playerIn);
+        return getTe().canInteractWith(playerIn);
     }
 
     private void addPlayerSlots(IInventory playerInventory) {
@@ -48,7 +55,7 @@ public class TemplateManagerContainer extends Container {
     }
 
     private void addOwnSlots() {
-        IItemHandler itemHandler = this.te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null).orElseThrow(CapabilityNotPresentException::new);
+        IItemHandler itemHandler = this.getTe().getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null).orElseThrow(CapabilityNotPresentException::new);
         int x = 86;
         int y = 41;
 
@@ -85,5 +92,9 @@ public class TemplateManagerContainer extends Container {
         }
 
         return itemstack;
+    }
+
+    public TemplateManagerTileEntity getTe() {
+        return te;
     }
 }

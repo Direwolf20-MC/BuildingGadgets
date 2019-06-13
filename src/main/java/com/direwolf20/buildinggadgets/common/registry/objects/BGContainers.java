@@ -1,8 +1,10 @@
 package com.direwolf20.buildinggadgets.common.registry.objects;
 
+import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManagerContainer;
 import com.direwolf20.buildinggadgets.common.registry.RegistryContainer;
 import com.direwolf20.buildinggadgets.common.registry.RegistryObjectBuilder;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
+import com.direwolf20.buildinggadgets.common.util.ref.Reference.ContainerReference;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.ContainerType;
 import net.minecraftforge.event.RegistryEvent;
@@ -21,10 +23,15 @@ public final class BGContainers {
 
     private BGContainers() {}
 
-    static void init() {
+    @ObjectHolder(ContainerReference.TEMPLATE_MANAGER_CONTAINER)
+    public static ContainerType<?> TEMPLATE_MANAGER_CONTAINER;
 
+    static void init() {
+        container.add(
+                new RegistryObjectBuilder<ContainerType<?>, ContainerTypeBuilder<?>>(ContainerReference.TEMPLATE_MANAGER_CONTAINER_RL)
+                        .builder(new ContainerTypeBuilder<>((wId, inv, buffer) -> new TemplateManagerContainer(wId, inv))));
     }
-    
+
     static void cleanup() {
         container.clear();
     }

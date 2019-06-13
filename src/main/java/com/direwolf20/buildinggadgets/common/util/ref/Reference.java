@@ -84,4 +84,12 @@ public final class Reference {
 
         private TileEntityReference() {}
     }
+
+    public static final class ContainerReference {
+        public static final String TEMPLATE_MANAGER_CONTAINER = Reference.MODID + ":template_manager_container";
+
+        public static final ResourceLocation TEMPLATE_MANAGER_CONTAINER_RL = new ResourceLocation(TEMPLATE_MANAGER_CONTAINER);
+
+        private ContainerReference() {}
+    }
 }
