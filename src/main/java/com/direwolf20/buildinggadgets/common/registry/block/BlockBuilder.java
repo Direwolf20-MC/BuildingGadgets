@@ -96,7 +96,7 @@ public final class BlockBuilder extends RegistryObjectBuilder<Block, Block.Prope
         return tileEntityId;
     }
 
-    public TileEntityBuilder<?> getTileEntityBuilder() {
+    TileEntityBuilder<?> getTileEntityBuilder() {
         return tileEntityBuilder;
     }
 }

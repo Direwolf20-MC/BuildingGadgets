@@ -90,9 +90,10 @@ public final class BGBlocks {
 
     @ObjectHolder(Reference.MODID)
     @EventBusSubscriber(modid = Reference.MODID, bus = Bus.MOD)
-    public static class BGTileEntities {
+    public static final class BGTileEntities {
         private static final TileEntityRegistryContainer container = new TileEntityRegistryContainer();
 
+        private BGTileEntities() {}
         @ObjectHolder(TileEntityReference.CONSTRUCTION_TILE)
         public static TileEntityType<?> CONSTRUCTION_BLOCK_TYPE;
         @ObjectHolder(TileEntityReference.TEMPLATE_MANAGER_TILE)

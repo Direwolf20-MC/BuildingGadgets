@@ -19,8 +19,10 @@ import net.minecraftforge.registries.ObjectHolder;
 
 @ObjectHolder(Reference.MODID)
 @EventBusSubscriber(modid = Reference.MODID, bus = Bus.MOD)
-public class BGEntities {
+public final class BGEntities {
     private static final EntityRegistryContainer container = new EntityRegistryContainer();
+
+    private BGEntities() {}
 
     @ObjectHolder(EntityReference.BUILD_BLOCK_ENTITY)
     public static EntityType<?> BUILD_BLOCK;
