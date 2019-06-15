@@ -1,6 +1,7 @@
 package com.direwolf20.buildinggadgets.client.gui;
 
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.util.text.StringTextComponent;
 
 import java.util.ArrayList;
@@ -22,7 +23,7 @@ public class GuiScreenTextFields extends Screen {
     }
 
     protected void forEachField(Consumer<GuiTextFieldBase> action) {
-        fields.forEach(field -> action.accept(field));
+        fields.forEach(action);
     }
 
     protected Iterator<GuiTextFieldBase> getFieldIterator() {
@@ -32,7 +33,7 @@ public class GuiScreenTextFields extends Screen {
     @Override
     public void tick() {
         super.tick();
-        fields.forEach(field -> field.tick());
+        fields.forEach(TextFieldWidget::tick);
     }
 
     @Override
