@@ -20,15 +20,15 @@ public final class UnnamedCompat {
     @Deprecated
     public static final class World {
         public static boolean spawnEntity(IWorldWriter worldWriter, Entity entity) {
-            return worldWriter.func_217376_c(entity);
+            return worldWriter.addEntity(entity);
         }
     }
 
     @Deprecated
     public static final class DataSerializer {
-        public static final IDataSerializer<Integer> VARINT = DataSerializers.field_187192_b;
-        public static final IDataSerializer<Optional<BlockState>> OPTIONAL_BLOCK_STATE = DataSerializers.field_187197_g;
-        public static final IDataSerializer<Boolean> BOOLEAN = DataSerializers.field_187198_h;
+        public static final IDataSerializer<Integer> VARINT = DataSerializers.VARINT;
+        public static final IDataSerializer<Optional<BlockState>> OPTIONAL_BLOCK_STATE = DataSerializers.OPTIONAL_BLOCK_STATE;
+        public static final IDataSerializer<Boolean> BOOLEAN = DataSerializers.BOOLEAN;
     }
 
     @Deprecated
@@ -36,7 +36,7 @@ public final class UnnamedCompat {
         private static Minecraft minecraft = Minecraft.getInstance();
 
         public static Screen getCurrentScreen() {
-            return minecraft.field_71462_r;
+            return minecraft.currentScreen;
         }
     }
 
@@ -45,7 +45,7 @@ public final class UnnamedCompat {
         // This works but I think I'm using the raw method and not
         // the actual isKeyDown method that we used in 1.13
         public static boolean isKeyDown( long handle, int keyCode ) {
-            return InputMappings.func_216506_a( handle, keyCode );
+            return InputMappings.isKeyDown(handle, keyCode);
         }
     }
 
@@ -53,14 +53,14 @@ public final class UnnamedCompat {
     public static class BlockPosition {
         public static double distanceSqToCenter(BlockPos pos, double x, double y, double z) {
             // no clue what true does, but it keeps is the same as the old method so :+1:
-            return pos.func_218140_a(x, y, z, true);
+            return pos.distanceSq(x, y, z, true);
         }
     }
 
     @Deprecated
     public static class TileEntityType {
         public static <T extends TileEntity> net.minecraft.tileentity.TileEntityType.Builder<T> builder(Supplier<? extends T> factory, Block... validBlocks) {
-            return net.minecraft.tileentity.TileEntityType.Builder.func_223042_a(factory, validBlocks);
+            return net.minecraft.tileentity.TileEntityType.Builder.create(factory, validBlocks);
         }
     }
 }

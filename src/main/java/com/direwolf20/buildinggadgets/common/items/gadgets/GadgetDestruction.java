@@ -455,11 +455,11 @@ public class GadgetDestruction extends GadgetGeneric {
                         }
                     }
                     if (pasteState != Blocks.AIR.getDefaultState()) {
-                        world.func_217376_c(new BlockBuildEntity(world, placePos, player, pasteState, BlockBuildEntity.Mode.PLACE, true));
+                        world.addEntity(new BlockBuildEntity(world, placePos, player, pasteState, BlockBuildEntity.Mode.PLACE, true));
                         success = true;
                     }
                 } else {
-                    world.func_217376_c(new BlockBuildEntity(world, placePos, player, placeState, BlockBuildEntity.Mode.PLACE, false));
+                    world.addEntity(new BlockBuildEntity(world, placePos, player, placeState, BlockBuildEntity.Mode.PLACE, false));
                     success = true;
                 }
             }
@@ -482,7 +482,7 @@ public class GadgetDestruction extends GadgetGeneric {
         this.applyDamage(tool, player);
 
         //TODO find replacement
-        world.func_217376_c(new BlockBuildEntity(world, voidPos, player, world.getBlockState(voidPos), BlockBuildEntity.Mode.REMOVE, false));
+        world.addEntity(new BlockBuildEntity(world, voidPos, player, world.getBlockState(voidPos), BlockBuildEntity.Mode.REMOVE, false));
         return true;
     }
 

@@ -29,7 +29,9 @@ public final class BGContainers {
     static void init() {
         container.add(
                 new RegistryObjectBuilder<ContainerType<?>, ContainerTypeBuilder<?>>(ContainerReference.TEMPLATE_MANAGER_CONTAINER_RL)
-                        .builder(new ContainerTypeBuilder<>((wId, inv, buffer) -> new TemplateManagerContainer(wId, inv))));
+                        .builder(new ContainerTypeBuilder<>((wId, inv, buffer) -> new TemplateManagerContainer(wId, inv)))
+                        .factory(ContainerTypeBuilder::build)
+        );
     }
 
     static void cleanup() {

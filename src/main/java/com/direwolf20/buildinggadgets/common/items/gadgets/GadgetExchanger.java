@@ -25,7 +25,10 @@ import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.*;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.ActionResultType;
+import net.minecraft.util.Direction;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.text.ITextComponent;
@@ -35,10 +38,7 @@ import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.ServerWorld;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldType;
-import net.minecraft.world.storage.loot.LootContext;
 import net.minecraft.world.storage.loot.LootContext.Builder;
-import net.minecraft.world.storage.loot.LootParameter;
-import net.minecraft.world.storage.loot.LootParameterSet;
 import net.minecraft.world.storage.loot.LootParameters;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -240,8 +240,8 @@ public class GadgetExchanger extends GadgetGeneric {
             return false;
 
         Builder lootBuilder = new Builder((ServerWorld) world)
-                                    .withParameter(LootParameters.field_216286_f, pos)
-                                    .withParameter(LootParameters.field_216289_i, itemStack);
+                .withParameter(LootParameters.POSITION, pos)
+                .withParameter(LootParameters.TOOL, itemStack);
 
         List<ItemStack> drops = setBlock.getDrops(lootBuilder);
 

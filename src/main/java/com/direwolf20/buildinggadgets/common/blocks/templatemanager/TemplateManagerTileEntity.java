@@ -96,6 +96,6 @@ public class TemplateManagerTileEntity extends TileEntity {
     }
 
     public TemplateManagerContainer getContainer(PlayerEntity playerIn) {
-        return new TemplateManagerContainer(playerIn.inventory, this);
+        return new TemplateManagerContainer(0, playerIn.inventory, this);
     }
 }

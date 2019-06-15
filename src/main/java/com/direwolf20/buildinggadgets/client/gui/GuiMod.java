@@ -1,10 +1,10 @@
 package com.direwolf20.buildinggadgets.client.gui;
 
 //import com.direwolf20.buildinggadgets.client.gui.materiallist.MaterialListGUI;
+
 import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManagerContainer;
 import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManagerGUI;
 import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManagerTileEntity;
-import com.direwolf20.buildinggadgets.common.items.ITemplate;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetDestruction;
 import com.direwolf20.buildinggadgets.common.util.lang.LangUtil;
@@ -101,7 +101,7 @@ public enum GuiMod {
     }
 
     private static TemplateManagerContainer getTemplateManagerContainer(PlayerEntity player, TileEntity te) {
-        return new TemplateManagerContainer(player.inventory, (TemplateManagerTileEntity) te);
+        return new TemplateManagerContainer(0, player.inventory, (TemplateManagerTileEntity) te);
     }
 
     private static void openGuiContainer(String id, ServerPlayerEntity player, Container container, Consumer<PacketBuffer> extraDataWriter) {

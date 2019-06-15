@@ -109,7 +109,7 @@ public class FakeDelegationWorld implements IWorld {
     }
 
     @Override
-    public boolean func_217375_a(BlockPos p_217375_1_, Predicate<BlockState> p_217375_2_) {
+    public boolean hasBlockState(BlockPos p_217375_1_, Predicate<BlockState> p_217375_2_) {
         return false;
     }
 
