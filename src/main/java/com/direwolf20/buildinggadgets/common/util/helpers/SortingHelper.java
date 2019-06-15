@@ -1,13 +1,11 @@
 package com.direwolf20.buildinggadgets.common.util.helpers;
 
-import com.direwolf20.buildinggadgets.common.util.UnnamedCompat;
 import it.unimi.dsi.fastutil.doubles.Double2ObjectArrayMap;
 import it.unimi.dsi.fastutil.doubles.Double2ObjectMap;
 import it.unimi.dsi.fastutil.doubles.DoubleRBTreeSet;
 import it.unimi.dsi.fastutil.doubles.DoubleSortedSet;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3i;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -43,7 +41,7 @@ public class SortingHelper {
                     z = player.posZ;
 
             list.forEach(pos -> {
-                double distance = UnnamedCompat.BlockPosition.distanceSqToCenter(pos, x, y, z);
+                double distance = pos.distanceSq(x, y, z, true);
 
                 rangeMap.put(distance, pos);
                 distances.add(distance);

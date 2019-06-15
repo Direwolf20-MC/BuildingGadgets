@@ -13,6 +13,7 @@ import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.client.gui.widget.button.Button.IPressable;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -60,7 +61,7 @@ public class CopyGUI extends GuiScreenTextFields {
         updateTextFields();
 
         // note: the id always has to be different or else it might get called twice or never!
-        addButton(new Button((x - 20) - 60, y, 40, 20, GuiMod.getLangKeySingle("confirm"), (button) -> {
+        addButton(new Button((x - 20) - 60, y, 40, 20, I18n.format(GuiMod.getLangKeySingle("confirm")), (button) -> {
             clearTextBoxes();
             if (absoluteCoords) {
                 startPos = new BlockPos(startX.getInt(), startY.getInt(), startZ.getInt());
@@ -71,12 +72,12 @@ public class CopyGUI extends GuiScreenTextFields {
             }
             PacketHandler.sendToServer(new PacketCopyCoords(startPos, endPos));
         }));
-        addButton(new Button((x - 20) - 20, y, 40, 20, GuiMod.getLangKeySingle("cancel"), (button) -> onClose()));
-        addButton(new Button((x - 20) + 20, y, 40, 20, GuiMod.getLangKeySingle("clear"), (button) -> {
+        addButton(new Button((x - 20) - 20, y, 40, 20, I18n.format(GuiMod.getLangKeySingle("cancel")), (button) -> onClose()));
+        addButton(new Button((x - 20) + 20, y, 40, 20, I18n.format(GuiMod.getLangKeySingle("clear")), (button) -> {
             PacketHandler.sendToServer(new PacketCopyCoords(BlockPos.ZERO, BlockPos.ZERO));
             onClose();
         }));
-        addButton(new Button((x - 40) + 80, y, 80, 20, GuiMod.getLangKeyButton("copy", "absolute"), (button) -> {
+        addButton(new Button((x - 40) + 80, y, 80, 20, I18n.format(GuiMod.getLangKeyButton("copy", "absolute")), (button) -> {
             coordsModeSwitch();
             updateTextFields();
         }));

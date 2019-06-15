@@ -1,6 +1,5 @@
 package com.direwolf20.buildinggadgets.common.registry.block.tile;
 
-import com.direwolf20.buildinggadgets.common.util.UnnamedCompat;
 import com.mojang.datafixers.types.Type;
 import net.minecraft.block.Block;
 import net.minecraft.tileentity.TileEntity;
@@ -41,6 +40,6 @@ public final class TileEntityTypeBuilder<T extends TileEntity> {
             resolvedBlocks[i] = ForgeRegistries.BLOCKS.getValue(location);
             ++ i;
         }
-        return UnnamedCompat.TileEntityType.builder(factory, resolvedBlocks).build(dataFixer);
+        return TileEntityType.Builder.create(factory, resolvedBlocks).build(dataFixer);
     }
 }

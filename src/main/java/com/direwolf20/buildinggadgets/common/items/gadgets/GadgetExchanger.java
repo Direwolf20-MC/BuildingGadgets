@@ -4,7 +4,6 @@ import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
 import com.direwolf20.buildinggadgets.common.util.CapabilityUtil.EnergyUtil;
-import com.direwolf20.buildinggadgets.common.util.UnnamedCompat;
 import com.direwolf20.buildinggadgets.common.util.helpers.InventoryHelper;
 import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
 import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
@@ -294,7 +293,7 @@ public class GadgetExchanger extends GadgetGeneric {
         }
         if (useItemSuccess) {
             //TODO reimplement once we find a valid replacement
-            UnnamedCompat.World.spawnEntity(world, new BlockBuildEntity(world, pos, player, setBlock, BlockBuildEntity.Mode.REPLACE, useConstructionPaste));
+            world.addEntity(new BlockBuildEntity(world, pos, player, setBlock, BlockBuildEntity.Mode.REPLACE, useConstructionPaste));
             return true;
         }
         return false;

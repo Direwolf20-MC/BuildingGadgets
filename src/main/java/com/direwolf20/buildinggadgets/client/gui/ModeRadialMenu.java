@@ -12,7 +12,6 @@ import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.*;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGSound;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
-import com.direwolf20.buildinggadgets.common.util.UnnamedCompat;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.direwolf20.buildinggadgets.common.util.tools.modes.BuildingMode;
 import com.direwolf20.buildinggadgets.common.util.tools.modes.ExchangingMode;
@@ -425,7 +424,7 @@ public class ModeRadialMenu extends Screen {
 
     @Override
     public void tick() {
-        if (! UnnamedCompat.Input.isKeyDown(Minecraft.getInstance().mainWindow.getHandle(), KeyBindings.menuSettings.getKey().getKeyCode())) {
+        if (! InputMappings.isKeyDown(Minecraft.getInstance().mainWindow.getHandle(), KeyBindings.menuSettings.getKey().getKeyCode())) {
             onClose();
             changeMode();
         }
