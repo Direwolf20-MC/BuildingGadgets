@@ -282,6 +282,7 @@ public class GadgetExchanger extends GadgetGeneric {
         this.applyDamage(tool, player);
 
 //        currentBlock.getBlock().harvestBlock(world, player, pos, currentBlock, world.getTileEntity(pos), tool);
+
         currentBlock.getBlock().removedByPlayer(currentBlock.getBlockState(), world, pos, player, false, null);
         player.addItemStackToInventory(new ItemStack(currentBlock.getBlock(), 1));
 

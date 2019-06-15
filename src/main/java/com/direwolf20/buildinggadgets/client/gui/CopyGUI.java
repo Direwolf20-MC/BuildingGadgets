@@ -9,6 +9,8 @@ import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketCopyCoords;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
+import com.direwolf20.buildinggadgets.common.util.lang.GuiTranslation;
+import com.direwolf20.buildinggadgets.common.util.lang.ITranslationProvider;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.button.AbstractButton;
@@ -55,18 +57,8 @@ public class CopyGUI extends GuiScreenTextFields {
         if (startPos == null) startPos = new BlockPos(0, 0, 0);
         if (endPos == null) endPos = new BlockPos(0, 0, 0);
 
-        startX = addField(65, 15, startPos.getX());
-        startY = addField(165, 15, startPos.getY());
-        startZ = addField(265, 15, startPos.getZ());
-        endX = addField(65, 35, endPos.getX());
-        endY = addField(165, 35, endPos.getY());
-        endZ = addField(265, 35, endPos.getZ());
-
-        updateTextFields();
-
         List<AbstractButton> buttons = new ArrayList<AbstractButton>() {{
-            // note: the id always has to be different or else it might get called twice or never!
-            add(new Button((x - 20) - 60, y, 50, 20, I18n.format(GuiMod.getLangKeySingle("confirm")), (button) -> {
+            add(new CenteredButton(y - 60, 50, GuiTranslation.SINGLE_CONFIRM, (button) -> {
                 clearTextBoxes();
                 if (absoluteCoords) {
                     startPos = new BlockPos(startX.getInt(), startY.getInt(), startZ.getInt());
@@ -77,12 +69,12 @@ public class CopyGUI extends GuiScreenTextFields {
                 }
                 PacketHandler.sendToServer(new PacketCopyCoords(startPos, endPos));
             }));
-            add(new Button((x - 20) - 20, y, 50, 20, I18n.format(GuiMod.getLangKeySingle("cancel")), (button) -> onClose()));
-            add(new Button((x - 20) + 20, y, 50, 20, I18n.format(GuiMod.getLangKeySingle("clear")), (button) -> {
+            add(new CenteredButton(y - 60, 50, GuiTranslation.SINGLE_CLOSE, (button) -> onClose()));
+            add(new CenteredButton(y - 60, 50, GuiTranslation.SINGLE_CLEAR, (button) -> {
                 PacketHandler.sendToServer(new PacketCopyCoords(BlockPos.ZERO, BlockPos.ZERO));
                 onClose();
             }));
-            add(new Button((x - 40) + 80, y, 120, 20, I18n.format(GuiMod.getLangKeyButton("copy", "absolute")), (button) -> {
+            add(new CenteredButton(y - 60, 120, GuiTranslation.COPY_BUTTON_ABSOLUTE, (button) -> {
                 coordsModeSwitch();
                 updateTextFields();
             }));
@@ -91,21 +83,33 @@ public class CopyGUI extends GuiScreenTextFields {
         this.centerButtonList(buttons, x);
         buttons.forEach(this::addButton);
 
+        startX = addField(65, 15, startPos.getX());
         addButton(50, 14, "-", (button) -> fieldChange(startX, -1));
         addButton(110, 14, "+", (button) -> fieldChange(startX, 1));
+
+        startY = addField(165, 15, startPos.getY());
         addButton(150, 14, "-", (button) -> fieldChange(startY, -1));
         addButton(210, 14, "+", (button) -> fieldChange(startY, 1));
+
+        startZ = addField(265, 15, startPos.getZ());
         addButton(250, 14, "-", (button) -> fieldChange(startZ, -1));
         addButton(310, 14, "+", (button) -> fieldChange(startZ, 1));
+
+        endX = addField(65, 35, endPos.getX());
         addButton(50, 34, "-", (button) -> fieldChange(endX, -1));
         addButton(110, 34, "+", (button) -> fieldChange(endX, 1));
+
+        endY = addField(165, 35, endPos.getY());
         addButton(150, 34, "-", (button) -> fieldChange(endY, -1));
         addButton(210, 34, "+", (button) -> fieldChange(endY, 1));
+
+        endZ = addField(265, 35, endPos.getZ());
         addButton(250, 34, "-", (button) -> fieldChange(endZ, -1));
         addButton(310, 34, "+", (button) -> fieldChange(endZ, 1));
+
+        updateTextFields();
     }
 
-    // todo: move this to a utils class logically
     private void centerButtonList(List<AbstractButton> buttons, int startX) {
         int collectiveWidth = buttons.stream().mapToInt(AbstractButton::getWidth).sum() + (buttons.size() - 1) * 5;
 
@@ -181,6 +185,12 @@ public class CopyGUI extends GuiScreenTextFields {
             endY.setText(y);
             z = !endZ.getText().equals("") ? String.valueOf(endZ.getInt() - startPos.getZ()) : String.valueOf(endPos.getZ() - startPos.getZ());
             endZ.setText(z);
+        }
+    }
+
+    private static class CenteredButton extends Button {
+        CenteredButton(int y, int width, ITranslationProvider text, IPressable onPress) {
+            super(0, y, width, 20, I18n.format(text.getTranslationKey()), onPress);
         }
     }
 }
