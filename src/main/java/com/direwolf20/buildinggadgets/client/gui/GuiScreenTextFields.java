@@ -12,7 +12,7 @@ public class GuiScreenTextFields extends Screen {
     private List<GuiTextFieldBase> fields = new ArrayList<>();
 
     public GuiScreenTextFields() {
-        super(new StringTextComponent("The text has not been determned yet")); //TODO figure that one out
+        super(new StringTextComponent("page title... duh! lmao")); //TODO figure that one out
     }
 
     protected GuiTextFieldBase addField(GuiTextFieldBase field) {

@@ -11,7 +11,7 @@ public class GuiTextFieldBase extends TextFieldWidget {
     private BiConsumer<GuiTextFieldBase, String> postModification;
 
     public GuiTextFieldBase(FontRenderer fontRenderer, int x, int y, int width) {
-        super(fontRenderer, 0, x, y, width, "");//TODO find out messages
+        super(fontRenderer, x, y, width, 15,"Hello?"); //TODO find out messages
         setMaxStringLength(50);
         setValidator(s -> {
             valueOld = getText();

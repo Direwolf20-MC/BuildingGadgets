@@ -135,6 +135,10 @@ public enum GuiMod {
         return LangUtil.getLangKey("gui", prefix, type, name);
     }
 
+    public static String getLangKeySingle(String name) {
+        return LangUtil.getLangKey("gui", "single", name);
+    }
+
     public static void setEmptyField(GuiTextFieldBase field, Supplier<Integer> value) {
         if (field.getText().isEmpty())
             field.setText(String.valueOf(value.get()));

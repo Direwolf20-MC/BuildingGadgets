@@ -98,14 +98,21 @@
     "message.gadget.boundTE": "Bound Gadget to Inventory",
     "message.gadget.unboundTE": "Unbound Gadget from Inventory",
 
+    "_comment": "gui - single words",
+    "gui.buildinggadgets.single.confirm": "Confirm",
+    "gui.buildinggadgets.single.cancel": "Cancel",
+    "gui.buildinggadgets.single.close": "Close",
+    "gui.buildinggadgets.single.clear": "Clear",
+
+    "_comment": "gui - destruction:",
+    "gui.buildinggadgets.copy.button.absolute": "Use absolute coords",
+
     "_comment": "gui - destruction:",
     "gui.buildinggadgets.destruction.field.depth": "Depth",
     "gui.buildinggadgets.destruction.field.down": "Down",
     "gui.buildinggadgets.destruction.field.left": "Left",
     "gui.buildinggadgets.destruction.field.right": "Right",
     "gui.buildinggadgets.destruction.field.up": "Up",
-    "gui.buildinggadgets.destruction.button.confirm": "Ok",
-    "gui.buildinggadgets.destruction.button.cancel": "Cancel",
 
     "_comment": "gui - material list:",
     "gui.buildinggadgets.materialList.button.close": "Close",

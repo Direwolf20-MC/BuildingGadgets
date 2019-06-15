@@ -1,6 +1,5 @@
 package com.direwolf20.buildinggadgets.client.gui;
 
-//import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.AbstractGui;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.renderer.Rectangle2d;

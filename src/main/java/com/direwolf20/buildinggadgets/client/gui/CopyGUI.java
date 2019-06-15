@@ -40,22 +40,27 @@ public class CopyGUI extends GuiScreenTextFields {
     public void init() {
         super.init();
 
+        // create a center point.
+        int x = width / 2;
+        int y = height / 2;
+
         startPos = BGItems.gadgetCopyPaste.getStartPos(copyPasteTool);
         endPos = BGItems.gadgetCopyPaste.getEndPos(copyPasteTool);
 
         if (startPos == null) startPos = new BlockPos(0, 0, 0);
         if (endPos == null) endPos = new BlockPos(0, 0, 0);
 
-        startX = addField(guiLeft + 65, 15, startPos.getX());
-        startY = addField(guiLeft + 165, 15, startPos.getY());
+        startX = addField( 65, 15, startPos.getX());
+        startY = addField( 165, 15, startPos.getY());
         startZ = addField(265, 15, startPos.getZ());
         endX = addField(65, 35, endPos.getX());
         endY = addField(165, 35, endPos.getY());
         endZ = addField(265, 35, endPos.getZ());
 
         updateTextFields();
-        //NOTE: the id always has to be different or else it might get called twice or never!
-        addButton(new Button(guiLeft + 45, guiTop + 60, 40, 20, "Ok", (button) -> {
+
+        // note: the id always has to be different or else it might get called twice or never!
+        addButton(new Button((x - 20) - 60, y, 40, 20, GuiMod.getLangKeySingle("confirm"), (button) -> {
             clearTextBoxes();
             if (absoluteCoords) {
                 startPos = new BlockPos(startX.getInt(), startY.getInt(), startZ.getInt());
@@ -66,12 +71,12 @@ public class CopyGUI extends GuiScreenTextFields {
             }
             PacketHandler.sendToServer(new PacketCopyCoords(startPos, endPos));
         }));
-        addButton(new Button(guiLeft + 145, guiTop + 60, 40, 20, "Cancel", (button) -> onClose()));
-        addButton(new Button(guiLeft + 245, guiTop + 60, 40, 20, "Clear", (button) -> {
+        addButton(new Button((x - 20) - 20, y, 40, 20, GuiMod.getLangKeySingle("cancel"), (button) -> onClose()));
+        addButton(new Button((x - 20) + 20, y, 40, 20, GuiMod.getLangKeySingle("clear"), (button) -> {
             PacketHandler.sendToServer(new PacketCopyCoords(BlockPos.ZERO, BlockPos.ZERO));
             onClose();
         }));
-        addButton(new Button(guiLeft + 325, guiTop + 60, 80, 20, "CoordsMode", (button) -> {
+        addButton(new Button((x - 40) + 80, y, 80, 20, GuiMod.getLangKeyButton("copy", "absolute"), (button) -> {
             coordsModeSwitch();
             updateTextFields();
         }));
