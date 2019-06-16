@@ -5,6 +5,7 @@
 
 package com.direwolf20.buildinggadgets.client.gui;
 
+import com.direwolf20.buildinggadgets.client.gui.components.GuiIncrementer;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketCopyCoords;
@@ -15,17 +16,17 @@ import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.button.AbstractButton;
 import net.minecraft.client.gui.widget.button.Button;
-import net.minecraft.client.gui.widget.button.Button.IPressable;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.StringTextComponent;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class CopyGUI extends GuiScreenTextFields {
-    private GuiTextFieldBase startX, startY, startZ, endX, endY, endZ;
+public class CopyGUI extends Screen {
+    private GuiIncrementer startX, startY, startZ, endX, endY, endZ;
 
     private boolean absoluteCoords = Config.GENERAL.absoluteCoordDefault.get();
 
@@ -36,16 +37,20 @@ public class CopyGUI extends GuiScreenTextFields {
     private BlockPos startPos;
     private BlockPos endPos;
 
+    private List<GuiIncrementer> fields = new ArrayList<>();
+
     private static final ResourceLocation background = new ResourceLocation(Reference.MODID, "textures/gui/testcontainer.png");
 
     public CopyGUI(ItemStack tool) {
-        super();
+        super(new StringTextComponent(""));
         this.copyPasteTool = tool;
     }
 
     @Override
     public void init() {
         super.init();
+
+        this.fields.clear();
 
         // create a center point.
         int x = width / 2;
@@ -57,15 +62,27 @@ public class CopyGUI extends GuiScreenTextFields {
         if (startPos == null) startPos = new BlockPos(0, 0, 0);
         if (endPos == null) endPos = new BlockPos(0, 0, 0);
 
+        int incrementerWidth = GuiIncrementer.WIDTH + (GuiIncrementer.WIDTH / 2);
+
+        fields.add(startX = new GuiIncrementer(x - incrementerWidth, y + 10, 0, 0, 16));
+        fields.add(startY = new GuiIncrementer(x - GuiIncrementer.WIDTH / 2, y + 10, 0, 0, 16));
+        fields.add(startZ = new GuiIncrementer(x + GuiIncrementer.WIDTH / 2, y + 10, 0, 0, 16));
+        fields.add(endX = new GuiIncrementer(x - incrementerWidth, y + 40, 0, 0, 16));
+        fields.add(endY = new GuiIncrementer(x - GuiIncrementer.WIDTH / 2, y + 40, 0, 0, 16));
+        fields.add(endZ = new GuiIncrementer(x + GuiIncrementer.WIDTH / 2, y + 40, 0, 0, 16));
+        fields.forEach(this::addButton);
+
+        updateTextFields();
+
         List<AbstractButton> buttons = new ArrayList<AbstractButton>() {{
             add(new CenteredButton(y - 60, 50, GuiTranslation.SINGLE_CONFIRM, (button) -> {
-                clearTextBoxes();
+//                fields.forEach(field -> field.setValue(absoluteCoords ? field.getDefaultValue() : 0));
                 if (absoluteCoords) {
-                    startPos = new BlockPos(startX.getInt(), startY.getInt(), startZ.getInt());
-                    endPos = new BlockPos(endX.getInt(), endY.getInt(), endZ.getInt());
+                    startPos = new BlockPos(startX.getValue(), startY.getValue(), startZ.getValue());
+                    endPos = new BlockPos(endX.getValue(), endY.getValue(), endZ.getValue());
                 } else {
-                    startPos = new BlockPos(startPos.getX() + startX.getInt(), startPos.getY() + startY.getInt(), startPos.getZ() + startZ.getInt());
-                    endPos = new BlockPos(startPos.getX() + endX.getInt(), startPos.getY() + endY.getInt(), startPos.getZ() + endZ.getInt());
+                    startPos = new BlockPos(startPos.getX() + startX.getValue(), startPos.getY() + startY.getValue(), startPos.getZ() + startZ.getValue());
+                    endPos = new BlockPos(startPos.getX() + endX.getValue(), startPos.getY() + endY.getValue(), startPos.getZ() + endZ.getValue());
                 }
                 PacketHandler.sendToServer(new PacketCopyCoords(startPos, endPos));
             }));
@@ -82,32 +99,6 @@ public class CopyGUI extends GuiScreenTextFields {
 
         this.centerButtonList(buttons, x);
         buttons.forEach(this::addButton);
-
-        startX = addField(65, 15, startPos.getX());
-        addButton(50, 14, "-", (button) -> fieldChange(startX, -1));
-        addButton(110, 14, "+", (button) -> fieldChange(startX, 1));
-
-        startY = addField(165, 15, startPos.getY());
-        addButton(150, 14, "-", (button) -> fieldChange(startY, -1));
-        addButton(210, 14, "+", (button) -> fieldChange(startY, 1));
-
-        startZ = addField(265, 15, startPos.getZ());
-        addButton(250, 14, "-", (button) -> fieldChange(startZ, -1));
-        addButton(310, 14, "+", (button) -> fieldChange(startZ, 1));
-
-        endX = addField(65, 35, endPos.getX());
-        addButton(50, 34, "-", (button) -> fieldChange(endX, -1));
-        addButton(110, 34, "+", (button) -> fieldChange(endX, 1));
-
-        endY = addField(165, 35, endPos.getY());
-        addButton(150, 34, "-", (button) -> fieldChange(endY, -1));
-        addButton(210, 34, "+", (button) -> fieldChange(endY, 1));
-
-        endZ = addField(265, 35, endPos.getZ());
-        addButton(250, 34, "-", (button) -> fieldChange(endZ, -1));
-        addButton(310, 34, "+", (button) -> fieldChange(endZ, 1));
-
-        updateTextFields();
     }
 
     private void centerButtonList(List<AbstractButton> buttons, int startX) {
@@ -120,20 +111,6 @@ public class CopyGUI extends GuiScreenTextFields {
         }
     }
 
-    private void addButton(int x, int y, String text, IPressable action) {
-        addButton(new DireButton(guiLeft + x, guiTop + y, 10, 10, text, action));
-    }
-
-    private GuiTextFieldBase addField(int x, int y, int defaultint) {
-        return addField(new GuiTextFieldBase(font, guiLeft + x, guiTop + y, 40).setDefaultInt(defaultint).restrictToNumeric());
-    }
-
-    private void fieldChange(GuiTextFieldBase textField, int amount) {
-        clearTextBoxes();
-        if (Screen.hasShiftDown()) amount *= 10;
-        textField.setText(String.valueOf(textField.getInt() + amount));
-    }
-
     @Override
     public void render(int mouseX, int mouseY, float partialTicks) {
         getMinecraft().getTextureManager().bindTexture(background);
@@ -143,49 +120,62 @@ public class CopyGUI extends GuiScreenTextFields {
         drawFieldLable("End X", 8, 35);
         drawFieldLable("Y", 131, 35);
         drawFieldLable("Z", 231, 35);
+
         super.render(mouseX, mouseY, partialTicks);
+    }
+
+    @Override
+    public boolean keyPressed(int p_keyPressed_1_, int p_keyPressed_2_, int p_keyPressed_3_) {
+        fields.forEach(button -> button.keyPressed(p_keyPressed_1_, p_keyPressed_2_, p_keyPressed_3_));
+        return super.keyPressed(p_keyPressed_1_, p_keyPressed_2_, p_keyPressed_3_);
+    }
+
+    @Override
+    public boolean charTyped(char p_charTyped_1_, int p_charTyped_2_) {
+        fields.forEach(button -> button.charTyped(p_charTyped_1_, p_charTyped_2_));
+        return false;
     }
 
     private void drawFieldLable(String name, int x, int y) {
         font.drawStringWithShadow(name, guiLeft + x, guiTop + y, 0xFFFFFF);
     }
 
-    private void clearTextBoxes() {
-        forEachField(field -> {
-            if (field.getText().equals(""))
-                field.setText(String.valueOf(absoluteCoords ? field.getDefaultValue() : "0"));
-        });
-    }
-
     private void coordsModeSwitch() {
         absoluteCoords = !absoluteCoords;
+        fields.forEach(button -> button.updateMax(absoluteCoords ? Integer.MAX_VALUE : 16));
     }
 
     private void updateTextFields() {
-        String x, y, z;
-        if (absoluteCoords) {
-            BlockPos start = startX.getText() != "" ? new BlockPos(startPos.getX() + startX.getInt(), startPos.getY() + startY.getInt(), startPos.getZ() + startZ.getInt()) : startPos;
-            BlockPos end = endX.getText() != "" ? new BlockPos(startPos.getX() + endX.getInt(), startPos.getY() + endY.getInt(), startPos.getZ() + endZ.getInt()) : endPos;
-            startX.setText(String.valueOf(start.getX()));
-            startY.setText(String.valueOf(start.getY()));
-            startZ.setText(String.valueOf(start.getZ()));
-            endX.setText(String.valueOf(end.getX()));
-            endY.setText(String.valueOf(end.getY()));
-            endZ.setText(String.valueOf(end.getZ()));
-        } else {
-            x = !startX.getText().equals("") ? String.valueOf(startX.getInt() - startPos.getX()) : "0";
-            startX.setText(x);
-            y = !startY.getText().equals("") ? String.valueOf(startY.getInt() - startPos.getY()) : "0";
-            startY.setText(y);
-            z = !startZ.getText().equals("") ? String.valueOf(startZ.getInt() - startPos.getZ()) : "0";
-            startZ.setText(z);
-            x = !endX.getText().equals("") ? String.valueOf(endX.getInt() - startPos.getX()) : String.valueOf(endPos.getX() - startPos.getX());
-            endX.setText(x);
-            y = !endY.getText().equals("") ? String.valueOf(endY.getInt() - startPos.getY()) : String.valueOf(endPos.getY() - startPos.getY());
-            endY.setText(y);
-            z = !endZ.getText().equals("") ? String.valueOf(endZ.getInt() - startPos.getZ()) : String.valueOf(endPos.getZ() - startPos.getZ());
-            endZ.setText(z);
+        BlockPos start = startX.getValue() != 0
+                ? new BlockPos(startPos.getX() + startX.getValue(), startPos.getY() + startY.getValue(), startPos.getZ() + startZ.getValue())
+                : startPos;
+
+        BlockPos end = endX.getValue() != 0
+                ? new BlockPos(startPos.getX() + endX.getValue(), startPos.getY() + endY.getValue(), startPos.getZ() + endZ.getValue())
+                : endPos;
+
+        if( absoluteCoords ) {
+            startX.setValue(startPos.getX() + startX.getValue());
+            startX.setValue(start.getX());
+            startY.setValue(start.getY());
+            startZ.setValue(start.getZ());
+            endX.setValue(end.getX());
+            endY.setValue(end.getY());
+            endZ.setValue(end.getZ());
         }
+        else {
+            startX.setValue(startX.getValue() != 0 ? startX.getValue() - startPos.getX() : 0);
+            startY.setValue(startY.getValue() != 0 ? startY.getValue() - startPos.getY() : 0);
+            startZ.setValue(startZ.getValue() != 0 ? startZ.getValue() - startPos.getZ() : 0);
+            endX.setValue(endX.getValue() != 0 ? endX.getValue() - startPos.getX() : endPos.getX() - startPos.getX());
+            endY.setValue(endY.getValue() != 0 ? endY.getValue() - startPos.getY() : endPos.getY() - startPos.getY());
+            endZ.setValue(endZ.getValue() != 0 ? endZ.getValue() - startPos.getZ() : endPos.getZ() - startPos.getZ());
+        }
+    }
+
+    @Override
+    public boolean isPauseScreen() {
+        return false;
     }
 
     private static class CenteredButton extends Button {

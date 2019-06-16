@@ -2,7 +2,6 @@ package com.direwolf20.buildinggadgets.common.util.helpers;
 
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
-import net.minecraft.block.Blocks;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
@@ -28,7 +27,7 @@ public class VectorHelper {
         //return world.rayTraceBlocks(start, end, rayTraceFluid, false, false);
         RayTraceContext context = new RayTraceContext(start,end,RayTraceContext.BlockMode.COLLIDER, rayTraceFluid, player);
         BlockRayTraceResult result = world.rayTraceBlocks(context);
-        if (player.world.getBlockState(result.getPos()) == Blocks.AIR.getDefaultState()) return null;
+//        if (player.world.getBlockState(result.getPos()) == Blocks.AIR.getDefaultState()) return new RayTraceContext.BlockMode.;
         return result;
     }
 

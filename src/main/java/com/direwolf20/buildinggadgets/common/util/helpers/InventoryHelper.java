@@ -352,17 +352,20 @@ public class InventoryHelper {
             placeState = originalState.getBlock().getDefaultState();
         }
 
-        for (IProperty prop : placeState.getProperties()) {
-            if (tool.getItem() instanceof GadgetCopyPaste) {
-                if (SAFE_PROPERTIES_COPY_PASTE.contains(prop)) {
-                    placeState = placeState.with(prop, originalState.get(prop));
-                }
-            } else {
-                if (SAFE_PROPERTIES.contains(prop)) {
-                    placeState = placeState.with(prop, originalState.get(prop));
+        if (placeState != null) {
+            for (IProperty prop : placeState.getProperties()) {
+                if (tool.getItem() instanceof GadgetCopyPaste) {
+                    if (SAFE_PROPERTIES_COPY_PASTE.contains(prop)) {
+                        placeState = placeState.with(prop, originalState.get(prop));
+                    }
+                } else {
+                    if (SAFE_PROPERTIES.contains(prop)) {
+                        placeState = placeState.with(prop, originalState.get(prop));
+                    }
                 }
             }
         }
+
         return placeState;
 
     }

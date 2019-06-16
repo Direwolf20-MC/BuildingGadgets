@@ -266,17 +266,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
                 return new ActionResult<ItemStack>(ActionResultType.SUCCESS, stack);
 
             if (getToolMode(stack) == ToolMode.Copy) {
-                if (player.isSneaking()) {
-                    if (getStartPos(stack) != null)
-                        copyBlocks(stack, player, world, getStartPos(stack), pos);
-                    else
-                        setEndPos(stack, pos);
-                } else {
-                    if (getEndPos(stack) != null)
-                        copyBlocks(stack, player, world, pos, getEndPos(stack));
-                    else
-                        setStartPos(stack, pos);
-                }
+                this.setPosOrCopy(stack, player, world, pos);
             } else if (getToolMode(stack) == ToolMode.Paste) {
                 if (! player.isSneaking() && player instanceof ServerPlayerEntity) {
                     if (getAnchor(stack) == null) {
@@ -302,6 +292,16 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
             }
         }
         return new ActionResult<>(ActionResultType.SUCCESS, stack);
+    }
+
+    public void setPosOrCopy(ItemStack stack, PlayerEntity player, World world, BlockPos pos) {
+        if (player.isSneaking())
+            setEndPos(stack, pos);
+        else
+            setStartPos(stack, pos);
+
+        if( getStartPos(stack) != null && getEndPos(stack) != null )
+            copyBlocks(stack, player, world, getStartPos(stack), getEndPos(stack));
     }
 
     public static void rotateOrMirrorBlocks(ItemStack stack, PlayerEntity player, PacketRotateMirror.Operation operation) {
