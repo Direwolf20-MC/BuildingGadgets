@@ -229,12 +229,13 @@ public class ToolRenders {
         BlockRayTraceResult lookingAt = VectorHelper.getLookingAt(player, stack);
         BlockState state = Blocks.AIR.getDefaultState();
         List<BlockPos> coordinates = getAnchor(stack);
-        if (lookingAt == null) {
-            coordinates.size();
-        }
+        //if (lookingAt == null) {
+        //    coordinates.size();
+        //}
+        if (lookingAt == null && coordinates.size() == 0) return;
         World world = player.world;
         BlockState startBlock = Blocks.AIR.getDefaultState();
-        startBlock = world.getBlockState(new BlockPos(lookingAt.getHitVec()));
+        startBlock = world.getBlockState(new BlockPos(lookingAt.getPos()));
         if (startBlock != BGBlocks.effectBlock.getDefaultState()) {
             BlockState renderBlockState = getToolBlock(stack);
 
