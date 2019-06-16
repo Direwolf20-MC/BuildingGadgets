@@ -5,7 +5,6 @@ import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGEntities;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.nbt.CompoundNBT;
@@ -14,7 +13,6 @@ import net.minecraft.network.IPacket;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
-import net.minecraft.network.play.server.SSpawnObjectPacket;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -50,7 +48,7 @@ public class BlockBuildEntity extends EntityBase {
         REMOVE() {
             @Override
             public void onBuilderEntityDespawn(BlockBuildEntity builder) {
-                builder.world.setBlockState(builder.targetPos, Blocks.AIR.getDefaultState());
+                builder.world.removeBlock(builder.targetPos, false);
             }
         },
         REPLACE() {
