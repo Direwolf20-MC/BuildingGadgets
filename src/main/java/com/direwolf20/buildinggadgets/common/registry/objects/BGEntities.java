@@ -25,23 +25,29 @@ public final class BGEntities {
     private BGEntities() {}
 
     @ObjectHolder(EntityReference.BUILD_BLOCK_ENTITY)
-    public static EntityType<?> BUILD_BLOCK;
+    public final static EntityType<BlockBuildEntity> BUILD_BLOCK = null;
     @ObjectHolder(EntityReference.CONSTRUCTION_BLOCK_ENTITY)
-    public static EntityType<?> CONSTRUCTION_BLOCK;
+    public final static EntityType<ConstructionBlockEntity> CONSTRUCTION_BLOCK = null;
 
     public static void init() {
         container.add(new EntityBuilder<BlockBuildEntity>(EntityReference.BUILD_BLOCK_ENTITY_RL)
                 .builder(Builder.<BlockBuildEntity>create(BlockBuildEntity::new, EntityClassification.MISC)
                         .setTrackingRange(64)
                         .setUpdateInterval(1)
-                        .setShouldReceiveVelocityUpdates(false))
+                        .setShouldReceiveVelocityUpdates(false)
+                        .setCustomClientFactory(((spawnEntity, world) -> {
+                            return BUILD_BLOCK.create(world);
+                        })))
                 .renderer(BlockBuildEntity.class, BlockBuildEntityRender::new)
                 .factory(b -> b.build("")));
         container.add(new EntityBuilder<ConstructionBlockEntity>(EntityReference.CONSTRUCTION_BLOCK_ENTITY_RL)
                 .builder(Builder.<ConstructionBlockEntity>create(ConstructionBlockEntity::new, EntityClassification.MISC)
                         .setTrackingRange(64)
                         .setUpdateInterval(1)
-                        .setShouldReceiveVelocityUpdates(false))
+                        .setShouldReceiveVelocityUpdates(false)
+                        .setCustomClientFactory(((spawnEntity, world) -> {
+                            return CONSTRUCTION_BLOCK.create(world);
+                        })))
                 .renderer(ConstructionBlockEntity.class, ConstructionBlockEntityRender::new)
                 .factory(b -> b.build("")));
     }
