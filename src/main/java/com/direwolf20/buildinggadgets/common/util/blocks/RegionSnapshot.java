@@ -18,9 +18,8 @@ import net.minecraft.nbt.NBTUtil;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.dimension.DimensionType;
-import net.minecraftforge.common.util.BlockSnapshot;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.TriPredicate;
 import net.minecraftforge.fml.server.ServerLifecycleHooks;
@@ -34,7 +33,6 @@ public class RegionSnapshot {
 
     private static final String DIMENSION = "dim";
     private static final String POSITIONS = "positions";
-    private static final String POSITIONS_CLASS = "positions_class";
     private static final String BLOCK_FRAMES = "frames";
     private static final String BLOCK_PALETTES = "palettes";
     private static final String TILE_DATA = "block_snapshots";
@@ -129,7 +127,7 @@ public class RegionSnapshot {
 
     public static RegionSnapshot deserialize(NBTTagCompound tag) {
         ResourceLocation dimension = new ResourceLocation(tag.getString(DIMENSION));
-        World world = ServerLifecycleHooks.getCurrentServer().getWorld(Objects.requireNonNull(DimensionType.byName(dimension)));
+        IWorld world = ServerLifecycleHooks.getCurrentServer().getWorld(Objects.requireNonNull(DimensionType.byName(dimension)));
 
         IPositionPlacementSequence positions = SerializationHelper.deserialize(tag.getByteArray(POSITIONS));
 
@@ -176,22 +174,25 @@ public class RegionSnapshot {
      * Create a {@link RegionSnapshot} builder.
      * <p>
      * Predicate for whether record blocks or not can be customized through the builder. If no extra conditions are
-     * needed, use {@link #take(World, IPositionPlacementSequence)} instead.
+     * needed, use {@link #take(IWorld, IPositionPlacementSequence)} instead.
      */
-    public static Builder select(World world, IPositionPlacementSequence positions) {
+    public static Builder select(IWorld world, IPositionPlacementSequence positions) {
         return new Builder(world, positions);
     }
 
     /**
      * Directly take a snapshot of the area, <b>without</b> tile entities.
      *
-     * @see #select(World, IPositionPlacementSequence)
+     * @see #select(IWorld, IPositionPlacementSequence)
      */
-    public static RegionSnapshot take(World world, IPositionPlacementSequence positions) throws PaletteOverflowException {
-        return select(world, positions).build();
+    public static RegionSnapshot take(IWorld world, IPositionPlacementSequence positions) throws PaletteOverflowException {
+        return select(world, positions)
+                .checkBlocks((pos, state) -> true)
+                .recordTiles(false)
+                .build();
     }
 
-    private World world;
+    private IWorld world;
     private IPositionPlacementSequence positions;
 
     private ImmutableList<Optional<IBlockState>> blockStates;
@@ -202,7 +203,7 @@ public class RegionSnapshot {
      */
     private NBTTagCompound serializedForm;
 
-    private RegionSnapshot(World world, IPositionPlacementSequence positions, ImmutableList<Optional<IBlockState>> blockStates, ImmutableList<Pair<BlockPos, NBTTagCompound>> tileData) {
+    private RegionSnapshot(IWorld world, IPositionPlacementSequence positions, ImmutableList<Optional<IBlockState>> blockStates, ImmutableList<Pair<BlockPos, NBTTagCompound>> tileData) {
         this.world = world;
         this.positions = positions;
         this.blockStates = blockStates;
@@ -212,7 +213,7 @@ public class RegionSnapshot {
     public void restore() {
         int index = 0;
         for (BlockPos pos : positions) {
-            blockStates.get(index).ifPresent(state -> world.setBlockState(pos, state));
+            blockStates.get(index).ifPresent(state -> world.setBlockState(pos, state, Constants.BlockFlags.DEFAULT));
             index++;
         }
 
@@ -234,8 +235,7 @@ public class RegionSnapshot {
     /**
      * From minimum Z to maximum Z; then from minimum Y to maximum Y; then from minimum X to maximum X; each entry are
      * stored in the above order and represent the block state in that position. If an entry is {@code null}, it means
-     * that position should not be replaced regularly: it might be replaced with a {@link BlockSnapshot}, or it should
-     * be left untouched.
+     * that position should not be replaced regularly: it should be left untouched.
      */
     public ImmutableList<Optional<IBlockState>> getBlockStates() {
         return blockStates;
@@ -261,14 +261,14 @@ public class RegionSnapshot {
 
     public static final class Builder {
 
-        private World world;
+        private IWorld world;
         private IPositionPlacementSequence positions;
         private BiPredicate<BlockPos, IBlockState> normalValidator;
         private TriPredicate<BlockPos, IBlockState, TileEntity> tileValidator;
 
         private boolean built = false;
 
-        private Builder(World world, IPositionPlacementSequence positions) {
+        private Builder(IWorld world, IPositionPlacementSequence positions) {
             this.world = world;
             this.positions = positions;
         }
