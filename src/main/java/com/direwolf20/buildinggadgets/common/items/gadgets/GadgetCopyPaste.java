@@ -166,7 +166,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
 
     @Nullable
     private static ResourceLocation getLastBuildDim(ItemStack stack) {
-        return GadgetUtils.getDIMFromNBT(stack, NBTKeys.GADGET_LAST_BUILD_DIM);
+        return GadgetUtils.getDIMFromNBT(stack, NBTKeys.GADGET_LAST_BUILD_POS);
     }
 
     public static List<BlockMap> getBlockMapList(@Nullable CompoundNBT tagCompound) {
