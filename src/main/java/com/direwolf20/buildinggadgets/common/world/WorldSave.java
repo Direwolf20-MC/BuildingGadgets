@@ -4,15 +4,21 @@ import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.ServerWorld;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.world.storage.DimensionSavedDataManager;
 import net.minecraft.world.storage.WorldSavedData;
+import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.util.Constants;
+import net.minecraftforge.fml.server.ServerLifecycleHooks;
 
 import javax.annotation.Nonnull;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 public class WorldSave extends WorldSavedData {
     private final String TAG_NAME;
@@ -46,29 +52,23 @@ public class WorldSave extends WorldSavedData {
     }
 
     public static WorldSave getWorldSave(World world) {
-        return get(world, WorldSaveBlockMap.NAME, WorldSaveBlockMap::new);
+        return get(world, WorldSaveBlockMap.NAME, () -> new WorldSaveBlockMap(WorldSaveBlockMap.NAME));
     }
 
     public static WorldSave getTemplateWorldSave(World world) {
-        return get(world, WorldSaveTemplate.NAME, WorldSaveTemplate::new);
+        return get(world, WorldSaveTemplate.NAME, () -> new WorldSaveTemplate(WorldSaveTemplate.NAME));
     }
 
     public static WorldSave getWorldSaveDestruction(World world) {
-        return get(world, WorldSaveDestruction.NAME, WorldSaveDestruction::new);
+        return get(world, WorldSaveDestruction.NAME,  () -> new WorldSaveDestruction(WorldSaveDestruction.NAME));
     }
 
     @Nonnull
-    private static <T extends WorldSave> WorldSave get(World world, String name, Function<String, T> factory) {
-        name = String.join("_", Reference.MODID, name);
-        DimensionType dim = world.getDimension().getType();
-        /*
-        WorldSave instance = world.func_212409_a(dim, factory, name);
-        if (instance == null) {
-            instance = factory.apply(name);
-            world.func_212409_a(dim, name, instance);
-        }
-        return instance;*/
-        return null;//TODO fix once we find out, how to access worldSave's
+    private static <T extends WorldSave> WorldSave get(World world, String name, Supplier<T> supplier) {
+        ServerWorld world2 = world.getServer().getWorld(DimensionType.OVERWORLD);
+        DimensionSavedDataManager storage = world2.getSavedData();
+        T data = storage.getOrCreate(supplier, name);
+        return data;
     }
 
     @Override

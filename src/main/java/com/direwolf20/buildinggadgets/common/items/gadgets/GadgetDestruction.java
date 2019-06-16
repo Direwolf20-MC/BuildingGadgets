@@ -422,7 +422,7 @@ public class GadgetDestruction extends GadgetGeneric {
         tagCompound.putString(NBTKeys.GADGET_DIM, DimensionType.getKey(player.dimension).toString());
         tagCompound.putString(NBTKeys.GADGET_UUID, UUID);
         worldSave.addToMap(UUID, tagCompound);
-        worldSave.markForSaving();
+        //worldSave.markForSaving();
     }
 
     public static void undo(PlayerEntity player, ItemStack stack) {
