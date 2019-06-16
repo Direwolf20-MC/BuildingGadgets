@@ -1,7 +1,11 @@
 package com.direwolf20.buildinggadgets.client.gui.components;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.Widget;
+import net.minecraft.util.math.MathHelper;
+
+import javax.annotation.Nullable;
 
 public class GuiIncrementer extends Widget {
     // this is the width of all components in a line
@@ -13,12 +17,13 @@ public class GuiIncrementer extends Widget {
     private int max;
 
     private int value;
+    private IIncrementerChanged onChange;
 
     private DireButton minusButton;
     private GuiTextFieldBase field;
     private DireButton plusButton;
 
-    public GuiIncrementer(int x, int y, int min, int max) {
+    public GuiIncrementer(int x, int y, int min, int max, @Nullable IIncrementerChanged onChange) {
         super(x, y, WIDTH, 20, "");
 
         this.x = x;
@@ -26,6 +31,7 @@ public class GuiIncrementer extends Widget {
         this.min = min;
         this.max = max;
         this.value = 0;
+        this.onChange = onChange;
 
         this.minusButton = new DireButton(this.x, this.y - 1, 12, 17, "-", (button) -> this.updateValue(true));
         this.field = new GuiTextFieldBase(Minecraft.getInstance().fontRenderer, x + 13, y, 40).setDefaultInt(this.value).restrictToNumeric();
@@ -34,8 +40,12 @@ public class GuiIncrementer extends Widget {
         this.field.setText(String.valueOf(this.value));
     }
 
+    public GuiIncrementer(int x, int y, @Nullable IIncrementerChanged onChange) {
+        this(x, y, Integer.MIN_VALUE, Integer.MAX_VALUE, onChange);
+    }
+
     public GuiIncrementer(int x, int y) {
-        this(x, y, Integer.MIN_VALUE, Integer.MAX_VALUE);
+        this(x, y, Integer.MIN_VALUE, Integer.MAX_VALUE, null);
     }
 
     public int getValue() {
@@ -43,16 +53,24 @@ public class GuiIncrementer extends Widget {
     }
 
     private void updateValue(boolean isMinus) {
-        int value = isMinus ? this.value - 1 : this.value + 1;
+        int modifier = 1;
+        if( Screen.hasShiftDown() )
+            modifier *= 10;
+
+        int value = isMinus ? this.value - modifier : this.value + modifier;
         this.setValue(value);
     }
 
     public void setValue(int value) {
-        if( value > this.max || value < this.min )
+        // We don't want to fire events for no reason
+        if( value == this.value )
             return;
 
-        this.value = value;
+        this.value = MathHelper.clamp(value, this.min, this.max);
         this.field.setText(String.valueOf(this.value));
+
+        if( this.onChange != null )
+            this.onChange.onChange(value);
     }
 
     public void updateMax(int max) {
@@ -113,5 +131,9 @@ public class GuiIncrementer extends Widget {
 
     public int getY() {
         return y;
+    }
+
+    public interface IIncrementerChanged {
+        void onChange(int value);
     }
 }

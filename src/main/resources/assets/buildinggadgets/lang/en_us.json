@@ -103,6 +103,7 @@
     "gui.buildinggadgets.single.cancel": "Cancel",
     "gui.buildinggadgets.single.close": "Close",
     "gui.buildinggadgets.single.clear": "Clear",
+    "gui.buildinggadgets.single.reset": "Reset",
 
     "_comment": "gui - destruction:",
     "gui.buildinggadgets.copy.button.absolute": "Use absolute coords",

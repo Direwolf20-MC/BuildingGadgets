@@ -96,18 +96,8 @@ public class CopyGUI extends Screen {
             }));
         }};
 
-        this.centerButtonList(buttons, x);
+        CenteredButton.centerButtonList(buttons, x);
         buttons.forEach(this::addButton);
-    }
-
-    private void centerButtonList(List<AbstractButton> buttons, int startX) {
-        int collectiveWidth = buttons.stream().mapToInt(AbstractButton::getWidth).sum() + (buttons.size() - 1) * 5;
-
-        int nextX = startX - collectiveWidth / 2;
-        for(AbstractButton button : buttons) {
-            button.x = nextX;
-            nextX += button.getWidth() + 5;
-        }
     }
 
     private void drawFieldLabel(String name, int x, int y) {
@@ -150,7 +140,7 @@ public class CopyGUI extends Screen {
         drawFieldLabel("Z", 55, -11);
 
         drawCenteredString(Minecraft.getInstance().fontRenderer, I18n.format(GuiTranslation.COPY_LABEL_HEADING.getTranslationKey()), this.x, this.y - 80, 0xFFFFFF);
-        drawCenteredString(Minecraft.getInstance().fontRenderer, I18n.format(GuiTranslation.COPY_LABEL_HEADING.getTranslationKey()), this.x, this.y - 68, 0xFFFFFF);
+        drawCenteredString(Minecraft.getInstance().fontRenderer, I18n.format(GuiTranslation.COPY_LABEL_SUBHEADING.getTranslationKey()), this.x, this.y - 68, 0xFFFFFF);
 
         super.render(mouseX, mouseY, partialTicks);
     }
@@ -167,15 +157,24 @@ public class CopyGUI extends Screen {
         return false;
     }
 
-
     @Override
     public boolean isPauseScreen() {
         return false;
     }
 
-    private static class CenteredButton extends Button {
-        CenteredButton(int y, int width, ITranslationProvider text, IPressable onPress) {
+    public static class CenteredButton extends Button {
+        public CenteredButton(int y, int width, ITranslationProvider text, IPressable onPress) {
             super(0, y, width, 20, I18n.format(text.getTranslationKey()), onPress);
+        }
+
+        protected static void centerButtonList(List<AbstractButton> buttons, int startX) {
+            int collectiveWidth = buttons.stream().mapToInt(AbstractButton::getWidth).sum() + (buttons.size() - 1) * 5;
+
+            int nextX = startX - collectiveWidth / 2;
+            for(AbstractButton button : buttons) {
+                button.x = nextX;
+                nextX += button.getWidth() + 5;
+            }
         }
     }
 }

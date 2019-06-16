@@ -5,113 +5,101 @@
 
 package com.direwolf20.buildinggadgets.client.gui;
 
-import com.direwolf20.buildinggadgets.client.gui.components.DireButton;
-import com.direwolf20.buildinggadgets.client.gui.components.GuiScreenTextFields;
-import com.direwolf20.buildinggadgets.client.gui.components.GuiTextFieldBase;
-import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
+import com.direwolf20.buildinggadgets.client.gui.components.GuiIncrementer;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketPasteGUI;
+import com.direwolf20.buildinggadgets.common.util.lang.GuiTranslation;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.button.Button;
-import net.minecraft.client.gui.widget.button.Button.IPressable;
+import net.minecraft.client.gui.widget.button.AbstractButton;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
 
-public class PasteGUI extends GuiScreenTextFields {
-    public static final int WIDTH = 256;
-    public static final int HEIGHT = 256;
+import java.util.ArrayList;
+import java.util.List;
 
-    private GuiTextFieldBase X, Y, Z;
-
-    private int guiLeft = 15;
-    private int guiTop = 50;
-
-    private ItemStack tool;
+public class PasteGUI extends Screen {
+    private GuiIncrementer X, Y, Z;
+    private List<GuiIncrementer> fields = new ArrayList<>();
 
     private static final ResourceLocation background = new ResourceLocation(Reference.MODID, "textures/gui/testcontainer.png");
 
     PasteGUI(ItemStack tool) {
-        super();
-        this.tool = tool;
+        super(new StringTextComponent(""));
     }
 
     @Override
     public void init() {
         super.init();
 
-        X = addField(80);
-        Y = addField(200);
-        Z = addField(320);
+        int x = width / 2;
+        int y = height / 2;
 
-        nullCheckTextBoxes();
+        fields.add(X = new GuiIncrementer(x - (GuiIncrementer.WIDTH + (GuiIncrementer.WIDTH / 2)) - 10, y - 10, -16, 16, this::onChange));
+        fields.add(Y = new GuiIncrementer(x - GuiIncrementer.WIDTH / 2, y - 10, -16, 16, this::onChange));
+        fields.add(Z = new GuiIncrementer(x + (GuiIncrementer.WIDTH / 2) + 10, y - 10, -16, 16, this::onChange));
 
-        addButton(new Button(guiLeft + 80, guiTop + 125, 40, 20, "Ok", (button) -> {
-            nullCheckTextBoxes();
-            if (GuiMod.sizeCheckBoxes(getFieldIterator(), -16, 16)) {
-                PacketHandler.sendToServer(new PacketPasteGUI(Integer.parseInt(X.getText()), Integer.parseInt(Y.getText()), Integer.parseInt(Z.getText())));
+        List<AbstractButton> buttons = new ArrayList<AbstractButton>() {{
+            add(new CopyGUI.CenteredButton(y + 20, 70, GuiTranslation.SINGLE_CONFIRM, (button) -> {
+                PacketHandler.sendToServer(new PacketPasteGUI(X.getValue(), Y.getValue(), Z.getValue()));
                 onClose();
-            } else {
-                Minecraft.getInstance().player.sendStatusMessage(new StringTextComponent(TextFormatting.RED + new TranslationTextComponent("message.gadget.destroysizeerror").getUnformattedComponentText()), true);
-            }
-        }));
+            }));
 
-        addButton(65, "-", (button) -> fieldChange(X, -1));
-        addButton(125, "+", (button) -> fieldChange(X, 1));
-        addButton(185, "-", (button) -> fieldChange(Y, -1));
-        addButton(245, "+", (button) -> fieldChange(Y, 1));
-        addButton(305, "-", (button) -> fieldChange(Z, -1));
-        addButton(365, "+", (button) -> fieldChange(Z, 1));
-        addButton(new Button(guiLeft + 320, guiTop + 125, 40, 20, "Reset", (button) -> {
-            X.setText("0");
-            Y.setText("1");
-            Z.setText("0");
-            sendPacket();
-        }));
-    }
+            add(new CopyGUI.CenteredButton(y + 20, 40, GuiTranslation.SINGLE_RESET, (button) -> {
+                X.setValue(0);
+                Y.setValue(1);
+                Z.setValue(0);
+                sendPacket();
+            }));
+        }};
 
-    private void addButton(int x, String text, IPressable action) {
-        addButton(new DireButton(guiLeft + x, guiTop + 99, 10, 10, text, action));
-    }
+        CopyGUI.CenteredButton.centerButtonList(buttons, x);
 
-    private GuiTextFieldBase addField(int x) {
-        return addField(new GuiTextFieldBase(font, guiLeft + x, guiTop + 100, 40).restrictToNumeric());
+        buttons.forEach(this::addButton);
+        fields.forEach(this::addButton);
     }
 
     private void sendPacket() {
-        PacketHandler.sendToServer(new PacketPasteGUI(X.getInt(), Y.getInt(), Z.getInt()));
+        PacketHandler.sendToServer(new PacketPasteGUI(X.getValue(), Y.getValue(), Z.getValue()));
     }
 
-    public void fieldChange(GuiTextFieldBase field, int amount) {
-        nullCheckTextBoxes();
-        if (Screen.hasShiftDown()) amount *= 10;
-        int i = MathHelper.clamp(field.getInt() + amount, -16, 16);
-        field.setText(String.valueOf(i));
-        sendPacket();
+    private void onChange(int value) {
+        PacketHandler.sendToServer(new PacketPasteGUI(X.getValue(), Y.getValue(), Z.getValue()));
+    }
+
+    @Override
+    public boolean keyPressed(int mouseX, int mouseY, int __unused) {
+        fields.forEach(button -> button.keyPressed(mouseX, mouseY, __unused));
+        return super.keyPressed(mouseX, mouseY, __unused);
+    }
+
+    @Override
+    public boolean charTyped(char charTyped, int __unused) {
+        fields.forEach(button -> button.charTyped(charTyped, __unused));
+        return false;
+    }
+
+    @Override
+    public boolean isPauseScreen() {
+        return false;
     }
 
     @Override
     public void render(int mouseX, int mouseY, float partialTicks) {
         getMinecraft().getTextureManager().bindTexture(background);
-        drawFieldLable("X", 55);
-        drawFieldLable("Y", 175);
-        drawFieldLable("Z", 296);
+        drawLabel("X", -75);
+        drawLabel("Y", 0);
+        drawLabel("Z", 75);
+
+        drawCenteredString(Minecraft.getInstance().fontRenderer, I18n.format(GuiTranslation.COPY_LABEL_HEADING.getTranslationKey()), (int)(width / 2f), (int)(height / 2f) - 60, 0xFFFFFF);
 
         super.render(mouseX, mouseY, partialTicks);
     }
 
-    private void drawFieldLable(String name, int x) {
-        font.drawStringWithShadow(name, guiLeft + x, guiTop + 100, 0xFFFFFF);
-    }
-
-    protected void nullCheckTextBoxes() {
-        GuiMod.setEmptyField(X, () -> GadgetCopyPaste.getX(tool));
-        GuiMod.setEmptyField(Y, () -> GadgetCopyPaste.getY(tool));
-        GuiMod.setEmptyField(Z, () -> GadgetCopyPaste.getZ(tool));
+    private void drawLabel(String name, int x) {
+        font.drawStringWithShadow(name, (width / 2f) + x, (height / 2f) - 30, 0xFFFFFF);
     }
 }
