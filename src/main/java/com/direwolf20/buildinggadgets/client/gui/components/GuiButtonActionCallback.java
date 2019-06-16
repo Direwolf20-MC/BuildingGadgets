@@ -1,4 +1,4 @@
-package com.direwolf20.buildinggadgets.client.gui;
+package com.direwolf20.buildinggadgets.client.gui.components;
 
 import com.direwolf20.buildinggadgets.client.gui.ModeRadialMenu.ScreenPosition;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;

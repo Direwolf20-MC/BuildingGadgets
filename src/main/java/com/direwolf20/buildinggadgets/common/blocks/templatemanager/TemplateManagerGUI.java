@@ -5,10 +5,10 @@
 
 package com.direwolf20.buildinggadgets.common.blocks.templatemanager;
 
-import com.direwolf20.buildinggadgets.client.gui.AreaHelpText;
-import com.direwolf20.buildinggadgets.client.gui.GuiButtonHelp;
-import com.direwolf20.buildinggadgets.client.gui.GuiButtonHelpText;
-import com.direwolf20.buildinggadgets.client.gui.IHoverHelpText;
+import com.direwolf20.buildinggadgets.client.gui.components.AreaHelpText;
+import com.direwolf20.buildinggadgets.client.gui.components.GuiButtonHelp;
+import com.direwolf20.buildinggadgets.client.gui.components.GuiButtonHelpText;
+import com.direwolf20.buildinggadgets.client.gui.components.IHoverHelpText;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketTemplateManagerLoad;

@@ -1,7 +1,5 @@
 package com.direwolf20.buildinggadgets.client.gui.components;
 
-import com.direwolf20.buildinggadgets.client.gui.DireButton;
-import com.direwolf20.buildinggadgets.client.gui.GuiTextFieldBase;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.widget.Widget;
 

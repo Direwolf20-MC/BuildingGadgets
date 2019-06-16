@@ -5,6 +5,9 @@
 
 package com.direwolf20.buildinggadgets.client.gui;
 
+import com.direwolf20.buildinggadgets.client.gui.components.DireButton;
+import com.direwolf20.buildinggadgets.client.gui.components.GuiScreenTextFields;
+import com.direwolf20.buildinggadgets.client.gui.components.GuiTextFieldBase;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketPasteGUI;

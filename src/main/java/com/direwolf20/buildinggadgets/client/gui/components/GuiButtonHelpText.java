@@ -1,5 +1,6 @@
-package com.direwolf20.buildinggadgets.client.gui;
+package com.direwolf20.buildinggadgets.client.gui.components;
 
+import com.direwolf20.buildinggadgets.client.gui.GuiMod;
 import net.minecraft.client.gui.AbstractGui;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.client.resources.I18n;

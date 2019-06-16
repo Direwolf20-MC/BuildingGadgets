@@ -6,6 +6,9 @@
 package com.direwolf20.buildinggadgets.client.gui;
 
 import com.direwolf20.buildinggadgets.client.KeyBindings;
+import com.direwolf20.buildinggadgets.client.gui.components.GuiButtonActionCallback;
+import com.direwolf20.buildinggadgets.client.gui.components.GuiButtonSelect;
+import com.direwolf20.buildinggadgets.client.gui.components.GuiSliderInt;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.items.gadgets.*;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;

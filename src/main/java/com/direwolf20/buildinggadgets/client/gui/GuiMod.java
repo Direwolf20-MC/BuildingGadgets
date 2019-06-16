@@ -2,6 +2,7 @@ package com.direwolf20.buildinggadgets.client.gui;
 
 //import com.direwolf20.buildinggadgets.client.gui.materiallist.MaterialListGUI;
 
+import com.direwolf20.buildinggadgets.client.gui.components.GuiTextFieldBase;
 import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManagerContainer;
 import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManagerGUI;
 import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManagerTileEntity;
