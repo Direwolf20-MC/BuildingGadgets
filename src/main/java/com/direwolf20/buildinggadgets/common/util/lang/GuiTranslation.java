@@ -11,7 +11,9 @@ public enum GuiTranslation implements ITranslationProvider {
     SINGLE_CLOSE("single.close"),
     SINGLE_CLEAR("single.clear"),
 
-    COPY_BUTTON_ABSOLUTE("copy.button.absolute");
+    COPY_BUTTON_ABSOLUTE("copy.button.absolute"),
+    COPY_LABEL_HEADING("copy.label.heading"),
+    COPY_LABEL_SUBHEADING("copy.label.subheading");
 
     private static final String PREFIX = "gui." + Reference.MODID + ".";
     private final String key;

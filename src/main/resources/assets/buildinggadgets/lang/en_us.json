@@ -106,6 +106,8 @@
 
     "_comment": "gui - destruction:",
     "gui.buildinggadgets.copy.button.absolute": "Use absolute coords",
+    "gui.buildinggadgets.copy.label.heading": "Make adjustments",
+    "gui.buildinggadgets.copy.label.subheading": "Use absolute mode to use block locations.",
 
     "_comment": "gui - destruction:",
     "gui.buildinggadgets.destruction.field.depth": "Depth",

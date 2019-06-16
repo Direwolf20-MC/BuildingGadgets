@@ -44,7 +44,7 @@ public class DireButton extends GuiButtonHelpText {
                 j = 16777120;
             }
 
-            this.drawCenteredString(fontrenderer, this.getMessage(), this.x + this.width / 2, this.y + (this.height - 8) / 2, j);
+            this.drawCenteredString(fontrenderer, this.getMessage(), this.x + this.width / 2, this.y + (this.height - 7) / 2, j);
         }
     }
 }

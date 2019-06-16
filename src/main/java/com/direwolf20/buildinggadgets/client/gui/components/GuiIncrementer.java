@@ -5,8 +5,7 @@ import net.minecraft.client.gui.widget.Widget;
 
 public class GuiIncrementer extends Widget {
     // this is the width of all components in a line
-    // with the spacing of 5 between each element
-    public static final int WIDTH = 70;
+    public static final int WIDTH = 64;
 
     private int x;
     private int y;
@@ -28,9 +27,9 @@ public class GuiIncrementer extends Widget {
         this.max = max;
         this.value = 0;
 
-        this.minusButton = new DireButton(this.x, this.y, 10, 10, "-", (button) -> this.updateValue(true));
-        this.field = new GuiTextFieldBase(Minecraft.getInstance().fontRenderer, x + 15, y, 40).setDefaultInt(this.value).restrictToNumeric();
-        this.plusButton = new DireButton(this.x + 40 + 15, this.y, 10, 10, "+", (button) -> this.updateValue(false));
+        this.minusButton = new DireButton(this.x, this.y - 1, 12, 17, "-", (button) -> this.updateValue(true));
+        this.field = new GuiTextFieldBase(Minecraft.getInstance().fontRenderer, x + 13, y, 40).setDefaultInt(this.value).restrictToNumeric();
+        this.plusButton = new DireButton(this.x + 40 + 14, this.y - 1, 12, 17, "+", (button) -> this.updateValue(false));
 
         this.field.setText(String.valueOf(this.value));
     }
@@ -45,7 +44,6 @@ public class GuiIncrementer extends Widget {
 
     private void updateValue(boolean isMinus) {
         int value = isMinus ? this.value - 1 : this.value + 1;
-        System.out.println(value);
         this.setValue(value);
     }
 

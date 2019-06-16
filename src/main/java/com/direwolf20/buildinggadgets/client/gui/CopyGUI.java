@@ -13,6 +13,7 @@ import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
 import com.direwolf20.buildinggadgets.common.util.lang.GuiTranslation;
 import com.direwolf20.buildinggadgets.common.util.lang.ITranslationProvider;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.button.AbstractButton;
 import net.minecraft.client.gui.widget.button.Button;
@@ -30,8 +31,8 @@ public class CopyGUI extends Screen {
 
     private boolean absoluteCoords = Config.GENERAL.absoluteCoordDefault.get();
 
-    private int guiLeft = 15;
-    private int guiTop = 15;
+    private int x;
+    private int y;
 
     private ItemStack copyPasteTool;
     private BlockPos startPos;
@@ -52,34 +53,29 @@ public class CopyGUI extends Screen {
 
         this.fields.clear();
 
-        // create a center point.
-        int x = width / 2;
-        int y = height / 2;
+        this.x = width / 2;
+        this.y = height / 2;
 
         startPos = BGItems.gadgetCopyPaste.getStartPos(copyPasteTool);
         endPos = BGItems.gadgetCopyPaste.getEndPos(copyPasteTool);
-
-        System.out.println(startPos);
-        System.out.println(endPos);
-
 
         if (startPos == null) startPos = new BlockPos(0, 0, 0);
         if (endPos == null) endPos = new BlockPos(0, 0, 0);
 
         int incrementerWidth = GuiIncrementer.WIDTH + (GuiIncrementer.WIDTH / 2);
 
-        fields.add(startX = new GuiIncrementer(x - incrementerWidth, y + 10));
-        fields.add(startY = new GuiIncrementer(x - GuiIncrementer.WIDTH / 2, y + 10));
-        fields.add(startZ = new GuiIncrementer(x + GuiIncrementer.WIDTH / 2, y + 10));
-        fields.add(endX = new GuiIncrementer(x - incrementerWidth, y + 40));
-        fields.add(endY = new GuiIncrementer(x - GuiIncrementer.WIDTH / 2, y + 40));
-        fields.add(endZ = new GuiIncrementer(x + GuiIncrementer.WIDTH / 2, y + 40));
+        fields.add(startX = new GuiIncrementer(x - incrementerWidth - 35, y - 40));
+        fields.add(startY = new GuiIncrementer(x - GuiIncrementer.WIDTH / 2, y - 40));
+        fields.add(startZ = new GuiIncrementer(x + (GuiIncrementer.WIDTH / 2) + 35, y - 40));
+        fields.add(endX = new GuiIncrementer(x - incrementerWidth - 35, y - 15));
+        fields.add(endY = new GuiIncrementer(x - GuiIncrementer.WIDTH / 2, y - 15));
+        fields.add(endZ = new GuiIncrementer(x + (GuiIncrementer.WIDTH / 2) + 35, y - 15));
         fields.forEach(this::addButton);
 
         updateTextFields();
 
         List<AbstractButton> buttons = new ArrayList<AbstractButton>() {{
-            add(new CenteredButton(y - 60, 50, GuiTranslation.SINGLE_CONFIRM, (button) -> {
+            add(new CenteredButton(y + 20, 50, GuiTranslation.SINGLE_CONFIRM, (button) -> {
                 if (absoluteCoords) {
                     startPos = new BlockPos(startX.getValue(), startY.getValue(), startZ.getValue());
                     endPos = new BlockPos(endX.getValue(), endY.getValue(), endZ.getValue());
@@ -89,12 +85,12 @@ public class CopyGUI extends Screen {
                 }
                 PacketHandler.sendToServer(new PacketCopyCoords(startPos, endPos));
             }));
-            add(new CenteredButton(y - 60, 50, GuiTranslation.SINGLE_CLOSE, (button) -> onClose()));
-            add(new CenteredButton(y - 60, 50, GuiTranslation.SINGLE_CLEAR, (button) -> {
+            add(new CenteredButton(y + 20, 50, GuiTranslation.SINGLE_CLOSE, (button) -> onClose()));
+            add(new CenteredButton(y + 20, 50, GuiTranslation.SINGLE_CLEAR, (button) -> {
                 PacketHandler.sendToServer(new PacketCopyCoords(BlockPos.ZERO, BlockPos.ZERO));
                 onClose();
             }));
-            add(new CenteredButton(y - 60, 120, GuiTranslation.COPY_BUTTON_ABSOLUTE, (button) -> {
+            add(new CenteredButton(y + 20, 120, GuiTranslation.COPY_BUTTON_ABSOLUTE, (button) -> {
                 coordsModeSwitch();
                 updateTextFields();
             }));
@@ -114,45 +110,19 @@ public class CopyGUI extends Screen {
         }
     }
 
-    @Override
-    public void render(int mouseX, int mouseY, float partialTicks) {
-        getMinecraft().getTextureManager().bindTexture(background);
-        drawFieldLable("Start X", 0, 15);
-        drawFieldLable("Y", 131, 15);
-        drawFieldLable("Z", 231, 15);
-        drawFieldLable("End X", 8, 35);
-        drawFieldLable("Y", 131, 35);
-        drawFieldLable("Z", 231, 35);
-
-        super.render(mouseX, mouseY, partialTicks);
-    }
-
-    @Override
-    public boolean keyPressed(int p_keyPressed_1_, int p_keyPressed_2_, int p_keyPressed_3_) {
-        fields.forEach(button -> button.keyPressed(p_keyPressed_1_, p_keyPressed_2_, p_keyPressed_3_));
-        return super.keyPressed(p_keyPressed_1_, p_keyPressed_2_, p_keyPressed_3_);
-    }
-
-    @Override
-    public boolean charTyped(char p_charTyped_1_, int p_charTyped_2_) {
-        fields.forEach(button -> button.charTyped(p_charTyped_1_, p_charTyped_2_));
-        return false;
-    }
-
-    private void drawFieldLable(String name, int x, int y) {
-        font.drawStringWithShadow(name, guiLeft + x, guiTop + y, 0xFFFFFF);
+    private void drawFieldLabel(String name, int x, int y) {
+        font.drawStringWithShadow(name, this.x + x, this.y + y, 0xFFFFFF);
     }
 
     private void coordsModeSwitch() {
         absoluteCoords = !absoluteCoords;
-        fields.forEach(button -> button.updateMax(absoluteCoords ? Integer.MAX_VALUE : 16));
     }
 
     private void updateTextFields() {
-        int x, y, z;
         if (absoluteCoords) {
             BlockPos start = startX.getValue() != 0 ? new BlockPos(startPos.getX() + startX.getValue(), startPos.getY() + startY.getValue(), startPos.getZ() + startZ.getValue()) : startPos;
             BlockPos end = endX.getValue() != 0 ? new BlockPos(startPos.getX() + endX.getValue(), startPos.getY() + endY.getValue(), startPos.getZ() + endZ.getValue()) : endPos;
+
             startX.setValue(start.getX());
             startY.setValue(start.getY());
             startZ.setValue(start.getZ());
@@ -168,6 +138,35 @@ public class CopyGUI extends Screen {
             endZ.setValue(endZ.getValue() != 0 ? endZ.getValue() - startPos.getZ() : endPos.getZ() - startPos.getZ());
         }
     }
+
+    @Override
+    public void render(int mouseX, int mouseY, float partialTicks) {
+        getMinecraft().getTextureManager().bindTexture(background);
+        drawFieldLabel("Start X", 0 - 175, -36);
+        drawFieldLabel("Y", -45, -36);
+        drawFieldLabel("Z", 55, -36);
+        drawFieldLabel("End X", 8 - 175, -11);
+        drawFieldLabel("Y", -45, -11);
+        drawFieldLabel("Z", 55, -11);
+
+        drawCenteredString(Minecraft.getInstance().fontRenderer, I18n.format(GuiTranslation.COPY_LABEL_HEADING.getTranslationKey()), this.x, this.y - 80, 0xFFFFFF);
+        drawCenteredString(Minecraft.getInstance().fontRenderer, I18n.format(GuiTranslation.COPY_LABEL_HEADING.getTranslationKey()), this.x, this.y - 68, 0xFFFFFF);
+
+        super.render(mouseX, mouseY, partialTicks);
+    }
+
+    @Override
+    public boolean keyPressed(int mouseX, int mouseY, int __unused) {
+        fields.forEach(button -> button.keyPressed(mouseX, mouseY, __unused));
+        return super.keyPressed(mouseX, mouseY, __unused);
+    }
+
+    @Override
+    public boolean charTyped(char charTyped, int __unused) {
+        fields.forEach(button -> button.charTyped(charTyped, __unused));
+        return false;
+    }
+
 
     @Override
     public boolean isPauseScreen() {
