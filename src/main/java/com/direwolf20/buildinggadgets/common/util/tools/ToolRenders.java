@@ -358,6 +358,7 @@ public class ToolRenders {
     public static void renderDestructionOverlay(RenderWorldLastEvent evt, PlayerEntity player, ItemStack stack) {
         BlockRayTraceResult lookingAt = VectorHelper.getLookingAt(player, stack);
         World world = player.world;
+        if (lookingAt == null && GadgetDestruction.getAnchor(stack) == null) return;
         BlockPos startBlock = (GadgetDestruction.getAnchor(stack) == null) ? lookingAt.getPos() : GadgetDestruction.getAnchor(stack);
         Direction facing = (GadgetDestruction.getAnchorSide(stack) == null) ? lookingAt.getFace() : GadgetDestruction.getAnchorSide(stack);
         if (world.getBlockState(startBlock) == BGBlocks.effectBlock.getDefaultState())

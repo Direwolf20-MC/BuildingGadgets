@@ -227,7 +227,7 @@ public class GadgetDestruction extends GadgetGeneric {
         if (!world.isRemote) {
             if (! player.isSneaking() && player instanceof ServerPlayerEntity) {
                 BlockRayTraceResult lookingAt = VectorHelper.getLookingAt(player, stack);
-                if (getAnchor(stack) == null) { //If we aren't looking at anything, exit
+                if (getAnchor(stack) == null && lookingAt == null) { //If we aren't looking at anything, exit
                     return new ActionResult<ItemStack>(ActionResultType.FAIL, stack);
                 }
                 BlockPos startBlock = (getAnchor(stack) == null) ? new BlockPos(lookingAt.getHitVec()) : getAnchor(stack);
