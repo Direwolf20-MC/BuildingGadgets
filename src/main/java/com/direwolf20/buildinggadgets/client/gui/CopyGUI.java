@@ -59,24 +59,27 @@ public class CopyGUI extends Screen {
         startPos = BGItems.gadgetCopyPaste.getStartPos(copyPasteTool);
         endPos = BGItems.gadgetCopyPaste.getEndPos(copyPasteTool);
 
+        System.out.println(startPos);
+        System.out.println(endPos);
+
+
         if (startPos == null) startPos = new BlockPos(0, 0, 0);
         if (endPos == null) endPos = new BlockPos(0, 0, 0);
 
         int incrementerWidth = GuiIncrementer.WIDTH + (GuiIncrementer.WIDTH / 2);
 
-        fields.add(startX = new GuiIncrementer(x - incrementerWidth, y + 10, 0, 0, 16));
-        fields.add(startY = new GuiIncrementer(x - GuiIncrementer.WIDTH / 2, y + 10, 0, 0, 16));
-        fields.add(startZ = new GuiIncrementer(x + GuiIncrementer.WIDTH / 2, y + 10, 0, 0, 16));
-        fields.add(endX = new GuiIncrementer(x - incrementerWidth, y + 40, 0, 0, 16));
-        fields.add(endY = new GuiIncrementer(x - GuiIncrementer.WIDTH / 2, y + 40, 0, 0, 16));
-        fields.add(endZ = new GuiIncrementer(x + GuiIncrementer.WIDTH / 2, y + 40, 0, 0, 16));
+        fields.add(startX = new GuiIncrementer(x - incrementerWidth, y + 10));
+        fields.add(startY = new GuiIncrementer(x - GuiIncrementer.WIDTH / 2, y + 10));
+        fields.add(startZ = new GuiIncrementer(x + GuiIncrementer.WIDTH / 2, y + 10));
+        fields.add(endX = new GuiIncrementer(x - incrementerWidth, y + 40));
+        fields.add(endY = new GuiIncrementer(x - GuiIncrementer.WIDTH / 2, y + 40));
+        fields.add(endZ = new GuiIncrementer(x + GuiIncrementer.WIDTH / 2, y + 40));
         fields.forEach(this::addButton);
 
         updateTextFields();
 
         List<AbstractButton> buttons = new ArrayList<AbstractButton>() {{
             add(new CenteredButton(y - 60, 50, GuiTranslation.SINGLE_CONFIRM, (button) -> {
-//                fields.forEach(field -> field.setValue(absoluteCoords ? field.getDefaultValue() : 0));
                 if (absoluteCoords) {
                     startPos = new BlockPos(startX.getValue(), startY.getValue(), startZ.getValue());
                     endPos = new BlockPos(endX.getValue(), endY.getValue(), endZ.getValue());
@@ -146,24 +149,17 @@ public class CopyGUI extends Screen {
     }
 
     private void updateTextFields() {
-        BlockPos start = startX.getValue() != 0
-                ? new BlockPos(startPos.getX() + startX.getValue(), startPos.getY() + startY.getValue(), startPos.getZ() + startZ.getValue())
-                : startPos;
-
-        BlockPos end = endX.getValue() != 0
-                ? new BlockPos(startPos.getX() + endX.getValue(), startPos.getY() + endY.getValue(), startPos.getZ() + endZ.getValue())
-                : endPos;
-
-        if( absoluteCoords ) {
-            startX.setValue(startPos.getX() + startX.getValue());
+        int x, y, z;
+        if (absoluteCoords) {
+            BlockPos start = startX.getValue() != 0 ? new BlockPos(startPos.getX() + startX.getValue(), startPos.getY() + startY.getValue(), startPos.getZ() + startZ.getValue()) : startPos;
+            BlockPos end = endX.getValue() != 0 ? new BlockPos(startPos.getX() + endX.getValue(), startPos.getY() + endY.getValue(), startPos.getZ() + endZ.getValue()) : endPos;
             startX.setValue(start.getX());
             startY.setValue(start.getY());
             startZ.setValue(start.getZ());
             endX.setValue(end.getX());
             endY.setValue(end.getY());
             endZ.setValue(end.getZ());
-        }
-        else {
+        } else {
             startX.setValue(startX.getValue() != 0 ? startX.getValue() - startPos.getX() : 0);
             startY.setValue(startY.getValue() != 0 ? startY.getValue() - startPos.getY() : 0);
             startZ.setValue(startZ.getValue() != 0 ? startZ.getValue() - startPos.getZ() : 0);

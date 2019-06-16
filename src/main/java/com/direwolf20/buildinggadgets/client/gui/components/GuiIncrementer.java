@@ -14,31 +14,29 @@ public class GuiIncrementer extends Widget {
     private int max;
 
     private int value;
-    private int defaultValue;
 
     private DireButton minusButton;
     private GuiTextFieldBase field;
     private DireButton plusButton;
 
-    public GuiIncrementer(int x, int y, int defaultValue, int min, int max) {
+    public GuiIncrementer(int x, int y, int min, int max) {
         super(x, y, WIDTH, 20, "");
 
         this.x = x;
         this.y = y;
         this.min = min;
         this.max = max;
-        this.value = defaultValue;
-        this.defaultValue = defaultValue;
+        this.value = 0;
 
         this.minusButton = new DireButton(this.x, this.y, 10, 10, "-", (button) -> this.updateValue(true));
-        this.field = new GuiTextFieldBase(Minecraft.getInstance().fontRenderer, x + 15, y, 40).setDefaultInt(defaultValue).restrictToNumeric();
+        this.field = new GuiTextFieldBase(Minecraft.getInstance().fontRenderer, x + 15, y, 40).setDefaultInt(this.value).restrictToNumeric();
         this.plusButton = new DireButton(this.x + 40 + 15, this.y, 10, 10, "+", (button) -> this.updateValue(false));
 
         this.field.setText(String.valueOf(this.value));
     }
 
-    public GuiIncrementer(int x, int y, int defaultValue) {
-        this(x, y, defaultValue, 0, Integer.MAX_VALUE);
+    public GuiIncrementer(int x, int y) {
+        this(x, y, Integer.MIN_VALUE, Integer.MAX_VALUE);
     }
 
     public int getValue() {
@@ -109,10 +107,6 @@ public class GuiIncrementer extends Widget {
     protected void onFocusedChanged(boolean isFocused) {
         this.field.changeFocus(isFocused);
         super.onFocusedChanged(isFocused);
-    }
-
-    public int getDefaultValue() {
-        return defaultValue;
     }
 
     public int getX() {
