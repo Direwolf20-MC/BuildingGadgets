@@ -230,7 +230,7 @@ public class GadgetDestruction extends GadgetGeneric {
                 if (getAnchor(stack) == null && lookingAt == null) { //If we aren't looking at anything, exit
                     return new ActionResult<ItemStack>(ActionResultType.FAIL, stack);
                 }
-                BlockPos startBlock = (getAnchor(stack) == null) ? new BlockPos(lookingAt.getHitVec()) : getAnchor(stack);
+                BlockPos startBlock = (getAnchor(stack) == null) ? new BlockPos(lookingAt.getPos()) : getAnchor(stack);
                 Direction sideHit = (getAnchorSide(stack) == null) ? lookingAt.getFace() : getAnchorSide(stack);
                 clearArea(world, startBlock, sideHit, (ServerPlayerEntity) player, stack);
                 if (getAnchor(stack) != null) {
