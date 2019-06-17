@@ -7,12 +7,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.*;
 
 import javax.annotation.Nonnull;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.function.BiFunction;
-import java.util.function.Function;
-import java.util.function.IntFunction;
 import java.util.*;
 import java.util.function.*;
 import java.util.stream.*;
@@ -359,12 +353,27 @@ public class NBTHelper {
         return toAppendTo;
     }
 
+    public static <T> NBTTagList serializeSet(Set<T> set, Function<? super T, ? extends INBTBase> elementSerializer) {
+        NBTTagList list = new NBTTagList();
+        for (T element : set) {
+            list.add(elementSerializer.apply(element));
+        }
+        return list;
+    }
+
+    public static <T> Set<T> deserializeSet(NBTTagList list, Set<T> toAppendTo, Function<INBTBase, ? extends T> elementDeserializer) {
+        for (INBTBase nbt : list) {
+            toAppendTo.add(elementDeserializer.apply(nbt));
+        }
+        return toAppendTo;
+    }
+
     /**
      * Connect two {@link NBTTagList} together to create a new one. This process has no side effects, which means it
      * will not modify two parameters.
      * <p>
-     * Additionally, if any of the lists are empty, the method will directly return the nonempty one. If both of them are
-     * empty, it will directly return the second list.
+     * Additionally, if any of the lists are empty, the method will directly return the nonempty one. If both of them
+     * are empty, it will directly return the second list.
      */
     public static NBTTagList concat(NBTTagList first, NBTTagList second) {
         if (first.isEmpty())

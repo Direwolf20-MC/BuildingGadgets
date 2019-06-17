@@ -257,7 +257,7 @@ public class GadgetBuilding extends GadgetPlacing implements IAtopPlacingGadget 
                 if (distance < 64 && sameDim && currentBlock != BGBlocks.effectBlock.getDefaultState() && !cancelled) { //Don't allow us to undo a block while its still being placed or too far away
                     if (currentBlock != Blocks.AIR.getDefaultState()) {
                         currentBlock.getBlock().harvestBlock(world, player, coord, currentBlock, world.getTileEntity(coord), silkTool);
-                        world.spawnEntity(new BlockBuildEntity(world, coord, player, currentBlock, BlockBuildEntity.Mode.REMOVE, false));
+                        world.spawnEntity(new BlockBuildEntity(world, coord, currentBlock, BlockBuildEntity.Mode.REMOVE, false));
                     }
                 } else { //If you're in the wrong dimension or too far away, fail the undo.
                     player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.undofailed").getUnformattedComponentText()), true);
@@ -333,7 +333,7 @@ public class GadgetBuilding extends GadgetPlacing implements IAtopPlacingGadget 
             useItemSuccess = InventoryHelper.useItem(itemStack, player, neededItems, world);
         }
         if (useItemSuccess) {
-            world.spawnEntity(new BlockBuildEntity(world, pos, player, setBlock, BlockBuildEntity.Mode.PLACE, useConstructionPaste));
+            world.spawnEntity(new BlockBuildEntity(world, pos, setBlock, BlockBuildEntity.Mode.PLACE, useConstructionPaste));
             return true;
         }
         return false;
