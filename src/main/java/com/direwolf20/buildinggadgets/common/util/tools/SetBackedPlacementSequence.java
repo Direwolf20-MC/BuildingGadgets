@@ -62,7 +62,7 @@ public class SetBackedPlacementSequence implements IPositionPlacementSequence, S
     @Nonnull
     @Override
     public IPositionPlacementSequence copy() {
-        return new SetBackedPlacementSequence(new LinkedHashSet<>(internalSet), boundingBox);
+        return new SetBackedPlacementSequence(internalSet, boundingBox);
     }
 
     public Set<BlockPos> getInternalSet() {

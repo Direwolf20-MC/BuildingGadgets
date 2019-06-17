@@ -233,7 +233,7 @@ public class GadgetDestruction extends GadgetSwapping {
     }
 
     private static void addConnectedCoordinates(World world, EntityPlayer player, BlockPos pos, IBlockState state, Set<BlockPos> coords, Region boundary) {
-        if (coords.contains(pos) || !boundary.contains(pos))
+        if (!boundary.contains(pos) || coords.containsPos(pos))
             return;
         if (!isValidBlock(world, pos, player, state))
             return;
