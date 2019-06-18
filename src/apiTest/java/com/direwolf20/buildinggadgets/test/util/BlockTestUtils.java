@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.test.util;
 
 import com.direwolf20.buildinggadgets.api.building.Region;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
 import net.minecraftforge.common.util.Constants;
@@ -33,7 +33,7 @@ public final class BlockTestUtils {
         return list.get(random.nextInt(list.size()));
     }
 
-    public static void setRandomBlockInWorld(IWorld world, Region region, List<IBlockState> blockStates, int amount) {
+    public static void setRandomBlockInWorld(IWorld world, Region region, List<BlockState> blockStates, int amount) {
         Random random = new Random();
         for (int i = 0; i < amount; i++) {
             BlockPos target = randomBlockPosIn(region);
