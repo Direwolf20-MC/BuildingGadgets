@@ -1,8 +1,12 @@
 package com.direwolf20.buildinggadgets.test.util;
 
 import com.direwolf20.buildinggadgets.api.building.Region;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IWorld;
+import net.minecraftforge.common.util.Constants;
 
+import java.util.List;
 import java.util.Random;
 
 public final class BlockTestUtils {
@@ -23,5 +27,17 @@ public final class BlockTestUtils {
 
     public static Region randomRegionAroundOrigin() {
         return new Region(- RND.nextInt(Integer.MAX_VALUE), - RND.nextInt(Integer.MAX_VALUE), - RND.nextInt(Integer.MAX_VALUE), RND.nextInt(Integer.MAX_VALUE), RND.nextInt(Integer.MAX_VALUE), RND.nextInt(Integer.MAX_VALUE));
+    }
+
+    public static <T> T randomElement(List<T> list, Random random) {
+        return list.get(random.nextInt(list.size()));
+    }
+
+    public static void setRandomBlockInWorld(IWorld world, Region region, List<IBlockState> blockStates, int amount) {
+        Random random = new Random();
+        for (int i = 0; i < amount; i++) {
+            BlockPos target = randomBlockPosIn(region);
+            world.setBlockState(target, randomElement(blockStates, random), Constants.BlockFlags.DEFAULT);
+        }
     }
 }

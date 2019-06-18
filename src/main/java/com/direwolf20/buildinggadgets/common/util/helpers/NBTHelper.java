@@ -356,12 +356,27 @@ public class NBTHelper {
         return toAppendTo;
     }
 
+    public static <T> ListNBT serializeSet(Set<T> set, Function<? super T, ? extends INBT> elementSerializer) {
+        ListNBT list = new ListNBT();
+        for (T element : set) {
+            list.add(elementSerializer.apply(element));
+        }
+        return list;
+    }
+
+    public static <T> Set<T> deserializeSet(ListNBT list, Set<T> toAppendTo, Function<INBT, ? extends T> elementDeserializer) {
+        for (INBT nbt : list) {
+            toAppendTo.add(elementDeserializer.apply(nbt));
+        }
+        return toAppendTo;
+    }
+
     /**
      * Connect two {@link ListNBT} together to create a new one. This process has no side effects, which means it
      * will not modify two parameters.
      * <p>
-     * Additionally, if any of the lists are empty, the method will directly return the nonempty one. If both of them are
-     * empty, it will directly return the second list.
+     * Additionally, if any of the lists are empty, the method will directly return the nonempty one. If both of them
+     * are empty, it will directly return the second list.
      */
     public static ListNBT concat(ListNBT first, ListNBT second) {
         if (first.isEmpty())

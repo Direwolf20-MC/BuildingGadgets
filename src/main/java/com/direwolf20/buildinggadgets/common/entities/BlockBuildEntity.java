@@ -6,7 +6,6 @@ import com.direwolf20.buildinggadgets.common.registry.objects.BGEntities;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.network.IPacket;
@@ -55,7 +54,7 @@ public class BlockBuildEntity extends EntityBase {
             @Override
             public void onBuilderEntityDespawn(BlockBuildEntity builder) {
                 World world = builder.world;
-                world.addEntity(new BlockBuildEntity(world, builder.targetPos, builder.spawnedBy, builder.originalSetBlock, PLACE, builder.isUsingPaste()));
+                world.addEntity(new BlockBuildEntity(world, builder.targetPos, builder.originalSetBlock, PLACE, builder.isUsingPaste()));
             }
         };
 
@@ -70,7 +69,6 @@ public class BlockBuildEntity extends EntityBase {
 
     private BlockState setBlock;
     private BlockState originalSetBlock;
-    private LivingEntity spawnedBy;
 
     private Mode mode;
     private boolean useConstructionPaste;
@@ -79,7 +77,7 @@ public class BlockBuildEntity extends EntityBase {
         super(type, world);
     }
 
-    public BlockBuildEntity(World world, BlockPos spawnPos, LivingEntity player, BlockState spawnBlock, Mode mode, boolean usePaste) {
+    public BlockBuildEntity(World world, BlockPos spawnPos, BlockState spawnBlock, Mode mode, boolean usePaste) {
         this(BGEntities.BUILD_BLOCK, world);
         setPosition(spawnPos.getX(), spawnPos.getY(), spawnPos.getZ());
 
@@ -97,7 +95,6 @@ public class BlockBuildEntity extends EntityBase {
         this.mode = mode;
         setToolMode(mode);
 
-        spawnedBy = player;
         world.setBlockState(spawnPos, BGBlocks.effectBlock.getDefaultState());
 
         setUsingPaste(usePaste);

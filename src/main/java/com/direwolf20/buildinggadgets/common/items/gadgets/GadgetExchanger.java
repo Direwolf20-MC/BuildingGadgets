@@ -293,7 +293,7 @@ public class GadgetExchanger extends GadgetGeneric {
         }
         if (useItemSuccess) {
             //TODO reimplement once we find a valid replacement
-            world.addEntity(new BlockBuildEntity(world, pos, player, setBlock, BlockBuildEntity.Mode.REPLACE, useConstructionPaste));
+            world.addEntity(new BlockBuildEntity(world, pos, setBlock, BlockBuildEntity.Mode.REPLACE, useConstructionPaste));
             //currentBlock.getBlock().removedByPlayer(currentBlock.getBlockState(), world, pos, player, false, null);
             player.addItemStackToInventory(new ItemStack(currentBlock.getBlock(), 1));
             return true;
