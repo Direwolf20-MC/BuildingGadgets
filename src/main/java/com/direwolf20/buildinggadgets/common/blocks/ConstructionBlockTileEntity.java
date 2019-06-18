@@ -9,12 +9,16 @@ import net.minecraft.nbt.NBTUtil;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SUpdateTileEntityPacket;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraftforge.client.model.data.IModelData;
+import net.minecraftforge.client.model.data.ModelDataMap;
+import net.minecraftforge.client.model.data.ModelProperty;
 
 import javax.annotation.Nonnull;
 
 public class ConstructionBlockTileEntity extends TileEntity {
     private BlockState blockState;
     private BlockState actualBlockState;
+    public static final ModelProperty<BlockState> Facade_State = new ModelProperty<BlockState>();
 
     public ConstructionBlockTileEntity() {
         super(BGTileEntities.CONSTRUCTION_BLOCK_TYPE);
@@ -24,6 +28,13 @@ public class ConstructionBlockTileEntity extends TileEntity {
         blockState = state;
         actualBlockState = state;
         markDirtyClient();
+    }
+
+    @Override
+    public IModelData getModelData()
+    {
+        BlockState state = getActualBlockState();
+        return new ModelDataMap.Builder().withInitial(Facade_State, state).build();
     }
 
     @Nonnull
