@@ -18,7 +18,7 @@ import javax.annotation.Nonnull;
 public class ConstructionBlockTileEntity extends TileEntity {
     private BlockState blockState;
     private BlockState actualBlockState;
-    public static final ModelProperty<BlockState> Facade_State = new ModelProperty<BlockState>();
+    public static final ModelProperty<BlockState> FACADE_STATE = new ModelProperty<>();
 
     public ConstructionBlockTileEntity() {
         super(BGTileEntities.CONSTRUCTION_BLOCK_TYPE);
@@ -34,7 +34,7 @@ public class ConstructionBlockTileEntity extends TileEntity {
     public IModelData getModelData()
     {
         BlockState state = getActualBlockState();
-        return new ModelDataMap.Builder().withInitial(Facade_State, state).build();
+        return new ModelDataMap.Builder().withInitial(FACADE_STATE, state).build();
     }
 
     @Nonnull

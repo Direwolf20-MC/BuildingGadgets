@@ -61,7 +61,7 @@ public class ClientProxy {
             @Override
             public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, Random rand, IModelData modelData) {
                 IBakedModel model;
-                BlockState facadeState = modelData.getData(ConstructionBlockTileEntity.Facade_State);
+                BlockState facadeState = modelData.getData(ConstructionBlockTileEntity.FACADE_STATE);
                 model = Minecraft.getInstance().getBlockRendererDispatcher().getBlockModelShapes().getModel(facadeState);
                 return model.getQuads(facadeState, side, rand);
 
