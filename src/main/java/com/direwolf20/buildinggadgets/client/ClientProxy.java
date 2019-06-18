@@ -38,10 +38,10 @@ public class ClientProxy {
         DeferredWorkQueue.runLater(KeyBindings::init);
         //BuildingObjects.initColorHandlers();
         //eventBus.addListener(ClientProxy::renderWorldLastEvent);
-        MinecraftForge.EVENT_BUS.addListener(ClientProxy::registerModels);
+        MinecraftForge.EVENT_BUS.addListener(ClientProxy::bakeModels);
     }
 
-    private static void registerModels(@SuppressWarnings("unused") ModelBakeEvent event) {
+    private static void bakeModels(ModelBakeEvent event) {
         event.getModelRegistry().put(new ModelResourceLocation(Reference.BlockReference.CONSTRUCTION_BLOCK), new IDynamicBakedModel() {
             @Override
             public boolean isGui3d() {
