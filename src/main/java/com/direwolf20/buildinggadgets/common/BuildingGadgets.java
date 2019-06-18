@@ -1,10 +1,8 @@
 package com.direwolf20.buildinggadgets.common;
 
-import afu.org.checkerframework.checker.nullness.qual.Nullable;
 import com.direwolf20.buildinggadgets.api.APIProxy;
 import com.direwolf20.buildinggadgets.client.ClientProxy;
 import com.direwolf20.buildinggadgets.client.gui.GuiMod;
-import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.commands.BlockMapCommand;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.config.crafting.CraftingConditionDestruction;
@@ -14,31 +12,14 @@ import com.direwolf20.buildinggadgets.common.events.AnvilRepairHandler;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.registry.objects.BuildingObjects;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.model.BakedQuad;
-import net.minecraft.client.renderer.model.IBakedModel;
-import net.minecraft.client.renderer.model.ItemOverrideList;
-import net.minecraft.client.renderer.model.ModelResourceLocation;
-import net.minecraft.client.renderer.texture.MissingTextureSprite;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.command.Commands;
 import net.minecraft.item.crafting.IRecipeSerializer;
-import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IEnviromentBlockReader;
-import net.minecraft.world.IWorldReader;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.ModelBakeEvent;
-import net.minecraftforge.client.model.data.IDynamicBakedModel;
-import net.minecraftforge.client.model.data.IModelData;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DeferredWorkQueue;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.ExtensionPoint;
@@ -53,9 +34,6 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import javax.annotation.Nonnull;
-import java.util.List;
-import java.util.Random;
 import java.util.function.Consumer;
 
 @Mod(value = Reference.MODID)
@@ -80,7 +58,6 @@ public class BuildingGadgets {
         eventBus.addListener(this::setup);
         eventBus.addListener(this::serverLoad);
         eventBus.addListener(this::finishLoad);
-        MinecraftForge.EVENT_BUS.addListener(this::modelBake);
         eventBus.addGenericListener(IRecipeSerializer.class, this::onRecipeRegister);
 
         eventBus.addListener(Config::onLoad);
@@ -98,60 +75,6 @@ public class BuildingGadgets {
 
         theApi = APIProxy.INSTANCE.onCreate(eventBus, MinecraftForge.EVENT_BUS, Config.API);
         BuildingObjects.init();
-    }
-
-    public void modelBake(ModelBakeEvent event)
-    {
-        final IBakedModel old = event.getModelRegistry().get(new ModelResourceLocation(Reference.BlockReference.CONSTRUCTION_BLOCK));
-        event.getModelRegistry().put(new ModelResourceLocation(Reference.MODID,"construction_block"), new IDynamicBakedModel()
-        {
-            @Override
-            public boolean isGui3d()
-            {
-                return false;
-            }
-
-            @Override
-            public boolean isBuiltInRenderer()
-            {
-                return false;
-            }
-
-            @Override
-            public boolean isAmbientOcclusion()
-            {
-                return true;
-            }
-
-            @Override
-            public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, Random rand, IModelData modelData)
-            {
-                IBakedModel model;
-                BlockState facadeState = modelData.getData(ConstructionBlockTileEntity.Facade_State);
-                model = Minecraft.getInstance().getBlockRendererDispatcher().getBlockModelShapes().getModel(facadeState);
-                return model.getQuads(facadeState, side, rand);
-
-            }
-
-            @Override
-            public TextureAtlasSprite getParticleTexture()
-            {
-                return MissingTextureSprite.func_217790_a();
-            }
-
-            @Override
-            public ItemOverrideList getOverrides()
-            {
-                return null;
-            }
-
-            @Override
-            @Nonnull
-            public IModelData getModelData(@Nonnull IEnviromentBlockReader world, @Nonnull BlockPos pos, @Nonnull BlockState state, @Nonnull IModelData tileData)
-            {
-                return tileData;
-            }
-        });
     }
 
     private void setup(final FMLCommonSetupEvent event) {

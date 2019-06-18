@@ -1,7 +1,11 @@
 package com.direwolf20.buildinggadgets.common.blocks;
 
+import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks.BGTileEntities;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
-import net.minecraft.block.*;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockRenderType;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.material.PushReaction;
 import net.minecraft.client.renderer.color.BlockColors;
 import net.minecraft.entity.Entity;
@@ -34,15 +38,10 @@ import java.util.List;
 import java.util.Random;
 
 //@Optional.Interface(iface = "team.chisel.ctm.api.IFacade", modid = "ctm-api")
-public class ConstructionBlock extends ContainerBlock /*implements IFacade*/ {
-    //public static final ConstructionProperty FACADEID = new ConstructionProperty("facadeid");
+public class ConstructionBlock extends Block /*implements IFacade*/ {
     public static final IProperty<Boolean> BRIGHT = BooleanProperty.create("bright");
     public static final IProperty<Boolean> NEIGHBOR_BRIGHTNESS = BooleanProperty.create("neighbor_brightness");
 
-    /* TODO revise when connected Textures will be supported again - supporting BlockState's as Properties is impossible
-    public static final IUnlistedProperty<BlockState> FACADE_ID = new BlockStateProperty("facadestate");
-    public static final IUnlistedProperty<BlockState> FACADE_EXT_STATE = new BlockStateProperty("facadeextstate");
-*/
     public ConstructionBlock(Properties builder) {
         super(builder);
 
@@ -55,21 +54,9 @@ public class ConstructionBlock extends ContainerBlock /*implements IFacade*/ {
         builder.add(BRIGHT, NEIGHBOR_BRIGHTNESS);
     }
 
-    /*
-    public void initModel() {
-        ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(this), 0, new ModelResourceLocation(getRegistryName(), "inventory"));
-        StateMapperBase ignoreState = new StateMapperBase() {
-            @Override
-            protected ModelResourceLocation getModelResourceLocation(BlockState iBlockState) {
-                return ConstructionBakedModel.modelFacade;
-            }
-        };
-        ModelLoader.setCustomStateMapper(this, ignoreState);
-    }*/
-
     @Override
     public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
-        return new ArrayList<ItemStack>(){{
+        return new ArrayList<ItemStack>() {{ //TODO change to LootTable
             add(new ItemStack(BGItems.constructionPaste));
         }};
     }
@@ -79,49 +66,15 @@ public class ConstructionBlock extends ContainerBlock /*implements IFacade*/ {
         return true;
     }
 
+    @Nullable
     @Override
-    public TileEntity createNewTileEntity(IBlockReader worldIn) {
-        return new ConstructionBlockTileEntity();
+    public TileEntity createTileEntity(BlockState state, IBlockReader world) {
+        return BGTileEntities.CONSTRUCTION_BLOCK_TYPE.create();
     }
 
     public boolean isMimicNull(BlockState mimicBlock) {
         return (mimicBlock == null || mimicBlock == Blocks.AIR.getDefaultState());
     }
-    /*private static ConstructionBlockTileEntity getTE(World world, BlockPos pos) {
-        return (ConstructionBlockTileEntity) world.getTileEntity(pos);
-    }
-
-    @Override
-    public boolean onBlockActivated(World world, BlockPos pos, BlockState state, ClientPlayerEntity player, Hand hand, Direction side, float hitX, float hitY, float hitZ) {
-        //super.onBlockActivated(world, pos, state, player, hand, side, hitX, hitY, hitZ);
-        ConstructionBlockTileEntity te = getTE(world, pos);
-        ItemStack heldItem = player.getHeldItem(hand);
-        BlockState newState = Block.getBlockFromItem(heldItem.getItem()).getStateFromMeta(heldItem.getMetadata());
-        if (newState != null && newState != Blocks.AIR.getDefaultState()) {
-            te.setBlockState(newState);
-            te.setActualBlockState(newState);
-            return true;
-        }
-        System.out.println("Failed: " + newState + ":" + te.getBlockState() + ":" + world.isRemote + ":" + te.getActualBlockState());
-        return false;
-    }*/
-
-    /**
-     * Can return IExtendedBlockState
-     */
-    /*@Override
-    public BlockState getExtendedState(BlockState state, IBlockReader world, BlockPos pos) {
-        IExtendedBlockState extendedBlockState = (IExtendedBlockState) super.getExtendedState(state, world, pos);
-        BlockState mimicBlock = getActualMimicBlock(world, pos);
-        if (mimicBlock != null) {
-            FakeRenderWorld fakeRenderWorld = new FakeRenderWorld();
-            fakeRenderWorld.setState((World) world, mimicBlock, pos);
-            BlockState extState = mimicBlock.getBlock().getExtendedState(mimicBlock, fakeRenderWorld, pos);
-            //ConstructionID mimicID = new ConstructionID(mimicBlock);
-            return extendedBlockState.withProperty(FACADE_ID, mimicBlock).withProperty(FACADE_EXT_STATE, extState);
-        }
-        return extendedBlockState;
-    }*/
 
     @Nullable
     private BlockState getActualMimicBlock(IBlockReader blockAccess, BlockPos pos) {
@@ -143,13 +96,6 @@ public class ConstructionBlock extends ContainerBlock /*implements IFacade*/ {
         return true; // delegated to FacadeBakedModel#getQuads
     }
 
-    /*@Override
-    @SideOnly(Side.CLIENT)
-    public boolean shouldSideBeRendered(BlockState blockState, IBlockAccess blockAccess, BlockPos pos, Direction side) {
-        BlockState mimicBlock = getActualMimicBlock(blockAccess, pos);
-        return mimicBlock == null ? true : mimicBlock.getBlock().shouldSideBeRendered(mimicBlock, blockAccess, pos, side);
-    }*/
-
     @Override
     public int getOpacity(BlockState state, IBlockReader worldIn, BlockPos pos) {
         Boolean bright = state.get(ConstructionBlock.BRIGHT);
@@ -157,8 +103,6 @@ public class ConstructionBlock extends ContainerBlock /*implements IFacade*/ {
             return 0;
         }
         return 255;
-        //BlockState mimic = getActualMimicBlock(worldIn, pos);
-        //return mimic != null ? mimic.getOpacity(worldIn, pos) : super.getOpacity(state, worldIn, pos);
     }
 
     @Override
@@ -440,7 +384,7 @@ public class ConstructionBlock extends ContainerBlock /*implements IFacade*/ {
         return !isMimicNull(mimic) ? mimic.canSustainPlant(world, pos, facing, plantable) : super.canSustainPlant(state, world, pos, facing, plantable);
     }
 
- /* Todo reeval
+ /* Todo re-eval
     public boolean shouldSideBeRendered(BlockState blockState, IBlockAccess blockAccess, BlockPos pos, Direction side) {
         FakeRenderWorld fakeWorld = new FakeRenderWorld();
 
