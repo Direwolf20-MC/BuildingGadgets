@@ -44,6 +44,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
 import net.minecraft.util.Direction.Axis;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.RayTraceContext.FluidMode;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.text.ITextComponent;
@@ -568,11 +569,11 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
     public static void anchorBlocks(PlayerEntity player, ItemStack stack) {
         BlockPos currentAnchor = getAnchor(stack);
         if (currentAnchor == null) {
-            RayTraceResult lookingAt = VectorHelper.getLookingAt(player, stack);
+            BlockRayTraceResult lookingAt = VectorHelper.getLookingAt(player, stack);
             if (lookingAt == null) {
                 return;
             }
-            currentAnchor = new BlockPos(lookingAt.getHitVec().x,lookingAt.getHitVec().y,lookingAt.getHitVec().z);
+            currentAnchor = lookingAt.getPos();
             setAnchor(stack, currentAnchor);
             player.sendStatusMessage(new StringTextComponent(TextFormatting.AQUA + new TranslationTextComponent("message.gadget.anchorrender").getUnformattedComponentText()), true);
         } else {
