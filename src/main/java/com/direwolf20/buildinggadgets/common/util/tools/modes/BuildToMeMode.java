@@ -30,7 +30,7 @@ public class BuildToMeMode extends AtopSupportedMode {
 
     @Override
     public IPositionPlacementSequence computeWithTransformed(PlayerEntity player, BlockPos transformed, BlockPos original, Direction sideHit, ItemStack tool) {
-        int range = GadgetUtils.getToolRange(tool);
+        int range = 25;
         return ExclusiveAxisChasing.create(transformed, new BlockPos(Math.floor(player.posX), Math.floor(player.posY), Math.floor(player.posZ)), sideHit, range);
     }
 
