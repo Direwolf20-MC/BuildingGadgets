@@ -53,7 +53,6 @@ public final class BGBlocks {
                 .builder(Block.Properties.create(Material.ROCK).hardnessAndResistance(2f, 0f))
                 .item(itemProperties())
                 .withTileEntity(new TileEntityBuilder<>(TileEntityReference.CONSTRUCTION_TILE_RL)
-                        // 1.13 -> 1.14 mapping missing (used to be create() )
                         .builder(new TileEntityTypeBuilder<>(ConstructionBlockTileEntity::new))
                         .factory(TileEntityTypeBuilder::build))
                 .factory(ConstructionBlock::new));
@@ -62,7 +61,7 @@ public final class BGBlocks {
                 .item(itemProperties())
                 .factory(ConstructionBlockDense::new));
         container.add(new BlockBuilder(BlockReference.CONSTRUCTION_BLOCK_POWDER_RL)
-                .builder(Block.Properties.create(Material.SAND).hardnessAndResistance(20f))
+                .builder(Block.Properties.create(Material.SAND).hardnessAndResistance(10f))
                 .item(itemProperties())
                 .factory(ConstructionBlockPowder::new));
         container.add(new BlockBuilder(BlockReference.TEMPLATE_MANAGER_RL)

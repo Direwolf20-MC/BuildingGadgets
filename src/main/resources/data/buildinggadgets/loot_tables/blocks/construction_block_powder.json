@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "rolls": 1,
+      "name" : "buildinggadgets:construction_block_powder#1",
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "buildinggadgets:construction_block_powder"
+        }
+      ],
+      "conditions": [
+        {
+          "condition": "minecraft:survives_explosion"
+        }
+      ]
+    }
+  ]
+}

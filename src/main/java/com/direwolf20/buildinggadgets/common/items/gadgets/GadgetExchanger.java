@@ -93,18 +93,12 @@ public class GadgetExchanger extends GadgetGeneric {
 
     @Override
     public boolean isBookEnchantable(ItemStack stack, ItemStack book) {
-        if (EnchantmentHelper.getEnchantments(book).containsKey(Enchantments.SILK_TOUCH)) {
-            return true;
-        }
-        return super.isBookEnchantable(stack, book);
+        return EnchantmentHelper.getEnchantments(book).containsKey(Enchantments.SILK_TOUCH) || super.isBookEnchantable(stack, book);
     }
 
     @Override
     public boolean canApplyAtEnchantingTable(ItemStack stack, Enchantment enchantment) {
-        if (enchantment == Enchantments.SILK_TOUCH) {
-            return true;
-        }
-        return super.canApplyAtEnchantingTable(stack, enchantment);
+        return enchantment == Enchantments.SILK_TOUCH || super.canApplyAtEnchantingTable(stack, enchantment);
     }
 
     private static void setToolMode(ItemStack tool, ExchangingMode mode) {
@@ -292,7 +286,6 @@ public class GadgetExchanger extends GadgetGeneric {
             useItemSuccess = InventoryHelper.useItem(itemStack, player, neededItems, world);
         }
         if (useItemSuccess) {
-            //TODO reimplement once we find a valid replacement
             world.addEntity(new BlockBuildEntity(world, pos, setBlock, BlockBuildEntity.Mode.REPLACE, useConstructionPaste));
             //currentBlock.getBlock().removedByPlayer(currentBlock.getBlockState(), world, pos, player, false, null);
             player.addItemStackToInventory(new ItemStack(currentBlock.getBlock(), 1));

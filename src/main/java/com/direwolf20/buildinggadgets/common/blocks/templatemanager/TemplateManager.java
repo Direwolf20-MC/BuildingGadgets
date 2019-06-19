@@ -9,7 +9,6 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
@@ -23,7 +22,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
-import net.minecraftforge.items.CapabilityItemHandler;
 
 import javax.annotation.Nullable;
 
@@ -84,22 +82,5 @@ public class TemplateManager extends Block {
         }
         GuiMod.TEMPLATE_MANAGER.openContainer(player, worldIn, pos);
         return true;
-    }
-
-    @Override
-    public void onReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean isMoving) {
-        if (state.getBlock() != newState.getBlock()) {
-            TileEntity tileEntity = world.getTileEntity(pos);
-            if (tileEntity instanceof TemplateManagerTileEntity) {
-                tileEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).ifPresent(iItemHandler -> {
-                    for (int i = 0; i < iItemHandler.getSlots(); i++) {
-                        ItemStack stack = iItemHandler.getStackInSlot(i);
-                        if (!stack.isEmpty())
-                            InventoryHelper.spawnItemStack(world, pos.getX(), pos.getY(), pos.getZ(), stack);
-                    }
-                });
-            }
-        }
-        super.onReplaced(state, world, pos, newState, isMoving);
     }
 }
