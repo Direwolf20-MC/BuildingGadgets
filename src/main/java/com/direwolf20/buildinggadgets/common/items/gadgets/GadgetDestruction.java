@@ -19,6 +19,7 @@ import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.util.tools.SetBackedPlacementSequence;
 import com.direwolf20.buildinggadgets.common.world.WorldSave;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -174,7 +175,7 @@ public class GadgetDestruction extends GadgetGeneric {
                 }
 
                 BlockRayTraceResult lookingAt = VectorHelper.getLookingAt(player, stack);
-                if (lookingAt != null) {
+                if (lookingAt != null || (world.getBlockState(VectorHelper.getLookingAt(player, stack).getPos()) != Blocks.AIR.getDefaultState())) {
                     clearArea(world, lookingAt.getPos(), lookingAt.getFace(), (ServerPlayerEntity) player, stack);
                     clearSuccess(stack);
                     player.sendStatusMessage(new StringTextComponent(TextFormatting.AQUA + new StringTextComponent("message.gadget.anchorremove").getUnformattedComponentText()), true);
@@ -198,7 +199,7 @@ public class GadgetDestruction extends GadgetGeneric {
         BlockPos currentAnchor = getAnchor(stack);
         if (currentAnchor == null) {
             BlockRayTraceResult lookingAt = VectorHelper.getLookingAt(player, stack);
-            if (lookingAt == null) {
+            if (lookingAt == null || (player.world.getBlockState(VectorHelper.getLookingAt(player, stack).getPos()) != Blocks.AIR.getDefaultState())) {
                 return;
             }
             currentAnchor = lookingAt.getPos();

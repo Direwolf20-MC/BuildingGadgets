@@ -272,7 +272,8 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
             } else if (getToolMode(stack) == ToolMode.Paste) {
                 if (! player.isSneaking() && player instanceof ServerPlayerEntity) {
                     if (getAnchor(stack) == null) {
-                        buildBlockMap(world, pos, stack, (ServerPlayerEntity) player);
+                        if (world.getBlockState(VectorHelper.getLookingAt(player, stack).getPos()) != Blocks.AIR.getDefaultState())
+                            buildBlockMap(world, pos, stack, (ServerPlayerEntity) player);
                     } else {
                         BlockPos startPos = getAnchor(stack);
                         buildBlockMap(world, startPos, stack, (ServerPlayerEntity) player);
@@ -570,7 +571,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
         BlockPos currentAnchor = getAnchor(stack);
         if (currentAnchor == null) {
             BlockRayTraceResult lookingAt = VectorHelper.getLookingAt(player, stack);
-            if (lookingAt == null) {
+            if (lookingAt == null || (player.world.getBlockState(VectorHelper.getLookingAt(player, stack).getPos()) == Blocks.AIR.getDefaultState())) {
                 return;
             }
             currentAnchor = lookingAt.getPos();

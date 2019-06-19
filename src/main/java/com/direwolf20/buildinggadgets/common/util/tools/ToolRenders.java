@@ -105,7 +105,7 @@ public class ToolRenders {
 
         BlockState state = Blocks.AIR.getDefaultState();
         List<BlockPos> coordinates = getAnchor(stack);
-        if (lookingAt != null || coordinates.size() > 0) {
+        if ((lookingAt != null && (player.world.getBlockState(VectorHelper.getLookingAt(player, stack).getPos()) != Blocks.AIR.getDefaultState())) || coordinates.size() > 0) {
             World world = player.world;
             BlockState startBlock = Blocks.AIR.getDefaultState();
             if (!(lookingAt == null)) {
@@ -231,7 +231,7 @@ public class ToolRenders {
         //if (lookingAt == null) {
         //    coordinates.size();
         //}
-        if (lookingAt == null && coordinates.size() == 0) return;
+        if ((lookingAt == null || (player.world.getBlockState(VectorHelper.getLookingAt(player, stack).getPos()) == Blocks.AIR.getDefaultState())) && coordinates.size() == 0) return;
         World world = player.world;
         BlockState startBlock = Blocks.AIR.getDefaultState();
         startBlock = world.getBlockState(new BlockPos(lookingAt.getPos()));
@@ -358,7 +358,7 @@ public class ToolRenders {
     public static void renderDestructionOverlay(RenderWorldLastEvent evt, PlayerEntity player, ItemStack stack) {
         BlockRayTraceResult lookingAt = VectorHelper.getLookingAt(player, stack);
         World world = player.world;
-        if (lookingAt == null && GadgetDestruction.getAnchor(stack) == null) return;
+        if ((lookingAt == null || (world.getBlockState(VectorHelper.getLookingAt(player, stack).getPos()) == Blocks.AIR.getDefaultState())) && GadgetDestruction.getAnchor(stack) == null) return;
         BlockPos startBlock = (GadgetDestruction.getAnchor(stack) == null) ? lookingAt.getPos() : GadgetDestruction.getAnchor(stack);
         Direction facing = (GadgetDestruction.getAnchorSide(stack) == null) ? lookingAt.getFace() : GadgetDestruction.getAnchorSide(stack);
         if (world.getBlockState(startBlock) == BGBlocks.effectBlock.getDefaultState())
@@ -456,7 +456,7 @@ public class ToolRenders {
             BlockPos startPos = GadgetCopyPaste.getAnchor(stack);
             if (startPos == null) {
                 startPos = VectorHelper.getPosLookingAt(player, stack);
-                if (startPos == null) return;
+                if (startPos == null || (world.getBlockState(startPos) == Blocks.AIR.getDefaultState())) return;
                 startPos = startPos.up(GadgetCopyPaste.getY(stack));
                 startPos = startPos.east(GadgetCopyPaste.getX(stack));
                 startPos = startPos.south(GadgetCopyPaste.getZ(stack));

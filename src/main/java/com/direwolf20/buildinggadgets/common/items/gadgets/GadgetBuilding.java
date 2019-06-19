@@ -187,7 +187,7 @@ public class GadgetBuilding extends GadgetGeneric implements IAtopPlacingGadget 
 
         if (coords.size() == 0) {  //If we don't have an anchor, build in the current spot
             RayTraceResult lookingAt = VectorHelper.getLookingAt(player, stack);
-            if (lookingAt == null) { //If we aren't looking at anything, exit
+            if (lookingAt == null || (world.getBlockState(VectorHelper.getLookingAt(player, stack).getPos()) == Blocks.AIR.getDefaultState())) { //If we aren't looking at anything, exit
                 return false;
             }
             BlockPos startBlock = ((BlockRayTraceResult) lookingAt).getPos();
