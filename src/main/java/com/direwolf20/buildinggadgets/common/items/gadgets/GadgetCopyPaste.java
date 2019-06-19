@@ -266,7 +266,8 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
                 return new ActionResult<ItemStack>(ActionResultType.SUCCESS, stack);
 
             if (getToolMode(stack) == ToolMode.Copy) {
-                this.setPosOrCopy(stack, player, world, pos);
+                if (world.getBlockState(VectorHelper.getLookingAt(player, stack).getPos()) != Blocks.AIR.getDefaultState())
+                    this.setPosOrCopy(stack, player, world, pos);
             } else if (getToolMode(stack) == ToolMode.Paste) {
                 if (! player.isSneaking() && player instanceof ServerPlayerEntity) {
                     if (getAnchor(stack) == null) {
@@ -284,7 +285,8 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
             }
             if (getToolMode(stack) == ToolMode.Copy) {
                 if (player.isSneaking())
-                    GuiMod.COPY.openScreen(player);
+                    if (world.getBlockState(VectorHelper.getLookingAt(player, stack).getPos()) == Blocks.AIR.getDefaultState())
+                        GuiMod.COPY.openScreen(player);
             } else if (player.isSneaking()) {
                 GuiMod.PASTE.openScreen(player);
             } else {
