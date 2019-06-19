@@ -33,7 +33,7 @@ public class PacketRequestBlockMap {
 
     public static class Handler {
         public static void handle(final PacketRequestBlockMap msg, Supplier<NetworkEvent.Context> ctx) {
-            if (ctx.get().getDirection() != NetworkDirection.PLAY_TO_CLIENT)
+            if (ctx.get().getDirection() == NetworkDirection.PLAY_TO_CLIENT)
                 return;
 
             ctx.get().enqueueWork(() -> {

@@ -1,6 +1,7 @@
 package com.direwolf20.buildinggadgets.client;
 
 import afu.org.checkerframework.checker.nullness.qual.Nullable;
+import com.direwolf20.buildinggadgets.client.events.EventClientTick;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import net.minecraft.block.BlockState;
@@ -39,6 +40,7 @@ public class ClientProxy {
         //BuildingObjects.initColorHandlers();
         //eventBus.addListener(ClientProxy::renderWorldLastEvent);
         MinecraftForge.EVENT_BUS.addListener(ClientProxy::bakeModels);
+        MinecraftForge.EVENT_BUS.addListener(EventClientTick::onClientTick);
     }
 
     private static void bakeModels(ModelBakeEvent event) {
