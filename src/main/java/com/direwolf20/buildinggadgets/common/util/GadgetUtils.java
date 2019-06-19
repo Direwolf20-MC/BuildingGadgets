@@ -319,7 +319,7 @@ public class GadgetUtils {
         List<BlockPos> currentCoords = getAnchor(stack);
         if (currentCoords.size() == 0) {  //If we don't have an anchor, find the block we're supposed to anchor to
             RayTraceResult lookingAt = VectorHelper.getLookingAt(player, stack);
-            if (lookingAt == null || (world.getBlockState(VectorHelper.getLookingAt(player, stack).getPos()) != Blocks.AIR.getDefaultState())) {  //If we aren't looking at anything, exit
+            if (lookingAt == null || (world.getBlockState(VectorHelper.getLookingAt(player, stack).getPos()) == Blocks.AIR.getDefaultState())) {  //If we aren't looking at anything, exit
                 return false;
             }
             BlockPos startBlock = ((BlockRayTraceResult) lookingAt).getPos();
