@@ -33,6 +33,7 @@ import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GLAllocation;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.texture.AtlasTexture;
+import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -93,10 +94,9 @@ public class ToolRenders {
         mc.getTextureManager().bindTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
 
         //Calculate the players current position, which is needed later
-        double doubleX = player.lastTickPosX + (player.posX - player.lastTickPosX) * evt.getPartialTicks();
-        double doubleY = player.lastTickPosY + (player.posY - player.lastTickPosY) * evt.getPartialTicks() + player.getEyeHeight();
-        double doubleZ = player.lastTickPosZ + (player.posZ - player.lastTickPosZ) * evt.getPartialTicks();
-
+        double doubleX = TileEntityRendererDispatcher.staticPlayerX;
+        double doubleY = TileEntityRendererDispatcher.staticPlayerY;
+        double doubleZ = TileEntityRendererDispatcher.staticPlayerZ;
         BlockRenderLayer origLayer = MinecraftForgeClient.getRenderLayer();
 
         renderLinkedInventoryOutline(stack, player, doubleX, doubleY, doubleZ);
@@ -219,9 +219,9 @@ public class ToolRenders {
 
     public static void renderExchangerOverlay(RenderWorldLastEvent evt, PlayerEntity player, ItemStack stack) {
         //Calculate the players current position, which is needed later
-        double doubleX = player.lastTickPosX + (player.posX - player.lastTickPosX) * evt.getPartialTicks();
-        double doubleY = player.lastTickPosY + (player.posY - player.lastTickPosY) * evt.getPartialTicks() + player.getEyeHeight();
-        double doubleZ = player.lastTickPosZ + (player.posZ - player.lastTickPosZ) * evt.getPartialTicks();
+        double doubleX = TileEntityRendererDispatcher.staticPlayerX;
+        double doubleY = TileEntityRendererDispatcher.staticPlayerY;
+        double doubleZ = TileEntityRendererDispatcher.staticPlayerZ;
 
         renderLinkedInventoryOutline(stack, player, doubleX, doubleY, doubleZ);
 
@@ -366,9 +366,9 @@ public class ToolRenders {
 
         if (!GadgetDestruction.getOverlay(stack)) return;
         GlStateManager.pushMatrix();
-        double doubleX = player.lastTickPosX + (player.posX - player.lastTickPosX) * evt.getPartialTicks();
-        double doubleY = player.lastTickPosY + (player.posY - player.lastTickPosY) * evt.getPartialTicks() + player.getEyeHeight();
-        double doubleZ = player.lastTickPosZ + (player.posZ - player.lastTickPosZ) * evt.getPartialTicks();
+        double doubleX = TileEntityRendererDispatcher.staticPlayerX;
+        double doubleY = TileEntityRendererDispatcher.staticPlayerY;
+        double doubleZ = TileEntityRendererDispatcher.staticPlayerZ;
         GlStateManager.translated(-doubleX, -doubleY, -doubleZ);
         try {
             GlStateManager.callList(cacheDestructionOverlay.get(new ImmutableTriple<UniqueItemStack, BlockPos, Integer>(new UniqueItemStack(stack), startBlock, facing.ordinal()), () -> {
@@ -439,9 +439,9 @@ public class ToolRenders {
     public static void renderPasteOverlay(RenderWorldLastEvent evt, PlayerEntity player, ItemStack stack) {
 
         //Calculate the players current position, which is needed later
-        double doubleX = player.lastTickPosX + (player.posX - player.lastTickPosX) * evt.getPartialTicks();
-        double doubleY = player.lastTickPosY + (player.posY - player.lastTickPosY) * evt.getPartialTicks() + player.getEyeHeight();
-        double doubleZ = player.lastTickPosZ + (player.posZ - player.lastTickPosZ) * evt.getPartialTicks();
+        double doubleX = TileEntityRendererDispatcher.staticPlayerX;
+        double doubleY = TileEntityRendererDispatcher.staticPlayerY;
+        double doubleZ = TileEntityRendererDispatcher.staticPlayerZ;
 
         mc.getTextureManager().bindTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
 
