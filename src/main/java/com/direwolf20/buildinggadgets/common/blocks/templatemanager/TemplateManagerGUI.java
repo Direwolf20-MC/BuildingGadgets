@@ -39,6 +39,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.JsonToNBT;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
@@ -77,6 +78,10 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
     private TemplateManagerContainer container;
 
     private static final ResourceLocation background = new ResourceLocation(Reference.MODID, "textures/gui/template_manager.png");
+
+    public TemplateManagerGUI(TemplateManagerContainer container, PlayerInventory playerInventory, ITextComponent title) {
+        super(container, playerInventory, title);
+    }
 
     public TemplateManagerGUI(TemplateManagerTileEntity tileEntity, TemplateManagerContainer container, PlayerInventory inv) {
         super(container, inv, null); //TODO find out the usage of this TextComponent
