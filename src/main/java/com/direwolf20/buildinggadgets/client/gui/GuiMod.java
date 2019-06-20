@@ -117,7 +117,7 @@ public enum GuiMod {
             public Container createMenu(int p_createMenu_1_, PlayerInventory p_createMenu_2_, PlayerEntity p_createMenu_3_) {
                 return container;
             }
-        });
+        }, extraDataWriter);
     }
 
     public static String getLangKeyField(String prefix, String name) {

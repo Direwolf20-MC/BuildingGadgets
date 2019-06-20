@@ -121,16 +121,18 @@ public class ModeRadialMenu extends Screen {
             if (!isDestruction) {
                 int widthSlider = 82;
                 sliderRange = new GuiSliderInt(width / 2 - widthSlider / 2, height / 2 + 72, widthSlider, 14, "Range ", "", 1, Config.GADGETS.maxRange.get(),
-                    GadgetUtils.getToolRange(tool), false, true, Color.DARK_GRAY, slider -> {
+                        GadgetUtils.getToolRange(tool), false, true, Color.DARK_GRAY, slider -> {
                     GuiSliderInt sliderI = (GuiSliderInt) slider;
                     if (sliderI.getValueInt() != GadgetUtils.getToolRange(getGadget()))
                         PacketHandler.sendToServer(new PacketChangeRange(sliderI.getValueInt()));
-                    }, (slider, amount) -> {
-                        int value = slider.getValueInt();
-                        int valueNew = MathHelper.clamp(value + amount, 1, Config.GADGETS.maxRange.get());
-                        slider.setValue(valueNew);
-                        slider.updateSlider();
-                    });
+                }, (slider, amount) -> {
+                    int value = slider.getValueInt();
+                    int valueNew = MathHelper.clamp(value + amount, 1, Config.GADGETS.maxRange.get());
+                    if (valueNew != GadgetUtils.getToolRange(getGadget()))
+                        PacketHandler.sendToServer(new PacketChangeRange(valueNew));
+                    slider.setValue(valueNew);
+                    slider.updateSlider();
+                });
                 sliderRange.precision = 1;
                 sliderRange.getComponents().forEach(this::addButton);
             }
@@ -370,7 +372,7 @@ public class ModeRadialMenu extends Screen {
             int ydp = (int) ((yp - y) * mod + y);
 
             getMinecraft().getTextureManager().bindTexture(signs.get(i));
-            GlStateManager.color4f(color.getRed() / 255F, color.getGreen() / 255F, color.getBlue() / 255F,1);
+            GlStateManager.color4f(color.getRed() / 255F, color.getGreen() / 255F, color.getBlue() / 255F, 1);
             getMinecraft().getTextureManager().bindTexture(signs.get(i));
             blit(xdp - 8, ydp - 8, 0, 0, 16, 16, 16, 16);
         }
@@ -406,7 +408,7 @@ public class ModeRadialMenu extends Screen {
             if (helpTextProvider.isHovered(mx, my)) {
                 Color color = button instanceof GuiButtonSelect && ((GuiButtonSelect) button).isSelected() ? Color.GREEN : Color.WHITE;
                 String text = helpTextProvider.getHoverHelpText();
-                int x = helpTextProvider.getScreenPosition() == ScreenPosition.LEFT ? mx - font.getStringWidth(text): mx;
+                int x = helpTextProvider.getScreenPosition() == ScreenPosition.LEFT ? mx - font.getStringWidth(text) : mx;
                 font.drawStringWithShadow(text, x, my - font.FONT_HEIGHT, color.getRGB());
             }
         });
@@ -427,7 +429,7 @@ public class ModeRadialMenu extends Screen {
 
     @Override
     public void tick() {
-        if (! InputMappings.isKeyDown(Minecraft.getInstance().mainWindow.getHandle(), KeyBindings.menuSettings.getKey().getKeyCode())) {
+        if (!InputMappings.isKeyDown(Minecraft.getInstance().mainWindow.getHandle(), KeyBindings.menuSettings.getKey().getKeyCode())) {
             onClose();
             changeMode();
         }

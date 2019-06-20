@@ -2,6 +2,8 @@ package com.direwolf20.buildinggadgets.client.gui.components;
 
 import com.direwolf20.buildinggadgets.client.ClientProxy;
 import com.direwolf20.buildinggadgets.client.gui.GuiMod;
+import com.direwolf20.buildinggadgets.common.network.PacketHandler;
+import com.direwolf20.buildinggadgets.common.network.packets.PacketChangeRange;
 import com.google.common.collect.ImmutableSet;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.SoundHandler;
@@ -40,6 +42,7 @@ public class GuiSliderInt extends GuiSlider {
         if (value != valueInt) {
             value = valueInt;
             playSound();
+            PacketHandler.sendToServer(new PacketChangeRange(getValueInt()));
         }
     }
 
