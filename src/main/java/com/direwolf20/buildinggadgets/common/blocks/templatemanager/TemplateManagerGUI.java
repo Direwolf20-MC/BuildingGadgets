@@ -81,6 +81,8 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
 
     public TemplateManagerGUI(TemplateManagerContainer container, PlayerInventory playerInventory, ITextComponent title) {
         super(container, playerInventory, title);
+        this.container = container;
+        this.te = container.getTe();
     }
 
     public TemplateManagerGUI(TemplateManagerTileEntity tileEntity, TemplateManagerContainer container, PlayerInventory inv) {
