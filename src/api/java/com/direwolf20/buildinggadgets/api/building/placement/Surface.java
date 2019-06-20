@@ -28,7 +28,7 @@ public final class Surface implements IPositionPlacementSequence {
      * @param side            Facing to offset from the {@code searchingCenter} to get to the reference region center
      */
     public static Surface create(IBlockReader world, BlockPos searchingCenter, Direction side, int range, boolean fuzzy) {
-        Region searchingRegion = Wall.clickedSide(searchingCenter, side, range).getBoundingBox();
+        Region searchingRegion = Wall.clickedSide(searchingCenter, side, range / 2).getBoundingBox();
         return create(world, searchingCenter, searchingRegion, pos -> pos.offset(side), fuzzy);
     }
 
