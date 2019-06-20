@@ -41,9 +41,11 @@
                 {
                   "function": "minecraft:apply_bonus",
                   "enchantment": "minecraft:fortune",
-                  "formula": "minecraft:binomial_with_bonus_count",
-                  "extra": 1,
-                  "probability": 0.4
+                  "parameters": {
+                    "extra": 1,
+                    "probability": 0.4
+                  },
+                  "formula": "minecraft:binomial_with_bonus_count"
                 }
               ],
               "name": "buildinggadgets:construction_paste"
