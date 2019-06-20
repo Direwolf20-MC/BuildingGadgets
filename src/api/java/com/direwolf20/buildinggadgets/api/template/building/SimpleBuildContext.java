@@ -1,6 +1,7 @@
 package com.direwolf20.buildinggadgets.api.template.building;
 
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.world.IWorld;
 
 import javax.annotation.Nonnull;
@@ -28,17 +29,20 @@ public final class SimpleBuildContext implements IBuildContext {
         Builder builder = builder();
         if (context == null)
             return builder;
-        return builder.world(context.getWorld()).buildingPlayer(context.getBuildingPlayer());
+        return builder.world(context.getWorld()).buildingPlayer(context.getBuildingPlayer()).usedStack(context.getUsedStack());
     }
 
-    @Nullable
+    @Nonnull
     private final IWorld world;
     @Nullable
     private final PlayerEntity buildingPlayer;
 
-    private SimpleBuildContext(@Nullable IWorld world, @Nullable PlayerEntity buildingPlayer) {
+    private final ItemStack stack;
+
+    private SimpleBuildContext(@Nonnull IWorld world, @Nullable PlayerEntity buildingPlayer, @Nonnull ItemStack stack) {
         this.world = world;
         this.buildingPlayer = buildingPlayer;
+        this.stack = Objects.requireNonNull(stack);
     }
 
     /**
@@ -58,18 +62,26 @@ public final class SimpleBuildContext implements IBuildContext {
         return buildingPlayer;
     }
 
+    @Override
+    public ItemStack getUsedStack() {
+        return stack;
+    }
+
     /**
      * {@code Builder} for creating new instances of {@link SimpleBuildContext}
      */
     public static final class Builder {
-        @Nonnull
+        @Nullable
         private IWorld world;
         @Nullable
         private PlayerEntity buildingPlayer;
+        @Nonnull
+        private ItemStack stack;
 
         private Builder() {
             this.world = null;
             this.buildingPlayer = null;
+            this.stack = ItemStack.EMPTY;
         }
 
         /**
@@ -84,13 +96,21 @@ public final class SimpleBuildContext implements IBuildContext {
         }
 
         /**
-         * Sets the {@link PlayerEntity} of the resulting {@link SimpleBuildContext}.
+         * Sets the {@link PlayerEntity} of the resulting {@link SimpleBuildContext}. Notice that this also set's the world
+         * for the resulting {@code SimpleBuildContext} if the player is non-null and a world hasn't been set yet.
          * @param buildingPlayer The {@link PlayerEntity} of the resulting {@link SimpleBuildContext}.
          * @return The {@code Builder} itself
          * @see SimpleBuildContext#getBuildingPlayer()
          */
         public Builder buildingPlayer(@Nullable PlayerEntity buildingPlayer) {
             this.buildingPlayer = buildingPlayer;
+            if (world == null && buildingPlayer != null)
+                this.world = buildingPlayer.world;
+            return this;
+        }
+
+        public Builder usedStack(@Nonnull ItemStack stack) {
+            this.stack = Objects.requireNonNull(stack);
             return this;
         }
 
@@ -110,7 +130,7 @@ public final class SimpleBuildContext implements IBuildContext {
          * @throws NullPointerException if both the {@link IWorld} passed in and the {@link IWorld} of this {@code Builder} are null.
          */
         public SimpleBuildContext build(@Nullable IWorld world) {
-            return new SimpleBuildContext(world != null ? world : Objects.requireNonNull(this.world), buildingPlayer);
+            return new SimpleBuildContext(world != null ? world : Objects.requireNonNull(this.world), buildingPlayer, stack);
         }
     }
 }

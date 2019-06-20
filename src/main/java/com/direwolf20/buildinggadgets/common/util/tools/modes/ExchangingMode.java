@@ -15,7 +15,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.world.IWorld;
 
 import java.util.Arrays;
 import java.util.List;
@@ -71,12 +71,12 @@ public enum ExchangingMode {
         return ICONS;
     }
 
-    public static List<BlockPos> collectPlacementPos(World world, PlayerEntity player, BlockPos hit, Direction sideHit, ItemStack tool, BlockPos initial) {
+    public static List<BlockPos> collectPlacementPos(IWorld world, PlayerEntity player, BlockPos hit, Direction sideHit, ItemStack tool, BlockPos initial) {
         IBuildingMode mode = byName(NBTHelper.getOrNewTag(tool).getString("mode")).getModeImplementation();
-        return mode.createExecutionContext(player, hit, sideHit, tool).collectFilteredSequence(world, tool, player, initial);
+        return mode.createExecutionContext(player, hit, sideHit, tool, initial).collectFilteredSequence();
     }
 
-    public static BiPredicate<BlockPos, BlockState> combineTester(World world, ItemStack tool, PlayerEntity player, BlockPos initial) {
+    public static BiPredicate<BlockPos, BlockState> combineTester(IWorld world, ItemStack tool, PlayerEntity player, BlockPos initial) {
         BlockState initialBlockState = world.getBlockState(initial);
         BlockState target = GadgetUtils.getToolBlock(tool);
         return (pos, state) -> {

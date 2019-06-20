@@ -4,7 +4,6 @@ import com.direwolf20.buildinggadgets.api.building.Region;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.IFluidState;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
@@ -20,7 +19,6 @@ import net.minecraft.world.dimension.Dimension;
 import net.minecraft.world.gen.Heightmap;
 
 import javax.annotation.Nullable;
-import java.util.function.Predicate;
 
 /**
  * A fake world that has a set of positions "filled" with some type of block and the rest will be air ({@link UniqueBlockState#AIR}).

@@ -1,6 +1,7 @@
 package com.direwolf20.buildinggadgets.api.template.building;
 
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.world.IWorld;
 
 import javax.annotation.Nullable;
@@ -20,4 +21,9 @@ public interface IBuildContext {
      */
     @Nullable
     PlayerEntity getBuildingPlayer();
+
+    /**
+     * @return The {@link net.minecraft.item.Item} used in this Build in the Form of an {@link ItemStack}
+     */
+    ItemStack getUsedStack();
 }

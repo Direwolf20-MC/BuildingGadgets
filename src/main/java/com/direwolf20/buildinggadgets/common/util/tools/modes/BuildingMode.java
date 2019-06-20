@@ -22,7 +22,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
-import net.minecraft.world.World;
+import net.minecraft.world.IWorld;
 
 import java.util.*;
 import java.util.function.BiPredicate;
@@ -66,10 +66,10 @@ public enum BuildingMode {
         return VALUES[(this.ordinal() + 1) % VALUES.length];
     }
 
-    public static List<BlockPos> collectPlacementPos(World world, PlayerEntity player, BlockPos hit, Direction sideHit, ItemStack tool, BlockPos initial) {
+    public static List<BlockPos> collectPlacementPos(IWorld world, PlayerEntity player, BlockPos hit, Direction sideHit, ItemStack tool, BlockPos initial) {
         IBuildingMode mode = byName(NBTHelper.getOrNewTag(tool).getString("mode")).getModeImplementation();
-        return mode.createExecutionContext(player, hit, sideHit, tool)
-                .collectFilteredSequence(world, tool, player, initial);
+        return mode.createExecutionContext(player, hit, sideHit, tool, initial)
+                .collectFilteredSequence();
     }
 
     public static BuildingMode byName(String name) {
@@ -87,7 +87,7 @@ public enum BuildingMode {
         return ICONS;
     }
 
-    public static BiPredicate<BlockPos, BlockState> combineTester(World world, ItemStack tool, PlayerEntity player, BlockPos original) {
+    public static BiPredicate<BlockPos, BlockState> combineTester(IWorld world, ItemStack tool, PlayerEntity player, BlockPos original) {
         BlockState target = GadgetUtils.getToolBlock(tool);
         return (pos, state) -> {
             BlockState current = world.getBlockState(pos);

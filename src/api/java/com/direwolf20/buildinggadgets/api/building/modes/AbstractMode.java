@@ -1,14 +1,12 @@
 package com.direwolf20.buildinggadgets.api.building.modes;
 
-import com.direwolf20.buildinggadgets.api.building.Context;
 import com.direwolf20.buildinggadgets.api.building.IBuildingMode;
 import com.direwolf20.buildinggadgets.api.building.IValidatorFactory;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.world.IWorld;
 
 import java.util.function.BiPredicate;
 
@@ -25,13 +23,8 @@ public abstract class AbstractMode implements IBuildingMode {
     }
 
     @Override
-    public BiPredicate<BlockPos, BlockState> createValidatorFor(World world, ItemStack tool, PlayerEntity player, BlockPos initial) {
+    public BiPredicate<BlockPos, BlockState> createValidatorFor(IWorld world, ItemStack tool, PlayerEntity player, BlockPos initial) {
         return validatorFactory.createValidatorFor(world, tool, player, initial);
-    }
-
-    @Override
-    public Context createExecutionContext(PlayerEntity player, BlockPos hit, Direction sideHit, ItemStack tool) {
-        return new Context(computeCoordinates(player, hit, sideHit, tool), getBlockProvider(tool), validatorFactory);
     }
 
 }

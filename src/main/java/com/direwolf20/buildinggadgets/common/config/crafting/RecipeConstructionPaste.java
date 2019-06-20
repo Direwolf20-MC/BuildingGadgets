@@ -1,10 +1,8 @@
 package com.direwolf20.buildinggadgets.common.config.crafting;
 
 import com.direwolf20.buildinggadgets.common.items.pastes.GenericPasteContainer;
-import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.google.gson.JsonObject;
 import net.minecraft.inventory.CraftingInventory;
-import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.item.crafting.ShapedRecipe;

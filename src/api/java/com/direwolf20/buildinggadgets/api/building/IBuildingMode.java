@@ -1,15 +1,17 @@
 package com.direwolf20.buildinggadgets.api.building;
 
 import com.direwolf20.buildinggadgets.api.capability.CapabilityBlockProvider;
+import com.direwolf20.buildinggadgets.api.template.building.SimpleBuildContext;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.world.IWorld;
 import net.minecraftforge.common.util.LazyOptional;
 
+import javax.annotation.Nullable;
 import java.util.function.BiPredicate;
 
 /**
@@ -30,13 +32,14 @@ public interface IBuildingMode {
         return capability.orElse(CapabilityBlockProvider.getDefaultAirProvider());
     }
 
-    BiPredicate<BlockPos, BlockState> createValidatorFor(World world, ItemStack tool, PlayerEntity player, BlockPos initial);
+    BiPredicate<BlockPos, BlockState> createValidatorFor(IWorld world, ItemStack tool, PlayerEntity player, BlockPos initial);
 
     /**
-     * @see Context#getPositionSequence()
+     * @see BuildingView#getPositionSequence()
      */
-    default Context createExecutionContext(PlayerEntity player, BlockPos hit, Direction sideHit, ItemStack tool) {
-        return new Context(computeCoordinates(player, hit, sideHit, tool), getBlockProvider(tool), this::createValidatorFor);
+    default BuildingView createExecutionContext(PlayerEntity player, BlockPos hit, Direction sideHit, ItemStack tool, @Nullable BlockPos initial) {
+        return new BuildingView(computeCoordinates(player, hit, sideHit, tool), getBlockProvider(tool), this::createValidatorFor,
+                SimpleBuildContext.builder().buildingPlayer(player).usedStack(tool).build(), initial);
     }
 
     /**
