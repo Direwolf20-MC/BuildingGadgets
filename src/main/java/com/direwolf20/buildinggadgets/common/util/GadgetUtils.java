@@ -235,7 +235,7 @@ public class GadgetUtils {
         if (data == null)
             data = BlockData.AIR;
 
-        CompoundNBT stateTag = BlockData.AIR.serialize(true);
+        CompoundNBT stateTag = data.serialize(true);
         tagCompound.put(NBTKeys.TE_CONSTRUCTION_STATE, stateTag);
         stack.setTag(tagCompound);
     }
