@@ -205,14 +205,13 @@ public class GadgetBuilding extends GadgetGeneric implements IAtopPlacingGadget 
         BlockData blockData = getToolBlock(heldItem);
 
         if (blockData.getState() != Blocks.AIR.getDefaultState()) { //Don't attempt a build if a block is not chosen -- Typically only happens on a new tool.
-            BlockData state = BlockData.AIR; //Initialize a new State Variable for use in the fake world
             //TODO replace with a better TileEntity supporting Fake IWorld
             fakeWorld.setWorldAndState(player.world, blockData.getState(), coords); // Initialize the fake world's blocks
             for (BlockPos coordinate : coords) {
                 //Get the extended block state in the fake world
                 //Disabled to fix Chisel
                 //state = state.getBlock().getExtendedState(state, fakeWorld, coordinate);
-                if (placeBlock(world, player, coordinate, state)) {
+                if (placeBlock(world, player, coordinate, blockData)) {
                     undoCoords.add(coordinate);//If we successfully place the block, add the location to the undo list.
                 }
             }
