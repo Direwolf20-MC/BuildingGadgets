@@ -85,7 +85,7 @@ public final class Registries {
 
     @SubscribeEvent
     public static void registerTileDataSerializers(RegistryEvent.Register<ITileDataSerializer> event) {
-        event.getRegistry().register(TileDataSerializers.DUMMY_TILE_DATA_SERIALIZER);
+        event.getRegistry().register(TileDataSerializers.dummyDataSerializer());
     }
 
     static void createOrderedRegistries() {

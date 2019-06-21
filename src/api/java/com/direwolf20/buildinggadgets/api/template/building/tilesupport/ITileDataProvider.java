@@ -3,7 +3,7 @@ package com.direwolf20.buildinggadgets.api.template.building.tilesupport;
 /**
  * Represents an {@link java.util.function.Supplier Supplier&lt;ITileEntityData&gt;} which can be used for creating {@link ITileEntityData} instances.
  * <p>
- * A {@link net.minecraft.tileentity.TileEntity} implementing this interface will be queried from {@link DataProviderFactory} in order to create {@link ITileEntityData}.
+ * A {@link net.minecraft.tileentity.TileEntity} implementing this interface will be queried from {@link TileSupport#dataProviderFactory()} in order to create {@link ITileEntityData}.
  * It may still choose to return null.
  */
 @FunctionalInterface

@@ -11,7 +11,7 @@ public enum DummyTileEntityData implements ITileEntityData {
 
     @Override
     public ITileDataSerializer getSerializer() {
-        return TileDataSerializers.DUMMY_TILE_DATA_SERIALIZER;
+        return TileDataSerializers.dummyDataSerializer();
     }
 
     @Override
