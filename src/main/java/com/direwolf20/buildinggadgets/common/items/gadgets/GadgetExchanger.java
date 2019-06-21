@@ -195,14 +195,13 @@ public class GadgetExchanger extends GadgetGeneric {
         BlockData blockState = getToolBlock(heldItem);
 
         if (blockState.getState() != Blocks.AIR.getDefaultState()) {  //Don't attempt a build if a block is not chosen -- Typically only happens on a new tool.
-            BlockData state = BlockData.AIR; //Initialize a new State Variable for use in the fake world
             //TODO replace fakeWorld
             fakeWorld.setWorldAndState(player.world, blockState.getState(), coordinates); // Initialize the fake world's blocks
             for (BlockPos coordinate : coords) {
                 //Get the extended block state in the fake world
                 //Disabled to fix Chisel
                 //state = state.getBlock().getExtendedState(state, fakeWorld, coordinate);
-                exchangeBlock(world, player, coordinate, state);
+                exchangeBlock(world, player, coordinate, blockState);
             }
         }
         return true;

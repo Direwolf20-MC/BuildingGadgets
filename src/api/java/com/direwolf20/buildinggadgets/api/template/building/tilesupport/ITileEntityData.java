@@ -38,7 +38,7 @@ public interface ITileEntityData {
      * @implNote The default implementation checks whether the given position is air.
      */
     default boolean allowPlacement(IBuildContext context, BlockState state, BlockPos position) {
-        return state.isAir(context.getWorld(), position);
+        return context.getWorld().isAirBlock(position);
     }
 
     /**

@@ -40,6 +40,7 @@ public class BlockBuildEntity extends EntityBase {
                     }
                     world.addEntity(new ConstructionBlockEntity(world, targetPos, false));
                 } else {
+                    world.removeBlock(targetPos, false);
                     targetBlock.placeIn(SimpleBuildContext.builder().build(world), targetPos);
                     BlockPos upPos = targetPos.up();
                     world.getBlockState(targetPos).neighborChanged(world, targetPos, world.getBlockState(upPos).getBlock(), upPos, false);
