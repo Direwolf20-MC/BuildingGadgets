@@ -123,13 +123,11 @@ public class ModeRadialMenu extends Screen {
                 sliderRange = new GuiSliderInt(width / 2 - widthSlider / 2, height / 2 + 72, widthSlider, 14, "Range ", "", 1, Config.GADGETS.maxRange.get(),
                         GadgetUtils.getToolRange(tool), false, true, Color.DARK_GRAY, slider -> {
                     GuiSliderInt sliderI = (GuiSliderInt) slider;
-                    if (sliderI.getValueInt() != GadgetUtils.getToolRange(getGadget()))
-                        PacketHandler.sendToServer(new PacketChangeRange(sliderI.getValueInt()));
+                    sendRangeUpdate(sliderI.getValueInt());
                 }, (slider, amount) -> {
                     int value = slider.getValueInt();
                     int valueNew = MathHelper.clamp(value + amount, 1, Config.GADGETS.maxRange.get());
-                    if (valueNew != GadgetUtils.getToolRange(getGadget()))
-                        PacketHandler.sendToServer(new PacketChangeRange(valueNew));
+                    sendRangeUpdate(valueNew);
                     slider.setValue(valueNew);
                     slider.updateSlider();
                 });
@@ -473,6 +471,11 @@ public class ModeRadialMenu extends Screen {
 
         float ang = (float) (Math.acos(baseVec.dot(mouseVec) / (baseVec.length() * mouseVec.length())) * (180F / Math.PI));
         return my < y ? 360F - ang : ang;
+    }
+
+    private void sendRangeUpdate(int valueNew) {
+        if (valueNew != GadgetUtils.getToolRange(getGadget()))
+            PacketHandler.sendToServer(new PacketChangeRange(valueNew));
     }
 
     public enum ScreenPosition {
