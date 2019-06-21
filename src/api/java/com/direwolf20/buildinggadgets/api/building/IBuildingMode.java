@@ -1,8 +1,8 @@
 package com.direwolf20.buildinggadgets.api.building;
 
+import com.direwolf20.buildinggadgets.api.abstraction.BlockData;
 import com.direwolf20.buildinggadgets.api.capability.CapabilityBlockProvider;
 import com.direwolf20.buildinggadgets.api.template.building.SimpleBuildContext;
-import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Direction;
@@ -32,7 +32,7 @@ public interface IBuildingMode {
         return capability.orElse(CapabilityBlockProvider.getDefaultAirProvider());
     }
 
-    BiPredicate<BlockPos, BlockState> createValidatorFor(IWorld world, ItemStack tool, PlayerEntity player, BlockPos initial);
+    BiPredicate<BlockPos, BlockData> createValidatorFor(IWorld world, ItemStack tool, PlayerEntity player, BlockPos initial);
 
     /**
      * @see BuildingView#getPositionSequence()

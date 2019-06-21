@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.common.entities;
 
+import com.direwolf20.buildinggadgets.api.abstraction.BlockData;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlock;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockPowder;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
@@ -7,7 +8,6 @@ import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGEntities;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
 import net.minecraft.entity.EntityType;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.IPacket;
@@ -63,13 +63,13 @@ public class ConstructionBlockEntity extends EntityBase {
             if (!getMakingPaste()) {
                 TileEntity te = world.getTileEntity(targetPos);
                 if (te instanceof ConstructionBlockTileEntity) {
-                    BlockState tempState = te.getBlockState();
+                    BlockData tempState = ((ConstructionBlockTileEntity) te).getConstructionBlockData();
 
-                    int opacity = tempState.getOpacity(world, targetPos);
+                    int opacity = tempState.getState().getOpacity(world, targetPos);
                     boolean neighborBrightness = false;//tempState.useNeighbourBrightness(world, targetPos); //TODO find replacement
                     if (opacity > 0 || neighborBrightness) {
-                        BlockState tempSetBlock = te.getBlockState();
-                        BlockState tempActualSetBlock = ((ConstructionBlockTileEntity) te).getActualBlockState();
+                        BlockData tempSetBlock = ((ConstructionBlockTileEntity) te).getConstructionBlockData();
+                        BlockData tempActualSetBlock = ((ConstructionBlockTileEntity) te).getActualBlockData();
                         world.setBlockState(targetPos, BGBlocks.constructionBlock.getDefaultState()
                                 .with(ConstructionBlock.BRIGHT, opacity == 0)
                                 .with(ConstructionBlock.NEIGHBOR_BRIGHTNESS, neighborBrightness));

@@ -1,5 +1,7 @@
 package com.direwolf20.buildinggadgets.common.util.blocks;
 
+import com.direwolf20.buildinggadgets.api.abstraction.BlockData;
+import com.direwolf20.buildinggadgets.api.template.building.tilesupport.DummyTileEntityData;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.util.tools.UniqueItem;
@@ -16,8 +18,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Deprecated //TODO @since 1.13.x replace with BlockState2ItemMap and BlockState2ShortMap respectively
-public class BlockMapIntState {
-
+public class BlockMapIntState { //TODO This class is no longer appropriate for the needs or Tile supported world
+    //This class does not store BlockData!!!
     public Map<Short, BlockState> intStateMap = new HashMap<>();
     public Map<BlockState, UniqueItem> intStackMap = new HashMap<>();
 
@@ -107,15 +109,15 @@ public class BlockMapIntState {
     }
 
     @Nonnull
-    public static UniqueItem blockStateToUniqueItem(BlockState state, PlayerEntity player, BlockPos pos) {
-        return UniqueItem.fromBlockState(state, player, pos);
+    public static UniqueItem blockStateToUniqueItem(BlockData state, PlayerEntity player, BlockPos pos) {
+        return UniqueItem.fromBlockState(state.getState(), player, pos);
     }
 
     public void makeStackMapFromStateMap(PlayerEntity player) {
         intStackMap.clear();
         for (Map.Entry<Short, BlockState> entry : intStateMap.entrySet()) {
             try {
-                intStackMap.put(entry.getValue(), blockStateToUniqueItem(entry.getValue(), player, new BlockPos(0, 0, 0)));
+                intStackMap.put(entry.getValue(), blockStateToUniqueItem(new BlockData(entry.getValue(), DummyTileEntityData.INSTANCE), player, new BlockPos(0, 0, 0)));
             } catch (IllegalArgumentException e) {
             }
         }

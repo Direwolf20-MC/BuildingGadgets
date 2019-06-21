@@ -1,16 +1,22 @@
 package com.direwolf20.buildinggadgets.api.abstraction;
 
+import com.direwolf20.buildinggadgets.api.APIProxy;
 import com.direwolf20.buildinggadgets.api.Registries;
 import com.direwolf20.buildinggadgets.api.template.building.IBuildContext;
+import com.direwolf20.buildinggadgets.api.template.building.tilesupport.DummyTileEntityData;
 import com.direwolf20.buildinggadgets.api.template.building.tilesupport.ITileEntityData;
 import com.direwolf20.buildinggadgets.api.template.serialisation.ITileDataSerializer;
 import com.direwolf20.buildinggadgets.api.util.RegistryUtils;
 import com.google.common.base.Preconditions;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.NBTUtil;
+import net.minecraft.util.Mirror;
+import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
 
+import javax.annotation.Nullable;
 import java.util.Objects;
 
 /**
@@ -20,30 +26,65 @@ import java.util.Objects;
  * Notice that this class is immutable as long as the {@link ITileEntityData} instance is immutable.
  */
 public final class BlockData {
+    public static final BlockData AIR = new BlockData(Blocks.AIR.getDefaultState(), DummyTileEntityData.INSTANCE);
     private static final String KEY_STATE = "state";
     private static final String KEY_SERIALIZER = "serializer";
     private static final String KEY_DATA = "data";
 
     /**
-     * @param tag The {@link CompoundNBT} representing the serialized block data.
+     * Attempts to retrieve a BlockData from the given {@link CompoundNBT}, if present.
+     *
+     * @param tag       The {@link CompoundNBT} representing the serialized block data.
      * @param persisted Whether or not the {@link CompoundNBT} was created using an persisted save.
-     * @return A new instance of {@code BlockData} as represented by the {@link CompoundNBT}.
-     * @throws IllegalArgumentException if the persisted flag does not match how the tag was created.
-     * @throws NullPointerException if an unknown serializer is referenced.
+     * @return A new instance of {@code BlockData} as represented by the {@link CompoundNBT}, if it could be created or null otherwise.
+     * @see #deserialize(CompoundNBT, boolean)
      */
-    public static BlockData deserialize(CompoundNBT tag, boolean persisted) {
+    @Nullable
+    public static BlockData tryDeserialize(@Nullable CompoundNBT tag, boolean persisted) {
+        if (tag == null || ! (tag.contains(KEY_STATE) && tag.contains(KEY_SERIALIZER) && tag.contains(KEY_DATA)))
+            return null;
         BlockState state = NBTUtil.readBlockState(tag.getCompound(KEY_STATE));
         ITileDataSerializer serializer;
         try {
             if (persisted)
                 serializer = RegistryUtils
-                        .getFromString(Registries.getTileDataSerializers(), tag.getString(KEY_SERIALIZER));
+                        .getFromString(Registries.TileEntityData.getTileDataSerializers(), tag.getString(KEY_SERIALIZER));
             else
-                serializer = RegistryUtils.getById(Registries.getTileDataSerializers(), tag.getInt(KEY_SERIALIZER));
+                serializer = RegistryUtils.getById(Registries.TileEntityData.getTileDataSerializers(), tag.getInt(KEY_SERIALIZER));
+        } catch (Exception e) {
+            APIProxy.LOG.error("Failed to create deserializer!", e);
+            return null;
+        }
+        if (serializer == null)
+            return null;
+        ITileEntityData data = serializer.deserialize(tag.getCompound(KEY_DATA), persisted);
+        return new BlockData(state, data);
+    }
+
+    /**
+     * @param tag The {@link CompoundNBT} representing the serialized block data.
+     * @param persisted Whether or not the {@link CompoundNBT} was created using an persisted save.
+     * @return A new instance of {@code BlockData} as represented by the {@link CompoundNBT}.
+     * @throws IllegalArgumentException if the given tag does not represent a valid {@code BlockData}.
+     * @throws NullPointerException if the tag was null.
+     */
+    public static BlockData deserialize(CompoundNBT tag, boolean persisted) {
+        Preconditions.checkNotNull(tag, "Cannot deserialize from a null tag compound");
+        Preconditions.checkArgument(tag.contains(KEY_STATE) && tag.contains(KEY_SERIALIZER) && tag.contains(KEY_DATA),
+                "Given NBTTagCompound does not contain a valid BlockData instance. Missing NBT-Keys in Tag {}!", tag.toString());
+        BlockState state = NBTUtil.readBlockState(tag.getCompound(KEY_STATE));
+        ITileDataSerializer serializer;
+        try {
+            if (persisted)
+                serializer = RegistryUtils
+                        .getFromString(Registries.TileEntityData.getTileDataSerializers(), tag.getString(KEY_SERIALIZER));
+            else
+                serializer = RegistryUtils.getById(Registries.TileEntityData.getTileDataSerializers(), tag.getInt(KEY_SERIALIZER));
         } catch (Exception e) {
             throw new IllegalArgumentException("Could not retrieve serializer with persisted=" + persisted + "!", e);
         }
-        Preconditions.checkArgument(serializer != null);
+        Preconditions.checkArgument(serializer != null,
+                "Failed to retrieve serializer for tag {} and persisted={}", tag.toString(), persisted);
         ITileEntityData data = serializer.deserialize(tag.getCompound(KEY_DATA), persisted);
         return new BlockData(state, data);
     }
@@ -97,8 +138,34 @@ public final class BlockData {
             tag.putString(KEY_SERIALIZER, tileData.getSerializer().getRegistryName().toString());
         else
             tag.putInt(KEY_SERIALIZER, RegistryUtils
-                    .getId(Registries.getTileDataSerializers(), tileData.getSerializer()));
+                    .getId(Registries.TileEntityData.getTileDataSerializers(), tileData.getSerializer()));
         tag.put(KEY_DATA, tileData.getSerializer().serialize(tileData, persisted));
         return tag;
+    }
+
+    public BlockData mirror(Mirror mirror) {
+        return new BlockData(getState().mirror(mirror), getTileData());
+    }
+
+    public BlockData rotate(Rotation rotation) {
+        return new BlockData(getState().rotate(rotation), getTileData());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (! (o instanceof BlockData)) return false;
+
+        BlockData blockData = (BlockData) o;
+
+        if (! getState().equals(blockData.getState())) return false;
+        return getTileData().equals(blockData.getTileData());
+    }
+
+    @Override
+    public int hashCode() {
+        int result = getState().hashCode();
+        result = 31 * result + getTileData().hashCode();
+        return result;
     }
 }

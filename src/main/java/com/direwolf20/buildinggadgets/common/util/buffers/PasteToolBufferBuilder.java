@@ -74,7 +74,8 @@ public class PasteToolBufferBuilder {
         ToolBufferBuilder bufferBuilder = new ToolBufferBuilder(2097152);
         bufferBuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
         for (BlockMap blockMap : blockMapList) {
-            BlockState renderBlockState = blockMap.state;
+            //TODO Tile Handling
+            BlockState renderBlockState = blockMap.state.getState();
             if (!(renderBlockState.equals(Blocks.AIR.getDefaultState()))) {
                 IBakedModel model = dispatcher.getModelForState(renderBlockState);
                 dispatcher.getBlockModelRenderer().renderModelFlat(Minecraft.getInstance().world, model, renderBlockState, new BlockPos(blockMap.xOffset, blockMap.yOffset, blockMap.zOffset), bufferBuilder, false, new Random(), 0L);

@@ -16,6 +16,7 @@ import com.direwolf20.buildinggadgets.common.util.tools.UniqueItem;
 import com.direwolf20.buildinggadgets.common.world.WorldSave;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.PlayerEntity;
@@ -25,11 +26,11 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
-import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.world.ServerWorld;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
 
@@ -190,11 +191,9 @@ public class TemplateManagerCommands {
         Map<BlockState, UniqueItem> intStackMap = mapIntState.intStackMap;
         List<BlockMap> blockMapList = GadgetCopyPaste.getBlockMapList(templateTagCompound);
         for (BlockMap blockMap : blockMapList) {
-            UniqueItem uniqueItem = intStackMap.get(blockMap.state);
+            UniqueItem uniqueItem = intStackMap.get(blockMap.state.getState());
             if (!(uniqueItem == null)) {
-                NonNullList<ItemStack> drops = NonNullList.create();
-                //TODO fix Lootables
-                blockMap.state.getDrops(null);
+                List<ItemStack> drops = Block.getDrops(blockMap.state.getState(), (ServerWorld) world, blockMap.pos, world.getTileEntity(blockMap.pos), player, ItemStack.EMPTY);
                 int neededItems = 0;
                 for (ItemStack drop : drops) {
                     if (drop.getItem().equals(uniqueItem.getItem())) {

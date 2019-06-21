@@ -1,23 +1,22 @@
 package com.direwolf20.buildinggadgets.api.building;
 
-import net.minecraft.block.BlockState;
+import com.direwolf20.buildinggadgets.api.abstraction.BlockData;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.NBTUtil;
 import net.minecraft.util.math.BlockPos;
 
 /**
- * Immutable block provider that always return the same block state regardless of which position is requested.
+ * Immutable block provider that always return the same block data regardless of which position is requested.
  */
 public class SingleTypeProvider implements IBlockProvider {
     private static final String SINGLE_TYPE_PROVIDER_TAG = "tag";
 
-    private final BlockState state;
+    private final BlockData data;
 
     /**
-     * @param state value that {@link #at(BlockPos)} will return
+     * @param data value that {@link #at(BlockPos)} will return
      */
-    public SingleTypeProvider(BlockState state) {
-        this.state = state;
+    public SingleTypeProvider(BlockData data) {
+        this.data = data;
     }
 
     @Override
@@ -26,25 +25,25 @@ public class SingleTypeProvider implements IBlockProvider {
     }
 
     /**
-     * @return {@link #state}, which is initialized in the constructor, regardless of the parameter.
+     * @return {@link #data}, which is initialized in the constructor, regardless of the parameter.
      */
     @Override
-    public BlockState at(BlockPos pos) {
-        return state;
+    public BlockData at(BlockPos pos) {
+        return data;
     }
 
-    public BlockState getBlockState() {
-        return state;
+    public BlockData getBlockData() {
+        return data;
     }
 
     @Override
     public void serialize(CompoundNBT tag) {
-        tag.put(SINGLE_TYPE_PROVIDER_TAG, NBTUtil.writeBlockState(state));
+        tag.put(SINGLE_TYPE_PROVIDER_TAG, data.serialize(true));
     }
 
     @Override
     public SingleTypeProvider deserialize(CompoundNBT tag) {
-        return new SingleTypeProvider(NBTUtil.readBlockState(tag.getCompound(SINGLE_TYPE_PROVIDER_TAG)));
+        return new SingleTypeProvider(BlockData.deserialize(tag.getCompound(SINGLE_TYPE_PROVIDER_TAG), true));
     }
 
 }

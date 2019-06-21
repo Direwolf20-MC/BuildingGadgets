@@ -1,6 +1,7 @@
 package com.direwolf20.buildinggadgets.common.util.helpers;
 
 import com.direwolf20.buildinggadgets.api.Registries;
+import com.direwolf20.buildinggadgets.api.abstraction.BlockData;
 import com.direwolf20.buildinggadgets.api.inventory.IStackProvider;
 import com.direwolf20.buildinggadgets.api.registry.IOrderedRegistry;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
@@ -340,7 +341,7 @@ public class InventoryHelper {
         return new ItemStack(state.getBlock());
     }
 
-    public static BlockState getSpecificStates(BlockState originalState, World world, PlayerEntity player, BlockPos pos, ItemStack tool) {
+    public static BlockData getSpecificStates(BlockState originalState, World world, PlayerEntity player, BlockPos pos, ItemStack tool) {
         BlockState placeState;
         Block block = originalState.getBlock();
         ItemStack item = block.getPickBlock(originalState, null, world, pos, player);
@@ -364,10 +365,10 @@ public class InventoryHelper {
                     }
                 }
             }
+
+            return new BlockData(placeState, Registries.TileEntityData.createTileData(world, pos));
         }
-
-        return placeState;
-
+        return null;
     }
 
     public static NonNullList<ItemStack> getInventory(PlayerEntity player) {

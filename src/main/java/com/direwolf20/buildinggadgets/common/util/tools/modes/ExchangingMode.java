@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.common.util.tools.modes;
 
+import com.direwolf20.buildinggadgets.api.abstraction.BlockData;
 import com.direwolf20.buildinggadgets.api.building.IBuildingMode;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
@@ -76,14 +77,14 @@ public enum ExchangingMode {
         return mode.createExecutionContext(player, hit, sideHit, tool, initial).collectFilteredSequence();
     }
 
-    public static BiPredicate<BlockPos, BlockState> combineTester(IWorld world, ItemStack tool, PlayerEntity player, BlockPos initial) {
+    public static BiPredicate<BlockPos, BlockData> combineTester(IWorld world, ItemStack tool, PlayerEntity player, BlockPos initial) {
         BlockState initialBlockState = world.getBlockState(initial);
-        BlockState target = GadgetUtils.getToolBlock(tool);
-        return (pos, state) -> {
+        BlockData target = GadgetUtils.getToolBlock(tool);
+        return (pos, data) -> {
             BlockState worldBlockState = world.getBlockState(pos);
 
             // Don't try to replace for the same block
-            if (worldBlockState == target)
+            if (worldBlockState == target.getState())
                 return false;
 
             // No need to replace if source and target are the same if fuzzy mode is off
@@ -99,7 +100,7 @@ public enum ExchangingMode {
 
             TileEntity tile = world.getTileEntity(pos);
             // Only replace construction block with same block state
-            if (tile instanceof ConstructionBlockTileEntity && ((ConstructionBlockTileEntity) tile).getBlockState() == state)
+            if (tile instanceof ConstructionBlockTileEntity && ((ConstructionBlockTileEntity) tile).getConstructionBlockData().equals(data))
                 return false;
             else if (tile != null) // Otherwise if the block has a tile entity, ignore it
                 return false;

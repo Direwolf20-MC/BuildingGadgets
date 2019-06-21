@@ -1,6 +1,8 @@
 package com.direwolf20.buildinggadgets.test.building.placementTests;
 
+import com.direwolf20.buildinggadgets.api.abstraction.BlockData;
 import com.direwolf20.buildinggadgets.api.building.SingleTypeProvider;
+import com.direwolf20.buildinggadgets.api.template.building.tilesupport.DummyTileEntityData;
 import com.direwolf20.buildinggadgets.test.util.UniqueBlockState;
 import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundNBT;
@@ -16,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class SingleTypeProviderTest {
 
     private final BlockState state = UniqueBlockState.createNew();
-    private final SingleTypeProvider provider = new SingleTypeProvider(state);
+    private final SingleTypeProvider provider = new SingleTypeProvider(new BlockData(state, DummyTileEntityData.INSTANCE));
     private final Random random = new Random();
 
     //TODO implement custom runner that launches minecraft
@@ -32,11 +34,11 @@ public class SingleTypeProviderTest {
 
     @Test
     void accessResultsShouldRemainConstantHardcoded() {
-        assertEquals(state, provider.at(new BlockPos(0, 0, 0)));
-        assertEquals(state, provider.at(new BlockPos(-0, -0, -0)));
-        assertEquals(state, provider.at(new BlockPos(64, 64, 64)));
-        assertEquals(state, provider.at(new BlockPos(512, -512, 512)));
-        assertEquals(state, provider.at(new BlockPos(-512, 512, -512)));
+        assertEquals(state, provider.at(new BlockPos(0, 0, 0)).getState());
+        assertEquals(state, provider.at(new BlockPos(- 0, - 0, - 0)).getState());
+        assertEquals(state, provider.at(new BlockPos(64, 64, 64)).getState());
+        assertEquals(state, provider.at(new BlockPos(512, - 512, 512)).getState());
+        assertEquals(state, provider.at(new BlockPos(- 512, 512, - 512)).getState());
     }
 
     @RepeatedTest(16)
@@ -44,7 +46,7 @@ public class SingleTypeProviderTest {
         int x = random.nextInt();
         int y = random.nextInt();
         int z = random.nextInt();
-        assertEquals(state, provider.at(new BlockPos(x, y, z)));
+        assertEquals(state, provider.at(new BlockPos(x, y, z)).getState());
     }
 
 }

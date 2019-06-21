@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.api.building;
 
-import net.minecraft.block.BlockState;
+import com.direwolf20.buildinggadgets.api.abstraction.BlockData;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.math.BlockPos;
 
@@ -37,7 +37,7 @@ public interface IBlockProvider<T extends IBlockProvider<T>> {
      * @return block that should be placed at the position
      * @implNote In most cases, {@code pos.add(this.getTranslation())} should be sufficient.
      */
-    BlockState at(BlockPos pos);
+    BlockData at(BlockPos pos);
 
     /**
      * Write the containing data into the given tag.
@@ -56,7 +56,7 @@ public interface IBlockProvider<T extends IBlockProvider<T>> {
     /**
      * Reads the data contained in the given tag and write them into a new object.
      *
-     * @implSpec The returning object should have the same type. Neither a child nor a parent.
+     * @implSpec The returning object should have the same type.
      */
     T deserialize(CompoundNBT tag);
 

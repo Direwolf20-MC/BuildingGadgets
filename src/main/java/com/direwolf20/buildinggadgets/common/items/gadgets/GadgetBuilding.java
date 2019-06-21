@@ -1,5 +1,7 @@
 package com.direwolf20.buildinggadgets.common.items.gadgets;
 
+import com.direwolf20.buildinggadgets.api.Registries;
+import com.direwolf20.buildinggadgets.api.abstraction.BlockData;
 import com.direwolf20.buildinggadgets.api.building.IAtopPlacingGadget;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
@@ -19,7 +21,6 @@ import com.direwolf20.buildinggadgets.common.util.tools.ToolRenders;
 import com.direwolf20.buildinggadgets.common.util.tools.UndoState;
 import com.direwolf20.buildinggadgets.common.util.tools.modes.BuildingMode;
 import com.direwolf20.buildinggadgets.common.world.FakeBuilderWorld;
-import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.enchantment.Enchantments;
@@ -37,7 +38,6 @@ import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldType;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.BlockSnapshot;
 import net.minecraftforge.energy.IEnergyStorage;
@@ -107,7 +107,7 @@ public class GadgetBuilding extends GadgetGeneric implements IAtopPlacingGadget 
     public void addInformation(ItemStack stack, @Nullable World world, List<ITextComponent> tooltip, ITooltipFlag flag) {
         super.addInformation(stack, world, tooltip, flag);
         tooltip.add(TooltipTranslation.GADGET_BLOCK
-                            .componentTranslation(LangUtil.getFormattedBlockName(getToolBlock(stack)))
+                .componentTranslation(LangUtil.getFormattedBlockName(getToolBlock(stack).getState()))
                             .setStyle(Styles.DK_GREEN));
         BuildingMode mode = getToolMode(stack);
         tooltip.add(TooltipTranslation.GADGET_MODE
@@ -202,19 +202,13 @@ public class GadgetBuilding extends GadgetGeneric implements IAtopPlacingGadget 
         if (heldItem.isEmpty())
             return false;
 
-        BlockState blockState = getToolBlock(heldItem);
+        BlockData blockData = getToolBlock(heldItem);
 
-        if (blockState != Blocks.AIR.getDefaultState()) { //Don't attempt a build if a block is not chosen -- Typically only happens on a new tool.
-            BlockState state = Blocks.AIR.getDefaultState(); //Initialize a new State Variable for use in the fake world
-            fakeWorld.setWorldAndState(player.world, blockState, coords); // Initialize the fake world's blocks
+        if (blockData.getState() != Blocks.AIR.getDefaultState()) { //Don't attempt a build if a block is not chosen -- Typically only happens on a new tool.
+            BlockData state = BlockData.AIR; //Initialize a new State Variable for use in the fake world
+            //TODO replace with a better TileEntity supporting Fake IWorld
+            fakeWorld.setWorldAndState(player.world, blockData.getState(), coords); // Initialize the fake world's blocks
             for (BlockPos coordinate : coords) {
-                if (fakeWorld.getWorldType() != WorldType.DEBUG_ALL_BLOCK_STATES) {
-                    try { //Get the state of the block in the fake world (This lets fences be connected, etc)
-// @todo: reimplement @since 1.13.x
-                        state = blockState.getExtendedState(fakeWorld, coordinate);
-                    } catch (Exception var8) {
-                    }
-                }
                 //Get the extended block state in the fake world
                 //Disabled to fix Chisel
                 //state = state.getBlock().getExtendedState(state, fakeWorld, coordinate);
@@ -244,7 +238,7 @@ public class GadgetBuilding extends GadgetGeneric implements IAtopPlacingGadget 
         }
         World world = player.world;
         if (!world.isRemote) {
-            BlockState currentBlock = Blocks.AIR.getDefaultState();
+            BlockData currentBlock = BlockData.AIR;
             List<BlockPos> undoCoords = undoState.coordinates; //Get the Coords to undo
 
             List<BlockPos> failedRemovals = new ArrayList<BlockPos>(); //Build a list of removals that fail
@@ -252,16 +246,16 @@ public class GadgetBuilding extends GadgetGeneric implements IAtopPlacingGadget 
             silkTool.addEnchantment(Enchantments.SILK_TOUCH, 1);
             boolean sameDim = player.dimension == undoState.dimension;
             for (BlockPos coord : undoCoords) {
-                currentBlock = world.getBlockState(coord);
+                currentBlock = Registries.TileEntityData.createBlockData(world, coord);
 
                 double distance = coord.distanceSq(player.getPosition());
 
-                BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(world, coord, currentBlock, player);
+                BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(world, coord, currentBlock.getState(), player);
                 boolean cancelled = MinecraftForge.EVENT_BUS.post(e);
 
-                if (distance < 64 && sameDim && currentBlock != BGBlocks.effectBlock.getDefaultState() && !cancelled) { //Don't allow us to undo a block while its still being placed or too far away
-                    if (currentBlock != Blocks.AIR.getDefaultState()) {
-                        currentBlock.getBlock().harvestBlock(world, player, coord, currentBlock, world.getTileEntity(coord), silkTool);
+                if (distance < 64 && sameDim && currentBlock.getState() != BGBlocks.effectBlock.getDefaultState() && ! cancelled) { //Don't allow us to undo a block while its still being placed or too far away
+                    if (currentBlock.getState() != Blocks.AIR.getDefaultState()) {
+                        currentBlock.getState().getBlock().harvestBlock(world, player, coord, currentBlock.getState(), world.getTileEntity(coord), silkTool);
                         world.addEntity(new BlockBuildEntity(world, coord, currentBlock, BlockBuildEntity.Mode.REMOVE, false));
                     }
                 } else { //If you're in the wrong dimension or too far away, fail the undo.
@@ -277,7 +271,7 @@ public class GadgetBuilding extends GadgetGeneric implements IAtopPlacingGadget 
         return true;
     }
 
-    private boolean placeBlock(World world, ServerPlayerEntity player, BlockPos pos, BlockState setBlock) {
+    private boolean placeBlock(World world, ServerPlayerEntity player, BlockPos pos, BlockData setBlock) {
         if (!player.isAllowEdit())
             return false;
 
@@ -289,12 +283,12 @@ public class GadgetBuilding extends GadgetGeneric implements IAtopPlacingGadget 
 
         ItemStack itemStack;
         if (true/*setBlock.getBlock().canSilkHarvest(setBlock, world, pos, player)*/) {//TODO figure LootTables out
-            itemStack = InventoryHelper.getSilkTouchDrop(setBlock);
+            itemStack = InventoryHelper.getSilkTouchDrop(setBlock.getState());
         } else {
-            itemStack = setBlock.getBlock().getPickBlock(setBlock, null, world, pos, player);
+            itemStack = setBlock.getState().getBlock().getPickBlock(setBlock.getState(), null, world, pos, player);
         }
         if (itemStack.getItem().equals(Items.AIR)) {
-            itemStack = setBlock.getBlock().getPickBlock(setBlock, null, world, pos, player);
+            itemStack = setBlock.getState().getBlock().getPickBlock(setBlock.getState(), null, world, pos, player);
         }
 
         NonNullList<ItemStack> drops = NonNullList.create();

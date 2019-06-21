@@ -68,7 +68,7 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
     private BlockState getActualMimicBlock(IBlockReader blockAccess, BlockPos pos) {
         TileEntity te = blockAccess.getTileEntity(pos);
         if (te instanceof ConstructionBlockTileEntity) {
-            return ((ConstructionBlockTileEntity) te).getActualBlockState();
+            return ((ConstructionBlockTileEntity) te).getActualBlockData().getState();
         }
         return null;
     }
@@ -380,7 +380,7 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
         if (mimicBlock == null) {
             return super.shouldSideBeRendered(blockState, blockAccess, pos, side);
         }
-        BlockState sideBlockState = blockAccess.getBlockState(pos.offset(side));
+        BlockState sideBlockState = blockAccess.getBlockData(pos.offset(side));
         if (sideBlockState.getBlock().equals(ModBlocks.constructionBlock)) {
             if (!(getActualMimicBlock(blockAccess, pos.offset(side)) == null)) {
                 sideBlockState = getActualMimicBlock(blockAccess, pos.offset(side));

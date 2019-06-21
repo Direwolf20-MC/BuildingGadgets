@@ -1,5 +1,8 @@
 package com.direwolf20.buildinggadgets.common.entities;
 
+import com.direwolf20.buildinggadgets.api.Registries;
+import com.direwolf20.buildinggadgets.api.abstraction.BlockData;
+import com.direwolf20.buildinggadgets.api.template.building.SimpleBuildContext;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGEntities;
@@ -7,7 +10,6 @@ import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.EntityType;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.NBTUtil;
 import net.minecraft.network.IPacket;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
@@ -29,7 +31,7 @@ public class BlockBuildEntity extends EntityBase {
             public void onBuilderEntityDespawn(BlockBuildEntity builder) {
                 World world = builder.world;
                 BlockPos targetPos = builder.targetPos;
-                BlockState targetBlock = builder.setBlock;
+                BlockData targetBlock = builder.setBlock;
                 if (builder.isUsingPaste()) {
                     world.setBlockState(targetPos, BGBlocks.constructionBlock.getDefaultState());
                     TileEntity te = world.getTileEntity(targetPos);
@@ -38,7 +40,7 @@ public class BlockBuildEntity extends EntityBase {
                     }
                     world.addEntity(new ConstructionBlockEntity(world, targetPos, false));
                 } else {
-                    world.setBlockState(targetPos, targetBlock);
+                    targetBlock.placeIn(SimpleBuildContext.builder().build(world), targetPos);
                     BlockPos upPos = targetPos.up();
                     world.getBlockState(targetPos).neighborChanged(world, targetPos, world.getBlockState(upPos).getBlock(), upPos, false);
                 }
@@ -67,8 +69,8 @@ public class BlockBuildEntity extends EntityBase {
     private static final DataParameter<Optional<BlockState>> SET_BLOCK = EntityDataManager.createKey(BlockBuildEntity.class, DataSerializers.OPTIONAL_BLOCK_STATE);
     private static final DataParameter<Boolean> USE_PASTE = EntityDataManager.createKey(BlockBuildEntity.class, DataSerializers.BOOLEAN);
 
-    private BlockState setBlock;
-    private BlockState originalSetBlock;
+    private BlockData setBlock;
+    private BlockData originalSetBlock;
 
     private Mode mode;
     private boolean useConstructionPaste;
@@ -77,19 +79,19 @@ public class BlockBuildEntity extends EntityBase {
         super(type, world);
     }
 
-    public BlockBuildEntity(World world, BlockPos spawnPos, BlockState spawnBlock, Mode mode, boolean usePaste) {
+    public BlockBuildEntity(World world, BlockPos spawnPos, BlockData spawnBlock, Mode mode, boolean usePaste) {
         this(BGEntities.BUILD_BLOCK, world);
         setPosition(spawnPos.getX(), spawnPos.getY(), spawnPos.getZ());
 
-        BlockState currentBlock = world.getBlockState(spawnPos);
+        BlockData currentBlock = Registries.TileEntityData.createBlockData(world, spawnPos);
         TileEntity te = world.getTileEntity(spawnPos);
         targetPos = spawnPos;
         originalSetBlock = spawnBlock;
 
         if (mode == Mode.REPLACE)
-            setBlock = te instanceof ConstructionBlockTileEntity ? te.getBlockState() : currentBlock;
+            setBlock = te instanceof ConstructionBlockTileEntity ? ((ConstructionBlockTileEntity) te).getConstructionBlockData() : currentBlock;
         else
-            setBlock = te instanceof ConstructionBlockTileEntity ? te.getBlockState() : spawnBlock;
+            setBlock = te instanceof ConstructionBlockTileEntity ? ((ConstructionBlockTileEntity) te).getConstructionBlockData() : spawnBlock;
         setSetBlock(setBlock);
 
         this.mode = mode;
@@ -118,8 +120,8 @@ public class BlockBuildEntity extends EntityBase {
         return dataManager.get(SET_BLOCK).orElse(null);
     }
 
-    public void setSetBlock(@Nullable BlockState state) {
-        dataManager.set(SET_BLOCK, Optional.ofNullable(state));
+    public void setSetBlock(@Nullable BlockData data) {
+        dataManager.set(SET_BLOCK, Optional.ofNullable(data != null ? data.getState() : null));
     }
 
     public void setUsingPaste(boolean paste) {
@@ -140,8 +142,8 @@ public class BlockBuildEntity extends EntityBase {
     @Override
     protected void readAdditional(CompoundNBT compound) {
         super.readAdditional(compound);
-        setBlock = NBTUtil.readBlockState(compound.getCompound(NBTKeys.ENTITY_BUILD_SET_BLOCK));
-        originalSetBlock = NBTUtil.readBlockState(compound.getCompound(NBTKeys.ENTITY_BUILD_ORIGINAL_BLOCK));
+        setBlock = BlockData.deserialize(compound.getCompound(NBTKeys.ENTITY_BUILD_SET_BLOCK), true);
+        originalSetBlock = BlockData.deserialize(compound.getCompound(NBTKeys.ENTITY_BUILD_ORIGINAL_BLOCK), true);
         mode = Mode.VALUES[compound.getInt(NBTKeys.GADGET_MODE)];
         useConstructionPaste = compound.getBoolean(NBTKeys.ENTITY_BUILD_USE_PASTE);
     }
@@ -150,10 +152,10 @@ public class BlockBuildEntity extends EntityBase {
     protected void writeAdditional(CompoundNBT compound) {
         super.writeAdditional(compound);
 
-        CompoundNBT blockStateTag = NBTUtil.writeBlockState(setBlock);
+        CompoundNBT blockStateTag = setBlock.serialize(true);
         compound.put(NBTKeys.ENTITY_BUILD_SET_BLOCK, blockStateTag);
 
-        blockStateTag = NBTUtil.writeBlockState(originalSetBlock);
+        blockStateTag = originalSetBlock.serialize(true);
 
         compound.put(NBTKeys.ENTITY_BUILD_ORIGINAL_BLOCK, blockStateTag);
         compound.putInt(NBTKeys.GADGET_MODE, mode.ordinal());

@@ -1,17 +1,13 @@
 package com.direwolf20.buildinggadgets.common.util.tools.modes;
 
+import com.direwolf20.buildinggadgets.api.abstraction.BlockData;
 import com.direwolf20.buildinggadgets.api.building.IBuildingMode;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
-import com.direwolf20.buildinggadgets.common.util.blocks.BlockMap;
 import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
 import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.google.common.collect.ImmutableList;
-import it.unimi.dsi.fastutil.doubles.Double2ObjectArrayMap;
-import it.unimi.dsi.fastutil.doubles.Double2ObjectMap;
-import it.unimi.dsi.fastutil.doubles.DoubleRBTreeSet;
-import it.unimi.dsi.fastutil.doubles.DoubleSortedSet;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItemUseContext;
@@ -21,10 +17,10 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.IWorld;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
 import java.util.function.BiPredicate;
 
 public enum BuildingMode {
@@ -87,12 +83,12 @@ public enum BuildingMode {
         return ICONS;
     }
 
-    public static BiPredicate<BlockPos, BlockState> combineTester(IWorld world, ItemStack tool, PlayerEntity player, BlockPos original) {
-        BlockState target = GadgetUtils.getToolBlock(tool);
-        return (pos, state) -> {
+    public static BiPredicate<BlockPos, BlockData> combineTester(IWorld world, ItemStack tool, PlayerEntity player, BlockPos original) {
+        BlockData target = GadgetUtils.getToolBlock(tool);
+        return (pos, data) -> {
             BlockState current = world.getBlockState(pos);
             // Filter out situations where people try to create floating grass (etc.)
-            if (!target.isValidPosition(world, pos))
+            if (! target.getState().isValidPosition(world, pos))
                 return false;
 
             // World boundary check
@@ -106,40 +102,6 @@ public enum BuildingMode {
             // If we don't allow overrides, replacement only happens when the current position is air
             return current.getBlock().isAir(current, world, pos);
         };
-    }
-
-    public static List<BlockMap> sortMapByDistance(List<BlockMap> unSortedMap, PlayerEntity player) {//TODO unused
-        List<BlockPos> unSortedList = new ArrayList<>();
-        Map<BlockPos, BlockState> PosToStateMap = new HashMap<>();
-        Map<BlockPos, Integer> PosToX = new HashMap<>();
-        Map<BlockPos, Integer> PosToY = new HashMap<>();
-        Map<BlockPos, Integer> PosToZ = new HashMap<>();
-        for (BlockMap blockMap : unSortedMap) {
-            PosToStateMap.put(blockMap.pos, blockMap.state);
-            PosToX.put(blockMap.pos, blockMap.xOffset);
-            PosToY.put(blockMap.pos, blockMap.yOffset);
-            PosToZ.put(blockMap.pos, blockMap.zOffset);
-            unSortedList.add(blockMap.pos);
-        }
-        List<BlockMap> sortedMap = new ArrayList<BlockMap>();
-        Double2ObjectMap<BlockPos> rangeMap = new Double2ObjectArrayMap<>(unSortedList.size());
-        DoubleSortedSet distances = new DoubleRBTreeSet();
-        double x = player.posX;
-        double y = player.posY + player.getEyeHeight();
-        double z = player.posZ;
-        for (BlockPos pos : unSortedList) {
-            double distance = pos.distanceSq(new Vec3i(x, y, z));
-            rangeMap.put(distance, pos);
-            distances.add(distance);
-        }
-        for (double dist : distances) {
-            //System.out.println(dist);
-            BlockPos pos = new BlockPos(rangeMap.get(dist));
-            sortedMap.add(new BlockMap(pos, PosToStateMap.get(pos), PosToX.get(pos), PosToY.get(pos), PosToZ.get(pos)));
-        }
-        //System.out.println(unSortedList);
-        //System.out.println(sortedList);
-        return sortedMap;
     }
 
 }

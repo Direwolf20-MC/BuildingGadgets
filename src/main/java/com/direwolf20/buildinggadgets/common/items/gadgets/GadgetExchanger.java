@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.common.items.gadgets;
 
+import com.direwolf20.buildinggadgets.api.abstraction.BlockData;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
@@ -13,6 +14,7 @@ import com.direwolf20.buildinggadgets.common.util.lang.TooltipTranslation;
 import com.direwolf20.buildinggadgets.common.util.tools.ToolRenders;
 import com.direwolf20.buildinggadgets.common.util.tools.modes.ExchangingMode;
 import com.direwolf20.buildinggadgets.common.world.FakeBuilderWorld;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.util.ITooltipFlag;
@@ -36,9 +38,6 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.ServerWorld;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldType;
-import net.minecraft.world.storage.loot.LootContext.Builder;
-import net.minecraft.world.storage.loot.LootParameters;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.MinecraftForge;
@@ -116,7 +115,7 @@ public class GadgetExchanger extends GadgetGeneric {
     public void addInformation(ItemStack stack, @Nullable World world, List<ITextComponent> tooltip, ITooltipFlag flag) {
         super.addInformation(stack, world, tooltip, flag);
         tooltip.add(TooltipTranslation.GADGET_BLOCK
-                            .componentTranslation(LangUtil.getFormattedBlockName(getToolBlock(stack)))
+                .componentTranslation(LangUtil.getFormattedBlockName(getToolBlock(stack).getState()))
                             .setStyle(Styles.DK_GREEN));
         ExchangingMode mode = getToolMode(stack);
         tooltip.add(TooltipTranslation.GADGET_MODE
@@ -193,18 +192,13 @@ public class GadgetExchanger extends GadgetGeneric {
         if (heldItem.isEmpty())
             return false;
 
-        BlockState blockState = getToolBlock(heldItem);
+        BlockData blockState = getToolBlock(heldItem);
 
-        if (blockState != Blocks.AIR.getDefaultState()) {  //Don't attempt a build if a block is not chosen -- Typically only happens on a new tool.
-            BlockState state = Blocks.AIR.getDefaultState(); //Initialize a new State Variable for use in the fake world
-            fakeWorld.setWorldAndState(player.world, blockState, coordinates); // Initialize the fake world's blocks
+        if (blockState.getState() != Blocks.AIR.getDefaultState()) {  //Don't attempt a build if a block is not chosen -- Typically only happens on a new tool.
+            BlockData state = BlockData.AIR; //Initialize a new State Variable for use in the fake world
+            //TODO replace fakeWorld
+            fakeWorld.setWorldAndState(player.world, blockState.getState(), coordinates); // Initialize the fake world's blocks
             for (BlockPos coordinate : coords) {
-                if (fakeWorld.getWorldType() != WorldType.DEBUG_ALL_BLOCK_STATES) {
-                    try {
-                        state = blockState.getExtendedState(world/*fakework*/, coordinate);  //Get the state of the block in the fake world (This lets fences be connected, etc)
-                    } catch (Exception var8) {
-                    }
-                }
                 //Get the extended block state in the fake world
                 //Disabled to fix Chisel
                 //state = state.getBlock().getExtendedState(state, fakeWorld, coordinate);
@@ -214,29 +208,25 @@ public class GadgetExchanger extends GadgetGeneric {
         return true;
     }
 
-    private boolean exchangeBlock(World world, ServerPlayerEntity player, BlockPos pos, BlockState setBlock) {
+    private boolean exchangeBlock(World world, ServerPlayerEntity player, BlockPos pos, BlockData setBlock) {
         BlockState currentBlock = world.getBlockState(pos);
         ItemStack itemStack;
         boolean useConstructionPaste = false;
         //ItemStack itemStack = setBlock.getBlock().getPickBlock(setBlock, null, world, pos, player);
-        if (setBlock.canHarvestBlock(world, pos, player)) {
-            itemStack = InventoryHelper.getSilkTouchDrop(setBlock);
+        if (setBlock.getState().canHarvestBlock(world, pos, player)) {
+            itemStack = InventoryHelper.getSilkTouchDrop(setBlock.getState());
         } else {
-            itemStack = setBlock.getBlock().getPickBlock(setBlock, null, world, pos, player);
+            itemStack = setBlock.getState().getBlock().getPickBlock(setBlock.getState(), null, world, pos, player);
         }
         if (itemStack.getItem().equals(Items.AIR)) {
-            itemStack = setBlock.getBlock().getPickBlock(setBlock, null, world, pos, player);
+            itemStack = setBlock.getState().getBlock().getPickBlock(setBlock.getState(), null, world, pos, player);
         }
 
         ItemStack tool = getGadget(player);
         if (tool.isEmpty())
             return false;
 
-        Builder lootBuilder = new Builder((ServerWorld) world)
-                .withParameter(LootParameters.POSITION, pos)
-                .withParameter(LootParameters.TOOL, itemStack);
-
-        List<ItemStack> drops = setBlock.getDrops(lootBuilder);
+        List<ItemStack> drops = Block.getDrops(setBlock.getState(), (ServerWorld) world, pos, world.getTileEntity(pos), player, tool);
 
         int neededItems = 0;
         for (ItemStack drop : drops) {
@@ -287,7 +277,7 @@ public class GadgetExchanger extends GadgetGeneric {
         }
         if (useItemSuccess) {
             world.addEntity(new BlockBuildEntity(world, pos, setBlock, BlockBuildEntity.Mode.REPLACE, useConstructionPaste));
-            //currentBlock.getBlock().removedByPlayer(currentBlock.getBlockState(), world, pos, player, false, null);
+            //currentBlock.getBlock().removedByPlayer(currentBlock.getBlockData(), world, pos, player, false, null);
             player.addItemStackToInventory(new ItemStack(currentBlock.getBlock(), 1));
             return true;
         }

@@ -1,8 +1,8 @@
 package com.direwolf20.buildinggadgets.api.capability;
 
+import com.direwolf20.buildinggadgets.api.abstraction.BlockData;
 import com.direwolf20.buildinggadgets.api.building.IBlockProvider;
 import com.direwolf20.buildinggadgets.api.building.SingleTypeProvider;
-import net.minecraft.block.Blocks;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.INBT;
 import net.minecraft.util.Direction;
@@ -18,7 +18,7 @@ public final class CapabilityBlockProvider {
     @CapabilityInject(IBlockProvider.class)
     public static Capability<IBlockProvider> BLOCK_PROVIDER = null;
 
-    private static IBlockProvider DEFAULT_AIR_PROVIDER = new SingleTypeProvider(Blocks.AIR.getDefaultState());
+    private static IBlockProvider DEFAULT_AIR_PROVIDER = new SingleTypeProvider(BlockData.AIR);
 
     public static IBlockProvider getDefaultAirProvider() {
         return DEFAULT_AIR_PROVIDER;

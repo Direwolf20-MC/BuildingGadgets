@@ -27,7 +27,7 @@ public class VectorHelper {
         //return world.rayTraceBlocks(start, end, rayTraceFluid, false, false);
         RayTraceContext context = new RayTraceContext(start,end,RayTraceContext.BlockMode.COLLIDER, rayTraceFluid, player);
         BlockRayTraceResult result = world.rayTraceBlocks(context);
-//        if (player.world.getBlockState(result.getPos()) == Blocks.AIR.getDefaultState()) return new RayTraceContext.BlockMode.;
+        //        if (player.world.getBlockData(result.getPos()) == Blocks.AIR.getDefaultState()) return new RayTraceContext.BlockMode.;
         return result;
     }
 

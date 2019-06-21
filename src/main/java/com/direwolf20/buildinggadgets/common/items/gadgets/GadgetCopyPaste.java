@@ -1,5 +1,8 @@
 package com.direwolf20.buildinggadgets.common.items.gadgets;
 
+import com.direwolf20.buildinggadgets.api.Registries;
+import com.direwolf20.buildinggadgets.api.abstraction.BlockData;
+import com.direwolf20.buildinggadgets.api.template.building.tilesupport.DummyTileEntityData;
 import com.direwolf20.buildinggadgets.client.events.EventTooltip;
 import com.direwolf20.buildinggadgets.client.gui.GuiMod;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlock;
@@ -190,7 +193,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
             int p = posIntArray[i];
             BlockPos pos = GadgetUtils.relIntToPos(startBlock, p);
             short IntState = (short) stateIntArray[i];
-            blockMap.add(new BlockMap(pos, MapIntState.getStateFromSlot(IntState), (byte) ((p & 0xff0000) >> 16), (byte) ((p & 0x00ff00) >> 8), (byte) (p & 0x0000ff)));
+            blockMap.add(new BlockMap(pos, new BlockData(MapIntState.getStateFromSlot(IntState), DummyTileEntityData.INSTANCE), (byte) ((p & 0xff0000) >> 16), (byte) ((p & 0x00ff00) >> 8), (byte) (p & 0x0000ff)));
         }
         return blockMap;
     }
@@ -329,7 +332,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
             int px = (tempPos.getX() - startPos.getX());
             int pz = (tempPos.getZ() - startPos.getZ());
             int nx, nz;
-            BlockState alteredState = GadgetUtils.rotateOrMirrorBlock(player, operation, blockMap.state);
+            BlockData alteredState = GadgetUtils.rotateOrMirrorBlock(player, operation, blockMap.state);
             if (operation == PacketRotateMirror.Operation.MIRROR) {
                 if (player.getHorizontalFacing().getAxis() == Axis.X) {
                     nx = px;
@@ -344,10 +347,10 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
             }
             BlockPos newPos = new BlockPos(startPos.getX() + nx, tempPos.getY(), startPos.getZ() + nz);
             posIntArrayList.add(GadgetUtils.relPosToInt(startPos, newPos));
-            blockMapIntState.addToMap(alteredState);
-            stateIntArrayList.add((int) blockMapIntState.findSlot(alteredState));
+            blockMapIntState.addToMap(alteredState.getState());
+            stateIntArrayList.add((int) blockMapIntState.findSlot(alteredState.getState()));
             UniqueItem uniqueItem = BlockMapIntState.blockStateToUniqueItem(alteredState, player, tempPos);
-            blockMapIntState.addToStackMap(uniqueItem, alteredState);
+            blockMapIntState.addToStackMap(uniqueItem, alteredState.getState());
         }
         int[] posIntArray = posIntArrayList.stream().mapToInt(i -> i).toArray();
         int[] stateIntArray = stateIntArrayList.stream().mapToInt(i -> i).toArray();
@@ -412,19 +415,19 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
                     BlockState tempState = world.getBlockState(tempPos);
                     if (tempState != Blocks.AIR.getDefaultState() && (world.getTileEntity(tempPos) == null || world.getTileEntity(tempPos) instanceof ConstructionBlockTileEntity) && !tempState.getMaterial().isLiquid() && Config.BLACKLIST.isAllowedBlock(tempState.getBlock())) {
                         TileEntity te = world.getTileEntity(tempPos);
-                        BlockState assignState = InventoryHelper.getSpecificStates(tempState, world, player, tempPos, stack);
-                        BlockState actualState = assignState.getExtendedState(world, tempPos);
+                        BlockData assignState = InventoryHelper.getSpecificStates(tempState, world, player, tempPos, stack);
+                        BlockData actualState = assignState;
                         if (te instanceof ConstructionBlockTileEntity) {
-                            actualState = ((ConstructionBlockTileEntity) te).getActualBlockState();
+                            actualState = ((ConstructionBlockTileEntity) te).getActualBlockData();
                         }
                         if (actualState != null) {
                             UniqueItem uniqueItem = BlockMapIntState.blockStateToUniqueItem(actualState, player, tempPos);
                             if (uniqueItem.getItem() != Items.AIR) {
                                 posIntArrayList.add(GadgetUtils.relPosToInt(start, tempPos));
-                                blockMapIntState.addToMap(actualState);
-                                stateIntArrayList.add((int) blockMapIntState.findSlot(actualState));
+                                blockMapIntState.addToMap(actualState.getState());
+                                stateIntArrayList.add((int) blockMapIntState.findSlot(actualState.getState()));
 
-                                blockMapIntState.addToStackMap(uniqueItem, actualState);
+                                blockMapIntState.addToStackMap(uniqueItem, actualState.getState());
                                 blockCount++;
                                 if (blockCount > 32768) {
                                     player.sendStatusMessage(new StringTextComponent(TextFormatting.RED + new TranslationTextComponent("message.gadget.toomanyblocks").getUnformattedComponentText()), true);
@@ -501,13 +504,13 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
         //System.out.printf("Built %d Blocks in %.2f ms%n", blockMapList.size(), (System.nanoTime() - time) * 1e-6);
     }
 
-    private void placeBlock(World world, BlockPos pos, ServerPlayerEntity player, BlockState state, Map<BlockState, UniqueItem> IntStackMap) {
+    private void placeBlock(World world, BlockPos pos, ServerPlayerEntity player, BlockData data, Map<BlockState, UniqueItem> IntStackMap) {
         BlockState testState = world.getBlockState(pos);
         if ((Config.GENERAL.allowOverwriteBlocks.get() && ! testState.isReplaceable(new BlockItemUseContext(new ItemUseContext(player, Hand.MAIN_HAND, VectorHelper.getLookingAt(player, FluidMode.NONE))))) ||
                 (! Config.GENERAL.allowOverwriteBlocks.get() && world.getBlockState(pos).getMaterial() != Material.AIR))
             return;
 
-        if (pos.getY() < 0 || state.equals(Blocks.AIR.getDefaultState()) || !player.isAllowEdit())
+        if (pos.getY() < 0 || data.getState().equals(Blocks.AIR.getDefaultState()) || ! player.isAllowEdit())
             return;
 
         ItemStack heldItem = getGadget(player);
@@ -517,7 +520,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
         if (BGItems.gadgetCopyPaste.getStartPos(heldItem) == null ||BGItems.gadgetCopyPaste.getEndPos(heldItem) == null)
             return;
 
-        UniqueItem uniqueItem = IntStackMap.get(state);
+        UniqueItem uniqueItem = IntStackMap.get(data.getState());
         if (uniqueItem == null) return; //This shouldn't happen I hope!
         ItemStack itemStack = new ItemStack(uniqueItem.getItem(), 1);
         NonNullList<ItemStack> drops = NonNullList.create();
@@ -561,7 +564,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
             useItemSuccess = InventoryHelper.useItem(itemStack, player, neededItems, world);
         }
         if (useItemSuccess) {
-            world.addEntity(new BlockBuildEntity(world, pos, state, BlockBuildEntity.Mode.PLACE, useConstructionPaste));
+            world.addEntity(new BlockBuildEntity(world, pos, data, BlockBuildEntity.Mode.PLACE, useConstructionPaste));
         }
 
     }
@@ -601,14 +604,14 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
         for (BlockMap blockMap : blockMapList) {
             double distance = blockMap.pos.distanceSq(player.getPosition());
 
-            BlockState currentBlock = world.getBlockState(blockMap.pos);
-            BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(world, blockMap.pos, currentBlock, player);
+            BlockData currentBlock = Registries.TileEntityData.createBlockData(world, blockMap.pos);
+            BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(world, blockMap.pos, currentBlock.getState(), player);
 
             boolean cancelled = MinecraftForge.EVENT_BUS.post(e);
             if (distance < 256 && !cancelled && sameDim) { //Don't allow us to undo a block while its still being placed or too far away
-                if (currentBlock.getBlock() == blockMap.state.getBlock() || currentBlock.getBlock() instanceof ConstructionBlock) {
-                    if (currentBlock.getBlockHardness(world, blockMap.pos) >= 0) {
-                        currentBlock.getBlock().harvestBlock(world, player, blockMap.pos, currentBlock, world.getTileEntity(blockMap.pos), silkTool);
+                if (currentBlock.getState().getBlock() == blockMap.state.getState().getBlock() || currentBlock.getState().getBlock() instanceof ConstructionBlock) {
+                    if (currentBlock.getState().getBlockHardness(world, blockMap.pos) >= 0) {
+                        currentBlock.getState().getBlock().harvestBlock(world, player, blockMap.pos, currentBlock.getState(), world.getTileEntity(blockMap.pos), silkTool);
                         world.addEntity(new BlockBuildEntity(world, blockMap.pos, currentBlock, BlockBuildEntity.Mode.REMOVE, false));
                     }
                 }

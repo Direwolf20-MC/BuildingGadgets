@@ -1,8 +1,8 @@
 package com.direwolf20.buildinggadgets.test.building.coreTests;
 
+import com.direwolf20.buildinggadgets.api.abstraction.BlockData;
 import com.direwolf20.buildinggadgets.api.building.IBlockProvider;
 import com.direwolf20.buildinggadgets.api.building.SingleTypeProvider;
-import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import org.junit.jupiter.api.Test;
 
@@ -20,7 +20,7 @@ public class TranslationWrapperTest {
 
         IBlockProvider handle = new SingleTypeProvider(null) {
             @Override
-            public BlockState at(BlockPos pos) {
+            public BlockData at(BlockPos pos) {
                 request[0] = pos;
                 return super.at(pos);
             }

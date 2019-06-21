@@ -1,9 +1,9 @@
 package com.direwolf20.buildinggadgets.common.items.capability;
 
+import com.direwolf20.buildinggadgets.api.abstraction.BlockData;
 import com.direwolf20.buildinggadgets.api.building.IBlockProvider;
 import com.direwolf20.buildinggadgets.api.building.TranslationWrapper;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
-import net.minecraft.block.BlockState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.math.BlockPos;
@@ -30,7 +30,7 @@ public final class LinkedBlockProvider implements IBlockProvider {
     }
 
     @Override
-    public BlockState at(BlockPos pos) {
+    public BlockData at(BlockPos pos) {
         return GadgetUtils.getToolBlock(stack);
     }
 

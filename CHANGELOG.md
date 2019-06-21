@@ -177,7 +177,7 @@ Please let me know if you run into anything weird!
 ## [2.3.5] - 2018-10-01
 ### Added
 - Added a GUI to the Copy/paste tool -- Shift Right Click on empty air to access it.
-- Added redstone repeat delay state to the allowed blockstates for copying. 
+- Added redstone repeat delay data to the allowed blockstates for copying. 
 
 ## [2.3.4] - 2018-09-30
 ### Note
@@ -298,7 +298,7 @@ Please let me know if you run into anything weird!
 - Removed effectBlock's item registration (No longer an item form of the block)
 ### Fixed
 - Proper doubleslab support (Fixes dupe bug)
-- BlockBuildEntity now stores it's state on chunk unload / world exit (Should prevent effect blocks being left behind on world exit)
+- BlockBuildEntity now stores it's data on chunk unload / world exit (Should prevent effect blocks being left behind on world exit)
 - Minor Undo improvement (If blocks no longer exist, they are still properly removed from the undo list)
 
 ## [1.1.2] - 2018-07-15

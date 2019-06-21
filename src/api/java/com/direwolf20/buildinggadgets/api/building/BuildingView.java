@@ -5,12 +5,10 @@ import com.direwolf20.buildinggadgets.api.abstraction.PlacementTarget;
 import com.direwolf20.buildinggadgets.api.abstraction.UniqueItem;
 import com.direwolf20.buildinggadgets.api.template.building.IBuildContext;
 import com.direwolf20.buildinggadgets.api.template.building.ITemplateView;
-import com.direwolf20.buildinggadgets.api.template.building.tilesupport.DummyTileEntityData;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.AbstractIterator;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multiset;
-import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 
 import javax.annotation.Nullable;
@@ -72,9 +70,9 @@ public class BuildingView implements ITemplateView {
                 if (! posIterator.hasNext())
                     return endOfData();
                 BlockPos next = posIterator.next();
-                BlockState state = blocks.at(next);
+                BlockData data = blocks.at(next);
                 //TODO use real TileEntityData
-                return new PlacementTarget(next, new BlockData(state, DummyTileEntityData.INSTANCE));
+                return new PlacementTarget(next, data);
             }
         };
     }
@@ -128,7 +126,7 @@ public class BuildingView implements ITemplateView {
      */
     public Iterator<BlockPos> getFilteredSequence() {
         Iterator<BlockPos> positions = getPositionSequence().iterator();
-        BiPredicate<BlockPos, BlockState> validator = validatorFactory.createValidatorFor(context.getWorld(), context.getUsedStack(), context.getBuildingPlayer(), start);
+        BiPredicate<BlockPos, BlockData> validator = validatorFactory.createValidatorFor(context.getWorld(), context.getUsedStack(), context.getBuildingPlayer(), start);
         return new AbstractIterator<BlockPos>() {
             @Override
             protected BlockPos computeNext() {

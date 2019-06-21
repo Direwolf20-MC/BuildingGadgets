@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.common.util;
 
+import com.direwolf20.buildinggadgets.api.abstraction.BlockData;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetBuilding;
@@ -216,11 +217,11 @@ public class GadgetUtils {
         return MathHelper.clamp(tagCompound.getInt("range"), 1, 15);
     }
 
-    public static BlockState rotateOrMirrorBlock(PlayerEntity player, PacketRotateMirror.Operation operation, BlockState state) {
+    public static BlockData rotateOrMirrorBlock(PlayerEntity player, PacketRotateMirror.Operation operation, BlockData data) {
         if (operation == PacketRotateMirror.Operation.MIRROR)
-            return state.mirror(player.getHorizontalFacing().getAxis() == Axis.X ? Mirror.LEFT_RIGHT : Mirror.FRONT_BACK);
+            return data.mirror(player.getHorizontalFacing().getAxis() == Axis.X ? Mirror.LEFT_RIGHT : Mirror.FRONT_BACK);
 
-        return state.rotate(Rotation.CLOCKWISE_90);
+        return data.rotate(Rotation.CLOCKWISE_90);
     }
 
     public static void rotateOrMirrorToolBlock(ItemStack stack, ServerPlayerEntity player, PacketRotateMirror.Operation operation) {
@@ -228,52 +229,48 @@ public class GadgetUtils {
         setToolActualBlock(stack, rotateOrMirrorBlock(player, operation, getToolActualBlock(stack)));
     }
 
-    private static void setToolBlock(ItemStack stack, @Nullable BlockState state) {
+    private static void setToolBlock(ItemStack stack, @Nullable BlockData data) {
         //Store the selected block in the tool's NBT
-        CompoundNBT tagCompound = stack.getTag();
-        if (tagCompound == null) {
-            tagCompound = new CompoundNBT();
-        }
-        if (state == null) {
-            state = Blocks.AIR.getDefaultState();
-        }
+        CompoundNBT tagCompound = NBTHelper.getOrNewTag(stack);
+        if (data == null)
+            data = BlockData.AIR;
 
-        CompoundNBT stateTag = NBTUtil.writeBlockState(state);
+        CompoundNBT stateTag = BlockData.AIR.serialize(true);
         tagCompound.put(NBTKeys.TE_CONSTRUCTION_STATE, stateTag);
         stack.setTag(tagCompound);
     }
 
-    private static void setToolActualBlock(ItemStack stack, @Nullable BlockState state) {
+    private static void setToolActualBlock(ItemStack stack, @Nullable BlockData data) {
         // Store the selected block actual state in the tool's NBT
-        CompoundNBT tagCompound = stack.getTag();
-        if (tagCompound == null) {
-            tagCompound = new CompoundNBT();
-        }
-        if (state == null) {
-            state = Blocks.AIR.getDefaultState();
-        }
+        CompoundNBT tagCompound = NBTHelper.getOrNewTag(stack);
+        if (data == null)
+            data = BlockData.AIR;
 
-        CompoundNBT stateTag = NBTUtil.writeBlockState(state);
-        tagCompound.put(NBTKeys.TE_CONSTRUCTION_STATE_ACTUAL, stateTag);
+        CompoundNBT dataTag = data.serialize(true);
+        tagCompound.put(NBTKeys.TE_CONSTRUCTION_STATE_ACTUAL, dataTag);
         stack.setTag(tagCompound);
     }
 
-    public static BlockState getToolBlock(ItemStack stack) {
-        CompoundNBT tagCompound = stack.getTag();
-        if (tagCompound == null) {
-            setToolBlock(stack, Blocks.AIR.getDefaultState());
-            return Blocks.AIR.getDefaultState();
+    @Nonnull
+    public static BlockData getToolBlock(ItemStack stack) {
+        CompoundNBT tagCompound = NBTHelper.getOrNewTag(stack);
+        BlockData res = BlockData.tryDeserialize(tagCompound.getCompound(NBTKeys.TE_CONSTRUCTION_STATE), true);
+        if (res == null) {
+            setToolActualBlock(stack, BlockData.AIR);
+            return BlockData.AIR;
         }
-        return NBTUtil.readBlockState(tagCompound.getCompound(NBTKeys.TE_CONSTRUCTION_STATE));
+        return res;
     }
 
-    public static BlockState getToolActualBlock(ItemStack stack) {
-        CompoundNBT tagCompound = stack.getTag();
-        if (tagCompound == null) {
-            setToolBlock(stack, Blocks.AIR.getDefaultState());
-            return Blocks.AIR.getDefaultState();
+    @Nonnull
+    public static BlockData getToolActualBlock(ItemStack stack) {
+        CompoundNBT tagCompound = NBTHelper.getOrNewTag(stack);
+        BlockData res = BlockData.tryDeserialize(tagCompound.getCompound(NBTKeys.TE_CONSTRUCTION_STATE_ACTUAL), true);
+        if (res == null) {
+            setToolActualBlock(stack, BlockData.AIR);
+            return BlockData.AIR;
         }
-        return NBTUtil.readBlockState(tagCompound.getCompound(NBTKeys.TE_CONSTRUCTION_STATE_ACTUAL));
+        return res;
     }
 
     public static void selectBlock(ItemStack stack, PlayerEntity player) {
@@ -290,11 +287,11 @@ public class GadgetUtils {
             player.sendStatusMessage(new StringTextComponent(TextFormatting.RED + new TranslationTextComponent("message.gadget.invalidblock").getUnformattedComponentText()), true);
             return;
         }
-        BlockState placeState = InventoryHelper.getSpecificStates(state, world, player, lookingAt.getPos(), stack);
-        BlockState actualState = placeState.getExtendedState(world, lookingAt.getPos());
+        BlockData placeState = InventoryHelper.getSpecificStates(state, world, player, lookingAt.getPos(), stack);
+        BlockState actualState = placeState.getState().getExtendedState(world, lookingAt.getPos());
 
         setToolBlock(stack, placeState);
-        setToolActualBlock(stack, actualState);
+        setToolActualBlock(stack, new BlockData(actualState, placeState.getTileData()));
     }
 
     public static ActionResultType setRemoteInventory(ItemStack stack, PlayerEntity player, World world, BlockPos pos, boolean setTool) {
@@ -302,9 +299,9 @@ public class GadgetUtils {
         if (te == null)
             return ActionResultType.PASS;
 
-        if (setTool && te instanceof ConstructionBlockTileEntity && ((ConstructionBlockTileEntity) te).getBlockState() != null) {
-            setToolBlock(stack, ((ConstructionBlockTileEntity) te).getActualBlockState());
-            setToolActualBlock(stack, ((ConstructionBlockTileEntity) te).getActualBlockState());
+        if (setTool && te instanceof ConstructionBlockTileEntity && ((ConstructionBlockTileEntity) te).getConstructionBlockData() != null) {
+            setToolBlock(stack, ((ConstructionBlockTileEntity) te).getActualBlockData());
+            setToolActualBlock(stack, ((ConstructionBlockTileEntity) te).getActualBlockData());
             return ActionResultType.SUCCESS;
         }
         if (setRemoteInventory(player, stack, pos, world))

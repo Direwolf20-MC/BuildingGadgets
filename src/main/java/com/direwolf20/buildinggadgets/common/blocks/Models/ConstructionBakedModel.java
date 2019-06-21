@@ -50,7 +50,7 @@ public class ConstructionBakedModel implements IBakedModel {
 //            return blankConstructionModel.getQuads(state, side, rand);
 //        }
 //
-//        //BlockState facadeState = facadeId.getBlockState();
+        //        //BlockState facadeState = facadeId.getBlockData();
 //
 //        BlockRenderLayer layer = MinecraftForgeClient.getRenderLayer();
 //
@@ -104,7 +104,7 @@ public class ConstructionBakedModel implements IBakedModel {
         if (facadeId == null) {
             return true;
         }
-        BlockState facadeState = facadeId.getBlockState();
+        BlockState facadeState = facadeId.getBlockData();
         return facadeState.getBlock().isOpaqueCube(facadeState);
     }*/
 }

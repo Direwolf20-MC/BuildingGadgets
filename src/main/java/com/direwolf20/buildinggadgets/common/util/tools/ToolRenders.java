@@ -113,7 +113,8 @@ public class ToolRenders {
             }
             if (startBlock != BGBlocks.effectBlock.getDefaultState()) {
 
-                BlockState renderBlockState = getToolBlock(heldItem);
+                //TODO handle TileEntities
+                BlockState renderBlockState = getToolBlock(heldItem).getState();
                 if (renderBlockState == Blocks.AIR.getDefaultState()) {//Don't render anything if there is no block selected (Air)
                     return;
                 }
@@ -236,7 +237,7 @@ public class ToolRenders {
         BlockState startBlock = Blocks.AIR.getDefaultState();
         startBlock = world.getBlockState(new BlockPos(lookingAt.getPos()));
         if (startBlock != BGBlocks.effectBlock.getDefaultState()) {
-            BlockState renderBlockState = getToolBlock(stack);
+            BlockState renderBlockState = getToolBlock(stack).getState();
 
             mc.getTextureManager().bindTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
             if (renderBlockState == Blocks.AIR.getDefaultState()) {//Don't render anything if there is no block selected (Air)

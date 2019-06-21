@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.api.building;
 
-import net.minecraft.block.BlockState;
+import com.direwolf20.buildinggadgets.api.abstraction.BlockData;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.math.BlockPos;
 
@@ -58,7 +58,7 @@ public final class TranslationWrapper implements IBlockProvider {
      * Redirects the call to the wrapped IBlockProvider.
      */
     @Override
-    public BlockState at(BlockPos pos) {
+    public BlockData at(BlockPos pos) {
         return provider.at(pos.add(translation));
     }
 
