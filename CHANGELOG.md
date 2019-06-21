@@ -177,7 +177,7 @@ Please let me know if you run into anything weird!
 ## [2.3.5] - 2018-10-01
 ### Added
 - Added a GUI to the Copy/paste tool -- Shift Right Click on empty air to access it.
-- Added redstone repeat delay data to the allowed blockstates for copying. 
+- Added redstone repeat delay state to the allowed blockstates for copying. 
 
 ## [2.3.4] - 2018-09-30
 ### Note
