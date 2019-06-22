@@ -19,6 +19,7 @@ import net.minecraft.client.renderer.model.ModelResourceLocation;
 import net.minecraft.client.renderer.texture.MissingTextureSprite;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.Direction;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IEnviromentBlockReader;
@@ -51,7 +52,12 @@ public class ClientProxy {
     }
 
     private static void bakeModels(ModelBakeEvent event) {
-        event.getModelRegistry().put(new ModelResourceLocation(Reference.BlockReference.CONSTRUCTION_BLOCK), new IDynamicBakedModel() {
+        ResourceLocation ConstrName = new ResourceLocation(Reference.MODID, "construction_block");
+        ModelResourceLocation ConstrLocation1 = new ModelResourceLocation(ConstrName, "bright=false,neighbor_brightness=false");
+        ModelResourceLocation ConstrLocation2 = new ModelResourceLocation(ConstrName, "bright=true,neighbor_brightness=false");
+        ModelResourceLocation ConstrLocation3 = new ModelResourceLocation(ConstrName, "bright=false,neighbor_brightness=true");
+        ModelResourceLocation ConstrLocation4 = new ModelResourceLocation(ConstrName, "bright=true,neighbor_brightness=true");
+        IDynamicBakedModel bakedModelLoader = new IDynamicBakedModel() {
             @Override
             public boolean isGui3d() {
                 return false;
@@ -91,7 +97,11 @@ public class ClientProxy {
             public IModelData getModelData(@Nonnull IEnviromentBlockReader world, @Nonnull BlockPos pos, @Nonnull BlockState state, @Nonnull IModelData tileData) {
                 return tileData;
             }
-        });
+        };
+        event.getModelRegistry().put(ConstrLocation1, bakedModelLoader);
+        event.getModelRegistry().put(ConstrLocation2, bakedModelLoader);
+        event.getModelRegistry().put(ConstrLocation3, bakedModelLoader);
+        event.getModelRegistry().put(ConstrLocation4, bakedModelLoader);
     }
 
     @SubscribeEvent
