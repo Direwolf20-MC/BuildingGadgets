@@ -43,7 +43,7 @@ public class ClientProxy {
 
     public static void clientSetup(final IEventBus eventBus) {
         DeferredWorkQueue.runLater(KeyBindings::init);
-        //BuildingObjects.initColorHandlers();
+        //MinecraftForge.EVENT_BUS.addListener(BuildingObjects::initColorHandlers);
         //eventBus.addListener(ClientProxy::renderWorldLastEvent);
         MinecraftForge.EVENT_BUS.addListener(ClientProxy::bakeModels);
         MinecraftForge.EVENT_BUS.addListener(EventClientTick::onClientTick);
