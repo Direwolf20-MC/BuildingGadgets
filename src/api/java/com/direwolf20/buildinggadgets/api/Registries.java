@@ -79,13 +79,13 @@ public final class Registries {
     }
 
     @SubscribeEvent
-    private static void registerTemplateSerializers(RegistryEvent.Register<ITemplateSerializer> event) {
+    public static void registerTemplateSerializers(RegistryEvent.Register<ITemplateSerializer> event) {
 
     }
 
 
     @SubscribeEvent
-    private static void registerTileDataSerializers(RegistryEvent.Register<ITileDataSerializer> event) {
+    public static void registerTileDataSerializers(RegistryEvent.Register<ITileDataSerializer> event) {
         event.getRegistry().register(SerialisationSupport.dummyDataSerializer().setRegistryName(TileDataSerializerReference.DUMMY_SERIALIZER_RL));
     }
 
