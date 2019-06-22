@@ -1,15 +1,14 @@
 package com.direwolf20.buildinggadgets.common.registry.objects;
 
-import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.material.MaterialColor;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.color.BlockColors;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.event.ColorHandlerEvent;
 import net.minecraftforge.fml.DistExecutor;
 
 public class BuildingObjects {
@@ -28,10 +27,10 @@ public class BuildingObjects {
     public static final Material EFFECT_BLOCK_MATERIAL = new Material.Builder(MaterialColor.AIR).notSolid().build();
 
 
-    public static void initColorHandlers() { //TODO ItemBlock Creative Tabs
-        BlockColors blockColors = Minecraft.getInstance().getBlockColors();
+    public static void initColorHandlers(ColorHandlerEvent.Block event) { //TODO ItemBlock Creative Tabs
+        BlockColors blockColors = event.getBlockColors();
         //TODO non conditional registry
-        if (Config.GENERAL.enablePaste.get()) BGBlocks.constructionBlock.initColorHandler(blockColors);
+        BGBlocks.constructionBlock.initColorHandler(blockColors);
     }
 
     public static void init() {
