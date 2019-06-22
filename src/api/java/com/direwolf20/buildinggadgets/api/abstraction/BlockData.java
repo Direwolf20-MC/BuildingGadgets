@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.api.abstraction;
 
-import com.direwolf20.buildinggadgets.api.APIProxy;
+import com.direwolf20.buildinggadgets.api.BuildinggadgetsAPI;
 import com.direwolf20.buildinggadgets.api.Registries;
 import com.direwolf20.buildinggadgets.api.template.building.IBuildContext;
 import com.direwolf20.buildinggadgets.api.template.building.tilesupport.DummyTileEntityData;
@@ -52,7 +52,7 @@ public final class BlockData {
             else
                 serializer = RegistryUtils.getById(Registries.TileEntityData.getTileDataSerializers(), tag.getInt(KEY_SERIALIZER));
         } catch (Exception e) {
-            APIProxy.LOG.error("Failed to create deserializer!", e);
+            BuildinggadgetsAPI.LOG.error("Failed to create deserializer!", e);
             return null;
         }
         if (serializer == null)

@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.api.template.building.tilesupport;
 
-import com.direwolf20.buildinggadgets.api.APIProxy;
+import com.direwolf20.buildinggadgets.api.BuildinggadgetsAPI;
 import com.direwolf20.buildinggadgets.api.abstraction.UniqueItem;
 import com.direwolf20.buildinggadgets.api.template.building.IBuildContext;
 import com.direwolf20.buildinggadgets.api.template.serialisation.ITileDataSerializer;
@@ -65,7 +65,7 @@ public interface ITileEntityData {
         try {
             stack = state.getBlock().getPickBlock(state, target, context.getWorld(), pos, context.getBuildingPlayer());
         } catch (Exception e) {
-            APIProxy.LOG.trace("Failed to retrieve pickBlock for {}.", state, e);
+            BuildinggadgetsAPI.LOG.trace("Failed to retrieve pickBlock for {}.", state, e);
         }
         if (stack == null)
             stack = new ItemStack(state.getBlock().asItem());

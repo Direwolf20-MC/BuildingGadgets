@@ -2,7 +2,7 @@ package com.direwolf20.buildinggadgets.api.template.building.tilesupport;
 
 import com.direwolf20.buildinggadgets.api.template.building.IBuildContext;
 import com.direwolf20.buildinggadgets.api.template.serialisation.ITileDataSerializer;
-import com.direwolf20.buildinggadgets.api.template.serialisation.TileDataSerializers;
+import com.direwolf20.buildinggadgets.api.template.serialisation.SerialisationSupport;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 
@@ -11,7 +11,7 @@ public enum DummyTileEntityData implements ITileEntityData {
 
     @Override
     public ITileDataSerializer getSerializer() {
-        return TileDataSerializers.dummyDataSerializer();
+        return SerialisationSupport.dummyDataSerializer();
     }
 
     @Override

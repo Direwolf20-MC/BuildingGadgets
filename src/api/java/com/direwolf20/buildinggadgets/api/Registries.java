@@ -1,5 +1,8 @@
 package com.direwolf20.buildinggadgets.api;
 
+import com.direwolf20.buildinggadgets.api.APIReference.TemplateSerializerReference;
+import com.direwolf20.buildinggadgets.api.APIReference.TileDataFactoryReference;
+import com.direwolf20.buildinggadgets.api.APIReference.TileDataSerializerReference;
 import com.direwolf20.buildinggadgets.api.abstraction.BlockData;
 import com.direwolf20.buildinggadgets.api.inventory.IStackProvider;
 import com.direwolf20.buildinggadgets.api.registry.IOrderedRegistry;
@@ -9,7 +12,7 @@ import com.direwolf20.buildinggadgets.api.template.building.tilesupport.ITileDat
 import com.direwolf20.buildinggadgets.api.template.building.tilesupport.ITileEntityData;
 import com.direwolf20.buildinggadgets.api.template.serialisation.ITemplateSerializer;
 import com.direwolf20.buildinggadgets.api.template.serialisation.ITileDataSerializer;
-import com.direwolf20.buildinggadgets.api.template.serialisation.TileDataSerializers;
+import com.direwolf20.buildinggadgets.api.template.serialisation.SerialisationSupport;
 import com.google.common.base.Preconditions;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -19,7 +22,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.RegistryEvent;
-import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.InterModComms;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
@@ -31,12 +33,9 @@ import net.minecraftforge.registries.RegistryBuilder;
 
 @EventBusSubscriber(modid = "buildinggadgets", bus = Bus.MOD)
 public final class Registries {
-    public static final ResourceLocation REGISTRY_ID_TEMPLATE_SERIALIZER = new ResourceLocation("buildinggadgets:template/serializer");
-    public static final ResourceLocation REGISTRY_ID_TILE_DATA_SERIALIZER = new ResourceLocation("buildinggadgets:tile_data/serializer");
 
     public static final ResourceLocation STACK_PROVIDER_ITEM_HANDLER = new ResourceLocation("buildinggadgets:stack_provider/item_handler");
 
-    public static final String IMC_METHOD_TILEDATA_FACTORY = "imc_tile_data_factory";
     public static final String IMC_METHOD_STACK_PROVIDER = "imc_stack_provider";
     private Registries() {}
 
@@ -66,37 +65,41 @@ public final class Registries {
         return stackProviders;
     }
 
-    static void onCreateRegistries(final IEventBus forgeEventBus) {
+    static void onCreateRegistries() {
+        BuildinggadgetsAPI.LOG.trace("Creating ForgeRegistries");
         templateSerializers = new RegistryBuilder<ITemplateSerializer>()
                 .setType(ITemplateSerializer.class)
-                .setName(REGISTRY_ID_TEMPLATE_SERIALIZER)
+                .setName(TemplateSerializerReference.REGISTRY_ID_TEMPLATE_SERIALIZER)
                 .create();
         tileDataSerializers = new RegistryBuilder<ITileDataSerializer>()
                 .setType(ITileDataSerializer.class)
-                .setName(REGISTRY_ID_TILE_DATA_SERIALIZER)
+                .setName(TileDataSerializerReference.REGISTRY_ID_TILE_DATA_SERIALIZER)
                 .create();
+        BuildinggadgetsAPI.LOG.trace("Finished Creating ForgeRegistries");
     }
 
     @SubscribeEvent
-    public static void registerTemplateSerializers(RegistryEvent.Register<ITemplateSerializer> event) {
+    private static void registerTemplateSerializers(RegistryEvent.Register<ITemplateSerializer> event) {
 
     }
 
 
     @SubscribeEvent
-    public static void registerTileDataSerializers(RegistryEvent.Register<ITileDataSerializer> event) {
-        event.getRegistry().register(TileDataSerializers.dummyDataSerializer());
+    private static void registerTileDataSerializers(RegistryEvent.Register<ITileDataSerializer> event) {
+        event.getRegistry().register(SerialisationSupport.dummyDataSerializer().setRegistryName(TileDataSerializerReference.DUMMY_SERIALIZER_RL));
     }
 
     static void createOrderedRegistries() {
+        BuildinggadgetsAPI.LOG.trace("Creating Ordered Registries");
         tileDataFactories = tileDataFactoryBuilder.build();
         stackProviders = stackProviderBuilder.build();
         tileDataFactoryBuilder = null;
         stackProviderBuilder = null;
+        BuildinggadgetsAPI.LOG.trace("Finished Creating Ordered Registries");
     }
 
     static boolean handleIMC(InterModComms.IMCMessage message) {
-        if (message.getMethod().equals(IMC_METHOD_TILEDATA_FACTORY)) {
+        if (message.getMethod().equals(TileDataFactoryReference.IMC_METHOD_TILEDATA_FACTORY)) {
             Preconditions
                     .checkState(tileDataFactories != null, "Attempted to register ITileDataFactory, after the Registry has been built!");
             tileDataFactoryBuilder

@@ -25,6 +25,24 @@ String forgeVersion = "$minecraft_version-${forge_major}.$forge_minor"
 String forgeName = "$forge_base:$forgeVersion"
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
 
+//https://discuss.gradle.org/t/concatenating-multiple-files-into-one-using-gradle/5056
+class ConcatFiles extends DefaultTask {
+    @InputFiles
+    FileCollection source
+    @OutputFile
+    File target
+    @TaskAction
+    void concat() {
+        target.withWriter { writer ->
+            source.each { file ->
+                file.withReader { reader ->
+                    writer << '\n' <<reader
+                }
+            }
+        }
+    }
+}
+
 sourceSets {
     api {
         java {
@@ -192,20 +210,29 @@ test {
     }
 }
 
-processResources { //Processes main only resouces
-    from(sourceSets.main.resources.srcDirs) {
-        include 'META-INF/mods.toml'
-        expand 'version':project.version,'forge_major':project.forge_major,'update_json':project.update_json
-    }
+task mergeModMetaInf(type: ConcatFiles) {
+    source = files("$rootDir/src/META-INF/mods.toml", "$rootDir/src/api/resources/META-INF/mods.toml", "$rootDir/src/main/resources/META-INF/mods.toml")
+    target = file("$buildDir/tmp/modMeta/META-INF/mods.toml")
+}
 
+processResources { //Processes main only resouces
+    dependsOn mergeModMetaInf
+    from("$buildDir/tmp/modMeta") {
+        expand 'version':project.version, 'api_version':project.api_version,'forge_major':project.forge_major,'update_json':project.update_json
+    }
+    
     from(sourceSets.main.resources.srcDirs) {
         exclude 'META-INF/mods.toml'
     }
 }
 
 processApiResources {
+    dependsOn mergeModMetaInf
+    from("$buildDir/tmp/modMeta/META-INF/mods.toml") {
+        expand 'version':project.version, 'api_version':project.api_version,'forge_major':project.forge_major,'update_json':project.update_json
+    }
     from(sourceSets.api.resources.srcDirs) {
-        expand 'api_version':project.api_version, 'forge_major':project.forge_major
+        exclude 'META-INF/mods.toml'
     }
 }
 
