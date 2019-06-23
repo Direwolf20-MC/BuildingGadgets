@@ -65,13 +65,13 @@ public class ConstructionBlockEntity extends EntityBase {
                 if (te instanceof ConstructionBlockTileEntity) {
                     BlockData tempState = ((ConstructionBlockTileEntity) te).getConstructionBlockData();
 
-                    int opacity = tempState.getState().getOpacity(world, targetPos);
+                    boolean opaque = tempState.getState().isOpaqueCube(world, targetPos);
                     boolean neighborBrightness = false;//tempState.useNeighbourBrightness(world, targetPos); //TODO find replacement
-                    if (opacity > 0 || neighborBrightness) {
+                    if (opaque || neighborBrightness) {
                         BlockData tempSetBlock = ((ConstructionBlockTileEntity) te).getConstructionBlockData();
                         BlockData tempActualSetBlock = ((ConstructionBlockTileEntity) te).getActualBlockData();
                         world.setBlockState(targetPos, BGBlocks.constructionBlock.getDefaultState()
-                                .with(ConstructionBlock.BRIGHT, opacity == 0)
+                                .with(ConstructionBlock.BRIGHT, !opaque)
                                 .with(ConstructionBlock.NEIGHBOR_BRIGHTNESS, neighborBrightness));
                         te = world.getTileEntity(targetPos);
                         if (te instanceof ConstructionBlockTileEntity) {
