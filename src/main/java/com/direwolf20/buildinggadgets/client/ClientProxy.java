@@ -7,6 +7,7 @@ import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManagerContainer;
 import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManagerGUI;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGContainers;
+import com.direwolf20.buildinggadgets.common.registry.objects.BuildingObjects;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
@@ -43,7 +44,7 @@ public class ClientProxy {
 
     public static void clientSetup(final IEventBus eventBus) {
         DeferredWorkQueue.runLater(KeyBindings::init);
-        //MinecraftForge.EVENT_BUS.addListener(BuildingObjects::initColorHandlers);
+        MinecraftForge.EVENT_BUS.addListener(BuildingObjects::initColorHandlers);
         //eventBus.addListener(ClientProxy::renderWorldLastEvent);
         MinecraftForge.EVENT_BUS.addListener(ClientProxy::bakeModels);
         MinecraftForge.EVENT_BUS.addListener(EventClientTick::onClientTick);

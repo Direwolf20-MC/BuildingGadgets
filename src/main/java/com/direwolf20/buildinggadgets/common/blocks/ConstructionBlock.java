@@ -103,7 +103,7 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
         blockColors.register((state, world, pos, tintIndex) -> {
             if (world != null) {
                 BlockState mimicBlock = getActualMimicBlock(world, pos);
-                return blockColors.getColor(mimicBlock, (World) world, pos);
+                return blockColors.getColor(mimicBlock, world, pos, 0);
             }
             return -1;
         }, this);
