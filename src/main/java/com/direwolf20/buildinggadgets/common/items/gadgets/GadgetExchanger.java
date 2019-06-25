@@ -174,7 +174,7 @@ public class GadgetExchanger extends GadgetGeneric {
     }
 
     private boolean exchange(ServerPlayerEntity player, ItemStack stack) {
-        World world = player.world;
+        ServerWorld world = player.getServerWorld();
         List<BlockPos> coords = getAnchor(stack);
 
         if (coords.size() == 0) { //If we don't have an anchor, build in the current spot
@@ -207,7 +207,7 @@ public class GadgetExchanger extends GadgetGeneric {
         return true;
     }
 
-    private boolean exchangeBlock(World world, ServerPlayerEntity player, BlockPos pos, BlockData setBlock) {
+    private boolean exchangeBlock(ServerWorld world, ServerPlayerEntity player, BlockPos pos, BlockData setBlock) {
         BlockState currentBlock = world.getBlockState(pos);
         ItemStack itemStack;
         boolean useConstructionPaste = false;
@@ -277,7 +277,16 @@ public class GadgetExchanger extends GadgetGeneric {
         if (useItemSuccess) {
             world.addEntity(new BlockBuildEntity(world, pos, setBlock, BlockBuildEntity.Mode.REPLACE, useConstructionPaste));
             //currentBlock.getBlock().removedByPlayer(currentBlock.getBlockData(), world, pos, player, false, null);
-            player.addItemStackToInventory(new ItemStack(currentBlock.getBlock(), 1));
+            List<ItemStack> blockDrops = currentBlock.getBlock().getDrops(currentBlock, world, pos, world.getTileEntity(pos));
+            for (ItemStack drop : blockDrops) {
+                if (drop.getItem().equals(BGItems.constructionPaste)) {
+                    InventoryHelper.addPasteToContainer(player, drop);
+                }
+                if (drop != null) {
+                    player.addItemStackToInventory(drop);
+                }
+            }
+            //player.addItemStackToInventory(new ItemStack(currentBlock.getBlock().getDrops(currentBlock, world, pos, world.getTileEntity(pos)), 1));
             return true;
         }
         return false;
