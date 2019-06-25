@@ -6,10 +6,12 @@ import com.direwolf20.buildinggadgets.client.events.EventTooltip;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManagerContainer;
 import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManagerGUI;
+import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGContainers;
 import com.direwolf20.buildinggadgets.common.registry.objects.BuildingObjects;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.SimpleSound;
 import net.minecraft.client.gui.ScreenManager;
@@ -82,7 +84,8 @@ public class ClientProxy {
                 IBakedModel model;
                 BlockState facadeState = modelData.getData(ConstructionBlockTileEntity.FACADE_STATE);
                 BlockRenderLayer layer = MinecraftForgeClient.getRenderLayer();
-                if (facadeState == null) return Collections.emptyList();
+                if (facadeState == null || facadeState == Blocks.AIR.getDefaultState())
+                    facadeState = BGBlocks.constructionBlockDense.getDefaultState();
                 if (layer != null && !facadeState.getBlock().canRenderInLayer(facadeState, layer)) { // always render in the null layer or the block-breaking textures don't show up
                     return Collections.emptyList();
                 }
