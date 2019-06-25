@@ -64,6 +64,7 @@ public class ClientProxy {
         ModelResourceLocation ConstrLocation3 = new ModelResourceLocation(ConstrName, "bright=false,neighbor_brightness=true");
         ModelResourceLocation ConstrLocation4 = new ModelResourceLocation(ConstrName, "bright=true,neighbor_brightness=true");
         IDynamicBakedModel bakedModelLoader = new IDynamicBakedModel() {
+            BlockState facadeState;
             @Override
             public boolean isGui3d() {
                 return false;
@@ -76,13 +77,16 @@ public class ClientProxy {
 
             @Override
             public boolean isAmbientOcclusion() {
-                return true;
+                if (facadeState == null) return false;
+                IBakedModel model;
+                model = Minecraft.getInstance().getBlockRendererDispatcher().getBlockModelShapes().getModel(facadeState);
+                return model.isAmbientOcclusion();
             }
 
             @Override
             public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, Random rand, IModelData modelData) {
                 IBakedModel model;
-                BlockState facadeState = modelData.getData(ConstructionBlockTileEntity.FACADE_STATE);
+                facadeState = modelData.getData(ConstructionBlockTileEntity.FACADE_STATE);
                 BlockRenderLayer layer = MinecraftForgeClient.getRenderLayer();
                 if (facadeState == null || facadeState == Blocks.AIR.getDefaultState())
                     facadeState = BGBlocks.constructionBlockDense.getDefaultState();
