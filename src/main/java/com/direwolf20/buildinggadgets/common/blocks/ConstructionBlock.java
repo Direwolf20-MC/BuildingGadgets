@@ -33,7 +33,7 @@ import javax.annotation.Nullable;
 import java.util.Random;
 
 //@Optional.Interface(iface = "team.chisel.ctm.api.IFacade", modid = "ctm-api")
-public class ConstructionBlock extends Block /*implements IFacade*/ {
+public class ConstructionBlock extends Block /*IFacade*/ {
     public static final IProperty<Boolean> BRIGHT = BooleanProperty.create("bright");
     public static final IProperty<Boolean> NEIGHBOR_BRIGHTNESS = BooleanProperty.create("neighbor_brightness");
 

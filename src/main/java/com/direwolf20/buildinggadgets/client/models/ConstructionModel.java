@@ -1,4 +1,4 @@
-package com.direwolf20.buildinggadgets.common.blocks.Models;
+package com.direwolf20.buildinggadgets.client.models;
 
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.google.common.collect.ImmutableMap;
@@ -39,7 +39,7 @@ public class ConstructionModel implements IUnbakedModel {
         } catch (Exception e) {
             throw new Error("Unable to load construction block model", e);
         }
-        return new ConstructionBakedModel(constructionModel.bake(bakery, spriteGetter, sprite, format));
+        return new ConstructionBakedModel();//new ConstructionBakedModel(constructionModel.bake(bakery, spriteGetter, sprite, format));
     }
 
     @Override

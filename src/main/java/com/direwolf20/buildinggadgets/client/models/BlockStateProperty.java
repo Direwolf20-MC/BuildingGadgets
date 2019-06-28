@@ -1,4 +1,4 @@
-package com.direwolf20.buildinggadgets.common.blocks.Models;
+package com.direwolf20.buildinggadgets.client.models;
 
 import com.direwolf20.buildinggadgets.common.util.blocks.BlockStateWrapper;
 import com.google.common.collect.ImmutableList;
