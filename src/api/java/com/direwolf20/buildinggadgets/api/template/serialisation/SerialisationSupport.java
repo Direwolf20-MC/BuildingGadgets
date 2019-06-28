@@ -1,7 +1,9 @@
 package com.direwolf20.buildinggadgets.api.template.serialisation;
 
-import com.direwolf20.buildinggadgets.api.template.building.tilesupport.DummyTileEntityData;
 import com.direwolf20.buildinggadgets.api.template.building.tilesupport.ITileEntityData;
+import com.direwolf20.buildinggadgets.api.template.building.tilesupport.NBTTileEntityData;
+import com.direwolf20.buildinggadgets.api.template.building.tilesupport.TileSupport;
+import com.google.common.base.Preconditions;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 
@@ -27,7 +29,29 @@ public final class SerialisationSupport {
 
         @Override
         public ITileEntityData deserialize(CompoundNBT tagCompound, boolean persisted) {
-            return DummyTileEntityData.INSTANCE;
+            return TileSupport.dummyTileEntityData();
         }
     }
+
+    private static final ITileDataSerializer NBT_TILE_DATA_SERIALIZER = new NBTTileEntityDataSerializer();
+
+    public static ITileDataSerializer nbtTileDataSerializer() {
+        return NBT_TILE_DATA_SERIALIZER;
+    }
+
+    private static final class NBTTileEntityDataSerializer extends ForgeRegistryEntry<ITileDataSerializer> implements ITileDataSerializer {
+        private NBTTileEntityDataSerializer() {}
+
+        @Override
+        public CompoundNBT serialize(ITileEntityData data, boolean persisted) {
+            Preconditions.checkArgument(data instanceof NBTTileEntityData);
+            return ((NBTTileEntityData) data).getNBT();
+        }
+
+        @Override
+        public ITileEntityData deserialize(CompoundNBT tagCompound, boolean persisted) {
+            return new NBTTileEntityData(tagCompound);
+        }
+    }
+
 }

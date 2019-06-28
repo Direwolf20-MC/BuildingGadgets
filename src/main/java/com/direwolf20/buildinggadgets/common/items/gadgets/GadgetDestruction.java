@@ -1,10 +1,9 @@
 package com.direwolf20.buildinggadgets.common.items.gadgets;
 
-import com.direwolf20.buildinggadgets.api.Registries;
 import com.direwolf20.buildinggadgets.api.abstraction.BlockData;
 import com.direwolf20.buildinggadgets.api.building.IPositionPlacementSequence;
 import com.direwolf20.buildinggadgets.api.building.Region;
-import com.direwolf20.buildinggadgets.api.template.building.tilesupport.DummyTileEntityData;
+import com.direwolf20.buildinggadgets.api.template.building.tilesupport.TileSupport;
 import com.direwolf20.buildinggadgets.client.gui.GuiMod;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.config.Config;
@@ -344,7 +343,7 @@ public class GadgetDestruction extends GadgetGeneric {
                 .collect(Collectors.toSet());
         int index = 0;
         for (BlockPos pos : snapshot.getPositions()) {
-            snapshot.getBlockStates().get(index).ifPresent(state -> world.addEntity(new BlockBuildEntity(world, pos, new BlockData(state, DummyTileEntityData.INSTANCE), BlockBuildEntity.Mode.PLACE, pastePositions.contains(pos))));
+            snapshot.getBlockStates().get(index).ifPresent(state -> world.addEntity(new BlockBuildEntity(world, pos, new BlockData(state, TileSupport.dummyTileEntityData()), BlockBuildEntity.Mode.PLACE, pastePositions.contains(pos))));
             index++;
         }
     }
@@ -361,7 +360,7 @@ public class GadgetDestruction extends GadgetGeneric {
             return false;
 
         this.applyDamage(tool, player);
-        world.addEntity(new BlockBuildEntity(world, voidPos, Registries.TileEntityData.createBlockData(world, voidPos), BlockBuildEntity.Mode.REMOVE, false));
+        world.addEntity(new BlockBuildEntity(world, voidPos, TileSupport.createBlockData(world, voidPos), BlockBuildEntity.Mode.REMOVE, false));
         return true;
     }
 

@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.common.util.blocks;
 
 import com.direwolf20.buildinggadgets.api.abstraction.BlockData;
-import com.direwolf20.buildinggadgets.api.template.building.tilesupport.DummyTileEntityData;
+import com.direwolf20.buildinggadgets.api.template.building.tilesupport.TileSupport;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.util.tools.UniqueItem;
@@ -117,7 +117,7 @@ public class BlockMapIntState { //TODO This class is no longer appropriate for t
         intStackMap.clear();
         for (Map.Entry<Short, BlockState> entry : intStateMap.entrySet()) {
             try {
-                intStackMap.put(entry.getValue(), blockStateToUniqueItem(new BlockData(entry.getValue(), DummyTileEntityData.INSTANCE), player, new BlockPos(0, 0, 0)));
+                intStackMap.put(entry.getValue(), blockStateToUniqueItem(new BlockData(entry.getValue(), TileSupport.dummyTileEntityData()), player, new BlockPos(0, 0, 0)));
             } catch (IllegalArgumentException e) {
             }
         }

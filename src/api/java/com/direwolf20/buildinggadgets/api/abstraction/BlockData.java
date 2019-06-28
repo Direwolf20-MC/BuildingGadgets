@@ -3,8 +3,8 @@ package com.direwolf20.buildinggadgets.api.abstraction;
 import com.direwolf20.buildinggadgets.api.BuildinggadgetsAPI;
 import com.direwolf20.buildinggadgets.api.Registries;
 import com.direwolf20.buildinggadgets.api.template.building.IBuildContext;
-import com.direwolf20.buildinggadgets.api.template.building.tilesupport.DummyTileEntityData;
 import com.direwolf20.buildinggadgets.api.template.building.tilesupport.ITileEntityData;
+import com.direwolf20.buildinggadgets.api.template.building.tilesupport.TileSupport;
 import com.direwolf20.buildinggadgets.api.template.serialisation.ITileDataSerializer;
 import com.direwolf20.buildinggadgets.api.util.RegistryUtils;
 import com.google.common.base.Preconditions;
@@ -26,7 +26,7 @@ import java.util.Objects;
  * Notice that this class is immutable as long as the {@link ITileEntityData} instance is immutable.
  */
 public final class BlockData {
-    public static final BlockData AIR = new BlockData(Blocks.AIR.getDefaultState(), DummyTileEntityData.INSTANCE);
+    public static final BlockData AIR = new BlockData(Blocks.AIR.getDefaultState(), TileSupport.dummyTileEntityData());
     private static final String KEY_STATE = "state";
     private static final String KEY_SERIALIZER = "serializer";
     private static final String KEY_DATA = "data";

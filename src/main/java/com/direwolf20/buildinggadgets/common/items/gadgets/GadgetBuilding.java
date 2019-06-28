@@ -1,8 +1,8 @@
 package com.direwolf20.buildinggadgets.common.items.gadgets;
 
-import com.direwolf20.buildinggadgets.api.Registries;
 import com.direwolf20.buildinggadgets.api.abstraction.BlockData;
 import com.direwolf20.buildinggadgets.api.building.IAtopPlacingGadget;
+import com.direwolf20.buildinggadgets.api.template.building.tilesupport.TileSupport;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
@@ -245,7 +245,7 @@ public class GadgetBuilding extends GadgetGeneric implements IAtopPlacingGadget 
             silkTool.addEnchantment(Enchantments.SILK_TOUCH, 1);
             boolean sameDim = player.dimension == undoState.dimension;
             for (BlockPos coord : undoCoords) {
-                currentBlock = Registries.TileEntityData.createBlockData(world, coord);
+                currentBlock = TileSupport.createBlockData(world, coord);
 
                 double distance = coord.distanceSq(player.getPosition());
 
