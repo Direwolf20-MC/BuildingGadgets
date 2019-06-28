@@ -38,6 +38,7 @@ import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DeferredWorkQueue;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
 import javax.annotation.Nonnull;
 import java.util.Collections;
@@ -51,7 +52,7 @@ public class ClientProxy {
         DeferredWorkQueue.runLater(KeyBindings::init);
         MinecraftForge.EVENT_BUS.addListener(BuildingObjects::initColorHandlers);
         //eventBus.addListener(ClientProxy::renderWorldLastEvent);
-        MinecraftForge.EVENT_BUS.addListener(ClientProxy::bakeModels);
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(ClientProxy::bakeModels);
         MinecraftForge.EVENT_BUS.addListener(EventClientTick::onClientTick);
         MinecraftForge.EVENT_BUS.addListener(EventTooltip::onDrawTooltip);
         ScreenManager.registerFactory(BGContainers.TEMPLATE_MANAGER_CONTAINER, (ScreenManager.IScreenFactory<TemplateManagerContainer, TemplateManagerGUI>) TemplateManagerGUI::new);
