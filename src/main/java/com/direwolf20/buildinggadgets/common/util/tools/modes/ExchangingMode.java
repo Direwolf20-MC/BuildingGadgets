@@ -100,8 +100,10 @@ public enum ExchangingMode {
 
             TileEntity tile = world.getTileEntity(pos);
             // Only replace construction block with same block state
-            if (tile instanceof ConstructionBlockTileEntity && ((ConstructionBlockTileEntity) tile).getConstructionBlockData().equals(data))
-                return false;
+            if (tile instanceof ConstructionBlockTileEntity) {
+                if (((ConstructionBlockTileEntity) tile).getConstructionBlockData().equals(data))
+                    return false;
+            }
             else if (tile != null) // Otherwise if the block has a tile entity, ignore it
                 return false;
 

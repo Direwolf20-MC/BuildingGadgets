@@ -5,12 +5,12 @@ import com.direwolf20.buildinggadgets.common.registry.ClientConstructContainer;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import net.minecraft.entity.EntityType;
 import net.minecraftforge.client.event.ModelRegistryEvent;
-import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
 public class EntityRegistryContainer extends ClientConstructContainer<EntityType<?>,EntityBuilder<?>> {
     @Override
     public void clientInit() {
-        MinecraftForge.EVENT_BUS.addListener(this::registerModels);
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::registerModels);
     }
 
     @Override

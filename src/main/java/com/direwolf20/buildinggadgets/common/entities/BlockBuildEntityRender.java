@@ -52,7 +52,7 @@ public class BlockBuildEntityRender extends EntityRenderer<BlockBuildEntity> {
 
         BlockState renderBlockState = entity.getSetBlock();
         if (entity.isUsingPaste() && toolMode == BlockBuildEntity.Mode.PLACE)
-            renderBlockState = BGBlocks.constructionBlock.getDefaultState();
+            renderBlockState = BGBlocks.constructionBlockDense.getDefaultState();
         if (renderBlockState == null) {
             renderBlockState = Blocks.COBBLESTONE.getDefaultState();
         }

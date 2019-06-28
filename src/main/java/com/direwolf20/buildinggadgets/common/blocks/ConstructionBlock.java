@@ -44,6 +44,19 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
     }
 
     @Override
+    public boolean isVariableOpacity() {
+        return true;
+    }
+
+    @Override
+    @Deprecated
+    public boolean isSolid(BlockState state) {
+        boolean bright = state.get(ConstructionBlock.BRIGHT);
+        return ! bright;
+        //return this.blocksMovement && this.getRenderLayer() == BlockRenderLayer.SOLID;
+    }
+
+    @Override
     protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
         super.fillStateContainer(builder);
         builder.add(BRIGHT, NEIGHBOR_BRIGHTNESS);
@@ -103,7 +116,11 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
         blockColors.register((state, world, pos, tintIndex) -> {
             if (world != null) {
                 BlockState mimicBlock = getActualMimicBlock(world, pos);
-                return blockColors.getColor(mimicBlock, (World) world, pos);
+                try {
+                    return blockColors.getColor(mimicBlock, world, pos, tintIndex);
+                } catch (Exception var8) {
+                    return - 1;
+                }
             }
             return -1;
         }, this);
@@ -397,9 +414,9 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
         }
     }*/
 
- /*
+
     @Override
-    public boolean isNormalCube(BlockState state, IBlockAccess world, BlockPos pos) {
+    public boolean isNormalCube(BlockState state, IBlockReader world, BlockPos pos) {
         BlockState mimicBlock = getActualMimicBlock(world, pos);
         if (mimicBlock == null) {
             return super.isNormalCube(state, world, pos);
@@ -409,7 +426,7 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
         } catch (Exception var8) {
             return super.isNormalCube(state, world, pos);
         }
-    }*/
+    }
 
 // fixme: removed as of 1.14?
 //    @Deprecated

@@ -62,7 +62,6 @@ public final class BuildingGadgets {
         eventBus.addListener(Config::onFileChange);
 
         MinecraftForge.EVENT_BUS.register(new AnvilRepairHandler());
-        MinecraftForge.EVENT_BUS.register(this);
 
 
         // Client only registering
