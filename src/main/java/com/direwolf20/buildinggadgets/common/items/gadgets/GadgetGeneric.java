@@ -13,12 +13,10 @@ import com.direwolf20.buildinggadgets.common.util.lang.TooltipTranslation;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.item.IItemPropertyGetter;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
@@ -35,16 +33,9 @@ import java.util.Random;
 import static com.direwolf20.buildinggadgets.common.util.GadgetUtils.withSuffix;
 
 public abstract class GadgetGeneric extends Item {
-    private static final IItemPropertyGetter DAMAGED_GETTER =
-            (p_210306_0_, p_210306_1_, p_210306_2_) -> p_210306_0_.isDamaged() ? 1.0F : 0.0F;
-    private static final IItemPropertyGetter DAMAGE_GETTER =
-            (p_210307_0_, p_210307_1_, p_210307_2_) -> MathHelper
-                    .clamp((float) p_210307_0_.getDamage() / (float) p_210307_0_.getMaxDamage(), 0.0F, 1.0F);
 
     public GadgetGeneric(Properties builder) {
         super(builder);
-        this.addPropertyOverride(new ResourceLocation("damaged"), DAMAGED_GETTER);
-        this.addPropertyOverride(new ResourceLocation("damage"), DAMAGE_GETTER);
     }
 
     public abstract int getEnergyMax();
