@@ -105,13 +105,13 @@ public class GadgetDestruction extends GadgetGeneric {
 
     public static UUID getUUID(ItemStack stack) {
         CompoundNBT tag = NBTHelper.getOrNewTag(stack);
-        if (! tag.contains("UUID")) {
+        if (! tag.hasUniqueId(NBTKeys.GADGET_UUID)) {
             UUID uuid = UUID.randomUUID();
-            tag.putString("UUID", uuid.toString());
+            tag.putUniqueId(NBTKeys.GADGET_UUID, uuid);
             stack.setTag(tag);
             return uuid;
         }
-        return tag.getUniqueId("UUID");
+        return tag.getUniqueId(NBTKeys.GADGET_UUID);
     }
 
     public static void setAnchor(ItemStack stack, BlockPos pos) {

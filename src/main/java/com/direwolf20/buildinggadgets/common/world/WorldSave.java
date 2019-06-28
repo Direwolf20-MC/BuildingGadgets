@@ -39,7 +39,8 @@ public class WorldSave extends WorldSavedData {
     }
 
     public CompoundNBT getCompoundFromUUID(String UUID) {
-        return tagMap.get(UUID);
+        CompoundNBT nbt = tagMap.get(UUID);
+        return nbt != null ? nbt : new CompoundNBT();
     }
 
     public void markForSaving() {
