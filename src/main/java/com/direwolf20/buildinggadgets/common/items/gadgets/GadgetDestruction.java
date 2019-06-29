@@ -300,8 +300,8 @@ public class GadgetDestruction extends GadgetGeneric {
         boolean vertical = side.getAxis().isVertical();
         Direction up = vertical ? player.getHorizontalFacing() : Direction.UP;
         Direction down = up.getOpposite();
-        Direction left = vertical ? up.rotateY() : side.rotateYCCW();
-        Direction right = left.getOpposite();
+        Direction right = vertical ? up.rotateY() : side.rotateYCCW();
+        Direction left = right.getOpposite();
 
         BlockPos first = pos.offset(left, getToolValue(stack, NBTKeys.GADGET_VALUE_LEFT))
                 .offset(up, getToolValue(stack, NBTKeys.GADGET_VALUE_UP));
