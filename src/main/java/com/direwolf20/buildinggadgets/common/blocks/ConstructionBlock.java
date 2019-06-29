@@ -237,7 +237,7 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
     public void tick(BlockState state, World worldIn, BlockPos pos, Random random) {
         BlockState mimic = getActualMimicBlock(worldIn, pos);
         if (!isMimicNull(mimic)) {
-            mimic.randomTick(worldIn, pos, random);
+            mimic.getBlock().tick(state, worldIn, pos, random);
         } else {
             super.tick(state, worldIn, pos, random);
         }
@@ -252,7 +252,11 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
     public void animateTick(BlockState stateIn, World worldIn, BlockPos pos, Random rand) {
         BlockState mimic = getActualMimicBlock(worldIn, pos);
         if (!isMimicNull(mimic)) {
-            mimic.randomTick(worldIn, pos, rand);
+            try {
+                mimic.getBlock().animateTick(stateIn, worldIn, pos, rand);
+            } catch (Exception var8) {
+                super.animateTick(stateIn, worldIn, pos, rand);
+            }
         } else {
             super.animateTick(stateIn, worldIn, pos, rand);
         }
