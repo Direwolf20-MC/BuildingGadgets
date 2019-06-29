@@ -8,6 +8,8 @@ import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGEntities;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import net.minecraft.block.Block;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.entity.EntityType;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.IPacket;
@@ -67,12 +69,16 @@ public class ConstructionBlockEntity extends EntityBase {
 
                     boolean opaque = tempState.getState().isOpaqueCube(world, targetPos);
                     boolean neighborBrightness = false;//tempState.useNeighbourBrightness(world, targetPos); //TODO find replacement
-                    if (opaque || neighborBrightness) {
+                    IBakedModel model;
+                    model = Minecraft.getInstance().getBlockRendererDispatcher().getBlockModelShapes().getModel(tempState.getState());
+                    boolean ambient = model.isAmbientOcclusion();
+                    if (opaque || neighborBrightness || !ambient) {
                         BlockData tempSetBlock = ((ConstructionBlockTileEntity) te).getConstructionBlockData();
                         BlockData tempActualSetBlock = ((ConstructionBlockTileEntity) te).getActualBlockData();
                         world.setBlockState(targetPos, BGBlocks.constructionBlock.getDefaultState()
                                 .with(ConstructionBlock.BRIGHT, !opaque)
-                                .with(ConstructionBlock.NEIGHBOR_BRIGHTNESS, neighborBrightness));
+                                .with(ConstructionBlock.NEIGHBOR_BRIGHTNESS, neighborBrightness)
+                                .with(ConstructionBlock.AMBIENT_OCCLUSION, ambient));
                         te = world.getTileEntity(targetPos);
                         if (te instanceof ConstructionBlockTileEntity) {
                             ((ConstructionBlockTileEntity) te).setBlockState(tempSetBlock, tempActualSetBlock);

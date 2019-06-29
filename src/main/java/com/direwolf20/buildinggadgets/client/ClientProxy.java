@@ -60,10 +60,14 @@ public class ClientProxy {
 
     private static void bakeModels(ModelBakeEvent event) {
         ResourceLocation ConstrName = new ResourceLocation(Reference.MODID, "construction_block");
-        ModelResourceLocation ConstrLocation1 = new ModelResourceLocation(ConstrName, "bright=false,neighbor_brightness=false");
-        ModelResourceLocation ConstrLocation2 = new ModelResourceLocation(ConstrName, "bright=true,neighbor_brightness=false");
-        ModelResourceLocation ConstrLocation3 = new ModelResourceLocation(ConstrName, "bright=false,neighbor_brightness=true");
-        ModelResourceLocation ConstrLocation4 = new ModelResourceLocation(ConstrName, "bright=true,neighbor_brightness=true");
+        ModelResourceLocation ConstrLocation1 = new ModelResourceLocation(ConstrName, "ambient_occlusion=false,bright=false,neighbor_brightness=false");
+        ModelResourceLocation ConstrLocation1a = new ModelResourceLocation(ConstrName, "ambient_occlusion=true,bright=false,neighbor_brightness=false");
+        ModelResourceLocation ConstrLocation2 = new ModelResourceLocation(ConstrName, "ambient_occlusion=false,bright=true,neighbor_brightness=false");
+        ModelResourceLocation ConstrLocation2a = new ModelResourceLocation(ConstrName, "ambient_occlusion=true,bright=true,neighbor_brightness=false");
+        ModelResourceLocation ConstrLocation3 = new ModelResourceLocation(ConstrName, "ambient_occlusion=false,bright=false,neighbor_brightness=true");
+        ModelResourceLocation ConstrLocation3a = new ModelResourceLocation(ConstrName, "ambient_occlusion=true,bright=false,neighbor_brightness=true");
+        ModelResourceLocation ConstrLocation4 = new ModelResourceLocation(ConstrName, "ambient_occlusion=false,bright=true,neighbor_brightness=true");
+        ModelResourceLocation ConstrLocation4a = new ModelResourceLocation(ConstrName, "ambient_occlusion=true,bright=true,neighbor_brightness=true");
         IDynamicBakedModel bakedModelLoader = new IDynamicBakedModel() {
             BlockState facadeState;
             @Override
@@ -78,10 +82,57 @@ public class ClientProxy {
 
             @Override
             public boolean isAmbientOcclusion() {
-                if (facadeState == null) return false;
+                return false;
+            }
+
+            @Override
+            public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, Random rand, IModelData modelData) {
                 IBakedModel model;
+                facadeState = modelData.getData(ConstructionBlockTileEntity.FACADE_STATE);
+                BlockRenderLayer layer = MinecraftForgeClient.getRenderLayer();
+                if (facadeState == null || facadeState == Blocks.AIR.getDefaultState())
+                    facadeState = BGBlocks.constructionBlockDense.getDefaultState();
+                if (layer != null && !facadeState.getBlock().canRenderInLayer(facadeState, layer)) { // always render in the null layer or the block-breaking textures don't show up
+                    return Collections.emptyList();
+                }
                 model = Minecraft.getInstance().getBlockRendererDispatcher().getBlockModelShapes().getModel(facadeState);
-                return model.isAmbientOcclusion();
+                return model.getQuads(facadeState, side, rand);
+
+            }
+
+            @Override
+            public TextureAtlasSprite getParticleTexture() {
+                return MissingTextureSprite.func_217790_a();
+            }
+
+            @Override
+            public ItemOverrideList getOverrides() {
+                return null;
+            }
+
+            @Override
+            @Nonnull
+            public IModelData getModelData(@Nonnull IEnviromentBlockReader world, @Nonnull BlockPos pos, @Nonnull BlockState state, @Nonnull IModelData tileData) {
+                return tileData;
+            }
+        };
+
+        IDynamicBakedModel bakedModelLoaderAmbient = new IDynamicBakedModel() {
+            BlockState facadeState;
+
+            @Override
+            public boolean isGui3d() {
+                return false;
+            }
+
+            @Override
+            public boolean isBuiltInRenderer() {
+                return false;
+            }
+
+            @Override
+            public boolean isAmbientOcclusion() {
+                return true;
             }
 
             @Override
@@ -119,6 +170,10 @@ public class ClientProxy {
         event.getModelRegistry().put(ConstrLocation2, bakedModelLoader);
         event.getModelRegistry().put(ConstrLocation3, bakedModelLoader);
         event.getModelRegistry().put(ConstrLocation4, bakedModelLoader);
+        event.getModelRegistry().put(ConstrLocation1a, bakedModelLoaderAmbient);
+        event.getModelRegistry().put(ConstrLocation2a, bakedModelLoaderAmbient);
+        event.getModelRegistry().put(ConstrLocation3a, bakedModelLoaderAmbient);
+        event.getModelRegistry().put(ConstrLocation4a, bakedModelLoaderAmbient);
     }
 
     @SubscribeEvent

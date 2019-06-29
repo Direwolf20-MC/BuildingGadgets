@@ -36,11 +36,12 @@ import java.util.Random;
 public class ConstructionBlock extends Block /*implements IFacade*/ {
     public static final IProperty<Boolean> BRIGHT = BooleanProperty.create("bright");
     public static final IProperty<Boolean> NEIGHBOR_BRIGHTNESS = BooleanProperty.create("neighbor_brightness");
+    public static final IProperty<Boolean> AMBIENT_OCCLUSION = BooleanProperty.create("ambient_occlusion");
 
     public ConstructionBlock(Properties builder) {
         super(builder);
 
-        setDefaultState(this.getStateContainer().getBaseState().with(BRIGHT, true).with(NEIGHBOR_BRIGHTNESS, false));
+        setDefaultState(this.getStateContainer().getBaseState().with(BRIGHT, true).with(NEIGHBOR_BRIGHTNESS, false).with(AMBIENT_OCCLUSION, false));
     }
 
     @Override
@@ -59,7 +60,7 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
     @Override
     protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
         super.fillStateContainer(builder);
-        builder.add(BRIGHT, NEIGHBOR_BRIGHTNESS);
+        builder.add(BRIGHT, NEIGHBOR_BRIGHTNESS, AMBIENT_OCCLUSION);
     }
 
     @Override
