@@ -64,7 +64,7 @@ public class BuildingGadgets {
         eventBus.addListener(Config::onFileChange);
 
         MinecraftForge.EVENT_BUS.register(new AnvilRepairHandler());
-
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(BuildingObjects::initColorHandlers);
 
         // Client only registering
         DistExecutor.runWhenOn(Dist.CLIENT, () -> () -> {
