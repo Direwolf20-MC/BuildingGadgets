@@ -34,6 +34,7 @@ import java.util.Random;
 
 //@Optional.Interface(iface = "team.chisel.ctm.api.IFacade", modid = "ctm-api")
 public class ConstructionBlock extends Block /*implements IFacade*/ {
+    //TODO Review which methods we are overriding -- a LOT more were added at some point, many of which I probably don't want in here :).
     public static final IProperty<Boolean> BRIGHT = BooleanProperty.create("bright");
     public static final IProperty<Boolean> NEIGHBOR_BRIGHTNESS = BooleanProperty.create("neighbor_brightness");
     public static final IProperty<Boolean> AMBIENT_OCCLUSION = BooleanProperty.create("ambient_occlusion");
@@ -292,7 +293,7 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
     public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult rayTraceResult) {
         BlockState mimic = getActualMimicBlock(worldIn, pos);
         //System.out.println(mimic);
-        return !isMimicNull(mimic) ? mimic.onBlockActivated(worldIn, player, hand, rayTraceResult) : super.onBlockActivated(state, worldIn, pos, player, hand, rayTraceResult);
+        return !isMimicNull(mimic) ? super.onBlockActivated(state, worldIn, pos, player, hand, rayTraceResult) : super.onBlockActivated(state, worldIn, pos, player, hand, rayTraceResult);
     }
 
     /**
@@ -318,7 +319,8 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
     public void onBlockClicked(BlockState state, World worldIn, BlockPos pos, PlayerEntity player) {
         BlockState mimic = getActualMimicBlock(worldIn, pos);
         if (!isMimicNull(mimic)) {
-            mimic.onBlockClicked(worldIn, pos, player);
+            super.onBlockClicked(state, worldIn, pos, player);
+            //mimic.onBlockClicked(worldIn, pos, player);
         } else {
             super.onBlockClicked(state, worldIn, pos, player);
         }
