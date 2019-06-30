@@ -358,7 +358,7 @@ public class GadgetUtils {
     }
     @Nullable
     public static IItemHandler getRemoteInventory(ItemStack tool, World world, NetworkIO.Operation operation) {
-        ResourceLocation dim = getDIMFromNBT(tool, NBTKeys.REMOTE_INVENTORY_DIM);
+        ResourceLocation dim = getDIMFromNBT(tool, NBTKeys.REMOTE_INVENTORY_POS);
         if (dim == null) return null;
         BlockPos pos = getPOSFromNBT(tool, NBTKeys.REMOTE_INVENTORY_POS);
         return pos == null ? null : getRemoteInventory(pos, dim, world /*, operation*/);
