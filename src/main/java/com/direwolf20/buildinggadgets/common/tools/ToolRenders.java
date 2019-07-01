@@ -202,11 +202,19 @@ public class ToolRenders {
             GL14.glBlendColor(1F, 1F, 1F, 0.55f); //Set the alpha of the blocks we are rendering
 
             // Get the block state in the fake world
-            if (fakeWorld.getWorldType() != WorldType.DEBUG_ALL_BLOCK_STATES)
+            if (fakeWorld.getWorldType() != WorldType.DEBUG_ALL_BLOCK_STATES) {
                 state = renderBlockState.getActualState(fakeWorld, coordinate);
+            }
 
             if (renderBlockState.getRenderType() != EnumBlockRenderType.INVISIBLE) {
-                dispatcher.renderBlockBrightness(state, 1f);//Render the defined block
+                try {
+                    dispatcher.renderBlockBrightness(state, 1f);//Render the defined block
+                } catch(NullPointerException ex) {
+                    // This is to stop crashes with blocks that have not been implemented
+                    // correctly by their mod authors.
+                    BuildingGadgets.logger.error(ToolRenders.class.getSimpleName() + ": Error within overlay rendering -> " + ex);
+                }
+
                 GlStateManager.rotate(-90.0F, 0.0F, 1.0F, 0.0F); //Rotate it because i'm not sure why but we need to
             }
 
