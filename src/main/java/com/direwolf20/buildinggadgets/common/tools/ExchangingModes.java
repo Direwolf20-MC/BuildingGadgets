@@ -88,6 +88,10 @@ public enum ExchangingModes {
             if (worldBlockState == target)
                 return false;
 
+            // Make sure we can actually place the block before doing anything else.
+            if (! target.getBlock().canPlaceBlockAt(world, pos))
+                return false;
+
             // No need to replace if source and target are the same if fuzzy mode is off
             if (!GadgetGeneric.getFuzzy(tool) && worldBlockState != initialBlockState)
                 return false;
@@ -95,6 +99,7 @@ public enum ExchangingModes {
             // If the target is already enqueued, don't replace it
             if (worldBlockState == ModBlocks.effectBlock.getDefaultState())
                 return false;
+
             // Only replace existing blocks, don't place more
             if (worldBlockState.getBlock().isAir(worldBlockState, world, pos))
                 return false;
