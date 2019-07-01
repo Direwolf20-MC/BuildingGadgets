@@ -237,6 +237,7 @@ public class GadgetExchanger extends GadgetGeneric {
         if (!world.isBlockModifiable(player, pos)) {
             return false;
         }
+
         BlockSnapshot blockSnapshot = BlockSnapshot.getBlockSnapshot(world, pos);
         if (ForgeEventFactory.onPlayerBlockPlace(player, blockSnapshot, EnumFacing.UP, EnumHand.MAIN_HAND).isCanceled()) {
             return false;
@@ -249,9 +250,13 @@ public class GadgetExchanger extends GadgetGeneric {
         if (!this.canUse(tool, player))
             return false;
 
+        if (!GadgetExchanger.canPlaceBlockAt(world, pos, setBlock, currentBlock))
+            return false;
+
         this.applyDamage(tool, player);
 
         currentBlock.getBlock().harvestBlock(world, player, pos, currentBlock, world.getTileEntity(pos), tool);
+
         boolean useItemSuccess;
         if (useConstructionPaste) {
             useItemSuccess = InventoryManipulation.usePaste(player, 1);
@@ -263,6 +268,24 @@ public class GadgetExchanger extends GadgetGeneric {
             return true;
         }
         return false;
+    }
+
+    /**
+     * This may seem a bit strange at a glance. Basically when checking if a block can be placed
+     * the game checks it against the current block. As the exchanger will not remove that
+     * block we need to do it a slightly different way. The way we resolve this issue
+     * is by removing the original block and setting it to air. We then do the
+     * check and replace the block regardless.
+     *
+     * @param setBlock      the block we need to test against
+     * @param originalBlock the block we need to put back on failure
+     */
+    private static boolean canPlaceBlockAt(World world, BlockPos pos, IBlockState setBlock, IBlockState originalBlock) {
+        world.setBlockState(pos, Blocks.AIR.getDefaultState());
+        boolean canPlace = setBlock.getBlock().canPlaceBlockAt(world, pos);
+        world.setBlockState(pos, originalBlock);
+
+        return canPlace;
     }
 
     public static ItemStack getGadget(EntityPlayer player) {
