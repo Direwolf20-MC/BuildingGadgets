@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.common.registry.objects;
 
+import com.direwolf20.buildinggadgets.common.blocks.chargingstation.ChargingStationContainer;
 import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManagerContainer;
 import com.direwolf20.buildinggadgets.common.registry.RegistryContainer;
 import com.direwolf20.buildinggadgets.common.registry.SimpleRegistryObjectBuilder;
@@ -23,12 +24,19 @@ public final class BGContainers {
 
     @ObjectHolder(ContainerReference.TEMPLATE_MANAGER_CONTAINER)
     public static ContainerType<TemplateManagerContainer> TEMPLATE_MANAGER_CONTAINER;
+    @ObjectHolder(ContainerReference.CHARGING_STATION_CONTAINER)
+    public static ContainerType<ChargingStationContainer> CHARGING_STATION_CONTAINER;
 
     static void init() {
         container.add(
                 new SimpleRegistryObjectBuilder<ContainerType<?>>(ContainerReference.TEMPLATE_MANAGER_CONTAINER_RL)
                         .object(new ContainerType<>((IContainerFactory<TemplateManagerContainer>)
                                 ((wId, inv, buffer) -> new TemplateManagerContainer(wId, inv))))
+        );
+        container.add(
+                new SimpleRegistryObjectBuilder<ContainerType<?>>(ContainerReference.CHARGING_STATION_CONTAINER_RL)
+                        .object(new ContainerType<>((IContainerFactory<ChargingStationContainer>)
+                                ((wId, inv, buffer) -> new ChargingStationContainer(wId, inv))))
         );
     }
 
@@ -40,7 +48,8 @@ public final class BGContainers {
     public static void registerContainer(RegistryEvent.Register<ContainerType<?>> event) {
         //container.register(event);
         event.getRegistry().registerAll(
-                IForgeContainerType.create(TemplateManagerContainer::new).setRegistryName("template_manager_container")
+                IForgeContainerType.create(TemplateManagerContainer::new).setRegistryName("template_manager_container"),
+                IForgeContainerType.create(ChargingStationContainer::new).setRegistryName("charging_station_container")
         );
     }
 }

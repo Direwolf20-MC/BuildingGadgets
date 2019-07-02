@@ -4,6 +4,8 @@ import afu.org.checkerframework.checker.nullness.qual.Nullable;
 import com.direwolf20.buildinggadgets.client.events.EventClientTick;
 import com.direwolf20.buildinggadgets.client.events.EventTooltip;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
+import com.direwolf20.buildinggadgets.common.blocks.chargingstation.ChargingStationContainer;
+import com.direwolf20.buildinggadgets.common.blocks.chargingstation.ChargingStationGUI;
 import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManagerContainer;
 import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManagerGUI;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
@@ -54,6 +56,7 @@ public class ClientProxy {
         MinecraftForge.EVENT_BUS.addListener(EventClientTick::onClientTick);
         MinecraftForge.EVENT_BUS.addListener(EventTooltip::onDrawTooltip);
         ScreenManager.registerFactory(BGContainers.TEMPLATE_MANAGER_CONTAINER, (ScreenManager.IScreenFactory<TemplateManagerContainer, TemplateManagerGUI>) TemplateManagerGUI::new);
+        ScreenManager.registerFactory(BGContainers.CHARGING_STATION_CONTAINER, (ScreenManager.IScreenFactory<ChargingStationContainer, ChargingStationGUI>) ChargingStationGUI::new);
     }
 
     private static void bakeModels(ModelBakeEvent event) {

@@ -1,6 +1,8 @@
 package com.direwolf20.buildinggadgets.common.registry.objects;
 
 import com.direwolf20.buildinggadgets.common.blocks.*;
+import com.direwolf20.buildinggadgets.common.blocks.chargingstation.ChargingStation;
+import com.direwolf20.buildinggadgets.common.blocks.chargingstation.ChargingStationTileEntity;
 import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManager;
 import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManagerTileEntity;
 import com.direwolf20.buildinggadgets.common.registry.block.BlockBuilder;
@@ -42,6 +44,8 @@ public final class BGBlocks {
     public static ConstructionBlockPowder constructionBlockPowder;
     @ObjectHolder(BlockReference.TEMPLATE_MANAGER)
     public static TemplateManager templateManger;
+    @ObjectHolder(BlockReference.CHARGING_STATION)
+    public static ChargingStation chargingStation;
 
     // No extracted block creation method, because property creation would just make any method call look lengthy
     static void init() {
@@ -71,6 +75,13 @@ public final class BGBlocks {
                         .builder(new TileEntityTypeBuilder<>(TemplateManagerTileEntity::new))
                         .factory(TileEntityTypeBuilder::build))
                 .factory(TemplateManager::new));
+        container.add(new BlockBuilder(BlockReference.CHARGING_STATION_RL)
+                .builder(Block.Properties.create(Material.ROCK).hardnessAndResistance(2f))
+                .item(itemProperties())
+                .withTileEntity(new TileEntityBuilder<>(TileEntityReference.CHARGING_STATION_TILE_RL)
+                        .builder(new TileEntityTypeBuilder<>(ChargingStationTileEntity::new))
+                        .factory(TileEntityTypeBuilder::build))
+                .factory(ChargingStation::new));
     }
 
     @SubscribeEvent
@@ -97,6 +108,8 @@ public final class BGBlocks {
         public static TileEntityType<?> CONSTRUCTION_BLOCK_TYPE;
         @ObjectHolder(TileEntityReference.TEMPLATE_MANAGER_TILE)
         public static TileEntityType<?> TEMPLATE_MANAGER_TYPE;
+        @ObjectHolder(TileEntityReference.CHARGING_STATION_TILE)
+        public static TileEntityType<?> CHARGING_STATION_TYPE;
 
         static void init() {
 
