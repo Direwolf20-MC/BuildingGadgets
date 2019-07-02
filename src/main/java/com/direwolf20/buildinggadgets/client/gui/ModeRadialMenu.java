@@ -101,6 +101,7 @@ public class ModeRadialMenu extends GuiScreen {
                         PacketHandler.INSTANCE.sendToServer(new PacketToggleFuzzy());
 
                     return GadgetGeneric.getFuzzy(getGadget());
+                });
                 addButton(button);
                 conditionalButtons.add(button);
             }
