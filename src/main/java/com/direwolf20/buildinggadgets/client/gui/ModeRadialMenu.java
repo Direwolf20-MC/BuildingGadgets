@@ -101,7 +101,6 @@ public class ModeRadialMenu extends GuiScreen {
                         PacketHandler.INSTANCE.sendToServer(new PacketToggleFuzzy());
 
                     return GadgetGeneric.getFuzzy(getGadget());
-                });
                 addButton(button);
                 conditionalButtons.add(button);
             }
@@ -128,6 +127,19 @@ public class ModeRadialMenu extends GuiScreen {
                 sliderRange.precision = 1;
                 sliderRange.getComponents().forEach(this::addButton);
             }
+        } else {
+            // Copy Paste specific
+            addButton(new GuiButtonActionCallback("copypaste.opengui", right, send -> {
+                if( !send )
+                    return false;
+
+                mc.player.closeScreen();
+                if( GadgetCopyPaste.getToolMode(tool) == GadgetCopyPaste.ToolMode.Copy )
+                    mc.displayGuiScreen(new CopyPasteGUI(tool));
+                else
+                    mc.displayGuiScreen(new PasteGUI(tool));
+                return true;
+            }).setTogglable(false));
         }
         addButton(new GuiButtonActionCallback("raytrace_fluid", right, send -> {
             if (send)

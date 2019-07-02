@@ -68,6 +68,7 @@ tooltip.gadget.energy=Energy
 tooltip.gadget.mode=Mode
 tooltip.gadget.range=Range
 tooltip.gadget.fuzzy=Fuzzy
+tooltip.gadget.copypaste.opengui=Edit Placement
 tooltip.gadget.raytrace_fluid=Raytrace Fluid
 tooltip.gadget.building.place_atop=Place On Top
 tooltip.gadget.connected=Connected
