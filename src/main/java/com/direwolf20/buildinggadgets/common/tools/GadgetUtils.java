@@ -35,6 +35,8 @@ import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
+import net.minecraftforge.common.DimensionManager;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 
@@ -364,7 +366,13 @@ public class GadgetUtils {
         if (remoteInventorySupplier == null) {
             remoteInventorySupplier = Suppliers.memoizeWithExpiration(() -> {
                 Integer dim = getDIMFromNBT(tool, "boundTE");
-                if (dim == null) return null;
+                if (dim == null)
+                    return null;
+
+                // Check if the Dimension actually exists. (Thanks RFTools...)
+                if (DimensionManager.getWorld(dim) == null)
+                    return null;
+
                 BlockPos pos = getPOSFromNBT(tool, "boundTE");
                 return pos == null ? null : getRemoteInventory(pos, dim, world, player, operation);
             }, 500, TimeUnit.MILLISECONDS);
