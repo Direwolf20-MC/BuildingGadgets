@@ -129,7 +129,7 @@ public class ChargingStationContainer extends Container {
                 slot.onSlotChange(stack, itemstack);
             } else {
                 int burnTime = net.minecraftforge.event.ForgeEventFactory.getItemBurnTime(stack, stack.getBurnTime() == -1 ? AbstractFurnaceTileEntity.getBurnTimes().getOrDefault(stack.getItem(), 0) : stack.getBurnTime());
-                System.out.println(burnTime);
+                //System.out.println(burnTime);
                 if (stack.getItem() instanceof GadgetGeneric) {
                     if (!this.mergeItemStack(stack, 1, 2, false)) {
                         return ItemStack.EMPTY;
