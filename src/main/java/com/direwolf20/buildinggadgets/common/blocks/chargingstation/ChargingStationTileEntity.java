@@ -14,6 +14,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.tileentity.AbstractFurnaceTileEntity;
 import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
@@ -179,15 +180,17 @@ public class ChargingStationTileEntity extends TileEntity implements ITickableTi
         LazyOptional<IItemHandler> handler = getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
         if (!world.isRemote) {
             if (counter > 0) {
-                addEnergy(1000);
+                addEnergy(300);
                 counter--;
             } else {
                 handler.ifPresent(h -> {
                     ItemStack stack = h.getStackInSlot(0);
-                    if (stack.getItem() == Items.COAL && getEnergyStored() < getMaxEnergyStored()) {
+                    int burnTime = net.minecraftforge.event.ForgeEventFactory.getItemBurnTime(stack, stack.getBurnTime() == -1 ? AbstractFurnaceTileEntity.getBurnTimes().getOrDefault(stack.getItem(), 0) : stack.getBurnTime());
+                    if (burnTime > 0 && getEnergyStored() < getMaxEnergyStored()) {
                         h.extractItem(0, 1, false);
-                        addEnergy(1000);
-                        counter = 23;
+                        counter = (int) Math.floor(burnTime / 20);
+                        addEnergy(300);
+                        counter--;
                     }
                 });
             }
