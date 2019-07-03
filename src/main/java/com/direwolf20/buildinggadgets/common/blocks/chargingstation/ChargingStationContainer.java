@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.common.blocks.chargingstation;
 
+import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGContainers;
 import com.direwolf20.buildinggadgets.common.util.exceptions.CapabilityNotPresentException;
 import net.minecraft.client.Minecraft;
@@ -8,6 +9,7 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.IntReferenceHolder;
 import net.minecraft.util.math.BlockPos;
@@ -33,9 +35,9 @@ public class ChargingStationContainer extends Container {
         super(BGContainers.CHARGING_STATION_CONTAINER, windowId);//TODO fix once we get access to ContainerTypes
         BlockPos pos = extraData.readBlockPos();
         this.te = (ChargingStationTileEntity) Minecraft.getInstance().world.getTileEntity(pos);
-
-        addPlayerSlots(playerInventory);
         addOwnSlots();
+        addPlayerSlots(playerInventory);
+
 
         func_216958_a(new IntReferenceHolder() {
             @Override
@@ -60,8 +62,9 @@ public class ChargingStationContainer extends Container {
     public ChargingStationContainer(int windowId, World world, BlockPos pos, PlayerInventory playerInventory, PlayerEntity player) {
         super(BGContainers.CHARGING_STATION_CONTAINER, windowId);
         this.te = (ChargingStationTileEntity) world.getTileEntity(pos);
-        addPlayerSlots(playerInventory);
         addOwnSlots();
+        addPlayerSlots(playerInventory);
+
 
         func_216958_a(new IntReferenceHolder() {
             @Override
@@ -117,24 +120,35 @@ public class ChargingStationContainer extends Container {
         Slot slot = this.inventorySlots.get(index);
 
         if (slot != null && slot.getHasStack()) {
-            ItemStack itemstack1 = slot.getStack();
-            //if (!(itemstack1.getItem() instanceof GadgetCopyPaste) && !itemstack1.getItem().equals(Items.PAPER) && !(itemstack1.getItem() instanceof Template))
-            //    return itemstack;
-            itemstack = itemstack1.copy();
-
+            ItemStack stack = slot.getStack();
+            itemstack = stack.copy();
             if (index < ChargingStationTileEntity.SIZE) {
-                if (!this.mergeItemStack(itemstack1, ChargingStationTileEntity.SIZE, this.inventorySlots.size(), true)) {
+                if (!this.mergeItemStack(stack, ChargingStationTileEntity.SIZE, this.inventorySlots.size(), true)) {
                     return ItemStack.EMPTY;
                 }
-            } else if (!this.mergeItemStack(itemstack1, 0, ChargingStationTileEntity.SIZE, false)) {
-                return ItemStack.EMPTY;
+                slot.onSlotChange(stack, itemstack);
+            } else {
+                if (stack.getItem() instanceof GadgetGeneric) {
+                    if (!this.mergeItemStack(stack, 1, 2, false)) {
+                        return ItemStack.EMPTY;
+                    }
+                } else if (stack.getItem() == Items.COAL) {
+                    if (!this.mergeItemStack(stack, 0, 1, false)) {
+                        return ItemStack.EMPTY;
+                    }
+                }
             }
-
-            if (itemstack1.isEmpty()) {
+            if (stack.isEmpty()) {
                 slot.putStack(ItemStack.EMPTY);
             } else {
                 slot.onSlotChanged();
             }
+
+            if (stack.getCount() == itemstack.getCount()) {
+                return ItemStack.EMPTY;
+            }
+
+            slot.onTake(p_82846_1_, stack);
         }
 
         return itemstack;

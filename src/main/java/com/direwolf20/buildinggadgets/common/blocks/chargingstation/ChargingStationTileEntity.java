@@ -2,6 +2,8 @@ package com.direwolf20.buildinggadgets.common.blocks.chargingstation;
 
 import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
+import com.direwolf20.buildinggadgets.common.util.CapabilityUtil;
+import com.direwolf20.buildinggadgets.common.util.exceptions.CapabilityNotPresentException;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.google.common.collect.ImmutableSet;
 import net.minecraft.entity.player.PlayerEntity;
@@ -168,24 +170,36 @@ public class ChargingStationTileEntity extends TileEntity implements ITickableTi
         return new ChargingStationContainer(0, playerIn.world, this.pos, playerIn.inventory, playerIn);
     }
 
+    public void addEnergy(int amount) {
+        energy.ifPresent(e -> ((CustomEnergyStorage) e).addEnergy(amount));
+    }
+
     @Override
     public void tick() {
         LazyOptional<IItemHandler> handler = getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
         if (!world.isRemote) {
             if (counter > 0) {
+                addEnergy(1000);
                 counter--;
-                if (counter <= 0) {
-                    energy.ifPresent(e -> ((CustomEnergyStorage) e).addEnergy(1000));
-                }
             } else {
                 handler.ifPresent(h -> {
                     ItemStack stack = h.getStackInSlot(0);
-                    if (stack.getItem() == Items.COAL) {
+                    if (stack.getItem() == Items.COAL && getEnergyStored() < getMaxEnergyStored()) {
                         h.extractItem(0, 1, false);
-                        counter = 20;
+                        addEnergy(1000);
+                        counter = 23;
                     }
                 });
             }
+            handler.ifPresent(h -> {
+                ItemStack stack = h.getStackInSlot(1);
+                if (!stack.isEmpty()) {
+                    IEnergyStorage energy = CapabilityUtil.EnergyUtil.getCap(stack).orElseThrow(CapabilityNotPresentException::new);
+                    if (getEnergyStored() > 0 && energy.getEnergyStored() < energy.getMaxEnergyStored()) {
+                        addEnergy(energy.receiveEnergy(Math.min(10000, getEnergyStored()), false) * -1);
+                    }
+                }
+            });
         }
     }
 }
