@@ -3,7 +3,6 @@ package com.direwolf20.buildinggadgets.common;
 import com.direwolf20.buildinggadgets.api.APIProxy;
 import com.direwolf20.buildinggadgets.client.ClientProxy;
 import com.direwolf20.buildinggadgets.client.gui.GuiMod;
-import com.direwolf20.buildinggadgets.common.commands.BlockMapCommand;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.config.crafting.CraftingConditionDestruction;
 import com.direwolf20.buildinggadgets.common.config.crafting.CraftingConditionPaste;
@@ -12,7 +11,6 @@ import com.direwolf20.buildinggadgets.common.events.AnvilRepairHandler;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.registry.objects.BuildingObjects;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
-import net.minecraft.command.Commands;
 import net.minecraft.item.crafting.IRecipeSerializer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
@@ -88,11 +86,11 @@ public class BuildingGadgets {
     }
 
     private void serverLoad(FMLServerStartingEvent event) {
-        event.getCommandDispatcher().register(
+        /*event.getCommandDispatcher().register(
                 Commands.literal(Reference.MODID)
                     .then(BlockMapCommand.registerList())
                     .then(BlockMapCommand.registerDelete())
-        );
+        );*/
     }
 
     private void finishLoad(FMLLoadCompleteEvent event) {
