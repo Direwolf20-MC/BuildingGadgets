@@ -1,0 +1,10 @@
+{
+  "parent": "buildinggadgets:block/orientable",
+  "textures": {
+    "particle": "buildinggadgets:blocks/charging_station_side",
+    "front": "buildinggadgets:blocks/charging_station_frontoff",
+    "top": "buildinggadgets:blocks/charging_station_top",
+    "bottom": "buildinggadgets:blocks/charging_station_bottom",
+    "side": "buildinggadgets:blocks/charging_station_side"
+  }
+}
