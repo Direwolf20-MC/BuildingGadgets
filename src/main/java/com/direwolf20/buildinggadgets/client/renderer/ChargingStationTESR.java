@@ -1,5 +1,6 @@
-package com.direwolf20.buildinggadgets.common.blocks.chargingstation;
+package com.direwolf20.buildinggadgets.client.renderer;
 
+import com.direwolf20.buildinggadgets.common.tiles.ChargingStationTileEntity;
 import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderHelper;

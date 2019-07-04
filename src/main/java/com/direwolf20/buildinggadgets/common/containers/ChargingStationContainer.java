@@ -1,12 +1,12 @@
-package com.direwolf20.buildinggadgets.common.blocks.chargingstation;
+package com.direwolf20.buildinggadgets.common.containers;
 
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGContainers;
+import com.direwolf20.buildinggadgets.common.tiles.ChargingStationTileEntity;
 import com.direwolf20.buildinggadgets.common.util.exceptions.CapabilityNotPresentException;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
@@ -22,42 +22,25 @@ import net.minecraftforge.items.SlotItemHandler;
 
 import javax.annotation.Nonnull;
 
-public class ChargingStationContainer extends Container {
+public class ChargingStationContainer extends BaseContainer {
     private ChargingStationTileEntity te;
 
     public ChargingStationContainer(int windowId, PlayerInventory playerInventory) {
-        super(BGContainers.CHARGING_STATION_CONTAINER, windowId);//TODO fix once we get access to ContainerTypes
+        super(BGContainers.CHARGING_STATION_CONTAINER, windowId);
         //addOwnSlots();
         //addPlayerSlots(playerInventory);
     }
 
     public ChargingStationContainer(int windowId, PlayerInventory playerInventory, PacketBuffer extraData) {
-        super(BGContainers.CHARGING_STATION_CONTAINER, windowId);//TODO fix once we get access to ContainerTypes
+        super(BGContainers.CHARGING_STATION_CONTAINER, windowId);
         BlockPos pos = extraData.readBlockPos();
         this.te = (ChargingStationTileEntity) Minecraft.getInstance().world.getTileEntity(pos);
         addOwnSlots();
         addPlayerSlots(playerInventory);
 
 
-        func_216958_a(new IntReferenceHolder() {
-            @Override
-            public int get() {
-                return getEnergy();
-            }
-
-            @Override
-            public void set(int value) {
-                te.getCapability(CapabilityEnergy.ENERGY).ifPresent(h -> ((CustomEnergyStorage) h).setEnergy(value));
-            }
-        });
+        func_216958_a(createEnergySync());
     }
-
-    /*public ChargingStationContainer(int windowId, PlayerInventory playerInventory, ChargingStationTileEntity tileEntity) {
-        this(windowId, playerInventory);
-        this.te = Objects.requireNonNull(tileEntity);
-        addPlayerSlots(playerInventory);
-        addOwnSlots();
-    }*/
 
     public ChargingStationContainer(int windowId, World world, BlockPos pos, PlayerInventory playerInventory, PlayerEntity player) {
         super(BGContainers.CHARGING_STATION_CONTAINER, windowId);
@@ -66,7 +49,11 @@ public class ChargingStationContainer extends Container {
         addPlayerSlots(playerInventory);
 
 
-        func_216958_a(new IntReferenceHolder() {
+        func_216958_a(createEnergySync());
+    }
+
+    private IntReferenceHolder createEnergySync() {
+        return new IntReferenceHolder() {
             @Override
             public int get() {
                 return getEnergy();
@@ -74,33 +61,18 @@ public class ChargingStationContainer extends Container {
 
             @Override
             public void set(int value) {
-                te.getCapability(CapabilityEnergy.ENERGY).ifPresent(h -> ((CustomEnergyStorage) h).setEnergy(value));
+                te.getCapability(CapabilityEnergy.ENERGY).ifPresent(h -> {
+                    h.extractEnergy(Integer.MAX_VALUE, true);
+                    h.receiveEnergy(value, true);
+                });
             }
-        });
+        };
     }
+
 
     @Override
     public boolean canInteractWith(PlayerEntity playerIn) {
         return getTe().canInteractWith(playerIn);
-    }
-
-    private void addPlayerSlots(PlayerInventory playerInventory) {
-        // Slots for the hotbar
-        for (int row = 0; row < 9; ++row) {
-            int x = 8 + row * 18;
-            int y = 58 + 84;
-            addSlot(new Slot(playerInventory, row, x, y));
-        }
-        // Slots for the main inventory
-        for (int row = 0; row < 3; ++row) {
-            for (int col = 0; col < 9; ++col) {
-                int x = 8 + col * 18;
-                int y = row * 18 + 84;
-                addSlot(new Slot(playerInventory, col + row * 9 + 9, x, y));
-            }
-        }
-
-
     }
 
     private void addOwnSlots() {

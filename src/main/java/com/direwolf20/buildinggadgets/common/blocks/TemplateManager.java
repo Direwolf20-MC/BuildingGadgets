@@ -1,12 +1,19 @@
-package com.direwolf20.buildinggadgets.common.blocks.chargingstation;
+package com.direwolf20.buildinggadgets.common.blocks;
 
-import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
+import com.direwolf20.buildinggadgets.client.gui.GuiMod;
+import com.direwolf20.buildinggadgets.common.containers.TemplateManagerContainer;
+import com.direwolf20.buildinggadgets.common.items.ITemplate;
+import com.direwolf20.buildinggadgets.common.network.PacketHandler;
+import com.direwolf20.buildinggadgets.common.network.packets.PacketBlockMap;
+import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks.BGTileEntities;
+import com.direwolf20.buildinggadgets.common.tiles.TemplateManagerTileEntity;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.inventory.container.INamedContainerProvider;
 import net.minecraft.item.BlockItemUseContext;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.state.DirectionProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.state.properties.BlockStateProperties;
@@ -17,14 +24,13 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.network.NetworkHooks;
 
 import javax.annotation.Nullable;
 
-public class ChargingStation extends Block {
+public class TemplateManager extends Block {
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
 
-    public ChargingStation(Properties builder) {
+    public TemplateManager(Properties builder) {
         super(builder);
         setDefaultState(getStateContainer().getBaseState().with(FACING, Direction.NORTH));
     }
@@ -49,7 +55,7 @@ public class ChargingStation extends Block {
     @Nullable
     @Override
     public TileEntity createTileEntity(BlockState state, IBlockReader world) {
-        return BGBlocks.BGTileEntities.CHARGING_STATION_TYPE.create();
+        return BGTileEntities.TEMPLATE_MANAGER_TYPE.create();
     }
 
     @Override
@@ -59,13 +65,24 @@ public class ChargingStation extends Block {
             return true;
         }
         TileEntity te = worldIn.getTileEntity(pos);
-        if (!(te instanceof ChargingStationTileEntity)) {
+        if (!(te instanceof TemplateManagerTileEntity)) {
             return false;
         }
-        ChargingStationContainer container = ((ChargingStationTileEntity) te).getContainer((PlayerEntity) player);
-        NetworkHooks.openGui((ServerPlayerEntity) player, (INamedContainerProvider) te, te.getPos());
-        //System.out.println(te.getCapability(CapabilityEnergy.ENERGY).map(IEnergyStorage::getEnergyStored).orElse(0));
-        //GuiMod.CHARGING_STATION.openContainer(player, worldIn, pos);
+        TemplateManagerContainer container = ((TemplateManagerTileEntity) te).getContainer((PlayerEntity) player);
+        for (int i = 0; i <= 1; i++) {
+            ItemStack itemStack = container.getSlot(i).getStack();
+            if (!(itemStack.getItem() instanceof ITemplate)) continue;
+
+            ITemplate template = (ITemplate) itemStack.getItem();
+            String UUID = template.getUUID(itemStack);
+            if (UUID == null) continue;
+
+            CompoundNBT tagCompound = template.getWorldSave(worldIn).getCompoundFromUUID(UUID);
+            if (tagCompound != null) {
+                PacketHandler.sendTo(new PacketBlockMap(tagCompound), (ServerPlayerEntity) player);
+            }
+        }
+        GuiMod.TEMPLATE_MANAGER.openContainer(player, worldIn, pos);
         return true;
     }
 }

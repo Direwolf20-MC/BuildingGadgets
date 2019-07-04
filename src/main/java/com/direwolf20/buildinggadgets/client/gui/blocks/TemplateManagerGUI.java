@@ -3,18 +3,21 @@
  * Chisel is Open Source and distributed under GNU GPL v2
  */
 
-package com.direwolf20.buildinggadgets.common.blocks.templatemanager;
+package com.direwolf20.buildinggadgets.client.gui.blocks;
 
 import com.direwolf20.buildinggadgets.client.gui.components.AreaHelpText;
 import com.direwolf20.buildinggadgets.client.gui.components.GuiButtonHelp;
 import com.direwolf20.buildinggadgets.client.gui.components.GuiButtonHelpText;
 import com.direwolf20.buildinggadgets.client.gui.components.IHoverHelpText;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
+import com.direwolf20.buildinggadgets.common.blocks.TemplateManagerCommands;
+import com.direwolf20.buildinggadgets.common.containers.TemplateManagerContainer;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketTemplateManagerLoad;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketTemplateManagerPaste;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketTemplateManagerSave;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
+import com.direwolf20.buildinggadgets.common.tiles.TemplateManagerTileEntity;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.buffers.PasteToolBufferBuilder;
 import com.direwolf20.buildinggadgets.common.util.buffers.ToolBufferBuilder;

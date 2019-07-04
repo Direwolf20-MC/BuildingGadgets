@@ -1,13 +1,12 @@
-package com.direwolf20.buildinggadgets.common.blocks.templatemanager;
+package com.direwolf20.buildinggadgets.common.containers;
 
 import com.direwolf20.buildinggadgets.common.registry.objects.BGContainers;
+import com.direwolf20.buildinggadgets.common.tiles.TemplateManagerTileEntity;
 import com.direwolf20.buildinggadgets.common.util.exceptions.CapabilityNotPresentException;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
@@ -18,7 +17,7 @@ import net.minecraftforge.items.IItemHandler;
 import javax.annotation.Nonnull;
 import java.util.Objects;
 
-public class TemplateManagerContainer extends Container {
+public class TemplateManagerContainer extends BaseContainer {
     public static final String TEXTURE_LOC_SLOT_TOOL = Reference.MODID + ":gui/slot_copy_paste_gadget";
     public static final String TEXTURE_LOC_SLOT_TEMPLATE = Reference.MODID + ":gui/slot_template";
     private TemplateManagerTileEntity te;
@@ -47,24 +46,6 @@ public class TemplateManagerContainer extends Container {
     @Override
     public boolean canInteractWith(PlayerEntity playerIn) {
         return getTe().canInteractWith(playerIn);
-    }
-
-    private void addPlayerSlots(IInventory playerInventory) {
-        // Slots for the main inventory
-        for (int row = 0; row < 3; ++row) {
-            for (int col = 0; col < 9; ++col) {
-                int x = 8 + col * 18;
-                int y = row * 18 + 84;
-                addSlot(new Slot(playerInventory, col + row * 9 + 9, x, y));
-            }
-        }
-
-        // Slots for the hotbar
-        for (int row = 0; row < 9; ++row) {
-            int x = 8 + row * 18;
-            int y = 58 + 84;
-            addSlot(new Slot(playerInventory, row, x, y));
-        }
     }
 
     private void addOwnSlots() {

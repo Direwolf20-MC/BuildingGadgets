@@ -2,15 +2,15 @@ package com.direwolf20.buildinggadgets.client.gui;
 
 //import com.direwolf20.buildinggadgets.client.gui.materiallist.MaterialListGUI;
 
+import com.direwolf20.buildinggadgets.client.gui.blocks.ChargingStationGUI;
+import com.direwolf20.buildinggadgets.client.gui.blocks.TemplateManagerGUI;
 import com.direwolf20.buildinggadgets.client.gui.components.GuiTextFieldBase;
-import com.direwolf20.buildinggadgets.common.blocks.chargingstation.ChargingStationContainer;
-import com.direwolf20.buildinggadgets.common.blocks.chargingstation.ChargingStationGUI;
-import com.direwolf20.buildinggadgets.common.blocks.chargingstation.ChargingStationTileEntity;
-import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManagerContainer;
-import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManagerGUI;
-import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManagerTileEntity;
+import com.direwolf20.buildinggadgets.common.containers.ChargingStationContainer;
+import com.direwolf20.buildinggadgets.common.containers.TemplateManagerContainer;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetDestruction;
+import com.direwolf20.buildinggadgets.common.tiles.ChargingStationTileEntity;
+import com.direwolf20.buildinggadgets.common.tiles.TemplateManagerTileEntity;
 import com.direwolf20.buildinggadgets.common.util.lang.LangUtil;
 import com.google.common.base.Function;
 import com.google.common.base.Supplier;

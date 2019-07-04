@@ -1,15 +1,15 @@
 package com.direwolf20.buildinggadgets.common.registry.objects;
 
+import com.direwolf20.buildinggadgets.client.renderer.ChargingStationTESR;
 import com.direwolf20.buildinggadgets.common.blocks.*;
-import com.direwolf20.buildinggadgets.common.blocks.chargingstation.ChargingStation;
-import com.direwolf20.buildinggadgets.common.blocks.chargingstation.ChargingStationTileEntity;
-import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManager;
-import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManagerTileEntity;
 import com.direwolf20.buildinggadgets.common.registry.block.BlockBuilder;
 import com.direwolf20.buildinggadgets.common.registry.block.BlockRegistryContainer;
 import com.direwolf20.buildinggadgets.common.registry.block.tile.TileEntityBuilder;
 import com.direwolf20.buildinggadgets.common.registry.block.tile.TileEntityRegistryContainer;
 import com.direwolf20.buildinggadgets.common.registry.block.tile.TileEntityTypeBuilder;
+import com.direwolf20.buildinggadgets.common.tiles.ChargingStationTileEntity;
+import com.direwolf20.buildinggadgets.common.tiles.ConstructionBlockTileEntity;
+import com.direwolf20.buildinggadgets.common.tiles.TemplateManagerTileEntity;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference.BlockReference;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference.TileEntityReference;
@@ -78,10 +78,10 @@ public final class BGBlocks {
         container.add(new BlockBuilder(BlockReference.CHARGING_STATION_RL)
                 .builder(Block.Properties.create(Material.ROCK).hardnessAndResistance(2f))
                 .item(itemProperties())
-                .withTileEntity(new TileEntityBuilder<>(TileEntityReference.CHARGING_STATION_TILE_RL)
+                .withTileEntity(new TileEntityBuilder<ChargingStationTileEntity>(TileEntityReference.CHARGING_STATION_TILE_RL)
                         .builder(new TileEntityTypeBuilder<>(ChargingStationTileEntity::new))
-                        .factory(TileEntityTypeBuilder::build))
-                //.renderer(ChargingStationTileEntity.class, new ChargingStationTESR()))
+                        .factory(TileEntityTypeBuilder::build)
+                        .renderer(ChargingStationTileEntity.class, new ChargingStationTESR()))
                 .factory(ChargingStation::new));
     }
 

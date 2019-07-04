@@ -6,7 +6,6 @@ import com.direwolf20.buildinggadgets.api.template.building.tilesupport.DummyTil
 import com.direwolf20.buildinggadgets.client.events.EventTooltip;
 import com.direwolf20.buildinggadgets.client.gui.GuiMod;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlock;
-import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.common.items.ITemplate;
@@ -14,6 +13,7 @@ import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketBlockMap;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketRotateMirror;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
+import com.direwolf20.buildinggadgets.common.tiles.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.util.CapabilityUtil;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.blocks.BlockMap;

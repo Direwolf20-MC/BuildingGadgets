@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.common.registry.objects;
 
-import com.direwolf20.buildinggadgets.common.blocks.chargingstation.ChargingStationContainer;
-import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManagerContainer;
+import com.direwolf20.buildinggadgets.common.containers.ChargingStationContainer;
+import com.direwolf20.buildinggadgets.common.containers.TemplateManagerContainer;
 import com.direwolf20.buildinggadgets.common.registry.RegistryContainer;
 import com.direwolf20.buildinggadgets.common.registry.SimpleRegistryObjectBuilder;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;

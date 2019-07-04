@@ -1,8 +1,8 @@
 package com.direwolf20.buildinggadgets.common.network.packets;
 
-import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManagerCommands;
-import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManagerContainer;
-import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManagerTileEntity;
+import com.direwolf20.buildinggadgets.common.blocks.TemplateManagerCommands;
+import com.direwolf20.buildinggadgets.common.containers.TemplateManagerContainer;
+import com.direwolf20.buildinggadgets.common.tiles.TemplateManagerTileEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;

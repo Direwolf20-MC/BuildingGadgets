@@ -1,6 +1,7 @@
-package com.direwolf20.buildinggadgets.common.blocks.templatemanager;
+package com.direwolf20.buildinggadgets.common.blocks;
 
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
+import com.direwolf20.buildinggadgets.common.containers.TemplateManagerContainer;
 import com.direwolf20.buildinggadgets.common.items.ITemplate;
 import com.direwolf20.buildinggadgets.common.items.Template;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
