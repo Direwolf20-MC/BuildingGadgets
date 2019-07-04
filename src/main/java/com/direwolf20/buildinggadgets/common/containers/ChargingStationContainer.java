@@ -39,7 +39,7 @@ public class ChargingStationContainer extends BaseContainer {
         addPlayerSlots(playerInventory);
 
 
-        func_216958_a(createEnergySync());
+        //func_216958_a(createEnergySync());
     }
 
     public ChargingStationContainer(int windowId, World world, BlockPos pos, PlayerInventory playerInventory, PlayerEntity player) {
@@ -49,7 +49,7 @@ public class ChargingStationContainer extends BaseContainer {
         addPlayerSlots(playerInventory);
 
 
-        func_216958_a(createEnergySync());
+        //func_216958_a(createEnergySync());
     }
 
     private IntReferenceHolder createEnergySync() {

@@ -1,10 +1,10 @@
 package com.direwolf20.buildinggadgets.common.items.gadgets;
 
 
+import com.direwolf20.buildinggadgets.common.capability.CapabilityProviderBlockProvider;
+import com.direwolf20.buildinggadgets.common.capability.CapabilityProviderEnergy;
+import com.direwolf20.buildinggadgets.common.capability.MultiCapabilityProvider;
 import com.direwolf20.buildinggadgets.common.config.Config;
-import com.direwolf20.buildinggadgets.common.items.capability.CapabilityProviderBlockProvider;
-import com.direwolf20.buildinggadgets.common.items.capability.CapabilityProviderEnergy;
-import com.direwolf20.buildinggadgets.common.items.capability.MultiCapabilityProvider;
 import com.direwolf20.buildinggadgets.common.util.CapabilityUtil.EnergyUtil;
 import com.direwolf20.buildinggadgets.common.util.exceptions.CapabilityNotPresentException;
 import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
@@ -30,7 +30,6 @@ import net.minecraftforge.energy.IEnergyStorage;
 
 import javax.annotation.Nullable;
 import java.util.List;
-import java.util.Random;
 
 import static com.direwolf20.buildinggadgets.common.util.GadgetUtils.withSuffix;
 
@@ -51,8 +50,6 @@ public abstract class GadgetGeneric extends Item {
 
     public abstract int getEnergyCost(ItemStack tool);
 
-    public abstract int getDamageCost(ItemStack tool);
-
     @Override
     @Nullable
     public ICapabilityProvider initCapabilities(ItemStack stack, @Nullable CompoundNBT tag) {
@@ -67,10 +64,6 @@ public abstract class GadgetGeneric extends Item {
     @Override
     public boolean isRepairable() {
         return false;
-    }
-
-    public static boolean poweredByFE() {
-        return Config.GADGETS.poweredByFE.get();
     }
 
     @Override
@@ -124,19 +117,13 @@ public abstract class GadgetGeneric extends Item {
         if (player.isCreative())
             return true;
 
-        if (poweredByFE()) {
-            IEnergyStorage energy = EnergyUtil.getCap(tool).orElseThrow(CapabilityNotPresentException::new);
-            return getEnergyCost(tool) <= energy.getEnergyStored();
-        }
-        return tool.getDamage() < tool.getMaxDamage() || tool.getStack().isDamageable();
+        IEnergyStorage energy = EnergyUtil.getCap(tool).orElseThrow(CapabilityNotPresentException::new);
+        return getEnergyCost(tool) <= energy.getEnergyStored();
     }
 
     public void applyDamage(ItemStack tool, ServerPlayerEntity player) {
-        if (poweredByFE()) {
-            IEnergyStorage energy = EnergyUtil.getCap(tool).orElseThrow(CapabilityNotPresentException::new);
-            energy.extractEnergy(getEnergyCost(tool), false);
-        } else
-            tool.attemptDamageItem(getDamageCost(tool), new Random(), player);
+        IEnergyStorage energy = EnergyUtil.getCap(tool).orElseThrow(CapabilityNotPresentException::new);
+        energy.extractEnergy(getEnergyCost(tool), false);
     }
 
     protected void addEnergyInformation(List<ITextComponent> tooltip, ItemStack stack) {

@@ -141,8 +141,6 @@ public class ToolRenders {
                 LazyOptional<IEnergyStorage> energy = EnergyUtil.getCap(stack);
                 if (energy.isPresent()) {
                     hasEnergy = energy.orElseThrow(CapabilityNotPresentException::new).getEnergyStored();
-                } else {
-                    hasEnergy = stack.getMaxDamage() - stack.getDamage();
                 }
                 if (player.isCreative() || (energy.isPresent() && !stack.isDamageable())) {
                     hasEnergy = 1000000;
@@ -197,8 +195,6 @@ public class ToolRenders {
                     hasBlocks--;
                     if (energy.isPresent()) {
                         hasEnergy -= ((GadgetGeneric) stack.getItem()).getEnergyCost(heldItem);
-                    } else {
-                        hasEnergy -= ((GadgetGeneric) stack.getItem()).getDamageCost(heldItem);
                     }
                     if (hasBlocks < 0 || hasEnergy < 0) {
                         mc.getBlockRendererDispatcher().renderBlockBrightness(Blocks.RED_STAINED_GLASS.getDefaultState(), 1f);
@@ -335,8 +331,6 @@ public class ToolRenders {
                 hasBlocks--;
                 if (energy.isPresent()) {
                     hasEnergy -= (((GadgetGeneric) stack.getItem())).getEnergyCost(stack);
-                } else {
-                    hasEnergy -= (((GadgetGeneric) stack.getItem())).getDamageCost(stack);
                 }
                 if (hasBlocks < 0 || hasEnergy < 0) {
                     mc.getBlockRendererDispatcher().renderBlockBrightness(Blocks.RED_STAINED_GLASS.getDefaultState(), 1f);

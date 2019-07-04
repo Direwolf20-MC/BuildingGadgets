@@ -87,18 +87,8 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
     }
 
     @Override
-    public int getMaxDamage(ItemStack stack) {
-        return Config.GADGETS.poweredByFE.get() ? 0 : Config.GADGETS.GADGET_COPY_PASTE.durability.get();
-    }
-
-    @Override
     public int getEnergyCost(ItemStack tool) {
         return Config.GADGETS.GADGET_COPY_PASTE.energyCost.get();
-    }
-
-    @Override
-    public int getDamageCost(ItemStack tool) {
-        return Config.GADGETS.GADGET_COPY_PASTE.durabilityCost.get();
     }
 
     private static void setAnchor(ItemStack stack, BlockPos anchorPos) {

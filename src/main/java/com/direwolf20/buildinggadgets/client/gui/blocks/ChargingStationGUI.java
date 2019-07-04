@@ -9,10 +9,10 @@ import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
 
 public class ChargingStationGUI extends ContainerScreen<ChargingStationContainer> {
 
-    private ChargingStationTileEntity te;
     private ChargingStationContainer container;
 
     private static final ResourceLocation background = new ResourceLocation(Reference.MODID, "textures/gui/template_manager.png");
@@ -20,11 +20,10 @@ public class ChargingStationGUI extends ContainerScreen<ChargingStationContainer
     public ChargingStationGUI(ChargingStationContainer container, PlayerInventory playerInventory, ITextComponent title) {
         super(container, playerInventory, title);
         this.container = container;
-        this.te = container.getTe();
     }
 
     public ChargingStationGUI(ChargingStationTileEntity tileEntity, ChargingStationContainer container, PlayerInventory inv) {
-        super(container, inv, null); //TODO find out the usage of this TextComponent
+        super(container, inv, new StringTextComponent("Charging station"));
         //this.te = tileEntity;
         //this.container = container;
     }

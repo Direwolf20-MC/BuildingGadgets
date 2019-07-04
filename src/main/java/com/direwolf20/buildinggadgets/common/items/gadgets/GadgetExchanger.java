@@ -66,18 +66,8 @@ public class GadgetExchanger extends GadgetGeneric {
     }
 
     @Override
-    public int getMaxDamage(ItemStack stack) {
-        return Config.GADGETS.poweredByFE.get() ? 0 : Config.GADGETS.GADGET_EXCHANGER.durability.get();
-    }
-
-    @Override
     public int getEnergyCost(ItemStack tool) {
         return Config.GADGETS.GADGET_EXCHANGER.energyCost.get();
-    }
-
-    @Override
-    public int getDamageCost(ItemStack tool) {
-        return Config.GADGETS.GADGET_EXCHANGER.durabilityCost.get();
     }
 
     @Override

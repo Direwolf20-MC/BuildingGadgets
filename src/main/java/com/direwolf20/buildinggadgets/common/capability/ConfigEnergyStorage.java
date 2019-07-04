@@ -1,21 +1,15 @@
-package com.direwolf20.buildinggadgets.common.items.capability;
+package com.direwolf20.buildinggadgets.common.capability;
 
-import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
-import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
 import net.minecraftforge.energy.IEnergyStorage;
 
 import java.util.function.IntSupplier;
 
-public final class ItemEnergyForge implements IEnergyStorage {
-    private final ItemStack stack;
+public abstract class ConfigEnergyStorage implements IEnergyStorage {
     private final IntSupplier capacitySupplier;
     private int energy;
 
-    public ItemEnergyForge(ItemStack stack, IntSupplier capacity) {
+    public ConfigEnergyStorage(IntSupplier capacity) {
         this.capacitySupplier = capacity;
-        this.stack = stack;
         this.energy = 0;
     }
 
@@ -33,7 +27,7 @@ public final class ItemEnergyForge implements IEnergyStorage {
     @Override
     public int receiveEnergy(int maxReceive, boolean simulate) {
         int energyReceived = Math.min(getMaxEnergyStored() - getEnergyStored(), maxReceive);
-        if (!simulate) {
+        if (! simulate) {
             energy += energyReceived;
             writeEnergy();
         }
@@ -43,7 +37,7 @@ public final class ItemEnergyForge implements IEnergyStorage {
     @Override
     public int extractEnergy(int maxExtract, boolean simulate) {
         int energyExtracted = Math.min(getEnergyStored(), maxExtract);
-        if (!simulate) {
+        if (! simulate) {
             energy -= energyExtracted;
             writeEnergy();
         }
@@ -68,23 +62,19 @@ public final class ItemEnergyForge implements IEnergyStorage {
         return true;
     }
 
-    private int getEnergyStoredCache() {
+    public void setEnergy(int energy) {
+        this.energy = energy;
+    }
+
+    protected int getEnergyStoredCache() {
         return energy;
     }
 
-    private void writeEnergy() {
-        CompoundNBT nbt = GadgetUtils.enforceHasTag(stack);
-        nbt.putInt(NBTKeys.ENERGY, getEnergyStoredCache());
-    }
+    protected abstract void writeEnergy();
 
-    private void updateEnergy() {
-        CompoundNBT nbt = GadgetUtils.enforceHasTag(stack);
-        if (nbt.contains(NBTKeys.ENERGY))
-            this.energy = nbt.getInt(NBTKeys.ENERGY) ;
-        updateMaxEnergy();
-    }
+    protected abstract void updateEnergy();
 
-    private void updateMaxEnergy() {
-        this.energy = Math.min(getMaxEnergyStored(),energy);
+    protected void updateMaxEnergy() {
+        this.energy = Math.min(getMaxEnergyStored(), energy);
     }
 }

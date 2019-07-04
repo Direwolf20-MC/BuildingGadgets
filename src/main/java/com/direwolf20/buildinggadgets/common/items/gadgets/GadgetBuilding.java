@@ -62,19 +62,10 @@ public class GadgetBuilding extends GadgetGeneric implements IAtopPlacingGadget 
         return Config.GADGETS.GADGET_BUILDING.maxEnergy.get();
     }
 
-    @Override
-    public int getMaxDamage(ItemStack stack) {
-        return Config.GADGETS.poweredByFE.get() ? 0 : Config.GADGETS.GADGET_BUILDING.durability.get();
-    }
 
     @Override
     public int getEnergyCost(ItemStack tool) {
         return Config.GADGETS.GADGET_BUILDING.energyCost.get();
-    }
-
-    @Override
-    public int getDamageCost(ItemStack tool) {
-        return Config.GADGETS.GADGET_BUILDING.durabilityCost.get();
     }
 
     @Override

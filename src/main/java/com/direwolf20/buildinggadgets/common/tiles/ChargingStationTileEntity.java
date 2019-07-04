@@ -1,5 +1,7 @@
 package com.direwolf20.buildinggadgets.common.tiles;
 
+import com.direwolf20.buildinggadgets.common.capability.ConfigEnergyStorage;
+import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.containers.ChargingStationContainer;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
 import com.direwolf20.buildinggadgets.common.util.CapabilityUtil;
@@ -22,7 +24,6 @@ import net.minecraft.util.text.StringTextComponent;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.CapabilityEnergy;
-import net.minecraftforge.energy.EnergyStorage;
 import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
@@ -39,33 +40,14 @@ public class ChargingStationTileEntity extends TileEntity implements ITickableTi
     private static final int CHARGE_SLOT = 1;
     private int counter;
 
-    private final IEnergyStorage energy;
+    private final ConfigEnergyStorage energy;
     private final LazyOptional<IEnergyStorage> energyCap;
+    private final LazyOptional<IItemHandler> itemCap;
 
-    public ChargingStationTileEntity() {
-        super(BGBlocks.BGTileEntities.CHARGING_STATION_TYPE);
-        energy = new EnergyStorage(10000); //TODO config
-        energyCap = LazyOptional.of(this::getEnergy);
-    }
 
-    @Override
-    public ITextComponent getDisplayName() {
-        return new StringTextComponent(getType().getRegistryName().getPath());
-    }
-
-    @Nullable
-    @Override
-    public Container createMenu(int i, PlayerInventory playerInventory, PlayerEntity playerEntity) {
-        Preconditions.checkArgument(getWorld() != null);
-        return new ChargingStationContainer(i, getWorld(), pos, playerInventory, playerEntity);
-    }
-
-    // This item handler will hold our inventory slots
     private final ItemStackHandler itemStackHandler = new ItemStackHandler(SIZE) {
         @Override
         protected void onContentsChanged(int slot) {
-            // We need to tell the tile entity that something has changed so
-            // that the chest contents is persisted
             ChargingStationTileEntity.this.markDirty();
         }
 
@@ -81,8 +63,37 @@ public class ChargingStationTileEntity extends TileEntity implements ITickableTi
         }
     };
 
+    public ChargingStationTileEntity() {
+        super(BGBlocks.BGTileEntities.CHARGING_STATION_TYPE);
+        energy = new ConfigEnergyStorage(Config.CHARGING_STATION.capacity::get) {
+            @Override
+            protected void writeEnergy() {
+                ChargingStationTileEntity.this.markDirty();
+            }
+
+            @Override
+            protected void updateEnergy() {
+
+            }
+        }; //TODO config
+        energyCap = LazyOptional.of(this::getEnergy);
+        itemCap = LazyOptional.of(this::getItemStackHandler);
+    }
+
+    @Override
+    public ITextComponent getDisplayName() {
+        return new StringTextComponent(getType().getRegistryName().getPath());
+    }
+
+    @Nullable
+    @Override
+    public Container createMenu(int i, PlayerInventory playerInventory, PlayerEntity playerEntity) {
+        Preconditions.checkArgument(getWorld() != null);
+        return new ChargingStationContainer(i, getWorld(), pos, playerInventory, playerEntity);
+    }
+
     @Nonnull
-    private IEnergyStorage getEnergy() {
+    private ConfigEnergyStorage getEnergy() {
         return energy;
     }
 
@@ -102,11 +113,11 @@ public class ChargingStationTileEntity extends TileEntity implements ITickableTi
     @Override
     public void read(CompoundNBT compound) {
         super.read(compound);
-
         if (compound.contains(NBTKeys.TE_TEMPLATE_MANAGER_ITEMS))
             itemStackHandler.deserializeNBT(compound.getCompound(NBTKeys.TE_TEMPLATE_MANAGER_ITEMS));
-        energy.extractEnergy(Integer.MAX_VALUE, false);
-        energy.receiveEnergy(compound.getInt(NBTKeys.ENERGY), false);
+        if (compound.contains(NBTKeys.ENERGY)) {
+            getEnergy().setEnergy(compound.getInt(NBTKeys.ENERGY));
+        }
     }
 
     @Override
@@ -127,35 +138,33 @@ public class ChargingStationTileEntity extends TileEntity implements ITickableTi
     @Override
     public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, final @Nullable Direction side) {
         if (cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
-            return LazyOptional.of(() -> itemStackHandler).cast();
+            return itemCap.cast();
         if (cap == CapabilityEnergy.ENERGY)
             return energyCap.cast();
         return super.getCapability(cap, side);
     }
 
-    public int addEnergy(int amount) {
-        return energy.receiveEnergy(amount, false);
+    private void addEnergy(int amount) {
+        energy.receiveEnergy(amount, false);
     }
 
     public ItemStack getRenderStack() {
-        LazyOptional<IItemHandler> handler = getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
-        LazyOptional<ItemStack> stack = handler.map(h -> h.getStackInSlot(1));
-        return stack.orElse(ItemStack.EMPTY);
+        return getChargeStack();
     }
 
     @Override
     public void tick() {
         if (getWorld() != null && ! getWorld().isRemote) {
-            if (counter > 0) {
-                addEnergy(300);
+            if (counter > 0 && getEnergy().receiveEnergy(Config.CHARGING_STATION.energyPerTick.get(), true) > 0) {
+                addEnergy(Config.CHARGING_STATION.energyPerTick.get());
                 counter--;
             } else {
                 ItemStack stack = getFuelStack();
                 int burnTime = GadgetUtils.getItemBurnTime(stack);
-                if (burnTime > 0 && getEnergy().getEnergyStored() < getEnergy().getMaxEnergyStored()) {
+                if (burnTime > 0 && getEnergy().receiveEnergy(Config.CHARGING_STATION.energyPerTick.get(), true) > 0) {
                     getItemStackHandler().extractItem(0, 1, false);
-                    counter = (int) Math.floor(burnTime / 20);
-                    addEnergy(300);
+                    counter = (int) Math.floor(burnTime / Config.CHARGING_STATION.fuelUsage.get());
+                    addEnergy(Config.CHARGING_STATION.energyPerTick.get());
                     counter--;
                 }
             }
@@ -163,7 +172,7 @@ public class ChargingStationTileEntity extends TileEntity implements ITickableTi
             if (! stack.isEmpty()) {
                 IEnergyStorage energy = CapabilityUtil.EnergyUtil.getCap(stack).orElseThrow(CapabilityNotPresentException::new);
                 if (getEnergy().getEnergyStored() > 0 && energy.getEnergyStored() < energy.getMaxEnergyStored())
-                    getEnergy().extractEnergy(energy.receiveEnergy(getEnergy().extractEnergy(Integer.MAX_VALUE, true), false), false);
+                    getEnergy().extractEnergy(energy.receiveEnergy(getEnergy().extractEnergy(Config.CHARGING_STATION.chargePerTick.get(), true), false), false);
             }
         }
     }

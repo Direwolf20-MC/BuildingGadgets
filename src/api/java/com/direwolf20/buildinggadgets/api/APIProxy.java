@@ -17,7 +17,7 @@ public enum APIProxy {
     private IApiConfig config = null;
 
     public APIProxy onCreate(IEventBus modEventbus, IEventBus forgeEventbus, IApiConfig config) {
-        Preconditions.checkState(this.modEventbus == null && this.forgeEventbus == null && this.config == null);
+        Preconditions.checkState(this.modEventbus == null && this.forgeEventbus == null);
         return createState(modEventbus,forgeEventbus,config);
     }
 
