@@ -5,25 +5,16 @@
 
 package com.direwolf20.buildinggadgets.client.gui.blocks;
 
-import com.direwolf20.buildinggadgets.client.gui.components.AreaHelpText;
 import com.direwolf20.buildinggadgets.client.gui.components.GuiButtonHelp;
 import com.direwolf20.buildinggadgets.client.gui.components.GuiButtonHelpText;
 import com.direwolf20.buildinggadgets.client.gui.components.IHoverHelpText;
-import com.direwolf20.buildinggadgets.common.BuildingGadgets;
-import com.direwolf20.buildinggadgets.common.blocks.TemplateManagerCommands;
 import com.direwolf20.buildinggadgets.common.containers.TemplateManagerContainer;
-import com.direwolf20.buildinggadgets.common.network.PacketHandler;
-import com.direwolf20.buildinggadgets.common.network.packets.PacketTemplateManagerLoad;
-import com.direwolf20.buildinggadgets.common.network.packets.PacketTemplateManagerPaste;
-import com.direwolf20.buildinggadgets.common.network.packets.PacketTemplateManagerSave;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
 import com.direwolf20.buildinggadgets.common.tiles.TemplateManagerTileEntity;
-import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.buffers.PasteToolBufferBuilder;
 import com.direwolf20.buildinggadgets.common.util.buffers.ToolBufferBuilder;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.mojang.blaze3d.platform.GlStateManager;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.gui.widget.button.Button;
@@ -39,17 +30,13 @@ import net.minecraft.client.renderer.vertex.VertexFormatElement;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.JsonToNBT;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
 import org.lwjgl.opengl.GL11;
 
 import javax.annotation.Nullable;
-import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
@@ -89,14 +76,15 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
     }
 
     public TemplateManagerGUI(TemplateManagerTileEntity tileEntity, TemplateManagerContainer container, PlayerInventory inv) {
-        super(container, inv, null); //TODO find out the usage of this TextComponent
+        super(container, inv, new StringTextComponent("Template Manager Gui")); //TODO find out the usage of this TextComponent
         this.te = tileEntity;
         this.container = container;
     }
 
     @Override
     public void render(int mouseX, int mouseY, float partialTicks) {
-        drawGuiContainerBackgroundLayer(partialTicks,mouseX,mouseY);
+        //TODO re-enable
+        /*drawGuiContainerBackgroundLayer(partialTicks,mouseX,mouseY);
         super.render(mouseX, mouseY, partialTicks);
         if (buttonHelp.isSelected()) {
             GlStateManager.color4f(1, 1, 1, 1);
@@ -114,10 +102,13 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
         }
         if (buttonHelp.isMouseOver(mouseX, mouseY))
             renderComponentHoverEffect(new StringTextComponent(buttonHelp.getHoverText()), mouseX, mouseY);
+         */
+        drawString(font, "Currently disabled", getGuiLeft() + getXSize() / 2, getGuiTop() + getYSize() / 2, 0);
     }
 
     @Override
     public void init() {
+        /*
         super.init();
         helpTextProviders.clear();
         buttonHelp = addButton(new GuiButtonHelp(this.guiLeft + this.xSize - 16, this.guiTop + 4, (button) -> buttonHelp.toggleSelected()));
@@ -155,6 +146,7 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
         helpTextProviders.add(new AreaHelpText(this.getContainer().getSlot(1), guiLeft, guiTop, "slot.template"));
         helpTextProviders.add(new AreaHelpText(guiLeft + 112, guiTop + 41, 22, 15, "arrow.data_flow"));
         helpTextProviders.add(new AreaHelpText(panel, guiLeft, guiTop + 10, "preview"));
+        */
     }
 
     private Button createAndAddButton(int x, int y, int witdth, int height, String text, @Nullable IPressable action) {
