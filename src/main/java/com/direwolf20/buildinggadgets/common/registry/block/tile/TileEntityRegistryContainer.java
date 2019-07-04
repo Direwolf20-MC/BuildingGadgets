@@ -1,10 +1,13 @@
 package com.direwolf20.buildinggadgets.common.registry.block.tile;
 
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
+import com.direwolf20.buildinggadgets.common.blocks.chargingstation.ChargingStationTESR;
+import com.direwolf20.buildinggadgets.common.blocks.chargingstation.ChargingStationTileEntity;
 import com.direwolf20.buildinggadgets.common.registry.ClientConstructContainer;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
@@ -40,6 +43,8 @@ public class TileEntityRegistryContainer extends ClientConstructContainer<TileEn
                 ++ count;
             }
         }
+        ClientRegistry.bindTileEntitySpecialRenderer(ChargingStationTileEntity.class, new ChargingStationTESR());
+        ++count;
         BuildingGadgets.LOG.info("Finished registering {} {} TileEntityRenderer's", count, Reference.MODID);
     }
 

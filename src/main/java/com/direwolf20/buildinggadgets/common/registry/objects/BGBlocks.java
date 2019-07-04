@@ -81,6 +81,7 @@ public final class BGBlocks {
                 .withTileEntity(new TileEntityBuilder<>(TileEntityReference.CHARGING_STATION_TILE_RL)
                         .builder(new TileEntityTypeBuilder<>(ChargingStationTileEntity::new))
                         .factory(TileEntityTypeBuilder::build))
+                //.renderer(ChargingStationTileEntity.class, new ChargingStationTESR()))
                 .factory(ChargingStation::new));
     }
 

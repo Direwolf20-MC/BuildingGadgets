@@ -175,6 +175,12 @@ public class ChargingStationTileEntity extends TileEntity implements ITickableTi
         energy.ifPresent(e -> ((CustomEnergyStorage) e).addEnergy(amount));
     }
 
+    public ItemStack getRenderStack() {
+        LazyOptional<IItemHandler> handler = getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
+        LazyOptional<ItemStack> stack = handler.map(h -> h.getStackInSlot(1));
+        return stack.orElse(ItemStack.EMPTY);
+    }
+
     @Override
     public void tick() {
         LazyOptional<IItemHandler> handler = getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
