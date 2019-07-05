@@ -320,19 +320,8 @@ public class GadgetDestruction extends GadgetGeneric {
         if (!player.isAllowEdit()) {
             return false;
         }
-        if (!world.isBlockModifiable(player, voidPos)) {
-            return false;
-        }
 
-        // Todo: Find out why we are calling a place event and why we are checking for Remote on an event
-        if (!world.isRemote) {
-            BlockSnapshot blockSnapshot = BlockSnapshot.getBlockSnapshot(world, voidPos);
-            if (ForgeEventFactory.onPlayerBlockPlace(player, blockSnapshot, EnumFacing.UP, EnumHand.MAIN_HAND).isCanceled())
-                return false;
-
-            return GadgetGeneric.EmitEvent.breakBlock(world, voidPos, currentBlock, player);
-        }
-        return true;
+        return world.isBlockModifiable(player, voidPos);
     }
 
     private void clearArea(World world, BlockPos pos, EnumFacing side, EntityPlayer player, ItemStack stack) {
@@ -430,6 +419,9 @@ public class GadgetDestruction extends GadgetGeneric {
             return false;
 
         if( !this.canUse(tool, player) )
+            return false;
+
+        if( !GadgetGeneric.EmitEvent.breakBlock(world, voidPos, world.getBlockState(voidPos), player) )
             return false;
 
         this.applyDamage(tool, player);
