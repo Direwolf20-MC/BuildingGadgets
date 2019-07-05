@@ -22,13 +22,18 @@ import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.client.settings.GameSettings;
 import net.minecraft.client.settings.KeyBinding;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TextFormatting;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.vector.Vector2f;
 
@@ -422,6 +427,19 @@ public class ModeRadialMenu extends GuiScreen {
 
     private void changeMode() {
         if (slotSelected >= 0) {
+            Item gadget = getGadget().getItem();
+
+            // This should logically never fail but implementing a way to ensure that would
+            // be a pretty solid idea for the next guy to touch this code.
+            String mode;
+            if( gadget instanceof GadgetBuilding )
+                mode = BuildingModes.values()[slotSelected].toString();
+            else if( gadget instanceof GadgetExchanger )
+                mode = ExchangingModes.values()[slotSelected].toString();
+            else
+                mode = GadgetCopyPaste.ToolMode.values()[slotSelected].toString();
+
+            mc.player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + I18n.format("message.gadget.toolmode", mode)), true);
             PacketHandler.INSTANCE.sendToServer(new PacketToggleMode(slotSelected));
             ModSounds.BEEP.playSound();
         }

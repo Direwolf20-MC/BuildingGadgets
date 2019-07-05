@@ -118,15 +118,10 @@ public class GadgetBuilding extends GadgetGeneric {
         return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, itemstack);
     }
 
-    public void toggleMode(EntityPlayer player, ItemStack heldItem) {//TODO unused
-        setMode(player, heldItem, getToolMode(heldItem).next().ordinal());
-    }
-
-    public void setMode(EntityPlayer player, ItemStack heldItem, int modeInt) {
+    public void setMode(ItemStack heldItem, int modeInt) {
         // Called when we specify a mode with the radial menu
         BuildingModes mode = BuildingModes.values()[modeInt];
         setToolMode(heldItem, mode);
-        player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.toolmode").getUnformattedComponentText() + ": " + mode), true);
     }
 
     public void rangeChange(EntityPlayer player, ItemStack heldItem) {
