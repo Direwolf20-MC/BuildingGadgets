@@ -6,19 +6,28 @@ import com.direwolf20.buildinggadgets.common.items.capability.CapabilityProvider
 import com.direwolf20.buildinggadgets.common.items.capability.CapabilityProviderEnergy;
 import com.direwolf20.buildinggadgets.common.items.capability.MultiCapabilityProvider;
 import com.direwolf20.buildinggadgets.common.tools.NBTTool;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraft.world.World;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
+import net.minecraftforge.common.util.BlockSnapshot;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
+import net.minecraftforge.event.ForgeEventFactory;
+import net.minecraftforge.event.world.BlockEvent;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -178,4 +187,23 @@ public abstract class GadgetGeneric extends ItemModBase {
         tooltip.add(TextFormatting.BLUE + I18n.format("tooltip.gadget.raytrace_fluid") + ": " + shouldRayTraceFluid(stack));
     }
 
+    public static class EmitEvent {
+        protected static boolean breakBlock(World world, BlockPos pos, IBlockState state, EntityPlayer player) {
+            BlockEvent.BreakEvent breakEvent = new BlockEvent.BreakEvent(world, pos, state, player);
+            MinecraftForge.EVENT_BUS.post(breakEvent);
+
+            return !breakEvent.isCanceled();
+        }
+
+        protected static boolean placeBlock(EntityPlayer player, BlockSnapshot snapshot, EnumFacing facing, EnumHand hand) {
+            BlockEvent.PlaceEvent event = ForgeEventFactory.onPlayerBlockPlace(
+                    player,
+                    snapshot,
+                    facing,
+                    hand
+            );
+
+            return !event.isCanceled();
+        }
+    }
 }

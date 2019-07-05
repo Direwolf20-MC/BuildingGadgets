@@ -238,12 +238,7 @@ public class GadgetExchanger extends GadgetGeneric {
             return false;
         }
 
-        BlockSnapshot blockSnapshot = BlockSnapshot.getBlockSnapshot(world, pos);
-        if (ForgeEventFactory.onPlayerBlockPlace(player, blockSnapshot, EnumFacing.UP, EnumHand.MAIN_HAND).isCanceled()) {
-            return false;
-        }
-        BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(world, pos, currentBlock, player);
-        if (MinecraftForge.EVENT_BUS.post(e)) {
+        if (!GadgetGeneric.EmitEvent.breakBlock(world, pos, currentBlock, player)) {
             return false;
         }
 
@@ -256,6 +251,11 @@ public class GadgetExchanger extends GadgetGeneric {
         this.applyDamage(tool, player);
 
         currentBlock.getBlock().harvestBlock(world, player, pos, currentBlock, world.getTileEntity(pos), tool);
+
+        BlockSnapshot blockSnapshot = BlockSnapshot.getBlockSnapshot(world, pos);
+        if (!GadgetGeneric.EmitEvent.placeBlock(player, blockSnapshot, player.getHorizontalFacing(), player.getActiveHand())) {
+            return false;
+        }
 
         boolean useItemSuccess;
         if (useConstructionPaste) {

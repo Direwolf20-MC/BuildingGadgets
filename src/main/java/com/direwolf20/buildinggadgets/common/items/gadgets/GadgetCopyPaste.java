@@ -528,10 +528,11 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
         if (!world.isBlockModifiable(player, pos)) {
             return;
         }
+
         BlockSnapshot blockSnapshot = BlockSnapshot.getBlockSnapshot(world, pos);
-        if (ForgeEventFactory.onPlayerBlockPlace(player, blockSnapshot, EnumFacing.UP, EnumHand.MAIN_HAND).isCanceled()) {
+        if( !GadgetGeneric.EmitEvent.placeBlock(player, blockSnapshot, EnumFacing.UP, EnumHand.MAIN_HAND) )
             return;
-        }
+
         ItemStack constructionPaste = new ItemStack(ModItems.constructionPaste);
         boolean useConstructionPaste = false;
         if (InventoryManipulation.countItem(itemStack, player, world) < neededItems) {
@@ -595,8 +596,8 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
             double distance = blockMap.pos.getDistance(player.getPosition().getX(), player.getPosition().getY(), player.getPosition().getZ());
             boolean sameDim = (player.dimension == dimension);
             IBlockState currentBlock = world.getBlockState(blockMap.pos);
-            BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(world, blockMap.pos, currentBlock, player);
-            boolean cancelled = MinecraftForge.EVENT_BUS.post(e);
+
+            boolean cancelled = GadgetGeneric.EmitEvent.breakBlock(world, blockMap.pos, currentBlock, player);
             if (distance < 256 && !cancelled && sameDim) { //Don't allow us to undo a block while its still being placed or too far away
                 if (currentBlock.getBlock() == blockMap.state.getBlock() || currentBlock.getBlock() instanceof ConstructionBlock) {
                     if (currentBlock.getBlockHardness(world, blockMap.pos) >= 0) {

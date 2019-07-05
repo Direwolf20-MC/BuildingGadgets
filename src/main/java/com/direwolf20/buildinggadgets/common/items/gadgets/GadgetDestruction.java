@@ -323,13 +323,14 @@ public class GadgetDestruction extends GadgetGeneric {
         if (!world.isBlockModifiable(player, voidPos)) {
             return false;
         }
+
+        // Todo: Find out why we are calling a place event and why we are checking for Remote on an event
         if (!world.isRemote) {
             BlockSnapshot blockSnapshot = BlockSnapshot.getBlockSnapshot(world, voidPos);
             if (ForgeEventFactory.onPlayerBlockPlace(player, blockSnapshot, EnumFacing.UP, EnumHand.MAIN_HAND).isCanceled())
                 return false;
 
-            BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(world, voidPos, currentBlock, player);
-            return !MinecraftForge.EVENT_BUS.post(e);
+            return GadgetGeneric.EmitEvent.breakBlock(world, voidPos, currentBlock, player);
         }
         return true;
     }
@@ -406,6 +407,11 @@ public class GadgetDestruction extends GadgetGeneric {
             IBlockState state = world.getBlockState(posState.getPos());
             if (!state.getBlock().isAir(state, world, posState.getPos()) && !state.getMaterial().isLiquid())
                 return;
+
+            // Per block place event to let mods override specific parts of the undo.
+            BlockSnapshot blockSnapshot = BlockSnapshot.getBlockSnapshot(world, posState.getPos());
+            if( !GadgetGeneric.EmitEvent.placeBlock(player, blockSnapshot, EnumFacing.UP, EnumHand.MAIN_HAND) )
+                continue;
 
             world.spawnEntity(new BlockBuildEntity(world, posState.getPos(), player, posState.getState(), 1, posState.getState(), posState.isPaste()));
             success = true;
