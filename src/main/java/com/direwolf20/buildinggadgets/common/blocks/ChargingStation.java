@@ -54,6 +54,12 @@ public class ChargingStation extends Block {
     }
 
     @Override
+    @Deprecated
+    public boolean isSolid(BlockState state) {
+        return false;
+    }
+
+    @Override
     public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult blockRayTraceResult) {
         // Only execute on the server
         if (worldIn.isRemote)

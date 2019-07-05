@@ -12,11 +12,12 @@ import net.minecraft.item.ItemStack;
 public class ChargingStationTESR extends TileEntityRenderer<ChargingStationTileEntity> {
 
     public ChargingStationTESR() {
-        System.out.println("Newed");
+        //System.out.println("Newed");
     }
 
     @Override
     public void render(ChargingStationTileEntity te, double x, double y, double z, float partialTicks, int destroyStage) {
+        GlStateManager.pushLightingAttributes();
         GlStateManager.pushMatrix();
 
         // Translate to the location of our tile entity
@@ -27,6 +28,7 @@ public class ChargingStationTESR extends TileEntityRenderer<ChargingStationTileE
         renderItem(te);
 
         GlStateManager.popMatrix();
+        GlStateManager.popAttributes();
     }
 
     private void renderItem(ChargingStationTileEntity te) {
@@ -36,7 +38,7 @@ public class ChargingStationTESR extends TileEntityRenderer<ChargingStationTileE
             GlStateManager.enableLighting();
             GlStateManager.pushMatrix();
             // Translate to the center of the block and .9 points higher
-            GlStateManager.translatef((float) .5, (float) 1.25, (float) .5);
+            GlStateManager.translatef((float) .5, (float) 1.5, (float) .5);
             GlStateManager.scalef(.4f, .4f, .4f);
 
             Minecraft.getInstance().getItemRenderer().renderItem(stack, ItemCameraTransforms.TransformType.NONE);
