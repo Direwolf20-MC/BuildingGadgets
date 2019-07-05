@@ -221,7 +221,7 @@ public class GadgetBuilding extends GadgetGeneric {
                 double distance = coord.getDistance(player.getPosition().getX(), player.getPosition().getY(), player.getPosition().getZ());
                 boolean sameDim = (player.dimension == dimension);
 
-                boolean cancelled = GadgetGeneric.EmitEvent.breakBlock(world, coord, currentBlock, player);
+                boolean cancelled = !GadgetGeneric.EmitEvent.breakBlock(world, coord, currentBlock, player);
 
                 if (distance < 64 && sameDim && currentBlock != ModBlocks.effectBlock.getDefaultState() && !cancelled) { //Don't allow us to undo a block while its still being placed or too far away
                     if (currentBlock != Blocks.AIR.getDefaultState()) {
