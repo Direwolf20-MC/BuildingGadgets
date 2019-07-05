@@ -21,7 +21,7 @@ import java.util.*;
 import java.util.function.BiPredicate;
 
 public enum BuildingModes {
-    TargetedAxisChasing("build_to_me.png", new BuildToMeMode(BuildingModes::combineTester)),
+    BuildToMe("build_to_me.png", new BuildToMeMode(BuildingModes::combineTester)),
     VerticalColumn("vertical_column.png", new BuildingVerticalColumnMode(BuildingModes::combineTester)),
     HorizontalColumn("horizontal_column.png", new BuildingHorizontalColumnMode(BuildingModes::combineTester)),
     VerticalWall("vertical_wall.png", new VerticalWallMode(BuildingModes::combineTester)),
@@ -69,7 +69,7 @@ public enum BuildingModes {
         return Arrays.stream(values())
                 .filter(mode -> mode.getRegistryName().equals(name))
                 .findFirst()
-                .orElse(TargetedAxisChasing);
+                .orElse(BuildToMe);
     }
 
     private static final ImmutableList<ResourceLocation> ICONS = Arrays.stream(values())

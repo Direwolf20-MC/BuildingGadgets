@@ -23,10 +23,8 @@ import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldType;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.BlockSnapshot;
 import net.minecraftforge.event.ForgeEventFactory;
-import net.minecraftforge.event.world.BlockEvent;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -88,7 +86,7 @@ public class GadgetBuilding extends GadgetGeneric {
         list.add(TextFormatting.DARK_GREEN + I18n.format("tooltip.gadget.block") + ": " + getToolBlock(stack).getBlock().getLocalizedName());
         BuildingModes mode = getToolMode(stack);
         list.add(TextFormatting.AQUA + I18n.format("tooltip.gadget.mode") + ": " + (mode == BuildingModes.Surface && getConnectedArea(stack) ? I18n.format("tooltip.gadget.connected") + " " : "") + mode);
-        if (getToolMode(stack) != BuildingModes.TargetedAxisChasing)
+        if (getToolMode(stack) != BuildingModes.BuildToMe)
             list.add(TextFormatting.LIGHT_PURPLE + I18n.format("tooltip.gadget.range") + ": " + getToolRange(stack));
 
         if (getToolMode(stack) == BuildingModes.Surface)
@@ -125,7 +123,7 @@ public class GadgetBuilding extends GadgetGeneric {
     }
 
     public void setMode(EntityPlayer player, ItemStack heldItem, int modeInt) {
-        //Called when we specify a mode with the radial menu
+        // Called when we specify a mode with the radial menu
         BuildingModes mode = BuildingModes.values()[modeInt];
         setToolMode(heldItem, mode);
         player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.toolmode").getUnformattedComponentText() + ": " + mode), true);
