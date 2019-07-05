@@ -21,7 +21,7 @@ public class ChargingStationTESR extends TileEntityRenderer<ChargingStationTileE
         GlStateManager.pushMatrix();
 
         // Translate to the location of our tile entity
-        GlStateManager.translatef((float) x, (float) y, (float) z);
+        GlStateManager.translated(x, y, z);
         GlStateManager.disableRescaleNormal();
 
         // Render our item
@@ -38,9 +38,10 @@ public class ChargingStationTESR extends TileEntityRenderer<ChargingStationTileE
             GlStateManager.enableLighting();
             GlStateManager.pushMatrix();
             // Translate to the center of the block and .9 points higher
-            GlStateManager.translatef((float) .5, (float) 1.5, (float) .5);
+            GlStateManager.translated(.5, 1.5, .5);
             GlStateManager.scalef(.4f, .4f, .4f);
-
+            float rotation = (float) (getWorld().getGameTime() % 80);
+            GlStateManager.rotatef(360f * rotation / 80f, 0, 1, 0);
             Minecraft.getInstance().getItemRenderer().renderItem(stack, ItemCameraTransforms.TransformType.NONE);
 
             GlStateManager.popMatrix();

@@ -108,6 +108,7 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
 
     @Override
     public void init() {
+        this.nameField = new TextFieldWidget(this.font, this.guiLeft + 8, this.guiTop + 6, 149, this.font.FONT_HEIGHT, "name?");
         /*
         super.init();
         helpTextProviders.clear();
@@ -136,7 +137,6 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
             }
         }));
 
-        this.nameField = new TextFieldWidget(this.font, this.guiLeft + 8, this.guiTop + 6, 149, this.font.FONT_HEIGHT, "name?");
         this.nameField.setMaxStringLength(50);
         this.nameField.setVisible(true);
         children.add(nameField);

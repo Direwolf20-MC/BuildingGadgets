@@ -75,7 +75,7 @@ public class ChargingStationTileEntity extends TileEntity implements ITickableTi
             protected void updateEnergy() {
 
             }
-        }; //TODO config
+        };
         energyCap = LazyOptional.of(this::getEnergy);
         itemCap = LazyOptional.of(this::getItemStackHandler);
     }
