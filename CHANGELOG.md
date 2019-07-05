@@ -1,12 +1,37 @@
 # Building Gadgets Changelog
 The format of this document is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and should continue to adhere to the conventions outlined in the Keep a Changelog guidelines.
 
-## [Unreleased]
+## [Unreleased] [3.0.0 - 1.13]
+- Nothing yet
+
+## [2.7.0 - 1.12.2] - Date to be added.
+### Note: 
+A note for this update, due to the pure amount of changes made between this version and the previous version we're just going
+to put it out there that this one might be a bit buggy! 🐛 If you encounter any issues with how the mod used to work to how it works now
+please be sure to create a new issue on the [Github Repo](https://github.com/Direwolf20-MC/BuildingGadgets/issues)
+
+## Added
+- Added a new and fancy Material List GUI for templates. Simply shift right click with a template in your hand to see the list.
+  - With this you can also now copy the material list right into your clipboard!
+- Some people where finding it hard to open the Copy & Paste Gadgets GUI in tight spaces so to help with this we've added a button in the Radial Menu (G) to go straight to it :)
+
 ## Changed
 - The Building and Exchanging Gadgets mode System, to make it more open for future additions. Thanks @hnOsmium001 for his PR.
-    - This also resulted in a lot of changes - please report any bugs you might encounter
+    - This also resulted in a lot of changes - please report any bugs you might encounter as a lot of the core functionality has been changed in this version.
+- Updated the Destruction Gadget's GUI as it needed some scaling and usability work. It's better but it's not pretty! Soz.
+- The destruction gadget now uses a different kind of magic for finding connected blocks. This should resolve any issues people have been having with less powerful 
+computers and large selection ranges.
+- Added slightly better handling of random crashes to hopefully reduce them... Wish us luck.
+
 ### Fixed
-- Fix typo when pasting **a** link 
+- Fix typo when pasting **a** link
+- Fixed an issue where linked inventories (Yeah, you can link loads of them now. Just shift right click with a supported Gadget!) would stay highlighted in different dimensions.
+- Fixed an odd one where linked inventories would throw out items if the dimension got deleted.
+- Fixed an exploit where the Exchanging Gadget could be used as a way to mine large areas quickly.
+- Fixed an issue with the new modes system using the Building Gadgets range in `Build To Me` mode which wasn't even close to right.
+
+### For Devs
+- We're now firing Break & Place block events for each of our tools semi correctly. We've not been able to do large scale tests so if you have any more issues then let us know.
 
 ## [2.6.8] - 2019-03-24
 ### Added
