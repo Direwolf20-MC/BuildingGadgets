@@ -25,6 +25,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.util.Constants.BlockFlags;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
@@ -44,6 +45,7 @@ public class ChargingStationTileEntity extends TileEntity implements ITickableTi
     private static final int UPDATE_FLAG_INVENTORY = 2;
     private static final int UPDATE_FLAG_ENERGY = 1;
     private static final int UPDATE_FLAG_ALL = UPDATE_FLAG_INVENTORY | UPDATE_FLAG_ENERGY;
+    private final int SEND_UPDATE_NO_RENDER = BlockFlags.NOTIFY_LISTENERS | BlockFlags.NO_RERENDER;
     private int updateNeeded;
     private int counter;
     private int renderCounter = 0;
@@ -61,7 +63,7 @@ public class ChargingStationTileEntity extends TileEntity implements ITickableTi
                 ChargingStationTileEntity.this.markDirty();
                 updateNeeded |= UPDATE_FLAG_ENERGY;
                 if (getWorld() != null && ! getWorld().isRemote()) //TODO this is unnecessary overhead: replace with custom update packet and update System... Similar to DataManger
-                    getWorld().notifyBlockUpdate(getPos(), getBlockState(), getBlockState(), 2);
+                    getWorld().notifyBlockUpdate(getPos(), getBlockState(), getBlockState(), SEND_UPDATE_NO_RENDER);
             }
 
             @Override
@@ -75,7 +77,7 @@ public class ChargingStationTileEntity extends TileEntity implements ITickableTi
                 ChargingStationTileEntity.this.markDirty();
                 updateNeeded |= UPDATE_FLAG_INVENTORY;
                 if (getWorld() != null && ! getWorld().isRemote()) //TODO more efficient update System - see energy...s
-                    getWorld().notifyBlockUpdate(getPos(), getBlockState(), getBlockState(), 2);
+                    getWorld().notifyBlockUpdate(getPos(), getBlockState(), getBlockState(), SEND_UPDATE_NO_RENDER);
             }
 
             @Override
@@ -149,13 +151,17 @@ public class ChargingStationTileEntity extends TileEntity implements ITickableTi
     public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket packet) {
         // Here we get the packet from the server and read it into our client side tile entity
         CompoundNBT nbt = packet.getNbtCompound();
-
-        if ((packet.getTileEntityType() & UPDATE_FLAG_ENERGY) == UPDATE_FLAG_ENERGY)
+        boolean causeReRender = false; //required to update the render when items are inserted/extracted by a hopper for example
+        if ((packet.getTileEntityType() & UPDATE_FLAG_INVENTORY) == UPDATE_FLAG_INVENTORY) {
+            ItemStack renderOld = getRenderStack();
             readItemNBT(nbt);
-        if ((packet.getTileEntityType() & UPDATE_FLAG_INVENTORY) == UPDATE_FLAG_INVENTORY)
+            if (! renderOld.equals(getRenderStack(), false) && getWorld() != null)
+                causeReRender = true;
+        }
+        if ((packet.getTileEntityType() & UPDATE_FLAG_ENERGY) == UPDATE_FLAG_ENERGY)
             readEnergyNBT(nbt);
-        if (packet.getTileEntityType() != 0 && getWorld() != null)
-            getWorld().notifyBlockUpdate(getPos(), getBlockState(), getBlockState(), 2);
+        if (causeReRender) //implemented this way in order allow future expansion, when the render influences more things
+            getWorld().notifyBlockUpdate(getPos(), getBlockState(), getBlockState(), BlockFlags.NOTIFY_LISTENERS);
     }
 
     @Override
@@ -236,12 +242,11 @@ public class ChargingStationTileEntity extends TileEntity implements ITickableTi
                 if (getEnergy().getEnergyStored() > 0 && energy.getEnergyStored() < energy.getMaxEnergyStored()) {
                     getEnergy().extractEnergy(energy.receiveEnergy(getEnergy().extractEnergy(Config.CHARGING_STATION.chargePerTick.get(), true), false), false);
                     //Every second, when charging an item, send a sync packet to the client so it knows how far along it is for the render coloring
-                    if (renderCounter == 20) {
+                    if (renderCounter % 20 == 0) {
                         BlockState state = getWorld().getBlockState(getPos());
-                        getWorld().notifyBlockUpdate(getPos(), state, state, 3);
-                    } else {
-                        renderCounter++;
+                        getWorld().notifyBlockUpdate(getPos(), state, state, BlockFlags.NOTIFY_LISTENERS);
                     }
+                    renderCounter++;
                 }
             }
         }
