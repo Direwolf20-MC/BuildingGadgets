@@ -1,6 +1,8 @@
 package com.direwolf20.buildinggadgets.client.renderer;
 
 import com.direwolf20.buildinggadgets.common.tiles.ChargingStationTileEntity;
+import com.direwolf20.buildinggadgets.common.util.CapabilityUtil;
+import com.direwolf20.buildinggadgets.common.util.exceptions.CapabilityNotPresentException;
 import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
@@ -10,6 +12,7 @@ import net.minecraft.client.renderer.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.energy.IEnergyStorage;
 import org.lwjgl.opengl.GL11;
 
 
@@ -52,10 +55,28 @@ public class ChargingStationTESR extends TileEntityRenderer<ChargingStationTileE
         float y = 0;
         float z = 0;
 
-        float red = 0f;
-        float green = 1f;
-        float blue = 1f;
-        float alpha = 1f;
+        float red;
+        float green;
+        float blue;
+
+
+        ItemStack stack = te.getRenderStack();
+        if (stack.isEmpty()) return;
+        IEnergyStorage energy = CapabilityUtil.EnergyUtil.getCap(stack).orElseThrow(CapabilityNotPresentException::new);
+        int stored = energy.getEnergyStored();
+        int max = energy.getMaxEnergyStored();
+        if (stored == max) {
+            red = 0f;
+            green = 0.25f;
+            blue = 1f;
+        } else {
+            red = 1f - (float) stored / max;
+            green = (float) stored / max;
+            blue = 0f;
+        }
+
+
+        float alpha = 0.5f;
 
         GlStateManager.pushMatrix();
         GlStateManager.pushLightingAttributes();
@@ -92,19 +113,13 @@ public class ChargingStationTESR extends TileEntityRenderer<ChargingStationTileE
 
                 x = (float) (radius1 * cda);
                 y = (float) (radius1 * sda);
-                bufferBuilder.pos(x, y, z1).color(c1, c1, c1, 0.7f).endVertex();
-                //bufferBuilder.color(c1, c1, c1,0.7f);
-                //bufferBuilder.sortVertexData(x, y,z1);
+                bufferBuilder.pos(x, y, z1).color(red, green, blue, alpha).endVertex();
                 x = (float) (radius2 * cda);
                 y = (float) (radius2 * sda);
-                bufferBuilder.pos(x, y, z2).color(c2, c2, c2, 0.7f).endVertex();
-                //bufferBuilder.color(c2, c2,c2,0.7f);
-                //bufferBuilder.sortVertexData(x, y,z2);
+                bufferBuilder.pos(x, y, z2).color(red, green, blue, alpha).endVertex();
             }
             t.draw();
         }
-
-        //t.draw();
         GlStateManager.disableBlend();
         GlStateManager.enableTexture();
         GlStateManager.popAttributes();

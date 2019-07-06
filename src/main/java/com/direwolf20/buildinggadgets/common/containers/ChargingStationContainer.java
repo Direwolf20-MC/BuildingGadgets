@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.common.containers;
 
+import com.direwolf20.buildinggadgets.common.capability.ConfigEnergyStorage;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGContainers;
 import com.direwolf20.buildinggadgets.common.tiles.ChargingStationTileEntity;
@@ -39,7 +40,7 @@ public class ChargingStationContainer extends BaseContainer {
         addPlayerSlots(playerInventory);
 
 
-        //func_216958_a(createEnergySync());
+        func_216958_a(createEnergySync());
     }
 
     public ChargingStationContainer(int windowId, World world, BlockPos pos, PlayerInventory playerInventory, PlayerEntity player) {
@@ -49,7 +50,7 @@ public class ChargingStationContainer extends BaseContainer {
         addPlayerSlots(playerInventory);
 
 
-        //func_216958_a(createEnergySync());
+        func_216958_a(createEnergySync());
     }
 
     private IntReferenceHolder createEnergySync() {
@@ -61,10 +62,11 @@ public class ChargingStationContainer extends BaseContainer {
 
             @Override
             public void set(int value) {
-                te.getCapability(CapabilityEnergy.ENERGY).ifPresent(h -> {
+                /*te.getCapability(CapabilityEnergy.ENERGY).ifPresent(h -> {
                     h.extractEnergy(Integer.MAX_VALUE, true);
                     h.receiveEnergy(value, true);
-                });
+                });*/
+                te.getCapability(CapabilityEnergy.ENERGY).ifPresent(h -> ((ConfigEnergyStorage) h).setEnergy(value));
             }
         };
     }
