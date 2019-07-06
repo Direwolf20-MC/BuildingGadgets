@@ -123,16 +123,16 @@ public class Config {
             CLIENT_BUILDER.comment("Charging station settings")/*.translation(LANG_KEY_CHARGING_STATION)*/.push("charging_station");
             capacity = SERVER_BUILDER.comment("Define the maximum energy stored in the Charging Station.")
                     .translation(LANG_KEY_CHARGING_STATION + ".capacity")
-                    .defineInRange("Energy capacity", 500000, 1, Integer.MAX_VALUE);
+                    .defineInRange("Energy capacity", 1000000, 1, Integer.MAX_VALUE);
             fuelUsage = SERVER_BUILDER.comment("Define the speed factor, by which the fuel is going to be consumed.")
                     .translation(LANG_KEY_CHARGING_STATION + ".consume")
-                    .defineInRange("Fuel Usage", 20, 0.00000001, Double.MAX_VALUE);
+                    .defineInRange("Fuel Usage", 50, 0.00000001, Double.MAX_VALUE);
             energyPerTick = SERVER_BUILDER.comment("Define the amount of energy produced per fuel tick.")
                     .translation(LANG_KEY_CHARGING_STATION + ".fePerTick")
-                    .defineInRange("Energy Production", 300, 0, Integer.MAX_VALUE);
+                    .defineInRange("Energy Production", 750, 0, Integer.MAX_VALUE);
             chargePerTick = SERVER_BUILDER.comment("Define how much the charging station attempts to charge per tick")
                     .translation(LANG_KEY_CHARGING_STATION + ".chargePerTick")
-                    .defineInRange("Charge Energy", 10000, 0, Integer.MAX_VALUE);
+                    .defineInRange("Charge Energy", 2500, 0, Integer.MAX_VALUE);
             CLIENT_BUILDER.pop();
             COMMON_BUILDER.pop();
             SERVER_BUILDER.pop();

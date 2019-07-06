@@ -65,15 +65,17 @@ public class ChargingStationTESR extends TileEntityRenderer<ChargingStationTileE
         IEnergyStorage energy = CapabilityUtil.EnergyUtil.getCap(stack).orElseThrow(CapabilityNotPresentException::new);
         int stored = energy.getEnergyStored();
         int max = energy.getMaxEnergyStored();
-        if (stored == max) {
+        /*if (stored == max) {
             red = 0f;
             green = 0.25f;
             blue = 1f;
-        } else {
-            red = 1f - (float) stored / max;
-            green = (float) stored / max;
+        } else {*/
+        //red = 1f - (float) stored / max;
+        //green = (float) stored / max;
+        red = Math.min(2 * (1f - (float) stored / max), 1f);
+        green = Math.min(2 * ((float) stored / max), 1f);
             blue = 0f;
-        }
+        //}
 
 
         float alpha = 0.5f;

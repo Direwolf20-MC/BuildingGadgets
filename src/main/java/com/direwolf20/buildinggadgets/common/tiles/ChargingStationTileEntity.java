@@ -9,6 +9,7 @@ import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.exceptions.CapabilityNotPresentException;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.google.common.base.Preconditions;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.container.Container;
@@ -41,6 +42,7 @@ public class ChargingStationTileEntity extends TileEntity implements ITickableTi
     private static final int FUEL_SLOT = 0;
     private static final int CHARGE_SLOT = 1;
     private int counter;
+    private int renderCounter = 0;
 
     private final ConfigEnergyStorage energy;
     private final LazyOptional<IEnergyStorage> energyCap;
@@ -199,8 +201,16 @@ public class ChargingStationTileEntity extends TileEntity implements ITickableTi
             ItemStack stack = getChargeStack();
             if (! stack.isEmpty()) {
                 IEnergyStorage energy = CapabilityUtil.EnergyUtil.getCap(stack).orElseThrow(CapabilityNotPresentException::new);
-                if (getEnergy().getEnergyStored() > 0 && energy.getEnergyStored() < energy.getMaxEnergyStored())
+                if (getEnergy().getEnergyStored() > 0 && energy.getEnergyStored() < energy.getMaxEnergyStored()) {
                     getEnergy().extractEnergy(energy.receiveEnergy(getEnergy().extractEnergy(Config.CHARGING_STATION.chargePerTick.get(), true), false), false);
+                    //Every second, when charging an item, send a sync packet to the client so it knows how far along it is for the render coloring
+                    if (renderCounter == 20) {
+                        BlockState state = getWorld().getBlockState(getPos());
+                        getWorld().notifyBlockUpdate(getPos(), state, state, 3);
+                    } else {
+                        renderCounter++;
+                    }
+                }
             }
         }
     }
