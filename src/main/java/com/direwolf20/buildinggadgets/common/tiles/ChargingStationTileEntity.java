@@ -41,31 +41,17 @@ public class ChargingStationTileEntity extends TileEntity implements ITickableTi
     public static final int SIZE = 2;
     private static final int FUEL_SLOT = 0;
     private static final int CHARGE_SLOT = 1;
+    private static final int UPDATE_FLAG_INVENTORY = 2;
+    private static final int UPDATE_FLAG_ENERGY = 1;
+    private static final int UPDATE_FLAG_ALL = UPDATE_FLAG_INVENTORY | UPDATE_FLAG_ENERGY;
+    private int updateNeeded;
     private int counter;
     private int renderCounter = 0;
 
     private final ConfigEnergyStorage energy;
+    private final ItemStackHandler itemStackHandler;
     private final LazyOptional<IEnergyStorage> energyCap;
     private final LazyOptional<IItemHandler> itemCap;
-
-
-    private final ItemStackHandler itemStackHandler = new ItemStackHandler(SIZE) {
-        @Override
-        protected void onContentsChanged(int slot) {
-            ChargingStationTileEntity.this.markDirty();
-        }
-
-        @Override
-        @Nonnull
-        public ItemStack insertItem(int slot, @Nonnull ItemStack stack, boolean simulate) {
-            if (slot == FUEL_SLOT && GadgetUtils.getItemBurnTime(stack) <= 0)
-                return stack;
-            else if (slot == CHARGE_SLOT && (! stack.getCapability(CapabilityEnergy.ENERGY).isPresent() || getStackInSlot(slot).getCount() > 0))
-                return stack;
-
-            return super.insertItem(slot, stack, simulate);
-        }
-    };
 
     public ChargingStationTileEntity() {
         super(BGBlocks.BGTileEntities.CHARGING_STATION_TYPE);
@@ -73,6 +59,9 @@ public class ChargingStationTileEntity extends TileEntity implements ITickableTi
             @Override
             protected void writeEnergy() {
                 ChargingStationTileEntity.this.markDirty();
+                updateNeeded |= UPDATE_FLAG_ENERGY;
+                if (getWorld() != null && ! getWorld().isRemote()) //TODO this is unnecessary overhead: replace with custom update packet and update System... Similar to DataManger
+                    getWorld().notifyBlockUpdate(getPos(), getBlockState(), getBlockState(), 2);
             }
 
             @Override
@@ -80,8 +69,29 @@ public class ChargingStationTileEntity extends TileEntity implements ITickableTi
 
             }
         };
+        itemStackHandler = new ItemStackHandler(SIZE) {
+            @Override
+            protected void onContentsChanged(int slot) {
+                ChargingStationTileEntity.this.markDirty();
+                updateNeeded |= UPDATE_FLAG_INVENTORY;
+                if (getWorld() != null && ! getWorld().isRemote()) //TODO more efficient update System - see energy...s
+                    getWorld().notifyBlockUpdate(getPos(), getBlockState(), getBlockState(), 2);
+            }
+
+            @Override
+            @Nonnull
+            public ItemStack insertItem(int slot, @Nonnull ItemStack stack, boolean simulate) {
+                if (slot == FUEL_SLOT && GadgetUtils.getItemBurnTime(stack) <= 0)
+                    return stack;
+                else if (slot == CHARGE_SLOT && (! stack.getCapability(CapabilityEnergy.ENERGY).isPresent() || getStackInSlot(slot).getCount() > 0))
+                    return stack;
+
+                return super.insertItem(slot, stack, simulate);
+            }
+        };
         energyCap = LazyOptional.of(this::getEnergy);
         itemCap = LazyOptional.of(this::getItemStackHandler);
+        updateNeeded = UPDATE_FLAG_ALL;
     }
 
     @Override
@@ -115,53 +125,75 @@ public class ChargingStationTileEntity extends TileEntity implements ITickableTi
     }
 
     @Override
+    @Nonnull
     public CompoundNBT getUpdateTag() {
-        // getUpdateTag() is called whenever the chunkdata is sent to the
-        // client. In contrast getUpdatePacket() is called when the tile entity
-        // itself wants to sync to the client. In many cases you want to send
-        // over the same information in getUpdateTag() as in getUpdatePacket().
         return write(new CompoundNBT());
     }
 
     @Override
+    @Nullable
     public SUpdateTileEntityPacket getUpdatePacket() {
-        // Prepare a packet for syncing our TE to the client. Since we only have to sync the stack
-        // and that's all we have we just write our entire NBT here. If you have a complex
-        // tile entity that doesn't need to have all information on the client you can write
-        // a more optimal NBT here.
+        if (updateNeeded == 0)
+            return null;
         CompoundNBT nbtTag = new CompoundNBT();
-        this.write(nbtTag);
-        return new SUpdateTileEntityPacket(getPos(), 1, nbtTag);
+        if ((updateNeeded & UPDATE_FLAG_ENERGY) == UPDATE_FLAG_ENERGY)
+            writeEnergyNBT(nbtTag);
+        if ((updateNeeded & UPDATE_FLAG_INVENTORY) == UPDATE_FLAG_INVENTORY)
+            writeItemNBT(nbtTag);
+        SUpdateTileEntityPacket packet = new SUpdateTileEntityPacket(getPos(), updateNeeded, nbtTag);
+        updateNeeded = 0;
+        return packet;
     }
 
     @Override
     public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket packet) {
         // Here we get the packet from the server and read it into our client side tile entity
-        this.read(packet.getNbtCompound());
+        CompoundNBT nbt = packet.getNbtCompound();
+
+        if ((packet.getTileEntityType() & UPDATE_FLAG_ENERGY) == UPDATE_FLAG_ENERGY)
+            readItemNBT(nbt);
+        if ((packet.getTileEntityType() & UPDATE_FLAG_INVENTORY) == UPDATE_FLAG_INVENTORY)
+            readEnergyNBT(nbt);
+        if (packet.getTileEntityType() != 0 && getWorld() != null)
+            getWorld().notifyBlockUpdate(getPos(), getBlockState(), getBlockState(), 2);
     }
 
     @Override
     public void read(CompoundNBT compound) {
         super.read(compound);
-        if (compound.contains(NBTKeys.TE_TEMPLATE_MANAGER_ITEMS))
-            itemStackHandler.deserializeNBT(compound.getCompound(NBTKeys.TE_TEMPLATE_MANAGER_ITEMS));
-        if (compound.contains(NBTKeys.ENERGY)) {
-            getEnergy().setEnergy(compound.getInt(NBTKeys.ENERGY));
-        }
+        readItemNBT(compound);
+        readEnergyNBT(compound);
     }
 
     @Override
     @Nonnull
     public CompoundNBT write(CompoundNBT compound) {
-        compound.put(NBTKeys.TE_TEMPLATE_MANAGER_ITEMS, itemStackHandler.serializeNBT());
-        compound.putInt(NBTKeys.ENERGY, energy.extractEnergy(Integer.MAX_VALUE, true));
+        writeItemNBT(compound);
+        readEnergyNBT(compound);
         return super.write(compound);
     }
 
+    private void writeItemNBT(CompoundNBT compound) {
+        compound.put(NBTKeys.TE_TEMPLATE_MANAGER_ITEMS, itemStackHandler.serializeNBT());
+    }
+
+    private void writeEnergyNBT(CompoundNBT compound) {
+        compound.putInt(NBTKeys.ENERGY, energy.getEnergyStored());
+    }
+
+    private void readItemNBT(CompoundNBT compound) {
+        if (compound.contains(NBTKeys.TE_TEMPLATE_MANAGER_ITEMS))
+            itemStackHandler.deserializeNBT(compound.getCompound(NBTKeys.TE_TEMPLATE_MANAGER_ITEMS));
+    }
+
+    private void readEnergyNBT(CompoundNBT compound) {
+        if (compound.contains(NBTKeys.ENERGY))
+            getEnergy().setEnergy(compound.getInt(NBTKeys.ENERGY));
+    }
 
     public boolean canInteractWith(PlayerEntity playerIn) {
         // If we are too far away from this tile entity you cannot use it
-        return !isRemoved() && playerIn.getDistanceSq(new Vec3d(pos).add(0.5D, 0.5D, 0.5D)) <= 64D;
+        return ! isRemoved() && playerIn.getDistanceSq(new Vec3d(getPos()).add(0.5D, 0.5D, 0.5D)) <= 64D;
     }
 
     @Nonnull

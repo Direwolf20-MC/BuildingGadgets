@@ -1,6 +1,5 @@
 package com.direwolf20.buildinggadgets.common.containers;
 
-import com.direwolf20.buildinggadgets.common.capability.ConfigEnergyStorage;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGContainers;
 import com.direwolf20.buildinggadgets.common.tiles.ChargingStationTileEntity;
@@ -12,7 +11,6 @@ import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.AbstractFurnaceTileEntity;
-import net.minecraft.util.IntReferenceHolder;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.energy.CapabilityEnergy;
@@ -38,9 +36,6 @@ public class ChargingStationContainer extends BaseContainer {
         this.te = (ChargingStationTileEntity) Minecraft.getInstance().world.getTileEntity(pos);
         addOwnSlots();
         addPlayerSlots(playerInventory);
-
-
-        func_216958_a(createEnergySync());
     }
 
     public ChargingStationContainer(int windowId, World world, BlockPos pos, PlayerInventory playerInventory, PlayerEntity player) {
@@ -48,27 +43,6 @@ public class ChargingStationContainer extends BaseContainer {
         this.te = (ChargingStationTileEntity) world.getTileEntity(pos);
         addOwnSlots();
         addPlayerSlots(playerInventory);
-
-
-        func_216958_a(createEnergySync());
-    }
-
-    private IntReferenceHolder createEnergySync() {
-        return new IntReferenceHolder() {
-            @Override
-            public int get() {
-                return getEnergy();
-            }
-
-            @Override
-            public void set(int value) {
-                /*te.getCapability(CapabilityEnergy.ENERGY).ifPresent(h -> {
-                    h.extractEnergy(Integer.MAX_VALUE, true);
-                    h.receiveEnergy(value, true);
-                });*/
-                te.getCapability(CapabilityEnergy.ENERGY).ifPresent(h -> ((ConfigEnergyStorage) h).setEnergy(value));
-            }
-        };
     }
 
 
@@ -126,6 +100,7 @@ public class ChargingStationContainer extends BaseContainer {
 
             slot.onTake(p_82846_1_, stack);
         }
+        detectAndSendChanges();
 
         return itemstack;
     }
