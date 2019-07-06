@@ -15,6 +15,8 @@ import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.INamedContainerProvider;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.network.NetworkManager;
+import net.minecraft.network.play.server.SUpdateTileEntityPacket;
 import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
@@ -108,6 +110,32 @@ public class ChargingStationTileEntity extends TileEntity implements ITickableTi
 
     private ItemStack getFuelStack() {
         return getItemStackHandler().getStackInSlot(FUEL_SLOT);
+    }
+
+    @Override
+    public CompoundNBT getUpdateTag() {
+        // getUpdateTag() is called whenever the chunkdata is sent to the
+        // client. In contrast getUpdatePacket() is called when the tile entity
+        // itself wants to sync to the client. In many cases you want to send
+        // over the same information in getUpdateTag() as in getUpdatePacket().
+        return write(new CompoundNBT());
+    }
+
+    @Override
+    public SUpdateTileEntityPacket getUpdatePacket() {
+        // Prepare a packet for syncing our TE to the client. Since we only have to sync the stack
+        // and that's all we have we just write our entire NBT here. If you have a complex
+        // tile entity that doesn't need to have all information on the client you can write
+        // a more optimal NBT here.
+        CompoundNBT nbtTag = new CompoundNBT();
+        this.write(nbtTag);
+        return new SUpdateTileEntityPacket(getPos(), 1, nbtTag);
+    }
+
+    @Override
+    public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket packet) {
+        // Here we get the packet from the server and read it into our client side tile entity
+        this.read(packet.getNbtCompound());
     }
 
     @Override
