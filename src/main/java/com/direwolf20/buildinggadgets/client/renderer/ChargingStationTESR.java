@@ -3,10 +3,14 @@ package com.direwolf20.buildinggadgets.client.renderer;
 import com.direwolf20.buildinggadgets.common.tiles.ChargingStationTileEntity;
 import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.item.ItemStack;
+import org.lwjgl.opengl.GL11;
 
 
 public class ChargingStationTESR extends TileEntityRenderer<ChargingStationTileEntity> {
@@ -27,8 +31,88 @@ public class ChargingStationTESR extends TileEntityRenderer<ChargingStationTileE
         // Render our item
         renderItem(te);
 
+        //Render our sphere
+        renderSphere(te);
+
         GlStateManager.popMatrix();
         GlStateManager.popAttributes();
+    }
+
+    private void renderSphere(ChargingStationTileEntity te) {
+        double radius1 = 0;
+        double radius2 = 0;
+
+        double radius = .33; //radius of sphere
+        double segments = 50; // the number of division in the sphere
+
+        double angle = 0;
+        double dAngle = (Math.PI / segments);
+
+        float x = 0;
+        float y = 0;
+        float z = 0;
+
+        float red = 0f;
+        float green = 1f;
+        float blue = 1f;
+        float alpha = 1f;
+
+        GlStateManager.pushMatrix();
+        GlStateManager.pushLightingAttributes();
+
+        GlStateManager.enableBlend();
+        GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
+        GlStateManager.disableTexture();
+        GlStateManager.translated(.5, 1.5, .5);
+        //GlStateManager.depthMask(false);
+        GlStateManager.shadeModel(GL11.GL_SMOOTH);
+        Tessellator t = Tessellator.getInstance();
+
+        BufferBuilder bufferBuilder = t.getBuffer();
+        //bufferBuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
+        for (int i = 0; i < segments; i++) // loop latitude
+        {
+            angle = Math.PI / 2 - i * dAngle;
+            radius1 = radius * Math.cos(angle);
+            float z1 = (float) (radius * Math.sin(angle));
+            float c1 = (float) ((Math.PI / 2 + angle) / Math.PI);   //calculate a colour
+
+            angle = Math.PI / 2 - (i + 1) * dAngle;
+            radius2 = radius * Math.cos(angle);
+            float z2 = (float) (radius * Math.sin(angle));
+
+            float c2 = (float) ((Math.PI / 2 + angle) / Math.PI);   //calculate a colour
+
+            bufferBuilder.begin(GL11.GL_TRIANGLE_STRIP, DefaultVertexFormats.POSITION_COLOR);
+
+            for (int j = 0; j <= 2 * segments; j++) // loop longitude
+            {
+                double cda = Math.cos(j * dAngle);
+                double sda = Math.sin(j * dAngle);
+
+                x = (float) (radius1 * cda);
+                y = (float) (radius1 * sda);
+                bufferBuilder.pos(x, y, z1).color(c1, c1, c1, 0.7f).endVertex();
+                //bufferBuilder.color(c1, c1, c1,0.7f);
+                //bufferBuilder.sortVertexData(x, y,z1);
+                x = (float) (radius2 * cda);
+                y = (float) (radius2 * sda);
+                bufferBuilder.pos(x, y, z2).color(c2, c2, c2, 0.7f).endVertex();
+                //bufferBuilder.color(c2, c2,c2,0.7f);
+                //bufferBuilder.sortVertexData(x, y,z2);
+            }
+            t.draw();
+        }
+
+        //t.draw();
+        GlStateManager.disableBlend();
+        GlStateManager.enableTexture();
+        GlStateManager.popAttributes();
+        GlStateManager.popMatrix();
+    }
+
+    private void renderParticles(ChargingStationTileEntity te) {
+
     }
 
     private void renderItem(ChargingStationTileEntity te) {
