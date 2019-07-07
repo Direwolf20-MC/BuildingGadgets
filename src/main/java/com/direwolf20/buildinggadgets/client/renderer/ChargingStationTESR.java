@@ -15,11 +15,14 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.energy.IEnergyStorage;
 import org.lwjgl.opengl.GL11;
 
+import java.util.Random;
+
 
 public class ChargingStationTESR extends TileEntityRenderer<ChargingStationTileEntity> {
 
+    double x2 = 0;
+    double z2 = 0;
     public ChargingStationTESR() {
-        //System.out.println("Newed");
     }
 
     @Override
@@ -37,8 +40,52 @@ public class ChargingStationTESR extends TileEntityRenderer<ChargingStationTileE
         //Render our sphere
         renderSphere(te);
 
+        //Render Lightning
+        if (te.isChargingItem()) renderLightning(te);
+
         GlStateManager.popMatrix();
         GlStateManager.popAttributes();
+    }
+
+    private void renderLightning(ChargingStationTileEntity te) {
+        //Just toying with this - i Think the effect i have in my mind is way too complex for my weak programming skills
+        //If someone else wants to take a crack at either lightning or particles flowing into the item from the charger, go for it!
+        float red = 1f;
+        float green = 0f;
+        float blue = 0f;
+        float alpha = 1f;
+
+        GlStateManager.pushMatrix();
+        GlStateManager.pushLightingAttributes();
+
+        GlStateManager.enableBlend();
+        GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
+        GlStateManager.disableTexture();
+        GlStateManager.translated(.5, 1, .5);
+        //GlStateManager.depthMask(false);
+        GlStateManager.shadeModel(GL11.GL_SMOOTH);
+        GlStateManager.disableDepthTest();
+        Tessellator t = Tessellator.getInstance();
+
+        BufferBuilder bufferBuilder = t.getBuffer();
+
+        bufferBuilder.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION_COLOR);
+        GlStateManager.lineWidth(3);
+        Random r = new Random();
+        if (te.getRenderCounter() % 20 == 0) {
+            x2 = r.nextDouble() - 0.5;
+            z2 = r.nextDouble() - 0.5;
+        }
+        bufferBuilder.pos(x2, 0, z2).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(0, 0.5, 0).color(red, green, blue, alpha).endVertex();
+        t.draw();
+
+        //GlStateManager.depthMask(true);
+        GlStateManager.enableDepthTest();
+        GlStateManager.disableBlend();
+        GlStateManager.enableTexture();
+        GlStateManager.popAttributes();
+        GlStateManager.popMatrix();
     }
 
     private void renderSphere(ChargingStationTileEntity te) {
@@ -93,6 +140,7 @@ public class ChargingStationTESR extends TileEntityRenderer<ChargingStationTileE
 
         BufferBuilder bufferBuilder = t.getBuffer();
         //bufferBuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
+        bufferBuilder.begin(GL11.GL_TRIANGLE_STRIP, DefaultVertexFormats.POSITION_COLOR);
         for (int i = 0; i < segments; i++) // loop latitude
         {
             angle = Math.PI / 2 - i * dAngle;
@@ -106,7 +154,7 @@ public class ChargingStationTESR extends TileEntityRenderer<ChargingStationTileE
 
             float c2 = (float) ((Math.PI / 2 + angle) / Math.PI);   //calculate a colour
 
-            bufferBuilder.begin(GL11.GL_TRIANGLE_STRIP, DefaultVertexFormats.POSITION_COLOR);
+
 
             for (int j = 0; j <= 2 * segments; j++) // loop longitude
             {
@@ -120,12 +168,14 @@ public class ChargingStationTESR extends TileEntityRenderer<ChargingStationTileE
                 y = (float) (radius2 * sda);
                 bufferBuilder.pos(x, y, z2).color(red, green, blue, alpha).endVertex();
             }
-            t.draw();
+
         }
+        t.draw();
         GlStateManager.disableBlend();
         GlStateManager.enableTexture();
         GlStateManager.popAttributes();
         GlStateManager.popMatrix();
+
     }
 
     private void renderParticles(ChargingStationTileEntity te) {
