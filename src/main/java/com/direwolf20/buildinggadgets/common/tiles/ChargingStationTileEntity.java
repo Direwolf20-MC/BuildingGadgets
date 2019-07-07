@@ -156,14 +156,12 @@ public class ChargingStationTileEntity extends TileEntity implements ITickableTi
         CompoundNBT nbt = packet.getNbtCompound();
         boolean causeReRender = false; //required to update the render when items are inserted/extracted by a hopper for example
         if ((packet.getTileEntityType() & UPDATE_FLAG_INVENTORY) == UPDATE_FLAG_INVENTORY) {
-            ItemStack renderOld = getRenderStack();
             readItemNBT(nbt);
-            if (! renderOld.equals(getRenderStack(), false) && getWorld() != null)
-                causeReRender = true;
+            causeReRender = true;
         }
         if ((packet.getTileEntityType() & UPDATE_FLAG_ENERGY) == UPDATE_FLAG_ENERGY)
             readEnergyNBT(nbt);
-        if (causeReRender) //implemented this way in order allow future expansion, when the render influences more things
+        if (getWorld() != null && causeReRender) //implemented this way in order allow future expansion, when the render influences more things
             getWorld().notifyBlockUpdate(getPos(), getBlockState(), getBlockState(), BlockFlags.NOTIFY_LISTENERS);
     }
 
@@ -223,78 +221,60 @@ public class ChargingStationTileEntity extends TileEntity implements ITickableTi
         return getChargeStack();
     }
 
-    public boolean isChargingItem() {
-        ItemStack stack = getChargeStack();
-        if (!stack.isEmpty()) {
-            IEnergyStorage energy = CapabilityUtil.EnergyUtil.getCap(stack).orElseThrow(CapabilityNotPresentException::new);
-            return (getEnergy().getEnergyStored() > 0 || !getFuelStack().isEmpty()) && energy.getEnergyStored() < energy.getMaxEnergyStored();
-        } else {
-            return false;
-        }
+    public boolean isChargingItem(IEnergyStorage energy) {
+        return (getEnergy().getEnergyStored() > 0 || ! getFuelStack().isEmpty()) && energy.getEnergyStored() < energy.getMaxEnergyStored();
     }
 
     @Override
     public void tick() {
         if (getWorld() != null && ! getWorld().isRemote) {
             if (counter > 0 && getEnergy().receiveEnergy(Config.CHARGING_STATION.energyPerTick.get(), true) > 0) {
-                addEnergy(Config.CHARGING_STATION.energyPerTick.get());
-                counter--;
+                burn();
             } else {
-                ItemStack stack = getFuelStack();
-                int burnTime = GadgetUtils.getItemBurnTime(stack);
-                if (burnTime > 0 && getEnergy().receiveEnergy(Config.CHARGING_STATION.energyPerTick.get(), true) > 0) {
-                    getItemStackHandler().extractItem(0, 1, false);
-                    counter = (int) Math.floor(burnTime / Config.CHARGING_STATION.fuelUsage.get());
-                    addEnergy(Config.CHARGING_STATION.energyPerTick.get());
-                    counter--;
-                }
+                initBurn();
             }
             ItemStack stack = getChargeStack();
             if (! stack.isEmpty()) {
-                IEnergyStorage energy = CapabilityUtil.EnergyUtil.getCap(stack).orElseThrow(CapabilityNotPresentException::new);
-                if (isChargingItem()) {
-                    getEnergy().extractEnergy(energy.receiveEnergy(getEnergy().extractEnergy(Config.CHARGING_STATION.chargePerTick.get(), true), false), false);
-                    //Every second, when charging an item, send a sync packet to the client so it knows how far along it is for the render coloring
-                    if (renderCounter % 20 == 0) {
-                        //BlockState state = getWorld().getBlockState(getPos());
-                        //getWorld().notifyBlockUpdate(getPos(), state, state, BlockFlags.NOTIFY_LISTENERS);
-                        renderCounter = 0;
-                    }
-                    renderCounter++;
-                }
+                chargeItem(stack);
             }
-        }
-        //My understanding is that this causes the same calculations to run client side as serverside, preventing our need to force a sync packet every second for rendering?
-        //Feel free to fix my derps if i'm wrong.
-        //Yes I realize theres code duplication here, i suspected we might want different things to happen on server/client so i have them as separate if's.
-        if (getWorld() != null && getWorld().isRemote) {
-            if (counter > 0 && getEnergy().receiveEnergy(Config.CHARGING_STATION.energyPerTick.get(), true) > 0) {
-                addEnergy(Config.CHARGING_STATION.energyPerTick.get());
-                counter--;
-            } else {
-                ItemStack stack = getFuelStack();
-                int burnTime = GadgetUtils.getItemBurnTime(stack);
-                if (burnTime > 0 && getEnergy().receiveEnergy(Config.CHARGING_STATION.energyPerTick.get(), true) > 0) {
-                    getItemStackHandler().extractItem(0, 1, false);
-                    counter = (int) Math.floor(burnTime / Config.CHARGING_STATION.fuelUsage.get());
-                    addEnergy(Config.CHARGING_STATION.energyPerTick.get());
-                    counter--;
-                }
-            }
+        } else if (getWorld() != null) {
+            //My understanding is that this causes the same calculations to run client side as serverside, preventing our need to force a sync packet every second for rendering?
+            //Feel free to fix my derps if i'm wrong.
+            //Yes I realize theres code duplication here, i suspected we might want different things to happen on server/client so i have them as separate if's.
+            if (counter > 0 && getEnergy().receiveEnergy(Config.CHARGING_STATION.energyPerTick.get(), true) > 0)
+                burn();
+            else
+                initBurn();
+
             ItemStack stack = getChargeStack();
             if (!stack.isEmpty()) {
-                IEnergyStorage energy = CapabilityUtil.EnergyUtil.getCap(stack).orElseThrow(CapabilityNotPresentException::new);
-                if (isChargingItem()) {
-                    getEnergy().extractEnergy(energy.receiveEnergy(getEnergy().extractEnergy(Config.CHARGING_STATION.chargePerTick.get(), true), false), false);
-                    //Every second, when charging an item, send a sync packet to the client so it knows how far along it is for the render coloring
-                    if (renderCounter % 20 == 0) {
-                        //BlockState state = getWorld().getBlockState(getPos());
-                        //getWorld().notifyBlockUpdate(getPos(), state, state, BlockFlags.NOTIFY_LISTENERS);
-                        renderCounter = 0;
-                    }
-                    renderCounter++;
-                }
+                chargeItem(stack);
+                //Every second, when charging an item, send a sync packet to the client so it knows how far along it is for the render coloring
+                renderCounter++;
             }
+        }
+    }
+
+    private void burn() {
+        addEnergy(Config.CHARGING_STATION.energyPerTick.get());
+        counter--;
+    }
+
+    private void initBurn() {
+        ItemStack stack = getFuelStack();
+        int burnTime = GadgetUtils.getItemBurnTime(stack);
+        if (burnTime > 0 && getEnergy().receiveEnergy(Config.CHARGING_STATION.energyPerTick.get(), true) > 0) {
+            getItemStackHandler().extractItem(0, 1, false);
+            counter = (int) Math.floor(burnTime / Config.CHARGING_STATION.fuelUsage.get());
+            addEnergy(Config.CHARGING_STATION.energyPerTick.get());
+            counter--;
+        }
+    }
+
+    private void chargeItem(ItemStack stack) {
+        IEnergyStorage energy = CapabilityUtil.EnergyUtil.getCap(stack).orElseThrow(CapabilityNotPresentException::new);
+        if (isChargingItem(energy)) {
+            getEnergy().extractEnergy(energy.receiveEnergy(getEnergy().extractEnergy(Config.CHARGING_STATION.chargePerTick.get(), true), false), false);
         }
     }
 }

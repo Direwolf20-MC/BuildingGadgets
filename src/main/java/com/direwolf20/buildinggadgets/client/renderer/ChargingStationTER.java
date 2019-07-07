@@ -12,39 +12,44 @@ import net.minecraft.client.renderer.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
 import org.lwjgl.opengl.GL11;
 
 import java.util.Random;
 
 
-public class ChargingStationTESR extends TileEntityRenderer<ChargingStationTileEntity> {
+public class ChargingStationTER extends TileEntityRenderer<ChargingStationTileEntity> {
 
     double x2 = 0;
     double z2 = 0;
-    public ChargingStationTESR() {
+
+    public ChargingStationTER() {
     }
 
     @Override
     public void render(ChargingStationTileEntity te, double x, double y, double z, float partialTicks, int destroyStage) {
-        GlStateManager.pushLightingAttributes();
-        GlStateManager.pushMatrix();
+        ItemStack stack = te.getRenderStack();
+        if (! stack.isEmpty()) {
+            GlStateManager.pushLightingAttributes();
+            GlStateManager.pushMatrix();
 
-        // Translate to the location of our tile entity
-        GlStateManager.translated(x, y, z);
-        GlStateManager.disableRescaleNormal();
+            // Translate to the location of our tile entity
+            GlStateManager.translated(x, y, z);
+            GlStateManager.disableRescaleNormal();
+            // Render our item
+            renderItem(te);
 
-        // Render our item
-        renderItem(te);
+            //Render our sphere
+            renderSphere(te);
 
-        //Render our sphere
-        renderSphere(te);
+            //Render Lightning
+            if (te.isChargingItem(stack.getCapability(CapabilityEnergy.ENERGY).orElseThrow(CapabilityNotPresentException::new)))
+                renderLightning(te);
+            GlStateManager.popMatrix();
+            GlStateManager.popAttributes();
+        }
 
-        //Render Lightning
-        if (te.isChargingItem()) renderLightning(te);
-
-        GlStateManager.popMatrix();
-        GlStateManager.popAttributes();
     }
 
     private void renderLightning(ChargingStationTileEntity te) {
@@ -108,7 +113,6 @@ public class ChargingStationTESR extends TileEntityRenderer<ChargingStationTileE
 
 
         ItemStack stack = te.getRenderStack();
-        if (stack.isEmpty()) return;
         IEnergyStorage energy = CapabilityUtil.EnergyUtil.getCap(stack).orElseThrow(CapabilityNotPresentException::new);
         int stored = energy.getEnergyStored();
         int max = energy.getMaxEnergyStored();
@@ -184,18 +188,16 @@ public class ChargingStationTESR extends TileEntityRenderer<ChargingStationTileE
 
     private void renderItem(ChargingStationTileEntity te) {
         ItemStack stack = te.getRenderStack();
-        if (!stack.isEmpty()) {
-            RenderHelper.enableStandardItemLighting();
-            GlStateManager.enableLighting();
-            GlStateManager.pushMatrix();
-            // Translate to the center of the block and .9 points higher
-            GlStateManager.translated(.5, 1.5, .5);
-            GlStateManager.scalef(.4f, .4f, .4f);
-            float rotation = (float) (getWorld().getGameTime() % 80);
-            GlStateManager.rotatef(360f * rotation / 80f, 0, 1, 0);
-            Minecraft.getInstance().getItemRenderer().renderItem(stack, ItemCameraTransforms.TransformType.NONE);
+        RenderHelper.enableStandardItemLighting();
+        GlStateManager.enableLighting();
+        GlStateManager.pushMatrix();
+        // Translate to the center of the block and .9 points higher
+        GlStateManager.translated(.5, 1.5, .5);
+        GlStateManager.scalef(.4f, .4f, .4f);
+        float rotation = (float) (getWorld().getGameTime() % 80);
+        GlStateManager.rotatef(360f * rotation / 80f, 0, 1, 0);
+        Minecraft.getInstance().getItemRenderer().renderItem(stack, ItemCameraTransforms.TransformType.NONE);
 
-            GlStateManager.popMatrix();
-        }
+        GlStateManager.popMatrix();
     }
 }

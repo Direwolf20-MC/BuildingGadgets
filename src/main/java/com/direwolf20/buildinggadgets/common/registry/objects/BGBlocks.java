@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.common.registry.objects;
 
-import com.direwolf20.buildinggadgets.client.renderer.ChargingStationTESR;
+import com.direwolf20.buildinggadgets.client.renderer.ChargingStationTER;
 import com.direwolf20.buildinggadgets.common.blocks.*;
 import com.direwolf20.buildinggadgets.common.registry.block.BlockBuilder;
 import com.direwolf20.buildinggadgets.common.registry.block.BlockRegistryContainer;
@@ -81,7 +81,7 @@ public final class BGBlocks {
                 .withTileEntity(new TileEntityBuilder<ChargingStationTileEntity>(TileEntityReference.CHARGING_STATION_TILE_RL)
                         .builder(new TileEntityTypeBuilder<>(ChargingStationTileEntity::new))
                         .factory(TileEntityTypeBuilder::build)
-                        .renderer(ChargingStationTileEntity.class, new ChargingStationTESR()))
+                        .renderer(ChargingStationTileEntity.class, new ChargingStationTER()))
                 .factory(ChargingStation::new));
     }
 
