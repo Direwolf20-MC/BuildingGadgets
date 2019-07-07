@@ -39,7 +39,10 @@ public class ChargingStationTER extends TileEntityRenderer<ChargingStationTileEn
             renderSphere(te);
 
             //Render Lightning
-            if (te.isChargingItem(stack.getCapability(CapabilityEnergy.ENERGY).orElseThrow(CapabilityNotPresentException::new)))
+
+            if (te.isChargingItem(stack.getCapability(CapabilityEnergy.ENERGY).orElseThrow(CapabilityNotPresentException::new)) &&
+                    //don't render more then 16 Blocks away from the Block
+                    SphereSegmentation.BY_DISTANCE.compare(te.getLastRenderedSegmentation(), SphereSegmentation.MEDIUM_SEGMENTATION) < 0)
                 renderLightning(te);
             GlStateManager.popMatrix();
             GlStateManager.popAttributes();
@@ -134,7 +137,6 @@ public class ChargingStationTER extends TileEntityRenderer<ChargingStationTileEn
         float green = Math.min(2 * te.getLastChargeFactor(), 1f);
         float blue = 0f;
         float alpha = 0.5f;
-        System.out.println("Rendering " + red + " " + green + " " + blue + " with factor " + te.getLastChargeFactor());
 
         GlStateManager.pushMatrix();
         GlStateManager.pushLightingAttributes();
