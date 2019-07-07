@@ -53,17 +53,19 @@ public class ChargingStationTileEntity extends TileEntity implements ITickableTi
     private int updateNeeded;
     private int counter;
 
+    private final ConfigEnergyStorage energy;
+    private final ItemStackHandler itemStackHandler;
+    private final LazyOptional<IEnergyStorage> energyCap;
+    private final LazyOptional<IItemHandler> itemCap;
+
+    //Render variables! ----------------------------------------------
     private int renderCounter = 0;
     private double lightningX = 0;
     private double lightningZ = 0;
     private SphereSegmentation lastSegmentation;
     private float lastChargeFactor;
     private int callList;
-
-    private final ConfigEnergyStorage energy;
-    private final ItemStackHandler itemStackHandler;
-    private final LazyOptional<IEnergyStorage> energyCap;
-    private final LazyOptional<IItemHandler> itemCap;
+    //-----------------------------------------------------------------
 
     public ChargingStationTileEntity() {
         super(BGBlocks.BGTileEntities.CHARGING_STATION_TYPE);
@@ -235,51 +237,7 @@ public class ChargingStationTileEntity extends TileEntity implements ITickableTi
         return (getEnergy().getEnergyStored() > 0 || ! getFuelStack().isEmpty()) && energy.getEnergyStored() < energy.getMaxEnergyStored();
     }
 
-    public double getLightningX() {
-        return lightningX;
-    }
 
-    public double getLightningZ() {
-        return lightningZ;
-    }
-
-    @Nonnull
-    public SphereSegmentation getLastRenderedSegmentation() {
-        return lastSegmentation;
-    }
-
-    public float getLastChargeFactor() {
-        return lastChargeFactor;
-    }
-
-    public float getChargeFactor() {
-        IEnergyStorage energy = getChargeStack().getCapability(CapabilityEnergy.ENERGY).orElseThrow(CapabilityNotPresentException::new);
-        return (float) energy.getEnergyStored() / energy.getMaxEnergyStored();
-    }
-
-    public void updateChargeFactor(float newFactor) {
-        lastChargeFactor = newFactor;
-    }
-
-    public SphereSegmentation getSegmentation() {
-        if (getWorld() == null || ! getWorld().isRemote())
-            return getLastRenderedSegmentation();
-        ClientPlayerEntity playerEntity = Minecraft.getInstance().player;
-        double dist = new Vec3d(getPos()).add(0.5, 0.5, 0.5).squareDistanceTo(playerEntity.getPositionVec());
-        return SphereSegmentation.forSquareDist(dist);
-    }
-
-    public void updateSegmentation(@Nonnull SphereSegmentation segmentation) {
-        this.lastSegmentation = Objects.requireNonNull(segmentation);
-    }
-
-    public int getCallList() {
-        return callList;
-    }
-
-    public void genCallList() {
-        callList = GlStateManager.genLists(1);
-    }
 
     @Override
     public void tick() {
@@ -341,5 +299,52 @@ public class ChargingStationTileEntity extends TileEntity implements ITickableTi
         if (isChargingItem(energy)) {
             getEnergy().extractEnergy(energy.receiveEnergy(getEnergy().extractEnergy(Config.CHARGING_STATION.chargePerTick.get(), true), false), false);
         }
+    }
+
+    // Render Only Methods! -------------------------------------------------------------------------------------
+    public double getLightningX() {
+        return lightningX;
+    }
+
+    public double getLightningZ() {
+        return lightningZ;
+    }
+
+    @Nonnull
+    public SphereSegmentation getLastRenderedSegmentation() {
+        return lastSegmentation;
+    }
+
+    public float getLastChargeFactor() {
+        return lastChargeFactor;
+    }
+
+    public float getChargeFactor() {
+        IEnergyStorage energy = getChargeStack().getCapability(CapabilityEnergy.ENERGY).orElseThrow(CapabilityNotPresentException::new);
+        return (float) energy.getEnergyStored() / energy.getMaxEnergyStored();
+    }
+
+    public void updateChargeFactor(float newFactor) {
+        lastChargeFactor = newFactor;
+    }
+
+    public SphereSegmentation getSegmentation() {
+        if (getWorld() == null || ! getWorld().isRemote())
+            return getLastRenderedSegmentation();
+        ClientPlayerEntity playerEntity = Minecraft.getInstance().player;
+        double dist = new Vec3d(getPos()).add(0.5, 0.5, 0.5).squareDistanceTo(playerEntity.getPositionVec());
+        return SphereSegmentation.forSquareDist(dist);
+    }
+
+    public void updateSegmentation(@Nonnull SphereSegmentation segmentation) {
+        this.lastSegmentation = Objects.requireNonNull(segmentation);
+    }
+
+    public int getCallList() {
+        return callList;
+    }
+
+    public void genCallList() {
+        callList = GlStateManager.genLists(1);
     }
 }
