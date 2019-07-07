@@ -48,6 +48,8 @@ public class ChargingStationTileEntity extends TileEntity implements ITickableTi
     private int updateNeeded;
     private int counter;
     private int renderCounter = 0;
+    private double lightningX = 0;
+    private double lightningZ = 0;
 
     private final ConfigEnergyStorage energy;
     private final ItemStackHandler itemStackHandler;
@@ -225,6 +227,14 @@ public class ChargingStationTileEntity extends TileEntity implements ITickableTi
         return (getEnergy().getEnergyStored() > 0 || ! getFuelStack().isEmpty()) && energy.getEnergyStored() < energy.getMaxEnergyStored();
     }
 
+    public double getLightningX() {
+        return lightningX;
+    }
+
+    public double getLightningZ() {
+        return lightningZ;
+    }
+
     @Override
     public void tick() {
         if (getWorld() != null && ! getWorld().isRemote) {
@@ -250,6 +260,10 @@ public class ChargingStationTileEntity extends TileEntity implements ITickableTi
             if (!stack.isEmpty()) {
                 chargeItem(stack);
                 //Every second, when charging an item, send a sync packet to the client so it knows how far along it is for the render coloring
+                if (renderCounter % 20 == 0) {
+                    lightningX = getWorld().getRandom().nextDouble() - 0.5;
+                    lightningZ = getWorld().getRandom().nextDouble() - 0.5;
+                }
                 renderCounter++;
             }
         }

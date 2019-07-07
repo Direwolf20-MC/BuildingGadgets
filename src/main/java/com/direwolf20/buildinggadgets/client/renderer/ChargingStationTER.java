@@ -16,13 +16,8 @@ import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
 import org.lwjgl.opengl.GL11;
 
-import java.util.Random;
-
 
 public class ChargingStationTER extends TileEntityRenderer<ChargingStationTileEntity> {
-
-    double x2 = 0;
-    double z2 = 0;
 
     public ChargingStationTER() {
     }
@@ -76,11 +71,8 @@ public class ChargingStationTER extends TileEntityRenderer<ChargingStationTileEn
 
         bufferBuilder.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION_COLOR);
         GlStateManager.lineWidth(3);
-        Random r = new Random();
-        if (te.getRenderCounter() % 20 == 0) {
-            x2 = r.nextDouble() - 0.5;
-            z2 = r.nextDouble() - 0.5;
-        }
+        double x2 = te.getLightningX();
+        double z2 = te.getLightningZ();
         bufferBuilder.pos(x2, 0, z2).color(red, green, blue, alpha).endVertex();
         bufferBuilder.pos(0, 0.5, 0).color(red, green, blue, alpha).endVertex();
         t.draw();
