@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.common.tiles;
 
+import com.direwolf20.buildinggadgets.client.renderer.SphereSegmentation;
 import com.direwolf20.buildinggadgets.common.capability.ConfigEnergyStorage;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.containers.ChargingStationContainer;
@@ -9,6 +10,9 @@ import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.exceptions.CapabilityNotPresentException;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.google.common.base.Preconditions;
+import com.mojang.blaze3d.platform.GlStateManager;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.container.Container;
@@ -34,6 +38,7 @@ import net.minecraftforge.items.ItemStackHandler;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.Objects;
 
 public class ChargingStationTileEntity extends TileEntity implements ITickableTileEntity, INamedContainerProvider {
 
@@ -47,9 +52,13 @@ public class ChargingStationTileEntity extends TileEntity implements ITickableTi
     private final int SEND_UPDATE_NO_RENDER = BlockFlags.NOTIFY_LISTENERS | BlockFlags.NO_RERENDER;
     private int updateNeeded;
     private int counter;
+
     private int renderCounter = 0;
     private double lightningX = 0;
     private double lightningZ = 0;
+    private SphereSegmentation lastSegmentation;
+    private float lastChargeFactor;
+    private int callList;
 
     private final ConfigEnergyStorage energy;
     private final ItemStackHandler itemStackHandler;
@@ -95,6 +104,9 @@ public class ChargingStationTileEntity extends TileEntity implements ITickableTi
         energyCap = LazyOptional.of(this::getEnergy);
         itemCap = LazyOptional.of(this::getItemStackHandler);
         updateNeeded = UPDATE_FLAG_ALL;
+        lastSegmentation = SphereSegmentation.LOW_SEGMENTATION;
+        lastChargeFactor = 0;
+        callList = 0;
     }
 
     @Override
@@ -125,10 +137,6 @@ public class ChargingStationTileEntity extends TileEntity implements ITickableTi
 
     private ItemStack getFuelStack() {
         return getItemStackHandler().getStackInSlot(FUEL_SLOT);
-    }
-
-    public int getRenderCounter() {
-        return renderCounter;
     }
 
     @Override
@@ -235,6 +243,44 @@ public class ChargingStationTileEntity extends TileEntity implements ITickableTi
         return lightningZ;
     }
 
+    @Nonnull
+    public SphereSegmentation getLastRenderedSegmentation() {
+        return lastSegmentation;
+    }
+
+    public float getLastChargeFactor() {
+        return lastChargeFactor;
+    }
+
+    public float getChargeFactor() {
+        IEnergyStorage energy = getChargeStack().getCapability(CapabilityEnergy.ENERGY).orElseThrow(CapabilityNotPresentException::new);
+        return (float) energy.getEnergyStored() / energy.getMaxEnergyStored();
+    }
+
+    public void updateChargeFactor(float newFactor) {
+        lastChargeFactor = newFactor;
+    }
+
+    public SphereSegmentation getSegmentation() {
+        if (getWorld() == null || ! getWorld().isRemote())
+            return getLastRenderedSegmentation();
+        ClientPlayerEntity playerEntity = Minecraft.getInstance().player;
+        double dist = new Vec3d(getPos()).add(0.5, 0.5, 0.5).squareDistanceTo(playerEntity.getPositionVec());
+        return SphereSegmentation.forSquareDist(dist);
+    }
+
+    public void updateSegmentation(@Nonnull SphereSegmentation segmentation) {
+        this.lastSegmentation = Objects.requireNonNull(segmentation);
+    }
+
+    public int getCallList() {
+        return callList;
+    }
+
+    public void genCallList() {
+        callList = GlStateManager.genLists(1);
+    }
+
     @Override
     public void tick() {
         if (getWorld() != null && ! getWorld().isRemote) {
@@ -259,14 +305,19 @@ public class ChargingStationTileEntity extends TileEntity implements ITickableTi
             ItemStack stack = getChargeStack();
             if (!stack.isEmpty()) {
                 chargeItem(stack);
-                //Every second, when charging an item, send a sync packet to the client so it knows how far along it is for the render coloring
-                if (renderCounter % 20 == 0) {
-                    lightningX = getWorld().getRandom().nextDouble() - 0.5;
-                    lightningZ = getWorld().getRandom().nextDouble() - 0.5;
-                }
-                renderCounter++;
+                updateLightning();
             }
         }
+    }
+
+    private void updateLightning() {
+        assert getWorld() != null; //always checked, before this is called
+        //update the lightnings Position
+        if (renderCounter % 20 == 0) {
+            lightningX = getWorld().getRandom().nextDouble() - 0.5;
+            lightningZ = getWorld().getRandom().nextDouble() - 0.5;
+        }
+        renderCounter++;
     }
 
     private void burn() {

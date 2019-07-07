@@ -1,7 +1,6 @@
 package com.direwolf20.buildinggadgets.client.renderer;
 
 import com.direwolf20.buildinggadgets.common.tiles.ChargingStationTileEntity;
-import com.direwolf20.buildinggadgets.common.util.CapabilityUtil;
 import com.direwolf20.buildinggadgets.common.util.exceptions.CapabilityNotPresentException;
 import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.Minecraft;
@@ -13,11 +12,11 @@ import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.energy.CapabilityEnergy;
-import net.minecraftforge.energy.IEnergyStorage;
 import org.lwjgl.opengl.GL11;
 
 
 public class ChargingStationTER extends TileEntityRenderer<ChargingStationTileEntity> {
+    private static final float CHARGE_UPDATE_BORDER = 0.005f;
 
     public ChargingStationTER() {
     }
@@ -36,6 +35,7 @@ public class ChargingStationTER extends TileEntityRenderer<ChargingStationTileEn
             renderItem(te);
 
             //Render our sphere
+
             renderSphere(te);
 
             //Render Lightning
@@ -86,11 +86,42 @@ public class ChargingStationTER extends TileEntityRenderer<ChargingStationTileEn
     }
 
     private void renderSphere(ChargingStationTileEntity te) {
+        float lastCharge = te.getLastChargeFactor();
+        float charge = te.getChargeFactor();
+        //(charge==1f && lastCharge!=1f) || (charge==0f && lastCharge!=0f) are required to enforce an update when it is fully charged or completely empty
+        if (lastCharge > charge + CHARGE_UPDATE_BORDER || lastCharge < charge - CHARGE_UPDATE_BORDER || (charge == 1f && lastCharge != 1f) || (charge == 0f && lastCharge != 0f)) {
+            te.updateChargeFactor(charge);
+            createCallList(te);
+        } else {
+            SphereSegmentation lastSegmentation = te.getLastRenderedSegmentation();
+            SphereSegmentation newSegmentation = te.getSegmentation();
+            if (lastSegmentation != newSegmentation) { //if the player moved to a different Distance: recreate the Sphere
+                te.updateSegmentation(newSegmentation);
+                createCallList(te, newSegmentation);
+            } else {
+                GlStateManager.callList(te.getCallList());
+            }
+        }
+    }
+
+    private void createCallList(ChargingStationTileEntity te) {
+        te.updateSegmentation(te.getSegmentation());
+        createCallList(te, te.getSegmentation());
+    }
+
+    private void createCallList(ChargingStationTileEntity te, SphereSegmentation segmentation) {
+        if (te.getCallList() == 0)
+            te.genCallList();
+        GlStateManager.newList(te.getCallList(), GL11.GL_COMPILE_AND_EXECUTE);
+        performRenderSphere(te, segmentation.getSegments());
+        GlStateManager.endList();
+    }
+
+    private void performRenderSphere(ChargingStationTileEntity te, int segments) {
         double radius1 = 0;
         double radius2 = 0;
 
         double radius = .33; //radius of sphere
-        double segments = 50; // the number of division in the sphere
 
         double angle = 0;
         double dAngle = (Math.PI / segments);
@@ -99,29 +130,11 @@ public class ChargingStationTER extends TileEntityRenderer<ChargingStationTileEn
         float y = 0;
         float z = 0;
 
-        float red;
-        float green;
-        float blue;
-
-
-        ItemStack stack = te.getRenderStack();
-        IEnergyStorage energy = CapabilityUtil.EnergyUtil.getCap(stack).orElseThrow(CapabilityNotPresentException::new);
-        int stored = energy.getEnergyStored();
-        int max = energy.getMaxEnergyStored();
-        /*if (stored == max) {
-            red = 0f;
-            green = 0.25f;
-            blue = 1f;
-        } else {*/
-        //red = 1f - (float) stored / max;
-        //green = (float) stored / max;
-        red = Math.min(2 * (1f - (float) stored / max), 1f);
-        green = Math.min(2 * ((float) stored / max), 1f);
-            blue = 0f;
-        //}
-
-
+        float red = Math.min(2 * (1f - te.getLastChargeFactor()), 1f);
+        float green = Math.min(2 * te.getLastChargeFactor(), 1f);
+        float blue = 0f;
         float alpha = 0.5f;
+        System.out.println("Rendering " + red + " " + green + " " + blue + " with factor " + te.getLastChargeFactor());
 
         GlStateManager.pushMatrix();
         GlStateManager.pushLightingAttributes();
@@ -151,7 +164,6 @@ public class ChargingStationTER extends TileEntityRenderer<ChargingStationTileEn
             float c2 = (float) ((Math.PI / 2 + angle) / Math.PI);   //calculate a colour
 
 
-
             for (int j = 0; j <= 2 * segments; j++) // loop longitude
             {
                 double cda = Math.cos(j * dAngle);
@@ -171,7 +183,6 @@ public class ChargingStationTER extends TileEntityRenderer<ChargingStationTileEn
         GlStateManager.enableTexture();
         GlStateManager.popAttributes();
         GlStateManager.popMatrix();
-
     }
 
     private void renderParticles(ChargingStationTileEntity te) {
