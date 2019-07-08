@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.client.renderer;
 
+import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.tiles.ChargingStationTileEntity;
 import com.direwolf20.buildinggadgets.common.util.exceptions.CapabilityNotPresentException;
 import com.mojang.blaze3d.platform.GlStateManager;
@@ -89,6 +90,10 @@ public class ChargingStationTER extends TileEntityRenderer<ChargingStationTileEn
     }
 
     private void renderSphere(ChargingStationTileEntity te) {
+        if (! Config.CHARGING_STATION.renderSphere.get()) {
+            te.updateSegmentation(te.getSegmentation());
+            return;
+        }
         float lastCharge = te.getLastChargeFactor();
         float charge = te.getChargeFactor();
         //(charge==1f && lastCharge!=1f) || (charge==0f && lastCharge!=0f) are required to enforce an update when it is fully charged or completely empty
@@ -101,9 +106,10 @@ public class ChargingStationTER extends TileEntityRenderer<ChargingStationTileEn
             if (lastSegmentation != newSegmentation) { //if the player moved to a different Distance: recreate the Sphere
                 te.updateSegmentation(newSegmentation);
                 createCallList(te, newSegmentation);
-            } else {
+            } else if (te.getCallList() == 0)
+                createCallList(te);
+            else
                 GlStateManager.callList(te.getCallList());
-            }
         }
     }
 

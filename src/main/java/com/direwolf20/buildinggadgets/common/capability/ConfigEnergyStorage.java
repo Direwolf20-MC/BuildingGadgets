@@ -6,11 +6,23 @@ import java.util.function.IntSupplier;
 
 public abstract class ConfigEnergyStorage implements IEnergyStorage {
     private final IntSupplier capacitySupplier;
+    private final IntSupplier extractSupplier;
+    private final IntSupplier receiveSupplier;
     private int energy;
 
-    public ConfigEnergyStorage(IntSupplier capacity) {
-        this.capacitySupplier = capacity;
+    public ConfigEnergyStorage(IntSupplier capacitySupplier, IntSupplier extractSupplier, IntSupplier receiveSupplier) {
+        this.capacitySupplier = capacitySupplier;
+        this.extractSupplier = extractSupplier;
+        this.receiveSupplier = receiveSupplier;
         this.energy = 0;
+    }
+
+    public ConfigEnergyStorage(IntSupplier capacitySupplier, IntSupplier transfer) {
+        this(capacitySupplier, transfer, transfer);
+    }
+
+    public ConfigEnergyStorage(IntSupplier capacity) {
+        this(capacity, capacity);
     }
 
     @Override
@@ -26,9 +38,11 @@ public abstract class ConfigEnergyStorage implements IEnergyStorage {
 
     @Override
     public int receiveEnergy(int maxReceive, boolean simulate) {
-        int energyReceived = Math.min(getMaxEnergyStored() - getEnergyStored(), maxReceive);
+        if (maxReceive < 0)
+            return 0;
+        int energyReceived = evaluateEnergyReceived(maxReceive, simulate);
         if (! simulate) {
-            energy += energyReceived;
+            setEnergy(energyReceived + getEnergyStored());
             writeEnergy();
         }
         return energyReceived;
@@ -36,9 +50,11 @@ public abstract class ConfigEnergyStorage implements IEnergyStorage {
 
     @Override
     public int extractEnergy(int maxExtract, boolean simulate) {
-        int energyExtracted = Math.min(getEnergyStored(), maxExtract);
+        if (maxExtract < 0)
+            return 0;
+        int energyExtracted = evaluateEnergyExtracted(maxExtract, simulate);
         if (! simulate) {
-            energy -= energyExtracted;
+            setEnergy(getEnergyStored() - energyExtracted);
             writeEnergy();
         }
         return energyExtracted;
@@ -50,7 +66,7 @@ public abstract class ConfigEnergyStorage implements IEnergyStorage {
      */
     @Override
     public boolean canExtract() {
-        return true;
+        return extractSupplier.getAsInt() > 0;
     }
 
     /**
@@ -59,7 +75,23 @@ public abstract class ConfigEnergyStorage implements IEnergyStorage {
      */
     @Override
     public boolean canReceive() {
-        return true;
+        return receiveSupplier.getAsInt() > 0;
+    }
+
+    protected IntSupplier getExtractSupplier() {
+        return extractSupplier;
+    }
+
+    protected IntSupplier getReceiveSupplier() {
+        return receiveSupplier;
+    }
+
+    protected int evaluateEnergyExtracted(int maxExtract, boolean simulate) {
+        return Math.min(getEnergyStored(), Math.min(maxExtract, getExtractSupplier().getAsInt()));
+    }
+
+    protected int evaluateEnergyReceived(int maxReceive, boolean simulate) {
+        return Math.min(getMaxEnergyStored() - getEnergyStored(), Math.min(maxReceive, getReceiveSupplier().getAsInt()));
     }
 
     public void setEnergy(int energy) {

@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.common.tiles;
 
 import com.direwolf20.buildinggadgets.client.renderer.SphereSegmentation;
-import com.direwolf20.buildinggadgets.common.capability.ConfigEnergyStorage;
+import com.direwolf20.buildinggadgets.common.capability.CappedEnergyStorage;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.containers.ChargingStationContainer;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
@@ -53,7 +53,7 @@ public class ChargingStationTileEntity extends TileEntity implements ITickableTi
     private int updateNeeded;
     private int counter;
 
-    private final ConfigEnergyStorage energy;
+    private final CappedEnergyStorage energy;
     private final ItemStackHandler itemStackHandler;
     private final LazyOptional<IEnergyStorage> energyCap;
     private final LazyOptional<IItemHandler> itemCap;
@@ -65,11 +65,12 @@ public class ChargingStationTileEntity extends TileEntity implements ITickableTi
     private SphereSegmentation lastSegmentation;
     private float lastChargeFactor;
     private int callList;
+    private int lightningPositionChange;
     //-----------------------------------------------------------------
 
     public ChargingStationTileEntity() {
         super(BGBlocks.BGTileEntities.CHARGING_STATION_TYPE);
-        energy = new ConfigEnergyStorage(Config.CHARGING_STATION.capacity::get) {
+        energy = new CappedEnergyStorage(Config.CHARGING_STATION.capacity::get, Config.CHARGING_STATION.maxExtract::get, Config.CHARGING_STATION.maxRecieve::get) {
             @Override
             protected void writeEnergy() {
                 ChargingStationTileEntity.this.markDirty();
@@ -109,6 +110,7 @@ public class ChargingStationTileEntity extends TileEntity implements ITickableTi
         lastSegmentation = SphereSegmentation.LOW_SEGMENTATION;
         lastChargeFactor = 0;
         callList = 0;
+        lightningPositionChange = 20;
     }
 
     @Override
@@ -124,7 +126,7 @@ public class ChargingStationTileEntity extends TileEntity implements ITickableTi
     }
 
     @Nonnull
-    private ConfigEnergyStorage getEnergy() {
+    private CappedEnergyStorage getEnergy() {
         return energy;
     }
 
@@ -237,8 +239,6 @@ public class ChargingStationTileEntity extends TileEntity implements ITickableTi
         return (getEnergy().getEnergyStored() > 0 || ! getFuelStack().isEmpty()) && energy.getEnergyStored() < energy.getMaxEnergyStored();
     }
 
-
-
     @Override
     public void tick() {
         if (getWorld() != null && ! getWorld().isRemote) {
@@ -266,14 +266,17 @@ public class ChargingStationTileEntity extends TileEntity implements ITickableTi
                 updateLightning();
             }
         }
+        getEnergy().resetReceiveCap();
+        getEnergy().resetExtractCap();
     }
 
     private void updateLightning() {
         assert getWorld() != null; //always checked, before this is called
         //update the lightnings Position
-        if (renderCounter % 20 == 0) {
+        if (renderCounter % lightningPositionChange == 0) {
             lightningX = getWorld().getRandom().nextDouble() - 0.5;
             lightningZ = getWorld().getRandom().nextDouble() - 0.5;
+            lightningPositionChange = getWorld().getRandom().nextInt(7) + 17;
         }
         renderCounter++;
     }
@@ -289,15 +292,14 @@ public class ChargingStationTileEntity extends TileEntity implements ITickableTi
         if (burnTime > 0 && getEnergy().receiveEnergy(Config.CHARGING_STATION.energyPerTick.get(), true) > 0) {
             getItemStackHandler().extractItem(0, 1, false);
             counter = (int) Math.floor(burnTime / Config.CHARGING_STATION.fuelUsage.get());
-            addEnergy(Config.CHARGING_STATION.energyPerTick.get());
-            counter--;
+            burn();
         }
     }
 
     private void chargeItem(ItemStack stack) {
-        IEnergyStorage energy = CapabilityUtil.EnergyUtil.getCap(stack).orElseThrow(CapabilityNotPresentException::new);
-        if (isChargingItem(energy)) {
-            getEnergy().extractEnergy(energy.receiveEnergy(getEnergy().extractEnergy(Config.CHARGING_STATION.chargePerTick.get(), true), false), false);
+        IEnergyStorage chargingStorage = CapabilityUtil.EnergyUtil.getCap(stack).orElseThrow(CapabilityNotPresentException::new);
+        if (isChargingItem(chargingStorage)) {
+            getEnergy().setEnergy(getEnergy().getEnergyStored() - chargingStorage.receiveEnergy(Math.min(getEnergy().getEnergyStored(), Config.CHARGING_STATION.chargePerTick.get()), false));
         }
     }
 

@@ -116,6 +116,11 @@ public class Config {
 
         public final IntValue chargePerTick;
 
+        public final IntValue maxRecieve;
+
+        public final IntValue maxExtract;
+
+        public final BooleanValue renderSphere;
 
         private CategoryChargingStation() {
             SERVER_BUILDER.comment("Charging station settings")/*.translation(LANG_KEY_CHARGING_STATION)*/.push("charging_station");
@@ -133,6 +138,18 @@ public class Config {
             chargePerTick = SERVER_BUILDER.comment("Define how much the charging station attempts to charge per tick")
                     .translation(LANG_KEY_CHARGING_STATION + ".chargePerTick")
                     .defineInRange("Charge Energy", 2500, 0, Integer.MAX_VALUE);
+            maxRecieve = SERVER_BUILDER.comment("Define how much Energy can be accepted by the Charging Station per tick. Note that burning fuel counts towards this cap.")
+                    .translation(LANG_KEY_CHARGING_STATION + ".maxRecieve")
+                    .defineInRange("Max Energy Recieved", 750, 0, Integer.MAX_VALUE);
+            maxExtract = SERVER_BUILDER.comment("Define how much Energy can at most be extracted from the Charging Station per tick. Charging Items does not" +
+                    "count towards this cap!")
+                    .translation(LANG_KEY_CHARGING_STATION + ".maxExtract")
+                    .defineInRange("Max Energy Extracted", 0, 0, Integer.MAX_VALUE);
+            renderSphere = CLIENT_BUILDER.comment("Whether or not to render the Charging Sphere. Disabling rendering of the Charging Sphere will increase rendering" +
+                    "Performance, as it is the main throttle on the Charging Station render. Note that we are already doing what we can to make it as fast as possible " +
+                    "but a colour changing Sphere just needs to update relativingly often...")
+                    .translation(LANG_KEY_CHARGING_STATION + ".renderSphere")
+                    .define("Render Sphere", true);
             CLIENT_BUILDER.pop();
             COMMON_BUILDER.pop();
             SERVER_BUILDER.pop();
