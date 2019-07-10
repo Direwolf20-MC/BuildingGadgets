@@ -1,4 +1,4 @@
-package com.direwolf20.buildinggadgets.common.entities;
+package com.direwolf20.buildinggadgets.client.renderer;
 
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
@@ -10,32 +10,28 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockRendererDispatcher;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.entity.EntityRenderer;
-import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.client.renderer.texture.AtlasTexture;
+import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
 
-import javax.annotation.Nullable;
+public class EffectBlockTER extends TileEntityRenderer<EffectBlockTileEntity> {
 
-public class BlockBuildEntityRender extends EntityRenderer<BlockBuildEntity> {
-
-    public BlockBuildEntityRender(EntityRendererManager renderManager) {
-        super(renderManager);
-        this.shadowSize = 0F;
+    public EffectBlockTER() {
     }
 
     @Override
-    public void doRender(BlockBuildEntity entity, double x, double y, double z, float entityYaw, float partialTicks) {
+    public void render(EffectBlockTileEntity tile, double x, double y, double z, float partialTicks, int destroyStage) {
+        // super.render(tile, x, y, z, partialTicks, destroyStage);
+
         BlockRendererDispatcher blockrendererdispatcher = Minecraft.getInstance().getBlockRendererDispatcher();
         Minecraft mc = Minecraft.getInstance();
         GlStateManager.pushMatrix();
 
-        EffectBlockTileEntity.Mode toolMode = entity.getToolMode();
+        EffectBlockTileEntity.Mode toolMode = tile.getReplacementMode();
         mc.getTextureManager().bindTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
-        int teCounter = entity.getTicksExisted();
-        int maxLife = entity.getMaxLife();
+        int teCounter = tile.getTicksExisted();
+        int maxLife = tile.getLifespan();
         teCounter = teCounter > maxLife ? maxLife : teCounter;
         float scale = (float) (teCounter) / (float) maxLife;
         if (scale >= 1.0f)
@@ -51,12 +47,10 @@ public class BlockBuildEntityRender extends EntityRenderer<BlockBuildEntity> {
 
         //BlockState renderBlockState = blocks.COBBLESTONE.getDefaultState();
 
-        BlockState renderBlockState = entity.getSetBlock();
-        if (entity.isUsingPaste() && toolMode == EffectBlockTileEntity.Mode.PLACE)
+        BlockState renderBlockState = tile.getReplacementBlock().getState();
+        if (tile.isUsingPaste() && toolMode == EffectBlockTileEntity.Mode.PLACE)
             renderBlockState = BGBlocks.constructionBlockDense.getDefaultState();
-        if (renderBlockState == null) {
-            renderBlockState = Blocks.COBBLESTONE.getDefaultState();
-        }
+
         try {
             blockrendererdispatcher.renderBlockBrightness(renderBlockState, 1.0f);
         } catch (Throwable t) {
@@ -102,37 +96,37 @@ public class BlockBuildEntityRender extends EntityRenderer<BlockBuildEntity> {
         if (alpha > 0.33f) {
             alpha = 0.33f;
         }
-        //down
+        // Down
         bufferBuilder.pos(x, y, z).color(red, green, blue, alpha).endVertex();
         bufferBuilder.pos(maxX, y, z).color(red, green, blue, alpha).endVertex();
         bufferBuilder.pos(maxX, y, maxZ).color(red, green, blue, alpha).endVertex();
         bufferBuilder.pos(x, y, maxZ).color(red, green, blue, alpha).endVertex();
 
-        //up
+        // Up
         bufferBuilder.pos(x, maxY, z).color(red, green, blue, alpha).endVertex();
         bufferBuilder.pos(x, maxY, maxZ).color(red, green, blue, alpha).endVertex();
         bufferBuilder.pos(maxX, maxY, maxZ).color(red, green, blue, alpha).endVertex();
         bufferBuilder.pos(maxX, maxY, z).color(red, green, blue, alpha).endVertex();
 
-        //north
+        // North
         bufferBuilder.pos(x, y, z).color(red, green, blue, alpha).endVertex();
         bufferBuilder.pos(x, maxY, z).color(red, green, blue, alpha).endVertex();
         bufferBuilder.pos(maxX, maxY, z).color(red, green, blue, alpha).endVertex();
         bufferBuilder.pos(maxX, y, z).color(red, green, blue, alpha).endVertex();
 
-        //south
+        // South
         bufferBuilder.pos(x, y, maxZ).color(red, green, blue, alpha).endVertex();
         bufferBuilder.pos(maxX, y, maxZ).color(red, green, blue, alpha).endVertex();
         bufferBuilder.pos(maxX, maxY, maxZ).color(red, green, blue, alpha).endVertex();
         bufferBuilder.pos(x, maxY, maxZ).color(red, green, blue, alpha).endVertex();
 
-        //east
+        // East
         bufferBuilder.pos(maxX, y, z).color(red, green, blue, alpha).endVertex();
         bufferBuilder.pos(maxX, maxY, z).color(red, green, blue, alpha).endVertex();
         bufferBuilder.pos(maxX, maxY, maxZ).color(red, green, blue, alpha).endVertex();
         bufferBuilder.pos(maxX, y, maxZ).color(red, green, blue, alpha).endVertex();
 
-        //west
+        // West
         bufferBuilder.pos(x, y, z).color(red, green, blue, alpha).endVertex();
         bufferBuilder.pos(x, y, maxZ).color(red, green, blue, alpha).endVertex();
         bufferBuilder.pos(x, maxY, maxZ).color(red, green, blue, alpha).endVertex();
@@ -145,13 +139,5 @@ public class BlockBuildEntityRender extends EntityRenderer<BlockBuildEntity> {
 
         GlStateManager.popMatrix();
         GlStateManager.popAttributes();
-
     }
-
-    @Nullable
-    @Override
-    protected ResourceLocation getEntityTexture(BlockBuildEntity entity) {
-        return null;
-    }
-
 }

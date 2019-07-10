@@ -6,10 +6,12 @@ import com.direwolf20.buildinggadgets.api.building.IPositionPlacementSequence;
 import com.direwolf20.buildinggadgets.api.building.Region;
 import com.direwolf20.buildinggadgets.api.template.building.tilesupport.DummyTileEntityData;
 import com.direwolf20.buildinggadgets.client.gui.GuiMod;
+import com.direwolf20.buildinggadgets.common.blocks.EffectBlock;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
 import com.direwolf20.buildinggadgets.common.tiles.ConstructionBlockTileEntity;
+import com.direwolf20.buildinggadgets.common.tiles.EffectBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.blocks.RegionSnapshot;
 import com.direwolf20.buildinggadgets.common.util.exceptions.PaletteOverflowException;
@@ -338,7 +340,7 @@ public class GadgetDestruction extends GadgetGeneric {
                 .collect(Collectors.toSet());
         int index = 0;
         for (BlockPos pos : snapshot.getPositions()) {
-            snapshot.getBlockStates().get(index).ifPresent(state -> world.addEntity(new BlockBuildEntity(world, pos, new BlockData(state, DummyTileEntityData.INSTANCE), BlockBuildEntity.Mode.PLACE, pastePositions.contains(pos))));
+            snapshot.getBlockStates().get(index).ifPresent(state -> EffectBlock.spawnEffectBlock(world, pos, new BlockData(state, DummyTileEntityData.INSTANCE), EffectBlockTileEntity.Mode.PLACE, pastePositions.contains(pos)));
             index++;
         }
     }
@@ -355,7 +357,7 @@ public class GadgetDestruction extends GadgetGeneric {
             return false;
 
         this.applyDamage(tool, player);
-        world.addEntity(new BlockBuildEntity(world, voidPos, Registries.TileEntityData.createBlockData(world, voidPos), BlockBuildEntity.Mode.REMOVE, false));
+        EffectBlock.spawnEffectBlock(world, voidPos, Registries.TileEntityData.createBlockData(world, voidPos), EffectBlockTileEntity.Mode.REMOVE, false);
         return true;
     }
 

@@ -1,21 +1,21 @@
 package com.direwolf20.buildinggadgets.common.registry.objects;
 
 import com.direwolf20.buildinggadgets.client.renderer.ChargingStationTER;
+import com.direwolf20.buildinggadgets.client.renderer.EffectBlockTER;
 import com.direwolf20.buildinggadgets.common.blocks.*;
 import com.direwolf20.buildinggadgets.common.registry.block.BlockBuilder;
 import com.direwolf20.buildinggadgets.common.registry.block.BlockRegistryContainer;
 import com.direwolf20.buildinggadgets.common.registry.block.tile.TileEntityBuilder;
 import com.direwolf20.buildinggadgets.common.registry.block.tile.TileEntityRegistryContainer;
 import com.direwolf20.buildinggadgets.common.registry.block.tile.TileEntityTypeBuilder;
-import com.direwolf20.buildinggadgets.common.tiles.ChargingStationTileEntity;
-import com.direwolf20.buildinggadgets.common.tiles.ConstructionBlockTileEntity;
-import com.direwolf20.buildinggadgets.common.tiles.TemplateManagerTileEntity;
+import com.direwolf20.buildinggadgets.common.tiles.*;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference.BlockReference;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference.TileEntityReference;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.item.Item;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -52,6 +52,10 @@ public final class BGBlocks {
         container.add(new BlockBuilder(BlockReference.EFFECT_BLOCK_RL)
                 .builder(Block.Properties.create(EFFECT_BLOCK_MATERIAL).hardnessAndResistance(20f))
                 .setHasNoItem()
+                .withTileEntity(new TileEntityBuilder<EffectBlockTileEntity>(TileEntityReference.EFFECT_BLOCK_TILE_RL)
+                        .builder(new TileEntityTypeBuilder<>(EffectBlockTileEntity::new))
+                        .factory(TileEntityTypeBuilder::build)
+                        .renderer(EffectBlockTileEntity.class, new EffectBlockTER()))
                 .factory(EffectBlock::new));
         container.add(new BlockBuilder(BlockReference.CONSTRUCTION_BLOCK_RL)
                 .builder(Block.Properties.create(Material.ROCK).hardnessAndResistance(2f, 0f))
@@ -111,6 +115,8 @@ public final class BGBlocks {
         public static TileEntityType<?> TEMPLATE_MANAGER_TYPE;
         @ObjectHolder(TileEntityReference.CHARGING_STATION_TILE)
         public static TileEntityType<?> CHARGING_STATION_TYPE;
+        @ObjectHolder(TileEntityReference.EFFECT_BLOCK_TILE)
+        public static TileEntityType<?> EFFECT_BLOCK_TYPE;
 
         static void init() {
 

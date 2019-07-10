@@ -1,9 +1,11 @@
 package com.direwolf20.buildinggadgets.common.items.gadgets;
 
 import com.direwolf20.buildinggadgets.api.abstraction.BlockData;
+import com.direwolf20.buildinggadgets.common.blocks.EffectBlock;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
+import com.direwolf20.buildinggadgets.common.tiles.EffectBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.util.helpers.InventoryHelper;
 import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
 import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
@@ -264,7 +266,7 @@ public class GadgetExchanger extends GadgetGeneric {
             useItemSuccess = InventoryHelper.useItem(itemStack, player, neededItems, world);
         }
         if (useItemSuccess) {
-            world.addEntity(new BlockBuildEntity(world, pos, setBlock, BlockBuildEntity.Mode.REPLACE, useConstructionPaste));
+            EffectBlock.spawnEffectBlock(world, pos, setBlock, EffectBlockTileEntity.Mode.REPLACE, useConstructionPaste);
             //currentBlock.getBlock().removedByPlayer(currentBlock.getBlockData(), world, pos, player, false, null);
             List<ItemStack> blockDrops = currentBlock.getBlock().getDrops(currentBlock, world, pos, world.getTileEntity(pos));
             for (ItemStack drop : blockDrops) {

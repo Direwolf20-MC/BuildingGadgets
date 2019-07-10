@@ -3,10 +3,12 @@ package com.direwolf20.buildinggadgets.common.items.gadgets;
 import com.direwolf20.buildinggadgets.api.Registries;
 import com.direwolf20.buildinggadgets.api.abstraction.BlockData;
 import com.direwolf20.buildinggadgets.api.building.IAtopPlacingGadget;
+import com.direwolf20.buildinggadgets.common.blocks.EffectBlock;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
+import com.direwolf20.buildinggadgets.common.tiles.EffectBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.util.helpers.InventoryHelper;
 import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
 import com.direwolf20.buildinggadgets.common.util.helpers.SortingHelper;
@@ -243,7 +245,7 @@ public class GadgetBuilding extends GadgetGeneric implements IAtopPlacingGadget 
                 if (distance < 64 && sameDim && currentBlock.getState() != BGBlocks.effectBlock.getDefaultState() && ! cancelled) { //Don't allow us to undo a block while its still being placed or too far away
                     if (currentBlock.getState() != Blocks.AIR.getDefaultState()) {
                         currentBlock.getState().getBlock().harvestBlock(world, player, coord, currentBlock.getState(), world.getTileEntity(coord), silkTool);
-                        world.addEntity(new BlockBuildEntity(world, coord, currentBlock, BlockBuildEntity.Mode.REMOVE, false));
+                        EffectBlock.spawnEffectBlock(world, coord, currentBlock, EffectBlockTileEntity.Mode.REMOVE, false);
                     }
                 } else { //If you're in the wrong dimension or too far away, fail the undo.
                     player.sendStatusMessage(new StringTextComponent(TextFormatting.RED + new TranslationTextComponent("message.gadget.undofailed").getUnformattedComponentText()), true);
@@ -320,7 +322,7 @@ public class GadgetBuilding extends GadgetGeneric implements IAtopPlacingGadget 
             useItemSuccess = InventoryHelper.useItem(itemStack, player, neededItems, world);
         }
         if (useItemSuccess) {
-            world.addEntity(new BlockBuildEntity(world, pos, setBlock, BlockBuildEntity.Mode.PLACE, useConstructionPaste));
+            EffectBlock.spawnEffectBlock(world, pos, setBlock, EffectBlockTileEntity.Mode.PLACE, useConstructionPaste);
             return true;
         }
         return false;

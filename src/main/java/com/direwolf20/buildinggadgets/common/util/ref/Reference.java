@@ -81,10 +81,12 @@ public final class Reference {
         public static final String CONSTRUCTION_TILE = Reference.MODID + ":construction_tile";
         public static final String TEMPLATE_MANAGER_TILE = Reference.MODID + ":template_manager_tile";
         public static final String CHARGING_STATION_TILE = Reference.MODID + ":charging_station_tile";
+        public static final String EFFECT_BLOCK_TILE = Reference.MODID + ":effect_block_tile";
 
         public static final ResourceLocation TEMPLATE_MANAGER_TILE_RL = new ResourceLocation(TEMPLATE_MANAGER_TILE);
         public static final ResourceLocation CONSTRUCTION_TILE_RL = new ResourceLocation(CONSTRUCTION_TILE);
         public static final ResourceLocation CHARGING_STATION_TILE_RL = new ResourceLocation(CHARGING_STATION_TILE);
+        public static final ResourceLocation EFFECT_BLOCK_TILE_RL = new ResourceLocation(EFFECT_BLOCK_TILE);
 
         private TileEntityReference() {}
     }

@@ -6,6 +6,7 @@ import com.direwolf20.buildinggadgets.api.template.building.tilesupport.DummyTil
 import com.direwolf20.buildinggadgets.client.events.EventTooltip;
 import com.direwolf20.buildinggadgets.client.gui.GuiMod;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlock;
+import com.direwolf20.buildinggadgets.common.blocks.EffectBlock;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.common.items.ITemplate;
@@ -14,6 +15,7 @@ import com.direwolf20.buildinggadgets.common.network.packets.PacketBlockMap;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketRotateMirror;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
 import com.direwolf20.buildinggadgets.common.tiles.ConstructionBlockTileEntity;
+import com.direwolf20.buildinggadgets.common.tiles.EffectBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.blocks.BlockMap;
 import com.direwolf20.buildinggadgets.common.util.blocks.BlockMapIntState;
@@ -553,7 +555,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
             useItemSuccess = InventoryHelper.useItem(itemStack, player, neededItems, world);
         }
         if (useItemSuccess) {
-            world.addEntity(new BlockBuildEntity(world, pos, data, BlockBuildEntity.Mode.PLACE, useConstructionPaste));
+            EffectBlock.spawnEffectBlock(world, pos, data, EffectBlockTileEntity.Mode.PLACE, useConstructionPaste);
         }
 
     }
@@ -601,7 +603,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
                 if (currentBlock.getState().getBlock() == blockMap.state.getState().getBlock() || currentBlock.getState().getBlock() instanceof ConstructionBlock) {
                     if (currentBlock.getState().getBlockHardness(world, blockMap.pos) >= 0) {
                         currentBlock.getState().getBlock().harvestBlock(world, player, blockMap.pos, currentBlock.getState(), world.getTileEntity(blockMap.pos), silkTool);
-                        world.addEntity(new BlockBuildEntity(world, blockMap.pos, currentBlock, BlockBuildEntity.Mode.REMOVE, false));
+                        EffectBlock.spawnEffectBlock(world, blockMap.pos, currentBlock, EffectBlockTileEntity.Mode.REMOVE, false);
                     }
                 }
             } else {
