@@ -10,10 +10,8 @@ import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
 import com.direwolf20.buildinggadgets.common.tiles.ConstructionBlockTileEntity;
-import com.direwolf20.buildinggadgets.common.util.CapabilityUtil;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.blocks.RegionSnapshot;
-import com.direwolf20.buildinggadgets.common.util.exceptions.CapabilityNotPresentException;
 import com.direwolf20.buildinggadgets.common.util.exceptions.PaletteOverflowException;
 import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
 import com.direwolf20.buildinggadgets.common.util.helpers.SortingHelper;
@@ -44,7 +42,6 @@ import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.BlockSnapshot;
-import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.world.BlockEvent;
 import org.apache.commons.lang3.tuple.Pair;
@@ -162,8 +159,8 @@ public class GadgetDestruction extends GadgetGeneric {
     public ActionResult<ItemStack> onItemRightClick(World world, PlayerEntity player, Hand hand) {
         ItemStack stack = player.getHeldItem(hand);
         player.setActiveHand(hand);
-        IEnergyStorage energy = CapabilityUtil.EnergyUtil.getCap(stack).orElseThrow(CapabilityNotPresentException::new);
-        energy.receiveEnergy(100000, false);
+        //IEnergyStorage energy = CapabilityUtil.EnergyUtil.getCap(stack).orElseThrow(CapabilityNotPresentException::new);
+        //energy.receiveEnergy(100000, false);
         if (!world.isRemote) {
             if (! player.isSneaking()) {
                 BlockPos anchorPos = getAnchor(stack);
@@ -175,7 +172,7 @@ public class GadgetDestruction extends GadgetGeneric {
                 }
 
                 BlockRayTraceResult lookingAt = VectorHelper.getLookingAt(player, stack);
-                if (lookingAt != null || (world.getBlockState(VectorHelper.getLookingAt(player, stack).getPos()) != Blocks.AIR.getDefaultState())) {
+                if (lookingAt != null && (world.getBlockState(VectorHelper.getLookingAt(player, stack).getPos()) != Blocks.AIR.getDefaultState())) {
                     clearArea(world, lookingAt.getPos(), lookingAt.getFace(), (ServerPlayerEntity) player, stack);
                     clearSuccess(stack);
                     player.sendStatusMessage(new StringTextComponent(TextFormatting.AQUA + new StringTextComponent("message.gadget.anchorremove").getUnformattedComponentText()), true);
