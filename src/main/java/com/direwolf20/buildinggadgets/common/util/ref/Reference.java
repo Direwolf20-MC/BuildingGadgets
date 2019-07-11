@@ -68,11 +68,9 @@ public final class Reference {
     }
 
     public static final class EntityReference {
-        public static final String BUILD_BLOCK_ENTITY = Reference.MODID + ":build_block_entity";
         public static final String CONSTRUCTION_BLOCK_ENTITY = Reference.MODID + ":construction_block_entity";
 
         public static final ResourceLocation CONSTRUCTION_BLOCK_ENTITY_RL = new ResourceLocation(CONSTRUCTION_BLOCK_ENTITY);
-        public static final ResourceLocation BUILD_BLOCK_ENTITY_RL = new ResourceLocation(BUILD_BLOCK_ENTITY);
 
         private EntityReference() {}
     }

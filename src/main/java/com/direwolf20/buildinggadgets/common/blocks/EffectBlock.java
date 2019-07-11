@@ -6,6 +6,7 @@ import com.direwolf20.buildinggadgets.common.entities.ConstructionBlockEntity;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
 import com.direwolf20.buildinggadgets.common.tiles.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.tiles.EffectBlockTileEntity;
+import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
@@ -20,9 +21,12 @@ import net.minecraft.world.storage.loot.LootContext;
 import net.minecraftforge.common.util.Constants;
 
 import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.List;
 
+@MethodsReturnNonnullByDefault
+@ParametersAreNonnullByDefault
 public class EffectBlock extends Block {
 
     public enum Mode {
@@ -57,8 +61,7 @@ public class EffectBlock extends Block {
         REPLACE() {
             @Override
             public void onBuilderRemoved(EffectBlockTileEntity builder) {
-                World world = builder.getWorld();
-                spawnEffectBlock(world, builder.getPos(), builder.getSourceBlock(), PLACE, builder.isUsingPaste());
+                spawnEffectBlock(builder.getWorld(), builder.getPos(), builder.getSourceBlock(), PLACE, builder.isUsingPaste());
             }
         };
 
@@ -108,7 +111,8 @@ public class EffectBlock extends Block {
      */
     @Override
     public BlockRenderLayer getRenderLayer() {
-        return BlockRenderLayer.TRANSLUCENT;
+        // Since the effect block has no model rendering at all, which means we don't need blending, simply cutout is fine
+        return BlockRenderLayer.CUTOUT;
     }
 
     /**
@@ -122,7 +126,6 @@ public class EffectBlock extends Block {
     }
 
     /**
-     * @param state
      * @deprecated call via {@link BlockState#getPushReaction()} whenever possible. Implementing/overriding is fine.
      */
     @Override
