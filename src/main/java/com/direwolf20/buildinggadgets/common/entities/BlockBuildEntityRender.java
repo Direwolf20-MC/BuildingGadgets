@@ -1,8 +1,8 @@
 package com.direwolf20.buildinggadgets.common.entities;
 
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
+import com.direwolf20.buildinggadgets.common.blocks.EffectBlock;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
-import com.direwolf20.buildinggadgets.common.tiles.EffectBlockTileEntity;
 import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -32,7 +32,7 @@ public class BlockBuildEntityRender extends EntityRenderer<BlockBuildEntity> {
         Minecraft mc = Minecraft.getInstance();
         GlStateManager.pushMatrix();
 
-        EffectBlockTileEntity.Mode toolMode = entity.getToolMode();
+        EffectBlock.Mode toolMode = entity.getToolMode();
         mc.getTextureManager().bindTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
         int teCounter = entity.getTicksExisted();
         int maxLife = entity.getMaxLife();
@@ -40,7 +40,7 @@ public class BlockBuildEntityRender extends EntityRenderer<BlockBuildEntity> {
         float scale = (float) (teCounter) / (float) maxLife;
         if (scale >= 1.0f)
             scale = 0.99f;
-        if (toolMode == EffectBlockTileEntity.Mode.REMOVE || toolMode == EffectBlockTileEntity.Mode.REPLACE)
+        if (toolMode == EffectBlock.Mode.REMOVE || toolMode == EffectBlock.Mode.REPLACE)
             scale = (float) (maxLife - teCounter) / maxLife;
         float trans = (1 - scale) / 2;
         GlStateManager.translated(x, y, z);
@@ -52,7 +52,7 @@ public class BlockBuildEntityRender extends EntityRenderer<BlockBuildEntity> {
         //BlockState renderBlockState = blocks.COBBLESTONE.getDefaultState();
 
         BlockState renderBlockState = entity.getSetBlock();
-        if (entity.isUsingPaste() && toolMode == EffectBlockTileEntity.Mode.PLACE)
+        if (entity.isUsingPaste() && toolMode == EffectBlock.Mode.PLACE)
             renderBlockState = BGBlocks.constructionBlockDense.getDefaultState();
         if (renderBlockState == null) {
             renderBlockState = Blocks.COBBLESTONE.getDefaultState();
@@ -90,7 +90,7 @@ public class BlockBuildEntityRender extends EntityRenderer<BlockBuildEntity> {
         float red = 0f;
         float green = 1f;
         float blue = 1f;
-        if (toolMode == EffectBlockTileEntity.Mode.REMOVE || toolMode == EffectBlockTileEntity.Mode.REPLACE) {
+        if (toolMode == EffectBlock.Mode.REMOVE || toolMode == EffectBlock.Mode.REPLACE) {
             red = 1f;
             green = 0.25f;
             blue = 0.25f;

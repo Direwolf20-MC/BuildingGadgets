@@ -1,11 +1,7 @@
 package com.direwolf20.buildinggadgets.common.entities;
 
-import com.direwolf20.buildinggadgets.api.Registries;
 import com.direwolf20.buildinggadgets.api.abstraction.BlockData;
-import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
-import com.direwolf20.buildinggadgets.common.registry.objects.BGEntities;
-import com.direwolf20.buildinggadgets.common.tiles.ConstructionBlockTileEntity;
-import com.direwolf20.buildinggadgets.common.tiles.EffectBlockTileEntity;
+import com.direwolf20.buildinggadgets.common.blocks.EffectBlock;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.EntityType;
@@ -14,8 +10,6 @@ import net.minecraft.network.IPacket;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.network.NetworkHooks;
 
@@ -31,7 +25,7 @@ public class BlockBuildEntity extends EntityBase {
     private BlockData setBlock;
     private BlockData originalSetBlock;
 
-    private EffectBlockTileEntity.Mode mode;
+    private EffectBlock.Mode mode;
     private boolean useConstructionPaste;
 
     public BlockBuildEntity(EntityType<?> type, World world) {
@@ -66,11 +60,11 @@ public class BlockBuildEntity extends EntityBase {
         return 20;
     }
 
-    public EffectBlockTileEntity.Mode getToolMode() {
-        return EffectBlockTileEntity.Mode.VALUES[dataManager.get(MODE)];
+    public EffectBlock.Mode getToolMode() {
+        return EffectBlock.Mode.VALUES[dataManager.get(MODE)];
     }
 
-    public void setToolMode(EffectBlockTileEntity.Mode mode) {
+    public void setToolMode(EffectBlock.Mode mode) {
         dataManager.set(MODE, mode.ordinal());
     }
 
@@ -93,7 +87,7 @@ public class BlockBuildEntity extends EntityBase {
 
     @Override
     protected void registerData() {
-        dataManager.register(MODE, EffectBlockTileEntity.Mode.PLACE.ordinal());
+        dataManager.register(MODE, EffectBlock.Mode.PLACE.ordinal());
         dataManager.register(SET_BLOCK, Optional.empty());
         dataManager.register(USE_PASTE, useConstructionPaste);
     }
@@ -103,7 +97,7 @@ public class BlockBuildEntity extends EntityBase {
         super.readAdditional(compound);
         setBlock = BlockData.deserialize(compound.getCompound(NBTKeys.ENTITY_BUILD_SET_BLOCK), true);
         originalSetBlock = BlockData.deserialize(compound.getCompound(NBTKeys.ENTITY_BUILD_ORIGINAL_BLOCK), true);
-        mode = EffectBlockTileEntity.Mode.VALUES[compound.getInt(NBTKeys.GADGET_MODE)];
+        mode = EffectBlock.Mode.VALUES[compound.getInt(NBTKeys.GADGET_MODE)];
         useConstructionPaste = compound.getBoolean(NBTKeys.ENTITY_BUILD_USE_PASTE);
     }
 

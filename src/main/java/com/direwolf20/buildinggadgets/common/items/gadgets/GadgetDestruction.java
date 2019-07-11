@@ -8,10 +8,8 @@ import com.direwolf20.buildinggadgets.api.template.building.tilesupport.DummyTil
 import com.direwolf20.buildinggadgets.client.gui.GuiMod;
 import com.direwolf20.buildinggadgets.common.blocks.EffectBlock;
 import com.direwolf20.buildinggadgets.common.config.Config;
-import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
 import com.direwolf20.buildinggadgets.common.tiles.ConstructionBlockTileEntity;
-import com.direwolf20.buildinggadgets.common.tiles.EffectBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.blocks.RegionSnapshot;
 import com.direwolf20.buildinggadgets.common.util.exceptions.PaletteOverflowException;
@@ -340,7 +338,7 @@ public class GadgetDestruction extends GadgetGeneric {
                 .collect(Collectors.toSet());
         int index = 0;
         for (BlockPos pos : snapshot.getPositions()) {
-            snapshot.getBlockStates().get(index).ifPresent(state -> EffectBlock.spawnEffectBlock(world, pos, new BlockData(state, DummyTileEntityData.INSTANCE), EffectBlockTileEntity.Mode.PLACE, pastePositions.contains(pos)));
+            snapshot.getBlockStates().get(index).ifPresent(state -> EffectBlock.spawnEffectBlock(world, pos, new BlockData(state, DummyTileEntityData.INSTANCE), EffectBlock.Mode.PLACE, pastePositions.contains(pos)));
             index++;
         }
     }
@@ -357,7 +355,7 @@ public class GadgetDestruction extends GadgetGeneric {
             return false;
 
         this.applyDamage(tool, player);
-        EffectBlock.spawnEffectBlock(world, voidPos, Registries.TileEntityData.createBlockData(world, voidPos), EffectBlockTileEntity.Mode.REMOVE, false);
+        EffectBlock.spawnEffectBlock(world, voidPos, Registries.TileEntityData.createBlockData(world, voidPos), EffectBlock.Mode.REMOVE, false);
         return true;
     }
 

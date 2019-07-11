@@ -1,11 +1,12 @@
 package com.direwolf20.buildinggadgets.client.renderer;
 
+import com.direwolf20.buildinggadgets.api.abstraction.BlockData;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
+import com.direwolf20.buildinggadgets.common.blocks.EffectBlock;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
 import com.direwolf20.buildinggadgets.common.tiles.EffectBlockTileEntity;
 import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockRendererDispatcher;
 import net.minecraft.client.renderer.BufferBuilder;
@@ -14,6 +15,8 @@ import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import org.lwjgl.opengl.GL11;
+
+import java.util.Objects;
 
 public class EffectBlockTER extends TileEntityRenderer<EffectBlockTileEntity> {
 
@@ -28,7 +31,7 @@ public class EffectBlockTER extends TileEntityRenderer<EffectBlockTileEntity> {
         Minecraft mc = Minecraft.getInstance();
         GlStateManager.pushMatrix();
 
-        EffectBlockTileEntity.Mode toolMode = tile.getReplacementMode();
+        EffectBlock.Mode toolMode = tile.getReplacementMode();
         mc.getTextureManager().bindTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
         int teCounter = tile.getTicksExisted();
         int maxLife = tile.getLifespan();
@@ -36,7 +39,7 @@ public class EffectBlockTER extends TileEntityRenderer<EffectBlockTileEntity> {
         float scale = (float) (teCounter) / (float) maxLife;
         if (scale >= 1.0f)
             scale = 0.99f;
-        if (toolMode == EffectBlockTileEntity.Mode.REMOVE || toolMode == EffectBlockTileEntity.Mode.REPLACE)
+        if (toolMode == EffectBlock.Mode.REMOVE || toolMode == EffectBlock.Mode.REPLACE)
             scale = (float) (maxLife - teCounter) / maxLife;
         float trans = (1 - scale) / 2;
         GlStateManager.translated(x, y, z);
@@ -47,8 +50,8 @@ public class EffectBlockTER extends TileEntityRenderer<EffectBlockTileEntity> {
 
         //BlockState renderBlockState = blocks.COBBLESTONE.getDefaultState();
 
-        BlockState renderBlockState = tile.getReplacementBlock().getState();
-        if (tile.isUsingPaste() && toolMode == EffectBlockTileEntity.Mode.PLACE)
+        BlockState renderBlockState = tile.getRenderedBlock().getState();
+        if (tile.isUsingPaste() && toolMode == EffectBlock.Mode.PLACE)
             renderBlockState = BGBlocks.constructionBlockDense.getDefaultState();
 
         try {
@@ -84,7 +87,7 @@ public class EffectBlockTER extends TileEntityRenderer<EffectBlockTileEntity> {
         float red = 0f;
         float green = 1f;
         float blue = 1f;
-        if (toolMode == EffectBlockTileEntity.Mode.REMOVE || toolMode == EffectBlockTileEntity.Mode.REPLACE) {
+        if (toolMode == EffectBlock.Mode.REMOVE || toolMode == EffectBlock.Mode.REPLACE) {
             red = 1f;
             green = 0.25f;
             blue = 0.25f;

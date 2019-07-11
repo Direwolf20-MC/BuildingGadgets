@@ -2,69 +2,24 @@ package com.direwolf20.buildinggadgets.common.tiles;
 
 import com.direwolf20.buildinggadgets.api.Registries;
 import com.direwolf20.buildinggadgets.api.abstraction.BlockData;
-import com.direwolf20.buildinggadgets.api.template.building.SimpleBuildContext;
-import com.direwolf20.buildinggadgets.common.blocks.EffectBlock;
-import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
-import com.direwolf20.buildinggadgets.common.entities.ConstructionBlockEntity;
-import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
+import com.direwolf20.buildinggadgets.common.blocks.EffectBlock.Mode;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks.BGTileEntities;
-import com.direwolf20.buildinggadgets.common.registry.objects.BGEntities;
-import com.google.common.base.Preconditions;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SUpdateTileEntityPacket;
 import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-
-import javax.annotation.Nullable;
 
 public class EffectBlockTileEntity extends TileEntity implements ITickableTileEntity {
 
-    public enum Mode {
-        // Serialization and networking based on `ordinal()`, please DO NOT CHANGE THE ORDER of the enums
-        PLACE() {
-            @Override
-            public void onBuilderRemoved(EffectBlockTileEntity builder) {
-                World world = builder.world;
-                BlockPos targetPos = builder.getPos();
-                BlockData targetBlock = builder.getReplacementBlock();
-                if (builder.isUsingPaste()) {
-                    world.setBlockState(targetPos, BGBlocks.constructionBlock.getDefaultState());
-                    TileEntity te = world.getTileEntity(targetPos);
-                    if (te instanceof ConstructionBlockTileEntity) {
-                        ((ConstructionBlockTileEntity) te).setBlockState(targetBlock, targetBlock);
-                    }
-                    world.addEntity(new ConstructionBlockEntity(world, targetPos, false));
-                } else {
-                    world.removeBlock(targetPos, false);
-                    targetBlock.placeIn(SimpleBuildContext.builder().build(world), targetPos);
-                    BlockPos upPos = targetPos.up();
-                    world.getBlockState(targetPos).neighborChanged(world, targetPos, world.getBlockState(upPos).getBlock(), upPos, false);
-                }
-            }
-        },
-        REMOVE() {
-            @Override
-            public void onBuilderRemoved(EffectBlockTileEntity builder) {
-                builder.world.removeBlock(builder.getPos(), false);
-            }
-        },
-        REPLACE() {
-            @Override
-            public void onBuilderRemoved(EffectBlockTileEntity builder) {
-                World world = builder.world;
-                EffectBlock.spawnEffectBlock(world, builder.getPos(), builder.getSourceBlock(), PLACE, builder.isUsingPaste());
-            }
-        };
-
-        public static final Mode[] VALUES = values();
-
-        public abstract void onBuilderRemoved(EffectBlockTileEntity builder);
-    }
-
-    private BlockData replacementBlock;
+    /**
+     * Even though this is called "rendered", is will be used for replacement under normal conditions.
+     */
+    private BlockData renderedBlock;
+    /**
+     * A copy of the target block, used for inheriting data for {@link Mode#REPLACE}
+     */
     private BlockData sourceBlock;
 
     private Mode mode = null;
@@ -76,22 +31,23 @@ public class EffectBlockTileEntity extends TileEntity implements ITickableTileEn
         super(BGTileEntities.EFFECT_BLOCK_TYPE);
     }
 
-    public void initializeData(World world, BlockData spawnBlock, Mode mode, boolean usePaste) {
-        // We use the field mode as an indicator of initialized or not
-        Preconditions.checkState(this.mode == null);
+    public void initializeData(World world, BlockData replacementBlock, Mode mode, boolean usePaste) {
+        // Minecraft will reuse a tile entity object at a location where the block got removed, but the modification is still buffered, and the block got restored again
+        // If we don't reset this here, the 2nd phase of REPLACE will simply finish immediately because the tile entity object is reused
+        this.ticks = 0;
+        // Again we don't check if the data has been set or not because there is a chance that this tile object gets reused
 
         BlockData currentBlock = Registries.TileEntityData.createBlockData(world, pos);
         TileEntity te = world.getTileEntity(pos);
-        sourceBlock = spawnBlock;
+        this.sourceBlock = replacementBlock;
 
         this.mode = mode;
         this.usePaste = usePaste;
 
-        if (mode == EffectBlockTileEntity.Mode.REPLACE)
-            replacementBlock = te instanceof ConstructionBlockTileEntity ? ((ConstructionBlockTileEntity) te).getConstructionBlockData() : currentBlock;
+        if (mode == Mode.REPLACE)
+            this.renderedBlock = te instanceof ConstructionBlockTileEntity ? ((ConstructionBlockTileEntity) te).getConstructionBlockData() : currentBlock;
         else
-            replacementBlock = te instanceof ConstructionBlockTileEntity ? ((ConstructionBlockTileEntity) te).getConstructionBlockData() : spawnBlock;
-
+            this.renderedBlock = te instanceof ConstructionBlockTileEntity ? ((ConstructionBlockTileEntity) te).getConstructionBlockData() : replacementBlock;
     }
 
     @Override
@@ -103,13 +59,13 @@ public class EffectBlockTileEntity extends TileEntity implements ITickableTileEn
     }
 
     private void complete() {
-        if (world.isRemote || mode == null || replacementBlock == null)
+        if (world.isRemote || mode == null || renderedBlock == null)
             return;
         mode.onBuilderRemoved(this);
     }
 
-    public BlockData getReplacementBlock() {
-        return replacementBlock;
+    public BlockData getRenderedBlock() {
+        return renderedBlock;
     }
 
     public BlockData getSourceBlock() {
@@ -132,10 +88,9 @@ public class EffectBlockTileEntity extends TileEntity implements ITickableTileEn
         return 20;
     }
 
-    @Nullable
     @Override
     public SUpdateTileEntityPacket getUpdatePacket() {
-        // TODO figure out the type
+        // Vanilla uses the type parameter to indicate which type of tile entity (command block, skull, or beacon?) is receiving the packet, but it seems like Forge has overridden this behavior
         return new SUpdateTileEntityPacket(pos, 0, write(new CompoundNBT()));
     }
 
@@ -148,7 +103,7 @@ public class EffectBlockTileEntity extends TileEntity implements ITickableTileEn
     public CompoundNBT write(CompoundNBT compound) {
         compound.putInt("ticks", ticks);
         compound.putInt("mode", mode.ordinal());
-        compound.put("replacement_block", replacementBlock.serialize(true));
+        compound.put("replacement_block", renderedBlock.serialize(true));
         compound.put("source_block", sourceBlock.serialize(true));
         compound.putBoolean("use_paste", usePaste);
 
@@ -161,7 +116,7 @@ public class EffectBlockTileEntity extends TileEntity implements ITickableTileEn
 
         ticks = compound.getInt("ticks");
         mode = Mode.VALUES[compound.getInt("mode")];
-        replacementBlock = BlockData.deserialize(compound.getCompound("replacement_block"), true);
+        renderedBlock = BlockData.deserialize(compound.getCompound("replacement_block"), true);
         sourceBlock = BlockData.deserialize(compound.getCompound("source_block"), true);
         usePaste = compound.getBoolean("use_paste");
     }
