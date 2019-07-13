@@ -55,8 +55,8 @@ public class ChargingStationTileEntity extends TileEntity implements ITickableTi
 
     private final CappedEnergyStorage energy;
     private final ItemStackHandler itemStackHandler;
-    private final LazyOptional<IEnergyStorage> energyCap;
-    private final LazyOptional<IItemHandler> itemCap;
+    private LazyOptional<IEnergyStorage> energyCap;
+    private LazyOptional<IItemHandler> itemCap;
 
     //Render variables! ----------------------------------------------
     private int renderCounter = 0;
@@ -227,6 +227,20 @@ public class ChargingStationTileEntity extends TileEntity implements ITickableTi
         return super.getCapability(cap, side);
     }
 
+    @Override
+    public void onChunkUnloaded() {
+        itemCap.invalidate();
+        energyCap.invalidate();
+    }
+
+    @Override
+    public void onLoad() {
+        if (! itemCap.isPresent())
+            itemCap = LazyOptional.of(this::getItemStackHandler);
+        if (! energyCap.isPresent())
+            energyCap = LazyOptional.of(this::getEnergy);
+    }
+
     private void addEnergy(int amount) {
         energy.receiveEnergy(amount, false);
     }
@@ -236,7 +250,7 @@ public class ChargingStationTileEntity extends TileEntity implements ITickableTi
     }
 
     public boolean isChargingItem(IEnergyStorage energy) {
-        return (getEnergy().getEnergyStored() > 0 || ! getFuelStack().isEmpty()) && energy.getEnergyStored() < energy.getMaxEnergyStored();
+        return getEnergy().getEnergyStored() > 0 && energy.receiveEnergy(getEnergy().getEnergyStored(), true) > 0;
     }
 
     @Override
