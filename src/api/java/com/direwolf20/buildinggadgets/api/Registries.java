@@ -20,7 +20,7 @@ import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.RegistryBuilder;
 
-@EventBusSubscriber(modid = "buildinggadgets", bus = Bus.MOD)
+@EventBusSubscriber(modid = APIReference.MODID, bus = Bus.MOD)
 public final class Registries {
 
     public static final ResourceLocation STACK_PROVIDER_ITEM_HANDLER = new ResourceLocation("buildinggadgets:stack_provider/item_handler");

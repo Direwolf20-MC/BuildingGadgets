@@ -1,4 +1,4 @@
-package com.direwolf20.buildinggadgets.common.items.capability;
+package com.direwolf20.buildinggadgets.common.capability;
 
 import com.direwolf20.buildinggadgets.api.building.IBlockProvider;
 import com.direwolf20.buildinggadgets.api.capability.CapabilityBlockProvider;

@@ -2,12 +2,15 @@ package com.direwolf20.buildinggadgets.client.gui;
 
 //import com.direwolf20.buildinggadgets.client.gui.materiallist.MaterialListGUI;
 
+import com.direwolf20.buildinggadgets.client.gui.blocks.ChargingStationGUI;
+import com.direwolf20.buildinggadgets.client.gui.blocks.TemplateManagerGUI;
 import com.direwolf20.buildinggadgets.client.gui.components.GuiTextFieldBase;
-import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManagerContainer;
-import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManagerGUI;
-import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManagerTileEntity;
+import com.direwolf20.buildinggadgets.common.containers.ChargingStationContainer;
+import com.direwolf20.buildinggadgets.common.containers.TemplateManagerContainer;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetDestruction;
+import com.direwolf20.buildinggadgets.common.tiles.ChargingStationTileEntity;
+import com.direwolf20.buildinggadgets.common.tiles.TemplateManagerTileEntity;
 import com.direwolf20.buildinggadgets.common.util.lang.LangUtil;
 import com.google.common.base.Function;
 import com.google.common.base.Supplier;
@@ -48,7 +51,21 @@ public enum GuiMod {
             return true;
         }
         return false;
+    }),
+    CHARGING_STATION("charging_station", message -> {
+        TileEntity te = Minecraft.getInstance().world.getTileEntity(message.getAdditionalData().readBlockPos());
+        return te instanceof ChargingStationTileEntity
+                ? new ChargingStationGUI((ChargingStationTileEntity) te, getChargingStationContainer(Minecraft.getInstance().player, te), Minecraft.getInstance().player.inventory)
+                : null;
+    }, (id, player, world, pos) -> {
+        TileEntity te = world.getTileEntity(pos);
+        if (te instanceof ChargingStationTileEntity) {
+            openGuiContainer(id, player, getChargingStationContainer(player, te), buffer -> buffer.writeBlockPos(pos));
+            return true;
+        }
+        return false;
     });
+
 //    MATERIAL_LIST(ITemplate::getTemplate, MaterialListGUI::new);
 
     private static interface IContainerOpener {
@@ -103,6 +120,10 @@ public enum GuiMod {
 
     private static TemplateManagerContainer getTemplateManagerContainer(PlayerEntity player, TileEntity te) {
         return new TemplateManagerContainer(0, player.inventory, (TemplateManagerTileEntity) te);
+    }
+
+    private static ChargingStationContainer getChargingStationContainer(PlayerEntity player, TileEntity te) {
+        return new ChargingStationContainer(0, player.world, te.getPos(), player.inventory, player);
     }
 
     private static void openGuiContainer(String id, ServerPlayerEntity player, Container container, Consumer<PacketBuffer> extraDataWriter) {

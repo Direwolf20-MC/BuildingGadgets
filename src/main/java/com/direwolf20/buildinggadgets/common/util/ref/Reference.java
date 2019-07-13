@@ -55,12 +55,14 @@ public final class Reference {
         public static final String CONSTRUCTION_BLOCK_DENSE = MODID + ":construction_block_dense";
         public static final String CONSTRUCTION_BLOCK_POWDER = MODID + ":construction_block_powder";
         public static final String TEMPLATE_MANAGER = MODID + ":template_manager";
+        public static final String CHARGING_STATION = MODID + ":charging_station";
 
         public static final ResourceLocation EFFECT_BLOCK_RL = new ResourceLocation(EFFECT_BLOCK);
         public static final ResourceLocation CONSTRUCTION_BLOCK_RL = new ResourceLocation(CONSTRUCTION_BLOCK);
         public static final ResourceLocation CONSTRUCTION_BLOCK_DENSE_RL = new ResourceLocation(CONSTRUCTION_BLOCK_DENSE);
         public static final ResourceLocation CONSTRUCTION_BLOCK_POWDER_RL = new ResourceLocation(CONSTRUCTION_BLOCK_POWDER);
         public static final ResourceLocation TEMPLATE_MANAGER_RL = new ResourceLocation(TEMPLATE_MANAGER);
+        public static final ResourceLocation CHARGING_STATION_RL = new ResourceLocation(CHARGING_STATION);
 
         private BlockReference() {}
     }
@@ -78,17 +80,21 @@ public final class Reference {
     public static final class TileEntityReference {
         public static final String CONSTRUCTION_TILE = Reference.MODID + ":construction_tile";
         public static final String TEMPLATE_MANAGER_TILE = Reference.MODID + ":template_manager_tile";
+        public static final String CHARGING_STATION_TILE = Reference.MODID + ":charging_station_tile";
 
         public static final ResourceLocation TEMPLATE_MANAGER_TILE_RL = new ResourceLocation(TEMPLATE_MANAGER_TILE);
         public static final ResourceLocation CONSTRUCTION_TILE_RL = new ResourceLocation(CONSTRUCTION_TILE);
+        public static final ResourceLocation CHARGING_STATION_TILE_RL = new ResourceLocation(CHARGING_STATION_TILE);
 
         private TileEntityReference() {}
     }
 
     public static final class ContainerReference {
         public static final String TEMPLATE_MANAGER_CONTAINER = Reference.MODID + ":template_manager_container";
+        public static final String CHARGING_STATION_CONTAINER = Reference.MODID + ":charging_station_container";
 
         public static final ResourceLocation TEMPLATE_MANAGER_CONTAINER_RL = new ResourceLocation(TEMPLATE_MANAGER_CONTAINER);
+        public static final ResourceLocation CHARGING_STATION_CONTAINER_RL = new ResourceLocation(CHARGING_STATION_CONTAINER);
 
         private ContainerReference() {}
     }

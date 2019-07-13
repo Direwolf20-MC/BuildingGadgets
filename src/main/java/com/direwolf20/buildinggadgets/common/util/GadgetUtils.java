@@ -1,12 +1,12 @@
 package com.direwolf20.buildinggadgets.common.util;
 
 import com.direwolf20.buildinggadgets.api.abstraction.BlockData;
-import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetBuilding;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetExchanger;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketRotateMirror;
+import com.direwolf20.buildinggadgets.common.tiles.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.util.exceptions.CapabilityNotPresentException;
 import com.direwolf20.buildinggadgets.common.util.helpers.InventoryHelper;
 import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
@@ -31,6 +31,7 @@ import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.tileentity.AbstractFurnaceTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
 import net.minecraft.util.Direction.Axis;
@@ -358,7 +359,7 @@ public class GadgetUtils {
     }
     @Nullable
     public static IItemHandler getRemoteInventory(ItemStack tool, World world, NetworkIO.Operation operation) {
-        ResourceLocation dim = getDIMFromNBT(tool, NBTKeys.REMOTE_INVENTORY_DIM);
+        ResourceLocation dim = getDIMFromNBT(tool, NBTKeys.REMOTE_INVENTORY_POS);
         if (dim == null) return null;
         BlockPos pos = getPOSFromNBT(tool, NBTKeys.REMOTE_INVENTORY_POS);
         return pos == null ? null : getRemoteInventory(pos, dim, world /*, operation*/);
@@ -592,4 +593,8 @@ public class GadgetUtils {
         return itemCountMap;
     }
 
+    public static int getItemBurnTime(ItemStack stack) {
+        return net.minecraftforge.event.ForgeEventFactory.getItemBurnTime(stack,
+                stack.getBurnTime() == - 1 ? AbstractFurnaceTileEntity.getBurnTimes().getOrDefault(stack.getItem(), 0) : stack.getBurnTime());
+    }
 }

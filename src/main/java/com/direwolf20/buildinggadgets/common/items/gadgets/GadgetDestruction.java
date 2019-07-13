@@ -5,14 +5,12 @@ import com.direwolf20.buildinggadgets.api.building.IPositionPlacementSequence;
 import com.direwolf20.buildinggadgets.api.building.Region;
 import com.direwolf20.buildinggadgets.api.template.building.tilesupport.TileSupport;
 import com.direwolf20.buildinggadgets.client.gui.GuiMod;
-import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
-import com.direwolf20.buildinggadgets.common.util.CapabilityUtil;
+import com.direwolf20.buildinggadgets.common.tiles.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.blocks.RegionSnapshot;
-import com.direwolf20.buildinggadgets.common.util.exceptions.CapabilityNotPresentException;
 import com.direwolf20.buildinggadgets.common.util.exceptions.PaletteOverflowException;
 import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
 import com.direwolf20.buildinggadgets.common.util.helpers.SortingHelper;
@@ -43,7 +41,6 @@ import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.BlockSnapshot;
-import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.world.BlockEvent;
 import org.apache.commons.lang3.tuple.Pair;
@@ -63,22 +60,13 @@ public class GadgetDestruction extends GadgetGeneric {
     }
 
     @Override
-    public int getMaxDamage(ItemStack stack) {
-        return Config.GADGETS.poweredByFE.get() ? 0 : Config.GADGETS.GADGET_DESTRUCTION.durability.get();
-    }
-
-    @Override
     public int getEnergyCost(ItemStack tool) {
         return Config.GADGETS.GADGET_DESTRUCTION.energyCost.get() * getCostMultiplier(tool);
     }
 
-    @Override
-    public int getDamageCost(ItemStack tool) {
-        return Config.GADGETS.GADGET_DESTRUCTION.durabilityCost.get() * getCostMultiplier(tool);
-    }
 
     private int getCostMultiplier(ItemStack tool) {
-        return (int) (Config.GADGETS.poweredByFE.get() && !getFuzzy(tool) ? Config.GADGETS.GADGET_DESTRUCTION.nonFuzzyMultiplier.get() : 1);
+        return (int) (! getFuzzy(tool) ? Config.GADGETS.GADGET_DESTRUCTION.nonFuzzyMultiplier.get() : 1);
     }
 
     @Override
@@ -170,8 +158,8 @@ public class GadgetDestruction extends GadgetGeneric {
     public ActionResult<ItemStack> onItemRightClick(World world, PlayerEntity player, Hand hand) {
         ItemStack stack = player.getHeldItem(hand);
         player.setActiveHand(hand);
-        IEnergyStorage energy = CapabilityUtil.EnergyUtil.getCap(stack).orElseThrow(CapabilityNotPresentException::new);
-        energy.receiveEnergy(100000, false);
+        //IEnergyStorage energy = CapabilityUtil.EnergyUtil.getCap(stack).orElseThrow(CapabilityNotPresentException::new);
+        //energy.receiveEnergy(100000, false);
         if (!world.isRemote) {
             if (! player.isSneaking()) {
                 BlockPos anchorPos = getAnchor(stack);
@@ -183,7 +171,7 @@ public class GadgetDestruction extends GadgetGeneric {
                 }
 
                 BlockRayTraceResult lookingAt = VectorHelper.getLookingAt(player, stack);
-                if (lookingAt != null || (world.getBlockState(VectorHelper.getLookingAt(player, stack).getPos()) != Blocks.AIR.getDefaultState())) {
+                if (lookingAt != null && (world.getBlockState(VectorHelper.getLookingAt(player, stack).getPos()) != Blocks.AIR.getDefaultState())) {
                     clearArea(world, lookingAt.getPos(), lookingAt.getFace(), (ServerPlayerEntity) player, stack);
                     clearSuccess(stack);
                     player.sendStatusMessage(new StringTextComponent(TextFormatting.AQUA + new StringTextComponent("message.gadget.anchorremove").getUnformattedComponentText()), true);
@@ -299,8 +287,8 @@ public class GadgetDestruction extends GadgetGeneric {
         boolean vertical = side.getAxis().isVertical();
         Direction up = vertical ? player.getHorizontalFacing() : Direction.UP;
         Direction down = up.getOpposite();
-        Direction left = vertical ? up.rotateY() : side.rotateYCCW();
-        Direction right = left.getOpposite();
+        Direction right = vertical ? up.rotateY() : side.rotateYCCW();
+        Direction left = right.getOpposite();
 
         BlockPos first = pos.offset(left, getToolValue(stack, NBTKeys.GADGET_VALUE_LEFT))
                 .offset(up, getToolValue(stack, NBTKeys.GADGET_VALUE_UP));

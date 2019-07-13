@@ -1,4 +1,4 @@
-package com.direwolf20.buildinggadgets.common.blocks;
+package com.direwolf20.buildinggadgets.common.tiles;
 
 import com.direwolf20.buildinggadgets.api.abstraction.BlockData;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks.BGTileEntities;
@@ -30,8 +30,7 @@ public class ConstructionBlockTileEntity extends TileEntity {
     }
 
     @Override
-    public IModelData getModelData()
-    {
+    public IModelData getModelData() {
         BlockState state = getActualBlockData().getState();
         //TODO: query simulated Tile, if exists, and relay model data...
         return new ModelDataMap.Builder().withInitial(FACADE_STATE, state).build();
@@ -59,8 +58,8 @@ public class ConstructionBlockTileEntity extends TileEntity {
     @Override
     public void read(CompoundNBT compound) {
         super.read(compound);
-        blockState = BlockData.deserialize(compound.getCompound(NBTKeys.TE_CONSTRUCTION_STATE), true);
-        actualBlockState = BlockData.deserialize(compound.getCompound(NBTKeys.TE_CONSTRUCTION_STATE_ACTUAL), true);
+        blockState = BlockData.tryDeserialize(compound.getCompound(NBTKeys.TE_CONSTRUCTION_STATE), true);
+        actualBlockState = BlockData.tryDeserialize(compound.getCompound(NBTKeys.TE_CONSTRUCTION_STATE_ACTUAL), true);
         markDirtyClient();
     }
 

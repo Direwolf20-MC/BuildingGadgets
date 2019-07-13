@@ -1,4 +1,4 @@
-package com.direwolf20.buildinggadgets.common.items.capability;
+package com.direwolf20.buildinggadgets.common.capability;
 
 import com.google.common.collect.ImmutableList;
 import net.minecraft.util.Direction;

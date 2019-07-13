@@ -26,6 +26,8 @@ public class Config {
 
     private static final String LANG_KEY_GENERAL = LANG_KEY_ROOT + "." + CATEGORY_GENERAL;
 
+    private static final String LANG_KEY_CHARGING_STATION = LANG_KEY_ROOT + ".charging";
+
     private static final String LANG_KEY_BLACKLIST = LANG_KEY_ROOT + ".blacklist";
 
     private static final String LANG_KEY_GADGETS = LANG_KEY_ROOT + ".gadgets";
@@ -46,9 +48,9 @@ public class Config {
     private static final Builder SERVER_BUILDER = new Builder();
     private static final Builder CLIENT_BUILDER = new Builder();
 
-    public static final IApiConfig API = new ApiConfig();
-
     public static final CategoryGeneral GENERAL = new CategoryGeneral();
+
+    public static final CategoryChargingStation CHARGING_STATION = new CategoryChargingStation();
 
     public static final CategoryGadgets GADGETS = new CategoryGadgets();
 
@@ -61,10 +63,6 @@ public class Config {
         public final DoubleValue rayTraceRange;
 
         public final BooleanValue enablePaste;
-
-        public final IntValue pasteDroppedMin;
-
-        public final IntValue pasteDroppedMax;
 
         public final BooleanValue enableDestructionGadget;
 
@@ -87,15 +85,6 @@ public class Config {
                     .translation(LANG_KEY_GENERAL + ".paste.enabled")
                     .define("Enable Construction Paste", true);
 
-            pasteDroppedMin = SERVER_BUILDER
-                    .comment("The minimum number of construction paste items dropped by a dense construction block.")
-                    .translation(LANG_KEY_GENERAL + ".paste.dropped.min")
-                    .defineInRange("Construction Paste Drop Count - Min", 1, 0, Integer.MAX_VALUE);
-
-            pasteDroppedMax = SERVER_BUILDER
-                    .comment("The maximum number of construction paste items dropped by a dense construction block.")
-                    .translation(LANG_KEY_GENERAL + ".paste.dropped.max")
-                    .defineInRange("Construction Paste Drop Count - Max", 3, 0, Integer.MAX_VALUE);
 
             enableDestructionGadget = SERVER_BUILDER
                     .comment("Set to false to disable the Destruction Gadget.")
@@ -118,12 +107,59 @@ public class Config {
         }
     }
 
+    public static final class CategoryChargingStation {
+        public final IntValue capacity;
+
+        public final DoubleValue fuelUsage;
+
+        public final IntValue energyPerTick;
+
+        public final IntValue chargePerTick;
+
+        public final IntValue maxRecieve;
+
+        public final IntValue maxExtract;
+
+        public final BooleanValue renderSphere;
+
+        private CategoryChargingStation() {
+            SERVER_BUILDER.comment("Charging station settings")/*.translation(LANG_KEY_CHARGING_STATION)*/.push("charging_station");
+            COMMON_BUILDER.comment("Charging station settings")/*.translation(LANG_KEY_CHARGING_STATION)*/.push("charging_station");
+            CLIENT_BUILDER.comment("Charging station settings")/*.translation(LANG_KEY_CHARGING_STATION)*/.push("charging_station");
+            capacity = SERVER_BUILDER.comment("Define the maximum energy stored in the Charging Station.")
+                    .translation(LANG_KEY_CHARGING_STATION + ".capacity")
+                    .defineInRange("Energy capacity", 1000000, 1, Integer.MAX_VALUE);
+            fuelUsage = SERVER_BUILDER.comment("Define the speed factor, by which the fuel is going to be consumed.")
+                    .translation(LANG_KEY_CHARGING_STATION + ".consume")
+                    .defineInRange("Fuel Usage", 50, 0.00000001, Double.MAX_VALUE);
+            energyPerTick = SERVER_BUILDER.comment("Define the amount of energy produced per fuel tick.")
+                    .translation(LANG_KEY_CHARGING_STATION + ".fePerTick")
+                    .defineInRange("Energy Production", 750, 0, Integer.MAX_VALUE);
+            chargePerTick = SERVER_BUILDER.comment("Define how much the charging station attempts to charge per tick")
+                    .translation(LANG_KEY_CHARGING_STATION + ".chargePerTick")
+                    .defineInRange("Charge Energy", 2500, 0, Integer.MAX_VALUE);
+            maxRecieve = SERVER_BUILDER.comment("Define how much Energy can be accepted by the Charging Station per tick. Note that burning fuel counts towards this cap.")
+                    .translation(LANG_KEY_CHARGING_STATION + ".maxRecieve")
+                    .defineInRange("Max Energy Recieved", 750, 0, Integer.MAX_VALUE);
+            maxExtract = SERVER_BUILDER.comment("Define how much Energy can at most be extracted from the Charging Station per tick. Charging Items does not" +
+                    "count towards this cap!")
+                    .translation(LANG_KEY_CHARGING_STATION + ".maxExtract")
+                    .defineInRange("Max Energy Extracted", 0, 0, Integer.MAX_VALUE);
+            renderSphere = CLIENT_BUILDER.comment("Whether or not to render the Charging Sphere. Disabling rendering of the Charging Sphere will increase rendering" +
+                    "Performance, as it is the main throttle on the Charging Station render. Note that we are already doing what we can to make it as fast as possible " +
+                    "but a colour changing Sphere just needs to update relativingly often...")
+                    .translation(LANG_KEY_CHARGING_STATION + ".renderSphere")
+                    .define("Render Sphere", true);
+            CLIENT_BUILDER.pop();
+            COMMON_BUILDER.pop();
+            SERVER_BUILDER.pop();
+        }
+    }
+
     //using unistantiable final class instead of enum, so that it doesn't cause issues with the ConfigManger trying to access the Instance field
     //No defense against reflection needed here (I think)
     public static final class CategoryGadgets {
         public final IntValue maxRange;
-
-        public final BooleanValue poweredByFE;
 
         public final CategoryGadgetBuilding GADGET_BUILDING;
 
@@ -141,11 +177,6 @@ public class Config {
                     .translation(LANG_KEY_GADGETS + ".maxRange")
                     .defineInRange("Maximum allowed Range", 15, 1, 32);
 
-            poweredByFE = SERVER_BUILDER
-                    .comment("Set to true for Forge Energy Support, set to False for vanilla Item Damage")
-                    .translation(LANG_KEY_GENERAL + ".poweredByFE")
-                    .define("Powered by Forge Energy", true);
-
             GADGET_BUILDING = new CategoryGadgetBuilding();
             GADGET_EXCHANGER = new CategoryGadgetExchanger();
             GADGET_DESTRUCTION = new CategoryGadgetDestruction();
@@ -162,13 +193,6 @@ public class Config {
                     .defineInRange("Maximum Energy", defaultValue, 1, Integer.MAX_VALUE);
         }
 
-        private static IntValue getDurability(int defaultValue) {
-            return SERVER_BUILDER
-                    .comment("The Gadget's Durability (0 means no durability is used) (Ignored if powered by FE)")
-                    .translation(LANG_KEY_GADGETS + ".durability")
-                    .defineInRange("Durability", defaultValue, 1, Integer.MAX_VALUE);
-        }
-
         private static IntValue getEnergyCost(int defaultValue) {
             return SERVER_BUILDER
                     .comment("The Gadget's Energy cost per Operation")
@@ -176,27 +200,18 @@ public class Config {
                     .defineInRange("Energy Cost", defaultValue, 0, Integer.MAX_VALUE);
         }
 
-        private static IntValue getDurabilityCost(int defaultValue) {
-            return SERVER_BUILDER
-                    .comment("The Gadget's Durability cost per Operation")
-                    .translation(LANG_KEY_GADGETS + ".durabilityCost")
-                    .defineInRange("Durability Cost", defaultValue, 1, Integer.MAX_VALUE);
-        }
-
         public static final class CategoryGadgetBuilding {
 
-            public final IntValue maxEnergy, durability;
+            public final IntValue maxEnergy;
 
-            public final IntValue energyCost, durabilityCost;
+            public final IntValue energyCost;
 
             private CategoryGadgetBuilding() {
                 SERVER_BUILDER.comment("Energy Cost & Durability of the Building Gadget")/*.translation(LANG_KEY_GADGET_BUILDING)*/.push("Building Gadget");
 
                 maxEnergy = getMaxEnergy(500000);
-                durability = getDurability(500);
 
                 energyCost = getEnergyCost(50);
-                durabilityCost = getDurabilityCost(1);
 
                 SERVER_BUILDER.pop();
             }
@@ -204,18 +219,16 @@ public class Config {
 
         public static final class CategoryGadgetExchanger {
 
-            public final IntValue maxEnergy, durability;
+            public final IntValue maxEnergy;
 
-            public final IntValue energyCost, durabilityCost;
+            public final IntValue energyCost;
 
             private CategoryGadgetExchanger() {
                 SERVER_BUILDER.comment("Energy Cost & Durability of the Exchanging Gadget")/*.translation(LANG_KEY_GADGET_EXCHANGER)*/.push("Exchanging Gadget");
 
                 maxEnergy = getMaxEnergy(500000);
-                durability = getDurability(500);
 
                 energyCost = getEnergyCost(100);
-                durabilityCost = getDurabilityCost(2);
 
                 SERVER_BUILDER.pop();
             }
@@ -223,9 +236,9 @@ public class Config {
 
         public static final class CategoryGadgetDestruction {
 
-            public final IntValue maxEnergy, durability;
+            public final IntValue maxEnergy;
 
-            public final IntValue energyCost, durabilityCost;
+            public final IntValue energyCost;
 
             public final DoubleValue nonFuzzyMultiplier;
 
@@ -235,10 +248,8 @@ public class Config {
                 SERVER_BUILDER.comment("Energy Cost, Durability & Maximum Energy of the Destruction Gadget")/*.translation(LANG_KEY_GADGET_DESTRUCTION)*/.push("Destruction Gadget");
 
                 maxEnergy = getMaxEnergy(1000000);
-                durability = getDurability(1000);
 
                 energyCost = getEnergyCost(200);
-                durabilityCost = getDurabilityCost(4);
 
                 nonFuzzyMultiplier = SERVER_BUILDER
                         .comment("The cost in energy/durability will increase by this amount when not in fuzzy mode")
@@ -258,19 +269,17 @@ public class Config {
 
         public static final class CategoryGadgetCopyPaste {
 
-            public final IntValue maxEnergy, durability;
+            public final IntValue maxEnergy;
 
-            public final IntValue energyCost, durabilityCost;
+            public final IntValue energyCost;
 
 
             private CategoryGadgetCopyPaste() {
                 SERVER_BUILDER.comment("Energy Cost & Durability of the Copy-Paste Gadget")/*.translation(LANG_KEY_GADGET_COPY_PASTE)*/.push("Copy-Paste Gadget");
 
                 maxEnergy = getMaxEnergy(500000);
-                durability = getDurability(500);
 
                 energyCost = getEnergyCost(50);
-                durabilityCost = getDurabilityCost(1);
 
                 SERVER_BUILDER.pop();
             }

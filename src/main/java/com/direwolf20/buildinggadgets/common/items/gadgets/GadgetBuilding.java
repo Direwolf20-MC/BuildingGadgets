@@ -7,8 +7,6 @@ import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
-import com.direwolf20.buildinggadgets.common.util.CapabilityUtil;
-import com.direwolf20.buildinggadgets.common.util.exceptions.CapabilityNotPresentException;
 import com.direwolf20.buildinggadgets.common.util.helpers.InventoryHelper;
 import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
 import com.direwolf20.buildinggadgets.common.util.helpers.SortingHelper;
@@ -40,7 +38,6 @@ import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.BlockSnapshot;
-import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.world.BlockEvent;
 
@@ -62,19 +59,10 @@ public class GadgetBuilding extends GadgetGeneric implements IAtopPlacingGadget 
         return Config.GADGETS.GADGET_BUILDING.maxEnergy.get();
     }
 
-    @Override
-    public int getMaxDamage(ItemStack stack) {
-        return Config.GADGETS.poweredByFE.get() ? 0 : Config.GADGETS.GADGET_BUILDING.durability.get();
-    }
 
     @Override
     public int getEnergyCost(ItemStack tool) {
         return Config.GADGETS.GADGET_BUILDING.energyCost.get();
-    }
-
-    @Override
-    public int getDamageCost(ItemStack tool) {
-        return Config.GADGETS.GADGET_BUILDING.durabilityCost.get();
     }
 
     @Override
@@ -136,9 +124,9 @@ public class GadgetBuilding extends GadgetGeneric implements IAtopPlacingGadget 
     public ActionResult<ItemStack> onItemRightClick(World world, PlayerEntity player, Hand hand) {
         //On item use, if sneaking, select the block clicked on, else build -- This is called when you right click a tool NOT on a block.
         ItemStack itemstack = player.getHeldItem(hand);
-        // @todo: remove once we go live - debug code to add free energy to tool
-        IEnergyStorage energy = CapabilityUtil.EnergyUtil.getCap(itemstack).orElseThrow(CapabilityNotPresentException::new);
-        energy.receiveEnergy(100000, false);
+        //remove once we go live - debug code to add free energy to tool
+        //IEnergyStorage energy = CapabilityUtil.EnergyUtil.getCap(itemstack).orElseThrow(CapabilityNotPresentException::new);
+        //energy.receiveEnergy(100000, false);
         /*CompoundNBT tagCompound = itemstack.getTag();
         ByteBuf buf = Unpooled.buffer(16);
         ByteBufUtils.writeTag(buf,tagCompound);

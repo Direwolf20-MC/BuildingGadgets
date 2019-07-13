@@ -1,4 +1,4 @@
-package com.direwolf20.buildinggadgets.common.blocks.templatemanager;
+package com.direwolf20.buildinggadgets.common.containers;
 
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.SlotItemHandler;

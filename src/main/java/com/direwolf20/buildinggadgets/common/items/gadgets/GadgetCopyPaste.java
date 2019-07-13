@@ -5,7 +5,6 @@ import com.direwolf20.buildinggadgets.api.template.building.tilesupport.TileSupp
 import com.direwolf20.buildinggadgets.client.events.EventTooltip;
 import com.direwolf20.buildinggadgets.client.gui.GuiMod;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlock;
-import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.common.items.ITemplate;
@@ -13,7 +12,7 @@ import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketBlockMap;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketRotateMirror;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
-import com.direwolf20.buildinggadgets.common.util.CapabilityUtil;
+import com.direwolf20.buildinggadgets.common.tiles.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.blocks.BlockMap;
 import com.direwolf20.buildinggadgets.common.util.blocks.BlockMapIntState;
@@ -86,18 +85,8 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
     }
 
     @Override
-    public int getMaxDamage(ItemStack stack) {
-        return Config.GADGETS.poweredByFE.get() ? 0 : Config.GADGETS.GADGET_COPY_PASTE.durability.get();
-    }
-
-    @Override
     public int getEnergyCost(ItemStack tool) {
         return Config.GADGETS.GADGET_COPY_PASTE.energyCost.get();
-    }
-
-    @Override
-    public int getDamageCost(ItemStack tool) {
-        return Config.GADGETS.GADGET_COPY_PASTE.durabilityCost.get();
     }
 
     private static void setAnchor(ItemStack stack, BlockPos anchorPos) {
@@ -261,8 +250,8 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
         ItemStack stack = player.getHeldItem(hand);
         player.setActiveHand(hand);
         BlockPos pos = VectorHelper.getPosLookingAt(player, stack);
-        //TODO Remove debug code
-        CapabilityUtil.EnergyUtil.getCap(stack).ifPresent(energy -> energy.receiveEnergy(105000, false));
+        // Remove debug code
+        // CapabilityUtil.EnergyUtil.getCap(stack).ifPresent(energy -> energy.receiveEnergy(105000, false));
         if (!world.isRemote) {
             if (player.isSneaking() && GadgetUtils.setRemoteInventory(stack, player, world, pos, false) == ActionResultType.SUCCESS)
                 return new ActionResult<ItemStack>(ActionResultType.SUCCESS, stack);

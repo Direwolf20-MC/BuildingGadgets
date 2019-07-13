@@ -1,13 +1,15 @@
 package com.direwolf20.buildinggadgets.common.registry.objects;
 
+import com.direwolf20.buildinggadgets.client.renderer.ChargingStationTER;
 import com.direwolf20.buildinggadgets.common.blocks.*;
-import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManager;
-import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManagerTileEntity;
 import com.direwolf20.buildinggadgets.common.registry.block.BlockBuilder;
 import com.direwolf20.buildinggadgets.common.registry.block.BlockRegistryContainer;
 import com.direwolf20.buildinggadgets.common.registry.block.tile.TileEntityBuilder;
 import com.direwolf20.buildinggadgets.common.registry.block.tile.TileEntityRegistryContainer;
 import com.direwolf20.buildinggadgets.common.registry.block.tile.TileEntityTypeBuilder;
+import com.direwolf20.buildinggadgets.common.tiles.ChargingStationTileEntity;
+import com.direwolf20.buildinggadgets.common.tiles.ConstructionBlockTileEntity;
+import com.direwolf20.buildinggadgets.common.tiles.TemplateManagerTileEntity;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference.BlockReference;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference.TileEntityReference;
@@ -42,6 +44,8 @@ public final class BGBlocks {
     public static ConstructionBlockPowder constructionBlockPowder;
     @ObjectHolder(BlockReference.TEMPLATE_MANAGER)
     public static TemplateManager templateManger;
+    @ObjectHolder(BlockReference.CHARGING_STATION)
+    public static ChargingStation chargingStation;
 
     // No extracted block creation method, because property creation would just make any method call look lengthy
     static void init() {
@@ -71,6 +75,14 @@ public final class BGBlocks {
                         .builder(new TileEntityTypeBuilder<>(TemplateManagerTileEntity::new))
                         .factory(TileEntityTypeBuilder::build))
                 .factory(TemplateManager::new));
+        container.add(new BlockBuilder(BlockReference.CHARGING_STATION_RL)
+                .builder(Block.Properties.create(Material.ROCK).hardnessAndResistance(2f))
+                .item(itemProperties())
+                .withTileEntity(new TileEntityBuilder<ChargingStationTileEntity>(TileEntityReference.CHARGING_STATION_TILE_RL)
+                        .builder(new TileEntityTypeBuilder<>(ChargingStationTileEntity::new))
+                        .factory(TileEntityTypeBuilder::build)
+                        .renderer(ChargingStationTileEntity.class, new ChargingStationTER()))
+                .factory(ChargingStation::new));
     }
 
     @SubscribeEvent
@@ -97,6 +109,8 @@ public final class BGBlocks {
         public static TileEntityType<?> CONSTRUCTION_BLOCK_TYPE;
         @ObjectHolder(TileEntityReference.TEMPLATE_MANAGER_TILE)
         public static TileEntityType<?> TEMPLATE_MANAGER_TYPE;
+        @ObjectHolder(TileEntityReference.CHARGING_STATION_TILE)
+        public static TileEntityType<?> CHARGING_STATION_TYPE;
 
         static void init() {
 
