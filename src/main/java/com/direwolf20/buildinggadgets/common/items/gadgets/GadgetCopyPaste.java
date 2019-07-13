@@ -14,7 +14,6 @@ import com.direwolf20.buildinggadgets.common.network.packets.PacketBlockMap;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketRotateMirror;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
 import com.direwolf20.buildinggadgets.common.tiles.ConstructionBlockTileEntity;
-import com.direwolf20.buildinggadgets.common.util.CapabilityUtil;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.blocks.BlockMap;
 import com.direwolf20.buildinggadgets.common.util.blocks.BlockMapIntState;
@@ -252,8 +251,8 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
         ItemStack stack = player.getHeldItem(hand);
         player.setActiveHand(hand);
         BlockPos pos = VectorHelper.getPosLookingAt(player, stack);
-        //TODO Remove debug code
-        CapabilityUtil.EnergyUtil.getCap(stack).ifPresent(energy -> energy.receiveEnergy(105000, false));
+        // Remove debug code
+        // CapabilityUtil.EnergyUtil.getCap(stack).ifPresent(energy -> energy.receiveEnergy(105000, false));
         if (!world.isRemote) {
             if (player.isSneaking() && GadgetUtils.setRemoteInventory(stack, player, world, pos, false) == ActionResultType.SUCCESS)
                 return new ActionResult<ItemStack>(ActionResultType.SUCCESS, stack);

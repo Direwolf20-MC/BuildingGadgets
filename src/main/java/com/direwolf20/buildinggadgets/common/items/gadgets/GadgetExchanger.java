@@ -4,7 +4,6 @@ import com.direwolf20.buildinggadgets.api.abstraction.BlockData;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
-import com.direwolf20.buildinggadgets.common.util.CapabilityUtil.EnergyUtil;
 import com.direwolf20.buildinggadgets.common.util.helpers.InventoryHelper;
 import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
 import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
@@ -128,8 +127,8 @@ public class GadgetExchanger extends GadgetGeneric {
         player.setActiveHand(hand);
         if (!world.isRemote) {
             if (player.isSneaking()) {
-                //TODO Remove debug code
-                EnergyUtil.getCap(itemstack).ifPresent(energy -> energy.receiveEnergy(105000, false));
+                //Remove debug code
+                //EnergyUtil.getCap(itemstack).ifPresent(energy -> energy.receiveEnergy(105000, false));
                 selectBlock(itemstack, player);
             } else if (player instanceof ServerPlayerEntity) {
                 exchange((ServerPlayerEntity) player, itemstack);
