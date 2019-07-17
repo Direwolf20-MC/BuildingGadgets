@@ -33,11 +33,14 @@ import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GLAllocation;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.texture.AtlasTexture;
+import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.tileentity.BeaconTileEntity;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
@@ -182,6 +185,8 @@ public class ToolRenders {
                     }
                     //Move the render position back to where it was
                     GlStateManager.popMatrix();
+
+
                 }
 
                 for (BlockPos coordinate : coordinates) { //Now run through the UNSORTED list of coords, to show which blocks won't place if you don't have enough of them.
@@ -201,6 +206,30 @@ public class ToolRenders {
                     }
                     //Move the render position back to where it was
                     GlStateManager.popMatrix();
+                }
+
+                if (state.hasTileEntity()) {
+                    TileEntity te = state.getBlock().createTileEntity(state, world); //TODO Its not ideal to generate this TE every draw call, we should cache it somewhere
+                    TileEntityRenderer<TileEntity> teRender = TileEntityRendererDispatcher.instance.getRenderer(te);
+
+                    if (teRender != null && !(te instanceof BeaconTileEntity)) { //beacons cause weirdness, remove this check to see for yourself TODO Figure out why if possible
+                        te.setWorld(world);
+                        for (BlockPos coordinate : coordinates) {
+                            GlStateManager.pushMatrix();
+                            GlStateManager.color4f(1F, 1F, 1F, 1F);
+                            GlStateManager.translatef((float) -doubleX, (float) -doubleY, (float) -doubleZ);
+                            GlStateManager.scalef(1.0f, 1.0f, 1.0f); //Block scale 1 = full sized block
+                            te.setPos(coordinate);
+                            try {
+                                GlStateManager.enableBlend(); //We have to do this in the loop because the TE Render removes blend when its done
+                                GlStateManager.blendFunc(GL14.GL_CONSTANT_ALPHA, GL14.GL_ONE_MINUS_CONSTANT_ALPHA);
+                                teRender.render(te, coordinate.getX(), coordinate.getY(), coordinate.getZ(), evt.getPartialTicks(), -1);
+                            } catch (Exception e) {
+
+                            }
+                            GlStateManager.popMatrix();
+                        }
+                    }
                 }
 
                 //Set blending back to the default mode
