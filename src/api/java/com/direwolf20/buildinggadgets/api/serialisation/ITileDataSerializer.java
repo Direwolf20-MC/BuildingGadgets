@@ -1,6 +1,6 @@
-package com.direwolf20.buildinggadgets.api.template.serialisation;
+package com.direwolf20.buildinggadgets.api.serialisation;
 
-import com.direwolf20.buildinggadgets.api.template.building.tilesupport.ITileEntityData;
+import com.direwolf20.buildinggadgets.api.building.tilesupport.ITileEntityData;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraftforge.registries.IForgeRegistryEntry;
 

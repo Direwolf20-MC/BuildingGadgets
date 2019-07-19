@@ -1,10 +1,11 @@
-package com.direwolf20.buildinggadgets.api.building;
+package com.direwolf20.buildinggadgets.api.building.view;
 
-import com.direwolf20.buildinggadgets.api.abstraction.BlockData;
-import com.direwolf20.buildinggadgets.api.abstraction.PlacementTarget;
-import com.direwolf20.buildinggadgets.api.abstraction.UniqueItem;
-import com.direwolf20.buildinggadgets.api.template.building.IBuildContext;
-import com.direwolf20.buildinggadgets.api.template.building.ITemplateView;
+import com.direwolf20.buildinggadgets.api.building.BlockData;
+import com.direwolf20.buildinggadgets.api.building.IBlockProvider;
+import com.direwolf20.buildinggadgets.api.building.PlacementTarget;
+import com.direwolf20.buildinggadgets.api.building.Region;
+import com.direwolf20.buildinggadgets.api.building.placement.IPositionPlacementSequence;
+import com.direwolf20.buildinggadgets.api.materials.UniqueItem;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.AbstractIterator;
 import com.google.common.collect.ImmutableList;
@@ -71,7 +72,6 @@ public class BuildingView implements ITemplateView {
                     return endOfData();
                 BlockPos next = posIterator.next();
                 BlockData data = blocks.at(next);
-                //TODO use real TileEntityData
                 return new PlacementTarget(next, data);
             }
         };

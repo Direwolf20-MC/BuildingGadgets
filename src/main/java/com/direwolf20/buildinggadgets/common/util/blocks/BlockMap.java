@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.common.util.blocks;
 
-import com.direwolf20.buildinggadgets.api.abstraction.BlockData;
+import com.direwolf20.buildinggadgets.api.building.BlockData;
 import net.minecraft.util.math.BlockPos;
 
 public class BlockMap {

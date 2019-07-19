@@ -3,13 +3,13 @@ package com.direwolf20.buildinggadgets.api;
 import com.direwolf20.buildinggadgets.api.APIReference.TemplateSerializerReference;
 import com.direwolf20.buildinggadgets.api.APIReference.TileDataFactoryReference;
 import com.direwolf20.buildinggadgets.api.APIReference.TileDataSerializerReference;
+import com.direwolf20.buildinggadgets.api.building.tilesupport.ITileDataFactory;
+import com.direwolf20.buildinggadgets.api.building.tilesupport.TileSupport;
 import com.direwolf20.buildinggadgets.api.registry.IOrderedRegistry;
 import com.direwolf20.buildinggadgets.api.registry.TopologicalRegistryBuilder;
-import com.direwolf20.buildinggadgets.api.template.building.tilesupport.ITileDataFactory;
-import com.direwolf20.buildinggadgets.api.template.building.tilesupport.TileSupport;
-import com.direwolf20.buildinggadgets.api.template.serialisation.ITemplateSerializer;
-import com.direwolf20.buildinggadgets.api.template.serialisation.ITileDataSerializer;
-import com.direwolf20.buildinggadgets.api.template.serialisation.SerialisationSupport;
+import com.direwolf20.buildinggadgets.api.serialisation.ITemplateSerializer;
+import com.direwolf20.buildinggadgets.api.serialisation.ITileDataSerializer;
+import com.direwolf20.buildinggadgets.api.serialisation.SerialisationSupport;
 import com.google.common.base.Preconditions;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.RegistryEvent;
@@ -45,7 +45,7 @@ public final class Registries {
     }
 
     static void onCreateRegistries() {
-        BuildinggadgetsAPI.LOG.trace("Creating ForgeRegistries");
+        BuildingGadgetsAPI.LOG.trace("Creating ForgeRegistries");
         templateSerializers = new RegistryBuilder<ITemplateSerializer>()
                 .setType(ITemplateSerializer.class)
                 .setName(TemplateSerializerReference.REGISTRY_ID_TEMPLATE_SERIALIZER)
@@ -54,7 +54,7 @@ public final class Registries {
                 .setType(ITileDataSerializer.class)
                 .setName(TileDataSerializerReference.REGISTRY_ID_TILE_DATA_SERIALIZER)
                 .create();
-        BuildinggadgetsAPI.LOG.trace("Finished Creating ForgeRegistries");
+        BuildingGadgetsAPI.LOG.trace("Finished Creating ForgeRegistries");
     }
 
     @SubscribeEvent
@@ -69,10 +69,10 @@ public final class Registries {
     }
 
     static void createOrderedRegistries() {
-        BuildinggadgetsAPI.LOG.trace("Creating Ordered Registries");
+        BuildingGadgetsAPI.LOG.trace("Creating Ordered Registries");
         tileDataFactories = tileDataFactoryBuilder.build();
         tileDataFactoryBuilder = null;
-        BuildinggadgetsAPI.LOG.trace("Finished Creating Ordered Registries");
+        BuildingGadgetsAPI.LOG.trace("Finished Creating Ordered Registries");
     }
 
     static boolean handleIMC(InterModComms.IMCMessage message) {

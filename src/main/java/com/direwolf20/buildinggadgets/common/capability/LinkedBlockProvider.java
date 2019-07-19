@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.common.capability;
 
-import com.direwolf20.buildinggadgets.api.abstraction.BlockData;
+import com.direwolf20.buildinggadgets.api.building.BlockData;
 import com.direwolf20.buildinggadgets.api.building.IBlockProvider;
 import com.direwolf20.buildinggadgets.api.building.TranslationWrapper;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;

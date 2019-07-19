@@ -1,8 +1,8 @@
 package com.direwolf20.buildinggadgets.api.template;
 
-import com.direwolf20.buildinggadgets.api.template.building.IBuildContext;
-import com.direwolf20.buildinggadgets.api.template.building.ITemplateView;
-import com.direwolf20.buildinggadgets.api.template.serialisation.ITemplateSerializer;
+import com.direwolf20.buildinggadgets.api.building.view.IBuildContext;
+import com.direwolf20.buildinggadgets.api.building.view.ITemplateView;
+import com.direwolf20.buildinggadgets.api.serialisation.ITemplateSerializer;
 import com.direwolf20.buildinggadgets.api.template.transaction.ITemplateTransaction;
 
 import javax.annotation.Nullable;

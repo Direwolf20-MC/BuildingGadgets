@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.common.util.blocks;
 
-import com.direwolf20.buildinggadgets.api.building.IPositionPlacementSequence;
+import com.direwolf20.buildinggadgets.api.building.placement.IPositionPlacementSequence;
 import com.direwolf20.buildinggadgets.common.util.exceptions.PaletteOverflowException;
 import com.direwolf20.buildinggadgets.common.util.helpers.LambdaHelper;
 import com.direwolf20.buildinggadgets.common.util.helpers.SerializationHelper;

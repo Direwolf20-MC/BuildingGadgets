@@ -1,8 +1,11 @@
-package com.direwolf20.buildinggadgets.api.building;
+package com.direwolf20.buildinggadgets.api.building.modes;
 
-import com.direwolf20.buildinggadgets.api.abstraction.BlockData;
+import com.direwolf20.buildinggadgets.api.building.BlockData;
+import com.direwolf20.buildinggadgets.api.building.IBlockProvider;
+import com.direwolf20.buildinggadgets.api.building.placement.IPositionPlacementSequence;
+import com.direwolf20.buildinggadgets.api.building.view.BuildingView;
+import com.direwolf20.buildinggadgets.api.building.view.SimpleBuildContext;
 import com.direwolf20.buildinggadgets.api.capability.CapabilityBlockProvider;
-import com.direwolf20.buildinggadgets.api.template.building.SimpleBuildContext;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Direction;

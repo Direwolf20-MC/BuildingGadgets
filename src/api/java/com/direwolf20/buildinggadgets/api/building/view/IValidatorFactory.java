@@ -1,6 +1,6 @@
-package com.direwolf20.buildinggadgets.api.building;
+package com.direwolf20.buildinggadgets.api.building.view;
 
-import com.direwolf20.buildinggadgets.api.abstraction.BlockData;
+import com.direwolf20.buildinggadgets.api.building.BlockData;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;

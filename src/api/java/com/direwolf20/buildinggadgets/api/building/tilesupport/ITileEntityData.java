@@ -1,9 +1,9 @@
-package com.direwolf20.buildinggadgets.api.template.building.tilesupport;
+package com.direwolf20.buildinggadgets.api.building.tilesupport;
 
-import com.direwolf20.buildinggadgets.api.BuildinggadgetsAPI;
-import com.direwolf20.buildinggadgets.api.abstraction.UniqueItem;
-import com.direwolf20.buildinggadgets.api.template.building.IBuildContext;
-import com.direwolf20.buildinggadgets.api.template.serialisation.ITileDataSerializer;
+import com.direwolf20.buildinggadgets.api.BuildingGadgetsAPI;
+import com.direwolf20.buildinggadgets.api.building.view.IBuildContext;
+import com.direwolf20.buildinggadgets.api.materials.UniqueItem;
+import com.direwolf20.buildinggadgets.api.serialisation.ITileDataSerializer;
 import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.Multiset;
 import net.minecraft.block.BlockState;
@@ -65,7 +65,7 @@ public interface ITileEntityData {
         try {
             stack = state.getBlock().getPickBlock(state, target, context.getWorld(), pos, context.getBuildingPlayer());
         } catch (Exception e) {
-            BuildinggadgetsAPI.LOG.trace("Failed to retrieve pickBlock for {}.", state, e);
+            BuildingGadgetsAPI.LOG.trace("Failed to retrieve pickBlock for {}.", state, e);
         }
         if (stack == null)
             stack = new ItemStack(state.getBlock().asItem());

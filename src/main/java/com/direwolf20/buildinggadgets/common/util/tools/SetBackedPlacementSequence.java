@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.common.util.tools;
 
-import com.direwolf20.buildinggadgets.api.building.IPositionPlacementSequence;
 import com.direwolf20.buildinggadgets.api.building.Region;
+import com.direwolf20.buildinggadgets.api.building.placement.IPositionPlacementSequence;
 import com.google.common.collect.ImmutableSet;
 import net.minecraft.util.math.BlockPos;
 

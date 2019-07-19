@@ -1,11 +1,12 @@
-package com.direwolf20.buildinggadgets.api.abstraction;
+package com.direwolf20.buildinggadgets.api.building;
 
-import com.direwolf20.buildinggadgets.api.BuildinggadgetsAPI;
+import com.direwolf20.buildinggadgets.api.APIReference.NBTKeys;
+import com.direwolf20.buildinggadgets.api.BuildingGadgetsAPI;
 import com.direwolf20.buildinggadgets.api.Registries;
-import com.direwolf20.buildinggadgets.api.template.building.IBuildContext;
-import com.direwolf20.buildinggadgets.api.template.building.tilesupport.ITileEntityData;
-import com.direwolf20.buildinggadgets.api.template.building.tilesupport.TileSupport;
-import com.direwolf20.buildinggadgets.api.template.serialisation.ITileDataSerializer;
+import com.direwolf20.buildinggadgets.api.building.tilesupport.ITileEntityData;
+import com.direwolf20.buildinggadgets.api.building.tilesupport.TileSupport;
+import com.direwolf20.buildinggadgets.api.building.view.IBuildContext;
+import com.direwolf20.buildinggadgets.api.serialisation.ITileDataSerializer;
 import com.direwolf20.buildinggadgets.api.util.RegistryUtils;
 import com.google.common.base.Preconditions;
 import net.minecraft.block.BlockState;
@@ -27,9 +28,6 @@ import java.util.Objects;
  */
 public final class BlockData {
     public static final BlockData AIR = new BlockData(Blocks.AIR.getDefaultState(), TileSupport.dummyTileEntityData());
-    private static final String KEY_STATE = "state";
-    private static final String KEY_SERIALIZER = "serializer";
-    private static final String KEY_DATA = "data";
 
     /**
      * Attempts to retrieve a BlockData from the given {@link CompoundNBT}, if present.
@@ -41,23 +39,23 @@ public final class BlockData {
      */
     @Nullable
     public static BlockData tryDeserialize(@Nullable CompoundNBT tag, boolean persisted) {
-        if (tag == null || ! (tag.contains(KEY_STATE) && tag.contains(KEY_SERIALIZER) && tag.contains(KEY_DATA)))
+        if (tag == null || ! (tag.contains(NBTKeys.KEY_STATE) && tag.contains(NBTKeys.KEY_SERIALIZER) && tag.contains(NBTKeys.KEY_DATA)))
             return null;
-        BlockState state = NBTUtil.readBlockState(tag.getCompound(KEY_STATE));
+        BlockState state = NBTUtil.readBlockState(tag.getCompound(NBTKeys.KEY_STATE));
         ITileDataSerializer serializer;
         try {
             if (persisted)
                 serializer = RegistryUtils
-                        .getFromString(Registries.TileEntityData.getTileDataSerializers(), tag.getString(KEY_SERIALIZER));
+                        .getFromString(Registries.TileEntityData.getTileDataSerializers(), tag.getString(NBTKeys.KEY_SERIALIZER));
             else
-                serializer = RegistryUtils.getById(Registries.TileEntityData.getTileDataSerializers(), tag.getInt(KEY_SERIALIZER));
+                serializer = RegistryUtils.getById(Registries.TileEntityData.getTileDataSerializers(), tag.getInt(NBTKeys.KEY_SERIALIZER));
         } catch (Exception e) {
-            BuildinggadgetsAPI.LOG.error("Failed to create deserializer!", e);
+            BuildingGadgetsAPI.LOG.error("Failed to create deserializer!", e);
             return null;
         }
         if (serializer == null)
             return null;
-        ITileEntityData data = serializer.deserialize(tag.getCompound(KEY_DATA), persisted);
+        ITileEntityData data = serializer.deserialize(tag.getCompound(NBTKeys.KEY_DATA), persisted);
         return new BlockData(state, data);
     }
 
@@ -70,22 +68,22 @@ public final class BlockData {
      */
     public static BlockData deserialize(CompoundNBT tag, boolean persisted) {
         Preconditions.checkNotNull(tag, "Cannot deserialize from a null tag compound");
-        Preconditions.checkArgument(tag.contains(KEY_STATE) && tag.contains(KEY_SERIALIZER) && tag.contains(KEY_DATA),
+        Preconditions.checkArgument(tag.contains(NBTKeys.KEY_STATE) && tag.contains(NBTKeys.KEY_SERIALIZER) && tag.contains(NBTKeys.KEY_DATA),
                 "Given NBTTagCompound does not contain a valid BlockData instance. Missing NBT-Keys in Tag {}!", tag.toString());
-        BlockState state = NBTUtil.readBlockState(tag.getCompound(KEY_STATE));
+        BlockState state = NBTUtil.readBlockState(tag.getCompound(NBTKeys.KEY_STATE));
         ITileDataSerializer serializer;
         try {
             if (persisted)
                 serializer = RegistryUtils
-                        .getFromString(Registries.TileEntityData.getTileDataSerializers(), tag.getString(KEY_SERIALIZER));
+                        .getFromString(Registries.TileEntityData.getTileDataSerializers(), tag.getString(NBTKeys.KEY_SERIALIZER));
             else
-                serializer = RegistryUtils.getById(Registries.TileEntityData.getTileDataSerializers(), tag.getInt(KEY_SERIALIZER));
+                serializer = RegistryUtils.getById(Registries.TileEntityData.getTileDataSerializers(), tag.getInt(NBTKeys.KEY_SERIALIZER));
         } catch (Exception e) {
             throw new IllegalArgumentException("Could not retrieve serializer with persisted=" + persisted + "!", e);
         }
         Preconditions.checkArgument(serializer != null,
                 "Failed to retrieve serializer for tag {} and persisted={}", tag.toString(), persisted);
-        ITileEntityData data = serializer.deserialize(tag.getCompound(KEY_DATA), persisted);
+        ITileEntityData data = serializer.deserialize(tag.getCompound(NBTKeys.KEY_DATA), persisted);
         return new BlockData(state, data);
     }
 
@@ -133,13 +131,13 @@ public final class BlockData {
      */
     public CompoundNBT serialize(boolean persisted) {
         CompoundNBT tag = new CompoundNBT();
-        tag.put(KEY_STATE, NBTUtil.writeBlockState(state));
+        tag.put(NBTKeys.KEY_STATE, NBTUtil.writeBlockState(state));
         if (persisted)
-            tag.putString(KEY_SERIALIZER, tileData.getSerializer().getRegistryName().toString());
+            tag.putString(NBTKeys.KEY_SERIALIZER, tileData.getSerializer().getRegistryName().toString());
         else
-            tag.putInt(KEY_SERIALIZER, RegistryUtils
+            tag.putInt(NBTKeys.KEY_SERIALIZER, RegistryUtils
                     .getId(Registries.TileEntityData.getTileDataSerializers(), tileData.getSerializer()));
-        tag.put(KEY_DATA, tileData.getSerializer().serialize(tileData, persisted));
+        tag.put(NBTKeys.KEY_DATA, tileData.getSerializer().serialize(tileData, persisted));
         return tag;
     }
 

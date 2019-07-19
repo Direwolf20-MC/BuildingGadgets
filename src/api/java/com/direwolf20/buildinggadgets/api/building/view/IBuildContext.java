@@ -1,4 +1,4 @@
-package com.direwolf20.buildinggadgets.api.template.building;
+package com.direwolf20.buildinggadgets.api.building.view;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -7,7 +7,7 @@ import net.minecraft.world.IWorld;
 import javax.annotation.Nullable;
 
 /**
- * Context providing additional information in which a given {@link com.direwolf20.buildinggadgets.api.template.ITemplate} is viewed as an {@link ITemplateView}.
+ * Context providing additional information in which a given {@link ITemplateView} is executed.
  * Besides the {@link IWorld} provided by this {@code IBuildContext} all information is optional, even though users should provide as much information as possible.
  */
 public interface IBuildContext {

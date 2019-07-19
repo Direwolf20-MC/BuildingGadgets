@@ -1,9 +1,9 @@
-package com.direwolf20.buildinggadgets.api.template.building.tilesupport;
+package com.direwolf20.buildinggadgets.api.building.tilesupport;
 
-import com.direwolf20.buildinggadgets.api.BuildinggadgetsAPI;
-import com.direwolf20.buildinggadgets.api.template.building.IBuildContext;
-import com.direwolf20.buildinggadgets.api.template.serialisation.ITileDataSerializer;
-import com.direwolf20.buildinggadgets.api.template.serialisation.SerialisationSupport;
+import com.direwolf20.buildinggadgets.api.BuildingGadgetsAPI;
+import com.direwolf20.buildinggadgets.api.building.view.IBuildContext;
+import com.direwolf20.buildinggadgets.api.serialisation.ITileDataSerializer;
+import com.direwolf20.buildinggadgets.api.serialisation.SerialisationSupport;
 import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
@@ -25,15 +25,15 @@ public class NBTTileEntityData implements ITileEntityData {
 
     @Override
     public boolean placeIn(IBuildContext context, BlockState state, BlockPos position) {
-        BuildinggadgetsAPI.LOG.trace("Placing {} with Tile NBT at {}.", state, position);
+        BuildingGadgetsAPI.LOG.trace("Placing {} with Tile NBT at {}.", state, position);
         context.getWorld().setBlockState(position, state, 0);
         TileEntity te = context.getWorld().getTileEntity(position);
         if (te != null) {
             try {
                 te.read(getNBTModifiable());
             } catch (Exception e) {
-                BuildinggadgetsAPI.LOG.debug("Failed to apply Tile NBT Data to {} at {} in Context {}", state, position, context);
-                BuildinggadgetsAPI.LOG.debug(e);
+                BuildingGadgetsAPI.LOG.debug("Failed to apply Tile NBT Data to {} at {} in Context {}", state, position, context);
+                BuildingGadgetsAPI.LOG.debug(e);
             }
         }
         return true;

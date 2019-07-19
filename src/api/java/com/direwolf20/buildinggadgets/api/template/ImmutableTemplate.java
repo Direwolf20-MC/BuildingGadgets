@@ -1,10 +1,10 @@
 package com.direwolf20.buildinggadgets.api.template;
 
-import com.direwolf20.buildinggadgets.api.abstraction.BlockData;
-import com.direwolf20.buildinggadgets.api.abstraction.UniqueItem;
-import com.direwolf20.buildinggadgets.api.template.building.IBuildContext;
-import com.direwolf20.buildinggadgets.api.template.building.ITemplateView;
-import com.direwolf20.buildinggadgets.api.template.serialisation.ITemplateSerializer;
+import com.direwolf20.buildinggadgets.api.building.BlockData;
+import com.direwolf20.buildinggadgets.api.building.view.IBuildContext;
+import com.direwolf20.buildinggadgets.api.building.view.ITemplateView;
+import com.direwolf20.buildinggadgets.api.materials.UniqueItem;
+import com.direwolf20.buildinggadgets.api.serialisation.ITemplateSerializer;
 import com.direwolf20.buildinggadgets.api.template.transaction.ITemplateTransaction;
 import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.Multiset;

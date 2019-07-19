@@ -1,8 +1,8 @@
 package com.direwolf20.buildinggadgets.api.template.transaction;
 
-import com.direwolf20.buildinggadgets.api.abstraction.BlockData;
+import com.direwolf20.buildinggadgets.api.building.BlockData;
+import com.direwolf20.buildinggadgets.api.serialisation.TemplateHeader;
 import com.direwolf20.buildinggadgets.api.template.ITemplate;
-import com.direwolf20.buildinggadgets.api.template.serialisation.TemplateHeader;
 import com.google.common.collect.ImmutableSet;
 import net.minecraft.util.math.BlockPos;
 

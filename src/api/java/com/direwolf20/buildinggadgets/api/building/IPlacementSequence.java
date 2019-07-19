@@ -1,6 +1,4 @@
-package com.direwolf20.buildinggadgets.api.abstraction;
-
-import com.direwolf20.buildinggadgets.api.building.Region;
+package com.direwolf20.buildinggadgets.api.building;
 
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;

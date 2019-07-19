@@ -1,4 +1,4 @@
-package com.direwolf20.buildinggadgets.api.template.building.tilesupport;
+package com.direwolf20.buildinggadgets.api.building.tilesupport;
 
 import com.direwolf20.buildinggadgets.api.Registries;
 import net.minecraft.tileentity.TileEntity;

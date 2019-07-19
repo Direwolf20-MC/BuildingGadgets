@@ -1,10 +1,10 @@
-package com.direwolf20.buildinggadgets.api.template.building.tilesupport;
+package com.direwolf20.buildinggadgets.api.building.tilesupport;
 
 import com.direwolf20.buildinggadgets.api.Registries.TileEntityData;
-import com.direwolf20.buildinggadgets.api.abstraction.BlockData;
-import com.direwolf20.buildinggadgets.api.template.building.IBuildContext;
-import com.direwolf20.buildinggadgets.api.template.serialisation.ITileDataSerializer;
-import com.direwolf20.buildinggadgets.api.template.serialisation.SerialisationSupport;
+import com.direwolf20.buildinggadgets.api.building.BlockData;
+import com.direwolf20.buildinggadgets.api.building.view.IBuildContext;
+import com.direwolf20.buildinggadgets.api.serialisation.ITileDataSerializer;
+import com.direwolf20.buildinggadgets.api.serialisation.SerialisationSupport;
 import net.minecraft.block.BlockState;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;

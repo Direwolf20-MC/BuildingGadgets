@@ -1,6 +1,6 @@
-package com.direwolf20.buildinggadgets.api.building;
+package com.direwolf20.buildinggadgets.api.building.placement;
 
-import com.direwolf20.buildinggadgets.api.abstraction.IPlacementSequence;
+import com.direwolf20.buildinggadgets.api.building.IPlacementSequence;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.util.math.BlockPos;
 

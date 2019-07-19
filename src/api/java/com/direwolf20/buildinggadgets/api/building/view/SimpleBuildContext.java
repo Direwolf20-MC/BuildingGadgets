@@ -1,4 +1,4 @@
-package com.direwolf20.buildinggadgets.api.template.building;
+package com.direwolf20.buildinggadgets.api.building.view;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -29,7 +29,14 @@ public final class SimpleBuildContext implements IBuildContext {
         Builder builder = builder();
         if (context == null)
             return builder;
-        return builder.world(context.getWorld()).buildingPlayer(context.getBuildingPlayer()).usedStack(context.getUsedStack());
+        return builder
+                .world(context.getWorld())
+                .buildingPlayer(context.getBuildingPlayer())
+                .usedStack(context.getUsedStack());
+    }
+
+    public static SimpleBuildContext copyOf(@Nullable IBuildContext context) {
+        return builderOf(context).build();
     }
 
     @Nonnull
@@ -98,6 +105,8 @@ public final class SimpleBuildContext implements IBuildContext {
         /**
          * Sets the {@link PlayerEntity} of the resulting {@link SimpleBuildContext}. Notice that this also set's the world
          * for the resulting {@code SimpleBuildContext} if the player is non-null and a world hasn't been set yet.
+         * <p>
+         * This defaults to null.
          * @param buildingPlayer The {@link PlayerEntity} of the resulting {@link SimpleBuildContext}.
          * @return The {@code Builder} itself
          * @see SimpleBuildContext#getBuildingPlayer()
@@ -109,6 +118,15 @@ public final class SimpleBuildContext implements IBuildContext {
             return this;
         }
 
+        /**
+         * Sets the {@link ItemStack} of the resulting {@link SimpleBuildContext}.
+         * <p>
+         * Defaults to {@link ItemStack#EMPTY}.
+         *
+         * @param stack The {@link ItemStack} of the resulting {@code SimpleBuildContext}
+         * @return The {@code Builder} itself
+         * @see SimpleBuildContext#getUsedStack()
+         */
         public Builder usedStack(@Nonnull ItemStack stack) {
             this.stack = Objects.requireNonNull(stack);
             return this;

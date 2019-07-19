@@ -1,6 +1,6 @@
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-package com.direwolf20.buildinggadgets.api.abstraction;
+package com.direwolf20.buildinggadgets.api.materials;
 
 import mcp.MethodsReturnNonnullByDefault;
 

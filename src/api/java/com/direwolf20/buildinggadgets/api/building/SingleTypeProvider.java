@@ -1,13 +1,12 @@
 package com.direwolf20.buildinggadgets.api.building;
 
-import com.direwolf20.buildinggadgets.api.abstraction.BlockData;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.math.BlockPos;
 
 /**
  * Immutable block provider that always return the same block data regardless of which position is requested.
  */
-public class SingleTypeProvider implements IBlockProvider {
+public class SingleTypeProvider implements IBlockProvider<SingleTypeProvider> {
     private static final String SINGLE_TYPE_PROVIDER_TAG = "tag";
 
     private final BlockData data;

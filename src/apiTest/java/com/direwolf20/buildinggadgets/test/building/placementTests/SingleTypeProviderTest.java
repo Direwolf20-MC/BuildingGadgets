@@ -1,8 +1,8 @@
 package com.direwolf20.buildinggadgets.test.building.placementTests;
 
-import com.direwolf20.buildinggadgets.api.abstraction.BlockData;
+import com.direwolf20.buildinggadgets.api.building.BlockData;
 import com.direwolf20.buildinggadgets.api.building.SingleTypeProvider;
-import com.direwolf20.buildinggadgets.api.template.building.tilesupport.TileSupport;
+import com.direwolf20.buildinggadgets.api.building.tilesupport.TileSupport;
 import com.direwolf20.buildinggadgets.test.util.UniqueBlockState;
 import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundNBT;

@@ -1,4 +1,4 @@
-package com.direwolf20.buildinggadgets.api.template.building.tilesupport;
+package com.direwolf20.buildinggadgets.api.building.tilesupport;
 
 /**
  * Represents an {@link java.util.function.Supplier Supplier&lt;ITileEntityData&gt;} which can be used for creating {@link ITileEntityData} instances.

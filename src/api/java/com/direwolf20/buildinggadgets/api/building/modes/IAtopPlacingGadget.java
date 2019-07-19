@@ -1,4 +1,4 @@
-package com.direwolf20.buildinggadgets.api.building;
+package com.direwolf20.buildinggadgets.api.building.modes;
 
 import net.minecraft.item.ItemStack;
 

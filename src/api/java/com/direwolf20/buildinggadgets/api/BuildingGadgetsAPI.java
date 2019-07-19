@@ -11,10 +11,10 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 @Mod(value = APIReference.MODID)
-public final class BuildinggadgetsAPI {
+public final class BuildingGadgetsAPI {
     public static final Logger LOG = LogManager.getLogger();
 
-    public BuildinggadgetsAPI() {
+    public BuildingGadgetsAPI() {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
         modEventBus.addListener(this::registerRegistries);
         modEventBus.addListener(this::setup);

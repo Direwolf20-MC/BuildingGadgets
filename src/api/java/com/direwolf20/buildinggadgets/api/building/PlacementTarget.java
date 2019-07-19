@@ -1,7 +1,8 @@
-package com.direwolf20.buildinggadgets.api.abstraction;
+package com.direwolf20.buildinggadgets.api.building;
 
-import com.direwolf20.buildinggadgets.api.template.building.IBuildContext;
-import com.direwolf20.buildinggadgets.api.template.building.tilesupport.ITileEntityData;
+import com.direwolf20.buildinggadgets.api.APIReference.NBTKeys;
+import com.direwolf20.buildinggadgets.api.building.tilesupport.ITileEntityData;
+import com.direwolf20.buildinggadgets.api.building.view.IBuildContext;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.util.math.BlockPos;
@@ -16,8 +17,6 @@ import java.util.Objects;
  * Notice that this class is immutable as long as the {@link ITileEntityData} instance of the contained {@link BlockData} is immutable.
  */
 public final class PlacementTarget {
-    private static final String KEY_DATA = "data";
-    private static final String KEY_POS = "pos";
 
     /**
      * @param nbt The {@link CompoundNBT} representing the serialized form of this {@code PlacementTarget}.
@@ -28,8 +27,8 @@ public final class PlacementTarget {
      * @see BlockData#deserialize(CompoundNBT, boolean)
      */
     public static PlacementTarget deserialize(CompoundNBT nbt, boolean persisted) {
-        BlockPos pos = NBTUtil.readBlockPos(nbt.getCompound(KEY_POS));
-        BlockData data = BlockData.deserialize(nbt.getCompound(KEY_DATA), persisted);
+        BlockPos pos = NBTUtil.readBlockPos(nbt.getCompound(NBTKeys.KEY_POS));
+        BlockData data = BlockData.deserialize(nbt.getCompound(NBTKeys.KEY_DATA), persisted);
         return new PlacementTarget(pos, data);
     }
 
@@ -80,8 +79,8 @@ public final class PlacementTarget {
      */
     public CompoundNBT serialize(boolean persisted) {
         CompoundNBT compound = new CompoundNBT();
-        compound.put(KEY_DATA, data.serialize(persisted));
-        compound.put(KEY_POS, NBTUtil.writeBlockPos(pos));
+        compound.put(NBTKeys.KEY_DATA, data.serialize(persisted));
+        compound.put(NBTKeys.KEY_POS, NBTUtil.writeBlockPos(pos));
         return compound;
     }
 }

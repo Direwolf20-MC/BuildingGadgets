@@ -1,4 +1,4 @@
-package com.direwolf20.buildinggadgets.api.template.serialisation;
+package com.direwolf20.buildinggadgets.api.serialisation;
 
 import com.direwolf20.buildinggadgets.api.template.ITemplate;
 import net.minecraft.nbt.CompoundNBT;

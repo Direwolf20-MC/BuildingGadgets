@@ -1,4 +1,4 @@
-package com.direwolf20.buildinggadgets.api.abstraction;
+package com.direwolf20.buildinggadgets.api.materials;
 
 import net.minecraft.item.Item;
 import net.minecraft.nbt.CompoundNBT;
