@@ -7,7 +7,6 @@ import com.direwolf20.buildinggadgets.api.building.Region;
  * Represents some context information during execution of an {@link ITemplateTransaction}
  */
 public interface ITransactionExecutionContext {
-    // Todo add getter for Template Boundingbox
 
     /**
      * @return The estimated amount of {@link com.direwolf20.buildinggadgets.api.building.PlacementTarget}'s produced by the
