@@ -3,9 +3,9 @@ package com.direwolf20.buildinggadgets.api.building.view;
 import com.direwolf20.buildinggadgets.api.building.IPlacementSequence;
 import com.direwolf20.buildinggadgets.api.building.PlacementTarget;
 import com.direwolf20.buildinggadgets.api.exceptions.TemplateException;
+import com.direwolf20.buildinggadgets.api.materials.MaterialList;
 import com.direwolf20.buildinggadgets.api.materials.UniqueItem;
 import com.direwolf20.buildinggadgets.api.template.ITemplate;
-import com.google.common.collect.Multiset;
 import net.minecraft.util.math.BlockPos;
 
 import javax.annotation.Nullable;
@@ -17,22 +17,22 @@ import java.util.stream.Stream;
 /**
  * A "snapshot" view of a specific buildable Template providing the ability to iterate over the represented {@link PlacementTarget}'s.
  * It also allows for translating to a specific position via {@link #translateTo(BlockPos)}.<br>
- * Furthermore an {@code ITemplateView} should provide a hint for users to check the amount of blocks an {@link ITemplateView} of this {@code ITemplate} is going to
+ * Furthermore an {@code IBuildView} should provide a hint for users to check the amount of blocks an {@link IBuildView} of this {@code ITemplate} is going to
  * produce at most via {@link #estimateSize()} in combination with hinting the amount of {@link UniqueItem}'s required.
  * However this is not strictly necessary and when computation might be costly it is not advised to return an accurate value.
  * <p>
- * The {@code ITemplateView} is constructed given an instance of {@link IBuildContext}. This
- * context allows the {@link ITemplateView} to adapt itself to the environment in which it is viewed. Therefore no assumptions may be made, that
- * 2 distinct instances of {@code ITemplateView} will produce the same results even if they were constructed by the same {@link IBuildContext}.
+ * The {@code IBuildView} is constructed given an instance of {@link IBuildContext}. This
+ * context allows the {@link IBuildView} to adapt itself to the environment in which it is viewed. Therefore no assumptions may be made, that
+ * 2 distinct instances of {@code IBuildView} will produce the same results even if they were constructed by the same {@link IBuildContext}.
  *
- * @implSpec Notice that no guarantees are made for the order in which {@link PlacementTarget}'s are produced by this {@code ITemplateView}.
+ * @implSpec Notice that no guarantees are made for the order in which {@link PlacementTarget}'s are produced by this {@code IBuildView}.
  * Order may be arbitrary or sorted, consult the documentation of the implementation you are currently faced with for information about traversal order.
  */
-public interface ITemplateView extends IPlacementSequence<PlacementTarget>, AutoCloseable {
+public interface IBuildView extends IPlacementSequence<PlacementTarget>, AutoCloseable {
     /**
-     * Creates a {@link Stream} backed by the {@link #spliterator()} of this {@code ITemplateView}.
+     * Creates a {@link Stream} backed by the {@link #spliterator()} of this {@code IBuildView}.
      *
-     * @return A {@link Stream} representing all positions produced by this {@code ITemplateView}.
+     * @return A {@link Stream} representing all positions produced by this {@code IBuildView}.
      * @throws UnsupportedOperationException if {@link #close()}  was called and concurrent Transaction execution is not permitted
      *                                       by the underlying {@link ITemplate}
      * @implSpec The {@link Stream} produced by this method must not be parallel. A user wishing for parallel traversal
@@ -45,7 +45,7 @@ public interface ITemplateView extends IPlacementSequence<PlacementTarget>, Auto
     }
 
     /**
-     * @return An {@link Iterator} over the {@link PlacementTarget}'s of this {@code ITemplateView}.
+     * @return An {@link Iterator} over the {@link PlacementTarget}'s of this {@code IBuildView}.
      * @throws UnsupportedOperationException if {@link #close()} was called and concurrent Transaction execution is not permitted
      *                                       by the underlying {@link ITemplate}
      * @implNote The default implementation is equivalent to calling {@code Spliterators.iterator(view.spliterator());}.
@@ -56,7 +56,7 @@ public interface ITemplateView extends IPlacementSequence<PlacementTarget>, Auto
     }
 
     /**
-     * @return An {@link Spliterator} over the {@link PlacementTarget}'s of this {@code ITemplateView}.
+     * @return An {@link Spliterator} over the {@link PlacementTarget}'s of this {@code IBuildView}.
      * @throws UnsupportedOperationException if {@link #close()} was called and concurrent Transaction execution is not permitted
      *                                       by the underlying {@link ITemplate}
      */
@@ -64,28 +64,28 @@ public interface ITemplateView extends IPlacementSequence<PlacementTarget>, Auto
     Spliterator<PlacementTarget> spliterator();
 
     /**
-     * Translates this {@code ITemplateView} to the specified position.
+     * Translates this {@code IBuildView} to the specified position.
      *
      * @param pos The position to translate to. May not be null.
-     * @return The new translated {@code ITemplateView}. May be the same or a new instance depending on implementation.
+     * @return The new translated {@code IBuildView}. May be the same or a new instance depending on implementation.
      * @throws NullPointerException if the given Position was null
      * @implSpec This Method may not accumulate multiple translations, but instead always set the absolute Translation performed
      * to the specified value.
      */
-    ITemplateView translateTo(BlockPos pos);
+    IBuildView translateTo(BlockPos pos);
 
     /**
      * Attempts to compute the amount of required {@link UniqueItem}'s. Should never be more than might be needed,
      * but may be fewer if exact requirements are hard or expensive to compute.
      *
-     * @return A {@link Multiset} representing the Item Requirements to build this {@code ITemplateView}.
+     * @return A {@link MaterialList} representing the Item Requirements to build this {@code IBuildView}.
      * Will be null if unknown or expensive to compute.
      */
     @Nullable
-    Multiset<UniqueItem> estimateRequiredItems();
+    MaterialList estimateRequiredItems();
 
     /**
-     * Attempts to compute an estimate of how many {@link PlacementTarget}'s this {@code ITemplateView} will produce.
+     * Attempts to compute an estimate of how many {@link PlacementTarget}'s this {@code IBuildView} will produce.
      * Should never be smaller than the amount produced by iterating over this, but may be larger if an exact size
      * is hard or expensive to compute.
      * <p>
@@ -112,8 +112,8 @@ public interface ITemplateView extends IPlacementSequence<PlacementTarget>, Auto
      * <p>
      * Calling
      * {@code
-     * ITemplateView view = template.createViewInContext(ctx);
-     * ITemplateView copy = view.copy();
+     * IBuildView view = template.createViewInContext(ctx);
+     * IBuildView copy = view.copy();
      * view.close();
      * }
      * should ensure that the {@link ITemplate} is no longer restricted because of an open {@code TemplateView}, whilst at the same time providing access to all the positions via
@@ -126,5 +126,5 @@ public interface ITemplateView extends IPlacementSequence<PlacementTarget>, Auto
      * @return A full copy of this {@code TemplateView}. Iterating over the whole {@code TemplateView} if necessary.
      */
     @Override
-    ITemplateView copy(); //Todo implement default Method which copies the whole TemplateView into a Collection...
+    IBuildView copy(); //Todo implement default Method which copies the whole TemplateView into a Collection...
 }

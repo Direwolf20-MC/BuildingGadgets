@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.api.template;
 
 import com.direwolf20.buildinggadgets.api.building.view.IBuildContext;
-import com.direwolf20.buildinggadgets.api.building.view.ITemplateView;
+import com.direwolf20.buildinggadgets.api.building.view.IBuildView;
 import com.direwolf20.buildinggadgets.api.building.view.SimpleBuildContext;
 import com.direwolf20.buildinggadgets.api.serialisation.ITemplateSerializer;
 import com.direwolf20.buildinggadgets.api.template.transaction.ITemplateTransaction;
@@ -17,7 +17,7 @@ import javax.annotation.Nullable;
  * <li>Provide a possibility to iterate over all placement information contained in this {@code ITemplate} via {@link #createViewInContext(IBuildContext)}.
  * <li>Optionally an {@code ITemplate} may choose to provide a possibility for modifying the represented structure
  * via an {@link ITemplateTransaction} created by {@link #startTransaction()}.
- * <li>Provide a boundingBox, which will enclose all positions produced by this {@code ITemplate} via {@link ITemplateView}.
+ * <li>Provide a boundingBox, which will enclose all positions produced by this {@code ITemplate} via {@link IBuildView}.
  * <li>Provide a possibility to serialize this ITemplate via an corresponding {@link ITemplateSerializer}.
  * </ul>
  * <p>
@@ -38,20 +38,20 @@ public interface ITemplate {
     ITemplateSerializer getSerializer();
 
     /**
-     * Creates a new {@link ITemplateView} for iteration over this {@code ITemplate}. The returned {@link ITemplateView} may be used on a
-     * different {@link Thread} then the one it was created on. Additionally parallel iteration on multiple {@link ITemplateView} is explicitly supported,
+     * Creates a new {@link IBuildView} for iteration over this {@code ITemplate}. The returned {@link IBuildView} may be used on a
+     * different {@link Thread} then the one it was created on. Additionally parallel iteration on multiple {@link IBuildView} is explicitly supported,
      * and an implementation must perform any required synchronisation.<br>
-     * However it is not required to support executing an {@link ITemplateTransaction} whilst iterating over an {@link ITemplateView} and the <b>{@link ITemplateTransaction}</b>
+     * However it is not required to support executing an {@link ITemplateTransaction} whilst iterating over an {@link IBuildView} and the <b>{@link ITemplateTransaction}</b>
      * should throw an exception in this case.
      * @param buildContext The {@link IBuildContext} in which this {@code ITemplate} should be viewed.
-     * @return An {@link ITemplateView} representing the actual Data of this {@code ITemplate} in a certain {@link IBuildContext}.
+     * @return An {@link IBuildView} representing the actual Data of this {@code ITemplate} in a certain {@link IBuildContext}.
      */
-    ITemplateView createViewInContext(IBuildContext buildContext);
+    IBuildView createViewInContext(IBuildContext buildContext);
 
     /**
      * Creates a new {@link ITemplateTransaction} for modifying this {@code ITemplate}. The created {@link ITemplateTransaction}
      * will only modify modify this {@code ITemplate} when {@link ITemplateTransaction#execute()} is called.
-     * Therefore iteration on an {@link ITemplateView} of this {@code ITemplate} must still be permitted even when an {@link ITemplateTransaction} has been created.
+     * Therefore iteration on an {@link IBuildView} of this {@code ITemplate} must still be permitted even when an {@link ITemplateTransaction} has been created.
      * It is upon the {@link ITemplateTransaction} to fail if multiple {@link ITemplateTransaction} attempt to execute in parallel or
      * this {@code ITemplate} is currently iterated upon.
      * <p>

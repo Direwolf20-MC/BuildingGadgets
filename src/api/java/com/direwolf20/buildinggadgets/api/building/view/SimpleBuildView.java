@@ -28,7 +28,7 @@ import java.util.function.BiPredicate;
  *
  * @implNote Execution context in Strategy Pattern
  */
-public class BuildingView implements ITemplateView {
+public class SimpleBuildView implements IBuildView {
     private final IPositionPlacementSequence positions;
     private IBlockProvider blocks;
     private final IValidatorFactory validatorFactory;
@@ -36,9 +36,9 @@ public class BuildingView implements ITemplateView {
     private BlockPos start;
 
     /**
-     * @see BuildingView#BuildingView(IPositionPlacementSequence, IBlockProvider, IValidatorFactory, IBuildContext, BlockPos)
+     * @see SimpleBuildView#SimpleBuildView(IPositionPlacementSequence, IBlockProvider, IValidatorFactory, IBuildContext, BlockPos)
      */
-    public BuildingView(IPositionPlacementSequence positions, IBlockProvider blocks, IBuildContext context) {
+    public SimpleBuildView(IPositionPlacementSequence positions, IBlockProvider blocks, IBuildContext context) {
         this(positions, blocks, (world, stack, player, initial) -> (pos, state) -> true, context, null);
     }
 
@@ -48,7 +48,7 @@ public class BuildingView implements ITemplateView {
      *
      * @param validatorFactory Creates predicate for determining whether a position should be used or not
      */
-    public BuildingView(IPositionPlacementSequence positions, IBlockProvider blocks, IValidatorFactory validatorFactory, IBuildContext buildContext, @Nullable BlockPos start) {
+    public SimpleBuildView(IPositionPlacementSequence positions, IBlockProvider blocks, IValidatorFactory validatorFactory, IBuildContext buildContext, @Nullable BlockPos start) {
         this.positions = positions;
         this.blocks = blocks;
         this.validatorFactory = validatorFactory;
@@ -78,7 +78,7 @@ public class BuildingView implements ITemplateView {
     }
 
     @Override
-    public ITemplateView translateTo(BlockPos pos) {
+    public IBuildView translateTo(BlockPos pos) {
         blocks = blocks.translate(pos);
         return this;
     }
@@ -100,8 +100,8 @@ public class BuildingView implements ITemplateView {
     }
 
     @Override
-    public ITemplateView copy() {
-        return new BuildingView(positions, blocks, validatorFactory, context, start);
+    public IBuildView copy() {
+        return new SimpleBuildView(positions, blocks, validatorFactory, context, start);
     }
 
     @Override

@@ -3,8 +3,8 @@ package com.direwolf20.buildinggadgets.api.building.modes;
 import com.direwolf20.buildinggadgets.api.building.BlockData;
 import com.direwolf20.buildinggadgets.api.building.IBlockProvider;
 import com.direwolf20.buildinggadgets.api.building.placement.IPositionPlacementSequence;
-import com.direwolf20.buildinggadgets.api.building.view.BuildingView;
 import com.direwolf20.buildinggadgets.api.building.view.SimpleBuildContext;
+import com.direwolf20.buildinggadgets.api.building.view.SimpleBuildView;
 import com.direwolf20.buildinggadgets.api.capability.CapabilityBlockProvider;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -38,10 +38,10 @@ public interface IBuildingMode {
     BiPredicate<BlockPos, BlockData> createValidatorFor(IWorld world, ItemStack tool, PlayerEntity player, BlockPos initial);
 
     /**
-     * @see BuildingView#getPositionSequence()
+     * @see SimpleBuildView#getPositionSequence()
      */
-    default BuildingView createExecutionContext(PlayerEntity player, BlockPos hit, Direction sideHit, ItemStack tool, @Nullable BlockPos initial) {
-        return new BuildingView(computeCoordinates(player, hit, sideHit, tool), getBlockProvider(tool), this::createValidatorFor,
+    default SimpleBuildView createExecutionContext(PlayerEntity player, BlockPos hit, Direction sideHit, ItemStack tool, @Nullable BlockPos initial) {
+        return new SimpleBuildView(computeCoordinates(player, hit, sideHit, tool), getBlockProvider(tool), this::createValidatorFor,
                 SimpleBuildContext.builder().buildingPlayer(player).usedStack(tool).build(), initial);
     }
 

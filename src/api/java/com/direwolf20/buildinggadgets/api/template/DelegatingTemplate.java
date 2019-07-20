@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.api.template;
 
 import com.direwolf20.buildinggadgets.api.building.view.IBuildContext;
-import com.direwolf20.buildinggadgets.api.building.view.ITemplateView;
+import com.direwolf20.buildinggadgets.api.building.view.IBuildView;
 import com.direwolf20.buildinggadgets.api.serialisation.ITemplateSerializer;
 import com.direwolf20.buildinggadgets.api.template.transaction.ITemplateTransaction;
 
@@ -55,7 +55,7 @@ public class DelegatingTemplate implements ITemplate {
      * {@inheritDoc}
      */
     @Override
-    public ITemplateView createViewInContext(IBuildContext buildContext) {
+    public IBuildView createViewInContext(IBuildContext buildContext) {
         return getDelegate().createViewInContext(buildContext);
     }
 

@@ -7,7 +7,7 @@ import net.minecraft.world.IWorld;
 import javax.annotation.Nullable;
 
 /**
- * Context providing additional information in which a given {@link ITemplateView} is executed.
+ * Context providing additional information in which a given {@link IBuildView} is executed.
  * Besides the {@link IWorld} provided by this {@code IBuildContext} all information is optional, even though users should provide as much information as possible.
  */
 public interface IBuildContext {
