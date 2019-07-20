@@ -279,12 +279,14 @@ public class GadgetUtils {
         World world = player.world;
         BlockRayTraceResult lookingAt = VectorHelper.getLookingAt(player, GadgetGeneric.shouldRayTraceFluid(stack) ? RayTraceContext.FluidMode.ANY : RayTraceContext.FluidMode.NONE);
         if (lookingAt == null || (world.getBlockState(VectorHelper.getLookingAt(player, stack).getPos()) == Blocks.AIR.getDefaultState())) return;
-        ActionResultType result = setRemoteInventory(stack, player, world, lookingAt.getPos(), true);
+
+
+        /*ActionResultType result = setRemoteInventory(stack, player, world, lookingAt.getPos(), true);
         if (result == ActionResultType.SUCCESS)
             return;
-
+*/
         BlockState state = world.getBlockState(lookingAt.getPos());
-        if (result == ActionResultType.FAIL || !Config.BLACKLIST.isAllowedBlock(state.getBlock())) {
+        if (!Config.BLACKLIST.isAllowedBlock(state.getBlock())) {
             player.sendStatusMessage(new StringTextComponent(TextFormatting.RED + new TranslationTextComponent("message.gadget.invalidblock").getUnformattedComponentText()), true);
             return;
         }

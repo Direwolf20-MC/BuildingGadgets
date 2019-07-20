@@ -61,10 +61,10 @@ public abstract class GadgetGeneric extends Item {
         return getMaxDamage() > 0;
     }
 
-    @Override
+    /*@Override
     public boolean isRepairable() {
         return false;
-    }
+    }*/
 
     @Override
     public double getDurabilityForDisplay(ItemStack stack) {
