@@ -11,6 +11,7 @@ import com.direwolf20.buildinggadgets.api.serialisation.ITemplateSerializer;
 import com.direwolf20.buildinggadgets.api.serialisation.ITileDataSerializer;
 import com.direwolf20.buildinggadgets.api.serialisation.SerialisationSupport;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Supplier;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -80,7 +81,7 @@ public final class Registries {
             Preconditions.checkState(tileDataFactories != null,
                     "Attempted to register ITileDataFactory, after the Registry has been built!");
             tileDataFactoryBuilder.merge(
-                    message.<TopologicalRegistryBuilder<ITileDataFactory>>getMessageSupplier().get());
+                    message.<Supplier<TopologicalRegistryBuilder<ITileDataFactory>>>getMessageSupplier().get().get());
             return true;
         }
         return false;

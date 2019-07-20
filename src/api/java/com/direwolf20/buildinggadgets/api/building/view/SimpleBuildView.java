@@ -5,11 +5,10 @@ import com.direwolf20.buildinggadgets.api.building.IBlockProvider;
 import com.direwolf20.buildinggadgets.api.building.PlacementTarget;
 import com.direwolf20.buildinggadgets.api.building.Region;
 import com.direwolf20.buildinggadgets.api.building.placement.IPositionPlacementSequence;
-import com.direwolf20.buildinggadgets.api.materials.UniqueItem;
+import com.direwolf20.buildinggadgets.api.materials.MaterialList;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.AbstractIterator;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Multiset;
 import net.minecraft.util.math.BlockPos;
 
 import javax.annotation.Nullable;
@@ -85,8 +84,8 @@ public class SimpleBuildView implements IBuildView {
 
     @Nullable
     @Override
-    public Multiset<UniqueItem> estimateRequiredItems() {
-        return null;
+    public MaterialList estimateRequiredItems() {
+        return MaterialList.empty();//TODO implement
     }
 
     @Override
