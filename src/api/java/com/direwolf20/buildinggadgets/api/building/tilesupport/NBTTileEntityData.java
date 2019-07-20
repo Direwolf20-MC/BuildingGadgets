@@ -2,25 +2,41 @@ package com.direwolf20.buildinggadgets.api.building.tilesupport;
 
 import com.direwolf20.buildinggadgets.api.BuildingGadgetsAPI;
 import com.direwolf20.buildinggadgets.api.building.view.IBuildContext;
+import com.direwolf20.buildinggadgets.api.materials.MaterialList;
 import com.direwolf20.buildinggadgets.api.serialisation.ITileDataSerializer;
 import com.direwolf20.buildinggadgets.api.serialisation.SerialisationSupport;
 import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceResult;
 
+import javax.annotation.Nullable;
 import java.util.Objects;
 
 public class NBTTileEntityData implements ITileEntityData {
     private final CompoundNBT nbt;
+    private final MaterialList requiredMaterials;
+
+    public NBTTileEntityData(CompoundNBT nbt, @Nullable MaterialList requiredMaterials) {
+        this.nbt = Objects.requireNonNull(nbt);
+        this.requiredMaterials = requiredMaterials;
+    }
 
     public NBTTileEntityData(CompoundNBT nbt) {
-        this.nbt = Objects.requireNonNull(nbt);
+        this(nbt, null);
     }
 
     @Override
     public ITileDataSerializer getSerializer() {
         return SerialisationSupport.nbtTileDataSerializer();
+    }
+
+    @Override
+    public MaterialList getRequiredItems(IBuildContext context, BlockState state, @Nullable RayTraceResult target, @Nullable BlockPos pos) {
+        if (requiredMaterials != null)
+            return requiredMaterials;
+        return ITileEntityData.super.getRequiredItems(context, state, target, pos);
     }
 
     @Override
@@ -41,6 +57,11 @@ public class NBTTileEntityData implements ITileEntityData {
 
     public CompoundNBT getNBT() {
         return nbt.copy();
+    }
+
+    @Nullable
+    public MaterialList getRequiredMaterials() {
+        return requiredMaterials;
     }
 
     protected CompoundNBT getNBTModifiable() {

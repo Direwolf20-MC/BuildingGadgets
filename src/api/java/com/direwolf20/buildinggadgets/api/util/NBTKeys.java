@@ -12,6 +12,9 @@ public final class NBTKeys {
     public static final String KEY_SERIALIZER = "serializer";
     public static final String KEY_DATA = "data";
     public static final String KEY_POS = "pos";
+    public static final String KEY_MATERIALS = "materials";
+    public static final String KEY_COUNT = "count";
+    public static final String KEY_ID = "id";
 
     private NBTKeys() {}
 }

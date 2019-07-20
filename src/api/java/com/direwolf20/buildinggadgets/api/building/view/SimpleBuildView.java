@@ -85,7 +85,7 @@ public class SimpleBuildView implements IBuildView {
     @Nullable
     @Override
     public MaterialList estimateRequiredItems() {
-        return MaterialList.empty();//TODO implement
+        return null;//TODO implement
     }
 
     @Override

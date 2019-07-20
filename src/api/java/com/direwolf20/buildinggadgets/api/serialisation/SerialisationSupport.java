@@ -3,8 +3,11 @@ package com.direwolf20.buildinggadgets.api.serialisation;
 import com.direwolf20.buildinggadgets.api.building.tilesupport.ITileEntityData;
 import com.direwolf20.buildinggadgets.api.building.tilesupport.NBTTileEntityData;
 import com.direwolf20.buildinggadgets.api.building.tilesupport.TileSupport;
+import com.direwolf20.buildinggadgets.api.materials.MaterialList;
+import com.direwolf20.buildinggadgets.api.util.NBTKeys;
 import com.google.common.base.Preconditions;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 
 public final class SerialisationSupport {
@@ -45,12 +48,21 @@ public final class SerialisationSupport {
         @Override
         public CompoundNBT serialize(ITileEntityData data, boolean persisted) {
             Preconditions.checkArgument(data instanceof NBTTileEntityData);
-            return ((NBTTileEntityData) data).getNBT();
+            NBTTileEntityData nbtData = (NBTTileEntityData) data;
+            CompoundNBT res = new CompoundNBT();
+            res.put(NBTKeys.KEY_DATA, nbtData.getNBT());
+            if (nbtData.getRequiredMaterials() != null)
+                res.put(NBTKeys.KEY_MATERIALS, nbtData.getRequiredMaterials().serialize(persisted));
+            return res;
         }
 
         @Override
         public ITileEntityData deserialize(CompoundNBT tagCompound, boolean persisted) {
-            return new NBTTileEntityData(tagCompound);
+            CompoundNBT data = tagCompound.getCompound(NBTKeys.KEY_DATA);
+            MaterialList materialList = null;
+            if (tagCompound.contains(NBTKeys.KEY_MATERIALS, NBT.TAG_COMPOUND))
+                materialList = MaterialList.deserialize(tagCompound.getCompound(NBTKeys.KEY_MATERIALS));
+            return new NBTTileEntityData(data, materialList);
         }
     }
 
