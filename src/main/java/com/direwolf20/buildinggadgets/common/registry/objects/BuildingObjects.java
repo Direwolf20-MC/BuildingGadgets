@@ -53,5 +53,6 @@ public class BuildingObjects {
     private static void clientInit() {
         BGEntities.clientInit();
         BGBlocks.BGTileEntities.clientInit();
+        BGContainers.clientInit();
     }
 }

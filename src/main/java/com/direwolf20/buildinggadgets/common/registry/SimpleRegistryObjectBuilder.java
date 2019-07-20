@@ -7,8 +7,8 @@ import net.minecraftforge.registries.IForgeRegistryEntry;
 import java.util.Objects;
 import java.util.function.Function;
 
-public final class SimpleRegistryObjectBuilder<T extends IForgeRegistryEntry<T>> extends RegistryObjectBuilder<T, ConstantObjectBuilder<T>> {
-
+public class SimpleRegistryObjectBuilder<T extends IForgeRegistryEntry<T>> extends RegistryObjectBuilder<T, ConstantObjectBuilder<T>> {
+    private T obj;
     public SimpleRegistryObjectBuilder(String registryName) {
         super(registryName);
     }
@@ -30,7 +30,12 @@ public final class SimpleRegistryObjectBuilder<T extends IForgeRegistryEntry<T>>
     public SimpleRegistryObjectBuilder<T> object(T obj) {
         super.builder(new ConstantObjectBuilder<>(obj));
         super.factory(ConstantObjectBuilder::build);
+        this.obj = obj;
         return this;
+    }
+
+    public T getObj() {
+        return obj;
     }
 
     static class ConstantObjectBuilder<T extends IForgeRegistryEntry<T>> {
