@@ -1,8 +1,8 @@
 package com.direwolf20.buildinggadgets.api.building;
 
-import com.direwolf20.buildinggadgets.api.APIReference.NBTKeys;
 import com.direwolf20.buildinggadgets.api.building.tilesupport.ITileEntityData;
 import com.direwolf20.buildinggadgets.api.building.view.IBuildContext;
+import com.direwolf20.buildinggadgets.api.util.NBTKeys;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.util.math.BlockPos;

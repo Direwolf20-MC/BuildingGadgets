@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.common;
 
+import com.direwolf20.buildinggadgets.api.BuildingGadgetsAPI;
 import com.direwolf20.buildinggadgets.client.ClientProxy;
 import com.direwolf20.buildinggadgets.client.gui.GuiMod;
 import com.direwolf20.buildinggadgets.common.config.Config;
@@ -44,7 +45,10 @@ public final class BuildingGadgets {
         return theMod;
     }
 
+    private final BuildingGadgetsAPI theAPi;
+
     public BuildingGadgets() {
+        theAPi = new BuildingGadgetsAPI();
         IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus();
 
         ModLoadingContext.get().registerConfig(Type.SERVER, Config.SERVER_CONFIG);

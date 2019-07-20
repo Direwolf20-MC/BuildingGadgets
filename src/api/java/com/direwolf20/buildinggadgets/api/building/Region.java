@@ -1,8 +1,8 @@
 package com.direwolf20.buildinggadgets.api.building;
 
-import com.direwolf20.buildinggadgets.api.APIReference.NBTKeys;
 import com.direwolf20.buildinggadgets.api.building.placement.IPositionPlacementSequence;
 import com.direwolf20.buildinggadgets.api.util.CommonUtils;
+import com.direwolf20.buildinggadgets.api.util.NBTKeys;
 import com.direwolf20.buildinggadgets.api.util.SpliteratorBackedPeekingIterator;
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.PeekingIterator;

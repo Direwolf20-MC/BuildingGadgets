@@ -35,9 +35,10 @@ class ConcatFiles extends DefaultTask {
     void concat() {
         target.withWriter { writer ->
             source.each { file ->
-                file.withReader { reader ->
-                    writer << '\n' <<reader
-                }
+                if (file.exists())
+                    file.withReader { reader ->
+                        writer << '\n' <<reader
+                    }
             }
         }
     }
