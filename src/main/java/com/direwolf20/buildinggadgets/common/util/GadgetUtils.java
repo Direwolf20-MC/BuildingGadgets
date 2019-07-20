@@ -279,6 +279,8 @@ public class GadgetUtils {
         World world = player.world;
         BlockRayTraceResult lookingAt = VectorHelper.getLookingAt(player, GadgetGeneric.shouldRayTraceFluid(stack) ? RayTraceContext.FluidMode.ANY : RayTraceContext.FluidMode.NONE);
         if (lookingAt == null || (world.getBlockState(VectorHelper.getLookingAt(player, stack).getPos()) == Blocks.AIR.getDefaultState())) return;
+
+
         /*ActionResultType result = setRemoteInventory(stack, player, world, lookingAt.getPos(), true);
         if (result == ActionResultType.SUCCESS)
             return;

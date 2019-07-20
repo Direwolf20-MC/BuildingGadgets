@@ -39,7 +39,6 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.tileentity.BeaconTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.Direction;
@@ -154,6 +153,7 @@ public class ToolRenders {
 
                 //Save the current position that is being rendered (I think)
                 GlStateManager.pushMatrix();
+                GlStateManager.pushTextureAttributes();
                 //Enable Blending (So we can have transparent effect)
                 GlStateManager.enableBlend();
                 //This blend function allows you to use a constant alpha, which is defined later
@@ -212,21 +212,26 @@ public class ToolRenders {
                     TileEntity te = state.getBlock().createTileEntity(state, world); //TODO Its not ideal to generate this TE every draw call, we should cache it somewhere
                     TileEntityRenderer<TileEntity> teRender = TileEntityRendererDispatcher.instance.getRenderer(te);
 
-                    if (teRender != null && !(te instanceof BeaconTileEntity)) { //beacons cause weirdness, remove this check to see for yourself TODO Figure out why if possible
+                    if (teRender != null) { //beacons cause weirdness, remove this check to see for yourself TODO Figure out why if possible
                         te.setWorld(world);
                         for (BlockPos coordinate : coordinates) {
                             GlStateManager.pushMatrix();
+                            GlStateManager.pushTextureAttributes(); //Some TESR's change attributes, save what we have
                             GlStateManager.color4f(1F, 1F, 1F, 1F);
                             GlStateManager.translatef((float) -doubleX, (float) -doubleY, (float) -doubleZ);
+                            GlStateManager.translatef(coordinate.getX(), coordinate.getY(), coordinate.getZ());
                             GlStateManager.scalef(1.0f, 1.0f, 1.0f); //Block scale 1 = full sized block
                             te.setPos(coordinate);
                             try {
                                 GlStateManager.enableBlend(); //We have to do this in the loop because the TE Render removes blend when its done
                                 GlStateManager.blendFunc(GL14.GL_CONSTANT_ALPHA, GL14.GL_ONE_MINUS_CONSTANT_ALPHA);
-                                teRender.render(te, coordinate.getX(), coordinate.getY(), coordinate.getZ(), evt.getPartialTicks(), -1);
+                                teRender.render(te, 0, 0, 0, evt.getPartialTicks(), -1);
                             } catch (Exception e) {
-
+                                System.out.println("TER Exception with block type: " + state);
+                                GlStateManager.popMatrix(); //If the TESR did a GLPushAttrib and died in the middle, we need to pop it.
                             }
+                            GlStateManager.popAttributes(); //Pop the attribute stack
+                            GlStateManager.disableFog();
                             GlStateManager.popMatrix();
                         }
                     }
@@ -238,6 +243,7 @@ public class ToolRenders {
                 //Disable blend
                 GlStateManager.disableBlend();
                 //Pop from the original push in this method
+                GlStateManager.popAttributes();
                 GlStateManager.popMatrix();
             }
         }
