@@ -2,20 +2,15 @@ package com.direwolf20.buildinggadgets.client;
 
 import com.direwolf20.buildinggadgets.client.events.EventClientTick;
 import com.direwolf20.buildinggadgets.client.events.EventTooltip;
-import com.direwolf20.buildinggadgets.client.gui.blocks.ChargingStationGUI;
-import com.direwolf20.buildinggadgets.client.gui.blocks.TemplateManagerGUI;
 import com.direwolf20.buildinggadgets.client.models.ConstructionBakedModel;
-import com.direwolf20.buildinggadgets.common.containers.ChargingStationContainer;
-import com.direwolf20.buildinggadgets.common.containers.TemplateManagerContainer;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
-import com.direwolf20.buildinggadgets.common.registry.objects.BGContainers;
+import com.direwolf20.buildinggadgets.common.registry.objects.BuildingObjects;
 import com.direwolf20.buildinggadgets.common.tiles.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.SimpleSound;
-import net.minecraft.client.gui.ScreenManager;
 import net.minecraft.client.renderer.model.BakedQuad;
 import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.model.ItemOverrideList;
@@ -55,8 +50,7 @@ public class ClientProxy {
         eventBus.addListener(ClientProxy::bakeModels);
         MinecraftForge.EVENT_BUS.addListener(EventClientTick::onClientTick);
         MinecraftForge.EVENT_BUS.addListener(EventTooltip::onDrawTooltip);
-        ScreenManager.registerFactory(BGContainers.TEMPLATE_MANAGER_CONTAINER, (ScreenManager.IScreenFactory<TemplateManagerContainer, TemplateManagerGUI>) TemplateManagerGUI::new);
-        ScreenManager.registerFactory(BGContainers.CHARGING_STATION_CONTAINER, (ScreenManager.IScreenFactory<ChargingStationContainer, ChargingStationGUI>) ChargingStationGUI::new);
+        BuildingObjects.clientSetup();
     }
 
     private static void bakeModels(ModelBakeEvent event) {

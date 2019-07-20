@@ -24,12 +24,6 @@ import javax.annotation.Nonnull;
 public class ChargingStationContainer extends BaseContainer {
     private ChargingStationTileEntity te;
 
-    public ChargingStationContainer(int windowId, PlayerInventory playerInventory) {
-        super(BGContainers.CHARGING_STATION_CONTAINER, windowId);
-        //addOwnSlots();
-        //addPlayerSlots(playerInventory);
-    }
-
     public ChargingStationContainer(int windowId, PlayerInventory playerInventory, PacketBuffer extraData) {
         super(BGContainers.CHARGING_STATION_CONTAINER, windowId);
         BlockPos pos = extraData.readBlockPos();

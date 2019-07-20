@@ -12,6 +12,7 @@ import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetDestruction;
 import com.direwolf20.buildinggadgets.common.tiles.ChargingStationTileEntity;
 import com.direwolf20.buildinggadgets.common.tiles.TemplateManagerTileEntity;
 import com.direwolf20.buildinggadgets.common.util.lang.LangUtil;
+import com.direwolf20.buildinggadgets.common.util.ref.Reference.ContainerReference;
 import com.google.common.base.Function;
 import com.google.common.base.Supplier;
 import net.minecraft.client.Minecraft;
@@ -39,7 +40,7 @@ public enum GuiMod {
     COPY(GadgetCopyPaste::getGadget, CopyGUI::new),
     PASTE(GadgetCopyPaste::getGadget, PasteGUI::new),
     DESTRUCTION(GadgetDestruction::getGadget, DestructionGUI::new),
-    TEMPLATE_MANAGER("template_manager", message -> {
+    TEMPLATE_MANAGER(ContainerReference.TEMPLATE_MANAGER_CONTAINER, message -> {
         TileEntity te = Minecraft.getInstance().world.getTileEntity(message.getAdditionalData().readBlockPos());
         return te instanceof TemplateManagerTileEntity
                 ? new TemplateManagerGUI((TemplateManagerTileEntity) te, getTemplateManagerContainer(Minecraft.getInstance().player, te), Minecraft.getInstance().player.inventory)
@@ -52,7 +53,7 @@ public enum GuiMod {
         }
         return false;
     }),
-    CHARGING_STATION("charging_station", message -> {
+    CHARGING_STATION(ContainerReference.CHARGING_STATION_CONTAINER, message -> {
         TileEntity te = Minecraft.getInstance().world.getTileEntity(message.getAdditionalData().readBlockPos());
         return te instanceof ChargingStationTileEntity
                 ? new ChargingStationGUI((ChargingStationTileEntity) te, getChargingStationContainer(Minecraft.getInstance().player, te), Minecraft.getInstance().player.inventory)
