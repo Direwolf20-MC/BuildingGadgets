@@ -22,12 +22,6 @@ public class TemplateManagerContainer extends BaseContainer {
     public static final String TEXTURE_LOC_SLOT_TEMPLATE = Reference.MODID + ":gui/slot_template";
     private TemplateManagerTileEntity te;
 
-    public TemplateManagerContainer(int windowId, PlayerInventory playerInventory) {
-        super(BGContainers.TEMPLATE_MANAGER_CONTAINER, windowId);//TODO fix once we get access to ContainerTypes
-        //addOwnSlots();
-        //addPlayerSlots(playerInventory);
-    }
-
     public TemplateManagerContainer(int windowId, PlayerInventory playerInventory, PacketBuffer extraData) {
         super(BGContainers.TEMPLATE_MANAGER_CONTAINER, windowId);//TODO fix once we get access to ContainerTypes
         BlockPos pos = extraData.readBlockPos();
@@ -37,7 +31,7 @@ public class TemplateManagerContainer extends BaseContainer {
     }
 
     public TemplateManagerContainer(int windowId, PlayerInventory playerInventory, TemplateManagerTileEntity tileEntity) {
-        this(windowId, playerInventory);
+        super(BGContainers.TEMPLATE_MANAGER_CONTAINER, windowId);
         this.te = Objects.requireNonNull(tileEntity);
         addOwnSlots();
         addPlayerSlots(playerInventory);

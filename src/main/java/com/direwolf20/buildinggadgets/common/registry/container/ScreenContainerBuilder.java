@@ -6,16 +6,17 @@ import net.minecraft.client.gui.ScreenManager.IScreenFactory;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.ContainerType;
-import net.minecraft.inventory.container.ContainerType.IFactory;
+import net.minecraftforge.common.extensions.IForgeContainerType;
+import net.minecraftforge.fml.network.IContainerFactory;
 
 import java.util.Objects;
 
 public final class ScreenContainerBuilder<T extends Container, U extends Screen & IHasContainer<T>> {
-    private final IFactory<T> containerFactory;
+    private final IContainerFactory<T> containerFactory;
     private final IScreenFactory<T, U> screenFactory;
     private ContainerType<T> type;
 
-    public ScreenContainerBuilder(IFactory<T> containerFactory, IScreenFactory<T, U> screenFactory) {
+    public ScreenContainerBuilder(IContainerFactory<T> containerFactory, IScreenFactory<T, U> screenFactory) {
         this.containerFactory = Objects.requireNonNull(containerFactory);
         this.screenFactory = Objects.requireNonNull(screenFactory);
         this.type = null;
@@ -24,7 +25,7 @@ public final class ScreenContainerBuilder<T extends Container, U extends Screen 
     ContainerType<T> getOrCreate() {
         if (type != null)
             return type;
-        type = new ContainerType<>(containerFactory);
+        type = IForgeContainerType.create(containerFactory);
         return type;
     }
 

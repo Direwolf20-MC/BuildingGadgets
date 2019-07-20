@@ -14,7 +14,6 @@ import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
-import net.minecraftforge.fml.network.IContainerFactory;
 import net.minecraftforge.registries.ObjectHolder;
 
 @ObjectHolder(Reference.MODID)
@@ -30,16 +29,16 @@ public final class BGContainers {
     public static ContainerType<ChargingStationContainer> CHARGING_STATION_CONTAINER;
 
     static void init() {
+        //Warning: The generics here cannot be converted to diamonds - even though IntelliJ thinks that these are redundant, Java cannot resolve that
         container.add(
                 new ScreenContainerObjectBuilder(ContainerReference.TEMPLATE_MANAGER_CONTAINER_RL)
                         .builder(new ScreenContainerBuilder<TemplateManagerContainer, TemplateManagerGUI>(
-                                (IContainerFactory<TemplateManagerContainer>) ((wId, inv, buffer) -> new TemplateManagerContainer(wId, inv)),
-                                TemplateManagerGUI::new))
+                                TemplateManagerContainer::new, TemplateManagerGUI::new))
         );
         container.add(
                 new ScreenContainerObjectBuilder(ContainerReference.CHARGING_STATION_CONTAINER_RL)
                         .builder(new ScreenContainerBuilder<ChargingStationContainer, ChargingStationGUI>(
-                                (IContainerFactory<ChargingStationContainer>) ((wId, inv, buffer) -> new ChargingStationContainer(wId, inv)),
+                                ChargingStationContainer::new,
                                 ChargingStationGUI::new))
         );
     }
@@ -48,8 +47,8 @@ public final class BGContainers {
         container.clear();
     }
 
-    static void clientInit() {
-        container.clientInit();
+    static void clientSetup() {
+        container.clientSetup();
     }
 
     @SubscribeEvent
