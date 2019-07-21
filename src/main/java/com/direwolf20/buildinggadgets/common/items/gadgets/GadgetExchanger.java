@@ -3,6 +3,8 @@ package com.direwolf20.buildinggadgets.common.items.gadgets;
 import com.direwolf20.buildinggadgets.api.abstraction.BlockData;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
+import com.direwolf20.buildinggadgets.common.network.PacketHandler;
+import com.direwolf20.buildinggadgets.common.network.packets.PacketBindTool;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
 import com.direwolf20.buildinggadgets.common.util.helpers.InventoryHelper;
 import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
@@ -16,6 +18,7 @@ import com.direwolf20.buildinggadgets.common.world.FakeBuilderWorld;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -133,8 +136,14 @@ public class GadgetExchanger extends GadgetGeneric {
             } else if (player instanceof ServerPlayerEntity) {
                 exchange((ServerPlayerEntity) player, itemstack);
             }
-        } else if (!player.isSneaking()) {
-            ToolRenders.updateInventoryCache();
+        } else {
+            if (!player.isSneaking()) {
+                ToolRenders.updateInventoryCache();
+            } else {
+                if (Screen.hasControlDown()) {
+                    PacketHandler.sendToServer(new PacketBindTool());
+                }
+            }
         }
         return new ActionResult<>(ActionResultType.SUCCESS, itemstack);
     }
