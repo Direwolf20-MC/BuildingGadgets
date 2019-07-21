@@ -244,7 +244,7 @@ public class GadgetBuilding extends GadgetGeneric implements IAtopPlacingGadget 
             for (BlockPos coord : undoCoords) {
                 currentBlock = Registries.TileEntityData.createBlockData(world, coord);
 
-                double distance = coord.distanceSq(player.getPosition());
+                double distance = Math.sqrt(coord.distanceSq(player.getPosition()));
 
                 BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(world, coord, currentBlock.getState(), player);
                 boolean cancelled = MinecraftForge.EVENT_BUS.post(e);
