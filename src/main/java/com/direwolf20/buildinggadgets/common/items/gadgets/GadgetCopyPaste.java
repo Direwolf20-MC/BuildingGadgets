@@ -409,7 +409,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
                 for (int z = iStartZ; z <= iEndZ; z++) {
                     BlockPos tempPos = new BlockPos(x, y, z);
                     BlockState tempState = world.getBlockState(tempPos);
-                    if (tempState != Blocks.AIR.getDefaultState() && (world.getTileEntity(tempPos) == null || world.getTileEntity(tempPos) instanceof ConstructionBlockTileEntity) && !tempState.getMaterial().isLiquid() && Config.BLACKLIST.isAllowedBlock(tempState.getBlock())) {
+                    if (tempState != Blocks.AIR.getDefaultState() && !tempState.getMaterial().isLiquid() && Config.BLACKLIST.isAllowedBlock(tempState.getBlock())) {
                         TileEntity te = world.getTileEntity(tempPos);
                         BlockData assignState = InventoryHelper.getSpecificStates(tempState, world, player, tempPos, stack);
                         BlockData actualState = assignState;
@@ -538,14 +538,16 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
         if (ForgeEventFactory.onBlockPlace(player, blockSnapshot, Direction.UP)) {
             return;
         }
-        ItemStack constructionPaste = new ItemStack(BGItems.constructionPaste);
         boolean useConstructionPaste = false;
-        if (InventoryHelper.countItem(itemStack, player, world) < neededItems) {
-            if (InventoryHelper.countPaste(player) < neededItems) {
-                return;
+        if (!data.getState().hasTileEntity()) {
+            ItemStack constructionPaste = new ItemStack(BGItems.constructionPaste);
+            if (InventoryHelper.countItem(itemStack, player, world) < neededItems) {
+                if (InventoryHelper.countPaste(player) < neededItems) {
+                    return;
+                }
+                itemStack = constructionPaste.copy();
+                useConstructionPaste = true;
             }
-            itemStack = constructionPaste.copy();
-            useConstructionPaste = true;
         }
 
         if (!this.canUse(heldItem, player))
