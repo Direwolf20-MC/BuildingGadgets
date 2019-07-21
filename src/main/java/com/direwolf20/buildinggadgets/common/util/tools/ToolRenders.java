@@ -26,20 +26,19 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Multiset;
 import com.mojang.blaze3d.platform.GlStateManager;
-import net.minecraft.block.BlockRenderType;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
+import net.minecraft.block.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.ChestRenderer;
 import net.minecraft.client.renderer.GLAllocation;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.texture.AtlasTexture;
+import net.minecraft.client.renderer.tileentity.ItemStackTileEntityRenderer;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
+import net.minecraft.item.*;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.Direction;
@@ -69,7 +68,7 @@ import static com.direwolf20.buildinggadgets.common.util.GadgetUtils.getToolBloc
 /**
  * Warning to any 1.12 dev's. This class has differed from 1.12 too much to allow for
  * merges. Even the best dev will miss issues with diffs. Please manually port any future changes
- *
+ * <p>
  * Remove message when master changes to 1.13
  */
 public class ToolRenders {
@@ -77,6 +76,7 @@ public class ToolRenders {
     private static final FakeTERWorld fakeTERWorld = new FakeTERWorld();
     private static final transient Set<TileEntity> erroredTiles = Collections.newSetFromMap(new WeakHashMap<>());
     private static final FakeBuilderWorld fakeWorld = new FakeBuilderWorld();
+    private static final ChestRenderer chestRenderer = new ChestRenderer();
     private static RemoteInventoryCache cacheInventory = new RemoteInventoryCache(false);
     private static Cache<Triple<UniqueItemStack, BlockPos, Integer>, Integer> cacheDestructionOverlay = CacheBuilder.newBuilder().maximumSize(1).
             expireAfterWrite(1, TimeUnit.SECONDS).removalListener(removal -> GLAllocation.deleteDisplayLists((int) removal.getValue())).build();
@@ -264,7 +264,8 @@ public class ToolRenders {
         //if (lookingAt == null) {
         //    coordinates.size();
         //}
-        if ((lookingAt == null || (player.world.getBlockState(VectorHelper.getLookingAt(player, stack).getPos()) == Blocks.AIR.getDefaultState())) && coordinates.size() == 0) return;
+        if ((lookingAt == null || (player.world.getBlockState(VectorHelper.getLookingAt(player, stack).getPos()) == Blocks.AIR.getDefaultState())) && coordinates.size() == 0)
+            return;
         World world = player.world;
         BlockState startBlock = Blocks.AIR.getDefaultState();
         startBlock = world.getBlockState(new BlockPos(lookingAt.getPos()));
@@ -417,7 +418,8 @@ public class ToolRenders {
     public static void renderDestructionOverlay(RenderWorldLastEvent evt, PlayerEntity player, ItemStack stack) {
         BlockRayTraceResult lookingAt = VectorHelper.getLookingAt(player, stack);
         World world = player.world;
-        if ((lookingAt == null || (world.getBlockState(VectorHelper.getLookingAt(player, stack).getPos()) == Blocks.AIR.getDefaultState())) && GadgetDestruction.getAnchor(stack) == null) return;
+        if ((lookingAt == null || (world.getBlockState(VectorHelper.getLookingAt(player, stack).getPos()) == Blocks.AIR.getDefaultState())) && GadgetDestruction.getAnchor(stack) == null)
+            return;
         BlockPos startBlock = (GadgetDestruction.getAnchor(stack) == null) ? lookingAt.getPos() : GadgetDestruction.getAnchor(stack);
         Direction facing = (GadgetDestruction.getAnchorSide(stack) == null) ? lookingAt.getFace() : GadgetDestruction.getAnchorSide(stack);
         if (world.getBlockState(startBlock) == BGBlocks.effectBlock.getDefaultState())
@@ -554,6 +556,7 @@ public class ToolRenders {
             GlStateManager.pushMatrix();//Push matrix again just because
             GlStateManager.translatef((float) -doubleX, (float) -doubleY, (float) -doubleZ);//The render starts at the player, so we subtract the player coords and move the render to 0,0,0
             GlStateManager.translatef(startPos.getX(), startPos.getY(), startPos.getZ()); //Move the render to the startingBlockPos
+
             GL14.glBlendColor(1F, 1F, 1F, 0.55f); //Set the alpha of the blocks we are rendering
             //GlStateManager.translate(-0.0005f, -0.0005f, 0.0005f);
             //GlStateManager.scale(1.001f, 1.001f, 1.001f);//Slightly Larger block to avoid z-fighting.
@@ -564,6 +567,43 @@ public class ToolRenders {
 
             GlStateManager.popMatrix();
             //Set blending back to the default mode
+
+            for (BlockMap blockMap : blockMapList) {
+                BlockState state = blockMap.state.getState();
+                if (state.hasTileEntity()) {
+                    TileEntity te = fakeTERWorld.getTE(state, world);
+                    TileEntityRenderer<TileEntity> teRender = fakeTERWorld.getTER(state, world);
+                    if (teRender != null) {
+                        GlStateManager.pushMatrix();
+                        GlStateManager.color4f(1F, 1F, 1F, 1F);
+                        GlStateManager.translatef((float) -doubleX, (float) -doubleY, (float) -doubleZ);
+                        GlStateManager.translatef(startPos.getX(), startPos.getY(), startPos.getZ());
+                        GlStateManager.translatef(blockMap.xOffset, blockMap.yOffset, blockMap.zOffset);
+                        GlStateManager.scalef(1.0f, 1.0f, 1.0f); //Block scale 1 = full sized block
+                        GlStateManager.enableBlend(); //We have to do this in the loop because the TE Render removes blend when its done
+                        GlStateManager.blendFunc(GL14.GL_CONSTANT_ALPHA, GL14.GL_ONE_MINUS_CONSTANT_ALPHA);
+                        ItemStack renderStack = new ItemStack(state.getBlock());
+                        if (renderStack.getItem().getTileEntityItemStackRenderer() != ItemStackTileEntityRenderer.instance || isVanillaISTER(renderStack)) {
+                            GlStateManager.rotatef(-90.0F, 0.0F, 1.0F, 0.0F); //Rotate it because i'm not sure why but we need to
+                            chestRenderer.renderChestBrightness(state.getBlock(), 1f);//Render the defined block
+                        } else {
+                            if (!erroredTiles.contains(te)) {
+                                try {
+                                    TileEntityRendererDispatcher.instance.render(te, 0, 0, 0, evt.getPartialTicks(), -1, true);
+                                } catch (Exception e) {
+                                    System.out.println("TER Exception with block type: " + state);
+                                    erroredTiles.add(te);
+                                    GlStateManager.disableFog();
+                                    GlStateManager.popMatrix();
+                                }
+                            }
+                        }
+                        GlStateManager.disableFog();
+                        GlStateManager.popMatrix();
+                    }
+                }
+            }
+
 
             GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
             //Disable blend
@@ -709,5 +749,32 @@ public class ToolRenders {
 
         mc.getBlockRendererDispatcher().renderBlockBrightness(Blocks.YELLOW_STAINED_GLASS.getDefaultState(), 1f);
         GlStateManager.popMatrix();
+    }
+
+    private static boolean isVanillaISTER(ItemStack stack) {
+        Item item = stack.getItem();
+        if (item instanceof BannerItem) {
+            return true;
+        } else if (item instanceof BlockItem && ((BlockItem) item).getBlock() instanceof BedBlock) {
+            return true;
+        } else if (item == Items.SHIELD) {
+            return true;
+        } else if (item instanceof BlockItem && ((BlockItem) item).getBlock() instanceof AbstractSkullBlock) {
+            return true;
+        } else if (item == Items.TRIDENT) {
+            return true;
+        } else if (item instanceof BlockItem && ((BlockItem) item).getBlock() == Blocks.CONDUIT) {
+            return true;
+        } else if (item == Blocks.ENDER_CHEST.asItem()) {
+            return true;
+        } else if (item == Blocks.TRAPPED_CHEST.asItem()) {
+            return true;
+        } else if (Block.getBlockFromItem(item) instanceof ShulkerBoxBlock) {
+            return true;
+        } else if (Block.getBlockFromItem(item) instanceof ChestBlock) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }
