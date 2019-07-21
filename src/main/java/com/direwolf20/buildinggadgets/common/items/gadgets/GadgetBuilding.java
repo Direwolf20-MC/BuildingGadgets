@@ -5,6 +5,8 @@ import com.direwolf20.buildinggadgets.api.abstraction.BlockData;
 import com.direwolf20.buildinggadgets.api.building.IAtopPlacingGadget;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
+import com.direwolf20.buildinggadgets.common.network.PacketHandler;
+import com.direwolf20.buildinggadgets.common.network.packets.PacketBindTool;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
 import com.direwolf20.buildinggadgets.common.util.helpers.InventoryHelper;
@@ -20,6 +22,7 @@ import com.direwolf20.buildinggadgets.common.util.tools.UndoState;
 import com.direwolf20.buildinggadgets.common.util.tools.modes.BuildingMode;
 import com.direwolf20.buildinggadgets.common.world.FakeBuilderWorld;
 import net.minecraft.block.Blocks;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.player.PlayerEntity;
@@ -138,8 +141,13 @@ public class GadgetBuilding extends GadgetGeneric implements IAtopPlacingGadget 
             } else if (player instanceof ServerPlayerEntity) {
                 build((ServerPlayerEntity) player, itemstack);
             }
-        } else if (!player.isSneaking()) {
-            ToolRenders.updateInventoryCache();
+        } else {
+            if (!player.isSneaking()) {
+                ToolRenders.updateInventoryCache();
+            }
+            if (Screen.hasControlDown()) {
+                PacketHandler.sendToServer(new PacketBindTool());
+            }
         }
         return new ActionResult<>(ActionResultType.SUCCESS, itemstack);
     }
