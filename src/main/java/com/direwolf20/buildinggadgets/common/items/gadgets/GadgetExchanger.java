@@ -234,13 +234,15 @@ public class GadgetExchanger extends GadgetGeneric {
         if (neededItems == 0) {
             neededItems = 1;
         }
-        if (InventoryHelper.countItem(itemStack, player, world) < neededItems) {
-            ItemStack constructionPaste = new ItemStack(BGItems.constructionPaste);
-            if (InventoryHelper.countPaste(player) < neededItems) {
-                return false;
+        if (!setBlock.getState().hasTileEntity()) {
+            if (InventoryHelper.countItem(itemStack, player, world) < neededItems) {
+                ItemStack constructionPaste = new ItemStack(BGItems.constructionPaste);
+                if (InventoryHelper.countPaste(player) < neededItems) {
+                    return false;
+                }
+                itemStack = constructionPaste.copy();
+                useConstructionPaste = true;
             }
-            itemStack = constructionPaste.copy();
-            useConstructionPaste = true;
         }
         if (!player.isAllowEdit()) {
             return false;
