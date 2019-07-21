@@ -1,6 +1,7 @@
 package com.direwolf20.buildinggadgets.common.util.tools;
 
 import com.direwolf20.buildinggadgets.client.RemoteInventoryCache;
+import com.direwolf20.buildinggadgets.client.renderer.FakeTERWorld;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetBuilding;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
@@ -58,9 +59,7 @@ import org.apache.commons.lang3.tuple.Triple;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL14;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
@@ -75,7 +74,8 @@ import static com.direwolf20.buildinggadgets.common.util.GadgetUtils.getToolBloc
  */
 public class ToolRenders {
     private static final Minecraft mc = Minecraft.getInstance();
-
+    private static final FakeTERWorld fakeTERWorld = new FakeTERWorld();
+    private static final transient Set<TileEntity> erroredTiles = Collections.newSetFromMap(new WeakHashMap<>());
     private static final FakeBuilderWorld fakeWorld = new FakeBuilderWorld();
     private static RemoteInventoryCache cacheInventory = new RemoteInventoryCache(false);
     private static Cache<Triple<UniqueItemStack, BlockPos, Integer>, Integer> cacheDestructionOverlay = CacheBuilder.newBuilder().maximumSize(1).
@@ -209,28 +209,27 @@ public class ToolRenders {
                 }
 
                 if (state.hasTileEntity()) {
-                    TileEntity te = state.getBlock().createTileEntity(state, world); //TODO Its not ideal to generate this TE every draw call, we should cache it somewhere
-                    TileEntityRenderer<TileEntity> teRender = TileEntityRendererDispatcher.instance.getRenderer(te);
-
-                    if (teRender != null) { //beacons cause weirdness, remove this check to see for yourself TODO Figure out why if possible
-                        te.setWorld(world);
+                    TileEntity te = fakeTERWorld.getTE(state, world);
+                    TileEntityRenderer<TileEntity> teRender = fakeTERWorld.getTER(state, world);
+                    if (teRender != null && !erroredTiles.contains(te)) {
                         for (BlockPos coordinate : coordinates) {
+                            te.setPos(coordinate);
                             GlStateManager.pushMatrix();
-                            GlStateManager.pushTextureAttributes(); //Some TESR's change attributes, save what we have
                             GlStateManager.color4f(1F, 1F, 1F, 1F);
                             GlStateManager.translatef((float) -doubleX, (float) -doubleY, (float) -doubleZ);
                             GlStateManager.translatef(coordinate.getX(), coordinate.getY(), coordinate.getZ());
                             GlStateManager.scalef(1.0f, 1.0f, 1.0f); //Block scale 1 = full sized block
-                            te.setPos(coordinate);
+                            GlStateManager.enableBlend(); //We have to do this in the loop because the TE Render removes blend when its done
+                            GlStateManager.blendFunc(GL14.GL_CONSTANT_ALPHA, GL14.GL_ONE_MINUS_CONSTANT_ALPHA);
                             try {
-                                GlStateManager.enableBlend(); //We have to do this in the loop because the TE Render removes blend when its done
-                                GlStateManager.blendFunc(GL14.GL_CONSTANT_ALPHA, GL14.GL_ONE_MINUS_CONSTANT_ALPHA);
-                                teRender.render(te, 0, 0, 0, evt.getPartialTicks(), -1);
+                                TileEntityRendererDispatcher.instance.render(te, 0, 0, 0, evt.getPartialTicks(), -1, true);
                             } catch (Exception e) {
                                 System.out.println("TER Exception with block type: " + state);
-                                GlStateManager.popMatrix(); //If the TESR did a GLPushAttrib and died in the middle, we need to pop it.
+                                erroredTiles.add(te);
+                                GlStateManager.disableFog();
+                                GlStateManager.popMatrix();
+                                break;
                             }
-                            GlStateManager.popAttributes(); //Pop the attribute stack
                             GlStateManager.disableFog();
                             GlStateManager.popMatrix();
                         }
