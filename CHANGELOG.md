@@ -4,7 +4,7 @@ The format of this document is based on [Keep a Changelog](https://keepachangelo
 ## [Unreleased] [3.0.0 - 1.13]
 - Nothing yet
 
-## [2.7.0 - 1.12.2] - Date to be added.
+## [2.7.0 - 1.12.2] - 2019-07-20
 ### Note: 
 A note for this update, due to the pure amount of changes made between this version and the previous version we're just going
 to put it out there that this one might be a bit buggy! 🐛 If you encounter any issues with how the mod used to work to how it works now
