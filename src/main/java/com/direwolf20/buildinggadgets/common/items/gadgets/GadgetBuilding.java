@@ -96,27 +96,27 @@ public class GadgetBuilding extends GadgetGeneric implements IAtopPlacingGadget 
         super.addInformation(stack, world, tooltip, flag);
         tooltip.add(TooltipTranslation.GADGET_BLOCK
                 .componentTranslation(LangUtil.getFormattedBlockName(getToolBlock(stack).getState()))
-                            .setStyle(Styles.DK_GREEN));
+                .setStyle(Styles.DK_GREEN));
         BuildingMode mode = getToolMode(stack);
         tooltip.add(TooltipTranslation.GADGET_MODE
-                            .componentTranslation((mode == BuildingMode.SURFACE && getConnectedArea(stack) ? TooltipTranslation.GADGET_CONNECTED
-                                    .format(mode) : mode))
-                            .setStyle(Styles.AQUA));
+                .componentTranslation((mode == BuildingMode.SURFACE && getConnectedArea(stack) ? TooltipTranslation.GADGET_CONNECTED
+                        .format(mode) : mode))
+                .setStyle(Styles.AQUA));
         if (getToolMode(stack) != BuildingMode.TARGETED_AXIS_CHASING)
             tooltip.add(TooltipTranslation.GADGET_RANGE
-                        .componentTranslation(getToolRange(stack))
-                         .setStyle(Styles.LT_PURPLE));
+                    .componentTranslation(getToolRange(stack))
+                    .setStyle(Styles.LT_PURPLE));
 
         if (getToolMode(stack) == BuildingMode.SURFACE)
             tooltip.add(TooltipTranslation.GADGET_FUZZY
-                                .componentTranslation(String.valueOf(getFuzzy(stack)))
-                                .setStyle(Styles.GOLD));
+                    .componentTranslation(String.valueOf(getFuzzy(stack)))
+                    .setStyle(Styles.GOLD));
 
         addInformationRayTraceFluid(tooltip, stack);
 
         tooltip.add(TooltipTranslation.GADGET_BUILDING_PLACE_ATOP
-                            .componentTranslation(String.valueOf(shouldPlaceAtop(stack)))
-                            .setStyle(Styles.YELLOW));
+                .componentTranslation(String.valueOf(shouldPlaceAtop(stack)))
+                .setStyle(Styles.YELLOW));
         addEnergyInformation(tooltip, stack);
     }
 
@@ -240,7 +240,7 @@ public class GadgetBuilding extends GadgetGeneric implements IAtopPlacingGadget 
                 BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(world, coord, currentBlock.getState(), player);
                 boolean cancelled = MinecraftForge.EVENT_BUS.post(e);
 
-                if (distance < 64 && sameDim && currentBlock.getState() != BGBlocks.effectBlock.getDefaultState() && ! cancelled) { //Don't allow us to undo a block while its still being placed or too far away
+                if (distance < 64 && sameDim && currentBlock.getState() != BGBlocks.effectBlock.getDefaultState() && !cancelled) { //Don't allow us to undo a block while its still being placed or too far away
                     if (currentBlock.getState() != Blocks.AIR.getDefaultState()) {
                         currentBlock.getState().getBlock().harvestBlock(world, player, coord, currentBlock.getState(), world.getTileEntity(coord), silkTool);
                         world.addEntity(new BlockBuildEntity(world, coord, currentBlock, BlockBuildEntity.Mode.REMOVE, false));
@@ -297,14 +297,16 @@ public class GadgetBuilding extends GadgetGeneric implements IAtopPlacingGadget 
         if (ForgeEventFactory.onBlockPlace(player, blockSnapshot, Direction.UP)) {
             return false;
         }
-        ItemStack constructionPaste = new ItemStack(BGItems.constructionPaste);
-        if (InventoryHelper.countItem(itemStack, player, world) < neededItems) {
-            //if (InventoryHelper.countItem(constructionStack, player) == 0) {
-            if (InventoryHelper.countPaste(player) < neededItems) {
-                return false;
+        if (!setBlock.getState().hasTileEntity()) {
+            ItemStack constructionPaste = new ItemStack(BGItems.constructionPaste);
+            if (InventoryHelper.countItem(itemStack, player, world) < neededItems) {
+                //if (InventoryHelper.countItem(constructionStack, player) == 0) {
+                if (InventoryHelper.countPaste(player) < neededItems) {
+                    return false;
+                }
+                itemStack = constructionPaste.copy();
+                useConstructionPaste = true;
             }
-            itemStack = constructionPaste.copy();
-            useConstructionPaste = true;
         }
 
         if (!this.canUse(heldItem, player))

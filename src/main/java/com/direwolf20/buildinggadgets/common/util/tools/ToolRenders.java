@@ -138,7 +138,9 @@ public class ToolRenders {
                 }
 
                 long hasBlocks = InventoryHelper.countItem(itemStack, player, cacheInventory);
-                hasBlocks = hasBlocks + InventoryHelper.countPaste(player);
+                if (!renderBlockState.hasTileEntity()) {
+                    hasBlocks = hasBlocks + InventoryHelper.countPaste(player);
+                }
                 int hasEnergy = 0;
                 LazyOptional<IEnergyStorage> energy = EnergyUtil.getCap(stack);
                 if (energy.isPresent()) {
