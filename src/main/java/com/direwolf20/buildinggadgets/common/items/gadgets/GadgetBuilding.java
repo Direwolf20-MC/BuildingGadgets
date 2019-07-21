@@ -144,9 +144,10 @@ public class GadgetBuilding extends GadgetGeneric implements IAtopPlacingGadget 
         } else {
             if (!player.isSneaking()) {
                 ToolRenders.updateInventoryCache();
-            }
-            if (Screen.hasControlDown()) {
-                PacketHandler.sendToServer(new PacketBindTool());
+            } else {
+                if (Screen.hasControlDown()) {
+                    PacketHandler.sendToServer(new PacketBindTool());
+                }
             }
         }
         return new ActionResult<>(ActionResultType.SUCCESS, itemstack);
