@@ -377,7 +377,33 @@ public class ToolRenders {
                 GlStateManager.popMatrix();
             }
 
-
+            if (state.hasTileEntity()) {
+                TileEntity te = fakeTERWorld.getTE(state, world);
+                TileEntityRenderer<TileEntity> teRender = fakeTERWorld.getTER(state, world);
+                if (teRender != null && !erroredTiles.contains(te)) {
+                    for (BlockPos coordinate : coordinates) {
+                        te.setPos(coordinate);
+                        GlStateManager.pushMatrix();
+                        GlStateManager.color4f(1F, 1F, 1F, 1F);
+                        GlStateManager.translatef((float) -doubleX, (float) -doubleY, (float) -doubleZ);
+                        GlStateManager.translatef(coordinate.getX(), coordinate.getY(), coordinate.getZ());
+                        GlStateManager.scalef(1.0f, 1.0f, 1.0f); //Block scale 1 = full sized block
+                        GlStateManager.enableBlend(); //We have to do this in the loop because the TE Render removes blend when its done
+                        GlStateManager.blendFunc(GL14.GL_CONSTANT_ALPHA, GL14.GL_ONE_MINUS_CONSTANT_ALPHA);
+                        try {
+                            TileEntityRendererDispatcher.instance.render(te, 0, 0, 0, evt.getPartialTicks(), -1, true);
+                        } catch (Exception e) {
+                            System.out.println("TER Exception with block type: " + state);
+                            erroredTiles.add(te);
+                            GlStateManager.disableFog();
+                            GlStateManager.popMatrix();
+                            break;
+                        }
+                        GlStateManager.disableFog();
+                        GlStateManager.popMatrix();
+                    }
+                }
+            }
             //Set blending back to the default mode
             GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
             ForgeHooksClient.setRenderLayer(origLayer);
