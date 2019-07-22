@@ -88,12 +88,17 @@ public class GuiIconActionable extends Button {
         GlStateManager.enableBlend();
         GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
         GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
-        GlStateManager.color4f(activeColor.getRed() / 255f, activeColor.getGreen() / 255f, activeColor.getBlue() / 255f, alpha);
 
+        GlStateManager.disableTexture();
+        GlStateManager.color4f(activeColor.getRed() / 255f, activeColor.getGreen() / 255f, activeColor.getBlue() / 255f, .15f);
+        blit(this.x, this.y, 0, 0, this.width, this.height, this.width, this.height);
+        GlStateManager.enableTexture();
+
+        GlStateManager.color4f(activeColor.getRed() / 255f, activeColor.getGreen() / 255f, activeColor.getBlue() / 255f, alpha);
         Minecraft.getInstance().getTextureManager().bindTexture(selected ? selectedTexture : deselectedTexture);
         blit(this.x, this.y, 0, 0, this.width, this.height, this.width, this.height);
 
         if( mouseX >= x && mouseY >= y && mouseX < x + width && mouseY < y + height )
-            drawString(Minecraft.getInstance().fontRenderer, this.getMessage(), mouseX + 2, mouseY - 10, activeColor.getRGB());
+            drawString(Minecraft.getInstance().fontRenderer, this.getMessage(), mouseX > (Minecraft.getInstance().mainWindow.getScaledWidth() / 2) ?  mouseX + 2 : mouseX - Minecraft.getInstance().fontRenderer.getStringWidth(getMessage()), mouseY - 10, activeColor.getRGB());
     }
 }

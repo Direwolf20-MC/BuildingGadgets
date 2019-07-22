@@ -149,7 +149,7 @@ public class ModeRadialMenu extends Screen {
                 return GadgetBuilding.shouldPlaceAtop(getGadget());
             }));
         }
-        addButton(new PositionedIconActionable("Anchor", "anchor", left, false, send -> {
+        addButton(new PositionedIconActionable("Anchor", "anchor", left, send -> {
             if (send)
                 PacketHandler.sendToServer(new PacketAnchor());
 
