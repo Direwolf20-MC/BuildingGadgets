@@ -1,3 +1,12 @@
+modLoader="javafml" #mandatory
+loaderVersion="[${forge_major},)" #mandatory (25 is current forge version)
+updateJSONURL="${update_json}" #optional
+issueTrackerURL="https://github.com/Direwolf20-MC/BuildingGadgets/issues" #optional
+displayURL="https://diresbg.com/" #optional
+logoFile="buildinggadgets_logo.png"
+credits="The Forge and FML guys, McJty, Vazkii, CPW, and Pahimar for helping me learn java/forge modding.  Rorax for the textures!" #optional
+authors="Direwolf20" #The man himself
+
 [[mods]] #mandatory
     modId="buildinggadgets" #mandatory
     version="${version}" #mandatory
@@ -18,13 +27,3 @@
     ordering="BEFORE"
     # Side this dependency is applied on - BOTH, CLIENT or SERVER
     side="BOTH"
-## We don't need to depend on the API, as it will always be in the same jar with an apropiate version, this way we can let forge decide the loading order
-#[[dependencies.buildinggadgets]] #optional
-    # the modid of the dependency
-    #modId="buildinggadgets_api" #mandatory
-    # Does this dependency have to exist - if not, ordering below must be specified
-    #mandatory=true #mandatory
-    # The version range of the dependency
-    #versionRange="[${api_version},)" #mandatory
-    # Side this dependency is applied on - BOTH, CLIENT or SERVER
-    #side="BOTH"

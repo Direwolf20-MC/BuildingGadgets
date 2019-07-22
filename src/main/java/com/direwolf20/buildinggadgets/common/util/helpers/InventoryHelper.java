@@ -40,7 +40,7 @@ public class InventoryHelper {
             ImmutableSet.of(SlabBlock.TYPE, StairsBlock.HALF, LogBlock.AXIS, AXIS, DirectionalBlock.FACING, StairsBlock.FACING, TrapDoorBlock.HALF, TrapDoorBlock.OPEN, StairsBlock.SHAPE, LeverBlock.POWERED, RepeaterBlock.DELAY, PaneBlock.EAST, PaneBlock.WEST, PaneBlock.NORTH, PaneBlock.SOUTH);
 
     private static final Set<IProperty> SAFE_PROPERTIES_COPY_PASTE =
-            ImmutableSet.<IProperty>builder().addAll(SAFE_PROPERTIES).addAll(ImmutableSet.of(RailBlock.SHAPE, PoweredRailBlock.SHAPE)).build();
+            ImmutableSet.<IProperty>builder().addAll(SAFE_PROPERTIES).addAll(ImmutableSet.of(RailBlock.SHAPE, PoweredRailBlock.SHAPE, ChestBlock.TYPE)).build();
 
     public static boolean giveItem(ItemStack itemStack, PlayerEntity player, IWorld world) {
         if (player.isCreative()) {

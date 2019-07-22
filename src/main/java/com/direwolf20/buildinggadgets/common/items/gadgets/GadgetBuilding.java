@@ -5,6 +5,8 @@ import com.direwolf20.buildinggadgets.api.building.modes.IAtopPlacingGadget;
 import com.direwolf20.buildinggadgets.api.building.tilesupport.TileSupport;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
+import com.direwolf20.buildinggadgets.common.network.PacketHandler;
+import com.direwolf20.buildinggadgets.common.network.packets.PacketBindTool;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
 import com.direwolf20.buildinggadgets.common.util.helpers.InventoryHelper;
@@ -20,6 +22,7 @@ import com.direwolf20.buildinggadgets.common.util.tools.UndoState;
 import com.direwolf20.buildinggadgets.common.util.tools.modes.BuildingMode;
 import com.direwolf20.buildinggadgets.common.world.FakeBuilderWorld;
 import net.minecraft.block.Blocks;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.player.PlayerEntity;
@@ -96,27 +99,27 @@ public class GadgetBuilding extends GadgetGeneric implements IAtopPlacingGadget 
         super.addInformation(stack, world, tooltip, flag);
         tooltip.add(TooltipTranslation.GADGET_BLOCK
                 .componentTranslation(LangUtil.getFormattedBlockName(getToolBlock(stack).getState()))
-                            .setStyle(Styles.DK_GREEN));
+                .setStyle(Styles.DK_GREEN));
         BuildingMode mode = getToolMode(stack);
         tooltip.add(TooltipTranslation.GADGET_MODE
-                            .componentTranslation((mode == BuildingMode.SURFACE && getConnectedArea(stack) ? TooltipTranslation.GADGET_CONNECTED
-                                    .format(mode) : mode))
-                            .setStyle(Styles.AQUA));
+                .componentTranslation((mode == BuildingMode.SURFACE && getConnectedArea(stack) ? TooltipTranslation.GADGET_CONNECTED
+                        .format(mode) : mode))
+                .setStyle(Styles.AQUA));
         if (getToolMode(stack) != BuildingMode.TARGETED_AXIS_CHASING)
             tooltip.add(TooltipTranslation.GADGET_RANGE
-                        .componentTranslation(getToolRange(stack))
-                         .setStyle(Styles.LT_PURPLE));
+                    .componentTranslation(getToolRange(stack))
+                    .setStyle(Styles.LT_PURPLE));
 
         if (getToolMode(stack) == BuildingMode.SURFACE)
             tooltip.add(TooltipTranslation.GADGET_FUZZY
-                                .componentTranslation(String.valueOf(getFuzzy(stack)))
-                                .setStyle(Styles.GOLD));
+                    .componentTranslation(String.valueOf(getFuzzy(stack)))
+                    .setStyle(Styles.GOLD));
 
         addInformationRayTraceFluid(tooltip, stack);
 
         tooltip.add(TooltipTranslation.GADGET_BUILDING_PLACE_ATOP
-                            .componentTranslation(String.valueOf(shouldPlaceAtop(stack)))
-                            .setStyle(Styles.YELLOW));
+                .componentTranslation(String.valueOf(shouldPlaceAtop(stack)))
+                .setStyle(Styles.YELLOW));
         addEnergyInformation(tooltip, stack);
     }
 
@@ -138,8 +141,14 @@ public class GadgetBuilding extends GadgetGeneric implements IAtopPlacingGadget 
             } else if (player instanceof ServerPlayerEntity) {
                 build((ServerPlayerEntity) player, itemstack);
             }
-        } else if (!player.isSneaking()) {
-            ToolRenders.updateInventoryCache();
+        } else {
+            if (! player.isSneaking()) {
+                ToolRenders.updateInventoryCache();
+            } else {
+                if (Screen.hasControlDown()) {
+                    PacketHandler.sendToServer(new PacketBindTool());
+                }
+            }
         }
         return new ActionResult<>(ActionResultType.SUCCESS, itemstack);
     }
@@ -235,7 +244,7 @@ public class GadgetBuilding extends GadgetGeneric implements IAtopPlacingGadget 
             for (BlockPos coord : undoCoords) {
                 currentBlock = TileSupport.createBlockData(world, coord);
 
-                double distance = coord.distanceSq(player.getPosition());
+                double distance = Math.sqrt(coord.distanceSq(player.getPosition()));
 
                 BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(world, coord, currentBlock.getState(), player);
                 boolean cancelled = MinecraftForge.EVENT_BUS.post(e);
@@ -297,14 +306,16 @@ public class GadgetBuilding extends GadgetGeneric implements IAtopPlacingGadget 
         if (ForgeEventFactory.onBlockPlace(player, blockSnapshot, Direction.UP)) {
             return false;
         }
-        ItemStack constructionPaste = new ItemStack(BGItems.constructionPaste);
-        if (InventoryHelper.countItem(itemStack, player, world) < neededItems) {
-            //if (InventoryHelper.countItem(constructionStack, player) == 0) {
-            if (InventoryHelper.countPaste(player) < neededItems) {
-                return false;
+        if (! setBlock.getState().hasTileEntity()) {
+            ItemStack constructionPaste = new ItemStack(BGItems.constructionPaste);
+            if (InventoryHelper.countItem(itemStack, player, world) < neededItems) {
+                //if (InventoryHelper.countItem(constructionStack, player) == 0) {
+                if (InventoryHelper.countPaste(player) < neededItems) {
+                    return false;
+                }
+                itemStack = constructionPaste.copy();
+                useConstructionPaste = true;
             }
-            itemStack = constructionPaste.copy();
-            useConstructionPaste = true;
         }
 
         if (!this.canUse(heldItem, player))

@@ -25,25 +25,6 @@ String forgeVersion = "$minecraft_version-${forge_major}.$forge_minor"
 String forgeName = "$forge_base:$forgeVersion"
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
 
-//https://discuss.gradle.org/t/concatenating-multiple-files-into-one-using-gradle/5056
-class ConcatFiles extends DefaultTask {
-    @InputFiles
-    FileCollection source
-    @OutputFile
-    File target
-    @TaskAction
-    void concat() {
-        target.withWriter { writer ->
-            source.each { file ->
-                if (file.exists())
-                    file.withReader { reader ->
-                        writer << '\n' <<reader
-                    }
-            }
-        }
-    }
-}
-
 sourceSets {
     api {
         java {
@@ -136,7 +117,7 @@ minecraft {
     // stable_#            stables are built at the discretion of the MCP team.
     // Use non-default mappings at your own risk. they may not always work.
     // simply re-run your setup task after changing the mappings to update your workspace.
-    mappings channel: 'snapshot', version: "${mcp_mappings}-${minecraft_version}"
+    mappings channel: 'snapshot', version: "${mcp_mappings}-1.14.3" //TODO un hardcode as soon as mcp updates
     // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
 
     //accessTransformer = file('my_at.cfg')
@@ -211,13 +192,7 @@ test {
     }
 }
 
-task mergeModMetaInf(type: ConcatFiles) {
-    source = files("$rootDir/src/META-INF/mods.toml", "$rootDir/src/api/resources/META-INF/mods.toml", "$rootDir/src/main/resources/META-INF/mods.toml")
-    target = file("$buildDir/tmp/modMeta/META-INF/mods.toml")
-}
-
 processResources { //Processes main only resouces
-    dependsOn mergeModMetaInf
     from("$buildDir/tmp/modMeta") {
         expand 'version':project.version, 'api_version':project.api_version,'forge_major':project.forge_major,'update_json':project.update_json
     }
@@ -228,7 +203,6 @@ processResources { //Processes main only resouces
 }
 
 processApiResources {
-    dependsOn mergeModMetaInf
     from("$buildDir/tmp/modMeta/META-INF/mods.toml") {
         expand 'version':project.version, 'api_version':project.api_version,'forge_major':project.forge_major,'update_json':project.update_json
     }

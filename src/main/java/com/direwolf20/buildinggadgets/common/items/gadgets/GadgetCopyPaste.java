@@ -9,6 +9,7 @@ import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.common.items.ITemplate;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
+import com.direwolf20.buildinggadgets.common.network.packets.PacketBindTool;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketBlockMap;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketRotateMirror;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
@@ -30,6 +31,7 @@ import com.google.common.collect.Multiset;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.material.Material;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.player.PlayerEntity;
@@ -253,8 +255,8 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
         // Remove debug code
         // CapabilityUtil.EnergyUtil.getCap(stack).ifPresent(energy -> energy.receiveEnergy(105000, false));
         if (!world.isRemote) {
-            if (player.isSneaking() && GadgetUtils.setRemoteInventory(stack, player, world, pos, false) == ActionResultType.SUCCESS)
-                return new ActionResult<ItemStack>(ActionResultType.SUCCESS, stack);
+            /*if (player.isSneaking() && GadgetUtils.setRemoteInventory(stack, player, world, pos, false) == ActionResultType.SUCCESS)
+                return new ActionResult<ItemStack>(ActionResultType.SUCCESS, stack);*/
 
             if (getToolMode(stack) == ToolMode.Copy) {
                 if (world.getBlockState(VectorHelper.getLookingAt(player, stack).getPos()) != Blocks.AIR.getDefaultState())
@@ -272,8 +274,13 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
             }
         } else {
             if (player.isSneaking()) {
-                if (GadgetUtils.getRemoteInventory(pos, world, NetworkIO.Operation.EXTRACT) != null)
-                    return new ActionResult<>(ActionResultType.SUCCESS, stack);
+                if (Screen.hasControlDown()) {
+                    PacketHandler.sendToServer(new PacketBindTool());
+                } else {
+                    if (GadgetUtils.getRemoteInventory(pos, world, NetworkIO.Operation.EXTRACT) != null)
+                        return new ActionResult<>(ActionResultType.SUCCESS, stack);
+                }
+
             }
             if (getToolMode(stack) == ToolMode.Copy) {
                 if (player.isSneaking())
@@ -401,7 +408,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
                 for (int z = iStartZ; z <= iEndZ; z++) {
                     BlockPos tempPos = new BlockPos(x, y, z);
                     BlockState tempState = world.getBlockState(tempPos);
-                    if (tempState != Blocks.AIR.getDefaultState() && (world.getTileEntity(tempPos) == null || world.getTileEntity(tempPos) instanceof ConstructionBlockTileEntity) && !tempState.getMaterial().isLiquid() && Config.BLACKLIST.isAllowedBlock(tempState.getBlock())) {
+                    if (tempState != Blocks.AIR.getDefaultState() && ! tempState.getMaterial().isLiquid() && Config.BLACKLIST.isAllowedBlock(tempState.getBlock())) {
                         TileEntity te = world.getTileEntity(tempPos);
                         BlockData assignState = InventoryHelper.getSpecificStates(tempState, world, player, tempPos, stack);
                         BlockData actualState = assignState;
@@ -530,14 +537,16 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
         if (ForgeEventFactory.onBlockPlace(player, blockSnapshot, Direction.UP)) {
             return;
         }
-        ItemStack constructionPaste = new ItemStack(BGItems.constructionPaste);
         boolean useConstructionPaste = false;
-        if (InventoryHelper.countItem(itemStack, player, world) < neededItems) {
-            if (InventoryHelper.countPaste(player) < neededItems) {
-                return;
+        if (! data.getState().hasTileEntity()) {
+            ItemStack constructionPaste = new ItemStack(BGItems.constructionPaste);
+            if (InventoryHelper.countItem(itemStack, player, world) < neededItems) {
+                if (InventoryHelper.countPaste(player) < neededItems) {
+                    return;
+                }
+                itemStack = constructionPaste.copy();
+                useConstructionPaste = true;
             }
-            itemStack = constructionPaste.copy();
-            useConstructionPaste = true;
         }
 
         if (!this.canUse(heldItem, player))

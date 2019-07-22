@@ -1,8 +1,0 @@
-modLoader="javafml" #mandatory
-loaderVersion="[${forge_major},)" #mandatory (25 is current forge version)
-updateJSONURL="${update_json}" #optional
-issueTrackerURL="https://github.com/Direwolf20-MC/BuildingGadgets/issues" #optional
-displayURL="https://diresbg.com/" #optional
-logoFile="buildinggadgets_logo.png"
-credits="The Forge and FML guys, McJty, Vazkii, CPW, and Pahimar for helping me learn java/forge modding.  Rorax for the textures!" #optional
-authors="Direwolf20" #The man himself

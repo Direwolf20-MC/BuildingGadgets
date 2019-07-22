@@ -29,6 +29,7 @@ public class PacketHandler {
     public static void register() {
         // Server side
         registerMessage(PacketAnchor.class, PacketAnchor::encode, PacketAnchor::decode, PacketAnchor.Handler::handle);
+        registerMessage(PacketBindTool.class, PacketBindTool::encode, PacketBindTool::decode, PacketBindTool.Handler::handle);
         registerMessage(PacketBlockMap.class, PacketBlockMap::encode, PacketBlockMap::decode, PacketBlockMap.Handler::handle);
         registerMessage(PacketToggleFuzzy.class, PacketToggleFuzzy::encode, PacketToggleFuzzy::decode, PacketToggleFuzzy.Handler::handle);
         registerMessage(PacketToggleConnectedArea.class, PacketToggleConnectedArea::encode, PacketToggleConnectedArea::decode, PacketToggleConnectedArea.Handler::handle);

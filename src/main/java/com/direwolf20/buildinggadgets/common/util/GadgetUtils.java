@@ -274,6 +274,14 @@ public class GadgetUtils {
         return res;
     }
 
+    public static void bindToolToTE(ItemStack stack, PlayerEntity player) {
+        World world = player.world;
+        BlockRayTraceResult lookingAt = VectorHelper.getLookingAt(player, GadgetGeneric.shouldRayTraceFluid(stack) ? RayTraceContext.FluidMode.ANY : RayTraceContext.FluidMode.NONE);
+        if (lookingAt == null || (world.getBlockState(VectorHelper.getLookingAt(player, stack).getPos()) == Blocks.AIR.getDefaultState()))
+            return;
+        ActionResultType result = setRemoteInventory(stack, player, world, lookingAt.getPos(), true);
+    }
+
     public static void selectBlock(ItemStack stack, PlayerEntity player) {
         // Used to find which block the player is looking at, and store it in NBT on the tool.
         World world = player.world;
