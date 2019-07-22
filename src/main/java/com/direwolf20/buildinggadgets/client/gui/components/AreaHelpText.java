@@ -7,7 +7,7 @@ import net.minecraft.client.renderer.Rectangle2d;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.inventory.container.Slot;
 
-public class AreaHelpText implements IHoverHelpText {
+public class AreaHelpText {
     private int minX, minY, maxX, maxY;
     private String helpTextKey;
 
@@ -31,17 +31,14 @@ public class AreaHelpText implements IHoverHelpText {
         this.helpTextKey = helpTextKey;
     }
 
-    @Override
     public boolean isHovered(int mouseX, int mouseY) {
         return mouseX >= minX && mouseX <= maxX && mouseY >= minY && mouseY <= maxY;
     }
 
-    @Override
     public String getHoverHelpText() {
         return I18n.format(GuiMod.getLangKeyArea("help", helpTextKey));
     }
 
-    @Override
     public void drawRect(AbstractGui gui, int color) {
         AbstractGui.fill(minX, minY, maxX, maxY, color);
     }

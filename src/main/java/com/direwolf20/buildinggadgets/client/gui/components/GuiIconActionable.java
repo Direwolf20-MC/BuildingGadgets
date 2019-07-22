@@ -13,7 +13,9 @@ import java.awt.*;
 import java.util.function.Predicate;
 
 /**
- *
+ * A one stop shop for all your icon gui related needs. We support colors,
+ * icons, selected and deselected states, sound and loads more. Come on
+ * down!
  */
 public class GuiIconActionable extends Button {
     private Predicate<Boolean> action;
@@ -54,6 +56,9 @@ public class GuiIconActionable extends Button {
         alpha = faded ? .6f : 1f;
     }
 
+    /**
+     * This should be used when ever changing select.
+     */
     public void setSelected(boolean selected) {
         this.selected = selected;
         this.activeColor = selected ? selectedColor : deselectedColor;

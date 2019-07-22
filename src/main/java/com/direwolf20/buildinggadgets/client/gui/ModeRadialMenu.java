@@ -40,8 +40,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 
-//import com.direwolf20.buildinggadgets.client.gui.components.GuiButtonActionCallback;
-
 public class ModeRadialMenu extends Screen {
 
     //TODO move to a enum of modes of Copy-Paste Gadget

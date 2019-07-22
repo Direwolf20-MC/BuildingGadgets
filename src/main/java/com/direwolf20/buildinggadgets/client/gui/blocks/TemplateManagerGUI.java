@@ -5,9 +5,6 @@
 
 package com.direwolf20.buildinggadgets.client.gui.blocks;
 
-import com.direwolf20.buildinggadgets.client.gui.components.GuiButtonHelp;
-import com.direwolf20.buildinggadgets.client.gui.components.GuiButtonHelpText;
-import com.direwolf20.buildinggadgets.client.gui.components.IHoverHelpText;
 import com.direwolf20.buildinggadgets.common.containers.TemplateManagerContainer;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
 import com.direwolf20.buildinggadgets.common.tiles.TemplateManagerTileEntity;
@@ -36,9 +33,7 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import org.lwjgl.opengl.GL11;
 
-import javax.annotation.Nullable;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
 import java.util.List;
 
 public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer> {
@@ -61,8 +56,8 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
     private TextFieldWidget nameField;
     private Button buttonSave, buttonLoad, buttonCopy, buttonPaste;
 
-    private GuiButtonHelp buttonHelp;
-    private List<IHoverHelpText> helpTextProviders = new ArrayList<>();
+//    private GuiButtonHelp buttonHelp; replace with my lovely replacement
+//    private List<IHoverHelpText> helpTextProviders = new ArrayList<>();
 
     private TemplateManagerTileEntity te;
     private TemplateManagerContainer container;
@@ -149,9 +144,9 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
         */
     }
 
-    private Button createAndAddButton(int x, int y, int witdth, int height, String text, @Nullable IPressable action) {
-        GuiButtonHelpText button = new GuiButtonHelpText(guiLeft + x, guiTop + y, witdth, height, text, text.toLowerCase(), action);
-        helpTextProviders.add(button);
+    private Button createAndAddButton(int x, int y, int witdth, int height, String text, IPressable action) {
+        Button button = new Button(guiLeft + x, guiTop + y, witdth, height, text, action);
+//        helpTextProviders.add(button);
         return button;
     }
 
