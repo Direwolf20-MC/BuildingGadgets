@@ -113,6 +113,9 @@ public abstract class GadgetGeneric extends Item {
     }
 
     public void applyDamage(ItemStack tool, ServerPlayerEntity player) {
+        if (player.isCreative())
+            return;
+
         IEnergyStorage energy = EnergyUtil.getCap(tool).orElseThrow(CapabilityNotPresentException::new);
         energy.extractEnergy(getEnergyCost(tool), false);
     }
