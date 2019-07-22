@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.common;
 
-import com.direwolf20.buildinggadgets.api.APIProxy;
+import com.direwolf20.buildinggadgets.api.BuildingGadgetsAPI;
 import com.direwolf20.buildinggadgets.client.ClientProxy;
 import com.direwolf20.buildinggadgets.client.gui.GuiMod;
 import com.direwolf20.buildinggadgets.common.config.Config;
@@ -35,18 +35,20 @@ import org.apache.logging.log4j.Logger;
 import java.util.function.Consumer;
 
 @Mod(value = Reference.MODID)
-public class BuildingGadgets {
+public final class BuildingGadgets {
 
     public static Logger LOG = LogManager.getLogger();
     private static BuildingGadgets theMod = null;
-    private final APIProxy theApi;
 
     public static BuildingGadgets getInstance() {
         assert theMod != null;
         return theMod;
     }
 
+    private final BuildingGadgetsAPI theAPi;
+
     public BuildingGadgets() {
+        theAPi = new BuildingGadgetsAPI();
         IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus();
 
         ModLoadingContext.get().registerConfig(Type.SERVER, Config.SERVER_CONFIG);
@@ -69,20 +71,16 @@ public class BuildingGadgets {
             eventBus.addListener((Consumer<FMLClientSetupEvent>) event -> ClientProxy.clientSetup(eventBus));
             ModLoadingContext.get().registerExtensionPoint(ExtensionPoint.CONFIGGUIFACTORY, () -> GuiMod::openScreen);
         });
-
-        theApi = APIProxy.INSTANCE.onCreate(eventBus, MinecraftForge.EVENT_BUS, null);
         BuildingObjects.init();
     }
 
     private void setup(final FMLCommonSetupEvent event) {
         theMod = (BuildingGadgets) ModLoadingContext.get().getActiveContainer().getMod();
-        theApi.onSetup();
         DeferredWorkQueue.runLater(() -> {
             PacketHandler.register();
             CraftingHelper.register(Reference.CONDITION_PASTE_ID, new CraftingConditionPaste());
             CraftingHelper.register(Reference.CONDITION_DESTRUCTION_ID, new CraftingConditionDestruction());
         });
-        event.getIMCStream().forEach(APIProxy.INSTANCE::handleIMC);
     }
 
     private void serverLoad(FMLServerStartingEvent event) {
@@ -94,7 +92,6 @@ public class BuildingGadgets {
     }
 
     private void finishLoad(FMLLoadCompleteEvent event) {
-        theApi.onLoadComplete();
         BuildingObjects.cleanup();
     }
 

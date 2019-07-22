@@ -1,8 +1,8 @@
 package com.direwolf20.buildinggadgets.test.building.placementTests;
 
-import com.direwolf20.buildinggadgets.api.abstraction.BlockData;
+import com.direwolf20.buildinggadgets.api.building.BlockData;
 import com.direwolf20.buildinggadgets.api.building.SingleTypeProvider;
-import com.direwolf20.buildinggadgets.api.template.building.tilesupport.DummyTileEntityData;
+import com.direwolf20.buildinggadgets.api.building.tilesupport.TileSupport;
 import com.direwolf20.buildinggadgets.test.util.UniqueBlockState;
 import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundNBT;
@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class SingleTypeProviderTest {
 
     private final BlockState state = UniqueBlockState.createNew();
-    private final SingleTypeProvider provider = new SingleTypeProvider(new BlockData(state, DummyTileEntityData.INSTANCE));
+    private final SingleTypeProvider provider = new SingleTypeProvider(new BlockData(state, TileSupport.dummyTileEntityData()));
     private final Random random = new Random();
 
     //TODO implement custom runner that launches minecraft

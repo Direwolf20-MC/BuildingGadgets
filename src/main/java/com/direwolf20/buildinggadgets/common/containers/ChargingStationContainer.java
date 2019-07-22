@@ -65,19 +65,19 @@ public class ChargingStationContainer extends BaseContainer {
             ItemStack stack = slot.getStack();
             itemstack = stack.copy();
             if (index < ChargingStationTileEntity.SIZE) {
-                if (!this.mergeItemStack(stack, ChargingStationTileEntity.SIZE, this.inventorySlots.size(), true)) {
+                if (! this.mergeItemStack(stack, ChargingStationTileEntity.SIZE, this.inventorySlots.size(), true)) {
                     return ItemStack.EMPTY;
                 }
                 slot.onSlotChange(stack, itemstack);
             } else {
-                int burnTime = net.minecraftforge.event.ForgeEventFactory.getItemBurnTime(stack, stack.getBurnTime() == -1 ? AbstractFurnaceTileEntity.getBurnTimes().getOrDefault(stack.getItem(), 0) : stack.getBurnTime());
+                int burnTime = net.minecraftforge.event.ForgeEventFactory.getItemBurnTime(stack, stack.getBurnTime() == - 1 ? AbstractFurnaceTileEntity.getBurnTimes().getOrDefault(stack.getItem(), 0) : stack.getBurnTime());
                 //System.out.println(burnTime);
                 if (stack.getItem() instanceof GadgetGeneric) {
-                    if (!this.mergeItemStack(stack, 1, 2, false)) {
+                    if (! this.mergeItemStack(stack, 1, 2, false)) {
                         return ItemStack.EMPTY;
                     }
                 } else if (burnTime > 0) {
-                    if (!this.mergeItemStack(stack, 0, 1, false)) {
+                    if (! this.mergeItemStack(stack, 0, 1, false)) {
                         return ItemStack.EMPTY;
                     }
                 }

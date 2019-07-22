@@ -1,8 +1,7 @@
 package com.direwolf20.buildinggadgets.api.building.modes;
 
-import com.direwolf20.buildinggadgets.api.abstraction.BlockData;
-import com.direwolf20.buildinggadgets.api.building.IBuildingMode;
-import com.direwolf20.buildinggadgets.api.building.IValidatorFactory;
+import com.direwolf20.buildinggadgets.api.building.BlockData;
+import com.direwolf20.buildinggadgets.api.building.view.IValidatorFactory;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;

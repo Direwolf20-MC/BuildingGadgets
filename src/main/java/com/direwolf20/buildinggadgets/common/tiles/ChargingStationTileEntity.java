@@ -275,7 +275,7 @@ public class ChargingStationTileEntity extends TileEntity implements ITickableTi
                 initBurn();
 
             ItemStack stack = getChargeStack();
-            if (!stack.isEmpty()) {
+            if (! stack.isEmpty()) {
                 chargeItem(stack);
                 updateLightning();
             }

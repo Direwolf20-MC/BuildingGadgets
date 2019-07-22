@@ -1,6 +1,5 @@
 package com.direwolf20.buildinggadgets.api.building;
 
-import com.direwolf20.buildinggadgets.api.abstraction.BlockData;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.math.BlockPos;
 
@@ -8,7 +7,7 @@ import net.minecraft.util.math.BlockPos;
  * Wraps an {@link IBlockProvider} such that all access to the provider will be translated by the given amount as the
  * BlockPos passed into the constructor.
  */
-public final class TranslationWrapper implements IBlockProvider {
+public final class TranslationWrapper implements IBlockProvider<TranslationWrapper> {
 
     private final IBlockProvider provider;
     /**
@@ -67,10 +66,15 @@ public final class TranslationWrapper implements IBlockProvider {
         this.provider.serialize(tag);
     }
 
+    /**
+     * Notice that this does not deserialize the translation performed!
+     *
+     * @param tag The tag to deserialize from
+     * @return A new translation wrapper backed by deserializing the backing {@link IBlockProvider}
+     */
     @Override
     public TranslationWrapper deserialize(CompoundNBT tag) {
-        this.provider.deserialize(tag);
-        return this;
+        return new TranslationWrapper(this.provider.deserialize(tag), translation);
     }
 
 }

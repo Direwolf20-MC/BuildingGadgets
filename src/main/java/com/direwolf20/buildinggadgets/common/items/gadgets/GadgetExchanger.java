@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.common.items.gadgets;
 
-import com.direwolf20.buildinggadgets.api.abstraction.BlockData;
+import com.direwolf20.buildinggadgets.api.building.BlockData;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
@@ -137,7 +137,7 @@ public class GadgetExchanger extends GadgetGeneric {
                 exchange((ServerPlayerEntity) player, itemstack);
             }
         } else {
-            if (!player.isSneaking()) {
+            if (! player.isSneaking()) {
                 ToolRenders.updateInventoryCache();
             } else {
                 if (Screen.hasControlDown()) {
@@ -234,7 +234,7 @@ public class GadgetExchanger extends GadgetGeneric {
         if (neededItems == 0) {
             neededItems = 1;
         }
-        if (!setBlock.getState().hasTileEntity()) {
+        if (! setBlock.getState().hasTileEntity()) {
             if (InventoryHelper.countItem(itemStack, player, world) < neededItems) {
                 ItemStack constructionPaste = new ItemStack(BGItems.constructionPaste);
                 if (InventoryHelper.countPaste(player) < neededItems) {

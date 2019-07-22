@@ -1,6 +1,5 @@
 package com.direwolf20.buildinggadgets.api.building;
 
-import com.direwolf20.buildinggadgets.api.abstraction.BlockData;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.math.BlockPos;
 

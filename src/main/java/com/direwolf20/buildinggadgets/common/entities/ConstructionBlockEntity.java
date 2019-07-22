@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.common.entities;
 
-import com.direwolf20.buildinggadgets.api.abstraction.BlockData;
+import com.direwolf20.buildinggadgets.api.building.BlockData;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlock;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockPowder;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
@@ -72,11 +72,11 @@ public class ConstructionBlockEntity extends EntityBase {
                     IBakedModel model;
                     model = Minecraft.getInstance().getBlockRendererDispatcher().getBlockModelShapes().getModel(tempState.getState());
                     boolean ambient = model.isAmbientOcclusion();
-                    if (opaque || neighborBrightness || !ambient) {
+                    if (opaque || neighborBrightness || ! ambient) {
                         BlockData tempSetBlock = ((ConstructionBlockTileEntity) te).getConstructionBlockData();
                         BlockData tempActualSetBlock = ((ConstructionBlockTileEntity) te).getActualBlockData();
                         world.setBlockState(targetPos, BGBlocks.constructionBlock.getDefaultState()
-                                .with(ConstructionBlock.BRIGHT, !opaque)
+                                .with(ConstructionBlock.BRIGHT, ! opaque)
                                 .with(ConstructionBlock.NEIGHBOR_BRIGHTNESS, neighborBrightness)
                                 .with(ConstructionBlock.AMBIENT_OCCLUSION, ambient));
                         te = world.getTileEntity(targetPos);

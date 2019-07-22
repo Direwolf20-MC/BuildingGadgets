@@ -138,7 +138,7 @@ public class ToolRenders {
                 }
 
                 long hasBlocks = InventoryHelper.countItem(itemStack, player, cacheInventory);
-                if (!renderBlockState.hasTileEntity()) {
+                if (! renderBlockState.hasTileEntity()) {
                     hasBlocks = hasBlocks + InventoryHelper.countPaste(player);
                 }
                 int hasEnergy = 0;
@@ -213,7 +213,7 @@ public class ToolRenders {
                 if (state.hasTileEntity()) {
                     TileEntity te = fakeTERWorld.getTE(state, world);
                     TileEntityRenderer<TileEntity> teRender = fakeTERWorld.getTER(state, world);
-                    if (teRender != null && !erroredTiles.contains(te)) {
+                    if (teRender != null && ! erroredTiles.contains(te)) {
                         for (BlockPos coordinate : coordinates) {
                             te.setPos(coordinate);
                             GlStateManager.pushMatrix();
@@ -224,7 +224,7 @@ public class ToolRenders {
                             GlStateManager.enableBlend(); //We have to do this in the loop because the TE Render removes blend when its done
                             GlStateManager.blendFunc(GL14.GL_CONSTANT_ALPHA, GL14.GL_ONE_MINUS_CONSTANT_ALPHA);
                             try {
-                                TileEntityRendererDispatcher.instance.render(te, 0, 0, 0, evt.getPartialTicks(), -1, true);
+                                TileEntityRendererDispatcher.instance.render(te, 0, 0, 0, evt.getPartialTicks(), - 1, true);
                             } catch (Exception e) {
                                 System.out.println("TER Exception with block type: " + state);
                                 erroredTiles.add(te);
@@ -295,7 +295,7 @@ public class ToolRenders {
                 itemStack = renderBlockState.getBlock().getPickBlock(renderBlockState, null, world, new BlockPos(0, 0, 0), player);
             }
             long hasBlocks = InventoryHelper.countItem(itemStack, player, cacheInventory);
-            if (!renderBlockState.hasTileEntity()) {
+            if (! renderBlockState.hasTileEntity()) {
                 hasBlocks = hasBlocks + InventoryHelper.countPaste(player);
             }
             int hasEnergy = 0;
@@ -306,7 +306,7 @@ public class ToolRenders {
             } else {
                 hasEnergy = stack.getMaxDamage() - stack.getDamage();
             }
-            if (player.isCreative() || (energy.isPresent() && !stack.isDamageable())) {
+            if (player.isCreative() || (energy.isPresent() && ! stack.isDamageable())) {
                 hasEnergy = 1000000;
             }
             //Prepare the block rendering
@@ -327,10 +327,10 @@ public class ToolRenders {
 
             for (BlockPos coordinate : coordinates) {
                 GlStateManager.pushMatrix();//Push matrix again just because
-                GlStateManager.translatef((float) -doubleX, (float) -doubleY, (float) -doubleZ);//The render starts at the player, so we subtract the player coords and move the render to 0,0,0
+                GlStateManager.translatef((float) - doubleX, (float) - doubleY, (float) - doubleZ);//The render starts at the player, so we subtract the player coords and move the render to 0,0,0
                 GlStateManager.translatef(coordinate.getX(), coordinate.getY(), coordinate.getZ());//Now move the render position to the coordinates we want to render at
-                GlStateManager.rotatef(-90.0F, 0.0F, 1.0F, 0.0F); //Rotate it because i'm not sure why but we need to
-                GlStateManager.translatef(-0.005f, -0.005f, 0.005f);
+                GlStateManager.rotatef(- 90.0F, 0.0F, 1.0F, 0.0F); //Rotate it because i'm not sure why but we need to
+                GlStateManager.translatef(- 0.005f, - 0.005f, 0.005f);
                 GlStateManager.scalef(1.01f, 1.01f, 1.01f);//Slightly Larger block to avoid z-fighting.
                 GL14.glBlendColor(1F, 1F, 1F, 0.55f); //Set the alpha of the blocks we are rendering
                 if (fakeWorld.getWorldType() != WorldType.DEBUG_ALL_BLOCK_STATES) { //Get the block state in the fake world
@@ -350,7 +350,7 @@ public class ToolRenders {
                         bufferBuilder.finishDrawing();
 
                     }
-                    GlStateManager.rotatef(-90.0F, 0.0F, 1.0F, 0.0F); //Rotate it because i'm not sure why but we need to
+                    GlStateManager.rotatef(- 90.0F, 0.0F, 1.0F, 0.0F); //Rotate it because i'm not sure why but we need to
                 }
                 GL14.glBlendColor(1F, 1F, 1F, 0.1f); //Set the alpha of the blocks we are rendering
                 //GlStateManager.rotate(-90.0F, 0.0F, 1.0F, 0.0F); //Rotate it because i'm not sure why but we need to
@@ -361,10 +361,10 @@ public class ToolRenders {
 
             for (BlockPos coordinate : coordinates) { //Now run through the UNSORTED list of coords, to show which blocks won't place if you don't have enough of them.
                 GlStateManager.pushMatrix();//Push matrix again just because
-                GlStateManager.translatef((float) -doubleX, (float) -doubleY, (float) -doubleZ);//The render starts at the player, so we subtract the player coords and move the render to 0,0,0
+                GlStateManager.translatef((float) - doubleX, (float) - doubleY, (float) - doubleZ);//The render starts at the player, so we subtract the player coords and move the render to 0,0,0
                 GlStateManager.translatef(coordinate.getX(), coordinate.getY(), coordinate.getZ());//Now move the render position to the coordinates we want to render at
-                GlStateManager.rotatef(-90.0F, 0.0F, 1.0F, 0.0F); //Rotate it because i'm not sure why but we need to
-                GlStateManager.translatef(-0.01f, -0.01f, 0.01f);
+                GlStateManager.rotatef(- 90.0F, 0.0F, 1.0F, 0.0F); //Rotate it because i'm not sure why but we need to
+                GlStateManager.translatef(- 0.01f, - 0.01f, 0.01f);
                 GlStateManager.scalef(1.02f, 1.02f, 1.02f);//Slightly Larger block to avoid z-fighting.
                 GL14.glBlendColor(1F, 1F, 1F, 0.55f); //Set the alpha of the blocks we are rendering
                 hasBlocks--;
@@ -381,18 +381,18 @@ public class ToolRenders {
             if (state.hasTileEntity()) {
                 TileEntity te = fakeTERWorld.getTE(state, world);
                 TileEntityRenderer<TileEntity> teRender = fakeTERWorld.getTER(state, world);
-                if (teRender != null && !erroredTiles.contains(te)) {
+                if (teRender != null && ! erroredTiles.contains(te)) {
                     for (BlockPos coordinate : coordinates) {
                         te.setPos(coordinate);
                         GlStateManager.pushMatrix();
                         GlStateManager.color4f(1F, 1F, 1F, 1F);
-                        GlStateManager.translatef((float) -doubleX, (float) -doubleY, (float) -doubleZ);
+                        GlStateManager.translatef((float) - doubleX, (float) - doubleY, (float) - doubleZ);
                         GlStateManager.translatef(coordinate.getX(), coordinate.getY(), coordinate.getZ());
                         GlStateManager.scalef(1.0f, 1.0f, 1.0f); //Block scale 1 = full sized block
                         GlStateManager.enableBlend(); //We have to do this in the loop because the TE Render removes blend when its done
                         GlStateManager.blendFunc(GL14.GL_CONSTANT_ALPHA, GL14.GL_ONE_MINUS_CONSTANT_ALPHA);
                         try {
-                            TileEntityRendererDispatcher.instance.render(te, 0, 0, 0, evt.getPartialTicks(), -1, true);
+                            TileEntityRendererDispatcher.instance.render(te, 0, 0, 0, evt.getPartialTicks(), - 1, true);
                         } catch (Exception e) {
                             System.out.println("TER Exception with block type: " + state);
                             erroredTiles.add(te);
@@ -554,7 +554,7 @@ public class ToolRenders {
             GlStateManager.blendFunc(GL14.GL_CONSTANT_ALPHA, GL14.GL_ONE_MINUS_CONSTANT_ALPHA);
 
             GlStateManager.pushMatrix();//Push matrix again just because
-            GlStateManager.translatef((float) -doubleX, (float) -doubleY, (float) -doubleZ);//The render starts at the player, so we subtract the player coords and move the render to 0,0,0
+            GlStateManager.translatef((float) - doubleX, (float) - doubleY, (float) - doubleZ);//The render starts at the player, so we subtract the player coords and move the render to 0,0,0
             GlStateManager.translatef(startPos.getX(), startPos.getY(), startPos.getZ()); //Move the render to the startingBlockPos
 
             GL14.glBlendColor(1F, 1F, 1F, 0.55f); //Set the alpha of the blocks we are rendering
@@ -576,7 +576,7 @@ public class ToolRenders {
                     if (teRender != null) {
                         GlStateManager.pushMatrix();
                         GlStateManager.color4f(1F, 1F, 1F, 1F);
-                        GlStateManager.translatef((float) -doubleX, (float) -doubleY, (float) -doubleZ);
+                        GlStateManager.translatef((float) - doubleX, (float) - doubleY, (float) - doubleZ);
                         GlStateManager.translatef(startPos.getX(), startPos.getY(), startPos.getZ());
                         GlStateManager.translatef(blockMap.xOffset, blockMap.yOffset, blockMap.zOffset);
                         GlStateManager.scalef(1.0f, 1.0f, 1.0f); //Block scale 1 = full sized block
@@ -584,12 +584,12 @@ public class ToolRenders {
                         GlStateManager.blendFunc(GL14.GL_CONSTANT_ALPHA, GL14.GL_ONE_MINUS_CONSTANT_ALPHA);
                         ItemStack renderStack = new ItemStack(state.getBlock());
                         if (renderStack.getItem().getTileEntityItemStackRenderer() != ItemStackTileEntityRenderer.instance || isVanillaISTER(renderStack)) {
-                            GlStateManager.rotatef(-90.0F, 0.0F, 1.0F, 0.0F); //Rotate it because i'm not sure why but we need to
+                            GlStateManager.rotatef(- 90.0F, 0.0F, 1.0F, 0.0F); //Rotate it because i'm not sure why but we need to
                             chestRenderer.renderChestBrightness(state.getBlock(), 1f);//Render the defined block
                         } else {
-                            if (!erroredTiles.contains(te)) {
+                            if (! erroredTiles.contains(te)) {
                                 try {
-                                    TileEntityRendererDispatcher.instance.render(te, 0, 0, 0, evt.getPartialTicks(), -1, true);
+                                    TileEntityRendererDispatcher.instance.render(te, 0, 0, 0, evt.getPartialTicks(), - 1, true);
                                 } catch (Exception e) {
                                     System.out.println("TER Exception with block type: " + state);
                                     erroredTiles.add(te);

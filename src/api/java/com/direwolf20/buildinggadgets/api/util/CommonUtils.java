@@ -1,8 +1,8 @@
 package com.direwolf20.buildinggadgets.api.util;
 
-import com.direwolf20.buildinggadgets.api.abstraction.IPlacementSequence;
-import com.direwolf20.buildinggadgets.api.building.IPositionPlacementSequence;
+import com.direwolf20.buildinggadgets.api.building.IPlacementSequence;
 import com.direwolf20.buildinggadgets.api.building.Region;
+import com.direwolf20.buildinggadgets.api.building.placement.IPositionPlacementSequence;
 import com.google.common.collect.AbstractIterator;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;

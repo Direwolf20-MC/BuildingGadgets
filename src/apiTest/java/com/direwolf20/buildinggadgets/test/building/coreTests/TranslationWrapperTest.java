@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.test.building.coreTests;
 
-import com.direwolf20.buildinggadgets.api.abstraction.BlockData;
+import com.direwolf20.buildinggadgets.api.building.BlockData;
 import com.direwolf20.buildinggadgets.api.building.IBlockProvider;
 import com.direwolf20.buildinggadgets.api.building.SingleTypeProvider;
 import net.minecraft.util.math.BlockPos;
