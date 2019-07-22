@@ -158,8 +158,7 @@ public class GadgetDestruction extends GadgetGeneric {
     public ActionResult<ItemStack> onItemRightClick(World world, PlayerEntity player, Hand hand) {
         ItemStack stack = player.getHeldItem(hand);
         player.setActiveHand(hand);
-        //IEnergyStorage energy = CapabilityUtil.EnergyUtil.getCap(stack).orElseThrow(CapabilityNotPresentException::new);
-        //energy.receiveEnergy(100000, false);
+
         if (!world.isRemote) {
             if (! player.isSneaking()) {
                 BlockPos anchorPos = getAnchor(stack);
@@ -174,7 +173,6 @@ public class GadgetDestruction extends GadgetGeneric {
                 if (lookingAt != null && (world.getBlockState(VectorHelper.getLookingAt(player, stack).getPos()) != Blocks.AIR.getDefaultState())) {
                     clearArea(world, lookingAt.getPos(), lookingAt.getFace(), (ServerPlayerEntity) player, stack);
                     clearSuccess(stack);
-                    player.sendStatusMessage(new StringTextComponent(TextFormatting.AQUA + new StringTextComponent("message.gadget.anchorremove").getUnformattedComponentText()), true);
                     return new ActionResult<>(ActionResultType.SUCCESS, stack);
                 }
 
