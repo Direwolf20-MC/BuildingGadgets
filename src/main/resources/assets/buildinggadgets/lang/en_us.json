@@ -21,7 +21,7 @@
     "block.buildinggadgets.construction_block_powder": "Construction Block Powder",
     "block.buildinggadgets.effect_block": "(Unused)Effect Block",
     "block.buildinggadgets.template_manager": "Template Manager",
-    "block.buildinggadgets.charging_station": "Charging Station",
+  "block.buildinggadgets.charging_station": "Charging Station",
 
     "_comment": "key:",
     "key.buildinggadgets.category": "Building Gadgets",

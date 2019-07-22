@@ -1,9 +1,10 @@
 package com.direwolf20.buildinggadgets.common.util.ref;
 
+import com.direwolf20.buildinggadgets.api.APIReference;
 import net.minecraft.util.ResourceLocation;
 
 public final class Reference {
-    public static final String MODID = "buildinggadgets";
+    public static final String MODID = APIReference.MODID;
     public static final String CONFIG_FILE_SERVER = MODID + "-server.toml";
     public static final String CONFIG_FILE_CLIENT = MODID + "-client.toml";
     public static final String CONFIG_FILE_API = MODID + "-api.toml";

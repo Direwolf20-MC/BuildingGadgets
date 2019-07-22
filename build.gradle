@@ -127,7 +127,7 @@ minecraft {
     runs {
         client = {
             // recommended logging data for a userdev environment
-            properties 'forge.logging.markers': 'SCAN,REGISTRIES' //,REGISTRYDUMP'
+            properties 'forge.logging.markers': 'FORGEMOD,REGISTRIES' //SCAN,REGISTRYDUMP'
             // recommended logging level for the console
             properties 'forge.logging.console.level': 'debug'
             workingDirectory project.file('run').canonicalPath
@@ -135,7 +135,7 @@ minecraft {
         }
         server = {
             // recommended logging data for a userdev environment
-            properties 'forge.logging.markers': 'SCAN,REGISTRIES' //,REGISTRYDUMP'
+            properties 'forge.logging.markers': 'FORGEMOD,REGISTRIES' //SCAN,REGISTRYDUMP'
             // recommended logging level for the console
             properties 'forge.logging.console.level': 'debug'
             workingDirectory project.file('run').canonicalPath
@@ -193,19 +193,21 @@ test {
 }
 
 processResources { //Processes main only resouces
-    from(sourceSets.main.resources.srcDirs) {
-        include 'META-INF/mods.toml'
-        expand 'version':project.version,'forge_major':project.forge_major,'update_json':project.update_json
+    from("$buildDir/tmp/modMeta") {
+        expand 'version':project.version, 'api_version':project.api_version,'forge_major':project.forge_major,'update_json':project.update_json
     }
-
+    
     from(sourceSets.main.resources.srcDirs) {
         exclude 'META-INF/mods.toml'
     }
 }
 
 processApiResources {
+    from("$buildDir/tmp/modMeta/META-INF/mods.toml") {
+        expand 'version':project.version, 'api_version':project.api_version,'forge_major':project.forge_major,'update_json':project.update_json
+    }
     from(sourceSets.api.resources.srcDirs) {
-        expand 'api_version':project.api_version, 'forge_major':project.forge_major
+        exclude 'META-INF/mods.toml'
     }
 }
 

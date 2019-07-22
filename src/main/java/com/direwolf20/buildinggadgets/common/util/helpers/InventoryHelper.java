@@ -1,9 +1,7 @@
 package com.direwolf20.buildinggadgets.common.util.helpers;
 
-import com.direwolf20.buildinggadgets.api.Registries;
-import com.direwolf20.buildinggadgets.api.abstraction.BlockData;
-import com.direwolf20.buildinggadgets.api.inventory.IStackProvider;
-import com.direwolf20.buildinggadgets.api.registry.IOrderedRegistry;
+import com.direwolf20.buildinggadgets.api.building.BlockData;
+import com.direwolf20.buildinggadgets.api.building.tilesupport.TileSupport;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
 import com.direwolf20.buildinggadgets.common.items.pastes.ConstructionPaste;
@@ -366,27 +364,9 @@ public class InventoryHelper {
                 }
             }
 
-            return new BlockData(placeState, Registries.TileEntityData.createTileData(world, pos));
+            return new BlockData(placeState, TileSupport.createTileData(world, pos));
         }
         return null;
-    }
-
-    public static NonNullList<ItemStack> getInventory(PlayerEntity player) {
-        IOrderedRegistry<IStackProvider> providers = Registries.getStackProviders();
-        NonNullList<ItemStack> toProcess = playerInv(player);
-        NonNullList<ItemStack> newStacks = NonNullList.create();
-        NonNullList<ItemStack> results = NonNullList.create();
-        while (! toProcess.isEmpty()) {
-            for (ItemStack stack : toProcess) {
-                for (IStackProvider provider : providers) {
-                    newStacks.addAll(provider.getStacksFromStack(stack));
-                }
-            }
-            results.addAll(toProcess);
-            toProcess = newStacks;
-            newStacks = NonNullList.create();
-        }
-        return results;
     }
 
     private static NonNullList<ItemStack> playerInv(PlayerEntity player) {

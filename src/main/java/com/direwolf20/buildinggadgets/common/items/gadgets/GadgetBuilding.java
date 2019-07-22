@@ -1,8 +1,8 @@
 package com.direwolf20.buildinggadgets.common.items.gadgets;
 
-import com.direwolf20.buildinggadgets.api.Registries;
-import com.direwolf20.buildinggadgets.api.abstraction.BlockData;
-import com.direwolf20.buildinggadgets.api.building.IAtopPlacingGadget;
+import com.direwolf20.buildinggadgets.api.building.BlockData;
+import com.direwolf20.buildinggadgets.api.building.modes.IAtopPlacingGadget;
+import com.direwolf20.buildinggadgets.api.building.tilesupport.TileSupport;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
@@ -142,7 +142,7 @@ public class GadgetBuilding extends GadgetGeneric implements IAtopPlacingGadget 
                 build((ServerPlayerEntity) player, itemstack);
             }
         } else {
-            if (!player.isSneaking()) {
+            if (! player.isSneaking()) {
                 ToolRenders.updateInventoryCache();
             } else {
                 if (Screen.hasControlDown()) {
@@ -242,14 +242,14 @@ public class GadgetBuilding extends GadgetGeneric implements IAtopPlacingGadget 
             silkTool.addEnchantment(Enchantments.SILK_TOUCH, 1);
             boolean sameDim = player.dimension == undoState.dimension;
             for (BlockPos coord : undoCoords) {
-                currentBlock = Registries.TileEntityData.createBlockData(world, coord);
+                currentBlock = TileSupport.createBlockData(world, coord);
 
                 double distance = Math.sqrt(coord.distanceSq(player.getPosition()));
 
                 BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(world, coord, currentBlock.getState(), player);
                 boolean cancelled = MinecraftForge.EVENT_BUS.post(e);
 
-                if (distance < 64 && sameDim && currentBlock.getState() != BGBlocks.effectBlock.getDefaultState() && !cancelled) { //Don't allow us to undo a block while its still being placed or too far away
+                if (distance < 64 && sameDim && currentBlock.getState() != BGBlocks.effectBlock.getDefaultState() && ! cancelled) { //Don't allow us to undo a block while its still being placed or too far away
                     if (currentBlock.getState() != Blocks.AIR.getDefaultState()) {
                         currentBlock.getState().getBlock().harvestBlock(world, player, coord, currentBlock.getState(), world.getTileEntity(coord), silkTool);
                         world.addEntity(new BlockBuildEntity(world, coord, currentBlock, BlockBuildEntity.Mode.REMOVE, false));
@@ -306,7 +306,7 @@ public class GadgetBuilding extends GadgetGeneric implements IAtopPlacingGadget 
         if (ForgeEventFactory.onBlockPlace(player, blockSnapshot, Direction.UP)) {
             return false;
         }
-        if (!setBlock.getState().hasTileEntity()) {
+        if (! setBlock.getState().hasTileEntity()) {
             ItemStack constructionPaste = new ItemStack(BGItems.constructionPaste);
             if (InventoryHelper.countItem(itemStack, player, world) < neededItems) {
                 //if (InventoryHelper.countItem(constructionStack, player) == 0) {

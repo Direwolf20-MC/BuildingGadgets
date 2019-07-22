@@ -6,6 +6,7 @@ displayURL="https://diresbg.com/" #optional
 logoFile="buildinggadgets_logo.png"
 credits="The Forge and FML guys, McJty, Vazkii, CPW, and Pahimar for helping me learn java/forge modding.  Rorax for the textures!" #optional
 authors="Direwolf20" #The man himself
+
 [[mods]] #mandatory
     modId="buildinggadgets" #mandatory
     version="${version}" #mandatory
@@ -14,7 +15,6 @@ authors="Direwolf20" #The man himself
     Building and Exchanging Gadget offer basic building & exchanging functionality for easily creating walls/columns etc.
     The Destruction Gadget will help you clear out large Areas for your complex builds which you can Copy and Paste at will with the Copy-Paste Gadget!
     '''
-
 ## A dependency - use the . to indicate dependency for a specific modid. Dependencies are optional.
 [[dependencies.buildinggadgets]] #optional
     # the modid of the dependency

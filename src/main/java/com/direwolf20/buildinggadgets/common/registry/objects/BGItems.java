@@ -61,10 +61,10 @@ public final class BGItems {
     public static ConstructionPasteContainerCreative creativeConstructionPasteContainer;
 
     static void init() {
-        addItemBuilder(ItemReference.GADGET_EXCHANGING_RL, unstackableItemProperties(), GadgetExchanger::new);
-        addItemBuilder(ItemReference.GADGET_BUILDING_RL, unstackableItemProperties(), GadgetBuilding::new);
-        addItemBuilder(ItemReference.GADGET_DESTRUCTION_RL, unstackableItemProperties(), GadgetDestruction::new);
-        addItemBuilder(ItemReference.GADGET_COPY_PASTE_RL, unstackableItemProperties(), GadgetCopyPaste::new);
+        addItemBuilder(ItemReference.GADGET_EXCHANGING_RL, unstackableItemProperties().maxDamage(1), GadgetExchanger::new);
+        addItemBuilder(ItemReference.GADGET_BUILDING_RL, unstackableItemProperties().maxDamage(1), GadgetBuilding::new);
+        addItemBuilder(ItemReference.GADGET_DESTRUCTION_RL, unstackableItemProperties().maxDamage(1), GadgetDestruction::new);
+        addItemBuilder(ItemReference.GADGET_COPY_PASTE_RL, unstackableItemProperties().maxDamage(1), GadgetCopyPaste::new);
         addItemBuilder(ItemReference.PASTE_CONTAINER_T1_RL, unstackableItemProperties(), RegularPasteContainerTypes.T1::create);
         addItemBuilder(ItemReference.PASTE_CONTAINER_T2_RL, unstackableItemProperties(), RegularPasteContainerTypes.T2::create);
         addItemBuilder(ItemReference.PASTE_CONTAINER_T3_RL, unstackableItemProperties(), RegularPasteContainerTypes.T3::create);

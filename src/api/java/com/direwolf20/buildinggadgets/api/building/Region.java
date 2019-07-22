@@ -1,6 +1,8 @@
 package com.direwolf20.buildinggadgets.api.building;
 
+import com.direwolf20.buildinggadgets.api.building.placement.IPositionPlacementSequence;
 import com.direwolf20.buildinggadgets.api.util.CommonUtils;
+import com.direwolf20.buildinggadgets.api.util.NBTKeys;
 import com.direwolf20.buildinggadgets.api.util.SpliteratorBackedPeekingIterator;
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.PeekingIterator;
@@ -20,21 +22,15 @@ import java.util.function.Consumer;
 public final class Region implements IPositionPlacementSequence, Serializable {
 
     private static final long serialVersionUID = 8391481277782374853L;
-    public static final String KEY_MIN_X = "minX";
-    public static final String KEY_MIN_Y = "minY";
-    public static final String KEY_MIN_Z = "minZ";
-    public static final String KEY_MAX_X = "maxX";
-    public static final String KEY_MAX_Y = "maxY";
-    public static final String KEY_MAX_Z = "maxZ";
 
     public static Region deserializeFrom(CompoundNBT tag) {
         return new Region(
-                tag.getInt(KEY_MIN_X),
-                tag.getInt(KEY_MIN_Y),
-                tag.getInt(KEY_MIN_Z),
-                tag.getInt(KEY_MAX_X),
-                tag.getInt(KEY_MAX_Y),
-                tag.getInt(KEY_MAX_Z)
+                tag.getInt(NBTKeys.KEY_MIN_X),
+                tag.getInt(NBTKeys.KEY_MIN_Y),
+                tag.getInt(NBTKeys.KEY_MIN_Z),
+                tag.getInt(NBTKeys.KEY_MAX_X),
+                tag.getInt(NBTKeys.KEY_MAX_Y),
+                tag.getInt(NBTKeys.KEY_MAX_Z)
         );
     }
 
@@ -376,12 +372,12 @@ public final class Region implements IPositionPlacementSequence, Serializable {
     }
 
     public CompoundNBT serializeTo(CompoundNBT tag) {
-        tag.putInt(KEY_MIN_X, minX);
-        tag.putInt(KEY_MIN_Y, minY);
-        tag.putInt(KEY_MIN_Z, minZ);
-        tag.putInt(KEY_MAX_X, maxX);
-        tag.putInt(KEY_MAX_Y, maxY);
-        tag.putInt(KEY_MAX_Z, maxZ);
+        tag.putInt(NBTKeys.KEY_MIN_X, minX);
+        tag.putInt(NBTKeys.KEY_MIN_Y, minY);
+        tag.putInt(NBTKeys.KEY_MIN_Z, minZ);
+        tag.putInt(NBTKeys.KEY_MAX_X, maxX);
+        tag.putInt(NBTKeys.KEY_MAX_Y, maxY);
+        tag.putInt(NBTKeys.KEY_MAX_Z, maxZ);
         return tag;
     }
 

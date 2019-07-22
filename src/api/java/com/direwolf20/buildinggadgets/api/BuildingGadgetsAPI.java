@@ -1,0 +1,37 @@
+package com.direwolf20.buildinggadgets.api;
+
+import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.InterModComms;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.event.lifecycle.InterModProcessEvent;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+public final class BuildingGadgetsAPI {
+    public static final Logger LOG = LogManager.getLogger();
+
+    public BuildingGadgetsAPI() {
+        IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
+        modEventBus.addListener(this::registerRegistries);
+        modEventBus.addListener(this::setup);
+        modEventBus.addListener(this::handleIMC);
+    }
+
+    private void registerRegistries(RegistryEvent.NewRegistry event) {
+        Registries.onCreateRegistries();
+    }
+
+    private void setup(FMLCommonSetupEvent event) {
+        Registries.createOrderedRegistries();
+    }
+
+    private void handleIMC(InterModProcessEvent event) {
+        event.getIMCStream().forEach(this::handleIMCMessage);
+    }
+
+    private void handleIMCMessage(InterModComms.IMCMessage message) {
+        Registries.handleIMC(message);
+    }
+}

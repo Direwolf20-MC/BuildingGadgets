@@ -1,8 +1,7 @@
 package com.direwolf20.buildinggadgets.common.items.gadgets;
 
-import com.direwolf20.buildinggadgets.api.Registries;
-import com.direwolf20.buildinggadgets.api.abstraction.BlockData;
-import com.direwolf20.buildinggadgets.api.template.building.tilesupport.DummyTileEntityData;
+import com.direwolf20.buildinggadgets.api.building.BlockData;
+import com.direwolf20.buildinggadgets.api.building.tilesupport.TileSupport;
 import com.direwolf20.buildinggadgets.client.events.EventTooltip;
 import com.direwolf20.buildinggadgets.client.gui.GuiMod;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlock;
@@ -184,7 +183,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
             int p = posIntArray[i];
             BlockPos pos = GadgetUtils.relIntToPos(startBlock, p);
             short IntState = (short) stateIntArray[i];
-            blockMap.add(new BlockMap(pos, new BlockData(MapIntState.getStateFromSlot(IntState), DummyTileEntityData.INSTANCE), (byte) ((p & 0xff0000) >> 16), (byte) ((p & 0x00ff00) >> 8), (byte) (p & 0x0000ff)));
+            blockMap.add(new BlockMap(pos, new BlockData(MapIntState.getStateFromSlot(IntState), TileSupport.dummyTileEntityData()), (byte) ((p & 0xff0000) >> 16), (byte) ((p & 0x00ff00) >> 8), (byte) (p & 0x0000ff)));
         }
         return blockMap;
     }
@@ -409,7 +408,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
                 for (int z = iStartZ; z <= iEndZ; z++) {
                     BlockPos tempPos = new BlockPos(x, y, z);
                     BlockState tempState = world.getBlockState(tempPos);
-                    if (tempState != Blocks.AIR.getDefaultState() && !tempState.getMaterial().isLiquid() && Config.BLACKLIST.isAllowedBlock(tempState.getBlock())) {
+                    if (tempState != Blocks.AIR.getDefaultState() && ! tempState.getMaterial().isLiquid() && Config.BLACKLIST.isAllowedBlock(tempState.getBlock())) {
                         TileEntity te = world.getTileEntity(tempPos);
                         BlockData assignState = InventoryHelper.getSpecificStates(tempState, world, player, tempPos, stack);
                         BlockData actualState = assignState;
@@ -539,7 +538,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
             return;
         }
         boolean useConstructionPaste = false;
-        if (!data.getState().hasTileEntity()) {
+        if (! data.getState().hasTileEntity()) {
             ItemStack constructionPaste = new ItemStack(BGItems.constructionPaste);
             if (InventoryHelper.countItem(itemStack, player, world) < neededItems) {
                 if (InventoryHelper.countPaste(player) < neededItems) {
@@ -602,7 +601,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
         for (BlockMap blockMap : blockMapList) {
             double distance = blockMap.pos.distanceSq(player.getPosition());
 
-            BlockData currentBlock = Registries.TileEntityData.createBlockData(world, blockMap.pos);
+            BlockData currentBlock = TileSupport.createBlockData(world, blockMap.pos);
             BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(world, blockMap.pos, currentBlock.getState(), player);
 
             boolean cancelled = MinecraftForge.EVENT_BUS.post(e);
