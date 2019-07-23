@@ -4,6 +4,10 @@ The format of this document is based on [Keep a Changelog](https://keepachangelo
 ## [Unreleased] [3.0.0 - 1.13]
 - Nothing yet
 
+## [2.7.1 - 1.12.2] - 2019-07-23
+### Fixed
+- Fixed an issue causing the game to crash when using the material list key on anything but the Copy&Paste Gadget or air.
+
 ## [2.7.0 - 1.12.2] - 2019-07-20
 ### Note: 
 A note for this update, due to the pure amount of changes made between this version and the previous version we're just going
