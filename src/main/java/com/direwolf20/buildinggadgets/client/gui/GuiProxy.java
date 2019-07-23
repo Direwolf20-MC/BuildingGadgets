@@ -64,7 +64,7 @@ public class GuiProxy implements IGuiHandler {
                 return null;
         } else if (ID == MaterialListID) {
             ItemStack template = InventoryManipulation.getStackInEitherHand(player, ITemplate.class);
-            if (template != ItemStack.EMPTY)
+            if (! template.isEmpty())
                 return new MaterialListGUI(template);
             return null;
         }

@@ -56,7 +56,8 @@ public class EventKeyInput {
             PacketHandler.INSTANCE.sendToServer(new PacketToggleConnectedArea());
         else if (KeyBindings.materialList.isPressed()) {
             ItemStack held = InventoryManipulation.getStackInEitherHand(Minecraft.getMinecraft().player, ITemplate.class);
-            Minecraft.getMinecraft().displayGuiScreen(new MaterialListGUI(held));
+            if( !held.isEmpty() )
+                Minecraft.getMinecraft().displayGuiScreen(new MaterialListGUI(held));
         }
     }
 }
