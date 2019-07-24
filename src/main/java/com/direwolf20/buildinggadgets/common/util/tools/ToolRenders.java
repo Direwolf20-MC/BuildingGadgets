@@ -648,7 +648,7 @@ public class ToolRenders {
 
             GlStateManager.lineWidth(1.0F);
             GlStateManager.enableLighting();
-            GlStateManager.disableTexture();
+            GlStateManager.enableTexture();
             GlStateManager.enableDepthTest();
             GlStateManager.depthMask(true);
 
