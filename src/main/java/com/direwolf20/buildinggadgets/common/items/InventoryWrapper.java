@@ -1,12 +1,12 @@
 package com.direwolf20.buildinggadgets.common.items;
 
-import jdk.internal.jline.internal.Nullable;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.items.IItemHandlerModifiable;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Objects;
 import java.util.function.Predicate;
 
