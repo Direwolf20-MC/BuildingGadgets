@@ -7,6 +7,7 @@ import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketBlockMap;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks.BGTileEntities;
 import com.direwolf20.buildinggadgets.common.tiles.TemplateManagerTileEntity;
+import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
@@ -39,6 +40,14 @@ public class TemplateManager extends Block {
     protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
         super.fillStateContainer(builder);
         builder.add(FACING);
+    }
+
+    @Override
+    public void onReplaced(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
+        if (newState.getBlock() != this) {
+            GadgetUtils.dropTileEntityInventory(worldIn, pos);
+            super.onReplaced(state, worldIn, pos, newState, isMoving);
+        }
     }
 
     @Nullable

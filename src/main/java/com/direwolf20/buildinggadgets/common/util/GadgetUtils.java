@@ -2,6 +2,7 @@ package com.direwolf20.buildinggadgets.common.util;
 
 import com.direwolf20.buildinggadgets.api.building.BlockData;
 import com.direwolf20.buildinggadgets.common.config.Config;
+import com.direwolf20.buildinggadgets.common.items.InventoryWrapper;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetBuilding;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetExchanger;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
@@ -44,6 +45,7 @@ import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.IItemHandlerModifiable;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -606,5 +608,19 @@ public class GadgetUtils {
     public static int getItemBurnTime(ItemStack stack) {
         return net.minecraftforge.event.ForgeEventFactory.getItemBurnTime(stack,
                 stack.getBurnTime() == - 1 ? AbstractFurnaceTileEntity.getBurnTimes().getOrDefault(stack.getItem(), 0) : stack.getBurnTime());
+    }
+
+    /**
+     * Drops the IItemHandlerModifiable Inventory of the TileEntity at the specified position.
+     */
+    public static void dropTileEntityInventory(World world, BlockPos pos) {
+        TileEntity tileEntity = world.getTileEntity(pos);
+        if (tileEntity != null) {
+            LazyOptional<IItemHandler> cap = tileEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY);
+            cap.ifPresent(handler -> {
+                if (handler instanceof IItemHandlerModifiable)
+                    net.minecraft.inventory.InventoryHelper.dropInventoryItems(world, pos, new InventoryWrapper((IItemHandlerModifiable) handler));
+            });
+        }
     }
 }
