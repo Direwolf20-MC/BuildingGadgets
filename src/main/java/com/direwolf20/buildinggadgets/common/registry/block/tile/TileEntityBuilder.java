@@ -1,13 +1,13 @@
 package com.direwolf20.buildinggadgets.common.registry.block.tile;
 
 import com.direwolf20.buildinggadgets.common.registry.RegistryObjectBuilder;
-import jdk.internal.jline.internal.Nullable;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 
+import javax.annotation.Nullable;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Supplier;

@@ -134,6 +134,19 @@ public class ModeRadialMenu extends Screen {
                 sliderRange.precision = 1;
                 sliderRange.getComponents().forEach(this::addButton);
             }
+        } else {
+            // Copy Paste specific
+            addButton(new PositionedIconActionable("Open Gui", "copypaste_opengui", right, send -> {
+                if( !send )
+                    return false;
+
+                getMinecraft().player.closeScreen();
+                if( GadgetCopyPaste.getToolMode(tool) == GadgetCopyPaste.ToolMode.Copy )
+                    getMinecraft().displayGuiScreen(new CopyGUI(tool));
+                else
+                    getMinecraft().displayGuiScreen(new PasteGUI(tool));
+                return true;
+            }));
         }
         addButton(new PositionedIconActionable("Ray Trace Fluid", "raytrace_fluid", right, send -> {
             if( send )
