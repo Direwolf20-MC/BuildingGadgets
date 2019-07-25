@@ -5,6 +5,7 @@ import com.direwolf20.buildinggadgets.api.Registries;
 import com.direwolf20.buildinggadgets.api.building.tilesupport.ITileEntityData;
 import com.direwolf20.buildinggadgets.api.building.tilesupport.TileSupport;
 import com.direwolf20.buildinggadgets.api.building.view.IBuildContext;
+import com.direwolf20.buildinggadgets.api.materials.MaterialList;
 import com.direwolf20.buildinggadgets.api.serialisation.ITileDataSerializer;
 import com.direwolf20.buildinggadgets.api.util.NBTKeys;
 import com.direwolf20.buildinggadgets.api.util.RegistryUtils;
@@ -16,6 +17,7 @@ import net.minecraft.nbt.NBTUtil;
 import net.minecraft.util.Mirror;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceResult;
 
 import javax.annotation.Nullable;
 import java.util.Objects;
@@ -149,9 +151,14 @@ public final class BlockData {
         return new BlockData(getState().rotate(rotation), getTileData());
     }
 
+    public MaterialList getRequiredItems(IBuildContext context, @Nullable RayTraceResult target, @Nullable BlockPos pos) {
+        return getTileData().getRequiredItems(context, getState(), target, pos);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
+
         if (! (o instanceof BlockData)) return false;
 
         BlockData blockData = (BlockData) o;

@@ -2,12 +2,17 @@ package com.direwolf20.buildinggadgets.api.building;
 
 import com.direwolf20.buildinggadgets.api.building.tilesupport.ITileEntityData;
 import com.direwolf20.buildinggadgets.api.building.view.IBuildContext;
+import com.direwolf20.buildinggadgets.api.materials.MaterialList;
 import com.direwolf20.buildinggadgets.api.util.NBTKeys;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.NBTUtil;
+import net.minecraft.util.Mirror;
+import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceResult;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Objects;
 
 /**
@@ -68,6 +73,18 @@ public final class PlacementTarget {
      */
     public boolean placeIn(IBuildContext context) {
         return data.placeIn(context, pos);
+    }
+
+    public PlacementTarget mirror(Mirror mirror) {
+        return new PlacementTarget(getPos(), getData().mirror(mirror));
+    }
+
+    public PlacementTarget rotate(Rotation rotation) {
+        return new PlacementTarget(getPos(), getData().rotate(rotation));
+    }
+
+    public MaterialList getRequiredItems(IBuildContext context, @Nullable RayTraceResult target) {
+        return getData().getRequiredItems(context, target, getPos());
     }
 
     /**
