@@ -158,6 +158,7 @@ public final class BlockData {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
+
         if (! (o instanceof BlockData)) return false;
 
         BlockData blockData = (BlockData) o;
