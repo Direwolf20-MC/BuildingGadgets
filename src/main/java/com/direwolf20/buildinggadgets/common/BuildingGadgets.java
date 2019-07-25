@@ -64,12 +64,12 @@ public final class BuildingGadgets {
         eventBus.addListener(Config::onFileChange);
 
         MinecraftForge.EVENT_BUS.register(new AnvilRepairHandler());
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(BuildingObjects::initColorHandlers);
 
         // Client only registering
         DistExecutor.runWhenOn(Dist.CLIENT, () -> () -> {
             eventBus.addListener((Consumer<FMLClientSetupEvent>) event -> ClientProxy.clientSetup(eventBus));
             ModLoadingContext.get().registerExtensionPoint(ExtensionPoint.CONFIGGUIFACTORY, () -> GuiMod::openScreen);
+            FMLJavaModLoadingContext.get().getModEventBus().addListener(BuildingObjects::initColorHandlers);
         });
         BuildingObjects.init();
     }
