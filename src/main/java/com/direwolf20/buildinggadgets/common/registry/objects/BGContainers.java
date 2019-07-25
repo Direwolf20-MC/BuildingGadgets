@@ -33,13 +33,13 @@ public final class BGContainers {
         container.add(
                 new ScreenContainerObjectBuilder(ContainerReference.TEMPLATE_MANAGER_CONTAINER_RL)
                         .builder(new ScreenContainerBuilder<TemplateManagerContainer, TemplateManagerGUI>(
-                                TemplateManagerContainer::new, TemplateManagerGUI::new))
+                                TemplateManagerContainer::new, () -> () -> TemplateManagerGUI::new))
         );
         container.add(
                 new ScreenContainerObjectBuilder(ContainerReference.CHARGING_STATION_CONTAINER_RL)
                         .builder(new ScreenContainerBuilder<ChargingStationContainer, ChargingStationGUI>(
                                 ChargingStationContainer::new,
-                                ChargingStationGUI::new))
+                                () -> () -> ChargingStationGUI::new))
         );
     }
 

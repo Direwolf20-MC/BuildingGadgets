@@ -38,7 +38,7 @@ public final class BGEntities {
                         .setCustomClientFactory(((spawnEntity, world) -> {
                             return BUILD_BLOCK.create(world);
                         })))
-                .renderer(BlockBuildEntity.class, BlockBuildEntityRender::new)
+                .renderer(BlockBuildEntity.class, () -> () -> BlockBuildEntityRender::new)
                 .factory(b -> b.build("")));
         container.add(new EntityBuilder<ConstructionBlockEntity>(EntityReference.CONSTRUCTION_BLOCK_ENTITY_RL)
                 .builder(Builder.<ConstructionBlockEntity>create(ConstructionBlockEntity::new, EntityClassification.MISC)
@@ -48,7 +48,7 @@ public final class BGEntities {
                         .setCustomClientFactory(((spawnEntity, world) -> {
                             return CONSTRUCTION_BLOCK.create(world);
                         })))
-                .renderer(ConstructionBlockEntity.class, ConstructionBlockEntityRender::new)
+                .renderer(ConstructionBlockEntity.class, () -> () -> ConstructionBlockEntityRender::new)
                 .factory(b -> b.build("")));
     }
 
