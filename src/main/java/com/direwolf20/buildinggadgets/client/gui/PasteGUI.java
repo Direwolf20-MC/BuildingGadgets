@@ -25,8 +25,6 @@ public class PasteGUI extends Screen {
     private GuiIncrementer X, Y, Z;
     private List<GuiIncrementer> fields = new ArrayList<>();
 
-    private static final ResourceLocation background = new ResourceLocation(Reference.MODID, "textures/gui/testcontainer.png");
-
     PasteGUI(ItemStack tool) {
         super(new StringTextComponent(""));
     }
