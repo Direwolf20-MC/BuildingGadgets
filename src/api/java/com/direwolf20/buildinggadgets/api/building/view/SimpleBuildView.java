@@ -1,20 +1,21 @@
 package com.direwolf20.buildinggadgets.api.building.view;
 
+import com.direwolf20.buildinggadgets.api.BuildingGadgetsAPI;
 import com.direwolf20.buildinggadgets.api.building.BlockData;
 import com.direwolf20.buildinggadgets.api.building.IBlockProvider;
 import com.direwolf20.buildinggadgets.api.building.PlacementTarget;
 import com.direwolf20.buildinggadgets.api.building.Region;
 import com.direwolf20.buildinggadgets.api.building.placement.IPositionPlacementSequence;
 import com.direwolf20.buildinggadgets.api.materials.MaterialList;
-import com.google.common.base.Preconditions;
-import com.google.common.collect.AbstractIterator;
+import com.direwolf20.buildinggadgets.api.util.CommonUtils;
+import com.direwolf20.buildinggadgets.api.util.MappingSpliterator;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 
 import javax.annotation.Nullable;
-import java.util.Iterator;
+import java.util.Objects;
 import java.util.Spliterator;
-import java.util.Spliterators;
 import java.util.function.BiPredicate;
 
 /**
@@ -29,15 +30,17 @@ import java.util.function.BiPredicate;
  */
 public class SimpleBuildView implements IBuildView {
     private final IPositionPlacementSequence positions;
-    private IBlockProvider blocks;
+    private IBlockProvider<?> blocks;
     private final IValidatorFactory validatorFactory;
     private IBuildContext context;
     private BlockPos start;
+    @Nullable
+    private MaterialList materials;
 
     /**
      * @see SimpleBuildView#SimpleBuildView(IPositionPlacementSequence, IBlockProvider, IValidatorFactory, IBuildContext, BlockPos)
      */
-    public SimpleBuildView(IPositionPlacementSequence positions, IBlockProvider blocks, IBuildContext context) {
+    public SimpleBuildView(IPositionPlacementSequence positions, IBlockProvider<?> blocks, IBuildContext context) {
         this(positions, blocks, (world, stack, player, initial) -> (pos, state) -> true, context, null);
     }
 
@@ -47,50 +50,40 @@ public class SimpleBuildView implements IBuildView {
      *
      * @param validatorFactory Creates predicate for determining whether a position should be used or not
      */
-    public SimpleBuildView(IPositionPlacementSequence positions, IBlockProvider blocks, IValidatorFactory validatorFactory, IBuildContext buildContext, @Nullable BlockPos start) {
+    public SimpleBuildView(IPositionPlacementSequence positions, IBlockProvider<?> blocks, IValidatorFactory validatorFactory, IBuildContext buildContext, @Nullable BlockPos start) {
         this.positions = positions;
-        this.blocks = blocks;
+        this.blocks = Objects.requireNonNull(blocks, "Cannot have a SimpleBuildView without IBlockProvider!");
         this.validatorFactory = validatorFactory;
-        Preconditions.checkArgument(buildContext.getBuildingPlayer() != null);
+        if (buildContext.getBuildingPlayer() == null)
+            BuildingGadgetsAPI.LOG.warn("Constructing SimpleBuildView without a player. This may lead to errors down the line, if the used IValidatorFactory doesn't handle null Players!");
         this.context = buildContext;
         this.start = start;
+        this.materials = null;
     }
 
     @Override
     public Spliterator<PlacementTarget> spliterator() {
-        return Spliterators.spliteratorUnknownSize(iterator(), 0);
-    }
-
-    @Override
-    public Iterator<PlacementTarget> iterator() {
-        Iterator<BlockPos> posIterator = getFilteredSequence();
-        return new AbstractIterator<PlacementTarget>() {
-            @Override
-            protected PlacementTarget computeNext() {
-                if (! posIterator.hasNext())
-                    return endOfData();
-                BlockPos next = posIterator.next();
-                BlockData data = blocks.at(next);
-                return new PlacementTarget(next, data);
-            }
-        };
+        return new MappingSpliterator<>(getFilteredSequence().spliterator(), pos -> new PlacementTarget(pos, getBlockProvider().at(pos)));
     }
 
     @Override
     public IBuildView translateTo(BlockPos pos) {
         blocks = blocks.translate(pos);
+        materials = null;
         return this;
     }
 
     @Nullable
     @Override
-    public MaterialList estimateRequiredItems() {
-        return null;//TODO implement
+    public MaterialList estimateRequiredItems(@Nullable Vec3d simulatePos) {
+        if (materials == null)
+            materials = IBuildView.super.estimateRequiredItems(simulatePos);
+        return materials;
     }
 
     @Override
     public int estimateSize() {
-        return - 1;
+        return getBoundingBox().size();
     }
 
     @Override
@@ -100,43 +93,28 @@ public class SimpleBuildView implements IBuildView {
 
     @Override
     public IBuildView copy() {
-        return new SimpleBuildView(positions, blocks, validatorFactory, context, start);
+        return new SimpleBuildView(getPositionSequence(), getBlockProvider(), getValidatorFactory(), context, start);
     }
 
     @Override
     public Region getBoundingBox() {
-        return positions.getBoundingBox();
+        return getPositionSequence().getBoundingBox();
     }
 
     @Override
     public boolean mayContain(int x, int y, int z) {
-        return positions.mayContain(x, y, z);
-    }
-
-    public IPositionPlacementSequence getPositionSequence() {
-        return positions;
+        return getPositionSequence().mayContain(x, y, z);
     }
 
     /**
-     * Wrap raw sequence ({@link #getPositionSequence()}) so that the new iterator only returns positions passing the
+     * Wrap raw sequence ({@link #getPositionSequence()}) so that the new spliterator only returns positions passing the
      * test of {@link #getValidatorFactory()} with the given World object.
      *
-     * @return {@link AbstractIterator} that wraps {@code getPositionSequence().iterator()}
+     * @return {@link Spliterator} that wraps {@code getPositionSequence().spliterator()}
      */
-    public Iterator<BlockPos> getFilteredSequence() {
-        Iterator<BlockPos> positions = getPositionSequence().iterator();
+    private IPositionPlacementSequence getFilteredSequence() {
         BiPredicate<BlockPos, BlockData> validator = validatorFactory.createValidatorFor(context.getWorld(), context.getUsedStack(), context.getBuildingPlayer(), start);
-        return new AbstractIterator<BlockPos>() {
-            @Override
-            protected BlockPos computeNext() {
-                while (positions.hasNext()) {
-                    BlockPos next = positions.next();
-                    if (validator.test(next, blocks.at(next)))
-                        return next;
-                }
-                return endOfData();
-            }
-        };
+        return CommonUtils.validatePositionData(getPositionSequence(), validator, getBlockProvider()::at);
     }
 
     /**
@@ -144,6 +122,10 @@ public class SimpleBuildView implements IBuildView {
      */
     public ImmutableList<BlockPos> collectFilteredSequence() {
         return ImmutableList.copyOf(getFilteredSequence());
+    }
+
+    public IPositionPlacementSequence getPositionSequence() {
+        return positions;
     }
 
     public IBlockProvider getBlockProvider() {
@@ -154,4 +136,8 @@ public class SimpleBuildView implements IBuildView {
         return validatorFactory;
     }
 
+    @Override
+    public IBuildContext getContext() {
+        return context;
+    }
 }
