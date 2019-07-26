@@ -23,6 +23,7 @@
     "block.buildinggadgets.template_manager": "Template Manager",
   "block.buildinggadgets.charging_station": "Charging Station",
 
+
     "_comment": "key:",
     "key.buildinggadgets.category": "Building Gadgets",
     "key.buildinggadgets.anchor": "Anchor",
@@ -55,6 +56,7 @@
     "tooltip.pasteContainer.amount": "Amount:%d",
     "tooltip.pasteContainer.creative.amountMsg": "Amount: Infinite!",
     "tooltip.template.name": "Name:%s",
+  "tooltip.donotuse": "DO NOT USE (WIP)",
 
     "_comment": "modes:",
     "modes.buildinggadgets.surface": "Surface",
