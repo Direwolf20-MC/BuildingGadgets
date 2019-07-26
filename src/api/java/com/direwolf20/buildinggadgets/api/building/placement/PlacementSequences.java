@@ -129,6 +129,19 @@ public final class PlacementSequences {
     }
 
     /**
+     * Grid is a set of blocks where each block is equidistant from its neighboring blocks. The distance between the blocks
+     * is a periodic sequence with a certain size.
+     */
+    public static final class Grid {
+        private Grid() {
+        }
+
+        public static IPositionPlacementSequence create(BlockPos base, int range, int periodSize) {
+            return new GridSequence(base, range, periodSize);
+        }
+    }
+
+    /**
      * A sequence of blocks that offsets in 2 different directions where one is vertical, one is horizontal.
      * <p>
      * For example, a regular climbing up stair facing north would have (UP, NORTH) as its parameter. This also applies to

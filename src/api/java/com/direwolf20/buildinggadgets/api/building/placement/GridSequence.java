@@ -10,23 +10,14 @@ import net.minecraft.util.math.BlockPos;
 import javax.annotation.Nonnull;
 import java.util.Iterator;
 
-/**
- * Grid is a set of blocks where each block is equidistant from its neighboring blocks. The distance between the blocks
- * is a periodic sequence with a certain size.
- */
-public final class Grid implements IPositionPlacementSequence {
-
-    public static Grid create(BlockPos base, int range, int periodSize) {
-        return new Grid(base, range, periodSize);
-    }
-
+final class GridSequence implements IPositionPlacementSequence {
     private final int periodSize;
     private final Region region;
     private final BlockPos center;
     private final int range;
 
     @VisibleForTesting
-    private Grid(BlockPos center, int range, int periodSize) {
+    GridSequence(BlockPos center, int range, int periodSize) {
         this.region = PlacementSequences.Wall.clickedSide(center, Direction.UP, range).getBoundingBox();
         this.range = range;
         this.center = center;
@@ -37,7 +28,7 @@ public final class Grid implements IPositionPlacementSequence {
      * For {@link #copy()}
      */
     @VisibleForTesting
-    private Grid(Region region, BlockPos center, int range, int periodSize) {
+    private GridSequence(Region region, BlockPos center, int range, int periodSize) {
         this.region = region;
         this.center = center;
         this.range = range;
@@ -60,7 +51,7 @@ public final class Grid implements IPositionPlacementSequence {
 
     @Override
     public IPositionPlacementSequence copy() {
-        return new Grid(region, center, range, periodSize);
+        return new GridSequence(region, center, range, periodSize);
     }
 
     @Override
