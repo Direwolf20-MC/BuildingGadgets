@@ -1,7 +1,8 @@
 package com.direwolf20.buildinggadgets.test.building.placementTests;
 
 import com.direwolf20.buildinggadgets.api.building.Region;
-import com.direwolf20.buildinggadgets.api.building.placement.Surface;
+import com.direwolf20.buildinggadgets.api.building.placement.IPositionPlacementSequence;
+import com.direwolf20.buildinggadgets.api.building.placement.PlacementSequences.Surface;
 import com.direwolf20.buildinggadgets.test.util.CasedBlockView;
 import com.google.common.collect.Sets;
 import net.minecraft.util.Direction;
@@ -23,7 +24,7 @@ public class SurfaceTest {
     void iteratorShouldIgnoreBaseBlock() {
         Region region = new Region(-2, 0, -2, 2, 0, 2);
         CasedBlockView world = new CasedBlockView(region, CasedBlockView.base, CasedBlockView.target);
-        Surface surface = Surface.create(world, BlockPos.ZERO, Direction.UP, 5, false);
+        IPositionPlacementSequence surface = Surface.create(world, BlockPos.ZERO, Direction.UP, 5, false);
 
         Set<BlockPos> expected = Sets.newHashSet(region);
         for (BlockPos pos : surface) {

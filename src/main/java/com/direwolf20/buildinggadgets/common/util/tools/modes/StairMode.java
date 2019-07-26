@@ -2,7 +2,7 @@ package com.direwolf20.buildinggadgets.common.util.tools.modes;
 
 import com.direwolf20.buildinggadgets.api.building.modes.AtopSupportedMode;
 import com.direwolf20.buildinggadgets.api.building.placement.IPositionPlacementSequence;
-import com.direwolf20.buildinggadgets.api.building.placement.Stair;
+import com.direwolf20.buildinggadgets.api.building.placement.PlacementSequences.Stair;
 import com.direwolf20.buildinggadgets.api.building.view.IValidatorFactory;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.lang.ModeTranslation;

@@ -27,7 +27,7 @@ public final class Grid implements IPositionPlacementSequence {
 
     @VisibleForTesting
     private Grid(BlockPos center, int range, int periodSize) {
-        this.region = Wall.clickedSide(center, Direction.UP, range).getBoundingBox();
+        this.region = PlacementSequences.Wall.clickedSide(center, Direction.UP, range).getBoundingBox();
         this.range = range;
         this.center = center;
         this.periodSize = periodSize;
