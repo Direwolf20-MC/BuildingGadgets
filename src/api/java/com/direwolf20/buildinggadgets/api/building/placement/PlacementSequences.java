@@ -73,7 +73,7 @@ public final class PlacementSequences {
             int difference = VectorUtils.getAxisValue(target, axis) - VectorUtils.getAxisValue(source, axis);
             maxProgression = Math.min(Math.abs(difference), maxProgression);
 
-            return new Region(source, source.offset(offsetDirection, maxProgression));
+            return extendFrom(source, offsetDirection, maxProgression);
         }
     }
 
