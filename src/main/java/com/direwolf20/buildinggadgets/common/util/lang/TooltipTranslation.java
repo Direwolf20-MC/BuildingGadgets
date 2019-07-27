@@ -24,6 +24,7 @@ public enum TooltipTranslation implements ITranslationProvider {
     GADGET_PALETTE_OVERFLOW("gadget.paletteOverflow", 0),
     PASTECONTAINER_AMOUNT("pasteContainer.amount", 1),
     PASTECONTAINER_CREATIVE_AMOUNT("pasteContainer.creative.amountMsg", 0),
+    DONOTUSE_TEXT("donotuse", 0),
     TEMPLATE_NAME("template.name", 1);
     private static final String PREFIX = "tooltip.";
     private final String key;

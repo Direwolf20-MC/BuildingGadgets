@@ -10,18 +10,7 @@ import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import javax.annotation.Nonnull;
 import java.util.Iterator;
 
-/**
- * A sequence of blocks that offsets in 2 different directions where one is vertical, one is horizontal.
- * <p>
- * For example, a regular climbing up stair facing north would have (UP, NORTH) as its parameter. This also applies to
- * descending stair like (DOWN, SOUTH) where each block is lower than the latter.
- */
-public final class Stair implements IPositionPlacementSequence {
-
-    public static Stair create(BlockPos base, Direction horizontalAdvance, Direction verticalAdvance, int range) {
-        return new Stair(base, horizontalAdvance, verticalAdvance, range);
-    }
-
+final class StairSequence implements IPositionPlacementSequence {
     private final BlockPos base;
     private final BlockPos target;
     private final Direction horizontalAdvance;
@@ -30,7 +19,7 @@ public final class Stair implements IPositionPlacementSequence {
     private final int range;
 
     @VisibleForTesting
-    private Stair(BlockPos base, Direction horizontalAdvance, Direction verticalAdvance, int range) {
+    StairSequence(BlockPos base, Direction horizontalAdvance, Direction verticalAdvance, int range) {
         this.base = base;
         this.target = base.offset(horizontalAdvance, range - 1).offset(verticalAdvance, range - 1);
         this.horizontalAdvance = horizontalAdvance;
@@ -43,7 +32,7 @@ public final class Stair implements IPositionPlacementSequence {
      * For {@link #copy()}
      */
     @VisibleForTesting
-    private Stair(BlockPos base, BlockPos target, Direction horizontalAdvance, Direction verticalAdvance, Region region, int range) {
+    private StairSequence(BlockPos base, BlockPos target, Direction horizontalAdvance, Direction verticalAdvance, Region region, int range) {
         this.base = base;
         this.target = target;
         this.horizontalAdvance = horizontalAdvance;
@@ -64,7 +53,7 @@ public final class Stair implements IPositionPlacementSequence {
 
     @Override
     public IPositionPlacementSequence copy() {
-        return new Stair(base, target, horizontalAdvance, verticalAdvance, region, range);
+        return new StairSequence(base, target, horizontalAdvance, verticalAdvance, region, range);
     }
 
     @Override
@@ -75,7 +64,7 @@ public final class Stair implements IPositionPlacementSequence {
             private int i = 0;
 
             {
-                current.move(horizontalAdvance, -1).move(verticalAdvance, -1);
+                current.move(horizontalAdvance, - 1).move(verticalAdvance, - 1);
             }
 
             @Override
@@ -89,5 +78,4 @@ public final class Stair implements IPositionPlacementSequence {
             }
         };
     }
-
 }

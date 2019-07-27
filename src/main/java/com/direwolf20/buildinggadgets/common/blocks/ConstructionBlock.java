@@ -247,7 +247,7 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
 
     /**
      * Called periodically clientside on blocks near the player to show effects (like furnace fire particles). Note that
-     * this method is unrelated to {@link } and {@link #?}, and will always be called regardless
+     * this method is unrelated to ? and ?, and will always be called regardless
      * of whether the block can receive random update ticks
      */
     @Override

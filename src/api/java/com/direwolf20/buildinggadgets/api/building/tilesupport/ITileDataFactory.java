@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.api.building.tilesupport;
 
-import com.direwolf20.buildinggadgets.api.Registries;
+import com.direwolf20.buildinggadgets.api.Registries.TileEntityData;
 import net.minecraft.tileentity.TileEntity;
 
 import javax.annotation.Nullable;
@@ -8,7 +8,7 @@ import javax.annotation.Nullable;
 /**
  * Function creating {@link ITileEntityData} from a given {@link TileEntity}.
  * <p>
- * The implementations registered to {@link Registries#getTileDataFactories()} (via {@link net.minecraftforge.fml.InterModComms.IMCMessage}'s) will be sorted
+ * The implementations registered to {@link TileEntityData#getTileDataFactories()} (via {@link net.minecraftforge.fml.InterModComms.IMCMessage}'s) will be sorted
  * according to the specified topological boundaries. When queried, they will be called successively until the first implementation returns a
  * non-null value. Therefore overriding an existing {@code ITileDataFactory} is as easy as requiring it to be run after your own implementation.
  * <p>

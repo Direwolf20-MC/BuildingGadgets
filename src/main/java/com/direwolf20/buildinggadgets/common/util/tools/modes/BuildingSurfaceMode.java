@@ -1,9 +1,9 @@
 package com.direwolf20.buildinggadgets.common.util.tools.modes;
 
 import com.direwolf20.buildinggadgets.api.building.modes.AtopSupportedMode;
-import com.direwolf20.buildinggadgets.api.building.placement.ConnectedSurface;
 import com.direwolf20.buildinggadgets.api.building.placement.IPositionPlacementSequence;
-import com.direwolf20.buildinggadgets.api.building.placement.Surface;
+import com.direwolf20.buildinggadgets.api.building.placement.PlacementSequences.ConnectedSurface;
+import com.direwolf20.buildinggadgets.api.building.placement.PlacementSequences.Surface;
 import com.direwolf20.buildinggadgets.api.building.view.IValidatorFactory;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;

@@ -1,7 +1,8 @@
 package com.direwolf20.buildinggadgets.test.building.placementTests;
 
 import com.direwolf20.buildinggadgets.api.building.Region;
-import com.direwolf20.buildinggadgets.api.building.placement.ConnectedSurface;
+import com.direwolf20.buildinggadgets.api.building.placement.IPositionPlacementSequence;
+import com.direwolf20.buildinggadgets.api.building.placement.PlacementSequences.ConnectedSurface;
 import com.direwolf20.buildinggadgets.api.util.VectorUtils;
 import com.direwolf20.buildinggadgets.test.util.CasedBlockView;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
@@ -25,7 +26,7 @@ public class ConnectedSurfaceTest {
     @Test
     void connectedSurfaceShouldUseFuzzyMayContainsToRegion5By5() {
         CasedBlockView world = new CasedBlockView(new Region(-2, 0, -2, 2, 0, 2), CasedBlockView.base, CasedBlockView.target);
-        ConnectedSurface surface = ConnectedSurface.create(world, BlockPos.ZERO, Direction.UP, 5, false);
+        IPositionPlacementSequence surface = ConnectedSurface.create(world, BlockPos.ZERO, Direction.UP, 5, false);
 
         //5 + 1 = 6, (5 / 2) + 1 = 3
         int x = random.nextInt(6) - 3;
@@ -40,7 +41,7 @@ public class ConnectedSurfaceTest {
         BlockState selectedBlock = world.getBlockState(BlockPos.ZERO);
 
         for (Direction side : Direction.values()) {
-            ConnectedSurface surface = ConnectedSurface.create(world, BlockPos.ZERO, side, 5, false);
+            IPositionPlacementSequence surface = ConnectedSurface.create(world, BlockPos.ZERO, side, 5, false);
             Set<BlockPos> calculated = surface.collect(new ObjectOpenHashSet<>());
 
             for (BlockPos pos : calculated) {
@@ -54,7 +55,7 @@ public class ConnectedSurfaceTest {
         CasedBlockView world = regionAtOriginWithRandomTargets(5, 30);
 
         for (Direction side : Direction.values()) {
-            ConnectedSurface surface = ConnectedSurface.create(world, BlockPos.ZERO.offset(side), side.getOpposite(), 5, false);
+            IPositionPlacementSequence surface = ConnectedSurface.create(world, BlockPos.ZERO.offset(side), side.getOpposite(), 5, false);
             Set<BlockPos> calculated = surface.collect(new ObjectOpenHashSet<>());
 
             int expected = VectorUtils.getAxisValue(BlockPos.ZERO.offset(side), side.getAxis());
@@ -84,7 +85,7 @@ public class ConnectedSurfaceTest {
                 .setOtherAt(BlockPos.ZERO.south(3))
                 .setOtherAt(BlockPos.ZERO.west(3));
 
-        ConnectedSurface surface = ConnectedSurface.create(world, BlockPos.ZERO, Direction.UP, 5, false);
+        IPositionPlacementSequence surface = ConnectedSurface.create(world, BlockPos.ZERO, Direction.UP, 5, false);
         assertEquals(9, surface.collect().size());
     }
 

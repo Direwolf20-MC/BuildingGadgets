@@ -300,6 +300,13 @@ task apiDocJar(type: Jar, dependsOn: apiDoc) {
     from apiDoc.destinationDir
 }
 
+reobf {
+    apiJar {
+        dependsOn tasks.createMcpToSrg
+        mappings = tasks.createMcpToSrg.outputs.files.singleFile
+    }
+}
+
 task allApiJars {
     group = project.artifactGroup
     dependsOn apiJar
@@ -333,11 +340,15 @@ test {
     dependsOn apiTestTask
 }
 
+//These 2 need to be hardcoded, because the reobfJar task doesn't register as an ArchivesBaseTask
+String reobfApiJarLoc = "${project.buildDir}\\libs\\${archivesBaseName}-api-${api_version}.jar"
+String reobfJarLoc = "${project.buildDir}\\libs\\${archivesBaseName}-${version}.jar"
 artifacts {
-    archives apiJar
+    //define as file, so that it can be reobfed
+    archives file(reobfApiJarLoc)
     archives apiDocJar
     archives apiSourcesJar
-    archives jar
+    archives file(reobfJarLoc)
     archives docJar
     archives sourcesJar
 }
@@ -348,22 +359,33 @@ publishing {
             groupId = project.group
             artifactId = project.archivesBaseName+'-api'
             version = project.api_version
-            artifact apiJar
+            artifact reobfApiJarLoc
             artifact apiDocJar
             artifact apiSourcesJar
             pom {
                 name = "Buildinggadgets-API"
                 url = "https://github.com/Direwolf20-MC/BuildingGadgets"
                 developers  {
-                    'Direwolf20'
+                    developer {
+                        name = 'Direwolf20'
+                    }
                 }
                 contributors {
-                    'Phylogeny'
-                    'MichaelHillcox'
-                    'MajorTuvok'
+                    contributor {
+                        name = 'Phylogeny'
+                    }
+                    contributor {
+                        name = 'MichaelHillcox'
+                    }
+                    contributor {
+                        name = 'MajorTuvok'
+                    }
                 }
                 licenses {
-                    'MIT License'
+                    license {
+                        name = 'MIT License'
+                        url = 'https://opensource.org/licenses/MIT'
+                    }
                 }
             }
         }
@@ -371,22 +393,33 @@ publishing {
             groupId = project.group
             artifactId = project.archivesBaseName
             version = project.version
-            artifact jar
+            artifact reobfJarLoc
             artifact docJar
             artifact sourcesJar
             pom {
                 name = "Buildinggadgets"
                 url = "https://github.com/Direwolf20-MC/BuildingGadgets"
                 developers  {
-                    'Direwolf20'
+                    developer {
+                        name = 'Direwolf20'
+                    }
                 }
                 contributors {
-                    'Phylogeny'
-                    'MichaelHillcox'
-                    'MajorTuvok'
+                    contributor {
+                        name = 'Phylogeny'
+                    }
+                    contributor {
+                        name = 'MichaelHillcox'
+                    }
+                    contributor {
+                        name = 'MajorTuvok'
+                    }
                 }
                 licenses {
-                    'MIT License'
+                    license {
+                        name = 'MIT License'
+                        url = 'https://opensource.org/licenses/MIT'
+                    }
                 }
             }
         }

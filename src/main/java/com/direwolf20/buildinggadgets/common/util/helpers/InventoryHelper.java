@@ -341,8 +341,8 @@ public class InventoryHelper {
 
     public static BlockData getSpecificStates(BlockState originalState, World world, PlayerEntity player, BlockPos pos, ItemStack tool) {
         BlockState placeState;
-        Block block = originalState.getBlock();
-        ItemStack item = block.getPickBlock(originalState, null, world, pos, player);
+        //Block block = originalState.getBlock();
+        //ItemStack item = block.getPickBlock(originalState, null, world, pos, player);
 
         try {
             placeState = originalState.getBlock().getStateForPlacement(

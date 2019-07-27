@@ -17,29 +17,7 @@ import java.util.Iterator;
 import java.util.Queue;
 import java.util.function.Function;
 
-/**
- * Surface that limits its attempt to blocks that are connected through either on its sides or corners. Candidates are
- * selected from a wall region centered at a point and filtered with a 8-way adjacent flood fill.
- *
- * @see #iterator()
- * @see Surface
- */
-public final class ConnectedSurface implements IPositionPlacementSequence {
-
-    /**
-     * @param world           Block access for searching reference
-     * @param searchingCenter Center of the searching region
-     * @param side            Facing to offset from the {@code searchingCenter} to get to the reference region center
-     */
-    public static ConnectedSurface create(IBlockReader world, BlockPos searchingCenter, Direction side, int range, boolean fuzzy) {
-        Region searchingRegion = Wall.clickedSide(searchingCenter, side, range / 2).getBoundingBox();
-        return create(world, searchingRegion, pos -> pos.offset(side), searchingCenter, side, fuzzy);
-    }
-
-    public static ConnectedSurface create(IBlockReader world, Region searchingRegion, Function<BlockPos, BlockPos> searching2referenceMapper, BlockPos searchingCenter, Direction side, boolean fuzzy) {
-        return new ConnectedSurface(world, searchingRegion, searching2referenceMapper, searchingCenter, side, fuzzy);
-    }
-
+final class ConnectedSurfaceSequence implements IPositionPlacementSequence {
     private final IBlockReader world;
     private final Region searchingRegion;
     private final Function<BlockPos, BlockPos> searching2referenceMapper;
@@ -48,7 +26,7 @@ public final class ConnectedSurface implements IPositionPlacementSequence {
     private final boolean fuzzy;
 
     @VisibleForTesting
-    private ConnectedSurface(IBlockReader world, Region searchingRegion, Function<BlockPos, BlockPos> searching2referenceMapper, BlockPos searchingCenter, Direction side, boolean fuzzy) {
+    ConnectedSurfaceSequence(IBlockReader world, Region searchingRegion, Function<BlockPos, BlockPos> searching2referenceMapper, BlockPos searchingCenter, Direction side, boolean fuzzy) {
         this.world = world;
         this.searchingRegion = searchingRegion;
         this.searching2referenceMapper = searching2referenceMapper;
@@ -78,7 +56,7 @@ public final class ConnectedSurface implements IPositionPlacementSequence {
 
     @Override
     public IPositionPlacementSequence copy() {
-        return new ConnectedSurface(world, searchingRegion, searching2referenceMapper, searchingCenter, side, fuzzy);
+        return new ConnectedSurfaceSequence(world, searchingRegion, searching2referenceMapper, searchingCenter, side, fuzzy);
     }
 
     /**
@@ -110,13 +88,13 @@ public final class ConnectedSurface implements IPositionPlacementSequence {
                 // The position is guaranteed to be valid
                 BlockPos current = queue.remove();
 
-                for (int i = -1; i <= 1; i++) {
-                    for (int j = -1; j <= 1; j++) {
+                for (int i = - 1; i <= 1; i++) {
+                    for (int j = - 1; j <= 1; j++) {
                         BlockPos neighbor = VectorUtils.perpendicularSurfaceOffset(current, side, i, j);
 
-                        boolean isSearched = !searched.add(neighbor);
+                        boolean isSearched = ! searched.add(neighbor);
 
-                        if (isSearched || !searchingRegion.contains(neighbor) || !isStateValid(selectedBlock, neighbor))
+                        if (isSearched || ! searchingRegion.contains(neighbor) || ! isStateValid(selectedBlock, neighbor))
                             continue;
 
                         queue.add(neighbor);
@@ -133,12 +111,11 @@ public final class ConnectedSurface implements IPositionPlacementSequence {
         boolean isAir = reference.isAir(world, pos);
         // If fuzzy=true, we ignore the block for reference
         if (fuzzy)
-            return !isAir;
-        return !isAir && filter == reference;
+            return ! isAir;
+        return ! isAir && filter == reference;
     }
 
     private BlockState getReferenceFor(BlockPos pos) {
         return world.getBlockState(searching2referenceMapper.apply(pos));
     }
-
 }

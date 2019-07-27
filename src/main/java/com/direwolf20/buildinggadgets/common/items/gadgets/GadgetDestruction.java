@@ -193,7 +193,7 @@ public class GadgetDestruction extends GadgetGeneric {
         BlockPos currentAnchor = getAnchor(stack);
         if (currentAnchor == null) {
             BlockRayTraceResult lookingAt = VectorHelper.getLookingAt(player, stack);
-            if (lookingAt == null || (player.world.getBlockState(VectorHelper.getLookingAt(player, stack).getPos()) != Blocks.AIR.getDefaultState())) {
+            if (lookingAt == null || (player.world.getBlockState(VectorHelper.getLookingAt(player, stack).getPos()) == Blocks.AIR.getDefaultState())) {
                 return;
             }
             currentAnchor = lookingAt.getPos();

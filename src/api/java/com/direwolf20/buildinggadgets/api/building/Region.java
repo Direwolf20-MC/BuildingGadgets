@@ -118,7 +118,7 @@ public final class Region implements IPositionPlacementSequence, Serializable {
      * creating a valid region - see last sample).
      *
      * <h3>Samples:</h3>
-     * <table>
+     * <table summary="A few examples of Regions">
      * <tr><th>Input</th><th>Result</th></tr>
      * <tr><td><pre>{@code new Region(0, 0, 0, 1, 1, 1).grow(2, 2, 2)}</pre></td><td><pre><samp>{@code box[-2, -2, -2 -> 3, 3, 3]}</samp></pre></td></tr>
      * <tr><td><pre>{@code new Region(0, 0, 0, 6, 6, 6).grow(-2, -2, -2)}</pre></td><td><pre><samp>{@code box[2, 2, 2 -> 4, 4, 4]}</samp></pre></td></tr>

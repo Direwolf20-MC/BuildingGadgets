@@ -2,10 +2,10 @@ package com.direwolf20.buildinggadgets.common.util.tools.modes;
 
 import com.direwolf20.buildinggadgets.api.building.Region;
 import com.direwolf20.buildinggadgets.api.building.modes.AbstractMode;
-import com.direwolf20.buildinggadgets.api.building.placement.ConnectedSurface;
 import com.direwolf20.buildinggadgets.api.building.placement.IPositionPlacementSequence;
-import com.direwolf20.buildinggadgets.api.building.placement.Surface;
-import com.direwolf20.buildinggadgets.api.building.placement.Wall;
+import com.direwolf20.buildinggadgets.api.building.placement.PlacementSequences.ConnectedSurface;
+import com.direwolf20.buildinggadgets.api.building.placement.PlacementSequences.Surface;
+import com.direwolf20.buildinggadgets.api.building.placement.PlacementSequences.Wall;
 import com.direwolf20.buildinggadgets.api.building.view.IValidatorFactory;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
@@ -37,7 +37,7 @@ public class ExchangingSurfaceMode extends AbstractMode {
 
     @Override
     public IPositionPlacementSequence computeCoordinates(PlayerEntity player, BlockPos hit, Direction sideHit, ItemStack tool) {
-        int range = GadgetUtils.getToolRange(tool);
+        int range = GadgetUtils.getToolRange(tool) / 2;
         boolean fuzzy = GadgetGeneric.getFuzzy(tool);
         Region region = Wall.clickedSide(hit, sideHit, range).getBoundingBox();
         if (GadgetGeneric.getConnectedArea(tool))
