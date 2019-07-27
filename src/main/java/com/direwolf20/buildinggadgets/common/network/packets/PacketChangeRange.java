@@ -1,9 +1,9 @@
 package com.direwolf20.buildinggadgets.common.network.packets;
 
+import com.direwolf20.buildinggadgets.common.items.gadgets.AbstractGadget;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetBuilding;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetDestruction;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetExchanger;
-import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -38,7 +38,7 @@ public class PacketChangeRange {
                 if (player == null)
                     return;
 
-                ItemStack stack = GadgetGeneric.getGadget(player);
+                ItemStack stack = AbstractGadget.getGadget(player);
                 if (msg.range >= 0)
                     GadgetUtils.setToolRange(stack, msg.range);
                 else if (stack.getItem() instanceof GadgetBuilding)

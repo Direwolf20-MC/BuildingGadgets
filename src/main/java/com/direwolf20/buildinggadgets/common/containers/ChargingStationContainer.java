@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.common.containers;
 
-import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
+import com.direwolf20.buildinggadgets.common.items.gadgets.AbstractGadget;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGContainers;
 import com.direwolf20.buildinggadgets.common.tiles.ChargingStationTileEntity;
 import com.direwolf20.buildinggadgets.common.util.exceptions.CapabilityNotPresentException;
@@ -72,7 +72,7 @@ public class ChargingStationContainer extends BaseContainer {
             } else {
                 int burnTime = net.minecraftforge.event.ForgeEventFactory.getItemBurnTime(stack, stack.getBurnTime() == - 1 ? AbstractFurnaceTileEntity.getBurnTimes().getOrDefault(stack.getItem(), 0) : stack.getBurnTime());
                 //System.out.println(burnTime);
-                if (stack.getItem() instanceof GadgetGeneric) {
+                if (stack.getItem() instanceof AbstractGadget) {
                     if (! this.mergeItemStack(stack, 1, 2, false)) {
                         return ItemStack.EMPTY;
                     }

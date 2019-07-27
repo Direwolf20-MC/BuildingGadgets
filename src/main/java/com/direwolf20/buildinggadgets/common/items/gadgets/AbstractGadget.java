@@ -5,6 +5,7 @@ import com.direwolf20.buildinggadgets.common.capability.CapabilityProviderBlockP
 import com.direwolf20.buildinggadgets.common.capability.CapabilityProviderEnergy;
 import com.direwolf20.buildinggadgets.common.capability.MultiCapabilityProvider;
 import com.direwolf20.buildinggadgets.common.config.Config;
+import com.direwolf20.buildinggadgets.common.items.gadgets.renderers.BaseRenderer;
 import com.direwolf20.buildinggadgets.common.util.CapabilityUtil.EnergyUtil;
 import com.direwolf20.buildinggadgets.common.util.exceptions.CapabilityNotPresentException;
 import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
@@ -31,15 +32,16 @@ import java.util.List;
 
 import static com.direwolf20.buildinggadgets.common.util.GadgetUtils.withSuffix;
 
-public abstract class GadgetGeneric extends Item {
+public abstract class AbstractGadget extends Item {
 
-    public GadgetGeneric(Properties builder) {
+    public AbstractGadget(Properties builder) {
         super(builder);
     }
 
     public abstract int getEnergyMax();
-
     public abstract int getEnergyCost(ItemStack tool);
+
+    public abstract BaseRenderer getRender();
 
     @Override
     @Nullable
@@ -95,9 +97,9 @@ public abstract class GadgetGeneric extends Item {
 
     public static ItemStack getGadget(PlayerEntity player) {
         ItemStack heldItem = player.getHeldItemMainhand();
-        if (!(heldItem.getItem() instanceof GadgetGeneric)) {
+        if (!(heldItem.getItem() instanceof AbstractGadget)) {
             heldItem = player.getHeldItemOffhand();
-            if (!(heldItem.getItem() instanceof GadgetGeneric)) {
+            if (!(heldItem.getItem() instanceof AbstractGadget)) {
                 return ItemStack.EMPTY;
             }
         }

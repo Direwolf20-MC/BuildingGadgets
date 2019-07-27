@@ -1,9 +1,9 @@
 package com.direwolf20.buildinggadgets.common.network.packets;
 
+import com.direwolf20.buildinggadgets.common.items.gadgets.AbstractGadget;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetBuilding;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetDestruction;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetExchanger;
-import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
@@ -23,9 +23,9 @@ public class PacketToggleConnectedArea {
                 if (player == null)
                     return;
 
-                ItemStack stack = GadgetGeneric.getGadget(player);
+                ItemStack stack = AbstractGadget.getGadget(player);
                 if (stack.getItem() instanceof GadgetExchanger || stack.getItem() instanceof GadgetBuilding || stack.getItem() instanceof GadgetDestruction)
-                    GadgetGeneric.toggleConnectedArea(player, stack);
+                    AbstractGadget.toggleConnectedArea(player, stack);
             });
             ctx.get().setPacketHandled(true);
         }

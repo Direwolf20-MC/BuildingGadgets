@@ -58,7 +58,7 @@ public class ModeRadialMenu extends Screen {
     public ModeRadialMenu(ItemStack stack) {
         super(new StringTextComponent("Mode Radial Menu?!?"));
         //getMinecraft() = Minecraft.getInstance();
-        if (stack.getItem() instanceof GadgetGeneric)
+        if (stack.getItem() instanceof AbstractGadget)
             setSocketable(stack);
     }
 
@@ -106,7 +106,7 @@ public class ModeRadialMenu extends Screen {
                     if (send)
                         PacketHandler.sendToServer(new PacketToggleFuzzy());
 
-                    return GadgetGeneric.getFuzzy(getGadget());
+                    return AbstractGadget.getFuzzy(getGadget());
                 });
                 addButton(button);
                 conditionalButtons.add(button);
@@ -115,7 +115,7 @@ public class ModeRadialMenu extends Screen {
                 if (send)
                     PacketHandler.sendToServer(new PacketToggleConnectedArea());
 
-                return GadgetGeneric.getConnectedArea(getGadget());
+                return AbstractGadget.getConnectedArea(getGadget());
             });
             addButton(button);
             conditionalButtons.add(button);
@@ -153,7 +153,7 @@ public class ModeRadialMenu extends Screen {
             if( send )
                 PacketHandler.sendToServer(new PacketToggleRayTraceFluid());
 
-            return GadgetGeneric.shouldRayTraceFluid(getGadget());
+            return AbstractGadget.shouldRayTraceFluid(getGadget());
         }));
         if (tool.getItem() instanceof GadgetBuilding) {
             addButton(new PositionedIconActionable(RadialTranslation.PLACE_ON_TOP, "building_place_atop", right, send -> {
@@ -243,7 +243,7 @@ public class ModeRadialMenu extends Screen {
     }
 
     private ItemStack getGadget() {
-        return GadgetGeneric.getGadget(Minecraft.getInstance().player);
+        return AbstractGadget.getGadget(Minecraft.getInstance().player);
     }
 
     @Override

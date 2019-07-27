@@ -2,7 +2,7 @@ package com.direwolf20.buildinggadgets.common.util.tools.modes;
 
 import com.direwolf20.buildinggadgets.api.building.BlockData;
 import com.direwolf20.buildinggadgets.api.building.modes.IBuildingMode;
-import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
+import com.direwolf20.buildinggadgets.common.items.gadgets.AbstractGadget;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
 import com.direwolf20.buildinggadgets.common.tiles.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
@@ -88,7 +88,7 @@ public enum ExchangingMode {
                 return false;
 
             // No need to replace if source and target are the same if fuzzy mode is off
-            if (!GadgetGeneric.getFuzzy(tool) && worldBlockState != initialBlockState)
+            if (!AbstractGadget.getFuzzy(tool) && worldBlockState != initialBlockState)
                 return false;
 
             // If the target is already enqueued, don't replace it

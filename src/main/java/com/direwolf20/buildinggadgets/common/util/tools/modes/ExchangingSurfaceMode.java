@@ -7,7 +7,7 @@ import com.direwolf20.buildinggadgets.api.building.placement.PlacementSequences.
 import com.direwolf20.buildinggadgets.api.building.placement.PlacementSequences.Surface;
 import com.direwolf20.buildinggadgets.api.building.placement.PlacementSequences.Wall;
 import com.direwolf20.buildinggadgets.api.building.view.IValidatorFactory;
-import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
+import com.direwolf20.buildinggadgets.common.items.gadgets.AbstractGadget;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.lang.ModeTranslation;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
@@ -38,9 +38,9 @@ public class ExchangingSurfaceMode extends AbstractMode {
     @Override
     public IPositionPlacementSequence computeCoordinates(PlayerEntity player, BlockPos hit, Direction sideHit, ItemStack tool) {
         int range = GadgetUtils.getToolRange(tool) / 2;
-        boolean fuzzy = GadgetGeneric.getFuzzy(tool);
+        boolean fuzzy = AbstractGadget.getFuzzy(tool);
         Region region = Wall.clickedSide(hit, sideHit, range).getBoundingBox();
-        if (GadgetGeneric.getConnectedArea(tool))
+        if (AbstractGadget.getConnectedArea(tool))
             return ConnectedSurface.create(player.getEntityWorld(), region, pos -> pos, hit, sideHit, fuzzy);
         return Surface.create(player.getEntityWorld(), hit, region, pos -> pos, fuzzy);
     }

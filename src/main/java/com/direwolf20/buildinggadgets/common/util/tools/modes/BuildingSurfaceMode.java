@@ -5,7 +5,7 @@ import com.direwolf20.buildinggadgets.api.building.placement.IPositionPlacementS
 import com.direwolf20.buildinggadgets.api.building.placement.PlacementSequences.ConnectedSurface;
 import com.direwolf20.buildinggadgets.api.building.placement.PlacementSequences.Surface;
 import com.direwolf20.buildinggadgets.api.building.view.IValidatorFactory;
-import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
+import com.direwolf20.buildinggadgets.common.items.gadgets.AbstractGadget;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.lang.ModeTranslation;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
@@ -38,8 +38,8 @@ public class BuildingSurfaceMode extends AtopSupportedMode {
     @Override
     public IPositionPlacementSequence computeWithTransformed(PlayerEntity player, BlockPos transformed, BlockPos original, Direction sideHit, ItemStack tool) {
         int range = GadgetUtils.getToolRange(tool);
-        boolean fuzzy = GadgetGeneric.getFuzzy(tool);
-        if (GadgetGeneric.getConnectedArea(tool))
+        boolean fuzzy = AbstractGadget.getFuzzy(tool);
+        if (AbstractGadget.getConnectedArea(tool))
             return ConnectedSurface.create(player.getEntityWorld(), transformed, sideHit.getOpposite(), range, fuzzy);
         return Surface.create(player.getEntityWorld(), transformed, sideHit.getOpposite(), range, fuzzy);
     }

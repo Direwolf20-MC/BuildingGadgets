@@ -21,7 +21,7 @@ public class PacketAnchor {
                 if (player == null)
                     return;
 
-                ItemStack stack = GadgetGeneric.getGadget(player);
+                ItemStack stack = AbstractGadget.getGadget(player);
                 if (stack.getItem() instanceof GadgetBuilding)
                     GadgetUtils.anchorBlocks(player, stack);
                 else if (stack.getItem() instanceof GadgetExchanger)
