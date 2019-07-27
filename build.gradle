@@ -366,15 +366,26 @@ publishing {
                 name = "Buildinggadgets-API"
                 url = "https://github.com/Direwolf20-MC/BuildingGadgets"
                 developers  {
-                    'Direwolf20'
+                    developer {
+                        name = 'Direwolf20'
+                    }
                 }
                 contributors {
-                    'Phylogeny'
-                    'MichaelHillcox'
-                    'MajorTuvok'
+                    contributor {
+                        name = 'Phylogeny'
+                    }
+                    contributor {
+                        name = 'MichaelHillcox'
+                    }
+                    contributor {
+                        name = 'MajorTuvok'
+                    }
                 }
                 licenses {
-                    'MIT License'
+                    license {
+                        name = 'MIT License'
+                        url = 'https://opensource.org/licenses/MIT'
+                    }
                 }
             }
         }
@@ -389,15 +400,26 @@ publishing {
                 name = "Buildinggadgets"
                 url = "https://github.com/Direwolf20-MC/BuildingGadgets"
                 developers  {
-                    'Direwolf20'
+                    developer {
+                        name = 'Direwolf20'
+                    }
                 }
                 contributors {
-                    'Phylogeny'
-                    'MichaelHillcox'
-                    'MajorTuvok'
+                    contributor {
+                        name = 'Phylogeny'
+                    }
+                    contributor {
+                        name = 'MichaelHillcox'
+                    }
+                    contributor {
+                        name = 'MajorTuvok'
+                    }
                 }
                 licenses {
-                    'MIT License'
+                    license {
+                        name = 'MIT License'
+                        url = 'https://opensource.org/licenses/MIT'
+                    }
                 }
             }
         }
