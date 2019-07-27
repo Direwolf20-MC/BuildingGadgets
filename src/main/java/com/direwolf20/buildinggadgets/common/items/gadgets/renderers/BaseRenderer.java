@@ -2,7 +2,10 @@ package com.direwolf20.buildinggadgets.common.items.gadgets.renderers;
 
 import com.direwolf20.buildinggadgets.client.RemoteInventoryCache;
 import com.direwolf20.buildinggadgets.client.renderer.FakeTERWorld;
+import com.direwolf20.buildinggadgets.common.util.CapabilityUtil;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
+import com.direwolf20.buildinggadgets.common.util.exceptions.CapabilityNotPresentException;
+import com.direwolf20.buildinggadgets.common.util.helpers.InventoryHelper;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.util.tools.UniqueItem;
 import com.direwolf20.buildinggadgets.common.world.FakeBuilderWorld;
@@ -19,8 +22,11 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
+import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.energy.IEnergyStorage;
 import org.lwjgl.opengl.GL14;
 
 import java.util.HashSet;
@@ -69,6 +75,36 @@ public abstract class BaseRenderer {
 
         getMc().getBlockRendererDispatcher().renderBlockBrightness(Blocks.YELLOW_STAINED_GLASS.getDefaultState(), 1f);
         GlStateManager.popMatrix();
+    }
+
+    int getEnergy(PlayerEntity player, ItemStack heldItem) {
+        LazyOptional<IEnergyStorage> energy = CapabilityUtil.EnergyUtil.getCap(heldItem);
+        if (player.isCreative() || !energy.isPresent())
+            return Integer.MAX_VALUE;
+
+        return energy.orElseThrow(CapabilityNotPresentException::new).getEnergyStored();
+    }
+
+    long playerHasBlocks(ItemStack stack, PlayerEntity player, BlockState state) {
+        long hasBlocks = InventoryHelper.countItem(stack, player, getCacheInventory());
+
+        if ( !state.hasTileEntity() )
+            hasBlocks = hasBlocks + InventoryHelper.countPaste(player);
+
+        return hasBlocks;
+    }
+
+    ItemStack getItemStackForRender(BlockState state, PlayerEntity player, IWorld world) {
+        ItemStack itemStack = ItemStack.EMPTY;
+
+        // Todo: use blockdata apparently
+//        if (state.getBlock().canSilkHarvest(state, world, BlockPos.ZERO, player))
+//            itemStack = InventoryHelper.getSilkTouchDrop(state);
+//        else
+        itemStack = state.getBlock().getPickBlock(state, null, world, BlockPos.ZERO, player);
+
+
+        return !itemStack.isEmpty() ? itemStack : state.getBlock().getPickBlock(state, null, world, BlockPos.ZERO, player);
     }
 
     /**

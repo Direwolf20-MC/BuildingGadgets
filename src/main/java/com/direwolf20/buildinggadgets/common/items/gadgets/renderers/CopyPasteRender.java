@@ -97,7 +97,10 @@ public class CopyPasteRender extends BaseRenderer {
         BlockPos startPos = GadgetCopyPaste.getAnchor(heldItem);
         if (startPos == null) {
             startPos = VectorHelper.getPosLookingAt(player, heldItem);
-            if (startPos == null || (world.getBlockState(startPos) == AIR)) return;
+
+            if (world.getBlockState(startPos) == AIR)
+                return;
+
             startPos = startPos.up(GadgetCopyPaste.getY(heldItem));
             startPos = startPos.east(GadgetCopyPaste.getX(heldItem));
             startPos = startPos.south(GadgetCopyPaste.getZ(heldItem));

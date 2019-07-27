@@ -3,8 +3,6 @@ package com.direwolf20.buildinggadgets.common.items.gadgets.renderers;
 import com.direwolf20.buildinggadgets.common.items.gadgets.AbstractGadget;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
 import com.direwolf20.buildinggadgets.common.util.CapabilityUtil;
-import com.direwolf20.buildinggadgets.common.util.exceptions.CapabilityNotPresentException;
-import com.direwolf20.buildinggadgets.common.util.helpers.InventoryHelper;
 import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
 import com.direwolf20.buildinggadgets.common.util.tools.modes.ExchangingMode;
 import com.mojang.blaze3d.platform.GlStateManager;
@@ -18,9 +16,7 @@ import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.Vec3d;
@@ -75,36 +71,15 @@ public class ExchangerRender extends BaseRenderer {
             //Figure out how many of the block we're rendering we have in the inventory of the player.
             //ItemStack itemStack = renderBlockState.getBlock().getPickBlock(renderBlockState, null, world, new BlockPos(0, 0, 0), player);
             //ItemStack itemStack = InventoryHelper.getSilkTouchDrop(renderBlockState);
-            ItemStack itemStack;
-            //TODO handle LootTables
-            if (true/*renderBlockState.getBlock().canSilkHarvest(renderBlockState, world, new BlockPos(0, 0, 0), player)*/) {
-                itemStack = InventoryHelper.getSilkTouchDrop(renderBlockState);
-            } else {
-                itemStack = renderBlockState.getBlock().getPickBlock(renderBlockState, null, world, new BlockPos(0, 0, 0), player);
-            }
-            if (itemStack.getItem().equals(Items.AIR)) {
-                itemStack = renderBlockState.getBlock().getPickBlock(renderBlockState, null, world, new BlockPos(0, 0, 0), player);
-            }
-            long hasBlocks = InventoryHelper.countItem(itemStack, player, getCacheInventory());
-            if (! renderBlockState.hasTileEntity()) {
-                hasBlocks = hasBlocks + InventoryHelper.countPaste(player);
-            }
-            int hasEnergy = 0;
+
+            ItemStack itemStack = getItemStackForRender(renderBlockState, player, world);
+            long hasBlocks      = playerHasBlocks(itemStack, player, renderBlockState);
+            int hasEnergy       = getEnergy(player, heldItem);
 
             LazyOptional<IEnergyStorage> energy = CapabilityUtil.EnergyUtil.getCap(heldItem);
-            if (energy.isPresent()) {
-                hasEnergy = energy.orElseThrow(CapabilityNotPresentException::new).getEnergyStored();
-            } else {
-                hasEnergy = heldItem.getMaxDamage() - heldItem.getDamage();
-            }
-            if (player.isCreative() || (energy.isPresent() && ! heldItem.isDamageable())) {
-                hasEnergy = 1000000;
-            }
-            //Prepare the block rendering
-            BlockRenderLayer origLayer = MinecraftForgeClient.getRenderLayer();
 
             //Prepare the fake world -- using a fake world lets us render things properly, like fences connecting.
-            Set<BlockPos> coords = new HashSet<BlockPos>(coordinates);
+            Set<BlockPos> coords = new HashSet<>(coordinates);
             getBuilderWorld().setWorldAndState(player.world, renderBlockState, coords);
 
             //Save the current position that is being rendered (I think)
@@ -198,7 +173,7 @@ public class ExchangerRender extends BaseRenderer {
             }
             //Set blending back to the default mode
             GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-            ForgeHooksClient.setRenderLayer(origLayer);
+            ForgeHooksClient.setRenderLayer(MinecraftForgeClient.getRenderLayer());
             //Disable blend
             GlStateManager.disableBlend();
             //Pop from the original push in this method

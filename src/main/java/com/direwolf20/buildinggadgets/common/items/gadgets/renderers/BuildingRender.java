@@ -3,8 +3,6 @@ package com.direwolf20.buildinggadgets.common.items.gadgets.renderers;
 import com.direwolf20.buildinggadgets.common.items.gadgets.AbstractGadget;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
 import com.direwolf20.buildinggadgets.common.util.CapabilityUtil;
-import com.direwolf20.buildinggadgets.common.util.exceptions.CapabilityNotPresentException;
-import com.direwolf20.buildinggadgets.common.util.helpers.InventoryHelper;
 import com.direwolf20.buildinggadgets.common.util.helpers.SortingHelper;
 import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
 import com.direwolf20.buildinggadgets.common.util.tools.modes.BuildingMode;
@@ -17,7 +15,6 @@ import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
@@ -66,30 +63,12 @@ public class BuildingRender extends BaseRenderer {
                             .collectPlacementPos(world, player, lookingAt.getPos(), lookingAt.getFace(), heldItem, lookingAt.getPos());
                 }
 
-                //Figure out how many of the block we're rendering we have in the inventory of the player.
-                ItemStack itemStack;
-                //TODO handle loot tables
-                if (true/*renderBlockState.getBlock().canSilkHarvest(renderBlockState, world, new BlockPos(0, 0, 0), player)*/) {
-                    itemStack = InventoryHelper.getSilkTouchDrop(renderBlockState);
-                } else {
-                    itemStack = renderBlockState.getBlock().getPickBlock(renderBlockState, null, world, new BlockPos(0, 0, 0), player);
-                }
-                if (itemStack.getItem().equals(Items.AIR)) {
-                    itemStack = renderBlockState.getBlock().getPickBlock(renderBlockState, null, world, new BlockPos(0, 0, 0), player);
-                }
+                // Figure out how many of the block we're rendering we have in the inventory of the player.
+                ItemStack itemStack = getItemStackForRender(renderBlockState, player, world);
+                long hasBlocks = playerHasBlocks(itemStack, player, renderBlockState);
+                int hasEnergy = getEnergy(player, heldItem);
 
-                long hasBlocks = InventoryHelper.countItem(itemStack, player, getCacheInventory());
-                if (! renderBlockState.hasTileEntity()) {
-                    hasBlocks = hasBlocks + InventoryHelper.countPaste(player);
-                }
-                int hasEnergy = 0;
-                LazyOptional<IEnergyStorage> energy = CapabilityUtil.EnergyUtil.getCap(heldItem);
-                if (energy.isPresent()) {
-                    hasEnergy = energy.orElseThrow(CapabilityNotPresentException::new).getEnergyStored();
-                }
-                if (player.isCreative() || (energy.isPresent() && !heldItem.isDamageable())) {
-                    hasEnergy = 1000000;
-                }
+                LazyOptional<IEnergyStorage> energyCap = CapabilityUtil.EnergyUtil.getCap(heldItem);
 
                 //Prepare the fake world -- using a fake world lets us render things properly, like fences connecting.
                 getBuilderWorld().setWorldAndState(player.world, renderBlockState, coordinates);
@@ -141,7 +120,7 @@ public class BuildingRender extends BaseRenderer {
                     GlStateManager.scalef(1.01f, 1.01f, 1.01f);
                     GL14.glBlendColor(1F, 1F, 1F, 0.35f); //Set the alpha of the blocks we are rendering
                     hasBlocks--;
-                    if (energy.isPresent()) {
+                    if (energyCap.isPresent()) {
                         hasEnergy -= ((AbstractGadget) heldItem.getItem()).getEnergyCost(heldItem);
                     }
                     if (hasBlocks < 0 || hasEnergy < 0) {
