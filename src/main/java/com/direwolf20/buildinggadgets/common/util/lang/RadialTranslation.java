@@ -12,7 +12,7 @@ public enum RadialTranslation implements ITranslationProvider {
     OPEN_GUI("open_gui"),
     RAYTRACE_FLUID("raytrace_fluid"),
     PLACE_ON_TOP("place_on_top"),
-    ANCHOR("Anchor"),
+    ANCHOR("anchor"),
     UNDO("undo");
 
     private final String key;
