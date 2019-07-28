@@ -3,18 +3,15 @@ package com.direwolf20.buildinggadgets.common.items.gadgets;
 import com.direwolf20.buildinggadgets.api.building.BlockData;
 import com.direwolf20.buildinggadgets.api.building.modes.IAtopPlacingGadget;
 import com.direwolf20.buildinggadgets.api.building.tilesupport.TileSupport;
+import com.direwolf20.buildinggadgets.common.blocks.EffectBlock;
 import com.direwolf20.buildinggadgets.common.config.Config;
-import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.common.items.gadgets.renderers.BaseRenderer;
 import com.direwolf20.buildinggadgets.common.items.gadgets.renderers.BuildingRender;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketBindTool;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
-import com.direwolf20.buildinggadgets.common.util.helpers.InventoryHelper;
-import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
-import com.direwolf20.buildinggadgets.common.util.helpers.SortingHelper;
-import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
+import com.direwolf20.buildinggadgets.common.util.helpers.*;
 import com.direwolf20.buildinggadgets.common.util.lang.LangUtil;
 import com.direwolf20.buildinggadgets.common.util.lang.Styles;
 import com.direwolf20.buildinggadgets.common.util.lang.TooltipTranslation;
@@ -35,10 +32,7 @@ import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.util.text.*;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.BlockSnapshot;
@@ -52,6 +46,7 @@ import java.util.List;
 import static com.direwolf20.buildinggadgets.common.util.GadgetUtils.*;
 
 public class GadgetBuilding extends AbstractGadget implements IAtopPlacingGadget {
+
     private static final FakeBuilderWorld fakeWorld = new FakeBuilderWorld();
     private static final BuildingRender render = new BuildingRender();
 
@@ -63,7 +58,6 @@ public class GadgetBuilding extends AbstractGadget implements IAtopPlacingGadget
     public int getEnergyMax() {
         return Config.GADGETS.GADGET_BUILDING.maxEnergy.get();
     }
-
 
     @Override
     public int getEnergyCost(ItemStack tool) {
@@ -141,7 +135,7 @@ public class GadgetBuilding extends AbstractGadget implements IAtopPlacingGadget
         ByteBuf buf = Unpooled.buffer(16);
         ByteBufUtils.writeTag(buf,tagCompound);
         System.out.println(buf.readableBytes());*/
-        System.out.println("jo");
+        // System.out.println("jo");
         player.setActiveHand(hand);
         if (!world.isRemote) {
             if (player.isSneaking()) {
@@ -149,11 +143,11 @@ public class GadgetBuilding extends AbstractGadget implements IAtopPlacingGadget
             } else if (player instanceof ServerPlayerEntity) {
                 build((ServerPlayerEntity) player, itemstack);
             }
-            System.out.println("hello");
+            // System.out.println("hello");
         } else {
-            System.out.println("ss");
+            // System.out.println("ss");
 
-            if (! player.isSneaking()) {
+            if (!player.isSneaking()) {
                 BaseRenderer.updateInventoryCache();
             } else {
                 if (Screen.hasControlDown()) {
@@ -246,7 +240,6 @@ public class GadgetBuilding extends AbstractGadget implements IAtopPlacingGadget
         }
         World world = player.world;
         if (!world.isRemote) {
-            BlockData currentBlock = BlockData.AIR;
             List<BlockPos> undoCoords = undoState.coordinates; //Get the Coords to undo
 
             List<BlockPos> failedRemovals = new ArrayList<BlockPos>(); //Build a list of removals that fail
@@ -254,17 +247,17 @@ public class GadgetBuilding extends AbstractGadget implements IAtopPlacingGadget
             silkTool.addEnchantment(Enchantments.SILK_TOUCH, 1);
             boolean sameDim = player.dimension == undoState.dimension;
             for (BlockPos coord : undoCoords) {
-                currentBlock = TileSupport.createBlockData(world, coord);
+                BlockData currentBlock = TileSupport.createBlockData(world, coord);
 
                 double distance = Math.sqrt(coord.distanceSq(player.getPosition()));
 
                 BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(world, coord, currentBlock.getState(), player);
                 boolean cancelled = MinecraftForge.EVENT_BUS.post(e);
 
-                if (distance < 64 && sameDim && currentBlock.getState() != BGBlocks.effectBlock.getDefaultState() && ! cancelled) { //Don't allow us to undo a block while its still being placed or too far away
+                if (distance < 64 && sameDim && currentBlock.getState() != BGBlocks.effectBlock.getDefaultState() && !cancelled) { //Don't allow us to undo a block while its still being placed or too far away
                     if (currentBlock.getState() != Blocks.AIR.getDefaultState()) {
                         currentBlock.getState().getBlock().harvestBlock(world, player, coord, currentBlock.getState(), world.getTileEntity(coord), silkTool);
-                        world.addEntity(new BlockBuildEntity(world, coord, currentBlock, BlockBuildEntity.Mode.REMOVE, false));
+                        EffectBlock.spawnEffectBlock(world, coord, currentBlock, EffectBlock.Mode.REMOVE, false);
                     }
                 } else { //If you're in the wrong dimension or too far away, fail the undo.
                     player.sendStatusMessage(new StringTextComponent(TextFormatting.RED + new TranslationTextComponent("message.gadget.undofailed").getUnformattedComponentText()), true);
@@ -318,7 +311,7 @@ public class GadgetBuilding extends AbstractGadget implements IAtopPlacingGadget
         if (ForgeEventFactory.onBlockPlace(player, blockSnapshot, Direction.UP)) {
             return false;
         }
-        if (! setBlock.getState().hasTileEntity()) {
+        if (!setBlock.getState().hasTileEntity()) {
             ItemStack constructionPaste = new ItemStack(BGItems.constructionPaste);
             if (InventoryHelper.countItem(itemStack, player, world) < neededItems) {
                 //if (InventoryHelper.countItem(constructionStack, player) == 0) {
@@ -343,7 +336,7 @@ public class GadgetBuilding extends AbstractGadget implements IAtopPlacingGadget
             useItemSuccess = InventoryHelper.useItem(itemStack, player, neededItems, world);
         }
         if (useItemSuccess) {
-            world.addEntity(new BlockBuildEntity(world, pos, setBlock, BlockBuildEntity.Mode.PLACE, useConstructionPaste));
+            EffectBlock.spawnEffectBlock(world, pos, setBlock, EffectBlock.Mode.PLACE, useConstructionPaste);
             return true;
         }
         return false;
