@@ -4,6 +4,7 @@ import com.direwolf20.buildinggadgets.common.items.pastes.GenericPasteContainer;
 import com.google.gson.JsonObject;
 import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.IRecipeSerializer;
 import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.item.crafting.ShapedRecipe;
 import net.minecraft.util.NonNullList;
@@ -31,7 +32,13 @@ public class RecipeConstructionPaste extends ShapedRecipe {
         return output; // Return the modified output
     }
 
-    public static class Serializer extends ShapedRecipe.Serializer {
+    @Override
+    public IRecipeSerializer<?> getSerializer() {
+        return Serializer.INSTANCE;
+    }
+
+    public static final class Serializer extends ShapedRecipe.Serializer {
+        public static final Serializer INSTANCE = new Serializer();
         @Override
         public ShapedRecipe read(ResourceLocation recipeId, JsonObject json) {
             ShapedRecipe recipe = super.read(recipeId, json);

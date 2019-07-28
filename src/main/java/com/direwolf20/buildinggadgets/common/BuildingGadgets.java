@@ -6,7 +6,7 @@ import com.direwolf20.buildinggadgets.client.gui.GuiMod;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.config.crafting.CraftingConditionDestruction;
 import com.direwolf20.buildinggadgets.common.config.crafting.CraftingConditionPaste;
-import com.direwolf20.buildinggadgets.common.config.crafting.RecipeConstructionPaste;
+import com.direwolf20.buildinggadgets.common.config.crafting.RecipeConstructionPaste.Serializer;
 import com.direwolf20.buildinggadgets.common.events.AnvilRepairHandler;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.registry.objects.BuildingObjects;
@@ -97,7 +97,7 @@ public final class BuildingGadgets {
 
     private void onRecipeRegister(final RegistryEvent.Register<IRecipeSerializer<?>> e) {
         e.getRegistry().register(
-            new RecipeConstructionPaste.Serializer().setRegistryName(
+                Serializer.INSTANCE.setRegistryName(
                     new ResourceLocation(Reference.MODID, "construction_paste")
             )
         );

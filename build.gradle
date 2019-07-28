@@ -13,6 +13,7 @@ apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
 apply plugin: 'maven-publish'
+apply plugin: 'signing'
 apply plugin: 'net.minecraftforge.gradle'
 version = "$version"
 def env = System.getenv()
@@ -156,7 +157,6 @@ dependencies {
     apiTestImplementation sourceSets.api.output
     apiTestImplementation "org.junit.jupiter:junit-jupiter-api:${project.junit_version}"
     apiTestImplementation "org.junit.jupiter:junit-jupiter:${project.junit_version}"
-    apiTestImplementation "org.hamcrest:hamcrest:$project.hamcrest_version"
     apiTestRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${project.junit_version}"
     implementation sourceSets.api.output
     testImplementation sourceSets.apiTest.output
@@ -353,10 +353,14 @@ artifacts {
     archives sourcesJar
 }
 
+signing {
+    sign configurations.archives
+}
+
 publishing {
     publications {
         mavenApiJava(MavenPublication) {
-            groupId = project.group
+            groupId = 'com.direwolf20'
             artifactId = project.archivesBaseName+'-api'
             version = project.api_version
             artifact reobfApiJarLoc
@@ -387,10 +391,14 @@ publishing {
                         url = 'https://opensource.org/licenses/MIT'
                     }
                 }
+                issueManagement {
+                    system = 'github'
+                    url = 'https://github.com/Direwolf20-MC/BuildingGadgets/issues'
+                }
             }
         }
         mavenJava(MavenPublication) {
-            groupId = project.group
+            groupId = 'com.direwolf20'
             artifactId = project.archivesBaseName
             version = project.version
             artifact reobfJarLoc
@@ -421,22 +429,19 @@ publishing {
                         url = 'https://opensource.org/licenses/MIT'
                     }
                 }
+                issueManagement {
+                    system = 'github'
+                    url = 'https://github.com/Direwolf20-MC/BuildingGadgets/issues'
+                }
             }
         }
     }
     repositories {
-        maven {
-            mavenCentral()
-        }
-    }
-}
+        /*maven {
+            credentials {
 
-// Example configuration to allow publishing using the maven-publish task
-// we define a custom artifact that is sourced from the reobfJar output task
-// and then declare that to be published
-// Note you'll need to add a repository here
-def reobfFile = file("$buildDir/reobfJar/output.jar")
-def reobfArtifact = artifacts.add('default', reobfFile) {
-    type 'jar'
-    builtBy 'reobfJar'
+            }
+            mavenCentral()
+        }*/
+    }
 }
