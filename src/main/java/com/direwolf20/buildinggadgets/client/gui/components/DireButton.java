@@ -3,17 +3,12 @@ package com.direwolf20.buildinggadgets.client.gui.components;
 import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.widget.button.Button;
 
-import javax.annotation.Nullable;
+public class DireButton extends Button {
 
-public class DireButton extends GuiButtonHelpText {
-
-    public DireButton(int x, int y, int widthIn, int heightIn, String buttonText, @Nullable IPressable action) {
-        this(x, y, widthIn, heightIn, buttonText, "", action);
-    }
-
-    public DireButton(int x, int y, int widthIn, int heightIn, String buttonText, String helpTextKey, @Nullable IPressable action) {
-        super(x, y, widthIn, heightIn, buttonText, helpTextKey, action);
+    public DireButton(int x, int y, int widthIn, int heightIn, String buttonText, IPressable action) {
+        super(x, y, widthIn, heightIn, buttonText, action);
     }
 
     @Override
@@ -22,7 +17,7 @@ public class DireButton extends GuiButtonHelpText {
             FontRenderer fontrenderer = Minecraft.getInstance().fontRenderer;
             Minecraft.getInstance().getTextureManager().bindTexture(WIDGETS_LOCATION);
             GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-            this.isHovered = isHovered(mouseX, mouseY);
+            this.isHovered = isMouseOver(mouseX, mouseY);
             GlStateManager.enableBlend();
             GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
             GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);

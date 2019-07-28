@@ -55,7 +55,7 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
     @Deprecated
     public boolean isSolid(BlockState state) {
         boolean bright = state.get(ConstructionBlock.BRIGHT);
-        return !bright;
+        return ! bright;
         //return this.blocksMovement && this.getRenderLayer() == BlockRenderLayer.SOLID;
     }
 
@@ -122,7 +122,7 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
                 try {
                     return blockColors.getColor(mimicBlock, world, pos, tintIndex);
                 } catch (Exception var8) {
-                    return -1;
+                    return - 1;
                 }
             }
             return -1;
@@ -247,7 +247,7 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
 
     /**
      * Called periodically clientside on blocks near the player to show effects (like furnace fire particles). Note that
-     * this method is unrelated to {@link } and {@link #?}, and will always be called regardless
+     * this method is unrelated to ? and ?, and will always be called regardless
      * of whether the block can receive random update ticks
      */
     @Override
@@ -294,7 +294,7 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
     public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult rayTraceResult) {
         BlockState mimic = getActualMimicBlock(worldIn, pos);
         //System.out.println(mimic);
-        return !isMimicNull(mimic) ? super.onBlockActivated(state, worldIn, pos, player, hand, rayTraceResult) : super.onBlockActivated(state, worldIn, pos, player, hand, rayTraceResult);
+        return ! isMimicNull(mimic) ? super.onBlockActivated(state, worldIn, pos, player, hand, rayTraceResult) : super.onBlockActivated(state, worldIn, pos, player, hand, rayTraceResult);
     }
 
     /**

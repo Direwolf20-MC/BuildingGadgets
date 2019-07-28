@@ -12,14 +12,12 @@ import com.direwolf20.buildinggadgets.common.network.packets.PacketCopyCoords;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
 import com.direwolf20.buildinggadgets.common.util.lang.GuiTranslation;
 import com.direwolf20.buildinggadgets.common.util.lang.ITranslationProvider;
-import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.button.AbstractButton;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.StringTextComponent;
 
@@ -39,8 +37,6 @@ public class CopyGUI extends Screen {
     private BlockPos endPos;
 
     private List<GuiIncrementer> fields = new ArrayList<>();
-
-    private static final ResourceLocation background = new ResourceLocation(Reference.MODID, "textures/gui/testcontainer.png");
 
     public CopyGUI(ItemStack tool) {
         super(new StringTextComponent(""));
@@ -131,7 +127,6 @@ public class CopyGUI extends Screen {
 
     @Override
     public void render(int mouseX, int mouseY, float partialTicks) {
-        getMinecraft().getTextureManager().bindTexture(background);
         drawFieldLabel("Start X", 0 - 175, -36);
         drawFieldLabel("Y", -45, -36);
         drawFieldLabel("Z", 55, -36);

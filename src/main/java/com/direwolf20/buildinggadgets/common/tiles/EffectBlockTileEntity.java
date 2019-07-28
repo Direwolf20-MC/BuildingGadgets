@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.common.tiles;
 
-import com.direwolf20.buildinggadgets.api.Registries;
-import com.direwolf20.buildinggadgets.api.abstraction.BlockData;
+import com.direwolf20.buildinggadgets.api.building.BlockData;
+import com.direwolf20.buildinggadgets.api.building.tilesupport.TileSupport;
 import com.direwolf20.buildinggadgets.common.blocks.EffectBlock.Mode;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks.BGTileEntities;
 import net.minecraft.nbt.CompoundNBT;
@@ -37,7 +37,6 @@ public class EffectBlockTileEntity extends TileEntity implements ITickableTileEn
         this.ticks = 0;
         // Again we don't check if the data has been set or not because there is a chance that this tile object gets reused
 
-        BlockData currentBlock = Registries.TileEntityData.createBlockData(world, pos);
         TileEntity te = world.getTileEntity(pos);
         this.sourceBlock = replacementBlock;
 
@@ -45,7 +44,7 @@ public class EffectBlockTileEntity extends TileEntity implements ITickableTileEn
         this.usePaste = usePaste;
 
         if (mode == Mode.REPLACE)
-            this.renderedBlock = te instanceof ConstructionBlockTileEntity ? ((ConstructionBlockTileEntity) te).getConstructionBlockData() : currentBlock;
+            this.renderedBlock = te instanceof ConstructionBlockTileEntity ? ((ConstructionBlockTileEntity) te).getConstructionBlockData() : TileSupport.createBlockData(world, pos);
         else
             this.renderedBlock = te instanceof ConstructionBlockTileEntity ? ((ConstructionBlockTileEntity) te).getConstructionBlockData() : replacementBlock;
     }

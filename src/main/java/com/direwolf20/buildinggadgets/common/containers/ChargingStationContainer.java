@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.common.containers;
 
-import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
+import com.direwolf20.buildinggadgets.common.items.gadgets.AbstractGadget;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGContainers;
 import com.direwolf20.buildinggadgets.common.tiles.ChargingStationTileEntity;
 import com.direwolf20.buildinggadgets.common.util.exceptions.CapabilityNotPresentException;
@@ -23,12 +23,6 @@ import javax.annotation.Nonnull;
 
 public class ChargingStationContainer extends BaseContainer {
     private ChargingStationTileEntity te;
-
-    public ChargingStationContainer(int windowId, PlayerInventory playerInventory) {
-        super(BGContainers.CHARGING_STATION_CONTAINER, windowId);
-        //addOwnSlots();
-        //addPlayerSlots(playerInventory);
-    }
 
     public ChargingStationContainer(int windowId, PlayerInventory playerInventory, PacketBuffer extraData) {
         super(BGContainers.CHARGING_STATION_CONTAINER, windowId);
@@ -71,19 +65,19 @@ public class ChargingStationContainer extends BaseContainer {
             ItemStack stack = slot.getStack();
             itemstack = stack.copy();
             if (index < ChargingStationTileEntity.SIZE) {
-                if (!this.mergeItemStack(stack, ChargingStationTileEntity.SIZE, this.inventorySlots.size(), true)) {
+                if (! this.mergeItemStack(stack, ChargingStationTileEntity.SIZE, this.inventorySlots.size(), true)) {
                     return ItemStack.EMPTY;
                 }
                 slot.onSlotChange(stack, itemstack);
             } else {
-                int burnTime = net.minecraftforge.event.ForgeEventFactory.getItemBurnTime(stack, stack.getBurnTime() == -1 ? AbstractFurnaceTileEntity.getBurnTimes().getOrDefault(stack.getItem(), 0) : stack.getBurnTime());
+                int burnTime = net.minecraftforge.event.ForgeEventFactory.getItemBurnTime(stack, stack.getBurnTime() == - 1 ? AbstractFurnaceTileEntity.getBurnTimes().getOrDefault(stack.getItem(), 0) : stack.getBurnTime());
                 //System.out.println(burnTime);
-                if (stack.getItem() instanceof GadgetGeneric) {
-                    if (!this.mergeItemStack(stack, 1, 2, false)) {
+                if (stack.getItem() instanceof AbstractGadget) {
+                    if (! this.mergeItemStack(stack, 1, 2, false)) {
                         return ItemStack.EMPTY;
                     }
                 } else if (burnTime > 0) {
-                    if (!this.mergeItemStack(stack, 0, 1, false)) {
+                    if (! this.mergeItemStack(stack, 0, 1, false)) {
                         return ItemStack.EMPTY;
                     }
                 }

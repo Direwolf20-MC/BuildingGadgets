@@ -18,11 +18,9 @@ import net.minecraftforge.registries.ObjectHolder;
 @ObjectHolder(Reference.MODID)
 @EventBusSubscriber(modid = Reference.MODID, bus = Bus.MOD)
 public final class BGEntities {
-
     private static final EntityRegistryContainer container = new EntityRegistryContainer();
 
-    private BGEntities() {
-    }
+    private BGEntities() {}
 
     @ObjectHolder(EntityReference.CONSTRUCTION_BLOCK_ENTITY)
     public final static EntityType<ConstructionBlockEntity> CONSTRUCTION_BLOCK = null;
@@ -36,7 +34,7 @@ public final class BGEntities {
                         .setCustomClientFactory(((spawnEntity, world) -> {
                             return CONSTRUCTION_BLOCK.create(world);
                         })))
-                .renderer(ConstructionBlockEntity.class, ConstructionBlockEntityRender::new)
+                .renderer(ConstructionBlockEntity.class, () -> () -> ConstructionBlockEntityRender::new)
                 .factory(b -> b.build("")));
     }
 

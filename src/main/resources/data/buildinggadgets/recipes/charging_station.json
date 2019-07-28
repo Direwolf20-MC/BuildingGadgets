@@ -1,0 +1,25 @@
+{
+  "result": {
+    "item": "buildinggadgets:charging_station"
+  },
+  "pattern": [
+    "iri",
+    "ere",
+    "ili"
+  ],
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "i": {
+      "tag": "forge:ingots/gold"
+    },
+    "r": {
+      "tag": "forge:dusts/redstone"
+    },
+    "l": {
+      "tag": "forge:gems/lapis"
+    },
+    "e": {
+      "tag": "forge:gems/diamond"
+    }
+  }
+}

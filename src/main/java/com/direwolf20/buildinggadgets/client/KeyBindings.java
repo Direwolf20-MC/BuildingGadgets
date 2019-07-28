@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.client;
 
-import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
+import com.direwolf20.buildinggadgets.common.items.gadgets.AbstractGadget;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
@@ -48,7 +48,7 @@ public class KeyBindings {
         @Override
         public boolean isActive() {
             return !KeyConflictContext.GUI.isActive() && Minecraft.getInstance().player != null
-                    && !GadgetGeneric.getGadget(Minecraft.getInstance().player).isEmpty();
+                    && !AbstractGadget.getGadget(Minecraft.getInstance().player).isEmpty();
         }
 
         @Override

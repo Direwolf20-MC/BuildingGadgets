@@ -1,11 +1,9 @@
 package com.direwolf20.buildinggadgets.common.util.helpers;
 
-import com.direwolf20.buildinggadgets.api.Registries;
-import com.direwolf20.buildinggadgets.api.abstraction.BlockData;
-import com.direwolf20.buildinggadgets.api.inventory.IStackProvider;
-import com.direwolf20.buildinggadgets.api.registry.IOrderedRegistry;
+import com.direwolf20.buildinggadgets.api.building.BlockData;
+import com.direwolf20.buildinggadgets.api.building.tilesupport.TileSupport;
+import com.direwolf20.buildinggadgets.common.items.gadgets.AbstractGadget;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
-import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
 import com.direwolf20.buildinggadgets.common.items.pastes.ConstructionPaste;
 import com.direwolf20.buildinggadgets.common.items.pastes.GenericPasteContainer;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
@@ -42,7 +40,7 @@ public class InventoryHelper {
             ImmutableSet.of(SlabBlock.TYPE, StairsBlock.HALF, LogBlock.AXIS, AXIS, DirectionalBlock.FACING, StairsBlock.FACING, TrapDoorBlock.HALF, TrapDoorBlock.OPEN, StairsBlock.SHAPE, LeverBlock.POWERED, RepeaterBlock.DELAY, PaneBlock.EAST, PaneBlock.WEST, PaneBlock.NORTH, PaneBlock.SOUTH);
 
     private static final Set<IProperty> SAFE_PROPERTIES_COPY_PASTE =
-            ImmutableSet.<IProperty>builder().addAll(SAFE_PROPERTIES).addAll(ImmutableSet.of(RailBlock.SHAPE, PoweredRailBlock.SHAPE)).build();
+            ImmutableSet.<IProperty>builder().addAll(SAFE_PROPERTIES).addAll(ImmutableSet.of(RailBlock.SHAPE, PoweredRailBlock.SHAPE, ChestBlock.TYPE)).build();
 
     public static boolean giveItem(ItemStack itemStack, PlayerEntity player, IWorld world) {
         if (player.isCreative()) {
@@ -68,7 +66,7 @@ public class InventoryHelper {
         }
 
         //Try to insert into the remote inventory.
-        ItemStack tool = GadgetGeneric.getGadget(player);
+        ItemStack tool = AbstractGadget.getGadget(player);
         IItemHandler remoteInventory = GadgetUtils.getRemoteInventory(tool,world.getWorld());
         if (remoteInventory != null) {
             for (int i = 0; i < remoteInventory.getSlots(); i++) {
@@ -110,7 +108,7 @@ public class InventoryHelper {
             return true;
         }
 
-        ItemStack tool = GadgetGeneric.getGadget(player);
+        ItemStack tool = AbstractGadget.getGadget(player);
         IItemHandler remoteInventory = GadgetUtils.getRemoteInventory(tool, world);
         if (remoteInventory != null) {
             for (int i = 0; i < remoteInventory.getSlots(); i++) {
@@ -166,7 +164,7 @@ public class InventoryHelper {
         if (player.isCreative())
             return Integer.MAX_VALUE;
 
-        long count = remoteInventory.countItem(GadgetGeneric.getGadget(player), itemStack);
+        long count = remoteInventory.countItem(AbstractGadget.getGadget(player), itemStack);
         PlayerInventory inv = player.inventory;
         List<Integer> slots = findItem(itemStack.getItem(), inv);
         List<IItemHandler> invContainers = findInvContainers(inv);
@@ -343,8 +341,8 @@ public class InventoryHelper {
 
     public static BlockData getSpecificStates(BlockState originalState, World world, PlayerEntity player, BlockPos pos, ItemStack tool) {
         BlockState placeState;
-        Block block = originalState.getBlock();
-        ItemStack item = block.getPickBlock(originalState, null, world, pos, player);
+        //Block block = originalState.getBlock();
+        //ItemStack item = block.getPickBlock(originalState, null, world, pos, player);
 
         try {
             placeState = originalState.getBlock().getStateForPlacement(
@@ -366,27 +364,9 @@ public class InventoryHelper {
                 }
             }
 
-            return new BlockData(placeState, Registries.TileEntityData.createTileData(world, pos));
+            return new BlockData(placeState, TileSupport.createTileData(world, pos));
         }
         return null;
-    }
-
-    public static NonNullList<ItemStack> getInventory(PlayerEntity player) {
-        IOrderedRegistry<IStackProvider> providers = Registries.getStackProviders();
-        NonNullList<ItemStack> toProcess = playerInv(player);
-        NonNullList<ItemStack> newStacks = NonNullList.create();
-        NonNullList<ItemStack> results = NonNullList.create();
-        while (! toProcess.isEmpty()) {
-            for (ItemStack stack : toProcess) {
-                for (IStackProvider provider : providers) {
-                    newStacks.addAll(provider.getStacksFromStack(stack));
-                }
-            }
-            results.addAll(toProcess);
-            toProcess = newStacks;
-            newStacks = NonNullList.create();
-        }
-        return results;
     }
 
     private static NonNullList<ItemStack> playerInv(PlayerEntity player) {

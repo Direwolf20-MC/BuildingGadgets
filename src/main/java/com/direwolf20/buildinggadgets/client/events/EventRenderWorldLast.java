@@ -1,8 +1,7 @@
 package com.direwolf20.buildinggadgets.client.events;
 
-import com.direwolf20.buildinggadgets.common.items.gadgets.*;
+import com.direwolf20.buildinggadgets.common.items.gadgets.AbstractGadget;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
-import com.direwolf20.buildinggadgets.common.util.tools.ToolRenders;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -16,22 +15,13 @@ public class EventRenderWorldLast {
 
     @SubscribeEvent
     static void renderWorldLastEvent(RenderWorldLastEvent evt) {
-        Minecraft mc = Minecraft.getInstance();
-        PlayerEntity player = mc.player;
-        ItemStack heldItem = GadgetGeneric.getGadget(player);
-        if (heldItem.isEmpty()) {
+        PlayerEntity player = Minecraft.getInstance().player;
+        ItemStack heldItem = AbstractGadget.getGadget(player);
+
+        if (heldItem.isEmpty())
             return;
-        }
 
-        if (heldItem.getItem() instanceof GadgetBuilding) {
-            ToolRenders.renderBuilderOverlay(evt, player, heldItem);
-        } else if (heldItem.getItem() instanceof GadgetExchanger) {
-            ToolRenders.renderExchangerOverlay(evt, player, heldItem);
-        } else if (heldItem.getItem() instanceof GadgetCopyPaste) {
-            ToolRenders.renderPasteOverlay(evt, player, heldItem);
-        } else if (heldItem.getItem() instanceof GadgetDestruction) {
-            ToolRenders.renderDestructionOverlay(evt, player, heldItem);
-        }
-
+        ((AbstractGadget) heldItem.getItem()).getRender().render(evt, player, heldItem);
     }
+
 }

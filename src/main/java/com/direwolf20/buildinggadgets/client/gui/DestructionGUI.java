@@ -48,7 +48,7 @@ public class DestructionGUI extends Screen {
         this.addButton(new Button((x - 30) + 32, y + 60, 60, 20, I18n.format(GuiMod.getLangKeySingle("confirm")), b -> {
             if (isWithinBounds()) {
                 PacketHandler.sendToServer(new PacketDestructionGUI(left.getValueInt(), right.getValueInt(), up.getValueInt(), down.getValueInt(), depth.getValueInt()));
-                this.removed();
+                this.onClose();
             }
             else
                 Minecraft.getInstance().player.sendStatusMessage(new StringTextComponent(TextFormatting.RED + new TranslationTextComponent("message.gadget.destroysizeerror").getUnformattedComponentText()), true);

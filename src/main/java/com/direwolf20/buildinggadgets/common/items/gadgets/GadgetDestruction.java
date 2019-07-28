@@ -1,13 +1,14 @@
 package com.direwolf20.buildinggadgets.common.items.gadgets;
 
-import com.direwolf20.buildinggadgets.api.Registries;
-import com.direwolf20.buildinggadgets.api.abstraction.BlockData;
-import com.direwolf20.buildinggadgets.api.building.IPositionPlacementSequence;
+import com.direwolf20.buildinggadgets.api.building.BlockData;
 import com.direwolf20.buildinggadgets.api.building.Region;
-import com.direwolf20.buildinggadgets.api.template.building.tilesupport.DummyTileEntityData;
+import com.direwolf20.buildinggadgets.api.building.placement.IPositionPlacementSequence;
+import com.direwolf20.buildinggadgets.api.building.tilesupport.TileSupport;
 import com.direwolf20.buildinggadgets.client.gui.GuiMod;
 import com.direwolf20.buildinggadgets.common.blocks.EffectBlock;
 import com.direwolf20.buildinggadgets.common.config.Config;
+import com.direwolf20.buildinggadgets.common.items.gadgets.renderers.BaseRenderer;
+import com.direwolf20.buildinggadgets.common.items.gadgets.renderers.DestructionRender;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
 import com.direwolf20.buildinggadgets.common.tiles.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
@@ -50,7 +51,9 @@ import javax.annotation.Nullable;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class GadgetDestruction extends GadgetGeneric {
+public class GadgetDestruction extends AbstractGadget {
+    private static final DestructionRender render = new DestructionRender();
+
     public GadgetDestruction(Properties builder) {
         super(builder);
     }
@@ -63,6 +66,11 @@ public class GadgetDestruction extends GadgetGeneric {
     @Override
     public int getEnergyCost(ItemStack tool) {
         return Config.GADGETS.GADGET_DESTRUCTION.energyCost.get() * getCostMultiplier(tool);
+    }
+
+    @Override
+    public BaseRenderer getRender() {
+        return render;
     }
 
 
@@ -159,8 +167,7 @@ public class GadgetDestruction extends GadgetGeneric {
     public ActionResult<ItemStack> onItemRightClick(World world, PlayerEntity player, Hand hand) {
         ItemStack stack = player.getHeldItem(hand);
         player.setActiveHand(hand);
-        //IEnergyStorage energy = CapabilityUtil.EnergyUtil.getCap(stack).orElseThrow(CapabilityNotPresentException::new);
-        //energy.receiveEnergy(100000, false);
+
         if (!world.isRemote) {
             if (! player.isSneaking()) {
                 BlockPos anchorPos = getAnchor(stack);
@@ -175,7 +182,6 @@ public class GadgetDestruction extends GadgetGeneric {
                 if (lookingAt != null && (world.getBlockState(VectorHelper.getLookingAt(player, stack).getPos()) != Blocks.AIR.getDefaultState())) {
                     clearArea(world, lookingAt.getPos(), lookingAt.getFace(), (ServerPlayerEntity) player, stack);
                     clearSuccess(stack);
-                    player.sendStatusMessage(new StringTextComponent(TextFormatting.AQUA + new StringTextComponent("message.gadget.anchorremove").getUnformattedComponentText()), true);
                     return new ActionResult<>(ActionResultType.SUCCESS, stack);
                 }
 
@@ -196,7 +202,7 @@ public class GadgetDestruction extends GadgetGeneric {
         BlockPos currentAnchor = getAnchor(stack);
         if (currentAnchor == null) {
             BlockRayTraceResult lookingAt = VectorHelper.getLookingAt(player, stack);
-            if (lookingAt == null || (player.world.getBlockState(VectorHelper.getLookingAt(player, stack).getPos()) != Blocks.AIR.getDefaultState())) {
+            if (lookingAt == null || (player.world.getBlockState(VectorHelper.getLookingAt(player, stack).getPos()) == Blocks.AIR.getDefaultState())) {
                 return;
             }
             currentAnchor = lookingAt.getPos();
@@ -213,9 +219,9 @@ public class GadgetDestruction extends GadgetGeneric {
     public static IPositionPlacementSequence getClearingPositions(World world, BlockPos pos, Direction incomingSide, PlayerEntity player, ItemStack stack) {
         Region boundary = getClearingRegion(pos, incomingSide, player, stack);
         BlockPos startPos = (getAnchor(stack) == null) ? pos : getAnchor(stack);
-        BlockState stateTarget = !Config.GADGETS.GADGET_DESTRUCTION.nonFuzzyEnabled.get() || GadgetGeneric.getFuzzy(stack) ? null : world.getBlockState(pos);
+        BlockState stateTarget = !Config.GADGETS.GADGET_DESTRUCTION.nonFuzzyEnabled.get() || AbstractGadget.getFuzzy(stack) ? null : world.getBlockState(pos);
 
-        if (GadgetGeneric.getConnectedArea(stack)) {
+        if (AbstractGadget.getConnectedArea(stack)) {
             Set<BlockPos> voidPositions = new HashSet<>();
             int depth = getToolValue(stack, NBTKeys.GADGET_VALUE_DEPTH);
             if (depth == 0)
@@ -338,7 +344,7 @@ public class GadgetDestruction extends GadgetGeneric {
                 .collect(Collectors.toSet());
         int index = 0;
         for (BlockPos pos : snapshot.getPositions()) {
-            snapshot.getBlockStates().get(index).ifPresent(state -> EffectBlock.spawnEffectBlock(world, pos, new BlockData(state, DummyTileEntityData.INSTANCE), EffectBlock.Mode.PLACE, pastePositions.contains(pos)));
+            snapshot.getBlockStates().get(index).ifPresent(state -> EffectBlock.spawnEffectBlock(world, pos, new BlockData(state, TileSupport.dummyTileEntityData()), EffectBlock.Mode.PLACE, pastePositions.contains(pos)));
             index++;
         }
     }
@@ -355,12 +361,12 @@ public class GadgetDestruction extends GadgetGeneric {
             return false;
 
         this.applyDamage(tool, player);
-        EffectBlock.spawnEffectBlock(world, voidPos, Registries.TileEntityData.createBlockData(world, voidPos), EffectBlock.Mode.REMOVE, false);
+        EffectBlock.spawnEffectBlock(world, voidPos, TileSupport.createBlockData(world, voidPos), EffectBlock.Mode.REMOVE, false);
         return true;
     }
 
     public static ItemStack getGadget(PlayerEntity player) {
-        ItemStack stack = GadgetGeneric.getGadget(player);
+        ItemStack stack = AbstractGadget.getGadget(player);
         if (!(stack.getItem() instanceof GadgetDestruction))
             return ItemStack.EMPTY;
 

@@ -1,13 +1,14 @@
 package com.direwolf20.buildinggadgets.api.template.transaction;
 
-import com.direwolf20.buildinggadgets.api.abstraction.BlockData;
+import com.direwolf20.buildinggadgets.api.building.BlockData;
+import com.direwolf20.buildinggadgets.api.building.view.IBuildView;
 import com.direwolf20.buildinggadgets.api.exceptions.TransactionExecutionException;
+import com.direwolf20.buildinggadgets.api.serialisation.TemplateHeader;
 import com.direwolf20.buildinggadgets.api.template.ITemplate;
-import com.direwolf20.buildinggadgets.api.template.serialisation.TemplateHeader;
 import net.minecraft.util.math.BlockPos;
 
 /**
- * This class represents a transaction used for modifying {@link ITemplate} in more advanced ways than just translating the {@link com.direwolf20.buildinggadgets.api.template.building.ITemplateView}
+ * This class represents a transaction used for modifying {@link ITemplate} in more advanced ways than just translating the {@link IBuildView}
  * to some other location. It has therefore the following responsibilities:
  * <ul>
  * <li>Provide a possibility for registering {@link ITransactionOperator} which specify the actual work to be performed by this Transaction.

@@ -1,9 +1,9 @@
 package com.direwolf20.buildinggadgets.common.util.tools.modes;
 
-import com.direwolf20.buildinggadgets.api.building.IPositionPlacementSequence;
-import com.direwolf20.buildinggadgets.api.building.IValidatorFactory;
 import com.direwolf20.buildinggadgets.api.building.modes.AtopSupportedMode;
-import com.direwolf20.buildinggadgets.api.building.placement.Column;
+import com.direwolf20.buildinggadgets.api.building.placement.IPositionPlacementSequence;
+import com.direwolf20.buildinggadgets.api.building.placement.PlacementSequences.Column;
+import com.direwolf20.buildinggadgets.api.building.view.IValidatorFactory;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.lang.ModeTranslation;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;

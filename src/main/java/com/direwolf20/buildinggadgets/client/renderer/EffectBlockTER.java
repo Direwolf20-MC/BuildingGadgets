@@ -1,6 +1,5 @@
 package com.direwolf20.buildinggadgets.client.renderer;
 
-import com.direwolf20.buildinggadgets.api.abstraction.BlockData;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.blocks.EffectBlock;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
@@ -16,17 +15,12 @@ import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import org.lwjgl.opengl.GL11;
 
-import java.util.Objects;
-
 public class EffectBlockTER extends TileEntityRenderer<EffectBlockTileEntity> {
 
-    public EffectBlockTER() {
-    }
+    public EffectBlockTER() {}
 
     @Override
     public void render(EffectBlockTileEntity tile, double x, double y, double z, float partialTicks, int destroyStage) {
-        // super.render(tile, x, y, z, partialTicks, destroyStage);
-
         BlockRendererDispatcher blockrendererdispatcher = Minecraft.getInstance().getBlockRendererDispatcher();
         Minecraft mc = Minecraft.getInstance();
         GlStateManager.pushMatrix();
@@ -47,9 +41,6 @@ public class EffectBlockTER extends TileEntityRenderer<EffectBlockTileEntity> {
         GlStateManager.rotatef(-90.0F, 0.0F, 1.0F, 0.0F);
         GlStateManager.scalef(scale, scale, scale);
 
-
-        //BlockState renderBlockState = blocks.COBBLESTONE.getDefaultState();
-
         BlockState renderBlockState = tile.getRenderedBlock().getState();
         if (tile.isUsingPaste() && toolMode == EffectBlock.Mode.PLACE)
             renderBlockState = BGBlocks.constructionBlockDense.getDefaultState();
@@ -68,7 +59,6 @@ public class EffectBlockTER extends TileEntityRenderer<EffectBlockTileEntity> {
             }
         }
         GlStateManager.popMatrix();
-
 
         GlStateManager.pushMatrix();
         GlStateManager.pushLightingAttributes();

@@ -7,12 +7,14 @@ import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 
+import javax.annotation.Nullable;
 import java.util.Objects;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 public final class TileEntityBuilder<T extends TileEntity> extends RegistryObjectBuilder<TileEntityType<?>, TileEntityTypeBuilder<T>> {
     private Class<T> tileClass;
-    private TileEntityRenderer<? super T> renderer;
+    private Supplier<Supplier<TileEntityRenderer<? super T>>> renderer;
 
     public TileEntityBuilder(String registryName) {
         super(registryName);
@@ -32,7 +34,7 @@ public final class TileEntityBuilder<T extends TileEntity> extends RegistryObjec
         return (TileEntityBuilder<T>) super.builder(builder);
     }
 
-    public TileEntityBuilder<T> renderer(Class<T> clazz, TileEntityRenderer<? super T> renderer) {
+    public TileEntityBuilder<T> renderer(Class<T> clazz, Supplier<Supplier<TileEntityRenderer<? super T>>> renderer) {
         this.tileClass = Objects.requireNonNull(clazz);
         this.renderer = Objects.requireNonNull(renderer);
         return this;
@@ -52,8 +54,9 @@ public final class TileEntityBuilder<T extends TileEntity> extends RegistryObjec
         return tileClass;
     }
 
+    @Nullable
     private TileEntityRenderer<? super T> getRenderer() {
-        return renderer;
+        return renderer != null ? renderer.get().get() : null;
     }
 
     boolean hasRenderer() {

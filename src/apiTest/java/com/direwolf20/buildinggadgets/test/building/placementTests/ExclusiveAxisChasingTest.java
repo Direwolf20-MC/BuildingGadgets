@@ -1,7 +1,8 @@
 package com.direwolf20.buildinggadgets.test.building.placementTests;
 
 import com.direwolf20.buildinggadgets.api.building.Region;
-import com.direwolf20.buildinggadgets.api.building.placement.ExclusiveAxisChasing;
+import com.direwolf20.buildinggadgets.api.building.placement.IPositionPlacementSequence;
+import com.direwolf20.buildinggadgets.api.building.placement.PlacementSequences.Column;
 import com.direwolf20.buildinggadgets.test.util.BlockTestUtils;
 import com.direwolf20.buildinggadgets.test.util.annotations.LargeTest;
 import net.minecraft.util.Direction;
@@ -23,7 +24,7 @@ public class ExclusiveAxisChasingTest {
         random = new Random();
     }
 
-    private void verify(ExclusiveAxisChasing axisChasing, BlockPos source, BlockPos end, Direction dir, int max) {
+    private void verify(IPositionPlacementSequence axisChasing, BlockPos source, BlockPos end, Direction dir, int max) {
         List<BlockPos> positions = axisChasing.collect();
         assertEquals(positions.size(), max, () -> "Expected exactly " + max + " positions to be present, but found " + positions.size());
         for (int i = 0; i < max; i++) {
@@ -39,7 +40,7 @@ public class ExclusiveAxisChasingTest {
         BlockPos p2 = BlockTestUtils.randomBlockPosIn(testRegion);
         int max = random.nextInt(15);
         for (Direction facing : Direction.values()) {
-            ExclusiveAxisChasing seq = ExclusiveAxisChasing.create(p1, p2, facing, max);
+            IPositionPlacementSequence seq = Column.createAxisChasing(p1, p2, facing, max);
             verify(seq, p1, p2, facing, max);
         }
     }

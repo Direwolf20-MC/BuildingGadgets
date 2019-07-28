@@ -3,7 +3,7 @@ package com.direwolf20.buildinggadgets.common.network.packets;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetBuilding;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetExchanger;
-import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
+import com.direwolf20.buildinggadgets.common.items.gadgets.AbstractGadget;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
@@ -33,7 +33,7 @@ public class PacketToggleMode {
                 ServerPlayerEntity playerEntity = ctx.get().getSender();
                 if( playerEntity == null ) return;
 
-                ItemStack heldItem = GadgetGeneric.getGadget(playerEntity);
+                ItemStack heldItem = AbstractGadget.getGadget(playerEntity);
                 if (heldItem.isEmpty())
                     return;
 

@@ -3,7 +3,7 @@ package com.direwolf20.buildinggadgets.common.world;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
-import net.minecraft.world.ServerWorld;
+import net.minecraft.world.server.ServerWorld;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.storage.DimensionSavedDataManager;

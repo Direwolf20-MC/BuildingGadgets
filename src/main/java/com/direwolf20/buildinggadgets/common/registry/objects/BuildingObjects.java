@@ -42,6 +42,10 @@ public class BuildingObjects {
         DistExecutor.runWhenOn(Dist.CLIENT, () -> BuildingObjects::clientInit);
     }
 
+    public static void clientSetup() {
+        BGContainers.clientSetup();
+    }
+
     public static void cleanup() {
         BGBlocks.cleanup();
         BGItems.cleanup();

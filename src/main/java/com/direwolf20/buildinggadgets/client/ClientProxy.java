@@ -1,21 +1,16 @@
 package com.direwolf20.buildinggadgets.client;
 
-import afu.org.checkerframework.checker.nullness.qual.Nullable;
 import com.direwolf20.buildinggadgets.client.events.EventClientTick;
 import com.direwolf20.buildinggadgets.client.events.EventTooltip;
-import com.direwolf20.buildinggadgets.client.gui.blocks.ChargingStationGUI;
-import com.direwolf20.buildinggadgets.client.gui.blocks.TemplateManagerGUI;
-import com.direwolf20.buildinggadgets.common.containers.ChargingStationContainer;
-import com.direwolf20.buildinggadgets.common.containers.TemplateManagerContainer;
+import com.direwolf20.buildinggadgets.client.models.ConstructionBakedModel;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
-import com.direwolf20.buildinggadgets.common.registry.objects.BGContainers;
+import com.direwolf20.buildinggadgets.common.registry.objects.BuildingObjects;
 import com.direwolf20.buildinggadgets.common.tiles.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.SimpleSound;
-import net.minecraft.client.gui.ScreenManager;
 import net.minecraft.client.renderer.model.BakedQuad;
 import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.model.ItemOverrideList;
@@ -39,9 +34,9 @@ import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DeferredWorkQueue;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
@@ -52,11 +47,10 @@ public class ClientProxy {
     public static void clientSetup(final IEventBus eventBus) {
         DeferredWorkQueue.runLater(KeyBindings::init);
         //eventBus.addListener(ClientProxy::renderWorldLastEvent);
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(ClientProxy::bakeModels);
+        eventBus.addListener(ClientProxy::bakeModels);
         MinecraftForge.EVENT_BUS.addListener(EventClientTick::onClientTick);
         MinecraftForge.EVENT_BUS.addListener(EventTooltip::onDrawTooltip);
-        ScreenManager.registerFactory(BGContainers.TEMPLATE_MANAGER_CONTAINER, (ScreenManager.IScreenFactory<TemplateManagerContainer, TemplateManagerGUI>) TemplateManagerGUI::new);
-        ScreenManager.registerFactory(BGContainers.CHARGING_STATION_CONTAINER, (ScreenManager.IScreenFactory<ChargingStationContainer, ChargingStationGUI>) ChargingStationGUI::new);
+        BuildingObjects.clientSetup();
     }
 
     private static void bakeModels(ModelBakeEvent event) {
@@ -69,8 +63,10 @@ public class ClientProxy {
         ModelResourceLocation ConstrLocation3a = new ModelResourceLocation(ConstrName, "ambient_occlusion=true,bright=false,neighbor_brightness=true");
         ModelResourceLocation ConstrLocation4 = new ModelResourceLocation(ConstrName, "ambient_occlusion=false,bright=true,neighbor_brightness=true");
         ModelResourceLocation ConstrLocation4a = new ModelResourceLocation(ConstrName, "ambient_occlusion=true,bright=true,neighbor_brightness=true");
+        IDynamicBakedModel constructionBakedModel = new ConstructionBakedModel();
         IDynamicBakedModel bakedModelLoader = new IDynamicBakedModel() {
             BlockState facadeState;
+
             @Override
             public boolean isGui3d() {
                 return false;
@@ -93,7 +89,7 @@ public class ClientProxy {
                 BlockRenderLayer layer = MinecraftForgeClient.getRenderLayer();
                 if (facadeState == null || facadeState == Blocks.AIR.getDefaultState())
                     facadeState = BGBlocks.constructionBlockDense.getDefaultState();
-                if (layer != null && !facadeState.getBlock().canRenderInLayer(facadeState, layer)) { // always render in the null layer or the block-breaking textures don't show up
+                if (layer != null && ! facadeState.getBlock().canRenderInLayer(facadeState, layer)) { // always render in the null layer or the block-breaking textures don't show up
                     return Collections.emptyList();
                 }
                 model = Minecraft.getInstance().getBlockRendererDispatcher().getBlockModelShapes().getModel(facadeState);
@@ -143,7 +139,7 @@ public class ClientProxy {
                 BlockRenderLayer layer = MinecraftForgeClient.getRenderLayer();
                 if (facadeState == null || facadeState == Blocks.AIR.getDefaultState())
                     facadeState = BGBlocks.constructionBlockDense.getDefaultState();
-                if (layer != null && !facadeState.getBlock().canRenderInLayer(facadeState, layer)) { // always render in the null layer or the block-breaking textures don't show up
+                if (layer != null && ! facadeState.getBlock().canRenderInLayer(facadeState, layer)) { // always render in the null layer or the block-breaking textures don't show up
                     return Collections.emptyList();
                 }
                 model = Minecraft.getInstance().getBlockRendererDispatcher().getBlockModelShapes().getModel(facadeState);

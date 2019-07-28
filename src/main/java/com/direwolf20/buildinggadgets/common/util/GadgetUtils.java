@@ -1,10 +1,11 @@
 package com.direwolf20.buildinggadgets.common.util;
 
-import com.direwolf20.buildinggadgets.api.abstraction.BlockData;
+import com.direwolf20.buildinggadgets.api.building.BlockData;
 import com.direwolf20.buildinggadgets.common.config.Config;
+import com.direwolf20.buildinggadgets.common.items.InventoryWrapper;
+import com.direwolf20.buildinggadgets.common.items.gadgets.AbstractGadget;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetBuilding;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetExchanger;
-import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketRotateMirror;
 import com.direwolf20.buildinggadgets.common.tiles.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.util.exceptions.CapabilityNotPresentException;
@@ -44,6 +45,7 @@ import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.IItemHandlerModifiable;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -274,17 +276,27 @@ public class GadgetUtils {
         return res;
     }
 
+    public static void bindToolToTE(ItemStack stack, PlayerEntity player) {
+        World world = player.world;
+        BlockRayTraceResult lookingAt = VectorHelper.getLookingAt(player, AbstractGadget.shouldRayTraceFluid(stack) ? RayTraceContext.FluidMode.ANY : RayTraceContext.FluidMode.NONE);
+        if (lookingAt == null || (world.getBlockState(VectorHelper.getLookingAt(player, stack).getPos()) == Blocks.AIR.getDefaultState()))
+            return;
+        ActionResultType result = setRemoteInventory(stack, player, world, lookingAt.getPos(), true);
+    }
+
     public static void selectBlock(ItemStack stack, PlayerEntity player) {
         // Used to find which block the player is looking at, and store it in NBT on the tool.
         World world = player.world;
-        BlockRayTraceResult lookingAt = VectorHelper.getLookingAt(player, GadgetGeneric.shouldRayTraceFluid(stack) ? RayTraceContext.FluidMode.ANY : RayTraceContext.FluidMode.NONE);
+        BlockRayTraceResult lookingAt = VectorHelper.getLookingAt(player, AbstractGadget.shouldRayTraceFluid(stack) ? RayTraceContext.FluidMode.ANY : RayTraceContext.FluidMode.NONE);
         if (lookingAt == null || (world.getBlockState(VectorHelper.getLookingAt(player, stack).getPos()) == Blocks.AIR.getDefaultState())) return;
-        ActionResultType result = setRemoteInventory(stack, player, world, lookingAt.getPos(), true);
+
+
+        /*ActionResultType result = setRemoteInventory(stack, player, world, lookingAt.getPos(), true);
         if (result == ActionResultType.SUCCESS)
             return;
-
+*/
         BlockState state = world.getBlockState(lookingAt.getPos());
-        if (result == ActionResultType.FAIL || !Config.BLACKLIST.isAllowedBlock(state.getBlock())) {
+        if (!Config.BLACKLIST.isAllowedBlock(state.getBlock())) {
             player.sendStatusMessage(new StringTextComponent(TextFormatting.RED + new TranslationTextComponent("message.gadget.invalidblock").getUnformattedComponentText()), true);
             return;
         }
@@ -596,5 +608,19 @@ public class GadgetUtils {
     public static int getItemBurnTime(ItemStack stack) {
         return net.minecraftforge.event.ForgeEventFactory.getItemBurnTime(stack,
                 stack.getBurnTime() == - 1 ? AbstractFurnaceTileEntity.getBurnTimes().getOrDefault(stack.getItem(), 0) : stack.getBurnTime());
+    }
+
+    /**
+     * Drops the IItemHandlerModifiable Inventory of the TileEntity at the specified position.
+     */
+    public static void dropTileEntityInventory(World world, BlockPos pos) {
+        TileEntity tileEntity = world.getTileEntity(pos);
+        if (tileEntity != null) {
+            LazyOptional<IItemHandler> cap = tileEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY);
+            cap.ifPresent(handler -> {
+                if (handler instanceof IItemHandlerModifiable)
+                    net.minecraft.inventory.InventoryHelper.dropInventoryItems(world, pos, new InventoryWrapper((IItemHandlerModifiable) handler));
+            });
+        }
     }
 }

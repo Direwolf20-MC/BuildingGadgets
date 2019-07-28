@@ -1,13 +1,13 @@
 package com.direwolf20.buildinggadgets.common.util.tools.modes;
 
-import com.direwolf20.buildinggadgets.api.building.IPositionPlacementSequence;
-import com.direwolf20.buildinggadgets.api.building.IValidatorFactory;
 import com.direwolf20.buildinggadgets.api.building.Region;
 import com.direwolf20.buildinggadgets.api.building.modes.AbstractMode;
-import com.direwolf20.buildinggadgets.api.building.placement.ConnectedSurface;
-import com.direwolf20.buildinggadgets.api.building.placement.Surface;
-import com.direwolf20.buildinggadgets.api.building.placement.Wall;
-import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
+import com.direwolf20.buildinggadgets.api.building.placement.IPositionPlacementSequence;
+import com.direwolf20.buildinggadgets.api.building.placement.PlacementSequences.ConnectedSurface;
+import com.direwolf20.buildinggadgets.api.building.placement.PlacementSequences.Surface;
+import com.direwolf20.buildinggadgets.api.building.placement.PlacementSequences.Wall;
+import com.direwolf20.buildinggadgets.api.building.view.IValidatorFactory;
+import com.direwolf20.buildinggadgets.common.items.gadgets.AbstractGadget;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.lang.ModeTranslation;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
@@ -37,10 +37,10 @@ public class ExchangingSurfaceMode extends AbstractMode {
 
     @Override
     public IPositionPlacementSequence computeCoordinates(PlayerEntity player, BlockPos hit, Direction sideHit, ItemStack tool) {
-        int range = GadgetUtils.getToolRange(tool);
-        boolean fuzzy = GadgetGeneric.getFuzzy(tool);
+        int range = GadgetUtils.getToolRange(tool) / 2;
+        boolean fuzzy = AbstractGadget.getFuzzy(tool);
         Region region = Wall.clickedSide(hit, sideHit, range).getBoundingBox();
-        if (GadgetGeneric.getConnectedArea(tool))
+        if (AbstractGadget.getConnectedArea(tool))
             return ConnectedSurface.create(player.getEntityWorld(), region, pos -> pos, hit, sideHit, fuzzy);
         return Surface.create(player.getEntityWorld(), hit, region, pos -> pos, fuzzy);
     }

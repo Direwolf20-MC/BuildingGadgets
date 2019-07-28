@@ -1,7 +1,7 @@
 {
   "forge_marker": 1,
   "defaults": {
-    "model": "buildinggadgets:constructionblock_dense"
+    "model": "buildinggadgets:block/constructionblock_dense"
   },
   "variants": {
     "normal": [{}],

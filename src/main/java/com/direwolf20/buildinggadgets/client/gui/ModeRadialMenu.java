@@ -6,8 +6,7 @@
 package com.direwolf20.buildinggadgets.client.gui;
 
 import com.direwolf20.buildinggadgets.client.KeyBindings;
-import com.direwolf20.buildinggadgets.client.gui.components.GuiButtonActionCallback;
-import com.direwolf20.buildinggadgets.client.gui.components.GuiButtonSelect;
+import com.direwolf20.buildinggadgets.client.gui.components.GuiIconActionable;
 import com.direwolf20.buildinggadgets.client.gui.components.GuiSliderInt;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.items.gadgets.*;
@@ -15,6 +14,7 @@ import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.*;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGSound;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
+import com.direwolf20.buildinggadgets.common.util.lang.RadialTranslation;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.direwolf20.buildinggadgets.common.util.tools.modes.BuildingMode;
 import com.direwolf20.buildinggadgets.common.util.tools.modes.ExchangingMode;
@@ -30,7 +30,6 @@ import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.client.util.InputMappings;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.StringTextComponent;
@@ -40,6 +39,7 @@ import javax.vecmath.Vector2f;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 
 public class ModeRadialMenu extends Screen {
 
@@ -58,7 +58,7 @@ public class ModeRadialMenu extends Screen {
     public ModeRadialMenu(ItemStack stack) {
         super(new StringTextComponent("Mode Radial Menu?!?"));
         //getMinecraft() = Minecraft.getInstance();
-        if (stack.getItem() instanceof GadgetGeneric)
+        if (stack.getItem() instanceof AbstractGadget)
             setSocketable(stack);
     }
 
@@ -78,43 +78,44 @@ public class ModeRadialMenu extends Screen {
         boolean isDestruction = tool.getItem() instanceof GadgetDestruction;
         ScreenPosition right = isDestruction ? ScreenPosition.TOP : ScreenPosition.RIGHT;
         ScreenPosition left = isDestruction ? ScreenPosition.BOTTOM : ScreenPosition.LEFT;
+
         if (isDestruction) {
-            addButton(new GuiButtonActionCallback("destroy.overlay", right, send -> {
+            addButton(new PositionedIconActionable(RadialTranslation.DESTRUCTION_OVERLAY,"destroy_overlay", right, send -> {
                 if (send)
                     PacketHandler.sendToServer(new PacketChangeRange());
 
                 return GadgetDestruction.getOverlay(getGadget());
             }));
         } else {
-            addButton(new GuiButtonActionCallback("rotate", left, send -> {
+            addButton(new PositionedIconActionable(RadialTranslation.ROTATE, "rotate", left, false, send -> {
                 if (send)
                     PacketHandler.sendToServer(new PacketRotateMirror(PacketRotateMirror.Operation.ROTATE));
 
                 return false;
-            }).setTogglable(false));
-            addButton(new GuiButtonActionCallback("mirror", left, send -> {
+            }));
+            addButton(new PositionedIconActionable(RadialTranslation.MIRROR, "mirror", left, false, send -> {
                 if (send)
                     PacketHandler.sendToServer(new PacketRotateMirror(PacketRotateMirror.Operation.MIRROR));
 
                 return false;
-            }).setTogglable(false));
+            }));
         }
         if (!(tool.getItem() instanceof GadgetCopyPaste)) {
             if (!isDestruction || Config.GADGETS.GADGET_DESTRUCTION.nonFuzzyEnabled.get()) {
-                Button button = new GuiButtonActionCallback("fuzzy", right, send -> {
+                Button button = new PositionedIconActionable(RadialTranslation.FUZZY, "fuzzy", right, send -> {
                     if (send)
                         PacketHandler.sendToServer(new PacketToggleFuzzy());
 
-                    return GadgetGeneric.getFuzzy(getGadget());
+                    return AbstractGadget.getFuzzy(getGadget());
                 });
                 addButton(button);
                 conditionalButtons.add(button);
             }
-            Button button = new GuiButtonActionCallback("connected_" + (isDestruction ? "area" : "surface"), right, send -> {
+            Button button = new PositionedIconActionable((isDestruction ? RadialTranslation.CONNECTED_AREA : RadialTranslation.CONNECTED_SURFACE), "connected_area", right, send -> {
                 if (send)
                     PacketHandler.sendToServer(new PacketToggleConnectedArea());
 
-                return GadgetGeneric.getConnectedArea(getGadget());
+                return AbstractGadget.getConnectedArea(getGadget());
             });
             addButton(button);
             conditionalButtons.add(button);
@@ -134,22 +135,35 @@ public class ModeRadialMenu extends Screen {
                 sliderRange.precision = 1;
                 sliderRange.getComponents().forEach(this::addButton);
             }
+        } else {
+            // Copy Paste specific
+            addButton(new PositionedIconActionable(RadialTranslation.OPEN_GUI, "copypaste_opengui", right, send -> {
+                if( !send )
+                    return false;
+
+                getMinecraft().player.closeScreen();
+                if( GadgetCopyPaste.getToolMode(tool) == GadgetCopyPaste.ToolMode.Copy )
+                    getMinecraft().displayGuiScreen(new CopyGUI(tool));
+                else
+                    getMinecraft().displayGuiScreen(new PasteGUI(tool));
+                return true;
+            }));
         }
-        addButton(new GuiButtonActionCallback("raytrace_fluid", right, send -> {
-            if (send)
+        addButton(new PositionedIconActionable(RadialTranslation.RAYTRACE_FLUID, "raytrace_fluid", right, send -> {
+            if( send )
                 PacketHandler.sendToServer(new PacketToggleRayTraceFluid());
 
-            return GadgetGeneric.shouldRayTraceFluid(getGadget());
+            return AbstractGadget.shouldRayTraceFluid(getGadget());
         }));
         if (tool.getItem() instanceof GadgetBuilding) {
-            addButton(new GuiButtonActionCallback("building.place_atop", right, send -> {
+            addButton(new PositionedIconActionable(RadialTranslation.PLACE_ON_TOP, "building_place_atop", right, send -> {
                 if (send)
                     PacketHandler.sendToServer(new PacketToggleBlockPlacement());
 
                 return GadgetBuilding.shouldPlaceAtop(getGadget());
             }));
         }
-        addButton(new GuiButtonActionCallback("anchor", left, send -> {
+        addButton(new PositionedIconActionable(RadialTranslation.ANCHOR, "anchor", left, send -> {
             if (send)
                 PacketHandler.sendToServer(new PacketAnchor());
 
@@ -162,12 +176,12 @@ public class ModeRadialMenu extends Screen {
             return !GadgetUtils.getAnchor(stack).isEmpty();
         }));
         if (!(tool.getItem() instanceof GadgetExchanger)) {
-            addButton(new GuiButtonActionCallback("undo", left, send -> {
+            addButton(new PositionedIconActionable(RadialTranslation.UNDO, "undo", left, false, send -> {
                 if (send)
                     PacketHandler.sendToServer(new PacketUndo());
 
                 return false;
-            }).setTogglable(false));
+            }));
         }
         updateButtons(tool);
     }
@@ -180,15 +194,14 @@ public class ModeRadialMenu extends Screen {
         boolean isDestruction = tool.getItem() instanceof GadgetDestruction;
         ScreenPosition right = isDestruction ? ScreenPosition.BOTTOM : ScreenPosition.RIGHT;
         for (int i = 0; i < buttons.size(); i++) {
-            if (!(buttons.get(i) instanceof GuiButtonActionCallback))
+            if (!(buttons.get(i) instanceof PositionedIconActionable) )
                 continue;
 
-            GuiButtonActionCallback button = (GuiButtonActionCallback) buttons.get(i);
-            SoundEvent sound = BGSound.BEEP.getSound();
-            button.setSounds(sound, sound, 1F, 0.6F);
+            PositionedIconActionable button = (PositionedIconActionable) buttons.get(i);
+
             if (!button.visible) continue;
             int offset;
-            boolean isRight = button.getScreenPosition() == right;
+            boolean isRight = button.position == right;
             if (isRight) {
                 posRight += dim + padding;
                 offset = 70;
@@ -206,12 +219,12 @@ public class ModeRadialMenu extends Screen {
         posRight = resetPos(tool, padding, posRight);
         posLeft = resetPos(tool, padding, posLeft);
         for (int i = 0; i < buttons.size(); i++) {
-            if (!(buttons.get(i) instanceof GuiButtonActionCallback))
+            if (!(buttons.get(i) instanceof PositionedIconActionable))
                 continue;
 
-            GuiButtonActionCallback button = (GuiButtonActionCallback) buttons.get(i);
+            PositionedIconActionable button = (PositionedIconActionable) buttons.get(i);
             if (!button.visible) continue;
-            boolean isRight = button.getScreenPosition() == right;
+            boolean isRight = button.position == right;
             int pos = isRight ? posRight : posLeft;
             if (isDestruction)
                 button.x = pos;
@@ -230,7 +243,7 @@ public class ModeRadialMenu extends Screen {
     }
 
     private ItemStack getGadget() {
-        return GadgetGeneric.getGadget(Minecraft.getInstance().player);
+        return AbstractGadget.getGadget(Minecraft.getInstance().player);
     }
 
     @Override
@@ -247,8 +260,8 @@ public class ModeRadialMenu extends Screen {
         if (segments != 0) {
             inRange = dist > radiusMin && dist < radiusMax;
             for (Widget button : buttons) {
-                if (button instanceof GuiButtonActionCallback)
-                    ((GuiButtonActionCallback) button).setFaded(inRange);
+                if (button instanceof PositionedIconActionable)
+                    ((PositionedIconActionable) button).setFaded(inRange);
             }
         }
         GlStateManager.pushMatrix();
@@ -256,10 +269,9 @@ public class ModeRadialMenu extends Screen {
         GlStateManager.scalef(fract, fract, fract);
         super.render(mx, my, partialTicks);
         GlStateManager.popMatrix();
-        if (segments == 0) {
-            renderHoverHelpText(mx, my);
+        if (segments == 0)
             return;
-        }
+
         GlStateManager.pushMatrix();
         GlStateManager.disableTexture();
 
@@ -390,26 +402,10 @@ public class ModeRadialMenu extends Screen {
         GlStateManager.disableRescaleNormal();
 
         GlStateManager.popMatrix();
-        renderHoverHelpText(mx, my);
     }
 
     private boolean isCursorInSlice(float angle, float totalDeg, float degPer, boolean inRange) {
         return inRange && angle > totalDeg && angle < totalDeg + degPer;
-    }
-
-    private void renderHoverHelpText(int mx, int my) {
-        buttons.forEach(button -> {
-            if (!(button instanceof GuiButtonActionCallback))
-                return;
-
-            GuiButtonActionCallback helpTextProvider = (GuiButtonActionCallback) button;
-            if (helpTextProvider.isHovered(mx, my)) {
-                Color color = button instanceof GuiButtonSelect && ((GuiButtonSelect) button).isSelected() ? Color.GREEN : Color.WHITE;
-                String text = helpTextProvider.getHoverHelpText();
-                int x = helpTextProvider.getScreenPosition() == ScreenPosition.LEFT ? mx - font.getStringWidth(text) : mx;
-                font.drawStringWithShadow(text, x, my - font.FONT_HEIGHT, color.getRGB());
-            }
-        });
     }
 
     private void changeMode() {
@@ -478,12 +474,7 @@ public class ModeRadialMenu extends Screen {
             PacketHandler.sendToServer(new PacketChangeRange(valueNew));
     }
 
-    public enum ScreenPosition {
-        RIGHT, LEFT, BOTTOM, TOP;
-    }
-
     private static final class NameDisplayData {
-
         private final int x;
         private final int y;
         private final boolean selected;
@@ -511,7 +502,23 @@ public class ModeRadialMenu extends Screen {
         private boolean isCentralized() {
             return centralize;
         }
-
     }
 
+    public enum ScreenPosition {
+        RIGHT, LEFT, BOTTOM, TOP
+    }
+
+    private static class PositionedIconActionable extends GuiIconActionable {
+        private ScreenPosition position;
+
+        public PositionedIconActionable(RadialTranslation message, String icon, ScreenPosition position, boolean isSelectable, Predicate<Boolean> action) {
+            super(0, 0, icon, message.getString(), isSelectable, action);
+
+            this.position = position;
+        }
+
+        public PositionedIconActionable(RadialTranslation message, String icon, ScreenPosition position, Predicate<Boolean> action) {
+            this(message, icon, position, true, action);
+        }
+    }
 }

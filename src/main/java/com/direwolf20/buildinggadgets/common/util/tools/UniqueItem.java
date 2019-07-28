@@ -25,18 +25,19 @@ public final class UniqueItem { //TODO @since 1.13.x can this be replaced with I
 
     public static UniqueItem fromBlockState(BlockState state, PlayerEntity player, BlockPos pos) {
         ItemStack itemStack;
+        //Removed the below because its client side only.
         //if (state.getBlock().canSilkHarvest(player.world, pos, state, player)) {
         //    itemStack = InventoryHelper.getSilkTouchDrop(state);
         //} else {
         //}
-        try {
+        /*try {
             itemStack = state.getBlock().getPickBlock(state, null, player.world, pos, player);
         } catch (Exception e) {
             itemStack = InventoryHelper.getSilkTouchDrop(state);
-        }
-        if (itemStack.isEmpty()) {
-            itemStack = InventoryHelper.getSilkTouchDrop(state);
-        }
+        }*/
+        //if (itemStack.isEmpty()) {
+        itemStack = InventoryHelper.getSilkTouchDrop(state);
+        //}
         if (!itemStack.isEmpty()) {
             return new UniqueItem(itemStack.getItem());
         }

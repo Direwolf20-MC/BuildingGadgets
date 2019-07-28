@@ -1,6 +1,5 @@
 package com.direwolf20.buildinggadgets.common.config;
 
-import com.direwolf20.buildinggadgets.api.abstraction.IApiConfig;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.google.common.collect.ImmutableList;
@@ -356,10 +355,6 @@ public class Config {
             String regName = Objects.requireNonNull(block.getRegistryName()).toString();
             return parsedWhitelist.contains(regName) && !parsedBlacklist.contains(regName);
         }
-    }
-
-    private static final class ApiConfig implements IApiConfig {
-
     }
 
     public static final ForgeConfigSpec COMMON_CONFIG = COMMON_BUILDER.build();

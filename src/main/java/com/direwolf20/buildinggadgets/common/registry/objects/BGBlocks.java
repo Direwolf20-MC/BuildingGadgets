@@ -55,7 +55,7 @@ public final class BGBlocks {
                 .withTileEntity(new TileEntityBuilder<EffectBlockTileEntity>(TileEntityReference.EFFECT_BLOCK_TILE_RL)
                         .builder(new TileEntityTypeBuilder<>(EffectBlockTileEntity::new))
                         .factory(TileEntityTypeBuilder::build)
-                        .renderer(EffectBlockTileEntity.class, new EffectBlockTER()))
+                        .renderer(EffectBlockTileEntity.class, () -> EffectBlockTER::new))
                 .factory(EffectBlock::new));
         container.add(new BlockBuilder(BlockReference.CONSTRUCTION_BLOCK_RL)
                 .builder(Block.Properties.create(Material.ROCK).hardnessAndResistance(2f, 0f))
@@ -85,7 +85,7 @@ public final class BGBlocks {
                 .withTileEntity(new TileEntityBuilder<ChargingStationTileEntity>(TileEntityReference.CHARGING_STATION_TILE_RL)
                         .builder(new TileEntityTypeBuilder<>(ChargingStationTileEntity::new))
                         .factory(TileEntityTypeBuilder::build)
-                        .renderer(ChargingStationTileEntity.class, new ChargingStationTER()))
+                        .renderer(ChargingStationTileEntity.class, () -> ChargingStationTER::new))
                 .factory(ChargingStation::new));
     }
 

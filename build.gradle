@@ -117,7 +117,7 @@ minecraft {
     // stable_#            stables are built at the discretion of the MCP team.
     // Use non-default mappings at your own risk. they may not always work.
     // simply re-run your setup task after changing the mappings to update your workspace.
-    mappings channel: 'snapshot', version: "${mcp_mappings}-${minecraft_version}"
+    mappings channel: 'snapshot', version: "${mcp_mappings}-1.14.3" //TODO un hardcode as soon as mcp updates
     // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
 
     //accessTransformer = file('my_at.cfg')
@@ -127,7 +127,7 @@ minecraft {
     runs {
         client = {
             // recommended logging data for a userdev environment
-            properties 'forge.logging.markers': 'SCAN,REGISTRIES' //,REGISTRYDUMP'
+            properties 'forge.logging.markers': 'FORGEMOD,REGISTRIES' //SCAN,REGISTRYDUMP'
             // recommended logging level for the console
             properties 'forge.logging.console.level': 'debug'
             workingDirectory project.file('run').canonicalPath
@@ -135,7 +135,7 @@ minecraft {
         }
         server = {
             // recommended logging data for a userdev environment
-            properties 'forge.logging.markers': 'SCAN,REGISTRIES' //,REGISTRYDUMP'
+            properties 'forge.logging.markers': 'FORGEMOD,REGISTRIES' //SCAN,REGISTRYDUMP'
             // recommended logging level for the console
             properties 'forge.logging.console.level': 'debug'
             workingDirectory project.file('run').canonicalPath
@@ -193,19 +193,21 @@ test {
 }
 
 processResources { //Processes main only resouces
-    from(sourceSets.main.resources.srcDirs) {
-        include 'META-INF/mods.toml'
-        expand 'version':project.version,'forge_major':project.forge_major,'update_json':project.update_json
+    from("$buildDir/tmp/modMeta") {
+        expand 'version':project.version, 'api_version':project.api_version,'forge_major':project.forge_major,'update_json':project.update_json
     }
-
+    
     from(sourceSets.main.resources.srcDirs) {
         exclude 'META-INF/mods.toml'
     }
 }
 
 processApiResources {
+    from("$buildDir/tmp/modMeta/META-INF/mods.toml") {
+        expand 'version':project.version, 'api_version':project.api_version,'forge_major':project.forge_major,'update_json':project.update_json
+    }
     from(sourceSets.api.resources.srcDirs) {
-        expand 'api_version':project.api_version, 'forge_major':project.forge_major
+        exclude 'META-INF/mods.toml'
     }
 }
 
@@ -298,6 +300,13 @@ task apiDocJar(type: Jar, dependsOn: apiDoc) {
     from apiDoc.destinationDir
 }
 
+reobf {
+    apiJar {
+        dependsOn tasks.createMcpToSrg
+        mappings = tasks.createMcpToSrg.outputs.files.singleFile
+    }
+}
+
 task allApiJars {
     group = project.artifactGroup
     dependsOn apiJar
@@ -331,11 +340,15 @@ test {
     dependsOn apiTestTask
 }
 
+//These 2 need to be hardcoded, because the reobfJar task doesn't register as an ArchivesBaseTask
+String reobfApiJarLoc = "${project.buildDir}\\libs\\${archivesBaseName}-api-${api_version}.jar"
+String reobfJarLoc = "${project.buildDir}\\libs\\${archivesBaseName}-${version}.jar"
 artifacts {
-    archives apiJar
+    //define as file, so that it can be reobfed
+    archives file(reobfApiJarLoc)
     archives apiDocJar
     archives apiSourcesJar
-    archives jar
+    archives file(reobfJarLoc)
     archives docJar
     archives sourcesJar
 }
@@ -346,22 +359,33 @@ publishing {
             groupId = project.group
             artifactId = project.archivesBaseName+'-api'
             version = project.api_version
-            artifact apiJar
+            artifact reobfApiJarLoc
             artifact apiDocJar
             artifact apiSourcesJar
             pom {
                 name = "Buildinggadgets-API"
                 url = "https://github.com/Direwolf20-MC/BuildingGadgets"
                 developers  {
-                    'Direwolf20'
+                    developer {
+                        name = 'Direwolf20'
+                    }
                 }
                 contributors {
-                    'Phylogeny'
-                    'MichaelHillcox'
-                    'MajorTuvok'
+                    contributor {
+                        name = 'Phylogeny'
+                    }
+                    contributor {
+                        name = 'MichaelHillcox'
+                    }
+                    contributor {
+                        name = 'MajorTuvok'
+                    }
                 }
                 licenses {
-                    'MIT License'
+                    license {
+                        name = 'MIT License'
+                        url = 'https://opensource.org/licenses/MIT'
+                    }
                 }
             }
         }
@@ -369,22 +393,33 @@ publishing {
             groupId = project.group
             artifactId = project.archivesBaseName
             version = project.version
-            artifact jar
+            artifact reobfJarLoc
             artifact docJar
             artifact sourcesJar
             pom {
                 name = "Buildinggadgets"
                 url = "https://github.com/Direwolf20-MC/BuildingGadgets"
                 developers  {
-                    'Direwolf20'
+                    developer {
+                        name = 'Direwolf20'
+                    }
                 }
                 contributors {
-                    'Phylogeny'
-                    'MichaelHillcox'
-                    'MajorTuvok'
+                    contributor {
+                        name = 'Phylogeny'
+                    }
+                    contributor {
+                        name = 'MichaelHillcox'
+                    }
+                    contributor {
+                        name = 'MajorTuvok'
+                    }
                 }
                 licenses {
-                    'MIT License'
+                    license {
+                        name = 'MIT License'
+                        url = 'https://opensource.org/licenses/MIT'
+                    }
                 }
             }
         }
