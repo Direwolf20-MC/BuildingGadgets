@@ -8,6 +8,8 @@ import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlock;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.common.items.ITemplate;
+import com.direwolf20.buildinggadgets.common.items.gadgets.renderers.BaseRenderer;
+import com.direwolf20.buildinggadgets.common.items.gadgets.renderers.CopyPasteRender;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketBindTool;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketBlockMap;
@@ -23,7 +25,6 @@ import com.direwolf20.buildinggadgets.common.util.lang.Styles;
 import com.direwolf20.buildinggadgets.common.util.lang.TooltipTranslation;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.util.tools.NetworkIO;
-import com.direwolf20.buildinggadgets.common.util.tools.ToolRenders;
 import com.direwolf20.buildinggadgets.common.util.tools.UniqueItem;
 import com.direwolf20.buildinggadgets.common.world.WorldSave;
 import com.google.common.collect.HashMultiset;
@@ -66,7 +67,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
+public class GadgetCopyPaste extends AbstractGadget implements ITemplate {
+    private static CopyPasteRender render = new CopyPasteRender();
 
     public enum ToolMode {
         Copy, Paste;
@@ -89,6 +91,11 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
     @Override
     public int getEnergyCost(ItemStack tool) {
         return Config.GADGETS.GADGET_COPY_PASTE.energyCost.get();
+    }
+
+    @Override
+    public BaseRenderer getRender() {
+        return render;
     }
 
     private static void setAnchor(ItemStack stack, BlockPos anchorPos) {
@@ -289,7 +296,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
             } else if (player.isSneaking()) {
                 GuiMod.PASTE.openScreen(player);
             } else {
-                ToolRenders.updateInventoryCache();
+                BaseRenderer.updateInventoryCache();
             }
         }
         return new ActionResult<>(ActionResultType.SUCCESS, stack);
@@ -622,7 +629,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
     }
 
     public static ItemStack getGadget(PlayerEntity player) {
-        ItemStack stack = GadgetGeneric.getGadget(player);
+        ItemStack stack = AbstractGadget.getGadget(player);
         if (!(stack.getItem() instanceof GadgetCopyPaste))
             return ItemStack.EMPTY;
 

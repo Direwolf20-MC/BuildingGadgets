@@ -5,6 +5,8 @@ import com.direwolf20.buildinggadgets.api.building.modes.IAtopPlacingGadget;
 import com.direwolf20.buildinggadgets.api.building.tilesupport.TileSupport;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
+import com.direwolf20.buildinggadgets.common.items.gadgets.renderers.BaseRenderer;
+import com.direwolf20.buildinggadgets.common.items.gadgets.renderers.BuildingRender;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketBindTool;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
@@ -17,7 +19,6 @@ import com.direwolf20.buildinggadgets.common.util.lang.LangUtil;
 import com.direwolf20.buildinggadgets.common.util.lang.Styles;
 import com.direwolf20.buildinggadgets.common.util.lang.TooltipTranslation;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
-import com.direwolf20.buildinggadgets.common.util.tools.ToolRenders;
 import com.direwolf20.buildinggadgets.common.util.tools.UndoState;
 import com.direwolf20.buildinggadgets.common.util.tools.modes.BuildingMode;
 import com.direwolf20.buildinggadgets.common.world.FakeBuilderWorld;
@@ -50,8 +51,9 @@ import java.util.List;
 
 import static com.direwolf20.buildinggadgets.common.util.GadgetUtils.*;
 
-public class GadgetBuilding extends GadgetGeneric implements IAtopPlacingGadget {
+public class GadgetBuilding extends AbstractGadget implements IAtopPlacingGadget {
     private static final FakeBuilderWorld fakeWorld = new FakeBuilderWorld();
+    private static final BuildingRender render = new BuildingRender();
 
     public GadgetBuilding(Properties builder) {
         super(builder);
@@ -66,6 +68,11 @@ public class GadgetBuilding extends GadgetGeneric implements IAtopPlacingGadget 
     @Override
     public int getEnergyCost(ItemStack tool) {
         return Config.GADGETS.GADGET_BUILDING.energyCost.get();
+    }
+
+    @Override
+    public BaseRenderer getRender() {
+        return render;
     }
 
     @Override
@@ -134,6 +141,7 @@ public class GadgetBuilding extends GadgetGeneric implements IAtopPlacingGadget 
         ByteBuf buf = Unpooled.buffer(16);
         ByteBufUtils.writeTag(buf,tagCompound);
         System.out.println(buf.readableBytes());*/
+        System.out.println("jo");
         player.setActiveHand(hand);
         if (!world.isRemote) {
             if (player.isSneaking()) {
@@ -141,11 +149,15 @@ public class GadgetBuilding extends GadgetGeneric implements IAtopPlacingGadget 
             } else if (player instanceof ServerPlayerEntity) {
                 build((ServerPlayerEntity) player, itemstack);
             }
+            System.out.println("hello");
         } else {
+            System.out.println("ss");
+
             if (! player.isSneaking()) {
-                ToolRenders.updateInventoryCache();
+                BaseRenderer.updateInventoryCache();
             } else {
                 if (Screen.hasControlDown()) {
+                    System.out.println("CUnt");
                     PacketHandler.sendToServer(new PacketBindTool());
                 }
             }
@@ -338,7 +350,7 @@ public class GadgetBuilding extends GadgetGeneric implements IAtopPlacingGadget 
     }
 
     public static ItemStack getGadget(PlayerEntity player) {
-        ItemStack stack = GadgetGeneric.getGadget(player);
+        ItemStack stack = AbstractGadget.getGadget(player);
         if (!(stack.getItem() instanceof GadgetBuilding))
             return ItemStack.EMPTY;
 

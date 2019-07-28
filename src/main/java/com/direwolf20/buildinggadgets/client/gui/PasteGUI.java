@@ -9,13 +9,11 @@ import com.direwolf20.buildinggadgets.client.gui.components.GuiIncrementer;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketPasteGUI;
 import com.direwolf20.buildinggadgets.common.util.lang.GuiTranslation;
-import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.button.AbstractButton;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.StringTextComponent;
 
 import java.util.ArrayList;
@@ -24,8 +22,6 @@ import java.util.List;
 public class PasteGUI extends Screen {
     private GuiIncrementer X, Y, Z;
     private List<GuiIncrementer> fields = new ArrayList<>();
-
-    private static final ResourceLocation background = new ResourceLocation(Reference.MODID, "textures/gui/testcontainer.png");
 
     PasteGUI(ItemStack tool) {
         super(new StringTextComponent(""));
@@ -89,7 +85,6 @@ public class PasteGUI extends Screen {
 
     @Override
     public void render(int mouseX, int mouseY, float partialTicks) {
-        getMinecraft().getTextureManager().bindTexture(background);
         drawLabel("X", -75);
         drawLabel("Y", 0);
         drawLabel("Z", 75);

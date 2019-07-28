@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.common.network.packets;
 
-import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
+import com.direwolf20.buildinggadgets.common.items.gadgets.AbstractGadget;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
@@ -20,9 +20,9 @@ public class PacketToggleRayTraceFluid {
                 if (player == null)
                     return;
 
-                ItemStack stack = GadgetGeneric.getGadget(player);
+                ItemStack stack = AbstractGadget.getGadget(player);
                 if (!stack.isEmpty())
-                    GadgetGeneric.toggleRayTraceFluid(player, stack);
+                    AbstractGadget.toggleRayTraceFluid(player, stack);
             });
             ctx.get().setPacketHandled(true);
         }

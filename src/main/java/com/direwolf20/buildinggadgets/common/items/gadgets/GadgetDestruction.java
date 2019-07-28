@@ -7,6 +7,8 @@ import com.direwolf20.buildinggadgets.api.building.tilesupport.TileSupport;
 import com.direwolf20.buildinggadgets.client.gui.GuiMod;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
+import com.direwolf20.buildinggadgets.common.items.gadgets.renderers.BaseRenderer;
+import com.direwolf20.buildinggadgets.common.items.gadgets.renderers.DestructionRender;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
 import com.direwolf20.buildinggadgets.common.tiles.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
@@ -49,7 +51,9 @@ import javax.annotation.Nullable;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class GadgetDestruction extends GadgetGeneric {
+public class GadgetDestruction extends AbstractGadget {
+    private static final DestructionRender render = new DestructionRender();
+
     public GadgetDestruction(Properties builder) {
         super(builder);
     }
@@ -62,6 +66,11 @@ public class GadgetDestruction extends GadgetGeneric {
     @Override
     public int getEnergyCost(ItemStack tool) {
         return Config.GADGETS.GADGET_DESTRUCTION.energyCost.get() * getCostMultiplier(tool);
+    }
+
+    @Override
+    public BaseRenderer getRender() {
+        return render;
     }
 
 
@@ -210,9 +219,9 @@ public class GadgetDestruction extends GadgetGeneric {
     public static IPositionPlacementSequence getClearingPositions(World world, BlockPos pos, Direction incomingSide, PlayerEntity player, ItemStack stack) {
         Region boundary = getClearingRegion(pos, incomingSide, player, stack);
         BlockPos startPos = (getAnchor(stack) == null) ? pos : getAnchor(stack);
-        BlockState stateTarget = !Config.GADGETS.GADGET_DESTRUCTION.nonFuzzyEnabled.get() || GadgetGeneric.getFuzzy(stack) ? null : world.getBlockState(pos);
+        BlockState stateTarget = !Config.GADGETS.GADGET_DESTRUCTION.nonFuzzyEnabled.get() || AbstractGadget.getFuzzy(stack) ? null : world.getBlockState(pos);
 
-        if (GadgetGeneric.getConnectedArea(stack)) {
+        if (AbstractGadget.getConnectedArea(stack)) {
             Set<BlockPos> voidPositions = new HashSet<>();
             int depth = getToolValue(stack, NBTKeys.GADGET_VALUE_DEPTH);
             if (depth == 0)
@@ -357,7 +366,7 @@ public class GadgetDestruction extends GadgetGeneric {
     }
 
     public static ItemStack getGadget(PlayerEntity player) {
-        ItemStack stack = GadgetGeneric.getGadget(player);
+        ItemStack stack = AbstractGadget.getGadget(player);
         if (!(stack.getItem() instanceof GadgetDestruction))
             return ItemStack.EMPTY;
 

@@ -2,7 +2,7 @@ package com.direwolf20.buildinggadgets.client.events;
 
 import com.direwolf20.buildinggadgets.client.KeyBindings;
 import com.direwolf20.buildinggadgets.client.gui.ModeRadialMenu;
-import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
+import com.direwolf20.buildinggadgets.common.items.gadgets.AbstractGadget;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.*;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
@@ -29,7 +29,7 @@ public class EventKeyInput {
 
         if (!(mc.currentScreen instanceof ModeRadialMenu) && mode.isPressed() && ((mode.getKeyModifier() == KeyModifier.NONE
                 && KeyModifier.getActiveModifier() == KeyModifier.NONE) || mode.getKeyModifier() != KeyModifier.NONE)) {
-            ItemStack tool = GadgetGeneric.getGadget(mc.player);
+            ItemStack tool = AbstractGadget.getGadget(mc.player);
             if (!tool.isEmpty())
                 mc.displayGuiScreen(new ModeRadialMenu(tool));
         } else if (KeyBindings.range.isPressed()) {

@@ -3,6 +3,8 @@ package com.direwolf20.buildinggadgets.common.items.gadgets;
 import com.direwolf20.buildinggadgets.api.building.BlockData;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
+import com.direwolf20.buildinggadgets.common.items.gadgets.renderers.BaseRenderer;
+import com.direwolf20.buildinggadgets.common.items.gadgets.renderers.ExchangerRender;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketBindTool;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
@@ -12,7 +14,6 @@ import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
 import com.direwolf20.buildinggadgets.common.util.lang.LangUtil;
 import com.direwolf20.buildinggadgets.common.util.lang.Styles;
 import com.direwolf20.buildinggadgets.common.util.lang.TooltipTranslation;
-import com.direwolf20.buildinggadgets.common.util.tools.ToolRenders;
 import com.direwolf20.buildinggadgets.common.util.tools.modes.ExchangingMode;
 import com.direwolf20.buildinggadgets.common.world.FakeBuilderWorld;
 import net.minecraft.block.Block;
@@ -55,8 +56,9 @@ import java.util.Set;
 
 import static com.direwolf20.buildinggadgets.common.util.GadgetUtils.*;
 
-public class GadgetExchanger extends GadgetGeneric {
+public class GadgetExchanger extends AbstractGadget {
     private static final FakeBuilderWorld fakeWorld = new FakeBuilderWorld();
+    private static final ExchangerRender render = new ExchangerRender();
 
     public GadgetExchanger(Properties builder) {
         super(builder);
@@ -70,6 +72,11 @@ public class GadgetExchanger extends GadgetGeneric {
     @Override
     public int getEnergyCost(ItemStack tool) {
         return Config.GADGETS.GADGET_EXCHANGER.energyCost.get();
+    }
+
+    @Override
+    public BaseRenderer getRender() {
+        return render;
     }
 
     @Override
@@ -138,7 +145,7 @@ public class GadgetExchanger extends GadgetGeneric {
             }
         } else {
             if (! player.isSneaking()) {
-                ToolRenders.updateInventoryCache();
+                BaseRenderer.updateInventoryCache();
             } else {
                 if (Screen.hasControlDown()) {
                     PacketHandler.sendToServer(new PacketBindTool());
@@ -293,7 +300,7 @@ public class GadgetExchanger extends GadgetGeneric {
     }
 
     public static ItemStack getGadget(PlayerEntity player) {
-        ItemStack stack = GadgetGeneric.getGadget(player);
+        ItemStack stack = AbstractGadget.getGadget(player);
         if (!(stack.getItem() instanceof GadgetExchanger))
             return ItemStack.EMPTY;
 
