@@ -22,9 +22,10 @@ public interface ITemplateTransaction {
      * The passed in {@link ITransactionOperator} may be a duplicate.<br>
      * <b>This Method does not execute the {@link ITransactionOperator}, see {@link #execute()} for more Information.</b>
      * @param operator The {@link ITransactionOperator} to register with this {@code ITemplateTransaction}
+     * @return itself to allow for Method chaining
      * @throws NullPointerException if faced with an null value
      */
-    void operate(ITransactionOperator operator);
+    ITemplateTransaction operate(ITransactionOperator operator);
 
     /**
      * This Method executes all via {@link #operate(ITransactionOperator)} specified {@link ITransactionOperator}'s in the order in which they were specified.

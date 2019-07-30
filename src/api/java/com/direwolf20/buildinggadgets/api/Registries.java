@@ -10,6 +10,7 @@ import com.direwolf20.buildinggadgets.api.registry.TopologicalRegistryBuilder;
 import com.direwolf20.buildinggadgets.api.serialisation.ITemplateSerializer;
 import com.direwolf20.buildinggadgets.api.serialisation.ITileDataSerializer;
 import com.direwolf20.buildinggadgets.api.serialisation.SerialisationSupport;
+import com.direwolf20.buildinggadgets.api.template.ImmutableTemplate;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Supplier;
 import net.minecraft.util.ResourceLocation;
@@ -60,13 +61,14 @@ public final class Registries {
 
     @SubscribeEvent
     public static void registerTemplateSerializers(RegistryEvent.Register<ITemplateSerializer> event) {
-
+        event.getRegistry().register(new ImmutableTemplate.Serializer().setRegistryName(TemplateSerializerReference.IMMUTABLE_TEMPLATE_SERIALIZER_RL));
     }
 
 
     @SubscribeEvent
     public static void registerTileDataSerializers(RegistryEvent.Register<ITileDataSerializer> event) {
         event.getRegistry().register(SerialisationSupport.dummyDataSerializer().setRegistryName(TileDataSerializerReference.DUMMY_SERIALIZER_RL));
+        event.getRegistry().register(SerialisationSupport.nbtTileDataSerializer().setRegistryName(TileDataSerializerReference.NBT_TILE_ENTITY_DATA_SERIALIZER_RL));
     }
 
     static void createOrderedRegistries() {

@@ -44,7 +44,7 @@ public final class TemplateHeader {
     private final MaterialList requiredItems;
     @Nonnull
     private final ResourceLocation serializer;
-    @Nonnull // Todo replace with Region
+    @Nonnull
     private final Region boundingBox;
 
     private TemplateHeader(@Nullable String name, @Nullable String author, @Nullable MaterialList requiredItems, @Nonnull ResourceLocation serializer, @Nonnull Region boundingBox) {

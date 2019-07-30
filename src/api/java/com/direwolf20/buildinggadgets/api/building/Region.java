@@ -20,6 +20,11 @@ import java.util.function.Consumer;
  * Represents a region in the world with a finite and nonzero size.
  */
 public final class Region implements IPositionPlacementSequence, Serializable {
+    private static final Region ZERO = new Region(new BlockPos(0, 0, 0));
+
+    public static Region singleZero() {
+        return ZERO;
+    }
 
     private static final long serialVersionUID = 8391481277782374853L;
 
