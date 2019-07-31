@@ -1,6 +1,7 @@
 package com.direwolf20.buildinggadgets.api.util;
 
 import com.direwolf20.buildinggadgets.api.building.BlockData;
+import jdk.internal.jline.internal.Nullable;
 import net.minecraft.util.math.BlockPos;
 
 import java.util.Spliterator;
@@ -28,8 +29,12 @@ final class PositionValidatingSpliterator extends DelegatingSpliterator<BlockPos
         return false;
     }
 
+    @Nullable
     @Override
     public Spliterator<BlockPos> trySplit() {
-        return new PositionValidatingSpliterator(getOther(), predicate, dataExtractor);
+        Spliterator<BlockPos> split = getOther().trySplit();
+        if (split != null)
+            return new PositionValidatingSpliterator(split, predicate, dataExtractor);
+        return null;
     }
 }

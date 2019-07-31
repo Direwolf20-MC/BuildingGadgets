@@ -1,10 +1,12 @@
 package com.direwolf20.buildinggadgets.api.template.transaction;
 
 import com.direwolf20.buildinggadgets.api.building.BlockData;
+import com.direwolf20.buildinggadgets.api.building.view.IBuildContext;
 import com.direwolf20.buildinggadgets.api.building.view.IBuildView;
 import com.direwolf20.buildinggadgets.api.exceptions.TransactionExecutionException;
 import com.direwolf20.buildinggadgets.api.serialisation.TemplateHeader;
 import com.direwolf20.buildinggadgets.api.template.ITemplate;
+import jdk.internal.jline.internal.Nullable;
 import net.minecraft.util.math.BlockPos;
 
 /**
@@ -44,6 +46,7 @@ public interface ITemplateTransaction {
      * </ol>
      * <p>
      * It is upon this method to create the {@link ITransactionExecutionContext} required to execute a given {@link ITransactionOperator}.
+     * @param context {@link IBuildContext} intended to allow for efficient pre-evaluation of for example required Items. May be null.
      * @return The transformed Template, as specified by the passed in {@link ITransactionOperator}'s. May be the original or a new instance.
      * @throws com.direwolf20.buildinggadgets.api.exceptions.ConcurrentTransactionExecutionException If this method is attempted to be used concurrently, but
      *         concurrent execution is not supported by this {@code ITemplateTransaction}
@@ -61,5 +64,15 @@ public interface ITemplateTransaction {
      *         return null to indicate that a certain position or <b>all positions referenced by a specific {@link BlockData}</b> should be removed from
      *         the backing {@link ITemplate}.
      */
-    ITemplate execute() throws TransactionExecutionException;
+    ITemplate execute(@Nullable IBuildContext context) throws TransactionExecutionException;
+
+    /**
+     * Equivalent to calling {@code transaction.execute(null)}. Prefer {@link #execute(IBuildContext)} wherever it is possible to construct even a minimalistic
+     * {@link IBuildContext} in order to allow the resulting {@link ITemplate} to perform caching of the required Items.
+     *
+     * @see #execute(IBuildContext)
+     */
+    default ITemplate execute() throws TransactionExecutionException {
+        return execute(null);
+    }
 }
