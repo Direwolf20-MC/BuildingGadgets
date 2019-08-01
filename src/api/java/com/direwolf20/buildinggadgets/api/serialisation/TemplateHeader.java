@@ -36,6 +36,17 @@ public final class TemplateHeader {
         return new Builder(serializer, boundingBox);
     }
 
+    /**
+     * @param header The {@code TemplateHeader} to copy
+     * @return a Builder with all values predefined to the values passed into the header
+     */
+    public static Builder builderOf(TemplateHeader header) {
+        return builder(header.getSerializer(), header.getBoundingBox())
+                .author(header.getAuthor())
+                .name(header.getName())
+                .requiredItems(header.getRequiredItems());
+    }
+
     @Nullable
     private final String name;
     @Nullable
@@ -107,12 +118,21 @@ public final class TemplateHeader {
         private MaterialList requiredItems;
         @Nonnull
         private final ResourceLocation serializer;
-        @Nonnull //Todo replace with Region
-        private final Region boundingBox;
+        @Nonnull
+        private Region boundingBox;
 
-        private Builder(@Nonnull ResourceLocation serializer, @Nonnull Region boundingBox) {
+        private Builder(ResourceLocation serializer, Region boundingBox) {
             this.serializer = Objects.requireNonNull(serializer);
             this.boundingBox = Objects.requireNonNull(boundingBox);
+        }
+
+        /**
+         * @param boundingBox The new boundingBox to be used. May not be null!
+         * @return The {@code Builder} instance to allow for method chaining
+         */
+        public Builder bounds(Region boundingBox) {
+            this.boundingBox = Objects.requireNonNull(boundingBox);
+            return this;
         }
 
         /**

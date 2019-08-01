@@ -23,7 +23,9 @@ public final class SimpleTransactionExecutionContext implements ITransactionExec
      * @return A new {@link Builder}, with all values copied from the specified context.
      */
     public static Builder builderOf(ITransactionExecutionContext context) {
-        return builder().size(context.getEstimatedTemplateSize());
+        return builder()
+                .size(context.getEstimatedTemplateSize())
+                .bounds(context.getBoundingBox());
     }
 
     private final int size;

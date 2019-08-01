@@ -343,6 +343,8 @@ public final class ImmutableTemplate implements ITemplate {
             assert posToData != null;
             posToStateId = new Long2IntOpenHashMap(posToData.size());
             MaterialList.Builder builder = context != null ? MaterialList.builder() : null;
+            int minx, miny, minz, maxx, maxy, maxz;
+            minx = miny = minz = maxx = maxy = maxz = 0;
             for (Map.Entry<BlockPos, BlockData> entry : posToData.entrySet()) {
                 posToStateId.put(MathUtils.posToLong(entry.getKey()), reverseMap.getInt(entry.getValue()));
                 if (context != null) {
@@ -351,8 +353,17 @@ public final class ImmutableTemplate implements ITemplate {
                     BlockRayTraceResult targetRes = player != null ? CommonUtils.fakeRayTrace(player.posX, player.posY, player.posZ, entry.getKey()) : null;
                     builder.addAll(target.getRequiredItems(context, targetRes).getRequiredItems());
                 }
+                minx = Math.min(minx, entry.getKey().getX());
+                miny = Math.min(miny, entry.getKey().getY());
+                minz = Math.min(minz, entry.getKey().getZ());
+                maxx = Math.max(maxx, entry.getKey().getX());
+                maxy = Math.max(maxy, entry.getKey().getY());
+                maxz = Math.max(maxz, entry.getKey().getZ());
             }
             requiredItems = builder != null ? builder.build() : null;
+            headerInfo = TemplateHeader.builderOf(headerInfo)
+                    .bounds(new Region(minx, miny, minz, maxx, maxy, maxz))
+                    .build();
         }
     }
 }
