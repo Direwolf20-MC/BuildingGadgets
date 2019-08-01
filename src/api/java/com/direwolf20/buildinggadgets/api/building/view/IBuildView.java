@@ -7,6 +7,7 @@ import com.direwolf20.buildinggadgets.api.materials.MaterialList;
 import com.direwolf20.buildinggadgets.api.materials.UniqueItem;
 import com.direwolf20.buildinggadgets.api.template.ITemplate;
 import com.direwolf20.buildinggadgets.api.util.CommonUtils;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.Vec3d;
@@ -82,9 +83,7 @@ public interface IBuildView extends IPlacementSequence<PlacementTarget>, AutoClo
      * but may be fewer if exact requirements are hard or expensive to compute.
      *
      * @return A {@link MaterialList} representing the Item Requirements to build this {@code IBuildView}.
-     * Will be null if unknown or expensive to compute.
      */
-    @Nullable
     default MaterialList estimateRequiredItems(@Nullable Vec3d simulatePos) {
         MaterialList.Builder builder = MaterialList.builder();
         for (PlacementTarget placementTarget : this) {
@@ -92,6 +91,11 @@ public interface IBuildView extends IPlacementSequence<PlacementTarget>, AutoClo
             builder.addAll(placementTarget.getRequiredItems(getContext(), target).getRequiredItems().asList());
         }
         return builder.build();
+    }
+
+    default MaterialList estimateRequiredItems() {
+        PlayerEntity player = getContext().getBuildingPlayer();
+        return estimateRequiredItems(player != null ? new Vec3d(player.posX, player.posY, player.posZ) : null);
     }
 
     /**

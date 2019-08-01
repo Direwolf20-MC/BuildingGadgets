@@ -34,7 +34,6 @@ public abstract class AbsTemplateTransaction implements ITemplateTransaction {
             throw new UnsupportedOperationException("Cannot execute TemplateTransaction twice!");
         OperatorOrdering ordering = createOrdering(operators);
         ITransactionExecutionContext exContext = createContext();
-        mergeCreated(exContext, ordering, createData(exContext, ordering));
         exContext = createContext();
         transformData(exContext, ordering);
         exContext = createContext();
@@ -97,7 +96,13 @@ public abstract class AbsTemplateTransaction implements ITemplateTransaction {
 
     protected abstract void updateHeader(ITransactionExecutionContext exContext, OperatorOrdering ordering, HeaderTransformer transformer) throws TransactionExecutionException;
 
-    protected abstract ITemplate createTemplate(ITransactionExecutionContext exContext, OperatorOrdering ordering, @Nullable IBuildContext context, boolean changed);
+    protected abstract ITemplate createTemplate(ITransactionExecutionContext exContext, OperatorOrdering ordering, @Nullable IBuildContext context, boolean changed) throws TransactionExecutionException;
+
+    protected void performCreateData(ITransactionExecutionContext exContext, OperatorOrdering ordering) throws TransactionExecutionException {
+        Map<BlockPos, BlockData> created = createData(exContext, ordering);
+        if (! created.isEmpty())
+            mergeCreated(exContext, ordering, created);
+    }
 
     protected void transformData(ITransactionExecutionContext exContext, OperatorOrdering ordering) throws TransactionExecutionException {
         if (ordering.getDataTransformers().isEmpty())

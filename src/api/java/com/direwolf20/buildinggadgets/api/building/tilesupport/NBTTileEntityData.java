@@ -11,11 +11,14 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Objects;
 
 public class NBTTileEntityData implements ITileEntityData {
+    @Nonnull
     private final CompoundNBT nbt;
+    @Nullable
     private final MaterialList requiredMaterials;
 
     public NBTTileEntityData(CompoundNBT nbt, @Nullable MaterialList requiredMaterials) {
@@ -68,4 +71,21 @@ public class NBTTileEntityData implements ITileEntityData {
         return nbt;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (! (o instanceof NBTTileEntityData)) return false;
+
+        NBTTileEntityData that = (NBTTileEntityData) o;
+
+        if (! nbt.equals(that.nbt)) return false;
+        return getRequiredMaterials() != null ? getRequiredMaterials().equals(that.getRequiredMaterials()) : that.getRequiredMaterials() == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = nbt.hashCode();
+        result = 31 * result + (getRequiredMaterials() != null ? getRequiredMaterials().hashCode() : 0);
+        return result;
+    }
 }
