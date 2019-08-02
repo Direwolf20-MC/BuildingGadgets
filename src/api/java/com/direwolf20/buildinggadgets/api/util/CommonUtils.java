@@ -2,14 +2,19 @@ package com.direwolf20.buildinggadgets.api.util;
 
 import com.direwolf20.buildinggadgets.api.building.BlockData;
 import com.direwolf20.buildinggadgets.api.building.IPlacementSequence;
+import com.direwolf20.buildinggadgets.api.building.PlacementTarget;
 import com.direwolf20.buildinggadgets.api.building.Region;
 import com.direwolf20.buildinggadgets.api.building.placement.IPositionPlacementSequence;
+import com.direwolf20.buildinggadgets.api.building.view.IBuildContext;
+import com.direwolf20.buildinggadgets.api.materials.MaterialList;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 
+import javax.annotation.Nullable;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Spliterator;
@@ -122,6 +127,20 @@ public final class CommonUtils {
         Vec3d simVec = new Vec3d(pos).subtract(simX, simY, simZ);
         Direction dir = Direction.getFacingFromVector(simVec.getX(), simVec.getY(), simVec.getZ());
         return new BlockRayTraceResult(simVec, dir, pos, false);
+    }
+
+    public static MaterialList estimateRequiredItems(Iterable<PlacementTarget> buildView, IBuildContext context) {
+        PlayerEntity player = context.getBuildingPlayer();
+        return estimateRequiredItems(buildView, context, player != null ? new Vec3d(player.posX, player.posY, player.posZ) : null);
+    }
+
+    public static MaterialList estimateRequiredItems(Iterable<PlacementTarget> buildView, IBuildContext context, @Nullable Vec3d simulatePos) {
+        MaterialList.Builder builder = MaterialList.builder();
+        for (PlacementTarget placementTarget : buildView) {
+            BlockRayTraceResult target = simulatePos != null ? CommonUtils.fakeRayTrace(simulatePos, placementTarget.getPos()) : null;
+            builder.addAll(placementTarget.getRequiredItems(context, target).getRequiredItems().asList());
+        }
+        return builder.build();
     }
 
 }

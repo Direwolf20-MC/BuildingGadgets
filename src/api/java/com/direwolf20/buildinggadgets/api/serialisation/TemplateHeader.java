@@ -51,7 +51,7 @@ public final class TemplateHeader {
     private final String name;
     @Nullable
     private final String author;
-    @Nonnull
+    @Nullable
     private final MaterialList requiredItems;
     @Nonnull
     private final ResourceLocation serializer;
@@ -61,7 +61,7 @@ public final class TemplateHeader {
     private TemplateHeader(@Nullable String name, @Nullable String author, @Nullable MaterialList requiredItems, @Nonnull ResourceLocation serializer, @Nonnull Region boundingBox) {
         this.name = name;
         this.author = author;
-        this.requiredItems = requiredItems != null ? requiredItems : MaterialList.empty();
+        this.requiredItems = requiredItems;
         this.serializer = Objects.requireNonNull(serializer);
         this.boundingBox = Objects.requireNonNull(boundingBox);
     }
@@ -83,9 +83,9 @@ public final class TemplateHeader {
     }
 
     /**
-     * @return The optional set of required Items of the corresponding {@link com.direwolf20.buildinggadgets.api.template.ITemplate}. Empty if not present.
+     * @return The optional set of required Items of the corresponding {@link com.direwolf20.buildinggadgets.api.template.ITemplate}. Null if not present.
      */
-    @Nonnull
+    @Nullable
     public MaterialList getRequiredItems() {
         return requiredItems;
     }

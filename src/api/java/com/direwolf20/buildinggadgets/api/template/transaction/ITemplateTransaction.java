@@ -1,6 +1,7 @@
 package com.direwolf20.buildinggadgets.api.template.transaction;
 
 import com.direwolf20.buildinggadgets.api.building.BlockData;
+import com.direwolf20.buildinggadgets.api.building.PlacementTarget;
 import com.direwolf20.buildinggadgets.api.building.view.IBuildContext;
 import com.direwolf20.buildinggadgets.api.building.view.IBuildView;
 import com.direwolf20.buildinggadgets.api.exceptions.TransactionExecutionException;
@@ -41,6 +42,7 @@ public interface ITemplateTransaction {
      * <li>Call {@link ITransactionOperator#createDataForPos(ITransactionExecutionContext, BlockPos)} for each Position previously returned by {@link ITransactionOperator#createPos(ITransactionExecutionContext)}
      * <li>Call {@link ITransactionOperator#transformData(ITransactionExecutionContext, BlockData)} <b>for each BlockData in the {@link ITemplate}.</b>
      * <li>Call {@link ITransactionOperator#transformPos(ITransactionExecutionContext, BlockPos, BlockData)} <b>for each Position in the {@link ITemplate}.</b>
+     * <li>Call {@link ITransactionOperator#transformTarget(ITransactionExecutionContext, PlacementTarget)} <b>for each {@link PlacementTarget} in the {@link ITemplate}.</b>
      * <li>Call {@link ITransactionOperator#transformHeader(ITransactionExecutionContext, TemplateHeader)} for all {@link ITransactionOperator ITransactionOperators} with the
      *     {@link ITransactionOperator.Characteristic#TRANSFORM_HEADER} characteristic
      * </ol>

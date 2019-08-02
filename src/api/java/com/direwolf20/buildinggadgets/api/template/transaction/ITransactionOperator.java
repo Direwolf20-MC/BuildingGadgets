@@ -1,6 +1,7 @@
 package com.direwolf20.buildinggadgets.api.template.transaction;
 
 import com.direwolf20.buildinggadgets.api.building.BlockData;
+import com.direwolf20.buildinggadgets.api.building.PlacementTarget;
 import com.direwolf20.buildinggadgets.api.serialisation.TemplateHeader;
 import com.direwolf20.buildinggadgets.api.template.ITemplate;
 import com.google.common.collect.ImmutableSet;
@@ -29,25 +30,32 @@ public interface ITransactionOperator {
      */
     enum Characteristic {
         /**
-         * This {@code Characteristic} represents the ability of an {@code ITransactionOperator} to transform the
-         * {@link TemplateHeader} of a given {@link ITemplate}.
+         * This {@code Characteristic} represents the ability of an {@code ITransactionOperator} to create new data via
+         * {@link #createPos(ITransactionExecutionContext)} and {@link #createDataForPos(ITransactionExecutionContext, BlockPos)}.
          */
-        TRANSFORM_HEADER(0),
-        /**
-         * This {@code Characteristic} represents the ability of an {@code ITransactionOperator} to transform positions via
-         * {@link #transformPos(ITransactionExecutionContext, BlockPos, BlockData)}.
-         */
-        TRANSFORM_POSITION(1),
+        CREATE_DATA(3),
         /**
          * This {@code Characteristic} represents the ability of an {@code ITransactionOperator} to transform data via
          * {@link #transformData(ITransactionExecutionContext, BlockData)}.
          */
         TRANSFORM_DATA(2),
         /**
-         * This {@code Characteristic} represents the ability of an {@code ITransactionOperator} to create new data via
-         * {@link #createPos(ITransactionExecutionContext)} and {@link #createDataForPos(ITransactionExecutionContext, BlockPos)}.
+         * This {@code Characteristic} represents the ability of an {@code ITransactionOperator} to transform positions via
+         * {@link #transformPos(ITransactionExecutionContext, BlockPos, BlockData)}.
          */
-        CREATE_DATA(3);
+        TRANSFORM_POSITION(1),
+
+        /**
+         * This {@code Characteristic} represents the ability of an {@code ITransactionOperator} to transform {@link PlacementTarget PlacementTargets} via
+         * {@link #transformTarget(ITransactionExecutionContext, PlacementTarget)}.
+         */
+        TRANSFORM_TARGET(4),
+        /**
+         * This {@code Characteristic} represents the ability of an {@code ITransactionOperator} to transform the
+         * {@link TemplateHeader} of a given {@link ITemplate}.
+         */
+        TRANSFORM_HEADER(0);
+
 
         private final byte id;
 
@@ -124,6 +132,20 @@ public interface ITransactionOperator {
     @Nullable
     default BlockPos transformPos(ITransactionExecutionContext context, BlockPos pos, BlockData data) {
         return pos;
+    }
+
+    /**
+     * Performs arbitrary operations on the given {@link PlacementTarget}.<br>
+     * Will be called after {@link #transformPos(ITransactionExecutionContext, BlockPos, BlockData)} is finished executing for the {@link BlockPos} associated with this {@link PlacementTarget}.
+     *
+     * @param context The {@link ITransactionExecutionContext} used during this transaction.
+     * @param target  The {@link PlacementTarget} to transform
+     * @return The new transformed {@link PlacementTarget} or null if it should be removed from the given {@link ITemplate}
+     * @implNote The default implementation just returns the given target
+     */
+    @Nullable
+    default PlacementTarget transformTarget(ITransactionExecutionContext context, PlacementTarget target) {
+        return target;
     }
 
     /**

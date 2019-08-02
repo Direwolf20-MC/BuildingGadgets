@@ -1,6 +1,8 @@
 package com.direwolf20.buildinggadgets.api.template.transaction;
 
 import com.direwolf20.buildinggadgets.api.building.BlockData;
+import com.direwolf20.buildinggadgets.api.building.PlacementTarget;
+import com.direwolf20.buildinggadgets.api.building.Region;
 import com.direwolf20.buildinggadgets.api.building.view.IBuildContext;
 import com.direwolf20.buildinggadgets.api.exceptions.OperatorExecutionFailedException;
 import com.direwolf20.buildinggadgets.api.exceptions.TransactionExecutionException;
@@ -8,9 +10,9 @@ import com.direwolf20.buildinggadgets.api.serialisation.TemplateHeader;
 import com.direwolf20.buildinggadgets.api.template.ITemplate;
 import com.direwolf20.buildinggadgets.api.template.transaction.ITransactionOperator.Characteristic;
 import com.google.common.collect.ImmutableList;
-import jdk.internal.jline.internal.Nullable;
 import net.minecraft.util.math.BlockPos;
 
+import javax.annotation.Nullable;
 import java.util.*;
 
 public abstract class AbsTemplateTransaction implements ITemplateTransaction {
@@ -38,6 +40,8 @@ public abstract class AbsTemplateTransaction implements ITemplateTransaction {
         transformData(exContext, ordering);
         exContext = createContext();
         transformPositions(exContext, ordering);
+        exContext = createContext();
+
         exContext = createContext();
         transformHeader(exContext, ordering);
         return createTemplate(exContext, ordering, context,
@@ -94,6 +98,8 @@ public abstract class AbsTemplateTransaction implements ITemplateTransaction {
 
     protected abstract void transformAllPositions(ITransactionExecutionContext exContext, OperatorOrdering ordering, PositionTransformer positionTransformer) throws TransactionExecutionException;
 
+    protected abstract void transformAllTargets(ITransactionExecutionContext exContext, OperatorOrdering ordering, TargetTransformer targetTransformer) throws TransactionExecutionException;
+
     protected abstract void updateHeader(ITransactionExecutionContext exContext, OperatorOrdering ordering, HeaderTransformer transformer) throws TransactionExecutionException;
 
     protected abstract ITemplate createTemplate(ITransactionExecutionContext exContext, OperatorOrdering ordering, @Nullable IBuildContext context, boolean changed) throws TransactionExecutionException;
@@ -138,8 +144,26 @@ public abstract class AbsTemplateTransaction implements ITemplateTransaction {
         });
     }
 
+    protected void transformTargets(ITransactionExecutionContext exContext, OperatorOrdering ordering) throws TransactionExecutionException {
+        if (ordering.getTargetTransformers().isEmpty())
+            return;
+        transformAllTargets(exContext, ordering, target -> {
+            for (ITransactionOperator operator : ordering.getTargetTransformers()) {
+                try {
+                    target = operator.transformTarget(exContext, target);
+                } catch (Exception e) {
+                    failOperatorExecution(operator, e);
+                }
+                if (target == null)
+                    break;
+            }
+            return target;
+        });
+    }
+
     protected void transformHeader(ITransactionExecutionContext exContext, OperatorOrdering ordering) throws TransactionExecutionException {
         updateHeader(exContext, ordering, header -> {
+            Region prevBoundingBox = header.getBoundingBox();
             for (ITransactionOperator operator : ordering.getHeaderTransformers()) {
                 try {
                     header = Objects.requireNonNull(operator.transformHeader(exContext, header), "Operator " + operator + " may not return a null TemplateHeader!");
@@ -154,13 +178,19 @@ public abstract class AbsTemplateTransaction implements ITemplateTransaction {
     @FunctionalInterface
     protected interface DataTransformer {
         @Nullable
-        public BlockData transformData(BlockData data) throws TransactionExecutionException;
+        BlockData transformData(BlockData data) throws TransactionExecutionException;
     }
 
     @FunctionalInterface
     protected interface PositionTransformer {
         @Nullable
-        public BlockPos transformPos(BlockPos pos, BlockData data) throws TransactionExecutionException;
+        BlockPos transformPos(BlockPos pos, BlockData data) throws TransactionExecutionException;
+    }
+
+    @FunctionalInterface
+    protected interface TargetTransformer {
+        @Nullable
+        PlacementTarget transformTarget(PlacementTarget target) throws TransactionExecutionException;
     }
 
     @FunctionalInterface
@@ -172,6 +202,7 @@ public abstract class AbsTemplateTransaction implements ITemplateTransaction {
         private final ImmutableList<ITransactionOperator> headerTransformers;
         private final ImmutableList<ITransactionOperator> positionTransformers;
         private final ImmutableList<ITransactionOperator> dataTransformers;
+        private final ImmutableList<ITransactionOperator> targetTransformers;
         private final ImmutableList<ITransactionOperator> dataCreators;
 
         protected OperatorOrdering(Collection<ITransactionOperator> operators) {
@@ -183,6 +214,9 @@ public abstract class AbsTemplateTransaction implements ITemplateTransaction {
                     .collect(ImmutableList.toImmutableList());
             dataTransformers = operators.stream()
                     .filter(op -> op.characteristics().contains(Characteristic.TRANSFORM_DATA))
+                    .collect(ImmutableList.toImmutableList());
+            targetTransformers = operators.stream()
+                    .filter(op -> op.characteristics().contains(Characteristic.TRANSFORM_TARGET))
                     .collect(ImmutableList.toImmutableList());
             dataCreators = operators.stream()
                     .filter(op -> op.characteristics().contains(Characteristic.CREATE_DATA))
@@ -203,6 +237,10 @@ public abstract class AbsTemplateTransaction implements ITemplateTransaction {
 
         public ImmutableList<ITransactionOperator> getDataCreators() {
             return dataCreators;
+        }
+
+        public ImmutableList<ITransactionOperator> getTargetTransformers() {
+            return targetTransformers;
         }
     }
 }

@@ -7,6 +7,7 @@ import com.direwolf20.buildinggadgets.api.building.Region;
 import com.direwolf20.buildinggadgets.api.building.view.IBuildContext;
 import com.direwolf20.buildinggadgets.api.building.view.IBuildView;
 import com.direwolf20.buildinggadgets.api.exceptions.TransactionExecutionException;
+import com.direwolf20.buildinggadgets.api.exceptions.TransactionResultExceedsTemplateSizeException.BlockPosOutOfBounds;
 import com.direwolf20.buildinggadgets.api.exceptions.TransactionResultExceedsTemplateSizeException.ToManyDifferentBlockDataInstances;
 import com.direwolf20.buildinggadgets.api.materials.MaterialList;
 import com.direwolf20.buildinggadgets.api.serialisation.ITemplateSerializer;
@@ -19,6 +20,7 @@ import com.direwolf20.buildinggadgets.api.template.transaction.SimpleTransaction
 import com.direwolf20.buildinggadgets.api.util.CommonUtils;
 import com.direwolf20.buildinggadgets.api.util.DelegatingSpliterator;
 import com.direwolf20.buildinggadgets.api.util.MathUtils;
+import com.google.common.collect.AbstractIterator;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.longs.Long2IntMap;
@@ -39,16 +41,15 @@ import javax.annotation.concurrent.Immutable;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collector;
+import java.util.stream.Stream;
 
 /**
  * An immutable implementation of {@link ITemplate}. It supports {@link ITemplateTransaction}, but those will always create a new instance.
  */
 @Immutable
 public final class ImmutableTemplate implements ITemplate {
-    public static final int MAX_NUM_STATES = 16_777_216; //2^24
     private final Long2IntMap posToStateId;
     private final Int2ObjectMap<BlockData> idToData;
-    private final MaterialList requiredItems;
     private final TemplateHeader headerInfo;
 
     /**
@@ -58,15 +59,14 @@ public final class ImmutableTemplate implements ITemplate {
         return new ImmutableTemplate();
     }
 
-    private ImmutableTemplate(Long2IntMap posToStateId, Int2ObjectMap<BlockData> idToData, MaterialList requiredItems, TemplateHeader headerInfo) {
+    private ImmutableTemplate(Long2IntMap posToStateId, Int2ObjectMap<BlockData> idToData, TemplateHeader headerInfo) {
         this.posToStateId = Objects.requireNonNull(posToStateId);
         this.idToData = Objects.requireNonNull(idToData);
-        this.requiredItems = Objects.requireNonNull(requiredItems);
         this.headerInfo = Objects.requireNonNull(headerInfo);
     }
 
     private ImmutableTemplate() {
-        this(new Long2IntOpenHashMap(), new Int2ObjectOpenHashMap<>(), MaterialList.empty(),
+        this(new Long2IntOpenHashMap(), new Int2ObjectOpenHashMap<>(),
                 TemplateHeader.builder(TemplateSerializerReference.IMMUTABLE_TEMPLATE_SERIALIZER_RL, Region.singleZero()).build());
     }
 
@@ -75,7 +75,7 @@ public final class ImmutableTemplate implements ITemplate {
      */
     @Override
     public ITemplateTransaction startTransaction() {
-        return new TemplateTransaction(posToStateId, idToData, requiredItems, headerInfo);
+        return new TemplateTransaction(posToStateId, idToData, headerInfo);
     }
 
     /**
@@ -91,7 +91,7 @@ public final class ImmutableTemplate implements ITemplate {
      */
     @Override
     public IBuildView createViewInContext(IBuildContext buildContext) {
-        return new BuildView(buildContext, posToStateId, idToData, requiredItems, headerInfo);
+        return new BuildView(buildContext, posToStateId, idToData, headerInfo);
     }
 
     public static final class Serializer extends ForgeRegistryEntry<ITemplateSerializer> implements ITemplateSerializer {
@@ -117,16 +117,13 @@ public final class ImmutableTemplate implements ITemplate {
         //hold references to the fields instead of the Template in order to allow it to be garbage collected
         private final Long2IntMap posToStateId;
         private final Int2ObjectMap<BlockData> idToData;
-        @Nullable
-        private MaterialList requiredItems;
-        private final TemplateHeader headerInfo;
+        private TemplateHeader headerInfo;
         private BlockPos translation;
 
-        private BuildView(IBuildContext context, Long2IntMap posToStateId, Int2ObjectMap<BlockData> idToData, @Nullable MaterialList requiredItems, TemplateHeader headerInfo) {
+        private BuildView(IBuildContext context, Long2IntMap posToStateId, Int2ObjectMap<BlockData> idToData, TemplateHeader headerInfo) {
             this.context = context;
             this.posToStateId = posToStateId;
             this.idToData = idToData;
-            this.requiredItems = requiredItems;
             this.headerInfo = headerInfo;
             this.translation = BlockPos.ZERO;
         }
@@ -154,7 +151,7 @@ public final class ImmutableTemplate implements ITemplate {
 
         @Override
         public IBuildView copy() {
-            return new BuildView(context, posToStateId, idToData, requiredItems, headerInfo)
+            return new BuildView(context, posToStateId, idToData, headerInfo)
                     .translateTo(translation);
         }
 
@@ -176,9 +173,13 @@ public final class ImmutableTemplate implements ITemplate {
 
         @Override
         public MaterialList estimateRequiredItems(@Nullable Vec3d simulatePos) {
-            if (requiredItems == null)
-                requiredItems = IBuildView.super.estimateRequiredItems(simulatePos);
-            return requiredItems;
+            if (headerInfo.getRequiredItems() == null) {
+                headerInfo = TemplateHeader.builderOf(headerInfo)
+                        .requiredItems(IBuildView.super.estimateRequiredItems(simulatePos))
+                        .build();
+            }
+            assert headerInfo.getRequiredItems() != null;
+            return headerInfo.getRequiredItems();
         }
 
         private static final class BuildSpliterator extends DelegatingSpliterator<Long2IntMap.Entry, PlacementTarget> {
@@ -210,21 +211,22 @@ public final class ImmutableTemplate implements ITemplate {
 
     private static final class TemplateTransaction extends AbsTemplateTransaction {
         private static final int PARALLEL_THRESHOLD = 512; //8^3
+        private static final int INVERSE_B1_MASK = ~ MathUtils.B1_BYTE_MASK;
+        private static final int INVERSE_B2_MASK = ~ MathUtils.B2_BYTE_MASK;
+        private static final int INVERSE_B3_MASK = ~ MathUtils.B3_BYTE_MASK;
         //hold references to the values instead of the TemplateItself in order to allow it to be garbage collected
         private Long2IntMap posToStateId;
         private Int2ObjectMap<BlockData> idToData;
-        private MaterialList requiredItems;
         private TemplateHeader headerInfo;
         //--------cache start------
         @Nullable
         private Map<BlockPos, BlockData> posToData;
         private Map<BlockData, Set<BlockPos>> dataToPos;
 
-        public TemplateTransaction(Long2IntMap posToStateId, Int2ObjectMap<BlockData> idToData, MaterialList requiredItems, TemplateHeader headerInfo) {
+        public TemplateTransaction(Long2IntMap posToStateId, Int2ObjectMap<BlockData> idToData, TemplateHeader headerInfo) {
             super();
             this.posToStateId = posToStateId;
             this.idToData = idToData;
-            this.requiredItems = requiredItems;
             this.headerInfo = headerInfo;
             this.posToData = null;
             this.dataToPos = null;
@@ -249,12 +251,11 @@ public final class ImmutableTemplate implements ITemplate {
                 positions.add(entry.getKey());
                 if (cur != null) { //replace op
                     Set<BlockPos> curPositions = dataToPos.get(cur);
-                    if (curPositions != null) {
-                        if (curPositions.size() <= 1)
-                            dataToPos.remove(cur);
-                        else
-                            curPositions.remove(entry.getKey());
-                    }
+                    assert curPositions != null;//there already was a mapping for the position
+                    if (curPositions.size() <= 1)
+                        dataToPos.remove(cur);
+                    else
+                        curPositions.remove(entry.getKey());
                 }
             }
         }
@@ -267,12 +268,17 @@ public final class ImmutableTemplate implements ITemplate {
             Map<BlockData, Set<BlockPos>> newDataToPositionMapping = new HashMap<>();
             for (Map.Entry<BlockData, Set<BlockPos>> entry : dataToPos.entrySet()) {
                 BlockData newData = dataTransformer.transformData(entry.getKey());
-                Set<BlockPos> positions = newDataToPositionMapping.computeIfAbsent(newData, k -> new HashSet<>());
-                positions.addAll(entry.getValue());
-                if (! newData.equals(entry.getKey())) {
-                    for (BlockPos pos : entry.getValue()) {
-                        posToData.put(pos, newData);
+                if (newData != null) {
+                    Set<BlockPos> positions = newDataToPositionMapping.computeIfAbsent(newData, k -> new HashSet<>());
+                    positions.addAll(entry.getValue());
+                    if (! newData.equals(entry.getKey())) {
+                        for (BlockPos pos : entry.getValue()) {
+                            posToData.put(pos, newData);
+                        }
                     }
+                } else {
+                    Stream.concat(newDataToPositionMapping.getOrDefault(entry.getKey(), Collections.emptySet()).stream(), entry.getValue().stream())
+                            .forEach(p -> posToData.remove(p));
                 }
             }
             dataToPos = newDataToPositionMapping;
@@ -286,13 +292,35 @@ public final class ImmutableTemplate implements ITemplate {
             Map<BlockPos, BlockData> newPosToDataMap = new HashMap<>();
             for (Map.Entry<BlockPos, BlockData> entry : posToData.entrySet()) {
                 BlockPos newPos = positionTransformer.transformPos(entry.getKey(), entry.getValue());
-                newPosToDataMap.put(newPos, entry.getValue());
                 Set<BlockPos> positions = dataToPos.get(entry.getValue());
                 assert positions != null && ! positions.isEmpty(); //we know that the data was present in the mapping and has an assigned pos
                 positions.remove(entry.getKey());
-                positions.add(newPos);
+                if (newPos != null) {
+                    newPosToDataMap.put(newPos, entry.getValue());
+                    positions.add(newPos);
+                } else if (positions.isEmpty())
+                    dataToPos.remove(entry.getValue());
             }
             posToData = newPosToDataMap;
+        }
+
+        @Override
+        protected void transformAllTargets(ITransactionExecutionContext exContext, OperatorOrdering ordering, TargetTransformer targetTransformer) throws TransactionExecutionException {
+            ensureReverseMappingCreated();
+            assert posToData != null;
+            Map<BlockPos, BlockData> newPosToDataMap = new HashMap<>();
+            Map<BlockData, Set<BlockPos>> newDataToPositionMapping = new HashMap<>();
+            for (Map.Entry<BlockPos, BlockData> entry : posToData.entrySet()) {
+                PlacementTarget target = targetTransformer.transformTarget(new PlacementTarget(entry.getKey(), entry.getValue()));
+                if (target == null)
+                    continue;
+                newPosToDataMap.put(target.getPos(), target.getData());
+                newDataToPositionMapping
+                        .computeIfAbsent(target.getData(), k -> new HashSet<>())
+                        .add(target.getPos());
+            }
+            posToData = newPosToDataMap;
+            dataToPos = newDataToPositionMapping;
         }
 
         @Override
@@ -302,12 +330,15 @@ public final class ImmutableTemplate implements ITemplate {
 
         @Override
         protected ITemplate createTemplate(ITransactionExecutionContext exContext, OperatorOrdering ordering, @Nullable IBuildContext context, boolean changed) throws TransactionExecutionException {
-            if (! changed)
-                return new ImmutableTemplate(posToStateId, idToData, requiredItems, headerInfo);
-            assert posToData != null;
-            posToStateId = new Long2IntOpenHashMap(posToData.size());
-            createPosToState(createIdToData(), context);
-            return createTemplate(exContext, ordering, context, false);
+            boolean hasNoDataChange = ordering.getPositionTransformers().isEmpty() && ordering.getDataTransformers().isEmpty() && ordering.getDataCreators().isEmpty();
+            boolean cannotUpdateHeader = context == null || headerInfo.getRequiredItems() != null;
+            if (! hasNoDataChange) {
+                assert posToData != null;
+                posToStateId = new Long2IntOpenHashMap(posToData.size());
+                createPosToState(createIdToData(), context);
+            } else if (! cannotUpdateHeader)
+                updateRequiredItems(context);
+            return new ImmutableTemplate(posToStateId, idToData, headerInfo);
         }
 
         private void ensureReverseMappingCreated() {
@@ -325,7 +356,6 @@ public final class ImmutableTemplate implements ITemplate {
             //free memory if possible
             posToStateId = null;
             idToData = null;
-            requiredItems = null;
         }
 
         private Object2IntMap<BlockData> createIdToData() throws TransactionExecutionException {
@@ -334,17 +364,17 @@ public final class ImmutableTemplate implements ITemplate {
             Object2IntMap<BlockData> reverse = new Object2IntOpenHashMap<>(dataToPos.size());
             int curId = 0;
             for (BlockData data : dataToPos.keySet()) {
+                if ((curId & INVERSE_B3_MASK) != 0)
+                    throw new ToManyDifferentBlockDataInstances(
+                            "Cannot have more then 2^24 different types (24-bit id's) of BlockData in one ImmutableTemplate!", this);
                 idToData.put(curId, data);
                 reverse.put(data, curId++);
-                if (curId > MAX_NUM_STATES)
-                    throw new ToManyDifferentBlockDataInstances(
-                            "Cannot have more then 2^24 different types of BlockData in one ImmutableTemplate!", this);
             }
             dataToPos = null; //free memory
             return reverse;
         }
 
-        private void createPosToState(Object2IntMap<BlockData> reverseMap, @Nullable IBuildContext context) {
+        private void createPosToState(Object2IntMap<BlockData> reverseMap, @Nullable IBuildContext context) throws TransactionExecutionException {
             assert posToData != null;
             posToStateId = new Long2IntOpenHashMap(posToData.size());
             MaterialList.Builder builder = context != null ? MaterialList.builder() : null;
@@ -353,7 +383,7 @@ public final class ImmutableTemplate implements ITemplate {
             maxx = maxy = maxz = 0;
             for (Map.Entry<BlockPos, BlockData> entry : posToData.entrySet()) {
                 //ensure that positions are shifted as much as possible towards (0, 0, 0) => There will be at least one position for each axis which has the value equal to 0
-                BlockPos resPos = entry.getKey().subtract(smallest);
+                BlockPos resPos = validatePos(entry.getKey().subtract(smallest));
                 posToStateId.put(MathUtils.posToLong(resPos), reverseMap.getInt(entry.getValue()));
                 if (context != null) {
                     PlacementTarget target = new PlacementTarget(resPos, entry.getValue());
@@ -365,9 +395,9 @@ public final class ImmutableTemplate implements ITemplate {
                 maxy = Math.max(maxy, resPos.getY());
                 maxz = Math.max(maxz, resPos.getZ());
             }
-            requiredItems = builder != null ? builder.build() : null;
             headerInfo = TemplateHeader.builderOf(headerInfo)
                     .bounds(new Region(0, 0, 0, maxx, maxy, maxz))
+                    .requiredItems(builder != null ? builder.build() : null)
                     .build();
         }
 
@@ -386,6 +416,35 @@ public final class ImmutableTemplate implements ITemplate {
                             Math.min(m1.getY(), m2.getY()),
                             Math.min(m1.getZ(), m2.getZ())),
                     Collector.Characteristics.UNORDERED));
+        }
+
+        private BlockPos validatePos(BlockPos resPos) throws TransactionExecutionException {
+            if ((resPos.getX() & INVERSE_B2_MASK) != 0)
+                throw new BlockPosOutOfBounds("X-Coordinate of " + resPos + " exceeds maximum X-Size of " + MathUtils.B2_BYTE_MASK + " (16-Bit)!", this, resPos);
+            if ((resPos.getY() & INVERSE_B1_MASK) != 0)
+                throw new BlockPosOutOfBounds("Y-Coordinate of " + resPos + " exceeds maximum Y-Size of " + MathUtils.B1_BYTE_MASK + " (8-Bit)!", this, resPos);
+            if ((resPos.getZ() & INVERSE_B2_MASK) != 0)
+                throw new BlockPosOutOfBounds("Z-Coordinate of " + resPos + " exceeds maximum Z-Size of " + MathUtils.B2_BYTE_MASK + " (16-Bit)!", this, resPos);
+            return resPos;
+        }
+
+        private void updateRequiredItems(IBuildContext context) {
+            headerInfo = TemplateHeader.builderOf(headerInfo)
+                    .requiredItems(CommonUtils.estimateRequiredItems(() -> {
+                        Iterator<Entry> iterator = posToStateId.long2IntEntrySet().iterator();
+                        return new AbstractIterator<PlacementTarget>() {
+                            @Override
+                            protected PlacementTarget computeNext() {
+                                if (! iterator.hasNext())
+                                    return endOfData();
+                                Entry entry = iterator.next();
+                                BlockPos pos = MathUtils.posFromLong(entry.getLongKey());
+                                BlockData data = idToData.get(entry.getIntValue());
+                                return new PlacementTarget(pos, data);
+                            }
+                        };
+                    }, context))
+                    .build();
         }
     }
 }
