@@ -7,7 +7,7 @@ import com.direwolf20.buildinggadgets.api.building.Region;
 import com.direwolf20.buildinggadgets.api.building.view.IBuildContext;
 import com.direwolf20.buildinggadgets.api.building.view.IBuildView;
 import com.direwolf20.buildinggadgets.api.exceptions.TransactionExecutionException;
-import com.direwolf20.buildinggadgets.api.exceptions.TransactionResultExceedsTemplateSizeException.TransactionProvidesToManyDifferentBlockDataInstances;
+import com.direwolf20.buildinggadgets.api.exceptions.TransactionResultExceedsTemplateSizeException.ToManyDifferentBlockDataInstances;
 import com.direwolf20.buildinggadgets.api.materials.MaterialList;
 import com.direwolf20.buildinggadgets.api.serialisation.ITemplateSerializer;
 import com.direwolf20.buildinggadgets.api.serialisation.SerialisationSupport;
@@ -29,6 +29,7 @@ import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.registries.ForgeRegistryEntry;
@@ -37,12 +38,14 @@ import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.stream.Collector;
 
 /**
  * An immutable implementation of {@link ITemplate}. It supports {@link ITemplateTransaction}, but those will always create a new instance.
  */
 @Immutable
 public final class ImmutableTemplate implements ITemplate {
+    public static final int MAX_NUM_STATES = 16_777_216; //2^24
     private final Long2IntMap posToStateId;
     private final Int2ObjectMap<BlockData> idToData;
     private final MaterialList requiredItems;
@@ -206,6 +209,7 @@ public final class ImmutableTemplate implements ITemplate {
     }
 
     private static final class TemplateTransaction extends AbsTemplateTransaction {
+        private static final int PARALLEL_THRESHOLD = 512; //8^3
         //hold references to the values instead of the TemplateItself in order to allow it to be garbage collected
         private Long2IntMap posToStateId;
         private Int2ObjectMap<BlockData> idToData;
@@ -332,10 +336,11 @@ public final class ImmutableTemplate implements ITemplate {
             for (BlockData data : dataToPos.keySet()) {
                 idToData.put(curId, data);
                 reverse.put(data, curId++);
-                if (curId == 0)
-                    throw new TransactionProvidesToManyDifferentBlockDataInstances(
-                            "Cannot have more then 2^32 different types of BlockData in one ImmutableTemplate!", this);
+                if (curId > MAX_NUM_STATES)
+                    throw new ToManyDifferentBlockDataInstances(
+                            "Cannot have more then 2^24 different types of BlockData in one ImmutableTemplate!", this);
             }
+            dataToPos = null; //free memory
             return reverse;
         }
 
@@ -343,27 +348,44 @@ public final class ImmutableTemplate implements ITemplate {
             assert posToData != null;
             posToStateId = new Long2IntOpenHashMap(posToData.size());
             MaterialList.Builder builder = context != null ? MaterialList.builder() : null;
-            int minx, miny, minz, maxx, maxy, maxz;
-            minx = miny = minz = maxx = maxy = maxz = 0;
+            MutableBlockPos smallest = getSmallest(); //linear-Time Operation - may be multithreaded though!!!
+            int maxx, maxy, maxz;
+            maxx = maxy = maxz = 0;
             for (Map.Entry<BlockPos, BlockData> entry : posToData.entrySet()) {
-                posToStateId.put(MathUtils.posToLong(entry.getKey()), reverseMap.getInt(entry.getValue()));
+                //ensure that positions are shifted as much as possible towards (0, 0, 0) => There will be at least one position for each axis which has the value equal to 0
+                BlockPos resPos = entry.getKey().subtract(smallest);
+                posToStateId.put(MathUtils.posToLong(resPos), reverseMap.getInt(entry.getValue()));
                 if (context != null) {
-                    PlacementTarget target = new PlacementTarget(entry.getKey(), entry.getValue());
+                    PlacementTarget target = new PlacementTarget(resPos, entry.getValue());
                     PlayerEntity player = context.getBuildingPlayer();
-                    BlockRayTraceResult targetRes = player != null ? CommonUtils.fakeRayTrace(player.posX, player.posY, player.posZ, entry.getKey()) : null;
+                    BlockRayTraceResult targetRes = player != null ? CommonUtils.fakeRayTrace(player.posX, player.posY, player.posZ, resPos) : null;
                     builder.addAll(target.getRequiredItems(context, targetRes).getRequiredItems());
                 }
-                minx = Math.min(minx, entry.getKey().getX());
-                miny = Math.min(miny, entry.getKey().getY());
-                minz = Math.min(minz, entry.getKey().getZ());
-                maxx = Math.max(maxx, entry.getKey().getX());
-                maxy = Math.max(maxy, entry.getKey().getY());
-                maxz = Math.max(maxz, entry.getKey().getZ());
+                maxx = Math.max(maxx, resPos.getX());
+                maxy = Math.max(maxy, resPos.getY());
+                maxz = Math.max(maxz, resPos.getZ());
             }
             requiredItems = builder != null ? builder.build() : null;
             headerInfo = TemplateHeader.builderOf(headerInfo)
-                    .bounds(new Region(minx, miny, minz, maxx, maxy, maxz))
+                    .bounds(new Region(0, 0, 0, maxx, maxy, maxz))
                     .build();
+        }
+
+        private MutableBlockPos getSmallest() {
+            assert posToData != null;
+            Set<BlockPos> keySet = posToData.keySet();
+            return (keySet.size() >= PARALLEL_THRESHOLD ? keySet.parallelStream() : keySet.stream()).collect(Collector.of(
+                    () -> new MutableBlockPos(Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE),
+                    (mutable, pos) -> {
+                        mutable.func_223471_o(Math.min(mutable.getX(), pos.getX()));
+                        mutable.setY(Math.min(mutable.getY(), pos.getY()));
+                        mutable.func_223472_q(Math.min(mutable.getZ(), pos.getZ()));
+                    },
+                    (m1, m2) -> new MutableBlockPos(
+                            Math.min(m1.getX(), m2.getX()),
+                            Math.min(m1.getY(), m2.getY()),
+                            Math.min(m1.getZ(), m2.getZ())),
+                    Collector.Characteristics.UNORDERED));
         }
     }
 }
