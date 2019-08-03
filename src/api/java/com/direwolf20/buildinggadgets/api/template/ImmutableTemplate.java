@@ -20,9 +20,8 @@ import com.direwolf20.buildinggadgets.api.template.transaction.SimpleTransaction
 import com.direwolf20.buildinggadgets.api.util.CommonUtils;
 import com.direwolf20.buildinggadgets.api.util.DelegatingSpliterator;
 import com.direwolf20.buildinggadgets.api.util.MathUtils;
+import com.direwolf20.buildinggadgets.api.util.NBTKeys;
 import com.google.common.collect.AbstractIterator;
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.longs.Long2IntMap;
 import it.unimi.dsi.fastutil.longs.Long2IntMap.Entry;
 import it.unimi.dsi.fastutil.longs.Long2IntOpenHashMap;
@@ -30,10 +29,13 @@ import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.INBT;
+import net.minecraft.nbt.ListNBT;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.Vec3d;
+import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 
 import javax.annotation.Nullable;
@@ -49,7 +51,7 @@ import java.util.stream.Stream;
 @Immutable
 public final class ImmutableTemplate implements ITemplate {
     private final Long2IntMap posToStateId;
-    private final Int2ObjectMap<BlockData> idToData;
+    private final BlockData[] idToData;
     private final TemplateHeader headerInfo;
 
     /**
@@ -59,14 +61,14 @@ public final class ImmutableTemplate implements ITemplate {
         return new ImmutableTemplate();
     }
 
-    private ImmutableTemplate(Long2IntMap posToStateId, Int2ObjectMap<BlockData> idToData, TemplateHeader headerInfo) {
+    private ImmutableTemplate(Long2IntMap posToStateId, BlockData[] idToData, TemplateHeader headerInfo) {
         this.posToStateId = Objects.requireNonNull(posToStateId);
         this.idToData = Objects.requireNonNull(idToData);
         this.headerInfo = Objects.requireNonNull(headerInfo);
     }
 
     private ImmutableTemplate() {
-        this(new Long2IntOpenHashMap(), new Int2ObjectOpenHashMap<>(),
+        this(new Long2IntOpenHashMap(), new BlockData[0],
                 TemplateHeader.builder(TemplateSerializerReference.IMMUTABLE_TEMPLATE_SERIALIZER_RL, Region.singleZero()).build());
     }
 
@@ -94,21 +96,68 @@ public final class ImmutableTemplate implements ITemplate {
         return new BuildView(buildContext, posToStateId, idToData, headerInfo);
     }
 
+    private Long2IntMap getPosToStateId() {
+        return posToStateId;
+    }
+
+    private BlockData[] getIdToData() {
+        return idToData;
+    }
+
+    private TemplateHeader getHeaderInfo() {
+        return headerInfo;
+    }
+
     public static final class Serializer extends ForgeRegistryEntry<ITemplateSerializer> implements ITemplateSerializer {
         @Override
         public TemplateHeader createHeaderFor(ITemplate template) {
             ImmutableTemplate castTemplate = (ImmutableTemplate) template;
-            return castTemplate.headerInfo;
+            return castTemplate.getHeaderInfo();
         }
 
         @Override
         public CompoundNBT serialize(ITemplate template, boolean persisted) {
-            return null;
+            CompoundNBT nbt = new CompoundNBT();
+            ImmutableTemplate castTemplate = (ImmutableTemplate) template;
+            BlockData[] idToData = castTemplate.getIdToData();
+            Long2IntMap posToStateId = castTemplate.getPosToStateId();
+            TemplateHeader header = castTemplate.getHeaderInfo();
+            ListNBT dataList = new ListNBT();
+            long[] posAndId = new long[posToStateId.size()];
+            for (BlockData entry : idToData) {
+                dataList.add(entry.serialize(persisted));
+            }
+            int index = 0;
+            for (Entry entry : posToStateId.long2IntEntrySet()) {
+                posAndId[index++] = MathUtils.includeStateId(entry.getLongKey(), entry.getIntValue());
+            }
+            nbt.put(NBTKeys.KEY_DATA, dataList);
+            nbt.putLongArray(NBTKeys.KEY_POS, posAndId);
+            nbt.put(NBTKeys.KEY_HEADER, header.toNBT(persisted));
+            return nbt;
         }
 
         @Override
         public ITemplate deserialize(CompoundNBT tagCompound, @Nullable TemplateHeader header, boolean persisted) {
-            return null;
+            long[] posAndId = tagCompound.getLongArray(NBTKeys.KEY_POS);
+            ListNBT dataList = tagCompound.getList(NBTKeys.KEY_DATA, NBT.TAG_COMPOUND);
+            header = TemplateHeader.fromNBT(tagCompound.getCompound(NBTKeys.KEY_HEADER));
+            BlockData[] idToData = new BlockData[dataList.size()];
+            Long2IntMap posToStateId = new Long2IntOpenHashMap(posAndId.length);
+            int index = 0;
+            for (INBT nbt : dataList) {
+                if (! (nbt instanceof CompoundNBT))//not done via Preconditions to avoid allocating and freeing useless Strings...
+                    throw new IllegalArgumentException("Found corrupted Template save! Expected " + nbt + " to be an instance of " + CompoundNBT.class.getName() + "!");
+                idToData[index++] = BlockData.deserialize((CompoundNBT) nbt, persisted);
+            }
+            for (long l : posAndId) {
+                int stateId = MathUtils.readStateId(l);
+                long serializedPos = MathUtils.readSerializedPos(l);
+                if (stateId < 0 || stateId >= idToData.length) //not done via Preconditions to avoid allocating and freeing useless Strings...
+                    throw new IllegalArgumentException("Found corrupted Template save! " + stateId + " is not a vaild state id! Should be in range [" + 0 + ", " + idToData.length + "]");
+                posToStateId.put(serializedPos, stateId);
+            }
+            return new ImmutableTemplate(posToStateId, idToData, header);
         }
     }
 
@@ -116,11 +165,11 @@ public final class ImmutableTemplate implements ITemplate {
         private final IBuildContext context;
         //hold references to the fields instead of the Template in order to allow it to be garbage collected
         private final Long2IntMap posToStateId;
-        private final Int2ObjectMap<BlockData> idToData;
+        private final BlockData[] idToData;
         private TemplateHeader headerInfo;
         private BlockPos translation;
 
-        private BuildView(IBuildContext context, Long2IntMap posToStateId, Int2ObjectMap<BlockData> idToData, TemplateHeader headerInfo) {
+        private BuildView(IBuildContext context, Long2IntMap posToStateId, BlockData[] idToData, TemplateHeader headerInfo) {
             this.context = context;
             this.posToStateId = posToStateId;
             this.idToData = idToData;
@@ -183,9 +232,9 @@ public final class ImmutableTemplate implements ITemplate {
         }
 
         private static final class BuildSpliterator extends DelegatingSpliterator<Long2IntMap.Entry, PlacementTarget> {
-            private final Int2ObjectMap<BlockData> idToData;
+            private final BlockData[] idToData;
 
-            public BuildSpliterator(Spliterator<Entry> idSpliterator, Int2ObjectMap<BlockData> idToData) {
+            public BuildSpliterator(Spliterator<Entry> idSpliterator, BlockData[] idToData) {
                 super(idSpliterator);
                 this.idToData = idToData; //no sync whatsoever - Immutable!
             }
@@ -202,7 +251,7 @@ public final class ImmutableTemplate implements ITemplate {
             @Override
             protected boolean advance(Long2IntMap.Entry object, Consumer<? super PlacementTarget> action) {
                 BlockPos constructed = MathUtils.posFromLong(object.getLongKey());
-                BlockData data = idToData.get(object.getIntValue());
+                BlockData data = idToData[object.getIntValue()];
                 action.accept(new PlacementTarget(constructed, data));
                 return true;
             }
@@ -216,7 +265,7 @@ public final class ImmutableTemplate implements ITemplate {
         private static final int INVERSE_B3_MASK = ~ MathUtils.B3_BYTE_MASK;
         //hold references to the values instead of the TemplateItself in order to allow it to be garbage collected
         private Long2IntMap posToStateId;
-        private Int2ObjectMap<BlockData> idToData;
+        private BlockData[] idToData;
         private TemplateHeader headerInfo;
         //--------cache start------
         @Nullable
@@ -224,7 +273,7 @@ public final class ImmutableTemplate implements ITemplate {
         @Nullable
         private Map<BlockData, Set<BlockPos>> dataToPos;
 
-        public TemplateTransaction(Long2IntMap posToStateId, Int2ObjectMap<BlockData> idToData, TemplateHeader headerInfo) {
+        public TemplateTransaction(Long2IntMap posToStateId, BlockData[] idToData, TemplateHeader headerInfo) {
             super();
             this.posToStateId = posToStateId;
             this.idToData = idToData;
@@ -373,10 +422,10 @@ public final class ImmutableTemplate implements ITemplate {
             if (posToData != null && dataToPos != null)
                 return;
             posToData = new HashMap<>(posToStateId.size());
-            dataToPos = new HashMap<>(idToData.size());
+            dataToPos = new HashMap<>(idToData.length);
             for (Long2IntMap.Entry entry : posToStateId.long2IntEntrySet()) {
                 BlockPos pos = MathUtils.posFromLong(entry.getLongKey());
-                BlockData data = idToData.get(entry.getIntValue());
+                BlockData data = idToData[entry.getIntValue()];
                 posToData.put(pos, data);
                 Set<BlockPos> positions = dataToPos.computeIfAbsent(data, k -> new HashSet<>());
                 positions.add(pos);
@@ -388,14 +437,16 @@ public final class ImmutableTemplate implements ITemplate {
 
         private Object2IntMap<BlockData> createIdToData() throws TransactionExecutionException {
             assert dataToPos != null;
-            idToData = new Int2ObjectOpenHashMap<>(dataToPos.size());
+            idToData = new BlockData[dataToPos.size()];
             Object2IntMap<BlockData> reverse = new Object2IntOpenHashMap<>(dataToPos.size());
             int curId = 0;
+            //This incremental behaviour is required by ImmutableTemplate.Serializer#serialize
+            //It infers the id from the position in the idToData map!!!
             for (BlockData data : dataToPos.keySet()) {
                 if ((curId & INVERSE_B3_MASK) != 0)
                     throw new ToManyDifferentBlockDataInstances(
                             "Cannot have more then 2^24 different types (24-bit id's) of BlockData in one ImmutableTemplate!", this);
-                idToData.put(curId, data);
+                idToData[curId] = data;
                 reverse.put(data, curId++);
             }
             dataToPos = null; //free memory
@@ -468,7 +519,7 @@ public final class ImmutableTemplate implements ITemplate {
                                     return endOfData();
                                 Entry entry = iterator.next();
                                 BlockPos pos = MathUtils.posFromLong(entry.getLongKey());
-                                BlockData data = idToData.get(entry.getIntValue());
+                                BlockData data = idToData[entry.getIntValue()];
                                 return new PlacementTarget(pos, data);
                             }
                         };

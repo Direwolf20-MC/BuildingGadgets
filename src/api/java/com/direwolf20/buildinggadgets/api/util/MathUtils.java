@@ -6,6 +6,7 @@ public final class MathUtils {
     public static final int B1_BYTE_MASK = 0xFF;
     public static final int B2_BYTE_MASK = 0xFF_FF;
     public static final int B3_BYTE_MASK = 0xFF_FF_FF;
+    public static final long B5_BYTE_MASK = ((long) 0xFF_FF_FF_FF) << 8 | 0xFF;
     private MathUtils() {}
 
     public static short additiveInverse(short num) {
@@ -36,6 +37,10 @@ public final class MathUtils {
 
     public static int readStateId(long serialized) {
         return (int) ((serialized >> 40) & B3_BYTE_MASK);
+    }
+
+    public static long readSerializedPos(long serialized) {
+        return serialized & B5_BYTE_MASK;
     }
 
     public static int floorMultiple(int i, int factor) {

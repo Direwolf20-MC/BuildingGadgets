@@ -2,9 +2,13 @@ package com.direwolf20.buildinggadgets.api.serialisation;
 
 import com.direwolf20.buildinggadgets.api.building.Region;
 import com.direwolf20.buildinggadgets.api.materials.MaterialList;
+import com.direwolf20.buildinggadgets.api.util.NBTKeys;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Multiset;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraftforge.common.util.Constants.NBT;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -45,6 +49,25 @@ public final class TemplateHeader {
                 .author(header.getAuthor())
                 .name(header.getName())
                 .requiredItems(header.getRequiredItems());
+    }
+
+    public static Builder builderFromNBT(CompoundNBT nbt) {
+        Preconditions.checkArgument(nbt.contains(NBTKeys.KEY_SERIALIZER, NBT.TAG_STRING) && nbt.contains(NBTKeys.KEY_BOUNDS, NBT.TAG_COMPOUND),
+                "Cannot construct a TemplateHeader without '" + NBTKeys.KEY_SERIALIZER + "' and '" + NBTKeys.KEY_BOUNDS + "'!");
+        ResourceLocation serializer = new ResourceLocation(nbt.getString(NBTKeys.KEY_SERIALIZER));
+        Region region = Region.deserializeFrom(nbt.getCompound(NBTKeys.KEY_BOUNDS));
+        Builder builder = builder(serializer, region);
+        if (nbt.contains(NBTKeys.KEY_NAME, NBT.TAG_STRING))
+            builder.name(nbt.getString(NBTKeys.KEY_NAME));
+        if (nbt.contains(NBTKeys.KEY_AUTHOR, NBT.TAG_STRING))
+            builder.name(nbt.getString(NBTKeys.KEY_AUTHOR));
+        if (nbt.contains(NBTKeys.KEY_MATERIALS, NBT.TAG_COMPOUND))
+            builder.requiredItems(MaterialList.deserialize(nbt.getCompound(NBTKeys.KEY_MATERIALS)));
+        return builder;
+    }
+
+    public static TemplateHeader fromNBT(CompoundNBT nbt) {
+        return TemplateHeader.builderFromNBT(nbt).build();
     }
 
     @Nullable
@@ -104,6 +127,25 @@ public final class TemplateHeader {
     @Nonnull
     public Region getBoundingBox() {
         return boundingBox;
+    }
+
+    /**
+     * @param persisted whether or not the save may be persisted
+     * @return A new {@link CompoundNBT} which can be used for {@link #fromNBT(CompoundNBT)}
+     * @implNote If this is called with persisted=false then this will never write {@link #getRequiredItems()}.
+     * This is done in order not to prevent updates from changing the required Items for an {@link com.direwolf20.buildinggadgets.api.template.ITemplate}.
+     */
+    public CompoundNBT toNBT(boolean persisted) {
+        CompoundNBT nbt = new CompoundNBT();
+        nbt.putString(NBTKeys.KEY_SERIALIZER, getSerializer().toString());
+        nbt.put(NBTKeys.KEY_BOUNDS, getBoundingBox().serialize());
+        if (getName() != null)
+            nbt.putString(NBTKeys.KEY_NAME, getName());
+        if (getAuthor() != null)
+            nbt.putString(NBTKeys.KEY_AUTHOR, getAuthor());
+        if (! persisted && getRequiredItems() != null)
+            nbt.put(NBTKeys.KEY_MATERIALS, getRequiredItems().serialize(persisted));
+        return nbt;
     }
 
     /**
