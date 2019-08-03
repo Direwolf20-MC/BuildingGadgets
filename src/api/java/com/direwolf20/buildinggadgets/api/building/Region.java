@@ -26,6 +26,30 @@ public final class Region implements IPositionPlacementSequence, Serializable {
         return ZERO;
     }
 
+    /**
+     * Creates a new Builder which initially contains {@code (0, 0, 0) to (0, 0, 0)}.
+     *
+     * @return A new {@link Builder}
+     */
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    /**
+     * Creates a new Builder which initially only contains {@code (Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE) to (Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE)}.
+     * <br>
+     * Useful for creating a builder which encloses all Positions passed in.
+     *
+     * @return A new {@link Builder}
+     */
+    public static Builder enclosingBuilder() {
+        return enclosingBuilder(Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE);
+    }
+
+    public static Builder enclosingBuilder(int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
+        return new Builder(minX, minY, minZ, maxX, maxY, maxZ);
+    }
+
     private static final long serialVersionUID = 8391481277782374853L;
 
     public static Region deserializeFrom(CompoundNBT tag) {
@@ -384,6 +408,113 @@ public final class Region implements IPositionPlacementSequence, Serializable {
         tag.putInt(NBTKeys.KEY_MAX_Y, maxY);
         tag.putInt(NBTKeys.KEY_MAX_Z, maxZ);
         return tag;
+    }
+
+    public static class Builder {
+        private int minX;
+        private int minY;
+        private int minZ;
+        private int maxX;
+        private int maxY;
+        private int maxZ;
+
+        private Builder() {
+            this(0, 0, 0, 0, 0, 0);
+        }
+
+        public Builder(int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
+            this.minX = minX;
+            this.minY = minY;
+            this.minZ = minZ;
+            this.maxX = maxX;
+            this.maxY = maxY;
+            this.maxZ = maxZ;
+        }
+
+        /**
+         * Allows enclosing of all Vectors in the passed iterable.
+         *
+         * @param iterable The iterable who's contents shall be in the resulting Region
+         * @return The Builder to allow for Method chaining
+         * @see #enclose(Vec3i)
+         */
+        public Builder encloseAll(Iterable<? extends Vec3i> iterable) {
+            for (Vec3i vec : iterable) {
+                enclose(vec);
+            }
+            return this;
+        }
+
+        public Builder enclose(Region region) {
+            enclose(region.getMin());
+            enclose(region.getMax());
+            return this;
+        }
+
+        /**
+         * @see #enclose(int, int, int)
+         */
+        public Builder enclose(Vec3i vec) {
+            return enclose(vec.getX(), vec.getY(), vec.getZ());
+        }
+
+        /**
+         * Ensures that the passed in coordinates are included in the resulting {@link Region}.
+         *
+         * @param x the x Coordinate which has to be included in the resulting {@link Region}
+         * @param y the y Coordinate which has to be included in the resulting {@link Region}
+         * @param z the z Coordinate which has to be included in the resulting {@link Region}
+         * @return The Builder to allow for Method chaining
+         * @see #encloseX(int)
+         * @see #encloseY(int)
+         * @see #encloseZ(int)
+         */
+        public Builder enclose(int x, int y, int z) {
+            encloseX(x);
+            encloseY(y);
+            encloseZ(z);
+            return this;
+        }
+
+        /**
+         * Ensures that the passed in x Coordinate is included in the resulting {@link Region}.
+         *
+         * @param x the x Coordinate which has to be included in the resulting {@link Region}
+         * @return The Builder to allow for Method chaining
+         */
+        public Builder encloseX(int x) {
+            minX = Math.min(x, minX);
+            maxX = Math.max(x, maxX);
+            return this;
+        }
+
+        /**
+         * Ensures that the passed in y Coordinate is included in the resulting {@link Region}.
+         *
+         * @param y the y Coordinate which has to be included in the resulting {@link Region}
+         * @return The Builder to allow for Method chaining
+         */
+        public Builder encloseY(int y) {
+            minY = Math.min(y, minY);
+            maxY = Math.max(y, maxY);
+            return this;
+        }
+
+        /**
+         * Ensures that the passed in y Coordinate is included in the resulting {@link Region}.
+         *
+         * @param z the z Coordinate which has to be included in the resulting {@link Region}
+         * @return The Builder to allow for Method chaining
+         */
+        public Builder encloseZ(int z) {
+            minZ = Math.min(z, minZ);
+            maxZ = Math.max(z, maxZ);
+            return this;
+        }
+
+        public Region build() {
+            return new Region(minX, minY, minZ, maxX, maxY, maxZ);
+        }
     }
 
     private static class RegionSpliterator implements Spliterator<BlockPos> {

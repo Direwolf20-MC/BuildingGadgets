@@ -12,6 +12,10 @@ public final class MathUtils {
         return (short) - num;
     }
 
+    /**
+     * Converts the BlockPos to a long. Under the assumption, that it is non-negative and does not exceed [0, 255] for the y Coordinate
+     * and [0, 65536] for x and z‬ Coordinates.
+     */
     public static long posToLong(BlockPos pos) {
         long res = (long) (pos.getX() & B2_BYTE_MASK) << 24;
         res |= (pos.getY() & B1_BYTE_MASK) << 16; // y-Positions are in [0,255] inclusive

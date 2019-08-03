@@ -221,6 +221,7 @@ public final class ImmutableTemplate implements ITemplate {
         //--------cache start------
         @Nullable
         private Map<BlockPos, BlockData> posToData;
+        @Nullable
         private Map<BlockData, Set<BlockPos>> dataToPos;
 
         public TemplateTransaction(Long2IntMap posToStateId, Int2ObjectMap<BlockData> idToData, TemplateHeader headerInfo) {
@@ -235,7 +236,8 @@ public final class ImmutableTemplate implements ITemplate {
         @Override
         protected ITransactionExecutionContext createContext() {
             return SimpleTransactionExecutionContext.builder()
-                    .size(posToStateId.size())
+                    .size(posToData != null ? posToData.size() : posToStateId.size())
+                    .header(headerInfo)
                     .build(headerInfo.getBoundingBox());
         }
 
@@ -244,6 +246,8 @@ public final class ImmutableTemplate implements ITemplate {
             ensureReverseMappingCreated();
             assert posToData != null;
             assert dataToPos != null;
+            Region.Builder builder = Region.enclosingBuilder()
+                    .enclose(headerInfo.getBoundingBox());
             for (Map.Entry<BlockPos, BlockData> entry : created.entrySet()) {
                 BlockData cur = posToData.get(entry.getKey());
                 posToData.put(entry.getKey(), entry.getValue());
@@ -257,7 +261,11 @@ public final class ImmutableTemplate implements ITemplate {
                     else
                         curPositions.remove(entry.getKey());
                 }
+                builder.enclose(entry.getKey());
             }
+            headerInfo = TemplateHeader.builderOf(headerInfo)
+                    .bounds(builder.build())
+                    .build();
         }
 
         @Override
@@ -290,6 +298,7 @@ public final class ImmutableTemplate implements ITemplate {
             assert posToData != null;
             assert dataToPos != null;
             Map<BlockPos, BlockData> newPosToDataMap = new HashMap<>();
+            Region.Builder builder = Region.enclosingBuilder();
             for (Map.Entry<BlockPos, BlockData> entry : posToData.entrySet()) {
                 BlockPos newPos = positionTransformer.transformPos(entry.getKey(), entry.getValue());
                 Set<BlockPos> positions = dataToPos.get(entry.getValue());
@@ -298,8 +307,14 @@ public final class ImmutableTemplate implements ITemplate {
                 if (newPos != null) {
                     newPosToDataMap.put(newPos, entry.getValue());
                     positions.add(newPos);
+                    builder.enclose(newPos);
                 } else if (positions.isEmpty())
                     dataToPos.remove(entry.getValue());
+            }
+            if (! posToData.isEmpty()) {
+                headerInfo = TemplateHeader.builderOf(headerInfo)
+                        .bounds(builder.build())
+                        .build();
             }
             posToData = newPosToDataMap;
         }
@@ -310,6 +325,7 @@ public final class ImmutableTemplate implements ITemplate {
             assert posToData != null;
             Map<BlockPos, BlockData> newPosToDataMap = new HashMap<>();
             Map<BlockData, Set<BlockPos>> newDataToPositionMapping = new HashMap<>();
+            Region.Builder builder = Region.enclosingBuilder();
             for (Map.Entry<BlockPos, BlockData> entry : posToData.entrySet()) {
                 PlacementTarget target = targetTransformer.transformTarget(new PlacementTarget(entry.getKey(), entry.getValue()));
                 if (target == null)
@@ -318,6 +334,12 @@ public final class ImmutableTemplate implements ITemplate {
                 newDataToPositionMapping
                         .computeIfAbsent(target.getData(), k -> new HashSet<>())
                         .add(target.getPos());
+                builder.enclose(target.getPos());
+            }
+            if (! posToData.isEmpty()) {
+                headerInfo = TemplateHeader.builderOf(headerInfo)
+                        .bounds(builder.build())
+                        .build();
             }
             posToData = newPosToDataMap;
             dataToPos = newDataToPositionMapping;
@@ -379,10 +401,10 @@ public final class ImmutableTemplate implements ITemplate {
             posToStateId = new Long2IntOpenHashMap(posToData.size());
             MaterialList.Builder builder = context != null ? MaterialList.builder() : null;
             MutableBlockPos smallest = getSmallest(); //linear-Time Operation - may be multithreaded though!!!
-            int maxx, maxy, maxz;
-            maxx = maxy = maxz = 0;
+            Region.Builder regionBuilder = Region.enclosingBuilder();
             for (Map.Entry<BlockPos, BlockData> entry : posToData.entrySet()) {
                 //ensure that positions are shifted as much as possible towards (0, 0, 0) => There will be at least one position for each axis which has the value equal to 0
+                //validatePos will fail whenever the BlockPos would not be serializable
                 BlockPos resPos = validatePos(entry.getKey().subtract(smallest));
                 posToStateId.put(MathUtils.posToLong(resPos), reverseMap.getInt(entry.getValue()));
                 if (context != null) {
@@ -391,12 +413,12 @@ public final class ImmutableTemplate implements ITemplate {
                     BlockRayTraceResult targetRes = player != null ? CommonUtils.fakeRayTrace(player.posX, player.posY, player.posZ, resPos) : null;
                     builder.addAll(target.getRequiredItems(context, targetRes).getRequiredItems());
                 }
-                maxx = Math.max(maxx, resPos.getX());
-                maxy = Math.max(maxy, resPos.getY());
-                maxz = Math.max(maxz, resPos.getZ());
+                regionBuilder.enclose(resPos);
             }
+            Region region = regionBuilder.build();
+            assert region.getMin().equals(BlockPos.ZERO);
             headerInfo = TemplateHeader.builderOf(headerInfo)
-                    .bounds(new Region(0, 0, 0, maxx, maxy, maxz))
+                    .bounds(region)
                     .requiredItems(builder != null ? builder.build() : null)
                     .build();
         }
