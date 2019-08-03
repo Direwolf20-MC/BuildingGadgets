@@ -351,14 +351,20 @@ public final class ImmutableTemplate implements ITemplate {
         }
 
         @Override
-        protected ITemplate createTemplate(ITransactionExecutionContext exContext, OperatorOrdering ordering, @Nullable IBuildContext context, boolean changed) throws TransactionExecutionException {
-            boolean hasNoDataChange = ordering.getPositionTransformers().isEmpty() && ordering.getDataTransformers().isEmpty() && ordering.getDataCreators().isEmpty();
-            boolean cannotUpdateHeader = context == null || headerInfo.getRequiredItems() != null;
+        protected ITemplate createTemplate(ITransactionExecutionContext exContext, Queue<OperatorOrdering> orderings, @Nullable IBuildContext context, boolean changed) throws TransactionExecutionException {
+            if (! changed)
+                return new ImmutableTemplate(posToStateId, idToData, headerInfo);
+            boolean hasNoDataChange = orderings.stream().allMatch(ordering ->
+                    ordering.getDataCreators().isEmpty()
+                            && ordering.getTargetTransformers().isEmpty()
+                            && ordering.getDataTransformers().isEmpty()
+                            && ordering.getPositionTransformers().isEmpty());
+            boolean cannotAddRequiredItems = context == null || headerInfo.getRequiredItems() != null;
             if (! hasNoDataChange) {
                 assert posToData != null;
                 posToStateId = new Long2IntOpenHashMap(posToData.size());
                 createPosToState(createIdToData(), context);
-            } else if (! cannotUpdateHeader)
+            } else if (! cannotAddRequiredItems)
                 updateRequiredItems(context);
             return new ImmutableTemplate(posToStateId, idToData, headerInfo);
         }
@@ -451,6 +457,7 @@ public final class ImmutableTemplate implements ITemplate {
         }
 
         private void updateRequiredItems(IBuildContext context) {
+            assert posToStateId != null;
             headerInfo = TemplateHeader.builderOf(headerInfo)
                     .requiredItems(CommonUtils.estimateRequiredItems(() -> {
                         Iterator<Entry> iterator = posToStateId.long2IntEntrySet().iterator();

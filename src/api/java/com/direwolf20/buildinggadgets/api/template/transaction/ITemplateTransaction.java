@@ -7,6 +7,7 @@ import com.direwolf20.buildinggadgets.api.building.view.IBuildView;
 import com.direwolf20.buildinggadgets.api.exceptions.TransactionExecutionException;
 import com.direwolf20.buildinggadgets.api.serialisation.TemplateHeader;
 import com.direwolf20.buildinggadgets.api.template.ITemplate;
+import com.direwolf20.buildinggadgets.api.template.transaction.ITransactionOperator.TransactionOperation;
 import jdk.internal.jline.internal.Nullable;
 import net.minecraft.util.math.BlockPos;
 
@@ -32,20 +33,21 @@ public interface ITemplateTransaction {
 
     /**
      * This Method executes all via {@link #operate(ITransactionOperator)} specified {@link ITransactionOperator}'s in the order in which they were specified.
-     * It is recommended that the implementation iterates over the Contents of the backing {@link ITemplate} only once and executes the
-     * {@link ITransactionOperator} on each position as specified. Further optimization might be possible by taking {@link ITransactionOperator#characteristics()}
-     * into account which describe, what kind of Operations a given {@link ITransactionOperator} performs.
+     * It is recommended that the implementation iterates over the Contents of the backing {@link ITemplate} only once (per {@link TransactionOperation}) and executes the
+     * {@link ITransactionOperator} on each position as specified. An {@link ITransactionOperator} is to be executed if and only if it reports the appropriate {@link TransactionOperation}.
+     * Furthermore execution is required to be repeated until all {@link ITransactionOperator ITransactionOperators} no longer report any {@link TransactionOperation Operations} via
+     * {@link ITransactionOperator#remainingOperations()}.
      * <p>
-     * The required execution order for the specified Operations is as follows:
+     * The required execution order (for a single Operation cycle) for the specified Operations is as follows:
      * <ol>
      * <li>Call {@link ITransactionOperator#createPos(ITransactionExecutionContext)} until it returns null. The resulting positions must exist in the resulting {@link ITemplate}.
      * <li>Call {@link ITransactionOperator#createDataForPos(ITransactionExecutionContext, BlockPos)} for each Position previously returned by {@link ITransactionOperator#createPos(ITransactionExecutionContext)}
      * <li>Call {@link ITransactionOperator#transformData(ITransactionExecutionContext, BlockData)} <b>for each BlockData in the {@link ITemplate}.</b>
      * <li>Call {@link ITransactionOperator#transformPos(ITransactionExecutionContext, BlockPos, BlockData)} <b>for each Position in the {@link ITemplate}.</b>
      * <li>Call {@link ITransactionOperator#transformTarget(ITransactionExecutionContext, PlacementTarget)} <b>for each {@link PlacementTarget} in the {@link ITemplate}.</b>
-     * <li>Call {@link ITransactionOperator#transformHeader(ITransactionExecutionContext, TemplateHeader)} for all {@link ITransactionOperator ITransactionOperators} with the
-     *     {@link ITransactionOperator.Characteristic#TRANSFORM_HEADER} characteristic
+     * <li>Call {@link ITransactionOperator#transformHeader(ITransactionExecutionContext, TemplateHeader)} for all {@link ITransactionOperator ITransactionOperators}
      * </ol>
+     * if any {@link TransactionOperation Operation} has to be repeated, then the current cycle is to be finished and afterwards a new cycle is to be started.
      * <p>
      * It is upon this method to create the {@link ITransactionExecutionContext} required to execute a given {@link ITransactionOperator}.
      * @param context {@link IBuildContext} intended to allow for efficient pre-evaluation of for example required Items. May be null.

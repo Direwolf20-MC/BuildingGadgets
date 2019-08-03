@@ -28,30 +28,30 @@ public interface ITransactionOperator {
      * a default case. Users may furthermore not depend on this Enum's ordinal for serialisation. <br>
      * However it is guaranteed, that the id field will remain the same across all non-major releases.
      */
-    enum Characteristic {
+    enum TransactionOperation {
         /**
-         * This {@code Characteristic} represents the ability of an {@code ITransactionOperator} to create new data via
+         * This {@code TransactionOperation} represents the ability of an {@code ITransactionOperator} to create new data via
          * {@link #createPos(ITransactionExecutionContext)} and {@link #createDataForPos(ITransactionExecutionContext, BlockPos)}.
          */
         CREATE_DATA(3),
         /**
-         * This {@code Characteristic} represents the ability of an {@code ITransactionOperator} to transform data via
+         * This {@code TransactionOperation} represents the ability of an {@code ITransactionOperator} to transform data via
          * {@link #transformData(ITransactionExecutionContext, BlockData)}.
          */
         TRANSFORM_DATA(2),
         /**
-         * This {@code Characteristic} represents the ability of an {@code ITransactionOperator} to transform positions via
+         * This {@code TransactionOperation} represents the ability of an {@code ITransactionOperator} to transform positions via
          * {@link #transformPos(ITransactionExecutionContext, BlockPos, BlockData)}.
          */
         TRANSFORM_POSITION(1),
 
         /**
-         * This {@code Characteristic} represents the ability of an {@code ITransactionOperator} to transform {@link PlacementTarget PlacementTargets} via
+         * This {@code TransactionOperation} represents the ability of an {@code ITransactionOperator} to transform {@link PlacementTarget PlacementTargets} via
          * {@link #transformTarget(ITransactionExecutionContext, PlacementTarget)}.
          */
         TRANSFORM_TARGET(4),
         /**
-         * This {@code Characteristic} represents the ability of an {@code ITransactionOperator} to transform the
+         * This {@code TransactionOperation} represents the ability of an {@code ITransactionOperator} to transform the
          * {@link TemplateHeader} of a given {@link ITemplate}.
          */
         TRANSFORM_HEADER(0);
@@ -59,7 +59,7 @@ public interface ITransactionOperator {
 
         private final byte id;
 
-        Characteristic(int id) {
+        TransactionOperation(int id) {
             this.id = (byte) id;
         }
 
@@ -149,11 +149,13 @@ public interface ITransactionOperator {
     }
 
     /**
-     * Returns an {@link Set} of {@link Characteristic} to indicate which operations are performed by this {@code ITransactionOperator}.
-     * All {@link Characteristic} returned by this Method are guaranteed to be executed.
-     * @return A {@link Set} representing the {@link Characteristic} of this {@code ITransactionOperator}
+     * Returns an {@link Set} of {@link TransactionOperation} to state which operations are yet to be performed by this {@code ITransactionOperator}.
+     * All {@link TransactionOperation TransactionOperations} returned by this Method are guaranteed to be executed.<br>
+     * <b>It is crucial that if the {@code ITransactionOperator} is finished with the execution of one Step, that this will no longer be represented in the resulting Set!</b>
+     * This is because {@link ITemplateTransaction ITemplateTransactions} use this to determine whether an {@link ITransactionOperator} has yet to run, or not.
+     * @return A {@link Set} representing the {@link TransactionOperation TransactionOperations} to be performed by this {@code ITransactionOperator}
      */
-    default Set<Characteristic> characteristics() {
+    default Set<TransactionOperation> remainingOperations() {
         return ImmutableSet.of();
     }
 }

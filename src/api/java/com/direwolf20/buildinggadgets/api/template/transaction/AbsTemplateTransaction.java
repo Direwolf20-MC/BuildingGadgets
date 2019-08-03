@@ -8,7 +8,7 @@ import com.direwolf20.buildinggadgets.api.exceptions.OperatorExecutionFailedExce
 import com.direwolf20.buildinggadgets.api.exceptions.TransactionExecutionException;
 import com.direwolf20.buildinggadgets.api.serialisation.TemplateHeader;
 import com.direwolf20.buildinggadgets.api.template.ITemplate;
-import com.direwolf20.buildinggadgets.api.template.transaction.ITransactionOperator.Characteristic;
+import com.direwolf20.buildinggadgets.api.template.transaction.ITransactionOperator.TransactionOperation;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.util.math.BlockPos;
 
@@ -36,17 +36,21 @@ public abstract class AbsTemplateTransaction implements ITemplateTransaction {
             throw new UnsupportedOperationException("Cannot execute TemplateTransaction twice!");
         OperatorOrdering ordering = createOrdering(operators);
         ITransactionExecutionContext exContext = createContext();
-        exContext = createContext();
-        transformData(exContext, ordering);
-        exContext = createContext();
-        transformPositions(exContext, ordering);
-        exContext = createContext();
-
-        exContext = createContext();
-        transformHeader(exContext, ordering);
-        return createTemplate(exContext, ordering, context,
-                ! (ordering.getDataCreators().isEmpty() && ordering.getDataTransformers().isEmpty()
-                        && ordering.getPositionTransformers().isEmpty() && ordering.getHeaderTransformers().isEmpty()));
+        boolean changed = false;
+        Queue<OperatorOrdering> orderingHistory = new LinkedList<>();
+        while (ordering.hasActingTransformers()) {
+            transformData(exContext, ordering);
+            exContext = createContext();
+            transformPositions(exContext, ordering);
+            exContext = createContext();
+            transformTargets(exContext, ordering);
+            exContext = createContext();
+            transformHeader(exContext, ordering);
+            orderingHistory.add(ordering);
+            ordering = createOrdering(operators);
+            changed = true;
+        }
+        return createTemplate(exContext, orderingHistory, context, changed);
     }
 
     protected void invalidate() {
@@ -102,7 +106,7 @@ public abstract class AbsTemplateTransaction implements ITemplateTransaction {
 
     protected abstract void updateHeader(ITransactionExecutionContext exContext, OperatorOrdering ordering, HeaderTransformer transformer) throws TransactionExecutionException;
 
-    protected abstract ITemplate createTemplate(ITransactionExecutionContext exContext, OperatorOrdering ordering, @Nullable IBuildContext context, boolean changed) throws TransactionExecutionException;
+    protected abstract ITemplate createTemplate(ITransactionExecutionContext exContext, Queue<OperatorOrdering> ordering, @Nullable IBuildContext context, boolean changed) throws TransactionExecutionException;
 
     protected void performCreateData(ITransactionExecutionContext exContext, OperatorOrdering ordering) throws TransactionExecutionException {
         Map<BlockPos, BlockData> created = createData(exContext, ordering);
@@ -204,23 +208,25 @@ public abstract class AbsTemplateTransaction implements ITemplateTransaction {
         private final ImmutableList<ITransactionOperator> dataTransformers;
         private final ImmutableList<ITransactionOperator> targetTransformers;
         private final ImmutableList<ITransactionOperator> dataCreators;
+        private final boolean hasActingTransformers;
 
         protected OperatorOrdering(Collection<ITransactionOperator> operators) {
             headerTransformers = operators.stream()
-                    .filter(op -> op.characteristics().contains(Characteristic.TRANSFORM_HEADER))
+                    .filter(op -> op.remainingOperations().contains(TransactionOperation.TRANSFORM_HEADER))
                     .collect(ImmutableList.toImmutableList());
             positionTransformers = operators.stream()
-                    .filter(op -> op.characteristics().contains(Characteristic.TRANSFORM_POSITION))
+                    .filter(op -> op.remainingOperations().contains(TransactionOperation.TRANSFORM_POSITION))
                     .collect(ImmutableList.toImmutableList());
             dataTransformers = operators.stream()
-                    .filter(op -> op.characteristics().contains(Characteristic.TRANSFORM_DATA))
+                    .filter(op -> op.remainingOperations().contains(TransactionOperation.TRANSFORM_DATA))
                     .collect(ImmutableList.toImmutableList());
             targetTransformers = operators.stream()
-                    .filter(op -> op.characteristics().contains(Characteristic.TRANSFORM_TARGET))
+                    .filter(op -> op.remainingOperations().contains(TransactionOperation.TRANSFORM_TARGET))
                     .collect(ImmutableList.toImmutableList());
             dataCreators = operators.stream()
-                    .filter(op -> op.characteristics().contains(Characteristic.CREATE_DATA))
+                    .filter(op -> op.remainingOperations().contains(TransactionOperation.CREATE_DATA))
                     .collect(ImmutableList.toImmutableList());
+            hasActingTransformers = ! (headerTransformers.isEmpty() && positionTransformers.isEmpty() && dataTransformers.isEmpty() && targetTransformers.isEmpty() && dataCreators.isEmpty());
         }
 
         public ImmutableList<ITransactionOperator> getHeaderTransformers() {
@@ -241,6 +247,10 @@ public abstract class AbsTemplateTransaction implements ITemplateTransaction {
 
         public ImmutableList<ITransactionOperator> getTargetTransformers() {
             return targetTransformers;
+        }
+
+        public boolean hasActingTransformers() {
+            return hasActingTransformers;
         }
     }
 }
