@@ -69,7 +69,6 @@ public final class BuildingGadgets {
         DistExecutor.runWhenOn(Dist.CLIENT, () -> () -> {
             eventBus.addListener((Consumer<FMLClientSetupEvent>) event -> ClientProxy.clientSetup(eventBus));
             ModLoadingContext.get().registerExtensionPoint(ExtensionPoint.CONFIGGUIFACTORY, () -> GuiMod::openScreen);
-            FMLJavaModLoadingContext.get().getModEventBus().addListener(BuildingObjects::initColorHandlers);
         });
         BuildingObjects.init();
     }

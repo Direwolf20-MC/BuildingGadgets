@@ -4,11 +4,11 @@ import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.material.MaterialColor;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.color.BlockColors;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.ColorHandlerEvent;
 import net.minecraftforge.fml.DistExecutor;
 
 public class BuildingObjects {
@@ -27,10 +27,8 @@ public class BuildingObjects {
     public static final Material EFFECT_BLOCK_MATERIAL = new Material.Builder(MaterialColor.AIR).notSolid().build();
 
 
-    public static void initColorHandlers(ColorHandlerEvent.Block event) { //TODO ItemBlock Creative Tabs
-        BlockColors blockColors = event.getBlockColors();
-        //TODO non conditional registry
-        BGBlocks.constructionBlock.initColorHandler(blockColors);
+    public static void initColorHandlers(BlockColors colors) {
+        BGBlocks.constructionBlock.initColorHandler(colors);
     }
 
     public static void init() {
@@ -39,11 +37,15 @@ public class BuildingObjects {
         BGEntities.init();
         BGBlocks.BGTileEntities.init();
         BGContainers.init();
-        DistExecutor.runWhenOn(Dist.CLIENT, () -> BuildingObjects::clientInit);
+        DistExecutor.runWhenOn(Dist.CLIENT, () -> () -> {
+            BGEntities.clientInit();
+            BGBlocks.BGTileEntities.clientInit();
+        });
     }
 
     public static void clientSetup() {
         BGContainers.clientSetup();
+        initColorHandlers(Minecraft.getInstance().getBlockColors());
     }
 
     public static void cleanup() {
@@ -52,10 +54,5 @@ public class BuildingObjects {
         BGEntities.cleanup();
         BGBlocks.BGTileEntities.cleanup();
         BGContainers.cleanup();
-    }
-
-    private static void clientInit() {
-        BGEntities.clientInit();
-        BGBlocks.BGTileEntities.clientInit();
     }
 }
