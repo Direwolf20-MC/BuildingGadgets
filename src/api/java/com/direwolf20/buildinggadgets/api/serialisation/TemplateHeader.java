@@ -45,7 +45,17 @@ public final class TemplateHeader {
      * @return a Builder with all values predefined to the values passed into the header
      */
     public static Builder builderOf(TemplateHeader header) {
-        return builder(header.getSerializer(), header.getBoundingBox())
+        return builderOf(header, header.getSerializer(), header.getBoundingBox());
+    }
+
+    /**
+     * @param boundingBox the {@link Region} to use
+     * @param serializer  The serializer to use
+     * @param header      The {@code TemplateHeader} to copy
+     * @return a Builder with all values predefined to the values passed into the header, except for serializer and boundBox
+     */
+    public static Builder builderOf(TemplateHeader header, ResourceLocation serializer, Region boundingBox) {
+        return builder(serializer, boundingBox)
                 .author(header.getAuthor())
                 .name(header.getName())
                 .requiredItems(header.getRequiredItems());

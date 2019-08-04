@@ -2,7 +2,6 @@ package com.direwolf20.buildinggadgets.api.template.transaction;
 
 import com.direwolf20.buildinggadgets.api.building.BlockData;
 import com.direwolf20.buildinggadgets.api.building.PlacementTarget;
-import com.direwolf20.buildinggadgets.api.building.Region;
 import com.direwolf20.buildinggadgets.api.building.view.IBuildContext;
 import com.direwolf20.buildinggadgets.api.exceptions.OperatorExecutionFailedException;
 import com.direwolf20.buildinggadgets.api.exceptions.TransactionExecutionException;
@@ -47,6 +46,7 @@ public abstract class AbsTemplateTransaction implements ITemplateTransaction {
             exContext = createContext();
             transformHeader(exContext, ordering);
             orderingHistory.add(ordering);
+            exContext = createContext();
             ordering = createOrdering(operators);
             changed = true;
         }
@@ -167,7 +167,6 @@ public abstract class AbsTemplateTransaction implements ITemplateTransaction {
 
     protected void transformHeader(ITransactionExecutionContext exContext, OperatorOrdering ordering) throws TransactionExecutionException {
         updateHeader(exContext, ordering, header -> {
-            Region prevBoundingBox = header.getBoundingBox();
             for (ITransactionOperator operator : ordering.getHeaderTransformers()) {
                 try {
                     header = Objects.requireNonNull(operator.transformHeader(exContext, header), "Operator " + operator + " may not return a null TemplateHeader!");

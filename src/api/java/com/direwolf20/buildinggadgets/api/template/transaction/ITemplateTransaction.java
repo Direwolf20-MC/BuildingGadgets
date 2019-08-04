@@ -8,8 +8,9 @@ import com.direwolf20.buildinggadgets.api.exceptions.TransactionExecutionExcepti
 import com.direwolf20.buildinggadgets.api.serialisation.TemplateHeader;
 import com.direwolf20.buildinggadgets.api.template.ITemplate;
 import com.direwolf20.buildinggadgets.api.template.transaction.ITransactionOperator.TransactionOperation;
-import jdk.internal.jline.internal.Nullable;
 import net.minecraft.util.math.BlockPos;
+
+import javax.annotation.Nullable;
 
 /**
  * This class represents a transaction used for modifying {@link ITemplate} in more advanced ways than just translating the {@link IBuildView}
