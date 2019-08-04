@@ -5,10 +5,7 @@ import com.direwolf20.buildinggadgets.api.building.PlacementTarget;
 import com.direwolf20.buildinggadgets.api.building.Region;
 import com.direwolf20.buildinggadgets.api.building.view.IBuildContext;
 import com.direwolf20.buildinggadgets.api.building.view.IBuildView;
-import com.direwolf20.buildinggadgets.api.exceptions.ConcurrentTransactionExecutionException;
-import com.direwolf20.buildinggadgets.api.exceptions.TemplateException;
-import com.direwolf20.buildinggadgets.api.exceptions.TemplateViewAlreadyClosedException;
-import com.direwolf20.buildinggadgets.api.exceptions.TransactionExecutionException;
+import com.direwolf20.buildinggadgets.api.exceptions.*;
 import com.direwolf20.buildinggadgets.api.materials.MaterialList;
 import com.direwolf20.buildinggadgets.api.serialisation.ITemplateSerializer;
 import com.direwolf20.buildinggadgets.api.serialisation.TemplateHeader;
@@ -36,8 +33,14 @@ import java.util.function.Consumer;
  */
 public class DelegatingTemplate implements ITemplate {
     public static ITemplate unwrap(ITemplate template) {
-        if (template instanceof DelegatingTemplate)
-            return unwrap(((DelegatingTemplate) template).getDelegate());
+        if (template instanceof DelegatingTemplate) {
+            DelegatingTemplate castTemplate = (DelegatingTemplate) template;
+            ITemplate delegate;
+            synchronized (castTemplate.getDelegateLock()) {
+                delegate = castTemplate.getDelegate();
+            }
+            return unwrap(delegate);
+        }
         return template;
     }
 
@@ -48,11 +51,13 @@ public class DelegatingTemplate implements ITemplate {
     private ITemplate delegate;
     private Object delegateLock;
     private Set<IBuildView> activeViews;
+    private boolean transactionActive;
 
     public DelegatingTemplate(ITemplate delegate) {
         this.delegate = Objects.requireNonNull(delegate);
         this.delegateLock = new Object();
         this.activeViews = Collections.newSetFromMap(new IdentityHashMap<>());
+        this.transactionActive = false;
     }
 
     public DelegatingTemplate() {
@@ -65,9 +70,15 @@ public class DelegatingTemplate implements ITemplate {
     @Override
     @Nullable
     public ITemplateTransaction startTransaction() {
-        ITemplateTransaction delegateTransaction = getDelegate().startTransaction();
-        if (delegateTransaction == null)
-            return null;
+        ITemplateTransaction delegateTransaction;
+        synchronized (getDelegateLock()) {
+            if (isTransactionActive()) //if there is already a Transaction active - don't go through the headaches of permitting another one
+                return null;
+            delegateTransaction = getDelegate().startTransaction();
+            if (delegateTransaction == null)
+                return null;
+            markTransactionActive();
+        }
         return new DelegatingTransaction(this, delegateTransaction);
     }
 
@@ -118,6 +129,18 @@ public class DelegatingTemplate implements ITemplate {
      */
     protected Set<IBuildView> getActiveViews() {
         return activeViews;
+    }
+
+    protected boolean isTransactionActive() {
+        return transactionActive;
+    }
+
+    protected void markTransactionActive() {
+        this.transactionActive = true;
+    }
+
+    protected void markTransactionFinished() {
+        this.transactionActive = false;
     }
 
     public static class DelegatingTemplateSerializer extends ForgeRegistryEntry<ITemplateSerializer> implements ITemplateSerializer {
@@ -188,7 +211,8 @@ public class DelegatingTemplate implements ITemplate {
 
         @Override
         public Spliterator<PlacementTarget> spliterator() {
-            validateOpen();
+            if (template == null || view == null)
+                throw new UnsupportedOperationException("Cannot create a Spliterator for an already closed IBuildView!");
             return new DelegatingBuildSpliterator(view.spliterator());
         }
 
@@ -295,22 +319,30 @@ public class DelegatingTemplate implements ITemplate {
 
         @Override
         public ITemplateTransaction operate(ITransactionOperator operator) {
+            Preconditions.checkState(transaction != null && template != null, "Transaction has already been executed!");
             transaction.operate(operator);
             return this;
         }
 
         @Override
         public ITemplate execute(@Nullable IBuildContext context) throws TransactionExecutionException {
+            if (transaction == null || template == null)
+                throw new TransactionInvalidException("Cannot execute Transaction Twice!");
             ITemplate result = transaction.execute(context);
-            applyNewDelegate(result);
-            return template;
+            markCompleteWithResult(result);
+            ITemplate returnVal = template;
+            template = null;
+            transaction = null;
+            return returnVal;
         }
 
-        protected void applyNewDelegate(ITemplate newDelegate) throws TransactionExecutionException {
+        protected void markCompleteWithResult(ITemplate newDelegate) throws TransactionExecutionException {
             synchronized (template.getDelegateLock()) {
+                template.markTransactionFinished();
                 if (! template.getActiveViews().isEmpty())
                     throw new ConcurrentTransactionExecutionException("Cannot apply delegate Template whilst a BuildView is present!");
                 template.setDelegate(newDelegate);
+
             }
         }
     }

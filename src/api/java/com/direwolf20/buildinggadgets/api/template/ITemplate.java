@@ -53,7 +53,7 @@ public interface ITemplate {
      * will only modify modify this {@code ITemplate} when {@link ITemplateTransaction#execute()} is called.
      * Therefore iteration on an {@link IBuildView} of this {@code ITemplate} must still be permitted even when an {@link ITemplateTransaction} has been created.
      * It is upon the {@link ITemplateTransaction} to fail if multiple {@link ITemplateTransaction} attempt to execute in parallel or
-     * this {@code ITemplate} is currently iterated upon.
+     * this {@code ITemplate} currently has active {@link IBuildView IBuildViews}.
      * <p>
      * An implementation is not required to support modification via an {@link ITemplateTransaction}. As a result this method may
      * return null if it is not supported. Furthermore an implementation may choose not to support multiple {@link ITemplateTransaction}'s at the same

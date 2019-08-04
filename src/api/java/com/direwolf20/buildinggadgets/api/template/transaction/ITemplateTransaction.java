@@ -29,6 +29,7 @@ public interface ITemplateTransaction {
      * @param operator The {@link ITransactionOperator} to register with this {@code ITemplateTransaction}
      * @return itself to allow for Method chaining
      * @throws NullPointerException if faced with an null value
+     * @throws IllegalStateException if this Transaction was already executed
      */
     ITemplateTransaction operate(ITransactionOperator operator);
 

@@ -5,9 +5,11 @@ import com.direwolf20.buildinggadgets.api.building.PlacementTarget;
 import com.direwolf20.buildinggadgets.api.building.view.IBuildContext;
 import com.direwolf20.buildinggadgets.api.exceptions.OperatorExecutionFailedException;
 import com.direwolf20.buildinggadgets.api.exceptions.TransactionExecutionException;
+import com.direwolf20.buildinggadgets.api.exceptions.TransactionInvalidException;
 import com.direwolf20.buildinggadgets.api.serialisation.TemplateHeader;
 import com.direwolf20.buildinggadgets.api.template.ITemplate;
 import com.direwolf20.buildinggadgets.api.template.transaction.ITransactionOperator.TransactionOperation;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.util.math.BlockPos;
 
@@ -25,14 +27,16 @@ public abstract class AbsTemplateTransaction implements ITemplateTransaction {
 
     @Override
     public ITemplateTransaction operate(ITransactionOperator operator) {
-        operators.add(operator);
+        Preconditions.checkState(isValid(), "Transaction has already been executed!");
+        operators.add(Objects.requireNonNull(operator));
         return this;
     }
 
     @Override
     public ITemplate execute(@Nullable IBuildContext context) throws TransactionExecutionException {
         if (! isValid())
-            throw new UnsupportedOperationException("Cannot execute TemplateTransaction twice!");
+            throw new TransactionInvalidException("Cannot execute TemplateTransaction twice!");
+        invalidate();
         OperatorOrdering ordering = createOrdering(operators);
         ITransactionExecutionContext exContext = createContext();
         boolean changed = false;
