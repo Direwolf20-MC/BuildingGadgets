@@ -23,25 +23,37 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
+import net.minecraftforge.fml.DistExecutor;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.function.Supplier;
 
 import static com.direwolf20.buildinggadgets.common.util.GadgetUtils.withSuffix;
 
 public abstract class AbstractGadget extends Item {
 
+    private BaseRenderer renderer;
+
     public AbstractGadget(Properties builder) {
         super(builder);
+        renderer = DistExecutor.runForDist(this::createRenderFactory, () -> () -> null);
     }
 
     public abstract int getEnergyMax();
     public abstract int getEnergyCost(ItemStack tool);
 
-    public abstract BaseRenderer getRender();
+    @OnlyIn(Dist.CLIENT)
+    public BaseRenderer getRender() {
+        return renderer;
+    }
+
+    protected abstract Supplier<BaseRenderer> createRenderFactory();
 
     @Override
     @Nullable

@@ -66,9 +66,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.Supplier;
 
 public class GadgetCopyPaste extends AbstractGadget implements ITemplate {
-    private static CopyPasteRender render = new CopyPasteRender();
 
     public enum ToolMode {
         Copy, Paste;
@@ -94,8 +94,8 @@ public class GadgetCopyPaste extends AbstractGadget implements ITemplate {
     }
 
     @Override
-    public BaseRenderer getRender() {
-        return render;
+    protected Supplier<BaseRenderer> createRenderFactory() {
+        return CopyPasteRender::new;
     }
 
     private static void setAnchor(ItemStack stack, BlockPos anchorPos) {

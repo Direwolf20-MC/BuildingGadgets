@@ -49,10 +49,10 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nullable;
 import java.util.*;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public class GadgetDestruction extends AbstractGadget {
-    private static final DestructionRender render = new DestructionRender();
 
     public GadgetDestruction(Properties builder) {
         super(builder);
@@ -69,10 +69,9 @@ public class GadgetDestruction extends AbstractGadget {
     }
 
     @Override
-    public BaseRenderer getRender() {
-        return render;
+    protected Supplier<BaseRenderer> createRenderFactory() {
+        return DestructionRender::new;
     }
-
 
     private int getCostMultiplier(ItemStack tool) {
         return (int) (! getFuzzy(tool) ? Config.GADGETS.GADGET_DESTRUCTION.nonFuzzyMultiplier.get() : 1);

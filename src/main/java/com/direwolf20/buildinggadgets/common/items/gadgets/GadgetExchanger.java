@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.common.items.gadgets;
 
-import com.direwolf20.buildinggadgets.common.blocks.EffectBlock;
 import com.direwolf20.buildinggadgets.api.building.BlockData;
+import com.direwolf20.buildinggadgets.common.blocks.EffectBlock;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.items.gadgets.renderers.BaseRenderer;
 import com.direwolf20.buildinggadgets.common.items.gadgets.renderers.ExchangerRender;
@@ -39,8 +39,8 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.server.ServerWorld;
 import net.minecraft.world.World;
+import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.MinecraftForge;
@@ -53,12 +53,12 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Supplier;
 
 import static com.direwolf20.buildinggadgets.common.util.GadgetUtils.*;
 
 public class GadgetExchanger extends AbstractGadget {
     private static final FakeBuilderWorld fakeWorld = new FakeBuilderWorld();
-    private static final ExchangerRender render = new ExchangerRender();
 
     public GadgetExchanger(Properties builder) {
         super(builder);
@@ -75,8 +75,8 @@ public class GadgetExchanger extends AbstractGadget {
     }
 
     @Override
-    public BaseRenderer getRender() {
-        return render;
+    protected Supplier<BaseRenderer> createRenderFactory() {
+        return ExchangerRender::new;
     }
 
     @Override
