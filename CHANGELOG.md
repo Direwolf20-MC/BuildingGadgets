@@ -1,7 +1,7 @@
 # Building Gadgets Changelog
 The format of this document is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and should continue to adhere to the conventions outlined in the Keep a Changelog guidelines.
 
-## [Unreleased] [3.0.1a - 1.13]
+## [Unreleased] [3.0.1a - 1.14.4]
 ## Changed
 - Bumped Forge version to .45 which fixes a binary incompat due to the movement of the GameEvents
     - This also includes a Forge-Fix which would crash BuildingGadgets during startup, if any other mod did a Registry
@@ -23,6 +23,7 @@ The format of this document is based on [Keep a Changelog](https://keepachangelo
 ## Removed
 - Removed durability option as it was causing very weird issues...
     - you've got a (by default very fast) charging station now.
+
 ## [2.7.1 - 1.12.2] - 2019-07-23
 ### Fixed
 - Fixed an issue causing the game to crash when using the material list key on anything but the Copy&Paste Gadget or air.
