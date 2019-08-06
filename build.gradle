@@ -207,7 +207,7 @@ processResources { //Processes main only resources
     }
 }
 
-processResources { //Processes main only resources
+processApiResources { //Processes main only resources
     inputs.property('version', project.version)
     inputs.property('api_version', project.api_version)
     inputs.property('forge_major', project.forge_major)
