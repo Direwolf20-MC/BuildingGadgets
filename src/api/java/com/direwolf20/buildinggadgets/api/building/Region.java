@@ -120,10 +120,10 @@ public final class Region implements IPositionPlacementSequence, Serializable {
      * <h3>Samples:</h3>
      * <table summary="A few examples of Regions">
      * <tr><th>Input</th><th>Result</th></tr>
-     * <tr><td><pre>{@code new Region(0, 0, 0, 1, 1, 1).grow(2, 2, 2)}</pre></td><td><pre><samp>{@code box[-2, -2, -2 -> 3, 3, 3]}</samp></pre></td></tr>
-     * <tr><td><pre>{@code new Region(0, 0, 0, 6, 6, 6).grow(-2, -2, -2)}</pre></td><td><pre><samp>{@code box[2, 2, 2 -> 4, 4, 4]}</samp></pre></td></tr>
-     * <tr><td><pre>{@code new Region(5, 5, 5, 7, 7, 7).grow(0, 1, -1)}</pre></td><td><pre><samp>{@code box[5, 4, 6 -> 7, 8, 6]}</samp></pre></td></tr>
-     * <tr><td><pre>{@code new Region(1, 1, 1, 3, 3, 3).grow(-4, -2, -3)}</pre></td><td><pre><samp>{@code box[-1, 1, 0 -> 5, 3, 4]}</samp></pre></td></tr>
+     * <tr><td><pre>{@code new Region(0, 0, 0, 1, 1, 1).grow(2, 2, 2)}</pre></td><td><pre><code>{@code box[-2, -2, -2 -> 3, 3, 3]}</code></pre></td></tr>
+     * <tr><td><pre>{@code new Region(0, 0, 0, 6, 6, 6).grow(-2, -2, -2)}</pre></td><td><pre><code>{@code box[2, 2, 2 -> 4, 4, 4]}</code></pre></td></tr>
+     * <tr><td><pre>{@code new Region(5, 5, 5, 7, 7, 7).grow(0, 1, -1)}</pre></td><td><pre><code>{@code box[5, 4, 6 -> 7, 8, 6]}</code></pre></td></tr>
+     * <tr><td><pre>{@code new Region(1, 1, 1, 3, 3, 3).grow(-4, -2, -3)}</pre></td><td><pre><code>{@code box[-1, 1, 0 -> 5, 3, 4]}</code></pre></td></tr>
      * </table>
      *
      * <h3>See Also:</h3>
