@@ -42,7 +42,6 @@ public class RegionSnapshot {
     private static CompoundNBT serialize(CompoundNBT tag, RegionSnapshot snapshot) {
         Preconditions.checkArgument(snapshot.positions instanceof Serializable);
 
-        // func_212678_a == getKey
         tag.putString(DIMENSION, DimensionType.getKey(snapshot.world.getDimension().getType()).toString());
 
         byte[] serializedPositions = SerializationHelper.serialize(snapshot.positions);
@@ -69,6 +68,9 @@ public class RegionSnapshot {
 
         // The repeating block state, if any
         // - similar logic as counter resetting for initializing as the first block state
+        if( snapshot.blockStates.size() == 0 )
+            return new CompoundNBT();
+
         Optional<BlockState> lastStreak = snapshot.blockStates.get(0);
         // Number of repeating block states
         int streak = 0;
