@@ -192,8 +192,13 @@ test {
     }
 }
 
-processResources { //Processes main only resouces
-    from("$buildDir/tmp/modMeta") {
+processResources { //Processes main only resources
+    inputs.property('version', project.version)
+    inputs.property('api_version', project.api_version)
+    inputs.property('forge_major', project.forge_major)
+    inputs.property('update_json', project.update_json)
+    from(sourceSets.main.resources.srcDirs) {
+        include 'META-INF/mods.toml'
         expand 'version':project.version, 'api_version':project.api_version,'forge_major':project.forge_major,'update_json':project.update_json
     }
     
@@ -202,10 +207,16 @@ processResources { //Processes main only resouces
     }
 }
 
-processApiResources {
-    from("$buildDir/tmp/modMeta/META-INF/mods.toml") {
+processApiResources { //Processes main only resources
+    inputs.property('version', project.version)
+    inputs.property('api_version', project.api_version)
+    inputs.property('forge_major', project.forge_major)
+    inputs.property('update_json', project.update_json)
+    from(sourceSets.api.resources.srcDirs) {
+        include 'META-INF/mods.toml'
         expand 'version':project.version, 'api_version':project.api_version,'forge_major':project.forge_major,'update_json':project.update_json
     }
+
     from(sourceSets.api.resources.srcDirs) {
         exclude 'META-INF/mods.toml'
     }

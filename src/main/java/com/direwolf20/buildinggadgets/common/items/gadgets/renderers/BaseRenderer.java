@@ -35,7 +35,6 @@ import java.util.Set;
 public abstract class BaseRenderer {
     public static final BlockState AIR = Blocks.AIR.getDefaultState();
 
-    private static final Minecraft minecraft = Minecraft.getInstance();
     private static final FakeTERWorld tileEntityWorld = new FakeTERWorld();
     private static final FakeBuilderWorld builderWorld = new FakeBuilderWorld();
     private static final Set<TileEntity> invalidTileEntities = new HashSet<>();
@@ -115,7 +114,7 @@ public abstract class BaseRenderer {
     }
 
     static Minecraft getMc() {
-        return minecraft;
+        return Minecraft.getInstance();
     }
 
     static FakeTERWorld getTileEntityWorld() {

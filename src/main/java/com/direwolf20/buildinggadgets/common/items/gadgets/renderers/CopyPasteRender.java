@@ -17,7 +17,9 @@ import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.*;
+import net.minecraft.item.BlockItem;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
@@ -29,7 +31,13 @@ import org.lwjgl.opengl.GL14;
 import java.util.List;
 
 public class CopyPasteRender extends BaseRenderer {
-    private static final ChestRenderer chestRenderer = new ChestRenderer();
+    private ChestRenderer chestRenderer;
+
+    public ChestRenderer getChestRenderer() {
+        if (chestRenderer == null)
+            chestRenderer = new ChestRenderer();
+        return chestRenderer;
+    }
 
     @Override
     public void render(RenderWorldLastEvent evt, PlayerEntity player, ItemStack heldItem) {
@@ -168,7 +176,7 @@ public class CopyPasteRender extends BaseRenderer {
                     ItemStack renderStack = new ItemStack(state.getBlock());
                     if (renderStack.getItem().getTileEntityItemStackRenderer() != ItemStackTileEntityRenderer.instance || isVanillaISTER(renderStack)) {
                         GlStateManager.rotatef(- 90.0F, 0.0F, 1.0F, 0.0F); //Rotate it because i'm not sure why but we need to
-                        chestRenderer.renderChestBrightness(state.getBlock(), 1f);//Render the defined block
+                        getChestRenderer().renderChestBrightness(state.getBlock(), 1f);//Render the defined block
                     } else {
                         if (! getInvalidTileEntities().contains(te)) {
                             try {

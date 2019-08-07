@@ -11,7 +11,10 @@ import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketBindTool;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
-import com.direwolf20.buildinggadgets.common.util.helpers.*;
+import com.direwolf20.buildinggadgets.common.util.helpers.InventoryHelper;
+import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
+import com.direwolf20.buildinggadgets.common.util.helpers.SortingHelper;
+import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
 import com.direwolf20.buildinggadgets.common.util.lang.LangUtil;
 import com.direwolf20.buildinggadgets.common.util.lang.Styles;
 import com.direwolf20.buildinggadgets.common.util.lang.TooltipTranslation;
@@ -32,7 +35,10 @@ import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.text.*;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.BlockSnapshot;
@@ -42,13 +48,13 @@ import net.minecraftforge.event.world.BlockEvent;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 
 import static com.direwolf20.buildinggadgets.common.util.GadgetUtils.*;
 
 public class GadgetBuilding extends AbstractGadget implements IAtopPlacingGadget {
 
     private static final FakeBuilderWorld fakeWorld = new FakeBuilderWorld();
-    private static final BuildingRender render = new BuildingRender();
 
     public GadgetBuilding(Properties builder) {
         super(builder);
@@ -65,8 +71,8 @@ public class GadgetBuilding extends AbstractGadget implements IAtopPlacingGadget
     }
 
     @Override
-    public BaseRenderer getRender() {
-        return render;
+    protected Supplier<BaseRenderer> createRenderFactory() {
+        return BuildingRender::new;
     }
 
     @Override

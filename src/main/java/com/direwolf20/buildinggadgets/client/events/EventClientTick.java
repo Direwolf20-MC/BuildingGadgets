@@ -9,9 +9,9 @@ import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
 
 import static net.minecraft.client.Minecraft.getInstance;
 
