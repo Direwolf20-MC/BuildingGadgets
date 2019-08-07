@@ -1,7 +1,7 @@
 # Building Gadgets Changelog
 The format of this document is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and should continue to adhere to the conventions outlined in the Keep a Changelog guidelines.
 
-## [3.0.1a - 1.14.4] - 2019-08-07
+## [3.0.2a - 1.14.4] - 2019-08-07
 ### Fixed
 - Fixed an issue with changing modes and I18n 
 
