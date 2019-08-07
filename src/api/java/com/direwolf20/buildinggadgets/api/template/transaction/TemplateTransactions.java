@@ -9,6 +9,9 @@ import net.minecraft.util.math.BlockPos;
 
 import javax.annotation.Nullable;
 import java.util.*;
+import java.util.function.Function;
+
+import static com.direwolf20.buildinggadgets.api.util.CommonUtils.inputIfNonNullFunction;
 
 public final class TemplateTransactions {
     private TemplateTransactions() {}
@@ -152,21 +155,37 @@ public final class TemplateTransactions {
         }
     }
 
-    public ITransactionOperator removeHeaderOperator() {
-        return new HeaderOperator(null, null);
+    public static ITransactionOperator modifyHeaderAuthorOperator(Function<String, String> author) {
+        return modifyHeaderOperator(Function.identity(), author);
     }
 
-    public ITransactionOperator replaceHeaderOperator(@Nullable String name, @Nullable String author) {
-        return new HeaderOperator(name, author);
+    public static ITransactionOperator modifyHeaderNameOperator(Function<String, String> name) {
+        return modifyHeaderOperator(name, Function.identity());
+    }
+
+    public static ITransactionOperator modifyHeaderOperator(Function<String, String> name, Function<String, String> author) {
+        return new HeaderOperator(
+                Objects.requireNonNull(name, "Cannot construct Header modification with null name Function!"),
+                Objects.requireNonNull(author, "Cannot construct Header modification with null author Function!"));
+    }
+
+    public static ITransactionOperator headerNameOperator(@Nullable String name) {
+        return modifyHeaderNameOperator(inputIfNonNullFunction(name));
+    }
+
+    public static ITransactionOperator headerAuthorOperator(@Nullable String author) {
+        return modifyHeaderAuthorOperator(inputIfNonNullFunction(author));
+    }
+
+    public static ITransactionOperator headerOperator(@Nullable String name, @Nullable String author) {
+        return modifyHeaderOperator(inputIfNonNullFunction(name), inputIfNonNullFunction(author));
     }
 
     private static final class HeaderOperator extends AbsSingleRunTransactionOperator {
-        @Nullable
-        private final String newName;
-        @Nullable
-        private final String newAuthor;
+        private final Function<String, String> newName;
+        private final Function<String, String> newAuthor;
 
-        private HeaderOperator(@Nullable String newName, @Nullable String newAuthor) {
+        private HeaderOperator(Function<String, String> newName, Function<String, String> newAuthor) {
             super(EnumSet.of(TransactionOperation.TRANSFORM_HEADER));
             this.newName = newName;
             this.newAuthor = newAuthor;
@@ -175,44 +194,9 @@ public final class TemplateTransactions {
         @Override
         public TemplateHeader transformHeader(ITransactionExecutionContext context, TemplateHeader header) {
             header = TemplateHeader.builderOf(header)
-                    .name(newName)
-                    .author(newAuthor)
+                    .name(newName.apply(header.getName()))
+                    .author(newAuthor.apply(header.getAuthor()))
                     .build();
-            return super.transformHeader(context, header);
-        }
-    }
-
-    public static ITransactionOperator headerNameOperator(@Nullable String name) {
-        return new AddToHeaderOperator(name, null);
-    }
-
-    public static ITransactionOperator headerAuthorOperator(@Nullable String author) {
-        return new AddToHeaderOperator(null, author);
-    }
-
-    public static ITransactionOperator headerOperator(@Nullable String name, @Nullable String author) {
-        return new AddToHeaderOperator(name, author);
-    }
-
-    private static final class AddToHeaderOperator extends AbsSingleRunTransactionOperator {
-        @Nullable
-        private final String newName;
-        @Nullable
-        private final String newAuthor;
-
-        public AddToHeaderOperator(@Nullable String newName, @Nullable String newAuthor) {
-            super(EnumSet.of(TransactionOperation.TRANSFORM_HEADER));
-            this.newName = newName;
-            this.newAuthor = newAuthor;
-        }
-
-        @Override
-        public TemplateHeader transformHeader(ITransactionExecutionContext context, TemplateHeader header) {
-            if (newName != null || newAuthor != null)
-                header = TemplateHeader.builderOf(header)
-                        .name(newName != null ? newName : header.getName())
-                        .author(newAuthor != null ? newAuthor : header.getAuthor())
-                        .build();
             return super.transformHeader(context, header);
         }
     }

@@ -149,4 +149,8 @@ public final class CommonUtils {
         return StreamSupport.stream(iterable.spliterator(), false).collect(ImmutableMap.toImmutableMap(PlacementTarget::getPos, PlacementTarget::getData));
     }
 
+    public static <T> Function<T, T> inputIfNonNullFunction(@Nullable T otherRes) {
+        return t -> otherRes != null ? otherRes : t;
+    }
+
 }
