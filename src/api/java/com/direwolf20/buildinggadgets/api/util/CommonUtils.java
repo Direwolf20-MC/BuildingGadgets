@@ -7,6 +7,7 @@ import com.direwolf20.buildinggadgets.api.building.Region;
 import com.direwolf20.buildinggadgets.api.building.placement.IPositionPlacementSequence;
 import com.direwolf20.buildinggadgets.api.building.view.IBuildContext;
 import com.direwolf20.buildinggadgets.api.materials.MaterialList;
+import com.google.common.collect.ImmutableMap;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
@@ -21,6 +22,7 @@ import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
+import java.util.stream.StreamSupport;
 
 public final class CommonUtils {
     private CommonUtils() {}
@@ -141,6 +143,10 @@ public final class CommonUtils {
             builder.addAll(placementTarget.getRequiredItems(context, target).getRequiredItems().asList());
         }
         return builder.build();
+    }
+
+    public static ImmutableMap<BlockPos, BlockData> targetsToMap(Iterable<PlacementTarget> iterable) {
+        return StreamSupport.stream(iterable.spliterator(), false).collect(ImmutableMap.toImmutableMap(PlacementTarget::getPos, PlacementTarget::getData));
     }
 
 }
