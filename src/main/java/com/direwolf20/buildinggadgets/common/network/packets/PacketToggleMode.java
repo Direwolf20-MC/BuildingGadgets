@@ -39,13 +39,13 @@ public class PacketToggleMode {
 
                 if (heldItem.getItem() instanceof GadgetBuilding) {
                     GadgetBuilding gadgetBuilding = (GadgetBuilding) (heldItem.getItem());
-                    gadgetBuilding.setMode(playerEntity, heldItem, msg.mode);
+                    gadgetBuilding.setMode(heldItem, msg.mode);
                 } else if (heldItem.getItem() instanceof GadgetExchanger) {
                     GadgetExchanger gadgetExchanger = (GadgetExchanger) (heldItem.getItem());
-                    gadgetExchanger.setMode(playerEntity, heldItem, msg.mode);
+                    gadgetExchanger.setMode(heldItem, msg.mode);
                 } else if (heldItem.getItem() instanceof GadgetCopyPaste) {
                     GadgetCopyPaste gadgetCopyPaste = (GadgetCopyPaste) (heldItem.getItem());
-                    gadgetCopyPaste.setMode(playerEntity, heldItem, msg.mode);
+                    gadgetCopyPaste.setMode(heldItem, msg.mode);
                 }
             });
 

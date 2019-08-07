@@ -247,11 +247,10 @@ public class GadgetCopyPaste extends AbstractGadget implements ITemplate {
     }
 
 
-    public void setMode(ServerPlayerEntity player, ItemStack heldItem, int modeInt) {
-        //Called when we specify a mode with the radial menu
+    public void setMode(ItemStack heldItem, int modeInt) {
+        // Called when we specify a mode with the radial menu
         ToolMode mode = ToolMode.values()[modeInt];
         setToolMode(heldItem, mode);
-        player.sendStatusMessage(new StringTextComponent(TextFormatting.AQUA + new TranslationTextComponent("message.gadget.toolmode").getUnformattedComponentText() + ": " + mode), true);
     }
 
     @Override
