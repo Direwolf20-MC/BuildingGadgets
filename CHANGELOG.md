@@ -1,8 +1,12 @@
 # Building Gadgets Changelog
 The format of this document is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and should continue to adhere to the conventions outlined in the Keep a Changelog guidelines.
 
-## [Unreleased] [3.0.0 - 1.13]
+## [Unreleased] [2.7.3 - 1.12.2]
 - Nothing yet
+
+## [2.7.2 - 1.12.2] - 2019-08-09
+### Fixed
+- Fixed the BuildingGadget's Placement-Preview sometimes being missing, when Botania and Baubles is present
 
 ## [2.7.1 - 1.12.2] - 2019-07-23
 ### Fixed
