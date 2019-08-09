@@ -16,7 +16,6 @@ public final class TopologicalRegistryBuilder<T> {
     private final MutableGraph<ValueObject<T>> theGraph;
     private final Map<ResourceLocation, ValueObject<T>> values;
     private boolean build;
-    private List<ValueObject<T>> sorted;
 
     public static <T> TopologicalRegistryBuilder<T> create() {
         return new TopologicalRegistryBuilder<>();
@@ -97,7 +96,7 @@ public final class TopologicalRegistryBuilder<T> {
         validateUnbuild();
         build = true;
         values.clear();
-        sorted = TopologicalSort.topologicalSort(theGraph, Comparator.naturalOrder());
+        List<ValueObject<T>> sorted = TopologicalSort.topologicalSort(theGraph, Comparator.naturalOrder());
         final List<T> objs = new ArrayList<>(sorted.size());
         final Map<ResourceLocation, T> map = new HashMap<>();
         sorted.stream().filter(val -> val.getValue() != null).forEach(obj -> {
@@ -109,6 +108,13 @@ public final class TopologicalRegistryBuilder<T> {
 
     private void validateUnbuild() {
         Preconditions.checkState(! build, "Cannot access already created Builder!");
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("values", values)
+                .toString();
     }
 
     private boolean containsValue(T value) {

@@ -78,4 +78,11 @@ public final class SerialisationSupport {
         return IMMUTABLE_TEMPLATE_SERIALIZER;
     }
 
+    @ObjectHolder(TemplateSerializerReference.DELEGATING_TEMPLATE_SERIALIZER)
+    private static ITemplateSerializer DELEGATING_TEMPLATE_SERIALIZER;
+
+    public static ITemplateSerializer delegatingTemplateSerializer() {
+        return DELEGATING_TEMPLATE_SERIALIZER;
+    }
+
 }

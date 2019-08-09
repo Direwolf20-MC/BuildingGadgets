@@ -30,6 +30,8 @@ public final class APIReference {
 
         public static final String IMMUTABLE_TEMPLATE_SERIALIZER = MODID + ":immutable_template_serializer";
         public static final ResourceLocation IMMUTABLE_TEMPLATE_SERIALIZER_RL = new ResourceLocation(IMMUTABLE_TEMPLATE_SERIALIZER);
+        public static final String DELEGATING_TEMPLATE_SERIALIZER = MODID + ":delegating_template_serializer";
+        public static final ResourceLocation DELEGATING_TEMPLATE_SERIALIZER_RL = new ResourceLocation(DELEGATING_TEMPLATE_SERIALIZER);
 
     }
 
