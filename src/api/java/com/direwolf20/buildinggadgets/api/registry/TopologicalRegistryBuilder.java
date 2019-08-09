@@ -2,6 +2,8 @@ package com.direwolf20.buildinggadgets.api.registry;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableBiMap;
+import com.google.common.collect.ImmutableList;
 import com.google.common.graph.EndpointPair;
 import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.MutableGraph;
@@ -37,12 +39,12 @@ public final class TopologicalRegistryBuilder<T> {
     public TopologicalRegistryBuilder<T> addValue(ResourceLocation key, T value) {
         validateUnbuild();
         ValueObject<T> obj;
+        Preconditions.checkArgument(! containsValue(value), "Cannot have duplicate values, as the mapping needs to be bijective!");
         if (values.containsKey(Objects.requireNonNull(key))) {
             obj = values.get(key);
             obj.setValue(value);//override existing value
         } else {
             obj = new ValueObject<>(key, value);
-            Preconditions.checkArgument(! containsValue(value), "Cannot have duplicate values, as the mapping needs to be bijective!");
             values.put(key, obj);
             theGraph.addNode(obj);
         }
@@ -97,13 +99,13 @@ public final class TopologicalRegistryBuilder<T> {
         build = true;
         values.clear();
         List<ValueObject<T>> sorted = TopologicalSort.topologicalSort(theGraph, Comparator.naturalOrder());
-        final List<T> objs = new ArrayList<>(sorted.size());
-        final Map<ResourceLocation, T> map = new HashMap<>();
+        final ImmutableList.Builder<T> objs = ImmutableList.builderWithExpectedSize(sorted.size());
+        final ImmutableBiMap.Builder<ResourceLocation, T> map = ImmutableBiMap.builder();
         sorted.stream().filter(val -> val.getValue() != null).forEach(obj -> {
             objs.add(obj.getValue());
             map.put(obj.getKey(), obj.getValue());
         });
-        return new ImmutableOrderedRegistry<>(map, objs);
+        return new ImmutableOrderedRegistry<>(map.build(), objs.build());
     }
 
     private void validateUnbuild() {
@@ -113,7 +115,8 @@ public final class TopologicalRegistryBuilder<T> {
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
-                .add("values", values)
+                .add("values", values.values())
+                .add("graph", "MutableGraph{" + theGraph + "}")
                 .toString();
     }
 

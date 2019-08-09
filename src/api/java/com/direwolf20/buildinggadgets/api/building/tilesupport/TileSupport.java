@@ -8,9 +8,10 @@ import com.direwolf20.buildinggadgets.api.serialisation.SerialisationSupport;
 import net.minecraft.block.BlockState;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IWorld;
+import net.minecraft.world.IBlockReader;
 
 import javax.annotation.Nullable;
+import java.util.Objects;
 
 public final class TileSupport {
     private TileSupport() {}
@@ -29,8 +30,7 @@ public final class TileSupport {
         return DATA_PROVIDER_FACTORY;
     }
 
-    public static ITileEntityData createTileData(IWorld world, BlockPos pos) {
-        TileEntity te = world.getTileEntity(pos);
+    public static ITileEntityData createTileData(@Nullable TileEntity te) {
         if (te == null)
             return dummyTileEntityData();
         ITileEntityData res;
@@ -42,7 +42,16 @@ public final class TileSupport {
         return dummyTileEntityData();
     }
 
-    public static BlockData createBlockData(IWorld world, BlockPos pos) {
+    public static ITileEntityData createTileData(IBlockReader world, BlockPos pos) {
+        TileEntity te = world.getTileEntity(pos);
+        return createTileData(te);
+    }
+
+    public static BlockData createBlockData(BlockState state, @Nullable TileEntity te) {
+        return new BlockData(Objects.requireNonNull(state), createTileData(te));
+    }
+
+    public static BlockData createBlockData(IBlockReader world, BlockPos pos) {
         return new BlockData(world.getBlockState(pos), createTileData(world, pos));
     }
 

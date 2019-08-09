@@ -457,8 +457,8 @@ public final class ImmutableTemplate implements ITemplate {
             assert posToData != null;
             posToStateId = new Long2IntOpenHashMap(posToData.size());
             MaterialList.Builder builder = context != null ? MaterialList.builder() : null;
-            MutableBlockPos smallest = getSmallest(); //linear-Time Operation - may be multithreaded though!!!
             Region.Builder regionBuilder = Region.enclosingBuilder();
+            BlockPos smallest = headerInfo.getBoundingBox().getMin(); //because we always update the boundingBox, it is safe to assume that this provides the min position
             for (Map.Entry<BlockPos, BlockData> entry : posToData.entrySet()) {
                 //ensure that positions are shifted as much as possible towards (0, 0, 0) => There will be at least one position for each axis which has the value equal to 0
                 //validatePos will fail whenever the BlockPos would not be serializable
