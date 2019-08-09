@@ -60,9 +60,13 @@ final class RotateOperator extends AbsSingleRunTransactionOperator {
     private final Rotation rot;
 
     RotateOperator(Rotation rotation) { //sadly blockstates only allow rotating around the y axis
+        this(Axis.Y, rotation);
+    }
+
+    RotateOperator(Axis axis, Rotation rotation) {
         super(EnumSet.of(TransactionOperation.TRANSFORM_TARGET));
-        this.matrix = rotationMatrixFor(Axis.Y, rotation);
-        this.rot = rotation;
+        this.matrix = rotationMatrixFor(axis, rotation);
+        this.rot = axis == Axis.Y ? rotation : Rotation.NONE;
     }
 
     @Nullable

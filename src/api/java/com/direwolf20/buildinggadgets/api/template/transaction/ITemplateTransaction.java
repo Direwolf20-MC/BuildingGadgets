@@ -59,26 +59,16 @@ public interface ITemplateTransaction {
      * @throws com.direwolf20.buildinggadgets.api.exceptions.OperatorExecutionFailedException If an {@link ITransactionOperator} throws an {@link Exception}
      * @throws com.direwolf20.buildinggadgets.api.exceptions.TransactionInvalidException If the {@code ITemplateTransaction} has already been executed.
      * @throws TransactionExecutionException If any other {@link Exception} is encountered or the implementation specifies additional subclasses
-     * @implSpec Notice that an {@code ITemplateTransaction} is considered invalid as soon as {@code execute()} has been called.
-     *         Any further calls should throw {@link UnsupportedOperationException}.
+     * @implSpec Notice that an {@code ITemplateTransaction} is considered invalid as soon as {@code execute()} has been called <b>including the case if any {@link Exception} was thrown</b>.
+     *           Any further calls should throw {@link UnsupportedOperationException}.
      * @implNote Note that {@link ITransactionOperator#createPos(ITransactionExecutionContext)} may produce Positions already contained in the backing {@link ITemplate}.
      *         This indicates that current Data should be replaced by whatever {@link ITransactionOperator#createDataForPos(ITransactionExecutionContext, BlockPos)} returns.
-     * @implNote <br> Note that {@link ITransactionOperator#createDataForPos(ITransactionExecutionContext, BlockPos)} may also return null in cases where data is already present in the backing
+     *         <p> Note that {@link ITransactionOperator#createDataForPos(ITransactionExecutionContext, BlockPos)} may also return null in cases where data is already present in the backing
      *         {@link ITemplate}. Returning null from this method, when no data is present for the given {@link BlockPos} is considered an error and
      *         should therefore throw an {@link TransactionExecutionException}.
-     * @implNote <br> Note that {@link ITransactionOperator#transformData(ITransactionExecutionContext, BlockData)} and {@link ITransactionOperator#transformPos(ITransactionExecutionContext, BlockPos, BlockData)} may
+     *         <p> Note that {@link ITransactionOperator#transformData(ITransactionExecutionContext, BlockData)} and {@link ITransactionOperator#transformPos(ITransactionExecutionContext, BlockPos, BlockData)} may
      *         return null to indicate that a certain position or <b>all positions referenced by a specific {@link BlockData}</b> should be removed from
      *         the backing {@link ITemplate}.
      */
     ITemplate execute(@Nullable IBuildContext context) throws TransactionExecutionException;
-
-    /**
-     * Equivalent to calling {@code transaction.execute(null)}. Prefer {@link #execute(IBuildContext)} wherever it is possible to construct even a minimalistic
-     * {@link IBuildContext} in order to allow the resulting {@link ITemplate} to perform caching of the required Items.
-     *
-     * @see #execute(IBuildContext)
-     */
-    default ITemplate execute() throws TransactionExecutionException {
-        return execute(null);
-    }
 }

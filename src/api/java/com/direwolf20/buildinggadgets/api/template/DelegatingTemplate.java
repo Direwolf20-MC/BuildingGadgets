@@ -11,6 +11,7 @@ import com.direwolf20.buildinggadgets.api.serialisation.ITemplateSerializer;
 import com.direwolf20.buildinggadgets.api.serialisation.TemplateHeader;
 import com.direwolf20.buildinggadgets.api.template.transaction.ITemplateTransaction;
 import com.direwolf20.buildinggadgets.api.template.transaction.ITransactionOperator;
+import com.direwolf20.buildinggadgets.api.template.transaction.ReplaceDelegateOperator;
 import com.direwolf20.buildinggadgets.api.util.DelegatingSpliterator;
 import com.direwolf20.buildinggadgets.api.util.NBTKeys;
 import com.direwolf20.buildinggadgets.api.util.RegistryUtils;
@@ -311,16 +312,23 @@ public class DelegatingTemplate implements ITemplate {
     public static class DelegatingTransaction implements ITemplateTransaction {
         private DelegatingTemplate template;
         private ITemplateTransaction transaction;
+        private List<ITransactionOperator> operators;
+        private ReplaceDelegateOperator replaceOp;
 
         protected DelegatingTransaction(DelegatingTemplate template, ITemplateTransaction transaction) {
             this.template = template;
             this.transaction = transaction;
+            this.operators = new LinkedList<>();
+            this.replaceOp = null;
         }
 
         @Override
         public ITemplateTransaction operate(ITransactionOperator operator) {
             Preconditions.checkState(transaction != null && template != null, "Transaction has already been executed!");
-            transaction.operate(operator);
+            if (operator instanceof ReplaceDelegateOperator)
+                replaceOp = (ReplaceDelegateOperator) operator;
+            else
+                operators.add(Objects.requireNonNull(operator, "Cannot have a null Operator!"));
             return this;
         }
 
@@ -328,22 +336,53 @@ public class DelegatingTemplate implements ITemplate {
         public ITemplate execute(@Nullable IBuildContext context) throws TransactionExecutionException {
             if (transaction == null || template == null)
                 throw new TransactionInvalidException("Cannot execute Transaction Twice!");
-            ITemplate result = transaction.execute(context);
-            markCompleteWithResult(result);
-            ITemplate returnVal = template;
-            template = null;
-            transaction = null;
-            return returnVal;
+            if (replaceOp != null)
+                applyResultAndReplaceOrComplete(replaceOp.getNewDelegate(), ! operators.isEmpty());
+            if (! operators.isEmpty()) {
+                for (ITransactionOperator operator : operators) {
+                    transaction.operate(operator);
+                }
+                ITemplate result = transaction.execute(context);
+                return applyResultAndReplaceOrComplete(result, false);
+            } else if (replaceOp != null)
+                return invalidateNoFinish();
+            else
+                return invalidate(true);
         }
 
-        protected void markCompleteWithResult(ITemplate newDelegate) throws TransactionExecutionException {
+        protected ITemplate applyResultAndReplaceOrComplete(ITemplate newDelegate, boolean replaceTransaction) throws TransactionExecutionException {
+            if (replaceTransaction)
+                transaction.execute(null);
             synchronized (template.getDelegateLock()) {
-                template.markTransactionFinished();
-                if (! template.getActiveViews().isEmpty())
+                if (! template.getActiveViews().isEmpty()) {
+                    invalidate(false);
                     throw new ConcurrentTransactionExecutionException("Cannot apply delegate Template whilst a BuildView is present!");
+                }
                 template.setDelegate(newDelegate);
-
+                if (replaceTransaction)
+                    transaction = newDelegate.startTransaction();
+                else {
+                    return invalidate(false);
+                }
             }
+            return template;
+        }
+
+        protected ITemplate invalidate(boolean requireSync) {
+            if (requireSync)
+                synchronized (template.getDelegateLock()) {
+                    template.markTransactionFinished();
+                }
+            else
+                template.markTransactionFinished();
+            return invalidateNoFinish();
+        }
+
+        protected ITemplate invalidateNoFinish() {
+            ITemplate res = template;
+            template = null;
+            transaction = null;
+            return res;
         }
     }
 }
