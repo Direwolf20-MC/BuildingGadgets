@@ -8,7 +8,7 @@ import java.util.Objects;
 public class ReplaceDelegateOperator implements ITransactionOperator {
     private final ITemplate newDelegate;
 
-    public ReplaceDelegateOperator(ITemplate newDelegate) {
+    ReplaceDelegateOperator(ITemplate newDelegate) {
         this.newDelegate = Objects.requireNonNull(newDelegate, "Cannot have a null Delegate Template!");
     }
 

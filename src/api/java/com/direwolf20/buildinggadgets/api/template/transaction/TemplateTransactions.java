@@ -3,8 +3,12 @@ package com.direwolf20.buildinggadgets.api.template.transaction;
 import com.direwolf20.buildinggadgets.api.building.BlockData;
 import com.direwolf20.buildinggadgets.api.building.PlacementTarget;
 import com.direwolf20.buildinggadgets.api.serialisation.TemplateHeader;
+import com.direwolf20.buildinggadgets.api.template.ITemplate;
 import com.direwolf20.buildinggadgets.api.util.CommonUtils;
 import com.google.common.collect.ImmutableMap;
+import net.minecraft.util.Direction.Axis;
+import net.minecraft.util.Mirror;
+import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
 
 import javax.annotation.Nullable;
@@ -155,6 +159,69 @@ public final class TemplateTransactions {
         }
     }
 
+    /**
+     * Identical to calling {@code rotateOperator(Axis.Y, rotation)}.
+     *
+     * @see #rotateOperator(Axis, Rotation)
+     */
+    public static ITransactionOperator rotateOperator(Rotation rotation) {
+        return new RotateOperator(Objects.requireNonNull(rotation, "Cannot rotate without an Rotation to apply!"));
+    }
+
+    /**
+     * Notice, that MC's {@link net.minecraft.block.BlockState} only support rotation around the y-Axis! Therefore they cannot be
+     * rotated around x and z Axis and in this case they'll just be rotated as is.
+     *
+     * @param axis     The axis to rotate around
+     * @param rotation The rotation to apply
+     * @return An {@link ITransactionOperator} rotating all PlacementTargets around the specified axis with the specified rotation.
+     */
+    public static ITransactionOperator rotateOperator(Axis axis, Rotation rotation) {
+        return new RotateOperator(Objects.requireNonNull(axis, "Cannot rotate without an axis to rotate around!"),
+                Objects.requireNonNull(rotation, "Cannot rotate without an Rotation to apply!"));
+    }
+
+    /**
+     * Notice that mirroring can only be performed along the X and Z Axis - otherwise this Operator will have no effect at all!
+     *
+     * @param axis The Axis to mirror along
+     * @return An {@link ITransactionOperator} mirroring along the specified Axis.
+     */
+    public static ITransactionOperator mirrorOperator(Axis axis) {
+        return new MirrorOperator(axis);
+    }
+
+    private static final class MirrorOperator extends AbsSingleRunTransactionOperator {
+        private int xFac;
+        private int zFac;
+        private Mirror mirror;
+
+        private MirrorOperator(Axis axis) {
+            super(axis != Axis.Y ? EnumSet.of(TransactionOperation.TRANSFORM_TARGET) : EnumSet.noneOf(TransactionOperation.class));
+            xFac = zFac = 1;
+            switch (axis) {
+                case X:
+                    mirror = Mirror.LEFT_RIGHT;
+                    zFac = - 1;
+                    break;
+                case Z:
+                    mirror = Mirror.FRONT_BACK;
+                    xFac = - 1;
+                    break;
+                default:
+                    mirror = Mirror.NONE;
+            }
+        }
+
+        @Nullable
+        @Override
+        public PlacementTarget transformTarget(ITransactionExecutionContext context, PlacementTarget target) {
+            int x = target.getPos().getX() * xFac;
+            int y = target.getPos().getZ() * zFac;
+            return super.transformTarget(context, new PlacementTarget(new BlockPos(x, target.getPos().getY(), y), target.getData().mirror(mirror)));
+        }
+    }
+
     public static ITransactionOperator modifyHeaderAuthorOperator(Function<String, String> author) {
         return modifyHeaderOperator(Function.identity(), author);
     }
@@ -199,5 +266,107 @@ public final class TemplateTransactions {
                     .build();
             return super.transformHeader(context, header);
         }
+    }
+
+    /**
+     * Useful in cases where one Operator needs updated Context data from another Operator - just put it one pass after the other
+     *
+     * @return an {@link ITransactionOperator} which delegates through to the other Operator after passesToShift many passes.
+     */
+    public static ITransactionOperator shiftingOperator(ITransactionOperator other, int passesToShift) {
+        return new ShiftingOperator(other, passesToShift);
+    }
+
+    private static final class ShiftingOperator implements ITransactionOperator {
+        private final ITransactionOperator other;
+        private int toShiftCounter;
+        private TransactionOperation lastOperation;
+
+        public ShiftingOperator(ITransactionOperator other, int toShiftAmount) {
+            this.other = other;
+            this.toShiftCounter = toShiftAmount + 1;
+            this.lastOperation = null;
+        }
+
+        @Nullable
+        @Override
+        public BlockPos createPos(ITransactionExecutionContext context) {
+            setLastOperation(TransactionOperation.CREATE_DATA);
+            if (lastOperation == TransactionOperation.CREATE_DATA)
+                -- toShiftCounter;
+            if (toShiftCounter <= 0)
+                return other.createPos(context);
+            return null;
+        }
+
+        @Nullable
+        @Override
+        public BlockData createDataForPos(ITransactionExecutionContext context, BlockPos pos) {
+            if (toShiftCounter <= 0)
+                return other.createDataForPos(context, pos);
+            return null;
+        }
+
+        @Override
+        public TemplateHeader transformHeader(ITransactionExecutionContext context, TemplateHeader header) {
+            setLastOperation(TransactionOperation.TRANSFORM_HEADER);
+            if (lastOperation == TransactionOperation.TRANSFORM_HEADER)
+                -- toShiftCounter;
+            if (toShiftCounter <= 0)
+                return other.transformHeader(context, header);
+            return header;
+        }
+
+        @Nullable
+        @Override
+        public BlockData transformData(ITransactionExecutionContext context, BlockData data) {
+            setLastOperation(TransactionOperation.TRANSFORM_DATA);
+            if (lastOperation == TransactionOperation.TRANSFORM_DATA)
+                -- toShiftCounter;
+            if (toShiftCounter <= 0)
+                return other.transformData(context, data);
+            return data;
+        }
+
+        @Nullable
+        @Override
+        public BlockPos transformPos(ITransactionExecutionContext context, BlockPos pos, BlockData data) {
+            setLastOperation(TransactionOperation.TRANSFORM_POSITION);
+            if (lastOperation == TransactionOperation.TRANSFORM_POSITION)
+                -- toShiftCounter;
+            if (toShiftCounter <= 0)
+                return other.transformPos(context, pos, data);
+            return pos;
+        }
+
+        @Nullable
+        @Override
+        public PlacementTarget transformTarget(ITransactionExecutionContext context, PlacementTarget target) {
+            setLastOperation(TransactionOperation.TRANSFORM_TARGET);
+            if (lastOperation == TransactionOperation.TRANSFORM_TARGET)
+                -- toShiftCounter;
+            if (toShiftCounter <= 0)
+                return other.transformTarget(context, target);
+            return target;
+        }
+
+        @Override
+        public Set<TransactionOperation> remainingOperations() {
+            return other.remainingOperations();
+        }
+
+        private void setLastOperation(TransactionOperation operation) {
+            if (lastOperation == null)
+                this.lastOperation = operation;
+        }
+    }
+
+    /**
+     * Creates an {@link ITransactionOperator} which replaces the delegate of an {@link com.direwolf20.buildinggadgets.api.template.DelegatingTemplate}. This doesn't have
+     * any effect if the {@link ITemplate} is not an instance of {@link com.direwolf20.buildinggadgets.api.template.DelegatingTemplate} or the implementation doesn't specifically
+     * support this Operator!
+     */
+    public static ReplaceDelegateOperator replaceDelegateOperator(ITemplate newDelegate) {
+        return new ReplaceDelegateOperator(Objects.requireNonNull(newDelegate, "Cannot construct a replace Delegate Operator without a new Delegate!"));
     }
 }
