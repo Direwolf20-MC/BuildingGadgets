@@ -10,6 +10,7 @@ import com.direwolf20.buildinggadgets.common.building.placement.ConnectedSurface
 import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.common.tools.*;
+import com.google.common.collect.ImmutableList;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
@@ -43,6 +44,7 @@ import org.lwjgl.Sys;
 
 import javax.annotation.Nullable;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class GadgetDestruction extends GadgetGeneric {
 
@@ -263,43 +265,33 @@ public class GadgetDestruction extends GadgetGeneric {
         BlockPos startPos = (getAnchor(stack) == null) ? pos : getAnchor(stack);
         EnumFacing side = (getAnchorSide(stack) == null) ? incomingSide : getAnchorSide(stack);
 
+        // Build the region
         List<EnumFacing> directions = assignDirections(side, player);
+        String[] directionNames = new String[] {"right", "left", "up", "down", "depth"};
+        Region selectionRegion = new Region(startPos);
+        for (int i = 0; i < directionNames.length; i++)
+            selectionRegion = selectionRegion.union(new Region(startPos.offset(directions.get(i), getToolValue(stack, directionNames[i]) - (i == 4 ? 1 : 0))));
+
         IBlockState stateTarget = !SyncedConfig.nonFuzzyEnabledDestruction || GadgetGeneric.getFuzzy(stack) ? null : world.getBlockState(pos);
         if (GadgetGeneric.getConnectedArea(stack)) {
-            String[] directionNames = new String[] {"right", "left", "up", "down", "depth"};
-            AxisAlignedBB area = new AxisAlignedBB(pos);
-            for (int i = 0; i < directionNames.length; i++)
-                area = area.union(new AxisAlignedBB(pos.offset(directions.get(i), getToolValue(stack, directionNames[i]) - (i == 4 ? 1 : 0))));
 
-            IPlacementSequence sequence = ConnectedSurface.create(
+            voidPositions.addAll(ConnectedSurface.create(
                     world,
-                    new Region(
-                            (int) area.minX, (int) area.minY, (int) area.minZ, (int) area.maxX - 1, (int) area.maxY - 1, (int) area.maxZ - 1
-                    ),
+                    selectionRegion,
                     searchPos -> searchPos,
                     startPos,
                     side,
                     SyncedConfig.nonFuzzyEnabledDestruction && GadgetGeneric.getFuzzy(stack)
+            ).collect());
+
+        } else {
+
+            voidPositions.addAll(
+                    selectionRegion.collect().stream().filter(
+                            e -> validBlock(world, e, player, stateTarget)
+                    ).collect(Collectors.toList())
             );
 
-            voidPositions.addAll(sequence.collect());
-        } else {
-            int left = -getToolValue(stack, "left");
-            int right = getToolValue(stack, "right");
-            int down = -getToolValue(stack, "down");
-            int up = getToolValue(stack, "up");
-            for (int d = 0; d < depth; d++) {
-                for (int x = left; x <= right; x++) {
-                    for (int y = down; y <= up; y++) {
-                        BlockPos voidPos = new BlockPos(startPos);
-                        voidPos = voidPos.offset(directions.get(0), x);
-                        voidPos = voidPos.offset(directions.get(2), y);
-                        voidPos = voidPos.offset(directions.get(4), d);
-                        if (validBlock(world, voidPos, player, stateTarget))
-                            voidPositions.add(voidPos);
-                    }
-                }
-            }
         }
         return voidPositions;
     }
