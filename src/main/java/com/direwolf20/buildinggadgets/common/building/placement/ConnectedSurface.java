@@ -5,17 +5,14 @@ import com.direwolf20.buildinggadgets.common.building.Region;
 import com.direwolf20.buildinggadgets.common.tools.VectorTools;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.AbstractIterator;
-import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
-import it.unimi.dsi.fastutil.objects.ObjectSet;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 
 import javax.annotation.Nonnull;
-import java.util.ArrayDeque;
-import java.util.Iterator;
-import java.util.Queue;
+import javax.annotation.Nullable;
+import java.util.*;
 import java.util.function.Function;
 
 /**
@@ -37,7 +34,7 @@ public final class ConnectedSurface implements IPlacementSequence {
         return create(world, searchingRegion, pos -> pos.offset(side), searchingCenter, side, fuzzy);
     }
 
-    public static ConnectedSurface create(IBlockAccess world, Region searchingRegion, Function<BlockPos, BlockPos> searching2referenceMapper, BlockPos searchingCenter, EnumFacing side, boolean fuzzy) {
+    public static ConnectedSurface create(IBlockAccess world, Region searchingRegion, Function<BlockPos, BlockPos> searching2referenceMapper, BlockPos searchingCenter, @Nullable EnumFacing side, boolean fuzzy) {
         return new ConnectedSurface(world, searchingRegion, searching2referenceMapper, searchingCenter, side, fuzzy);
     }
 
@@ -49,7 +46,7 @@ public final class ConnectedSurface implements IPlacementSequence {
     private final boolean fuzzy;
 
     @VisibleForTesting
-    private ConnectedSurface(IBlockAccess world, Region searchingRegion, Function<BlockPos, BlockPos> searching2referenceMapper, BlockPos searchingCenter, EnumFacing side, boolean fuzzy) {
+    private ConnectedSurface(IBlockAccess world, Region searchingRegion, Function<BlockPos, BlockPos> searching2referenceMapper, BlockPos searchingCenter, @Nullable EnumFacing side, boolean fuzzy) {
         this.world = world;
         this.searchingRegion = searchingRegion;
         this.searching2referenceMapper = searching2referenceMapper;
@@ -94,8 +91,8 @@ public final class ConnectedSurface implements IPlacementSequence {
         IBlockState selectedBlock = getReferenceFor(searchingCenter);
 
         return new AbstractIterator<BlockPos>() {
-            private Queue<BlockPos> queue = new ArrayDeque<>(searchingRegion.size());
-            private ObjectSet<BlockPos> searched = new ObjectOpenHashSet<>();
+            private Queue<BlockPos> queue = new LinkedList<>();
+            private Set<BlockPos> searched = new HashSet<>(searchingRegion.size());
 
             {
                 queue.add(searchingCenter);
@@ -110,21 +107,28 @@ public final class ConnectedSurface implements IPlacementSequence {
 
                 // The position is guaranteed to be valid
                 BlockPos current = queue.remove();
-
                 for (int i = -1; i <= 1; i++) {
                     for (int j = -1; j <= 1; j++) {
-                        BlockPos neighbor = VectorTools.perpendicularSurfaceOffset(current, side, i, j);
-
-                        boolean isSearched = !searched.add(neighbor);
-
-                        if (isSearched || !searchingRegion.contains(neighbor) || !isStateValid(selectedBlock, neighbor))
-                            continue;
-
-                        queue.add(neighbor);
+                        if (side != null) {
+                            BlockPos neighbor = VectorTools.perpendicularSurfaceOffset(current, side, i, j);
+                            addNeighbour(neighbor);
+                        } else {
+                            for (int k = - 1; k <= 1; k++) {
+                                BlockPos neighbor = current.add(i, j, k);
+                                addNeighbour(neighbor);
+                            }
+                        }
                     }
                 }
 
                 return current;
+            }
+
+            private void addNeighbour(BlockPos neighbor) {
+                boolean isSearched = ! searched.add(neighbor);
+                if (isSearched || ! searchingRegion.contains(neighbor) || ! isStateValid(selectedBlock, neighbor))
+                    return;
+                queue.add(neighbor);
             }
         };
     }
@@ -133,9 +137,7 @@ public final class ConnectedSurface implements IPlacementSequence {
         IBlockState reference = getReferenceFor(pos);
         boolean isAir = reference.getBlock().isAir(reference, world, pos);
         // If fuzzy=true, we ignore the block for reference
-        if (fuzzy)
-            return !isAir;
-        return !isAir && filter == reference;
+        return ! isAir && (fuzzy || filter == reference);
     }
 
     private IBlockState getReferenceFor(BlockPos pos) {

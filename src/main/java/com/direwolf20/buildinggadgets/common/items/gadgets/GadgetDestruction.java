@@ -4,14 +4,14 @@ import com.direwolf20.buildinggadgets.client.gui.GuiProxy;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.blocks.ModBlocks;
-import com.direwolf20.buildinggadgets.common.building.IPlacementSequence;
 import com.direwolf20.buildinggadgets.common.building.Region;
 import com.direwolf20.buildinggadgets.common.building.placement.ConnectedSurface;
 import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
-import com.direwolf20.buildinggadgets.common.tools.*;
-import com.google.common.collect.ImmutableList;
-import net.minecraft.block.material.Material;
+import com.direwolf20.buildinggadgets.common.tools.BlockPosState;
+import com.direwolf20.buildinggadgets.common.tools.GadgetUtils;
+import com.direwolf20.buildinggadgets.common.tools.VectorTools;
+import com.direwolf20.buildinggadgets.common.tools.WorldSave;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
@@ -20,27 +20,20 @@ import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.nbt.NBTUtil;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumFacing.Axis;
 import net.minecraft.util.EnumHand;
-import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.Vec3i;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.BlockSnapshot;
 import net.minecraftforge.common.util.Constants;
-import net.minecraftforge.event.ForgeEventFactory;
-import net.minecraftforge.event.world.BlockEvent;
-import org.lwjgl.Sys;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -256,11 +249,10 @@ public class GadgetDestruction extends GadgetGeneric {
         }
     }
 
-    public static SortedSet<BlockPos> getArea(World world, BlockPos pos, EnumFacing incomingSide, EntityPlayer player, ItemStack stack) {
-        SortedSet<BlockPos> voidPositions = new TreeSet<>(Comparator.comparingInt(Vec3i::getX).thenComparingInt(Vec3i::getY).thenComparingInt(Vec3i::getZ));
+    public static Set<BlockPos> getArea(World world, BlockPos pos, EnumFacing incomingSide, EntityPlayer player, ItemStack stack) {
         int depth = getToolValue(stack, "depth");
         if (depth == 0)
-            return voidPositions;
+            return Collections.emptySet();
 
         BlockPos startPos = (getAnchor(stack) == null) ? pos : getAnchor(stack);
         EnumFacing side = (getAnchorSide(stack) == null) ? incomingSide : getAnchorSide(stack);
@@ -272,28 +264,23 @@ public class GadgetDestruction extends GadgetGeneric {
         for (int i = 0; i < directionNames.length; i++)
             selectionRegion = selectionRegion.union(new Region(startPos.offset(directions.get(i), getToolValue(stack, directionNames[i]) - (i == 4 ? 1 : 0))));
 
-        IBlockState stateTarget = !SyncedConfig.nonFuzzyEnabledDestruction || GadgetGeneric.getFuzzy(stack) ? null : world.getBlockState(pos);
+        boolean fuzzy = ! SyncedConfig.nonFuzzyEnabledDestruction || GadgetGeneric.getFuzzy(stack);
+        IBlockState stateTarget = fuzzy ? null : world.getBlockState(pos);
         if (GadgetGeneric.getConnectedArea(stack)) {
-
-            voidPositions.addAll(ConnectedSurface.create(
+            return ConnectedSurface.create(
                     world,
                     selectionRegion,
                     searchPos -> searchPos,
                     startPos,
-                    side,
-                    SyncedConfig.nonFuzzyEnabledDestruction && GadgetGeneric.getFuzzy(stack)
-            ).collect());
+                    null,
+                    fuzzy
+            ).stream().collect(Collectors.toSet());
 
         } else {
-
-            voidPositions.addAll(
-                    selectionRegion.collect().stream().filter(
-                            e -> validBlock(world, e, player, stateTarget)
-                    ).collect(Collectors.toList())
-            );
-
+            return selectionRegion.stream().filter(
+                    e -> validBlock(world, e, player, stateTarget)
+            ).collect(Collectors.toSet());
         }
-        return voidPositions;
     }
 
     private static boolean validBlock(World world, BlockPos voidPos, EntityPlayer player, @Nullable IBlockState stateTarget) {
@@ -317,7 +304,7 @@ public class GadgetDestruction extends GadgetGeneric {
     }
 
     private void clearArea(World world, BlockPos pos, EnumFacing side, EntityPlayer player, ItemStack stack) {
-        SortedSet<BlockPos> voidPosArray = getArea(world, pos, side, player, stack);
+        Set<BlockPos> voidPosArray = getArea(world, pos, side, player, stack);
         List<BlockPosState> blockList = new ArrayList<>();
 
         for (BlockPos voidPos : voidPosArray) {
