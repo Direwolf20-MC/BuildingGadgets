@@ -109,6 +109,7 @@ final class ConnectedSurfaceSequence implements IPositionPlacementSequence {
                     return;
                 queue.add(neighbor);
             }
+
         };
     }
 

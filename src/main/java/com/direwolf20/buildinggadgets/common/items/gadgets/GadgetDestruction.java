@@ -58,6 +58,9 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+import static com.direwolf20.buildinggadgets.api.util.CommonUtils.filterSequence;
+import static com.direwolf20.buildinggadgets.api.util.CommonUtils.mapToPositionPlacementSequence;
+
 public class GadgetDestruction extends AbstractGadget {
 
     public GadgetDestruction(Properties builder) {
@@ -231,7 +234,7 @@ public class GadgetDestruction extends AbstractGadget {
             int depth = getToolValue(stack, NBTKeys.GADGET_VALUE_DEPTH);
             if (depth == 0)
                 return CommonUtils.emptyPositionSequence();
-            return ConnectedSurface.create(world, boundary, Function.identity(), startPos, null, fuzzy);
+            return mapToPositionPlacementSequence(filterSequence(ConnectedSurface.create(world, boundary, Function.identity(), startPos, null, fuzzy), p -> isValidBlock(world, p, player, stateTarget)));
         }
 
         return new SetBackedPlacementSequence(boundary.stream()
