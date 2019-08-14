@@ -92,8 +92,8 @@ public final class ImmutableTemplate implements ITemplate {
      * {@inheritDoc}
      */
     @Override
-    public IBuildView createViewInContext(IBuildContext buildContext) {
-        return new BuildView(buildContext, posToStateId, idToData, headerInfo);
+    public IBuildView createViewInContext(IBuildOpenOptions openOptions) {
+        return new BuildView(openOptions.getContext(), posToStateId, idToData, headerInfo);
     }
 
     private Long2IntMap getPosToStateId() {

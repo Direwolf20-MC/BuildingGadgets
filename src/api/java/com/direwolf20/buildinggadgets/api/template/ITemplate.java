@@ -43,10 +43,11 @@ public interface ITemplate {
      * and an implementation must perform any required synchronisation.<br>
      * However it is not required to support executing an {@link ITemplateTransaction} whilst iterating over an {@link IBuildView} and the <b>{@link ITemplateTransaction}</b>
      * should throw an exception in this case.
-     * @param buildContext The {@link IBuildContext} in which this {@code ITemplate} should be viewed.
+     * @param openOptions The {@link IBuildOpenOptions} in which this {@code ITemplate} should be viewed - contain the {@link IBuildContext}
      * @return An {@link IBuildView} representing the actual Data of this {@code ITemplate} in a certain {@link IBuildContext}.
      */
-    IBuildView createViewInContext(IBuildContext buildContext);
+    @Nullable
+    IBuildView createViewInContext(IBuildOpenOptions openOptions);
 
     /**
      * Creates a new {@link ITemplateTransaction} for modifying this {@code ITemplate}. The created {@link ITemplateTransaction}

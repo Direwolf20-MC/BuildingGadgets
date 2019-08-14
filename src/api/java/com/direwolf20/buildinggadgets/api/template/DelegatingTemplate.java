@@ -9,6 +9,7 @@ import com.direwolf20.buildinggadgets.api.exceptions.*;
 import com.direwolf20.buildinggadgets.api.materials.MaterialList;
 import com.direwolf20.buildinggadgets.api.serialisation.ITemplateSerializer;
 import com.direwolf20.buildinggadgets.api.serialisation.TemplateHeader;
+import com.direwolf20.buildinggadgets.api.template.IBuildOpenOptions.OpenType;
 import com.direwolf20.buildinggadgets.api.template.transaction.ITemplateTransaction;
 import com.direwolf20.buildinggadgets.api.template.transaction.ITransactionOperator;
 import com.direwolf20.buildinggadgets.api.template.transaction.ReplaceDelegateOperator;
@@ -95,8 +96,20 @@ public class DelegatingTemplate implements ITemplate {
      * {@inheritDoc}
      */
     @Override
-    public IBuildView createViewInContext(IBuildContext buildContext) {
-        return getDelegate().createViewInContext(buildContext);
+    public IBuildView createViewInContext(IBuildOpenOptions openOptions) {
+        switch (openOptions.getOpenType()) {
+            case DEFAULT:
+                return new DelegatingBuildView(this, openOptions);
+            case IF_NO_TRANSACTION_OPEN:
+                synchronized (getDelegateLock()) {
+                    if (! transactionActive)
+                        return new DelegatingBuildView(this, openOptions);
+                    else
+                        return null;
+                }
+            default:
+                return null;
+        }
     }
 
     /**
@@ -201,13 +214,16 @@ public class DelegatingTemplate implements ITemplate {
         private IBuildContext context;
         private DelegatingTemplate template;
 
-        protected DelegatingBuildView(DelegatingTemplate template, IBuildContext context) {
+        protected DelegatingBuildView(DelegatingTemplate template, IBuildOpenOptions openOptions) {
             synchronized (template.getDelegateLock()) {
                 template.getActiveViews().add(this);
-                view = template.getDelegate().createViewInContext(context);
+                view = template.getDelegate().createViewInContext(SimpleBuildOpenOptions
+                        .builderCopyOf(openOptions)
+                        .openType(OpenType.DEFAULT)
+                        .build());
             }
             this.template = template;
-            this.context = context;
+            this.context = openOptions.getContext();
         }
 
         @Override
@@ -247,7 +263,10 @@ public class DelegatingTemplate implements ITemplate {
         @Override
         public IBuildView copy() {
             validateOpen();
-            return new DelegatingBuildView(template, getContext());
+            return new DelegatingBuildView(template, SimpleBuildOpenOptions
+                    .builder()
+                    .context(getContext())
+                    .build());
         }
 
         @Override
