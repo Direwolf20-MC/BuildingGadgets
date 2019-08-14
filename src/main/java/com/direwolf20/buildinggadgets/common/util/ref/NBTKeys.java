@@ -10,6 +10,10 @@ public final class NBTKeys {
     public static final String CREATIVE_MARKER = "creative";
 
     public static final String GADGET_MODE = "mode";
+    public static final String GADGET_TICKS = "ticks";
+    public static final String GADGET_REPLACEMENT_BLOCK = "replacement_block";
+    public static final String GADGET_SOURCE_BLOCK = "source_block";
+    public static final String GADGET_USE_PASTE = "use_paste";
     public static final String GADGET_RANGE = "range";
     public static final String GADGET_OVERLAY = "overlay";
     public static final String GADGET_FUZZY = "fuzzy";
@@ -88,5 +92,7 @@ public final class NBTKeys {
     public static final String ENTITY_BUILD_SET_BLOCK_ACTUAL = "set_block_actual";
     public static final String ENTITY_BUILD_ORIGINAL_BLOCK = "original_block";
     public static final String ENTITY_BUILD_USE_PASTE = "use_paste";
+
+    public static final String AREA = "area";
 
 }

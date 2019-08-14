@@ -165,15 +165,10 @@ public class GadgetBuilding extends AbstractGadget implements IAtopPlacingGadget
         return new ActionResult<>(ActionResultType.SUCCESS, itemstack);
     }
 
-    public void toggleMode(PlayerEntity player, ItemStack heldItem) {//TODO unused
-        setMode(player, heldItem, getToolMode(heldItem).next().ordinal());
-    }
-
-    public void setMode(PlayerEntity player, ItemStack heldItem, int modeInt) {
+    public void setMode(ItemStack heldItem, int modeInt) {
         //Called when we specify a mode with the radial menu
         BuildingMode mode = BuildingMode.values()[modeInt];
         setToolMode(heldItem, mode);
-        player.sendStatusMessage(new StringTextComponent(TextFormatting.AQUA + new TranslationTextComponent("message.gadget.toolmode").getUnformattedComponentText() + ": " + mode), true);
     }
 
     public static void rangeChange(PlayerEntity player, ItemStack heldItem) {

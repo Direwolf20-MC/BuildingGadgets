@@ -1,8 +1,3 @@
-/**
- * Parts of this class were adapted from code written by TTerrag for the Chisel mod: https://github.com/Chisel-Team/Chisel
- * Chisel is Open Source and distributed under GNU GPL v2
- */
-
 package com.direwolf20.buildinggadgets.client.gui;
 
 import com.direwolf20.buildinggadgets.client.gui.components.GuiIncrementer;
@@ -157,12 +152,12 @@ public class CopyGUI extends Screen {
         return false;
     }
 
-    public static class CenteredButton extends Button {
-        public CenteredButton(int y, int width, ITranslationProvider text, IPressable onPress) {
+    static class CenteredButton extends Button {
+        CenteredButton(int y, int width, ITranslationProvider text, IPressable onPress) {
             super(0, y, width, 20, I18n.format(text.getTranslationKey()), onPress);
         }
 
-        protected static void centerButtonList(List<AbstractButton> buttons, int startX) {
+        static void centerButtonList(List<AbstractButton> buttons, int startX) {
             int collectiveWidth = buttons.stream().mapToInt(AbstractButton::getWidth).sum() + (buttons.size() - 1) * 5;
 
             int nextX = startX - collectiveWidth / 2;

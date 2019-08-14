@@ -16,10 +16,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 
 import javax.annotation.Nullable;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.Spliterator;
-import java.util.Spliterators;
+import java.util.*;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.stream.StreamSupport;
@@ -31,6 +28,34 @@ public final class CommonUtils {
             .comparingInt(Vec3i::getX)
             .thenComparingInt(Vec3i::getY)
             .thenComparingInt(Vec3i::getZ);
+
+    public static <T> IPlacementSequence<T> emptySequence() {
+        return new IPlacementSequence<T>() {
+            @Override
+            public Region getBoundingBox() {
+                return new Region(new BlockPos(0, 0, 0));
+            }
+
+            @Override
+            public boolean mayContain(int x, int y, int z) {
+                return false;
+            }
+
+            @Override
+            public IPlacementSequence<T> copy() {
+                return emptySequence();
+            }
+
+            @Override
+            public Iterator<T> iterator() {
+                return Collections.emptyIterator();
+            }
+        };
+    }
+
+    public static IPositionPlacementSequence emptyPositionSequence() {
+        return mapToPositionPlacementSequence(emptySequence(), Function.identity());
+    }
 
     public static <T,U> IPlacementSequence<U> map(IPlacementSequence<T> sequence, Function<T,U> mapper) {
         return new IPlacementSequence<U>() {

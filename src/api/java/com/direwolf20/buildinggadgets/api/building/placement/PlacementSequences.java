@@ -205,7 +205,7 @@ public final class PlacementSequences {
             return create(world, searchingRegion, pos -> pos.offset(side), searchingCenter, side, fuzzy);
         }
 
-        public static IPositionPlacementSequence create(IBlockReader world, Region searchingRegion, Function<BlockPos, BlockPos> searching2referenceMapper, BlockPos searchingCenter, Direction side, boolean fuzzy) {
+        public static IPositionPlacementSequence create(IBlockReader world, Region searchingRegion, Function<BlockPos, BlockPos> searching2referenceMapper, BlockPos searchingCenter, @Nullable Direction side, boolean fuzzy) {
             return new ConnectedSurfaceSequence(world, searchingRegion, searching2referenceMapper, searchingCenter, side, fuzzy);
         }
     }

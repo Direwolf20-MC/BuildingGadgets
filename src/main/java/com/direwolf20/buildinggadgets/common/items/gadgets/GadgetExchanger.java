@@ -155,15 +155,10 @@ public class GadgetExchanger extends AbstractGadget {
         return new ActionResult<>(ActionResultType.SUCCESS, itemstack);
     }
 
-    public void toggleMode(PlayerEntity player, ItemStack heldItem) {//TODO unused
-        setToolMode(heldItem, getToolMode(heldItem).next());
-    }
-
-    public void setMode(PlayerEntity player, ItemStack heldItem, int modeInt) {
+    public void setMode(ItemStack heldItem, int modeInt) {
         //Called when we specify a mode with the radial menu
         ExchangingMode mode = ExchangingMode.values()[modeInt];
         setToolMode(heldItem, mode);
-        player.sendStatusMessage(new StringTextComponent(TextFormatting.AQUA + new TranslationTextComponent("message.gadget.toolmode").getUnformattedComponentText() + ": " + mode), true);
     }
 
     public static void rangeChange(PlayerEntity player, ItemStack heldItem) {

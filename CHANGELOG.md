@@ -1,7 +1,17 @@
 # Building Gadgets Changelog
 The format of this document is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and should continue to adhere to the conventions outlined in the Keep a Changelog guidelines.
 
-## [Unreleased]
+## Unreleased [3.0.3a - 1.14.4]
+### Changed
+- Converted the Destruction-Gadget's connected area mode to use the same algorithm as the other Gadget's
+### Fixed
+- Fix the Destruction-Gadget crashing when voiding any Blocks
+- Fix the Destruction-Gadget's undo not working (and spamming the log) due to crashing during serialisation
+- Fix Exchanger's Effect Blocks not rendering any remove operation 
+
+## [3.0.2a - 1.14.4] - 2019-08-07
+### Fixed
+- Fixed an issue with changing modes and I18n 
 
 ## [3.0.1a - 1.14.4] - 2019-08-06
 ### Changed

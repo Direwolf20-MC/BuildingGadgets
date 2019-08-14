@@ -28,11 +28,14 @@ import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.client.util.InputMappings;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TranslationTextComponent;
 import org.lwjgl.opengl.GL11;
 
 import javax.vecmath.Vector2f;
@@ -56,8 +59,8 @@ public class ModeRadialMenu extends Screen {
     private final List<Button> conditionalButtons = new ArrayList<>();
 
     public ModeRadialMenu(ItemStack stack) {
-        super(new StringTextComponent("Mode Radial Menu?!?"));
-        //getMinecraft() = Minecraft.getInstance();
+        super(new StringTextComponent(""));
+
         if (stack.getItem() instanceof AbstractGadget)
             setSocketable(stack);
     }
@@ -410,6 +413,20 @@ public class ModeRadialMenu extends Screen {
 
     private void changeMode() {
         if (slotSelected >= 0) {
+            Item gadget = getGadget().getItem();
+
+            // This should logically never fail but implementing a way to ensure that would
+            // be a pretty solid idea for the next guy to touch this code.
+            String mode;
+            if( gadget instanceof GadgetBuilding )
+                mode = BuildingMode.values()[slotSelected].toString();
+            else if( gadget instanceof GadgetExchanger )
+                mode = ExchangingMode.values()[slotSelected].toString();
+            else
+                mode = GadgetCopyPaste.ToolMode.values()[slotSelected].toString();
+
+            getMinecraft().player.sendStatusMessage(new StringTextComponent(TextFormatting.AQUA + new TranslationTextComponent("message.gadget.toolmode").getUnformattedComponentText() + ": " + mode), true);
+
             PacketHandler.sendToServer(new PacketToggleMode(slotSelected));
             BGSound.BEEP.playSound();
         }
@@ -511,13 +528,13 @@ public class ModeRadialMenu extends Screen {
     private static class PositionedIconActionable extends GuiIconActionable {
         private ScreenPosition position;
 
-        public PositionedIconActionable(RadialTranslation message, String icon, ScreenPosition position, boolean isSelectable, Predicate<Boolean> action) {
+        PositionedIconActionable(RadialTranslation message, String icon, ScreenPosition position, boolean isSelectable, Predicate<Boolean> action) {
             super(0, 0, icon, message.getString(), isSelectable, action);
 
             this.position = position;
         }
 
-        public PositionedIconActionable(RadialTranslation message, String icon, ScreenPosition position, Predicate<Boolean> action) {
+        PositionedIconActionable(RadialTranslation message, String icon, ScreenPosition position, Predicate<Boolean> action) {
             this(message, icon, position, true, action);
         }
     }

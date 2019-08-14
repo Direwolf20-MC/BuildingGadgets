@@ -4,17 +4,14 @@ import com.direwolf20.buildinggadgets.api.building.Region;
 import com.direwolf20.buildinggadgets.api.util.VectorUtils;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.AbstractIterator;
-import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
-import it.unimi.dsi.fastutil.objects.ObjectSet;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockReader;
 
 import javax.annotation.Nonnull;
-import java.util.ArrayDeque;
-import java.util.Iterator;
-import java.util.Queue;
+import javax.annotation.Nullable;
+import java.util.*;
 import java.util.function.Function;
 
 final class ConnectedSurfaceSequence implements IPositionPlacementSequence {
@@ -22,11 +19,12 @@ final class ConnectedSurfaceSequence implements IPositionPlacementSequence {
     private final Region searchingRegion;
     private final Function<BlockPos, BlockPos> searching2referenceMapper;
     private final BlockPos searchingCenter;
+    @Nullable
     private final Direction side;
     private final boolean fuzzy;
 
     @VisibleForTesting
-    ConnectedSurfaceSequence(IBlockReader world, Region searchingRegion, Function<BlockPos, BlockPos> searching2referenceMapper, BlockPos searchingCenter, Direction side, boolean fuzzy) {
+    ConnectedSurfaceSequence(IBlockReader world, Region searchingRegion, Function<BlockPos, BlockPos> searching2referenceMapper, BlockPos searchingCenter, @Nullable Direction side, boolean fuzzy) {
         this.world = world;
         this.searchingRegion = searchingRegion;
         this.searching2referenceMapper = searching2referenceMapper;
@@ -71,8 +69,8 @@ final class ConnectedSurfaceSequence implements IPositionPlacementSequence {
         BlockState selectedBlock = getReferenceFor(searchingCenter);
 
         return new AbstractIterator<BlockPos>() {
-            private Queue<BlockPos> queue = new ArrayDeque<>(searchingRegion.size());
-            private ObjectSet<BlockPos> searched = new ObjectOpenHashSet<>();
+            private Queue<BlockPos> queue = new LinkedList<>();
+            private Set<BlockPos> searched = new HashSet<>(searchingRegion.size());
 
             {
                 queue.add(searchingCenter);
@@ -90,18 +88,26 @@ final class ConnectedSurfaceSequence implements IPositionPlacementSequence {
 
                 for (int i = - 1; i <= 1; i++) {
                     for (int j = - 1; j <= 1; j++) {
-                        BlockPos neighbor = VectorUtils.perpendicularSurfaceOffset(current, side, i, j);
-
-                        boolean isSearched = ! searched.add(neighbor);
-
-                        if (isSearched || ! searchingRegion.contains(neighbor) || ! isStateValid(selectedBlock, neighbor))
-                            continue;
-
-                        queue.add(neighbor);
+                        if (side != null) {
+                            BlockPos neighbor = VectorUtils.perpendicularSurfaceOffset(current, side, i, j);
+                            addNeighbour(neighbor);
+                        } else {
+                            for (int k = - 1; k <= 1; k++) {
+                                BlockPos neighbor = current.add(i, j, k);
+                                addNeighbour(neighbor);
+                            }
+                        }
                     }
                 }
 
                 return current;
+            }
+
+            private void addNeighbour(BlockPos neighbor) {
+                boolean isSearched = ! searched.add(neighbor);
+                if (isSearched || ! searchingRegion.contains(neighbor) || ! isStateValid(selectedBlock, neighbor))
+                    return;
+                queue.add(neighbor);
             }
         };
     }
@@ -110,9 +116,7 @@ final class ConnectedSurfaceSequence implements IPositionPlacementSequence {
         BlockState reference = getReferenceFor(pos);
         boolean isAir = reference.isAir(world, pos);
         // If fuzzy=true, we ignore the block for reference
-        if (fuzzy)
-            return ! isAir;
-        return ! isAir && filter == reference;
+        return ! isAir && (fuzzy || filter == reference);
     }
 
     private BlockState getReferenceFor(BlockPos pos) {

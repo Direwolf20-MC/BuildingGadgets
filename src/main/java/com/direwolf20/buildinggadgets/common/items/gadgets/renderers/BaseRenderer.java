@@ -42,7 +42,7 @@ public abstract class BaseRenderer {
     private static RemoteInventoryCache cacheInventory = new RemoteInventoryCache(false);
 
     public void render(RenderWorldLastEvent evt, PlayerEntity player, ItemStack heldItem) {
-        // @MichaelHillcox: Not sure why we do this but apparently we do and so does mc
+        // This is necessary to prevent issues with not rendering the overlay's at all (when Botania being present) - See #329 for more information
         getMc().getTextureManager().bindTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
 
         if( this.isLinkable() )
