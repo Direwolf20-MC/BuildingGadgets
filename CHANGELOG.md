@@ -1,8 +1,44 @@
 # Building Gadgets Changelog
 The format of this document is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and should continue to adhere to the conventions outlined in the Keep a Changelog guidelines.
 
+## Unreleased [3.0.3a - 1.14.4]
+### Changed
+- Converted the Destruction-Gadget's connected area mode to use the same algorithm as the other Gadget's
+### Fixed
+- Fix the Destruction-Gadget crashing when voiding any Blocks
+- Fix the Destruction-Gadget's undo not working (and spamming the log) due to crashing during serialisation
+- Fix Exchanger's Effect Blocks not rendering any remove operation 
+
+## [3.0.2a - 1.14.4] - 2019-08-07
+### Fixed
+- Fixed an issue with changing modes and I18n 
+
+## [3.0.1a - 1.14.4] - 2019-08-06
+### Changed
+- Bumped Forge version to .45 which fixes a binary incompat due to the movement of the GameEvents
+    - This also includes a Forge-Fix which would crash BuildingGadgets during startup, if any other mod did a Registry
+      Replacement.
+- Removed the BlockBuildEntity and moved it's functionality to a TER on the already existing effect-block. This should
+  improve performance a little bit.
+    - You can safely ignore warnings about a missing entity...
+
+## [3.0.0a - 1.14.4] - 2019-07-26
+- Initial release for 1.14.4
+### Changed
+- The Template System is still being rewritten and therefore the TemplateManger is disabled. Tooltip indicates it is disabled.
+- Undo drops the items on the ground. Waiting on a fix from forge to have it go back to your inventory.
+### Added
+- Added a charging station to allow you to charge your tools with coal (Or any furnace burnable item). 
+  The GUI is rather basic but it does the job
+- Started with **TILE ENTITY** support. Please test this :)
+    - It is not completed yet though
+### Removed
+- Removed durability option as it was causing very weird issues...
+    - you've got a (by default very fast) charging station now.
+
 ## [Unreleased] [2.7.3 - 1.12.2]
-- Nothing yet
+### Fixed
+- Fixed the Destruction Gadget in Connected Surface Mode always using a depth of 1, regardless of the setting
 
 ## [2.7.2 - 1.12.2] - 2019-08-09
 ### Fixed
