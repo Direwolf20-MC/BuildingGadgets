@@ -147,7 +147,7 @@ public final class TemplateTransactions {
     private static final class ReplaceDataOperator extends AbsSingleRunTransactionOperator {
         private final Map<BlockData, BlockData> dataMap;
 
-        public ReplaceDataOperator(Map<BlockData, BlockData> dataMap) {
+        private ReplaceDataOperator(Map<BlockData, BlockData> dataMap) {
             super(EnumSet.of(TransactionOperation.TRANSFORM_DATA));
             this.dataMap = dataMap;
         }
@@ -282,7 +282,7 @@ public final class TemplateTransactions {
         private int toShiftCounter;
         private TransactionOperation lastOperation;
 
-        public ShiftingOperator(ITransactionOperator other, int toShiftAmount) {
+        private ShiftingOperator(ITransactionOperator other, int toShiftAmount) {
             this.other = other;
             this.toShiftCounter = toShiftAmount + 1;
             this.lastOperation = null;

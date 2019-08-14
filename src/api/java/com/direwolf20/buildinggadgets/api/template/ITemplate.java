@@ -50,7 +50,7 @@ public interface ITemplate {
 
     /**
      * Creates a new {@link ITemplateTransaction} for modifying this {@code ITemplate}. The created {@link ITemplateTransaction}
-     * will only modify modify this {@code ITemplate} when {@link ITemplateTransaction#execute()} is called.
+     * will only modify modify this {@code ITemplate} when {@link ITemplateTransaction#execute(IBuildContext)} is called.
      * Therefore iteration on an {@link IBuildView} of this {@code ITemplate} must still be permitted even when an {@link ITemplateTransaction} has been created.
      * It is upon the {@link ITemplateTransaction} to fail if multiple {@link ITemplateTransaction} attempt to execute in parallel or
      * this {@code ITemplate} currently has active {@link IBuildView IBuildViews}.
