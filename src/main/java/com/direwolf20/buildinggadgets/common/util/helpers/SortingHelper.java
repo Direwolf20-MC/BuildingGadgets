@@ -8,7 +8,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -30,10 +29,10 @@ public class SortingHelper {
          * @param player the player
          * @return a sorted by distance {@link List} of {@link BlockPos}
          */
-        public static List<BlockPos> byDistance(Collection<BlockPos> list, PlayerEntity player) {
+        public static List<BlockPos> byDistance(Iterable<BlockPos> list, PlayerEntity player) {
             List<BlockPos> sortedList = new ArrayList<>();
 
-            Double2ObjectMap<BlockPos> rangeMap = new Double2ObjectArrayMap<>(list.size());
+            Double2ObjectMap<BlockPos> rangeMap = new Double2ObjectArrayMap<>();
             DoubleSortedSet distances = new DoubleRBTreeSet();
 
             double  x = player.posX,

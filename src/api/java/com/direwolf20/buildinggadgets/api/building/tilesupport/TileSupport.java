@@ -29,8 +29,7 @@ public final class TileSupport {
         return DATA_PROVIDER_FACTORY;
     }
 
-    public static ITileEntityData createTileData(IWorld world, BlockPos pos) {
-        TileEntity te = world.getTileEntity(pos);
+    public static ITileEntityData createTileData(@Nullable TileEntity te) {
         if (te == null)
             return dummyTileEntityData();
         ITileEntityData res;
@@ -42,8 +41,16 @@ public final class TileSupport {
         return dummyTileEntityData();
     }
 
+    public static ITileEntityData createTileData(IWorld world, BlockPos pos) {
+        return createTileData(world.getTileEntity(pos));
+    }
+
+    public static BlockData createBlockData(BlockState state, @Nullable TileEntity te) {
+        return new BlockData(state, createTileData(te));
+    }
+
     public static BlockData createBlockData(IWorld world, BlockPos pos) {
-        return new BlockData(world.getBlockState(pos), createTileData(world, pos));
+        return createBlockData(world.getBlockState(pos), world.getTileEntity(pos));
     }
 
     private static class DataProviderFactory implements ITileDataFactory {

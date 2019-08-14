@@ -72,8 +72,11 @@ public class EffectBlock extends Block {
 
     public static void spawnEffectBlock(World world, BlockPos spawnPos, BlockData spawnBlock, Mode mode, boolean usePaste) {
         BlockState state = BGBlocks.effectBlock.getDefaultState();
+        TileEntity curTe = world.getTileEntity(spawnPos);
+        BlockState curState = world.getBlockState(spawnPos);
         world.setBlockState(spawnPos, state);
-        ((EffectBlockTileEntity) world.getTileEntity(spawnPos)).initializeData(world, spawnBlock, mode, usePaste);
+        assert world.getTileEntity(spawnPos) != null;
+        ((EffectBlockTileEntity) world.getTileEntity(spawnPos)).initializeData(world, curState, curTe, spawnBlock, mode, usePaste);
         // Send data to client
         world.notifyBlockUpdate(spawnPos, state, state, Constants.BlockFlags.DEFAULT);
     }

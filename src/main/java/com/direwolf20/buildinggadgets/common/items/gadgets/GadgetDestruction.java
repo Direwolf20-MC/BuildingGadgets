@@ -3,7 +3,9 @@ package com.direwolf20.buildinggadgets.common.items.gadgets;
 import com.direwolf20.buildinggadgets.api.building.BlockData;
 import com.direwolf20.buildinggadgets.api.building.Region;
 import com.direwolf20.buildinggadgets.api.building.placement.IPositionPlacementSequence;
+import com.direwolf20.buildinggadgets.api.building.placement.PlacementSequences.ConnectedSurface;
 import com.direwolf20.buildinggadgets.api.building.tilesupport.TileSupport;
+import com.direwolf20.buildinggadgets.api.util.CommonUtils;
 import com.direwolf20.buildinggadgets.client.gui.GuiMod;
 import com.direwolf20.buildinggadgets.common.blocks.EffectBlock;
 import com.direwolf20.buildinggadgets.common.config.Config;
@@ -48,7 +50,11 @@ import net.minecraftforge.event.world.BlockEvent;
 import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -218,16 +224,14 @@ public class GadgetDestruction extends AbstractGadget {
     public static IPositionPlacementSequence getClearingPositions(World world, BlockPos pos, Direction incomingSide, PlayerEntity player, ItemStack stack) {
         Region boundary = getClearingRegion(pos, incomingSide, player, stack);
         BlockPos startPos = (getAnchor(stack) == null) ? pos : getAnchor(stack);
-        BlockState stateTarget = !Config.GADGETS.GADGET_DESTRUCTION.nonFuzzyEnabled.get() || AbstractGadget.getFuzzy(stack) ? null : world.getBlockState(pos);
+        boolean fuzzy = ! Config.GADGETS.GADGET_DESTRUCTION.nonFuzzyEnabled.get() || AbstractGadget.getFuzzy(stack);
+        BlockState stateTarget = fuzzy ? null : world.getBlockState(pos);
 
         if (AbstractGadget.getConnectedArea(stack)) {
-            Set<BlockPos> voidPositions = new HashSet<>();
             int depth = getToolValue(stack, NBTKeys.GADGET_VALUE_DEPTH);
             if (depth == 0)
-                return new SetBackedPlacementSequence(voidPositions, boundary);
-
-            addConnectedCoordinates(world, player, startPos, stateTarget, voidPositions, boundary);
-            return new SetBackedPlacementSequence(voidPositions, boundary);
+                return CommonUtils.emptyPositionSequence();
+            return ConnectedSurface.create(world, boundary, Function.identity(), startPos, null, fuzzy);
         }
 
         return new SetBackedPlacementSequence(boundary.stream()
@@ -236,25 +240,7 @@ public class GadgetDestruction extends AbstractGadget {
     }
 
     public static List<BlockPos> getClearingPositionsForRendering(World world, BlockPos pos, Direction incomingSide, PlayerEntity player, ItemStack stack) {
-        List<BlockPos> list = getClearingPositions(world, pos, incomingSide, player, stack).stream()
-                .collect(Collectors.toCollection(ArrayList::new));
-        return SortingHelper.Blocks.byDistance(list, player);
-    }
-
-    private static void addConnectedCoordinates(World world, PlayerEntity player, BlockPos pos, BlockState state, Set<BlockPos> coords, Region boundary) {
-        if (! boundary.contains(pos) || coords.contains(pos))
-            return;
-        if (! isValidBlock(world, pos, player, state))
-            return;
-
-        coords.add(pos);
-        for (int x = -1; x <= 1; x++) {
-            for (int y = -1; y <= 1; y++) {
-                for (int z = -1; z <= 1; z++) {
-                    addConnectedCoordinates(world, player, pos.add(x, y, z), state, coords, boundary);
-                }
-            }
-        }
+        return SortingHelper.Blocks.byDistance(getClearingPositions(world, pos, incomingSide, player, stack), player);
     }
 
     public static boolean isValidBlock(World world, BlockPos voidPos, PlayerEntity player, @Nullable BlockState stateTarget) {
