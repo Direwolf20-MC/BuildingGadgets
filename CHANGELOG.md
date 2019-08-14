@@ -7,6 +7,8 @@ The format of this document is based on [Keep a Changelog](https://keepachangelo
 ### Fixed
 - Fix the Destruction-Gadget crashing when voiding any Blocks
 - Fix the Destruction-Gadget's undo not working (and spamming the log) due to crashing during serialisation
+- Fix the Destruction-Gadget voiding Bedrock and attempting to void in-progress effect blocks (the latter caused 
+  crashes when attempting to undo)
 - Fix Exchanger's Effect Blocks not rendering any remove operation 
 
 ## [3.0.2a - 1.14.4] - 2019-08-07
@@ -39,6 +41,9 @@ The format of this document is based on [Keep a Changelog](https://keepachangelo
 ## [Unreleased] [2.7.3 - 1.12.2]
 ### Fixed
 - Fixed the Destruction Gadget in Connected Surface Mode always using a depth of 1, regardless of the setting
+- Fixed the Destruction Gadget in Connected Surface Mode ignoring bed-rock and other in-destructible things 
+  (including mod prevented Blocks)
+- Fixed the Destruction Gadget ignoring the fuzzy Mode setting completly  
 
 ## [2.7.2 - 1.12.2] - 2019-08-09
 ### Fixed

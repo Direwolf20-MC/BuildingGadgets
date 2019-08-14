@@ -273,19 +273,19 @@ public class GadgetDestruction extends GadgetGeneric {
                     searchPos -> searchPos,
                     startPos,
                     null,
-                    fuzzy
+                    (s, p) -> validBlock(world, p, player, s, fuzzy)
             ).stream().collect(Collectors.toSet());
 
         } else {
             return selectionRegion.stream().filter(
-                    e -> validBlock(world, e, player, stateTarget)
+                    e -> validBlock(world, e, player, stateTarget, fuzzy)
             ).collect(Collectors.toSet());
         }
     }
 
-    private static boolean validBlock(World world, BlockPos voidPos, EntityPlayer player, @Nullable IBlockState stateTarget) {
+    private static boolean validBlock(World world, BlockPos voidPos, EntityPlayer player, @Nullable IBlockState stateTarget, boolean fuzzy) {
         IBlockState currentBlock = world.getBlockState(voidPos);
-        if (stateTarget != null && currentBlock != stateTarget) return false;
+        if (! fuzzy && currentBlock != stateTarget) return false;
         TileEntity te = world.getTileEntity(voidPos);
         if (currentBlock.getBlock().isAir(currentBlock, world, voidPos)) return false;
         //if (currentBlock.getBlock().getMaterial(currentBlock).isLiquid()) return false;

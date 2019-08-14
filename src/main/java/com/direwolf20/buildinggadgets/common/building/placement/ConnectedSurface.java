@@ -13,6 +13,7 @@ import net.minecraft.world.IBlockAccess;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
+import java.util.function.BiPredicate;
 import java.util.function.Function;
 
 /**
@@ -38,21 +39,35 @@ public final class ConnectedSurface implements IPlacementSequence {
         return new ConnectedSurface(world, searchingRegion, searching2referenceMapper, searchingCenter, side, fuzzy);
     }
 
+    public static ConnectedSurface create(IBlockAccess world, Region searchingRegion, Function<BlockPos, BlockPos> searching2referenceMapper, BlockPos searchingCenter, @Nullable EnumFacing side, BiPredicate<IBlockState, BlockPos> predicate) {
+        return new ConnectedSurface(world, searchingRegion, searching2referenceMapper, searchingCenter, side, predicate);
+    }
+
     private final IBlockAccess world;
     private final Region searchingRegion;
     private final Function<BlockPos, BlockPos> searching2referenceMapper;
     private final BlockPos searchingCenter;
     private final EnumFacing side;
-    private final boolean fuzzy;
+    private final BiPredicate<IBlockState, BlockPos> predicate;
 
     @VisibleForTesting
     private ConnectedSurface(IBlockAccess world, Region searchingRegion, Function<BlockPos, BlockPos> searching2referenceMapper, BlockPos searchingCenter, @Nullable EnumFacing side, boolean fuzzy) {
+        this(world, searchingRegion, searching2referenceMapper, searchingCenter, side,
+                (filter, pos) -> {
+                    IBlockState reference = world.getBlockState(searching2referenceMapper.apply(pos));
+                    boolean isAir = reference.getBlock().isAir(reference, world, pos);
+                    // If fuzzy=true, we ignore the block for reference
+                    return ! isAir && (fuzzy || filter == reference);
+                });
+    }
+
+    ConnectedSurface(IBlockAccess world, Region searchingRegion, Function<BlockPos, BlockPos> searching2referenceMapper, BlockPos searchingCenter, @Nullable EnumFacing side, BiPredicate<IBlockState, BlockPos> predicate) {
         this.world = world;
         this.searchingRegion = searchingRegion;
         this.searching2referenceMapper = searching2referenceMapper;
         this.searchingCenter = searchingCenter;
         this.side = side;
-        this.fuzzy = fuzzy;
+        this.predicate = predicate;
     }
 
     /**
@@ -76,7 +91,7 @@ public final class ConnectedSurface implements IPlacementSequence {
 
     @Override
     public IPlacementSequence copy() {
-        return new ConnectedSurface(world, searchingRegion, searching2referenceMapper, searchingCenter, side, fuzzy);
+        return new ConnectedSurface(world, searchingRegion, searching2referenceMapper, searchingCenter, side, predicate);
     }
 
     /**
@@ -95,15 +110,16 @@ public final class ConnectedSurface implements IPlacementSequence {
             private Set<BlockPos> searched = new HashSet<>(searchingRegion.size());
 
             {
-                queue.add(searchingCenter);
-                searched.add(searchingCenter);
+                if (isValid(searchingCenter)) { //The destruction Gadget might be facing Bedrock or something similar - this would not be valid!
+                    queue.add(searchingCenter);
+                    searched.add(searchingCenter);
+                }
             }
 
             @Override
             protected BlockPos computeNext() {
-                if (queue.isEmpty()) {
+                if (queue.isEmpty())
                     return endOfData();
-                }
 
                 // The position is guaranteed to be valid
                 BlockPos current = queue.remove();
@@ -126,18 +142,15 @@ public final class ConnectedSurface implements IPlacementSequence {
 
             private void addNeighbour(BlockPos neighbor) {
                 boolean isSearched = ! searched.add(neighbor);
-                if (isSearched || ! searchingRegion.contains(neighbor) || ! isStateValid(selectedBlock, neighbor))
+                if (isSearched || ! isValid(neighbor))
                     return;
                 queue.add(neighbor);
             }
-        };
-    }
 
-    private boolean isStateValid(IBlockState filter, BlockPos pos) {
-        IBlockState reference = getReferenceFor(pos);
-        boolean isAir = reference.getBlock().isAir(reference, world, pos);
-        // If fuzzy=true, we ignore the block for reference
-        return ! isAir && (fuzzy || filter == reference);
+            private boolean isValid(BlockPos pos) {
+                return searchingRegion.contains(pos) && predicate.test(selectedBlock, pos);
+            }
+        };
     }
 
     private IBlockState getReferenceFor(BlockPos pos) {
