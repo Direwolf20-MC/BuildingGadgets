@@ -3,10 +3,10 @@ The format of this document is based on [Keep a Changelog](https://keepachangelo
 
 ## Unreleased [3.0.3a - 1.14.4]
 ### Changed
-- Converted the Destruction-Gadget's remove to use the same algorithm as the other Gadget's
+- Converted the Destruction-Gadget's connected area mode to use the same algorithm as the other Gadget's
 ### Fixed
-- Fix the Destruction-Gadget crashing on void operation
-- Fix the Destruction-Gadget's undo crashing during serialize and therefore not working
+- Fix the Destruction-Gadget crashing when voiding any Blocks
+- Fix the Destruction-Gadget's undo not working (and spamming the log) due to crashing during serialisation
 - Fix Exchanger's Effect Blocks not rendering any remove operation 
 
 ## [3.0.2a - 1.14.4] - 2019-08-07
