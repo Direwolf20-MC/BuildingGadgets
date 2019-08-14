@@ -1,6 +1,14 @@
 # Building Gadgets Changelog
 The format of this document is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and should continue to adhere to the conventions outlined in the Keep a Changelog guidelines.
 
+## Unreleased [3.0.3a - 1.14.4]
+### Changed
+- Converted the Destruction-Gadget's remove to use the same algorithm as the other Gadget's
+### Fixed
+- Fix the Destruction-Gadget crashing on void operation
+- Fix the Destruction-Gadget's undo crashing during serialize and therefore not working
+- Fix Exchanger's Effect Blocks not rendering any remove operation 
+
 ## [3.0.2a - 1.14.4] - 2019-08-07
 ### Fixed
 - Fixed an issue with changing modes and I18n 

@@ -93,4 +93,6 @@ public final class NBTKeys {
     public static final String ENTITY_BUILD_ORIGINAL_BLOCK = "original_block";
     public static final String ENTITY_BUILD_USE_PASTE = "use_paste";
 
+    public static final String AREA = "area";
+
 }

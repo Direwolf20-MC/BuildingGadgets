@@ -1,9 +1,12 @@
 package com.direwolf20.buildinggadgets.common.util.blocks;
 
+import com.direwolf20.buildinggadgets.api.building.Region;
 import com.direwolf20.buildinggadgets.api.building.placement.IPositionPlacementSequence;
 import com.direwolf20.buildinggadgets.common.util.exceptions.PaletteOverflowException;
 import com.direwolf20.buildinggadgets.common.util.helpers.LambdaHelper;
-import com.direwolf20.buildinggadgets.common.util.helpers.SerializationHelper;
+import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
+import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
+import com.direwolf20.buildinggadgets.common.util.tools.SetBackedPlacementSequence;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -25,7 +28,6 @@ import net.minecraftforge.common.util.TriPredicate;
 import net.minecraftforge.fml.server.ServerLifecycleHooks;
 import org.apache.commons.lang3.tuple.Pair;
 
-import java.io.Serializable;
 import java.util.*;
 import java.util.function.BiPredicate;
 
@@ -40,12 +42,10 @@ public class RegionSnapshot {
     private static final String TILE_NBT = "block_nbt";
 
     private static CompoundNBT serialize(CompoundNBT tag, RegionSnapshot snapshot) {
-        Preconditions.checkArgument(snapshot.positions instanceof Serializable);
-
         tag.putString(DIMENSION, DimensionType.getKey(snapshot.world.getDimension().getType()).toString());
 
-        byte[] serializedPositions = SerializationHelper.serialize(snapshot.positions);
-        tag.putByteArray(POSITIONS, Objects.requireNonNull(serializedPositions));
+        tag.put(POSITIONS, Objects.requireNonNull(NBTHelper.writeIterable(snapshot.positions, NBTUtil::writeBlockPos)));
+        tag.put(NBTKeys.AREA, snapshot.positions.getBoundingBox().serialize());
 
         // Palette serialization begin
         // The serialized palettes only include actual block states, empty block state should be added, regardlessly, during deserialization
@@ -131,7 +131,9 @@ public class RegionSnapshot {
         ResourceLocation dimension = new ResourceLocation(tag.getString(DIMENSION));
         IWorld world = ServerLifecycleHooks.getCurrentServer().getWorld(Objects.requireNonNull(DimensionType.byName(dimension)));
 
-        IPositionPlacementSequence positions = SerializationHelper.deserialize(tag.getByteArray(POSITIONS));
+        IPositionPlacementSequence positions = new SetBackedPlacementSequence(
+                NBTHelper.deserializeSet((ListNBT) tag.get(POSITIONS), new HashSet<>(), nbt -> NBTUtil.readBlockPos((CompoundNBT) nbt)),
+                Region.deserializeFrom(tag.getCompound(NBTKeys.AREA)));
 
         List<Optional<BlockState>> palettes = new ArrayList<>();
         {
