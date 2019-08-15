@@ -49,7 +49,7 @@ public class CopyPasteRender extends BaseRenderer {
         Vec3d playerPos = getPlayerPos();
         String UUID = BGItems.gadgetCopyPaste.getUUID(heldItem);
 
-        if(GadgetCopyPaste.getToolMode(heldItem) == GadgetCopyPaste.ToolMode.Copy)
+        if (GadgetCopyPaste.getToolMode(heldItem) == GadgetCopyPaste.ToolMode.COPY)
             renderCopy(evt, player, heldItem, playerPos, UUID);
         else
             renderPaste(evt, player, heldItem, playerPos, UUID);
