@@ -10,9 +10,10 @@ import com.direwolf20.buildinggadgets.api.registry.TopologicalRegistryBuilder;
 import com.direwolf20.buildinggadgets.api.serialisation.ITemplateSerializer;
 import com.direwolf20.buildinggadgets.api.serialisation.ITileDataSerializer;
 import com.direwolf20.buildinggadgets.api.serialisation.SerialisationSupport;
+import com.direwolf20.buildinggadgets.api.template.DelegatingTemplate.DelegatingTemplateSerializer;
+import com.direwolf20.buildinggadgets.api.template.ImmutableTemplate;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Supplier;
-import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.InterModComms;
@@ -23,10 +24,6 @@ import net.minecraftforge.registries.RegistryBuilder;
 
 @EventBusSubscriber(modid = APIReference.MODID, bus = Bus.MOD)
 public final class Registries {
-
-    public static final ResourceLocation STACK_PROVIDER_ITEM_HANDLER = new ResourceLocation("buildinggadgets:stack_provider/item_handler");
-
-    public static final String IMC_METHOD_STACK_PROVIDER = "imc_stack_provider";
     private Registries() {}
 
     private static TopologicalRegistryBuilder<ITileDataFactory> tileDataFactoryBuilder = TopologicalRegistryBuilder.create();
@@ -60,28 +57,38 @@ public final class Registries {
 
     @SubscribeEvent
     public static void registerTemplateSerializers(RegistryEvent.Register<ITemplateSerializer> event) {
-
+        BuildingGadgetsAPI.LOG.trace("Registering Template Serializers");
+        event.getRegistry().register(new ImmutableTemplate.Serializer().setRegistryName(TemplateSerializerReference.IMMUTABLE_TEMPLATE_SERIALIZER_RL));
+        event.getRegistry().register(new DelegatingTemplateSerializer().setRegistryName(TemplateSerializerReference.DELEGATING_TEMPLATE_SERIALIZER_RL));
+        BuildingGadgetsAPI.LOG.trace("Finished Registering Template Serializers");
     }
 
 
     @SubscribeEvent
     public static void registerTileDataSerializers(RegistryEvent.Register<ITileDataSerializer> event) {
+        BuildingGadgetsAPI.LOG.trace("Registering Template Serializers");
         event.getRegistry().register(SerialisationSupport.dummyDataSerializer().setRegistryName(TileDataSerializerReference.DUMMY_SERIALIZER_RL));
+        event.getRegistry().register(SerialisationSupport.nbtTileDataSerializer().setRegistryName(TileDataSerializerReference.NBT_TILE_ENTITY_DATA_SERIALIZER_RL));
+        BuildingGadgetsAPI.LOG.trace("Finished Registering Template Serializers");
     }
 
     static void createOrderedRegistries() {
         BuildingGadgetsAPI.LOG.trace("Creating Ordered Registries");
+        Preconditions.checkState(tileDataFactoryBuilder != null, "Cannot create Ordered Registries twice!");
         tileDataFactories = tileDataFactoryBuilder.build();
         tileDataFactoryBuilder = null;
         BuildingGadgetsAPI.LOG.trace("Finished Creating Ordered Registries");
     }
 
     static boolean handleIMC(InterModComms.IMCMessage message) {
+        BuildingGadgetsAPI.LOG.debug("Received IMC message using Method {} from {}.", message.getMethod(), message.getSenderModId());
         if (message.getMethod().equals(TileDataFactoryReference.IMC_METHOD_TILEDATA_FACTORY)) {
+            BuildingGadgetsAPI.LOG.debug("Recognized ITileDataFactory registration message. Registering.");
             Preconditions.checkState(tileDataFactories != null,
                     "Attempted to register ITileDataFactory, after the Registry has been built!");
-            tileDataFactoryBuilder.merge(
-                    message.<Supplier<TopologicalRegistryBuilder<ITileDataFactory>>>getMessageSupplier().get().get());
+            TopologicalRegistryBuilder<ITileDataFactory> builder = message.<Supplier<TopologicalRegistryBuilder<ITileDataFactory>>>getMessageSupplier().get().get();
+            tileDataFactoryBuilder.merge(builder);
+            BuildingGadgetsAPI.LOG.trace("Registered {} from {} to the ITileDataFactory registry.", builder, message.getSenderModId());
             return true;
         }
         return false;

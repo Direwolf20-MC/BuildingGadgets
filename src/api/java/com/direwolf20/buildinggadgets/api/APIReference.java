@@ -19,12 +19,19 @@ public final class APIReference {
 
         public static final String DUMMY_SERIALIZER = MODID + ":dummy_serializer";
         public static final ResourceLocation DUMMY_SERIALIZER_RL = new ResourceLocation(DUMMY_SERIALIZER);
+        public static final String NBT_TILE_ENTITY_DATA_SERIALIZER = MODID + ":nbt_tile_data_serializer";
+        public static final ResourceLocation NBT_TILE_ENTITY_DATA_SERIALIZER_RL = new ResourceLocation(NBT_TILE_ENTITY_DATA_SERIALIZER);
     }
 
     public static final class TemplateSerializerReference {
         public static final ResourceLocation REGISTRY_ID_TEMPLATE_SERIALIZER = new ResourceLocation(MODID, "template/serializer");
 
         private TemplateSerializerReference() {}
+
+        public static final String IMMUTABLE_TEMPLATE_SERIALIZER = MODID + ":immutable_template_serializer";
+        public static final ResourceLocation IMMUTABLE_TEMPLATE_SERIALIZER_RL = new ResourceLocation(IMMUTABLE_TEMPLATE_SERIALIZER);
+        public static final String DELEGATING_TEMPLATE_SERIALIZER = MODID + ":delegating_template_serializer";
+        public static final ResourceLocation DELEGATING_TEMPLATE_SERIALIZER_RL = new ResourceLocation(DELEGATING_TEMPLATE_SERIALIZER);
 
     }
 

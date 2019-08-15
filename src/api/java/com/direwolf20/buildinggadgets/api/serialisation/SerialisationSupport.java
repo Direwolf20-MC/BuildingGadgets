@@ -1,5 +1,7 @@
 package com.direwolf20.buildinggadgets.api.serialisation;
 
+import com.direwolf20.buildinggadgets.api.APIReference.TemplateSerializerReference;
+import com.direwolf20.buildinggadgets.api.APIReference.TileDataSerializerReference;
 import com.direwolf20.buildinggadgets.api.building.tilesupport.ITileEntityData;
 import com.direwolf20.buildinggadgets.api.building.tilesupport.NBTTileEntityData;
 import com.direwolf20.buildinggadgets.api.building.tilesupport.TileSupport;
@@ -9,11 +11,13 @@ import com.google.common.base.Preconditions;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.registries.ForgeRegistryEntry;
+import net.minecraftforge.registries.ObjectHolder;
 
 public final class SerialisationSupport {
     private SerialisationSupport() {}
 
-    private static final ITileDataSerializer DUMMY_TILE_DATA_SERIALIZER = new DummyTileDataSerializer();
+    @ObjectHolder(TileDataSerializerReference.DUMMY_SERIALIZER)
+    private static ITileDataSerializer DUMMY_TILE_DATA_SERIALIZER = new DummyTileDataSerializer();
 
     public static ITileDataSerializer dummyDataSerializer() {
         return DUMMY_TILE_DATA_SERIALIZER;
@@ -36,7 +40,8 @@ public final class SerialisationSupport {
         }
     }
 
-    private static final ITileDataSerializer NBT_TILE_DATA_SERIALIZER = new NBTTileEntityDataSerializer();
+    @ObjectHolder(TileDataSerializerReference.NBT_TILE_ENTITY_DATA_SERIALIZER)
+    private static ITileDataSerializer NBT_TILE_DATA_SERIALIZER = new NBTTileEntityDataSerializer();
 
     public static ITileDataSerializer nbtTileDataSerializer() {
         return NBT_TILE_DATA_SERIALIZER;
@@ -64,6 +69,20 @@ public final class SerialisationSupport {
                 materialList = MaterialList.deserialize(tagCompound.getCompound(NBTKeys.KEY_MATERIALS));
             return new NBTTileEntityData(data, materialList);
         }
+    }
+
+    @ObjectHolder(TemplateSerializerReference.IMMUTABLE_TEMPLATE_SERIALIZER)
+    private static ITemplateSerializer IMMUTABLE_TEMPLATE_SERIALIZER;
+
+    public static ITemplateSerializer immutableTemplateSerializer() {
+        return IMMUTABLE_TEMPLATE_SERIALIZER;
+    }
+
+    @ObjectHolder(TemplateSerializerReference.DELEGATING_TEMPLATE_SERIALIZER)
+    private static ITemplateSerializer DELEGATING_TEMPLATE_SERIALIZER;
+
+    public static ITemplateSerializer delegatingTemplateSerializer() {
+        return DELEGATING_TEMPLATE_SERIALIZER;
     }
 
 }

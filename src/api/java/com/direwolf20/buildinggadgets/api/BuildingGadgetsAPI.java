@@ -32,6 +32,9 @@ public final class BuildingGadgetsAPI {
     }
 
     private void handleIMCMessage(InterModComms.IMCMessage message) {
-        Registries.handleIMC(message);
+        if (Registries.handleIMC(message))
+            LOG.trace("Successfully handled IMC-Message using Method {} from Mod {}.", message.getMethod(), message.getSenderModId());
+        else
+            LOG.warn("Failed to handle IMC-Message using Method {} from Mod {}!", message.getMethod(), message.getSenderModId());
     }
 }

@@ -1,5 +1,7 @@
 package com.direwolf20.buildinggadgets.api.util;
 
+import jdk.internal.jline.internal.Nullable;
+
 import java.util.Spliterator;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -19,7 +21,11 @@ public final class MappingSpliterator<T, U> extends DelegatingSpliterator<T, U> 
     }
 
     @Override
+    @Nullable
     public Spliterator<U> trySplit() {
-        return new MappingSpliterator<>(getOther(), mapper);
+        Spliterator<T> split = getOther().trySplit();
+        if (split != null)
+            return new MappingSpliterator<>(split, mapper);
+        return null;
     }
 }

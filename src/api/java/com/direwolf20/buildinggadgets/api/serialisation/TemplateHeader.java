@@ -2,9 +2,13 @@ package com.direwolf20.buildinggadgets.api.serialisation;
 
 import com.direwolf20.buildinggadgets.api.building.Region;
 import com.direwolf20.buildinggadgets.api.materials.MaterialList;
+import com.direwolf20.buildinggadgets.api.util.NBTKeys;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Multiset;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraftforge.common.util.Constants.NBT;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -36,21 +40,61 @@ public final class TemplateHeader {
         return new Builder(serializer, boundingBox);
     }
 
+    /**
+     * @param header The {@code TemplateHeader} to copy
+     * @return a Builder with all values predefined to the values passed into the header
+     */
+    public static Builder builderOf(TemplateHeader header) {
+        return builderOf(header, header.getSerializer(), header.getBoundingBox());
+    }
+
+    /**
+     * @param boundingBox the {@link Region} to use
+     * @param serializer  The serializer to use
+     * @param header      The {@code TemplateHeader} to copy
+     * @return a Builder with all values predefined to the values passed into the header, except for serializer and boundBox
+     */
+    public static Builder builderOf(TemplateHeader header, ResourceLocation serializer, Region boundingBox) {
+        return builder(serializer, boundingBox)
+                .author(header.getAuthor())
+                .name(header.getName())
+                .requiredItems(header.getRequiredItems());
+    }
+
+    public static Builder builderFromNBT(CompoundNBT nbt) {
+        Preconditions.checkArgument(nbt.contains(NBTKeys.KEY_SERIALIZER, NBT.TAG_STRING) && nbt.contains(NBTKeys.KEY_BOUNDS, NBT.TAG_COMPOUND),
+                "Cannot construct a TemplateHeader without '" + NBTKeys.KEY_SERIALIZER + "' and '" + NBTKeys.KEY_BOUNDS + "'!");
+        ResourceLocation serializer = new ResourceLocation(nbt.getString(NBTKeys.KEY_SERIALIZER));
+        Region region = Region.deserializeFrom(nbt.getCompound(NBTKeys.KEY_BOUNDS));
+        Builder builder = builder(serializer, region);
+        if (nbt.contains(NBTKeys.KEY_NAME, NBT.TAG_STRING))
+            builder.name(nbt.getString(NBTKeys.KEY_NAME));
+        if (nbt.contains(NBTKeys.KEY_AUTHOR, NBT.TAG_STRING))
+            builder.name(nbt.getString(NBTKeys.KEY_AUTHOR));
+        if (nbt.contains(NBTKeys.KEY_MATERIALS, NBT.TAG_COMPOUND))
+            builder.requiredItems(MaterialList.deserialize(nbt.getCompound(NBTKeys.KEY_MATERIALS)));
+        return builder;
+    }
+
+    public static TemplateHeader fromNBT(CompoundNBT nbt) {
+        return TemplateHeader.builderFromNBT(nbt).build();
+    }
+
     @Nullable
     private final String name;
     @Nullable
     private final String author;
-    @Nonnull
+    @Nullable
     private final MaterialList requiredItems;
     @Nonnull
     private final ResourceLocation serializer;
-    @Nonnull // Todo replace with Region
+    @Nonnull
     private final Region boundingBox;
 
     private TemplateHeader(@Nullable String name, @Nullable String author, @Nullable MaterialList requiredItems, @Nonnull ResourceLocation serializer, @Nonnull Region boundingBox) {
         this.name = name;
         this.author = author;
-        this.requiredItems = requiredItems != null ? requiredItems : MaterialList.empty();
+        this.requiredItems = requiredItems;
         this.serializer = Objects.requireNonNull(serializer);
         this.boundingBox = Objects.requireNonNull(boundingBox);
     }
@@ -72,9 +116,9 @@ public final class TemplateHeader {
     }
 
     /**
-     * @return The optional set of required Items of the corresponding {@link com.direwolf20.buildinggadgets.api.template.ITemplate}. Empty if not present.
+     * @return The optional set of required Items of the corresponding {@link com.direwolf20.buildinggadgets.api.template.ITemplate}. Null if not present.
      */
-    @Nonnull
+    @Nullable
     public MaterialList getRequiredItems() {
         return requiredItems;
     }
@@ -96,6 +140,25 @@ public final class TemplateHeader {
     }
 
     /**
+     * @param persisted whether or not the save may be persisted
+     * @return A new {@link CompoundNBT} which can be used for {@link #fromNBT(CompoundNBT)}
+     * @implNote If this is called with persisted=false then this will never write {@link #getRequiredItems()}.
+     * This is done in order not to prevent updates from changing the required Items for an {@link com.direwolf20.buildinggadgets.api.template.ITemplate}.
+     */
+    public CompoundNBT toNBT(boolean persisted) {
+        CompoundNBT nbt = new CompoundNBT();
+        nbt.putString(NBTKeys.KEY_SERIALIZER, getSerializer().toString());
+        nbt.put(NBTKeys.KEY_BOUNDS, getBoundingBox().serialize());
+        if (getName() != null)
+            nbt.putString(NBTKeys.KEY_NAME, getName());
+        if (getAuthor() != null)
+            nbt.putString(NBTKeys.KEY_AUTHOR, getAuthor());
+        if (! persisted && getRequiredItems() != null)
+            nbt.put(NBTKeys.KEY_MATERIALS, getRequiredItems().serialize(persisted));
+        return nbt;
+    }
+
+    /**
      * Builder for {@link TemplateHeader}. An instance of this class can be acquired via {@link #builder(ResourceLocation, Region)}.
      */
     public static final class Builder {
@@ -107,12 +170,21 @@ public final class TemplateHeader {
         private MaterialList requiredItems;
         @Nonnull
         private final ResourceLocation serializer;
-        @Nonnull //Todo replace with Region
-        private final Region boundingBox;
+        @Nonnull
+        private Region boundingBox;
 
-        private Builder(@Nonnull ResourceLocation serializer, @Nonnull Region boundingBox) {
+        private Builder(ResourceLocation serializer, Region boundingBox) {
             this.serializer = Objects.requireNonNull(serializer);
             this.boundingBox = Objects.requireNonNull(boundingBox);
+        }
+
+        /**
+         * @param boundingBox The new boundingBox to be used. May not be null!
+         * @return The {@code Builder} instance to allow for method chaining
+         */
+        public Builder bounds(Region boundingBox) {
+            this.boundingBox = Objects.requireNonNull(boundingBox);
+            return this;
         }
 
         /**

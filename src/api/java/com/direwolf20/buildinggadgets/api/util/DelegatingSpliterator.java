@@ -4,11 +4,12 @@ import java.util.Objects;
 import java.util.Spliterator;
 import java.util.function.Consumer;
 
-abstract class DelegatingSpliterator<T, U> implements Spliterator<U> {
+//internal do not use, see package-info
+public abstract class DelegatingSpliterator<T, U> implements Spliterator<U> {
     private final Spliterator<T> other;
     private boolean found;
 
-    DelegatingSpliterator(Spliterator<T> other) {
+    protected DelegatingSpliterator(Spliterator<T> other) {
         this.other = Objects.requireNonNull(other);
         found = true;
     }
@@ -36,9 +37,9 @@ abstract class DelegatingSpliterator<T, U> implements Spliterator<U> {
         return getOther().getExactSizeIfKnown();
     }
 
-    abstract boolean advance(T object, Consumer<? super U> action);
+    protected abstract boolean advance(T object, Consumer<? super U> action);
 
-    Spliterator<T> getOther() {
+    protected Spliterator<T> getOther() {
         return other;
     }
 }

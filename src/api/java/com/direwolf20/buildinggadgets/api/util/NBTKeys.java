@@ -15,6 +15,10 @@ public final class NBTKeys {
     public static final String KEY_MATERIALS = "materials";
     public static final String KEY_COUNT = "count";
     public static final String KEY_ID = "id";
+    public static final String KEY_HEADER = "header";
+    public static final String KEY_BOUNDS = "bounds";
+    public static final String KEY_NAME = "name";
+    public static final String KEY_AUTHOR = "author";
 
     private NBTKeys() {}
 }

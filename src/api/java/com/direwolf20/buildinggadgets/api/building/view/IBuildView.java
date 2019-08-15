@@ -7,8 +7,8 @@ import com.direwolf20.buildinggadgets.api.materials.MaterialList;
 import com.direwolf20.buildinggadgets.api.materials.UniqueItem;
 import com.direwolf20.buildinggadgets.api.template.ITemplate;
 import com.direwolf20.buildinggadgets.api.util.CommonUtils;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.Vec3d;
 
 import javax.annotation.Nullable;
@@ -27,7 +27,8 @@ import java.util.stream.Stream;
  * The {@code IBuildView} is constructed given an instance of {@link IBuildContext}. This
  * context allows the {@link IBuildView} to adapt itself to the environment in which it is viewed. Therefore no assumptions may be made, that
  * 2 distinct instances of {@code IBuildView} will produce the same results even if they were constructed by the same {@link IBuildContext}.
- *
+ * <p>
+ * All Methods in this class may throw an {@link IllegalStateException} if called after the {@code IBuildView} has been closed.
  * @implSpec Notice that no guarantees are made for the order in which {@link PlacementTarget}'s are produced by this {@code IBuildView}.
  * Order may be arbitrary or sorted, consult the documentation of the implementation you are currently faced with for information about traversal order.
  */
@@ -82,16 +83,14 @@ public interface IBuildView extends IPlacementSequence<PlacementTarget>, AutoClo
      * but may be fewer if exact requirements are hard or expensive to compute.
      *
      * @return A {@link MaterialList} representing the Item Requirements to build this {@code IBuildView}.
-     * Will be null if unknown or expensive to compute.
      */
-    @Nullable
     default MaterialList estimateRequiredItems(@Nullable Vec3d simulatePos) {
-        MaterialList.Builder builder = MaterialList.builder();
-        for (PlacementTarget placementTarget : this) {
-            BlockRayTraceResult target = simulatePos != null ? CommonUtils.fakeRayTrace(simulatePos, placementTarget.getPos()) : null;
-            builder.addAll(placementTarget.getRequiredItems(getContext(), target).getRequiredItems().asList());
-        }
-        return builder.build();
+        return CommonUtils.estimateRequiredItems(this, this.getContext(), simulatePos);
+    }
+
+    default MaterialList estimateRequiredItems() {
+        PlayerEntity player = getContext().getBuildingPlayer();
+        return estimateRequiredItems(player != null ? new Vec3d(player.posX, player.posY, player.posZ) : null);
     }
 
     /**
@@ -107,10 +106,13 @@ public interface IBuildView extends IPlacementSequence<PlacementTarget>, AutoClo
     int estimateSize();
 
     /**
-     * Calling this Method will invalidate this {@code TemplateView}. Invalidation both frees this {@code TemplateViews} execution lock on any
-     * {@link com.direwolf20.buildinggadgets.api.template.transaction.ITemplateTransaction} and prevents further iteration over this views content if the
-     * backing {@link ITemplate} does not support concurrent {@link com.direwolf20.buildinggadgets.api.template.transaction.ITemplateTransaction} execution.
-     * Any calls to {@link #iterator()}, {@link #spliterator()} or {@link #stream()} will throw an {@link UnsupportedOperationException} in this case.
+     * Calling this Method will invalidate this {@code IBuildView}. If this {@code IBuildView} was created by an {@link ITemplate} then
+     * Invalidation must free this {@code IBuildViews} execution lock on any {@link com.direwolf20.buildinggadgets.api.template.transaction.ITemplateTransaction}
+     * and may prevent further iteration over this views content if the backing {@link ITemplate} does not support concurrent
+     * {@link com.direwolf20.buildinggadgets.api.template.transaction.ITemplateTransaction} execution.
+     * <p>
+     * Any calls to {@link #iterator()}, {@link #spliterator()} or {@link #stream()} may throw an {@link UnsupportedOperationException} in this case.
+     * Additionally an implementation may choose to throw {@link IllegalStateException} from any other Method in this class.
      */
     @Override
     void close() throws TemplateException;

@@ -1,6 +1,7 @@
 package com.direwolf20.buildinggadgets.api.template.transaction;
 
 import com.direwolf20.buildinggadgets.api.building.BlockData;
+import com.direwolf20.buildinggadgets.api.building.PlacementTarget;
 import com.direwolf20.buildinggadgets.api.serialisation.TemplateHeader;
 import com.direwolf20.buildinggadgets.api.template.ITemplate;
 import com.google.common.collect.ImmutableSet;
@@ -27,31 +28,38 @@ public interface ITransactionOperator {
      * a default case. Users may furthermore not depend on this Enum's ordinal for serialisation. <br>
      * However it is guaranteed, that the id field will remain the same across all non-major releases.
      */
-    enum Characteristic {
+    enum TransactionOperation {
         /**
-         * This {@code Characteristic} represents the ability of an {@code ITransactionOperator} to transform the
-         * {@link TemplateHeader} of a given {@link ITemplate}.
+         * This {@code TransactionOperation} represents the ability of an {@code ITransactionOperator} to create new data via
+         * {@link #createPos(ITransactionExecutionContext)} and {@link #createDataForPos(ITransactionExecutionContext, BlockPos)}.
          */
-        TRANSFORM_HEADER(0),
+        CREATE_DATA(3),
         /**
-         * This {@code Characteristic} represents the ability of an {@code ITransactionOperator} to transform positions via
-         * {@link #transformPos(ITransactionExecutionContext, BlockPos, BlockData)}.
-         */
-        TRANSFORM_POSITION(1),
-        /**
-         * This {@code Characteristic} represents the ability of an {@code ITransactionOperator} to transform data via
+         * This {@code TransactionOperation} represents the ability of an {@code ITransactionOperator} to transform data via
          * {@link #transformData(ITransactionExecutionContext, BlockData)}.
          */
         TRANSFORM_DATA(2),
         /**
-         * This {@code Characteristic} represents the ability of an {@code ITransactionOperator} to create new data via
-         * {@link #createPos(ITransactionExecutionContext)} and {@link #createDataForPos(ITransactionExecutionContext, BlockPos)}.
+         * This {@code TransactionOperation} represents the ability of an {@code ITransactionOperator} to transform positions via
+         * {@link #transformPos(ITransactionExecutionContext, BlockPos, BlockData)}.
          */
-        CREATE_DATA(3);
+        TRANSFORM_POSITION(1),
+
+        /**
+         * This {@code TransactionOperation} represents the ability of an {@code ITransactionOperator} to transform {@link PlacementTarget PlacementTargets} via
+         * {@link #transformTarget(ITransactionExecutionContext, PlacementTarget)}.
+         */
+        TRANSFORM_TARGET(4),
+        /**
+         * This {@code TransactionOperation} represents the ability of an {@code ITransactionOperator} to transform the
+         * {@link TemplateHeader} of a given {@link ITemplate}.
+         */
+        TRANSFORM_HEADER(0);
+
 
         private final byte id;
 
-        Characteristic(int id) {
+        TransactionOperation(int id) {
             this.id = (byte) id;
         }
 
@@ -127,11 +135,27 @@ public interface ITransactionOperator {
     }
 
     /**
-     * Returns an {@link Set} of {@link Characteristic} to indicate which operations are performed by this {@code ITransactionOperator}.
-     * All {@link Characteristic} returned by this Method are guaranteed to be executed.
-     * @return A {@link Set} representing the {@link Characteristic} of this {@code ITransactionOperator}
+     * Performs arbitrary operations on the given {@link PlacementTarget}.<br>
+     * Will be called after {@link #transformPos(ITransactionExecutionContext, BlockPos, BlockData)} is finished executing for the {@link BlockPos} associated with this {@link PlacementTarget}.
+     *
+     * @param context The {@link ITransactionExecutionContext} used during this transaction.
+     * @param target  The {@link PlacementTarget} to transform
+     * @return The new transformed {@link PlacementTarget} or null if it should be removed from the given {@link ITemplate}
+     * @implNote The default implementation just returns the given target
      */
-    default Set<Characteristic> characteristics() {
+    @Nullable
+    default PlacementTarget transformTarget(ITransactionExecutionContext context, PlacementTarget target) {
+        return target;
+    }
+
+    /**
+     * Returns an {@link Set} of {@link TransactionOperation} to state which operations are yet to be performed by this {@code ITransactionOperator}.
+     * All {@link TransactionOperation TransactionOperations} returned by this Method are guaranteed to be executed.<br>
+     * <b>It is crucial that if the {@code ITransactionOperator} is finished with the execution of one Step, that this will no longer be represented in the resulting Set!</b>
+     * This is because {@link ITemplateTransaction ITemplateTransactions} use this to determine whether an {@link ITransactionOperator} has yet to run, or not.
+     * @return A {@link Set} representing the {@link TransactionOperation TransactionOperations} to be performed by this {@code ITransactionOperator}
+     */
+    default Set<TransactionOperation> remainingOperations() {
         return ImmutableSet.of();
     }
 }

@@ -24,4 +24,8 @@ public class OperatorExecutionFailedException extends TransactionExecutionExcept
         super(message, cause, enableSuppression, writableStackTrace);
         this.failingOperator = failingOperator;
     }
+
+    public ITransactionOperator getFailingOperator() {
+        return failingOperator;
+    }
 }
