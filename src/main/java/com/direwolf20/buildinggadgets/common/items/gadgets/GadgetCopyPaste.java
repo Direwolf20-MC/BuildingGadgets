@@ -3,6 +3,7 @@ package com.direwolf20.buildinggadgets.common.items.gadgets;
 import com.direwolf20.buildinggadgets.api.building.BlockData;
 import com.direwolf20.buildinggadgets.api.building.Region;
 import com.direwolf20.buildinggadgets.api.building.tilesupport.TileSupport;
+import com.direwolf20.buildinggadgets.api.building.view.WorldBackedBuildView;
 import com.direwolf20.buildinggadgets.client.events.EventTooltip;
 import com.direwolf20.buildinggadgets.client.gui.GuiMod;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
@@ -66,11 +67,13 @@ import net.minecraftforge.common.util.BlockSnapshot;
 import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.world.BlockEvent;
+import net.minecraftforge.fml.common.EnhancedRuntimeException;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 public class GadgetCopyPaste extends AbstractGadget {
@@ -102,6 +105,11 @@ public class GadgetCopyPaste extends AbstractGadget {
         public ToolMode next() {
             return VALUES[(this.ordinal() + 1) % VALUES.length];
         }
+
+        @Nullable
+        public static ToolMode ofId(byte id) {
+            return BY_ID.get(id);
+        }
     }
 
     public GadgetCopyPaste(Properties builder) {
@@ -131,16 +139,32 @@ public class GadgetCopyPaste extends AbstractGadget {
         return GadgetUtils.getPOSFromNBT(stack, NBTKeys.GADGET_ANCHOR);
     }
 
-    public static Region getSelectedRegion(ItemStack stack) {
+    public static Optional<Region> getSelectedRegion(ItemStack stack) {
         CompoundNBT nbt = NBTHelper.getOrNewTag(stack);
         if (nbt.contains(NBTKeys.AREA, NBT.TAG_COMPOUND))
-            return Region.deserializeFrom(nbt.getCompound(NBTKeys.AREA));
-        return Region.singleZero();
+            return Optional.of(Region.deserializeFrom(nbt.getCompound(NBTKeys.AREA)));
+        return Optional.empty();
     }
 
     public static void setSelectedRegion(ItemStack stack, Region region) {
         CompoundNBT nbt = NBTHelper.getOrNewTag(stack);
         nbt.put(NBTKeys.AREA, region.serialize());
+    }
+
+    public static void setUpperRegionBound(ItemStack stack, BlockPos pos) {
+        Optional<Region> region = getSelectedRegion(stack); //TODO update when Forge reaches J9
+        if (region.isPresent())
+            setSelectedRegion(stack, new Region(region.get().getMin(), pos));
+        else
+            setSelectedRegion(stack, new Region(pos));
+    }
+
+    public static void setLowerRegionBound(ItemStack stack, BlockPos pos) {
+        Optional<Region> region = getSelectedRegion(stack); //TODO update when Forge reaches J9
+        if (region.isPresent())
+            setSelectedRegion(stack, new Region(pos, region.get().getMax()));
+        else
+            setSelectedRegion(stack, new Region(pos));
     }
 
     private static void setLastBuild(ItemStack stack, BlockPos anchorPos, DimensionType dim) {
@@ -161,19 +185,31 @@ public class GadgetCopyPaste extends AbstractGadget {
 
     private static void setToolMode(ItemStack stack, ToolMode mode) {
         CompoundNBT tagCompound = NBTHelper.getOrNewTag(stack);
-        tagCompound.putString(NBTKeys.GADGET_MODE, mode.name());
+        tagCompound.putByte(NBTKeys.GADGET_MODE, mode.getId());
     }
 
     public static ToolMode getToolMode(ItemStack stack) {
         CompoundNBT tagCompound = NBTHelper.getOrNewTag(stack);
         ToolMode mode = ToolMode.COPY;
-        try {
-            mode = ToolMode.valueOf(tagCompound.getString(NBTKeys.GADGET_MODE));
-        } catch (Exception e) {
-            BuildingGadgets.LOG.debug("Failed to read Tool Mode {} falling back to {}.", tagCompound.getString(NBTKeys.GADGET_MODE), mode, e);
+        if (! tagCompound.contains(NBTKeys.GADGET_MODE, NBT.TAG_BYTE)) {
+            setToolMode(stack, mode);
+            return mode;
+        }
+        mode = ToolMode.ofId(tagCompound.getByte(NBTKeys.GADGET_MODE));
+        if (mode == null) {
+            BuildingGadgets.LOG.debug("Failed to read Tool Mode {} falling back to {}.", tagCompound.getString(NBTKeys.GADGET_MODE), mode);
+            mode = ToolMode.COPY;
             setToolMode(stack, mode);
         }
         return mode;
+    }
+
+    public static ItemStack getGadget(PlayerEntity player) {
+        ItemStack stack = AbstractGadget.getGadget(player);
+        if (! (stack.getItem() instanceof GadgetCopyPaste))
+            return ItemStack.EMPTY;
+
+        return stack;
     }
 
     @Override
@@ -184,7 +220,6 @@ public class GadgetCopyPaste extends AbstractGadget {
         addInformationRayTraceFluid(tooltip, stack);
         EventTooltip.addTemplatePadding(stack, tooltip);
     }
-
 
     public void setMode(ItemStack heldItem, int modeInt) {
         // Called when we specify a mode with the radial menu
@@ -200,8 +235,8 @@ public class GadgetCopyPaste extends AbstractGadget {
         // Remove debug code
         // CapabilityUtil.EnergyUtil.getCap(stack).ifPresent(energy -> energy.receiveEnergy(105000, false));
         if (!world.isRemote) {
-            /*if (player.isSneaking() && GadgetUtils.setRemoteInventory(stack, player, world, pos, false) == ActionResultType.SUCCESS)
-                return new ActionResult<ItemStack>(ActionResultType.SUCCESS, stack);*/
+            if (player.isSneaking() && GadgetUtils.setRemoteInventory(stack, player, world, pos, false) == ActionResultType.SUCCESS)
+                return new ActionResult<>(ActionResultType.SUCCESS, stack);
 
             if (getToolMode(stack) == ToolMode.COPY) {
                 //if (world.getBlockState(VectorHelper.getLookingAt(player, stack).getPos()) != Blocks.AIR.getDefaultState())
@@ -240,12 +275,18 @@ public class GadgetCopyPaste extends AbstractGadget {
         return new ActionResult<>(ActionResultType.SUCCESS, stack);
     }
 
+    private void setRegionAndCopy(ItemStack stack, World world, PlayerEntity player, BlockPos lookedAt) {
+        if (player.isSneaking())
+            setUpperRegionBound(stack, lookedAt);
+        else
+            setLowerRegionBound(stack, lookedAt);
+        performCopy(stack, world, player, lookedAt);
+    }
 
-    public static ItemStack getGadget(PlayerEntity player) {
-        ItemStack stack = AbstractGadget.getGadget(player);
-        if (!(stack.getItem() instanceof GadgetCopyPaste))
-            return ItemStack.EMPTY;
-
-        return stack;
+    private void performCopy(ItemStack stack, World world, PlayerEntity player, BlockPos lookedAt) {
+        Optional<Region> regOpt = getSelectedRegion(stack);
+        Region region = regOpt.orElseThrow(() -> new RuntimeException("Expected Selection Region to be present before copy! This is an internal error, please contact mod authors!"));
+        WorldBackedBuildView buildView = WorldBackedBuildView.inWorld(world, region);
+        
     }
 }
