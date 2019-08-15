@@ -222,52 +222,47 @@ public class GadgetDestruction extends AbstractGadget {
     }
 
     public static IPositionPlacementSequence getClearingPositions(World world, BlockPos pos, Direction incomingSide, PlayerEntity player, ItemStack stack) {
+        ItemStack tool = getGadget(player);
+        int depth = getToolValue(stack, NBTKeys.GADGET_VALUE_DEPTH);
+        if (tool.isEmpty() || depth == 0 || ! player.isAllowEdit())
+            return CommonUtils.emptyPositionSequence();
+
         Region boundary = getClearingRegion(pos, incomingSide, player, stack);
         BlockPos startPos = (getAnchor(stack) == null) ? pos : getAnchor(stack);
         boolean fuzzy = ! Config.GADGETS.GADGET_DESTRUCTION.nonFuzzyEnabled.get() || AbstractGadget.getFuzzy(stack);
         BlockState stateTarget = fuzzy ? null : world.getBlockState(pos);
 
-        if (AbstractGadget.getConnectedArea(stack)) {
-            int depth = getToolValue(stack, NBTKeys.GADGET_VALUE_DEPTH);
-            if (depth == 0)
-                return CommonUtils.emptyPositionSequence();
-            return ConnectedSurface.create(world, boundary, Function.identity(), startPos, null, fuzzy);
-        }
-
-        return new SetBackedPlacementSequence(boundary.stream()
-                .filter(p -> isValidBlock(world, p, player, stateTarget))
-                .collect(Collectors.toCollection(HashSet::new)), boundary);
+        if (AbstractGadget.getConnectedArea(stack))
+            return ConnectedSurface.create(world, boundary, Function.identity(), startPos, null, (s, p) -> isValidBlock(world, p, player, s, fuzzy));
+        else
+            return new SetBackedPlacementSequence(boundary.stream()
+                    .filter(p -> isValidBlock(world, p, player, stateTarget, fuzzy))
+                    .collect(Collectors.toCollection(HashSet::new)), boundary);
     }
 
     public static List<BlockPos> getClearingPositionsForRendering(World world, BlockPos pos, Direction incomingSide, PlayerEntity player, ItemStack stack) {
         return SortingHelper.Blocks.byDistance(getClearingPositions(world, pos, incomingSide, player, stack), player);
     }
 
-    public static boolean isValidBlock(World world, BlockPos voidPos, PlayerEntity player, @Nullable BlockState stateTarget) {
+    public static boolean isValidBlock(World world, BlockPos voidPos, PlayerEntity player, @Nullable BlockState stateTarget, boolean fuzzy) {
         BlockState currentBlock = world.getBlockState(voidPos);
-        if (stateTarget != null && currentBlock != stateTarget) return false;
+        return isValidBlock(world, voidPos, player, currentBlock, stateTarget, fuzzy);
+    }
+
+    public static boolean isValidBlock(World world, BlockPos voidPos, PlayerEntity player, BlockState currentBlock, @Nullable BlockState stateTarget, boolean fuzzy) {
+        if (currentBlock.getBlock().isAir(currentBlock, world, voidPos) ||
+                currentBlock.equals(BGBlocks.effectBlock.getDefaultState()) ||
+                currentBlock.getBlockHardness(world, voidPos) < 0 ||
+                (! fuzzy && currentBlock != stateTarget) ||
+                ! world.isBlockModifiable(player, voidPos)) return false;
+
         TileEntity te = world.getTileEntity(voidPos);
+        if ((te != null) && ! (te instanceof ConstructionBlockTileEntity)) return false;
 
-        if (currentBlock.getBlock().isAir(currentBlock, world, voidPos)) return false;
-        if (currentBlock.equals(BGBlocks.effectBlock.getDefaultState())) return false;
-        if ((te != null) && !(te instanceof ConstructionBlockTileEntity)) return false;
-        if (currentBlock.getBlockHardness(world, voidPos) < 0) return false;
-
-        ItemStack tool = getGadget(player);
-        if (tool.isEmpty())
-            return false;
-
-        if (! player.isAllowEdit())
-            return false;
-
-        if (! world.isBlockModifiable(player, voidPos))
-            return false;
-
-        if (!world.isRemote) {
+        if (! world.isRemote) {
             BlockSnapshot blockSnapshot = BlockSnapshot.getBlockSnapshot(world, voidPos);
-            if (ForgeEventFactory.onBlockPlace(player, blockSnapshot, Direction.UP)) {
+            if (ForgeEventFactory.onBlockPlace(player, blockSnapshot, Direction.UP))
                 return false;
-            }
             BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(world, voidPos, currentBlock, player);
             return ! MinecraftForge.EVENT_BUS.post(e);
         }

@@ -7,6 +7,8 @@ The format of this document is based on [Keep a Changelog](https://keepachangelo
 ### Fixed
 - Fix the Destruction-Gadget crashing when voiding any Blocks
 - Fix the Destruction-Gadget's undo not working (and spamming the log) due to crashing during serialisation
+- Fix the Destruction-Gadget voiding Bedrock and attempting to void in-progress effect blocks (the latter causes 
+  crashes when attempting to undo)
 - Fix Exchanger's Effect Blocks not rendering any remove operation 
 
 ## [3.0.2a - 1.14.4] - 2019-08-07

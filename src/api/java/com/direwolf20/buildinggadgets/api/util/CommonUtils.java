@@ -20,6 +20,7 @@ import java.util.*;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.stream.StreamSupport;
+import java.util.function.Predicate;
 
 public final class CommonUtils {
     private CommonUtils() {}
@@ -28,6 +29,19 @@ public final class CommonUtils {
             .comparingInt(Vec3i::getX)
             .thenComparingInt(Vec3i::getY)
             .thenComparingInt(Vec3i::getZ);
+
+    public static <T> IPlacementSequence<T> filterSequence(IPlacementSequence<T> sequence, Predicate<T> filter) {
+        return filterSequence(sequence, Function.identity(), filter);
+    }
+
+    public static <T, U> IPlacementSequence<T> filterSequence(IPlacementSequence<U> sequence, Function<U, T> mapper, Predicate<T> filter) {
+        return new DelegatingPlacementSequence<T, U>(sequence, mapper) {
+            @Override
+            public Spliterator<T> spliterator() {
+                return new FilterSpliterator<>(super.spliterator(), filter);
+            }
+        };
+    }
 
     public static <T> IPlacementSequence<T> emptySequence() {
         return new IPlacementSequence<T>() {
@@ -58,32 +72,11 @@ public final class CommonUtils {
     }
 
     public static <T,U> IPlacementSequence<U> map(IPlacementSequence<T> sequence, Function<T,U> mapper) {
-        return new IPlacementSequence<U>() {
-            @Override
-            public Spliterator<U> spliterator() {
-                return new MappingSpliterator<>(sequence.spliterator(), mapper);
-            }
+        return new DelegatingPlacementSequence<>(sequence, mapper);
+    }
 
-            @Override
-            public Iterator<U> iterator() {
-                return Spliterators.iterator(spliterator());
-            }
-
-            @Override
-            public IPlacementSequence<U> copy() {
-                return map(sequence,mapper);
-            }
-
-            @Override
-            public Region getBoundingBox() {
-                return sequence.getBoundingBox();
-            }
-
-            @Override
-            public boolean mayContain(int x, int y, int z) {
-                return sequence.mayContain(x,y,z);
-            }
-        };
+    public static IPositionPlacementSequence mapToPositionPlacementSequence(final IPlacementSequence<BlockPos> sequence) {
+        return mapToPositionPlacementSequence(sequence, Function.identity());
     }
 
     public static <T> IPositionPlacementSequence mapToPositionPlacementSequence(final IPlacementSequence<T> sequence, final Function<T, BlockPos> positionGenerator) {

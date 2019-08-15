@@ -4,6 +4,7 @@ import com.direwolf20.buildinggadgets.api.building.Region;
 import com.direwolf20.buildinggadgets.api.util.MathUtils;
 import com.direwolf20.buildinggadgets.api.util.VectorUtils;
 import com.google.common.base.Preconditions;
+import net.minecraft.block.BlockState;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Direction.Axis;
 import net.minecraft.util.Direction.AxisDirection;
@@ -12,6 +13,7 @@ import net.minecraft.world.IBlockReader;
 
 import javax.annotation.Nullable;
 import java.util.Objects;
+import java.util.function.BiPredicate;
 import java.util.function.Function;
 
 public final class PlacementSequences {
@@ -207,6 +209,10 @@ public final class PlacementSequences {
 
         public static IPositionPlacementSequence create(IBlockReader world, Region searchingRegion, Function<BlockPos, BlockPos> searching2referenceMapper, BlockPos searchingCenter, @Nullable Direction side, boolean fuzzy) {
             return new ConnectedSurfaceSequence(world, searchingRegion, searching2referenceMapper, searchingCenter, side, fuzzy);
+        }
+
+        public static IPositionPlacementSequence create(IBlockReader world, Region searchingRegion, Function<BlockPos, BlockPos> searching2referenceMapper, BlockPos searchingCenter, @Nullable Direction side, BiPredicate<BlockState, BlockPos> predicate) {
+            return new ConnectedSurfaceSequence(world, searchingRegion, searching2referenceMapper, searchingCenter, side, predicate);
         }
     }
 }
