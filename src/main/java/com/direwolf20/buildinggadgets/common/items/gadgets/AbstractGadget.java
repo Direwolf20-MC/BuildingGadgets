@@ -12,6 +12,7 @@ import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
 import com.direwolf20.buildinggadgets.common.util.lang.Styles;
 import com.direwolf20.buildinggadgets.common.util.lang.TooltipTranslation;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
+import com.google.common.collect.ImmutableList;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.Item;
@@ -55,10 +56,17 @@ public abstract class AbstractGadget extends Item {
 
     protected abstract Supplier<BaseRenderer> createRenderFactory();
 
+    protected void addCapabilityProviders(ImmutableList.Builder<ICapabilityProvider> providerBuilder, ItemStack stack, @Nullable CompoundNBT tag) {
+        providerBuilder.add(new CapabilityProviderEnergy(stack, this::getEnergyMax));
+        providerBuilder.add(new CapabilityProviderBlockProvider(stack));
+    }
+
     @Override
     @Nullable
     public ICapabilityProvider initCapabilities(ItemStack stack, @Nullable CompoundNBT tag) {
-        return new MultiCapabilityProvider(new CapabilityProviderEnergy(stack, this::getEnergyMax), new CapabilityProviderBlockProvider(stack));
+        ImmutableList.Builder<ICapabilityProvider> providerBuilder = ImmutableList.builder();
+        addCapabilityProviders(providerBuilder, stack, tag);
+        return new MultiCapabilityProvider(providerBuilder.build());
     }
 
     @Override

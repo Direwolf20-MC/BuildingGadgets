@@ -3,9 +3,12 @@ package com.direwolf20.buildinggadgets.common.items.gadgets;
 import com.direwolf20.buildinggadgets.api.building.Region;
 import com.direwolf20.buildinggadgets.api.building.view.MapBackedBuildView;
 import com.direwolf20.buildinggadgets.api.building.view.WorldBackedBuildView;
+import com.direwolf20.buildinggadgets.api.capability.CapabilityTemplate;
+import com.direwolf20.buildinggadgets.api.template.ITemplate;
 import com.direwolf20.buildinggadgets.client.events.EventTooltip;
 import com.direwolf20.buildinggadgets.client.gui.GuiMod;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
+import com.direwolf20.buildinggadgets.common.capability.DelegatingTemplateProvider;
 import com.direwolf20.buildinggadgets.common.commands.CopyUnloadedCommand;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.items.gadgets.renderers.BaseRenderer;
@@ -15,11 +18,13 @@ import com.direwolf20.buildinggadgets.common.network.packets.PacketBindTool;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
 import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
+import com.direwolf20.buildinggadgets.common.util.lang.MessageTranslation;
 import com.direwolf20.buildinggadgets.common.util.lang.Styles;
 import com.direwolf20.buildinggadgets.common.util.lang.TooltipTranslation;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.util.tools.NetworkIO;
 import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableList.Builder;
 import com.google.common.collect.ImmutableSortedSet;
 import it.unimi.dsi.fastutil.bytes.Byte2ObjectMap;
 import it.unimi.dsi.fastutil.bytes.Byte2ObjectOpenHashMap;
@@ -40,7 +45,9 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
+import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.Constants.NBT;
+import net.minecraftforge.common.util.LazyOptional;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -103,6 +110,12 @@ public class GadgetCopyPaste extends AbstractGadget {
         return CopyPasteRender::new;
     }
 
+    @Override
+    protected void addCapabilityProviders(Builder<ICapabilityProvider> providerBuilder, ItemStack stack, @Nullable CompoundNBT tag) {
+        super.addCapabilityProviders(providerBuilder, stack, tag);
+        providerBuilder.add(new DelegatingTemplateProvider());
+    }
+
     private static void setAnchor(ItemStack stack, BlockPos anchorPos) {
         GadgetUtils.writePOSToNBT(stack, anchorPos, NBTKeys.GADGET_ANCHOR);
     }
@@ -113,33 +126,54 @@ public class GadgetCopyPaste extends AbstractGadget {
 
     public static Optional<Region> getSelectedRegion(ItemStack stack) {
         CompoundNBT nbt = NBTHelper.getOrNewTag(stack);
-        if (nbt.contains(NBTKeys.AREA, NBT.TAG_COMPOUND))
-            return Optional.of(Region.deserializeFrom(nbt.getCompound(NBTKeys.AREA)));
+        BlockPos lower = getLowerRegionBound(stack);
+        BlockPos upper = getUpperRegionBound(stack);
+        if (lower != null && upper != null) {
+            return Optional.of(new Region(lower, upper));
+        }
         return Optional.empty();
     }
 
-    public static void setSelectedRegion(ItemStack stack, Region region) {
+    public static void setSelectedRegion(ItemStack stack, @Nullable Region region) {
+        if (region != null) {
+            setLowerRegionBound(stack, region.getMin());
+            setUpperRegionBound(stack, region.getMax());
+        } else {
+            setLowerRegionBound(stack, null);
+            setUpperRegionBound(stack, null);
+        }
+    }
+
+    public static void setUpperRegionBound(ItemStack stack, @Nullable BlockPos pos) {
         CompoundNBT nbt = NBTHelper.getOrNewTag(stack);
-        if (region != null)
-            nbt.put(NBTKeys.AREA, region.serialize());
+        if (pos != null)
+            nbt.put(NBTKeys.GADGET_START_POS, NBTUtil.writeBlockPos(pos));
         else
-            nbt.remove(NBTKeys.AREA);
+            nbt.remove(NBTKeys.GADGET_START_POS);
     }
 
-    public static void setUpperRegionBound(ItemStack stack, BlockPos pos) {
-        Optional<Region> region = getSelectedRegion(stack); //TODO update when Forge reaches J9
-        if (region.isPresent())
-            setSelectedRegion(stack, new Region(region.get().getMin(), pos));
+    public static void setLowerRegionBound(ItemStack stack, @Nullable BlockPos pos) {
+        CompoundNBT nbt = NBTHelper.getOrNewTag(stack);
+        if (pos != null)
+            nbt.put(NBTKeys.GADGET_END_POS, NBTUtil.writeBlockPos(pos));
         else
-            setSelectedRegion(stack, new Region(pos));
+            nbt.remove(NBTKeys.GADGET_END_POS);
     }
 
-    public static void setLowerRegionBound(ItemStack stack, BlockPos pos) {
-        Optional<Region> region = getSelectedRegion(stack); //TODO update when Forge reaches J9
-        if (region.isPresent())
-            setSelectedRegion(stack, new Region(pos, region.get().getMax()));
-        else
-            setSelectedRegion(stack, new Region(pos));
+    @Nullable
+    public static BlockPos getUpperRegionBound(ItemStack stack) {
+        CompoundNBT nbt = NBTHelper.getOrNewTag(stack);
+        if (nbt.contains(NBTKeys.GADGET_START_POS, NBT.TAG_COMPOUND))
+            return NBTUtil.readBlockPos(nbt.getCompound(NBTKeys.GADGET_START_POS));
+        return null;
+    }
+
+    @Nullable
+    public static BlockPos getLowerRegionBound(ItemStack stack) {
+        CompoundNBT nbt = NBTHelper.getOrNewTag(stack);
+        if (nbt.contains(NBTKeys.GADGET_END_POS, NBT.TAG_COMPOUND))
+            return NBTUtil.readBlockPos(nbt.getCompound(NBTKeys.GADGET_END_POS));
+        return null;
     }
 
     private static void setLastBuild(ItemStack stack, BlockPos anchorPos, DimensionType dim) {
@@ -255,21 +289,24 @@ public class GadgetCopyPaste extends AbstractGadget {
             setUpperRegionBound(stack, lookedAt);
         else
             setLowerRegionBound(stack, lookedAt);
-        performCopy(stack, world, player, lookedAt);
+        Optional<Region> regionOpt = getSelectedRegion(stack);
+        regionOpt.ifPresent(region -> performCopy(stack, world, player, region, lookedAt));
     }
 
-    private void performCopy(ItemStack stack, World world, PlayerEntity player, BlockPos lookedAt) {
-        Optional<Region> regOpt = getSelectedRegion(stack);
-        Region region = regOpt.orElseThrow(() -> new RuntimeException("Expected Selection Region to be present before copy! This is an internal error, please contact mod authors!"));
-        if (! CopyUnloadedCommand.mayCopyUnloadedChunks(player)) {
-            ImmutableSortedSet<ChunkPos> unloaded = region.getUnloadedChunks(world);
-            if (! unloaded.isEmpty()) {
-                BuildingGadgets.LOG.debug("Prevented copy because {} chunks where detected as unloaded.", unloaded.size());
-                BuildingGadgets.LOG.trace("The following chunks were detected as unloaded {}.", CHUNK_JOINER.join(unloaded));
-                return;
+    private void performCopy(ItemStack stack, World world, PlayerEntity player, Region region, BlockPos lookedAt) {
+        LazyOptional<ITemplate> templateCap = stack.getCapability(CapabilityTemplate.TEMPLATE_CAPABILITY, null);
+        templateCap.ifPresent(template -> {
+            if (! CopyUnloadedCommand.mayCopyUnloadedChunks(player)) {
+                ImmutableSortedSet<ChunkPos> unloaded = region.getUnloadedChunks(world);
+                if (! unloaded.isEmpty()) {
+                    player.sendStatusMessage(MessageTranslation.COPY_UNLOADED.componentTranslation(unloaded.size()).setStyle(Styles.RED), true);
+                    BuildingGadgets.LOG.debug("Prevented copy because {} chunks where detected as unloaded.", unloaded.size());
+                    BuildingGadgets.LOG.trace("The following chunks were detected as unloaded {}.", CHUNK_JOINER.join(unloaded));
+                    return;
+                }
             }
-        }
-        MapBackedBuildView buildView = WorldBackedBuildView.inWorld(world, region).evaluate();//remember this requires linear time, but is required so that we can pass it off-thread!
-
+            final MapBackedBuildView buildView = WorldBackedBuildView.inWorld(world, region).evaluate();//remember this requires linear time, but is required so that we can pass it off-thread!
+            
+        });
     }
 }
