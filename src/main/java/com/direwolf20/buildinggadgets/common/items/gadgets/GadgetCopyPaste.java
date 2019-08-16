@@ -3,6 +3,7 @@ package com.direwolf20.buildinggadgets.common.items.gadgets;
 import com.direwolf20.buildinggadgets.api.building.BlockData;
 import com.direwolf20.buildinggadgets.api.building.Region;
 import com.direwolf20.buildinggadgets.api.building.tilesupport.TileSupport;
+import com.direwolf20.buildinggadgets.api.building.view.MapBackedBuildView;
 import com.direwolf20.buildinggadgets.api.building.view.WorldBackedBuildView;
 import com.direwolf20.buildinggadgets.client.events.EventTooltip;
 import com.direwolf20.buildinggadgets.client.gui.GuiMod;
@@ -286,7 +287,7 @@ public class GadgetCopyPaste extends AbstractGadget {
     private void performCopy(ItemStack stack, World world, PlayerEntity player, BlockPos lookedAt) {
         Optional<Region> regOpt = getSelectedRegion(stack);
         Region region = regOpt.orElseThrow(() -> new RuntimeException("Expected Selection Region to be present before copy! This is an internal error, please contact mod authors!"));
-        WorldBackedBuildView buildView = WorldBackedBuildView.inWorld(world, region);
-        
+        MapBackedBuildView buildView = WorldBackedBuildView.inWorld(world, region).evaluate();//remember this requires linear time, but is required so that we can pass it off-thread!
+
     }
 }

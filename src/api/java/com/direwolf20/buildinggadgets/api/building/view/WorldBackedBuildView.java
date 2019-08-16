@@ -4,7 +4,6 @@ import com.direwolf20.buildinggadgets.api.building.BlockData;
 import com.direwolf20.buildinggadgets.api.building.PlacementTarget;
 import com.direwolf20.buildinggadgets.api.building.Region;
 import com.direwolf20.buildinggadgets.api.building.tilesupport.TileSupport;
-import com.direwolf20.buildinggadgets.api.exceptions.TemplateException;
 import com.direwolf20.buildinggadgets.api.util.DelegatingSpliterator;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
@@ -40,11 +39,12 @@ public final class WorldBackedBuildView implements IBuildView {
         this.context = context;
         this.region = region;
         this.predicate = predicate;
+        this.translation = BlockPos.ZERO;
     }
 
     @Override
     public Spliterator<PlacementTarget> spliterator() {
-        return new WorldBackedSpliterator(getBoundingBox().spliterator());
+        return new WorldBackedSpliterator(getBoundingBox().spliterator(), translation, predicate, getContext());
     }
 
     @Override
@@ -64,8 +64,12 @@ public final class WorldBackedBuildView implements IBuildView {
     }
 
     @Override
-    public IBuildView copy() {
+    public WorldBackedBuildView copy() {
         return new WorldBackedBuildView(getContext(), getBoundingBox(), predicate);
+    }
+
+    public MapBackedBuildView evaluate() {
+        return MapBackedBuildView.ofIterable(getContext(), this);
     }
 
     @Override
@@ -83,15 +87,25 @@ public final class WorldBackedBuildView implements IBuildView {
         return region.mayContain(x, y, z) && predicate.test(getContext(), new BlockPos(x, y, z));
     }
 
-    private final class WorldBackedSpliterator extends DelegatingSpliterator<BlockPos, PlacementTarget> {
-        private WorldBackedSpliterator(Spliterator<BlockPos> other) {
+    private static final class WorldBackedSpliterator extends DelegatingSpliterator<BlockPos, PlacementTarget> {
+        private final BlockPos translation;
+        private final BiPredicate<IBuildContext, BlockPos> predicate;
+        private final IBuildContext context;
+
+        private WorldBackedSpliterator(Spliterator<BlockPos> other, BlockPos translation, BiPredicate<IBuildContext, BlockPos> predicate, IBuildContext context) {
             super(other);
+            this.translation = translation;
+            this.predicate = predicate;
+            this.context = context;
         }
 
         @Override
         protected boolean advance(BlockPos object, Consumer<? super PlacementTarget> action) {
-            BlockData data = TileSupport.createBlockData(getContext().getWorld(), object);
-            action.accept(new PlacementTarget(object.add(translation), data));
+            BlockData data = TileSupport.createBlockData(context.getWorld(), object);
+            if (predicate.test(context, object)) {
+                action.accept(new PlacementTarget(object.add(translation), data));
+                return true;
+            }
             return false;
         }
 
@@ -100,8 +114,13 @@ public final class WorldBackedBuildView implements IBuildView {
         public Spliterator<PlacementTarget> trySplit() {
             Spliterator<BlockPos> other = getOther().trySplit();
             if (other != null)
-                return new WorldBackedSpliterator(other);
+                return new WorldBackedSpliterator(other, translation, predicate, context);
             return null;
+        }
+
+        @Override
+        public int characteristics() {
+            return ORDERED | SORTED | DISTINCT;
         }
     }
 }
