@@ -3,6 +3,7 @@ package com.direwolf20.buildinggadgets.common;
 import com.direwolf20.buildinggadgets.api.BuildingGadgetsAPI;
 import com.direwolf20.buildinggadgets.client.ClientProxy;
 import com.direwolf20.buildinggadgets.client.gui.GuiMod;
+import com.direwolf20.buildinggadgets.common.commands.BlockMapCommand;
 import com.direwolf20.buildinggadgets.common.commands.CopyUnloadedCommand;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.config.crafting.CraftingConditionDestruction;
@@ -89,8 +90,8 @@ public final class BuildingGadgets {
                 Commands.literal(Reference.MODID)
                         .then(CopyUnloadedCommand.registerToggle())
                         .then(CopyUnloadedCommand.registerList())
-                //.then(BlockMapCommand.registerList())
-                //.then(BlockMapCommand.registerDelete())
+                        .then(BlockMapCommand.registerList())
+                        .then(BlockMapCommand.registerDelete())
         );
     }
 
