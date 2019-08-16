@@ -1,9 +1,9 @@
 package com.direwolf20.buildinggadgets.api.util;
 
 import com.direwolf20.buildinggadgets.api.building.BlockData;
-import jdk.internal.jline.internal.Nullable;
 import net.minecraft.util.math.BlockPos;
 
+import javax.annotation.Nullable;
 import java.util.Spliterator;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
