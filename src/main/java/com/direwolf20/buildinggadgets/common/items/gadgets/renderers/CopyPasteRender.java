@@ -2,11 +2,9 @@ package com.direwolf20.buildinggadgets.common.items.gadgets.renderers;
 
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
-import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
 import com.direwolf20.buildinggadgets.common.util.blocks.BlockMap;
 import com.direwolf20.buildinggadgets.common.util.buffers.PasteToolBufferBuilder;
 import com.direwolf20.buildinggadgets.common.util.buffers.ToolBufferBuilder;
-import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
 import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.block.*;
 import net.minecraft.client.renderer.BufferBuilder;
@@ -28,6 +26,7 @@ import net.minecraftforge.client.event.RenderWorldLastEvent;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL14;
 
+import java.util.Collections;
 import java.util.List;
 
 public class CopyPasteRender extends BaseRenderer {
@@ -43,6 +42,7 @@ public class CopyPasteRender extends BaseRenderer {
     public void render(RenderWorldLastEvent evt, PlayerEntity player, ItemStack heldItem) {
         super.render(evt, player, heldItem);
 
+        /*
         if (BGItems.gadgetCopyPaste.getStartPos(heldItem) == null || BGItems.gadgetCopyPaste.getEndPos(heldItem) == null)
             return;
 
@@ -53,9 +53,11 @@ public class CopyPasteRender extends BaseRenderer {
             renderCopy(evt, player, heldItem, playerPos, UUID);
         else
             renderPaste(evt, player, heldItem, playerPos, UUID);
+         */
     }
 
     private void renderCopy(RenderWorldLastEvent evt, PlayerEntity player, ItemStack heldItem, Vec3d playerPos, String UUID) {
+        /*
         BlockPos startPos = BGItems.gadgetCopyPaste.getStartPos(heldItem);
         BlockPos endPos = BGItems.gadgetCopyPaste.getEndPos(heldItem);
         BlockPos blankPos = new BlockPos(0, 0, 0);
@@ -96,6 +98,7 @@ public class CopyPasteRender extends BaseRenderer {
         GlStateManager.depthMask(true);
 
         GlStateManager.popMatrix();
+         */
     }
 
     private void renderPaste(RenderWorldLastEvent evt, PlayerEntity player, ItemStack heldItem, Vec3d playerPos, String UUID) {
@@ -103,7 +106,7 @@ public class CopyPasteRender extends BaseRenderer {
 
         //First check if we have an anchor, if not check if we're looking at a block, if not, exit
         BlockPos startPos = GadgetCopyPaste.getAnchor(heldItem);
-        if (startPos == null) {
+        /*if (startPos == null) {
             startPos = VectorHelper.getPosLookingAt(player, heldItem);
 
             if (world.getBlockState(startPos) == AIR)
@@ -116,7 +119,7 @@ public class CopyPasteRender extends BaseRenderer {
             startPos = startPos.up(GadgetCopyPaste.getY(heldItem));
             startPos = startPos.east(GadgetCopyPaste.getX(heldItem));
             startPos = startPos.south(GadgetCopyPaste.getZ(heldItem));
-        }
+        }*/
 
         //We store our buffers in PasteToolBufferBuilder (A client only class) -- retrieve the buffer from this locally cache'd map
         ToolBufferBuilder toolBufferBuilder = PasteToolBufferBuilder.getBufferFromMap(UUID);
@@ -124,7 +127,7 @@ public class CopyPasteRender extends BaseRenderer {
             return;
         }
         //Also get the blockMapList from the local cache - If either the buffer or the blockmap list are empty, exit.
-        List<BlockMap> blockMapList = GadgetCopyPaste.getBlockMapList(PasteToolBufferBuilder.getTagFromUUID(UUID));
+        List<BlockMap> blockMapList = Collections.emptyList();//GadgetCopyPaste.getBlockMapList(PasteToolBufferBuilder.getTagFromUUID(UUID));
         if (toolBufferBuilder.getVertexCount() == 0 || blockMapList.size() == 0) {
             return;
         }

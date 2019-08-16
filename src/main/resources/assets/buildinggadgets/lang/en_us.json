@@ -57,7 +57,11 @@
     "tooltip.pasteContainer.creative.amountMsg": "Amount: Infinite!",
     "tooltip.template.name": "Name: %s",
   "tooltip.donotuse": "DO NOT USE (WIP)",
-
+  "_comment": "commands",
+  "buildinggadgets.commands.copy_unloaded.no_player": "Cannot toggle player status without a player unload status to target!",
+  "buildinggadgets.commands.copy_unloaded.toggled": "Set ForceLoadedChunks for player %s to %b",
+  "buildinggadgets.commands.copy_unloaded.list": "Player with UUID %s has ForceLoadedChunks set to %b",
+  "_comment": "radial-menu",
     "buildinggadgets.radialmenu.destruction_overlay": "Show Overlay",
     "buildinggadgets.radialmenu.rotate": "Rotate",
     "buildinggadgets.radialmenu.mirror": "Mirror",

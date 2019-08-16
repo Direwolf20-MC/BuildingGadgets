@@ -6,10 +6,7 @@
 package com.direwolf20.buildinggadgets.client.gui.blocks;
 
 import com.direwolf20.buildinggadgets.common.containers.TemplateManagerContainer;
-import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
 import com.direwolf20.buildinggadgets.common.tiles.TemplateManagerTileEntity;
-import com.direwolf20.buildinggadgets.common.util.buffers.PasteToolBufferBuilder;
-import com.direwolf20.buildinggadgets.common.util.buffers.ToolBufferBuilder;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
@@ -17,24 +14,15 @@ import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.client.gui.widget.button.Button.IPressable;
 import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.Matrix4f;
 import net.minecraft.client.renderer.Rectangle2d;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.client.renderer.vertex.VertexFormat;
-import net.minecraft.client.renderer.vertex.VertexFormatElement;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.container.Slot;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import org.lwjgl.opengl.GL11;
-
-import java.nio.ByteBuffer;
-import java.util.List;
 
 public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer> {
     public static final int HELP_TEXT_BACKGROUNG_COLOR = 1694460416;
@@ -181,6 +169,7 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
     }
 
     private void drawStructure() {
+        /*
         double scale = getMinecraft().mainWindow.getGuiScaleFactor();
         fill(guiLeft + panel.getX() - 1, guiTop + panel.getY() - 1, guiLeft + panel.getX() + panel.getWidth() + 1, guiTop + panel.getY() + panel.getHeight() + 1, 0xFF8A8A8A);
         ItemStack itemstack = this.container.getSlot(0).getStack();
@@ -305,6 +294,7 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
             panX = 0;
             panY = 0;
         }
+         */
     }
 
     @Override

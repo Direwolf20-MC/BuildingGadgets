@@ -15,7 +15,7 @@ class FilterSpliterator<T> extends DelegatingSpliterator<T, T> implements Splite
     }
 
     @Override
-    boolean advance(T object, Consumer<? super T> action) {
+    public boolean advance(T object, Consumer<? super T> action) {
         if (predicate.test(object)) {
             action.accept(object);
             return true;

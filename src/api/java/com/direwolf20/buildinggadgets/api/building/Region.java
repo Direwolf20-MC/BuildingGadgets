@@ -5,10 +5,13 @@ import com.direwolf20.buildinggadgets.api.util.CommonUtils;
 import com.direwolf20.buildinggadgets.api.util.NBTKeys;
 import com.direwolf20.buildinggadgets.api.util.SpliteratorBackedPeekingIterator;
 import com.google.common.base.MoreObjects;
+import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.PeekingIterator;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Vec3i;
+import net.minecraft.world.IWorldReader;
 
 import java.io.Serializable;
 import java.util.Comparator;
@@ -394,6 +397,24 @@ public final class Region implements IPositionPlacementSequence, Serializable {
     @Override
     public int hashCode() {
         return Objects.hash(minX, minY, minZ, maxX, maxY, maxZ);
+    }
+
+    @SuppressWarnings("deprecation")
+    public ImmutableSortedSet<ChunkPos> getUnloadedChunks(IWorldReader reader) {
+        ImmutableSortedSet.Builder<ChunkPos> posBuilder = ImmutableSortedSet.orderedBy(Comparator.comparing(ChunkPos::getXStart).thenComparing(ChunkPos::getZStart));
+        for (int i = minX; i <= maxX; i += 16) {
+            for (int j = minZ; j <= maxZ; j += 16) {
+                if (! reader.chunkExists(i >> 4, j >> 4))
+                    posBuilder.add(new ChunkPos(i >> 4, j >> 4));
+            }
+        }
+        for (int j = minZ; j <= maxZ; j += 16) {//check the last x row
+            if (! reader.chunkExists(maxX >> 4, j >> 4))
+                posBuilder.add(new ChunkPos(maxX >> 4, j >> 4));
+        }
+        if (! reader.chunkExists(maxX >> 4, maxZ >> 4))// might have still missed the last one
+            posBuilder.add(new ChunkPos(maxX >> 4, maxZ >> 4));
+        return posBuilder.build();
     }
 
     public CompoundNBT serialize() {

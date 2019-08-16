@@ -101,8 +101,8 @@ public final class WorldBackedBuildView implements IBuildView {
 
         @Override
         protected boolean advance(BlockPos object, Consumer<? super PlacementTarget> action) {
-            BlockData data = TileSupport.createBlockData(context.getWorld(), object);
             if (predicate.test(context, object)) {
+                BlockData data = TileSupport.createBlockData(context.getWorld(), object);
                 action.accept(new PlacementTarget(object.add(translation), data));
                 return true;
             }

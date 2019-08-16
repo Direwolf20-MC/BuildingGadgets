@@ -34,9 +34,11 @@ public class PacketPasteGUI {
                 ItemStack heldItem = GadgetCopyPaste.getGadget(ctx.get().getSender());
                 if (heldItem.isEmpty()) return;
 
+                /*
                 GadgetCopyPaste.setX(heldItem, msg.X);
                 GadgetCopyPaste.setY(heldItem, msg.Y);
                 GadgetCopyPaste.setZ(heldItem, msg.Z);
+                 */
             });
 
             ctx.get().setPacketHandled(true);

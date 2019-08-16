@@ -1,10 +1,11 @@
 package com.direwolf20.buildinggadgets.client.gui;
 
+import com.direwolf20.buildinggadgets.api.building.Region;
 import com.direwolf20.buildinggadgets.client.gui.components.GuiIncrementer;
 import com.direwolf20.buildinggadgets.common.config.Config;
+import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketCopyCoords;
-import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
 import com.direwolf20.buildinggadgets.common.util.lang.GuiTranslation;
 import com.direwolf20.buildinggadgets.common.util.lang.ITranslationProvider;
 import net.minecraft.client.Minecraft;
@@ -47,11 +48,9 @@ public class CopyGUI extends Screen {
         this.x = width / 2;
         this.y = height / 2;
 
-        startPos = BGItems.gadgetCopyPaste.getStartPos(copyPasteTool);
-        endPos = BGItems.gadgetCopyPaste.getEndPos(copyPasteTool);
-
-        if (startPos == null) startPos = new BlockPos(0, 0, 0);
-        if (endPos == null) endPos = new BlockPos(0, 0, 0);
+        Region reg = GadgetCopyPaste.getSelectedRegion(copyPasteTool).orElse(Region.singleZero());
+        startPos = reg.getMin();
+        endPos = reg.getMax();
 
         int incrementerWidth = GuiIncrementer.WIDTH + (GuiIncrementer.WIDTH / 2);
 

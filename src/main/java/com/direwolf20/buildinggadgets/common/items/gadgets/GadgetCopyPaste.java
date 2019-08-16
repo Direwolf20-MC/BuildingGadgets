@@ -1,84 +1,53 @@
 package com.direwolf20.buildinggadgets.common.items.gadgets;
 
-import com.direwolf20.buildinggadgets.api.building.BlockData;
 import com.direwolf20.buildinggadgets.api.building.Region;
-import com.direwolf20.buildinggadgets.api.building.tilesupport.TileSupport;
 import com.direwolf20.buildinggadgets.api.building.view.MapBackedBuildView;
 import com.direwolf20.buildinggadgets.api.building.view.WorldBackedBuildView;
 import com.direwolf20.buildinggadgets.client.events.EventTooltip;
 import com.direwolf20.buildinggadgets.client.gui.GuiMod;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
-import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlock;
-import com.direwolf20.buildinggadgets.common.blocks.EffectBlock;
+import com.direwolf20.buildinggadgets.common.commands.CopyUnloadedCommand;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.items.gadgets.renderers.BaseRenderer;
 import com.direwolf20.buildinggadgets.common.items.gadgets.renderers.CopyPasteRender;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketBindTool;
-import com.direwolf20.buildinggadgets.common.network.packets.PacketBlockMap;
-import com.direwolf20.buildinggadgets.common.network.packets.PacketRotateMirror;
-import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
-import com.direwolf20.buildinggadgets.common.tiles.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
-import com.direwolf20.buildinggadgets.common.util.blocks.BlockMap;
-import com.direwolf20.buildinggadgets.common.util.blocks.BlockMapIntState;
-import com.direwolf20.buildinggadgets.common.util.helpers.InventoryHelper;
 import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
 import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
 import com.direwolf20.buildinggadgets.common.util.lang.Styles;
 import com.direwolf20.buildinggadgets.common.util.lang.TooltipTranslation;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.util.tools.NetworkIO;
-import com.direwolf20.buildinggadgets.common.util.tools.UniqueItem;
-import com.direwolf20.buildinggadgets.common.world.WorldSave;
-import com.google.common.collect.HashMultiset;
-import com.google.common.collect.Multiset;
+import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableSortedSet;
 import it.unimi.dsi.fastutil.bytes.Byte2ObjectMap;
 import it.unimi.dsi.fastutil.bytes.Byte2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.block.material.Material;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUseContext;
-import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.NBTUtil;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.*;
-import net.minecraft.util.Direction.Axis;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.ActionResultType;
+import net.minecraft.util.Hand;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.RayTraceContext.FluidMode;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.util.BlockSnapshot;
 import net.minecraftforge.common.util.Constants.NBT;
-import net.minecraftforge.event.ForgeEventFactory;
-import net.minecraftforge.event.world.BlockEvent;
-import net.minecraftforge.fml.common.EnhancedRuntimeException;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 
 public class GadgetCopyPaste extends AbstractGadget {
-
     public enum ToolMode {
         COPY(0),
         PASTE(1);
@@ -112,6 +81,8 @@ public class GadgetCopyPaste extends AbstractGadget {
             return BY_ID.get(id);
         }
     }
+
+    private static final Joiner CHUNK_JOINER = Joiner.on("; ");
 
     public GadgetCopyPaste(Properties builder) {
         super(builder);
@@ -149,7 +120,10 @@ public class GadgetCopyPaste extends AbstractGadget {
 
     public static void setSelectedRegion(ItemStack stack, Region region) {
         CompoundNBT nbt = NBTHelper.getOrNewTag(stack);
-        nbt.put(NBTKeys.AREA, region.serialize());
+        if (region != null)
+            nbt.put(NBTKeys.AREA, region.serialize());
+        else
+            nbt.remove(NBTKeys.AREA);
     }
 
     public static void setUpperRegionBound(ItemStack stack, BlockPos pos) {
@@ -232,16 +206,16 @@ public class GadgetCopyPaste extends AbstractGadget {
     public ActionResult<ItemStack> onItemRightClick(World world, PlayerEntity player, Hand hand) {
         ItemStack stack = player.getHeldItem(hand);
         player.setActiveHand(hand);
-        BlockPos pos = VectorHelper.getPosLookingAt(player, stack);
+        BlockPos posLookingAt = VectorHelper.getPosLookingAt(player, stack);
         // Remove debug code
         // CapabilityUtil.EnergyUtil.getCap(stack).ifPresent(energy -> energy.receiveEnergy(105000, false));
         if (!world.isRemote) {
-            if (player.isSneaking() && GadgetUtils.setRemoteInventory(stack, player, world, pos, false) == ActionResultType.SUCCESS)
+            if (player.isSneaking() && GadgetUtils.setRemoteInventory(stack, player, world, posLookingAt, false) == ActionResultType.SUCCESS)
                 return new ActionResult<>(ActionResultType.SUCCESS, stack);
 
             if (getToolMode(stack) == ToolMode.COPY) {
-                //if (world.getBlockState(VectorHelper.getLookingAt(player, stack).getPos()) != Blocks.AIR.getDefaultState())
-                //this.setPosOrCopy(stack, player, world, pos);
+                if (world.getBlockState(posLookingAt) != Blocks.AIR.getDefaultState())
+                    setRegionAndCopy(stack, world, player, posLookingAt);
             } else if (getToolMode(stack) == ToolMode.PASTE) {
                 if (! player.isSneaking() && player instanceof ServerPlayerEntity) {
                     if (getAnchor(stack) == null) {
@@ -258,14 +232,14 @@ public class GadgetCopyPaste extends AbstractGadget {
                 if (Screen.hasControlDown()) {
                     PacketHandler.sendToServer(new PacketBindTool());
                 } else {
-                    if (GadgetUtils.getRemoteInventory(pos, world, NetworkIO.Operation.EXTRACT) != null)
+                    if (GadgetUtils.getRemoteInventory(posLookingAt, world, NetworkIO.Operation.EXTRACT) != null)
                         return new ActionResult<>(ActionResultType.SUCCESS, stack);
                 }
 
             }
             if (getToolMode(stack) == ToolMode.COPY) {
                 if (player.isSneaking())
-                    if (world.getBlockState(VectorHelper.getLookingAt(player, stack).getPos()) == Blocks.AIR.getDefaultState())
+                    if (world.getBlockState(posLookingAt) == Blocks.AIR.getDefaultState())
                         GuiMod.COPY.openScreen(player);
             } else if (player.isSneaking()) {
                 GuiMod.PASTE.openScreen(player);
@@ -287,6 +261,14 @@ public class GadgetCopyPaste extends AbstractGadget {
     private void performCopy(ItemStack stack, World world, PlayerEntity player, BlockPos lookedAt) {
         Optional<Region> regOpt = getSelectedRegion(stack);
         Region region = regOpt.orElseThrow(() -> new RuntimeException("Expected Selection Region to be present before copy! This is an internal error, please contact mod authors!"));
+        if (! CopyUnloadedCommand.mayCopyUnloadedChunks(player)) {
+            ImmutableSortedSet<ChunkPos> unloaded = region.getUnloadedChunks(world);
+            if (! unloaded.isEmpty()) {
+                BuildingGadgets.LOG.debug("Prevented copy because {} chunks where detected as unloaded.", unloaded.size());
+                BuildingGadgets.LOG.trace("The following chunks were detected as unloaded {}.", CHUNK_JOINER.join(unloaded));
+                return;
+            }
+        }
         MapBackedBuildView buildView = WorldBackedBuildView.inWorld(world, region).evaluate();//remember this requires linear time, but is required so that we can pass it off-thread!
 
     }

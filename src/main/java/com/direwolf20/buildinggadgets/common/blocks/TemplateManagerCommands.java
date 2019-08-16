@@ -1,24 +1,15 @@
 package com.direwolf20.buildinggadgets.common.blocks;
 
-import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.containers.TemplateManagerContainer;
 import com.direwolf20.buildinggadgets.common.items.ITemplate;
 import com.direwolf20.buildinggadgets.common.items.Template;
-import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketBlockMap;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
-import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
-import com.direwolf20.buildinggadgets.common.util.blocks.BlockMap;
-import com.direwolf20.buildinggadgets.common.util.blocks.BlockMapIntState;
-import com.direwolf20.buildinggadgets.common.util.buffers.PasteToolBufferBuilder;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.util.tools.UniqueItem;
 import com.direwolf20.buildinggadgets.common.world.WorldSave;
-import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -26,18 +17,12 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.ListNBT;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
-import net.minecraft.world.dimension.DimensionType;
-import net.minecraft.world.server.ServerWorld;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -147,7 +132,7 @@ public class TemplateManagerCommands {
     }
 
     public static void pasteTemplate(TemplateManagerContainer container, PlayerEntity player, CompoundNBT sentTagCompound, String templateName) {
-        ItemStack itemStack1 = container.getSlot(1).getStack();
+        /*ItemStack itemStack1 = container.getSlot(1).getStack();
 
         if (!(allowedItemsRight.contains(itemStack1.getItem()))) {
             return;
@@ -220,9 +205,11 @@ public class TemplateManagerCommands {
         Template.setName(templateStack, templateName);
         container.putStackInSlot(1, templateStack);
         PacketHandler.sendTo(new PacketBlockMap(templateTagCompound), (ServerPlayerEntity) player);
+         */
     }
 
     public static void copyTemplate(TemplateManagerContainer container) {
+        /*
         ItemStack itemStack0 = container.getSlot(0).getStack();
         if (itemStack0.getItem() instanceof ITemplate) {
             CompoundNBT tagCompound = PasteToolBufferBuilder.getTagFromUUID(BGItems.gadgetCopyPaste.getUUID(itemStack0));
@@ -251,6 +238,7 @@ public class TemplateManagerCommands {
                 pasteIsTooLarge();
             }
         }
+         */
     }
 
     private static void pasteIsTooLarge() {
