@@ -51,8 +51,9 @@ public class CopyUnloadedCommand {
     public static LiteralArgumentBuilder<CommandSource> registerToggle() {
         return Commands.literal("ForceLoadChunks")
                 .requires(commandSource -> commandSource.hasPermissionLevel(2))
-                .then(Commands.argument("player", EntityArgument.player()))
-                .executes(context -> executeToggle(context, EntityArgument.getPlayer(context, "player")));
+                .then(Commands.argument("player", EntityArgument.player())
+                        .executes(context -> executeToggle(context, EntityArgument.getPlayer(context, "player")))
+                );
     }
 
     public static LiteralArgumentBuilder<CommandSource> registerList() {

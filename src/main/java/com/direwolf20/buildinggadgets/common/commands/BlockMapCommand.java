@@ -25,16 +25,18 @@ public class BlockMapCommand {
     public static LiteralArgumentBuilder<CommandSource> registerDelete() {
         return Commands.literal("DeleteBlockMaps")
                 .requires(commandSource -> commandSource.hasPermissionLevel(4))
-                .then(Commands.argument("targets", EntityArgument.entity()))
-                .executes(context -> execute(context, EntityArgument.getEntity(context, "targets"), true));
+                .then(Commands.argument("targets", EntityArgument.player())
+                        .executes(context -> execute(context, EntityArgument.getEntity(context, "targets"), true))
+                );
     }
 
 
     public static LiteralArgumentBuilder<CommandSource> registerList() {
         return Commands.literal("FindBlockMaps")
                 .requires(commandSource -> commandSource.hasPermissionLevel(4))
-                .then(Commands.argument("targets", EntityArgument.entity()))
-                .executes(context -> execute(context, EntityArgument.getEntity(context, "targets"), false));
+                .then(Commands.argument("targets", EntityArgument.player())
+                        .executes(context -> execute(context, EntityArgument.getPlayer(context, "targets"), false))
+                );
     }
 
     // I don't get the logic going on here but this is basically what it was originally :P
