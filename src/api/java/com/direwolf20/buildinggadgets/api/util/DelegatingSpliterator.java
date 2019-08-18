@@ -23,13 +23,13 @@ public abstract class DelegatingSpliterator<T, U> implements Spliterator<U> {
     }
 
     @Override
-    public long estimateSize() {
-        return getOther().estimateSize();
+    public int characteristics() {
+        return getOther().characteristics() & (~ SORTED);
     }
 
     @Override
-    public int characteristics() {
-        return getOther().characteristics();
+    public long estimateSize() {
+        return getOther().estimateSize();
     }
 
     @Override

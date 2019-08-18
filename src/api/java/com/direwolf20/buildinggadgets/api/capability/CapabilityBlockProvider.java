@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.api.capability;
 
+import com.direwolf20.buildinggadgets.api.BuildingGadgetsAPI;
 import com.direwolf20.buildinggadgets.api.building.BlockData;
 import com.direwolf20.buildinggadgets.api.building.IBlockProvider;
 import com.direwolf20.buildinggadgets.api.building.SingleTypeProvider;
@@ -28,6 +29,7 @@ public final class CapabilityBlockProvider {
     }
 
     public static void register() {
+        BuildingGadgetsAPI.LOG.debug("Registering BlockProvider Capability");
         CapabilityManager.INSTANCE.register(IBlockProvider.class, new IStorage<IBlockProvider>() {
 
             @Override

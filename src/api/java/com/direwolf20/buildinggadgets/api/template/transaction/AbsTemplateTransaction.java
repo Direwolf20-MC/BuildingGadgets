@@ -42,6 +42,8 @@ public abstract class AbsTemplateTransaction implements ITemplateTransaction {
         boolean changed = false;
         Queue<OperatorOrdering> orderingHistory = new LinkedList<>();
         while (ordering.hasActingTransformers()) {
+            performCreateData(exContext, ordering);
+            exContext = createContext();
             transformData(exContext, ordering);
             exContext = createContext();
             transformPositions(exContext, ordering);

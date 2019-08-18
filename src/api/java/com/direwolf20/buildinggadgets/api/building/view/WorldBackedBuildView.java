@@ -9,6 +9,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
 
 import javax.annotation.Nullable;
+import java.util.Comparator;
 import java.util.Objects;
 import java.util.Spliterator;
 import java.util.function.BiPredicate;
@@ -107,6 +108,11 @@ public final class WorldBackedBuildView implements IBuildView {
                 return true;
             }
             return false;
+        }
+
+        @Override
+        public Comparator<? super PlacementTarget> getComparator() {
+            return Comparator.comparing(PlacementTarget::getPos);
         }
 
         @Override

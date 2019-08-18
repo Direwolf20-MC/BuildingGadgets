@@ -55,7 +55,6 @@ public final class TemplateTransactions {
         @Nullable
         @Override
         public BlockData createDataForPos(ITransactionExecutionContext context, BlockPos pos) {
-            super.createDataForPos(context, pos);
             return getDataMap().get(pos);
         }
 

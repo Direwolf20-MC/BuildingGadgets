@@ -272,6 +272,7 @@ public class Config {
 
             public final IntValue energyCost;
 
+            public final IntValue maxSynchronousExecution;
 
             private CategoryGadgetCopyPaste() {
                 SERVER_BUILDER.comment("Energy Cost & Durability of the Copy-Paste Gadget")/*.translation(LANG_KEY_GADGET_COPY_PASTE)*/.push("Copy-Paste Gadget");
@@ -279,6 +280,13 @@ public class Config {
                 maxEnergy = getMaxEnergy(500000);
 
                 energyCost = getEnergyCost(50);
+
+                maxSynchronousExecution = SERVER_BUILDER
+                        .comment(
+                                "Maximum amount of Blocks in a to-copy Region to be copied synchronously. " +
+                                        "Higher values will lead to less busy-errors with large Templates, but will also hurt Server-Performance")
+                        .translation(LANG_KEY_GADGET_COPY_PASTE + ".maxsync")
+                        .defineInRange("Max Synchronous Transaction Size", 16384, 0, Integer.MAX_VALUE);
 
                 SERVER_BUILDER.pop();
             }

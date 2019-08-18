@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.api.capability;
 
+import com.direwolf20.buildinggadgets.api.BuildingGadgetsAPI;
 import com.direwolf20.buildinggadgets.api.template.ITemplate;
 import com.direwolf20.buildinggadgets.api.template.ImmutableTemplate;
 import com.direwolf20.buildinggadgets.api.util.NBTKeys;
@@ -15,6 +16,7 @@ public class CapabilityTemplate {
     public static Capability<ITemplate> TEMPLATE_CAPABILITY = null;
 
     public static void register() {
+        BuildingGadgetsAPI.LOG.debug("Registering Template Capability");
         CapabilityManager.INSTANCE.register(ITemplate.class, new Capability.IStorage<ITemplate>() {
             @Override
             public INBT writeNBT(Capability<ITemplate> capability, ITemplate instance, Direction side) {

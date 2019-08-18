@@ -1,5 +1,7 @@
 package com.direwolf20.buildinggadgets.api;
 
+import com.direwolf20.buildinggadgets.api.capability.CapabilityBlockProvider;
+import com.direwolf20.buildinggadgets.api.capability.CapabilityTemplate;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.InterModComms;
@@ -25,6 +27,8 @@ public final class BuildingGadgetsAPI {
 
     private void setup(FMLCommonSetupEvent event) {
         Registries.createOrderedRegistries();
+        CapabilityBlockProvider.register();
+        CapabilityTemplate.register();
     }
 
     private void handleIMC(InterModProcessEvent event) {

@@ -357,16 +357,21 @@ public class DelegatingTemplate implements ITemplate {
                 throw new TransactionInvalidException("Cannot execute Transaction Twice!");
             if (replaceOp != null)
                 applyResultAndReplaceOrComplete(replaceOp.getNewDelegate(), ! operators.isEmpty());
-            if (! operators.isEmpty()) {
-                for (ITransactionOperator operator : operators) {
-                    transaction.operate(operator);
-                }
-                ITemplate result = transaction.execute(context);
-                return applyResultAndReplaceOrComplete(result, false);
-            } else if (replaceOp != null)
-                return invalidateNoFinish();
-            else
-                return invalidate(true);
+            try {
+                if (! operators.isEmpty()) {
+                    for (ITransactionOperator operator : operators) {
+                        transaction.operate(operator);
+                    }
+                    ITemplate result = transaction.execute(context);
+                    return applyResultAndReplaceOrComplete(result, false);
+                } else if (replaceOp != null)
+                    return invalidateNoFinish();
+                else
+                    return invalidate(true);
+            } catch (Exception e) {
+                invalidate(true);
+                throw e;
+            }
         }
 
         protected ITemplate applyResultAndReplaceOrComplete(ITemplate newDelegate, boolean replaceTransaction) throws TransactionExecutionException {

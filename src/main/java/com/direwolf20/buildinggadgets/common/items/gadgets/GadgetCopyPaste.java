@@ -1,15 +1,21 @@
 package com.direwolf20.buildinggadgets.common.items.gadgets;
 
 import com.direwolf20.buildinggadgets.api.building.Region;
+import com.direwolf20.buildinggadgets.api.building.view.IBuildContext;
 import com.direwolf20.buildinggadgets.api.building.view.MapBackedBuildView;
+import com.direwolf20.buildinggadgets.api.building.view.SimpleBuildContext;
 import com.direwolf20.buildinggadgets.api.building.view.WorldBackedBuildView;
 import com.direwolf20.buildinggadgets.api.capability.CapabilityTemplate;
+import com.direwolf20.buildinggadgets.api.exceptions.TransactionExecutionException;
 import com.direwolf20.buildinggadgets.api.template.ITemplate;
+import com.direwolf20.buildinggadgets.api.template.transaction.ITemplateTransaction;
+import com.direwolf20.buildinggadgets.api.template.transaction.TemplateTransactions;
 import com.direwolf20.buildinggadgets.client.events.EventTooltip;
 import com.direwolf20.buildinggadgets.client.gui.GuiMod;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.capability.DelegatingTemplateProvider;
 import com.direwolf20.buildinggadgets.common.commands.CopyUnloadedCommand;
+import com.direwolf20.buildinggadgets.common.concurrent.TransactionPoolExecutor;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.items.gadgets.renderers.BaseRenderer;
 import com.direwolf20.buildinggadgets.common.items.gadgets.renderers.CopyPasteRender;
@@ -55,6 +61,7 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 public class GadgetCopyPaste extends AbstractGadget {
+
     public enum ToolMode {
         COPY(0),
         PASTE(1);
@@ -88,6 +95,8 @@ public class GadgetCopyPaste extends AbstractGadget {
             return BY_ID.get(id);
         }
     }
+
+    public static final int TRANSACTION_CREATION_LIMIT = 20; //try for one second
 
     private static final Joiner CHUNK_JOINER = Joiner.on("; ");
 
@@ -243,7 +252,7 @@ public class GadgetCopyPaste extends AbstractGadget {
         BlockPos posLookingAt = VectorHelper.getPosLookingAt(player, stack);
         // Remove debug code
         // CapabilityUtil.EnergyUtil.getCap(stack).ifPresent(energy -> energy.receiveEnergy(105000, false));
-        if (!world.isRemote) {
+        if (! world.isRemote) {
             if (player.isSneaking() && GadgetUtils.setRemoteInventory(stack, player, world, posLookingAt, false) == ActionResultType.SUCCESS)
                 return new ActionResult<>(ActionResultType.SUCCESS, stack);
 
@@ -305,8 +314,43 @@ public class GadgetCopyPaste extends AbstractGadget {
                     return;
                 }
             }
-            final MapBackedBuildView buildView = WorldBackedBuildView.inWorld(world, region).evaluate();//remember this requires linear time, but is required so that we can pass it off-thread!
-            
+            WorldBackedBuildView buildView = WorldBackedBuildView.inWorld(world, region);
+            SimpleBuildContext context = SimpleBuildContext.builder()
+                    .buildingPlayer(player)
+                    .usedStack(stack)
+                    .build(world);
+            //TODO add config to allow always async
+            //runCopyTransactionAsync(template, buildView, context);
+            runCopyTransactionSync(template, buildView, context);
         });
+    }
+
+    private void runCopyTransactionSync(ITemplate template, WorldBackedBuildView buildView, IBuildContext context) {
+        ITemplateTransaction transaction = template.startTransaction();
+        if (transaction != null && Config.GADGETS.GADGET_COPY_PASTE.maxSynchronousExecution.get() >= buildView.getBoundingBox().size()) {
+            try {
+                transaction.operate(TemplateTransactions.copyOperator(buildView))
+                        .execute(context);
+            } catch (TransactionExecutionException e) {
+                BuildingGadgets.LOG.error("Transaction Execution failed synchronously this should not have been possible!", e);
+            }
+        } else { //we are currently syncing to the client from some other thread... This will schedule it afterwards
+            if (transaction != null) {
+                try {
+                    transaction.execute(null);
+                } catch (TransactionExecutionException e) {
+                    BuildingGadgets.LOG.debug("Ignored Transaction threw an Exception.", e);
+                }
+            }
+            runCopyTransactionAsync(template, buildView.evaluate(), context); //remember this requires linear time, but is required so that we can pass it off-thread!
+        }
+    }
+
+    private void runCopyTransactionAsync(ITemplate template, MapBackedBuildView buildView, IBuildContext context) {
+        TransactionPoolExecutor.INSTANCE.tryExecuteTransaction(
+                template,
+                tr -> tr.operate(TemplateTransactions.copyOperator(buildView.getMap())),
+                TRANSACTION_CREATION_LIMIT,
+                context);
     }
 }

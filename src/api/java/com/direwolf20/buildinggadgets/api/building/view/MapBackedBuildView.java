@@ -101,4 +101,8 @@ public final class MapBackedBuildView implements IBuildView {
     public boolean mayContain(int x, int y, int z) {
         return map.containsKey(new BlockPos(x, y, z));
     }
+
+    public ImmutableMap<BlockPos, BlockData> getMap() {
+        return ImmutableMap.copyOf(map);
+    }
 }
