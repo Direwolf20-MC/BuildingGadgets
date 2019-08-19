@@ -11,7 +11,6 @@ import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SUpdateTileEntityPacket;
 import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
 
@@ -35,7 +34,7 @@ public class EffectBlockTileEntity extends TileEntity implements ITickableTileEn
         super(BGTileEntities.EFFECT_BLOCK_TYPE);
     }
 
-    public void initializeData(World world, BlockState curState, @Nullable TileEntity te, BlockData replacementBlock, Mode mode, boolean usePaste) {
+    public void initializeData(BlockState curState, @Nullable TileEntity te, BlockData replacementBlock, Mode mode, boolean usePaste) {
         // Minecraft will reuse a tile entity object at a location where the block got removed, but the modification is still buffered, and the block got restored again
         // If we don't reset this here, the 2nd phase of REPLACE will simply finish immediately because the tile entity object is reused
         this.ticks = 0;

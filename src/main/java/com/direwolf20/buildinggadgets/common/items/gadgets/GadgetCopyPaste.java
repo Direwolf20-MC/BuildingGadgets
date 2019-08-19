@@ -1,21 +1,25 @@
 package com.direwolf20.buildinggadgets.common.items.gadgets;
 
 import com.direwolf20.buildinggadgets.api.building.Region;
-import com.direwolf20.buildinggadgets.api.building.view.IBuildContext;
-import com.direwolf20.buildinggadgets.api.building.view.MapBackedBuildView;
-import com.direwolf20.buildinggadgets.api.building.view.SimpleBuildContext;
-import com.direwolf20.buildinggadgets.api.building.view.WorldBackedBuildView;
+import com.direwolf20.buildinggadgets.api.building.view.*;
 import com.direwolf20.buildinggadgets.api.capability.CapabilityTemplate;
 import com.direwolf20.buildinggadgets.api.exceptions.TransactionExecutionException;
+import com.direwolf20.buildinggadgets.api.template.IBuildOpenOptions;
+import com.direwolf20.buildinggadgets.api.template.IBuildOpenOptions.OpenType;
 import com.direwolf20.buildinggadgets.api.template.ITemplate;
+import com.direwolf20.buildinggadgets.api.template.SimpleBuildOpenOptions;
 import com.direwolf20.buildinggadgets.api.template.transaction.ITemplateTransaction;
 import com.direwolf20.buildinggadgets.api.template.transaction.TemplateTransactions;
 import com.direwolf20.buildinggadgets.client.events.EventTooltip;
 import com.direwolf20.buildinggadgets.client.gui.GuiMod;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
+import com.direwolf20.buildinggadgets.common.blocks.EffectBlock;
+import com.direwolf20.buildinggadgets.common.blocks.EffectBlock.Mode;
 import com.direwolf20.buildinggadgets.common.capability.DelegatingTemplateProvider;
 import com.direwolf20.buildinggadgets.common.commands.CopyUnloadedCommand;
+import com.direwolf20.buildinggadgets.common.concurrent.PlacementScheduler;
 import com.direwolf20.buildinggadgets.common.concurrent.ServerTickingScheduler;
+import com.direwolf20.buildinggadgets.common.concurrent.TimeOutSupplier;
 import com.direwolf20.buildinggadgets.common.concurrent.TransactionPoolExecutor;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.items.gadgets.renderers.BaseRenderer;
@@ -39,7 +43,6 @@ import net.minecraft.block.Blocks;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.NBTUtil;
@@ -253,38 +256,30 @@ public class GadgetCopyPaste extends AbstractGadget {
         BlockPos posLookingAt = VectorHelper.getPosLookingAt(player, stack);
         // Remove debug code
         // CapabilityUtil.EnergyUtil.getCap(stack).ifPresent(energy -> energy.receiveEnergy(105000, false));
-        if (! world.isRemote) {
+        if (! world.isRemote()) {
             if (player.isSneaking() && GadgetUtils.setRemoteInventory(stack, player, world, posLookingAt, false) == ActionResultType.SUCCESS)
                 return new ActionResult<>(ActionResultType.SUCCESS, stack);
 
             if (getToolMode(stack) == ToolMode.COPY) {
                 if (world.getBlockState(posLookingAt) != Blocks.AIR.getDefaultState())
                     setRegionAndCopy(stack, world, player, posLookingAt);
-            } else if (getToolMode(stack) == ToolMode.PASTE) {
-                if (! player.isSneaking() && player instanceof ServerPlayerEntity) {
-                    if (getAnchor(stack) == null) {
-                        //if (world.getBlockState(VectorHelper.getLookingAt(player, stack).getPos()) != Blocks.AIR.getDefaultState())
-                        //buildBlockMap(world, pos, stack, (ServerPlayerEntity) player);
-                    } else {
-                        BlockPos startPos = getAnchor(stack);
-                        //buildBlockMap(world, startPos, stack, (ServerPlayerEntity) player);
-                    }
-                }
+            } else if (getToolMode(stack) == ToolMode.PASTE && ! player.isSneaking()) {
+                BlockPos startPos = getAnchor(stack);
+                if (startPos == null && ! world.isAirBlock(posLookingAt))
+                    startPos = posLookingAt;
+                if (startPos != null)
+                    build(stack, world, player, posLookingAt);
             }
         } else {
             if (player.isSneaking()) {
                 if (Screen.hasControlDown()) {
                     PacketHandler.sendToServer(new PacketBindTool());
-                } else {
-                    if (GadgetUtils.getRemoteInventory(posLookingAt, world, NetworkIO.Operation.EXTRACT) != null)
+                } else if (GadgetUtils.getRemoteInventory(posLookingAt, world, NetworkIO.Operation.EXTRACT) != null)
                         return new ActionResult<>(ActionResultType.SUCCESS, stack);
-                }
-
             }
             if (getToolMode(stack) == ToolMode.COPY) {
-                if (player.isSneaking())
-                    if (world.getBlockState(posLookingAt) == Blocks.AIR.getDefaultState())
-                        GuiMod.COPY.openScreen(player);
+                if (player.isSneaking() && world.getBlockState(posLookingAt) == Blocks.AIR.getDefaultState())
+                    GuiMod.COPY.openScreen(player);
             } else if (player.isSneaking()) {
                 GuiMod.PASTE.openScreen(player);
             } else {
@@ -359,5 +354,52 @@ public class GadgetCopyPaste extends AbstractGadget {
                 },
                 TRANSACTION_CREATION_LIMIT,
                 context);
+    }
+
+    private void build(ItemStack stack, World world, PlayerEntity player, BlockPos pos) {
+        stack.getCapability(CapabilityTemplate.TEMPLATE_CAPABILITY).ifPresent(template -> {
+            SimpleBuildOpenOptions openOptions = SimpleBuildOpenOptions.builder()
+                    .context(SimpleBuildContext.builder()
+                            .usedStack(stack)
+                            .buildingPlayer(player)
+                            .build(world))
+                    .openType(OpenType.IF_NO_TRANSACTION_OPEN)
+                    .build();
+            IBuildView view = template.createViewInContext(openOptions);
+            if (view != null)
+                schedulePlacement(view, pos);
+            else
+                awaitFreePlacement(template, openOptions, pos);
+        });
+    }
+
+    private void awaitFreePlacement(ITemplate template, IBuildOpenOptions openOptions, BlockPos pos) {
+        ServerTickingScheduler.runTicked(new TimeOutSupplier(TRANSACTION_CREATION_LIMIT) {
+            @Override
+            protected boolean run() {
+                IBuildView view = template.createViewInContext(openOptions);
+                if (view != null) {
+                    schedulePlacement(view, pos);
+                    return true;
+                }
+                return false;
+            }
+
+            @Override
+            protected void onTimeout() {
+                SimpleBuildOpenOptions forceOptions = SimpleBuildOpenOptions
+                        .builderCopyOf(openOptions)
+                        .openType(OpenType.DEFAULT)
+                        .build();
+                schedulePlacement(template.createViewInContext(forceOptions), pos);
+            }
+        });
+    }
+
+    private void schedulePlacement(IBuildView view, BlockPos pos) {
+        view.translateTo(pos);
+        PlacementScheduler.schedulePlacement(t -> {//TODO PlacementLogic and mechanism to stop when missing blocks!
+            EffectBlock.spawnEffectBlock(view.getContext(), t, Mode.PLACE, false);
+        }, view, 250);
     }
 }

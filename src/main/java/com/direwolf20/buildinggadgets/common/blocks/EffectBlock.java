@@ -1,6 +1,8 @@
 package com.direwolf20.buildinggadgets.common.blocks;
 
 import com.direwolf20.buildinggadgets.api.building.BlockData;
+import com.direwolf20.buildinggadgets.api.building.PlacementTarget;
+import com.direwolf20.buildinggadgets.api.building.view.IBuildContext;
 import com.direwolf20.buildinggadgets.api.building.view.SimpleBuildContext;
 import com.direwolf20.buildinggadgets.common.entities.ConstructionBlockEntity;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
@@ -16,6 +18,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockReader;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraft.world.storage.loot.LootContext;
 import net.minecraftforge.common.util.Constants;
@@ -70,15 +73,20 @@ public class EffectBlock extends Block {
         public abstract void onBuilderRemoved(EffectBlockTileEntity builder);
     }
 
-    public static void spawnEffectBlock(World world, BlockPos spawnPos, BlockData spawnBlock, Mode mode, boolean usePaste) {
+    public static void spawnEffectBlock(IBuildContext context, PlacementTarget target, Mode mode, boolean usePaste) {//TODO pass the buildcontext through, aka invert the overloading
+        spawnEffectBlock(context.getWorld(), target.getPos(), target.getData(), mode, usePaste);
+    }
+
+    public static void spawnEffectBlock(IWorld world, BlockPos spawnPos, BlockData spawnBlock, Mode mode, boolean usePaste) {
         BlockState state = BGBlocks.effectBlock.getDefaultState();
         TileEntity curTe = world.getTileEntity(spawnPos);
         BlockState curState = world.getBlockState(spawnPos);
-        world.setBlockState(spawnPos, state);
+        world.setBlockState(spawnPos, state, 3);
         assert world.getTileEntity(spawnPos) != null;
-        ((EffectBlockTileEntity) world.getTileEntity(spawnPos)).initializeData(world, curState, curTe, spawnBlock, mode, usePaste);
+        ((EffectBlockTileEntity) world.getTileEntity(spawnPos)).initializeData(curState, curTe, spawnBlock, mode, usePaste);
         // Send data to client
-        world.notifyBlockUpdate(spawnPos, state, state, Constants.BlockFlags.DEFAULT);
+        if (world instanceof World)
+            ((World) world).notifyBlockUpdate(spawnPos, state, state, Constants.BlockFlags.DEFAULT);
     }
 
     public EffectBlock(Properties builder) {
