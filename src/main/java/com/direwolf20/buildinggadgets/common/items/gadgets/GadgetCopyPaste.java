@@ -15,6 +15,7 @@ import com.direwolf20.buildinggadgets.client.gui.GuiMod;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.capability.DelegatingTemplateProvider;
 import com.direwolf20.buildinggadgets.common.commands.CopyUnloadedCommand;
+import com.direwolf20.buildinggadgets.common.concurrent.ServerTickingScheduler;
 import com.direwolf20.buildinggadgets.common.concurrent.TransactionPoolExecutor;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.items.gadgets.renderers.BaseRenderer;
@@ -299,10 +300,10 @@ public class GadgetCopyPaste extends AbstractGadget {
         else
             setLowerRegionBound(stack, lookedAt);
         Optional<Region> regionOpt = getSelectedRegion(stack);
-        regionOpt.ifPresent(region -> performCopy(stack, world, player, region, lookedAt));
+        regionOpt.ifPresent(region -> performCopy(stack, world, player, region));
     }
 
-    private void performCopy(ItemStack stack, World world, PlayerEntity player, Region region, BlockPos lookedAt) {
+    private void performCopy(ItemStack stack, World world, PlayerEntity player, Region region) {
         LazyOptional<ITemplate> templateCap = stack.getCapability(CapabilityTemplate.TEMPLATE_CAPABILITY, null);
         templateCap.ifPresent(template -> {
             if (! CopyUnloadedCommand.mayCopyUnloadedChunks(player)) {
@@ -319,7 +320,6 @@ public class GadgetCopyPaste extends AbstractGadget {
                     .buildingPlayer(player)
                     .usedStack(stack)
                     .build(world);
-            //TODO add config to allow always async
             //runCopyTransactionAsync(template, buildView, context);
             runCopyTransactionSync(template, buildView, context);
         });
@@ -350,6 +350,13 @@ public class GadgetCopyPaste extends AbstractGadget {
         TransactionPoolExecutor.INSTANCE.tryExecuteTransaction(
                 template,
                 tr -> tr.operate(TemplateTransactions.copyOperator(buildView.getMap())),
+                (cr, tr) -> {
+                    ServerTickingScheduler.runTickedStartAndEnd(() -> {
+                        assert context.getBuildingPlayer() != null;
+                        //context.getBuildingPlayer().sendStatusMessage();
+                        return false;
+                    });
+                },
                 TRANSACTION_CREATION_LIMIT,
                 context);
     }

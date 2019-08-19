@@ -5,8 +5,6 @@ import com.direwolf20.buildinggadgets.api.exceptions.TransactionExecutionExcepti
 import com.direwolf20.buildinggadgets.api.template.ITemplate;
 import com.direwolf20.buildinggadgets.api.template.transaction.ITemplateTransaction;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
-import com.google.common.util.concurrent.ListeningExecutorService;
-import com.google.common.util.concurrent.MoreExecutors;
 import jdk.internal.jline.internal.Nullable;
 
 import java.util.concurrent.RejectedExecutionException;
@@ -25,17 +23,19 @@ public enum TransactionPoolExecutor {
         SUCCESS
     }
 
-    private final ListeningExecutorService executor;
+    private final ThreadPoolExecutor executor;
 
     TransactionPoolExecutor() {
-        ThreadPoolExecutor core = new ThreadPoolExecutor(2, 16, 1, TimeUnit.MINUTES, new SynchronousQueue<>());
-        core.allowCoreThreadTimeOut(true);
-        executor = MoreExecutors.listeningDecorator(core);
+        executor = new ThreadPoolExecutor(2, 16, 1, TimeUnit.MINUTES, new SynchronousQueue<>());
+        executor.allowCoreThreadTimeOut(true);
     }
 
     public boolean submitTask(Runnable task, Runnable completionListener) {
         try {
-            executor.submit(task).addListener(completionListener, ServerTickingExecutor.INSTANCE);
+            executor.execute(() -> {
+                task.run();
+                completionListener.run();
+            });
             return true;
         } catch (RejectedExecutionException e) {
             return false;
@@ -57,7 +57,7 @@ public enum TransactionPoolExecutor {
 
     public void tryExecuteTransaction(ITemplate template, Consumer<ITemplateTransaction> setupFunction, BiConsumer<CompletionResult, ITemplateTransaction> completionListener,
                                       int ttl, @Nullable IBuildContext context) {
-        new ServerTickingScheduler(new TimeOutSupplier(ttl) {
+        ServerTickingScheduler.runTicked(new TimeOutSupplier(ttl) {
             private CompletionResult res = CompletionResult.SUBMIT_FAILED;
 
             @Override
@@ -69,6 +69,7 @@ public enum TransactionPoolExecutor {
                             try {
                                 transaction.execute(context);
                                 res = CompletionResult.SUCCESS;
+                                BuildingGadgets.LOG.trace("Successfully completed async Transaction.");
                             } catch (TransactionExecutionException e) {
                                 BuildingGadgets.LOG.warn("Failed to execute Transaction! Execution is deemed impossible!", e);
                                 res = CompletionResult.EXECUTE_FAILED;
@@ -81,7 +82,7 @@ public enum TransactionPoolExecutor {
 
             @Override
             protected void onTimeout() {
-                BuildingGadgets.LOG.error("Template seems to be busy. Aborting execution attempt.");
+                BuildingGadgets.LOG.debug("Template seems to be busy. Aborting execution attempt.");
                 completionListener.accept(res, null);
             }
         });

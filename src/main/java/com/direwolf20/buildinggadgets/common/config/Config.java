@@ -284,9 +284,10 @@ public class Config {
                 maxSynchronousExecution = SERVER_BUILDER
                         .comment(
                                 "Maximum amount of Blocks in a to-copy Region to be copied synchronously. " +
-                                        "Higher values will lead to less busy-errors with large Templates, but will also hurt Server-Performance")
+                                        "Higher values will lead to less busy-errors with large Templates, but may hurt Server-Performance.")
                         .translation(LANG_KEY_GADGET_COPY_PASTE + ".maxsync")
-                        .defineInRange("Max Synchronous Transaction Size", 16384, 0, Integer.MAX_VALUE);
+                        //use the old cap as the synchronous border... This implies that 32*32*32 areas are the max size for a synchronous copy by default
+                        .defineInRange("Max Synchronous Transaction Size", 32768, 0, Integer.MAX_VALUE);
 
                 SERVER_BUILDER.pop();
             }

@@ -5,19 +5,34 @@ import net.minecraftforge.event.TickEvent.Phase;
 import net.minecraftforge.event.TickEvent.ServerTickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
+import java.util.EnumSet;
 import java.util.function.BooleanSupplier;
 
 public final class ServerTickingScheduler {
-    private final BooleanSupplier runnable;
+    public static void runTicked(BooleanSupplier runUntilFalse) {
+        new ServerTickingScheduler(runUntilFalse, EnumSet.of(Phase.START));
+    }
 
-    public ServerTickingScheduler(BooleanSupplier runnable) {
+    public static void runTickedAtEnd(BooleanSupplier runUntilFalse) {
+        new ServerTickingScheduler(runUntilFalse, EnumSet.of(Phase.END));
+    }
+
+    public static void runTickedStartAndEnd(BooleanSupplier runUntilFalse) {
+        new ServerTickingScheduler(runUntilFalse, EnumSet.allOf(Phase.class));
+    }
+
+    private final BooleanSupplier runnable;
+    private final EnumSet<Phase> phases;
+
+    private ServerTickingScheduler(BooleanSupplier runnable, EnumSet<Phase> phases) {
         this.runnable = runnable;
         MinecraftForge.EVENT_BUS.register(this);
+        this.phases = phases;
     }
 
     @SubscribeEvent
     public void tick(ServerTickEvent event) {
-        if (event.phase != Phase.START)
+        if (! phases.contains(event.phase))
             return;
         if (! runnable.getAsBoolean())
             MinecraftForge.EVENT_BUS.unregister(this);

@@ -7,7 +7,7 @@ public enum ServerTickingExecutor implements Executor {
 
     @Override
     public void execute(Runnable command) {
-        new ServerTickingScheduler(() -> {
+        ServerTickingScheduler.runTicked(() -> {
             command.run();
             return false;
         });
