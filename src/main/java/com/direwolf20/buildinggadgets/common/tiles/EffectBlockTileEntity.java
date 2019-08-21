@@ -5,7 +5,6 @@ import com.direwolf20.buildinggadgets.api.building.tilesupport.TileSupport;
 import com.direwolf20.buildinggadgets.common.blocks.EffectBlock.Mode;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks.BGTileEntities;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
-import jdk.internal.jline.internal.Nullable;
 import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.NetworkManager;
@@ -13,6 +12,8 @@ import net.minecraft.network.play.server.SUpdateTileEntityPacket;
 import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
+
+import javax.annotation.Nullable;
 
 public class EffectBlockTileEntity extends TileEntity implements ITickableTileEntity {
 

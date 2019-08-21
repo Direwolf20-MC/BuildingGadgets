@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.api.util;
 
-import jdk.internal.jline.internal.Nullable;
 
+import javax.annotation.Nullable;
 import java.util.Spliterator;
 import java.util.function.Consumer;
 import java.util.function.Function;
