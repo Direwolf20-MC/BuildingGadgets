@@ -1,7 +1,9 @@
 # Building Gadgets Changelog
 The format of this document is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and should continue to adhere to the conventions outlined in the Keep a Changelog guidelines.
 
-## Unreleased [3.0.3a - 1.14.4]
+## Unreleased
+
+## [3.0.3a - 1.14.4] - 2019-08-21
 ### Changed
 - Converted the Destruction-Gadget's connected area mode to use the same algorithm as the other Gadget's
 ### Fixed
