@@ -19,13 +19,13 @@ import javax.annotation.Nullable;
  * <li>Provide a possibility for registering {@link ITransactionOperator} which specify the actual work to be performed by this Transaction.
  * <li>Provide a possibility to execute the {@link ITransactionOperator}'s as efficiently as possible for the backing {@link ITemplate}.
  * </ul><br>
- * For more detailed Information about how the {@code ITemplateTransaction} will be executed see {@link #execute()}.
+ * For more detailed Information about how the {@code ITemplateTransaction} will be executed see {@link #execute(IBuildContext)}.
  */
 public interface ITemplateTransaction {
     /**
      * Registers the given {@link ITransactionOperator} with this {@code ITemplateTransaction}.
      * The passed in {@link ITransactionOperator} may be a duplicate.<br>
-     * <b>This Method does not execute the {@link ITransactionOperator}, see {@link #execute()} for more Information.</b>
+     * <b>This Method does not execute the {@link ITransactionOperator}, see {@link #execute(IBuildContext)} for more Information.</b>
      * @param operator The {@link ITransactionOperator} to register with this {@code ITemplateTransaction}
      * @return itself to allow for Method chaining
      * @throws NullPointerException if faced with an null value

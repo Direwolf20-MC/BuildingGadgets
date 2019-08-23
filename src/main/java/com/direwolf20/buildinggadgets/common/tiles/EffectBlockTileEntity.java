@@ -14,6 +14,8 @@ import net.minecraft.tileentity.TileEntity;
 
 import javax.annotation.Nullable;
 
+import javax.annotation.Nullable;
+
 public class EffectBlockTileEntity extends TileEntity implements ITickableTileEntity {
 
     /**

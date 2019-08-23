@@ -14,7 +14,7 @@ import javax.annotation.Nullable;
  * Instances of this class represent a 3D-Template for any kind of structure.
  * An {@code ITemplate} therefore has the following responsibilities:
  * <ul>
- * <li>Provide a possibility to iterate over all placement information contained in this {@code ITemplate} via {@link #createViewInContext(IBuildContext)}.
+ * <li>Provide a possibility to iterate over all placement information contained in this {@code ITemplate} via {@link #createViewInContext(IBuildOpenOptions)} )}.
  * <li>Optionally an {@code ITemplate} may choose to provide a possibility for modifying the represented structure
  * via an {@link ITemplateTransaction} created by {@link #startTransaction()}.
  * <li>Provide a boundingBox, which will enclose all positions produced by this {@code ITemplate} via {@link IBuildView}.

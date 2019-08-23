@@ -99,7 +99,7 @@ public final class TopologicalRegistryBuilder<T> {
         build = true;
         values.clear();
         List<ValueObject<T>> sorted = TopologicalSort.topologicalSort(theGraph, Comparator.naturalOrder());
-        final ImmutableList.Builder<T> objs = ImmutableList.builderWithExpectedSize(sorted.size());
+        final ImmutableList.Builder<T> objs = ImmutableList.builder();
         final ImmutableBiMap.Builder<ResourceLocation, T> map = ImmutableBiMap.builder();
         sorted.stream().filter(val -> val.getValue() != null).forEach(obj -> {
             objs.add(obj.getValue());
