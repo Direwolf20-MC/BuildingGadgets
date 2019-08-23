@@ -5,6 +5,7 @@ import com.direwolf20.buildinggadgets.api.building.BlockData;
 import com.direwolf20.buildinggadgets.api.building.view.IBuildContext;
 import com.direwolf20.buildinggadgets.api.serialisation.ITileDataSerializer;
 import com.direwolf20.buildinggadgets.api.serialisation.SerialisationSupport;
+import com.google.common.base.MoreObjects;
 import net.minecraft.block.BlockState;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
@@ -74,6 +75,12 @@ public final class TileSupport {
         @Override
         public boolean placeIn(IBuildContext context, BlockState state, BlockPos position) {
             return context.getWorld().setBlockState(position, state, 0);
+        }
+
+        @Override
+        public String toString() {
+            return MoreObjects.toStringHelper(this)
+                    .toString();
         }
     };
 

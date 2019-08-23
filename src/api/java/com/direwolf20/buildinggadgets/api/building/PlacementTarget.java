@@ -4,6 +4,7 @@ import com.direwolf20.buildinggadgets.api.building.tilesupport.ITileEntityData;
 import com.direwolf20.buildinggadgets.api.building.view.IBuildContext;
 import com.direwolf20.buildinggadgets.api.materials.MaterialList;
 import com.direwolf20.buildinggadgets.api.util.NBTKeys;
+import com.google.common.base.MoreObjects;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.util.Mirror;
@@ -37,7 +38,9 @@ public final class PlacementTarget {
         return new PlacementTarget(pos, data);
     }
 
+    @Nonnull
     private final BlockPos pos;
+    @Nonnull
     private final BlockData data;
 
     /**
@@ -99,5 +102,31 @@ public final class PlacementTarget {
         compound.put(NBTKeys.KEY_DATA, data.serialize(persisted));
         compound.put(NBTKeys.KEY_POS, NBTUtil.writeBlockPos(pos));
         return compound;
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("pos", pos)
+                .add("data", data)
+                .toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (! (o instanceof PlacementTarget)) return false;
+
+        PlacementTarget that = (PlacementTarget) o;
+
+        if (! getPos().equals(that.getPos())) return false;
+        return getData().equals(that.getData());
+    }
+
+    @Override
+    public int hashCode() {
+        int result = getPos().hashCode();
+        result = 31 * result + getData().hashCode();
+        return result;
     }
 }

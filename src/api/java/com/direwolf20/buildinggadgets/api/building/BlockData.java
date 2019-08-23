@@ -9,6 +9,7 @@ import com.direwolf20.buildinggadgets.api.materials.MaterialList;
 import com.direwolf20.buildinggadgets.api.serialisation.ITileDataSerializer;
 import com.direwolf20.buildinggadgets.api.util.NBTKeys;
 import com.direwolf20.buildinggadgets.api.util.RegistryUtils;
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -171,5 +172,13 @@ public final class BlockData {
         int result = getState().hashCode();
         result = 31 * result + getTileData().hashCode();
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("state", state)
+                .add("tileData", tileData)
+                .toString();
     }
 }

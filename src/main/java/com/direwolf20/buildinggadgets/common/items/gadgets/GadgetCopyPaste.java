@@ -3,6 +3,7 @@ package com.direwolf20.buildinggadgets.common.items.gadgets;
 import com.direwolf20.buildinggadgets.api.building.Region;
 import com.direwolf20.buildinggadgets.api.building.view.*;
 import com.direwolf20.buildinggadgets.api.capability.CapabilityTemplate;
+import com.direwolf20.buildinggadgets.api.exceptions.TemplateException;
 import com.direwolf20.buildinggadgets.api.exceptions.TransactionExecutionException;
 import com.direwolf20.buildinggadgets.api.template.IBuildOpenOptions;
 import com.direwolf20.buildinggadgets.api.template.IBuildOpenOptions.OpenType;
@@ -10,6 +11,7 @@ import com.direwolf20.buildinggadgets.api.template.ITemplate;
 import com.direwolf20.buildinggadgets.api.template.SimpleBuildOpenOptions;
 import com.direwolf20.buildinggadgets.api.template.transaction.ITemplateTransaction;
 import com.direwolf20.buildinggadgets.api.template.transaction.TemplateTransactions;
+import com.direwolf20.buildinggadgets.api.util.DebugUtils;
 import com.direwolf20.buildinggadgets.client.events.EventTooltip;
 import com.direwolf20.buildinggadgets.client.gui.GuiMod;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
@@ -58,6 +60,7 @@ import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.common.util.LazyOptional;
+import org.apache.logging.log4j.Level;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -317,6 +320,16 @@ public class GadgetCopyPaste extends AbstractGadget {
                     .build(world);
             //runCopyTransactionAsync(template, buildView, context);
             runCopyTransactionSync(template, buildView, context);
+            //TODO remove Debug code!
+            IBuildView view = template.createViewInContext(SimpleBuildOpenOptions.withContext(context));
+            if (view != null) {
+                DebugUtils.printBuildToLog(BuildingGadgets.LOG, Level.INFO, view, false);
+                try {
+                    view.close();
+                } catch (TemplateException e) {
+                    BuildingGadgets.LOG.error(e);
+                }
+            }
         });
     }
 
@@ -324,7 +337,7 @@ public class GadgetCopyPaste extends AbstractGadget {
         ITemplateTransaction transaction = template.startTransaction();
         if (transaction != null && Config.GADGETS.GADGET_COPY_PASTE.maxSynchronousExecution.get() >= buildView.getBoundingBox().size()) {
             try {
-                transaction.operate(TemplateTransactions.copyOperator(buildView))
+                transaction.operate(TemplateTransactions.replaceOperator(buildView))
                         .execute(context);
             } catch (TransactionExecutionException e) {
                 BuildingGadgets.LOG.error("Transaction Execution failed synchronously this should not have been possible!", e);

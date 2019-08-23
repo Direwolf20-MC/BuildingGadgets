@@ -295,8 +295,9 @@ public final class ImmutableTemplate implements ITemplate {
             ensureReverseMappingCreated();
             assert posToData != null;
             assert dataToPos != null;
-            Region.Builder builder = Region.enclosingBuilder()
-                    .enclose(headerInfo.getBoundingBox());
+            Region.Builder builder = Region.enclosingBuilder();
+            if (! posToData.isEmpty())
+                builder.enclose(headerInfo.getBoundingBox());
             for (Map.Entry<BlockPos, BlockData> entry : created.entrySet()) {
                 BlockData cur = posToData.get(entry.getKey());
                 posToData.put(entry.getKey(), entry.getValue());
@@ -361,9 +362,7 @@ public final class ImmutableTemplate implements ITemplate {
                     dataToPos.remove(entry.getValue());
             }
             if (! posToData.isEmpty()) {
-                headerInfo = TemplateHeader.builderOf(headerInfo)
-                        .bounds(builder.build())
-                        .build();
+                updateBoundingBox(builder);
             }
             posToData = newPosToDataMap;
         }
@@ -386,9 +385,7 @@ public final class ImmutableTemplate implements ITemplate {
                 builder.enclose(target.getPos());
             }
             if (! posToData.isEmpty()) {
-                headerInfo = TemplateHeader.builderOf(headerInfo)
-                        .bounds(builder.build())
-                        .build();
+                updateBoundingBox(builder);
             }
             posToData = newPosToDataMap;
             dataToPos = newDataToPositionMapping;
@@ -473,7 +470,7 @@ public final class ImmutableTemplate implements ITemplate {
                 regionBuilder.enclose(resPos);
             }
             Region region = regionBuilder.build();
-            assert region.getMin().equals(BlockPos.ZERO);
+            assert region.getMin().equals(BlockPos.ZERO) : "the smallest position in the resulting ImmutableTemplate should be at (0, 0, 0) and not " + region.getMin() + " (or evaluated " + getSmallest() + ")";
             headerInfo = TemplateHeader.builderOf(headerInfo)
                     .bounds(region)
                     .requiredItems(builder != null ? builder.build() : null)
@@ -496,6 +493,7 @@ public final class ImmutableTemplate implements ITemplate {
                             Math.min(m1.getZ(), m2.getZ())),
                     Collector.Characteristics.UNORDERED));
         }
+
 
         private BlockPos validatePos(BlockPos resPos) throws TransactionExecutionException {
             if ((resPos.getX() & INVERSE_B2_MASK) != 0)
@@ -524,6 +522,12 @@ public final class ImmutableTemplate implements ITemplate {
                             }
                         };
                     }, context))
+                    .build();
+        }
+
+        private void updateBoundingBox(Region.Builder builder) {
+            headerInfo = TemplateHeader.builderOf(headerInfo)
+                    .bounds(builder.build())
                     .build();
         }
     }

@@ -2,6 +2,7 @@ package com.direwolf20.buildinggadgets.api.materials;
 
 import com.direwolf20.buildinggadgets.api.util.NBTKeys;
 import com.direwolf20.buildinggadgets.api.util.RegistryUtils;
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
 import net.minecraft.item.Item;
 import net.minecraft.nbt.CompoundNBT;
@@ -77,5 +78,13 @@ public final class UniqueItem {
     @Override
     public int hashCode() {
         return hash;
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("item", item)
+                .add("tagCompound", tagCompound)
+                .toString();
     }
 }

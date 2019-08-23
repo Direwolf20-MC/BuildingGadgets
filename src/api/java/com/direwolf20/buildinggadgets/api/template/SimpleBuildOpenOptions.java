@@ -19,6 +19,10 @@ public final class SimpleBuildOpenOptions implements IBuildOpenOptions {
         return SimpleBuildOpenOptions.builderCopyOf(openOptions).build();
     }
 
+    public static SimpleBuildOpenOptions withContext(IBuildContext context) {
+        return builder().context(context).build();
+    }
+
     private final IBuildContext buildContext;
     private final OpenType openType;
 

@@ -5,6 +5,7 @@ import com.direwolf20.buildinggadgets.api.building.view.IBuildContext;
 import com.direwolf20.buildinggadgets.api.materials.MaterialList;
 import com.direwolf20.buildinggadgets.api.serialisation.ITileDataSerializer;
 import com.direwolf20.buildinggadgets.api.serialisation.SerialisationSupport;
+import com.google.common.base.MoreObjects;
 import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
@@ -87,5 +88,13 @@ public class NBTTileEntityData implements ITileEntityData {
         int result = nbt.hashCode();
         result = 31 * result + (getRequiredMaterials() != null ? getRequiredMaterials().hashCode() : 0);
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("nbt", nbt)
+                .add("requiredMaterials", requiredMaterials)
+                .toString();
     }
 }

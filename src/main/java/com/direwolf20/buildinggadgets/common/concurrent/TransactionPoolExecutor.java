@@ -5,8 +5,8 @@ import com.direwolf20.buildinggadgets.api.exceptions.TransactionExecutionExcepti
 import com.direwolf20.buildinggadgets.api.template.ITemplate;
 import com.direwolf20.buildinggadgets.api.template.transaction.ITemplateTransaction;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
-import jdk.internal.jline.internal.Nullable;
 
+import javax.annotation.Nullable;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
