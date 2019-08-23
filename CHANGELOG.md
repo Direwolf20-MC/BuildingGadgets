@@ -1,7 +1,11 @@
 # Building Gadgets Changelog
 The format of this document is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and should continue to adhere to the conventions outlined in the Keep a Changelog guidelines.
 
-## Unreleased
+## Unreleased [3.0.4a - 1.14.4]
+### Fixed
+- Remove some performance improvements which caused BG not to load in non-Dev environment because Forge provides 
+  a newer version of the used library (guava) in Dev-Environment then it does when it is regularly installed. Sorry
+  for the inconvenience, but we obviously did not expect a Forge Bug like this.
 
 ## [3.0.3a - 1.14.4] - 2019-08-21
 ### Changed
