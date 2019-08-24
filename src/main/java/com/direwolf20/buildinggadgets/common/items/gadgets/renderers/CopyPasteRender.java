@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.common.items.gadgets.renderers;
 
+import com.direwolf20.buildinggadgets.api.building.Region;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
 import com.direwolf20.buildinggadgets.common.util.blocks.BlockMap;
@@ -28,6 +29,7 @@ import org.lwjgl.opengl.GL14;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 public class CopyPasteRender extends BaseRenderer {
     private ChestRenderer chestRenderer;
@@ -42,33 +44,24 @@ public class CopyPasteRender extends BaseRenderer {
     public void render(RenderWorldLastEvent evt, PlayerEntity player, ItemStack heldItem) {
         super.render(evt, player, heldItem);
 
-        /*
-        if (BGItems.gadgetCopyPaste.getStartPos(heldItem) == null || BGItems.gadgetCopyPaste.getEndPos(heldItem) == null)
-            return;
 
-        Vec3d playerPos = getPlayerPos();
-        String UUID = BGItems.gadgetCopyPaste.getUUID(heldItem);
+        Optional<Region> reg = GadgetCopyPaste.getSelectedRegion(heldItem);
+        reg.ifPresent(region -> {
+            Vec3d playerPos = getPlayerPos();
 
-        if (GadgetCopyPaste.getToolMode(heldItem) == GadgetCopyPaste.ToolMode.COPY)
-            renderCopy(evt, player, heldItem, playerPos, UUID);
-        else
-            renderPaste(evt, player, heldItem, playerPos, UUID);
-         */
+            if (GadgetCopyPaste.getToolMode(heldItem) == GadgetCopyPaste.ToolMode.COPY)
+                renderCopy(evt, player, heldItem, playerPos, region);
+            /*else
+                renderPaste(evt, player, heldItem, playerPos, UUID);*/
+        });
     }
 
-    private void renderCopy(RenderWorldLastEvent evt, PlayerEntity player, ItemStack heldItem, Vec3d playerPos, String UUID) {
-        /*
-        BlockPos startPos = BGItems.gadgetCopyPaste.getStartPos(heldItem);
-        BlockPos endPos = BGItems.gadgetCopyPaste.getEndPos(heldItem);
+    private void renderCopy(RenderWorldLastEvent evt, PlayerEntity player, ItemStack heldItem, Vec3d playerPos, Region region) {
+        BlockPos startPos = region.getMin();
+        BlockPos endPos = region.getMax();
         BlockPos blankPos = new BlockPos(0, 0, 0);
-        if (startPos == null || endPos == null || startPos.equals(blankPos) || endPos.equals(blankPos)) {
+        if (startPos.equals(blankPos) || endPos.equals(blankPos))
             return;
-        }
-
-        List<BlockMap> blockMapList = GadgetCopyPaste.getBlockMapList(PasteToolBufferBuilder.getTagFromUUID(UUID));
-        if (blockMapList.size() == 0) {
-            //return;
-        }
 
         //We want to draw from the starting position to the (ending position)+1
         int x = (startPos.getX() <= endPos.getX()) ? startPos.getX() : endPos.getX();
@@ -98,7 +91,7 @@ public class CopyPasteRender extends BaseRenderer {
         GlStateManager.depthMask(true);
 
         GlStateManager.popMatrix();
-         */
+
     }
 
     private void renderPaste(RenderWorldLastEvent evt, PlayerEntity player, ItemStack heldItem, Vec3d playerPos, String UUID) {

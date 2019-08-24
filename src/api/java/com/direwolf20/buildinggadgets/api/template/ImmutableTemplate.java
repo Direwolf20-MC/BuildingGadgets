@@ -179,12 +179,12 @@ public final class ImmutableTemplate implements ITemplate {
 
         @Override
         public Spliterator<PlacementTarget> spliterator() {
-            return new BuildSpliterator(posToStateId.long2IntEntrySet().spliterator(), idToData);
+            return new BuildSpliterator(posToStateId.long2IntEntrySet().spliterator(), idToData, translation);
         }
 
         @Override
         public IBuildView translateTo(BlockPos pos) {
-            translation = pos;
+            translation = Objects.requireNonNull(pos, "Cannot translate to a null BlockPos!");
             return this;
         }
 
@@ -233,10 +233,12 @@ public final class ImmutableTemplate implements ITemplate {
 
         private static final class BuildSpliterator extends DelegatingSpliterator<Long2IntMap.Entry, PlacementTarget> {
             private final BlockData[] idToData;
+            private final BlockPos translation;
 
-            public BuildSpliterator(Spliterator<Entry> idSpliterator, BlockData[] idToData) {
+            public BuildSpliterator(Spliterator<Entry> idSpliterator, BlockData[] idToData, BlockPos translation) {
                 super(idSpliterator);
                 this.idToData = idToData; //no sync whatsoever - Immutable!
+                this.translation = translation;
             }
 
             @Override
@@ -244,13 +246,13 @@ public final class ImmutableTemplate implements ITemplate {
             public Spliterator<PlacementTarget> trySplit() {
                 Spliterator<Entry> split = getOther().trySplit();
                 if (split != null)
-                    return new BuildSpliterator(split, idToData);
+                    return new BuildSpliterator(split, idToData, translation);
                 return null;
             }
 
             @Override
             protected boolean advance(Long2IntMap.Entry object, Consumer<? super PlacementTarget> action) {
-                BlockPos constructed = MathUtils.posFromLong(object.getLongKey());
+                BlockPos constructed = MathUtils.posFromLong(object.getLongKey()).add(translation);
                 BlockData data = idToData[object.getIntValue()];
                 action.accept(new PlacementTarget(constructed, data));
                 return true;
@@ -361,9 +363,8 @@ public final class ImmutableTemplate implements ITemplate {
                 } else if (positions.isEmpty())
                     dataToPos.remove(entry.getValue());
             }
-            if (! posToData.isEmpty()) {
+            if (! posToData.isEmpty())
                 updateBoundingBox(builder);
-            }
             posToData = newPosToDataMap;
         }
 
@@ -384,9 +385,8 @@ public final class ImmutableTemplate implements ITemplate {
                         .add(target.getPos());
                 builder.enclose(target.getPos());
             }
-            if (! posToData.isEmpty()) {
+            if (! posToData.isEmpty())
                 updateBoundingBox(builder);
-            }
             posToData = newPosToDataMap;
             dataToPos = newDataToPositionMapping;
         }
@@ -470,7 +470,8 @@ public final class ImmutableTemplate implements ITemplate {
                 regionBuilder.enclose(resPos);
             }
             Region region = regionBuilder.build();
-            assert region.getMin().equals(BlockPos.ZERO) : "the smallest position in the resulting ImmutableTemplate should be at (0, 0, 0) and not " + region.getMin() + " (or evaluated " + getSmallest() + ")";
+            assert region.getMin().equals(BlockPos.ZERO) :
+                    "the smallest position in the resulting ImmutableTemplate should be at (0, 0, 0) and not " + region.getMin() + " (or evaluated " + getSmallest() + ")";
             headerInfo = TemplateHeader.builderOf(headerInfo)
                     .bounds(region)
                     .requiredItems(builder != null ? builder.build() : null)

@@ -1,7 +1,10 @@
 package com.direwolf20.buildinggadgets.common.items.gadgets;
 
 import com.direwolf20.buildinggadgets.api.building.Region;
-import com.direwolf20.buildinggadgets.api.building.view.*;
+import com.direwolf20.buildinggadgets.api.building.view.IBuildContext;
+import com.direwolf20.buildinggadgets.api.building.view.IBuildView;
+import com.direwolf20.buildinggadgets.api.building.view.SimpleBuildContext;
+import com.direwolf20.buildinggadgets.api.building.view.WorldBackedBuildView;
 import com.direwolf20.buildinggadgets.api.capability.CapabilityTemplate;
 import com.direwolf20.buildinggadgets.api.exceptions.TemplateException;
 import com.direwolf20.buildinggadgets.api.exceptions.TransactionExecutionException;
@@ -22,7 +25,6 @@ import com.direwolf20.buildinggadgets.common.commands.CopyUnloadedCommand;
 import com.direwolf20.buildinggadgets.common.concurrent.PlacementScheduler;
 import com.direwolf20.buildinggadgets.common.concurrent.ServerTickingScheduler;
 import com.direwolf20.buildinggadgets.common.concurrent.TimeOutSupplier;
-import com.direwolf20.buildinggadgets.common.concurrent.TransactionPoolExecutor;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.items.gadgets.renderers.BaseRenderer;
 import com.direwolf20.buildinggadgets.common.items.gadgets.renderers.CopyPasteRender;
@@ -132,6 +134,18 @@ public class GadgetCopyPaste extends AbstractGadget {
         providerBuilder.add(new DelegatingTemplateProvider());
     }
 
+    public static int getCopyCounter(ItemStack stack) {
+        CompoundNBT nbt = NBTHelper.getOrNewTag(stack);
+        return nbt.getInt(NBTKeys.TEMPLATE_COPY_COUNT); //returns 0 if not present
+    }
+
+    public static int getAndIncrementCopyCounter(ItemStack stack) {
+        CompoundNBT nbt = NBTHelper.getOrNewTag(stack);
+        int count = nbt.getInt(NBTKeys.TEMPLATE_COPY_COUNT); //returns 0 if not present
+        nbt.putInt(NBTKeys.TEMPLATE_COPY_COUNT, count + 1);
+        return count;
+    }
+
     private static void setAnchor(ItemStack stack, BlockPos anchorPos) {
         GadgetUtils.writePOSToNBT(stack, anchorPos, NBTKeys.GADGET_ANCHOR);
     }
@@ -141,7 +155,6 @@ public class GadgetCopyPaste extends AbstractGadget {
     }
 
     public static Optional<Region> getSelectedRegion(ItemStack stack) {
-        CompoundNBT nbt = NBTHelper.getOrNewTag(stack);
         BlockPos lower = getLowerRegionBound(stack);
         BlockPos upper = getUpperRegionBound(stack);
         if (lower != null && upper != null) {
@@ -313,13 +326,13 @@ public class GadgetCopyPaste extends AbstractGadget {
                     return;
                 }
             }
-            WorldBackedBuildView buildView = WorldBackedBuildView.inWorld(world, region);
             SimpleBuildContext context = SimpleBuildContext.builder()
                     .buildingPlayer(player)
                     .usedStack(stack)
                     .build(world);
+            WorldBackedBuildView buildView = WorldBackedBuildView.create(context, region);
             //runCopyTransactionAsync(template, buildView, context);
-            runCopyTransactionSync(template, buildView, context);
+            runCopyTransactionSync(stack, template, buildView);
             //TODO remove Debug code!
             IBuildView view = template.createViewInContext(SimpleBuildOpenOptions.withContext(context));
             if (view != null) {
@@ -333,40 +346,25 @@ public class GadgetCopyPaste extends AbstractGadget {
         });
     }
 
-    private void runCopyTransactionSync(ITemplate template, WorldBackedBuildView buildView, IBuildContext context) {
+    private void runCopyTransactionSync(ItemStack stack, ITemplate template, WorldBackedBuildView buildView) {
         ITemplateTransaction transaction = template.startTransaction();
-        if (transaction != null && Config.GADGETS.GADGET_COPY_PASTE.maxSynchronousExecution.get() >= buildView.getBoundingBox().size()) {
+        if (transaction != null) {
+            IBuildContext context = buildView.getContext();
+            assert context.getBuildingPlayer() != null;
             try {
-                transaction.operate(TemplateTransactions.replaceOperator(buildView))
+                //TODO move operation into multiple steps
+                transaction
+                        .operate(TemplateTransactions.replaceOperator(buildView))
+                        .operate(TemplateTransactions.headerOperator(
+                                "Copy " + getAndIncrementCopyCounter(stack),
+                                context.getBuildingPlayer().getDisplayName().getUnformattedComponentText()))
                         .execute(context);
             } catch (TransactionExecutionException e) {
                 BuildingGadgets.LOG.error("Transaction Execution failed synchronously this should not have been possible!", e);
             }
-        } else { //we are currently syncing to the client from some other thread... This will schedule it afterwards
-            if (transaction != null) {
-                try {
-                    transaction.execute(null);
-                } catch (TransactionExecutionException e) {
-                    BuildingGadgets.LOG.debug("Ignored Transaction threw an Exception.", e);
-                }
-            }
-            runCopyTransactionAsync(template, buildView.evaluate(), context); //remember this requires linear time, but is required so that we can pass it off-thread!
+        } else {
+            BuildingGadgets.LOG.error("Even though only synchronous operations are performed, No Transaction could be created. This should not be possible");
         }
-    }
-
-    private void runCopyTransactionAsync(ITemplate template, MapBackedBuildView buildView, IBuildContext context) {
-        TransactionPoolExecutor.INSTANCE.tryExecuteTransaction(
-                template,
-                tr -> tr.operate(TemplateTransactions.copyOperator(buildView.getMap())),
-                (cr, tr) -> {
-                    ServerTickingScheduler.runTickedStartAndEnd(() -> {
-                        assert context.getBuildingPlayer() != null;
-                        //context.getBuildingPlayer().sendStatusMessage();
-                        return false;
-                    });
-                },
-                TRANSACTION_CREATION_LIMIT,
-                context);
     }
 
     private void build(ItemStack stack, World world, PlayerEntity player, BlockPos pos) {
@@ -412,6 +410,7 @@ public class GadgetCopyPaste extends AbstractGadget {
     private void schedulePlacement(IBuildView view, BlockPos pos) {
         view.translateTo(pos);
         PlacementScheduler.schedulePlacement(t -> {//TODO PlacementLogic and mechanism to stop when missing blocks!
+            BuildingGadgets.LOG.info("placing " + t);//TODO remove Debug code
             EffectBlock.spawnEffectBlock(view.getContext(), t, Mode.PLACE, false);
         }, view, 250);
     }

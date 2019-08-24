@@ -20,8 +20,14 @@ public abstract class AbsSingleRunTransactionOperator implements ITransactionOpe
     @Nullable
     @Override
     public BlockPos createPos(ITransactionExecutionContext context) {
-        remainingOperations.remove(TransactionOperation.CREATE_DATA);
         return ITransactionOperator.super.createPos(context);
+    }
+
+    @Nullable
+    @Override
+    public BlockData createDataForPos(ITransactionExecutionContext context, BlockPos pos) {
+        remainingOperations.remove(TransactionOperation.CREATE_DATA);
+        return null;
     }
 
     @Override
@@ -33,21 +39,21 @@ public abstract class AbsSingleRunTransactionOperator implements ITransactionOpe
     @Nullable
     @Override
     public BlockData transformData(ITransactionExecutionContext context, BlockData data) {
-        remainingOperations.remove(TransactionOperation.TRANSFORM_HEADER);
+        remainingOperations.remove(TransactionOperation.TRANSFORM_DATA);
         return null;
     }
 
     @Nullable
     @Override
     public BlockPos transformPos(ITransactionExecutionContext context, BlockPos pos, BlockData data) {
-        remainingOperations.remove(TransactionOperation.TRANSFORM_HEADER);
+        remainingOperations.remove(TransactionOperation.TRANSFORM_POSITION);
         return ITransactionOperator.super.transformPos(context, pos, data);
     }
 
     @Nullable
     @Override
     public PlacementTarget transformTarget(ITransactionExecutionContext context, PlacementTarget target) {
-        remainingOperations.remove(TransactionOperation.TRANSFORM_HEADER);
+        remainingOperations.remove(TransactionOperation.TRANSFORM_TARGET);
         return ITransactionOperator.super.transformTarget(context, target);
     }
 

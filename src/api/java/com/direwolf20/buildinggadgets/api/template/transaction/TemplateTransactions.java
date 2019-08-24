@@ -45,7 +45,6 @@ public final class TemplateTransactions {
         @Nullable
         @Override
         public BlockPos createPos(ITransactionExecutionContext context) {
-            super.createPos(context);
             if (positions != null && positions.hasNext())
                 return positions.next();
             positions = null;
@@ -55,6 +54,7 @@ public final class TemplateTransactions {
         @Nullable
         @Override
         public BlockData createDataForPos(ITransactionExecutionContext context, BlockPos pos) {
+            super.createDataForPos(context, pos);
             return getDataMap().get(pos);
         }
 
@@ -114,7 +114,6 @@ public final class TemplateTransactions {
         @Nullable
         @Override
         public BlockPos createPos(ITransactionExecutionContext context) {
-            super.createPos(context);
             return copyOperator.createPos(context);
         }
 
