@@ -1,12 +1,8 @@
 package com.direwolf20.buildinggadgets.common.items.gadgets;
 
 import com.direwolf20.buildinggadgets.api.building.Region;
-import com.direwolf20.buildinggadgets.api.building.view.IBuildContext;
-import com.direwolf20.buildinggadgets.api.building.view.IBuildView;
-import com.direwolf20.buildinggadgets.api.building.view.SimpleBuildContext;
-import com.direwolf20.buildinggadgets.api.building.view.WorldBackedBuildView;
+import com.direwolf20.buildinggadgets.api.building.view.*;
 import com.direwolf20.buildinggadgets.api.capability.CapabilityTemplate;
-import com.direwolf20.buildinggadgets.api.exceptions.TemplateException;
 import com.direwolf20.buildinggadgets.api.exceptions.TransactionExecutionException;
 import com.direwolf20.buildinggadgets.api.template.IBuildOpenOptions;
 import com.direwolf20.buildinggadgets.api.template.IBuildOpenOptions.OpenType;
@@ -14,7 +10,6 @@ import com.direwolf20.buildinggadgets.api.template.ITemplate;
 import com.direwolf20.buildinggadgets.api.template.SimpleBuildOpenOptions;
 import com.direwolf20.buildinggadgets.api.template.transaction.ITemplateTransaction;
 import com.direwolf20.buildinggadgets.api.template.transaction.TemplateTransactions;
-import com.direwolf20.buildinggadgets.api.util.DebugUtils;
 import com.direwolf20.buildinggadgets.client.events.EventTooltip;
 import com.direwolf20.buildinggadgets.client.gui.GuiMod;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
@@ -22,6 +17,7 @@ import com.direwolf20.buildinggadgets.common.blocks.EffectBlock;
 import com.direwolf20.buildinggadgets.common.blocks.EffectBlock.Mode;
 import com.direwolf20.buildinggadgets.common.capability.DelegatingTemplateProvider;
 import com.direwolf20.buildinggadgets.common.commands.CopyUnloadedCommand;
+import com.direwolf20.buildinggadgets.common.concurrent.CopyScheduler;
 import com.direwolf20.buildinggadgets.common.concurrent.PlacementScheduler;
 import com.direwolf20.buildinggadgets.common.concurrent.ServerTickingScheduler;
 import com.direwolf20.buildinggadgets.common.concurrent.TimeOutSupplier;
@@ -62,7 +58,6 @@ import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.common.util.LazyOptional;
-import org.apache.logging.log4j.Level;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -333,16 +328,6 @@ public class GadgetCopyPaste extends AbstractGadget {
             WorldBackedBuildView buildView = WorldBackedBuildView.create(context, region);
             //runCopyTransactionAsync(template, buildView, context);
             runCopyTransactionSync(stack, template, buildView);
-            //TODO remove Debug code!
-            IBuildView view = template.createViewInContext(SimpleBuildOpenOptions.withContext(context));
-            if (view != null) {
-                DebugUtils.printBuildToLog(BuildingGadgets.LOG, Level.INFO, view, false);
-                try {
-                    view.close();
-                } catch (TemplateException e) {
-                    BuildingGadgets.LOG.error(e);
-                }
-            }
         });
     }
 
@@ -351,17 +336,22 @@ public class GadgetCopyPaste extends AbstractGadget {
         if (transaction != null) {
             IBuildContext context = buildView.getContext();
             assert context.getBuildingPlayer() != null;
-            try {
-                //TODO move operation into multiple steps
-                transaction
-                        .operate(TemplateTransactions.replaceOperator(buildView))
-                        .operate(TemplateTransactions.headerOperator(
-                                "Copy " + getAndIncrementCopyCounter(stack),
-                                context.getBuildingPlayer().getDisplayName().getUnformattedComponentText()))
-                        .execute(context);
-            } catch (TransactionExecutionException e) {
-                BuildingGadgets.LOG.error("Transaction Execution failed synchronously this should not have been possible!", e);
-            }
+            CopyScheduler.scheduleCopy(map -> {
+                MapBackedBuildView view = MapBackedBuildView.create(context, map);
+                ServerTickingScheduler.runTickedStartAndEnd(() -> {
+                    try { //TODO check whether this should run async or not
+                        transaction
+                                .operate(TemplateTransactions.replaceOperator(view))
+                                .operate(TemplateTransactions.headerOperator(
+                                        "Copy " + getAndIncrementCopyCounter(stack),
+                                        context.getBuildingPlayer().getDisplayName().getUnformattedComponentText()))
+                                .execute(context);
+                    } catch (TransactionExecutionException e) {
+                        BuildingGadgets.LOG.error("Transaction Execution failed synchronously this should not have been possible!", e);
+                    }
+                    return false;
+                });
+            }, buildView, 4096);
         } else {
             BuildingGadgets.LOG.error("Even though only synchronous operations are performed, No Transaction could be created. This should not be possible");
         }
@@ -410,7 +400,6 @@ public class GadgetCopyPaste extends AbstractGadget {
     private void schedulePlacement(IBuildView view, BlockPos pos) {
         view.translateTo(pos);
         PlacementScheduler.schedulePlacement(t -> {//TODO PlacementLogic and mechanism to stop when missing blocks!
-            BuildingGadgets.LOG.info("placing " + t);//TODO remove Debug code
             EffectBlock.spawnEffectBlock(view.getContext(), t, Mode.PLACE, false);
         }, view, 250);
     }
