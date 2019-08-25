@@ -21,6 +21,13 @@ public final class ServerTickingScheduler {
         new ServerTickingScheduler(runUntilFalse, EnumSet.allOf(Phase.class));
     }
 
+    public static void runOnServerOnce(Runnable runnable) {
+        runTickedStartAndEnd(() -> {
+            runnable.run();
+            return false;
+        });
+    }
+
     private final BooleanSupplier runnable;
     private final EnumSet<Phase> phases;
 

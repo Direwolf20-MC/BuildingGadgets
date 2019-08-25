@@ -11,6 +11,7 @@ public final class NBTKeys {
 
     public static final String GADGET_MODE = "mode";
     public static final String GADGET_TICKS = "ticks";
+    public static final String GADGET_BUSY = "busy";
     public static final String GADGET_REPLACEMENT_BLOCK = "replacement_block";
     public static final String GADGET_SOURCE_BLOCK = "source_block";
     public static final String GADGET_USE_PASTE = "use_paste";

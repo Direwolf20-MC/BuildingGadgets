@@ -1,11 +1,15 @@
 package com.direwolf20.buildinggadgets.common.items.gadgets;
 
 import com.direwolf20.buildinggadgets.api.building.Region;
-import com.direwolf20.buildinggadgets.api.building.view.*;
+import com.direwolf20.buildinggadgets.api.building.view.IBuildContext;
+import com.direwolf20.buildinggadgets.api.building.view.IBuildView;
+import com.direwolf20.buildinggadgets.api.building.view.SimpleBuildContext;
+import com.direwolf20.buildinggadgets.api.building.view.WorldBackedBuildView;
 import com.direwolf20.buildinggadgets.api.capability.CapabilityTemplate;
 import com.direwolf20.buildinggadgets.api.exceptions.TransactionExecutionException;
-import com.direwolf20.buildinggadgets.api.template.IBuildOpenOptions;
-import com.direwolf20.buildinggadgets.api.template.IBuildOpenOptions.OpenType;
+import com.direwolf20.buildinggadgets.api.exceptions.TransactionResultExceedsTemplateSizeException;
+import com.direwolf20.buildinggadgets.api.exceptions.TransactionResultExceedsTemplateSizeException.BlockPosOutOfBounds;
+import com.direwolf20.buildinggadgets.api.exceptions.TransactionResultExceedsTemplateSizeException.ToManyDifferentBlockDataInstances;
 import com.direwolf20.buildinggadgets.api.template.ITemplate;
 import com.direwolf20.buildinggadgets.api.template.SimpleBuildOpenOptions;
 import com.direwolf20.buildinggadgets.api.template.transaction.ITemplateTransaction;
@@ -20,7 +24,7 @@ import com.direwolf20.buildinggadgets.common.commands.CopyUnloadedCommand;
 import com.direwolf20.buildinggadgets.common.concurrent.CopyScheduler;
 import com.direwolf20.buildinggadgets.common.concurrent.PlacementScheduler;
 import com.direwolf20.buildinggadgets.common.concurrent.ServerTickingScheduler;
-import com.direwolf20.buildinggadgets.common.concurrent.TimeOutSupplier;
+import com.direwolf20.buildinggadgets.common.concurrent.TransactionPoolExecutor;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.items.gadgets.renderers.BaseRenderer;
 import com.direwolf20.buildinggadgets.common.items.gadgets.renderers.CopyPasteRender;
@@ -29,6 +33,7 @@ import com.direwolf20.buildinggadgets.common.network.packets.PacketBindTool;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
 import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
+import com.direwolf20.buildinggadgets.common.util.lang.ITranslationProvider;
 import com.direwolf20.buildinggadgets.common.util.lang.MessageTranslation;
 import com.direwolf20.buildinggadgets.common.util.lang.Styles;
 import com.direwolf20.buildinggadgets.common.util.lang.TooltipTranslation;
@@ -53,6 +58,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.Style;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
@@ -129,6 +135,27 @@ public class GadgetCopyPaste extends AbstractGadget {
         providerBuilder.add(new DelegatingTemplateProvider());
     }
 
+    public static boolean isBusy(ItemStack stack) {
+        return NBTHelper.getOrNewTag(stack).contains(NBTKeys.GADGET_BUSY);
+    }
+
+    public static void setCopyBusy(ItemStack stack, Region regionCopied) {
+        CompoundNBT nbt = NBTHelper.getOrNewTag(stack);
+        nbt.remove(NBTKeys.GADGET_BUSY);
+        nbt.put(NBTKeys.GADGET_BUSY, regionCopied.serialize());
+    }
+
+    public static void setBuildBusy(ItemStack stack) {
+        CompoundNBT nbt = NBTHelper.getOrNewTag(stack);
+        nbt.remove(NBTKeys.GADGET_BUSY);
+        nbt.putBoolean(NBTKeys.GADGET_BUSY, true);
+    }
+
+    public static void freeGadget(ItemStack stack) {
+        CompoundNBT nbt = NBTHelper.getOrNewTag(stack);
+        nbt.remove(NBTKeys.GADGET_BUSY);
+    }
+
     public static int getCopyCounter(ItemStack stack) {
         CompoundNBT nbt = NBTHelper.getOrNewTag(stack);
         return nbt.getInt(NBTKeys.TEMPLATE_COPY_COUNT); //returns 0 if not present
@@ -152,9 +179,8 @@ public class GadgetCopyPaste extends AbstractGadget {
     public static Optional<Region> getSelectedRegion(ItemStack stack) {
         BlockPos lower = getLowerRegionBound(stack);
         BlockPos upper = getUpperRegionBound(stack);
-        if (lower != null && upper != null) {
+        if (lower != null && upper != null)
             return Optional.of(new Region(lower, upper));
-        }
         return Optional.empty();
     }
 
@@ -300,6 +326,14 @@ public class GadgetCopyPaste extends AbstractGadget {
         return new ActionResult<>(ActionResultType.SUCCESS, stack);
     }
 
+    private boolean checkAndNotifyGadgetBusy(ItemStack stack, PlayerEntity player) {
+        if (isBusy(stack)) {
+            player.sendStatusMessage(MessageTranslation.GADGET_BUSY.componentTranslation().setStyle(Styles.RED), true);
+            return true;
+        }
+        return false;
+    }
+
     private void setRegionAndCopy(ItemStack stack, World world, PlayerEntity player, BlockPos lookedAt) {
         if (player.isSneaking())
             setUpperRegionBound(stack, lookedAt);
@@ -326,81 +360,131 @@ public class GadgetCopyPaste extends AbstractGadget {
                     .usedStack(stack)
                     .build(world);
             WorldBackedBuildView buildView = WorldBackedBuildView.create(context, region);
-            //runCopyTransactionAsync(template, buildView, context);
-            runCopyTransactionSync(stack, template, buildView);
+            runCopyTransaction(stack, template, buildView);
         });
     }
 
-    private void runCopyTransactionSync(ItemStack stack, ITemplate template, WorldBackedBuildView buildView) {
+    private void runCopyTransaction(ItemStack stack, ITemplate template, WorldBackedBuildView buildView) {
+        IBuildContext context = buildView.getContext();
+        assert context.getBuildingPlayer() != null;
+        if (checkAndNotifyGadgetBusy(stack, context.getBuildingPlayer()))
+            return;
+        setCopyBusy(stack, buildView.getBoundingBox());
         ITemplateTransaction transaction = template.startTransaction();
         if (transaction != null) {
-            IBuildContext context = buildView.getContext();
-            assert context.getBuildingPlayer() != null;
             CopyScheduler.scheduleCopy(map -> {
-                MapBackedBuildView view = MapBackedBuildView.create(context, map);
-                ServerTickingScheduler.runTickedStartAndEnd(() -> {
-                    try { //TODO check whether this should run async or not
-                        transaction
-                                .operate(TemplateTransactions.replaceOperator(view))
-                                .operate(TemplateTransactions.headerOperator(
-                                        "Copy " + getAndIncrementCopyCounter(stack),
-                                        context.getBuildingPlayer().getDisplayName().getUnformattedComponentText()))
-                                .execute(context);
-                    } catch (TransactionExecutionException e) {
-                        BuildingGadgets.LOG.error("Transaction Execution failed synchronously this should not have been possible!", e);
-                    }
-                    return false;
-                });
-            }, buildView, 4096);
-        } else {
-            BuildingGadgets.LOG.error("Even though only synchronous operations are performed, No Transaction could be created. This should not be possible");
+                transaction
+                        .operate(TemplateTransactions.replaceOperator(map))
+                        .operate(TemplateTransactions.headerOperator(
+                                "Copy " + getAndIncrementCopyCounter(stack),
+                                context.getBuildingPlayer().getDisplayName().getUnformattedComponentText()));
+                if (Config.GADGETS.GADGET_COPY_PASTE.maxSynchronousExecution.get() >= map.size())
+                    performTransactionSync(stack, transaction, context);
+                else
+                    performTransactionAsync(stack, transaction, context);
+            }, buildView, Config.GADGETS.GADGET_COPY_PASTE.copySteps.get());
+        } else
+            BuildingGadgets.LOG.error("No Transaction could be created. This should not be possible.");
+    }
+
+    private void performTransactionSync(ItemStack stack, ITemplateTransaction transaction, IBuildContext context) {
+        assert context.getBuildingPlayer() != null;
+        PlayerEntity player = context.getBuildingPlayer();
+        ServerTickingScheduler.runTickedStartAndEnd(() -> {
+            try {
+                transaction.execute(context);
+                onCopyFinished(stack, player);
+            } catch (ToManyDifferentBlockDataInstances e) {
+                BuildingGadgets.LOG.trace("Too many different Blocks detected!", e);
+                onTooManyDifferentBlocks(stack, player);
+            } catch (BlockPosOutOfBounds e) {
+                BuildingGadgets.LOG.trace("Too large Area detected!", e);
+                onTooBigArea(stack, player);
+            } catch (TransactionResultExceedsTemplateSizeException e) {
+                BuildingGadgets.LOG.trace("Too many Blocks detected!", e);
+                onTooManyBlocks(stack, player);
+            } catch (TransactionExecutionException e) {
+                BuildingGadgets.LOG.error("Transaction Execution failed synchronously!", e);
+                onCopyFail(stack, player);
+            }
+            return false;
+        });
+    }
+
+    private void performTransactionAsync(ItemStack stack, ITemplateTransaction transaction, IBuildContext context) {
+        assert context.getBuildingPlayer() != null;
+        PlayerEntity player = context.getBuildingPlayer();
+        if (! TransactionPoolExecutor.INSTANCE.submitTask(() -> {
+            try {
+                transaction.execute(context);
+                ServerTickingScheduler.runOnServerOnce(() -> onCopyFinished(stack, context.getBuildingPlayer()));
+            } catch (ToManyDifferentBlockDataInstances e) {
+                BuildingGadgets.LOG.trace("Too many different Blocks detected!", e);
+                ServerTickingScheduler.runOnServerOnce(() -> onTooManyDifferentBlocks(stack, player));
+            } catch (BlockPosOutOfBounds e) {
+                BuildingGadgets.LOG.trace("Too large Area detected!", e);
+                ServerTickingScheduler.runOnServerOnce(() -> onTooBigArea(stack, player));
+            } catch (TransactionResultExceedsTemplateSizeException e) {
+                BuildingGadgets.LOG.trace("Too many Blocks detected!", e);
+                ServerTickingScheduler.runOnServerOnce(() -> onTooManyBlocks(stack, player));
+            } catch (TransactionExecutionException e) {
+                BuildingGadgets.LOG.error("Transaction Execution failed asynchronously!", e);
+                ServerTickingScheduler.runOnServerOnce(() -> onCopyFail(stack, player));
+            }
+        })) { //could not submit
+            player.sendStatusMessage(MessageTranslation.SERVER_BUSY.componentTranslation().setStyle(Styles.RED), true);
+            freeGadget(stack);
         }
     }
 
+    private void onCopyFinished(ItemStack stack, PlayerEntity player) {
+        sendMessageAndFree(stack, player, MessageTranslation.AREA_COPIED, Styles.DK_GREEN);
+    }
+
+    private void onTooManyDifferentBlocks(ItemStack stack, PlayerEntity player) {
+        sendMessageAndFree(stack, player, MessageTranslation.AREA_COPIED_FAILED_TOO_MANY_DIFF, Styles.RED);
+    }
+
+    private void onTooManyBlocks(ItemStack stack, PlayerEntity player) {
+        sendMessageAndFree(stack, player, MessageTranslation.AREA_COPIED_FAILED_TOO_MANY, Styles.RED);
+    }
+
+    private void onTooBigArea(ItemStack stack, PlayerEntity player) {
+        sendMessageAndFree(stack, player, MessageTranslation.AREA_COPIED_FAILED_TOO_BIG, Styles.RED);
+    }
+
+    private void onCopyFail(ItemStack stack, PlayerEntity player) {
+        sendMessageAndFree(stack, player, MessageTranslation.AREA_COPIED_FAILED, Styles.RED);
+    }
+
     private void build(ItemStack stack, World world, PlayerEntity player, BlockPos pos) {
+        if (checkAndNotifyGadgetBusy(stack, player))
+            return;
         stack.getCapability(CapabilityTemplate.TEMPLATE_CAPABILITY).ifPresent(template -> {
-            SimpleBuildOpenOptions openOptions = SimpleBuildOpenOptions.builder()
-                    .context(SimpleBuildContext.builder()
-                            .usedStack(stack)
-                            .buildingPlayer(player)
-                            .build(world))
-                    .openType(OpenType.IF_NO_TRANSACTION_OPEN)
-                    .build();
+            SimpleBuildOpenOptions openOptions = SimpleBuildOpenOptions.withContext(SimpleBuildContext.builder()
+                    .usedStack(stack)
+                    .buildingPlayer(player)
+                    .build(world));
             IBuildView view = template.createViewInContext(openOptions);
             if (view != null)
-                schedulePlacement(view, pos);
-            else
-                awaitFreePlacement(template, openOptions, pos);
+                schedulePlacement(stack, view, player, pos);
         });
     }
 
-    private void awaitFreePlacement(ITemplate template, IBuildOpenOptions openOptions, BlockPos pos) {
-        ServerTickingScheduler.runTicked(new TimeOutSupplier(TRANSACTION_CREATION_LIMIT) {
-            @Override
-            protected boolean run() {
-                IBuildView view = template.createViewInContext(openOptions);
-                if (view != null) {
-                    schedulePlacement(view, pos);
-                    return true;
-                }
-                return false;
-            }
-
-            @Override
-            protected void onTimeout() {
-                SimpleBuildOpenOptions forceOptions = SimpleBuildOpenOptions
-                        .builderCopyOf(openOptions)
-                        .openType(OpenType.DEFAULT)
-                        .build();
-                schedulePlacement(template.createViewInContext(forceOptions), pos);
-            }
-        });
-    }
-
-    private void schedulePlacement(IBuildView view, BlockPos pos) {
+    private void schedulePlacement(ItemStack stack, IBuildView view, PlayerEntity player, BlockPos pos) {
         view.translateTo(pos);
         PlacementScheduler.schedulePlacement(t -> {//TODO PlacementLogic and mechanism to stop when missing blocks!
             EffectBlock.spawnEffectBlock(view.getContext(), t, Mode.PLACE, false);
-        }, view, 250);
+        }, view, Config.GADGETS.GADGET_COPY_PASTE.placeSteps.get())
+                .withFinisher(() -> onBuildFinished(stack, player));
+    }
+
+    private void onBuildFinished(ItemStack stack, PlayerEntity player) {
+        sendMessageAndFree(stack, player, MessageTranslation.TEMPLATE_BUILD, Styles.DK_GREEN);
+    }
+
+    private void sendMessageAndFree(ItemStack stack, PlayerEntity player, ITranslationProvider messageSource, Style style) {
+        player.sendStatusMessage(messageSource.componentTranslation().setStyle(style), true);
+        freeGadget(stack);
     }
 }

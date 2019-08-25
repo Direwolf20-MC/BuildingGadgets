@@ -10,26 +10,31 @@ import java.util.Spliterator;
 import java.util.function.Consumer;
 
 public final class PlacementScheduler extends SteppedScheduler {
-    public static void schedulePlacement(Consumer<PlacementTarget> consumer, IBuildView view, int steps) {
+    public static PlacementScheduler schedulePlacement(Consumer<PlacementTarget> consumer, IBuildView view, int steps) {
         Preconditions.checkArgument(steps > 0);
-        ServerTickingScheduler.runTicked(new PlacementScheduler(
+        PlacementScheduler res = new PlacementScheduler(
                 Objects.requireNonNull(consumer),
                 Objects.requireNonNull(view),
-                steps, true));
+                steps, true);
+        ServerTickingScheduler.runTicked(res);
+        return res;
     }
 
-    public static void schedulePlacementNoClose(Consumer<PlacementTarget> consumer, IBuildView view, int steps) {
+    public static PlacementScheduler schedulePlacementNoClose(Consumer<PlacementTarget> consumer, IBuildView view, int steps) {
         Preconditions.checkArgument(steps > 0);
-        ServerTickingScheduler.runTicked(new PlacementScheduler(
+        PlacementScheduler res = new PlacementScheduler(
                 Objects.requireNonNull(consumer),
                 Objects.requireNonNull(view),
-                steps, false));
+                steps, false);
+        ServerTickingScheduler.runTicked(res);
+        return res;
     }
 
     private final IBuildView view;
     private Spliterator<PlacementTarget> spliterator;
     private Consumer<PlacementTarget> consumer;
     private boolean close;
+    private Runnable finisher;
 
     private PlacementScheduler(Consumer<PlacementTarget> consumer, IBuildView view, int steps, boolean close) {
         super(steps);
@@ -37,6 +42,7 @@ public final class PlacementScheduler extends SteppedScheduler {
         this.view = view;
         this.spliterator = view.spliterator();
         this.close = close;
+        this.finisher = () -> {};
     }
     @Override
     protected void onFinish() {
@@ -52,5 +58,10 @@ public final class PlacementScheduler extends SteppedScheduler {
     @Override
     protected boolean advance() {
         return spliterator.tryAdvance(consumer);
+    }
+
+    public PlacementScheduler withFinisher(Runnable runnable) {
+        this.finisher = Objects.requireNonNull(runnable);
+        return this;
     }
 }

@@ -7,6 +7,7 @@ import com.direwolf20.buildinggadgets.api.building.Region;
 import com.direwolf20.buildinggadgets.api.building.view.IBuildContext;
 import com.direwolf20.buildinggadgets.api.building.view.IBuildView;
 import com.direwolf20.buildinggadgets.api.exceptions.TransactionExecutionException;
+import com.direwolf20.buildinggadgets.api.exceptions.TransactionResultExceedsTemplateSizeException;
 import com.direwolf20.buildinggadgets.api.exceptions.TransactionResultExceedsTemplateSizeException.BlockPosOutOfBounds;
 import com.direwolf20.buildinggadgets.api.exceptions.TransactionResultExceedsTemplateSizeException.ToManyDifferentBlockDataInstances;
 import com.direwolf20.buildinggadgets.api.materials.MaterialList;
@@ -456,10 +457,13 @@ public final class ImmutableTemplate implements ITemplate {
             MaterialList.Builder builder = context != null ? MaterialList.builder() : null;
             Region.Builder regionBuilder = Region.enclosingBuilder();
             BlockPos smallest = headerInfo.getBoundingBox().getMin(); //because we always update the boundingBox, it is safe to assume that this provides the min position
+            long count = 0;
             for (Map.Entry<BlockPos, BlockData> entry : posToData.entrySet()) {
                 //ensure that positions are shifted as much as possible towards (0, 0, 0) => There will be at least one position for each axis which has the value equal to 0
                 //validatePos will fail whenever the BlockPos would not be serializable
                 BlockPos resPos = validatePos(entry.getKey().subtract(smallest));
+                if (++ count > Integer.MAX_VALUE)
+                    throw new TransactionResultExceedsTemplateSizeException("Attempted to add the " + count + "BlockPos!", this);
                 posToStateId.put(MathUtils.posToLong(resPos), reverseMap.getInt(entry.getValue()));
                 if (context != null) {
                     PlacementTarget target = new PlacementTarget(resPos, entry.getValue());

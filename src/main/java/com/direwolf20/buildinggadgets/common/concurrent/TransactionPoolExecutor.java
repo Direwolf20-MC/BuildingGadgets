@@ -30,6 +30,10 @@ public enum TransactionPoolExecutor {
         executor.allowCoreThreadTimeOut(true);
     }
 
+    public boolean submitTask(Runnable task) {
+        return submitTask(task, () -> {});
+    }
+
     public boolean submitTask(Runnable task, Runnable completionListener) {
         try {
             executor.execute(() -> {
