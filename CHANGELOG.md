@@ -1,7 +1,7 @@
 # Building Gadgets Changelog
 The format of this document is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and should continue to adhere to the conventions outlined in the Keep a Changelog guidelines.
 
-## Unreleased [3.0.3a - 1.14.4]
+## [3.0.3a - 1.14.4] - 2019-08-26
 ### Changed
 - Converted the Destruction-Gadget's connected area mode to use the same algorithm as the other Gadget's
 ### Fixed
@@ -38,7 +38,7 @@ The format of this document is based on [Keep a Changelog](https://keepachangelo
 - Removed durability option as it was causing very weird issues...
     - you've got a (by default very fast) charging station now.
 
-## [Unreleased] [2.7.3 - 1.12.2]
+## [2.7.3 - 1.12.2] - 2019-08-26
 ### Fixed
 - Fixed the Destruction Gadget in Connected Surface Mode always using a depth of 1, regardless of the setting
 - Fixed the Destruction Gadget in Connected Surface Mode ignoring bed-rock and other in-destructible things 
