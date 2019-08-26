@@ -14,6 +14,7 @@ import com.direwolf20.buildinggadgets.api.template.DelegatingTemplate.Delegating
 import com.direwolf20.buildinggadgets.api.template.ImmutableTemplate;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Supplier;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.InterModComms;
@@ -21,6 +22,8 @@ import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.RegistryBuilder;
+
+import javax.annotation.Nullable;
 
 @EventBusSubscriber(modid = APIReference.MODID, bus = Bus.MOD)
 public final class Registries {
@@ -40,6 +43,16 @@ public final class Registries {
         Preconditions
                 .checkState(templateSerializers != null, "Attempted to retrieve TemplateSerializerRegistry before registries were created!");
         return templateSerializers;
+    }
+
+    @Nullable
+    public static ITemplateSerializer getTemplateSerializer(String s) {
+        return getTemplateSerializer(new ResourceLocation(s));
+    }
+
+    @Nullable
+    public static ITemplateSerializer getTemplateSerializer(ResourceLocation location) {
+        return getTemplateSerializers().getValue(location);
     }
 
     static void onCreateRegistries() {
