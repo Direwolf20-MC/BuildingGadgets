@@ -378,6 +378,7 @@ public class GadgetCopyPaste extends AbstractGadget {
                         .operate(TemplateTransactions.headerOperator(
                                 "Copy " + getAndIncrementCopyCounter(stack),
                                 context.getBuildingPlayer().getDisplayName().getUnformattedComponentText()));
+                BuildingGadgets.LOG.info("Copying " + map.size());
                 if (Config.GADGETS.GADGET_COPY_PASTE.maxSynchronousExecution.get() >= map.size())
                     performTransactionSync(stack, transaction, context);
                 else
@@ -390,7 +391,7 @@ public class GadgetCopyPaste extends AbstractGadget {
     private void performTransactionSync(ItemStack stack, ITemplateTransaction transaction, IBuildContext context) {
         assert context.getBuildingPlayer() != null;
         PlayerEntity player = context.getBuildingPlayer();
-        ServerTickingScheduler.runTickedStartAndEnd(() -> {
+        ServerTickingScheduler.runOnServerOnce(() -> {
             try {
                 transaction.execute(context);
                 onCopyFinished(stack, player);
@@ -407,7 +408,6 @@ public class GadgetCopyPaste extends AbstractGadget {
                 BuildingGadgets.LOG.error("Transaction Execution failed synchronously!", e);
                 onCopyFail(stack, player);
             }
-            return false;
         });
     }
 

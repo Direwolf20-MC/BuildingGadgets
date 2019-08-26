@@ -12,6 +12,7 @@ import com.direwolf20.buildinggadgets.common.config.crafting.RecipeConstructionP
 import com.direwolf20.buildinggadgets.common.events.AnvilRepairHandler;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.registry.objects.BuildingObjects;
+import com.direwolf20.buildinggadgets.common.save.TemplateSave;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import net.minecraft.command.Commands;
 import net.minecraft.item.crafting.IRecipeSerializer;
@@ -49,6 +50,7 @@ public final class BuildingGadgets {
     }
 
     private final BuildingGadgetsAPI theAPi;
+    private TemplateSave copyPasteSave;
 
     public BuildingGadgets() {
         theAPi = new BuildingGadgetsAPI();
@@ -93,6 +95,7 @@ public final class BuildingGadgets {
                         .then(BlockMapCommand.registerList())
                         .then(BlockMapCommand.registerDelete())
         );
+        BuildingGadgets.LOG.info("DataDir = {}; FolderName={}", event.getServer().getDataDirectory().getAbsolutePath(), event.getServer().getFolderName());
     }
 
     private void finishLoad(FMLLoadCompleteEvent event) {
