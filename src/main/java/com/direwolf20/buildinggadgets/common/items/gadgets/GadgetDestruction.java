@@ -1,6 +1,5 @@
 package com.direwolf20.buildinggadgets.common.items.gadgets;
 
-import com.direwolf20.buildinggadgets.api.building.BlockData;
 import com.direwolf20.buildinggadgets.api.building.Region;
 import com.direwolf20.buildinggadgets.api.building.placement.IPositionPlacementSequence;
 import com.direwolf20.buildinggadgets.api.building.placement.PlacementSequences.ConnectedSurface;
@@ -12,6 +11,7 @@ import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.items.gadgets.renderers.BaseRenderer;
 import com.direwolf20.buildinggadgets.common.items.gadgets.renderers.DestructionRender;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
+import com.direwolf20.buildinggadgets.common.save.WorldSave;
 import com.direwolf20.buildinggadgets.common.tiles.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.blocks.RegionSnapshot;
@@ -23,7 +23,6 @@ import com.direwolf20.buildinggadgets.common.util.lang.Styles;
 import com.direwolf20.buildinggadgets.common.util.lang.TooltipTranslation;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.util.tools.SetBackedPlacementSequence;
-import com.direwolf20.buildinggadgets.common.world.WorldSave;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.util.ITooltipFlag;
@@ -47,12 +46,10 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.BlockSnapshot;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.world.BlockEvent;
-import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nullable;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -313,20 +310,9 @@ public class GadgetDestruction extends AbstractGadget {
             return;
 
         RegionSnapshot snapshot = RegionSnapshot.deserialize(serializedSnapshot);
-        restoreSnapshotWithBuilder(world, snapshot);
+        snapshot.restore(world);
         worldSave.addToMap(getUUID(stack).toString(), new CompoundNBT());
         worldSave.markDirty();
-    }
-
-    public static void restoreSnapshotWithBuilder(World world, RegionSnapshot snapshot) {
-        Set<BlockPos> pastePositions = snapshot.getTileData().stream()
-                .map(Pair::getLeft)
-                .collect(Collectors.toSet());
-        int index = 0;
-        for (BlockPos pos : snapshot.getPositions()) {
-            snapshot.getBlockStates().get(index).ifPresent(state -> EffectBlock.spawnEffectBlock(world, pos, new BlockData(state, TileSupport.dummyTileEntityData()), EffectBlock.Mode.PLACE, pastePositions.contains(pos)));
-            index++;
-        }
     }
 
     private boolean destroyBlock(World world, BlockPos voidPos, ServerPlayerEntity player) {

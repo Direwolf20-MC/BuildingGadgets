@@ -22,10 +22,10 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
+import net.minecraft.world.IWorldReader;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.TriPredicate;
-import net.minecraftforge.fml.server.ServerLifecycleHooks;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.*;
@@ -42,7 +42,7 @@ public class RegionSnapshot {
     private static final String TILE_NBT = "block_nbt";
 
     private static CompoundNBT serialize(CompoundNBT tag, RegionSnapshot snapshot) {
-        tag.putString(DIMENSION, DimensionType.getKey(snapshot.world.getDimension().getType()).toString());
+        tag.putString(DIMENSION, DimensionType.getKey(snapshot.dim).toString());
 
         tag.put(POSITIONS, Objects.requireNonNull(NBTHelper.writeIterable(snapshot.positions, NBTUtil::writeBlockPos)));
         tag.put(NBTKeys.AREA, snapshot.positions.getBoundingBox().serialize());
@@ -129,7 +129,6 @@ public class RegionSnapshot {
 
     public static RegionSnapshot deserialize(CompoundNBT tag) {
         ResourceLocation dimension = new ResourceLocation(tag.getString(DIMENSION));
-        IWorld world = ServerLifecycleHooks.getCurrentServer().getWorld(Objects.requireNonNull(DimensionType.byName(dimension)));
 
         IPositionPlacementSequence positions = new SetBackedPlacementSequence(
                 NBTHelper.deserializeSet((ListNBT) tag.get(POSITIONS), new HashSet<>(), nbt -> NBTUtil.readBlockPos((CompoundNBT) nbt)),
@@ -171,7 +170,19 @@ public class RegionSnapshot {
                     serializedData.getCompound(TILE_NBT)));
         }
 
-        return new RegionSnapshot(world, positions, blockStates.build(), tileData.build());
+        return new RegionSnapshot(DimensionType.byName(dimension), positions, blockStates.build(), tileData.build());
+    }
+
+    public static Recorder record(BiPredicate<BlockPos, BlockState> normalValidator, TriPredicate<BlockPos, BlockState, TileEntity> tileValidator, int expectedSize) {
+        return new Recorder(normalValidator, tileValidator, expectedSize);
+    }
+
+    public static Recorder recordAll(int expectedSize) {
+        return record((p, s) -> true, (p, s, t) -> true, expectedSize);
+    }
+
+    public static Recorder recordAll() {
+        return recordAll(100);
     }
 
     /**
@@ -196,25 +207,27 @@ public class RegionSnapshot {
                 .build();
     }
 
-    private IWorld world;
+    private DimensionType dim;
     private IPositionPlacementSequence positions;
 
-    private ImmutableList<Optional<BlockState>> blockStates;
-    private ImmutableList<Pair<BlockPos, CompoundNBT>> tileData;
+    private List<Optional<BlockState>> blockStates;
+    private List<Pair<BlockPos, CompoundNBT>> tileData;
 
     /**
      * Cached serialized form. This is reliable because {@link RegionSnapshot} is <i>immutable</i>.
      */
     private CompoundNBT serializedForm;
 
-    private RegionSnapshot(IWorld world, IPositionPlacementSequence positions, ImmutableList<Optional<BlockState>> blockStates, ImmutableList<Pair<BlockPos, CompoundNBT>> tileData) {
-        this.world = world;
+    private RegionSnapshot(DimensionType dim, IPositionPlacementSequence positions, List<Optional<BlockState>> blockStates, List<Pair<BlockPos, CompoundNBT>> tileData) {
+        this.dim = Objects.requireNonNull(dim);
         this.positions = positions;
         this.blockStates = blockStates;
         this.tileData = tileData;
     }
 
-    public void restore() {
+    public void restore(IWorld world) {
+        if (dim != world.getDimension().getType())
+            return;
         int index = 0;
         for (BlockPos pos : positions) {
             blockStates.get(index).ifPresent(state -> world.setBlockState(pos, state, Constants.BlockFlags.DEFAULT));
@@ -242,7 +255,7 @@ public class RegionSnapshot {
      * that position should not be replaced regularly: it should be left untouched.
      */
     public ImmutableList<Optional<BlockState>> getBlockStates() {
-        return blockStates;
+        return ImmutableList.copyOf(blockStates);
     }
 
     /**
@@ -250,7 +263,7 @@ public class RegionSnapshot {
      * coordinate.
      */
     public ImmutableList<Pair<BlockPos, CompoundNBT>> getTileData() {
-        return tileData;
+        return ImmutableList.copyOf(tileData);
     }
 
     public CompoundNBT serialize() {
@@ -323,9 +336,7 @@ public class RegionSnapshot {
          * @see #checkTiles(TriPredicate)
          */
         public Builder recordTiles(boolean flag) {
-            Preconditions.checkState(!built);
-            tileValidator = flag ? (pos, state, tile) -> true : null;
-            return this;
+            return checkTiles(flag ? (pos, state, tile) -> true : (pos, state, tileEntity) -> false);
         }
 
         /**
@@ -360,9 +371,44 @@ public class RegionSnapshot {
                 throw new PaletteOverflowException(positions, uniqueBlocksStates.size());
 
             built = true;
-            return new RegionSnapshot(world, positions, blockStates, tileDataBuilder.build());
+            return new RegionSnapshot(world.getDimension().getType(), positions, blockStates, tileDataBuilder.build());
+        }
+    }
+
+    public static class Recorder {
+        private final Set<BlockPos> positions;
+        private final Region.Builder regionBuilder;
+        private final List<Optional<BlockState>> states;
+        private final List<Pair<BlockPos, CompoundNBT>> tileData;
+        private final BiPredicate<BlockPos, BlockState> normalValidator;
+        private final TriPredicate<BlockPos, BlockState, TileEntity> tileValidator;
+
+        private Recorder(BiPredicate<BlockPos, BlockState> normalValidator, TriPredicate<BlockPos, BlockState, TileEntity> tileValidator, int expectedSize) {
+            this.normalValidator = Objects.requireNonNull(normalValidator);
+            this.tileValidator = Objects.requireNonNull(tileValidator);
+            this.positions = new HashSet<>(expectedSize);
+            this.states = new ArrayList<>(expectedSize);
+            this.tileData = new ArrayList<>(expectedSize);
+            this.regionBuilder = Region.enclosingBuilder();
         }
 
+        public void record(IWorldReader world, BlockPos pos) {
+            TileEntity tile = world.getTileEntity(pos);
+            BlockState state = world.getBlockState(pos);
+            if (tile != null && tileValidator.test(pos, state, tile)) {
+                tileData.add(Pair.of(pos, tile.serializeNBT()));
+                states.add(Optional.of(state));
+            } else if (normalValidator.test(pos, state))
+                states.add(Optional.of(state));
+            else
+                states.add(Optional.empty());
+            this.positions.add(pos);
+            this.regionBuilder.enclose(pos);
+        }
+
+        public RegionSnapshot build(DimensionType dimensionIn) {
+            return new RegionSnapshot(dimensionIn, new SetBackedPlacementSequence(positions, regionBuilder.build()), states, tileData);
+        }
     }
 
 }
