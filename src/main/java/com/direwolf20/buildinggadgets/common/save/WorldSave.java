@@ -4,7 +4,6 @@ import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.world.World;
-import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraft.world.storage.DimensionSavedDataManager;
 import net.minecraft.world.storage.WorldSavedData;
@@ -61,8 +60,7 @@ public class WorldSave extends WorldSavedData {
 
     @Nonnull
     private static <T extends WorldSave> WorldSave get(World world, String name, Supplier<T> supplier) {
-        ServerWorld world2 = world.getServer().getWorld(DimensionType.OVERWORLD);
-        DimensionSavedDataManager storage = world2.getSavedData();
+        DimensionSavedDataManager storage = ((ServerWorld) world).getSavedData();
         T data = storage.getOrCreate(supplier, name);
         return data;
     }

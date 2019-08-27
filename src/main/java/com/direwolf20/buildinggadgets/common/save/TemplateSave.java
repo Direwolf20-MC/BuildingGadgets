@@ -7,8 +7,8 @@ import com.direwolf20.buildinggadgets.api.template.ImmutableTemplate;
 import com.direwolf20.buildinggadgets.api.template.TemplateIO;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
-import jdk.internal.jline.internal.Nullable;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -71,8 +71,8 @@ public final class TemplateSave {
 
     private void saveTemplateInfo(UUID id, TemplateInfo templateInfo) {
         String fileName = id.toString();
-        Path templateFile = saveFolder.resolve(fileName + Reference.TEMPLATE_FILE_ENDING);
-        Path templateHeaderFile = saveFolder.resolve(fileName + Reference.TEMPLATE_HEADER_FILE_ENDING);
+        Path templateFile = saveFolder.resolve(fileName + Reference.FILE_ENDING_TEMPLATE);
+        Path templateHeaderFile = saveFolder.resolve(fileName + Reference.FILE_ENDING_TEMPLATE_HEADER);
         templateInfo.saveTo(id, templateFile, templateHeaderFile);
     }
 
@@ -147,7 +147,7 @@ public final class TemplateSave {
                     TemplateIO.writeTemplate(template, stream);
                 }
             } catch (IOException e) {
-                BuildingGadgets.LOG.error("Failed to save {}{}!", id, Reference.TEMPLATE_FILE_ENDING, e);
+                BuildingGadgets.LOG.error("Failed to save {}{}!", id, Reference.FILE_ENDING_TEMPLATE, e);
             }
         }
 
@@ -159,7 +159,7 @@ public final class TemplateSave {
                     TemplateIO.writeTemplateHeaderJson(template, stream);
                 }
             } catch (IOException e) {
-                BuildingGadgets.LOG.error("Failed to save {}{}!", id, Reference.TEMPLATE_HEADER_FILE_ENDING, e);
+                BuildingGadgets.LOG.error("Failed to save {}{}!", id, Reference.FILE_ENDING_TEMPLATE_HEADER, e);
             }
         }
     }
@@ -171,12 +171,12 @@ public final class TemplateSave {
             if (file.getFileName() == null)
                 throw new IOException("Attempted to read from an unnamed file!");
             String name = file.getFileName().toString();
-            if (name.endsWith(Reference.TEMPLATE_FILE_ENDING)) {
-                String fileName = name.replace(Reference.TEMPLATE_FILE_ENDING, "");
+            if (name.endsWith(Reference.FILE_ENDING_TEMPLATE)) {
+                String fileName = name.replace(Reference.FILE_ENDING_TEMPLATE, "");
                 try {
                     UUID id = UUID.fromString(fileName);
                     Path parent = file.getParent();
-                    loadDataForId(id, file, parent != null ? parent.resolve(fileName + Reference.TEMPLATE_HEADER_FILE_ENDING) : null);
+                    loadDataForId(id, file, parent != null ? parent.resolve(fileName + Reference.FILE_ENDING_TEMPLATE_HEADER) : null);
                 } catch (IllegalArgumentException e) {
                     BuildingGadgets.LOG.warn("Found non id-File {}. This will be ignored for loading Templates.", file);
                 } catch (IOException e) {

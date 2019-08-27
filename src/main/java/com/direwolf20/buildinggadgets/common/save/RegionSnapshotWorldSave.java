@@ -4,6 +4,7 @@ import com.direwolf20.buildinggadgets.common.util.blocks.RegionSnapshot;
 import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.INBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.world.storage.WorldSavedData;
 
@@ -12,7 +13,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-public final class RegionSnapshotWorldSave extends WorldSavedData {
+public class RegionSnapshotWorldSave extends WorldSavedData {
     private final Map<UUID, RegionSnapshot> idToSnapshot;
 
     public RegionSnapshotWorldSave(String name) {
@@ -40,7 +41,9 @@ public final class RegionSnapshotWorldSave extends WorldSavedData {
     @Override
     public void read(CompoundNBT nbt) {
         idToSnapshot.clear();
-        NBTHelper.deserializeUUIDMap((ListNBT) nbt.get(NBTKeys.WORLD_SAVE_TAG), idToSnapshot, c -> RegionSnapshot.deserialize((CompoundNBT) c));
+        INBT data = nbt.get(NBTKeys.WORLD_SAVE_TAG);
+        if (data instanceof ListNBT)
+            NBTHelper.deserializeUUIDMap((ListNBT) data, idToSnapshot, c -> RegionSnapshot.deserialize((CompoundNBT) c));
     }
 
     @Override

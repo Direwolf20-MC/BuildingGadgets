@@ -12,6 +12,7 @@ import com.direwolf20.buildinggadgets.common.config.crafting.RecipeConstructionP
 import com.direwolf20.buildinggadgets.common.events.AnvilRepairHandler;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.registry.objects.BuildingObjects;
+import com.direwolf20.buildinggadgets.common.save.SaveManager;
 import com.direwolf20.buildinggadgets.common.save.TemplateSave;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import net.minecraft.command.Commands;
@@ -31,7 +32,9 @@ import net.minecraftforge.fml.config.ModConfig.Type;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
+import net.minecraftforge.fml.event.server.FMLServerStartedEvent;
 import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
+import net.minecraftforge.fml.event.server.FMLServerStoppedEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -62,6 +65,8 @@ public final class BuildingGadgets {
 
         eventBus.addListener(this::setup);
         MinecraftForge.EVENT_BUS.addListener(this::serverLoad);
+        MinecraftForge.EVENT_BUS.addListener(this::serverLoaded);
+        MinecraftForge.EVENT_BUS.addListener(this::serverStopped);
         eventBus.addListener(this::finishLoad);
         eventBus.addGenericListener(IRecipeSerializer.class, this::onRecipeRegister);
 
@@ -95,7 +100,14 @@ public final class BuildingGadgets {
                         .then(BlockMapCommand.registerList())
                         .then(BlockMapCommand.registerDelete())
         );
-        BuildingGadgets.LOG.info("DataDir = {}; FolderName={}", event.getServer().getDataDirectory().getAbsolutePath(), event.getServer().getFolderName());
+    }
+
+    private void serverLoaded(FMLServerStartedEvent event) {
+        SaveManager.INSTANCE.onServerStarted(event);
+    }
+
+    private void serverStopped(FMLServerStoppedEvent event) {
+        SaveManager.INSTANCE.onServerStopped(event);
     }
 
     private void finishLoad(FMLLoadCompleteEvent event) {

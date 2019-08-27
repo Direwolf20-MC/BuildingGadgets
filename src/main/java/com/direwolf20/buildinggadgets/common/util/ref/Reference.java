@@ -8,8 +8,16 @@ public final class Reference {
     public static final String CONFIG_FILE_SERVER = MODID + "-server.toml";
     public static final String CONFIG_FILE_CLIENT = MODID + "-client.toml";
     public static final String CONFIG_FILE_API = MODID + "-api.toml";
-    public static final String TEMPLATE_FILE_ENDING = ".template";
-    public static final String TEMPLATE_HEADER_FILE_ENDING = ".th";
+
+    public static final String FILE_ENDING_TEMPLATE = ".template";
+    public static final String FILE_ENDING_TEMPLATE_HEADER = ".th";
+    public static final String DIRECTORY_SAVE = "saves";
+    public static final String DIRECTORY_TEMPLATE = "template";
+    public static final String DIRECTORY_COPY_PASTE = "copy_paste";
+    public static final String UNDO_COPY_PASTE = "copy_paste_undo";
+    public static final String UNDO_DESTRUCTION = "destruction_undo";
+    public static final String UNDO_EXCHANGING = "exchanging_undo";
+    public static final String UNDO_BUILDING = "building_undo";
 
     public static final ResourceLocation CONDITION_PASTE_ID = new ResourceLocation(Reference.MODID, "enable_paste");
     public static final ResourceLocation CONDITION_DESTRUCTION_ID = new ResourceLocation(Reference.MODID, "enable_destruction");
