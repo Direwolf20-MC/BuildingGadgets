@@ -11,6 +11,8 @@ import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketBindTool;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
+import com.direwolf20.buildinggadgets.common.save.SaveManager;
+import com.direwolf20.buildinggadgets.common.save.UndoWorldSave;
 import com.direwolf20.buildinggadgets.common.util.helpers.InventoryHelper;
 import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
 import com.direwolf20.buildinggadgets.common.util.helpers.SortingHelper;
@@ -73,6 +75,11 @@ public class GadgetBuilding extends AbstractGadget implements IAtopPlacingGadget
     @Override
     protected Supplier<BaseRenderer> createRenderFactory() {
         return BuildingRender::new;
+    }
+
+    @Override
+    protected UndoWorldSave getUndoSave() {
+        return SaveManager.INSTANCE.getBuildingUndo();
     }
 
     @Override

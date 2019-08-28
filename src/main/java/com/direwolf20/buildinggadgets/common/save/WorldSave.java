@@ -54,10 +54,6 @@ public class WorldSave extends WorldSavedData {
         return get(world, WorldSaveTemplate.NAME, () -> new WorldSaveTemplate(WorldSaveTemplate.NAME));
     }
 
-    public static WorldSave getWorldSaveDestruction(World world) {
-        return get(world, WorldSaveDestruction.NAME,  () -> new WorldSaveDestruction(WorldSaveDestruction.NAME));
-    }
-
     @Nonnull
     private static <T extends WorldSave> WorldSave get(World world, String name, Supplier<T> supplier) {
         DimensionSavedDataManager storage = ((ServerWorld) world).getSavedData();
@@ -103,13 +99,6 @@ public class WorldSave extends WorldSavedData {
     public static class WorldSaveTemplate extends WorldSave {
         public static final String NAME = "template_data";
         public WorldSaveTemplate(String name) {
-            super(name, NAME);
-        }
-    }
-
-    public static class WorldSaveDestruction extends WorldSave {
-        public static final String NAME = "destruction_undo";
-        public WorldSaveDestruction(String name) {
             super(name, NAME);
         }
     }

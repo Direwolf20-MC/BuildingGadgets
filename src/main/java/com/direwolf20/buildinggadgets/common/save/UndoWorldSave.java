@@ -50,20 +50,21 @@ public class UndoWorldSave extends TimedDataSave<UndoValue> {
         return new UndoValue(nbt, undoMaxLength);
     }
 
-    static class UndoValue extends TimedValue {
+    static final class UndoValue extends TimedValue {
         private final UndoHistory history;
 
-        public UndoValue(CompoundNBT nbt, IntSupplier supplier) {
+        private UndoValue(CompoundNBT nbt, IntSupplier supplier) {
             super(nbt);
             this.history = new UndoHistory(supplier);
             history.read(nbt);
         }
 
-        public UndoValue(IntSupplier maxLength) {
+        private UndoValue(IntSupplier maxLength) {
+            super();
             this.history = new UndoHistory(maxLength);
         }
 
-        public UndoHistory getHistory() {
+        private UndoHistory getHistory() {
             return history;
         }
 

@@ -30,6 +30,8 @@ import com.direwolf20.buildinggadgets.common.items.gadgets.renderers.BaseRendere
 import com.direwolf20.buildinggadgets.common.items.gadgets.renderers.CopyPasteRender;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketBindTool;
+import com.direwolf20.buildinggadgets.common.save.SaveManager;
+import com.direwolf20.buildinggadgets.common.save.UndoWorldSave;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
 import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
@@ -127,6 +129,11 @@ public class GadgetCopyPaste extends AbstractGadget {
     @Override
     protected Supplier<BaseRenderer> createRenderFactory() {
         return CopyPasteRender::new;
+    }
+
+    @Override
+    protected UndoWorldSave getUndoSave() {
+        return SaveManager.INSTANCE.getCopyPasteUndo();
     }
 
     @Override

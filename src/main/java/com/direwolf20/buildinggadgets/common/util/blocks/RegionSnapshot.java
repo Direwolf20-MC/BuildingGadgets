@@ -258,6 +258,10 @@ public class RegionSnapshot {
         return ImmutableList.copyOf(blockStates);
     }
 
+    public DimensionType getDim() {
+        return dim;
+    }
+
     /**
      * The indices of the entries of this list is unrelated to any positions, instead, the entry stores the affected
      * coordinate.

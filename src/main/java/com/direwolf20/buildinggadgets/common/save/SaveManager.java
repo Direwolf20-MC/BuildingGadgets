@@ -25,15 +25,15 @@ public enum SaveManager {
     }
 
     public void onServerStarted(FMLServerStartedEvent event) {
-        ServerWorld world = event.getServer().getWorld(DimensionType.OVERWORLD);
         BuildingGadgets.LOG.debug("Loading World Saves.");
+        ServerWorld world = event.getServer().getWorld(DimensionType.OVERWORLD);
         copyPasteUndo = getUndoSave(world, Config.GADGETS.GADGET_COPY_PASTE.undoSize::get, SaveReference.UNDO_COPY_PASTE);
         destructionUndo = getUndoSave(world, Config.GADGETS.GADGET_DESTRUCTION.undoSize::get, SaveReference.UNDO_DESTRUCTION);
         buildingUndo = getUndoSave(world, Config.GADGETS.GADGET_BUILDING.undoSize::get, SaveReference.UNDO_BUILDING);
         exchangingUndo = getUndoSave(world, Config.GADGETS.GADGET_EXCHANGER.undoSize::get, SaveReference.UNDO_EXCHANGING);
         templateSave = getTemplateSave(world, SaveReference.TEMPLATE_SAVE_TEMPLATES);
         copyPasteSave = getTemplateSave(world, SaveReference.TEMPLATE_SAVE_COPY_PASTE);
-        BuildingGadgets.LOG.info("Finished Loading saves");
+        BuildingGadgets.LOG.debug("Finished Loading saves");
     }
 
     public void onServerStopped(FMLServerStoppedEvent event) {

@@ -22,12 +22,12 @@ public final class Reference {
 
         public static final String FILE_ENDING_TEMPLATE = ".template";
         public static final String FILE_ENDING_TEMPLATE_HEADER = ".th";
-        public static final String TEMPLATE_SAVE_COPY_PASTE = MODID + "_copy_paste_save";
-        public static final String TEMPLATE_SAVE_TEMPLATES = MODID + "_template_save";
-        public static final String UNDO_BUILDING = MODID + "_building_undo";
-        public static final String UNDO_COPY_PASTE = MODID + "_copy_paste_undo";
-        public static final String UNDO_DESTRUCTION = MODID + "_destruction_undo";
-        public static final String UNDO_EXCHANGING = MODID + "_exchanging_undo";
+        public static final String TEMPLATE_SAVE_COPY_PASTE = MODID + "_save_copy_paste";
+        public static final String TEMPLATE_SAVE_TEMPLATES = MODID + "_save_templates";
+        public static final String UNDO_BUILDING = MODID + "_undo_building";
+        public static final String UNDO_COPY_PASTE = MODID + "_undo_copy_paste";
+        public static final String UNDO_DESTRUCTION = MODID + "_undo_destruction";
+        public static final String UNDO_EXCHANGING = MODID + "_undo_exchanging";
     }
 
     public static final class ItemReference {

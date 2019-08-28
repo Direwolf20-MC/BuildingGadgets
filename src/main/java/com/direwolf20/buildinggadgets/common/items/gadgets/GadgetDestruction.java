@@ -11,7 +11,8 @@ import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.items.gadgets.renderers.BaseRenderer;
 import com.direwolf20.buildinggadgets.common.items.gadgets.renderers.DestructionRender;
 import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
-import com.direwolf20.buildinggadgets.common.save.WorldSave;
+import com.direwolf20.buildinggadgets.common.save.SaveManager;
+import com.direwolf20.buildinggadgets.common.save.UndoWorldSave;
 import com.direwolf20.buildinggadgets.common.tiles.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.blocks.RegionSnapshot;
@@ -50,7 +51,6 @@ import net.minecraftforge.event.world.BlockEvent;
 import javax.annotation.Nullable;
 import java.util.HashSet;
 import java.util.List;
-import java.util.UUID;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -76,6 +76,11 @@ public class GadgetDestruction extends AbstractGadget {
         return DestructionRender::new;
     }
 
+    @Override
+    protected UndoWorldSave getUndoSave() {
+        return SaveManager.INSTANCE.getDestructionUndo();
+    }
+
     private int getCostMultiplier(ItemStack tool) {
         return (int) (! getFuzzy(tool) ? Config.GADGETS.GADGET_DESTRUCTION.nonFuzzyMultiplier.get() : 1);
     }
@@ -99,17 +104,6 @@ public class GadgetDestruction extends AbstractGadget {
 
         addInformationRayTraceFluid(tooltip, stack);
         addEnergyInformation(tooltip, stack);
-    }
-
-    public static UUID getUUID(ItemStack stack) {
-        CompoundNBT tag = NBTHelper.getOrNewTag(stack);
-        if (! tag.hasUniqueId(NBTKeys.GADGET_UUID)) {
-            UUID uuid = UUID.randomUUID();
-            tag.putUniqueId(NBTKeys.GADGET_UUID, uuid);
-            stack.setTag(tag);
-            return uuid;
-        }
-        return tag.getUniqueId(NBTKeys.GADGET_UUID);
     }
 
     public static void setAnchor(ItemStack stack, BlockPos pos) {
@@ -296,23 +290,7 @@ public class GadgetDestruction extends AbstractGadget {
             player.sendMessage(TooltipTranslation.GADGET_PALETTE_OVERFLOW.componentTranslation());
             return;
         }
-
-        WorldSave worldSave = WorldSave.getWorldSaveDestruction(world);
-        worldSave.addToMap(getUUID(stack).toString(), snapshot.serialize());
-    }
-
-    public static void undo(PlayerEntity player, ItemStack stack) {
-        World world = player.world;
-        WorldSave worldSave = WorldSave.getWorldSaveDestruction(world);
-
-        CompoundNBT serializedSnapshot = worldSave.getCompoundFromUUID(getUUID(stack).toString());
-        if (serializedSnapshot.isEmpty())
-            return;
-
-        RegionSnapshot snapshot = RegionSnapshot.deserialize(serializedSnapshot);
-        snapshot.restore(world);
-        worldSave.addToMap(getUUID(stack).toString(), new CompoundNBT());
-        worldSave.markDirty();
+        addUndo(stack, snapshot);
     }
 
     private boolean destroyBlock(World world, BlockPos voidPos, ServerPlayerEntity player) {

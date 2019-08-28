@@ -14,7 +14,9 @@ public enum MessageTranslation implements ITranslationProvider {
     AREA_COPIED_FAILED_TOO_MANY_DIFF("too_many_dif_blocks", 0),
     TEMPLATE_BUILD("template_build", 0),
     GADGET_BUSY("gadget_busy", 0),
-    SERVER_BUSY("server_busy", 0);
+    SERVER_BUSY("server_busy", 0),
+    NOTHING_TO_UNDO("nothing_to_undo", 0),
+    UNDO_FAILED("undo_failed", 0);
     private static final String PREFIX = Reference.MODID + ".message.";
     private final String key;
     private final int argCount;
