@@ -131,7 +131,7 @@ public class RegionSnapshot {
         ResourceLocation dimension = new ResourceLocation(tag.getString(DIMENSION));
 
         IPositionPlacementSequence positions = new SetBackedPlacementSequence(
-                NBTHelper.deserializeSet((ListNBT) tag.get(POSITIONS), new HashSet<>(), nbt -> NBTUtil.readBlockPos((CompoundNBT) nbt)),
+                NBTHelper.deserializeCollection((ListNBT) tag.get(POSITIONS), new HashSet<>(), nbt -> NBTUtil.readBlockPos((CompoundNBT) nbt)),
                 Region.deserializeFrom(tag.getCompound(NBTKeys.AREA)));
 
         List<Optional<BlockState>> palettes = new ArrayList<>();

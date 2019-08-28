@@ -1,66 +1,62 @@
 package com.direwolf20.buildinggadgets.common.save;
 
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
-import com.direwolf20.buildinggadgets.common.util.ref.Reference;
-import net.minecraft.server.dedicated.DedicatedServer;
+import com.direwolf20.buildinggadgets.common.config.Config;
+import com.direwolf20.buildinggadgets.common.util.ref.Reference.SaveReference;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.storage.WorldSavedData;
 import net.minecraftforge.fml.event.server.FMLServerStartedEvent;
 import net.minecraftforge.fml.event.server.FMLServerStoppedEvent;
 
-import java.nio.file.Path;
+import java.util.function.IntSupplier;
+import java.util.function.Supplier;
 
 public enum SaveManager {
     INSTANCE;
     private TemplateSave copyPasteSave;
     private TemplateSave templateSave;
-    private RegionSnapshotWorldSave copyPasteUndo;
-    private RegionSnapshotWorldSave destructionUndo;
-    private RegionSnapshotWorldSave buildingUndo;
-    private RegionSnapshotWorldSave exchangingUndo;
+    private UndoWorldSave copyPasteUndo;
+    private UndoWorldSave destructionUndo;
+    private UndoWorldSave buildingUndo;
+    private UndoWorldSave exchangingUndo;
 
     SaveManager() {
     }
 
     public void onServerStarted(FMLServerStartedEvent event) {
-        Path bgSaveFolder = event.getServer().getDataDirectory().toPath();
-        bgSaveFolder = (event.getServer() instanceof DedicatedServer ? bgSaveFolder.resolve("saves") : bgSaveFolder)
-                .resolve(event.getServer().getFolderName())
-                .resolve(Reference.MODID)
-                .resolve(Reference.DIRECTORY_SAVE);
-        BuildingGadgets.LOG.info("Loading saves from {}.", bgSaveFolder);
         ServerWorld world = event.getServer().getWorld(DimensionType.OVERWORLD);
-        copyPasteSave = new TemplateSave(bgSaveFolder.resolve(Reference.DIRECTORY_COPY_PASTE));
-        templateSave = new TemplateSave(bgSaveFolder.resolve(Reference.DIRECTORY_TEMPLATE));
         BuildingGadgets.LOG.debug("Loading World Saves.");
-        copyPasteUndo = get(world, Reference.UNDO_COPY_PASTE);
-        destructionUndo = get(world, Reference.UNDO_DESTRUCTION);
-        buildingUndo = get(world, Reference.UNDO_BUILDING);
-        exchangingUndo = get(world, Reference.UNDO_EXCHANGING);
-        BuildingGadgets.LOG.debug("Loading Copy-Paste Save.");
-        copyPasteSave.loadAll();
-        BuildingGadgets.LOG.debug("Loading Template Save.");
-        templateSave.loadAll();
+        copyPasteUndo = getUndoSave(world, Config.GADGETS.GADGET_COPY_PASTE.undoSize::get, SaveReference.UNDO_COPY_PASTE);
+        destructionUndo = getUndoSave(world, Config.GADGETS.GADGET_DESTRUCTION.undoSize::get, SaveReference.UNDO_DESTRUCTION);
+        buildingUndo = getUndoSave(world, Config.GADGETS.GADGET_BUILDING.undoSize::get, SaveReference.UNDO_BUILDING);
+        exchangingUndo = getUndoSave(world, Config.GADGETS.GADGET_EXCHANGER.undoSize::get, SaveReference.UNDO_EXCHANGING);
+        templateSave = getTemplateSave(world, SaveReference.TEMPLATE_SAVE_TEMPLATES);
+        copyPasteSave = getTemplateSave(world, SaveReference.TEMPLATE_SAVE_COPY_PASTE);
         BuildingGadgets.LOG.info("Finished Loading saves");
     }
 
     public void onServerStopped(FMLServerStoppedEvent event) {
-        BuildingGadgets.LOG.info("Writing saves.");
-        BuildingGadgets.LOG.debug("Writing Copy-Paste Save.");
-        copyPasteSave.saveAll();
-        BuildingGadgets.LOG.debug("Writing Template Save.");
-        templateSave.saveAll();
+        BuildingGadgets.LOG.debug("Clearing save caches");
         copyPasteSave = null;
         templateSave = null;
         copyPasteUndo = null;
         destructionUndo = null;
         buildingUndo = null;
         exchangingUndo = null;
-        BuildingGadgets.LOG.info("Finished writing saves.");
+        BuildingGadgets.LOG.debug("Finished clearing save caches");
     }
 
-    private static RegionSnapshotWorldSave get(ServerWorld world, String name) {
-        return world.getSavedData().getOrCreate(() -> new RegionSnapshotWorldSave(name), name);
+    private static UndoWorldSave getUndoSave(ServerWorld world, IntSupplier maxLengthSupplier, String name) {
+        return get(world, () -> new UndoWorldSave(name, maxLengthSupplier), name);
+    }
+
+    private static TemplateSave getTemplateSave(ServerWorld world, String name) {
+        return get(world, () -> new TemplateSave(name), name);
+    }
+
+    private static <T extends WorldSavedData> T get(ServerWorld world, Supplier<T> supplier, String name) {
+        return world.getSavedData().getOrCreate(supplier, name);
     }
 
     public TemplateSave getCopyPasteSave() {
@@ -71,19 +67,19 @@ public enum SaveManager {
         return templateSave;
     }
 
-    public RegionSnapshotWorldSave getCopyPasteUndo() {
+    public UndoWorldSave getCopyPasteUndo() {
         return copyPasteUndo;
     }
 
-    public RegionSnapshotWorldSave getDestructionUndo() {
+    public UndoWorldSave getDestructionUndo() {
         return destructionUndo;
     }
 
-    public RegionSnapshotWorldSave getBuildingUndo() {
+    public UndoWorldSave getBuildingUndo() {
         return buildingUndo;
     }
 
-    public RegionSnapshotWorldSave getExchangingUndo() {
+    public UndoWorldSave getExchangingUndo() {
         return exchangingUndo;
     }
 }

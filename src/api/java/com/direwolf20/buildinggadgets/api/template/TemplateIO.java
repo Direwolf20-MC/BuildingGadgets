@@ -23,12 +23,16 @@ public final class TemplateIO {
     }
 
     public static void writeTemplate(ITemplate template, OutputStream stream, boolean persisted) throws IOException {
+        CompoundNBT nbt = new CompoundNBT();
+        writeTemplate(template, nbt, persisted);
+        CompressedStreamTools.writeCompressed(nbt, stream);
+    }
+
+    public static void writeTemplate(ITemplate template, CompoundNBT nbt, boolean persisted) {
         ITemplateSerializer serializer = template.getSerializer();
         Preconditions.checkArgument(serializer.getRegistryName() != null, "Cannot serialize with a not-registered Serializer!");
-        CompoundNBT nbt = new CompoundNBT();
         nbt.putString(NBTKeys.KEY_SERIALIZER, serializer.getRegistryName().toString());
         nbt.put(NBTKeys.KEY_DATA, serializer.serialize(template, persisted));
-        CompressedStreamTools.writeCompressed(nbt, stream);
     }
 
     /**
@@ -48,7 +52,18 @@ public final class TemplateIO {
      */
     @Nullable
     public static ITemplate readTemplate(InputStream stream, @Nullable TemplateHeader header, boolean persisted) throws IOException {
-        CompoundNBT nbt = CompressedStreamTools.readCompressed(stream);
+        return readTemplate(CompressedStreamTools.readCompressed(stream), header, persisted);
+    }
+
+    /**
+     * @param nbt       the Compound to read from
+     * @param persisted whether this was written as persisted.
+     * @param header    The TemplateHeader if present. Null otherwise.
+     * @return A Template if the serializer is known. Null if not.
+     * @throws IOException if a read error occurs or the read nbt does not match the format written by {@link #writeTemplate(ITemplate, OutputStream, boolean)}
+     */
+    @Nullable
+    public static ITemplate readTemplate(CompoundNBT nbt, @Nullable TemplateHeader header, boolean persisted) throws IllegalTemplateFormatException {
         if (! nbt.contains(NBTKeys.KEY_SERIALIZER, NBT.TAG_STRING))
             throw new IllegalTemplateFormatException("Cannot read Template without a Serializer!");
         ITemplateSerializer serializer = Registries.getTemplateSerializer(nbt.getString(NBTKeys.KEY_SERIALIZER));

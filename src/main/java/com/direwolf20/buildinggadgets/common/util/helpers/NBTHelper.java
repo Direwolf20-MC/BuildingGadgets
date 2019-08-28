@@ -318,11 +318,11 @@ public class NBTHelper {
         return res;
     }
 
-    public static <V, T extends INBT> List<V> readList(CollectionNBT<T> list, Function<? super T, ? extends V> deserializer) {
+    public static <V, T extends INBT> List<V> deserializeList(CollectionNBT<T> list, Function<? super T, ? extends V> deserializer) {
         return list.stream().map(deserializer).collect(Collectors.toList());
     }
 
-    public static <V, T extends INBT> List<V> readList(CollectionNBT<T> list, BiFunction<? super T, Integer, ? extends V> deserializer) {
+    public static <V, T extends INBT> List<V> deserializeList(CollectionNBT<T> list, BiFunction<? super T, Integer, ? extends V> deserializer) {
         List<V> res = new ArrayList<>(list.size());
         int index = 0;
         for (T element : list) {
@@ -380,15 +380,7 @@ public class NBTHelper {
         return toAppendTo;
     }
 
-    public static <T> ListNBT serializeSet(Set<T> set, Function<? super T, ? extends INBT> elementSerializer) {
-        ListNBT list = new ListNBT();
-        for (T element : set) {
-            list.add(elementSerializer.apply(element));
-        }
-        return list;
-    }
-
-    public static <T> Set<T> deserializeSet(ListNBT list, Set<T> toAppendTo, Function<INBT, ? extends T> elementDeserializer) {
+    public static <T, C extends Collection<T>> C deserializeCollection(ListNBT list, C toAppendTo, Function<INBT, ? extends T> elementDeserializer) {
         for (INBT nbt : list) {
             toAppendTo.add(elementDeserializer.apply(nbt));
         }

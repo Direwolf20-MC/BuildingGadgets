@@ -199,11 +199,20 @@ public class Config {
                     .defineInRange("Energy Cost", defaultValue, 0, Integer.MAX_VALUE);
         }
 
+        private static IntValue getMaxUndoSize(int defaultValue) {
+            return SERVER_BUILDER
+                    .comment("The Gadget'S Max Undo size")
+                    .translation(LANG_KEY_GADGETS + ".undo_size")
+                    .defineInRange("Max Undo History Size", defaultValue, 0, 128);
+        }
+
         public static final class CategoryGadgetBuilding {
 
             public final IntValue maxEnergy;
 
             public final IntValue energyCost;
+
+            public final IntValue undoSize;
 
             private CategoryGadgetBuilding() {
                 SERVER_BUILDER.comment("Energy Cost & Durability of the Building Gadget")/*.translation(LANG_KEY_GADGET_BUILDING)*/.push("Building Gadget");
@@ -211,6 +220,8 @@ public class Config {
                 maxEnergy = getMaxEnergy(500000);
 
                 energyCost = getEnergyCost(50);
+
+                undoSize = getMaxUndoSize(10);
 
                 SERVER_BUILDER.pop();
             }
@@ -222,12 +233,16 @@ public class Config {
 
             public final IntValue energyCost;
 
+            public final IntValue undoSize;
+
             private CategoryGadgetExchanger() {
                 SERVER_BUILDER.comment("Energy Cost & Durability of the Exchanging Gadget")/*.translation(LANG_KEY_GADGET_EXCHANGER)*/.push("Exchanging Gadget");
 
                 maxEnergy = getMaxEnergy(500000);
 
                 energyCost = getEnergyCost(100);
+
+                undoSize = getMaxUndoSize(10);
 
                 SERVER_BUILDER.pop();
             }
@@ -239,6 +254,8 @@ public class Config {
 
             public final IntValue energyCost;
 
+            public final IntValue undoSize;
+
             public final DoubleValue nonFuzzyMultiplier;
 
             public final BooleanValue nonFuzzyEnabled;
@@ -249,6 +266,8 @@ public class Config {
                 maxEnergy = getMaxEnergy(1000000);
 
                 energyCost = getEnergyCost(200);
+
+                undoSize = getMaxUndoSize(1);
 
                 nonFuzzyMultiplier = SERVER_BUILDER
                         .comment("The cost in energy/durability will increase by this amount when not in fuzzy mode")
@@ -272,6 +291,8 @@ public class Config {
 
             public final IntValue energyCost;
 
+            public final IntValue undoSize;
+
             public final IntValue maxSynchronousExecution;
 
             public final IntValue placeSteps;
@@ -284,6 +305,8 @@ public class Config {
                 maxEnergy = getMaxEnergy(500000);
 
                 energyCost = getEnergyCost(50);
+
+                undoSize = getMaxUndoSize(1);
 
                 maxSynchronousExecution = SERVER_BUILDER
                         .comment("Maximum amount of Blocks in a to-copy Region to be copied synchronously. ",
