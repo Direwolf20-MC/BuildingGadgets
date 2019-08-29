@@ -50,7 +50,7 @@ public class UndoWorldSave extends TimedDataSave<UndoValue> {
         return new UndoValue(nbt, undoMaxLength);
     }
 
-    static final class UndoValue extends TimedValue {
+    static final class UndoValue extends TimedDataSave.TimedValue { //for reasons I don't understand it doesn't compile if you leave the TimedDataSave out!
         private final UndoHistory history;
 
         private UndoValue(CompoundNBT nbt, IntSupplier supplier) {

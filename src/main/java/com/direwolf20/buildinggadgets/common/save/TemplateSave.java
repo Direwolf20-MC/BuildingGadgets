@@ -18,12 +18,18 @@ public final class TemplateSave extends TimedDataSave<TemplateInfo> {
 
     public ITemplate getTemplate(UUID id) {
         TemplateInfo info = get(id);
-        info.updateTime();
-        return info.getTemplate();
+        markDirty();
+        return info.updateTime().getTemplate();
     }
 
-    public void removeTemplate(UUID id) {
+    void setTemplate(UUID id, ITemplate template) {
+        get(id).updateTime().setTemplate(template);
+        markDirty();
+    }
+
+    void removeTemplate(UUID id) {
         remove(id);
+        markDirty();
     }
 
     @Override
@@ -36,12 +42,12 @@ public final class TemplateSave extends TimedDataSave<TemplateInfo> {
         try {
             return new TemplateInfo(nbt);
         } catch (IllegalTemplateFormatException e) {
-            throw new RuntimeException("Failed to read Template! This should not have been possible!");
+            throw new RuntimeException("Failed to read Template! This should not have been possible!", e);
         }
     }
 
-    static final class TemplateInfo extends TimedValue {
-        private final ITemplate template;
+    static final class TemplateInfo extends TimedDataSave.TimedValue { //for reasons I don't understand it doesn't compile if you leave the TimedDataSave out!
+        private ITemplate template;
 
         private TemplateInfo(CompoundNBT nbt) throws IllegalTemplateFormatException {
             super(nbt);
@@ -60,6 +66,16 @@ public final class TemplateSave extends TimedDataSave<TemplateInfo> {
 
         private ITemplate getTemplate() {
             return template;
+        }
+
+        public TemplateInfo setTemplate(ITemplate template) {
+            this.template = template;
+            return this;
+        }
+
+        @Override
+        public TemplateInfo updateTime() {
+            return (TemplateInfo) super.updateTime();
         }
 
         @Override

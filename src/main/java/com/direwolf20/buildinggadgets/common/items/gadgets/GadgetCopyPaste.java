@@ -19,7 +19,7 @@ import com.direwolf20.buildinggadgets.client.gui.GuiMod;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.blocks.EffectBlock;
 import com.direwolf20.buildinggadgets.common.blocks.EffectBlock.Mode;
-import com.direwolf20.buildinggadgets.common.capability.DelegatingTemplateProvider;
+import com.direwolf20.buildinggadgets.common.capability.provider.TemplateKeyProvider;
 import com.direwolf20.buildinggadgets.common.commands.CopyUnloadedCommand;
 import com.direwolf20.buildinggadgets.common.concurrent.CopyScheduler;
 import com.direwolf20.buildinggadgets.common.concurrent.PlacementScheduler;
@@ -65,7 +65,6 @@ import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.Constants.NBT;
-import net.minecraftforge.common.util.LazyOptional;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -139,7 +138,7 @@ public class GadgetCopyPaste extends AbstractGadget {
     @Override
     protected void addCapabilityProviders(Builder<ICapabilityProvider> providerBuilder, ItemStack stack, @Nullable CompoundNBT tag) {
         super.addCapabilityProviders(providerBuilder, stack, tag);
-        providerBuilder.add(new DelegatingTemplateProvider());
+        providerBuilder.add(new TemplateKeyProvider(stack));
     }
 
     public static boolean isBusy(ItemStack stack) {
@@ -319,7 +318,7 @@ public class GadgetCopyPaste extends AbstractGadget {
                 if (Screen.hasControlDown()) {
                     PacketHandler.sendToServer(new PacketBindTool());
                 } else if (GadgetUtils.getRemoteInventory(posLookingAt, world, NetworkIO.Operation.EXTRACT) != null)
-                        return new ActionResult<>(ActionResultType.SUCCESS, stack);
+                    return new ActionResult<>(ActionResultType.SUCCESS, stack);
             }
             if (getToolMode(stack) == ToolMode.COPY) {
                 if (player.isSneaking() && world.getBlockState(posLookingAt) == Blocks.AIR.getDefaultState())
@@ -351,23 +350,26 @@ public class GadgetCopyPaste extends AbstractGadget {
     }
 
     private void performCopy(ItemStack stack, World world, PlayerEntity player, Region region) {
-        LazyOptional<ITemplate> templateCap = stack.getCapability(CapabilityTemplate.TEMPLATE_CAPABILITY, null);
-        templateCap.ifPresent(template -> {
-            if (! CopyUnloadedCommand.mayCopyUnloadedChunks(player)) {
-                ImmutableSortedSet<ChunkPos> unloaded = region.getUnloadedChunks(world);
-                if (! unloaded.isEmpty()) {
-                    player.sendStatusMessage(MessageTranslation.COPY_UNLOADED.componentTranslation(unloaded.size()).setStyle(Styles.RED), true);
-                    BuildingGadgets.LOG.debug("Prevented copy because {} chunks where detected as unloaded.", unloaded.size());
-                    BuildingGadgets.LOG.trace("The following chunks were detected as unloaded {}.", CHUNK_JOINER.join(unloaded));
-                    return;
+        world.getCapability(CapabilityTemplate.TEMPLATE_PROVIDER_CAPABILITY).ifPresent(provider -> {
+            stack.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(key -> {
+                ITemplate template = provider.getTemplateForKey(key);
+                if (! CopyUnloadedCommand.mayCopyUnloadedChunks(player)) {
+                    ImmutableSortedSet<ChunkPos> unloaded = region.getUnloadedChunks(world);
+                    if (! unloaded.isEmpty()) {
+                        player.sendStatusMessage(MessageTranslation.COPY_UNLOADED.componentTranslation(unloaded.size()).setStyle(Styles.RED), true);
+                        BuildingGadgets.LOG.debug("Prevented copy because {} chunks where detected as unloaded.", unloaded.size());
+                        BuildingGadgets.LOG.trace("The following chunks were detected as unloaded {}.", CHUNK_JOINER.join(unloaded));
+                        return;
+                    }
                 }
-            }
-            SimpleBuildContext context = SimpleBuildContext.builder()
-                    .buildingPlayer(player)
-                    .usedStack(stack)
-                    .build(world);
-            WorldBackedBuildView buildView = WorldBackedBuildView.create(context, region);
-            runCopyTransaction(stack, template, buildView);
+                SimpleBuildContext context = SimpleBuildContext.builder()
+                        .buildingPlayer(player)
+                        .usedStack(stack)
+                        .build(world);
+                WorldBackedBuildView buildView = WorldBackedBuildView.create(context, region);
+                runCopyTransaction(stack, template, buildView);
+            });
+
         });
     }
 
@@ -467,15 +469,19 @@ public class GadgetCopyPaste extends AbstractGadget {
     private void build(ItemStack stack, World world, PlayerEntity player, BlockPos pos) {
         if (checkAndNotifyGadgetBusy(stack, player))
             return;
-        stack.getCapability(CapabilityTemplate.TEMPLATE_CAPABILITY).ifPresent(template -> {
-            SimpleBuildOpenOptions openOptions = SimpleBuildOpenOptions.withContext(SimpleBuildContext.builder()
-                    .usedStack(stack)
-                    .buildingPlayer(player)
-                    .build(world));
-            IBuildView view = template.createViewInContext(openOptions);
-            if (view != null)
-                schedulePlacement(stack, view, player, pos);
+        world.getCapability(CapabilityTemplate.TEMPLATE_PROVIDER_CAPABILITY).ifPresent(provider -> {
+            stack.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(key -> {
+                ITemplate template = provider.getTemplateForKey(key);
+                SimpleBuildOpenOptions openOptions = SimpleBuildOpenOptions.withContext(SimpleBuildContext.builder()
+                        .usedStack(stack)
+                        .buildingPlayer(player)
+                        .build(world));
+                IBuildView view = template.createViewInContext(openOptions);
+                if (view != null)
+                    schedulePlacement(stack, view, player, pos);
+            });
         });
+
     }
 
     private void schedulePlacement(ItemStack stack, IBuildView view, PlayerEntity player, BlockPos pos) {

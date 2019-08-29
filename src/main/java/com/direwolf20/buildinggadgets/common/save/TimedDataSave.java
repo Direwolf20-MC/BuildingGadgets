@@ -73,7 +73,7 @@ public abstract class TimedDataSave<T extends TimedValue> extends WorldSavedData
 
     protected abstract T readValue(CompoundNBT nbt);
 
-    protected static class TimedValue {
+    public static class TimedValue {
         private long lastUpdateTime;
 
         protected TimedValue(CompoundNBT nbt) {

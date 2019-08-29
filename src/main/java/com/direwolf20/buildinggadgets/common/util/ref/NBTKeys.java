@@ -65,6 +65,7 @@ public final class NBTKeys {
     public static final String TEMPLATE_UUID = GADGET_UUID;
     public static final String TEMPLATE_NAME = "template_name";
     public static final String TEMPLATE_OWNER = "owner";
+    public static final String TEMPLATE_KEY_ID = "template_id";
 
     public static final String PASTE_COUNT = "amount";
 

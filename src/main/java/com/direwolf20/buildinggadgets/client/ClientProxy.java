@@ -30,6 +30,7 @@ import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.client.model.data.IDynamicBakedModel;
 import net.minecraftforge.client.model.data.IModelData;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedOutEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DeferredWorkQueue;
@@ -43,7 +44,7 @@ import java.util.Random;
 
 @EventBusSubscriber(Dist.CLIENT)
 public class ClientProxy {
-
+    public static final CacheTemplateProvider CACHE_TEMPLATE_PROVIDER = new CacheTemplateProvider();
     public static void clientSetup(final IEventBus eventBus) {
         DeferredWorkQueue.runLater(KeyBindings::init);
         //eventBus.addListener(ClientProxy::renderWorldLastEvent);
@@ -186,5 +187,10 @@ public class ClientProxy {
 
     public static void playSound(SoundEvent sound, float pitch) {
         Minecraft.getInstance().getSoundHandler().play(SimpleSound.master(sound, pitch));
+    }
+
+    @SubscribeEvent
+    public static void onPlayerLoggedOut(PlayerLoggedOutEvent event) {
+        CACHE_TEMPLATE_PROVIDER.clear();
     }
 }

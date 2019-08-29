@@ -2,9 +2,9 @@ package com.direwolf20.buildinggadgets.common.items.gadgets;
 
 
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
-import com.direwolf20.buildinggadgets.common.capability.CapabilityProviderBlockProvider;
 import com.direwolf20.buildinggadgets.common.capability.CapabilityProviderEnergy;
-import com.direwolf20.buildinggadgets.common.capability.MultiCapabilityProvider;
+import com.direwolf20.buildinggadgets.common.capability.provider.CapabilityProviderBlockProvider;
+import com.direwolf20.buildinggadgets.common.capability.provider.MultiCapabilityProvider;
 import com.direwolf20.buildinggadgets.common.commands.CopyUnloadedCommand;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.items.gadgets.renderers.BaseRenderer;

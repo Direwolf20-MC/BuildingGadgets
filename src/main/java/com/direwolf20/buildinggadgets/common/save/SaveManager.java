@@ -14,7 +14,7 @@ import java.util.function.Supplier;
 
 public enum SaveManager {
     INSTANCE;
-    private TemplateSave copyPasteSave;
+    private SaveTemplateProvider templateProvider;
     private TemplateSave templateSave;
     private UndoWorldSave copyPasteUndo;
     private UndoWorldSave destructionUndo;
@@ -22,6 +22,7 @@ public enum SaveManager {
     private UndoWorldSave exchangingUndo;
 
     SaveManager() {
+        this.templateProvider = new SaveTemplateProvider(this::getTemplateSave);
     }
 
     public void onServerStarted(FMLServerStartedEvent event) {
@@ -32,13 +33,11 @@ public enum SaveManager {
         buildingUndo = getUndoSave(world, Config.GADGETS.GADGET_BUILDING.undoSize::get, SaveReference.UNDO_BUILDING);
         exchangingUndo = getUndoSave(world, Config.GADGETS.GADGET_EXCHANGER.undoSize::get, SaveReference.UNDO_EXCHANGING);
         templateSave = getTemplateSave(world, SaveReference.TEMPLATE_SAVE_TEMPLATES);
-        copyPasteSave = getTemplateSave(world, SaveReference.TEMPLATE_SAVE_COPY_PASTE);
         BuildingGadgets.LOG.debug("Finished Loading saves");
     }
 
     public void onServerStopped(FMLServerStoppedEvent event) {
         BuildingGadgets.LOG.debug("Clearing save caches");
-        copyPasteSave = null;
         templateSave = null;
         copyPasteUndo = null;
         destructionUndo = null;
@@ -59,8 +58,8 @@ public enum SaveManager {
         return world.getSavedData().getOrCreate(supplier, name);
     }
 
-    public TemplateSave getCopyPasteSave() {
-        return copyPasteSave;
+    public SaveTemplateProvider getTemplateProvider() {
+        return templateProvider;
     }
 
     public TemplateSave getTemplateSave() {
