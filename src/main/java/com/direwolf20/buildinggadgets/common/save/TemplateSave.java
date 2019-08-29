@@ -80,7 +80,9 @@ public final class TemplateSave extends TimedDataSave<TemplateInfo> {
 
         @Override
         public CompoundNBT write() {
-            return super.write();
+            CompoundNBT nbt = super.write();
+            TemplateIO.writeTemplate(template, nbt, true);
+            return nbt;
         }
     }
 

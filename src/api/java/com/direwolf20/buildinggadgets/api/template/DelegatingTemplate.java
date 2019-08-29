@@ -8,6 +8,7 @@ import com.direwolf20.buildinggadgets.api.building.view.IBuildView;
 import com.direwolf20.buildinggadgets.api.exceptions.*;
 import com.direwolf20.buildinggadgets.api.materials.MaterialList;
 import com.direwolf20.buildinggadgets.api.serialisation.ITemplateSerializer;
+import com.direwolf20.buildinggadgets.api.serialisation.SerialisationSupport;
 import com.direwolf20.buildinggadgets.api.serialisation.TemplateHeader;
 import com.direwolf20.buildinggadgets.api.template.IBuildOpenOptions.OpenType;
 import com.direwolf20.buildinggadgets.api.template.transaction.ITemplateTransaction;
@@ -89,7 +90,7 @@ public class DelegatingTemplate implements ITemplate {
      */
     @Override
     public ITemplateSerializer getSerializer() {
-        return getDelegate().getSerializer();
+        return SerialisationSupport.delegatingTemplateSerializer();
     }
 
     /**
