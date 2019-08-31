@@ -72,11 +72,7 @@ public final class BuildingGadgets {
 
     private void setup(final FMLCommonSetupEvent event) {
         theMod = (BuildingGadgets) ModLoadingContext.get().getActiveContainer().getMod();
-        DeferredWorkQueue.runLater(() -> {
-            PacketHandler.register();
-            //CraftingHelper.register(Reference.CONDITION_PASTE_ID, new CraftingConditionPaste());
-            //CraftingHelper.register(Reference.CONDITION_DESTRUCTION_ID, new CraftingConditionDestruction());
-        });
+        DeferredWorkQueue.runLater(PacketHandler::register);
     }
 
     private void serverLoad(FMLServerStartingEvent event) {
