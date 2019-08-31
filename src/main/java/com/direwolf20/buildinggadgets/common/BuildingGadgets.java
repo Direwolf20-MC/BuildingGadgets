@@ -4,8 +4,6 @@ import com.direwolf20.buildinggadgets.api.BuildingGadgetsAPI;
 import com.direwolf20.buildinggadgets.client.ClientProxy;
 import com.direwolf20.buildinggadgets.client.gui.GuiMod;
 import com.direwolf20.buildinggadgets.common.config.Config;
-import com.direwolf20.buildinggadgets.common.config.crafting.CraftingConditionDestruction;
-import com.direwolf20.buildinggadgets.common.config.crafting.CraftingConditionPaste;
 import com.direwolf20.buildinggadgets.common.config.crafting.RecipeConstructionPaste.Serializer;
 import com.direwolf20.buildinggadgets.common.events.AnvilRepairHandler;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
@@ -15,7 +13,6 @@ import net.minecraft.item.crafting.IRecipeSerializer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.DeferredWorkQueue;
@@ -77,8 +74,8 @@ public final class BuildingGadgets {
         theMod = (BuildingGadgets) ModLoadingContext.get().getActiveContainer().getMod();
         DeferredWorkQueue.runLater(() -> {
             PacketHandler.register();
-            CraftingHelper.register(Reference.CONDITION_PASTE_ID, new CraftingConditionPaste());
-            CraftingHelper.register(Reference.CONDITION_DESTRUCTION_ID, new CraftingConditionDestruction());
+            //CraftingHelper.register(Reference.CONDITION_PASTE_ID, new CraftingConditionPaste());
+            //CraftingHelper.register(Reference.CONDITION_DESTRUCTION_ID, new CraftingConditionDestruction());
         });
     }
 

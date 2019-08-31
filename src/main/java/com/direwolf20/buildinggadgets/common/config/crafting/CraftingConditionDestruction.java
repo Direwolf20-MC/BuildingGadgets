@@ -1,14 +1,34 @@
 package com.direwolf20.buildinggadgets.common.config.crafting;
 
-import com.direwolf20.buildinggadgets.common.config.Config;
 import com.google.gson.JsonObject;
-import net.minecraftforge.common.crafting.IConditionSerializer;
-
-import java.util.function.BooleanSupplier;
+import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.common.crafting.conditions.ICondition;
+import net.minecraftforge.common.crafting.conditions.IConditionSerializer;
 
 public class CraftingConditionDestruction implements IConditionSerializer {
+
     @Override
-    public BooleanSupplier parse(JsonObject json) {
-        return Config.GENERAL.enableDestructionGadget::get;
+    public void write(JsonObject jsonObject, ICondition iCondition) {
+
+    }
+
+    @Override
+    public ICondition read(JsonObject jsonObject) {
+        return new ICondition() {
+            @Override
+            public ResourceLocation getID() {
+                return null;
+            }
+
+            @Override
+            public boolean test() {
+                return false;
+            }
+        };
+    }
+
+    @Override
+    public ResourceLocation getID() {
+        return null;
     }
 }

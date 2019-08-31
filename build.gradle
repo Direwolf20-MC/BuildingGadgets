@@ -154,9 +154,9 @@ dependencies {
     // that the dep is a ForgeGradle 'patcher' dependency. And it's patches will be applied.
     // The userdev artifact is a special name and will get all sorts of transformations applied to it.
     minecraft forgeName
-    apiImplementation("com.google.guava:guava:21.0") {
+    /*apiImplementation("com.google.guava:guava:21.0") {
         force = true
-    }
+    }*/
     apiTestImplementation sourceSets.api.output
     apiTestImplementation "org.junit.jupiter:junit-jupiter-api:${project.junit_version}"
     apiTestImplementation "org.junit.jupiter:junit-jupiter:${project.junit_version}"

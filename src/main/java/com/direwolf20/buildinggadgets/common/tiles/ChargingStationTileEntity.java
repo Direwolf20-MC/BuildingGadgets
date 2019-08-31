@@ -41,15 +41,13 @@ import javax.annotation.Nullable;
 import java.util.Objects;
 
 public class ChargingStationTileEntity extends TileEntity implements ITickableTileEntity, INamedContainerProvider {
-
-
     public static final int SIZE = 2;
     private static final int FUEL_SLOT = 0;
     private static final int CHARGE_SLOT = 1;
     private static final int UPDATE_FLAG_INVENTORY = 2;
     private static final int UPDATE_FLAG_ENERGY = 1;
     private static final int UPDATE_FLAG_ALL = UPDATE_FLAG_INVENTORY | UPDATE_FLAG_ENERGY;
-    private final int SEND_UPDATE_NO_RENDER = BlockFlags.NOTIFY_LISTENERS | BlockFlags.NO_RERENDER;
+    private final int SEND_UPDATE_NO_RENDER = BlockFlags.BLOCK_UPDATE | BlockFlags.NO_RERENDER;
     private int updateNeeded;
     private int counter;
 
@@ -176,7 +174,7 @@ public class ChargingStationTileEntity extends TileEntity implements ITickableTi
         if ((packet.getTileEntityType() & UPDATE_FLAG_ENERGY) == UPDATE_FLAG_ENERGY)
             readEnergyNBT(nbt);
         if (getWorld() != null && causeReRender) //implemented this way in order allow future expansion, when the render influences more things
-            getWorld().notifyBlockUpdate(getPos(), getBlockState(), getBlockState(), BlockFlags.NOTIFY_LISTENERS);
+            getWorld().notifyBlockUpdate(getPos(), getBlockState(), getBlockState(), BlockFlags.BLOCK_UPDATE);
     }
 
     @Override
