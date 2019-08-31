@@ -1,6 +1,14 @@
 # Building Gadgets Changelog
 The format of this document is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and should continue to adhere to the conventions outlined in the Keep a Changelog guidelines.
 
+## [3.0.5a - 1.14.4] - 2019-08-31
+### Fixed
+- Issue causing crashing due to a removed class in Forge 28.0.70+ 
+
+### Removed
+- Removed the ability to disable the Destruction & Copy-Paste gadget in the config. Instead you should modify or make a 
+data pack to remove the recipe. 
+
 ## [3.0.4a - 1.14.4] - 2019-08-26
 ### Fixed
 - Remove some performance improvements which caused BG not to load in non-Dev environment because Forge provides 
