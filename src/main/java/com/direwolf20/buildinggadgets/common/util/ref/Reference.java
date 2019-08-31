@@ -5,9 +5,7 @@ import net.minecraft.util.ResourceLocation;
 
 public final class Reference {
     public static final String MODID = APIReference.MODID;
-    public static final String CONFIG_FILE_SERVER = MODID + "-server.toml";
-    public static final String CONFIG_FILE_CLIENT = MODID + "-client.toml";
-    public static final String CONFIG_FILE_API = MODID + "-api.toml";
+    public static final ResourceLocation NETWORK_CHANNEL_ID_MAIN = new ResourceLocation(Reference.MODID, "main_network_channel");
 
     public static final ResourceLocation WORLD_TEMPLATE_PROVIDER_ID = new ResourceLocation(MODID, "template_provider");
 
