@@ -17,6 +17,7 @@ public interface IPlacementSequence<T> extends Iterable<T>{
 
     /**
      * The bounding box containing all positions which may be produced by this {@code IPositionPlacementSequence}.
+     * @return {@link Region}
      */
     Region getBoundingBox();
 
@@ -31,7 +32,11 @@ public interface IPlacementSequence<T> extends Iterable<T>{
      * <p>
      * Please consult the Javadoc of a given implementation for accurate information.
      *
-     * @return {@code false} if this PlacementSequence definitely doesn't contain the specified Position. Otherwise {@code true}.
+     * @param x X
+     * @param y Y
+     * @param z Z
+     *
+     *  @return {@code false} if this PlacementSequence definitely doesn't contain the specified Position. Otherwise {@code true}.
      */
     boolean mayContain(int x, int y, int z);
 

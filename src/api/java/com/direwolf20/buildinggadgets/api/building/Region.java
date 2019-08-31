@@ -104,6 +104,9 @@ public final class Region implements IPositionPlacementSequence, Serializable {
 
     /**
      * @see #translate(int, int, int)
+     *
+     * @param direction Direction to translate to
+     * @return {@link Region}
      */
     public Region translate(Vec3i direction) {
         return this.translate(direction.getX(), direction.getY(), direction.getZ());
@@ -121,6 +124,9 @@ public final class Region implements IPositionPlacementSequence, Serializable {
 
     /**
      * See {@link #grow(int, int, int)} - grown on all three axes.
+     *
+     * @param size Size to grow to
+     * @return {@link Region}
      */
     public Region grow(int size) {
         return this.grow(size, size, size);
@@ -128,6 +134,12 @@ public final class Region implements IPositionPlacementSequence, Serializable {
 
     /**
      * See {@link #grow(int, int, int)} - subtracting instead of adding.
+     *
+     * @param x X
+     * @param y Y
+     * @param z Z
+     *
+     * @return {@link Region}
      */
     public Region shrink(int x, int y, int z) {
         return this.grow(-x, -y, -z);
@@ -135,6 +147,8 @@ public final class Region implements IPositionPlacementSequence, Serializable {
 
     /**
      * See {@link #grow(int)} - subtracting instead of adding.
+     * @param size Size to shrink to
+     * @return {@link Region}
      */
     public Region shrink(int size) {
         return this.grow(-size);
@@ -152,10 +166,10 @@ public final class Region implements IPositionPlacementSequence, Serializable {
      * <h3>Samples:</h3>
      * <table summary="A few examples of Regions">
      * <tr><th>Input</th><th>Result</th></tr>
-     * <tr><td><pre>{@code new Region(0, 0, 0, 1, 1, 1).grow(2, 2, 2)}</pre></td><td><pre><code>{@code box[-2, -2, -2 -> 3, 3, 3]}</code></pre></td></tr>
-     * <tr><td><pre>{@code new Region(0, 0, 0, 6, 6, 6).grow(-2, -2, -2)}</pre></td><td><pre><code>{@code box[2, 2, 2 -> 4, 4, 4]}</code></pre></td></tr>
-     * <tr><td><pre>{@code new Region(5, 5, 5, 7, 7, 7).grow(0, 1, -1)}</pre></td><td><pre><code>{@code box[5, 4, 6 -> 7, 8, 6]}</code></pre></td></tr>
-     * <tr><td><pre>{@code new Region(1, 1, 1, 3, 3, 3).grow(-4, -2, -3)}</pre></td><td><pre><code>{@code box[-1, 1, 0 -> 5, 3, 4]}</code></pre></td></tr>
+     * <tr><td><pre>{new Region(0, 0, 0, 1, 1, 1).grow(2, 2, 2)}</pre></td><td><pre><code>{box[-2, -2, -2 to 3, 3, 3]}</code></pre></td></tr>
+     * <tr><td><pre>{new Region(0, 0, 0, 6, 6, 6).grow(-2, -2, -2)}</pre></td><td><pre><code>{box[2, 2, 2 to 4, 4, 4]}</code></pre></td></tr>
+     * <tr><td><pre>{new Region(5, 5, 5, 7, 7, 7).grow(0, 1, -1)}</pre></td><td><pre><code>{box[5, 4, 6 to 7, 8, 6]}</code></pre></td></tr>
+     * <tr><td><pre>{new Region(1, 1, 1, 3, 3, 3).grow(-4, -2, -3)}</pre></td><td><pre><code>{box[-1, 1, 0 to 5, 3, 4]}</code></pre></td></tr>
      * </table>
      *
      * <h3>See Also:</h3>
@@ -163,6 +177,12 @@ public final class Region implements IPositionPlacementSequence, Serializable {
      * <li>{@link #grow(int)} - version of this that expands in all directions from one parameter.
      * <li>{@link #shrink(int)} - contracts in all directions
      * </ul>
+     *
+     *
+     * @param x X
+     * @param y Y
+     * @param z Z
+     * @return {@link Region}
      */
     public Region expand(int x, int y, int z) {
         return new Region(minX - x, minY - y, minZ - z, maxX + x, maxY + y, maxZ + z);
@@ -173,20 +193,27 @@ public final class Region implements IPositionPlacementSequence, Serializable {
     }
 
     /**
-     * Expand the current region by the given value in the max values. Equivalent to {@link
-     * #expand(int)}  with the given value for all 3 params. Negative values will shrink the region.
+     * Expand the current region by the given value in the max values. Equivalent to   with the given value for all 3 params. Negative values will shrink the region.
      * <p>
      * Side lengths will be increased by 2 times the value of the parameter, since both min and max are changed.
      * <p>
      * If contracting and the amount to contract by is larger than the length of a side, then the side will wrap (still
      * creating a valid region - see samples on {@link #grow(int, int, int)}).
+     *
+     *
+     * @param size Size to expand to
+     * @return {@link Region}
      */
     public Region expand(int size) {
         return expand(size, size, size);
     }
 
     /**
+     * @param x X
+     * @param y Y
+     * @param z Z
      * @see #expand(int, int, int) - substracting instead of adding.
+     * @return {@link Region}
      */
     public Region collapse(int x, int y, int z) {
         return expand(-x, -y, -z);
@@ -194,6 +221,8 @@ public final class Region implements IPositionPlacementSequence, Serializable {
 
     /**
      * @see #collapse(int, int, int) - read x, y, and z from the {@link Vec3i}.
+     * @param vec Vec3i to collapse to
+     * @return {@link Region}
      */
     public Region collapse(Vec3i vec) {
         return collapse(vec.getX(), vec.getY(), vec.getZ());
@@ -201,6 +230,9 @@ public final class Region implements IPositionPlacementSequence, Serializable {
 
     /**
      * @see #collapse(int, int, int) - collapse on all three axes.
+     *
+     * @param size Size to collapse to
+     * @return {@link Region}
      */
     public Region collapse(int size) {
         return expand(-size);
@@ -209,6 +241,7 @@ public final class Region implements IPositionPlacementSequence, Serializable {
     /**
      * Create a new region with the intersecting part between the two regions.
      *
+     * @param other another region
      * @return a new region
      */
     public Region intersect(Region other) {
@@ -224,6 +257,7 @@ public final class Region implements IPositionPlacementSequence, Serializable {
     /**
      * Create a new region that encloses both regions
      *
+     * @param other another region
      * @return a new region
      */
     public Region union(Region other) {
@@ -307,6 +341,10 @@ public final class Region implements IPositionPlacementSequence, Serializable {
     }
 
     /**
+     * @param x X
+     * @param y Y
+     * @param z Z
+     *
      * @return whether or not this {@link BlockPos} lies within this Region
      */
     public boolean contains(int x, int y, int z) {
@@ -473,7 +511,10 @@ public final class Region implements IPositionPlacementSequence, Serializable {
         }
 
         /**
+         * @param vec Vex3i
          * @see #enclose(int, int, int)
+         *
+         * @return {@link Builder}
          */
         public Builder enclose(Vec3i vec) {
             return enclose(vec.getX(), vec.getY(), vec.getZ());

@@ -24,11 +24,21 @@ public interface IBuildingMode {
 
     /**
      * Iterator that supplies raw coordinates that haven't been filtered yet.
+     *
+     * @param player      target player
+     * @param hit         BlockPos hit
+     * @param sideHit     Side Hit
+     * @param tool        Current Gadget
+     *
+     * @return {@link IPositionPlacementSequence}
      */
     IPositionPlacementSequence computeCoordinates(PlayerEntity player, BlockPos hit, Direction sideHit, ItemStack tool);
 
     /**
      * <p>Get the the block provider that can be accessed by using ItemStack capability system.</p>
+     * @param tool      Current gadget
+     *
+     * @return {@link IBlockProvider}
      */
     default IBlockProvider getBlockProvider(ItemStack tool) {
         LazyOptional<IBlockProvider> capability = tool.getCapability(CapabilityBlockProvider.BLOCK_PROVIDER, null);
@@ -39,6 +49,14 @@ public interface IBuildingMode {
 
     /**
      * @see SimpleBuildView#getPositionSequence()
+     *
+     * @param player    target player
+     * @param hit       BlockPos hit
+     * @param sideHit   Side Hit
+     * @param tool      Current Gadget
+     * @param initial   Initial BlockPos
+     *
+     * @return {@link SimpleBuildContext}
      */
     default SimpleBuildView createExecutionContext(PlayerEntity player, BlockPos hit, Direction sideHit, ItemStack tool, @Nullable BlockPos initial) {
         return new SimpleBuildView(computeCoordinates(player, hit, sideHit, tool), getBlockProvider(tool), this::createValidatorFor,
@@ -47,6 +65,8 @@ public interface IBuildingMode {
 
     /**
      * Registry name used for mapping.
+     *
+     * @return {@link ResourceLocation}
      */
     //TODO implement mode registry system
     ResourceLocation getRegistryName();
@@ -54,6 +74,8 @@ public interface IBuildingMode {
     /**
      * A localized user-readable textual representation of this {@code IBuildingMode}
      * <p>Implementations should override this method and use formatting features.</p>
+     *
+     * @return {@link String}
      */
     String getLocalizedName();
 

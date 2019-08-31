@@ -39,6 +39,10 @@ public class SimpleBuildView implements IBuildView {
 
     /**
      * @see SimpleBuildView#SimpleBuildView(IPositionPlacementSequence, IBlockProvider, IValidatorFactory, IBuildContext, BlockPos)
+     *
+     * @param positions     List of Block Positions
+     * @param blocks        List of Block Providers
+     * @param context       Build Context
      */
     public SimpleBuildView(IPositionPlacementSequence positions, IBlockProvider<?> blocks, IBuildContext context) {
         this(positions, blocks, (world, stack, player, initial) -> (pos, state) -> true, context, null);
@@ -48,7 +52,11 @@ public class SimpleBuildView implements IBuildView {
      * Note that it is assumed that this method will return a block provider which uses the first value returned by
      * {@link #positions} as translation.
      *
+     * @param positions        Positions
+     * @param blocks           List of blocks
      * @param validatorFactory Creates predicate for determining whether a position should be used or not
+     * @param buildContext     Build context
+     * @param start            Starting BlockPos
      */
     public SimpleBuildView(IPositionPlacementSequence positions, IBlockProvider<?> blocks, IValidatorFactory validatorFactory, IBuildContext buildContext, @Nullable BlockPos start) {
         this.positions = positions;
@@ -119,6 +127,8 @@ public class SimpleBuildView implements IBuildView {
 
     /**
      * @see IPositionPlacementSequence#collect()
+     *
+     * @return Filtered Block ImmutableList
      */
     public ImmutableList<BlockPos> collectFilteredSequence() {
         return ImmutableList.copyOf(getFilteredSequence());

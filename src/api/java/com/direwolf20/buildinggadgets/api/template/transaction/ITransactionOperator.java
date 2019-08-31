@@ -72,6 +72,8 @@ public interface ITransactionOperator {
      * Allows this {@code ITransactionOperator} to add arbitrary {@link BlockPos} to a given {@link ITemplate}. Notice that returning a
      * {@link BlockPos} which is already contained in a given {@link ITemplate} will effectively replace the previous data with whatever
      * {@link BlockData} {@link #createDataForPos(ITransactionExecutionContext, BlockPos)} returns.
+     *
+     * @param context Translation context
      * @return A new {@link BlockPos} to add to a given {@link ITemplate} or null if no more positions should be added
      */
     @Nullable

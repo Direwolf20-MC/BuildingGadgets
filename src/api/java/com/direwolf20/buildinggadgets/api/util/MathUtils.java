@@ -16,6 +16,9 @@ public final class MathUtils {
     /**
      * Converts the BlockPos to a long. Under the assumption, that it is non-negative and does not exceed [0, 255] for the y Coordinate
      * and [0, 65536] for x and z‬ Coordinates.
+     * @param pos   BlockPos
+     *
+     * @return BlockPos to a long
      */
     public static long posToLong(BlockPos pos) {
         long res = (long) (pos.getX() & B2_BYTE_MASK) << 24;

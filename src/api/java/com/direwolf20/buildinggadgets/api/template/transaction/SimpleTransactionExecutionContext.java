@@ -116,6 +116,7 @@ public final class SimpleTransactionExecutionContext implements ITransactionExec
          * Same as calling {@link #build(Region) build(null)}
          *
          * @see #build(Region)
+         * @return {@link SimpleTransactionExecutionContext}
          */
         public SimpleTransactionExecutionContext build() {
             return build(null);

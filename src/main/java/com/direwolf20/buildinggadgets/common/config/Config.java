@@ -61,10 +61,6 @@ public class Config {
 
         public final DoubleValue rayTraceRange;
 
-        public final BooleanValue enablePaste;
-
-        public final BooleanValue enableDestructionGadget;
-
         /* Client Only!*/
         public final BooleanValue absoluteCoordDefault;
 
@@ -78,17 +74,6 @@ public class Config {
                     .comment("Defines how far away you can build")
                     .translation(LANG_KEY_GENERAL + ".rayTraceRange")
                     .defineInRange("MaxBuildDistance", 32D, 1, 48);
-
-            enablePaste = SERVER_BUILDER
-                    .comment("Set to false to disable the recipe for construction paste.")
-                    .translation(LANG_KEY_GENERAL + ".paste.enabled")
-                    .define("Enable Construction Paste", true);
-
-
-            enableDestructionGadget = SERVER_BUILDER
-                    .comment("Set to false to disable the Destruction Gadget.")
-                    .translation(LANG_KEY_GENERAL + ".enableDestructionGadget")
-                    .define("Enable Destruction Gadget", true);
 
             absoluteCoordDefault = CLIENT_BUILDER
                     .comment("Determines if the Copy/Paste GUI's coordinate mode starts in 'Absolute' mode by default.", "Set to true for Absolute, set to False for Relative.")

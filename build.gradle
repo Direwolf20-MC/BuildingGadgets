@@ -20,10 +20,12 @@ def env = System.getenv()
 if (env.BUILD_NUMBER) {
     version = version + "-" + "${env.BUILD_NUMBER}"
 }
-group = 'com.direwolf20.buildinggadgets' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
+group = 'com.direwolf20.buildinggadgets'
 archivesBaseName = 'buildinggadgets'
+
 String forgeVersion = "$minecraft_version-${forge_major}.$forge_minor"
 String forgeName = "$forge_base:$forgeVersion"
+
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
 
 sourceSets {
@@ -113,79 +115,38 @@ eclipse {
 }
 
 minecraft {
-    // the mappings can be changed at any time, and must be in the following format.
-    // snapshot_YYYYMMDD   snapshot are built nightly.
-    // stable_#            stables are built at the discretion of the MCP team.
-    // Use non-default mappings at your own risk. they may not always work.
-    // simply re-run your setup task after changing the mappings to update your workspace.
     mappings channel: 'snapshot', version: "${mcp_mappings}-1.14.3" //TODO un hardcode as soon as mcp updates
     // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
 
-    //accessTransformer = file('my_at.cfg')
-
-    // default run configurations.
-    // these can be tweaked, removed, or duplicated as needed.
     runs {
         client = {
-            // recommended logging data for a userdev environment
-            properties 'forge.logging.markers': 'FORGEMOD,REGISTRIES' //SCAN,REGISTRYDUMP'
-            // recommended logging level for the console
+            properties 'forge.logging.markers': 'FORGEMOD,REGISTRIES'
             properties 'forge.logging.console.level': 'debug'
             workingDirectory project.file('run').canonicalPath
             sources sourceSets.main, sourceSets.api
         }
         server = {
-            // recommended logging data for a userdev environment
-            properties 'forge.logging.markers': 'FORGEMOD,REGISTRIES' //SCAN,REGISTRYDUMP'
-            // recommended logging level for the console
+            properties 'forge.logging.markers': 'FORGEMOD,REGISTRIES'
             properties 'forge.logging.console.level': 'debug'
             workingDirectory project.file('run').canonicalPath
             sources sourceSets.main, sourceSets.api
         }
     }
-    /*maven {
-        name 'Raoulvdberge Repo' // RS
-        url 'https://repo.raoulvdberge.com/'
-    }*/
 }
 
 dependencies {
-    // Specify the version of Minecraft to use, If this is any group other then 'net.minecraft' it is assumed
-    // that the dep is a ForgeGradle 'patcher' dependency. And it's patches will be applied.
-    // The userdev artifact is a special name and will get all sorts of transformations applied to it.
     minecraft forgeName
-    apiImplementation("com.google.guava:guava:21.0") {
-        force = true
-    }
+
     apiTestImplementation sourceSets.api.output
     apiTestImplementation "org.junit.jupiter:junit-jupiter-api:${project.junit_version}"
     apiTestImplementation "org.junit.jupiter:junit-jupiter:${project.junit_version}"
     apiTestRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${project.junit_version}"
+
     implementation sourceSets.api.output
     testImplementation sourceSets.apiTest.output
     // deobfCompile "team.chisel.ctm:CTM:MC${minecraft_version}-${ctm_version}:api"
     // deobfCompile "refinedstorage:refinedstorage:${rs_version}:api"
     // runtime "team.chisel.ctm:CTM:MC${minecraft_version}-${ctm_version}"
-
-    // you may put jars on which you depend on in ./libs
-    // or you may define them like so..
-    //compile "some.group:artifact:version:classifier"
-    //compile "some.group:artifact:version"
-
-    // real examples
-    //compile 'com.mod-buildcraft:buildcraft:6.0.8:dev'  // adds buildcraft to the dev env
-    //compile 'com.googlecode.efficient-java-matrix-library:ejml:0.24' // adds ejml to the dev env
-
-    // the 'provided' configuration is for optional dependencies that exist at compile-time but might not at runtime.
-    //provided 'com.mod-buildcraft:buildcraft:6.0.8:dev'
-
-    // These dependencies get remapped to your current MCP mappings
-    //deobf 'com.mod-buildcraft:buildcraft:6.0.8:dev'
-
-    // for more info...
-    // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
-    // http://www.gradle.org/docs/current/userguide/dependency_management.html
-
 }
 
 test {
@@ -195,11 +156,13 @@ test {
     }
 }
 
-processResources { //Processes main only resources
+// Processes main only resources
+processResources {
     inputs.property('version', project.version)
     inputs.property('api_version', project.api_version)
     inputs.property('forge_major', project.forge_major)
     inputs.property('update_json', project.update_json)
+
     from(sourceSets.main.resources.srcDirs) {
         include 'META-INF/mods.toml'
         expand 'version':project.version, 'api_version':project.api_version,'forge_major':project.forge_major,'update_json':project.update_json
@@ -210,7 +173,8 @@ processResources { //Processes main only resources
     }
 }
 
-processApiResources { //Processes main only resources
+// Processes main only resources
+processApiResources {
     inputs.property('version', project.version)
     inputs.property('api_version', project.api_version)
     inputs.property('forge_major', project.forge_major)
@@ -228,7 +192,7 @@ processApiResources { //Processes main only resources
 task clearDoc (type: Delete) {
     delete javadoc.destinationDir
 }
-// Example for how to get properties into the manifest for reading by the runtime..
+
 jar {
     group = project.artifactGroup
     manifest {
@@ -246,26 +210,6 @@ void manipulateDocTags(List<String> tags) {
     tags.add("implNote:a:Implementation Note:")
     tags.add('implSpec:a:Implementation Requirements:')
     tags.add('apiNote:a:API Note:')
-}
-
-void setApiDocOptions(StandardJavadocDocletOptions options) {
-    manipulateDocTags(options.getTags())
-}
-
-void setRegularDocOptions(StandardJavadocDocletOptions options) {
-    manipulateDocTags(options.getTags())
-}
-
-javadoc {
-    setRegularDocOptions(options)
-    source = sourceSets.main.allJava.plus(sourceSets.api.allJava)
-}
-
-task docJar(type: Jar, dependsOn: javadoc) {
-    group = project.artifactGroup
-    manifest = jar.manifest
-    classifier = 'javadoc'
-    from javadoc.destinationDir
 }
 
 task sourcesJar(type: Jar, dependsOn: classes) {
@@ -302,7 +246,7 @@ task apiDoc (type: Javadoc, dependsOn: clearDoc){
     classpath = sourceSets.api.compileClasspath
     exclude('com/dirwolf20/buildinggadgets/api') // no idea why, but this results in only the api doc being created - I thought this would be done by include
     source = sourceSets.api.allJava
-    setApiDocOptions(options)
+    manipulateDocTags(options.getTags())
 }
 
 task apiDocJar(type: Jar, dependsOn: apiDoc) {
@@ -332,7 +276,6 @@ task allImplementationJars {
     group = project.artifactGroup
     dependsOn jar
     dependsOn sourcesJar
-    dependsOn docJar
 }
 
 task allJars {
@@ -354,7 +297,7 @@ test {
     dependsOn apiTestTask
 }
 
-//These 2 need to be hardcoded, because the reobfJar task doesn't register as an ArchivesBaseTask
+// These 2 need to be hardcoded, because the reobfJar task doesn't register as an ArchivesBaseTask
 String reobfApiJarLoc = "${project.buildDir}\\libs\\${archivesBaseName}-api-${api_version}.jar"
 String reobfJarLoc = "${project.buildDir}\\libs\\${archivesBaseName}-${version}.jar"
 artifacts {
@@ -363,7 +306,6 @@ artifacts {
     archives apiDocJar
     archives apiSourcesJar
     archives file(reobfJarLoc)
-    archives docJar
     archives sourcesJar
 }
 
@@ -416,7 +358,6 @@ publishing {
             artifactId = project.archivesBaseName
             version = project.version
             artifact reobfJarLoc
-            artifact docJar
             artifact sourcesJar
             pom {
                 name = "Buildinggadgets"
@@ -450,12 +391,5 @@ publishing {
             }
         }
     }
-    repositories {
-        /*maven {
-            credentials {
-
-            }
-            mavenCentral()
-        }*/
-    }
+    repositories {}
 }

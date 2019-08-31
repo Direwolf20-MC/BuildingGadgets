@@ -157,11 +157,6 @@ public final class TemplateTransactions {
         }
     }
 
-    /**
-     * Identical to calling {@code rotateOperator(Axis.Y, rotation)}.
-     *
-     * @see #rotateOperator(Axis, Rotation)
-     */
     public static ITransactionOperator rotateOperator(Rotation rotation) {
         return new RotateOperator(Objects.requireNonNull(rotation, "Cannot rotate without an Rotation to apply!"));
     }
@@ -268,7 +263,8 @@ public final class TemplateTransactions {
 
     /**
      * Useful in cases where one Operator needs updated Context data from another Operator - just put it one pass after the other
-     *
+     * @param other other
+     * @param passesToShift shift amount
      * @return an {@link ITransactionOperator} which delegates through to the other Operator after passesToShift many passes.
      */
     public static ITransactionOperator shiftingOperator(ITransactionOperator other, int passesToShift) {
@@ -363,6 +359,9 @@ public final class TemplateTransactions {
      * Creates an {@link ITransactionOperator} which replaces the delegate of an {@link com.direwolf20.buildinggadgets.api.template.DelegatingTemplate}. This doesn't have
      * any effect if the {@link ITemplate} is not an instance of {@link com.direwolf20.buildinggadgets.api.template.DelegatingTemplate} or the implementation doesn't specifically
      * support this Operator!
+     *
+     * @param newDelegate newDelegate
+     * @return {@link ReplaceDelegateOperator}
      */
     public static ReplaceDelegateOperator replaceDelegateOperator(ITemplate newDelegate) {
         return new ReplaceDelegateOperator(Objects.requireNonNull(newDelegate, "Cannot construct a replace Delegate Operator without a new Delegate!"));

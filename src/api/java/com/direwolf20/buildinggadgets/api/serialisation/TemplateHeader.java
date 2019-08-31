@@ -24,7 +24,13 @@ import java.util.Objects;
 public final class TemplateHeader {
     /**
      * Convenience overload taking an {@link ITemplateSerializer} instead of it's registryName-
+     *
+     * @param serializer        Template Serializer
+     * @param boundingBox       the {@link Region} bounding box
+     *
      * @see #builder(ResourceLocation, Region)
+     *
+     * @return {@link Builder}
      */
     public static Builder builder(ITemplateSerializer serializer, Region boundingBox) {
         return builder(Objects.requireNonNull(serializer.getRegistryName()), boundingBox);

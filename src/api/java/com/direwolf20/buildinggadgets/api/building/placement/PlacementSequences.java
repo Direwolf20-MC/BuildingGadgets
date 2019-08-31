@@ -37,6 +37,8 @@ public final class PlacementSequences {
          * @param side  side to grow the column into
          * @param range length of the column
          * @implSpec this sequence includes the source position
+         *
+         * @return {@link IPositionPlacementSequence}
          */
         public static IPositionPlacementSequence extendFrom(BlockPos hit, Direction side, int range) {
             return new Region(hit, hit.offset(side, range - 1));
@@ -48,6 +50,8 @@ public final class PlacementSequences {
          * @param center center of the column
          * @param axis   which axis will the column align to
          * @param length length of the column, will be floored to an odd number if it is not one already
+         *
+         * @return {@link com.direwolf20.buildinggadgets.api.building.IPlacementSequence}
          */
         public static IPositionPlacementSequence centerAt(BlockPos center, Axis axis, int length) {
             Direction positive = Direction.getFacingFromAxis(Direction.AxisDirection.POSITIVE, axis);
@@ -59,6 +63,13 @@ public final class PlacementSequences {
 
         /**
          * Starts from the selected position, and extend a column of blocks towards a target position on the axis of the selected face.
+         *
+         * @param source         Source Block
+         * @param target         Target Block
+         * @param axis           which axis will the column align to
+         * @param maxProgression Max range / Progression
+         *
+         * @return {@link IPositionPlacementSequence}
          */
         public static IPositionPlacementSequence createAxisChasing(BlockPos source, BlockPos target, Axis axis, int maxProgression) {
             int difference = VectorUtils.getAxisValue(target, axis) - VectorUtils.getAxisValue(source, axis);
@@ -68,7 +79,14 @@ public final class PlacementSequences {
         }
 
         /**
-         * <p>Note that this factory method does not verify that {@code offsetDirection} is appropriate. Use {@link #createAxisChasing(BlockPos, BlockPos, Axis, int)} if this is required.</p>
+         * <p>Note that this factory method does not verify that {@code offsetDirection} is appropriate.</p>
+         *
+         * @param source          Source Block
+         * @param target          Target Block
+         * @param offsetDirection The direction offset into
+         * @param maxProgression  Max range / Progression
+         *
+         * @return IPositionPlacementSequence
          */
         public static IPositionPlacementSequence createAxisChasing(BlockPos source, BlockPos target, Direction offsetDirection, int maxProgression) {
             Axis axis = offsetDirection.getAxis();
@@ -95,6 +113,8 @@ public final class PlacementSequences {
          * @param center the center of the wall
          * @param side   front face of the wall
          * @param radius radius of the wall
+         *
+         * @return {@link IPositionPlacementSequence}
          */
         public static IPositionPlacementSequence clickedSide(BlockPos center, Direction side, int radius) {
             return create(center, side, radius, null, 0);
@@ -108,6 +128,8 @@ public final class PlacementSequences {
          * @param flatSide  front face of the wall
          * @param radius    radius of the wall.
          * @param extra     amount of blocks to add beyond the radius
+         *
+         * @return {@link IPositionPlacementSequence}
          */
         public static IPositionPlacementSequence extendingFrom(BlockPos posHit, Direction extension, Direction flatSide, int radius, int extra) {
             Preconditions.checkArgument(extension != flatSide, "Cannot have a wall extending to " + extension + " and flat at " + flatSide);
@@ -171,6 +193,10 @@ public final class PlacementSequences {
          * @param world           Block access for searching reference
          * @param searchingCenter Center of the searching region
          * @param side            Facing to offset from the {@code searchingCenter} to get to the reference region center
+         * @param range           Range of the gadget
+         * @param fuzzy           If the gadget is fuzzy
+         *
+         * @return {@link com.direwolf20.buildinggadgets.api.building.IPlacementSequence}
          */
         public static IPositionPlacementSequence create(IBlockReader world, BlockPos searchingCenter, Direction side, int range, boolean fuzzy) {
             Region searchingRegion = Wall.clickedSide(searchingCenter, side, range / 2).getBoundingBox();
@@ -201,6 +227,10 @@ public final class PlacementSequences {
          * @param world           Block access for searching reference
          * @param searchingCenter Center of the searching region
          * @param side            Facing to offset from the {@code searchingCenter} to get to the reference region center
+         * @param range           The range of the tool
+         * @param fuzzy           If the gadget is fuzzy or not
+         *
+         * @return IPositionPlacementSequence
          */
         public static IPositionPlacementSequence create(IBlockReader world, BlockPos searchingCenter, Direction side, int range, boolean fuzzy) {
             Region searchingRegion = Wall.clickedSide(searchingCenter, side, range / 2).getBoundingBox();

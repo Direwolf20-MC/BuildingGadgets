@@ -563,9 +563,9 @@ public final class ImmutableTemplate implements ITemplate {
             return (keySet.size() >= PARALLEL_THRESHOLD ? keySet.parallelStream() : keySet.stream()).collect(Collector.of(
                     () -> new MutableBlockPos(Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE),
                     (mutable, pos) -> {
-                        mutable.func_223471_o(Math.min(mutable.getX(), pos.getX()));
+                        mutable.setX(Math.min(mutable.getX(), pos.getX()));
                         mutable.setY(Math.min(mutable.getY(), pos.getY()));
-                        mutable.func_223472_q(Math.min(mutable.getZ(), pos.getZ()));
+                        mutable.setY(Math.min(mutable.getZ(), pos.getZ()));
                     },
                     (m1, m2) -> new MutableBlockPos(
                             Math.min(m1.getX(), m2.getX()),
