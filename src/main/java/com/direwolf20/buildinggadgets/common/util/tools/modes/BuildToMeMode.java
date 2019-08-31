@@ -17,7 +17,7 @@ import net.minecraft.util.math.BlockPos;
 import javax.annotation.Nonnull;
 
 /**
- * Logic is backed with {@link Column#createAxisChasing(BlockPos, BlockPos, Axis, int)} where no attempt will be made at the ending (player) position.
+ * Logic is backed with {@link Column#createAxisChasing(BlockPos, BlockPos, Axis, int)}} where no attempt will be made at the ending (player) position.
  * <p>
  * This mode is designed for Building Gadget and does not guarantee to work with other gadgets.
  */

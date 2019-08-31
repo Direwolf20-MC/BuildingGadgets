@@ -24,14 +24,26 @@ public abstract class AtopSupportedMode extends AbstractMode {
     }
 
     /**
-     * @param transformed transformed starting position with {@link #transformAtop(PlayerEntity, BlockPos, Direction, ItemStack)}
-     * @param original    original starting position
+     * @param player        current player
+     * @param transformed   transformed starting position with {@link #transformAtop(PlayerEntity, BlockPos, Direction, ItemStack)}
+     * @param original      original starting position
+     * @param sideHit       side of block hit
+     * @param tool          current gadget
      * @implSpec Implementation should work with {@code transformed.equals(original)}
+     *
+     * @return {@link IPositionPlacementSequence}
      */
     public abstract IPositionPlacementSequence computeWithTransformed(PlayerEntity player, BlockPos transformed, BlockPos original, Direction sideHit, ItemStack tool);
 
     /**
      * Calculate the block pos if "Place on Top" was enabled.
+     *
+     * @param player    target player
+     * @param hit       BlockPos hit
+     * @param sideHit   side hit
+     * @param tool      current gadget
+     *
+     * @return {@link BlockPos}
      */
     public abstract BlockPos transformAtop(PlayerEntity player, BlockPos hit, Direction sideHit, ItemStack tool);
 

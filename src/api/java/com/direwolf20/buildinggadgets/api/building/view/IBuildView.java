@@ -82,6 +82,7 @@ public interface IBuildView extends IPlacementSequence<PlacementTarget>, AutoClo
      * Attempts to compute the amount of required {@link UniqueItem}'s. Should never be more than might be needed,
      * but may be fewer if exact requirements are hard or expensive to compute.
      *
+     * @param simulatePos nullable BlockPos used to simulate
      * @return A {@link MaterialList} representing the Item Requirements to build this {@code IBuildView}.
      */
     default MaterialList estimateRequiredItems(@Nullable Vec3d simulatePos) {

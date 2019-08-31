@@ -29,6 +29,9 @@ public interface IPositionPlacementSequence extends IPlacementSequence<BlockPos>
     /**
      * Collect the elements provided by the object to the given {@link Collection}.
      *
+     * @param collection    collection
+     * @param <T>           collection
+     *
      * @return The given {@link Collection} but with all Elements represented by this {@code IPositionPlacementSequence} added to it. Will be the same instance as the parameter.
      */
     default <T extends Collection<? super BlockPos>> T collect(T collection) {
@@ -38,6 +41,7 @@ public interface IPositionPlacementSequence extends IPlacementSequence<BlockPos>
 
     /**
      * Collect the elements into a newly created {@link ImmutableList}
+     * @return {@link ImmutableList}
      */
     default ImmutableList<BlockPos> collect() {
         return ImmutableList.copyOf(this);

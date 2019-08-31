@@ -390,6 +390,9 @@ public class NBTHelper {
     /**
      * If the given stack has a tag, returns it. If the given stack does not have a tag, it will set a reference and
      * return the new tag compound.
+     *
+     * @param stack itemStack
+     * @return new CompoundNBT
      */
     public static CompoundNBT getOrNewTag(ItemStack stack) {
         if (stack.hasTag()) {

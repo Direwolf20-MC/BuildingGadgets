@@ -11,7 +11,7 @@ import net.minecraft.util.math.BlockPos;
  * Blocks.AIR.getDefaultState()} when the given position is out of boundary. All positions passed as parameter will be
  * translated by a specific vector which can be accessed by {@link #getTranslation()}.
  *
- * @param <T>
+ * @param <T> {@link IBlockProvider}
  */
 public interface IBlockProvider<T extends IBlockProvider<T>> {
 
@@ -32,6 +32,7 @@ public interface IBlockProvider<T extends IBlockProvider<T>> {
 
     /**
      * The parameter will be translated by {@link #getTranslation} before being used to read a block state.
+     * @param pos block pos
      *
      * @return block that should be placed at the position
      * @implNote In most cases, {@code pos.add(this.getTranslation())} should be sufficient.
@@ -40,11 +41,14 @@ public interface IBlockProvider<T extends IBlockProvider<T>> {
 
     /**
      * Write the containing data into the given tag.
+     *
+     * @param tag given tag
      */
     void serialize(CompoundNBT tag);
 
     /**
      * @see #serialize(CompoundNBT) - create a new {@link CompoundNBT} instead of writing into an existing one.
+     * @return CompoundNBT
      */
     default CompoundNBT serialize() {
         CompoundNBT tag = new CompoundNBT();
@@ -54,8 +58,9 @@ public interface IBlockProvider<T extends IBlockProvider<T>> {
 
     /**
      * Reads the data contained in the given tag and write them into a new object.
-     *
+     * @param tag given tag
      * @implSpec The returning object should have the same type.
+     * @return {@link T}
      */
     T deserialize(CompoundNBT tag);
 

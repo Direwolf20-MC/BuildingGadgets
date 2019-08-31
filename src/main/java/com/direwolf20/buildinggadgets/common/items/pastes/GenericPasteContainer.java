@@ -12,6 +12,9 @@ public abstract class GenericPasteContainer extends Item {
 
     /**
      * Helper method. Delegates to {@link GenericPasteContainer#setPasteCount(ItemStack, int)}.
+     *
+     * @param stack  current gadget
+     * @param amount amount
      */
     public static void setPasteAmount(ItemStack stack, int amount) {
         Item item = stack.getItem();
