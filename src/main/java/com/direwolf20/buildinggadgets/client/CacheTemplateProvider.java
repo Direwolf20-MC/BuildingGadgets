@@ -3,6 +3,10 @@ package com.direwolf20.buildinggadgets.client;
 import com.direwolf20.buildinggadgets.api.template.ITemplate;
 import com.direwolf20.buildinggadgets.api.template.provider.ITemplateKey;
 import com.direwolf20.buildinggadgets.api.template.provider.ITemplateProvider;
+import com.direwolf20.buildinggadgets.common.network.PacketHandler;
+import com.direwolf20.buildinggadgets.common.network.packets.PacketRequestTemplate;
+import com.direwolf20.buildinggadgets.common.network.packets.PacketTemplateIdAllocated;
+import com.direwolf20.buildinggadgets.common.network.packets.SplitPacketUpdateTemplate;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 
@@ -30,15 +34,36 @@ public final class CacheTemplateProvider implements ITemplateProvider {
     public ITemplate getTemplateForKey(@Nonnull ITemplateKey key) {
         UUID id = key.getTemplateId(this::getFreeId);
         try {
-            ITemplate template = cache.get(id, () -> key.createTemplate(id));
-            if (key.requestUpdate(template))
-                onUpdateRequested(id);
-            else if (key.requestRemoteUpdate(template))
-                onRemoteUpdateRequested(id, template);
-            return template;
+            return cache.get(id, () -> key.createTemplate(id));
         } catch (ExecutionException e) {
             throw new RuntimeException("Failed to access Cache!", e);
         }
+    }
+
+    @Override
+    public void setTemplate(ITemplateKey key, ITemplate template) {
+        UUID id = key.getTemplateId(this::getFreeId);
+        allocatedIds.add(id);
+        cache.put(id, template);
+    }
+
+    @Override
+    public boolean requestUpdate(ITemplateKey key) {
+        PacketHandler.sendToServer(new PacketRequestTemplate(key.getTemplateId(this::getFreeId)));
+        return true;
+    }
+
+    @Override
+    public boolean requestRemoteUpdate(ITemplateKey key) {
+        UUID id = key.getTemplateId(this::getFreeId);
+        ITemplate template = cache.getIfPresent(id);
+        if (template != null)
+            PacketHandler.getSplitManager().sendToServer(new SplitPacketUpdateTemplate(id, template));
+        return template != null;
+    }
+
+    public void onRemoteIdAllocated(UUID id) {
+        this.allocatedIds.add(id);
     }
 
     private UUID getFreeId() {
@@ -51,15 +76,7 @@ public final class CacheTemplateProvider implements ITemplateProvider {
 
     private void onIdAllocated(UUID allocatedId) {
         this.allocatedIds.add(allocatedId);
-        //TODO packet
-    }
-
-    private void onUpdateRequested(UUID id) {
-        //TODO packet
-    }
-
-    private void onRemoteUpdateRequested(UUID id, ITemplate template) {
-        //TODO packet
+        PacketHandler.sendToServer(new PacketTemplateIdAllocated(allocatedId));
     }
 
     void clear() {

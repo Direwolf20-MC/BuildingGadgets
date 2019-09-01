@@ -12,6 +12,7 @@ import net.minecraft.world.storage.WorldSavedData;
 import net.minecraftforge.common.util.Constants.NBT;
 
 import java.util.*;
+import java.util.function.Function;
 
 public abstract class TimedDataSave<T extends TimedValue> extends WorldSavedData {
     private Map<UUID, T> idToValue;
@@ -29,8 +30,12 @@ public abstract class TimedDataSave<T extends TimedValue> extends WorldSavedData
     }
 
     protected T get(UUID id) {
+        return get(id, uuid -> createValue());
+    }
+
+    protected T get(UUID id, Function<UUID, T> factory) {
         markDirty();
-        return idToValue.computeIfAbsent(id, uuid -> createValue());
+        return idToValue.computeIfAbsent(id, factory);
     }
 
     protected void remove(UUID id) {
@@ -43,6 +48,10 @@ public abstract class TimedDataSave<T extends TimedValue> extends WorldSavedData
                     timeToId.remove(val.getUpdateTime());
             }
         }
+    }
+
+    protected boolean contains(UUID id) {
+        return idToValue.containsKey(id);
     }
 
     public long getLastUpdateTime(UUID id) {

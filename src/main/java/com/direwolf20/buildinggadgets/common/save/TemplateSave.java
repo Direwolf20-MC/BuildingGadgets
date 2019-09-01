@@ -9,6 +9,7 @@ import com.direwolf20.buildinggadgets.common.save.TemplateSave.TemplateInfo;
 import net.minecraft.nbt.CompoundNBT;
 
 import java.util.UUID;
+import java.util.function.Function;
 
 public final class TemplateSave extends TimedDataSave<TemplateInfo> {
 
@@ -16,15 +17,18 @@ public final class TemplateSave extends TimedDataSave<TemplateInfo> {
         super(name);
     }
 
+    public ITemplate getTemplate(UUID id, Function<UUID, ITemplate> factory) {
+        TemplateInfo info = get(id, uuid -> new TemplateInfo(factory.apply(uuid)));
+        return markDirtyAndUpdate(info).getTemplate();
+    }
+
     public ITemplate getTemplate(UUID id) {
         TemplateInfo info = get(id);
-        markDirty();
-        return info.updateTime().getTemplate();
+        return markDirtyAndUpdate(info).getTemplate();
     }
 
     void setTemplate(UUID id, ITemplate template) {
-        get(id).updateTime().setTemplate(template);
-        markDirty();
+        markDirtyAndUpdate(get(id, uuid -> new TemplateInfo(template))).setTemplate(template);
     }
 
     void removeTemplate(UUID id) {
@@ -46,12 +50,22 @@ public final class TemplateSave extends TimedDataSave<TemplateInfo> {
         }
     }
 
+    private TemplateInfo markDirtyAndUpdate(TemplateInfo info) {
+        markDirty();
+        return info.updateTime();
+    }
+
     static final class TemplateInfo extends TimedDataSave.TimedValue { //for reasons I don't understand it doesn't compile if you leave the TimedDataSave out!
         private ITemplate template;
 
         private TemplateInfo(CompoundNBT nbt) throws IllegalTemplateFormatException {
             super(nbt);
             template = TemplateIO.readTemplate(nbt, null, true);
+        }
+
+        private TemplateInfo(ITemplate template) {
+            super();
+            this.template = template;
         }
 
         private TemplateInfo(long lastUpdateTime, ITemplate template) {

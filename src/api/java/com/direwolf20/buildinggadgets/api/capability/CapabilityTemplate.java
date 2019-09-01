@@ -46,8 +46,6 @@ public class CapabilityTemplate {
                     CompoundNBT nbt = new CompoundNBT();
                     if (simpleTemplateKey.getId() != null)
                         nbt.putUniqueId(NBTKeys.KEY_ID, simpleTemplateKey.getId());
-                    nbt.putBoolean("client_update", simpleTemplateKey.requireClientUpdate());
-                    nbt.putBoolean("server_update", simpleTemplateKey.requireServerUpdate());
                     return nbt;
                 }
                 return null;
@@ -60,8 +58,6 @@ public class CapabilityTemplate {
                     CompoundNBT nbt = (CompoundNBT) inbt;
                     if (nbt.hasUniqueId(NBTKeys.KEY_ID))
                         simpleTemplateKey.setUUID(nbt.getUniqueId(NBTKeys.KEY_ID));
-                    simpleTemplateKey.setRequireClientUpdate(nbt.getBoolean("client_update"));
-                    simpleTemplateKey.setRequireServerUpdate(nbt.getBoolean("server_update"));
                 }
             }
         }, SimpleTemplateKey::new);

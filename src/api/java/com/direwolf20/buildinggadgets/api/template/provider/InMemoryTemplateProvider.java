@@ -20,8 +20,19 @@ public class InMemoryTemplateProvider implements ITemplateProvider {
         return map.computeIfAbsent(id, key::createTemplate);
     }
 
-    public void insertTemplate(UUID id, ITemplate template) {
-        this.map.put(id, template);
+    @Override
+    public boolean requestUpdate(ITemplateKey key) {
+        return false;
+    }
+
+    @Override
+    public boolean requestRemoteUpdate(ITemplateKey key) {
+        return false;
+    }
+
+    @Override
+    public void setTemplate(ITemplateKey key, ITemplate template) {
+        this.map.put(key.getTemplateId(this::requestFreeId), template);
     }
 
     public void clear() {

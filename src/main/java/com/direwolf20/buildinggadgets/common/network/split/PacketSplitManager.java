@@ -7,6 +7,7 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent.Context;
+import net.minecraftforge.fml.network.PacketDistributor.PacketTarget;
 
 import java.util.IdentityHashMap;
 import java.util.Map;
@@ -43,7 +44,11 @@ public final class PacketSplitManager {
         send(message, PacketHandler::sendToServer);
     }
 
-    public void send(Object message, Consumer<SplitPacket> packetConsumer) {
+    public void send(Object message, PacketTarget target) {
+        send(message, packet -> PacketHandler.HANDLER.send(target, packet));
+    }
+
+    private void send(Object message, Consumer<SplitPacket> packetConsumer) {
         @SuppressWarnings("unchecked") //it will only ever have been inserted for the correct class!
                 PacketSplitHandler<Object> handler = (PacketSplitHandler<Object>) classToHandlerMap.get(message.getClass());
         Preconditions.checkArgument(handler != null, "Cannot send unknown packet " + message + "!");

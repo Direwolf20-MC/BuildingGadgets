@@ -30,16 +30,6 @@ public final class ItemTemplateKey implements ITemplateKey {
     }
 
     @Override
-    public boolean requestUpdate(ITemplate currentTemplate) {
-        return false;
-    }
-
-    @Override
-    public boolean requestRemoteUpdate(ITemplate currentTemplate) {
-        return false;
-    }
-
-    @Override
     public ITemplate createTemplate(UUID id) {
         return new DelegatingTemplate();
     }

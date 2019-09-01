@@ -33,6 +33,7 @@ import com.direwolf20.buildinggadgets.common.network.packets.PacketBindTool;
 import com.direwolf20.buildinggadgets.common.save.SaveManager;
 import com.direwolf20.buildinggadgets.common.save.UndoWorldSave;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
+import com.direwolf20.buildinggadgets.common.util.exceptions.CapabilityNotPresentException;
 import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
 import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
 import com.direwolf20.buildinggadgets.common.util.lang.ITranslationProvider;
@@ -50,6 +51,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.NBTUtil;
@@ -448,6 +450,8 @@ public class GadgetCopyPaste extends AbstractGadget {
 
     private void onCopyFinished(ItemStack stack, PlayerEntity player) {
         sendMessageAndFree(stack, player, MessageTranslation.AREA_COPIED, Styles.DK_GREEN);
+        SaveManager.INSTANCE.getTemplateProvider().requestUpdate(stack.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY)
+                .orElseThrow(CapabilityNotPresentException::new), (ServerPlayerEntity) player);
     }
 
     private void onTooManyDifferentBlocks(ItemStack stack, PlayerEntity player) {

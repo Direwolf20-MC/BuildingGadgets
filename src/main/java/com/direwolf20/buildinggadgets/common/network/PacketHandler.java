@@ -10,6 +10,7 @@ import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.fml.network.NetworkEvent.Context;
 import net.minecraftforge.fml.network.NetworkRegistry;
+import net.minecraftforge.fml.network.PacketDistributor;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
 
 import java.util.function.BiConsumer;
@@ -27,6 +28,10 @@ public class PacketHandler {
             .serverAcceptedVersions(PROTOCOL_VERSION::equals)
             .networkProtocolVersion(() -> PROTOCOL_VERSION)
             .simpleChannel();
+
+    public static PacketSplitManager getSplitManager() {
+        return SPLIT_MANAGER;
+    }
 
     public static void register() {
         // Server side
@@ -53,12 +58,18 @@ public class PacketHandler {
 
         // Both Sides
         registerMessage(SplitPacket.class, SPLIT_MANAGER::encode, SPLIT_MANAGER::decode, SPLIT_MANAGER::handle);
+        getSplitManager().registerSplitPacket(SplitPacketUpdateTemplate.class, SplitPacketUpdateTemplate::encode, SplitPacketUpdateTemplate::new, SplitPacketUpdateTemplate::handle);
+        registerMessage(PacketTemplateIdAllocated.class, PacketTemplateIdAllocated::encode, PacketTemplateIdAllocated::new, PacketTemplateIdAllocated::handle);
         registerMessage(PacketSetRemoteInventoryCache.class, PacketSetRemoteInventoryCache::encode, PacketSetRemoteInventoryCache::decode, PacketSetRemoteInventoryCache.Handler::handle);
     }
 
     public static void sendTo(Object msg, ServerPlayerEntity player) {
         if (!(player instanceof FakePlayer))
             HANDLER.sendTo(msg, player.connection.netManager, NetworkDirection.PLAY_TO_CLIENT);
+    }
+
+    public static void sendToAllClients(Object msg) {
+        HANDLER.send(PacketDistributor.ALL.noArg(), msg);
     }
 
     public static void sendToServer(Object msg) {
