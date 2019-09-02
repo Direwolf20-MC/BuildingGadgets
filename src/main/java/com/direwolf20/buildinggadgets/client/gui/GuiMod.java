@@ -5,8 +5,10 @@ package com.direwolf20.buildinggadgets.client.gui;
 import com.direwolf20.buildinggadgets.client.gui.blocks.ChargingStationGUI;
 import com.direwolf20.buildinggadgets.client.gui.blocks.TemplateManagerGUI;
 import com.direwolf20.buildinggadgets.client.gui.components.GuiTextFieldBase;
+import com.direwolf20.buildinggadgets.client.gui.materiallist.MaterialListGUI;
 import com.direwolf20.buildinggadgets.common.containers.ChargingStationContainer;
 import com.direwolf20.buildinggadgets.common.containers.TemplateManagerContainer;
+import com.direwolf20.buildinggadgets.common.items.ITemplate;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetDestruction;
 import com.direwolf20.buildinggadgets.common.tiles.ChargingStationTileEntity;
@@ -17,9 +19,7 @@ import com.google.common.base.Function;
 import com.google.common.base.Supplier;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.entity.player.*;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.INamedContainerProvider;
 import net.minecraft.item.ItemStack;
@@ -65,11 +65,22 @@ public enum GuiMod {
             return true;
         }
         return false;
-    });
+    }),
 
-//    MATERIAL_LIST(ITemplate::getTemplate, MaterialListGUI::new);
+    MATERIAL_LIST(player -> {
+        ItemStack mainhand = player.getHeldItemMainhand();
+        if (mainhand.getItem() instanceof ITemplate)
+            return mainhand;
+
+        ItemStack offhand = player.getHeldItemOffhand();
+        if (offhand.getItem() instanceof ITemplate)
+            return offhand;
+
+        return ItemStack.EMPTY;
+    }, MaterialListGUI::new);
 
     private static interface IContainerOpener {
+
         boolean open(String id, ServerPlayerEntity player, World world, BlockPos pos);
     }
 
