@@ -15,6 +15,7 @@ public enum MaterialListTranslation implements ITranslationProvider {
     BUTTON_SORTING_MISSINGACSE("button.sorting.missingAcse", 0),
     BUTTON_SORTING_MISSINGDESC("button.sorting.missingDesc", 0),
     MESSAGE_COPY_SUCCESS("message.copyList.success", 0),
+    HELP_COPY_LIST("help.copyList", 0),
     TITLE("title", 0);
 
     private static final String PREFIX = "gui." + Reference.MODID + ".materialList.";

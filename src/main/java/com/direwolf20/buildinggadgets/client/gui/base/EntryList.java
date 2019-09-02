@@ -64,7 +64,7 @@ public class EntryList<E extends AbstractListEntry<E>> extends ExtendedList<E> {
             renderHeader(k, l, tessellator);
         }
 
-        renderList(k, l, mouseX, mouseX, partialTicks);
+        renderList(k, l, mouseX, mouseY, partialTicks);
         GlStateManager.disableDepthTest();
 
         renderHoleBackground(0, y0, 255, 255);

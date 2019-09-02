@@ -4,6 +4,7 @@ import com.direwolf20.buildinggadgets.common.items.ITemplate;
 import com.direwolf20.buildinggadgets.common.util.lang.MaterialListTranslation;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -177,10 +178,10 @@ public class MaterialListGUI extends Screen {
         drawString(font, title, titleLeft, titleTop, Color.WHITE.getRGB());
         super.render(mouseX, mouseY, particleTicks);
 
-        if (hoveringText != null) {
-            RenderHelper.enableGUIStandardItemLighting();
-            setTaskHoveringText(hoveringTextX, hoveringTextY, hoveringText);
-            GlStateManager.disableLighting();
+        if (buttonCopyList.isMouseOver(mouseX, mouseY)) {
+            GuiUtils.drawHoveringText(ImmutableList.of(MaterialListTranslation.HELP_COPY_LIST.format()), mouseX, mouseY, width, height, Integer.MAX_VALUE, font);
+        } else if (hoveringText != null) {
+            GuiUtils.drawHoveringText(hoveringText, hoveringTextX, hoveringTextY, width, height, Integer.MAX_VALUE, font);
             hoveringText = null;
         }
     }

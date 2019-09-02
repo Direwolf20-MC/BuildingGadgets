@@ -138,7 +138,7 @@ class ScrollingMaterialList extends EntryList<Entry> {
         }
 
         private void drawHoveringText(ItemStack item, int slotX, int slotY, int mouseX, int mouseY) {
-            if (parent.isMouseOver(mouseX, mouseY) && isPointInBox(mouseX, mouseY, slotX, slotY, 18, 18))
+            if (isPointInBox(mouseX, mouseY, slotX, slotY, 18, 18))
                 parent.gui.setTaskHoveringText(mouseX, mouseY, parent.gui.getTooltipFromItem(item));
         }
 
