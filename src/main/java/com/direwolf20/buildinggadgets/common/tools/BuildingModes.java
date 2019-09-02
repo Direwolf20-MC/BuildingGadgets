@@ -71,7 +71,7 @@ public enum BuildingModes {
         return StreamSupport.stream(
                 Spliterators.spliteratorUnknownSize(
                         mode.createExecutionContext(player, hit, sideHit, tool).getFilteredSequence(world, tool, player, initial),
-                        SORTED
+                        ORDERED
                 ),
                 false
         ).sorted(Comparator.comparingDouble((e) -> e.distanceSqToCenter(player.posX, player.posY + player.getEyeHeight(), player.posZ))).collect(Collectors.toList());
