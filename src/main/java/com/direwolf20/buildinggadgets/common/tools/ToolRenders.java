@@ -36,9 +36,7 @@ import org.apache.commons.lang3.tuple.Triple;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL14;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
@@ -76,7 +74,6 @@ public class ToolRenders {
         renderLinkedInventoryOutline(heldItem, playerPos, player);
 
         RayTraceResult lookingAt = VectorTools.getLookingAt(player, heldItem);
-        IBlockState state = Blocks.AIR.getDefaultState();
         List<BlockPos> coordinates = getAnchor(heldItem);
 
         if (lookingAt == null && coordinates.size() == 0)
@@ -113,19 +110,22 @@ public class ToolRenders {
         GlStateManager.pushMatrix();
         ToolRenders.Utils.stateManagerPrepareBlend();
 
-//        List<BlockPos> sortedCoordinates = Sorter.Blocks.byDistance(coordinates, player); //Sort the coords by distance to player.
-
-        for (BlockPos coordinate : coordinates) {
+        // Render all the raw blocks
+        coordinates.forEach(coordinate -> {
             GlStateManager.pushMatrix();
             ToolRenders.Utils.stateManagerPrepare(playerPos, coordinate, null);
             GL14.glBlendColor(1F, 1F, 1F, 0.55f); //Set the alpha of the blocks we are rendering
 
+            IBlockState state = Blocks.AIR.getDefaultState();
             if (fakeWorld.getWorldType() != WorldType.DEBUG_ALL_BLOCK_STATES)
                 state = renderBlockState.getActualState(fakeWorld, coordinate);
 
             mc.getBlockRendererDispatcher().renderBlockBrightness(state, 1f);//Render the defined block
             GlStateManager.popMatrix();
+        });
 
+        // Render if the block can be built or not
+        for (BlockPos coordinate : coordinates) {
             GlStateManager.pushMatrix();
             ToolRenders.Utils.stateManagerPrepare(playerPos, coordinate, 0.01f);
             GlStateManager.scale(1.006f, 1.006f, 1.006f);
