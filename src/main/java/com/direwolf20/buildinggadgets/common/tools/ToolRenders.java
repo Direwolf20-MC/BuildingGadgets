@@ -113,9 +113,9 @@ public class ToolRenders {
         GlStateManager.pushMatrix();
         ToolRenders.Utils.stateManagerPrepareBlend();
 
-        List<BlockPos> sortedCoordinates = Sorter.Blocks.byDistance(coordinates, player); //Sort the coords by distance to player.
+//        List<BlockPos> sortedCoordinates = Sorter.Blocks.byDistance(coordinates, player); //Sort the coords by distance to player.
 
-        for (BlockPos coordinate : sortedCoordinates) {
+        for (BlockPos coordinate : coordinates) {
             GlStateManager.pushMatrix();
             ToolRenders.Utils.stateManagerPrepare(playerPos, coordinate, null);
             GL14.glBlendColor(1F, 1F, 1F, 0.55f); //Set the alpha of the blocks we are rendering

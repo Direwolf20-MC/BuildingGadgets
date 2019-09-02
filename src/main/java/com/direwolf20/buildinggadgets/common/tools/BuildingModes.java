@@ -19,6 +19,11 @@ import net.minecraft.world.World;
 
 import java.util.*;
 import java.util.function.BiPredicate;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
+
+import static java.util.Spliterator.ORDERED;
+import static java.util.Spliterator.SORTED;
 
 public enum BuildingModes {
     BuildToMe("build_to_me.png", new BuildToMeMode(BuildingModes::combineTester)),
@@ -61,8 +66,15 @@ public enum BuildingModes {
 
     public static List<BlockPos> collectPlacementPos(World world, EntityPlayer player, BlockPos hit, EnumFacing sideHit, ItemStack tool, BlockPos initial) {
         IBuildingMode mode = byName(NBTTool.getOrNewTag(tool).getString("mode")).getModeImplementation();
-        return mode.createExecutionContext(player, hit, sideHit, tool)
-                .collectFilteredSequence(world, tool, player, initial);
+
+        // stream, sort by closes to the player, collect, return
+        return StreamSupport.stream(
+                Spliterators.spliteratorUnknownSize(
+                        mode.createExecutionContext(player, hit, sideHit, tool).getFilteredSequence(world, tool, player, initial),
+                        SORTED
+                ),
+                false
+        ).sorted(Comparator.comparingDouble((e) -> e.distanceSqToCenter(player.posX, player.posY + player.getEyeHeight(), player.posZ))).collect(Collectors.toList());
     }
 
     public static BuildingModes byName(String name) {
