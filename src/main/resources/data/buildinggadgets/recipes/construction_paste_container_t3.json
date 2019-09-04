@@ -15,10 +15,5 @@
     "c": {
       "item": "buildinggadgets:construction_paste_container_t2"
     }
-  },
-  "conditions": [
-    {
-      "type": "buildinggadgets:enable_paste"
-    }
-  ]
+  }
 }
