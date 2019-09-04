@@ -1,31 +1,16 @@
 package com.direwolf20.buildinggadgets.client.gui.base;
 
 import com.mojang.blaze3d.platform.GlStateManager;
-import com.mojang.blaze3d.platform.GlStateManager.DestFactor;
-import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.AbstractGui;
 import net.minecraft.client.gui.widget.list.ExtendedList;
 import net.minecraft.client.gui.widget.list.ExtendedList.AbstractListEntry;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.math.MathHelper;
-import org.lwjgl.opengl.GL11;
 
 import static org.lwjgl.opengl.GL11.*;
 
-/**
- * A preset of {@link ExtendedList} where
- * <ul>
- * <li>No overlays will be drawn
- * <li>No dirt background, but a gradient rectangle instead
- * <li>Use {@link GL11#glScissor(int, int, int, int)} instead of overlay pieces to cover overflows
- * <li>Allow selection
- * <li>Ability to disable the transitioning black rectangles (override {@link #renderTransition(Tessellator,
- * BufferBuilder, int, int)}
- * </ul>
- */
 public class EntryList<E extends AbstractListEntry<E>> extends ExtendedList<E> {
 
     public static final int SCROLL_BAR_WIDTH = 6;
@@ -50,7 +35,7 @@ public class EntryList<E extends AbstractListEntry<E>> extends ExtendedList<E> {
 
     // Copied and modified from AbstractLists#render(int, int, float)
     private void renderParts(int mouseX, int mouseY, float partialTicks) {
-        this.renderBackground();
+        renderBackground();
         GlStateManager.disableLighting();
         GlStateManager.disableFog();
         Tessellator tessellator = Tessellator.getInstance();
@@ -66,13 +51,6 @@ public class EntryList<E extends AbstractListEntry<E>> extends ExtendedList<E> {
 
         renderList(k, l, mouseX, mouseY, partialTicks);
         GlStateManager.disableDepthTest();
-
-        renderHoleBackground(0, y0, 255, 255);
-        renderHoleBackground(y1, height, 255, 255);
-
-        renderTransition(tessellator, bufferbuilder, y0, y0 + 4);
-        renderTransition(tessellator, bufferbuilder, y1 - 4, y1);
-        GlStateManager.shadeModel(GL_FLAT);
 
         int j1 = getMaxScroll();
         if (j1 > 0) {
@@ -106,55 +84,16 @@ public class EntryList<E extends AbstractListEntry<E>> extends ExtendedList<E> {
 
         renderDecorations(mouseX, mouseX);
         GlStateManager.enableTexture();
-        GlStateManager.shadeModel(GL_FLAT);
-        GlStateManager.enableAlphaTest();
         GlStateManager.disableBlend();
-    }
-
-    protected void renderTransition(Tessellator tessellator, BufferBuilder buffer, int transitionTop, int transitionBottom) {
-        GlStateManager.enableBlend();
-        GlStateManager.blendFuncSeparate(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA, SourceFactor.ZERO, DestFactor.ONE);
-        GlStateManager.disableAlphaTest();
-        GlStateManager.shadeModel(GL_SMOOTH);
-        buffer.begin(GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
-        buffer.pos(x0, transitionTop, 0.0D).color(0, 0, 0, 255).endVertex();
-        buffer.pos(x1, transitionTop, 0.0D).color(0, 0, 0, 255).endVertex();
-        buffer.pos(x1, transitionBottom, 0.0D).color(0, 0, 0, 0).endVertex();
-        buffer.pos(x0, transitionBottom, 0.0D).color(0, 0, 0, 0).endVertex();
-        tessellator.draw();
     }
 
     protected void renderContentBackground(Tessellator tessellator, BufferBuilder bufferbuilder) {
         fillGradient(getLeft(), getTop(), getRight(), getBottom(), 0xC0101010, 0xD0101010);
     }
 
-    protected final void renderDefaultContentBackground(Tessellator tessellator, BufferBuilder bufferbuilder) {
-        this.minecraft.getTextureManager().bindTexture(AbstractGui.BACKGROUND_LOCATION);
-        GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-        bufferbuilder.begin(GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
-        float v1 = (float) (y1 + (int) getScrollAmount()) / 32.0F;
-        float v2 = (float) (y0 + (int) getScrollAmount()) / 32.0F;
-        float u1 = (float) x0 / 32.0F;
-        float u2 = (float) x1 / 32.0F;
-        bufferbuilder.pos(x0, y1, 0.0D).tex(u1, v1).color(32, 32, 32, 255).endVertex();
-        bufferbuilder.pos(x1, y1, 0.0D).tex(u2, v1).color(32, 32, 32, 255).endVertex();
-        bufferbuilder.pos(x1, y0, 0.0D).tex(u2, v2).color(32, 32, 32, 255).endVertex();
-        bufferbuilder.pos(x0, y0, 0.0D).tex(u1, v2).color(32, 32, 32, 255).endVertex();
-        tessellator.draw();
-    }
-
     // No dirt top/bottom background
     @Override
     protected void renderHoleBackground(int p_renderHoleBackground_1_, int p_renderHoleBackground_2_, int p_renderHoleBackground_3_, int p_renderHoleBackground_4_) {
-    }
-
-    protected final void renderDefaultHoldBackground(int p1, int p2, int p3, int p4) {
-        super.renderHoleBackground(p1, p2, p3, p4);
-    }
-
-    @Override
-    protected int getScrollbarPosition() {
-        return getRight() - SCROLL_BAR_WIDTH;
     }
 
     @Override
@@ -175,6 +114,7 @@ public class EntryList<E extends AbstractListEntry<E>> extends ExtendedList<E> {
         if (super.mouseDragged(x, y, button, dx, dy))
             return true;
 
+        // Dragging elements in panel
         if (isMouseOver(x, y)) {
             setScrollAmount(getScrollAmount() - dy);
         }

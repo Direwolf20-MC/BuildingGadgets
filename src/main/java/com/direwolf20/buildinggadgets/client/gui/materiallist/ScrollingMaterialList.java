@@ -1,20 +1,24 @@
 package com.direwolf20.buildinggadgets.client.gui.materiallist;
 
+import com.direwolf20.buildinggadgets.api.building.view.*;
+import com.direwolf20.buildinggadgets.api.materials.UniqueItem;
+import com.direwolf20.buildinggadgets.api.template.IBuildOpenOptions;
+import com.direwolf20.buildinggadgets.api.template.SimpleBuildOpenOptions;
 import com.direwolf20.buildinggadgets.client.gui.base.EntryList;
 import com.direwolf20.buildinggadgets.common.util.helpers.InventoryHelper;
-import com.direwolf20.buildinggadgets.common.util.tools.UniqueItem;
 import com.google.common.collect.Multiset;
 import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.client.gui.widget.list.ExtendedList;
-import net.minecraft.client.renderer.*;
+import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import org.lwjgl.glfw.GLFW;
 
 import java.awt.*;
+import java.util.Objects;
 
 import static com.direwolf20.buildinggadgets.client.gui.materiallist.MaterialListGUI.*;
 import static com.direwolf20.buildinggadgets.client.gui.materiallist.ScrollingMaterialList.Entry;
@@ -42,9 +46,18 @@ class ScrollingMaterialList extends EntryList<Entry> {
                 ENTRY_HEIGHT);
         this.gui = gui;
 
-        Multiset<UniqueItem> materials = gui.getTemplateItem().getItemCountMap(gui.getTemplate());
-        ClientPlayerEntity player = Minecraft.getInstance().player;
         World world = Minecraft.getInstance().world;
+        ClientPlayerEntity player = Minecraft.getInstance().player;
+        IBuildContext context = SimpleBuildContext.builder()
+                .buildingPlayer(player)
+                .usedStack(gui.getTemplateItem())
+                .build(world);
+        IBuildOpenOptions options = SimpleBuildOpenOptions.builder()
+                .context(context)
+                .openType(IBuildOpenOptions.OpenType.DEFAULT)
+                .build();
+        IBuildView view = Objects.requireNonNull(gui.getTemplateCapability().createViewInContext(options));
+        Multiset<UniqueItem> materials = view.estimateRequiredItems().getRequiredItems();
         for (Multiset.Entry<UniqueItem> entry : materials.entrySet()) {
             UniqueItem item = entry.getElement();
             addEntry(new Entry(this, item, entry.getCount(), InventoryHelper.countItem(item.toItemStack(), player, world)));
@@ -201,10 +214,6 @@ class ScrollingMaterialList extends EntryList<Entry> {
         public boolean isSelected() {
             return parent.getSelected() == this;
         }
-    }
-
-    @Override
-    protected void renderTransition(Tessellator tessellator, BufferBuilder buffer, int transitionTop, int transitionBottom) {
     }
 
     public SortingModes getSortingMode() {

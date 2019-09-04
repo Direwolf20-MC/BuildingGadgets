@@ -1,14 +1,15 @@
 package com.direwolf20.buildinggadgets.client.gui;
 
-//import com.direwolf20.buildinggadgets.client.gui.materiallist.MaterialListGUI;
-
+import com.direwolf20.buildinggadgets.api.capability.CapabilityTemplate;
+import com.direwolf20.buildinggadgets.api.template.ITemplate;
+import com.direwolf20.buildinggadgets.api.template.provider.ITemplateKey;
 import com.direwolf20.buildinggadgets.client.gui.blocks.ChargingStationGUI;
 import com.direwolf20.buildinggadgets.client.gui.blocks.TemplateManagerGUI;
 import com.direwolf20.buildinggadgets.client.gui.components.GuiTextFieldBase;
 import com.direwolf20.buildinggadgets.client.gui.materiallist.MaterialListGUI;
+import com.direwolf20.buildinggadgets.common.capability.provider.TemplateKeyProvider;
 import com.direwolf20.buildinggadgets.common.containers.ChargingStationContainer;
 import com.direwolf20.buildinggadgets.common.containers.TemplateManagerContainer;
-import com.direwolf20.buildinggadgets.common.items.ITemplate;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetDestruction;
 import com.direwolf20.buildinggadgets.common.tiles.ChargingStationTileEntity;
@@ -28,6 +29,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fml.network.FMLPlayMessages.OpenContainer;
 import net.minecraftforge.fml.network.NetworkHooks;
 
@@ -69,11 +71,12 @@ public enum GuiMod {
 
     MATERIAL_LIST(player -> {
         ItemStack mainhand = player.getHeldItemMainhand();
-        if (mainhand.getItem() instanceof ITemplate)
+        if (mainhand.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).isPresent()) {
             return mainhand;
+        }
 
         ItemStack offhand = player.getHeldItemOffhand();
-        if (offhand.getItem() instanceof ITemplate)
+        if (offhand.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).isPresent())
             return offhand;
 
         return ItemStack.EMPTY;

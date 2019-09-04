@@ -5,6 +5,7 @@ import com.direwolf20.buildinggadgets.api.util.RegistryUtils;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.util.Constants.NBT;
@@ -41,6 +42,10 @@ public final class UniqueItem {
 
     public Item getItem() {
         return item;
+    }
+
+    public ItemStack toItemStack() {
+        return new ItemStack(item, 1, tagCompound);
     }
 
     public ResourceLocation getRegistryName() {

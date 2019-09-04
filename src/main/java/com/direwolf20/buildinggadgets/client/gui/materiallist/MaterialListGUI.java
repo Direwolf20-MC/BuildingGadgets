@@ -1,6 +1,11 @@
 package com.direwolf20.buildinggadgets.client.gui.materiallist;
 
-import com.direwolf20.buildinggadgets.common.items.ITemplate;
+import com.direwolf20.buildinggadgets.api.capability.CapabilityTemplate;
+import com.direwolf20.buildinggadgets.api.template.ITemplate;
+import com.direwolf20.buildinggadgets.api.template.provider.ITemplateKey;
+import com.direwolf20.buildinggadgets.api.template.provider.ITemplateProvider;
+import com.direwolf20.buildinggadgets.common.BuildingGadgets;
+import com.direwolf20.buildinggadgets.common.capability.provider.TemplateProviderCapabilityProvider;
 import com.direwolf20.buildinggadgets.common.util.lang.MaterialListTranslation;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.google.common.base.Preconditions;
@@ -11,10 +16,10 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.Widget;
 import net.minecraft.client.gui.widget.button.Button;
-import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fml.client.config.GuiUtils;
 
 import java.awt.*;
@@ -71,26 +76,19 @@ public class MaterialListGUI extends Screen {
     public static final int WINDOW_WIDTH = BACKGROUND_WIDTH - BORDER_SIZE * 2;
     public static final int WINDOW_HEIGHT = BACKGROUND_HEIGHT - BORDER_SIZE * 2;
 
-    /**
-     * <ol>
-     * <li>Item name (localized)
-     * <li>Item count
-     * </ol>
-     */
+     // Item name (localized)
+     // Item count
     public static final String PATTERN_SIMPLE = "%s: %d";
-    /**
-     * <ol>
-     * <li>Item name (localized)
-     * <li>Item count
-     * <li>Item registry name
-     * <li>Formatted stack count, e.g. 5x64+2
-     * </ol>
-     */
+     // Item name (localized)
+     // Item count
+     // Item registry name
+     // Formatted stack count, e.g. 5x64+2
     public static final String PATTERN_DETAILED = "%s: %d (%s, %s)";
 
     private int backgroundX;
     private int backgroundY;
-    private ItemStack template;
+    private ItemStack item;
+    private ITemplate cachedTemplate;
 
     private String title;
     private int titleLeft;
@@ -106,10 +104,10 @@ public class MaterialListGUI extends Screen {
     private int hoveringTextY;
     private List<String> hoveringText;
 
-    public MaterialListGUI(ItemStack template) {
+    public MaterialListGUI(ItemStack item) {
         super(MaterialListTranslation.TITLE.componentTranslation());
-        Preconditions.checkArgument(template.getItem() instanceof ITemplate);
-        this.template = template;
+        Preconditions.checkArgument(item.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).isPresent());
+        this.item = item;
     }
 
     @Override
@@ -236,12 +234,29 @@ public class MaterialListGUI extends Screen {
         return WINDOW_HEIGHT;
     }
 
-    public ItemStack getTemplate() {
-        return template;
+    public ItemStack getTemplateItem() {
+        return item;
     }
 
-    public ITemplate getTemplateItem() {
-        return (ITemplate) template.getItem();
+    public ITemplate getTemplateCapability() {
+        if (cachedTemplate == null) {
+            LazyOptional<ITemplateProvider> providerCap = Minecraft.getInstance().world.getCapability(CapabilityTemplate.TEMPLATE_PROVIDER_CAPABILITY);
+            if (providerCap.isPresent()) {
+                LazyOptional<ITemplateKey> keyCap = item.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY);
+                if (keyCap.isPresent()) {
+                    ITemplateProvider provider = providerCap.orElseThrow(RuntimeException::new);
+                    ITemplateKey key = keyCap.orElseThrow(RuntimeException::new);
+                    cachedTemplate = provider.getTemplateForKey(key);
+                } else {
+                    BuildingGadgets.LOG.warn("Item used for material list does not have an ITemplateKey capability!");
+                    Minecraft.getInstance().player.closeScreen();
+                }
+            } else {
+                BuildingGadgets.LOG.warn("Item used for material list does not have an ITemplateProvider capability!");
+                Minecraft.getInstance().player.closeScreen();
+            }
+        }
+        return cachedTemplate;
     }
 
     public void setTaskHoveringText(int x, int y, List<String> text) {
