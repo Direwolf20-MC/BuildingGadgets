@@ -18,7 +18,7 @@
 To see how to use Dires `Building Gadgets` refer to our [Wiki](https://github.com/Direwolf20-MC/BuildingGadgets/wiki) and well as Direwolf's Spotlights - [Spotlight Part One](https://youtu.be/D4Ib4h7aTSk) and [Spotlight Part Two](https://youtu.be/JS1Xx_kwQQ0)
 
 ### Installing the mod
-**First**, grab [forge](https://files.minecraftforge.net) and install it using the installer. **Second**, pick up [Building Gadgets](https://minecraft.curseforge.com/projects/building-gadgets) from CurseForge, **Third**, drop the hot stuff into your Mods folder (*Psst* It's in username/appdata/.roaming/minecraft), **Finally**, Enjoy
+**First**, grab [forge](https://files.minecraftforge.net) and install it using the installer. **Second**, pick up [Building Gadgets](https://minecraft.curseforge.com/projects/building-gadgets) from CurseForge, **Third**, drop the hot stuff into your `mods` folder (*Psst* It's in `C:\Users\<username>\AppData\Roaming\.minecraft\mods`), **Finally**, Enjoy
 
 *Bonus: Find a bug and report it for a cookie*
 
