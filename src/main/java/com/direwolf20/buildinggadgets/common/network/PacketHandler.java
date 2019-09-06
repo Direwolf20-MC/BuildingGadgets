@@ -1,5 +1,7 @@
 package com.direwolf20.buildinggadgets.common.network;
 
+import com.direwolf20.buildinggadgets.common.network.login.InitAllocatedIds;
+import com.direwolf20.buildinggadgets.common.network.login.LoginIndexedMessage;
 import com.direwolf20.buildinggadgets.common.network.packets.*;
 import com.direwolf20.buildinggadgets.common.network.split.PacketSplitManager;
 import com.direwolf20.buildinggadgets.common.network.split.SplitPacket;
@@ -7,6 +9,7 @@ import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.common.util.FakePlayer;
+import net.minecraftforge.fml.network.FMLHandshakeHandler;
 import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.fml.network.NetworkEvent.Context;
 import net.minecraftforge.fml.network.NetworkRegistry;
@@ -24,6 +27,13 @@ public class PacketHandler {
 
     public static final SimpleChannel HANDLER = NetworkRegistry.ChannelBuilder
             .named(Reference.NETWORK_CHANNEL_ID_MAIN)
+            .clientAcceptedVersions(PROTOCOL_VERSION::equals)
+            .serverAcceptedVersions(PROTOCOL_VERSION::equals)
+            .networkProtocolVersion(() -> PROTOCOL_VERSION)
+            .simpleChannel();
+
+    public static final SimpleChannel LOGIN_MESSAGE_CHANNEL = NetworkRegistry.ChannelBuilder
+            .named(Reference.NETWORK_CHANNEL_ID_LOGIN)
             .clientAcceptedVersions(PROTOCOL_VERSION::equals)
             .serverAcceptedVersions(PROTOCOL_VERSION::equals)
             .networkProtocolVersion(() -> PROTOCOL_VERSION)
@@ -80,5 +90,15 @@ public class PacketHandler {
         index++;
         if (index > 0xFF)
             throw new RuntimeException("Too many messages!");
+    }
+
+    private static void registerLoginMessages() {
+        LOGIN_MESSAGE_CHANNEL.messageBuilder(InitAllocatedIds.class, 1)
+                .loginIndex(LoginIndexedMessage::getIndex, LoginIndexedMessage::setIndex)
+                .decoder(InitAllocatedIds::new)
+                .encoder(InitAllocatedIds::encode)
+                .markAsLoginPacket()
+                .consumer(FMLHandshakeHandler.biConsumerFor((fmlHandshakeHandler, initAllocatedIds, contextSupplier) -> initAllocatedIds.handleOnClient(contextSupplier)))
+                .add();
     }
 }

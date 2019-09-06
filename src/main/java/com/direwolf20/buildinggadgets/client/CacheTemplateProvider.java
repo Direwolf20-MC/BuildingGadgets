@@ -34,7 +34,10 @@ public final class CacheTemplateProvider implements ITemplateProvider {
     public ITemplate getTemplateForKey(@Nonnull ITemplateKey key) {
         UUID id = key.getTemplateId(this::getFreeId);
         try {
-            return cache.get(id, () -> key.createTemplate(id));
+            return cache.get(id, () -> {
+                requestUpdate(id);
+                return key.createTemplate(id);
+            });
         } catch (ExecutionException e) {
             throw new RuntimeException("Failed to access Cache!", e);
         }
@@ -49,7 +52,11 @@ public final class CacheTemplateProvider implements ITemplateProvider {
 
     @Override
     public boolean requestUpdate(ITemplateKey key) {
-        PacketHandler.sendToServer(new PacketRequestTemplate(key.getTemplateId(this::getFreeId)));
+        return requestUpdate(key.getTemplateId(this::getFreeId));
+    }
+
+    private boolean requestUpdate(UUID id) {
+        PacketHandler.sendToServer(new PacketRequestTemplate(id));
         return true;
     }
 
