@@ -52,10 +52,7 @@ class ScrollingMaterialList extends EntryList<Entry> {
                 .buildingPlayer(player)
                 .usedStack(gui.getTemplateItem())
                 .build(world);
-        IBuildOpenOptions options = SimpleBuildOpenOptions.builder()
-                .context(context)
-                .openType(IBuildOpenOptions.OpenType.DEFAULT)
-                .build();
+        IBuildOpenOptions options = SimpleBuildOpenOptions.withContext(context);
         IBuildView view = Objects.requireNonNull(gui.getTemplateCapability().createViewInContext(options));
         Multiset<UniqueItem> materials = view.estimateRequiredItems().getRequiredItems();
         for (Multiset.Entry<UniqueItem> entry : materials.entrySet()) {

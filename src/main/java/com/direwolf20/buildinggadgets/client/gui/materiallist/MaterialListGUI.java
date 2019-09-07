@@ -5,7 +5,6 @@ import com.direwolf20.buildinggadgets.api.template.ITemplate;
 import com.direwolf20.buildinggadgets.api.template.provider.ITemplateKey;
 import com.direwolf20.buildinggadgets.api.template.provider.ITemplateProvider;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
-import com.direwolf20.buildinggadgets.common.capability.provider.TemplateProviderCapabilityProvider;
 import com.direwolf20.buildinggadgets.common.util.lang.MaterialListTranslation;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.google.common.base.Preconditions;
@@ -76,19 +75,18 @@ public class MaterialListGUI extends Screen {
     public static final int WINDOW_WIDTH = BACKGROUND_WIDTH - BORDER_SIZE * 2;
     public static final int WINDOW_HEIGHT = BACKGROUND_HEIGHT - BORDER_SIZE * 2;
 
-     // Item name (localized)
-     // Item count
+    // Item name (localized)
+    // Item count
     public static final String PATTERN_SIMPLE = "%s: %d";
-     // Item name (localized)
-     // Item count
-     // Item registry name
-     // Formatted stack count, e.g. 5x64+2
+    // Item name (localized)
+    // Item count
+    // Item registry name
+    // Formatted stack count, e.g. 5x64+2
     public static final String PATTERN_DETAILED = "%s: %d (%s, %s)";
 
     private int backgroundX;
     private int backgroundY;
     private ItemStack item;
-    private ITemplate cachedTemplate;
 
     private String title;
     private int titleLeft;
@@ -239,24 +237,21 @@ public class MaterialListGUI extends Screen {
     }
 
     public ITemplate getTemplateCapability() {
-        if (cachedTemplate == null) {
-            LazyOptional<ITemplateProvider> providerCap = Minecraft.getInstance().world.getCapability(CapabilityTemplate.TEMPLATE_PROVIDER_CAPABILITY);
-            if (providerCap.isPresent()) {
-                LazyOptional<ITemplateKey> keyCap = item.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY);
-                if (keyCap.isPresent()) {
-                    ITemplateProvider provider = providerCap.orElseThrow(RuntimeException::new);
-                    ITemplateKey key = keyCap.orElseThrow(RuntimeException::new);
-                    cachedTemplate = provider.getTemplateForKey(key);
-                } else {
-                    BuildingGadgets.LOG.warn("Item used for material list does not have an ITemplateKey capability!");
-                    Minecraft.getInstance().player.closeScreen();
-                }
-            } else {
-                BuildingGadgets.LOG.warn("Item used for material list does not have an ITemplateProvider capability!");
-                Minecraft.getInstance().player.closeScreen();
+        LazyOptional<ITemplateProvider> providerCap = Minecraft.getInstance().world.getCapability(CapabilityTemplate.TEMPLATE_PROVIDER_CAPABILITY);
+        if (providerCap.isPresent()) {
+            LazyOptional<ITemplateKey> keyCap = item.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY);
+            if (keyCap.isPresent()) {
+                ITemplateProvider provider = providerCap.orElseThrow(RuntimeException::new);
+                ITemplateKey key = keyCap.orElseThrow(RuntimeException::new);
+                return provider.getTemplateForKey(key);
             }
+            BuildingGadgets.LOG.warn("Item used for material list does not have an ITemplateKey capability!");
+            Minecraft.getInstance().player.closeScreen();
+            return null;
         }
-        return cachedTemplate;
+        BuildingGadgets.LOG.warn("Client world used for material list does not have an ITemplateProvider capability!");
+        Minecraft.getInstance().player.closeScreen();
+        return null;
     }
 
     public void setTaskHoveringText(int x, int y, List<String> text) {
