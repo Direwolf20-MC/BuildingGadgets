@@ -1,4 +1,4 @@
-package com.direwolf20.buildinggadgets.client;
+package com.direwolf20.buildinggadgets.client.cache;
 
 import com.direwolf20.buildinggadgets.api.template.ITemplate;
 import com.direwolf20.buildinggadgets.api.template.provider.ITemplateKey;
@@ -21,7 +21,7 @@ public final class CacheTemplateProvider implements ITemplateProvider {
     private final Cache<UUID, ITemplate> cache;
     private final Set<UUID> allocatedIds;
 
-    CacheTemplateProvider() {
+    public CacheTemplateProvider() {
         this.cache = CacheBuilder
                 .newBuilder()
                 .expireAfterAccess(1, TimeUnit.MINUTES)
@@ -86,7 +86,11 @@ public final class CacheTemplateProvider implements ITemplateProvider {
         PacketHandler.sendToServer(new PacketTemplateIdAllocated(allocatedId));
     }
 
-    void clear() {
+    /**
+     * Although public, do not use this method willingly. The cache is already purged on each
+     * onPlayerLoggedOut event.
+     */
+    public void clear() {
         this.cache.invalidateAll();
         this.cache.cleanUp();
         this.allocatedIds.clear();

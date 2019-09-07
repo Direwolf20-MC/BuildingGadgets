@@ -13,10 +13,5 @@
     {
       "item": "minecraft:clay_ball"
     }
-  ],
-  "conditions": [
-    {
-      "type": "buildinggadgets:enable_paste"
-    }
   ]
 }

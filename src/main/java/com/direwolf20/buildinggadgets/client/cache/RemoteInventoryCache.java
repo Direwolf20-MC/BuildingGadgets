@@ -1,4 +1,4 @@
-package com.direwolf20.buildinggadgets.client;
+package com.direwolf20.buildinggadgets.client.cache;
 
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketSetRemoteInventoryCache;
