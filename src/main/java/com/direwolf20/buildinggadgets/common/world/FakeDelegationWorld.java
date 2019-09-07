@@ -328,7 +328,7 @@ public class FakeDelegationWorld implements IWorld {
         if (info != null) {
             info.setState(newState);
         } else
-            posToBlock.put(pos, new BlockInfo(pos, newState));
+            posToBlock.put(pos, createInfo(pos, newState));
         return true;
     }
 
@@ -373,7 +373,11 @@ public class FakeDelegationWorld implements IWorld {
         return false;
     }
 
-    private static final class BlockInfo {
+    protected BlockInfo createInfo(BlockPos pos, BlockState state) {
+        return new BlockInfo(pos, state);
+    }
+
+    protected static class BlockInfo {
         private BlockPos pos;
         private BlockState state;
         @Nullable

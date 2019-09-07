@@ -197,7 +197,7 @@ public abstract class AbstractGadget extends Item {
                             .setStyle(Styles.BLUE));
     }
 
-    protected UUID getUUID(ItemStack stack) {
+    public UUID getUUID(ItemStack stack) {
         CompoundNBT nbt = NBTHelper.getOrNewTag(stack);
         if (! nbt.hasUniqueId(NBTKeys.GADGET_UUID)) {
             UUID newId = getUndoSave().getFreeUUID();

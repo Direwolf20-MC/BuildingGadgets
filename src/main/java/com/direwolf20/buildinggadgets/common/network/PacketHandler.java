@@ -71,6 +71,7 @@ public class PacketHandler {
         getSplitManager().registerSplitPacket(SplitPacketUpdateTemplate.class, SplitPacketUpdateTemplate::encode, SplitPacketUpdateTemplate::new, SplitPacketUpdateTemplate::handle);
         registerMessage(PacketTemplateIdAllocated.class, PacketTemplateIdAllocated::encode, PacketTemplateIdAllocated::new, PacketTemplateIdAllocated::handle);
         registerMessage(PacketSetRemoteInventoryCache.class, PacketSetRemoteInventoryCache::encode, PacketSetRemoteInventoryCache::decode, PacketSetRemoteInventoryCache.Handler::handle);
+        registerMessage(PacketRequestTemplate.class, PacketRequestTemplate::encode, PacketRequestTemplate::new, PacketRequestTemplate::handle);
     }
 
     public static void sendTo(Object msg, ServerPlayerEntity player) {
