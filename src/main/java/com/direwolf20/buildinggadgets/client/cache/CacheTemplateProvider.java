@@ -86,6 +86,10 @@ public final class CacheTemplateProvider implements ITemplateProvider {
         PacketHandler.sendToServer(new PacketTemplateIdAllocated(allocatedId));
     }
 
+    /**
+     * Although public, do not use this method willingly. The cache is already purged on each
+     * onPlayerLoggedOut event.
+     */
     public void clear() {
         this.cache.invalidateAll();
         this.cache.cleanUp();
