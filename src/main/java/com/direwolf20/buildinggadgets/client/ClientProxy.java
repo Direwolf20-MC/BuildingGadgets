@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.client;
 
+import com.direwolf20.buildinggadgets.client.cache.CacheTemplateProvider;
 import com.direwolf20.buildinggadgets.client.events.EventClientTick;
 import com.direwolf20.buildinggadgets.client.events.EventTooltip;
 import com.direwolf20.buildinggadgets.client.models.ConstructionBakedModel;
