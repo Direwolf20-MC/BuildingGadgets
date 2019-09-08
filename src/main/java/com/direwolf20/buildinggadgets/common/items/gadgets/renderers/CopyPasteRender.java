@@ -163,17 +163,17 @@ public class CopyPasteRender extends BaseRenderer {
                     //GlStateManager.translate(-0.0005f, -0.0005f, 0.0005f);
                     //GlStateManager.scale(1.001f, 1.001f, 1.001f);//Slightly Larger block to avoid z-fighting.
                     GlStateManager.translatef(0.0005f, 0.0005f, - 0.0005f);
-                    GlStateManager.scalef(0.999f, 0.999f, 0.999f);//Slightly Larger block to avoid z-fighting.
                     BlockRendererDispatcher dispatcher = getMc().getBlockRendererDispatcher();
                     TileEntityRendererDispatcher teDispatcher = TileEntityRendererDispatcher.instance;
                     for (PlacementTarget target : sorter.getSortedTargets()) {
                         BlockPos targetPos = target.getPos();
                         BlockState state = context.getWorld().getBlockState(target.getPos());
                         TileEntity te = context.getWorld().getTileEntity(target.getPos());
-                        GlStateManager.pushMatrix();//Push matrix again just because
+                        GlStateManager.pushMatrix();//Push matrix again in order to apply these settings individually
+                        GlStateManager.scalef(0.999f, 0.999f, 0.999f);//Slightly Larger block to avoid z-fighting.
                         GlStateManager.translated(targetPos.getX(), targetPos.getY(), targetPos.getZ());//The render starts at the player, so we subtract the player coords and move the render to 0,0,0
-                        GlStateManager.rotatef(- 90.0F, 0.0F, 1.0F, 0.0F); //Rotate it because i'm not sure why but we need to
                         GlStateManager.enableBlend(); //We have to do this in the loop because the TE Render removes blend when its done
+                        GlStateManager.rotatef(- 90.0F, 0.0F, 1.0F, 0.0F); //Rotate it because i'm not sure why but we need to
                         //state = state.getBlock().getExtendedState(state, fakeWorld, coordinate); //Get the extended block state in the fake world (Disabled to fix chisel, not sure why.)
                         try {
                             dispatcher.renderBlockBrightness(state, 1f);//Render the defined block
