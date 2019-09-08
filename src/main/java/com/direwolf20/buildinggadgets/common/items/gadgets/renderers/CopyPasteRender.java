@@ -47,7 +47,7 @@ public class CopyPasteRender extends BaseRenderer {
 
     private final Cache<BlockData, Boolean> erroredCache = CacheBuilder
             .newBuilder()
-            .expireAfterAccess(1, TimeUnit.MINUTES)
+            .expireAfterAccess(500, TimeUnit.MILLISECONDS)
             .build();
 
     public ChestRenderer getChestRenderer() {
@@ -173,9 +173,8 @@ public class CopyPasteRender extends BaseRenderer {
                         BlockState state = context.getWorld().getBlockState(target.getPos());
                         TileEntity te = context.getWorld().getTileEntity(target.getPos());
                         GlStateManager.pushMatrix();//Push matrix again in order to apply these settings individually
-                        GlStateManager.scalef(1, 1, 1);//Slightly Larger block to avoid z-fighting.
-                        BuildingGadgets.LOG.info("Translating to {} with player at {}", targetPos, playerPos);
-                        GlStateManager.translated(targetPos.getX(), targetPos.getY(), targetPos.getZ());//The render starts at the player, so we subtract the player coords and move the render to 0,0,0
+                        GlStateManager.scalef(0.999f, 0.999f, 0.999f);//Slightly Larger block to avoid z-fighting.
+                        GlStateManager.translatef(targetPos.getX(), targetPos.getY(), targetPos.getZ());//The render starts at the player, so we subtract the player coords and move the render to 0,0,0
                         GlStateManager.enableBlend(); //We have to do this in the loop because the TE Render removes blend when its done
                         //GlStateManager.rotatef(- 90.0F, 0.0F, 1.0F, 0.0F); //Rotate it because i'm not sure why but we need to
                         //state = state.getBlock().getExtendedState(state, fakeWorld, coordinate); //Get the extended block state in the fake world (Disabled to fix chisel, not sure why.)
@@ -186,17 +185,17 @@ public class CopyPasteRender extends BaseRenderer {
                             BufferBuilder bufferBuilder = tessellator.getBuffer();
                             bufferBuilder.finishDrawing();
                         }
-                        /*
                         try {
                             if (te != null && ! erroredCache.get(target.getData(), () -> false)) {
                                 teDispatcher.render(te, targetPos.getX(), targetPos.getY(), targetPos.getZ(), partialTicks, - 1, true);
                             }
                         } catch (Exception e) {
                             erroredCache.put(target.getData(), true);
-                        }*/
+                        }
 
                         GlStateManager.popMatrix();
                     }
+                    GlStateManager.disableBlend();
                     GlStateManager.popAttributes();
                     GlStateManager.popMatrix();
                     //TODO unbuildBlocks
