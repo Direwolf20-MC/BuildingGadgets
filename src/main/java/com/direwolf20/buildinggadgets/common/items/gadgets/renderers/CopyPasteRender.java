@@ -142,6 +142,7 @@ public class CopyPasteRender extends BaseRenderer {
                         BuildingGadgets.LOG.warn("Expected Template to be able to create a build view! Aborting render!");
                         return;
                     }
+                    view.translateTo(startPos);
                     RenderSorter sorter = new RenderSorter(context, view.estimateSize());
                     for (PlacementTarget target : view) {
                         if (target.placeIn(context))
@@ -153,16 +154,18 @@ public class CopyPasteRender extends BaseRenderer {
                     //Save the current position that is being rendered
                     GlStateManager.pushMatrix();
 
+                    GlStateManager.pushTextureAttributes();
+
                     //Enable Blending (So we can have transparent effect)
                     GlStateManager.enableBlend();
                     //This blend function allows you to use a constant alpha, which is defined later
                     GlStateManager.blendFunc(GL14.GL_CONSTANT_ALPHA, GL14.GL_ONE_MINUS_CONSTANT_ALPHA);
-                    //GlStateManager.translated(-playerPos.getX(), -playerPos.getY(), -playerPos.getZ());//The render starts at the player, so we subtract the player coords and move the render to 0,0,0
+                    GlStateManager.translated(- playerPos.getX(), - playerPos.getY(), - playerPos.getZ());//The render starts at the player, so we subtract the player coords and move the render to 0,0,0
 
                     GL14.glBlendColor(1F, 1F, 1F, 0.55f); //Set the alpha of the blocks we are rendering
                     //GlStateManager.translate(-0.0005f, -0.0005f, 0.0005f);
                     //GlStateManager.scale(1.001f, 1.001f, 1.001f);//Slightly Larger block to avoid z-fighting.
-                    GlStateManager.translatef(0.0005f, 0.0005f, - 0.0005f);
+                    //GlStateManager.translatef(0.0005f, 0.0005f, - 0.0005f);
                     BlockRendererDispatcher dispatcher = getMc().getBlockRendererDispatcher();
                     TileEntityRendererDispatcher teDispatcher = TileEntityRendererDispatcher.instance;
                     for (PlacementTarget target : sorter.getSortedTargets()) {
@@ -170,10 +173,11 @@ public class CopyPasteRender extends BaseRenderer {
                         BlockState state = context.getWorld().getBlockState(target.getPos());
                         TileEntity te = context.getWorld().getTileEntity(target.getPos());
                         GlStateManager.pushMatrix();//Push matrix again in order to apply these settings individually
-                        GlStateManager.scalef(0.999f, 0.999f, 0.999f);//Slightly Larger block to avoid z-fighting.
+                        GlStateManager.scalef(1, 1, 1);//Slightly Larger block to avoid z-fighting.
+                        BuildingGadgets.LOG.info("Translating to {} with player at {}", targetPos, playerPos);
                         GlStateManager.translated(targetPos.getX(), targetPos.getY(), targetPos.getZ());//The render starts at the player, so we subtract the player coords and move the render to 0,0,0
                         GlStateManager.enableBlend(); //We have to do this in the loop because the TE Render removes blend when its done
-                        GlStateManager.rotatef(- 90.0F, 0.0F, 1.0F, 0.0F); //Rotate it because i'm not sure why but we need to
+                        //GlStateManager.rotatef(- 90.0F, 0.0F, 1.0F, 0.0F); //Rotate it because i'm not sure why but we need to
                         //state = state.getBlock().getExtendedState(state, fakeWorld, coordinate); //Get the extended block state in the fake world (Disabled to fix chisel, not sure why.)
                         try {
                             dispatcher.renderBlockBrightness(state, 1f);//Render the defined block
@@ -182,16 +186,18 @@ public class CopyPasteRender extends BaseRenderer {
                             BufferBuilder bufferBuilder = tessellator.getBuffer();
                             bufferBuilder.finishDrawing();
                         }
+                        /*
                         try {
                             if (te != null && ! erroredCache.get(target.getData(), () -> false)) {
                                 teDispatcher.render(te, targetPos.getX(), targetPos.getY(), targetPos.getZ(), partialTicks, - 1, true);
                             }
                         } catch (Exception e) {
                             erroredCache.put(target.getData(), true);
-                        }
+                        }*/
 
                         GlStateManager.popMatrix();
                     }
+                    GlStateManager.popAttributes();
                     GlStateManager.popMatrix();
                     //TODO unbuildBlocks
                 });
