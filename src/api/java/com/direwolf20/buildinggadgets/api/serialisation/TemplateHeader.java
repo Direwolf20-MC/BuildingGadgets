@@ -177,6 +177,7 @@ public final class TemplateHeader {
     public String toJson(boolean printName, boolean extended) {
         return new GsonBuilder()
                 .setPrettyPrinting()
+                .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
                 .registerTypeAdapter(ResourceLocation.class, (JsonSerializer<ResourceLocation>) (src, typeOfSrc, context) -> new JsonPrimitive(src.toString()))
                 .registerTypeAdapter(MaterialList.class, (JsonSerializer<MaterialList>) (src, typeOfSrc, context) -> {
                     Multiset<UniqueItem> set = src.getRequiredItems();
