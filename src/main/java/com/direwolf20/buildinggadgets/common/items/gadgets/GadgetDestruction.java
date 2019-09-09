@@ -290,7 +290,7 @@ public class GadgetDestruction extends AbstractGadget {
             player.sendMessage(TooltipTranslation.GADGET_PALETTE_OVERFLOW.componentTranslation());
             return;
         }
-        addUndo(stack, snapshot);
+        pushUndo(stack, snapshot);
     }
 
     private boolean destroyBlock(World world, BlockPos voidPos, ServerPlayerEntity player) {

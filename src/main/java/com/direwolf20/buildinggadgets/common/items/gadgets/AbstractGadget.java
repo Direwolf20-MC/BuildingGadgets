@@ -211,7 +211,7 @@ public abstract class AbstractGadget extends Item {
         return name.replaceAll("(?=[A-Z])", " ").trim();
     }
 
-    protected void addUndo(ItemStack stack, RegionSnapshot snapshot) {
+    protected void pushUndo(ItemStack stack, RegionSnapshot snapshot) {
         UndoWorldSave save = getUndoSave();
         save.insertSnapshot(getUUID(stack), snapshot);
     }

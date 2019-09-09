@@ -15,6 +15,18 @@ import java.util.Spliterator;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 
+/**
+ * An {@link IBuildView} which views a {@link Region} in an {@link IWorld} as an {@link IBuildView}. {@link PlacementTarget PlacementTargets}
+ * will be created lazily when iterating over this {@link IBuildView} via {@code new PlacementTarget(pos, TileSupport.createBlockData(world, pos))}
+ * where pos is the Position currently iterating on and world is the world provided by this views {@link #getContext() build context}.
+ * <p>
+ * This {@link IBuildView} is especially useful, when trying to read all {@link BlockData} instances with in a given {@link Region}.
+ * If you need this Information in a pre-determined way, or intend on iterating multiple times on this {@link IBuildView} consider
+ * calling {@link #evaluate()} (which is equivalent to calling {@code MapBackedBuildView.ofIterable(view.getContext(), view)})
+ * to evaluate all {@link BlockData} instances described by this {@link IBuildView view}.
+ * <p>
+ * Notice that closing has no effect on this object, and therefore also isn't required.
+ */
 public final class WorldBackedBuildView implements IBuildView {
     private final IBuildContext context;
     private final Region region;
