@@ -2,9 +2,15 @@ package com.direwolf20.buildinggadgets.api.serialisation;
 
 import com.direwolf20.buildinggadgets.api.building.Region;
 import com.direwolf20.buildinggadgets.api.materials.MaterialList;
+import com.direwolf20.buildinggadgets.api.materials.UniqueItem;
 import com.direwolf20.buildinggadgets.api.util.NBTKeys;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Multiset;
+import com.google.common.collect.Multiset.Entry;
+import com.google.gson.*;
+import net.minecraft.client.resources.I18n;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -22,15 +28,18 @@ import java.util.Objects;
  * expanded over time, as we get informed about other useful things to be put in here.
  */
 public final class TemplateHeader {
+    private static final String MATERIAL_LIST_ITEM_NAME = "name";
+    private static final String MATERIAL_LIST_ITEM_ID = "id";
+    private static final String MATERIAL_LIST_ITEM_COUNT = "count";
+    private static final String MATERIAL_LIST_ITEM_NBT = "nbt";
+
     /**
      * Convenience overload taking an {@link ITemplateSerializer} instead of it's registryName-
      *
-     * @param serializer        Template Serializer
-     * @param boundingBox       the {@link Region} bounding box
-     *
-     * @see #builder(ResourceLocation, Region)
-     *
+     * @param serializer  Template Serializer
+     * @param boundingBox the {@link Region} bounding box
      * @return {@link Builder}
+     * @see #builder(ResourceLocation, Region)
      */
     public static Builder builder(ITemplateSerializer serializer, Region boundingBox) {
         return builder(Objects.requireNonNull(serializer.getRegistryName()), boundingBox);
@@ -38,7 +47,8 @@ public final class TemplateHeader {
 
     /**
      * Creates a new {@link Builder} which can be used to create {@code TemplateHeader} objects.
-     * @param serializer The {@link ITemplateSerializer}'s id who created the corresponding {@link com.direwolf20.buildinggadgets.api.template.ITemplate}.
+     *
+     * @param serializer  The {@link ITemplateSerializer}'s id who created the corresponding {@link com.direwolf20.buildinggadgets.api.template.ITemplate}.
      * @param boundingBox a {@link BlockPos} representing the x-y-z size of the corresponding {@link com.direwolf20.buildinggadgets.api.template.ITemplate}.
      * @return A new {@link Builder} for the specified serializer and boundingBox.
      */
@@ -164,6 +174,35 @@ public final class TemplateHeader {
         return nbt;
     }
 
+    public String toJson(boolean printName, boolean extended) {
+        return new GsonBuilder()
+                .setPrettyPrinting()
+                .registerTypeAdapter(ResourceLocation.class, (JsonSerializer<ResourceLocation>) (src, typeOfSrc, context) -> new JsonPrimitive(src.toString()))
+                .registerTypeAdapter(MaterialList.class, (JsonSerializer<MaterialList>) (src, typeOfSrc, context) -> {
+                    Multiset<UniqueItem> set = src.getRequiredItems();
+                    JsonArray jsonArray = new JsonArray();
+                    for (Entry<UniqueItem> entry : set.entrySet()) {
+                        JsonObject obj = new JsonObject();
+                        UniqueItem element = entry.getElement();
+                        Item item = element.getItem();
+                        if (printName)
+                            obj.addProperty(MATERIAL_LIST_ITEM_NAME, I18n.format(item.getTranslationKey(new ItemStack(item, entry.getCount()))));
+                        if (extended || ! printName)
+                            obj.add(MATERIAL_LIST_ITEM_ID, context.serialize(element.getRegistryName()));
+                        if (extended) {
+                            CompoundNBT nbt = element.getTag();
+                            if (nbt != null)
+                                obj.addProperty(MATERIAL_LIST_ITEM_NBT, element.getTag().toString());
+                        }
+                        obj.addProperty(MATERIAL_LIST_ITEM_COUNT, entry.getCount());
+                        jsonArray.add(obj);
+                    }
+                    return jsonArray;
+                })
+                .create()
+                .toJson(this);
+    }
+
     /**
      * Builder for {@link TemplateHeader}. An instance of this class can be acquired via {@link #builder(ResourceLocation, Region)}.
      */
@@ -195,6 +234,7 @@ public final class TemplateHeader {
 
         /**
          * Set's the name for the resulting {@link TemplateHeader}
+         *
          * @param name The name of the corresponding {@link com.direwolf20.buildinggadgets.api.template.ITemplate}.
          * @return The {@code Builder} instance to allow for method chaining
          */
@@ -205,6 +245,7 @@ public final class TemplateHeader {
 
         /**
          * Set's the author for the resulting {@link TemplateHeader}
+         *
          * @param author The author of the corresponding {@link com.direwolf20.buildinggadgets.api.template.ITemplate}.
          * @return The {@code Builder} instance to allow for method chaining
          */
@@ -215,8 +256,9 @@ public final class TemplateHeader {
 
         /**
          * Set's the requiredItems for the resulting {@link TemplateHeader}
+         *
          * @param requiredItems The requiredItems of the corresponding {@link com.direwolf20.buildinggadgets.api.template.ITemplate}.
-         *         Null values will be converted to an empty {@link Multiset}.
+         *                      Null values will be converted to an empty {@link Multiset}.
          * @return The {@code Builder} instance to allow for method chaining
          */
         public Builder requiredItems(@Nullable MaterialList requiredItems) {
