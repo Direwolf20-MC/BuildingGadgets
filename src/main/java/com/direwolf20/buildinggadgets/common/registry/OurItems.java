@@ -9,47 +9,50 @@ import com.direwolf20.buildinggadgets.common.items.pastes.ConstructionPaste;
 import com.direwolf20.buildinggadgets.common.items.pastes.ConstructionPasteContainer;
 import com.direwolf20.buildinggadgets.common.items.pastes.ConstructionPasteContainerCreative;
 import com.direwolf20.buildinggadgets.common.registry.objects.BuildingObjects;
+import com.direwolf20.buildinggadgets.common.util.ref.Reference.ItemReference;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
+import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
 import net.minecraftforge.registries.ObjectHolder;
 
 import java.util.Set;
 import java.util.function.Function;
 
 @ObjectHolder(Reference.MODID)
-@Mod.EventBusSubscriber(modid = Reference.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(modid = Reference.MODID, bus = Bus.MOD)
 public class OurItems {
+    
     // Warning: ugly object holder code below
     // Our Gadgets
-    @ObjectHolder(Reference.ItemReference.GADGET_BUILDING)
+    @ObjectHolder(ItemReference.GADGET_BUILDING)
     public static GadgetBuilding gadgetBuilding;
-    @ObjectHolder(Reference.ItemReference.GADGET_COPY_PASTE)
+    @ObjectHolder(ItemReference.GADGET_COPY_PASTE)
     public static GadgetCopyPaste gadgetCopyPaste;
-    @ObjectHolder(Reference.ItemReference.GADGET_EXCHANGING)
+    @ObjectHolder(ItemReference.GADGET_EXCHANGING)
     public static GadgetExchanger gadgetExchanger;
-    @ObjectHolder(Reference.ItemReference.GADGET_DESTRUCTION)
+    @ObjectHolder(ItemReference.GADGET_DESTRUCTION)
     public static GadgetDestruction gadgetDestruction;
 
     // Building Items
-    @ObjectHolder(Reference.ItemReference.CONSTRUCTION_PASTE)
+    @ObjectHolder(ItemReference.CONSTRUCTION_PASTE)
     public static ConstructionPaste constructionPaste;
-    @ObjectHolder(Reference.ItemReference.CONSTRUCTION_CHUNK_DENSE)
+    @ObjectHolder(ItemReference.CONSTRUCTION_CHUNK_DENSE)
     public static Item constructionChunkDense;
-    @ObjectHolder(Reference.ItemReference.TEMPLATE)
+    @ObjectHolder(ItemReference.TEMPLATE)
     public static Template template;
 
     // Construction Paste Containers
-    @ObjectHolder(Reference.ItemReference.PASTE_CONTAINER_T1)
+    @ObjectHolder(ItemReference.PASTE_CONTAINER_T1)
     public static ConstructionPasteContainer constructionPasteContainerT1;
-    @ObjectHolder(Reference.ItemReference.PASTE_CONTAINER_T2)
+    @ObjectHolder(ItemReference.PASTE_CONTAINER_T2)
     public static ConstructionPasteContainer constructionPasteContainerT2;
-    @ObjectHolder(Reference.ItemReference.PASTE_CONTAINER_T3)
+    @ObjectHolder(ItemReference.PASTE_CONTAINER_T3)
     public static ConstructionPasteContainer constructionPasteContainerT3;
-    @ObjectHolder(Reference.ItemReference.PASTE_CONTAINER_CREATIVE)
+    @ObjectHolder(ItemReference.PASTE_CONTAINER_CREATIVE)
     public static ConstructionPasteContainerCreative creativeConstructionPasteContainer;
 
     // Back to how the actual class works.
