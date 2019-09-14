@@ -8,6 +8,7 @@ import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetExchanger;
 import com.direwolf20.buildinggadgets.common.items.pastes.ConstructionPaste;
 import com.direwolf20.buildinggadgets.common.items.pastes.ConstructionPasteContainer;
 import com.direwolf20.buildinggadgets.common.items.pastes.ConstructionPasteContainerCreative;
+import com.direwolf20.buildinggadgets.common.items.pastes.RegularPasteContainerTypes;
 import com.direwolf20.buildinggadgets.common.registry.objects.BuildingObjects;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference.ItemReference;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
@@ -19,6 +20,7 @@ import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
 import net.minecraftforge.registries.ObjectHolder;
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Function;
 
@@ -56,28 +58,28 @@ public class OurItems {
     public static ConstructionPasteContainerCreative creativeConstructionPasteContainer;
 
     // Back to how the actual class works.
-    private static Set<Builder> itemBuilders;
+    private static Set<Builder> itemBuilders = new HashSet<>();
 
     /**
      * setup us required to be loaded before the registry event
      * happens.
      */
     public static void setup() {
-        itemBuilders.add(new Builder(Reference.ItemReference.GADGET_BUILDING_RL)
-                    .setBuilder(nonStackableItemProperties().maxDamage(1))
-                    .setFactory(GadgetBuilding::new));
-
-        itemBuilders.add(new Builder(Reference.ItemReference.GADGET_EXCHANGING_RL)
-                .setBuilder(nonStackableItemProperties().maxDamage(1))
-                .setFactory(GadgetExchanger::new));
-
-        itemBuilders.add(new Builder(Reference.ItemReference.GADGET_COPY_PASTE_RL)
-                .setBuilder(nonStackableItemProperties().maxDamage(1))
-                .setFactory(GadgetExchanger::new));
-
-        itemBuilders.add(new Builder(Reference.ItemReference.GADGET_DESTRUCTION_RL)
-                .setBuilder(nonStackableItemProperties().maxDamage(1))
-                .setFactory(GadgetDestruction::new));
+        // Looks complicated but it's not. We're just building a list of Builders that will, when
+        // applied will construct the Item.Properties Builder for us allowing us to do a lot less work.
+        itemBuilders.addAll(new HashSet<Builder>() {{
+            add(new Builder(Reference.ItemReference.GADGET_BUILDING_RL).setBuilder(nonStackableItemProperties().maxDamage(1)).setFactory(GadgetBuilding::new));
+            add(new Builder(Reference.ItemReference.GADGET_EXCHANGING_RL).setBuilder(nonStackableItemProperties().maxDamage(1)).setFactory(GadgetExchanger::new));
+            add(new Builder(Reference.ItemReference.GADGET_COPY_PASTE_RL).setBuilder(nonStackableItemProperties().maxDamage(1)).setFactory(GadgetExchanger::new));
+            add(new Builder(Reference.ItemReference.GADGET_DESTRUCTION_RL).setBuilder(nonStackableItemProperties().maxDamage(1)).setFactory(GadgetDestruction::new));
+            add(new Builder(Reference.ItemReference.PASTE_CONTAINER_T1_RL).setBuilder(nonStackableItemProperties()).setFactory(RegularPasteContainerTypes.T1::create));
+            add(new Builder(Reference.ItemReference.PASTE_CONTAINER_T2_RL).setBuilder(nonStackableItemProperties()).setFactory(RegularPasteContainerTypes.T2::create));
+            add(new Builder(Reference.ItemReference.PASTE_CONTAINER_T3_RL).setBuilder(nonStackableItemProperties()).setFactory(RegularPasteContainerTypes.T3::create));
+            add(new Builder(Reference.ItemReference.PASTE_CONTAINER_CREATIVE_RL).setBuilder(nonStackableItemProperties()).setFactory(ConstructionPasteContainerCreative::new));
+            add(new Builder(Reference.ItemReference.CONSTRUCTION_PASTE_RL).setBuilder(itemProperties()).setFactory(ConstructionPaste::new));
+            add(new Builder(Reference.ItemReference.CONSTRUCTION_CHUNK_DENSE_RL).setBuilder(itemProperties()).setFactory(Item::new));
+            add(new Builder(Reference.ItemReference.TEMPLATE_RL).setBuilder(itemProperties()).setFactory(Template::new));
+        }});
     }
 
     @SubscribeEvent

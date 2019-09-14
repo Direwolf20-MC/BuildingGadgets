@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.common.registry.objects;
 
+import com.direwolf20.buildinggadgets.common.registry.OurItems;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import net.minecraft.block.material.Material;
@@ -32,8 +33,10 @@ public class BuildingObjects {
     }
 
     public static void init() {
+        OurItems.setup();
+
         BGBlocks.init();
-        BGItems.init();
+//        BGItems.init();
         BGEntities.init();
         BGBlocks.BGTileEntities.init();
         BGContainers.init();
@@ -50,7 +53,7 @@ public class BuildingObjects {
 
     public static void cleanup() {
         BGBlocks.cleanup();
-        BGItems.cleanup();
+//        BGItems.cleanup();
         BGEntities.cleanup();
         BGBlocks.BGTileEntities.cleanup();
         BGContainers.cleanup();
