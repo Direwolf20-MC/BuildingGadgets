@@ -26,7 +26,7 @@ import java.util.function.Function;
 
 @ObjectHolder(Reference.MODID)
 @EventBusSubscriber(modid = Reference.MODID, bus = Bus.MOD)
-public class OurItems implements IRegistryComponent {
+public class OurItems {
     public OurItems() {}
 
     // Warning: ugly object holder code below
@@ -65,7 +65,7 @@ public class OurItems implements IRegistryComponent {
      * setup us required to be loaded before the registry event
      * happens.
      */
-    public void setup() {
+    public static void setup() {
         // Looks complicated but it's not. We're just building a list of Builders that will, when
         // applied will construct the Item.Properties Builder for us allowing us to do a lot less work.
         itemBuilders.addAll(new HashSet<Builder>() {{
