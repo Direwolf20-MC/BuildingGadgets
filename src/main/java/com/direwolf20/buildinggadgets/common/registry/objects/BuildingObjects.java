@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.common.registry.objects;
 
+import com.direwolf20.buildinggadgets.common.registry.OurBlocks;
 import com.direwolf20.buildinggadgets.common.registry.OurItems;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
@@ -34,6 +35,7 @@ public class BuildingObjects {
 
     public static void init() {
         OurItems.setup();
+        OurBlocks.setup();
 
         BGBlocks.init();
 //        BGItems.init();

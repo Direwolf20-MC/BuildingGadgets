@@ -26,8 +26,9 @@ import java.util.function.Function;
 
 @ObjectHolder(Reference.MODID)
 @EventBusSubscriber(modid = Reference.MODID, bus = Bus.MOD)
-public class OurItems {
-    
+public class OurItems implements IRegistryComponent {
+    public OurItems() {}
+
     // Warning: ugly object holder code below
     // Our Gadgets
     @ObjectHolder(ItemReference.GADGET_BUILDING)
@@ -82,6 +83,12 @@ public class OurItems {
         }});
     }
 
+    /**
+     * Register the items with the forge registry by looping over
+     * our builders and calling their register method.
+     *
+     * @param event the forge registry event
+     */
     @SubscribeEvent
     public static void registerItems(RegistryEvent.Register<Item> event) {
         itemBuilders.forEach(e -> event.getRegistry().register(
