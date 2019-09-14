@@ -28,7 +28,7 @@ import static com.direwolf20.buildinggadgets.common.registry.objects.BuildingObj
 
 @ObjectHolder(Reference.MODID)
 @EventBusSubscriber(modid = Reference.MODID, bus = Bus.MOD)
-public class OurBlocks {
+public final class OurBlocks {
     private OurBlocks() {}
 
     // ugly Object holder code below
@@ -72,10 +72,10 @@ public class OurBlocks {
     public static void registerTiles(RegistryEvent.Register<TileEntityType<?>> event) {
         IForgeRegistry<TileEntityType<?>> registry = event.getRegistry();
 
-        registry.register(TileEntityType.Builder.create(EffectBlockTileEntity::new, effectBlock).build(null));
-        registry.register(TileEntityType.Builder.create(ConstructionBlockTileEntity::new, constructionBlock).build(null));
-        registry.register(TileEntityType.Builder.create(TemplateManagerTileEntity::new, templateManger).build(null));
-        registry.register(TileEntityType.Builder.create(ChargingStationTileEntity::new, chargingStation).build(null));
+        registry.register(TileEntityType.Builder.create(EffectBlockTileEntity::new, effectBlock).build(null).setRegistryName(TileEntityReference.EFFECT_BLOCK_TILE_RL));
+        registry.register(TileEntityType.Builder.create(ConstructionBlockTileEntity::new, constructionBlock).build(null).setRegistryName(TileEntityReference.CONSTRUCTION_TILE_RL));
+        registry.register(TileEntityType.Builder.create(TemplateManagerTileEntity::new, templateManger).build(null).setRegistryName(TileEntityReference.TEMPLATE_MANAGER_TILE_RL));
+        registry.register(TileEntityType.Builder.create(ChargingStationTileEntity::new, chargingStation).build(null).setRegistryName(TileEntityReference.CHARGING_STATION_TILE_RL));
     }
 
     public static final class OurTileEntities {
