@@ -65,7 +65,7 @@ public class OurItems implements IRegistryComponent {
      * setup us required to be loaded before the registry event
      * happens.
      */
-    public static void setup() {
+    public void setup() {
         // Looks complicated but it's not. We're just building a list of Builders that will, when
         // applied will construct the Item.Properties Builder for us allowing us to do a lot less work.
         itemBuilders.addAll(new HashSet<Builder>() {{
@@ -96,7 +96,7 @@ public class OurItems implements IRegistryComponent {
         ));
     }
 
-    private static Item.Properties itemProperties() {
+    public static Item.Properties itemProperties() {
         return new Item.Properties().group(BuildingObjects.creativeTab);
     }
 
