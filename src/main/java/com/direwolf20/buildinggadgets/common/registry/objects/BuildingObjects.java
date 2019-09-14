@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.common.registry.objects;
 
+import com.direwolf20.buildinggadgets.common.registry.OurBlocks;
 import com.direwolf20.buildinggadgets.common.registry.OurEntities;
 import com.direwolf20.buildinggadgets.common.registry.OurItems;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
@@ -19,7 +20,7 @@ public class BuildingObjects {
     public static ItemGroup creativeTab = new ItemGroup(Reference.MODID){
         @Override
         public ItemStack createIcon() {
-            ItemStack stack = new ItemStack(BGItems.gadgetBuilding);
+            ItemStack stack = new ItemStack(OurItems.gadgetBuilding);
             stack.getOrCreateTag().putByte(NBTKeys.CREATIVE_MARKER, (byte) 0);
             return stack;
         }
@@ -30,22 +31,16 @@ public class BuildingObjects {
 
 
     public static void initColorHandlers(BlockColors colors) {
-        BGBlocks.constructionBlock.initColorHandler(colors);
+        OurBlocks.constructionBlock.initColorHandler(colors);
     }
 
     public static void init() {
         OurItems.setup();
-//        OurBlocks.setup();
-
-        BGBlocks.init();
-//        BGItems.init();
-//        BGEntities.init();
-        BGBlocks.BGTileEntities.init();
         BGContainers.init();
+
         DistExecutor.runWhenOn(Dist.CLIENT, () -> () -> {
             OurEntities.registerModels();
-//            BGEntities.clientInit();
-            BGBlocks.BGTileEntities.clientInit();
+            OurBlocks.OurTileEntities.registerRenderers();
         });
     }
 
@@ -55,10 +50,6 @@ public class BuildingObjects {
     }
 
     public static void cleanup() {
-        BGBlocks.cleanup();
-//        BGItems.cleanup();
-        BGEntities.cleanup();
-        BGBlocks.BGTileEntities.cleanup();
         BGContainers.cleanup();
     }
 }

@@ -4,7 +4,7 @@ import com.direwolf20.buildinggadgets.client.gui.components.GuiIncrementer;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketCopyCoords;
-import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
+import com.direwolf20.buildinggadgets.common.registry.OurItems;
 import com.direwolf20.buildinggadgets.common.util.lang.GuiTranslation;
 import com.direwolf20.buildinggadgets.common.util.lang.ITranslationProvider;
 import net.minecraft.client.Minecraft;
@@ -47,8 +47,8 @@ public class CopyGUI extends Screen {
         this.x = width / 2;
         this.y = height / 2;
 
-        startPos = BGItems.gadgetCopyPaste.getStartPos(copyPasteTool);
-        endPos = BGItems.gadgetCopyPaste.getEndPos(copyPasteTool);
+        startPos = OurItems.gadgetCopyPaste.getStartPos(copyPasteTool);
+        endPos = OurItems.gadgetCopyPaste.getEndPos(copyPasteTool);
 
         if (startPos == null) startPos = new BlockPos(0, 0, 0);
         if (endPos == null) endPos = new BlockPos(0, 0, 0);

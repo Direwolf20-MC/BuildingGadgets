@@ -1,8 +1,8 @@
 package com.direwolf20.buildinggadgets.common.items.gadgets.renderers;
 
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
-import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
-import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
+import com.direwolf20.buildinggadgets.common.registry.OurBlocks;
+import com.direwolf20.buildinggadgets.common.registry.OurItems;
 import com.direwolf20.buildinggadgets.common.util.blocks.BlockMap;
 import com.direwolf20.buildinggadgets.common.util.buffers.PasteToolBufferBuilder;
 import com.direwolf20.buildinggadgets.common.util.buffers.ToolBufferBuilder;
@@ -43,11 +43,11 @@ public class CopyPasteRender extends BaseRenderer {
     public void render(RenderWorldLastEvent evt, PlayerEntity player, ItemStack heldItem) {
         super.render(evt, player, heldItem);
 
-        if (BGItems.gadgetCopyPaste.getStartPos(heldItem) == null || BGItems.gadgetCopyPaste.getEndPos(heldItem) == null)
+        if (OurItems.gadgetCopyPaste.getStartPos(heldItem) == null || OurItems.gadgetCopyPaste.getEndPos(heldItem) == null)
             return;
 
         Vec3d playerPos = getPlayerPos();
-        String UUID = BGItems.gadgetCopyPaste.getUUID(heldItem);
+        String UUID = OurItems.gadgetCopyPaste.getUUID(heldItem);
 
         if(GadgetCopyPaste.getToolMode(heldItem) == GadgetCopyPaste.ToolMode.Copy)
             renderCopy(evt, player, heldItem, playerPos, UUID);
@@ -56,8 +56,8 @@ public class CopyPasteRender extends BaseRenderer {
     }
 
     private void renderCopy(RenderWorldLastEvent evt, PlayerEntity player, ItemStack heldItem, Vec3d playerPos, String UUID) {
-        BlockPos startPos = BGItems.gadgetCopyPaste.getStartPos(heldItem);
-        BlockPos endPos = BGItems.gadgetCopyPaste.getEndPos(heldItem);
+        BlockPos startPos = OurItems.gadgetCopyPaste.getStartPos(heldItem);
+        BlockPos endPos = OurItems.gadgetCopyPaste.getEndPos(heldItem);
         BlockPos blankPos = new BlockPos(0, 0, 0);
         if (startPos == null || endPos == null || startPos.equals(blankPos) || endPos.equals(blankPos)) {
             return;
@@ -131,7 +131,7 @@ public class CopyPasteRender extends BaseRenderer {
 
         //Don't draw on top of blocks being built by our tools.
         BlockState startBlock = world.getBlockState(startPos);
-        if (startBlock == BGBlocks.effectBlock.getDefaultState()) return;
+        if (startBlock == OurBlocks.effectBlock.getDefaultState()) return;
 
         //Prepare the block rendering
         //BlockRendererDispatcher dispatcher = Minecraft.getInstance().getBlockRendererDispatcher();

@@ -1,27 +1,100 @@
 package com.direwolf20.buildinggadgets.common.registry;
 
-import com.direwolf20.buildinggadgets.common.blocks.EffectBlock;
+import com.direwolf20.buildinggadgets.client.renderer.ChargingStationTER;
+import com.direwolf20.buildinggadgets.client.renderer.EffectBlockTER;
+import com.direwolf20.buildinggadgets.common.blocks.*;
+import com.direwolf20.buildinggadgets.common.tiles.ChargingStationTileEntity;
+import com.direwolf20.buildinggadgets.common.tiles.ConstructionBlockTileEntity;
+import com.direwolf20.buildinggadgets.common.tiles.EffectBlockTileEntity;
+import com.direwolf20.buildinggadgets.common.tiles.TemplateManagerTileEntity;
+import com.direwolf20.buildinggadgets.common.util.ref.Reference;
+import com.direwolf20.buildinggadgets.common.util.ref.Reference.BlockReference;
+import com.direwolf20.buildinggadgets.common.util.ref.Reference.TileEntityReference;
 import net.minecraft.block.Block;
+import net.minecraft.block.material.Material;
+import net.minecraft.item.BlockItem;
+import net.minecraft.item.Item;
+import net.minecraft.tileentity.TileEntityType;
+import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.client.registry.ClientRegistry;
+import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
+import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.registries.IForgeRegistry;
+import net.minecraftforge.registries.ObjectHolder;
 
-import java.util.function.Function;
+import static com.direwolf20.buildinggadgets.common.registry.objects.BuildingObjects.EFFECT_BLOCK_MATERIAL;
 
-public class OurBlocks implements IRegistryComponent {
+@ObjectHolder(Reference.MODID)
+@EventBusSubscriber(modid = Reference.MODID, bus = Bus.MOD)
+public class OurBlocks {
+    private OurBlocks() {}
 
-    /**
-     * Something to note: the factory will not work without the Builder being initialized
-     * with the empty <>. We're not 100% sure why the generics is breaking the Function
-     * interface but it does so this is what we've done to fix it :cry: java why...
-     */
-    public static void setup() {
-        new Builder<>().setFactory(EffectBlock::new);
+    // ugly Object holder code below
+    @ObjectHolder(BlockReference.EFFECT_BLOCK)
+    public static EffectBlock effectBlock;
+    @ObjectHolder(BlockReference.CONSTRUCTION_BLOCK)
+    public static ConstructionBlock constructionBlock;
+    @ObjectHolder(BlockReference.CONSTRUCTION_BLOCK_DENSE)
+    public static ConstructionBlockDense constructionBlockDense;
+    @ObjectHolder(BlockReference.CONSTRUCTION_BLOCK_POWDER)
+    public static ConstructionBlockPowder constructionBlockPowder;
+    @ObjectHolder(BlockReference.TEMPLATE_MANAGER)
+    public static TemplateManager templateManger;
+    @ObjectHolder(BlockReference.CHARGING_STATION)
+    public static ChargingStation chargingStation;
+
+    @SubscribeEvent
+    public static void registerBlocks(RegistryEvent.Register<Block> event) {
+        IForgeRegistry<Block> registry = event.getRegistry();
+
+        registry.register(new EffectBlock(Block.Properties.create(EFFECT_BLOCK_MATERIAL).hardnessAndResistance(20f)).setRegistryName(BlockReference.EFFECT_BLOCK_RL));
+        registry.register(new ConstructionBlock(Block.Properties.create(Material.ROCK).hardnessAndResistance(2f, 0f)).setRegistryName(BlockReference.CONSTRUCTION_BLOCK_RL));
+        registry.register(new ConstructionBlockDense(Block.Properties.create(Material.ROCK).hardnessAndResistance(3f, 0f)).setRegistryName(BlockReference.CONSTRUCTION_BLOCK_DENSE_RL));
+        registry.register(new ConstructionBlockPowder(Block.Properties.create(Material.SAND).hardnessAndResistance(10f)).setRegistryName(BlockReference.CONSTRUCTION_BLOCK_POWDER_RL));
+        registry.register(new TemplateManager(Block.Properties.create(Material.ROCK).hardnessAndResistance(2f)).setRegistryName(BlockReference.TEMPLATE_MANAGER_RL));
+        registry.register(new ChargingStation(Block.Properties.create(Material.ROCK).hardnessAndResistance(2f)).setRegistryName(BlockReference.CHARGING_STATION_RL));
     }
 
-    private static final class Builder<T extends Block> {
-        private Function<Block.Properties, Block> factory;
+    @SubscribeEvent
+    public static void registerItemBlocks(RegistryEvent.Register<Item> event) {
+        IForgeRegistry<Item> registry = event.getRegistry();
 
-        public Builder setFactory(Function<Block.Properties, Block> factory) {
-            this.factory = factory;
-            return this;
+        registry.register(new BlockItem(constructionBlock, OurItems.itemProperties()).setRegistryName(BlockReference.CONSTRUCTION_BLOCK_RL));
+        registry.register(new BlockItem(constructionBlockDense, OurItems.itemProperties()).setRegistryName(BlockReference.CONSTRUCTION_BLOCK_DENSE_RL));
+        registry.register(new BlockItem(constructionBlockPowder, OurItems.itemProperties()).setRegistryName(BlockReference.CONSTRUCTION_BLOCK_POWDER_RL));
+        registry.register(new BlockItem(templateManger, OurItems.itemProperties()).setRegistryName(BlockReference.TEMPLATE_MANAGER_RL));
+        registry.register(new BlockItem(chargingStation, OurItems.itemProperties()).setRegistryName(BlockReference.CHARGING_STATION_RL));
+    }
+
+    @SubscribeEvent
+    public static void registerTiles(RegistryEvent.Register<TileEntityType<?>> event) {
+        IForgeRegistry<TileEntityType<?>> registry = event.getRegistry();
+
+        registry.register(TileEntityType.Builder.create(EffectBlockTileEntity::new, effectBlock).build(null));
+        registry.register(TileEntityType.Builder.create(ConstructionBlockTileEntity::new, constructionBlock).build(null));
+        registry.register(TileEntityType.Builder.create(TemplateManagerTileEntity::new, templateManger).build(null));
+        registry.register(TileEntityType.Builder.create(ChargingStationTileEntity::new, chargingStation).build(null));
+    }
+
+    public static final class OurTileEntities {
+        private OurTileEntities() {}
+
+        @ObjectHolder(TileEntityReference.CONSTRUCTION_TILE)
+        public static TileEntityType<?> CONSTRUCTION_BLOCK_TYPE;
+        @ObjectHolder(TileEntityReference.TEMPLATE_MANAGER_TILE)
+        public static TileEntityType<?> TEMPLATE_MANAGER_TYPE;
+        @ObjectHolder(TileEntityReference.CHARGING_STATION_TILE)
+        public static TileEntityType<?> CHARGING_STATION_TYPE;
+        @ObjectHolder(TileEntityReference.EFFECT_BLOCK_TILE)
+        public static TileEntityType<?> EFFECT_BLOCK_TYPE;
+
+        public static void registerRenderers() {
+            FMLJavaModLoadingContext.get().getModEventBus().addListener(event -> {
+                ClientRegistry.bindTileEntitySpecialRenderer(EffectBlockTileEntity.class, new EffectBlockTER());
+                ClientRegistry.bindTileEntitySpecialRenderer(ChargingStationTileEntity.class, new ChargingStationTER());
+            });
         }
     }
 }

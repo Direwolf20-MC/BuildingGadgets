@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.common.util.buffers;
 
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
-import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
+import com.direwolf20.buildinggadgets.common.registry.OurItems;
 import com.direwolf20.buildinggadgets.common.util.blocks.BlockMap;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.mojang.blaze3d.platform.GlStateManager;
@@ -123,6 +123,6 @@ public class PasteToolBufferBuilder {
     }
 
     public static boolean isUpdateNeeded(String UUID, ItemStack stack) {
-        return BGItems.gadgetCopyPaste.getCopyCounter(stack) != getCopyCounter(UUID) || PasteToolBufferBuilder.getTagFromUUID(UUID) == null;
+        return OurItems.gadgetCopyPaste.getCopyCounter(stack) != getCopyCounter(UUID) || PasteToolBufferBuilder.getTagFromUUID(UUID) == null;
     }
 }

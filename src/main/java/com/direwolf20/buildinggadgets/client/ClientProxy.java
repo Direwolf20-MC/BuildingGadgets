@@ -3,7 +3,7 @@ package com.direwolf20.buildinggadgets.client;
 import com.direwolf20.buildinggadgets.client.events.EventClientTick;
 import com.direwolf20.buildinggadgets.client.events.EventTooltip;
 import com.direwolf20.buildinggadgets.client.models.ConstructionBakedModel;
-import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
+import com.direwolf20.buildinggadgets.common.registry.OurBlocks;
 import com.direwolf20.buildinggadgets.common.registry.objects.BuildingObjects;
 import com.direwolf20.buildinggadgets.common.tiles.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
@@ -88,7 +88,7 @@ public class ClientProxy {
                 facadeState = modelData.getData(ConstructionBlockTileEntity.FACADE_STATE);
                 BlockRenderLayer layer = MinecraftForgeClient.getRenderLayer();
                 if (facadeState == null || facadeState == Blocks.AIR.getDefaultState())
-                    facadeState = BGBlocks.constructionBlockDense.getDefaultState();
+                    facadeState = OurBlocks.constructionBlockDense.getDefaultState();
                 if (layer != null && ! facadeState.getBlock().canRenderInLayer(facadeState, layer)) { // always render in the null layer or the block-breaking textures don't show up
                     return Collections.emptyList();
                 }
@@ -138,7 +138,7 @@ public class ClientProxy {
                 facadeState = modelData.getData(ConstructionBlockTileEntity.FACADE_STATE);
                 BlockRenderLayer layer = MinecraftForgeClient.getRenderLayer();
                 if (facadeState == null || facadeState == Blocks.AIR.getDefaultState())
-                    facadeState = BGBlocks.constructionBlockDense.getDefaultState();
+                    facadeState = OurBlocks.constructionBlockDense.getDefaultState();
                 if (layer != null && ! facadeState.getBlock().canRenderInLayer(facadeState, layer)) { // always render in the null layer or the block-breaking textures don't show up
                     return Collections.emptyList();
                 }

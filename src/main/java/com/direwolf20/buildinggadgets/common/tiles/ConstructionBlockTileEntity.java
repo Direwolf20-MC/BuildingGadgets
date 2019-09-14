@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.common.tiles;
 
 import com.direwolf20.buildinggadgets.api.building.BlockData;
-import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks.BGTileEntities;
+import com.direwolf20.buildinggadgets.common.registry.OurBlocks;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundNBT;
@@ -20,7 +20,7 @@ public class ConstructionBlockTileEntity extends TileEntity {
     public static final ModelProperty<BlockState> FACADE_STATE = new ModelProperty<>();
 
     public ConstructionBlockTileEntity() {
-        super(BGTileEntities.CONSTRUCTION_BLOCK_TYPE);
+        super(OurBlocks.OurTileEntities.CONSTRUCTION_BLOCK_TYPE);
     }
 
     public void setBlockState(BlockData state, BlockData actualState) {
