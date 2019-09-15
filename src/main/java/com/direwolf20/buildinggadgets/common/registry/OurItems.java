@@ -25,7 +25,7 @@ import java.util.function.Function;
 
 @EventBusSubscriber(modid = Reference.MODID, bus = Bus.MOD)
 public final class OurItems {
-    public OurItems() {}
+    private OurItems() {}
 
     // Our Gadgets
     @ObjectHolder(ItemReference.GADGET_BUILDING)
