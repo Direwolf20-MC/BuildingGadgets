@@ -1,12 +1,7 @@
-package com.direwolf20.buildinggadgets.common.registry.objects;
+package com.direwolf20.buildinggadgets.common.registry;
 
-import com.direwolf20.buildinggadgets.common.registry.OurBlocks;
-import com.direwolf20.buildinggadgets.common.registry.OurEntities;
-import com.direwolf20.buildinggadgets.common.registry.OurItems;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
-import net.minecraft.block.material.Material;
-import net.minecraft.block.material.MaterialColor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.color.BlockColors;
 import net.minecraft.item.ItemGroup;
@@ -14,9 +9,13 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
 
-public class BuildingObjects {
+public final class RegistryHandler {
 
-    // Creative tab
+    /**
+     * Register our creative tab. Notice that we're also modifying the NBT data of the
+     * building gadget to remove the damage / energy indicator from the creative
+     * tabs icon.
+     */
     public static ItemGroup creativeTab = new ItemGroup(Reference.MODID){
         @Override
         public ItemStack createIcon() {
@@ -26,17 +25,12 @@ public class BuildingObjects {
         }
     };
 
-    // Materials
-    public static final Material EFFECT_BLOCK_MATERIAL = new Material.Builder(MaterialColor.AIR).notSolid().build();
-
-
-    public static void initColorHandlers(BlockColors colors) {
+    private static void initColorHandlers(BlockColors colors) {
         OurBlocks.constructionBlock.initColorHandler(colors);
     }
 
-    public static void init() {
+    public static void setup() {
         OurItems.setup();
-        BGContainers.init();
 
         DistExecutor.runWhenOn(Dist.CLIENT, () -> () -> {
             OurEntities.registerModels();
@@ -45,11 +39,7 @@ public class BuildingObjects {
     }
 
     public static void clientSetup() {
-        BGContainers.clientSetup();
+        OurContainers.registerContainerScreens();
         initColorHandlers(Minecraft.getInstance().getBlockColors());
-    }
-
-    public static void cleanup() {
-        BGContainers.cleanup();
     }
 }

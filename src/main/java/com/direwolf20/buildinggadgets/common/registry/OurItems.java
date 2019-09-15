@@ -9,7 +9,6 @@ import com.direwolf20.buildinggadgets.common.items.pastes.ConstructionPaste;
 import com.direwolf20.buildinggadgets.common.items.pastes.ConstructionPasteContainer;
 import com.direwolf20.buildinggadgets.common.items.pastes.ConstructionPasteContainerCreative;
 import com.direwolf20.buildinggadgets.common.items.pastes.RegularPasteContainerTypes;
-import com.direwolf20.buildinggadgets.common.registry.objects.BuildingObjects;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference.ItemReference;
 import net.minecraft.item.Item;
@@ -96,7 +95,7 @@ public final class OurItems {
     }
 
     static Item.Properties itemProperties() {
-        return new Item.Properties().group(BuildingObjects.creativeTab);
+        return new Item.Properties().group(RegistryHandler.creativeTab);
     }
 
     private static Item.Properties nonStackableItemProperties() {

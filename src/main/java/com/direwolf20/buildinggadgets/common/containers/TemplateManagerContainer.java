@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.common.containers;
 
-import com.direwolf20.buildinggadgets.common.registry.objects.BGContainers;
+import com.direwolf20.buildinggadgets.common.registry.OurContainers;
 import com.direwolf20.buildinggadgets.common.tiles.TemplateManagerTileEntity;
 import com.direwolf20.buildinggadgets.common.util.exceptions.CapabilityNotPresentException;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
@@ -23,7 +23,7 @@ public class TemplateManagerContainer extends BaseContainer {
     private TemplateManagerTileEntity te;
 
     public TemplateManagerContainer(int windowId, PlayerInventory playerInventory, PacketBuffer extraData) {
-        super(BGContainers.TEMPLATE_MANAGER_CONTAINER, windowId);//TODO fix once we get access to ContainerTypes
+        super(OurContainers.TEMPLATE_MANAGER_CONTAINER, windowId);//TODO fix once we get access to ContainerTypes
         BlockPos pos = extraData.readBlockPos();
         this.te = (TemplateManagerTileEntity) Minecraft.getInstance().world.getTileEntity(pos);
         addOwnSlots();
@@ -31,7 +31,7 @@ public class TemplateManagerContainer extends BaseContainer {
     }
 
     public TemplateManagerContainer(int windowId, PlayerInventory playerInventory, TemplateManagerTileEntity tileEntity) {
-        super(BGContainers.TEMPLATE_MANAGER_CONTAINER, windowId);
+        super(OurContainers.TEMPLATE_MANAGER_CONTAINER, windowId);
         this.te = Objects.requireNonNull(tileEntity);
         addOwnSlots();
         addPlayerSlots(playerInventory);

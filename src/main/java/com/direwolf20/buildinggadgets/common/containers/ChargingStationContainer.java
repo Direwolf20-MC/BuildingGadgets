@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.common.containers;
 
 import com.direwolf20.buildinggadgets.common.items.gadgets.AbstractGadget;
-import com.direwolf20.buildinggadgets.common.registry.objects.BGContainers;
+import com.direwolf20.buildinggadgets.common.registry.OurContainers;
 import com.direwolf20.buildinggadgets.common.tiles.ChargingStationTileEntity;
 import com.direwolf20.buildinggadgets.common.util.exceptions.CapabilityNotPresentException;
 import net.minecraft.client.Minecraft;
@@ -25,7 +25,7 @@ public class ChargingStationContainer extends BaseContainer {
     private ChargingStationTileEntity te;
 
     public ChargingStationContainer(int windowId, PlayerInventory playerInventory, PacketBuffer extraData) {
-        super(BGContainers.CHARGING_STATION_CONTAINER, windowId);
+        super(OurContainers.CHARGING_STATION_CONTAINER, windowId);
         BlockPos pos = extraData.readBlockPos();
         this.te = (ChargingStationTileEntity) Minecraft.getInstance().world.getTileEntity(pos);
         addOwnSlots();
@@ -33,7 +33,7 @@ public class ChargingStationContainer extends BaseContainer {
     }
 
     public ChargingStationContainer(int windowId, World world, BlockPos pos, PlayerInventory playerInventory, PlayerEntity player) {
-        super(BGContainers.CHARGING_STATION_CONTAINER, windowId);
+        super(OurContainers.CHARGING_STATION_CONTAINER, windowId);
         this.te = (ChargingStationTileEntity) world.getTileEntity(pos);
         addOwnSlots();
         addPlayerSlots(playerInventory);

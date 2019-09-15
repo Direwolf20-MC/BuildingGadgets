@@ -4,7 +4,7 @@ import com.direwolf20.buildinggadgets.client.events.EventClientTick;
 import com.direwolf20.buildinggadgets.client.events.EventTooltip;
 import com.direwolf20.buildinggadgets.client.models.ConstructionBakedModel;
 import com.direwolf20.buildinggadgets.common.registry.OurBlocks;
-import com.direwolf20.buildinggadgets.common.registry.objects.BuildingObjects;
+import com.direwolf20.buildinggadgets.common.registry.RegistryHandler;
 import com.direwolf20.buildinggadgets.common.tiles.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import net.minecraft.block.BlockState;
@@ -50,7 +50,9 @@ public class ClientProxy {
         eventBus.addListener(ClientProxy::bakeModels);
         MinecraftForge.EVENT_BUS.addListener(EventClientTick::onClientTick);
         MinecraftForge.EVENT_BUS.addListener(EventTooltip::onDrawTooltip);
-        BuildingObjects.clientSetup();
+
+        // @michaelhillcox: I have questions on why this is here
+        RegistryHandler.clientSetup();
     }
 
     private static void bakeModels(ModelBakeEvent event) {
