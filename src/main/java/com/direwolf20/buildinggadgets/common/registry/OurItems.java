@@ -23,7 +23,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Function;
 
-@ObjectHolder(Reference.MODID)
 @EventBusSubscriber(modid = Reference.MODID, bus = Bus.MOD)
 public final class OurItems {
     public OurItems() {}
