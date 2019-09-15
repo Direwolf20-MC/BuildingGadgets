@@ -21,7 +21,7 @@ import net.minecraftforge.registries.ObjectHolder;
  */
 @EventBusSubscriber(modid = Reference.MODID, bus = Bus.MOD)
 public class OurEntities {
-
+private OurEntities() {} 
     @ObjectHolder(EntityReference.CONSTRUCTION_BLOCK_ENTITY)
     public static EntityType<ConstructionBlockEntity> CONSTRUCTION_BLOCK;
 
