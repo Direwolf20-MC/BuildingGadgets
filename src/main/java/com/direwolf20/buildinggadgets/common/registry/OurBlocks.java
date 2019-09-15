@@ -26,7 +26,6 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.ObjectHolder;
 
-@ObjectHolder(Reference.MODID)
 @EventBusSubscriber(modid = Reference.MODID, bus = Bus.MOD)
 public final class OurBlocks {
     private OurBlocks() {}
