@@ -18,7 +18,7 @@ import net.minecraftforge.registries.ObjectHolder;
 
 @EventBusSubscriber(modid = Reference.MODID, bus = Bus.MOD)
 public final class OurContainers {
-
+    private OurContainers() {} 
     @ObjectHolder(ContainerReference.TEMPLATE_MANAGER_CONTAINER)
     public final static ContainerType<TemplateManagerContainer> TEMPLATE_MANAGER_CONTAINER = IForgeContainerType.create(TemplateManagerContainer::new);
 
