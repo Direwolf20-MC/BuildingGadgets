@@ -91,6 +91,7 @@ public final class OurItems {
         itemBuilders.forEach(e -> event.getRegistry().register(
                 e.register()
         ));
+        itemBuilders.clear();
     }
 
     static Item.Properties itemProperties() {
