@@ -23,7 +23,7 @@ if (env.BUILD_NUMBER) {
 group = 'com.direwolf20.buildinggadgets'
 archivesBaseName = 'buildinggadgets'
 
-String forgeVersion = "$minecraft_version-${forge_major}.${forge_minor}"
+String forgeVersion = "${minecraft_version}-${forge_major}.${forge_minor}"
 String forgeName = "$forge_base:$forgeVersion"
 
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
