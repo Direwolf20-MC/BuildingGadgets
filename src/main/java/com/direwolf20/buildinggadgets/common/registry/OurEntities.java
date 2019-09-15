@@ -19,7 +19,6 @@ import net.minecraftforge.registries.ObjectHolder;
  *           as we only have a single entity so far with no plans to change this any time
  *           soon.
  */
-@ObjectHolder(Reference.MODID)
 @EventBusSubscriber(modid = Reference.MODID, bus = Bus.MOD)
 public class OurEntities {
 
