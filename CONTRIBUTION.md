@@ -30,7 +30,8 @@ Your PR should include the following at least the following Information:
 * If testing was performed, what tests and how extensive they have been
 
 ## Code Guidelines
-In general your code should be well-structured and easy to read. we'd like to be the first to acknowledge that our code base isn't perfect and in some areas it's really not perfect! But we are trying to improve upon the code-base. Unless your PR is directly related to code cleaning then your PR should not contain any formatting changes to unchanged code blocks as this simply makes reviewing them unnecessarily complex.
+- In general your code should be well-structured and easy to read. we'd like to be the first to acknowledge that our code base isn't perfect and in some areas it's really unreadable! We are trying to improve upon the code-base. 
+- Your PR should not contain any formatting changes to unchanged code blocks, unless it is directly related to code cleanup. This makes reviewing them unnecessarily complex.
 
 ### Formatting
 * Use 4 space indent instead of Tabs.
