@@ -14,7 +14,7 @@ import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketBindTool;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketBlockMap;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketRotateMirror;
-import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
+import com.direwolf20.buildinggadgets.common.registry.OurItems;
 import com.direwolf20.buildinggadgets.common.tiles.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.blocks.BlockMap;
@@ -316,7 +316,7 @@ public class GadgetCopyPaste extends AbstractGadget implements ITemplate {
         if (player.world.isRemote) {
             return;
         }
-        GadgetCopyPaste tool = BGItems.gadgetCopyPaste;
+        GadgetCopyPaste tool = OurItems.gadgetCopyPaste;
         List<BlockMap> blockMapList;
         WorldSave worldSave = WorldSave.getWorldSave(player.world);
         CompoundNBT tagCompound = worldSave.getCompoundFromUUID(tool.getUUID(stack));
@@ -370,7 +370,7 @@ public class GadgetCopyPaste extends AbstractGadget implements ITemplate {
 
     public static void copyBlocks(ItemStack stack, PlayerEntity player, World world, BlockPos startPos, BlockPos endPos) {
         if (startPos != null && endPos != null) {
-            GadgetCopyPaste tool = BGItems.gadgetCopyPaste;
+            GadgetCopyPaste tool = OurItems.gadgetCopyPaste;
             if (findBlocks(world, startPos, endPos, stack, player, tool)) {
                 tool.setStartPos(stack, startPos);
                 tool.setEndPos(stack, endPos);
@@ -518,7 +518,7 @@ public class GadgetCopyPaste extends AbstractGadget implements ITemplate {
         if (heldItem.isEmpty())
             return;
 
-        if (BGItems.gadgetCopyPaste.getStartPos(heldItem) == null ||BGItems.gadgetCopyPaste.getEndPos(heldItem) == null)
+        if (OurItems.gadgetCopyPaste.getStartPos(heldItem) == null ||OurItems.gadgetCopyPaste.getEndPos(heldItem) == null)
             return;
 
         UniqueItem uniqueItem = IntStackMap.get(data.getState());
@@ -545,7 +545,7 @@ public class GadgetCopyPaste extends AbstractGadget implements ITemplate {
         }
         boolean useConstructionPaste = false;
         if (! data.getState().hasTileEntity()) {
-            ItemStack constructionPaste = new ItemStack(BGItems.constructionPaste);
+            ItemStack constructionPaste = new ItemStack(OurItems.constructionPaste);
             if (InventoryHelper.countItem(itemStack, player, world) < neededItems) {
                 if (InventoryHelper.countPaste(player) < neededItems) {
                     return;
@@ -590,7 +590,7 @@ public class GadgetCopyPaste extends AbstractGadget implements ITemplate {
 
     public static void undoBuild(PlayerEntity player, ItemStack heldItem) {
 //        long time = System.nanoTime();
-        CompoundNBT tagCompound = WorldSave.getWorldSave(player.world).getCompoundFromUUID(BGItems.gadgetCopyPaste.getUUID(heldItem));
+        CompoundNBT tagCompound = WorldSave.getWorldSave(player.world).getCompoundFromUUID(OurItems.gadgetCopyPaste.getUUID(heldItem));
         World world = player.world;
         if (world.isRemote) {
             return;

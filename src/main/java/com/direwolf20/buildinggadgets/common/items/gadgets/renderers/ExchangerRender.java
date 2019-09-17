@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.common.items.gadgets.renderers;
 
 import com.direwolf20.buildinggadgets.common.items.gadgets.AbstractGadget;
-import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
+import com.direwolf20.buildinggadgets.common.registry.OurBlocks;
 import com.direwolf20.buildinggadgets.common.util.CapabilityUtil;
 import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
 import com.direwolf20.buildinggadgets.common.util.tools.modes.ExchangingMode;
@@ -56,7 +56,7 @@ public class ExchangerRender extends BaseRenderer {
         World world = player.world;
         BlockState startBlock = AIR;
         startBlock = world.getBlockState(new BlockPos(lookingAt.getPos()));
-        if (startBlock != BGBlocks.effectBlock.getDefaultState()) {
+        if (startBlock != OurBlocks.effectBlock.getDefaultState()) {
             BlockState renderBlockState = getToolBlock(heldItem).getState();
 
             getMc().getTextureManager().bindTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE);

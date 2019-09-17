@@ -2,7 +2,7 @@ package com.direwolf20.buildinggadgets.client.renderer;
 
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.blocks.EffectBlock;
-import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
+import com.direwolf20.buildinggadgets.common.registry.OurBlocks;
 import com.direwolf20.buildinggadgets.common.tiles.EffectBlockTileEntity;
 import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.block.BlockState;
@@ -43,7 +43,7 @@ public class EffectBlockTER extends TileEntityRenderer<EffectBlockTileEntity> {
 
         BlockState renderBlockState = tile.getRenderedBlock().getState();
         if (tile.isUsingPaste() && toolMode == EffectBlock.Mode.PLACE)
-            renderBlockState = BGBlocks.constructionBlockDense.getDefaultState();
+            renderBlockState = OurBlocks.constructionBlockDense.getDefaultState();
 
         try {
             blockrendererdispatcher.renderBlockBrightness(renderBlockState, 1.0f);

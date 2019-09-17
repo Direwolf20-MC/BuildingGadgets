@@ -5,7 +5,7 @@ import com.direwolf20.buildinggadgets.common.containers.TemplateManagerContainer
 import com.direwolf20.buildinggadgets.common.items.ITemplate;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketBlockMap;
-import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks.BGTileEntities;
+import com.direwolf20.buildinggadgets.common.registry.OurBlocks;
 import com.direwolf20.buildinggadgets.common.tiles.TemplateManagerTileEntity;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.lang.Styles;
@@ -75,7 +75,7 @@ public class TemplateManager extends Block {
     @Nullable
     @Override
     public TileEntity createTileEntity(BlockState state, IBlockReader world) {
-        return BGTileEntities.TEMPLATE_MANAGER_TYPE.create();
+        return OurBlocks.OurTileEntities.TEMPLATE_MANAGER_TYPE.create();
     }
 
     @Override

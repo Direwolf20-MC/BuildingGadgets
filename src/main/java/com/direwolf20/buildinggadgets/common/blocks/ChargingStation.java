@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.common.blocks;
 
-import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
+import com.direwolf20.buildinggadgets.common.registry.OurBlocks;
 import com.direwolf20.buildinggadgets.common.tiles.ChargingStationTileEntity;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import net.minecraft.block.Block;
@@ -59,7 +59,7 @@ public class ChargingStation extends Block {
     @Nullable
     @Override
     public TileEntity createTileEntity(BlockState state, IBlockReader world) {
-        return BGBlocks.BGTileEntities.CHARGING_STATION_TYPE.create();
+        return OurBlocks.OurTileEntities.CHARGING_STATION_TYPE.create();
     }
 
     @Override

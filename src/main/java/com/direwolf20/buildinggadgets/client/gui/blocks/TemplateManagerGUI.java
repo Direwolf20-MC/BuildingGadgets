@@ -6,7 +6,7 @@
 package com.direwolf20.buildinggadgets.client.gui.blocks;
 
 import com.direwolf20.buildinggadgets.common.containers.TemplateManagerContainer;
-import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
+import com.direwolf20.buildinggadgets.common.registry.OurItems;
 import com.direwolf20.buildinggadgets.common.tiles.TemplateManagerTileEntity;
 import com.direwolf20.buildinggadgets.common.util.buffers.PasteToolBufferBuilder;
 import com.direwolf20.buildinggadgets.common.util.buffers.ToolBufferBuilder;
@@ -189,11 +189,11 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
 
         //float rotX = 165, rotY = 0, zoom = 1;
         if (!itemstack.isEmpty()) {
-            String UUID = BGItems.gadgetCopyPaste.getUUID(itemstack);
+            String UUID = OurItems.gadgetCopyPaste.getUUID(itemstack);
             ToolBufferBuilder bufferBuilder = PasteToolBufferBuilder.getBufferFromMap(UUID);
             if (bufferBuilder != null) {
-                BlockPos startPos = BGItems.gadgetCopyPaste.getStartPos(itemstack);
-                BlockPos endPos = BGItems.gadgetCopyPaste.getEndPos(itemstack);
+                BlockPos startPos = OurItems.gadgetCopyPaste.getStartPos(itemstack);
+                BlockPos endPos = OurItems.gadgetCopyPaste.getEndPos(itemstack);
                 if (startPos == null || endPos == null) return;
                 double lengthX = Math.abs(startPos.getX() - endPos.getX());
                 double lengthY = Math.abs(startPos.getY() - endPos.getY());
