@@ -3,19 +3,6 @@ package com.direwolf20.buildinggadgets.common.util.ref;
 import com.direwolf20.buildinggadgets.api.APIReference;
 import net.minecraft.util.ResourceLocation;
 
-/**
- * @implNote @michaelhillcox: So much is wrong here I can event start to fix it but for future me
- *           the MODID is being applied when almost every single instance uses a class annotation
- *           that defines the same MODID.
- *
- *           Either remove it here or remove it there. Either would fix this.
- *
- *           Why in the literal hell are we pulling our MODID reference from the API. That is
- *           completely backwards.
- *
- *           A lot of the resource locations we're creating aren't needed as the things using
- *           them just puts them back to a string for some reason.
- */
 public final class Reference {
     public static final String MODID = APIReference.MODID;
     public static final String CONFIG_FILE_SERVER = MODID + "-server.toml";

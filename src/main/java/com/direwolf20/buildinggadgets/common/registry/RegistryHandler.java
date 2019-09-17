@@ -3,7 +3,6 @@ package com.direwolf20.buildinggadgets.common.registry;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.color.BlockColors;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
@@ -25,10 +24,6 @@ public final class RegistryHandler {
         }
     };
 
-    private static void initColorHandlers(BlockColors colors) {
-        OurBlocks.constructionBlock.initColorHandler(colors);
-    }
-
     public static void setup() {
         OurItems.setup();
 
@@ -40,6 +35,6 @@ public final class RegistryHandler {
 
     public static void clientSetup() {
         OurContainers.registerContainerScreens();
-        initColorHandlers(Minecraft.getInstance().getBlockColors());
+        OurBlocks.constructionBlock.initColorHandler(Minecraft.getInstance().getBlockColors());
     }
 }

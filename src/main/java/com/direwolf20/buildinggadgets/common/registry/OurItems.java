@@ -89,8 +89,9 @@ public final class OurItems {
     @SubscribeEvent
     public static void registerItems(RegistryEvent.Register<Item> event) {
         itemBuilders.forEach(e -> event.getRegistry().register(
-                e.register()
+                e.createItem()
         ));
+
         itemBuilders.clear();
     }
 
@@ -111,21 +112,21 @@ public final class OurItems {
         Item.Properties builder;
         Function<Item.Properties, Item> factory; // Our item
 
-        Builder(ResourceLocation registryName) {
+        private Builder(ResourceLocation registryName) {
             this.registryName = registryName;
         }
 
-        Builder setBuilder(Item.Properties builder) {
+        private Builder setBuilder(Item.Properties builder) {
             this.builder = builder;
             return this;
         }
 
-        Builder setFactory(Function<Item.Properties, Item> factory) {
+        private Builder setFactory(Function<Item.Properties, Item> factory) {
             this.factory = factory;
             return this;
         }
 
-        Item register() {
+        private Item createItem() {
             return this.factory.apply(this.builder).setRegistryName(this.registryName);
         }
     }
