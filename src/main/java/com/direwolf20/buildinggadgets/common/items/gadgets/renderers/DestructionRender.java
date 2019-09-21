@@ -2,7 +2,7 @@ package com.direwolf20.buildinggadgets.common.items.gadgets.renderers;
 
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetDestruction;
-import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
+import com.direwolf20.buildinggadgets.common.registry.OurBlocks;
 import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
 import com.direwolf20.buildinggadgets.common.util.tools.UniqueItemStack;
 import com.google.common.cache.Cache;
@@ -47,7 +47,7 @@ public class DestructionRender extends BaseRenderer {
         BlockPos startBlock = (GadgetDestruction.getAnchor(heldItem) == null) ? lookingAt.getPos() : GadgetDestruction.getAnchor(heldItem);
         Direction facing = (GadgetDestruction.getAnchorSide(heldItem) == null) ? lookingAt.getFace() : GadgetDestruction.getAnchorSide(heldItem);
 
-        if (world.getBlockState(startBlock) == BGBlocks.effectBlock.getDefaultState())
+        if (world.getBlockState(startBlock) == OurBlocks.effectBlock.getDefaultState())
             return;
 
         Vec3d playerPos = getPlayerPos();

@@ -10,9 +10,9 @@ import com.direwolf20.buildinggadgets.common.blocks.EffectBlock;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.items.gadgets.renderers.BaseRenderer;
 import com.direwolf20.buildinggadgets.common.items.gadgets.renderers.DestructionRender;
-import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
 import com.direwolf20.buildinggadgets.common.save.SaveManager;
 import com.direwolf20.buildinggadgets.common.save.UndoWorldSave;
+import com.direwolf20.buildinggadgets.common.registry.OurBlocks;
 import com.direwolf20.buildinggadgets.common.tiles.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.blocks.RegionSnapshot;
@@ -242,7 +242,7 @@ public class GadgetDestruction extends AbstractGadget {
 
     public static boolean isValidBlock(World world, BlockPos voidPos, PlayerEntity player, BlockState currentBlock, @Nullable BlockState stateTarget, boolean fuzzy) {
         if (currentBlock.getBlock().isAir(currentBlock, world, voidPos) ||
-                currentBlock.equals(BGBlocks.effectBlock.getDefaultState()) ||
+                currentBlock.equals(OurBlocks.effectBlock.getDefaultState()) ||
                 currentBlock.getBlockHardness(world, voidPos) < 0 ||
                 (! fuzzy && currentBlock != stateTarget) ||
                 ! world.isBlockModifiable(player, voidPos)) return false;
@@ -284,7 +284,7 @@ public class GadgetDestruction extends AbstractGadget {
             snapshot = RegionSnapshot.select(world, positions)
                     .excludeAir()
                     .checkBlocks((p, state) -> destroyBlock(world, p, player))
-                    .checkTiles((p, state, tile) -> state.getBlock() == BGBlocks.constructionBlock && tile instanceof ConstructionBlockTileEntity)
+                    .checkTiles((p, state, tile) -> state.getBlock() == OurBlocks.constructionBlock && tile instanceof ConstructionBlockTileEntity)
                     .build();
         } catch (PaletteOverflowException e) {
             player.sendMessage(TooltipTranslation.GADGET_PALETTE_OVERFLOW.componentTranslation());

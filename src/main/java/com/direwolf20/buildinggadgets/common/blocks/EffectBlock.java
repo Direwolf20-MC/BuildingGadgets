@@ -5,7 +5,7 @@ import com.direwolf20.buildinggadgets.api.building.PlacementTarget;
 import com.direwolf20.buildinggadgets.api.building.view.IBuildContext;
 import com.direwolf20.buildinggadgets.api.building.view.SimpleBuildContext;
 import com.direwolf20.buildinggadgets.common.entities.ConstructionBlockEntity;
-import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
+import com.direwolf20.buildinggadgets.common.registry.OurBlocks;
 import com.direwolf20.buildinggadgets.common.tiles.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.tiles.EffectBlockTileEntity;
 import mcp.MethodsReturnNonnullByDefault;
@@ -41,7 +41,7 @@ public class EffectBlock extends Block {
                 BlockPos targetPos = builder.getPos();
                 BlockData targetBlock = builder.getRenderedBlock();
                 if (builder.isUsingPaste()) {
-                    world.setBlockState(targetPos, BGBlocks.constructionBlock.getDefaultState());
+                    world.setBlockState(targetPos, OurBlocks.constructionBlock.getDefaultState());
                     TileEntity te = world.getTileEntity(targetPos);
                     if (te instanceof ConstructionBlockTileEntity) {
                         ((ConstructionBlockTileEntity) te).setBlockState(targetBlock, targetBlock);
@@ -78,7 +78,7 @@ public class EffectBlock extends Block {
     }
 
     public static void spawnEffectBlock(IWorld world, BlockPos spawnPos, BlockData spawnBlock, Mode mode, boolean usePaste) {
-        BlockState state = BGBlocks.effectBlock.getDefaultState();
+        BlockState state = OurBlocks.effectBlock.getDefaultState();
         TileEntity curTe = world.getTileEntity(spawnPos);
         BlockState curState = world.getBlockState(spawnPos);
         world.setBlockState(spawnPos, state, 3);

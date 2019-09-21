@@ -1,8 +1,9 @@
 package com.direwolf20.buildinggadgets.client.renderer;
 
+import com.direwolf20.buildinggadgets.api.building.BlockData;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.blocks.EffectBlock;
-import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
+import com.direwolf20.buildinggadgets.common.registry.OurBlocks;
 import com.direwolf20.buildinggadgets.common.tiles.EffectBlockTileEntity;
 import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.block.BlockState;
@@ -21,6 +22,13 @@ public class EffectBlockTER extends TileEntityRenderer<EffectBlockTileEntity> {
 
     @Override
     public void render(EffectBlockTileEntity tile, double x, double y, double z, float partialTicks, int destroyStage) {
+        BlockData renderData = tile.getRenderedBlock();
+        if (renderData == null) {
+            BuildingGadgets.LOG.error("Client did not receive Effect-Block Render Data. " +
+                    "This is an error we know about and will try to fix as soon as possible! " +
+                    "Aborting render for now to prevent Client-Crash.");
+            return;
+        }
         BlockRendererDispatcher blockrendererdispatcher = Minecraft.getInstance().getBlockRendererDispatcher();
         Minecraft mc = Minecraft.getInstance();
         GlStateManager.pushMatrix();
@@ -36,14 +44,15 @@ public class EffectBlockTER extends TileEntityRenderer<EffectBlockTileEntity> {
         if (toolMode == EffectBlock.Mode.REMOVE || toolMode == EffectBlock.Mode.REPLACE)
             scale = (float) (maxLife - teCounter) / maxLife;
         float trans = (1 - scale) / 2;
+
         GlStateManager.translated(x, y, z);
         GlStateManager.translatef(trans, trans, trans);
         GlStateManager.rotatef(-90.0F, 0.0F, 1.0F, 0.0F);
         GlStateManager.scalef(scale, scale, scale);
 
-        BlockState renderBlockState = tile.getRenderedBlock().getState();
+        BlockState renderBlockState = renderData.getState();
         if (tile.isUsingPaste() && toolMode == EffectBlock.Mode.PLACE)
-            renderBlockState = BGBlocks.constructionBlockDense.getDefaultState();
+            renderBlockState = OurBlocks.constructionBlockDense.getDefaultState();
 
         try {
             blockrendererdispatcher.renderBlockBrightness(renderBlockState, 1.0f);

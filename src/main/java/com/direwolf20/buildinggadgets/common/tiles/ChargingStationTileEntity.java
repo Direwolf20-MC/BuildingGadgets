@@ -4,7 +4,7 @@ import com.direwolf20.buildinggadgets.client.renderer.SphereSegmentation;
 import com.direwolf20.buildinggadgets.common.capability.CappedEnergyStorage;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.containers.ChargingStationContainer;
-import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
+import com.direwolf20.buildinggadgets.common.registry.OurBlocks;
 import com.direwolf20.buildinggadgets.common.util.CapabilityUtil;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.exceptions.CapabilityNotPresentException;
@@ -67,7 +67,7 @@ public class ChargingStationTileEntity extends TileEntity implements ITickableTi
     //-----------------------------------------------------------------
 
     public ChargingStationTileEntity() {
-        super(BGBlocks.BGTileEntities.CHARGING_STATION_TYPE);
+        super(OurBlocks.OurTileEntities.CHARGING_STATION_TYPE);
         energy = new CappedEnergyStorage(Config.CHARGING_STATION.capacity::get, Config.CHARGING_STATION.maxExtract::get, Config.CHARGING_STATION.maxRecieve::get) {
             @Override
             protected void writeEnergy() {

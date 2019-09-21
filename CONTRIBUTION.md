@@ -1,13 +1,20 @@
-# Contribution Guidlines
+# Contribution Guidelines
 
-## Preamble
-These guidelines are intended as "guidelines" to how an PR To Dire's Buildinggadgets should be structured. 
+## Introduction
+Dire's Building Gadgets has 2 primary goals that have been defined by Direwolf20 we always try to adhere to. The goals are to:
+1) To be a fun mod for players to use to make building large structures easier. 
+2) To be a learning guide for beginner programmers wanting to learn how to code, and start making a Minecraft mod.
+
+These goals should always be thought about when considering a new implementation, a structural code change or any other changes you may thing to add.
+
+Below we have outlined our `guidelines` for interacting with the `Mods` code base and how you should go about creating PR's.
+
 Bear in mind that these are only guidelines and don't necessarily apply in each and every case, but if you choose not to follow a specific Part of this specification, you must be able to reason out why, if asked to do so.
 
 ## PR structure
 ### General Notes
-In General a PR should explain what it does, how it does this and how it was tested. It should also follow the [Code Guidelines](#code-guidelines).
-* If you are not yet finished implementing, prepend it with \[WIP]
+In general an ideal PR should always explain what it does, how it does this and how it was tested. It should also follow the [Code Guidelines](#code-guidelines).
+* If you are not yet finished implementing the changes then you should mark the PR as a `draft` on Github
 * A description must be provided before the PR is merged, to provide record of the Performed changes
 
 ### Bug Fix PR's
@@ -23,9 +30,8 @@ Your PR should include the following at least the following Information:
 * If testing was performed, what tests and how extensive they have been
 
 ## Code Guidelines
-In General your code should be well-structured and easy to read. 
-We know that as of 1.12 this is not the case for great parts of the mod, but we are trying to improve upon the code-base.
-Unless your PR is directly related to code cleaning then your PR should not contain any formatting changes to unchanged code blocks as this simply makes reviewing them unnecessarily complex.
+- In general your code should be well-structured and easy to read. we'd like to be the first to acknowledge that our code base isn't perfect and in some areas it's really unreadable! We are trying to improve upon the code-base. 
+- Your PR should not contain any formatting changes to unchanged code blocks, unless it is directly related to code cleanup. This makes reviewing them unnecessarily complex.
 
 ### Formatting
 * Use 4 space indent instead of Tabs.
@@ -52,8 +58,6 @@ Unless your PR is directly related to code cleaning then your PR should not cont
 In general apply common sense to the Code you write. "Effective Java" is also always a good start.
 * Avoid unnecessary `else` clauses.
 * Avoid large case statements as it's likely not needed. If you find yourself requiring a large case statement block then try to think about how you might be able to refactor your code in a way that avoids the requirement. Small case statements are fine.
-    * In most cases this can be avoided by giving the object that's being tested on an abstract method to be overridden. For example, give Item and Block objects a method called `getGuiElement(ClientPlayerEntity, int, int ,int)` and call it in `GuiProxy` instead of using a case statement.
-    * The other approach would be using a `Map<SomePropertyOfMyObject, Consumer<MyObject>>` and setup all different cases as lambdas where the parameter is the object being tested.
 * Prefix Interfaces with `I` - like `ITemplate`.
 * `@SupressWarnings("...")` should be avoided in General:
     * If it needs to be applied, limit it to the smallest possible scope (and create a new variable for it if necessary).

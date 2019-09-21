@@ -12,6 +12,7 @@ import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.registry.objects.BuildingObjects;
 import com.direwolf20.buildinggadgets.common.save.SaveManager;
 import com.direwolf20.buildinggadgets.common.save.TemplateSave;
+import com.direwolf20.buildinggadgets.common.registry.RegistryHandler;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import net.minecraft.command.Commands;
 import net.minecraft.item.crafting.IRecipeSerializer;
@@ -77,7 +78,8 @@ public final class BuildingGadgets {
             eventBus.addListener((Consumer<FMLClientSetupEvent>) event -> ClientProxy.clientSetup(eventBus));
             ModLoadingContext.get().registerExtensionPoint(ExtensionPoint.CONFIGGUIFACTORY, () -> GuiMod::openScreen);
         });
-        BuildingObjects.init();
+
+        RegistryHandler.setup();
     }
 
     private void setup(final FMLCommonSetupEvent event) {
@@ -103,10 +105,6 @@ public final class BuildingGadgets {
         SaveManager.INSTANCE.onServerStopped(event);
     }
 
-    private void finishLoad(FMLLoadCompleteEvent event) {
-        BuildingObjects.cleanup();
-    }
-
     private void onRecipeRegister(final RegistryEvent.Register<IRecipeSerializer<?>> e) {
         e.getRegistry().register(
                 Serializer.INSTANCE.setRegistryName(
@@ -114,5 +112,4 @@ public final class BuildingGadgets {
             )
         );
     }
-
 }

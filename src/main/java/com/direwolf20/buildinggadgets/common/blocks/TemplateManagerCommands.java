@@ -5,8 +5,12 @@ import com.direwolf20.buildinggadgets.common.items.ITemplate;
 import com.direwolf20.buildinggadgets.common.items.Template;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketBlockMap;
-import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
 import com.direwolf20.buildinggadgets.common.save.WorldSave;
+import com.direwolf20.buildinggadgets.common.registry.OurItems;
+import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
+import com.direwolf20.buildinggadgets.common.util.blocks.BlockMap;
+import com.direwolf20.buildinggadgets.common.util.blocks.BlockMapIntState;
+import com.direwolf20.buildinggadgets.common.util.buffers.PasteToolBufferBuilder;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.util.tools.UniqueItem;
 import com.google.common.collect.Multiset;
@@ -28,7 +32,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class TemplateManagerCommands {
-    private static final Set<Item> allowedItemsRight = Stream.of(Items.PAPER, BGItems.template).collect(Collectors.toSet());
+    private static final Set<Item> allowedItemsRight = Stream.of(Items.PAPER, OurItems.template).collect(Collectors.toSet());
 
     public static void loadTemplate(TemplateManagerContainer container, PlayerEntity player) {
         ItemStack itemStack0 = container.getSlot(0).getStack();
@@ -43,7 +47,7 @@ public class TemplateManagerCommands {
         BlockPos startPos = template.getStartPos(itemStack1);
         BlockPos endPos = template.getEndPos(itemStack1);
         Multiset<UniqueItem> tagMap = template.getItemCountMap(itemStack1);
-        String UUIDTemplate = BGItems.template.getUUID(itemStack1);
+        String UUIDTemplate = OurItems.template.getUUID(itemStack1);
         if (UUIDTemplate == null) return;
 
         WorldSave worldSave = WorldSave.getWorldSave(world);
@@ -63,7 +67,7 @@ public class TemplateManagerCommands {
         tagCompound.putInt(NBTKeys.TEMPLATE_COPY_COUNT, template.getCopyCounter(itemStack0));
         tagCompound.putString(NBTKeys.TEMPLATE_UUID, template.getUUID(itemStack0));
         tagCompound.putString(NBTKeys.TEMPLATE_OWNER, player.getName().getString());
-        if (template.equals(BGItems.gadgetCopyPaste)) {
+        if (template.equals(OurItems.gadgetCopyPaste)) {
             worldSave.addToMap(UUID, tagCompound);
         } else {
             templateWorldSave.addToMap(UUID, tagCompound);
@@ -90,26 +94,26 @@ public class TemplateManagerCommands {
         World world = player.world;
         ItemStack templateStack;
         if (itemStack1.getItem().equals(Items.PAPER)) {
-            templateStack = new ItemStack(BGItems.template, 1);
+            templateStack = new ItemStack(OurItems.template, 1);
             container.putStackInSlot(1, templateStack);
         }
-        if (!(container.getSlot(1).getStack().getItem().equals(BGItems.template))) return;
+        if (!(container.getSlot(1).getStack().getItem().equals(OurItems.template))) return;
         templateStack = container.getSlot(1).getStack();
         WorldSave worldSave = WorldSave.getWorldSave(world);
         WorldSave templateWorldSave = WorldSave.getTemplateWorldSave(world);
         CompoundNBT templateTagCompound;
 
         String UUID = template.getUUID(itemStack0);
-        String UUIDTemplate = BGItems.template.getUUID(templateStack);
+        String UUIDTemplate = OurItems.template.getUUID(templateStack);
         if (UUID == null) return;
         if (UUIDTemplate == null) return;
 
-        boolean isTool = itemStack0.getItem().equals(BGItems.gadgetCopyPaste);
+        boolean isTool = itemStack0.getItem().equals(OurItems.gadgetCopyPaste);
         CompoundNBT tagCompound = isTool ? worldSave.getCompoundFromUUID(UUID) : templateWorldSave.getCompoundFromUUID(UUID);
         templateTagCompound = tagCompound.copy();
         template.incrementCopyCounter(templateStack);
         templateTagCompound.putInt(NBTKeys.TEMPLATE_COPY_COUNT, template.getCopyCounter(templateStack));
-        templateTagCompound.putString(NBTKeys.TEMPLATE_UUID, BGItems.template.getUUID(templateStack));
+        templateTagCompound.putString(NBTKeys.TEMPLATE_UUID, OurItems.template.getUUID(templateStack));
 
         templateWorldSave.addToMap(UUIDTemplate, templateTagCompound);
         BlockPos startPos = template.getStartPos(itemStack0);
@@ -141,14 +145,14 @@ public class TemplateManagerCommands {
         World world = player.world;
         ItemStack templateStack;
         if (itemStack1.getItem().equals(Items.PAPER)) {
-            templateStack = new ItemStack(BGItems.template, 1);
+            templateStack = new ItemStack(OurItems.template, 1);
             container.putStackInSlot(1, templateStack);
         }
-        if (!(container.getSlot(1).getStack().getItem().equals(BGItems.template))) return;
+        if (!(container.getSlot(1).getStack().getItem().equals(OurItems.template))) return;
         templateStack = container.getSlot(1).getStack();
 
         WorldSave templateWorldSave = WorldSave.getTemplateWorldSave(world);
-        Template template = BGItems.template;
+        Template template = OurItems.template;
         String UUIDTemplate = template.getUUID(templateStack);
         if (UUIDTemplate == null) return;
 
@@ -212,7 +216,7 @@ public class TemplateManagerCommands {
         /*
         ItemStack itemStack0 = container.getSlot(0).getStack();
         if (itemStack0.getItem() instanceof ITemplate) {
-            CompoundNBT tagCompound = PasteToolBufferBuilder.getTagFromUUID(BGItems.gadgetCopyPaste.getUUID(itemStack0));
+            CompoundNBT tagCompound = PasteToolBufferBuilder.getTagFromUUID(OurItems.gadgetCopyPaste.getUUID(itemStack0));
             if (tagCompound == null) {
                 Minecraft.getInstance().player.sendStatusMessage(new StringTextComponent(TextFormatting.RED + new TranslationTextComponent("message.gadget.copyfailed").getUnformattedComponentText()), false);
                 return;

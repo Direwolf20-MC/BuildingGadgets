@@ -12,7 +12,7 @@ import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.items.gadgets.*;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.*;
-import com.direwolf20.buildinggadgets.common.registry.objects.BGSound;
+import com.direwolf20.buildinggadgets.common.registry.OurSounds;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.lang.RadialTranslation;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
@@ -428,7 +428,7 @@ public class ModeRadialMenu extends Screen {
             getMinecraft().player.sendStatusMessage(new StringTextComponent(TextFormatting.AQUA + new TranslationTextComponent("message.gadget.toolmode").getUnformattedComponentText() + ": " + mode), true);
 
             PacketHandler.sendToServer(new PacketToggleMode(slotSelected));
-            BGSound.BEEP.playSound();
+            OurSounds.BEEP.playSound();
         }
     }
 

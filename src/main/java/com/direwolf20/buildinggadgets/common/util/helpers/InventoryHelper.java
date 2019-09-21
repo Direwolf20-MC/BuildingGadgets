@@ -6,7 +6,7 @@ import com.direwolf20.buildinggadgets.common.items.gadgets.AbstractGadget;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.items.pastes.ConstructionPaste;
 import com.direwolf20.buildinggadgets.common.items.pastes.GenericPasteContainer;
-import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
+import com.direwolf20.buildinggadgets.common.registry.OurItems;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.google.common.collect.ImmutableSet;
 import net.minecraft.block.*;
@@ -190,7 +190,7 @@ public class InventoryHelper {
 
         long count = 0;
         PlayerInventory inv = player.inventory;
-        Item item = BGItems.constructionPaste;
+        Item item = OurItems.constructionPaste;
         List<Integer> slots = findItem(item, inv);
         if (slots.size() > 0) {
             for (int slot : slots) {
@@ -262,7 +262,7 @@ public class InventoryHelper {
             return true;
         }
         PlayerInventory inv = player.inventory;
-        List<Integer> slots = findItem(BGItems.constructionPaste, inv);
+        List<Integer> slots = findItem(OurItems.constructionPaste, inv);
         if (slots.size() > 0) {
             for (int slot : slots) {
                 ItemStack pasteStack = inv.getStackInSlot(slot);
