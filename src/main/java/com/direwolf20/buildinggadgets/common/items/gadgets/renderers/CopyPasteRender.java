@@ -17,12 +17,6 @@ import com.direwolf20.buildinggadgets.common.world.FakeDelegationWorld;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.RemovalListener;
-import com.direwolf20.buildinggadgets.common.registry.OurBlocks;
-import com.direwolf20.buildinggadgets.common.registry.OurItems;
-import com.direwolf20.buildinggadgets.common.util.blocks.BlockMap;
-import com.direwolf20.buildinggadgets.common.util.buffers.PasteToolBufferBuilder;
-import com.direwolf20.buildinggadgets.common.util.buffers.ToolBufferBuilder;
-import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
 import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.block.*;
 import net.minecraft.client.renderer.*;
@@ -40,20 +34,22 @@ import net.minecraftforge.client.event.RenderWorldLastEvent;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL14;
 
+import javax.annotation.Nonnull;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 public class CopyPasteRender extends BaseRenderer {
     private ChestRenderer chestRenderer;
-    private final Cache<UUID, RenderInfo> renderCache = CacheBuilder.newBuilder()
+    private final Cache<RenderKey, RenderInfo> renderCache = CacheBuilder.newBuilder()
             .expireAfterWrite(1, TimeUnit.SECONDS)
-            .removalListener((RemovalListener<UUID, RenderInfo>) notification -> notification.getValue().onRemove())
+            .removalListener((RemovalListener<RenderKey, RenderInfo>) notification -> notification.getValue().onRemove())
             .build();
 
     private final Cache<BlockData, Boolean> erroredCache = CacheBuilder
             .newBuilder()
-            .expireAfterAccess(500, TimeUnit.MILLISECONDS)
+            .expireAfterAccess(1, TimeUnit.MINUTES)
             .build();
 
     public ChestRenderer getChestRenderer() {
@@ -95,7 +91,7 @@ public class CopyPasteRender extends BaseRenderer {
         BufferBuilder bufferbuilder = tessellator.getBuffer();
 
         GlStateManager.pushMatrix();
-        GlStateManager.translated(-playerPos.getX(), -playerPos.getY(), -playerPos.getZ());//The render starts at the player, so we subtract the player coords and move the render to 0,0,0
+        GlStateManager.translated(- playerPos.getX(), - playerPos.getY(), - playerPos.getZ());//The render starts at the player, so we subtract the player coords and move the render to 0,0,0
 
         GlStateManager.disableLighting();
         GlStateManager.disableTexture();
@@ -119,93 +115,89 @@ public class CopyPasteRender extends BaseRenderer {
         AbstractGadget item = (AbstractGadget) heldItem.getItem();
         UUID id = item.getUUID(heldItem);
         float partialTicks = evt.getPartialTicks();
-        try {
-            RenderInfo info = renderCache.get(id, () -> {
-                int displayList = GLAllocation.generateDisplayLists(1);
-                GlStateManager.newList(displayList, GL11.GL_COMPILE);
-                this.performRender(world, player, playerPos, heldItem, id, partialTicks);
-                GlStateManager.endList();
-                return new RenderInfo(displayList);
-            });
-            info.render();
-        } catch (ExecutionException e) {
-            BuildingGadgets.LOG.error("Failed to create Render!", e);
-        }
+        GadgetCopyPaste.getActivePos(player, heldItem).ifPresent(startPos -> {
+            try {
+                RenderInfo info = renderCache.get(new RenderKey(id, startPos), () -> {
+                    int displayList = GLAllocation.generateDisplayLists(1);
+                    GlStateManager.newList(displayList, GL11.GL_COMPILE);
+                    this.performRender(world, player, heldItem, startPos, partialTicks);
+                    GlStateManager.endList();
+                    return new RenderInfo(displayList);
+                });
+                info.render(playerPos);
+            } catch (ExecutionException e) {
+                BuildingGadgets.LOG.error("Failed to create Render!", e);
+            }
+        });
     }
 
-    private void performRender(World world, PlayerEntity player, Vec3d playerPos, ItemStack stack, UUID id, float partialTicks) {
-        GadgetCopyPaste.getActivePos(player, stack).ifPresent(startPos -> {
-            world.getCapability(CapabilityTemplate.TEMPLATE_PROVIDER_CAPABILITY).ifPresent(provider -> {
-                stack.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(key -> {
-                    ITemplate template = provider.getTemplateForKey(key);
-                    FakeDelegationWorld fakeWorld = new FakeDelegationWorld(world);
-                    IBuildContext context = SimpleBuildContext.builder()
-                            .buildingPlayer(player)
-                            .usedStack(stack)
-                            .build(fakeWorld);
-                    IBuildView view = template.createViewInContext(SimpleBuildOpenOptions.withContext(context));
-                    if (view == null) {
-                        BuildingGadgets.LOG.warn("Expected Template to be able to create a build view! Aborting render!");
-                        return;
+    private void performRender(World world, PlayerEntity player, ItemStack stack, BlockPos startPos, float partialTicks) {
+        world.getCapability(CapabilityTemplate.TEMPLATE_PROVIDER_CAPABILITY).ifPresent(provider -> {
+            stack.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(key -> {
+                ITemplate template = provider.getTemplateForKey(key);
+                FakeDelegationWorld fakeWorld = new FakeDelegationWorld(world);
+                IBuildContext context = SimpleBuildContext.builder()
+                        .buildingPlayer(player)
+                        .usedStack(stack)
+                        .build(fakeWorld);
+                IBuildView view = template.createViewInContext(SimpleBuildOpenOptions.withContext(context));
+                if (view == null) {
+                    BuildingGadgets.LOG.warn("Expected Template to be able to create a build view! Aborting render!");
+                    return;
+                }
+                view.translateTo(startPos);
+                RenderSorter sorter = new RenderSorter(context, view.estimateSize());
+                for (PlacementTarget target : view) {
+                    if (target.placeIn(context))
+                        sorter.onPlaced(target);
+                }
+                //Prepare the block rendering
+                //BlockRendererDispatcher dispatcher = Minecraft.getInstance().getBlockRendererDispatcher();
+
+
+                GlStateManager.pushTextureAttributes();
+
+                //Enable Blending (So we can have transparent effect)
+                GlStateManager.enableBlend();
+                //This blend function allows you to use a constant alpha, which is defined later
+                GlStateManager.blendFunc(GL14.GL_CONSTANT_ALPHA, GL14.GL_ONE_MINUS_CONSTANT_ALPHA);
+
+                GL14.glBlendColor(1F, 1F, 1F, 0.55f); //Set the alpha of the blocks we are rendering
+                //GlStateManager.translate(-0.0005f, -0.0005f, 0.0005f);
+                //GlStateManager.scale(1.001f, 1.001f, 1.001f);//Slightly Larger block to avoid z-fighting.
+                //GlStateManager.translatef(0.0005f, 0.0005f, - 0.0005f);
+                BlockRendererDispatcher dispatcher = getMc().getBlockRendererDispatcher();
+                TileEntityRendererDispatcher teDispatcher = TileEntityRendererDispatcher.instance;
+                for (PlacementTarget target : sorter.getSortedTargets()) {
+                    BlockPos targetPos = target.getPos();
+                    BlockState state = context.getWorld().getBlockState(target.getPos());
+                    TileEntity te = context.getWorld().getTileEntity(target.getPos());
+                    GlStateManager.pushMatrix();//Push matrix again in order to apply these settings individually
+                    GlStateManager.scalef(0.999f, 0.999f, 0.999f);//Slightly Larger block to avoid z-fighting.
+                    GlStateManager.translatef(targetPos.getX(), targetPos.getY(), targetPos.getZ());//The render starts at the player, so we subtract the player coords and move the render to 0,0,0
+                    GlStateManager.enableBlend(); //We have to do this in the loop because the TE Render removes blend when its done
+                    //GlStateManager.rotatef(- 90.0F, 0.0F, 1.0F, 0.0F); //Rotate it because i'm not sure why but we need to
+                    //state = state.getBlock().getExtendedState(state, fakeWorld, coordinate); //Get the extended block state in the fake world (Disabled to fix chisel, not sure why.)
+                    try {
+                        dispatcher.renderBlockBrightness(state, 1f);//Render the defined block
+                    } catch (Exception e) {
+                        Tessellator tessellator = Tessellator.getInstance();
+                        BufferBuilder bufferBuilder = tessellator.getBuffer();
+                        bufferBuilder.finishDrawing();
                     }
-                    view.translateTo(startPos);
-                    RenderSorter sorter = new RenderSorter(context, view.estimateSize());
-                    for (PlacementTarget target : view) {
-                        if (target.placeIn(context))
-                            sorter.onPlaced(target);
-                    }
-                    //Prepare the block rendering
-                    //BlockRendererDispatcher dispatcher = Minecraft.getInstance().getBlockRendererDispatcher();
-
-                    //Save the current position that is being rendered
-                    GlStateManager.pushMatrix();
-
-                    GlStateManager.pushTextureAttributes();
-
-                    //Enable Blending (So we can have transparent effect)
-                    GlStateManager.enableBlend();
-                    //This blend function allows you to use a constant alpha, which is defined later
-                    GlStateManager.blendFunc(GL14.GL_CONSTANT_ALPHA, GL14.GL_ONE_MINUS_CONSTANT_ALPHA);
-                    GlStateManager.translated(- playerPos.getX(), - playerPos.getY(), - playerPos.getZ());//The render starts at the player, so we subtract the player coords and move the render to 0,0,0
-
-                    GL14.glBlendColor(1F, 1F, 1F, 0.55f); //Set the alpha of the blocks we are rendering
-                    //GlStateManager.translate(-0.0005f, -0.0005f, 0.0005f);
-                    //GlStateManager.scale(1.001f, 1.001f, 1.001f);//Slightly Larger block to avoid z-fighting.
-                    //GlStateManager.translatef(0.0005f, 0.0005f, - 0.0005f);
-                    BlockRendererDispatcher dispatcher = getMc().getBlockRendererDispatcher();
-                    TileEntityRendererDispatcher teDispatcher = TileEntityRendererDispatcher.instance;
-                    for (PlacementTarget target : sorter.getSortedTargets()) {
-                        BlockPos targetPos = target.getPos();
-                        BlockState state = context.getWorld().getBlockState(target.getPos());
-                        TileEntity te = context.getWorld().getTileEntity(target.getPos());
-                        GlStateManager.pushMatrix();//Push matrix again in order to apply these settings individually
-                        GlStateManager.scalef(0.999f, 0.999f, 0.999f);//Slightly Larger block to avoid z-fighting.
-                        GlStateManager.translatef(targetPos.getX(), targetPos.getY(), targetPos.getZ());//The render starts at the player, so we subtract the player coords and move the render to 0,0,0
-                        GlStateManager.enableBlend(); //We have to do this in the loop because the TE Render removes blend when its done
-                        //GlStateManager.rotatef(- 90.0F, 0.0F, 1.0F, 0.0F); //Rotate it because i'm not sure why but we need to
-                        //state = state.getBlock().getExtendedState(state, fakeWorld, coordinate); //Get the extended block state in the fake world (Disabled to fix chisel, not sure why.)
-                        try {
-                            dispatcher.renderBlockBrightness(state, 1f);//Render the defined block
-                        } catch (Exception e) {
-                            Tessellator tessellator = Tessellator.getInstance();
-                            BufferBuilder bufferBuilder = tessellator.getBuffer();
-                            bufferBuilder.finishDrawing();
+                    try {
+                        if (te != null && ! erroredCache.get(target.getData(), () -> false)) {
+                            teDispatcher.render(te, targetPos.getX(), targetPos.getY(), targetPos.getZ(), partialTicks, - 1, true);
                         }
-                        try {
-                            if (te != null && ! erroredCache.get(target.getData(), () -> false)) {
-                                teDispatcher.render(te, targetPos.getX(), targetPos.getY(), targetPos.getZ(), partialTicks, - 1, true);
-                            }
-                        } catch (Exception e) {
-                            erroredCache.put(target.getData(), true);
-                        }
-
-                        GlStateManager.popMatrix();
+                    } catch (Exception e) {
+                        erroredCache.put(target.getData(), true);
                     }
-                    GlStateManager.disableBlend();
-                    GlStateManager.popAttributes();
+
                     GlStateManager.popMatrix();
-                    //TODO unbuildBlocks
-                });
+                }
+                GL14.glBlendColor(1F, 1F, 1F, 1); //Reset Blend, as it seems to affect the Item Render
+                GlStateManager.disableBlend();
+                GlStateManager.popAttributes();
             });
         });
 
@@ -262,18 +254,72 @@ public class CopyPasteRender extends BaseRenderer {
         GlStateManager.lineWidth(1.0F);
     }
 
+    /**
+     * We use both the id and the target pos as keys, so that it re-render's once the player has looks at a different Block.
+     * We cache the hashcode, as renders should be as fast as possible.
+     */
+    private static final class RenderKey {
+        @Nonnull
+        private final UUID id;
+        @Nonnull
+        private final BlockPos targetPos;
+        private int hash;
+
+        private RenderKey(UUID id, BlockPos targetPos) {
+            this.id = Objects.requireNonNull(id, "Cannot create RenderKey without ID!");
+            this.targetPos = Objects.requireNonNull(targetPos, "Cannot create RenderKey for " + id + " without target Pos!");
+            this.hash = 0;
+        }
+
+        @Nonnull
+        private UUID getId() {
+            return id;
+        }
+
+        @Nonnull
+        private BlockPos getTargetPos() {
+            return targetPos;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (! (o instanceof RenderKey)) return false;
+
+            RenderKey renderKey = (RenderKey) o;
+
+            if (! getId().equals(renderKey.getId())) return false;
+            return getTargetPos().equals(renderKey.getTargetPos());
+        }
+
+        @Override
+        public int hashCode() {
+            if (hash == 0) {//very unlikely that we hash to 0 - no need to add an evaluated boolean
+                hash = getId().hashCode();
+                hash = 31 * hash + getTargetPos().hashCode();
+                return hash;
+            }
+            return hash;
+        }
+    }
+
+
     private static final class RenderInfo {
         private final int callList;
 
-        public RenderInfo(int callList) {
+        private RenderInfo(int callList) {
             this.callList = callList;
         }
 
-        public void render() {
+        private void render(Vec3d playerPos) {
+            //Save the current position that is being rendered
+            GlStateManager.pushMatrix();
+            GlStateManager.translated(- playerPos.getX(), - playerPos.getY(), - playerPos.getZ());//The render starts at the player, so we subtract the player coords and move the render to 0,0,0
             GlStateManager.callList(callList);
+            GlStateManager.popMatrix();
         }
 
-        public void onRemove() {
+        private void onRemove() {
             GLAllocation.deleteDisplayLists(callList);
         }
     }
