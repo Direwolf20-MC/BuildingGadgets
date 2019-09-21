@@ -17,6 +17,8 @@ import net.minecraft.block.material.MaterialColor;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.tileentity.TileEntityType;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
@@ -107,6 +109,7 @@ public final class OurBlocks {
          * Called from {@link RegistryHandler} as this is required to be loaded
          * only on the client side.
          */
+        @OnlyIn(Dist.CLIENT)
         static void registerRenderers() {
             FMLJavaModLoadingContext.get().getModEventBus().addListener(event -> {
                 ClientRegistry.bindTileEntitySpecialRenderer(EffectBlockTileEntity.class, new EffectBlockTER());
