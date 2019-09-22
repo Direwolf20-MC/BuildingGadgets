@@ -14,6 +14,7 @@ import com.direwolf20.buildinggadgets.api.exceptions.TransactionResultExceedsTem
 import com.direwolf20.buildinggadgets.api.exceptions.TransactionResultExceedsTemplateSizeException.BlockPosOutOfBounds;
 import com.direwolf20.buildinggadgets.api.exceptions.TransactionResultExceedsTemplateSizeException.ToManyDifferentBlockDataInstances;
 import com.direwolf20.buildinggadgets.api.materials.MaterialList;
+import com.direwolf20.buildinggadgets.api.materials.MaterialList.SimpleBuilder;
 import com.direwolf20.buildinggadgets.api.serialisation.ITemplateSerializer;
 import com.direwolf20.buildinggadgets.api.serialisation.ITileDataSerializer;
 import com.direwolf20.buildinggadgets.api.serialisation.SerialisationSupport;
@@ -529,7 +530,7 @@ public final class ImmutableTemplate implements ITemplate {
         private void createPosToState(Object2IntMap<BlockData> reverseMap, @Nullable IBuildContext context) throws TransactionExecutionException {
             assert posToData != null;
             posToStateId = new Long2IntOpenHashMap(posToData.size());
-            MaterialList.Builder builder = context != null ? MaterialList.builder() : null;
+            SimpleBuilder builder = context != null ? MaterialList.simpleBuilder() : null;
             Region.Builder regionBuilder = Region.enclosingBuilder();
             BlockPos smallest = headerInfo.getBoundingBox().getMin(); //because we always update the boundingBox, it is safe to assume that this provides the min position
             long count = 0;

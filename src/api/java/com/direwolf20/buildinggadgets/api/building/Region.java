@@ -30,7 +30,7 @@ public final class Region implements IPositionPlacementSequence, Serializable {
     }
 
     /**
-     * Creates a new Builder which initially contains {@code (0, 0, 0) to (0, 0, 0)}.
+     * Creates a new SimpleBuilder which initially contains {@code (0, 0, 0) to (0, 0, 0)}.
      *
      * @return A new {@link Builder}
      */
@@ -39,7 +39,7 @@ public final class Region implements IPositionPlacementSequence, Serializable {
     }
 
     /**
-     * Creates a new Builder which initially only contains {@code (Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE) to (Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE)}.
+     * Creates a new SimpleBuilder which initially only contains {@code (Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE) to (Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE)}.
      * <br>
      * Useful for creating a builder which encloses all Positions passed in.
      *
@@ -494,7 +494,7 @@ public final class Region implements IPositionPlacementSequence, Serializable {
          * Allows enclosing of all Vectors in the passed iterable.
          *
          * @param iterable The iterable who's contents shall be in the resulting Region
-         * @return The Builder to allow for Method chaining
+         * @return The SimpleBuilder to allow for Method chaining
          * @see #enclose(Vec3i)
          */
         public Builder encloseAll(Iterable<? extends Vec3i> iterable) {
@@ -526,7 +526,7 @@ public final class Region implements IPositionPlacementSequence, Serializable {
          * @param x the x Coordinate which has to be included in the resulting {@link Region}
          * @param y the y Coordinate which has to be included in the resulting {@link Region}
          * @param z the z Coordinate which has to be included in the resulting {@link Region}
-         * @return The Builder to allow for Method chaining
+         * @return The SimpleBuilder to allow for Method chaining
          * @see #encloseX(int)
          * @see #encloseY(int)
          * @see #encloseZ(int)
@@ -542,7 +542,7 @@ public final class Region implements IPositionPlacementSequence, Serializable {
          * Ensures that the passed in x Coordinate is included in the resulting {@link Region}.
          *
          * @param x the x Coordinate which has to be included in the resulting {@link Region}
-         * @return The Builder to allow for Method chaining
+         * @return The SimpleBuilder to allow for Method chaining
          */
         public Builder encloseX(int x) {
             minX = Math.min(x, minX);
@@ -554,7 +554,7 @@ public final class Region implements IPositionPlacementSequence, Serializable {
          * Ensures that the passed in y Coordinate is included in the resulting {@link Region}.
          *
          * @param y the y Coordinate which has to be included in the resulting {@link Region}
-         * @return The Builder to allow for Method chaining
+         * @return The SimpleBuilder to allow for Method chaining
          */
         public Builder encloseY(int y) {
             minY = Math.min(y, minY);
@@ -566,7 +566,7 @@ public final class Region implements IPositionPlacementSequence, Serializable {
          * Ensures that the passed in y Coordinate is included in the resulting {@link Region}.
          *
          * @param z the z Coordinate which has to be included in the resulting {@link Region}
-         * @return The Builder to allow for Method chaining
+         * @return The SimpleBuilder to allow for Method chaining
          */
         public Builder encloseZ(int z) {
             minZ = Math.min(z, minZ);

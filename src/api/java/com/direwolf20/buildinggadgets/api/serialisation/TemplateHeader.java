@@ -2,15 +2,13 @@ package com.direwolf20.buildinggadgets.api.serialisation;
 
 import com.direwolf20.buildinggadgets.api.building.Region;
 import com.direwolf20.buildinggadgets.api.materials.MaterialList;
-import com.direwolf20.buildinggadgets.api.materials.UniqueItem;
 import com.direwolf20.buildinggadgets.api.util.NBTKeys;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Multiset;
-import com.google.common.collect.Multiset.Entry;
-import com.google.gson.*;
-import net.minecraft.client.resources.I18n;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
+import com.google.gson.FieldNamingPolicy;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonPrimitive;
+import com.google.gson.JsonSerializer;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -28,10 +26,6 @@ import java.util.Objects;
  * expanded over time, as we get informed about other useful things to be put in here.
  */
 public final class TemplateHeader {
-    private static final String MATERIAL_LIST_ITEM_NAME = "name";
-    private static final String MATERIAL_LIST_ITEM_ID = "id";
-    private static final String MATERIAL_LIST_ITEM_COUNT = "count";
-    private static final String MATERIAL_LIST_ITEM_NBT = "nbt";
 
     /**
      * Convenience overload taking an {@link ITemplateSerializer} instead of it's registryName-
@@ -58,7 +52,7 @@ public final class TemplateHeader {
 
     /**
      * @param header The {@code TemplateHeader} to copy
-     * @return a Builder with all values predefined to the values passed into the header
+     * @return a SimpleBuilder with all values predefined to the values passed into the header
      */
     public static Builder builderOf(TemplateHeader header) {
         return builderOf(header, header.getSerializer(), header.getBoundingBox());
@@ -68,7 +62,7 @@ public final class TemplateHeader {
      * @param boundingBox the {@link Region} to use
      * @param serializer  The serializer to use
      * @param header      The {@code TemplateHeader} to copy
-     * @return a Builder with all values predefined to the values passed into the header, except for serializer and boundBox
+     * @return a SimpleBuilder with all values predefined to the values passed into the header, except for serializer and boundBox
      */
     public static Builder builderOf(TemplateHeader header, ResourceLocation serializer, Region boundingBox) {
         return builder(serializer, boundingBox)
@@ -77,7 +71,7 @@ public final class TemplateHeader {
                 .requiredItems(header.getRequiredItems());
     }
 
-    public static Builder builderFromNBT(CompoundNBT nbt) {
+    public static Builder builderFromNBT(CompoundNBT nbt, boolean persisted) {
         Preconditions.checkArgument(nbt.contains(NBTKeys.KEY_SERIALIZER, NBT.TAG_STRING) && nbt.contains(NBTKeys.KEY_BOUNDS, NBT.TAG_COMPOUND),
                 "Cannot construct a TemplateHeader without '" + NBTKeys.KEY_SERIALIZER + "' and '" + NBTKeys.KEY_BOUNDS + "'!");
         ResourceLocation serializer = new ResourceLocation(nbt.getString(NBTKeys.KEY_SERIALIZER));
@@ -88,8 +82,12 @@ public final class TemplateHeader {
         if (nbt.contains(NBTKeys.KEY_AUTHOR, NBT.TAG_STRING))
             builder.name(nbt.getString(NBTKeys.KEY_AUTHOR));
         if (nbt.contains(NBTKeys.KEY_MATERIALS, NBT.TAG_COMPOUND))
-            builder.requiredItems(MaterialList.deserialize(nbt.getCompound(NBTKeys.KEY_MATERIALS)));
+            builder.requiredItems(MaterialList.deserialize(nbt.getCompound(NBTKeys.KEY_MATERIALS), persisted));
         return builder;
+    }
+
+    public static Builder builderFromNBT(CompoundNBT nbt) {
+        return builderFromNBT(nbt, true);
     }
 
     public static TemplateHeader fromNBT(CompoundNBT nbt) {
@@ -179,33 +177,13 @@ public final class TemplateHeader {
                 .setPrettyPrinting()
                 .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
                 .registerTypeAdapter(ResourceLocation.class, (JsonSerializer<ResourceLocation>) (src, typeOfSrc, context) -> new JsonPrimitive(src.toString()))
-                .registerTypeAdapter(MaterialList.class, (JsonSerializer<MaterialList>) (src, typeOfSrc, context) -> {
-                    Multiset<UniqueItem> set = src.getRequiredItems();
-                    JsonArray jsonArray = new JsonArray();
-                    for (Entry<UniqueItem> entry : set.entrySet()) {
-                        JsonObject obj = new JsonObject();
-                        UniqueItem element = entry.getElement();
-                        Item item = element.getItem();
-                        if (printName)
-                            obj.addProperty(MATERIAL_LIST_ITEM_NAME, I18n.format(item.getTranslationKey(new ItemStack(item, entry.getCount()))));
-                        if (extended || ! printName)
-                            obj.add(MATERIAL_LIST_ITEM_ID, context.serialize(element.getRegistryName()));
-                        if (extended) {
-                            CompoundNBT nbt = element.getTag();
-                            if (nbt != null)
-                                obj.addProperty(MATERIAL_LIST_ITEM_NBT, element.getTag().toString());
-                        }
-                        obj.addProperty(MATERIAL_LIST_ITEM_COUNT, entry.getCount());
-                        jsonArray.add(obj);
-                    }
-                    return jsonArray;
-                })
+                .registerTypeAdapter(MaterialList.class, new MaterialList.JsonSerializer(printName, extended))
                 .create()
                 .toJson(this);
     }
 
     /**
-     * Builder for {@link TemplateHeader}. An instance of this class can be acquired via {@link #builder(ResourceLocation, Region)}.
+     * SimpleBuilder for {@link TemplateHeader}. An instance of this class can be acquired via {@link #builder(ResourceLocation, Region)}.
      */
     public static final class Builder {
         @Nullable
@@ -226,7 +204,7 @@ public final class TemplateHeader {
 
         /**
          * @param boundingBox The new boundingBox to be used. May not be null!
-         * @return The {@code Builder} instance to allow for method chaining
+         * @return The {@code SimpleBuilder} instance to allow for method chaining
          */
         public Builder bounds(Region boundingBox) {
             this.boundingBox = Objects.requireNonNull(boundingBox);
@@ -237,7 +215,7 @@ public final class TemplateHeader {
          * Set's the name for the resulting {@link TemplateHeader}
          *
          * @param name The name of the corresponding {@link com.direwolf20.buildinggadgets.api.template.ITemplate}.
-         * @return The {@code Builder} instance to allow for method chaining
+         * @return The {@code SimpleBuilder} instance to allow for method chaining
          */
         public Builder name(@Nullable String name) {
             this.name = name;
@@ -248,7 +226,7 @@ public final class TemplateHeader {
          * Set's the author for the resulting {@link TemplateHeader}
          *
          * @param author The author of the corresponding {@link com.direwolf20.buildinggadgets.api.template.ITemplate}.
-         * @return The {@code Builder} instance to allow for method chaining
+         * @return The {@code SimpleBuilder} instance to allow for method chaining
          */
         public Builder author(@Nullable String author) {
             this.author = author;
@@ -260,7 +238,7 @@ public final class TemplateHeader {
          *
          * @param requiredItems The requiredItems of the corresponding {@link com.direwolf20.buildinggadgets.api.template.ITemplate}.
          *                      Null values will be converted to an empty {@link Multiset}.
-         * @return The {@code Builder} instance to allow for method chaining
+         * @return The {@code SimpleBuilder} instance to allow for method chaining
          */
         public Builder requiredItems(@Nullable MaterialList requiredItems) {
             this.requiredItems = requiredItems;
