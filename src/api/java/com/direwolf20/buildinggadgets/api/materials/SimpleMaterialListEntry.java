@@ -19,7 +19,6 @@ import net.minecraft.nbt.ListNBT;
 import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 
-import java.util.NoSuchElementException;
 import java.util.Objects;
 
 class SimpleMaterialListEntry implements MaterialListEntry<SimpleMaterialListEntry> {
@@ -42,6 +41,11 @@ class SimpleMaterialListEntry implements MaterialListEntry<SimpleMaterialListEnt
     @Override
     public MaterialListEntry.Serializer<SimpleMaterialListEntry> getSerializer() {
         return SERIALIZER;
+    }
+
+    @Override
+    public SimpleMaterialListEntry simplify() {
+        return this;
     }
 
     private static class Serializer extends ForgeRegistryEntry<MaterialListEntry.Serializer<SimpleMaterialListEntry>> implements MaterialListEntry.Serializer<SimpleMaterialListEntry> {

@@ -15,6 +15,8 @@ interface MaterialListEntry<T extends MaterialListEntry<T>> extends Iterable<Imm
 
     Serializer<T> getSerializer();
 
+    MaterialListEntry<?> simplify();
+
     interface Serializer<T extends MaterialListEntry<T>> extends IForgeRegistryEntry<Serializer<T>> {
         T readFromNBT(CompoundNBT nbt, boolean persisted);
 

@@ -4,17 +4,21 @@ import com.direwolf20.buildinggadgets.api.util.NBTKeys;
 import com.google.common.collect.*;
 import net.minecraft.nbt.CompoundNBT;
 
-import java.util.Deque;
-import java.util.Iterator;
-import java.util.LinkedList;
+import java.util.*;
+import java.util.stream.Collectors;
 
 class AndMaterialListEntry extends SubMaterialListEntry {
     static final MaterialListEntry.Serializer<SubMaterialListEntry> SERIALIZER = new SubMaterialListEntry.Serializer() {
         @Override
-        protected SubMaterialListEntry create(ImmutableList<MaterialListEntry<?>> subEntries, CompoundNBT nbt, boolean persisted) {
-            return new AndMaterialListEntry(subEntries);
+        protected SubMaterialListEntry create(ImmutableList<MaterialListEntry<?>> subEntries, ImmutableList<SimpleMaterialListEntry> constantEntries, CompoundNBT nbt, boolean persisted) {
+            return new AndMaterialListEntry(subEntries, constantEntries);
         }
     }.setRegistryName(NBTKeys.AND_SERIALIZER_ID);
+
+
+    AndMaterialListEntry(ImmutableList<MaterialListEntry<?>> subEntries, ImmutableList<SimpleMaterialListEntry> simpleEntries) {
+        super(subEntries, simpleEntries);
+    }
 
     AndMaterialListEntry(ImmutableList<MaterialListEntry<?>> subEntries) {
         super(subEntries);
@@ -22,12 +26,11 @@ class AndMaterialListEntry extends SubMaterialListEntry {
 
     @Override
     public PeekingIterator<ImmutableMultiset<UniqueItem>> iterator() {
-        if (getSubEntries().isEmpty())
+        if (! getAllSubEntries().findFirst().isPresent())
             return Iterators.peekingIterator(Iterators.singletonIterator(ImmutableMultiset.of()));
-        LinkedList<MaterialEntryWrapper> list = new LinkedList<>();
-        for (MaterialListEntry<?> entry : getSubEntries()) {
-            list.add(new MaterialEntryWrapper(entry));
-        } ;
+        LinkedList<MaterialEntryWrapper> list = getAllSubEntries()
+                .map(MaterialEntryWrapper::new)
+                .collect(Collectors.toCollection(LinkedList::new));
         return Iterators.peekingIterator(new AbstractIterator<ImmutableMultiset<UniqueItem>>() {
             private Deque<MaterialEntryWrapper> dequeue = list;
 
@@ -63,6 +66,27 @@ class AndMaterialListEntry extends SubMaterialListEntry {
     @Override
     public MaterialListEntry.Serializer<SubMaterialListEntry> getSerializer() {
         return SERIALIZER;
+    }
+
+    @Override
+    protected List<MaterialListEntry<?>> orderAndSimplifyEntries(List<OrMaterialListEntry> orEntries, List<AndMaterialListEntry> andEntries, List<SimpleMaterialListEntry> simpleEntries) {
+        List<MaterialListEntry<?>> res = super.orderAndSimplifyEntries(orEntries, andEntries, simpleEntries);
+        for (AndMaterialListEntry andEntry: andEntries) {
+            List<OrMaterialListEntry> innerOrEntries = new ArrayList<>(andEntry.getSubEntries().size());
+            List<AndMaterialListEntry> innerAndEntries = new ArrayList<>(andEntry.getSubEntries().size());
+            List<SimpleMaterialListEntry> innerSimpleEntries = new ArrayList<>(andEntry.getConstantEntries().size());
+            List<MaterialListEntry<?>> innerRemainder = andEntry.orderAndSimplifyEntries(innerOrEntries, innerAndEntries, innerSimpleEntries);
+            orEntries.addAll(innerOrEntries);
+            andEntries.addAll(innerAndEntries);
+            simpleEntries.addAll(innerSimpleEntries);
+            res.addAll(innerRemainder);
+        };
+        return res;
+    }
+
+    @Override
+    protected SubMaterialListEntry createFrom(ImmutableList<MaterialListEntry<?>> subEntries, ImmutableList<SimpleMaterialListEntry> constantEntry) {
+        return new AndMaterialListEntry(subEntries, constantEntry);
     }
 
     private static final class MaterialEntryWrapper {

@@ -99,9 +99,17 @@ public final class MaterialList implements Iterable<ImmutableMultiset<UniqueItem
         return rootEntry;
     }
 
-    @Deprecated
+    public Iterable<ImmutableMultiset<UniqueItem>> getItemOptions() {
+        return rootEntry instanceof SubMaterialListEntry?
+                ((SubMaterialListEntry) rootEntry).viewOnlySubEntries() :
+                ImmutableList.of();
+    }
+
     public ImmutableMultiset<UniqueItem> getRequiredItems() {
-        return iterator().peek();
+        SimpleMaterialListEntry simpleEntry = rootEntry instanceof SubMaterialListEntry?
+                ((SubMaterialListEntry) rootEntry).getCombinedConstantEntry() :
+                ((SimpleMaterialListEntry) rootEntry);
+        return simpleEntry.getItems();
     }
 
     public CompoundNBT serialize(boolean persisted) {
@@ -179,7 +187,7 @@ public final class MaterialList implements Iterable<ImmutableMultiset<UniqueItem
         }
 
         public MaterialList build() {
-            return new MaterialList(factory.apply(subBuilder.build()));
+            return new MaterialList(factory.apply(subBuilder.build()).simplify());
         }
     }
 
