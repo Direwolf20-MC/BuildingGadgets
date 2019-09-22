@@ -3,6 +3,7 @@ package com.direwolf20.buildinggadgets.api.materials;
 import com.direwolf20.buildinggadgets.api.util.JsonKeys;
 import com.direwolf20.buildinggadgets.api.util.NBTKeys;
 import com.google.common.collect.ImmutableMultiset;
+import com.google.common.collect.Iterators;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.Multiset.Entry;
 import com.google.common.collect.PeekingIterator;
@@ -35,33 +36,7 @@ class SimpleMaterialListEntry implements MaterialListEntry<SimpleMaterialListEnt
 
     @Override
     public PeekingIterator<ImmutableMultiset<UniqueItem>> iterator() {
-        return new PeekingIterator<ImmutableMultiset<UniqueItem>>() {
-            private boolean advanced = false;
-
-            @Override
-            public ImmutableMultiset<UniqueItem> peek() {
-                if (advanced)
-                    throw new NoSuchElementException();
-                return items;
-            }
-
-            @Override
-            public ImmutableMultiset<UniqueItem> next() {
-                ImmutableMultiset<UniqueItem> res = peek();
-                advanced = true;
-                return res;
-            }
-
-            @Override
-            public void remove() {
-                throw new UnsupportedOperationException();
-            }
-
-            @Override
-            public boolean hasNext() {
-                return ! advanced;
-            }
-        };
+        return Iterators.peekingIterator(Iterators.singletonIterator(items));
     }
 
     @Override

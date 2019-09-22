@@ -52,7 +52,7 @@ public final class TemplateHeader {
 
     /**
      * @param header The {@code TemplateHeader} to copy
-     * @return a SimpleBuilder with all values predefined to the values passed into the header
+     * @return a {@link Builder} with all values predefined to the values passed into the header
      */
     public static Builder builderOf(TemplateHeader header) {
         return builderOf(header, header.getSerializer(), header.getBoundingBox());
@@ -62,7 +62,7 @@ public final class TemplateHeader {
      * @param boundingBox the {@link Region} to use
      * @param serializer  The serializer to use
      * @param header      The {@code TemplateHeader} to copy
-     * @return a SimpleBuilder with all values predefined to the values passed into the header, except for serializer and boundBox
+     * @return a {@link Builder} with all values predefined to the values passed into the header, except for serializer and boundBox
      */
     public static Builder builderOf(TemplateHeader header, ResourceLocation serializer, Region boundingBox) {
         return builder(serializer, boundingBox)
@@ -183,7 +183,7 @@ public final class TemplateHeader {
     }
 
     /**
-     * SimpleBuilder for {@link TemplateHeader}. An instance of this class can be acquired via {@link #builder(ResourceLocation, Region)}.
+     * {@code Builder} for {@link TemplateHeader}. An instance of this class can be acquired via {@link #builder(ResourceLocation, Region)}.
      */
     public static final class Builder {
         @Nullable
@@ -204,7 +204,7 @@ public final class TemplateHeader {
 
         /**
          * @param boundingBox The new boundingBox to be used. May not be null!
-         * @return The {@code SimpleBuilder} instance to allow for method chaining
+         * @return The {@code Builder} instance to allow for method chaining
          */
         public Builder bounds(Region boundingBox) {
             this.boundingBox = Objects.requireNonNull(boundingBox);
@@ -215,7 +215,7 @@ public final class TemplateHeader {
          * Set's the name for the resulting {@link TemplateHeader}
          *
          * @param name The name of the corresponding {@link com.direwolf20.buildinggadgets.api.template.ITemplate}.
-         * @return The {@code SimpleBuilder} instance to allow for method chaining
+         * @return The {@code Builder} instance to allow for method chaining
          */
         public Builder name(@Nullable String name) {
             this.name = name;
@@ -226,7 +226,7 @@ public final class TemplateHeader {
          * Set's the author for the resulting {@link TemplateHeader}
          *
          * @param author The author of the corresponding {@link com.direwolf20.buildinggadgets.api.template.ITemplate}.
-         * @return The {@code SimpleBuilder} instance to allow for method chaining
+         * @return The {@code Builder} instance to allow for method chaining
          */
         public Builder author(@Nullable String author) {
             this.author = author;
@@ -238,7 +238,7 @@ public final class TemplateHeader {
          *
          * @param requiredItems The requiredItems of the corresponding {@link com.direwolf20.buildinggadgets.api.template.ITemplate}.
          *                      Null values will be converted to an empty {@link Multiset}.
-         * @return The {@code SimpleBuilder} instance to allow for method chaining
+         * @return The {@code Builder} instance to allow for method chaining
          */
         public Builder requiredItems(@Nullable MaterialList requiredItems) {
             this.requiredItems = requiredItems;

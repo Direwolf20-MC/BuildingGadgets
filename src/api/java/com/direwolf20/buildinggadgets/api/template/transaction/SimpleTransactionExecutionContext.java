@@ -68,7 +68,7 @@ public final class SimpleTransactionExecutionContext implements ITransactionExec
     }
 
     /**
-     * SimpleBuilder for creating {@link SimpleTransactionExecutionContext}'s
+     * {@code Builder} for creating {@link SimpleTransactionExecutionContext}'s
      */
     public static final class Builder {
         private int size;
@@ -82,7 +82,7 @@ public final class SimpleTransactionExecutionContext implements ITransactionExec
         /**
          * Set's the size for the resulting {@link SimpleTransactionExecutionContext}. Defaults to -1 as that indicates unkown.
          * @param size The new size.
-         * @return The {@code SimpleBuilder} instance to allow for method chaining.
+         * @return The {@code Builder} instance to allow for method chaining.
          */
         public Builder size(int size) {
             this.size = size;
@@ -94,7 +94,7 @@ public final class SimpleTransactionExecutionContext implements ITransactionExec
          * Failing to specify a {@link Region} either here or in {@link #build(Region)} will result in {@link NullPointerException NPE's}.
          *
          * @param boundingBox A {@link Region} enclosing all positions provided by the constructing Template
-         * @return The {@code SimpleBuilder} instance to allow for method chaining.
+         * @return The {@code Builder} instance to allow for method chaining.
          */
         public Builder bounds(Region boundingBox) {
             this.boundingBox = Objects.requireNonNull(boundingBox);
@@ -105,7 +105,7 @@ public final class SimpleTransactionExecutionContext implements ITransactionExec
          * Set's the {@link TemplateHeader} for the resulting {@link SimpleTransactionExecutionContext}. Defaults to null.
          *
          * @param header The {@link TemplateHeader} to use. May be null.
-         * @return The {@code SimpleBuilder} instance to allow for method chaining.
+         * @return The {@code Builder} instance to allow for method chaining.
          */
         public Builder header(@Nullable TemplateHeader header) {
             this.header = header;

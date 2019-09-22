@@ -64,7 +64,7 @@ public final class OurItems {
      */
     public static void setup() {
         // Looks complicated but it's not. We're just building a list of Builders that will, when
-        // applied will construct the Item.Properties SimpleBuilder for us allowing us to do a lot less work.
+        // applied will construct the Item.Properties Builder for us allowing us to do a lot less work.
         itemBuilders.addAll(new HashSet<Builder>() {{
             add(new Builder(ItemReference.GADGET_BUILDING_RL).setBuilder(nonStackableItemProperties().maxDamage(1)).setFactory(GadgetBuilding::new));
             add(new Builder(ItemReference.GADGET_EXCHANGING_RL).setBuilder(nonStackableItemProperties().maxDamage(1)).setFactory(GadgetExchanger::new));
@@ -104,7 +104,7 @@ public final class OurItems {
     }
 
     /**
-     * A very simple SimpleBuilder for item registry to provide
+     * A very simple Builder for item registry to provide
      * forge / mc with our items.
      */
     private static final class Builder {

@@ -109,7 +109,7 @@ public final class TopologicalRegistryBuilder<T> {
     }
 
     private void validateUnbuild() {
-        Preconditions.checkState(! build, "Cannot access already created SimpleBuilder!");
+        Preconditions.checkState(! build, "Cannot access already created Builder!");
     }
 
     @Override
