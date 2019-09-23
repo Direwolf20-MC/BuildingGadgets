@@ -24,6 +24,9 @@ public final class NBTKeys {
     public static final String KEY_NAME = "name";
     public static final String KEY_AUTHOR = "author";
     public static final String KEY_SUB_ENTRIES = "sub_entries";
+    public static final String KEY_CAP_NBT = "cap_data";
+    public static final String KEY_DATA_COMPARISON = "data_comp";
+    public static final String KEY_CAP_COMPARISON = "cap_comp";
 
     public static final ResourceLocation AND_SERIALIZER_ID = new ResourceLocation(MODID, "sub_entries");
     public static final ResourceLocation OR_SERIALIZER_ID = new ResourceLocation(MODID, "alternatives");
