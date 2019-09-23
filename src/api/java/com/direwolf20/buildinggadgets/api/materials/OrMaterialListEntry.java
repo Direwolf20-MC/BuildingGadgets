@@ -6,6 +6,7 @@ import net.minecraft.nbt.CompoundNBT;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 class OrMaterialListEntry extends SubMaterialListEntry {
@@ -57,16 +58,16 @@ class OrMaterialListEntry extends SubMaterialListEntry {
     @Override
     protected List<MaterialListEntry<?>> orderAndSimplifyEntries(List<OrMaterialListEntry> orEntries, List<AndMaterialListEntry> andEntries, List<SimpleMaterialListEntry> simpleEntries) {
         List<MaterialListEntry<?>> res = super.orderAndSimplifyEntries(orEntries, andEntries, simpleEntries);
+        List<OrMaterialListEntry> innerOrEntries = new LinkedList<>();
         for (OrMaterialListEntry orEntry:orEntries) {
-            List<OrMaterialListEntry> innerOrEntries = new ArrayList<>(orEntry.getSubEntries().size());
             List<AndMaterialListEntry> innerAndEntries = new ArrayList<>(orEntry.getSubEntries().size());
             List<SimpleMaterialListEntry> innerSimpleEntries = new ArrayList<>(orEntry.getConstantEntries().size());
             List<MaterialListEntry<?>> innerRemainder = orEntry.orderAndSimplifyEntries(innerOrEntries, innerAndEntries, innerSimpleEntries);
-            orEntries.addAll(innerOrEntries);
             andEntries.addAll(innerAndEntries);
             simpleEntries.addAll(innerSimpleEntries);
             res.addAll(innerRemainder);
         };
+        orEntries.addAll(innerOrEntries);
         return res;
     }
 

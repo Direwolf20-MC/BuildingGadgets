@@ -71,16 +71,16 @@ class AndMaterialListEntry extends SubMaterialListEntry {
     @Override
     protected List<MaterialListEntry<?>> orderAndSimplifyEntries(List<OrMaterialListEntry> orEntries, List<AndMaterialListEntry> andEntries, List<SimpleMaterialListEntry> simpleEntries) {
         List<MaterialListEntry<?>> res = super.orderAndSimplifyEntries(orEntries, andEntries, simpleEntries);
+        List<AndMaterialListEntry> innerAndEntries = new LinkedList<>();
         for (AndMaterialListEntry andEntry: andEntries) {
             List<OrMaterialListEntry> innerOrEntries = new ArrayList<>(andEntry.getSubEntries().size());
-            List<AndMaterialListEntry> innerAndEntries = new ArrayList<>(andEntry.getSubEntries().size());
             List<SimpleMaterialListEntry> innerSimpleEntries = new ArrayList<>(andEntry.getConstantEntries().size());
             List<MaterialListEntry<?>> innerRemainder = andEntry.orderAndSimplifyEntries(innerOrEntries, innerAndEntries, innerSimpleEntries);
             orEntries.addAll(innerOrEntries);
-            andEntries.addAll(innerAndEntries);
             simpleEntries.addAll(innerSimpleEntries);
             res.addAll(innerRemainder);
         };
+        andEntries.addAll(innerAndEntries);
         return res;
     }
 
