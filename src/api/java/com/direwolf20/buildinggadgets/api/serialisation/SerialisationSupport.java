@@ -66,7 +66,7 @@ public final class SerialisationSupport {
             CompoundNBT data = tagCompound.getCompound(NBTKeys.KEY_DATA);
             MaterialList materialList = null;
             if (tagCompound.contains(NBTKeys.KEY_MATERIALS, NBT.TAG_COMPOUND))
-                materialList = MaterialList.deserialize(tagCompound.getCompound(NBTKeys.KEY_MATERIALS));
+                materialList = MaterialList.deserialize(tagCompound.getCompound(NBTKeys.KEY_MATERIALS), persisted);
             return new NBTTileEntityData(data, materialList);
         }
     }
