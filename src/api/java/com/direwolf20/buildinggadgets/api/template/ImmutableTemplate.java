@@ -34,6 +34,7 @@ import it.unimi.dsi.fastutil.longs.Long2IntMap.Entry;
 import it.unimi.dsi.fastutil.longs.Long2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import net.minecraft.block.Blocks;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.INBT;
@@ -172,7 +173,9 @@ public final class ImmutableTemplate implements ITemplate {
             for (INBT nbt : dataList) {
                 if (! (nbt instanceof CompoundNBT))//not done via Preconditions to avoid allocating and freeing useless Strings...
                     throw new IllegalArgumentException("Found corrupted Template save! Expected " + nbt + " to be an instance of " + CompoundNBT.class.getName() + "!");
-                idToData[index++] = BlockData.deserialize((CompoundNBT) nbt, mapper, persisted);
+                idToData[index++] = BlockData.tryDeserialize((CompoundNBT) nbt, mapper, persisted);
+                if (idToData[index - 1] == null)//remove unknown blocks
+                    idToData[index - 1] = new BlockData(Blocks.AIR.getDefaultState(), TileSupport.dummyTileEntityData());
             }
             for (long l : posAndId) {
                 int stateId = MathUtils.readStateId(l);
