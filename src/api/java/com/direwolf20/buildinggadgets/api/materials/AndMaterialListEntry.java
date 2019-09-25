@@ -69,19 +69,25 @@ class AndMaterialListEntry extends SubMaterialListEntry {
     }
 
     @Override
-    protected List<MaterialListEntry<?>> orderAndSimplifyEntries(List<OrMaterialListEntry> orEntries, List<AndMaterialListEntry> andEntries, List<SimpleMaterialListEntry> simpleEntries) {
-        List<MaterialListEntry<?>> res = super.orderAndSimplifyEntries(orEntries, andEntries, simpleEntries);
-        List<AndMaterialListEntry> innerAndEntries = new LinkedList<>();
-        for (AndMaterialListEntry andEntry: andEntries) {
-            List<OrMaterialListEntry> innerOrEntries = new ArrayList<>(andEntry.getSubEntries().size());
-            List<SimpleMaterialListEntry> innerSimpleEntries = new ArrayList<>(andEntry.getConstantEntries().size());
-            List<MaterialListEntry<?>> innerRemainder = andEntry.orderAndSimplifyEntries(innerOrEntries, innerAndEntries, innerSimpleEntries);
-            orEntries.addAll(innerOrEntries);
-            simpleEntries.addAll(innerSimpleEntries);
-            res.addAll(innerRemainder);
-        };
-        andEntries.addAll(innerAndEntries);
-        return res;
+    protected List<MaterialListEntry<?>> orderAndSimplifyEntries(List<OrMaterialListEntry> orEntries,
+                                                                 List<AndMaterialListEntry> andEntries,
+                                                                 List<SimpleMaterialListEntry> simpleEntries) {
+        List<MaterialListEntry<?>> remainder = new ArrayList<>();
+        getSubEntries().forEach(entry -> {
+            MaterialListEntry<?> simplified = entry.simplify();
+            if (simplified instanceof AndMaterialListEntry) {
+                simpleEntries.addAll(((SubMaterialListEntry) simplified).getConstantEntries());
+                //There's no need for nested and's
+                pullUpInnerEntries((AndMaterialListEntry) entry, orEntries, andEntries, simpleEntries, remainder);
+            } else if (simplified instanceof OrMaterialListEntry) {
+                simpleEntries.addAll(((SubMaterialListEntry) simplified).getConstantEntries());
+                orEntries.add(new OrMaterialListEntry(((SubMaterialListEntry) simplified).getSubEntries(), ImmutableList.of()));
+            } else if (simplified instanceof SimpleMaterialListEntry)
+                simpleEntries.add((SimpleMaterialListEntry) simplified);
+            else
+                remainder.add(simplified);
+        });
+        return remainder;
     }
 
     @Override

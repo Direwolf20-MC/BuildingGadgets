@@ -1,11 +1,15 @@
 package com.direwolf20.buildinggadgets.api.materials;
 
+import com.direwolf20.buildinggadgets.api.util.JsonKeys;
 import com.direwolf20.buildinggadgets.api.util.NBTKeys;
 import com.direwolf20.buildinggadgets.api.util.RegistryUtils;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonSerializer;
 import it.unimi.dsi.fastutil.bytes.Byte2ObjectMap;
 import it.unimi.dsi.fastutil.bytes.Byte2ObjectOpenHashMap;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
@@ -13,13 +17,13 @@ import net.minecraft.nbt.INBT;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.ForgeRegistryEntry;
 
 import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.Objects;
 
 public final class UniqueItem {
-
     public enum ComparisonMode {
         EXACT_MATCH(0) {
             @Override
@@ -71,19 +75,7 @@ public final class UniqueItem {
         }
     }
 
-    public static UniqueItem deserialize(CompoundNBT res) {
-        Preconditions.checkArgument(res.contains(NBTKeys.KEY_ID), "Cannot construct a UniqueItem without an Item!");
-        CompoundNBT nbt = res.getCompound(NBTKeys.KEY_DATA);
-        ComparisonMode mode = ComparisonMode.byId(res.getByte(NBTKeys.KEY_DATA_COMPARISON));
-        CompoundNBT capNbt = res.getCompound(NBTKeys.KEY_CAP_NBT);
-        ComparisonMode capMode = ComparisonMode.byId(res.getByte(NBTKeys.KEY_CAP_COMPARISON));
-        Item item;
-        if (res.contains(NBTKeys.KEY_ID, NBT.TAG_INT))
-            item = RegistryUtils.getById(ForgeRegistries.ITEMS, res.getInt(NBTKeys.KEY_ID));
-        else
-            item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(res.getString(NBTKeys.KEY_ID)));
-        return new UniqueItem(item, nbt.isEmpty() ? null : nbt, mode, capNbt.isEmpty() ? null : capNbt, capMode);
-    }
+    public static final Serializer SERIALIZER = new Serializer().setRegistryName(NBTKeys.SIMPLE_UNIQUE_ITEM_ID_RL);
 
     private final Item item;
     @Nullable
@@ -158,19 +150,8 @@ public final class UniqueItem {
         return true;
     }
 
-    public CompoundNBT serialize(boolean persisted) {
-        CompoundNBT res = new CompoundNBT();
-        if (tagCompound != null)
-            res.put(NBTKeys.KEY_DATA, tagCompound);
-        if (forgeCaps != null)
-            res.put(NBTKeys.KEY_CAP_NBT, forgeCaps);
-        if (persisted)
-            res.putString(NBTKeys.KEY_ID, item.getRegistryName().toString());
-        else
-            res.putInt(NBTKeys.KEY_ID, RegistryUtils.getId(ForgeRegistries.ITEMS, item));
-        res.putByte(NBTKeys.KEY_DATA_COMPARISON, tagMatch.getId());
-        res.putByte(NBTKeys.KEY_CAP_COMPARISON, capMatch.getId());
-        return res;
+    public Serializer getSerializer() {
+        return SERIALIZER;
     }
 
     @Override
@@ -201,5 +182,59 @@ public final class UniqueItem {
                 .add("tagMatch", tagMatch)
                 .add("capMatch", capMatch)
                 .toString();
+    }
+
+    public static final class Serializer extends ForgeRegistryEntry<Serializer> {
+        public CompoundNBT serialize(UniqueItem item, boolean persisted) {
+            CompoundNBT res = new CompoundNBT();
+            if (item.tagCompound != null)
+                res.put(NBTKeys.KEY_DATA, item.tagCompound);
+            if (item.forgeCaps != null)
+                res.put(NBTKeys.KEY_CAP_NBT, item.forgeCaps);
+            if (persisted)
+                res.putString(NBTKeys.KEY_ID, item.getRegistryName().toString());
+            else
+                res.putInt(NBTKeys.KEY_ID, RegistryUtils.getId(ForgeRegistries.ITEMS, item.item));
+            res.putByte(NBTKeys.KEY_DATA_COMPARISON, item.tagMatch.getId());
+            res.putByte(NBTKeys.KEY_CAP_COMPARISON, item.capMatch.getId());
+            return res;
+        }
+
+        public UniqueItem deserialize(CompoundNBT res) {
+            Preconditions.checkArgument(res.contains(NBTKeys.KEY_ID), "Cannot construct a UniqueItem without an Item!");
+            CompoundNBT nbt = res.getCompound(NBTKeys.KEY_DATA);
+            ComparisonMode mode = ComparisonMode.byId(res.getByte(NBTKeys.KEY_DATA_COMPARISON));
+            CompoundNBT capNbt = res.getCompound(NBTKeys.KEY_CAP_NBT);
+            ComparisonMode capMode = ComparisonMode.byId(res.getByte(NBTKeys.KEY_CAP_COMPARISON));
+            Item item;
+            if (res.contains(NBTKeys.KEY_ID, NBT.TAG_INT))
+                item = RegistryUtils.getById(ForgeRegistries.ITEMS, res.getInt(NBTKeys.KEY_ID));
+            else
+                item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(res.getString(NBTKeys.KEY_ID)));
+            return new UniqueItem(item, nbt.isEmpty() ? null : nbt, mode, capNbt.isEmpty() ? null : capNbt, capMode);
+        }
+
+        public JsonSerializer<UniqueItem> asJsonSerializer(int count, boolean printName, boolean extended) {
+            return (element, typeOfSrc, context) -> {
+                JsonObject obj = new JsonObject();
+                Item item = element.getItem();
+                if (printName)
+                    obj.addProperty(JsonKeys.MATERIAL_LIST_ITEM_NAME, I18n.format(item.getTranslationKey(element.createStack(count))));
+                if (extended || ! printName)
+                    obj.add(JsonKeys.MATERIAL_LIST_ITEM_ID, context.serialize(element.getRegistryName()));
+                if (extended) {
+                    if (element.tagCompound != null) {
+                        obj.addProperty(JsonKeys.MATERIAL_LIST_ITEM_NBT, element.tagCompound.toString());
+                        obj.add(JsonKeys.MATERIAL_LIST_ITEM_NBT_MATCH, context.serialize(element.tagMatch));
+                    }
+                    if (element.forgeCaps != null) {
+                        obj.addProperty(JsonKeys.MATERIAL_LIST_CAP_NBT, element.forgeCaps.toString());
+                        obj.add(JsonKeys.MATERIAL_LIST_CAP_NBT_MATCH, context.serialize(element.capMatch));
+                    }
+                }
+                obj.addProperty(JsonKeys.MATERIAL_LIST_ITEM_COUNT, count);
+                return obj;
+            };
+        }
     }
 }

@@ -10,6 +10,7 @@ import com.direwolf20.buildinggadgets.api.materials.MaterialList;
 import com.direwolf20.buildinggadgets.api.serialisation.ITemplateSerializer;
 import com.direwolf20.buildinggadgets.api.serialisation.SerialisationSupport;
 import com.direwolf20.buildinggadgets.api.serialisation.TemplateHeader;
+import com.direwolf20.buildinggadgets.api.serialisation.TemplateHeader.SerializerInfo;
 import com.direwolf20.buildinggadgets.api.template.IBuildOpenOptions.OpenType;
 import com.direwolf20.buildinggadgets.api.template.transaction.ITemplateTransaction;
 import com.direwolf20.buildinggadgets.api.template.transaction.ITransactionOperator;
@@ -168,7 +169,7 @@ public class DelegatingTemplate implements ITemplate {
                 delegateTemplate = castTemplate.getDelegate();
             }
             TemplateHeader delegateHeader = delegateTemplate.getSerializer().createHeaderFor(delegateTemplate);
-            return TemplateHeader.builderOf(delegateHeader, getRegistryName(), delegateHeader.getBoundingBox())
+            return TemplateHeader.builderOf(delegateHeader, new SerializerInfo(getRegistryName(), delegateHeader.getSerializerInfo()), delegateHeader.getBoundingBox())
                     .build();
         }
 
@@ -204,7 +205,10 @@ public class DelegatingTemplate implements ITemplate {
             CompoundNBT data = tagCompound.getCompound(NBTKeys.KEY_DATA);
             ITemplate delegate = serializer.deserialize(
                     data,
-                    header != null ? TemplateHeader.builderOf(header, serializer.getRegistryName(), header.getBoundingBox()).build() : null,
+                    header != null ? TemplateHeader.builderOf(
+                            header,
+                            header.getSerializerInfo().getSubSerializer() != null ? header.getSerializerInfo().getSubSerializer() : new SerializerInfo(serializer.getRegistryName()),
+                            header.getBoundingBox()).build() : null,
                     persisted);
             return new DelegatingTemplate(delegate);
         }

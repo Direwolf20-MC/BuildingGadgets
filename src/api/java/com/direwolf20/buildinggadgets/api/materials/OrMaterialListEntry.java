@@ -6,7 +6,6 @@ import net.minecraft.nbt.CompoundNBT;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 
 class OrMaterialListEntry extends SubMaterialListEntry {
@@ -56,19 +55,22 @@ class OrMaterialListEntry extends SubMaterialListEntry {
     }
 
     @Override
-    protected List<MaterialListEntry<?>> orderAndSimplifyEntries(List<OrMaterialListEntry> orEntries, List<AndMaterialListEntry> andEntries, List<SimpleMaterialListEntry> simpleEntries) {
-        List<MaterialListEntry<?>> res = super.orderAndSimplifyEntries(orEntries, andEntries, simpleEntries);
-        List<OrMaterialListEntry> innerOrEntries = new LinkedList<>();
-        for (OrMaterialListEntry orEntry:orEntries) {
-            List<AndMaterialListEntry> innerAndEntries = new ArrayList<>(orEntry.getSubEntries().size());
-            List<SimpleMaterialListEntry> innerSimpleEntries = new ArrayList<>(orEntry.getConstantEntries().size());
-            List<MaterialListEntry<?>> innerRemainder = orEntry.orderAndSimplifyEntries(innerOrEntries, innerAndEntries, innerSimpleEntries);
-            andEntries.addAll(innerAndEntries);
-            simpleEntries.addAll(innerSimpleEntries);
-            res.addAll(innerRemainder);
-        };
-        orEntries.addAll(innerOrEntries);
-        return res;
+    protected List<MaterialListEntry<?>> orderAndSimplifyEntries(List<OrMaterialListEntry> orEntries,
+                                                                 List<AndMaterialListEntry> andEntries,
+                                                                 List<SimpleMaterialListEntry> simpleEntries) {
+        List<MaterialListEntry<?>> remainder = new ArrayList<>();
+        //Theoretically we could evaluate the Set intersection here and add that as a constant entry
+        //I believe that to be too much overhead for too little gain though
+        getSubEntries().stream().map(MaterialListEntry::simplify).forEach(entry -> {
+            if (entry instanceof AndMaterialListEntry)
+                andEntries.add((AndMaterialListEntry) entry);
+            else if (entry instanceof OrMaterialListEntry) {
+                simpleEntries.addAll(((SubMaterialListEntry) entry).getConstantEntries());
+                pullUpInnerEntries((SubMaterialListEntry) entry, orEntries, andEntries, simpleEntries, remainder);
+            } else //Cannot pull out simple Entries! They are alternatives after all!
+                remainder.add(entry);
+        });
+        return remainder;
     }
 
     @Override

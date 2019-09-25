@@ -5,10 +5,7 @@ import com.direwolf20.buildinggadgets.api.materials.MaterialList;
 import com.direwolf20.buildinggadgets.api.util.NBTKeys;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Multiset;
-import com.google.gson.FieldNamingPolicy;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.JsonSerializer;
+import com.google.gson.*;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -42,12 +39,23 @@ public final class TemplateHeader {
     /**
      * Creates a new {@link Builder} which can be used to create {@code TemplateHeader} objects.
      *
+     * @param serializer  Information about the {@link ITemplateSerializer}'s id who created the corresponding {@link com.direwolf20.buildinggadgets.api.template.ITemplate}.
+     * @param boundingBox a {@link BlockPos} representing the x-y-z size of the corresponding {@link com.direwolf20.buildinggadgets.api.template.ITemplate}.
+     * @return A new {@link Builder} for the specified serializer and boundingBox.
+     */
+    public static Builder builder(SerializerInfo serializer, Region boundingBox) {
+        return new Builder(serializer, boundingBox);
+    }
+
+    /**
+     * Creates a new {@link Builder} which can be used to create {@code TemplateHeader} objects.
+     *
      * @param serializer  The {@link ITemplateSerializer}'s id who created the corresponding {@link com.direwolf20.buildinggadgets.api.template.ITemplate}.
      * @param boundingBox a {@link BlockPos} representing the x-y-z size of the corresponding {@link com.direwolf20.buildinggadgets.api.template.ITemplate}.
      * @return A new {@link Builder} for the specified serializer and boundingBox.
      */
     public static Builder builder(ResourceLocation serializer, Region boundingBox) {
-        return new Builder(serializer, boundingBox);
+        return builder(new SerializerInfo(serializer), boundingBox);
     }
 
     /**
@@ -55,7 +63,7 @@ public final class TemplateHeader {
      * @return a {@link Builder} with all values predefined to the values passed into the header
      */
     public static Builder builderOf(TemplateHeader header) {
-        return builderOf(header, header.getSerializer(), header.getBoundingBox());
+        return builderOf(header, header.getSerializerInfo(), header.getBoundingBox());
     }
 
     /**
@@ -64,7 +72,7 @@ public final class TemplateHeader {
      * @param header      The {@code TemplateHeader} to copy
      * @return a {@link Builder} with all values predefined to the values passed into the header, except for serializer and boundBox
      */
-    public static Builder builderOf(TemplateHeader header, ResourceLocation serializer, Region boundingBox) {
+    public static Builder builderOf(TemplateHeader header, SerializerInfo serializer, Region boundingBox) {
         return builder(serializer, boundingBox)
                 .author(header.getAuthor())
                 .name(header.getName())
@@ -101,11 +109,11 @@ public final class TemplateHeader {
     @Nullable
     private final MaterialList requiredItems;
     @Nonnull
-    private final ResourceLocation serializer;
+    private final SerializerInfo serializer;
     @Nonnull
     private final Region boundingBox;
 
-    private TemplateHeader(@Nullable String name, @Nullable String author, @Nullable MaterialList requiredItems, @Nonnull ResourceLocation serializer, @Nonnull Region boundingBox) {
+    private TemplateHeader(@Nullable String name, @Nullable String author, @Nullable MaterialList requiredItems, @Nonnull SerializerInfo serializer, @Nonnull Region boundingBox) {
         this.name = name;
         this.author = author;
         this.requiredItems = requiredItems;
@@ -140,15 +148,24 @@ public final class TemplateHeader {
     /**
      * @return The id of the serializer used to create the corresponding {@link com.direwolf20.buildinggadgets.api.template.ITemplate}.
      */
-    @Nonnull
     public ResourceLocation getSerializer() {
+        return serializer.getSerializer();
+    }
+
+    public SerializerInfo getSerializerInfo() {
         return serializer;
+    }
+
+    public ResourceLocation getInnerMostSerializer() {
+        SerializerInfo info = serializer;
+        while (info.getSubSerializer() != null)
+            info = info.getSubSerializer();
+        return info.getSerializer();
     }
 
     /**
      * @return The boundingBox of the corresponding {@link com.direwolf20.buildinggadgets.api.template.ITemplate}.
      */
-    @Nonnull
     public Region getBoundingBox() {
         return boundingBox;
     }
@@ -178,6 +195,15 @@ public final class TemplateHeader {
                 .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
                 .registerTypeAdapter(ResourceLocation.class, (JsonSerializer<ResourceLocation>) (src, typeOfSrc, context) -> new JsonPrimitive(src.toString()))
                 .registerTypeAdapter(MaterialList.class, new MaterialList.JsonSerializer(printName, extended))
+                .registerTypeAdapter(SerializerInfo.class, (JsonSerializer<SerializerInfo>) (src, typeOfSrc, context) -> {
+                    if (src.getSubSerializer() != null) {
+                        JsonObject obj = new JsonObject();
+                        obj.add("serializer", context.serialize(src.getSerializer()));
+                        obj.add("sub_serializer", context.serialize(src.getSubSerializer()));
+                        return obj;
+                    } else
+                        return context.serialize(src.getSerializer());
+                })
                 .create()
                 .toJson(this);
     }
@@ -193,11 +219,11 @@ public final class TemplateHeader {
         @Nullable
         private MaterialList requiredItems;
         @Nonnull
-        private final ResourceLocation serializer;
+        private final SerializerInfo serializer;
         @Nonnull
         private Region boundingBox;
 
-        private Builder(ResourceLocation serializer, Region boundingBox) {
+        private Builder(SerializerInfo serializer, Region boundingBox) {
             this.serializer = Objects.requireNonNull(serializer);
             this.boundingBox = Objects.requireNonNull(boundingBox);
         }
@@ -250,6 +276,30 @@ public final class TemplateHeader {
          */
         public TemplateHeader build() {
             return new TemplateHeader(name, author, requiredItems, serializer, boundingBox);
+        }
+    }
+
+    public static final class SerializerInfo {
+        private final ResourceLocation serializer;
+        @Nullable
+        private final SerializerInfo subSerializer;
+
+        public SerializerInfo(ResourceLocation serializer, @Nullable SerializerInfo subSerializer) {
+            this.serializer = Objects.requireNonNull(serializer, "Cannot have SerializerInfo without serializerId");
+            this.subSerializer = subSerializer;
+        }
+
+        public SerializerInfo(ResourceLocation serializer) {
+            this(serializer, null);
+        }
+
+        public ResourceLocation getSerializer() {
+            return serializer;
+        }
+
+        @Nullable
+        public SerializerInfo getSubSerializer() {
+            return subSerializer;
         }
     }
 }

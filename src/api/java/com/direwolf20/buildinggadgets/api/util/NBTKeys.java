@@ -31,6 +31,8 @@ public final class NBTKeys {
     public static final ResourceLocation AND_SERIALIZER_ID = new ResourceLocation(MODID, "sub_entries");
     public static final ResourceLocation OR_SERIALIZER_ID = new ResourceLocation(MODID, "alternatives");
     public static final ResourceLocation SIMPLE_SERIALIZER_ID = new ResourceLocation(MODID, "entries");
+    public static final String SIMPLE_UNIQUE_ITEM_ID = MODID + ":simple_item";
+    public static final ResourceLocation SIMPLE_UNIQUE_ITEM_ID_RL = new ResourceLocation(SIMPLE_UNIQUE_ITEM_ID);
 
     private NBTKeys() {}
 }

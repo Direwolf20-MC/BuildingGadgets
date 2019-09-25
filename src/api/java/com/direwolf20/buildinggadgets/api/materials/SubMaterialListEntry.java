@@ -51,29 +51,13 @@ abstract class SubMaterialListEntry implements MaterialListEntry<SubMaterialList
                 .addAll(orEntries)
                 .addAll(remainder)
                 .build(),
-                ImmutableList.of(constantEntry));
+                constantEntry.getItems().isEmpty() ? ImmutableList.of() : ImmutableList.of(constantEntry));
     }
 
-    protected List<MaterialListEntry<?>> orderAndSimplifyEntries(
+    protected abstract List<MaterialListEntry<?>> orderAndSimplifyEntries(
             List<OrMaterialListEntry> orEntries,
             List<AndMaterialListEntry> andEntries,
-            List<SimpleMaterialListEntry> simpleEntries) {
-        List<MaterialListEntry<?>> remainder = new ArrayList<>();
-        getSubEntries().forEach(entry -> {
-            MaterialListEntry<?> simplified = entry.simplify();
-            if (simplified instanceof AndMaterialListEntry) {
-                simpleEntries.addAll(((SubMaterialListEntry) simplified).getConstantEntries());
-                andEntries.add(new AndMaterialListEntry(((SubMaterialListEntry) simplified).getSubEntries(), ImmutableList.of()));
-            } else if (simplified instanceof OrMaterialListEntry) {
-                simpleEntries.addAll(((SubMaterialListEntry) simplified).getConstantEntries());
-                orEntries.add(new OrMaterialListEntry(((SubMaterialListEntry) simplified).getSubEntries(), ImmutableList.of()));
-            } else if (simplified instanceof SimpleMaterialListEntry)
-                simpleEntries.add((SimpleMaterialListEntry) simplified);
-            else
-                remainder.add(simplified);
-        });
-        return remainder;
-    }
+            List<SimpleMaterialListEntry> simpleEntries);
 
     protected ImmutableList<MaterialListEntry<?>> getSubEntries() {
         return subEntries;
@@ -101,6 +85,23 @@ abstract class SubMaterialListEntry implements MaterialListEntry<SubMaterialList
 
     protected Iterable<ImmutableMultiset<UniqueItem>> viewOnlySubEntries() {
         return createFrom(getSubEntries(), ImmutableList.of());
+    }
+
+    protected void pullUpInnerEntries(SubMaterialListEntry entry,
+                                      List<OrMaterialListEntry> orEntries,
+                                      List<AndMaterialListEntry> andEntries,
+                                      List<SimpleMaterialListEntry> simpleEntries,
+                                      List<MaterialListEntry<?>> remainder) {
+        for (MaterialListEntry<?> subEntry : entry.getSubEntries()) {
+            if (subEntry instanceof OrMaterialListEntry)
+                orEntries.add((OrMaterialListEntry) subEntry);
+            else if (subEntry instanceof AndMaterialListEntry)
+                andEntries.add((AndMaterialListEntry) subEntry);
+            else if (subEntry instanceof SimpleMaterialListEntry)
+                simpleEntries.add((SimpleMaterialListEntry) subEntry);
+            else
+                remainder.add(subEntry);
+        } ;
     }
 
     protected static abstract class Serializer extends ForgeRegistryEntry<MaterialListEntry.Serializer<SubMaterialListEntry>> implements MaterialListEntry.Serializer<SubMaterialListEntry> {
@@ -148,6 +149,7 @@ abstract class SubMaterialListEntry implements MaterialListEntry<SubMaterialList
                         obj.add(JsonKeys.MATERIAL_ENTRY, element);
                     }
                     obj.add(JsonKeys.MATERIAL_ENTRY_TYPE, context.serialize(entry.getSerializer().getRegistryName()));
+                    ar.add(obj);
                 });
                 return ar;
             };
