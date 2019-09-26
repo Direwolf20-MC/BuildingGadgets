@@ -9,7 +9,7 @@ import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.config.crafting.RecipeConstructionPaste.Serializer;
 import com.direwolf20.buildinggadgets.common.events.AnvilRepairHandler;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
-import com.direwolf20.buildinggadgets.common.registry.objects.BuildingObjects;
+import com.direwolf20.buildinggadgets.common.registry.RegistryHandler;
 import com.direwolf20.buildinggadgets.common.save.SaveManager;
 import com.direwolf20.buildinggadgets.common.save.TemplateSave;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
@@ -28,7 +28,6 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig.Type;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.event.server.FMLServerStartedEvent;
 import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 import net.minecraftforge.fml.event.server.FMLServerStoppedEvent;
@@ -64,7 +63,6 @@ public final class BuildingGadgets {
         MinecraftForge.EVENT_BUS.addListener(this::serverLoad);
         MinecraftForge.EVENT_BUS.addListener(this::serverLoaded);
         MinecraftForge.EVENT_BUS.addListener(this::serverStopped);
-        eventBus.addListener(this::finishLoad);
         eventBus.addGenericListener(IRecipeSerializer.class, this::onRecipeRegister);
 
         eventBus.addListener(Config::onLoad);
@@ -77,7 +75,8 @@ public final class BuildingGadgets {
             eventBus.addListener((Consumer<FMLClientSetupEvent>) event -> ClientProxy.clientSetup(eventBus));
             ModLoadingContext.get().registerExtensionPoint(ExtensionPoint.CONFIGGUIFACTORY, () -> GuiMod::openScreen);
         });
-        BuildingObjects.init();
+
+        RegistryHandler.setup();
     }
 
     private void setup(final FMLCommonSetupEvent event) {
@@ -103,10 +102,6 @@ public final class BuildingGadgets {
         SaveManager.INSTANCE.onServerStopped(event);
     }
 
-    private void finishLoad(FMLLoadCompleteEvent event) {
-        BuildingObjects.cleanup();
-    }
-
     private void onRecipeRegister(final RegistryEvent.Register<IRecipeSerializer<?>> e) {
         e.getRegistry().register(
                 Serializer.INSTANCE.setRegistryName(
@@ -114,5 +109,4 @@ public final class BuildingGadgets {
             )
         );
     }
-
 }

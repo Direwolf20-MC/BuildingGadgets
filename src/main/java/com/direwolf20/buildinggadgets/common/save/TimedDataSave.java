@@ -8,6 +8,7 @@ import it.unimi.dsi.fastutil.longs.Long2ObjectSortedMap;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.INBT;
 import net.minecraft.nbt.ListNBT;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.world.storage.WorldSavedData;
 import net.minecraftforge.common.util.Constants.NBT;
 
@@ -27,6 +28,12 @@ public abstract class TimedDataSave<T extends TimedValue> extends WorldSavedData
     public UUID getFreeUUID() {
         UUID res = UUID.randomUUID();
         return idToValue.containsKey(res) ? getFreeUUID() : res;
+    }
+
+    protected void writeAllIds(PacketBuffer buffer) {
+        for (UUID id : idToValue.keySet()) {
+            buffer.writeUniqueId(id);
+        }
     }
 
     protected T get(UUID id) {

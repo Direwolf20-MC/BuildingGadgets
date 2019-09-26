@@ -3,8 +3,8 @@ package com.direwolf20.buildinggadgets.common.entities;
 import com.direwolf20.buildinggadgets.api.building.BlockData;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlock;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockPowder;
-import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
-import com.direwolf20.buildinggadgets.common.registry.objects.BGEntities;
+import com.direwolf20.buildinggadgets.common.registry.OurBlocks;
+import com.direwolf20.buildinggadgets.common.registry.OurEntities;
 import com.direwolf20.buildinggadgets.common.tiles.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import net.minecraft.block.Block;
@@ -28,7 +28,8 @@ public class ConstructionBlockEntity extends EntityBase {
     }
 
     public ConstructionBlockEntity(World world, BlockPos spawnPos, boolean makePaste) {
-        this(BGEntities.CONSTRUCTION_BLOCK, world);
+        this(OurEntities.CONSTRUCTION_BLOCK, world);
+        
         setPosition(spawnPos.getX(), spawnPos.getY(), spawnPos.getZ());
         targetPos = spawnPos;
         setMakingPaste(makePaste);
@@ -74,7 +75,7 @@ public class ConstructionBlockEntity extends EntityBase {
                     if (opaque || neighborBrightness || ! ambient) {
                         BlockData tempSetBlock = ((ConstructionBlockTileEntity) te).getConstructionBlockData();
                         BlockData tempActualSetBlock = ((ConstructionBlockTileEntity) te).getActualBlockData();
-                        world.setBlockState(targetPos, BGBlocks.constructionBlock.getDefaultState()
+                        world.setBlockState(targetPos, OurBlocks.constructionBlock.getDefaultState()
                                 .with(ConstructionBlock.BRIGHT, ! opaque)
                                 .with(ConstructionBlock.NEIGHBOR_BRIGHTNESS, neighborBrightness)
                                 .with(ConstructionBlock.AMBIENT_OCCLUSION, ambient));
@@ -84,8 +85,8 @@ public class ConstructionBlockEntity extends EntityBase {
                         }
                     }
                 }
-            } else if (world.getBlockState(targetPos) == BGBlocks.constructionBlockPowder.getDefaultState()) {
-                world.setBlockState(targetPos, BGBlocks.constructionBlockDense.getDefaultState());
+            } else if (world.getBlockState(targetPos) == OurBlocks.constructionBlockPowder.getDefaultState()) {
+                world.setBlockState(targetPos, OurBlocks.constructionBlockDense.getDefaultState());
             }
         }
     }

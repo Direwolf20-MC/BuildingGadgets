@@ -72,6 +72,6 @@ public interface ITileEntityData {
             stack = new ItemStack(state.getBlock().asItem());
         if (stack.isEmpty())
             return MaterialList.empty();
-        return MaterialList.builder().addAll(ImmutableMultiset.of(new UniqueItem(stack.getItem(), stack.getTag()))).build();
+        return MaterialList.simpleBuilder().addAll(ImmutableMultiset.of(new UniqueItem(stack.getItem(), stack.getTag()))).build();
     }
 }

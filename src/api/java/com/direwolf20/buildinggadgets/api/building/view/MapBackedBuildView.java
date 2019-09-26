@@ -12,6 +12,14 @@ import java.util.Objects;
 import java.util.Spliterator;
 import java.util.function.Function;
 
+/**
+ * A simple {@link IBuildView} backed by a {@link Map Map<BlockPos, BlockData>}. {@link PlacementTarget PlacementTargets} will be created
+ * lazily when iterating over this {@link IBuildView}. You can supply this with a mutable {@link Map} via {@link #createUnsafe(IBuildContext, Map, Region)}
+ * for efficiency reasons, note however that you will encounter undefined behaviour if the {@link Map} is modified after this {@link IBuildView} was
+ * created.
+ * <p>
+ * Notice that closing has no effect on this object, and therefore also isn't required.
+ */
 public final class MapBackedBuildView implements IBuildView {
     private Map<BlockPos, BlockData> map;
     private Region boundingBox;
@@ -78,9 +86,7 @@ public final class MapBackedBuildView implements IBuildView {
     }
 
     @Override
-    public void close() {
-
-    }
+    public void close() {}
 
     @Override
     public MapBackedBuildView copy() {

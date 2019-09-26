@@ -3,7 +3,7 @@ package com.direwolf20.buildinggadgets.common.tiles;
 import com.direwolf20.buildinggadgets.api.building.BlockData;
 import com.direwolf20.buildinggadgets.api.building.tilesupport.TileSupport;
 import com.direwolf20.buildinggadgets.common.blocks.EffectBlock.Mode;
-import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks.BGTileEntities;
+import com.direwolf20.buildinggadgets.common.registry.OurBlocks;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundNBT;
@@ -33,7 +33,7 @@ public class EffectBlockTileEntity extends TileEntity implements ITickableTileEn
     private int ticks;
 
     public EffectBlockTileEntity() {
-        super(BGTileEntities.EFFECT_BLOCK_TYPE);
+        super(OurBlocks.OurTileEntities.EFFECT_BLOCK_TYPE);
     }
 
     public void initializeData(BlockState curState, @Nullable TileEntity te, BlockData replacementBlock, Mode mode, boolean usePaste) {

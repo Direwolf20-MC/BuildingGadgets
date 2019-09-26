@@ -9,10 +9,11 @@ import com.direwolf20.buildinggadgets.common.items.gadgets.renderers.BaseRendere
 import com.direwolf20.buildinggadgets.common.items.gadgets.renderers.BuildingRender;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketBindTool;
-import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
-import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
 import com.direwolf20.buildinggadgets.common.save.SaveManager;
 import com.direwolf20.buildinggadgets.common.save.UndoWorldSave;
+import com.direwolf20.buildinggadgets.common.registry.OurBlocks;
+import com.direwolf20.buildinggadgets.common.registry.OurItems;
+
 import com.direwolf20.buildinggadgets.common.util.helpers.InventoryHelper;
 import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
 import com.direwolf20.buildinggadgets.common.util.helpers.SortingHelper;
@@ -262,7 +263,7 @@ public class GadgetBuilding extends AbstractGadget implements IAtopPlacingGadget
                 BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(world, coord, currentBlock.getState(), player);
                 boolean cancelled = MinecraftForge.EVENT_BUS.post(e);
 
-                if (distance < 64 && sameDim && currentBlock.getState() != BGBlocks.effectBlock.getDefaultState() && !cancelled) { //Don't allow us to undo a block while its still being placed or too far away
+                if (distance < 64 && sameDim && currentBlock.getState() != OurBlocks.effectBlock.getDefaultState() && !cancelled) { //Don't allow us to undo a block while its still being placed or too far away
                     if (currentBlock.getState() != Blocks.AIR.getDefaultState()) {
                         currentBlock.getState().getBlock().harvestBlock(world, player, coord, currentBlock.getState(), world.getTileEntity(coord), silkTool);
                         EffectBlock.spawnEffectBlock(world, coord, currentBlock, EffectBlock.Mode.REMOVE, false);
@@ -320,7 +321,7 @@ public class GadgetBuilding extends AbstractGadget implements IAtopPlacingGadget
             return false;
         }
         if (!setBlock.getState().hasTileEntity()) {
-            ItemStack constructionPaste = new ItemStack(BGItems.constructionPaste);
+            ItemStack constructionPaste = new ItemStack(OurItems.constructionPaste);
             if (InventoryHelper.countItem(itemStack, player, world) < neededItems) {
                 //if (InventoryHelper.countItem(constructionStack, player) == 0) {
                 if (InventoryHelper.countPaste(player) < neededItems) {

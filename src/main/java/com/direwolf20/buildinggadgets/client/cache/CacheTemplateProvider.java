@@ -1,4 +1,4 @@
-package com.direwolf20.buildinggadgets.client;
+package com.direwolf20.buildinggadgets.client.cache;
 
 import com.direwolf20.buildinggadgets.api.template.ITemplate;
 import com.direwolf20.buildinggadgets.api.template.provider.ITemplateKey;
@@ -21,7 +21,7 @@ public final class CacheTemplateProvider implements ITemplateProvider {
     private final Cache<UUID, ITemplate> cache;
     private final Set<UUID> allocatedIds;
 
-    CacheTemplateProvider() {
+    public CacheTemplateProvider() {
         this.cache = CacheBuilder
                 .newBuilder()
                 .expireAfterAccess(1, TimeUnit.MINUTES)
@@ -34,7 +34,10 @@ public final class CacheTemplateProvider implements ITemplateProvider {
     public ITemplate getTemplateForKey(@Nonnull ITemplateKey key) {
         UUID id = key.getTemplateId(this::getFreeId);
         try {
-            return cache.get(id, () -> key.createTemplate(id));
+            return cache.get(id, () -> {
+                requestUpdate(id);
+                return key.createTemplate(id);
+            });
         } catch (ExecutionException e) {
             throw new RuntimeException("Failed to access Cache!", e);
         }
@@ -49,7 +52,11 @@ public final class CacheTemplateProvider implements ITemplateProvider {
 
     @Override
     public boolean requestUpdate(ITemplateKey key) {
-        PacketHandler.sendToServer(new PacketRequestTemplate(key.getTemplateId(this::getFreeId)));
+        return requestUpdate(key.getTemplateId(this::getFreeId));
+    }
+
+    private boolean requestUpdate(UUID id) {
+        PacketHandler.sendToServer(new PacketRequestTemplate(id));
         return true;
     }
 
@@ -79,7 +86,11 @@ public final class CacheTemplateProvider implements ITemplateProvider {
         PacketHandler.sendToServer(new PacketTemplateIdAllocated(allocatedId));
     }
 
-    void clear() {
+    /**
+     * Although public, do not use this method willingly. The cache is already purged on each
+     * onPlayerLoggedOut event.
+     */
+    public void clear() {
         this.cache.invalidateAll();
         this.cache.cleanUp();
         this.allocatedIds.clear();

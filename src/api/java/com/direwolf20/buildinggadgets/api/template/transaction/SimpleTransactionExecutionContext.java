@@ -68,7 +68,7 @@ public final class SimpleTransactionExecutionContext implements ITransactionExec
     }
 
     /**
-     * Builder for creating {@link SimpleTransactionExecutionContext}'s
+     * {@code Builder} for creating {@link SimpleTransactionExecutionContext}'s
      */
     public static final class Builder {
         private int size;

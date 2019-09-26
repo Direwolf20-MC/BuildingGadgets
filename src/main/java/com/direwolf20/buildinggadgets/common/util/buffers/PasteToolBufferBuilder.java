@@ -114,6 +114,6 @@ public class PasteToolBufferBuilder {
     }
 
     public static boolean isUpdateNeeded(String UUID, ItemStack stack) {
-        return true; //BGItems.gadgetCopyPaste.getCopyCounter(stack) != getCopyCounter(UUID) || PasteToolBufferBuilder.getTagFromUUID(UUID) == null;
+        return true; //OurItems.gadgetCopyPaste.getCopyCounter(stack) != getCopyCounter(UUID) || PasteToolBufferBuilder.getTagFromUUID(UUID) == null;
     }
 }

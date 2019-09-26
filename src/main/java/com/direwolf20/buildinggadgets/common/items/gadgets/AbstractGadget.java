@@ -197,7 +197,7 @@ public abstract class AbstractGadget extends Item {
                             .setStyle(Styles.BLUE));
     }
 
-    protected UUID getUUID(ItemStack stack) {
+    public UUID getUUID(ItemStack stack) {
         CompoundNBT nbt = NBTHelper.getOrNewTag(stack);
         if (! nbt.hasUniqueId(NBTKeys.GADGET_UUID)) {
             UUID newId = getUndoSave().getFreeUUID();
@@ -211,7 +211,7 @@ public abstract class AbstractGadget extends Item {
         return name.replaceAll("(?=[A-Z])", " ").trim();
     }
 
-    protected void addUndo(ItemStack stack, RegionSnapshot snapshot) {
+    protected void pushUndo(ItemStack stack, RegionSnapshot snapshot) {
         UndoWorldSave save = getUndoSave();
         save.insertSnapshot(getUUID(stack), snapshot);
     }

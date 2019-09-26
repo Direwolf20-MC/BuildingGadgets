@@ -3,11 +3,17 @@ package com.direwolf20.buildinggadgets.common.save;
 import com.direwolf20.buildinggadgets.api.template.ITemplate;
 import com.direwolf20.buildinggadgets.api.template.provider.ITemplateKey;
 import com.direwolf20.buildinggadgets.api.template.provider.ITemplateProvider;
+import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketRequestTemplate;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketTemplateIdAllocated;
 import com.direwolf20.buildinggadgets.common.network.packets.SplitPacketUpdateTemplate;
+import com.direwolf20.buildinggadgets.common.util.ref.Reference;
+import io.netty.buffer.Unpooled;
 import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.network.PacketBuffer;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.network.NetworkEvent.GatherLoginPayloadsEvent;
 import net.minecraftforge.fml.network.PacketDistributor;
 import net.minecraftforge.fml.network.PacketDistributor.PacketTarget;
 
@@ -23,6 +29,18 @@ public final class SaveTemplateProvider implements ITemplateProvider {
 
     public TemplateSave getSave() {
         return save.get();
+    }
+
+    @SubscribeEvent
+    public void onGatherPayloads(GatherLoginPayloadsEvent event) {
+        TemplateSave save = getSave();
+        if (save == null) {
+            BuildingGadgets.LOG.error("Attempted to gather login payloads, before templates could be loaded! Aborting!");
+            return;
+        }
+        PacketBuffer buffer = new PacketBuffer(Unpooled.buffer());
+        save.writeAllIds(buffer);
+        event.add(buffer, Reference.NETWORK_CHANNEL_ID_LOGIN, Reference.PAYLOAD_CONTEXT_ID_SYNC);
     }
 
     @Override
@@ -72,6 +90,7 @@ public final class SaveTemplateProvider implements ITemplateProvider {
 
     public void onRemoteIdAllocated(UUID allocated) {
         getSave().getTemplate(allocated);
+        onIdAllocated(allocated);//propagate it to everyone
     }
 
     private UUID getFreeId() {

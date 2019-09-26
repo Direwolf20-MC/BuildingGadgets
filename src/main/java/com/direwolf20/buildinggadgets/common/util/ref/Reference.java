@@ -6,6 +6,8 @@ import net.minecraft.util.ResourceLocation;
 public final class Reference {
     public static final String MODID = APIReference.MODID;
     public static final ResourceLocation NETWORK_CHANNEL_ID_MAIN = new ResourceLocation(Reference.MODID, "main_network_channel");
+    public static final ResourceLocation NETWORK_CHANNEL_ID_LOGIN = new ResourceLocation(Reference.MODID, "login_network_channel");
+    public static final String PAYLOAD_CONTEXT_ID_SYNC = "template_id_sync";
 
     public static final ResourceLocation WORLD_TEMPLATE_PROVIDER_ID = new ResourceLocation(MODID, "template_provider");
 

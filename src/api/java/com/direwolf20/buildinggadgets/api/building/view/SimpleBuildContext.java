@@ -75,7 +75,7 @@ public final class SimpleBuildContext implements IBuildContext {
     }
 
     /**
-     * {@code Builder} for creating new instances of {@link SimpleBuildContext}
+     * {@code SimpleBuilder} for creating new instances of {@link SimpleBuildContext}
      */
     public static final class Builder {
         @Nullable
@@ -143,8 +143,8 @@ public final class SimpleBuildContext implements IBuildContext {
 
         /**
          * Creates a new {@link SimpleBuildContext} using the specified world. If the given world is null, the world in this {@code Builder} will be used.
-         * @param world The {@link IWorld} to use. If null this {@code Builder}'s world will be used.
-         * @return A new {@link SimpleBuildContext} with the values specified in this {@code Builder}.
+         * @param world The {@link IWorld} to use. If null this {@code SimpleBuilder}'s world will be used.
+         * @return A new {@link SimpleBuildContext} with the values specified in this {@code SimpleBuilder}.
          * @throws NullPointerException if both the {@link IWorld} passed in and the {@link IWorld} of this {@code Builder} are null.
          */
         public SimpleBuildContext build(@Nullable IWorld world) {

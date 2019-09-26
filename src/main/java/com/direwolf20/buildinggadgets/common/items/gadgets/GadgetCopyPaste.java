@@ -14,7 +14,6 @@ import com.direwolf20.buildinggadgets.api.template.ITemplate;
 import com.direwolf20.buildinggadgets.api.template.SimpleBuildOpenOptions;
 import com.direwolf20.buildinggadgets.api.template.transaction.ITemplateTransaction;
 import com.direwolf20.buildinggadgets.api.template.transaction.TemplateTransactions;
-import com.direwolf20.buildinggadgets.client.events.EventTooltip;
 import com.direwolf20.buildinggadgets.client.gui.GuiMod;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.blocks.EffectBlock;
@@ -30,6 +29,10 @@ import com.direwolf20.buildinggadgets.common.items.gadgets.renderers.BaseRendere
 import com.direwolf20.buildinggadgets.common.items.gadgets.renderers.CopyPasteRender;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketBindTool;
+import com.direwolf20.buildinggadgets.common.network.packets.PacketBlockMap;
+import com.direwolf20.buildinggadgets.common.network.packets.PacketRotateMirror;
+import com.direwolf20.buildinggadgets.common.registry.OurItems;
+import com.direwolf20.buildinggadgets.common.tiles.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.save.SaveManager;
 import com.direwolf20.buildinggadgets.common.save.UndoWorldSave;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
@@ -60,7 +63,9 @@ import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.math.RayTraceResult.Type;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.Style;
 import net.minecraft.world.World;
@@ -184,6 +189,17 @@ public class GadgetCopyPaste extends AbstractGadget {
         return GadgetUtils.getPOSFromNBT(stack, NBTKeys.GADGET_ANCHOR);
     }
 
+    public static Optional<BlockPos> getActivePos(PlayerEntity playerEntity, ItemStack stack) {
+        BlockPos pos = getAnchor(stack);
+        if (pos == null) {
+            BlockRayTraceResult res = VectorHelper.getLookingAt(playerEntity, stack);
+            if (res.getType() == Type.MISS)
+                return Optional.empty();
+            pos = res.getPos();
+        }
+        return Optional.of(pos);
+    }
+
     public static Optional<Region> getSelectedRegion(ItemStack stack) {
         BlockPos lower = getLowerRegionBound(stack);
         BlockPos upper = getUpperRegionBound(stack);
@@ -285,7 +301,7 @@ public class GadgetCopyPaste extends AbstractGadget {
         tooltip.add(TooltipTranslation.GADGET_MODE.componentTranslation(getToolMode(stack)).setStyle(Styles.AQUA));
         addEnergyInformation(tooltip, stack);
         addInformationRayTraceFluid(tooltip, stack);
-        EventTooltip.addTemplatePadding(stack, tooltip);
+        //EventTooltip.addTemplatePadding(stack, tooltip);
     }
 
     public void setMode(ItemStack heldItem, int modeInt) {

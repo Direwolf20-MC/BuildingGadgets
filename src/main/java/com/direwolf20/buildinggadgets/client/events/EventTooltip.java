@@ -1,8 +1,8 @@
 package com.direwolf20.buildinggadgets.client.events;
 
-import com.direwolf20.buildinggadgets.client.RemoteInventoryCache;
+import com.direwolf20.buildinggadgets.client.cache.RemoteInventoryCache;
 import com.direwolf20.buildinggadgets.common.items.ITemplate;
-import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
+import com.direwolf20.buildinggadgets.common.registry.OurItems;
 import com.direwolf20.buildinggadgets.common.util.helpers.InventoryHelper;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.direwolf20.buildinggadgets.common.util.tools.UniqueItem;
@@ -135,7 +135,7 @@ public class EventTooltip {
                 j++;
             }
             if (totalMissing > 0) {
-                ItemStack pasteItemStack = new ItemStack(BGItems.constructionPaste);
+                ItemStack pasteItemStack = new ItemStack(OurItems.constructionPaste);
                 int hasAmt = InventoryHelper.countPaste(Minecraft.getInstance().player);
                 int x = bx + (j % STACKS_PER_LINE) * 18;
                 int y = by + (j / STACKS_PER_LINE) * 20;

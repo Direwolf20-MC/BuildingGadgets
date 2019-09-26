@@ -1,5 +1,9 @@
 package com.direwolf20.buildinggadgets.api.util;
 
+import net.minecraft.util.ResourceLocation;
+
+import static com.direwolf20.buildinggadgets.api.APIReference.MODID;
+
 public final class NBTKeys {
     public static final String KEY_MAX_X = "maxX";
     public static final String KEY_MAX_Y = "maxY";
@@ -19,6 +23,16 @@ public final class NBTKeys {
     public static final String KEY_BOUNDS = "bounds";
     public static final String KEY_NAME = "name";
     public static final String KEY_AUTHOR = "author";
+    public static final String KEY_SUB_ENTRIES = "sub_entries";
+    public static final String KEY_CAP_NBT = "cap_data";
+    public static final String KEY_DATA_COMPARISON = "data_comp";
+    public static final String KEY_CAP_COMPARISON = "cap_comp";
+
+    public static final ResourceLocation AND_SERIALIZER_ID = new ResourceLocation(MODID, "sub_entries");
+    public static final ResourceLocation OR_SERIALIZER_ID = new ResourceLocation(MODID, "alternatives");
+    public static final ResourceLocation SIMPLE_SERIALIZER_ID = new ResourceLocation(MODID, "entries");
+    public static final String SIMPLE_UNIQUE_ITEM_ID = MODID + ":simple_item";
+    public static final ResourceLocation SIMPLE_UNIQUE_ITEM_ID_RL = new ResourceLocation(SIMPLE_UNIQUE_ITEM_ID);
 
     private NBTKeys() {}
 }

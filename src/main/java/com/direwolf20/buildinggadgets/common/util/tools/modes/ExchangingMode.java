@@ -3,7 +3,7 @@ package com.direwolf20.buildinggadgets.common.util.tools.modes;
 import com.direwolf20.buildinggadgets.api.building.BlockData;
 import com.direwolf20.buildinggadgets.api.building.modes.IBuildingMode;
 import com.direwolf20.buildinggadgets.common.items.gadgets.AbstractGadget;
-import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
+import com.direwolf20.buildinggadgets.common.registry.OurBlocks;
 import com.direwolf20.buildinggadgets.common.tiles.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
@@ -92,7 +92,7 @@ public enum ExchangingMode {
                 return false;
 
             // If the target is already enqueued, don't replace it
-            if (worldBlockState == BGBlocks.effectBlock.getDefaultState())
+            if (worldBlockState == OurBlocks.effectBlock.getDefaultState())
                 return false;
             // Only replace existing blocks, don't place more
             if (worldBlockState.getBlock().isAir(worldBlockState, world, pos))

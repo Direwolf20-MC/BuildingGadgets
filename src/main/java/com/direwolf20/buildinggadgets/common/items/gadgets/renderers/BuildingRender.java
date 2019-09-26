@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.common.items.gadgets.renderers;
 
 import com.direwolf20.buildinggadgets.common.items.gadgets.AbstractGadget;
-import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks;
+import com.direwolf20.buildinggadgets.common.registry.OurBlocks;
 import com.direwolf20.buildinggadgets.common.util.CapabilityUtil;
 import com.direwolf20.buildinggadgets.common.util.helpers.SortingHelper;
 import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
@@ -51,7 +51,7 @@ public class BuildingRender extends BaseRenderer {
             if (!(lookingAt == null)) {
                 startBlock = world.getBlockState(lookingAt.getPos());
             }
-            if (startBlock != BGBlocks.effectBlock.getDefaultState()) {
+            if (startBlock != OurBlocks.effectBlock.getDefaultState()) {
 
                 //TODO handle TileEntities
                 BlockState renderBlockState = getToolBlock(heldItem).getState();

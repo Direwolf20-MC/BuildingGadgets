@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.common.items.gadgets.renderers;
 
-import com.direwolf20.buildinggadgets.client.RemoteInventoryCache;
+import com.direwolf20.buildinggadgets.client.cache.RemoteInventoryCache;
 import com.direwolf20.buildinggadgets.client.renderer.FakeTERWorld;
 import com.direwolf20.buildinggadgets.common.util.CapabilityUtil;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;

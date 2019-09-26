@@ -1,4 +1,4 @@
-package com.direwolf20.buildinggadgets.common.registry.objects;
+package com.direwolf20.buildinggadgets.common.registry;
 
 import com.direwolf20.buildinggadgets.client.ClientProxy;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
@@ -10,11 +10,11 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 
 @EventBusSubscriber(modid = Reference.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
-public enum BGSound {
+public enum OurSounds {
     BEEP("beep");
     private SoundEvent sound;
 
-    BGSound(String name) {
+    OurSounds(String name) {
         ResourceLocation loc = new ResourceLocation(Reference.MODID, name);
         sound = new SoundEvent(loc).setRegistryName(name);
     }
@@ -33,7 +33,7 @@ public enum BGSound {
 
     @SubscribeEvent
     public static void registerSounds(RegistryEvent.Register<SoundEvent> event) {
-        for (BGSound sound : values()) {
+        for (OurSounds sound : values()) {
             event.getRegistry().register(sound.getSound());
         }
     }

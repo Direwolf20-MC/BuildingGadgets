@@ -7,9 +7,9 @@ import com.direwolf20.buildinggadgets.common.items.gadgets.renderers.BaseRendere
 import com.direwolf20.buildinggadgets.common.items.gadgets.renderers.ExchangerRender;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketBindTool;
-import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
 import com.direwolf20.buildinggadgets.common.save.SaveManager;
 import com.direwolf20.buildinggadgets.common.save.UndoWorldSave;
+import com.direwolf20.buildinggadgets.common.registry.OurItems;
 import com.direwolf20.buildinggadgets.common.util.helpers.InventoryHelper;
 import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
 import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
@@ -246,7 +246,7 @@ public class GadgetExchanger extends AbstractGadget {
         }
         if (! setBlock.getState().hasTileEntity()) {
             if (InventoryHelper.countItem(itemStack, player, world) < neededItems) {
-                ItemStack constructionPaste = new ItemStack(BGItems.constructionPaste);
+                ItemStack constructionPaste = new ItemStack(OurItems.constructionPaste);
                 if (InventoryHelper.countPaste(player) < neededItems) {
                     return false;
                 }
@@ -289,7 +289,7 @@ public class GadgetExchanger extends AbstractGadget {
             //currentBlock.getBlock().removedByPlayer(currentBlock.getBlockData(), world, pos, player, false, null);
             List<ItemStack> blockDrops = currentBlock.getBlock().getDrops(currentBlock, world, pos, world.getTileEntity(pos));
             for (ItemStack drop : blockDrops) {
-                if (drop.getItem().equals(BGItems.constructionPaste)) {
+                if (drop.getItem().equals(OurItems.constructionPaste)) {
                     InventoryHelper.addPasteToContainer(player, drop);
                 }
                 if (drop != null) {

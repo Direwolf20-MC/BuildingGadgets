@@ -1,8 +1,8 @@
 package com.direwolf20.buildinggadgets.common.tiles;
 
 import com.direwolf20.buildinggadgets.common.containers.TemplateManagerContainer;
-import com.direwolf20.buildinggadgets.common.registry.objects.BGBlocks.BGTileEntities;
-import com.direwolf20.buildinggadgets.common.registry.objects.BGItems;
+import com.direwolf20.buildinggadgets.common.registry.OurBlocks;
+import com.direwolf20.buildinggadgets.common.registry.OurItems;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.google.common.collect.ImmutableSet;
 import net.minecraft.entity.player.PlayerEntity;
@@ -25,13 +25,13 @@ import java.util.Set;
 
 public class TemplateManagerTileEntity extends TileEntity {
 
-    private static final Set<Item> allowedItemsLeft = ImmutableSet.of(BGItems.gadgetCopyPaste, BGItems.template);
-    private static final Set<Item> allowedItemsRight = ImmutableSet.of(Items.PAPER, BGItems.template);
+    private static final Set<Item> allowedItemsLeft = ImmutableSet.of(OurItems.gadgetCopyPaste, OurItems.template);
+    private static final Set<Item> allowedItemsRight = ImmutableSet.of(Items.PAPER, OurItems.template);
 
     public static final int SIZE = 2;
 
     public TemplateManagerTileEntity() {
-        super(BGTileEntities.TEMPLATE_MANAGER_TYPE);
+        super(OurBlocks.OurTileEntities.TEMPLATE_MANAGER_TYPE);
     }
 
     // This item handler will hold our inventory slots
