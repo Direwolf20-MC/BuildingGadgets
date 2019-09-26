@@ -218,10 +218,11 @@ public final class UniqueItem {
             return (element, typeOfSrc, context) -> {
                 JsonObject obj = new JsonObject();
                 Item item = element.getItem();
+                obj.add(JsonKeys.MATERIAL_ENTRY_TYPE, context.serialize(getRegistryName()));
                 if (printName)
                     obj.addProperty(JsonKeys.MATERIAL_LIST_ITEM_NAME, I18n.format(item.getTranslationKey(element.createStack(count))));
-                if (extended || ! printName)
-                    obj.add(JsonKeys.MATERIAL_LIST_ITEM_ID, context.serialize(element.getRegistryName()));
+                obj.add(JsonKeys.MATERIAL_LIST_ITEM_ID, context.serialize(element.getRegistryName()));
+                obj.addProperty(JsonKeys.MATERIAL_LIST_ITEM_COUNT, count);
                 if (extended) {
                     if (element.tagCompound != null) {
                         obj.addProperty(JsonKeys.MATERIAL_LIST_ITEM_NBT, element.tagCompound.toString());
@@ -232,7 +233,6 @@ public final class UniqueItem {
                         obj.add(JsonKeys.MATERIAL_LIST_CAP_NBT_MATCH, context.serialize(element.capMatch));
                     }
                 }
-                obj.addProperty(JsonKeys.MATERIAL_LIST_ITEM_COUNT, count);
                 return obj;
             };
         }

@@ -11,6 +11,8 @@ public final class JsonKeys {
     public static final String MATERIAL_ENTRIES = "entries";
     public static final String MATERIAL_ENTRY = "entry";
     public static final String MATERIAL_ENTRY_TYPE = "type";
+    public static final String SERIALIZER_INFO_SERIALIZER = "serializer";
+    public static final String SERIALIZER_INFO_SUB_SERIALIZER = "sub_serializer";
 
     private JsonKeys() {}
 

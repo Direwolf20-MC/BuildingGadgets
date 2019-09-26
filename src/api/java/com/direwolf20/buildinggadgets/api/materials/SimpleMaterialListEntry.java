@@ -3,21 +3,19 @@ package com.direwolf20.buildinggadgets.api.materials;
 import com.direwolf20.buildinggadgets.api.BuildingGadgetsAPI;
 import com.direwolf20.buildinggadgets.api.util.JsonKeys;
 import com.direwolf20.buildinggadgets.api.util.NBTKeys;
-import com.google.common.collect.ImmutableMultiset;
-import com.google.common.collect.Iterators;
-import com.google.common.collect.Multiset;
+import com.google.common.collect.*;
 import com.google.common.collect.Multiset.Entry;
-import com.google.common.collect.PeekingIterator;
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializer;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.INBT;
 import net.minecraft.nbt.ListNBT;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 
+import java.util.Comparator;
 import java.util.Objects;
 
 class SimpleMaterialListEntry implements MaterialListEntry<SimpleMaterialListEntry> {
@@ -47,7 +45,11 @@ class SimpleMaterialListEntry implements MaterialListEntry<SimpleMaterialListEnt
         return this;
     }
 
-    private static class Serializer extends ForgeRegistryEntry<MaterialListEntry.Serializer<SimpleMaterialListEntry>> implements MaterialListEntry.Serializer<SimpleMaterialListEntry> {
+    private static class Serializer extends ForgeRegistryEntry<MaterialListEntry.Serializer<SimpleMaterialListEntry>>
+            implements MaterialListEntry.Serializer<SimpleMaterialListEntry> {
+        private static final Comparator<Entry<UniqueItem>> COMPARATOR = Comparator
+                .<Entry<UniqueItem>, ResourceLocation>comparing(e -> e.getElement().getRegistryName())
+                .thenComparingInt(Entry::getCount);
         @Override
         public SimpleMaterialListEntry readFromNBT(CompoundNBT nbt, boolean persisted) {
             ListNBT nbtList = nbt.getList(NBTKeys.KEY_DATA, NBT.TAG_COMPOUND);
@@ -87,21 +89,11 @@ class SimpleMaterialListEntry implements MaterialListEntry<SimpleMaterialListEnt
             return (src, typeOfSrc, context) -> {
                 Multiset<UniqueItem> set = src.getItems();
                 JsonArray jsonArray = new JsonArray();
-                for (Entry<UniqueItem> entry : set.entrySet()) {
-                    JsonElement element = entry
-                            .getElement()
+                for (Entry<UniqueItem> entry : ImmutableList.sortedCopyOf(COMPARATOR, set.entrySet())) {
+                    jsonArray.add(entry.getElement()
                             .getSerializer()
                             .asJsonSerializer(entry.getCount(), printName, extended)
-                            .serialize(entry.getElement(), entry.getElement().getClass(), context);
-                    JsonObject obj;
-                    if (element.isJsonObject()) {
-                        obj = element.getAsJsonObject();
-                    } else {
-                        obj = new JsonObject();
-                        obj.add(JsonKeys.MATERIAL_ENTRY, element);
-                    }
-                    obj.addProperty(JsonKeys.MATERIAL_ENTRY_TYPE, entry.getElement().getSerializer().getRegistryName().toString());
-                    jsonArray.add(obj);
+                            .serialize(entry.getElement(), entry.getElement().getClass(), context));
                 }
                 JsonObject res = new JsonObject();
                 res.add(JsonKeys.MATERIAL_ENTRIES, jsonArray);

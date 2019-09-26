@@ -2,6 +2,7 @@ package com.direwolf20.buildinggadgets.api.serialisation;
 
 import com.direwolf20.buildinggadgets.api.building.Region;
 import com.direwolf20.buildinggadgets.api.materials.MaterialList;
+import com.direwolf20.buildinggadgets.api.util.JsonKeys;
 import com.direwolf20.buildinggadgets.api.util.NBTKeys;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Multiset;
@@ -198,8 +199,8 @@ public final class TemplateHeader {
                 .registerTypeAdapter(SerializerInfo.class, (JsonSerializer<SerializerInfo>) (src, typeOfSrc, context) -> {
                     if (src.getSubSerializer() != null) {
                         JsonObject obj = new JsonObject();
-                        obj.add("serializer", context.serialize(src.getSerializer()));
-                        obj.add("sub_serializer", context.serialize(src.getSubSerializer()));
+                        obj.add(JsonKeys.SERIALIZER_INFO_SERIALIZER, context.serialize(src.getSerializer()));
+                        obj.add(JsonKeys.SERIALIZER_INFO_SUB_SERIALIZER, context.serialize(src.getSubSerializer()));
                         return obj;
                     } else
                         return context.serialize(src.getSerializer());
