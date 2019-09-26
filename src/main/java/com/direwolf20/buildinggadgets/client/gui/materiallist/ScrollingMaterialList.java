@@ -1,10 +1,13 @@
 package com.direwolf20.buildinggadgets.client.gui.materiallist;
 
 import com.direwolf20.buildinggadgets.api.building.view.*;
+import com.direwolf20.buildinggadgets.api.exceptions.TemplateException;
+import com.direwolf20.buildinggadgets.api.materials.MaterialList;
 import com.direwolf20.buildinggadgets.api.materials.UniqueItem;
 import com.direwolf20.buildinggadgets.api.template.IBuildOpenOptions;
 import com.direwolf20.buildinggadgets.api.template.SimpleBuildOpenOptions;
 import com.direwolf20.buildinggadgets.client.gui.base.EntryList;
+import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.util.helpers.InventoryHelper;
 import com.google.common.collect.Multiset;
 import com.mojang.blaze3d.platform.GlStateManager;
@@ -53,14 +56,22 @@ class ScrollingMaterialList extends EntryList<Entry> {
                 .usedStack(gui.getTemplateItem())
                 .build(world);
         IBuildOpenOptions options = SimpleBuildOpenOptions.withContext(context);
-        IBuildView view = Objects.requireNonNull(gui.getTemplateCapability().createViewInContext(options));
-        Multiset<UniqueItem> materials = view.estimateRequiredItems().getRequiredItems();
-        for (Multiset.Entry<UniqueItem> entry : materials.entrySet()) {
-            UniqueItem item = entry.getElement();
-            addEntry(new Entry(this, item, entry.getCount(), InventoryHelper.countItem(item.toItemStack(), player, world)));
-        }
+        try (IBuildView view = Objects.requireNonNull(gui.getTemplateCapability().createViewInContext(options))) {
+            MaterialList materialList = gui.getTemplateHeader().getRequiredItems();
+            if (materialList == null) {
+                materialList = view.estimateRequiredItems();
+            }
+            Multiset<UniqueItem> materials = materialList.getRequiredItems();
+            for (Multiset.Entry<UniqueItem> entry : materials.entrySet()) {
+                UniqueItem item = entry.getElement();
+                addEntry(new Entry(this, item, entry.getCount(), InventoryHelper.countItem(item.toItemStack(), player, world)));
+            }
 
-        this.setSortingMode(SortingModes.NAME);
+            this.setSortingMode(SortingModes.NAME);
+        } catch (TemplateException e) {
+            BuildingGadgets.LOG.error("Error closing IBuildView", e);
+            Minecraft.getInstance().player.closeScreen();
+        }
     }
 
     @Override

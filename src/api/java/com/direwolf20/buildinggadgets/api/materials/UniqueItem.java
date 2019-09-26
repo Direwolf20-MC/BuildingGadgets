@@ -111,7 +111,11 @@ public final class UniqueItem {
     }
 
     public ItemStack toItemStack() {
-        return new ItemStack(item, 1, tagCompound);
+        ItemStack stack = new ItemStack(item, 1);
+        if (tagCompound != null) {
+            stack.setTag(tagCompound);
+        }
+        return stack;
     }
 
     public ResourceLocation getRegistryName() {

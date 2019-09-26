@@ -1,6 +1,8 @@
 package com.direwolf20.buildinggadgets.client.gui.materiallist;
 
 import com.direwolf20.buildinggadgets.api.capability.CapabilityTemplate;
+import com.direwolf20.buildinggadgets.api.materials.MaterialList;
+import com.direwolf20.buildinggadgets.api.serialisation.TemplateHeader;
 import com.direwolf20.buildinggadgets.api.template.ITemplate;
 import com.direwolf20.buildinggadgets.api.template.provider.ITemplateKey;
 import com.direwolf20.buildinggadgets.api.template.provider.ITemplateProvider;
@@ -23,7 +25,6 @@ import net.minecraftforge.fml.client.config.GuiUtils;
 
 import java.awt.*;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class MaterialListGUI extends Screen {
 
@@ -75,15 +76,6 @@ public class MaterialListGUI extends Screen {
     public static final int WINDOW_WIDTH = BACKGROUND_WIDTH - BORDER_SIZE * 2;
     public static final int WINDOW_HEIGHT = BACKGROUND_HEIGHT - BORDER_SIZE * 2;
 
-    // Item name (localized)
-    // Item count
-    public static final String PATTERN_SIMPLE = "%s: %d";
-    // Item name (localized)
-    // Item count
-    // Item registry name
-    // Formatted stack count, e.g. 5x64+2
-    public static final String PATTERN_DETAILED = "%s: %d (%s, %s)";
-
     private int backgroundX;
     private int backgroundY;
     private ItemStack item;
@@ -113,7 +105,13 @@ public class MaterialListGUI extends Screen {
         this.backgroundX = getXForAlignedCenter(0, width, BACKGROUND_WIDTH);
         this.backgroundY = getYForAlignedCenter(0, height, BACKGROUND_HEIGHT);
 
-        this.title = MaterialListTranslation.TITLE.format();
+        TemplateHeader header = getTemplateHeader();
+        String name = header.getName();
+        String author = header.getAuthor();
+        this.title = name == null && author == null ? MaterialListTranslation.TITLE_EMPTY.format()
+                : name == null ? MaterialListTranslation.TITLE_AUTHOR_ONLY.format(author)
+                : author == null ? MaterialListTranslation.TITLE_NAME_ONLY.format(name)
+                : MaterialListTranslation.TITLE.format(name, author);
         this.titleTop = getYForAlignedCenter(backgroundY, getWindowTopY() + ScrollingMaterialList.TOP, font.FONT_HEIGHT);
         this.titleLeft = getXForAlignedCenter(backgroundX, getWindowRightX(), font.getStringWidth(title));
 
@@ -148,21 +146,18 @@ public class MaterialListGUI extends Screen {
     }
 
     private String stringifyDetailed() {
-        return scrollingList.children().stream()
-                .map(entry -> String.format(PATTERN_DETAILED,
-                        entry.getItemName(),
-                        entry.getRequired(),
-                        entry.getStack().getItem().getRegistryName(),
-                        entry.getFormattedRequired()))
-                .collect(Collectors.joining("\n"));
+        MaterialList materialList = getTemplateHeader().getRequiredItems();
+        return materialList == null ? "" : materialList.stringifySimple();
     }
 
     private String stringifySimple() {
-        return scrollingList.children().stream()
-                .map(entry -> String.format(PATTERN_SIMPLE,
-                        entry.getItemName(),
-                        entry.getRequired()))
-                .collect(Collectors.joining("\n"));
+        MaterialList materialList = getTemplateHeader().getRequiredItems();
+        return materialList == null ? "" : materialList.stringifyDetailed();
+    }
+
+    public TemplateHeader getTemplateHeader() {
+        ITemplate template = getTemplateCapability();
+        return template.getSerializer().createHeaderFor(template);
     }
 
     @Override
@@ -180,14 +175,6 @@ public class MaterialListGUI extends Screen {
             GuiUtils.drawHoveringText(hoveringText, hoveringTextX, hoveringTextY, width, height, Integer.MAX_VALUE, font);
             hoveringText = null;
         }
-    }
-
-    /**
-     * {@inheritDoc} Override to make it visible to outside.
-     */
-    @Override
-    public void hLine(int p_hLine_1_, int p_hLine_2_, int p_hLine_3_, int p_hLine_4_) {
-        super.hLine(p_hLine_1_, p_hLine_2_, p_hLine_3_, p_hLine_4_);
     }
 
     private void calculateButtonsWidthAndX() {
