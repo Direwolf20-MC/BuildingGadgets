@@ -110,6 +110,14 @@ public final class UniqueItem {
         return item;
     }
 
+    public ItemStack toItemStack() {
+        ItemStack stack = new ItemStack(item, 1);
+        if (tagCompound != null) {
+            stack.setTag(tagCompound);
+        }
+        return stack;
+    }
+
     public ResourceLocation getRegistryName() {
         assert item.getRegistryName() != null; //tested in constructor
         return item.getRegistryName();

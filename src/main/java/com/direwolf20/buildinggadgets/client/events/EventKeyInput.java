@@ -1,6 +1,7 @@
 package com.direwolf20.buildinggadgets.client.events;
 
 import com.direwolf20.buildinggadgets.client.KeyBindings;
+import com.direwolf20.buildinggadgets.client.gui.GuiMod;
 import com.direwolf20.buildinggadgets.client.gui.ModeRadialMenu;
 import com.direwolf20.buildinggadgets.common.items.gadgets.AbstractGadget;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
@@ -44,9 +45,8 @@ public class EventKeyInput {
             PacketHandler.sendToServer(new PacketToggleFuzzy());
         } else if (KeyBindings.connectedArea.isPressed()) {
             PacketHandler.sendToServer(new PacketToggleConnectedArea());
+        } else if (KeyBindings.materialList.isPressed()) {
+            GuiMod.MATERIAL_LIST.openScreen(mc.player);
         }
-            //        } else if (KeyBindings.materialList.isPressed()) {
-//            GuiMod.MATERIAL_LIST.openScreen(mc.player);
-//        }
     }
 }

@@ -152,7 +152,11 @@
     "gui.buildinggadgets.materialList.button.sorting.missingAcse": "Missing ↓",
     "gui.buildinggadgets.materialList.button.sorting.missingDesc": "Missing ↑",
     "gui.buildinggadgets.materialList.message.copyList.success": "Successfully copied material list",
-    "gui.buildinggadgets.materialList.title": "Material List",
+    "gui.buildinggadgets.materialList.titleEmpty": "Material List",
+    "gui.buildinggadgets.materialList.titleNameOnly": "Material List for %s",
+    "gui.buildinggadgets.materialList.titleAuthorOnly": "Material List by %s",
+    "gui.buildinggadgets.materialList.title": "Material List for %s by %s",
+    "gui.buildinggadgets.materialList.help.copyList": "Copy a text version of the material list.\nPress Ctrl/Command to create a detailed version with code names",
 
     "_comment": "gui - help:",
     "gui.buildinggadgets.help.area.arrow.data_flow": "Represents the flow of data from one item to another; either from a template to a gadget/template, or from a gadget/template to a template or piece of paper",
