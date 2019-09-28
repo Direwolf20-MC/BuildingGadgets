@@ -53,6 +53,7 @@ public final class PlacementScheduler extends SteppedScheduler {
                 throw new RuntimeException("Attempt to close Template-IBuildView failed!", e);
             }
         }
+        finisher.run();
     }
 
     @Override

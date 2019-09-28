@@ -88,6 +88,10 @@ class ScrollingMaterialList extends EntryList<Entry> {
         super.render(mouseX, mouseY, partialTicks);
     }
 
+    public void reset() {
+        multisetIterator = null;
+    }
+
     static class Entry extends ExtendedList.AbstractListEntry<Entry> {
 
         private ScrollingMaterialList parent;

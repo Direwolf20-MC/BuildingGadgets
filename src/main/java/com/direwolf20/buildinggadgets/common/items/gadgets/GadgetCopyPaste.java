@@ -29,10 +29,6 @@ import com.direwolf20.buildinggadgets.common.items.gadgets.renderers.BaseRendere
 import com.direwolf20.buildinggadgets.common.items.gadgets.renderers.CopyPasteRender;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketBindTool;
-import com.direwolf20.buildinggadgets.common.network.packets.PacketBlockMap;
-import com.direwolf20.buildinggadgets.common.network.packets.PacketRotateMirror;
-import com.direwolf20.buildinggadgets.common.registry.OurItems;
-import com.direwolf20.buildinggadgets.common.tiles.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.save.SaveManager;
 import com.direwolf20.buildinggadgets.common.save.UndoWorldSave;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
@@ -466,7 +462,7 @@ public class GadgetCopyPaste extends AbstractGadget {
 
     private void onCopyFinished(ItemStack stack, PlayerEntity player) {
         sendMessageAndFree(stack, player, MessageTranslation.AREA_COPIED, Styles.DK_GREEN);
-        SaveManager.INSTANCE.getTemplateProvider().requestUpdate(stack.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY)
+        SaveManager.INSTANCE.getTemplateProvider().requestRemoteUpdate(stack.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY)
                 .orElseThrow(CapabilityNotPresentException::new), (ServerPlayerEntity) player);
     }
 

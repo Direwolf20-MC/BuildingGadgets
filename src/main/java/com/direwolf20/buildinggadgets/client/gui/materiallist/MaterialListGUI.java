@@ -109,7 +109,7 @@ public class MaterialListGUI extends Screen implements ITemplateProvider.IUpdate
         this.backgroundY = getYForAlignedCenter(0, height, BACKGROUND_HEIGHT);
 
         header = evaluateTemplateHeader();
-
+        evaluateTitle();
         this.scrollingList = new ScrollingMaterialList(this);
         // Make it receive mouse scroll events, so that the player can use his mouse wheel at the start
         this.setFocused(scrollingList);
@@ -141,11 +141,11 @@ public class MaterialListGUI extends Screen implements ITemplateProvider.IUpdate
     }
 
     private String stringifyDetailed() {
-        return evaluateTemplateHeader().toJson(true, true);
+        return evaluateTemplateHeader().toJson(false, true);
     }
 
     private String stringifySimple() {
-        return evaluateTemplateHeader().toJson(true, false);
+        return evaluateTemplateHeader().toJson(false, false);
     }
 
     public TemplateHeader evaluateTemplateHeader() {
@@ -256,6 +256,8 @@ public class MaterialListGUI extends Screen implements ITemplateProvider.IUpdate
             UUID itemId = provider.getId(itemKey);
             if (keyId.equals(itemId)) {
                 header = evaluateTemplateHeader();
+                evaluateTitle();
+                scrollingList.reset();
             }
         });
     }

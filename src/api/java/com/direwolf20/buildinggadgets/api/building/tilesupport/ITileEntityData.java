@@ -7,17 +7,11 @@ import com.direwolf20.buildinggadgets.api.materials.UniqueItem;
 import com.direwolf20.buildinggadgets.api.serialisation.ITileDataSerializer;
 import com.google.common.collect.Multiset;
 import net.minecraft.block.BlockState;
-import net.minecraft.enchantment.Enchantments;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.world.server.ServerWorld;
-import net.minecraft.world.storage.loot.LootContext.Builder;
-import net.minecraft.world.storage.loot.LootParameters;
 
 import javax.annotation.Nullable;
-import java.util.List;
 
 /**
  * Represents the serializable data of an {@link net.minecraft.tileentity.TileEntity}. It also provides actions which can be performed on the
@@ -67,8 +61,9 @@ public interface ITileEntityData {
      * @return A {@link Multiset} of required Items.
      */
     default MaterialList getRequiredItems(IBuildContext context, BlockState state, @Nullable RayTraceResult target, @Nullable BlockPos pos) {
+        /*
         if (context.getWorld() instanceof ServerWorld) {
-            ItemStack stack = context.getUsedStack().isEmpty() ? new ItemStack(Items.DIAMOND_PICKAXE) : context.getUsedStack();
+            ItemStack stack = context.getUsedStack().isEmpty() ? new ItemStack(Items.DIAMOND_PICKAXE) : context.getUsedStack().copy();
             stack.addEnchantment(Enchantments.SILK_TOUCH, 1);
             List<ItemStack> drops = state.getDrops(new Builder((ServerWorld) context.getWorld())
                     .withParameter(LootParameters.POSITION, pos != null ? pos : BlockPos.ZERO)
@@ -79,7 +74,7 @@ public interface ITileEntityData {
                 builder.add(UniqueItem.ofStack(drop));
             }
             return builder.build();
-        }
+        }*/
         ItemStack stack = null;
         try {
             stack = state.getBlock().getPickBlock(state, target, context.getWorld(), pos, context.getBuildingPlayer());
@@ -87,7 +82,7 @@ public interface ITileEntityData {
             BuildingGadgetsAPI.LOG.trace("Failed to retrieve pickBlock for {}.", state, e);
         }
         if (stack == null)
-            stack = new ItemStack(state.getBlock().asItem());
+            stack = new ItemStack(state.getBlock());
         if (stack.isEmpty())
             return MaterialList.empty();
         return MaterialList.of(UniqueItem.ofStack(stack));
