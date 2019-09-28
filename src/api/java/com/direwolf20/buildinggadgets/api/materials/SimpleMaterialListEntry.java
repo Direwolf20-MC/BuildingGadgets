@@ -96,7 +96,7 @@ class SimpleMaterialListEntry implements MaterialListEntry<SimpleMaterialListEnt
                             .asJsonSerializer(entry.getCount(), printName, extended)
                             .serialize(entry.getElement(), entry.getElement().getClass(), context);
                     JsonObject obj = new JsonObject();
-                    obj.add(JsonKeys.MATERIAL_LIST_ITEM_TYPE, context.serialize(getRegistryName()));
+                    obj.add(JsonKeys.MATERIAL_LIST_ITEM_TYPE, context.serialize(entry.getElement().getSerializer().getRegistryName()));
                     obj.add(JsonKeys.MATERIAL_LIST_ITEM, element);
                     jsonArray.add(obj);
                 }

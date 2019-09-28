@@ -10,6 +10,8 @@ public final class JsonKeys {
     public static final String MATERIAL_LIST_ITEM_NBT_MATCH = "nbt_match_type";
     public static final String MATERIAL_LIST_CAP_NBT = "cap_nbt";
     public static final String MATERIAL_LIST_CAP_NBT_MATCH = "cap_nbt_match_type";
+    public static final String MATERIAL_LIST_ROOT_TYPE = "root_type";
+    public static final String MATERIAL_LIST_ROOT_ENTRY = "root_entry";
     public static final String MATERIAL_ENTRIES = "entries";
     public static final String MATERIAL_ENTRY = "entry";
     public static final String MATERIAL_ENTRY_TYPE = "type";

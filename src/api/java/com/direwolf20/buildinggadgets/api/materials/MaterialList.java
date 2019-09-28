@@ -1,18 +1,23 @@
 package com.direwolf20.buildinggadgets.api.materials;
 
+import com.direwolf20.buildinggadgets.api.util.JsonKeys;
 import com.direwolf20.buildinggadgets.api.util.NBTKeys;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.*;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMultiset;
+import com.google.common.collect.Multiset;
+import com.google.common.collect.PeekingIterator;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
-import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ResourceLocation;
 
 import java.lang.reflect.Type;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.Objects;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 
 public final class MaterialList implements Iterable<ImmutableMultiset<UniqueItem>> { //Todo fully implement MaterialList system
@@ -123,34 +128,6 @@ public final class MaterialList implements Iterable<ImmutableMultiset<UniqueItem
                 ((SimpleMaterialListEntry) rootEntry);
         return simpleEntry.getItems();
     }
-
-//    public String stringifySimple() {
-//        return requiredItems.entrySet().stream()
-//                .map(entry -> String.format(PATTERN_SIMPLE,
-//                        entry.getElement().getItem().getDisplayName(entry.getElement().toItemStack()),
-//                        entry.getCount()))
-//                .collect(Collectors.joining("\n"));
-//    }
-//
-//    public String stringifyDetailed() {
-//        return requiredItems.entrySet().stream()
-//                .map(entry -> {
-//                    UniqueItem item = entry.getElement();
-//                    ItemStack stack = item.toItemStack();
-//                    int required = entry.getCount();
-//                    return String.format(PATTERN_DETAILED, stack, required, item.getRegistryName(), getFormattedRequired(stack, required));
-//                })
-//                .collect(Collectors.joining("\n"));
-//    }
-//
-//    private String getFormattedRequired(ItemStack stack, int required) {
-//        int maxSize = stack.getMaxStackSize();
-//        int stacks = required / maxSize; // Integer division automatically floors
-//        int leftover = required % maxSize;
-//        if (stacks == 0)
-//            return String.valueOf(leftover);
-//        return stacks + "×" + maxSize + "+" + leftover;
-//    }
 
     public CompoundNBT serialize(boolean persisted) {
         return writeEntry(rootEntry, persisted);
@@ -284,7 +261,10 @@ public final class MaterialList implements Iterable<ImmutableMultiset<UniqueItem
         @Override
         @SuppressWarnings("unchecked") // only called on the entry itself... this is ok
         public JsonElement serialize(MaterialList src, Type typeOfSrc, JsonSerializationContext context) {
-            return src.getRootEntry().getSerializer().asJsonSerializer(printName, extended).serialize(src.getRootEntry(), src.getRootEntry().getClass(), context);
+            JsonObject res = new JsonObject();
+            res.add(JsonKeys.MATERIAL_LIST_ROOT_TYPE, context.serialize(src.getRootEntry().getSerializer().getRegistryName()));
+            res.add(JsonKeys.MATERIAL_LIST_ROOT_ENTRY, src.getRootEntry().getSerializer().asJsonSerializer(printName, extended).serialize(src.getRootEntry(), src.getRootEntry().getClass(), context));
+            return res;
         }
     }
 }

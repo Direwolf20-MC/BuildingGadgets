@@ -107,12 +107,12 @@ public final class TemplateHeader {
     private final String name;
     @Nullable
     private final String author;
-    @Nullable
-    private final MaterialList requiredItems;
-    @Nonnull
-    private final SerializerInfo serializer;
     @Nonnull
     private final Region boundingBox;
+    @Nonnull
+    private final SerializerInfo serializer;
+    @Nullable
+    private final MaterialList requiredItems;
 
     private TemplateHeader(@Nullable String name, @Nullable String author, @Nullable MaterialList requiredItems, @Nonnull SerializerInfo serializer, @Nonnull Region boundingBox) {
         this.name = name;
