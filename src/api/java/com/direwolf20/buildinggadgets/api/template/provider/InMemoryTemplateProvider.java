@@ -16,8 +16,12 @@ public class InMemoryTemplateProvider implements ITemplateProvider {
 
     @Override
     public ITemplate getTemplateForKey(ITemplateKey key) {
-        UUID id = key.getTemplateId(this::requestFreeId);
-        return map.computeIfAbsent(id, key::createTemplate);
+        return map.computeIfAbsent(getId(key), key::createTemplate);
+    }
+
+    @Override
+    public UUID getId(ITemplateKey key) {
+        return key.getTemplateId(this::requestFreeId);
     }
 
     @Override
@@ -42,5 +46,15 @@ public class InMemoryTemplateProvider implements ITemplateProvider {
     private UUID requestFreeId() {
         UUID res = UUID.randomUUID();
         return map.containsKey(res) ? requestFreeId() : res;
+    }
+
+    @Override
+    public void registerUpdateListener(IUpdateListener listener) {
+
+    }
+
+    @Override
+    public void removeUpdateListener(IUpdateListener listener) {
+
     }
 }

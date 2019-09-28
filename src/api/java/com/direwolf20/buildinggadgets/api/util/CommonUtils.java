@@ -7,7 +7,6 @@ import com.direwolf20.buildinggadgets.api.building.Region;
 import com.direwolf20.buildinggadgets.api.building.placement.IPositionPlacementSequence;
 import com.direwolf20.buildinggadgets.api.building.view.IBuildContext;
 import com.direwolf20.buildinggadgets.api.materials.MaterialList;
-import com.direwolf20.buildinggadgets.api.materials.MaterialList.SimpleBuilder;
 import com.google.common.collect.ImmutableMap;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Direction;
@@ -156,10 +155,10 @@ public final class CommonUtils {
     }
 
     public static MaterialList estimateRequiredItems(Iterable<PlacementTarget> buildView, IBuildContext context, @Nullable Vec3d simulatePos) {
-        SimpleBuilder builder = MaterialList.simpleBuilder();
+        MaterialList.SubEntryBuilder builder = MaterialList.andBuilder();
         for (PlacementTarget placementTarget : buildView) {
             BlockRayTraceResult target = simulatePos != null ? CommonUtils.fakeRayTrace(simulatePos, placementTarget.getPos()) : null;
-            builder.addAll(placementTarget.getRequiredItems(context, target).getRequiredItems().asList());
+            builder.add(placementTarget.getRequiredItems(context, target));
         }
         return builder.build();
     }

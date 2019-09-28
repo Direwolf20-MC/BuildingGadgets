@@ -3,23 +3,25 @@ package com.direwolf20.buildinggadgets.client.cache;
 import com.direwolf20.buildinggadgets.api.template.ITemplate;
 import com.direwolf20.buildinggadgets.api.template.provider.ITemplateKey;
 import com.direwolf20.buildinggadgets.api.template.provider.ITemplateProvider;
+import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketRequestTemplate;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketTemplateIdAllocated;
 import com.direwolf20.buildinggadgets.common.network.packets.SplitPacketUpdateTemplate;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import org.apache.logging.log4j.util.TriConsumer;
 
 import javax.annotation.Nonnull;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 
 public final class CacheTemplateProvider implements ITemplateProvider {
     private final Cache<UUID, ITemplate> cache;
     private final Set<UUID> allocatedIds;
+    private final Set<IUpdateListener> updateListeners;
 
     public CacheTemplateProvider() {
         this.cache = CacheBuilder
@@ -27,12 +29,13 @@ public final class CacheTemplateProvider implements ITemplateProvider {
                 .expireAfterAccess(1, TimeUnit.MINUTES)
                 .build();
         this.allocatedIds = new HashSet<>();
+        this.updateListeners = Collections.newSetFromMap(new WeakHashMap<>());
     }
 
     @Override
     @Nonnull
     public ITemplate getTemplateForKey(@Nonnull ITemplateKey key) {
-        UUID id = key.getTemplateId(this::getFreeId);
+        UUID id = getId(key);
         try {
             return cache.get(id, () -> {
                 requestUpdate(id);
@@ -45,9 +48,10 @@ public final class CacheTemplateProvider implements ITemplateProvider {
 
     @Override
     public void setTemplate(ITemplateKey key, ITemplate template) {
-        UUID id = key.getTemplateId(this::getFreeId);
+        UUID id = getId(key);
         allocatedIds.add(id);
         cache.put(id, template);
+        notifyListeners(key, template, l -> l::onTemplateUpdate);
     }
 
     @Override
@@ -62,11 +66,28 @@ public final class CacheTemplateProvider implements ITemplateProvider {
 
     @Override
     public boolean requestRemoteUpdate(ITemplateKey key) {
-        UUID id = key.getTemplateId(this::getFreeId);
+        UUID id = getId(key);
         ITemplate template = cache.getIfPresent(id);
-        if (template != null)
+        if (template != null) {
+            notifyListeners(key, template, l -> l::onTemplateUpdateSend);
             PacketHandler.getSplitManager().sendToServer(new SplitPacketUpdateTemplate(id, template));
+        }
         return template != null;
+    }
+
+    @Override
+    public void registerUpdateListener(IUpdateListener listener) {
+        updateListeners.add(listener);
+    }
+
+    @Override
+    public void removeUpdateListener(IUpdateListener listener) {
+        updateListeners.remove(listener);
+    }
+
+    @Override
+    public UUID getId(ITemplateKey key) {
+        return key.getTemplateId(this::getFreeId);
     }
 
     public void onRemoteIdAllocated(UUID id) {
@@ -94,5 +115,15 @@ public final class CacheTemplateProvider implements ITemplateProvider {
         this.cache.invalidateAll();
         this.cache.cleanUp();
         this.allocatedIds.clear();
+    }
+
+    private void notifyListeners(ITemplateKey key, ITemplate template, Function<IUpdateListener, TriConsumer<ITemplateProvider, ITemplateKey, ITemplate>> function) {
+        for (IUpdateListener listener : updateListeners) {
+            try {
+                function.apply(listener).accept(this, key, template);
+            } catch (Exception e) {
+                BuildingGadgets.LOG.error("Update listener threw an exception!", e);
+            }
+        }
     }
 }

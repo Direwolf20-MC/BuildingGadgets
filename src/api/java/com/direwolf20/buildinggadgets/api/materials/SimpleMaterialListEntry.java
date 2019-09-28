@@ -6,6 +6,7 @@ import com.direwolf20.buildinggadgets.api.util.NBTKeys;
 import com.google.common.collect.*;
 import com.google.common.collect.Multiset.Entry;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializer;
 import net.minecraft.nbt.CompoundNBT;
@@ -90,14 +91,16 @@ class SimpleMaterialListEntry implements MaterialListEntry<SimpleMaterialListEnt
                 Multiset<UniqueItem> set = src.getItems();
                 JsonArray jsonArray = new JsonArray();
                 for (Entry<UniqueItem> entry : ImmutableList.sortedCopyOf(COMPARATOR, set.entrySet())) {
-                    jsonArray.add(entry.getElement()
+                    JsonElement element = entry.getElement()
                             .getSerializer()
                             .asJsonSerializer(entry.getCount(), printName, extended)
-                            .serialize(entry.getElement(), entry.getElement().getClass(), context));
+                            .serialize(entry.getElement(), entry.getElement().getClass(), context);
+                    JsonObject obj = new JsonObject();
+                    obj.add(JsonKeys.MATERIAL_LIST_ITEM_TYPE, context.serialize(getRegistryName()));
+                    obj.add(JsonKeys.MATERIAL_LIST_ITEM, element);
+                    jsonArray.add(obj);
                 }
-                JsonObject res = new JsonObject();
-                res.add(JsonKeys.MATERIAL_ENTRIES, jsonArray);
-                return res;
+                return jsonArray;
             };
         }
     }

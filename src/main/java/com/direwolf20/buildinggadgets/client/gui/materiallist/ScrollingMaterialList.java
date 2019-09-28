@@ -1,34 +1,31 @@
 package com.direwolf20.buildinggadgets.client.gui.materiallist;
 
-import com.direwolf20.buildinggadgets.api.building.view.*;
-import com.direwolf20.buildinggadgets.api.exceptions.TemplateException;
 import com.direwolf20.buildinggadgets.api.materials.MaterialList;
 import com.direwolf20.buildinggadgets.api.materials.UniqueItem;
-import com.direwolf20.buildinggadgets.api.template.IBuildOpenOptions;
-import com.direwolf20.buildinggadgets.api.template.SimpleBuildOpenOptions;
 import com.direwolf20.buildinggadgets.client.gui.base.EntryList;
-import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.util.helpers.InventoryHelper;
+import com.google.common.collect.ImmutableMultiset;
+import com.google.common.collect.Iterators;
 import com.google.common.collect.Multiset;
 import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.client.gui.widget.list.ExtendedList;
 import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import org.lwjgl.glfw.GLFW;
 
 import java.awt.*;
-import java.util.Objects;
+import java.util.Iterator;
 
 import static com.direwolf20.buildinggadgets.client.gui.materiallist.MaterialListGUI.*;
 import static com.direwolf20.buildinggadgets.client.gui.materiallist.ScrollingMaterialList.Entry;
 import static org.lwjgl.opengl.GL11.*;
 
 class ScrollingMaterialList extends EntryList<Entry> {
-
+    private static final int UPDATE_MILLIS = 1000;
     static final int TOP = 16;
     static final int BOTTOM = 32;
 
@@ -40,6 +37,8 @@ class ScrollingMaterialList extends EntryList<Entry> {
     private MaterialListGUI gui;
 
     private SortingModes sortingMode;
+    private long lastUpdate;
+    private Iterator<ImmutableMultiset<UniqueItem>> multisetIterator;
 
     public ScrollingMaterialList(MaterialListGUI gui) {
         super(gui.getWindowLeftX(),
@@ -48,30 +47,24 @@ class ScrollingMaterialList extends EntryList<Entry> {
                 gui.getWindowHeight() - TOP - BOTTOM,
                 ENTRY_HEIGHT);
         this.gui = gui;
+        this.setSortingMode(SortingModes.NAME);
+        updateEntries();
+    }
 
-        World world = Minecraft.getInstance().world;
-        ClientPlayerEntity player = Minecraft.getInstance().player;
-        IBuildContext context = SimpleBuildContext.builder()
-                .buildingPlayer(player)
-                .usedStack(gui.getTemplateItem())
-                .build(world);
-        IBuildOpenOptions options = SimpleBuildOpenOptions.withContext(context);
-        try (IBuildView view = Objects.requireNonNull(gui.getTemplateCapability().createViewInContext(options))) {
-            MaterialList materialList = gui.getTemplateHeader().getRequiredItems();
-            if (materialList == null) {
-                materialList = view.estimateRequiredItems();
-            }
-            Multiset<UniqueItem> materials = materialList.getRequiredItems();
-            for (Multiset.Entry<UniqueItem> entry : materials.entrySet()) {
-                UniqueItem item = entry.getElement();
-                addEntry(new Entry(this, item, entry.getCount(), InventoryHelper.countItem(item.toItemStack(), player, world)));
-            }
-
-            this.setSortingMode(SortingModes.NAME);
-        } catch (TemplateException e) {
-            BuildingGadgets.LOG.error("Error closing IBuildView", e);
-            Minecraft.getInstance().player.closeScreen();
+    private void updateEntries() {
+        this.lastUpdate = System.currentTimeMillis();
+        this.clearEntries();
+        if (multisetIterator == null || ! multisetIterator.hasNext()) {
+            MaterialList list = gui.getHeader().getRequiredItems();
+            multisetIterator = list != null ? list.iterator() : Iterators.singletonIterator(ImmutableMultiset.of());
         }
+        PlayerEntity player = Minecraft.getInstance().player;
+        World world = Minecraft.getInstance().world;
+        for (Multiset.Entry<UniqueItem> entry : multisetIterator.next().entrySet()) {
+            UniqueItem item = entry.getElement();
+            addEntry(new Entry(this, item, entry.getCount(), InventoryHelper.countItem(item.toItemStack(), player, world)));
+        }
+        sort();
     }
 
     @Override
@@ -86,6 +79,13 @@ class ScrollingMaterialList extends EntryList<Entry> {
             return true;
         }
         return super.keyPressed(keyCode, scanCode, modifiers);
+    }
+
+    @Override
+    public void render(int mouseX, int mouseY, float partialTicks) {
+        if (lastUpdate + UPDATE_MILLIS < System.currentTimeMillis())
+            updateEntries();
+        super.render(mouseX, mouseY, partialTicks);
     }
 
     static class Entry extends ExtendedList.AbstractListEntry<Entry> {
@@ -230,6 +230,10 @@ class ScrollingMaterialList extends EntryList<Entry> {
 
     public void setSortingMode(SortingModes sortingMode) {
         this.sortingMode = sortingMode;
+        sort();
+    }
+
+    private void sort() {
         children().sort(sortingMode.getComparator());
     }
 }

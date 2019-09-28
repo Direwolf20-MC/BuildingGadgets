@@ -5,14 +5,19 @@ import com.direwolf20.buildinggadgets.api.building.view.IBuildContext;
 import com.direwolf20.buildinggadgets.api.materials.MaterialList;
 import com.direwolf20.buildinggadgets.api.materials.UniqueItem;
 import com.direwolf20.buildinggadgets.api.serialisation.ITileDataSerializer;
-import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.Multiset;
 import net.minecraft.block.BlockState;
+import net.minecraft.enchantment.Enchantments;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.storage.loot.LootContext.Builder;
+import net.minecraft.world.storage.loot.LootParameters;
 
 import javax.annotation.Nullable;
+import java.util.List;
 
 /**
  * Represents the serializable data of an {@link net.minecraft.tileentity.TileEntity}. It also provides actions which can be performed on the
@@ -62,6 +67,19 @@ public interface ITileEntityData {
      * @return A {@link Multiset} of required Items.
      */
     default MaterialList getRequiredItems(IBuildContext context, BlockState state, @Nullable RayTraceResult target, @Nullable BlockPos pos) {
+        if (context.getWorld() instanceof ServerWorld) {
+            ItemStack stack = context.getUsedStack().isEmpty() ? new ItemStack(Items.DIAMOND_PICKAXE) : context.getUsedStack();
+            stack.addEnchantment(Enchantments.SILK_TOUCH, 1);
+            List<ItemStack> drops = state.getDrops(new Builder((ServerWorld) context.getWorld())
+                    .withParameter(LootParameters.POSITION, pos != null ? pos : BlockPos.ZERO)
+                    .withParameter(LootParameters.TOOL, stack)
+                    .withParameter(LootParameters.BLOCK_STATE, state));
+            MaterialList.SimpleBuilder builder = MaterialList.simpleBuilder();
+            for (ItemStack drop : drops) {
+                builder.add(UniqueItem.ofStack(drop));
+            }
+            return builder.build();
+        }
         ItemStack stack = null;
         try {
             stack = state.getBlock().getPickBlock(state, target, context.getWorld(), pos, context.getBuildingPlayer());
@@ -72,6 +90,6 @@ public interface ITileEntityData {
             stack = new ItemStack(state.getBlock().asItem());
         if (stack.isEmpty())
             return MaterialList.empty();
-        return MaterialList.simpleBuilder().addAll(ImmutableMultiset.of(new UniqueItem(stack.getItem(), stack.getTag()))).build();
+        return MaterialList.of(UniqueItem.ofStack(stack));
     }
 }

@@ -5,7 +5,11 @@ import com.direwolf20.buildinggadgets.api.template.ITemplate;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.NonNullSupplier;
 
+import java.util.UUID;
+
 public interface ITemplateProvider {
+    UUID getId(ITemplateKey key);
+
     ITemplate getTemplateForKey(ITemplateKey key);
 
     default <T extends Throwable> ITemplate getTemplateForKey(ICapabilityProvider provider, NonNullSupplier<? extends T> exceptionSupplier) throws T {
@@ -27,4 +31,23 @@ public interface ITemplateProvider {
     boolean requestUpdate(ITemplateKey key);
 
     boolean requestRemoteUpdate(ITemplateKey key);
+
+    /**
+     * Registers an Update Listener - it will only be weakly referenced!
+     */
+    void registerUpdateListener(IUpdateListener listener);
+
+    void removeUpdateListener(IUpdateListener listener);
+
+    interface IUpdateListener {
+        default void onTemplateUpdate(ITemplateProvider provider, ITemplateKey key, ITemplate template) {
+
+        }
+
+        default void onTemplateUpdateSend(ITemplateProvider provider, ITemplateKey key, ITemplate template) {
+
+        }
+
+
+    }
 }

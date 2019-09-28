@@ -1,7 +1,8 @@
 package com.direwolf20.buildinggadgets.client.gui.materiallist;
 
+import com.direwolf20.buildinggadgets.api.building.view.IBuildContext;
+import com.direwolf20.buildinggadgets.api.building.view.SimpleBuildContext;
 import com.direwolf20.buildinggadgets.api.capability.CapabilityTemplate;
-import com.direwolf20.buildinggadgets.api.materials.MaterialList;
 import com.direwolf20.buildinggadgets.api.serialisation.TemplateHeader;
 import com.direwolf20.buildinggadgets.api.template.ITemplate;
 import com.direwolf20.buildinggadgets.api.template.provider.ITemplateKey;
@@ -25,8 +26,9 @@ import net.minecraftforge.fml.client.config.GuiUtils;
 
 import java.awt.*;
 import java.util.List;
+import java.util.UUID;
 
-public class MaterialListGUI extends Screen {
+public class MaterialListGUI extends Screen implements ITemplateProvider.IUpdateListener {
 
     public static int getXForAlignedRight(int right, int width) {
         return right - width;
@@ -93,6 +95,7 @@ public class MaterialListGUI extends Screen {
     private int hoveringTextX;
     private int hoveringTextY;
     private List<String> hoveringText;
+    private TemplateHeader header;
 
     public MaterialListGUI(ItemStack item) {
         super(MaterialListTranslation.TITLE.componentTranslation());
@@ -105,15 +108,7 @@ public class MaterialListGUI extends Screen {
         this.backgroundX = getXForAlignedCenter(0, width, BACKGROUND_WIDTH);
         this.backgroundY = getYForAlignedCenter(0, height, BACKGROUND_HEIGHT);
 
-        TemplateHeader header = getTemplateHeader();
-        String name = header.getName();
-        String author = header.getAuthor();
-        this.title = name == null && author == null ? MaterialListTranslation.TITLE_EMPTY.format()
-                : name == null ? MaterialListTranslation.TITLE_AUTHOR_ONLY.format(author)
-                : author == null ? MaterialListTranslation.TITLE_NAME_ONLY.format(name)
-                : MaterialListTranslation.TITLE.format(name, author);
-        this.titleTop = getYForAlignedCenter(backgroundY, getWindowTopY() + ScrollingMaterialList.TOP, font.FONT_HEIGHT);
-        this.titleLeft = getXForAlignedCenter(backgroundX, getWindowRightX(), font.getStringWidth(title));
+        header = evaluateTemplateHeader();
 
         this.scrollingList = new ScrollingMaterialList(this);
         // Make it receive mouse scroll events, so that the player can use his mouse wheel at the start
@@ -146,18 +141,24 @@ public class MaterialListGUI extends Screen {
     }
 
     private String stringifyDetailed() {
-        MaterialList materialList = getTemplateHeader().getRequiredItems();
-        return materialList == null ? "" : materialList.stringifySimple();
+        return evaluateTemplateHeader().toJson(true, true);
     }
 
     private String stringifySimple() {
-        MaterialList materialList = getTemplateHeader().getRequiredItems();
-        return materialList == null ? "" : materialList.stringifyDetailed();
+        return evaluateTemplateHeader().toJson(true, false);
     }
 
-    public TemplateHeader getTemplateHeader() {
+    public TemplateHeader evaluateTemplateHeader() {
         ITemplate template = getTemplateCapability();
-        return template.getSerializer().createHeaderFor(template);
+        IBuildContext context = SimpleBuildContext.builder()
+                .buildingPlayer(getMinecraft().player)
+                .usedStack(getTemplateItem())
+                .build(getMinecraft().world);
+        return template.getSerializer().createHeaderAndTryForceMaterials(template, context);
+    }
+
+    public TemplateHeader getHeader() {
+        return header;
     }
 
     @Override
@@ -227,8 +228,9 @@ public class MaterialListGUI extends Screen {
         LazyOptional<ITemplateProvider> providerCap = Minecraft.getInstance().world.getCapability(CapabilityTemplate.TEMPLATE_PROVIDER_CAPABILITY);
         if (providerCap.isPresent()) {
             LazyOptional<ITemplateKey> keyCap = item.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY);
+            ITemplateProvider provider = providerCap.orElseThrow(RuntimeException::new);
             if (keyCap.isPresent()) {
-                ITemplateProvider provider = providerCap.orElseThrow(RuntimeException::new);
+                provider.registerUpdateListener(this);
                 ITemplateKey key = keyCap.orElseThrow(RuntimeException::new);
                 return provider.getTemplateForKey(key);
             }
@@ -247,4 +249,25 @@ public class MaterialListGUI extends Screen {
         hoveringText = text;
     }
 
+    @Override
+    public void onTemplateUpdate(ITemplateProvider provider, ITemplateKey key, ITemplate template) {
+        item.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(itemKey -> {
+            UUID keyId = provider.getId(key);
+            UUID itemId = provider.getId(itemKey);
+            if (keyId.equals(itemId)) {
+                header = evaluateTemplateHeader();
+            }
+        });
+    }
+
+    private void evaluateTitle() {
+        String name = getHeader().getName();
+        String author = getHeader().getAuthor();
+        this.title = name == null && author == null ? MaterialListTranslation.TITLE_EMPTY.format()
+                : name == null ? MaterialListTranslation.TITLE_AUTHOR_ONLY.format(author)
+                : author == null ? MaterialListTranslation.TITLE_NAME_ONLY.format(name)
+                : MaterialListTranslation.TITLE.format(name, author);
+        this.titleTop = getYForAlignedCenter(backgroundY, getWindowTopY() + ScrollingMaterialList.TOP, font.FONT_HEIGHT);
+        this.titleLeft = getXForAlignedCenter(backgroundX, getWindowRightX(), font.getStringWidth(title));
+    }
 }

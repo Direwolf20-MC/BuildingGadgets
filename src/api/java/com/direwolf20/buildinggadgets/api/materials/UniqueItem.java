@@ -77,6 +77,12 @@ public final class UniqueItem {
 
     public static final Serializer SERIALIZER = new Serializer().setRegistryName(NBTKeys.SIMPLE_UNIQUE_ITEM_ID_RL);
 
+    public static UniqueItem ofStack(ItemStack stack) {
+        CompoundNBT nbt = new CompoundNBT();
+        stack.write(nbt);
+        return new UniqueItem(stack.getItem(), stack.getTag(), ComparisonMode.EXACT_MATCH, nbt.getCompound("ForgeCaps"), ComparisonMode.EXACT_MATCH);
+    }
+
     private final Item item;
     @Nullable
     private final CompoundNBT tagCompound;
@@ -226,7 +232,6 @@ public final class UniqueItem {
             return (element, typeOfSrc, context) -> {
                 JsonObject obj = new JsonObject();
                 Item item = element.getItem();
-                obj.add(JsonKeys.MATERIAL_ENTRY_TYPE, context.serialize(getRegistryName()));
                 if (printName)
                     obj.addProperty(JsonKeys.MATERIAL_LIST_ITEM_NAME, I18n.format(item.getTranslationKey(element.createStack(count))));
                 obj.add(JsonKeys.MATERIAL_LIST_ITEM_ID, context.serialize(element.getRegistryName()));

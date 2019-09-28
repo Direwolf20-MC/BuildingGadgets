@@ -138,17 +138,13 @@ abstract class SubMaterialListEntry implements MaterialListEntry<SubMaterialList
                 src.getAllSubEntries().forEach((MaterialListEntry entry) -> {
                     @SuppressWarnings("unchecked") //I ignore generics on purpose here, as this will always be the correct type - it's it's own serializer
                     JsonElement element = entry.getSerializer().asJsonSerializer(printName, extended).serialize(entry, entry.getClass(), context);
-                    JsonObject obj;
-                    if (element.isJsonObject() && ! element.getAsJsonObject().has(JsonKeys.MATERIAL_ENTRY_TYPE)) {
-                        obj = element.getAsJsonObject();
-                    } else if (element.isJsonArray()) {
-                        obj = new JsonObject();
+                    JsonObject obj = new JsonObject();
+                    obj.add(JsonKeys.MATERIAL_ENTRY_TYPE, context.serialize(entry.getSerializer().getRegistryName()));
+                    if (element.isJsonArray()) {
                         obj.add(JsonKeys.MATERIAL_ENTRIES, element.getAsJsonArray());
                     } else {
-                        obj = new JsonObject();
                         obj.add(JsonKeys.MATERIAL_ENTRY, element);
                     }
-                    obj.add(JsonKeys.MATERIAL_ENTRY_TYPE, context.serialize(entry.getSerializer().getRegistryName()));
                     ar.add(obj);
                 });
                 return ar;

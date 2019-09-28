@@ -1,6 +1,11 @@
 package com.direwolf20.buildinggadgets.api.serialisation;
 
+import com.direwolf20.buildinggadgets.api.BuildingGadgetsAPI;
+import com.direwolf20.buildinggadgets.api.building.view.IBuildContext;
+import com.direwolf20.buildinggadgets.api.building.view.IBuildView;
+import com.direwolf20.buildinggadgets.api.exceptions.TemplateException;
 import com.direwolf20.buildinggadgets.api.template.ITemplate;
+import com.direwolf20.buildinggadgets.api.template.SimpleBuildOpenOptions;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraftforge.registries.IForgeRegistryEntry;
 
@@ -26,6 +31,34 @@ public interface ITemplateSerializer extends IForgeRegistryEntry<ITemplateSerial
      *         if a persisted save is attempted to be retrieved non-persistently or vice-versa.
      */
     TemplateHeader createHeaderFor(ITemplate template);
+
+    default TemplateHeader createHeaderAndTryForceMaterials(ITemplate template, SimpleBuildOpenOptions openOptions) {
+        TemplateHeader header = createHeaderFor(template);
+        if (header.getRequiredItems() == null) {
+            IBuildView view = null;
+            try {
+                view = template.createViewInContext(openOptions);
+                if (view != null)
+                    return TemplateHeader
+                            .builderOf(header)
+                            .requiredItems(view.estimateRequiredItems())
+                            .build();
+            } finally {
+                if (view != null)
+                    try {
+                        view.close();
+                    } catch (TemplateException e) {
+                        BuildingGadgetsAPI.LOG.error("Failed to close BuildView - this may cause Unexpected Behaviour down the line!", e);
+                    }
+            }
+
+        }
+        return header;
+    }
+
+    default TemplateHeader createHeaderAndTryForceMaterials(ITemplate template, IBuildContext context) {
+        return createHeaderAndTryForceMaterials(template, SimpleBuildOpenOptions.builder().context(context).build());
+    }
 
     /**
      * Serializes a given {@link ITemplate}. The persisted flag is meant to allow for more efficient usage of a Player's Network capabilities by using for example

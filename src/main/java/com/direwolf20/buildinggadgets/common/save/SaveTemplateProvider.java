@@ -8,50 +8,41 @@ import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketRequestTemplate;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketTemplateIdAllocated;
 import com.direwolf20.buildinggadgets.common.network.packets.SplitPacketUpdateTemplate;
-import com.direwolf20.buildinggadgets.common.util.ref.Reference;
-import io.netty.buffer.Unpooled;
 import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.network.PacketBuffer;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.network.NetworkEvent.GatherLoginPayloadsEvent;
 import net.minecraftforge.fml.network.PacketDistributor;
 import net.minecraftforge.fml.network.PacketDistributor.PacketTarget;
+import org.apache.logging.log4j.util.TriConsumer;
 
+import java.util.Collections;
+import java.util.Set;
 import java.util.UUID;
+import java.util.WeakHashMap;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 public final class SaveTemplateProvider implements ITemplateProvider {
     private final Supplier<TemplateSave> save;
+    private final Set<IUpdateListener> updateListeners;
 
     public SaveTemplateProvider(Supplier<TemplateSave> save) {
         this.save = save;
+        this.updateListeners = Collections.newSetFromMap(new WeakHashMap<>());
     }
 
     public TemplateSave getSave() {
         return save.get();
     }
 
-    @SubscribeEvent
-    public void onGatherPayloads(GatherLoginPayloadsEvent event) {
-        TemplateSave save = getSave();
-        if (save == null) {
-            BuildingGadgets.LOG.error("Attempted to gather login payloads, before templates could be loaded! Aborting!");
-            return;
-        }
-        PacketBuffer buffer = new PacketBuffer(Unpooled.buffer());
-        save.writeAllIds(buffer);
-        event.add(buffer, Reference.NETWORK_CHANNEL_ID_LOGIN, Reference.PAYLOAD_CONTEXT_ID_SYNC);
-    }
-
     @Override
     public ITemplate getTemplateForKey(ITemplateKey key) {
-        UUID id = key.getTemplateId(this::getFreeId);
+        UUID id = getId(key);
         return getSave().getTemplate(id, key::createTemplate);
     }
 
     @Override
     public void setTemplate(ITemplateKey key, ITemplate template) {
         getSave().setTemplate(key.getTemplateId(this::getFreeId), template);
+        notifyListeners(key, template, l -> l::onTemplateUpdate);
     }
 
     @Override
@@ -61,10 +52,26 @@ public final class SaveTemplateProvider implements ITemplateProvider {
 
     @Override
     public boolean requestRemoteUpdate(ITemplateKey key) {
-        UUID id = key.getTemplateId(this::getFreeId);
+        UUID id = getId(key);
         ITemplate template = getSave().getTemplate(id, key::createTemplate);
+        notifyListeners(key, template, l -> l::onTemplateUpdateSend);
         PacketHandler.getSplitManager().send(new SplitPacketUpdateTemplate(id, template), PacketDistributor.ALL.noArg());
         return true;
+    }
+
+    @Override
+    public void registerUpdateListener(IUpdateListener listener) {
+        updateListeners.add(listener);
+    }
+
+    @Override
+    public void removeUpdateListener(IUpdateListener listener) {
+        updateListeners.remove(listener);
+    }
+
+    @Override
+    public UUID getId(ITemplateKey key) {
+        return key.getTemplateId(this::getFreeId);
     }
 
     public boolean requestRemoteUpdate(ITemplateKey key, ServerPlayerEntity playerEntity) {
@@ -72,7 +79,7 @@ public final class SaveTemplateProvider implements ITemplateProvider {
     }
 
     public boolean requestRemoteUpdate(ITemplateKey key, PacketTarget target) {
-        UUID id = key.getTemplateId(this::getFreeId);
+        UUID id = getId(key);
         ITemplate template = getSave().getTemplate(id, key::createTemplate);
         PacketHandler.getSplitManager().send(new SplitPacketUpdateTemplate(id, template), target);
         return true;
@@ -83,7 +90,7 @@ public final class SaveTemplateProvider implements ITemplateProvider {
     }
 
     public boolean requestUpdate(ITemplateKey key, PacketTarget target) {
-        UUID id = key.getTemplateId(this::getFreeId);
+        UUID id = getId(key);
         PacketHandler.HANDLER.send(target, new PacketRequestTemplate(id));
         return true;
     }
@@ -101,5 +108,15 @@ public final class SaveTemplateProvider implements ITemplateProvider {
 
     private void onIdAllocated(UUID allocatedId) {
         PacketHandler.sendToAllClients(new PacketTemplateIdAllocated(allocatedId));
+    }
+
+    private void notifyListeners(ITemplateKey key, ITemplate template, Function<IUpdateListener, TriConsumer<ITemplateProvider, ITemplateKey, ITemplate>> function) {
+        for (IUpdateListener listener : updateListeners) {
+            try {
+                function.apply(listener).accept(this, key, template);
+            } catch (Exception e) {
+                BuildingGadgets.LOG.error("Update listener threw an exception!", e);
+            }
+        }
     }
 }

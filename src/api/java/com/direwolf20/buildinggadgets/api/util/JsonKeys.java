@@ -5,6 +5,8 @@ public final class JsonKeys {
     public static final String MATERIAL_LIST_ITEM_ID = "id";
     public static final String MATERIAL_LIST_ITEM_COUNT = "count";
     public static final String MATERIAL_LIST_ITEM_NBT = "nbt";
+    public static final String MATERIAL_LIST_ITEM_TYPE = "type";
+    public static final String MATERIAL_LIST_ITEM = "item";
     public static final String MATERIAL_LIST_ITEM_NBT_MATCH = "nbt_match_type";
     public static final String MATERIAL_LIST_CAP_NBT = "cap_nbt";
     public static final String MATERIAL_LIST_CAP_NBT_MATCH = "cap_nbt_match_type";
