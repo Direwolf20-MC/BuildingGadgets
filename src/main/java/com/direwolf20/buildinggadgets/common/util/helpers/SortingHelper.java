@@ -1,19 +1,13 @@
 package com.direwolf20.buildinggadgets.common.util.helpers;
 
 import com.direwolf20.buildinggadgets.api.building.PlacementTarget;
-import com.direwolf20.buildinggadgets.api.building.view.IBuildContext;
-import it.unimi.dsi.fastutil.doubles.Double2ObjectArrayMap;
-import it.unimi.dsi.fastutil.doubles.Double2ObjectMap;
-import it.unimi.dsi.fastutil.doubles.DoubleRBTreeSet;
-import it.unimi.dsi.fastutil.doubles.DoubleSortedSet;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 /**
  * SortingHelper
@@ -26,7 +20,7 @@ import java.util.function.Function;
  */
 public class SortingHelper {
 
-    public static class Blocks {
+    public static class Blocks { //TODO move sort to RenderSorter#sort when everything uses PlacementTargets and delete this afterwards...
 
         public static List<BlockPos> byDistance(Iterable<BlockPos> list, PlayerEntity player) {
             return byDistance(list, Function.identity(), player);
@@ -39,41 +33,27 @@ public class SortingHelper {
          * @return a sorted by distance {@link List} of {@link BlockPos}
          */
         public static <T> List<T> byDistance(Iterable<T> list, Function<T, ? extends BlockPos> posExtractor, PlayerEntity player) {
-            List<T> sortedList = new ArrayList<>();
-
-            Double2ObjectMap<T> rangeMap = new Double2ObjectArrayMap<>();
-            DoubleSortedSet distances = new DoubleRBTreeSet();
-
             double  x = player.posX,
                     y = player.posY + player.getEyeHeight(),
                     z = player.posZ;
-
-            list.forEach(obj -> {
-                BlockPos pos = posExtractor.apply(obj);
-                double distance = pos.distanceSq(x, y, z, true);
-
-                rangeMap.put(distance, obj);
-                distances.add(distance);
-            } );
-
-            for (double dist : distances) {
-                sortedList.add(rangeMap.get(dist));
-            }
-
-            return sortedList;
+            return StreamSupport.stream(list.spliterator(), false)
+                    .map(t -> new TargetObject<T>(posExtractor.apply(t).distanceSq(x, y, z, true), t))
+                    .sorted(TargetObject.BY_DISTANCE)
+                    .map(TargetObject::getTarget)
+                    //A linked list is the optimal Datastructure here - we don't need random access. Notice that changing that to an ArrayList will add an Factor of 1.2!
+                    .collect(Collectors.toCollection(LinkedList::new));
         }
 
     }
 
     public static class RenderSorter {
         private final List<PlacementTarget> orderedTargets;
-        private final IBuildContext context;
+        private final PlayerEntity player;
         private List<PlacementTarget> sortedTargets;
 
-        public RenderSorter(IBuildContext context, int estimatedSize) {
+        public RenderSorter(PlayerEntity player, int estimatedSize) {
             this.orderedTargets = new ArrayList<>(estimatedSize);
-            this.context = Objects.requireNonNull(context);
-            assert context.getBuildingPlayer() != null;
+            this.player = player;
             this.sortedTargets = null;
         }
 
@@ -86,23 +66,41 @@ public class SortingHelper {
         }
 
         public List<PlacementTarget> getSortedTargets() {
-            if (sortedTargets == null)
+            if (sortedTargets == null) {
+                //long nanoTime = System.nanoTime();
                 sortedTargets = sort(orderedTargets);
+                //long dif = System.nanoTime() - nanoTime;
+                //BuildingGadgets.LOG.info("Render sorting took {} nano seconds.", dif);
+            }
             return Collections.unmodifiableList(sortedTargets);
 
         }
 
-        protected List<PlacementTarget> sort(List<PlacementTarget> orderedTargets) {
+        private List<PlacementTarget> sort(List<PlacementTarget> orderedTargets) {
             return Blocks.byDistance(orderedTargets, PlacementTarget::getPos, getPlayer());
         }
 
-        public IBuildContext getContext() {
-            return context;
+        public PlayerEntity getPlayer() {
+            return player;
+        }
+    }
+
+    private static final class TargetObject<T> {
+        public static final Comparator<TargetObject<?>> BY_DISTANCE = Comparator.<TargetObject<?>>comparingDouble(TargetObject::getDist).reversed();
+        private final double dist;
+        private final T target;
+
+        public TargetObject(double dist, T target) {
+            this.dist = dist;
+            this.target = target;
         }
 
-        public PlayerEntity getPlayer() {
-            assert context.getBuildingPlayer() != null;
-            return context.getBuildingPlayer();
+        public T getTarget() {
+            return target;
+        }
+
+        public double getDist() {
+            return dist;
         }
     }
 

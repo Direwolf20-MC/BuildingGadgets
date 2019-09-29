@@ -146,7 +146,7 @@ public class CopyPasteRender extends BaseRenderer {
                     return;
                 }
                 view.translateTo(startPos);
-                RenderSorter sorter = new RenderSorter(context, view.estimateSize());
+                RenderSorter sorter = new RenderSorter(player, view.estimateSize());
                 for (PlacementTarget target : view) {
                     if (target.placeIn(context))
                         sorter.onPlaced(target);
