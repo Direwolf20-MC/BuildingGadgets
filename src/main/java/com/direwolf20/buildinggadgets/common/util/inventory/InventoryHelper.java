@@ -1,4 +1,4 @@
-package com.direwolf20.buildinggadgets.common.util.helpers;
+package com.direwolf20.buildinggadgets.common.util.inventory;
 
 import com.direwolf20.buildinggadgets.api.building.BlockData;
 import com.direwolf20.buildinggadgets.api.building.tilesupport.TileSupport;
@@ -8,6 +8,10 @@ import com.direwolf20.buildinggadgets.common.items.pastes.ConstructionPaste;
 import com.direwolf20.buildinggadgets.common.items.pastes.GenericPasteContainer;
 import com.direwolf20.buildinggadgets.common.registry.OurItems;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
+import com.direwolf20.buildinggadgets.common.util.exceptions.CapabilityNotPresentException;
+import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.ImmutableSet;
 import net.minecraft.block.*;
 import net.minecraft.entity.player.PlayerEntity;
@@ -41,6 +45,27 @@ public class InventoryHelper {
 
     private static final Set<IProperty> SAFE_PROPERTIES_COPY_PASTE =
             ImmutableSet.<IProperty>builder().addAll(SAFE_PROPERTIES).addAll(ImmutableSet.of(RailBlock.SHAPE, PoweredRailBlock.SHAPE, ChestBlock.TYPE)).build();
+    private static final CreativeItemIndex CREATIVE_INDEX = new CreativeItemIndex();
+
+    public static IItemIndex index(ItemStack tool, PlayerEntity player) {
+        if (player.isCreative())
+            return CREATIVE_INDEX;
+        IItemHandler handler = player.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).orElseThrow(CapabilityNotPresentException::new);
+        IItemHandler remoteInv = GadgetUtils.getRemoteInventory(tool, player.world);
+        ImmutableMultimap.Builder<Item, IStackHandle> builder = ImmutableMultimap.builder();
+        indexHandler(builder, handler);
+        if (remoteInv != null)
+            indexHandler(builder, remoteInv);
+        return new SimpleItemIndex(builder.build(), ImmutableList.of());
+    }
+
+    private static void indexHandler(ImmutableMultimap.Builder<Item, IStackHandle> builder, IItemHandler handler) {
+        for (int i = 0; i < handler.getSlots(); i++) {
+            ItemStack stack = handler.getStackInSlot(i);
+            if (! stack.isEmpty())
+                builder.put(stack.getItem(), new StackHandlerHandle(handler, i));
+        }
+    }
 
     public static boolean giveItem(ItemStack itemStack, PlayerEntity player, IWorld world) {
         if (player.isCreative()) {

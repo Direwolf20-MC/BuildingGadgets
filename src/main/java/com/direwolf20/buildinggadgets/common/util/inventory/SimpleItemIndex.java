@@ -2,40 +2,55 @@ package com.direwolf20.buildinggadgets.common.util.inventory;
 
 import com.direwolf20.buildinggadgets.api.materials.MaterialList;
 import com.direwolf20.buildinggadgets.api.materials.UniqueItem;
-import com.direwolf20.buildinggadgets.common.util.inventory.SimpleItemIndex.MatchResult;
+import com.google.common.collect.HashMultiset;
 import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.Multimap;
+import com.google.common.collect.Multiset;
 import com.google.common.collect.Multiset.Entry;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
-import java.util.Set;
+import java.util.Iterator;
+import java.util.List;
 
-public final class SimpleItemIndex implements IItemIndex<MatchResult> {
+public final class SimpleItemIndex implements IItemIndex {
     private final Multimap<Item, IStackHandle> handleMap;
-    private final Set<IInsertExtractProvider> insertExtractProviders;
+    private final List<IInsertExtractProvider> insertExtractProviders;
 
-    SimpleItemIndex(Multimap<Item, IStackHandle> handleMap, Set<IInsertExtractProvider> insertExtractProviders) {
+    SimpleItemIndex(Multimap<Item, IStackHandle> handleMap, List<IInsertExtractProvider> insertExtractProviders) {
         this.handleMap = handleMap;
         this.insertExtractProviders = insertExtractProviders;
     }
 
     @Override
     public MatchResult tryMatch(MaterialList list) {
-        MatchResult requiredMatch = match(list, list.getRequiredItems(), true);
-        if (! requiredMatch.isSuccess())
-            return requiredMatch;
-        boolean anyOption = false;
-        for (ImmutableMultiset<UniqueItem> option : list.getItemOptions()) {
-            anyOption = true;
-            MatchResult optionMatch = match(list, option, true);
-            if (optionMatch.isSuccess())
-                return new SuccessResult(list, option);
+        MatchResult result = null;
+        for (ImmutableMultiset<UniqueItem> multiset : list) {
+            result = match(list, multiset, true);
+            if (result.isSuccess())
+                return MatchResult.success(list, result.getFoundItems(), multiset);
         }
-        return anyOption ? new FailureResult(list) : requiredMatch;
+        return result == null ? MatchResult.success(list, ImmutableMultiset.of(), ImmutableMultiset.of()) : evaluateFailingOptionFoundItems(list);
     }
 
-    private MatchResult match(MaterialList list, ImmutableMultiset<UniqueItem> multiset, boolean simulate) {
+    private MatchResult evaluateFailingOptionFoundItems(MaterialList list) {
+        Multiset<UniqueItem> multiset = HashMultiset.create();
+        for (ImmutableMultiset<UniqueItem> option : list.getItemOptions()) {
+            for (Entry<UniqueItem> entry : option.entrySet()) {
+                multiset.setCount(entry.getElement(), Math.max(multiset.count(entry.getElement()), entry.getCount()));
+            }
+        }
+        multiset.addAll(list.getRequiredItems());
+        MatchResult result = match(list, multiset, true);
+        if (result.isSuccess())
+            throw new RuntimeException("This should not be possible! The the content changed between matches?!?");
+        Iterator<ImmutableMultiset<UniqueItem>> it = list.iterator();
+        return it.hasNext() ? MatchResult.failure(list, result.getFoundItems(), it.next()) : result;
+    }
+
+    private MatchResult match(MaterialList list, Multiset<UniqueItem> multiset, boolean simulate) {
+        ImmutableMultiset.Builder<UniqueItem> availableBuilder = ImmutableMultiset.builder();
+        boolean failure = false;
         for (Entry<UniqueItem> entry : multiset.entrySet()) {
             int remainingCount = entry.getCount();
             for (IStackHandle handle : handleMap.get(entry.getElement().getItem())) {
@@ -47,74 +62,30 @@ public final class SimpleItemIndex implements IItemIndex<MatchResult> {
             }
             if (remainingCount > 0) {
                 ItemStack stack = entry.getElement().createStack(remainingCount);
-                for (IInsertExtractProvider provider : insertExtractProviders) {
-                    stack = provider.extract(stack, simulate);
-                    remainingCount = stack.getCount();
-                    if (stack.isEmpty())
-                        break;
+                if (! stack.isEmpty()) {
+                    for (IInsertExtractProvider provider : insertExtractProviders) {
+                        stack = provider.extract(stack, simulate);
+                        remainingCount = stack.getCount();
+                        if (stack.isEmpty())
+                            break;
+                    }
                 }
             }
+            remainingCount = Math.max(0, remainingCount);
             if (remainingCount > 0)
-                return new FailureResult(list);
+                failure = true;
+            availableBuilder.addCopies(entry.getElement(), entry.getCount() - remainingCount);
         }
-        return new SuccessResult(list, ImmutableMultiset.of());
+        if (failure)
+            return MatchResult.failure(list, availableBuilder.build(), ImmutableMultiset.of());
+        return MatchResult.success(list, availableBuilder.build(), ImmutableMultiset.of());
     }
 
     @Override
     public boolean applyMatch(MatchResult result) {
         if (! result.isSuccess())
             return false;
-        return match(result.getMatchedList(), result.getMatchedList().getRequiredItems(), false).isSuccess() &&
-                match(result.getMatchedList(), result.getChosenOption(), false).isSuccess();
+        return match(result.getMatchedList(), result.getChosenOption(), false).isSuccess();
     }
 
-    public static abstract class MatchResult implements IMatchResult {
-        private final MaterialList matchedList;
-
-        private MatchResult(MaterialList matchedList) {
-            this.matchedList = matchedList;
-        }
-
-        @Override
-        public MaterialList getMatchedList() {
-            return matchedList;
-        }
-
-        public abstract ImmutableMultiset<UniqueItem> getChosenOption();
-    }
-
-    private static class SuccessResult extends MatchResult {
-        private final ImmutableMultiset<UniqueItem> chosenOption;
-
-        private SuccessResult(MaterialList matchedList, ImmutableMultiset<UniqueItem> chosenOption) {
-            super(matchedList);
-            this.chosenOption = chosenOption;
-        }
-
-        @Override
-        public boolean isSuccess() {
-            return true;
-        }
-
-        @Override
-        public ImmutableMultiset<UniqueItem> getChosenOption() {
-            return chosenOption;
-        }
-    }
-
-    private static class FailureResult extends MatchResult {
-        private FailureResult(MaterialList matchedList) {
-            super(matchedList);
-        }
-
-        @Override
-        public boolean isSuccess() {
-            return false;
-        }
-
-        @Override
-        public ImmutableMultiset<UniqueItem> getChosenOption() {
-            return ImmutableMultiset.of();
-        }
-    }
 }

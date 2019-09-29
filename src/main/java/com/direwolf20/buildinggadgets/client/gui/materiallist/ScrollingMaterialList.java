@@ -3,7 +3,9 @@ package com.direwolf20.buildinggadgets.client.gui.materiallist;
 import com.direwolf20.buildinggadgets.api.materials.MaterialList;
 import com.direwolf20.buildinggadgets.api.materials.UniqueItem;
 import com.direwolf20.buildinggadgets.client.gui.base.EntryList;
-import com.direwolf20.buildinggadgets.common.util.helpers.InventoryHelper;
+import com.direwolf20.buildinggadgets.common.util.inventory.IItemIndex;
+import com.direwolf20.buildinggadgets.common.util.inventory.InventoryHelper;
+import com.direwolf20.buildinggadgets.common.util.inventory.MatchResult;
 import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Multiset;
@@ -14,7 +16,6 @@ import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.World;
 import org.lwjgl.glfw.GLFW;
 
 import java.awt.*;
@@ -59,10 +60,11 @@ class ScrollingMaterialList extends EntryList<Entry> {
             multisetIterator = list != null ? list.iterator() : Iterators.singletonIterator(ImmutableMultiset.of());
         }
         PlayerEntity player = Minecraft.getInstance().player;
-        World world = Minecraft.getInstance().world;
-        for (Multiset.Entry<UniqueItem> entry : multisetIterator.next().entrySet()) {
+        IItemIndex index = InventoryHelper.index(gui.getTemplateItem(), player);
+        MatchResult result = index.tryMatch(multisetIterator.next());
+        for (Multiset.Entry<UniqueItem> entry : result.getChosenOption().entrySet()) {
             UniqueItem item = entry.getElement();
-            addEntry(new Entry(this, item, entry.getCount(), InventoryHelper.countItem(item.toItemStack(), player, world)));
+            addEntry(new Entry(this, item, entry.getCount(), result.getFoundItems().count(entry.getElement())));
         }
         sort();
     }

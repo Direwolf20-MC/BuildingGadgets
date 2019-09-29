@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.common.events;
 
 import com.direwolf20.buildinggadgets.common.items.pastes.ConstructionPaste;
-import com.direwolf20.buildinggadgets.common.util.helpers.InventoryHelper;
+import com.direwolf20.buildinggadgets.common.util.inventory.InventoryHelper;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;

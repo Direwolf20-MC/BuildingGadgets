@@ -3,7 +3,7 @@ package com.direwolf20.buildinggadgets.client.cache;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketSetRemoteInventoryCache;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
-import com.direwolf20.buildinggadgets.common.util.helpers.InventoryHelper.IRemoteInventoryProvider;
+import com.direwolf20.buildinggadgets.common.util.inventory.InventoryHelper.IRemoteInventoryProvider;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.util.tools.UniqueItem;
 import com.google.common.base.Stopwatch;
