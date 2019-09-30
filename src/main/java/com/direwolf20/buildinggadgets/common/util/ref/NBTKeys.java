@@ -73,7 +73,10 @@ public final class NBTKeys {
     public static final String WORLD_SAVE_TAG = "tag";
     public static final String WORD_SAVE_DATA_MAP = "data_map";
     public static final String WORLD_SAVE_TIME = "time";
-    public static final String WORLD_SAVE_UNDO = "undo_history";
+    public static final String WORLD_SAVE_UNDO_HISTORY = "undo_history";
+    public static final String WORLD_SAVE_UNDO_SNAPSHOT = "snapshot";
+    public static final String WORLD_SAVE_UNDO_ITEMS_USED = "used_items";
+    public static final String WORLD_SAVE_UNDO_ITEMS_PRODUCED = "produced_items";
 
     public static final String REMOTE_INVENTORY_POS = "bound_te_pos";
     public static final String REMOTE_INVENTORY_DIM = "bound_te_dim";

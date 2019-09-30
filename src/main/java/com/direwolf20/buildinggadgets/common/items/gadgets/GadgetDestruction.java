@@ -12,6 +12,7 @@ import com.direwolf20.buildinggadgets.common.items.gadgets.renderers.BaseRendere
 import com.direwolf20.buildinggadgets.common.items.gadgets.renderers.DestructionRender;
 import com.direwolf20.buildinggadgets.common.registry.OurBlocks;
 import com.direwolf20.buildinggadgets.common.save.SaveManager;
+import com.direwolf20.buildinggadgets.common.save.Undo;
 import com.direwolf20.buildinggadgets.common.save.UndoWorldSave;
 import com.direwolf20.buildinggadgets.common.tiles.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
@@ -272,7 +273,7 @@ public class GadgetDestruction extends AbstractGadget {
             player.sendMessage(TooltipTranslation.GADGET_PALETTE_OVERFLOW.componentTranslation());
             return;
         }
-        pushUndo(stack, snapshot);
+        pushUndo(stack, new Undo(snapshot));
     }
 
     private boolean destroyBlock(World world, BlockPos voidPos, ServerPlayerEntity player) {

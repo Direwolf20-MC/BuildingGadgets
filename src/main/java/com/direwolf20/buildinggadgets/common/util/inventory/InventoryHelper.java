@@ -45,7 +45,7 @@ public class InventoryHelper {
 
     private static final Set<IProperty> SAFE_PROPERTIES_COPY_PASTE =
             ImmutableSet.<IProperty>builder().addAll(SAFE_PROPERTIES).addAll(ImmutableSet.of(RailBlock.SHAPE, PoweredRailBlock.SHAPE, ChestBlock.TYPE)).build();
-    private static final CreativeItemIndex CREATIVE_INDEX = new CreativeItemIndex();
+    public static final CreativeItemIndex CREATIVE_INDEX = new CreativeItemIndex();
 
     public static IItemIndex index(ItemStack tool, PlayerEntity player) {
         if (player.isCreative())

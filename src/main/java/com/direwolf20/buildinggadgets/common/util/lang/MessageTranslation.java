@@ -17,6 +17,8 @@ public enum MessageTranslation implements ITranslationProvider {
     SERVER_BUSY("server_busy", 0),
     NOTHING_TO_UNDO("nothing_to_undo", 0),
     UNDO_FAILED("undo_failed", 0),
+    UNDO_UNLOADED("undo_unloaded", 1),
+    UNDO_MISSING_ITEMS("undo_missing_items", 0),
     ANCHOR_SET("anchor_set", 0),
     ANCHOR_REMOVED("anchor_removed", 0),
     TRANSACTION_FAILED("transaction_failed", 0),

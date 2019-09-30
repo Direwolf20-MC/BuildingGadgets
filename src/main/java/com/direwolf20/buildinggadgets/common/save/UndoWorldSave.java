@@ -1,7 +1,6 @@
 package com.direwolf20.buildinggadgets.common.save;
 
 import com.direwolf20.buildinggadgets.common.save.UndoWorldSave.UndoValue;
-import com.direwolf20.buildinggadgets.common.util.blocks.RegionSnapshot;
 import net.minecraft.nbt.CompoundNBT;
 
 import java.util.Objects;
@@ -17,16 +16,16 @@ public class UndoWorldSave extends TimedDataSave<UndoValue> {
         this.undoMaxLength = Objects.requireNonNull(undoMaxLength);
     }
 
-    public void insertSnapshot(UUID uuid, RegionSnapshot snapshot) {
+    public void insertUndo(UUID uuid, Undo undo) {
         UndoValue val = getAndUpdateTime(uuid);
-        val.getHistory().add(snapshot);
+        val.getHistory().add(undo);
     }
 
-    public Optional<RegionSnapshot> getSnapshot(UUID uuid) {
+    public Optional<Undo> getUndo(UUID uuid) {
         return getAndUpdateTime(uuid).getHistory().get();
     }
 
-    public Optional<RegionSnapshot> peekSnapshot(UUID uuid) {
+    public Optional<Undo> peekSnapshot(UUID uuid) {
         return getAndUpdateTime(uuid).getHistory().peek();
     }
 

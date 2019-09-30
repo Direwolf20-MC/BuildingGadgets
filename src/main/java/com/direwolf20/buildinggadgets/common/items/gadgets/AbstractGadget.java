@@ -8,6 +8,7 @@ import com.direwolf20.buildinggadgets.common.capability.provider.MultiCapability
 import com.direwolf20.buildinggadgets.common.commands.CopyUnloadedCommand;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.items.gadgets.renderers.BaseRenderer;
+import com.direwolf20.buildinggadgets.common.save.Undo;
 import com.direwolf20.buildinggadgets.common.save.UndoWorldSave;
 import com.direwolf20.buildinggadgets.common.util.CapabilityUtil.EnergyUtil;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
@@ -15,6 +16,9 @@ import com.direwolf20.buildinggadgets.common.util.blocks.RegionSnapshot;
 import com.direwolf20.buildinggadgets.common.util.exceptions.CapabilityNotPresentException;
 import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
 import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
+import com.direwolf20.buildinggadgets.common.util.inventory.IItemIndex;
+import com.direwolf20.buildinggadgets.common.util.inventory.InventoryHelper;
+import com.direwolf20.buildinggadgets.common.util.inventory.MatchResult;
 import com.direwolf20.buildinggadgets.common.util.lang.MessageTranslation;
 import com.direwolf20.buildinggadgets.common.util.lang.Styles;
 import com.direwolf20.buildinggadgets.common.util.lang.TooltipTranslation;
@@ -259,21 +263,25 @@ public abstract class AbstractGadget extends Item {
         return name.replaceAll("(?=[A-Z])", " ").trim();
     }
 
-    protected void pushUndo(ItemStack stack, RegionSnapshot snapshot) {
+    protected void pushUndo(ItemStack stack, Undo undo) {
         UndoWorldSave save = getUndoSave();
-        save.insertSnapshot(getUUID(stack), snapshot);
+        save.insertUndo(getUUID(stack), undo);
     }
 
     public void undo(World world, PlayerEntity player, ItemStack stack) {
         UndoWorldSave save = getUndoSave();
-        Optional<RegionSnapshot> snapshotOptional = save.getSnapshot(getUUID(stack));
-        if (snapshotOptional.isPresent()) {
-            RegionSnapshot snapshot = snapshotOptional.orElseThrow(RuntimeException::new);
+        Optional<Undo> undoOptional = save.getUndo(getUUID(stack));
+        if (undoOptional.isPresent()) {
+            Undo undo = undoOptional.orElseThrow(RuntimeException::new);
+            IItemIndex index = undo.getProducedItems().isEmpty() && undo.getUsedItems().isEmpty() ?
+                    InventoryHelper.CREATIVE_INDEX :
+                    InventoryHelper.index(stack, player);
+            RegionSnapshot snapshot = undo.getSnapshot();
             if (! CopyUnloadedCommand.mayCopyUnloadedChunks(player)) {//TODO separate command
                 ImmutableSortedSet<ChunkPos> unloadedChunks = snapshot.getPositions().getBoundingBox().getUnloadedChunks(world);
                 if (! unloadedChunks.isEmpty()) {
                     //TODO Proper message
-                    player.sendStatusMessage(MessageTranslation.COPY_UNLOADED.componentTranslation().setStyle(Styles.RED), true);
+                    player.sendStatusMessage(MessageTranslation.UNDO_UNLOADED.componentTranslation().setStyle(Styles.RED), true);
                     BuildingGadgets.LOG.error("Player attempted to undo a Region missing {} unloaded chunks. Denied undo!", unloadedChunks.size());
                     BuildingGadgets.LOG.trace("The following chunks were detected as unloaded {}.", unloadedChunks);
                     return;
@@ -283,6 +291,12 @@ public abstract class AbstractGadget extends Item {
                 player.sendStatusMessage(MessageTranslation.UNDO_FAILED.componentTranslation().setStyle(Styles.RED), true);
                 return;
             }
+            MatchResult result = index.tryMatch(undo.getProducedItems());
+            if (! result.isSuccess()) {
+                player.sendStatusMessage(MessageTranslation.UNDO_MISSING_ITEMS.componentTranslation().setStyle(Styles.RED), true);
+                return;
+            }
+            index.insert(undo.getUsedItems());
             snapshot.restore(world);
         } else
             player.sendStatusMessage(MessageTranslation.NOTHING_TO_UNDO.componentTranslation().setStyle(Styles.RED), true);

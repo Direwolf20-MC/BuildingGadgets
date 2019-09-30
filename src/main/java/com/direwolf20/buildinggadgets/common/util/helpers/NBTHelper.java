@@ -1,10 +1,12 @@
 package com.direwolf20.buildinggadgets.common.util.helpers;
 
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
+import com.google.common.collect.Multiset;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.*;
+import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nonnull;
 import java.util.*;
@@ -384,6 +386,11 @@ public class NBTHelper {
         for (INBT nbt : list) {
             toAppendTo.add(elementDeserializer.apply(nbt));
         }
+        return toAppendTo;
+    }
+
+    public static <T> Multiset<T> deserializeMultisetEntries(ListNBT list, Multiset<T> toAppendTo, Function<INBT, Pair<? extends T, Integer>> entryDeserializer) {
+        list.stream().map(entryDeserializer).forEach(p -> toAppendTo.add(p.getKey(), p.getValue()));
         return toAppendTo;
     }
 

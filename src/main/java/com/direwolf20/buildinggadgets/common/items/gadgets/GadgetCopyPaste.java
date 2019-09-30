@@ -33,13 +33,15 @@ import com.direwolf20.buildinggadgets.common.items.gadgets.renderers.CopyPasteRe
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketBindTool;
 import com.direwolf20.buildinggadgets.common.save.SaveManager;
+import com.direwolf20.buildinggadgets.common.save.Undo;
 import com.direwolf20.buildinggadgets.common.save.UndoWorldSave;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
+import com.direwolf20.buildinggadgets.common.util.blocks.RegionSnapshot;
 import com.direwolf20.buildinggadgets.common.util.exceptions.CapabilityNotPresentException;
 import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
 import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
-import com.direwolf20.buildinggadgets.common.util.inventory.IItemIndex;
 import com.direwolf20.buildinggadgets.common.util.inventory.InventoryHelper;
+import com.direwolf20.buildinggadgets.common.util.inventory.RecordingItemIndex;
 import com.direwolf20.buildinggadgets.common.util.lang.ITranslationProvider;
 import com.direwolf20.buildinggadgets.common.util.lang.MessageTranslation;
 import com.direwolf20.buildinggadgets.common.util.lang.Styles;
@@ -509,7 +511,7 @@ public class GadgetCopyPaste extends AbstractGadget {
     private void schedulePlacement(ItemStack stack, IBuildView view, PlayerEntity player, BlockPos pos) {
         view.translateTo(pos);
         int energyCost = getEnergyCost(stack);
-        IItemIndex index = InventoryHelper.index(stack, player);
+        RecordingItemIndex index = new RecordingItemIndex(InventoryHelper.index(stack, player));
         boolean overwrite = Config.GENERAL.allowOverwriteBlocks.get();
         BlockItemUseContext useContext = new BlockItemUseContext(new ItemUseContext(player, Hand.MAIN_HAND, VectorHelper.getLookingAt(player, stack)));
         PlacementEvaluator evalView = new PlacementEvaluator(
@@ -520,10 +522,17 @@ public class GadgetCopyPaste extends AbstractGadget {
                 (c, t) -> overwrite ? c.getWorld().getBlockState(t.getPos()).isReplaceable(useContext) : c.getWorld().isAirBlock(t.getPos()),
                 true,
                 false);
+        RegionSnapshot.Recorder recorder = RegionSnapshot.recordAll();
         PlacementScheduler.schedulePlacement(t -> {//TODO PlacementLogic and mechanism to stop when missing blocks!
+            recorder.record(view.getContext().getWorld(), t.getPos());
             EffectBlock.spawnEffectBlock(view.getContext(), t, Mode.PLACE, false);
         }, evalView, Config.GADGETS.GADGET_COPY_PASTE.placeSteps.get())
-                .withFinisher(() -> onBuildFinished(stack, player));
+                .withFinisher(() -> {
+                    pushUndo(stack, new Undo(
+                            recorder.build(view.getContext().getWorld().getDimension().getType()),
+                            index.getExtractedItems()));
+                    onBuildFinished(stack, player);
+                });
     }
 
     private void onBuildFinished(ItemStack stack, PlayerEntity player) {
