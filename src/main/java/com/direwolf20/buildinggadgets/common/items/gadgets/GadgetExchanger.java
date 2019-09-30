@@ -1,6 +1,7 @@
 package com.direwolf20.buildinggadgets.common.items.gadgets;
 
 import com.direwolf20.buildinggadgets.api.building.BlockData;
+import com.direwolf20.buildinggadgets.api.materials.UniqueItem;
 import com.direwolf20.buildinggadgets.common.blocks.EffectBlock;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.items.gadgets.renderers.BaseRenderer;
@@ -9,8 +10,10 @@ import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketBindTool;
 import com.direwolf20.buildinggadgets.common.registry.OurItems;
 import com.direwolf20.buildinggadgets.common.save.SaveManager;
+import com.direwolf20.buildinggadgets.common.save.Undo;
 import com.direwolf20.buildinggadgets.common.save.UndoWorldSave;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
+import com.direwolf20.buildinggadgets.common.util.blocks.RegionSnapshot;
 import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
 import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
 import com.direwolf20.buildinggadgets.common.util.inventory.InventoryHelper;
@@ -19,6 +22,8 @@ import com.direwolf20.buildinggadgets.common.util.lang.Styles;
 import com.direwolf20.buildinggadgets.common.util.lang.TooltipTranslation;
 import com.direwolf20.buildinggadgets.common.util.tools.modes.ExchangingMode;
 import com.direwolf20.buildinggadgets.common.world.FakeBuilderWorld;
+import com.google.common.collect.HashMultiset;
+import com.google.common.collect.Multiset;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -202,7 +207,9 @@ public class GadgetExchanger extends ModeGadget {
             return false;
 
         BlockData blockState = getToolBlock(heldItem);
-
+        RegionSnapshot.Recorder recorder = RegionSnapshot.recordAll();
+        Multiset<UniqueItem> usedItems = HashMultiset.create();
+        Multiset<UniqueItem> producedItems = HashMultiset.create();
         if (blockState.getState() != Blocks.AIR.getDefaultState()) {  //Don't attempt a build if a block is not chosen -- Typically only happens on a new tool.
             //TODO replace fakeWorld
             fakeWorld.setWorldAndState(player.world, blockState.getState(), coordinates); // Initialize the fake world's blocks
@@ -210,13 +217,14 @@ public class GadgetExchanger extends ModeGadget {
                 //Get the extended block state in the fake world
                 //Disabled to fix Chisel
                 //state = state.getBlock().getExtendedState(state, fakeWorld, coordinate);
-                exchangeBlock(world, player, coordinate, blockState);
+                exchangeBlock(world, player, recorder, coordinate, blockState, usedItems, producedItems);
             }
         }
+        pushUndo(stack, new Undo(recorder.build(world.getDimension().getType()), usedItems, producedItems));
         return true;
     }
 
-    private boolean exchangeBlock(ServerWorld world, ServerPlayerEntity player, BlockPos pos, BlockData setBlock) {
+    private boolean exchangeBlock(ServerWorld world, ServerPlayerEntity player, RegionSnapshot.Recorder recorder, BlockPos pos, BlockData setBlock, Multiset<UniqueItem> usedItems, Multiset<UniqueItem> producedItems) {
         BlockState currentBlock = world.getBlockState(pos);
         ItemStack itemStack;
         boolean useConstructionPaste = false;
@@ -286,16 +294,21 @@ public class GadgetExchanger extends ModeGadget {
             useItemSuccess = InventoryHelper.useItem(itemStack, player, neededItems, world);
         }
         if (useItemSuccess) {
+            if (useConstructionPaste)
+                usedItems.add(new com.direwolf20.buildinggadgets.api.materials.UniqueItem(OurItems.constructionPaste), 1);
+            else
+                usedItems.add(com.direwolf20.buildinggadgets.api.materials.UniqueItem.ofStack(itemStack), neededItems);
+            recorder.record(world, pos);
             EffectBlock.spawnEffectBlock(world, pos, setBlock, EffectBlock.Mode.REPLACE, useConstructionPaste);
             //currentBlock.getBlock().removedByPlayer(currentBlock.getBlockData(), world, pos, player, false, null);
-            List<ItemStack> blockDrops = currentBlock.getBlock().getDrops(currentBlock, world, pos, world.getTileEntity(pos));
+            List<ItemStack> blockDrops = Block.getDrops(currentBlock, world, pos, world.getTileEntity(pos));
             for (ItemStack drop : blockDrops) {
                 if (drop.getItem().equals(OurItems.constructionPaste)) {
                     InventoryHelper.addPasteToContainer(player, drop);
-                }
-                if (drop != null) {
+                } else {
                     player.addItemStackToInventory(drop);
                 }
+                producedItems.add(UniqueItem.ofStack(drop));
             }
             //player.addItemStackToInventory(new ItemStack(currentBlock.getBlock().getDrops(currentBlock, world, pos, world.getTileEntity(pos)), 1));
             return true;

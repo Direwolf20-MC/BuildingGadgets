@@ -280,7 +280,7 @@ public abstract class AbstractGadget extends Item {
             if (! CopyUnloadedCommand.mayCopyUnloadedChunks(player)) {//TODO separate command
                 ImmutableSortedSet<ChunkPos> unloadedChunks = snapshot.getPositions().getBoundingBox().getUnloadedChunks(world);
                 if (! unloadedChunks.isEmpty()) {
-                    //TODO Proper message
+                    pushUndo(stack, undo);
                     player.sendStatusMessage(MessageTranslation.UNDO_UNLOADED.componentTranslation().setStyle(Styles.RED), true);
                     BuildingGadgets.LOG.error("Player attempted to undo a Region missing {} unloaded chunks. Denied undo!", unloadedChunks.size());
                     BuildingGadgets.LOG.trace("The following chunks were detected as unloaded {}.", unloadedChunks);
@@ -288,11 +288,13 @@ public abstract class AbstractGadget extends Item {
                 }
             }
             if (snapshot.getDim() != world.getDimension().getType()) {
+                pushUndo(stack, undo);
                 player.sendStatusMessage(MessageTranslation.UNDO_FAILED.componentTranslation().setStyle(Styles.RED), true);
                 return;
             }
             MatchResult result = index.tryMatch(undo.getProducedItems());
             if (! result.isSuccess()) {
+                pushUndo(stack, undo);
                 player.sendStatusMessage(MessageTranslation.UNDO_MISSING_ITEMS.componentTranslation().setStyle(Styles.RED), true);
                 return;
             }

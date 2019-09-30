@@ -2,18 +2,18 @@ package com.direwolf20.buildinggadgets.common.items.gadgets;
 
 import com.direwolf20.buildinggadgets.api.building.BlockData;
 import com.direwolf20.buildinggadgets.api.building.modes.IAtopPlacingGadget;
-import com.direwolf20.buildinggadgets.api.building.tilesupport.TileSupport;
 import com.direwolf20.buildinggadgets.common.blocks.EffectBlock;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.items.gadgets.renderers.BaseRenderer;
 import com.direwolf20.buildinggadgets.common.items.gadgets.renderers.BuildingRender;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketBindTool;
-import com.direwolf20.buildinggadgets.common.registry.OurBlocks;
 import com.direwolf20.buildinggadgets.common.registry.OurItems;
 import com.direwolf20.buildinggadgets.common.save.SaveManager;
+import com.direwolf20.buildinggadgets.common.save.Undo;
 import com.direwolf20.buildinggadgets.common.save.UndoWorldSave;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
+import com.direwolf20.buildinggadgets.common.util.blocks.RegionSnapshot;
 import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
 import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
 import com.direwolf20.buildinggadgets.common.util.inventory.InventoryHelper;
@@ -21,13 +21,13 @@ import com.direwolf20.buildinggadgets.common.util.lang.LangUtil;
 import com.direwolf20.buildinggadgets.common.util.lang.Styles;
 import com.direwolf20.buildinggadgets.common.util.lang.TooltipTranslation;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
-import com.direwolf20.buildinggadgets.common.util.tools.UndoState;
 import com.direwolf20.buildinggadgets.common.util.tools.modes.BuildingMode;
 import com.direwolf20.buildinggadgets.common.world.FakeBuilderWorld;
+import com.google.common.collect.HashMultiset;
+import com.google.common.collect.Multiset;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -42,10 +42,8 @@ import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.BlockSnapshot;
 import net.minecraftforge.event.ForgeEventFactory;
-import net.minecraftforge.event.world.BlockEvent;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -207,14 +205,14 @@ public class GadgetBuilding extends ModeGadget implements IAtopPlacingGadget {
         } else { //If we do have an anchor, erase it (Even if the build fails)
             setAnchor(stack, new ArrayList<BlockPos>());
         }
-        List<BlockPos> undoCoords = new ArrayList<BlockPos>();
 
         ItemStack heldItem = getGadget(player);
         if (heldItem.isEmpty())
             return false;
 
         BlockData blockData = getToolBlock(heldItem);
-
+        RegionSnapshot.Recorder recorder = RegionSnapshot.recordAll();
+        Multiset<com.direwolf20.buildinggadgets.api.materials.UniqueItem> requiredItems = HashMultiset.create();
         if (blockData.getState() != Blocks.AIR.getDefaultState()) { //Don't attempt a build if a block is not chosen -- Typically only happens on a new tool.
             //TODO replace with a better TileEntity supporting Fake IWorld
             fakeWorld.setWorldAndState(player.world, blockData.getState(), coords); // Initialize the fake world's blocks
@@ -222,65 +220,16 @@ public class GadgetBuilding extends ModeGadget implements IAtopPlacingGadget {
                 //Get the extended block state in the fake world
                 //Disabled to fix Chisel
                 //state = state.getBlock().getExtendedState(state, fakeWorld, coordinate);
-                if (placeBlock(world, player, coordinate, blockData)) {
-                    undoCoords.add(coordinate);//If we successfully place the block, add the location to the undo list.
-                }
-            }
-            if (undoCoords.size() > 0) { //If the undo list has any data in it, add it to NBT on the tool.
-                UndoState undoState = new UndoState(player.dimension, undoCoords);
-                pushUndoList(heldItem, undoState);
+                placeBlock(world, player, recorder, coordinate, blockData, requiredItems);
             }
         }
+        pushUndo(stack, new Undo(recorder.build(world.getDimension().getType()), requiredItems));
 
         //SortingHelper.Blocks.byDistance(coords, player);
         return true;
     }
 
-    public static boolean undoBuild(PlayerEntity player) {
-        ItemStack heldItem = getGadget(player);
-        if (heldItem.isEmpty())
-            return false;
-
-        UndoState undoState = popUndoList(heldItem); //Get the undo list off the tool, exit if empty
-        if (undoState == null) {
-            player.sendStatusMessage(new StringTextComponent(TextFormatting.AQUA + new TranslationTextComponent("message.gadget.nothingtoundo").getUnformattedComponentText()), true);
-            return false;
-        }
-        World world = player.world;
-        if (!world.isRemote) {
-            List<BlockPos> undoCoords = undoState.coordinates; //Get the Coords to undo
-
-            List<BlockPos> failedRemovals = new ArrayList<BlockPos>(); //Build a list of removals that fail
-            ItemStack silkTool = heldItem.copy(); //Setup a Silk Touch version of the tool so we can return stone instead of cobblestone, etc.
-            silkTool.addEnchantment(Enchantments.SILK_TOUCH, 1);
-            boolean sameDim = player.dimension == undoState.dimension;
-            for (BlockPos coord : undoCoords) {
-                BlockData currentBlock = TileSupport.createBlockData(world, coord);
-
-                double distance = Math.sqrt(coord.distanceSq(player.getPosition()));
-
-                BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(world, coord, currentBlock.getState(), player);
-                boolean cancelled = MinecraftForge.EVENT_BUS.post(e);
-
-                if (distance < 64 && sameDim && currentBlock.getState() != OurBlocks.effectBlock.getDefaultState() && !cancelled) { //Don't allow us to undo a block while its still being placed or too far away
-                    if (currentBlock.getState() != Blocks.AIR.getDefaultState()) {
-                        currentBlock.getState().getBlock().harvestBlock(world, player, coord, currentBlock.getState(), world.getTileEntity(coord), silkTool);
-                        EffectBlock.spawnEffectBlock(world, coord, currentBlock, EffectBlock.Mode.REMOVE, false);
-                    }
-                } else { //If you're in the wrong dimension or too far away, fail the undo.
-                    player.sendStatusMessage(new StringTextComponent(TextFormatting.RED + new TranslationTextComponent("message.gadget.undofailed").getUnformattedComponentText()), true);
-                    failedRemovals.add(coord);
-                }
-            }
-            if (failedRemovals.size() != 0) { //Add any failed undo blocks to the undo stack.
-                UndoState failedState = new UndoState(player.dimension, failedRemovals);
-                pushUndoList(heldItem, failedState);
-            }
-        }
-        return true;
-    }
-
-    private boolean placeBlock(World world, ServerPlayerEntity player, BlockPos pos, BlockData setBlock) {
+    private boolean placeBlock(World world, ServerPlayerEntity player, RegionSnapshot.Recorder recorder, BlockPos pos, BlockData setBlock, Multiset<com.direwolf20.buildinggadgets.api.materials.UniqueItem> usedItems) {
         if (!player.isAllowEdit())
             return false;
 
@@ -344,6 +293,11 @@ public class GadgetBuilding extends ModeGadget implements IAtopPlacingGadget {
             useItemSuccess = InventoryHelper.useItem(itemStack, player, neededItems, world);
         }
         if (useItemSuccess) {
+            if (useConstructionPaste)
+                usedItems.add(new com.direwolf20.buildinggadgets.api.materials.UniqueItem(OurItems.constructionPaste), 1);
+            else
+                usedItems.add(com.direwolf20.buildinggadgets.api.materials.UniqueItem.ofStack(itemStack), neededItems);
+            recorder.record(world, pos);
             EffectBlock.spawnEffectBlock(world, pos, setBlock, EffectBlock.Mode.PLACE, useConstructionPaste);
             return true;
         }
