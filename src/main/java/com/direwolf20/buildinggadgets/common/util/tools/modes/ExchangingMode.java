@@ -95,7 +95,7 @@ public enum ExchangingMode {
             if (worldBlockState == OurBlocks.effectBlock.getDefaultState())
                 return false;
             // Only replace existing blocks, don't place more
-            if (worldBlockState.getBlock().isAir(worldBlockState, world, pos))
+            if (worldBlockState.isAir(world, pos))
                 return false;
 
             TileEntity tile = world.getTileEntity(pos);

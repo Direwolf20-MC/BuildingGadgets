@@ -35,12 +35,15 @@ import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.exceptions.CapabilityNotPresentException;
 import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
 import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
+import com.direwolf20.buildinggadgets.common.util.inventory.IItemIndex;
+import com.direwolf20.buildinggadgets.common.util.inventory.InventoryHelper;
 import com.direwolf20.buildinggadgets.common.util.lang.ITranslationProvider;
 import com.direwolf20.buildinggadgets.common.util.lang.MessageTranslation;
 import com.direwolf20.buildinggadgets.common.util.lang.Styles;
 import com.direwolf20.buildinggadgets.common.util.lang.TooltipTranslation;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.util.tools.NetworkIO;
+import com.direwolf20.buildinggadgets.common.util.tools.building.PlacementEvaluator;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList.Builder;
 import com.google.common.collect.ImmutableSortedSet;
@@ -51,7 +54,9 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemUseContext;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.util.ActionResult;
@@ -68,6 +73,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.Constants.NBT;
+import net.minecraftforge.energy.CapabilityEnergy;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -502,9 +508,21 @@ public class GadgetCopyPaste extends AbstractGadget {
 
     private void schedulePlacement(ItemStack stack, IBuildView view, PlayerEntity player, BlockPos pos) {
         view.translateTo(pos);
+        int energyCost = getEnergyCost(stack);
+        IItemIndex index = InventoryHelper.index(stack, player);
+        boolean overwrite = Config.GENERAL.allowOverwriteBlocks.get();
+        BlockItemUseContext useContext = new BlockItemUseContext(new ItemUseContext(player, Hand.MAIN_HAND, VectorHelper.getLookingAt(player, stack)));
+        PlacementEvaluator evalView = new PlacementEvaluator(
+                view,
+                stack.getCapability(CapabilityEnergy.ENERGY),
+                t -> energyCost,
+                index,
+                (c, t) -> overwrite ? c.getWorld().getBlockState(t.getPos()).isReplaceable(useContext) : c.getWorld().isAirBlock(t.getPos()),
+                true,
+                false);
         PlacementScheduler.schedulePlacement(t -> {//TODO PlacementLogic and mechanism to stop when missing blocks!
             EffectBlock.spawnEffectBlock(view.getContext(), t, Mode.PLACE, false);
-        }, view, Config.GADGETS.GADGET_COPY_PASTE.placeSteps.get())
+        }, evalView, Config.GADGETS.GADGET_COPY_PASTE.placeSteps.get())
                 .withFinisher(() -> onBuildFinished(stack, player));
     }
 

@@ -79,14 +79,14 @@ public final class PlacementTarget {
     }
 
     public PlacementTarget mirror(Mirror mirror) {
-        return new PlacementTarget(getPos(), getData().mirror(mirror));
+        return new PlacementTarget(pos, data.mirror(mirror));
     }
 
     public PlacementTarget rotate(Rotation rotation) {
         return new PlacementTarget(getPos(), getData().rotate(rotation));
     }
 
-    public MaterialList getRequiredItems(IBuildContext context, @Nullable RayTraceResult target) {
+    public MaterialList getRequiredMaterials(IBuildContext context, @Nullable RayTraceResult target) {
         return getData().getRequiredItems(context, target, getPos());
     }
 

@@ -1,4 +1,4 @@
-package com.direwolf20.buildinggadgets.common.util.tools;
+package com.direwolf20.buildinggadgets.common.util.tools.building;
 
 import com.direwolf20.buildinggadgets.api.building.Region;
 import com.direwolf20.buildinggadgets.api.building.placement.IPositionPlacementSequence;

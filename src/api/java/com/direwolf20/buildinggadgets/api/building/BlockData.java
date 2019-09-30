@@ -135,7 +135,7 @@ public final class BlockData {
      * @return whether or not the {@link ITileEntityData} reported that placement was performed.
      */
     public boolean placeIn(IBuildContext context, BlockPos pos) {
-        return tileData.allowPlacement(context, state, pos) && tileData.placeIn(context, state, pos);
+        return tileData.placeIn(context, state, pos);
     }
 
     /**

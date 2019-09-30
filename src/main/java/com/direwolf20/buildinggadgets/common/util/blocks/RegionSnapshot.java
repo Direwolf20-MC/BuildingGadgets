@@ -6,7 +6,7 @@ import com.direwolf20.buildinggadgets.common.util.exceptions.PaletteOverflowExce
 import com.direwolf20.buildinggadgets.common.util.helpers.LambdaHelper;
 import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
-import com.direwolf20.buildinggadgets.common.util.tools.SetBackedPlacementSequence;
+import com.direwolf20.buildinggadgets.common.util.tools.building.SetBackedPlacementSequence;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;

@@ -100,7 +100,7 @@ public enum BuildingMode {
                 // Is the current block replaceable by the target block in the given context?
                 return current.isReplaceable(new BlockItemUseContext(new ItemUseContext(player, Hand.MAIN_HAND, VectorHelper.getLookingAt(player, tool))));
             // If we don't allow overrides, replacement only happens when the current position is air
-            return current.getBlock().isAir(current, world, pos);
+            return current.isAir(world, pos);
         };
     }
 

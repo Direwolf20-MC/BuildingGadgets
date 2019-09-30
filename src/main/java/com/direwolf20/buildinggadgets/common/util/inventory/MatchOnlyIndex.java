@@ -2,27 +2,28 @@ package com.direwolf20.buildinggadgets.common.util.inventory;
 
 import com.direwolf20.buildinggadgets.api.materials.MaterialList;
 import com.direwolf20.buildinggadgets.api.materials.UniqueItem;
-import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.Multiset;
 
-import java.util.Iterator;
+public final class MatchOnlyIndex implements IItemIndex {
+    private final IItemIndex delegate;
 
-public final class CreativeItemIndex implements IItemIndex {
-    @Override
-    public void insert(Multiset<UniqueItem> items) {
-
+    public MatchOnlyIndex(IItemIndex delegate) {
+        this.delegate = delegate;
     }
 
     @Override
     public void reIndex() {
-
+        delegate.reIndex();
     }
 
     @Override
     public MatchResult tryMatch(MaterialList list) {
-        Iterator<ImmutableMultiset<UniqueItem>> it = list.iterator();
-        ImmutableMultiset<UniqueItem> chosen = it.hasNext() ? it.next() : ImmutableMultiset.of();
-        return MatchResult.success(list, chosen, chosen);
+        return delegate.tryMatch(list);
+    }
+
+    @Override
+    public void insert(Multiset<UniqueItem> items) {
+
     }
 
     @Override

@@ -2,24 +2,68 @@ package com.direwolf20.buildinggadgets.common.util.inventory;
 
 import com.direwolf20.buildinggadgets.api.materials.MaterialList;
 import com.direwolf20.buildinggadgets.api.materials.UniqueItem;
-import com.google.common.collect.HashMultiset;
-import com.google.common.collect.ImmutableMultiset;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.Multiset;
+import com.google.common.collect.*;
 import com.google.common.collect.Multiset.Entry;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.items.IItemHandler;
 
+import java.util.Collection;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 public final class SimpleItemIndex implements IItemIndex {
-    private final Multimap<Item, IStackHandle> handleMap;
-    private final List<IInsertExtractProvider> insertExtractProviders;
+    private Multimap<Item, IStackHandle> handleMap;
+    private List<IInsertExtractProvider> insertExtractProviders;
+    private final ItemStack stack;
+    private final PlayerEntity player;
 
-    SimpleItemIndex(Multimap<Item, IStackHandle> handleMap, List<IInsertExtractProvider> insertExtractProviders) {
-        this.handleMap = handleMap;
-        this.insertExtractProviders = insertExtractProviders;
+    public SimpleItemIndex(ItemStack stack, PlayerEntity player) {
+        this.stack = stack;
+        this.player = player;
+        reIndex();
+    }
+
+    @Override
+    public void insert(Multiset<UniqueItem> items) {
+        Multiset<UniqueItem> copy = HashMultiset.create(items);
+        for (IItemHandler handler : InventoryHelper.getHandlers(stack, player)) {
+            for (int i = 0; i < handler.getSlots(); i++) {
+                ItemStack stack = handler.getStackInSlot(i);
+                Multiset<UniqueItem> toRemove = HashMultiset.create();
+                for (Multiset.Entry<UniqueItem> entry : copy.entrySet()) {
+                    int remainingCount = entry.getCount();
+                    if (stack.isEmpty()) {
+                        ItemStack insertStack = entry.getElement().createStack(entry.getCount());
+                        remainingCount = handler.insertItem(i, insertStack, false).getCount();
+                        IStackHandle handle = new StackHandlerHandle(handler, i);
+                        if (! handleMap.containsEntry(insertStack.getItem(), handle))
+                            handleMap.put(insertStack.getItem(), handle);
+                    } else if (entry.getElement().matches(stack)) {
+                        ItemStack copyStack = stack.copy();
+                        copyStack.setCount(entry.getCount());
+                        remainingCount = handler.insertItem(i, copyStack, false).getCount();
+                    }
+                    if (remainingCount < entry.getCount()) {
+                        toRemove.add(entry.getElement(), entry.getCount() - remainingCount);
+                        stack = handler.getStackInSlot(i);
+                    }
+                }
+                for (Multiset.Entry<UniqueItem> entry : toRemove.entrySet()) {
+                    copy.remove(entry.getElement(), entry.getCount());
+                }
+                if (copy.isEmpty())
+                    return;
+            }
+        }
+    }
+
+    @Override
+    public void reIndex() {
+        this.handleMap = InventoryHelper.indexMap(stack, player);
+        this.insertExtractProviders = ImmutableList.of();
     }
 
     @Override
@@ -53,13 +97,18 @@ public final class SimpleItemIndex implements IItemIndex {
         boolean failure = false;
         for (Entry<UniqueItem> entry : multiset.entrySet()) {
             int remainingCount = entry.getCount();
-            for (IStackHandle handle : handleMap.get(entry.getElement().getItem())) {
+            Collection<IStackHandle> entries = handleMap.get(entry.getElement().getItem());
+            List<IStackHandle> toRemove = new LinkedList<>();
+            for (IStackHandle handle : entries) {
                 if (remainingCount <= 0)
                     break;
                 int match = handle.match(entry.getElement(), remainingCount, simulate);
                 if (match > 0)
                     remainingCount -= match;
+                if (handle.shouldCleanup())
+                    toRemove.add(handle);
             }
+            entries.removeAll(toRemove);//cleanup
             if (remainingCount > 0) {
                 ItemStack stack = entry.getElement().createStack(remainingCount);
                 if (! stack.isEmpty()) {

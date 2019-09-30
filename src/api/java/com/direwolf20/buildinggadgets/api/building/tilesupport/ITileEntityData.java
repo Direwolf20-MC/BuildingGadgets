@@ -29,19 +29,6 @@ public interface ITileEntityData {
     ITileDataSerializer getSerializer();
 
     /**
-     * Checks whether this {@link ITileEntityData} permits being placed at the given position.
-     * @param context The {@link IBuildContext} to place in.
-     * @param state The {@link BlockState} to place.
-     * @param position The {@link BlockPos} at which to place
-     * @return Whether or not placement should be allowed for this {@link ITileEntityData}. Returning false can be as trivial as the position being in the wrong
-     *         Biome for this type of liquid for example...
-     * @implNote The default implementation checks whether the given position is air.
-     */
-    default boolean allowPlacement(IBuildContext context, BlockState state, BlockPos position) {
-        return context.getWorld().isAirBlock(position);
-    }
-
-    /**
      * Attempts to place this {@link ITileEntityData} in the given {@link IBuildContext}. If this is called but {@link #allowPlacement(IBuildContext, BlockState, BlockPos)}
      * would have returned false, placement should still be attempted and counted as a "forced placement".<br>
      * This Method should also set any data on the {@link net.minecraft.tileentity.TileEntity} represented by this {@code ITileEntityData}.

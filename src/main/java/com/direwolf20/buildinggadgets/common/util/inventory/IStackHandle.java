@@ -8,5 +8,5 @@ interface IStackHandle {
 
     int match(UniqueItem item, int count, boolean simulate);
 
-    boolean isReady();
+    boolean shouldCleanup();
 }

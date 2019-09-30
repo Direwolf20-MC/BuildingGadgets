@@ -548,7 +548,7 @@ public final class ImmutableTemplate implements ITemplate {
                     PlacementTarget target = new PlacementTarget(resPos, entry.getValue());
                     PlayerEntity player = context.getBuildingPlayer();
                     BlockRayTraceResult targetRes = player != null ? CommonUtils.fakeRayTrace(player.posX, player.posY, player.posZ, resPos) : null;
-                    builder.addAll(target.getRequiredItems(context, targetRes).getRequiredItems());
+                    builder.addAll(target.getRequiredMaterials(context, targetRes).getRequiredItems());
                 }
                 regionBuilder.enclose(resPos);
             }

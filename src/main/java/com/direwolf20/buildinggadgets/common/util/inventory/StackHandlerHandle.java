@@ -15,8 +15,8 @@ public final class StackHandlerHandle implements IStackHandle {
     }
 
     @Override
-    public boolean isReady() {
-        return ! getStack().isEmpty();
+    public boolean shouldCleanup() {
+        return getStack().isEmpty();
     }
 
     @Override
@@ -36,5 +36,23 @@ public final class StackHandlerHandle implements IStackHandle {
 
     private ItemStack getStack() {
         return handler.getStackInSlot(slot);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (! (o instanceof StackHandlerHandle)) return false;
+
+        StackHandlerHandle that = (StackHandlerHandle) o;
+
+        if (slot != that.slot) return false;
+        return handler.equals(that.handler);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = handler.hashCode();
+        result = 31 * result + slot;
+        return result;
     }
 }

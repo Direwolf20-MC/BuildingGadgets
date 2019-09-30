@@ -10,9 +10,9 @@ import com.direwolf20.buildinggadgets.common.registry.OurItems;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.exceptions.CapabilityNotPresentException;
 import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMultimap;
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Multimap;
 import net.minecraft.block.*;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -50,20 +50,29 @@ public class InventoryHelper {
     public static IItemIndex index(ItemStack tool, PlayerEntity player) {
         if (player.isCreative())
             return CREATIVE_INDEX;
-        IItemHandler handler = player.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).orElseThrow(CapabilityNotPresentException::new);
-        IItemHandler remoteInv = GadgetUtils.getRemoteInventory(tool, player.world);
-        ImmutableMultimap.Builder<Item, IStackHandle> builder = ImmutableMultimap.builder();
-        indexHandler(builder, handler);
-        if (remoteInv != null)
-            indexHandler(builder, remoteInv);
-        return new SimpleItemIndex(builder.build(), ImmutableList.of());
+        return new SimpleItemIndex(tool, player);
     }
 
-    private static void indexHandler(ImmutableMultimap.Builder<Item, IStackHandle> builder, IItemHandler handler) {
+    static Multimap<Item, IStackHandle> indexMap(ItemStack tool, PlayerEntity player) {
+        Multimap<Item, IStackHandle> map = HashMultimap.create();
+        for (IItemHandler handler : getHandlers(tool, player)) {
+            if (handler != null)
+                indexHandler(map, handler);
+        }
+        return map;
+    }
+
+    static List<IItemHandler> getHandlers(ItemStack stack, PlayerEntity player) {
+        return Arrays.asList(
+                player.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).orElseThrow(CapabilityNotPresentException::new),
+                GadgetUtils.getRemoteInventory(stack, player.world));
+    }
+
+    private static void indexHandler(Multimap<Item, IStackHandle> map, IItemHandler handler) {
         for (int i = 0; i < handler.getSlots(); i++) {
             ItemStack stack = handler.getStackInSlot(i);
             if (! stack.isEmpty())
-                builder.put(stack.getItem(), new StackHandlerHandle(handler, i));
+                map.put(stack.getItem(), new StackHandlerHandle(handler, i));
         }
     }
 

@@ -5,6 +5,11 @@ import com.direwolf20.buildinggadgets.api.materials.UniqueItem;
 import com.google.common.collect.Multiset;
 
 public interface IItemIndex {
+
+    void insert(Multiset<UniqueItem> items);
+
+    void reIndex();
+
     MatchResult tryMatch(MaterialList list);
 
     default MatchResult tryMatch(Multiset<UniqueItem> items) {

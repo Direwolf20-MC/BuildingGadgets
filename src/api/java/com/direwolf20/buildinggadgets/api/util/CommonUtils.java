@@ -158,7 +158,7 @@ public final class CommonUtils {
         MaterialList.SubEntryBuilder builder = MaterialList.andBuilder();
         for (PlacementTarget placementTarget : buildView) {
             BlockRayTraceResult target = simulatePos != null ? CommonUtils.fakeRayTrace(simulatePos, placementTarget.getPos()) : null;
-            builder.add(placementTarget.getRequiredItems(context, target));
+            builder.add(placementTarget.getRequiredMaterials(context, target));
         }
         return builder.build();
     }

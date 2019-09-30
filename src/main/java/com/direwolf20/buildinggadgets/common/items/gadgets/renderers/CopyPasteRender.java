@@ -10,9 +10,16 @@ import com.direwolf20.buildinggadgets.api.capability.CapabilityTemplate;
 import com.direwolf20.buildinggadgets.api.template.ITemplate;
 import com.direwolf20.buildinggadgets.api.template.SimpleBuildOpenOptions;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
+import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.items.gadgets.AbstractGadget;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.util.helpers.SortingHelper.RenderSorter;
+import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
+import com.direwolf20.buildinggadgets.common.util.inventory.IItemIndex;
+import com.direwolf20.buildinggadgets.common.util.inventory.InventoryHelper;
+import com.direwolf20.buildinggadgets.common.util.tools.SimulateEnergyStorage;
+import com.direwolf20.buildinggadgets.common.util.tools.building.InvertedPlacementEvaluator;
+import com.direwolf20.buildinggadgets.common.util.tools.building.SetBackedBuildView;
 import com.direwolf20.buildinggadgets.common.world.FakeDelegationWorld;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -23,14 +30,14 @@ import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
+import net.minecraft.item.*;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
+import net.minecraftforge.energy.CapabilityEnergy;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL14;
 
@@ -195,12 +202,42 @@ public class CopyPasteRender extends BaseRenderer {
 
                     GlStateManager.popMatrix();
                 }
+                if (! player.isCreative()) {
+                    renderMissing(player, stack, view, sorter);
+                }
                 GL14.glBlendColor(1F, 1F, 1F, 1); //Reset Blend, as it seems to affect the Item Render
                 GlStateManager.disableBlend();
                 GlStateManager.popAttributes();
             });
         });
 
+    }
+
+    private void renderMissing(PlayerEntity player, ItemStack stack, IBuildView view, RenderSorter sorter) {
+        int energyCost = ((GadgetCopyPaste) stack.getItem()).getEnergyCost(stack);
+        IItemIndex index = InventoryHelper.index(stack, player);
+        boolean overwrite = Config.GENERAL.allowOverwriteBlocks.get();
+        BlockItemUseContext useContext = new BlockItemUseContext(new ItemUseContext(player, Hand.MAIN_HAND, VectorHelper.getLookingAt(player, stack)));
+        InvertedPlacementEvaluator evaluator = new InvertedPlacementEvaluator(
+                new SetBackedBuildView(view.getContext(), sorter.getOrderedTargets(), view.getBoundingBox()),
+                stack.getCapability(CapabilityEnergy.ENERGY).map(SimulateEnergyStorage::new),
+                t -> energyCost,
+                index,
+                (c, t) -> overwrite ? c.getWorld().getBlockState(t.getPos()).isReplaceable(useContext) : c.getWorld().isAirBlock(t.getPos()),
+                false,
+                false);
+        GL14.glBlendColor(1F, 1F, 1F, 0.35f); //Set the alpha of the blocks we are rendering
+        for (PlacementTarget target : evaluator) { //Now run through the UNSORTED list of coords, to show which blocks won't place if you don't have enough of them.
+            GlStateManager.pushMatrix();//Push matrix again just because
+            BlockPos pos = target.getPos();
+            GlStateManager.translatef(pos.getX(), pos.getY(), pos.getZ());//Now move the render position to the coordinates we want to render at
+            GlStateManager.rotatef(- 90.0F, 0.0F, 1.0F, 0.0F); //Rotate it because i'm not sure why but we need to
+            GlStateManager.translatef(- 0.005f, - 0.005f, 0.005f);
+            GlStateManager.scalef(1.01f, 1.01f, 1.01f);
+            getMc().getBlockRendererDispatcher().renderBlockBrightness(Blocks.RED_STAINED_GLASS.getDefaultState(), 1f);
+            //Move the render position back to where it was
+            GlStateManager.popMatrix();
+        }
     }
 
     @Override
