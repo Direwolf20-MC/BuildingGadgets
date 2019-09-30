@@ -168,7 +168,7 @@ public class GadgetDestruction extends AbstractGadget {
                 }
 
                 BlockRayTraceResult lookingAt = VectorHelper.getLookingAt(player, stack);
-                if (world.isAirBlock(lookingAt.getPos())) {
+                if (! world.isAirBlock(lookingAt.getPos())) {
                     clearArea(world, lookingAt.getPos(), lookingAt.getFace(), (ServerPlayerEntity) player, stack);
                     onAnchorRemoved(stack, player);
                     return new ActionResult<>(ActionResultType.SUCCESS, stack);

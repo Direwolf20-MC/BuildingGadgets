@@ -509,9 +509,10 @@ public class GadgetCopyPaste extends AbstractGadget {
     }
 
     private void schedulePlacement(ItemStack stack, IBuildView view, PlayerEntity player, BlockPos pos) {
+        RecordingItemIndex index = new RecordingItemIndex(InventoryHelper.index(stack, player));
+        RegionSnapshot.Recorder recorder = RegionSnapshot.recordAll();
         view.translateTo(pos);
         int energyCost = getEnergyCost(stack);
-        RecordingItemIndex index = new RecordingItemIndex(InventoryHelper.index(stack, player));
         boolean overwrite = Config.GENERAL.allowOverwriteBlocks.get();
         BlockItemUseContext useContext = new BlockItemUseContext(new ItemUseContext(player, Hand.MAIN_HAND, VectorHelper.getLookingAt(player, stack)));
         PlacementEvaluator evalView = new PlacementEvaluator(
@@ -522,7 +523,6 @@ public class GadgetCopyPaste extends AbstractGadget {
                 (c, t) -> overwrite ? c.getWorld().getBlockState(t.getPos()).isReplaceable(useContext) : c.getWorld().isAirBlock(t.getPos()),
                 true,
                 false);
-        RegionSnapshot.Recorder recorder = RegionSnapshot.recordAll();
         PlacementScheduler.schedulePlacement(t -> {//TODO PlacementLogic and mechanism to stop when missing blocks!
             recorder.record(view.getContext().getWorld(), t.getPos());
             EffectBlock.spawnEffectBlock(view.getContext(), t, Mode.PLACE, false);

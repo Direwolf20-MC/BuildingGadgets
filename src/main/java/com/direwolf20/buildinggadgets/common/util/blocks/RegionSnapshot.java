@@ -352,10 +352,11 @@ public class RegionSnapshot {
          */
         public RegionSnapshot build() throws IllegalStateException, PaletteOverflowException {
             Preconditions.checkState(!built);
-
+            ImmutableSet.Builder<BlockPos> positionBuilder = ImmutableSet.builder();
             ImmutableList.Builder<Optional<BlockState>> blockStatesBuilder = ImmutableList.builder();
             ImmutableList.Builder<Pair<BlockPos, CompoundNBT>> tileDataBuilder = ImmutableList.builder();
             for (BlockPos pos : positions) {
+                positionBuilder.add(pos);
                 TileEntity tile = world.getTileEntity(pos);
                 BlockState state = world.getBlockState(pos);
                 if (tile != null && tileValidator.test(pos, state, tile)) {
@@ -375,7 +376,10 @@ public class RegionSnapshot {
                 throw new PaletteOverflowException(positions, uniqueBlocksStates.size());
 
             built = true;
-            return new RegionSnapshot(world.getDimension().getType(), positions, blockStates, tileDataBuilder.build());
+            return new RegionSnapshot(world.getDimension().getType(),
+                    new SetBackedPlacementSequence(positionBuilder.build(), positions.getBoundingBox()),
+                    blockStates,
+                    tileDataBuilder.build());
         }
     }
 

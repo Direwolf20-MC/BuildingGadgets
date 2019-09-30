@@ -51,9 +51,7 @@ public final class SimpleItemIndex implements IItemIndex {
                         stack = handler.getStackInSlot(i);
                     }
                 }
-                for (Multiset.Entry<UniqueItem> entry : toRemove.entrySet()) {
-                    copy.remove(entry.getElement(), entry.getCount());
-                }
+                Multisets.removeOccurrences(copy, toRemove);
                 if (copy.isEmpty())
                     return;
             }
