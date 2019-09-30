@@ -13,6 +13,7 @@ import com.direwolf20.buildinggadgets.common.registry.OurBlocks;
 import com.direwolf20.buildinggadgets.common.registry.OurItems;
 import com.direwolf20.buildinggadgets.common.save.SaveManager;
 import com.direwolf20.buildinggadgets.common.save.UndoWorldSave;
+import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
 import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
 import com.direwolf20.buildinggadgets.common.util.inventory.InventoryHelper;
@@ -53,7 +54,7 @@ import java.util.function.Supplier;
 
 import static com.direwolf20.buildinggadgets.common.util.GadgetUtils.*;
 
-public class GadgetBuilding extends AbstractGadget implements IAtopPlacingGadget {
+public class GadgetBuilding extends ModeGadget implements IAtopPlacingGadget {
 
     private static final FakeBuilderWorld fakeWorld = new FakeBuilderWorld();
 
@@ -193,7 +194,7 @@ public class GadgetBuilding extends AbstractGadget implements IAtopPlacingGadget
     private boolean build(ServerPlayerEntity player, ItemStack stack) {
         //Build the blocks as shown in the visual render
         World world = player.world;
-        List<BlockPos> coords = getAnchor(stack);
+        List<BlockPos> coords = GadgetUtils.getAnchor(stack);
 
         if (coords.size() == 0) {  //If we don't have an anchor, build in the current spot
             RayTraceResult lookingAt = VectorHelper.getLookingAt(player, stack);

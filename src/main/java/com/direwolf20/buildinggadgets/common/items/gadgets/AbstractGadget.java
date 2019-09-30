@@ -10,9 +10,11 @@ import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.items.gadgets.renderers.BaseRenderer;
 import com.direwolf20.buildinggadgets.common.save.UndoWorldSave;
 import com.direwolf20.buildinggadgets.common.util.CapabilityUtil.EnergyUtil;
+import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.blocks.RegionSnapshot;
 import com.direwolf20.buildinggadgets.common.util.exceptions.CapabilityNotPresentException;
 import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
+import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
 import com.direwolf20.buildinggadgets.common.util.lang.MessageTranslation;
 import com.direwolf20.buildinggadgets.common.util.lang.Styles;
 import com.direwolf20.buildinggadgets.common.util.lang.TooltipTranslation;
@@ -25,6 +27,8 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.ITextComponent;
@@ -161,6 +165,50 @@ public abstract class AbstractGadget extends Item {
                                     .componentTranslation(withSuffix(energy.getEnergyStored()), withSuffix(energy.getMaxEnergyStored()))
                                     .setStyle(Styles.WHITE));
             });
+    }
+
+    public final void onRotate(ItemStack stack, PlayerEntity player) {
+        if (performRotate(stack, player))
+            player.sendStatusMessage(MessageTranslation.ROTATED.componentTranslation().setStyle(Styles.AQUA), true);
+    }
+
+    protected boolean performRotate(ItemStack stack, PlayerEntity player) {
+        return false;
+    }
+
+    public final void onMirror(ItemStack stack, PlayerEntity player) {
+        if (performMirror(stack, player))
+            player.sendStatusMessage(MessageTranslation.MIRRORED.componentTranslation().setStyle(Styles.AQUA), true);
+    }
+
+    protected boolean performMirror(ItemStack stack, PlayerEntity player) {
+        return false;
+    }
+
+    public final void onAnchor(ItemStack stack, PlayerEntity player) {
+        if (getAnchor(stack) == null) {
+            BlockRayTraceResult lookingAt = VectorHelper.getLookingAt(player, stack);
+            if ((player.world.isAirBlock(lookingAt.getPos())))
+                return;
+            onAnchorSet(stack, player, lookingAt);
+            player.sendStatusMessage(MessageTranslation.ANCHOR_SET.componentTranslation().setStyle(Styles.AQUA), true);
+        } else {
+            onAnchorRemoved(stack, player);
+            player.sendStatusMessage(MessageTranslation.ANCHOR_REMOVED.componentTranslation().setStyle(Styles.AQUA), true);
+        }
+    }
+
+    protected void onAnchorSet(ItemStack stack, PlayerEntity player, BlockRayTraceResult lookingAt) {
+        GadgetUtils.writePOSToNBT(stack, lookingAt.getPos(), NBTKeys.GADGET_ANCHOR);
+    }
+
+    protected void onAnchorRemoved(ItemStack stack, PlayerEntity player) {
+        NBTHelper.getOrNewTag(stack).remove(NBTKeys.GADGET_ANCHOR);
+    }
+
+    @Nullable
+    public BlockPos getAnchor(ItemStack stack) {
+        return GadgetUtils.getPOSFromNBT(stack, NBTKeys.GADGET_ANCHOR);
     }
 
     public static boolean getFuzzy(ItemStack stack) {

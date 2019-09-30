@@ -1,6 +1,7 @@
 package com.direwolf20.buildinggadgets.common.items.gadgets.renderers;
 
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
+import com.direwolf20.buildinggadgets.common.items.gadgets.AbstractGadget;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetDestruction;
 import com.direwolf20.buildinggadgets.common.registry.OurBlocks;
 import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
@@ -41,10 +42,11 @@ public class DestructionRender extends BaseRenderer {
 
         BlockRayTraceResult lookingAt = VectorHelper.getLookingAt(player, heldItem);
         World world = player.world;
-        if ((lookingAt == null || (world.getBlockState(VectorHelper.getLookingAt(player, heldItem).getPos()) == AIR)) && GadgetDestruction.getAnchor(heldItem) == null)
+        BlockPos anchor = ((AbstractGadget) heldItem.getItem()).getAnchor(heldItem);
+        if ((lookingAt == null || (world.getBlockState(VectorHelper.getLookingAt(player, heldItem).getPos()) == AIR)) && anchor == null)
             return;
 
-        BlockPos startBlock = (GadgetDestruction.getAnchor(heldItem) == null) ? lookingAt.getPos() : GadgetDestruction.getAnchor(heldItem);
+        BlockPos startBlock = (anchor == null) ? lookingAt.getPos() : anchor;
         Direction facing = (GadgetDestruction.getAnchorSide(heldItem) == null) ? lookingAt.getFace() : GadgetDestruction.getAnchorSide(heldItem);
 
         if (world.getBlockState(startBlock) == OurBlocks.effectBlock.getDefaultState())

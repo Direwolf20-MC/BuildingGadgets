@@ -10,6 +10,7 @@ import com.direwolf20.buildinggadgets.common.network.packets.PacketBindTool;
 import com.direwolf20.buildinggadgets.common.registry.OurItems;
 import com.direwolf20.buildinggadgets.common.save.SaveManager;
 import com.direwolf20.buildinggadgets.common.save.UndoWorldSave;
+import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
 import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
 import com.direwolf20.buildinggadgets.common.util.inventory.InventoryHelper;
@@ -59,7 +60,7 @@ import java.util.function.Supplier;
 
 import static com.direwolf20.buildinggadgets.common.util.GadgetUtils.*;
 
-public class GadgetExchanger extends AbstractGadget {
+public class GadgetExchanger extends ModeGadget {
     private static final FakeBuilderWorld fakeWorld = new FakeBuilderWorld();
 
     public GadgetExchanger(Properties builder) {
@@ -183,7 +184,7 @@ public class GadgetExchanger extends AbstractGadget {
 
     private boolean exchange(ServerPlayerEntity player, ItemStack stack) {
         ServerWorld world = player.getServerWorld();
-        List<BlockPos> coords = getAnchor(stack);
+        List<BlockPos> coords = GadgetUtils.getAnchor(stack);
 
         if (coords.size() == 0) { //If we don't have an anchor, build in the current spot
             BlockRayTraceResult lookingAt = VectorHelper.getLookingAt(player, stack);

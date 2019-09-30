@@ -2,7 +2,6 @@ package com.direwolf20.buildinggadgets.common.network.packets;
 
 import com.direwolf20.buildinggadgets.common.items.gadgets.AbstractGadget;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetBuilding;
-import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetDestruction;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetExchanger;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import net.minecraft.entity.player.PlayerEntity;
@@ -29,10 +28,8 @@ public class PacketAnchor {
                     GadgetUtils.anchorBlocks(player, stack);
                 else if (stack.getItem() instanceof GadgetExchanger)
                     GadgetUtils.anchorBlocks(player, stack);
-                    //else if (stack.getItem() instanceof GadgetCopyPaste)
-                    //GadgetCopyPaste.anchorBlocks(player, stack);
-                else if (stack.getItem() instanceof GadgetDestruction)
-                    GadgetDestruction.anchorBlocks(player, stack);
+                else
+                    ((AbstractGadget) stack.getItem()).onAnchor(stack, player);
             });
             ctx.get().setPacketHandled(true);
         }

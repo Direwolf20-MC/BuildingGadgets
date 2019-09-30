@@ -24,7 +24,6 @@ import com.google.common.collect.Multiset;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
@@ -227,7 +226,7 @@ public class GadgetUtils {
         return data.rotate(Rotation.CLOCKWISE_90);
     }
 
-    public static void rotateOrMirrorToolBlock(ItemStack stack, ServerPlayerEntity player, PacketRotateMirror.Operation operation) {
+    public static void rotateOrMirrorToolBlock(ItemStack stack, PlayerEntity player, PacketRotateMirror.Operation operation) {
         setToolBlock(stack, rotateOrMirrorBlock(player, operation, getToolBlock(stack)));
         setToolActualBlock(stack, rotateOrMirrorBlock(player, operation, getToolActualBlock(stack)));
     }
@@ -464,14 +463,12 @@ public class GadgetUtils {
 
     @Nullable
     public static BlockPos getPOSFromNBT(ItemStack stack, String tagName) {
-        CompoundNBT tagCompound = stack.getTag();
-        if (tagCompound == null) {
+        CompoundNBT stackTag = NBTHelper.getOrNewTag(stack);
+        if (! stackTag.contains(tagName))
             return null;
-        }
-        CompoundNBT posTag = tagCompound.getCompound(tagName);
-        if (posTag.equals(new CompoundNBT())) {
+        CompoundNBT posTag = NBTHelper.getOrNewTag(stack).getCompound(tagName);
+        if (posTag.isEmpty())
             return null;
-        }
         return NBTUtil.readBlockPos(posTag);
     }
 

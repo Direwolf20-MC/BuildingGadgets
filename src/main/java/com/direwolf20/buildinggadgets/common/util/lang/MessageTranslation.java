@@ -16,7 +16,12 @@ public enum MessageTranslation implements ITranslationProvider {
     GADGET_BUSY("gadget_busy", 0),
     SERVER_BUSY("server_busy", 0),
     NOTHING_TO_UNDO("nothing_to_undo", 0),
-    UNDO_FAILED("undo_failed", 0);
+    UNDO_FAILED("undo_failed", 0),
+    ANCHOR_SET("anchor_set", 0),
+    ANCHOR_REMOVED("anchor_removed", 0),
+    TRANSACTION_FAILED("transaction_failed", 0),
+    ROTATED("rotated", 0),
+    MIRRORED("mirrored", 0);
     private static final String PREFIX = Reference.MODID + ".message.";
     private final String key;
     private final int argCount;

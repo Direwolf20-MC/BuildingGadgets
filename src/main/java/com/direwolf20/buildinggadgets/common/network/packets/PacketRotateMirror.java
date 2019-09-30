@@ -1,9 +1,6 @@
 package com.direwolf20.buildinggadgets.common.network.packets;
 
 import com.direwolf20.buildinggadgets.common.items.gadgets.AbstractGadget;
-import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetBuilding;
-import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetExchanger;
-import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
@@ -32,7 +29,7 @@ public class PacketRotateMirror {
         return new PacketRotateMirror(buffer.readBoolean() ? Operation.values()[buffer.readInt()] : null);
     }
 
-    public static enum Operation {
+    public enum Operation {
         ROTATE, MIRROR;
     }
 
@@ -45,9 +42,13 @@ public class PacketRotateMirror {
 
                 ItemStack stack = AbstractGadget.getGadget(player);
                 Operation operation = msg.operation != null ? msg.operation : (player.isSneaking() ? Operation.MIRROR : Operation.ROTATE);
-                if (stack.getItem() instanceof GadgetBuilding || stack.getItem() instanceof GadgetExchanger)
-                    GadgetUtils.rotateOrMirrorToolBlock(stack, player, operation);
-                //else if (stack.getItem() instanceof GadgetCopyPaste)
+                switch (operation) {
+                    case MIRROR:
+                        ((AbstractGadget) stack.getItem()).onMirror(stack, player);
+                        break;
+                    default:
+                        ((AbstractGadget) stack.getItem()).onRotate(stack, player);
+                }
                 //GadgetCopyPaste.rotateOrMirrorBlocks(stack, player, operation);
             });
             ctx.get().setPacketHandled(true);

@@ -25,7 +25,6 @@ import com.direwolf20.buildinggadgets.common.util.lang.TooltipTranslation;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.util.tools.building.SetBackedPlacementSequence;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -39,9 +38,6 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.BlockSnapshot;
@@ -110,10 +106,6 @@ public class GadgetDestruction extends AbstractGadget {
         GadgetUtils.writePOSToNBT(stack, pos, NBTKeys.GADGET_ANCHOR);
     }
 
-    public static BlockPos getAnchor(ItemStack stack) {
-        return GadgetUtils.getPOSFromNBT(stack, NBTKeys.GADGET_ANCHOR);
-    }
-
     public static void setAnchorSide(ItemStack stack, Direction side) {
         CompoundNBT tag = NBTHelper.getOrNewTag(stack);
         if (side == null)
@@ -170,14 +162,14 @@ public class GadgetDestruction extends AbstractGadget {
                 Direction anchorSide = getAnchorSide(stack);
                 if (anchorPos != null && anchorSide != null) {
                     clearArea(world, anchorPos, anchorSide, (ServerPlayerEntity) player, stack);
-                    clearSuccess(stack);
+                    onAnchorRemoved(stack, player);
                     return new ActionResult<>(ActionResultType.SUCCESS, stack);
                 }
 
                 BlockRayTraceResult lookingAt = VectorHelper.getLookingAt(player, stack);
-                if (lookingAt != null && (world.getBlockState(VectorHelper.getLookingAt(player, stack).getPos()) != Blocks.AIR.getDefaultState())) {
+                if (world.isAirBlock(lookingAt.getPos())) {
                     clearArea(world, lookingAt.getPos(), lookingAt.getFace(), (ServerPlayerEntity) player, stack);
-                    clearSuccess(stack);
+                    onAnchorRemoved(stack, player);
                     return new ActionResult<>(ActionResultType.SUCCESS, stack);
                 }
 
@@ -189,37 +181,27 @@ public class GadgetDestruction extends AbstractGadget {
         return new ActionResult<>(ActionResultType.SUCCESS, stack);
     }
 
-    public static void clearSuccess(ItemStack stack) {
-        setAnchor(stack, null);
-        setAnchorSide(stack, null);
+    @Override
+    protected void onAnchorSet(ItemStack stack, PlayerEntity player, BlockRayTraceResult lookingAt) {
+        super.onAnchorSet(stack, player, lookingAt);
+        setAnchorSide(stack, lookingAt.getFace());
     }
 
-    public static void anchorBlocks(PlayerEntity player, ItemStack stack) {
-        BlockPos currentAnchor = getAnchor(stack);
-        if (currentAnchor == null) {
-            BlockRayTraceResult lookingAt = VectorHelper.getLookingAt(player, stack);
-            if (lookingAt == null || (player.world.getBlockState(VectorHelper.getLookingAt(player, stack).getPos()) == Blocks.AIR.getDefaultState())) {
-                return;
-            }
-            currentAnchor = lookingAt.getPos();
-            setAnchor(stack, currentAnchor);
-            setAnchorSide(stack, lookingAt.getFace());
-            player.sendStatusMessage(new StringTextComponent(TextFormatting.AQUA + new TranslationTextComponent("message.gadget.anchorrender").getUnformattedComponentText()), true);
-        } else {
-            setAnchor(stack, null);
-            setAnchorSide(stack, null);
-            player.sendStatusMessage(new StringTextComponent(TextFormatting.AQUA + new TranslationTextComponent("message.gadget.anchorremove").getUnformattedComponentText()), true);
-        }
+    @Override
+    protected void onAnchorRemoved(ItemStack stack, PlayerEntity player) {
+        super.onAnchorRemoved(stack, player);
+        setAnchorSide(stack, null);
     }
 
     public static IPositionPlacementSequence getClearingPositions(World world, BlockPos pos, Direction incomingSide, PlayerEntity player, ItemStack stack) {
         ItemStack tool = getGadget(player);
+        GadgetDestruction item = (GadgetDestruction) tool.getItem();
         int depth = getToolValue(stack, NBTKeys.GADGET_VALUE_DEPTH);
         if (tool.isEmpty() || depth == 0 || ! player.isAllowEdit())
             return CommonUtils.emptyPositionSequence();
 
         Region boundary = getClearingRegion(pos, incomingSide, player, stack);
-        BlockPos startPos = (getAnchor(stack) == null) ? pos : getAnchor(stack);
+        BlockPos startPos = (item.getAnchor(stack) == null) ? pos : item.getAnchor(stack);
         boolean fuzzy = ! Config.GADGETS.GADGET_DESTRUCTION.nonFuzzyEnabled.get() || AbstractGadget.getFuzzy(stack);
         BlockState stateTarget = fuzzy ? null : world.getBlockState(pos);
 

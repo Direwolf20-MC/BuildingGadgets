@@ -1,7 +1,6 @@
 package com.direwolf20.buildinggadgets.client;
 
 import com.direwolf20.buildinggadgets.client.cache.CacheTemplateProvider;
-import com.direwolf20.buildinggadgets.client.events.EventClientTick;
 import com.direwolf20.buildinggadgets.client.events.EventTooltip;
 import com.direwolf20.buildinggadgets.client.models.ConstructionBakedModel;
 import com.direwolf20.buildinggadgets.common.registry.OurBlocks;
@@ -50,7 +49,6 @@ public class ClientProxy {
         DeferredWorkQueue.runLater(KeyBindings::init);
         //eventBus.addListener(ClientProxy::renderWorldLastEvent);
         eventBus.addListener(ClientProxy::bakeModels);
-        MinecraftForge.EVENT_BUS.addListener(EventClientTick::onClientTick);
         MinecraftForge.EVENT_BUS.addListener(EventTooltip::onDrawTooltip);
 
         // @michaelhillcox: I have questions on why this is here

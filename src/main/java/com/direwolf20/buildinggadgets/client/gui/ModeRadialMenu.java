@@ -171,10 +171,8 @@ public class ModeRadialMenu extends Screen {
                 PacketHandler.sendToServer(new PacketAnchor());
 
             ItemStack stack = getGadget();
-            if (stack.getItem() instanceof GadgetCopyPaste)
-                return GadgetCopyPaste.getAnchor(stack) != null;
-            else if (stack.getItem() instanceof GadgetDestruction)
-                return GadgetDestruction.getAnchor(stack) != null;
+            if (stack.getItem() instanceof GadgetCopyPaste || stack.getItem() instanceof GadgetDestruction)
+                return ((AbstractGadget) stack.getItem()).getAnchor(stack) != null;
 
             return !GadgetUtils.getAnchor(stack).isEmpty();
         }));

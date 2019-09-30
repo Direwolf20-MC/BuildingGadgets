@@ -12,7 +12,10 @@ import com.direwolf20.buildinggadgets.api.exceptions.TransactionResultExceedsTem
 import com.direwolf20.buildinggadgets.api.exceptions.TransactionResultExceedsTemplateSizeException.ToManyDifferentBlockDataInstances;
 import com.direwolf20.buildinggadgets.api.template.ITemplate;
 import com.direwolf20.buildinggadgets.api.template.SimpleBuildOpenOptions;
+import com.direwolf20.buildinggadgets.api.template.provider.ITemplateKey;
+import com.direwolf20.buildinggadgets.api.template.provider.ITemplateProvider;
 import com.direwolf20.buildinggadgets.api.template.transaction.ITemplateTransaction;
+import com.direwolf20.buildinggadgets.api.template.transaction.ITransactionOperator;
 import com.direwolf20.buildinggadgets.api.template.transaction.TemplateTransactions;
 import com.direwolf20.buildinggadgets.client.gui.GuiMod;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
@@ -59,10 +62,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUseContext;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.NBTUtil;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Hand;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.ChunkPos;
@@ -150,25 +150,41 @@ public class GadgetCopyPaste extends AbstractGadget {
         providerBuilder.add(new TemplateKeyProvider(stack));
     }
 
-    public static boolean isBusy(ItemStack stack) {
-        return NBTHelper.getOrNewTag(stack).contains(NBTKeys.GADGET_BUSY);
+    @Override
+    public boolean performRotate(ItemStack stack, PlayerEntity player) {
+        return performSingleOperator(stack, player, TemplateTransactions.rotateOperator(Rotation.CLOCKWISE_90));
     }
 
-    public static void setCopyBusy(ItemStack stack, Region regionCopied) {
-        CompoundNBT nbt = NBTHelper.getOrNewTag(stack);
-        nbt.remove(NBTKeys.GADGET_BUSY);
-        nbt.put(NBTKeys.GADGET_BUSY, regionCopied.serialize());
+    @Override
+    public boolean performMirror(ItemStack stack, PlayerEntity player) {
+        return performSingleOperator(stack, player, TemplateTransactions.mirrorOperator(player.getHorizontalFacing().getAxis()));
     }
 
-    public static void setBuildBusy(ItemStack stack) {
-        CompoundNBT nbt = NBTHelper.getOrNewTag(stack);
-        nbt.remove(NBTKeys.GADGET_BUSY);
-        nbt.putBoolean(NBTKeys.GADGET_BUSY, true);
-    }
-
-    public static void freeGadget(ItemStack stack) {
-        CompoundNBT nbt = NBTHelper.getOrNewTag(stack);
-        nbt.remove(NBTKeys.GADGET_BUSY);
+    private boolean performSingleOperator(ItemStack stack, PlayerEntity player, ITransactionOperator operator) {
+        ITemplateProvider provider = player.world.getCapability(CapabilityTemplate.TEMPLATE_PROVIDER_CAPABILITY).orElseThrow(CapabilityNotPresentException::new);
+        ITemplateKey templateKey = stack.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).orElseThrow(CapabilityNotPresentException::new);
+        ITemplate template = provider.getTemplateForKey(templateKey);
+        ITemplateTransaction transaction = template.startTransaction();
+        IBuildContext context = SimpleBuildContext.builder()
+                .usedStack(stack)
+                .buildingPlayer(player)
+                .world(player.world)
+                .build();
+        if (transaction != null) {
+            transaction.operate(operator);
+            try {
+                transaction.execute(context);
+                provider.requestRemoteUpdate(templateKey);
+                return true;
+            } catch (TransactionExecutionException e) {
+                BuildingGadgets.LOG.error("Error whilst executing Rotate/Mirror transaction!", e);
+                sendMessage(stack, player, MessageTranslation.TRANSACTION_FAILED, Styles.RED);
+                return false;
+            }
+        } else {
+            notifyGadgetBusy(stack, player);
+            return false;
+        }
     }
 
     public static int getCopyCounter(ItemStack stack) {
@@ -183,16 +199,8 @@ public class GadgetCopyPaste extends AbstractGadget {
         return count;
     }
 
-    private static void setAnchor(ItemStack stack, BlockPos anchorPos) {
-        GadgetUtils.writePOSToNBT(stack, anchorPos, NBTKeys.GADGET_ANCHOR);
-    }
-
-    public static BlockPos getAnchor(ItemStack stack) {
-        return GadgetUtils.getPOSFromNBT(stack, NBTKeys.GADGET_ANCHOR);
-    }
-
     public static Optional<BlockPos> getActivePos(PlayerEntity playerEntity, ItemStack stack) {
-        BlockPos pos = getAnchor(stack);
+        BlockPos pos = ((AbstractGadget) stack.getItem()).getAnchor(stack);
         if (pos == null) {
             BlockRayTraceResult res = VectorHelper.getLookingAt(playerEntity, stack);
             if (res.getType() == Type.MISS)
@@ -352,12 +360,8 @@ public class GadgetCopyPaste extends AbstractGadget {
         return new ActionResult<>(ActionResultType.SUCCESS, stack);
     }
 
-    private boolean checkAndNotifyGadgetBusy(ItemStack stack, PlayerEntity player) {
-        if (isBusy(stack)) {
-            player.sendStatusMessage(MessageTranslation.GADGET_BUSY.componentTranslation().setStyle(Styles.RED), true);
-            return true;
-        }
-        return false;
+    private void notifyGadgetBusy(ItemStack stack, PlayerEntity player) {
+        player.sendStatusMessage(MessageTranslation.GADGET_BUSY.componentTranslation().setStyle(Styles.RED), true);
     }
 
     private void setRegionAndCopy(ItemStack stack, World world, PlayerEntity player, BlockPos lookedAt) {
@@ -396,9 +400,6 @@ public class GadgetCopyPaste extends AbstractGadget {
     private void runCopyTransaction(ItemStack stack, ITemplate template, WorldBackedBuildView buildView) {
         IBuildContext context = buildView.getContext();
         assert context.getBuildingPlayer() != null;
-        if (checkAndNotifyGadgetBusy(stack, context.getBuildingPlayer()))
-            return;
-        setCopyBusy(stack, buildView.getBoundingBox());
         ITemplateTransaction transaction = template.startTransaction();
         if (transaction != null) {
             CopyScheduler.scheduleCopy(map -> {
@@ -414,7 +415,7 @@ public class GadgetCopyPaste extends AbstractGadget {
                     performTransactionAsync(stack, transaction, context);
             }, buildView, Config.GADGETS.GADGET_COPY_PASTE.copySteps.get());
         } else
-            BuildingGadgets.LOG.error("No Transaction could be created. This should not be possible.");
+            notifyGadgetBusy(stack, context.getBuildingPlayer());
     }
 
     private void performTransactionSync(ItemStack stack, ITemplateTransaction transaction, IBuildContext context) {
@@ -462,35 +463,32 @@ public class GadgetCopyPaste extends AbstractGadget {
             }
         })) { //could not submit
             player.sendStatusMessage(MessageTranslation.SERVER_BUSY.componentTranslation().setStyle(Styles.RED), true);
-            freeGadget(stack);
         }
     }
 
     private void onCopyFinished(ItemStack stack, PlayerEntity player) {
-        sendMessageAndFree(stack, player, MessageTranslation.AREA_COPIED, Styles.DK_GREEN);
+        sendMessage(stack, player, MessageTranslation.AREA_COPIED, Styles.DK_GREEN);
         SaveManager.INSTANCE.getTemplateProvider().requestRemoteUpdate(stack.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY)
                 .orElseThrow(CapabilityNotPresentException::new), (ServerPlayerEntity) player);
     }
 
     private void onTooManyDifferentBlocks(ItemStack stack, PlayerEntity player) {
-        sendMessageAndFree(stack, player, MessageTranslation.AREA_COPIED_FAILED_TOO_MANY_DIFF, Styles.RED);
+        sendMessage(stack, player, MessageTranslation.AREA_COPIED_FAILED_TOO_MANY_DIFF, Styles.RED);
     }
 
     private void onTooManyBlocks(ItemStack stack, PlayerEntity player) {
-        sendMessageAndFree(stack, player, MessageTranslation.AREA_COPIED_FAILED_TOO_MANY, Styles.RED);
+        sendMessage(stack, player, MessageTranslation.AREA_COPIED_FAILED_TOO_MANY, Styles.RED);
     }
 
     private void onTooBigArea(ItemStack stack, PlayerEntity player) {
-        sendMessageAndFree(stack, player, MessageTranslation.AREA_COPIED_FAILED_TOO_BIG, Styles.RED);
+        sendMessage(stack, player, MessageTranslation.AREA_COPIED_FAILED_TOO_BIG, Styles.RED);
     }
 
     private void onCopyFail(ItemStack stack, PlayerEntity player) {
-        sendMessageAndFree(stack, player, MessageTranslation.AREA_COPIED_FAILED, Styles.RED);
+        sendMessage(stack, player, MessageTranslation.AREA_COPIED_FAILED, Styles.RED);
     }
 
     private void build(ItemStack stack, World world, PlayerEntity player, BlockPos pos) {
-        if (checkAndNotifyGadgetBusy(stack, player))
-            return;
         world.getCapability(CapabilityTemplate.TEMPLATE_PROVIDER_CAPABILITY).ifPresent(provider -> {
             stack.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(key -> {
                 ITemplate template = provider.getTemplateForKey(key);
@@ -501,6 +499,8 @@ public class GadgetCopyPaste extends AbstractGadget {
                 IBuildView view = template.createViewInContext(openOptions);
                 if (view != null)
                     schedulePlacement(stack, view, player, pos);
+                else
+                    notifyGadgetBusy(stack, player);
             });
         });
 
@@ -527,11 +527,10 @@ public class GadgetCopyPaste extends AbstractGadget {
     }
 
     private void onBuildFinished(ItemStack stack, PlayerEntity player) {
-        sendMessageAndFree(stack, player, MessageTranslation.TEMPLATE_BUILD, Styles.DK_GREEN);
+        sendMessage(stack, player, MessageTranslation.TEMPLATE_BUILD, Styles.DK_GREEN);
     }
 
-    private void sendMessageAndFree(ItemStack stack, PlayerEntity player, ITranslationProvider messageSource, Style style) {
+    private void sendMessage(ItemStack stack, PlayerEntity player, ITranslationProvider messageSource, Style style) {
         player.sendStatusMessage(messageSource.componentTranslation().setStyle(style), true);
-        freeGadget(stack);
     }
 }
