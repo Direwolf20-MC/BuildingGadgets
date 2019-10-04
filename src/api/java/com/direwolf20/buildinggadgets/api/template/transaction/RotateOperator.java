@@ -36,6 +36,7 @@ final class RotateOperator extends AbsSingleRunTransactionOperator {
                 matrix[1][2] = - sineForRotation(rotation);
                 matrix[2][1] = sineForRotation(rotation);
                 matrix[2][2] = cosineForRotation(rotation);
+                break;
             }
             case Y: {
                 matrix[1][1] = 1;
@@ -43,6 +44,7 @@ final class RotateOperator extends AbsSingleRunTransactionOperator {
                 matrix[2][0] = - sineForRotation(rotation);
                 matrix[0][2] = sineForRotation(rotation);
                 matrix[2][2] = cosineForRotation(rotation);
+                break;
             }
             case Z: {
                 matrix[2][2] = 1;
@@ -50,6 +52,7 @@ final class RotateOperator extends AbsSingleRunTransactionOperator {
                 matrix[0][1] = - sineForRotation(rotation);
                 matrix[1][0] = sineForRotation(rotation);
                 matrix[1][1] = cosineForRotation(rotation);
+                break;
             }
         }
         return matrix;
