@@ -11,6 +11,7 @@ import com.direwolf20.buildinggadgets.common.commands.CopyUnloadedCommand;
 import com.direwolf20.buildinggadgets.common.concurrent.UndoScheduler;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.items.gadgets.renderers.BaseRenderer;
+import com.direwolf20.buildinggadgets.common.save.SaveManager;
 import com.direwolf20.buildinggadgets.common.save.Undo;
 import com.direwolf20.buildinggadgets.common.save.UndoWorldSave;
 import com.direwolf20.buildinggadgets.common.util.CapabilityUtil.EnergyUtil;
@@ -52,6 +53,7 @@ import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.IntSupplier;
 import java.util.function.Supplier;
 
 import static com.direwolf20.buildinggadgets.common.util.GadgetUtils.withSuffix;
@@ -59,10 +61,12 @@ import static com.direwolf20.buildinggadgets.common.util.GadgetUtils.withSuffix;
 public abstract class AbstractGadget extends Item {
 
     private BaseRenderer renderer;
+    private Supplier<UndoWorldSave> saveSupplier;
 
-    public AbstractGadget(Properties builder) {
+    public AbstractGadget(Properties builder, IntSupplier undoLengthSupplier, String undoName) {
         super(builder);
         renderer = DistExecutor.runForDist(this::createRenderFactory, () -> () -> null);
+        saveSupplier = SaveManager.INSTANCE.registerUndoSave(w -> SaveManager.getUndoSave(w, undoLengthSupplier, undoName));
     }
 
     public abstract int getEnergyMax();
@@ -75,7 +79,9 @@ public abstract class AbstractGadget extends Item {
 
     protected abstract Supplier<BaseRenderer> createRenderFactory();
 
-    protected abstract UndoWorldSave getUndoSave();
+    protected UndoWorldSave getUndoSave() {
+        return saveSupplier.get();
+    }
 
     protected void addCapabilityProviders(ImmutableList.Builder<ICapabilityProvider> providerBuilder, ItemStack stack, @Nullable CompoundNBT tag) {
         providerBuilder.add(new CapabilityProviderEnergy(stack, this::getEnergyMax));

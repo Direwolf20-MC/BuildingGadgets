@@ -32,7 +32,6 @@ import com.direwolf20.buildinggadgets.common.items.gadgets.renderers.CopyPasteRe
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketBindTool;
 import com.direwolf20.buildinggadgets.common.save.SaveManager;
-import com.direwolf20.buildinggadgets.common.save.UndoWorldSave;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.exceptions.CapabilityNotPresentException;
 import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
@@ -77,6 +76,7 @@ import net.minecraftforge.energy.CapabilityEnergy;
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.IntSupplier;
 import java.util.function.Supplier;
 
 public class GadgetCopyPaste extends AbstractGadget {
@@ -119,8 +119,8 @@ public class GadgetCopyPaste extends AbstractGadget {
 
     private static final Joiner CHUNK_JOINER = Joiner.on("; ");
 
-    public GadgetCopyPaste(Properties builder) {
-        super(builder);
+    public GadgetCopyPaste(Properties builder, IntSupplier undoLengthSupplier, String undoName) {
+        super(builder, undoLengthSupplier, undoName);
     }
 
     @Override
@@ -136,11 +136,6 @@ public class GadgetCopyPaste extends AbstractGadget {
     @Override
     protected Supplier<BaseRenderer> createRenderFactory() {
         return CopyPasteRender::new;
-    }
-
-    @Override
-    protected UndoWorldSave getUndoSave() {
-        return SaveManager.INSTANCE.getCopyPasteUndo();
     }
 
     @Override

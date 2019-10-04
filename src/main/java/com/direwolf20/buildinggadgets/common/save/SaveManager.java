@@ -1,14 +1,18 @@
 package com.direwolf20.buildinggadgets.common.save;
 
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
-import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference.SaveReference;
+import jdk.internal.jline.internal.Nullable;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraft.world.storage.WorldSavedData;
 import net.minecraftforge.fml.event.server.FMLServerStartedEvent;
 import net.minecraftforge.fml.event.server.FMLServerStoppedEvent;
 
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Objects;
+import java.util.function.Function;
 import java.util.function.IntSupplier;
 import java.util.function.Supplier;
 
@@ -16,37 +20,39 @@ public enum SaveManager {
     INSTANCE;
     private SaveTemplateProvider templateProvider;
     private TemplateSave templateSave;
-    private UndoWorldSave copyPasteUndo;
-    private UndoWorldSave destructionUndo;
-    private UndoWorldSave buildingUndo;
-    private UndoWorldSave exchangingUndo;
+    private List<UndoSaveContainer> undoSaves;
 
     SaveManager() {
         this.templateProvider = new SaveTemplateProvider(this::getTemplateSave);
+        this.undoSaves = new LinkedList<>();
+    }
+
+    public Supplier<UndoWorldSave> registerUndoSave(Function<ServerWorld, UndoWorldSave> ctrFun) {
+        UndoSaveContainer container = new UndoSaveContainer(Objects.requireNonNull(ctrFun));
+        this.undoSaves.add(container);
+        return container::getCurrentSave;
     }
 
     public void onServerStarted(FMLServerStartedEvent event) {
         BuildingGadgets.LOG.debug("Loading World Saves.");
         ServerWorld world = event.getServer().getWorld(DimensionType.OVERWORLD);
-        copyPasteUndo = getUndoSave(world, Config.GADGETS.GADGET_COPY_PASTE.undoSize::get, SaveReference.UNDO_COPY_PASTE);
-        destructionUndo = getUndoSave(world, Config.GADGETS.GADGET_DESTRUCTION.undoSize::get, SaveReference.UNDO_DESTRUCTION);
-        buildingUndo = getUndoSave(world, Config.GADGETS.GADGET_BUILDING.undoSize::get, SaveReference.UNDO_BUILDING);
-        exchangingUndo = getUndoSave(world, Config.GADGETS.GADGET_EXCHANGER.undoSize::get, SaveReference.UNDO_EXCHANGING);
+        for (UndoSaveContainer c : undoSaves) {
+            c.acquire(world);
+        }
         templateSave = getTemplateSave(world, SaveReference.TEMPLATE_SAVE_TEMPLATES);
         BuildingGadgets.LOG.debug("Finished Loading saves");
     }
 
     public void onServerStopped(FMLServerStoppedEvent event) {
         BuildingGadgets.LOG.debug("Clearing save caches");
+        for (UndoSaveContainer c : undoSaves) {
+            c.release();
+        }
         templateSave = null;
-        copyPasteUndo = null;
-        destructionUndo = null;
-        buildingUndo = null;
-        exchangingUndo = null;
         BuildingGadgets.LOG.debug("Finished clearing save caches");
     }
 
-    private static UndoWorldSave getUndoSave(ServerWorld world, IntSupplier maxLengthSupplier, String name) {
+    public static UndoWorldSave getUndoSave(ServerWorld world, IntSupplier maxLengthSupplier, String name) {
         return get(world, () -> new UndoWorldSave(name, maxLengthSupplier), name);
     }
 
@@ -66,19 +72,27 @@ public enum SaveManager {
         return templateSave;
     }
 
-    public UndoWorldSave getCopyPasteUndo() {
-        return copyPasteUndo;
-    }
+    private static final class UndoSaveContainer {
+        private final Function<ServerWorld, UndoWorldSave> constructor;
+        @Nullable
+        private UndoWorldSave currentSave;
 
-    public UndoWorldSave getDestructionUndo() {
-        return destructionUndo;
-    }
+        private UndoSaveContainer(Function<ServerWorld, UndoWorldSave> constructor) {
+            this.constructor = constructor;
+            this.currentSave = null;
+        }
 
-    public UndoWorldSave getBuildingUndo() {
-        return buildingUndo;
-    }
+        private void acquire(ServerWorld world) {
+            this.currentSave = constructor.apply(world);
+        }
 
-    public UndoWorldSave getExchangingUndo() {
-        return exchangingUndo;
+        @Nullable
+        private UndoWorldSave getCurrentSave() {
+            return currentSave;
+        }
+
+        private void release() {
+            currentSave = null;
+        }
     }
 }

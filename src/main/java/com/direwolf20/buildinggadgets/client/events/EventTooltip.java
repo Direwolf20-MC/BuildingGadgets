@@ -42,6 +42,7 @@ import java.util.List;
 public class EventTooltip {
     private static final Comparator<Multiset.Entry<UniqueItem>> ENTRY_COMPARATOR = Comparator
             .<Multiset.Entry<UniqueItem>, Integer>comparing(Entry::getCount)
+            .reversed()
             .thenComparing(e -> e.getElement().getItem().getRegistryName());
     private static final int STACKS_PER_LINE = 8;
     private static RemoteInventoryCache cache = new RemoteInventoryCache(true);
