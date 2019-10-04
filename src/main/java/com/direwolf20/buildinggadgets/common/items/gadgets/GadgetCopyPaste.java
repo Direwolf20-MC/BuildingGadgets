@@ -17,6 +17,7 @@ import com.direwolf20.buildinggadgets.api.template.provider.ITemplateProvider;
 import com.direwolf20.buildinggadgets.api.template.transaction.ITemplateTransaction;
 import com.direwolf20.buildinggadgets.api.template.transaction.ITransactionOperator;
 import com.direwolf20.buildinggadgets.api.template.transaction.TemplateTransactions;
+import com.direwolf20.buildinggadgets.client.events.EventTooltip;
 import com.direwolf20.buildinggadgets.client.gui.GuiMod;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.capability.provider.TemplateKeyProvider;
@@ -309,7 +310,7 @@ public class GadgetCopyPaste extends AbstractGadget {
         tooltip.add(TooltipTranslation.GADGET_MODE.componentTranslation(getToolMode(stack)).setStyle(Styles.AQUA));
         addEnergyInformation(tooltip, stack);
         addInformationRayTraceFluid(tooltip, stack);
-        //EventTooltip.addTemplatePadding(stack, tooltip);
+        EventTooltip.addTemplatePadding(stack, tooltip);
     }
 
     public void setMode(ItemStack heldItem, int modeInt) {

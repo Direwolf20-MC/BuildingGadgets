@@ -57,7 +57,7 @@ import java.util.stream.Stream;
 public final class ImmutableTemplate implements ITemplate {
     private final Long2IntMap posToStateId;
     private final BlockData[] idToData;
-    private final TemplateHeader headerInfo;
+    private TemplateHeader headerInfo;
 
     /**
      * @return A new {@code ImmutableTemplate}
@@ -118,6 +118,16 @@ public final class ImmutableTemplate implements ITemplate {
         public TemplateHeader createHeaderFor(ITemplate template) {
             ImmutableTemplate castTemplate = (ImmutableTemplate) template;
             return castTemplate.getHeaderInfo();
+        }
+
+        @Override
+        public TemplateHeader createHeaderAndTryForceMaterials(ITemplate template, SimpleBuildOpenOptions openOptions) {
+            TemplateHeader res = ITemplateSerializer.super.createHeaderAndTryForceMaterials(template, openOptions);
+            ImmutableTemplate castTemplate = (ImmutableTemplate) template;
+            //This may produce race conditions, but if some thread doesn't notice the updated materials - so be it
+            if (castTemplate.headerInfo.getRequiredItems() == null)
+                castTemplate.headerInfo = res;
+            return res;
         }
 
         @Override

@@ -162,13 +162,24 @@ public class DelegatingTemplate implements ITemplate {
     public static class DelegatingTemplateSerializer extends ForgeRegistryEntry<ITemplateSerializer> implements ITemplateSerializer {
         @Override
         public TemplateHeader createHeaderFor(ITemplate template) {
+            return createHeader(template, null);
+        }
+
+        @Override
+        public TemplateHeader createHeaderAndTryForceMaterials(ITemplate template, SimpleBuildOpenOptions openOptions) {
+            return createHeader(template, openOptions);
+        }
+
+        private TemplateHeader createHeader(ITemplate template, @Nullable SimpleBuildOpenOptions openOptions) {
             assert getRegistryName() != null;
             DelegatingTemplate castTemplate = (DelegatingTemplate) template;
             ITemplate delegateTemplate;
             synchronized (castTemplate.getDelegateLock()) {
                 delegateTemplate = castTemplate.getDelegate();
             }
-            TemplateHeader delegateHeader = delegateTemplate.getSerializer().createHeaderFor(delegateTemplate);
+            TemplateHeader delegateHeader = openOptions != null ?
+                    delegateTemplate.getSerializer().createHeaderAndTryForceMaterials(delegateTemplate, openOptions) :
+                    delegateTemplate.getSerializer().createHeaderFor(delegateTemplate);
             return TemplateHeader.builderOf(delegateHeader, new SerializerInfo(getRegistryName(), delegateHeader.getSerializerInfo()), delegateHeader.getBoundingBox())
                     .build();
         }

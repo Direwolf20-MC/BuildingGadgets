@@ -7,6 +7,7 @@ import com.direwolf20.buildinggadgets.api.building.view.IBuildContext;
 import com.direwolf20.buildinggadgets.api.building.view.IBuildView;
 import com.direwolf20.buildinggadgets.api.building.view.SimpleBuildContext;
 import com.direwolf20.buildinggadgets.api.capability.CapabilityTemplate;
+import com.direwolf20.buildinggadgets.api.exceptions.TemplateException;
 import com.direwolf20.buildinggadgets.api.template.ITemplate;
 import com.direwolf20.buildinggadgets.api.template.SimpleBuildOpenOptions;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
@@ -150,24 +151,27 @@ public class CopyPasteRender extends BaseRenderer {
                         .buildingPlayer(player)
                         .usedStack(stack)
                         .build(fakeWorld);
-                IBuildView view = template.createViewInContext(SimpleBuildOpenOptions.withContext(context));
-                if (view == null) {
-                    BuildingGadgets.LOG.warn("Expected Template to be able to create a build view! Aborting render!");
-                    return;
-                }
-                view.translateTo(startPos);
-                RenderSorter sorter = new RenderSorter(player, view.estimateSize());
-                for (PlacementTarget target : view) {
-                    if (target.placeIn(context))
-                        sorter.onPlaced(target);
-                }
-                //Prepare the block rendering
-                //BlockRendererDispatcher dispatcher = Minecraft.getInstance().getBlockRendererDispatcher();
-                renderTargets(context, sorter, partialTicks);
+                try (IBuildView view = template.createViewInContext(SimpleBuildOpenOptions.withContext(context))) {
+                    if (view == null) {
+                        BuildingGadgets.LOG.warn("Expected Template to be able to create a build view! Aborting render!");
+                        return;
+                    }
+                    view.translateTo(startPos);
+                    RenderSorter sorter = new RenderSorter(player, view.estimateSize());
+                    for (PlacementTarget target : view) {
+                        if (target.placeIn(context))
+                            sorter.onPlaced(target);
+                    }
+                    //Prepare the block rendering
+                    //BlockRendererDispatcher dispatcher = Minecraft.getInstance().getBlockRendererDispatcher();
+                    renderTargets(context, sorter, partialTicks);
 
-                if (! player.isCreative())
-                    renderMissing(player, stack, view, sorter);
-                GlStateManager.disableBlend();
+                    if (! player.isCreative())
+                        renderMissing(player, stack, view, sorter);
+                    GlStateManager.disableBlend();
+                } catch (TemplateException e) {
+                    BuildingGadgets.LOG.error("Failed to close BuildView!");
+                }
             });
         });
 
