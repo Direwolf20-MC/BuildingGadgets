@@ -27,6 +27,7 @@ import com.google.common.cache.RemovalListener;
 import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.block.*;
 import net.minecraft.client.renderer.*;
+import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.player.PlayerEntity;
@@ -37,12 +38,14 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
+import net.minecraftforge.client.model.data.EmptyModelData;
 import net.minecraftforge.energy.CapabilityEnergy;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL14;
 
 import javax.annotation.Nonnull;
 import java.util.Objects;
+import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -160,57 +163,66 @@ public class CopyPasteRender extends BaseRenderer {
                 }
                 //Prepare the block rendering
                 //BlockRendererDispatcher dispatcher = Minecraft.getInstance().getBlockRendererDispatcher();
+                renderTargets(context, sorter, partialTicks);
 
-
-                GlStateManager.pushTextureAttributes();
-
-                //Enable Blending (So we can have transparent effect)
-                GlStateManager.enableBlend();
-                //This blend function allows you to use a constant alpha, which is defined later
-                GlStateManager.blendFunc(GL14.GL_CONSTANT_ALPHA, GL14.GL_ONE_MINUS_CONSTANT_ALPHA);
-
-                GL14.glBlendColor(1F, 1F, 1F, 0.55f); //Set the alpha of the blocks we are rendering
-                //GlStateManager.translate(-0.0005f, -0.0005f, 0.0005f);
-                //GlStateManager.scale(1.001f, 1.001f, 1.001f);//Slightly Larger block to avoid z-fighting.
-                //GlStateManager.translatef(0.0005f, 0.0005f, - 0.0005f);
-                BlockRendererDispatcher dispatcher = getMc().getBlockRendererDispatcher();
-                TileEntityRendererDispatcher teDispatcher = TileEntityRendererDispatcher.instance;
-                for (PlacementTarget target : sorter.getSortedTargets()) {
-                    BlockPos targetPos = target.getPos();
-                    BlockState state = context.getWorld().getBlockState(target.getPos());
-                    TileEntity te = context.getWorld().getTileEntity(target.getPos());
-                    GlStateManager.pushMatrix();//Push matrix again in order to apply these settings individually
-                    GlStateManager.scalef(0.999f, 0.999f, 0.999f);//Slightly Larger block to avoid z-fighting.
-                    GlStateManager.translatef(targetPos.getX(), targetPos.getY(), targetPos.getZ());//The render starts at the player, so we subtract the player coords and move the render to 0,0,0
-                    GlStateManager.enableBlend(); //We have to do this in the loop because the TE Render removes blend when its done
-                    //GlStateManager.rotatef(- 90.0F, 0.0F, 1.0F, 0.0F); //Rotate it because i'm not sure why but we need to
-                    //state = state.getBlock().getExtendedState(state, fakeWorld, coordinate); //Get the extended block state in the fake world (Disabled to fix chisel, not sure why.)
-                    try {
-                        dispatcher.renderBlockBrightness(state, 1f);//Render the defined block
-                    } catch (Exception e) {
-                        Tessellator tessellator = Tessellator.getInstance();
-                        BufferBuilder bufferBuilder = tessellator.getBuffer();
-                        bufferBuilder.finishDrawing();
-                    }
-                    try {
-                        if (te != null && ! erroredCache.get(target.getData(), () -> false)) {
-                            teDispatcher.render(te, targetPos.getX(), targetPos.getY(), targetPos.getZ(), partialTicks, - 1, true);
-                        }
-                    } catch (Exception e) {
-                        erroredCache.put(target.getData(), true);
-                    }
-
-                    GlStateManager.popMatrix();
-                }
-                if (! player.isCreative()) {
+                if (! player.isCreative())
                     renderMissing(player, stack, view, sorter);
-                }
-                GL14.glBlendColor(1F, 1F, 1F, 1); //Reset Blend, as it seems to affect the Item Render
                 GlStateManager.disableBlend();
-                GlStateManager.popAttributes();
             });
         });
 
+    }
+
+    private void renderTargets(IBuildContext context, RenderSorter sorter, float partialTicks) {
+        //Enable Blending (So we can have transparent effect)
+        GlStateManager.enableBlend();
+        //This blend function allows you to use a constant alpha, which is defined later
+        GlStateManager.blendFunc(GL14.GL_CONSTANT_ALPHA, GL14.GL_ONE_MINUS_CONSTANT_ALPHA);
+        //GlStateManager.translate(-0.0005f, -0.0005f, 0.0005f);
+        //GlStateManager.scale(1.001f, 1.001f, 1.001f);//Slightly Larger block to avoid z-fighting.
+        //GlStateManager.translatef(0.0005f, 0.0005f, - 0.0005f);
+        BlockRendererDispatcher dispatcher = getMc().getBlockRendererDispatcher();
+        TileEntityRendererDispatcher teDispatcher = TileEntityRendererDispatcher.instance;
+        BufferBuilder builder = Tessellator.getInstance().getBuffer();
+        builder.begin(GL14.GL_QUADS, DefaultVertexFormats.BLOCK);
+        Random rand = new Random();
+        for (PlacementTarget target : sorter.getSortedTargets()) {
+            BlockPos targetPos = target.getPos();
+            BlockState state = context.getWorld().getBlockState(target.getPos());
+            TileEntity te = context.getWorld().getTileEntity(target.getPos());
+            GlStateManager.pushMatrix();//Push matrix again in order to apply these settings individually
+            GlStateManager.translatef(targetPos.getX(), targetPos.getY(), targetPos.getZ());//The render starts at the player, so we subtract the player coords and move the render to 0,0,0
+            GlStateManager.enableBlend();
+            GL14.glBlendColor(1F, 1F, 1F, 0.55f); //Set the alpha of the blocks we are rendering
+            try {
+                switch (state.getRenderType()) {
+                    case MODEL:
+                        dispatcher.renderBlock(state, targetPos, context.getWorld(), builder, rand, te != null ? te.getModelData() : EmptyModelData.INSTANCE);
+                        break;
+                    case ENTITYBLOCK_ANIMATED: {
+                        getChestRenderer().renderChestBrightness(state.getBlock(), 1f);
+                    }
+                }
+            } catch (Exception e) {
+                BuildingGadgets.LOG.trace("Caught exception whilst rendering {}.", state, e);
+            }
+            try {
+                if (te != null && ! erroredCache.get(target.getData(), () -> false)) {
+                    TileEntityRenderer<TileEntity> renderer = teDispatcher.getRenderer(te);
+                    if (renderer != null) {
+                        if (te.hasFastRenderer())
+                            renderer.renderTileEntityFast(te, targetPos.getX(), targetPos.getY(), targetPos.getZ(), partialTicks, 0, builder);
+                        else
+                            renderer.render(te, targetPos.getX(), targetPos.getY(), targetPos.getZ(), partialTicks, 0);
+                    }
+                }
+            } catch (Exception e) {
+                erroredCache.put(target.getData(), true);
+            }
+            GlStateManager.popMatrix();
+        }
+        Tessellator.getInstance().draw();
+        GL14.glBlendColor(1F, 1F, 1F, 1f); //Set the alpha of the blocks we are rendering
     }
 
     private void renderMissing(PlayerEntity player, ItemStack stack, IBuildView view, RenderSorter sorter) {
@@ -221,24 +233,71 @@ public class CopyPasteRender extends BaseRenderer {
         InvertedPlacementEvaluator evaluator = new InvertedPlacementEvaluator(
                 sorter.getOrderedTargets(),
                 new PlacementChecker(
-                stack.getCapability(CapabilityEnergy.ENERGY).map(SimulateEnergyStorage::new),
-                t -> energyCost,
-                index,
-                (c, t) -> overwrite ? c.getWorld().getBlockState(t.getPos()).isReplaceable(useContext) : c.getWorld().isAirBlock(t.getPos()),
+                        stack.getCapability(CapabilityEnergy.ENERGY).map(SimulateEnergyStorage::new),
+                        t -> energyCost,
+                        index,
+                        (c, t) -> overwrite ? c.getWorld().getBlockState(t.getPos()).isReplaceable(useContext) : c.getWorld().isAirBlock(t.getPos()),
                         false),
                 view.getContext());
+        BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+        GlStateManager.enableBlend();
         GL14.glBlendColor(1F, 1F, 1F, 0.35f); //Set the alpha of the blocks we are rendering
+        GlStateManager.alphaFunc(GL11.GL_GREATER, 0.0001F);
+        GlStateManager.disableTexture();
+        GlStateManager.depthMask(false);
+        bufferBuilder.begin(GL14.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
         for (PlacementTarget target : evaluator) { //Now run through the UNSORTED list of coords, to show which blocks won't place if you don't have enough of them.
-            GlStateManager.pushMatrix();//Push matrix again just because
-            BlockPos pos = target.getPos();
-            GlStateManager.translatef(pos.getX(), pos.getY(), pos.getZ());//Now move the render position to the coordinates we want to render at
-            GlStateManager.rotatef(- 90.0F, 0.0F, 1.0F, 0.0F); //Rotate it because i'm not sure why but we need to
-            GlStateManager.translatef(- 0.005f, - 0.005f, 0.005f);
-            GlStateManager.scalef(1.01f, 1.01f, 1.01f);
-            getMc().getBlockRendererDispatcher().renderBlockBrightness(Blocks.RED_STAINED_GLASS.getDefaultState(), 1f);
-            //Move the render position back to where it was
-            GlStateManager.popMatrix();
+            renderBox(bufferBuilder, target.getPos());
         }
+        Tessellator.getInstance().draw();
+        GlStateManager.depthMask(true);
+        GlStateManager.enableTexture();
+        GL14.glBlendColor(1F, 1F, 1F, 1f); //Set the alpha of the blocks we are rendering
+    }
+
+    private void renderBox(BufferBuilder bufferBuilder, BlockPos pos) {
+        float red = 1;
+        float green = 0;
+        float blue = 0;
+        float alpha = 0.55f;
+        double x = pos.getX() - 0.01;
+        double y = pos.getY() - 0.01;
+        double z = pos.getZ() - 0.01;
+        double xEnd = pos.getX() + 1.01;
+        double yEnd = pos.getY() + 1.01;
+        double zEnd = pos.getZ() + 1.01;
+        //careful: mc want's it's vertices to be defined CCW - if you do it the other way around weird cullling issues will arise
+        //CCW herby counts as if you were looking at it from the outside
+        //front-side
+        bufferBuilder.pos(x, y, z).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(x, yEnd, z).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(xEnd, yEnd, z).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(xEnd, y, z).color(red, green, blue, alpha).endVertex();
+        //left-side
+        bufferBuilder.pos(x, y, z).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(x, y, zEnd).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(x, yEnd, zEnd).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(x, yEnd, z).color(red, green, blue, alpha).endVertex();
+        //bottom
+        bufferBuilder.pos(x, y, z).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(xEnd, y, z).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(xEnd, y, zEnd).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(x, y, zEnd).color(red, green, blue, alpha).endVertex();
+        //top
+        bufferBuilder.pos(xEnd, yEnd, zEnd).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(xEnd, yEnd, z).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(x, yEnd, z).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(x, yEnd, zEnd).color(red, green, blue, alpha).endVertex();
+        //right-side
+        bufferBuilder.pos(xEnd, yEnd, zEnd).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(xEnd, y, zEnd).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(xEnd, y, z).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(xEnd, yEnd, z).color(red, green, blue, alpha).endVertex();
+        //back-side
+        bufferBuilder.pos(xEnd, yEnd, zEnd).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(x, yEnd, zEnd).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(x, y, zEnd).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(xEnd, y, zEnd).color(red, green, blue, alpha).endVertex();
     }
 
     @Override
