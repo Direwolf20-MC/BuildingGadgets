@@ -13,7 +13,6 @@ import com.direwolf20.buildinggadgets.common.save.SaveManager;
 import com.direwolf20.buildinggadgets.common.save.Undo;
 import com.direwolf20.buildinggadgets.common.save.UndoWorldSave;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
-import com.direwolf20.buildinggadgets.common.util.blocks.RegionSnapshot;
 import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
 import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
 import com.direwolf20.buildinggadgets.common.util.inventory.InventoryHelper;
@@ -23,8 +22,7 @@ import com.direwolf20.buildinggadgets.common.util.lang.TooltipTranslation;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.util.tools.modes.BuildingMode;
 import com.direwolf20.buildinggadgets.common.world.FakeBuilderWorld;
-import com.google.common.collect.HashMultiset;
-import com.google.common.collect.Multiset;
+import com.google.common.collect.ImmutableMultiset;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.ITooltipFlag;
@@ -211,8 +209,7 @@ public class GadgetBuilding extends ModeGadget implements IAtopPlacingGadget {
             return false;
 
         BlockData blockData = getToolBlock(heldItem);
-        RegionSnapshot.Recorder recorder = RegionSnapshot.recordAll();
-        Multiset<com.direwolf20.buildinggadgets.api.materials.UniqueItem> requiredItems = HashMultiset.create();
+        Undo.Builder builder = Undo.builder();
         if (blockData.getState() != Blocks.AIR.getDefaultState()) { //Don't attempt a build if a block is not chosen -- Typically only happens on a new tool.
             //TODO replace with a better TileEntity supporting Fake IWorld
             fakeWorld.setWorldAndState(player.world, blockData.getState(), coords); // Initialize the fake world's blocks
@@ -220,16 +217,16 @@ public class GadgetBuilding extends ModeGadget implements IAtopPlacingGadget {
                 //Get the extended block state in the fake world
                 //Disabled to fix Chisel
                 //state = state.getBlock().getExtendedState(state, fakeWorld, coordinate);
-                placeBlock(world, player, recorder, coordinate, blockData, requiredItems);
+                placeBlock(world, player, builder, coordinate, blockData);
             }
         }
-        pushUndo(stack, new Undo(recorder.build(world.getDimension().getType()), requiredItems));
+        pushUndo(stack, builder.build(world.getDimension().getType()));
 
         //SortingHelper.Blocks.byDistance(coords, player);
         return true;
     }
 
-    private boolean placeBlock(World world, ServerPlayerEntity player, RegionSnapshot.Recorder recorder, BlockPos pos, BlockData setBlock, Multiset<com.direwolf20.buildinggadgets.api.materials.UniqueItem> usedItems) {
+    private boolean placeBlock(World world, ServerPlayerEntity player, Undo.Builder builder, BlockPos pos, BlockData setBlock) {
         if (!player.isAllowEdit())
             return false;
 
@@ -293,11 +290,14 @@ public class GadgetBuilding extends ModeGadget implements IAtopPlacingGadget {
             useItemSuccess = InventoryHelper.useItem(itemStack, player, neededItems, world);
         }
         if (useItemSuccess) {
+            ImmutableMultiset<com.direwolf20.buildinggadgets.api.materials.UniqueItem> usedItems;
             if (useConstructionPaste)
-                usedItems.add(new com.direwolf20.buildinggadgets.api.materials.UniqueItem(OurItems.constructionPaste), 1);
+                usedItems = ImmutableMultiset.of(new com.direwolf20.buildinggadgets.api.materials.UniqueItem(OurItems.constructionPaste));
             else
-                usedItems.add(com.direwolf20.buildinggadgets.api.materials.UniqueItem.ofStack(itemStack), neededItems);
-            recorder.record(world, pos);
+                usedItems = ImmutableMultiset.<com.direwolf20.buildinggadgets.api.materials.UniqueItem>builder()
+                        .addCopies(com.direwolf20.buildinggadgets.api.materials.UniqueItem.ofStack(itemStack), neededItems)
+                        .build();
+            builder.record(world, pos, usedItems, ImmutableMultiset.of());
             EffectBlock.spawnEffectBlock(world, pos, setBlock, EffectBlock.Mode.PLACE, useConstructionPaste);
             return true;
         }

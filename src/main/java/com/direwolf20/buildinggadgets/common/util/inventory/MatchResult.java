@@ -14,6 +14,10 @@ public final class MatchResult {
         return new MatchResult(matchedList, foundItems, chosenOption, true);
     }
 
+    public static MatchResult failure() {
+        return new MatchResult(MaterialList.empty(), ImmutableMultiset.of(), ImmutableMultiset.of(), false);
+    }
+
     public static MatchResult failure(MaterialList matchedList, ImmutableMultiset<UniqueItem> foundItems, ImmutableMultiset<UniqueItem> chosenOption) {
         return new MatchResult(matchedList, foundItems, chosenOption, false);
     }

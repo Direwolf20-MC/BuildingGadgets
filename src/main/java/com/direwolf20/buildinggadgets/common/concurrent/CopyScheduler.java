@@ -36,11 +36,11 @@ public final class CopyScheduler extends SteppedScheduler {
     }
 
     @Override
-    protected boolean advance() {
-        return targets.tryAdvance(t -> {
+    protected StepResult advance() {
+        return StepResult.ofBoolean(targets.tryAdvance(t -> {
             if (! t.getData().getState().isAir(context.getWorld(), t.getPos()))
                 builder.put(t.getPos(), t.getData());
-        });
+        }));
     }
 
     @Override

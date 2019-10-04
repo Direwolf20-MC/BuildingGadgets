@@ -3,6 +3,15 @@ package com.direwolf20.buildinggadgets.common.concurrent;
 import java.util.function.BooleanSupplier;
 
 public abstract class SteppedScheduler implements BooleanSupplier {
+    protected enum StepResult {
+        SUCCESS,
+        FAILURE,
+        END;
+
+        public static StepResult ofBoolean(boolean b) {
+            return b ? SUCCESS : END;
+        }
+    }
     private final int steps;
     private boolean finished;
 
@@ -15,9 +24,9 @@ public abstract class SteppedScheduler implements BooleanSupplier {
     public boolean getAsBoolean() {
         if (finished)
             return false;
-        for (int i = 0; advance() && i < steps - 1; ++ i)
+        for (int i = 0; advance() != StepResult.END && i < steps - 1; ++ i)
             ;
-        boolean res = advance();
+        boolean res = advance() != StepResult.END;
         if (! res) {
             this.finished = true;
             onFinish();
@@ -25,7 +34,7 @@ public abstract class SteppedScheduler implements BooleanSupplier {
         return res;
     }
 
-    protected abstract boolean advance();
+    protected abstract StepResult advance();
 
     protected abstract void onFinish();
 }

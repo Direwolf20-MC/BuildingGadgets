@@ -74,9 +74,16 @@ public final class NBTKeys {
     public static final String WORD_SAVE_DATA_MAP = "data_map";
     public static final String WORLD_SAVE_TIME = "time";
     public static final String WORLD_SAVE_UNDO_HISTORY = "undo_history";
-    public static final String WORLD_SAVE_UNDO_SNAPSHOT = "snapshot";
+    public static final String WORLD_SAVE_DIM = "dim";
+    public static final String WORLD_SAVE_UNDO_BLOCK_LIST = "block_list";
+    public static final String WORLD_SAVE_UNDO_DATA_LIST = "data_list";
+    public static final String WORLD_SAVE_UNDO_DATA_SERIALIZER_LIST = "data_serializer_list";
+    public static final String WORLD_SAVE_UNDO_ITEMS_LIST = "items_list";
+    public static final String WORLD_SAVE_UNDO_ITEMS_SERIALIZER_LIST = "items_serializer_list";
+    public static final String WORLD_SAVE_UNDO_DATA = "data";
     public static final String WORLD_SAVE_UNDO_ITEMS_USED = "used_items";
     public static final String WORLD_SAVE_UNDO_ITEMS_PRODUCED = "produced_items";
+    public static final String WORLD_SAVE_UNDO_BOUNDS = "bounding_box";
 
     public static final String REMOTE_INVENTORY_POS = "bound_te_pos";
     public static final String REMOTE_INVENTORY_DIM = "bound_te_dim";
@@ -84,6 +91,7 @@ public final class NBTKeys {
     public static final String ENERGY = "energy";
 
     public static final String UNIQUE_ITEM_ITEM = "item";
+    public static final String UNIQUE_ITEM_SERIALIZER = "serializer";
     public static final String UNIQUE_ITEM_COUNT = "count";
 
     public static final String TE_CONSTRUCTION_STATE = MAP_STATE;

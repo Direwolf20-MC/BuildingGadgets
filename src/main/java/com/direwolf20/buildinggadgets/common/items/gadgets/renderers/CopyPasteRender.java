@@ -19,7 +19,7 @@ import com.direwolf20.buildinggadgets.common.util.inventory.IItemIndex;
 import com.direwolf20.buildinggadgets.common.util.inventory.InventoryHelper;
 import com.direwolf20.buildinggadgets.common.util.tools.SimulateEnergyStorage;
 import com.direwolf20.buildinggadgets.common.util.tools.building.InvertedPlacementEvaluator;
-import com.direwolf20.buildinggadgets.common.util.tools.building.SetBackedBuildView;
+import com.direwolf20.buildinggadgets.common.util.tools.building.PlacementChecker;
 import com.direwolf20.buildinggadgets.common.world.FakeDelegationWorld;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -219,13 +219,14 @@ public class CopyPasteRender extends BaseRenderer {
         boolean overwrite = Config.GENERAL.allowOverwriteBlocks.get();
         BlockItemUseContext useContext = new BlockItemUseContext(new ItemUseContext(player, Hand.MAIN_HAND, VectorHelper.getLookingAt(player, stack)));
         InvertedPlacementEvaluator evaluator = new InvertedPlacementEvaluator(
-                new SetBackedBuildView(view.getContext(), sorter.getOrderedTargets(), view.getBoundingBox()),
+                sorter.getOrderedTargets(),
+                new PlacementChecker(
                 stack.getCapability(CapabilityEnergy.ENERGY).map(SimulateEnergyStorage::new),
                 t -> energyCost,
                 index,
                 (c, t) -> overwrite ? c.getWorld().getBlockState(t.getPos()).isReplaceable(useContext) : c.getWorld().isAirBlock(t.getPos()),
-                false,
-                false);
+                        false),
+                view.getContext());
         GL14.glBlendColor(1F, 1F, 1F, 0.35f); //Set the alpha of the blocks we are rendering
         for (PlacementTarget target : evaluator) { //Now run through the UNSORTED list of coords, to show which blocks won't place if you don't have enough of them.
             GlStateManager.pushMatrix();//Push matrix again just because

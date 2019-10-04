@@ -16,8 +16,6 @@ import com.direwolf20.buildinggadgets.common.save.Undo;
 import com.direwolf20.buildinggadgets.common.save.UndoWorldSave;
 import com.direwolf20.buildinggadgets.common.tiles.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
-import com.direwolf20.buildinggadgets.common.util.blocks.RegionSnapshot;
-import com.direwolf20.buildinggadgets.common.util.exceptions.PaletteOverflowException;
 import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
 import com.direwolf20.buildinggadgets.common.util.helpers.SortingHelper;
 import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
@@ -25,6 +23,7 @@ import com.direwolf20.buildinggadgets.common.util.lang.Styles;
 import com.direwolf20.buildinggadgets.common.util.lang.TooltipTranslation;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.util.tools.building.SetBackedPlacementSequence;
+import com.google.common.collect.ImmutableMultiset;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.PlayerEntity;
@@ -262,21 +261,18 @@ public class GadgetDestruction extends AbstractGadget {
 
     public void clearArea(World world, BlockPos pos, Direction side, ServerPlayerEntity player, ItemStack stack) {
         IPositionPlacementSequence positions = getClearingPositions(world, pos, side, player, stack);
-        RegionSnapshot snapshot;
-        try {
-            snapshot = RegionSnapshot.select(world, positions)
-                    .excludeAir()
-                    .checkBlocks((p, state) -> destroyBlock(world, p, player))
-                    .checkTiles((p, state, tile) -> state.getBlock() == OurBlocks.constructionBlock && tile instanceof ConstructionBlockTileEntity)
-                    .build();
-        } catch (PaletteOverflowException e) {
-            player.sendMessage(TooltipTranslation.GADGET_PALETTE_OVERFLOW.componentTranslation());
-            return;
+        Undo.Builder builder = Undo.builder();
+        for (BlockPos clearPos : positions) {
+            BlockState state = world.getBlockState(clearPos);
+            TileEntity te = world.getTileEntity(clearPos);
+            if (te == null || state.getBlock() == OurBlocks.constructionBlock && te instanceof ConstructionBlockTileEntity) {
+                destroyBlock(world, clearPos, player, builder);
+            }
         }
-        pushUndo(stack, new Undo(snapshot));
+        pushUndo(stack, builder.build(world.getDimension().getType()));
     }
 
-    private boolean destroyBlock(World world, BlockPos voidPos, ServerPlayerEntity player) {
+    private boolean destroyBlock(World world, BlockPos voidPos, ServerPlayerEntity player, Undo.Builder builder) {
         if (world.isAirBlock(voidPos))
             return false;
 
@@ -288,6 +284,7 @@ public class GadgetDestruction extends AbstractGadget {
             return false;
 
         this.applyDamage(tool, player);
+        builder.record(world, voidPos, ImmutableMultiset.of(), ImmutableMultiset.of());
         EffectBlock.spawnEffectBlock(world, voidPos, TileSupport.createBlockData(world, voidPos), EffectBlock.Mode.REMOVE, false);
         return true;
     }

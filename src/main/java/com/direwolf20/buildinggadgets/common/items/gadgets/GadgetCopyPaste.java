@@ -19,8 +19,6 @@ import com.direwolf20.buildinggadgets.api.template.transaction.ITransactionOpera
 import com.direwolf20.buildinggadgets.api.template.transaction.TemplateTransactions;
 import com.direwolf20.buildinggadgets.client.gui.GuiMod;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
-import com.direwolf20.buildinggadgets.common.blocks.EffectBlock;
-import com.direwolf20.buildinggadgets.common.blocks.EffectBlock.Mode;
 import com.direwolf20.buildinggadgets.common.capability.provider.TemplateKeyProvider;
 import com.direwolf20.buildinggadgets.common.commands.CopyUnloadedCommand;
 import com.direwolf20.buildinggadgets.common.concurrent.CopyScheduler;
@@ -33,22 +31,20 @@ import com.direwolf20.buildinggadgets.common.items.gadgets.renderers.CopyPasteRe
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketBindTool;
 import com.direwolf20.buildinggadgets.common.save.SaveManager;
-import com.direwolf20.buildinggadgets.common.save.Undo;
 import com.direwolf20.buildinggadgets.common.save.UndoWorldSave;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
-import com.direwolf20.buildinggadgets.common.util.blocks.RegionSnapshot;
 import com.direwolf20.buildinggadgets.common.util.exceptions.CapabilityNotPresentException;
 import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
 import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
+import com.direwolf20.buildinggadgets.common.util.inventory.IItemIndex;
 import com.direwolf20.buildinggadgets.common.util.inventory.InventoryHelper;
-import com.direwolf20.buildinggadgets.common.util.inventory.RecordingItemIndex;
 import com.direwolf20.buildinggadgets.common.util.lang.ITranslationProvider;
 import com.direwolf20.buildinggadgets.common.util.lang.MessageTranslation;
 import com.direwolf20.buildinggadgets.common.util.lang.Styles;
 import com.direwolf20.buildinggadgets.common.util.lang.TooltipTranslation;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.util.tools.NetworkIO;
-import com.direwolf20.buildinggadgets.common.util.tools.building.PlacementEvaluator;
+import com.direwolf20.buildinggadgets.common.util.tools.building.PlacementChecker;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList.Builder;
 import com.google.common.collect.ImmutableSortedSet;
@@ -509,28 +505,20 @@ public class GadgetCopyPaste extends AbstractGadget {
     }
 
     private void schedulePlacement(ItemStack stack, IBuildView view, PlayerEntity player, BlockPos pos) {
-        RecordingItemIndex index = new RecordingItemIndex(InventoryHelper.index(stack, player));
-        RegionSnapshot.Recorder recorder = RegionSnapshot.recordAll();
+        IItemIndex index = InventoryHelper.index(stack, player);
         view.translateTo(pos);
         int energyCost = getEnergyCost(stack);
         boolean overwrite = Config.GENERAL.allowOverwriteBlocks.get();
         BlockItemUseContext useContext = new BlockItemUseContext(new ItemUseContext(player, Hand.MAIN_HAND, VectorHelper.getLookingAt(player, stack)));
-        PlacementEvaluator evalView = new PlacementEvaluator(
-                view,
+        PlacementChecker checker = new PlacementChecker(
                 stack.getCapability(CapabilityEnergy.ENERGY),
                 t -> energyCost,
                 index,
                 (c, t) -> overwrite ? c.getWorld().getBlockState(t.getPos()).isReplaceable(useContext) : c.getWorld().isAirBlock(t.getPos()),
-                true,
-                false);
-        PlacementScheduler.schedulePlacement(t -> {//TODO PlacementLogic and mechanism to stop when missing blocks!
-            recorder.record(view.getContext().getWorld(), t.getPos());
-            EffectBlock.spawnEffectBlock(view.getContext(), t, Mode.PLACE, false);
-        }, evalView, Config.GADGETS.GADGET_COPY_PASTE.placeSteps.get())
-                .withFinisher(() -> {
-                    pushUndo(stack, new Undo(
-                            recorder.build(view.getContext().getWorld().getDimension().getType()),
-                            index.getExtractedItems()));
+                true);
+        PlacementScheduler.schedulePlacement(view, checker, Config.GADGETS.placeSteps.get())
+                .withFinisher(p -> {
+                    pushUndo(stack, p.getUndoBuilder().build(view.getContext().getWorld().getDimension().getType()));
                     onBuildFinished(stack, player);
                 });
     }

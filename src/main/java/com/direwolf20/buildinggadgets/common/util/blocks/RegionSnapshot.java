@@ -206,10 +206,9 @@ public class RegionSnapshot {
                 .recordTiles(false)
                 .build();
     }
-
-    private DimensionType dim;
     private IPositionPlacementSequence positions;
 
+    private DimensionType dim;
     private List<Optional<BlockState>> blockStates;
     private List<Pair<BlockPos, CompoundNBT>> tileData;
 

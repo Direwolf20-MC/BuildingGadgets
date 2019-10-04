@@ -47,12 +47,12 @@ public class SortingHelper {
     }
 
     public static class RenderSorter {
-        private final LinkedHashSet<PlacementTarget> orderedTargets;
+        private final List<PlacementTarget> orderedTargets;
         private final PlayerEntity player;
         private List<PlacementTarget> sortedTargets;
 
         public RenderSorter(PlayerEntity player, int estimatedSize) {
-            this.orderedTargets = new LinkedHashSet<>(estimatedSize);
+            this.orderedTargets = new ArrayList<>(estimatedSize);
             this.player = player;
             this.sortedTargets = null;
         }
@@ -61,7 +61,7 @@ public class SortingHelper {
             this.orderedTargets.add(target);
         }
 
-        public Set<PlacementTarget> getOrderedTargets() {
+        public List<PlacementTarget> getOrderedTargets() {
             return orderedTargets;
         }
 

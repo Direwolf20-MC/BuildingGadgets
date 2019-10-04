@@ -1,6 +1,10 @@
 package com.direwolf20.buildinggadgets.common.items.gadgets;
 
 import com.direwolf20.buildinggadgets.api.building.BlockData;
+import com.direwolf20.buildinggadgets.api.building.tilesupport.TileSupport;
+import com.direwolf20.buildinggadgets.api.building.view.IBuildContext;
+import com.direwolf20.buildinggadgets.api.building.view.SimpleBuildContext;
+import com.direwolf20.buildinggadgets.api.materials.MaterialList;
 import com.direwolf20.buildinggadgets.api.materials.UniqueItem;
 import com.direwolf20.buildinggadgets.common.blocks.EffectBlock;
 import com.direwolf20.buildinggadgets.common.config.Config;
@@ -8,23 +12,21 @@ import com.direwolf20.buildinggadgets.common.items.gadgets.renderers.BaseRendere
 import com.direwolf20.buildinggadgets.common.items.gadgets.renderers.ExchangerRender;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketBindTool;
-import com.direwolf20.buildinggadgets.common.registry.OurItems;
 import com.direwolf20.buildinggadgets.common.save.SaveManager;
 import com.direwolf20.buildinggadgets.common.save.Undo;
 import com.direwolf20.buildinggadgets.common.save.UndoWorldSave;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
-import com.direwolf20.buildinggadgets.common.util.blocks.RegionSnapshot;
 import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
 import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
+import com.direwolf20.buildinggadgets.common.util.inventory.IItemIndex;
 import com.direwolf20.buildinggadgets.common.util.inventory.InventoryHelper;
+import com.direwolf20.buildinggadgets.common.util.inventory.MatchResult;
 import com.direwolf20.buildinggadgets.common.util.lang.LangUtil;
 import com.direwolf20.buildinggadgets.common.util.lang.Styles;
 import com.direwolf20.buildinggadgets.common.util.lang.TooltipTranslation;
 import com.direwolf20.buildinggadgets.common.util.tools.modes.ExchangingMode;
 import com.direwolf20.buildinggadgets.common.world.FakeBuilderWorld;
-import com.google.common.collect.HashMultiset;
-import com.google.common.collect.Multiset;
-import net.minecraft.block.Block;
+import com.google.common.collect.ImmutableMultiset;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.gui.screen.Screen;
@@ -35,7 +37,6 @@ import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.ActionResultType;
@@ -43,6 +44,10 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.util.math.RayTraceContext;
+import net.minecraft.util.math.RayTraceContext.BlockMode;
+import net.minecraft.util.math.RayTraceContext.FluidMode;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
@@ -57,10 +62,7 @@ import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.world.BlockEvent;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Supplier;
 
 import static com.direwolf20.buildinggadgets.common.util.GadgetUtils.*;
@@ -207,9 +209,8 @@ public class GadgetExchanger extends ModeGadget {
             return false;
 
         BlockData blockState = getToolBlock(heldItem);
-        RegionSnapshot.Recorder recorder = RegionSnapshot.recordAll();
-        Multiset<UniqueItem> usedItems = HashMultiset.create();
-        Multiset<UniqueItem> producedItems = HashMultiset.create();
+        Undo.Builder builder = Undo.builder();
+        IItemIndex index = InventoryHelper.index(stack, player);
         if (blockState.getState() != Blocks.AIR.getDefaultState()) {  //Don't attempt a build if a block is not chosen -- Typically only happens on a new tool.
             //TODO replace fakeWorld
             fakeWorld.setWorldAndState(player.world, blockState.getState(), coordinates); // Initialize the fake world's blocks
@@ -217,52 +218,32 @@ public class GadgetExchanger extends ModeGadget {
                 //Get the extended block state in the fake world
                 //Disabled to fix Chisel
                 //state = state.getBlock().getExtendedState(state, fakeWorld, coordinate);
-                exchangeBlock(world, player, recorder, coordinate, blockState, usedItems, producedItems);
+                exchangeBlock(world, player, index, builder, coordinate, blockState);
             }
         }
-        pushUndo(stack, new Undo(recorder.build(world.getDimension().getType()), usedItems, producedItems));
+        pushUndo(stack, builder.build(world.getDimension().getType()));
         return true;
     }
 
-    private boolean exchangeBlock(ServerWorld world, ServerPlayerEntity player, RegionSnapshot.Recorder recorder, BlockPos pos, BlockData setBlock, Multiset<UniqueItem> usedItems, Multiset<UniqueItem> producedItems) {
+    private boolean exchangeBlock(ServerWorld world, ServerPlayerEntity player, IItemIndex index, Undo.Builder builder, BlockPos pos, BlockData setBlock) {
         BlockState currentBlock = world.getBlockState(pos);
-        ItemStack itemStack;
         boolean useConstructionPaste = false;
         //ItemStack itemStack = setBlock.getBlock().getPickBlock(setBlock, null, world, pos, player);
-        if (setBlock.getState().canHarvestBlock(world, pos, player)) {
-            itemStack = InventoryHelper.getSilkTouchDrop(setBlock.getState());
-        } else {
-            itemStack = setBlock.getState().getBlock().getPickBlock(setBlock.getState(), null, world, pos, player);
-        }
-        if (itemStack.getItem().equals(Items.AIR)) {
-            itemStack = setBlock.getState().getBlock().getPickBlock(setBlock.getState(), null, world, pos, player);
-        }
+
 
         ItemStack tool = getGadget(player);
         if (tool.isEmpty())
             return false;
 
-        List<ItemStack> drops = Block.getDrops(setBlock.getState(), (ServerWorld) world, pos, world.getTileEntity(pos), player, tool);
 
-        int neededItems = 0;
-        for (ItemStack drop : drops) {
-            if (drop.getItem().equals(itemStack.getItem())) {
-                neededItems++;
-            }
-        }
-        if (neededItems == 0) {
-            neededItems = 1;
-        }
-        if (! setBlock.getState().hasTileEntity()) {
-            if (InventoryHelper.countItem(itemStack, player, world) < neededItems) {
-                ItemStack constructionPaste = new ItemStack(OurItems.constructionPaste);
-                if (InventoryHelper.countPaste(player) < neededItems) {
-                    return false;
-                }
-                itemStack = constructionPaste.copy();
-                useConstructionPaste = true;
-            }
-        }
+        IBuildContext buildContext = SimpleBuildContext.builder()
+                .usedStack(tool)
+                .buildingPlayer(player)
+                .build(world);
+        MaterialList requiredItems = setBlock.getRequiredItems(buildContext, null, pos);
+        MatchResult match = index.tryMatch(requiredItems);
+        if (! match.isSuccess())
+            return false;
         if (!player.isAllowEdit()) {
             return false;
         }
@@ -286,30 +267,20 @@ public class GadgetExchanger extends ModeGadget {
 //        currentBlock.getBlock().harvestBlock(world, player, pos, currentBlock, world.getTileEntity(pos), tool);
 
 
-
-        boolean useItemSuccess;
-        if (useConstructionPaste) {
-            useItemSuccess = InventoryHelper.usePaste(player, 1);
-        } else {
-            useItemSuccess = InventoryHelper.useItem(itemStack, player, neededItems, world);
-        }
-        if (useItemSuccess) {
-            if (useConstructionPaste)
-                usedItems.add(new com.direwolf20.buildinggadgets.api.materials.UniqueItem(OurItems.constructionPaste), 1);
-            else
-                usedItems.add(com.direwolf20.buildinggadgets.api.materials.UniqueItem.ofStack(itemStack), neededItems);
-            recorder.record(world, pos);
+        if (index.applyMatch(match)) {
+            ImmutableMultiset<UniqueItem> usedItems = match.getChosenOption();
+            MaterialList materials = TileSupport.createTileData(world, pos).getRequiredItems(
+                    buildContext,
+                    currentBlock,
+                    world.rayTraceBlocks(new RayTraceContext(player.getPositionVec(), new Vec3d(pos), BlockMode.COLLIDER, FluidMode.NONE, player)),
+                    pos);
+            Iterator<ImmutableMultiset<UniqueItem>> it = materials.iterator();
+            ImmutableMultiset<UniqueItem> producedItems = it.hasNext() ? it.next() : ImmutableMultiset.of();
+            index.insert(producedItems);
+            builder.record(world, pos, usedItems, producedItems);
             EffectBlock.spawnEffectBlock(world, pos, setBlock, EffectBlock.Mode.REPLACE, useConstructionPaste);
             //currentBlock.getBlock().removedByPlayer(currentBlock.getBlockData(), world, pos, player, false, null);
-            List<ItemStack> blockDrops = Block.getDrops(currentBlock, world, pos, world.getTileEntity(pos));
-            for (ItemStack drop : blockDrops) {
-                if (drop.getItem().equals(OurItems.constructionPaste)) {
-                    InventoryHelper.addPasteToContainer(player, drop);
-                } else {
-                    player.addItemStackToInventory(drop);
-                }
-                producedItems.add(UniqueItem.ofStack(drop));
-            }
+
             //player.addItemStackToInventory(new ItemStack(currentBlock.getBlock().getDrops(currentBlock, world, pos, world.getTileEntity(pos)), 1));
             return true;
         }

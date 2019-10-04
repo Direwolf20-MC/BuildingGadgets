@@ -1,24 +1,25 @@
 package com.direwolf20.buildinggadgets.common.items.gadgets;
 
 
+import com.direwolf20.buildinggadgets.api.building.view.IBuildContext;
+import com.direwolf20.buildinggadgets.api.building.view.SimpleBuildContext;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.capability.CapabilityProviderEnergy;
 import com.direwolf20.buildinggadgets.common.capability.provider.CapabilityProviderBlockProvider;
 import com.direwolf20.buildinggadgets.common.capability.provider.MultiCapabilityProvider;
 import com.direwolf20.buildinggadgets.common.commands.CopyUnloadedCommand;
+import com.direwolf20.buildinggadgets.common.concurrent.UndoScheduler;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.items.gadgets.renderers.BaseRenderer;
 import com.direwolf20.buildinggadgets.common.save.Undo;
 import com.direwolf20.buildinggadgets.common.save.UndoWorldSave;
 import com.direwolf20.buildinggadgets.common.util.CapabilityUtil.EnergyUtil;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
-import com.direwolf20.buildinggadgets.common.util.blocks.RegionSnapshot;
 import com.direwolf20.buildinggadgets.common.util.exceptions.CapabilityNotPresentException;
 import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
 import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
 import com.direwolf20.buildinggadgets.common.util.inventory.IItemIndex;
 import com.direwolf20.buildinggadgets.common.util.inventory.InventoryHelper;
-import com.direwolf20.buildinggadgets.common.util.inventory.MatchResult;
 import com.direwolf20.buildinggadgets.common.util.lang.MessageTranslation;
 import com.direwolf20.buildinggadgets.common.util.lang.Styles;
 import com.direwolf20.buildinggadgets.common.util.lang.TooltipTranslation;
@@ -273,12 +274,9 @@ public abstract class AbstractGadget extends Item {
         Optional<Undo> undoOptional = save.getUndo(getUUID(stack));
         if (undoOptional.isPresent()) {
             Undo undo = undoOptional.orElseThrow(RuntimeException::new);
-            IItemIndex index = undo.getProducedItems().isEmpty() && undo.getUsedItems().isEmpty() ?
-                    InventoryHelper.CREATIVE_INDEX :
-                    InventoryHelper.index(stack, player);
-            RegionSnapshot snapshot = undo.getSnapshot();
+            IItemIndex index = InventoryHelper.index(stack, player);
             if (! CopyUnloadedCommand.mayCopyUnloadedChunks(player)) {//TODO separate command
-                ImmutableSortedSet<ChunkPos> unloadedChunks = snapshot.getPositions().getBoundingBox().getUnloadedChunks(world);
+                ImmutableSortedSet<ChunkPos> unloadedChunks = undo.getBoundingBox().getUnloadedChunks(world);
                 if (! unloadedChunks.isEmpty()) {
                     pushUndo(stack, undo);
                     player.sendStatusMessage(MessageTranslation.UNDO_UNLOADED.componentTranslation().setStyle(Styles.RED), true);
@@ -287,19 +285,11 @@ public abstract class AbstractGadget extends Item {
                     return;
                 }
             }
-            if (snapshot.getDim() != world.getDimension().getType()) {
-                pushUndo(stack, undo);
-                player.sendStatusMessage(MessageTranslation.UNDO_FAILED.componentTranslation().setStyle(Styles.RED), true);
-                return;
-            }
-            MatchResult result = index.tryMatch(undo.getProducedItems());
-            if (! result.isSuccess()) {
-                pushUndo(stack, undo);
-                player.sendStatusMessage(MessageTranslation.UNDO_MISSING_ITEMS.componentTranslation().setStyle(Styles.RED), true);
-                return;
-            }
-            index.insert(undo.getUsedItems());
-            snapshot.restore(world);
+            IBuildContext buildContext = SimpleBuildContext.builder()
+                    .buildingPlayer(player)
+                    .usedStack(stack)
+                    .build(world);
+            UndoScheduler.scheduleUndo(undo, index, buildContext, Config.GADGETS.placeSteps.get());
         } else
             player.sendStatusMessage(MessageTranslation.NOTHING_TO_UNDO.componentTranslation().setStyle(Styles.RED), true);
     }

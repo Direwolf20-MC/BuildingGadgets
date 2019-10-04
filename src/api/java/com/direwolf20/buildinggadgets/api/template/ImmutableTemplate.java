@@ -25,10 +25,6 @@ import com.direwolf20.buildinggadgets.api.template.transaction.ITransactionExecu
 import com.direwolf20.buildinggadgets.api.template.transaction.SimpleTransactionExecutionContext;
 import com.direwolf20.buildinggadgets.api.util.*;
 import com.google.common.collect.AbstractIterator;
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectRBTreeMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectSortedMap;
 import it.unimi.dsi.fastutil.longs.Long2IntMap;
 import it.unimi.dsi.fastutil.longs.Long2IntMap.Entry;
 import it.unimi.dsi.fastutil.longs.Long2IntOpenHashMap;
@@ -51,8 +47,6 @@ import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
 import java.util.*;
 import java.util.function.Consumer;
-import java.util.function.IntFunction;
-import java.util.function.ToIntFunction;
 import java.util.stream.Collector;
 import java.util.stream.Stream;
 
@@ -134,15 +128,12 @@ public final class ImmutableTemplate implements ITemplate {
             Long2IntMap posToStateId = castTemplate.getPosToStateId();
             TemplateHeader header = castTemplate.getHeaderInfo();
             ListNBT dataList = new ListNBT();
-            ListNBT serializerList = new ListNBT();
             long[] posAndId = new long[posToStateId.size()];
-            TileSerializerMapper mapper = new TileSerializerMapper(idToData.length);
+            ObjectIncrementer<ITileDataSerializer> mapper = new ObjectIncrementer<>(idToData.length);
             for (BlockData entry : idToData) {
                 dataList.add(entry.serialize(mapper, persisted));
             }
-            for (ITileDataSerializer serializer : mapper.getSerializerMap().values()) {//Because the map is sorted, this will use the proper ordering
-                serializerList.add(new StringNBT(serializer.getRegistryName().toString()));
-            }
+            ListNBT serializerList = mapper.write(ts -> new StringNBT(ts.getRegistryName().toString()));
             int index = 0;
             for (Entry entry : posToStateId.long2IntEntrySet()) {
                 posAndId[index++] = MathUtils.includeStateId(entry.getLongKey(), entry.getIntValue());
@@ -158,7 +149,20 @@ public final class ImmutableTemplate implements ITemplate {
         public ITemplate deserialize(CompoundNBT tagCompound, @Nullable TemplateHeader header, boolean persisted) {
             long[] posAndId = tagCompound.getLongArray(NBTKeys.KEY_POS);
             ListNBT dataList = tagCompound.getList(NBTKeys.KEY_DATA, NBT.TAG_COMPOUND);
-            ReverseTileSerializerMapper mapper = new ReverseTileSerializerMapper(tagCompound.getList(NBTKeys.KEY_SERIALIZER, NBT.TAG_STRING));
+            ReverseObjectIncrementer<ITileDataSerializer> mapper = new ReverseObjectIncrementer<>(tagCompound.getList(NBTKeys.KEY_SERIALIZER, NBT.TAG_STRING),
+                    nbt -> {
+                        String s = nbt.getString();
+                        ITileDataSerializer serializer = RegistryUtils.getFromString(Registries.TileEntityData.getTileDataSerializers(), s);
+                        if (serializer == null) {
+                            BuildingGadgetsAPI.LOG.warn("Found unknown serializer {}. Replacing with dummy!", s);
+                            serializer = TileSupport.dummyTileEntityData().getSerializer();
+                        }
+                        return serializer;
+                    },
+                    value -> {
+                        BuildingGadgetsAPI.LOG.warn("Attempted to query unknown serializer {}. Replacing with dummy!", value);
+                        return TileSupport.dummyTileEntityData().getSerializer();
+                    });
             TemplateHeader.Builder headerBuilder = TemplateHeader.builderFromNBT(tagCompound.getCompound(NBTKeys.KEY_HEADER));
             if (header != null) {
                 if (header.getAuthor() != null)
@@ -185,59 +189,6 @@ public final class ImmutableTemplate implements ITemplate {
                 posToStateId.put(serializedPos, stateId);
             }
             return new ImmutableTemplate(posToStateId, idToData, header);
-        }
-
-        private static final class TileSerializerMapper implements ToIntFunction<ITileDataSerializer> {
-            private final Object2IntMap<ITileDataSerializer> serializerMap;
-            private final Int2ObjectSortedMap<ITileDataSerializer> reverseMap;
-            private int count;
-
-            private TileSerializerMapper(int length) {
-                serializerMap = new Object2IntOpenHashMap<>(length);
-                reverseMap = new Int2ObjectRBTreeMap<>();
-                count = 0;
-            }
-
-            private Int2ObjectSortedMap<ITileDataSerializer> getSerializerMap() {
-                return reverseMap;
-            }
-
-            @Override
-            public int applyAsInt(ITileDataSerializer value) {
-                if (! serializerMap.containsKey(value)) {
-                    serializerMap.put(value, count);
-                    reverseMap.put(count, value);
-                    return count++;
-                }
-                return serializerMap.getInt(value);
-            }
-        }
-
-        private static final class ReverseTileSerializerMapper implements IntFunction<ITileDataSerializer> {
-            private final Int2ObjectMap<ITileDataSerializer> serializerMap;
-
-            public ReverseTileSerializerMapper(ListNBT list) {
-                serializerMap = new Int2ObjectOpenHashMap<>(list.size());
-                int count = 0;
-                for (INBT nbt : list) {
-                    String s = nbt.getString();
-                    ITileDataSerializer serializer = RegistryUtils.getFromString(Registries.TileEntityData.getTileDataSerializers(), s);
-                    if (serializer == null) {
-                        BuildingGadgetsAPI.LOG.warn("Found unkown serializer {}. Replacing with dummy!", s);
-                        serializer = TileSupport.dummyTileEntityData().getSerializer();
-                    }
-                    serializerMap.put(count++, serializer);
-                }
-            }
-
-            @Override
-            public ITileDataSerializer apply(int value) {
-                if (! serializerMap.containsKey(value)) {
-                    BuildingGadgetsAPI.LOG.warn("Attempted to query unknown serializer {}. Replacing with dummy!", value);
-                    return TileSupport.dummyTileEntityData().getSerializer();
-                }
-                return serializerMap.get(value);
-            }
         }
     }
 

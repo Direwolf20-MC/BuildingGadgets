@@ -17,6 +17,11 @@ import javax.annotation.Nullable;
 import java.util.Objects;
 
 public class NBTTileEntityData implements ITileEntityData {
+    public static NBTTileEntityData ofTile(TileEntity te) {
+        CompoundNBT nbt = new CompoundNBT();
+        te.write(nbt);
+        return new NBTTileEntityData(nbt);
+    }
     @Nonnull
     private final CompoundNBT nbt;
     @Nullable
