@@ -3,8 +3,6 @@ package com.direwolf20.buildinggadgets.common.blocks;
 import com.direwolf20.buildinggadgets.common.containers.TemplateManagerContainer;
 import com.direwolf20.buildinggadgets.common.items.ITemplate;
 import com.direwolf20.buildinggadgets.common.items.Template;
-import com.direwolf20.buildinggadgets.common.network.PacketHandler;
-import com.direwolf20.buildinggadgets.common.network.packets.PacketBlockMap;
 import com.direwolf20.buildinggadgets.common.registry.OurItems;
 import com.direwolf20.buildinggadgets.common.save.WorldSave;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
@@ -12,7 +10,6 @@ import com.direwolf20.buildinggadgets.common.util.tools.UniqueItem;
 import com.google.common.collect.Multiset;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -70,7 +67,7 @@ public class TemplateManagerCommands {
             Template.setName(itemStack0, Template.getName(itemStack1));
         }
         container.putStackInSlot(0, itemStack0);
-        PacketHandler.sendTo(new PacketBlockMap(tagCompound), (ServerPlayerEntity) player);
+        //PacketHandler.sendTo(new PacketBlockMap(tagCompound), (ServerPlayerEntity) player);
     }
 
     public static void saveTemplate(TemplateManagerContainer container, PlayerEntity player, String templateName) {
@@ -128,7 +125,7 @@ public class TemplateManagerCommands {
             }
         }
         container.putStackInSlot(1, templateStack);
-        PacketHandler.sendTo(new PacketBlockMap(templateTagCompound), (ServerPlayerEntity) player);
+        //PacketHandler.sendTo(new PacketBlockMap(templateTagCompound), (ServerPlayerEntity) player);
     }
 
     public static void pasteTemplate(TemplateManagerContainer container, PlayerEntity player, CompoundNBT sentTagCompound, String templateName) {

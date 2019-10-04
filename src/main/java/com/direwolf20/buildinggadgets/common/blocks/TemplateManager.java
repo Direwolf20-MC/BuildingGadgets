@@ -3,8 +3,6 @@ package com.direwolf20.buildinggadgets.common.blocks;
 import com.direwolf20.buildinggadgets.client.gui.GuiMod;
 import com.direwolf20.buildinggadgets.common.containers.TemplateManagerContainer;
 import com.direwolf20.buildinggadgets.common.items.ITemplate;
-import com.direwolf20.buildinggadgets.common.network.PacketHandler;
-import com.direwolf20.buildinggadgets.common.network.packets.PacketBlockMap;
 import com.direwolf20.buildinggadgets.common.registry.OurBlocks;
 import com.direwolf20.buildinggadgets.common.tiles.TemplateManagerTileEntity;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
@@ -14,7 +12,6 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
@@ -99,7 +96,7 @@ public class TemplateManager extends Block {
 
             CompoundNBT tagCompound = template.getWorldSave(worldIn).getCompoundFromUUID(UUID);
             if (tagCompound != null) {
-                PacketHandler.sendTo(new PacketBlockMap(tagCompound), (ServerPlayerEntity) player);
+                //PacketHandler.sendTo(new PacketBlockMap(tagCompound), (ServerPlayerEntity) player);
             }
         }
         GuiMod.TEMPLATE_MANAGER.openContainer(player, worldIn, pos);

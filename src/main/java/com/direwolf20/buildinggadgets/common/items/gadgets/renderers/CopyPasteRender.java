@@ -193,7 +193,7 @@ public class CopyPasteRender extends BaseRenderer {
             GlStateManager.pushMatrix();//Push matrix again in order to apply these settings individually
             GlStateManager.translatef(targetPos.getX(), targetPos.getY(), targetPos.getZ());//The render starts at the player, so we subtract the player coords and move the render to 0,0,0
             GlStateManager.enableBlend();
-            GL14.glBlendColor(1F, 1F, 1F, 0.55f); //Set the alpha of the blocks we are rendering
+            GL14.glBlendColor(1F, 1F, 1F, 0.6f); //Set the alpha of the blocks we are rendering
             try {
                 switch (state.getRenderType()) {
                     case MODEL:
@@ -241,7 +241,7 @@ public class CopyPasteRender extends BaseRenderer {
                 view.getContext());
         BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
         GlStateManager.enableBlend();
-        GL14.glBlendColor(1F, 1F, 1F, 0.35f); //Set the alpha of the blocks we are rendering
+        GL14.glBlendColor(1F, 1F, 1F, 0.3f); //Set the alpha of the blocks we are rendering
         GlStateManager.alphaFunc(GL11.GL_GREATER, 0.0001F);
         GlStateManager.disableTexture();
         GlStateManager.depthMask(false);
