@@ -6,7 +6,6 @@ import com.direwolf20.buildinggadgets.client.gui.GuiMod;
 import com.direwolf20.buildinggadgets.common.commands.CopyUnloadedCommand;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.config.crafting.RecipeConstructionPaste.Serializer;
-import com.direwolf20.buildinggadgets.common.events.AnvilRepairHandler;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.registry.RegistryHandler;
 import com.direwolf20.buildinggadgets.common.save.SaveManager;
@@ -66,8 +65,6 @@ public final class BuildingGadgets {
 
         eventBus.addListener(Config::onLoad);
         eventBus.addListener(Config::onFileChange);
-
-        MinecraftForge.EVENT_BUS.register(new AnvilRepairHandler());
 
         // Client only registering
         DistExecutor.runWhenOn(Dist.CLIENT, () -> () -> {
