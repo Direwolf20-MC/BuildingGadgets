@@ -1,13 +1,23 @@
 package com.direwolf20.buildinggadgets.common.items.pastes;
 
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
+import com.direwolf20.buildinggadgets.common.capability.PasteContainerCapabilityProvider;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraftforge.common.capabilities.ICapabilityProvider;
+
+import javax.annotation.Nullable;
 
 public abstract class GenericPasteContainer extends Item {
 
     public GenericPasteContainer(Properties builder) {
         super(builder);
+    }
+
+    @Override
+    public ICapabilityProvider initCapabilities(ItemStack stack, @Nullable CompoundNBT nbt) {
+        return new PasteContainerCapabilityProvider(stack);
     }
 
     /**
@@ -18,11 +28,10 @@ public abstract class GenericPasteContainer extends Item {
      */
     public static void setPasteAmount(ItemStack stack, int amount) {
         Item item = stack.getItem();
-        if (item instanceof GenericPasteContainer) {
+        if (item instanceof GenericPasteContainer)
             ((GenericPasteContainer) item).setPasteCount(stack, amount);
-        } else {
+        else
             BuildingGadgets.LOG.warn("Potential abuse of GenericPasteContainer#setPasteAmount(ItemStack, int) where the given ItemStack does not contain a GenericPasteContainer.");
-        }
     }
 
     /**
@@ -30,9 +39,8 @@ public abstract class GenericPasteContainer extends Item {
      */
     public static int getPasteAmount(ItemStack stack) {
         Item item = stack.getItem();
-        if (item instanceof GenericPasteContainer) {
+        if (item instanceof GenericPasteContainer)
             return ((GenericPasteContainer) item).getPasteCount(stack);
-        }
         BuildingGadgets.LOG.warn("Potential abuse of GenericPasteContainer#getPasteAmount(ItemStack) where the given ItemStack does not contain a GenericPasteContainer.");
         return 0;
     }
