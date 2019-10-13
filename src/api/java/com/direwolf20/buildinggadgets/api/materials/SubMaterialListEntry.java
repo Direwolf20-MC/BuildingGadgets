@@ -24,10 +24,16 @@ import java.util.stream.Stream;
 abstract class SubMaterialListEntry implements MaterialListEntry<SubMaterialListEntry> {
     private final ImmutableList<MaterialListEntry<?>> subEntries;
     private final ImmutableList<SimpleMaterialListEntry> constantEntries;
+    private boolean simplified;
+
+    public SubMaterialListEntry(ImmutableList<MaterialListEntry<?>> subEntries, ImmutableList<SimpleMaterialListEntry> simpleEntries, boolean simplified) {
+        this.subEntries = Objects.requireNonNull(subEntries, "Cannot construct a SubMaterialListEntry without a list of Sub-MaterialEntries!");
+        this.constantEntries = Objects.requireNonNull(simpleEntries, "Cannot construct a SubMaterialListEntry without a list of constant Entries!");
+        this.simplified = simplified;
+    }
 
     protected SubMaterialListEntry(ImmutableList<MaterialListEntry<?>> subEntries, ImmutableList<SimpleMaterialListEntry> simpleEntries) {
-        this.subEntries = Objects.requireNonNull(subEntries, "Cannot construct a SubMaterialListEntry without a list of Sub-MaterialEntries!");
-        this.constantEntries = Objects.requireNonNull(simpleEntries, "Cannot construct a SubMaterialListEntry without a list of Konstant Entries!");
+        this(subEntries, simpleEntries, false);
     }
 
     public SubMaterialListEntry(ImmutableList<MaterialListEntry<?>> subEntries) {
@@ -40,6 +46,8 @@ abstract class SubMaterialListEntry implements MaterialListEntry<SubMaterialList
 
     @Override
     public MaterialListEntry<?> simplify() {
+        if (simplified)
+            return this;
         List<OrMaterialListEntry> orEntries = new ArrayList<>(subEntries.size());
         List<AndMaterialListEntry> andEntries = new ArrayList<>(subEntries.size());
         List<SimpleMaterialListEntry> simpleEntries = new ArrayList<>(constantEntries);
@@ -52,7 +60,7 @@ abstract class SubMaterialListEntry implements MaterialListEntry<SubMaterialList
                 .addAll(orEntries)
                 .addAll(remainder)
                 .build(),
-                constantEntry.getItems().isEmpty() ? ImmutableList.of() : ImmutableList.of(constantEntry));
+                constantEntry.getItems().isEmpty() ? ImmutableList.of() : ImmutableList.of(constantEntry), true);
     }
 
     protected abstract List<MaterialListEntry<?>> orderAndSimplifyEntries(
@@ -82,10 +90,10 @@ abstract class SubMaterialListEntry implements MaterialListEntry<SubMaterialList
         return new SimpleMaterialListEntry(builder.build());
     }
 
-    protected abstract SubMaterialListEntry createFrom(ImmutableList<MaterialListEntry<?>> subEntries, ImmutableList<SimpleMaterialListEntry> constantEntry);
+    protected abstract SubMaterialListEntry createFrom(ImmutableList<MaterialListEntry<?>> subEntries, ImmutableList<SimpleMaterialListEntry> constantEntry, boolean simplified);
 
     protected Iterable<ImmutableMultiset<IUniqueObject<?>>> viewOnlySubEntries() {
-        return createFrom(getSubEntries(), ImmutableList.of());
+        return createFrom(getSubEntries(), ImmutableList.of(), simplified);
     }
 
     protected void pullUpInnerEntries(SubMaterialListEntry entry,

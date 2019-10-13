@@ -13,15 +13,19 @@ public final class SimulateEnergyStorage implements IEnergyStorage {
     @Override
     public int receiveEnergy(int maxReceive, boolean simulate) {
         int received = other.receiveEnergy(maxReceive + energyChanged, true);
-        energyChanged += received;
-        return received;
+        int dif = Math.max(received - energyChanged, 0);
+        if (! simulate)
+            energyChanged += dif;
+        return dif;
     }
 
     @Override
     public int extractEnergy(int maxExtract, boolean simulate) {
         int extracted = other.extractEnergy(maxExtract - energyChanged, true);
-        energyChanged -= extracted;
-        return extracted;
+        int dif = Math.max(extracted + energyChanged, 0);
+        if (! simulate)
+            energyChanged -= dif;
+        return dif;
     }
 
     @Override

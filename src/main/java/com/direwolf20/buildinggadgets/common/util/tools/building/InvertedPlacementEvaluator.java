@@ -27,7 +27,7 @@ public class InvertedPlacementEvaluator implements Iterable<PlacementTarget> {
                 PlacementTarget next = null;
                 while (other.hasNext() && next == null) {
                     next = other.next();
-                    if (checker.checkPosition(context, next, true, false)) //if it is valid: skip
+                    if (checker.checkPosition(context, next, false, false)) //if it is valid: skip
                         next = null;
                 }
                 if (! other.hasNext() && next == null)

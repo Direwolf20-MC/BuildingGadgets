@@ -16,6 +16,9 @@ class AndMaterialListEntry extends SubMaterialListEntry {
         }
     }.setRegistryName(NBTKeys.AND_SERIALIZER_ID);
 
+    AndMaterialListEntry(ImmutableList<MaterialListEntry<?>> subEntries, ImmutableList<SimpleMaterialListEntry> simpleEntries, boolean simplified) {
+        super(subEntries, simpleEntries, simplified);
+    }
 
     AndMaterialListEntry(ImmutableList<MaterialListEntry<?>> subEntries, ImmutableList<SimpleMaterialListEntry> simpleEntries) {
         super(subEntries, simpleEntries);
@@ -92,8 +95,8 @@ class AndMaterialListEntry extends SubMaterialListEntry {
     }
 
     @Override
-    protected SubMaterialListEntry createFrom(ImmutableList<MaterialListEntry<?>> subEntries, ImmutableList<SimpleMaterialListEntry> constantEntry) {
-        return new AndMaterialListEntry(subEntries, constantEntry);
+    protected SubMaterialListEntry createFrom(ImmutableList<MaterialListEntry<?>> subEntries, ImmutableList<SimpleMaterialListEntry> constantEntry, boolean simplified) {
+        return new AndMaterialListEntry(subEntries, constantEntry, simplified);
     }
 
     private static final class MaterialEntryWrapper {

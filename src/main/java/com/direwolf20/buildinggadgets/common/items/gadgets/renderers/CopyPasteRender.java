@@ -18,6 +18,7 @@ import com.direwolf20.buildinggadgets.common.util.helpers.SortingHelper.RenderSo
 import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
 import com.direwolf20.buildinggadgets.common.util.inventory.IItemIndex;
 import com.direwolf20.buildinggadgets.common.util.inventory.InventoryHelper;
+import com.direwolf20.buildinggadgets.common.util.inventory.RecordingItemIndex;
 import com.direwolf20.buildinggadgets.common.util.tools.SimulateEnergyStorage;
 import com.direwolf20.buildinggadgets.common.util.tools.building.InvertedPlacementEvaluator;
 import com.direwolf20.buildinggadgets.common.util.tools.building.PlacementChecker;
@@ -231,7 +232,9 @@ public class CopyPasteRender extends BaseRenderer {
 
     private void renderMissing(PlayerEntity player, ItemStack stack, IBuildView view, RenderSorter sorter) {
         int energyCost = ((GadgetCopyPaste) stack.getItem()).getEnergyCost(stack);
-        IItemIndex index = InventoryHelper.index(stack, player); //wrap in a recording index, to prevent
+        //wrap in a recording index, to prevent a single item of some type from allowing all of that kind.
+        //it sadly makes it very inefficient - we should try to find a faster solution
+        IItemIndex index = new RecordingItemIndex(InventoryHelper.index(stack, player));
         boolean overwrite = Config.GENERAL.allowOverwriteBlocks.get();
         BlockItemUseContext useContext = new BlockItemUseContext(new ItemUseContext(player, Hand.MAIN_HAND, VectorHelper.getLookingAt(player, stack)));
         InvertedPlacementEvaluator evaluator = new InvertedPlacementEvaluator(
@@ -240,7 +243,7 @@ public class CopyPasteRender extends BaseRenderer {
                         stack.getCapability(CapabilityEnergy.ENERGY).map(SimulateEnergyStorage::new),
                         t -> energyCost,
                         index,
-                        (c, t) -> overwrite ? c.getWorld().getBlockState(t.getPos()).isReplaceable(useContext) : c.getWorld().isAirBlock(t.getPos()),
+                        (c, t) -> overwrite ? player.world.getBlockState(t.getPos()).isReplaceable(useContext) : player.world.isAirBlock(t.getPos()),
                         false),
                 view.getContext());
         BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();

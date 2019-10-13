@@ -17,6 +17,10 @@ class OrMaterialListEntry extends SubMaterialListEntry {
         }
     }.setRegistryName(NBTKeys.OR_SERIALIZER_ID);
 
+    OrMaterialListEntry(ImmutableList<MaterialListEntry<?>> subEntries, ImmutableList<SimpleMaterialListEntry> simpleEntries, boolean simplified) {
+        super(subEntries, simpleEntries, simplified);
+    }
+
     OrMaterialListEntry(ImmutableList<MaterialListEntry<?>> subEntries, ImmutableList<SimpleMaterialListEntry> constantEntries) {
         super(subEntries, constantEntries);
     }
@@ -75,7 +79,7 @@ class OrMaterialListEntry extends SubMaterialListEntry {
     }
 
     @Override
-    protected SubMaterialListEntry createFrom(ImmutableList<MaterialListEntry<?>> subEntries, ImmutableList<SimpleMaterialListEntry> constantEntry) {
-        return new OrMaterialListEntry(subEntries, constantEntry);
+    protected SubMaterialListEntry createFrom(ImmutableList<MaterialListEntry<?>> subEntries, ImmutableList<SimpleMaterialListEntry> constantEntry, boolean simplified) {
+        return new OrMaterialListEntry(subEntries, constantEntry, simplified);
     }
 }
