@@ -42,7 +42,7 @@ public final class PlacementChecker {
         this.placeCheck = placeCheck;
     }
 
-    public CheckResult checkPositionWithResult(IBuildContext context, PlacementTarget target, boolean simulate, boolean giveBackItems) {
+    public CheckResult checkPositionWithResult(IBuildContext context, PlacementTarget target, boolean giveBackItems) {
         if (! placeCheck.test(context, target))
             return new CheckResult(MatchResult.failure(), ImmutableMultiset.of(), - 1, false, false);
         int energy = energyFun.applyAsInt(target);
@@ -77,23 +77,21 @@ public final class PlacementChecker {
                 if (MinecraftForge.EVENT_BUS.post(e))
                     return new CheckResult(match, insertedItems, energy, false, usePaste);
             }
-            if (giveBackItems && ! simulate) {
+            if (giveBackItems) {
                 insertedItems = TileSupport.createTileData(context.getWorld().getTileEntity(target.getPos()))
                         .getRequiredItems(context, blockSnapshot.getCurrentBlock(), null, target.getPos()).iterator().next();
                 index.insert(insertedItems);
             }
         }
         boolean success = true;
-        if (! simulate) {
-            if (! isCreative)
-                success = storage.extractEnergy(energy, false) == energy;
-            success = success && index.applyMatch(match);
-        }
+        if (! isCreative)
+            success = storage.extractEnergy(energy, false) == energy;
+        success = success && index.applyMatch(match);
         return new CheckResult(match, insertedItems, energy, success, usePaste);
     }
 
-    public boolean checkPosition(IBuildContext context, PlacementTarget target, boolean simulate, boolean giveBackItems) {
-        return checkPositionWithResult(context, target, simulate, giveBackItems).isSuccess();
+    public boolean checkPosition(IBuildContext context, PlacementTarget target, boolean giveBackItems) {
+        return checkPositionWithResult(context, target, giveBackItems).isSuccess();
     }
 
     public static final class CheckResult {

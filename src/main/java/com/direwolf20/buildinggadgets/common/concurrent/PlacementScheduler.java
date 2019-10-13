@@ -81,7 +81,7 @@ public final class PlacementScheduler extends SteppedScheduler {
     }
 
     private void checkTarget(PlacementTarget target) {
-        CheckResult res = checker.checkPositionWithResult(view.getContext(), target, false, false);
+        CheckResult res = checker.checkPositionWithResult(view.getContext(), target, false);
         lastWasSuccess = res.isSuccess();
         if (lastWasSuccess) {
             undoBuilder.record(view.getContext().getWorld(), target.getPos(), res.getMatch().getChosenOption(), res.getInsertedItems());

@@ -31,7 +31,7 @@ public final class StackHandlerItemHandle implements IObjectHandle<Item> {
         ItemStack stack = getStack();
         if (item.matches(stack)) {
             ItemStack resultStack = handler.extractItem(slot, count, simulate);
-            return stack.getCount() - resultStack.getCount();
+            return resultStack.getCount();
         }
         return 0;
     }
