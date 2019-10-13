@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.api.materials;
 
+import com.direwolf20.buildinggadgets.api.materials.inventory.IUniqueObject;
 import com.direwolf20.buildinggadgets.api.util.JsonKeys;
 import com.direwolf20.buildinggadgets.api.util.NBTKeys;
 import com.google.common.collect.ImmutableList;
@@ -74,7 +75,7 @@ abstract class SubMaterialListEntry implements MaterialListEntry<SubMaterialList
     private SimpleMaterialListEntry combine(List<SimpleMaterialListEntry> simpleEntries) {
         if (simpleEntries.size() == 1)
             return simpleEntries.get(0);
-        ImmutableMultiset.Builder<UniqueItem> builder = ImmutableMultiset.builder();
+        ImmutableMultiset.Builder<IUniqueObject<?>> builder = ImmutableMultiset.builder();
         for (SimpleMaterialListEntry entry:simpleEntries) {
             builder.addAll(entry.getItems());
         };
@@ -83,7 +84,7 @@ abstract class SubMaterialListEntry implements MaterialListEntry<SubMaterialList
 
     protected abstract SubMaterialListEntry createFrom(ImmutableList<MaterialListEntry<?>> subEntries, ImmutableList<SimpleMaterialListEntry> constantEntry);
 
-    protected Iterable<ImmutableMultiset<UniqueItem>> viewOnlySubEntries() {
+    protected Iterable<ImmutableMultiset<IUniqueObject<?>>> viewOnlySubEntries() {
         return createFrom(getSubEntries(), ImmutableList.of());
     }
 

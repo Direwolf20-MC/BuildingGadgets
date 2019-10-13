@@ -35,6 +35,15 @@ public final class APIReference {
 
     }
 
+    public static final class UniqueObjectSerializerReference {
+        public static final ResourceLocation REGISTRY_ID_UNIQUE_OBJECT_SERIALIZER = new ResourceLocation(MODID, "unique_object/serializer");
+
+        private UniqueObjectSerializerReference() {}
+
+        public static final String SIMPLE_UNIQUE_ITEM_ID = MODID + ":simple_item";
+        public static final ResourceLocation SIMPLE_UNIQUE_ITEM_ID_RL = new ResourceLocation(SIMPLE_UNIQUE_ITEM_ID);
+    }
+
     public static final class TileDataFactoryReference {
         public static final String IMC_METHOD_TILEDATA_FACTORY = "imc_tile_data_factory";
 
@@ -42,6 +51,15 @@ public final class APIReference {
 
         public static final String DATA_PROVIDER_FACTORY = MODID + ":data_provider_factory";
         public static final ResourceLocation DATA_PROVIDER_FACTORY_RL = new ResourceLocation(DATA_PROVIDER_FACTORY);
+    }
+
+    public static final class HandleProviderReference {
+        public static final String IMC_METHOD_HANDLE_PROVIDER = "imc_handle_provider";
+
+        private HandleProviderReference() {}
+
+        public static final String STACK_HANDLER_ITEM_HANDLE = MODID + ":stack_handler_provider";
+        public static final ResourceLocation STACK_HANDLER_ITEM_HANDLE_RL = new ResourceLocation(STACK_HANDLER_ITEM_HANDLE);
     }
 
 }

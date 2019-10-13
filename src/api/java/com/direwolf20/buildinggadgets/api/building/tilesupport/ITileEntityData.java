@@ -3,7 +3,7 @@ package com.direwolf20.buildinggadgets.api.building.tilesupport;
 import com.direwolf20.buildinggadgets.api.BuildingGadgetsAPI;
 import com.direwolf20.buildinggadgets.api.building.view.IBuildContext;
 import com.direwolf20.buildinggadgets.api.materials.MaterialList;
-import com.direwolf20.buildinggadgets.api.materials.UniqueItem;
+import com.direwolf20.buildinggadgets.api.materials.inventory.UniqueItem;
 import com.direwolf20.buildinggadgets.api.serialisation.ITileDataSerializer;
 import com.google.common.collect.Multiset;
 import net.minecraft.block.BlockState;

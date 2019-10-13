@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.client.gui.materiallist;
 
 import com.direwolf20.buildinggadgets.api.materials.MaterialList;
-import com.direwolf20.buildinggadgets.api.materials.UniqueItem;
+import com.direwolf20.buildinggadgets.api.materials.inventory.IUniqueObject;
 import com.direwolf20.buildinggadgets.client.gui.base.EntryList;
 import com.direwolf20.buildinggadgets.common.util.inventory.IItemIndex;
 import com.direwolf20.buildinggadgets.common.util.inventory.InventoryHelper;
@@ -39,7 +39,7 @@ class ScrollingMaterialList extends EntryList<Entry> {
 
     private SortingModes sortingMode;
     private long lastUpdate;
-    private Iterator<ImmutableMultiset<UniqueItem>> multisetIterator;
+    private Iterator<ImmutableMultiset<IUniqueObject<?>>> multisetIterator;
 
     public ScrollingMaterialList(MaterialListGUI gui) {
         super(gui.getWindowLeftX(),
@@ -62,8 +62,8 @@ class ScrollingMaterialList extends EntryList<Entry> {
         PlayerEntity player = Minecraft.getInstance().player;
         IItemIndex index = InventoryHelper.index(gui.getTemplateItem(), player);
         MatchResult result = index.tryMatch(multisetIterator.next());
-        for (Multiset.Entry<UniqueItem> entry : result.getChosenOption().entrySet()) {
-            UniqueItem item = entry.getElement();
+        for (Multiset.Entry<IUniqueObject<?>> entry : result.getChosenOption().entrySet()) {
+            IUniqueObject<?> item = entry.getElement();
             addEntry(new Entry(this, item, entry.getCount(), result.getFoundItems().count(entry.getElement())));
         }
         sort();
@@ -108,12 +108,12 @@ class ScrollingMaterialList extends EntryList<Entry> {
         private int widthItemName;
         private int widthAmount;
 
-        public Entry(ScrollingMaterialList parent, UniqueItem item, int required, int available) {
+        public Entry(ScrollingMaterialList parent, IUniqueObject<?> item, int required, int available) {
             this.parent = parent;
             this.required = required;
             this.available = MathHelper.clamp(available, 0, required);
 
-            this.stack = new ItemStack(item.getItem());
+            this.stack = item.createStack();
             this.itemName = stack.getDisplayName().getString();
             // Use this.available since the parameter is not clamped
             this.amount = this.available + "/" + required;

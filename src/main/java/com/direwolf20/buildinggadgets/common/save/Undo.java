@@ -7,9 +7,10 @@ import com.direwolf20.buildinggadgets.api.building.Region;
 import com.direwolf20.buildinggadgets.api.building.tilesupport.ITileEntityData;
 import com.direwolf20.buildinggadgets.api.building.tilesupport.NBTTileEntityData;
 import com.direwolf20.buildinggadgets.api.building.tilesupport.TileSupport;
-import com.direwolf20.buildinggadgets.api.materials.UniqueItem;
-import com.direwolf20.buildinggadgets.api.materials.UniqueItem.Serializer;
+import com.direwolf20.buildinggadgets.api.materials.inventory.IUniqueObject;
+import com.direwolf20.buildinggadgets.api.materials.inventory.IUniqueObjectSerializer;
 import com.direwolf20.buildinggadgets.api.serialisation.ITileDataSerializer;
+import com.direwolf20.buildinggadgets.api.serialisation.SerialisationSupport;
 import com.direwolf20.buildinggadgets.api.util.ObjectIncrementer;
 import com.direwolf20.buildinggadgets.api.util.RegistryUtils;
 import com.direwolf20.buildinggadgets.api.util.ReverseObjectIncrementer;
@@ -26,11 +27,11 @@ import net.minecraft.block.BlockState;
 import net.minecraft.nbt.*;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Tuple;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.common.util.Constants.NBT;
-import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -64,20 +65,20 @@ public final class Undo {
                 (ListNBT) nbt.get(NBTKeys.WORLD_SAVE_UNDO_DATA_LIST),
                 inbt -> BlockData.deserialize((CompoundNBT) inbt, serializerReverseObjectIncrementer, true),
                 value -> BlockData.AIR);
-        ReverseObjectIncrementer<UniqueItem.Serializer> itemSerializerIncrementer = new ReverseObjectIncrementer<>(
+        ReverseObjectIncrementer<IUniqueObjectSerializer> itemSerializerIncrementer = new ReverseObjectIncrementer<>(
                 (ListNBT) nbt.get(NBTKeys.WORLD_SAVE_UNDO_ITEMS_SERIALIZER_LIST),
                 inbt -> {
                     String s = inbt.getString();
-                    UniqueItem.Serializer serializer = UniqueItem.SERIALIZER;
-                    if (! s.equals(serializer.getRegistryName().toString()))
-                        BuildingGadgets.LOG.warn("Found unknown item-serializer {}. Replacing with default!", s);
+                    IUniqueObjectSerializer serializer = RegistryUtils.getFromString(Registries.getUniqueObjectSerializers(), s);
+                    if (serializer == null)
+                        return SerialisationSupport.uniqueItemSerializer();
                     return serializer;
                 },
                 value -> {
                     BuildingGadgetsAPI.LOG.warn("Attempted to query unknown item-serializer {}. Replacing with default!", value);
-                    return UniqueItem.SERIALIZER;
+                    return SerialisationSupport.uniqueItemSerializer();
                 });
-        ReverseObjectIncrementer<Multiset<UniqueItem>> itemSetReverseObjectIncrementer = new ReverseObjectIncrementer<>(
+        ReverseObjectIncrementer<Multiset<IUniqueObject<?>>> itemSetReverseObjectIncrementer = new ReverseObjectIncrementer<>(
                 (ListNBT) nbt.get(NBTKeys.WORLD_SAVE_UNDO_ITEMS_LIST),
                 inbt -> NBTHelper.deserializeMultisetEntries((ListNBT) inbt, HashMultiset.create(), entry -> readEntry(entry, itemSerializerIncrementer)),
                 value -> HashMultiset.create());
@@ -90,13 +91,12 @@ public final class Undo {
         return new Undo(dim, map, bounds);
     }
 
-    private static Pair<UniqueItem, Integer> readEntry(INBT inbt, IntFunction<UniqueItem.Serializer> serializerIntFunction) {
+    private static Tuple<IUniqueObject<?>, Integer> readEntry(INBT inbt, IntFunction<IUniqueObjectSerializer> serializerIntFunction) {
         CompoundNBT nbt = (CompoundNBT) inbt;
-        UniqueItem.Serializer serializer = UniqueItem.SERIALIZER;
-        Preconditions.checkArgument(serializerIntFunction.apply(nbt.getInt(NBTKeys.UNIQUE_ITEM_SERIALIZER)).equals(serializer));
+        IUniqueObjectSerializer serializer = serializerIntFunction.apply(nbt.getInt(NBTKeys.UNIQUE_ITEM_SERIALIZER));
         int count = nbt.getInt(NBTKeys.UNIQUE_ITEM_COUNT);
-        UniqueItem item = serializer.deserialize(nbt.getCompound(NBTKeys.UNIQUE_ITEM_ITEM));
-        return Pair.of(item, count);
+        IUniqueObject<?> item = serializer.deserialize(nbt.getCompound(NBTKeys.UNIQUE_ITEM_ITEM));
+        return new Tuple<>(item, count);
     }
 
     public static Builder builder() {
@@ -123,8 +123,8 @@ public final class Undo {
 
     CompoundNBT serialize() {
         ObjectIncrementer<BlockData> dataObjectIncrementer = new ObjectIncrementer<>();
-        ObjectIncrementer<UniqueItem.Serializer> itemSerializerIncrementer = new ObjectIncrementer<>();
-        ObjectIncrementer<Multiset<UniqueItem>> itemObjectIncrementer = new ObjectIncrementer<>();
+        ObjectIncrementer<IUniqueObjectSerializer> itemSerializerIncrementer = new ObjectIncrementer<>();
+        ObjectIncrementer<Multiset<IUniqueObject<?>>> itemObjectIncrementer = new ObjectIncrementer<>();
         ObjectIncrementer<ITileDataSerializer> serializerObjectIncrementer = new ObjectIncrementer<>();
         CompoundNBT res = new CompoundNBT();
         ListNBT infoList = NBTHelper.serializeMap(dataMap, NBTUtil::writeBlockPos, i -> i.serialize(dataObjectIncrementer, itemObjectIncrementer));
@@ -142,7 +142,7 @@ public final class Undo {
         return res;
     }
 
-    private CompoundNBT writeEntry(Entry<UniqueItem> entry, ToIntFunction<Serializer> serializerObjectIncrementer) {
+    private CompoundNBT writeEntry(Entry<IUniqueObject<?>> entry, ToIntFunction<IUniqueObjectSerializer> serializerObjectIncrementer) {
         CompoundNBT res = new CompoundNBT();
         res.putInt(NBTKeys.UNIQUE_ITEM_SERIALIZER, serializerObjectIncrementer.applyAsInt(entry.getElement().getSerializer()));
         res.put(NBTKeys.UNIQUE_ITEM_ITEM, entry.getElement().getSerializer().serialize(entry.getElement(), true));
@@ -151,24 +151,24 @@ public final class Undo {
     }
 
     public static final class BlockInfo {
-        private static BlockInfo deserialize(CompoundNBT nbt, IntFunction<BlockData> dataSupplier, IntFunction<Multiset<UniqueItem>> itemSetSupplier) {
+        private static BlockInfo deserialize(CompoundNBT nbt, IntFunction<BlockData> dataSupplier, IntFunction<Multiset<IUniqueObject<?>>> itemSetSupplier) {
             BlockData data = dataSupplier.apply(nbt.getInt(NBTKeys.WORLD_SAVE_UNDO_DATA));
-            Multiset<UniqueItem> usedItems = itemSetSupplier.apply(nbt.getInt(NBTKeys.WORLD_SAVE_UNDO_ITEMS_USED));
-            Multiset<UniqueItem> producedItems = itemSetSupplier.apply(nbt.getInt(NBTKeys.WORLD_SAVE_UNDO_ITEMS_PRODUCED));
+            Multiset<IUniqueObject<?>> usedItems = itemSetSupplier.apply(nbt.getInt(NBTKeys.WORLD_SAVE_UNDO_ITEMS_USED));
+            Multiset<IUniqueObject<?>> producedItems = itemSetSupplier.apply(nbt.getInt(NBTKeys.WORLD_SAVE_UNDO_ITEMS_PRODUCED));
             return new BlockInfo(data, usedItems, producedItems);
         }
 
         private final BlockData data;
-        private final Multiset<UniqueItem> usedItems;
-        private final Multiset<UniqueItem> producedItems;
+        private final Multiset<IUniqueObject<?>> usedItems;
+        private final Multiset<IUniqueObject<?>> producedItems;
 
-        private BlockInfo(BlockData data, Multiset<UniqueItem> usedItems, Multiset<UniqueItem> producedItems) {
+        private BlockInfo(BlockData data, Multiset<IUniqueObject<?>> usedItems, Multiset<IUniqueObject<?>> producedItems) {
             this.data = data;
             this.usedItems = usedItems;
             this.producedItems = producedItems;
         }
 
-        private CompoundNBT serialize(ToIntFunction<BlockData> dataIdSupplier, ToIntFunction<Multiset<UniqueItem>> itemIdSupplier) {
+        private CompoundNBT serialize(ToIntFunction<BlockData> dataIdSupplier, ToIntFunction<Multiset<IUniqueObject<?>>> itemIdSupplier) {
             CompoundNBT res = new CompoundNBT();
             res.putInt(NBTKeys.WORLD_SAVE_UNDO_DATA, dataIdSupplier.applyAsInt(data));
             res.putInt(NBTKeys.WORLD_SAVE_UNDO_ITEMS_USED, itemIdSupplier.applyAsInt(usedItems));
@@ -180,11 +180,11 @@ public final class Undo {
             return data;
         }
 
-        public Multiset<UniqueItem> getUsedItems() {
+        public Multiset<IUniqueObject<?>> getUsedItems() {
             return Multisets.unmodifiableMultiset(usedItems);
         }
 
-        public Multiset<UniqueItem> getProducedItems() {
+        public Multiset<IUniqueObject<?>> getProducedItems() {
             return Multisets.unmodifiableMultiset(producedItems);
         }
     }
@@ -198,14 +198,14 @@ public final class Undo {
             regionBuilder = null;
         }
 
-        public Builder record(IBlockReader reader, BlockPos pos, Multiset<UniqueItem> requiredItems, Multiset<UniqueItem> producedItems) {
+        public Builder record(IBlockReader reader, BlockPos pos, Multiset<IUniqueObject<?>> requiredItems, Multiset<IUniqueObject<?>> producedItems) {
             BlockState state = reader.getBlockState(pos);
             TileEntity te = reader.getTileEntity(pos);
             ITileEntityData data = te != null ? NBTTileEntityData.ofTile(te) : TileSupport.dummyTileEntityData();
             return record(pos, new BlockData(state, data), requiredItems, producedItems);
         }
 
-        private Builder record(BlockPos pos, BlockData data, Multiset<UniqueItem> requiredItems, Multiset<UniqueItem> producedItems) {
+        private Builder record(BlockPos pos, BlockData data, Multiset<IUniqueObject<?>> requiredItems, Multiset<IUniqueObject<?>> producedItems) {
             mapBuilder.put(pos, new BlockInfo(data, requiredItems, producedItems));
             if (regionBuilder == null)
                 regionBuilder = Region.enclosingBuilder();

@@ -1,16 +1,16 @@
 package com.direwolf20.buildinggadgets.common.util.inventory;
 
 import com.direwolf20.buildinggadgets.api.materials.MaterialList;
-import com.direwolf20.buildinggadgets.api.materials.UniqueItem;
+import com.direwolf20.buildinggadgets.api.materials.inventory.IUniqueObject;
 import com.google.common.collect.ImmutableMultiset;
 
 public final class MatchResult {
     private final MaterialList matchedList;
-    private final ImmutableMultiset<UniqueItem> foundItems;
-    private final ImmutableMultiset<UniqueItem> chosenOption;
+    private final ImmutableMultiset<IUniqueObject<?>> foundItems;
+    private final ImmutableMultiset<IUniqueObject<?>> chosenOption;
     private final boolean isSuccess;
 
-    public static MatchResult success(MaterialList matchedList, ImmutableMultiset<UniqueItem> foundItems, ImmutableMultiset<UniqueItem> chosenOption) {
+    public static MatchResult success(MaterialList matchedList, ImmutableMultiset<IUniqueObject<?>> foundItems, ImmutableMultiset<IUniqueObject<?>> chosenOption) {
         return new MatchResult(matchedList, foundItems, chosenOption, true);
     }
 
@@ -18,11 +18,11 @@ public final class MatchResult {
         return new MatchResult(MaterialList.empty(), ImmutableMultiset.of(), ImmutableMultiset.of(), false);
     }
 
-    public static MatchResult failure(MaterialList matchedList, ImmutableMultiset<UniqueItem> foundItems, ImmutableMultiset<UniqueItem> chosenOption) {
+    public static MatchResult failure(MaterialList matchedList, ImmutableMultiset<IUniqueObject<?>> foundItems, ImmutableMultiset<IUniqueObject<?>> chosenOption) {
         return new MatchResult(matchedList, foundItems, chosenOption, false);
     }
 
-    MatchResult(MaterialList matchedList, ImmutableMultiset<UniqueItem> foundItems, ImmutableMultiset<UniqueItem> chosenOption, boolean isSuccess) {
+    MatchResult(MaterialList matchedList, ImmutableMultiset<IUniqueObject<?>> foundItems, ImmutableMultiset<IUniqueObject<?>> chosenOption, boolean isSuccess) {
         this.matchedList = matchedList;
         this.foundItems = foundItems;
         this.chosenOption = chosenOption;
@@ -33,11 +33,11 @@ public final class MatchResult {
         return matchedList;
     }
 
-    public ImmutableMultiset<UniqueItem> getFoundItems() {
+    public ImmutableMultiset<IUniqueObject<?>> getFoundItems() {
         return foundItems;
     }
 
-    public ImmutableMultiset<UniqueItem> getChosenOption() {
+    public ImmutableMultiset<IUniqueObject<?>> getChosenOption() {
         return chosenOption;
     }
 

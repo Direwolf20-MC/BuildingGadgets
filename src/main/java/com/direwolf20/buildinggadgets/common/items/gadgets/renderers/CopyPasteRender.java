@@ -231,7 +231,7 @@ public class CopyPasteRender extends BaseRenderer {
 
     private void renderMissing(PlayerEntity player, ItemStack stack, IBuildView view, RenderSorter sorter) {
         int energyCost = ((GadgetCopyPaste) stack.getItem()).getEnergyCost(stack);
-        IItemIndex index = InventoryHelper.index(stack, player);
+        IItemIndex index = InventoryHelper.index(stack, player); //wrap in a recording index, to prevent
         boolean overwrite = Config.GENERAL.allowOverwriteBlocks.get();
         BlockItemUseContext useContext = new BlockItemUseContext(new ItemUseContext(player, Hand.MAIN_HAND, VectorHelper.getLookingAt(player, stack)));
         InvertedPlacementEvaluator evaluator = new InvertedPlacementEvaluator(

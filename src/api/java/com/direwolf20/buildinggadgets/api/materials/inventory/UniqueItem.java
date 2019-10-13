@@ -1,5 +1,6 @@
-package com.direwolf20.buildinggadgets.api.materials;
+package com.direwolf20.buildinggadgets.api.materials.inventory;
 
+import com.direwolf20.buildinggadgets.api.serialisation.SerialisationSupport;
 import com.direwolf20.buildinggadgets.api.util.JsonKeys;
 import com.direwolf20.buildinggadgets.api.util.NBTKeys;
 import com.direwolf20.buildinggadgets.api.util.RegistryUtils;
@@ -22,8 +23,9 @@ import net.minecraftforge.registries.ForgeRegistryEntry;
 import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.Objects;
+import java.util.Optional;
 
-public final class UniqueItem {
+public final class UniqueItem implements IUniqueObject<Item> {
     public enum ComparisonMode {
         EXACT_MATCH(0) {
             @Override
@@ -75,8 +77,6 @@ public final class UniqueItem {
         }
     }
 
-    public static final Serializer SERIALIZER = new Serializer().setRegistryName(NBTKeys.SIMPLE_UNIQUE_ITEM_ID_RL);
-
     public static UniqueItem ofStack(ItemStack stack) {
         CompoundNBT nbt = new CompoundNBT();
         stack.write(nbt);
@@ -112,21 +112,14 @@ public final class UniqueItem {
         this.hash = Objects.requireNonNull(item.getRegistryName()).hashCode() + 31 * hash;
     }
 
-    public Item getItem() {
+    @Override
+    public Class<Item> getIndexClass() {
+        return Item.class;
+    }
+
+    @Override
+    public Item getIndexObject() {
         return item;
-    }
-
-    public ItemStack toItemStack() {
-        ItemStack stack = new ItemStack(item, 1);
-        if (tagCompound != null) {
-            stack.setTag(tagCompound);
-        }
-        return stack;
-    }
-
-    public ResourceLocation getRegistryName() {
-        assert item.getRegistryName() != null; //tested in constructor
-        return item.getRegistryName();
     }
 
     @Nullable
@@ -139,18 +132,16 @@ public final class UniqueItem {
         return forgeCaps != null ? forgeCaps.copy() : null;
     }
 
-    public ItemStack createStack() {
-        return createStack(1);
-    }
-
+    @Override
     public ItemStack createStack(int count) {
         ItemStack res = new ItemStack(item, count, forgeCaps);
         res.setTag(tagCompound);
         return res;
     }
 
+    @Override
     public boolean matches(ItemStack stack) {
-        if (stack.getItem() != getItem())
+        if (stack.getItem() != getIndexObject())
             return false;
         if (tagCompound != null && ! tagMatch.match(tagCompound, stack.getTag()))
             return false;
@@ -164,17 +155,32 @@ public final class UniqueItem {
         return true;
     }
 
-    public Serializer getSerializer() {
-        return SERIALIZER;
+    @Override
+    public ItemStack insertInto(ItemStack stack, int count) {
+        if (forgeCaps != null) {
+            stack = new ItemStack(getIndexObject(), count, forgeCaps);
+        } else
+            stack.setCount(Math.min(stack.getCount() + count, stack.getMaxStackSize()));
+        if (tagCompound != null)
+            stack.setTag(tagCompound);
+        return stack;
+    }
+
+    @Override
+    public Optional<ItemStack> trySimpleInsert(int count) {
+        return Optional.of(createStack(count));
+    }
+
+    @Override
+    public IUniqueObjectSerializer getSerializer() {
+        return SerialisationSupport.uniqueItemSerializer();
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (! (o instanceof UniqueItem)) return false;
-
         UniqueItem that = (UniqueItem) o;
-
         if (! item.equals(that.item)) return false;
         if (tagCompound != null ? ! tagCompound.equals(that.tagCompound) : that.tagCompound != null) return false;
         if (forgeCaps != null ? ! forgeCaps.equals(that.forgeCaps) : that.forgeCaps != null) return false;
@@ -190,7 +196,7 @@ public final class UniqueItem {
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
-                .add("item", getRegistryName())
+                .add("item", getIndexObject().getRegistryName())
                 .add("tagCompound", tagCompound)
                 .add("forgeCaps", forgeCaps)
                 .add("tagMatch", tagMatch)
@@ -198,15 +204,16 @@ public final class UniqueItem {
                 .toString();
     }
 
-    public static final class Serializer extends ForgeRegistryEntry<Serializer> {
-        public CompoundNBT serialize(UniqueItem item, boolean persisted) {
+    public static final class Serializer extends ForgeRegistryEntry<IUniqueObjectSerializer> implements IUniqueObjectSerializer {
+        public CompoundNBT serialize(IUniqueObject<?> obj, boolean persisted) {
+            UniqueItem item = (UniqueItem) obj;
             CompoundNBT res = new CompoundNBT();
             if (item.tagCompound != null)
                 res.put(NBTKeys.KEY_DATA, item.tagCompound);
             if (item.forgeCaps != null)
                 res.put(NBTKeys.KEY_CAP_NBT, item.forgeCaps);
             if (persisted)
-                res.putString(NBTKeys.KEY_ID, item.getRegistryName().toString());
+                res.putString(NBTKeys.KEY_ID, item.getIndexObject().getRegistryName().toString());
             else
                 res.putInt(NBTKeys.KEY_ID, RegistryUtils.getId(ForgeRegistries.ITEMS, item.item));
             res.putByte(NBTKeys.KEY_DATA_COMPARISON, item.tagMatch.getId());
@@ -214,7 +221,7 @@ public final class UniqueItem {
             return res;
         }
 
-        public UniqueItem deserialize(CompoundNBT res) {
+        public IUniqueObject<Item> deserialize(CompoundNBT res) {
             Preconditions.checkArgument(res.contains(NBTKeys.KEY_ID), "Cannot construct a UniqueItem without an Item!");
             CompoundNBT nbt = res.getCompound(NBTKeys.KEY_DATA);
             ComparisonMode mode = ComparisonMode.byId(res.getByte(NBTKeys.KEY_DATA_COMPARISON));
@@ -228,13 +235,14 @@ public final class UniqueItem {
             return new UniqueItem(item, nbt.isEmpty() ? null : nbt, mode, capNbt.isEmpty() ? null : capNbt, capMode);
         }
 
-        public JsonSerializer<UniqueItem> asJsonSerializer(int count, boolean printName, boolean extended) {
-            return (element, typeOfSrc, context) -> {
+        public JsonSerializer<IUniqueObject<?>> asJsonSerializer(int count, boolean printName, boolean extended) {
+            return (uobj, typeOfSrc, context) -> {
                 JsonObject obj = new JsonObject();
-                Item item = element.getItem();
+                UniqueItem element = (UniqueItem) uobj;
+                Item item = element.getIndexObject();
                 if (printName)
                     obj.addProperty(JsonKeys.MATERIAL_LIST_ITEM_NAME, I18n.format(item.getTranslationKey(element.createStack(count))));
-                obj.add(JsonKeys.MATERIAL_LIST_ITEM_ID, context.serialize(element.getRegistryName()));
+                obj.add(JsonKeys.MATERIAL_LIST_ITEM_ID, context.serialize(element.getIndexObject().getRegistryName()));
                 obj.addProperty(JsonKeys.MATERIAL_LIST_ITEM_COUNT, count);
                 if (extended) {
                     if (element.tagCompound != null) {

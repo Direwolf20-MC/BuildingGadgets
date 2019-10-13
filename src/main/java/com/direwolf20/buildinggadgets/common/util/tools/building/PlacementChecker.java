@@ -4,7 +4,8 @@ import com.direwolf20.buildinggadgets.api.building.PlacementTarget;
 import com.direwolf20.buildinggadgets.api.building.tilesupport.TileSupport;
 import com.direwolf20.buildinggadgets.api.building.view.IBuildContext;
 import com.direwolf20.buildinggadgets.api.materials.MaterialList;
-import com.direwolf20.buildinggadgets.api.materials.UniqueItem;
+import com.direwolf20.buildinggadgets.api.materials.inventory.IUniqueObject;
+import com.direwolf20.buildinggadgets.api.materials.inventory.UniqueItem;
 import com.direwolf20.buildinggadgets.api.util.CommonUtils;
 import com.direwolf20.buildinggadgets.common.registry.OurItems;
 import com.direwolf20.buildinggadgets.common.util.exceptions.CapabilityNotPresentException;
@@ -45,7 +46,7 @@ public final class PlacementChecker {
         if (! placeCheck.test(context, target))
             return new CheckResult(MatchResult.failure(), ImmutableMultiset.of(), - 1, false, false);
         int energy = energyFun.applyAsInt(target);
-        Multiset<UniqueItem> insertedItems = ImmutableMultiset.of();
+        Multiset<IUniqueObject<?>> insertedItems = ImmutableMultiset.of();
         boolean isCreative = context.getBuildingPlayer() != null && context.getBuildingPlayer().isCreative();
         IEnergyStorage storage = energyCap.orElseThrow(CapabilityNotPresentException::new);
         if (! isCreative && storage.extractEnergy(energy, true) != energy)
@@ -97,12 +98,12 @@ public final class PlacementChecker {
 
     public static final class CheckResult {
         private final MatchResult match;
-        private final Multiset<UniqueItem> insertedItems;
+        private final Multiset<IUniqueObject<?>> insertedItems;
         private final int usedEnergy;
         private final boolean success;
         private final boolean usingPaste;
 
-        private CheckResult(MatchResult match, Multiset<UniqueItem> insertedItems, int usedEnergy, boolean success, boolean usingPaste) {
+        private CheckResult(MatchResult match, Multiset<IUniqueObject<?>> insertedItems, int usedEnergy, boolean success, boolean usingPaste) {
             this.match = match;
             this.insertedItems = insertedItems;
             this.usedEnergy = usedEnergy;
@@ -110,7 +111,7 @@ public final class PlacementChecker {
             this.usingPaste = usingPaste;
         }
 
-        public Multiset<UniqueItem> getInsertedItems() {
+        public Multiset<IUniqueObject<?>> getInsertedItems() {
             return insertedItems;
         }
 

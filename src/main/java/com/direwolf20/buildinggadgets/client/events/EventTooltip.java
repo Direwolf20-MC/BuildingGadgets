@@ -4,7 +4,8 @@ import com.direwolf20.buildinggadgets.api.building.view.IBuildContext;
 import com.direwolf20.buildinggadgets.api.building.view.SimpleBuildContext;
 import com.direwolf20.buildinggadgets.api.capability.CapabilityTemplate;
 import com.direwolf20.buildinggadgets.api.materials.MaterialList;
-import com.direwolf20.buildinggadgets.api.materials.UniqueItem;
+import com.direwolf20.buildinggadgets.api.materials.inventory.IUniqueObject;
+import com.direwolf20.buildinggadgets.api.materials.inventory.UniqueItem;
 import com.direwolf20.buildinggadgets.api.serialisation.TemplateHeader;
 import com.direwolf20.buildinggadgets.api.template.ITemplate;
 import com.direwolf20.buildinggadgets.client.cache.RemoteInventoryCache;
@@ -40,10 +41,10 @@ import java.util.List;
 
 @Mod.EventBusSubscriber(modid = Reference.MODID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public class EventTooltip {
-    private static final Comparator<Multiset.Entry<UniqueItem>> ENTRY_COMPARATOR = Comparator
-            .<Multiset.Entry<UniqueItem>, Integer>comparing(Entry::getCount)
+    private static final Comparator<Multiset.Entry<IUniqueObject<?>>> ENTRY_COMPARATOR = Comparator
+            .<Multiset.Entry<IUniqueObject<?>>, Integer>comparing(Entry::getCount)
             .reversed()
-            .thenComparing(e -> e.getElement().getItem().getRegistryName());
+            .thenComparing(e -> e.getElement().getObjectRegistryName());
     private static final int STACKS_PER_LINE = 8;
     private static RemoteInventoryCache cache = new RemoteInventoryCache(true);
 
@@ -104,8 +105,8 @@ public class EventTooltip {
                 if (list == null)
                     list = MaterialList.empty();
                 MatchResult match = index.tryMatch(list);
-                Multiset<UniqueItem> existing = match.getFoundItems();
-                List<Multiset.Entry<UniqueItem>> sortedEntries = ImmutableList.sortedCopyOf(ENTRY_COMPARATOR, match.getChosenOption().entrySet());
+                Multiset<IUniqueObject<?>> existing = match.getFoundItems();
+                List<Multiset.Entry<IUniqueObject<?>>> sortedEntries = ImmutableList.sortedCopyOf(ENTRY_COMPARATOR, match.getChosenOption().entrySet());
                 int bx = event.getX();
                 int by = event.getY();
                 int j = 0;
@@ -118,15 +119,15 @@ public class EventTooltip {
                 }
                 GlStateManager.enableBlend();
                 GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-                for (Multiset.Entry<UniqueItem> entry : sortedEntries) {
+                for (Multiset.Entry<IUniqueObject<?>> entry : sortedEntries) {
                     int x = bx + (j % STACKS_PER_LINE) * 18;
                     int y = by + (j / STACKS_PER_LINE) * 20;
                     totalMissing += renderRequiredBlocks(entry.getElement().createStack(), x, y, existing.count(entry.getElement()), entry.getCount());
                     j++;
                 }
                 if (! match.isSuccess()) {
-                    UniqueItem pasteItem = new UniqueItem(OurItems.constructionPaste);
-                    Multiset<UniqueItem> pasteSet = ImmutableMultiset.<UniqueItem>builder()
+                    IUniqueObject<?> pasteItem = new UniqueItem(OurItems.constructionPaste);
+                    Multiset<IUniqueObject<?>> pasteSet = ImmutableMultiset.<IUniqueObject<?>>builder()
                             .addCopies(pasteItem, totalMissing)
                             .build();
                     int hasAmt = index.tryMatch(pasteSet).getFoundItems().count(pasteItem);

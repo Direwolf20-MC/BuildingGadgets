@@ -5,7 +5,7 @@ import com.direwolf20.buildinggadgets.api.building.tilesupport.TileSupport;
 import com.direwolf20.buildinggadgets.api.building.view.IBuildContext;
 import com.direwolf20.buildinggadgets.api.building.view.SimpleBuildContext;
 import com.direwolf20.buildinggadgets.api.materials.MaterialList;
-import com.direwolf20.buildinggadgets.api.materials.UniqueItem;
+import com.direwolf20.buildinggadgets.api.materials.inventory.IUniqueObject;
 import com.direwolf20.buildinggadgets.common.blocks.EffectBlock;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.items.gadgets.renderers.BaseRenderer;
@@ -261,14 +261,14 @@ public class GadgetExchanger extends ModeGadget {
 
 
         if (index.applyMatch(match)) {
-            ImmutableMultiset<UniqueItem> usedItems = match.getChosenOption();
+            ImmutableMultiset<IUniqueObject<?>> usedItems = match.getChosenOption();
             MaterialList materials = TileSupport.createTileData(world, pos).getRequiredItems(
                     buildContext,
                     currentBlock,
                     world.rayTraceBlocks(new RayTraceContext(player.getPositionVec(), new Vec3d(pos), BlockMode.COLLIDER, FluidMode.NONE, player)),
                     pos);
-            Iterator<ImmutableMultiset<UniqueItem>> it = materials.iterator();
-            ImmutableMultiset<UniqueItem> producedItems = it.hasNext() ? it.next() : ImmutableMultiset.of();
+            Iterator<ImmutableMultiset<IUniqueObject<?>>> it = materials.iterator();
+            ImmutableMultiset<IUniqueObject<?>> producedItems = it.hasNext() ? it.next() : ImmutableMultiset.of();
             index.insert(producedItems);
             builder.record(world, pos, usedItems, producedItems);
             EffectBlock.spawnEffectBlock(world, pos, setBlock, EffectBlock.Mode.REPLACE, useConstructionPaste);

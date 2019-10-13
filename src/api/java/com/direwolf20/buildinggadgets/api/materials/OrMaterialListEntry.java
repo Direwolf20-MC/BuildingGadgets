@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.api.materials;
 
+import com.direwolf20.buildinggadgets.api.materials.inventory.IUniqueObject;
 import com.direwolf20.buildinggadgets.api.util.NBTKeys;
 import com.google.common.collect.*;
 import net.minecraft.nbt.CompoundNBT;
@@ -25,15 +26,15 @@ class OrMaterialListEntry extends SubMaterialListEntry {
     }
 
     @Override
-    public PeekingIterator<ImmutableMultiset<UniqueItem>> iterator() {
+    public PeekingIterator<ImmutableMultiset<IUniqueObject<?>>> iterator() {
         if (! getAllSubEntries().findFirst().isPresent())
             return Iterators.peekingIterator(Iterators.singletonIterator(ImmutableMultiset.of()));
         Iterator<MaterialListEntry<?>> entryIterator = getAllSubEntries().iterator();
-        return Iterators.peekingIterator(new AbstractIterator<ImmutableMultiset<UniqueItem>>() {
-            private Iterator<ImmutableMultiset<UniqueItem>> itemIterator;
+        return Iterators.peekingIterator(new AbstractIterator<ImmutableMultiset<IUniqueObject<?>>>() {
+            private Iterator<ImmutableMultiset<IUniqueObject<?>>> itemIterator;
 
             @Override
-            protected ImmutableMultiset<UniqueItem> computeNext() {
+            protected ImmutableMultiset<IUniqueObject<?>> computeNext() {
                 if (itemIterator == null) {
                     if (entryIterator.hasNext())
                         itemIterator = entryIterator.next().iterator();

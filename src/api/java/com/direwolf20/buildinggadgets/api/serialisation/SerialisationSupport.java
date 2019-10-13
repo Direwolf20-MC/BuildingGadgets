@@ -2,10 +2,12 @@ package com.direwolf20.buildinggadgets.api.serialisation;
 
 import com.direwolf20.buildinggadgets.api.APIReference.TemplateSerializerReference;
 import com.direwolf20.buildinggadgets.api.APIReference.TileDataSerializerReference;
+import com.direwolf20.buildinggadgets.api.APIReference.UniqueObjectSerializerReference;
 import com.direwolf20.buildinggadgets.api.building.tilesupport.ITileEntityData;
 import com.direwolf20.buildinggadgets.api.building.tilesupport.NBTTileEntityData;
 import com.direwolf20.buildinggadgets.api.building.tilesupport.TileSupport;
 import com.direwolf20.buildinggadgets.api.materials.MaterialList;
+import com.direwolf20.buildinggadgets.api.materials.inventory.IUniqueObjectSerializer;
 import com.direwolf20.buildinggadgets.api.util.NBTKeys;
 import com.google.common.base.Preconditions;
 import net.minecraft.nbt.CompoundNBT;
@@ -83,6 +85,13 @@ public final class SerialisationSupport {
 
     public static ITemplateSerializer delegatingTemplateSerializer() {
         return DELEGATING_TEMPLATE_SERIALIZER;
+    }
+
+    @ObjectHolder(UniqueObjectSerializerReference.SIMPLE_UNIQUE_ITEM_ID)
+    private static IUniqueObjectSerializer UNIQUE_ITEM_SERIALIZER;
+
+    public static IUniqueObjectSerializer uniqueItemSerializer() {
+        return UNIQUE_ITEM_SERIALIZER;
     }
 
 }

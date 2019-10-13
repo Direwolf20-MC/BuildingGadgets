@@ -1,7 +1,13 @@
 package com.direwolf20.buildinggadgets.common.util.inventory;
 
+import com.direwolf20.buildinggadgets.api.APIReference;
+import com.direwolf20.buildinggadgets.api.APIReference.HandleProviderReference;
+import com.direwolf20.buildinggadgets.api.Registries.HandleProvider;
 import com.direwolf20.buildinggadgets.api.building.BlockData;
 import com.direwolf20.buildinggadgets.api.building.tilesupport.TileSupport;
+import com.direwolf20.buildinggadgets.api.materials.inventory.IHandleProvider;
+import com.direwolf20.buildinggadgets.api.materials.inventory.IObjectHandle;
+import com.direwolf20.buildinggadgets.api.registry.TopologicalRegistryBuilder;
 import com.direwolf20.buildinggadgets.common.items.gadgets.AbstractGadget;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.items.pastes.ConstructionPaste;
@@ -10,7 +16,8 @@ import com.direwolf20.buildinggadgets.common.registry.OurItems;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.exceptions.CapabilityNotPresentException;
 import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
-import com.google.common.collect.HashMultimap;
+import com.direwolf20.buildinggadgets.common.util.ref.Reference;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Multimap;
 import net.minecraft.block.*;
@@ -28,10 +35,12 @@ import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.InterModComms;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 
 import java.util.*;
+import java.util.function.Supplier;
 
 /*
  * @MichaelHillcox
@@ -50,30 +59,51 @@ public class InventoryHelper {
     public static IItemIndex index(ItemStack tool, PlayerEntity player) {
         if (player.isCreative())
             return CREATIVE_INDEX;
-        return new SimpleItemIndex(tool, player);
+        return new PlayerItemIndex(tool, player);
     }
 
-    static Multimap<Item, IStackHandle> indexMap(ItemStack tool, PlayerEntity player) {
-        Multimap<Item, IStackHandle> map = HashMultimap.create();
+    static List<IInsertProvider> indexInsertProviders(ItemStack tool, PlayerEntity player) {
+        ImmutableList.Builder<IInsertProvider> builder = ImmutableList.builder();
+        IItemHandler remoteInv = GadgetUtils.getRemoteInventory(tool, player.world);
+        if (remoteInv != null)
+            builder.add(new HandlerInsertProvider(remoteInv));
+        builder.add(new PlayerInventoryInsertProvider(player));
+        return builder.build();
+    }
+
+    static Map<Class<?>, Map<Object, List<IObjectHandle<?>>>> indexMap(ItemStack tool, PlayerEntity player) {
+        Map<Class<?>, Map<Object, List<IObjectHandle<?>>>> map = new HashMap<>();
         for (IItemHandler handler : getHandlers(tool, player)) {
             if (handler != null)
-                indexHandler(map, handler);
+                ItemHandlerProvider.index(handler, map);
         }
         return map;
     }
 
     static List<IItemHandler> getHandlers(ItemStack stack, PlayerEntity player) {
         return Arrays.asList(
-                player.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).orElseThrow(CapabilityNotPresentException::new),
-                GadgetUtils.getRemoteInventory(stack, player.world));
+                GadgetUtils.getRemoteInventory(stack, player.world),
+                player.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).orElseThrow(CapabilityNotPresentException::new));
     }
 
-    private static void indexHandler(Multimap<Item, IStackHandle> map, IItemHandler handler) {
+    private static void indexHandler(Multimap<Item, IObjectHandle> map, IItemHandler handler) {
         for (int i = 0; i < handler.getSlots(); i++) {
             ItemStack stack = handler.getStackInSlot(i);
-            if (! stack.isEmpty())
-                map.put(stack.getItem(), new StackHandlerHandle(handler, i));
+            if (! stack.isEmpty()) {
+                Set<Class<?>> testedClasses = null;
+                for (IHandleProvider provider : HandleProvider.getHandleProviders().getValuesInOrder()) {
+
+                }
+            }
         }
+    }
+
+    public static void registerHandleProviders() {
+        InterModComms.sendTo(Reference.MODID, HandleProviderReference.IMC_METHOD_HANDLE_PROVIDER, () -> (Supplier<TopologicalRegistryBuilder<IHandleProvider>>)
+                (() -> TopologicalRegistryBuilder.<IHandleProvider>create()
+                        .addMarker(APIReference.MARKER_AFTER_RL)
+                        .addValue(HandleProviderReference.STACK_HANDLER_ITEM_HANDLE_RL, new ItemHandlerProvider())
+                        .addDependency(HandleProviderReference.STACK_HANDLER_ITEM_HANDLE_RL, APIReference.MARKER_AFTER_RL)));
     }
 
     public static boolean giveItem(ItemStack itemStack, PlayerEntity player, IWorld world) {

@@ -1,8 +1,12 @@
 package com.direwolf20.buildinggadgets.api.materials;
 
 import com.direwolf20.buildinggadgets.api.BuildingGadgetsAPI;
+import com.direwolf20.buildinggadgets.api.Registries;
+import com.direwolf20.buildinggadgets.api.materials.inventory.IUniqueObject;
+import com.direwolf20.buildinggadgets.api.materials.inventory.IUniqueObjectSerializer;
 import com.direwolf20.buildinggadgets.api.util.JsonKeys;
 import com.direwolf20.buildinggadgets.api.util.NBTKeys;
+import com.direwolf20.buildinggadgets.api.util.RegistryUtils;
 import com.google.common.collect.*;
 import com.google.common.collect.Multiset.Entry;
 import com.google.gson.JsonArray;
@@ -21,18 +25,18 @@ import java.util.Objects;
 
 class SimpleMaterialListEntry implements MaterialListEntry<SimpleMaterialListEntry> {
     static final MaterialListEntry.Serializer<SimpleMaterialListEntry> SERIALIZER = new Serializer().setRegistryName(NBTKeys.SIMPLE_SERIALIZER_ID);
-    private final ImmutableMultiset<UniqueItem> items;
+    private final ImmutableMultiset<IUniqueObject<?>> items;
 
-    SimpleMaterialListEntry(ImmutableMultiset<UniqueItem> items) {
+    SimpleMaterialListEntry(ImmutableMultiset<IUniqueObject<?>> items) {
         this.items = Objects.requireNonNull(items, "Cannot have a SimpleMaterialListEntry without any Materials!");
     }
 
-    ImmutableMultiset<UniqueItem> getItems() {
+    ImmutableMultiset<IUniqueObject<?>> getItems() {
         return items;
     }
 
     @Override
-    public PeekingIterator<ImmutableMultiset<UniqueItem>> iterator() {
+    public PeekingIterator<ImmutableMultiset<IUniqueObject<?>>> iterator() {
         return Iterators.peekingIterator(Iterators.singletonIterator(items));
     }
 
@@ -48,23 +52,24 @@ class SimpleMaterialListEntry implements MaterialListEntry<SimpleMaterialListEnt
 
     private static class Serializer extends ForgeRegistryEntry<MaterialListEntry.Serializer<SimpleMaterialListEntry>>
             implements MaterialListEntry.Serializer<SimpleMaterialListEntry> {
-        private static final Comparator<Entry<UniqueItem>> COMPARATOR = Comparator
-                .<Entry<UniqueItem>, ResourceLocation>comparing(e -> e.getElement().getRegistryName())
+        private static final Comparator<Entry<IUniqueObject<?>>> COMPARATOR = Comparator
+                .<Entry<IUniqueObject<?>>, ResourceLocation>comparing(e -> e.getElement().getObjectRegistryName())
                 .thenComparingInt(Entry::getCount);
         @Override
         public SimpleMaterialListEntry readFromNBT(CompoundNBT nbt, boolean persisted) {
             ListNBT nbtList = nbt.getList(NBTKeys.KEY_DATA, NBT.TAG_COMPOUND);
-            ImmutableMultiset.Builder<UniqueItem> builder = ImmutableMultiset.builder();
+            ImmutableMultiset.Builder<IUniqueObject<?>> builder = ImmutableMultiset.builder();
             for (INBT nbtEntry : nbtList) {
                 CompoundNBT compoundEntry = (CompoundNBT) nbtEntry;
-                Serializer serializer;
-                if (! compoundEntry.getString(NBTKeys.KEY_SERIALIZER).equals(NBTKeys.SIMPLE_UNIQUE_ITEM_ID)) {
-                    BuildingGadgetsAPI.LOG.error("Found unknown UniqueItem serializer {}. This version can only handle {}! Skipping!",
-                            compoundEntry.getString(NBTKeys.KEY_SERIALIZER), NBTKeys.SIMPLE_UNIQUE_ITEM_ID);
+                IUniqueObjectSerializer serializer = persisted ?
+                        RegistryUtils.getFromString(Registries.getUniqueObjectSerializers(), compoundEntry.getString(NBTKeys.KEY_SERIALIZER)) :
+                        RegistryUtils.getById(Registries.getUniqueObjectSerializers(), compoundEntry.getInt(NBTKeys.KEY_SERIALIZER));
+                if (serializer == null) {
+                    BuildingGadgetsAPI.LOG.error("Found unknown UniqueItem serializer {}. Skipping!", compoundEntry.getString(NBTKeys.KEY_SERIALIZER));
                     continue;
                 }
                 builder.addCopies(
-                        UniqueItem.SERIALIZER.deserialize((compoundEntry.getCompound(NBTKeys.KEY_DATA))),
+                        serializer.deserialize((compoundEntry.getCompound(NBTKeys.KEY_DATA))),
                         compoundEntry.getInt(NBTKeys.KEY_COUNT));
             }
             return new SimpleMaterialListEntry(builder.build());
@@ -74,9 +79,12 @@ class SimpleMaterialListEntry implements MaterialListEntry<SimpleMaterialListEnt
         public CompoundNBT writeToNBT(SimpleMaterialListEntry listEntry, boolean persisted) {
             CompoundNBT res = new CompoundNBT();
             ListNBT nbtList = new ListNBT();
-            for (Entry<UniqueItem> entry : listEntry.getItems().entrySet()) {
+            for (Entry<IUniqueObject<?>> entry : listEntry.getItems().entrySet()) {
                 CompoundNBT nbtEntry = new CompoundNBT();
-                nbtEntry.putString(NBTKeys.KEY_SERIALIZER, entry.getElement().getSerializer().getRegistryName().toString());
+                if (persisted)
+                    nbtEntry.putString(NBTKeys.KEY_SERIALIZER, entry.getElement().getSerializer().getRegistryName().toString());
+                else
+                    nbtEntry.putInt(NBTKeys.KEY_SERIALIZER, RegistryUtils.getId(Registries.getUniqueObjectSerializers(), entry.getElement().getSerializer()));
                 nbtEntry.put(NBTKeys.KEY_DATA, entry.getElement().getSerializer().serialize(entry.getElement(), persisted));
                 nbtEntry.putInt(NBTKeys.KEY_COUNT, entry.getCount());
                 nbtList.add(nbtEntry);
@@ -88,9 +96,9 @@ class SimpleMaterialListEntry implements MaterialListEntry<SimpleMaterialListEnt
         @Override
         public JsonSerializer<SimpleMaterialListEntry> asJsonSerializer(boolean printName, boolean extended) {
             return (src, typeOfSrc, context) -> {
-                Multiset<UniqueItem> set = src.getItems();
+                Multiset<IUniqueObject<?>> set = src.getItems();
                 JsonArray jsonArray = new JsonArray();
-                for (Entry<UniqueItem> entry : ImmutableList.sortedCopyOf(COMPARATOR, set.entrySet())) {
+                for (Entry<IUniqueObject<?>> entry : ImmutableList.sortedCopyOf(COMPARATOR, set.entrySet())) {
                     JsonElement element = entry.getElement()
                             .getSerializer()
                             .asJsonSerializer(entry.getCount(), printName, extended)

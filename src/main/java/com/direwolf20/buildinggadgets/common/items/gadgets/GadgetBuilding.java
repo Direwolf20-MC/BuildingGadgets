@@ -2,6 +2,8 @@ package com.direwolf20.buildinggadgets.common.items.gadgets;
 
 import com.direwolf20.buildinggadgets.api.building.BlockData;
 import com.direwolf20.buildinggadgets.api.building.modes.IAtopPlacingGadget;
+import com.direwolf20.buildinggadgets.api.materials.inventory.IUniqueObject;
+import com.direwolf20.buildinggadgets.api.materials.inventory.UniqueItem;
 import com.direwolf20.buildinggadgets.common.blocks.EffectBlock;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.items.gadgets.renderers.BaseRenderer;
@@ -284,12 +286,12 @@ public class GadgetBuilding extends ModeGadget implements IAtopPlacingGadget {
             useItemSuccess = InventoryHelper.useItem(itemStack, player, neededItems, world);
         }
         if (useItemSuccess) {
-            ImmutableMultiset<com.direwolf20.buildinggadgets.api.materials.UniqueItem> usedItems;
+            ImmutableMultiset<IUniqueObject<?>> usedItems;
             if (useConstructionPaste)
-                usedItems = ImmutableMultiset.of(new com.direwolf20.buildinggadgets.api.materials.UniqueItem(OurItems.constructionPaste));
+                usedItems = ImmutableMultiset.of(new UniqueItem(OurItems.constructionPaste));
             else
-                usedItems = ImmutableMultiset.<com.direwolf20.buildinggadgets.api.materials.UniqueItem>builder()
-                        .addCopies(com.direwolf20.buildinggadgets.api.materials.UniqueItem.ofStack(itemStack), neededItems)
+                usedItems = ImmutableMultiset.<IUniqueObject<?>>builder()
+                        .addCopies(UniqueItem.ofStack(itemStack), neededItems)
                         .build();
             builder.record(world, pos, usedItems, ImmutableMultiset.of());
             EffectBlock.spawnEffectBlock(world, pos, setBlock, EffectBlock.Mode.PLACE, useConstructionPaste);

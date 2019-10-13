@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.common.util.inventory;
 
 import com.direwolf20.buildinggadgets.api.materials.MaterialList;
-import com.direwolf20.buildinggadgets.api.materials.UniqueItem;
+import com.direwolf20.buildinggadgets.api.materials.inventory.IUniqueObject;
 import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.Multiset;
 
@@ -9,8 +9,8 @@ import java.util.Iterator;
 
 public final class CreativeItemIndex implements IItemIndex {
     @Override
-    public void insert(Multiset<UniqueItem> items) {
-
+    public Multiset<IUniqueObject<?>> insert(Multiset<IUniqueObject<?>> items, boolean simulate) {
+        return items;
     }
 
     @Override
@@ -20,8 +20,8 @@ public final class CreativeItemIndex implements IItemIndex {
 
     @Override
     public MatchResult tryMatch(MaterialList list) {
-        Iterator<ImmutableMultiset<UniqueItem>> it = list.iterator();
-        ImmutableMultiset<UniqueItem> chosen = it.hasNext() ? it.next() : ImmutableMultiset.of();
+        Iterator<ImmutableMultiset<IUniqueObject<?>>> it = list.iterator();
+        ImmutableMultiset<IUniqueObject<?>> chosen = it.hasNext() ? it.next() : ImmutableMultiset.of();
         return MatchResult.success(list, chosen, chosen);
     }
 

@@ -11,6 +11,7 @@ import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.registry.RegistryHandler;
 import com.direwolf20.buildinggadgets.common.save.SaveManager;
 import com.direwolf20.buildinggadgets.common.save.TemplateSave;
+import com.direwolf20.buildinggadgets.common.util.inventory.InventoryHelper;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import net.minecraft.command.Commands;
 import net.minecraft.item.crafting.IRecipeSerializer;
@@ -27,6 +28,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig.Type;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
 import net.minecraftforge.fml.event.server.FMLServerStartedEvent;
 import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 import net.minecraftforge.fml.event.server.FMLServerStoppedEvent;
@@ -66,6 +68,7 @@ public final class BuildingGadgets {
 
         eventBus.addListener(Config::onLoad);
         eventBus.addListener(Config::onFileChange);
+        eventBus.addListener(this::onEnqueueIMC);
 
         MinecraftForge.EVENT_BUS.register(new AnvilRepairHandler());
 
@@ -105,5 +108,9 @@ public final class BuildingGadgets {
                     new ResourceLocation(Reference.MODID, "construction_paste")
             )
         );
+    }
+
+    private void onEnqueueIMC(InterModEnqueueEvent event) {
+        InventoryHelper.registerHandleProviders();
     }
 }
