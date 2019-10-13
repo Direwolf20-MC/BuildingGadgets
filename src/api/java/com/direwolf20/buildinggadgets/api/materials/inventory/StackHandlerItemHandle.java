@@ -51,6 +51,8 @@ public final class StackHandlerItemHandle implements IObjectHandle<Item> {
         } else if (handler instanceof IItemHandlerModifiable) {
             IItemHandlerModifiable modifiable = (IItemHandlerModifiable) handler;
             ItemStack stack = getStack();
+            if (! item.matches(stack))
+                return 0;
             ItemStack res = item.insertInto(stack, count);
             if (! simulate)
                 modifiable.setStackInSlot(slot, res);

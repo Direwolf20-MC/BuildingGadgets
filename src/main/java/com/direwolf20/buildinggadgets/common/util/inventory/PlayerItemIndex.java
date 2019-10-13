@@ -6,6 +6,7 @@ import com.direwolf20.buildinggadgets.api.materials.inventory.IUniqueObject;
 import com.direwolf20.buildinggadgets.api.materials.inventory.UniqueItem;
 import com.google.common.collect.*;
 import com.google.common.collect.Multiset.Entry;
+import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -85,6 +86,13 @@ public final class PlayerItemIndex implements IItemIndex {
                             handleMap.get(Item.class)
                                     .computeIfAbsent(item.getIndexObject(), i -> new ArrayList<>())
                                     .add(handle);
+                        }
+                        while (innerRemainder > 0) {
+                            ItemStack copy = stack.copy();
+                            copy.setCount(Math.min(innerRemainder, copy.getMaxStackSize()));
+                            innerRemainder -= copy.getCount();
+                            ItemEntity itemEntity = new ItemEntity(player.world, player.posX, player.posY, player.posZ, copy);
+                            player.world.addEntity(itemEntity);
                         }
                         return innerRemainder;
                     })
