@@ -1,9 +1,17 @@
 package com.direwolf20.buildinggadgets.common.items.gadgets.renderers;
 
+import com.direwolf20.buildinggadgets.api.building.BlockData;
+import com.direwolf20.buildinggadgets.api.building.view.IBuildContext;
+import com.direwolf20.buildinggadgets.api.building.view.SimpleBuildContext;
+import com.direwolf20.buildinggadgets.api.materials.MaterialList;
 import com.direwolf20.buildinggadgets.common.items.gadgets.AbstractGadget;
 import com.direwolf20.buildinggadgets.common.registry.OurBlocks;
 import com.direwolf20.buildinggadgets.common.util.CapabilityUtil;
 import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
+import com.direwolf20.buildinggadgets.common.util.inventory.IItemIndex;
+import com.direwolf20.buildinggadgets.common.util.inventory.InventoryHelper;
+import com.direwolf20.buildinggadgets.common.util.inventory.MatchResult;
+import com.direwolf20.buildinggadgets.common.util.inventory.RecordingItemIndex;
 import com.direwolf20.buildinggadgets.common.util.tools.modes.ExchangingMode;
 import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.block.BlockRenderType;
@@ -57,7 +65,8 @@ public class ExchangerRender extends BaseRenderer {
         BlockState startBlock = AIR;
         startBlock = world.getBlockState(new BlockPos(lookingAt.getPos()));
         if (startBlock != OurBlocks.effectBlock.getDefaultState()) {
-            BlockState renderBlockState = getToolBlock(heldItem).getState();
+            BlockData data = getToolBlock(heldItem);
+            BlockState renderBlockState = data.getState();
 
             getMc().getTextureManager().bindTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
             if (renderBlockState == AIR) {//Don't render anything if there is no block selected (Air)
@@ -72,8 +81,13 @@ public class ExchangerRender extends BaseRenderer {
             //ItemStack itemStack = renderBlockState.getBlock().getPickBlock(renderBlockState, null, world, new BlockPos(0, 0, 0), player);
             //ItemStack itemStack = InventoryHelper.getSilkTouchDrop(renderBlockState);
 
-            ItemStack itemStack = getItemStackForRender(renderBlockState, player, world);
-            long hasBlocks      = playerHasBlocks(itemStack, player, renderBlockState);
+            IBuildContext buildContext = SimpleBuildContext.builder()
+                    .usedStack(heldItem)
+                    .buildingPlayer(player)
+                    .build(world);
+            // Figure out how many of the block we're rendering we have in the inventory of the player.
+            IItemIndex index = new RecordingItemIndex(InventoryHelper.index(heldItem, player));
+            MaterialList materials = data.getRequiredItems(buildContext, null, null);
             int hasEnergy       = getEnergy(player, heldItem);
 
             LazyOptional<IEnergyStorage> energy = CapabilityUtil.EnergyUtil.getCap(heldItem);
@@ -133,12 +147,14 @@ public class ExchangerRender extends BaseRenderer {
                 GlStateManager.translatef(- 0.01f, - 0.01f, 0.01f);
                 GlStateManager.scalef(1.02f, 1.02f, 1.02f);//Slightly Larger block to avoid z-fighting.
                 GL14.glBlendColor(1F, 1F, 1F, 0.55f); //Set the alpha of the blocks we are rendering
-                hasBlocks--;
                 if (energy.isPresent()) {
                     hasEnergy -= (((AbstractGadget) heldItem.getItem())).getEnergyCost(heldItem);
                 }
-                if (hasBlocks < 0 || hasEnergy < 0) {
+                MatchResult match = index.tryMatch(materials);
+                if (! match.isSuccess() || hasEnergy < 0) {
                     getMc().getBlockRendererDispatcher().renderBlockBrightness(Blocks.RED_STAINED_GLASS.getDefaultState(), 1f);
+                } else {
+                    index.applyMatch(match); //notify the recording index that this counts
                 }
                 //Move the render position back to where it was
                 GlStateManager.popMatrix();

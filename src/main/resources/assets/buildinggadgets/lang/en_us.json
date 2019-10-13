@@ -120,8 +120,7 @@
   "buildinggadgets.message.rotated": "Blocks Rotated",
   "buildinggadgets.message.mirrored": "Blocks Mirrored",
   "buildinggadgets.message.toolmode": "Tool Mode",
-  "buildinggadgets.message.toolrange": "Tool Range",
-  "buildinggadgets.message.TEinCopy": "Area Copied, Number of tile entities not copied",
+  "buildinggadgets.message.range_set": "Tool Range:%d",
   "buildinggadgets.message.boundTE": "Bound Gadget to Inventory",
   "buildinggadgets.message.unboundTE": "Unbound Gadget from Inventory",
 

@@ -5,12 +5,15 @@ import com.direwolf20.buildinggadgets.api.APIReference.HandleProviderReference;
 import com.direwolf20.buildinggadgets.api.Registries.HandleProvider;
 import com.direwolf20.buildinggadgets.api.building.BlockData;
 import com.direwolf20.buildinggadgets.api.building.tilesupport.TileSupport;
+import com.direwolf20.buildinggadgets.api.materials.MaterialList;
 import com.direwolf20.buildinggadgets.api.materials.inventory.IHandleProvider;
 import com.direwolf20.buildinggadgets.api.materials.inventory.IObjectHandle;
+import com.direwolf20.buildinggadgets.api.materials.inventory.UniqueItem;
 import com.direwolf20.buildinggadgets.api.registry.TopologicalRegistryBuilder;
 import com.direwolf20.buildinggadgets.common.items.gadgets.AbstractGadget;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.items.pastes.ConstructionPaste;
+import com.direwolf20.buildinggadgets.common.items.pastes.ConstructionPasteContainerCreative;
 import com.direwolf20.buildinggadgets.common.items.pastes.GenericPasteContainer;
 import com.direwolf20.buildinggadgets.common.registry.OurItems;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
@@ -47,6 +50,7 @@ import java.util.function.Supplier;
  *  This entire class could do with some refactoring and cleaning :grin:
  */
 public class InventoryHelper {
+    public static final MaterialList PASTE_LIST = MaterialList.of(new UniqueItem(OurItems.constructionPaste));
     private static IProperty AXIS = EnumProperty.create("axis", Direction.Axis.class);
 
     private static final Set<IProperty> SAFE_PROPERTIES =
@@ -306,9 +310,10 @@ public class InventoryHelper {
 
         for (Map.Entry<Integer, Integer> entry : list) {
             ItemStack containerStack = inv.getStackInSlot(entry.getKey());
-            int maxAmount = ((GenericPasteContainer) containerStack.getItem()).getMaxCapacity();
+            GenericPasteContainer item = ((GenericPasteContainer) containerStack.getItem());
+            int maxAmount = item.getMaxCapacity();
             int pasteInContainer = GenericPasteContainer.getPasteAmount(containerStack);
-            int freeSpace = maxAmount - pasteInContainer;
+            int freeSpace = item instanceof ConstructionPasteContainerCreative ? Integer.MAX_VALUE : maxAmount - pasteInContainer;
             int stackSize = itemStack.getCount();
             int remainingPaste = stackSize - freeSpace;
             if (remainingPaste < 0) {

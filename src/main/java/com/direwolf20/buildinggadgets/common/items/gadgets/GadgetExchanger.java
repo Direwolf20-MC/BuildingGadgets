@@ -20,6 +20,7 @@ import com.direwolf20.buildinggadgets.common.util.inventory.IItemIndex;
 import com.direwolf20.buildinggadgets.common.util.inventory.InventoryHelper;
 import com.direwolf20.buildinggadgets.common.util.inventory.MatchResult;
 import com.direwolf20.buildinggadgets.common.util.lang.LangUtil;
+import com.direwolf20.buildinggadgets.common.util.lang.MessageTranslation;
 import com.direwolf20.buildinggadgets.common.util.lang.Styles;
 import com.direwolf20.buildinggadgets.common.util.lang.TooltipTranslation;
 import com.direwolf20.buildinggadgets.common.util.tools.modes.ExchangingMode;
@@ -47,9 +48,6 @@ import net.minecraft.util.math.RayTraceContext.BlockMode;
 import net.minecraft.util.math.RayTraceContext.FluidMode;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
@@ -179,7 +177,7 @@ public class GadgetExchanger extends ModeGadget {
             range = (range >= Config.GADGETS.maxRange.get()) ? 1 : range + changeAmount;
         }
         setToolRange(heldItem, range);
-        player.sendStatusMessage(new StringTextComponent(TextFormatting.DARK_AQUA + new TranslationTextComponent("message.gadget.toolrange").getUnformattedComponentText() + ": " + range), true);
+        player.sendStatusMessage(MessageTranslation.RANGE_SET.componentTranslation(range).setStyle(Styles.AQUA), true);
     }
 
     private boolean exchange(ServerPlayerEntity player, ItemStack stack) {
@@ -220,7 +218,6 @@ public class GadgetExchanger extends ModeGadget {
 
     private boolean exchangeBlock(ServerWorld world, ServerPlayerEntity player, IItemIndex index, Undo.Builder builder, BlockPos pos, BlockData setBlock) {
         BlockState currentBlock = world.getBlockState(pos);
-        boolean useConstructionPaste = false;
         //ItemStack itemStack = setBlock.getBlock().getPickBlock(setBlock, null, world, pos, player);
 
 
@@ -235,18 +232,23 @@ public class GadgetExchanger extends ModeGadget {
                 .build(world);
         MaterialList requiredItems = setBlock.getRequiredItems(buildContext, null, pos);
         MatchResult match = index.tryMatch(requiredItems);
-        if (! match.isSuccess())
-            return false;
-        if (!player.isAllowEdit()) {
-            return false;
+        boolean useConstructionPaste = false;
+        if (! match.isSuccess()) {
+            if (setBlock.getState().hasTileEntity())
+                return false;
+            match = index.tryMatch(InventoryHelper.PASTE_LIST);
+            if (! match.isSuccess())
+                return false;
+            else
+                useConstructionPaste = true;
         }
-        if (!world.isBlockModifiable(player, pos)) {
+        if (! player.isAllowEdit())
             return false;
-        }
+        if (! world.isBlockModifiable(player, pos))
+            return false;
         BlockSnapshot blockSnapshot = BlockSnapshot.getBlockSnapshot(world, pos);
-        if (ForgeEventFactory.onBlockPlace(player, blockSnapshot, Direction.UP)) {
+        if (ForgeEventFactory.onBlockPlace(player, blockSnapshot, Direction.UP))
             return false;
-        }
         BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(world, pos, currentBlock, player);
         if (MinecraftForge.EVENT_BUS.post(e)) {
             return false;
@@ -272,9 +274,6 @@ public class GadgetExchanger extends ModeGadget {
             index.insert(producedItems);
             builder.record(world, pos, usedItems, producedItems);
             EffectBlock.spawnEffectBlock(world, pos, setBlock, EffectBlock.Mode.REPLACE, useConstructionPaste);
-            //currentBlock.getBlock().removedByPlayer(currentBlock.getBlockData(), world, pos, player, false, null);
-
-            //player.addItemStackToInventory(new ItemStack(currentBlock.getBlock().getDrops(currentBlock, world, pos, world.getTileEntity(pos)), 1));
             return true;
         }
         return false;

@@ -5,11 +5,10 @@ import com.direwolf20.buildinggadgets.api.building.tilesupport.TileSupport;
 import com.direwolf20.buildinggadgets.api.building.view.IBuildContext;
 import com.direwolf20.buildinggadgets.api.materials.MaterialList;
 import com.direwolf20.buildinggadgets.api.materials.inventory.IUniqueObject;
-import com.direwolf20.buildinggadgets.api.materials.inventory.UniqueItem;
 import com.direwolf20.buildinggadgets.api.util.CommonUtils;
-import com.direwolf20.buildinggadgets.common.registry.OurItems;
 import com.direwolf20.buildinggadgets.common.util.exceptions.CapabilityNotPresentException;
 import com.direwolf20.buildinggadgets.common.util.inventory.IItemIndex;
+import com.direwolf20.buildinggadgets.common.util.inventory.InventoryHelper;
 import com.direwolf20.buildinggadgets.common.util.inventory.MatchResult;
 import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.Multiset;
@@ -27,7 +26,6 @@ import java.util.function.BiPredicate;
 import java.util.function.ToIntFunction;
 
 public final class PlacementChecker {
-    private static final MaterialList PASTE_LIST = MaterialList.of(new UniqueItem(OurItems.constructionPaste));
     private final LazyOptional<IEnergyStorage> energyCap;
     private final ToIntFunction<PlacementTarget> energyFun;
     private final IItemIndex index;
@@ -60,7 +58,7 @@ public final class PlacementChecker {
         MatchResult match = index.tryMatch(materials);
         boolean usePaste = false;
         if (! match.isSuccess()) {
-            match = index.tryMatch(PASTE_LIST);
+            match = index.tryMatch(InventoryHelper.PASTE_LIST);
             if (! match.isSuccess())
                 return new CheckResult(match, insertedItems, energy, false, false);
             usePaste = true;

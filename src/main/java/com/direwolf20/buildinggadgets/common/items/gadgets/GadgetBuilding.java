@@ -2,21 +2,25 @@ package com.direwolf20.buildinggadgets.common.items.gadgets;
 
 import com.direwolf20.buildinggadgets.api.building.BlockData;
 import com.direwolf20.buildinggadgets.api.building.modes.IAtopPlacingGadget;
+import com.direwolf20.buildinggadgets.api.building.view.IBuildContext;
+import com.direwolf20.buildinggadgets.api.building.view.SimpleBuildContext;
+import com.direwolf20.buildinggadgets.api.materials.MaterialList;
 import com.direwolf20.buildinggadgets.api.materials.inventory.IUniqueObject;
-import com.direwolf20.buildinggadgets.api.materials.inventory.UniqueItem;
 import com.direwolf20.buildinggadgets.common.blocks.EffectBlock;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.items.gadgets.renderers.BaseRenderer;
 import com.direwolf20.buildinggadgets.common.items.gadgets.renderers.BuildingRender;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketBindTool;
-import com.direwolf20.buildinggadgets.common.registry.OurItems;
 import com.direwolf20.buildinggadgets.common.save.Undo;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
 import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
+import com.direwolf20.buildinggadgets.common.util.inventory.IItemIndex;
 import com.direwolf20.buildinggadgets.common.util.inventory.InventoryHelper;
+import com.direwolf20.buildinggadgets.common.util.inventory.MatchResult;
 import com.direwolf20.buildinggadgets.common.util.lang.LangUtil;
+import com.direwolf20.buildinggadgets.common.util.lang.MessageTranslation;
 import com.direwolf20.buildinggadgets.common.util.lang.Styles;
 import com.direwolf20.buildinggadgets.common.util.lang.TooltipTranslation;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
@@ -29,9 +33,11 @@ import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.*;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.ActionResultType;
+import net.minecraft.util.Direction;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.RayTraceResult;
@@ -155,10 +161,8 @@ public class GadgetBuilding extends ModeGadget implements IAtopPlacingGadget {
             if (!player.isSneaking()) {
                 BaseRenderer.updateInventoryCache();
             } else {
-                if (Screen.hasControlDown()) {
-                    System.out.println("CUnt");
+                if (Screen.hasControlDown())
                     PacketHandler.sendToServer(new PacketBindTool());
-                }
             }
         }
         return new ActionResult<>(ActionResultType.SUCCESS, itemstack);
@@ -180,7 +184,7 @@ public class GadgetBuilding extends ModeGadget implements IAtopPlacingGadget {
             range = (range >= Config.GADGETS.maxRange.get()) ? 1 : range + changeAmount;
 
         setToolRange(heldItem, range);
-        player.sendStatusMessage(new StringTextComponent(TextFormatting.DARK_AQUA + new TranslationTextComponent("message.gadget.toolrange").getUnformattedComponentText() + ": " + range), true);
+        player.sendStatusMessage(MessageTranslation.RANGE_SET.componentTranslation(range).setStyle(Styles.AQUA), true);
     }
 
     private boolean build(ServerPlayerEntity player, ItemStack stack) {
@@ -206,6 +210,7 @@ public class GadgetBuilding extends ModeGadget implements IAtopPlacingGadget {
 
         BlockData blockData = getToolBlock(heldItem);
         Undo.Builder builder = Undo.builder();
+        IItemIndex index = InventoryHelper.index(stack, player);
         if (blockData.getState() != Blocks.AIR.getDefaultState()) { //Don't attempt a build if a block is not chosen -- Typically only happens on a new tool.
             //TODO replace with a better TileEntity supporting Fake IWorld
             fakeWorld.setWorldAndState(player.world, blockData.getState(), coords); // Initialize the fake world's blocks
@@ -213,7 +218,7 @@ public class GadgetBuilding extends ModeGadget implements IAtopPlacingGadget {
                 //Get the extended block state in the fake world
                 //Disabled to fix Chisel
                 //state = state.getBlock().getExtendedState(state, fakeWorld, coordinate);
-                placeBlock(world, player, builder, coordinate, blockData);
+                placeBlock(world, player, index, builder, coordinate, blockData);
             }
         }
         pushUndo(stack, builder.build(world.getDimension().getType()));
@@ -222,7 +227,7 @@ public class GadgetBuilding extends ModeGadget implements IAtopPlacingGadget {
         return true;
     }
 
-    private boolean placeBlock(World world, ServerPlayerEntity player, Undo.Builder builder, BlockPos pos, BlockData setBlock) {
+    private boolean placeBlock(World world, ServerPlayerEntity player, IItemIndex index, Undo.Builder builder, BlockPos pos, BlockData setBlock) {
         if (!player.isAllowEdit())
             return false;
 
@@ -232,45 +237,26 @@ public class GadgetBuilding extends ModeGadget implements IAtopPlacingGadget {
 
         boolean useConstructionPaste = false;
 
-        ItemStack itemStack;
-        if (true/*setBlock.getBlock().canSilkHarvest(setBlock, world, pos, player)*/) {//TODO figure LootTables out
-            itemStack = InventoryHelper.getSilkTouchDrop(setBlock.getState());
-        } else {
-            itemStack = setBlock.getState().getBlock().getPickBlock(setBlock.getState(), null, world, pos, player);
+        IBuildContext buildContext = SimpleBuildContext.builder()
+                .usedStack(heldItem)
+                .buildingPlayer(player)
+                .build(world);
+        MaterialList requiredItems = setBlock.getRequiredItems(buildContext, null, pos);
+        MatchResult match = index.tryMatch(requiredItems);
+        if (! match.isSuccess()) {
+            if (setBlock.getState().hasTileEntity())
+                return false;
+            match = index.tryMatch(InventoryHelper.PASTE_LIST);
+            if (! match.isSuccess())
+                return false;
+            else
+                useConstructionPaste = true;
         }
-        if (itemStack.getItem().equals(Items.AIR)) {
-            itemStack = setBlock.getState().getBlock().getPickBlock(setBlock.getState(), null, world, pos, player);
-        }
-
-        NonNullList<ItemStack> drops = NonNullList.create();
-        //TODO figure LootTables out
-        //setBlock.getBlock().getDrops(setBlock, drops, world, pos, 0);
-        int neededItems = 0;
-        for (ItemStack drop : drops) {
-            if (drop.getItem().equals(itemStack.getItem())) {
-                neededItems++;
-            }
-        }
-        if (neededItems == 0) {
-            neededItems = 1;
-        }
-        if (!world.isBlockModifiable(player, pos)) {
+        if (! world.isBlockModifiable(player, pos))
             return false;
-        }
         BlockSnapshot blockSnapshot = BlockSnapshot.getBlockSnapshot(world, pos);
         if (ForgeEventFactory.onBlockPlace(player, blockSnapshot, Direction.UP)) {
             return false;
-        }
-        if (!setBlock.getState().hasTileEntity()) {
-            ItemStack constructionPaste = new ItemStack(OurItems.constructionPaste);
-            if (InventoryHelper.countItem(itemStack, player, world) < neededItems) {
-                //if (InventoryHelper.countItem(constructionStack, player) == 0) {
-                if (InventoryHelper.countPaste(player) < neededItems) {
-                    return false;
-                }
-                itemStack = constructionPaste.copy();
-                useConstructionPaste = true;
-            }
         }
 
         if (!this.canUse(heldItem, player))
@@ -278,21 +264,8 @@ public class GadgetBuilding extends ModeGadget implements IAtopPlacingGadget {
 
         this.applyDamage(heldItem, player);
 
-        //ItemStack constructionStack = InventoryHelper.getSilkTouchDrop(ModBlocks.constructionBlock.getDefaultState());
-        boolean useItemSuccess;
-        if (useConstructionPaste) {
-            useItemSuccess = InventoryHelper.usePaste(player, 1);
-        } else {
-            useItemSuccess = InventoryHelper.useItem(itemStack, player, neededItems, world);
-        }
-        if (useItemSuccess) {
-            ImmutableMultiset<IUniqueObject<?>> usedItems;
-            if (useConstructionPaste)
-                usedItems = ImmutableMultiset.of(new UniqueItem(OurItems.constructionPaste));
-            else
-                usedItems = ImmutableMultiset.<IUniqueObject<?>>builder()
-                        .addCopies(UniqueItem.ofStack(itemStack), neededItems)
-                        .build();
+        if (index.applyMatch(match)) {
+            ImmutableMultiset<IUniqueObject<?>> usedItems = match.getChosenOption();
             builder.record(world, pos, usedItems, ImmutableMultiset.of());
             EffectBlock.spawnEffectBlock(world, pos, setBlock, EffectBlock.Mode.PLACE, useConstructionPaste);
             return true;
@@ -304,12 +277,6 @@ public class GadgetBuilding extends ModeGadget implements IAtopPlacingGadget {
         ItemStack stack = AbstractGadget.getGadget(player);
         if (!(stack.getItem() instanceof GadgetBuilding))
             return ItemStack.EMPTY;
-
         return stack;
-    }
-
-    @Override
-    public int getUseDuration(ItemStack stack) {
-        return 20;
     }
 }
