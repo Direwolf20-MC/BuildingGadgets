@@ -27,8 +27,7 @@ public final class NBTKeys {
     public static final String GADGET_UNDO_STACK = "undo_stack";
     public static final String GADGET_UNDO_INT_COORDS = "undo_int_coords";
     public static final String GADGET_UNDO_START_POS = "undo_start_pos";
-    public static final String GADGET_LAST_BUILD_POS = "last_build_pos";
-    public static final String GADGET_LAST_BUILD_DIM = "last_build_dim";
+    public static final String GADGET_REL_POS = "rel_pos";
     public static final String GADGET_UUID = "uuid";
     public static final String GADGET_START_POS = "start_pos";
     public static final String GADGET_END_POS = "end_pos";

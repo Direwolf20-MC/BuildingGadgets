@@ -37,7 +37,7 @@ public class PasteGUI extends Screen {
         fields.add(X = new GuiIncrementer(x - (GuiIncrementer.WIDTH + (GuiIncrementer.WIDTH / 2)) - 10, y - 10, -16, 16, this::onChange));
         fields.add(Y = new GuiIncrementer(x - GuiIncrementer.WIDTH / 2, y - 10, -16, 16, this::onChange));
         fields.add(Z = new GuiIncrementer(x + (GuiIncrementer.WIDTH / 2) + 10, y - 10, -16, 16, this::onChange));
-
+        //BlockPos original = GadgetCopyPaste.getRelativeVector(GadgetCopyPaste.getGadget(Minecraft.getInstance().player));
         List<AbstractButton> buttons = new ArrayList<AbstractButton>() {{
             add(new CopyGUI.CenteredButton(y + 20, 70, GuiTranslation.SINGLE_CONFIRM, (button) -> {
                 PacketHandler.sendToServer(new PacketPasteGUI(X.getValue(), Y.getValue(), Z.getValue()));
@@ -46,7 +46,7 @@ public class PasteGUI extends Screen {
 
             add(new CopyGUI.CenteredButton(y + 20, 40, GuiTranslation.SINGLE_RESET, (button) -> {
                 X.setValue(0);
-                Y.setValue(1);
+                Y.setValue(0);
                 Z.setValue(0);
                 sendPacket();
             }));

@@ -60,7 +60,10 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUseContext;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.NBTUtil;
-import net.minecraft.util.*;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.ActionResultType;
+import net.minecraft.util.Hand;
+import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.ChunkPos;
@@ -68,7 +71,6 @@ import net.minecraft.util.math.RayTraceResult.Type;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.Style;
 import net.minecraft.world.World;
-import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.energy.CapabilityEnergy;
@@ -181,6 +183,20 @@ public class GadgetCopyPaste extends AbstractGadget {
         }
     }
 
+    public static void setRelativeVector(ItemStack stack, BlockPos vec) {
+        CompoundNBT nbt = NBTHelper.getOrNewTag(stack);
+        if (vec.equals(BlockPos.ZERO))
+            nbt.remove(NBTKeys.GADGET_REL_POS);
+        else
+            nbt.put(NBTKeys.GADGET_REL_POS, NBTUtil.writeBlockPos(vec));
+    }
+
+    public static BlockPos getRelativeVector(ItemStack stack) {
+        CompoundNBT nbt = NBTHelper.getOrNewTag(stack);
+        //if not present, then this will just return (0, 0, 0)
+        return NBTUtil.readBlockPos(nbt.getCompound(NBTKeys.GADGET_REL_POS));
+    }
+
     public static int getCopyCounter(ItemStack stack) {
         CompoundNBT nbt = NBTHelper.getOrNewTag(stack);
         return nbt.getInt(NBTKeys.TEMPLATE_COPY_COUNT); //returns 0 if not present
@@ -201,7 +217,7 @@ public class GadgetCopyPaste extends AbstractGadget {
                 return Optional.empty();
             pos = res.getPos().offset(res.getFace());
         }
-        return Optional.of(pos);
+        return Optional.of(pos).map(p -> p.add(getRelativeVector(stack)));
     }
 
     public static Optional<Region> getSelectedRegion(ItemStack stack) {
@@ -252,22 +268,6 @@ public class GadgetCopyPaste extends AbstractGadget {
         if (nbt.contains(NBTKeys.GADGET_END_POS, NBT.TAG_COMPOUND))
             return NBTUtil.readBlockPos(nbt.getCompound(NBTKeys.GADGET_END_POS));
         return null;
-    }
-
-    private static void setLastBuild(ItemStack stack, BlockPos anchorPos, DimensionType dim) {
-        CompoundNBT nbt = NBTHelper.getOrNewTag(stack);
-        nbt.put(NBTKeys.GADGET_LAST_BUILD_POS, NBTUtil.writeBlockPos(anchorPos));
-        assert dim.getRegistryName() != null;
-        nbt.putString(NBTKeys.GADGET_LAST_BUILD_DIM, dim.getRegistryName().toString());
-    }
-
-    private static BlockPos getLastBuild(ItemStack stack) {
-        return GadgetUtils.getPOSFromNBT(stack, NBTKeys.GADGET_LAST_BUILD_POS);
-    }
-
-    @Nullable
-    private static ResourceLocation getLastBuildDim(ItemStack stack) {
-        return GadgetUtils.getDIMFromNBT(stack, NBTKeys.GADGET_LAST_BUILD_DIM);
     }
 
     private static void setToolMode(ItemStack stack, ToolMode mode) {

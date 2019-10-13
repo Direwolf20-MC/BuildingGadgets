@@ -20,6 +20,7 @@ public enum MessageTranslation implements ITranslationProvider {
     SERVER_BUSY("server_busy", 0),
     NOTHING_TO_UNDO("nothing_to_undo", 0),
     MIRRORED("mirrored", 0),
+    MODE_SET("tool_mode", 1),
     ROTATED("rotated", 0),
     RANGE_SET("range_set", 1),
     UNDO_FAILED("undo_failed", 0),

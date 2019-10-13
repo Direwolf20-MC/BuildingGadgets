@@ -119,7 +119,7 @@
   "buildinggadgets.message.pastetoobig": "Paste is too large",
   "buildinggadgets.message.rotated": "Blocks Rotated",
   "buildinggadgets.message.mirrored": "Blocks Mirrored",
-  "buildinggadgets.message.toolmode": "Tool Mode",
+  "buildinggadgets.message.tool_mode": "Tool Mode:%s",
   "buildinggadgets.message.range_set": "Tool Range:%d",
   "buildinggadgets.message.boundTE": "Bound Gadget to Inventory",
   "buildinggadgets.message.unboundTE": "Unbound Gadget from Inventory",
