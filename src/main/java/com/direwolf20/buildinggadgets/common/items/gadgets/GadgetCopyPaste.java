@@ -199,7 +199,7 @@ public class GadgetCopyPaste extends AbstractGadget {
             BlockRayTraceResult res = VectorHelper.getLookingAt(playerEntity, stack);
             if (res.getType() == Type.MISS)
                 return Optional.empty();
-            pos = res.getPos();
+            pos = res.getPos().offset(res.getFace());
         }
         return Optional.of(pos);
     }
@@ -328,13 +328,8 @@ public class GadgetCopyPaste extends AbstractGadget {
             if (getToolMode(stack) == ToolMode.COPY) {
                 if (world.getBlockState(posLookingAt) != Blocks.AIR.getDefaultState())
                     setRegionAndCopy(stack, world, player, posLookingAt);
-            } else if (getToolMode(stack) == ToolMode.PASTE && ! player.isSneaking()) {
-                BlockPos startPos = getAnchor(stack);
-                if (startPos == null && ! world.isAirBlock(posLookingAt))
-                    startPos = posLookingAt;
-                if (startPos != null)
-                    build(stack, world, player, posLookingAt);
-            }
+            } else if (getToolMode(stack) == ToolMode.PASTE && ! player.isSneaking())
+                getActivePos(player, stack).ifPresent(pos -> build(stack, world, player, pos));
         } else {
             if (player.isSneaking()) {
                 if (Screen.hasControlDown()) {
