@@ -166,11 +166,11 @@ public class DelegatingTemplate implements ITemplate {
         }
 
         @Override
-        public TemplateHeader createHeaderAndTryForceMaterials(ITemplate template, SimpleBuildOpenOptions openOptions) {
+        public TemplateHeader createHeaderAndTryForceMaterials(ITemplate template, IBuildOpenOptions openOptions) {
             return createHeader(template, openOptions);
         }
 
-        private TemplateHeader createHeader(ITemplate template, @Nullable SimpleBuildOpenOptions openOptions) {
+        private TemplateHeader createHeader(ITemplate template, @Nullable IBuildOpenOptions openOptions) {
             assert getRegistryName() != null;
             DelegatingTemplate castTemplate = (DelegatingTemplate) template;
             ITemplate delegateTemplate;

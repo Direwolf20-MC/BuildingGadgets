@@ -4,6 +4,7 @@ import com.direwolf20.buildinggadgets.api.BuildingGadgetsAPI;
 import com.direwolf20.buildinggadgets.api.building.view.IBuildContext;
 import com.direwolf20.buildinggadgets.api.building.view.IBuildView;
 import com.direwolf20.buildinggadgets.api.exceptions.TemplateException;
+import com.direwolf20.buildinggadgets.api.template.IBuildOpenOptions;
 import com.direwolf20.buildinggadgets.api.template.ITemplate;
 import com.direwolf20.buildinggadgets.api.template.SimpleBuildOpenOptions;
 import net.minecraft.nbt.CompoundNBT;
@@ -32,7 +33,7 @@ public interface ITemplateSerializer extends IForgeRegistryEntry<ITemplateSerial
      */
     TemplateHeader createHeaderFor(ITemplate template);
 
-    default TemplateHeader createHeaderAndTryForceMaterials(ITemplate template, SimpleBuildOpenOptions openOptions) {
+    default TemplateHeader createHeaderAndTryForceMaterials(ITemplate template, IBuildOpenOptions openOptions) {
         TemplateHeader header = createHeaderFor(template);
         if (header.getRequiredItems() == null) {
             IBuildView view = null;
