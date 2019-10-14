@@ -523,6 +523,7 @@ public class GadgetCopyPaste extends AbstractGadget {
 
     private void onBuildFinished(ItemStack stack, PlayerEntity player) {
         sendMessage(stack, player, MessageTranslation.TEMPLATE_BUILD, Styles.DK_GREEN);
+        onAnchorRemoved(stack, player); //clear the anchor after a successful build
     }
 
     private void sendMessage(ItemStack stack, PlayerEntity player, ITranslationProvider messageSource, Style style) {
