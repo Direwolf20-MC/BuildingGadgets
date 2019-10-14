@@ -121,7 +121,7 @@ public final class ImmutableTemplate implements ITemplate {
         }
 
         @Override
-        public TemplateHeader createHeaderAndTryForceMaterials(ITemplate template, SimpleBuildOpenOptions openOptions) {
+        public TemplateHeader createHeaderAndTryForceMaterials(ITemplate template, IBuildOpenOptions openOptions) {
             TemplateHeader res = ITemplateSerializer.super.createHeaderAndTryForceMaterials(template, openOptions);
             ImmutableTemplate castTemplate = (ImmutableTemplate) template;
             //This may produce race conditions, but if some thread doesn't notice the updated materials - so be it
