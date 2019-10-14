@@ -11,9 +11,7 @@ import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraftforge.common.util.Constants.NBT;
 
 import javax.annotation.Nullable;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 
 public final class TemplateIO {
     private TemplateIO() {}
@@ -74,11 +72,27 @@ public final class TemplateIO {
         return serializer.deserialize(nbt.getCompound(NBTKeys.KEY_DATA), header, persisted);
     }
 
-    public static void writeTemplateHeaderJson(ITemplate template, OutputStream stream) throws IOException {
-
+    public static void writeTemplateJson(ITemplate template, OutputStream stream) throws IOException {
+        String json = writeTemplateJson(template);
+        new OutputStreamWriter(stream).append(json);
     }
 
-    public static TemplateHeader readTemplateHeaderJson(InputStream stream) throws IOException {
-        return null;
+    public static String writeTemplateJson(ITemplate template) {
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
+
+    public static ITemplate readTemplateFromJson(String json) {
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
+
+    public static ITemplate readTemplateFromJson(InputStream stream) throws IOException {
+        Reader r = new InputStreamReader(stream);
+        StringBuilder builder = new StringBuilder();
+        char[] buf = new char[4096];
+        int read = 0;
+        while ((read = r.read(buf)) > 0) {
+            builder.append(buf, 0, read);
+        }
+        return readTemplateFromJson(builder.toString());
     }
 }
