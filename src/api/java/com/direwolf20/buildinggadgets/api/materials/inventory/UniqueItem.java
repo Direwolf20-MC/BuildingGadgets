@@ -23,7 +23,6 @@ import net.minecraftforge.registries.ForgeRegistryEntry;
 import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.Objects;
-import java.util.Optional;
 
 public final class UniqueItem implements IUniqueObject<Item> {
     public enum ComparisonMode {
@@ -164,11 +163,6 @@ public final class UniqueItem implements IUniqueObject<Item> {
         if (tagCompound != null)
             stack.setTag(tagCompound);
         return stack;
-    }
-
-    @Override
-    public Optional<ItemStack> trySimpleInsert(int count) {
-        return Optional.of(createStack(count));
     }
 
     @Override

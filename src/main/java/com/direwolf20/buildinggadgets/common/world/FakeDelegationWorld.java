@@ -417,7 +417,9 @@ public class FakeDelegationWorld implements IWorld {
                     entity = state.createTileEntity(world);
                     if (entity != null) {
                         entity.setPos(pos);
-                        entity.setWorld(world.getWorld());
+                        //if we pass our wrapped world down to this, it will cause it to determine an errornous blockstate...
+                        //we'd need to reflect into the te...
+                        entity.setWorld(null);
                         entity.onLoad();
                     }
                 } catch (Exception e) {

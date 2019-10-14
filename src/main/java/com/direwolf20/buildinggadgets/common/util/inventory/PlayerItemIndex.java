@@ -41,17 +41,67 @@ public final class PlayerItemIndex implements IItemIndex {
     }
 
     private int insertObject(IUniqueObject<?> obj, int count, boolean simulate) {
-        return obj.trySimpleInsert(count)
+        if (obj.preferStackInsert())
+            return obj.tryCreateInsertStack(Collections.unmodifiableMap(handleMap), count)
                 .map(itemStack -> performSimpleInsert(itemStack, count, simulate))
                 .orElseGet(() -> performComplexInsert(obj, count, simulate));
+        else {
+            int remainingCount = performComplexInsert(obj, count, simulate);
+            return remainingCount == 0 ? 0 : obj.tryCreateInsertStack(Collections.unmodifiableMap(handleMap), count)
+                    .map(itemStack -> performSimpleInsert(itemStack, count, simulate))
+                    .orElse(remainingCount);
+        }
     }
 
     private int performSimpleInsert(ItemStack stack, int count, boolean simulate) {
-        int remainingCount = count;
+        int remainingCount = insertIntoProviders(stack, count, simulate);
+        if (remainingCount == 0)
+            return 0;
+        remainingCount = insertIntoEmptyHandles(stack, remainingCount, simulate);
+        if (remainingCount == 0)
+            return 0;
+        if (! simulate)
+            spawnRemainder(stack, remainingCount);
+        return 0;
+    }
+
+    private int insertIntoProviders(ItemStack stack, int remainingCount, boolean simulate) {
         for (IInsertProvider insertProvider : insertProviders) {
             remainingCount = insertProvider.insert(stack, remainingCount, simulate);
+            if (remainingCount <= 0)
+                return 0;
         }
         return remainingCount;
+    }
+
+    private int insertIntoEmptyHandles(ItemStack stack, int remainingCount, boolean simulate) {
+        List<IObjectHandle<?>> emptyHandles = handleMap
+                .computeIfAbsent(Item.class, c -> new HashMap<>())
+                .getOrDefault(Items.AIR, ImmutableList.of());
+        for (Iterator<IObjectHandle<?>> it = emptyHandles.iterator(); it.hasNext() && remainingCount >= 0; ) {
+            IObjectHandle<?> handle = it.next();
+            UniqueItem item = UniqueItem.ofStack(stack);
+            int match = handle.insert(item, remainingCount, simulate);
+            if (match > 0)
+                remainingCount -= match;
+            it.remove();
+            handleMap.get(Item.class)
+                    .computeIfAbsent(item.getIndexObject(), i -> new ArrayList<>())
+                    .add(handle);
+            if (remainingCount <= 0)
+                return 0;
+        }
+        return remainingCount;
+    }
+
+    private void spawnRemainder(ItemStack stack, int remainingCount) {
+        while (remainingCount > 0) {
+            ItemStack copy = stack.copy();
+            copy.setCount(Math.min(remainingCount, copy.getMaxStackSize()));
+            remainingCount -= copy.getCount();
+            ItemEntity itemEntity = new ItemEntity(player.world, player.posX, player.posY, player.posZ, copy);
+            player.world.addEntity(itemEntity);
+        }
     }
 
     private int performComplexInsert(IUniqueObject<?> obj, int count, boolean simulate) {
@@ -66,39 +116,10 @@ public final class PlayerItemIndex implements IItemIndex {
                 remainingCount -= match;
             if (handle.shouldCleanup())
                 it.remove();
+            if (remainingCount <= 0)
+                return 0;
         }
-        remainingCount = Math.max(0, remainingCount);
-        if (remainingCount > 0) {
-            final int remainder = remainingCount;//pass it to lambda
-            return obj.tryCreateComplexInsertStack(Collections.unmodifiableMap(handleMap), count)
-                    .map(stack -> {
-                        List<IObjectHandle<?>> emptyHandles = handleMap
-                                .computeIfAbsent(Item.class, c -> new HashMap<>())
-                                .getOrDefault(Items.AIR, ImmutableList.of());
-                        int innerRemainder = remainder;
-                        for (Iterator<IObjectHandle<?>> it = emptyHandles.iterator(); it.hasNext() && innerRemainder >= 0; ) {
-                            IObjectHandle<?> handle = it.next();
-                            UniqueItem item = UniqueItem.ofStack(stack);
-                            int match = handle.insert(item, innerRemainder, simulate);
-                            if (match > 0)
-                                innerRemainder -= match;
-                            it.remove();
-                            handleMap.get(Item.class)
-                                    .computeIfAbsent(item.getIndexObject(), i -> new ArrayList<>())
-                                    .add(handle);
-                        }
-                        while (innerRemainder > 0) {
-                            ItemStack copy = stack.copy();
-                            copy.setCount(Math.min(innerRemainder, copy.getMaxStackSize()));
-                            innerRemainder -= copy.getCount();
-                            ItemEntity itemEntity = new ItemEntity(player.world, player.posX, player.posY, player.posZ, copy);
-                            player.world.addEntity(itemEntity);
-                        }
-                        return innerRemainder;
-                    })
-                    .orElse(remainder);
-        }
-        return 0;
+        return remainingCount;
     }
 
     @Override

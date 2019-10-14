@@ -291,6 +291,12 @@ public class GadgetCopyPaste extends AbstractGadget {
         return mode;
     }
 
+    @Override
+    protected void onAnchorSet(ItemStack stack, PlayerEntity player, BlockRayTraceResult lookingAt) {
+        //offset by one
+        super.onAnchorSet(stack, player, new BlockRayTraceResult(lookingAt.getHitVec(), lookingAt.getFace(), lookingAt.getPos().offset(lookingAt.getFace()), lookingAt.isInside()));
+    }
+
     public static ItemStack getGadget(PlayerEntity player) {
         ItemStack stack = AbstractGadget.getGadget(player);
         if (! (stack.getItem() instanceof GadgetCopyPaste))

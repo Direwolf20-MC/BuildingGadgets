@@ -5,8 +5,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 
-import java.util.Optional;
-
 public final class StackHandlerItemHandle implements IObjectHandle<Item> {
     private final IItemHandler handler;
     private final int slot;
@@ -43,15 +41,10 @@ public final class StackHandlerItemHandle implements IObjectHandle<Item> {
 
     @Override
     public int insert(IUniqueObject<?> item, int count, boolean simulate) {
-        Optional<ItemStack> simpleInsert = item.trySimpleInsert(count);
-        if (simpleInsert.isPresent()) {
-            ItemStack insertStack = simpleInsert.get();
-            ItemStack remaining = handler.insertItem(slot, insertStack, simulate);
-            return insertStack.getCount() - remaining.getCount();
-        } else if (handler instanceof IItemHandlerModifiable) {
+        if (handler instanceof IItemHandlerModifiable) {
             IItemHandlerModifiable modifiable = (IItemHandlerModifiable) handler;
             ItemStack stack = getStack();
-            if (! item.matches(stack))
+            if (! stack.isEmpty() && ! item.matches(stack))
                 return 0;
             ItemStack res = item.insertInto(stack, count);
             if (! simulate)

@@ -148,32 +148,32 @@ public class CopyPasteRender extends BaseRenderer {
     }
 
     private void performRender(World world, PlayerEntity player, ItemStack stack, BlockPos startPos, ITemplate template, float partialTicks) {
-                FakeDelegationWorld fakeWorld = new FakeDelegationWorld(world);
-                IBuildContext context = SimpleBuildContext.builder()
-                        .buildingPlayer(player)
-                        .usedStack(stack)
-                        .build(fakeWorld);
-                try (IBuildView view = template.createViewInContext(SimpleBuildOpenOptions.withContext(context))) {
-                    if (view == null) {
-                        BuildingGadgets.LOG.warn("Expected Template to be able to create a build view! Aborting render!");
-                        return;
-                    }
-                    view.translateTo(startPos);
-                    RenderSorter sorter = new RenderSorter(player, view.estimateSize());
-                    for (PlacementTarget target : view) {
-                        if (target.placeIn(context))
-                            sorter.onPlaced(target);
-                    }
-                    //Prepare the block rendering
-                    //BlockRendererDispatcher dispatcher = Minecraft.getInstance().getBlockRendererDispatcher();
-                    renderTargets(context, sorter, partialTicks);
+        FakeDelegationWorld fakeWorld = new FakeDelegationWorld(world);
+        IBuildContext context = SimpleBuildContext.builder()
+                .buildingPlayer(player)
+                .usedStack(stack)
+                .build(fakeWorld);
+        try (IBuildView view = template.createViewInContext(SimpleBuildOpenOptions.withContext(context))) {
+            if (view == null) {
+                BuildingGadgets.LOG.warn("Expected Template to be able to create a build view! Aborting render!");
+                return;
+            }
+            view.translateTo(startPos);
+            RenderSorter sorter = new RenderSorter(player, view.estimateSize());
+            for (PlacementTarget target : view) {
+                if (target.placeIn(context))
+                    sorter.onPlaced(target);
+            }
+            //Prepare the block rendering
+            //BlockRendererDispatcher dispatcher = Minecraft.getInstance().getBlockRendererDispatcher();
+            renderTargets(context, sorter, partialTicks);
 
-                    if (! player.isCreative())
-                        renderMissing(player, stack, view, sorter);
-                    GlStateManager.disableBlend();
-                } catch (TemplateException e) {
-                    BuildingGadgets.LOG.error("Failed to close BuildView!");
-                }
+            if (! player.isCreative())
+                renderMissing(player, stack, view, sorter);
+            GlStateManager.disableBlend();
+        } catch (TemplateException e) {
+            BuildingGadgets.LOG.error("Failed to close BuildView!");
+        }
 
     }
 
@@ -199,14 +199,8 @@ public class CopyPasteRender extends BaseRenderer {
             GlStateManager.enableBlend();
             GL14.glBlendColor(1F, 1F, 1F, 0.6f); //Set the alpha of the blocks we are rendering
             try {
-                switch (state.getRenderType()) {
-                    case MODEL:
-                        dispatcher.renderBlock(state, targetPos, context.getWorld(), builder, rand, te != null ? te.getModelData() : EmptyModelData.INSTANCE);
-                        break;
-                    case ENTITYBLOCK_ANIMATED: {
-                        getChestRenderer().renderChestBrightness(state.getBlock(), 1f);
-                    }
-                }
+                if (state.getRenderType() == BlockRenderType.MODEL)
+                    dispatcher.renderBlock(state, targetPos, context.getWorld(), builder, rand, te != null ? te.getModelData() : EmptyModelData.INSTANCE);
             } catch (Exception e) {
                 BuildingGadgets.LOG.trace("Caught exception whilst rendering {}.", state, e);
             }
@@ -215,9 +209,11 @@ public class CopyPasteRender extends BaseRenderer {
                     TileEntityRenderer<TileEntity> renderer = teDispatcher.getRenderer(te);
                     if (renderer != null) {
                         if (te.hasFastRenderer())
-                            renderer.renderTileEntityFast(te, targetPos.getX(), targetPos.getY(), targetPos.getZ(), partialTicks, 0, builder);
-                        else
-                            renderer.render(te, targetPos.getX(), targetPos.getY(), targetPos.getZ(), partialTicks, 0);
+                            renderer.renderTileEntityFast(te, 0, 0, 0, partialTicks, - 1, builder);
+                        else {
+                            renderer.render(te, 0, 0, 0, partialTicks, - 1);
+                            bindBlocks(); //some blocks (all vanilla tiles I tested) rebind the atlas!
+                        }
                     }
                 }
             } catch (Exception e) {

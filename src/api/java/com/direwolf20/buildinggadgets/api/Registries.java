@@ -104,6 +104,7 @@ public final class Registries {
         BuildingGadgetsAPI.LOG.trace("Finished Registering Template Serializers");
     }
 
+    @SubscribeEvent
     public static void registerUniqueObjectSerializers(RegistryEvent.Register<IUniqueObjectSerializer> event) {
         BuildingGadgetsAPI.LOG.trace("Registering UniqueObject Serializers");
         event.getRegistry().register(new UniqueItem.Serializer().setRegistryName(UniqueObjectSerializerReference.SIMPLE_UNIQUE_ITEM_ID_RL));
