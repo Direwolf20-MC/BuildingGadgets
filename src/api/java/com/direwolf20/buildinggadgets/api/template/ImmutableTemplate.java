@@ -139,7 +139,7 @@ public final class ImmutableTemplate implements ITemplate {
             TemplateHeader header = castTemplate.getHeaderInfo();
             ListNBT dataList = new ListNBT();
             long[] posAndId = new long[posToStateId.size()];
-            ObjectIncrementer<ITileDataSerializer> mapper = new ObjectIncrementer<>(idToData.length);
+            DataCompressor<ITileDataSerializer> mapper = new DataCompressor<>(idToData.length);
             for (BlockData entry : idToData) {
                 dataList.add(entry.serialize(mapper, persisted));
             }
@@ -159,7 +159,7 @@ public final class ImmutableTemplate implements ITemplate {
         public ITemplate deserialize(CompoundNBT tagCompound, @Nullable TemplateHeader header, boolean persisted) {
             long[] posAndId = tagCompound.getLongArray(NBTKeys.KEY_POS);
             ListNBT dataList = tagCompound.getList(NBTKeys.KEY_DATA, NBT.TAG_COMPOUND);
-            ReverseObjectIncrementer<ITileDataSerializer> mapper = new ReverseObjectIncrementer<>(tagCompound.getList(NBTKeys.KEY_SERIALIZER, NBT.TAG_STRING),
+            DataDecompressor<ITileDataSerializer> mapper = new DataDecompressor<>(tagCompound.getList(NBTKeys.KEY_SERIALIZER, NBT.TAG_STRING),
                     nbt -> {
                         String s = nbt.getString();
                         ITileDataSerializer serializer = RegistryUtils.getFromString(Registries.TileEntityData.getTileDataSerializers(), s);

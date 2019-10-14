@@ -10,18 +10,34 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.function.ToIntFunction;
 
-public final class ObjectIncrementer<T> implements ToIntFunction<T> {
+/**
+ * Allows a simple nbt-data compression to happen, by building a map from the Data to int's.
+ * Every call to {@link #applyAsInt(Object)} will return the int key associated with the given value,
+ * which is evaluated if the value is at that point unknown. This int key can then be used to efficiently
+ * represent the value, which will obviously reduce the size for duplicate values.
+ * <p>
+ * The mapping build can be represented efficiently using a {@link ListNBT NBTList}. For reading this
+ * and reversing the mapping use {@link DataDecompressor}.
+ * <p>
+ * This class implements {@link ToIntFunction} for cases, where another int mapping may be used sometimes.
+ * For example if the Data is associated with an {@link net.minecraftforge.registries.IForgeRegistry} and the
+ * integer id's might be used, it is of course more efficient to use those directly.
+ *
+ * @param <T> The type of Data which is compressed
+ * @see DataDecompressor
+ */
+public final class DataCompressor<T> implements ToIntFunction<T> {
     private int cur;
     private Object2IntMap<T> objectMap;
     private List<T> reverseMap;
 
-    public ObjectIncrementer(int expectedSize) {
+    public DataCompressor(int expectedSize) {
         cur = 0;
         objectMap = new Object2IntOpenHashMap<>(expectedSize);
         reverseMap = new LinkedList<>();
     }
 
-    public ObjectIncrementer() {
+    public DataCompressor() {
         cur = 0;
         objectMap = new Object2IntOpenHashMap<>();
         reverseMap = new LinkedList<>();

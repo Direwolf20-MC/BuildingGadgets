@@ -11,9 +11,9 @@ import com.direwolf20.buildinggadgets.api.materials.inventory.IUniqueObject;
 import com.direwolf20.buildinggadgets.api.materials.inventory.IUniqueObjectSerializer;
 import com.direwolf20.buildinggadgets.api.serialisation.ITileDataSerializer;
 import com.direwolf20.buildinggadgets.api.serialisation.SerialisationSupport;
-import com.direwolf20.buildinggadgets.api.util.ObjectIncrementer;
+import com.direwolf20.buildinggadgets.api.util.DataCompressor;
+import com.direwolf20.buildinggadgets.api.util.DataDecompressor;
 import com.direwolf20.buildinggadgets.api.util.RegistryUtils;
-import com.direwolf20.buildinggadgets.api.util.ReverseObjectIncrementer;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
@@ -46,7 +46,7 @@ public final class Undo {
                 && nbt.contains(NBTKeys.WORLD_SAVE_UNDO_BLOCK_LIST, NBT.TAG_LIST)
                 && nbt.contains(NBTKeys.WORLD_SAVE_UNDO_DATA_LIST, NBT.TAG_LIST)
                 && nbt.contains(NBTKeys.WORLD_SAVE_UNDO_DATA_SERIALIZER_LIST, NBT.TAG_LIST));
-        ReverseObjectIncrementer<ITileDataSerializer> serializerReverseObjectIncrementer = new ReverseObjectIncrementer<>(
+        DataDecompressor<ITileDataSerializer> serializerReverseObjectIncrementer = new DataDecompressor<>(
                 (ListNBT) nbt.get(NBTKeys.WORLD_SAVE_UNDO_DATA_SERIALIZER_LIST),
                 inbt -> {
                     String s = inbt.getString();
@@ -61,11 +61,11 @@ public final class Undo {
                     BuildingGadgetsAPI.LOG.warn("Attempted to query unknown serializer {}. Replacing with dummy!", value);
                     return TileSupport.dummyTileEntityData().getSerializer();
                 });
-        ReverseObjectIncrementer<BlockData> dataReverseObjectIncrementer = new ReverseObjectIncrementer<>(
+        DataDecompressor<BlockData> dataReverseObjectIncrementer = new DataDecompressor<>(
                 (ListNBT) nbt.get(NBTKeys.WORLD_SAVE_UNDO_DATA_LIST),
                 inbt -> BlockData.deserialize((CompoundNBT) inbt, serializerReverseObjectIncrementer, true),
                 value -> BlockData.AIR);
-        ReverseObjectIncrementer<IUniqueObjectSerializer> itemSerializerIncrementer = new ReverseObjectIncrementer<>(
+        DataDecompressor<IUniqueObjectSerializer> itemSerializerIncrementer = new DataDecompressor<>(
                 (ListNBT) nbt.get(NBTKeys.WORLD_SAVE_UNDO_ITEMS_SERIALIZER_LIST),
                 inbt -> {
                     String s = inbt.getString();
@@ -78,7 +78,7 @@ public final class Undo {
                     BuildingGadgetsAPI.LOG.warn("Attempted to query unknown item-serializer {}. Replacing with default!", value);
                     return SerialisationSupport.uniqueItemSerializer();
                 });
-        ReverseObjectIncrementer<Multiset<IUniqueObject<?>>> itemSetReverseObjectIncrementer = new ReverseObjectIncrementer<>(
+        DataDecompressor<Multiset<IUniqueObject<?>>> itemSetReverseObjectIncrementer = new DataDecompressor<>(
                 (ListNBT) nbt.get(NBTKeys.WORLD_SAVE_UNDO_ITEMS_LIST),
                 inbt -> NBTHelper.deserializeMultisetEntries((ListNBT) inbt, HashMultiset.create(), entry -> readEntry(entry, itemSerializerIncrementer)),
                 value -> HashMultiset.create());
@@ -122,10 +122,10 @@ public final class Undo {
     }
 
     CompoundNBT serialize() {
-        ObjectIncrementer<BlockData> dataObjectIncrementer = new ObjectIncrementer<>();
-        ObjectIncrementer<IUniqueObjectSerializer> itemSerializerIncrementer = new ObjectIncrementer<>();
-        ObjectIncrementer<Multiset<IUniqueObject<?>>> itemObjectIncrementer = new ObjectIncrementer<>();
-        ObjectIncrementer<ITileDataSerializer> serializerObjectIncrementer = new ObjectIncrementer<>();
+        DataCompressor<BlockData> dataObjectIncrementer = new DataCompressor<>();
+        DataCompressor<IUniqueObjectSerializer> itemSerializerIncrementer = new DataCompressor<>();
+        DataCompressor<Multiset<IUniqueObject<?>>> itemObjectIncrementer = new DataCompressor<>();
+        DataCompressor<ITileDataSerializer> serializerObjectIncrementer = new DataCompressor<>();
         CompoundNBT res = new CompoundNBT();
         ListNBT infoList = NBTHelper.serializeMap(dataMap, NBTUtil::writeBlockPos, i -> i.serialize(dataObjectIncrementer, itemObjectIncrementer));
         ListNBT dataSerializerList = serializerObjectIncrementer.write(ts -> new StringNBT(ts.getRegistryName().toString()));
