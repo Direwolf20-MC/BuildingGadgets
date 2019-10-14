@@ -12,6 +12,7 @@ import com.direwolf20.buildinggadgets.common.util.exceptions.CapabilityNotPresen
 import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
 import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
 import com.direwolf20.buildinggadgets.common.util.inventory.InventoryHelper;
+import com.direwolf20.buildinggadgets.common.util.lang.MessageTranslation;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.util.tools.NetworkIO;
 import com.direwolf20.buildinggadgets.common.util.tools.UndoState;
@@ -52,6 +53,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class GadgetUtils {
     private static final ImmutableList<String> LINK_STARTS = ImmutableList.of("http","www");
@@ -296,14 +298,17 @@ public class GadgetUtils {
 */
         BlockState state = world.getBlockState(lookingAt.getPos());
         if (!Config.BLACKLIST.isAllowedBlock(state.getBlock())) {
-            player.sendStatusMessage(new StringTextComponent(TextFormatting.RED + new TranslationTextComponent("message.gadget.invalidblock").getUnformattedComponentText()), true);
+            player.sendStatusMessage(MessageTranslation.INVALID_BLOCK.componentTranslation(state.getBlock().getRegistryName()), true);
             return;
         }
-        BlockData placeState = InventoryHelper.getSpecificStates(state, world, player, lookingAt.getPos(), stack);
-        BlockState actualState = placeState.getState().getExtendedState(world, lookingAt.getPos());
+        Optional<BlockData> data = InventoryHelper.getSafeBlockData(player, lookingAt.getPos(), player.getActiveHand());
+        data.ifPresent(placeState -> {
+            BlockState actualState = placeState.getState().getExtendedState(world, lookingAt.getPos());
 
-        setToolBlock(stack, placeState);
-        setToolActualBlock(stack, new BlockData(actualState, placeState.getTileData()));
+            setToolBlock(stack, placeState);
+            setToolActualBlock(stack, new BlockData(actualState, placeState.getTileData()));
+        });
+
     }
 
     public static ActionResultType setRemoteInventory(ItemStack stack, PlayerEntity player, World world, BlockPos pos, boolean setTool) {

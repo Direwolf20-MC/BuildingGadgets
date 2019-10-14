@@ -24,9 +24,9 @@ public class EffectBlockTER extends TileEntityRenderer<EffectBlockTileEntity> {
     public void render(EffectBlockTileEntity tile, double x, double y, double z, float partialTicks, int destroyStage) {
         BlockData renderData = tile.getRenderedBlock();
         if (renderData == null) {
-            BuildingGadgets.LOG.error("Client did not receive Effect-Block Render Data. " +
+            /*BuildingGadgets.LOG.error("Client did not receive Effect-Block Render Data. " +
                     "This is an error we know about and will try to fix as soon as possible! " +
-                    "Aborting render for now to prevent Client-Crash.");
+                    "Aborting render for now to prevent Client-Crash.");*/
             return;
         }
         BlockRendererDispatcher blockrendererdispatcher = Minecraft.getInstance().getBlockRendererDispatcher();

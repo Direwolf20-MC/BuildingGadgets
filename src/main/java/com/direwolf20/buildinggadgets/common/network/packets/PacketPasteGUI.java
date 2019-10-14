@@ -24,7 +24,6 @@ public class PacketPasteGUI {
         buffer.writeInt(msg.Z);
     }
 
-
     public static PacketPasteGUI decode(PacketBuffer buffer) {
         return new PacketPasteGUI(buffer.readInt(), buffer.readInt(), buffer.readInt());
     }

@@ -125,28 +125,29 @@ public class CopyPasteRender extends BaseRenderer {
     private void renderPaste(RenderWorldLastEvent evt, PlayerEntity player, ItemStack heldItem, Vec3d playerPos) {
         World world = player.world;
         AbstractGadget item = (AbstractGadget) heldItem.getItem();
-        UUID id = item.getUUID(heldItem);
-        float partialTicks = evt.getPartialTicks();
-        GadgetCopyPaste.getActivePos(player, heldItem).ifPresent(startPos -> {
-            try {
-                RenderInfo info = renderCache.get(new RenderKey(id, startPos), () -> {
-                    int displayList = GLAllocation.generateDisplayLists(1);
-                    GlStateManager.newList(displayList, GL11.GL_COMPILE);
-                    this.performRender(world, player, heldItem, startPos, partialTicks);
-                    GlStateManager.endList();
-                    return new RenderInfo(displayList);
+        world.getCapability(CapabilityTemplate.TEMPLATE_PROVIDER_CAPABILITY).ifPresent(provider -> {
+            heldItem.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(key -> {
+                UUID id = provider.getId(key);
+                float partialTicks = evt.getPartialTicks();
+                GadgetCopyPaste.getActivePos(player, heldItem).ifPresent(startPos -> {
+                    try {
+                        RenderInfo info = renderCache.get(new RenderKey(id, startPos), () -> {
+                            int displayList = GLAllocation.generateDisplayLists(1);
+                            GlStateManager.newList(displayList, GL11.GL_COMPILE);
+                            this.performRender(world, player, heldItem, startPos, provider.getTemplateForKey(key), partialTicks);
+                            GlStateManager.endList();
+                            return new RenderInfo(displayList);
+                        });
+                        info.render(playerPos);
+                    } catch (ExecutionException e) {
+                        BuildingGadgets.LOG.error("Failed to create Render!", e);
+                    }
                 });
-                info.render(playerPos);
-            } catch (ExecutionException e) {
-                BuildingGadgets.LOG.error("Failed to create Render!", e);
-            }
+            });
         });
     }
 
-    private void performRender(World world, PlayerEntity player, ItemStack stack, BlockPos startPos, float partialTicks) {
-        world.getCapability(CapabilityTemplate.TEMPLATE_PROVIDER_CAPABILITY).ifPresent(provider -> {
-            stack.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(key -> {
-                ITemplate template = provider.getTemplateForKey(key);
+    private void performRender(World world, PlayerEntity player, ItemStack stack, BlockPos startPos, ITemplate template, float partialTicks) {
                 FakeDelegationWorld fakeWorld = new FakeDelegationWorld(world);
                 IBuildContext context = SimpleBuildContext.builder()
                         .buildingPlayer(player)
@@ -173,8 +174,6 @@ public class CopyPasteRender extends BaseRenderer {
                 } catch (TemplateException e) {
                     BuildingGadgets.LOG.error("Failed to close BuildView!");
                 }
-            });
-        });
 
     }
 

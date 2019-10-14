@@ -10,15 +10,14 @@ import com.direwolf20.buildinggadgets.api.materials.inventory.IHandleProvider;
 import com.direwolf20.buildinggadgets.api.materials.inventory.IObjectHandle;
 import com.direwolf20.buildinggadgets.api.materials.inventory.UniqueItem;
 import com.direwolf20.buildinggadgets.api.registry.TopologicalRegistryBuilder;
+import com.direwolf20.buildinggadgets.api.util.CommonUtils;
 import com.direwolf20.buildinggadgets.common.items.gadgets.AbstractGadget;
-import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.items.pastes.ConstructionPaste;
 import com.direwolf20.buildinggadgets.common.items.pastes.ConstructionPasteContainerCreative;
 import com.direwolf20.buildinggadgets.common.items.pastes.GenericPasteContainer;
 import com.direwolf20.buildinggadgets.common.registry.OurItems;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.exceptions.CapabilityNotPresentException;
-import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -57,7 +56,9 @@ public class InventoryHelper {
             ImmutableSet.of(SlabBlock.TYPE, StairsBlock.HALF, LogBlock.AXIS, AXIS, DirectionalBlock.FACING, StairsBlock.FACING, TrapDoorBlock.HALF, TrapDoorBlock.OPEN, StairsBlock.SHAPE, LeverBlock.POWERED, RepeaterBlock.DELAY, PaneBlock.EAST, PaneBlock.WEST, PaneBlock.NORTH, PaneBlock.SOUTH);
 
     private static final Set<IProperty> SAFE_PROPERTIES_COPY_PASTE =
-            ImmutableSet.<IProperty>builder().addAll(SAFE_PROPERTIES).addAll(ImmutableSet.of(RailBlock.SHAPE, PoweredRailBlock.SHAPE, ChestBlock.TYPE)).build();
+            ImmutableSet.<IProperty>builder().addAll(SAFE_PROPERTIES).add(RailBlock.SHAPE, PoweredRailBlock.SHAPE, ChestBlock.TYPE).build();
+    private static final Set<IProperty<?>> UNSAFE_PROPERTIES =
+            ImmutableSet.<IProperty<?>>builder().add(CropsBlock.AGE).build();
     public static final CreativeItemIndex CREATIVE_INDEX = new CreativeItemIndex();
 
     public static IItemIndex index(ItemStack tool, PlayerEntity player) {
@@ -408,34 +409,32 @@ public class InventoryHelper {
         return new ItemStack(state.getBlock());
     }
 
-    public static BlockData getSpecificStates(BlockState originalState, World world, PlayerEntity player, BlockPos pos, ItemStack tool) {
+    public static Optional<BlockData> getSafeBlockData(PlayerEntity player, BlockPos pos, Hand hand) {
+        BlockItemUseContext blockItemUseContext = new BlockItemUseContext(new ItemUseContext(player, hand, CommonUtils.fakeRayTrace(player.getPositionVec(), pos)));
+        return getSafeBlockData(player, pos, blockItemUseContext);
+    }
+
+    public static Optional<BlockData> getSafeBlockData(PlayerEntity player, BlockPos pos, BlockItemUseContext useContext) {
+        World world = player.world;
+        BlockState state = world.getBlockState(pos);
         BlockState placeState;
-        //Block block = originalState.getBlock();
-        //ItemStack item = block.getPickBlock(originalState, null, world, pos, player);
-
         try {
-            placeState = originalState.getBlock().getStateForPlacement(
-                    new BlockItemUseContext(new ItemUseContext(player, Hand.MAIN_HAND, VectorHelper.getLookingAt(player, tool))));
-        } catch (Exception var8) {
-            placeState = originalState.getBlock().getDefaultState();
+            placeState = state.getBlock().getStateForPlacement(useContext);
+        } catch (Exception e) {
+            placeState = state.getBlock().getDefaultState();
         }
-
-        if (placeState != null) {
-            for (IProperty prop : placeState.getProperties()) {
-                if (tool.getItem() instanceof GadgetCopyPaste) {
-                    if (SAFE_PROPERTIES_COPY_PASTE.contains(prop)) {
-                        placeState = placeState.with(prop, originalState.get(prop));
-                    }
-                } else {
-                    if (SAFE_PROPERTIES.contains(prop)) {
-                        placeState = placeState.with(prop, originalState.get(prop));
-                    }
-                }
-            }
-
-            return new BlockData(placeState, TileSupport.createTileData(world, pos));
+        if (placeState == null)
+            return Optional.empty();
+        for (IProperty<?> prop : placeState.getProperties()) {
+            if (! UNSAFE_PROPERTIES.contains(prop))
+                placeState = applyProperty(placeState, state, prop);
         }
-        return null;
+        return Optional.of(new BlockData(state, TileSupport.createTileData(world, pos)));
+    }
+
+    //proper generics...
+    private static <T extends Comparable<T>> BlockState applyProperty(BlockState state, BlockState from, IProperty<T> prop) {
+        return state.with(prop, from.get(prop));
     }
 
     private static NonNullList<ItemStack> playerInv(PlayerEntity player) {

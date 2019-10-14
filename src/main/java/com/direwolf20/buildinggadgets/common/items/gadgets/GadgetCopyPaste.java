@@ -379,7 +379,8 @@ public class GadgetCopyPaste extends AbstractGadget {
                         .buildingPlayer(player)
                         .usedStack(stack)
                         .build(world);
-                WorldBackedBuildView buildView = WorldBackedBuildView.create(context, region);
+                WorldBackedBuildView buildView = WorldBackedBuildView.create(context, region,
+                        (c, p) -> InventoryHelper.getSafeBlockData(player, p, player.getActiveHand()));
                 runCopyTransaction(stack, template, buildView);
             });
 

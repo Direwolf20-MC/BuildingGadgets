@@ -11,8 +11,9 @@ import net.minecraft.world.IWorld;
 import javax.annotation.Nullable;
 import java.util.Comparator;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Spliterator;
-import java.util.function.BiPredicate;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
 /**
@@ -30,7 +31,7 @@ import java.util.function.Consumer;
 public final class WorldBackedBuildView implements IBuildView {
     private final IBuildContext context;
     private final Region region;
-    private final BiPredicate<IBuildContext, BlockPos> predicate;
+    private final BiFunction<IBuildContext, BlockPos, Optional<BlockData>> dataFactory;
     private BlockPos translation;
 
     public static WorldBackedBuildView inWorld(IWorld world, Region region) {
@@ -41,23 +42,23 @@ public final class WorldBackedBuildView implements IBuildView {
         return create(context, region, null);
     }
 
-    public static WorldBackedBuildView create(IBuildContext context, Region region, @Nullable BiPredicate<IBuildContext, BlockPos> predicate) {
+    public static WorldBackedBuildView create(IBuildContext context, Region region, @Nullable BiFunction<IBuildContext, BlockPos, Optional<BlockData>> dataFactory) {
         return new WorldBackedBuildView(
                 Objects.requireNonNull(context, "Cannot create WorldBackedBuildView without an IBuildContext!"),
                 Objects.requireNonNull(region, "Cannot create WorldBackedBuildView without an Region!"),
-                predicate != null ? predicate : (c, p) -> true);
+                dataFactory != null ? dataFactory : (c, p) -> Optional.of(TileSupport.createBlockData(c.getWorld(), p)));
     }
 
-    private WorldBackedBuildView(IBuildContext context, Region region, BiPredicate<IBuildContext, BlockPos> predicate) {
+    private WorldBackedBuildView(IBuildContext context, Region region, BiFunction<IBuildContext, BlockPos, Optional<BlockData>> dataFactory) {
         this.context = context;
         this.region = region;
-        this.predicate = predicate;
+        this.dataFactory = dataFactory;
         this.translation = BlockPos.ZERO;
     }
 
     @Override
     public Spliterator<PlacementTarget> spliterator() {
-        return new WorldBackedSpliterator(getBoundingBox().spliterator(), translation, predicate, getContext());
+        return new WorldBackedSpliterator(getBoundingBox().spliterator(), translation, dataFactory, getContext());
     }
 
     @Override
@@ -78,7 +79,7 @@ public final class WorldBackedBuildView implements IBuildView {
 
     @Override
     public WorldBackedBuildView copy() {
-        return new WorldBackedBuildView(getContext(), getBoundingBox(), predicate);
+        return new WorldBackedBuildView(getContext(), getBoundingBox(), dataFactory);
     }
 
     public MapBackedBuildView evaluate() {
@@ -97,25 +98,26 @@ public final class WorldBackedBuildView implements IBuildView {
 
     @Override
     public boolean mayContain(int x, int y, int z) {
-        return region.mayContain(x, y, z) && predicate.test(getContext(), new BlockPos(x, y, z));
+        return region.mayContain(x, y, z) && dataFactory.apply(getContext(), new BlockPos(x, y, z)).isPresent();
     }
 
     private static final class WorldBackedSpliterator extends DelegatingSpliterator<BlockPos, PlacementTarget> {
         private final BlockPos translation;
-        private final BiPredicate<IBuildContext, BlockPos> predicate;
+        private final BiFunction<IBuildContext, BlockPos, Optional<BlockData>> dataFactory;
         private final IBuildContext context;
 
-        private WorldBackedSpliterator(Spliterator<BlockPos> other, BlockPos translation, BiPredicate<IBuildContext, BlockPos> predicate, IBuildContext context) {
+        private WorldBackedSpliterator(Spliterator<BlockPos> other, BlockPos translation, BiFunction<IBuildContext, BlockPos, Optional<BlockData>> dataFactory, IBuildContext context) {
             super(other);
             this.translation = translation;
-            this.predicate = predicate;
+            this.dataFactory = dataFactory;
             this.context = context;
         }
 
         @Override
         protected boolean advance(BlockPos object, Consumer<? super PlacementTarget> action) {
-            if (predicate.test(context, object)) {
-                BlockData data = TileSupport.createBlockData(context.getWorld(), object);
+            Optional<BlockData> dataOptional = dataFactory.apply(context, object);
+            if (dataOptional.isPresent()) {
+                BlockData data = dataOptional.get();
                 action.accept(new PlacementTarget(object.add(translation), data));
                 return true;
             }
@@ -132,7 +134,7 @@ public final class WorldBackedBuildView implements IBuildView {
         public Spliterator<PlacementTarget> trySplit() {
             Spliterator<BlockPos> other = getOther().trySplit();
             if (other != null)
-                return new WorldBackedSpliterator(other, translation, predicate, context);
+                return new WorldBackedSpliterator(other, translation, dataFactory, context);
             return null;
         }
 

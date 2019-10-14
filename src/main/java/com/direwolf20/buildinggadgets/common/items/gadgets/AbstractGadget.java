@@ -256,6 +256,7 @@ public abstract class AbstractGadget extends Item {
                             .setStyle(Styles.BLUE));
     }
 
+    //this should only be called Server-Side!!!
     public UUID getUUID(ItemStack stack) {
         CompoundNBT nbt = NBTHelper.getOrNewTag(stack);
         if (! nbt.hasUniqueId(NBTKeys.GADGET_UUID)) {

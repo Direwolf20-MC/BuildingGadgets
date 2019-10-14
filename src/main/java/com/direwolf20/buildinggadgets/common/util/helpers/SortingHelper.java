@@ -86,7 +86,7 @@ public class SortingHelper {
     }
 
     private static final class TargetObject<T> {
-        public static final Comparator<TargetObject<?>> BY_DISTANCE = Comparator.<TargetObject<?>>comparingDouble(TargetObject::getDist).reversed();
+        public static final Comparator<TargetObject<?>> BY_DISTANCE = Comparator.<TargetObject<?>>comparingDouble(TargetObject::getDist);
         private final double dist;
         private final T target;
 

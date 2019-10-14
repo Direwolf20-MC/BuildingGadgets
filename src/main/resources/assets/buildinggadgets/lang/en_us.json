@@ -109,7 +109,7 @@
   "buildinggadgets.message.building.placement.inside": "Inside",
   "buildinggadgets.message.connectedarea": "Connected Area",
   "buildinggadgets.message.connectedsurface": "Connected Surface",
-  "buildinggadgets.message.invalidblock": "Invalid Block",
+  "buildinggadgets.message.invalid_block": "Invalid Block (%s)",
   "buildinggadgets.message.undo_missing_items": "Missing Items for Undo",
   "buildinggadgets.message.undo_failed": "Undo Failed (Too far away?)",
   "buildinggadgets.message.nothing_to_undo": "Nothing To Undo",
