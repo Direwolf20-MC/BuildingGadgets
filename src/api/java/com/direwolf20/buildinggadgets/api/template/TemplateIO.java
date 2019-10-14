@@ -6,14 +6,18 @@ import com.direwolf20.buildinggadgets.api.serialisation.ITemplateSerializer;
 import com.direwolf20.buildinggadgets.api.serialisation.TemplateHeader;
 import com.direwolf20.buildinggadgets.api.util.NBTKeys;
 import com.google.common.base.Preconditions;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraftforge.common.util.Constants.NBT;
 
 import javax.annotation.Nullable;
 import java.io.*;
+import java.util.Base64;
 
 public final class TemplateIO {
+    private static final Gson GSON = TemplateHeader.appendHeaderSpecification(new GsonBuilder(), false, true).create();
     private TemplateIO() {}
 
     public static void writeTemplate(ITemplate template, OutputStream stream) throws IOException {
@@ -78,11 +82,19 @@ public final class TemplateIO {
     }
 
     public static String writeTemplateJson(ITemplate template) {
-        throw new UnsupportedOperationException("Not yet implemented");
+        try {
+            return GSON.toJson(TemplateJsonRepresentation.ofTemplate(template, null));
+        } catch (IOException e) { //TODO exceptions
+            return null;
+        }
     }
 
     public static ITemplate readTemplateFromJson(String json) {
-        throw new UnsupportedOperationException("Not yet implemented");
+        try {
+            return GSON.fromJson(json, TemplateJsonRepresentation.class).getTemplate();
+        } catch (IOException e) { //TODO exceptions
+            return null;
+        }
     }
 
     public static ITemplate readTemplateFromJson(InputStream stream) throws IOException {
@@ -90,9 +102,46 @@ public final class TemplateIO {
         StringBuilder builder = new StringBuilder();
         char[] buf = new char[4096];
         int read = 0;
-        while ((read = r.read(buf)) > 0) {
+        while ((read = r.read(buf)) > 0)
             builder.append(buf, 0, read);
-        }
         return readTemplateFromJson(builder.toString());
+    }
+
+    private static final class TemplateJsonRepresentation {
+        public static TemplateJsonRepresentation ofTemplate(ITemplate template, @Nullable IBuildOpenOptions openOptions) throws IOException {
+            ITemplateSerializer serializer = template.getSerializer();
+            TemplateHeader header = openOptions != null ?
+                    serializer.createHeaderAndTryForceMaterials(template, openOptions) :
+                    serializer.createHeaderFor(template);
+            CompoundNBT nbt = serializer.serialize(template, true);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            CompressedStreamTools.writeCompressed(nbt, baos);
+            String base64 = Base64.getEncoder().encodeToString(baos.toByteArray());
+            return new TemplateJsonRepresentation(header, base64);
+        }
+
+        private final TemplateHeader header;
+        private final String body;
+
+        private TemplateJsonRepresentation(TemplateHeader header, String body) {
+            this.header = header;
+            this.body = body;
+        }
+
+        private TemplateHeader getHeader() {
+            return header;
+        }
+
+        private String getBody() {
+            return body;
+        }
+
+        @Nullable
+        private ITemplate getTemplate() throws IOException {
+            byte[] bytes = Base64.getDecoder().decode(body);
+            CompoundNBT nbt = CompressedStreamTools.readCompressed(new ByteArrayInputStream(bytes));
+            ITemplateSerializer serializer = Registries.getTemplateSerializer(header.getSerializer());
+            return serializer != null ? serializer.deserialize(nbt, header, true) : null;
+        }
     }
 }

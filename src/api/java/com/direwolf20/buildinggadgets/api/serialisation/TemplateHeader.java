@@ -103,6 +103,23 @@ public final class TemplateHeader {
         return TemplateHeader.builderFromNBT(nbt).build();
     }
 
+    public static GsonBuilder appendHeaderSpecification(GsonBuilder builder, boolean printName, boolean extended) {
+        return builder
+                .setPrettyPrinting()
+                .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
+                .registerTypeAdapter(ResourceLocation.class, (JsonSerializer<ResourceLocation>) (src, typeOfSrc, context) -> new JsonPrimitive(src.toString()))
+                .registerTypeAdapter(MaterialList.class, new MaterialList.JsonSerializer(printName, extended))
+                .registerTypeAdapter(SerializerInfo.class, (JsonSerializer<SerializerInfo>) (src, typeOfSrc, context) -> {
+                    if (src.getSubSerializer() != null) {
+                        JsonObject obj = new JsonObject();
+                        obj.add(JsonKeys.SERIALIZER_INFO_SERIALIZER, context.serialize(src.getSerializer()));
+                        obj.add(JsonKeys.SERIALIZER_INFO_SUB_SERIALIZER, context.serialize(src.getSubSerializer()));
+                        return obj;
+                    } else
+                        return context.serialize(src.getSerializer());
+                });
+    }
+
     @Nullable
     private final String name;
     @Nullable
@@ -190,21 +207,9 @@ public final class TemplateHeader {
         return nbt;
     }
 
+
     public String toJson(boolean printName, boolean extended) {
-        return new GsonBuilder()
-                .setPrettyPrinting()
-                .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
-                .registerTypeAdapter(ResourceLocation.class, (JsonSerializer<ResourceLocation>) (src, typeOfSrc, context) -> new JsonPrimitive(src.toString()))
-                .registerTypeAdapter(MaterialList.class, new MaterialList.JsonSerializer(printName, extended))
-                .registerTypeAdapter(SerializerInfo.class, (JsonSerializer<SerializerInfo>) (src, typeOfSrc, context) -> {
-                    if (src.getSubSerializer() != null) {
-                        JsonObject obj = new JsonObject();
-                        obj.add(JsonKeys.SERIALIZER_INFO_SERIALIZER, context.serialize(src.getSerializer()));
-                        obj.add(JsonKeys.SERIALIZER_INFO_SUB_SERIALIZER, context.serialize(src.getSubSerializer()));
-                        return obj;
-                    } else
-                        return context.serialize(src.getSerializer());
-                })
+        return appendHeaderSpecification(new GsonBuilder(), printName, extended)
                 .create()
                 .toJson(this);
     }
