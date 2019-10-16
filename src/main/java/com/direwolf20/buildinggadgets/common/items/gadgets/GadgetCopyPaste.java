@@ -1,50 +1,40 @@
 package com.direwolf20.buildinggadgets.common.items.gadgets;
 
-import com.direwolf20.buildinggadgets.api.building.Region;
-import com.direwolf20.buildinggadgets.api.building.view.IBuildContext;
-import com.direwolf20.buildinggadgets.api.building.view.IBuildView;
-import com.direwolf20.buildinggadgets.api.building.view.SimpleBuildContext;
-import com.direwolf20.buildinggadgets.api.building.view.WorldBackedBuildView;
-import com.direwolf20.buildinggadgets.api.capability.CapabilityTemplate;
-import com.direwolf20.buildinggadgets.api.exceptions.TransactionExecutionException;
-import com.direwolf20.buildinggadgets.api.exceptions.TransactionResultExceedsTemplateSizeException;
-import com.direwolf20.buildinggadgets.api.exceptions.TransactionResultExceedsTemplateSizeException.BlockPosOutOfBounds;
-import com.direwolf20.buildinggadgets.api.exceptions.TransactionResultExceedsTemplateSizeException.ToManyDifferentBlockDataInstances;
-import com.direwolf20.buildinggadgets.api.template.ITemplate;
-import com.direwolf20.buildinggadgets.api.template.SimpleBuildOpenOptions;
-import com.direwolf20.buildinggadgets.api.template.provider.ITemplateKey;
-import com.direwolf20.buildinggadgets.api.template.provider.ITemplateProvider;
-import com.direwolf20.buildinggadgets.api.template.transaction.ITemplateTransaction;
-import com.direwolf20.buildinggadgets.api.template.transaction.ITransactionOperator;
-import com.direwolf20.buildinggadgets.api.template.transaction.TemplateTransactions;
 import com.direwolf20.buildinggadgets.client.events.EventTooltip;
 import com.direwolf20.buildinggadgets.client.gui.GuiMod;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
+import com.direwolf20.buildinggadgets.common.building.Region;
+import com.direwolf20.buildinggadgets.common.building.placement.PlacementChecker;
+import com.direwolf20.buildinggadgets.common.building.view.IBuildContext;
+import com.direwolf20.buildinggadgets.common.building.view.IBuildView;
+import com.direwolf20.buildinggadgets.common.building.view.SimpleBuildContext;
+import com.direwolf20.buildinggadgets.common.building.view.WorldBackedBuildView;
+import com.direwolf20.buildinggadgets.common.capability.CapabilityTemplate;
 import com.direwolf20.buildinggadgets.common.capability.provider.TemplateKeyProvider;
 import com.direwolf20.buildinggadgets.common.commands.CopyUnloadedCommand;
 import com.direwolf20.buildinggadgets.common.concurrent.CopyScheduler;
 import com.direwolf20.buildinggadgets.common.concurrent.PlacementScheduler;
-import com.direwolf20.buildinggadgets.common.concurrent.ServerTickingScheduler;
-import com.direwolf20.buildinggadgets.common.concurrent.TransactionPoolExecutor;
 import com.direwolf20.buildinggadgets.common.config.Config;
+import com.direwolf20.buildinggadgets.common.inventory.IItemIndex;
+import com.direwolf20.buildinggadgets.common.inventory.InventoryHelper;
 import com.direwolf20.buildinggadgets.common.items.gadgets.renderers.BaseRenderer;
 import com.direwolf20.buildinggadgets.common.items.gadgets.renderers.CopyPasteRender;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketBindTool;
 import com.direwolf20.buildinggadgets.common.save.SaveManager;
+import com.direwolf20.buildinggadgets.common.template.ITemplateKey;
+import com.direwolf20.buildinggadgets.common.template.Template;
+import com.direwolf20.buildinggadgets.common.template.TemplateHeader;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.exceptions.CapabilityNotPresentException;
 import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
 import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
-import com.direwolf20.buildinggadgets.common.util.inventory.IItemIndex;
-import com.direwolf20.buildinggadgets.common.util.inventory.InventoryHelper;
 import com.direwolf20.buildinggadgets.common.util.lang.ITranslationProvider;
 import com.direwolf20.buildinggadgets.common.util.lang.MessageTranslation;
 import com.direwolf20.buildinggadgets.common.util.lang.Styles;
 import com.direwolf20.buildinggadgets.common.util.lang.TooltipTranslation;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.util.tools.NetworkIO;
-import com.direwolf20.buildinggadgets.common.util.tools.building.PlacementChecker;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList.Builder;
 import com.google.common.collect.ImmutableSortedSet;
@@ -74,6 +64,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.energy.CapabilityEnergy;
+import net.minecraftforge.fml.network.PacketDistributor;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -148,39 +139,26 @@ public class GadgetCopyPaste extends AbstractGadget {
 
     @Override
     public boolean performRotate(ItemStack stack, PlayerEntity player) {
-        return performSingleOperator(stack, player, TemplateTransactions.rotateOperator(Rotation.CLOCKWISE_90));
+        return player.world.getCapability(CapabilityTemplate.TEMPLATE_PROVIDER_CAPABILITY).map(provider ->
+                stack.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).map(key -> {
+                    Template template = provider.getTemplateForKey(key);
+                    provider.setTemplate(key, template.rotate(Rotation.CLOCKWISE_90));
+                    provider.requestRemoteUpdate(key, PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) player));
+                    return true;
+                }).orElse(false))
+                .orElse(false);
     }
 
     @Override
     public boolean performMirror(ItemStack stack, PlayerEntity player) {
-        return performSingleOperator(stack, player, TemplateTransactions.mirrorOperator(player.getHorizontalFacing().getAxis()));
-    }
-
-    private boolean performSingleOperator(ItemStack stack, PlayerEntity player, ITransactionOperator operator) {
-        ITemplateProvider provider = player.world.getCapability(CapabilityTemplate.TEMPLATE_PROVIDER_CAPABILITY).orElseThrow(CapabilityNotPresentException::new);
-        ITemplateKey templateKey = stack.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).orElseThrow(CapabilityNotPresentException::new);
-        ITemplate template = provider.getTemplateForKey(templateKey);
-        ITemplateTransaction transaction = template.startTransaction();
-        IBuildContext context = SimpleBuildContext.builder()
-                .usedStack(stack)
-                .buildingPlayer(player)
-                .world(player.world)
-                .build();
-        if (transaction != null) {
-            transaction.operate(operator);
-            try {
-                transaction.execute(context);
-                provider.requestRemoteUpdate(templateKey);
-                return true;
-            } catch (TransactionExecutionException e) {
-                BuildingGadgets.LOG.error("Error whilst executing Rotate/Mirror transaction!", e);
-                sendMessage(stack, player, MessageTranslation.TRANSACTION_FAILED, Styles.RED);
-                return false;
-            }
-        } else {
-            notifyGadgetBusy(stack, player);
-            return false;
-        }
+        return player.world.getCapability(CapabilityTemplate.TEMPLATE_PROVIDER_CAPABILITY).map(provider ->
+                stack.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).map(key -> {
+                    Template template = provider.getTemplateForKey(key);
+                    provider.setTemplate(key, template.mirror(player.getHorizontalFacing().getAxis()));
+                    provider.requestRemoteUpdate(key, PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) player));
+                    return true;
+                }).orElse(false))
+                .orElse(false);
     }
 
     public static void setRelativeVector(ItemStack stack, BlockPos vec) {
@@ -371,7 +349,7 @@ public class GadgetCopyPaste extends AbstractGadget {
     private void performCopy(ItemStack stack, World world, PlayerEntity player, Region region) {
         world.getCapability(CapabilityTemplate.TEMPLATE_PROVIDER_CAPABILITY).ifPresent(provider -> {
             stack.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(key -> {
-                ITemplate template = provider.getTemplateForKey(key);
+                Template template = provider.getTemplateForKey(key);
                 if (! CopyUnloadedCommand.mayCopyUnloadedChunks(player)) {
                     ImmutableSortedSet<ChunkPos> unloaded = region.getUnloadedChunks(world);
                     if (! unloaded.isEmpty()) {
@@ -393,110 +371,37 @@ public class GadgetCopyPaste extends AbstractGadget {
         });
     }
 
-    private void runCopyTransaction(ItemStack stack, ITemplate template, WorldBackedBuildView buildView) {
+    private void runCopyTransaction(ItemStack stack, Template template, WorldBackedBuildView buildView) {
         IBuildContext context = buildView.getContext();
         assert context.getBuildingPlayer() != null;
-        ITemplateTransaction transaction = template.startTransaction();
-        if (transaction != null) {
-            CopyScheduler.scheduleCopy(map -> {
-                transaction
-                        .operate(TemplateTransactions.replaceOperator(map))
-                        .operate(TemplateTransactions.headerOperator(
-                                "Copy " + getAndIncrementCopyCounter(stack),
-                                context.getBuildingPlayer().getDisplayName().getUnformattedComponentText()));
-                BuildingGadgets.LOG.info("Copying " + map.size());
-                if (Config.GADGETS.GADGET_COPY_PASTE.maxSynchronousExecution.get() >= map.size())
-                    performTransactionSync(stack, transaction, context);
-                else
-                    performTransactionAsync(stack, transaction, context);
-            }, buildView, Config.GADGETS.GADGET_COPY_PASTE.copySteps.get());
-        } else
-            notifyGadgetBusy(stack, context.getBuildingPlayer());
-    }
-
-    private void performTransactionSync(ItemStack stack, ITemplateTransaction transaction, IBuildContext context) {
-        assert context.getBuildingPlayer() != null;
         PlayerEntity player = context.getBuildingPlayer();
-        ServerTickingScheduler.runOnServerOnce(() -> {
-            try {
-                transaction.execute(context);
-                onCopyFinished(stack, player);
-            } catch (ToManyDifferentBlockDataInstances e) {
-                BuildingGadgets.LOG.trace("Too many different Blocks detected!", e);
-                onTooManyDifferentBlocks(stack, player);
-            } catch (BlockPosOutOfBounds e) {
-                BuildingGadgets.LOG.trace("Too large Area detected!", e);
-                onTooBigArea(stack, player);
-            } catch (TransactionResultExceedsTemplateSizeException e) {
-                BuildingGadgets.LOG.trace("Too many Blocks detected!", e);
-                onTooManyBlocks(stack, player);
-            } catch (TransactionExecutionException e) {
-                BuildingGadgets.LOG.error("Transaction Execution failed synchronously!", e);
-                onCopyFail(stack, player);
-            }
-        });
+        CopyScheduler.scheduleCopy((map, region) -> {
+            Template newTemplate = new Template(map,
+                    TemplateHeader.builder(region)
+                            .name("Copy " + getAndIncrementCopyCounter(stack))
+                            .author(player.getName().getUnformattedComponentText())
+                            .build());
+            onCopyFinished(newTemplate.normalize(), stack, player);
+        }, buildView, Config.GADGETS.GADGET_COPY_PASTE.copySteps.get());
     }
 
-    private void performTransactionAsync(ItemStack stack, ITemplateTransaction transaction, IBuildContext context) {
-        assert context.getBuildingPlayer() != null;
-        PlayerEntity player = context.getBuildingPlayer();
-        if (! TransactionPoolExecutor.INSTANCE.submitTask(() -> {
-            try {
-                transaction.execute(context);
-                ServerTickingScheduler.runOnServerOnce(() -> onCopyFinished(stack, context.getBuildingPlayer()));
-            } catch (ToManyDifferentBlockDataInstances e) {
-                BuildingGadgets.LOG.trace("Too many different Blocks detected!", e);
-                ServerTickingScheduler.runOnServerOnce(() -> onTooManyDifferentBlocks(stack, player));
-            } catch (BlockPosOutOfBounds e) {
-                BuildingGadgets.LOG.trace("Too large Area detected!", e);
-                ServerTickingScheduler.runOnServerOnce(() -> onTooBigArea(stack, player));
-            } catch (TransactionResultExceedsTemplateSizeException e) {
-                BuildingGadgets.LOG.trace("Too many Blocks detected!", e);
-                ServerTickingScheduler.runOnServerOnce(() -> onTooManyBlocks(stack, player));
-            } catch (TransactionExecutionException e) {
-                BuildingGadgets.LOG.error("Transaction Execution failed asynchronously!", e);
-                ServerTickingScheduler.runOnServerOnce(() -> onCopyFail(stack, player));
-            }
-        })) { //could not submit
-            player.sendStatusMessage(MessageTranslation.SERVER_BUSY.componentTranslation().setStyle(Styles.RED), true);
-        }
-    }
-
-    private void onCopyFinished(ItemStack stack, PlayerEntity player) {
+    private void onCopyFinished(Template newTemplate, ItemStack stack, PlayerEntity player) {
         sendMessage(stack, player, MessageTranslation.AREA_COPIED, Styles.DK_GREEN);
-        SaveManager.INSTANCE.getTemplateProvider().requestRemoteUpdate(stack.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY)
-                .orElseThrow(CapabilityNotPresentException::new), (ServerPlayerEntity) player);
-    }
-
-    private void onTooManyDifferentBlocks(ItemStack stack, PlayerEntity player) {
-        sendMessage(stack, player, MessageTranslation.AREA_COPIED_FAILED_TOO_MANY_DIFF, Styles.RED);
-    }
-
-    private void onTooManyBlocks(ItemStack stack, PlayerEntity player) {
-        sendMessage(stack, player, MessageTranslation.AREA_COPIED_FAILED_TOO_MANY, Styles.RED);
-    }
-
-    private void onTooBigArea(ItemStack stack, PlayerEntity player) {
-        sendMessage(stack, player, MessageTranslation.AREA_COPIED_FAILED_TOO_BIG, Styles.RED);
-    }
-
-    private void onCopyFail(ItemStack stack, PlayerEntity player) {
-        sendMessage(stack, player, MessageTranslation.AREA_COPIED_FAILED, Styles.RED);
+        ITemplateKey key = stack.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).orElseThrow(CapabilityNotPresentException::new);
+        SaveManager.INSTANCE.getTemplateProvider().setTemplate(key, newTemplate);
+        SaveManager.INSTANCE.getTemplateProvider().requestRemoteUpdate(key, (ServerPlayerEntity) player);
     }
 
     private void build(ItemStack stack, World world, PlayerEntity player, BlockPos pos) {
         world.getCapability(CapabilityTemplate.TEMPLATE_PROVIDER_CAPABILITY).ifPresent(provider -> {
             stack.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(key -> {
-                ITemplate template = provider.getTemplateForKey(key);
-                SimpleBuildOpenOptions openOptions = SimpleBuildOpenOptions.withContext(SimpleBuildContext.builder()
+                Template template = provider.getTemplateForKey(key);
+                IBuildContext buildContext = SimpleBuildContext.builder()
                         .usedStack(stack)
                         .buildingPlayer(player)
-                        .build(world));
-                IBuildView view = template.createViewInContext(openOptions);
-                if (view != null)
-                    schedulePlacement(stack, view, player, pos);
-                else
-                    notifyGadgetBusy(stack, player);
+                        .build(world);
+                IBuildView view = template.createViewInContext(buildContext);
+                schedulePlacement(stack, view, player, pos);
             });
         });
 

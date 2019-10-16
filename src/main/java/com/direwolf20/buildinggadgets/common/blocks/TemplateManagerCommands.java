@@ -1,24 +1,15 @@
 package com.direwolf20.buildinggadgets.common.blocks;
 
 import com.direwolf20.buildinggadgets.common.containers.TemplateManagerContainer;
-import com.direwolf20.buildinggadgets.common.items.ITemplate;
-import com.direwolf20.buildinggadgets.common.items.Template;
 import com.direwolf20.buildinggadgets.common.registry.OurItems;
-import com.direwolf20.buildinggadgets.common.save.WorldSave;
-import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
-import com.direwolf20.buildinggadgets.common.util.tools.UniqueItem;
-import com.google.common.collect.Multiset;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.World;
 
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -28,6 +19,7 @@ public class TemplateManagerCommands {
     private static final Set<Item> allowedItemsRight = Stream.of(Items.PAPER, OurItems.template).collect(Collectors.toSet());
 
     public static void loadTemplate(TemplateManagerContainer container, PlayerEntity player) {
+        /*
         ItemStack itemStack0 = container.getSlot(0).getStack();
         ItemStack itemStack1 = container.getSlot(1).getStack();
         if (!(itemStack0.getItem() instanceof ITemplate) || !(allowedItemsRight.contains(itemStack1.getItem()))) {
@@ -64,18 +56,20 @@ public class TemplateManagerCommands {
             worldSave.addToMap(UUID, tagCompound);
         } else {
             templateWorldSave.addToMap(UUID, tagCompound);
-            Template.setName(itemStack0, Template.getName(itemStack1));
+            TemplateItem.setName(itemStack0, TemplateItem.getName(itemStack1));
         }
         container.putStackInSlot(0, itemStack0);
         //PacketHandler.sendTo(new PacketBlockMap(tagCompound), (ServerPlayerEntity) player);
+         */
     }
 
     public static void saveTemplate(TemplateManagerContainer container, PlayerEntity player, String templateName) {
+        /*
         ItemStack itemStack0 = container.getSlot(0).getStack();
         ItemStack itemStack1 = container.getSlot(1).getStack();
 
-        if (itemStack0.isEmpty() && itemStack1.getItem() instanceof Template && !templateName.isEmpty()) {
-            Template.setName(itemStack1, templateName);
+        if (itemStack0.isEmpty() && itemStack1.getItem() instanceof TemplateItem && !templateName.isEmpty()) {
+            TemplateItem.setName(itemStack1, templateName);
             container.putStackInSlot(1, itemStack1);
             return;
         }
@@ -116,16 +110,17 @@ public class TemplateManagerCommands {
         template.setEndPos(templateStack, endPos);
         template.setItemCountMap(templateStack, tagMap);
         if (isTool) {
-            Template.setName(templateStack, templateName);
+            TemplateItem.setName(templateStack, templateName);
         } else {
             if (templateName.isEmpty()) {
-                Template.setName(templateStack, Template.getName(itemStack0));
+                TemplateItem.setName(templateStack, TemplateItem.getName(itemStack0));
             } else {
-                Template.setName(templateStack, templateName);
+                TemplateItem.setName(templateStack, templateName);
             }
         }
         container.putStackInSlot(1, templateStack);
         //PacketHandler.sendTo(new PacketBlockMap(templateTagCompound), (ServerPlayerEntity) player);
+         */
     }
 
     public static void pasteTemplate(TemplateManagerContainer container, PlayerEntity player, CompoundNBT sentTagCompound, String templateName) {
@@ -145,7 +140,7 @@ public class TemplateManagerCommands {
         templateStack = container.getSlot(1).getStack();
 
         WorldSave templateWorldSave = WorldSave.getTemplateWorldSave(world);
-        Template template = OurItems.template;
+        TemplateItem template = OurItems.template;
         String UUIDTemplate = template.getUUID(templateStack);
         if (UUIDTemplate == null) return;
 
@@ -199,7 +194,7 @@ public class TemplateManagerCommands {
         template.setEndPos(templateStack, endPos);
 
         template.setItemCountMap(templateStack, itemCountMap);
-        Template.setName(templateStack, templateName);
+        TemplateItem.setName(templateStack, templateName);
         container.putStackInSlot(1, templateStack);
         PacketHandler.sendTo(new PacketBlockMap(templateTagCompound), (ServerPlayerEntity) player);
          */
@@ -208,7 +203,7 @@ public class TemplateManagerCommands {
     public static void copyTemplate(TemplateManagerContainer container) {
         /*
         ItemStack itemStack0 = container.getSlot(0).getStack();
-        if (itemStack0.getItem() instanceof ITemplate) {
+        if (itemStack0.getItem() instanceof TemplateItem) {
             CompoundNBT tagCompound = PasteToolBufferBuilder.getTagFromUUID(OurItems.gadgetCopyPaste.getUUID(itemStack0));
             if (tagCompound == null) {
                 Minecraft.getInstance().player.sendStatusMessage(new StringTextComponent(TextFormatting.RED + new TranslationTextComponent("message.gadget.copyfailed").getUnformattedComponentText()), false);
@@ -231,7 +226,7 @@ public class TemplateManagerCommands {
                     pasteIsTooLarge();
                 }
             } catch (IOException e) {
-                BuildingGadgets.LOG.error("Failed to evaluate template network size. Template will be considered too large.", e);
+                BuildingGadgets.LOG.error("Failed to evaluate template network size. TemplateItem will be considered too large.", e);
                 pasteIsTooLarge();
             }
         }

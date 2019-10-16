@@ -1,14 +1,13 @@
 package com.direwolf20.buildinggadgets.common.concurrent;
 
-import com.direwolf20.buildinggadgets.api.building.PlacementTarget;
-import com.direwolf20.buildinggadgets.api.building.view.IBuildView;
-import com.direwolf20.buildinggadgets.api.exceptions.TemplateException;
 import com.direwolf20.buildinggadgets.common.blocks.EffectBlock;
 import com.direwolf20.buildinggadgets.common.blocks.EffectBlock.Mode;
+import com.direwolf20.buildinggadgets.common.building.PlacementTarget;
+import com.direwolf20.buildinggadgets.common.building.placement.PlacementChecker;
+import com.direwolf20.buildinggadgets.common.building.placement.PlacementChecker.CheckResult;
+import com.direwolf20.buildinggadgets.common.building.view.IBuildView;
 import com.direwolf20.buildinggadgets.common.save.Undo;
 import com.direwolf20.buildinggadgets.common.save.Undo.Builder;
-import com.direwolf20.buildinggadgets.common.util.tools.building.PlacementChecker;
-import com.direwolf20.buildinggadgets.common.util.tools.building.PlacementChecker.CheckResult;
 import com.google.common.base.Preconditions;
 
 import java.util.Objects;
@@ -21,46 +20,28 @@ public final class PlacementScheduler extends SteppedScheduler {
         PlacementScheduler res = new PlacementScheduler(
                 Objects.requireNonNull(view),
                 Objects.requireNonNull(checker),
-                steps, true);
+                steps);
         ServerTickingScheduler.runTicked(res);
         return res;
     }
 
-    public static PlacementScheduler schedulePlacementNoClose(IBuildView view, PlacementChecker checker, int steps) {
-        Preconditions.checkArgument(steps > 0);
-        PlacementScheduler res = new PlacementScheduler(
-                Objects.requireNonNull(view),
-                Objects.requireNonNull(checker),
-                steps, false);
-        ServerTickingScheduler.runTicked(res);
-        return res;
-    }
     private final IBuildView view;
     private final Spliterator<PlacementTarget> spliterator;
     private final PlacementChecker checker;
-    private final boolean close;
     private boolean lastWasSuccess;
     private Consumer<PlacementScheduler> finisher;
     private Undo.Builder undoBuilder;
 
-    private PlacementScheduler(IBuildView view, PlacementChecker checker, int steps, boolean close) {
+    private PlacementScheduler(IBuildView view, PlacementChecker checker, int steps) {
         super(steps);
         this.checker = checker;
         this.view = view;
         this.spliterator = view.spliterator();
-        this.close = close;
         this.undoBuilder = Undo.builder();
         this.finisher = p -> {};
     }
     @Override
     protected void onFinish() {
-        if (close) {
-            try {
-                view.close();
-            } catch (TemplateException e) {
-                throw new RuntimeException("Attempt to close Template-IBuildView failed!", e);
-            }
-        }
         finisher.accept(this);
     }
 

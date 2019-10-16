@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.common.util.helpers;
 
-import com.direwolf20.buildinggadgets.api.building.PlacementTarget;
+import com.direwolf20.buildinggadgets.common.building.PlacementTarget;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
 

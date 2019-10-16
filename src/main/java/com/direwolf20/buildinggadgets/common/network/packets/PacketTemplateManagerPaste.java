@@ -64,7 +64,7 @@ public class PacketTemplateManagerPaste {
                     TemplateManagerContainer container = ((TemplateManagerTileEntity) te).getContainer(player);
                     TemplateManagerCommands.pasteTemplate(container, player, newTag, msg.templateName);
                 } catch (IOException e) {
-                    BuildingGadgets.LOG.error("Template Manager paste failed", e);
+                    BuildingGadgets.LOG.error("TemplateItem Manager paste failed", e);
                 }
             });
             ctx.get().setPacketHandled(true);

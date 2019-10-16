@@ -1,15 +1,12 @@
 package com.direwolf20.buildinggadgets.common.save;
 
-import com.direwolf20.buildinggadgets.api.exceptions.IllegalTemplateFormatException;
-import com.direwolf20.buildinggadgets.api.template.DelegatingTemplate;
-import com.direwolf20.buildinggadgets.api.template.ITemplate;
-import com.direwolf20.buildinggadgets.api.template.ImmutableTemplate;
-import com.direwolf20.buildinggadgets.api.template.TemplateIO;
 import com.direwolf20.buildinggadgets.common.save.TemplateSave.TemplateInfo;
+import com.direwolf20.buildinggadgets.common.template.Template;
+import com.direwolf20.buildinggadgets.common.util.exceptions.IllegalTemplateFormatException;
+import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import net.minecraft.nbt.CompoundNBT;
 
 import java.util.UUID;
-import java.util.function.Function;
 
 public final class TemplateSave extends TimedDataSave<TemplateInfo> {
 
@@ -17,17 +14,12 @@ public final class TemplateSave extends TimedDataSave<TemplateInfo> {
         super(name);
     }
 
-    public ITemplate getTemplate(UUID id, Function<UUID, ITemplate> factory) {
-        TemplateInfo info = get(id, uuid -> new TemplateInfo(factory.apply(uuid)));
+    public Template getTemplate(UUID id) {
+        TemplateInfo info = get(id, uuid -> new TemplateInfo());
         return markDirtyAndUpdate(info).getTemplate();
     }
 
-    public ITemplate getTemplate(UUID id) {
-        TemplateInfo info = get(id);
-        return markDirtyAndUpdate(info).getTemplate();
-    }
-
-    void setTemplate(UUID id, ITemplate template) {
+    void setTemplate(UUID id, Template template) {
         markDirtyAndUpdate(get(id, uuid -> new TemplateInfo(template))).setTemplate(template);
     }
 
@@ -46,7 +38,7 @@ public final class TemplateSave extends TimedDataSave<TemplateInfo> {
         try {
             return new TemplateInfo(nbt);
         } catch (IllegalTemplateFormatException e) {
-            throw new RuntimeException("Failed to read Template! This should not have been possible!", e);
+            throw new RuntimeException("Failed to read TemplateItem! This should not have been possible!", e);
         }
     }
 
@@ -56,33 +48,32 @@ public final class TemplateSave extends TimedDataSave<TemplateInfo> {
     }
 
     static final class TemplateInfo extends TimedDataSave.TimedValue { //for reasons I don't understand it doesn't compile if you leave the TimedDataSave out!
-        private ITemplate template;
+        private Template template;
 
         private TemplateInfo(CompoundNBT nbt) throws IllegalTemplateFormatException {
             super(nbt);
-            template = TemplateIO.readTemplate(nbt, null, true);
+            template = Template.deserialize(nbt.getCompound(NBTKeys.KEY_DATA), null, true);
         }
 
-        private TemplateInfo(ITemplate template) {
+        private TemplateInfo(Template template) {
             super();
             this.template = template;
         }
 
-        private TemplateInfo(long lastUpdateTime, ITemplate template) {
+        private TemplateInfo(long lastUpdateTime, Template template) {
             super(lastUpdateTime);
             this.template = template;
         }
 
         private TemplateInfo() {
-            super();
-            this.template = new DelegatingTemplate(ImmutableTemplate.create());
+            this(new Template());
         }
 
-        private ITemplate getTemplate() {
+        private Template getTemplate() {
             return template;
         }
 
-        public TemplateInfo setTemplate(ITemplate template) {
+        public TemplateInfo setTemplate(Template template) {
             this.template = template;
             return this;
         }
@@ -95,7 +86,7 @@ public final class TemplateSave extends TimedDataSave<TemplateInfo> {
         @Override
         public CompoundNBT write() {
             CompoundNBT nbt = super.write();
-            TemplateIO.writeTemplate(template, nbt, true);
+            nbt.put(NBTKeys.KEY_DATA, template.serialize(true));
             return nbt;
         }
     }

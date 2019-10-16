@@ -1,8 +1,8 @@
 package com.direwolf20.buildinggadgets.common.capability;
 
-import com.direwolf20.buildinggadgets.api.building.BlockData;
-import com.direwolf20.buildinggadgets.api.building.IBlockProvider;
-import com.direwolf20.buildinggadgets.api.building.TranslationWrapper;
+import com.direwolf20.buildinggadgets.common.building.BlockData;
+import com.direwolf20.buildinggadgets.common.building.IBlockProvider;
+import com.direwolf20.buildinggadgets.common.building.TranslationWrapper;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;

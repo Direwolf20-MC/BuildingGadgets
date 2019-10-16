@@ -1,18 +1,18 @@
 package com.direwolf20.buildinggadgets.client.events;
 
-import com.direwolf20.buildinggadgets.api.building.view.IBuildContext;
-import com.direwolf20.buildinggadgets.api.building.view.SimpleBuildContext;
-import com.direwolf20.buildinggadgets.api.capability.CapabilityTemplate;
-import com.direwolf20.buildinggadgets.api.materials.MaterialList;
-import com.direwolf20.buildinggadgets.api.materials.inventory.IUniqueObject;
-import com.direwolf20.buildinggadgets.api.materials.inventory.UniqueItem;
-import com.direwolf20.buildinggadgets.api.serialisation.TemplateHeader;
-import com.direwolf20.buildinggadgets.api.template.ITemplate;
 import com.direwolf20.buildinggadgets.client.cache.RemoteInventoryCache;
+import com.direwolf20.buildinggadgets.common.building.view.IBuildContext;
+import com.direwolf20.buildinggadgets.common.building.view.SimpleBuildContext;
+import com.direwolf20.buildinggadgets.common.capability.CapabilityTemplate;
+import com.direwolf20.buildinggadgets.common.inventory.IItemIndex;
+import com.direwolf20.buildinggadgets.common.inventory.InventoryHelper;
+import com.direwolf20.buildinggadgets.common.inventory.MatchResult;
+import com.direwolf20.buildinggadgets.common.inventory.materials.MaterialList;
+import com.direwolf20.buildinggadgets.common.inventory.materials.objects.IUniqueObject;
+import com.direwolf20.buildinggadgets.common.inventory.materials.objects.UniqueItem;
 import com.direwolf20.buildinggadgets.common.registry.OurItems;
-import com.direwolf20.buildinggadgets.common.util.inventory.IItemIndex;
-import com.direwolf20.buildinggadgets.common.util.inventory.InventoryHelper;
-import com.direwolf20.buildinggadgets.common.util.inventory.MatchResult;
+import com.direwolf20.buildinggadgets.common.template.Template;
+import com.direwolf20.buildinggadgets.common.template.TemplateHeader;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMultiset;
@@ -59,13 +59,13 @@ public class EventTooltip {
             return;
         mc.world.getCapability(CapabilityTemplate.TEMPLATE_PROVIDER_CAPABILITY).ifPresent(provider -> {
             stack.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(templateKey -> {
-                ITemplate template = provider.getTemplateForKey(templateKey);
+                Template template = provider.getTemplateForKey(templateKey);
                 IItemIndex index = InventoryHelper.index(stack, mc.player);
                 IBuildContext buildContext = SimpleBuildContext.builder()
                         .usedStack(stack)
                         .buildingPlayer(mc.player)
                         .build(mc.world);
-                TemplateHeader header = template.getSerializer().createHeaderAndTryForceMaterials(template, buildContext);
+                TemplateHeader header = template.getHeaderAndForceMaterials(buildContext);
                 MaterialList list = header.getRequiredItems();
                 if (list == null)
                     list = MaterialList.empty();
@@ -94,13 +94,13 @@ public class EventTooltip {
         Minecraft mc = Minecraft.getInstance();
         mc.world.getCapability(CapabilityTemplate.TEMPLATE_PROVIDER_CAPABILITY).ifPresent(provider -> {
             stack.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(templateKey -> {
-                ITemplate template = provider.getTemplateForKey(templateKey);
+                Template template = provider.getTemplateForKey(templateKey);
                 IItemIndex index = InventoryHelper.index(stack, mc.player);
                 IBuildContext buildContext = SimpleBuildContext.builder()
                         .usedStack(stack)
                         .buildingPlayer(mc.player)
                         .build(mc.world);
-                TemplateHeader header = template.getSerializer().createHeaderAndTryForceMaterials(template, buildContext);
+                TemplateHeader header = template.getHeaderAndForceMaterials(buildContext);
                 MaterialList list = header.getRequiredItems();
                 if (list == null)
                     list = MaterialList.empty();

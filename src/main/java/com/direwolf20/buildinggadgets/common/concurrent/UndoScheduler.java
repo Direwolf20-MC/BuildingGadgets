@@ -1,14 +1,14 @@
 package com.direwolf20.buildinggadgets.common.concurrent;
 
-import com.direwolf20.buildinggadgets.api.building.PlacementTarget;
-import com.direwolf20.buildinggadgets.api.building.view.IBuildContext;
 import com.direwolf20.buildinggadgets.common.blocks.EffectBlock;
 import com.direwolf20.buildinggadgets.common.blocks.EffectBlock.Mode;
+import com.direwolf20.buildinggadgets.common.building.PlacementTarget;
+import com.direwolf20.buildinggadgets.common.building.view.IBuildContext;
+import com.direwolf20.buildinggadgets.common.inventory.IItemIndex;
+import com.direwolf20.buildinggadgets.common.inventory.MatchResult;
 import com.direwolf20.buildinggadgets.common.save.Undo;
 import com.direwolf20.buildinggadgets.common.save.Undo.BlockInfo;
 import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
-import com.direwolf20.buildinggadgets.common.util.inventory.IItemIndex;
-import com.direwolf20.buildinggadgets.common.util.inventory.MatchResult;
 import com.google.common.base.Preconditions;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemUseContext;

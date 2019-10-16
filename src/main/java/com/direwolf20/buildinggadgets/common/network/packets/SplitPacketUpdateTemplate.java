@@ -1,11 +1,11 @@
 package com.direwolf20.buildinggadgets.common.network.packets;
 
-import com.direwolf20.buildinggadgets.api.template.ITemplate;
-import com.direwolf20.buildinggadgets.api.template.TemplateIO;
-import com.direwolf20.buildinggadgets.api.template.provider.SimpleTemplateKey;
 import com.direwolf20.buildinggadgets.client.ClientProxy;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.save.SaveManager;
+import com.direwolf20.buildinggadgets.common.template.SimpleTemplateKey;
+import com.direwolf20.buildinggadgets.common.template.Template;
+import com.direwolf20.buildinggadgets.common.template.TemplateIO;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.network.NetworkEvent.Context;
@@ -17,7 +17,7 @@ import java.util.UUID;
 import java.util.function.Supplier;
 
 public final class SplitPacketUpdateTemplate extends UUIDPacket {
-    private final ITemplate template;
+    private final Template template;
 
     public SplitPacketUpdateTemplate(PacketBuffer buffer) {
         super(buffer);
@@ -26,11 +26,11 @@ public final class SplitPacketUpdateTemplate extends UUIDPacket {
         try {
             template = TemplateIO.readTemplate(new ByteArrayInputStream(bytes), null);
         } catch (IOException e) {
-            throw new RuntimeException("Failed to read Template from buffer!", e);
+            throw new RuntimeException("Failed to read TemplateItem from buffer!", e);
         }
     }
 
-    public SplitPacketUpdateTemplate(UUID id, ITemplate template) {
+    public SplitPacketUpdateTemplate(UUID id, Template template) {
         super(id);
         this.template = template;
     }
@@ -42,7 +42,7 @@ public final class SplitPacketUpdateTemplate extends UUIDPacket {
             TemplateIO.writeTemplate(template, stream);
             buffer.writeBytes(stream.toByteArray());
         } catch (IOException e) {
-            BuildingGadgets.LOG.error("Failed to write Template during Packet Encoding!", e);
+            BuildingGadgets.LOG.error("Failed to write TemplateItem during Packet Encoding!", e);
         }
     }
 

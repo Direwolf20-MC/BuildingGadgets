@@ -1,22 +1,21 @@
 package com.direwolf20.buildinggadgets.common.save;
 
-import com.direwolf20.buildinggadgets.api.BuildingGadgetsAPI;
-import com.direwolf20.buildinggadgets.api.Registries;
-import com.direwolf20.buildinggadgets.api.building.BlockData;
-import com.direwolf20.buildinggadgets.api.building.Region;
-import com.direwolf20.buildinggadgets.api.building.tilesupport.ITileEntityData;
-import com.direwolf20.buildinggadgets.api.building.tilesupport.NBTTileEntityData;
-import com.direwolf20.buildinggadgets.api.building.tilesupport.TileSupport;
-import com.direwolf20.buildinggadgets.api.materials.inventory.IUniqueObject;
-import com.direwolf20.buildinggadgets.api.materials.inventory.IUniqueObjectSerializer;
-import com.direwolf20.buildinggadgets.api.serialisation.ITileDataSerializer;
-import com.direwolf20.buildinggadgets.api.serialisation.SerialisationSupport;
-import com.direwolf20.buildinggadgets.api.util.DataCompressor;
-import com.direwolf20.buildinggadgets.api.util.DataDecompressor;
-import com.direwolf20.buildinggadgets.api.util.RegistryUtils;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
+import com.direwolf20.buildinggadgets.common.building.BlockData;
+import com.direwolf20.buildinggadgets.common.building.Region;
+import com.direwolf20.buildinggadgets.common.building.tilesupport.ITileDataSerializer;
+import com.direwolf20.buildinggadgets.common.building.tilesupport.ITileEntityData;
+import com.direwolf20.buildinggadgets.common.building.tilesupport.NBTTileEntityData;
+import com.direwolf20.buildinggadgets.common.building.tilesupport.TileSupport;
+import com.direwolf20.buildinggadgets.common.inventory.materials.objects.IUniqueObject;
+import com.direwolf20.buildinggadgets.common.inventory.materials.objects.IUniqueObjectSerializer;
+import com.direwolf20.buildinggadgets.common.registry.Registries;
+import com.direwolf20.buildinggadgets.common.template.SerialisationSupport;
+import com.direwolf20.buildinggadgets.common.util.compression.DataCompressor;
+import com.direwolf20.buildinggadgets.common.util.compression.DataDecompressor;
 import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
+import com.direwolf20.buildinggadgets.common.util.tools.RegistryUtils;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.ImmutableMap;
@@ -58,7 +57,7 @@ public final class Undo {
                     return serializer;
                 },
                 value -> {
-                    BuildingGadgetsAPI.LOG.warn("Attempted to query unknown serializer {}. Replacing with dummy!", value);
+                    BuildingGadgets.LOG.warn("Attempted to query unknown serializer {}. Replacing with dummy!", value);
                     return TileSupport.dummyTileEntityData().getSerializer();
                 });
         DataDecompressor<BlockData> dataReverseObjectIncrementer = new DataDecompressor<>(
@@ -75,7 +74,7 @@ public final class Undo {
                     return serializer;
                 },
                 value -> {
-                    BuildingGadgetsAPI.LOG.warn("Attempted to query unknown item-serializer {}. Replacing with default!", value);
+                    BuildingGadgets.LOG.warn("Attempted to query unknown item-serializer {}. Replacing with default!", value);
                     return SerialisationSupport.uniqueItemSerializer();
                 });
         DataDecompressor<Multiset<IUniqueObject<?>>> itemSetReverseObjectIncrementer = new DataDecompressor<>(

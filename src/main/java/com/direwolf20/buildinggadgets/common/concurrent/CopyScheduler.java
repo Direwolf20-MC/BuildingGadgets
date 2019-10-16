@@ -1,19 +1,20 @@
 package com.direwolf20.buildinggadgets.common.concurrent;
 
-import com.direwolf20.buildinggadgets.api.building.BlockData;
-import com.direwolf20.buildinggadgets.api.building.PlacementTarget;
-import com.direwolf20.buildinggadgets.api.building.view.IBuildContext;
-import com.direwolf20.buildinggadgets.api.building.view.IBuildView;
+import com.direwolf20.buildinggadgets.common.building.BlockData;
+import com.direwolf20.buildinggadgets.common.building.PlacementTarget;
+import com.direwolf20.buildinggadgets.common.building.Region;
+import com.direwolf20.buildinggadgets.common.building.view.IBuildContext;
+import com.direwolf20.buildinggadgets.common.building.view.IBuildView;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import net.minecraft.util.math.BlockPos;
 
 import java.util.Objects;
 import java.util.Spliterator;
-import java.util.function.Consumer;
+import java.util.function.BiConsumer;
 
 public final class CopyScheduler extends SteppedScheduler {
-    public static void scheduleCopy(Consumer<ImmutableMap<BlockPos, BlockData>> finisher, IBuildView worldView, int steps) {
+    public static void scheduleCopy(BiConsumer<ImmutableMap<BlockPos, BlockData>, Region> finisher, IBuildView worldView, int steps) {
         Preconditions.checkArgument(steps > 0);
         ServerTickingScheduler.runTicked(new CopyScheduler(
                 Objects.requireNonNull(finisher),
@@ -22,29 +23,35 @@ public final class CopyScheduler extends SteppedScheduler {
         ));
     }
 
-    private final Consumer<ImmutableMap<BlockPos, BlockData>> finisher;
+    private final BiConsumer<ImmutableMap<BlockPos, BlockData>, Region> finisher;
     private final Spliterator<PlacementTarget> targets;
     private final ImmutableMap.Builder<BlockPos, BlockData> builder;
+    private Region.Builder regionBuilder;
     private final IBuildContext context;
 
-    private CopyScheduler(Consumer<ImmutableMap<BlockPos, BlockData>> finisher, IBuildView worldView, int steps) {
+    private CopyScheduler(BiConsumer<ImmutableMap<BlockPos, BlockData>, Region> finisher, IBuildView worldView, int steps) {
         super(steps);
         this.finisher = finisher;
         this.targets = worldView.spliterator();
-        builder = ImmutableMap.builder();
+        this.builder = ImmutableMap.builder();
         this.context = worldView.getContext();
+        this.regionBuilder = null;
     }
 
     @Override
     protected StepResult advance() {
         return StepResult.ofBoolean(targets.tryAdvance(t -> {
-            if (! t.getData().getState().isAir(context.getWorld(), t.getPos()))
+            if (! t.getData().getState().isAir(context.getWorld(), t.getPos())) {
                 builder.put(t.getPos(), t.getData());
+                if (regionBuilder == null)
+                    regionBuilder = Region.enclosingBuilder();
+                regionBuilder.enclose(t.getPos());
+            }
         }));
     }
 
     @Override
     protected void onFinish() {
-        finisher.accept(builder.build());
+        finisher.accept(builder.build(), regionBuilder != null ? regionBuilder.build() : Region.singleZero());
     }
 }

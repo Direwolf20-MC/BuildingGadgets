@@ -1,13 +1,13 @@
 package com.direwolf20.buildinggadgets.client.gui.materiallist;
 
-import com.direwolf20.buildinggadgets.api.building.view.IBuildContext;
-import com.direwolf20.buildinggadgets.api.building.view.SimpleBuildContext;
-import com.direwolf20.buildinggadgets.api.capability.CapabilityTemplate;
-import com.direwolf20.buildinggadgets.api.serialisation.TemplateHeader;
-import com.direwolf20.buildinggadgets.api.template.ITemplate;
-import com.direwolf20.buildinggadgets.api.template.provider.ITemplateKey;
-import com.direwolf20.buildinggadgets.api.template.provider.ITemplateProvider;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
+import com.direwolf20.buildinggadgets.common.building.view.IBuildContext;
+import com.direwolf20.buildinggadgets.common.building.view.SimpleBuildContext;
+import com.direwolf20.buildinggadgets.common.capability.CapabilityTemplate;
+import com.direwolf20.buildinggadgets.common.template.ITemplateKey;
+import com.direwolf20.buildinggadgets.common.template.ITemplateProvider;
+import com.direwolf20.buildinggadgets.common.template.Template;
+import com.direwolf20.buildinggadgets.common.template.TemplateHeader;
 import com.direwolf20.buildinggadgets.common.util.lang.MaterialListTranslation;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.google.common.base.Preconditions;
@@ -149,12 +149,12 @@ public class MaterialListGUI extends Screen implements ITemplateProvider.IUpdate
     }
 
     public TemplateHeader evaluateTemplateHeader() {
-        ITemplate template = getTemplateCapability();
+        Template template = getTemplateCapability();
         IBuildContext context = SimpleBuildContext.builder()
                 .buildingPlayer(getMinecraft().player)
                 .usedStack(getTemplateItem())
                 .build(getMinecraft().world);
-        return template.getSerializer().createHeaderAndTryForceMaterials(template, context);
+        return template.getHeaderAndForceMaterials(context);
     }
 
     public TemplateHeader getHeader() {
@@ -224,7 +224,7 @@ public class MaterialListGUI extends Screen implements ITemplateProvider.IUpdate
         return item;
     }
 
-    public ITemplate getTemplateCapability() {
+    public Template getTemplateCapability() {
         LazyOptional<ITemplateProvider> providerCap = Minecraft.getInstance().world.getCapability(CapabilityTemplate.TEMPLATE_PROVIDER_CAPABILITY);
         if (providerCap.isPresent()) {
             LazyOptional<ITemplateKey> keyCap = item.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY);
@@ -250,7 +250,7 @@ public class MaterialListGUI extends Screen implements ITemplateProvider.IUpdate
     }
 
     @Override
-    public void onTemplateUpdate(ITemplateProvider provider, ITemplateKey key, ITemplate template) {
+    public void onTemplateUpdate(ITemplateProvider provider, ITemplateKey key, Template template) {
         item.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(itemKey -> {
             UUID keyId = provider.getId(key);
             UUID itemId = provider.getId(itemKey);

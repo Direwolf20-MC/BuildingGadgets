@@ -5,23 +5,17 @@
 
 package com.direwolf20.buildinggadgets.client.gui.blocks;
 
-import com.direwolf20.buildinggadgets.api.building.view.IBuildView;
-import com.direwolf20.buildinggadgets.api.building.view.SimpleBuildContext;
-import com.direwolf20.buildinggadgets.api.capability.CapabilityTemplate;
-import com.direwolf20.buildinggadgets.api.exceptions.IllegalTemplateFormatException;
-import com.direwolf20.buildinggadgets.api.exceptions.TransactionExecutionException;
-import com.direwolf20.buildinggadgets.api.serialisation.TemplateHeader;
-import com.direwolf20.buildinggadgets.api.template.IBuildOpenOptions;
-import com.direwolf20.buildinggadgets.api.template.ITemplate;
-import com.direwolf20.buildinggadgets.api.template.SimpleBuildOpenOptions;
-import com.direwolf20.buildinggadgets.api.template.TemplateIO;
-import com.direwolf20.buildinggadgets.api.template.transaction.ITemplateTransaction;
-import com.direwolf20.buildinggadgets.api.template.transaction.TemplateTransactions;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
+import com.direwolf20.buildinggadgets.common.building.view.IBuildContext;
+import com.direwolf20.buildinggadgets.common.building.view.SimpleBuildContext;
+import com.direwolf20.buildinggadgets.common.capability.CapabilityTemplate;
 import com.direwolf20.buildinggadgets.common.containers.TemplateManagerContainer;
 import com.direwolf20.buildinggadgets.common.registry.OurItems;
+import com.direwolf20.buildinggadgets.common.template.Template;
+import com.direwolf20.buildinggadgets.common.template.TemplateIO;
 import com.direwolf20.buildinggadgets.common.tiles.TemplateManagerTileEntity;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
+import com.direwolf20.buildinggadgets.common.util.exceptions.IllegalTemplateFormatException;
 import com.direwolf20.buildinggadgets.common.util.lang.GuiTranslation;
 import com.direwolf20.buildinggadgets.common.util.lang.MessageTranslation;
 import com.direwolf20.buildinggadgets.common.util.lang.Styles;
@@ -81,7 +75,7 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
     }
 
     public TemplateManagerGUI(TemplateManagerTileEntity tileEntity, TemplateManagerContainer container, PlayerInventory inv) {
-        super(container, inv, new StringTextComponent("Template Manager Gui")); //TODO find out the usage of this TextComponent
+        super(container, inv, new StringTextComponent("TemplateItem Manager Gui")); //TODO find out the usage of this TextComponent
         this.te = tileEntity;
         this.container = container;
     }
@@ -154,12 +148,12 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
             World world = Minecraft.getInstance().world;
             world.getCapability(CapabilityTemplate.TEMPLATE_PROVIDER_CAPABILITY).ifPresent(provider -> {
                 PlayerEntity player = Minecraft.getInstance().player;
-                IBuildOpenOptions openOptions = SimpleBuildOpenOptions.withContext(SimpleBuildContext.builder()
+                IBuildContext buildContext = SimpleBuildContext.builder()
                         .buildingPlayer(player)
                         .usedStack(stack)
-                        .build(world));
+                        .build(world);
                 try {
-                    String json = TemplateIO.writeTemplateJson(provider.getTemplateForKey(key), openOptions);
+                    String json = TemplateIO.writeTemplateJson(provider.getTemplateForKey(key), buildContext);
                     Minecraft.getInstance().keyboardListener.setClipboardString(json);
                 } catch (IllegalTemplateFormatException e) {
                     e.printStackTrace();
@@ -180,42 +174,21 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
         PlayerEntity player = Minecraft.getInstance().player;
         ItemStack stack = container.getSlot(1).getStack();
         try {
-            //Anything larger than below is likely to overflow the max packet size, crashing your client.
-            ITemplate readTemplate = TemplateIO.readTemplateFromJson(CBString);
-            TemplateHeader header = readTemplate.getSerializer().createHeaderFor(readTemplate);
-            IBuildOpenOptions openOptions = SimpleBuildOpenOptions.withContext(
-                    SimpleBuildContext.builder()
-                            .buildingPlayer(Minecraft.getInstance().player)
-                            .usedStack(stack)
-                            .build(Minecraft.getInstance().world));
-            IBuildView buildView = readTemplate.createViewInContext(openOptions);
+            Template readTemplate = TemplateIO.readTemplateFromJson(CBString).clearMaterials();
             if (! nameField.getText().isEmpty())
-                header = TemplateHeader.builderOf(header).name(nameField.getText()).build();
-            pasteBuildView(world, stack, player, buildView, header);
+                readTemplate = readTemplate.withNameAndAuthor(nameField.getText(), readTemplate.getHeader().getAuthor());
+            pasteBuildView(world, stack, readTemplate);
         } catch (Throwable t) { //TODO make use of exceptions
             BuildingGadgets.LOG.error(t);
             Minecraft.getInstance().player.sendStatusMessage(MessageTranslation.PASTE_FAILED.componentTranslation().setStyle(Styles.RED), false);
         }
     }
 
-    private void pasteBuildView(World world, ItemStack stack, PlayerEntity player, IBuildView view, TemplateHeader otherHeader) {
+    private void pasteBuildView(World world, ItemStack stack, Template newTemplate) {
         world.getCapability(CapabilityTemplate.TEMPLATE_PROVIDER_CAPABILITY).ifPresent(provider -> {
             stack.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(key -> {
-                ITemplate currentTemplate = provider.getTemplateForKey(key);
-                ITemplateTransaction transaction = currentTemplate.startTransaction();
-                if (transaction == null) {//TODO correct message
-                    player.sendStatusMessage(MessageTranslation.GADGET_BUSY.componentTranslation().setStyle(Styles.RED), true);
-                    return;
-                }
-                try {
-                    transaction
-                            .operate(TemplateTransactions.replaceOperator(view))
-                            .operate(TemplateTransactions.headerOperator(otherHeader.getName(), otherHeader.getAuthor()))
-                            .execute(view.getContext());
-                    provider.requestRemoteUpdate(key);
-                } catch (TransactionExecutionException e) { //TODO messages
-                    e.printStackTrace();
-                }
+                provider.setTemplate(key, newTemplate);
+                provider.requestRemoteUpdate(key);
             });
         });
     }

@@ -1,8 +1,6 @@
 package com.direwolf20.buildinggadgets.common.capability;
 
-import com.direwolf20.buildinggadgets.api.template.DelegatingTemplate;
-import com.direwolf20.buildinggadgets.api.template.ITemplate;
-import com.direwolf20.buildinggadgets.api.template.provider.ITemplateKey;
+import com.direwolf20.buildinggadgets.common.template.ITemplateKey;
 import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import net.minecraft.item.ItemStack;
@@ -27,10 +25,5 @@ public final class ItemTemplateKey implements ITemplateKey {
             return newID;
         }
         return nbt.getUniqueId(NBTKeys.TEMPLATE_KEY_ID);
-    }
-
-    @Override
-    public ITemplate createTemplate(UUID id) {
-        return new DelegatingTemplate();
     }
 }

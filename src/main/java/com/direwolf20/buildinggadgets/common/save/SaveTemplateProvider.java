@@ -1,13 +1,13 @@
 package com.direwolf20.buildinggadgets.common.save;
 
-import com.direwolf20.buildinggadgets.api.template.ITemplate;
-import com.direwolf20.buildinggadgets.api.template.provider.ITemplateKey;
-import com.direwolf20.buildinggadgets.api.template.provider.ITemplateProvider;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketRequestTemplate;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketTemplateIdAllocated;
 import com.direwolf20.buildinggadgets.common.network.packets.SplitPacketUpdateTemplate;
+import com.direwolf20.buildinggadgets.common.template.ITemplateKey;
+import com.direwolf20.buildinggadgets.common.template.ITemplateProvider;
+import com.direwolf20.buildinggadgets.common.template.Template;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraftforge.fml.network.PacketDistributor;
 import net.minecraftforge.fml.network.PacketDistributor.PacketTarget;
@@ -34,13 +34,13 @@ public final class SaveTemplateProvider implements ITemplateProvider {
     }
 
     @Override
-    public ITemplate getTemplateForKey(ITemplateKey key) {
+    public Template getTemplateForKey(ITemplateKey key) {
         UUID id = getId(key);
-        return getSave().getTemplate(id, key::createTemplate);
+        return getSave().getTemplate(id);
     }
 
     @Override
-    public void setTemplate(ITemplateKey key, ITemplate template) {
+    public void setTemplate(ITemplateKey key, Template template) {
         getSave().setTemplate(key.getTemplateId(this::getFreeId), template);
         notifyListeners(key, template, l -> l::onTemplateUpdate);
     }
@@ -53,7 +53,7 @@ public final class SaveTemplateProvider implements ITemplateProvider {
     @Override
     public boolean requestRemoteUpdate(ITemplateKey key) {
         UUID id = getId(key);
-        ITemplate template = getSave().getTemplate(id, key::createTemplate);
+        Template template = getSave().getTemplate(id);
         notifyListeners(key, template, l -> l::onTemplateUpdateSend);
         PacketHandler.getSplitManager().send(new SplitPacketUpdateTemplate(id, template), PacketDistributor.ALL.noArg());
         return true;
@@ -81,7 +81,7 @@ public final class SaveTemplateProvider implements ITemplateProvider {
     @Override
     public boolean requestRemoteUpdate(ITemplateKey key, PacketTarget target) {
         UUID id = getId(key);
-        ITemplate template = getSave().getTemplate(id, key::createTemplate);
+        Template template = getSave().getTemplate(id);
         PacketHandler.getSplitManager().send(new SplitPacketUpdateTemplate(id, template), target);
         return true;
     }
@@ -112,7 +112,7 @@ public final class SaveTemplateProvider implements ITemplateProvider {
         PacketHandler.sendToAllClients(new PacketTemplateIdAllocated(allocatedId));
     }
 
-    private void notifyListeners(ITemplateKey key, ITemplate template, Function<IUpdateListener, TriConsumer<ITemplateProvider, ITemplateKey, ITemplate>> function) {
+    private void notifyListeners(ITemplateKey key, Template template, Function<IUpdateListener, TriConsumer<ITemplateProvider, ITemplateKey, Template>> function) {
         for (IUpdateListener listener : updateListeners) {
             try {
                 function.apply(listener).accept(this, key, template);

@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.common.registry;
 
 import com.direwolf20.buildinggadgets.common.config.Config;
-import com.direwolf20.buildinggadgets.common.items.Template;
+import com.direwolf20.buildinggadgets.common.items.TemplateItem;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetBuilding;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetDestruction;
@@ -45,7 +45,7 @@ public final class OurItems {
     @ObjectHolder(ItemReference.CONSTRUCTION_CHUNK_DENSE)
     public static Item constructionChunkDense;
     @ObjectHolder(ItemReference.TEMPLATE)
-    public static Template template;
+    public static TemplateItem template;
 
     // Construction Paste Containers
     @ObjectHolder(ItemReference.PASTE_CONTAINER_T1)
@@ -82,7 +82,7 @@ public final class OurItems {
             add(new Builder(ItemReference.PASTE_CONTAINER_CREATIVE_RL).setBuilder(nonStackableItemProperties()).setFactory(ConstructionPasteContainerCreative::new));
             add(new Builder(ItemReference.CONSTRUCTION_PASTE_RL).setBuilder(itemProperties()).setFactory(ConstructionPaste::new));
             add(new Builder(ItemReference.CONSTRUCTION_CHUNK_DENSE_RL).setBuilder(itemProperties()).setFactory(Item::new));
-            add(new Builder(ItemReference.TEMPLATE_RL).setBuilder(itemProperties()).setFactory(Template::new));
+            add(new Builder(ItemReference.TEMPLATE_RL).setBuilder(itemProperties()).setFactory(TemplateItem::new));
         }});
     }
 
@@ -102,7 +102,7 @@ public final class OurItems {
     }
 
     static Item.Properties itemProperties() {
-        return new Item.Properties().group(RegistryHandler.creativeTab);
+        return new Item.Properties().group(Registries.creativeTab);
     }
 
     private static Item.Properties nonStackableItemProperties() {

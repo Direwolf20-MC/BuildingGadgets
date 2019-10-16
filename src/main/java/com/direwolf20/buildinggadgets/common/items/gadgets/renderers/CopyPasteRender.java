@@ -1,27 +1,25 @@
 package com.direwolf20.buildinggadgets.common.items.gadgets.renderers;
 
-import com.direwolf20.buildinggadgets.api.building.BlockData;
-import com.direwolf20.buildinggadgets.api.building.PlacementTarget;
-import com.direwolf20.buildinggadgets.api.building.Region;
-import com.direwolf20.buildinggadgets.api.building.view.IBuildContext;
-import com.direwolf20.buildinggadgets.api.building.view.IBuildView;
-import com.direwolf20.buildinggadgets.api.building.view.SimpleBuildContext;
-import com.direwolf20.buildinggadgets.api.capability.CapabilityTemplate;
-import com.direwolf20.buildinggadgets.api.exceptions.TemplateException;
-import com.direwolf20.buildinggadgets.api.template.ITemplate;
-import com.direwolf20.buildinggadgets.api.template.SimpleBuildOpenOptions;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
+import com.direwolf20.buildinggadgets.common.building.BlockData;
+import com.direwolf20.buildinggadgets.common.building.PlacementTarget;
+import com.direwolf20.buildinggadgets.common.building.Region;
+import com.direwolf20.buildinggadgets.common.building.placement.InvertedPlacementEvaluator;
+import com.direwolf20.buildinggadgets.common.building.placement.PlacementChecker;
+import com.direwolf20.buildinggadgets.common.building.view.IBuildContext;
+import com.direwolf20.buildinggadgets.common.building.view.IBuildView;
+import com.direwolf20.buildinggadgets.common.building.view.SimpleBuildContext;
+import com.direwolf20.buildinggadgets.common.capability.CapabilityTemplate;
 import com.direwolf20.buildinggadgets.common.config.Config;
+import com.direwolf20.buildinggadgets.common.inventory.IItemIndex;
+import com.direwolf20.buildinggadgets.common.inventory.InventoryHelper;
+import com.direwolf20.buildinggadgets.common.inventory.RecordingItemIndex;
 import com.direwolf20.buildinggadgets.common.items.gadgets.AbstractGadget;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
+import com.direwolf20.buildinggadgets.common.template.Template;
 import com.direwolf20.buildinggadgets.common.util.helpers.SortingHelper.RenderSorter;
 import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
-import com.direwolf20.buildinggadgets.common.util.inventory.IItemIndex;
-import com.direwolf20.buildinggadgets.common.util.inventory.InventoryHelper;
-import com.direwolf20.buildinggadgets.common.util.inventory.RecordingItemIndex;
 import com.direwolf20.buildinggadgets.common.util.tools.SimulateEnergyStorage;
-import com.direwolf20.buildinggadgets.common.util.tools.building.InvertedPlacementEvaluator;
-import com.direwolf20.buildinggadgets.common.util.tools.building.PlacementChecker;
 import com.direwolf20.buildinggadgets.common.world.FakeDelegationWorld;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -147,17 +145,13 @@ public class CopyPasteRender extends BaseRenderer {
         });
     }
 
-    private void performRender(World world, PlayerEntity player, ItemStack stack, BlockPos startPos, ITemplate template, float partialTicks) {
+    private void performRender(World world, PlayerEntity player, ItemStack stack, BlockPos startPos, Template template, float partialTicks) {
         FakeDelegationWorld fakeWorld = new FakeDelegationWorld(world);
         IBuildContext context = SimpleBuildContext.builder()
                 .buildingPlayer(player)
                 .usedStack(stack)
                 .build(fakeWorld);
-        try (IBuildView view = template.createViewInContext(SimpleBuildOpenOptions.withContext(context))) {
-            if (view == null) {
-                BuildingGadgets.LOG.warn("Expected Template to be able to create a build view! Aborting render!");
-                return;
-            }
+        IBuildView view = template.createViewInContext(context);
             view.translateTo(startPos);
             RenderSorter sorter = new RenderSorter(player, view.estimateSize());
             for (PlacementTarget target : view) {
@@ -171,10 +165,6 @@ public class CopyPasteRender extends BaseRenderer {
             if (! player.isCreative())
                 renderMissing(player, stack, view, sorter);
             GlStateManager.disableBlend();
-        } catch (TemplateException e) {
-            BuildingGadgets.LOG.error("Failed to close BuildView!");
-        }
-
     }
 
     private void renderTargets(IBuildContext context, RenderSorter sorter, float partialTicks) {
