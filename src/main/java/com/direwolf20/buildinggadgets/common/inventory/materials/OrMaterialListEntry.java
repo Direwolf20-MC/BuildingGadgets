@@ -3,19 +3,18 @@ package com.direwolf20.buildinggadgets.common.inventory.materials;
 import com.direwolf20.buildinggadgets.common.inventory.materials.objects.IUniqueObject;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.google.common.collect.*;
-import net.minecraft.nbt.CompoundNBT;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 class OrMaterialListEntry extends SubMaterialListEntry {
-    static final MaterialListEntry.Serializer<SubMaterialListEntry> SERIALIZER = new SubMaterialListEntry.Serializer() {
+    static final MaterialListEntry.Serializer<SubMaterialListEntry> SERIALIZER = new SubMaterialListEntry.Serializer(NBTKeys.OR_SERIALIZER_ID) {
         @Override
-        protected SubMaterialListEntry create(ImmutableList<MaterialListEntry<?>> subEntries, ImmutableList<SimpleMaterialListEntry> constantEntries, CompoundNBT nbt, boolean persisted) {
+        protected SubMaterialListEntry create(ImmutableList<MaterialListEntry<?>> subEntries, ImmutableList<SimpleMaterialListEntry> constantEntries) {
             return new OrMaterialListEntry(subEntries, constantEntries);
         }
-    }.setRegistryName(NBTKeys.OR_SERIALIZER_ID);
+    };
 
     OrMaterialListEntry(ImmutableList<MaterialListEntry<?>> subEntries, ImmutableList<SimpleMaterialListEntry> simpleEntries, boolean simplified) {
         super(subEntries, simpleEntries, simplified);

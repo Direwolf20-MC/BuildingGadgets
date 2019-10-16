@@ -15,8 +15,12 @@ public final class JsonKeys {
     public static final String MATERIAL_ENTRIES = "entries";
     public static final String MATERIAL_ENTRY = "entry";
     public static final String MATERIAL_ENTRY_TYPE = "entry_type";
-    public static final String SERIALIZER_INFO_SERIALIZER = "serializer";
-    public static final String SERIALIZER_INFO_SUB_SERIALIZER = "sub_serializer";
+    public static final String HEADER_BOUNDING_BOX = "bounding_box";
+    public static final String HEADER_NAME = "name";
+    public static final String HEADER_AUTHOR = "author";
+    public static final String HEADER_REQUIRED_ITEMS = "material_list";
+    public static final String HEADER_VERSION = "version";
+    public static final String HEADER_MC_VERSION = "mc_version";
 
     private JsonKeys() {}
 

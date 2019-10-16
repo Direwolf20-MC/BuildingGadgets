@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.common.inventory.materials.objects;
 
+import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonSerializer;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraftforge.registries.IForgeRegistryEntry;
@@ -9,5 +10,7 @@ public interface IUniqueObjectSerializer extends IForgeRegistryEntry<IUniqueObje
 
     IUniqueObject<?> deserialize(CompoundNBT res);
 
-    JsonSerializer<IUniqueObject<?>> asJsonSerializer(int count, boolean printName, boolean extended);
+    JsonSerializer<IUniqueObject<?>> asJsonSerializer(boolean printName, boolean extended);
+
+    JsonDeserializer<IUniqueObject<?>> asJsonDeserializer();
 }

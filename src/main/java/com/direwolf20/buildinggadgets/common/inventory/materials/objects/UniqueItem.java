@@ -6,15 +6,19 @@ import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.util.tools.RegistryUtils;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
+import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializer;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import it.unimi.dsi.fastutil.bytes.Byte2ObjectMap;
 import it.unimi.dsi.fastutil.bytes.Byte2ObjectOpenHashMap;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.INBT;
+import net.minecraft.nbt.JsonToNBT;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -199,6 +203,7 @@ public final class UniqueItem implements IUniqueObject<Item> {
     }
 
     public static final class Serializer extends ForgeRegistryEntry<IUniqueObjectSerializer> implements IUniqueObjectSerializer {
+        @Override
         public CompoundNBT serialize(IUniqueObject<?> obj, boolean persisted) {
             UniqueItem item = (UniqueItem) obj;
             CompoundNBT res = new CompoundNBT();
@@ -215,6 +220,7 @@ public final class UniqueItem implements IUniqueObject<Item> {
             return res;
         }
 
+        @Override
         public IUniqueObject<Item> deserialize(CompoundNBT res) {
             Preconditions.checkArgument(res.contains(NBTKeys.KEY_ID), "Cannot construct a UniqueItem without an Item!");
             CompoundNBT nbt = res.getCompound(NBTKeys.KEY_DATA);
@@ -229,26 +235,58 @@ public final class UniqueItem implements IUniqueObject<Item> {
             return new UniqueItem(item, nbt.isEmpty() ? null : nbt, mode, capNbt.isEmpty() ? null : capNbt, capMode);
         }
 
-        public JsonSerializer<IUniqueObject<?>> asJsonSerializer(int count, boolean printName, boolean extended) {
+        @Override
+        public JsonSerializer<IUniqueObject<?>> asJsonSerializer(boolean printName, boolean extended) {
             return (uobj, typeOfSrc, context) -> {
                 JsonObject obj = new JsonObject();
                 UniqueItem element = (UniqueItem) uobj;
                 Item item = element.getIndexObject();
                 if (printName)
-                    obj.addProperty(JsonKeys.MATERIAL_LIST_ITEM_NAME, I18n.format(item.getTranslationKey(element.createStack(count))));
+                    obj.addProperty(JsonKeys.MATERIAL_LIST_ITEM_NAME, I18n.format(item.getTranslationKey(element.createStack())));
                 obj.add(JsonKeys.MATERIAL_LIST_ITEM_ID, context.serialize(element.getIndexObject().getRegistryName()));
-                obj.addProperty(JsonKeys.MATERIAL_LIST_ITEM_COUNT, count);
                 if (extended) {
-                    if (element.tagCompound != null) {
+                    if (element.tagCompound != null && ! element.tagCompound.isEmpty()) {
                         obj.addProperty(JsonKeys.MATERIAL_LIST_ITEM_NBT, element.tagCompound.toString());
                         obj.add(JsonKeys.MATERIAL_LIST_ITEM_NBT_MATCH, context.serialize(element.tagMatch));
                     }
-                    if (element.forgeCaps != null) {
+                    if (element.forgeCaps != null && ! element.forgeCaps.isEmpty()) {
                         obj.addProperty(JsonKeys.MATERIAL_LIST_CAP_NBT, element.forgeCaps.toString());
                         obj.add(JsonKeys.MATERIAL_LIST_CAP_NBT_MATCH, context.serialize(element.capMatch));
                     }
                 }
                 return obj;
+            };
+        }
+
+        @Override
+        public JsonDeserializer<IUniqueObject<?>> asJsonDeserializer() {
+            return (json, typeOfT, context) -> {
+                JsonObject object = json.getAsJsonObject();
+                ResourceLocation registryName = context.deserialize(object.get(JsonKeys.MATERIAL_LIST_ITEM_ID), ResourceLocation.class);
+                Item item = ForgeRegistries.ITEMS.getValue(registryName);
+                if (item == null)
+                    return new UniqueItem(Items.AIR);
+                CompoundNBT tagCompound = null;
+                ComparisonMode tagMatch = ComparisonMode.EXACT_MATCH;
+                if (object.has(JsonKeys.MATERIAL_LIST_ITEM_NBT)) {
+                    try {
+                        tagCompound = JsonToNBT.getTagFromJson(object.getAsJsonPrimitive(JsonKeys.MATERIAL_LIST_ITEM_NBT).getAsString());
+                        tagMatch = context.deserialize(object.get(JsonKeys.MATERIAL_LIST_ITEM_NBT_MATCH), ComparisonMode.class);
+                    } catch (CommandSyntaxException e) {
+                        e.printStackTrace();
+                    }
+                }
+                CompoundNBT forgeCaps = null;
+                ComparisonMode capMatch = ComparisonMode.EXACT_MATCH;
+                if (object.has(JsonKeys.MATERIAL_LIST_CAP_NBT)) {
+                    try {
+                        forgeCaps = JsonToNBT.getTagFromJson(object.getAsJsonPrimitive(JsonKeys.MATERIAL_LIST_CAP_NBT).getAsString());
+                        capMatch = context.deserialize(object.get(JsonKeys.MATERIAL_LIST_CAP_NBT_MATCH), ComparisonMode.class);
+                    } catch (CommandSyntaxException e) {
+                        e.printStackTrace();
+                    }
+                }
+                return new UniqueItem(item, tagCompound, tagMatch, forgeCaps, capMatch);
             };
         }
     }

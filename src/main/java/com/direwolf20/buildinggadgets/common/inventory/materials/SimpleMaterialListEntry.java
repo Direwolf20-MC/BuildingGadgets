@@ -9,22 +9,18 @@ import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.util.tools.RegistryUtils;
 import com.google.common.collect.*;
 import com.google.common.collect.Multiset.Entry;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonSerializer;
+import com.google.gson.*;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.INBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.util.Constants.NBT;
-import net.minecraftforge.registries.ForgeRegistryEntry;
 
 import java.util.Comparator;
 import java.util.Objects;
 
 class SimpleMaterialListEntry implements MaterialListEntry<SimpleMaterialListEntry> {
-    static final MaterialListEntry.Serializer<SimpleMaterialListEntry> SERIALIZER = new Serializer().setRegistryName(NBTKeys.SIMPLE_SERIALIZER_ID);
+    static final MaterialListEntry.Serializer<SimpleMaterialListEntry> SERIALIZER = new Serializer();
     private final ImmutableMultiset<IUniqueObject<?>> items;
 
     SimpleMaterialListEntry(ImmutableMultiset<IUniqueObject<?>> items) {
@@ -50,8 +46,7 @@ class SimpleMaterialListEntry implements MaterialListEntry<SimpleMaterialListEnt
         return this;
     }
 
-    private static class Serializer extends ForgeRegistryEntry<MaterialListEntry.Serializer<SimpleMaterialListEntry>>
-            implements MaterialListEntry.Serializer<SimpleMaterialListEntry> {
+    private static class Serializer implements MaterialListEntry.Serializer<SimpleMaterialListEntry> {
         private static final Comparator<Entry<IUniqueObject<?>>> COMPARATOR = Comparator
                 .<Entry<IUniqueObject<?>>, ResourceLocation>comparing(e -> e.getElement().getObjectRegistryName())
                 .thenComparingInt(Entry::getCount);
@@ -101,15 +96,40 @@ class SimpleMaterialListEntry implements MaterialListEntry<SimpleMaterialListEnt
                 for (Entry<IUniqueObject<?>> entry : ImmutableList.sortedCopyOf(COMPARATOR, set.entrySet())) {
                     JsonElement element = entry.getElement()
                             .getSerializer()
-                            .asJsonSerializer(entry.getCount(), printName, extended)
+                            .asJsonSerializer(printName, extended)
                             .serialize(entry.getElement(), entry.getElement().getClass(), context);
                     JsonObject obj = new JsonObject();
                     obj.add(JsonKeys.MATERIAL_LIST_ITEM_TYPE, context.serialize(entry.getElement().getSerializer().getRegistryName()));
+                    obj.addProperty(JsonKeys.MATERIAL_LIST_ITEM_COUNT, entry.getCount());
                     obj.add(JsonKeys.MATERIAL_LIST_ITEM, element);
                     jsonArray.add(obj);
                 }
                 return jsonArray;
             };
+        }
+
+        @Override
+        public JsonDeserializer<SimpleMaterialListEntry> asJsonDeserializer() {
+            return (json, typeOfT, context) -> {
+                JsonArray array = json.getAsJsonArray();
+                ImmutableMultiset.Builder<IUniqueObject<?>> items = ImmutableMultiset.builder();
+                for (JsonElement element : array) {
+                    JsonObject object = element.getAsJsonObject();
+                    ResourceLocation id = context.deserialize(object.get(JsonKeys.MATERIAL_LIST_ITEM_TYPE), ResourceLocation.class);
+                    IUniqueObjectSerializer serializer = Registries.getUniqueObjectSerializers().getValue(id);
+                    if (serializer == null)
+                        continue;
+                    int count = object.getAsJsonPrimitive(JsonKeys.MATERIAL_LIST_ITEM_COUNT).getAsInt();
+                    IUniqueObject<?> item = serializer.asJsonDeserializer().deserialize(object.get(JsonKeys.MATERIAL_LIST_ITEM), IUniqueObject.class, context);
+                    items.addCopies(item, count);
+                }
+                return new SimpleMaterialListEntry(items.build());
+            };
+        }
+
+        @Override
+        public ResourceLocation getRegistryName() {
+            return NBTKeys.SIMPLE_SERIALIZER_ID;
         }
     }
 }

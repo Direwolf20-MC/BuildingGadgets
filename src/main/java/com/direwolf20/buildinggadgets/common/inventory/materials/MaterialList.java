@@ -3,17 +3,17 @@ package com.direwolf20.buildinggadgets.common.inventory.materials;
 import com.direwolf20.buildinggadgets.common.inventory.materials.objects.IUniqueObject;
 import com.direwolf20.buildinggadgets.common.util.ref.JsonKeys;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
+import com.direwolf20.buildinggadgets.common.util.tools.JsonBiDiSerializer;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.PeekingIterator;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonSerializationContext;
+import com.google.gson.*;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ResourceLocation;
 
+import javax.annotation.Nullable;
 import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -78,8 +78,8 @@ public final class MaterialList implements Iterable<ImmutableMultiset<IUniqueObj
         return new SubEntryBuilder(OrMaterialListEntry::new);
     }
 
-    static MaterialListEntry<?> readEntry(CompoundNBT nbt, boolean persisted) {
-        ResourceLocation id = new ResourceLocation(nbt.getString(NBTKeys.KEY_SERIALIZER));
+    @Nullable
+    static MaterialListEntry.Serializer<?> getSerializerForId(ResourceLocation id) {
         MaterialListEntry.Serializer<?> serializer = null;
         if (id.equals(NBTKeys.SIMPLE_SERIALIZER_ID))
             serializer = SimpleMaterialListEntry.SERIALIZER;
@@ -87,6 +87,12 @@ public final class MaterialList implements Iterable<ImmutableMultiset<IUniqueObj
             serializer = OrMaterialListEntry.SERIALIZER;
         else if (id.equals(NBTKeys.AND_SERIALIZER_ID))
             serializer = AndMaterialListEntry.SERIALIZER;
+        return serializer;
+    }
+
+    static MaterialListEntry<?> readEntry(CompoundNBT nbt, boolean persisted) {
+        ResourceLocation id = new ResourceLocation(nbt.getString(NBTKeys.KEY_SERIALIZER));
+        MaterialListEntry.Serializer<?> serializer = getSerializerForId(id);
         Preconditions.checkArgument(serializer != null,
                 "Failed to recognize Serializer " + id +
                         "! If you believe you need another implementation, please contact us and we can sort something out!");
@@ -250,7 +256,7 @@ public final class MaterialList implements Iterable<ImmutableMultiset<IUniqueObj
         }
     }
 
-    public static final class JsonSerializer implements com.google.gson.JsonSerializer<MaterialList> {
+    public static final class JsonSerializer implements JsonBiDiSerializer<MaterialList> {
         private final boolean printName;
         private final boolean extended;
 
@@ -266,6 +272,18 @@ public final class MaterialList implements Iterable<ImmutableMultiset<IUniqueObj
             res.add(JsonKeys.MATERIAL_LIST_ROOT_TYPE, context.serialize(src.getRootEntry().getSerializer().getRegistryName()));
             res.add(JsonKeys.MATERIAL_LIST_ROOT_ENTRY, src.getRootEntry().getSerializer().asJsonSerializer(printName, extended).serialize(src.getRootEntry(), src.getRootEntry().getClass(), context));
             return res;
+        }
+
+        @Override
+        public MaterialList deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+            if (json.isJsonNull())
+                return MaterialList.empty();
+            JsonObject object = json.getAsJsonObject();
+            MaterialListEntry.Serializer<?> serializer = getSerializerForId(context.deserialize(object.get(JsonKeys.MATERIAL_LIST_ROOT_TYPE), ResourceLocation.class));
+            if (serializer == null)
+                return MaterialList.empty();
+            JsonDeserializer<?> jsonSerializer = serializer.asJsonDeserializer();
+            return new MaterialList((MaterialListEntry) jsonSerializer.deserialize(object.get(JsonKeys.MATERIAL_LIST_ROOT_ENTRY), MaterialListEntry.class, context));
         }
     }
 }

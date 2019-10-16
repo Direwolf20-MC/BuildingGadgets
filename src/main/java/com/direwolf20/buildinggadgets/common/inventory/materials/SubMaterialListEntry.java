@@ -6,15 +6,12 @@ import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.Streams;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonSerializer;
+import com.google.gson.*;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.INBT;
 import net.minecraft.nbt.ListNBT;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.util.Constants.NBT;
-import net.minecraftforge.registries.ForgeRegistryEntry;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -113,7 +110,18 @@ abstract class SubMaterialListEntry implements MaterialListEntry<SubMaterialList
         } ;
     }
 
-    protected static abstract class Serializer extends ForgeRegistryEntry<MaterialListEntry.Serializer<SubMaterialListEntry>> implements MaterialListEntry.Serializer<SubMaterialListEntry> {
+    protected static abstract class Serializer implements MaterialListEntry.Serializer<SubMaterialListEntry> {
+        private final ResourceLocation registryName;
+
+        public Serializer(ResourceLocation registryName) {
+            this.registryName = registryName;
+        }
+
+        @Override
+        public ResourceLocation getRegistryName() {
+            return registryName;
+        }
+
         @Override
         public SubMaterialListEntry readFromNBT(CompoundNBT nbt, boolean persisted) {
             ListNBT list = nbt.getList(NBTKeys.KEY_SUB_ENTRIES, NBT.TAG_COMPOUND);
@@ -126,7 +134,7 @@ abstract class SubMaterialListEntry implements MaterialListEntry<SubMaterialList
                 else
                     entryBuilder.add(entry);
             }
-            return create(entryBuilder.build(), simpleBuilder.build(), nbt, persisted);
+            return create(entryBuilder.build(), simpleBuilder.build());
         }
 
         @Override
@@ -149,17 +157,35 @@ abstract class SubMaterialListEntry implements MaterialListEntry<SubMaterialList
                     JsonElement element = entry.getSerializer().asJsonSerializer(printName, extended).serialize(entry, entry.getClass(), context);
                     JsonObject obj = new JsonObject();
                     obj.add(JsonKeys.MATERIAL_ENTRY_TYPE, context.serialize(entry.getSerializer().getRegistryName()));
-                    if (element.isJsonArray()) {
+                    if (element.isJsonArray())
                         obj.add(JsonKeys.MATERIAL_ENTRIES, element.getAsJsonArray());
-                    } else {
+                    else
                         obj.add(JsonKeys.MATERIAL_ENTRY, element);
-                    }
                     ar.add(obj);
                 });
                 return ar;
             };
         }
 
-        protected abstract SubMaterialListEntry create(ImmutableList<MaterialListEntry<?>> subEntries, ImmutableList<SimpleMaterialListEntry> constantEntries, CompoundNBT nbt, boolean persisted);
+        @Override
+        public JsonDeserializer<SubMaterialListEntry> asJsonDeserializer() {
+            return (json, typeOfT, context) -> {
+                JsonArray array = json.getAsJsonArray();
+                ImmutableList.Builder<MaterialListEntry<?>> subEntries = ImmutableList.builder();
+                for (JsonElement element : array) {
+                    JsonObject object = element.getAsJsonObject();
+                    ResourceLocation id = context.deserialize(object.get(JsonKeys.MATERIAL_ENTRY_TYPE), ResourceLocation.class);
+                    MaterialListEntry.Serializer<?> serializer = MaterialList.getSerializerForId(id);
+                    if (serializer == null)
+                        continue;
+                    JsonElement subEntry = object.has(JsonKeys.MATERIAL_ENTRIES) ? object.get(JsonKeys.MATERIAL_ENTRIES) : object.get(JsonKeys.MATERIAL_ENTRY);
+                    subEntries.add(serializer.asJsonDeserializer().deserialize(subEntry, MaterialListEntry.class, context));
+                }
+                return (SubMaterialListEntry) create(subEntries.build(), ImmutableList.of()).simplify();
+            };
+
+        }
+
+        protected abstract SubMaterialListEntry create(ImmutableList<MaterialListEntry<?>> subEntries, ImmutableList<SimpleMaterialListEntry> constantEntries);
     }
 }
