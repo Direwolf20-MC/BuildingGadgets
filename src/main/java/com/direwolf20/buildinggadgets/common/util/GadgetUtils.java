@@ -1,8 +1,10 @@
 package com.direwolf20.buildinggadgets.common.util;
 
+import com.direwolf20.buildinggadgets.client.events.EventTooltip;
 import com.direwolf20.buildinggadgets.common.building.BlockData;
 import com.direwolf20.buildinggadgets.common.building.modes.BuildingMode;
 import com.direwolf20.buildinggadgets.common.building.modes.ExchangingMode;
+import com.direwolf20.buildinggadgets.common.capability.CapabilityTemplate;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.inventory.InventoryHelper;
 import com.direwolf20.buildinggadgets.common.items.InventoryWrapper;
@@ -10,11 +12,15 @@ import com.direwolf20.buildinggadgets.common.items.gadgets.AbstractGadget;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetBuilding;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetExchanger;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketRotateMirror;
+import com.direwolf20.buildinggadgets.common.template.Template;
+import com.direwolf20.buildinggadgets.common.template.TemplateHeader;
 import com.direwolf20.buildinggadgets.common.tiles.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.util.exceptions.CapabilityNotPresentException;
 import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
 import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
 import com.direwolf20.buildinggadgets.common.util.lang.MessageTranslation;
+import com.direwolf20.buildinggadgets.common.util.lang.Styles;
+import com.direwolf20.buildinggadgets.common.util.lang.TooltipTranslation;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.util.tools.NetworkIO;
 import com.direwolf20.buildinggadgets.common.util.tools.UndoState;
@@ -37,6 +43,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
 import net.minecraft.util.Direction.Axis;
 import net.minecraft.util.math.*;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
@@ -64,6 +71,20 @@ public class GadgetUtils {
 
     public static String getStackErrorSuffix(ItemStack stack) {
         return getStackErrorText(stack) + " with NBT tag: " + stack.getTag();
+    }
+
+    public static void addTooltipNameAndAuthor(ItemStack stack, @Nullable World world, List<ITextComponent> tooltip) {
+        if (world != null) {
+            world.getCapability(CapabilityTemplate.TEMPLATE_PROVIDER_CAPABILITY).ifPresent(provider -> {
+                stack.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(key -> {
+                    Template template = provider.getTemplateForKey(key);
+                    TemplateHeader header = template.getHeader();
+                    tooltip.add(TooltipTranslation.TEMPLATE_NAME.componentTranslation(header.getName()).setStyle(Styles.AQUA));
+                    tooltip.add(TooltipTranslation.TEMPLATE_AUTHOR.componentTranslation(header.getAuthor()).setStyle(Styles.AQUA));
+                });
+            });
+        }
+        EventTooltip.addTemplatePadding(stack, tooltip);
     }
 
     private static String getStackErrorText(ItemStack stack) {

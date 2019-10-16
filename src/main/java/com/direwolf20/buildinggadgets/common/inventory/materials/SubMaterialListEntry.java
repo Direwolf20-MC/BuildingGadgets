@@ -181,7 +181,10 @@ abstract class SubMaterialListEntry implements MaterialListEntry<SubMaterialList
                     JsonElement subEntry = object.has(JsonKeys.MATERIAL_ENTRIES) ? object.get(JsonKeys.MATERIAL_ENTRIES) : object.get(JsonKeys.MATERIAL_ENTRY);
                     subEntries.add(serializer.asJsonDeserializer().deserialize(subEntry, MaterialListEntry.class, context));
                 }
-                return (SubMaterialListEntry) create(subEntries.build(), ImmutableList.of()).simplify();
+                MaterialListEntry<?> entry = create(subEntries.build(), ImmutableList.of()).simplify();
+                if (entry instanceof SubMaterialListEntry)
+                    return (SubMaterialListEntry) entry;
+                return new AndMaterialListEntry(ImmutableList.of(entry));
             };
 
         }

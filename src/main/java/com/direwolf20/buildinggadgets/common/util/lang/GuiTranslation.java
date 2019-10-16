@@ -12,10 +12,10 @@ public enum GuiTranslation implements ITranslationProvider {
     SINGLE_CLEAR("single.clear"),
     SINGLE_RESET("single.reset"),
 
-    BUTTON_LOAD("button.load"),
-    BUTTON_SAVE("button.save"),
-    BUTTON_COPY("button.copy"),
-    BUTTON_PASTE("button.paste"),
+    BUTTON_LOAD("tm.button.load"),
+    BUTTON_SAVE("tm.button.save"),
+    BUTTON_COPY("tm.button.copy"),
+    BUTTON_PASTE("tm.button.paste"),
 
     COPY_BUTTON_ABSOLUTE("copy.button.absolute"),
     COPY_LABEL_HEADING("copy.label.heading"),

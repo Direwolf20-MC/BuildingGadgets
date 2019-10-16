@@ -169,6 +169,10 @@ public final class Template {
         return new Template(mapBuilder.build(), header, isNormalized);
     }
 
+    public Template withName(@Nullable String name) {
+        return new Template(map, TemplateHeader.builderOf(header).name(name).build());
+    }
+
     public Template withNameAndAuthor(@Nullable String name, @Nullable String author) {
         return new Template(map, TemplateHeader.builderOf(header).name(name).author(author).build());
     }

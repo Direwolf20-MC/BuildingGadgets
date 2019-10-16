@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.test.toolsTest;
 
-import com.direwolf20.buildinggadgets.api.util.VectorUtils;
+import com.direwolf20.buildinggadgets.common.util.tools.VectorUtils;
 import net.minecraft.util.math.BlockPos;
 import org.junit.jupiter.api.RepeatedTest;
 

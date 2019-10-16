@@ -1,6 +1,5 @@
 package com.direwolf20.buildinggadgets.common.network.packets;
 
-import com.direwolf20.buildinggadgets.common.blocks.TemplateManagerCommands;
 import com.direwolf20.buildinggadgets.common.containers.TemplateManagerContainer;
 import com.direwolf20.buildinggadgets.common.tiles.TemplateManagerTileEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -41,7 +40,7 @@ public class PacketTemplateManagerLoad {
                 if (!(te instanceof TemplateManagerTileEntity)) return;
 
                 TemplateManagerContainer container = ((TemplateManagerTileEntity) te).getContainer(player);
-                TemplateManagerCommands.loadTemplate(container, player);
+                //TemplateManagerCommands.loadTemplate(container, player);
             });
 
             ctx.get().setPacketHandled(true);

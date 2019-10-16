@@ -1,7 +1,6 @@
 package com.direwolf20.buildinggadgets.common.network.packets;
 
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
-import com.direwolf20.buildinggadgets.common.blocks.TemplateManagerCommands;
 import com.direwolf20.buildinggadgets.common.containers.TemplateManagerContainer;
 import com.direwolf20.buildinggadgets.common.tiles.TemplateManagerTileEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -62,7 +61,7 @@ public class PacketTemplateManagerPaste {
                     if (!(te instanceof TemplateManagerTileEntity)) return;
 
                     TemplateManagerContainer container = ((TemplateManagerTileEntity) te).getContainer(player);
-                    TemplateManagerCommands.pasteTemplate(container, player, newTag, msg.templateName);
+                    //TemplateManagerCommands.pasteTemplate(container, player, newTag, msg.templateName);
                 } catch (IOException e) {
                     BuildingGadgets.LOG.error("TemplateItem Manager paste failed", e);
                 }

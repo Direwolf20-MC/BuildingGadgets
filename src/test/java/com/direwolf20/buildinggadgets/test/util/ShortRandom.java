@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.test.util;
 
-import com.direwolf20.buildinggadgets.api.util.MathUtils;
+import com.direwolf20.buildinggadgets.common.util.tools.MathUtils;
 
 import java.util.Random;
 

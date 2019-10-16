@@ -18,12 +18,12 @@ import javax.annotation.Nonnull;
 import java.util.Objects;
 
 public class TemplateManagerContainer extends BaseContainer {
-    public static final String TEXTURE_LOC_SLOT_TOOL = Reference.MODID + ":gui/slot_copy_paste_gadget";
-    public static final String TEXTURE_LOC_SLOT_TEMPLATE = Reference.MODID + ":gui/slot_template";
+    public static final String TEXTURE_LOC_SLOT_TOOL = Reference.MODID + ":textures/gui/slot_copy_paste_gadget";
+    public static final String TEXTURE_LOC_SLOT_TEMPLATE = Reference.MODID + ":textures/gui/slot_template";
     private TemplateManagerTileEntity te;
 
     public TemplateManagerContainer(int windowId, PlayerInventory playerInventory, PacketBuffer extraData) {
-        super(OurContainers.TEMPLATE_MANAGER_CONTAINER, windowId);//TODO fix once we get access to ContainerTypes
+        super(OurContainers.TEMPLATE_MANAGER_CONTAINER, windowId);
         BlockPos pos = extraData.readBlockPos();
         this.te = (TemplateManagerTileEntity) Minecraft.getInstance().world.getTileEntity(pos);
         addOwnSlots();
@@ -43,7 +43,7 @@ public class TemplateManagerContainer extends BaseContainer {
     }
 
     private void addOwnSlots() {
-        IItemHandler itemHandler = this.getTe().getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null).orElseThrow(CapabilityNotPresentException::new);
+        IItemHandler itemHandler = this.getTe().getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).orElseThrow(CapabilityNotPresentException::new);
         int x = 86;
         int y = 41;
 

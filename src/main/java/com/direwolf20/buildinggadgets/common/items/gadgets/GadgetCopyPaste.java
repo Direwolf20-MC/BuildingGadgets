@@ -1,6 +1,5 @@
 package com.direwolf20.buildinggadgets.common.items.gadgets;
 
-import com.direwolf20.buildinggadgets.client.events.EventTooltip;
 import com.direwolf20.buildinggadgets.client.gui.GuiMod;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.building.Region;
@@ -289,7 +288,7 @@ public class GadgetCopyPaste extends AbstractGadget {
         tooltip.add(TooltipTranslation.GADGET_MODE.componentTranslation(getToolMode(stack)).setStyle(Styles.AQUA));
         addEnergyInformation(tooltip, stack);
         addInformationRayTraceFluid(tooltip, stack);
-        EventTooltip.addTemplatePadding(stack, tooltip);
+        GadgetUtils.addTooltipNameAndAuthor(stack, world, tooltip);
     }
 
     public void setMode(ItemStack heldItem, int modeInt) {

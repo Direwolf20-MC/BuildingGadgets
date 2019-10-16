@@ -97,7 +97,7 @@ public final class TemplateHeader {
         if (nbt.contains(NBTKeys.KEY_NAME, NBT.TAG_STRING))
             builder.name(nbt.getString(NBTKeys.KEY_NAME));
         if (nbt.contains(NBTKeys.KEY_AUTHOR, NBT.TAG_STRING))
-            builder.name(nbt.getString(NBTKeys.KEY_AUTHOR));
+            builder.author(nbt.getString(NBTKeys.KEY_AUTHOR));
         if (nbt.contains(NBTKeys.KEY_MATERIALS, NBT.TAG_COMPOUND))
             builder.requiredItems(MaterialList.deserialize(nbt.getCompound(NBTKeys.KEY_MATERIALS), persisted));
         return builder;
