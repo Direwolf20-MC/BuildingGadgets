@@ -62,6 +62,8 @@ public final class Reference {
         public static final ResourceLocation PASTE_CONTAINER_T3_RL = new ResourceLocation(PASTE_CONTAINER_T3);
         public static final ResourceLocation PASTE_CONTAINER_CREATIVE_RL = new ResourceLocation(PASTE_CONTAINER_CREATIVE);
 
+        public static final ResourceLocation TAG_TEMPLATE_CONVERTIBLE = new ResourceLocation(MODID, "template_convertible");
+
         private ItemReference() {}
     }
 

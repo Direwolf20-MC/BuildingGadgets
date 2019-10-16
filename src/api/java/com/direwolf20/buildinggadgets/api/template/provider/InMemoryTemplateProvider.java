@@ -1,6 +1,7 @@
 package com.direwolf20.buildinggadgets.api.template.provider;
 
 import com.direwolf20.buildinggadgets.api.template.ITemplate;
+import net.minecraftforge.fml.network.PacketDistributor.PacketTarget;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -31,6 +32,16 @@ public class InMemoryTemplateProvider implements ITemplateProvider {
 
     @Override
     public boolean requestRemoteUpdate(ITemplateKey key) {
+        return false;
+    }
+
+    @Override
+    public boolean requestUpdate(ITemplateKey key, PacketTarget target) {
+        return false;
+    }
+
+    @Override
+    public boolean requestRemoteUpdate(ITemplateKey key, PacketTarget target) {
         return false;
     }
 

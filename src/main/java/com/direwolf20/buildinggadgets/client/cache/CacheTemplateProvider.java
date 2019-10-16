@@ -10,6 +10,8 @@ import com.direwolf20.buildinggadgets.common.network.packets.PacketTemplateIdAll
 import com.direwolf20.buildinggadgets.common.network.packets.SplitPacketUpdateTemplate;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import net.minecraftforge.fml.network.PacketDistributor;
+import net.minecraftforge.fml.network.PacketDistributor.PacketTarget;
 import org.apache.logging.log4j.util.TriConsumer;
 
 import javax.annotation.Nonnull;
@@ -38,7 +40,7 @@ public final class CacheTemplateProvider implements ITemplateProvider {
         UUID id = getId(key);
         try {
             return cache.get(id, () -> {
-                requestUpdate(id);
+                requestUpdate(id, PacketDistributor.SERVER.noArg());
                 return key.createTemplate(id);
             });
         } catch (ExecutionException e) {
@@ -56,23 +58,33 @@ public final class CacheTemplateProvider implements ITemplateProvider {
 
     @Override
     public boolean requestUpdate(ITemplateKey key) {
-        return requestUpdate(key.getTemplateId(this::getFreeId));
+        return requestUpdate(key, PacketDistributor.SERVER.noArg());
     }
 
-    private boolean requestUpdate(UUID id) {
-        PacketHandler.sendToServer(new PacketRequestTemplate(id));
+    @Override
+    public boolean requestUpdate(ITemplateKey key, PacketTarget target) {
+        return requestUpdate(key.getTemplateId(this::getFreeId), target);
+    }
+
+    private boolean requestUpdate(UUID id, PacketTarget target) {
+        PacketHandler.send(new PacketRequestTemplate(id), target);
         return true;
     }
 
     @Override
-    public boolean requestRemoteUpdate(ITemplateKey key) {
+    public boolean requestRemoteUpdate(ITemplateKey key, PacketTarget target) {
         UUID id = getId(key);
         ITemplate template = cache.getIfPresent(id);
         if (template != null) {
             notifyListeners(key, template, l -> l::onTemplateUpdateSend);
-            PacketHandler.getSplitManager().sendToServer(new SplitPacketUpdateTemplate(id, template));
+            PacketHandler.getSplitManager().send(new SplitPacketUpdateTemplate(id, template), target);
         }
         return template != null;
+    }
+
+    @Override
+    public boolean requestRemoteUpdate(ITemplateKey key) {
+        return requestRemoteUpdate(key, PacketDistributor.SERVER.noArg());
     }
 
     @Override

@@ -5,11 +5,29 @@
 
 package com.direwolf20.buildinggadgets.client.gui.blocks;
 
+import com.direwolf20.buildinggadgets.api.building.view.IBuildView;
+import com.direwolf20.buildinggadgets.api.building.view.SimpleBuildContext;
+import com.direwolf20.buildinggadgets.api.capability.CapabilityTemplate;
+import com.direwolf20.buildinggadgets.api.exceptions.IllegalTemplateFormatException;
+import com.direwolf20.buildinggadgets.api.exceptions.TransactionExecutionException;
+import com.direwolf20.buildinggadgets.api.serialisation.TemplateHeader;
+import com.direwolf20.buildinggadgets.api.template.IBuildOpenOptions;
+import com.direwolf20.buildinggadgets.api.template.ITemplate;
+import com.direwolf20.buildinggadgets.api.template.SimpleBuildOpenOptions;
+import com.direwolf20.buildinggadgets.api.template.TemplateIO;
+import com.direwolf20.buildinggadgets.api.template.transaction.ITemplateTransaction;
+import com.direwolf20.buildinggadgets.api.template.transaction.TemplateTransactions;
+import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.containers.TemplateManagerContainer;
 import com.direwolf20.buildinggadgets.common.registry.OurItems;
 import com.direwolf20.buildinggadgets.common.tiles.TemplateManagerTileEntity;
+import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
+import com.direwolf20.buildinggadgets.common.util.lang.GuiTranslation;
+import com.direwolf20.buildinggadgets.common.util.lang.MessageTranslation;
+import com.direwolf20.buildinggadgets.common.util.lang.Styles;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.mojang.blaze3d.platform.GlStateManager;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.gui.widget.button.Button;
@@ -18,11 +36,14 @@ import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.Rectangle2d;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.container.Slot;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.world.World;
 import org.lwjgl.opengl.GL11;
 
 public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer> {
@@ -30,7 +51,7 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
 
     private boolean panelClicked;
     private int clickButton;
-    //    private long lastDragTime;
+    private long lastDragTime;
     private int clickX, clickY;
     private float initRotX, initRotY, initZoom, initPanX, initPanY;
     private float prevRotX, prevRotY;// prevPanX, prevPanY;
@@ -40,13 +61,13 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
     private float panX = 0, panY = 0;
     private Rectangle2d panel = new Rectangle2d(8, 18, 62, 62);
 
-//    private int scrollAcc;
+    private int scrollAcc;
 
     private TextFieldWidget nameField;
     private Button buttonSave, buttonLoad, buttonCopy, buttonPaste;
 
-//    private GuiButtonHelp buttonHelp; replace with my lovely replacement
-//    private List<IHoverHelpText> helpTextProviders = new ArrayList<>();
+    //private HelpB buttonHelp; //@MichaelHillcox replace with your lovely replacement (?)
+    //private List<IHoverHelpText> helpTextProviders = new ArrayList<>();
 
     private TemplateManagerTileEntity te;
     private TemplateManagerContainer container;
@@ -68,9 +89,9 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
     @Override
     public void render(int mouseX, int mouseY, float partialTicks) {
         //TODO re-enable
-        /*drawGuiContainerBackgroundLayer(partialTicks,mouseX,mouseY);
+        drawGuiContainerBackgroundLayer(partialTicks, mouseX, mouseY);
         super.render(mouseX, mouseY, partialTicks);
-        if (buttonHelp.isSelected()) {
+        /*if (buttonHelp.isSelected()) {
             GlStateManager.color4f(1, 1, 1, 1);
             GlStateManager.disableLighting();
             for (IHoverHelpText helpTextProvider : helpTextProviders)
@@ -81,50 +102,30 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
                 if (helpTextProvider.isHovered(mouseX, mouseY))
                     renderComponentHoverEffect(new StringTextComponent(helpTextProvider.getHoverHelpText()), mouseX, mouseY);
             }
-        } else {
-            this.renderHoveredToolTip(mouseX, mouseY);
-        }
+        } else {*/
+        this.renderHoveredToolTip(mouseX, mouseY);
+        /*}
         if (buttonHelp.isMouseOver(mouseX, mouseY))
-            renderComponentHoverEffect(new StringTextComponent(buttonHelp.getHoverText()), mouseX, mouseY);
-         */
-        drawString(font, "Currently disabled", getGuiLeft() + getXSize() / 2, getGuiTop() + getYSize() / 2, 0);
+            renderComponentHoverEffect(new StringTextComponent(buttonHelp.getHoverText()), mouseX, mouseY);*/
     }
 
     @Override
     public void init() {
         this.nameField = new TextFieldWidget(this.font, this.guiLeft + 8, this.guiTop + 6, 149, this.font.FONT_HEIGHT, "name?");
-        /*
+
         super.init();
-        helpTextProviders.clear();
-        buttonHelp = addButton(new GuiButtonHelp(this.guiLeft + this.xSize - 16, this.guiTop + 4, (button) -> buttonHelp.toggleSelected()));
-        buttonSave = addButton(createAndAddButton(79, 17, 30, 20, "Save", (button) -> PacketHandler.sendToServer(new PacketTemplateManagerSave(te.getPos(), nameField.getText()))));
-        buttonLoad = addButton(createAndAddButton(137, 17, 30, 20, "Load", (button) -> PacketHandler.sendToServer(new PacketTemplateManagerLoad(te.getPos()))));
-        buttonCopy = addButton(createAndAddButton(79, 61, 30, 20, "Copy", (button) -> TemplateManagerCommands.copyTemplate(container)));
-        buttonPaste = addButton(createAndAddButton(135, 61, 34, 20, "Paste", (button) -> {
-            String CBString = getMinecraft().keyboardListener.getClipboardString();
-            if (GadgetUtils.mightBeLink(CBString)) {
-                Minecraft.getInstance().player.sendStatusMessage(new StringTextComponent(TextFormatting.RED + new TranslationTextComponent("message.gadget.pastefailed.linkcopied").getUnformattedComponentText()),false);
-                return;
-            }
-            try {
-                //Anything larger than below is likely to overflow the max packet size, crashing your client.
-                ByteArrayOutputStream pasteStream = GadgetUtils.getPasteStream(JsonToNBT.getTagFromJson(CBString), nameField.getText());
-                if (pasteStream != null) {
-                    PacketHandler.sendToServer(new PacketTemplateManagerPaste(pasteStream, te.getPos(), nameField.getText()));
-                    Minecraft.getInstance().player.sendStatusMessage(new StringTextComponent(TextFormatting.AQUA + new TranslationTextComponent("message.gadget.pastesuccess").getUnformattedComponentText()), false);
-                } else {
-                    Minecraft.getInstance().player.sendStatusMessage(new StringTextComponent(TextFormatting.RED + new TranslationTextComponent("message.gadget.pastetoobig").getUnformattedComponentText()), false);
-                }
-            } catch (Throwable t) {
-                BuildingGadgets.LOG.error(t);
-                Minecraft.getInstance().player.sendStatusMessage(new StringTextComponent(TextFormatting.RED + new TranslationTextComponent("message.gadget.pastefailed").getUnformattedComponentText()), false);
-            }
-        }));
+        //helpTextProviders.clear();
+        //buttonHelp = addButton(new GuiButtonHelp(this.guiLeft + this.xSize - 16, this.guiTop + 4, (button) -> buttonHelp.toggleSelected()));
+        buttonSave = addButton(createAndAddButton(79, 17, 30, 20, GuiTranslation.BUTTON_SAVE.format(), b -> onSave()));
+        buttonLoad = addButton(createAndAddButton(137, 17, 30, 20, GuiTranslation.BUTTON_LOAD.format(), b -> onLoad()));
+        buttonCopy = addButton(createAndAddButton(79, 61, 30, 20, GuiTranslation.BUTTON_COPY.format(), b -> onCopy()));
+        buttonPaste = addButton(createAndAddButton(135, 61, 34, 20, GuiTranslation.BUTTON_PASTE.format(), b -> onPaste()));
 
         this.nameField.setMaxStringLength(50);
         this.nameField.setVisible(true);
         children.add(nameField);
 
+        /*
         helpTextProviders.add(new AreaHelpText(nameField, "field.template_name"));
         helpTextProviders.add(new AreaHelpText(this.getContainer().getSlot(0), guiLeft, guiTop, "slot.gadget"));
         helpTextProviders.add(new AreaHelpText(this.getContainer().getSlot(1), guiLeft, guiTop, "slot.template"));
@@ -135,8 +136,101 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
 
     private Button createAndAddButton(int x, int y, int witdth, int height, String text, IPressable action) {
         Button button = new Button(guiLeft + x, guiTop + y, witdth, height, text, action);
-//        helpTextProviders.add(button);
+        //        helpTextProviders.add(button);
         return button;
+    }
+
+    private void onSave() {
+
+    }
+
+    private void onLoad() {
+
+    }
+
+    private void onCopy() {
+        ItemStack stack = container.getSlot(1).getStack();
+        stack.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(key -> {
+            World world = Minecraft.getInstance().world;
+            world.getCapability(CapabilityTemplate.TEMPLATE_PROVIDER_CAPABILITY).ifPresent(provider -> {
+                PlayerEntity player = Minecraft.getInstance().player;
+                IBuildOpenOptions openOptions = SimpleBuildOpenOptions.withContext(SimpleBuildContext.builder()
+                        .buildingPlayer(player)
+                        .usedStack(stack)
+                        .build(world));
+                try {
+                    String json = TemplateIO.writeTemplateJson(provider.getTemplateForKey(key), openOptions);
+                    Minecraft.getInstance().keyboardListener.setClipboardString(json);
+                } catch (IllegalTemplateFormatException e) {
+                    e.printStackTrace();
+                }
+            });
+        });
+    }
+
+    private void onPaste() {
+        if (! replaceStack()) //TODO message
+            return;
+        String CBString = getMinecraft().keyboardListener.getClipboardString();
+        if (GadgetUtils.mightBeLink(CBString)) {
+            Minecraft.getInstance().player.sendStatusMessage(MessageTranslation.PASTE_SUCCESS.componentTranslation().setStyle(Styles.RED), false);
+            return;
+        }
+        World world = Minecraft.getInstance().world;
+        PlayerEntity player = Minecraft.getInstance().player;
+        ItemStack stack = container.getSlot(1).getStack();
+        try {
+            //Anything larger than below is likely to overflow the max packet size, crashing your client.
+            ITemplate readTemplate = TemplateIO.readTemplateFromJson(CBString);
+            TemplateHeader header = readTemplate.getSerializer().createHeaderFor(readTemplate);
+            IBuildOpenOptions openOptions = SimpleBuildOpenOptions.withContext(
+                    SimpleBuildContext.builder()
+                            .buildingPlayer(Minecraft.getInstance().player)
+                            .usedStack(stack)
+                            .build(Minecraft.getInstance().world));
+            IBuildView buildView = readTemplate.createViewInContext(openOptions);
+            if (! nameField.getText().isEmpty())
+                header = TemplateHeader.builderOf(header).name(nameField.getText()).build();
+            pasteBuildView(world, stack, player, buildView, header);
+        } catch (Throwable t) { //TODO make use of exceptions
+            BuildingGadgets.LOG.error(t);
+            Minecraft.getInstance().player.sendStatusMessage(MessageTranslation.PASTE_FAILED.componentTranslation().setStyle(Styles.RED), false);
+        }
+    }
+
+    private void pasteBuildView(World world, ItemStack stack, PlayerEntity player, IBuildView view, TemplateHeader otherHeader) {
+        world.getCapability(CapabilityTemplate.TEMPLATE_PROVIDER_CAPABILITY).ifPresent(provider -> {
+            stack.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(key -> {
+                ITemplate currentTemplate = provider.getTemplateForKey(key);
+                ITemplateTransaction transaction = currentTemplate.startTransaction();
+                if (transaction == null) {//TODO correct message
+                    player.sendStatusMessage(MessageTranslation.GADGET_BUSY.componentTranslation().setStyle(Styles.RED), true);
+                    return;
+                }
+                try {
+                    transaction
+                            .operate(TemplateTransactions.replaceOperator(view))
+                            .operate(TemplateTransactions.headerOperator(otherHeader.getName(), otherHeader.getAuthor()))
+                            .execute(view.getContext());
+                    provider.requestRemoteUpdate(key);
+                } catch (TransactionExecutionException e) { //TODO messages
+                    e.printStackTrace();
+                }
+            });
+        });
+    }
+
+    private boolean replaceStack() {
+        ItemStack stack = container.getSlot(1).getStack();
+        if (stack.isEmpty())
+            return false;
+        if (stack.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).isPresent())
+            return true;
+        else if (TemplateManagerTileEntity.TEMPLATE_CONVERTIBLES.contains(stack.getItem())) {
+            container.getSlot(0).putStack(new ItemStack(OurItems.template));
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -341,8 +435,8 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
                 momentumY = rotY - prevRotY;
                 doMomentum = false;
             } else if (clickButton == 1) {
-//                prevPanX = panX;
-//                prevPanY = panY;
+                //                prevPanX = panX;
+                //                prevPanY = panY;
                 panX = initPanX + ((int) getMinecraft().mouseHelper.getMouseX() - clickX) / 8;
                 panY = initPanY + ((int) getMinecraft().mouseHelper.getMouseY() - clickY) / 8;
             }
@@ -355,7 +449,7 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
             momentumY *= momentumDampening;
         }
 
-        if (!nameField.isFocused() && nameField.getText().isEmpty())
+        if (! nameField.isFocused() && nameField.getText().isEmpty())
             getMinecraft().fontRenderer.drawString("template name", nameField.x - guiLeft + 4, nameField.y - guiTop, - 10197916);
 
         if (buttonSave.isHovered() || buttonLoad.isHovered() || buttonPaste.isHovered())
@@ -365,7 +459,7 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
     private void drawSlotOverlay(Slot slot) {
         GlStateManager.translated(0, 0, 1000);
         fill(slot.xPos, slot.yPos, slot.xPos + 16, slot.yPos + 16, - 1660903937);
-        GlStateManager.translated(0, 0, -1000);
+        GlStateManager.translated(0, 0, - 1000);
     }
 
 
@@ -382,7 +476,7 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
     public void tick() {
         super.tick();
         nameField.tick();
-        if (!panelClicked) {
+        if (! panelClicked) {
             initRotX = rotX;
             initRotY = rotY;
             initZoom = zoom;

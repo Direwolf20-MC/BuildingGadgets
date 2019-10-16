@@ -4,6 +4,7 @@ import com.direwolf20.buildinggadgets.api.capability.CapabilityTemplate;
 import com.direwolf20.buildinggadgets.api.template.ITemplate;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.NonNullSupplier;
+import net.minecraftforge.fml.network.PacketDistributor.PacketTarget;
 
 import java.util.UUID;
 
@@ -28,9 +29,39 @@ public interface ITemplateProvider {
      */
     void setTemplate(ITemplateKey key, ITemplate template);
 
+    /**
+     * Requests an update <b>from</b> the other side - aka requests the other side to send an update. Has <b>no effect on Servers</b> as,
+     * the Client from which to request the update from would be undefined.
+     *
+     * @param key The {@link ITemplateKey} for which to request an update
+     * @return whether or not an update was requested
+     */
     boolean requestUpdate(ITemplateKey key);
 
+    /**
+     * Requests an update from the specified target.
+     *
+     * @param target The target to which to request the update
+     * @see #requestUpdate(ITemplateKey)
+     */
+    boolean requestUpdate(ITemplateKey key, PacketTarget target);
+
+    /**
+     * Requests an update <b>for<b/> the other side - aka sends an update packet to it. On the client this will send the data to the server,
+     * on the server this will send the data to <b>all logged in Clients</b>.
+     * @param key The key to request a remote update for
+     * @return whether or not a remote update was requested.
+     */
     boolean requestRemoteUpdate(ITemplateKey key);
+
+    /**
+     * Requests a remote update for the specified target.
+     *
+     * @param target The target for which to request an update
+     * @see #requestRemoteUpdate(ITemplateKey)
+     */
+    boolean requestRemoteUpdate(ITemplateKey key, PacketTarget target);
+
 
     /**
      * Registers an Update Listener - it will only be weakly referenced!

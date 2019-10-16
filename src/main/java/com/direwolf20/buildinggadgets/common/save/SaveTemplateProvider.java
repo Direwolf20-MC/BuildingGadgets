@@ -78,6 +78,7 @@ public final class SaveTemplateProvider implements ITemplateProvider {
         return requestRemoteUpdate(key, PacketDistributor.PLAYER.with(() -> playerEntity));
     }
 
+    @Override
     public boolean requestRemoteUpdate(ITemplateKey key, PacketTarget target) {
         UUID id = getId(key);
         ITemplate template = getSave().getTemplate(id, key::createTemplate);
@@ -89,6 +90,7 @@ public final class SaveTemplateProvider implements ITemplateProvider {
         return requestUpdate(key, PacketDistributor.PLAYER.with(() -> playerEntity));
     }
 
+    @Override
     public boolean requestUpdate(ITemplateKey key, PacketTarget target) {
         UUID id = getId(key);
         PacketHandler.HANDLER.send(target, new PacketRequestTemplate(id));
