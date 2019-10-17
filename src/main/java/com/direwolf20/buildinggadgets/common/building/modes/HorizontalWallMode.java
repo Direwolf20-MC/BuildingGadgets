@@ -41,8 +41,7 @@ public class HorizontalWallMode extends AtopSupportedMode {
         int radius = MathUtils.floorToOdd(range) / 2;
         if (sideHit.getAxis().isVertical())
             return Wall.clickedSide(transformed, sideHit, radius);
-        return Wall.extendingFrom(transformed.offset(sideHit.getOpposite()), sideHit, Direction.UP, radius, MathUtils
-                .isEven(range) ? 1 : 0);
+        return Wall.extendingFrom(transformed.offset(sideHit.getOpposite()), sideHit, Direction.UP, radius, 0);
     }
 
     @Override

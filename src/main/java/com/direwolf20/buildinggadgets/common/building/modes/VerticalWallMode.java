@@ -42,8 +42,7 @@ public class VerticalWallMode extends AtopSupportedMode {
         int range = GadgetUtils.getToolRange(tool);
         int radius = MathUtils.floorToOdd(range) / 2;
         if (sideHit.getAxis().isVertical())
-            return Wall.extendingFrom(transformed.offset(sideHit.getOpposite()), sideHit, player.getHorizontalFacing(), radius, MathUtils
-                    .isEven(range) ? 1 : 0);
+            return Wall.extendingFrom(transformed.offset(sideHit.getOpposite()), sideHit, player.getHorizontalFacing(), radius, 0);
         return Wall.clickedSide(transformed, sideHit, radius);
     }
 
