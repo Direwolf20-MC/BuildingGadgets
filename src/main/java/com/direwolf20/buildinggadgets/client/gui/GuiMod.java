@@ -132,11 +132,13 @@ public enum GuiMod {
     }
 
     private static TemplateManagerContainer getTemplateManagerContainer(PlayerEntity player, TileEntity te) {
-        return new TemplateManagerContainer(0, player.inventory, (TemplateManagerTileEntity) te);
+        //Be warned you need to manually assign the window id on the server
+        //if you don't do this, and just return 0 as you can do on the client, it will sync the player inventory instead...!
+        return new TemplateManagerContainer(player instanceof ServerPlayerEntity ? ((ServerPlayerEntity) player).currentWindowId + 1 : 0, player.inventory, (TemplateManagerTileEntity) te);
     }
 
     private static ChargingStationContainer getChargingStationContainer(PlayerEntity player, TileEntity te) {
-        return new ChargingStationContainer(0, player.world, te.getPos(), player.inventory, player);
+        return new ChargingStationContainer(player instanceof ServerPlayerEntity ? ((ServerPlayerEntity) player).currentWindowId + 1 : 0, player.world, te.getPos(), player.inventory, player);
     }
 
     private static void openGuiContainer(String id, ServerPlayerEntity player, Container container, Consumer<PacketBuffer> extraDataWriter) {
