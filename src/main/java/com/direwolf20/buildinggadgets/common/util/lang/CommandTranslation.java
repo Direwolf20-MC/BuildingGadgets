@@ -24,6 +24,10 @@ public enum CommandTranslation implements ITranslationProvider {
         this.argCount = argCount;
     }
 
+    CommandTranslation(@Nonnull String key) {
+        this(key, 0);
+    }
+
     @Override
     public boolean areValidArguments(Object... args) {
         return args.length == argCount;

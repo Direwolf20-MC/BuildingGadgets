@@ -26,6 +26,7 @@ import com.direwolf20.buildinggadgets.common.save.SaveManager;
 import com.direwolf20.buildinggadgets.common.template.ITemplateKey;
 import com.direwolf20.buildinggadgets.common.template.Template;
 import com.direwolf20.buildinggadgets.common.template.TemplateHeader;
+import com.direwolf20.buildinggadgets.common.util.Additions;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.exceptions.CapabilityNotPresentException;
 import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
@@ -396,7 +397,8 @@ public class GadgetCopyPaste extends AbstractGadget {
     }
 
     private void onCopyFinished(Template newTemplate, ItemStack stack, PlayerEntity player) {
-        sendMessage(stack, player, MessageTranslation.AREA_COPIED, Styles.DK_GREEN);
+        if (! Additions.sizeInvalid(player, newTemplate.getHeader().getBoundingBox()))
+            sendMessage(stack, player, MessageTranslation.AREA_COPIED, Styles.DK_GREEN);
         ITemplateKey key = stack.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).orElseThrow(CapabilityNotPresentException::new);
         SaveManager.INSTANCE.getTemplateProvider().setTemplate(key, newTemplate);
         SaveManager.INSTANCE.getTemplateProvider().requestRemoteUpdate(key, (ServerPlayerEntity) player);
@@ -455,12 +457,13 @@ public class GadgetCopyPaste extends AbstractGadget {
         PlacementScheduler.schedulePlacement(view, checker, Config.GADGETS.placeSteps.get())
                 .withFinisher(p -> {
                     pushUndo(stack, p.getUndoBuilder().build(view.getContext().getWorld().getDimension().getType()));
-                    onBuildFinished(stack, player);
+                    onBuildFinished(stack, player, view.getBoundingBox());
                 });
     }
 
-    private void onBuildFinished(ItemStack stack, PlayerEntity player) {
-        sendMessage(stack, player, MessageTranslation.TEMPLATE_BUILD, Styles.DK_GREEN);
+    private void onBuildFinished(ItemStack stack, PlayerEntity player, Region bounds) {
+        if (! Additions.sizeInvalid(player, bounds))
+            sendMessage(stack, player, MessageTranslation.TEMPLATE_BUILD, Styles.DK_GREEN);
         onAnchorRemoved(stack, player); //clear the anchor after a successful build
     }
 
