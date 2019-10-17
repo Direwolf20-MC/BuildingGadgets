@@ -79,8 +79,10 @@ public class GadgetUtils {
                 stack.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(key -> {
                     Template template = provider.getTemplateForKey(key);
                     TemplateHeader header = template.getHeader();
-                    tooltip.add(TooltipTranslation.TEMPLATE_NAME.componentTranslation(header.getName()).setStyle(Styles.AQUA));
-                    tooltip.add(TooltipTranslation.TEMPLATE_AUTHOR.componentTranslation(header.getAuthor()).setStyle(Styles.AQUA));
+                    if (header.getName() != null && ! header.getName().isEmpty())
+                        tooltip.add(TooltipTranslation.TEMPLATE_NAME.componentTranslation(header.getName()).setStyle(Styles.AQUA));
+                    if (header.getAuthor() != null && ! header.getAuthor().isEmpty())
+                        tooltip.add(TooltipTranslation.TEMPLATE_AUTHOR.componentTranslation(header.getAuthor()).setStyle(Styles.AQUA));
                 });
             });
         }
