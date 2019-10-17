@@ -55,9 +55,15 @@
   "tooltip.donotuse": "DO NOT USE (WIP)",
 
   "_comment": "commands",
-  "buildinggadgets.commands.copy_unloaded.no_player": "Cannot toggle player status without a player unload status to target!",
-  "buildinggadgets.commands.copy_unloaded.toggled": "Set ForceLoadedChunks for player %s to %b",
-  "buildinggadgets.commands.copy_unloaded.list": "Player with UUID %s has ForceLoadedChunks set to %b",
+  "buildinggadgets.commands.force_unloaded.no_player": "Cannot toggle player status without a player unload status to target!",
+  "buildinggadgets.commands.force_unloaded.toggled": "Set ForceLoadedChunks for player %s to %b.",
+  "buildinggadgets.commands.force_unloaded.list": "Player with UUID %s has ForceLoadedChunks set to %b.",
+  "buildinggadgets.commands.override_copy_size.no_player": "Cannot toggle player status without a player copy status to target!",
+  "buildinggadgets.commands.override_copy_size.toggled": "Set OverrideCopySize for player %s to %b.",
+  "buildinggadgets.commands.override_copy_size.list": "Player with UUID %s has OverrideCopySize set to %b.",
+  "buildinggadgets.commands.override_build_size.no_player": "Cannot toggle player status without a player build status to target!",
+  "buildinggadgets.commands.override_build_size.toggled": "Set OverrideBuildSize for player %s to %b.",
+  "buildinggadgets.commands.override_build_size.list": "Player with UUID %s has OverrideBuildSize set to %b.",
 
   "_comment": "radial-menu",
   "buildinggadgets.radialmenu.destruction_overlay": "Show Overlay",

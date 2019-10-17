@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.common.commands;
 
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
-import com.direwolf20.buildinggadgets.common.util.lang.CommandTranslation;
+import com.direwolf20.buildinggadgets.common.util.lang.ITranslationProvider;
 import com.direwolf20.buildinggadgets.common.util.lang.Styles;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -18,14 +18,23 @@ import java.util.concurrent.TimeUnit;
 
 final class AllowPlayerOverrideManager {
     private final Cache<UUID, Boolean> allowPlayerOverrideCache;
+    private final ITranslationProvider noPlayerTranslation;
+    private final ITranslationProvider toggledTranslation;
+    private final ITranslationProvider listTranslation;
+    private final String logMessage;
 
-    AllowPlayerOverrideManager() {
+    public AllowPlayerOverrideManager(ITranslationProvider noPlayerTranslation, ITranslationProvider toggledTranslation, ITranslationProvider listTranslation, String logMessage) {
         allowPlayerOverrideCache = CacheBuilder.newBuilder()
                 .expireAfterWrite(5, TimeUnit.MINUTES)
                 .removalListener((RemovalListener<UUID, Boolean>) notification -> BuildingGadgets.LOG.info(
-                        "Player with id {} was removed from the list of players who may {} paste unloaded chunks. He/She will need to run the command in order to be allowed to copy unloaded chunks.",
-                        notification.getKey(), notification.getValue() ? "" : "not"))
+                        "Player with id {} was removed from the list of players for which '{}' is {} enabled. " +
+                                "He/She will need to run the command again for '{}' to become active again.",
+                        notification.getKey(), logMessage, notification.getValue() ? "" : "not", logMessage))
                 .build();
+        this.noPlayerTranslation = noPlayerTranslation;
+        this.toggledTranslation = toggledTranslation;
+        this.listTranslation = listTranslation;
+        this.logMessage = logMessage;
     }
 
     void toggleAllowOverride(PlayerEntity player) {
@@ -36,7 +45,7 @@ final class AllowPlayerOverrideManager {
         try {
             allowPlayerOverrideCache.put(uuid, ! allowPlayerOverrideCache.get(uuid, () -> false));
         } catch (ExecutionException e) {
-            BuildingGadgets.LOG.warn("Failed to toggle 'allow copy unloaded chunks' for player {}", uuid, e);
+            BuildingGadgets.LOG.warn("Failed to toggle '{}' for player {}", logMessage, uuid, e);
         }
     }
 
@@ -51,19 +60,18 @@ final class AllowPlayerOverrideManager {
 
     int executeToggle(CommandContext<CommandSource> context, PlayerEntity player) {
         if (player == null) {
-            context.getSource().sendErrorMessage(CommandTranslation.COPY_UNLOADED_NO_PLAYER.componentTranslation().setStyle(Styles.RED));
+            context.getSource().sendErrorMessage(noPlayerTranslation.componentTranslation().setStyle(Styles.RED));
             return 0;
         }
         toggleAllowOverride(player);
-        context.getSource().sendFeedback(CommandTranslation.COPY_UNLOADED_TOGGLED
-                .componentTranslation(player.getDisplayName(), mayOverride(player))
+        context.getSource().sendFeedback(toggledTranslation.componentTranslation(player.getDisplayName(), mayOverride(player))
                 .setStyle(Styles.AQUA), true);
         return 1;
     }
 
     int executeList(CommandContext<CommandSource> context) {
         for (Map.Entry<UUID, Boolean> entry : allowPlayerOverrideCache.asMap().entrySet()) {
-            ITextComponent component = CommandTranslation.COPY_UNLOADED_LIST.componentTranslation(entry.getKey(), entry.getValue());
+            ITextComponent component = listTranslation.componentTranslation(entry.getKey(), entry.getValue());
             component = entry.getValue() ? component.setStyle(Styles.BLUE) : component.setStyle(Styles.DK_GREEN);
             context.getSource().sendFeedback(component, true);
         }

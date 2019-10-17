@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.common.commands;
 
+import com.direwolf20.buildinggadgets.common.util.lang.CommandTranslation;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import net.minecraft.command.CommandSource;
@@ -10,7 +11,10 @@ import net.minecraft.entity.player.PlayerEntity;
 import java.util.UUID;
 
 public final class OverrideBuildSizeCommand {
-    private static final AllowPlayerOverrideManager ALLOW_LARGE_BUILDS = new AllowPlayerOverrideManager();
+    private static final AllowPlayerOverrideManager ALLOW_LARGE_BUILDS = new AllowPlayerOverrideManager(
+            CommandTranslation.OVERRIDE_BUILD_SIZE_NO_PLAYER, CommandTranslation.OVERRIDE_BUILD_SIZE_TOGGLED,
+            CommandTranslation.OVERRIDE_BUILD_SIZE_LIST, "override build size"
+    );
 
     public static void toggleAllowLargeBuilds(PlayerEntity player) {
         ALLOW_LARGE_BUILDS.toggleAllowOverride(player);

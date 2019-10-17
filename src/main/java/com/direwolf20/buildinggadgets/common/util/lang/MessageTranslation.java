@@ -34,6 +34,7 @@ public enum MessageTranslation implements ITranslationProvider {
     UNDO_FAILED("undo_failed"),
     UNDO_UNLOADED("undo_unloaded", 1),
     UNDO_MISSING_ITEMS("undo_missing_items");
+
     private static final String PREFIX = Reference.MODID + ".message.";
     private final String key;
     private final int argCount;

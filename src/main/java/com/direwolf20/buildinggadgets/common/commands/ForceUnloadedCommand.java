@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.common.commands;
 
+import com.direwolf20.buildinggadgets.common.util.lang.CommandTranslation;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import net.minecraft.command.CommandSource;
@@ -10,7 +11,10 @@ import net.minecraft.entity.player.PlayerEntity;
 import java.util.UUID;
 
 public class ForceUnloadedCommand {
-    private static final AllowPlayerOverrideManager ALLOW_UNLOADED_CHUNKS = new AllowPlayerOverrideManager();
+    private static final AllowPlayerOverrideManager ALLOW_UNLOADED_CHUNKS = new AllowPlayerOverrideManager(
+            CommandTranslation.FORCE_UNLOADED_NO_PLAYER, CommandTranslation.FORCE_UNLOADED_TOGGLED,
+            CommandTranslation.FORCE_UNLOADED_LIST, "allow unloaded chunks"
+    );
 
     public static void toggleAllowUnloadedChunks(PlayerEntity player) {
         ALLOW_UNLOADED_CHUNKS.toggleAllowOverride(player);
