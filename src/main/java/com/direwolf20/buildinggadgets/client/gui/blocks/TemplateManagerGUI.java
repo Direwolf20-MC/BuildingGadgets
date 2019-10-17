@@ -14,10 +14,8 @@ import com.direwolf20.buildinggadgets.common.containers.TemplateManagerContainer
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketTemplateManagerTemplateCreated;
 import com.direwolf20.buildinggadgets.common.registry.OurItems;
-import com.direwolf20.buildinggadgets.common.template.ITemplateProvider;
-import com.direwolf20.buildinggadgets.common.template.Template;
-import com.direwolf20.buildinggadgets.common.template.TemplateHeader;
-import com.direwolf20.buildinggadgets.common.template.TemplateIO;
+import com.direwolf20.buildinggadgets.common.template.*;
+import com.direwolf20.buildinggadgets.common.template.ITemplateProvider.IUpdateListener;
 import com.direwolf20.buildinggadgets.common.tiles.TemplateManagerTileEntity;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.exceptions.TemplateParseException.IllegalMinecraftVersionException;
@@ -154,6 +152,24 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
         return button;
     }
 
+    //we need to ensure that the Template we want to look at is recent, before we take any further action
+    private void runAfterUpdate(Runnable runnable, int slot) {
+        container.getSlot(slot).getStack().getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(key -> {
+            Minecraft.getInstance().world.getCapability(CapabilityTemplate.TEMPLATE_PROVIDER_CAPABILITY).ifPresent(provider -> {
+                provider.registerUpdateListener(new IUpdateListener() {
+                    @Override
+                    public void onTemplateUpdate(ITemplateProvider provider, ITemplateKey updateKey, Template template) {
+                        if (provider.getId(updateKey).equals(provider.getId(key))) {
+                            runnable.run();
+                            provider.removeUpdateListener(this);
+                        }
+                    }
+                });
+                provider.requestUpdate(key);
+            });
+        });
+    }
+
     private void onSave() {
         boolean replaced = replaceStack();
         ItemStack left = container.getSlot(0).getStack();
@@ -162,12 +178,15 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
             rename(Minecraft.getInstance().world, right);
             return;
         }
-        Minecraft.getInstance().world.getCapability(CapabilityTemplate.TEMPLATE_PROVIDER_CAPABILITY).ifPresent(provider -> {
-            left.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(key -> {
-                Template templateToSave = provider.getTemplateForKey(key);
-                pasteTemplateToStack(provider, right, templateToSave, replaced);
+        runAfterUpdate(() -> { //we are copying form 0 to 1 => slot 0 needs to be the recent one
+            Minecraft.getInstance().world.getCapability(CapabilityTemplate.TEMPLATE_PROVIDER_CAPABILITY).ifPresent(provider -> {
+                left.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(key -> {
+                    Template templateToSave = provider.getTemplateForKey(key);
+                    pasteTemplateToStack(provider, right, templateToSave, replaced);
+                });
             });
-        });
+        }, 0);
+
     }
 
     private void onLoad() {
@@ -178,40 +197,46 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
             rename(Minecraft.getInstance().world, right);
             return;
         }
-        Minecraft.getInstance().world.getCapability(CapabilityTemplate.TEMPLATE_PROVIDER_CAPABILITY).ifPresent(provider -> {
-            right.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(key -> {
-                Template templateToSave = provider.getTemplateForKey(key);
-                pasteTemplateToStack(provider, left, templateToSave, replaced);
+        runAfterUpdate(() -> { //we are copying form 1 to 0 => slot 1 needs to be the recent one
+            Minecraft.getInstance().world.getCapability(CapabilityTemplate.TEMPLATE_PROVIDER_CAPABILITY).ifPresent(provider -> {
+                right.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(key -> {
+                    Template templateToSave = provider.getTemplateForKey(key);
+                    pasteTemplateToStack(provider, left, templateToSave, replaced);
+                });
             });
-        });
+        }, 1);
+
     }
 
     private void onCopy() {
-        ItemStack stack = container.getSlot(1).getStack();
-        stack.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(key -> {
-            World world = Minecraft.getInstance().world;
-            world.getCapability(CapabilityTemplate.TEMPLATE_PROVIDER_CAPABILITY).ifPresent(provider -> {
-                PlayerEntity player = Minecraft.getInstance().player;
-                IBuildContext buildContext = SimpleBuildContext.builder()
-                        .buildingPlayer(player)
-                        .usedStack(stack)
-                        .build(world);
-                try {
-                    Template template = provider.getTemplateForKey(key);
-                    if (! nameField.getText().isEmpty())
-                        template = template.withName(nameField.getText());
-                    String json = TemplateIO.writeTemplateJson(template, buildContext);
-                    Minecraft.getInstance().keyboardListener.setClipboardString(json);
-                    player.sendStatusMessage(MessageTranslation.CLIPBOARD_COPY_SUCCESS.componentTranslation().setStyle(Styles.DK_GREEN), false);
-                } catch (DataCannotBeWrittenException e) {
-                    BuildingGadgets.LOG.error("Failed to write Template.", e);
-                    player.sendStatusMessage(MessageTranslation.CLIPBOARD_COPY_ERROR_TEMPLATE.componentTranslation().setStyle(Styles.RED), false);
-                } catch (Exception e) {
-                    BuildingGadgets.LOG.error("Failed to copy Template to clipboard.", e);
-                    player.sendStatusMessage(MessageTranslation.CLIPBOARD_COPY_ERROR.componentTranslation().setStyle(Styles.RED), false);
-                }
+        runAfterUpdate(() -> { //we are copying from slot 1 => slot 1 needs to be updated
+            ItemStack stack = container.getSlot(1).getStack();
+            stack.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(key -> {
+                World world = Minecraft.getInstance().world;
+                world.getCapability(CapabilityTemplate.TEMPLATE_PROVIDER_CAPABILITY).ifPresent(provider -> {
+                    PlayerEntity player = Minecraft.getInstance().player;
+                    IBuildContext buildContext = SimpleBuildContext.builder()
+                            .buildingPlayer(player)
+                            .usedStack(stack)
+                            .build(world);
+                    try {
+                        Template template = provider.getTemplateForKey(key);
+                        if (! nameField.getText().isEmpty())
+                            template = template.withName(nameField.getText());
+                        String json = TemplateIO.writeTemplateJson(template, buildContext);
+                        Minecraft.getInstance().keyboardListener.setClipboardString(json);
+                        player.sendStatusMessage(MessageTranslation.CLIPBOARD_COPY_SUCCESS.componentTranslation().setStyle(Styles.DK_GREEN), false);
+                    } catch (DataCannotBeWrittenException e) {
+                        BuildingGadgets.LOG.error("Failed to write Template.", e);
+                        player.sendStatusMessage(MessageTranslation.CLIPBOARD_COPY_ERROR_TEMPLATE.componentTranslation().setStyle(Styles.RED), false);
+                    } catch (Exception e) {
+                        BuildingGadgets.LOG.error("Failed to copy Template to clipboard.", e);
+                        player.sendStatusMessage(MessageTranslation.CLIPBOARD_COPY_ERROR.componentTranslation().setStyle(Styles.RED), false);
+                    }
+                });
             });
-        });
+        }, 1);
+
     }
 
     private void onPaste() {
