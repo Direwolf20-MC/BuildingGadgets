@@ -11,6 +11,8 @@ import com.direwolf20.buildinggadgets.common.building.view.IBuildContext;
 import com.direwolf20.buildinggadgets.common.building.view.SimpleBuildContext;
 import com.direwolf20.buildinggadgets.common.capability.CapabilityTemplate;
 import com.direwolf20.buildinggadgets.common.containers.TemplateManagerContainer;
+import com.direwolf20.buildinggadgets.common.network.PacketHandler;
+import com.direwolf20.buildinggadgets.common.network.packets.PacketTemplateManagerTemplateCreated;
 import com.direwolf20.buildinggadgets.common.registry.OurItems;
 import com.direwolf20.buildinggadgets.common.template.ITemplateProvider;
 import com.direwolf20.buildinggadgets.common.template.Template;
@@ -153,8 +155,7 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
     }
 
     private void onSave() {
-        if (! replaceStack())
-            return;
+        boolean replaced = replaceStack();
         ItemStack left = container.getSlot(0).getStack();
         ItemStack right = container.getSlot(1).getStack();
         if (left.isEmpty()) {
@@ -164,14 +165,13 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
         Minecraft.getInstance().world.getCapability(CapabilityTemplate.TEMPLATE_PROVIDER_CAPABILITY).ifPresent(provider -> {
             left.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(key -> {
                 Template templateToSave = provider.getTemplateForKey(key);
-                pasteTemplateToStack(provider, right, templateToSave);
+                pasteTemplateToStack(provider, right, templateToSave, replaced);
             });
         });
     }
 
     private void onLoad() {
-        if (! replaceStack())
-            return;
+        boolean replaced = replaceStack();
         ItemStack left = container.getSlot(0).getStack();
         ItemStack right = container.getSlot(1).getStack();
         if (left.isEmpty()) {
@@ -181,7 +181,7 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
         Minecraft.getInstance().world.getCapability(CapabilityTemplate.TEMPLATE_PROVIDER_CAPABILITY).ifPresent(provider -> {
             right.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(key -> {
                 Template templateToSave = provider.getTemplateForKey(key);
-                pasteTemplateToStack(provider, left, templateToSave);
+                pasteTemplateToStack(provider, left, templateToSave, replaced);
             });
         });
     }
@@ -225,10 +225,9 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
             Template readTemplate = TemplateIO.readTemplateFromJson(CBString).clearMaterials();
             if (! nameField.getText().isEmpty())
                 readTemplate = readTemplate.withName(nameField.getText());
-            if (! replaceStack())
-                return;
+            boolean replaced = replaceStack();
             ItemStack stack = container.getSlot(1).getStack();
-            pasteTemplateToStack(world, stack, readTemplate);
+            pasteTemplateToStack(world, stack, readTemplate, replaced);
             Minecraft.getInstance().player.sendStatusMessage(MessageTranslation.PASTE_SUCCESS.componentTranslation().setStyle(Styles.DK_GREEN), false);
         } catch (CorruptJsonException e) {
             BuildingGadgets.LOG.error("Failed to parse json syntax.", e);
@@ -259,28 +258,30 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
         }
     }
 
-    private void pasteTemplateToStack(World world, ItemStack stack, Template newTemplate) {
+    private void pasteTemplateToStack(World world, ItemStack stack, Template newTemplate, boolean replaced) {
         world.getCapability(CapabilityTemplate.TEMPLATE_PROVIDER_CAPABILITY).ifPresent(provider -> {
-            pasteTemplateToStack(provider, stack, newTemplate);
+            pasteTemplateToStack(provider, stack, newTemplate, replaced && world.isRemote());
         });
     }
 
-    private void pasteTemplateToStack(ITemplateProvider provider, ItemStack stack, Template newTemplate) {
+    private void pasteTemplateToStack(ITemplateProvider provider, ItemStack stack, Template newTemplate, boolean replaced) {
         stack.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(key -> {
             provider.setTemplate(key, newTemplate);
-            provider.requestRemoteUpdate(key);
+            if (replaced)
+                PacketHandler.sendToServer(new PacketTemplateManagerTemplateCreated(provider.getId(key), te.getPos()));
+            else
+                provider.requestRemoteUpdate(key);
         });
     }
 
-    private boolean replaceStack() { //TODO message
+    private boolean replaceStack() {
         ItemStack stack = container.getSlot(1).getStack();
         if (stack.isEmpty())
             return false;
         if (stack.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).isPresent())
-            return true;
+            return false;
         else if (TemplateManagerTileEntity.TEMPLATE_CONVERTIBLES.contains(stack.getItem())) {
             container.putStackInSlot(1, new ItemStack(OurItems.template));
-            container.detectAndSendChanges();
             return true;
         }
         return false;

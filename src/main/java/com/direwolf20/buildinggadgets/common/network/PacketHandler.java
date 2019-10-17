@@ -67,6 +67,8 @@ public class PacketHandler {
         registerMessage(PacketTemplateIdAllocated.class, PacketTemplateIdAllocated::encode, PacketTemplateIdAllocated::new, PacketTemplateIdAllocated::handle);
         registerMessage(PacketSetRemoteInventoryCache.class, PacketSetRemoteInventoryCache::encode, PacketSetRemoteInventoryCache::decode, PacketSetRemoteInventoryCache.Handler::handle);
         registerMessage(PacketRequestTemplate.class, PacketRequestTemplate::encode, PacketRequestTemplate::new, PacketRequestTemplate::handle);
+        //Client side
+        registerMessage(PacketTemplateManagerTemplateCreated.class, PacketTemplateManagerTemplateCreated::encode, PacketTemplateManagerTemplateCreated::new, PacketTemplateManagerTemplateCreated::handle);
     }
 
     public static void sendTo(Object msg, ServerPlayerEntity player) {

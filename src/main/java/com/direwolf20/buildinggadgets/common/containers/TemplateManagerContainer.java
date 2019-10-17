@@ -20,6 +20,7 @@ import java.util.Objects;
 public class TemplateManagerContainer extends BaseContainer {
     public static final String TEXTURE_LOC_SLOT_TOOL = Reference.MODID + ":gui/slot_copy_paste_gadget";
     public static final String TEXTURE_LOC_SLOT_TEMPLATE = Reference.MODID + ":gui/slot_template";
+    private static final int DRAG_TYPE_TEMPLATE_CRAFTED = 4;
     private TemplateManagerTileEntity te;
 
     public TemplateManagerContainer(int windowId, PlayerInventory playerInventory, PacketBuffer extraData) {
@@ -54,7 +55,7 @@ public class TemplateManagerContainer extends BaseContainer {
 
     @Override
     @Nonnull
-    public ItemStack transferStackInSlot(PlayerEntity p_82846_1_, int index) {
+    public ItemStack transferStackInSlot(PlayerEntity player, int index) {
         ItemStack itemstack = ItemStack.EMPTY;
         Slot slot = this.inventorySlots.get(index);
 
@@ -78,7 +79,6 @@ public class TemplateManagerContainer extends BaseContainer {
                 slot.onSlotChanged();
             }
         }
-        detectAndSendChanges();
 
         return itemstack;
     }
@@ -86,4 +86,5 @@ public class TemplateManagerContainer extends BaseContainer {
     public TemplateManagerTileEntity getTe() {
         return te;
     }
+
 }
