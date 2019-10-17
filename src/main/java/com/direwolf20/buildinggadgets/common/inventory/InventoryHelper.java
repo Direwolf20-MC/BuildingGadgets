@@ -418,14 +418,14 @@ public class InventoryHelper {
         BlockState state = world.getBlockState(pos);
         if (state.getBlock() instanceof FlowingFluidBlock || ! state.getFluidState().isEmpty())
             return Optional.empty();
-        BlockState placeState;
+        BlockState placeState = null;
         try {
             placeState = state.getBlock().getStateForPlacement(useContext);
         } catch (Exception e) {
-            placeState = state.getBlock().getDefaultState();
+            ; //this can happen if the context doesn't match how it should be
         }
         if (placeState == null)
-            return Optional.empty();
+            placeState = state.getBlock().getDefaultState();
         for (IProperty<?> prop : placeState.getProperties()) {
             if (! UNSAFE_PROPERTIES.contains(prop))
                 placeState = applyProperty(placeState, state, prop);

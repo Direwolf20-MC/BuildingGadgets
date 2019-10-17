@@ -96,7 +96,7 @@
   "buildinggadgets.message.areareset": "Copy Area Reset",
   "buildinggadgets.message.copyfailed": "Copy Failed, no data for tool",
   "buildinggadgets.message.copyguierror": "Copy Area Failed",
-  "buildinggadgets.message.copysuccess": "Copy to Clipboard successful",
+  "buildinggadgets.message.copy_clipboard_success": "Copy to Clipboard successful",
   "buildinggadgets.message.destroysizeerror": "Maximum Destruction size is 16x16x16, negative numbers are invalid",
   "buildinggadgets.message.fuzzymode": "Fuzzy Mode",
   "buildinggadgets.message.raytrace_fluid": "Raytracing Fluid",

@@ -199,6 +199,7 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
                         template = template.withName(nameField.getText());
                     String json = TemplateIO.writeTemplateJson(template, buildContext);
                     Minecraft.getInstance().keyboardListener.setClipboardString(json);
+                    Minecraft.getInstance().player.sendStatusMessage(MessageTranslation.CLIPBOARD_COPY_SUCCESS.componentTranslation().setStyle(Styles.DK_GREEN), false);
                 } catch (IllegalTemplateFormatException e) {
                     BuildingGadgets.LOG.error("Failed to copy Template to clipboard", e);
                 }
@@ -221,6 +222,7 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
             if (! nameField.getText().isEmpty())
                 readTemplate = readTemplate.withName(nameField.getText());
             pasteTemplateToStack(world, stack, readTemplate);
+            Minecraft.getInstance().player.sendStatusMessage(MessageTranslation.PASTE_SUCCESS.componentTranslation().setStyle(Styles.DK_GREEN), false);
         } catch (Throwable t) { //TODO make use of exceptions
             BuildingGadgets.LOG.error("Failed to paste Template.", t);
             Minecraft.getInstance().player.sendStatusMessage(MessageTranslation.PASTE_FAILED.componentTranslation().setStyle(Styles.RED), false);

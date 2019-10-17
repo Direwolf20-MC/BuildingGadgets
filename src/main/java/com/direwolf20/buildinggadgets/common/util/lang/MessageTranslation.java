@@ -13,6 +13,7 @@ public enum MessageTranslation implements ITranslationProvider {
     AREA_COPIED_FAILED_TOO_MANY_DIFF("too_many_dif_blocks"),
     ANCHOR_REMOVED("anchor_removed"),
     ANCHOR_SET("anchor_set"),
+    CLIPBOARD_COPY_SUCCESS("copy_clipboard_success", 0),
     COPY_UNLOADED("copy_unloaded", 1),
     GADGET_BUSY("gadget_busy"),
     INVALID_BLOCK("invalid_block", 1),
