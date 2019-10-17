@@ -41,18 +41,19 @@ public class TemplateManagerTileEntity extends TileEntity {
             TemplateManagerTileEntity.this.markDirty();
         }
 
-        @Override
-        @Nonnull
-        public ItemStack insertItem(int slot, @Nonnull ItemStack stack, boolean simulate) {
-            if ((slot == 0 && isNonTemplateStack(stack)))
-                return stack;
-            if (slot == 1 && isNonTemplateStack(stack) && ! stack.getItem().isIn(TEMPLATE_CONVERTIBLES))
-                return stack;
-            return super.insertItem(slot, stack, simulate); //handles non-stackable items etc.
+        private boolean isTemplateStack(ItemStack stack) {
+            return stack.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).isPresent();
         }
 
-        private boolean isNonTemplateStack(ItemStack stack) {
-            return ! stack.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).isPresent();
+        @Override
+        public int getSlotLimit(int slot) {
+            return 1;
+        }
+
+        @Override
+        public boolean isItemValid(int slot, @Nonnull ItemStack stack) {
+            return (slot == 0 && isTemplateStack(stack)) ||
+                    (slot == 1 && (isTemplateStack(stack) || stack.getItem().isIn(TEMPLATE_CONVERTIBLES)));
         }
     };
     private LazyOptional<IItemHandler> handlerOpt;
