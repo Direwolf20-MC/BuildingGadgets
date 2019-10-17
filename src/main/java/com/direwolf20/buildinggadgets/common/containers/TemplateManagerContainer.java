@@ -18,8 +18,8 @@ import javax.annotation.Nonnull;
 import java.util.Objects;
 
 public class TemplateManagerContainer extends BaseContainer {
-    public static final String TEXTURE_LOC_SLOT_TOOL = Reference.MODID + ":textures/gui/slot_copy_paste_gadget";
-    public static final String TEXTURE_LOC_SLOT_TEMPLATE = Reference.MODID + ":textures/gui/slot_template";
+    public static final String TEXTURE_LOC_SLOT_TOOL = Reference.MODID + ":gui/slot_copy_paste_gadget";
+    public static final String TEXTURE_LOC_SLOT_TEMPLATE = Reference.MODID + ":gui/slot_template";
     private TemplateManagerTileEntity te;
 
     public TemplateManagerContainer(int windowId, PlayerInventory playerInventory, PacketBuffer extraData) {

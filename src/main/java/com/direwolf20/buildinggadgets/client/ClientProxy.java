@@ -32,7 +32,6 @@ import net.minecraftforge.client.model.data.IModelData;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedOutEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DeferredWorkQueue;
 
 import javax.annotation.Nonnull;
@@ -174,7 +173,6 @@ public class ClientProxy {
         event.getModelRegistry().put(ConstrLocation4a, bakedModelLoaderAmbient);
     }
 
-    @SubscribeEvent
     private static void registerSprites(TextureStitchEvent.Pre event) {
         event.addSprite(new ResourceLocation(TemplateManagerContainer.TEXTURE_LOC_SLOT_TOOL));
         event.addSprite(new ResourceLocation(TemplateManagerContainer.TEXTURE_LOC_SLOT_TEMPLATE));
@@ -184,7 +182,6 @@ public class ClientProxy {
         Minecraft.getInstance().getSoundHandler().play(SimpleSound.master(sound, pitch));
     }
 
-    @SubscribeEvent
     private static void onPlayerLoggedOut(PlayerLoggedOutEvent event) {
         CACHE_TEMPLATE_PROVIDER.clear();
     }
