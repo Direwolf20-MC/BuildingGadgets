@@ -123,6 +123,7 @@
   "gui.buildinggadgets.tm.button.paste": "Paste",
   "gui.buildinggadgets.tm.button.save": "Save",
   "gui.buildinggadgets.tm.button.load": "Load",
+  "gui.buildinggadgets.tm.name_field.text": "name?",
   "_comment": "gui - single words",
   "gui.buildinggadgets.single.confirm": "Confirm",
   "gui.buildinggadgets.single.cancel": "Cancel",

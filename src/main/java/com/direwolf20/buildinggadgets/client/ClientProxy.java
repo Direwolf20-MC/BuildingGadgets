@@ -3,6 +3,7 @@ package com.direwolf20.buildinggadgets.client;
 import com.direwolf20.buildinggadgets.client.cache.CacheTemplateProvider;
 import com.direwolf20.buildinggadgets.client.events.EventTooltip;
 import com.direwolf20.buildinggadgets.client.models.ConstructionBakedModel;
+import com.direwolf20.buildinggadgets.common.containers.TemplateManagerContainer;
 import com.direwolf20.buildinggadgets.common.registry.OurBlocks;
 import com.direwolf20.buildinggadgets.common.registry.Registries;
 import com.direwolf20.buildinggadgets.common.tiles.ConstructionBlockTileEntity;
@@ -23,7 +24,6 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IEnviromentBlockReader;
-import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
@@ -34,7 +34,6 @@ import net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedOutEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DeferredWorkQueue;
-import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -42,14 +41,14 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
-@EventBusSubscriber(Dist.CLIENT)
 public class ClientProxy {
     public static final CacheTemplateProvider CACHE_TEMPLATE_PROVIDER = new CacheTemplateProvider();
     public static void clientSetup(final IEventBus eventBus) {
         DeferredWorkQueue.runLater(KeyBindings::init);
-        //eventBus.addListener(ClientProxy::renderWorldLastEvent);
         eventBus.addListener(ClientProxy::bakeModels);
+        eventBus.addListener(ClientProxy::registerSprites);
         MinecraftForge.EVENT_BUS.addListener(EventTooltip::onDrawTooltip);
+        MinecraftForge.EVENT_BUS.addListener(ClientProxy::onPlayerLoggedOut);
 
         // @michaelhillcox: I have questions on why this is here
         Registries.clientSetup();
@@ -176,14 +175,9 @@ public class ClientProxy {
     }
 
     @SubscribeEvent
-    public static void registerSprites(TextureStitchEvent.Pre event) {
-        //registerSprite(event, TemplateManagerContainer.TEXTURE_LOC_SLOT_TOOL);
-        //registerSprite(event, TemplateManagerContainer.TEXTURE_LOC_SLOT_TEMPLATE);
-    }
-
-    private static void registerSprite(TextureStitchEvent.Pre event, String loc) {
-        //TODO replace with something that doesn't result in an StackOverflow error
-        //event.getMap().func_215254_a(Minecraft.getInstance().getResourceManager(), Collections.singleton(new ResourceLocation(loc)), null);
+    private static void registerSprites(TextureStitchEvent.Pre event) {
+        event.addSprite(new ResourceLocation(TemplateManagerContainer.TEXTURE_LOC_SLOT_TOOL));
+        event.addSprite(new ResourceLocation(TemplateManagerContainer.TEXTURE_LOC_SLOT_TEMPLATE));
     }
 
     public static void playSound(SoundEvent sound, float pitch) {
@@ -191,7 +185,7 @@ public class ClientProxy {
     }
 
     @SubscribeEvent
-    public static void onPlayerLoggedOut(PlayerLoggedOutEvent event) {
+    private static void onPlayerLoggedOut(PlayerLoggedOutEvent event) {
         CACHE_TEMPLATE_PROVIDER.clear();
     }
 }

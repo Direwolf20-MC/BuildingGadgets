@@ -16,6 +16,7 @@ public enum GuiTranslation implements ITranslationProvider {
     BUTTON_SAVE("tm.button.save"),
     BUTTON_COPY("tm.button.copy"),
     BUTTON_PASTE("tm.button.paste"),
+    TEMPLATE_NAME_TIP("tm.name_field.text"),
 
     COPY_BUTTON_ABSOLUTE("copy.button.absolute"),
     COPY_LABEL_HEADING("copy.label.heading"),

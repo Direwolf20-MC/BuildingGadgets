@@ -120,9 +120,8 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
 
     @Override
     public void init() {
-        this.nameField = new TextFieldWidget(this.font, this.guiLeft + 8, this.guiTop + 6, 149, this.font.FONT_HEIGHT, "name?");
-
         super.init();
+        this.nameField = new TextFieldWidget(this.font, this.guiLeft + 8, this.guiTop + 6, 149, this.font.FONT_HEIGHT, GuiTranslation.TEMPLATE_NAME_TIP.format());
         //helpTextProviders.clear();
         //buttonHelp = addButton(new GuiButtonHelp(this.guiLeft + this.xSize - 16, this.guiTop + 4, (button) -> buttonHelp.toggleSelected()));
         buttonSave = addButton(createAndAddButton(79, 17, 30, 20, GuiTranslation.BUTTON_SAVE.format(), b -> onSave()));
@@ -278,6 +277,13 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
 
         this.nameField.render(mouseX, mouseY, partialTicks);
         //drawStructure();
+    }
+
+    @Override
+    public boolean keyPressed(int key, int key_code, int p_keyPressed_3_) {
+        if (nameField.isFocused() && key != 256) //if someone is typing, then only esc should matter
+            return nameField.keyPressed(key, key_code, p_keyPressed_3_);
+        return super.keyPressed(key, key_code, p_keyPressed_3_);
     }
 
     public void drawTexturedModalRectReverseX(int x, int y, int textureX, int textureY, int width, int height, boolean reverse) {
