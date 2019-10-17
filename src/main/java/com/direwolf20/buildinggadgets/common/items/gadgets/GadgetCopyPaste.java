@@ -452,7 +452,7 @@ public class GadgetCopyPaste extends AbstractGadget {
                 index,
                 (c, t) -> overwrite ? c.getWorld().getBlockState(t.getPos()).isReplaceable(useContext) : c.getWorld().isAirBlock(t.getPos()),
                 true);
-        PlacementScheduler.schedulePlacement(view, checker, Config.GADGETS.GADGET_COPY_PASTE.placeSteps.get())
+        PlacementScheduler.schedulePlacement(view, checker, Config.GADGETS.placeSteps.get())
                 .withFinisher(p -> {
                     pushUndo(stack, p.getUndoBuilder().build(view.getContext().getWorld().getDimension().getType()));
                     onBuildFinished(stack, player);

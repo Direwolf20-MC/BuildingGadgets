@@ -18,12 +18,17 @@ import com.direwolf20.buildinggadgets.common.template.TemplateHeader;
 import com.direwolf20.buildinggadgets.common.template.TemplateIO;
 import com.direwolf20.buildinggadgets.common.tiles.TemplateManagerTileEntity;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
-import com.direwolf20.buildinggadgets.common.util.exceptions.IllegalTemplateFormatException;
+import com.direwolf20.buildinggadgets.common.util.exceptions.TemplateParseException.IllegalMinecraftVersionException;
+import com.direwolf20.buildinggadgets.common.util.exceptions.TemplateParseException.UnknownTemplateVersionException;
+import com.direwolf20.buildinggadgets.common.util.exceptions.TemplateReadException;
+import com.direwolf20.buildinggadgets.common.util.exceptions.TemplateReadException.CorruptJsonException;
+import com.direwolf20.buildinggadgets.common.util.exceptions.TemplateWriteException.DataCannotBeWrittenException;
 import com.direwolf20.buildinggadgets.common.util.lang.GuiTranslation;
 import com.direwolf20.buildinggadgets.common.util.lang.MessageTranslation;
 import com.direwolf20.buildinggadgets.common.util.lang.Styles;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.direwolf20.buildinggadgets.common.world.FakeDelegationWorld;
+import com.google.gson.JsonParseException;
 import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
@@ -197,9 +202,13 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
                         template = template.withName(nameField.getText());
                     String json = TemplateIO.writeTemplateJson(template, buildContext);
                     Minecraft.getInstance().keyboardListener.setClipboardString(json);
-                    Minecraft.getInstance().player.sendStatusMessage(MessageTranslation.CLIPBOARD_COPY_SUCCESS.componentTranslation().setStyle(Styles.DK_GREEN), false);
-                } catch (IllegalTemplateFormatException e) {
-                    BuildingGadgets.LOG.error("Failed to copy Template to clipboard", e);
+                    player.sendStatusMessage(MessageTranslation.CLIPBOARD_COPY_SUCCESS.componentTranslation().setStyle(Styles.DK_GREEN), false);
+                } catch (DataCannotBeWrittenException e) {
+                    BuildingGadgets.LOG.error("Failed to write Template.", e);
+                    player.sendStatusMessage(MessageTranslation.CLIPBOARD_COPY_ERROR_TEMPLATE.componentTranslation().setStyle(Styles.RED), false);
+                } catch (Exception e) {
+                    BuildingGadgets.LOG.error("Failed to copy Template to clipboard.", e);
+                    player.sendStatusMessage(MessageTranslation.CLIPBOARD_COPY_ERROR.componentTranslation().setStyle(Styles.RED), false);
                 }
             });
         });
@@ -221,9 +230,32 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
             ItemStack stack = container.getSlot(1).getStack();
             pasteTemplateToStack(world, stack, readTemplate);
             Minecraft.getInstance().player.sendStatusMessage(MessageTranslation.PASTE_SUCCESS.componentTranslation().setStyle(Styles.DK_GREEN), false);
-        } catch (Throwable t) { //TODO make use of exceptions
-            BuildingGadgets.LOG.error("Failed to paste Template.", t);
-            Minecraft.getInstance().player.sendStatusMessage(MessageTranslation.PASTE_FAILED.componentTranslation().setStyle(Styles.RED), false);
+        } catch (CorruptJsonException e) {
+            BuildingGadgets.LOG.error("Failed to parse json syntax.", e);
+            Minecraft.getInstance().player.sendStatusMessage(MessageTranslation.PASTE_FAILED_CORRUPT_JSON
+                    .componentTranslation().setStyle(Styles.RED), false);
+        } catch (IllegalMinecraftVersionException e) {
+            BuildingGadgets.LOG.error("Attempted to parse Template for Minecraft version {} but expected {}.",
+                    e.getMinecraftVersion(), e.getExpectedVersion(), e);
+            Minecraft.getInstance().player.sendStatusMessage(MessageTranslation.PASTE_FAILED_WRONG_MC_VERSION
+                    .componentTranslation(e.getMinecraftVersion(), e.getExpectedVersion()).setStyle(Styles.RED), false);
+        } catch (UnknownTemplateVersionException e) {
+            BuildingGadgets.LOG.error("Attempted to parse Template version {} but newest is {}.",
+                    e.getTemplateVersion(), TemplateHeader.VERSION, e);
+            Minecraft.getInstance().player.sendStatusMessage(MessageTranslation.PASTE_FAILED_TOO_RECENT_VERSION
+                    .componentTranslation(e.getTemplateVersion(), TemplateHeader.VERSION).setStyle(Styles.RED), false);
+        } catch (JsonParseException e) {
+            BuildingGadgets.LOG.error("Failed to parse Template json.", e);
+            Minecraft.getInstance().player.sendStatusMessage(MessageTranslation.PASTE_FAILED_INVALID_JSON
+                    .componentTranslation().setStyle(Styles.RED), false);
+        } catch (TemplateReadException e) {
+            BuildingGadgets.LOG.error("Failed to read Template body.", e);
+            Minecraft.getInstance().player.sendStatusMessage(MessageTranslation.PASTE_FAILED_CORRUPT_BODY
+                    .componentTranslation().setStyle(Styles.RED), false);
+        } catch (Exception e) {
+            BuildingGadgets.LOG.error("Failed to paste Template.", e);
+            Minecraft.getInstance().player.sendStatusMessage(MessageTranslation.PASTE_FAILED
+                    .componentTranslation().setStyle(Styles.RED), false);
         }
     }
 

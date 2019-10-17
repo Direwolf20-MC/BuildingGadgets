@@ -282,7 +282,7 @@ public abstract class AbstractGadget extends Item {
         if (undoOptional.isPresent()) {
             Undo undo = undoOptional.orElseThrow(RuntimeException::new);
             IItemIndex index = InventoryHelper.index(stack, player);
-            if (! ForceUnloadedCommand.mayCopyUnloadedChunks(player)) {//TODO separate command
+            if (! ForceUnloadedCommand.mayForceUnloadedChunks(player)) {//TODO separate command
                 ImmutableSortedSet<ChunkPos> unloadedChunks = undo.getBoundingBox().getUnloadedChunks(world);
                 if (! unloadedChunks.isEmpty()) {
                     pushUndo(stack, undo);

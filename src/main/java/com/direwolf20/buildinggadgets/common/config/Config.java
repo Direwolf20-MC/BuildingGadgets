@@ -123,6 +123,7 @@ public class Config {
     //No defense against reflection needed here (I think)
     public static final class CategoryGadgets {
         public final IntValue maxRange;
+        public final IntValue placeSteps;
         public final CategoryGadgetBuilding GADGET_BUILDING;
         public final CategoryGadgetExchanger GADGET_EXCHANGER;
         public final CategoryGadgetDestruction GADGET_DESTRUCTION;
@@ -135,6 +136,15 @@ public class Config {
                     .comment("The max range of the Gadgets")
                     .translation(LANG_KEY_GADGETS + ".maxRange")
                     .defineInRange("Maximum allowed Range", 15, 1, 32);
+
+            placeSteps = SERVER_BUILDER
+                    .comment("Maximum amount of Blocks to be placed in one Tick.",
+                            "Notice that an EffectBlock takes 20 ticks to place, therefore a Server has to handle 20-times this value effect-block Tile's at once. " +
+                                    "Reduce this if  you notice lag-spikes from Players placing Templates.",
+                            "Of course decreasing this value will result in more time required to place large TemplateItem's.")
+                    .translation(LANG_KEY_GADGET_COPY_PASTE + ".place_steps")
+                    //use the old cap as the synchronous border... This implies that 32*32*32 areas are the max size for a synchronous copy by default
+                    .defineInRange("Max Placement/Tick", 1024, 1, Integer.MAX_VALUE);
 
             GADGET_BUILDING     = new CategoryGadgetBuilding();
             GADGET_EXCHANGER    = new CategoryGadgetExchanger();
@@ -237,7 +247,6 @@ public class Config {
             public final IntValue energyCost;
             public final IntValue undoSize;
             public final IntValue copySteps;
-            public final IntValue placeSteps;
             public final IntValue maxCopySize;
             public final IntValue maxBuildSize;
 
@@ -254,15 +263,6 @@ public class Config {
                         .translation(LANG_KEY_GADGET_COPY_PASTE + ".copy_steps")
                         //use the old cap as the per tick border... This implies that 32*32*32 areas are the max size for a one tick copy by default
                         .defineInRange("Max Copy/Tick", 32768, 1, Integer.MAX_VALUE);
-
-                placeSteps = SERVER_BUILDER
-                        .comment("Maximum amount of Blocks to be placed in one Tick.",
-                                "Notice that an EffectBlock takes 20 ticks to place, therefore a Server has to handle 20-times this value effect-block Tile's at once. " +
-                                        "Reduce this if  you notice lag-spikes from Players placing Templates.",
-                                "Of course decreasing this value will result in more time required to place large TemplateItem's.")
-                        .translation(LANG_KEY_GADGET_COPY_PASTE + ".place_steps")
-                        //use the old cap as the synchronous border... This implies that 32*32*32 areas are the max size for a synchronous copy by default
-                        .defineInRange("Max Placement/Tick", 1024, 1, Integer.MAX_VALUE);
 
                 maxCopySize = SERVER_BUILDER
                         .comment("Maximum dimensions (x, y and z) that can be copied by a Template without requiring special permission.",

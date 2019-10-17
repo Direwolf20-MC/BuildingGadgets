@@ -27,7 +27,7 @@ import java.util.Objects;
  * much information as possible about the {@link Template} they would like to use.
  */
 public final class TemplateHeader {
-    private static final String VERSION = "2-beta";
+    public static final String VERSION = "2-beta";
     private static final ComparableVersion COMP_VERSION = new ComparableVersion(VERSION);
     private static final String MC_VERSION = "1.14.4";
     private static final JsonBiDiSerializer<TemplateHeader> BI_DI_SERIALIZER = new JsonBiDiSerializer<TemplateHeader>() {

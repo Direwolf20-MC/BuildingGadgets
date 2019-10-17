@@ -2,7 +2,6 @@ package com.direwolf20.buildinggadgets.common.save;
 
 import com.direwolf20.buildinggadgets.common.save.TemplateSave.TemplateInfo;
 import com.direwolf20.buildinggadgets.common.template.Template;
-import com.direwolf20.buildinggadgets.common.util.exceptions.IllegalTemplateFormatException;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import net.minecraft.nbt.CompoundNBT;
 
@@ -35,11 +34,7 @@ public final class TemplateSave extends TimedDataSave<TemplateInfo> {
 
     @Override
     protected TemplateInfo readValue(CompoundNBT nbt) {
-        try {
-            return new TemplateInfo(nbt);
-        } catch (IllegalTemplateFormatException e) {
-            throw new RuntimeException("Failed to read TemplateItem! This should not have been possible!", e);
-        }
+        return new TemplateInfo(nbt);
     }
 
     private TemplateInfo markDirtyAndUpdate(TemplateInfo info) {
@@ -50,7 +45,7 @@ public final class TemplateSave extends TimedDataSave<TemplateInfo> {
     static final class TemplateInfo extends TimedDataSave.TimedValue { //for reasons I don't understand it doesn't compile if you leave the TimedDataSave out!
         private Template template;
 
-        private TemplateInfo(CompoundNBT nbt) throws IllegalTemplateFormatException {
+        private TemplateInfo(CompoundNBT nbt) {
             super(nbt);
             template = Template.deserialize(nbt.getCompound(NBTKeys.KEY_DATA), null, true);
         }

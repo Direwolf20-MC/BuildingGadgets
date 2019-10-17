@@ -1,18 +1,18 @@
 package com.direwolf20.buildinggadgets.common.network.packets;
 
 import com.direwolf20.buildinggadgets.client.ClientProxy;
-import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.save.SaveManager;
 import com.direwolf20.buildinggadgets.common.template.SimpleTemplateKey;
 import com.direwolf20.buildinggadgets.common.template.Template;
 import com.direwolf20.buildinggadgets.common.template.TemplateIO;
+import com.direwolf20.buildinggadgets.common.util.exceptions.TemplateReadException;
+import com.direwolf20.buildinggadgets.common.util.exceptions.TemplateWriteException;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.network.NetworkEvent.Context;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.util.UUID;
 import java.util.function.Supplier;
 
@@ -25,7 +25,7 @@ public final class SplitPacketUpdateTemplate extends UUIDPacket {
         buffer.readBytes(bytes);
         try {
             template = TemplateIO.readTemplate(new ByteArrayInputStream(bytes), null);
-        } catch (IOException e) {
+        } catch (TemplateReadException e) {
             throw new RuntimeException("Failed to read TemplateItem from buffer!", e);
         }
     }
@@ -41,8 +41,8 @@ public final class SplitPacketUpdateTemplate extends UUIDPacket {
         try {
             TemplateIO.writeTemplate(template, stream);
             buffer.writeBytes(stream.toByteArray());
-        } catch (IOException e) {
-            BuildingGadgets.LOG.error("Failed to write TemplateItem during Packet Encoding!", e);
+        } catch (TemplateWriteException e) {
+            throw new RuntimeException("Failed to write TemplateItem during Packet Encoding!", e);
         }
     }
 
