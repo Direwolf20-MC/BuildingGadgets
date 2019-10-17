@@ -4,7 +4,9 @@ import com.direwolf20.buildinggadgets.client.ClientProxy;
 import com.direwolf20.buildinggadgets.client.gui.GuiMod;
 import com.direwolf20.buildinggadgets.common.capability.CapabilityBlockProvider;
 import com.direwolf20.buildinggadgets.common.capability.CapabilityTemplate;
-import com.direwolf20.buildinggadgets.common.commands.CopyUnloadedCommand;
+import com.direwolf20.buildinggadgets.common.commands.ForceUnloadedCommand;
+import com.direwolf20.buildinggadgets.common.commands.OverrideBuildSizeCommand;
+import com.direwolf20.buildinggadgets.common.commands.OverrideCopySizeCommand;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.config.crafting.RecipeConstructionPaste.Serializer;
 import com.direwolf20.buildinggadgets.common.inventory.InventoryHelper;
@@ -104,8 +106,12 @@ public final class BuildingGadgets {
     private void serverLoad(FMLServerStartingEvent event) {
         event.getCommandDispatcher().register(
                 Commands.literal(Reference.MODID)
-                        .then(CopyUnloadedCommand.registerToggle())
-                        .then(CopyUnloadedCommand.registerList())
+                        .then(OverrideBuildSizeCommand.registerToggle())
+                        .then(OverrideCopySizeCommand.registerToggle())
+                        .then(ForceUnloadedCommand.registerToggle())
+                        .then(OverrideBuildSizeCommand.registerList())
+                        .then(OverrideCopySizeCommand.registerList())
+                        .then(ForceUnloadedCommand.registerList())
         );
     }
 

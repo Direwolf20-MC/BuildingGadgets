@@ -7,7 +7,7 @@ import com.direwolf20.buildinggadgets.common.building.view.SimpleBuildContext;
 import com.direwolf20.buildinggadgets.common.capability.CapabilityProviderEnergy;
 import com.direwolf20.buildinggadgets.common.capability.provider.CapabilityProviderBlockProvider;
 import com.direwolf20.buildinggadgets.common.capability.provider.MultiCapabilityProvider;
-import com.direwolf20.buildinggadgets.common.commands.CopyUnloadedCommand;
+import com.direwolf20.buildinggadgets.common.commands.ForceUnloadedCommand;
 import com.direwolf20.buildinggadgets.common.concurrent.UndoScheduler;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.inventory.IItemIndex;
@@ -282,7 +282,7 @@ public abstract class AbstractGadget extends Item {
         if (undoOptional.isPresent()) {
             Undo undo = undoOptional.orElseThrow(RuntimeException::new);
             IItemIndex index = InventoryHelper.index(stack, player);
-            if (! CopyUnloadedCommand.mayCopyUnloadedChunks(player)) {//TODO separate command
+            if (! ForceUnloadedCommand.mayCopyUnloadedChunks(player)) {//TODO separate command
                 ImmutableSortedSet<ChunkPos> unloadedChunks = undo.getBoundingBox().getUnloadedChunks(world);
                 if (! unloadedChunks.isEmpty()) {
                     pushUndo(stack, undo);

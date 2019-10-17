@@ -10,7 +10,9 @@ import com.direwolf20.buildinggadgets.common.building.view.SimpleBuildContext;
 import com.direwolf20.buildinggadgets.common.building.view.WorldBackedBuildView;
 import com.direwolf20.buildinggadgets.common.capability.CapabilityTemplate;
 import com.direwolf20.buildinggadgets.common.capability.provider.TemplateKeyProvider;
-import com.direwolf20.buildinggadgets.common.commands.CopyUnloadedCommand;
+import com.direwolf20.buildinggadgets.common.commands.ForceUnloadedCommand;
+import com.direwolf20.buildinggadgets.common.commands.OverrideBuildSizeCommand;
+import com.direwolf20.buildinggadgets.common.commands.OverrideCopySizeCommand;
 import com.direwolf20.buildinggadgets.common.concurrent.CopyScheduler;
 import com.direwolf20.buildinggadgets.common.concurrent.PlacementScheduler;
 import com.direwolf20.buildinggadgets.common.config.Config;
@@ -342,35 +344,44 @@ public class GadgetCopyPaste extends AbstractGadget {
         else
             setLowerRegionBound(stack, lookedAt);
         Optional<Region> regionOpt = getSelectedRegion(stack);
-        regionOpt.ifPresent(region -> performCopy(stack, world, player, region));
+        regionOpt.ifPresent(region -> tryCopy(stack, world, player, region));
     }
 
-    private void performCopy(ItemStack stack, World world, PlayerEntity player, Region region) {
-        world.getCapability(CapabilityTemplate.TEMPLATE_PROVIDER_CAPABILITY).ifPresent(provider -> {
-            stack.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(key -> {
-                Template template = provider.getTemplateForKey(key);
-                if (! CopyUnloadedCommand.mayCopyUnloadedChunks(player)) {
-                    ImmutableSortedSet<ChunkPos> unloaded = region.getUnloadedChunks(world);
-                    if (! unloaded.isEmpty()) {
-                        player.sendStatusMessage(MessageTranslation.COPY_UNLOADED.componentTranslation(unloaded.size()).setStyle(Styles.RED), true);
-                        BuildingGadgets.LOG.debug("Prevented copy because {} chunks where detected as unloaded.", unloaded.size());
-                        BuildingGadgets.LOG.trace("The following chunks were detected as unloaded {}.", CHUNK_JOINER.join(unloaded));
-                        return;
-                    }
-                }
-                SimpleBuildContext context = SimpleBuildContext.builder()
-                        .buildingPlayer(player)
-                        .usedStack(stack)
-                        .build(world);
-                WorldBackedBuildView buildView = WorldBackedBuildView.create(context, region,
-                        (c, p) -> InventoryHelper.getSafeBlockData(player, p, player.getActiveHand()));
-                runCopyTransaction(stack, template, buildView);
-            });
-
-        });
+    private void tryCopy(ItemStack stack, World world, PlayerEntity player, Region region) {
+        if (! checkCopy(world, player, region))
+            return;
+        SimpleBuildContext context = SimpleBuildContext.builder()
+                .buildingPlayer(player)
+                .usedStack(stack)
+                .build(world);
+        WorldBackedBuildView buildView = WorldBackedBuildView.create(context, region,
+                (c, p) -> InventoryHelper.getSafeBlockData(player, p, player.getActiveHand()));
+        performCopy(stack, buildView);
     }
 
-    private void runCopyTransaction(ItemStack stack, Template template, WorldBackedBuildView buildView) {
+    private boolean checkCopy(World world, PlayerEntity player, Region region) {
+        if (! ForceUnloadedCommand.mayForceUnloadedChunks(player)) {
+            ImmutableSortedSet<ChunkPos> unloaded = region.getUnloadedChunks(world);
+            if (! unloaded.isEmpty()) {
+                player.sendStatusMessage(MessageTranslation.COPY_UNLOADED.componentTranslation(unloaded.size()).setStyle(Styles.RED), true);
+                BuildingGadgets.LOG.debug("Prevented copy because {} chunks where detected as unloaded.", unloaded.size());
+                BuildingGadgets.LOG.trace("The following chunks were detected as unloaded {}.", CHUNK_JOINER.join(unloaded));
+                return false;
+            }
+        }
+        int maxDimension = Config.GADGETS.GADGET_COPY_PASTE.maxCopySize.get();
+        if ((region.getXSize() > maxDimension || region.getYSize() > maxDimension || region.getZSize() > maxDimension) &&
+                ! OverrideCopySizeCommand.mayPerformLargeCopy(player)) {
+            BlockPos sizeVec = region.getMax().subtract(region.getMin());
+            player.sendStatusMessage(MessageTranslation.COPY_TOO_LARGE
+                    .componentTranslation(sizeVec.getX(), sizeVec.getY(), sizeVec.getZ(), maxDimension, maxDimension, maxDimension)
+                    .setStyle(Styles.RED), true);
+            return false;
+        }
+        return true;
+    }
+
+    private void performCopy(ItemStack stack, WorldBackedBuildView buildView) {
         IBuildContext context = buildView.getContext();
         assert context.getBuildingPlayer() != null;
         PlayerEntity player = context.getBuildingPlayer();
@@ -400,15 +411,38 @@ public class GadgetCopyPaste extends AbstractGadget {
                         .buildingPlayer(player)
                         .build(world);
                 IBuildView view = template.createViewInContext(buildContext);
-                schedulePlacement(stack, view, player, pos);
+                view.translateTo(pos);
+                if (! checkPlacement(world, player, view.getBoundingBox()))
+                    return;
+                schedulePlacement(stack, view, player);
             });
         });
-
     }
 
-    private void schedulePlacement(ItemStack stack, IBuildView view, PlayerEntity player, BlockPos pos) {
+    private boolean checkPlacement(World world, PlayerEntity player, Region region) {
+        if (! ForceUnloadedCommand.mayForceUnloadedChunks(player)) {
+            ImmutableSortedSet<ChunkPos> unloaded = region.getUnloadedChunks(world);
+            if (! unloaded.isEmpty()) {
+                player.sendStatusMessage(MessageTranslation.BUILD_UNLOADED.componentTranslation(unloaded.size()).setStyle(Styles.RED), true);
+                BuildingGadgets.LOG.debug("Prevented build because {} chunks where detected as unloaded.", unloaded.size());
+                BuildingGadgets.LOG.trace("The following chunks were detected as unloaded {}.", CHUNK_JOINER.join(unloaded));
+                return false;
+            }
+        }
+        int maxDimension = Config.GADGETS.GADGET_COPY_PASTE.maxBuildSize.get();
+        if ((region.getXSize() > maxDimension || region.getYSize() > maxDimension || region.getZSize() > maxDimension) &&
+                ! OverrideBuildSizeCommand.mayPerformLargeBuild(player)) {
+            BlockPos sizeVec = region.getMax().subtract(region.getMin());
+            player.sendStatusMessage(MessageTranslation.BUILD_TOO_LARGE
+                    .componentTranslation(sizeVec.getX(), sizeVec.getY(), sizeVec.getZ(), maxDimension, maxDimension, maxDimension)
+                    .setStyle(Styles.RED), true);
+            return false;
+        }
+        return true;
+    }
+
+    private void schedulePlacement(ItemStack stack, IBuildView view, PlayerEntity player) {
         IItemIndex index = InventoryHelper.index(stack, player);
-        view.translateTo(pos);
         int energyCost = getEnergyCost(stack);
         boolean overwrite = Config.GENERAL.allowOverwriteBlocks.get();
         BlockItemUseContext useContext = new BlockItemUseContext(new ItemUseContext(player, Hand.MAIN_HAND, VectorHelper.getLookingAt(player, stack)));
@@ -418,7 +452,7 @@ public class GadgetCopyPaste extends AbstractGadget {
                 index,
                 (c, t) -> overwrite ? c.getWorld().getBlockState(t.getPos()).isReplaceable(useContext) : c.getWorld().isAirBlock(t.getPos()),
                 true);
-        PlacementScheduler.schedulePlacement(view, checker, Config.GADGETS.placeSteps.get())
+        PlacementScheduler.schedulePlacement(view, checker, Config.GADGETS.GADGET_COPY_PASTE.placeSteps.get())
                 .withFinisher(p -> {
                     pushUndo(stack, p.getUndoBuilder().build(view.getContext().getWorld().getDimension().getType()));
                     onBuildFinished(stack, player);
