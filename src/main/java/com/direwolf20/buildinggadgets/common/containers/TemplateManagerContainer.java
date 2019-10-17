@@ -59,25 +59,26 @@ public class TemplateManagerContainer extends BaseContainer {
         Slot slot = this.inventorySlots.get(index);
 
         if (slot != null && slot.getHasStack()) {
-            ItemStack itemstack1 = slot.getStack();
+            ItemStack currentStack = slot.getStack();
             //if (!(itemstack1.getItem() instanceof GadgetCopyPaste) && !itemstack1.getItem().equals(Items.PAPER) && !(itemstack1.getItem() instanceof TemplateItem))
             //    return itemstack;
-            itemstack = itemstack1.copy();
+            itemstack = currentStack.copy();
 
             if (index < TemplateManagerTileEntity.SIZE) {
-                if (!this.mergeItemStack(itemstack1, TemplateManagerTileEntity.SIZE, this.inventorySlots.size(), true)) {
+                if (! this.mergeItemStack(currentStack, TemplateManagerTileEntity.SIZE, this.inventorySlots.size(), true)) {
                     return ItemStack.EMPTY;
                 }
-            } else if (!this.mergeItemStack(itemstack1, 0, TemplateManagerTileEntity.SIZE, false)) {
+            } else if (! this.mergeItemStack(currentStack, 0, TemplateManagerTileEntity.SIZE, false)) {
                 return ItemStack.EMPTY;
             }
 
-            if (itemstack1.isEmpty()) {
+            if (currentStack.isEmpty()) {
                 slot.putStack(ItemStack.EMPTY);
             } else {
                 slot.onSlotChanged();
             }
         }
+        detectAndSendChanges();
 
         return itemstack;
     }

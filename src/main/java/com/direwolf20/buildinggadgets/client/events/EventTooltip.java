@@ -87,10 +87,10 @@ public class EventTooltip {
 
     @SubscribeEvent
     public static void onDrawTooltip(RenderTooltipEvent.PostText event) {
+        if (! Screen.hasShiftDown())
+            return;
         //This method will draw items on the tooltip
         ItemStack stack = event.getStack();
-        if (stack.getItem() != OurItems.gadgetCopyPaste || ! Screen.hasShiftDown())
-            return;
         Minecraft mc = Minecraft.getInstance();
         mc.world.getCapability(CapabilityTemplate.TEMPLATE_PROVIDER_CAPABILITY).ifPresent(provider -> {
             stack.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(templateKey -> {

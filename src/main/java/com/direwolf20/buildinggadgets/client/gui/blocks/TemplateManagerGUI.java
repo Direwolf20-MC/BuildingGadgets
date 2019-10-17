@@ -97,8 +97,6 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
 
     @Override
     public void render(int mouseX, int mouseY, float partialTicks) {
-        //TODO re-enable
-        drawGuiContainerBackgroundLayer(partialTicks, mouseX, mouseY);
         super.render(mouseX, mouseY, partialTicks);
         /*if (buttonHelp.isSelected()) {
             GlStateManager.color4f(1, 1, 1, 1);
@@ -112,6 +110,7 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
                     renderComponentHoverEffect(new StringTextComponent(helpTextProvider.getHoverHelpText()), mouseX, mouseY);
             }
         } else {*/
+        //TODO re-enable
         this.renderHoveredToolTip(mouseX, mouseY);
         /*}
         if (buttonHelp.isMouseOver(mouseX, mouseY))
@@ -207,19 +206,19 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
     }
 
     private void onPaste() {
-        if (! replaceStack())
-            return;
         String CBString = getMinecraft().keyboardListener.getClipboardString();
         if (GadgetUtils.mightBeLink(CBString)) {
             Minecraft.getInstance().player.sendStatusMessage(MessageTranslation.PASTE_SUCCESS.componentTranslation().setStyle(Styles.RED), false);
             return;
         }
         World world = Minecraft.getInstance().world;
-        ItemStack stack = container.getSlot(1).getStack();
         try {
             Template readTemplate = TemplateIO.readTemplateFromJson(CBString).clearMaterials();
             if (! nameField.getText().isEmpty())
                 readTemplate = readTemplate.withName(nameField.getText());
+            if (! replaceStack())
+                return;
+            ItemStack stack = container.getSlot(1).getStack();
             pasteTemplateToStack(world, stack, readTemplate);
             Minecraft.getInstance().player.sendStatusMessage(MessageTranslation.PASTE_SUCCESS.componentTranslation().setStyle(Styles.DK_GREEN), false);
         } catch (Throwable t) { //TODO make use of exceptions
@@ -248,7 +247,8 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
         if (stack.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).isPresent())
             return true;
         else if (TemplateManagerTileEntity.TEMPLATE_CONVERTIBLES.contains(stack.getItem())) {
-            container.getSlot(1).putStack(new ItemStack(OurItems.template));
+            container.putStackInSlot(1, new ItemStack(OurItems.template));
+            container.detectAndSendChanges();
             return true;
         }
         return false;

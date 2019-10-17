@@ -2,6 +2,8 @@ package com.direwolf20.buildinggadgets.common.template;
 
 import com.direwolf20.buildinggadgets.common.building.Region;
 import com.direwolf20.buildinggadgets.common.inventory.materials.MaterialList;
+import com.direwolf20.buildinggadgets.common.util.exceptions.TemplateParseException.IllegalMinecraftVersionException;
+import com.direwolf20.buildinggadgets.common.util.exceptions.TemplateParseException.UnknownTemplateVersionException;
 import com.direwolf20.buildinggadgets.common.util.ref.JsonKeys;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.util.tools.JsonBiDiSerializer;
@@ -12,6 +14,7 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.util.Constants.NBT;
+import org.apache.maven.artifact.versioning.ComparableVersion;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -24,12 +27,19 @@ import java.util.Objects;
  * much information as possible about the {@link Template} they would like to use.
  */
 public final class TemplateHeader {
-    private static final String VERSION = "2";
+    private static final String VERSION = "2-beta";
+    private static final ComparableVersion COMP_VERSION = new ComparableVersion(VERSION);
     private static final String MC_VERSION = "1.14.4";
     private static final JsonBiDiSerializer<TemplateHeader> BI_DI_SERIALIZER = new JsonBiDiSerializer<TemplateHeader>() {
         @Override
         public TemplateHeader deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
             JsonObject object = json.getAsJsonObject();
+            String mcVersion = object.getAsJsonPrimitive(JsonKeys.HEADER_MC_VERSION).getAsString();
+            if (! mcVersion.equals(MC_VERSION))
+                throw new IllegalMinecraftVersionException(mcVersion, MC_VERSION);
+            String version = object.getAsJsonPrimitive(JsonKeys.HEADER_VERSION).getAsString();
+            if (new ComparableVersion(version).compareTo(COMP_VERSION) > 0)
+                throw new UnknownTemplateVersionException(version);
             TemplateHeader.Builder builder;
             if (object.has(JsonKeys.HEADER_BOUNDING_BOX))
                 builder = TemplateHeader.builder(context.deserialize(object.get(JsonKeys.HEADER_BOUNDING_BOX), Region.class));
