@@ -11,9 +11,11 @@ import com.direwolf20.buildinggadgets.common.items.gadgets.AbstractGadget;
 import com.direwolf20.buildinggadgets.common.items.pastes.ConstructionPaste;
 import com.direwolf20.buildinggadgets.common.items.pastes.ConstructionPasteContainerCreative;
 import com.direwolf20.buildinggadgets.common.items.pastes.GenericPasteContainer;
+import com.direwolf20.buildinggadgets.common.registry.OurBlocks;
 import com.direwolf20.buildinggadgets.common.registry.OurItems;
 import com.direwolf20.buildinggadgets.common.registry.Registries.HandleProvider;
 import com.direwolf20.buildinggadgets.common.registry.TopologicalRegistryBuilder;
+import com.direwolf20.buildinggadgets.common.tiles.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.util.CommonUtils;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.exceptions.CapabilityNotPresentException;
@@ -30,6 +32,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUseContext;
 import net.minecraft.state.EnumProperty;
 import net.minecraft.state.IProperty;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.NonNullList;
@@ -171,61 +174,8 @@ public class InventoryHelper {
         return inv.addItemStackToInventory(giveItemStack);
     }
 
-    public static boolean useItem(ItemStack itemStack, PlayerEntity player, int count, World world) {
-        if (player.isCreative()) {
-            return true;
-        }
-
-        ItemStack tool = AbstractGadget.getGadget(player);
-        IItemHandler remoteInventory = GadgetUtils.getRemoteInventory(tool, world);
-        if (remoteInventory != null) {
-            for (int i = 0; i < remoteInventory.getSlots(); i++) {
-                ItemStack containerItem = remoteInventory.getStackInSlot(i);
-                if (containerItem.getItem() == itemStack.getItem() && containerItem.getCount() >= count) {
-                    remoteInventory.extractItem(i, count, false);
-                    return true;
-                }
-            }
-        }
-
-
-        PlayerInventory inv = player.inventory;
-
-        List<Integer> slots = findItem(itemStack.getItem(), inv);
-        List<IItemHandler> invContainers = findInvContainers(inv);
-
-        if (invContainers.size() > 0) {
-            for (IItemHandler container : invContainers) {
-                for (int i = 0; i < container.getSlots(); i++) {
-                    ItemStack containerItem = container.getStackInSlot(i);
-                    if (containerItem.getItem() == itemStack.getItem() && containerItem.getCount() >= count) {
-                        container.extractItem(i, count, false);
-                        return true;
-                    }
-                }
-            }
-        }
-        if (slots.size() == 0) {
-            return false;
-        }
-        int slot = slots.get(0);
-        ItemStack stackInSlot = inv.getStackInSlot(slot);
-        if (stackInSlot.getCount() < count) {
-            return false;
-        }
-        stackInSlot.shrink(count);
-        return true;
-    }
-
     public interface IRemoteInventoryProvider {
         int countItem(ItemStack tool, ItemStack stack);
-    }
-
-    public static int countItem(ItemStack itemStack, PlayerEntity player, World world) {
-        return countItem(itemStack, player, (tool, stack) -> {
-            IItemHandler remoteInventory = GadgetUtils.getRemoteInventory(tool, world);
-            return remoteInventory == null ? 0 : countInContainer(remoteInventory, stack.getItem());
-        });
     }
 
     public static int countItem(ItemStack itemStack, PlayerEntity player, IRemoteInventoryProvider remoteInventory) {
@@ -326,38 +276,6 @@ public class InventoryHelper {
         return itemStack;
     }
 
-    public static boolean usePaste(PlayerEntity player, int count) {
-        if (player.isCreative()) {
-            return true;
-        }
-        PlayerInventory inv = player.inventory;
-        List<Integer> slots = findItem(OurItems.constructionPaste, inv);
-        if (slots.size() > 0) {
-            for (int slot : slots) {
-                ItemStack pasteStack = inv.getStackInSlot(slot);
-                if (pasteStack.getCount() >= count) {
-                    pasteStack.shrink(count);
-                    return true;
-                }
-            }
-        }
-        List<Integer> containerSlots = findItemClass(GenericPasteContainer.class, inv);
-        if (containerSlots.size() > 0) {
-            for (int slot : containerSlots) {
-                ItemStack containerStack = inv.getStackInSlot(slot);
-                if (containerStack.getItem() instanceof GenericPasteContainer) {
-                    int pasteAmt = GenericPasteContainer.getPasteAmount(containerStack);
-                    if (pasteAmt >= count) {
-                        GenericPasteContainer.setPasteAmount(containerStack, pasteAmt - count);
-                        return true;
-                    }
-
-                }
-            }
-        }
-        return false;
-    }
-
     private static List<IItemHandler> findInvContainers(PlayerInventory inv) {
         List<IItemHandler> containers = new ArrayList<>();
 
@@ -418,6 +336,11 @@ public class InventoryHelper {
         BlockState state = world.getBlockState(pos);
         if (state.getBlock() instanceof FlowingFluidBlock || ! state.getFluidState().isEmpty())
             return Optional.empty();
+        if (state.getBlock() == OurBlocks.constructionBlock) {
+            TileEntity te = world.getTileEntity(pos);
+            if (te instanceof ConstructionBlockTileEntity) //should already be checked
+                return Optional.of(((ConstructionBlockTileEntity) te).getConstructionBlockData());
+        }
         BlockState placeState = null;
         try {
             placeState = state.getBlock().getStateForPlacement(useContext);
