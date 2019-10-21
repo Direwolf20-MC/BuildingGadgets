@@ -79,41 +79,6 @@ idea {
     }
 }
 
-Project proj = project
-eclipse {
-    classpath {
-        file {
-            whenMerged { cp ->
-                project.logger.lifecycle "[eclipse] Excluding sourceSet outputs from eclipse dependencies for project '${project.path}'"
-                cp.entries.grep { it.kind == 'lib' }.each { entry ->
-                    rootProject.allprojects { Project project ->
-                        String buildDirPath = project.buildDir.path.replace('\\', '/') + '/'
-                        String entryPath = entry.path
-
-                        if (entryPath.startsWith(buildDirPath)) {
-                            cp.entries.remove entry
-
-                            if (project != proj) {
-                                boolean projectContainsProjectDep = false
-                                for (Configuration cfg : proj.configurations) {
-                                    boolean cfgContainsProjectDependency = cfg.allDependencies.withType(ProjectDependency).collect { it.dependencyProject }.contains(project)
-                                    if(cfgContainsProjectDependency) {
-                                        projectContainsProjectDep = true
-                                        break;
-                                    }
-                                }
-                                if (!projectContainsProjectDep) {
-                                    throw new GradleException("The project '${proj.path}' has a dependency to the outputs of project '${project.path}', but not to the project itself. This is not allowed because it will cause compilation in eclipse to behave differently than in gradle.")
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
 minecraft {
     mappings channel: 'snapshot', version: "${mcp_mappings}"
     // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
