@@ -305,8 +305,6 @@ public class GadgetCopyPaste extends AbstractGadget {
         ItemStack stack = player.getHeldItem(hand);
         player.setActiveHand(hand);
         BlockPos posLookingAt = VectorHelper.getPosLookingAt(player, stack);
-        // Remove debug code
-        // CapabilityUtil.EnergyUtil.getCap(stack).ifPresent(energy -> energy.receiveEnergy(105000, false));
         if (! world.isRemote()) {
             if (player.isSneaking() && GadgetUtils.setRemoteInventory(stack, player, world, posLookingAt, false) == ActionResultType.SUCCESS)
                 return new ActionResult<>(ActionResultType.SUCCESS, stack);

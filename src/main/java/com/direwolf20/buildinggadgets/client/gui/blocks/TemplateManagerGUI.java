@@ -80,8 +80,8 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
     private TextFieldWidget nameField;
     private Button buttonSave, buttonLoad, buttonCopy, buttonPaste;
 
-    //private HelpB buttonHelp; //@MichaelHillcox replace with your lovely replacement (?)
-    //private List<IHoverHelpText> helpTextProviders = new ArrayList<>();
+//    private GuiButtonHelp buttonHelp; replace with my lovely replacement
+//    private List<IHoverHelpText> helpTextProviders = new ArrayList<>();
 
     private TemplateManagerTileEntity te;
     private TemplateManagerContainer container;
@@ -400,7 +400,6 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
                         zoomScale = overH / 40;
                     }
 
-                    //System.out.println(distance);
                     GlStateManager.pushMatrix();
                     //GlStateManager.translate(panel.getX() + (panel.getWidth() / 2), panel.getY() + (panel.getHeight() / 2), 100);
 
@@ -422,56 +421,19 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
                     GlStateManager.scaled(sc, sc, sc);
                     int moveX = startPos.getX() - endPos.getX();
 
-                    //GlStateManager.rotate(30, 0, 1, 0);
-                    if (startPos.getX() >= endPos.getX()) {
-                        moveX--;
-                        //GlStateManager.rotate(90, 0, -1, 0);
-                    }
+                //GlStateManager.rotate(30, 0, 1, 0);
+                if (startPos.getX() >= endPos.getX()) {
+                    moveX--;
+                }
 
-                    GlStateManager.translated((moveX) / 1.75, - Math.abs(startPos.getY() - endPos.getY()) / 1.75, 0);
-                    GlStateManager.translated(panX, - panY, 0);
-                    //System.out.println(((startPos.getX() - endPos.getX()) / 2) * -1 + ":" + ((startPos.getY() - endPos.getY()) / 2) * -1 + ":" + ((startPos.getZ() - endPos.getZ()) / 2) * -1);
-                    GlStateManager.translated(((startPos.getX() - endPos.getX()) / 2) * - 1, ((startPos.getY() - endPos.getY()) / 2) * - 1, ((startPos.getZ() - endPos.getZ()) / 2) * - 1);
-                    GlStateManager.rotatef(- rotX, 1, 0, 0);
-                    GlStateManager.rotatef(rotY, 0, 1, 0);
-                    GlStateManager.translated(((startPos.getX() - endPos.getX()) / 2), ((startPos.getY() - endPos.getY()) / 2), ((startPos.getZ() - endPos.getZ()) / 2));
+                GlStateManager.translated((moveX) / 1.75, -Math.abs(startPos.getY() - endPos.getY()) / 1.75, 0);
+                GlStateManager.translated(panX, -panY, 0);
+                GlStateManager.translated(((startPos.getX() - endPos.getX()) / 2) * -1, ((startPos.getY() - endPos.getY()) / 2) * -1, ((startPos.getZ() - endPos.getZ()) / 2) * -1);
+                GlStateManager.rotatef(-rotX, 1, 0, 0);
+                GlStateManager.rotatef(rotY, 0, 1, 0);
+                GlStateManager.translated(((startPos.getX() - endPos.getX()) / 2), ((startPos.getY() - endPos.getY()) / 2), ((startPos.getZ() - endPos.getZ()) / 2));
 
-                    getMinecraft().getTextureManager().bindTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
-                    if ((startPos.getX() - endPos.getX()) == 0) {
-                        //GlStateManager.rotate(270, 0, 1, 0);
-                    }
-                    //Tessellator.getInstance().getBuffer().begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
-                    //dispatcher.renderBlockBrightness(Blocks.GLASS.getDefaultState(), 1f);
-                    //Tessellator.getInstance().draw();
-                    FakeDelegationWorld fakeWorld = new FakeDelegationWorld(Minecraft.getInstance().world);
-                    IBuildContext context = SimpleBuildContext.builder()
-                            .usedStack(itemstack)
-                            .buildingPlayer(Minecraft.getInstance().player)
-                            .build(fakeWorld);
-                    Random rand = new Random();
-                    bufferBuilder.begin(GL14.GL_QUADS, DefaultVertexFormats.BLOCK);
-                    for (PlacementTarget target : template.createViewInContext(context)) {
-                        if (! target.placeIn(context))
-                            continue;
-                        BlockPos targetPos = target.getPos();
-                        BlockState state = fakeWorld.getBlockState(targetPos);
-                        TileEntity te = fakeWorld.getTileEntity(targetPos);
-                        try {
-                            if (state.getRenderType() == BlockRenderType.MODEL)
-                                dispatcher.getBlockModelRenderer().renderModel( //we need to call this directly, to prevent the side check
-                                        context.getWorld(),
-                                        dispatcher.getModelForState(state),
-                                        state,
-                                        targetPos,
-                                        bufferBuilder,
-                                        false, //This parameter (checkSides) is the important one - mc's caches block every solid block from being rendered
-                                        rand,
-                                        state.getPositionRandom(targetPos),
-                                        te != null ? te.getModelData() : EmptyModelData.INSTANCE);
-                        } catch (Exception e) {
-                            BuildingGadgets.LOG.info("Caught exception whilst rendering {}.", state, e);
-                        }
-                    }
+                getMinecraft().getTextureManager().bindTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
 
                     if (bufferBuilder.getVertexCount() > 0) {
                         VertexFormat vertexformat = bufferBuilder.getVertexFormat();
@@ -566,8 +528,8 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
                 momentumY = rotY - prevRotY;
                 doMomentum = false;
             } else if (clickButton == 1) {
-                //                prevPanX = panX;
-                //                prevPanY = panY;
+                //prevPanX = panX;
+                //prevPanY = panY;
                 panX = initPanX + ((int) getMinecraft().mouseHelper.getMouseX() - clickX) / 8;
                 panY = initPanY + ((int) getMinecraft().mouseHelper.getMouseY() - clickY) / 8;
             }
