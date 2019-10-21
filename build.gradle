@@ -115,7 +115,7 @@ eclipse {
 }
 
 minecraft {
-    mappings channel: 'snapshot', version: "${mcp_mappings}-1.14.3" //TODO un hardcode as soon as mcp updates
+    mappings channel: 'snapshot', version: "${mcp_mappings}"
     // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
 
     runs {
