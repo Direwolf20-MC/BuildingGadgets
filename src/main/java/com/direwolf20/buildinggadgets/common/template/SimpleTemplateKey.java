@@ -3,6 +3,10 @@ import javax.annotation.Nullable;
 import java.util.UUID;
 import java.util.function.Supplier;
 
+/**
+ * A very simple {@link ITemplateKey} which allows to query an {@link ITemplateProvider} for a specific Template, without
+ * having the CapabilityProvider at hand. (For example useful for packets)
+ */
 public final class SimpleTemplateKey implements ITemplateKey {
     @Nullable
     private UUID id;

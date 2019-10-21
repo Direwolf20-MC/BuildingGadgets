@@ -11,6 +11,10 @@ import net.minecraftforge.items.IItemHandler;
 
 import java.util.*;
 
+/**
+ * Indexes an IITemHandler for {@link IObjectHandle}'s, to allow {@link com.direwolf20.buildinggadgets.common.inventory.PlayerItemIndex} access
+ * to an indexed map of available Items.
+ */
 public final class ItemHandlerProvider implements IHandleProvider {
     public static void index(IItemHandler handler, Map<Class<?>, Map<Object, List<IObjectHandle<?>>>> indexMap) {
         List<ItemStack> stacks = new ArrayList<>(handler.getSlots());

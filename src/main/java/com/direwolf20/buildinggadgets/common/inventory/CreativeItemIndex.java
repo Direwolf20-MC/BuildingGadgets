@@ -7,6 +7,9 @@ import com.google.common.collect.Multiset;
 
 import java.util.Iterator;
 
+/**
+ * Represents the Items available in Creative Mode: everything. All queries will succeed. Always.
+ */
 public final class CreativeItemIndex implements IItemIndex {
     @Override
     public Multiset<IUniqueObject<?>> insert(Multiset<IUniqueObject<?>> items, boolean simulate) {

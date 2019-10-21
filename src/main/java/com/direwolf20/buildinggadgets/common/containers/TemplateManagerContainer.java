@@ -61,8 +61,6 @@ public class TemplateManagerContainer extends BaseContainer {
 
         if (slot != null && slot.getHasStack()) {
             ItemStack currentStack = slot.getStack();
-            //if (!(itemstack1.getItem() instanceof GadgetCopyPaste) && !itemstack1.getItem().equals(Items.PAPER) && !(itemstack1.getItem() instanceof TemplateItem))
-            //    return itemstack;
             itemstack = currentStack.copy();
 
             if (index < TemplateManagerTileEntity.SIZE) {

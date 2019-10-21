@@ -8,6 +8,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+/**
+ * A {@link SubMaterialListEntry} using "or" as the connection between entries.
+ */
 class OrMaterialListEntry extends SubMaterialListEntry {
     static final MaterialListEntry.Serializer<SubMaterialListEntry> SERIALIZER = new SubMaterialListEntry.Serializer(NBTKeys.OR_SERIALIZER_ID) {
         @Override
@@ -28,6 +31,9 @@ class OrMaterialListEntry extends SubMaterialListEntry {
         super(subEntries);
     }
 
+    /**
+     * Applies an "or" by iterating over all contained entries in the order in which they appear, and then in-turn iterating over the items.
+     */
     @Override
     public PeekingIterator<ImmutableMultiset<IUniqueObject<?>>> iterator() {
         if (! getAllSubEntries().findFirst().isPresent())

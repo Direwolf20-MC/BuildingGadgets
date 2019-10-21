@@ -28,6 +28,10 @@ import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.Objects;
 
+/**
+ * An {@link IUniqueObject} which represents all defining (unique) properties of an ItemStack: the item and the 2 types of nbt.
+ * For convenience 2 match types are provided for the nbt data.
+ */
 public final class UniqueItem implements IUniqueObject<Item> {
     public enum ComparisonMode {
         EXACT_MATCH(0) {

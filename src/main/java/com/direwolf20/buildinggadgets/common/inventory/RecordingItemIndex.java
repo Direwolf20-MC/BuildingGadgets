@@ -7,6 +7,13 @@ import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.Multisets;
 
+/**
+ * An {@link IItemIndex} which instead of inserting or extracting Items from the backing {@link IItemIndex} keeps record of
+ * everything that was attempted to be inserted and then simulates extraction/insertion of the combination of the "record" and
+ * the new Items. Works just like {@link com.direwolf20.buildinggadgets.common.util.tools.SimulateEnergyStorage} - only for Items.
+ *
+ * @see com.direwolf20.buildinggadgets.common.util.tools.SimulateEnergyStorage
+ */
 public final class RecordingItemIndex implements IItemIndex {
     private final IItemIndex other;
     private Multiset<IUniqueObject<?>> extractedItems;

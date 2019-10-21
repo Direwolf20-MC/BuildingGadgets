@@ -47,20 +47,6 @@ public interface ITileEntityData {
      * @return A {@link Multiset} of required Items.
      */
     default MaterialList getRequiredItems(IBuildContext context, BlockState state, @Nullable RayTraceResult target, @Nullable BlockPos pos) {
-        /*
-        if (context.getWorld() instanceof ServerWorld) {
-            ItemStack stack = context.getUsedStack().isEmpty() ? new ItemStack(Items.DIAMOND_PICKAXE) : context.getUsedStack().copy();
-            stack.addEnchantment(Enchantments.SILK_TOUCH, 1);
-            List<ItemStack> drops = state.getDrops(new Builder((ServerWorld) context.getWorld())
-                    .withParameter(LootParameters.POSITION, pos != null ? pos : BlockPos.ZERO)
-                    .withParameter(LootParameters.TOOL, stack)
-                    .withParameter(LootParameters.BLOCK_STATE, state));
-            MaterialList.SimpleBuilder builder = MaterialList.simpleBuilder();
-            for (ItemStack drop : drops) {
-                builder.add(UniqueItem.ofStack(drop));
-            }
-            return builder.build();
-        }*/
         ItemStack stack = null;
         try {
             stack = state.getBlock().getPickBlock(state, target, context.getWorld(), pos, context.getBuildingPlayer());

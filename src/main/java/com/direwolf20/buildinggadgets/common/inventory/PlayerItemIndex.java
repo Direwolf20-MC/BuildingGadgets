@@ -14,7 +14,12 @@ import net.minecraft.item.Items;
 
 import java.util.*;
 
+/**
+ * Item Index representation all Items accessible for the Player by BuildingGadgets.
+ * To allow for better performance, the Items in the player's Inventory are indexed by their Item and upon query only those with the appropriate Item need to be iterated.
+ */
 public final class PlayerItemIndex implements IItemIndex {
+    //use a class map first, to allow for non-Item IUniqueObjects...
     private Map<Class<?>, Map<Object, List<IObjectHandle<?>>>> handleMap;
     private List<IInsertProvider> insertProviders;
     private final ItemStack stack;
@@ -43,8 +48,8 @@ public final class PlayerItemIndex implements IItemIndex {
     private int insertObject(IUniqueObject<?> obj, int count, boolean simulate) {
         if (obj.preferStackInsert())
             return obj.tryCreateInsertStack(Collections.unmodifiableMap(handleMap), count)
-                .map(itemStack -> performSimpleInsert(itemStack, count, simulate))
-                .orElseGet(() -> performComplexInsert(obj, count, simulate));
+                    .map(itemStack -> performSimpleInsert(itemStack, count, simulate))
+                    .orElseGet(() -> performComplexInsert(obj, count, simulate));
         else {
             int remainingCount = performComplexInsert(obj, count, simulate);
             return remainingCount == 0 ? 0 : obj.tryCreateInsertStack(Collections.unmodifiableMap(handleMap), count)

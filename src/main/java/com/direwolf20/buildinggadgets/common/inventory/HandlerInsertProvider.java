@@ -3,6 +3,9 @@ package com.direwolf20.buildinggadgets.common.inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.items.IItemHandler;
 
+/**
+ * {@link IInsertProvider} which allows insertion into a single {@link IItemHandler} (for example a remote inventory).
+ */
 public final class HandlerInsertProvider implements IInsertProvider {
     private final IItemHandler remoteInventory;
 

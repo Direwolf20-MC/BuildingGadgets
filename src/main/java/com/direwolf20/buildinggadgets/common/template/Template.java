@@ -5,7 +5,7 @@ import com.direwolf20.buildinggadgets.common.building.Region;
 import com.direwolf20.buildinggadgets.common.building.tilesupport.ITileDataSerializer;
 import com.direwolf20.buildinggadgets.common.building.view.IBuildContext;
 import com.direwolf20.buildinggadgets.common.building.view.IBuildView;
-import com.direwolf20.buildinggadgets.common.building.view.MapBackedBuildView;
+import com.direwolf20.buildinggadgets.common.building.view.PositionalBuildView;
 import com.direwolf20.buildinggadgets.common.inventory.materials.MaterialList;
 import com.direwolf20.buildinggadgets.common.registry.Registries;
 import com.direwolf20.buildinggadgets.common.util.CommonUtils;
@@ -90,7 +90,7 @@ public final class Template {
     }
 
     public IBuildView createViewInContext(IBuildContext context) {
-        return MapBackedBuildView.createUnsafe(context, map, header.getBoundingBox());
+        return PositionalBuildView.createUnsafe(context, map, header.getBoundingBox());
     }
 
     public CompoundNBT serialize(boolean persisted) {

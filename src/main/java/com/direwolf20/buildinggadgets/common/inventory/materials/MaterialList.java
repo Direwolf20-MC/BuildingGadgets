@@ -20,21 +20,11 @@ import java.util.Iterator;
 import java.util.Objects;
 import java.util.function.Function;
 
-
-public final class MaterialList implements Iterable<ImmutableMultiset<IUniqueObject<?>>> { //Todo fully implement MaterialList system
-
-    /**
-     * <li>Item name (localized)
-     * <li>Item count
-     */
-    public static final String PATTERN_SIMPLE = "%s: %d";
-    /**
-     * <li>Item name (localized)
-     * <li>Item count
-     * <li>Item registry name
-     * <li>Formatted stack count, e.g. 5x64+2
-     */
-    public static final String PATTERN_DETAILED = "%s: %d (%s, %s)";
+/**
+ * Represents the required Item options for a single block, or a set of blocks. The option with the highest priority is listed
+ * first, followed by the remaining options in descending priority order.
+ */
+public final class MaterialList implements Iterable<ImmutableMultiset<IUniqueObject<?>>> {
 
     private static final MaterialList EMPTY = new MaterialList();
 

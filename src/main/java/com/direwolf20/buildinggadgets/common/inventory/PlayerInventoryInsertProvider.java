@@ -4,6 +4,9 @@ import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 
+/**
+ * An {@link net.minecraftforge.items.IItemHandler} which inserts items into the PlayerInventory by making it pick up a freshly created ItemStack.
+ */
 public final class PlayerInventoryInsertProvider implements IInsertProvider {
     private final PlayerEntity player;
 

@@ -23,33 +23,31 @@ import java.util.function.Consumer;
  * <p>
  * This {@link IBuildView} is especially useful, when trying to read all {@link BlockData} instances with in a given {@link Region}.
  * If you need this Information in a pre-determined way, or intend on iterating multiple times on this {@link IBuildView} consider
- * calling {@link #evaluate()} (which is equivalent to calling {@code MapBackedBuildView.ofIterable(view.getContext(), view)})
+ * calling {@link #evaluate()} (which is equivalent to calling {@code PositionalBuildView.ofIterable(view.getContext(), view)})
  * to evaluate all {@link BlockData} instances described by this {@link IBuildView view}.
- * <p>
- * Notice that closing has no effect on this object, and therefore also isn't required.
  */
-public final class WorldBackedBuildView implements IBuildView {
+public final class WorldBuildView implements IBuildView {
     private final IBuildContext context;
     private final Region region;
     private final BiFunction<IBuildContext, BlockPos, Optional<BlockData>> dataFactory;
     private BlockPos translation;
 
-    public static WorldBackedBuildView inWorld(IWorld world, Region region) {
+    public static WorldBuildView inWorld(IWorld world, Region region) {
         return create(SimpleBuildContext.builder().build(world), region);
     }
 
-    public static WorldBackedBuildView create(IBuildContext context, Region region) {
+    public static WorldBuildView create(IBuildContext context, Region region) {
         return create(context, region, null);
     }
 
-    public static WorldBackedBuildView create(IBuildContext context, Region region, @Nullable BiFunction<IBuildContext, BlockPos, Optional<BlockData>> dataFactory) {
-        return new WorldBackedBuildView(
-                Objects.requireNonNull(context, "Cannot create WorldBackedBuildView without an IBuildContext!"),
-                Objects.requireNonNull(region, "Cannot create WorldBackedBuildView without an Region!"),
+    public static WorldBuildView create(IBuildContext context, Region region, @Nullable BiFunction<IBuildContext, BlockPos, Optional<BlockData>> dataFactory) {
+        return new WorldBuildView(
+                Objects.requireNonNull(context, "Cannot create WorldBuildView without an IBuildContext!"),
+                Objects.requireNonNull(region, "Cannot create WorldBuildView without an Region!"),
                 dataFactory != null ? dataFactory : (c, p) -> Optional.of(TileSupport.createBlockData(c.getWorld(), p)));
     }
 
-    private WorldBackedBuildView(IBuildContext context, Region region, BiFunction<IBuildContext, BlockPos, Optional<BlockData>> dataFactory) {
+    private WorldBuildView(IBuildContext context, Region region, BiFunction<IBuildContext, BlockPos, Optional<BlockData>> dataFactory) {
         this.context = context;
         this.region = region;
         this.dataFactory = dataFactory;
@@ -62,7 +60,7 @@ public final class WorldBackedBuildView implements IBuildView {
     }
 
     @Override
-    public WorldBackedBuildView translateTo(BlockPos pos) {
+    public WorldBuildView translateTo(BlockPos pos) {
         this.translation = pos;
         return this;
     }
@@ -73,12 +71,12 @@ public final class WorldBackedBuildView implements IBuildView {
     }
 
     @Override
-    public WorldBackedBuildView copy() {
-        return new WorldBackedBuildView(getContext(), getBoundingBox(), dataFactory);
+    public WorldBuildView copy() {
+        return new WorldBuildView(getContext(), getBoundingBox(), dataFactory);
     }
 
-    public MapBackedBuildView evaluate() {
-        return MapBackedBuildView.ofIterable(getContext(), this);
+    public PositionalBuildView evaluate() {
+        return PositionalBuildView.ofIterable(getContext(), this);
     }
 
     @Override

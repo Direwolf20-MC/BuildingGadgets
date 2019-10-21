@@ -7,6 +7,9 @@ import com.google.common.collect.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * A {@link SubMaterialListEntry} using "and" as the connection between entries.
+ */
 class AndMaterialListEntry extends SubMaterialListEntry {
     static final MaterialListEntry.Serializer<SubMaterialListEntry> SERIALIZER = new SubMaterialListEntry.Serializer(NBTKeys.AND_SERIALIZER_ID) {
         @Override
@@ -27,6 +30,10 @@ class AndMaterialListEntry extends SubMaterialListEntry {
         super(subEntries);
     }
 
+    /**
+     * Applies an "and" to the contained {@link MaterialListEntry MaterialListEntries}. This happens by slowly incrementing through all options of
+     * the contained entries.
+     */
     @Override
     public PeekingIterator<ImmutableMultiset<IUniqueObject<?>>> iterator() {
         if (! getAllSubEntries().findFirst().isPresent())

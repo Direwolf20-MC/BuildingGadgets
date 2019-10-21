@@ -47,9 +47,9 @@ public final class SimpleBuildContext implements IBuildContext {
     private final ItemStack stack;
 
     private SimpleBuildContext(@Nonnull IWorld world, @Nullable PlayerEntity buildingPlayer, @Nonnull ItemStack stack) {
-        this.world = Objects.requireNonNull(world);
+        this.world = world;
         this.buildingPlayer = buildingPlayer;
-        this.stack = Objects.requireNonNull(stack);
+        this.stack = stack;
     }
 
     /**
@@ -97,8 +97,8 @@ public final class SimpleBuildContext implements IBuildContext {
          * @return The {@code Builder} itself
          * @see SimpleBuildContext#getWorld()
          */
-        public Builder world(IWorld world) {
-            this.world = Objects.requireNonNull(world);
+        public Builder world(@Nonnull IWorld world) {
+            this.world = world;
             return this;
         }
 
@@ -128,7 +128,7 @@ public final class SimpleBuildContext implements IBuildContext {
          * @see SimpleBuildContext#getUsedStack()
          */
         public Builder usedStack(@Nonnull ItemStack stack) {
-            this.stack = Objects.requireNonNull(stack);
+            this.stack = stack;
             return this;
         }
 

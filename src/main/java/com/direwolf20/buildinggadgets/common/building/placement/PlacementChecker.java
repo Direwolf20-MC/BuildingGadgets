@@ -25,6 +25,10 @@ import net.minecraftforge.event.world.BlockEvent;
 import java.util.function.BiPredicate;
 import java.util.function.ToIntFunction;
 
+/**
+ * This class performs all Placement checks required for the Copy-Paste-Gadget. Aka it tests for availability of energy, items and free placement-space.
+ * You can extract information about whether the tests succed, paste was used etc. from the CheckResult.
+ */
 public final class PlacementChecker {
     private final LazyOptional<IEnergyStorage> energyCap;
     private final ToIntFunction<PlacementTarget> energyFun;

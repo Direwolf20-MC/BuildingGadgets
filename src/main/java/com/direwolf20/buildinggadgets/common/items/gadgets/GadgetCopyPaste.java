@@ -7,7 +7,7 @@ import com.direwolf20.buildinggadgets.common.building.placement.PlacementChecker
 import com.direwolf20.buildinggadgets.common.building.view.IBuildContext;
 import com.direwolf20.buildinggadgets.common.building.view.IBuildView;
 import com.direwolf20.buildinggadgets.common.building.view.SimpleBuildContext;
-import com.direwolf20.buildinggadgets.common.building.view.WorldBackedBuildView;
+import com.direwolf20.buildinggadgets.common.building.view.WorldBuildView;
 import com.direwolf20.buildinggadgets.common.capability.CapabilityTemplate;
 import com.direwolf20.buildinggadgets.common.capability.provider.TemplateKeyProvider;
 import com.direwolf20.buildinggadgets.common.commands.ForceUnloadedCommand;
@@ -355,7 +355,7 @@ public class GadgetCopyPaste extends AbstractGadget {
                 .buildingPlayer(player)
                 .usedStack(stack)
                 .build(world);
-        WorldBackedBuildView buildView = WorldBackedBuildView.create(context, region,
+        WorldBuildView buildView = WorldBuildView.create(context, region,
                 (c, p) -> InventoryHelper.getSafeBlockData(player, p, player.getActiveHand()));
         performCopy(stack, buildView);
     }
@@ -382,7 +382,7 @@ public class GadgetCopyPaste extends AbstractGadget {
         return true;
     }
 
-    private void performCopy(ItemStack stack, WorldBackedBuildView buildView) {
+    private void performCopy(ItemStack stack, WorldBuildView buildView) {
         IBuildContext context = buildView.getContext();
         assert context.getBuildingPlayer() != null;
         PlayerEntity player = context.getBuildingPlayer();

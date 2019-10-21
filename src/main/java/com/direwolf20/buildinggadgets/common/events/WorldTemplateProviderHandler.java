@@ -10,6 +10,9 @@ import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 
+/**
+ * Event handler for attaching the TemplateProvider capability to worlds.
+ */
 @EventBusSubscriber
 public final class WorldTemplateProviderHandler {
     @SubscribeEvent
