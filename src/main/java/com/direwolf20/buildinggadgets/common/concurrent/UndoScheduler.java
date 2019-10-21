@@ -1,7 +1,6 @@
 package com.direwolf20.buildinggadgets.common.concurrent;
 
 import com.direwolf20.buildinggadgets.common.blocks.EffectBlock;
-import com.direwolf20.buildinggadgets.common.blocks.EffectBlock.Mode;
 import com.direwolf20.buildinggadgets.common.building.PlacementTarget;
 import com.direwolf20.buildinggadgets.common.building.view.IBuildContext;
 import com.direwolf20.buildinggadgets.common.inventory.IItemIndex;
@@ -61,7 +60,7 @@ public final class UndoScheduler extends SteppedScheduler {
         if (lastWasSuccess) {
             index.applyMatch(matchResult);
             index.insert(entry.getValue().getUsedItems());
-            EffectBlock.spawnEffectBlock(context, new PlacementTarget(entry.getKey(), entry.getValue().getData()), Mode.REPLACE, false);
+            EffectBlock.spawnUndoBlock(context, new PlacementTarget(entry.getKey(), entry.getValue().getData()));
         }
     }
 
