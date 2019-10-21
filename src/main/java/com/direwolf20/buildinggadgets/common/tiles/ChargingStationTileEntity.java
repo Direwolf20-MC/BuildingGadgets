@@ -188,7 +188,7 @@ public class ChargingStationTileEntity extends TileEntity implements ITickableTi
     @Nonnull
     public CompoundNBT write(CompoundNBT compound) {
         writeItemNBT(compound);
-        readEnergyNBT(compound);
+        writeEnergyNBT(compound);
         return super.write(compound);
     }
 
