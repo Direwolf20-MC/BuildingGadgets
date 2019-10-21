@@ -502,7 +502,6 @@ public class GadgetCopyPaste extends AbstractGadget implements ITemplate {
             placeBlock(world, blockMap.pos, player, blockMap.state, getBlockMapIntState(tagCompound).getIntStackMap());
 
         setAnchor(stack, null);
-        //System.out.printf("Built %d Blocks in %.2f ms%n", blockMapList.size(), (System.nanoTime() - time) * 1e-6);
     }
 
     private void placeBlock(World world, BlockPos pos, ServerPlayerEntity player, BlockData data, Map<BlockState, UniqueItem> IntStackMap) {
@@ -622,7 +621,6 @@ public class GadgetCopyPaste extends AbstractGadget implements ITemplate {
                 player.sendStatusMessage(new StringTextComponent(TextFormatting.RED + new TranslationTextComponent("message.gadget.undofailed").getUnformattedComponentText()), true);
                 success = false;
             }
-            //System.out.printf("Undid %d Blocks in %.2f ms%n", blockMapList.size(), (System.nanoTime() - time) * 1e-6);
         }
         if (success) setLastBuild(heldItem, null, DimensionType.OVERWORLD);
     }

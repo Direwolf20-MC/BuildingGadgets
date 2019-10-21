@@ -135,14 +135,7 @@ public class GadgetBuilding extends AbstractGadget implements IAtopPlacingGadget
     public ActionResult<ItemStack> onItemRightClick(World world, PlayerEntity player, Hand hand) {
         //On item use, if sneaking, select the block clicked on, else build -- This is called when you right click a tool NOT on a block.
         ItemStack itemstack = player.getHeldItem(hand);
-        //remove once we go live - debug code to add free energy to tool
-        //IEnergyStorage energy = CapabilityUtil.EnergyUtil.getCap(itemstack).orElseThrow(CapabilityNotPresentException::new);
-        //energy.receiveEnergy(100000, false);
-        /*CompoundNBT tagCompound = itemstack.getTag();
-        ByteBuf buf = Unpooled.buffer(16);
-        ByteBufUtils.writeTag(buf,tagCompound);
-        System.out.println(buf.readableBytes());*/
-        // System.out.println("jo");
+
         player.setActiveHand(hand);
         if (!world.isRemote) {
             if (player.isSneaking()) {
@@ -150,15 +143,11 @@ public class GadgetBuilding extends AbstractGadget implements IAtopPlacingGadget
             } else if (player instanceof ServerPlayerEntity) {
                 build((ServerPlayerEntity) player, itemstack);
             }
-            // System.out.println("hello");
         } else {
-            // System.out.println("ss");
-
             if (!player.isSneaking()) {
                 BaseRenderer.updateInventoryCache();
             } else {
                 if (Screen.hasControlDown()) {
-                    System.out.println("CUnt");
                     PacketHandler.sendToServer(new PacketBindTool());
                 }
             }

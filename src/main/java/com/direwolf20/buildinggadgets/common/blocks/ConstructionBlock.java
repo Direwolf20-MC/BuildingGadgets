@@ -293,7 +293,6 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
     @Override
     public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult rayTraceResult) {
         BlockState mimic = getActualMimicBlock(worldIn, pos);
-        //System.out.println(mimic);
         return ! isMimicNull(mimic) ? super.onBlockActivated(state, worldIn, pos, player, hand, rayTraceResult) : super.onBlockActivated(state, worldIn, pos, player, hand, rayTraceResult);
     }
 

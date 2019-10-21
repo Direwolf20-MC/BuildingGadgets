@@ -39,7 +39,6 @@ public class EventClientTick {
                 ITemplate template = (ITemplate) stack.getItem();
                 String UUID = template.getUUID(stack);
                 if (UUID != null && PasteToolBufferBuilder.isUpdateNeeded(UUID, stack)) {
-                    //System.out.println("BlockMap Update Needed for UUID: " + UUID + " in slot " + i);
                     PacketHandler.sendToServer(new PacketRequestBlockMap(template.getUUID(stack), !(template instanceof GadgetCopyPaste)));
                     joinedWorld = true;
                 }

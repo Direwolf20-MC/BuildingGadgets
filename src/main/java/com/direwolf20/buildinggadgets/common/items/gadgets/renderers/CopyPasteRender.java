@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.common.items.gadgets.renderers;
 
+import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.registry.OurBlocks;
 import com.direwolf20.buildinggadgets.common.registry.OurItems;
@@ -182,7 +183,7 @@ public class CopyPasteRender extends BaseRenderer {
                             try {
                                 TileEntityRendererDispatcher.instance.render(te, 0, 0, 0, evt.getPartialTicks(), - 1, true);
                             } catch (Exception e) {
-                                System.out.println("TER Exception with block type: " + state);
+                                BuildingGadgets.LOG.warn("TER Exception with block type: " + state);
                                 getInvalidTileEntities().add(te);
                                 GlStateManager.disableFog();
                                 GlStateManager.popMatrix();

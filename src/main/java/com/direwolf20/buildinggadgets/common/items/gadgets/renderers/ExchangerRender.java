@@ -160,7 +160,6 @@ public class ExchangerRender extends BaseRenderer {
                         try {
                             TileEntityRendererDispatcher.instance.render(te, 0, 0, 0, evt.getPartialTicks(), - 1, true);
                         } catch (Exception e) {
-                            System.out.println("TER Exception with block type: " + state);
                             getInvalidTileEntities().add(te);
                             GlStateManager.disableFog();
                             GlStateManager.popMatrix();
