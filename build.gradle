@@ -47,22 +47,6 @@ sourceSets {
     }
 }
 
-configurations {
-    apiImplementation.extendsFrom minecraft
-    apiTestImplementation.extendsFrom apiImplementation
-    implementation.extendsFrom apiImplementation
-    testImplementation.extendsFrom apiTestImplementation, implementation
-}
-
-idea {
-    module {
-        sourceDirs+=sourceSets.api.java.srcDirs
-        sourceDirs+=sourceSets.api.resources.srcDirs
-        testSourceDirs+= sourceSets.apiTest.java.srcDirs
-        testSourceDirs+= sourceSets.apiTest.resources.srcDirs
-    }
-}
-
 minecraft {
     mappings channel: 'snapshot', version: "${mcp_mappings}"
     // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
