@@ -2,20 +2,17 @@ package com.direwolf20.buildinggadgets.common.network.packets;
 
 import com.direwolf20.buildinggadgets.common.building.Region;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
-import com.direwolf20.buildinggadgets.common.registry.OurItems;
+import com.direwolf20.buildinggadgets.common.util.lang.MessageTranslation;
+import com.direwolf20.buildinggadgets.common.util.lang.Styles;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.fml.network.NetworkEvent;
 
 import java.util.function.Supplier;
 
 public class PacketCopyCoords {
-
     private final BlockPos start;
     private final BlockPos end;
 
@@ -34,12 +31,6 @@ public class PacketCopyCoords {
     }
 
     public static class Handler {
-//        @Override
-//        public IMessage onMessage(PacketCopyCoords message, MessageContext ctx) {
-//            FMLCommonHandler.instance().getWorldThread(ctx.netHandler).addScheduledTask(() -> handle(message, ctx));
-//            return null;
-//        }
-
         public static void handle(final PacketCopyCoords msg, Supplier<NetworkEvent.Context> ctx) {
             ServerPlayerEntity playerEntity = ctx.get().getSender();
             if( playerEntity == null ) return;
@@ -50,10 +41,9 @@ public class PacketCopyCoords {
 
                 BlockPos startPos = msg.start;
                 BlockPos endPos = msg.end;
-                GadgetCopyPaste tool = OurItems.gadgetCopyPaste;
                 if (startPos.equals(BlockPos.ZERO) && endPos.equals(BlockPos.ZERO)) {
                     GadgetCopyPaste.setSelectedRegion(heldItem, null);
-                    playerEntity.sendStatusMessage(new StringTextComponent(TextFormatting.AQUA + new TranslationTextComponent("message.gadget.areareset").getUnformattedComponentText()), true);
+                    playerEntity.sendStatusMessage(MessageTranslation.AREA_RESET.componentTranslation().setStyle(Styles.AQUA), true);
                 } else {
                     GadgetCopyPaste.setSelectedRegion(heldItem, new Region(startPos, endPos));
                 }

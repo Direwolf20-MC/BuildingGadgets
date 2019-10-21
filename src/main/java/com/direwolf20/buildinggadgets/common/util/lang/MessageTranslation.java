@@ -11,6 +11,7 @@ public enum MessageTranslation implements ITranslationProvider {
     AREA_COPIED_FAILED_TOO_BIG("area_too_big"),
     AREA_COPIED_FAILED_TOO_MANY("too_many_blocks"),
     AREA_COPIED_FAILED_TOO_MANY_DIFF("too_many_dif_blocks"),
+    AREA_RESET("area_reset"),
     ANCHOR_REMOVED("anchor_removed"),
     ANCHOR_SET("anchor_set"),
     BUILD_UNLOADED("build_unloaded", 1),

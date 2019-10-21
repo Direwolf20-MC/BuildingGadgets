@@ -363,7 +363,7 @@ public class ModeRadialMenu extends Screen {
             else if (tool.getItem() instanceof GadgetExchanger)
                 name = ExchangingMode.values()[i].toString();
             else
-                name = GadgetCopyPaste.ToolMode.values()[i].toString();
+                name = GadgetCopyPaste.ToolMode.values()[i].format();
 
             int xsp = xp - 4;
             int ysp = yp;

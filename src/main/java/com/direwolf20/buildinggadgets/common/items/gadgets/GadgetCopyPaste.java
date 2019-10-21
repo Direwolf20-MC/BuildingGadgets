@@ -31,10 +31,7 @@ import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.exceptions.CapabilityNotPresentException;
 import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
 import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
-import com.direwolf20.buildinggadgets.common.util.lang.ITranslationProvider;
-import com.direwolf20.buildinggadgets.common.util.lang.MessageTranslation;
-import com.direwolf20.buildinggadgets.common.util.lang.Styles;
-import com.direwolf20.buildinggadgets.common.util.lang.TooltipTranslation;
+import com.direwolf20.buildinggadgets.common.util.lang.*;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.util.tools.NetworkIO;
 import com.google.common.base.Joiner;
@@ -77,8 +74,8 @@ import java.util.function.Supplier;
 public class GadgetCopyPaste extends AbstractGadget {
 
     public enum ToolMode {
-        COPY(0),
-        PASTE(1);
+        COPY(ModeTranslation.COPY, 0),
+        PASTE(ModeTranslation.PASTE, 1);
         public static final ToolMode[] VALUES = values();
         private static final Byte2ObjectMap<ToolMode> BY_ID;
 
@@ -91,9 +88,11 @@ public class GadgetCopyPaste extends AbstractGadget {
         }
 
         private final byte id;
+        private final ITranslationProvider translation;
 
-        ToolMode(int id) {
+        ToolMode(ITranslationProvider translation, int id) {
             this.id = (byte) id;
+            this.translation = translation;
         }
 
         public byte getId() {
@@ -102,6 +101,10 @@ public class GadgetCopyPaste extends AbstractGadget {
 
         public ToolMode next() {
             return VALUES[(this.ordinal() + 1) % VALUES.length];
+        }
+
+        public String format(Object... args) {
+            return translation.format(args);
         }
 
         @Nullable
@@ -288,7 +291,7 @@ public class GadgetCopyPaste extends AbstractGadget {
     @Override
     public void addInformation(ItemStack stack, @Nullable World world, List<ITextComponent> tooltip, ITooltipFlag flag) {
         super.addInformation(stack, world, tooltip, flag);
-        tooltip.add(TooltipTranslation.GADGET_MODE.componentTranslation(getToolMode(stack)).setStyle(Styles.AQUA));
+        tooltip.add(TooltipTranslation.GADGET_MODE.componentTranslation(getToolMode(stack).format()).setStyle(Styles.AQUA));
         addEnergyInformation(tooltip, stack);
         addInformationRayTraceFluid(tooltip, stack);
         GadgetUtils.addTooltipNameAndAuthor(stack, world, tooltip);
