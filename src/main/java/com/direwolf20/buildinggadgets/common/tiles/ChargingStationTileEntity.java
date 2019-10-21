@@ -11,6 +11,7 @@ import com.direwolf20.buildinggadgets.common.util.exceptions.CapabilityNotPresen
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.google.common.base.Preconditions;
 import com.mojang.blaze3d.platform.GlStateManager;
+import net.minecraft.block.AbstractFurnaceBlock;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -27,6 +28,7 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
+import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.Constants.BlockFlags;
 import net.minecraftforge.common.util.LazyOptional;
@@ -49,7 +51,8 @@ public class ChargingStationTileEntity extends TileEntity implements ITickableTi
     private static final int UPDATE_FLAG_ALL = UPDATE_FLAG_INVENTORY | UPDATE_FLAG_ENERGY;
     private final int SEND_UPDATE_NO_RENDER = BlockFlags.BLOCK_UPDATE | BlockFlags.NO_RERENDER;
     private int updateNeeded;
-    private int counter;
+    private int counter = 0;
+    private int maxBurn = 0;
 
     private final CappedEnergyStorage energy;
     private final ItemStackHandler itemStackHandler;
@@ -94,7 +97,7 @@ public class ChargingStationTileEntity extends TileEntity implements ITickableTi
             @Override
             @Nonnull
             public ItemStack insertItem(int slot, @Nonnull ItemStack stack, boolean simulate) {
-                if (slot == FUEL_SLOT && GadgetUtils.getItemBurnTime(stack) <= 0)
+                if (slot == FUEL_SLOT && ForgeHooks.getBurnTime(stack) <= 0)
                     return stack;
                 else if (slot == CHARGE_SLOT && (! stack.getCapability(CapabilityEnergy.ENERGY).isPresent() || getStackInSlot(slot).getCount() > 0))
                     return stack;
@@ -137,7 +140,7 @@ public class ChargingStationTileEntity extends TileEntity implements ITickableTi
         return getItemStackHandler().getStackInSlot(CHARGE_SLOT);
     }
 
-    private ItemStack getFuelStack() {
+    public ItemStack getFuelStack() {
         return getItemStackHandler().getStackInSlot(FUEL_SLOT);
     }
 
@@ -253,6 +256,7 @@ public class ChargingStationTileEntity extends TileEntity implements ITickableTi
 
     @Override
     public void tick() {
+        boolean isBurning = this.isBurning();
         if (getWorld() != null && ! getWorld().isRemote) {
             if (counter > 0 && getEnergy().receiveEnergy(Config.CHARGING_STATION.energyPerTick.get(), true) > 0) {
                 burn();
@@ -263,6 +267,9 @@ public class ChargingStationTileEntity extends TileEntity implements ITickableTi
             if (! stack.isEmpty()) {
                 chargeItem(stack);
             }
+
+            if( isBurning != this.isBurning() )
+            getWorld().setBlockState(this.pos, getWorld().getBlockState(this.pos).with(AbstractFurnaceBlock.LIT, this.isBurning()), 3);
         } else if (getWorld() != null) {
             //My understanding is that this causes the same calculations to run client side as serverside, preventing our need to force a sync packet every second for rendering?
             //Feel free to fix my derps if i'm wrong.
@@ -296,14 +303,18 @@ public class ChargingStationTileEntity extends TileEntity implements ITickableTi
     private void burn() {
         addEnergy(Config.CHARGING_STATION.energyPerTick.get());
         counter--;
+
+        if( counter == 0 )
+            maxBurn = 0;
     }
 
     private void initBurn() {
         ItemStack stack = getFuelStack();
-        int burnTime = GadgetUtils.getItemBurnTime(stack);
+        int burnTime = ForgeHooks.getBurnTime(stack);
         if (burnTime > 0 && getEnergy().receiveEnergy(Config.CHARGING_STATION.energyPerTick.get(), true) > 0) {
             getItemStackHandler().extractItem(0, 1, false);
             counter = (int) Math.floor(burnTime / Config.CHARGING_STATION.fuelUsage.get());
+            maxBurn = counter;
             burn();
         }
     }
@@ -313,6 +324,18 @@ public class ChargingStationTileEntity extends TileEntity implements ITickableTi
         if (isChargingItem(chargingStorage)) {
             getEnergy().setEnergy(getEnergy().getEnergyStored() - chargingStorage.receiveEnergy(Math.min(getEnergy().getEnergyStored(), Config.CHARGING_STATION.chargePerTick.get()), false));
         }
+    }
+
+    public int getRemainingBurn() {
+        return counter;
+    }
+
+    public boolean isBurning() {
+        return counter > 0;
+    }
+
+    public int getMaxBurn() {
+        return maxBurn;
     }
 
     // Render Only Methods! -------------------------------------------------------------------------------------

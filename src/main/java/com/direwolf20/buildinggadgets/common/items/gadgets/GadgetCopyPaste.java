@@ -241,9 +241,9 @@ public class GadgetCopyPaste extends AbstractGadget implements ITemplate {
     public void addInformation(ItemStack stack, @Nullable World world, List<ITextComponent> tooltip, ITooltipFlag flag) {
         super.addInformation(stack, world, tooltip, flag);
         tooltip.add(TooltipTranslation.GADGET_MODE.componentTranslation(getToolMode(stack)).setStyle(Styles.AQUA));
-        addEnergyInformation(tooltip, stack);
         addInformationRayTraceFluid(tooltip, stack);
         EventTooltip.addTemplatePadding(stack, tooltip);
+        addEnergyInformation(tooltip, stack);
     }
 
 

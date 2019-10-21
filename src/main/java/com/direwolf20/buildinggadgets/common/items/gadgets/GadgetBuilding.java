@@ -128,6 +128,7 @@ public class GadgetBuilding extends AbstractGadget implements IAtopPlacingGadget
         tooltip.add(TooltipTranslation.GADGET_BUILDING_PLACE_ATOP
                 .componentTranslation(String.valueOf(shouldPlaceAtop(stack)))
                 .setStyle(Styles.YELLOW));
+
         addEnergyInformation(tooltip, stack);
     }
 

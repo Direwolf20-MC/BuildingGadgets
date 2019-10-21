@@ -23,7 +23,6 @@
     "block.buildinggadgets.template_manager": "Template Manager",
     "block.buildinggadgets.charging_station": "Charging Station",
 
-
     "_comment": "key:",
     "key.buildinggadgets.category": "Building Gadgets",
     "key.buildinggadgets.anchor": "Anchor",
@@ -55,8 +54,10 @@
     "tooltip.gadget.connected_surface": "Connected Surface",
     "tooltip.pasteContainer.amount": "Amount: %d",
     "tooltip.pasteContainer.creative.amountMsg": "Amount: Infinite!",
-    "tooltip.template.name": "Name: %s",
-  "tooltip.donotuse": "DO NOT USE (WIP)",
+    "tooltip.charger.energy": "Energy: %s FE",
+    "tooltip.charger.burn_time": "Burn time left: %ss",
+    "tooltip.charger.fuel_empty": "No fuel",
+    "tooltip.donotuse": "DO NOT USE (WIP)",
 
     "buildinggadgets.radialmenu.destruction_overlay": "Show Overlay",
     "buildinggadgets.radialmenu.rotate": "Rotate",

@@ -37,7 +37,7 @@ public class EffectBlockTER extends TileEntityRenderer<EffectBlockTileEntity> {
         mc.getTextureManager().bindTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
         int teCounter = tile.getTicksExisted();
         int maxLife = tile.getLifespan();
-        teCounter = teCounter > maxLife ? maxLife : teCounter;
+        teCounter = Math.min(teCounter, maxLife);
         float scale = (float) (teCounter) / (float) maxLife;
         if (scale >= 1.0f)
             scale = 0.99f;
