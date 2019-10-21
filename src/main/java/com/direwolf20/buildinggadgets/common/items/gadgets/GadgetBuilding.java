@@ -114,7 +114,7 @@ public class GadgetBuilding extends ModeGadget implements IAtopPlacingGadget {
                 .componentTranslation((mode == BuildingMode.SURFACE && getConnectedArea(stack) ? TooltipTranslation.GADGET_CONNECTED
                         .format(mode) : mode))
                 .setStyle(Styles.AQUA));
-        addEnergyInformation(tooltip, stack);
+
         tooltip.add(TooltipTranslation.GADGET_BLOCK
                 .componentTranslation(LangUtil.getFormattedBlockName(getToolBlock(stack).getState()))
                 .setStyle(Styles.DK_GREEN));
@@ -133,6 +133,8 @@ public class GadgetBuilding extends ModeGadget implements IAtopPlacingGadget {
         tooltip.add(TooltipTranslation.GADGET_BUILDING_PLACE_ATOP
                 .componentTranslation(String.valueOf(shouldPlaceAtop(stack)))
                 .setStyle(Styles.YELLOW));
+
+        addEnergyInformation(tooltip, stack);
     }
 
     @Override

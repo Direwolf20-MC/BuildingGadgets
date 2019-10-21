@@ -15,6 +15,14 @@
       "east": {
         "y": 90
       }
+    },
+    "lit" : {
+      "true": {
+        "model": "buildinggadgets:block/charging_station_on"
+      },
+      "false": {
+        "model": "buildinggadgets:block/charging_station"
+      }
     }
   }
-}
+}if this

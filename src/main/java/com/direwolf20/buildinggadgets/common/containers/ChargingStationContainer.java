@@ -13,6 +13,7 @@ import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.AbstractFurnaceTileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.items.CapabilityItemHandler;
@@ -47,12 +48,10 @@ public class ChargingStationContainer extends BaseContainer {
 
     private void addOwnSlots() {
         IItemHandler itemHandler = this.getTe().getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null).orElseThrow(CapabilityNotPresentException::new);
-        int x = 86;
-        int y = 41;
+        int y = 43;
 
-        addSlot(new SlotItemHandler(itemHandler, 0, x, y));
-        x = 144;
-        addSlot(new SlotItemHandler(itemHandler, 1, x, y));
+        addSlot(new SlotItemHandler(itemHandler, 0, 65, y));
+        addSlot(new SlotItemHandler(itemHandler, 1, 119, y));
     }
 
     @Override
@@ -70,7 +69,7 @@ public class ChargingStationContainer extends BaseContainer {
                 }
                 slot.onSlotChange(stack, itemstack);
             } else {
-                int burnTime = net.minecraftforge.event.ForgeEventFactory.getItemBurnTime(stack, stack.getBurnTime() == - 1 ? AbstractFurnaceTileEntity.getBurnTimes().getOrDefault(stack.getItem(), 0) : stack.getBurnTime());
+                int burnTime = ForgeHooks.getBurnTime(stack);
                 if (stack.getItem() instanceof AbstractGadget) {
                     if (! this.mergeItemStack(stack, 1, 2, false)) {
                         return ItemStack.EMPTY;

@@ -5,10 +5,12 @@ import com.direwolf20.buildinggadgets.common.tiles.ChargingStationTileEntity;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.RedstoneTorchBlock;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.inventory.container.INamedContainerProvider;
 import net.minecraft.item.BlockItemUseContext;
+import net.minecraft.state.BooleanProperty;
 import net.minecraft.state.DirectionProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.state.properties.BlockStateProperties;
@@ -25,16 +27,18 @@ import javax.annotation.Nullable;
 
 public class ChargingStation extends Block {
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
+    public static final BooleanProperty LIT = BlockStateProperties.LIT;
 
     public ChargingStation(Properties builder) {
         super(builder);
-        setDefaultState(getStateContainer().getBaseState().with(FACING, Direction.NORTH));
+        setDefaultState(getStateContainer().getBaseState().with(FACING, Direction.NORTH).with(LIT, Boolean.FALSE));
     }
 
     @Override
     protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
         super.fillStateContainer(builder);
         builder.add(FACING);
+        builder.add(LIT);
     }
 
     @Override
@@ -79,5 +83,10 @@ public class ChargingStation extends Block {
             return false;
         NetworkHooks.openGui((ServerPlayerEntity) player, (INamedContainerProvider) te, te.getPos());
         return true;
+    }
+
+    @Override
+    public int getLightValue(BlockState state) {
+        return state.get(LIT) ? 14 : 0;
     }
 }
