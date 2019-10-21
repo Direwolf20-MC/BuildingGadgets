@@ -109,14 +109,15 @@ public class GadgetBuilding extends ModeGadget implements IAtopPlacingGadget {
     @Override
     public void addInformation(ItemStack stack, @Nullable World world, List<ITextComponent> tooltip, ITooltipFlag flag) {
         super.addInformation(stack, world, tooltip, flag);
-        tooltip.add(TooltipTranslation.GADGET_BLOCK
-                .componentTranslation(LangUtil.getFormattedBlockName(getToolBlock(stack).getState()))
-                .setStyle(Styles.DK_GREEN));
         BuildingMode mode = getToolMode(stack);
         tooltip.add(TooltipTranslation.GADGET_MODE
                 .componentTranslation((mode == BuildingMode.SURFACE && getConnectedArea(stack) ? TooltipTranslation.GADGET_CONNECTED
                         .format(mode) : mode))
                 .setStyle(Styles.AQUA));
+        addEnergyInformation(tooltip, stack);
+        tooltip.add(TooltipTranslation.GADGET_BLOCK
+                .componentTranslation(LangUtil.getFormattedBlockName(getToolBlock(stack).getState()))
+                .setStyle(Styles.DK_GREEN));
         if (getToolMode(stack) != BuildingMode.TARGETED_AXIS_CHASING)
             tooltip.add(TooltipTranslation.GADGET_RANGE
                     .componentTranslation(getToolRange(stack))
@@ -132,7 +133,6 @@ public class GadgetBuilding extends ModeGadget implements IAtopPlacingGadget {
         tooltip.add(TooltipTranslation.GADGET_BUILDING_PLACE_ATOP
                 .componentTranslation(String.valueOf(shouldPlaceAtop(stack)))
                 .setStyle(Styles.YELLOW));
-        addEnergyInformation(tooltip, stack);
     }
 
     @Override

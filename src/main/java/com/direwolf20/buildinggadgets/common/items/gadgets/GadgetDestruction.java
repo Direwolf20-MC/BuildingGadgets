@@ -78,6 +78,7 @@ public class GadgetDestruction extends AbstractGadget {
     @Override
     public void addInformation(ItemStack stack, @Nullable World world, List<ITextComponent> tooltip, ITooltipFlag flag) {
         super.addInformation(stack, world, tooltip, flag);
+        addEnergyInformation(tooltip, stack);
         tooltip.add(TooltipTranslation.GADGET_DESTROYWARNING
                             .componentTranslation()
                             .setStyle(Styles.RED));
@@ -93,7 +94,6 @@ public class GadgetDestruction extends AbstractGadget {
                                 .setStyle(Styles.GOLD));
 
         addInformationRayTraceFluid(tooltip, stack);
-        addEnergyInformation(tooltip, stack);
     }
 
     public static void setAnchor(ItemStack stack, BlockPos pos) {

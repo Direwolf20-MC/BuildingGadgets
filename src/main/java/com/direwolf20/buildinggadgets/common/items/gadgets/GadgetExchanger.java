@@ -120,14 +120,15 @@ public class GadgetExchanger extends ModeGadget {
     @Override
     public void addInformation(ItemStack stack, @Nullable World world, List<ITextComponent> tooltip, ITooltipFlag flag) {
         super.addInformation(stack, world, tooltip, flag);
+        ExchangingMode mode = getToolMode(stack);
+        tooltip.add(TooltipTranslation.GADGET_MODE
+                .componentTranslation((mode == ExchangingMode.SURFACE && getConnectedArea(stack) ? TooltipTranslation.GADGET_CONNECTED
+                        .format(mode) : mode))
+                .setStyle(Styles.AQUA));
+        addEnergyInformation(tooltip, stack);
         tooltip.add(TooltipTranslation.GADGET_BLOCK
                 .componentTranslation(LangUtil.getFormattedBlockName(getToolBlock(stack).getState()))
                             .setStyle(Styles.DK_GREEN));
-        ExchangingMode mode = getToolMode(stack);
-        tooltip.add(TooltipTranslation.GADGET_MODE
-                            .componentTranslation((mode == ExchangingMode.SURFACE && getConnectedArea(stack) ? TooltipTranslation.GADGET_CONNECTED
-                                    .format(mode) : mode))
-                            .setStyle(Styles.AQUA));
         tooltip.add(TooltipTranslation.GADGET_RANGE
                             .componentTranslation(getToolRange(stack))
                             .setStyle(Styles.LT_PURPLE));
@@ -135,7 +136,6 @@ public class GadgetExchanger extends ModeGadget {
                             .componentTranslation(String.valueOf(getFuzzy(stack)))
                             .setStyle(Styles.GOLD));
         addInformationRayTraceFluid(tooltip, stack);
-        addEnergyInformation(tooltip, stack);
     }
 
     @Override
