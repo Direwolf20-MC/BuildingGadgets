@@ -21,6 +21,7 @@ public enum MessageTranslation implements ITranslationProvider {
     CLIPBOARD_COPY_ERROR_TEMPLATE("copy_failed.template_write", 0),
     COPY_UNLOADED("copy_unloaded", 1),
     COPY_TOO_LARGE("copy_too_large", 6),
+    DESTRCUT_TOO_LARGE("destroy_size_too_large"),
     GADGET_BUSY("gadget_busy"),
     INVALID_BLOCK("invalid_block", 1),
     MIRRORED("mirrored"),

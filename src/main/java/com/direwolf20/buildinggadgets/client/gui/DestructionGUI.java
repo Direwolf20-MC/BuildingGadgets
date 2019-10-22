@@ -6,9 +6,11 @@
 package com.direwolf20.buildinggadgets.client.gui;
 
 import com.direwolf20.buildinggadgets.client.gui.components.GuiSliderInt;
+import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetDestruction;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketDestructionGUI;
+import com.direwolf20.buildinggadgets.common.util.lang.MessageTranslation;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.button.Button;
@@ -16,8 +18,6 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -51,7 +51,7 @@ public class DestructionGUI extends Screen {
                 this.onClose();
             }
             else
-                Minecraft.getInstance().player.sendStatusMessage(new StringTextComponent(TextFormatting.RED + new TranslationTextComponent("message.gadget.destroysizeerror").getUnformattedComponentText()), true);
+                Minecraft.getInstance().player.sendStatusMessage(MessageTranslation.DESTRCUT_TOO_LARGE.componentTranslation(Config.GADGETS.GADGET_DESTRUCTION.destroySize.get()), true);
         }));
 
         this.addButton(new Button((x - 30) - 32, y + 60, 60, 20, I18n.format(GuiMod.getLangKeySingle("cancel")), b -> onClose()));
@@ -70,8 +70,10 @@ public class DestructionGUI extends Screen {
     private boolean isWithinBounds() {
         int x = left.getValueInt() + right.getValueInt();
         int y = up.getValueInt() + down.getValueInt();
+        int z = depth.getValueInt();
+        int dim = Config.GADGETS.GADGET_DESTRUCTION.destroySize.get();
 
-        return x <= 16 && y <= 16;
+        return x <= dim && y <= dim && z <= dim;
     }
 
     @Override

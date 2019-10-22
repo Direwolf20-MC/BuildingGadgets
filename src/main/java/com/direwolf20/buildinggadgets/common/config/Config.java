@@ -215,6 +215,7 @@ public class Config {
             public final IntValue maxEnergy;
             public final IntValue energyCost;
             public final IntValue undoSize;
+            public final IntValue destroySize;
             public final DoubleValue nonFuzzyMultiplier;
             public final BooleanValue nonFuzzyEnabled;
 
@@ -224,6 +225,11 @@ public class Config {
                 maxEnergy   = getMaxEnergy(1000000);
                 energyCost  = getEnergyCost(200);
                 undoSize    = getMaxUndoSize(1);
+
+                destroySize = SERVER_BUILDER
+                        .comment("The maximum dimensions, the Destruction Gadget can destroy.")
+                        .translation(LANG_KEY_GADGET_DESTRUCTION + ".destroy_size")
+                        .defineInRange("Destroy Dimensions", 16, 0, 32);
 
                 nonFuzzyMultiplier = SERVER_BUILDER
                         .comment("The cost in energy/durability will increase by this amount when not in fuzzy mode")

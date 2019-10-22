@@ -113,7 +113,7 @@
   "buildinggadgets.message.copy_failed.template_write": "Could not write Template binary.",
   "buildinggadgets.message.copy_failed.error": "Could not copy to clipboard.",
   "buildinggadgets.message.copy_clipboard_success": "Copy to Clipboard successful",
-  "buildinggadgets.message.destroysizeerror": "Maximum Destruction size is 16x16x16, negative numbers are invalid",
+  "buildinggadgets.message.destroy_size_too_large": "Maximum Destruction size is %1$dx%1$dx%1$d, negative numbers are invalid.",
   "buildinggadgets.message.fuzzymode": "Fuzzy Mode",
   "buildinggadgets.message.raytrace_fluid": "Raytracing Fluid",
   "buildinggadgets.message.building.placement": "Block Placement: %s",
