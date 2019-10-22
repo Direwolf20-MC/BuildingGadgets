@@ -37,6 +37,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.function.Predicate;
 
 @MethodsReturnNonnullByDefault
@@ -47,6 +48,10 @@ public class FakeDelegationWorld implements IWorld {
     public FakeDelegationWorld(IWorld delegate) {
         this.delegate = Objects.requireNonNull(delegate);
         posToBlock = new HashMap<>();
+    }
+
+    public Set<Entry<BlockPos, BlockInfo>> entrySet() {
+        return Collections.unmodifiableSet(posToBlock.entrySet());
     }
 
     public void addBlock(@Nonnull BlockPos pos, BlockData data) {
@@ -377,7 +382,7 @@ public class FakeDelegationWorld implements IWorld {
         return new BlockInfo(pos, state);
     }
 
-    protected static class BlockInfo {
+    public static class BlockInfo {
         private BlockPos pos;
         private BlockState state;
         @Nullable

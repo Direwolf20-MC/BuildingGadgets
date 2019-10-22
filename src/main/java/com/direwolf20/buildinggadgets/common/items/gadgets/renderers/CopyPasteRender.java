@@ -1,7 +1,6 @@
 package com.direwolf20.buildinggadgets.common.items.gadgets.renderers;
 
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
-import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.building.BlockData;
 import com.direwolf20.buildinggadgets.common.building.PlacementTarget;
 import com.direwolf20.buildinggadgets.common.building.Region;
@@ -109,7 +108,7 @@ public class CopyPasteRender extends BaseRenderer {
         GlStateManager.enableBlend();
         GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
 
-        renderBox(tessellator, bufferbuilder, x, y, z, dx, dy, dz, 255, 223, 127); // Draw the box around the blocks we've copied.
+        renderCopyOutline(tessellator, bufferbuilder, x, y, z, dx, dy, dz, 255, 223, 127); // Draw the box around the blocks we've copied.
 
         GlStateManager.lineWidth(1.0F);
         GlStateManager.enableLighting();
@@ -153,19 +152,19 @@ public class CopyPasteRender extends BaseRenderer {
                 .usedStack(stack)
                 .build(fakeWorld);
         IBuildView view = template.createViewInContext(context);
-            view.translateTo(startPos);
-            RenderSorter sorter = new RenderSorter(player, view.estimateSize());
-            for (PlacementTarget target : view) {
-                if (target.placeIn(context))
-                    sorter.onPlaced(target);
-            }
-            //Prepare the block rendering
-            //BlockRendererDispatcher dispatcher = Minecraft.getInstance().getBlockRendererDispatcher();
-            renderTargets(context, sorter, partialTicks);
+        view.translateTo(startPos);
+        RenderSorter sorter = new RenderSorter(player, view.estimateSize());
+        for (PlacementTarget target : view) {
+            if (target.placeIn(context))
+                sorter.onPlaced(target);
+        }
+        //Prepare the block rendering
+        //BlockRendererDispatcher dispatcher = Minecraft.getInstance().getBlockRendererDispatcher();
+        renderTargets(context, sorter, partialTicks);
 
-            if (! player.isCreative())
-                renderMissing(player, stack, view, sorter);
-            GlStateManager.disableBlend();
+        if (! player.isCreative())
+            renderMissing(player, stack, view, sorter);
+        GlStateManager.disableBlend();
     }
 
     private void renderTargets(IBuildContext context, RenderSorter sorter, float partialTicks) {
@@ -240,57 +239,12 @@ public class CopyPasteRender extends BaseRenderer {
         GlStateManager.depthMask(false);
         bufferBuilder.begin(GL14.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
         for (PlacementTarget target : evaluator) { //Now run through the UNSORTED list of coords, to show which blocks won't place if you don't have enough of them.
-            renderBox(bufferBuilder, target.getPos());
+            renderMissingBlock(bufferBuilder, target.getPos());
         }
         Tessellator.getInstance().draw();
         GlStateManager.depthMask(true);
         GlStateManager.enableTexture();
         GL14.glBlendColor(1F, 1F, 1F, 1f); //Set the alpha of the blocks we are rendering
-    }
-
-    private void renderBox(BufferBuilder bufferBuilder, BlockPos pos) {
-        float red = 1;
-        float green = 0;
-        float blue = 0;
-        float alpha = 0.55f;
-        double x = pos.getX() - 0.01;
-        double y = pos.getY() - 0.01;
-        double z = pos.getZ() - 0.01;
-        double xEnd = pos.getX() + 1.01;
-        double yEnd = pos.getY() + 1.01;
-        double zEnd = pos.getZ() + 1.01;
-        //careful: mc want's it's vertices to be defined CCW - if you do it the other way around weird cullling issues will arise
-        //CCW herby counts as if you were looking at it from the outside
-        //front-side
-        bufferBuilder.pos(x, y, z).color(red, green, blue, alpha).endVertex();
-        bufferBuilder.pos(x, yEnd, z).color(red, green, blue, alpha).endVertex();
-        bufferBuilder.pos(xEnd, yEnd, z).color(red, green, blue, alpha).endVertex();
-        bufferBuilder.pos(xEnd, y, z).color(red, green, blue, alpha).endVertex();
-        //left-side
-        bufferBuilder.pos(x, y, z).color(red, green, blue, alpha).endVertex();
-        bufferBuilder.pos(x, y, zEnd).color(red, green, blue, alpha).endVertex();
-        bufferBuilder.pos(x, yEnd, zEnd).color(red, green, blue, alpha).endVertex();
-        bufferBuilder.pos(x, yEnd, z).color(red, green, blue, alpha).endVertex();
-        //bottom
-        bufferBuilder.pos(x, y, z).color(red, green, blue, alpha).endVertex();
-        bufferBuilder.pos(xEnd, y, z).color(red, green, blue, alpha).endVertex();
-        bufferBuilder.pos(xEnd, y, zEnd).color(red, green, blue, alpha).endVertex();
-        bufferBuilder.pos(x, y, zEnd).color(red, green, blue, alpha).endVertex();
-        //top
-        bufferBuilder.pos(xEnd, yEnd, zEnd).color(red, green, blue, alpha).endVertex();
-        bufferBuilder.pos(xEnd, yEnd, z).color(red, green, blue, alpha).endVertex();
-        bufferBuilder.pos(x, yEnd, z).color(red, green, blue, alpha).endVertex();
-        bufferBuilder.pos(x, yEnd, zEnd).color(red, green, blue, alpha).endVertex();
-        //right-side
-        bufferBuilder.pos(xEnd, yEnd, zEnd).color(red, green, blue, alpha).endVertex();
-        bufferBuilder.pos(xEnd, y, zEnd).color(red, green, blue, alpha).endVertex();
-        bufferBuilder.pos(xEnd, y, z).color(red, green, blue, alpha).endVertex();
-        bufferBuilder.pos(xEnd, yEnd, z).color(red, green, blue, alpha).endVertex();
-        //back-side
-        bufferBuilder.pos(xEnd, yEnd, zEnd).color(red, green, blue, alpha).endVertex();
-        bufferBuilder.pos(x, yEnd, zEnd).color(red, green, blue, alpha).endVertex();
-        bufferBuilder.pos(x, y, zEnd).color(red, green, blue, alpha).endVertex();
-        bufferBuilder.pos(xEnd, y, zEnd).color(red, green, blue, alpha).endVertex();
     }
 
     @Override
@@ -319,7 +273,7 @@ public class CopyPasteRender extends BaseRenderer {
             return false;
     }
 
-    private static void renderBox(Tessellator tessellator, BufferBuilder bufferBuilder, double startX, double startY, double startZ, double endX, double endY, double endZ, int R, int G, int B) {
+    private static void renderCopyOutline(Tessellator tessellator, BufferBuilder bufferBuilder, double startX, double startY, double startZ, double endX, double endY, double endZ, int R, int G, int B) {
         GlStateManager.lineWidth(2.0F);
         bufferBuilder.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION_COLOR);
         bufferBuilder.pos(startX, startY, startZ).color(G, G, G, 0.0F).endVertex();

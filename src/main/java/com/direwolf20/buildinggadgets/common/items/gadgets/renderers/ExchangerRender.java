@@ -22,6 +22,7 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -139,26 +140,26 @@ public class ExchangerRender extends BaseRenderer {
                 GlStateManager.popMatrix();
             }
 
-            for (BlockPos coordinate : coordinates) { //Now run through the UNSORTED list of coords, to show which blocks won't place if you don't have enough of them.
-                GlStateManager.pushMatrix();//Push matrix again just because
-                GlStateManager.translated(-playerPos.getX(), -playerPos.getY(), - playerPos.getZ());
-                GlStateManager.translatef(coordinate.getX(), coordinate.getY(), coordinate.getZ());//Now move the render position to the coordinates we want to render at
-                GlStateManager.rotatef(- 90.0F, 0.0F, 1.0F, 0.0F); //Rotate it because i'm not sure why but we need to
-                GlStateManager.translatef(- 0.01f, - 0.01f, 0.01f);
-                GlStateManager.scalef(1.02f, 1.02f, 1.02f);//Slightly Larger block to avoid z-fighting.
-                GL14.glBlendColor(1F, 1F, 1F, 0.55f); //Set the alpha of the blocks we are rendering
+            BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+            bufferBuilder.begin(GL14.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
+            GlStateManager.alphaFunc(GL11.GL_GREATER, 0.0001F);
+            GlStateManager.disableTexture();
+            GlStateManager.depthMask(false);
+            for (BlockPos coordinate : coordinates) {
                 if (energy.isPresent()) {
                     hasEnergy -= (((AbstractGadget) heldItem.getItem())).getEnergyCost(heldItem);
                 }
                 MatchResult match = index.tryMatch(materials);
                 if (! match.isSuccess() || hasEnergy < 0) {
-                    getMc().getBlockRendererDispatcher().renderBlockBrightness(Blocks.RED_STAINED_GLASS.getDefaultState(), 1f);
+                    renderMissingBlock(bufferBuilder, coordinate);
                 } else {
                     index.applyMatch(match); //notify the recording index that this counts
                 }
                 //Move the render position back to where it was
-                GlStateManager.popMatrix();
             }
+            Tessellator.getInstance().draw();
+            GlStateManager.depthMask(true);
+            GlStateManager.enableTexture();
 
             if (state.hasTileEntity()) {
                 TileEntity te = getTileEntityWorld().getTE(state, world);

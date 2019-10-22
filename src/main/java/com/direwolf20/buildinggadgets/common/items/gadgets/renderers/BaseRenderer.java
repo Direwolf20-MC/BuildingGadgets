@@ -14,6 +14,7 @@ import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.entity.player.PlayerEntity;
@@ -40,6 +41,7 @@ public abstract class BaseRenderer {
     private static final Set<TileEntity> invalidTileEntities = new HashSet<>();
 
     private static RemoteInventoryCache cacheInventory = new RemoteInventoryCache(false);
+
 
     public void render(RenderWorldLastEvent evt, PlayerEntity player, ItemStack heldItem) {
         // This is necessary to prevent issues with not rendering the overlay's at all (when Botania being present) - See #329 for more information
@@ -108,6 +110,54 @@ public abstract class BaseRenderer {
 
 
         return !itemStack.isEmpty() ? itemStack : state.getBlock().getPickBlock(state, null, world, BlockPos.ZERO, player);
+    }
+
+    protected void renderMissingBlock(BufferBuilder bufferBuilder, BlockPos pos) {
+        float red = 1;
+        float green = 0;
+        float blue = 0;
+        float alpha = 0.55f;
+        double x = pos.getX() - 0.01;
+        double y = pos.getY() - 0.01;
+        double z = pos.getZ() - 0.01;
+        double xEnd = pos.getX() + 1.01;
+        double yEnd = pos.getY() + 1.01;
+        double zEnd = pos.getZ() + 1.01;
+        renderBoxSolid(bufferBuilder, x, y, z, xEnd, yEnd, zEnd, red, green, blue, alpha);
+    }
+
+    protected void renderBoxSolid(BufferBuilder bufferBuilder, double x, double y, double z, double xEnd, double yEnd, double zEnd, float red, float green, float blue, float alpha) {
+        //careful: mc want's it's vertices to be defined CCW - if you do it the other way around weird cullling issues will arise
+        //CCW herby counts as if you were looking at it from the outside
+        bufferBuilder.pos(x, y, z).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(x, yEnd, z).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(xEnd, yEnd, z).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(xEnd, y, z).color(red, green, blue, alpha).endVertex();
+        //left-side
+        bufferBuilder.pos(x, y, z).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(x, y, zEnd).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(x, yEnd, zEnd).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(x, yEnd, z).color(red, green, blue, alpha).endVertex();
+        //bottom
+        bufferBuilder.pos(x, y, z).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(xEnd, y, z).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(xEnd, y, zEnd).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(x, y, zEnd).color(red, green, blue, alpha).endVertex();
+        //top
+        bufferBuilder.pos(xEnd, yEnd, zEnd).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(xEnd, yEnd, z).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(x, yEnd, z).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(x, yEnd, zEnd).color(red, green, blue, alpha).endVertex();
+        //right-side
+        bufferBuilder.pos(xEnd, yEnd, zEnd).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(xEnd, y, zEnd).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(xEnd, y, z).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(xEnd, yEnd, z).color(red, green, blue, alpha).endVertex();
+        //back-side
+        bufferBuilder.pos(xEnd, yEnd, zEnd).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(x, yEnd, zEnd).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(x, y, zEnd).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(xEnd, y, zEnd).color(red, green, blue, alpha).endVertex();
     }
 
     /**
