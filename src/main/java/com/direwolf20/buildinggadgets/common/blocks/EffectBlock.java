@@ -2,6 +2,7 @@ package com.direwolf20.buildinggadgets.common.blocks;
 
 import com.direwolf20.buildinggadgets.common.building.BlockData;
 import com.direwolf20.buildinggadgets.common.building.PlacementTarget;
+import com.direwolf20.buildinggadgets.common.building.tilesupport.TileSupport;
 import com.direwolf20.buildinggadgets.common.building.view.IBuildContext;
 import com.direwolf20.buildinggadgets.common.building.view.SimpleBuildContext;
 import com.direwolf20.buildinggadgets.common.entities.ConstructionBlockEntity;
@@ -77,13 +78,13 @@ public class EffectBlock extends Block {
     public static void spawnUndoBlock(IBuildContext context, PlacementTarget target) {
         BlockState state = context.getWorld().getBlockState(target.getPos());
 
+        TileEntity curTe = context.getWorld().getTileEntity(target.getPos());
         //can't use .isAir, because it's not build yet
         if (target.getData().getState() != Blocks.AIR.getDefaultState()) {
-            TileEntity curTe = context.getWorld().getTileEntity(target.getPos());
             Mode mode = state.isAir(context.getWorld(), target.getPos()) ? Mode.PLACE : Mode.REPLACE;
             spawnEffectBlock(curTe, state, context.getWorld(), target.getPos(), target.getData(), mode, false);
         } else if (! state.isAir(context.getWorld(), target.getPos())) {
-            spawnEffectBlock(null, state, context.getWorld(), target.getPos(), target.getData(), Mode.REMOVE, false);
+            spawnEffectBlock(curTe, state, context.getWorld(), target.getPos(), TileSupport.createBlockData(state, curTe), Mode.REMOVE, false);
         }
     }
 

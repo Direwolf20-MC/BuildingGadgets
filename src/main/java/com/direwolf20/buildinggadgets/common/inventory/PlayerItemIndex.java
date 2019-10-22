@@ -83,6 +83,7 @@ public final class PlayerItemIndex implements IItemIndex {
         List<IObjectHandle<?>> emptyHandles = handleMap
                 .computeIfAbsent(Item.class, c -> new HashMap<>())
                 .getOrDefault(Items.AIR, ImmutableList.of());
+        Multimap<Object, IObjectHandle<?>> toAdd = HashMultimap.create();
         for (Iterator<IObjectHandle<?>> it = emptyHandles.iterator(); it.hasNext() && remainingCount >= 0; ) {
             IObjectHandle<?> handle = it.next();
             UniqueItem item = UniqueItem.ofStack(stack);
@@ -96,6 +97,11 @@ public final class PlayerItemIndex implements IItemIndex {
             if (remainingCount <= 0)
                 return 0;
         }
+        /*
+        Map<Object, List<IObjectHandle<?>>> itemMap = handleMap.get(Item.class);
+        for (Map.Entry<Object, IObjectHandle<?>> entry:toAdd.entries()) {
+            itemMap.computeIfAbsent(entry.getKey(), i -> new ArrayList<>()).add(entry.getValue());
+        }*/
         return remainingCount;
     }
 
