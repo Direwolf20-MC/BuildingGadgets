@@ -25,13 +25,16 @@ public class EventKeyInput {
         Minecraft mc = Minecraft.getInstance();
         if (mc.player == null || event.phase == Phase.START)
             return;
-
+        if (KeyBindings.materialList.isPressed()) {
+            GuiMod.MATERIAL_LIST.openScreen(mc.player);
+            return;
+        }
+        ItemStack tool = AbstractGadget.getGadget(mc.player);
+        if (tool.isEmpty())
+            return;
         KeyBinding mode = KeyBindings.menuSettings;
-
         if (!(mc.currentScreen instanceof ModeRadialMenu) && mode.isPressed() && ((mode.getKeyModifier() == KeyModifier.NONE
                 && KeyModifier.getActiveModifier() == KeyModifier.NONE) || mode.getKeyModifier() != KeyModifier.NONE)) {
-            ItemStack tool = AbstractGadget.getGadget(mc.player);
-            if (!tool.isEmpty())
                 mc.displayGuiScreen(new ModeRadialMenu(tool));
         } else if (KeyBindings.range.isPressed()) {
             PacketHandler.sendToServer(new PacketChangeRange());
@@ -45,8 +48,6 @@ public class EventKeyInput {
             PacketHandler.sendToServer(new PacketToggleFuzzy());
         } else if (KeyBindings.connectedArea.isPressed()) {
             PacketHandler.sendToServer(new PacketToggleConnectedArea());
-        } else if (KeyBindings.materialList.isPressed()) {
-            GuiMod.MATERIAL_LIST.openScreen(mc.player);
         }
     }
 }

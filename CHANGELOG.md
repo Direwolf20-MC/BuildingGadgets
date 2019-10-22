@@ -1,13 +1,17 @@
 # Building Gadgets Changelog
 The format of this document is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and should continue to adhere to the conventions outlined in the Keep a Changelog guidelines.
 
-## [3.0.6b - 1.14.4] 
+## [3.0.7b - 1.14.4] 
 ### Fixed
 - Wall modes increased their size in an arbitrary direction when given an even range
 - Creative Paste container cannot absorb ConstructionPaste
 - Charging station (and theoretically also the disabled TemplateManager) sometimes dupes Items in slots 3-11 and applies them as armor
 - Copy-Paste Gadget now properly renders copied tile data
     - notice that none is copied atm though
+
+### Added
+- Config option for the destruction Gadget's max dimensions, which defaults to 16 as before
+    
 ### Changes
 - Rewrote the Item Handling System
     - this included as a side effect to allow other mods to pull or push into paste-containers

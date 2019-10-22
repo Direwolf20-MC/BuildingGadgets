@@ -23,7 +23,8 @@ public class PacketUndo {
                 return;
 
             ItemStack stack = AbstractGadget.getGadget(player);
-            ((AbstractGadget) stack.getItem()).undo(player.world, player, stack);
+            if (! stack.isEmpty())
+                ((AbstractGadget) stack.getItem()).undo(player.world, player, stack);
         }
     }
 }
