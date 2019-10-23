@@ -6,13 +6,10 @@ import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.lang.TooltipTranslation;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.mojang.blaze3d.platform.GlStateManager;
-import net.minecraft.block.FurnaceBlock;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.FurnaceTileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
@@ -50,7 +47,7 @@ public class ChargingStationGUI extends ContainerScreen<ChargingStationContainer
                     TooltipTranslation.CHARGER_ENERGY.format(GadgetUtils.withSuffix(this.container.getEnergy())),
                     this.container.getTe().getRemainingBurn() <= 0 ?
                         TooltipTranslation.CHARGER_EMPTY.format() :
-                        TooltipTranslation.CHARGER_BURN.format((Math.ceil(this.container.getTe().getRemainingBurn() / 20f)))
+                            TooltipTranslation.CHARGER_BURN.format(GadgetUtils.ticksInSeconds(this.container.getTe().getRemainingBurn()))
             ), mouseX, mouseY);
 
         toolTip.clear();

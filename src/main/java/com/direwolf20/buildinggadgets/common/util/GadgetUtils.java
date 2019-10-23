@@ -52,6 +52,8 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -419,6 +421,15 @@ public class GadgetUtils {
         return String.format("%.1f%c",
                 count / Math.pow(1000, exp),
                 "kMGTPE".charAt(exp - 1));
+    }
+
+    //pre-allocate divisors, to prevent too bad performance
+    private static final BigDecimal TWENTY = new BigDecimal(20);
+
+    public static String ticksInSeconds(int ticks) {
+        BigDecimal value = new BigDecimal(ticks);
+        value = value.divide(TWENTY, 1, RoundingMode.HALF_UP);
+        return value.toString();
     }
 
     public static void writePOSToNBT(ItemStack stack, @Nullable BlockPos pos, String tagName) {

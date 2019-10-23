@@ -6,7 +6,6 @@ import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.containers.ChargingStationContainer;
 import com.direwolf20.buildinggadgets.common.registry.OurBlocks;
 import com.direwolf20.buildinggadgets.common.util.CapabilityUtil;
-import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.exceptions.CapabilityNotPresentException;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.google.common.base.Preconditions;
@@ -269,10 +268,8 @@ public class ChargingStationTileEntity extends TileEntity implements ITickableTi
             }
 
             if( isBurning != this.isBurning() )
-            getWorld().setBlockState(this.pos, getWorld().getBlockState(this.pos).with(AbstractFurnaceBlock.LIT, this.isBurning()), 3);
+                getWorld().setBlockState(this.pos, getWorld().getBlockState(this.pos).with(AbstractFurnaceBlock.LIT, this.isBurning()), BlockFlags.DEFAULT);
         } else if (getWorld() != null) {
-            //My understanding is that this causes the same calculations to run client side as serverside, preventing our need to force a sync packet every second for rendering?
-            //Feel free to fix my derps if i'm wrong.
             //Yes I realize theres code duplication here, i suspected we might want different things to happen on server/client so i have them as separate if's.
             if (counter > 0 && getEnergy().receiveEnergy(Config.CHARGING_STATION.energyPerTick.get(), true) > 0)
                 burn();
@@ -320,10 +317,10 @@ public class ChargingStationTileEntity extends TileEntity implements ITickableTi
     }
 
     private void chargeItem(ItemStack stack) {
-        IEnergyStorage chargingStorage = CapabilityUtil.EnergyUtil.getCap(stack).orElseThrow(CapabilityNotPresentException::new);
-        if (isChargingItem(chargingStorage)) {
-            getEnergy().setEnergy(getEnergy().getEnergyStored() - chargingStorage.receiveEnergy(Math.min(getEnergy().getEnergyStored(), Config.CHARGING_STATION.chargePerTick.get()), false));
-        }
+        CapabilityUtil.EnergyUtil.getCap(stack).ifPresent(chargingStorage -> {
+            if (isChargingItem(chargingStorage))
+                getEnergy().setEnergy(getEnergy().getEnergyStored() - chargingStorage.receiveEnergy(Math.min(getEnergy().getEnergyStored(), Config.CHARGING_STATION.chargePerTick.get()), false));
+        });
     }
 
     public int getRemainingBurn() {
@@ -331,7 +328,7 @@ public class ChargingStationTileEntity extends TileEntity implements ITickableTi
     }
 
     public boolean isBurning() {
-        return counter > 0;
+        return counter > 0 && getEnergy().getEnergyStored() < getEnergy().getMaxEnergyStored();
     }
 
     public int getMaxBurn() {
