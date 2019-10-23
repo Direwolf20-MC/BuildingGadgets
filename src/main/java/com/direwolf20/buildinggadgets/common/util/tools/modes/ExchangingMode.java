@@ -9,8 +9,10 @@ import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
 import com.direwolf20.buildinggadgets.common.util.helpers.SortingHelper;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
+import com.direwolf20.buildinggadgets.common.world.FakeDelegationWorld;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -81,7 +83,12 @@ public enum ExchangingMode {
     public static BiPredicate<BlockPos, BlockData> combineTester(IWorld world, ItemStack tool, PlayerEntity player, BlockPos initial) {
         BlockState initialBlockState = world.getBlockState(initial);
         BlockData target = GadgetUtils.getToolBlock(tool);
+        FakeDelegationWorld fakeWorld = new FakeDelegationWorld(world);
         return (pos, data) -> {
+            fakeWorld.setBlockState(pos, Blocks.AIR.getDefaultState(), 0);
+            if (! target.getState().isValidPosition(fakeWorld, pos))
+                return false;
+
             BlockState worldBlockState = world.getBlockState(pos);
 
             // Don't try to replace for the same block
