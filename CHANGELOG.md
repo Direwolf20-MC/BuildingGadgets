@@ -1,6 +1,5 @@
 # Building Gadgets Changelog
 The format of this document is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and should continue to adhere to the conventions outlined in the Keep a Changelog guidelines.
-
 ## [3.0.7b - 1.14.4] 
 ### Fixed
 - Wall modes increased their size in an arbitrary direction when given an even range
@@ -33,6 +32,30 @@ The format of this document is based on [Keep a Changelog](https://keepachangelo
         - notice that we are releasing the format as version "2-beta" in case we need to do some changes after we released
             - The old *version "1"* format is not supported
     - We had to disable the template preview in the TemplateManager, but are working on getting it back up and running            
+
+
+## [3.0.6a - 1.14.4] - 2019-10-21
+### Added
+- A new `charging station` Gui to clean up and make more sense of what was already there. (I'ts alo prettier)
+  - We now show the burn time remaining on the fuel source
+  - The FE (Forge Energy) stored in the block (with a pretty power indicator I might add)
+  - A faded version of the a Gadget do signify where the Gadget slot is
+  - A flame to indicate burn time like a normal Furnace as well to indicate 
+- The `Charging Station` now has a new texture for it's front when off and on
+  - We also produce 14 levels of light, why 14? I don't know...
+  
+### Fixed
+- Charging station should now accept all modded fuel types and have no hard dependency to Vanilla burnable figures.
+- Charging station no longer loses it's power when unloaded (literal spelling mistake)
+- Our effect block crashing servers when it fails to get it's faking block for what ever reason.
+
+### Changed
+- We're now on Forge 28.1.61 so this should resolve all forge related issues we've been seeing.
+- Completely rewrite the internal registration system for our blocks, items, etc.
+
+### Deprecated
+- If you where planning on using our new API, this is your one version notice to stop and add a hard dep on our main mods codebase.
+Due to bad planning and lots of other reasons we've opted to remove the API until we've got a better plan for it. Sorry.
 
 ## [3.0.5a - 1.14.4] - 2019-08-31
 ### Fixed

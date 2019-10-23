@@ -42,7 +42,6 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
 
     public ConstructionBlock(Properties builder) {
         super(builder);
-
         setDefaultState(this.getStateContainer().getBaseState().with(BRIGHT, true).with(NEIGHBOR_BRIGHTNESS, false).with(AMBIENT_OCCLUSION, false));
     }
 

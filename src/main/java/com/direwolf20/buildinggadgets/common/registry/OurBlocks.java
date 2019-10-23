@@ -10,7 +10,6 @@ import com.direwolf20.buildinggadgets.common.tiles.TemplateManagerTileEntity;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference.BlockReference;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference.TileEntityReference;
-
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.material.MaterialColor;
@@ -19,6 +18,7 @@ import net.minecraft.item.Item;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.common.ToolType;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
@@ -62,7 +62,7 @@ public final class OurBlocks {
         IForgeRegistry<Block> registry = event.getRegistry();
 
         registry.register(new EffectBlock(Block.Properties.create(EFFECT_BLOCK_MATERIAL).hardnessAndResistance(20f)).setRegistryName(BlockReference.EFFECT_BLOCK_RL));
-        registry.register(new ConstructionBlock(Block.Properties.create(Material.ROCK).hardnessAndResistance(2f, 0f)).setRegistryName(BlockReference.CONSTRUCTION_BLOCK_RL));
+        registry.register(new ConstructionBlock(Block.Properties.create(Material.SAND).hardnessAndResistance(2f, 0f).harvestTool(ToolType.SHOVEL)).setRegistryName(BlockReference.CONSTRUCTION_BLOCK_RL));
         registry.register(new ConstructionBlockDense(Block.Properties.create(Material.ROCK).hardnessAndResistance(3f, 0f)).setRegistryName(BlockReference.CONSTRUCTION_BLOCK_DENSE_RL));
         registry.register(new ConstructionBlockPowder(Block.Properties.create(Material.SAND).hardnessAndResistance(10f)).setRegistryName(BlockReference.CONSTRUCTION_BLOCK_POWDER_RL));
         registry.register(new TemplateManager(Block.Properties.create(Material.ROCK).hardnessAndResistance(2f)).setRegistryName(BlockReference.TEMPLATE_MANAGER_RL));
