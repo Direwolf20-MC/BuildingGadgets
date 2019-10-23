@@ -7,6 +7,7 @@ import com.direwolf20.buildinggadgets.common.items.gadgets.AbstractGadget;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetBuilding;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetExchanger;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketRotateMirror;
+import com.direwolf20.buildinggadgets.common.registry.OurBlocks;
 import com.direwolf20.buildinggadgets.common.tiles.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.util.exceptions.CapabilityNotPresentException;
 import com.direwolf20.buildinggadgets.common.util.helpers.InventoryHelper;
@@ -301,10 +302,14 @@ public class GadgetUtils {
             return;
         }
         BlockData placeState = InventoryHelper.getSpecificStates(state, world, player, lookingAt.getPos(), stack);
-        BlockState actualState = placeState.getState().getExtendedState(world, lookingAt.getPos());
-
+        if (state.getBlock() == OurBlocks.constructionBlock) {
+            TileEntity te = world.getTileEntity(lookingAt.getPos());
+            if (te instanceof ConstructionBlockTileEntity) {
+                placeState = ((ConstructionBlockTileEntity) te).getConstructionBlockData();
+            }
+        }
         setToolBlock(stack, placeState);
-        setToolActualBlock(stack, new BlockData(actualState, placeState.getTileData()));
+        setToolActualBlock(stack, placeState);
     }
 
     public static ActionResultType setRemoteInventory(ItemStack stack, PlayerEntity player, World world, BlockPos pos, boolean setTool) {
