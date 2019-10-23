@@ -4,6 +4,7 @@ import com.direwolf20.buildinggadgets.common.building.BlockData;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
+import com.direwolf20.buildinggadgets.common.util.helpers.SortingHelper.Blocks;
 import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.google.common.collect.ImmutableList;
@@ -19,8 +20,11 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
 
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.function.BiPredicate;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public enum BuildingMode {
     TARGETED_AXIS_CHASING("build_to_me.png", new BuildToMeMode(BuildingMode::combineTester)),
@@ -63,8 +67,8 @@ public enum BuildingMode {
 
     public static List<BlockPos> collectPlacementPos(IWorld world, PlayerEntity player, BlockPos hit, Direction sideHit, ItemStack tool, BlockPos initial) {
         IBuildingMode mode = byName(NBTHelper.getOrNewTag(tool).getString("mode")).getModeImplementation();
-        return mode.createExecutionContext(player, hit, sideHit, tool, initial)
-                .collectFilteredSequence();
+        return Blocks.byDistance(mode.createExecutionContext(player, hit, sideHit, tool, initial).getFilteredSequence().stream(), Function.identity(), player)
+                .collect(Collectors.toCollection(LinkedList::new));
     }
 
     public static BuildingMode byName(String name) {

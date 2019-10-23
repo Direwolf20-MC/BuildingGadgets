@@ -115,7 +115,7 @@ public class SimpleBuildView implements IBuildView {
      *
      * @return {@link Spliterator} that wraps {@code getPositionSequence().spliterator()}
      */
-    private IPositionPlacementSequence getFilteredSequence() {
+    public IPositionPlacementSequence getFilteredSequence() {
         BiPredicate<BlockPos, BlockData> validator = validatorFactory.createValidatorFor(context.getWorld(), context.getUsedStack(), context.getBuildingPlayer(), start);
         return CommonUtils.validatePositionData(getPositionSequence(), validator, getBlockProvider()::at);
     }

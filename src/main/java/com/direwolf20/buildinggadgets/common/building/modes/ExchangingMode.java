@@ -6,6 +6,7 @@ import com.direwolf20.buildinggadgets.common.registry.OurBlocks;
 import com.direwolf20.buildinggadgets.common.tiles.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
+import com.direwolf20.buildinggadgets.common.util.helpers.SortingHelper.Blocks;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.block.BlockState;
@@ -18,8 +19,11 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
 
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.function.BiPredicate;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public enum ExchangingMode {
     SURFACE("surface.png", new ExchangingSurfaceMode(ExchangingMode::combineTester)),
@@ -73,7 +77,8 @@ public enum ExchangingMode {
 
     public static List<BlockPos> collectPlacementPos(IWorld world, PlayerEntity player, BlockPos hit, Direction sideHit, ItemStack tool, BlockPos initial) {
         IBuildingMode mode = byName(NBTHelper.getOrNewTag(tool).getString("mode")).getModeImplementation();
-        return mode.createExecutionContext(player, hit, sideHit, tool, initial).collectFilteredSequence();
+        return Blocks.byDistance(mode.createExecutionContext(player, hit, sideHit, tool, initial).getFilteredSequence().stream(), Function.identity(), player)
+                .collect(Collectors.toCollection(LinkedList::new));
     }
 
     public static BiPredicate<BlockPos, BlockData> combineTester(IWorld world, ItemStack tool, PlayerEntity player, BlockPos initial) {

@@ -7,6 +7,7 @@ import net.minecraft.util.math.BlockPos;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 /**
@@ -33,15 +34,20 @@ public class SortingHelper {
          * @return a sorted by distance {@link List} of {@link BlockPos}
          */
         public static <T> List<T> byDistance(Iterable<T> list, Function<T, ? extends BlockPos> posExtractor, PlayerEntity player) {
-            double  x = player.posX,
-                    y = player.posY + player.getEyeHeight(),
-                    z = player.posZ;
-            return StreamSupport.stream(list.spliterator(), false)
-                    .map(t -> new TargetObject<T>(posExtractor.apply(t).distanceSq(x, y, z, true), t))
-                    .sorted(TargetObject.BY_DISTANCE)
-                    .map(TargetObject::getTarget)
+
+            return byDistance(StreamSupport.stream(list.spliterator(), false), posExtractor, player)
                     //A linked list is the optimal Datastructure here - we don't need random access. Notice that changing that to an ArrayList will add an Factor of 1.2!
                     .collect(Collectors.toCollection(LinkedList::new));
+        }
+
+        public static <T> Stream<T> byDistance(Stream<T> stream, Function<T, ? extends BlockPos> posExtractor, PlayerEntity player) {
+            double x = player.posX,
+                    y = player.posY + player.getEyeHeight(),
+                    z = player.posZ;
+            return stream
+                    .map(t -> new TargetObject<T>(posExtractor.apply(t).distanceSq(x, y, z, true), t))
+                    .sorted(TargetObject.BY_DISTANCE)
+                    .map(TargetObject::getTarget);
         }
 
     }
