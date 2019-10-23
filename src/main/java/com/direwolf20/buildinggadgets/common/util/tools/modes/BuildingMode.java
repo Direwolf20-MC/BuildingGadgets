@@ -5,6 +5,7 @@ import com.direwolf20.buildinggadgets.api.building.modes.IBuildingMode;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
+import com.direwolf20.buildinggadgets.common.util.helpers.SortingHelper;
 import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.google.common.collect.ImmutableList;
@@ -64,8 +65,8 @@ public enum BuildingMode {
 
     public static List<BlockPos> collectPlacementPos(IWorld world, PlayerEntity player, BlockPos hit, Direction sideHit, ItemStack tool, BlockPos initial) {
         IBuildingMode mode = byName(NBTHelper.getOrNewTag(tool).getString("mode")).getModeImplementation();
-        return mode.createExecutionContext(player, hit, sideHit, tool, initial)
-                .collectFilteredSequence();
+        return SortingHelper.Blocks.byDistance(mode.createExecutionContext(player, hit, sideHit, tool, initial)
+                .collectFilteredSequence(), player);
     }
 
     public static BuildingMode byName(String name) {

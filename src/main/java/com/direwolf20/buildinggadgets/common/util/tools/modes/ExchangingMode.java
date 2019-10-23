@@ -7,6 +7,7 @@ import com.direwolf20.buildinggadgets.common.registry.OurBlocks;
 import com.direwolf20.buildinggadgets.common.tiles.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
+import com.direwolf20.buildinggadgets.common.util.helpers.SortingHelper;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.block.BlockState;
@@ -74,7 +75,7 @@ public enum ExchangingMode {
 
     public static List<BlockPos> collectPlacementPos(IWorld world, PlayerEntity player, BlockPos hit, Direction sideHit, ItemStack tool, BlockPos initial) {
         IBuildingMode mode = byName(NBTHelper.getOrNewTag(tool).getString("mode")).getModeImplementation();
-        return mode.createExecutionContext(player, hit, sideHit, tool, initial).collectFilteredSequence();
+        return SortingHelper.Blocks.byDistance(mode.createExecutionContext(player, hit, sideHit, tool, initial).collectFilteredSequence(), player);
     }
 
     public static BiPredicate<BlockPos, BlockData> combineTester(IWorld world, ItemStack tool, PlayerEntity player, BlockPos initial) {
