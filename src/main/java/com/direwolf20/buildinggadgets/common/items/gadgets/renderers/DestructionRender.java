@@ -26,6 +26,7 @@ import net.minecraftforge.client.event.RenderWorldLastEvent;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.commons.lang3.tuple.Triple;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL14;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -86,24 +87,14 @@ public class DestructionRender extends BaseRenderer {
         GlStateManager.alphaFunc(GL11.GL_GREATER, 0.0001F);
         GlStateManager.disableTexture();
         GlStateManager.depthMask(false);
-        GlStateManager.color4f(1f, 1f, 1f, 0.5f);
+        GL14.glBlendColor(1F, 1F, 1F, 0.3f); //Set the alpha of the blocks we are rendering
         for (BlockPos coordinate : GadgetDestruction.getClearingPositionsForRendering(world, startBlock, facing, player, heldItem)) {
-            /*boolean invisible = true;
-            BlockState state = world.getBlockState(coordinate);
-            for (Direction side : Direction.values()) {
-                if (!state.isSideInvisible(state, side)) {
-                    invisible = false;
-                    break;
-                }
-            }
-            if (invisible) continue;*/
             renderMissingBlock(bufferBuilder, coordinate);
-
         }
         Tessellator.getInstance().draw();
         GlStateManager.depthMask(true);
         GlStateManager.enableTexture();
-        GlStateManager.color4f(1, 1, 1, 1);
+        GL14.glBlendColor(1F, 1F, 1F, 1f); //Set the alpha of the blocks we are rendering
         //Set blending back to the default mode
         GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
         ForgeHooksClient.setRenderLayer(MinecraftForgeClient.getRenderLayer());

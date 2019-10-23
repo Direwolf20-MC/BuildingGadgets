@@ -21,7 +21,6 @@ import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -89,6 +88,7 @@ public class BuildingRender extends BaseRenderer {
 
                 //Save the current position that is being rendered (I think)
                 GlStateManager.pushMatrix();
+                GlStateManager.translated(- playerPos.getX(), - playerPos.getY(), - playerPos.getZ());//The render starts at the player, so we subtract the player coords and move the render to 0,0,0
                 GlStateManager.pushTextureAttributes();
                 //Enable Blending (So we can have transparent effect)
                 GlStateManager.enableBlend();
@@ -99,10 +99,8 @@ public class BuildingRender extends BaseRenderer {
 
                 for (BlockPos coordinate : sortedCoordinates) {
                     GlStateManager.pushMatrix();//Push matrix again just because
-                    GlStateManager.translated(-playerPos.getX(), -playerPos.getY(), -playerPos.getZ());//The render starts at the player, so we subtract the player coords and move the render to 0,0,0
                     GlStateManager.translatef(coordinate.getX(), coordinate.getY(), coordinate.getZ());//Now move the render position to the coordinates we want to render at
                     GlStateManager.rotatef(-90.0F, 0.0F, 1.0F, 0.0F); //Rotate it because i'm not sure why but we need to
-                    GlStateManager.scalef(1.0f, 1.0f, 1.0f); //Block scale 1 = full sized block
                     GL14.glBlendColor(1F, 1F, 1F, 0.55f); //Set the alpha of the blocks we are rendering
                     if (getBuilderWorld().getWorldType() != WorldType.DEBUG_ALL_BLOCK_STATES) { //Get the block state in the fake world
                         try {
@@ -124,11 +122,7 @@ public class BuildingRender extends BaseRenderer {
 
 
                 }
-                BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
-                bufferBuilder.begin(GL14.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
-                GlStateManager.alphaFunc(GL11.GL_GREATER, 0.0001F);
-                GlStateManager.disableTexture();
-                GlStateManager.depthMask(false);
+                BufferBuilder bufferBuilder = setupMissingRender();
                 for (BlockPos coordinate : coordinates) { //Now run through the UNSORTED list of coords, to show which blocks won't place if you don't have enough of them.
 
                     if (energyCap.isPresent()) {
@@ -142,9 +136,7 @@ public class BuildingRender extends BaseRenderer {
                     }
                     //Move the render position back to where it was
                 }
-                Tessellator.getInstance().draw();
-                GlStateManager.depthMask(true);
-                GlStateManager.enableTexture();
+                teardownMissingRender();
 
                 if (state.hasTileEntity()) {
                     TileEntity te = getTileEntityWorld().getTE(state, world);

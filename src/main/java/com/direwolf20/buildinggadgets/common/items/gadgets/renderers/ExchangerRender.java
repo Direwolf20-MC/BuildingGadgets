@@ -22,7 +22,6 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -99,6 +98,7 @@ public class ExchangerRender extends BaseRenderer {
 
             //Save the current position that is being rendered (I think)
             GlStateManager.pushMatrix();
+            GlStateManager.translated(- playerPos.getX(), - playerPos.getY(), - playerPos.getZ());
             //Enable Blending (So we can have transparent effect)
             GlStateManager.enableBlend();
             //This blend function allows you to use a constant alpha, which is defined later
@@ -108,11 +108,8 @@ public class ExchangerRender extends BaseRenderer {
 
             for (BlockPos coordinate : coordinates) {
                 GlStateManager.pushMatrix();//Push matrix again just because
-                GlStateManager.translated(-playerPos.getX(), -playerPos.getY(), - playerPos.getZ());
                 GlStateManager.translatef(coordinate.getX(), coordinate.getY(), coordinate.getZ());//Now move the render position to the coordinates we want to render at
                 GlStateManager.rotatef(- 90.0F, 0.0F, 1.0F, 0.0F); //Rotate it because i'm not sure why but we need to
-                GlStateManager.translatef(- 0.005f, - 0.005f, 0.005f);
-                GlStateManager.scalef(1.01f, 1.01f, 1.01f);//Slightly Larger block to avoid z-fighting.
                 GL14.glBlendColor(1F, 1F, 1F, 0.55f); //Set the alpha of the blocks we are rendering
                 if (getBuilderWorld().getWorldType() != WorldType.DEBUG_ALL_BLOCK_STATES) { //Get the block state in the fake world
                     try {
@@ -140,11 +137,7 @@ public class ExchangerRender extends BaseRenderer {
                 GlStateManager.popMatrix();
             }
 
-            BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
-            bufferBuilder.begin(GL14.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
-            GlStateManager.alphaFunc(GL11.GL_GREATER, 0.0001F);
-            GlStateManager.disableTexture();
-            GlStateManager.depthMask(false);
+            BufferBuilder bufferBuilder = setupMissingRender();
             for (BlockPos coordinate : coordinates) {
                 if (energy.isPresent()) {
                     hasEnergy -= (((AbstractGadget) heldItem.getItem())).getEnergyCost(heldItem);
@@ -157,9 +150,7 @@ public class ExchangerRender extends BaseRenderer {
                 }
                 //Move the render position back to where it was
             }
-            Tessellator.getInstance().draw();
-            GlStateManager.depthMask(true);
-            GlStateManager.enableTexture();
+            teardownMissingRender();
 
             if (state.hasTileEntity()) {
                 TileEntity te = getTileEntityWorld().getTE(state, world);
