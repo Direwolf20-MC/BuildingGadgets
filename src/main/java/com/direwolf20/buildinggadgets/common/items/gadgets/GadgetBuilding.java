@@ -256,7 +256,7 @@ public class GadgetBuilding extends ModeGadget implements IAtopPlacingGadget {
 
         if (index.applyMatch(match)) {
             ImmutableMultiset<IUniqueObject<?>> usedItems = match.getChosenOption();
-            builder.record(world, pos, usedItems, ImmutableMultiset.of());
+            builder.record(world, pos, setBlock, usedItems, ImmutableMultiset.of());
             EffectBlock.spawnEffectBlock(world, pos, setBlock, EffectBlock.Mode.PLACE, useConstructionPaste);
             return true;
         }

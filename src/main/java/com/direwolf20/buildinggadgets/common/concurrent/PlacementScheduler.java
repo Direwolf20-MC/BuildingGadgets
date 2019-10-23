@@ -65,7 +65,7 @@ public final class PlacementScheduler extends SteppedScheduler {
         CheckResult res = checker.checkPositionWithResult(view.getContext(), target, false);
         lastWasSuccess = res.isSuccess();
         if (lastWasSuccess) {
-            undoBuilder.record(view.getContext().getWorld(), target.getPos(), res.getMatch().getChosenOption(), res.getInsertedItems());
+            undoBuilder.record(view.getContext().getWorld(), target.getPos(), target.getData(), res.getMatch().getChosenOption(), res.getInsertedItems());
             EffectBlock.spawnEffectBlock(view.getContext(), target, Mode.PLACE, res.isUsingPaste());
         }
     }

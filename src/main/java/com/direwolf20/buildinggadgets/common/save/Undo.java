@@ -151,32 +151,40 @@ public final class Undo {
 
     public static final class BlockInfo {
         private static BlockInfo deserialize(CompoundNBT nbt, IntFunction<BlockData> dataSupplier, IntFunction<Multiset<IUniqueObject<?>>> itemSetSupplier) {
-            BlockData data = dataSupplier.apply(nbt.getInt(NBTKeys.WORLD_SAVE_UNDO_DATA));
+            BlockData data = dataSupplier.apply(nbt.getInt(NBTKeys.WORLD_SAVE_UNDO_RECORDED_DATA));
+            BlockData placedData = dataSupplier.apply(nbt.getInt(NBTKeys.WORLD_SAVE_UNDO_PLACED_DATA));
             Multiset<IUniqueObject<?>> usedItems = itemSetSupplier.apply(nbt.getInt(NBTKeys.WORLD_SAVE_UNDO_ITEMS_USED));
             Multiset<IUniqueObject<?>> producedItems = itemSetSupplier.apply(nbt.getInt(NBTKeys.WORLD_SAVE_UNDO_ITEMS_PRODUCED));
-            return new BlockInfo(data, usedItems, producedItems);
+            return new BlockInfo(data, placedData, usedItems, producedItems);
         }
 
-        private final BlockData data;
+        private final BlockData recordedData;
+        private final BlockData placedData;
         private final Multiset<IUniqueObject<?>> usedItems;
         private final Multiset<IUniqueObject<?>> producedItems;
 
-        private BlockInfo(BlockData data, Multiset<IUniqueObject<?>> usedItems, Multiset<IUniqueObject<?>> producedItems) {
-            this.data = data;
+        private BlockInfo(BlockData recordedData, BlockData placedData, Multiset<IUniqueObject<?>> usedItems, Multiset<IUniqueObject<?>> producedItems) {
+            this.recordedData = recordedData;
+            this.placedData = placedData;
             this.usedItems = usedItems;
             this.producedItems = producedItems;
         }
 
         private CompoundNBT serialize(ToIntFunction<BlockData> dataIdSupplier, ToIntFunction<Multiset<IUniqueObject<?>>> itemIdSupplier) {
             CompoundNBT res = new CompoundNBT();
-            res.putInt(NBTKeys.WORLD_SAVE_UNDO_DATA, dataIdSupplier.applyAsInt(data));
+            res.putInt(NBTKeys.WORLD_SAVE_UNDO_RECORDED_DATA, dataIdSupplier.applyAsInt(recordedData));
+            res.putInt(NBTKeys.WORLD_SAVE_UNDO_PLACED_DATA, dataIdSupplier.applyAsInt(placedData));
             res.putInt(NBTKeys.WORLD_SAVE_UNDO_ITEMS_USED, itemIdSupplier.applyAsInt(usedItems));
             res.putInt(NBTKeys.WORLD_SAVE_UNDO_ITEMS_PRODUCED, itemIdSupplier.applyAsInt(producedItems));
             return res;
         }
 
-        public BlockData getData() {
-            return data;
+        public BlockData getRecordedData() {
+            return recordedData;
+        }
+
+        public BlockData getPlacedData() {
+            return placedData;
         }
 
         public Multiset<IUniqueObject<?>> getUsedItems() {
@@ -197,15 +205,15 @@ public final class Undo {
             regionBuilder = null;
         }
 
-        public Builder record(IBlockReader reader, BlockPos pos, Multiset<IUniqueObject<?>> requiredItems, Multiset<IUniqueObject<?>> producedItems) {
+        public Builder record(IBlockReader reader, BlockPos pos, BlockData placeData, Multiset<IUniqueObject<?>> requiredItems, Multiset<IUniqueObject<?>> producedItems) {
             BlockState state = reader.getBlockState(pos);
             TileEntity te = reader.getTileEntity(pos);
             ITileEntityData data = te != null ? NBTTileEntityData.ofTile(te) : TileSupport.dummyTileEntityData();
-            return record(pos, new BlockData(state, data), requiredItems, producedItems);
+            return record(pos, new BlockData(state, data), placeData, requiredItems, producedItems);
         }
 
-        private Builder record(BlockPos pos, BlockData data, Multiset<IUniqueObject<?>> requiredItems, Multiset<IUniqueObject<?>> producedItems) {
-            mapBuilder.put(pos, new BlockInfo(data, requiredItems, producedItems));
+        private Builder record(BlockPos pos, BlockData recordedData, BlockData placedData, Multiset<IUniqueObject<?>> requiredItems, Multiset<IUniqueObject<?>> producedItems) {
+            mapBuilder.put(pos, new BlockInfo(recordedData, placedData, requiredItems, producedItems));
             if (regionBuilder == null)
                 regionBuilder = Region.enclosingBuilder();
             regionBuilder.enclose(pos);

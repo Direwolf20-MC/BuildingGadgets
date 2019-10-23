@@ -2,6 +2,7 @@ package com.direwolf20.buildinggadgets.common.items.gadgets;
 
 import com.direwolf20.buildinggadgets.client.gui.GuiMod;
 import com.direwolf20.buildinggadgets.common.blocks.EffectBlock;
+import com.direwolf20.buildinggadgets.common.building.BlockData;
 import com.direwolf20.buildinggadgets.common.building.Region;
 import com.direwolf20.buildinggadgets.common.building.placement.IPositionPlacementSequence;
 import com.direwolf20.buildinggadgets.common.building.placement.PlacementSequences.ConnectedSurface;
@@ -278,7 +279,7 @@ public class GadgetDestruction extends AbstractGadget {
             return false;
 
         this.applyDamage(tool, player);
-        builder.record(world, voidPos, ImmutableMultiset.of(), ImmutableMultiset.of());
+        builder.record(world, voidPos, BlockData.AIR, ImmutableMultiset.of(), ImmutableMultiset.of());
         EffectBlock.spawnEffectBlock(world, voidPos, TileSupport.createBlockData(world, voidPos), EffectBlock.Mode.REMOVE, false);
         return true;
     }

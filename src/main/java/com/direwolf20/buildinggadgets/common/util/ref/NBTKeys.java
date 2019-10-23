@@ -107,7 +107,8 @@ public final class NBTKeys {
     public static final String WORLD_SAVE_UNDO_DATA_SERIALIZER_LIST = "data_serializer_list";
     public static final String WORLD_SAVE_UNDO_ITEMS_LIST = "items_list";
     public static final String WORLD_SAVE_UNDO_ITEMS_SERIALIZER_LIST = "items_serializer_list";
-    public static final String WORLD_SAVE_UNDO_DATA = "data";
+    public static final String WORLD_SAVE_UNDO_RECORDED_DATA = "recorded_data";
+    public static final String WORLD_SAVE_UNDO_PLACED_DATA = "placed_data";
     public static final String WORLD_SAVE_UNDO_ITEMS_USED = "used_items";
     public static final String WORLD_SAVE_UNDO_ITEMS_PRODUCED = "produced_items";
     public static final String WORLD_SAVE_UNDO_BOUNDS = "bounding_box";

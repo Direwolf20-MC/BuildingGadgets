@@ -272,7 +272,7 @@ public class GadgetExchanger extends ModeGadget {
             Iterator<ImmutableMultiset<IUniqueObject<?>>> it = materials.iterator();
             ImmutableMultiset<IUniqueObject<?>> producedItems = it.hasNext() ? it.next() : ImmutableMultiset.of();
             index.insert(producedItems);
-            builder.record(world, pos, usedItems, producedItems);
+            builder.record(world, pos, setBlock, usedItems, producedItems);
             EffectBlock.spawnEffectBlock(world, pos, setBlock, EffectBlock.Mode.REPLACE, useConstructionPaste);
             return true;
         }

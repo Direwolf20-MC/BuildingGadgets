@@ -2,6 +2,7 @@ package com.direwolf20.buildinggadgets.common.concurrent;
 
 import com.direwolf20.buildinggadgets.common.blocks.EffectBlock;
 import com.direwolf20.buildinggadgets.common.building.PlacementTarget;
+import com.direwolf20.buildinggadgets.common.building.tilesupport.TileSupport;
 import com.direwolf20.buildinggadgets.common.building.view.IBuildContext;
 import com.direwolf20.buildinggadgets.common.inventory.IItemIndex;
 import com.direwolf20.buildinggadgets.common.inventory.MatchResult;
@@ -55,12 +56,17 @@ public final class UndoScheduler extends SteppedScheduler {
     }
 
     private void undoBlock(Map.Entry<BlockPos, BlockInfo> entry) {
+        //if the block that was placed is no longer there, we should not undo anything
+        if (! TileSupport.createBlockData(context.getWorld(), entry.getKey()).equals(entry.getValue().getPlacedData())) {
+            lastWasSuccess = false;
+            return;
+        }
         MatchResult matchResult = index.tryMatch(entry.getValue().getProducedItems());
         lastWasSuccess = matchResult.isSuccess();
         if (lastWasSuccess) {
             index.applyMatch(matchResult);
             index.insert(entry.getValue().getUsedItems());
-            EffectBlock.spawnUndoBlock(context, new PlacementTarget(entry.getKey(), entry.getValue().getData()));
+            EffectBlock.spawnUndoBlock(context, new PlacementTarget(entry.getKey(), entry.getValue().getRecordedData()));
         }
     }
 
