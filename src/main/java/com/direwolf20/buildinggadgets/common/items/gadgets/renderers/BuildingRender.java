@@ -2,7 +2,7 @@ package com.direwolf20.buildinggadgets.common.items.gadgets.renderers;
 
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.building.BlockData;
-import com.direwolf20.buildinggadgets.common.building.modes.ExchangingMode;
+import com.direwolf20.buildinggadgets.common.building.modes.BuildingMode;
 import com.direwolf20.buildinggadgets.common.building.view.IBuildContext;
 import com.direwolf20.buildinggadgets.common.building.view.SimpleBuildContext;
 import com.direwolf20.buildinggadgets.common.inventory.IItemIndex;
@@ -74,7 +74,7 @@ public class BuildingRender extends BaseRenderer {
                 }
                 List<BlockPos> renderCoordinates;
                 if (coordinates.size() == 0) { //Build a list of coordinates based on the tool mode and range
-                    coordinates = ExchangingMode
+                    coordinates = BuildingMode
                             .collectPlacementPos(world, player, lookingAt.getPos(), lookingAt.getFace(), heldItem, lookingAt.getPos());
                     renderCoordinates = coordinates;
                 } else { //anchors need to be resorted
