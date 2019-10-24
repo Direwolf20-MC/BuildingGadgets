@@ -1,6 +1,4 @@
 {
   "replace": false,
-  "values": [
-    "#buildinggadgets:blacklist/generic"
-  ]
+  "values": []
 }

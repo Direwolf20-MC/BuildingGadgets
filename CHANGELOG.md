@@ -54,7 +54,7 @@ The format of this document is based on [Keep a Changelog](https://keepachangelo
 - Completely rewrite the internal registration system for our blocks, items, etc.
 - The Black and Whitelists are now based on Tags
     - The Tags `buildinggadgets:blacklist\<gadget>`, `buildinggadgets:whitelist\<gadget>` allow you to use the full Power of vanilla's Tag System for this! :)
-    - By default they all contain `buildinggadgets:blacklist\generic` and `buildinggadgets:whitelist\generic` respectively. This is setup with the same default values the config used to have.
+    - By default both exchanging and building Gadget whitelist contain `buildinggadgets:blacklist\generic` and `buildinggadgets:whitelist\generic` respectively. This is setup with the same default values the config used to have.
     - Notice that the exchanger has now Torches Blacklisted, as they allow for far to easy dupe of Items
 
 ### Deprecated
