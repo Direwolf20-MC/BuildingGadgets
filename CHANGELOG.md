@@ -31,7 +31,8 @@ The format of this document is based on [Keep a Changelog](https://keepachangelo
             - You can change name and author of a copied TemplateHeader, but all other changes won't have an effect or even prevent it from being copied (in case of version or mc_version)
         - notice that we are releasing the format as version "2-beta" in case we need to do some changes after we released
             - The old *version "1"* format is not supported
-    - We had to disable the template preview in the TemplateManager, but are working on getting it back up and running            
+    - We had to disable the template preview in the TemplateManager, but are working on getting it back up and running 
+    - The Items which can be converted into a Template are now determined by the `buildinggadgets:template_convertible` Item tag
 
 
 ## [3.0.6a - 1.14.4] - 2019-10-21
