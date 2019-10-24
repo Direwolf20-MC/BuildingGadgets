@@ -42,6 +42,7 @@ public class SingleTypeProviderTest {
     }
 
     @RepeatedTest(16)
+    @Disabled
     void accessResultsShouldRemainConstantRandom() {
         int x = random.nextInt();
         int y = random.nextInt();

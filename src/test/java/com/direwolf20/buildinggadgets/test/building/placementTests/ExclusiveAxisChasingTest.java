@@ -8,6 +8,7 @@ import com.direwolf20.buildinggadgets.test.util.annotations.LargeTest;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 
 import java.util.List;
 import java.util.Random;
@@ -34,6 +35,7 @@ public class ExclusiveAxisChasingTest {
     }
 
     @LargeTest
+    @Disabled
     void testAllFacingsRandomly() {
         Region testRegion = BlockTestUtils.randomRegion();
         BlockPos p1 = BlockTestUtils.randomBlockPosIn(testRegion);

@@ -371,11 +371,11 @@ public class GadgetCopyPaste extends AbstractGadget {
             }
         }
         int maxDimension = Config.GADGETS.GADGET_COPY_PASTE.maxCopySize.get();
-        if ((region.getXSize() > maxDimension || region.getYSize() > maxDimension || region.getZSize() > maxDimension) &&
-                ! OverrideCopySizeCommand.mayPerformLargeCopy(player)) {
+        if (region.getXSize() > 0xFFFF || region.getYSize() > 255 || region.getZSize() > 0xFFFF ||  //these are the max dimensions of a Template
+                ((region.getXSize() > maxDimension || region.getYSize() > maxDimension || region.getZSize() > maxDimension) && ! OverrideCopySizeCommand.mayPerformLargeCopy(player))) {
             BlockPos sizeVec = region.getMax().subtract(region.getMin());
             player.sendStatusMessage(MessageTranslation.COPY_TOO_LARGE
-                    .componentTranslation(sizeVec.getX(), sizeVec.getY(), sizeVec.getZ(), maxDimension, maxDimension, maxDimension)
+                    .componentTranslation(sizeVec.getX(), sizeVec.getY(), sizeVec.getZ(), Math.min(maxDimension, 0xFFFF), Math.min(maxDimension, 255), Math.min(maxDimension, 0xFFFF))
                     .setStyle(Styles.RED), true);
             return false;
         }
