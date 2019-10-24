@@ -45,7 +45,7 @@ public final class PlacementChecker {
     }
 
     public CheckResult checkPositionWithResult(IBuildContext context, PlacementTarget target, boolean giveBackItems) {
-        if (! placeCheck.test(context, target))
+        if (target.getPos().getY() > context.getWorld().getMaxHeight() || target.getPos().getY() < 0 || ! placeCheck.test(context, target))
             return new CheckResult(MatchResult.failure(), ImmutableMultiset.of(), - 1, false, false);
         int energy = energyFun.applyAsInt(target);
         Multiset<IUniqueObject<?>> insertedItems = ImmutableMultiset.of();
