@@ -14,6 +14,7 @@ import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
 import com.direwolf20.buildinggadgets.common.util.lang.LangUtil;
 import com.direwolf20.buildinggadgets.common.util.lang.Styles;
 import com.direwolf20.buildinggadgets.common.util.lang.TooltipTranslation;
+import com.direwolf20.buildinggadgets.common.util.ref.Reference.BlockReference.TagReference;
 import com.direwolf20.buildinggadgets.common.util.tools.modes.ExchangingMode;
 import com.direwolf20.buildinggadgets.common.world.FakeBuilderWorld;
 import net.minecraft.block.Block;
@@ -61,7 +62,7 @@ public class GadgetExchanger extends AbstractGadget {
     private static final FakeBuilderWorld fakeWorld = new FakeBuilderWorld();
 
     public GadgetExchanger(Properties builder) {
-        super(builder);
+        super(builder, TagReference.WHITELIST_EXCHANGING, TagReference.BLACKLIST_EXCHANGING);
     }
 
     @Override

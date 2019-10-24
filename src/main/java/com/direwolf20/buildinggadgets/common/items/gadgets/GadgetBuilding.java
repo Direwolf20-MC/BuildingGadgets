@@ -11,7 +11,6 @@ import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketBindTool;
 import com.direwolf20.buildinggadgets.common.registry.OurBlocks;
 import com.direwolf20.buildinggadgets.common.registry.OurItems;
-
 import com.direwolf20.buildinggadgets.common.util.helpers.InventoryHelper;
 import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
 import com.direwolf20.buildinggadgets.common.util.helpers.SortingHelper;
@@ -20,6 +19,7 @@ import com.direwolf20.buildinggadgets.common.util.lang.LangUtil;
 import com.direwolf20.buildinggadgets.common.util.lang.Styles;
 import com.direwolf20.buildinggadgets.common.util.lang.TooltipTranslation;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
+import com.direwolf20.buildinggadgets.common.util.ref.Reference.BlockReference.TagReference;
 import com.direwolf20.buildinggadgets.common.util.tools.UndoState;
 import com.direwolf20.buildinggadgets.common.util.tools.modes.BuildingMode;
 import com.direwolf20.buildinggadgets.common.world.FakeBuilderWorld;
@@ -54,11 +54,10 @@ import java.util.function.Supplier;
 import static com.direwolf20.buildinggadgets.common.util.GadgetUtils.*;
 
 public class GadgetBuilding extends AbstractGadget implements IAtopPlacingGadget {
-
     private static final FakeBuilderWorld fakeWorld = new FakeBuilderWorld();
 
     public GadgetBuilding(Properties builder) {
-        super(builder);
+        super(builder, TagReference.WHITELIST_BUILDING, TagReference.BLACKLIST_BUILDING);
     }
 
     @Override

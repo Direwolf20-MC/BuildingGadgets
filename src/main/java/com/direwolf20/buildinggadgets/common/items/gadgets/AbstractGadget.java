@@ -12,12 +12,16 @@ import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
 import com.direwolf20.buildinggadgets.common.util.lang.Styles;
 import com.direwolf20.buildinggadgets.common.util.lang.TooltipTranslation;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
+import net.minecraft.block.Block;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.tags.BlockTags.Wrapper;
+import net.minecraft.tags.Tag;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
@@ -37,16 +41,27 @@ import java.util.function.Supplier;
 import static com.direwolf20.buildinggadgets.common.util.GadgetUtils.withSuffix;
 
 public abstract class AbstractGadget extends Item {
-
     private BaseRenderer renderer;
+    private final Tag<Block> whiteList;
+    private final Tag<Block> blackList;
 
-    public AbstractGadget(Properties builder) {
+    public AbstractGadget(Properties builder, ResourceLocation whiteListTag, ResourceLocation blackListTag) {
         super(builder);
         renderer = DistExecutor.runForDist(this::createRenderFactory, () -> () -> null);
+        this.whiteList = new Wrapper(whiteListTag);
+        this.blackList = new Wrapper(blackListTag);
     }
 
     public abstract int getEnergyMax();
     public abstract int getEnergyCost(ItemStack tool);
+
+    public Tag<Block> getWhiteList() {
+        return whiteList;
+    }
+
+    public Tag<Block> getBlackList() {
+        return blackList;
+    }
 
     @OnlyIn(Dist.CLIENT)
     public BaseRenderer getRender() {
@@ -105,6 +120,20 @@ public abstract class AbstractGadget extends Item {
     @Override
     public boolean getIsRepairable(ItemStack toRepair, ItemStack repair) {
         return !EnergyUtil.hasCap(toRepair) && repair.getItem() == Items.DIAMOND;
+    }
+
+    public boolean isAllowedBlock(Block block) {
+        if (getWhiteList().getAllElements().isEmpty())
+            return ! getBlackList().contains(block);
+        return getWhiteList().contains(block);
+    }
+
+    public boolean isAllowedBlock(Block block, @Nullable PlayerEntity notifiedPlayer) {
+        if (isAllowedBlock(block))
+            return true;
+        if (notifiedPlayer != null)
+            notifiedPlayer.sendStatusMessage(new StringTextComponent(TextFormatting.RED + new TranslationTextComponent("message.gadget.invalidblock").getUnformattedComponentText()), true);
+        return false;
     }
 
     public static ItemStack getGadget(PlayerEntity player) {

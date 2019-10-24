@@ -1,7 +1,6 @@
 package com.direwolf20.buildinggadgets.common.util;
 
 import com.direwolf20.buildinggadgets.api.building.BlockData;
-import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.items.InventoryWrapper;
 import com.direwolf20.buildinggadgets.common.items.gadgets.AbstractGadget;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetBuilding;
@@ -299,10 +298,8 @@ public class GadgetUtils {
             return;
 */
         BlockState state = world.getBlockState(lookingAt.getPos());
-        if (!Config.BLACKLIST.isAllowedBlock(state.getBlock())) {
-            player.sendStatusMessage(new StringTextComponent(TextFormatting.RED + new TranslationTextComponent("message.gadget.invalidblock").getUnformattedComponentText()), true);
+        if (! ((AbstractGadget) stack.getItem()).isAllowedBlock(state.getBlock(), player))
             return;
-        }
         BlockData placeState = InventoryHelper.getSpecificStates(state, world, player, lookingAt.getPos(), stack);
         if (state.getBlock() == OurBlocks.constructionBlock) {
             TileEntity te = world.getTileEntity(lookingAt.getPos());

@@ -24,6 +24,7 @@ import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
 import com.direwolf20.buildinggadgets.common.util.lang.Styles;
 import com.direwolf20.buildinggadgets.common.util.lang.TooltipTranslation;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
+import com.direwolf20.buildinggadgets.common.util.ref.Reference.BlockReference.TagReference;
 import com.direwolf20.buildinggadgets.common.util.tools.NetworkIO;
 import com.direwolf20.buildinggadgets.common.util.tools.UniqueItem;
 import com.direwolf20.buildinggadgets.common.world.WorldSave;
@@ -80,7 +81,7 @@ public class GadgetCopyPaste extends AbstractGadget implements ITemplate {
     }
 
     public GadgetCopyPaste(Properties builder) {
-        super(builder);
+        super(builder, TagReference.WHITELIST_COPY_PASTE, TagReference.BLACKLIST_COPY_PASTE);
     }
 
     @Override
@@ -368,7 +369,7 @@ public class GadgetCopyPaste extends AbstractGadget implements ITemplate {
                 + new TranslationTextComponent("message.gadget." + (player.isSneaking() ? "mirrored" : "rotated")).getUnformattedComponentText()), true);
     }
 
-    public static void copyBlocks(ItemStack stack, PlayerEntity player, World world, BlockPos startPos, BlockPos endPos) {
+    public void copyBlocks(ItemStack stack, PlayerEntity player, World world, BlockPos startPos, BlockPos endPos) {
         if (startPos != null && endPos != null) {
             GadgetCopyPaste tool = OurItems.gadgetCopyPaste;
             if (findBlocks(world, startPos, endPos, stack, player, tool)) {
@@ -378,7 +379,7 @@ public class GadgetCopyPaste extends AbstractGadget implements ITemplate {
         }
     }
 
-    private static boolean findBlocks(World world, BlockPos start, BlockPos end, ItemStack stack, PlayerEntity player, GadgetCopyPaste tool) {
+    private boolean findBlocks(World world, BlockPos start, BlockPos end, ItemStack stack, PlayerEntity player, GadgetCopyPaste tool) {
         setLastBuild(stack, null, DimensionType.OVERWORLD);
         int foundTE = 0;
         int startX = start.getX();
@@ -414,7 +415,7 @@ public class GadgetCopyPaste extends AbstractGadget implements ITemplate {
                 for (int z = iStartZ; z <= iEndZ; z++) {
                     BlockPos tempPos = new BlockPos(x, y, z);
                     BlockState tempState = world.getBlockState(tempPos);
-                    if (tempState != Blocks.AIR.getDefaultState() && ! tempState.getMaterial().isLiquid() && Config.BLACKLIST.isAllowedBlock(tempState.getBlock())) {
+                    if (tempState != Blocks.AIR.getDefaultState() && ! tempState.getMaterial().isLiquid() && isAllowedBlock(tempState.getBlock())) {
                         TileEntity te = world.getTileEntity(tempPos);
                         BlockData assignState = InventoryHelper.getSpecificStates(tempState, world, player, tempPos, stack);
                         BlockData actualState = assignState;

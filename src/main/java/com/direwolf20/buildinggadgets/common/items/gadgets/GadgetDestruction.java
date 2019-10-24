@@ -22,6 +22,7 @@ import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
 import com.direwolf20.buildinggadgets.common.util.lang.Styles;
 import com.direwolf20.buildinggadgets.common.util.lang.TooltipTranslation;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
+import com.direwolf20.buildinggadgets.common.util.ref.Reference.BlockReference.TagReference;
 import com.direwolf20.buildinggadgets.common.util.tools.SetBackedPlacementSequence;
 import com.direwolf20.buildinggadgets.common.world.WorldSave;
 import net.minecraft.block.BlockState;
@@ -59,9 +60,8 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public class GadgetDestruction extends AbstractGadget {
-
     public GadgetDestruction(Properties builder) {
-        super(builder);
+        super(builder, TagReference.WHITELIST_DESTRUCTION, TagReference.BLACKLIST_DESTRUCTION);
     }
 
     @Override
@@ -292,7 +292,7 @@ public class GadgetDestruction extends AbstractGadget {
         try {
             snapshot = RegionSnapshot.select(world, positions)
                     .excludeAir()
-                    .checkBlocks((p, state) -> destroyBlock(world, p, player))
+                    .checkBlocks((p, state) -> isAllowedBlock(state.getBlock()) && destroyBlock(world, p, player))
                     .checkTiles((p, state, tile) -> state.getBlock() == OurBlocks.constructionBlock && tile instanceof ConstructionBlockTileEntity)
                     .build();
         } catch (PaletteOverflowException e) {

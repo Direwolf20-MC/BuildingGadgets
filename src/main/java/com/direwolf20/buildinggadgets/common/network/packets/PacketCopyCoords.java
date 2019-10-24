@@ -57,7 +57,7 @@ public class PacketCopyCoords {
                 } else {
                     tool.setStartPos(heldItem, startPos);
                     tool.setEndPos(heldItem, endPos);
-                    GadgetCopyPaste.copyBlocks(heldItem, playerEntity, playerEntity.world, tool.getStartPos(heldItem), tool.getEndPos(heldItem));
+                    OurItems.gadgetCopyPaste.copyBlocks(heldItem, playerEntity, playerEntity.world, tool.getStartPos(heldItem), tool.getEndPos(heldItem));
                 }
             });
 
