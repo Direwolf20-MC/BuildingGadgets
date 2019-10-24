@@ -3,6 +3,7 @@ package com.direwolf20.buildinggadgets.common.items.gadgets;
 import com.direwolf20.buildinggadgets.common.blocks.EffectBlock;
 import com.direwolf20.buildinggadgets.common.building.BlockData;
 import com.direwolf20.buildinggadgets.common.building.modes.ExchangingMode;
+import com.direwolf20.buildinggadgets.common.building.tilesupport.ITileEntityData;
 import com.direwolf20.buildinggadgets.common.building.tilesupport.TileSupport;
 import com.direwolf20.buildinggadgets.common.building.view.IBuildContext;
 import com.direwolf20.buildinggadgets.common.building.view.SimpleBuildContext;
@@ -17,6 +18,7 @@ import com.direwolf20.buildinggadgets.common.items.gadgets.renderers.ExchangerRe
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketBindTool;
 import com.direwolf20.buildinggadgets.common.save.Undo;
+import com.direwolf20.buildinggadgets.common.tiles.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
 import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
@@ -38,6 +40,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
@@ -219,6 +222,13 @@ public class GadgetExchanger extends ModeGadget {
 
     private boolean exchangeBlock(ServerWorld world, ServerPlayerEntity player, IItemIndex index, Undo.Builder builder, BlockPos pos, BlockData setBlock) {
         BlockState currentBlock = world.getBlockState(pos);
+        ITileEntityData data;
+        TileEntity te = world.getTileEntity(pos);
+        if (te instanceof ConstructionBlockTileEntity) {
+            data = ((ConstructionBlockTileEntity) te).getConstructionBlockData().getTileData();
+            currentBlock = ((ConstructionBlockTileEntity) te).getConstructionBlockData().getState();
+        } else
+            data = TileSupport.createTileData(world, pos);
         //ItemStack itemStack = setBlock.getBlock().getPickBlock(setBlock, null, world, pos, player);
 
 
@@ -265,7 +275,7 @@ public class GadgetExchanger extends ModeGadget {
 
         if (index.applyMatch(match)) {
             ImmutableMultiset<IUniqueObject<?>> usedItems = match.getChosenOption();
-            MaterialList materials = TileSupport.createTileData(world, pos).getRequiredItems(
+            MaterialList materials = te instanceof ConstructionBlockTileEntity ? InventoryHelper.PASTE_LIST : data.getRequiredItems(
                     buildContext,
                     currentBlock,
                     world.rayTraceBlocks(new RayTraceContext(player.getPositionVec(), new Vec3d(pos), BlockMode.COLLIDER, FluidMode.NONE, player)),

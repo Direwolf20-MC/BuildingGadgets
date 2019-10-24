@@ -124,13 +124,6 @@ public enum GuiMod {
         return containerOpener != null && player instanceof ServerPlayerEntity && containerOpener.open(id, (ServerPlayerEntity) player, world, pos);
     }
 
-    public static Screen openScreen(OpenContainer message) {
-        /*if (message.getId().getPath().equals(TEMPLATE_MANAGER.id))
-            return TEMPLATE_MANAGER.commonScreenProvider.apply(message);
-        */ //TODO fix when ContainerTypes are a thing
-        return null;
-    }
-
     private static TemplateManagerContainer getTemplateManagerContainer(PlayerEntity player, TileEntity te) {
         //Be warned you need to manually assign the window id on the server
         //if you don't do this, and just return 0 as you can do on the client, it will sync the player inventory instead...!
