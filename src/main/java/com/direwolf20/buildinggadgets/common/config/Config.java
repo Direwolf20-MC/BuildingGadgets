@@ -2,16 +2,9 @@ package com.direwolf20.buildinggadgets.common.config;
 
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
-import com.google.common.collect.ImmutableList;
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.config.ModConfig;
-
-import java.util.List;
-import java.util.Objects;
-import java.util.regex.PatternSyntaxException;
 
 import static net.minecraftforge.common.ForgeConfigSpec.*;
 import static net.minecraftforge.fml.Logging.CORE;
@@ -41,7 +34,6 @@ public class Config {
     public static final CategoryChargingStation CHARGING_STATION = new CategoryChargingStation();
     public static final CategoryGadgets GADGETS = new CategoryGadgets();
     public static final CategoryPasteContainers PASTE_CONTAINERS = new CategoryPasteContainers();
-    public static final CategoryBlacklist BLACKLIST = new CategoryBlacklist();
 
     public static final class CategoryGeneral {
 
@@ -309,62 +301,12 @@ public class Config {
         }
     }
 
-    public static final class CategoryBlacklist {
-
-        //TODO convert to a tag (or at least make compatible with) - I don't know whether this might or might not work
-        public final ConfigValue<List<? extends String>> blockBlacklist;
-        public final ConfigValue<List<? extends String>> blockWhitelist;
-        private PatternList parsedBlacklist = null;
-        private PatternList parsedWhitelist = null;
-
-        private CategoryBlacklist() {
-            SERVER_BUILDER.comment("Configure your Blacklist-Settings here")/*.translation(LANG_KEY_BLACKLIST)*/.push("Blacklist Settings");
-
-            blockBlacklist = SERVER_BUILDER
-                    .comment("All Blocks added to this will be treated similar to TileEntities. Not at all.",
-                            "Notice that you can use Regular Expressions as defined by Java Patterns to express more complex name combinations.",
-                            "Use for example \"awfulmod:.*\" to blacklist all awfulmod Blocks.")
-                    .translation(LANG_KEY_BLACKLIST + ".blockBlacklist")
-                    .defineList("Blacklisted Blocks", ImmutableList.of("minecraft:.*_door.*", PatternList.getName(Blocks.PISTON_HEAD)), obj -> obj instanceof String);
-
-            blockWhitelist = SERVER_BUILDER
-                    .comment("Allows you to define a whitelist, allowing Patterns to be defined in the same way as the blacklist.")
-                    .translation(LANG_KEY_BLACKLIST + ".blockWhitelist")
-                    .defineList("Whitelisted Blocks",ImmutableList.of(".*"),obj -> obj instanceof String);
-
-            SERVER_BUILDER.pop();
-        }
-
-        private PatternList parsePatternListSafe(ConfigValue<List<? extends String>> value, List<String> def) {
-            try {
-                return PatternList.ofResourcePattern(value.get());
-            } catch (PatternSyntaxException e) {
-                BuildingGadgets.LOG
-                        .error("The config value {}={} contains non-valid Pattern-Syntax. Defaulting to {}.", value
-                                .getPath(), value.get(), def);
-                return PatternList.ofResourcePattern(def);
-            }
-        }
-
-        private void parseBlacklists() {
-            parsedBlacklist = parsePatternListSafe(blockBlacklist, ImmutableList.of());
-            parsedWhitelist = parsePatternListSafe(blockWhitelist, ImmutableList.of(".*"));
-        }
-
-        public boolean isAllowedBlock(Block block) {
-            if (parsedBlacklist == null || parsedWhitelist == null) parseBlacklists();
-            String regName = Objects.requireNonNull(block.getRegistryName()).toString();
-            return parsedWhitelist.contains(regName) && !parsedBlacklist.contains(regName);
-        }
-    }
-
     public static final ForgeConfigSpec COMMON_CONFIG = COMMON_BUILDER.build();
     public static final ForgeConfigSpec SERVER_CONFIG = SERVER_BUILDER.build();
     public static final ForgeConfigSpec CLIENT_CONFIG = CLIENT_BUILDER.build();
     private static boolean serverCfgLoaded = false;
 
     private static void loadServerConfig() {
-        BLACKLIST.parseBlacklists();
         serverCfgLoaded = true;
     }
 

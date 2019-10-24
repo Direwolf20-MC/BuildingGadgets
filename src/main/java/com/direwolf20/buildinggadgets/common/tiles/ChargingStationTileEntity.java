@@ -4,8 +4,10 @@ import com.direwolf20.buildinggadgets.client.renderer.SphereSegmentation;
 import com.direwolf20.buildinggadgets.common.capability.CappedEnergyStorage;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.containers.ChargingStationContainer;
+import com.direwolf20.buildinggadgets.common.items.ChargingStationItem;
 import com.direwolf20.buildinggadgets.common.registry.OurBlocks;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
+import com.direwolf20.buildinggadgets.common.util.CapabilityUtil;
 import com.direwolf20.buildinggadgets.common.util.exceptions.CapabilityNotPresentException;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.util.tools.CapabilityUtil;
@@ -54,7 +56,7 @@ public class ChargingStationTileEntity extends TileEntity implements ITickableTi
     private int counter = 0;
     private int maxBurn = 0;
 
-    private final CappedEnergyStorage energy;
+    private final ChargingStationEnergyStorage energy;
     private final ItemStackHandler itemStackHandler;
     private LazyOptional<IEnergyStorage> energyCap;
     private LazyOptional<IItemHandler> itemCap;
@@ -71,20 +73,7 @@ public class ChargingStationTileEntity extends TileEntity implements ITickableTi
 
     public ChargingStationTileEntity() {
         super(OurBlocks.OurTileEntities.CHARGING_STATION_TYPE);
-        energy = new CappedEnergyStorage(Config.CHARGING_STATION.capacity::get, Config.CHARGING_STATION.maxExtract::get, Config.CHARGING_STATION.maxRecieve::get) {
-            @Override
-            protected void writeEnergy() {
-                ChargingStationTileEntity.this.markDirty();
-                updateNeeded |= UPDATE_FLAG_ENERGY;
-                if (getWorld() != null && ! getWorld().isRemote()) //TODO this is unnecessary overhead: replace with custom update packet and update System... Similar to DataManger
-                    getWorld().notifyBlockUpdate(getPos(), getBlockState(), getBlockState(), SEND_UPDATE_NO_RENDER);
-            }
-
-            @Override
-            protected void updateEnergy() {
-
-            }
-        };
+        energy = new ChargingStationEnergyStorage();
         itemStackHandler = new ItemStackHandler(SIZE) {
             @Override
             protected void onContentsChanged(int slot) {
@@ -114,6 +103,24 @@ public class ChargingStationTileEntity extends TileEntity implements ITickableTi
         lightningPositionChange = 20;
     }
 
+    public void onInitEnergy(ItemStack stack) {
+        if (! stack.isEmpty() && stack.getItem() instanceof ChargingStationItem) {
+            stack.getCapability(CapabilityEnergy.ENERGY).ifPresent(storage -> {
+                ChargingStationEnergyStorage stationEnergy = getEnergy();
+                stationEnergy.setEnergy(stationEnergy.getEnergyStored() + storage.extractEnergy(stationEnergy.getMaxEnergyStored() - stationEnergy.getEnergyStored(), false));
+            });
+        }
+    }
+
+    public void onStoreEnergy(ItemStack stack) {
+        if (! stack.isEmpty() && stack.getItem() instanceof ChargingStationItem) {
+            stack.getCapability(CapabilityEnergy.ENERGY).ifPresent(storage -> {
+                ChargingStationEnergyStorage stationEnergy = getEnergy();
+                stationEnergy.setEnergy(stationEnergy.getEnergyStored() - storage.receiveEnergy(stationEnergy.getEnergyStored(), false));
+            });
+        }
+    }
+
     @Override
     public ITextComponent getDisplayName() {
         return new StringTextComponent(getType().getRegistryName().getPath());
@@ -127,7 +134,7 @@ public class ChargingStationTileEntity extends TileEntity implements ITickableTi
     }
 
     @Nonnull
-    private CappedEnergyStorage getEnergy() {
+    private ChargingStationEnergyStorage getEnergy() {
         return energy;
     }
 
@@ -269,10 +276,8 @@ public class ChargingStationTileEntity extends TileEntity implements ITickableTi
             }
 
             if( isBurning != this.isBurning() )
-            getWorld().setBlockState(this.pos, getWorld().getBlockState(this.pos).with(AbstractFurnaceBlock.LIT, this.isBurning()), 3);
+                getWorld().setBlockState(this.pos, getWorld().getBlockState(this.pos).with(AbstractFurnaceBlock.LIT, this.isBurning()), BlockFlags.DEFAULT);
         } else if (getWorld() != null) {
-            //My understanding is that this causes the same calculations to run client side as serverside, preventing our need to force a sync packet every second for rendering?
-            //Feel free to fix my derps if i'm wrong.
             //Yes I realize theres code duplication here, i suspected we might want different things to happen on server/client so i have them as separate if's.
             if (counter > 0 && getEnergy().receiveEnergy(Config.CHARGING_STATION.energyPerTick.get(), true) > 0)
                 burn();
@@ -320,10 +325,10 @@ public class ChargingStationTileEntity extends TileEntity implements ITickableTi
     }
 
     private void chargeItem(ItemStack stack) {
-        IEnergyStorage chargingStorage = CapabilityUtil.EnergyUtil.getCap(stack).orElseThrow(CapabilityNotPresentException::new);
-        if (isChargingItem(chargingStorage)) {
-            getEnergy().setEnergy(getEnergy().getEnergyStored() - chargingStorage.receiveEnergy(Math.min(getEnergy().getEnergyStored(), Config.CHARGING_STATION.chargePerTick.get()), false));
-        }
+        CapabilityUtil.EnergyUtil.getCap(stack).ifPresent(chargingStorage -> {
+            if (isChargingItem(chargingStorage))
+                getEnergy().setEnergy(getEnergy().getEnergyStored() - chargingStorage.receiveEnergy(Math.min(getEnergy().getEnergyStored(), Config.CHARGING_STATION.chargePerTick.get()), false));
+        });
     }
 
     public int getRemainingBurn() {
@@ -331,7 +336,7 @@ public class ChargingStationTileEntity extends TileEntity implements ITickableTi
     }
 
     public boolean isBurning() {
-        return counter > 0;
+        return counter > 0 && getEnergy().getEnergyStored() < getEnergy().getMaxEnergyStored();
     }
 
     public int getMaxBurn() {
@@ -383,5 +388,26 @@ public class ChargingStationTileEntity extends TileEntity implements ITickableTi
 
     public void genCallList() {
         callList = GlStateManager.genLists(1);
+    }
+
+    private final class ChargingStationEnergyStorage extends CappedEnergyStorage {
+        public ChargingStationEnergyStorage() {
+            super(Config.CHARGING_STATION.capacity::get, Config.CHARGING_STATION.maxExtract::get, Config.CHARGING_STATION.maxRecieve::get);
+        }
+
+        @Override
+        protected void writeEnergy() {
+            ChargingStationTileEntity.this.markDirty();
+            updateNeeded |= UPDATE_FLAG_ENERGY;
+            if (getWorld() != null && ! getWorld().isRemote()) //TODO this is unnecessary overhead: replace with custom update packet and update System... Similar to DataManger
+                getWorld().notifyBlockUpdate(getPos(), getBlockState(), getBlockState(), SEND_UPDATE_NO_RENDER);
+        }
+
+        @Override
+        protected void updateEnergy() {
+
+        }
+
+
     }
 }

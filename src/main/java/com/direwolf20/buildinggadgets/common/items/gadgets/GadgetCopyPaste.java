@@ -33,6 +33,7 @@ import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
 import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
 import com.direwolf20.buildinggadgets.common.util.lang.*;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
+import com.direwolf20.buildinggadgets.common.util.ref.Reference.BlockReference.TagReference;
 import com.direwolf20.buildinggadgets.common.util.tools.NetworkIO;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList.Builder;
@@ -112,13 +113,10 @@ public class GadgetCopyPaste extends AbstractGadget {
             return BY_ID.get(id);
         }
     }
-
-    public static final int TRANSACTION_CREATION_LIMIT = 20; //try for one second
-
     private static final Joiner CHUNK_JOINER = Joiner.on("; ");
 
     public GadgetCopyPaste(Properties builder, IntSupplier undoLengthSupplier, String undoName) {
-        super(builder, undoLengthSupplier, undoName);
+        super(builder, undoLengthSupplier, undoName, , TagReference.WHITELIST_COPY_PASTE, TagReference.BLACKLIST_COPY_PASTE);
     }
 
     @Override

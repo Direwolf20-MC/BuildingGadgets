@@ -1,6 +1,7 @@
 package com.direwolf20.buildinggadgets.common.capability;
 
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
+import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
@@ -16,7 +17,7 @@ public final class ItemEnergyForge extends ConfigEnergyStorage {
     }
 
     protected void writeEnergy() {
-        CompoundNBT nbt = GadgetUtils.enforceHasTag(stack);
+        CompoundNBT nbt = NBTHelper.getOrNewTag(stack);
         nbt.putInt(NBTKeys.ENERGY, getEnergyStoredCache());
     }
 

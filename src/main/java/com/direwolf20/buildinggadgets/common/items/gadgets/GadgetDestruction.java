@@ -23,6 +23,9 @@ import com.direwolf20.buildinggadgets.common.util.lang.Styles;
 import com.direwolf20.buildinggadgets.common.util.lang.TooltipTranslation;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.google.common.collect.ImmutableMultiset;
+import com.direwolf20.buildinggadgets.common.util.ref.Reference.BlockReference.TagReference;
+import com.direwolf20.buildinggadgets.common.util.tools.SetBackedPlacementSequence;
+import com.direwolf20.buildinggadgets.common.world.WorldSave;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.PlayerEntity;
@@ -54,7 +57,7 @@ import java.util.stream.Collectors;
 public class GadgetDestruction extends AbstractGadget {
 
     public GadgetDestruction(Properties builder, IntSupplier undoLengthSupplier, String undoName) {
-        super(builder, undoLengthSupplier, undoName);
+        super(builder, undoLengthSupplier, undoName, TagReference.WHITELIST_DESTRUCTION, TagReference.BLACKLIST_DESTRUCTION);
     }
 
     @Override
@@ -260,6 +263,8 @@ public class GadgetDestruction extends AbstractGadget {
         for (BlockPos clearPos : positions) {
             BlockState state = world.getBlockState(clearPos);
             TileEntity te = world.getTileEntity(clearPos);
+            if (!isAllowedBlock(state.getBlock()))
+                continue;
             if (te == null || state.getBlock() == OurBlocks.constructionBlock && te instanceof ConstructionBlockTileEntity) {
                 destroyBlock(world, clearPos, player, builder);
             }

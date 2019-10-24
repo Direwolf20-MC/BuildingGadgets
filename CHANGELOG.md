@@ -52,6 +52,10 @@ The format of this document is based on [Keep a Changelog](https://keepachangelo
 ### Changed
 - We're now on Forge 28.1.61 so this should resolve all forge related issues we've been seeing.
 - Completely rewrite the internal registration system for our blocks, items, etc.
+- The Black and Whitelists are now based on Tags
+    - The Tags `buildinggadgets:blacklist\<gadget>`, `buildinggadgets:whitelist\<gadget>` allow you to use the full Power of vanilla's Tag System for this! :)
+    - By default they all contain `buildinggadgets:blacklist\generic` and `buildinggadgets:whitelist\generic` respectively. This is setup with the same default values the config used to have.
+    - Notice that the exchanger has now Torches Blacklisted, as they allow for far to easy dupe of Items
 
 ### Deprecated
 - If you where planning on using our new API, this is your one version notice to stop and add a hard dep on our main mods codebase.

@@ -85,6 +85,19 @@ public final class Reference {
         public static final ResourceLocation TEMPLATE_MANAGER_RL = new ResourceLocation(TEMPLATE_MANAGER);
         public static final ResourceLocation CHARGING_STATION_RL = new ResourceLocation(CHARGING_STATION);
 
+        public static final class TagReference {
+            public static final ResourceLocation BLACKLIST_COPY_PASTE = new ResourceLocation(MODID, "blacklist/copy_paste");
+            public static final ResourceLocation BLACKLIST_BUILDING = new ResourceLocation(MODID, "blacklist/building");
+            public static final ResourceLocation BLACKLIST_EXCHANGING = new ResourceLocation(MODID, "blacklist/exchanging");
+            public static final ResourceLocation BLACKLIST_DESTRUCTION = new ResourceLocation(MODID, "blacklist/destruction");
+            public static final ResourceLocation WHITELIST_COPY_PASTE = new ResourceLocation(MODID, "whitelist/copy_paste");
+            public static final ResourceLocation WHITELIST_BUILDING = new ResourceLocation(MODID, "whitelist/building");
+            public static final ResourceLocation WHITELIST_EXCHANGING = new ResourceLocation(MODID, "whitelist/exchanging");
+            public static final ResourceLocation WHITELIST_DESTRUCTION = new ResourceLocation(MODID, "whitelist/destruction");
+
+            private TagReference() {}
+        }
+
         private BlockReference() {}
     }
 

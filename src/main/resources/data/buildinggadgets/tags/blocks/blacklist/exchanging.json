@@ -1,0 +1,8 @@
+{
+  "replace": false,
+  "values": [
+    "#buildinggadgets:blacklist/generic",
+    "minecraft:torch",
+    "minecraft:wall_torch"
+  ]
+}
