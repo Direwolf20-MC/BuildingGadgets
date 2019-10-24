@@ -11,6 +11,8 @@ import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SUpdateTileEntityPacket;
 import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.world.World;
+import net.minecraftforge.common.util.Constants.NBT;
 
 import javax.annotation.Nullable;
 
@@ -112,23 +114,29 @@ public class EffectBlockTileEntity extends TileEntity implements ITickableTileEn
 
     @Override
     public CompoundNBT write(CompoundNBT compound) {
-        compound.putInt(NBTKeys.GADGET_TICKS, ticks);
-        compound.putInt(NBTKeys.GADGET_MODE, mode.ordinal());
-        compound.put(NBTKeys.GADGET_REPLACEMENT_BLOCK, renderedBlock.serialize(true));
-        compound.put(NBTKeys.GADGET_SOURCE_BLOCK, sourceBlock.serialize(true));
-        compound.putBoolean(NBTKeys.GADGET_USE_PASTE, usePaste);
-
+        if (mode != null && renderedBlock != null && sourceBlock != null) {
+            compound.putInt(NBTKeys.GADGET_TICKS, ticks);
+            compound.putInt(NBTKeys.GADGET_MODE, mode.ordinal());
+            compound.put(NBTKeys.GADGET_REPLACEMENT_BLOCK, renderedBlock.serialize(true));
+            compound.put(NBTKeys.GADGET_SOURCE_BLOCK, sourceBlock.serialize(true));
+            compound.putBoolean(NBTKeys.GADGET_USE_PASTE, usePaste);
+        }
         return super.write(compound);
     }
 
     @Override
     public void read(CompoundNBT compound) {
         super.read(compound);
-
-        ticks = compound.getInt(NBTKeys.GADGET_TICKS);
-        mode = Mode.VALUES[compound.getInt(NBTKeys.GADGET_MODE)];
-        renderedBlock = BlockData.tryDeserialize(compound.getCompound(NBTKeys.GADGET_REPLACEMENT_BLOCK), true);
-        sourceBlock = BlockData.tryDeserialize(compound.getCompound(NBTKeys.GADGET_SOURCE_BLOCK), true);
-        usePaste = compound.getBoolean(NBTKeys.GADGET_USE_PASTE);
+        if (compound.contains(NBTKeys.GADGET_TICKS, NBT.TAG_INT) &&
+                compound.contains(NBTKeys.GADGET_MODE, NBT.TAG_INT) &&
+                compound.contains(NBTKeys.GADGET_SOURCE_BLOCK, NBT.TAG_COMPOUND) &&
+                compound.contains(NBTKeys.GADGET_REPLACEMENT_BLOCK, NBT.TAG_COMPOUND) &&
+                compound.contains(NBTKeys.GADGET_USE_PASTE)) {
+            ticks = compound.getInt(NBTKeys.GADGET_TICKS);
+            mode = Mode.VALUES[compound.getInt(NBTKeys.GADGET_MODE)];
+            renderedBlock = BlockData.tryDeserialize(compound.getCompound(NBTKeys.GADGET_REPLACEMENT_BLOCK), true);
+            sourceBlock = BlockData.tryDeserialize(compound.getCompound(NBTKeys.GADGET_SOURCE_BLOCK), true);
+            usePaste = compound.getBoolean(NBTKeys.GADGET_USE_PASTE);
+        }
     }
 }

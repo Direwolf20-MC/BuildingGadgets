@@ -2,6 +2,8 @@ package com.direwolf20.buildinggadgets.common.building.modes;
 
 import com.direwolf20.buildinggadgets.common.building.BlockData;
 import com.direwolf20.buildinggadgets.common.config.Config;
+import com.direwolf20.buildinggadgets.common.registry.OurBlocks;
+import com.direwolf20.buildinggadgets.common.tiles.EffectBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
 import com.direwolf20.buildinggadgets.common.util.helpers.SortingHelper.Blocks;
@@ -13,6 +15,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUseContext;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.ResourceLocation;
@@ -90,9 +93,16 @@ public enum BuildingMode {
         BlockData target = GadgetUtils.getToolBlock(tool);
         return (pos, data) -> {
             BlockState current = world.getBlockState(pos);
+            if (current.getBlock() == OurBlocks.effectBlock) {
+                TileEntity te = world.getTileEntity(pos);
+                if (te instanceof EffectBlockTileEntity && ((EffectBlockTileEntity) te).getRenderedBlock() != null)
+                    current = ((EffectBlockTileEntity) te).getRenderedBlock().getState();
+            }
+
             // Filter out situations where people try to create floating grass (etc.)
             if (! target.getState().isValidPosition(world, pos))
                 return false;
+
 
             // World boundary check
             if (pos.getY() < 0)
