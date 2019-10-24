@@ -14,6 +14,8 @@ import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemUseContext;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.world.BlockEvent.BreakEvent;
 
 import java.util.Map;
 import java.util.Objects;
@@ -58,6 +60,11 @@ public final class UndoScheduler extends SteppedScheduler {
     private void undoBlock(Map.Entry<BlockPos, BlockInfo> entry) {
         //if the block that was placed is no longer there, we should not undo anything
         if (! TileSupport.createBlockData(context.getWorld(), entry.getKey()).equals(entry.getValue().getPlacedData())) {
+            lastWasSuccess = false;
+            return;
+        }
+        BreakEvent event = new BreakEvent(context.getWorld().getWorld(), entry.getKey(), entry.getValue().getPlacedData().getState(), context.getBuildingPlayer());
+        if (MinecraftForge.EVENT_BUS.post(event)) {
             lastWasSuccess = false;
             return;
         }
