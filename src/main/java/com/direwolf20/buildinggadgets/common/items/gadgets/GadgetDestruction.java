@@ -90,7 +90,7 @@ public class GadgetDestruction extends AbstractGadget {
         tooltip.add(TooltipTranslation.GADGET_BUILDING_PLACE_ATOP
                             .componentTranslation(String.valueOf(getConnectedArea(stack)))
                             .setStyle(Styles.YELLOW));
-        if (Config.isServerConfigLoaded() && Config.GADGETS.GADGET_DESTRUCTION.nonFuzzyEnabled.get())
+        if (Config.GADGETS.GADGET_DESTRUCTION.nonFuzzyEnabled.get())
             tooltip.add(TooltipTranslation.GADGET_FUZZY
                                 .componentTranslation(String.valueOf(getFuzzy(stack)))
                                 .setStyle(Styles.GOLD));

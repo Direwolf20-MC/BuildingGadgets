@@ -199,7 +199,6 @@ public abstract class AbstractGadget extends Item {
     }
 
     protected void addEnergyInformation(List<ITextComponent> tooltip, ItemStack stack) {
-        if (Config.isServerConfigLoaded())
             stack.getCapability(CapabilityEnergy.ENERGY).ifPresent(energy -> {
                 tooltip.add(TooltipTranslation.GADGET_ENERGY
                                     .componentTranslation(withSuffix(energy.getEnergyStored()), withSuffix(energy.getMaxEnergyStored()))
