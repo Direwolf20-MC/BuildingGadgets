@@ -3,6 +3,7 @@ package com.direwolf20.buildinggadgets.common.registry;
 import com.direwolf20.buildinggadgets.client.renderer.ChargingStationTER;
 import com.direwolf20.buildinggadgets.client.renderer.EffectBlockTER;
 import com.direwolf20.buildinggadgets.common.blocks.*;
+import com.direwolf20.buildinggadgets.common.items.ChargingStationItem;
 import com.direwolf20.buildinggadgets.common.tiles.ChargingStationTileEntity;
 import com.direwolf20.buildinggadgets.common.tiles.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.tiles.EffectBlockTileEntity;
@@ -49,7 +50,7 @@ public final class OurBlocks {
     public static TemplateManager templateManger;
 
     @ObjectHolder(BlockReference.CHARGING_STATION)
-    public static ChargingStation chargingStation;
+    public static ChargingStationBlock chargingStation;
 
     /**
      * As the effect block is effectively air it needs to have a material just like Air.
@@ -66,7 +67,7 @@ public final class OurBlocks {
         registry.register(new ConstructionBlockDense(Block.Properties.create(Material.ROCK).hardnessAndResistance(3f, 0f)).setRegistryName(BlockReference.CONSTRUCTION_BLOCK_DENSE_RL));
         registry.register(new ConstructionBlockPowder(Block.Properties.create(Material.SAND).hardnessAndResistance(10f)).setRegistryName(BlockReference.CONSTRUCTION_BLOCK_POWDER_RL));
         registry.register(new TemplateManager(Block.Properties.create(Material.ROCK).hardnessAndResistance(2f)).setRegistryName(BlockReference.TEMPLATE_MANAGER_RL));
-        registry.register(new ChargingStation(Block.Properties.create(Material.ROCK).hardnessAndResistance(2f)).setRegistryName(BlockReference.CHARGING_STATION_RL));
+        registry.register(new ChargingStationBlock(Block.Properties.create(Material.ROCK).hardnessAndResistance(2f)).setRegistryName(BlockReference.CHARGING_STATION_RL));
     }
 
     @SubscribeEvent
@@ -77,7 +78,7 @@ public final class OurBlocks {
         registry.register(new BlockItem(constructionBlockDense, OurItems.itemProperties()).setRegistryName(BlockReference.CONSTRUCTION_BLOCK_DENSE_RL));
         registry.register(new BlockItem(constructionBlockPowder, OurItems.itemProperties()).setRegistryName(BlockReference.CONSTRUCTION_BLOCK_POWDER_RL));
         registry.register(new BlockItem(templateManger, OurItems.itemProperties()).setRegistryName(BlockReference.TEMPLATE_MANAGER_RL));
-        registry.register(new BlockItem(chargingStation, OurItems.itemProperties()).setRegistryName(BlockReference.CHARGING_STATION_RL));
+        registry.register(new ChargingStationItem(OurItems.itemProperties()).setRegistryName(BlockReference.CHARGING_STATION_RL));
     }
 
     @SubscribeEvent
