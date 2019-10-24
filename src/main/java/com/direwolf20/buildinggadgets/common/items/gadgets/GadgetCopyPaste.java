@@ -528,7 +528,7 @@ public class GadgetCopyPaste extends AbstractGadget implements ITemplate {
                 (! Config.GENERAL.allowOverwriteBlocks.get() && world.getBlockState(pos).getMaterial() != Material.AIR))
             return;
 
-        if (pos.getY() < 0 || data.getState().equals(Blocks.AIR.getDefaultState()) || ! player.isAllowEdit())
+        if (pos.getY() < 0 || pos.getY() > world.getMaxHeight() || data.getState().equals(Blocks.AIR.getDefaultState()) || ! player.isAllowEdit())
             return;
 
         ItemStack heldItem = getGadget(player);
