@@ -10,6 +10,8 @@ import com.direwolf20.buildinggadgets.common.save.Undo;
 import com.direwolf20.buildinggadgets.common.save.Undo.BlockInfo;
 import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
 import com.google.common.base.Preconditions;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemUseContext;
 import net.minecraft.util.Hand;
@@ -63,10 +65,13 @@ public final class UndoScheduler extends SteppedScheduler {
             lastWasSuccess = false;
             return;
         }
-        BreakEvent event = new BreakEvent(context.getWorld().getWorld(), entry.getKey(), entry.getValue().getPlacedData().getState(), context.getBuildingPlayer());
-        if (MinecraftForge.EVENT_BUS.post(event)) {
-            lastWasSuccess = false;
-            return;
+        BlockState state = entry.getValue().getPlacedData().getState();
+        if (state != Blocks.AIR.getDefaultState()) {
+            BreakEvent event = new BreakEvent(context.getWorld().getWorld(), entry.getKey(), state, context.getBuildingPlayer());
+            if (MinecraftForge.EVENT_BUS.post(event)) {
+                lastWasSuccess = false;
+                return;
+            }
         }
         MatchResult matchResult = index.tryMatch(entry.getValue().getProducedItems());
         lastWasSuccess = matchResult.isSuccess();
