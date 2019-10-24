@@ -336,11 +336,11 @@ public class GadgetCopyPaste extends AbstractGadget {
 
     private void setRegionAndCopy(ItemStack stack, World world, PlayerEntity player, BlockPos lookedAt) {
         if (player.isSneaking()) {
-            if (getLowerRegionBound(stack) != null && checkCopy(world, player, new Region(lookedAt, getLowerRegionBound(stack))))
+            if (getLowerRegionBound(stack) != null && ! checkCopy(world, player, new Region(lookedAt, getLowerRegionBound(stack))))
                 return;
             setUpperRegionBound(stack, lookedAt);
         } else {
-            if (getUpperRegionBound(stack) != null && checkCopy(world, player, new Region(lookedAt, getUpperRegionBound(stack))))
+            if (getUpperRegionBound(stack) != null && ! checkCopy(world, player, new Region(lookedAt, getUpperRegionBound(stack))))
                 return;
             setLowerRegionBound(stack, lookedAt);
         }

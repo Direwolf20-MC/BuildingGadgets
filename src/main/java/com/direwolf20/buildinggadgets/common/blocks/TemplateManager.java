@@ -1,6 +1,5 @@
 package com.direwolf20.buildinggadgets.common.blocks;
 
-import com.direwolf20.buildinggadgets.client.gui.GuiMod;
 import com.direwolf20.buildinggadgets.common.capability.CapabilityTemplate;
 import com.direwolf20.buildinggadgets.common.registry.OurBlocks;
 import com.direwolf20.buildinggadgets.common.tiles.TemplateManagerTileEntity;
@@ -21,6 +20,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.network.NetworkHooks;
 import net.minecraftforge.fml.network.PacketDistributor;
 import net.minecraftforge.items.CapabilityItemHandler;
 
@@ -84,7 +84,7 @@ public class TemplateManager extends Block {
             });
         });
 
-        GuiMod.TEMPLATE_MANAGER.openContainer(player, worldIn, pos);
+        NetworkHooks.openGui((ServerPlayerEntity) player, (TemplateManagerTileEntity) te, pos);
         return true;
     }
 }
