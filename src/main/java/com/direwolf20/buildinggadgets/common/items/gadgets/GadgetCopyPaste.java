@@ -303,13 +303,35 @@ public class GadgetCopyPaste extends AbstractGadget implements ITemplate {
     }
 
     public void setPosOrCopy(ItemStack stack, PlayerEntity player, World world, BlockPos pos) {
-        if (player.isSneaking())
+        boolean set = false;
+        if (player.isSneaking() && checkAndNotifySize(stack, pos, player, true)) {
             setEndPos(stack, pos);
-        else
+            set = true;
+        } else if (checkAndNotifySize(stack, pos, player, false)) {
             setStartPos(stack, pos);
+            set = true;
+        }
 
-        if( getStartPos(stack) != null && getEndPos(stack) != null )
+        if (set && getStartPos(stack) != null && getEndPos(stack) != null)
             copyBlocks(stack, player, world, getStartPos(stack), getEndPos(stack));
+    }
+
+    private boolean checkAndNotifySize(ItemStack stack, BlockPos newPos, PlayerEntity player, boolean isEnd) {
+        if (isEnd && getStartPos(stack) == null || ! isEnd && getEndPos(stack) == null)
+            return true;
+        BlockPos startPos = isEnd ? getStartPos(stack) : newPos;
+        BlockPos endPos = isEnd ? newPos : getEndPos(stack);
+        int startX = startPos.getX();
+        int startY = startPos.getY();
+        int startZ = startPos.getZ();
+        int endX = endPos.getX();
+        int endY = endPos.getY();
+        int endZ = endPos.getZ();
+        if (Math.abs(startX - endX) >= 125 || Math.abs(startY - endY) >= 125 || Math.abs(startZ - endZ) >= 125) {
+            player.sendStatusMessage(new StringTextComponent(TextFormatting.RED + new TranslationTextComponent("message.gadget.toobigarea").getUnformattedComponentText()), true);
+            return false;
+        }
+        return true;
     }
 
     public static void rotateOrMirrorBlocks(ItemStack stack, PlayerEntity player, PacketRotateMirror.Operation operation) {
@@ -389,11 +411,6 @@ public class GadgetCopyPaste extends AbstractGadget implements ITemplate {
         int endX = end.getX();
         int endY = end.getY();
         int endZ = end.getZ();
-
-        if (Math.abs(startX - endX) >= 125 || Math.abs(startY - endY) >= 125 || Math.abs(startZ - endZ) >= 125) {
-            player.sendStatusMessage(new StringTextComponent(TextFormatting.RED + new TranslationTextComponent("message.gadget.toobigarea").getUnformattedComponentText()), true);
-            return false;
-        }
 
         int iStartX = startX < endX ? startX : endX;
         int iStartY = startY < endY ? startY : endY;
