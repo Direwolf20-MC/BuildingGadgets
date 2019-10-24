@@ -44,7 +44,8 @@ public final class CacheTemplateProvider implements ITemplateProvider {
                 return new Template();
             });
         } catch (ExecutionException e) {
-            throw new RuntimeException("Failed to access Cache!", e);
+            BuildingGadgets.LOG.error("Failed to access Cache! Returning new Template, this is certainly going to cause unexpected behaviour!", e);
+            return new Template();
         }
     }
 
