@@ -20,11 +20,9 @@ import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.renderer.BlockRendererDispatcher;
 import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -36,14 +34,12 @@ import net.minecraft.world.WorldType;
 import net.minecraftforge.client.ForgeHooksClient;
 import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
-import net.minecraftforge.client.model.data.EmptyModelData;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.IEnergyStorage;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL14;
 
 import java.util.List;
-import java.util.Random;
 
 import static com.direwolf20.buildinggadgets.common.util.GadgetUtils.getAnchor;
 import static com.direwolf20.buildinggadgets.common.util.GadgetUtils.getToolBlock;
@@ -108,15 +104,17 @@ public class ExchangerRender extends BaseRenderer {
             //Enable Blending (So we can have transparent effect)
             GlStateManager.enableBlend();
             //This blend function allows you to use a constant alpha, which is defined later
+            /*
             GlStateManager.blendFunc(GL14.GL_CONSTANT_ALPHA, GL14.GL_ONE_MINUS_CONSTANT_ALPHA);
             BufferBuilder builder = Tessellator.getInstance().getBuffer();
             builder.begin(GL14.GL_QUADS, DefaultVertexFormats.BLOCK);
-            Random rand = new Random();
+            Random rand = new Random();*/
             BlockRendererDispatcher dispatcher = getMc().getBlockRendererDispatcher();
             for (BlockPos coordinate : renderCoordinates) {
                 GlStateManager.pushMatrix();//Push matrix again just because
-                GlStateManager.translatef(coordinate.getX(), coordinate.getY(), coordinate.getZ());//Now move the render position to the coordinates we want to render at
+                GlStateManager.translatef(coordinate.getX() - 0.001f, coordinate.getY() - 0.001f, coordinate.getZ() - 0.001f);
                 GlStateManager.rotatef(- 90.0F, 0.0F, 1.0F, 0.0F); //Rotate it because i'm not sure why but we need to
+                GlStateManager.scalef(1.002f, 1.002f, 1.002f);
                 GL14.glBlendColor(1F, 1F, 1F, 0.55f); //Set the alpha of the blocks we are rendering
                 if (getBuilderWorld().getWorldType() != WorldType.DEBUG_ALL_BLOCK_STATES) { //Get the block state in the fake world
                     try {
@@ -126,15 +124,17 @@ public class ExchangerRender extends BaseRenderer {
                     }
                 }
                 try {
+                    //cannot render into buffer, because we can't scale it in that case, which causes z-Fighting
                     if (state.getRenderType() == BlockRenderType.MODEL)
-                        dispatcher.renderBlock(state, coordinate, world, builder, rand, EmptyModelData.INSTANCE);
+                        dispatcher.renderBlockBrightness(state, 1f);
+                    //dispatcher.renderBlock(state, coordinate, world, builder, rand, EmptyModelData.INSTANCE);
                 } catch (Throwable t) {
                     BuildingGadgets.LOG.trace("Block at {} with state {} threw exception, whilst rendering", coordinate, state, t);
                 }
                 //Move the render position back to where it was
                 GlStateManager.popMatrix();
             }
-            Tessellator.getInstance().draw();
+            //Tessellator.getInstance().draw();
             BufferBuilder bufferBuilder = setupMissingRender();
             for (BlockPos coordinate : coordinates) {
                 if (energy.isPresent()) {
