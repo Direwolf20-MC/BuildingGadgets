@@ -335,10 +335,15 @@ public class GadgetCopyPaste extends AbstractGadget {
     }
 
     private void setRegionAndCopy(ItemStack stack, World world, PlayerEntity player, BlockPos lookedAt) {
-        if (player.isSneaking())
+        if (player.isSneaking()) {
+            if (getLowerRegionBound(stack) != null && checkCopy(world, player, new Region(lookedAt, getLowerRegionBound(stack))))
+                return;
             setUpperRegionBound(stack, lookedAt);
-        else
+        } else {
+            if (getUpperRegionBound(stack) != null && checkCopy(world, player, new Region(lookedAt, getUpperRegionBound(stack))))
+                return;
             setLowerRegionBound(stack, lookedAt);
+        }
         Optional<Region> regionOpt = getSelectedRegion(stack);
         if (! regionOpt.isPresent()) //notify of single copy
             player.sendStatusMessage(MessageTranslation.FIRST_COPY.componentTranslation().setStyle(Styles.DK_GREEN), true);
@@ -346,8 +351,6 @@ public class GadgetCopyPaste extends AbstractGadget {
     }
 
     private void tryCopy(ItemStack stack, World world, PlayerEntity player, Region region) {
-        if (! checkCopy(world, player, region))
-            return;
         SimpleBuildContext context = SimpleBuildContext.builder()
                 .buildingPlayer(player)
                 .usedStack(stack)
