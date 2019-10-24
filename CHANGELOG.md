@@ -14,7 +14,10 @@ The format of this document is based on [Keep a Changelog](https://keepachangelo
 ### Fixed
 - Charging station should now accept all modded fuel types and have no hard dependency to Vanilla burnable figures.
 - Charging station no longer loses it's power when unloaded (literal spelling mistake)
-- Our effect block crashing servers when it fails to get it's faking block for what ever reason.
+- The Copy-Paste Gadget no longer selects Area's which are too large for a copy (which results in a misleading Copy-Render)
+- Copy-Paste and Building Gadget will no longer build higher then the World's max Build height
+- Effect block crashing servers when it fails to get it's faking block for what ever reason.
+- Fixed EffectBlock crashing and corrupting chunks when building whilst the Server is overloaded
 
 ### Changed
 - We're now on Forge 28.1.61 so this should resolve all forge related issues we've been seeing.
