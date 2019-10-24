@@ -286,23 +286,12 @@ public class Config {
     public static final ForgeConfigSpec COMMON_CONFIG = COMMON_BUILDER.build();
     public static final ForgeConfigSpec SERVER_CONFIG = SERVER_BUILDER.build();
     public static final ForgeConfigSpec CLIENT_CONFIG = CLIENT_BUILDER.build();
-    private static boolean serverCfgLoaded = false;
-
-    private static void loadServerConfig() {
-        serverCfgLoaded = true;
-    }
 
     public static void onLoad(final ModConfig.Loading configEvent) {
-        if (configEvent.getConfig().getSpec() == Config.SERVER_CONFIG)
-            loadServerConfig();
         BuildingGadgets.LOG.debug("Loaded {} config file {}", Reference.MODID, configEvent.getConfig().getFileName());
     }
 
     public static void onFileChange(final ModConfig.ConfigReloading configEvent) {
         BuildingGadgets.LOG.fatal(CORE, "{} config just got changed on the file system!", Reference.MODID);
-    }
-
-    public static boolean isServerConfigLoaded() {
-        return serverCfgLoaded;
     }
 }

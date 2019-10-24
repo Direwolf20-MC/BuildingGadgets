@@ -4,7 +4,6 @@ package com.direwolf20.buildinggadgets.common.items.gadgets;
 import com.direwolf20.buildinggadgets.common.capability.CapabilityProviderBlockProvider;
 import com.direwolf20.buildinggadgets.common.capability.CapabilityProviderEnergy;
 import com.direwolf20.buildinggadgets.common.capability.MultiCapabilityProvider;
-import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.items.gadgets.renderers.BaseRenderer;
 import com.direwolf20.buildinggadgets.common.util.CapabilityUtil.EnergyUtil;
 import com.direwolf20.buildinggadgets.common.util.exceptions.CapabilityNotPresentException;
@@ -164,7 +163,6 @@ public abstract class AbstractGadget extends Item {
     }
 
     protected void addEnergyInformation(List<ITextComponent> tooltip, ItemStack stack) {
-        if (Config.isServerConfigLoaded())
             stack.getCapability(CapabilityEnergy.ENERGY).ifPresent(energy -> {
                 tooltip.add(TooltipTranslation.GADGET_ENERGY
                                     .componentTranslation(withSuffix(energy.getEnergyStored()), withSuffix(energy.getMaxEnergyStored()))
