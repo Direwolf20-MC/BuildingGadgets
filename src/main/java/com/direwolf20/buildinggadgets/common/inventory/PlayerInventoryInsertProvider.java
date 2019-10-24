@@ -22,6 +22,6 @@ public final class PlayerInventoryInsertProvider implements IInsertProvider {
         }
         ItemEntity itemEntity = new ItemEntity(player.world, player.posX, player.posY, player.posZ, stack);
         itemEntity.onCollideWithPlayer(player);
-        return count - itemEntity.getItem().getCount();
+        return itemEntity.getItem().getCount();
     }
 }
