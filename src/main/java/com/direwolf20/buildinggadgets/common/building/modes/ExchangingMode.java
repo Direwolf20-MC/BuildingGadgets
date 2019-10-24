@@ -84,7 +84,13 @@ public enum ExchangingMode {
     public static BiPredicate<BlockPos, BlockData> combineTester(IWorld world, ItemStack tool, PlayerEntity player, BlockPos initial) {
         BlockState initialBlockState = world.getBlockState(initial);
         BlockData target = GadgetUtils.getToolBlock(tool);
+        FakeDelegationWorld fakeWorld = new FakeDelegationWorld(world);
         return (pos, data) -> {
+            fakeWorld.setBlockState(pos, Blocks.AIR.getDefaultState(), 0);
+            if (! target.getState().isValidPosition(fakeWorld, pos))
+                return false;
+            fakeWorld.setBlockState(pos, data.getState(), 0); //set the new state for the side Rendering check
+
             BlockState worldBlockState = world.getBlockState(pos);
 
             // Don't try to replace for the same block
@@ -113,6 +119,18 @@ public enum ExchangingMode {
 
             // Bedrock, End Portal Frame, etc.
             if (worldBlockState.getBlockHardness(world, pos) < 0)
+                return false;
+
+            //Test whether all surrounding Blocks are opaque on the side, which touches this Block
+            boolean hasVisibleSide = false;
+            for (Direction dir : Direction.values()) {
+                BlockPos offset = pos.offset(dir);
+                if (! fakeWorld.getBlockState(offset).doesSideBlockRendering(fakeWorld, pos, dir.getOpposite())) {
+                    hasVisibleSide = true;
+                    break;
+                }
+            }
+            if (! hasVisibleSide)
                 return false;
 
             // Don't replace liquids
