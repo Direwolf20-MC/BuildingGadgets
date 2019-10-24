@@ -317,9 +317,9 @@ public class GadgetCopyPaste extends AbstractGadget {
                 getActivePos(player, stack).ifPresent(pos -> build(stack, world, player, pos));
         } else {
             if (player.isSneaking()) {
-                if (Screen.hasControlDown()) {
+                if (Screen.hasControlDown())
                     PacketHandler.sendToServer(new PacketBindTool());
-                } else if (GadgetUtils.getRemoteInventory(posLookingAt, world, NetworkIO.Operation.EXTRACT) != null)
+                else if (GadgetUtils.getRemoteInventory(posLookingAt, world, NetworkIO.Operation.EXTRACT) != null)
                     return new ActionResult<>(ActionResultType.SUCCESS, stack);
             }
             if (getToolMode(stack) == ToolMode.COPY) {
@@ -334,16 +334,14 @@ public class GadgetCopyPaste extends AbstractGadget {
         return new ActionResult<>(ActionResultType.SUCCESS, stack);
     }
 
-    private void notifyGadgetBusy(ItemStack stack, PlayerEntity player) {
-        player.sendStatusMessage(MessageTranslation.GADGET_BUSY.componentTranslation().setStyle(Styles.RED), true);
-    }
-
     private void setRegionAndCopy(ItemStack stack, World world, PlayerEntity player, BlockPos lookedAt) {
         if (player.isSneaking())
             setUpperRegionBound(stack, lookedAt);
         else
             setLowerRegionBound(stack, lookedAt);
         Optional<Region> regionOpt = getSelectedRegion(stack);
+        if (! regionOpt.isPresent()) //notify of single copy
+            player.sendStatusMessage(MessageTranslation.FIRST_COPY.componentTranslation().setStyle(Styles.DK_GREEN), true);
         regionOpt.ifPresent(region -> tryCopy(stack, world, player, region));
     }
 

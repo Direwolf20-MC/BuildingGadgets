@@ -139,6 +139,7 @@
   "buildinggadgets.message.range_set": "Tool Range:%d",
   "buildinggadgets.message.boundTE": "Bound Gadget to Inventory",
   "buildinggadgets.message.unboundTE": "Unbound Gadget from Inventory",
+  "buildinggadgets.message.first_copy": "First Position set",
   "buildinggadgets.easter_eggs.9x9.for_the_collection": "Another 9 by 9 for Dire'S collection... Go submit it!",
   "buildinggadgets.easter_eggs.9x9.just_like_dire": "A 9 by 9 just like Dire's.",
   "buildinggadgets.easter_eggs.9x9.dire_would_be_proud": "Dire would be proud.",

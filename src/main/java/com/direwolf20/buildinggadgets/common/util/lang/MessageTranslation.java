@@ -22,6 +22,7 @@ public enum MessageTranslation implements ITranslationProvider {
     COPY_UNLOADED("copy_unloaded", 1),
     COPY_TOO_LARGE("copy_too_large", 6),
     DESTRCUT_TOO_LARGE("destroy_size_too_large"),
+    FIRST_COPY("first_copy"),
     GADGET_BUSY("gadget_busy"),
     INVALID_BLOCK("invalid_block", 1),
     MIRRORED("mirrored"),
