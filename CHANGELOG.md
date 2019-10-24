@@ -1,6 +1,6 @@
 # Building Gadgets Changelog
 The format of this document is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and should continue to adhere to the conventions outlined in the Keep a Changelog guidelines.
-## [3.0.7b - 1.14.4] 
+## [3.1.0b - 1.14.4] 
 ### Fixed
 - Wall modes increased their size in an arbitrary direction when given an even range
 - Creative Paste container cannot absorb ConstructionPaste
