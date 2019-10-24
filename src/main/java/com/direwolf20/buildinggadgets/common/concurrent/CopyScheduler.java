@@ -5,6 +5,7 @@ import com.direwolf20.buildinggadgets.common.building.PlacementTarget;
 import com.direwolf20.buildinggadgets.common.building.Region;
 import com.direwolf20.buildinggadgets.common.building.view.IBuildContext;
 import com.direwolf20.buildinggadgets.common.building.view.IBuildView;
+import com.direwolf20.buildinggadgets.common.registry.OurItems;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import net.minecraft.util.math.BlockPos;
@@ -41,7 +42,7 @@ public final class CopyScheduler extends SteppedScheduler {
     @Override
     protected StepResult advance() {
         return StepResult.ofBoolean(targets.tryAdvance(t -> {
-            if (! t.getData().getState().isAir(context.getWorld(), t.getPos())) {
+            if (! t.getData().getState().isAir(context.getWorld(), t.getPos()) && OurItems.gadgetCopyPaste.isAllowedBlock(t.getData().getState().getBlock())) {
                 builder.put(t.getPos(), t.getData());
                 if (regionBuilder == null)
                     regionBuilder = Region.enclosingBuilder();

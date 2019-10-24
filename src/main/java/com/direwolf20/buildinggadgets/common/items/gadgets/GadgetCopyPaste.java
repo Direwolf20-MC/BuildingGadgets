@@ -116,7 +116,7 @@ public class GadgetCopyPaste extends AbstractGadget {
     private static final Joiner CHUNK_JOINER = Joiner.on("; ");
 
     public GadgetCopyPaste(Properties builder, IntSupplier undoLengthSupplier, String undoName) {
-        super(builder, undoLengthSupplier, undoName, , TagReference.WHITELIST_COPY_PASTE, TagReference.BLACKLIST_COPY_PASTE);
+        super(builder, undoLengthSupplier, undoName, TagReference.WHITELIST_COPY_PASTE, TagReference.BLACKLIST_COPY_PASTE);
     }
 
     @Override

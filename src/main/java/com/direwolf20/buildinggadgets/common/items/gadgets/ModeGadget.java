@@ -4,12 +4,13 @@ import com.direwolf20.buildinggadgets.common.network.packets.PacketRotateMirror.
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
 
 import java.util.function.IntSupplier;
 
 public abstract class ModeGadget extends AbstractGadget {
-    public ModeGadget(Properties builder, IntSupplier undoLengthSupplier, String undoName) {
-        super(builder, undoLengthSupplier, undoName);
+    public ModeGadget(Properties builder, IntSupplier undoLengthSupplier, String undoName, ResourceLocation whiteListTag, ResourceLocation blackListTag) {
+        super(builder, undoLengthSupplier, undoName, whiteListTag, blackListTag);
     }
 
     @Override

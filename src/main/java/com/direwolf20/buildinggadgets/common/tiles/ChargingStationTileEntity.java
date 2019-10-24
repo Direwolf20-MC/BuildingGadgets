@@ -6,8 +6,6 @@ import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.containers.ChargingStationContainer;
 import com.direwolf20.buildinggadgets.common.items.ChargingStationItem;
 import com.direwolf20.buildinggadgets.common.registry.OurBlocks;
-import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
-import com.direwolf20.buildinggadgets.common.util.CapabilityUtil;
 import com.direwolf20.buildinggadgets.common.util.exceptions.CapabilityNotPresentException;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.util.tools.CapabilityUtil;

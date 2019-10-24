@@ -25,7 +25,6 @@ import com.direwolf20.buildinggadgets.common.util.lang.MessageTranslation;
 import com.direwolf20.buildinggadgets.common.util.lang.Styles;
 import com.direwolf20.buildinggadgets.common.util.lang.TooltipTranslation;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference.BlockReference.TagReference;
-import com.direwolf20.buildinggadgets.common.util.tools.modes.ExchangingMode;
 import com.direwolf20.buildinggadgets.common.world.FakeBuilderWorld;
 import com.google.common.collect.ImmutableMultiset;
 import net.minecraft.block.BlockState;
