@@ -219,7 +219,7 @@ public class GadgetBuilding extends ModeGadget implements IAtopPlacingGadget {
     }
 
     private boolean placeBlock(World world, ServerPlayerEntity player, IItemIndex index, Undo.Builder builder, BlockPos pos, BlockData setBlock) {
-        if (pos.getY() > world.getMaxHeight() || pos.getY() < world.getMaxHeight())
+        if (pos.getY() > world.getMaxHeight() || pos.getY() < 0)
             return false;
         if (!player.isAllowEdit())
             return false;
