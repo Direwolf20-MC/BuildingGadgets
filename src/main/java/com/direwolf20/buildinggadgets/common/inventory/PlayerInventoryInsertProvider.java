@@ -16,12 +16,19 @@ public final class PlayerInventoryInsertProvider implements IInsertProvider {
 
     @Override
     public int insert(ItemStack stack, int count, boolean simulate) {
-        if (stack.getCount() != count) {
-            stack = stack.copy();
-            stack.setCount(count);
-        }
-        ItemEntity itemEntity = new ItemEntity(player.world, player.posX, player.posY, player.posZ, stack);
+        ItemStack copy = stack.copy();
+        if (copy.getCount() != count)
+            copy.setCount(count);
+        ItemEntity itemEntity = new ItemEntity(player.world, player.posX, player.posY, player.posZ, copy) {
+            //If the stack is completely inserted, then the ItemEntity will reset the count just after it calls remove... We need to catch that 0  count though
+            //So we hack our way into remove
+            @Override
+            public void remove() {
+                super.remove();
+                stack.setCount(getItem().getCount());
+            }
+        };
         itemEntity.onCollideWithPlayer(player);
-        return itemEntity.getItem().getCount();
+        return Math.min(stack.getCount(), itemEntity.getItem().getCount());
     }
 }
