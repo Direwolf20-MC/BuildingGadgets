@@ -264,7 +264,7 @@ public class GadgetBuilding extends AbstractGadget implements IAtopPlacingGadget
     }
 
     private boolean placeBlock(World world, ServerPlayerEntity player, BlockPos pos, BlockData setBlock) {
-        if (pos.getY() > world.getMaxHeight() || pos.getY() < world.getMaxHeight())
+        if (pos.getY() > world.getMaxHeight() || pos.getY() < 0)
             return false;
         if (!player.isAllowEdit())
             return false;
