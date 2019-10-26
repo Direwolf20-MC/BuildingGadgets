@@ -24,10 +24,10 @@ import com.direwolf20.buildinggadgets.common.util.lang.MessageTranslation;
 import com.direwolf20.buildinggadgets.common.util.lang.Styles;
 import com.direwolf20.buildinggadgets.common.util.lang.TooltipTranslation;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
-import net.minecraft.block.Block;
 import com.direwolf20.buildinggadgets.common.util.tools.CapabilityUtil.EnergyUtil;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSortedSet;
+import net.minecraft.block.Block;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.Item;
@@ -42,9 +42,6 @@ import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -167,7 +164,7 @@ public abstract class AbstractGadget extends Item {
         if (isAllowedBlock(block))
             return true;
         if (notifiedPlayer != null)
-            notifiedPlayer.sendStatusMessage(new StringTextComponent(TextFormatting.RED + new TranslationTextComponent("message.gadget.invalidblock").getUnformattedComponentText()), true);
+            notifiedPlayer.sendStatusMessage(MessageTranslation.INVALID_BLOCK.componentTranslation(block.getNameTextComponent()).setStyle(Styles.AQUA), true);
         return false;
     }
 
@@ -256,7 +253,7 @@ public abstract class AbstractGadget extends Item {
 
     public static void toggleFuzzy(PlayerEntity player, ItemStack stack) {
         NBTHelper.getOrNewTag(stack).putBoolean(NBTKeys.GADGET_FUZZY, !getFuzzy(stack));
-        player.sendStatusMessage(new StringTextComponent(TextFormatting.AQUA + new TranslationTextComponent("message.gadget.fuzzymode").getUnformattedComponentText() + ": " + getFuzzy(stack)), true);
+        player.sendStatusMessage(MessageTranslation.FUZZY_MODE.componentTranslation(getFuzzy(stack)).setStyle(Styles.AQUA), true);
     }
 
     public static boolean getConnectedArea(ItemStack stack) {
@@ -265,8 +262,8 @@ public abstract class AbstractGadget extends Item {
 
     public static void toggleConnectedArea(PlayerEntity player, ItemStack stack) {
         NBTHelper.getOrNewTag(stack).putBoolean(NBTKeys.GADGET_UNCONNECTED_AREA, getConnectedArea(stack));
-        String suffix = stack.getItem() instanceof GadgetDestruction ? "area" : "surface";
-        player.sendStatusMessage(new StringTextComponent(TextFormatting.AQUA + new TranslationTextComponent("message.gadget.connected" + suffix).getUnformattedComponentText() + ": " + getConnectedArea(stack)), true);
+        player.sendStatusMessage((stack.getItem() instanceof GadgetDestruction ? MessageTranslation.CONNECTED_AREA : MessageTranslation.CONNECTED_SURFACE)
+                .componentTranslation(getConnectedArea(stack)).setStyle(Styles.AQUA), true);
     }
 
     public static boolean shouldRayTraceFluid(ItemStack stack) {
@@ -275,7 +272,7 @@ public abstract class AbstractGadget extends Item {
 
     public static void toggleRayTraceFluid(ServerPlayerEntity player, ItemStack stack) {
         NBTHelper.getOrNewTag(stack).putBoolean(NBTKeys.GADGET_RAYTRACE_FLUID, !shouldRayTraceFluid(stack));
-        player.sendStatusMessage(new StringTextComponent(TextFormatting.AQUA + new TranslationTextComponent("message.gadget.raytrace_fluid").getUnformattedComponentText() + ": " + shouldRayTraceFluid(stack)), true);
+        player.sendStatusMessage(MessageTranslation.RAYTRACE_FLUID.componentTranslation(shouldRayTraceFluid(stack)).setStyle(Styles.AQUA), true);
     }
 
     public static void addInformationRayTraceFluid(List<ITextComponent> tooltip, ItemStack stack) {
