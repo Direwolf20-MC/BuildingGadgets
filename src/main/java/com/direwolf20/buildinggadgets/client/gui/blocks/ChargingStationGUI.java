@@ -38,8 +38,9 @@ public class ChargingStationGUI extends ContainerScreen<ChargingStationContainer
 
     @Override
     public void render(int mouseX, int mouseY, float partialTicks) {
-        drawGuiContainerBackgroundLayer(partialTicks, mouseX, mouseY);
+        this.renderBackground();
         super.render(mouseX, mouseY, partialTicks);
+
         this.renderHoveredToolTip(mouseX, mouseY);
 
         if( mouseX > (guiLeft + 7) && mouseX < (guiLeft + 7) + 18 && mouseY > (guiTop + 7) && mouseY < (guiTop + 7) + 73 )

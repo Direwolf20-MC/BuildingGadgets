@@ -1,16 +1,18 @@
 # Building Gadgets Changelog
 The format of this document is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and should continue to adhere to the conventions outlined in the Keep a Changelog guidelines.
 
-## [3.0.6a - 1.14.4] - 2019-10-21
+## [3.0.6a - 1.14.4] - 2019-10-26
+This will be the final alpha. The next version `3.1.0` will be part of a big system rewrite and template support being reintroduced. Keep an eye out as it's going to be a big one!
 ### Added
 - A new `charging station` Gui to clean up and make more sense of what was already there. (I'ts alo prettier)
   - We now show the burn time remaining on the fuel source
   - The FE (Forge Energy) stored in the block (with a pretty power indicator I might add)
   - A faded version of the a Gadget do signify where the Gadget slot is
-  - A flame to indicate burn time like a normal Furnace as well to indicate 
+  - A flame to indicate burn time like a normal Furnace as well to indicate
+- The `Charging station` now keeps it's charge when broken :+1: 
 - The `Charging Station` now has a new texture for it's front when off and on
   - We also produce 14 levels of light, why 14? I don't know...
-  
+
 ### Fixed
 - Charging station should now accept all modded fuel types and have no hard dependency to Vanilla burnable figures.
 - Charging station no longer loses it's power when unloaded (literal spelling mistake)
@@ -18,8 +20,14 @@ The format of this document is based on [Keep a Changelog](https://keepachangelo
 - Copy-Paste and Building Gadget will no longer build higher then the World's max Build height
 - Effect block crashing servers when it fails to get it's faking block for what ever reason.
 - Fixed EffectBlock crashing and corrupting chunks when building whilst the Server is overloaded
+- The Charging station wouldn't show it's background
+- You can no longer get a construction block from a construction block. It'll now select the block that the construction block is mimicing
+- Construction blocks are now a lot easier to break
 
 ### Changed
+- The Exchanger will now only exchange if the blocks it tries to select have a single visible face
+  - This means that you'll no longer be exchanged blocks that are recessed into a wall, under a wall or generally places you wouldn't want the blocks to change.
+- The Exchanger can no longer exchange torches as it was causing a lot of placement issues we don't want to fix...
 - We're now on Forge 28.1.61 so this should resolve all forge related issues we've been seeing.
 - Completely rewrite the internal registration system for our blocks, items, etc.
 - The Black and Whitelists are now based on Tags
