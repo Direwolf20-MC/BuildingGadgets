@@ -13,7 +13,9 @@ public enum ModeTranslation implements ITranslationProvider{
     HORIZONTAL_WALL("horizontal_wall", 0),
     VERTICAL_WALL("vertical_wall", 0),
     STAIR("stair", 0),
-    AXIS_CHASING("axis_chasing", 0);
+    AXIS_CHASING("axis_chasing", 0),
+    COPY("copy"),
+    PASTE("paste");
     private static final String PREFIX = "modes."+ Reference.MODID+".";
     private final String key;
     private final int argCount;
@@ -21,6 +23,10 @@ public enum ModeTranslation implements ITranslationProvider{
     ModeTranslation(@Nonnull String key, @Nonnegative int argCount) {
         this.key = PREFIX + key;
         this.argCount = argCount;
+    }
+
+    ModeTranslation(@Nonnull String key) {
+        this(key, 0);
     }
 
     @Override

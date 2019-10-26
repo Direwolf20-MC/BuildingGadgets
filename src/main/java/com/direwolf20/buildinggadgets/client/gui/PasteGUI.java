@@ -46,7 +46,7 @@ public class PasteGUI extends Screen {
 
             add(new CopyGUI.CenteredButton(y + 20, 40, GuiTranslation.SINGLE_RESET, (button) -> {
                 X.setValue(0);
-                Y.setValue(1);
+                Y.setValue(0);
                 Z.setValue(0);
                 sendPacket();
             }));

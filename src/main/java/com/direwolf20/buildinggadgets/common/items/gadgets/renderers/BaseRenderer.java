@@ -1,12 +1,12 @@
 package com.direwolf20.buildinggadgets.common.items.gadgets.renderers;
 
-import com.direwolf20.buildinggadgets.client.RemoteInventoryCache;
+import com.direwolf20.buildinggadgets.client.cache.RemoteInventoryCache;
 import com.direwolf20.buildinggadgets.client.renderer.FakeTERWorld;
-import com.direwolf20.buildinggadgets.common.util.CapabilityUtil;
+import com.direwolf20.buildinggadgets.common.inventory.InventoryHelper;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.exceptions.CapabilityNotPresentException;
-import com.direwolf20.buildinggadgets.common.util.helpers.InventoryHelper;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
+import com.direwolf20.buildinggadgets.common.util.tools.CapabilityUtil;
 import com.direwolf20.buildinggadgets.common.util.tools.UniqueItem;
 import com.direwolf20.buildinggadgets.common.world.FakeBuilderWorld;
 import com.google.common.collect.Multiset;
@@ -14,8 +14,11 @@ import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -27,6 +30,7 @@ import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.IEnergyStorage;
+import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL14;
 
 import java.util.HashSet;
@@ -41,12 +45,17 @@ public abstract class BaseRenderer {
 
     private static RemoteInventoryCache cacheInventory = new RemoteInventoryCache(false);
 
+
     public void render(RenderWorldLastEvent evt, PlayerEntity player, ItemStack heldItem) {
         // This is necessary to prevent issues with not rendering the overlay's at all (when Botania being present) - See #329 for more information
-        getMc().getTextureManager().bindTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
+        bindBlocks();
 
         if( this.isLinkable() )
             BaseRenderer.renderLinkedInventoryOutline(heldItem, player);
+    }
+
+    protected void bindBlocks() {
+        getMc().getTextureManager().bindTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
     }
 
     private static void renderLinkedInventoryOutline(ItemStack item, PlayerEntity player) {
@@ -104,6 +113,73 @@ public abstract class BaseRenderer {
 
 
         return !itemStack.isEmpty() ? itemStack : state.getBlock().getPickBlock(state, null, world, BlockPos.ZERO, player);
+    }
+
+    protected BufferBuilder setupMissingRender() {
+        BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+        GlStateManager.alphaFunc(GL11.GL_GREATER, 0.0001F);
+        GlStateManager.disableTexture();
+        GlStateManager.depthMask(false);
+        GlStateManager.enableBlend();
+        GlStateManager.blendFunc(GL14.GL_CONSTANT_ALPHA, GL14.GL_ONE_MINUS_CONSTANT_ALPHA);
+        GL14.glBlendColor(1F, 1F, 1F, 0.3f); //Set the alpha of the blocks we are rendering
+        bufferBuilder.begin(GL14.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
+        return bufferBuilder;
+    }
+
+    protected void teardownMissingRender() {
+        Tessellator.getInstance().draw();
+        GlStateManager.depthMask(true);
+        GlStateManager.enableTexture();
+        GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+    }
+
+    protected void renderMissingBlock(BufferBuilder bufferBuilder, BlockPos pos) {
+        float red = 1;
+        float green = 0;
+        float blue = 0;
+        float alpha = 0.55f;
+        double x = pos.getX() - 0.01;
+        double y = pos.getY() - 0.01;
+        double z = pos.getZ() - 0.01;
+        double xEnd = pos.getX() + 1.01;
+        double yEnd = pos.getY() + 1.01;
+        double zEnd = pos.getZ() + 1.01;
+        renderBoxSolid(bufferBuilder, x, y, z, xEnd, yEnd, zEnd, red, green, blue, alpha);
+    }
+
+    protected void renderBoxSolid(BufferBuilder bufferBuilder, double x, double y, double z, double xEnd, double yEnd, double zEnd, float red, float green, float blue, float alpha) {
+        //careful: mc want's it's vertices to be defined CCW - if you do it the other way around weird cullling issues will arise
+        //CCW herby counts as if you were looking at it from the outside
+        bufferBuilder.pos(x, y, z).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(x, yEnd, z).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(xEnd, yEnd, z).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(xEnd, y, z).color(red, green, blue, alpha).endVertex();
+        //left-side
+        bufferBuilder.pos(x, y, z).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(x, y, zEnd).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(x, yEnd, zEnd).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(x, yEnd, z).color(red, green, blue, alpha).endVertex();
+        //bottom
+        bufferBuilder.pos(x, y, z).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(xEnd, y, z).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(xEnd, y, zEnd).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(x, y, zEnd).color(red, green, blue, alpha).endVertex();
+        //top
+        bufferBuilder.pos(xEnd, yEnd, zEnd).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(xEnd, yEnd, z).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(x, yEnd, z).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(x, yEnd, zEnd).color(red, green, blue, alpha).endVertex();
+        //right-side
+        bufferBuilder.pos(xEnd, yEnd, zEnd).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(xEnd, y, zEnd).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(xEnd, y, z).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(xEnd, yEnd, z).color(red, green, blue, alpha).endVertex();
+        //back-side
+        bufferBuilder.pos(xEnd, yEnd, zEnd).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(x, yEnd, zEnd).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(x, y, zEnd).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.pos(xEnd, y, zEnd).color(red, green, blue, alpha).endVertex();
     }
 
     /**

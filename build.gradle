@@ -29,22 +29,6 @@ String forgeName = "$forge_base:$forgeVersion"
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
 
 sourceSets {
-    api {
-        java {
-            'src/api/java'
-        }
-        resources {
-            'src/api/resources'
-        }
-    }
-    apiTest {
-        java {
-            'src/apiTest/java'
-        }
-        resources {
-            'src/apiTest/resources'
-        }
-    }
     main {
         java {
             'src/main/java'
@@ -63,22 +47,6 @@ sourceSets {
     }
 }
 
-configurations {
-    apiImplementation.extendsFrom minecraft
-    apiTestImplementation.extendsFrom apiImplementation
-    implementation.extendsFrom apiImplementation
-    testImplementation.extendsFrom apiTestImplementation, implementation
-}
-
-idea {
-    module {
-        sourceDirs+=sourceSets.api.java.srcDirs
-        sourceDirs+=sourceSets.api.resources.srcDirs
-        testSourceDirs+= sourceSets.apiTest.java.srcDirs
-        testSourceDirs+= sourceSets.apiTest.resources.srcDirs
-    }
-}
-
 minecraft {
     mappings channel: 'snapshot', version: "${mcp_mappings}"
     // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
@@ -88,13 +56,13 @@ minecraft {
             properties 'forge.logging.markers': 'FORGEMOD,REGISTRIES'
             properties 'forge.logging.console.level': 'debug'
             workingDirectory project.file('run').canonicalPath
-            sources sourceSets.main, sourceSets.api
+            sources sourceSets.main
         }
         server = {
             properties 'forge.logging.markers': 'FORGEMOD,REGISTRIES'
             properties 'forge.logging.console.level': 'debug'
             workingDirectory project.file('run').canonicalPath
-            sources sourceSets.main, sourceSets.api
+            sources sourceSets.main
         }
     }
 }
@@ -102,13 +70,9 @@ minecraft {
 dependencies {
     minecraft forgeName
 
-    apiTestImplementation sourceSets.api.output
-    apiTestImplementation "org.junit.jupiter:junit-jupiter-api:${project.junit_version}"
-    apiTestImplementation "org.junit.jupiter:junit-jupiter:${project.junit_version}"
-    apiTestRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${project.junit_version}"
-
-    implementation sourceSets.api.output
-    testImplementation sourceSets.apiTest.output
+    testImplementation "org.junit.jupiter:junit-jupiter-api:${project.junit_version}"
+    testImplementation "org.junit.jupiter:junit-jupiter:${project.junit_version}"
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${project.junit_version}"
     // deobfCompile "team.chisel.ctm:CTM:MC${minecraft_version}-${ctm_version}:api"
     // deobfCompile "refinedstorage:refinedstorage:${rs_version}:api"
     // runtime "team.chisel.ctm:CTM:MC${minecraft_version}-${ctm_version}"
@@ -138,26 +102,6 @@ processResources {
     }
 }
 
-// Processes main only resources
-processApiResources {
-    inputs.property('version', project.version)
-    inputs.property('api_version', project.api_version)
-    inputs.property('forge_major', project.forge_major)
-    inputs.property('update_json', project.update_json)
-    from(sourceSets.api.resources.srcDirs) {
-        include 'META-INF/mods.toml'
-        expand 'version':project.version, 'api_version':project.api_version,'forge_major':project.forge_major,'update_json':project.update_json
-    }
-
-    from(sourceSets.api.resources.srcDirs) {
-        exclude 'META-INF/mods.toml'
-    }
-}
-
-task clearDoc (type: Delete) {
-    delete javadoc.destinationDir
-}
-
 jar {
     group = project.artifactGroup
     manifest {
@@ -167,194 +111,13 @@ jar {
                     "Implementation-Version": project.version,
                     "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")],)
     }
-    from sourceSets.main.output, sourceSets.api.output
+    from sourceSets.main.output
     dependsOn classes
-}
-
-void manipulateDocTags(List<String> tags) {
-    tags.add("implNote:a:Implementation Note:")
-    tags.add('implSpec:a:Implementation Requirements:')
-    tags.add('apiNote:a:API Note:')
 }
 
 task sourcesJar(type: Jar, dependsOn: classes) {
     group = project.artifactGroup
     manifest = jar.manifest
     classifier = 'sources'
-    from sourceSets.main.allSource, sourceSets.api.allSource
-}
-
-task apiJar (type:Jar, dependsOn:apiClasses) {
-    group = project.artifactGroup
-    manifest {
-        attributes(["Specification-Title": "Buildinggadgets-API",
-                    "Specification-Version": forge_major,
-                    "Implementation-Title": project.archivesBaseName+'-api',
-                    "Implementation-Version": project.api_version,
-                    "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")],)
-    }
-    version = project.api_version
-    appendix = 'api'
-    from sourceSets.api.output
-}
-
-task apiSourcesJar(type: Jar, dependsOn: apiClasses) {
-    group = project.artifactGroup
-    manifest = apiJar.manifest
-    version = project.api_version
-    appendix = 'api'
-    classifier = 'sources'
-    from sourceSets.api.allSource
-}
-
-task apiDoc (type: Javadoc, dependsOn: clearDoc){
-    classpath = sourceSets.api.compileClasspath
-    exclude('com/dirwolf20/buildinggadgets/api') // no idea why, but this results in only the api doc being created - I thought this would be done by include
-    source = sourceSets.api.allJava
-    manipulateDocTags(options.getTags())
-}
-
-task apiDocJar(type: Jar, dependsOn: apiDoc) {
-    group = project.artifactGroup
-    manifest = apiJar.manifest
-    version = project.api_version
-    appendix = 'api'
-    classifier = 'javadoc'
-    from apiDoc.destinationDir
-}
-
-reobf {
-    apiJar {
-        dependsOn tasks.createMcpToSrg
-        mappings = tasks.createMcpToSrg.outputs.files.singleFile
-    }
-}
-
-task allApiJars {
-    group = project.artifactGroup
-    dependsOn apiJar
-    dependsOn apiDocJar
-    dependsOn apiSourcesJar
-}
-
-task allImplementationJars {
-    group = project.artifactGroup
-    dependsOn jar
-    dependsOn sourcesJar
-}
-
-task allJars {
-    group = project.artifactGroup
-    dependsOn allApiJars
-    dependsOn allImplementationJars
-}
-
-task apiTestTask(type: Test) {
-    description = 'Runs all api Tests.'
-    group = 'verification'
-    testClassesDirs = sourceSets.apiTest.output.classesDirs
-    classpath = sourceSets.apiTest.runtimeClasspath
-    useJUnitPlatform()
-}
-
-test {
-    useJUnitPlatform()
-    dependsOn apiTestTask
-}
-
-// These 2 need to be hardcoded, because the reobfJar task doesn't register as an ArchivesBaseTask
-String reobfApiJarLoc = "${project.buildDir}\\libs\\${archivesBaseName}-api-${api_version}.jar"
-String reobfJarLoc = "${project.buildDir}\\libs\\${archivesBaseName}-${version}.jar"
-artifacts {
-    //define as file, so that it can be reobfed
-    archives file(reobfApiJarLoc)
-    archives apiDocJar
-    archives apiSourcesJar
-    archives file(reobfJarLoc)
-    archives sourcesJar
-}
-
-signing {
-    sign configurations.archives
-}
-
-publishing {
-    publications {
-        mavenApiJava(MavenPublication) {
-            groupId = 'com.direwolf20'
-            artifactId = project.archivesBaseName+'-api'
-            version = project.api_version
-            artifact reobfApiJarLoc
-            artifact apiDocJar
-            artifact apiSourcesJar
-            pom {
-                name = "Buildinggadgets-API"
-                url = "https://github.com/Direwolf20-MC/BuildingGadgets"
-                developers  {
-                    developer {
-                        name = 'Direwolf20'
-                    }
-                }
-                contributors {
-                    contributor {
-                        name = 'Phylogeny'
-                    }
-                    contributor {
-                        name = 'MichaelHillcox'
-                    }
-                    contributor {
-                        name = 'MajorTuvok'
-                    }
-                }
-                licenses {
-                    license {
-                        name = 'MIT License'
-                        url = 'https://opensource.org/licenses/MIT'
-                    }
-                }
-                issueManagement {
-                    system = 'github'
-                    url = 'https://github.com/Direwolf20-MC/BuildingGadgets/issues'
-                }
-            }
-        }
-        mavenJava(MavenPublication) {
-            groupId = 'com.direwolf20'
-            artifactId = project.archivesBaseName
-            version = project.version
-            artifact reobfJarLoc
-            artifact sourcesJar
-            pom {
-                name = "Buildinggadgets"
-                url = "https://github.com/Direwolf20-MC/BuildingGadgets"
-                developers  {
-                    developer {
-                        name = 'Direwolf20'
-                    }
-                }
-                contributors {
-                    contributor {
-                        name = 'Phylogeny'
-                    }
-                    contributor {
-                        name = 'MichaelHillcox'
-                    }
-                    contributor {
-                        name = 'MajorTuvok'
-                    }
-                }
-                licenses {
-                    license {
-                        name = 'MIT License'
-                        url = 'https://opensource.org/licenses/MIT'
-                    }
-                }
-                issueManagement {
-                    system = 'github'
-                    url = 'https://github.com/Direwolf20-MC/BuildingGadgets/issues'
-                }
-            }
-        }
-    }
-    repositories {}
+    from sourceSets.main.allSource
 }

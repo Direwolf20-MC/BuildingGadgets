@@ -20,10 +20,11 @@ import java.util.Objects;
 public class TemplateManagerContainer extends BaseContainer {
     public static final String TEXTURE_LOC_SLOT_TOOL = Reference.MODID + ":gui/slot_copy_paste_gadget";
     public static final String TEXTURE_LOC_SLOT_TEMPLATE = Reference.MODID + ":gui/slot_template";
+    private static final int DRAG_TYPE_TEMPLATE_CRAFTED = 4;
     private TemplateManagerTileEntity te;
 
     public TemplateManagerContainer(int windowId, PlayerInventory playerInventory, PacketBuffer extraData) {
-        super(OurContainers.TEMPLATE_MANAGER_CONTAINER, windowId);//TODO fix once we get access to ContainerTypes
+        super(OurContainers.TEMPLATE_MANAGER_CONTAINER, windowId);
         BlockPos pos = extraData.readBlockPos();
         this.te = (TemplateManagerTileEntity) Minecraft.getInstance().world.getTileEntity(pos);
         addOwnSlots();
@@ -43,7 +44,7 @@ public class TemplateManagerContainer extends BaseContainer {
     }
 
     private void addOwnSlots() {
-        IItemHandler itemHandler = this.getTe().getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null).orElseThrow(CapabilityNotPresentException::new);
+        IItemHandler itemHandler = this.getTe().getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).orElseThrow(CapabilityNotPresentException::new);
         int x = 86;
         int y = 41;
 
@@ -54,25 +55,23 @@ public class TemplateManagerContainer extends BaseContainer {
 
     @Override
     @Nonnull
-    public ItemStack transferStackInSlot(PlayerEntity p_82846_1_, int index) {
+    public ItemStack transferStackInSlot(PlayerEntity player, int index) {
         ItemStack itemstack = ItemStack.EMPTY;
         Slot slot = this.inventorySlots.get(index);
 
         if (slot != null && slot.getHasStack()) {
-            ItemStack itemstack1 = slot.getStack();
-            //if (!(itemstack1.getItem() instanceof GadgetCopyPaste) && !itemstack1.getItem().equals(Items.PAPER) && !(itemstack1.getItem() instanceof Template))
-            //    return itemstack;
-            itemstack = itemstack1.copy();
+            ItemStack currentStack = slot.getStack();
+            itemstack = currentStack.copy();
 
             if (index < TemplateManagerTileEntity.SIZE) {
-                if (!this.mergeItemStack(itemstack1, TemplateManagerTileEntity.SIZE, this.inventorySlots.size(), true)) {
+                if (! this.mergeItemStack(currentStack, TemplateManagerTileEntity.SIZE, this.inventorySlots.size(), true)) {
                     return ItemStack.EMPTY;
                 }
-            } else if (!this.mergeItemStack(itemstack1, 0, TemplateManagerTileEntity.SIZE, false)) {
+            } else if (! this.mergeItemStack(currentStack, 0, TemplateManagerTileEntity.SIZE, false)) {
                 return ItemStack.EMPTY;
             }
 
-            if (itemstack1.isEmpty()) {
+            if (currentStack.isEmpty()) {
                 slot.putStack(ItemStack.EMPTY);
             } else {
                 slot.onSlotChanged();
@@ -85,4 +84,5 @@ public class TemplateManagerContainer extends BaseContainer {
     public TemplateManagerTileEntity getTe() {
         return te;
     }
+
 }

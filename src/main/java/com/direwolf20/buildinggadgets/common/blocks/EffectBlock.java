@@ -1,7 +1,10 @@
 package com.direwolf20.buildinggadgets.common.blocks;
 
-import com.direwolf20.buildinggadgets.api.building.BlockData;
-import com.direwolf20.buildinggadgets.api.building.view.SimpleBuildContext;
+import com.direwolf20.buildinggadgets.common.building.BlockData;
+import com.direwolf20.buildinggadgets.common.building.PlacementTarget;
+import com.direwolf20.buildinggadgets.common.building.tilesupport.TileSupport;
+import com.direwolf20.buildinggadgets.common.building.view.IBuildContext;
+import com.direwolf20.buildinggadgets.common.building.view.SimpleBuildContext;
 import com.direwolf20.buildinggadgets.common.entities.ConstructionBlockEntity;
 import com.direwolf20.buildinggadgets.common.registry.OurBlocks;
 import com.direwolf20.buildinggadgets.common.tiles.ConstructionBlockTileEntity;
@@ -10,12 +13,14 @@ import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.material.PushReaction;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockReader;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraft.world.storage.loot.LootContext;
 import net.minecraftforge.common.util.Constants;
@@ -70,15 +75,37 @@ public class EffectBlock extends Block {
         public abstract void onBuilderRemoved(EffectBlockTileEntity builder);
     }
 
-    public static void spawnEffectBlock(World world, BlockPos spawnPos, BlockData spawnBlock, Mode mode, boolean usePaste) {
-        BlockState state = OurBlocks.effectBlock.getDefaultState();
+    public static void spawnUndoBlock(IBuildContext context, PlacementTarget target) {
+        BlockState state = context.getWorld().getBlockState(target.getPos());
+
+        TileEntity curTe = context.getWorld().getTileEntity(target.getPos());
+        //can't use .isAir, because it's not build yet
+        if (target.getData().getState() != Blocks.AIR.getDefaultState()) {
+            Mode mode = state.isAir(context.getWorld(), target.getPos()) ? Mode.PLACE : Mode.REPLACE;
+            spawnEffectBlock(curTe, state, context.getWorld(), target.getPos(), target.getData(), mode, false);
+        } else if (! state.isAir(context.getWorld(), target.getPos())) {
+            spawnEffectBlock(curTe, state, context.getWorld(), target.getPos(), TileSupport.createBlockData(state, curTe), Mode.REMOVE, false);
+        }
+    }
+
+    public static void spawnEffectBlock(IBuildContext context, PlacementTarget target, Mode mode, boolean usePaste) {//TODO pass the buildcontext through, aka invert the overloading
+        spawnEffectBlock(context.getWorld(), target.getPos(), target.getData(), mode, usePaste);
+    }
+
+    public static void spawnEffectBlock(IWorld world, BlockPos spawnPos, BlockData spawnBlock, Mode mode, boolean usePaste) {
+        BlockState state = world.getBlockState(spawnPos);
         TileEntity curTe = world.getTileEntity(spawnPos);
-        BlockState curState = world.getBlockState(spawnPos);
-        world.setBlockState(spawnPos, state);
+        spawnEffectBlock(curTe, state, world, spawnPos, spawnBlock, mode, usePaste);
+    }
+
+    private static void spawnEffectBlock(@Nullable TileEntity curTe, BlockState curState, IWorld world, BlockPos spawnPos, BlockData spawnBlock, Mode mode, boolean usePaste) {
+        BlockState state = OurBlocks.effectBlock.getDefaultState();
+        world.setBlockState(spawnPos, state, 3);
         assert world.getTileEntity(spawnPos) != null;
-        ((EffectBlockTileEntity) world.getTileEntity(spawnPos)).initializeData(world, curState, curTe, spawnBlock, mode, usePaste);
+        ((EffectBlockTileEntity) world.getTileEntity(spawnPos)).initializeData(curState, curTe, spawnBlock, mode, usePaste);
         // Send data to client
-        world.notifyBlockUpdate(spawnPos, state, state, Constants.BlockFlags.DEFAULT);
+        if (world instanceof World)
+            ((World) world).notifyBlockUpdate(spawnPos, state, state, Constants.BlockFlags.DEFAULT);
     }
 
     public EffectBlock(Properties builder) {

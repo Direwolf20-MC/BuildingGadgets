@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.common.util.exceptions;
 
-import com.direwolf20.buildinggadgets.api.building.placement.IPositionPlacementSequence;
+import com.direwolf20.buildinggadgets.common.building.placement.IPositionPlacementSequence;
 
 public class PaletteOverflowException extends Exception {
 

@@ -8,16 +8,18 @@ package com.direwolf20.buildinggadgets.client.gui;
 import com.direwolf20.buildinggadgets.client.KeyBindings;
 import com.direwolf20.buildinggadgets.client.gui.components.GuiIconActionable;
 import com.direwolf20.buildinggadgets.client.gui.components.GuiSliderInt;
+import com.direwolf20.buildinggadgets.common.building.modes.BuildingMode;
+import com.direwolf20.buildinggadgets.common.building.modes.ExchangingMode;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.items.gadgets.*;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.*;
 import com.direwolf20.buildinggadgets.common.registry.OurSounds;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
+import com.direwolf20.buildinggadgets.common.util.lang.MessageTranslation;
 import com.direwolf20.buildinggadgets.common.util.lang.RadialTranslation;
+import com.direwolf20.buildinggadgets.common.util.lang.Styles;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
-import com.direwolf20.buildinggadgets.common.util.tools.modes.BuildingMode;
-import com.direwolf20.buildinggadgets.common.util.tools.modes.ExchangingMode;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.mojang.blaze3d.platform.GlStateManager;
@@ -34,8 +36,6 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
 import org.lwjgl.opengl.GL11;
 
 import javax.vecmath.Vector2f;
@@ -145,7 +145,7 @@ public class ModeRadialMenu extends Screen {
                     return false;
 
                 getMinecraft().player.closeScreen();
-                if( GadgetCopyPaste.getToolMode(tool) == GadgetCopyPaste.ToolMode.Copy )
+                if (GadgetCopyPaste.getToolMode(tool) == GadgetCopyPaste.ToolMode.COPY)
                     getMinecraft().displayGuiScreen(new CopyGUI(tool));
                 else
                     getMinecraft().displayGuiScreen(new PasteGUI(tool));
@@ -171,10 +171,8 @@ public class ModeRadialMenu extends Screen {
                 PacketHandler.sendToServer(new PacketAnchor());
 
             ItemStack stack = getGadget();
-            if (stack.getItem() instanceof GadgetCopyPaste)
-                return GadgetCopyPaste.getAnchor(stack) != null;
-            else if (stack.getItem() instanceof GadgetDestruction)
-                return GadgetDestruction.getAnchor(stack) != null;
+            if (stack.getItem() instanceof GadgetCopyPaste || stack.getItem() instanceof GadgetDestruction)
+                return ((AbstractGadget) stack.getItem()).getAnchor(stack) != null;
 
             return !GadgetUtils.getAnchor(stack).isEmpty();
         }));
@@ -365,7 +363,7 @@ public class ModeRadialMenu extends Screen {
             else if (tool.getItem() instanceof GadgetExchanger)
                 name = ExchangingMode.values()[i].toString();
             else
-                name = GadgetCopyPaste.ToolMode.values()[i].toString();
+                name = GadgetCopyPaste.ToolMode.values()[i].format();
 
             int xsp = xp - 4;
             int ysp = yp;
@@ -425,7 +423,7 @@ public class ModeRadialMenu extends Screen {
             else
                 mode = GadgetCopyPaste.ToolMode.values()[slotSelected].toString();
 
-            getMinecraft().player.sendStatusMessage(new StringTextComponent(TextFormatting.AQUA + new TranslationTextComponent("message.gadget.toolmode").getUnformattedComponentText() + ": " + mode), true);
+            getMinecraft().player.sendStatusMessage(MessageTranslation.MODE_SET.componentTranslation(mode).setStyle(Styles.AQUA), true);
 
             PacketHandler.sendToServer(new PacketToggleMode(slotSelected));
             OurSounds.BEEP.playSound();

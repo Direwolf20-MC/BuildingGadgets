@@ -1,5 +1,39 @@
 # Building Gadgets Changelog
 The format of this document is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and should continue to adhere to the conventions outlined in the Keep a Changelog guidelines.
+## [3.1.0b - 1.14.4] 
+### Fixed
+- Wall modes increased their size in an arbitrary direction when given an even range
+- Creative Paste container cannot absorb ConstructionPaste
+- Charging station (and theoretically also the disabled TemplateManager) sometimes dupes Items in slots 3-11 and applies them as armor
+- Copy-Paste Gadget now properly renders copied tile data
+    - notice that none is copied atm though
+
+### Added
+- Config option for the destruction Gadget's max dimensions, which defaults to 16 as before
+    
+### Changes
+- Rewrote the Item Handling System
+    - this included as a side effect to allow other mods to pull or push into paste-containers
+- Rewrote the Undo System
+    - **All** Gadgets (including the Exchanger) now have an undo
+    - Undo's have a configurable size, which truncates existing undos when set smaller
+    - Undo's store last-modified timestamp to allow for clearing commands in the future
+- Rewrote the Copy-Paste-Gadget and Template Manager
+    - Template's now have an almost infinite size and block limit
+    - The size is restricted by a config value, to prevent Servers from being overwhelmed by too large builds
+        - This can be overwritten using the *OverwriteBuildSize* or the *OverwriteCopySize* commands respectively
+        - Another command (ForceLoadChunks) exists to allow a copy or build to force load chunks
+        - All commands are available for Server admins with permission level 2 and above
+    - Templates can now be build and copied with a certain config-controlled-amount of blocks per tick 
+    - The Template format has received an overhaul
+        - Template's consist of header and body
+        - the body contains all the necessary build information, whereas the header contains information for the person creating the Template
+            - You can change name and author of a copied TemplateHeader, but all other changes won't have an effect or even prevent it from being copied (in case of version or mc_version)
+        - notice that we are releasing the format as version "2-beta" in case we need to do some changes after we released
+            - The old *version "1"* format is not supported
+    - We had to disable the template preview in the TemplateManager, but are working on getting it back up and running 
+    - The Items which can be converted into a Template are now determined by the `buildinggadgets:template_convertible` Item tag
+
 
 ## [3.0.6a - 1.14.4] - 2019-10-26
 This will be the final alpha. The next version `3.1.0` will be part of a big system rewrite and template support being reintroduced. Keep an eye out as it's going to be a big one!

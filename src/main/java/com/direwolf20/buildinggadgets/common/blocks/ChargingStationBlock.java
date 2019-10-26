@@ -104,7 +104,7 @@ public class ChargingStationBlock extends Block {
         TileEntity te = worldIn.getTileEntity(pos);
         if (! (te instanceof ChargingStationTileEntity))
             return false;
-        NetworkHooks.openGui((ServerPlayerEntity) player, (INamedContainerProvider) te, te.getPos());
+        NetworkHooks.openGui((ServerPlayerEntity) player, (INamedContainerProvider) te, pos);
         return true;
     }
 

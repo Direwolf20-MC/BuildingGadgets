@@ -1,21 +1,21 @@
 package com.direwolf20.buildinggadgets.common.items.gadgets;
 
-import com.direwolf20.buildinggadgets.api.building.BlockData;
-import com.direwolf20.buildinggadgets.api.building.Region;
-import com.direwolf20.buildinggadgets.api.building.placement.IPositionPlacementSequence;
-import com.direwolf20.buildinggadgets.api.building.placement.PlacementSequences.ConnectedSurface;
-import com.direwolf20.buildinggadgets.api.building.tilesupport.TileSupport;
-import com.direwolf20.buildinggadgets.api.util.CommonUtils;
 import com.direwolf20.buildinggadgets.client.gui.GuiMod;
 import com.direwolf20.buildinggadgets.common.blocks.EffectBlock;
+import com.direwolf20.buildinggadgets.common.building.BlockData;
+import com.direwolf20.buildinggadgets.common.building.Region;
+import com.direwolf20.buildinggadgets.common.building.placement.IPositionPlacementSequence;
+import com.direwolf20.buildinggadgets.common.building.placement.PlacementSequences.ConnectedSurface;
+import com.direwolf20.buildinggadgets.common.building.placement.SetBackedPlacementSequence;
+import com.direwolf20.buildinggadgets.common.building.tilesupport.TileSupport;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.items.gadgets.renderers.BaseRenderer;
 import com.direwolf20.buildinggadgets.common.items.gadgets.renderers.DestructionRender;
 import com.direwolf20.buildinggadgets.common.registry.OurBlocks;
+import com.direwolf20.buildinggadgets.common.save.Undo;
 import com.direwolf20.buildinggadgets.common.tiles.ConstructionBlockTileEntity;
+import com.direwolf20.buildinggadgets.common.util.CommonUtils;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
-import com.direwolf20.buildinggadgets.common.util.blocks.RegionSnapshot;
-import com.direwolf20.buildinggadgets.common.util.exceptions.PaletteOverflowException;
 import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
 import com.direwolf20.buildinggadgets.common.util.helpers.SortingHelper;
 import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
@@ -23,10 +23,8 @@ import com.direwolf20.buildinggadgets.common.util.lang.Styles;
 import com.direwolf20.buildinggadgets.common.util.lang.TooltipTranslation;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference.BlockReference.TagReference;
-import com.direwolf20.buildinggadgets.common.util.tools.SetBackedPlacementSequence;
-import com.direwolf20.buildinggadgets.common.world.WorldSave;
+import com.google.common.collect.ImmutableMultiset;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -40,28 +38,24 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.BlockSnapshot;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.world.BlockEvent;
-import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nullable;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.UUID;
 import java.util.function.Function;
+import java.util.function.IntSupplier;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public class GadgetDestruction extends AbstractGadget {
-    public GadgetDestruction(Properties builder) {
-        super(builder, TagReference.WHITELIST_DESTRUCTION, TagReference.BLACKLIST_DESTRUCTION);
+
+    public GadgetDestruction(Properties builder, IntSupplier undoLengthSupplier, String undoName) {
+        super(builder, undoLengthSupplier, undoName, TagReference.WHITELIST_DESTRUCTION, TagReference.BLACKLIST_DESTRUCTION);
     }
 
     @Override
@@ -86,6 +80,7 @@ public class GadgetDestruction extends AbstractGadget {
     @Override
     public void addInformation(ItemStack stack, @Nullable World world, List<ITextComponent> tooltip, ITooltipFlag flag) {
         super.addInformation(stack, world, tooltip, flag);
+        addEnergyInformation(tooltip, stack);
         tooltip.add(TooltipTranslation.GADGET_DESTROYWARNING
                             .componentTranslation()
                             .setStyle(Styles.RED));
@@ -101,26 +96,10 @@ public class GadgetDestruction extends AbstractGadget {
                                 .setStyle(Styles.GOLD));
 
         addInformationRayTraceFluid(tooltip, stack);
-        addEnergyInformation(tooltip, stack);
-    }
-
-    public static UUID getUUID(ItemStack stack) {
-        CompoundNBT tag = NBTHelper.getOrNewTag(stack);
-        if (! tag.hasUniqueId(NBTKeys.GADGET_UUID)) {
-            UUID uuid = UUID.randomUUID();
-            tag.putUniqueId(NBTKeys.GADGET_UUID, uuid);
-            stack.setTag(tag);
-            return uuid;
-        }
-        return tag.getUniqueId(NBTKeys.GADGET_UUID);
     }
 
     public static void setAnchor(ItemStack stack, BlockPos pos) {
         GadgetUtils.writePOSToNBT(stack, pos, NBTKeys.GADGET_ANCHOR);
-    }
-
-    public static BlockPos getAnchor(ItemStack stack) {
-        return GadgetUtils.getPOSFromNBT(stack, NBTKeys.GADGET_ANCHOR);
     }
 
     public static void setAnchorSide(ItemStack stack, Direction side) {
@@ -179,14 +158,14 @@ public class GadgetDestruction extends AbstractGadget {
                 Direction anchorSide = getAnchorSide(stack);
                 if (anchorPos != null && anchorSide != null) {
                     clearArea(world, anchorPos, anchorSide, (ServerPlayerEntity) player, stack);
-                    clearSuccess(stack);
+                    onAnchorRemoved(stack, player);
                     return new ActionResult<>(ActionResultType.SUCCESS, stack);
                 }
 
                 BlockRayTraceResult lookingAt = VectorHelper.getLookingAt(player, stack);
-                if (lookingAt != null && (world.getBlockState(VectorHelper.getLookingAt(player, stack).getPos()) != Blocks.AIR.getDefaultState())) {
+                if (! world.isAirBlock(lookingAt.getPos())) {
                     clearArea(world, lookingAt.getPos(), lookingAt.getFace(), (ServerPlayerEntity) player, stack);
-                    clearSuccess(stack);
+                    onAnchorRemoved(stack, player);
                     return new ActionResult<>(ActionResultType.SUCCESS, stack);
                 }
 
@@ -198,37 +177,27 @@ public class GadgetDestruction extends AbstractGadget {
         return new ActionResult<>(ActionResultType.SUCCESS, stack);
     }
 
-    public static void clearSuccess(ItemStack stack) {
-        setAnchor(stack, null);
-        setAnchorSide(stack, null);
+    @Override
+    protected void onAnchorSet(ItemStack stack, PlayerEntity player, BlockRayTraceResult lookingAt) {
+        super.onAnchorSet(stack, player, lookingAt);
+        setAnchorSide(stack, lookingAt.getFace());
     }
 
-    public static void anchorBlocks(PlayerEntity player, ItemStack stack) {
-        BlockPos currentAnchor = getAnchor(stack);
-        if (currentAnchor == null) {
-            BlockRayTraceResult lookingAt = VectorHelper.getLookingAt(player, stack);
-            if (lookingAt == null || (player.world.getBlockState(VectorHelper.getLookingAt(player, stack).getPos()) == Blocks.AIR.getDefaultState())) {
-                return;
-            }
-            currentAnchor = lookingAt.getPos();
-            setAnchor(stack, currentAnchor);
-            setAnchorSide(stack, lookingAt.getFace());
-            player.sendStatusMessage(new StringTextComponent(TextFormatting.AQUA + new TranslationTextComponent("message.gadget.anchorrender").getUnformattedComponentText()), true);
-        } else {
-            setAnchor(stack, null);
-            setAnchorSide(stack, null);
-            player.sendStatusMessage(new StringTextComponent(TextFormatting.AQUA + new TranslationTextComponent("message.gadget.anchorremove").getUnformattedComponentText()), true);
-        }
+    @Override
+    protected void onAnchorRemoved(ItemStack stack, PlayerEntity player) {
+        super.onAnchorRemoved(stack, player);
+        setAnchorSide(stack, null);
     }
 
     public static IPositionPlacementSequence getClearingPositions(World world, BlockPos pos, Direction incomingSide, PlayerEntity player, ItemStack stack) {
         ItemStack tool = getGadget(player);
+        GadgetDestruction item = (GadgetDestruction) tool.getItem();
         int depth = getToolValue(stack, NBTKeys.GADGET_VALUE_DEPTH);
         if (tool.isEmpty() || depth == 0 || ! player.isAllowEdit())
             return CommonUtils.emptyPositionSequence();
 
         Region boundary = getClearingRegion(pos, incomingSide, player, stack);
-        BlockPos startPos = (getAnchor(stack) == null) ? pos : getAnchor(stack);
+        BlockPos startPos = (item.getAnchor(stack) == null) ? pos : item.getAnchor(stack);
         boolean fuzzy = ! Config.GADGETS.GADGET_DESTRUCTION.nonFuzzyEnabled.get() || AbstractGadget.getFuzzy(stack);
         BlockState stateTarget = fuzzy ? null : world.getBlockState(pos);
 
@@ -288,48 +257,20 @@ public class GadgetDestruction extends AbstractGadget {
 
     public void clearArea(World world, BlockPos pos, Direction side, ServerPlayerEntity player, ItemStack stack) {
         IPositionPlacementSequence positions = getClearingPositions(world, pos, side, player, stack);
-        RegionSnapshot snapshot;
-        try {
-            snapshot = RegionSnapshot.select(world, positions)
-                    .excludeAir()
-                    .checkBlocks((p, state) -> isAllowedBlock(state.getBlock()) && destroyBlock(world, p, player))
-                    .checkTiles((p, state, tile) -> state.getBlock() == OurBlocks.constructionBlock && tile instanceof ConstructionBlockTileEntity)
-                    .build();
-        } catch (PaletteOverflowException e) {
-            player.sendMessage(TooltipTranslation.GADGET_PALETTE_OVERFLOW.componentTranslation());
-            return;
+        Undo.Builder builder = Undo.builder();
+        for (BlockPos clearPos : positions) {
+            BlockState state = world.getBlockState(clearPos);
+            TileEntity te = world.getTileEntity(clearPos);
+            if (!isAllowedBlock(state.getBlock()))
+                continue;
+            if (te == null || state.getBlock() == OurBlocks.constructionBlock && te instanceof ConstructionBlockTileEntity) {
+                destroyBlock(world, clearPos, player, builder);
+            }
         }
-
-        WorldSave worldSave = WorldSave.getWorldSaveDestruction(world);
-        worldSave.addToMap(getUUID(stack).toString(), snapshot.serialize());
+        pushUndo(stack, builder.build(world.getDimension().getType()));
     }
 
-    public static void undo(PlayerEntity player, ItemStack stack) {
-        World world = player.world;
-        WorldSave worldSave = WorldSave.getWorldSaveDestruction(world);
-
-        CompoundNBT serializedSnapshot = worldSave.getCompoundFromUUID(getUUID(stack).toString());
-        if (serializedSnapshot.isEmpty())
-            return;
-
-        RegionSnapshot snapshot = RegionSnapshot.deserialize(serializedSnapshot);
-        restoreSnapshotWithBuilder(world, snapshot);
-        worldSave.addToMap(getUUID(stack).toString(), new CompoundNBT());
-        worldSave.markDirty();
-    }
-
-    public static void restoreSnapshotWithBuilder(World world, RegionSnapshot snapshot) {
-        Set<BlockPos> pastePositions = snapshot.getTileData().stream()
-                .map(Pair::getLeft)
-                .collect(Collectors.toSet());
-        int index = 0;
-        for (BlockPos pos : snapshot.getPositions()) {
-            snapshot.getBlockStates().get(index).ifPresent(state -> EffectBlock.spawnEffectBlock(world, pos, new BlockData(state, TileSupport.dummyTileEntityData()), EffectBlock.Mode.PLACE, pastePositions.contains(pos)));
-            index++;
-        }
-    }
-
-    private boolean destroyBlock(World world, BlockPos voidPos, ServerPlayerEntity player) {
+    private boolean destroyBlock(World world, BlockPos voidPos, ServerPlayerEntity player, Undo.Builder builder) {
         if (world.isAirBlock(voidPos))
             return false;
 
@@ -341,6 +282,7 @@ public class GadgetDestruction extends AbstractGadget {
             return false;
 
         this.applyDamage(tool, player);
+        builder.record(world, voidPos, BlockData.AIR, ImmutableMultiset.of(), ImmutableMultiset.of());
         EffectBlock.spawnEffectBlock(world, voidPos, TileSupport.createBlockData(world, voidPos), EffectBlock.Mode.REMOVE, false);
         return true;
     }

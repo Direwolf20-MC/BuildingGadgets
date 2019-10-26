@@ -15,25 +15,15 @@ public class Config {
     private static final String CATEGORY_GENERAL = "general";
 
     private static final String LANG_KEY_ROOT = "config." + Reference.MODID;
-
     private static final String LANG_KEY_GENERAL = LANG_KEY_ROOT + "." + CATEGORY_GENERAL;
-
     private static final String LANG_KEY_CHARGING_STATION = LANG_KEY_ROOT + ".charging";
-
     private static final String LANG_KEY_BLACKLIST = LANG_KEY_ROOT + ".blacklist";
-
     private static final String LANG_KEY_GADGETS = LANG_KEY_ROOT + ".gadgets";
-
     private static final String LANG_KEY_PASTE_CONTAINERS = LANG_KEY_ROOT + ".pasteContainers";
-
     private static final String LANG_KEY_PASTE_CONTAINERS_CAPACITY = LANG_KEY_PASTE_CONTAINERS + ".capacity";
-
     private static final String LANG_KEY_GADGET_BUILDING = LANG_KEY_GADGETS + ".gadgetBuilding";
-
     private static final String LANG_KEY_GADGET_EXCHANGER = LANG_KEY_GADGETS + ".gadgetExchanger";
-
     private static final String LANG_KEY_GADGET_DESTRUCTION = LANG_KEY_GADGETS + ".gadgetDestruction";
-
     private static final String LANG_KEY_GADGET_COPY_PASTE = LANG_KEY_GADGETS + ".gadgetCopyPaste";
 
     private static final Builder COMMON_BUILDER = new Builder();
@@ -41,11 +31,8 @@ public class Config {
     private static final Builder CLIENT_BUILDER = new Builder();
 
     public static final CategoryGeneral GENERAL = new CategoryGeneral();
-
     public static final CategoryChargingStation CHARGING_STATION = new CategoryChargingStation();
-
     public static final CategoryGadgets GADGETS = new CategoryGadgets();
-
     public static final CategoryPasteContainers PASTE_CONTAINERS = new CategoryPasteContainers();
 
     public static final class CategoryGeneral {
@@ -54,7 +41,6 @@ public class Config {
 
         /* Client Only!*/
         public final BooleanValue absoluteCoordDefault;
-
         public final BooleanValue allowOverwriteBlocks;
 
         private CategoryGeneral() {
@@ -84,17 +70,11 @@ public class Config {
 
     public static final class CategoryChargingStation {
         public final IntValue capacity;
-
         public final DoubleValue fuelUsage;
-
         public final IntValue energyPerTick;
-
         public final IntValue chargePerTick;
-
         public final IntValue maxRecieve;
-
         public final IntValue maxExtract;
-
         public final BooleanValue renderSphere;
 
         private CategoryChargingStation() {
@@ -135,13 +115,10 @@ public class Config {
     //No defense against reflection needed here (I think)
     public static final class CategoryGadgets {
         public final IntValue maxRange;
-
+        public final IntValue placeSteps;
         public final CategoryGadgetBuilding GADGET_BUILDING;
-
         public final CategoryGadgetExchanger GADGET_EXCHANGER;
-
         public final CategoryGadgetDestruction GADGET_DESTRUCTION;
-
         public final CategoryGadgetCopyPaste GADGET_COPY_PASTE;
 
         private CategoryGadgets() {
@@ -152,10 +129,19 @@ public class Config {
                     .translation(LANG_KEY_GADGETS + ".maxRange")
                     .defineInRange("Maximum allowed Range", 15, 1, 32);
 
-            GADGET_BUILDING = new CategoryGadgetBuilding();
-            GADGET_EXCHANGER = new CategoryGadgetExchanger();
-            GADGET_DESTRUCTION = new CategoryGadgetDestruction();
-            GADGET_COPY_PASTE = new CategoryGadgetCopyPaste();
+            placeSteps = SERVER_BUILDER
+                    .comment("Maximum amount of Blocks to be placed in one Tick.",
+                            "Notice that an EffectBlock takes 20 ticks to place, therefore a Server has to handle 20-times this value effect-block Tile's at once. " +
+                                    "Reduce this if  you notice lag-spikes from Players placing Templates.",
+                            "Of course decreasing this value will result in more time required to place large TemplateItem's.")
+                    .translation(LANG_KEY_GADGET_COPY_PASTE + ".place_steps")
+                    //use the old cap as the synchronous border... This implies that 32*32*32 areas are the max size for a synchronous copy by default
+                    .defineInRange("Max Placement/Tick", 1024, 1, Integer.MAX_VALUE);
+
+            GADGET_BUILDING     = new CategoryGadgetBuilding();
+            GADGET_EXCHANGER    = new CategoryGadgetExchanger();
+            GADGET_DESTRUCTION  = new CategoryGadgetDestruction();
+            GADGET_COPY_PASTE   = new CategoryGadgetCopyPaste();
 
             COMMON_BUILDER.pop();
             SERVER_BUILDER.pop();
@@ -175,18 +161,25 @@ public class Config {
                     .defineInRange("Energy Cost", defaultValue, 0, Integer.MAX_VALUE);
         }
 
+        private static IntValue getMaxUndoSize(int defaultValue) {
+            return SERVER_BUILDER
+                    .comment("The Gadget'S Max Undo size")
+                    .translation(LANG_KEY_GADGETS + ".undo_size")
+                    .defineInRange("Max Undo History Size", defaultValue, 0, 128);
+        }
+
         public static final class CategoryGadgetBuilding {
 
             public final IntValue maxEnergy;
-
             public final IntValue energyCost;
+            public final IntValue undoSize;
 
             private CategoryGadgetBuilding() {
                 SERVER_BUILDER.comment("Energy Cost & Durability of the Building Gadget")/*.translation(LANG_KEY_GADGET_BUILDING)*/.push("Building Gadget");
 
-                maxEnergy = getMaxEnergy(500000);
-
-                energyCost = getEnergyCost(50);
+                maxEnergy    = getMaxEnergy(500000);
+                energyCost   = getEnergyCost(50);
+                undoSize     = getMaxUndoSize(10);
 
                 SERVER_BUILDER.pop();
             }
@@ -195,15 +188,15 @@ public class Config {
         public static final class CategoryGadgetExchanger {
 
             public final IntValue maxEnergy;
-
             public final IntValue energyCost;
+            public final IntValue undoSize;
 
             private CategoryGadgetExchanger() {
                 SERVER_BUILDER.comment("Energy Cost & Durability of the Exchanging Gadget")/*.translation(LANG_KEY_GADGET_EXCHANGER)*/.push("Exchanging Gadget");
 
-                maxEnergy = getMaxEnergy(500000);
-
-                energyCost = getEnergyCost(100);
+                maxEnergy   = getMaxEnergy(500000);
+                energyCost  = getEnergyCost(100);
+                undoSize    = getMaxUndoSize(10);
 
                 SERVER_BUILDER.pop();
             }
@@ -212,19 +205,23 @@ public class Config {
         public static final class CategoryGadgetDestruction {
 
             public final IntValue maxEnergy;
-
             public final IntValue energyCost;
-
+            public final IntValue undoSize;
+            public final IntValue destroySize;
             public final DoubleValue nonFuzzyMultiplier;
-
             public final BooleanValue nonFuzzyEnabled;
 
             private CategoryGadgetDestruction() {
                 SERVER_BUILDER.comment("Energy Cost, Durability & Maximum Energy of the Destruction Gadget")/*.translation(LANG_KEY_GADGET_DESTRUCTION)*/.push("Destruction Gadget");
 
-                maxEnergy = getMaxEnergy(1000000);
+                maxEnergy   = getMaxEnergy(1000000);
+                energyCost  = getEnergyCost(200);
+                undoSize    = getMaxUndoSize(1);
 
-                energyCost = getEnergyCost(200);
+                destroySize = SERVER_BUILDER
+                        .comment("The maximum dimensions, the Destruction Gadget can destroy.")
+                        .translation(LANG_KEY_GADGET_DESTRUCTION + ".destroy_size")
+                        .defineInRange("Destroy Dimensions", 16, 0, 32);
 
                 nonFuzzyMultiplier = SERVER_BUILDER
                         .comment("The cost in energy/durability will increase by this amount when not in fuzzy mode")
@@ -245,16 +242,37 @@ public class Config {
         public static final class CategoryGadgetCopyPaste {
 
             public final IntValue maxEnergy;
-
             public final IntValue energyCost;
-
+            public final IntValue undoSize;
+            public final IntValue copySteps;
+            public final IntValue maxCopySize;
+            public final IntValue maxBuildSize;
 
             private CategoryGadgetCopyPaste() {
                 SERVER_BUILDER.comment("Energy Cost & Durability of the Copy-Paste Gadget")/*.translation(LANG_KEY_GADGET_COPY_PASTE)*/.push("Copy-Paste Gadget");
 
-                maxEnergy = getMaxEnergy(500000);
+                maxEnergy   = getMaxEnergy(500000);
+                energyCost  = getEnergyCost(50);
+                undoSize    = getMaxUndoSize(1);
 
-                energyCost = getEnergyCost(50);
+                copySteps = SERVER_BUILDER
+                        .comment("Maximum amount of Blocks to be copied in one Tick. ",
+                                "Lower values may improve Server-Performance when copying large Templates")
+                        .translation(LANG_KEY_GADGET_COPY_PASTE + ".copy_steps")
+                        //use the old cap as the per tick border... This implies that 32*32*32 areas are the max size for a one tick copy by default
+                        .defineInRange("Max Copy/Tick", 32768, 1, Integer.MAX_VALUE);
+
+                maxCopySize = SERVER_BUILDER
+                        .comment("Maximum dimensions (x, y and z) that can be copied by a Template without requiring special permission.",
+                                "Permission can be granted using the '/buildinggadgets OverrideCopySize [<Player>]' command.")
+                        .translation(LANG_KEY_GADGET_COPY_PASTE + ".max_copy")
+                        .defineInRange("Max Copy Dimensions", 256, - 1, Integer.MAX_VALUE);
+
+                maxBuildSize = SERVER_BUILDER
+                        .comment("Maximum dimensions (x, y and z) that can be build by a Template without requiring special permission.",
+                                "Permission can be granted using the '/buildinggadgets OverrideBuildSize [<Player>]' command.")
+                        .translation(LANG_KEY_GADGET_COPY_PASTE + ".max_build")
+                        .defineInRange("Max Build Dimensions", 256, - 1, Integer.MAX_VALUE);
 
                 SERVER_BUILDER.pop();
             }

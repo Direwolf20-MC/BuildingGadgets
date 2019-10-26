@@ -1,30 +1,36 @@
 package com.direwolf20.buildinggadgets.common.util;
 
-import com.direwolf20.buildinggadgets.api.building.BlockData;
+import com.direwolf20.buildinggadgets.client.events.EventTooltip;
+import com.direwolf20.buildinggadgets.common.building.BlockData;
+import com.direwolf20.buildinggadgets.common.building.modes.BuildingMode;
+import com.direwolf20.buildinggadgets.common.building.modes.ExchangingMode;
+import com.direwolf20.buildinggadgets.common.capability.CapabilityTemplate;
+import com.direwolf20.buildinggadgets.common.config.Config;
+import com.direwolf20.buildinggadgets.common.inventory.InventoryHelper;
 import com.direwolf20.buildinggadgets.common.items.InventoryWrapper;
 import com.direwolf20.buildinggadgets.common.items.gadgets.AbstractGadget;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetBuilding;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetExchanger;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketRotateMirror;
-import com.direwolf20.buildinggadgets.common.registry.OurBlocks;
+import com.direwolf20.buildinggadgets.common.template.Template;
+import com.direwolf20.buildinggadgets.common.template.TemplateHeader;
 import com.direwolf20.buildinggadgets.common.tiles.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.util.exceptions.CapabilityNotPresentException;
-import com.direwolf20.buildinggadgets.common.util.helpers.InventoryHelper;
 import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
 import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
+import com.direwolf20.buildinggadgets.common.util.lang.MessageTranslation;
+import com.direwolf20.buildinggadgets.common.util.lang.Styles;
+import com.direwolf20.buildinggadgets.common.util.lang.TooltipTranslation;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.util.tools.NetworkIO;
 import com.direwolf20.buildinggadgets.common.util.tools.UndoState;
 import com.direwolf20.buildinggadgets.common.util.tools.UniqueItem;
-import com.direwolf20.buildinggadgets.common.util.tools.modes.BuildingMode;
-import com.direwolf20.buildinggadgets.common.util.tools.modes.ExchangingMode;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multiset;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
@@ -37,6 +43,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
 import net.minecraft.util.Direction.Axis;
 import net.minecraft.util.math.*;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
@@ -55,6 +62,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class GadgetUtils {
     private static final ImmutableList<String> LINK_STARTS = ImmutableList.of("http","www");
@@ -65,6 +73,22 @@ public class GadgetUtils {
 
     public static String getStackErrorSuffix(ItemStack stack) {
         return getStackErrorText(stack) + " with NBT tag: " + stack.getTag();
+    }
+
+    public static void addTooltipNameAndAuthor(ItemStack stack, @Nullable World world, List<ITextComponent> tooltip) {
+        if (world != null) {
+            world.getCapability(CapabilityTemplate.TEMPLATE_PROVIDER_CAPABILITY).ifPresent(provider -> {
+                stack.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(key -> {
+                    Template template = provider.getTemplateForKey(key);
+                    TemplateHeader header = template.getHeader();
+                    if (header.getName() != null && ! header.getName().isEmpty())
+                        tooltip.add(TooltipTranslation.TEMPLATE_NAME.componentTranslation(header.getName()).setStyle(Styles.AQUA));
+                    if (header.getAuthor() != null && ! header.getAuthor().isEmpty())
+                        tooltip.add(TooltipTranslation.TEMPLATE_AUTHOR.componentTranslation(header.getAuthor()).setStyle(Styles.AQUA));
+                });
+            });
+        }
+        EventTooltip.addTemplatePadding(stack, tooltip);
     }
 
     private static String getStackErrorText(ItemStack stack) {
@@ -229,7 +253,7 @@ public class GadgetUtils {
         return data.rotate(Rotation.CLOCKWISE_90);
     }
 
-    public static void rotateOrMirrorToolBlock(ItemStack stack, ServerPlayerEntity player, PacketRotateMirror.Operation operation) {
+    public static void rotateOrMirrorToolBlock(ItemStack stack, PlayerEntity player, PacketRotateMirror.Operation operation) {
         setToolBlock(stack, rotateOrMirrorBlock(player, operation, getToolBlock(stack)));
         setToolActualBlock(stack, rotateOrMirrorBlock(player, operation, getToolActualBlock(stack)));
     }
@@ -300,15 +324,14 @@ public class GadgetUtils {
         BlockState state = world.getBlockState(lookingAt.getPos());
         if (! ((AbstractGadget) stack.getItem()).isAllowedBlock(state.getBlock(), player))
             return;
-        BlockData placeState = InventoryHelper.getSpecificStates(state, world, player, lookingAt.getPos(), stack);
-        if (state.getBlock() == OurBlocks.constructionBlock) {
-            TileEntity te = world.getTileEntity(lookingAt.getPos());
-            if (te instanceof ConstructionBlockTileEntity) {
-                placeState = ((ConstructionBlockTileEntity) te).getConstructionBlockData();
-            }
-        }
-        setToolBlock(stack, placeState);
-        setToolActualBlock(stack, placeState);
+        Optional<BlockData> data = InventoryHelper.getSafeBlockData(player, lookingAt.getPos(), player.getActiveHand());
+        data.ifPresent(placeState -> {
+            BlockState actualState = placeState.getState().getExtendedState(world, lookingAt.getPos());
+
+            setToolBlock(stack, placeState);
+            setToolActualBlock(stack, new BlockData(actualState, placeState.getTileData()));
+        });
+
     }
 
     public static ActionResultType setRemoteInventory(ItemStack stack, PlayerEntity player, World world, BlockPos pos, boolean setTool) {
@@ -350,10 +373,10 @@ public class GadgetUtils {
                         .collectPlacementPos(world, player, startBlock, sideHit, stack, startBlock); // Build the positions list based on tool mode and range
             }
             setAnchor(stack, coords); //Set the anchor NBT
-            player.sendStatusMessage(new StringTextComponent(TextFormatting.AQUA + new TranslationTextComponent("message.gadget.anchorrender").getUnformattedComponentText()), true);
+            player.sendStatusMessage(MessageTranslation.ANCHOR_SET.componentTranslation().setStyle(Styles.AQUA), true);
         } else {  //If theres already an anchor, remove it.
             setAnchor(stack, new ArrayList<BlockPos>());
-            player.sendStatusMessage(new StringTextComponent(TextFormatting.AQUA + new TranslationTextComponent("message.gadget.anchorremove").getUnformattedComponentText()), true);
+            player.sendStatusMessage(MessageTranslation.ANCHOR_REMOVED.componentTranslation().setStyle(Styles.AQUA), true);
         }
         return true;
     }
@@ -477,14 +500,12 @@ public class GadgetUtils {
 
     @Nullable
     public static BlockPos getPOSFromNBT(ItemStack stack, String tagName) {
-        CompoundNBT tagCompound = stack.getTag();
-        if (tagCompound == null) {
+        CompoundNBT stackTag = NBTHelper.getOrNewTag(stack);
+        if (! stackTag.contains(tagName))
             return null;
-        }
-        CompoundNBT posTag = tagCompound.getCompound(tagName);
-        if (posTag.equals(new CompoundNBT())) {
+        CompoundNBT posTag = NBTHelper.getOrNewTag(stack).getCompound(tagName);
+        if (posTag.isEmpty())
             return null;
-        }
         return NBTUtil.readBlockPos(posTag);
     }
 

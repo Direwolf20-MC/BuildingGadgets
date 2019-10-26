@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.common.util.tools;
 
-import com.direwolf20.buildinggadgets.common.util.helpers.InventoryHelper;
+import com.direwolf20.buildinggadgets.common.inventory.InventoryHelper;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.google.common.base.Preconditions;
 import net.minecraft.block.BlockState;

@@ -1,10 +1,12 @@
 package com.direwolf20.buildinggadgets.common.util.helpers;
 
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
+import com.google.common.collect.Multiset;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.*;
+import net.minecraft.util.Tuple;
 
 import javax.annotation.Nonnull;
 import java.util.*;
@@ -318,11 +320,11 @@ public class NBTHelper {
         return res;
     }
 
-    public static <V, T extends INBT> List<V> readList(CollectionNBT<T> list, Function<? super T, ? extends V> deserializer) {
+    public static <V, T extends INBT> List<V> deserializeList(CollectionNBT<T> list, Function<? super T, ? extends V> deserializer) {
         return list.stream().map(deserializer).collect(Collectors.toList());
     }
 
-    public static <V, T extends INBT> List<V> readList(CollectionNBT<T> list, BiFunction<? super T, Integer, ? extends V> deserializer) {
+    public static <V, T extends INBT> List<V> deserializeList(CollectionNBT<T> list, BiFunction<? super T, Integer, ? extends V> deserializer) {
         List<V> res = new ArrayList<>(list.size());
         int index = 0;
         for (T element : list) {
@@ -343,6 +345,17 @@ public class NBTHelper {
         return list;
     }
 
+    public static <V> ListNBT serializeUUIDMap(Map<UUID, V> map, Function<? super V, ? extends INBT> valueSerializer) {
+        ListNBT list = new ListNBT();
+        for (Map.Entry<UUID, V> entry : map.entrySet()) {
+            CompoundNBT compound = new CompoundNBT();
+            compound.putUniqueId(NBTKeys.MAP_SERIALIZE_KEY, entry.getKey());
+            compound.put(NBTKeys.MAP_SERIALIZE_VALUE, valueSerializer.apply(entry.getValue()));
+            list.add(compound);
+        }
+        return list;
+    }
+
     public static <K, V> Map<K, V> deserializeMap(ListNBT list, Map<K, V> toAppendTo, Function<INBT, ? extends K> keyDeserializer, Function<INBT, ? extends V> valueDeserializer) {
         for (INBT nbt : list) {
             if (nbt instanceof CompoundNBT) {
@@ -356,18 +369,28 @@ public class NBTHelper {
         return toAppendTo;
     }
 
-    public static <T> ListNBT serializeSet(Set<T> set, Function<? super T, ? extends INBT> elementSerializer) {
-        ListNBT list = new ListNBT();
-        for (T element : set) {
-            list.add(elementSerializer.apply(element));
+    public static <V> Map<UUID, V> deserializeUUIDMap(ListNBT list, Map<UUID, V> toAppendTo, Function<INBT, ? extends V> valueDeserializer) {
+        for (INBT nbt : list) {
+            if (nbt instanceof CompoundNBT) {
+                CompoundNBT compound = (CompoundNBT) nbt;
+                toAppendTo.put(
+                        compound.getUniqueId(NBTKeys.MAP_SERIALIZE_KEY),
+                        valueDeserializer.apply(compound.get(NBTKeys.MAP_SERIALIZE_VALUE))
+                );
+            }
         }
-        return list;
+        return toAppendTo;
     }
 
-    public static <T> Set<T> deserializeSet(ListNBT list, Set<T> toAppendTo, Function<INBT, ? extends T> elementDeserializer) {
+    public static <T, C extends Collection<T>> C deserializeCollection(ListNBT list, C toAppendTo, Function<INBT, ? extends T> elementDeserializer) {
         for (INBT nbt : list) {
             toAppendTo.add(elementDeserializer.apply(nbt));
         }
+        return toAppendTo;
+    }
+
+    public static <T> Multiset<T> deserializeMultisetEntries(ListNBT list, Multiset<T> toAppendTo, Function<INBT, Tuple<? extends T, Integer>> entryDeserializer) {
+        list.stream().map(entryDeserializer).forEach(p -> toAppendTo.add(p.getA(), p.getB()));
         return toAppendTo;
     }
 

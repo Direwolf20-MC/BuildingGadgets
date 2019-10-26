@@ -1,8 +1,10 @@
 package com.direwolf20.buildinggadgets.common.world;
 
-import com.direwolf20.buildinggadgets.api.building.BlockData;
-import com.direwolf20.buildinggadgets.api.building.view.IBuildContext;
-import com.direwolf20.buildinggadgets.api.building.view.SimpleBuildContext;
+import com.direwolf20.buildinggadgets.common.BuildingGadgets;
+import com.direwolf20.buildinggadgets.common.building.BlockData;
+import com.direwolf20.buildinggadgets.common.building.view.IBuildContext;
+import com.direwolf20.buildinggadgets.common.building.view.SimpleBuildContext;
+import com.google.common.base.Preconditions;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -35,18 +37,21 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.function.Predicate;
 
 @MethodsReturnNonnullByDefault
 public class FakeDelegationWorld implements IWorld {
-    private final IWorld world;
-    private Map<BlockPos, BlockState> posToState;
-    private Map<BlockPos, TileEntity> posToTile;
+    private final IWorld delegate;
+    private Map<BlockPos, BlockInfo> posToBlock;
 
-    public FakeDelegationWorld(IWorld world) {
-        this.world = Objects.requireNonNull(world);
-        posToState = new HashMap<>();
-        posToTile = new HashMap<>();
+    public FakeDelegationWorld(IWorld delegate) {
+        this.delegate = Objects.requireNonNull(delegate);
+        posToBlock = new HashMap<>();
+    }
+
+    public Set<Entry<BlockPos, BlockInfo>> entrySet() {
+        return Collections.unmodifiableSet(posToBlock.entrySet());
     }
 
     public void addBlock(@Nonnull BlockPos pos, BlockData data) {
@@ -59,7 +64,7 @@ public class FakeDelegationWorld implements IWorld {
     }
 
     public IWorld getDelegate() {
-        return world;
+        return delegate;
     }
 
     @Override
@@ -79,48 +84,38 @@ public class FakeDelegationWorld implements IWorld {
 
     @Override
     public List<Entity> getEntitiesInAABBexcluding(@Nullable Entity entity, AxisAlignedBB axisAlignedBB, @Nullable Predicate<? super Entity> predicate) {
-        return null;
+        return new ArrayList<>();
     }
 
     @Override
     public <T extends Entity> List<T> getEntitiesWithinAABB(Class<? extends T> aClass, AxisAlignedBB axisAlignedBB, @Nullable Predicate<? super T> predicate) {
-        return null;
+        return new ArrayList<>();
     }
 
     @Override
     public List<? extends PlayerEntity> getPlayers() {
-        return null;
+        return new ArrayList<>();
     }
 
     @Nullable
     @Override
     public IChunk getChunk(int p_217353_1_, int p_217353_2_, ChunkStatus p_217353_3_, boolean p_217353_4_) {
-        return null;
+        return getChunk(p_217353_1_, p_217353_2_);
     }
 
     @Override
     public BlockPos getHeight(Type heightmapType, BlockPos pos) {
-        return null;
+        return getDelegate().getHeight(heightmapType, pos);
     }
 
     @Override
     public boolean removeBlock(BlockPos blockPos, boolean b) {
-        return false;
+        return removeOverride(blockPos);
     }
 
     @Override
     public boolean hasBlockState(BlockPos p_217375_1_, Predicate<BlockState> p_217375_2_) {
-        return false;
-    }
-
-    @Nullable
-    private BlockState getOverriddenState(BlockPos pos) {
-        return posToState.get(pos);
-    }
-
-    @Nullable
-    private TileEntity getOverriddenTile(BlockPos pos) {
-        return posToTile.get(pos);
+        return p_217375_2_.test(getBlockState(p_217375_1_));
     }
 
     /**
@@ -128,7 +123,7 @@ public class FakeDelegationWorld implements IWorld {
      */
     @Override
     public long getSeed() {
-        return world.getSeed();
+        return delegate.getSeed();
     }
 
     /**
@@ -136,7 +131,7 @@ public class FakeDelegationWorld implements IWorld {
      */
     @Override
     public float getCurrentMoonPhaseFactor() {
-        return world.getCurrentMoonPhaseFactor();
+        return delegate.getCurrentMoonPhaseFactor();
     }
 
     /**
@@ -144,23 +139,23 @@ public class FakeDelegationWorld implements IWorld {
      */
     @Override
     public float getCelestialAngle(float partialTicks) {
-        return world.getCelestialAngle(partialTicks);
+        return delegate.getCelestialAngle(partialTicks);
     }
 
     @Override
     @OnlyIn(Dist.CLIENT)
     public int getMoonPhase() {
-        return world.getMoonPhase();
+        return delegate.getMoonPhase();
     }
 
     @Override
     public ITickList<Block> getPendingBlockTicks() {
-        return world.getPendingBlockTicks();
+        return delegate.getPendingBlockTicks();
     }
 
     @Override
     public ITickList<Fluid> getPendingFluidTicks() {
-        return world.getPendingFluidTicks();
+        return delegate.getPendingFluidTicks();
     }
 
     /**
@@ -168,12 +163,12 @@ public class FakeDelegationWorld implements IWorld {
      */
     @Override
     public IChunk getChunk(int chunkX, int chunkZ) {
-        return world.getChunk(chunkX, chunkZ);
+        return delegate.getChunk(chunkX, chunkZ);
     }
 
     @Override
     public World getWorld() {
-        return world.getWorld();
+        return delegate.getWorld();
     }
 
     /**
@@ -181,17 +176,17 @@ public class FakeDelegationWorld implements IWorld {
      */
     @Override
     public WorldInfo getWorldInfo() {
-        return world.getWorldInfo();
+        return delegate.getWorldInfo();
     }
 
     @Override
     public DifficultyInstance getDifficultyForLocation(BlockPos pos) {
-        return world.getDifficultyForLocation(pos);
+        return delegate.getDifficultyForLocation(pos);
     }
 
     @Override
     public Difficulty getDifficulty() {
-        return world.getDifficulty();
+        return delegate.getDifficulty();
     }
 
     /**
@@ -199,13 +194,13 @@ public class FakeDelegationWorld implements IWorld {
      */
     @Override
     public AbstractChunkProvider getChunkProvider() {
-        return world.getChunkProvider();
+        return delegate.getChunkProvider();
     }
 
 
     @Override
     public Random getRandom() {
-        return world.getRandom();
+        return delegate.getRandom();
     }
 
     @Override
@@ -221,7 +216,7 @@ public class FakeDelegationWorld implements IWorld {
      */
     @Override
     public BlockPos getSpawnPoint() {
-        return world.getSpawnPoint();
+        return delegate.getSpawnPoint();
     }
 
 
@@ -236,60 +231,58 @@ public class FakeDelegationWorld implements IWorld {
 
     @Override
     public Biome getBiome(BlockPos pos) {
-        return world.getBiome(pos);
+        return delegate.getBiome(pos);
     }
 
     @Override
     public int getLightFor(LightType type, BlockPos pos) {
-        return world.getLightFor(type, pos);
+        return delegate.getLightFor(type, pos);
     }
 
     @Override
     public int getLightSubtracted(BlockPos pos, int amount) {
-        return world.getLightSubtracted(pos, amount);
+        return delegate.getLightSubtracted(pos, amount);
     }
 
 
     @Override
     public int getHeight(Heightmap.Type heightmapType, int x, int z) {
-        return world.getHeight(heightmapType, x, z);
+        return delegate.getHeight(heightmapType, x, z);
     }
-
-
 
     @Override
     public int getSkylightSubtracted() {
-        return world.getSkylightSubtracted();
+        return delegate.getSkylightSubtracted();
     }
 
     @Override
     public WorldBorder getWorldBorder() {
-        return world.getWorldBorder();
+        return delegate.getWorldBorder();
     }
 
     @Override
     public boolean checkNoEntityCollision(@Nullable Entity entityIn, VoxelShape shape) {
-        return world.checkNoEntityCollision(entityIn, shape);
+        return delegate.checkNoEntityCollision(entityIn, shape);
     }
 
     @Override
     public int getStrongPower(BlockPos pos, Direction direction) {
-        return world.getStrongPower(pos, direction);
+        return delegate.getStrongPower(pos, direction);
     }
 
     @Override
     public boolean isRemote() {
-        return world.isRemote();
+        return delegate.isRemote();
     }
 
     @Override
     public int getSeaLevel() {
-        return world.getSeaLevel();
+        return delegate.getSeaLevel();
     }
 
     @Override
     public Dimension getDimension() {
-        return world.getDimension();
+        return delegate.getDimension();
     }
 
     @Override
@@ -297,21 +290,10 @@ public class FakeDelegationWorld implements IWorld {
     public TileEntity getTileEntity(BlockPos pos) {
         if (World.isOutsideBuildHeight(pos))
             return null;
-        TileEntity tile = getOverriddenTile(pos);
-        if (tile != null) return tile;
-        BlockState state = getOverriddenState(pos);
-        if (state != null) {
-            if (! state.hasTileEntity())
-                return null; //if it's overridden, but does not have a tile... well then there is no tile
-            tile = state.createTileEntity(this);
-            if (tile != null) {
-                tile.setPos(pos);
-                //tile.setWorld(getWorld());
-                posToTile.put(pos, tile);
-                return tile;
-            }
-        }
-        return world.getTileEntity(pos);
+        BlockInfo info = getOverriddenBlock(pos);
+        if (info != null)
+            return info.getEntity(this);
+        return delegate.getTileEntity(pos);
     }
 
     @Override
@@ -319,7 +301,7 @@ public class FakeDelegationWorld implements IWorld {
         if (World.isOutsideBuildHeight(pos))
             return Blocks.VOID_AIR.getDefaultState();
         BlockState state = getOverriddenState(pos);
-        return state != null ? state : world.getBlockState(pos);
+        return state != null ? state : delegate.getBlockState(pos);
     }
 
     @Override
@@ -329,7 +311,7 @@ public class FakeDelegationWorld implements IWorld {
 
     @Override
     public int getMaxLightLevel() {
-        return world.getMaxLightLevel();
+        return delegate.getMaxLightLevel();
     }
 
     /**
@@ -347,17 +329,13 @@ public class FakeDelegationWorld implements IWorld {
     public boolean setBlockState(BlockPos pos, BlockState newState, int flags) {
         if (World.isOutsideBuildHeight(pos))
             return false;
-        posToState.put(pos, newState);
+        BlockInfo info = getOverriddenBlock(pos);
+        if (info != null) {
+            info.setState(newState);
+        } else
+            posToBlock.put(pos, createInfo(pos, newState));
         return true;
     }
-
-
-
-//    fixme: removed in 1.14?
-//    @Override
-//    public void setLightFor(LightType type, BlockPos pos, int lightValue) {
-//        world.setLightFor(type, pos, lightValue);
-//    }
 
     /**
      * Sets a block to air, but also plays the sound and particles and can spawn drops
@@ -366,5 +344,105 @@ public class FakeDelegationWorld implements IWorld {
     public boolean destroyBlock(BlockPos pos, boolean dropBlock) {
         // adapted from World
         return ! this.getBlockState(pos).isAir(this, pos) && removeBlock(pos, true);
+    }
+
+    //-------------------Extra Methods--------------------
+
+    @Nullable
+    public BlockInfo getOverriddenBlock(BlockPos pos) {
+        return posToBlock.get(pos);
+    }
+
+    @Nullable
+    public BlockState getOverriddenState(BlockPos pos) {
+        BlockInfo info = getOverriddenBlock(pos);
+        return info != null ? info.getState() : null;
+    }
+
+    @Nullable
+    public TileEntity getOverriddenTile(BlockPos pos) {
+        BlockInfo info = getOverriddenBlock(pos);
+        return info != null ? info.getEntity(this) : null;
+    }
+
+    public void clear() {
+        posToBlock.clear();
+    }
+
+    public boolean removeOverride(BlockPos pos) {
+        BlockInfo info = posToBlock.remove(pos);
+        if (info != null) {
+            info.onRemove();
+            return true;
+        }
+        return false;
+    }
+
+    protected BlockInfo createInfo(BlockPos pos, BlockState state) {
+        return new BlockInfo(pos, state);
+    }
+
+    public static class BlockInfo {
+        private BlockPos pos;
+        private BlockState state;
+        @Nullable
+        private TileEntity entity;
+
+        public BlockInfo(BlockPos pos, BlockState state) {
+            this.pos = Objects.requireNonNull(pos);
+            this.state = Objects.requireNonNull(state);
+        }
+
+        public BlockPos getPos() {
+            return pos;
+        }
+
+        public BlockInfo setPos(BlockPos pos) {
+            this.pos = Objects.requireNonNull(pos);
+            return this;
+        }
+
+        public BlockState getState() {
+            return state;
+        }
+
+        public BlockInfo setState(BlockState state) {
+            Preconditions.checkNotNull(state);
+            if (this.state.getBlock() != state.getBlock() || ! state.hasTileEntity()) {
+                onRemove();
+            }
+            this.state = state;
+            return this;
+        }
+
+        @Nullable
+        public TileEntity getEntity(IWorld world) {
+            if (entity == null && state.hasTileEntity()) {
+                try {
+                    entity = state.createTileEntity(world);
+                    if (entity != null) {
+                        entity.setPos(pos);
+                        //if we pass our wrapped world down to this, it will cause it to determine an errornous blockstate...
+                        //we'd need to reflect into the te...
+                        entity.setWorld(null);
+                        entity.onLoad();
+                    }
+                } catch (Exception e) {
+                    BuildingGadgets.LOG.debug("Tile Entity at {} with state {} threw exception whilst creating.", pos, state, e);
+                }
+            }
+            return entity;
+        }
+
+        public void onRemove() {
+            if (entity != null) {
+                try {
+                    entity.remove();
+                } catch (Exception e) {
+                    BuildingGadgets.LOG.debug("Tile Entity at {} with state {} threw exception whilst removing.", pos, state, e);
+                }
+                entity = null;
+            }
+        }
     }
 }

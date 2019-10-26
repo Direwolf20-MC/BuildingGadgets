@@ -1,6 +1,7 @@
 package com.direwolf20.buildinggadgets.common.items.gadgets.renderers;
 
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
+import com.direwolf20.buildinggadgets.common.items.gadgets.AbstractGadget;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetDestruction;
 import com.direwolf20.buildinggadgets.common.registry.OurBlocks;
 import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
@@ -8,7 +9,6 @@ import com.direwolf20.buildinggadgets.common.util.tools.UniqueItemStack;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.mojang.blaze3d.platform.GlStateManager;
-import net.minecraft.block.BlockState;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GLAllocation;
 import net.minecraft.client.renderer.Tessellator;
@@ -26,6 +26,7 @@ import net.minecraftforge.client.event.RenderWorldLastEvent;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.commons.lang3.tuple.Triple;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL14;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -41,10 +42,11 @@ public class DestructionRender extends BaseRenderer {
 
         BlockRayTraceResult lookingAt = VectorHelper.getLookingAt(player, heldItem);
         World world = player.world;
-        if ((lookingAt == null || (world.getBlockState(VectorHelper.getLookingAt(player, heldItem).getPos()) == AIR)) && GadgetDestruction.getAnchor(heldItem) == null)
+        BlockPos anchor = ((AbstractGadget) heldItem.getItem()).getAnchor(heldItem);
+        if ((lookingAt == null || (world.getBlockState(VectorHelper.getLookingAt(player, heldItem).getPos()) == AIR)) && anchor == null)
             return;
 
-        BlockPos startBlock = (GadgetDestruction.getAnchor(heldItem) == null) ? lookingAt.getPos() : GadgetDestruction.getAnchor(heldItem);
+        BlockPos startBlock = (anchor == null) ? lookingAt.getPos() : anchor;
         Direction facing = (GadgetDestruction.getAnchorSide(heldItem) == null) ? lookingAt.getFace() : GadgetDestruction.getAnchorSide(heldItem);
 
         if (world.getBlockState(startBlock) == OurBlocks.effectBlock.getDefaultState())
@@ -81,33 +83,18 @@ public class DestructionRender extends BaseRenderer {
 
         Tessellator t = Tessellator.getInstance();
         BufferBuilder bufferBuilder = t.getBuffer();
-
+        bufferBuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
+        GlStateManager.alphaFunc(GL11.GL_GREATER, 0.0001F);
+        GlStateManager.disableTexture();
+        GlStateManager.depthMask(false);
+        GL14.glBlendColor(1F, 1F, 1F, 0.3f); //Set the alpha of the blocks we are rendering
         for (BlockPos coordinate : GadgetDestruction.getClearingPositionsForRendering(world, startBlock, facing, player, heldItem)) {
-            boolean invisible = true;
-            BlockState state = world.getBlockState(coordinate);
-            for (Direction side : Direction.values()) {
-                if (!state.isSideInvisible(state, side)) {
-                    invisible = false;
-                    break;
-                }
-            }
-            if (invisible) continue;
-
-            GlStateManager.pushMatrix();//Push matrix again just because
-            GlStateManager.translatef(coordinate.getX(), coordinate.getY(), coordinate.getZ());//Now move the render position to the coordinates we want to render at
-            GlStateManager.rotatef(-90.0F, 0.0F, 1.0F, 0.0F); //Rotate it because i'm not sure why but we need to
-            GlStateManager.translatef(-0.005f, -0.005f, 0.005f);
-            GlStateManager.scalef(1.01f, 1.01f, 1.01f);//Slightly Larger block to avoid z-fighting.
-
-            GlStateManager.disableLighting();
-            GlStateManager.disableTexture();
-            //renderBoxSolid(t, bufferBuilder, a.getX(), a.getY(), a.getZ()+1, b.getX()+1, b.getY()+1, b.getZ()+1, 1, 1, 1);
-            renderBoxSolid(t, bufferBuilder, 0, 0, -1, 1, 1, 0, 1, 0, 0, 0.5f);
-            GlStateManager.enableTexture();
-            GlStateManager.enableLighting();
-            //Move the render position back to where it was
-            GlStateManager.popMatrix();
+            renderMissingBlock(bufferBuilder, coordinate);
         }
+        Tessellator.getInstance().draw();
+        GlStateManager.depthMask(true);
+        GlStateManager.enableTexture();
+        GL14.glBlendColor(1F, 1F, 1F, 1f); //Set the alpha of the blocks we are rendering
         //Set blending back to the default mode
         GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
         ForgeHooksClient.setRenderLayer(MinecraftForgeClient.getRenderLayer());
@@ -117,44 +104,4 @@ public class DestructionRender extends BaseRenderer {
         GlStateManager.popMatrix();
     }
 
-    private static void renderBoxSolid(Tessellator tessellator, BufferBuilder bufferBuilder, double startX, double startY, double startZ, double endX, double endY, double endZ, float red, float green, float blue, float alpha) {
-        bufferBuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
-
-        //down
-        bufferBuilder.pos(startX, startY, startZ).color(red, green, blue, alpha).endVertex();
-        bufferBuilder.pos(endX, startY, startZ).color(red, green, blue, alpha).endVertex();
-        bufferBuilder.pos(endX, startY, endZ).color(red, green, blue, alpha).endVertex();
-        bufferBuilder.pos(startX, startY, endZ).color(red, green, blue, alpha).endVertex();
-
-        //up
-        bufferBuilder.pos(startX, endY, startZ).color(red, green, blue, alpha).endVertex();
-        bufferBuilder.pos(startX, endY, endZ).color(red, green, blue, alpha).endVertex();
-        bufferBuilder.pos(endX, endY, endZ).color(red, green, blue, alpha).endVertex();
-        bufferBuilder.pos(endX, endY, startZ).color(red, green, blue, alpha).endVertex();
-
-        //east
-        bufferBuilder.pos(startX, startY, startZ).color(red, green, blue, alpha).endVertex();
-        bufferBuilder.pos(startX, endY, startZ).color(red, green, blue, alpha).endVertex();
-        bufferBuilder.pos(endX, endY, startZ).color(red, green, blue, alpha).endVertex();
-        bufferBuilder.pos(endX, startY, startZ).color(red, green, blue, alpha).endVertex();
-
-        //west
-        bufferBuilder.pos(startX, startY, endZ).color(red, green, blue, alpha).endVertex();
-        bufferBuilder.pos(endX, startY, endZ).color(red, green, blue, alpha).endVertex();
-        bufferBuilder.pos(endX, endY, endZ).color(red, green, blue, alpha).endVertex();
-        bufferBuilder.pos(startX, endY, endZ).color(red, green, blue, alpha).endVertex();
-
-        //south
-        bufferBuilder.pos(endX, startY, startZ).color(red, green, blue, alpha).endVertex();
-        bufferBuilder.pos(endX, endY, startZ).color(red, green, blue, alpha).endVertex();
-        bufferBuilder.pos(endX, endY, endZ).color(red, green, blue, alpha).endVertex();
-        bufferBuilder.pos(endX, startY, endZ).color(red, green, blue, alpha).endVertex();
-
-        //north
-        bufferBuilder.pos(startX, startY, startZ).color(red, green, blue, alpha).endVertex();
-        bufferBuilder.pos(startX, startY, endZ).color(red, green, blue, alpha).endVertex();
-        bufferBuilder.pos(startX, endY, endZ).color(red, green, blue, alpha).endVertex();
-        bufferBuilder.pos(startX, endY, startZ).color(red, green, blue, alpha).endVertex();
-        tessellator.draw();
-    }
 }

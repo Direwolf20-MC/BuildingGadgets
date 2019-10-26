@@ -1,6 +1,34 @@
 package com.direwolf20.buildinggadgets.common.util.ref;
 
+import net.minecraft.util.ResourceLocation;
+
+import static com.direwolf20.buildinggadgets.common.util.ref.Reference.MODID;
+
 public final class NBTKeys {
+    public static final ResourceLocation AND_SERIALIZER_ID = new ResourceLocation(MODID, "sub_entries");
+    public static final String KEY_AUTHOR = "author";
+    public static final String KEY_BOUNDS = "bounds";
+    public static final String KEY_CAP_COMPARISON = "cap_comp";
+    public static final String KEY_CAP_NBT = "cap_data";
+    public static final String KEY_COUNT = "count";
+    public static final String KEY_DATA = "data";
+    public static final String KEY_DATA_COMPARISON = "data_comp";
+    public static final String KEY_HEADER = "header";
+    public static final String KEY_ID = "id";
+    public static final String KEY_MATERIALS = "materials";
+    public static final String KEY_MAX_X = "maxX";
+    public static final String KEY_MAX_Y = "maxY";
+    public static final String KEY_MAX_Z = "maxZ";
+    public static final String KEY_MIN_X = "minX";
+    public static final String KEY_MIN_Y = "minY";
+    public static final String KEY_MIN_Z = "minZ";
+    public static final String KEY_NAME = "name";
+    public static final String KEY_POS = "pos";
+    public static final String KEY_SERIALIZER = "serializer";
+    public static final String KEY_STATE = "state";
+    public static final String KEY_SUB_ENTRIES = "sub_entries";
+    public static final ResourceLocation OR_SERIALIZER_ID = new ResourceLocation(MODID, "alternatives");
+    public static final ResourceLocation SIMPLE_SERIALIZER_ID = new ResourceLocation(MODID, "entries");
     private NBTKeys() {}
 
     public static final String POSITION_X = "X";
@@ -11,6 +39,7 @@ public final class NBTKeys {
 
     public static final String GADGET_MODE = "mode";
     public static final String GADGET_TICKS = "ticks";
+    public static final String GADGET_BUSY = "busy";
     public static final String GADGET_REPLACEMENT_BLOCK = "replacement_block";
     public static final String GADGET_SOURCE_BLOCK = "source_block";
     public static final String GADGET_USE_PASTE = "use_paste";
@@ -26,8 +55,7 @@ public final class NBTKeys {
     public static final String GADGET_UNDO_STACK = "undo_stack";
     public static final String GADGET_UNDO_INT_COORDS = "undo_int_coords";
     public static final String GADGET_UNDO_START_POS = "undo_start_pos";
-    public static final String GADGET_LAST_BUILD_POS = "last_build_pos";
-    public static final String GADGET_LAST_BUILD_DIM = "last_build_dim";
+    public static final String GADGET_REL_POS = "rel_pos";
     public static final String GADGET_UUID = "uuid";
     public static final String GADGET_START_POS = "start_pos";
     public static final String GADGET_END_POS = "end_pos";
@@ -64,11 +92,26 @@ public final class NBTKeys {
     public static final String TEMPLATE_UUID = GADGET_UUID;
     public static final String TEMPLATE_NAME = "template_name";
     public static final String TEMPLATE_OWNER = "owner";
+    public static final String TEMPLATE_KEY_ID = "template_id";
 
     public static final String PASTE_COUNT = "amount";
 
     public static final String WORLD_SAVE_UUID = GADGET_UUID;
     public static final String WORLD_SAVE_TAG = "tag";
+    public static final String WORD_SAVE_DATA_MAP = "data_map";
+    public static final String WORLD_SAVE_TIME = "time";
+    public static final String WORLD_SAVE_UNDO_HISTORY = "undo_history";
+    public static final String WORLD_SAVE_DIM = "dim";
+    public static final String WORLD_SAVE_UNDO_BLOCK_LIST = "block_list";
+    public static final String WORLD_SAVE_UNDO_DATA_LIST = "data_list";
+    public static final String WORLD_SAVE_UNDO_DATA_SERIALIZER_LIST = "data_serializer_list";
+    public static final String WORLD_SAVE_UNDO_ITEMS_LIST = "items_list";
+    public static final String WORLD_SAVE_UNDO_ITEMS_SERIALIZER_LIST = "items_serializer_list";
+    public static final String WORLD_SAVE_UNDO_RECORDED_DATA = "recorded_data";
+    public static final String WORLD_SAVE_UNDO_PLACED_DATA = "placed_data";
+    public static final String WORLD_SAVE_UNDO_ITEMS_USED = "used_items";
+    public static final String WORLD_SAVE_UNDO_ITEMS_PRODUCED = "produced_items";
+    public static final String WORLD_SAVE_UNDO_BOUNDS = "bounding_box";
 
     public static final String REMOTE_INVENTORY_POS = "bound_te_pos";
     public static final String REMOTE_INVENTORY_DIM = "bound_te_dim";
@@ -76,6 +119,7 @@ public final class NBTKeys {
     public static final String ENERGY = "energy";
 
     public static final String UNIQUE_ITEM_ITEM = "item";
+    public static final String UNIQUE_ITEM_SERIALIZER = "serializer";
     public static final String UNIQUE_ITEM_COUNT = "count";
 
     public static final String TE_CONSTRUCTION_STATE = MAP_STATE;
