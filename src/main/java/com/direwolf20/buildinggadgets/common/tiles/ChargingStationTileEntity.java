@@ -12,6 +12,7 @@ import com.direwolf20.buildinggadgets.common.util.tools.CapabilityUtil;
 import com.google.common.base.Preconditions;
 import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.block.AbstractFurnaceBlock;
+import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -161,6 +162,7 @@ public class ChargingStationTileEntity extends TileEntity implements ITickableTi
         if (updateNeeded == 0)
             return null;
         CompoundNBT nbtTag = new CompoundNBT();
+        nbtTag.putInt(NBTKeys.CHARGING_MAX_BURN, maxBurn);
         if ((updateNeeded & UPDATE_FLAG_ENERGY) == UPDATE_FLAG_ENERGY)
             writeEnergyNBT(nbtTag);
         if ((updateNeeded & UPDATE_FLAG_INVENTORY) == UPDATE_FLAG_INVENTORY)
@@ -174,6 +176,7 @@ public class ChargingStationTileEntity extends TileEntity implements ITickableTi
     public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket packet) {
         // Here we get the packet from the server and read it into our client side tile entity
         CompoundNBT nbt = packet.getNbtCompound();
+        maxBurn = nbt.getInt(NBTKeys.CHARGING_MAX_BURN);
         boolean causeReRender = false; //required to update the render when items are inserted/extracted by a hopper for example
         if ((packet.getTileEntityType() & UPDATE_FLAG_INVENTORY) == UPDATE_FLAG_INVENTORY) {
             readItemNBT(nbt);
@@ -190,6 +193,7 @@ public class ChargingStationTileEntity extends TileEntity implements ITickableTi
         super.read(compound);
         readItemNBT(compound);
         readEnergyNBT(compound);
+        maxBurn = compound.getInt(NBTKeys.CHARGING_MAX_BURN);
     }
 
     @Override
@@ -197,6 +201,8 @@ public class ChargingStationTileEntity extends TileEntity implements ITickableTi
     public CompoundNBT write(CompoundNBT compound) {
         writeItemNBT(compound);
         writeEnergyNBT(compound);
+        //keep it across reloads, so the UI can display it properly
+        compound.putInt(NBTKeys.CHARGING_MAX_BURN, maxBurn);
         return super.write(compound);
     }
 
@@ -261,26 +267,17 @@ public class ChargingStationTileEntity extends TileEntity implements ITickableTi
 
     @Override
     public void tick() {
-        boolean isBurning = this.isBurning();
-        if (getWorld() != null && ! getWorld().isRemote) {
-            if (counter > 0 && getEnergy().receiveEnergy(Config.CHARGING_STATION.energyPerTick.get(), true) > 0) {
-                burn();
-            } else {
-                initBurn();
-            }
-            ItemStack stack = getChargeStack();
-            if (! stack.isEmpty()) {
-                chargeItem(stack);
-            }
+        if (getWorld() != null) {
+            tryBurn();
 
-            if( isBurning != this.isBurning() )
-                getWorld().setBlockState(this.pos, getWorld().getBlockState(this.pos).with(AbstractFurnaceBlock.LIT, this.isBurning()), BlockFlags.DEFAULT);
+            ItemStack stack = getChargeStack();
+            if (! stack.isEmpty())
+                chargeItem(stack);
+
+            //todo AT the cached BlockState, so that we can reset it if necessary
+
         } else if (getWorld() != null) {
-            //Yes I realize theres code duplication here, i suspected we might want different things to happen on server/client so i have them as separate if's.
-            if (counter > 0 && getEnergy().receiveEnergy(Config.CHARGING_STATION.energyPerTick.get(), true) > 0)
-                burn();
-            else
-                initBurn();
+            tryBurn();
 
             ItemStack stack = getChargeStack();
             if (! stack.isEmpty()) {
@@ -289,7 +286,6 @@ public class ChargingStationTileEntity extends TileEntity implements ITickableTi
             }
         }
         getEnergy().resetReceiveCap();
-        getEnergy().resetExtractCap();
     }
 
     private void updateLightning() {
@@ -303,23 +299,48 @@ public class ChargingStationTileEntity extends TileEntity implements ITickableTi
         renderCounter++;
     }
 
+    private void tryBurn() {
+        assert getWorld() != null;
+        boolean canInsertEnergy = getEnergy().receiveEnergy(Config.CHARGING_STATION.energyPerTick.get(), true) > 0;
+        if (counter > 0 && canInsertEnergy) {
+            burn();
+        } else if (canInsertEnergy) {
+            if (initBurn())
+                burn();
+        } else //someone else inserted energy - we aren't burning anything...
+            setLit(false);
+    }
+
     private void burn() {
         addEnergy(Config.CHARGING_STATION.energyPerTick.get());
         counter--;
-
-        if( counter == 0 )
+        setLit(true);//needs to updated for cases, where you are extracting energy
+        if (counter == 0) {
             maxBurn = 0;
+            initBurn();
+        }
     }
 
-    private void initBurn() {
+    private boolean initBurn() {
         ItemStack stack = getFuelStack();
         int burnTime = ForgeHooks.getBurnTime(stack);
-        if (burnTime > 0 && getEnergy().receiveEnergy(Config.CHARGING_STATION.energyPerTick.get(), true) > 0) {
+        if (burnTime > 0) {
             getItemStackHandler().extractItem(0, 1, false);
             counter = (int) Math.floor(burnTime / Config.CHARGING_STATION.fuelUsage.get());
             maxBurn = counter;
-            burn();
+            setLit(true);
+            return true;
         }
+        setLit(false);
+        return false;
+    }
+
+    private void setLit(boolean lit) {
+        if (getWorld() == null || getWorld().isRemote())
+            return;
+        BlockState currentState = getWorld().getBlockState(getPos());
+        if (currentState.get(AbstractFurnaceBlock.LIT) != lit)
+            getWorld().setBlockState(this.pos, currentState.with(AbstractFurnaceBlock.LIT, lit), BlockFlags.DEFAULT);
     }
 
     private void chargeItem(ItemStack stack) {
@@ -331,10 +352,6 @@ public class ChargingStationTileEntity extends TileEntity implements ITickableTi
 
     public int getRemainingBurn() {
         return counter;
-    }
-
-    public boolean isBurning() {
-        return counter > 0 && getEnergy().getEnergyStored() < getEnergy().getMaxEnergyStored();
     }
 
     public int getMaxBurn() {
