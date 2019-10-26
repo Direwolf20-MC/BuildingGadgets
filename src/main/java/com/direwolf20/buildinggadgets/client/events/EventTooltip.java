@@ -20,6 +20,7 @@ import com.google.common.collect.Multiset;
 import com.google.common.collect.Multiset.Entry;
 import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.renderer.ItemRenderer;
 import net.minecraft.item.ItemStack;
@@ -41,6 +42,7 @@ import java.util.List;
 
 @Mod.EventBusSubscriber(modid = Reference.MODID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public class EventTooltip {
+    private static final String PLACE_HOLDER = "\u00a77\u00a7r\u00a7r\u00a7r\u00a7r\u00a7r";
     private static final Comparator<Multiset.Entry<IUniqueObject<?>>> ENTRY_COMPARATOR = Comparator
             .<Multiset.Entry<IUniqueObject<?>>, Integer>comparing(Entry::getCount)
             .reversed()
@@ -70,11 +72,11 @@ public class EventTooltip {
                 if (list == null)
                     list = MaterialList.empty();
                 MatchResult match = index.tryMatch(list);
-                int count = match.isSuccess() ? match.getChosenOption().entrySet().size() + 1 : match.getChosenOption().entrySet().size();
+                int count = match.isSuccess() ? match.getChosenOption().entrySet().size() : match.getChosenOption().entrySet().size() + 1;
                 if (count > 0 && Screen.hasShiftDown()) {
                     int lines = (((count - 1) / STACKS_PER_LINE) + 1) * 2;
                     int width = Math.min(STACKS_PER_LINE, count) * 18;
-                    String spaces = "\u00a7r\u00a7r\u00a7r\u00a7r\u00a7r";
+                    String spaces = PLACE_HOLDER;
                     while (mc.fontRenderer.getStringWidth(spaces) < width)
                         spaces += " ";
 
@@ -112,11 +114,15 @@ public class EventTooltip {
                 int j = 0;
                 int totalMissing = 0;
                 List<String> tooltip = event.getLines();
+                FontRenderer fontRenderer = Minecraft.getInstance().fontRenderer;
                 for (String s : tooltip) {
-                    if (s.trim().equals("\u00a77\u00a7r\u00a7r\u00a7r\u00a7r\u00a7r"))
+                    if (s.trim().equals(PLACE_HOLDER))
                         break;
-                    by += 7;
+                    by += fontRenderer.FONT_HEIGHT;
                 }
+                //add missing offset because the Stack is 16 by 16 as a render, not 9 by 9
+                //needs to be 8 instead of 7, so that there is a one pixel padding to the text, just as there is between stacks
+                by += 8;
                 GlStateManager.enableBlend();
                 GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
                 for (Multiset.Entry<IUniqueObject<?>> entry : sortedEntries) {

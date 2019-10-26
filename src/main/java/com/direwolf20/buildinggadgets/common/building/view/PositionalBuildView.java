@@ -74,6 +74,7 @@ public final class PositionalBuildView implements IBuildView {
 
     @Override
     public PositionalBuildView translateTo(BlockPos pos) {
+        boundingBox = boundingBox.translate(pos.subtract(translation));//translate the bounding box to the correct position
         this.translation = pos;
         return this;
     }
