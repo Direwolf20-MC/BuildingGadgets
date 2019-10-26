@@ -141,6 +141,8 @@ public class ExchangerRender extends BaseRenderer {
                     hasEnergy -= (((AbstractGadget) heldItem.getItem())).getEnergyCost(heldItem);
                 }
                 MatchResult match = index.tryMatch(materials);
+                if (! match.isSuccess())
+                    match = index.tryMatch(InventoryHelper.PASTE_LIST);
                 if (! match.isSuccess() || hasEnergy < 0) {
                     renderMissingBlock(bufferBuilder, coordinate);
                 } else {
