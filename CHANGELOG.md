@@ -34,7 +34,6 @@ The format of this document is based on [Keep a Changelog](https://keepachangelo
     - We had to disable the template preview in the TemplateManager, but are working on getting it back up and running 
     - The Items which can be converted into a Template are now determined by the `buildinggadgets:template_convertible` Item tag
 
-
 ## [3.0.6a - 1.14.4] - 2019-10-26
 This will be the final alpha. The next version `3.1.0` will be part of a big system rewrite and template support being reintroduced. Keep an eye out as it's going to be a big one!
 ### Added
