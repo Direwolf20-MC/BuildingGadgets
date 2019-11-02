@@ -129,7 +129,7 @@ public class ChargingStationTileEntity extends TileEntity implements ITickableTi
     @Override
     public Container createMenu(int i, PlayerInventory playerInventory, PlayerEntity playerEntity) {
         Preconditions.checkArgument(getWorld() != null);
-        return new ChargingStationContainer(i, getWorld(), pos, playerInventory, playerEntity);
+        return new ChargingStationContainer(i, getWorld(), pos, playerInventory);
     }
 
     @Nonnull
