@@ -180,16 +180,6 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
         return !isMimicNull(mimic) ? mimic.allowsMovement(worldIn, pos, type) : super.allowsMovement(state, worldIn, pos, type);
     }
 
-    /**
-     * @deprecated call via {@link BlockState#getBlockHardness(IBlockReader, BlockPos)} whenever possible.
-     * Implementing/overriding is fine.
-     */
-    @Override
-    public float getBlockHardness(BlockState blockState, IBlockReader worldIn, BlockPos pos) {
-        BlockState mimic = getActualMimicBlock(worldIn, pos);
-        return !isMimicNull(mimic) ? mimic.getBlockHardness(worldIn, pos) : super.getBlockHardness(blockState, worldIn, pos);
-    }
-
     @Override
     public boolean hasTileEntity() {
         return true;
