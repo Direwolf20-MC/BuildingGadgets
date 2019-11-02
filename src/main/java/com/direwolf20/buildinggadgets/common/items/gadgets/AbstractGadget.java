@@ -67,6 +67,7 @@ public abstract class AbstractGadget extends Item {
 
     public AbstractGadget(Properties builder, IntSupplier undoLengthSupplier, String undoName, ResourceLocation whiteListTag, ResourceLocation blackListTag) {
         super(builder);
+
         renderer = DistExecutor.runForDist(this::createRenderFactory, () -> () -> null);
         this.whiteList = new Wrapper(whiteListTag);
         this.blackList = new Wrapper(blackListTag);
@@ -180,7 +181,7 @@ public abstract class AbstractGadget extends Item {
     }
 
     public boolean canUse(ItemStack tool, PlayerEntity player) {
-        if (player.isCreative())
+        if (player.isCreative() || getEnergyMax() == 0)
             return true;
 
         IEnergyStorage energy = EnergyUtil.getCap(tool).orElseThrow(CapabilityNotPresentException::new);
@@ -188,7 +189,7 @@ public abstract class AbstractGadget extends Item {
     }
 
     public void applyDamage(ItemStack tool, ServerPlayerEntity player) {
-        if (player.isCreative())
+        if (player.isCreative() || getEnergyMax() == 0)
             return;
 
         IEnergyStorage energy = EnergyUtil.getCap(tool).orElseThrow(CapabilityNotPresentException::new);
@@ -196,11 +197,14 @@ public abstract class AbstractGadget extends Item {
     }
 
     protected void addEnergyInformation(List<ITextComponent> tooltip, ItemStack stack) {
-            stack.getCapability(CapabilityEnergy.ENERGY).ifPresent(energy -> {
-                tooltip.add(TooltipTranslation.GADGET_ENERGY
-                                    .componentTranslation(withSuffix(energy.getEnergyStored()), withSuffix(energy.getMaxEnergyStored()))
-                                    .setStyle(Styles.WHITE));
-            });
+        if( getEnergyMax() == 0 )
+            return;
+
+        stack.getCapability(CapabilityEnergy.ENERGY).ifPresent(energy -> {
+            tooltip.add(TooltipTranslation.GADGET_ENERGY
+                                .componentTranslation(withSuffix(energy.getEnergyStored()), withSuffix(energy.getMaxEnergyStored()))
+                                .setStyle(Styles.WHITE));
+        });
     }
 
     public final void onRotate(ItemStack stack, PlayerEntity player) {
