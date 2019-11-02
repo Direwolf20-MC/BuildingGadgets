@@ -1,6 +1,9 @@
 # Building Gadgets Changelog
 The format of this document is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and should continue to adhere to the conventions outlined in the Keep a Changelog guidelines.
-## [3.1.0b - 1.14.4] 
+
+## [3.1.0b - 1.14.4]
+A small note to this release: we know about chests not rendering in the in-game render. Please do not report this as it'll be fixed in the next version. Sorry about that.
+
 ### Fixed
 - Wall modes increased their size in an arbitrary direction when given an even range
 - Creative Paste container cannot absorb ConstructionPaste
@@ -10,7 +13,10 @@ The format of this document is based on [Keep a Changelog](https://keepachangelo
 
 ### Added
 - Config option for the destruction Gadget's max dimensions, which defaults to 16 as before
-    
+- Config option to disable Absolute coords mode in the Copy Paste Gadget [#284](https://github.com/Direwolf20-MC/BuildingGadgets/issues/284)
+- Added the ability to turn gadgets into `non-powered mode` when there `max power` config is set to 0. This means you can have the option of needing power to use the gadgets or not needing power. This is on by default... Duh [#383](https://github.com/Direwolf20-MC/BuildingGadgets/issues/383)
+- Added a rough estimate of blocks that'll be needed depending on the gadgets range. You'll find it in the tool tip :) 
+
 ### Changes
 - Rewrote the Item Handling System
     - this included as a side effect to allow other mods to pull or push into paste-containers
@@ -31,8 +37,11 @@ The format of this document is based on [Keep a Changelog](https://keepachangelo
             - You can change name and author of a copied TemplateHeader, but all other changes won't have an effect or even prevent it from being copied (in case of version or mc_version)
         - notice that we are releasing the format as version "2-beta" in case we need to do some changes after we released
             - The old *version "1"* format is not supported
-    - We had to disable the template preview in the TemplateManager, but are working on getting it back up and running 
     - The Items which can be converted into a Template are now determined by the `buildinggadgets:template_convertible` Item tag
+- Completely updated the look of the Template Manager Gui
+   - Bigger preview render for all the fullscreen (full gui) goodness,
+   - Cleaned up the Ui components
+   - Improved the performance of the render :+1:
 
 ## [3.0.6a - 1.14.4] - 2019-10-26
 This will be the final alpha. The next version `3.1.0` will be part of a big system rewrite and template support being reintroduced. Keep an eye out as it's going to be a big one!
