@@ -103,7 +103,6 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
         this.nameField.setVisible(true);
         children.add(nameField);
         renderCache = Optional.empty();
-        getContainer().addOnCopyPasteChangeListener(stack -> invalidateRenderCache());
     }
 
     @Override
@@ -411,7 +410,7 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
                 GlStateManager.newList(displayList, GL11.GL_COMPILE);
                 performStructureRender(view);
                 GlStateManager.endList();
-                updateRenderCache(new TemplatePrebuilt(template, displayList));
+                invalidateRenderCache(new TemplatePrebuilt(template, displayList));
             });
         });
     }
@@ -562,8 +561,8 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
         renderCache = Optional.empty();
     }
 
-    private void updateRenderCache(TemplatePrebuilt newValue) {
-        invalidateRenderCache();
+    private void invalidateRenderCache(TemplatePrebuilt newValue) {
+        renderCache.ifPresent(TemplatePrebuilt::invalidate);
         renderCache = Optional.of(newValue);
     }
 
