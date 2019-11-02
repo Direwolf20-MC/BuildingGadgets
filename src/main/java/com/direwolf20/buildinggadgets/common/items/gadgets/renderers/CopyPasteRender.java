@@ -117,12 +117,11 @@ public class CopyPasteRender extends BaseRenderer {
         GlStateManager.depthMask(true);
 
         GlStateManager.popMatrix();
-
     }
 
     private void renderPaste(RenderWorldLastEvent evt, PlayerEntity player, ItemStack heldItem, Vec3d playerPos) {
         World world = player.world;
-        AbstractGadget item = (AbstractGadget) heldItem.getItem();
+
         world.getCapability(CapabilityTemplate.TEMPLATE_PROVIDER_CAPABILITY).ifPresent(provider -> {
             heldItem.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(key -> {
                 UUID id = provider.getId(key);
