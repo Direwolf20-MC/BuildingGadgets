@@ -12,6 +12,8 @@ import com.direwolf20.buildinggadgets.common.building.view.IBuildView;
 import com.direwolf20.buildinggadgets.common.building.view.SimpleBuildContext;
 import com.direwolf20.buildinggadgets.common.capability.CapabilityTemplate;
 import com.direwolf20.buildinggadgets.common.containers.TemplateManagerContainer;
+import com.direwolf20.buildinggadgets.common.inventory.materials.MaterialList;
+import com.direwolf20.buildinggadgets.common.inventory.materials.objects.IUniqueObject;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketTemplateManagerTemplateCreated;
 import com.direwolf20.buildinggadgets.common.registry.OurItems;
@@ -29,6 +31,8 @@ import com.direwolf20.buildinggadgets.common.util.lang.MessageTranslation;
 import com.direwolf20.buildinggadgets.common.util.lang.Styles;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.direwolf20.buildinggadgets.common.world.FakeDelegationWorld;
+import com.google.common.collect.ImmutableMultiset;
+import com.google.common.collect.ImmutableSet;
 import com.google.gson.JsonParseException;
 import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.block.BlockRenderType;
@@ -59,6 +63,7 @@ import net.minecraftforge.client.model.data.EmptyModelData;
 import net.minecraftforge.common.util.LazyOptional;
 import org.lwjgl.opengl.GL11;
 
+import java.awt.*;
 import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.Random;
@@ -138,8 +143,10 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
         this.nameField.render(mouseX, mouseY, partialTicks);
         fill(guiLeft + panel.getX() - 1, guiTop + panel.getY() - 1, guiLeft + panel.getX() + panel.getWidth() + 1, guiTop + panel.getY() + panel.getHeight() + 1, 0xFF8A8A8A);
 
-        if( this.template != null )
+        if( this.template != null ) {
             renderPanel();
+            renderRequirement();
+        }
     }
 
     private void validateCache(float partialTicks) {
@@ -154,10 +161,10 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
 
         container.getSlot(0).getStack().getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(key -> templateProvider.ifPresent(provider -> {
             // Make sure we're not re-creating the same cache.
-            if( templateKey == key )
+            Template template = provider.getTemplateForKey(key);
+            if( this.template == template )
                 return;
 
-            Template template = provider.getTemplateForKey(key);
             this.template = template;
             this.templateKey = key;
 
@@ -235,6 +242,42 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
                 vertexformatelement1.getUsage().postDraw(vertexformat, i1, i, bytebuffer);
             }
         }
+    }
+
+    // Todo: think about this better :P scale is a bitch
+    private void renderRequirement() {
+//        MaterialList requirements = this.template.getHeaderAndForceMaterials(SimpleBuildContext.builder().build(getWorld())).getRequiredItems();
+//        if( requirements == null )
+//            return;
+//
+//        RenderHelper.enableGUIStandardItemLighting();
+//
+//        double scale = getMinecraft().mainWindow.getGuiScaleFactor();
+//        GlStateManager.pushMatrix();
+////        GlStateManager.scalef(.7f, .7f, .7f);
+////        GlStateManager.translated(1f * scale, 1f * scale, 0f);
+//        drawRightAlignedString(getMinecraft().fontRenderer, "Requirements", guiLeft + 14, guiTop + 5, Color.WHITE.getRGB());
+//
+//        int index = 0, column = 0;
+//        for(ImmutableMultiset<IUniqueObject<?>> e: requirements) {
+//            if( e.isEmpty() ) {
+//                return;
+//            }
+//
+//            for (IUniqueObject<?> a: e.elementSet()) {
+//                ItemStack stack = a.createStack(1);
+//                getMinecraft().getItemRenderer().renderItemIntoGUI(stack, guiLeft - (column * 20), (guiTop + 25) + (index * 20));
+//
+//                index ++;
+//                if( index % 12 == 0 ) {
+//                    column ++;
+//                    index = 0;
+//                }
+//            }
+//        }
+//
+//        GlStateManager.popMatrix();
+//        RenderHelper.disableStandardItemLighting();
     }
 
     private void pasteTemplateToStack(World world, ItemStack stack, Template newTemplate, boolean replaced) {
