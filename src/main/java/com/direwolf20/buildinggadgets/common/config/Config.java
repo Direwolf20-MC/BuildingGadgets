@@ -38,7 +38,7 @@ public class Config {
     public static final class CategoryGeneral {
 
         public final DoubleValue rayTraceRange;
-
+        public final BooleanValue allowAbsoluteCoords;
         /* Client Only!*/
         public final BooleanValue absoluteCoordDefault;
         public final BooleanValue allowOverwriteBlocks;
@@ -47,6 +47,11 @@ public class Config {
             SERVER_BUILDER.comment("General mod settings")/*.translation(LANG_KEY_GENERAL)*/.push("general");
             COMMON_BUILDER.comment("General mod settings")/*.translation(LANG_KEY_GENERAL)*/.push("general");
             CLIENT_BUILDER.comment("General mod settings")/*.translation(LANG_KEY_GENERAL)*/.push("general");
+
+            allowAbsoluteCoords = COMMON_BUILDER
+                    .comment("Defined whether or not a player can use Absolute Coords mode in the Copy Paste Gadget")
+                    .define("Allow Absolute Coords", true);
+
             rayTraceRange = SERVER_BUILDER
                     .comment("Defines how far away you can build")
                     .translation(LANG_KEY_GENERAL + ".rayTraceRange")
@@ -62,6 +67,7 @@ public class Config {
                             "False will only allow it to overwrite air blocks.")
                     .translation(LANG_KEY_GENERAL + ".allowOverwriteBlocks")
                     .define("Allow non-Air-Block-Overwrite", true);
+
             CLIENT_BUILDER.pop();
             COMMON_BUILDER.pop();
             SERVER_BUILDER.pop();
