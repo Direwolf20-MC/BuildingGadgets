@@ -45,10 +45,9 @@ public class Config {
 
         private CategoryGeneral() {
             SERVER_BUILDER.comment("General mod settings")/*.translation(LANG_KEY_GENERAL)*/.push("general");
-            COMMON_BUILDER.comment("General mod settings")/*.translation(LANG_KEY_GENERAL)*/.push("general");
             CLIENT_BUILDER.comment("General mod settings")/*.translation(LANG_KEY_GENERAL)*/.push("general");
 
-            allowAbsoluteCoords = COMMON_BUILDER
+            allowAbsoluteCoords = SERVER_BUILDER
                     .comment("Defined whether or not a player can use Absolute Coords mode in the Copy Paste Gadget")
                     .define("Allow Absolute Coords", true);
 
@@ -69,7 +68,6 @@ public class Config {
                     .define("Allow non-Air-Block-Overwrite", true);
 
             CLIENT_BUILDER.pop();
-            COMMON_BUILDER.pop();
             SERVER_BUILDER.pop();
         }
     }
@@ -85,8 +83,8 @@ public class Config {
 
         private CategoryChargingStation() {
             SERVER_BUILDER.comment("Charging station settings")/*.translation(LANG_KEY_CHARGING_STATION)*/.push("charging_station");
-            COMMON_BUILDER.comment("Charging station settings")/*.translation(LANG_KEY_CHARGING_STATION)*/.push("charging_station");
             CLIENT_BUILDER.comment("Charging station settings")/*.translation(LANG_KEY_CHARGING_STATION)*/.push("charging_station");
+
             capacity = SERVER_BUILDER.comment("Define the maximum energy stored in the Charging Station.")
                     .translation(LANG_KEY_CHARGING_STATION + ".capacity")
                     .defineInRange("Energy capacity", 1000000, 1, Integer.MAX_VALUE);
@@ -111,8 +109,8 @@ public class Config {
                     "but a colour changing Sphere just needs to update relativingly often...")
                     .translation(LANG_KEY_CHARGING_STATION + ".renderSphere")
                     .define("Render Sphere", true);
+
             CLIENT_BUILDER.pop();
-            COMMON_BUILDER.pop();
             SERVER_BUILDER.pop();
         }
     }
@@ -155,9 +153,9 @@ public class Config {
 
         private static IntValue getMaxEnergy(int defaultValue) {
             return SERVER_BUILDER
-                    .comment("The max energy of the Gadget")
+                    .comment("The max energy of the Gadget, set to 0 to disable energy usage")
                     .translation(LANG_KEY_GADGETS + ".maxEnergy")
-                    .defineInRange("Maximum Energy", defaultValue, 1, Integer.MAX_VALUE);
+                    .defineInRange("Maximum Energy", defaultValue, 0, Integer.MAX_VALUE);
         }
 
         private static IntValue getEnergyCost(int defaultValue) {
