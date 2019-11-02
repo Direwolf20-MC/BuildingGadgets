@@ -115,6 +115,10 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
         super.render(mouseX, mouseY, partialTicks);
         this.renderHoveredToolTip(mouseX, mouseY);
 
+        validateCache();
+    }
+
+    private void validateCache() {
         // Invalidate the render
         if( container.getSlot(0).getStack().isEmpty() && template != null ) {
             template = null;
@@ -141,44 +145,47 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
             int displayList = GLAllocation.generateDisplayLists(1);
             GlStateManager.newList(displayList, GL11.GL_COMPILE);
 
-            BlockRendererDispatcher dispatcher = getMinecraft().getBlockRendererDispatcher();
-            BufferBuilder bufferBuilder = new BufferBuilder(2097152);
-            bufferBuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
-            Random rand = new Random();
-            for (PlacementTarget target : view) {
-                BlockState renderBlockState = target.getData().getState();
-                if (!(renderBlockState.equals(Blocks.AIR.getDefaultState()))) {
-                    IBakedModel model = dispatcher.getModelForState(renderBlockState);
-                    dispatcher.getBlockModelRenderer().renderModelFlat(getWorld(), model, renderBlockState, target.getPos(), bufferBuilder, false, rand, 0L, EmptyModelData.INSTANCE);
-                }
-            }
-            bufferBuilder.finishDrawing();
-
-            if (bufferBuilder.getVertexCount() > 0) {
-                VertexFormat vertexformat = bufferBuilder.getVertexFormat();
-                int i = vertexformat.getSize();
-                ByteBuffer bytebuffer = bufferBuilder.getByteBuffer();
-                List<VertexFormatElement> list = vertexformat.getElements();
-
-                for (int j = 0; j < list.size(); ++ j) {
-                    VertexFormatElement vertexformatelement = list.get(j);
-                    bytebuffer.position(vertexformat.getOffset(j));
-                    vertexformatelement.getUsage().preDraw(vertexformat, j, i, bytebuffer);
-                }
-
-                GlStateManager.drawArrays(bufferBuilder.getDrawMode(), 0, bufferBuilder.getVertexCount());
-                int i1 = 0;
-
-                for (int j1 = list.size(); i1 < j1; ++ i1) {
-                    VertexFormatElement vertexformatelement1 = list.get(i1);
-                    vertexformatelement1.getUsage().postDraw(vertexformat, i1, i, bytebuffer);
-                }
-            }
+            renderStructure(view);
 
             GlStateManager.endList();
-
             this.displayList = displayList;
         }));
+    }
+
+    private void renderStructure(IBuildView view) {
+        BlockRendererDispatcher dispatcher = getMinecraft().getBlockRendererDispatcher();
+        BufferBuilder bufferBuilder = new BufferBuilder(2097152);
+        bufferBuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
+        Random rand = new Random();
+        for (PlacementTarget target : view) {
+            BlockState renderBlockState = target.getData().getState();
+            if (!(renderBlockState.equals(Blocks.AIR.getDefaultState()))) {
+                IBakedModel model = dispatcher.getModelForState(renderBlockState);
+                dispatcher.getBlockModelRenderer().renderModelFlat(getWorld(), model, renderBlockState, target.getPos(), bufferBuilder, false, rand, 0L, EmptyModelData.INSTANCE);
+            }
+        }
+        bufferBuilder.finishDrawing();
+
+        if (bufferBuilder.getVertexCount() > 0) {
+            VertexFormat vertexformat = bufferBuilder.getVertexFormat();
+            int i = vertexformat.getSize();
+            ByteBuffer bytebuffer = bufferBuilder.getByteBuffer();
+            List<VertexFormatElement> list = vertexformat.getElements();
+
+            for (int j = 0; j < list.size(); ++ j) {
+                VertexFormatElement vertexformatelement = list.get(j);
+                bytebuffer.position(vertexformat.getOffset(j));
+                vertexformatelement.getUsage().preDraw(vertexformat, j, i, bytebuffer);
+            }
+
+            GlStateManager.drawArrays(bufferBuilder.getDrawMode(), 0, bufferBuilder.getVertexCount());
+            int i1 = 0;
+
+            for (int j1 = list.size(); i1 < j1; ++ i1) {
+                VertexFormatElement vertexformatelement1 = list.get(i1);
+                vertexformatelement1.getUsage().postDraw(vertexformat, i1, i, bytebuffer);
+            }
+        }
     }
 
     private void pasteTemplateToStack(World world, ItemStack stack, Template newTemplate, boolean replaced) {

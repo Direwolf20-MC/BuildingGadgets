@@ -5,20 +5,20 @@ import com.direwolf20.buildinggadgets.common.capability.CapabilityTemplate;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetDestruction;
 import com.direwolf20.buildinggadgets.common.util.lang.LangUtil;
-import com.google.common.base.Function;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 
 import java.awt.*;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 public enum GuiMod {
     COPY(GadgetCopyPaste::getGadget, stack -> () -> new CopyGUI(stack)),
     PASTE(GadgetCopyPaste::getGadget, stack -> () -> new PasteGUI(stack)),
     DESTRUCTION(GadgetDestruction::getGadget, stack -> () -> new DestructionGUI(stack)),
-
     MATERIAL_LIST(player -> {
         ItemStack mainhand = player.getHeldItemMainhand();
         if (mainhand.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).isPresent()) {
@@ -35,7 +35,7 @@ public enum GuiMod {
     private Function<PlayerEntity, ItemStack> stackReader;
     private Function<ItemStack, Supplier<? extends Screen>> clientScreenProvider;
 
-    private GuiMod(Function<PlayerEntity, ItemStack> stackReader, Function<ItemStack, Supplier<? extends Screen>> clientScreenProvider) {
+    GuiMod(Function<PlayerEntity, ItemStack> stackReader, Function<ItemStack, Supplier<? extends Screen>> clientScreenProvider) {
         this.stackReader = stackReader;
         this.clientScreenProvider = clientScreenProvider;
     }
@@ -56,14 +56,6 @@ public enum GuiMod {
         Screen screen = clientScreenProvider.apply(stack).get();
         Minecraft.getInstance().displayGuiScreen(screen);
         return screen == null;
-    }
-
-    public static String getLangKeyArea(String prefix, String name) {
-        return getLangKey(prefix, "area", name);
-    }
-
-    public static String getLangKey(String prefix, String type, String name) {
-        return LangUtil.getLangKey("gui", prefix, type, name);
     }
 
     public static String getLangKeySingle(String name) {
