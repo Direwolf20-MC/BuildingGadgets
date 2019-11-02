@@ -29,12 +29,12 @@ import com.direwolf20.buildinggadgets.common.util.lang.MessageTranslation;
 import com.direwolf20.buildinggadgets.common.util.lang.Styles;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 
+import com.direwolf20.buildinggadgets.common.world.FakeDelegationWorld;
 import com.google.gson.JsonParseException;
 import com.mojang.blaze3d.platform.GlStateManager;
 
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
@@ -42,6 +42,8 @@ import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.texture.AtlasTexture;
+import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
+import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.client.renderer.vertex.VertexFormatElement;
@@ -49,6 +51,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
@@ -116,7 +119,7 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
         super.render(mouseX, mouseY, partialTicks);
         this.renderHoveredToolTip(mouseX, mouseY);
 
-        validateCache();
+        validateCache(partialTicks);
     }
 
     @Override
@@ -138,10 +141,10 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
         fill(guiLeft + panel.getX() - 1, guiTop + panel.getY() - 1, guiLeft + panel.getX() + panel.getWidth() + 1, guiTop + panel.getY() + panel.getHeight() + 1, 0xFF8A8A8A);
 
         if( this.template != null )
-            renderStructure();
+            renderPanel();
     }
 
-    private void validateCache() {
+    private void validateCache(float partialTicks) {
         // Invalidate the render
         if( container.getSlot(0).getStack().isEmpty() && template != null ) {
             template = null;
@@ -164,31 +167,46 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
                     SimpleBuildContext.builder()
                             .buildingPlayer(getMinecraft().player)
                             .usedStack(container.getSlot(0).getStack())
-                            .build(getMinecraft().world));
+                            .build(new FakeDelegationWorld(getMinecraft().world)));
 
             int displayList = GLAllocation.generateDisplayLists(1);
             GlStateManager.newList(displayList, GL11.GL_COMPILE);
 
-            renderStructure(view);
+            renderStructure(view, partialTicks);
 
             GlStateManager.endList();
             this.displayList = displayList;
         }));
     }
 
-    private void renderStructure(IBuildView view) {
+    private void renderStructure(IBuildView view, float partialTicks) {
         Random rand = new Random();
         BlockRendererDispatcher dispatcher = getMinecraft().getBlockRendererDispatcher();
 
         BufferBuilder bufferBuilder = new BufferBuilder(2097152);
         bufferBuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
+
         for (PlacementTarget target : view) {
-            BlockState renderBlockState = target.getData().getState();
-            if (renderBlockState.getRenderType() == BlockRenderType.MODEL) {
+            target.placeIn(view.getContext());
+            BlockState renderBlockState = view.getContext().getWorld().getBlockState(target.getPos());
+            TileEntity te = view.getContext().getWorld().getTileEntity(target.getPos());
+
+            if (renderBlockState.getRenderType() == BlockRenderType.MODEL && te == null) {
                 IBakedModel model = dispatcher.getModelForState(renderBlockState);
                 dispatcher.getBlockModelRenderer().renderModelFlat(getWorld(), model, renderBlockState, target.getPos(), bufferBuilder, false, rand, 0L, EmptyModelData.INSTANCE);
             }
+
+            if( te != null ) {
+                TileEntityRenderer<TileEntity> renderer = TileEntityRendererDispatcher.instance.getRenderer(te);
+                if (renderer != null) {
+                    if (te.hasFastRenderer())
+                        renderer.renderTileEntityFast(te, 0, 0, 0, partialTicks, - 1, bufferBuilder);
+                    else
+                        renderer.render(te, 0, 0, 0, partialTicks, - 1);
+                }
+            }
         }
+
         bufferBuilder.finishDrawing();
 
         if (bufferBuilder.getVertexCount() > 0) {
@@ -257,7 +275,7 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
         }));
     }
 
-    private void renderStructure() {
+    private void renderPanel() {
         double scale = getMinecraft().mainWindow.getGuiScaleFactor();
 
         BlockPos startPos = template.getHeader().getBoundingBox().getMin();
