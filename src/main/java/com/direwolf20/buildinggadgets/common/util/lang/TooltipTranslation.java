@@ -10,7 +10,7 @@ public enum TooltipTranslation implements ITranslationProvider {
     GADGET_DESTROYWARNING("gadget.destroywarning", 0),
     GADGET_ENERGY("gadget.energy", 2),
     GADGET_MODE("gadget.mode", 1),
-    GADGET_RANGE("gadget.range", 1),
+    GADGET_RANGE("gadget.range", 2),
     GADGET_FUZZY("gadget.fuzzy", 1),
     GADGET_RAYTRACE_FLUID("gadget.raytrace_fluid", 1),
     GADGET_BUILDING_PLACE_ATOP("gadget.building.place_atop", 1),

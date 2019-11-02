@@ -289,8 +289,9 @@ public class GadgetCopyPaste extends AbstractGadget {
     @Override
     public void addInformation(ItemStack stack, @Nullable World world, List<ITextComponent> tooltip, ITooltipFlag flag) {
         super.addInformation(stack, world, tooltip, flag);
-        tooltip.add(TooltipTranslation.GADGET_MODE.componentTranslation(getToolMode(stack).format()).setStyle(Styles.AQUA));
         addEnergyInformation(tooltip, stack);
+
+        tooltip.add(TooltipTranslation.GADGET_MODE.componentTranslation(getToolMode(stack).format()).setStyle(Styles.AQUA));
         addInformationRayTraceFluid(tooltip, stack);
         GadgetUtils.addTooltipNameAndAuthor(stack, world, tooltip);
     }

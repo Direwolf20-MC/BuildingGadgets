@@ -14,4 +14,5 @@ public final class Styles {
     public static final Style WHITE = new Style().setColor(TextFormatting.WHITE);
     public static final Style BLUE = new Style().setColor(TextFormatting.BLUE);
     public static final Style YELLOW = new Style().setColor(TextFormatting.YELLOW);
+    public static final Style GRAY = new Style().setColor(TextFormatting.GRAY);
 }

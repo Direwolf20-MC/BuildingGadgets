@@ -39,7 +39,7 @@
   "tooltip.gadget.mode": "Mode: %s",
   "tooltip.gadget.rotate": "Rotate",
   "tooltip.gadget.mirror": "Mirror",
-  "tooltip.gadget.range": "Range: %s",
+  "tooltip.gadget.range": "Range: %s (%s blocks)",
   "tooltip.gadget.anchor": "Anchor",
   "tooltip.gadget.undo": "Undo",
   "tooltip.gadget.fuzzy": "Fuzzy: %s",
