@@ -34,7 +34,11 @@ public class FakeTERWorld implements IBlockReader {
             return teMap.get(state);
         } else {
             TileEntity te = state.getBlock().createTileEntity(state, this);
-            te.setWorld(realWorld);
+            try {
+                te.onLoad();
+            } catch (Exception e) {
+                //temporary until this is replaced with FakeDelegationWorld
+            }
             teMap.put(state, te);
             return teMap.get(state);
         }

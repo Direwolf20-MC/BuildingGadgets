@@ -22,7 +22,6 @@ import net.minecraft.client.renderer.BlockRendererDispatcher;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
-import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -163,7 +162,7 @@ public class BuildingRender extends BaseRenderer {
                             GlStateManager.enableBlend(); //We have to do this in the loop because the TE Render removes blend when its done
                             GlStateManager.blendFunc(GL14.GL_CONSTANT_ALPHA, GL14.GL_ONE_MINUS_CONSTANT_ALPHA);
                             try {
-                                TileEntityRendererDispatcher.instance.render(te, 0, 0, 0, evt.getPartialTicks(), - 1, true);
+                                teRender.render(te, 0, 0, 0, evt.getPartialTicks(), - 1);
                             } catch (Exception e) {
                                 BuildingGadgets.LOG.warn("TER Exception with block type: " + state);
                                 getInvalidTileEntities().add(te);
