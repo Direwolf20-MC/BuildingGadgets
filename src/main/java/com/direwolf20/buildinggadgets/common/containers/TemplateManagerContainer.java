@@ -1,9 +1,17 @@
 package com.direwolf20.buildinggadgets.common.containers;
 
+import com.direwolf20.buildinggadgets.common.building.view.IBuildView;
+import com.direwolf20.buildinggadgets.common.building.view.SimpleBuildContext;
+import com.direwolf20.buildinggadgets.common.capability.CapabilityTemplate;
+import com.direwolf20.buildinggadgets.common.items.TemplateItem;
+import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.registry.OurContainers;
+import com.direwolf20.buildinggadgets.common.template.Template;
 import com.direwolf20.buildinggadgets.common.tiles.TemplateManagerTileEntity;
 import com.direwolf20.buildinggadgets.common.util.exceptions.CapabilityNotPresentException;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
+import com.direwolf20.buildinggadgets.common.world.FakeDelegationWorld;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.container.Slot;
@@ -15,6 +23,7 @@ import net.minecraftforge.items.IItemHandler;
 
 import javax.annotation.Nonnull;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 public class TemplateManagerContainer extends BaseContainer {
@@ -22,12 +31,14 @@ public class TemplateManagerContainer extends BaseContainer {
     public static final String TEXTURE_LOC_SLOT_TEMPLATE = Reference.MODID + ":gui/slot_template";
 
     private TemplateManagerTileEntity te;
+    private Optional<TemplatePrebuilt> viewCache = Optional.empty();
+    private FakeDelegationWorld delegationWorld = new FakeDelegationWorld(Minecraft.getInstance().world);
 
     public TemplateManagerContainer(int windowId, PlayerInventory playerInventory, PacketBuffer extraData) {
         super(OurContainers.TEMPLATE_MANAGER_CONTAINER, windowId);
         BlockPos pos = extraData.readBlockPos();
 
-        this.te = (TemplateManagerTileEntity) playerInventory.player.world.getTileEntity(pos);
+        this.te = (TemplateManagerTileEntity) Minecraft.getInstance().world.getTileEntity(pos);
         addOwnSlots();
         addPlayerSlots(playerInventory, -12, 70);
     }
@@ -40,10 +51,6 @@ public class TemplateManagerContainer extends BaseContainer {
         addPlayerSlots(playerInventory, -12, 70);
     }
 
-    public void addOnCopyPasteChangeListener(Consumer<ItemStack> consumer) {
-        ((WatchedSlot) getSlot(0)).addOnChangerListener(consumer);
-    }
-
     @Override
     public boolean canInteractWith(PlayerEntity playerIn) {
         return getTe().canInteractWith(playerIn);
@@ -52,7 +59,7 @@ public class TemplateManagerContainer extends BaseContainer {
     private void addOwnSlots() {
         IItemHandler itemHandler = this.getTe().getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).orElseThrow(CapabilityNotPresentException::new);
         int x = 132;
-        addSlot(new WatchedSlot(itemHandler, 0, x, 18, TEXTURE_LOC_SLOT_TOOL));
+        addSlot(new WatchedSlot(itemHandler, 0, x, 18, TEXTURE_LOC_SLOT_TOOL, this::updateViewCache));
         addSlot(new SlotTemplateManager(itemHandler, 1, x, 63, TEXTURE_LOC_SLOT_TEMPLATE));
     }
 
@@ -84,18 +91,40 @@ public class TemplateManagerContainer extends BaseContainer {
         return itemstack;
     }
 
+    private void updateViewCache(int slot) {
+        ItemStack stack = this.getSlot(slot).getStack();
+        if( stack.isEmpty() ) {
+            if( this.viewCache.isPresent() )
+                this.viewCache = Optional.empty();
+
+            return;
+        }
+
+        if(!(stack.getItem() instanceof GadgetCopyPaste) && !(stack.getItem() instanceof TemplateItem))
+            return;
+
+        Minecraft.getInstance().world.getCapability(CapabilityTemplate.TEMPLATE_PROVIDER_CAPABILITY).ifPresent(provider -> stack.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(key -> {
+            Template template = provider.getTemplateForKey(key);
+            this.viewCache = Optional.of(new TemplatePrebuilt(template, template.createViewInContext(
+                    SimpleBuildContext.builder().
+                            buildingPlayer(Minecraft.getInstance().player).
+                            build(delegationWorld)
+            )));
+        }));
+    }
+
+    public Optional<TemplatePrebuilt> getViewCache() {
+        return viewCache;
+    }
+
     public TemplateManagerTileEntity getTe() {
         return te;
     }
 
-    private static final class WatchedSlot extends SlotTemplateManager {
-        private Consumer<ItemStack> onChange;
+    private class WatchedSlot extends SlotTemplateManager {
+        private Consumer<Integer> onChange;
 
-        private WatchedSlot(IItemHandler itemHandler, int index, int xPosition, int yPosition, String backgroundLoc) {
-            this(itemHandler, index, xPosition, yPosition, backgroundLoc, s -> {});
-        }
-
-        private WatchedSlot(IItemHandler itemHandler, int index, int xPosition, int yPosition, String backgroundLoc, Consumer<ItemStack> onChange) {
+        public WatchedSlot(IItemHandler itemHandler, int index, int xPosition, int yPosition, String backgroundLoc, Consumer<Integer> onChange) {
             super(itemHandler, index, xPosition, yPosition, backgroundLoc);
             this.onChange = onChange;
         }
@@ -103,11 +132,25 @@ public class TemplateManagerContainer extends BaseContainer {
         @Override
         public void onSlotChanged() {
             super.onSlotChanged();
-            this.onChange.accept(this.getStack());
+            this.onChange.accept(this.getSlotIndex());
+        }
+    }
+
+    public class TemplatePrebuilt {
+        private Template template;
+        private IBuildView buildView;
+
+        public TemplatePrebuilt(Template template, IBuildView buildView) {
+            this.template = template;
+            this.buildView = buildView;
         }
 
-        private void addOnChangerListener(Consumer<ItemStack> listener) {
-            this.onChange = this.onChange.andThen(listener);
+        public Template getTemplate() {
+            return template;
+        }
+
+        public IBuildView getBuildView() {
+            return buildView;
         }
     }
 
