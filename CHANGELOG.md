@@ -1,7 +1,7 @@
 # Building Gadgets Changelog
 The format of this document is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and should continue to adhere to the conventions outlined in the Keep a Changelog guidelines.
 
-## [3.1.0b - 1.14.4]
+## [3.1.0b - 1.14.4] - 2019-11-02
 A small note to this release: we know about chests not rendering in the in-game render. Please do not report this as it'll be fixed in the next version. Sorry about that.
 
 ### Fixed
