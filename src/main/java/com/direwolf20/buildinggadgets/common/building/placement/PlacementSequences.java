@@ -199,8 +199,12 @@ public final class PlacementSequences {
          * @return {@link com.direwolf20.buildinggadgets.common.building.IPlacementSequence}
          */
         public static IPositionPlacementSequence create(IBlockReader world, BlockPos searchingCenter, Direction side, int range, boolean fuzzy) {
-            Region searchingRegion = Wall.clickedSide(searchingCenter, side, range / 2).getBoundingBox();
-            return create(world, searchingCenter, searchingRegion, pos -> pos.offset(side), fuzzy);
+            return create(world, pos -> pos.offset(side), searchingCenter, side, range, fuzzy);
+        }
+
+        public static IPositionPlacementSequence create(IBlockReader world, Function<BlockPos, BlockPos> searching2referenceMapper, BlockPos searchingCenter, Direction side, int range, boolean fuzzy) {
+            Region searchingRegion = Wall.clickedSide(searchingCenter, side, MathUtils.floorToOdd(range) / 2).getBoundingBox();
+            return create(world, searchingCenter, searchingRegion, searching2referenceMapper, fuzzy);
         }
 
         public static IPositionPlacementSequence create(IBlockReader world, BlockPos center, Region searchingRegion, Function<BlockPos, BlockPos> searching2referenceMapper, boolean fuzzy) {
@@ -233,8 +237,12 @@ public final class PlacementSequences {
          * @return IPositionPlacementSequence
          */
         public static IPositionPlacementSequence create(IBlockReader world, BlockPos searchingCenter, Direction side, int range, boolean fuzzy) {
-            Region searchingRegion = Wall.clickedSide(searchingCenter, side, range / 2).getBoundingBox();
-            return create(world, searchingRegion, pos -> pos.offset(side), searchingCenter, side, fuzzy);
+            return create(world, pos -> pos.offset(side), searchingCenter, side, range, fuzzy);
+        }
+
+        public static IPositionPlacementSequence create(IBlockReader world, Function<BlockPos, BlockPos> searching2referenceMapper, BlockPos searchingCenter, Direction side, int range, boolean fuzzy) {
+            Region searchingRegion = Wall.clickedSide(searchingCenter, side, MathUtils.floorToOdd(range) / 2).getBoundingBox();
+            return create(world, searchingRegion, searching2referenceMapper, searchingCenter, side, fuzzy);
         }
 
         public static IPositionPlacementSequence create(IBlockReader world, Region searchingRegion, Function<BlockPos, BlockPos> searching2referenceMapper, BlockPos searchingCenter, @Nullable Direction side, boolean fuzzy) {
