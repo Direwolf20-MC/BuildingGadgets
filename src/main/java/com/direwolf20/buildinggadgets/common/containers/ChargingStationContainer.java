@@ -28,7 +28,7 @@ public class ChargingStationContainer extends BaseContainer {
     public ChargingStationContainer(int windowId, PlayerInventory playerInventory, PacketBuffer extraData) {
         super(OurContainers.CHARGING_STATION_CONTAINER, windowId);
         BlockPos pos = extraData.readBlockPos();
-        this.te = (ChargingStationTileEntity) Minecraft.getInstance().world.getTileEntity(pos);
+        this.te = (ChargingStationTileEntity) playerInventory.player.world.getTileEntity(pos);
         addOwnSlots();
         addPlayerSlots(playerInventory);
     }

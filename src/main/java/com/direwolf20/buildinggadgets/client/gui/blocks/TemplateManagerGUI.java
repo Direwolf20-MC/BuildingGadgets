@@ -8,6 +8,7 @@ package com.direwolf20.buildinggadgets.client.gui.blocks;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.building.PlacementTarget;
 import com.direwolf20.buildinggadgets.common.building.view.IBuildContext;
+import com.direwolf20.buildinggadgets.common.building.view.IBuildView;
 import com.direwolf20.buildinggadgets.common.building.view.SimpleBuildContext;
 import com.direwolf20.buildinggadgets.common.capability.CapabilityTemplate;
 import com.direwolf20.buildinggadgets.common.containers.TemplateManagerContainer;
@@ -37,10 +38,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.gui.widget.button.Button;
-import net.minecraft.client.renderer.BlockRendererDispatcher;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.Matrix4f;
-import net.minecraft.client.renderer.Rectangle2d;
+import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
@@ -83,6 +81,12 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
     private TemplateManagerContainer container;
     private LazyOptional<ITemplateProvider> templateProvider = getWorld().getCapability(CapabilityTemplate.TEMPLATE_PROVIDER_CAPABILITY);
 
+    // It is so stupid I can't get the key from the template.
+    private Template template;
+    private ITemplateKey templateKey;
+
+    private int displayList;
+
     public TemplateManagerGUI(TemplateManagerContainer container, PlayerInventory playerInventory, ITextComponent title) {
         super(container, playerInventory, new StringTextComponent(""));
 
@@ -110,135 +114,71 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
     public void render(int mouseX, int mouseY, float partialTicks) {
         super.render(mouseX, mouseY, partialTicks);
         this.renderHoveredToolTip(mouseX, mouseY);
-    }
 
-    // we need to ensure that the Template we want to look at is recent, before we take any further action
-    private void runAfterUpdate(int slot, Runnable runnable) {
-        container.getSlot(slot).getStack().getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(key -> templateProvider.ifPresent(provider -> {
-            provider.registerUpdateListener(new IUpdateListener() {
-                @Override
-                public void onTemplateUpdate(ITemplateProvider provider, ITemplateKey updateKey, Template template) {
-                    if (provider.getId(updateKey).equals(provider.getId(key))) {
-                        runnable.run();
-                        provider.removeUpdateListener(this);
-                    }
+        // Invalidate the render
+        if( container.getSlot(0).getStack().isEmpty() && template != null ) {
+            template = null;
+            templateKey = null;
+            GLAllocation.deleteDisplayLists(this.displayList);
+            return;
+        }
+
+        container.getSlot(0).getStack().getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(key -> templateProvider.ifPresent(provider -> {
+            // Make sure we're not re-creating the same cache.
+            if( templateKey == key )
+                return;
+
+            Template template = provider.getTemplateForKey(key);
+            this.template = template;
+            this.templateKey = key;
+
+            IBuildView view = template.createViewInContext(
+                    SimpleBuildContext.builder()
+                            .buildingPlayer(getMinecraft().player)
+                            .usedStack(container.getSlot(0).getStack())
+                            .build(getMinecraft().world));
+
+            int displayList = GLAllocation.generateDisplayLists(1);
+            GlStateManager.newList(displayList, GL11.GL_COMPILE);
+
+            BlockRendererDispatcher dispatcher = getMinecraft().getBlockRendererDispatcher();
+            BufferBuilder bufferBuilder = new BufferBuilder(2097152);
+            bufferBuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
+            Random rand = new Random();
+            for (PlacementTarget target : view) {
+                BlockState renderBlockState = target.getData().getState();
+                if (!(renderBlockState.equals(Blocks.AIR.getDefaultState()))) {
+                    IBakedModel model = dispatcher.getModelForState(renderBlockState);
+                    dispatcher.getBlockModelRenderer().renderModelFlat(getWorld(), model, renderBlockState, target.getPos(), bufferBuilder, false, rand, 0L, EmptyModelData.INSTANCE);
                 }
-            });
-            provider.requestUpdate(key);
+            }
+            bufferBuilder.finishDrawing();
+
+            if (bufferBuilder.getVertexCount() > 0) {
+                VertexFormat vertexformat = bufferBuilder.getVertexFormat();
+                int i = vertexformat.getSize();
+                ByteBuffer bytebuffer = bufferBuilder.getByteBuffer();
+                List<VertexFormatElement> list = vertexformat.getElements();
+
+                for (int j = 0; j < list.size(); ++ j) {
+                    VertexFormatElement vertexformatelement = list.get(j);
+                    bytebuffer.position(vertexformat.getOffset(j));
+                    vertexformatelement.getUsage().preDraw(vertexformat, j, i, bytebuffer);
+                }
+
+                GlStateManager.drawArrays(bufferBuilder.getDrawMode(), 0, bufferBuilder.getVertexCount());
+                int i1 = 0;
+
+                for (int j1 = list.size(); i1 < j1; ++ i1) {
+                    VertexFormatElement vertexformatelement1 = list.get(i1);
+                    vertexformatelement1.getUsage().postDraw(vertexformat, i1, i, bytebuffer);
+                }
+            }
+
+            GlStateManager.endList();
+
+            this.displayList = displayList;
         }));
-    }
-
-    private void onSave() {
-        boolean replaced = replaceStack();
-        ItemStack left = container.getSlot(0).getStack();
-        ItemStack right = container.getSlot(1).getStack();
-        if (left.isEmpty()) {
-            rename(right);
-            return;
-        }
-
-        runAfterUpdate(0, () -> { //we are copying form 0 to 1 => slot 0 needs to be the recent one
-            templateProvider.ifPresent(provider -> {
-                left.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(key -> {
-                    Template templateToSave = provider.getTemplateForKey(key);
-                    pasteTemplateToStack(provider, right, templateToSave, replaced);
-                });
-            });
-        });
-
-    }
-
-    private void onLoad() {
-        boolean replaced = replaceStack();
-        ItemStack left = container.getSlot(0).getStack();
-        ItemStack right = container.getSlot(1).getStack();
-        if (left.isEmpty()) {
-            rename(right);
-            return;
-        }
-
-        runAfterUpdate(1, () -> { //we are copying form 1 to 0 => slot 1 needs to be the recent one
-            templateProvider.ifPresent(provider -> {
-                right.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(key -> {
-                    Template templateToSave = provider.getTemplateForKey(key);
-                    pasteTemplateToStack(provider, left, templateToSave, replaced);
-                });
-            });
-        });
-    }
-
-    private void onCopy() {
-        runAfterUpdate(1, () -> { //we are copying from slot 1 => slot 1 needs to be updated
-            ItemStack stack = container.getSlot(1).getStack();
-            stack.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(key -> {
-                templateProvider.ifPresent(provider -> {
-                    PlayerEntity player = getMinecraft().player;
-                    IBuildContext buildContext = SimpleBuildContext.builder()
-                            .buildingPlayer(player)
-                            .usedStack(stack)
-                            .build(getWorld());
-                    try {
-                        Template template = provider.getTemplateForKey(key);
-                        if (! nameField.getText().isEmpty())
-                            template = template.withName(nameField.getText());
-                        String json = TemplateIO.writeTemplateJson(template, buildContext);
-                        getMinecraft().keyboardListener.setClipboardString(json);
-                        player.sendStatusMessage(MessageTranslation.CLIPBOARD_COPY_SUCCESS.componentTranslation().setStyle(Styles.DK_GREEN), false);
-                    } catch (DataCannotBeWrittenException e) {
-                        BuildingGadgets.LOG.error("Failed to write Template.", e);
-                        player.sendStatusMessage(MessageTranslation.CLIPBOARD_COPY_ERROR_TEMPLATE.componentTranslation().setStyle(Styles.RED), false);
-                    } catch (Exception e) {
-                        BuildingGadgets.LOG.error("Failed to copy Template to clipboard.", e);
-                        player.sendStatusMessage(MessageTranslation.CLIPBOARD_COPY_ERROR.componentTranslation().setStyle(Styles.RED), false);
-                    }
-                });
-            });
-        });
-    }
-
-    private void onPaste() {
-        String CBString = getMinecraft().keyboardListener.getClipboardString();
-        if (GadgetUtils.mightBeLink(CBString)) {
-            getMinecraft().player.sendStatusMessage(MessageTranslation.PASTE_SUCCESS.componentTranslation().setStyle(Styles.RED), false);
-            return;
-        }
-
-        // todo: this needs to be put onto some kind of readTemplateFromJson(input stream).onError(e -> error)
-        try {
-            Template readTemplate = TemplateIO.readTemplateFromJson(CBString).clearMaterials();
-            if (! nameField.getText().isEmpty())
-                readTemplate = readTemplate.withName(nameField.getText());
-            boolean replaced = replaceStack();
-            ItemStack stack = container.getSlot(1).getStack();
-            pasteTemplateToStack(getWorld(), stack, readTemplate, replaced);
-            getMinecraft().player.sendStatusMessage(MessageTranslation.PASTE_SUCCESS.componentTranslation().setStyle(Styles.DK_GREEN), false);
-        } catch (CorruptJsonException e) {
-            BuildingGadgets.LOG.error("Failed to parse json syntax.", e);
-            getMinecraft().player.sendStatusMessage(MessageTranslation.PASTE_FAILED_CORRUPT_JSON
-                    .componentTranslation().setStyle(Styles.RED), false);
-        } catch (IllegalMinecraftVersionException e) {
-            BuildingGadgets.LOG.error("Attempted to parse Template for Minecraft version {} but expected {}.",
-                    e.getMinecraftVersion(), e.getExpectedVersion(), e);
-            getMinecraft().player.sendStatusMessage(MessageTranslation.PASTE_FAILED_WRONG_MC_VERSION
-                    .componentTranslation(e.getMinecraftVersion(), e.getExpectedVersion()).setStyle(Styles.RED), false);
-        } catch (UnknownTemplateVersionException e) {
-            BuildingGadgets.LOG.error("Attempted to parse Template version {} but newest is {}.",
-                    e.getTemplateVersion(), TemplateHeader.VERSION, e);
-            getMinecraft().player.sendStatusMessage(MessageTranslation.PASTE_FAILED_TOO_RECENT_VERSION
-                    .componentTranslation(e.getTemplateVersion(), TemplateHeader.VERSION).setStyle(Styles.RED), false);
-        } catch (JsonParseException e) {
-            BuildingGadgets.LOG.error("Failed to parse Template json.", e);
-            getMinecraft().player.sendStatusMessage(MessageTranslation.PASTE_FAILED_INVALID_JSON
-                    .componentTranslation().setStyle(Styles.RED), false);
-        } catch (TemplateReadException e) {
-            BuildingGadgets.LOG.error("Failed to read Template body.", e);
-            getMinecraft().player.sendStatusMessage(MessageTranslation.PASTE_FAILED_CORRUPT_BODY
-                    .componentTranslation().setStyle(Styles.RED), false);
-        } catch (Exception e) {
-            BuildingGadgets.LOG.error("Failed to paste Template.", e);
-            getMinecraft().player.sendStatusMessage(MessageTranslation.PASTE_FAILED
-                    .componentTranslation().setStyle(Styles.RED), false);
-        }
     }
 
     private void pasteTemplateToStack(World world, ItemStack stack, Template newTemplate, boolean replaced) {
@@ -324,17 +264,12 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
             return;
         }
 
-        if( !this.container.getViewCache().isPresent() )
+        if( this.template == null )
             return;
 
-        BlockRendererDispatcher dispatcher = getMinecraft().getBlockRendererDispatcher();
-        GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-
-        Template template = this.container.getViewCache().get().getTemplate();
         BlockPos startPos = template.getHeader().getBoundingBox().getMin();
         BlockPos endPos = template.getHeader().getBoundingBox().getMax();
 
-        BufferBuilder bufferBuilder = new BufferBuilder(2097152);
         double lengthX = Math.abs(startPos.getX() - endPos.getX());
         double lengthY = Math.abs(startPos.getY() - endPos.getY());
         double lengthZ = Math.abs(startPos.getZ() - endPos.getZ());
@@ -387,36 +322,7 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
 
         getMinecraft().getTextureManager().bindTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
 
-        bufferBuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
-        for (PlacementTarget target : this.container.getViewCache().get().getBuildView()) {
-            BlockState renderBlockState = target.getData().getState();
-            if (!(renderBlockState.equals(Blocks.AIR.getDefaultState()))) {
-                IBakedModel model = dispatcher.getModelForState(renderBlockState);
-                dispatcher.getBlockModelRenderer().renderModelFlat(getWorld(), model, renderBlockState, target.getPos(), bufferBuilder, false, new Random(), 0L, EmptyModelData.INSTANCE);
-            }
-        }
-        bufferBuilder.finishDrawing();
-
-        if (bufferBuilder.getVertexCount() > 0) {
-            VertexFormat vertexformat = bufferBuilder.getVertexFormat();
-            int i = vertexformat.getSize();
-            ByteBuffer bytebuffer = bufferBuilder.getByteBuffer();
-            List<VertexFormatElement> list = vertexformat.getElements();
-
-            for (int j = 0; j < list.size(); ++ j) {
-                VertexFormatElement vertexformatelement = list.get(j);
-                bytebuffer.position(vertexformat.getOffset(j));
-                vertexformatelement.getUsage().preDraw(vertexformat, j, i, bytebuffer);
-            }
-
-            GlStateManager.drawArrays(bufferBuilder.getDrawMode(), 0, bufferBuilder.getVertexCount());
-            int i1 = 0;
-
-            for (int j1 = list.size(); i1 < j1; ++ i1) {
-                VertexFormatElement vertexformatelement1 = list.get(i1);
-                vertexformatelement1.getUsage().postDraw(vertexformat, i1, i, bytebuffer);
-            }
-        }
+        GlStateManager.callList(displayList);
 
         GlStateManager.popMatrix();
         GlStateManager.matrixMode(GL11.GL_PROJECTION);
@@ -528,5 +434,134 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
     @Override
     public Minecraft getMinecraft() {
         return Minecraft.getInstance();
+    }
+
+    // Events
+    // we need to ensure that the Template we want to look at is recent, before we take any further action
+    private void runAfterUpdate(int slot, Runnable runnable) {
+        container.getSlot(slot).getStack().getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(key -> templateProvider.ifPresent(provider -> {
+            provider.registerUpdateListener(new IUpdateListener() {
+                @Override
+                public void onTemplateUpdate(ITemplateProvider provider, ITemplateKey updateKey, Template template) {
+                    if (provider.getId(updateKey).equals(provider.getId(key))) {
+                        runnable.run();
+                        provider.removeUpdateListener(this);
+                    }
+                }
+            });
+            provider.requestUpdate(key);
+        }));
+    }
+
+    private void onSave() {
+        boolean replaced = replaceStack();
+        ItemStack left = container.getSlot(0).getStack();
+        ItemStack right = container.getSlot(1).getStack();
+        if (left.isEmpty()) {
+            rename(right);
+            return;
+        }
+
+        runAfterUpdate(0, () -> { //we are copying form 0 to 1 => slot 0 needs to be the recent one
+            templateProvider.ifPresent(provider -> {
+                left.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(key -> {
+                    Template templateToSave = provider.getTemplateForKey(key);
+                    pasteTemplateToStack(provider, right, templateToSave, replaced);
+                });
+            });
+        });
+    }
+
+    private void onLoad() {
+        boolean replaced = replaceStack();
+        ItemStack left = container.getSlot(0).getStack();
+        ItemStack right = container.getSlot(1).getStack();
+        if (left.isEmpty()) {
+            rename(right);
+            return;
+        }
+
+        runAfterUpdate(1, () -> { //we are copying form 1 to 0 => slot 1 needs to be the recent one
+            templateProvider.ifPresent(provider -> {
+                right.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(key -> {
+                    Template templateToSave = provider.getTemplateForKey(key);
+                    pasteTemplateToStack(provider, left, templateToSave, replaced);
+                });
+            });
+        });
+    }
+
+    private void onCopy() {
+        runAfterUpdate(1, () -> { //we are copying from slot 1 => slot 1 needs to be updated
+            ItemStack stack = container.getSlot(1).getStack();
+            stack.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(key -> {
+                templateProvider.ifPresent(provider -> {
+                    PlayerEntity player = getMinecraft().player;
+                    IBuildContext buildContext = SimpleBuildContext.builder()
+                            .buildingPlayer(player)
+                            .usedStack(stack)
+                            .build(getWorld());
+                    try {
+                        Template template = provider.getTemplateForKey(key);
+                        if (! nameField.getText().isEmpty())
+                            template = template.withName(nameField.getText());
+                        String json = TemplateIO.writeTemplateJson(template, buildContext);
+                        getMinecraft().keyboardListener.setClipboardString(json);
+                        player.sendStatusMessage(MessageTranslation.CLIPBOARD_COPY_SUCCESS.componentTranslation().setStyle(Styles.DK_GREEN), false);
+                    } catch (DataCannotBeWrittenException e) {
+                        BuildingGadgets.LOG.error("Failed to write Template.", e);
+                        player.sendStatusMessage(MessageTranslation.CLIPBOARD_COPY_ERROR_TEMPLATE.componentTranslation().setStyle(Styles.RED), false);
+                    } catch (Exception e) {
+                        BuildingGadgets.LOG.error("Failed to copy Template to clipboard.", e);
+                        player.sendStatusMessage(MessageTranslation.CLIPBOARD_COPY_ERROR.componentTranslation().setStyle(Styles.RED), false);
+                    }
+                });
+            });
+        });
+    }
+
+    private void onPaste() {
+        String CBString = getMinecraft().keyboardListener.getClipboardString();
+        if (GadgetUtils.mightBeLink(CBString)) {
+            getMinecraft().player.sendStatusMessage(MessageTranslation.PASTE_SUCCESS.componentTranslation().setStyle(Styles.RED), false);
+            return;
+        }
+
+        // todo: this needs to be put onto some kind of readTemplateFromJson(input stream).onError(e -> error)
+        try {
+            Template readTemplate = TemplateIO.readTemplateFromJson(CBString).clearMaterials();
+            if (! nameField.getText().isEmpty())
+                readTemplate = readTemplate.withName(nameField.getText());
+            boolean replaced = replaceStack();
+            ItemStack stack = container.getSlot(1).getStack();
+            pasteTemplateToStack(getWorld(), stack, readTemplate, replaced);
+            getMinecraft().player.sendStatusMessage(MessageTranslation.PASTE_SUCCESS.componentTranslation().setStyle(Styles.DK_GREEN), false);
+        } catch (CorruptJsonException e) {
+            BuildingGadgets.LOG.error("Failed to parse json syntax.", e);
+            getMinecraft().player.sendStatusMessage(MessageTranslation.PASTE_FAILED_CORRUPT_JSON
+                    .componentTranslation().setStyle(Styles.RED), false);
+        } catch (IllegalMinecraftVersionException e) {
+            BuildingGadgets.LOG.error("Attempted to parse Template for Minecraft version {} but expected {}.",
+                    e.getMinecraftVersion(), e.getExpectedVersion(), e);
+            getMinecraft().player.sendStatusMessage(MessageTranslation.PASTE_FAILED_WRONG_MC_VERSION
+                    .componentTranslation(e.getMinecraftVersion(), e.getExpectedVersion()).setStyle(Styles.RED), false);
+        } catch (UnknownTemplateVersionException e) {
+            BuildingGadgets.LOG.error("Attempted to parse Template version {} but newest is {}.",
+                    e.getTemplateVersion(), TemplateHeader.VERSION, e);
+            getMinecraft().player.sendStatusMessage(MessageTranslation.PASTE_FAILED_TOO_RECENT_VERSION
+                    .componentTranslation(e.getTemplateVersion(), TemplateHeader.VERSION).setStyle(Styles.RED), false);
+        } catch (JsonParseException e) {
+            BuildingGadgets.LOG.error("Failed to parse Template json.", e);
+            getMinecraft().player.sendStatusMessage(MessageTranslation.PASTE_FAILED_INVALID_JSON
+                    .componentTranslation().setStyle(Styles.RED), false);
+        } catch (TemplateReadException e) {
+            BuildingGadgets.LOG.error("Failed to read Template body.", e);
+            getMinecraft().player.sendStatusMessage(MessageTranslation.PASTE_FAILED_CORRUPT_BODY
+                    .componentTranslation().setStyle(Styles.RED), false);
+        } catch (Exception e) {
+            BuildingGadgets.LOG.error("Failed to paste Template.", e);
+            getMinecraft().player.sendStatusMessage(MessageTranslation.PASTE_FAILED
+                    .componentTranslation().setStyle(Styles.RED), false);
+        }
     }
 }
