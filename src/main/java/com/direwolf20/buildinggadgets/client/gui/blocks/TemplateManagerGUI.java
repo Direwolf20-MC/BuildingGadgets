@@ -118,12 +118,34 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
         validateCache();
     }
 
+    @Override
+    protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
+        this.renderBackground();
+
+        getMinecraft().getTextureManager().bindTexture(background);
+        blit(guiLeft - 20, guiTop - 12, 0, 0, xSize, ySize + 25);
+        blit((guiLeft - 20) + xSize, guiTop + 8, xSize + 3, 30, 71, ySize);
+
+        if (! buttonCopy.isHovered() && ! buttonPaste.isHovered()) {
+            if( buttonLoad.isHovered() )
+                blit((guiLeft + xSize) - 44, guiTop + 38, xSize, 0, 17, 24);
+            else
+                blit((guiLeft + xSize) - 44, guiTop + 38, xSize + 17, 0, 16, 24);
+        }
+
+        this.nameField.render(mouseX, mouseY, partialTicks);
+
+        if( this.template != null )
+            renderStructure();
+    }
+
     private void validateCache() {
         // Invalidate the render
         if( container.getSlot(0).getStack().isEmpty() && template != null ) {
             template = null;
             templateKey = null;
             GLAllocation.deleteDisplayLists(this.displayList);
+            resetViewport();
             return;
         }
 
@@ -232,47 +254,9 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
         }));
     }
 
-    @Override
-    protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
-        this.renderBackground();
-
-        getMinecraft().getTextureManager().bindTexture(background);
-        blit(guiLeft - 20, guiTop - 12, 0, 0, xSize, ySize + 25);
-        blit((guiLeft - 20) + xSize, guiTop + 8, xSize + 3, 30, 71, ySize);
-
-        if (! buttonCopy.isHovered() && ! buttonPaste.isHovered())
-            drawTexturedModalRectReverseX(buttonLoad.isHovered());
-
-        this.nameField.render(mouseX, mouseY, partialTicks);
-        drawStructure();
-    }
-
-    private void drawTexturedModalRectReverseX(boolean reverse) {
-        if( reverse )
-            blit((guiLeft + xSize) - 44, guiTop + 38, xSize, 0, 17, 24);
-        else
-            blit((guiLeft + xSize) - 44, guiTop + 38, xSize + 17, 0, 16, 24);
-    }
-
-    private void drawStructure() {
+    private void renderStructure() {
         double scale = getMinecraft().mainWindow.getGuiScaleFactor();
         fill(guiLeft + panel.getX() - 1, guiTop + panel.getY() - 1, guiLeft + panel.getX() + panel.getWidth() + 1, guiTop + panel.getY() + panel.getHeight() + 1, 0xFF8A8A8A);
-        ItemStack itemstack = this.container.getSlot(0).getStack();
-
-        // Reset on undo.
-        if (itemstack.isEmpty() && zoom != 1) {
-            rotX = 0;
-            rotY = 0;
-            zoom = 1;
-            momentumX = 0;
-            momentumY = 0;
-            panX = 0;
-            panY = 0;
-            return;
-        }
-
-        if( this.template == null )
-            return;
 
         BlockPos startPos = template.getHeader().getBoundingBox().getMin();
         BlockPos endPos = template.getHeader().getBoundingBox().getMax();
@@ -336,6 +320,16 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
         GlStateManager.popMatrix();
         GlStateManager.matrixMode(GL11.GL_MODELVIEW);
         GlStateManager.viewport(0, 0, getMinecraft().mainWindow.getFramebufferWidth(), getMinecraft().mainWindow.getFramebufferHeight());
+    }
+
+    private void resetViewport() {
+        rotX = 0;
+        rotY = 0;
+        zoom = 1;
+        momentumX = 0;
+        momentumY = 0;
+        panX = 0;
+        panY = 0;
     }
 
     @Override
