@@ -28,11 +28,9 @@ import com.direwolf20.buildinggadgets.common.util.lang.GuiTranslation;
 import com.direwolf20.buildinggadgets.common.util.lang.MessageTranslation;
 import com.direwolf20.buildinggadgets.common.util.lang.Styles;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
-
 import com.direwolf20.buildinggadgets.common.world.FakeDelegationWorld;
 import com.google.gson.JsonParseException;
 import com.mojang.blaze3d.platform.GlStateManager;
-
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
@@ -188,21 +186,29 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
 
         for (PlacementTarget target : view) {
             target.placeIn(view.getContext());
-            BlockState renderBlockState = view.getContext().getWorld().getBlockState(target.getPos());
-            TileEntity te = view.getContext().getWorld().getTileEntity(target.getPos());
+            BlockPos targetPos = target.getPos();
+            BlockState renderBlockState = view.getContext().getWorld().getBlockState(targetPos);
+            TileEntity te = view.getContext().getWorld().getTileEntity(targetPos);
 
-            if (renderBlockState.getRenderType() == BlockRenderType.MODEL && te == null) {
+            if (renderBlockState.getRenderType() == BlockRenderType.MODEL) {
                 IBakedModel model = dispatcher.getModelForState(renderBlockState);
-                dispatcher.getBlockModelRenderer().renderModelFlat(getWorld(), model, renderBlockState, target.getPos(), bufferBuilder, false, rand, 0L, EmptyModelData.INSTANCE);
+                dispatcher.getBlockModelRenderer().renderModelFlat(getWorld(), model, renderBlockState, target.getPos(), bufferBuilder, false,
+                        rand, 0L, te != null ? te.getModelData() : EmptyModelData.INSTANCE);
             }
 
-            if( te != null ) {
-                TileEntityRenderer<TileEntity> renderer = TileEntityRendererDispatcher.instance.getRenderer(te);
-                if (renderer != null) {
-                    if (te.hasFastRenderer())
-                        renderer.renderTileEntityFast(te, 0, 0, 0, partialTicks, - 1, bufferBuilder);
-                    else
-                        renderer.render(te, 0, 0, 0, partialTicks, - 1);
+            if (te != null) {
+                try {
+                    TileEntityRenderer<TileEntity> renderer = TileEntityRendererDispatcher.instance.getRenderer(te);
+                    if (renderer != null) {
+                        if (te.hasFastRenderer())
+                            renderer.renderTileEntityFast(te, targetPos.getX(), targetPos.getY(), targetPos.getZ(), partialTicks, - 1, bufferBuilder);
+                        else
+                            renderer.render(te, targetPos.getX(), targetPos.getY(), targetPos.getZ(), partialTicks, - 1);
+                    }
+                    //remember vanilla Tiles rebinding the TextureAtlas
+                    getMinecraft().getTextureManager().bindTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
+                } catch (Exception e) {
+                    BuildingGadgets.LOG.error("Error rendering TileEntity", e);
                 }
             }
         }
