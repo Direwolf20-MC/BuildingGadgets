@@ -3,7 +3,6 @@ package com.direwolf20.buildinggadgets.common.save;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketRequestTemplate;
-import com.direwolf20.buildinggadgets.common.network.packets.PacketTemplateIdAllocated;
 import com.direwolf20.buildinggadgets.common.network.packets.SplitPacketUpdateTemplate;
 import com.direwolf20.buildinggadgets.common.template.ITemplateKey;
 import com.direwolf20.buildinggadgets.common.template.ITemplateProvider;
@@ -99,17 +98,11 @@ public final class SaveTemplateProvider implements ITemplateProvider {
 
     public void onRemoteIdAllocated(UUID allocated) {
         getSave().getTemplate(allocated);
-        onIdAllocated(allocated);//propagate it to everyone
     }
 
     private UUID getFreeId() {
         UUID freeId = getSave().getFreeUUID();
-        onIdAllocated(freeId);
         return freeId;
-    }
-
-    private void onIdAllocated(UUID allocatedId) {
-        PacketHandler.sendToAllClients(new PacketTemplateIdAllocated(allocatedId));
     }
 
     private void notifyListeners(ITemplateKey key, Template template, Function<IUpdateListener, TriConsumer<ITemplateProvider, ITemplateKey, Template>> function) {

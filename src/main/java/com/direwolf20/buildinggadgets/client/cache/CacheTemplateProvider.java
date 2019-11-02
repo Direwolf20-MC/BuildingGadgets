@@ -3,7 +3,6 @@ package com.direwolf20.buildinggadgets.client.cache;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketRequestTemplate;
-import com.direwolf20.buildinggadgets.common.network.packets.PacketTemplateIdAllocated;
 import com.direwolf20.buildinggadgets.common.network.packets.SplitPacketUpdateTemplate;
 import com.direwolf20.buildinggadgets.common.template.ITemplateKey;
 import com.direwolf20.buildinggadgets.common.template.ITemplateProvider;
@@ -15,14 +14,16 @@ import net.minecraftforge.fml.network.PacketDistributor.PacketTarget;
 import org.apache.logging.log4j.util.TriConsumer;
 
 import javax.annotation.Nonnull;
-import java.util.*;
+import java.util.Collections;
+import java.util.Set;
+import java.util.UUID;
+import java.util.WeakHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 public final class CacheTemplateProvider implements ITemplateProvider {
     private final Cache<UUID, Template> cache;
-    private final Set<UUID> allocatedIds;
     private final Set<IUpdateListener> updateListeners;
 
     public CacheTemplateProvider() {
@@ -30,7 +31,6 @@ public final class CacheTemplateProvider implements ITemplateProvider {
                 .newBuilder()
                 .expireAfterAccess(1, TimeUnit.MINUTES)
                 .build();
-        this.allocatedIds = new HashSet<>();
         this.updateListeners = Collections.newSetFromMap(new WeakHashMap<>());
     }
 
@@ -52,7 +52,6 @@ public final class CacheTemplateProvider implements ITemplateProvider {
     @Override
     public void setTemplate(ITemplateKey key, Template template) {
         UUID id = getId(key);
-        allocatedIds.add(id);
         cache.put(id, template);
         notifyListeners(key, template, l -> l::onTemplateUpdate);
     }
@@ -64,7 +63,7 @@ public final class CacheTemplateProvider implements ITemplateProvider {
 
     @Override
     public boolean requestUpdate(ITemplateKey key, PacketTarget target) {
-        return requestUpdate(key.getTemplateId(this::getFreeId), target);
+        return requestUpdate(key.getTemplateId(UUID::randomUUID), target);
     }
 
     private boolean requestUpdate(UUID id, PacketTarget target) {
@@ -100,24 +99,7 @@ public final class CacheTemplateProvider implements ITemplateProvider {
 
     @Override
     public UUID getId(ITemplateKey key) {
-        return key.getTemplateId(this::getFreeId);
-    }
-
-    public void onRemoteIdAllocated(UUID id) {
-        this.allocatedIds.add(id);
-    }
-
-    private UUID getFreeId() {
-        UUID id = UUID.randomUUID();
-        if (allocatedIds.contains(id))
-            return getFreeId();
-        onIdAllocated(id);
-        return id;
-    }
-
-    private void onIdAllocated(UUID allocatedId) {
-        this.allocatedIds.add(allocatedId);
-        PacketHandler.sendToServer(new PacketTemplateIdAllocated(allocatedId));
+        return key.getTemplateId(UUID::randomUUID);
     }
 
     /**
@@ -127,7 +109,6 @@ public final class CacheTemplateProvider implements ITemplateProvider {
     public void clear() {
         this.cache.invalidateAll();
         this.cache.cleanUp();
-        this.allocatedIds.clear();
     }
 
     private void notifyListeners(ITemplateKey key, Template template, Function<IUpdateListener, TriConsumer<ITemplateProvider, ITemplateKey, Template>> function) {
