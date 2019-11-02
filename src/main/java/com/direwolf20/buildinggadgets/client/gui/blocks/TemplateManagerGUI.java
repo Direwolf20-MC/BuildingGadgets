@@ -32,6 +32,7 @@ import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.google.gson.JsonParseException;
 import com.mojang.blaze3d.platform.GlStateManager;
 
+import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.Minecraft;
@@ -134,6 +135,7 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
         }
 
         this.nameField.render(mouseX, mouseY, partialTicks);
+        fill(guiLeft + panel.getX() - 1, guiTop + panel.getY() - 1, guiLeft + panel.getX() + panel.getWidth() + 1, guiTop + panel.getY() + panel.getHeight() + 1, 0xFF8A8A8A);
 
         if( this.template != null )
             renderStructure();
@@ -175,13 +177,14 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
     }
 
     private void renderStructure(IBuildView view) {
+        Random rand = new Random();
         BlockRendererDispatcher dispatcher = getMinecraft().getBlockRendererDispatcher();
+
         BufferBuilder bufferBuilder = new BufferBuilder(2097152);
         bufferBuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
-        Random rand = new Random();
         for (PlacementTarget target : view) {
             BlockState renderBlockState = target.getData().getState();
-            if (!(renderBlockState.equals(Blocks.AIR.getDefaultState()))) {
+            if (renderBlockState.getRenderType() == BlockRenderType.MODEL) {
                 IBakedModel model = dispatcher.getModelForState(renderBlockState);
                 dispatcher.getBlockModelRenderer().renderModelFlat(getWorld(), model, renderBlockState, target.getPos(), bufferBuilder, false, rand, 0L, EmptyModelData.INSTANCE);
             }
@@ -256,7 +259,6 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
 
     private void renderStructure() {
         double scale = getMinecraft().mainWindow.getGuiScaleFactor();
-        fill(guiLeft + panel.getX() - 1, guiTop + panel.getY() - 1, guiLeft + panel.getX() + panel.getWidth() + 1, guiTop + panel.getY() + panel.getHeight() + 1, 0xFF8A8A8A);
 
         BlockPos startPos = template.getHeader().getBoundingBox().getMin();
         BlockPos endPos = template.getHeader().getBoundingBox().getMax();
