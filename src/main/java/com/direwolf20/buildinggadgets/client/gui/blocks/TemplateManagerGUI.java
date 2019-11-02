@@ -31,14 +31,11 @@ import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.direwolf20.buildinggadgets.common.world.FakeDelegationWorld;
 import com.google.gson.JsonParseException;
 import com.mojang.blaze3d.platform.GlStateManager;
-import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.gui.widget.button.Button;
-import net.minecraft.client.gui.widget.button.Button.IPressable;
 import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.texture.AtlasTexture;
@@ -49,92 +46,68 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.client.model.data.EmptyModelData;
+import net.minecraftforge.common.util.LazyOptional;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL14;
 
 import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.Random;
 
 public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer> {
-    public static final int HELP_TEXT_BACKGROUNG_COLOR = 1694460416;
 
+    private Rectangle2d panel = new Rectangle2d(8, 18, 62, 62);
     private boolean panelClicked;
-    private int clickButton;
-    private long lastDragTime;
-    private int clickX, clickY;
+    private int clickButton, clickX, clickY;
     private float initRotX, initRotY, initZoom, initPanX, initPanY;
-    private float prevRotX, prevRotY;// prevPanX, prevPanY;
+    private float prevRotX, prevRotY;
     private float momentumX, momentumY;
     private float momentumDampening = 0.98f;
     private float rotX = 0, rotY = 0, zoom = 1;
     private float panX = 0, panY = 0;
-    private Rectangle2d panel = new Rectangle2d(8, 18, 62, 62);
-
-    private int scrollAcc;
 
     private TextFieldWidget nameField;
     private Button buttonSave, buttonLoad, buttonCopy, buttonPaste;
 
-//    private GuiButtonHelp buttonHelp; replace with my lovely replacement
-//    private List<IHoverHelpText> helpTextProviders = new ArrayList<>();
-
     private TemplateManagerTileEntity te;
     private TemplateManagerContainer container;
+    private FakeDelegationWorld delegationWorld = new FakeDelegationWorld(getWorld());
+    private LazyOptional<ITemplateProvider> templateProvider = getWorld().getCapability(CapabilityTemplate.TEMPLATE_PROVIDER_CAPABILITY);
 
     private static final ResourceLocation background = new ResourceLocation(Reference.MODID, "textures/gui/template_manager.png");
 
     public TemplateManagerGUI(TemplateManagerContainer container, PlayerInventory playerInventory, ITextComponent title) {
-        super(container, playerInventory, new StringTextComponent("TemplateItem Manager Gui"));
+        super(container, playerInventory, new StringTextComponent(""));
+
         this.container = container;
         this.te = container.getTe();
-    }
-
-    public TemplateManagerGUI(TemplateManagerTileEntity tileEntity, TemplateManagerContainer container, PlayerInventory inv) {
-        super(container, inv, new StringTextComponent("TemplateItem Manager Gui"));
-        this.te = tileEntity;
-        this.container = container;
-    }
-
-    @Override
-    public void render(int mouseX, int mouseY, float partialTicks) {
-        super.render(mouseX, mouseY, partialTicks);
-        /*if (buttonHelp.isSelected()) {
-            GlStateManager.color4f(1, 1, 1, 1);
-            GlStateManager.disableLighting();
-            for (IHoverHelpText helpTextProvider : helpTextProviders)
-                helpTextProvider.drawRect(this, HELP_TEXT_BACKGROUNG_COLOR);
-
-            GlStateManager.enableLighting();
-            for (IHoverHelpText helpTextProvider : helpTextProviders) {
-                if (helpTextProvider.isHovered(mouseX, mouseY))
-                    renderComponentHoverEffect(new StringTextComponent(helpTextProvider.getHoverHelpText()), mouseX, mouseY);
-            }
-        } else {*/
-        //TODO re-enable
-        this.renderHoveredToolTip(mouseX, mouseY);
-        /*}
-        if (buttonHelp.isMouseOver(mouseX, mouseY))
-            renderComponentHoverEffect(new StringTextComponent(buttonHelp.getHoverText()), mouseX, mouseY);*/
     }
 
     @Override
     public void init() {
         super.init();
         this.nameField = new TextFieldWidget(this.font, this.guiLeft + 8, this.guiTop + 6, 149, this.font.FONT_HEIGHT, GuiTranslation.TEMPLATE_NAME_TIP.format());
-        //helpTextProviders.clear();
-        //buttonHelp = addButton(new GuiButtonHelp(this.guiLeft + this.xSize - 16, this.guiTop + 4, (button) -> buttonHelp.toggleSelected()));
-        buttonSave = addButton(createAndAddButton(79, 17, 30, 20, GuiTranslation.BUTTON_SAVE.format(), b -> onSave()));
-        buttonLoad = addButton(createAndAddButton(137, 17, 30, 20, GuiTranslation.BUTTON_LOAD.format(), b -> onLoad()));
-        buttonCopy = addButton(createAndAddButton(79, 61, 30, 20, GuiTranslation.BUTTON_COPY.format(), b -> onCopy()));
-        buttonPaste = addButton(createAndAddButton(135, 61, 34, 20, GuiTranslation.BUTTON_PASTE.format(), b -> onPaste()));
+
+        buttonSave = addButton(
+                new Button(79, 17, 30, 20, GuiTranslation.BUTTON_SAVE.format(), b -> onSave())
+        );
+
+        buttonLoad = addButton(
+                new Button(137, 17, 30, 20, GuiTranslation.BUTTON_LOAD.format(), b -> onLoad())
+        );
+
+        buttonCopy = addButton(
+                new Button(79, 61, 30, 20, GuiTranslation.BUTTON_COPY.format(), b -> onCopy())
+        );
+
+        buttonPaste = addButton(
+                new Button(135, 61, 34, 20, GuiTranslation.BUTTON_PASTE.format(), b -> onPaste())
+        );
 
         this.nameField.setMaxStringLength(50);
         this.nameField.setVisible(true);
@@ -149,16 +122,16 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
         */
     }
 
-    private Button createAndAddButton(int x, int y, int witdth, int height, String text, IPressable action) {
-        Button button = new Button(guiLeft + x, guiTop + y, witdth, height, text, action);
-        //        helpTextProviders.add(button);
-        return button;
+    @Override
+    public void render(int mouseX, int mouseY, float partialTicks) {
+        super.render(mouseX, mouseY, partialTicks);
+        this.renderHoveredToolTip(mouseX, mouseY);
     }
 
-    //we need to ensure that the Template we want to look at is recent, before we take any further action
-    private void runAfterUpdate(Runnable runnable, int slot) {
+    // we need to ensure that the Template we want to look at is recent, before we take any further action
+    private void runAfterUpdate(int slot, Runnable runnable) {
         container.getSlot(slot).getStack().getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(key -> {
-            Minecraft.getInstance().world.getCapability(CapabilityTemplate.TEMPLATE_PROVIDER_CAPABILITY).ifPresent(provider -> {
+            templateProvider.ifPresent(provider -> {
                 provider.registerUpdateListener(new IUpdateListener() {
                     @Override
                     public void onTemplateUpdate(ITemplateProvider provider, ITemplateKey updateKey, Template template) {
@@ -178,17 +151,18 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
         ItemStack left = container.getSlot(0).getStack();
         ItemStack right = container.getSlot(1).getStack();
         if (left.isEmpty()) {
-            rename(Minecraft.getInstance().world, right);
+            rename(right);
             return;
         }
-        runAfterUpdate(() -> { //we are copying form 0 to 1 => slot 0 needs to be the recent one
-            Minecraft.getInstance().world.getCapability(CapabilityTemplate.TEMPLATE_PROVIDER_CAPABILITY).ifPresent(provider -> {
+
+        runAfterUpdate(0, () -> { //we are copying form 0 to 1 => slot 0 needs to be the recent one
+            templateProvider.ifPresent(provider -> {
                 left.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(key -> {
                     Template templateToSave = provider.getTemplateForKey(key);
                     pasteTemplateToStack(provider, right, templateToSave, replaced);
                 });
             });
-        }, 0);
+        });
 
     }
 
@@ -197,37 +171,36 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
         ItemStack left = container.getSlot(0).getStack();
         ItemStack right = container.getSlot(1).getStack();
         if (left.isEmpty()) {
-            rename(Minecraft.getInstance().world, right);
+            rename(right);
             return;
         }
-        runAfterUpdate(() -> { //we are copying form 1 to 0 => slot 1 needs to be the recent one
-            Minecraft.getInstance().world.getCapability(CapabilityTemplate.TEMPLATE_PROVIDER_CAPABILITY).ifPresent(provider -> {
+
+        runAfterUpdate(1, () -> { //we are copying form 1 to 0 => slot 1 needs to be the recent one
+            templateProvider.ifPresent(provider -> {
                 right.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(key -> {
                     Template templateToSave = provider.getTemplateForKey(key);
                     pasteTemplateToStack(provider, left, templateToSave, replaced);
                 });
             });
-        }, 1);
-
+        });
     }
 
     private void onCopy() {
-        runAfterUpdate(() -> { //we are copying from slot 1 => slot 1 needs to be updated
+        runAfterUpdate(1, () -> { //we are copying from slot 1 => slot 1 needs to be updated
             ItemStack stack = container.getSlot(1).getStack();
             stack.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(key -> {
-                World world = Minecraft.getInstance().world;
-                world.getCapability(CapabilityTemplate.TEMPLATE_PROVIDER_CAPABILITY).ifPresent(provider -> {
-                    PlayerEntity player = Minecraft.getInstance().player;
+                templateProvider.ifPresent(provider -> {
+                    PlayerEntity player = getMinecraft().player;
                     IBuildContext buildContext = SimpleBuildContext.builder()
                             .buildingPlayer(player)
                             .usedStack(stack)
-                            .build(world);
+                            .build(getWorld());
                     try {
                         Template template = provider.getTemplateForKey(key);
                         if (! nameField.getText().isEmpty())
                             template = template.withName(nameField.getText());
                         String json = TemplateIO.writeTemplateJson(template, buildContext);
-                        Minecraft.getInstance().keyboardListener.setClipboardString(json);
+                        getMinecraft().keyboardListener.setClipboardString(json);
                         player.sendStatusMessage(MessageTranslation.CLIPBOARD_COPY_SUCCESS.componentTranslation().setStyle(Styles.DK_GREEN), false);
                     } catch (DataCannotBeWrittenException e) {
                         BuildingGadgets.LOG.error("Failed to write Template.", e);
@@ -238,50 +211,50 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
                     }
                 });
             });
-        }, 1);
-
+        });
     }
 
     private void onPaste() {
         String CBString = getMinecraft().keyboardListener.getClipboardString();
         if (GadgetUtils.mightBeLink(CBString)) {
-            Minecraft.getInstance().player.sendStatusMessage(MessageTranslation.PASTE_SUCCESS.componentTranslation().setStyle(Styles.RED), false);
+            getMinecraft().player.sendStatusMessage(MessageTranslation.PASTE_SUCCESS.componentTranslation().setStyle(Styles.RED), false);
             return;
         }
-        World world = Minecraft.getInstance().world;
+
+        // todo: this needs to be put onto some kind of readTemplateFromJson(input stream).onError(e -> error)
         try {
             Template readTemplate = TemplateIO.readTemplateFromJson(CBString).clearMaterials();
             if (! nameField.getText().isEmpty())
                 readTemplate = readTemplate.withName(nameField.getText());
             boolean replaced = replaceStack();
             ItemStack stack = container.getSlot(1).getStack();
-            pasteTemplateToStack(world, stack, readTemplate, replaced);
-            Minecraft.getInstance().player.sendStatusMessage(MessageTranslation.PASTE_SUCCESS.componentTranslation().setStyle(Styles.DK_GREEN), false);
+            pasteTemplateToStack(getWorld(), stack, readTemplate, replaced);
+            getMinecraft().player.sendStatusMessage(MessageTranslation.PASTE_SUCCESS.componentTranslation().setStyle(Styles.DK_GREEN), false);
         } catch (CorruptJsonException e) {
             BuildingGadgets.LOG.error("Failed to parse json syntax.", e);
-            Minecraft.getInstance().player.sendStatusMessage(MessageTranslation.PASTE_FAILED_CORRUPT_JSON
+            getMinecraft().player.sendStatusMessage(MessageTranslation.PASTE_FAILED_CORRUPT_JSON
                     .componentTranslation().setStyle(Styles.RED), false);
         } catch (IllegalMinecraftVersionException e) {
             BuildingGadgets.LOG.error("Attempted to parse Template for Minecraft version {} but expected {}.",
                     e.getMinecraftVersion(), e.getExpectedVersion(), e);
-            Minecraft.getInstance().player.sendStatusMessage(MessageTranslation.PASTE_FAILED_WRONG_MC_VERSION
+            getMinecraft().player.sendStatusMessage(MessageTranslation.PASTE_FAILED_WRONG_MC_VERSION
                     .componentTranslation(e.getMinecraftVersion(), e.getExpectedVersion()).setStyle(Styles.RED), false);
         } catch (UnknownTemplateVersionException e) {
             BuildingGadgets.LOG.error("Attempted to parse Template version {} but newest is {}.",
                     e.getTemplateVersion(), TemplateHeader.VERSION, e);
-            Minecraft.getInstance().player.sendStatusMessage(MessageTranslation.PASTE_FAILED_TOO_RECENT_VERSION
+            getMinecraft().player.sendStatusMessage(MessageTranslation.PASTE_FAILED_TOO_RECENT_VERSION
                     .componentTranslation(e.getTemplateVersion(), TemplateHeader.VERSION).setStyle(Styles.RED), false);
         } catch (JsonParseException e) {
             BuildingGadgets.LOG.error("Failed to parse Template json.", e);
-            Minecraft.getInstance().player.sendStatusMessage(MessageTranslation.PASTE_FAILED_INVALID_JSON
+            getMinecraft().player.sendStatusMessage(MessageTranslation.PASTE_FAILED_INVALID_JSON
                     .componentTranslation().setStyle(Styles.RED), false);
         } catch (TemplateReadException e) {
             BuildingGadgets.LOG.error("Failed to read Template body.", e);
-            Minecraft.getInstance().player.sendStatusMessage(MessageTranslation.PASTE_FAILED_CORRUPT_BODY
+            getMinecraft().player.sendStatusMessage(MessageTranslation.PASTE_FAILED_CORRUPT_BODY
                     .componentTranslation().setStyle(Styles.RED), false);
         } catch (Exception e) {
             BuildingGadgets.LOG.error("Failed to paste Template.", e);
-            Minecraft.getInstance().player.sendStatusMessage(MessageTranslation.PASTE_FAILED
+            getMinecraft().player.sendStatusMessage(MessageTranslation.PASTE_FAILED
                     .componentTranslation().setStyle(Styles.RED), false);
         }
     }
@@ -306,30 +279,34 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
         ItemStack stack = container.getSlot(1).getStack();
         if (stack.isEmpty())
             return false;
+
         if (stack.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).isPresent())
             return false;
+
         else if (TemplateManagerTileEntity.TEMPLATE_CONVERTIBLES.contains(stack.getItem())) {
             container.putStackInSlot(1, new ItemStack(OurItems.template));
             return true;
         }
+
         return false;
     }
 
-    private void rename(World world, ItemStack stack) {
+    private void rename(ItemStack stack) {
         if (nameField.getText().isEmpty())
             return;
-        stack.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(key -> {
-            world.getCapability(CapabilityTemplate.TEMPLATE_PROVIDER_CAPABILITY).ifPresent(provider -> {
-                Template template = provider.getTemplateForKey(key);
-                template = template.withName(nameField.getText());
-                provider.setTemplate(key, template);
-                provider.requestRemoteUpdate(key);
-            });
-        });
+
+        stack.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(key -> templateProvider.ifPresent(provider -> {
+            Template template = provider.getTemplateForKey(key);
+            template = template.withName(nameField.getText());
+            provider.setTemplate(key, template);
+            provider.requestRemoteUpdate(key);
+        }));
     }
 
     @Override
     protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
+        this.renderBackground();
+
         GlStateManager.color4f(1, 1, 1, 1);
         getMinecraft().getTextureManager().bindTexture(background);
         blit(guiLeft, guiTop, 0, 0, xSize, ySize);
@@ -338,13 +315,6 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
 
         this.nameField.render(mouseX, mouseY, partialTicks);
         drawStructure();
-    }
-
-    @Override
-    public boolean keyPressed(int key, int key_code, int p_keyPressed_3_) {
-        if (nameField.isFocused() && key != 256) //if someone is typing, then only esc should matter
-            return nameField.keyPressed(key, key_code, p_keyPressed_3_);
-        return super.keyPressed(key, key_code, p_keyPressed_3_);
     }
 
     public void drawTexturedModalRectReverseX(int x, int y, int textureX, int textureY, int width, int height, boolean reverse) {
@@ -369,132 +339,9 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
         double scale = getMinecraft().mainWindow.getGuiScaleFactor();
         fill(guiLeft + panel.getX() - 1, guiTop + panel.getY() - 1, guiLeft + panel.getX() + panel.getWidth() + 1, guiTop + panel.getY() + panel.getHeight() + 1, 0xFF8A8A8A);
         ItemStack itemstack = this.container.getSlot(0).getStack();
-        BlockRendererDispatcher dispatcher = Minecraft.getInstance().getBlockRendererDispatcher();
-        GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
 
-        //float rotX = 165, rotY = 0, zoom = 1;
-        if (!itemstack.isEmpty()) {
-            getMinecraft().world.getCapability(CapabilityTemplate.TEMPLATE_PROVIDER_CAPABILITY).ifPresent(provider -> {
-                itemstack.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(key -> {
-
-                    BufferBuilder bufferBuilder = new BufferBuilder(2097152);
-                    Template template = provider.getTemplateForKey(key);
-                    TemplateHeader header = template.getHeader();
-                    BlockPos startPos = header.getBoundingBox().getMin();
-                    BlockPos endPos = header.getBoundingBox().getMax();
-
-                    double lengthX = Math.abs(startPos.getX() - endPos.getX());
-                    double lengthY = Math.abs(startPos.getY() - endPos.getY());
-                    double lengthZ = Math.abs(startPos.getZ() - endPos.getZ());
-
-                    final double maxW = 6 * 16;
-                    final double maxH = 11 * 16;
-
-                    double overW = Math.max(lengthX * 16 - maxW, lengthZ * 16 - maxW);
-                    double overH = lengthY * 16 - maxH;
-
-                    double sc = 1;
-                    double zoomScale = 1;
-
-                    if (overW > 0 && overW >= overH) {
-                        sc = maxW / (overW + maxW);
-                        zoomScale = overW / 40;
-                    } else if (overH > 0 && overH >= overW) {
-                        sc = maxH / (overH + maxH);
-                        zoomScale = overH / 40;
-                    }
-
-                    GlStateManager.pushMatrix();
-                    GlStateManager.translated(panel.getX() + (panel.getWidth() / 2), panel.getY() + (panel.getHeight() / 2), 100);
-
-                    GlStateManager.matrixMode(GL11.GL_PROJECTION);
-                    GlStateManager.pushMatrix();
-                    GlStateManager.loadIdentity();
-                    //int scale = new ScaledResolution(mc).getScaleFactor();
-                    GlStateManager.multMatrix(Matrix4f.perspective(60, (float) panel.getWidth() / panel.getHeight(), 0.01F, 4000));
-                    GlStateManager.matrixMode(GL11.GL_MODELVIEW);
-                    GlStateManager.translated(-panel.getX() - panel.getWidth() / 2, -panel.getY() - panel.getHeight() / 2, 0);
-                    GlStateManager.viewport((int) Math.round((guiLeft + panel.getX()) * scale),
-                            (int) Math.round(getMinecraft().mainWindow.getFramebufferHeight() - (guiTop + panel.getY() + panel.getHeight()) * scale),
-                            (int) Math.round(panel.getWidth() * scale),
-                            (int) Math.round(panel.getHeight() * scale));
-                    GlStateManager.clear(GL11.GL_DEPTH_BUFFER_BIT, true);
-
-                    //double sc = 300 + 8 * 0.0125 * (Math.sqrt(zoom + 99) - 9);
-                    sc = (293 * sc) + zoom / zoomScale;
-                    GlStateManager.scaled(sc, sc, sc);
-                    int moveX = startPos.getX() - endPos.getX();
-
-                    GlStateManager.rotatef(30, 0, 1, 0);
-                    if (startPos.getX() >= endPos.getX()) {
-                        moveX--;
-                    }
-
-                    GlStateManager.translated((moveX) / 1.75, -Math.abs(startPos.getY() - endPos.getY()) / 1.75, 0);
-                    GlStateManager.translated(panX, -panY, 0);
-                    GlStateManager.translated(((startPos.getX() - endPos.getX()) / 2) * -1, ((startPos.getY() - endPos.getY()) / 2) * -1, ((startPos.getZ() - endPos.getZ()) / 2) * -1);
-                    GlStateManager.rotatef(-rotX, 1, 0, 0);
-                    GlStateManager.rotatef(rotY, 0, 1, 0);
-                    GlStateManager.translated(((startPos.getX() - endPos.getX()) / 2), ((startPos.getY() - endPos.getY()) / 2), ((startPos.getZ() - endPos.getZ()) / 2));
-
-                    getMinecraft().getTextureManager().bindTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
-
-                    IBuildContext context = SimpleBuildContext.builder()
-                            .buildingPlayer(Minecraft.getInstance().player)
-                            .build(new FakeDelegationWorld(Minecraft.getInstance().world));
-
-                    IBuildView view = template.createViewInContext(context);
-
-                    bufferBuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
-                    for (PlacementTarget target : view) {
-                        BlockState renderBlockState = target.getData().getState();
-                        if (!(renderBlockState.equals(Blocks.AIR.getDefaultState()))) {
-                            IBakedModel model = dispatcher.getModelForState(renderBlockState);
-                            dispatcher.getBlockModelRenderer().renderModelFlat(Minecraft.getInstance().world, model, renderBlockState, target.getPos(), bufferBuilder, false, new Random(), 0L, EmptyModelData.INSTANCE);
-                        }
-                    }
-                    bufferBuilder.finishDrawing();
-
-                    if (bufferBuilder.getVertexCount() > 0) {
-                        VertexFormat vertexformat = bufferBuilder.getVertexFormat();
-                        int i = vertexformat.getSize();
-                        ByteBuffer bytebuffer = bufferBuilder.getByteBuffer();
-                        List<VertexFormatElement> list = vertexformat.getElements();
-
-                        for (int j = 0; j < list.size(); ++ j) {
-                            VertexFormatElement vertexformatelement = list.get(j);
-                            //                        VertexFormatElement.EnumUsage vertexformatelement$enumusage = vertexformatelement.getUsage();
-                            //                        int k = vertexformatelement.getType().getGlConstant();
-                            //                        int l = vertexformatelement.getIndex();
-                            bytebuffer.position(vertexformat.getOffset(j));
-
-                            // moved to VertexFormatElement.preDraw
-                            vertexformatelement.getUsage().preDraw(vertexformat, j, i, bytebuffer);
-                        }
-
-                        GlStateManager.drawArrays(bufferBuilder.getDrawMode(), 0, bufferBuilder.getVertexCount());
-                        int i1 = 0;
-
-                        for (int j1 = list.size(); i1 < j1; ++ i1) {
-                            VertexFormatElement vertexformatelement1 = list.get(i1);
-                            //                        VertexFormatElement.EnumUsage vertexformatelement$enumusage1 = vertexformatelement1.getUsage();
-                            //                        int k1 = vertexformatelement1.getIndex();
-
-                            // moved to VertexFormatElement.postDraw
-                            vertexformatelement1.getUsage().postDraw(vertexformat, i1, i, bytebuffer);
-                        }
-                    }
-
-                    GlStateManager.popMatrix();
-                    GlStateManager.matrixMode(GL11.GL_PROJECTION);
-                    GlStateManager.popMatrix();
-                    GlStateManager.matrixMode(GL11.GL_MODELVIEW);
-                    GlStateManager.viewport(0, 0, getMinecraft().mainWindow.getFramebufferWidth(), getMinecraft().mainWindow.getFramebufferHeight());
-
-                });
-            });
-
-        } else {
+        // Reset on undo.
+        if (itemstack.isEmpty() && zoom != 1) {
             rotX = 0;
             rotY = 0;
             zoom = 1;
@@ -502,7 +349,115 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
             momentumY = 0;
             panX = 0;
             panY = 0;
+            return;
         }
+
+        BlockRendererDispatcher dispatcher = getMinecraft().getBlockRendererDispatcher();
+        GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+        templateProvider.ifPresent(provider -> itemstack.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(key -> {
+            BufferBuilder bufferBuilder = new BufferBuilder(2097152);
+            Template template = provider.getTemplateForKey(key);
+            TemplateHeader header = template.getHeader();
+            BlockPos startPos = header.getBoundingBox().getMin();
+            BlockPos endPos = header.getBoundingBox().getMax();
+
+            double lengthX = Math.abs(startPos.getX() - endPos.getX());
+            double lengthY = Math.abs(startPos.getY() - endPos.getY());
+            double lengthZ = Math.abs(startPos.getZ() - endPos.getZ());
+
+            final double maxW = 6 * 16;
+            final double maxH = 11 * 16;
+
+            double overW = Math.max(lengthX * 16 - maxW, lengthZ * 16 - maxW);
+            double overH = lengthY * 16 - maxH;
+
+            double sc = 1;
+            double zoomScale = 1;
+
+            if (overW > 0 && overW >= overH) {
+                sc = maxW / (overW + maxW);
+                zoomScale = overW / 40;
+            } else if (overH > 0 && overH >= overW) {
+                sc = maxH / (overH + maxH);
+                zoomScale = overH / 40;
+            }
+
+            GlStateManager.pushMatrix();
+            GlStateManager.translated(panel.getX() + (panel.getWidth() / 2), panel.getY() + (panel.getHeight() / 2), 100);
+
+            GlStateManager.matrixMode(GL11.GL_PROJECTION);
+            GlStateManager.pushMatrix();
+            GlStateManager.loadIdentity();
+            //int scale = new ScaledResolution(mc).getScaleFactor();
+            GlStateManager.multMatrix(Matrix4f.perspective(60, (float) panel.getWidth() / panel.getHeight(), 0.01F, 4000));
+            GlStateManager.matrixMode(GL11.GL_MODELVIEW);
+            GlStateManager.translated(-panel.getX() - panel.getWidth() / 2, -panel.getY() - panel.getHeight() / 2, 0);
+            GlStateManager.viewport((int) Math.round((guiLeft + panel.getX()) * scale),
+                    (int) Math.round(getMinecraft().mainWindow.getFramebufferHeight() - (guiTop + panel.getY() + panel.getHeight()) * scale),
+                    (int) Math.round(panel.getWidth() * scale),
+                    (int) Math.round(panel.getHeight() * scale));
+            GlStateManager.clear(GL11.GL_DEPTH_BUFFER_BIT, true);
+
+            //double sc = 300 + 8 * 0.0125 * (Math.sqrt(zoom + 99) - 9);
+            sc = (293 * sc) + zoom / zoomScale;
+            GlStateManager.scaled(sc, sc, sc);
+            int moveX = startPos.getX() - endPos.getX();
+
+            GlStateManager.rotatef(30, 0, 1, 0);
+            if (startPos.getX() >= endPos.getX()) {
+                moveX--;
+            }
+
+            GlStateManager.translated((moveX) / 1.75, -Math.abs(startPos.getY() - endPos.getY()) / 1.75, 0);
+            GlStateManager.translated(panX, -panY, 0);
+            GlStateManager.translated(((startPos.getX() - endPos.getX()) / 2) * -1, ((startPos.getY() - endPos.getY()) / 2) * -1, ((startPos.getZ() - endPos.getZ()) / 2) * -1);
+            GlStateManager.rotatef(-rotX, 1, 0, 0);
+            GlStateManager.rotatef(rotY, 0, 1, 0);
+            GlStateManager.translated(((startPos.getX() - endPos.getX()) / 2), ((startPos.getY() - endPos.getY()) / 2), ((startPos.getZ() - endPos.getZ()) / 2));
+
+            getMinecraft().getTextureManager().bindTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
+
+            IBuildView view = template.createViewInContext(
+                    SimpleBuildContext.builder().buildingPlayer(getMinecraft().player).build(delegationWorld)
+            );
+
+            bufferBuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
+            for (PlacementTarget target : view) {
+                BlockState renderBlockState = target.getData().getState();
+                if (!(renderBlockState.equals(Blocks.AIR.getDefaultState()))) {
+                    IBakedModel model = dispatcher.getModelForState(renderBlockState);
+                    dispatcher.getBlockModelRenderer().renderModelFlat(getWorld(), model, renderBlockState, target.getPos(), bufferBuilder, false, new Random(), 0L, EmptyModelData.INSTANCE);
+                }
+            }
+            bufferBuilder.finishDrawing();
+
+            if (bufferBuilder.getVertexCount() > 0) {
+                VertexFormat vertexformat = bufferBuilder.getVertexFormat();
+                int i = vertexformat.getSize();
+                ByteBuffer bytebuffer = bufferBuilder.getByteBuffer();
+                List<VertexFormatElement> list = vertexformat.getElements();
+
+                for (int j = 0; j < list.size(); ++ j) {
+                    VertexFormatElement vertexformatelement = list.get(j);
+                    bytebuffer.position(vertexformat.getOffset(j));
+                    vertexformatelement.getUsage().preDraw(vertexformat, j, i, bytebuffer);
+                }
+
+                GlStateManager.drawArrays(bufferBuilder.getDrawMode(), 0, bufferBuilder.getVertexCount());
+                int i1 = 0;
+
+                for (int j1 = list.size(); i1 < j1; ++ i1) {
+                    VertexFormatElement vertexformatelement1 = list.get(i1);
+                    vertexformatelement1.getUsage().postDraw(vertexformat, i1, i, bytebuffer);
+                }
+            }
+
+            GlStateManager.popMatrix();
+            GlStateManager.matrixMode(GL11.GL_PROJECTION);
+            GlStateManager.popMatrix();
+            GlStateManager.matrixMode(GL11.GL_MODELVIEW);
+            GlStateManager.viewport(0, 0, getMinecraft().mainWindow.getFramebufferWidth(), getMinecraft().mainWindow.getFramebufferHeight());
+        }));
     }
 
     @Override
@@ -577,9 +532,9 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double scrollDelta) {
-        zoom = initZoom + ((float) scrollDelta * 14);
+        zoom = initZoom + ((float) scrollDelta * 20);
         if (zoom < -200) zoom = -200;
-        if (zoom > 1000) zoom = 1000;
+        if (zoom > 5000) zoom = 5000;
 
         return super.mouseScrolled(mouseX, mouseY, scrollDelta);
     }
@@ -595,5 +550,9 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
             initPanX = panX;
             initPanY = panY;
         }
+    }
+
+    private World getWorld() {
+        return getMinecraft().world;
     }
 }
