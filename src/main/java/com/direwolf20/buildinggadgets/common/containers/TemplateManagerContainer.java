@@ -40,7 +40,7 @@ public class TemplateManagerContainer extends BaseContainer {
 
         this.te = (TemplateManagerTileEntity) Minecraft.getInstance().world.getTileEntity(pos);
         addOwnSlots();
-        addPlayerSlots(playerInventory);
+        addPlayerSlots(playerInventory, -12, 70);
     }
 
     public TemplateManagerContainer(int windowId, PlayerInventory playerInventory, TemplateManagerTileEntity tileEntity) {
@@ -48,7 +48,7 @@ public class TemplateManagerContainer extends BaseContainer {
         this.te = Objects.requireNonNull(tileEntity);
 
         addOwnSlots();
-        addPlayerSlots(playerInventory);
+        addPlayerSlots(playerInventory, -12, 70);
     }
 
     @Override
@@ -58,13 +58,9 @@ public class TemplateManagerContainer extends BaseContainer {
 
     private void addOwnSlots() {
         IItemHandler itemHandler = this.getTe().getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).orElseThrow(CapabilityNotPresentException::new);
-        int x = 86;
-        int y = 41;
-
-        addSlot(new WatchedSlot(itemHandler, 0, x, y, TEXTURE_LOC_SLOT_TOOL, this::updateViewCache));
-
-        x = 144;
-        addSlot(new SlotTemplateManager(itemHandler, 1, x, y, TEXTURE_LOC_SLOT_TEMPLATE));
+        int x = 132;
+        addSlot(new WatchedSlot(itemHandler, 0, x, 18, TEXTURE_LOC_SLOT_TOOL, this::updateViewCache));
+        addSlot(new SlotTemplateManager(itemHandler, 1, x, 63, TEXTURE_LOC_SLOT_TEMPLATE));
     }
 
     @Override

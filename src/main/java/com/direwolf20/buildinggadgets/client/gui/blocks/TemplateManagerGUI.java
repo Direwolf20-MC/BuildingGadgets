@@ -8,7 +8,6 @@ package com.direwolf20.buildinggadgets.client.gui.blocks;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.building.PlacementTarget;
 import com.direwolf20.buildinggadgets.common.building.view.IBuildContext;
-import com.direwolf20.buildinggadgets.common.building.view.IBuildView;
 import com.direwolf20.buildinggadgets.common.building.view.SimpleBuildContext;
 import com.direwolf20.buildinggadgets.common.capability.CapabilityTemplate;
 import com.direwolf20.buildinggadgets.common.containers.TemplateManagerContainer;
@@ -28,16 +27,20 @@ import com.direwolf20.buildinggadgets.common.util.lang.GuiTranslation;
 import com.direwolf20.buildinggadgets.common.util.lang.MessageTranslation;
 import com.direwolf20.buildinggadgets.common.util.lang.Styles;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
-import com.direwolf20.buildinggadgets.common.world.FakeDelegationWorld;
+
 import com.google.gson.JsonParseException;
 import com.mojang.blaze3d.platform.GlStateManager;
+
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.gui.widget.button.Button;
-import net.minecraft.client.renderer.*;
+import net.minecraft.client.renderer.BlockRendererDispatcher;
+import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.Matrix4f;
+import net.minecraft.client.renderer.Rectangle2d;
 import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
@@ -63,7 +66,7 @@ import java.util.Random;
 public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer> {
     private static final ResourceLocation background = new ResourceLocation(Reference.MODID, "textures/gui/template_manager.png");
 
-    private Rectangle2d panel = new Rectangle2d(8, 18, 62, 62);
+    private Rectangle2d panel = new Rectangle2d((8 - 20), 12, 136, 80);
     private boolean panelClicked;
     private int clickButton, clickX, clickY;
     private float initRotX, initRotY, initZoom, initPanX, initPanY;
@@ -90,35 +93,17 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
     @Override
     public void init() {
         super.init();
-        this.nameField = new TextFieldWidget(this.font, this.guiLeft + 8, this.guiTop + 6, 149, this.font.FONT_HEIGHT, GuiTranslation.TEMPLATE_NAME_TIP.format());
+        this.nameField = new TextFieldWidget(this.font, (this.guiLeft - 20) + 8, guiTop - 5, xSize - 16, this.font.FONT_HEIGHT + 3, GuiTranslation.TEMPLATE_NAME_TIP.format());
 
-        buttonSave = addButton(
-                new Button(79, 17, 30, 20, GuiTranslation.BUTTON_SAVE.format(), b -> onSave())
-        );
-
-        buttonLoad = addButton(
-                new Button(137, 17, 30, 20, GuiTranslation.BUTTON_LOAD.format(), b -> onLoad())
-        );
-
-        buttonCopy = addButton(
-                new Button(79, 61, 30, 20, GuiTranslation.BUTTON_COPY.format(), b -> onCopy())
-        );
-
-        buttonPaste = addButton(
-                new Button(135, 61, 34, 20, GuiTranslation.BUTTON_PASTE.format(), b -> onPaste())
-        );
+        int x = (guiLeft - 20) + 180;
+        buttonSave = addButton(new Button(x, guiTop + 17, 60, 20, GuiTranslation.BUTTON_SAVE.format(), b -> onSave()));
+        buttonLoad = addButton(new Button(x,guiTop + 39, 60, 20, GuiTranslation.BUTTON_LOAD.format(), b -> onLoad()));
+        buttonCopy = addButton(new Button(x, guiTop + 66, 60, 20, GuiTranslation.BUTTON_COPY.format(), b -> onCopy()));
+        buttonPaste = addButton(new Button(x, guiTop + 89, 60, 20, GuiTranslation.BUTTON_PASTE.format(), b -> onPaste()));
 
         this.nameField.setMaxStringLength(50);
         this.nameField.setVisible(true);
         children.add(nameField);
-
-        /*
-        helpTextProviders.add(new AreaHelpText(nameField, "field.template_name"));
-        helpTextProviders.add(new AreaHelpText(this.getContainer().getSlot(0), guiLeft, guiTop, "slot.gadget"));
-        helpTextProviders.add(new AreaHelpText(this.getContainer().getSlot(1), guiLeft, guiTop, "slot.template"));
-        helpTextProviders.add(new AreaHelpText(guiLeft + 112, guiTop + 41, 22, 15, "arrow.data_flow"));
-        helpTextProviders.add(new AreaHelpText(panel, guiLeft, guiTop + 10, "preview"));
-        */
     }
 
     @Override
@@ -304,32 +289,22 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
     protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
         this.renderBackground();
 
-        GlStateManager.color4f(1, 1, 1, 1);
         getMinecraft().getTextureManager().bindTexture(background);
-        blit(guiLeft, guiTop, 0, 0, xSize, ySize);
+        blit(guiLeft - 20, guiTop - 12, 0, 0, xSize, ySize + 25);
+        blit((guiLeft - 20) + xSize, guiTop + 8, xSize + 3, 30, 71, ySize);
+
         if (! buttonCopy.isHovered() && ! buttonPaste.isHovered())
-            drawTexturedModalRectReverseX(guiLeft + 112, guiTop + 41, 176, 0, 22, 15, buttonLoad.isHovered());
+            drawTexturedModalRectReverseX(buttonLoad.isHovered());
 
         this.nameField.render(mouseX, mouseY, partialTicks);
         drawStructure();
     }
 
-    public void drawTexturedModalRectReverseX(int x, int y, int textureX, int textureY, int width, int height, boolean reverse) {
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder bufferbuilder = tessellator.getBuffer();
-        bufferbuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
-        if (reverse) {
-            bufferbuilder.pos(x, y + height, 0).tex((textureX + width) * 0.00390625F, textureY * 0.00390625F).endVertex();
-            bufferbuilder.pos(x + width, y + height, 0).tex(textureX * 0.00390625F, textureY * 0.00390625F).endVertex();
-            bufferbuilder.pos(x + width, y, 0).tex(textureX * 0.00390625F, (textureY + height) * 0.00390625F).endVertex();
-            bufferbuilder.pos(x, y, 0).tex((textureX + width) * 0.00390625F, (textureY + height) * 0.00390625F).endVertex();
-        } else {
-            bufferbuilder.pos(x, y + height, 0).tex(textureX * 0.00390625F, (textureY + height) * 0.00390625F).endVertex();
-            bufferbuilder.pos(x + width, y + height, 0).tex((textureX + width) * 0.00390625F, (textureY + height) * 0.00390625F).endVertex();
-            bufferbuilder.pos(x + width, y, 0).tex((textureX + width) * 0.00390625F, textureY * 0.00390625F).endVertex();
-            bufferbuilder.pos(x, y, 0).tex(textureX * 0.00390625F, textureY * 0.00390625F).endVertex();
-        }
-        tessellator.draw();
+    private void drawTexturedModalRectReverseX(boolean reverse) {
+        if( reverse )
+            blit((guiLeft + xSize) - 44, guiTop + 38, xSize, 0, 17, 24);
+        else
+            blit((guiLeft + xSize) - 44, guiTop + 38, xSize + 17, 0, 16, 24);
     }
 
     private void drawStructure() {
@@ -452,16 +427,11 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int mouseButton) {
-        if (this.nameField.mouseClicked(mouseX, mouseY, mouseButton)) {
-            nameField.setFocused2(true);
-        } else {
-            nameField.setFocused2(false);
-            if (panel.contains((int) mouseX - guiLeft, (int) mouseY - guiTop)) {
-                clickButton = mouseButton;
-                panelClicked = true;
-                clickX = (int) getMinecraft().mouseHelper.getMouseX();
-                clickY = (int) getMinecraft().mouseHelper.getMouseY();
-            }
+        if (panel.contains((int) mouseX - guiLeft, (int) mouseY - guiTop)) {
+            clickButton = mouseButton;
+            panelClicked = true;
+            clickX = (int) getMinecraft().mouseHelper.getMouseX();
+            clickY = (int) getMinecraft().mouseHelper.getMouseY();
         }
 
         return super.mouseClicked(mouseX, mouseY, mouseButton);
@@ -479,6 +449,15 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
         return super.mouseReleased(mouseX, mouseY, state);
     }
 
+    @Override
+    public boolean keyPressed(int p_keyPressed_1_, int p_keyPressed_2_, int p_keyPressed_3_) {
+        if (p_keyPressed_1_ == 256) {
+            this.onClose();
+            return true;
+        }
+
+        return this.nameField.isFocused() ? this.nameField.keyPressed(p_keyPressed_1_, p_keyPressed_2_, p_keyPressed_3_) : super.keyPressed(p_keyPressed_1_, p_keyPressed_2_, p_keyPressed_3_);
+    }
 
     @Override
     protected void drawGuiContainerForegroundLayer(int j, int i) {
@@ -508,7 +487,7 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
         }
 
         if (! nameField.isFocused() && nameField.getText().isEmpty())
-            getMinecraft().fontRenderer.drawString("template name", nameField.x - guiLeft + 4, nameField.y - guiTop, - 10197916);
+            getMinecraft().fontRenderer.drawString("template name", nameField.x - guiLeft + 4, (nameField.y + 2) - guiTop, - 10197916);
 
         if (buttonSave.isHovered() || buttonLoad.isHovered() || buttonPaste.isHovered())
             drawSlotOverlay(buttonLoad.isHovered() ? container.getSlot(0) : container.getSlot(1));
