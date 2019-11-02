@@ -106,9 +106,11 @@ public class EventTooltip {
                 MaterialList list = header.getRequiredItems();
                 if (list == null)
                     list = MaterialList.empty();
+
                 MatchResult match = index.tryMatch(list);
                 Multiset<IUniqueObject<?>> existing = match.getFoundItems();
                 List<Multiset.Entry<IUniqueObject<?>>> sortedEntries = ImmutableList.sortedCopyOf(ENTRY_COMPARATOR, match.getChosenOption().entrySet());
+
                 int bx = event.getX();
                 int by = event.getY();
                 int j = 0;

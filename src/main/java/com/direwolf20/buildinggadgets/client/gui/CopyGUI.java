@@ -23,7 +23,7 @@ import java.util.List;
 public class CopyGUI extends Screen {
     private GuiIncrementer startX, startY, startZ, endX, endY, endZ;
 
-    private boolean absoluteCoords = Config.GENERAL.absoluteCoordDefault.get();
+    private boolean absoluteCoords = Config.GENERAL.absoluteCoordDefault.get() && Config.GENERAL.allowAbsoluteCoords.get();
 
     private int x;
     private int y;
@@ -80,10 +80,13 @@ public class CopyGUI extends Screen {
                 PacketHandler.sendToServer(new PacketCopyCoords(BlockPos.ZERO, BlockPos.ZERO));
                 onClose();
             }));
-            add(new CenteredButton(y + 20, 120, GuiTranslation.COPY_BUTTON_ABSOLUTE, (button) -> {
-                coordsModeSwitch();
-                updateTextFields();
-            }));
+
+            if( Config.GENERAL.allowAbsoluteCoords.get() ) {
+                add(new CenteredButton(y + 20, 120, GuiTranslation.COPY_BUTTON_ABSOLUTE, (button) -> {
+                    coordsModeSwitch();
+                    updateTextFields();
+                }));
+            }
         }};
 
         CenteredButton.centerButtonList(buttons, x);
