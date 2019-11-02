@@ -37,6 +37,13 @@ public final class MatchResult {
         return matchedList;
     }
 
+    /**
+     * If this result is a success, then this will be a reference to the same set returned by {@link #getChosenOption()} as all the {@link IUniqueObject unique objects}
+     * in there will be available. If this match is not a success, then this will return the amount of found Items for all {@link IUniqueObject unique objects} across
+     * all options.
+     *
+     * @return The found items
+     */
     public ImmutableMultiset<IUniqueObject<?>> getFoundItems() {
         return foundItems;
     }

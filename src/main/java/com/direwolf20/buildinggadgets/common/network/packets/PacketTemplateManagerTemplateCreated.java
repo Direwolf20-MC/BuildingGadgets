@@ -12,6 +12,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.network.NetworkEvent.Context;
+import net.minecraftforge.fml.network.PacketDistributor;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 
@@ -53,7 +54,8 @@ public final class PacketTemplateManagerTemplateCreated extends UUIDPacket {
                                 BuildingGadgets.LOG.error("Failed to apply Template id on server!");
                             else {
                                 ((IItemHandlerModifiable) handler).setStackInSlot(1, stack);
-                                world.getCapability(CapabilityTemplate.TEMPLATE_PROVIDER_CAPABILITY).ifPresent(provider -> provider.requestUpdate(key));
+                                world.getCapability(CapabilityTemplate.TEMPLATE_PROVIDER_CAPABILITY).ifPresent(provider ->
+                                        provider.requestUpdate(key, PacketDistributor.PLAYER.with(() -> contextSupplier.get().getSender())));
                             }
                         });
                     }
