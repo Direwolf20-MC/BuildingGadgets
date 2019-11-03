@@ -13,17 +13,17 @@ import java.util.Spliterator;
 import java.util.function.Function;
 
 /**
- * A simple {@link IBuildView} backed by a {@link Map Map<BlockPos, BlockData>}. {@link PlacementTarget PlacementTargets} will be created
- * lazily when iterating over this {@link IBuildView}. You can supply this with a mutable {@link Map} via {@link #createUnsafe(Map, Region)}
- * for efficiency reasons, note however that you will encounter undefined behaviour if the {@link Map} is modified after this {@link IBuildView} was
+ * A simple {@link IBuildSequence} backed by a {@link Map Map<BlockPos, BlockData>}. {@link PlacementTarget PlacementTargets} will be created
+ * lazily when iterating over this {@link IBuildSequence}. You can supply this with a mutable {@link Map} via {@link #createUnsafe(Map, Region)}
+ * for efficiency reasons, note however that you will encounter undefined behaviour if the {@link Map} is modified after this {@link IBuildSequence} was
  * created.
  */
-public final class PositionalBuildView implements IBuildView {
+public final class PositionalBuildSequence implements IBuildSequence {
     private Map<BlockPos, BlockData> map;
     private Region boundingBox;
     private BlockPos translation;
 
-    public static <T> PositionalBuildView ofIterable(Iterable<T> iterable, Function<? super T, ? extends BlockPos> keyExtractor, Function<? super T, BlockData> dataExtractor) {
+    public static <T> PositionalBuildSequence ofIterable(Iterable<T> iterable, Function<? super T, ? extends BlockPos> keyExtractor, Function<? super T, BlockData> dataExtractor) {
         ImmutableMap.Builder<BlockPos, BlockData> builder = ImmutableMap.builder();
         Region.Builder regBuilder = iterable.iterator().hasNext() ? Region.enclosingBuilder() : Region.builder();
         for (T target : iterable) {
@@ -35,11 +35,11 @@ public final class PositionalBuildView implements IBuildView {
         return createUnsafe(builder.build(), regBuilder.build());
     }
 
-    public static PositionalBuildView ofIterable(Iterable<PlacementTarget> iterable) {
+    public static PositionalBuildSequence ofIterable(Iterable<PlacementTarget> iterable) {
         return ofIterable(iterable, PlacementTarget::getPos, PlacementTarget::getData);
     }
 
-    public static PositionalBuildView create(Map<BlockPos, BlockData> map) {
+    public static PositionalBuildSequence create(Map<BlockPos, BlockData> map) {
         if (map instanceof ImmutableMap) {
             Region.Builder regBuilder = map.isEmpty() ? Region.builder() : Region.enclosingBuilder();
             for (BlockPos pos : map.keySet()) {
@@ -50,14 +50,14 @@ public final class PositionalBuildView implements IBuildView {
             return ofIterable(map.entrySet(), Map.Entry::getKey, Map.Entry::getValue);
     }
 
-    public static PositionalBuildView createUnsafe(Map<BlockPos, BlockData> map, Region boundingBox) {
-        return new PositionalBuildView(
-                Objects.requireNonNull(map, "Cannot have a PositionalBuildView without position to data map!"),
-                Objects.requireNonNull(boundingBox, "Cannot have a PositionalBuildView without a boundingBox!")
+    public static PositionalBuildSequence createUnsafe(Map<BlockPos, BlockData> map, Region boundingBox) {
+        return new PositionalBuildSequence(
+                Objects.requireNonNull(map, "Cannot have a PositionalBuildSequence without position to data map!"),
+                Objects.requireNonNull(boundingBox, "Cannot have a PositionalBuildSequence without a boundingBox!")
         );
     }
 
-    private PositionalBuildView(Map<BlockPos, BlockData> map, Region boundingBox) {
+    private PositionalBuildSequence(Map<BlockPos, BlockData> map, Region boundingBox) {
         this.map = map;
         this.boundingBox = boundingBox;
         this.translation = BlockPos.ZERO;
@@ -70,7 +70,7 @@ public final class PositionalBuildView implements IBuildView {
     }
 
     @Override
-    public PositionalBuildView translateTo(BlockPos pos) {
+    public PositionalBuildSequence translateTo(BlockPos pos) {
         boundingBox = boundingBox.translate(pos.subtract(translation));//translate the bounding box to the correct position
         this.translation = pos;
         return this;
@@ -83,8 +83,8 @@ public final class PositionalBuildView implements IBuildView {
 
 
     @Override
-    public PositionalBuildView copy() {
-        return new PositionalBuildView(map, boundingBox);
+    public PositionalBuildSequence copy() {
+        return new PositionalBuildSequence(map, boundingBox);
     }
 
 

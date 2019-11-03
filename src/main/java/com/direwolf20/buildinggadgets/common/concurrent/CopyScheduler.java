@@ -4,7 +4,7 @@ import com.direwolf20.buildinggadgets.common.building.BlockData;
 import com.direwolf20.buildinggadgets.common.building.PlacementTarget;
 import com.direwolf20.buildinggadgets.common.building.Region;
 import com.direwolf20.buildinggadgets.common.building.view.BuildContext;
-import com.direwolf20.buildinggadgets.common.building.view.IBuildView;
+import com.direwolf20.buildinggadgets.common.building.view.IBuildSequence;
 import com.direwolf20.buildinggadgets.common.registry.OurItems;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
@@ -15,7 +15,7 @@ import java.util.Spliterator;
 import java.util.function.BiConsumer;
 
 public final class CopyScheduler extends SteppedScheduler {
-    public static void scheduleCopy(BiConsumer<ImmutableMap<BlockPos, BlockData>, Region> finisher, IBuildView worldView, BuildContext context, int steps) {
+    public static void scheduleCopy(BiConsumer<ImmutableMap<BlockPos, BlockData>, Region> finisher, IBuildSequence worldView, BuildContext context, int steps) {
         Preconditions.checkArgument(steps > 0);
         ServerTickingScheduler.runTicked(new CopyScheduler(
                 Objects.requireNonNull(finisher),
@@ -31,7 +31,7 @@ public final class CopyScheduler extends SteppedScheduler {
     private Region.Builder regionBuilder;
     private final BuildContext context;
 
-    private CopyScheduler(BiConsumer<ImmutableMap<BlockPos, BlockData>, Region> finisher, IBuildView worldView, BuildContext context, int steps) {
+    private CopyScheduler(BiConsumer<ImmutableMap<BlockPos, BlockData>, Region> finisher, IBuildSequence worldView, BuildContext context, int steps) {
         super(steps);
         this.finisher = finisher;
         this.targets = worldView.spliterator();

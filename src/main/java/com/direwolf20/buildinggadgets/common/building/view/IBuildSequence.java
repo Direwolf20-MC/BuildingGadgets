@@ -19,23 +19,23 @@ import java.util.stream.Stream;
 /**
  * A "snapshot" view of a specific buildable TemplateItem providing the ability to iterate over the represented {@link PlacementTarget}'s.
  * It also allows for translating to a specific position via {@link #translateTo(BlockPos)}.<br>
- * Furthermore an {@code IBuildView} should provide a hint for users to check the amount of blocks an {@link IBuildView} of this {@code TemplateItem} is going to
+ * Furthermore an {@code IBuildSequence} should provide a hint for users to check the amount of blocks an {@link IBuildSequence} of this {@code TemplateItem} is going to
  * produce at most via {@link #estimateSize()} in combination with hinting the amount of {@link IUniqueObject}'s required.
  * However this is not strictly necessary and when computation might be costly it is not advised to return an accurate value.
  * <p>
- * The {@code IBuildView} is constructed given an instance of {@link BuildContext}. This
- * context allows the {@link IBuildView} to adapt itself to the environment in which it is viewed. Therefore no assumptions may be made, that
- * 2 distinct instances of {@code IBuildView} will produce the same results even if they were constructed by the same {@link BuildContext}.
+ * The {@code IBuildSequence} is constructed given an instance of {@link BuildContext}. This
+ * context allows the {@link IBuildSequence} to adapt itself to the environment in which it is viewed. Therefore no assumptions may be made, that
+ * 2 distinct instances of {@code IBuildSequence} will produce the same results even if they were constructed by the same {@link BuildContext}.
  * <p>
- * All Methods in this class may throw an {@link IllegalStateException} if called after the {@code IBuildView} has been closed.
- * @implSpec Notice that no guarantees are made for the order in which {@link PlacementTarget}'s are produced by this {@code IBuildView}.
+ * All Methods in this class may throw an {@link IllegalStateException} if called after the {@code IBuildSequence} has been closed.
+ * @implSpec Notice that no guarantees are made for the order in which {@link PlacementTarget}'s are produced by this {@code IBuildSequence}.
  * Order may be arbitrary or sorted, consult the documentation of the implementation you are currently faced with for information about traversal order.
  */
-public interface IBuildView extends IPlacementSequence<PlacementTarget> {
+public interface IBuildSequence extends IPlacementSequence<PlacementTarget> {
     /**
-     * Creates a {@link Stream} backed by the {@link #spliterator()} of this {@code IBuildView}.
+     * Creates a {@link Stream} backed by the {@link #spliterator()} of this {@code IBuildSequence}.
      *
-     * @return A {@link Stream} representing all positions produced by this {@code IBuildView}.
+     * @return A {@link Stream} representing all positions produced by this {@code IBuildSequence}.
      * @implSpec The {@link Stream} produced by this method must not be parallel. A user wishing for parallel traversal
      * should take a look at {@link java.util.stream.StreamSupport#stream(Spliterator, boolean)}.
      * @implNote The default implementation is equivalent to calling {@code StreamSupport.stream(view.spliterator(), false);}.
@@ -46,7 +46,7 @@ public interface IBuildView extends IPlacementSequence<PlacementTarget> {
     }
 
     /**
-     * @return An {@link Iterator} over the {@link PlacementTarget}'s of this {@code IBuildView}.
+     * @return An {@link Iterator} over the {@link PlacementTarget}'s of this {@code IBuildSequence}.
      * @implNote The default implementation is equivalent to calling {@code Spliterators.iterator(view.spliterator());}.
      */
     @Override
@@ -55,28 +55,28 @@ public interface IBuildView extends IPlacementSequence<PlacementTarget> {
     }
 
     /**
-     * @return An {@link Spliterator} over the {@link PlacementTarget}'s of this {@code IBuildView}.
+     * @return An {@link Spliterator} over the {@link PlacementTarget}'s of this {@code IBuildSequence}.
      */
     @Override
     Spliterator<PlacementTarget> spliterator();
 
     /**
-     * Translates this {@code IBuildView} to the specified position.
+     * Translates this {@code IBuildSequence} to the specified position.
      *
      * @param pos The position to translate to. May not be null.
-     * @return The new translated {@code IBuildView}. May be the same or a new instance depending on implementation.
+     * @return The new translated {@code IBuildSequence}. May be the same or a new instance depending on implementation.
      * @throws NullPointerException if the given Position was null
      * @implSpec This Method may not accumulate multiple translations, but instead always set the absolute Translation performed
      * to the specified value.
      */
-    IBuildView translateTo(BlockPos pos);
+    IBuildSequence translateTo(BlockPos pos);
 
     /**
      * Attempts to compute the amount of required {@link IUniqueObject}'s. Should never be more than might be needed,
      * but may be fewer if exact requirements are hard or expensive to compute.
      *
      * @param simulatePos nullable BlockPos used to simulate
-     * @return A {@link MaterialList} representing the Item Requirements to build this {@code IBuildView}.
+     * @return A {@link MaterialList} representing the Item Requirements to build this {@code IBuildSequence}.
      */
     default MaterialList estimateRequiredItems(BuildContext context, @Nullable Vec3d simulatePos) {
         return CommonUtils.estimateRequiredItems(this, context, simulatePos);
@@ -88,7 +88,7 @@ public interface IBuildView extends IPlacementSequence<PlacementTarget> {
     }
 
     /**
-     * Attempts to compute an estimate of how many {@link PlacementTarget}'s this {@code IBuildView} will produce.
+     * Attempts to compute an estimate of how many {@link PlacementTarget}'s this {@code IBuildSequence} will produce.
      * Should never be smaller than the amount produced by iterating over this, but may be larger if an exact size
      * is hard or expensive to compute.
      * <p>
@@ -106,8 +106,8 @@ public interface IBuildView extends IPlacementSequence<PlacementTarget> {
      * <p>
      * Calling
      * {@code
-     * IBuildView view = template.createViewInContext(ctx);
-     * IBuildView copy = view.copy();
+     * IBuildSequence view = template.createViewInContext(ctx);
+     * IBuildSequence copy = view.copy();
      * view.close();
      * }
      * should ensure that the {@link Template} is no longer restricted because of an open {@code TemplateView}, whilst at the same time providing access to all the positions via
@@ -120,5 +120,5 @@ public interface IBuildView extends IPlacementSequence<PlacementTarget> {
      * @return A full copy of this {@code IBuildSequence}. Iterating over the whole {@code IBuildSequence} if necessary.
      */
     @Override
-    IBuildView copy();
+    IBuildSequence copy();
 }

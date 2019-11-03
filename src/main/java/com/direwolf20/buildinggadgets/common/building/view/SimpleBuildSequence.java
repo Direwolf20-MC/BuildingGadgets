@@ -28,7 +28,7 @@ import java.util.function.BiPredicate;
  *
  * @implNote Execution context in Strategy Pattern
  */
-public class SimpleBuildView implements IBuildView {
+public class SimpleBuildSequence implements IBuildSequence {
     private final IPositionPlacementSequence positions;
     private IBlockProvider<?> blocks;
     private final IValidatorFactory validatorFactory;
@@ -38,13 +38,13 @@ public class SimpleBuildView implements IBuildView {
     private MaterialList materials;
 
     /**
-     * @see SimpleBuildView#SimpleBuildView(IPositionPlacementSequence, IBlockProvider, IValidatorFactory, BuildContext, BlockPos)
+     * @see SimpleBuildSequence#SimpleBuildSequence(IPositionPlacementSequence, IBlockProvider, IValidatorFactory, BuildContext, BlockPos)
      *
      * @param positions     List of Block Positions
      * @param blocks        List of Block Providers
      * @param context       Build Context
      */
-    public SimpleBuildView(IPositionPlacementSequence positions, IBlockProvider<?> blocks, BuildContext context) {
+    public SimpleBuildSequence(IPositionPlacementSequence positions, IBlockProvider<?> blocks, BuildContext context) {
         this(positions, blocks, (world, stack, player, initial) -> (pos, state) -> true, context, null);
     }
 
@@ -58,12 +58,12 @@ public class SimpleBuildView implements IBuildView {
      * @param buildContext     Build context
      * @param start            Starting BlockPos
      */
-    public SimpleBuildView(IPositionPlacementSequence positions, IBlockProvider<?> blocks, IValidatorFactory validatorFactory, BuildContext buildContext, @Nullable BlockPos start) {
+    public SimpleBuildSequence(IPositionPlacementSequence positions, IBlockProvider<?> blocks, IValidatorFactory validatorFactory, BuildContext buildContext, @Nullable BlockPos start) {
         this.positions = positions;
-        this.blocks = Objects.requireNonNull(blocks, "Cannot have a SimpleBuildView without IBlockProvider!");
+        this.blocks = Objects.requireNonNull(blocks, "Cannot have a SimpleBuildSequence without IBlockProvider!");
         this.validatorFactory = validatorFactory;
         if (buildContext.getBuildingPlayer() == null)
-            BuildingGadgets.LOG.warn("Constructing SimpleBuildView without a player. This may lead to errors down the line, if the used IValidatorFactory doesn't handle null Players!");
+            BuildingGadgets.LOG.warn("Constructing SimpleBuildSequence without a player. This may lead to errors down the line, if the used IValidatorFactory doesn't handle null Players!");
         this.context = buildContext;
         this.start = start;
         this.materials = null;
@@ -75,7 +75,7 @@ public class SimpleBuildView implements IBuildView {
     }
 
     @Override
-    public IBuildView translateTo(BlockPos pos) {
+    public IBuildSequence translateTo(BlockPos pos) {
         blocks = blocks.translate(pos);
         materials = null;
         return this;
@@ -84,7 +84,7 @@ public class SimpleBuildView implements IBuildView {
     @Override
     public MaterialList estimateRequiredItems(BuildContext context, @Nullable Vec3d simulatePos) {
         if (materials == null)
-            materials = IBuildView.super.estimateRequiredItems(context, simulatePos);
+            materials = IBuildSequence.super.estimateRequiredItems(context, simulatePos);
         return materials;
     }
 
@@ -94,8 +94,8 @@ public class SimpleBuildView implements IBuildView {
     }
 
     @Override
-    public IBuildView copy() {
-        return new SimpleBuildView(getPositionSequence(), getBlockProvider(), getValidatorFactory(), context, start);
+    public IBuildSequence copy() {
+        return new SimpleBuildSequence(getPositionSequence(), getBlockProvider(), getValidatorFactory(), context, start);
     }
 
     @Override

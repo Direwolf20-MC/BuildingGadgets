@@ -6,7 +6,7 @@ import com.direwolf20.buildinggadgets.common.building.PlacementTarget;
 import com.direwolf20.buildinggadgets.common.building.placement.PlacementChecker;
 import com.direwolf20.buildinggadgets.common.building.placement.PlacementChecker.CheckResult;
 import com.direwolf20.buildinggadgets.common.building.view.BuildContext;
-import com.direwolf20.buildinggadgets.common.building.view.IBuildView;
+import com.direwolf20.buildinggadgets.common.building.view.IBuildSequence;
 import com.direwolf20.buildinggadgets.common.save.Undo;
 import com.direwolf20.buildinggadgets.common.save.Undo.Builder;
 import com.google.common.base.Preconditions;
@@ -16,7 +16,7 @@ import java.util.Spliterator;
 import java.util.function.Consumer;
 
 public final class PlacementScheduler extends SteppedScheduler {
-    public static PlacementScheduler schedulePlacement(IBuildView view, BuildContext context, PlacementChecker checker, int steps) {
+    public static PlacementScheduler schedulePlacement(IBuildSequence view, BuildContext context, PlacementChecker checker, int steps) {
         Preconditions.checkArgument(steps > 0);
         PlacementScheduler res = new PlacementScheduler(
                 Objects.requireNonNull(view),
@@ -34,7 +34,7 @@ public final class PlacementScheduler extends SteppedScheduler {
     private Consumer<PlacementScheduler> finisher;
     private Undo.Builder undoBuilder;
 
-    private PlacementScheduler(IBuildView view, BuildContext context, PlacementChecker checker, int steps) {
+    private PlacementScheduler(IBuildSequence view, BuildContext context, PlacementChecker checker, int steps) {
         super(steps);
         this.checker = checker;
         this.context = context;

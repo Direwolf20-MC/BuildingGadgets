@@ -17,37 +17,37 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
 /**
- * An {@link IBuildView} which views a {@link Region} in an {@link IWorld} as an {@link IBuildView}. {@link PlacementTarget PlacementTargets}
- * will be created lazily when iterating over this {@link IBuildView} via {@code new PlacementTarget(pos, TileSupport.createBlockData(world, pos))}
+ * An {@link IBuildSequence} which views a {@link Region} in an {@link IWorld} as an {@link IBuildSequence}. {@link PlacementTarget PlacementTargets}
+ * will be created lazily when iterating over this {@link IBuildSequence} via {@code new PlacementTarget(pos, TileSupport.createBlockData(world, pos))}
  * where pos is the Position currently iterating on and world is the world provided by this views {@link #getContext() build context}.
  * <p>
- * This {@link IBuildView} is especially useful, when trying to read all {@link BlockData} instances with in a given {@link Region}.
- * If you need this Information in a pre-determined way, or intend on iterating multiple times on this {@link IBuildView} consider
- * calling {@link #evaluate()} (which is equivalent to calling {@code PositionalBuildView.ofIterable(view.getContext(), view)})
- * to evaluate all {@link BlockData} instances described by this {@link IBuildView view}.
+ * This {@link IBuildSequence} is especially useful, when trying to read all {@link BlockData} instances with in a given {@link Region}.
+ * If you need this Information in a pre-determined way, or intend on iterating multiple times on this {@link IBuildSequence} consider
+ * calling {@link #evaluate()} (which is equivalent to calling {@code PositionalBuildSequence.ofIterable(view.getContext(), view)})
+ * to evaluate all {@link BlockData} instances described by this {@link IBuildSequence view}.
  */
-public final class WorldBuildView implements IBuildView {
+public final class WorldBuildSequence implements IBuildSequence {
     private final BuildContext context;
     private final Region region;
     private final BiFunction<BuildContext, BlockPos, Optional<BlockData>> dataFactory;
     private BlockPos translation;
 
-    public static WorldBuildView inWorld(IWorld world, Region region) {
+    public static WorldBuildSequence inWorld(IWorld world, Region region) {
         return create(BuildContext.builder().build(world), region);
     }
 
-    public static WorldBuildView create(BuildContext context, Region region) {
+    public static WorldBuildSequence create(BuildContext context, Region region) {
         return create(context, region, null);
     }
 
-    public static WorldBuildView create(BuildContext context, Region region, @Nullable BiFunction<BuildContext, BlockPos, Optional<BlockData>> dataFactory) {
-        return new WorldBuildView(
-                Objects.requireNonNull(context, "Cannot create WorldBuildView without an BuildContext!"),
-                Objects.requireNonNull(region, "Cannot create WorldBuildView without an Region!"),
+    public static WorldBuildSequence create(BuildContext context, Region region, @Nullable BiFunction<BuildContext, BlockPos, Optional<BlockData>> dataFactory) {
+        return new WorldBuildSequence(
+                Objects.requireNonNull(context, "Cannot create WorldBuildSequence without an BuildContext!"),
+                Objects.requireNonNull(region, "Cannot create WorldBuildSequence without an Region!"),
                 dataFactory != null ? dataFactory : (c, p) -> Optional.of(TileSupport.createBlockData(c.getWorld(), p)));
     }
 
-    private WorldBuildView(BuildContext context, Region region, BiFunction<BuildContext, BlockPos, Optional<BlockData>> dataFactory) {
+    private WorldBuildSequence(BuildContext context, Region region, BiFunction<BuildContext, BlockPos, Optional<BlockData>> dataFactory) {
         this.context = context;
         this.region = region;
         this.dataFactory = dataFactory;
@@ -60,7 +60,7 @@ public final class WorldBuildView implements IBuildView {
     }
 
     @Override
-    public WorldBuildView translateTo(BlockPos pos) {
+    public WorldBuildSequence translateTo(BlockPos pos) {
         this.translation = pos;
         return this;
     }
@@ -71,12 +71,12 @@ public final class WorldBuildView implements IBuildView {
     }
 
     @Override
-    public WorldBuildView copy() {
-        return new WorldBuildView(getContext(), getBoundingBox(), dataFactory);
+    public WorldBuildSequence copy() {
+        return new WorldBuildSequence(getContext(), getBoundingBox(), dataFactory);
     }
 
-    public PositionalBuildView evaluate() {
-        return PositionalBuildView.ofIterable(this);
+    public PositionalBuildSequence evaluate() {
+        return PositionalBuildSequence.ofIterable(this);
     }
 
     public BuildContext getContext() {

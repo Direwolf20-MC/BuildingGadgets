@@ -5,8 +5,8 @@ import com.direwolf20.buildinggadgets.common.building.PlacementTarget;
 import com.direwolf20.buildinggadgets.common.building.Region;
 import com.direwolf20.buildinggadgets.common.building.tilesupport.IAdditionalBlockDataSerializer;
 import com.direwolf20.buildinggadgets.common.building.view.BuildContext;
-import com.direwolf20.buildinggadgets.common.building.view.IBuildView;
-import com.direwolf20.buildinggadgets.common.building.view.PositionalBuildView;
+import com.direwolf20.buildinggadgets.common.building.view.IBuildSequence;
+import com.direwolf20.buildinggadgets.common.building.view.PositionalBuildSequence;
 import com.direwolf20.buildinggadgets.common.inventory.materials.MaterialList;
 import com.direwolf20.buildinggadgets.common.registry.Registries;
 import com.direwolf20.buildinggadgets.common.util.compression.DataCompressor;
@@ -31,7 +31,7 @@ import java.util.Optional;
 import java.util.Spliterator;
 import java.util.function.Function;
 
-public final class Template implements IBuildView {
+public final class Template implements IBuildSequence {
     public static Template deserialize(CompoundNBT nbt, @Nullable TemplateHeader externalHeader, boolean persisted) {
         ListNBT posList = nbt.getList(com.direwolf20.buildinggadgets.common.util.ref.NBTKeys.KEY_POS, NBT.TAG_LONG);
         TemplateHeader.Builder header = TemplateHeader.builderFromNBT(nbt.getCompound(com.direwolf20.buildinggadgets.common.util.ref.NBTKeys.KEY_HEADER));
@@ -78,7 +78,7 @@ public final class Template implements IBuildView {
 
     public TemplateHeader getHeaderAndForceMaterials(BuildContext context, @Nullable Vec3d simulatePos) {
         if (header.getRequiredItems() == null) {
-            MaterialList materialList = IBuildView.super.estimateRequiredItems(context, simulatePos);
+            MaterialList materialList = IBuildSequence.super.estimateRequiredItems(context, simulatePos);
             header = TemplateHeader.builderOf(header).requiredItems(materialList).build();
         }
         return getHeader();
@@ -139,8 +139,8 @@ public final class Template implements IBuildView {
         return getBoundingBox().mayContain(x, y, z);
     }
 
-    public IBuildView createViewInContext(BuildContext context) {
-        return PositionalBuildView.createUnsafe(map, header.getBoundingBox());
+    public IBuildSequence createViewInContext(BuildContext context) {
+        return PositionalBuildSequence.createUnsafe(map, header.getBoundingBox());
     }
 
     public CompoundNBT serialize(boolean persisted) {

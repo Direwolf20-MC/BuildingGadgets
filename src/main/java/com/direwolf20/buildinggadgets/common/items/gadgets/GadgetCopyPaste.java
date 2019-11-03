@@ -5,8 +5,8 @@ import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.building.Region;
 import com.direwolf20.buildinggadgets.common.building.placement.PlacementChecker;
 import com.direwolf20.buildinggadgets.common.building.view.BuildContext;
-import com.direwolf20.buildinggadgets.common.building.view.IBuildView;
-import com.direwolf20.buildinggadgets.common.building.view.WorldBuildView;
+import com.direwolf20.buildinggadgets.common.building.view.IBuildSequence;
+import com.direwolf20.buildinggadgets.common.building.view.WorldBuildSequence;
 import com.direwolf20.buildinggadgets.common.capability.CapabilityTemplate;
 import com.direwolf20.buildinggadgets.common.capability.provider.TemplateKeyProvider;
 import com.direwolf20.buildinggadgets.common.commands.ForceUnloadedCommand;
@@ -355,7 +355,7 @@ public class GadgetCopyPaste extends AbstractGadget {
                 .buildingPlayer(player)
                 .usedStack(stack)
                 .build(world);
-        WorldBuildView buildView = WorldBuildView.create(context, region,
+        WorldBuildSequence buildView = WorldBuildSequence.create(context, region,
                 (c, p) -> InventoryHelper.getSafeBlockData(player, p, player.getActiveHand()));
         performCopy(stack, buildView);
     }
@@ -382,7 +382,7 @@ public class GadgetCopyPaste extends AbstractGadget {
         return true;
     }
 
-    private void performCopy(ItemStack stack, WorldBuildView buildView) {
+    private void performCopy(ItemStack stack, WorldBuildSequence buildView) {
         BuildContext context = buildView.getContext();
         assert context.getBuildingPlayer() != null;
         PlayerEntity player = context.getBuildingPlayer();
@@ -442,7 +442,7 @@ public class GadgetCopyPaste extends AbstractGadget {
         return true;
     }
 
-    private void schedulePlacement(ItemStack stack, IBuildView view, BuildContext context, PlayerEntity player) {
+    private void schedulePlacement(ItemStack stack, IBuildSequence view, BuildContext context, PlayerEntity player) {
         IItemIndex index = InventoryHelper.index(stack, player);
         int energyCost = getEnergyCost(stack);
         boolean overwrite = Config.GENERAL.allowOverwriteBlocks.get();

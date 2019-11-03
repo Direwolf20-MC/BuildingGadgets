@@ -8,7 +8,7 @@ package com.direwolf20.buildinggadgets.client.gui.blocks;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.building.PlacementTarget;
 import com.direwolf20.buildinggadgets.common.building.view.BuildContext;
-import com.direwolf20.buildinggadgets.common.building.view.IBuildView;
+import com.direwolf20.buildinggadgets.common.building.view.IBuildSequence;
 import com.direwolf20.buildinggadgets.common.capability.CapabilityTemplate;
 import com.direwolf20.buildinggadgets.common.containers.TemplateManagerContainer;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
@@ -177,7 +177,7 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
         }));
     }
 
-    private void renderStructure(IBuildView view, BuildContext context, float partialTicks) {
+    private void renderStructure(IBuildSequence view, BuildContext context, float partialTicks) {
         Random rand = new Random();
         BlockRendererDispatcher dispatcher = getMinecraft().getBlockRendererDispatcher();
 
