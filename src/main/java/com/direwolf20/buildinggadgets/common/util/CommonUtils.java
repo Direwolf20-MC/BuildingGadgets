@@ -5,7 +5,7 @@ import com.direwolf20.buildinggadgets.common.building.IPlacementSequence;
 import com.direwolf20.buildinggadgets.common.building.PlacementTarget;
 import com.direwolf20.buildinggadgets.common.building.Region;
 import com.direwolf20.buildinggadgets.common.building.placement.IPositionPlacementSequence;
-import com.direwolf20.buildinggadgets.common.building.view.IBuildContext;
+import com.direwolf20.buildinggadgets.common.building.view.BuildContext;
 import com.direwolf20.buildinggadgets.common.inventory.materials.MaterialList;
 import com.direwolf20.buildinggadgets.common.util.spliterator.DelegatingPlacementSequence;
 import com.direwolf20.buildinggadgets.common.util.spliterator.FilterSpliterator;
@@ -152,12 +152,12 @@ public final class CommonUtils {
         return new BlockRayTraceResult(simVec, dir, pos, false);
     }
 
-    public static MaterialList estimateRequiredItems(Iterable<PlacementTarget> buildView, IBuildContext context) {
+    public static MaterialList estimateRequiredItems(Iterable<PlacementTarget> buildView, BuildContext context) {
         PlayerEntity player = context.getBuildingPlayer();
         return estimateRequiredItems(buildView, context, player != null ? new Vec3d(player.posX, player.posY, player.posZ) : null);
     }
 
-    public static MaterialList estimateRequiredItems(Iterable<PlacementTarget> buildView, IBuildContext context, @Nullable Vec3d simulatePos) {
+    public static MaterialList estimateRequiredItems(Iterable<PlacementTarget> buildView, BuildContext context, @Nullable Vec3d simulatePos) {
         MaterialList.SubEntryBuilder builder = MaterialList.andBuilder();
         for (PlacementTarget placementTarget : buildView) {
             BlockRayTraceResult target = simulatePos != null ? CommonUtils.fakeRayTrace(simulatePos, placementTarget.getPos()) : null;

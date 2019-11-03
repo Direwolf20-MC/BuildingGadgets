@@ -6,15 +6,13 @@ import com.direwolf20.buildinggadgets.common.building.PlacementTarget;
 import com.direwolf20.buildinggadgets.common.building.Region;
 import com.direwolf20.buildinggadgets.common.building.placement.InvertedPlacementEvaluator;
 import com.direwolf20.buildinggadgets.common.building.placement.PlacementChecker;
-import com.direwolf20.buildinggadgets.common.building.view.IBuildContext;
+import com.direwolf20.buildinggadgets.common.building.view.BuildContext;
 import com.direwolf20.buildinggadgets.common.building.view.IBuildView;
-import com.direwolf20.buildinggadgets.common.building.view.SimpleBuildContext;
 import com.direwolf20.buildinggadgets.common.capability.CapabilityTemplate;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.inventory.IItemIndex;
 import com.direwolf20.buildinggadgets.common.inventory.InventoryHelper;
 import com.direwolf20.buildinggadgets.common.inventory.RecordingItemIndex;
-import com.direwolf20.buildinggadgets.common.items.gadgets.AbstractGadget;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.template.Template;
 import com.direwolf20.buildinggadgets.common.util.helpers.SortingHelper.RenderSorter;
@@ -146,7 +144,7 @@ public class CopyPasteRender extends BaseRenderer {
 
     private void performRender(World world, PlayerEntity player, ItemStack stack, BlockPos startPos, Template template, float partialTicks) {
         FakeDelegationWorld fakeWorld = new FakeDelegationWorld(world);
-        IBuildContext context = SimpleBuildContext.builder()
+        BuildContext context = BuildContext.builder()
                 .buildingPlayer(player)
                 .usedStack(stack)
                 .build(fakeWorld);
@@ -166,7 +164,7 @@ public class CopyPasteRender extends BaseRenderer {
         GlStateManager.disableBlend();
     }
 
-    private void renderTargets(IBuildContext context, RenderSorter sorter, float partialTicks) {
+    private void renderTargets(BuildContext context, RenderSorter sorter, float partialTicks) {
         //Enable Blending (So we can have transparent effect)
         GlStateManager.enableBlend();
         //This blend function allows you to use a constant alpha, which is defined later

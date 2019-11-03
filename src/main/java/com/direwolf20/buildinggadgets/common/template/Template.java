@@ -3,7 +3,7 @@ package com.direwolf20.buildinggadgets.common.template;
 import com.direwolf20.buildinggadgets.common.building.BlockData;
 import com.direwolf20.buildinggadgets.common.building.Region;
 import com.direwolf20.buildinggadgets.common.building.tilesupport.IAdditionalBlockDataSerializer;
-import com.direwolf20.buildinggadgets.common.building.view.IBuildContext;
+import com.direwolf20.buildinggadgets.common.building.view.BuildContext;
 import com.direwolf20.buildinggadgets.common.building.view.IBuildView;
 import com.direwolf20.buildinggadgets.common.building.view.PositionalBuildView;
 import com.direwolf20.buildinggadgets.common.inventory.materials.MaterialList;
@@ -72,7 +72,7 @@ public final class Template {
         this(ImmutableMap.of(), TemplateHeader.builder(Region.singleZero()).build());
     }
 
-    public TemplateHeader getHeaderAndForceMaterials(IBuildContext context) {
+    public TemplateHeader getHeaderAndForceMaterials(BuildContext context) {
         if (header.getRequiredItems() == null) {
             MaterialList materialList = CommonUtils.estimateRequiredItems(
                     createViewInContext(context),
@@ -89,7 +89,7 @@ public final class Template {
         return header;
     }
 
-    public IBuildView createViewInContext(IBuildContext context) {
+    public IBuildView createViewInContext(BuildContext context) {
         return PositionalBuildView.createUnsafe(context, map, header.getBoundingBox());
     }
 

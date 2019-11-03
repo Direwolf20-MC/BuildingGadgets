@@ -2,7 +2,7 @@ package com.direwolf20.buildinggadgets.common.building.placement;
 
 import com.direwolf20.buildinggadgets.common.building.PlacementTarget;
 import com.direwolf20.buildinggadgets.common.building.Region;
-import com.direwolf20.buildinggadgets.common.building.view.IBuildContext;
+import com.direwolf20.buildinggadgets.common.building.view.BuildContext;
 import com.direwolf20.buildinggadgets.common.building.view.IBuildView;
 import com.direwolf20.buildinggadgets.common.util.spliterator.MappingSpliterator;
 import net.minecraft.util.math.BlockPos;
@@ -13,10 +13,10 @@ import java.util.Spliterator;
 public class SetBackedBuildView implements IBuildView {
     private final Region bounds;
     private final Set<PlacementTarget> targets;
-    private final IBuildContext context;
+    private final BuildContext context;
     private BlockPos translation;
 
-    public SetBackedBuildView(IBuildContext context, Set<PlacementTarget> targets, Region bounds) {
+    public SetBackedBuildView(BuildContext context, Set<PlacementTarget> targets, Region bounds) {
         this.bounds = bounds;
         this.targets = targets;
         this.context = context;
@@ -45,7 +45,7 @@ public class SetBackedBuildView implements IBuildView {
     }
 
     @Override
-    public IBuildContext getContext() {
+    public BuildContext getContext() {
         return context;
     }
 

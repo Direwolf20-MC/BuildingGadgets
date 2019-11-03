@@ -3,8 +3,7 @@ package com.direwolf20.buildinggadgets.common.blocks;
 import com.direwolf20.buildinggadgets.common.building.BlockData;
 import com.direwolf20.buildinggadgets.common.building.PlacementTarget;
 import com.direwolf20.buildinggadgets.common.building.tilesupport.TileSupport;
-import com.direwolf20.buildinggadgets.common.building.view.IBuildContext;
-import com.direwolf20.buildinggadgets.common.building.view.SimpleBuildContext;
+import com.direwolf20.buildinggadgets.common.building.view.BuildContext;
 import com.direwolf20.buildinggadgets.common.entities.ConstructionBlockEntity;
 import com.direwolf20.buildinggadgets.common.registry.OurBlocks;
 import com.direwolf20.buildinggadgets.common.tiles.ConstructionBlockTileEntity;
@@ -51,7 +50,7 @@ public class EffectBlock extends Block {
                     world.addEntity(new ConstructionBlockEntity(world, targetPos, false));
                 } else {
                     world.removeBlock(targetPos, false);
-                    targetBlock.placeIn(SimpleBuildContext.builder().build(world), targetPos);
+                    targetBlock.placeIn(BuildContext.builder().build(world), targetPos);
                     BlockPos upPos = targetPos.up();
                     world.getBlockState(targetPos).neighborChanged(world, targetPos, world.getBlockState(upPos).getBlock(), upPos, false);
                 }
@@ -75,7 +74,7 @@ public class EffectBlock extends Block {
         public abstract void onBuilderRemoved(EffectBlockTileEntity builder);
     }
 
-    public static void spawnUndoBlock(IBuildContext context, PlacementTarget target) {
+    public static void spawnUndoBlock(BuildContext context, PlacementTarget target) {
         BlockState state = context.getWorld().getBlockState(target.getPos());
 
         TileEntity curTe = context.getWorld().getTileEntity(target.getPos());
@@ -88,7 +87,7 @@ public class EffectBlock extends Block {
         }
     }
 
-    public static void spawnEffectBlock(IBuildContext context, PlacementTarget target, Mode mode, boolean usePaste) {//TODO pass the buildcontext through, aka invert the overloading
+    public static void spawnEffectBlock(BuildContext context, PlacementTarget target, Mode mode, boolean usePaste) {//TODO pass the buildcontext through, aka invert the overloading
         spawnEffectBlock(context.getWorld(), target.getPos(), target.getData(), mode, usePaste);
     }
 

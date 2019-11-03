@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.common.building.tilesupport;
 
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
-import com.direwolf20.buildinggadgets.common.building.view.IBuildContext;
+import com.direwolf20.buildinggadgets.common.building.view.BuildContext;
 import com.direwolf20.buildinggadgets.common.inventory.materials.MaterialList;
 import com.direwolf20.buildinggadgets.common.template.SerialisationSupport;
 import com.google.common.base.MoreObjects;
@@ -41,14 +41,14 @@ public class NBTAdditionalBlockData implements IAdditionalBlockData {
     }
 
     @Override
-    public MaterialList getRequiredItems(IBuildContext context, BlockState state, @Nullable RayTraceResult target, @Nullable BlockPos pos) {
+    public MaterialList getRequiredItems(BuildContext context, BlockState state, @Nullable RayTraceResult target, @Nullable BlockPos pos) {
         if (requiredMaterials != null)
             return requiredMaterials;
         return IAdditionalBlockData.super.getRequiredItems(context, state, target, pos);
     }
 
     @Override
-    public boolean placeIn(IBuildContext context, BlockState state, BlockPos position) {
+    public boolean placeIn(BuildContext context, BlockState state, BlockPos position) {
         BuildingGadgets.LOG.trace("Placing {} with Tile NBT at {}.", state, position);
         context.getWorld().setBlockState(position, state, 0);
         TileEntity te = context.getWorld().getTileEntity(position);

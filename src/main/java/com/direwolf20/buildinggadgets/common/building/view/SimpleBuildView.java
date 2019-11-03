@@ -32,19 +32,19 @@ public class SimpleBuildView implements IBuildView {
     private final IPositionPlacementSequence positions;
     private IBlockProvider<?> blocks;
     private final IValidatorFactory validatorFactory;
-    private IBuildContext context;
+    private BuildContext context;
     private BlockPos start;
     @Nullable
     private MaterialList materials;
 
     /**
-     * @see SimpleBuildView#SimpleBuildView(IPositionPlacementSequence, IBlockProvider, IValidatorFactory, IBuildContext, BlockPos)
+     * @see SimpleBuildView#SimpleBuildView(IPositionPlacementSequence, IBlockProvider, IValidatorFactory, BuildContext, BlockPos)
      *
      * @param positions     List of Block Positions
      * @param blocks        List of Block Providers
      * @param context       Build Context
      */
-    public SimpleBuildView(IPositionPlacementSequence positions, IBlockProvider<?> blocks, IBuildContext context) {
+    public SimpleBuildView(IPositionPlacementSequence positions, IBlockProvider<?> blocks, BuildContext context) {
         this(positions, blocks, (world, stack, player, initial) -> (pos, state) -> true, context, null);
     }
 
@@ -58,7 +58,7 @@ public class SimpleBuildView implements IBuildView {
      * @param buildContext     Build context
      * @param start            Starting BlockPos
      */
-    public SimpleBuildView(IPositionPlacementSequence positions, IBlockProvider<?> blocks, IValidatorFactory validatorFactory, IBuildContext buildContext, @Nullable BlockPos start) {
+    public SimpleBuildView(IPositionPlacementSequence positions, IBlockProvider<?> blocks, IValidatorFactory validatorFactory, BuildContext buildContext, @Nullable BlockPos start) {
         this.positions = positions;
         this.blocks = Objects.requireNonNull(blocks, "Cannot have a SimpleBuildView without IBlockProvider!");
         this.validatorFactory = validatorFactory;
@@ -142,7 +142,7 @@ public class SimpleBuildView implements IBuildView {
     }
 
     @Override
-    public IBuildContext getContext() {
+    public BuildContext getContext() {
         return context;
     }
 }

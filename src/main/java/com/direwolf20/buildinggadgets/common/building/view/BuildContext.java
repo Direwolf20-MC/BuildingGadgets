@@ -10,10 +10,10 @@ import javax.annotation.concurrent.Immutable;
 import java.util.Objects;
 
 /**
- * Simple implementation of {@link IBuildContext} providing a {@link Builder} for creation.
+ * Simple implementation of {@link BuildContext} providing a {@link Builder} for creation.
  */
 @Immutable
-public final class SimpleBuildContext implements IBuildContext {
+public final class BuildContext {
     /**
      * @return A new {@link Builder}.
      */
@@ -23,9 +23,9 @@ public final class SimpleBuildContext implements IBuildContext {
 
     /**
      * @param context The context to copy. If null, then this Method acts as if calling {@link #builder()}.
-     * @return A new {@link Builder} with all values copied from the specified {@link IBuildContext}.
+     * @return A new {@link Builder} with all values copied from the specified {@link BuildContext}.
      */
-    public static Builder builderOf(@Nullable IBuildContext context) {
+    public static Builder builderOf(@Nullable BuildContext context) {
         Builder builder = builder();
         if (context == null)
             return builder;
@@ -35,7 +35,7 @@ public final class SimpleBuildContext implements IBuildContext {
                 .usedStack(context.getUsedStack());
     }
 
-    public static SimpleBuildContext copyOf(@Nullable IBuildContext context) {
+    public static BuildContext copyOf(@Nullable BuildContext context) {
         return builderOf(context).build();
     }
 
@@ -46,16 +46,15 @@ public final class SimpleBuildContext implements IBuildContext {
 
     private final ItemStack stack;
 
-    private SimpleBuildContext(@Nonnull IWorld world, @Nullable PlayerEntity buildingPlayer, @Nonnull ItemStack stack) {
+    private BuildContext(@Nonnull IWorld world, @Nullable PlayerEntity buildingPlayer, @Nonnull ItemStack stack) {
         this.world = world;
         this.buildingPlayer = buildingPlayer;
         this.stack = stack;
     }
 
     /**
-     * @return The {@link IWorld} of this {@code SimpleBuildContext}. Will not be null.
+     * @return The {@link IWorld} of this {@code BuildContext}. Will not be null.
      */
-    @Override
     public IWorld getWorld() {
         return world;
     }
@@ -64,18 +63,16 @@ public final class SimpleBuildContext implements IBuildContext {
      * @return The {@link PlayerEntity} performing the build. May be null if unknown.
      */
     @Nullable
-    @Override
     public PlayerEntity getBuildingPlayer() {
         return buildingPlayer;
     }
 
-    @Override
     public ItemStack getUsedStack() {
         return stack;
     }
 
     /**
-     * {@code SimpleBuilder} for creating new instances of {@link SimpleBuildContext}
+     * {@code SimpleBuilder} for creating new instances of {@link BuildContext}
      */
     public static final class Builder {
         @Nullable
@@ -92,10 +89,10 @@ public final class SimpleBuildContext implements IBuildContext {
         }
 
         /**
-         * Sets the {@link IWorld} of the resulting {@link SimpleBuildContext}.
-         * @param world The {@link IWorld} of the resulting {@link SimpleBuildContext}.
+         * Sets the {@link IWorld} of the resulting {@link BuildContext}.
+         * @param world The {@link IWorld} of the resulting {@link BuildContext}.
          * @return The {@code Builder} itself
-         * @see SimpleBuildContext#getWorld()
+         * @see BuildContext#getWorld()
          */
         public Builder world(@Nonnull IWorld world) {
             this.world = world;
@@ -103,13 +100,13 @@ public final class SimpleBuildContext implements IBuildContext {
         }
 
         /**
-         * Sets the {@link PlayerEntity} of the resulting {@link SimpleBuildContext}. Notice that this also set's the world
-         * for the resulting {@code SimpleBuildContext} if the player is non-null and a world hasn't been set yet.
+         * Sets the {@link PlayerEntity} of the resulting {@link BuildContext}. Notice that this also set's the world
+         * for the resulting {@code BuildContext} if the player is non-null and a world hasn't been set yet.
          * <p>
          * This defaults to null.
-         * @param buildingPlayer The {@link PlayerEntity} of the resulting {@link SimpleBuildContext}.
+         * @param buildingPlayer The {@link PlayerEntity} of the resulting {@link BuildContext}.
          * @return The {@code Builder} itself
-         * @see SimpleBuildContext#getBuildingPlayer()
+         * @see BuildContext#getBuildingPlayer()
          */
         public Builder buildingPlayer(@Nullable PlayerEntity buildingPlayer) {
             this.buildingPlayer = buildingPlayer;
@@ -119,13 +116,13 @@ public final class SimpleBuildContext implements IBuildContext {
         }
 
         /**
-         * Sets the {@link ItemStack} of the resulting {@link SimpleBuildContext}.
+         * Sets the {@link ItemStack} of the resulting {@link BuildContext}.
          * <p>
          * Defaults to {@link ItemStack#EMPTY}.
          *
-         * @param stack The {@link ItemStack} of the resulting {@code SimpleBuildContext}
+         * @param stack The {@link ItemStack} of the resulting {@code BuildContext}
          * @return The {@code Builder} itself
-         * @see SimpleBuildContext#getUsedStack()
+         * @see BuildContext#getUsedStack()
          */
         public Builder usedStack(@Nonnull ItemStack stack) {
             this.stack = stack;
@@ -133,22 +130,22 @@ public final class SimpleBuildContext implements IBuildContext {
         }
 
         /**
-         * Creates a new {@link SimpleBuildContext} using the world previously set on this {@code Builder}.
-         * @return A new {@link SimpleBuildContext} with the values specified in this {@code Builder}.
+         * Creates a new {@link BuildContext} using the world previously set on this {@code Builder}.
+         * @return A new {@link BuildContext} with the values specified in this {@code Builder}.
          * @see #build(IWorld)
          */
-        public SimpleBuildContext build() {
+        public BuildContext build() {
             return build(null);
         }
 
         /**
-         * Creates a new {@link SimpleBuildContext} using the specified world. If the given world is null, the world in this {@code Builder} will be used.
+         * Creates a new {@link BuildContext} using the specified world. If the given world is null, the world in this {@code Builder} will be used.
          * @param world The {@link IWorld} to use. If null this {@code SimpleBuilder}'s world will be used.
-         * @return A new {@link SimpleBuildContext} with the values specified in this {@code SimpleBuilder}.
+         * @return A new {@link BuildContext} with the values specified in this {@code SimpleBuilder}.
          * @throws NullPointerException if both the {@link IWorld} passed in and the {@link IWorld} of this {@code Builder} are null.
          */
-        public SimpleBuildContext build(@Nullable IWorld world) {
-            return new SimpleBuildContext(world != null ? world : Objects.requireNonNull(this.world), buildingPlayer, stack);
+        public BuildContext build(@Nullable IWorld world) {
+            return new BuildContext(world != null ? world : Objects.requireNonNull(this.world), buildingPlayer, stack);
         }
     }
 }

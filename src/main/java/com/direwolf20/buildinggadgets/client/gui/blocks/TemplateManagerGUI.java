@@ -7,13 +7,10 @@ package com.direwolf20.buildinggadgets.client.gui.blocks;
 
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.building.PlacementTarget;
-import com.direwolf20.buildinggadgets.common.building.view.IBuildContext;
+import com.direwolf20.buildinggadgets.common.building.view.BuildContext;
 import com.direwolf20.buildinggadgets.common.building.view.IBuildView;
-import com.direwolf20.buildinggadgets.common.building.view.SimpleBuildContext;
 import com.direwolf20.buildinggadgets.common.capability.CapabilityTemplate;
 import com.direwolf20.buildinggadgets.common.containers.TemplateManagerContainer;
-import com.direwolf20.buildinggadgets.common.inventory.materials.MaterialList;
-import com.direwolf20.buildinggadgets.common.inventory.materials.objects.IUniqueObject;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketTemplateManagerTemplateCreated;
 import com.direwolf20.buildinggadgets.common.registry.OurItems;
@@ -31,8 +28,6 @@ import com.direwolf20.buildinggadgets.common.util.lang.MessageTranslation;
 import com.direwolf20.buildinggadgets.common.util.lang.Styles;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.direwolf20.buildinggadgets.common.world.FakeDelegationWorld;
-import com.google.common.collect.ImmutableMultiset;
-import com.google.common.collect.ImmutableSet;
 import com.google.gson.JsonParseException;
 import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.block.BlockRenderType;
@@ -63,7 +58,6 @@ import net.minecraftforge.client.model.data.EmptyModelData;
 import net.minecraftforge.common.util.LazyOptional;
 import org.lwjgl.opengl.GL11;
 
-import java.awt.*;
 import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.Random;
@@ -169,7 +163,7 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
             this.templateKey = key;
 
             IBuildView view = template.createViewInContext(
-                    SimpleBuildContext.builder()
+                    BuildContext.builder()
                             .buildingPlayer(getMinecraft().player)
                             .usedStack(container.getSlot(0).getStack())
                             .build(new FakeDelegationWorld(getMinecraft().world)));
@@ -246,7 +240,7 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
 
     // Todo: think about this better :P scale is a bitch
     private void renderRequirement() {
-//        MaterialList requirements = this.template.getHeaderAndForceMaterials(SimpleBuildContext.builder().build(getWorld())).getRequiredItems();
+        //        MaterialList requirements = this.template.getHeaderAndForceMaterials(BuildContext.builder().build(getWorld())).getRequiredItems();
 //        if( requirements == null )
 //            return;
 //
@@ -567,7 +561,7 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
             stack.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(key -> {
                 templateProvider.ifPresent(provider -> {
                     PlayerEntity player = getMinecraft().player;
-                    IBuildContext buildContext = SimpleBuildContext.builder()
+                    BuildContext buildContext = BuildContext.builder()
                             .buildingPlayer(player)
                             .usedStack(stack)
                             .build(getWorld());

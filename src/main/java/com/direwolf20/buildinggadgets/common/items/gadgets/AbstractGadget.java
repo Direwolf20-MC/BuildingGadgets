@@ -3,8 +3,7 @@ package com.direwolf20.buildinggadgets.common.items.gadgets;
 
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.building.modes.*;
-import com.direwolf20.buildinggadgets.common.building.view.IBuildContext;
-import com.direwolf20.buildinggadgets.common.building.view.SimpleBuildContext;
+import com.direwolf20.buildinggadgets.common.building.view.BuildContext;
 import com.direwolf20.buildinggadgets.common.capability.CapabilityProviderEnergy;
 import com.direwolf20.buildinggadgets.common.capability.provider.CapabilityProviderBlockProvider;
 import com.direwolf20.buildinggadgets.common.capability.provider.MultiCapabilityProvider;
@@ -337,7 +336,7 @@ public abstract class AbstractGadget extends Item {
                     return;
                 }
             }
-            IBuildContext buildContext = SimpleBuildContext.builder()
+            BuildContext buildContext = BuildContext.builder()
                     .buildingPlayer(player)
                     .usedStack(stack)
                     .build(world);

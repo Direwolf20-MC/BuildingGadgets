@@ -3,7 +3,7 @@ package com.direwolf20.buildinggadgets.common.concurrent;
 import com.direwolf20.buildinggadgets.common.building.BlockData;
 import com.direwolf20.buildinggadgets.common.building.PlacementTarget;
 import com.direwolf20.buildinggadgets.common.building.Region;
-import com.direwolf20.buildinggadgets.common.building.view.IBuildContext;
+import com.direwolf20.buildinggadgets.common.building.view.BuildContext;
 import com.direwolf20.buildinggadgets.common.building.view.IBuildView;
 import com.direwolf20.buildinggadgets.common.registry.OurItems;
 import com.google.common.base.Preconditions;
@@ -28,7 +28,7 @@ public final class CopyScheduler extends SteppedScheduler {
     private final Spliterator<PlacementTarget> targets;
     private final ImmutableMap.Builder<BlockPos, BlockData> builder;
     private Region.Builder regionBuilder;
-    private final IBuildContext context;
+    private final BuildContext context;
 
     private CopyScheduler(BiConsumer<ImmutableMap<BlockPos, BlockData>, Region> finisher, IBuildView worldView, int steps) {
         super(steps);

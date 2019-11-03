@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.common.building.placement;
 
 import com.direwolf20.buildinggadgets.common.building.PlacementTarget;
-import com.direwolf20.buildinggadgets.common.building.view.IBuildContext;
+import com.direwolf20.buildinggadgets.common.building.view.BuildContext;
 import com.google.common.collect.AbstractIterator;
 
 import java.util.Iterator;
@@ -9,9 +9,9 @@ import java.util.Iterator;
 public class InvertedPlacementEvaluator implements Iterable<PlacementTarget> {
     private final Iterable<PlacementTarget> iterable;
     private final PlacementChecker checker;
-    private final IBuildContext context;
+    private final BuildContext context;
 
-    public InvertedPlacementEvaluator(Iterable<PlacementTarget> iterable, PlacementChecker checker, IBuildContext context) {
+    public InvertedPlacementEvaluator(Iterable<PlacementTarget> iterable, PlacementChecker checker, BuildContext context) {
         this.iterable = iterable;
         this.checker = checker;
         this.context = context;

@@ -3,8 +3,7 @@ package com.direwolf20.buildinggadgets.common.items.gadgets.renderers;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.building.BlockData;
 import com.direwolf20.buildinggadgets.common.building.modes.ExchangingMode;
-import com.direwolf20.buildinggadgets.common.building.view.IBuildContext;
-import com.direwolf20.buildinggadgets.common.building.view.SimpleBuildContext;
+import com.direwolf20.buildinggadgets.common.building.view.BuildContext;
 import com.direwolf20.buildinggadgets.common.inventory.IItemIndex;
 import com.direwolf20.buildinggadgets.common.inventory.InventoryHelper;
 import com.direwolf20.buildinggadgets.common.inventory.MatchResult;
@@ -83,7 +82,7 @@ public class ExchangerRender extends BaseRenderer {
             //ItemStack itemStack = renderBlockState.getBlock().getPickBlock(renderBlockState, null, world, new BlockPos(0, 0, 0), player);
             //ItemStack itemStack = InventoryHelper.getSilkTouchDrop(renderBlockState);
 
-            IBuildContext buildContext = SimpleBuildContext.builder()
+            BuildContext buildContext = BuildContext.builder()
                     .usedStack(heldItem)
                     .buildingPlayer(player)
                     .build(world);

@@ -4,8 +4,7 @@ import com.direwolf20.buildinggadgets.common.blocks.EffectBlock;
 import com.direwolf20.buildinggadgets.common.building.BlockData;
 import com.direwolf20.buildinggadgets.common.building.modes.BuildingMode;
 import com.direwolf20.buildinggadgets.common.building.modes.IAtopPlacingGadget;
-import com.direwolf20.buildinggadgets.common.building.view.IBuildContext;
-import com.direwolf20.buildinggadgets.common.building.view.SimpleBuildContext;
+import com.direwolf20.buildinggadgets.common.building.view.BuildContext;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.inventory.IItemIndex;
 import com.direwolf20.buildinggadgets.common.inventory.InventoryHelper;
@@ -228,7 +227,7 @@ public class GadgetBuilding extends ModeGadget implements IAtopPlacingGadget {
 
         boolean useConstructionPaste = false;
 
-        IBuildContext buildContext = SimpleBuildContext.builder()
+        BuildContext buildContext = BuildContext.builder()
                 .usedStack(heldItem)
                 .buildingPlayer(player)
                 .build(world);

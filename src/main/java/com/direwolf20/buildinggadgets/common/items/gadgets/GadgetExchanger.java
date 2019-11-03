@@ -5,8 +5,7 @@ import com.direwolf20.buildinggadgets.common.building.BlockData;
 import com.direwolf20.buildinggadgets.common.building.modes.ExchangingMode;
 import com.direwolf20.buildinggadgets.common.building.tilesupport.IAdditionalBlockData;
 import com.direwolf20.buildinggadgets.common.building.tilesupport.TileSupport;
-import com.direwolf20.buildinggadgets.common.building.view.IBuildContext;
-import com.direwolf20.buildinggadgets.common.building.view.SimpleBuildContext;
+import com.direwolf20.buildinggadgets.common.building.view.BuildContext;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.inventory.IItemIndex;
 import com.direwolf20.buildinggadgets.common.inventory.InventoryHelper;
@@ -243,7 +242,7 @@ public class GadgetExchanger extends ModeGadget {
             return false;
 
 
-        IBuildContext buildContext = SimpleBuildContext.builder()
+        BuildContext buildContext = BuildContext.builder()
                 .usedStack(tool)
                 .buildingPlayer(player)
                 .build(world);

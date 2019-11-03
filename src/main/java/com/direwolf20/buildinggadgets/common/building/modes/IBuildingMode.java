@@ -3,7 +3,7 @@ package com.direwolf20.buildinggadgets.common.building.modes;
 import com.direwolf20.buildinggadgets.common.building.BlockData;
 import com.direwolf20.buildinggadgets.common.building.IBlockProvider;
 import com.direwolf20.buildinggadgets.common.building.placement.IPositionPlacementSequence;
-import com.direwolf20.buildinggadgets.common.building.view.SimpleBuildContext;
+import com.direwolf20.buildinggadgets.common.building.view.BuildContext;
 import com.direwolf20.buildinggadgets.common.building.view.SimpleBuildView;
 import com.direwolf20.buildinggadgets.common.capability.CapabilityBlockProvider;
 import net.minecraft.entity.player.PlayerEntity;
@@ -56,11 +56,11 @@ public interface IBuildingMode {
      * @param tool      Current Gadget
      * @param initial   Initial BlockPos
      *
-     * @return {@link SimpleBuildContext}
+     * @return {@link BuildContext}
      */
     default SimpleBuildView createExecutionContext(PlayerEntity player, BlockPos hit, Direction sideHit, ItemStack tool, @Nullable BlockPos initial) {
         return new SimpleBuildView(computeCoordinates(player, hit, sideHit, tool), getBlockProvider(tool), this::createValidatorFor,
-                SimpleBuildContext.builder().buildingPlayer(player).usedStack(tool).build(), initial);
+                BuildContext.builder().buildingPlayer(player).usedStack(tool).build(), initial);
     }
 
     /**

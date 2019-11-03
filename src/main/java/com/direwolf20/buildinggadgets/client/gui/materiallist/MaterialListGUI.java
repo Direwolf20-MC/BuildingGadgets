@@ -1,8 +1,7 @@
 package com.direwolf20.buildinggadgets.client.gui.materiallist;
 
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
-import com.direwolf20.buildinggadgets.common.building.view.IBuildContext;
-import com.direwolf20.buildinggadgets.common.building.view.SimpleBuildContext;
+import com.direwolf20.buildinggadgets.common.building.view.BuildContext;
 import com.direwolf20.buildinggadgets.common.capability.CapabilityTemplate;
 import com.direwolf20.buildinggadgets.common.template.ITemplateKey;
 import com.direwolf20.buildinggadgets.common.template.ITemplateProvider;
@@ -150,7 +149,7 @@ public class MaterialListGUI extends Screen implements ITemplateProvider.IUpdate
 
     public TemplateHeader evaluateTemplateHeader() {
         Template template = getTemplateCapability();
-        IBuildContext context = SimpleBuildContext.builder()
+        BuildContext context = BuildContext.builder()
                 .buildingPlayer(getMinecraft().player)
                 .usedStack(getTemplateItem())
                 .build(getMinecraft().world);
