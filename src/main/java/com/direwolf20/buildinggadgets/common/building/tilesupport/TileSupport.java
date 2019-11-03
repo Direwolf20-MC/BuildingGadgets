@@ -30,35 +30,41 @@ public final class TileSupport {
         return DATA_PROVIDER_FACTORY;
     }
 
-    public static ITileEntityData createTileData(@Nullable TileEntity te) {
+    public static ITileEntityData createTileData(BlockState state, @Nullable TileEntity te) {
         if (te == null)
             return dummyTileEntityData();
         ITileEntityData res;
         for (ITileDataFactory factory : TileEntityData.getTileDataFactories()) {
-            res = factory.createDataFor(te);
+            res = factory.createDataFor(state, te);
             if (res != null)
                 return res;
         }
         return dummyTileEntityData();
     }
 
-    public static ITileEntityData createTileData(IBlockReader world, BlockPos pos) {
+    public static ITileEntityData createTileData(IBlockReader world, BlockState state, BlockPos pos) {
         TileEntity te = world.getTileEntity(pos);
-        return createTileData(te);
+        return createTileData(state, te);
+    }
+
+    public static ITileEntityData createTileData(IBlockReader world, BlockPos pos) {
+        BlockState state = world.getBlockState(pos);
+        return createTileData(world, state, pos);
     }
 
     public static BlockData createBlockData(BlockState state, @Nullable TileEntity te) {
-        return new BlockData(Objects.requireNonNull(state), createTileData(te));
+        return new BlockData(Objects.requireNonNull(state), createTileData(state, te));
     }
 
     public static BlockData createBlockData(IBlockReader world, BlockPos pos) {
-        return new BlockData(world.getBlockState(pos), createTileData(world, pos));
+        BlockState state = world.getBlockState(pos);
+        return new BlockData(world.getBlockState(pos), createTileData(world, state, pos));
     }
 
     private static class DataProviderFactory implements ITileDataFactory {
         @Nullable
         @Override
-        public ITileEntityData createDataFor(TileEntity tileEntity) {
+        public ITileEntityData createDataFor(BlockState state, @Nullable TileEntity tileEntity) {
             if (tileEntity instanceof ITileDataProvider)
                 return ((ITileDataProvider) tileEntity).createTileData();
             return null;

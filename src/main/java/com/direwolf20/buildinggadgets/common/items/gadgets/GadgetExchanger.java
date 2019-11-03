@@ -234,7 +234,7 @@ public class GadgetExchanger extends ModeGadget {
             data = ((ConstructionBlockTileEntity) te).getConstructionBlockData().getTileData();
             currentBlock = ((ConstructionBlockTileEntity) te).getConstructionBlockData().getState();
         } else
-            data = TileSupport.createTileData(world, pos);
+            data = TileSupport.createTileData(world, currentBlock, pos);
         //ItemStack itemStack = setBlock.getBlock().getPickBlock(setBlock, null, world, pos, player);
 
 

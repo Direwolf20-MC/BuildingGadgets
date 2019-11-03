@@ -80,7 +80,7 @@ public final class PlacementChecker {
                     return new CheckResult(match, insertedItems, energy, false, usePaste);
             }
             if (giveBackItems) {
-                insertedItems = TileSupport.createTileData(context.getWorld().getTileEntity(target.getPos()))
+                insertedItems = TileSupport.createTileData(context.getWorld(), target.getPos())
                         .getRequiredItems(context, blockSnapshot.getCurrentBlock(), null, target.getPos()).iterator().next();
                 index.insert(insertedItems);
             }
