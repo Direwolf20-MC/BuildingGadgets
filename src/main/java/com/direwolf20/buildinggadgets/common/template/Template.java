@@ -90,7 +90,7 @@ public final class Template {
     }
 
     public IBuildView createViewInContext(BuildContext context) {
-        return PositionalBuildView.createUnsafe(context, map, header.getBoundingBox());
+        return PositionalBuildView.createUnsafe(map, header.getBoundingBox());
     }
 
     public CompoundNBT serialize(boolean persisted) {

@@ -43,7 +43,7 @@ public final class BuildContext {
     private final IWorld world;
     @Nullable
     private final PlayerEntity buildingPlayer;
-
+    @Nonnull
     private final ItemStack stack;
 
     private BuildContext(@Nonnull IWorld world, @Nullable PlayerEntity buildingPlayer, @Nonnull ItemStack stack) {

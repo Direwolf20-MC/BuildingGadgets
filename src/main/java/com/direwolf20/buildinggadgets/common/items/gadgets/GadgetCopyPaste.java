@@ -393,7 +393,7 @@ public class GadgetCopyPaste extends AbstractGadget {
                             .author(player.getName().getUnformattedComponentText())
                             .build());
             onCopyFinished(newTemplate.normalize(), stack, player);
-        }, buildView, Config.GADGETS.GADGET_COPY_PASTE.copySteps.get());
+        }, buildView, context, Config.GADGETS.GADGET_COPY_PASTE.copySteps.get());
     }
 
     private void onCopyFinished(Template newTemplate, ItemStack stack, PlayerEntity player) {
@@ -416,7 +416,7 @@ public class GadgetCopyPaste extends AbstractGadget {
                 view.translateTo(pos);
                 if (! checkPlacement(world, player, view.getBoundingBox()))
                     return;
-                schedulePlacement(stack, view, player);
+                schedulePlacement(stack, view, buildContext, player);
             });
         });
     }
@@ -443,7 +443,7 @@ public class GadgetCopyPaste extends AbstractGadget {
         return true;
     }
 
-    private void schedulePlacement(ItemStack stack, IBuildView view, PlayerEntity player) {
+    private void schedulePlacement(ItemStack stack, IBuildView view, BuildContext context, PlayerEntity player) {
         IItemIndex index = InventoryHelper.index(stack, player);
         int energyCost = getEnergyCost(stack);
         boolean overwrite = Config.GENERAL.allowOverwriteBlocks.get();
@@ -454,9 +454,9 @@ public class GadgetCopyPaste extends AbstractGadget {
                 index,
                 (c, t) -> overwrite ? c.getWorld().getBlockState(t.getPos()).isReplaceable(useContext) : c.getWorld().isAirBlock(t.getPos()),
                 true);
-        PlacementScheduler.schedulePlacement(view, checker, Config.GADGETS.placeSteps.get())
+        PlacementScheduler.schedulePlacement(view, context, checker, Config.GADGETS.placeSteps.get())
                 .withFinisher(p -> {
-                    pushUndo(stack, p.getUndoBuilder().build(view.getContext().getWorld().getDimension().getType()));
+                    pushUndo(stack, p.getUndoBuilder().build(context.getWorld().getDimension().getType()));
                     onBuildFinished(stack, player, view.getBoundingBox());
                 });
     }

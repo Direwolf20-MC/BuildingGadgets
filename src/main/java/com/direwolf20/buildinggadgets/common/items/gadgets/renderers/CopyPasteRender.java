@@ -160,7 +160,7 @@ public class CopyPasteRender extends BaseRenderer {
         renderTargets(context, sorter, partialTicks);
 
         if (! player.isCreative())
-            renderMissing(player, stack, view, sorter);
+            renderMissing(player, stack, view, context, sorter);
         GlStateManager.disableBlend();
     }
 
@@ -212,7 +212,7 @@ public class CopyPasteRender extends BaseRenderer {
         GL14.glBlendColor(1F, 1F, 1F, 1f); //Set the alpha of the blocks we are rendering
     }
 
-    private void renderMissing(PlayerEntity player, ItemStack stack, IBuildView view, RenderSorter sorter) {
+    private void renderMissing(PlayerEntity player, ItemStack stack, IBuildView view, BuildContext context, RenderSorter sorter) {
         int energyCost = ((GadgetCopyPaste) stack.getItem()).getEnergyCost(stack);
         //wrap in a recording index, to prevent a single item of some type from allowing all of that kind.
         //it sadly makes it very inefficient - we should try to find a faster solution
@@ -227,7 +227,7 @@ public class CopyPasteRender extends BaseRenderer {
                         index,
                         (c, t) -> overwrite ? player.world.getBlockState(t.getPos()).isReplaceable(useContext) : player.world.isAirBlock(t.getPos()),
                         false),
-                view.getContext());
+                context);
         BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
         GlStateManager.enableBlend();
         GL14.glBlendColor(1F, 1F, 1F, 0.3f); //Set the alpha of the blocks we are rendering

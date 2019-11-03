@@ -81,11 +81,10 @@ public class SimpleBuildView implements IBuildView {
         return this;
     }
 
-    @Nullable
     @Override
-    public MaterialList estimateRequiredItems(@Nullable Vec3d simulatePos) {
+    public MaterialList estimateRequiredItems(BuildContext context, @Nullable Vec3d simulatePos) {
         if (materials == null)
-            materials = IBuildView.super.estimateRequiredItems(simulatePos);
+            materials = IBuildView.super.estimateRequiredItems(context, simulatePos);
         return materials;
     }
 
@@ -141,7 +140,6 @@ public class SimpleBuildView implements IBuildView {
         return validatorFactory;
     }
 
-    @Override
     public BuildContext getContext() {
         return context;
     }

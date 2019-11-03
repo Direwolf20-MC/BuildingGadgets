@@ -15,11 +15,12 @@ import java.util.Spliterator;
 import java.util.function.BiConsumer;
 
 public final class CopyScheduler extends SteppedScheduler {
-    public static void scheduleCopy(BiConsumer<ImmutableMap<BlockPos, BlockData>, Region> finisher, IBuildView worldView, int steps) {
+    public static void scheduleCopy(BiConsumer<ImmutableMap<BlockPos, BlockData>, Region> finisher, IBuildView worldView, BuildContext context, int steps) {
         Preconditions.checkArgument(steps > 0);
         ServerTickingScheduler.runTicked(new CopyScheduler(
                 Objects.requireNonNull(finisher),
                 Objects.requireNonNull(worldView),
+                Objects.requireNonNull(context),
                 steps
         ));
     }
@@ -30,12 +31,12 @@ public final class CopyScheduler extends SteppedScheduler {
     private Region.Builder regionBuilder;
     private final BuildContext context;
 
-    private CopyScheduler(BiConsumer<ImmutableMap<BlockPos, BlockData>, Region> finisher, IBuildView worldView, int steps) {
+    private CopyScheduler(BiConsumer<ImmutableMap<BlockPos, BlockData>, Region> finisher, IBuildView worldView, BuildContext context, int steps) {
         super(steps);
         this.finisher = finisher;
         this.targets = worldView.spliterator();
         this.builder = ImmutableMap.builder();
-        this.context = worldView.getContext();
+        this.context = context;
         this.regionBuilder = null;
     }
 

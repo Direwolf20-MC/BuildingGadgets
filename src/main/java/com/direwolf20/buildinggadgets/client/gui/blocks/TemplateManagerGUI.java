@@ -162,23 +162,23 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
             this.template = template;
             this.templateKey = key;
 
-            IBuildView view = template.createViewInContext(
-                    BuildContext.builder()
-                            .buildingPlayer(getMinecraft().player)
-                            .usedStack(container.getSlot(0).getStack())
-                            .build(new FakeDelegationWorld(getMinecraft().world)));
+            BuildContext context = BuildContext.builder()
+                    .buildingPlayer(getMinecraft().player)
+                    .usedStack(container.getSlot(0).getStack())
+                    .build(new FakeDelegationWorld(getMinecraft().world));
+            IBuildView view = template.createViewInContext(context);
 
             int displayList = GLAllocation.generateDisplayLists(1);
             GlStateManager.newList(displayList, GL11.GL_COMPILE);
 
-            renderStructure(view, partialTicks);
+            renderStructure(view, context, partialTicks);
 
             GlStateManager.endList();
             this.displayList = displayList;
         }));
     }
 
-    private void renderStructure(IBuildView view, float partialTicks) {
+    private void renderStructure(IBuildView view, BuildContext context, float partialTicks) {
         Random rand = new Random();
         BlockRendererDispatcher dispatcher = getMinecraft().getBlockRendererDispatcher();
 
@@ -186,10 +186,10 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
         bufferBuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
 
         for (PlacementTarget target : view) {
-            target.placeIn(view.getContext());
+            target.placeIn(context);
             BlockPos targetPos = target.getPos();
-            BlockState renderBlockState = view.getContext().getWorld().getBlockState(targetPos);
-            TileEntity te = view.getContext().getWorld().getTileEntity(targetPos);
+            BlockState renderBlockState = context.getWorld().getBlockState(targetPos);
+            TileEntity te = context.getWorld().getTileEntity(targetPos);
 
             if (renderBlockState.getRenderType() == BlockRenderType.MODEL) {
                 IBakedModel model = dispatcher.getModelForState(renderBlockState);

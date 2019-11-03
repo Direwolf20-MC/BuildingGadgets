@@ -14,7 +14,7 @@ import java.util.function.Function;
 
 /**
  * A simple {@link IBuildView} backed by a {@link Map Map<BlockPos, BlockData>}. {@link PlacementTarget PlacementTargets} will be created
- * lazily when iterating over this {@link IBuildView}. You can supply this with a mutable {@link Map} via {@link #createUnsafe(BuildContext, Map, Region)}
+ * lazily when iterating over this {@link IBuildView}. You can supply this with a mutable {@link Map} via {@link #createUnsafe(Map, Region)}
  * for efficiency reasons, note however that you will encounter undefined behaviour if the {@link Map} is modified after this {@link IBuildView} was
  * created.
  */
@@ -22,9 +22,8 @@ public final class PositionalBuildView implements IBuildView {
     private Map<BlockPos, BlockData> map;
     private Region boundingBox;
     private BlockPos translation;
-    private BuildContext context;
 
-    public static <T> PositionalBuildView ofIterable(BuildContext context, Iterable<T> iterable, Function<? super T, ? extends BlockPos> keyExtractor, Function<? super T, BlockData> dataExtractor) {
+    public static <T> PositionalBuildView ofIterable(Iterable<T> iterable, Function<? super T, ? extends BlockPos> keyExtractor, Function<? super T, BlockData> dataExtractor) {
         ImmutableMap.Builder<BlockPos, BlockData> builder = ImmutableMap.builder();
         Region.Builder regBuilder = iterable.iterator().hasNext() ? Region.enclosingBuilder() : Region.builder();
         for (T target : iterable) {
@@ -33,34 +32,32 @@ public final class PositionalBuildView implements IBuildView {
             builder.put(pos, data);
             regBuilder.enclose(pos);
         }
-        return createUnsafe(context, builder.build(), regBuilder.build());
+        return createUnsafe(builder.build(), regBuilder.build());
     }
 
-    public static PositionalBuildView ofIterable(BuildContext context, Iterable<PlacementTarget> iterable) {
-        return ofIterable(context, iterable, PlacementTarget::getPos, PlacementTarget::getData);
+    public static PositionalBuildView ofIterable(Iterable<PlacementTarget> iterable) {
+        return ofIterable(iterable, PlacementTarget::getPos, PlacementTarget::getData);
     }
 
-    public static PositionalBuildView create(BuildContext context, Map<BlockPos, BlockData> map) {
+    public static PositionalBuildView create(Map<BlockPos, BlockData> map) {
         if (map instanceof ImmutableMap) {
             Region.Builder regBuilder = map.isEmpty() ? Region.builder() : Region.enclosingBuilder();
             for (BlockPos pos : map.keySet()) {
                 regBuilder.enclose(pos);
             }
-            return createUnsafe(context, map, regBuilder.build());
+            return createUnsafe(map, regBuilder.build());
         } else
-            return ofIterable(context, map.entrySet(), Map.Entry::getKey, Map.Entry::getValue);
+            return ofIterable(map.entrySet(), Map.Entry::getKey, Map.Entry::getValue);
     }
 
-    public static PositionalBuildView createUnsafe(BuildContext context, Map<BlockPos, BlockData> map, Region boundingBox) {
+    public static PositionalBuildView createUnsafe(Map<BlockPos, BlockData> map, Region boundingBox) {
         return new PositionalBuildView(
-                Objects.requireNonNull(context, "Cannot have a PositionalBuildView without BuildContext!"),
                 Objects.requireNonNull(map, "Cannot have a PositionalBuildView without position to data map!"),
                 Objects.requireNonNull(boundingBox, "Cannot have a PositionalBuildView without a boundingBox!")
         );
     }
 
-    private PositionalBuildView(BuildContext context, Map<BlockPos, BlockData> map, Region boundingBox) {
-        this.context = context;
+    private PositionalBuildView(Map<BlockPos, BlockData> map, Region boundingBox) {
         this.map = map;
         this.boundingBox = boundingBox;
         this.translation = BlockPos.ZERO;
@@ -87,13 +84,9 @@ public final class PositionalBuildView implements IBuildView {
 
     @Override
     public PositionalBuildView copy() {
-        return new PositionalBuildView(context, map, boundingBox);
+        return new PositionalBuildView(map, boundingBox);
     }
 
-    @Override
-    public BuildContext getContext() {
-        return context;
-    }
 
     @Override
     public Region getBoundingBox() {

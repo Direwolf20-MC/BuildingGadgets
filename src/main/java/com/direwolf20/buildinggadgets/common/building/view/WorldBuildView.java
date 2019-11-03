@@ -76,10 +76,9 @@ public final class WorldBuildView implements IBuildView {
     }
 
     public PositionalBuildView evaluate() {
-        return PositionalBuildView.ofIterable(getContext(), this);
+        return PositionalBuildView.ofIterable(this);
     }
 
-    @Override
     public BuildContext getContext() {
         return context;
     }

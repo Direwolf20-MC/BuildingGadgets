@@ -78,13 +78,13 @@ public interface IBuildView extends IPlacementSequence<PlacementTarget> {
      * @param simulatePos nullable BlockPos used to simulate
      * @return A {@link MaterialList} representing the Item Requirements to build this {@code IBuildView}.
      */
-    default MaterialList estimateRequiredItems(@Nullable Vec3d simulatePos) {
-        return CommonUtils.estimateRequiredItems(this, this.getContext(), simulatePos);
+    default MaterialList estimateRequiredItems(BuildContext context, @Nullable Vec3d simulatePos) {
+        return CommonUtils.estimateRequiredItems(this, context, simulatePos);
     }
 
-    default MaterialList estimateRequiredItems() {
-        PlayerEntity player = getContext().getBuildingPlayer();
-        return estimateRequiredItems(player != null ? new Vec3d(player.posX, player.posY, player.posZ) : null);
+    default MaterialList estimateRequiredItems(BuildContext context) {
+        PlayerEntity player = context.getBuildingPlayer();
+        return estimateRequiredItems(context, player != null ? new Vec3d(player.posX, player.posY, player.posZ) : null);
     }
 
     /**
@@ -117,10 +117,8 @@ public interface IBuildView extends IPlacementSequence<PlacementTarget> {
      * {@link PlacementTarget PlacementTargets} produced) and will almost certainly nullify any benefits that the original {@code TemplateView} may have had by
      * using a lazy implementation.</b>
      *
-     * @return A full copy of this {@code TemplateView}. Iterating over the whole {@code TemplateView} if necessary.
+     * @return A full copy of this {@code IBuildSequence}. Iterating over the whole {@code IBuildSequence} if necessary.
      */
     @Override
     IBuildView copy();
-
-    BuildContext getContext();
 }
