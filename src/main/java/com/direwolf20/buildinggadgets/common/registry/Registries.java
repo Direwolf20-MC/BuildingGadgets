@@ -1,8 +1,8 @@
 package com.direwolf20.buildinggadgets.common.registry;
 
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
-import com.direwolf20.buildinggadgets.common.building.tilesupport.ITileDataFactory;
-import com.direwolf20.buildinggadgets.common.building.tilesupport.ITileDataSerializer;
+import com.direwolf20.buildinggadgets.common.building.tilesupport.IAdditionalBlockDataFactory;
+import com.direwolf20.buildinggadgets.common.building.tilesupport.IAdditionalBlockDataSerializer;
 import com.direwolf20.buildinggadgets.common.building.tilesupport.TileSupport;
 import com.direwolf20.buildinggadgets.common.inventory.handle.IHandleProvider;
 import com.direwolf20.buildinggadgets.common.inventory.handle.IObjectHandle;
@@ -49,12 +49,12 @@ public final class Registries {
 
     private Registries() {}
 
-    private static TopologicalRegistryBuilder<ITileDataFactory> tileDataFactoryBuilder = TopologicalRegistryBuilder.create();
+    private static TopologicalRegistryBuilder<IAdditionalBlockDataFactory> tileDataFactoryBuilder = TopologicalRegistryBuilder.create();
     private static TopologicalRegistryBuilder<IHandleProvider> handleProviderBuilder = TopologicalRegistryBuilder.create();
 
-    private static IForgeRegistry<ITileDataSerializer> tileDataSerializers = null;
+    private static IForgeRegistry<IAdditionalBlockDataSerializer> tileDataSerializers = null;
     private static IForgeRegistry<IUniqueObjectSerializer> uniqueObjectSerializers = null;
-    private static IOrderedRegistry<ITileDataFactory> tileDataFactories = null;
+    private static IOrderedRegistry<IAdditionalBlockDataFactory> tileDataFactories = null;
     private static IOrderedRegistry<IHandleProvider> handleProviders = null;
 
     static {
@@ -83,8 +83,8 @@ public final class Registries {
 
     public static void onCreateRegistries() {
         BuildingGadgets.LOG.trace("Creating ForgeRegistries");
-        tileDataSerializers = new RegistryBuilder<ITileDataSerializer>()
-                .setType(ITileDataSerializer.class)
+        tileDataSerializers = new RegistryBuilder<IAdditionalBlockDataSerializer>()
+                .setType(IAdditionalBlockDataSerializer.class)
                 .setName(Reference.TileDataSerializerReference.REGISTRY_ID_TILE_DATA_SERIALIZER)
                 .create();
         uniqueObjectSerializers = new RegistryBuilder<IUniqueObjectSerializer>()
@@ -95,7 +95,7 @@ public final class Registries {
     }
 
     @SubscribeEvent
-    public static void registerTileDataSerializers(RegistryEvent.Register<ITileDataSerializer> event) {
+    public static void registerTileDataSerializers(RegistryEvent.Register<IAdditionalBlockDataSerializer> event) {
         BuildingGadgets.LOG.trace("Registering TemplateItem Serializers");
         event.getRegistry().register(SerialisationSupport.dummyDataSerializer());
         event.getRegistry().register(SerialisationSupport.nbtTileDataSerializer());
@@ -122,12 +122,12 @@ public final class Registries {
     public static boolean handleIMC(InterModComms.IMCMessage message) {
         BuildingGadgets.LOG.debug("Received IMC message using Method {} from {}.", message.getMethod(), message.getSenderModId());
         if (message.getMethod().equals(Reference.TileDataFactoryReference.IMC_METHOD_TILEDATA_FACTORY)) {
-            BuildingGadgets.LOG.debug("Recognized ITileDataFactory registration message. Registering.");
+            BuildingGadgets.LOG.debug("Recognized IAdditionalBlockDataFactory registration message. Registering.");
             Preconditions.checkState(tileDataFactoryBuilder != null,
-                    "Attempted to register ITileDataFactory, after the Registry has been built!");
-            TopologicalRegistryBuilder<ITileDataFactory> builder = message.<Supplier<TopologicalRegistryBuilder<ITileDataFactory>>>getMessageSupplier().get().get();
+                    "Attempted to register IAdditionalBlockDataFactory, after the Registry has been built!");
+            TopologicalRegistryBuilder<IAdditionalBlockDataFactory> builder = message.<Supplier<TopologicalRegistryBuilder<IAdditionalBlockDataFactory>>>getMessageSupplier().get().get();
             tileDataFactoryBuilder.merge(builder);
-            BuildingGadgets.LOG.trace("Registered {} from {} to the ITileDataFactory registry.", builder, message.getSenderModId());
+            BuildingGadgets.LOG.trace("Registered {} from {} to the IAdditionalBlockDataFactory registry.", builder, message.getSenderModId());
             return true;
         } else if (message.getMethod().equals(Reference.HandleProviderReference.IMC_METHOD_HANDLE_PROVIDER)) {
             BuildingGadgets.LOG.debug("Recognized IHandleProvider registration message. Registering.");
@@ -157,13 +157,13 @@ public final class Registries {
     public static final class TileEntityData {
         private TileEntityData() {}
 
-        public static IOrderedRegistry<ITileDataFactory> getTileDataFactories() {
+        public static IOrderedRegistry<IAdditionalBlockDataFactory> getTileDataFactories() {
             Preconditions
                     .checkState(tileDataFactories != null, "Attempted to retrieve TileDataFactoryRegistry before it was created!");
             return tileDataFactories;
         }
 
-        public static IForgeRegistry<ITileDataSerializer> getTileDataSerializers() {
+        public static IForgeRegistry<IAdditionalBlockDataSerializer> getTileDataSerializers() {
             Preconditions
                     .checkState(tileDataSerializers != null, "Attempted to retrieve TileDataSerializerRegistry before registries were created!");
             return tileDataSerializers;

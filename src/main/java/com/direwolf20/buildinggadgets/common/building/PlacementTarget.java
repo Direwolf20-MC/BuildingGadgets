@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.common.building;
 
-import com.direwolf20.buildinggadgets.common.building.tilesupport.ITileEntityData;
+import com.direwolf20.buildinggadgets.common.building.tilesupport.IAdditionalBlockData;
 import com.direwolf20.buildinggadgets.common.building.view.IBuildContext;
 import com.direwolf20.buildinggadgets.common.inventory.materials.MaterialList;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
@@ -20,7 +20,7 @@ import java.util.Objects;
  * {@link BlockPos} and {@link BlockData} combined, to allow for placement of an {@link BlockData} in an {@link IBuildContext}. Ths class also offers serialisation
  * capabilities, though in general mapping positions to data across a structure wide-map should be preferred, as BlockData:position is a 1:n relationship.
  * <p>
- * Notice that this class is immutable as long as the {@link ITileEntityData} instance of the contained {@link BlockData} is immutable.
+ * Notice that this class is immutable as long as the {@link IAdditionalBlockData} instance of the contained {@link BlockData} is immutable.
  */
 public final class PlacementTarget {
 
@@ -29,7 +29,7 @@ public final class PlacementTarget {
      * @param persisted Flag indicating whether the data was created for an persisted save or not
      * @return A new {@code PlacementTarget} representing the serialized form of nbt.
      * @throws IllegalArgumentException if the persisted flag does not match the way the nbt was created
-     * @throws NullPointerException if the serializer for the {@link ITileEntityData} could not be found
+     * @throws NullPointerException if the serializer for the {@link IAdditionalBlockData} could not be found
      * @see BlockData#deserialize(CompoundNBT, boolean)
      */
     public static PlacementTarget deserialize(CompoundNBT nbt, boolean persisted) {

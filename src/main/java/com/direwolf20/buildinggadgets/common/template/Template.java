@@ -2,7 +2,7 @@ package com.direwolf20.buildinggadgets.common.template;
 
 import com.direwolf20.buildinggadgets.common.building.BlockData;
 import com.direwolf20.buildinggadgets.common.building.Region;
-import com.direwolf20.buildinggadgets.common.building.tilesupport.ITileDataSerializer;
+import com.direwolf20.buildinggadgets.common.building.tilesupport.IAdditionalBlockDataSerializer;
 import com.direwolf20.buildinggadgets.common.building.view.IBuildContext;
 import com.direwolf20.buildinggadgets.common.building.view.IBuildView;
 import com.direwolf20.buildinggadgets.common.building.view.PositionalBuildView;
@@ -33,7 +33,7 @@ public final class Template {
         TemplateHeader.Builder header = TemplateHeader.builderFromNBT(nbt.getCompound(com.direwolf20.buildinggadgets.common.util.ref.NBTKeys.KEY_HEADER));
         if (externalHeader != null)
             header = header.name(externalHeader.getName()).author(externalHeader.getAuthor());
-        DataDecompressor<ITileDataSerializer> serializerDecompressor = persisted ? new DataDecompressor<>(
+        DataDecompressor<IAdditionalBlockDataSerializer> serializerDecompressor = persisted ? new DataDecompressor<>(
                 nbt.getList(com.direwolf20.buildinggadgets.common.util.ref.NBTKeys.KEY_SERIALIZER, NBT.TAG_STRING),
                 inbt -> RegistryUtils.getFromString(Registries.TileEntityData.getTileDataSerializers(), inbt.getString()),
                 value -> SerialisationSupport.dummyDataSerializer())
@@ -99,7 +99,7 @@ public final class Template {
         CompoundNBT res = new CompoundNBT();
         ListNBT posList = new ListNBT();
         DataCompressor<BlockData> blockDataCompressor = new DataCompressor<>();
-        DataCompressor<ITileDataSerializer> dataSerializerCompressor = new DataCompressor<>();
+        DataCompressor<IAdditionalBlockDataSerializer> dataSerializerCompressor = new DataCompressor<>();
         for (Map.Entry<BlockPos, BlockData> entry : map.entrySet()) {
             long posEntry = MathUtils.includeStateId(MathUtils.posToLong(entry.getKey()), blockDataCompressor.applyAsInt(entry.getValue()));
             posList.add(new LongNBT(posEntry));

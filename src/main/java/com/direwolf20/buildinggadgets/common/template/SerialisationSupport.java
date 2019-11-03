@@ -1,8 +1,8 @@
 package com.direwolf20.buildinggadgets.common.template;
 
-import com.direwolf20.buildinggadgets.common.building.tilesupport.ITileDataSerializer;
-import com.direwolf20.buildinggadgets.common.building.tilesupport.ITileEntityData;
-import com.direwolf20.buildinggadgets.common.building.tilesupport.NBTTileEntityData;
+import com.direwolf20.buildinggadgets.common.building.tilesupport.IAdditionalBlockData;
+import com.direwolf20.buildinggadgets.common.building.tilesupport.IAdditionalBlockDataSerializer;
+import com.direwolf20.buildinggadgets.common.building.tilesupport.NBTAdditionalBlockData;
 import com.direwolf20.buildinggadgets.common.building.tilesupport.TileSupport;
 import com.direwolf20.buildinggadgets.common.inventory.materials.MaterialList;
 import com.direwolf20.buildinggadgets.common.inventory.materials.objects.IUniqueObjectSerializer;
@@ -19,45 +19,45 @@ public final class SerialisationSupport {
     private SerialisationSupport() {}
 
     @ObjectHolder(Reference.TileDataSerializerReference.DUMMY_SERIALIZER)
-    private static ITileDataSerializer DUMMY_TILE_DATA_SERIALIZER = new DummyTileDataSerializer()
+    private static IAdditionalBlockDataSerializer DUMMY_TILE_DATA_SERIALIZER = new DummyAdditionalBlockDataSerializer()
             .setRegistryName(Reference.TileDataSerializerReference.DUMMY_SERIALIZER_RL);
 
-    public static ITileDataSerializer dummyDataSerializer() {
+    public static IAdditionalBlockDataSerializer dummyDataSerializer() {
         return DUMMY_TILE_DATA_SERIALIZER;
     }
 
-    private static final class DummyTileDataSerializer extends ForgeRegistryEntry<ITileDataSerializer> implements ITileDataSerializer {
+    private static final class DummyAdditionalBlockDataSerializer extends ForgeRegistryEntry<IAdditionalBlockDataSerializer> implements IAdditionalBlockDataSerializer {
 
-        private DummyTileDataSerializer() {
+        private DummyAdditionalBlockDataSerializer() {
             super();
         }
 
         @Override
-        public CompoundNBT serialize(ITileEntityData data, boolean persisted) {
+        public CompoundNBT serialize(IAdditionalBlockData data, boolean persisted) {
             return new CompoundNBT();
         }
 
         @Override
-        public ITileEntityData deserialize(CompoundNBT tagCompound, boolean persisted) {
+        public IAdditionalBlockData deserialize(CompoundNBT tagCompound, boolean persisted) {
             return TileSupport.dummyTileEntityData();
         }
     }
 
     @ObjectHolder(Reference.TileDataSerializerReference.NBT_TILE_ENTITY_DATA_SERIALIZER)
-    private static ITileDataSerializer NBT_TILE_DATA_SERIALIZER = new NBTTileEntityDataSerializer()
+    private static IAdditionalBlockDataSerializer NBT_TILE_DATA_SERIALIZER = new NBTAdditionalBlockEntityDataSerializer()
             .setRegistryName(Reference.TileDataSerializerReference.NBT_TILE_ENTITY_DATA_SERIALIZER_RL);
 
-    public static ITileDataSerializer nbtTileDataSerializer() {
+    public static IAdditionalBlockDataSerializer nbtTileDataSerializer() {
         return NBT_TILE_DATA_SERIALIZER;
     }
 
-    private static final class NBTTileEntityDataSerializer extends ForgeRegistryEntry<ITileDataSerializer> implements ITileDataSerializer {
-        private NBTTileEntityDataSerializer() {}
+    private static final class NBTAdditionalBlockEntityDataSerializer extends ForgeRegistryEntry<IAdditionalBlockDataSerializer> implements IAdditionalBlockDataSerializer {
+        private NBTAdditionalBlockEntityDataSerializer() {}
 
         @Override
-        public CompoundNBT serialize(ITileEntityData data, boolean persisted) {
-            Preconditions.checkArgument(data instanceof NBTTileEntityData);
-            NBTTileEntityData nbtData = (NBTTileEntityData) data;
+        public CompoundNBT serialize(IAdditionalBlockData data, boolean persisted) {
+            Preconditions.checkArgument(data instanceof NBTAdditionalBlockData);
+            NBTAdditionalBlockData nbtData = (NBTAdditionalBlockData) data;
             CompoundNBT res = new CompoundNBT();
             res.put(NBTKeys.KEY_DATA, nbtData.getNBT());
             if (nbtData.getRequiredMaterials() != null)
@@ -66,12 +66,12 @@ public final class SerialisationSupport {
         }
 
         @Override
-        public ITileEntityData deserialize(CompoundNBT tagCompound, boolean persisted) {
+        public IAdditionalBlockData deserialize(CompoundNBT tagCompound, boolean persisted) {
             CompoundNBT data = tagCompound.getCompound(NBTKeys.KEY_DATA);
             MaterialList materialList = null;
             if (tagCompound.contains(NBTKeys.KEY_MATERIALS, NBT.TAG_COMPOUND))
                 materialList = MaterialList.deserialize(tagCompound.getCompound(NBTKeys.KEY_MATERIALS), persisted);
-            return new NBTTileEntityData(data, materialList);
+            return new NBTAdditionalBlockData(data, materialList);
         }
     }
 

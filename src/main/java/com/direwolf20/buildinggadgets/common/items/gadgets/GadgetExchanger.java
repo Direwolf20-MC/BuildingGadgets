@@ -3,7 +3,7 @@ package com.direwolf20.buildinggadgets.common.items.gadgets;
 import com.direwolf20.buildinggadgets.common.blocks.EffectBlock;
 import com.direwolf20.buildinggadgets.common.building.BlockData;
 import com.direwolf20.buildinggadgets.common.building.modes.ExchangingMode;
-import com.direwolf20.buildinggadgets.common.building.tilesupport.ITileEntityData;
+import com.direwolf20.buildinggadgets.common.building.tilesupport.IAdditionalBlockData;
 import com.direwolf20.buildinggadgets.common.building.tilesupport.TileSupport;
 import com.direwolf20.buildinggadgets.common.building.view.IBuildContext;
 import com.direwolf20.buildinggadgets.common.building.view.SimpleBuildContext;
@@ -228,7 +228,7 @@ public class GadgetExchanger extends ModeGadget {
 
     private boolean exchangeBlock(ServerWorld world, ServerPlayerEntity player, IItemIndex index, Undo.Builder builder, BlockPos pos, BlockData setBlock) {
         BlockState currentBlock = world.getBlockState(pos);
-        ITileEntityData data;
+        IAdditionalBlockData data;
         TileEntity te = world.getTileEntity(pos);
         if (te instanceof ConstructionBlockTileEntity) {
             data = ((ConstructionBlockTileEntity) te).getConstructionBlockData().getTileData();

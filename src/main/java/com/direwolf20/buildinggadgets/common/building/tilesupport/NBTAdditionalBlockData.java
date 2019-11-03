@@ -15,28 +15,28 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Objects;
 
-public class NBTTileEntityData implements ITileEntityData {
-    public static NBTTileEntityData ofTile(TileEntity te) {
+public class NBTAdditionalBlockData implements IAdditionalBlockData {
+    public static NBTAdditionalBlockData ofTile(TileEntity te) {
         CompoundNBT nbt = new CompoundNBT();
         te.write(nbt);
-        return new NBTTileEntityData(nbt);
+        return new NBTAdditionalBlockData(nbt);
     }
     @Nonnull
     private final CompoundNBT nbt;
     @Nullable
     private final MaterialList requiredMaterials;
 
-    public NBTTileEntityData(CompoundNBT nbt, @Nullable MaterialList requiredMaterials) {
+    public NBTAdditionalBlockData(CompoundNBT nbt, @Nullable MaterialList requiredMaterials) {
         this.nbt = Objects.requireNonNull(nbt);
         this.requiredMaterials = requiredMaterials;
     }
 
-    public NBTTileEntityData(CompoundNBT nbt) {
+    public NBTAdditionalBlockData(CompoundNBT nbt) {
         this(nbt, null);
     }
 
     @Override
-    public ITileDataSerializer getSerializer() {
+    public IAdditionalBlockDataSerializer getSerializer() {
         return SerialisationSupport.nbtTileDataSerializer();
     }
 
@@ -44,7 +44,7 @@ public class NBTTileEntityData implements ITileEntityData {
     public MaterialList getRequiredItems(IBuildContext context, BlockState state, @Nullable RayTraceResult target, @Nullable BlockPos pos) {
         if (requiredMaterials != null)
             return requiredMaterials;
-        return ITileEntityData.super.getRequiredItems(context, state, target, pos);
+        return IAdditionalBlockData.super.getRequiredItems(context, state, target, pos);
     }
 
     @Override
@@ -78,9 +78,9 @@ public class NBTTileEntityData implements ITileEntityData {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (! (o instanceof NBTTileEntityData)) return false;
+        if (! (o instanceof NBTAdditionalBlockData)) return false;
 
-        NBTTileEntityData that = (NBTTileEntityData) o;
+        NBTAdditionalBlockData that = (NBTAdditionalBlockData) o;
 
         if (! nbt.equals(that.nbt)) return false;
         return getRequiredMaterials() != null ? getRequiredMaterials().equals(that.getRequiredMaterials()) : that.getRequiredMaterials() == null;

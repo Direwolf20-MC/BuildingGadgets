@@ -1,8 +1,8 @@
 package com.direwolf20.buildinggadgets.common.building;
 
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
-import com.direwolf20.buildinggadgets.common.building.tilesupport.ITileDataSerializer;
-import com.direwolf20.buildinggadgets.common.building.tilesupport.ITileEntityData;
+import com.direwolf20.buildinggadgets.common.building.tilesupport.IAdditionalBlockData;
+import com.direwolf20.buildinggadgets.common.building.tilesupport.IAdditionalBlockDataSerializer;
 import com.direwolf20.buildinggadgets.common.building.tilesupport.TileSupport;
 import com.direwolf20.buildinggadgets.common.building.view.IBuildContext;
 import com.direwolf20.buildinggadgets.common.inventory.materials.MaterialList;
@@ -26,10 +26,10 @@ import java.util.function.IntFunction;
 import java.util.function.ToIntFunction;
 
 /**
- * Representation of the data one block can hold, in the form of an {@link BlockState} and an instance of {@link ITileEntityData}.
- * This calls offers serialisation facilities as well as delegating placement through to the {@link ITileEntityData}.
+ * Representation of the data one block can hold, in the form of an {@link BlockState} and an instance of {@link IAdditionalBlockData}.
+ * This calls offers serialisation facilities as well as delegating placement through to the {@link IAdditionalBlockData}.
  * <p>
- * Notice that this class is immutable as long as the {@link ITileEntityData} instance is immutable.
+ * Notice that this class is immutable as long as the {@link IAdditionalBlockData} instance is immutable.
  */
 public final class BlockData {
     public static final BlockData AIR = new BlockData(Blocks.AIR.getDefaultState(), TileSupport.dummyTileEntityData());
@@ -48,11 +48,11 @@ public final class BlockData {
     }
 
     @Nullable
-    public static BlockData tryDeserialize(@Nullable CompoundNBT tag, @Nullable IntFunction<ITileDataSerializer> serializerProvider, boolean readDataPersisted) {
+    public static BlockData tryDeserialize(@Nullable CompoundNBT tag, @Nullable IntFunction<IAdditionalBlockDataSerializer> serializerProvider, boolean readDataPersisted) {
         if (tag == null || ! (tag.contains(NBTKeys.KEY_STATE) && tag.contains(NBTKeys.KEY_SERIALIZER) && tag.contains(NBTKeys.KEY_DATA)))
             return null;
         BlockState state = NBTUtil.readBlockState(tag.getCompound(NBTKeys.KEY_STATE));
-        ITileDataSerializer serializer;
+        IAdditionalBlockDataSerializer serializer;
         try {
             if (serializerProvider == null)
                 serializer = RegistryUtils
@@ -65,7 +65,7 @@ public final class BlockData {
         }
         if (serializer == null)
             return null;
-        ITileEntityData data = serializer.deserialize(tag.getCompound(NBTKeys.KEY_DATA), readDataPersisted);
+        IAdditionalBlockData data = serializer.deserialize(tag.getCompound(NBTKeys.KEY_DATA), readDataPersisted);
         return new BlockData(state, data);
     }
 
@@ -80,12 +80,12 @@ public final class BlockData {
         return deserialize(tag, persisted ? null : i -> RegistryUtils.getById(Registries.TileEntityData.getTileDataSerializers(), i), persisted);
     }
 
-    public static BlockData deserialize(CompoundNBT tag, @Nullable IntFunction<ITileDataSerializer> serializerProvider, boolean readDataPersisted) {
+    public static BlockData deserialize(CompoundNBT tag, @Nullable IntFunction<IAdditionalBlockDataSerializer> serializerProvider, boolean readDataPersisted) {
         Preconditions.checkNotNull(tag, "Cannot deserialize from a null tag compound");
         Preconditions.checkArgument(tag.contains(NBTKeys.KEY_STATE) && tag.contains(NBTKeys.KEY_SERIALIZER) && tag.contains(NBTKeys.KEY_DATA),
                 "Given NBTTagCompound does not contain a valid BlockData instance. Missing NBT-Keys in Tag {}!", tag.toString());
         BlockState state = NBTUtil.readBlockState(tag.getCompound(NBTKeys.KEY_STATE));
-        ITileDataSerializer serializer;
+        IAdditionalBlockDataSerializer serializer;
         try {
             if (serializerProvider == null)
                 serializer = RegistryUtils
@@ -97,20 +97,20 @@ public final class BlockData {
         }
         Preconditions.checkArgument(serializer != null,
                 "Failed to retrieve serializer for tag {} and persisted={}", tag.toString(), readDataPersisted);
-        ITileEntityData data = serializer.deserialize(tag.getCompound(NBTKeys.KEY_DATA), readDataPersisted);
+        IAdditionalBlockData data = serializer.deserialize(tag.getCompound(NBTKeys.KEY_DATA), readDataPersisted);
         return new BlockData(state, data);
     }
 
     private final BlockState state;
-    private final ITileEntityData tileData;
+    private final IAdditionalBlockData tileData;
 
     /**
      * Creates a new {@code BlockData} with the specified data.
      * @param state The {@link BlockState} of the resulting data.
-     * @param tileData The {@link ITileEntityData} of the resulting data.
+     * @param tileData The {@link IAdditionalBlockData} of the resulting data.
      * @throws NullPointerException if state or tileData are null.
      */
-    public BlockData(BlockState state, ITileEntityData tileData) {
+    public BlockData(BlockState state, IAdditionalBlockData tileData) {
         this.state = Objects.requireNonNull(state);
         this.tileData = Objects.requireNonNull(tileData);
     }
@@ -123,16 +123,16 @@ public final class BlockData {
     }
 
     /**
-     * @return The {@link ITileEntityData} contained by this {@code BlockState}.
+     * @return The {@link IAdditionalBlockData} contained by this {@code BlockState}.
      */
-    public ITileEntityData getTileData() {
+    public IAdditionalBlockData getTileData() {
         return tileData;
     }
 
     /**
      * @param context The {@link IBuildContext} in which to perform the placement.
      * @param pos The {@link BlockPos} at which to perform the placement.
-     * @return whether or not the {@link ITileEntityData} reported that placement was performed.
+     * @return whether or not the {@link IAdditionalBlockData} reported that placement was performed.
      */
     public boolean placeIn(IBuildContext context, BlockPos pos) {
         return tileData.placeIn(context, state, pos);
@@ -147,7 +147,7 @@ public final class BlockData {
         return serialize(persisted ? null : ser -> RegistryUtils.getId(Registries.TileEntityData.getTileDataSerializers(), ser), persisted);
     }
 
-    public CompoundNBT serialize(@Nullable ToIntFunction<ITileDataSerializer> idGetter, boolean writeDataPersisted) {
+    public CompoundNBT serialize(@Nullable ToIntFunction<IAdditionalBlockDataSerializer> idGetter, boolean writeDataPersisted) {
         CompoundNBT tag = new CompoundNBT();
         tag.put(NBTKeys.KEY_STATE, NBTUtil.writeBlockState(state));
         if (idGetter == null)

@@ -16,25 +16,25 @@ import java.util.Objects;
 public final class TileSupport {
     private TileSupport() {}
 
-    private static ITileDataFactory DATA_PROVIDER_FACTORY = new DataProviderFactory();
+    private static IAdditionalBlockDataFactory DATA_PROVIDER_FACTORY = new DataProviderFactory();
 
     /**
-     * Returns an adapter for {@link ITileDataFactory} and {@link ITileDataProvider}. If a {@link TileEntity} is an instance of {@link ITileDataProvider} this {@link ITileDataFactory}
-     * will return the data created by the given {@link ITileDataProvider}.
+     * Returns an adapter for {@link IAdditionalBlockDataFactory} and {@link IAdditionalBlockDataProvider}. If a {@link TileEntity} is an instance of {@link IAdditionalBlockDataProvider} this {@link IAdditionalBlockDataFactory}
+     * will return the data created by the given {@link IAdditionalBlockDataProvider}.
      * <p>
-     * Notice that this will by default be registered to be the last {@link ITileDataFactory} called in order to allow mods to override the data returned by a {@link TileEntity} itself.
+     * Notice that this will by default be registered to be the last {@link IAdditionalBlockDataFactory} called in order to allow mods to override the data returned by a {@link TileEntity} itself.
      *
-     * @return An {@link ITileDataFactory} which will return {@link ITileEntityData} instances provided by {@link TileEntity TileEntities} implementing {@link ITileDataProvider}
+     * @return An {@link IAdditionalBlockDataFactory} which will return {@link IAdditionalBlockData} instances provided by {@link TileEntity TileEntities} implementing {@link IAdditionalBlockDataProvider}
      */
-    public static ITileDataFactory dataProviderFactory() {
+    public static IAdditionalBlockDataFactory dataProviderFactory() {
         return DATA_PROVIDER_FACTORY;
     }
 
-    public static ITileEntityData createTileData(BlockState state, @Nullable TileEntity te) {
+    public static IAdditionalBlockData createTileData(BlockState state, @Nullable TileEntity te) {
         if (te == null)
             return dummyTileEntityData();
-        ITileEntityData res;
-        for (ITileDataFactory factory : TileEntityData.getTileDataFactories()) {
+        IAdditionalBlockData res;
+        for (IAdditionalBlockDataFactory factory : TileEntityData.getTileDataFactories()) {
             res = factory.createDataFor(state, te);
             if (res != null)
                 return res;
@@ -42,12 +42,12 @@ public final class TileSupport {
         return dummyTileEntityData();
     }
 
-    public static ITileEntityData createTileData(IBlockReader world, BlockState state, BlockPos pos) {
+    public static IAdditionalBlockData createTileData(IBlockReader world, BlockState state, BlockPos pos) {
         TileEntity te = world.getTileEntity(pos);
         return createTileData(state, te);
     }
 
-    public static ITileEntityData createTileData(IBlockReader world, BlockPos pos) {
+    public static IAdditionalBlockData createTileData(IBlockReader world, BlockPos pos) {
         BlockState state = world.getBlockState(pos);
         return createTileData(world, state, pos);
     }
@@ -61,19 +61,19 @@ public final class TileSupport {
         return new BlockData(world.getBlockState(pos), createTileData(world, state, pos));
     }
 
-    private static class DataProviderFactory implements ITileDataFactory {
+    private static class DataProviderFactory implements IAdditionalBlockDataFactory {
         @Nullable
         @Override
-        public ITileEntityData createDataFor(BlockState state, @Nullable TileEntity tileEntity) {
-            if (tileEntity instanceof ITileDataProvider)
-                return ((ITileDataProvider) tileEntity).createTileData();
+        public IAdditionalBlockData createDataFor(BlockState state, @Nullable TileEntity tileEntity) {
+            if (tileEntity instanceof IAdditionalBlockDataProvider)
+                return ((IAdditionalBlockDataProvider) tileEntity).createTileData();
             return null;
         }
     }
 
-    private static final ITileEntityData DUMMY_TILE_ENTITY_DATA = new ITileEntityData() {
+    private static final IAdditionalBlockData DUMMY_TILE_ENTITY_DATA = new IAdditionalBlockData() {
         @Override
-        public ITileDataSerializer getSerializer() {
+        public IAdditionalBlockDataSerializer getSerializer() {
             return SerialisationSupport.dummyDataSerializer();
         }
 
@@ -89,7 +89,7 @@ public final class TileSupport {
         }
     };
 
-    public static ITileEntityData dummyTileEntityData() {
+    public static IAdditionalBlockData dummyTileEntityData() {
         return DUMMY_TILE_ENTITY_DATA;
     }
 }

@@ -3,9 +3,9 @@ package com.direwolf20.buildinggadgets.common.save;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.building.BlockData;
 import com.direwolf20.buildinggadgets.common.building.Region;
-import com.direwolf20.buildinggadgets.common.building.tilesupport.ITileDataSerializer;
-import com.direwolf20.buildinggadgets.common.building.tilesupport.ITileEntityData;
-import com.direwolf20.buildinggadgets.common.building.tilesupport.NBTTileEntityData;
+import com.direwolf20.buildinggadgets.common.building.tilesupport.IAdditionalBlockData;
+import com.direwolf20.buildinggadgets.common.building.tilesupport.IAdditionalBlockDataSerializer;
+import com.direwolf20.buildinggadgets.common.building.tilesupport.NBTAdditionalBlockData;
 import com.direwolf20.buildinggadgets.common.building.tilesupport.TileSupport;
 import com.direwolf20.buildinggadgets.common.inventory.materials.objects.IUniqueObject;
 import com.direwolf20.buildinggadgets.common.inventory.materials.objects.IUniqueObjectSerializer;
@@ -45,11 +45,11 @@ public final class Undo {
                 && nbt.contains(NBTKeys.WORLD_SAVE_UNDO_BLOCK_LIST, NBT.TAG_LIST)
                 && nbt.contains(NBTKeys.WORLD_SAVE_UNDO_DATA_LIST, NBT.TAG_LIST)
                 && nbt.contains(NBTKeys.WORLD_SAVE_UNDO_DATA_SERIALIZER_LIST, NBT.TAG_LIST));
-        DataDecompressor<ITileDataSerializer> serializerReverseObjectIncrementer = new DataDecompressor<>(
+        DataDecompressor<IAdditionalBlockDataSerializer> serializerReverseObjectIncrementer = new DataDecompressor<>(
                 (ListNBT) nbt.get(NBTKeys.WORLD_SAVE_UNDO_DATA_SERIALIZER_LIST),
                 inbt -> {
                     String s = inbt.getString();
-                    ITileDataSerializer serializer = RegistryUtils.getFromString(Registries.TileEntityData.getTileDataSerializers(), s);
+                    IAdditionalBlockDataSerializer serializer = RegistryUtils.getFromString(Registries.TileEntityData.getTileDataSerializers(), s);
                     if (serializer == null) {
                         BuildingGadgets.LOG.warn("Found unknown serializer {}. Replacing with dummy!", s);
                         serializer = TileSupport.dummyTileEntityData().getSerializer();
@@ -124,7 +124,7 @@ public final class Undo {
         DataCompressor<BlockData> dataObjectIncrementer = new DataCompressor<>();
         DataCompressor<IUniqueObjectSerializer> itemSerializerIncrementer = new DataCompressor<>();
         DataCompressor<Multiset<IUniqueObject<?>>> itemObjectIncrementer = new DataCompressor<>();
-        DataCompressor<ITileDataSerializer> serializerObjectIncrementer = new DataCompressor<>();
+        DataCompressor<IAdditionalBlockDataSerializer> serializerObjectIncrementer = new DataCompressor<>();
         CompoundNBT res = new CompoundNBT();
         ListNBT infoList = NBTHelper.serializeMap(dataMap, NBTUtil::writeBlockPos, i -> i.serialize(dataObjectIncrementer, itemObjectIncrementer));
         ListNBT dataList = dataObjectIncrementer.write(d -> d.serialize(serializerObjectIncrementer, true));
@@ -208,7 +208,7 @@ public final class Undo {
         public Builder record(IBlockReader reader, BlockPos pos, BlockData placeData, Multiset<IUniqueObject<?>> requiredItems, Multiset<IUniqueObject<?>> producedItems) {
             BlockState state = reader.getBlockState(pos);
             TileEntity te = reader.getTileEntity(pos);
-            ITileEntityData data = te != null ? NBTTileEntityData.ofTile(te) : TileSupport.dummyTileEntityData();
+            IAdditionalBlockData data = te != null ? NBTAdditionalBlockData.ofTile(te) : TileSupport.dummyTileEntityData();
             return record(pos, new BlockData(state, data), placeData, requiredItems, producedItems);
         }
 

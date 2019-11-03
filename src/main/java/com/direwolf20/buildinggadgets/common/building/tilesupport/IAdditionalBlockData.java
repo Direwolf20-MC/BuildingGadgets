@@ -18,23 +18,23 @@ import javax.annotation.Nullable;
  * <ul>
  * <li>Check whether placement should be permitted via {@link #allowPlacement(IBuildContext, BlockState, BlockPos)}
  * <li>Place this data with a given {@link BlockState} in an {@link IBuildContext} via {@link #placeIn(IBuildContext, BlockState, BlockPos)}
- * <li>Query the requiredItems to build this {@link ITileEntityData} via {@link #getRequiredItems(IBuildContext, BlockState, RayTraceResult, BlockPos)}.
+ * <li>Query the requiredItems to build this {@link IAdditionalBlockData} via {@link #getRequiredItems(IBuildContext, BlockState, RayTraceResult, BlockPos)}.
  * </ul>
  */
-public interface ITileEntityData {
+public interface IAdditionalBlockData {
     /**
-     * @return The {@link ITileDataSerializer} which can be used for serializing this {@link ITileEntityData} instance.
+     * @return The {@link IAdditionalBlockDataSerializer} which can be used for serializing this {@link IAdditionalBlockData} instance.
      */
-    ITileDataSerializer getSerializer();
+    IAdditionalBlockDataSerializer getSerializer();
 
     /**
-     * Attempts to place this {@link ITileEntityData} in the given {@link IBuildContext}. If this is called but {@link #allowPlacement(IBuildContext, BlockState, BlockPos)}
+     * Attempts to place this {@link IAdditionalBlockData} in the given {@link IBuildContext}. If this is called but {@link #allowPlacement(IBuildContext, BlockState, BlockPos)}
      * would have returned false, placement should still be attempted and counted as a "forced placement".<br>
-     * This Method should also set any data on the {@link net.minecraft.tileentity.TileEntity} represented by this {@code ITileEntityData}.
+     * This Method should also set any data on the {@link net.minecraft.tileentity.TileEntity} represented by this {@code IAdditionalBlockData}.
      * @param context The {@link IBuildContext} to place in.
      * @param state The {@link BlockState} to place.
      * @param position The {@link BlockPos} at which to place
-     * @return Whether or not placement was performed by this {@link ITileEntityData}. This should only return false if some really hard requirements would not be met,
+     * @return Whether or not placement was performed by this {@link IAdditionalBlockData}. This should only return false if some really hard requirements would not be met,
      *         like for example a required block not being present next to the given position.
      */
     boolean placeIn(IBuildContext context, BlockState state, BlockPos position);
