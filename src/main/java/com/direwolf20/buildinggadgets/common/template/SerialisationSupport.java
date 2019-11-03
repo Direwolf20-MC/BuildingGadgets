@@ -6,6 +6,7 @@ import com.direwolf20.buildinggadgets.common.building.tilesupport.NBTTileEntityD
 import com.direwolf20.buildinggadgets.common.building.tilesupport.TileSupport;
 import com.direwolf20.buildinggadgets.common.inventory.materials.MaterialList;
 import com.direwolf20.buildinggadgets.common.inventory.materials.objects.IUniqueObjectSerializer;
+import com.direwolf20.buildinggadgets.common.inventory.materials.objects.UniqueItem;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.google.common.base.Preconditions;
@@ -18,7 +19,8 @@ public final class SerialisationSupport {
     private SerialisationSupport() {}
 
     @ObjectHolder(Reference.TileDataSerializerReference.DUMMY_SERIALIZER)
-    private static ITileDataSerializer DUMMY_TILE_DATA_SERIALIZER = new DummyTileDataSerializer();
+    private static ITileDataSerializer DUMMY_TILE_DATA_SERIALIZER = new DummyTileDataSerializer()
+            .setRegistryName(Reference.TileDataSerializerReference.DUMMY_SERIALIZER_RL);
 
     public static ITileDataSerializer dummyDataSerializer() {
         return DUMMY_TILE_DATA_SERIALIZER;
@@ -42,7 +44,8 @@ public final class SerialisationSupport {
     }
 
     @ObjectHolder(Reference.TileDataSerializerReference.NBT_TILE_ENTITY_DATA_SERIALIZER)
-    private static ITileDataSerializer NBT_TILE_DATA_SERIALIZER = new NBTTileEntityDataSerializer();
+    private static ITileDataSerializer NBT_TILE_DATA_SERIALIZER = new NBTTileEntityDataSerializer()
+            .setRegistryName(Reference.TileDataSerializerReference.NBT_TILE_ENTITY_DATA_SERIALIZER_RL);
 
     public static ITileDataSerializer nbtTileDataSerializer() {
         return NBT_TILE_DATA_SERIALIZER;
@@ -73,7 +76,8 @@ public final class SerialisationSupport {
     }
 
     @ObjectHolder(Reference.UniqueObjectSerializerReference.SIMPLE_UNIQUE_ITEM_ID)
-    private static IUniqueObjectSerializer UNIQUE_ITEM_SERIALIZER;
+    private static IUniqueObjectSerializer UNIQUE_ITEM_SERIALIZER = new UniqueItem.Serializer()
+            .setRegistryName(Reference.UniqueObjectSerializerReference.SIMPLE_UNIQUE_ITEM_ID_RL);
 
     public static IUniqueObjectSerializer uniqueItemSerializer() {
         return UNIQUE_ITEM_SERIALIZER;
