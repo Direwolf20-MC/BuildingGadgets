@@ -1,6 +1,7 @@
 package com.direwolf20.buildinggadgets.common.template;
 
 import com.direwolf20.buildinggadgets.common.building.BlockData;
+import com.direwolf20.buildinggadgets.common.building.PlacementTarget;
 import com.direwolf20.buildinggadgets.common.building.Region;
 import com.direwolf20.buildinggadgets.common.building.tilesupport.IAdditionalBlockDataSerializer;
 import com.direwolf20.buildinggadgets.common.building.view.BuildContext;
@@ -8,26 +9,29 @@ import com.direwolf20.buildinggadgets.common.building.view.IBuildView;
 import com.direwolf20.buildinggadgets.common.building.view.PositionalBuildView;
 import com.direwolf20.buildinggadgets.common.inventory.materials.MaterialList;
 import com.direwolf20.buildinggadgets.common.registry.Registries;
-import com.direwolf20.buildinggadgets.common.util.CommonUtils;
 import com.direwolf20.buildinggadgets.common.util.compression.DataCompressor;
 import com.direwolf20.buildinggadgets.common.util.compression.DataDecompressor;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
+import com.direwolf20.buildinggadgets.common.util.spliterator.MappingSpliterator;
 import com.direwolf20.buildinggadgets.common.util.tools.MathUtils;
 import com.direwolf20.buildinggadgets.common.util.tools.RegistryUtils;
 import com.google.common.collect.ImmutableMap;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.*;
 import net.minecraft.util.Direction.Axis;
 import net.minecraft.util.Mirror;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.common.util.Constants.NBT;
 
 import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Spliterator;
 import java.util.function.Function;
 
-public final class Template {
+public final class Template implements IBuildView {
     public static Template deserialize(CompoundNBT nbt, @Nullable TemplateHeader externalHeader, boolean persisted) {
         ListNBT posList = nbt.getList(com.direwolf20.buildinggadgets.common.util.ref.NBTKeys.KEY_POS, NBT.TAG_LONG);
         TemplateHeader.Builder header = TemplateHeader.builderFromNBT(nbt.getCompound(com.direwolf20.buildinggadgets.common.util.ref.NBTKeys.KEY_HEADER));
@@ -72,21 +76,67 @@ public final class Template {
         this(ImmutableMap.of(), TemplateHeader.builder(Region.singleZero()).build());
     }
 
+    public TemplateHeader getHeaderAndForceMaterials(BuildContext context, @Nullable Vec3d simulatePos) {
+        if (header.getRequiredItems() == null) {
+            MaterialList materialList = IBuildView.super.estimateRequiredItems(context, simulatePos);
+            header = TemplateHeader.builderOf(header).requiredItems(materialList).build();
+        }
+        return getHeader();
+    }
+
     public TemplateHeader getHeaderAndForceMaterials(BuildContext context) {
         if (header.getRequiredItems() == null) {
-            MaterialList materialList = CommonUtils.estimateRequiredItems(
-                    createViewInContext(context),
-                    context,
-                    context.getBuildingPlayer() != null ?
-                            context.getBuildingPlayer().getPositionVec().add(0, context.getBuildingPlayer().getEyeHeight(), 0) :
-                            null);
-            header = TemplateHeader.builderOf(header).requiredItems(materialList).build();
+            PlayerEntity player = context.getBuildingPlayer();
+            return getHeaderAndForceMaterials(context, player != null ? player.getPositionVec().add(0, player.getEyeHeight(), 0) : null);
         }
         return getHeader();
     }
 
     public TemplateHeader getHeader() {
         return header;
+    }
+
+    @Override
+    public Spliterator<PlacementTarget> spliterator() {
+        BlockPos translation = header.getBoundingBox().getMin(); //freeze translation
+        return new MappingSpliterator<>(map.entrySet().spliterator(), e -> new PlacementTarget(e.getKey().add(translation), e.getValue()));
+    }
+
+    @Override
+    public Template translateTo(BlockPos pos) {
+        Template copy = new Template(map,
+                TemplateHeader.builderOf(header)
+                        .bounds(header.getBoundingBox().translate(pos.subtract(header.getBoundingBox().getMin())))
+                        .build(),
+                isNormalized);
+        return copy;
+    }
+
+    @Override
+    public int estimateSize() {
+        return map.size();
+    }
+
+    @Override
+    public MaterialList estimateRequiredItems(BuildContext context, @Nullable Vec3d simulatePos) {
+        MaterialList materialList = getHeaderAndForceMaterials(context, simulatePos).getRequiredItems();
+        assert materialList != null;
+        return materialList;
+    }
+
+    @Override
+    public Template copy() {
+        return new Template(map, header, isNormalized);
+    }
+
+    @Override
+    public Region getBoundingBox() {
+        return getHeader().getBoundingBox();
+    }
+
+    @Override
+    public boolean mayContain(int x, int y, int z) {
+        return getBoundingBox().mayContain(x, y, z);
     }
 
     public IBuildView createViewInContext(BuildContext context) {
@@ -184,7 +234,11 @@ public final class Template {
     public Template normalize() {
         if (isNormalized)
             return this;
-        Region region = header.getBoundingBox();
+        //need to rebuild the Region as it's affected by translation
+        Region.Builder regBuilder = Region.enclosingBuilder();
+        map.keySet().forEach(regBuilder::enclose);
+        Region region = regBuilder.build();
+
         ImmutableMap.Builder<BlockPos, BlockData> builder = ImmutableMap.builder();
         for (Map.Entry<BlockPos, BlockData> entry : map.entrySet()) {
             builder.put(entry.getKey().subtract(region.getMin()), entry.getValue());

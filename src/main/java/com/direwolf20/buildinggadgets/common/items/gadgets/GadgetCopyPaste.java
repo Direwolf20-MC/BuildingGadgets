@@ -412,11 +412,10 @@ public class GadgetCopyPaste extends AbstractGadget {
                         .usedStack(stack)
                         .buildingPlayer(player)
                         .build(world);
-                IBuildView view = template.createViewInContext(buildContext);
-                view.translateTo(pos);
-                if (! checkPlacement(world, player, view.getBoundingBox()))
+                template = template.translateTo(pos);
+                if (! checkPlacement(world, player, template.getBoundingBox()))
                     return;
-                schedulePlacement(stack, view, buildContext, player);
+                schedulePlacement(stack, template, buildContext, player);
             });
         });
     }

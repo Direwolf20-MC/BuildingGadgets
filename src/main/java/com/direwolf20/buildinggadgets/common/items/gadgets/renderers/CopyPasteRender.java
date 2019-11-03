@@ -148,10 +148,9 @@ public class CopyPasteRender extends BaseRenderer {
                 .buildingPlayer(player)
                 .usedStack(stack)
                 .build(fakeWorld);
-        IBuildView view = template.createViewInContext(context);
-        view.translateTo(startPos);
-        RenderSorter sorter = new RenderSorter(player, view.estimateSize());
-        for (PlacementTarget target : view) {
+        template = template.translateTo(startPos);
+        RenderSorter sorter = new RenderSorter(player, template.estimateSize());
+        for (PlacementTarget target : template) {
             if (target.placeIn(context))
                 sorter.onPlaced(target);
         }
@@ -160,7 +159,7 @@ public class CopyPasteRender extends BaseRenderer {
         renderTargets(context, sorter, partialTicks);
 
         if (! player.isCreative())
-            renderMissing(player, stack, view, context, sorter);
+            renderMissing(player, stack, template, context, sorter);
         GlStateManager.disableBlend();
     }
 

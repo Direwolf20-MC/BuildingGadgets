@@ -166,12 +166,11 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
                     .buildingPlayer(getMinecraft().player)
                     .usedStack(container.getSlot(0).getStack())
                     .build(new FakeDelegationWorld(getMinecraft().world));
-            IBuildView view = template.createViewInContext(context);
 
             int displayList = GLAllocation.generateDisplayLists(1);
             GlStateManager.newList(displayList, GL11.GL_COMPILE);
 
-            renderStructure(view, context, partialTicks);
+            renderStructure(template, context, partialTicks);
 
             GlStateManager.endList();
             this.displayList = displayList;

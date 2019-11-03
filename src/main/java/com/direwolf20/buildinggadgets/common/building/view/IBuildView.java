@@ -84,7 +84,7 @@ public interface IBuildView extends IPlacementSequence<PlacementTarget> {
 
     default MaterialList estimateRequiredItems(BuildContext context) {
         PlayerEntity player = context.getBuildingPlayer();
-        return estimateRequiredItems(context, player != null ? new Vec3d(player.posX, player.posY, player.posZ) : null);
+        return estimateRequiredItems(context, player != null ? player.getPositionVec().add(0, player.getEyeHeight(), 0) : null);
     }
 
     /**
