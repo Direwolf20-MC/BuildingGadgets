@@ -93,6 +93,9 @@ public class SyncedConfig {
     public static boolean absoluteCoordDefault;
 
     @AutoSync
+    public static boolean allowAbsoluteCoords;
+
+    @AutoSync
     public static boolean canOverwriteBlocks;
 
     @AutoSync
@@ -125,6 +128,7 @@ public class SyncedConfig {
         poweredByFE = Config.poweredByFE;
         enableDestructionGadget = Config.enableDestructionGadget;
         absoluteCoordDefault = Config.absoluteCoordDefault;
+        allowAbsoluteCoords = Config.allowAbsoluteCoords;
         canOverwriteBlocks = Config.canOverwriteBlocks;
         enablePaste = Config.enablePaste;
         pasteDroppedMin = Config.pasteDroppedMin;

@@ -27,6 +27,7 @@ public class CompatConfig {
     private static boolean enableDestructionTool = true;
     private static boolean absoluteCoordDefault = false;
     private static boolean canOverwriteBlocks = true;
+    private static boolean allowAbsoluteCoords = true;
     private static String[] blacklist = {};
 
     public static boolean readConfig(File compatConfigFile) {
@@ -59,6 +60,7 @@ public class CompatConfig {
         enablePaste = cfg.getBoolean("enablePaste", CATEGORY_GENERAL, enablePaste, "Set to false to disable the recipe for construction paste.");
         enableDestructionTool = cfg.getBoolean("enableDestructionTool", CATEGORY_GENERAL, enableDestructionTool, "Set to false to disable the destruction tool.");
         absoluteCoordDefault = cfg.getBoolean("absoluteCoordinateModeDefault", CATEGORY_GENERAL, absoluteCoordDefault, "Determines if the Copy/Paste GUI's coordinate mode starts in 'Absolute' mode by default. Set to true for Absolute, set to False for Relative.");
+        allowAbsoluteCoords = cfg.getBoolean("allowAbsoluteCoords", CATEGORY_GENERAL, allowAbsoluteCoords, "Disabled absolute coords mode for the copy paste gadget?");
         canOverwriteBlocks = cfg.getBoolean("canOverwriteBlocks", CATEGORY_GENERAL, canOverwriteBlocks, "Whether the Builder / CopyPaste gadgets can overwrite blocks like water, lava, grass, etc (like a player can). False will only allow it to overwrite air blocks.");
         cfg.addCustomCategoryComment(CATEGORY_BLACKLIST, "Blacklist configuration");
         ConfigCategory category = cfg.getCategory(CATEGORY_BLACKLIST);
@@ -70,6 +72,7 @@ public class CompatConfig {
         Config.enablePaste = enablePaste;
         Config.enableDestructionGadget = enableDestructionTool;
         Config.absoluteCoordDefault = absoluteCoordDefault;
+        Config.allowAbsoluteCoords = allowAbsoluteCoords;
         Config.canOverwriteBlocks = canOverwriteBlocks;
         Config.poweredByFE = poweredByFE;
         Config.subCategoryBlacklist.blockBlacklist = blacklist;

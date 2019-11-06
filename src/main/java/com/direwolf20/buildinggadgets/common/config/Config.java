@@ -84,6 +84,10 @@ public class Config {
     @LangKey(LANG_KEY_ROOT + ".absoluteCoordDefault")
     public static boolean absoluteCoordDefault = false;
 
+    @Name("Allow absolute Coord-Mode")
+    @Comment("Disable absolute coords-mode for the Copy-Paste gadget")
+    public static boolean allowAbsoluteCoords = true;
+
     @Name("Allow non-Air-Block-Overwrite")
     @Comment({"Whether the Building / CopyPaste Gadget can overwrite blocks like water, lava, grass, etc (like a player can).",
               "False will only allow it to overwrite air blocks."})

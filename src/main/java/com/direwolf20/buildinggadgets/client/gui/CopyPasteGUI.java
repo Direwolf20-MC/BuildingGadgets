@@ -34,7 +34,7 @@ public class CopyPasteGUI extends GuiScreen {
     private GuiTextField endY;
     private GuiTextField endZ;
 
-    private boolean absoluteCoords = SyncedConfig.absoluteCoordDefault;
+    private boolean absoluteCoords = SyncedConfig.absoluteCoordDefault && SyncedConfig.allowAbsoluteCoords;
 
     private int guiLeft = 15;
     private int guiTop = 15;
@@ -93,7 +93,10 @@ public class CopyPasteGUI extends GuiScreen {
         this.buttonList.add(new GuiButton(1, this.guiLeft + 45, this.guiTop + 60, 40, 20, "Ok"));
         this.buttonList.add(new GuiButton(2, this.guiLeft + 145, this.guiTop + 60, 40, 20, "Cancel"));
         this.buttonList.add(new GuiButton(3, this.guiLeft + 245, this.guiTop + 60, 40, 20, "Clear"));
-        this.buttonList.add(new GuiButton(4, this.guiLeft + 325, this.guiTop + 60, 80, 20, "CoordsMode"));
+
+        if( SyncedConfig.allowAbsoluteCoords )
+            this.buttonList.add(new GuiButton(4, this.guiLeft + 325, this.guiTop + 60, 80, 20, "CoordsMode"));
+
         this.buttonList.add(new DireButton(5, this.guiLeft + 50, this.guiTop + 14, 10, 10, "-"));
         this.buttonList.add(new DireButton(6, this.guiLeft + 110, this.guiTop + 14, 10, 10, "+"));
         this.buttonList.add(new DireButton(7, this.guiLeft + 150, this.guiTop + 14, 10, 10, "-"));
