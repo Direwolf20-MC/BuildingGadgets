@@ -3,6 +3,8 @@ package com.direwolf20.buildinggadgets.common.entities;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.blocks.ModBlocks;
 import com.google.common.base.Optional;
+import net.minecraft.block.BlockLeaves;
+import net.minecraft.block.BlockNewLeaf;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -82,6 +84,11 @@ public class BlockBuildEntity extends Entity {
         setToolMode(toolMode);
         spawnedBy = player;
         actualSetBlock = actualSpawnBlock;
+
+        // Don't let leaves decay
+        if( setBlock.getBlock() instanceof BlockLeaves )
+            setBlock = setBlock.withProperty(BlockLeaves.DECAYABLE, false);
+
         world.setBlockState(spawnPos, ModBlocks.effectBlock.getDefaultState());
         setUsingConstructionPaste(constrPaste);
     }
