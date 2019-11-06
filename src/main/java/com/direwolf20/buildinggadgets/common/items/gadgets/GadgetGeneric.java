@@ -130,7 +130,8 @@ public abstract class GadgetGeneric extends ItemModBase {
     public abstract int getDamageCost(ItemStack tool);
 
     public boolean canUse(ItemStack tool, EntityPlayer player) {
-        if (player.capabilities.isCreativeMode)
+        // You can always use in creative or when max energy is set to 0
+        if (player.capabilities.isCreativeMode || getEnergyMax() == 0)
             return true;
 
         if (tool.hasCapability(CapabilityEnergy.ENERGY, null)) {
@@ -141,6 +142,10 @@ public abstract class GadgetGeneric extends ItemModBase {
     }
 
     public void applyDamage(ItemStack tool, EntityPlayer player) {
+        // don't apply damage in creative or if there is no power to be had
+        if (player.capabilities.isCreativeMode || getEnergyMax() == 0)
+            return;
+
         if (tool.hasCapability(CapabilityEnergy.ENERGY, null)) {
             IEnergyStorage energy = CapabilityProviderEnergy.getCap(tool);
             energy.extractEnergy(getEnergyCost(tool), false);
@@ -149,6 +154,8 @@ public abstract class GadgetGeneric extends ItemModBase {
     }
 
     protected void addEnergyInformation(List<String> list, ItemStack stack) {
+        // Don't display energy for gadgets that can't accept it.
+        if( getEnergyMax() == 0 ) return;
         if (stack.hasCapability(CapabilityEnergy.ENERGY, null)) {
             IEnergyStorage energy = CapabilityProviderEnergy.getCap(stack);
             list.add(TextFormatting.WHITE + I18n.format("tooltip.gadget.energy") + ": " + withSuffix(energy.getEnergyStored()) + "/" + withSuffix(energy.getMaxEnergyStored()));

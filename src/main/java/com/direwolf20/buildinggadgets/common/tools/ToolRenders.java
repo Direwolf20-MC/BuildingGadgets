@@ -3,6 +3,7 @@ package com.direwolf20.buildinggadgets.common.tools;
 import com.direwolf20.buildinggadgets.client.RemoteInventoryCache;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.blocks.ModBlocks;
+import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
 import com.direwolf20.buildinggadgets.common.items.FakeBuilderWorld;
 import com.direwolf20.buildinggadgets.common.items.ModItems;
 import com.direwolf20.buildinggadgets.common.items.capability.CapabilityProviderEnergy;
@@ -101,7 +102,7 @@ public class ToolRenders {
         long hasBlocks = InventoryManipulation.countItem(itemStack, player, cacheInventory);
         hasBlocks += InventoryManipulation.countPaste(player);
 
-        int hasEnergy = ToolRenders.Utils.getStackEnergy(heldItem, player);
+        int hasEnergy = SyncedConfig.energyMax == 0 ? Integer.MAX_VALUE : ToolRenders.Utils.getStackEnergy(heldItem, player);
 
         // Prepare the fake world -- using a fake world lets us render things properly, like fences connecting.
         Set<BlockPos> coords =  new HashSet<>(coordinates);
@@ -186,7 +187,7 @@ public class ToolRenders {
 
         long hasBlocks = InventoryManipulation.countItem(itemStack, player, cacheInventory);
         hasBlocks = hasBlocks + InventoryManipulation.countPaste(player);
-        int hasEnergy = ToolRenders.Utils.getStackEnergy(heldItem, player);
+        int hasEnergy = SyncedConfig.energyMax == 0 ? Integer.MAX_VALUE : ToolRenders.Utils.getStackEnergy(heldItem, player);
 
         // Prepare the fake world -- using a fake world lets us render things properly, like fences connecting.
         Set<BlockPos> coords =  new HashSet<>(coordinates);
