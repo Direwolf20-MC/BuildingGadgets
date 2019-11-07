@@ -1,6 +1,20 @@
 # Building Gadgets Changelog
 The format of this document is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and should continue to adhere to the conventions outlined in the Keep a Changelog guidelines.
 
+## [2.7.4 - 1.12.2] - 2019-11-07
+Release note: We're nearing the final versions of Building Gadgets for Minecraft 1.12 and will be winding down on the release schedule. 1.14 is going strong and we'd recommend you check it out :D
+### Added
+- Back ported a feature from 1.14 that disabled the Gadgets tooltip for power if the config is set to 0 for max-power
+- Back ported a feature from 1.14 that allows you to disable `absolute coords mode` for the Copy and Paste gadget to mask coords.
+
+### Changed
+- Bumped forge version to `14.23.5.2847`
+
+### Fixed
+- Disabled other mods from being able to use the gadgets as a battery
+- Stopped leaves decaying when placed by the the gadgets
+- Fixed the `Surface` mode on the Building & Exchanging gadget using the wrong radius
+
 ## [3.0.3a - 1.14.4] - 2019-08-26
 ### Changed
 - Converted the Destruction-Gadget's connected area mode to use the same algorithm as the other Gadget's
