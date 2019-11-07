@@ -27,8 +27,19 @@ public class ItemEnergyForge extends EnergyStorage {
         return changeEnergy(super.receiveEnergy(maxReceive, simulate), simulate);
     }
 
+    /**
+     * Do not use internally as this method has been replaced by {@link #extractPower(int, boolean)}
+     * to stop other mods using our gadgets as batteries.
+     */
     @Override
     public int extractEnergy(int maxExtract, boolean simulate) {
+        System.out.println("EXTRACT");
+        return 0;
+    }
+
+    public int extractPower(int maxExtract, boolean simulate) {
+        System.out.println("Safe extract");
+
         updateMaxEnergy();
         return changeEnergy(super.extractEnergy(maxExtract, simulate), simulate);
     }
