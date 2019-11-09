@@ -9,10 +9,7 @@ import com.direwolf20.buildinggadgets.common.registry.OurBlocks;
 import com.direwolf20.buildinggadgets.common.tiles.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.tiles.EffectBlockTileEntity;
 import mcp.MethodsReturnNonnullByDefault;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockRenderType;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
+import net.minecraft.block.*;
 import net.minecraft.block.material.PushReaction;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -50,6 +47,10 @@ public class EffectBlock extends Block {
                     world.addEntity(new ConstructionBlockEntity(world, targetPos, false));
                 } else {
                     world.removeBlock(targetPos, false);
+
+                    if( targetBlock.getState().getBlock() instanceof LeavesBlock)
+                        targetBlock = new BlockData(targetBlock.getState().with(LeavesBlock.PERSISTENT, true), targetBlock.getTileData());
+
                     targetBlock.placeIn(BuildContext.builder().build(world), targetPos);
                     BlockPos upPos = targetPos.up();
                     world.getBlockState(targetPos).neighborChanged(world, targetPos, world.getBlockState(upPos).getBlock(), upPos, false);

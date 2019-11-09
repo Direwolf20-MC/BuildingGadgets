@@ -5,6 +5,7 @@ import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.building.modes.*;
 import com.direwolf20.buildinggadgets.common.building.view.BuildContext;
 import com.direwolf20.buildinggadgets.common.capability.CapabilityProviderEnergy;
+import com.direwolf20.buildinggadgets.common.capability.ItemEnergyForge;
 import com.direwolf20.buildinggadgets.common.capability.provider.CapabilityProviderBlockProvider;
 import com.direwolf20.buildinggadgets.common.capability.provider.MultiCapabilityProvider;
 import com.direwolf20.buildinggadgets.common.commands.ForceUnloadedCommand;
@@ -192,8 +193,8 @@ public abstract class AbstractGadget extends Item {
         if (player.isCreative() || getEnergyMax() == 0)
             return;
 
-        IEnergyStorage energy = EnergyUtil.getCap(tool).orElseThrow(CapabilityNotPresentException::new);
-        energy.extractEnergy(getEnergyCost(tool), false);
+        ItemEnergyForge energy = (ItemEnergyForge) EnergyUtil.getCap(tool).orElseThrow(CapabilityNotPresentException::new);
+        energy.extractPower(getEnergyCost(tool), false);
     }
 
     protected void addEnergyInformation(List<ITextComponent> tooltip, ItemStack stack) {
