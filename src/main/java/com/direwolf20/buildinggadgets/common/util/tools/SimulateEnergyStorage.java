@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.common.util.tools;
 
+import com.direwolf20.buildinggadgets.common.capability.IPrivateEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
 
 /**
@@ -11,7 +12,7 @@ import net.minecraftforge.energy.IEnergyStorage;
  * are insert/extract limits on the backing storage. In that case this implementation will only work as long as the accumulated buffer is smaller then
  * the defined limits.
  */
-public final class SimulateEnergyStorage implements IEnergyStorage {
+public final class SimulateEnergyStorage implements IPrivateEnergy {
     private final IEnergyStorage other;
     private int energyChanged;
 
@@ -30,6 +31,11 @@ public final class SimulateEnergyStorage implements IEnergyStorage {
 
     @Override
     public int extractEnergy(int maxExtract, boolean simulate) {
+        return 0;
+    }
+
+    @Override
+    public int extractPower(int maxExtract, boolean simulate) {
         int extracted = other.extractEnergy(maxExtract - energyChanged, true);
         int dif = Math.max(extracted + energyChanged, 0);
         if (! simulate)
