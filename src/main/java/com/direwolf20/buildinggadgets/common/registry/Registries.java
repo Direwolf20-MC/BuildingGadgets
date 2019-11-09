@@ -7,7 +7,6 @@ import com.direwolf20.buildinggadgets.common.building.tilesupport.TileSupport;
 import com.direwolf20.buildinggadgets.common.inventory.handle.IHandleProvider;
 import com.direwolf20.buildinggadgets.common.inventory.handle.IObjectHandle;
 import com.direwolf20.buildinggadgets.common.inventory.materials.objects.IUniqueObjectSerializer;
-import com.direwolf20.buildinggadgets.common.inventory.materials.objects.UniqueItem;
 import com.direwolf20.buildinggadgets.common.template.SerialisationSupport;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
@@ -98,15 +97,15 @@ public final class Registries {
     @SubscribeEvent
     public static void registerTileDataSerializers(RegistryEvent.Register<ITileDataSerializer> event) {
         BuildingGadgets.LOG.trace("Registering TemplateItem Serializers");
-        event.getRegistry().register(SerialisationSupport.dummyDataSerializer().setRegistryName(Reference.TileDataSerializerReference.DUMMY_SERIALIZER_RL));
-        event.getRegistry().register(SerialisationSupport.nbtTileDataSerializer().setRegistryName(Reference.TileDataSerializerReference.NBT_TILE_ENTITY_DATA_SERIALIZER_RL));
+        event.getRegistry().register(SerialisationSupport.dummyDataSerializer());
+        event.getRegistry().register(SerialisationSupport.nbtTileDataSerializer());
         BuildingGadgets.LOG.trace("Finished Registering TemplateItem Serializers");
     }
 
     @SubscribeEvent
     public static void registerUniqueObjectSerializers(RegistryEvent.Register<IUniqueObjectSerializer> event) {
         BuildingGadgets.LOG.trace("Registering UniqueObject Serializers");
-        event.getRegistry().register(new UniqueItem.Serializer().setRegistryName(Reference.UniqueObjectSerializerReference.SIMPLE_UNIQUE_ITEM_ID_RL));
+        event.getRegistry().register(SerialisationSupport.uniqueItemSerializer());
         BuildingGadgets.LOG.trace("Finished Registering UniqueObject Serializers");
     }
 
