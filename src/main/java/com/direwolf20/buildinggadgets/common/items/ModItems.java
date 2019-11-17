@@ -1,10 +1,10 @@
 package com.direwolf20.buildinggadgets.common.items;
 
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
-import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetBuilding;
-import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
-import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetDestruction;
-import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetExchanger;
+import com.direwolf20.buildinggadgets.common.gadgets.GadgetBuilding;
+import com.direwolf20.buildinggadgets.common.gadgets.GadgetCopyPaste;
+import com.direwolf20.buildinggadgets.common.gadgets.GadgetDestruction;
+import com.direwolf20.buildinggadgets.common.gadgets.GadgetExchanger;
 import com.direwolf20.buildinggadgets.common.items.pastes.ConstructionChunkDense;
 import com.direwolf20.buildinggadgets.common.items.pastes.ConstructionPaste;
 import com.direwolf20.buildinggadgets.common.items.pastes.ConstructionPasteContainer;

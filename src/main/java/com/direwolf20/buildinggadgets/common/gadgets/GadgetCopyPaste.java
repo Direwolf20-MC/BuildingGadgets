@@ -1,4 +1,4 @@
-package com.direwolf20.buildinggadgets.common.items.gadgets;
+package com.direwolf20.buildinggadgets.common.gadgets;
 
 import com.direwolf20.buildinggadgets.client.events.EventTooltip;
 import com.direwolf20.buildinggadgets.client.gui.GuiProxy;

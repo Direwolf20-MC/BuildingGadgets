@@ -7,7 +7,7 @@ import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateMana
 import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
 import com.direwolf20.buildinggadgets.common.entities.*;
 import com.direwolf20.buildinggadgets.common.items.ModItems;
-import com.direwolf20.buildinggadgets.common.items.gadgets.*;
+import com.direwolf20.buildinggadgets.common.gadgets.*;
 import com.direwolf20.buildinggadgets.common.proxy.CommonProxy;
 import com.direwolf20.buildinggadgets.common.tools.PasteContainerMeshDefinition;
 import com.direwolf20.buildinggadgets.common.tools.ToolRenders;

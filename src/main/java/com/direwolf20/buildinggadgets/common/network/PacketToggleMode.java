@@ -1,9 +1,9 @@
 package com.direwolf20.buildinggadgets.common.network;
 
-import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetBuilding;
-import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
-import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetExchanger;
-import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
+import com.direwolf20.buildinggadgets.common.gadgets.GadgetBuilding;
+import com.direwolf20.buildinggadgets.common.gadgets.GadgetCopyPaste;
+import com.direwolf20.buildinggadgets.common.gadgets.GadgetExchanger;
+import com.direwolf20.buildinggadgets.common.gadgets.GadgetGeneric;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
