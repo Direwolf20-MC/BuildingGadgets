@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.common.gadgets.building;
 
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 
@@ -12,7 +13,7 @@ public class GridMode extends AbstractMode {
     }
 
     @Override
-    List<BlockPos> collect(BlockPos start, BlockPos playerPos, EnumFacing side, int range) {
+    List<BlockPos> collect(EntityPlayer player, BlockPos playerPos, EnumFacing side, int range, BlockPos start) {
         List<BlockPos> coordinates = new ArrayList<>();
 
         // Not sure on why we add 1 to the range but sure?

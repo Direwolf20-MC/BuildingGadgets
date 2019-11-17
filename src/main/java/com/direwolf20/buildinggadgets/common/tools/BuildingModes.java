@@ -309,7 +309,7 @@ public class BuildingModes {
             }
         }
         //***************************************************
-        //Checkerboard
+        //Checkerboard - done
         //***************************************************
         else if (mode == GadgetBuilding.ToolMode.Grid) {
             range++;

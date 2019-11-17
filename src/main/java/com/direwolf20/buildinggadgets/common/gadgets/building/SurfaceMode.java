@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.common.gadgets.building;
 
-import com.google.common.collect.ImmutableList;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
@@ -14,7 +14,7 @@ public class SurfaceMode extends AbstractMode {
     public SurfaceMode() { super(false); }
 
     @Override
-    List<BlockPos> collect(BlockPos start, BlockPos playerPos, EnumFacing side, int range) {
+    List<BlockPos> collect(EntityPlayer player, BlockPos playerPos, EnumFacing side, int range, BlockPos start) {
         List<BlockPos> coordinates = new ArrayList<>();
         int bound = range / 2;
 

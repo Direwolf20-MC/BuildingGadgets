@@ -3,7 +3,8 @@ package com.direwolf20.buildinggadgets.common.gadgets.building;
 public enum BuildingGadgetModes {
     BUILD_TO_ME(new BuildToMeMode()),
     SURFACE(new SurfaceMode()),
-    GRID(new GridMode(false));
+    GRID(new GridMode(false)),
+    STAIR(new StairMode());
 
     AbstractMode mode;
     BuildingGadgetModes(AbstractMode mode) {

@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.common.gadgets.building;
 
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 
@@ -10,7 +11,7 @@ public class BuildToMeMode extends AbstractMode {
     public BuildToMeMode() { super(false); }
 
     @Override
-    public List<BlockPos> collect(BlockPos start, BlockPos playerPos, EnumFacing side, int range) {
+    public List<BlockPos> collect(EntityPlayer player, BlockPos playerPos, EnumFacing side, int range, BlockPos start) {
         List<BlockPos> coordinates = new ArrayList<>();
 
         XYZ facingXYZ = XYZ.fromFacing(side);
