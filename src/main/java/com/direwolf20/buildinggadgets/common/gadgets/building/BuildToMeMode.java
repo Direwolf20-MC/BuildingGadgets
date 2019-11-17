@@ -7,9 +7,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BuildToMeMode extends AbstractMode {
+    public BuildToMeMode() { super(false); }
 
     @Override
-    public List<BlockPos> collect(BlockPos start, BlockPos playerPos, EnumFacing side) {
+    public List<BlockPos> collect(BlockPos start, BlockPos playerPos, EnumFacing side, int range) {
         List<BlockPos> coordinates = new ArrayList<>();
 
         XYZ facingXYZ = XYZ.fromFacing(side);

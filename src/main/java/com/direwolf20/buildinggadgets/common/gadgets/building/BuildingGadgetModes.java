@@ -1,7 +1,8 @@
 package com.direwolf20.buildinggadgets.common.gadgets.building;
 
 public enum BuildingGadgetModes {
-    BUILD_TO_ME(new BuildToMeMode());
+    BUILD_TO_ME(new BuildToMeMode()),
+    SURFACE(new SurfaceMode());
 
     AbstractMode mode;
     BuildingGadgetModes(AbstractMode mode) {

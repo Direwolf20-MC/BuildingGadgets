@@ -48,8 +48,7 @@ import java.util.SortedSet;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-import static com.direwolf20.buildinggadgets.common.tools.GadgetUtils.getAnchor;
-import static com.direwolf20.buildinggadgets.common.tools.GadgetUtils.getToolBlock;
+import static com.direwolf20.buildinggadgets.common.tools.GadgetUtils.*;
 import static net.minecraft.block.BlockStainedGlass.COLOR;
 
 public class ToolRenders {
@@ -118,8 +117,8 @@ public class ToolRenders {
                     return;
                 }
                 if (coordinates.size() == 0 && lookingAt != null) { //Build a list of coordinates based on the tool mode and range
-                    //BuildingModes.getBuildOrders(world, player, lookingAt.getBlockPos(), lookingAt.sideHit, heldItem);
-                    coordinates = BuildingGadgetModes.BUILD_TO_ME.getMode().getCollection(world, renderBlockState, lookingAt.getBlockPos(), player.getPosition(), lookingAt.sideHit, GadgetBuilding.shouldPlaceAtop(heldItem));
+//                    coordinates = BuildingModes.getBuildOrders(world, player, lookingAt.getBlockPos(), lookingAt.sideHit, heldItem);
+                    coordinates = BuildingGadgetModes.SURFACE.getMode().getCollection(world, renderBlockState, lookingAt.getBlockPos(), player.getPosition(), lookingAt.sideHit, getToolRange(heldItem), GadgetBuilding.shouldPlaceAtop(heldItem), GadgetBuilding.getFuzzy(heldItem));
                     //new BuildToMeMode().collect(lookingAt.getBlockPos(), player.getPosition(), lookingAt.sideHit);
                 }
 

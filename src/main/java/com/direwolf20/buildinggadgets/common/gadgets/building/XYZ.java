@@ -51,6 +51,8 @@ public enum XYZ {
      * You pipe in the original block and the offset values (a, b) that you want
      * to shift the block by.
      *
+     * todo: fix math
+     *
      * @param a a can be either the new x,y,z
      * @param b b can be either the new x,y,z
      * @param pos block pos to build from

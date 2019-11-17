@@ -11,22 +11,39 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public abstract class AbstractMode {
-    abstract List<BlockPos> collect(BlockPos start, BlockPos playerPos, EnumFacing side);
+    private boolean isExchanging;
+
+    public AbstractMode(boolean isExchanging) {
+        this.isExchanging = isExchanging;
+    }
+
+    abstract List<BlockPos> collect(BlockPos start, BlockPos playerPos, EnumFacing side, int range);
 
     /**
      * Gets the collection with filters applied stopping us having to handle the filters in the actual collection
      * method from having to handle the world etc.
      */
-    public List<BlockPos> getCollection(World world, IBlockState setBlock, BlockPos start, BlockPos playerPos, EnumFacing side, boolean placeOnTop) {
+    public List<BlockPos> getCollection(World world, IBlockState setBlock, BlockPos start, BlockPos playerPos, EnumFacing side, int range, boolean placeOnTop, boolean isFuzzy) {
         BlockPos startPos = placeOnTop ? start.offset(side, 1) : start;
 
-        return collect(startPos, playerPos, side)
+        return collect(startPos, playerPos, side, range)
                 .stream()
-                .filter(e -> isReplaceable(world, e, setBlock))
+                .filter(e -> this.validator(world, e, start, setBlock, isFuzzy))
                 .collect(Collectors.toList());
     }
 
-    private static boolean isReplaceable(World world, BlockPos pos, IBlockState setBlock) {
+    /**
+     * This method does the barest minimum checking that is needed by most modes
+     *
+     * @param world         the world
+     * @param pos           the block pos we're validating against
+     * @param lookingAt     the block we're looking at (mostly unused in the Building Gadget modes)
+     * @param setBlock      the block we're setting to
+     * @param isFuzzy       if the gadget is fuzzy (mostly unused in the Building Gadget modes)
+     *
+     * @return if the block is valid
+     */
+    public boolean validator(World world, BlockPos pos, BlockPos lookingAt, IBlockState setBlock, boolean isFuzzy) {
         if (!setBlock.getBlock().canPlaceBlockAt(world, pos))
             return false;
 
@@ -34,5 +51,9 @@ public abstract class AbstractMode {
             return false;
 
         return SyncedConfig.canOverwriteBlocks ? world.getBlockState(pos).getBlock().isReplaceable(world, pos) : world.getBlockState(pos).getMaterial() != Material.AIR;
+    }
+
+    public boolean isExchanging() {
+        return isExchanging;
     }
 }

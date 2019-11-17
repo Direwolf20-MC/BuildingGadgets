@@ -43,7 +43,7 @@ public class BuildingModes {
             boundZ = bound;
         }
         //***************************************************
-        //Build to me
+        //Build to me - done
         //***************************************************
         if (mode == GadgetBuilding.ToolMode.BuildToMe) {
             if (sideHit == EnumFacing.SOUTH) {
@@ -325,7 +325,7 @@ public class BuildingModes {
             }
         }
         //***************************************************
-        //Surface
+        //Surface - done
         //***************************************************
         else if (mode == GadgetBuilding.ToolMode.Surface) {
             IBlockState startState = world.getBlockState(startBlock);
