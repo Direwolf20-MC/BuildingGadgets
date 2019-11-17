@@ -26,9 +26,10 @@ public abstract class AbstractMode {
     public List<BlockPos> getCollection(World world, IBlockState setBlock, BlockPos start, BlockPos playerPos, EnumFacing side, int range, boolean placeOnTop, boolean isFuzzy) {
         BlockPos startPos = placeOnTop ? start.offset(side, 1) : start;
 
+        // We alternate the validator as the exchanger requires a more in-depth validation process.
         return collect(startPos, playerPos, side, range)
                 .stream()
-                .filter(e -> this.validator(world, e, start, setBlock, isFuzzy))
+                .filter(e -> isExchanging ? this.exchangingValidator(world, e, start, setBlock, isFuzzy) : this.validator(world, e, start, setBlock, isFuzzy))
                 .collect(Collectors.toList());
     }
 
@@ -51,6 +52,10 @@ public abstract class AbstractMode {
             return false;
 
         return SyncedConfig.canOverwriteBlocks ? world.getBlockState(pos).getBlock().isReplaceable(world, pos) : world.getBlockState(pos).getMaterial() != Material.AIR;
+    }
+
+    public boolean exchangingValidator(World world, BlockPos pos, BlockPos lookingAt, IBlockState setBlock, boolean isFuzzy) {
+        return true;
     }
 
     public boolean isExchanging() {
