@@ -1,8 +1,8 @@
 package com.direwolf20.buildinggadgets.common.tools;
 
 import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
-import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetBuilding;
-import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
+import com.direwolf20.buildinggadgets.common.gadgets.GadgetBuilding;
+import com.direwolf20.buildinggadgets.common.gadgets.GadgetGeneric;
 import it.unimi.dsi.fastutil.doubles.Double2ObjectArrayMap;
 import it.unimi.dsi.fastutil.doubles.Double2ObjectMap;
 import it.unimi.dsi.fastutil.doubles.DoubleRBTreeSet;
@@ -19,25 +19,6 @@ import net.minecraft.world.World;
 import java.util.*;
 
 public class BuildingModes {
-    private static boolean isReplaceable(World world, BlockPos pos, IBlockState setBlock) {
-        if (!setBlock.getBlock().canPlaceBlockAt(world, pos)) {
-            return false;
-        }
-        if (pos.getY() < 0) {
-            return false;
-        }
-        if (SyncedConfig.canOverwriteBlocks) {
-            if (!world.getBlockState(pos).getBlock().isReplaceable(world, pos)) {
-                return false;
-            }
-        } else {
-            if (world.getBlockState(pos).getMaterial() != Material.AIR) {
-                return false;
-            }
-        }
-        return true;
-    }
-
     public static List<BlockPos> getBuildOrders(World world, EntityPlayer player, BlockPos startBlock, EnumFacing sideHit, ItemStack tool) {
         //GadgetBuilding.ToolMode mode, IBlockState setBlock
         GadgetBuilding.ToolMode mode = GadgetBuilding.getToolMode(tool);
@@ -384,6 +365,25 @@ public class BuildingModes {
                 }
             }
         }
+    }
+
+    private static boolean isReplaceable(World world, BlockPos pos, IBlockState setBlock) {
+        if (!setBlock.getBlock().canPlaceBlockAt(world, pos)) {
+            return false;
+        }
+        if (pos.getY() < 0) {
+            return false;
+        }
+        if (SyncedConfig.canOverwriteBlocks) {
+            if (!world.getBlockState(pos).getBlock().isReplaceable(world, pos)) {
+                return false;
+            }
+        } else {
+            if (world.getBlockState(pos).getMaterial() != Material.AIR) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public static List<BlockMap> sortMapByDistance(List<BlockMap> unSortedMap, EntityPlayer player) {//TODO unused

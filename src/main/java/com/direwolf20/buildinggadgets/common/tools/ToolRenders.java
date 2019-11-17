@@ -3,6 +3,9 @@ package com.direwolf20.buildinggadgets.common.tools;
 import com.direwolf20.buildinggadgets.client.RemoteInventoryCache;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.blocks.ModBlocks;
+import com.direwolf20.buildinggadgets.common.gadgets.GadgetGeneric;
+import com.direwolf20.buildinggadgets.common.gadgets.building.BuildToMeMode;
+import com.direwolf20.buildinggadgets.common.gadgets.building.BuildingGadgetModes;
 import com.direwolf20.buildinggadgets.common.items.FakeBuilderWorld;
 import com.direwolf20.buildinggadgets.common.items.ModItems;
 import com.direwolf20.buildinggadgets.common.items.capability.CapabilityProviderEnergy;
@@ -115,7 +118,9 @@ public class ToolRenders {
                     return;
                 }
                 if (coordinates.size() == 0 && lookingAt != null) { //Build a list of coordinates based on the tool mode and range
-                    coordinates = BuildingModes.getBuildOrders(world, player, lookingAt.getBlockPos(), lookingAt.sideHit, heldItem);
+                    //BuildingModes.getBuildOrders(world, player, lookingAt.getBlockPos(), lookingAt.sideHit, heldItem);
+                    coordinates = BuildingGadgetModes.BUILD_TO_ME.getMode().getCollection(world, renderBlockState, lookingAt.getBlockPos(), player.getPosition(), lookingAt.sideHit, GadgetBuilding.shouldPlaceAtop(heldItem));
+                    //new BuildToMeMode().collect(lookingAt.getBlockPos(), player.getPosition(), lookingAt.sideHit);
                 }
 
                 //Figure out how many of the block we're rendering we have in the inventory of the player.
