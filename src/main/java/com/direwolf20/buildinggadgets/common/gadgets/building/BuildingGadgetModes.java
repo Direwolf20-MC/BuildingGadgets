@@ -4,7 +4,8 @@ public enum BuildingGadgetModes {
     BUILD_TO_ME(new BuildToMeMode()),
     SURFACE(new SurfaceMode()),
     GRID(new GridMode(false)),
-    STAIR(new StairMode());
+    STAIR(new StairMode()),
+    VERTICAL_COLUMN(new VerticalColumnMode(false));
 
     AbstractMode mode;
     BuildingGadgetModes(AbstractMode mode) {

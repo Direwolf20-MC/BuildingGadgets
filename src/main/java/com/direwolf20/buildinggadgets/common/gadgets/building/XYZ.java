@@ -25,6 +25,18 @@ public enum XYZ {
         return XYZ.Y;
     }
 
+    public static boolean isAxisX(EnumFacing facing) {
+        return facing == EnumFacing.EAST || facing == EnumFacing.WEST;
+    }
+
+    public static boolean isAxisY(EnumFacing facing) {
+        return facing == EnumFacing.UP || facing == EnumFacing.DOWN;
+    }
+
+    public static boolean isAxisZ(EnumFacing facing) {
+        return facing == EnumFacing.SOUTH || facing == EnumFacing.NORTH;
+    }
+
     public static int posToXYZ(BlockPos pos, XYZ xyz) {
         if( xyz == X ) return pos.getX();
         if( xyz == Y ) return pos.getY();

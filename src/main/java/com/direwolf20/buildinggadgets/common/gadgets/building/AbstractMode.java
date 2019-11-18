@@ -25,7 +25,7 @@ public abstract class AbstractMode {
      * method from having to handle the world etc.
      */
     public List<BlockPos> getCollection(EntityPlayer player, World world, IBlockState setBlock, BlockPos start, BlockPos playerPos, EnumFacing side, int range, boolean placeOnTop, boolean isFuzzy) {
-        BlockPos startPos = placeOnTop ? start.offset(side, 1) : start;
+        BlockPos startPos = this.withOffset(start, side, placeOnTop);
 
         // We alternate the validator as the exchanger requires a more in-depth validation process.
         return collect(player, playerPos, side, range, startPos)
@@ -57,6 +57,10 @@ public abstract class AbstractMode {
 
     public boolean exchangingValidator(World world, BlockPos pos, BlockPos lookingAt, IBlockState setBlock, boolean isFuzzy) {
         return true;
+    }
+
+    public BlockPos withOffset(BlockPos pos, EnumFacing side, boolean placeOnTop) {
+        return placeOnTop ? pos.offset(side, 1) : pos;
     }
 
     public boolean isExchanging() {

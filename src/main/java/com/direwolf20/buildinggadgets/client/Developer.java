@@ -1,8 +1,6 @@
 package com.direwolf20.buildinggadgets.client;
 
-import com.direwolf20.buildinggadgets.common.gadgets.building.BuildToMeMode;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiOverlayDebug;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.RayTraceResult;
 
