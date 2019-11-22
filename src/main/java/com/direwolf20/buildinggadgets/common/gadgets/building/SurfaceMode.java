@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SurfaceMode extends AbstractMode {
-    public SurfaceMode() { super(false); }
+    public SurfaceMode(boolean isExchanging) { super(isExchanging); }
 
     @Override
     List<BlockPos> collect(EntityPlayer player, BlockPos playerPos, EnumFacing side, int range, BlockPos start) {

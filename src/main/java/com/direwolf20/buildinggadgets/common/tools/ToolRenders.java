@@ -3,9 +3,8 @@ package com.direwolf20.buildinggadgets.common.tools;
 import com.direwolf20.buildinggadgets.client.RemoteInventoryCache;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.blocks.ModBlocks;
-import com.direwolf20.buildinggadgets.common.gadgets.GadgetGeneric;
-import com.direwolf20.buildinggadgets.common.gadgets.building.BuildToMeMode;
-import com.direwolf20.buildinggadgets.common.gadgets.building.BuildingGadgetModes;
+import com.direwolf20.buildinggadgets.common.gadgets.GadgetExchanger;
+import com.direwolf20.buildinggadgets.common.gadgets.building.BuildingModes;
 import com.direwolf20.buildinggadgets.common.items.FakeBuilderWorld;
 import com.direwolf20.buildinggadgets.common.items.ModItems;
 import com.direwolf20.buildinggadgets.common.items.capability.CapabilityProviderEnergy;
@@ -118,7 +117,7 @@ public class ToolRenders {
                 }
                 if (coordinates.size() == 0 && lookingAt != null) { //Build a list of coordinates based on the tool mode and range
 //                    coordinates = BuildingModes.getBuildOrders(world, player, lookingAt.getBlockPos(), lookingAt.sideHit, heldItem);
-                    coordinates = BuildingGadgetModes.VERTICAL_WALL.getMode().getCollection(player, world, renderBlockState, lookingAt.getBlockPos(), player.getPosition(), lookingAt.sideHit, getToolRange(heldItem), GadgetBuilding.shouldPlaceAtop(heldItem), GadgetBuilding.getFuzzy(heldItem));
+                    coordinates = BuildingModes.VERTICAL_WALL.getMode().getCollection(player, world, renderBlockState, lookingAt.getBlockPos(), player.getPosition(), lookingAt.sideHit, getToolRange(heldItem), GadgetBuilding.shouldPlaceAtop(heldItem), GadgetBuilding.getFuzzy(heldItem));
                     //new BuildToMeMode().collect(lookingAt.getBlockPos(), player.getPosition(), lookingAt.sideHit);
                 }
 
@@ -217,6 +216,9 @@ public class ToolRenders {
     }
 
     public static void renderExchangerOverlay(RenderWorldLastEvent evt, EntityPlayer player, ItemStack stack) {
+        ItemStack heldItem = GadgetExchanger.getGadget(player);
+        if (heldItem.isEmpty()) return;
+
         //Calculate the players current position, which is needed later
         double doubleX = player.lastTickPosX + (player.posX - player.lastTickPosX) * evt.getPartialTicks();
         double doubleY = player.lastTickPosY + (player.posY - player.lastTickPosY) * evt.getPartialTicks();
@@ -259,7 +261,8 @@ public class ToolRenders {
                     return;
                 }
                 if (coordinates.size() == 0 && lookingAt != null) { //Build a list of coordinates based on the tool mode and range
-                    coordinates = ExchangingModes.getBuildOrders(world, player, lookingAt.getBlockPos(), lookingAt.sideHit, stack);
+//                    coordinates = ExchangingModes.getBuildOrders(world, player, lookingAt.getBlockPos(), lookingAt.sideHit, stack);
+                    coordinates = com.direwolf20.buildinggadgets.common.gadgets.building.ExchangingModes.SURFACE.getMode().getCollection(player, world, renderBlockState, lookingAt.getBlockPos(), player.getPosition(), lookingAt.sideHit, getToolRange(heldItem), false, GadgetExchanger.getFuzzy(heldItem));
                 }
 
                 //Figure out how many of the block we're rendering we have in the inventory of the player.
