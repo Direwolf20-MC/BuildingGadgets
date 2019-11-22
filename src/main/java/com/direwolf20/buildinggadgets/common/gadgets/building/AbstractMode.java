@@ -30,10 +30,14 @@ public abstract class AbstractMode {
     public List<BlockPos> getCollection(EntityPlayer player, World world, IBlockState setBlock, BlockPos start, BlockPos playerPos, EnumFacing side, int range, boolean placeOnTop, boolean isFuzzy) {
         BlockPos startPos = this.withOffset(start, side, placeOnTop);
 
+        // We don't need this unless we're using the exchanger but I also don't want to
+        // have to remake the state for every block.
+        IBlockState lookingAtState = isExchanging() ? world.getBlockState(startPos) : null;
+
         // We alternate the validator as the exchanger requires a more in-depth validation process.
         return collect(player, playerPos, side, range, startPos)
                 .stream()
-                .filter(e -> isExchanging ? this.exchangingValidator(world, e, start, setBlock, isFuzzy) : this.validator(world, e, start, setBlock, isFuzzy))
+                .filter(e -> isExchanging ? this.exchangingValidator(world, e, lookingAtState, setBlock, isFuzzy) : this.validator(world, e, start, setBlock, isFuzzy))
                 .collect(Collectors.toList());
     }
 
@@ -58,11 +62,11 @@ public abstract class AbstractMode {
         return SyncedConfig.canOverwriteBlocks ? world.getBlockState(pos).getBlock().isReplaceable(world, pos) : world.getBlockState(pos).getMaterial() != Material.AIR;
     }
 
-    public boolean exchangingValidator(World world, BlockPos pos, BlockPos lookingAt, IBlockState setBlock, boolean isFuzzy) {
+    public boolean exchangingValidator(World world, BlockPos pos, IBlockState lookingAtState, IBlockState setBlock, boolean isFuzzy) {
         IBlockState worldBlockState = world.getBlockState(pos);
         TileEntity te = world.getTileEntity(pos);
 
-        if ((worldBlockState != setBlock && !isFuzzy)
+        if ((worldBlockState != lookingAtState && !isFuzzy)
                 || worldBlockState == ModBlocks.effectBlock.getDefaultState()
                 || worldBlockState == setBlock )
             return false;

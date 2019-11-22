@@ -5,6 +5,7 @@ import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.blocks.ModBlocks;
 import com.direwolf20.buildinggadgets.common.gadgets.GadgetExchanger;
 import com.direwolf20.buildinggadgets.common.gadgets.building.BuildingModes;
+import com.direwolf20.buildinggadgets.common.gadgets.building.ExchangingModes;
 import com.direwolf20.buildinggadgets.common.items.FakeBuilderWorld;
 import com.direwolf20.buildinggadgets.common.items.ModItems;
 import com.direwolf20.buildinggadgets.common.items.capability.CapabilityProviderEnergy;
@@ -47,6 +48,7 @@ import java.util.SortedSet;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
+import static com.direwolf20.buildinggadgets.common.gadgets.building.ExchangingModes.*;
 import static com.direwolf20.buildinggadgets.common.tools.GadgetUtils.*;
 import static net.minecraft.block.BlockStainedGlass.COLOR;
 
@@ -262,7 +264,7 @@ public class ToolRenders {
                 }
                 if (coordinates.size() == 0 && lookingAt != null) { //Build a list of coordinates based on the tool mode and range
 //                    coordinates = ExchangingModes.getBuildOrders(world, player, lookingAt.getBlockPos(), lookingAt.sideHit, stack);
-                    coordinates = com.direwolf20.buildinggadgets.common.gadgets.building.ExchangingModes.SURFACE.getMode().getCollection(player, world, renderBlockState, lookingAt.getBlockPos(), player.getPosition(), lookingAt.sideHit, getToolRange(heldItem), false, GadgetExchanger.getFuzzy(heldItem));
+                    coordinates = VERTICAL_COLUMN.getMode().getCollection(player, world, renderBlockState, lookingAt.getBlockPos(), player.getPosition(), lookingAt.sideHit, getToolRange(heldItem), false, GadgetExchanger.getFuzzy(heldItem));
                 }
 
                 //Figure out how many of the block we're rendering we have in the inventory of the player.
