@@ -1,11 +1,21 @@
 package com.direwolf20.buildinggadgets.client;
 
+import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.RayTraceResult;
+import net.minecraftforge.classloading.FMLForgePlugin;
+import net.minecraftforge.common.ForgeHooks;
 
 public class Developer {
-    private boolean isDev = true;
+    private boolean isDev = FMLForgePlugin.RUNTIME_DEOBF;
+
+    public Developer() {
+        if( !isDev )
+            return;
+
+        BuildingGadgets.logger.info("Developer Mode Started");
+    }
 
     /**
      * Note this class is only client sided

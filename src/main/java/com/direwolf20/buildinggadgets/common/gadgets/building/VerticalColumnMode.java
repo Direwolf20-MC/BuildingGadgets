@@ -1,7 +1,5 @@
 package com.direwolf20.buildinggadgets.common.gadgets.building;
 
-import com.direwolf20.buildinggadgets.common.gadgets.GadgetBuilding;
-import com.direwolf20.buildinggadgets.common.gadgets.GadgetExchanger;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
