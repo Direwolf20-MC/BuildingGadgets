@@ -49,11 +49,15 @@ public enum XYZ {
      * dimension.
      */
     public static BlockPos extendPosSingle(int value, BlockPos pos, EnumFacing facing, XYZ xyz) {
-        int change = value * ((facing == EnumFacing.NORTH || facing == EnumFacing.DOWN || facing == EnumFacing.WEST) ? -1 : 1);
+        int change = invertOnFace(facing, value);
 
         if( xyz == X ) return new BlockPos(pos.getX() + change, pos.getY(), pos.getZ());
         if( xyz == Y ) return new BlockPos(pos.getX(), pos.getY() + change, pos.getZ());
 
         return new BlockPos(pos.getX(), pos.getY(), pos.getZ() + change);
+    }
+
+    public static int invertOnFace(EnumFacing facing, int value) {
+        return value * ((facing == EnumFacing.NORTH || facing == EnumFacing.DOWN || facing == EnumFacing.WEST) ? -1 : 1);
     }
 }

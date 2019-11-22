@@ -14,10 +14,10 @@ public class StairMode extends AbstractMode {
     List<BlockPos> collect(EntityPlayer player, BlockPos playerPos, EnumFacing side, int range, BlockPos start) {
         List<BlockPos> coordinates = new ArrayList<>();
 
-        start = start.offset(side, -1).offset(EnumFacing.UP);
+        if (XYZ.isAxisY(side))
+            side = player.getHorizontalFacing().getOpposite();
 
         XYZ facingXYZ = XYZ.fromFacing(side);
-
         for( int i = 0; i < range; i ++ ) {
             // Check to see if we should build up or down from the player
             int tmp = start.getY() > player.posY + 1 ? (i + 1) * -1 : i;
