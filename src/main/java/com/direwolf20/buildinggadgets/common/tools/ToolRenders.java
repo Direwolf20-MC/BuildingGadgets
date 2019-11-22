@@ -118,7 +118,7 @@ public class ToolRenders {
                 }
                 if (coordinates.size() == 0 && lookingAt != null) { //Build a list of coordinates based on the tool mode and range
 //                    coordinates = BuildingModes.getBuildOrders(world, player, lookingAt.getBlockPos(), lookingAt.sideHit, heldItem);
-                    coordinates = BuildingGadgetModes.STAIR.getMode().getCollection(player, world, renderBlockState, lookingAt.getBlockPos(), player.getPosition(), lookingAt.sideHit, getToolRange(heldItem), GadgetBuilding.shouldPlaceAtop(heldItem), GadgetBuilding.getFuzzy(heldItem));
+                    coordinates = BuildingGadgetModes.VERTICAL_WALL.getMode().getCollection(player, world, renderBlockState, lookingAt.getBlockPos(), player.getPosition(), lookingAt.sideHit, getToolRange(heldItem), GadgetBuilding.shouldPlaceAtop(heldItem), GadgetBuilding.getFuzzy(heldItem));
                     //new BuildToMeMode().collect(lookingAt.getBlockPos(), player.getPosition(), lookingAt.sideHit);
                 }
 

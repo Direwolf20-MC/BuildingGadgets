@@ -130,7 +130,7 @@ public class BuildingModes {
             }
         }
         //***************************************************
-        //VerticalColumn
+        //VerticalColumn - done
         //***************************************************
         else if (mode == GadgetBuilding.ToolMode.VerticalColumn) {
             if (sideHit == EnumFacing.UP) {
@@ -157,7 +157,7 @@ public class BuildingModes {
             }
         }
         //***************************************************
-        //HorizontalColumn
+        //HorizontalColumn - done
         //***************************************************
         else if (mode == GadgetBuilding.ToolMode.HorizontalColumn) {
             if (sideHit == EnumFacing.UP || sideHit == EnumFacing.DOWN) {
@@ -194,7 +194,7 @@ public class BuildingModes {
             }
         }
         //***************************************************
-        //HorizontalWallMode
+        //HorizontalWallMode - done
         //***************************************************
         else if (mode == GadgetBuilding.ToolMode.HorizontalWall) {
             /*if (sideHit == EnumFacing.UP || sideHit == EnumFacing.DOWN) {
