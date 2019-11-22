@@ -194,7 +194,7 @@ public class BuildingModes {
             }
         }
         //***************************************************
-        //HorizontalWall
+        //HorizontalWallMode
         //***************************************************
         else if (mode == GadgetBuilding.ToolMode.HorizontalWall) {
             /*if (sideHit == EnumFacing.UP || sideHit == EnumFacing.DOWN) {

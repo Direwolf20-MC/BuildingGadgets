@@ -6,7 +6,9 @@ public enum BuildingGadgetModes {
     GRID(new GridMode(false)),
     STAIR(new StairMode()),
     VERTICAL_COLUMN(new VerticalColumnMode(false)),
-    HORIZONTAL_COLUMN(new HorizontalColumnMode(false));
+    VERTICAL_WALL(new VerticalWallMode()),
+    HORIZONTAL_COLUMN(new HorizontalColumnMode(false)),
+    HORIZONTAL_WALL(new HorizontalWallMode());
 
     AbstractMode mode;
     BuildingGadgetModes(AbstractMode mode) {

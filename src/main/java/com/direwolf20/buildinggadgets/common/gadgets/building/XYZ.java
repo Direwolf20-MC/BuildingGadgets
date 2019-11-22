@@ -45,9 +45,8 @@ public enum XYZ {
     }
 
     /**
-     * Very similar to {@link #extendPosDouble(int, int, BlockPos, XYZ)} as it expands
-     * the original block pos by the new offset value. This only happens on a single
-     * dimension though.
+     * Expands the original block pos by the new offset value. This only happens on a single
+     * dimension.
      */
     public static BlockPos extendPosSingle(int value, BlockPos pos, EnumFacing facing, XYZ xyz) {
         int change = value * ((facing == EnumFacing.NORTH || facing == EnumFacing.DOWN || facing == EnumFacing.WEST) ? -1 : 1);
@@ -56,25 +55,5 @@ public enum XYZ {
         if( xyz == Y ) return new BlockPos(pos.getX(), pos.getY() + change, pos.getZ());
 
         return new BlockPos(pos.getX(), pos.getY(), pos.getZ() + change);
-    }
-
-    /**
-     * Used offset / grow a blockPos depending on the face you're looking at.
-     * You pipe in the original block and the offset values (a, b) that you want
-     * to shift the block by.
-     *
-     * todo: fix math
-     *
-     * @param a a can be either the new x,y,z
-     * @param b b can be either the new x,y,z
-     * @param pos block pos to build from
-     * @param facingXYZ XYZ
-     * @return BlockPos
-     */
-    public static BlockPos extendPosDouble(int a, int b, BlockPos pos, XYZ facingXYZ) {
-        if( facingXYZ == X ) return new BlockPos(pos.getX() + a, pos.getY() + b, pos.getZ());
-        if( facingXYZ == Y ) return new BlockPos(pos.getX() + a, pos.getY(), pos.getZ() + b);
-
-        return new BlockPos(pos.getX(), pos.getY() + a, pos.getZ() + b);
     }
 }

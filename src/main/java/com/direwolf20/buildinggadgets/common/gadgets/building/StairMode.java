@@ -14,14 +14,12 @@ public class StairMode extends AbstractMode {
     List<BlockPos> collect(EntityPlayer player, BlockPos playerPos, EnumFacing side, int range, BlockPos start) {
         List<BlockPos> coordinates = new ArrayList<>();
 
-        if (side == EnumFacing.UP || side == EnumFacing.DOWN)
-            side = player.getHorizontalFacing().getOpposite();
-        else
-            start = start.offset(side, -1).offset(EnumFacing.UP);
+        start = start.offset(side, -1).offset(EnumFacing.UP);
 
         XYZ facingXYZ = XYZ.fromFacing(side);
 
         for( int i = 0; i < range; i ++ ) {
+            // Check to see if we should build up or down from the player
             int tmp = start.getY() > player.posY + 1 ? (i + 1) * -1 : i;
 
             if( facingXYZ == XYZ.X )
@@ -32,5 +30,11 @@ public class StairMode extends AbstractMode {
         }
 
         return coordinates;
+    }
+
+    @Override
+    public BlockPos withOffset(BlockPos pos, EnumFacing side, boolean placeOnTop) {
+        // Is top / bottom? Do as normal. Not? then place on top or inside :D
+        return XYZ.isAxisY(side) ? super.withOffset(pos, side, placeOnTop) : (placeOnTop ? pos.offset(EnumFacing.UP) : pos);
     }
 }
