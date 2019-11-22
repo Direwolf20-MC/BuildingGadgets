@@ -16,30 +16,21 @@ public class VerticalColumnMode extends AbstractMode {
     List<BlockPos> collect(EntityPlayer player, BlockPos playerPos, EnumFacing side, int range, BlockPos start) {
         List<BlockPos> coordinates = new ArrayList<>();
 
-        // Exchanger... Come back to this
-//        if (sideHit == EnumFacing.UP || sideHit == EnumFacing.DOWN) {
-//            for (int x = boundZ * -1; x <= boundZ; x++) {
-//                for (int z = boundX * -1; z <= boundX; z++) {
-//                        coordinates.add(new BlockPos(startBlock.getX() - x, startBlock.getY(), startBlock.getZ() + z));
-//                }
-//            }
-//        } else {
-//            for (int y = bound; y >= bound * -1; y--) {
-//                pos = new BlockPos(startBlock.getX(), startBlock.getY() - y, startBlock.getZ());
-//                if (isReplaceable(world, pos, currentBlock, setBlock, fuzzyMode)) {
-//                    coordinates.add(new BlockPos(startBlock.getX(), startBlock.getY() - y, startBlock.getZ()));
-//                }
-//            }
-//        }
-
         // If up or down, full height from start block
-        if( XYZ.isAxisY(side) ) {
-            for (int i = 0; i < range; i++)
-                coordinates.add(XYZ.extendPosSingle(i, start, side, XYZ.Y));
+        int halfRange = range / 2;
 
+        if( XYZ.isAxisY(side) ) {
+            // The exchanger handles the Y completely differently :sad: means more code
+            if( isExchanging() ) {
+                side = player.getHorizontalFacing();
+                for (int i = -halfRange; i <= halfRange; i++)
+                    coordinates.add(XYZ.extendPosSingle(i, start, side, XYZ.fromFacing(side)));
+            } else {
+                for (int i = 0; i < range; i++)
+                    coordinates.add(XYZ.extendPosSingle(i, start, side, XYZ.Y));
+            }
         // Else, half and half
         } else {
-            int halfRange = range / 2;
             for (int i = -halfRange; i <= halfRange; i++)
                 coordinates.add(XYZ.extendPosSingle(i, start, side, XYZ.Y));
         }
