@@ -40,10 +40,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static com.direwolf20.buildinggadgets.common.gadgets.building.ExchangingModes.SURFACE;
 import static com.direwolf20.buildinggadgets.common.tools.GadgetUtils.*;
 
 public class GadgetExchanger extends GadgetGeneric {
-    private static final FakeBuilderWorld fakeWorld = new FakeBuilderWorld();
+    public static final FakeBuilderWorld fakeWorld = new FakeBuilderWorld();
 
     public enum ToolMode {
         Surface, VerticalColumn, HorizontalColumn, Grid;
@@ -184,6 +185,10 @@ public class GadgetExchanger extends GadgetGeneric {
         World world = player.world;
         List<BlockPos> coords = getAnchor(stack);
 
+        IBlockState setBlock = GadgetUtils.getToolBlock(stack);
+        int range = GadgetUtils.getToolRange(stack);
+        boolean fuzzyMode = GadgetGeneric.getFuzzy(stack);
+
         if (coords.size() == 0) { //If we don't have an anchor, build in the current spot
             RayTraceResult lookingAt = VectorTools.getLookingAt(player, stack);
             if (lookingAt == null) { //If we aren't looking at anything, exit
@@ -192,7 +197,8 @@ public class GadgetExchanger extends GadgetGeneric {
             BlockPos startBlock = lookingAt.getBlockPos();
             EnumFacing sideHit = lookingAt.sideHit;
 //            IBlockState setBlock = getToolBlock(stack);
-            coords = ExchangingModes.getBuildOrders(world, player, startBlock, sideHit, stack);
+//            coords = ExchangingModes.getBuildOrders(world, player, startBlock, sideHit, stack);
+            coords = SURFACE.getMode().getCollection(player, world, setBlock, lookingAt.getBlockPos(), player.getPosition(), lookingAt.sideHit, range, false, fuzzyMode);
         } else { //If we do have an anchor, erase it (Even if the build fails)
             setAnchor(stack, new ArrayList<BlockPos>());
         }

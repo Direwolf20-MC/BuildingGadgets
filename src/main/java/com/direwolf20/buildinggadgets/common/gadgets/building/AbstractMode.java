@@ -3,13 +3,17 @@ package com.direwolf20.buildinggadgets.common.gadgets.building;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.blocks.ModBlocks;
 import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
+import com.direwolf20.buildinggadgets.common.gadgets.GadgetExchanger;
+import com.direwolf20.buildinggadgets.common.items.FakeBuilderWorld;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.renderer.EnumFaceDirection;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import org.lwjgl.Sys;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -77,7 +81,20 @@ public abstract class AbstractMode {
         if (worldBlockState.getBlockHardness(world, pos) < 0)
             return false;
 
-        return worldBlockState.getMaterial() != Material.AIR && !worldBlockState.getMaterial().isLiquid();
+        if( worldBlockState.getMaterial() == Material.AIR || worldBlockState.getMaterial().isLiquid() )
+            return false;
+
+        // Finally, ensure at least a single face is exposed.
+        boolean hasSingeValid = false;
+        for(EnumFacing direction : EnumFacing.values()) {
+            BlockPos offset = pos.offset(direction);
+            if( !world.getBlockState(offset).doesSideBlockRendering(world, pos, direction.getOpposite()) ) {
+                hasSingeValid = true;
+                break;
+            }
+        }
+
+        return hasSingeValid;
     }
 
     public BlockPos withOffset(BlockPos pos, EnumFacing side, boolean placeOnTop) {
