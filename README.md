@@ -17,9 +17,9 @@
 To see how to use Dire's `Building Gadgets` refer to our [Wiki](https://github.com/Direwolf20-MC/BuildingGadgets/wiki) and well as Direwolf's Spotlights - [Spotlight Part One](https://youtu.be/D4Ib4h7aTSk) and [Spotlight Part Two](https://youtu.be/JS1Xx_kwQQ0)
 
 ### Installing the mod
-**First**, grab [Forge](https://files.minecraftforge.net) and install it using the installer. **Second**, pick up [Building Gadgets](https://minecraft.curseforge.com/projects/building-gadgets) from CurseForge, **Third**, drop the hot stuff into your `mods` folder (*Psst* It's (usually) in `C:\Users\<username>\AppData\Roaming\.minecraft\mods` on *Windows* and `~/Library/Application\ Support/minecraft/mods` on *Mac* and `~/.minecraft` on *most Linux distros*), **Finally**, Enjoy!
+**First**, grab [Forge](https://files.minecraftforge.net) and install it using the installer. **Second**, pick up [Building Gadgets](https://minecraft.curseforge.com/projects/building-gadgets) from CurseForge, **Third**, drop the hot stuff into your `mods` folder (*Psst*! It's (usually) in `C:\Users\<username>\AppData\Roaming\.minecraft\mods` on *Windows* and `~/Library/Application\ Support/minecraft/mods` on *Mac* and `~/.minecraft` on *most Linux distros*), **Finally**, Enjoy!
 
-*Bonus: Find a bug and report it for a cookie*
+*Bonus: Find a bug and report it for a cookie.*
 
 ### Using the Gadgets
 Building gadgets has grown a lot since its initial release to the point that we have multiple tools for every occasion, Our wiki has a great set of instructions on how to use each of our Gadgets, check out the [Building Gadget](https://github.com/Direwolf20-MC/BuildingGadgets/wiki/Building-Gadget), the [Exchanger Gadget](https://github.com/Direwolf20-MC/BuildingGadgets/wiki/Exchanger-Gadget), the [Copy Paste Gadget](https://github.com/Direwolf20-MC/BuildingGadgets/wiki/Copy-Paste-Gadget), or the [Destruction Gadget](https://github.com/Direwolf20-MC/BuildingGadgets/wiki/Destruction-Gadget)
