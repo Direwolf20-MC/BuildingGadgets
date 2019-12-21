@@ -4,9 +4,9 @@ import com.direwolf20.buildinggadgets.client.RemoteInventoryCache;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.blocks.ModBlocks;
 import com.direwolf20.buildinggadgets.common.gadgets.GadgetExchanger;
+import com.direwolf20.buildinggadgets.common.gadgets.GadgetGeneric;
 import com.direwolf20.buildinggadgets.common.items.MockBuildingWorld;
 import com.direwolf20.buildinggadgets.common.items.ModItems;
-import com.direwolf20.buildinggadgets.common.gadgets.GadgetBuilding;
 import com.direwolf20.buildinggadgets.common.gadgets.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.gadgets.GadgetDestruction;
 import com.google.common.cache.Cache;
@@ -91,7 +91,7 @@ public class ToolRenders {
 //            GlStateManager.popMatrix();
 //        }
 
-//        RayTraceResult lookingAt = VectorTools.getLookingAt(player, heldItem);
+//        RayTraceResult lookingAt = RayTraceHelper.getLookingAt(player, heldItem);
 //        IBlockState state = Blocks.AIR.getDefaultState();
 //        List<BlockPos> coordinates = getAnchor(stack);
 //        if (lookingAt != null || coordinates.size() > 0) {
@@ -236,7 +236,7 @@ public class ToolRenders {
             GlStateManager.popMatrix();
         }
 
-        RayTraceResult lookingAt = VectorTools.getLookingAt(player, stack);
+        RayTraceResult lookingAt = RayTraceHelper.rayTrace(player, GadgetGeneric.shouldRayTraceFluid(stack));
         IBlockState state = Blocks.AIR.getDefaultState();
         List<BlockPos> coordinates = getAnchor(stack);
         if (lookingAt != null || coordinates.size() > 0) {
@@ -363,7 +363,7 @@ public class ToolRenders {
     }
 
     public static void renderDestructionOverlay(RenderWorldLastEvent evt, EntityPlayer player, ItemStack stack) {
-        RayTraceResult lookingAt = VectorTools.getLookingAt(player, stack);
+        RayTraceResult lookingAt = RayTraceHelper.rayTrace(player, GadgetGeneric.shouldRayTraceFluid(stack));
         if (lookingAt == null && GadgetDestruction.getAnchor(stack) == null) return;
         World world = player.world;
         BlockPos startBlock = (GadgetDestruction.getAnchor(stack) == null) ? lookingAt.getBlockPos() : GadgetDestruction.getAnchor(stack);
@@ -495,7 +495,7 @@ public class ToolRenders {
             //First check if we have an anchor, if not check if we're looking at a block, if not, exit
             BlockPos startPos = GadgetCopyPaste.getAnchor(stack);
             if (startPos == null) {
-                startPos = VectorTools.getPosLookingAt(player, stack);
+                startPos = RayTraceHelper.rayTrace(player, GadgetGeneric.shouldRayTraceFluid(stack)).getBlockPos();
                 if (startPos == null) return;
                 startPos = startPos.up(GadgetCopyPaste.getY(stack));
                 startPos = startPos.east(GadgetCopyPaste.getX(stack));

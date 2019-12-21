@@ -11,6 +11,7 @@ import javax.annotation.Nullable;
 
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
+import com.direwolf20.buildinggadgets.common.gadgets.GadgetGeneric;
 import com.direwolf20.buildinggadgets.common.integration.NetworkProvider;
 import com.direwolf20.buildinggadgets.common.gadgets.GadgetBuilding;
 import com.direwolf20.buildinggadgets.common.gadgets.GadgetExchanger;
@@ -275,7 +276,7 @@ public class GadgetUtils {
     public static void selectBlock(ItemStack stack, EntityPlayer player) {
         //Used to find which block the player is looking at, and store it in NBT on the tool.
         World world = player.world;
-        RayTraceResult lookingAt = VectorTools.getLookingAt(player, false);
+        RayTraceResult lookingAt = RayTraceHelper.rayTrace(player, false);
         if (lookingAt == null)
             return;
 
@@ -316,7 +317,7 @@ public class GadgetUtils {
         World world = player.world;
         List<BlockPos> currentCoords = getAnchor(stack);
         if (currentCoords.size() == 0) {  //If we don't have an anchor, find the block we're supposed to anchor to
-            RayTraceResult lookingAt = VectorTools.getLookingAt(player, stack);
+            RayTraceResult lookingAt = RayTraceHelper.rayTrace(player, GadgetGeneric.shouldRayTraceFluid(stack));
             if (lookingAt == null) {  //If we aren't looking at anything, exit
                 return false;
             }
