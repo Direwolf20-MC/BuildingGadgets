@@ -9,6 +9,7 @@ import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.ResourceLocation;
+import org.lwjgl.Sys;
 
 import java.awt.*;
 import java.util.function.Predicate;
@@ -76,8 +77,11 @@ public class GuiIconActionable extends GuiButton {
     public boolean mousePressed(Minecraft mc, int mouseX, int mouseY) {
         super.mousePressed(mc, mouseX, mouseY);
 
+        if( !(mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + this.height) )
+            return false;
+
         this.action.test(true);
-        if( !this.isSelectable )
+        if (!this.isSelectable)
             return false;
 
         this.setSelected(!this.selected);
@@ -99,10 +103,10 @@ public class GuiIconActionable extends GuiButton {
         drawTexturedModalRect(this.x, this.y, 0, 0, this.width, this.height);
         GlStateManager.enableTexture2D();
 
-        GlStateManager.color(activeColor.getRed() / 255f, activeColor.getGreen() / 255f, activeColor.getBlue() / 255f, alpha);
+        GlStateManager.color(1, 1, 1, alpha);
         Minecraft.getMinecraft().getTextureManager().bindTexture(selected ? selectedTexture : deselectedTexture);
 //        blit(this.x, this.y, 0, 0, this.width, this.height, this.width, this.height);
-        drawTexturedModalRect(this.x, this.y, 0, 0, this.width, this.height);
+        drawModalRectWithCustomSizedTexture(this.x, this.y, 0, 0, this.width, this.height, this.width, this.height);
 
         ScaledResolution scaledresolution = new ScaledResolution(mc);
         if( mouseX >= x && mouseY >= y && mouseX < x + width && mouseY < y + height )

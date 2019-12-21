@@ -12,7 +12,6 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.IGuiHandler;
 
 public class GuiProxy implements IGuiHandler {
-
     public static final int CopyPasteID = 0;
     public static final int DestructionID = 1;
     public static final int PasteID = 2;
@@ -24,7 +23,6 @@ public class GuiProxy implements IGuiHandler {
         if (te instanceof TemplateManagerTileEntity) {
             return new TemplateManagerContainer(player.inventory, (TemplateManagerTileEntity) te);
         }
-
 
         return null;
     }

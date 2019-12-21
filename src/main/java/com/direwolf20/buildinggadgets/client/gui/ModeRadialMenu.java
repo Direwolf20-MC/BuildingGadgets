@@ -90,41 +90,31 @@ public class ModeRadialMenu extends GuiScreen {
         ScreenPosition right = isDestruction ? ScreenPosition.TOP : ScreenPosition.RIGHT;
         ScreenPosition left = isDestruction ? ScreenPosition.BOTTOM : ScreenPosition.LEFT;
         if (isDestruction) {
-            addButton(new PositionedIconActionable("", "destroy_overlay", right, send -> {
-                if (send)
-                    PacketHandler.INSTANCE.sendToServer(new PacketChangeRange());
-
+            addButton(new PositionedIconActionable("Show Overlay", "destroy_overlay", right, send -> {
+                if (send) PacketHandler.INSTANCE.sendToServer(new PacketChangeRange());
                 return GadgetDestruction.getOverlay(getGadget());
             }));
         } else {
-            addButton(new PositionedIconActionable("", "rotate", left, send -> {
-                if (send)
-                    PacketHandler.INSTANCE.sendToServer(new PacketRotateMirror(PacketRotateMirror.Operation.ROTATE));
-
+            addButton(new PositionedIconActionable("Rotate", "rotate", left, false, send -> {
+                if (send) PacketHandler.INSTANCE.sendToServer(new PacketRotateMirror(PacketRotateMirror.Operation.ROTATE));
                 return false;
             }));
-            addButton(new PositionedIconActionable("", "mirror", left, send -> {
-                if (send)
-                    PacketHandler.INSTANCE.sendToServer(new PacketRotateMirror(PacketRotateMirror.Operation.MIRROR));
-
+            addButton(new PositionedIconActionable("Mirror", "mirror", left, false, send -> {
+                if (send) PacketHandler.INSTANCE.sendToServer(new PacketRotateMirror(PacketRotateMirror.Operation.MIRROR));
                 return false;
             }));
         }
         if (!(tool.getItem() instanceof GadgetCopyPaste)) {
             if (!isDestruction || SyncedConfig.nonFuzzyEnabledDestruction) {
-                GuiButton button = new PositionedIconActionable("", "fuzzy", right, send -> {
-                    if (send)
-                        PacketHandler.INSTANCE.sendToServer(new PacketToggleFuzzy());
-
+                GuiButton button = new PositionedIconActionable("Fuzzy", "fuzzy", right, send -> {
+                    if (send) PacketHandler.INSTANCE.sendToServer(new PacketToggleFuzzy());
                     return GadgetGeneric.getFuzzy(getGadget());
                 });
                 addButton(button);
                 conditionalButtons.add(button);
             }
-            GuiButton button = new PositionedIconActionable("", "connected_area", right, send -> {
-                if (send)
-                    PacketHandler.INSTANCE.sendToServer(new PacketToggleConnectedArea());
-
+            GuiButton button = new PositionedIconActionable("Connected area", "connected_area", right, send -> {
+                if (send) PacketHandler.INSTANCE.sendToServer(new PacketToggleConnectedArea());
                 return GadgetGeneric.getConnectedArea(getGadget());
             });
             addButton(button);
@@ -145,24 +135,18 @@ public class ModeRadialMenu extends GuiScreen {
                 sliderRange.getComponents().forEach(this::addButton);
             }
         }
-        addButton(new PositionedIconActionable("", "raytrace_fluid", right, send -> {
-            if (send)
-                PacketHandler.INSTANCE.sendToServer(new PacketToggleRayTraceFluid());
-
+        addButton(new PositionedIconActionable("Place on fluids", "raytrace_fluid", right, send -> {
+            if (send) PacketHandler.INSTANCE.sendToServer(new PacketToggleRayTraceFluid());
             return GadgetGeneric.shouldRayTraceFluid(getGadget());
         }));
         if (tool.getItem() instanceof GadgetBuilding) {
-            addButton(new PositionedIconActionable("", "building_place_atop", right, send -> {
-                if (send)
-                    PacketHandler.INSTANCE.sendToServer(new PacketToggleBlockPlacement());
-
+            addButton(new PositionedIconActionable("Place on top", "building_place_atop", right, send -> {
+                if (send) PacketHandler.INSTANCE.sendToServer(new PacketToggleBlockPlacement());
                 return GadgetBuilding.shouldPlaceAtop(getGadget());
             }));
         }
-        addButton(new PositionedIconActionable("", "anchor", left, send -> {
-            if (send)
-                PacketHandler.INSTANCE.sendToServer(new PacketAnchor());
-
+        addButton(new PositionedIconActionable("Anchor", "anchor", left, send -> {
+            if (send) PacketHandler.INSTANCE.sendToServer(new PacketAnchor());
             ItemStack stack = getGadget();
             if (stack.getItem() instanceof GadgetCopyPaste)
                 return GadgetCopyPaste.getAnchor(stack) != null;
@@ -172,10 +156,8 @@ public class ModeRadialMenu extends GuiScreen {
             return !GadgetUtils.getAnchor(stack).isEmpty();
         }));
         if (!(tool.getItem() instanceof GadgetExchanger)) {
-            addButton(new PositionedIconActionable("", "undo", left, send -> {
-                if (send)
-                    PacketHandler.INSTANCE.sendToServer(new PacketUndo());
-
+            addButton(new PositionedIconActionable("Undo", "undo", left, false, send -> {
+                if (send) PacketHandler.INSTANCE.sendToServer(new PacketUndo());
                 return false;
             }));
         }
