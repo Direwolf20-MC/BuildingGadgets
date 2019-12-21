@@ -2,9 +2,8 @@ package com.direwolf20.buildinggadgets.common.gadgets;
 
 import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
-import com.direwolf20.buildinggadgets.common.items.FakeBuilderWorld;
+import com.direwolf20.buildinggadgets.common.items.MockBuildingWorld;
 import com.direwolf20.buildinggadgets.common.items.ModItems;
-import com.direwolf20.buildinggadgets.common.tools.ExchangingModes;
 import com.direwolf20.buildinggadgets.common.tools.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.tools.InventoryManipulation;
 import com.direwolf20.buildinggadgets.common.tools.ToolRenders;
@@ -44,7 +43,7 @@ import static com.direwolf20.buildinggadgets.common.gadgets.building.ExchangingM
 import static com.direwolf20.buildinggadgets.common.tools.GadgetUtils.*;
 
 public class GadgetExchanger extends GadgetGeneric {
-    public static final FakeBuilderWorld fakeWorld = new FakeBuilderWorld();
+    public static final MockBuildingWorld fakeWorld = new MockBuildingWorld();
 
     public enum ToolMode {
         Surface, VerticalColumn, HorizontalColumn, Grid;

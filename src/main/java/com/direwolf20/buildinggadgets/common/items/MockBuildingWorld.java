@@ -15,7 +15,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import javax.annotation.Nullable;
 import java.util.Set;
 
-public class FakeBuilderWorld implements IBlockAccess {
+public class MockBuildingWorld implements IBlockAccess {
     private Set<BlockPos> positions;
     private IBlockState state;
     private World realWorld;

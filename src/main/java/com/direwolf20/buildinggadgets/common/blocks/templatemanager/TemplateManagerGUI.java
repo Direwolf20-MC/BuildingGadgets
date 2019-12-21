@@ -5,8 +5,6 @@
 
 package com.direwolf20.buildinggadgets.common.blocks.templatemanager;
 
-import com.direwolf20.buildinggadgets.client.gui.AreaHelpText;
-import com.direwolf20.buildinggadgets.client.gui.IHoverHelpText;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.items.ModItems;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
@@ -68,7 +66,7 @@ public class TemplateManagerGUI extends GuiContainer {
     private GuiButton buttonSave, buttonLoad, buttonCopy, buttonPaste;
 
 //    private GuiButtonHelp buttonHelp;
-    private List<IHoverHelpText> helpTextProviders = new ArrayList<>();
+//    private List<IHoverHelpText> helpTextProviders = new ArrayList<>();
 
     private TemplateManagerTileEntity te;
     private TemplateManagerContainer container;
@@ -108,7 +106,7 @@ public class TemplateManagerGUI extends GuiContainer {
     @Override
     public void initGui() {
         super.initGui();
-        helpTextProviders.clear();
+//        helpTextProviders.clear();
 //        this.buttonList.add(buttonHelp = new GuiButtonHelp(100, this.guiLeft + this.xSize - 16, this.guiTop + 4));
         //The parameters of GuiButton are(id, x, y, width, height, text);
         this.buttonList.add(buttonSave = createAndAddButton(0, 79, 17, 30, 20, "Save"));
@@ -118,11 +116,11 @@ public class TemplateManagerGUI extends GuiContainer {
         this.nameField = new GuiTextField(0, this.fontRenderer, this.guiLeft + 8, this.guiTop + 6, 149, this.fontRenderer.FONT_HEIGHT);
         this.nameField.setMaxStringLength(50);
         this.nameField.setVisible(true);
-        helpTextProviders.add(new AreaHelpText(nameField, "field.template_name"));
-        helpTextProviders.add(new AreaHelpText(inventorySlots.getSlot(0), guiLeft, guiTop, "slot.gadget"));
-        helpTextProviders.add(new AreaHelpText(inventorySlots.getSlot(1), guiLeft, guiTop, "slot.template"));
-        helpTextProviders.add(new AreaHelpText(guiLeft + 112, guiTop + 41, 22, 15, "arrow.data_flow"));
-        helpTextProviders.add(new AreaHelpText(panel, guiLeft, guiTop + 10, "preview"));
+//        helpTextProviders.add(new AreaHelpText(nameField, "field.template_name"));
+//        helpTextProviders.add(new AreaHelpText(inventorySlots.getSlot(0), guiLeft, guiTop, "slot.gadget"));
+//        helpTextProviders.add(new AreaHelpText(inventorySlots.getSlot(1), guiLeft, guiTop, "slot.template"));
+//        helpTextProviders.add(new AreaHelpText(guiLeft + 112, guiTop + 41, 22, 15, "arrow.data_flow"));
+//        helpTextProviders.add(new AreaHelpText(panel, guiLeft, guiTop + 10, "preview"));
         //NOTE: the id always has to be different or else it might get called twice or never!
     }
 

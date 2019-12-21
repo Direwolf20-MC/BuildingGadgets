@@ -3,7 +3,7 @@ package com.direwolf20.buildinggadgets.common.gadgets;
 import com.direwolf20.buildinggadgets.common.blocks.ModBlocks;
 import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
-import com.direwolf20.buildinggadgets.common.items.FakeBuilderWorld;
+import com.direwolf20.buildinggadgets.common.items.MockBuildingWorld;
 import com.direwolf20.buildinggadgets.common.items.ModItems;
 import com.direwolf20.buildinggadgets.common.tools.*;
 import net.minecraft.block.state.IBlockState;
@@ -38,7 +38,7 @@ import static com.direwolf20.buildinggadgets.common.tools.GadgetUtils.*;
 
 
 public class GadgetBuilding extends GadgetGeneric {
-    private static final FakeBuilderWorld fakeWorld = new FakeBuilderWorld();
+    private static final MockBuildingWorld fakeWorld = new MockBuildingWorld();
 
     public enum ToolMode {
         BuildToMe, VerticalColumn, HorizontalColumn, VerticalWall, HorizontalWall, Stairs, Grid, Surface;
