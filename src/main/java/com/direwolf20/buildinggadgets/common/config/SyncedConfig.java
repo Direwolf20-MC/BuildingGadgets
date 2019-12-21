@@ -1,8 +1,10 @@
 package com.direwolf20.buildinggadgets.common.config;
 
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
-import com.direwolf20.buildinggadgets.common.config.fieldmap.FieldMapper;
-import com.direwolf20.buildinggadgets.common.config.fieldmap.FieldSerializer;
+import com.direwolf20.buildinggadgets.common.config.utils.AutoSync;
+import com.direwolf20.buildinggadgets.common.config.utils.FieldMapper;
+import com.direwolf20.buildinggadgets.common.config.utils.FieldSerializer;
+import com.direwolf20.buildinggadgets.common.config.utils.PatternList;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.PacketSyncConfig;
 import com.direwolf20.buildinggadgets.common.tools.ReflectionTool;
@@ -29,92 +31,35 @@ public class SyncedConfig {
     private static final String KEY_NAME = "NAME";
     private static final String KEY_VALUE = "VAL";
 
-    @AutoSync
-    public static int energyCostBuilder;
-
-    @AutoSync
-    public static int energyCostExchanger;
-
-    @AutoSync
-    public static int energyCostDestruction;
-
-    @AutoSync
-    public static int energyCostCopyPaste;
-
-    @AutoSync
-    public static int damageCostBuilder;
-
-    @AutoSync
-    public static int damageCostExchanger;
-
-    @AutoSync
-    public static int damageCostDestruction;
-
-    @AutoSync
-    public static int damageCostCopyPaste;
-
-    @AutoSync
-    public static int energyMax;
-
-    @AutoSync
-    public static int energyMaxDestruction;
-
-    @AutoSync
-    public static boolean poweredByFE;
-
-    @AutoSync
-    public static int durabilityBuilder;
-
-    @AutoSync
-    public static int durabilityExchanger;
-
-    @AutoSync
-    public static int durabilityDestruction;
-
-    @AutoSync
-    public static double nonFuzzyMultiplierDestruction;
-
-    @AutoSync
-    public static boolean nonFuzzyEnabledDestruction;
-
-    @AutoSync
-    public static int durabilityCopyPaste;
-
-    @AutoSync
-    public static double rayTraceRange;
-
-    @AutoSync
-    public static int maxRange;
-
-    @AutoSync
-    public static boolean enableDestructionGadget;
-
-    @AutoSync
-    public static boolean absoluteCoordDefault;
-
-    @AutoSync
-    public static boolean canOverwriteBlocks;
-
-    @AutoSync
-    public static boolean enablePaste;
-
-    @AutoSync
-    public static int pasteDroppedMin;
-
-    @AutoSync
-    public static int pasteDroppedMax;
-
-    @AutoSync
-    public static int t1ContainerCapacity;
-
-    @AutoSync
-    public static int t2ContainerCapacity;
-
-    @AutoSync
-    public static int t3ContainerCapacity;
-
-    @AutoSync(mapperId = FieldMapper.PATTERN_LIST_MAPPER_ID)
-    public static PatternList blockBlacklist;
+    @AutoSync public static int energyCostBuilder;
+    @AutoSync public static int energyCostExchanger;
+    @AutoSync public static int energyCostDestruction;
+    @AutoSync public static int energyCostCopyPaste;
+    @AutoSync public static int damageCostBuilder;
+    @AutoSync public static int damageCostExchanger;
+    @AutoSync public static int damageCostDestruction;
+    @AutoSync public static int damageCostCopyPaste;
+    @AutoSync public static int energyMax;
+    @AutoSync public static int energyMaxDestruction;
+    @AutoSync public static boolean poweredByFE;
+    @AutoSync public static int durabilityBuilder;
+    @AutoSync public static int durabilityExchanger;
+    @AutoSync public static int durabilityDestruction;
+    @AutoSync public static double nonFuzzyMultiplierDestruction;
+    @AutoSync public static boolean nonFuzzyEnabledDestruction;
+    @AutoSync public static int durabilityCopyPaste;
+    @AutoSync public static double rayTraceRange;
+    @AutoSync public static int maxRange;
+    @AutoSync public static boolean enableDestructionGadget;
+    @AutoSync public static boolean absoluteCoordDefault;
+    @AutoSync public static boolean canOverwriteBlocks;
+    @AutoSync public static boolean enablePaste;
+    @AutoSync public static int pasteDroppedMin;
+    @AutoSync public static int pasteDroppedMax;
+    @AutoSync public static int t1ContainerCapacity;
+    @AutoSync public static int t2ContainerCapacity;
+    @AutoSync public static int t3ContainerCapacity;
+    @AutoSync(mapperId = FieldMapper.PATTERN_LIST_MAPPER_ID) public static PatternList blockBlacklist;
 
     /**
      * This Methods transfers Data from the 'Master copy' (the normal {@link Config}) into the SyncedConfig,

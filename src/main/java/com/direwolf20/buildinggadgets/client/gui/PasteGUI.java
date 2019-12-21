@@ -29,7 +29,6 @@ public class PasteGUI extends GuiScreen {
     private GuiTextField Y;
     private GuiTextField Z;
 
-
     int guiLeft = 15;
     int guiTop = 50;
 

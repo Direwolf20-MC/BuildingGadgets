@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.common.gadgets.building;
 
+import com.direwolf20.buildinggadgets.common.config.Config;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
@@ -19,9 +20,8 @@ public class BuildToMeMode extends AbstractMode {
         int startCoord = XYZ.posToXYZ(start, facingXYZ);
         int playerCoord = XYZ.posToXYZ(playerPos, facingXYZ);
 
-        // Clamp the value to the max range of the gadget
-        // todo: remove hardcoded 15
-        int difference = Math.max(0, Math.min(15, Math.abs(startCoord - playerCoord)));
+        // Clamp the value to the max range of the gadgets raytrace
+        int difference = Math.max(0, Math.min((int) Config.rayTraceRange, Math.abs(startCoord - playerCoord)));
         for( int i = 0; i < difference; i ++)
             coordinates.add(XYZ.extendPosSingle(i, start, side, facingXYZ));
 

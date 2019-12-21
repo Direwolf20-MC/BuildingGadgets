@@ -1,4 +1,4 @@
-package com.direwolf20.buildinggadgets.common.config.fieldmap;
+package com.direwolf20.buildinggadgets.common.config.utils;
 
 import com.direwolf20.buildinggadgets.common.tools.ReflectionTool;
 import com.google.common.annotations.VisibleForTesting;

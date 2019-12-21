@@ -57,6 +57,14 @@ public enum XYZ {
         return new BlockPos(pos.getX(), pos.getY(), pos.getZ() + change);
     }
 
+    /**
+     * Inverts the value based on the face. If you're facing in a negative direction
+     * the value will be flipped to a negative and vise versa.
+     *
+     * @param facing Looking at face
+     * @param value  Value to be modified
+     * @return modified value
+     */
     public static int invertOnFace(EnumFacing facing, int value) {
         return value * ((facing == EnumFacing.NORTH || facing == EnumFacing.DOWN || facing == EnumFacing.WEST) ? -1 : 1);
     }

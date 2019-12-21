@@ -1,6 +1,7 @@
 package com.direwolf20.buildinggadgets.common.config;
 
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
+import com.direwolf20.buildinggadgets.common.config.utils.PatternList;
 import net.minecraft.init.Blocks;
 import net.minecraftforge.common.config.Config.*;
 

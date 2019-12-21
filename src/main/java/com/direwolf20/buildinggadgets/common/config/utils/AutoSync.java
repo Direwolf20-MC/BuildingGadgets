@@ -1,4 +1,6 @@
-package com.direwolf20.buildinggadgets.common.config;
+package com.direwolf20.buildinggadgets.common.config.utils;
+
+import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -17,7 +19,7 @@ public @interface AutoSync {
 
     /**
      * Can be used for specifying a FieldMapper, in order to have some kind of complex Type stored in the {@link SyncedConfig}.
-     * In order to make use of this, first register a {@link com.direwolf20.buildinggadgets.common.config.fieldmap.FieldMapper} with the desired id.
+     * In order to make use of this, first register a {@link com.direwolf20.buildinggadgets.common.config.utils.FieldMapper} with the desired id.
      * You can then switch the Type of the Field to the Field Type mapped by the Mapper
      * @implNote <b>Make sure that you are referring to a Mapper of the desired Type, as using incompatible mappers can have unexpected consequences!</b>
      * @return The id of the registered FieldMapper to be used for transforming this field

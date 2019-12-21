@@ -37,6 +37,7 @@ import java.awt.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 
 public class ModeRadialMenu extends GuiScreen {
 
@@ -89,29 +90,29 @@ public class ModeRadialMenu extends GuiScreen {
         ScreenPosition right = isDestruction ? ScreenPosition.TOP : ScreenPosition.RIGHT;
         ScreenPosition left = isDestruction ? ScreenPosition.BOTTOM : ScreenPosition.LEFT;
         if (isDestruction) {
-            addButton(new GuiButtonActionCallback("destroy.overlay", right, send -> {
+            addButton(new PositionedIconActionable("", "destroy.overlay", right, send -> {
                 if (send)
                     PacketHandler.INSTANCE.sendToServer(new PacketChangeRange());
 
                 return GadgetDestruction.getOverlay(getGadget());
             }));
         } else {
-            addButton(new GuiButtonActionCallback("rotate", left, send -> {
+            addButton(new PositionedIconActionable("", "rotate", left, send -> {
                 if (send)
                     PacketHandler.INSTANCE.sendToServer(new PacketRotateMirror(PacketRotateMirror.Operation.ROTATE));
 
                 return false;
-            }).setTogglable(false));
-            addButton(new GuiButtonActionCallback("mirror", left, send -> {
+            }));
+            addButton(new PositionedIconActionable("", "mirror", left, send -> {
                 if (send)
                     PacketHandler.INSTANCE.sendToServer(new PacketRotateMirror(PacketRotateMirror.Operation.MIRROR));
 
                 return false;
-            }).setTogglable(false));
+            }));
         }
         if (!(tool.getItem() instanceof GadgetCopyPaste)) {
             if (!isDestruction || SyncedConfig.nonFuzzyEnabledDestruction) {
-                GuiButton button = new GuiButtonActionCallback("fuzzy", right, send -> {
+                GuiButton button = new PositionedIconActionable("", "fuzzy", right, send -> {
                     if (send)
                         PacketHandler.INSTANCE.sendToServer(new PacketToggleFuzzy());
 
@@ -120,7 +121,7 @@ public class ModeRadialMenu extends GuiScreen {
                 addButton(button);
                 conditionalButtons.add(button);
             }
-            GuiButton button = new GuiButtonActionCallback("connected_" + (isDestruction ? "area" : "surface"), right, send -> {
+            GuiButton button = new PositionedIconActionable("", "connected_" + (isDestruction ? "area" : "surface"), right, send -> {
                 if (send)
                     PacketHandler.INSTANCE.sendToServer(new PacketToggleConnectedArea());
 
@@ -141,24 +142,24 @@ public class ModeRadialMenu extends GuiScreen {
                         slider.updateSlider();
                     });
                 sliderRange.precision = 1;
-                sliderRange.getComponents().forEach(component -> addButton(component));
+                sliderRange.getComponents().forEach(this::addButton);
             }
         }
-        addButton(new GuiButtonActionCallback("raytrace_fluid", right, send -> {
+        addButton(new PositionedIconActionable("", "raytrace_fluid", right, send -> {
             if (send)
                 PacketHandler.INSTANCE.sendToServer(new PacketToggleRayTraceFluid());
 
             return GadgetGeneric.shouldRayTraceFluid(getGadget());
         }));
         if (tool.getItem() instanceof GadgetBuilding) {
-            addButton(new GuiButtonActionCallback("building.place_atop", right, send -> {
+            addButton(new PositionedIconActionable("", "building.place_atop", right, send -> {
                 if (send)
                     PacketHandler.INSTANCE.sendToServer(new PacketToggleBlockPlacement());
 
                 return GadgetBuilding.shouldPlaceAtop(getGadget());
             }));
         }
-        addButton(new GuiButtonActionCallback("anchor", left, send -> {
+        addButton(new PositionedIconActionable("", "anchor", left, send -> {
             if (send)
                 PacketHandler.INSTANCE.sendToServer(new PacketAnchor());
 
@@ -171,12 +172,12 @@ public class ModeRadialMenu extends GuiScreen {
             return !GadgetUtils.getAnchor(stack).isEmpty();
         }));
         if (!(tool.getItem() instanceof GadgetExchanger)) {
-            addButton(new GuiButtonActionCallback("undo", left, send -> {
+            addButton(new PositionedIconActionable("", "undo", left, send -> {
                 if (send)
                     PacketHandler.INSTANCE.sendToServer(new PacketUndo());
 
                 return false;
-            }).setTogglable(false));
+            }));
         }
         updateButtons(tool);
     }
@@ -189,15 +190,13 @@ public class ModeRadialMenu extends GuiScreen {
         boolean isDestruction = tool.getItem() instanceof GadgetDestruction;
         ScreenPosition right = isDestruction ? ScreenPosition.BOTTOM : ScreenPosition.RIGHT;
         for (int i = 0; i < buttonList.size(); i++) {
-            if (!(buttonList.get(i) instanceof GuiButtonActionCallback))
+            if (!(buttonList.get(i) instanceof PositionedIconActionable))
                 continue;
 
-            GuiButtonActionCallback button = (GuiButtonActionCallback) buttonList.get(i);
-            SoundEvent sound = ModSounds.BEEP.getSound();
-            button.setSounds(sound, sound, 1F, 0.6F);
+            PositionedIconActionable button = (PositionedIconActionable) buttonList.get(i);
             if (!button.visible) continue;
             int offset;
-            boolean isRight = button.getScreenPosition() == right;
+            boolean isRight = button.position == right;
             if (isRight) {
                 posRight += dim + padding;
                 offset = 70;
@@ -215,12 +214,12 @@ public class ModeRadialMenu extends GuiScreen {
         posRight = resetPos(tool, padding, posRight);
         posLeft = resetPos(tool, padding, posLeft);
         for (int i = 0; i < buttonList.size(); i++) {
-            if (!(buttonList.get(i) instanceof GuiButtonActionCallback))
+            if (!(buttonList.get(i) instanceof PositionedIconActionable))
                 continue;
 
-            GuiButtonActionCallback button = (GuiButtonActionCallback) buttonList.get(i);
+            PositionedIconActionable button = (PositionedIconActionable) buttonList.get(i);
             if (!button.visible) continue;
-            boolean isRight = button.getScreenPosition() == right;
+            boolean isRight = button.position == right;
             int pos = isRight ? posRight : posLeft;
             if (isDestruction)
                 button.x = pos;
@@ -256,8 +255,8 @@ public class ModeRadialMenu extends GuiScreen {
         if (segments != 0) {
             inRange = dist > radiusMin && dist < radiusMax;
             for (GuiButton button : buttonList) {
-                if (button instanceof GuiButtonActionCallback)
-                    ((GuiButtonActionCallback) button).setFaded(inRange);
+                if (button instanceof PositionedIconActionable)
+                    ((PositionedIconActionable) button).setFaded(inRange);
             }
         }
         GlStateManager.pushMatrix();
@@ -406,18 +405,18 @@ public class ModeRadialMenu extends GuiScreen {
     }
 
     private void renderHoverHelpText(int mx, int my) {
-        buttonList.forEach(button -> {
-            if (!(button instanceof GuiButtonActionCallback))
-                return;
-
-            GuiButtonActionCallback helpTextProvider = (GuiButtonActionCallback) button;
-            if (helpTextProvider.isHovered(mx, my)) {
-                Color color = button instanceof GuiButtonSelect && ((GuiButtonSelect) button).isSelected() ? Color.GREEN : Color.WHITE;
-                String text = helpTextProvider.getHoverHelpText();
-                int x = helpTextProvider.getScreenPosition() == ScreenPosition.LEFT ? mx - fontRenderer.getStringWidth(text): mx;
-                fontRenderer.drawStringWithShadow(text, x, my - fontRenderer.FONT_HEIGHT, color.getRGB());
-            }
-        });
+//        buttonList.forEach(button -> {
+//            if (!(button instanceof PositionedIconActionable))
+//                return;
+//
+//            PositionedIconActionable helpTextProvider = (PositionedIconActionable) button;
+//            if (helpTextProvider.isHovered(mx, my)) {
+//                Color color = button instanceof GuiButtonSelect && ((GuiButtonSelect) button).isSelected() ? Color.GREEN : Color.WHITE;
+//                String text = helpTextProvider.getHoverHelpText();
+//                int x = helpTextProvider.getScreenPosition() == ScreenPosition.LEFT ? mx - fontRenderer.getStringWidth(text): mx;
+//                fontRenderer.drawStringWithShadow(text, x, my - fontRenderer.FONT_HEIGHT, color.getRGB());
+//            }
+//        });
     }
 
     private void changeMode() {
@@ -483,5 +482,19 @@ public class ModeRadialMenu extends GuiScreen {
 
     public static enum ScreenPosition {
         RIGHT, LEFT, BOTTOM, TOP;
+    }
+
+    private static class PositionedIconActionable extends GuiIconActionable {
+        public ScreenPosition position;
+
+        PositionedIconActionable(String message, String icon, ScreenPosition position, boolean isSelectable, Predicate<Boolean> action) {
+            super(0, 0, icon, message, isSelectable, action);
+
+            this.position = position;
+        }
+
+        PositionedIconActionable(String message, String icon, ScreenPosition position, Predicate<Boolean> action) {
+            this(message, icon, position, true, action);
+        }
     }
 }

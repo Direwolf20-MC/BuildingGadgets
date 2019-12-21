@@ -1,4 +1,4 @@
-package com.direwolf20.buildinggadgets.common.config;
+package com.direwolf20.buildinggadgets.common.config.utils;
 
 import com.google.common.collect.ImmutableList;
 import net.minecraft.item.ItemStack;

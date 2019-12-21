@@ -6,8 +6,6 @@
 package com.direwolf20.buildinggadgets.common.blocks.templatemanager;
 
 import com.direwolf20.buildinggadgets.client.gui.AreaHelpText;
-import com.direwolf20.buildinggadgets.client.gui.GuiButtonHelp;
-import com.direwolf20.buildinggadgets.client.gui.GuiButtonHelpText;
 import com.direwolf20.buildinggadgets.client.gui.IHoverHelpText;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.items.ModItems;
@@ -69,7 +67,7 @@ public class TemplateManagerGUI extends GuiContainer {
     private GuiTextField nameField;
     private GuiButton buttonSave, buttonLoad, buttonCopy, buttonPaste;
 
-    private GuiButtonHelp buttonHelp;
+//    private GuiButtonHelp buttonHelp;
     private List<IHoverHelpText> helpTextProviders = new ArrayList<>();
 
     private TemplateManagerTileEntity te;
@@ -89,29 +87,29 @@ public class TemplateManagerGUI extends GuiContainer {
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         drawDefaultBackground();
         super.drawScreen(mouseX, mouseY, partialTicks);
-        if (buttonHelp.isSelected()) {
-            GlStateManager.color(1, 1, 1, 1);
-            GlStateManager.disableLighting();
-            for (IHoverHelpText helpTextProvider : helpTextProviders)
-                helpTextProvider.drawRect(this, HELP_TEXT_BACKGROUNG_COLOR);
-
-            GlStateManager.enableLighting();
-            for (IHoverHelpText helpTextProvider : helpTextProviders) {
-                if (helpTextProvider.isHovered(mouseX, mouseY))
-                    drawHoveringText(helpTextProvider.getHoverHelpText(), mouseX, mouseY);
-            }
-        } else {
+//        if (buttonHelp.isSelected()) {
+//            GlStateManager.color(1, 1, 1, 1);
+//            GlStateManager.disableLighting();
+//            for (IHoverHelpText helpTextProvider : helpTextProviders)
+//                helpTextProvider.drawRect(this, HELP_TEXT_BACKGROUNG_COLOR);
+//
+//            GlStateManager.enableLighting();
+//            for (IHoverHelpText helpTextProvider : helpTextProviders) {
+//                if (helpTextProvider.isHovered(mouseX, mouseY))
+//                    drawHoveringText(helpTextProvider.getHoverHelpText(), mouseX, mouseY);
+//            }
+//        } else {
             this.renderHoveredToolTip(mouseX, mouseY);
-        }
-        if (buttonHelp.isMouseOver())
-            drawHoveringText(buttonHelp.getHoverText(), mouseX, mouseY);
+//        }
+//        if (buttonHelp.isMouseOver())
+//            drawHoveringText(buttonHelp.getHoverText(), mouseX, mouseY);
     }
 
     @Override
     public void initGui() {
         super.initGui();
         helpTextProviders.clear();
-        this.buttonList.add(buttonHelp = new GuiButtonHelp(100, this.guiLeft + this.xSize - 16, this.guiTop + 4));
+//        this.buttonList.add(buttonHelp = new GuiButtonHelp(100, this.guiLeft + this.xSize - 16, this.guiTop + 4));
         //The parameters of GuiButton are(id, x, y, width, height, text);
         this.buttonList.add(buttonSave = createAndAddButton(0, 79, 17, 30, 20, "Save"));
         this.buttonList.add(buttonLoad = createAndAddButton(1, 137, 17, 30, 20, "Load"));
@@ -129,9 +127,10 @@ public class TemplateManagerGUI extends GuiContainer {
     }
 
     private GuiButton createAndAddButton(int id, int x, int y, int witdth, int height, String text) {
-        GuiButtonHelpText button = new GuiButtonHelpText(id, this.guiLeft + x, this.guiTop + y, witdth, height, text, text.toLowerCase());
-        helpTextProviders.add(button);
-        return button;
+//        GuiButtonHelpText button = new GuiButtonHelpText(id, this.guiLeft + x, this.guiTop + y, witdth, height, text, text.toLowerCase());
+//        helpTextProviders.add(button);
+//        return button;
+        return null;
     }
 
     @Override
@@ -291,9 +290,10 @@ public class TemplateManagerGUI extends GuiContainer {
 
     @Override
     protected void actionPerformed(GuiButton b) {
-        if (b.id == buttonHelp.id) {
-            buttonHelp.toggleSelected();
-        } else if (b.id == 0) {
+//        if (b.id == buttonHelp.id) {
+//            buttonHelp.toggleSelected();
+//        }
+         if (b.id == 0) {
             PacketHandler.INSTANCE.sendToServer(new PacketTemplateManagerSave(te.getPos(), nameField.getText()));
         } else if (b.id == 1) {
             PacketHandler.INSTANCE.sendToServer(new PacketTemplateManagerLoad(te.getPos()));

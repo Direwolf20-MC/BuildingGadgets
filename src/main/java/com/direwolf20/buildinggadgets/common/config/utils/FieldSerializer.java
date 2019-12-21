@@ -1,7 +1,6 @@
-package com.direwolf20.buildinggadgets.common.config.fieldmap;
+package com.direwolf20.buildinggadgets.common.config.utils;
 
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
-import com.direwolf20.buildinggadgets.common.tools.ArrayUtils;
 import com.direwolf20.buildinggadgets.common.tools.NBTTool;
 import com.google.common.base.Preconditions;
 import net.minecraft.nbt.*;

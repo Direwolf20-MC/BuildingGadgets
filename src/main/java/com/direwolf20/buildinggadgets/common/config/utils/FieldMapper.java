@@ -1,25 +1,21 @@
-package com.direwolf20.buildinggadgets.common.config.fieldmap;
-
-import com.direwolf20.buildinggadgets.common.config.PatternList;
+package com.direwolf20.buildinggadgets.common.config.utils;
 
 import java.util.function.Function;
 
 /**
  * Class representing a bijective Function and it's reverse Function used to Mapping Field Types to other Types which can be
  * synced more easily.
+ *
+ * todo: remove in 1.14
+ *
  * The Value produced by {@link #mapToSync(Object)}will then be given to a {@link ITypeSerializer} to be serialized.
  * The value given to {@link #mapToField(Object)} will be the deserialized Value from an appropriate {@link ITypeSerializer}.
+ *
  * @param <FieldVal> The Type of Field this Mapper maps to
  * @param <SyncedVal> The Type of Synced Value this Mapper maps to
  */
 public class FieldMapper<FieldVal, SyncedVal> {
-    //public static final String BLOCK_LIST_MAPPER_ID = "Block List Mapper";
     public static final String PATTERN_LIST_MAPPER_ID = "Pattern List Mapper";
-    /*@SuppressWarnings("unchecked")
-    public static final FieldMapper<ImmutableList, String[]> BLOCK_LIST_MAPPER = of(
-            (list) -> ((ImmutableList<Block>)list).stream().map((b) -> Objects.requireNonNull(b.getRegistryName()).toString()).toArray(String[]::new),
-            (strings) -> Stream.of(strings).map(ResourceLocation::new).map(ForgeRegistries.BLOCKS::getValue).collect(ImmutableList.toImmutableList()),
-            ImmutableList.class,String[].class);*/
     public static final FieldMapper<PatternList, String[]> PATTERN_LIST_MAPPER = of(
             PatternList::toArray, PatternList::ofResourcePattern,
             PatternList.class, String[].class);
@@ -34,8 +30,7 @@ public class FieldMapper<FieldVal, SyncedVal> {
     }
 
     public static <FieldVal, SyncedVal> FieldMapper<FieldVal, SyncedVal> of(Function<FieldVal, SyncedVal> fieldToSync, Function<SyncedVal, FieldVal> syncToField, Class<FieldVal> fieldType, Class<SyncedVal> syncedType) {
-        return new FieldMapper<FieldVal, SyncedVal>(fieldToSync, syncToField, fieldType, syncedType) {
-        };
+        return new FieldMapper<FieldVal, SyncedVal>(fieldToSync, syncToField, fieldType, syncedType) {};
     }
 
     private FieldMapper(Function<FieldVal, SyncedVal> fieldToSync, Function<SyncedVal, FieldVal> syncToField, Class<FieldVal> fieldType, Class<SyncedVal> syncedType) {

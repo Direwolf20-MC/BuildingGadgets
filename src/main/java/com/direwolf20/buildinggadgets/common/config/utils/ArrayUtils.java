@@ -1,7 +1,9 @@
-package com.direwolf20.buildinggadgets.common.tools;
+package com.direwolf20.buildinggadgets.common.config.utils;
 
 /**
  * Utility class providing various Methods for boxing and unboxing arrays
+ *
+ * todo: remove in 1.14
  */
 public class ArrayUtils {
     public static byte[] asPrimitive(Byte[] ar) {
