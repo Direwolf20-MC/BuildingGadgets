@@ -90,7 +90,7 @@ public class ModeRadialMenu extends GuiScreen {
         ScreenPosition right = isDestruction ? ScreenPosition.TOP : ScreenPosition.RIGHT;
         ScreenPosition left = isDestruction ? ScreenPosition.BOTTOM : ScreenPosition.LEFT;
         if (isDestruction) {
-            addButton(new PositionedIconActionable("", "destroy.overlay", right, send -> {
+            addButton(new PositionedIconActionable("", "destroy_overlay", right, send -> {
                 if (send)
                     PacketHandler.INSTANCE.sendToServer(new PacketChangeRange());
 
@@ -121,7 +121,7 @@ public class ModeRadialMenu extends GuiScreen {
                 addButton(button);
                 conditionalButtons.add(button);
             }
-            GuiButton button = new PositionedIconActionable("", "connected_" + (isDestruction ? "area" : "surface"), right, send -> {
+            GuiButton button = new PositionedIconActionable("", "connected_area", right, send -> {
                 if (send)
                     PacketHandler.INSTANCE.sendToServer(new PacketToggleConnectedArea());
 
@@ -152,7 +152,7 @@ public class ModeRadialMenu extends GuiScreen {
             return GadgetGeneric.shouldRayTraceFluid(getGadget());
         }));
         if (tool.getItem() instanceof GadgetBuilding) {
-            addButton(new PositionedIconActionable("", "building.place_atop", right, send -> {
+            addButton(new PositionedIconActionable("", "building_place_atop", right, send -> {
                 if (send)
                     PacketHandler.INSTANCE.sendToServer(new PacketToggleBlockPlacement());
 
