@@ -6,6 +6,8 @@ import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.blocks.ModBlocks;
 import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
+import com.direwolf20.buildinggadgets.common.gadgets.history.HistoryEntry;
+import com.direwolf20.buildinggadgets.common.gadgets.history.HistoryStack;
 import com.direwolf20.buildinggadgets.common.tools.BlockMapIntState;
 import com.direwolf20.buildinggadgets.common.tools.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.tools.RayTraceHelper;
@@ -38,9 +40,11 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.BlockSnapshot;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.world.BlockEvent;
+import org.lwjgl.Sys;
 
 import javax.annotation.Nullable;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class GadgetDestruction extends GadgetGeneric {
 
@@ -100,40 +104,6 @@ public class GadgetDestruction extends GadgetGeneric {
             uuid = uid.toString();
         }
         return uuid;
-    }
-
-    public static void setAnchor(ItemStack stack, BlockPos pos) {
-        GadgetUtils.writePOSToNBT(stack, pos, "anchor");
-    }
-
-    public static BlockPos getAnchor(ItemStack stack) {
-        return GadgetUtils.getPOSFromNBT(stack, "anchor");
-    }
-
-    public static void setAnchorSide(ItemStack stack, EnumFacing side) {
-        NBTTagCompound tagCompound = stack.getTagCompound();
-        if (tagCompound == null) {
-            tagCompound = new NBTTagCompound();
-        }
-        if (side == null) {
-            if (tagCompound.getTag("anchorSide") != null) {
-                tagCompound.removeTag("anchorSide");
-                stack.setTagCompound(tagCompound);
-            }
-            return;
-        }
-        tagCompound.setString("anchorSide", side.getName());
-        stack.setTagCompound(tagCompound);
-    }
-
-    public static EnumFacing getAnchorSide(ItemStack stack) {
-        NBTTagCompound tagCompound = stack.getTagCompound();
-        if (tagCompound == null) {
-            return null;
-        }
-        String facing = tagCompound.getString("anchorSide");
-        if (facing.isEmpty()) return null;
-        return EnumFacing.byName(facing);
     }
 
     public static void setToolValue(ItemStack stack, int value, String valueName) {
@@ -213,100 +183,104 @@ public class GadgetDestruction extends GadgetGeneric {
         if (!world.isRemote) {
             if (!player.isSneaking()) {
                 RayTraceResult lookingAt = RayTraceHelper.rayTrace(player, GadgetGeneric.shouldRayTraceFluid(stack));
-                if (lookingAt == null && getAnchor(stack) == null) { //If we aren't looking at anything, exit
-                    return new ActionResult<ItemStack>(EnumActionResult.FAIL, stack);
-                }
-                BlockPos startBlock = (getAnchor(stack) == null) ? lookingAt.getBlockPos() : getAnchor(stack);
-                EnumFacing sideHit = (getAnchorSide(stack) == null) ? lookingAt.sideHit : getAnchorSide(stack);
-                clearArea(world, startBlock, sideHit, player, stack);
-                if (getAnchor(stack) != null) {
-                    setAnchor(stack, null);
-                    setAnchorSide(stack, null);
+
+                List<BlockPos> anchorPositions = GadgetUtils.getAnchor(stack);
+                if (lookingAt == null && anchorPositions.size() == 0)
+                    return new ActionResult<>(EnumActionResult.FAIL, stack);
+
+                clearArea(world, lookingAt, player, stack, anchorPositions);
+
+                // Clear the current anchor
+                if (anchorPositions.size() > 0) {
+                    GadgetUtils.setAnchor(stack, new ArrayList<>());
                     player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.anchorremove").getUnformattedComponentText()), true);
                 }
             }
         } else {
             if (player.isSneaking()) {
                 player.openGui(BuildingGadgets.instance, GuiProxy.DestructionID, world, hand.ordinal(), 0, 0);
-                return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);
+                return new ActionResult<>(EnumActionResult.SUCCESS, stack);
             }
         }
-        return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);
+
+        return new ActionResult<>(EnumActionResult.SUCCESS, stack);
     }
 
-    public static void anchorBlocks(EntityPlayer player, ItemStack stack) {
-        BlockPos currentAnchor = getAnchor(stack);
-        if (currentAnchor == null) {
-            RayTraceResult lookingAt = RayTraceHelper.rayTrace(player, GadgetGeneric.shouldRayTraceFluid(stack));
-            if (lookingAt == null) {
+    public void clearArea(World world, RayTraceResult rayTraceResult, EntityPlayer player, ItemStack stack, List<BlockPos> anchorPositions) {
+        List<BlockPos> posList = getArea(world, rayTraceResult, player, stack, anchorPositions);
+
+        HistoryStack historyStack = new HistoryStack();
+        posList.forEach(blockPos -> {
+            TileEntity te = world.getTileEntity(blockPos);
+            IBlockState state = world.getBlockState(blockPos);
+
+            // Don't push to the stack if you can't do it
+            if( !destroyBlock(world, blockPos, player) )
                 return;
-            }
-            currentAnchor = lookingAt.getBlockPos();
-            setAnchor(stack, currentAnchor);
-            setAnchorSide(stack, lookingAt.sideHit);
-            player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.anchorrender").getUnformattedComponentText()), true);
-        } else {
-            setAnchor(stack, null);
-            setAnchorSide(stack, null);
-            player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.anchorremove").getUnformattedComponentText()), true);
-        }
+
+            historyStack.getHistory().add(new HistoryEntry(
+                    blockPos,
+                    state,
+                    te instanceof ConstructionBlockTileEntity
+                            ? ((ConstructionBlockTileEntity) te).getActualBlockState()
+                            : null
+            ));
+        });
+
+        // Don't continue if nothing was broken...
+        if( historyStack.getHistory().size() == 0 )
+            return;
+
+        WorldSave worldSave = WorldSave.getWorldSaveDestruction(world);
+        NBTTagCompound tagCompound = new NBTTagCompound();
+        String UUID = getUUID(stack);
+        if( UUID == null )
+            return;
+
+        tagCompound.setTag("history", historyStack.serialize());
+        tagCompound.setInteger("dim", player.dimension);
+        tagCompound.setString("UUID", UUID);
+
+        worldSave.addToMap(UUID, tagCompound);
+        worldSave.markForSaving();
     }
 
-    public static SortedSet<BlockPos> getArea(World world, BlockPos pos, EnumFacing incomingSide, EntityPlayer player, ItemStack stack) {
+    public static List<BlockPos> getArea(World world, RayTraceResult rayTraceResult, EntityPlayer player, ItemStack stack, List<BlockPos> existing) {
+        // Avoid doing computation when an anchor is in place.
+        if( existing != null && existing.size() > 0 )
+            return existing;
+
+        if( rayTraceResult == null )
+            return new ArrayList<>();
+
         SortedSet<BlockPos> voidPositions = new TreeSet<>(Comparator.comparingInt(Vec3i::getX).thenComparingInt(Vec3i::getY).thenComparingInt(Vec3i::getZ));
         int depth = getToolValue(stack, "depth");
         if (depth == 0)
-            return voidPositions;
+            return new ArrayList<>();
 
-        BlockPos startPos = (getAnchor(stack) == null) ? pos : getAnchor(stack);
-        EnumFacing side = (getAnchorSide(stack) == null) ? incomingSide : getAnchorSide(stack);
-        List<EnumFacing> directions = assignDirections(side, player);
-        IBlockState stateTarget = !SyncedConfig.nonFuzzyEnabledDestruction || GadgetGeneric.getFuzzy(stack) ? null : world.getBlockState(pos);
-        if (GadgetGeneric.getConnectedArea(stack)) {
-            String[] directionNames = new String[] {"right", "left", "up", "down", "depth"};
-            AxisAlignedBB area = new AxisAlignedBB(pos);
-            for (int i = 0; i < directionNames.length; i++)
-                area = area.union(new AxisAlignedBB(pos.offset(directions.get(i), getToolValue(stack, directionNames[i]) - (i == 4 ? 1 : 0))));
+        BlockPos startPos = rayTraceResult.getBlockPos();
 
-            addConnectedCoords(world, player, startPos, stateTarget, voidPositions,
-                    (int) area.minX, (int) area.minY, (int) area.minZ, (int) area.maxX - 1, (int) area.maxY - 1, (int) area.maxZ - 1);
-        } else {
-            int left = -getToolValue(stack, "left");
-            int right = getToolValue(stack, "right");
-            int down = -getToolValue(stack, "down");
-            int up = getToolValue(stack, "up");
-            for (int d = 0; d < depth; d++) {
-                for (int x = left; x <= right; x++) {
-                    for (int y = down; y <= up; y++) {
-                        BlockPos voidPos = new BlockPos(startPos);
-                        voidPos = voidPos.offset(directions.get(0), x);
-                        voidPos = voidPos.offset(directions.get(2), y);
-                        voidPos = voidPos.offset(directions.get(4), d);
-                        if (validBlock(world, voidPos, player, stateTarget))
-                            voidPositions.add(voidPos);
-                    }
+        List<EnumFacing> directions = assignDirections(rayTraceResult.sideHit, player);
+        IBlockState stateTarget = !SyncedConfig.nonFuzzyEnabledDestruction || GadgetGeneric.getFuzzy(stack) ? null : world.getBlockState(startPos);
+
+        int left = -getToolValue(stack, "left");
+        int right = getToolValue(stack, "right");
+        int down = -getToolValue(stack, "down");
+        int up = getToolValue(stack, "up");
+        for (int d = 0; d < depth; d++) {
+            for (int x = left; x <= right; x++) {
+                for (int y = down; y <= up; y++) {
+                    BlockPos voidPos = new BlockPos(startPos);
+                    voidPos = voidPos.offset(directions.get(0), x);
+                    voidPos = voidPos.offset(directions.get(2), y);
+                    voidPos = voidPos.offset(directions.get(4), d);
+                    if (validBlock(world, voidPos, player, stateTarget))
+                        voidPositions.add(voidPos);
                 }
             }
         }
-        return voidPositions;
-    }
 
-    public static void addConnectedCoords(World world, EntityPlayer player, BlockPos loc, IBlockState state,
-            SortedSet<BlockPos> coords, int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
-        if (coords.contains(loc) || loc.getX() < minX || loc.getY() < minY || loc.getZ() < minZ || loc.getX() > maxX || loc.getY() > maxY || loc.getZ() > maxZ)
-            return;
-
-        if (!validBlock(world, loc, player, state))
-            return;
-
-        coords.add(loc);
-        for (int x = -1; x <= 1; x++) {
-            for (int y = -1; y <= 1; y++) {
-                for (int z = -1; z <= 1; z++) {
-                    addConnectedCoords(world, player, loc.add(x, y, z), state, coords, minX, minY, minZ, maxX, maxY, maxZ);
-                }
-            }
-        }
+        return new ArrayList<>(voidPositions);
     }
 
     public static boolean validBlock(World world, BlockPos voidPos, EntityPlayer player, @Nullable IBlockState stateTarget) {
@@ -341,116 +315,30 @@ public class GadgetDestruction extends GadgetGeneric {
         return true;
     }
 
-    public void clearArea(World world, BlockPos pos, EnumFacing side, EntityPlayer player, ItemStack stack) {
-        SortedSet<BlockPos> voidPosArray = getArea(world, pos, side, player, stack);
-        Map<BlockPos, IBlockState> posStateMap = new HashMap<BlockPos, IBlockState>();
-        Map<BlockPos, IBlockState> pasteStateMap = new HashMap<BlockPos, IBlockState>();
-        for (BlockPos voidPos : voidPosArray) {
-            IBlockState blockState = world.getBlockState(voidPos);
-            IBlockState pasteState = Blocks.AIR.getDefaultState();
-            if (blockState.getBlock() == ModBlocks.constructionBlock) {
-                TileEntity te = world.getTileEntity(voidPos);
-                if (te instanceof ConstructionBlockTileEntity) {
-                    pasteState = ((ConstructionBlockTileEntity) te).getActualBlockState();
-                }
-            }
-            boolean success = destroyBlock(world, voidPos, player);
-            if (success)
-                posStateMap.put(voidPos, blockState);
-            if (pasteState != Blocks.AIR.getDefaultState()) {
-                pasteStateMap.put(voidPos, pasteState);
-            }
-        }
-        if (posStateMap.size() > 0) {
-            BlockPos startPos = (getAnchor(stack) == null) ? pos : getAnchor(stack);
-            storeUndo(world, posStateMap, pasteStateMap, startPos, stack, player);
-        }
-    }
-
-    public static void storeUndo(World world, Map<BlockPos, IBlockState> posStateMap, Map<BlockPos, IBlockState> pasteStateMap, BlockPos startBlock, ItemStack stack, EntityPlayer player) {
-        WorldSave worldSave = WorldSave.getWorldSaveDestruction(world);
-        NBTTagCompound tagCompound = new NBTTagCompound();
-        List<Integer> posIntArrayList = new ArrayList<Integer>();
-        List<Integer> stateIntArrayList = new ArrayList<Integer>();
-        List<Integer> pastePosArrayList = new ArrayList<Integer>();
-        List<Integer> pasteStateArrayList = new ArrayList<Integer>();
-        BlockMapIntState blockMapIntState = new BlockMapIntState();
-        String UUID = getUUID(stack);
-
-        for (Map.Entry<BlockPos, IBlockState> entry : posStateMap.entrySet()) {
-            posIntArrayList.add(GadgetUtils.relPosToInt(startBlock, entry.getKey()));
-            blockMapIntState.addToMap(entry.getValue());
-            stateIntArrayList.add((int) blockMapIntState.findSlot(entry.getValue()));
-            if (pasteStateMap.containsKey(entry.getKey())) {
-                pastePosArrayList.add(GadgetUtils.relPosToInt(startBlock, entry.getKey()));
-                IBlockState pasteBlockState = pasteStateMap.get(entry.getKey());
-                blockMapIntState.addToMap(pasteBlockState);
-                pasteStateArrayList.add((int) blockMapIntState.findSlot(pasteBlockState));
-            }
-        }
-        tagCompound.setTag("mapIntState", blockMapIntState.putIntStateMapIntoNBT());
-        int[] posIntArray = posIntArrayList.stream().mapToInt(i -> i).toArray();
-        int[] stateIntArray = stateIntArrayList.stream().mapToInt(i -> i).toArray();
-        int[] posPasteArray = pastePosArrayList.stream().mapToInt(i -> i).toArray();
-        int[] statePasteArray = pasteStateArrayList.stream().mapToInt(i -> i).toArray();
-        tagCompound.setIntArray("posIntArray", posIntArray);
-        tagCompound.setIntArray("stateIntArray", stateIntArray);
-        tagCompound.setIntArray("posPasteArray", posPasteArray);
-        tagCompound.setIntArray("statePasteArray", statePasteArray);
-        tagCompound.setTag("startPos", NBTUtil.createPosTag(startBlock));
-        tagCompound.setInteger("dim", player.dimension);
-        tagCompound.setString("UUID", UUID);
-        worldSave.addToMap(UUID, tagCompound);
-        worldSave.markForSaving();
-    }
-
     public void undo(EntityPlayer player, ItemStack stack) {
         World world = player.world;
+
         WorldSave worldSave = WorldSave.getWorldSaveDestruction(world);
         NBTTagCompound tagCompound = worldSave.getCompoundFromUUID(getUUID(stack));
-        if (tagCompound == null) return;
-        BlockPos startPos = NBTUtil.getPosFromTag(tagCompound.getCompoundTag("startPos"));
-        if (startPos == null) return;
-        int[] posIntArray = tagCompound.getIntArray("posIntArray");
-        int[] stateIntArray = tagCompound.getIntArray("stateIntArray");
-        int[] posPasteArray = tagCompound.getIntArray("posPasteArray");
-        int[] statePasteArray = tagCompound.getIntArray("statePasteArray");
-
-        NBTTagList MapIntStateTag = (NBTTagList) tagCompound.getTag("mapIntState");
-        if (MapIntStateTag == null) {
+        if (tagCompound == null || !tagCompound.hasKey("history"))
             return;
-        }
-        BlockMapIntState MapIntState = new BlockMapIntState();
-        MapIntState.getIntStateMapFromNBT(MapIntStateTag);
-        boolean success = false;
-        for (int i = 0; i < posIntArray.length; i++) {
-            BlockPos placePos = GadgetUtils.relIntToPos(startPos, posIntArray[i]);
-            IBlockState currentState = world.getBlockState(placePos);
-            if (currentState.getMaterial() == Material.AIR || currentState.getMaterial().isLiquid()) {
-                IBlockState placeState = MapIntState.getStateFromSlot((short) stateIntArray[i]);
-                if (placeState.getBlock() == ModBlocks.constructionBlock) {
-                    IBlockState pasteState = Blocks.AIR.getDefaultState();
-                    for (int j = 0; j < posPasteArray.length; j++) {
-                        if (posPasteArray[j] == posIntArray[i]) {
-                            pasteState = MapIntState.getStateFromSlot((short) statePasteArray[j]);
-                            break;
-                        }
-                    }
-                    if (pasteState != Blocks.AIR.getDefaultState()) {
-                        world.spawnEntity(new BlockBuildEntity(world, placePos, player, pasteState, 1, pasteState, true));
-                        success = true;
-                    }
-                } else {
-                    world.spawnEntity(new BlockBuildEntity(world, placePos, player, placeState, 1, placeState, false));
-                    success = true;
-                }
-            }
-        }
-        if (success) {
-            NBTTagCompound newTag = new NBTTagCompound();
-            worldSave.addToMap(getUUID(stack), newTag);
-            worldSave.markForSaving();
-        }
+
+        HistoryStack historyStack = new HistoryStack();
+        historyStack.deserialize(tagCompound.getCompoundTag("history"));
+
+        historyStack.getHistory().forEach(entry -> {
+            IBlockState existingState = world.getBlockState(entry.getPos());
+            if( existingState.getMaterial() != Material.AIR && !existingState.getMaterial().isLiquid() )
+                return;
+
+            IBlockState pasteState = entry.getPasteState();
+            IBlockState setState = pasteState == null ? entry.getState() : pasteState;
+
+            world.spawnEntity(new BlockBuildEntity(world, entry.getPos(), player, setState, 1, setState, pasteState != null));
+        });
+
+        worldSave.addToMap(getUUID(stack), new NBTTagCompound());
+        worldSave.markForSaving();
     }
 
     private boolean destroyBlock(World world, BlockPos voidPos, EntityPlayer player) {

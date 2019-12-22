@@ -32,7 +32,7 @@ public class ExchangerRender extends AbstractRender {
     private static final MockBuildingWorld mockBuildingWorld = new MockBuildingWorld();
 
     @Override
-    public void gadgetRender(Tessellator tessellator, BufferBuilder bufferBuilder, RayTraceResult rayTraceResult, IBlockState traceBlock, ItemStack gadget, List<BlockPos> existingLocations) {
+    public void gadgetRender(Tessellator tessellator, BufferBuilder bufferBuilder, RayTraceResult rayTraceResult, ItemStack gadget, List<BlockPos> existingLocations) {
         IBlockState renderBlockState = GadgetUtils.getToolBlock(gadget);
 
         //Don't render anything if there is no block selected (Air)
@@ -41,7 +41,7 @@ public class ExchangerRender extends AbstractRender {
 
         List<BlockPos> locations = existingLocations.size() != 0
                 ? existingLocations
-                : GadgetExchanger.getToolMode(gadget).getMode().getCollection(mc.player, mc.player.world, renderBlockState, rayTraceResult.getBlockPos(), mc.player.getPosition(), rayTraceResult.sideHit, GadgetUtils.getToolRange(gadget), false, GadgetBuilding.getFuzzy(gadget));
+                : GadgetExchanger.getToolMode(gadget).getMode().getCollection(mc.player, mc.player.world, renderBlockState, rayTraceResult.getBlockPos(), rayTraceResult.sideHit, GadgetUtils.getToolRange(gadget), false, GadgetBuilding.getFuzzy(gadget));
 
         //Prepare the fake world -- using a fake world lets us render things properly, like fences connecting.
         Set<BlockPos> coords = new HashSet<>(locations);

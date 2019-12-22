@@ -2,7 +2,6 @@ package com.direwolf20.buildinggadgets.common.gadgets;
 
 import com.direwolf20.buildinggadgets.common.blocks.ModBlocks;
 import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
-import com.direwolf20.buildinggadgets.common.config.utils.NBTTool;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.common.gadgets.building.BuildingModes;
 import com.direwolf20.buildinggadgets.common.items.MockBuildingWorld;
@@ -169,7 +168,7 @@ public class GadgetBuilding extends GadgetGeneric {
                 return false;
 
             coords = GadgetBuilding.getToolMode(stack).getMode().getCollection(
-                    player, world, setBlock, lookingAt.getBlockPos(), player.getPosition(), lookingAt.sideHit, getToolRange(stack), shouldPlaceAtop(stack), getFuzzy(stack)
+                    player, world, setBlock, lookingAt.getBlockPos(), lookingAt.sideHit, getToolRange(stack), shouldPlaceAtop(stack), getFuzzy(stack)
             );
         } else { //If we do have an anchor, erase it (Even if the build fails)
             setAnchor(stack, new ArrayList<>());

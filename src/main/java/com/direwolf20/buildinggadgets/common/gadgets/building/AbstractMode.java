@@ -27,7 +27,7 @@ public abstract class AbstractMode {
      * Gets the collection with filters applied stopping us having to handle the filters in the actual collection
      * method from having to handle the world etc.
      */
-    public List<BlockPos> getCollection(EntityPlayer player, World world, IBlockState setBlock, BlockPos start, BlockPos playerPos, EnumFacing side, int range, boolean placeOnTop, boolean isFuzzy) {
+    public List<BlockPos> getCollection(EntityPlayer player, World world, IBlockState setBlock, BlockPos start, EnumFacing side, int range, boolean placeOnTop, boolean isFuzzy) {
         BlockPos startPos = this.withOffset(start, side, placeOnTop);
 
         // We don't need this unless we're using the exchanger but I also don't want to
@@ -35,7 +35,7 @@ public abstract class AbstractMode {
         IBlockState lookingAtState = isExchanging() ? world.getBlockState(startPos) : null;
 
         // We alternate the validator as the exchanger requires a more in-depth validation process.
-        return collect(player, playerPos, side, range, startPos)
+        return collect(player, player.getPosition(), side, range, startPos)
                 .stream()
                 .filter(e -> isExchanging ? this.exchangingValidator(world, e, lookingAtState, setBlock, isFuzzy) : this.validator(world, e, start, setBlock, isFuzzy))
                 .collect(Collectors.toList());

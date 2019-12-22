@@ -154,8 +154,8 @@ public class ModeRadialMenu extends GuiScreen {
             ItemStack stack = getGadget();
             if (stack.getItem() instanceof GadgetCopyPaste)
                 return GadgetCopyPaste.getAnchor(stack) != null;
-            else if (stack.getItem() instanceof GadgetDestruction)
-                return GadgetDestruction.getAnchor(stack) != null;
+//            else if (stack.getItem() instanceof GadgetDestruction)
+//                return GadgetDestruction.getAnchor(stack) != null;
 
             return !GadgetUtils.getAnchor(stack).isEmpty();
         }));

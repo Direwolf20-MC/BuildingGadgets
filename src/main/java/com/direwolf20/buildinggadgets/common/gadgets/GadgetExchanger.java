@@ -177,7 +177,7 @@ public class GadgetExchanger extends GadgetGeneric {
                 return false;
             }
 
-            coords = GadgetExchanger.getToolMode(stack).getMode().getCollection(player, world, setBlock, lookingAt.getBlockPos(), player.getPosition(), lookingAt.sideHit, range, false, fuzzyMode);
+            coords = GadgetExchanger.getToolMode(stack).getMode().getCollection(player, world, setBlock, lookingAt.getBlockPos(), lookingAt.sideHit, range, false, fuzzyMode);
         } else { //If we do have an anchor, erase it (Even if the build fails)
             setAnchor(stack, new ArrayList<>());
         }

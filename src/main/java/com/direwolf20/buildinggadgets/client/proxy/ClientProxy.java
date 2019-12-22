@@ -2,6 +2,7 @@ package com.direwolf20.buildinggadgets.client.proxy;
 
 import com.direwolf20.buildinggadgets.client.KeyBindings;
 import com.direwolf20.buildinggadgets.client.renders.BuildingRender;
+import com.direwolf20.buildinggadgets.client.renders.DestructionRender;
 import com.direwolf20.buildinggadgets.client.renders.ExchangerRender;
 import com.direwolf20.buildinggadgets.common.blocks.ModBlocks;
 import com.direwolf20.buildinggadgets.common.blocks.Models.BakedModelLoader;
@@ -97,7 +98,7 @@ public class ClientProxy extends CommonProxy {
         } else if (heldItem.getItem() instanceof GadgetCopyPaste) {
             ToolRenders.renderPasteOverlay(evt, player, heldItem);
         } else if (heldItem.getItem() instanceof GadgetDestruction) {
-            ToolRenders.renderDestructionOverlay(evt, player, heldItem);
+            new DestructionRender().render(evt, player, heldItem);
         }
 
     }

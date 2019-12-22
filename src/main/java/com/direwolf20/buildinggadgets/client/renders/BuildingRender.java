@@ -1,7 +1,6 @@
 package com.direwolf20.buildinggadgets.client.renders;
 
 import com.direwolf20.buildinggadgets.common.gadgets.GadgetBuilding;
-import com.direwolf20.buildinggadgets.common.gadgets.building.BuildingModes;
 import com.direwolf20.buildinggadgets.common.items.MockBuildingWorld;
 import com.direwolf20.buildinggadgets.common.items.ModItems;
 import com.direwolf20.buildinggadgets.common.tools.GadgetUtils;
@@ -28,7 +27,7 @@ public class BuildingRender extends AbstractRender {
     private static final MockBuildingWorld mockBuildingWorld = new MockBuildingWorld();
     
     @Override
-    public void gadgetRender(Tessellator tessellator, BufferBuilder bufferBuilder, RayTraceResult rayTraceResult, IBlockState traceBlock, ItemStack gadget, List<BlockPos> existingLocations) {
+    public void gadgetRender(Tessellator tessellator, BufferBuilder bufferBuilder, RayTraceResult rayTraceResult, ItemStack gadget, List<BlockPos> existingLocations) {
         IBlockState renderBlockState = GadgetUtils.getToolBlock(gadget);
 
         // Don't render anything if there is no block selected (Air)
@@ -38,7 +37,7 @@ public class BuildingRender extends AbstractRender {
         // todo: replace with actual mode methods
         List<BlockPos> locations = existingLocations.size() != 0
                 ? existingLocations
-                : GadgetBuilding.getToolMode(gadget).getMode().getCollection(mc.player, mc.player.world, renderBlockState, rayTraceResult.getBlockPos(), mc.player.getPosition(), rayTraceResult.sideHit, GadgetUtils.getToolRange(gadget), GadgetBuilding.shouldPlaceAtop(gadget), GadgetBuilding.getFuzzy(gadget));
+                : GadgetBuilding.getToolMode(gadget).getMode().getCollection(mc.player, mc.player.world, renderBlockState, rayTraceResult.getBlockPos(), rayTraceResult.sideHit, GadgetUtils.getToolRange(gadget), GadgetBuilding.shouldPlaceAtop(gadget), GadgetBuilding.getFuzzy(gadget));
 
         IBlockState state = emptyBlockState;
         // Prepare the mock world using a mock world lets us render things properly, like fences connecting.

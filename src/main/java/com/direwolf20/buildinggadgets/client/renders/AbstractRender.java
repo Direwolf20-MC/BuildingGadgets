@@ -42,7 +42,7 @@ public abstract class AbstractRender {
 
     private static RemoteInventoryCache cacheInventory = new RemoteInventoryCache(false);
 
-    public abstract void gadgetRender(Tessellator tessellator, BufferBuilder bufferBuilder, RayTraceResult rayTraceResult, IBlockState traceBlock, ItemStack gadget, List<BlockPos> existingLocations);
+    public abstract void gadgetRender(Tessellator tessellator, BufferBuilder bufferBuilder, RayTraceResult rayTraceResult, ItemStack gadget, List<BlockPos> existingLocations);
 
     public void render(RenderWorldLastEvent evt, EntityPlayer player, ItemStack gadget) {
         Tessellator tessellator = Tessellator.getInstance();
@@ -65,16 +65,22 @@ public abstract class AbstractRender {
         if( dim != null && pos != null && dim == mc.player.dimension )
             renderSingleBlock(tessellator, bufferBuilder, pos, .94f, 1f, 0, .35f);
 
+
         // Validate that we should render
         RayTraceResult rayTraceResult = RayTraceHelper.rayTrace(mc.player, GadgetGeneric.shouldRayTraceFluid(gadget));
-        if( rayTraceResult != null && rayTraceResult.typeOfHit != RayTraceResult.Type.MISS) {
-            IBlockState traceBlock = mc.player.world.getBlockState(rayTraceResult.getBlockPos());
+        List<BlockPos> existingLocations = getAnchor(gadget);
 
-            if( traceBlock != effectBlockState ) {
-                List<BlockPos> existingLocations = getAnchor(gadget);
-                this.gadgetRender(tessellator, bufferBuilder, rayTraceResult, traceBlock, gadget, existingLocations);
+        // Perform a typical render
+        if( existingLocations.size() == 0 ) {
+            if( rayTraceResult != null && rayTraceResult.typeOfHit != RayTraceResult.Type.MISS) {
+                IBlockState traceBlock = mc.player.world.getBlockState(rayTraceResult.getBlockPos());
+
+                if( traceBlock != effectBlockState )
+                    this.gadgetRender(tessellator, bufferBuilder, rayTraceResult, gadget, existingLocations);
             }
         }
+        else
+            this.gadgetRender(tessellator, bufferBuilder, rayTraceResult, gadget, existingLocations); // render using anchor
 
         // Reset the majority of what we changed
         GlStateManager.translate(0, 0, 0);

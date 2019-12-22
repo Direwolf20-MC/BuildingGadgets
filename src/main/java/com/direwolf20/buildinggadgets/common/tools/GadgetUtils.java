@@ -11,7 +11,10 @@ import javax.annotation.Nullable;
 
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
+import com.direwolf20.buildinggadgets.common.gadgets.GadgetDestruction;
 import com.direwolf20.buildinggadgets.common.gadgets.GadgetGeneric;
+import com.direwolf20.buildinggadgets.common.gadgets.building.AbstractMode;
+import com.direwolf20.buildinggadgets.common.gadgets.building.BuildingModes;
 import com.direwolf20.buildinggadgets.common.integration.NetworkProvider;
 import com.direwolf20.buildinggadgets.common.gadgets.GadgetBuilding;
 import com.direwolf20.buildinggadgets.common.gadgets.GadgetExchanger;
@@ -326,12 +329,20 @@ public class GadgetUtils {
             if (startBlock == null || world.getBlockState(startBlock) == Blocks.AIR.getDefaultState()) { //If we are looking at air, exit
                 return false;
             }
+
             List<BlockPos> coords = new ArrayList<BlockPos>();
             if (stack.getItem() instanceof GadgetBuilding) {
-//                coords = BuildingModes.getBuildOrders(world, player, startBlock, sideHit, stack); //Build the positions list based on tool mode and range
+                coords = GadgetBuilding.getToolMode(stack).getMode().getCollection(
+                        player, world, GadgetUtils.getToolBlock(stack), startBlock, sideHit, GadgetUtils.getToolRange(stack), GadgetBuilding.shouldPlaceAtop(stack), GadgetBuilding.getFuzzy(stack)
+                ); //Build the positions list based on tool mode and range
             } else if (stack.getItem() instanceof GadgetExchanger) {
-//                coords = ExchangingModes.getBuildOrders(world, player, startBlock, sideHit, stack); //Build the positions list based on tool mode and range
+                coords = GadgetExchanger.getToolMode(stack).getMode().getCollection(
+                        player, world, GadgetUtils.getToolBlock(stack), startBlock, sideHit, GadgetUtils.getToolRange(stack), false, GadgetExchanger.getFuzzy(stack)
+                ); //Build the positions list based on tool mode and range
+            } else if(stack.getItem() instanceof GadgetDestruction) {
+                coords = GadgetDestruction.getArea(world, lookingAt, player, stack, currentCoords);
             }
+
             setAnchor(stack, coords); //Set the anchor NBT
             player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.anchorrender").getUnformattedComponentText()), true);
         } else {  //If theres already an anchor, remove it.
@@ -361,15 +372,16 @@ public class GadgetUtils {
     }
 
     /**
-     * Call {@link clearCachedRemoteInventory clearCachedRemoteInventory} when done using this method
+     * Call when done using this method
      */
     @Nullable
     public static IItemHandler getRemoteInventory(ItemStack tool, World world, EntityPlayer player, NetworkIO.Operation operation) {
         if (remoteInventorySupplier == null) {
             remoteInventorySupplier = Suppliers.memoizeWithExpiration(() -> {
                         Integer dim = getDIMFromNBT(tool, "boundTE");
-                        System.out.println("fffff");
-                        if (dim == null) return null;
+                        if (dim == null)
+                            return null;
+
                         BlockPos pos = getPOSFromNBT(tool, "boundTE");
                         return pos == null ? null : getRemoteInventory(pos, dim, world, player, operation);
                     }, 500, TimeUnit.MILLISECONDS);

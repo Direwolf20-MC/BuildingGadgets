@@ -31,7 +31,7 @@ public class PacketAnchor extends PacketEmpty {
             } else if (heldItem.getItem() instanceof GadgetCopyPaste) {
                 GadgetCopyPaste.anchorBlocks(playerEntity, heldItem);
             } else if (heldItem.getItem() instanceof GadgetDestruction) {
-                GadgetDestruction.anchorBlocks(playerEntity, heldItem);
+                GadgetUtils.anchorBlocks(playerEntity, heldItem);
             }
         }
     }
