@@ -38,7 +38,7 @@ public class BuildingRender extends AbstractRender {
         // todo: replace with actual mode methods
         List<BlockPos> locations = existingLocations.size() != 0
                 ? existingLocations
-                : BuildingModes.GRID.getMode().getCollection(mc.player, mc.player.world, renderBlockState, rayTraceResult.getBlockPos(), mc.player.getPosition(), rayTraceResult.sideHit, GadgetUtils.getToolRange(gadget), GadgetBuilding.shouldPlaceAtop(gadget), GadgetBuilding.getFuzzy(gadget));
+                : GadgetBuilding.getToolMode(gadget).getMode().getCollection(mc.player, mc.player.world, renderBlockState, rayTraceResult.getBlockPos(), mc.player.getPosition(), rayTraceResult.sideHit, GadgetUtils.getToolRange(gadget), GadgetBuilding.shouldPlaceAtop(gadget), GadgetBuilding.getFuzzy(gadget));
 
         IBlockState state = emptyBlockState;
         // Prepare the mock world using a mock world lets us render things properly, like fences connecting.

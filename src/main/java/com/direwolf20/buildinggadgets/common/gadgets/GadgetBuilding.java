@@ -3,6 +3,7 @@ package com.direwolf20.buildinggadgets.common.gadgets;
 import com.direwolf20.buildinggadgets.common.blocks.ModBlocks;
 import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
+import com.direwolf20.buildinggadgets.common.gadgets.building.BuildingModes;
 import com.direwolf20.buildinggadgets.common.items.MockBuildingWorld;
 import com.direwolf20.buildinggadgets.common.items.ModItems;
 import com.direwolf20.buildinggadgets.common.tools.*;
@@ -40,20 +41,6 @@ import static com.direwolf20.buildinggadgets.common.tools.GadgetUtils.*;
 public class GadgetBuilding extends GadgetGeneric {
     private static final MockBuildingWorld fakeWorld = new MockBuildingWorld();
 
-    public enum ToolMode {
-        BuildToMe, VerticalColumn, HorizontalColumn, VerticalWall, HorizontalWall, Stairs, Grid, Surface;
-        private static ToolMode[] vals = values();
-
-        @Override
-        public String toString() {
-            return formatName(name());
-        }
-
-        public ToolMode next() {
-            return vals[(this.ordinal() + 1) % vals.length];
-        }
-    }
-
     public GadgetBuilding() {
         super("buildingtool");
         setMaxDamage(SyncedConfig.durabilityBuilder);
@@ -74,7 +61,7 @@ public class GadgetBuilding extends GadgetGeneric {
         return SyncedConfig.damageCostBuilder;
     }
 
-    private static void setToolMode(ItemStack stack, ToolMode mode) {
+    private static void setToolMode(ItemStack stack, BuildingModes mode) {
         //Store the tool's mode in NBT as a string
         NBTTagCompound tagCompound = stack.getTagCompound();
         if (tagCompound == null) {
@@ -84,15 +71,15 @@ public class GadgetBuilding extends GadgetGeneric {
         stack.setTagCompound(tagCompound);
     }
 
-    public static ToolMode getToolMode(ItemStack stack) {
+    public static BuildingModes getToolMode(ItemStack stack) {
         NBTTagCompound tagCompound = stack.getTagCompound();
-        ToolMode mode = ToolMode.BuildToMe;
+        BuildingModes mode = BuildingModes.BUILD_TO_ME;
         if (tagCompound == null) {
             setToolMode(stack, mode);
             return mode;
         }
         try {
-            mode = ToolMode.valueOf(tagCompound.getString("mode"));
+            mode = BuildingModes.valueOf(tagCompound.getString("mode"));
         } catch (Exception e) {
             setToolMode(stack, mode);
         }
@@ -114,12 +101,13 @@ public class GadgetBuilding extends GadgetGeneric {
         //Add tool information to the tooltip
         super.addInformation(stack, world, list, b);
         list.add(TextFormatting.DARK_GREEN + I18n.format("tooltip.gadget.block") + ": " + getToolBlock(stack).getBlock().getLocalizedName());
-        ToolMode mode = getToolMode(stack);
-        list.add(TextFormatting.AQUA + I18n.format("tooltip.gadget.mode") + ": " + (mode == ToolMode.Surface && getConnectedArea(stack) ? I18n.format("tooltip.gadget.connected") + " " : "") + mode);
-        if (getToolMode(stack) != ToolMode.BuildToMe)
+        BuildingModes mode = getToolMode(stack);
+        list.add(TextFormatting.AQUA + I18n.format("tooltip.gadget.mode") + ": " + (mode == BuildingModes.SURFACE && getConnectedArea(stack) ? I18n.format("tooltip.gadget.connected") + " " : "") + mode);
+
+        if (getToolMode(stack) != BuildingModes.BUILD_TO_ME)
             list.add(TextFormatting.LIGHT_PURPLE + I18n.format("tooltip.gadget.range") + ": " + getToolRange(stack));
 
-        if (getToolMode(stack) == ToolMode.Surface)
+        if (getToolMode(stack) == BuildingModes.SURFACE)
             list.add(TextFormatting.GOLD + I18n.format("tooltip.gadget.fuzzy") + ": " + getFuzzy(stack));
 
         addInformationRayTraceFluid(list, stack);
@@ -148,13 +136,9 @@ public class GadgetBuilding extends GadgetGeneric {
         return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, itemstack);
     }
 
-    public void toggleMode(EntityPlayer player, ItemStack heldItem) {//TODO unused
-        setMode(player, heldItem, getToolMode(heldItem).next().ordinal());
-    }
-
     public void setMode(EntityPlayer player, ItemStack heldItem, int modeInt) {
-        //Called when we specify a mode with the radial menu
-        ToolMode mode = ToolMode.values()[modeInt];
+        // Called when we specify a mode with the radial menu
+        BuildingModes mode = BuildingModes.values()[modeInt];
         setToolMode(heldItem, mode);
         player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.toolmode").getUnformattedComponentText() + ": " + mode), true);
     }
@@ -162,7 +146,7 @@ public class GadgetBuilding extends GadgetGeneric {
     public void rangeChange(EntityPlayer player, ItemStack heldItem) {
         //Called when the range change hotkey is pressed
         int range = getToolRange(heldItem);
-        int changeAmount = (getToolMode(heldItem) != ToolMode.Surface || (range % 2 == 0)) ? 1 : 2;
+        int changeAmount = (getToolMode(heldItem) != BuildingModes.SURFACE || (range % 2 == 0)) ? 1 : 2;
         if (player.isSneaking())
             range = (range == 1) ? SyncedConfig.maxRange : range - changeAmount;
         else
@@ -177,17 +161,19 @@ public class GadgetBuilding extends GadgetGeneric {
         World world = player.world;
         List<BlockPos> coords = getAnchor(stack);
 
+        IBlockState setBlock = GadgetUtils.getToolBlock(stack);
         if (coords.size() == 0) {  //If we don't have an anchor, build in the current spot
             RayTraceResult lookingAt = RayTraceHelper.rayTrace(player, GadgetGeneric.shouldRayTraceFluid(stack));
-            if (lookingAt == null) { //If we aren't looking at anything, exit
+            if (lookingAt == null)
                 return false;
-            }
-            BlockPos startBlock = lookingAt.getBlockPos();
-            EnumFacing sideHit = lookingAt.sideHit;
-            coords = BuildingModes.getBuildOrders(world, player, startBlock, sideHit, stack);
+
+            coords = GadgetBuilding.getToolMode(stack).getMode().getCollection(
+                    player, world, setBlock, lookingAt.getBlockPos(), player.getPosition(), lookingAt.sideHit, getToolRange(stack), shouldPlaceAtop(stack), getFuzzy(stack)
+            );
         } else { //If we do have an anchor, erase it (Even if the build fails)
-            setAnchor(stack, new ArrayList<BlockPos>());
+            setAnchor(stack, new ArrayList<>());
         }
+
         List<BlockPos> undoCoords = new ArrayList<BlockPos>();
         Set<BlockPos> coordinates = new HashSet<BlockPos>(coords);
 

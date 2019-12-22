@@ -2,13 +2,13 @@ package com.direwolf20.buildinggadgets.common.gadgets.building;
 
 public enum BuildingModes {
     BUILD_TO_ME(new BuildToMeMode()),
-    SURFACE(new SurfaceMode(false)),
-    GRID(new GridMode(false)),
-    STAIR(new StairMode()),
     VERTICAL_COLUMN(new VerticalColumnMode(false)),
-    VERTICAL_WALL(new VerticalWallMode()),
     HORIZONTAL_COLUMN(new HorizontalColumnMode(false)),
-    HORIZONTAL_WALL(new HorizontalWallMode());
+    VERTICAL_WALL(new VerticalWallMode()),
+    HORIZONTAL_WALL(new HorizontalWallMode()),
+    STAIR(new StairMode()),
+    GRID(new GridMode(false)),
+    SURFACE(new SurfaceMode(false));
 
     AbstractMode mode;
     BuildingModes(AbstractMode mode) {
