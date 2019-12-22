@@ -3,7 +3,7 @@ package com.direwolf20.buildinggadgets.common.gadgets;
 import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
 import com.direwolf20.buildinggadgets.common.items.ItemModBase;
 import com.direwolf20.buildinggadgets.common.items.capability.CapabilityProviderEnergy;
-import com.direwolf20.buildinggadgets.common.tools.NBTTool;
+import com.direwolf20.buildinggadgets.common.config.utils.NBTTool;
 
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
@@ -147,38 +147,47 @@ public abstract class GadgetGeneric extends ItemModBase {
     }
 
     public static boolean getFuzzy(ItemStack stack) {
-        return NBTTool.getOrNewTag(stack).getBoolean("fuzzy");
+        return getOrNewTag(stack).getBoolean("fuzzy");
     }
 
     public static void toggleFuzzy(EntityPlayer player, ItemStack stack) {
-        NBTTool.getOrNewTag(stack).setBoolean("fuzzy", !getFuzzy(stack));
+        getOrNewTag(stack).setBoolean("fuzzy", !getFuzzy(stack));
         player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.fuzzymode").getUnformattedComponentText() + ": " + getFuzzy(stack)), true);
     }
 
     public static boolean getConnectedArea(ItemStack stack) {
-        return !NBTTool.getOrNewTag(stack).getBoolean("unconnectedarea");
+        return !getOrNewTag(stack).getBoolean("unconnectedarea");
     }
 
     public static void toggleConnectedArea(EntityPlayer player, ItemStack stack) {
-        NBTTool.getOrNewTag(stack).setBoolean("unconnectedarea", getConnectedArea(stack));
+        getOrNewTag(stack).setBoolean("unconnectedarea", getConnectedArea(stack));
         String suffix = stack.getItem() instanceof GadgetDestruction ? "area" : "surface";
         player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.connected" + suffix).getUnformattedComponentText() + ": " + getConnectedArea(stack)), true);
     }
 
     public static boolean shouldRayTraceFluid(ItemStack stack) {
-        return NBTTool.getOrNewTag(stack).getBoolean("raytrace_fluid");
+        return getOrNewTag(stack).getBoolean("raytrace_fluid");
     }
 
     public static void toggleRayTraceFluid(EntityPlayer player, ItemStack stack) {
-        NBTTool.getOrNewTag(stack).setBoolean("raytrace_fluid", !shouldRayTraceFluid(stack));
+        getOrNewTag(stack).setBoolean("raytrace_fluid", !shouldRayTraceFluid(stack));
         player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.raytrace_fluid").getUnformattedComponentText() + ": " + shouldRayTraceFluid(stack)), true);
     }
 
     public static void addInformationRayTraceFluid(List<String> tooltip, ItemStack stack) {
         tooltip.add(TextFormatting.BLUE + I18n.format("tooltip.gadget.raytrace_fluid") + ": " + shouldRayTraceFluid(stack));
     }
-    
-    protected static String formatName(String name) {
-        return name.replaceAll("(?=[A-Z])", " ").trim();
+
+    /**
+     * If the given stack has a tag, returns it. If the given stack does not have a tag, it will set a reference and return the new tag
+     * compound.
+     */
+    public static NBTTagCompound getOrNewTag(ItemStack stack) {
+        if (stack.hasTagCompound()) {
+            return stack.getTagCompound();
+        }
+        NBTTagCompound tag = new NBTTagCompound();
+        stack.setTagCompound(tag);
+        return tag;
     }
 }

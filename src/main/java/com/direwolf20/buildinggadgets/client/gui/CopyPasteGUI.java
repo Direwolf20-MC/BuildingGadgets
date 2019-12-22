@@ -60,8 +60,8 @@ public class CopyPasteGUI extends GuiScreen {
         super.initGui();
         startPos = ModItems.gadgetCopyPaste.getStartPos(copyPasteTool);
         endPos = ModItems.gadgetCopyPaste.getEndPos(copyPasteTool);
-        if (startPos == null) startPos = new BlockPos(0, 0, 0);
-        if (endPos == null) endPos = new BlockPos(0, 0, 0);
+        if (startPos == null) startPos = BlockPos.ORIGIN;
+        if (endPos == null) endPos = BlockPos.ORIGIN;
 
         startX = new GuiTextField(0, this.fontRenderer, this.guiLeft + 65, this.guiTop + 15, 40, this.fontRenderer.FONT_HEIGHT);
         startX.setMaxStringLength(50);

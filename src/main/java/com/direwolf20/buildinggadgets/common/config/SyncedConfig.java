@@ -7,7 +7,7 @@ import com.direwolf20.buildinggadgets.common.config.utils.FieldSerializer;
 import com.direwolf20.buildinggadgets.common.config.utils.PatternList;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.PacketSyncConfig;
-import com.direwolf20.buildinggadgets.common.tools.ReflectionTool;
+import com.direwolf20.buildinggadgets.common.config.utils.ReflectionTool;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;

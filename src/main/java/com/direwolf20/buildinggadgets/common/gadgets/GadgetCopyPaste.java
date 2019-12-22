@@ -423,7 +423,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
                                 }
                                 NonNullList<ItemStack> drops = NonNullList.create();
                                 if (actualState != null)
-                                    actualState.getBlock().getDrops(drops, world, new BlockPos(0, 0, 0), actualState, 0);
+                                    actualState.getBlock().getDrops(drops, world, BlockPos.ORIGIN, actualState, 0);
 
                                 int neededItems = 0;
                                 for (ItemStack drop : drops) {

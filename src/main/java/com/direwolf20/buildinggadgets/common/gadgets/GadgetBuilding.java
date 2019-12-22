@@ -2,6 +2,7 @@ package com.direwolf20.buildinggadgets.common.gadgets;
 
 import com.direwolf20.buildinggadgets.common.blocks.ModBlocks;
 import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
+import com.direwolf20.buildinggadgets.common.config.utils.NBTTool;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.common.gadgets.building.BuildingModes;
 import com.direwolf20.buildinggadgets.common.items.MockBuildingWorld;
@@ -87,11 +88,11 @@ public class GadgetBuilding extends GadgetGeneric {
     }
 
     public static boolean shouldPlaceAtop(ItemStack stack) {
-        return !NBTTool.getOrNewTag(stack).getBoolean("start_inside");
+        return !getOrNewTag(stack).getBoolean("start_inside");
     }
 
     public static void togglePlaceAtop(EntityPlayer player, ItemStack stack) {
-        NBTTool.getOrNewTag(stack).setBoolean("start_inside", shouldPlaceAtop(stack));
+        getOrNewTag(stack).setBoolean("start_inside", shouldPlaceAtop(stack));
         String prefix = "message.gadget.building.placement";
         player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation(prefix, new TextComponentTranslation(prefix + (shouldPlaceAtop(stack) ? ".atop" : ".inside"))).getUnformattedComponentText()), true);
     }

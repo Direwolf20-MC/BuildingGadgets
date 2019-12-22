@@ -2,6 +2,7 @@ package com.direwolf20.buildinggadgets.common.gadgets;
 
 import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
+import com.direwolf20.buildinggadgets.common.gadgets.building.ExchangingModes;
 import com.direwolf20.buildinggadgets.common.items.MockBuildingWorld;
 import com.direwolf20.buildinggadgets.common.items.ModItems;
 import com.direwolf20.buildinggadgets.common.tools.GadgetUtils;
@@ -44,20 +45,6 @@ import static com.direwolf20.buildinggadgets.common.tools.GadgetUtils.*;
 
 public class GadgetExchanger extends GadgetGeneric {
     public static final MockBuildingWorld fakeWorld = new MockBuildingWorld();
-
-    public enum ToolMode {
-        Surface, VerticalColumn, HorizontalColumn, Grid;
-        private static ToolMode[] vals = values();//TODO unused
-
-        @Override
-        public String toString() {
-            return formatName(name());
-        }
-
-        public ToolMode next() {//TODO unused
-            return vals[(this.ordinal() + 1) % vals.length];
-        }
-    }
 
     public GadgetExchanger() {
         super("exchangertool");
@@ -105,7 +92,7 @@ public class GadgetExchanger extends GadgetGeneric {
         return super.canApplyAtEnchantingTable(stack, enchantment);
     }
 
-    private static void setToolMode(ItemStack stack, ToolMode mode) {
+    private static void setToolMode(ItemStack stack, ExchangingModes mode) {
         NBTTagCompound tagCompound = stack.getTagCompound();
         if (tagCompound == null) {
             tagCompound = new NBTTagCompound();
@@ -114,15 +101,15 @@ public class GadgetExchanger extends GadgetGeneric {
         stack.setTagCompound(tagCompound);
     }
 
-    public static ToolMode getToolMode(ItemStack stack) {
+    public static ExchangingModes getToolMode(ItemStack stack) {
         NBTTagCompound tagCompound = stack.getTagCompound();
-        ToolMode mode = ToolMode.Surface;
+        ExchangingModes mode = SURFACE;
         if (tagCompound == null) {
             setToolMode(stack, mode);
             return mode;
         }
         try {
-            mode = ToolMode.valueOf(tagCompound.getString("mode"));
+            mode = ExchangingModes.valueOf(tagCompound.getString("mode"));
         } catch (Exception e) {
             setToolMode(stack, mode);
         }
@@ -133,8 +120,8 @@ public class GadgetExchanger extends GadgetGeneric {
     public void addInformation(ItemStack stack, @Nullable World world, List<String> list, ITooltipFlag b) {
         super.addInformation(stack, world, list, b);
         list.add(TextFormatting.DARK_GREEN + I18n.format("tooltip.gadget.block") + ": " + getToolBlock(stack).getBlock().getLocalizedName());
-        ToolMode mode = getToolMode(stack);
-        list.add(TextFormatting.AQUA + I18n.format("tooltip.gadget.mode") + ": " + (mode == ToolMode.Surface && getConnectedArea(stack) ? I18n.format("tooltip.gadget.connected") + " " : "") + mode);
+        ExchangingModes mode = getToolMode(stack);
+        list.add(TextFormatting.AQUA + I18n.format("tooltip.gadget.mode") + ": " + (mode == SURFACE && getConnectedArea(stack) ? I18n.format("tooltip.gadget.connected") + " " : "") + mode);
         list.add(TextFormatting.LIGHT_PURPLE + I18n.format("tooltip.gadget.range") + ": " + getToolRange(stack));
         list.add(TextFormatting.GOLD + I18n.format("tooltip.gadget.fuzzy") + ": " + getFuzzy(stack));
         addInformationRayTraceFluid(list, stack);
@@ -154,23 +141,19 @@ public class GadgetExchanger extends GadgetGeneric {
         } else if (!player.isSneaking()) {
             ToolRenders.updateInventoryCache();
         }
-        return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, itemstack);
-    }
-
-    public void toggleMode(EntityPlayer player, ItemStack heldItem) {//TODO unused
-        setToolMode(heldItem, getToolMode(heldItem).next());
+        return new ActionResult<>(EnumActionResult.SUCCESS, itemstack);
     }
 
     public void setMode(EntityPlayer player, ItemStack heldItem, int modeInt) {
         //Called when we specify a mode with the radial menu
-        ToolMode mode = ToolMode.values()[modeInt];
+        ExchangingModes mode = ExchangingModes.values()[modeInt];
         setToolMode(heldItem, mode);
         player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.toolmode").getUnformattedComponentText() + ": " + mode), true);
     }
 
     public void rangeChange(EntityPlayer player, ItemStack heldItem) {
         int range = getToolRange(heldItem);
-        int changeAmount = (getToolMode(heldItem) == ToolMode.Grid || (range % 2 == 0)) ? 1 : 2;
+        int changeAmount = (getToolMode(heldItem) == ExchangingModes.GRID || (range % 2 == 0)) ? 1 : 2;
         if (player.isSneaking()) {
             range = (range <= 1) ? SyncedConfig.maxRange : range - changeAmount;
         } else {
@@ -193,15 +176,12 @@ public class GadgetExchanger extends GadgetGeneric {
             if (lookingAt == null) { //If we aren't looking at anything, exit
                 return false;
             }
-            BlockPos startBlock = lookingAt.getBlockPos();
-            EnumFacing sideHit = lookingAt.sideHit;
-//            IBlockState setBlock = getToolBlock(stack);
-//            coords = ExchangingModes.getBuildOrders(world, player, startBlock, sideHit, stack);
-            coords = SURFACE.getMode().getCollection(player, world, setBlock, lookingAt.getBlockPos(), player.getPosition(), lookingAt.sideHit, range, false, fuzzyMode);
+
+            coords = GadgetExchanger.getToolMode(stack).getMode().getCollection(player, world, setBlock, lookingAt.getBlockPos(), player.getPosition(), lookingAt.sideHit, range, false, fuzzyMode);
         } else { //If we do have an anchor, erase it (Even if the build fails)
-            setAnchor(stack, new ArrayList<BlockPos>());
+            setAnchor(stack, new ArrayList<>());
         }
-        Set<BlockPos> coordinates = new HashSet<BlockPos>(coords);
+        Set<BlockPos> coordinates = new HashSet<>(coords);
 
         ItemStack heldItem = getGadget(player);
         if (heldItem.isEmpty())

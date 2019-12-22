@@ -12,6 +12,7 @@ import com.direwolf20.buildinggadgets.common.ModSounds;
 import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
 import com.direwolf20.buildinggadgets.common.gadgets.*;
 import com.direwolf20.buildinggadgets.common.gadgets.building.BuildingModes;
+import com.direwolf20.buildinggadgets.common.gadgets.building.ExchangingModes;
 import com.direwolf20.buildinggadgets.common.network.PacketChangeRange;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.*;
@@ -37,8 +38,10 @@ import org.lwjgl.util.vector.Vector2f;
 import java.awt.*;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class ModeRadialMenu extends GuiScreen {
 
@@ -78,7 +81,7 @@ public class ModeRadialMenu extends GuiScreen {
         if (stack.getItem() instanceof GadgetBuilding)
             segments = BuildingModes.values().length;
         else if (stack.getItem() instanceof GadgetExchanger)
-            segments = GadgetExchanger.ToolMode.values().length;
+            segments = ExchangingModes.values().length;
         else if (stack.getItem() instanceof GadgetCopyPaste)
             segments = GadgetCopyPaste.ToolMode.values().length;
     }
@@ -334,11 +337,13 @@ public class ModeRadialMenu extends GuiScreen {
 
             String name = "";
             if (tool.getItem() instanceof GadgetBuilding)
-                name = BuildingModes.values()[i].toString();
+                name = BuildingModes.values()[i].name();
             else if (tool.getItem() instanceof GadgetExchanger)
-                name = GadgetExchanger.ToolMode.values()[i].toString();
+                name = ExchangingModes.values()[i].name();
             else
-                name = GadgetCopyPaste.ToolMode.values()[i].toString();
+                name = GadgetCopyPaste.ToolMode.values()[i].name();
+
+            name = formatName(name);
 
             int xsp = xp - 4;
             int ysp = yp;
@@ -439,7 +444,7 @@ public class ModeRadialMenu extends GuiScreen {
             if (builder)
                 curent = GadgetBuilding.getToolMode(tool) == BuildingModes.SURFACE;
             else
-                curent = i == 0 || GadgetExchanger.getToolMode(tool) == GadgetExchanger.ToolMode.Surface;
+                curent = i == 0 || GadgetExchanger.getToolMode(tool) == ExchangingModes.SURFACE;
 
             if (button.visible != curent) {
                 button.visible = curent;
@@ -463,8 +468,8 @@ public class ModeRadialMenu extends GuiScreen {
         return my < y ? 360F - ang : ang;
     }
 
-    public static enum ScreenPosition {
-        RIGHT, LEFT, BOTTOM, TOP;
+    public enum ScreenPosition {
+        RIGHT, LEFT, BOTTOM, TOP
     }
 
     private static class PositionedIconActionable extends GuiIconActionable {
@@ -479,5 +484,9 @@ public class ModeRadialMenu extends GuiScreen {
         PositionedIconActionable(String message, String icon, ScreenPosition position, Predicate<Boolean> action) {
             this(message, icon, position, true, action);
         }
+    }
+
+    protected static String formatName(String name) {
+        return Arrays.stream(name.split("_")).map(e -> (e.toCharArray()[0] + e.toLowerCase().substring(1)) + " ").collect(Collectors.joining());
     }
 }

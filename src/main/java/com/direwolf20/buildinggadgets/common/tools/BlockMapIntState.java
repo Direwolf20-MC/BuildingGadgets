@@ -145,7 +145,7 @@ public class BlockMapIntState {
         intStackMap.clear();
         for (Map.Entry<Short, IBlockState> entry : intStateMap.entrySet()) {
             try {
-                intStackMap.put(entry.getValue(), blockStateToUniqueItem(entry.getValue(), player, new BlockPos(0, 0, 0)));
+                intStackMap.put(entry.getValue(), blockStateToUniqueItem(entry.getValue(), player, BlockPos.ORIGIN));
             } catch (IllegalArgumentException e) {
             }
         }

@@ -62,7 +62,7 @@ public abstract class AbstractMode {
         return SyncedConfig.canOverwriteBlocks ? world.getBlockState(pos).getBlock().isReplaceable(world, pos) : world.getBlockState(pos).getMaterial() != Material.AIR;
     }
 
-    public boolean exchangingValidator(World world, BlockPos pos, IBlockState lookingAtState, IBlockState setBlock, boolean isFuzzy) {
+    private boolean exchangingValidator(World world, BlockPos pos, IBlockState lookingAtState, IBlockState setBlock, boolean isFuzzy) {
         IBlockState worldBlockState = world.getBlockState(pos);
         TileEntity te = world.getTileEntity(pos);
 

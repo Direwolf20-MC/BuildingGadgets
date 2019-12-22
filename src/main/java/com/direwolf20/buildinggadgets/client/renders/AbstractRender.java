@@ -85,13 +85,13 @@ public abstract class AbstractRender {
     // todo: figure out if this actually is working as intended.
     public static ItemStack getItemWithSilk(IBlockState gadgetBlock) {
         ItemStack itemStack;
-        if (gadgetBlock.getBlock().canSilkHarvest(mc.player.world, new BlockPos(0, 0, 0), gadgetBlock, mc.player))
+        if (gadgetBlock.getBlock().canSilkHarvest(mc.player.world, BlockPos.ORIGIN, gadgetBlock, mc.player))
             itemStack = InventoryManipulation.getSilkTouchDrop(gadgetBlock);
         else
-            itemStack = gadgetBlock.getBlock().getPickBlock(gadgetBlock, null, mc.player.world, new BlockPos(0, 0, 0), mc.player);
+            itemStack = gadgetBlock.getBlock().getPickBlock(gadgetBlock, null, mc.player.world, BlockPos.ORIGIN, mc.player);
 
         if (itemStack.getItem().equals(Items.AIR))
-            itemStack = gadgetBlock.getBlock().getPickBlock(gadgetBlock, null, mc.player.world, new BlockPos(0, 0, 0), mc.player);
+            itemStack = gadgetBlock.getBlock().getPickBlock(gadgetBlock, null, mc.player.world, BlockPos.ORIGIN, mc.player);
 
         return itemStack;
     }

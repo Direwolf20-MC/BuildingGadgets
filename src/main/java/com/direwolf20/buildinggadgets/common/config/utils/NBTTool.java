@@ -1,4 +1,4 @@
-package com.direwolf20.buildinggadgets.common.tools;
+package com.direwolf20.buildinggadgets.common.config.utils;
 
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
@@ -298,42 +298,4 @@ public class NBTTool {
         }
         return res;
     }
-
-    public static <K, V> NBTTagList serializeMap(Map<K, V> map, Function<K, NBTBase> keySerializer, Function<V, NBTBase> valueSerializer) {
-        NBTTagList list = new NBTTagList();
-        for (Map.Entry<K, V> entry : map.entrySet()) {
-            NBTTagCompound compound = new NBTTagCompound();
-            compound.setTag("key", keySerializer.apply(entry.getKey()));
-            compound.setTag("val", valueSerializer.apply(entry.getValue()));
-            list.appendTag(compound);
-        }
-        return list;
-    }
-
-    public static <K, V> Map<K, V> deserializeMap(NBTTagList list, Map<K, V> toAppendTo, Function<NBTBase, K> keyDeserializer, Function<NBTBase, V> valueDeserializer) {
-        for (NBTBase nbt : list) {
-            if (nbt instanceof NBTTagCompound) {
-                NBTTagCompound compound = (NBTTagCompound) nbt;
-                toAppendTo.put(
-                        keyDeserializer.apply(compound.getTag("key")),
-                        valueDeserializer.apply(compound.getTag("val"))
-                );
-            }
-        }
-        return toAppendTo;
-    }
-
-    /**
-     * If the given stack has a tag, returns it. If the given stack does not have a tag, it will set a reference and return the new tag
-     * compound.
-     */
-    public static NBTTagCompound getOrNewTag(ItemStack stack) {
-        if (stack.hasTagCompound()) {
-            return stack.getTagCompound();
-        }
-        NBTTagCompound tag = new NBTTagCompound();
-        stack.setTagCompound(tag);
-        return tag;
-    }
-
 }

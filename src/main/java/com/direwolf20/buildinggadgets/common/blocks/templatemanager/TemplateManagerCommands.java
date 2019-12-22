@@ -188,7 +188,7 @@ public class TemplateManagerCommands {
             UniqueItem uniqueItem = intStackMap.get(blockMap.state);
             if (!(uniqueItem == null)) {
                 NonNullList<ItemStack> drops = NonNullList.create();
-                blockMap.state.getBlock().getDrops(drops, world, new BlockPos(0, 0, 0), blockMap.state, 0);
+                blockMap.state.getBlock().getDrops(drops, world, BlockPos.ORIGIN, blockMap.state, 0);
                 int neededItems = 0;
                 for (ItemStack drop : drops) {
                     if (drop.getItem().equals(uniqueItem.item)) {
