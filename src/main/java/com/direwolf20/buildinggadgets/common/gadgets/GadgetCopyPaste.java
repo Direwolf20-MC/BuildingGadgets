@@ -2,6 +2,7 @@ package com.direwolf20.buildinggadgets.common.gadgets;
 
 import com.direwolf20.buildinggadgets.client.events.EventTooltip;
 import com.direwolf20.buildinggadgets.client.gui.GuiProxy;
+import com.direwolf20.buildinggadgets.client.renders.AbstractRender;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlock;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
@@ -135,16 +136,6 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
             uuid = uid.toString();
         }
         return uuid;
-    }
-
-    public static String getOwner(ItemStack stack) {//TODO unused
-        return GadgetUtils.getStackTag(stack).getString("owner");
-    }
-
-    public static void setOwner(ItemStack stack, String owner) {//TODO unused
-        NBTTagCompound tagCompound = GadgetUtils.getStackTag(stack);
-        tagCompound.setString("owner", owner);
-        stack.setTagCompound(tagCompound);
     }
 
     private static void setLastBuild(ItemStack stack, BlockPos anchorPos, Integer dim) {
@@ -284,7 +275,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
         } else {
             if (pos != null && player.isSneaking()) {
                 if (GadgetUtils.getRemoteInventory(pos, world, player, NetworkIO.Operation.EXTRACT) != null)
-                    return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);
+                    return new ActionResult<>(EnumActionResult.SUCCESS, stack);
             }
             if (getToolMode(stack) == ToolMode.Copy) {
                 if (pos == null && player.isSneaking())
@@ -292,10 +283,10 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
             } else if (player.isSneaking()) {
                 player.openGui(BuildingGadgets.instance, GuiProxy.PasteID, world, hand.ordinal(), 0, 0);
             } else {
-                ToolRenders.updateInventoryCache();
+                AbstractRender.updateInventoryCache();
             }
         }
-        return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);
+        return new ActionResult<>(EnumActionResult.SUCCESS, stack);
     }
 
     public static void rotateOrMirrorBlocks(ItemStack stack, EntityPlayer player, PacketRotateMirror.Operation operation) {
@@ -304,14 +295,14 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
             return;
         }
         GadgetCopyPaste tool = ModItems.gadgetCopyPaste;
-        List<BlockMap> blockMapList = new ArrayList<BlockMap>();
+        List<BlockMap> blockMapList;
         WorldSave worldSave = WorldSave.getWorldSave(player.world);
         NBTTagCompound tagCompound = worldSave.getCompoundFromUUID(tool.getUUID(stack));
         BlockPos startPos = tool.getStartPos(stack);
         if (startPos == null) return;
         blockMapList = getBlockMapList(tagCompound);
-        List<Integer> posIntArrayList = new ArrayList<Integer>();
-        List<Integer> stateIntArrayList = new ArrayList<Integer>();
+        List<Integer> posIntArrayList = new ArrayList<>();
+        List<Integer> stateIntArrayList = new ArrayList<>();
         BlockMapIntState blockMapIntState = new BlockMapIntState();
 
         for (BlockMap blockMap : blockMapList) {

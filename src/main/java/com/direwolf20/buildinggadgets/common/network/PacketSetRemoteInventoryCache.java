@@ -3,6 +3,7 @@ package com.direwolf20.buildinggadgets.common.network;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.direwolf20.buildinggadgets.client.renders.AbstractRender;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -109,7 +110,7 @@ public class PacketSetRemoteInventoryCache implements IMessage {
                 if (message.isCopyPaste)
                     EventTooltip.setCache(message.cache);
                 else
-                    ToolRenders.setInventoryCache(message.cache);
+                    AbstractRender.setInventoryCache(message.cache);
             });
             return null;
         }

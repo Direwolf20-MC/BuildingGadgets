@@ -8,6 +8,8 @@ import com.direwolf20.buildinggadgets.common.items.capability.CapabilityProvider
 import com.direwolf20.buildinggadgets.common.tools.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.tools.InventoryManipulation;
 import com.direwolf20.buildinggadgets.common.tools.RayTraceHelper;
+import com.direwolf20.buildinggadgets.common.tools.UniqueItem;
+import com.google.common.collect.Multiset;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockRendererDispatcher;
@@ -41,6 +43,13 @@ public abstract class AbstractRender {
     private static final IBlockState effectBlockState = ModBlocks.effectBlock.getDefaultState();
 
     private static RemoteInventoryCache cacheInventory = new RemoteInventoryCache(false);
+    public static void setInventoryCache(Multiset<UniqueItem> cache) {
+        cacheInventory.setCache(cache);
+    }
+
+    public static void updateInventoryCache() {
+        cacheInventory.forceUpdate();
+    }
 
     public abstract void gadgetRender(Tessellator tessellator, BufferBuilder bufferBuilder, RayTraceResult rayTraceResult, ItemStack gadget, List<BlockPos> existingLocations);
 

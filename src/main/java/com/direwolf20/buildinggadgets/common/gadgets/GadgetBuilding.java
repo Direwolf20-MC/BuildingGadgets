@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.common.gadgets;
 
+import com.direwolf20.buildinggadgets.client.renders.AbstractRender;
 import com.direwolf20.buildinggadgets.common.blocks.ModBlocks;
 import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
@@ -131,7 +132,7 @@ public class GadgetBuilding extends GadgetGeneric {
                 build(player, itemstack);
             }
         } else if (!player.isSneaking()) {
-            ToolRenders.updateInventoryCache();
+            AbstractRender.updateInventoryCache();
         }
         return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, itemstack);
     }

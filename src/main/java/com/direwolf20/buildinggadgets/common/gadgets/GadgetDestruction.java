@@ -231,6 +231,8 @@ public class GadgetDestruction extends GadgetGeneric {
         if( historyStack.getHistory().size() == 0 )
             return;
 
+
+        // Store into the world save
         WorldSave worldSave = WorldSave.getWorldSaveDestruction(world);
         NBTTagCompound tagCompound = new NBTTagCompound();
         String UUID = getUUID(stack);

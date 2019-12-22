@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.common.gadgets;
 
+import com.direwolf20.buildinggadgets.client.renders.AbstractRender;
 import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.common.gadgets.building.ExchangingModes;
@@ -139,7 +140,7 @@ public class GadgetExchanger extends GadgetGeneric {
                 exchange(player, itemstack);
             }
         } else if (!player.isSneaking()) {
-            ToolRenders.updateInventoryCache();
+            AbstractRender.updateInventoryCache();
         }
         return new ActionResult<>(EnumActionResult.SUCCESS, itemstack);
     }

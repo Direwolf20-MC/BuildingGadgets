@@ -17,9 +17,8 @@ public class WorldSave extends WorldSavedData {
     private final String TAG_NAME;
 
     private Map<String, NBTTagCompound> tagMap = new HashMap<String, NBTTagCompound>();
-    //private NBTTagList mapTag;
 
-    public WorldSave(String name, String tagName) {
+    private WorldSave(String name, String tagName) {
         super(name);
         TAG_NAME = tagName;
     }
@@ -34,7 +33,7 @@ public class WorldSave extends WorldSavedData {
     }
 
     public void setTagMap(Map<String, NBTTagCompound> newMap) {
-        tagMap = new HashMap<String, NBTTagCompound>(newMap);
+        tagMap = new HashMap<>(newMap);
     }
 
     public NBTTagCompound getCompoundFromUUID(String UUID) {
@@ -87,7 +86,6 @@ public class WorldSave extends WorldSavedData {
 
     @Nonnull
     private static WorldSave get(World world, Class<? extends WorldSave> clazz) {
-        //boolean isTemplate = clazz == WorldSaveTemplate.class;
         String name = MODID;
         if (clazz == WorldSaveBlockMap.class) {
             name += "_BlockMapData";
@@ -96,7 +94,7 @@ public class WorldSave extends WorldSavedData {
         } else if (clazz == WorldSaveDestruction.class) {
             name += "_DestructionUndo";
         }
-        //String name = MODID + (isTemplate ? "_TemplateData" : "_BlockMapData");
+
         MapStorage storage = world.getMapStorage();
         if (storage == null)
             throw new IllegalStateException("World#getMapStorage returned null. The following WorldSave failed to save data: " + name);
@@ -111,7 +109,7 @@ public class WorldSave extends WorldSavedData {
             } else if (clazz == WorldSaveDestruction.class) {
                 instance = new WorldSaveDestruction(name);
             }
-            //instance = isTemplate ? new WorldSaveTemplate(name) : new WorldSaveBlockMap(name);
+
             storage.setData(name, instance);
         }
         return instance;

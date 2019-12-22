@@ -26,7 +26,6 @@ public class BlockBuildEntity extends Entity {
     private static final DataParameter<BlockPos> FIXED = EntityDataManager.createKey(BlockBuildEntity.class, DataSerializers.BLOCK_POS);
     private static final DataParameter<Boolean> usePaste = EntityDataManager.createKey(BlockBuildEntity.class, DataSerializers.BOOLEAN);
 
-
     private int despawning = -1;
     public int maxLife = 20;
     private int mode;
@@ -38,12 +37,6 @@ public class BlockBuildEntity extends Entity {
     private boolean useConstructionPaste;
 
     private World world;
-
-    public BlockBuildEntity(World worldIn) {
-        super(worldIn);
-        setSize(0.1F, 0.1F);
-        world = worldIn;
-    }
 
     public BlockBuildEntity(World worldIn, BlockPos spawnPos, EntityLivingBase player, IBlockState spawnBlock, int toolMode, IBlockState actualSpawnBlock, boolean constrPaste) {
         super(worldIn);
