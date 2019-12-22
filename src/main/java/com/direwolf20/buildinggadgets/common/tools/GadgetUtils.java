@@ -510,19 +510,6 @@ public class GadgetUtils {
         tagCompound.setString(tagName, string);
     }
 
-    public static void writeStringToNBT(NBTTagCompound tagCompound, String string, String tagName) {//TODO unused
-        if (tagCompound == null) {
-            tagCompound = new NBTTagCompound();
-        }
-        if (string.equals(null)) {
-            if (tagCompound.getTag(tagName) != null) {
-                tagCompound.removeTag(tagName);
-            }
-            return;
-        }
-        tagCompound.setString(tagName, string);
-    }
-
     @Nullable
     public static String getStringFromNBT(ItemStack stack, String tagName) {
         NBTTagCompound tagCompound = stack.getTagCompound();
@@ -555,12 +542,6 @@ public class GadgetUtils {
             return null;
         }
         return posTag.getInteger("dim");
-    }
-
-    public static NBTTagCompound stateToCompound(IBlockState state) {
-        NBTTagCompound tagCompound = new NBTTagCompound();
-        NBTUtil.writeBlockState(tagCompound, state);
-        return tagCompound;
     }
 
     @Nullable

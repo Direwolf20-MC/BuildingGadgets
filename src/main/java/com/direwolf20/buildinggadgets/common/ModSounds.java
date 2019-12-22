@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.common;
 
-import com.direwolf20.buildinggadgets.client.proxy.ClientProxy;
+import com.direwolf20.buildinggadgets.client.ClientProxy;
 
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;

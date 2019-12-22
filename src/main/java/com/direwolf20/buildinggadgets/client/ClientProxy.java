@@ -1,4 +1,4 @@
-package com.direwolf20.buildinggadgets.client.proxy;
+package com.direwolf20.buildinggadgets.client;
 
 import com.direwolf20.buildinggadgets.client.KeyBindings;
 import com.direwolf20.buildinggadgets.client.renders.BuildingRender;

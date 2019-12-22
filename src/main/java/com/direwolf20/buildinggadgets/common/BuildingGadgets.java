@@ -38,7 +38,7 @@ public class BuildingGadgets {
         }
     };
 
-    @SidedProxy(clientSide = "com.direwolf20.buildinggadgets.client.proxy.ClientProxy", serverSide = "com.direwolf20.buildinggadgets.common.proxy.ServerProxy")
+    @SidedProxy(clientSide = "com.direwolf20.buildinggadgets.client.ClientProxy", serverSide = "com.direwolf20.buildinggadgets.common.proxy.ServerProxy")
     public static CommonProxy proxy;
 
     @Mod.Instance

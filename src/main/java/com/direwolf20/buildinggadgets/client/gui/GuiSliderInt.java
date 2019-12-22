@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.client.gui;
 
-import com.direwolf20.buildinggadgets.client.proxy.ClientProxy;
+import com.direwolf20.buildinggadgets.client.ClientProxy;
 import com.google.common.collect.ImmutableSet;
 
 import net.minecraft.client.Minecraft;

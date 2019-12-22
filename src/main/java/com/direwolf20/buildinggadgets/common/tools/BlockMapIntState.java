@@ -21,8 +21,8 @@ public class BlockMapIntState {
     public Map<IBlockState, UniqueItem> intStackMap;
 
     public BlockMapIntState() {
-        intStateMap = new HashMap<Short, IBlockState>();
-        intStackMap = new HashMap<IBlockState, UniqueItem>();
+        intStateMap = new HashMap<>();
+        intStackMap = new HashMap<>();
     }
 
     public Map<Short, IBlockState> getIntStateMap() {
@@ -111,7 +111,7 @@ public class BlockMapIntState {
             NBTTagCompound compound = new NBTTagCompound();
             compound.setInteger("item", Item.getIdFromItem(entry.getValue().item));
             compound.setInteger("meta", entry.getValue().meta);
-            compound.setTag("state", GadgetUtils.stateToCompound(entry.getKey()));
+            compound.setTag("state", NBTUtil.writeBlockState(new NBTTagCompound(), entry.getKey()));
             tagList.appendTag(compound);
         }
         return tagList;
