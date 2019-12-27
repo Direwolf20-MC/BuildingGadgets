@@ -3,7 +3,6 @@ package com.direwolf20.buildinggadgets.common.gadgets;
 import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
 import com.direwolf20.buildinggadgets.common.items.ItemModBase;
 import com.direwolf20.buildinggadgets.common.items.capability.CapabilityProviderEnergy;
-import com.direwolf20.buildinggadgets.common.config.utils.NBTTool;
 
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
@@ -24,9 +23,9 @@ import java.util.List;
 
 import static com.direwolf20.buildinggadgets.common.tools.GadgetUtils.withSuffix;
 
-public abstract class GadgetGeneric extends ItemModBase {
+public abstract class AbstractGadget extends ItemModBase {
 
-    public GadgetGeneric(String name) {
+    public AbstractGadget(String name) {
         super(name);
         setMaxStackSize(1);
     }
@@ -106,9 +105,9 @@ public abstract class GadgetGeneric extends ItemModBase {
 
     public static ItemStack getGadget(EntityPlayer player) {
         ItemStack heldItem = player.getHeldItemMainhand();
-        if (!(heldItem.getItem() instanceof GadgetGeneric)) {
+        if (!(heldItem.getItem() instanceof AbstractGadget)) {
             heldItem = player.getHeldItemOffhand();
-            if (!(heldItem.getItem() instanceof GadgetGeneric)) {
+            if (!(heldItem.getItem() instanceof AbstractGadget)) {
                 return ItemStack.EMPTY;
             }
         }
@@ -161,7 +160,7 @@ public abstract class GadgetGeneric extends ItemModBase {
 
     public static void toggleConnectedArea(EntityPlayer player, ItemStack stack) {
         getOrNewTag(stack).setBoolean("unconnectedarea", getConnectedArea(stack));
-        String suffix = stack.getItem() instanceof GadgetDestruction ? "area" : "surface";
+        String suffix = stack.getItem() instanceof DestructionGadget ? "area" : "surface";
         player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.connected" + suffix).getUnformattedComponentText() + ": " + getConnectedArea(stack)), true);
     }
 

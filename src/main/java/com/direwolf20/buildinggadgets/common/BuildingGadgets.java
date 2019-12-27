@@ -31,7 +31,7 @@ public class BuildingGadgets {
     public static final CreativeTabs BUILDING_CREATIVE_TAB = new CreativeTabs(new TextComponentTranslation("buildingGadgets").getUnformattedComponentText()) {
         @Override
         public ItemStack getTabIconItem() {
-            ItemStack stack = new ItemStack(ModItems.gadgetBuilding);
+            ItemStack stack = new ItemStack(ModItems.buildingGadget);
             stack.setTagCompound(new NBTTagCompound());
             stack.getTagCompound().setByte("creative", (byte) 0); 
             return stack;

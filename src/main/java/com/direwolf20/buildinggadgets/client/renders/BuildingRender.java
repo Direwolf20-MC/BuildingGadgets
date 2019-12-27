@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.client.renders;
 
-import com.direwolf20.buildinggadgets.common.gadgets.GadgetBuilding;
+import com.direwolf20.buildinggadgets.common.gadgets.BuildingGadget;
 import com.direwolf20.buildinggadgets.common.items.MockBuildingWorld;
 import com.direwolf20.buildinggadgets.common.items.ModItems;
 import com.direwolf20.buildinggadgets.common.tools.GadgetUtils;
@@ -37,7 +37,7 @@ public class BuildingRender extends AbstractRender {
         // todo: replace with actual mode methods
         List<BlockPos> locations = existingLocations.size() != 0
                 ? existingLocations
-                : GadgetBuilding.getToolMode(gadget).getMode().getCollection(mc.player, mc.player.world, renderBlockState, rayTraceResult.getBlockPos(), rayTraceResult.sideHit, GadgetUtils.getToolRange(gadget), GadgetBuilding.shouldPlaceAtop(gadget), GadgetBuilding.getFuzzy(gadget));
+                : BuildingGadget.getToolMode(gadget).getMode().getCollection(mc.player, mc.player.world, renderBlockState, rayTraceResult.getBlockPos(), rayTraceResult.sideHit, GadgetUtils.getToolRange(gadget), BuildingGadget.shouldPlaceAtop(gadget), BuildingGadget.getFuzzy(gadget));
 
         IBlockState state = emptyBlockState;
         // Prepare the mock world using a mock world lets us render things properly, like fences connecting.
@@ -76,8 +76,8 @@ public class BuildingRender extends AbstractRender {
         for (BlockPos coordinate : locations) { //Now run through the UNSORTED list of coords, to show which blocks won't place if you don't have enough of them.
             playerItemCount --;
             remainingEnergy -= gadget.hasCapability(CapabilityEnergy.ENERGY, null)
-                    ? ModItems.gadgetBuilding.getEnergyCost(gadget)
-                    : ModItems.gadgetBuilding.getDamageCost(gadget);
+                    ? ModItems.buildingGadget.getEnergyCost(gadget)
+                    : ModItems.buildingGadget.getDamageCost(gadget);
 
             if (playerItemCount < 0 || remainingEnergy < 0)
                 renderSingleBlock(tessellator, bufferBuilder, coordinate, 1f, 0, 0, .33f);

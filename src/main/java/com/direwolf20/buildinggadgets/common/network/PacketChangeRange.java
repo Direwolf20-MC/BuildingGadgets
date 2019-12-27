@@ -41,21 +41,21 @@ public class PacketChangeRange implements IMessage {
 
         private void handle(PacketChangeRange message, MessageContext ctx) {
             EntityPlayerMP playerEntity = ctx.getServerHandler().player;
-            ItemStack heldItem = GadgetGeneric.getGadget(playerEntity);
+            ItemStack heldItem = AbstractGadget.getGadget(playerEntity);
             if (heldItem.isEmpty())
                 return;
 
             if (message.range >= 0)
                 GadgetUtils.setToolRange(heldItem, message.range);
-            else if (heldItem.getItem() instanceof GadgetBuilding) {
-                GadgetBuilding gadgetBuilding = (GadgetBuilding) (heldItem.getItem());
-                gadgetBuilding.rangeChange(playerEntity, heldItem);
-            } else if (heldItem.getItem() instanceof GadgetExchanger) {
-                GadgetExchanger gadgetExchanger = (GadgetExchanger) (heldItem.getItem());
-                gadgetExchanger.rangeChange(playerEntity, heldItem);
-            } else if (heldItem.getItem() instanceof GadgetDestruction) {
-                GadgetDestruction gadgetDestruction = (GadgetDestruction) (heldItem.getItem());
-                gadgetDestruction.switchOverlay(playerEntity, heldItem);
+            else if (heldItem.getItem() instanceof BuildingGadget) {
+                BuildingGadget buildingGadget = (BuildingGadget) (heldItem.getItem());
+                buildingGadget.rangeChange(playerEntity, heldItem);
+            } else if (heldItem.getItem() instanceof ExchangerGadget) {
+                ExchangerGadget exchangerGadget = (ExchangerGadget) (heldItem.getItem());
+                exchangerGadget.rangeChange(playerEntity, heldItem);
+            } else if (heldItem.getItem() instanceof DestructionGadget) {
+                DestructionGadget destructionGadget = (DestructionGadget) (heldItem.getItem());
+                destructionGadget.switchOverlay(playerEntity, heldItem);
             }
         }
     }

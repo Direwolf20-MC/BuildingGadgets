@@ -11,13 +11,10 @@ import javax.annotation.Nullable;
 
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
-import com.direwolf20.buildinggadgets.common.gadgets.GadgetDestruction;
-import com.direwolf20.buildinggadgets.common.gadgets.GadgetGeneric;
-import com.direwolf20.buildinggadgets.common.gadgets.building.AbstractMode;
-import com.direwolf20.buildinggadgets.common.gadgets.building.BuildingModes;
+import com.direwolf20.buildinggadgets.common.gadgets.*;
+import com.direwolf20.buildinggadgets.common.gadgets.AbstractGadget;
 import com.direwolf20.buildinggadgets.common.integration.NetworkProvider;
-import com.direwolf20.buildinggadgets.common.gadgets.GadgetBuilding;
-import com.direwolf20.buildinggadgets.common.gadgets.GadgetExchanger;
+import com.direwolf20.buildinggadgets.common.gadgets.ExchangerGadget;
 import com.direwolf20.buildinggadgets.common.network.PacketRotateMirror;
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
@@ -320,7 +317,7 @@ public class GadgetUtils {
         World world = player.world;
         List<BlockPos> currentCoords = getAnchor(stack);
         if (currentCoords.size() == 0) {  //If we don't have an anchor, find the block we're supposed to anchor to
-            RayTraceResult lookingAt = RayTraceHelper.rayTrace(player, GadgetGeneric.shouldRayTraceFluid(stack));
+            RayTraceResult lookingAt = RayTraceHelper.rayTrace(player, AbstractGadget.shouldRayTraceFluid(stack));
             if (lookingAt == null) {  //If we aren't looking at anything, exit
                 return false;
             }
@@ -331,16 +328,16 @@ public class GadgetUtils {
             }
 
             List<BlockPos> coords = new ArrayList<BlockPos>();
-            if (stack.getItem() instanceof GadgetBuilding) {
-                coords = GadgetBuilding.getToolMode(stack).getMode().getCollection(
-                        player, world, GadgetUtils.getToolBlock(stack), startBlock, sideHit, GadgetUtils.getToolRange(stack), GadgetBuilding.shouldPlaceAtop(stack), GadgetBuilding.getFuzzy(stack)
+            if (stack.getItem() instanceof BuildingGadget) {
+                coords = BuildingGadget.getToolMode(stack).getMode().getCollection(
+                        player, world, GadgetUtils.getToolBlock(stack), startBlock, sideHit, GadgetUtils.getToolRange(stack), BuildingGadget.shouldPlaceAtop(stack), BuildingGadget.getFuzzy(stack)
                 ); //Build the positions list based on tool mode and range
-            } else if (stack.getItem() instanceof GadgetExchanger) {
-                coords = GadgetExchanger.getToolMode(stack).getMode().getCollection(
-                        player, world, GadgetUtils.getToolBlock(stack), startBlock, sideHit, GadgetUtils.getToolRange(stack), false, GadgetExchanger.getFuzzy(stack)
+            } else if (stack.getItem() instanceof ExchangerGadget) {
+                coords = ExchangerGadget.getToolMode(stack).getMode().getCollection(
+                        player, world, GadgetUtils.getToolBlock(stack), startBlock, sideHit, GadgetUtils.getToolRange(stack), false, ExchangerGadget.getFuzzy(stack)
                 ); //Build the positions list based on tool mode and range
-            } else if(stack.getItem() instanceof GadgetDestruction) {
-                coords = GadgetDestruction.getArea(world, lookingAt, player, stack, currentCoords);
+            } else if(stack.getItem() instanceof DestructionGadget) {
+                coords = DestructionGadget.getArea(world, lookingAt, player, stack, currentCoords);
             }
 
             setAnchor(stack, coords); //Set the anchor NBT

@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.client.renders;
 
-import com.direwolf20.buildinggadgets.common.gadgets.GadgetBuilding;
-import com.direwolf20.buildinggadgets.common.gadgets.GadgetExchanger;
+import com.direwolf20.buildinggadgets.common.gadgets.BuildingGadget;
+import com.direwolf20.buildinggadgets.common.gadgets.ExchangerGadget;
 import com.direwolf20.buildinggadgets.common.items.MockBuildingWorld;
 import com.direwolf20.buildinggadgets.common.items.ModItems;
 import com.direwolf20.buildinggadgets.common.tools.GadgetUtils;
@@ -41,7 +41,7 @@ public class ExchangerRender extends AbstractRender {
 
         List<BlockPos> locations = existingLocations.size() != 0
                 ? existingLocations
-                : GadgetExchanger.getToolMode(gadget).getMode().getCollection(mc.player, mc.player.world, renderBlockState, rayTraceResult.getBlockPos(), rayTraceResult.sideHit, GadgetUtils.getToolRange(gadget), false, GadgetBuilding.getFuzzy(gadget));
+                : ExchangerGadget.getToolMode(gadget).getMode().getCollection(mc.player, mc.player.world, renderBlockState, rayTraceResult.getBlockPos(), rayTraceResult.sideHit, GadgetUtils.getToolRange(gadget), false, BuildingGadget.getFuzzy(gadget));
 
         //Prepare the fake world -- using a fake world lets us render things properly, like fences connecting.
         Set<BlockPos> coords = new HashSet<>(locations);
@@ -87,8 +87,8 @@ public class ExchangerRender extends AbstractRender {
         for (BlockPos coordinate : locations) { //Now run through the UNSORTED list of coords, to show which blocks won't place if you don't have enough of them.
             playerItemCount --;
             remainingEnergy -= gadget.hasCapability(CapabilityEnergy.ENERGY, null)
-                    ? ModItems.gadgetExchanger.getEnergyCost(gadget)
-                    : ModItems.gadgetExchanger.getDamageCost(gadget);
+                    ? ModItems.exchangerGadget.getEnergyCost(gadget)
+                    : ModItems.exchangerGadget.getDamageCost(gadget);
 
             if (playerItemCount < 0 || remainingEnergy < 0)
                 renderSingleBlock(tessellator, bufferBuilder, coordinate, 1f, 0, 0, .33f);

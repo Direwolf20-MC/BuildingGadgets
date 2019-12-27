@@ -1,9 +1,8 @@
 package com.direwolf20.buildinggadgets.common.network;
 
-import com.direwolf20.buildinggadgets.common.gadgets.GadgetBuilding;
-import com.direwolf20.buildinggadgets.common.gadgets.GadgetCopyPaste;
-import com.direwolf20.buildinggadgets.common.gadgets.GadgetExchanger;
-import com.direwolf20.buildinggadgets.common.gadgets.GadgetGeneric;
+import com.direwolf20.buildinggadgets.common.gadgets.*;
+import com.direwolf20.buildinggadgets.common.gadgets.BuildingGadget;
+import com.direwolf20.buildinggadgets.common.gadgets.AbstractGadget;
 import com.direwolf20.buildinggadgets.common.tools.GadgetUtils;
 
 import io.netty.buffer.ByteBuf;
@@ -46,12 +45,12 @@ public class PacketRotateMirror implements IMessage {
         public IMessage onMessage(PacketRotateMirror message, MessageContext ctx) {
             FMLCommonHandler.instance().getWorldThread(ctx.netHandler).addScheduledTask(() -> {
                 EntityPlayer player = ctx.getServerHandler().player;
-                ItemStack stack = GadgetGeneric.getGadget(player);
+                ItemStack stack = AbstractGadget.getGadget(player);
                 Operation operation = message.operation != null ? message.operation : (player.isSneaking() ? Operation.MIRROR : Operation.ROTATE);
-                if (stack.getItem() instanceof GadgetBuilding || stack.getItem() instanceof GadgetExchanger)
+                if (stack.getItem() instanceof BuildingGadget || stack.getItem() instanceof ExchangerGadget)
                     GadgetUtils.rotateOrMirrorToolBlock(stack, player, operation);
-                else if (stack.getItem() instanceof GadgetCopyPaste)
-                    GadgetCopyPaste.rotateOrMirrorBlocks(stack, player, operation);
+                else if (stack.getItem() instanceof CopyGadget)
+                    CopyGadget.rotateOrMirrorBlocks(stack, player, operation);
             });
             return null;
         }

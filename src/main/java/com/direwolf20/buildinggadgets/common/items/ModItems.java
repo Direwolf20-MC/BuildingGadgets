@@ -1,10 +1,9 @@
 package com.direwolf20.buildinggadgets.common.items;
 
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
-import com.direwolf20.buildinggadgets.common.gadgets.GadgetBuilding;
-import com.direwolf20.buildinggadgets.common.gadgets.GadgetCopyPaste;
-import com.direwolf20.buildinggadgets.common.gadgets.GadgetDestruction;
-import com.direwolf20.buildinggadgets.common.gadgets.GadgetExchanger;
+import com.direwolf20.buildinggadgets.common.gadgets.*;
+import com.direwolf20.buildinggadgets.common.gadgets.DestructionGadget;
+import com.direwolf20.buildinggadgets.common.gadgets.ExchangerGadget;
 import com.direwolf20.buildinggadgets.common.items.pastes.ConstructionChunkDense;
 import com.direwolf20.buildinggadgets.common.items.pastes.ConstructionPaste;
 import com.direwolf20.buildinggadgets.common.items.pastes.ConstructionPasteContainer;
@@ -15,10 +14,10 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 @GameRegistry.ObjectHolder(BuildingGadgets.MODID)
 public class ModItems {
     @GameRegistry.ObjectHolder("buildingtool")
-    public static GadgetBuilding gadgetBuilding;
+    public static BuildingGadget buildingGadget;
 
     @GameRegistry.ObjectHolder("exchangertool")
-    public static GadgetExchanger gadgetExchanger;
+    public static ExchangerGadget exchangerGadget;
 
     @GameRegistry.ObjectHolder("constructionpaste")
     public static ConstructionPaste constructionPaste;
@@ -39,11 +38,11 @@ public class ModItems {
     public static ConstructionPasteContainerCreative constructionPasteContainerCreative;
 
     @GameRegistry.ObjectHolder("copypastetool")
-    public static GadgetCopyPaste gadgetCopyPaste;
+    public static CopyGadget copyGadget;
 
     @GameRegistry.ObjectHolder("template")
     public static Template template;
 
     @GameRegistry.ObjectHolder("destructiontool")
-    public static GadgetDestruction gadgetDestruction;
+    public static DestructionGadget destructionGadget;
 }

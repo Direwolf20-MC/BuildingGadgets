@@ -46,7 +46,7 @@ import net.minecraftforge.event.world.BlockEvent;
 import javax.annotation.Nullable;
 import java.util.*;
 
-public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
+public class CopyGadget extends AbstractGadget implements ITemplate {
 
     public enum ToolMode {
         Copy, Paste;
@@ -57,7 +57,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
         }
     }
 
-    public GadgetCopyPaste() {
+    public CopyGadget() {
         super("copypastetool");
         setMaxDamage(SyncedConfig.durabilityCopyPaste);
     }
@@ -238,7 +238,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
     public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
         ItemStack stack = player.getHeldItem(hand);
         player.setActiveHand(hand);
-        BlockPos pos = RayTraceHelper.rayTrace(player, GadgetGeneric.shouldRayTraceFluid(stack)).getBlockPos();
+        BlockPos pos = RayTraceHelper.rayTrace(player, AbstractGadget.shouldRayTraceFluid(stack)).getBlockPos();
         if (!world.isRemote) {
             if (pos != null && player.isSneaking() && GadgetUtils.setRemoteInventory(stack, player, world, pos, false) == EnumActionResult.SUCCESS)
                 return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);
@@ -294,7 +294,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
         if (player.world.isRemote) {
             return;
         }
-        GadgetCopyPaste tool = ModItems.gadgetCopyPaste;
+        CopyGadget tool = ModItems.copyGadget;
         List<BlockMap> blockMapList;
         WorldSave worldSave = WorldSave.getWorldSave(player.world);
         NBTTagCompound tagCompound = worldSave.getCompoundFromUUID(tool.getUUID(stack));
@@ -348,7 +348,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
 
     public static void copyBlocks(ItemStack stack, EntityPlayer player, World world, BlockPos startPos, BlockPos endPos) {
         if (startPos != null && endPos != null) {
-            GadgetCopyPaste tool = ModItems.gadgetCopyPaste;
+            CopyGadget tool = ModItems.copyGadget;
             if (findBlocks(world, startPos, endPos, stack, player, tool)) {
                 tool.setStartPos(stack, startPos);
                 tool.setEndPos(stack, endPos);
@@ -356,7 +356,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
         }
     }
 
-    private static boolean findBlocks(World world, BlockPos start, BlockPos end, ItemStack stack, EntityPlayer player, GadgetCopyPaste tool) {
+    private static boolean findBlocks(World world, BlockPos start, BlockPos end, ItemStack stack, EntityPlayer player, CopyGadget tool) {
         setLastBuild(stack, null, 0);
         int foundTE = 0;
         int startX = start.getX();
@@ -469,9 +469,9 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
         BlockPos pos = anchorPos == null ? startPos : anchorPos;
         NBTTagCompound tagCompound = WorldSave.getWorldSave(world).getCompoundFromUUID(getUUID(stack));
 
-        pos = pos.up(GadgetCopyPaste.getY(stack));
-        pos = pos.east(GadgetCopyPaste.getX(stack));
-        pos = pos.south(GadgetCopyPaste.getZ(stack));
+        pos = pos.up(CopyGadget.getY(stack));
+        pos = pos.east(CopyGadget.getX(stack));
+        pos = pos.south(CopyGadget.getZ(stack));
 
         List<BlockMap> blockMapList = getBlockMapList(tagCompound, pos);
         setLastBuild(stack, pos, player.dimension);
@@ -497,7 +497,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
         if (heldItem.isEmpty())
             return;
 
-        if (ModItems.gadgetCopyPaste.getStartPos(heldItem) == null || ModItems.gadgetCopyPaste.getEndPos(heldItem) == null)
+        if (ModItems.copyGadget.getStartPos(heldItem) == null || ModItems.copyGadget.getEndPos(heldItem) == null)
             return;
 
         UniqueItem uniqueItem = IntStackMap.get(state);
@@ -551,7 +551,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
     public static void anchorBlocks(EntityPlayer player, ItemStack stack) {
         BlockPos currentAnchor = getAnchor(stack);
         if (currentAnchor == null) {
-            RayTraceResult lookingAt = RayTraceHelper.rayTrace(player, GadgetGeneric.shouldRayTraceFluid(stack));
+            RayTraceResult lookingAt = RayTraceHelper.rayTrace(player, AbstractGadget.shouldRayTraceFluid(stack));
             if (lookingAt == null) {
                 return;
             }
@@ -566,7 +566,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
 
     public void undoBuild(EntityPlayer player, ItemStack heldItem) {
 //        long time = System.nanoTime();
-        NBTTagCompound tagCompound = WorldSave.getWorldSave(player.world).getCompoundFromUUID(ModItems.gadgetCopyPaste.getUUID(heldItem));
+        NBTTagCompound tagCompound = WorldSave.getWorldSave(player.world).getCompoundFromUUID(ModItems.copyGadget.getUUID(heldItem));
         World world = player.world;
         if (world.isRemote) {
             return;
@@ -603,8 +603,8 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
     }
 
     public static ItemStack getGadget(EntityPlayer player) {
-        ItemStack stack = GadgetGeneric.getGadget(player);
-        if (!(stack.getItem() instanceof GadgetCopyPaste))
+        ItemStack stack = AbstractGadget.getGadget(player);
+        if (!(stack.getItem() instanceof CopyGadget))
             return ItemStack.EMPTY;
 
         return stack;

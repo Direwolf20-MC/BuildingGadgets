@@ -1,8 +1,8 @@
 package com.direwolf20.buildinggadgets.common.tools;
 
 import com.direwolf20.buildinggadgets.common.blocks.ModBlocks;
-import com.direwolf20.buildinggadgets.common.gadgets.GadgetCopyPaste;
-import com.direwolf20.buildinggadgets.common.gadgets.GadgetGeneric;
+import com.direwolf20.buildinggadgets.common.gadgets.CopyGadget;
+import com.direwolf20.buildinggadgets.common.gadgets.AbstractGadget;
 import com.direwolf20.buildinggadgets.common.items.ModItems;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -55,32 +55,32 @@ public class ToolRenders {
             GlStateManager.popMatrix();
         }
 
-        String UUID = ModItems.gadgetCopyPaste.getUUID(stack);
+        String UUID = ModItems.copyGadget.getUUID(stack);
         World world = player.world;
-        if (ModItems.gadgetCopyPaste.getStartPos(stack) == null) return;
-        if (ModItems.gadgetCopyPaste.getEndPos(stack) == null) return;
-        if (GadgetCopyPaste.getToolMode(stack) == GadgetCopyPaste.ToolMode.Paste) {
+        if (ModItems.copyGadget.getStartPos(stack) == null) return;
+        if (ModItems.copyGadget.getEndPos(stack) == null) return;
+        if (CopyGadget.getToolMode(stack) == CopyGadget.ToolMode.Paste) {
             //First check if we have an anchor, if not check if we're looking at a block, if not, exit
-            BlockPos startPos = GadgetCopyPaste.getAnchor(stack);
+            BlockPos startPos = CopyGadget.getAnchor(stack);
             if (startPos == null) {
-                startPos = RayTraceHelper.rayTrace(player, GadgetGeneric.shouldRayTraceFluid(stack)).getBlockPos();
+                startPos = RayTraceHelper.rayTrace(player, AbstractGadget.shouldRayTraceFluid(stack)).getBlockPos();
                 if (startPos == null) return;
-                startPos = startPos.up(GadgetCopyPaste.getY(stack));
-                startPos = startPos.east(GadgetCopyPaste.getX(stack));
-                startPos = startPos.south(GadgetCopyPaste.getZ(stack));
+                startPos = startPos.up(CopyGadget.getY(stack));
+                startPos = startPos.east(CopyGadget.getX(stack));
+                startPos = startPos.south(CopyGadget.getZ(stack));
             } else {
-                startPos = startPos.up(GadgetCopyPaste.getY(stack));
-                startPos = startPos.east(GadgetCopyPaste.getX(stack));
-                startPos = startPos.south(GadgetCopyPaste.getZ(stack));
+                startPos = startPos.up(CopyGadget.getY(stack));
+                startPos = startPos.east(CopyGadget.getX(stack));
+                startPos = startPos.south(CopyGadget.getZ(stack));
             }
 
             //We store our buffers in PasteToolBufferBuilder (A client only class) -- retrieve the buffer from this locally cache'd map
-            ToolDireBuffer toolDireBuffer = PasteToolBufferBuilder.getBufferFromMap(UUID);
+            ReverseBufferBuilder toolDireBuffer = PasteToolBufferBuilder.getBufferFromMap(UUID);
             if (toolDireBuffer == null) {
                 return;
             }
             //Also get the blockMapList from the local cache - If either the buffer or the blockmap list are empty, exit.
-            List<BlockMap> blockMapList = GadgetCopyPaste.getBlockMapList(PasteToolBufferBuilder.getTagFromUUID(UUID));
+            List<BlockMap> blockMapList = CopyGadget.getBlockMapList(PasteToolBufferBuilder.getTagFromUUID(UUID));
             if (toolDireBuffer.getVertexCount() == 0 || blockMapList.size() == 0) {
                 return;
             }
@@ -121,15 +121,15 @@ public class ToolRenders {
             GlStateManager.popMatrix();
 
         } else {
-            BlockPos startPos = ModItems.gadgetCopyPaste.getStartPos(stack);
-            BlockPos endPos = ModItems.gadgetCopyPaste.getEndPos(stack);
+            BlockPos startPos = ModItems.copyGadget.getStartPos(stack);
+            BlockPos endPos = ModItems.copyGadget.getEndPos(stack);
             BlockPos blankPos = BlockPos.ORIGIN;
             if (startPos == null || endPos == null || startPos.equals(blankPos) || endPos.equals(blankPos)) {
                 return;
             }
 
 
-            List<BlockMap> blockMapList = GadgetCopyPaste.getBlockMapList(PasteToolBufferBuilder.getTagFromUUID(UUID));
+            List<BlockMap> blockMapList = CopyGadget.getBlockMapList(PasteToolBufferBuilder.getTagFromUUID(UUID));
             if (blockMapList.size() == 0) {
                 //return;
             }

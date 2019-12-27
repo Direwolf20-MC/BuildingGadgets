@@ -19,14 +19,14 @@ public class PacketUndo extends PacketEmpty {
 
         private void handle(MessageContext ctx) {
             EntityPlayerMP player = ctx.getServerHandler().player;
-            ItemStack stack = GadgetGeneric.getGadget(player);
-            GadgetGeneric item = (GadgetGeneric) stack.getItem();
-            if (item instanceof GadgetBuilding)
-                ((GadgetBuilding) item).undoBuild(player);
-            else if (item instanceof GadgetCopyPaste)
-                ((GadgetCopyPaste) item).undoBuild(player, stack);
-            else if (item instanceof GadgetDestruction)
-                ((GadgetDestruction) item).undo(player, stack);
+            ItemStack stack = AbstractGadget.getGadget(player);
+            AbstractGadget item = (AbstractGadget) stack.getItem();
+            if (item instanceof BuildingGadget)
+                ((BuildingGadget) item).undoBuild(player);
+            else if (item instanceof CopyGadget)
+                ((CopyGadget) item).undoBuild(player, stack);
+            else if (item instanceof DestructionGadget)
+                ((DestructionGadget) item).undo(player, stack);
         }
     }
 }

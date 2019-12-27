@@ -5,6 +5,7 @@
 
 package com.direwolf20.buildinggadgets.client.gui;
 
+import com.direwolf20.buildinggadgets.client.gui.components.DireButton;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
 import com.direwolf20.buildinggadgets.common.items.ModItems;
@@ -23,7 +24,7 @@ import net.minecraft.util.text.TextFormatting;
 
 import java.io.IOException;
 
-public class CopyPasteGUI extends GuiScreen {
+public class CopyPasteScreen extends GuiScreen {
 //     public static final int WIDTH = 256;
 //     public static final int HEIGHT = 256;
 
@@ -45,7 +46,7 @@ public class CopyPasteGUI extends GuiScreen {
 
     private static final ResourceLocation background = new ResourceLocation(BuildingGadgets.MODID, "textures/gui/testcontainer.png");
 
-    public CopyPasteGUI(ItemStack tool) {
+    public CopyPasteScreen(ItemStack tool) {
         super();
         this.copyPasteTool = tool;
     }
@@ -58,8 +59,8 @@ public class CopyPasteGUI extends GuiScreen {
     @Override
     public void initGui() {
         super.initGui();
-        startPos = ModItems.gadgetCopyPaste.getStartPos(copyPasteTool);
-        endPos = ModItems.gadgetCopyPaste.getEndPos(copyPasteTool);
+        startPos = ModItems.copyGadget.getStartPos(copyPasteTool);
+        endPos = ModItems.copyGadget.getEndPos(copyPasteTool);
         if (startPos == null) startPos = BlockPos.ORIGIN;
         if (endPos == null) endPos = BlockPos.ORIGIN;
 

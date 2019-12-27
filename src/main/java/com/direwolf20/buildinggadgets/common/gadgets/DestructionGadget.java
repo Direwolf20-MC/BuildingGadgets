@@ -42,9 +42,9 @@ import net.minecraftforge.event.world.BlockEvent;
 import javax.annotation.Nullable;
 import java.util.*;
 
-public class GadgetDestruction extends GadgetGeneric {
+public class DestructionGadget extends AbstractGadget {
 
-    public GadgetDestruction() {
+    public DestructionGadget() {
         super("destructiontool");
         setMaxDamage(SyncedConfig.durabilityDestruction);
     }
@@ -178,7 +178,7 @@ public class GadgetDestruction extends GadgetGeneric {
         player.setActiveHand(hand);
         if (!world.isRemote) {
             if (!player.isSneaking()) {
-                RayTraceResult lookingAt = RayTraceHelper.rayTrace(player, GadgetGeneric.shouldRayTraceFluid(stack));
+                RayTraceResult lookingAt = RayTraceHelper.rayTrace(player, AbstractGadget.shouldRayTraceFluid(stack));
 
                 List<BlockPos> anchorPositions = GadgetUtils.getAnchor(stack);
                 if (lookingAt == null && anchorPositions.size() == 0)
@@ -259,7 +259,7 @@ public class GadgetDestruction extends GadgetGeneric {
         BlockPos startPos = rayTraceResult.getBlockPos();
 
         List<EnumFacing> directions = assignDirections(rayTraceResult.sideHit, player);
-        IBlockState stateTarget = !SyncedConfig.nonFuzzyEnabledDestruction || GadgetGeneric.getFuzzy(stack) ? null : world.getBlockState(startPos);
+        IBlockState stateTarget = !SyncedConfig.nonFuzzyEnabledDestruction || AbstractGadget.getFuzzy(stack) ? null : world.getBlockState(startPos);
 
         int left = -getToolValue(stack, "left");
         int right = getToolValue(stack, "right");
@@ -354,8 +354,8 @@ public class GadgetDestruction extends GadgetGeneric {
     }
 
     public static ItemStack getGadget(EntityPlayer player) {
-        ItemStack stack = GadgetGeneric.getGadget(player);
-        if (!(stack.getItem() instanceof GadgetDestruction))
+        ItemStack stack = AbstractGadget.getGadget(player);
+        if (!(stack.getItem() instanceof DestructionGadget))
             return ItemStack.EMPTY;
 
         return stack;

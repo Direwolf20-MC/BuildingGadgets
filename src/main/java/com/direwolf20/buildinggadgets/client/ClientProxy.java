@@ -1,6 +1,5 @@
 package com.direwolf20.buildinggadgets.client;
 
-import com.direwolf20.buildinggadgets.client.KeyBindings;
 import com.direwolf20.buildinggadgets.client.renders.BuildingRender;
 import com.direwolf20.buildinggadgets.client.renders.DestructionRender;
 import com.direwolf20.buildinggadgets.client.renders.ExchangerRender;
@@ -31,7 +30,7 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 
-import static com.direwolf20.buildinggadgets.common.items.ModItems.gadgetBuilding;
+import static com.direwolf20.buildinggadgets.common.items.ModItems.buildingGadget;
 
 import java.awt.Color;
 
@@ -55,12 +54,12 @@ public class ClientProxy extends CommonProxy {
     public static void registerModels(@SuppressWarnings("unused") ModelRegistryEvent event) {
         ModBlocks.effectBlock.initModel();
         ModBlocks.templateManager.initModel();
-        gadgetBuilding.initModel();
-        ModItems.gadgetExchanger.initModel();
-        ModItems.gadgetCopyPaste.initModel();
+        buildingGadget.initModel();
+        ModItems.exchangerGadget.initModel();
+        ModItems.copyGadget.initModel();
         ModItems.template.initModel();
         if (SyncedConfig.enableDestructionGadget) {
-            ModItems.gadgetDestruction.initModel();
+            ModItems.destructionGadget.initModel();
         }
         if (SyncedConfig.enablePaste) {
             ModItems.constructionPaste.initModel();
@@ -87,17 +86,17 @@ public class ClientProxy extends CommonProxy {
     public static void renderWorldLastEvent(RenderWorldLastEvent evt) {
         Minecraft mc = Minecraft.getMinecraft();
         EntityPlayer player = mc.player;
-        ItemStack heldItem = GadgetGeneric.getGadget(player);
+        ItemStack heldItem = AbstractGadget.getGadget(player);
         if (heldItem.isEmpty())
             return;
 
-        if (heldItem.getItem() instanceof GadgetBuilding) {
+        if (heldItem.getItem() instanceof BuildingGadget) {
             new BuildingRender().render(evt, player, heldItem);
-        } else if (heldItem.getItem() instanceof GadgetExchanger) {
+        } else if (heldItem.getItem() instanceof ExchangerGadget) {
             new ExchangerRender().render(evt, player, heldItem);
-        } else if (heldItem.getItem() instanceof GadgetCopyPaste) {
+        } else if (heldItem.getItem() instanceof CopyGadget) {
             ToolRenders.renderPasteOverlay(evt, player, heldItem);
-        } else if (heldItem.getItem() instanceof GadgetDestruction) {
+        } else if (heldItem.getItem() instanceof DestructionGadget) {
             new DestructionRender().render(evt, player, heldItem);
         }
 

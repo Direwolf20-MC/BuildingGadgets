@@ -9,7 +9,6 @@ import com.direwolf20.buildinggadgets.common.items.ModItems;
 import com.direwolf20.buildinggadgets.common.tools.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.tools.InventoryManipulation;
 import com.direwolf20.buildinggadgets.common.tools.RayTraceHelper;
-import com.direwolf20.buildinggadgets.common.tools.ToolRenders;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
@@ -44,10 +43,10 @@ import java.util.Set;
 import static com.direwolf20.buildinggadgets.common.gadgets.building.ExchangingModes.SURFACE;
 import static com.direwolf20.buildinggadgets.common.tools.GadgetUtils.*;
 
-public class GadgetExchanger extends GadgetGeneric {
+public class ExchangerGadget extends AbstractGadget {
     public static final MockBuildingWorld fakeWorld = new MockBuildingWorld();
 
-    public GadgetExchanger() {
+    public ExchangerGadget() {
         super("exchangertool");
         setMaxDamage(SyncedConfig.durabilityExchanger);
     }
@@ -170,15 +169,15 @@ public class GadgetExchanger extends GadgetGeneric {
 
         IBlockState setBlock = GadgetUtils.getToolBlock(stack);
         int range = GadgetUtils.getToolRange(stack);
-        boolean fuzzyMode = GadgetGeneric.getFuzzy(stack);
+        boolean fuzzyMode = AbstractGadget.getFuzzy(stack);
 
         if (coords.size() == 0) { //If we don't have an anchor, build in the current spot
-            RayTraceResult lookingAt = RayTraceHelper.rayTrace(player, GadgetGeneric.shouldRayTraceFluid(stack));
+            RayTraceResult lookingAt = RayTraceHelper.rayTrace(player, AbstractGadget.shouldRayTraceFluid(stack));
             if (lookingAt == null) { //If we aren't looking at anything, exit
                 return false;
             }
 
-            coords = GadgetExchanger.getToolMode(stack).getMode().getCollection(player, world, setBlock, lookingAt.getBlockPos(), lookingAt.sideHit, range, false, fuzzyMode);
+            coords = ExchangerGadget.getToolMode(stack).getMode().getCollection(player, world, setBlock, lookingAt.getBlockPos(), lookingAt.sideHit, range, false, fuzzyMode);
         } else { //If we do have an anchor, erase it (Even if the build fails)
             setAnchor(stack, new ArrayList<>());
         }
@@ -282,8 +281,8 @@ public class GadgetExchanger extends GadgetGeneric {
     }
 
     public static ItemStack getGadget(EntityPlayer player) {
-        ItemStack stack = GadgetGeneric.getGadget(player);
-        if (!(stack.getItem() instanceof GadgetExchanger))
+        ItemStack stack = AbstractGadget.getGadget(player);
+        if (!(stack.getItem() instanceof ExchangerGadget))
             return ItemStack.EMPTY;
 
         return stack;

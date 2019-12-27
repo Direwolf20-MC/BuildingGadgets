@@ -3,8 +3,8 @@ package com.direwolf20.buildinggadgets.client.gui;
 import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManagerContainer;
 import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManagerGUI;
 import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManagerTileEntity;
-import com.direwolf20.buildinggadgets.common.gadgets.GadgetCopyPaste;
-import com.direwolf20.buildinggadgets.common.gadgets.GadgetDestruction;
+import com.direwolf20.buildinggadgets.common.gadgets.CopyGadget;
+import com.direwolf20.buildinggadgets.common.gadgets.DestructionGadget;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
@@ -36,24 +36,24 @@ public class GuiProxy implements IGuiHandler {
             return new TemplateManagerGUI(containerTileEntity, new TemplateManagerContainer(player.inventory, containerTileEntity));
         }
         if (ID == CopyPasteID) {
-            if (player.getHeldItemMainhand().getItem() instanceof GadgetCopyPaste)
-                return new CopyPasteGUI(player.getHeldItemMainhand());
-            else if (player.getHeldItemOffhand().getItem() instanceof GadgetCopyPaste)
-                return new CopyPasteGUI(player.getHeldItemOffhand());
+            if (player.getHeldItemMainhand().getItem() instanceof CopyGadget)
+                return new CopyPasteScreen(player.getHeldItemMainhand());
+            else if (player.getHeldItemOffhand().getItem() instanceof CopyGadget)
+                return new CopyPasteScreen(player.getHeldItemOffhand());
             else
                 return null;
         } else if (ID == DestructionID) {
-            if (player.getHeldItemMainhand().getItem() instanceof GadgetDestruction)
-                return new DestructionGUI(player.getHeldItemMainhand());
-            else if (player.getHeldItemOffhand().getItem() instanceof GadgetDestruction)
-                return new DestructionGUI(player.getHeldItemOffhand());
+            if (player.getHeldItemMainhand().getItem() instanceof DestructionGadget)
+                return new DestructionScreen(player.getHeldItemMainhand());
+            else if (player.getHeldItemOffhand().getItem() instanceof DestructionGadget)
+                return new DestructionScreen(player.getHeldItemOffhand());
             else
                 return null;
         } else if (ID == PasteID) {
-            if (player.getHeldItemMainhand().getItem() instanceof GadgetCopyPaste)
-                return new PasteGUI(player.getHeldItemMainhand());
-            else if (player.getHeldItemOffhand().getItem() instanceof GadgetCopyPaste)
-                return new PasteGUI(player.getHeldItemOffhand());
+            if (player.getHeldItemMainhand().getItem() instanceof CopyGadget)
+                return new PasteScreen(player.getHeldItemMainhand());
+            else if (player.getHeldItemOffhand().getItem() instanceof CopyGadget)
+                return new PasteScreen(player.getHeldItemOffhand());
             else
                 return null;
         }

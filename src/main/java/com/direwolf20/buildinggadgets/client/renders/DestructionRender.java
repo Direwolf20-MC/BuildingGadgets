@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.client.renders;
 
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
-import com.direwolf20.buildinggadgets.common.gadgets.GadgetDestruction;
+import com.direwolf20.buildinggadgets.common.gadgets.DestructionGadget;
 import com.direwolf20.buildinggadgets.common.tools.Sorter;
 import com.direwolf20.buildinggadgets.common.tools.UniqueItemStack;
 import com.google.common.cache.Cache;
@@ -32,10 +32,10 @@ public class DestructionRender extends AbstractRender {
 
     @Override
     public void gadgetRender(Tessellator tessellator, BufferBuilder bufferBuilder, RayTraceResult rayTraceResult, ItemStack gadget, List<BlockPos> existingLocations) {
-        if (!GadgetDestruction.getOverlay(gadget))
+        if (!DestructionGadget.getOverlay(gadget))
             return;
 
-        List<BlockPos> coordinates = GadgetDestruction.getArea(mc.player.world, rayTraceResult, mc.player, gadget, existingLocations);
+        List<BlockPos> coordinates = DestructionGadget.getArea(mc.player.world, rayTraceResult, mc.player, gadget, existingLocations);
 
         if( coordinates.size() == 0 )
             return;

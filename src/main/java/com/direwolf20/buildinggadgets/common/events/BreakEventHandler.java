@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.common.events;
 
-import com.direwolf20.buildinggadgets.common.gadgets.GadgetGeneric;
+import com.direwolf20.buildinggadgets.common.gadgets.AbstractGadget;
 import com.direwolf20.buildinggadgets.common.tools.InventoryManipulation;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -20,7 +20,7 @@ public class BreakEventHandler {
         if (player == null)
             return;
 
-        ItemStack heldItem = GadgetGeneric.getGadget(player);
+        ItemStack heldItem = AbstractGadget.getGadget(player);
         if (heldItem.isEmpty())
             return;
 

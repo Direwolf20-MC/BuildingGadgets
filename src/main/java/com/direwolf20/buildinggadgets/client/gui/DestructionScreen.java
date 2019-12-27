@@ -5,8 +5,9 @@
 
 package com.direwolf20.buildinggadgets.client.gui;
 
+import com.direwolf20.buildinggadgets.client.gui.components.DireButton;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
-import com.direwolf20.buildinggadgets.common.gadgets.GadgetDestruction;
+import com.direwolf20.buildinggadgets.common.gadgets.DestructionGadget;
 import com.direwolf20.buildinggadgets.common.network.PacketDestructionGUI;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import net.minecraft.client.Minecraft;
@@ -22,7 +23,7 @@ import net.minecraft.util.text.TextFormatting;
 
 import java.io.IOException;
 
-public class DestructionGUI extends GuiScreen {
+public class DestructionScreen extends GuiScreen {
     public static final int WIDTH = 256;
     public static final int HEIGHT = 256;
 
@@ -42,7 +43,7 @@ public class DestructionGUI extends GuiScreen {
 
     private static final ResourceLocation background = new ResourceLocation(BuildingGadgets.MODID, "textures/gui/testcontainer.png");
 
-    public DestructionGUI(ItemStack tool) {
+    public DestructionScreen(ItemStack tool) {
         super();
         this.destructionTool = tool;
     }
@@ -131,19 +132,19 @@ public class DestructionGUI extends GuiScreen {
 
     private void nullCheckTextBoxes() {
         if (left.getText().isEmpty()) {
-            left.setText(String.valueOf(GadgetDestruction.getToolValue(destructionTool, "left")));
+            left.setText(String.valueOf(DestructionGadget.getToolValue(destructionTool, "left")));
         }
         if (right.getText().isEmpty()) {
-            right.setText(String.valueOf(GadgetDestruction.getToolValue(destructionTool, "right")));
+            right.setText(String.valueOf(DestructionGadget.getToolValue(destructionTool, "right")));
         }
         if (up.getText().isEmpty()) {
-            up.setText(String.valueOf(GadgetDestruction.getToolValue(destructionTool, "up")));
+            up.setText(String.valueOf(DestructionGadget.getToolValue(destructionTool, "up")));
         }
         if (down.getText().isEmpty()) {
-            down.setText(String.valueOf(GadgetDestruction.getToolValue(destructionTool, "down")));
+            down.setText(String.valueOf(DestructionGadget.getToolValue(destructionTool, "down")));
         }
         if (depth.getText().isEmpty()) {
-            depth.setText(String.valueOf(GadgetDestruction.getToolValue(destructionTool, "depth")));
+            depth.setText(String.valueOf(DestructionGadget.getToolValue(destructionTool, "depth")));
         }
     }
 

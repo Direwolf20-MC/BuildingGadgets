@@ -1,4 +1,4 @@
-package com.direwolf20.buildinggadgets.client.gui;
+package com.direwolf20.buildinggadgets.client.gui.components;
 
 import javax.annotation.Nullable;
 

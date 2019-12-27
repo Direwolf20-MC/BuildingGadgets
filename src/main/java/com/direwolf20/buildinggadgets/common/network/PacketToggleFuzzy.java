@@ -1,10 +1,9 @@
 package com.direwolf20.buildinggadgets.common.network;
 
 import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
-import com.direwolf20.buildinggadgets.common.gadgets.GadgetBuilding;
-import com.direwolf20.buildinggadgets.common.gadgets.GadgetDestruction;
-import com.direwolf20.buildinggadgets.common.gadgets.GadgetExchanger;
-import com.direwolf20.buildinggadgets.common.gadgets.GadgetGeneric;
+import com.direwolf20.buildinggadgets.common.gadgets.*;
+import com.direwolf20.buildinggadgets.common.gadgets.ExchangerGadget;
+import com.direwolf20.buildinggadgets.common.gadgets.AbstractGadget;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -20,10 +19,10 @@ public class PacketToggleFuzzy extends PacketEmpty {
         public IMessage onMessage(PacketToggleFuzzy message, MessageContext ctx) {
             FMLCommonHandler.instance().getWorldThread(ctx.netHandler).addScheduledTask(() -> {
                 EntityPlayer player = ctx.getServerHandler().player;
-                ItemStack stack = GadgetGeneric.getGadget(player);
-                GadgetGeneric item = (GadgetGeneric) stack.getItem();
-                if (item instanceof GadgetExchanger || item instanceof GadgetBuilding
-                        || (item instanceof GadgetDestruction && SyncedConfig.nonFuzzyEnabledDestruction))
+                ItemStack stack = AbstractGadget.getGadget(player);
+                AbstractGadget item = (AbstractGadget) stack.getItem();
+                if (item instanceof ExchangerGadget || item instanceof BuildingGadget
+                        || (item instanceof DestructionGadget && SyncedConfig.nonFuzzyEnabledDestruction))
                     item.toggleFuzzy(player, stack);
             });
             return null;

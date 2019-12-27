@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.common.tools;
 
+import com.direwolf20.buildinggadgets.common.gadgets.CopyGadget;
 import com.direwolf20.buildinggadgets.common.items.ModItems;
-import com.direwolf20.buildinggadgets.common.gadgets.GadgetCopyPaste;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockRendererDispatcher;
@@ -29,7 +29,7 @@ import java.util.Map;
 public class PasteToolBufferBuilder {
 
     private static Map<String, NBTTagCompound> tagMap = new HashMap<String, NBTTagCompound>();
-    private static Map<String, ToolDireBuffer> bufferMap = new HashMap<String, ToolDireBuffer>();
+    private static Map<String, ReverseBufferBuilder> bufferMap = new HashMap<String, ReverseBufferBuilder>();
 
 
     private static int getCopyCounter(String UUID) {
@@ -40,8 +40,8 @@ public class PasteToolBufferBuilder {
     }
 
     public static void clearMaps() {
-        tagMap = new HashMap<String, NBTTagCompound>();
-        bufferMap = new HashMap<String, ToolDireBuffer>();
+        tagMap = new HashMap<>();
+        bufferMap = new HashMap<>();
     }
 
     public static void addToMap(String UUID, NBTTagCompound tag) {
@@ -57,7 +57,7 @@ public class PasteToolBufferBuilder {
     }
 
     @Nullable
-    public static ToolDireBuffer getBufferFromMap(String UUID) {
+    public static ReverseBufferBuilder getBufferFromMap(String UUID) {
         if (bufferMap.containsKey(UUID)) {
             return bufferMap.get(UUID);
         }
@@ -66,9 +66,9 @@ public class PasteToolBufferBuilder {
 
     public static void addMapToBuffer(String UUID) {
 //        long time = System.nanoTime();
-        List<BlockMap> blockMapList = GadgetCopyPaste.getBlockMapList(tagMap.get(UUID));
+        List<BlockMap> blockMapList = CopyGadget.getBlockMapList(tagMap.get(UUID));
         BlockRendererDispatcher dispatcher = Minecraft.getMinecraft().getBlockRendererDispatcher();
-        ToolDireBuffer bufferBuilder = new ToolDireBuffer(2097152);
+        ReverseBufferBuilder bufferBuilder = new ReverseBufferBuilder(2097152);
         bufferBuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
         for (BlockMap blockMap : blockMapList) {
             IBlockState renderBlockState = blockMap.state;
@@ -84,7 +84,7 @@ public class PasteToolBufferBuilder {
 
     public static void draw(EntityPlayer player, double x, double y, double z, BlockPos startPos, String UUID) {
 //        long time = System.nanoTime();
-        ToolDireBuffer bufferBuilder = bufferMap.get(UUID);
+        ReverseBufferBuilder bufferBuilder = bufferMap.get(UUID);
         bufferBuilder.sortVertexData((float) (x - startPos.getX()), (float) ((y + player.getEyeHeight()) - startPos.getY()), (float) (z - startPos.getZ()));
         //System.out.printf("Sorted %d Vertexes in %.2f ms%n", bufferBuilder.getVertexCount(), (System.nanoTime() - time) * 1e-6);
         if (bufferBuilder.getVertexCount() > 0) {
@@ -119,6 +119,6 @@ public class PasteToolBufferBuilder {
     }
 
     public static boolean isUpdateNeeded(String UUID, ItemStack stack) {
-        return ((ModItems.gadgetCopyPaste.getCopyCounter(stack) != getCopyCounter(UUID) || PasteToolBufferBuilder.getTagFromUUID(UUID) == null));
+        return ((ModItems.copyGadget.getCopyCounter(stack) != getCopyCounter(UUID) || PasteToolBufferBuilder.getTagFromUUID(UUID) == null));
     }
 }

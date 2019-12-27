@@ -1,9 +1,8 @@
 package com.direwolf20.buildinggadgets.common.network;
 
-import com.direwolf20.buildinggadgets.common.gadgets.GadgetBuilding;
-import com.direwolf20.buildinggadgets.common.gadgets.GadgetCopyPaste;
-import com.direwolf20.buildinggadgets.common.gadgets.GadgetExchanger;
-import com.direwolf20.buildinggadgets.common.gadgets.GadgetGeneric;
+import com.direwolf20.buildinggadgets.common.gadgets.*;
+import com.direwolf20.buildinggadgets.common.gadgets.BuildingGadget;
+import com.direwolf20.buildinggadgets.common.gadgets.ExchangerGadget;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
@@ -42,19 +41,19 @@ public class PacketToggleMode implements IMessage {
 
         private void handle(PacketToggleMode message, MessageContext ctx) {
             EntityPlayerMP playerEntity = ctx.getServerHandler().player;
-            ItemStack heldItem = GadgetGeneric.getGadget(playerEntity);
+            ItemStack heldItem = AbstractGadget.getGadget(playerEntity);
             if (heldItem.isEmpty())
                 return;
 
-            if (heldItem.getItem() instanceof GadgetBuilding) {
-                GadgetBuilding gadgetBuilding = (GadgetBuilding) (heldItem.getItem());
-                gadgetBuilding.setMode(playerEntity, heldItem, message.mode);
-            } else if (heldItem.getItem() instanceof GadgetExchanger) {
-                GadgetExchanger gadgetExchanger = (GadgetExchanger) (heldItem.getItem());
-                gadgetExchanger.setMode(playerEntity, heldItem, message.mode);
-            } else if (heldItem.getItem() instanceof GadgetCopyPaste) {
-                GadgetCopyPaste gadgetCopyPaste = (GadgetCopyPaste) (heldItem.getItem());
-                gadgetCopyPaste.setMode(playerEntity, heldItem, message.mode);
+            if (heldItem.getItem() instanceof BuildingGadget) {
+                BuildingGadget buildingGadget = (BuildingGadget) (heldItem.getItem());
+                buildingGadget.setMode(playerEntity, heldItem, message.mode);
+            } else if (heldItem.getItem() instanceof ExchangerGadget) {
+                ExchangerGadget exchangerGadget = (ExchangerGadget) (heldItem.getItem());
+                exchangerGadget.setMode(playerEntity, heldItem, message.mode);
+            } else if (heldItem.getItem() instanceof CopyGadget) {
+                CopyGadget copyGadget = (CopyGadget) (heldItem.getItem());
+                copyGadget.setMode(playerEntity, heldItem, message.mode);
             }
         }
     }

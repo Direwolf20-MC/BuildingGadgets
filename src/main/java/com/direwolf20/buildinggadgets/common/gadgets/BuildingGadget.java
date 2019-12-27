@@ -39,10 +39,10 @@ import java.util.Set;
 import static com.direwolf20.buildinggadgets.common.tools.GadgetUtils.*;
 
 
-public class GadgetBuilding extends GadgetGeneric {
+public class BuildingGadget extends AbstractGadget {
     private static final MockBuildingWorld fakeWorld = new MockBuildingWorld();
 
-    public GadgetBuilding() {
+    public BuildingGadget() {
         super("buildingtool");
         setMaxDamage(SyncedConfig.durabilityBuilder);
     }
@@ -164,11 +164,11 @@ public class GadgetBuilding extends GadgetGeneric {
 
         IBlockState setBlock = GadgetUtils.getToolBlock(stack);
         if (coords.size() == 0) {  //If we don't have an anchor, build in the current spot
-            RayTraceResult lookingAt = RayTraceHelper.rayTrace(player, GadgetGeneric.shouldRayTraceFluid(stack));
+            RayTraceResult lookingAt = RayTraceHelper.rayTrace(player, AbstractGadget.shouldRayTraceFluid(stack));
             if (lookingAt == null)
                 return false;
 
-            coords = GadgetBuilding.getToolMode(stack).getMode().getCollection(
+            coords = BuildingGadget.getToolMode(stack).getMode().getCollection(
                     player, world, setBlock, lookingAt.getBlockPos(), lookingAt.sideHit, getToolRange(stack), shouldPlaceAtop(stack), getFuzzy(stack)
             );
         } else { //If we do have an anchor, erase it (Even if the build fails)
@@ -324,8 +324,8 @@ public class GadgetBuilding extends GadgetGeneric {
     }
 
     public static ItemStack getGadget(EntityPlayer player) {
-        ItemStack stack = GadgetGeneric.getGadget(player);
-        if (!(stack.getItem() instanceof GadgetBuilding))
+        ItemStack stack = AbstractGadget.getGadget(player);
+        if (!(stack.getItem() instanceof BuildingGadget))
             return ItemStack.EMPTY;
 
         return stack;

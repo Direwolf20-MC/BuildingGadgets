@@ -1,8 +1,8 @@
 package com.direwolf20.buildinggadgets.common.tools;
 
+import com.direwolf20.buildinggadgets.common.gadgets.AbstractGadget;
+import com.direwolf20.buildinggadgets.common.gadgets.CopyGadget;
 import com.direwolf20.buildinggadgets.common.items.ModItems;
-import com.direwolf20.buildinggadgets.common.gadgets.GadgetCopyPaste;
-import com.direwolf20.buildinggadgets.common.gadgets.GadgetGeneric;
 import com.direwolf20.buildinggadgets.common.items.pastes.ConstructionPaste;
 import com.direwolf20.buildinggadgets.common.items.pastes.GenericPasteContainer;
 import com.google.common.collect.ImmutableSet;
@@ -57,7 +57,7 @@ public class InventoryManipulation {
         }
 
         //Try to insert into the remote inventory.
-        ItemStack tool = GadgetGeneric.getGadget(player);
+        ItemStack tool = AbstractGadget.getGadget(player);
         IItemHandler remoteInventory = GadgetUtils.getRemoteInventory(tool, world, player, NetworkIO.Operation.INSERT);
         if (remoteInventory != null) {
             for (int i = 0; i < remoteInventory.getSlots(); i++) {
@@ -103,7 +103,7 @@ public class InventoryManipulation {
             return true;
         }
 
-        ItemStack tool = GadgetGeneric.getGadget(player);
+        ItemStack tool = AbstractGadget.getGadget(player);
         IItemHandler remoteInventory = GadgetUtils.getRemoteInventory(tool, world, player);
         if (remoteInventory != null) {
             for (int i = 0; i < remoteInventory.getSlots(); i++) {
@@ -162,7 +162,7 @@ public class InventoryManipulation {
         if (player.capabilities.isCreativeMode) {
             return Integer.MAX_VALUE;
         }
-        long count = remoteInventory.countItem(GadgetGeneric.getGadget(player), itemStack);
+        long count = remoteInventory.countItem(AbstractGadget.getGadget(player), itemStack);
         InventoryPlayer inv = player.inventory;
         List<Integer> slots = findItem(itemStack.getItem(), itemStack.getMetadata(), inv);
         List<IItemHandler> invContainers = findInvContainers(inv);
@@ -351,7 +351,7 @@ public class InventoryManipulation {
             placeState = originalState.getBlock().getDefaultState();
         }
         for (IProperty prop : placeState.getPropertyKeys()) {
-            if (tool.getItem() instanceof GadgetCopyPaste) {
+            if (tool.getItem() instanceof CopyGadget) {
                 if (SAFE_PROPERTIES_COPY_PASTE.contains(prop)) {
                     placeState = placeState.withProperty(prop, originalState.getValue(prop));
                 }

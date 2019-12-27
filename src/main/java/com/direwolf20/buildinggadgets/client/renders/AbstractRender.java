@@ -2,8 +2,7 @@ package com.direwolf20.buildinggadgets.client.renders;
 
 import com.direwolf20.buildinggadgets.client.RemoteInventoryCache;
 import com.direwolf20.buildinggadgets.common.blocks.ModBlocks;
-import com.direwolf20.buildinggadgets.common.config.Config;
-import com.direwolf20.buildinggadgets.common.gadgets.GadgetGeneric;
+import com.direwolf20.buildinggadgets.common.gadgets.AbstractGadget;
 import com.direwolf20.buildinggadgets.common.items.capability.CapabilityProviderEnergy;
 import com.direwolf20.buildinggadgets.common.tools.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.tools.InventoryManipulation;
@@ -76,7 +75,7 @@ public abstract class AbstractRender {
 
 
         // Validate that we should render
-        RayTraceResult rayTraceResult = RayTraceHelper.rayTrace(mc.player, GadgetGeneric.shouldRayTraceFluid(gadget));
+        RayTraceResult rayTraceResult = RayTraceHelper.rayTrace(mc.player, AbstractGadget.shouldRayTraceFluid(gadget));
         List<BlockPos> existingLocations = getAnchor(gadget);
 
         // Perform a typical render

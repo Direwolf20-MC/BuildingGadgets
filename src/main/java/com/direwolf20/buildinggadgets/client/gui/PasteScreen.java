@@ -5,8 +5,9 @@
 
 package com.direwolf20.buildinggadgets.client.gui;
 
+import com.direwolf20.buildinggadgets.client.gui.components.DireButton;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
-import com.direwolf20.buildinggadgets.common.gadgets.GadgetCopyPaste;
+import com.direwolf20.buildinggadgets.common.gadgets.CopyGadget;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.PacketPasteGUI;
 import net.minecraft.client.Minecraft;
@@ -21,7 +22,7 @@ import net.minecraft.util.text.TextFormatting;
 
 import java.io.IOException;
 
-public class PasteGUI extends GuiScreen {
+public class PasteScreen extends GuiScreen {
     public static final int WIDTH = 256;
     public static final int HEIGHT = 256;
 
@@ -36,7 +37,7 @@ public class PasteGUI extends GuiScreen {
 
     private static final ResourceLocation background = new ResourceLocation(BuildingGadgets.MODID, "textures/gui/testcontainer.png");
 
-    public PasteGUI(ItemStack tool) {
+    public PasteScreen(ItemStack tool) {
         super();
         this.tool = tool;
     }
@@ -105,13 +106,13 @@ public class PasteGUI extends GuiScreen {
 
     protected void nullCheckTextBoxes() {
         if (X.getText().isEmpty()) {
-            X.setText(String.valueOf(GadgetCopyPaste.getX(tool)));
+            X.setText(String.valueOf(CopyGadget.getX(tool)));
         }
         if (Y.getText().isEmpty()) {
-            Y.setText(String.valueOf(GadgetCopyPaste.getY(tool)));
+            Y.setText(String.valueOf(CopyGadget.getY(tool)));
         }
         if (Z.getText().isEmpty()) {
-            Z.setText(String.valueOf(GadgetCopyPaste.getZ(tool)));
+            Z.setText(String.valueOf(CopyGadget.getZ(tool)));
         }
     }
 

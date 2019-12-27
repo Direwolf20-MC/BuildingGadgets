@@ -17,9 +17,9 @@ import java.util.BitSet;
 
 /**
  * This class differs from {@link BufferBuilder BufferBuilder} only in that the Comparator arguments of {@link Arrays#sort(Integer[], Comparator) Arrays#sort}
- * are compared in reverse order in {@link ToolDireBuffer#sortVertexData sortVertexData}
+ * are compared in reverse order in {@link ReverseBufferBuilder#sortVertexData sortVertexData}
  */
-public class ToolDireBuffer extends BufferBuilder {
+public class ReverseBufferBuilder extends BufferBuilder {
 
     private static final Logger LOGGER = LogManager.getLogger();
     private ByteBuffer byteBuffer;
@@ -40,7 +40,7 @@ public class ToolDireBuffer extends BufferBuilder {
     private VertexFormat vertexFormat;
     private boolean isDrawing;
 
-    public ToolDireBuffer(int bufferSizeIn) {
+    public ReverseBufferBuilder(int bufferSizeIn) {
         super(bufferSizeIn);
         this.byteBuffer = GLAllocation.createDirectByteBuffer(bufferSizeIn * 4);
         this.rawIntBuffer = this.byteBuffer.asIntBuffer();

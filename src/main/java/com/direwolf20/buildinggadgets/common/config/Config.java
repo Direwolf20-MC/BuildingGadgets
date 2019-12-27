@@ -19,13 +19,13 @@ public class Config {
 
     private static final String LANG_KEY_PASTE_CONTAINERS = LANG_KEY_ROOT + ".subCategoryPasteContainers";
 
-    private static final String LANG_KEY_GADGET_BUILDING = LANG_KEY_GADGETS + ".gadgetBuilding";
+    private static final String LANG_KEY_GADGET_BUILDING = LANG_KEY_GADGETS + ".buildingGadget";
 
-    private static final String LANG_KEY_GADGET_EXCHANGER = LANG_KEY_GADGETS + ".gadgetExchanger";
+    private static final String LANG_KEY_GADGET_EXCHANGER = LANG_KEY_GADGETS + ".exchangerGadget";
 
-    private static final String LANG_KEY_GADGET_DESTRUCTION = LANG_KEY_GADGETS + ".gadgetDestruction";
+    private static final String LANG_KEY_GADGET_DESTRUCTION = LANG_KEY_GADGETS + ".destructionGadget";
 
-    private static final String LANG_KEY_GADGET_COPY_PASTE = LANG_KEY_GADGETS + ".gadgetCopyPaste";
+    private static final String LANG_KEY_GADGET_COPY_PASTE = LANG_KEY_GADGETS + ".copyGadget";
 
     private static final String LANG_KEY_PASTE_CONTAINERS_CAPACITY = LANG_KEY_PASTE_CONTAINERS + ".capacity";
 
