@@ -36,8 +36,8 @@ public class PacketRotateMirror implements IMessage {
             buf.writeInt(operation.ordinal());
     }
 
-    public static enum Operation {
-        ROTATE, MIRROR;
+    public enum Operation {
+        ROTATE, MIRROR
     }
 
     public static class Handler implements IMessageHandler<PacketRotateMirror, IMessage> {
@@ -45,12 +45,14 @@ public class PacketRotateMirror implements IMessage {
         public IMessage onMessage(PacketRotateMirror message, MessageContext ctx) {
             FMLCommonHandler.instance().getWorldThread(ctx.netHandler).addScheduledTask(() -> {
                 EntityPlayer player = ctx.getServerHandler().player;
-                ItemStack stack = AbstractGadget.getGadget(player);
-                Operation operation = message.operation != null ? message.operation : (player.isSneaking() ? Operation.MIRROR : Operation.ROTATE);
-                if (stack.getItem() instanceof BuildingGadget || stack.getItem() instanceof ExchangerGadget)
-                    GadgetUtils.rotateOrMirrorToolBlock(stack, player, operation);
-                else if (stack.getItem() instanceof CopyGadget)
-                    CopyGadget.rotateOrMirrorBlocks(stack, player, operation);
+
+                AbstractGadget.getGadget(player).ifPresent(gadget -> {
+                    Operation operation = message.operation != null ? message.operation : (player.isSneaking() ? Operation.MIRROR : Operation.ROTATE);
+                    if (gadget.getItem() instanceof BuildingGadget || gadget.getItem() instanceof ExchangingGadget)
+                        GadgetUtils.rotateOrMirrorToolBlock(gadget, player, operation);
+                    else if (gadget.getItem() instanceof CopyGadget)
+                        CopyGadget.rotateOrMirrorBlocks(gadget, player, operation);
+                });
             });
             return null;
         }

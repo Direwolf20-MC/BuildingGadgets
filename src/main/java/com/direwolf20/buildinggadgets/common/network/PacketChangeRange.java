@@ -41,22 +41,20 @@ public class PacketChangeRange implements IMessage {
 
         private void handle(PacketChangeRange message, MessageContext ctx) {
             EntityPlayerMP playerEntity = ctx.getServerHandler().player;
-            ItemStack heldItem = AbstractGadget.getGadget(playerEntity);
-            if (heldItem.isEmpty())
-                return;
-
-            if (message.range >= 0)
-                GadgetUtils.setToolRange(heldItem, message.range);
-            else if (heldItem.getItem() instanceof BuildingGadget) {
-                BuildingGadget buildingGadget = (BuildingGadget) (heldItem.getItem());
-                buildingGadget.rangeChange(playerEntity, heldItem);
-            } else if (heldItem.getItem() instanceof ExchangerGadget) {
-                ExchangerGadget exchangerGadget = (ExchangerGadget) (heldItem.getItem());
-                exchangerGadget.rangeChange(playerEntity, heldItem);
-            } else if (heldItem.getItem() instanceof DestructionGadget) {
-                DestructionGadget destructionGadget = (DestructionGadget) (heldItem.getItem());
-                destructionGadget.switchOverlay(playerEntity, heldItem);
-            }
+            AbstractGadget.getGadget(playerEntity).ifPresent(gadget -> {
+                if (message.range >= 0)
+                    GadgetUtils.setToolRange(gadget, message.range);
+                else if (gadget.getItem() instanceof BuildingGadget) {
+                    BuildingGadget buildingGadget = (BuildingGadget) (gadget.getItem());
+                    buildingGadget.rangeChange(playerEntity, gadget);
+                } else if (gadget.getItem() instanceof ExchangingGadget) {
+                    ExchangingGadget exchangingGadget = (ExchangingGadget) (gadget.getItem());
+                    exchangingGadget.rangeChange(playerEntity, gadget);
+                } else if (gadget.getItem() instanceof DestructionGadget) {
+                    DestructionGadget destructionGadget = (DestructionGadget) (gadget.getItem());
+                    destructionGadget.switchOverlay(playerEntity, gadget);
+                }
+            });
         }
     }
 }

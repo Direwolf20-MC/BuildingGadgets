@@ -17,6 +17,7 @@ import net.minecraft.init.Blocks;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import org.lwjgl.opengl.GL11;
@@ -63,8 +64,11 @@ public class ToolRenders {
             //First check if we have an anchor, if not check if we're looking at a block, if not, exit
             BlockPos startPos = CopyGadget.getAnchor(stack);
             if (startPos == null) {
-                startPos = RayTraceHelper.rayTrace(player, AbstractGadget.shouldRayTraceFluid(stack)).getBlockPos();
-                if (startPos == null) return;
+                RayTraceResult trace = RayTraceHelper.rayTrace(player, AbstractGadget.shouldRayTraceFluid(stack));
+                if (trace == null)
+                    return;
+
+                startPos = trace.getBlockPos();
                 startPos = startPos.up(CopyGadget.getY(stack));
                 startPos = startPos.east(CopyGadget.getX(stack));
                 startPos = startPos.south(CopyGadget.getZ(stack));

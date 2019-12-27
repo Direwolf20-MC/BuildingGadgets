@@ -16,9 +16,8 @@ public class PacketToggleRayTraceFluid extends PacketEmpty {
         public IMessage onMessage(PacketToggleRayTraceFluid message, MessageContext ctx) {
             FMLCommonHandler.instance().getWorldThread(ctx.netHandler).addScheduledTask(() -> {
                 EntityPlayer player = ctx.getServerHandler().player;
-                ItemStack stack = AbstractGadget.getGadget(player);
-                if (!stack.isEmpty())
-                    AbstractGadget.toggleRayTraceFluid(player, stack);
+
+                AbstractGadget.getGadget(player).ifPresent(gadget -> AbstractGadget.toggleRayTraceFluid(player, gadget));
             });
             return null;
         }

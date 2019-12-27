@@ -35,18 +35,15 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static com.direwolf20.buildinggadgets.common.gadgets.building.ExchangingModes.SURFACE;
 import static com.direwolf20.buildinggadgets.common.tools.GadgetUtils.*;
 
-public class ExchangerGadget extends AbstractGadget {
+public class ExchangingGadget extends AbstractGadget {
     public static final MockBuildingWorld fakeWorld = new MockBuildingWorld();
 
-    public ExchangerGadget() {
+    public ExchangingGadget() {
         super("exchangertool");
         setMaxDamage(SyncedConfig.durabilityExchanger);
     }
@@ -177,13 +174,13 @@ public class ExchangerGadget extends AbstractGadget {
                 return false;
             }
 
-            coords = ExchangerGadget.getToolMode(stack).getMode().getCollection(player, world, setBlock, lookingAt.getBlockPos(), lookingAt.sideHit, range, false, fuzzyMode);
+            coords = ExchangingGadget.getToolMode(stack).getMode().getCollection(player, world, setBlock, lookingAt.getBlockPos(), lookingAt.sideHit, range, false, fuzzyMode);
         } else { //If we do have an anchor, erase it (Even if the build fails)
             setAnchor(stack, new ArrayList<>());
         }
         Set<BlockPos> coordinates = new HashSet<>(coords);
 
-        ItemStack heldItem = getGadget(player);
+        ItemStack heldItem = getAsStack(player);
         if (heldItem.isEmpty())
             return false;
 
@@ -223,7 +220,7 @@ public class ExchangerGadget extends AbstractGadget {
             itemStack = setBlock.getBlock().getPickBlock(setBlock, null, world, pos, player);
         }
 
-        ItemStack tool = getGadget(player);
+        ItemStack tool = getAsStack(player);
         if (tool.isEmpty())
             return false;
 
@@ -280,12 +277,12 @@ public class ExchangerGadget extends AbstractGadget {
         return false;
     }
 
-    public static ItemStack getGadget(EntityPlayer player) {
-        ItemStack stack = AbstractGadget.getGadget(player);
-        if (!(stack.getItem() instanceof ExchangerGadget))
+    public static ItemStack getAsStack(EntityPlayer player) {
+        Optional<ItemStack> stack = AbstractGadget.getGadget(player);
+        if (!stack.isPresent() || !(stack.get().getItem() instanceof ExchangingGadget))
             return ItemStack.EMPTY;
 
-        return stack;
+        return stack.get();
     }
 
     @Override

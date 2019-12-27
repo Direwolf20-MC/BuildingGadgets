@@ -21,7 +21,7 @@ public class Config {
 
     private static final String LANG_KEY_GADGET_BUILDING = LANG_KEY_GADGETS + ".buildingGadget";
 
-    private static final String LANG_KEY_GADGET_EXCHANGER = LANG_KEY_GADGETS + ".exchangerGadget";
+    private static final String LANG_KEY_GADGET_EXCHANGER = LANG_KEY_GADGETS + ".exchangingGadget";
 
     private static final String LANG_KEY_GADGET_DESTRUCTION = LANG_KEY_GADGETS + ".destructionGadget";
 

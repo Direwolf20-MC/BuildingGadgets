@@ -31,10 +31,7 @@ import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.world.BlockEvent;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static com.direwolf20.buildinggadgets.common.tools.GadgetUtils.*;
 
@@ -178,7 +175,7 @@ public class BuildingGadget extends AbstractGadget {
         List<BlockPos> undoCoords = new ArrayList<BlockPos>();
         Set<BlockPos> coordinates = new HashSet<BlockPos>(coords);
 
-        ItemStack heldItem = getGadget(player);
+        ItemStack heldItem = getAsStack(player);
         if (heldItem.isEmpty())
             return false;
 
@@ -213,7 +210,7 @@ public class BuildingGadget extends AbstractGadget {
     }
 
     public boolean undoBuild(EntityPlayer player) {
-        ItemStack heldItem = getGadget(player);
+        ItemStack heldItem = getAsStack(player);
         if (heldItem.isEmpty())
             return false;
 
@@ -260,7 +257,7 @@ public class BuildingGadget extends AbstractGadget {
         if (!player.isAllowEdit())
             return false;
 
-        ItemStack heldItem = getGadget(player);
+        ItemStack heldItem = getAsStack(player);
         if (heldItem.isEmpty())
             return false;
 
@@ -323,12 +320,12 @@ public class BuildingGadget extends AbstractGadget {
         return false;
     }
 
-    public static ItemStack getGadget(EntityPlayer player) {
-        ItemStack stack = AbstractGadget.getGadget(player);
-        if (!(stack.getItem() instanceof BuildingGadget))
+    public static ItemStack getAsStack(EntityPlayer player) {
+        Optional<ItemStack> stack = AbstractGadget.getGadget(player);
+        if (!stack.isPresent() || !(stack.get().getItem() instanceof BuildingGadget))
             return ItemStack.EMPTY;
 
-        return stack;
+        return stack.get();
     }
 
     @Override

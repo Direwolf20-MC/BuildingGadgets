@@ -24,7 +24,7 @@ import net.minecraft.util.text.TextFormatting;
 
 import java.io.IOException;
 
-public class CopyPasteScreen extends GuiScreen {
+public class CopyScreen extends GuiScreen {
 //     public static final int WIDTH = 256;
 //     public static final int HEIGHT = 256;
 
@@ -46,7 +46,7 @@ public class CopyPasteScreen extends GuiScreen {
 
     private static final ResourceLocation background = new ResourceLocation(BuildingGadgets.MODID, "textures/gui/testcontainer.png");
 
-    public CopyPasteScreen(ItemStack tool) {
+    public CopyScreen(ItemStack tool) {
         super();
         this.copyPasteTool = tool;
     }

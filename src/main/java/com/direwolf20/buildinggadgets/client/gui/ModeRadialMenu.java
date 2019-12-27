@@ -81,7 +81,7 @@
 //    public void setSocketable(ItemStack stack) {
 //        if (stack.getItem() instanceof BuildingGadget)
 //            segments = BuildingModes.values().length;
-//        else if (stack.getItem() instanceof ExchangerGadget)
+//        else if (stack.getItem() instanceof ExchangingGadget)
 //            segments = ExchangingModes.values().length;
 //        else if (stack.getItem() instanceof CopyGadget)
 //            segments = CopyGadget.ToolMode.values().length;
@@ -90,14 +90,14 @@
 //    @Override
 //    public void initGui() {
 //        conditionalButtons.clear();
-//        ItemStack tool = getGadget();
+//        ItemStack tool = getAsStack();
 //        boolean isDestruction = tool.getItem() instanceof DestructionGadget;
 //        ScreenPosition right = isDestruction ? ScreenPosition.TOP : ScreenPosition.RIGHT;
 //        ScreenPosition left = isDestruction ? ScreenPosition.BOTTOM : ScreenPosition.LEFT;
 //        if (isDestruction) {
 //            addButton(new PositionedIconActionable("Show Overlay", "destroy_overlay", right, send -> {
 //                if (send) PacketHandler.INSTANCE.sendToServer(new PacketChangeRange());
-//                return DestructionGadget.getOverlay(getGadget());
+//                return DestructionGadget.getOverlay(getAsStack());
 //            }));
 //        } else {
 //            addButton(new PositionedIconActionable("Rotate", "rotate", left, false, send -> {
@@ -113,14 +113,14 @@
 //            if (!isDestruction || SyncedConfig.nonFuzzyEnabledDestruction) {
 //                GuiButton button = new PositionedIconActionable("Fuzzy", "fuzzy", right, send -> {
 //                    if (send) PacketHandler.INSTANCE.sendToServer(new PacketToggleFuzzy());
-//                    return AbstractGadget.getFuzzy(getGadget());
+//                    return AbstractGadget.getFuzzy(getAsStack());
 //                });
 //                addButton(button);
 //                conditionalButtons.add(button);
 //            }
 //            GuiButton button = new PositionedIconActionable("Connected area", "connected_area", right, send -> {
 //                if (send) PacketHandler.INSTANCE.sendToServer(new PacketToggleConnectedArea());
-//                return AbstractGadget.getConnectedArea(getGadget());
+//                return AbstractGadget.getConnectedArea(getAsStack());
 //            });
 //            addButton(button);
 //            conditionalButtons.add(button);
@@ -128,7 +128,7 @@
 //                int widthSlider = 82;
 //                sliderRange = new GuiSliderInt(width / 2 - widthSlider / 2, height / 2 + 72, widthSlider, 14, "Range ", "", 1, SyncedConfig.maxRange,
 //                    GadgetUtils.getToolRange(tool), false, true, Color.DARK_GRAY, slider -> {
-//                        if (slider.getValueInt() != GadgetUtils.getToolRange(getGadget()))
+//                        if (slider.getValueInt() != GadgetUtils.getToolRange(getAsStack()))
 //                            PacketHandler.INSTANCE.sendToServer(new PacketChangeRange(slider.getValueInt()));
 //                    }, (slider, amount) -> {
 //                        int value = slider.getValueInt();
@@ -142,17 +142,17 @@
 //        }
 //        addButton(new PositionedIconActionable("Place on fluids", "raytrace_fluid", right, send -> {
 //            if (send) PacketHandler.INSTANCE.sendToServer(new PacketToggleRayTraceFluid());
-//            return AbstractGadget.shouldRayTraceFluid(getGadget());
+//            return AbstractGadget.shouldRayTraceFluid(getAsStack());
 //        }));
 //        if (tool.getItem() instanceof BuildingGadget) {
 //            addButton(new PositionedIconActionable("Place on top", "building_place_atop", right, send -> {
 //                if (send) PacketHandler.INSTANCE.sendToServer(new PacketToggleBlockPlacement());
-//                return BuildingGadget.shouldPlaceAtop(getGadget());
+//                return BuildingGadget.shouldPlaceAtop(getAsStack());
 //            }));
 //        }
 //        addButton(new PositionedIconActionable("Anchor", "anchor", left, send -> {
 //            if (send) PacketHandler.INSTANCE.sendToServer(new PacketAnchor());
-//            ItemStack stack = getGadget();
+//            ItemStack stack = getAsStack();
 //            if (stack.getItem() instanceof CopyGadget)
 //                return CopyGadget.getAnchor(stack) != null;
 ////            else if (stack.getItem() instanceof DestructionGadget)
@@ -160,7 +160,7 @@
 //
 //            return !GadgetUtils.getAnchor(stack).isEmpty();
 //        }));
-//        if (!(tool.getItem() instanceof ExchangerGadget)) {
+//        if (!(tool.getItem() instanceof ExchangingGadget)) {
 //            addButton(new PositionedIconActionable("Undo", "undo", left, false, send -> {
 //                if (send) PacketHandler.INSTANCE.sendToServer(new PacketUndo());
 //                return false;
@@ -224,8 +224,8 @@
 //        return tool.getItem() instanceof DestructionGadget ? width / 2 - (pos - padding) / 2 : height / 2 - (pos - padding) / 2;
 //    }
 //
-//    private ItemStack getGadget() {
-//        return AbstractGadget.getGadget(Minecraft.getMinecraft().player);
+//    private ItemStack getAsStack() {
+//        return AbstractGadget.getAsStack(Minecraft.getMinecraft().player);
 //    }
 //
 //    @Override
@@ -269,7 +269,7 @@
 //
 //        List<int[]> stringPositions = new ArrayList();
 //
-//        ItemStack tool = getGadget();
+//        ItemStack tool = getAsStack();
 //        if (tool.isEmpty())
 //            return;
 //
@@ -280,8 +280,8 @@
 //        if (tool.getItem() instanceof BuildingGadget) {
 //            modeIndex = BuildingGadget.getToolMode(tool).ordinal();
 //            signs = signsBuilding;
-//        } else if (tool.getItem() instanceof ExchangerGadget) {
-//            modeIndex = ExchangerGadget.getToolMode(tool).ordinal();
+//        } else if (tool.getItem() instanceof ExchangingGadget) {
+//            modeIndex = ExchangingGadget.getToolMode(tool).ordinal();
 //            signs = signsExchanger;
 //        } else {
 //            modeIndex = CopyGadget.getToolMode(tool).ordinal();
@@ -339,7 +339,7 @@
 //            String name = "";
 //            if (tool.getItem() instanceof BuildingGadget)
 //                name = BuildingModes.values()[i].name();
-//            else if (tool.getItem() instanceof ExchangerGadget)
+//            else if (tool.getItem() instanceof ExchangingGadget)
 //                name = ExchangingModes.values()[i].name();
 //            else
 //                name = CopyGadget.ToolMode.values()[i].name();
@@ -433,9 +433,9 @@
 //            KeyBinding.setKeyBindState(k.getKeyCode(), GameSettings.isKeyDown(k));
 //
 //        timeIn++;
-//        ItemStack tool = getGadget();
+//        ItemStack tool = getAsStack();
 //        boolean builder = tool.getItem() instanceof BuildingGadget;
-//        if (!builder && !(tool.getItem() instanceof ExchangerGadget))
+//        if (!builder && !(tool.getItem() instanceof ExchangingGadget))
 //            return;
 //
 //        boolean curent;
@@ -445,7 +445,7 @@
 //            if (builder)
 //                curent = BuildingGadget.getToolMode(tool) == BuildingModes.SURFACE;
 //            else
-//                curent = i == 0 || ExchangerGadget.getToolMode(tool) == ExchangingModes.SURFACE;
+//                curent = i == 0 || ExchangingGadget.getToolMode(tool) == ExchangingModes.SURFACE;
 //
 //            if (button.visible != curent) {
 //                button.visible = curent;

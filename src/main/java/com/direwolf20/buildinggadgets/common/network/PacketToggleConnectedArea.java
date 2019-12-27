@@ -18,10 +18,13 @@ public class PacketToggleConnectedArea extends PacketEmpty {
         public IMessage onMessage(PacketToggleConnectedArea message, MessageContext ctx) {
             FMLCommonHandler.instance().getWorldThread(ctx.netHandler).addScheduledTask(() -> {
                 EntityPlayer player = ctx.getServerHandler().player;
-                ItemStack stack = AbstractGadget.getGadget(player);
-                AbstractGadget item = (AbstractGadget) stack.getItem();
-                if (item instanceof ExchangerGadget || item instanceof BuildingGadget || item instanceof DestructionGadget)
-                    item.toggleConnectedArea(player, stack);
+
+                AbstractGadget.getGadget(player).ifPresent(gadget -> {
+                    AbstractGadget item = (AbstractGadget) gadget.getItem();
+                    if (item instanceof ExchangingGadget || item instanceof BuildingGadget || item instanceof DestructionGadget)
+                        AbstractGadget.toggleConnectedArea(player, gadget);
+                });
+
             });
             return null;
         }

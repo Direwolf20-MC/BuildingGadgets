@@ -57,22 +57,23 @@ public class InventoryManipulation {
         }
 
         //Try to insert into the remote inventory.
-        ItemStack tool = AbstractGadget.getGadget(player);
-        IItemHandler remoteInventory = GadgetUtils.getRemoteInventory(tool, world, player, NetworkIO.Operation.INSERT);
-        if (remoteInventory != null) {
-            for (int i = 0; i < remoteInventory.getSlots(); i++) {
-                ItemStack containerItem = remoteInventory.getStackInSlot(i);
-                ItemStack giveItemStack = itemStack.copy();
-                if ((containerItem.getItem() == itemStack.getItem() && containerItem.getMetadata() == itemStack.getMetadata()) || containerItem.isEmpty()) {
-                    giveItemStack = remoteInventory.insertItem(i, giveItemStack, false);
-                    if (giveItemStack.isEmpty())
-                        return true;
+        Optional<ItemStack> tool = AbstractGadget.getGadget(player);
+        if( tool.isPresent() ) {
+            IItemHandler remoteInventory = GadgetUtils.getRemoteInventory(tool.get(), world, player, NetworkIO.Operation.INSERT);
+            if (remoteInventory != null) {
+                for (int i = 0; i < remoteInventory.getSlots(); i++) {
+                    ItemStack containerItem = remoteInventory.getStackInSlot(i);
+                    ItemStack giveItemStack = itemStack.copy();
+                    if ((containerItem.getItem() == itemStack.getItem() && containerItem.getMetadata() == itemStack.getMetadata()) || containerItem.isEmpty()) {
+                        giveItemStack = remoteInventory.insertItem(i, giveItemStack, false);
+                        if (giveItemStack.isEmpty())
+                            return true;
 
-                    itemStack = giveItemStack.copy();
+                        itemStack = giveItemStack.copy();
+                    }
                 }
             }
         }
-
 
         List<IItemHandler> invContainers = findInvContainers(inv);
         if (invContainers.size() > 0) {
@@ -91,8 +92,7 @@ public class InventoryManipulation {
             }
         }
         ItemStack giveItemStack = itemStack.copy();
-        boolean success = inv.addItemStackToInventory(giveItemStack);
-        return success;
+        return inv.addItemStackToInventory(giveItemStack);
     }
 
     /**
@@ -103,14 +103,16 @@ public class InventoryManipulation {
             return true;
         }
 
-        ItemStack tool = AbstractGadget.getGadget(player);
-        IItemHandler remoteInventory = GadgetUtils.getRemoteInventory(tool, world, player);
-        if (remoteInventory != null) {
-            for (int i = 0; i < remoteInventory.getSlots(); i++) {
-                ItemStack containerItem = remoteInventory.getStackInSlot(i);
-                if (containerItem.getItem() == itemStack.getItem() && containerItem.getMetadata() == itemStack.getMetadata() && containerItem.getCount() >= count) {
-                    remoteInventory.extractItem(i, count, false);
-                    return true;
+        Optional<ItemStack> tool = AbstractGadget.getGadget(player);
+        if( tool.isPresent() ) {
+            IItemHandler remoteInventory = GadgetUtils.getRemoteInventory(tool.get(), world, player);
+            if (remoteInventory != null) {
+                for (int i = 0; i < remoteInventory.getSlots(); i++) {
+                    ItemStack containerItem = remoteInventory.getStackInSlot(i);
+                    if (containerItem.getItem() == itemStack.getItem() && containerItem.getMetadata() == itemStack.getMetadata() && containerItem.getCount() >= count) {
+                        remoteInventory.extractItem(i, count, false);
+                        return true;
+                    }
                 }
             }
         }
@@ -144,7 +146,7 @@ public class InventoryManipulation {
         return true;
     }
 
-    public static interface IRemoteInventoryProvider {
+    public interface IRemoteInventoryProvider {
         int countItem(ItemStack tool, ItemStack stack);
     }
 
@@ -162,7 +164,9 @@ public class InventoryManipulation {
         if (player.capabilities.isCreativeMode) {
             return Integer.MAX_VALUE;
         }
-        long count = remoteInventory.countItem(AbstractGadget.getGadget(player), itemStack);
+        Optional<ItemStack> gadget = AbstractGadget.getGadget(player);
+        long count = gadget.map(e -> remoteInventory.countItem(e, itemStack)).orElse(0);
+
         InventoryPlayer inv = player.inventory;
         List<Integer> slots = findItem(itemStack.getItem(), itemStack.getMetadata(), inv);
         List<IItemHandler> invContainers = findInvContainers(inv);

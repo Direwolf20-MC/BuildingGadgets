@@ -238,34 +238,30 @@ public class CopyGadget extends AbstractGadget implements ITemplate {
     public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
         ItemStack stack = player.getHeldItem(hand);
         player.setActiveHand(hand);
-        BlockPos pos = RayTraceHelper.rayTrace(player, AbstractGadget.shouldRayTraceFluid(stack)).getBlockPos();
+        RayTraceResult trace = RayTraceHelper.rayTrace(player, AbstractGadget.shouldRayTraceFluid(stack));
+
         if (!world.isRemote) {
-            if (pos != null && player.isSneaking() && GadgetUtils.setRemoteInventory(stack, player, world, pos, false) == EnumActionResult.SUCCESS)
-                return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);
+            if (trace != null && player.isSneaking() && GadgetUtils.setRemoteInventory(stack, player, world, trace.getBlockPos(), false) == EnumActionResult.SUCCESS)
+                return new ActionResult<>(EnumActionResult.SUCCESS, stack);
 
             if (getToolMode(stack) == ToolMode.Copy) {
-                if (pos == null) {
-                    //setStartPos(stack, null);
-                    //setEndPos(stack, null);
-                    //player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.areareset").getUnformattedComponentText()), true);
-                    return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);
-                }
-                if (player.isSneaking()) {
-                    if (getStartPos(stack) != null)
-                        copyBlocks(stack, player, world, getStartPos(stack), pos);
-                    else
-                        setEndPos(stack, pos);
-                } else {
-                    if (getEndPos(stack) != null)
-                        copyBlocks(stack, player, world, pos, getEndPos(stack));
-                    else
-                        setStartPos(stack, pos);
+                if( trace != null ) {
+                    if (player.isSneaking()) {
+                        if (getStartPos(stack) != null)
+                            copyBlocks(stack, player, world, getStartPos(stack), trace.getBlockPos());
+                        else
+                            setEndPos(stack, trace.getBlockPos());
+                    } else {
+                        if (getEndPos(stack) != null)
+                            copyBlocks(stack, player, world, trace.getBlockPos(), getEndPos(stack));
+                        else
+                            setStartPos(stack, trace.getBlockPos());
+                    }
                 }
             } else if (getToolMode(stack) == ToolMode.Paste) {
                 if (!player.isSneaking()) {
-                    if (getAnchor(stack) == null) {
-                        if (pos == null) return new ActionResult<ItemStack>(EnumActionResult.FAIL, stack);
-                        buildBlockMap(world, pos, stack, player);
+                    if (getAnchor(stack) == null && trace != null) {
+                        buildBlockMap(world, trace.getBlockPos(), stack, player);
                     } else {
                         BlockPos startPos = getAnchor(stack);
                         buildBlockMap(world, startPos, stack, player);
@@ -273,12 +269,12 @@ public class CopyGadget extends AbstractGadget implements ITemplate {
                 }
             }
         } else {
-            if (pos != null && player.isSneaking()) {
-                if (GadgetUtils.getRemoteInventory(pos, world, player, NetworkIO.Operation.EXTRACT) != null)
+            if (player.isSneaking() && trace != null) {
+                if (GadgetUtils.getRemoteInventory(trace.getBlockPos(), world, player, NetworkIO.Operation.EXTRACT) != null)
                     return new ActionResult<>(EnumActionResult.SUCCESS, stack);
             }
             if (getToolMode(stack) == ToolMode.Copy) {
-                if (pos == null && player.isSneaking())
+                if (player.isSneaking() && trace == null)
                     player.openGui(BuildingGadgets.instance, GuiProxy.CopyPasteID, world, hand.ordinal(), 0, 0);
             } else if (player.isSneaking()) {
                 player.openGui(BuildingGadgets.instance, GuiProxy.PasteID, world, hand.ordinal(), 0, 0);
@@ -286,7 +282,8 @@ public class CopyGadget extends AbstractGadget implements ITemplate {
                 AbstractRender.updateInventoryCache();
             }
         }
-        return new ActionResult<>(EnumActionResult.SUCCESS, stack);
+
+        return new ActionResult<>(EnumActionResult.PASS, stack);
     }
 
     public static void rotateOrMirrorBlocks(ItemStack stack, EntityPlayer player, PacketRotateMirror.Operation operation) {
@@ -493,7 +490,7 @@ public class CopyGadget extends AbstractGadget implements ITemplate {
         if (pos.getY() < 0 || state.equals(Blocks.AIR.getDefaultState()) || !player.isAllowEdit())
             return;
 
-        ItemStack heldItem = getGadget(player);
+        ItemStack heldItem = getAsStack(player);
         if (heldItem.isEmpty())
             return;
 
@@ -602,11 +599,11 @@ public class CopyGadget extends AbstractGadget implements ITemplate {
         if (success) setLastBuild(heldItem, null, 0);
     }
 
-    public static ItemStack getGadget(EntityPlayer player) {
-        ItemStack stack = AbstractGadget.getGadget(player);
-        if (!(stack.getItem() instanceof CopyGadget))
+    public static ItemStack getAsStack(EntityPlayer player) {
+        Optional<ItemStack> stack = AbstractGadget.getGadget(player);
+        if (!stack.isPresent() || !(stack.get().getItem() instanceof CopyGadget))
             return ItemStack.EMPTY;
 
-        return stack;
+        return stack.get();
     }
 }

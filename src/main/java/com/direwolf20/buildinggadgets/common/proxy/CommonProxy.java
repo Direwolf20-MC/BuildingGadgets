@@ -15,7 +15,7 @@ import com.direwolf20.buildinggadgets.common.gadgets.DestructionGadget;
 import com.direwolf20.buildinggadgets.common.integration.IntegrationHandler;
 import com.direwolf20.buildinggadgets.common.items.Template;
 import com.direwolf20.buildinggadgets.common.gadgets.CopyGadget;
-import com.direwolf20.buildinggadgets.common.gadgets.ExchangerGadget;
+import com.direwolf20.buildinggadgets.common.gadgets.ExchangingGadget;
 import com.direwolf20.buildinggadgets.common.items.pastes.ConstructionChunkDense;
 import com.direwolf20.buildinggadgets.common.items.pastes.ConstructionPaste;
 import com.direwolf20.buildinggadgets.common.items.pastes.ConstructionPasteContainer;
@@ -81,7 +81,7 @@ public class CommonProxy {
     @SubscribeEvent
     public static void registerItems(RegistryEvent.Register<Item> event) {
         event.getRegistry().register(new BuildingGadget());
-        event.getRegistry().register(new ExchangerGadget());
+        event.getRegistry().register(new ExchangingGadget());
         event.getRegistry().register(new CopyGadget());
         event.getRegistry().register(new ItemBlock(ModBlocks.templateManager).setRegistryName(ModBlocks.templateManager.getRegistryName()));
         event.getRegistry().register(new Template());

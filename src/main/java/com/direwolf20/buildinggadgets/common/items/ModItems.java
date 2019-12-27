@@ -3,7 +3,7 @@ package com.direwolf20.buildinggadgets.common.items;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.gadgets.*;
 import com.direwolf20.buildinggadgets.common.gadgets.DestructionGadget;
-import com.direwolf20.buildinggadgets.common.gadgets.ExchangerGadget;
+import com.direwolf20.buildinggadgets.common.gadgets.ExchangingGadget;
 import com.direwolf20.buildinggadgets.common.items.pastes.ConstructionChunkDense;
 import com.direwolf20.buildinggadgets.common.items.pastes.ConstructionPaste;
 import com.direwolf20.buildinggadgets.common.items.pastes.ConstructionPasteContainer;
@@ -17,7 +17,7 @@ public class ModItems {
     public static BuildingGadget buildingGadget;
 
     @GameRegistry.ObjectHolder("exchangertool")
-    public static ExchangerGadget exchangerGadget;
+    public static ExchangingGadget exchangingGadget;
 
     @GameRegistry.ObjectHolder("constructionpaste")
     public static ConstructionPaste constructionPaste;

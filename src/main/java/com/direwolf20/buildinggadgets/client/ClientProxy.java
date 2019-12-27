@@ -55,7 +55,7 @@ public class ClientProxy extends CommonProxy {
         ModBlocks.effectBlock.initModel();
         ModBlocks.templateManager.initModel();
         buildingGadget.initModel();
-        ModItems.exchangerGadget.initModel();
+        ModItems.exchangingGadget.initModel();
         ModItems.copyGadget.initModel();
         ModItems.template.initModel();
         if (SyncedConfig.enableDestructionGadget) {
@@ -86,20 +86,18 @@ public class ClientProxy extends CommonProxy {
     public static void renderWorldLastEvent(RenderWorldLastEvent evt) {
         Minecraft mc = Minecraft.getMinecraft();
         EntityPlayer player = mc.player;
-        ItemStack heldItem = AbstractGadget.getGadget(player);
-        if (heldItem.isEmpty())
-            return;
 
-        if (heldItem.getItem() instanceof BuildingGadget) {
-            new BuildingRender().render(evt, player, heldItem);
-        } else if (heldItem.getItem() instanceof ExchangerGadget) {
-            new ExchangerRender().render(evt, player, heldItem);
-        } else if (heldItem.getItem() instanceof CopyGadget) {
-            ToolRenders.renderPasteOverlay(evt, player, heldItem);
-        } else if (heldItem.getItem() instanceof DestructionGadget) {
-            new DestructionRender().render(evt, player, heldItem);
-        }
-
+        AbstractGadget.getGadget(player).ifPresent(gadget -> {
+            if (gadget.getItem() instanceof BuildingGadget) {
+                new BuildingRender().render(evt, player, gadget);
+            } else if (gadget.getItem() instanceof ExchangingGadget) {
+                new ExchangerRender().render(evt, player, gadget);
+            } else if (gadget.getItem() instanceof CopyGadget) {
+                ToolRenders.renderPasteOverlay(evt, player, gadget);
+            } else if (gadget.getItem() instanceof DestructionGadget) {
+                new DestructionRender().render(evt, player, gadget);
+            }
+        });
     }
 
     @SubscribeEvent

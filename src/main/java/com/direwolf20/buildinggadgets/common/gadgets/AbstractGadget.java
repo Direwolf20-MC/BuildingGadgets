@@ -20,6 +20,7 @@ import net.minecraftforge.energy.IEnergyStorage;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Optional;
 
 import static com.direwolf20.buildinggadgets.common.tools.GadgetUtils.withSuffix;
 
@@ -103,15 +104,16 @@ public abstract class AbstractGadget extends ItemModBase {
         return false;
     }
 
-    public static ItemStack getGadget(EntityPlayer player) {
+    public static Optional<ItemStack> getGadget(EntityPlayer player) {
         ItemStack heldItem = player.getHeldItemMainhand();
         if (!(heldItem.getItem() instanceof AbstractGadget)) {
             heldItem = player.getHeldItemOffhand();
             if (!(heldItem.getItem() instanceof AbstractGadget)) {
-                return ItemStack.EMPTY;
+                return Optional.empty();
             }
         }
-        return heldItem;
+
+        return Optional.of(heldItem);
     }
 
     public abstract int getEnergyCost(ItemStack tool);

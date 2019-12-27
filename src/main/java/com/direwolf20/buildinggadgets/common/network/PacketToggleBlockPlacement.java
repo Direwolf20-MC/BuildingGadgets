@@ -17,9 +17,11 @@ public class PacketToggleBlockPlacement extends PacketEmpty {
         public IMessage onMessage(PacketToggleBlockPlacement message, MessageContext ctx) {
             FMLCommonHandler.instance().getWorldThread(ctx.netHandler).addScheduledTask(() -> {
                 EntityPlayer player = ctx.getServerHandler().player;
-                ItemStack stack = AbstractGadget.getGadget(player);
-                if (stack.getItem() instanceof BuildingGadget)
-                    BuildingGadget.togglePlaceAtop(player, stack);
+
+                AbstractGadget.getGadget(player).ifPresent(gadget -> {
+                    if (gadget.getItem() instanceof BuildingGadget)
+                        BuildingGadget.togglePlaceAtop(player, gadget);
+                });
             });
             return null;
         }

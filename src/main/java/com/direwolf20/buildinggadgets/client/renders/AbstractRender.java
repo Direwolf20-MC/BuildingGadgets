@@ -75,20 +75,20 @@ public abstract class AbstractRender {
 
 
         // Validate that we should render
-        RayTraceResult rayTraceResult = RayTraceHelper.rayTrace(mc.player, AbstractGadget.shouldRayTraceFluid(gadget));
+        RayTraceResult trace = RayTraceHelper.rayTrace(mc.player, AbstractGadget.shouldRayTraceFluid(gadget));
         List<BlockPos> existingLocations = getAnchor(gadget);
 
         // Perform a typical render
         if( existingLocations.size() == 0 ) {
-            if( rayTraceResult != null && rayTraceResult.typeOfHit != RayTraceResult.Type.MISS) {
-                IBlockState traceBlock = mc.player.world.getBlockState(rayTraceResult.getBlockPos());
+            if( trace != null && trace.typeOfHit != RayTraceResult.Type.MISS) {
+                IBlockState traceBlock = mc.player.world.getBlockState(trace.getBlockPos());
 
                 if( traceBlock != effectBlockState )
-                    this.gadgetRender(tessellator, bufferBuilder, rayTraceResult, gadget, existingLocations);
+                    this.gadgetRender(tessellator, bufferBuilder, trace, gadget, existingLocations);
             }
         }
         else
-            this.gadgetRender(tessellator, bufferBuilder, rayTraceResult, gadget, existingLocations); // render using anchor
+            this.gadgetRender(tessellator, bufferBuilder, trace, gadget, existingLocations); // render using anchor
 
         // Reset the majority of what we changed
         GlStateManager.translate(0, 0, 0);

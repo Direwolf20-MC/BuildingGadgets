@@ -37,9 +37,9 @@ public class GuiProxy implements IGuiHandler {
         }
         if (ID == CopyPasteID) {
             if (player.getHeldItemMainhand().getItem() instanceof CopyGadget)
-                return new CopyPasteScreen(player.getHeldItemMainhand());
+                return new CopyScreen(player.getHeldItemMainhand());
             else if (player.getHeldItemOffhand().getItem() instanceof CopyGadget)
-                return new CopyPasteScreen(player.getHeldItemOffhand());
+                return new CopyScreen(player.getHeldItemOffhand());
             else
                 return null;
         } else if (ID == DestructionID) {

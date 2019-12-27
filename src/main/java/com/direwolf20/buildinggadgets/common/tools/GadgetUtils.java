@@ -14,7 +14,7 @@ import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
 import com.direwolf20.buildinggadgets.common.gadgets.*;
 import com.direwolf20.buildinggadgets.common.gadgets.AbstractGadget;
 import com.direwolf20.buildinggadgets.common.integration.NetworkProvider;
-import com.direwolf20.buildinggadgets.common.gadgets.ExchangerGadget;
+import com.direwolf20.buildinggadgets.common.gadgets.ExchangingGadget;
 import com.direwolf20.buildinggadgets.common.network.PacketRotateMirror;
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
@@ -332,9 +332,9 @@ public class GadgetUtils {
                 coords = BuildingGadget.getToolMode(stack).getMode().getCollection(
                         player, world, GadgetUtils.getToolBlock(stack), startBlock, sideHit, GadgetUtils.getToolRange(stack), BuildingGadget.shouldPlaceAtop(stack), BuildingGadget.getFuzzy(stack)
                 ); //Build the positions list based on tool mode and range
-            } else if (stack.getItem() instanceof ExchangerGadget) {
-                coords = ExchangerGadget.getToolMode(stack).getMode().getCollection(
-                        player, world, GadgetUtils.getToolBlock(stack), startBlock, sideHit, GadgetUtils.getToolRange(stack), false, ExchangerGadget.getFuzzy(stack)
+            } else if (stack.getItem() instanceof ExchangingGadget) {
+                coords = ExchangingGadget.getToolMode(stack).getMode().getCollection(
+                        player, world, GadgetUtils.getToolBlock(stack), startBlock, sideHit, GadgetUtils.getToolRange(stack), false, ExchangingGadget.getFuzzy(stack)
                 ); //Build the positions list based on tool mode and range
             } else if(stack.getItem() instanceof DestructionGadget) {
                 coords = DestructionGadget.getArea(world, lookingAt, player, stack, currentCoords);

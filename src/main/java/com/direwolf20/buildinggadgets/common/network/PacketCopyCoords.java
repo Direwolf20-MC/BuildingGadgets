@@ -50,7 +50,7 @@ public class PacketCopyCoords implements IMessage {
         private void handle(PacketCopyCoords message, MessageContext ctx) {
             EntityPlayerMP playerEntity = ctx.getServerHandler().player;
 
-            ItemStack heldItem = CopyGadget.getGadget(playerEntity);
+            ItemStack heldItem = CopyGadget.getAsStack(playerEntity);
             if (heldItem.isEmpty()) return;
 
             BlockPos startPos = message.start;

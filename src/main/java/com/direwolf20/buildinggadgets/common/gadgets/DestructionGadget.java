@@ -291,7 +291,7 @@ public class DestructionGadget extends AbstractGadget {
         if ((te != null) && !(te instanceof ConstructionBlockTileEntity)) return false;
         if (currentBlock.getBlockHardness(world, voidPos) < 0) return false;
 
-        ItemStack tool = getGadget(player);
+        ItemStack tool = getAsStack(player);
         if (tool.isEmpty()) return false;
 
         if (!player.isAllowEdit()) {
@@ -340,7 +340,7 @@ public class DestructionGadget extends AbstractGadget {
     }
 
     private boolean destroyBlock(World world, BlockPos voidPos, EntityPlayer player) {
-        ItemStack tool = getGadget(player);
+        ItemStack tool = getAsStack(player);
         if (tool.isEmpty())
             return false;
 
@@ -353,11 +353,11 @@ public class DestructionGadget extends AbstractGadget {
         return true;
     }
 
-    public static ItemStack getGadget(EntityPlayer player) {
-        ItemStack stack = AbstractGadget.getGadget(player);
-        if (!(stack.getItem() instanceof DestructionGadget))
+    public static ItemStack getAsStack(EntityPlayer player) {
+        Optional<ItemStack> stack = AbstractGadget.getGadget(player);
+        if (!stack.isPresent() || !(stack.get().getItem() instanceof DestructionGadget))
             return ItemStack.EMPTY;
 
-        return stack;
+        return stack.get();
     }
 }

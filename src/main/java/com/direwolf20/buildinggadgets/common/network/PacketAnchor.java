@@ -20,19 +20,17 @@ public class PacketAnchor extends PacketEmpty {
 
         private void handle(MessageContext ctx) {
             EntityPlayerMP playerEntity = ctx.getServerHandler().player;
-            ItemStack heldItem = AbstractGadget.getGadget(playerEntity);
-            if (heldItem.isEmpty())
-                return;
-
-            if (heldItem.getItem() instanceof BuildingGadget) {
-                GadgetUtils.anchorBlocks(playerEntity, heldItem);
-            } else if (heldItem.getItem() instanceof ExchangerGadget) {
-                GadgetUtils.anchorBlocks(playerEntity, heldItem);
-            } else if (heldItem.getItem() instanceof CopyGadget) {
-                CopyGadget.anchorBlocks(playerEntity, heldItem);
-            } else if (heldItem.getItem() instanceof DestructionGadget) {
-                GadgetUtils.anchorBlocks(playerEntity, heldItem);
-            }
+            AbstractGadget.getGadget(playerEntity).ifPresent(gadget -> {
+                if (gadget.getItem() instanceof BuildingGadget) {
+                    GadgetUtils.anchorBlocks(playerEntity, gadget);
+                } else if (gadget.getItem() instanceof ExchangingGadget) {
+                    GadgetUtils.anchorBlocks(playerEntity, gadget);
+                } else if (gadget.getItem() instanceof CopyGadget) {
+                    CopyGadget.anchorBlocks(playerEntity, gadget);
+                } else if (gadget.getItem() instanceof DestructionGadget) {
+                    GadgetUtils.anchorBlocks(playerEntity, gadget);
+                }
+            });
         }
     }
 }

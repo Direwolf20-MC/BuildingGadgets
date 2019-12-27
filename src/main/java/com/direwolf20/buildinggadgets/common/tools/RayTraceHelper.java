@@ -6,10 +6,13 @@ import net.minecraft.util.math.Vec3d;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
+import javax.annotation.Nullable;
+
 import static com.direwolf20.buildinggadgets.common.config.SyncedConfig.rayTraceRange;
 
 public class RayTraceHelper {
 
+    @Nullable
     public static RayTraceResult rayTrace(EntityPlayer player, boolean stopAtFluid) {
         Pair<Vec3d, Vec3d> vectors = getVectors(player);
 

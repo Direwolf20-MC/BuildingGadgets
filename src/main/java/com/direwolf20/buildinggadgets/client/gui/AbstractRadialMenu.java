@@ -50,7 +50,32 @@ public class AbstractRadialMenu extends GuiScreen {
     private int slotSelected = -1;
     private int segments;
     private List<GuiButton> buttons = new ArrayList<>();
-    private GuiSliderInt sliderRange;
+    private ResourceLocation[] icons;
+    private ItemStack gadget;
+
+    AbstractRadialMenu(ResourceLocation[] icons, ItemStack gadget) {
+        this.icons = icons;
+        this.segments = icons.length;
+        this.gadget = gadget;
+    }
+
+    @Override
+    public void initGui() {
+        super.initGui();
+
+        GuiSliderInt sliderRange = new GuiSliderInt(width / 2 - 82 / 2, height / 2 + 72, 82, 14, "Range ", "", 1, SyncedConfig.maxRange,
+            GadgetUtils.getToolRange(this.gadget), false, true, Color.DARK_GRAY, slider -> {
+                if (slider.getValueInt() != GadgetUtils.getToolRange(this.gadget))
+                    PacketHandler.INSTANCE.sendToServer(new PacketChangeRange(slider.getValueInt()));
+            }, (slider, amount) -> {
+                int value = slider.getValueInt();
+                int valueNew = MathHelper.clamp(value + amount, 1, SyncedConfig.maxRange);
+                slider.setValue(valueNew);
+                slider.updateSlider();
+            });
+        sliderRange.precision = 1;
+        sliderRange.getComponents().forEach(this::addButton);
+    }
 
     public List<GuiButton> getButtons() {
         return buttons;
@@ -79,10 +104,10 @@ public class AbstractRadialMenu extends GuiScreen {
 
         if (segments != 0) {
             inRange = dist > radiusMin && dist < radiusMax;
-            for (GuiButton button : buttonList) {
-                if (button instanceof PositionedIconActionable)
-                    ((PositionedIconActionable) button).setFaded(inRange);
-            }
+//            for (GuiButton button : buttonList) {
+//                if (button instanceof PositionedIconActionable)
+//                    ((PositionedIconActionable) button).setFaded(inRange);
+//            }
         }
 
         GlStateManager.pushMatrix();
@@ -104,7 +129,6 @@ public class AbstractRadialMenu extends GuiScreen {
 
         slotSelected = -1;
 
-        ResourceLocation[] signs = new ResourceLocation[0];
         int modeIndex = 0;
 
         boolean shouldCenter = (segments + 2) % 4 == 0;
@@ -158,7 +182,7 @@ public class AbstractRadialMenu extends GuiScreen {
             int ysp = yp;
             int width = fontRenderer.getStringWidth(name);
 
-            double mod = 0.6;
+            double mod;
             int xdp, ydp;
 
             if (xsp < x)
@@ -174,7 +198,7 @@ public class AbstractRadialMenu extends GuiScreen {
             xdp = (int) ((xp - x) * mod + x);
             ydp = (int) ((yp - y) * mod + y);
             GlStateManager.color(color.getRed() / 255F, color.getGreen() / 255F, color.getBlue() / 255F);
-            mc.renderEngine.bindTexture(signs[i]);
+            mc.renderEngine.bindTexture(icons[i]);
             drawModalRectWithCustomSizedTexture(xdp - 8, ydp - 8, 0, 0, 16, 16, 16, 16);
 
         }
@@ -224,9 +248,9 @@ public class AbstractRadialMenu extends GuiScreen {
             KeyBinding.setKeyBindState(k.getKeyCode(), GameSettings.isKeyDown(k));
 
         timeIn++;
-//        ItemStack tool = getGadget();
+//        ItemStack tool = getAsStack();
 //        boolean builder = tool.getItem() instanceof BuildingGadget;
-//        if (!builder && !(tool.getItem() instanceof ExchangerGadget))
+//        if (!builder && !(tool.getItem() instanceof ExchangingGadget))
 //            return;
 
 //        boolean current;
@@ -236,7 +260,7 @@ public class AbstractRadialMenu extends GuiScreen {
 //            if (builder)
 //                current = BuildingGadget.getToolMode(tool) == BuildingModes.SURFACE;
 //            else
-//                current = i == 0 || ExchangerGadget.getToolMode(tool) == ExchangingModes.SURFACE;
+//                current = i == 0 || ExchangingGadget.getToolMode(tool) == ExchangingModes.SURFACE;
 //
 //            if (button.visible != current) {
 //                button.visible = current;
