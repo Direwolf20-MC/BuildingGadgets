@@ -38,6 +38,12 @@ public class BlockBuildEntity extends Entity {
 
     private World world;
 
+    public BlockBuildEntity(World worldIn) {
+        super(worldIn);
+        setSize(0.1F, 0.1F);
+        world = worldIn;
+    }
+
     public BlockBuildEntity(World worldIn, BlockPos spawnPos, EntityLivingBase player, IBlockState spawnBlock, int toolMode, IBlockState actualSpawnBlock, boolean constrPaste) {
         super(worldIn);
         setSize(0.1F, 0.1F);
