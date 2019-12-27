@@ -3,6 +3,7 @@ package com.direwolf20.buildinggadgets.client.events;
 import com.direwolf20.buildinggadgets.client.gui.BuildingRadial;
 import com.direwolf20.buildinggadgets.client.gui.CopyRadial;
 import com.direwolf20.buildinggadgets.client.gui.DestructionRadial;
+import com.direwolf20.buildinggadgets.client.gui.ExchangingRadial;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.gadgets.*;
 import com.direwolf20.buildinggadgets.common.network.*;
@@ -31,13 +32,11 @@ public class EventKeyInput {
     private static void handleEventInput() {
         if (menuSettings.isKeyDown() && ((menuSettings.getKeyModifier() == KeyModifier.NONE && KeyModifier.getActiveModifier() == KeyModifier.NONE) || menuSettings.getKeyModifier() != KeyModifier.NONE)) {
             Minecraft mc = Minecraft.getMinecraft();
-            System.out.println(AbstractGadget.getGadget(mc.player));
             AbstractGadget.getGadget(mc.player).ifPresent(gadget -> {
-                System.out.println("9as8ghd9as8g");
                 if( gadget.getItem() instanceof BuildingGadget )
                     mc.displayGuiScreen(new BuildingRadial(gadget));
                 else if( gadget.getItem() instanceof ExchangingGadget)
-                    mc.displayGuiScreen(new BuildingRadial(gadget));
+                    mc.displayGuiScreen(new ExchangingRadial(gadget));
                 else if( gadget.getItem() instanceof CopyGadget)
                     mc.displayGuiScreen(new CopyRadial(gadget));
                 else if( gadget.getItem() instanceof DestructionGadget)

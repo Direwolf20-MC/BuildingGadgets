@@ -22,6 +22,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.text.Style;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
@@ -145,7 +146,7 @@ public class ExchangingGadget extends AbstractGadget {
         //Called when we specify a mode with the radial menu
         ExchangingModes mode = ExchangingModes.values()[modeInt];
         setToolMode(heldItem, mode);
-        player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.toolmode").getUnformattedComponentText() + ": " + mode), true);
+        player.sendStatusMessage(new TextComponentTranslation("message.gadget.toolmode", mode.getI18n()).setStyle(new Style().setColor(TextFormatting.AQUA)), true);
     }
 
     public void rangeChange(EntityPlayer player, ItemStack heldItem) {
@@ -157,7 +158,7 @@ public class ExchangingGadget extends AbstractGadget {
             range = (range >= SyncedConfig.maxRange) ? 1 : range + changeAmount;
         }
         setToolRange(heldItem, range);
-        player.sendStatusMessage(new TextComponentString(TextFormatting.DARK_AQUA + new TextComponentTranslation("message.gadget.toolrange").getUnformattedComponentText() + ": " + range), true);
+        player.sendStatusMessage(new TextComponentTranslation("message.gadget.toolrange", range).setStyle(new Style().setColor(TextFormatting.DARK_AQUA)), true);
     }
 
     private boolean exchange(EntityPlayer player, ItemStack stack) {

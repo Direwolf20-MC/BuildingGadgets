@@ -11,6 +11,18 @@ singles.buildinggadgets.up=Up
 singles.buildinggadgets.confirm=Ok
 singles.buildinggadgets.cancel=Cancel
 
+#modes:
+buildinggadgets.modes.build_to_me=Build To Me
+buildinggadgets.modes.vertical_column=Vertical Column
+buildinggadgets.modes.horizontal_column=Horizontal Column
+buildinggadgets.modes.vertical_wall=Vertical Wall
+buildinggadgets.modes.horizontal_wall=Horizontal Wall
+buildinggadgets.modes.stairs=Stairs
+buildinggadgets.modes.grid=Grid
+buildinggadgets.modes.surface=Surface
+buildinggadgets.modes.copy=Copy
+buildinggadgets.modes.paste=Paste
+
 #item: 
 item.buildinggadgets.buildingtool.name=Building Gadget
 item.buildinggadgets.constructionpaste.name=Construction Paste
@@ -89,8 +101,8 @@ message.gadget.pastetoobig=Paste is too large
 message.gadget.rotated=Blocks Rotated
 message.gadget.mirrored=Blocks Mirrored
 message.gadget.toobigarea=Area too Large, max area is 125x125x125 (Right click empty air to reset)
-message.gadget.toolmode=Tool Mode
-message.gadget.toolrange= Tool Range
+message.gadget.toolmode=Tool Mode: %s
+message.gadget.toolrange= Tool Range: %s
 message.gadget.toomanyblocks=Too Many Blocks, Limit is 32,768 (Right click empty air to reset)
 message.gadget.undofailed=Undo Failed (Too far away?)
 message.gadget.TEinCopy=Area Copied, Number of tile entities not copied

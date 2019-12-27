@@ -31,6 +31,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.feature.WorldGenMegaJungle;
 import org.lwjgl.opengl.GL11;
@@ -50,10 +51,10 @@ public class AbstractRadialMenu extends GuiScreen {
     private int slotSelected = -1;
     private int segments;
     private List<GuiButton> buttons = new ArrayList<>();
-    private ResourceLocation[] icons;
+    private ModeIcon[] icons;
     private ItemStack gadget;
 
-    AbstractRadialMenu(ResourceLocation[] icons, ItemStack gadget) {
+    AbstractRadialMenu(ModeIcon[] icons, ItemStack gadget) {
         this.icons = icons;
         this.segments = icons.length;
         this.gadget = gadget;
@@ -62,6 +63,15 @@ public class AbstractRadialMenu extends GuiScreen {
     @Override
     public void initGui() {
         super.initGui();
+
+        boolean isDestruction = gadget.getItem() instanceof DestructionGadget;
+        ScreenPosition right = isDestruction ? ScreenPosition.TOP : ScreenPosition.RIGHT;
+        ScreenPosition left = isDestruction ? ScreenPosition.BOTTOM : ScreenPosition.LEFT;
+
+        addButton(new PositionedIconActionable("Place on fluids", "raytrace_fluid", right, send -> {
+            if (send) PacketHandler.INSTANCE.sendToServer(new PacketToggleRayTraceFluid());
+            return AbstractGadget.shouldRayTraceFluid(gadget);
+        }));
 
         GuiSliderInt sliderRange = new GuiSliderInt(width / 2 - 82 / 2, height / 2 + 72, 82, 14, "Range ", "", 1, SyncedConfig.maxRange,
             GadgetUtils.getToolRange(this.gadget), false, true, Color.DARK_GRAY, slider -> {
@@ -104,10 +114,10 @@ public class AbstractRadialMenu extends GuiScreen {
 
         if (segments != 0) {
             inRange = dist > radiusMin && dist < radiusMax;
-//            for (GuiButton button : buttonList) {
-//                if (button instanceof PositionedIconActionable)
-//                    ((PositionedIconActionable) button).setFaded(inRange);
-//            }
+            for (GuiButton button : buttonList) {
+                if (button instanceof PositionedIconActionable)
+                    ((PositionedIconActionable) button).setFaded(inRange);
+            }
         }
 
         GlStateManager.pushMatrix();
@@ -176,7 +186,7 @@ public class AbstractRadialMenu extends GuiScreen {
             int xp = pos[0];
             int yp = pos[1];
 
-            String name = "TODO: GET NAME";
+            String name = icons[i].text.getUnformattedComponentText();
 
             int xsp = xp - 4;
             int ysp = yp;
@@ -198,7 +208,7 @@ public class AbstractRadialMenu extends GuiScreen {
             xdp = (int) ((xp - x) * mod + x);
             ydp = (int) ((yp - y) * mod + y);
             GlStateManager.color(color.getRed() / 255F, color.getGreen() / 255F, color.getBlue() / 255F);
-            mc.renderEngine.bindTexture(icons[i]);
+            mc.renderEngine.bindTexture(icons[i].icon);
             drawModalRectWithCustomSizedTexture(xdp - 8, ydp - 8, 0, 0, 16, 16, 16, 16);
 
         }
@@ -304,5 +314,15 @@ public class AbstractRadialMenu extends GuiScreen {
 
     protected static String formatName(String name) {
         return Arrays.stream(name.split("_")).map(e -> (e.toCharArray()[0] + e.toLowerCase().substring(1)) + " ").collect(Collectors.joining());
+    }
+
+    public static class ModeIcon {
+        private ResourceLocation icon;
+        private TextComponentTranslation text;
+
+        public ModeIcon(String icon, String text) {
+            this.icon = new ResourceLocation(BuildingGadgets.MODID, icon);
+            this.text = new TextComponentTranslation("buildinggadgets.modes." + text);
+        }
     }
 }
