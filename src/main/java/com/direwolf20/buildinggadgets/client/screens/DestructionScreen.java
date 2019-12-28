@@ -24,34 +24,21 @@ import net.minecraft.util.text.TextFormatting;
 import java.io.IOException;
 
 public class DestructionScreen extends GuiScreen {
-    public static final int WIDTH = 256;
-    public static final int HEIGHT = 256;
-
     private GuiTextField left;
     private GuiTextField right;
     private GuiTextField up;
     private GuiTextField down;
     private GuiTextField depth;
-    //private GuiTextField endZ;
 
-    //private boolean absoluteCoords = Config.absoluteCoordDefault;
+    private int guiLeft = 15;
+    private int guiTop = 50;
 
-    int guiLeft = 15;
-    int guiTop = 50;
+    private ItemStack destructionTool;
 
-    ItemStack destructionTool;
-
-    private static final ResourceLocation background = new ResourceLocation(BuildingGadgets.MODID, "textures/screens/testcontainer.png");
-
-    public DestructionScreen(ItemStack tool) {
+    DestructionScreen(ItemStack tool) {
         super();
         this.destructionTool = tool;
     }
-
-    /*@Override
-    public void drawScreen(int mouseX, int mouseY, float partialTicks) {
-        super.drawScreen(mouseX, mouseY, partialTicks);
-    }*/
 
     @Override
     public void initGui() {
@@ -80,11 +67,9 @@ public class DestructionScreen extends GuiScreen {
 
         nullCheckTextBoxes();
 
-        //NOTE: the id always has to be different or else it might get called twice or never!
         this.buttonList.add(new GuiButton(1, this.guiLeft + 145, this.guiTop + 125, 40, 20, I18n.format("singles.buildinggadgets.confirm")));
         this.buttonList.add(new GuiButton(2, this.guiLeft + 245, this.guiTop + 125, 40, 20, I18n.format("singles.buildinggadgets.cancel")));
-        //this.buttonList.add(new GuiButton(3, this.guiLeft + 245, this.guiTop + 60, 40, 20, "Clear"));
-        //this.buttonList.add(new GuiButton(4, this.guiLeft + 325, this.guiTop + 60, 80, 20, "CoordsMode"));
+
         this.buttonList.add(new DireButton(5, this.guiLeft + 65, this.guiTop + 59, 10, 10, "-"));
         this.buttonList.add(new DireButton(6, this.guiLeft + 125, this.guiTop + 59, 10, 10, "+"));
         this.buttonList.add(new DireButton(7, this.guiLeft + 305, this.guiTop + 59, 10, 10, "-"));
@@ -95,8 +80,7 @@ public class DestructionScreen extends GuiScreen {
         this.buttonList.add(new DireButton(12, this.guiLeft + 245, this.guiTop + 89, 10, 10, "+"));
         this.buttonList.add(new DireButton(13, this.guiLeft + 185, this.guiTop + 59, 10, 10, "-"));
         this.buttonList.add(new DireButton(14, this.guiLeft + 245, this.guiTop + 59, 10, 10, "+"));
-        //this.buttonList.add(new DireButton(15, this.guiLeft + 250, this.guiTop + 34, 10, 10, "-"));
-        //this.buttonList.add(new DireButton(16, this.guiLeft + 310, this.guiTop + 34, 10, 10, "+"));
+
     }
 
     public void fieldChange(GuiTextField textField, int amount) {
@@ -115,8 +99,6 @@ public class DestructionScreen extends GuiScreen {
 
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
-        mc.getTextureManager().bindTexture(background);
-        //drawTexturedModalRect(guiLeft, guiTop, 0, 0, xSize, ySize);
         this.left.drawTextBox();
         this.right.drawTextBox();
         this.up.drawTextBox();
@@ -224,7 +206,6 @@ public class DestructionScreen extends GuiScreen {
             } else if (this.depth.mouseClicked(mouseX, mouseY, 0)) {
                 depth.setText("");
             } else {
-                //startX.setFocused(false);
                 super.mouseClicked(mouseX, mouseY, mouseButton);
             }
         } else {
@@ -239,7 +220,6 @@ public class DestructionScreen extends GuiScreen {
             } else if (this.depth.mouseClicked(mouseX, mouseY, mouseButton)) {
                 depth.setFocused(true);
             } else {
-                //startX.setFocused(false);
                 super.mouseClicked(mouseX, mouseY, mouseButton);
             }
         }
@@ -250,13 +230,9 @@ public class DestructionScreen extends GuiScreen {
         super.mouseReleased(mouseX, mouseY, state);
     }
 
-
     @Override
     public void handleMouseInput() throws IOException {
         super.handleMouseInput();
-        //System.out.println(Mouse.getEventDWheel());
-        //System.out.println(zoom);
-
     }
 
     @Override

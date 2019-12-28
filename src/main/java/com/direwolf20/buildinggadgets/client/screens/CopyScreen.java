@@ -25,9 +25,6 @@ import net.minecraft.util.text.TextFormatting;
 import java.io.IOException;
 
 public class CopyScreen extends GuiScreen {
-//     public static final int WIDTH = 256;
-//     public static final int HEIGHT = 256;
-
     private GuiTextField startX;
     private GuiTextField startY;
     private GuiTextField startZ;
@@ -44,17 +41,10 @@ public class CopyScreen extends GuiScreen {
     private BlockPos startPos;
     private BlockPos endPos;
 
-    private static final ResourceLocation background = new ResourceLocation(BuildingGadgets.MODID, "textures/screens/testcontainer.png");
-
     public CopyScreen(ItemStack tool) {
         super();
         this.copyPasteTool = tool;
     }
-
-    /*@Override
-    public void drawScreen(int mouseX, int mouseY, float partialTicks) {
-        super.drawScreen(mouseX, mouseY, partialTicks);
-    }*/
 
     @Override
     public void initGui() {
@@ -123,8 +113,6 @@ public class CopyScreen extends GuiScreen {
 
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
-        mc.getTextureManager().bindTexture(background);
-        //drawTexturedModalRect(guiLeft, guiTop, 0, 0, xSize, ySize);
         this.startX.drawTextBox();
         this.startY.drawTextBox();
         this.startZ.drawTextBox();
@@ -242,8 +230,8 @@ public class CopyScreen extends GuiScreen {
     private void updateTextFields() {
         String x, y, z;
         if (absoluteCoords) {
-            BlockPos start = startX.getText() != "" ? new BlockPos(startPos.getX() + Integer.parseInt(startX.getText()), startPos.getY() + Integer.parseInt(startY.getText()), startPos.getZ() + Integer.parseInt(startZ.getText())) : startPos;
-            BlockPos end = endX.getText() != "" ? new BlockPos(startPos.getX() + Integer.parseInt(endX.getText()), startPos.getY() + Integer.parseInt(endY.getText()), startPos.getZ() + Integer.parseInt(endZ.getText())) : endPos;
+            BlockPos start = !startX.getText().equals("") ? new BlockPos(startPos.getX() + Integer.parseInt(startX.getText()), startPos.getY() + Integer.parseInt(startY.getText()), startPos.getZ() + Integer.parseInt(startZ.getText())) : startPos;
+            BlockPos end = !endX.getText().equals("") ? new BlockPos(startPos.getX() + Integer.parseInt(endX.getText()), startPos.getY() + Integer.parseInt(endY.getText()), startPos.getZ() + Integer.parseInt(endZ.getText())) : endPos;
             startX.setText(String.valueOf(start.getX()));
             startY.setText(String.valueOf(start.getY()));
             startZ.setText(String.valueOf(start.getZ()));
@@ -251,17 +239,17 @@ public class CopyScreen extends GuiScreen {
             endY.setText(String.valueOf(end.getY()));
             endZ.setText(String.valueOf(end.getZ()));
         } else {
-            x = startX.getText() != "" ? String.valueOf(Integer.parseInt(startX.getText()) - startPos.getX()) : "0";
+            x = !startX.getText().equals("") ? String.valueOf(Integer.parseInt(startX.getText()) - startPos.getX()) : "0";
             startX.setText(x);
-            y = startY.getText() != "" ? String.valueOf(Integer.parseInt(startY.getText()) - startPos.getY()) : "0";
+            y = !startY.getText().equals("") ? String.valueOf(Integer.parseInt(startY.getText()) - startPos.getY()) : "0";
             startY.setText(y);
-            z = startZ.getText() != "" ? String.valueOf(Integer.parseInt(startZ.getText()) - startPos.getZ()) : "0";
+            z = !startZ.getText().equals("") ? String.valueOf(Integer.parseInt(startZ.getText()) - startPos.getZ()) : "0";
             startZ.setText(z);
-            x = endX.getText() != "" ? String.valueOf(Integer.parseInt(endX.getText()) - startPos.getX()) : String.valueOf(endPos.getX() - startPos.getX());
+            x = !endX.getText().equals("") ? String.valueOf(Integer.parseInt(endX.getText()) - startPos.getX()) : String.valueOf(endPos.getX() - startPos.getX());
             endX.setText(x);
-            y = endY.getText() != "" ? String.valueOf(Integer.parseInt(endY.getText()) - startPos.getY()) : String.valueOf(endPos.getY() - startPos.getY());
+            y = !endY.getText().equals("") ? String.valueOf(Integer.parseInt(endY.getText()) - startPos.getY()) : String.valueOf(endPos.getY() - startPos.getY());
             endY.setText(y);
-            z = endZ.getText() != "" ? String.valueOf(Integer.parseInt(endZ.getText()) - startPos.getZ()) : String.valueOf(endPos.getZ() - startPos.getZ());
+            z = !endZ.getText().equals("") ? String.valueOf(Integer.parseInt(endZ.getText()) - startPos.getZ()) : String.valueOf(endPos.getZ() - startPos.getZ());
             endZ.setText(z);
         }
     }
@@ -269,7 +257,6 @@ public class CopyScreen extends GuiScreen {
     @Override
     protected void keyTyped(char typedChar, int keyCode) throws IOException {
         if (this.startX.textboxKeyTyped(typedChar, keyCode) || this.startY.textboxKeyTyped(typedChar, keyCode) || this.startZ.textboxKeyTyped(typedChar, keyCode) || this.endX.textboxKeyTyped(typedChar, keyCode) || this.endY.textboxKeyTyped(typedChar, keyCode) || this.endZ.textboxKeyTyped(typedChar, keyCode)) {
-
         } else {
             super.keyTyped(typedChar, keyCode);
         }
@@ -291,7 +278,6 @@ public class CopyScreen extends GuiScreen {
             } else if (this.endZ.mouseClicked(mouseX, mouseY, 0)) {
                 endZ.setText("");
             } else {
-                //startX.setFocused(false);
                 super.mouseClicked(mouseX, mouseY, mouseButton);
             }
         } else {
@@ -308,7 +294,6 @@ public class CopyScreen extends GuiScreen {
             } else if (this.endZ.mouseClicked(mouseX, mouseY, mouseButton)) {
                 endZ.setFocused(true);
             } else {
-                //startX.setFocused(false);
                 super.mouseClicked(mouseX, mouseY, mouseButton);
             }
         }
@@ -319,13 +304,9 @@ public class CopyScreen extends GuiScreen {
         super.mouseReleased(mouseX, mouseY, state);
     }
 
-
     @Override
     public void handleMouseInput() throws IOException {
         super.handleMouseInput();
-        //System.out.println(Mouse.getEventDWheel());
-        //System.out.println(zoom);
-
     }
 
     @Override

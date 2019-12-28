@@ -139,7 +139,7 @@ public class BuildingGadget extends AbstractGadget {
         // Called when we specify a mode with the radial menu
         BuildingModes mode = BuildingModes.values()[modeInt];
         setToolMode(heldItem, mode);
-        player.sendStatusMessage(new TextComponentTranslation("message.gadget.toolmode", mode.getI18n()).setStyle(new Style().setColor(TextFormatting.AQUA)), true);
+        player.sendStatusMessage(new TextComponentTranslation("message.gadget.toolmode", new TextComponentTranslation(mode.getI18n())).setStyle(new Style().setColor(TextFormatting.AQUA)), true);
     }
 
     public void rangeChange(EntityPlayer player, ItemStack heldItem) {
