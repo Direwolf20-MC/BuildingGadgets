@@ -34,6 +34,7 @@ import net.minecraft.util.*;
 import net.minecraft.util.EnumFacing.Axis;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.text.Style;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
@@ -219,14 +220,15 @@ public class CopyGadget extends AbstractGadget implements ITemplate {
         //Called when we specify a mode with the radial menu
         ToolMode mode = ToolMode.values()[modeInt];
         setToolMode(heldItem, mode);
-        player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.toolmode").getUnformattedComponentText() + ": " + mode), true);
+
+        player.sendStatusMessage(new TextComponentTranslation("message.gadget.toolmode", mode).setStyle(new Style().setColor(TextFormatting.AQUA)), true);
     }
 
     @Override
     public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
         ItemStack stack = player.getHeldItem(hand);
         player.setActiveHand(hand);
-        RayTraceResult trace = RayTraceHelper.rayTrace(player, AbstractGadget.shouldRayTraceFluid(stack));
+        RayTraceResult trace = MagicHelpers.rayTrace(player, AbstractGadget.shouldRayTraceFluid(stack));
 
         if (!world.isRemote) {
             if (trace != null && player.isSneaking() && GadgetUtils.setRemoteInventory(stack, player, world, trace.getBlockPos(), false) == EnumActionResult.SUCCESS)
@@ -536,7 +538,7 @@ public class CopyGadget extends AbstractGadget implements ITemplate {
     public static void anchorBlocks(EntityPlayer player, ItemStack stack) {
         BlockPos currentAnchor = getAnchor(stack);
         if (currentAnchor == null) {
-            RayTraceResult lookingAt = RayTraceHelper.rayTrace(player, AbstractGadget.shouldRayTraceFluid(stack));
+            RayTraceResult lookingAt = MagicHelpers.rayTrace(player, AbstractGadget.shouldRayTraceFluid(stack));
             if (lookingAt == null) {
                 return;
             }

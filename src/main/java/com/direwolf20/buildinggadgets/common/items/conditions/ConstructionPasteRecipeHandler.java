@@ -1,4 +1,4 @@
-package com.direwolf20.buildinggadgets.common.utils;
+package com.direwolf20.buildinggadgets.common.items.conditions;
 
 import com.direwolf20.buildinggadgets.common.items.pastes.GenericPasteContainer;
 import com.google.common.collect.Maps;

@@ -149,7 +149,7 @@ public class BuildingGadget extends AbstractGadget {
 
         IBlockState setBlock = GadgetUtils.getToolBlock(stack);
         if (coords.size() == 0) {  //If we don't have an anchor, build in the current spot
-            RayTraceResult lookingAt = RayTraceHelper.rayTrace(player, AbstractGadget.shouldRayTraceFluid(stack));
+            RayTraceResult lookingAt = MagicHelpers.rayTrace(player, AbstractGadget.shouldRayTraceFluid(stack));
             if (lookingAt == null)
                 return false;
 
@@ -189,7 +189,7 @@ public class BuildingGadget extends AbstractGadget {
             }
         }
 
-        Sorter.Blocks.byDistance(coords, player);
+        MagicHelpers.byDistance(coords, player);
         return true;
     }
 

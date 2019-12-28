@@ -4,7 +4,7 @@ import com.direwolf20.buildinggadgets.common.gadgets.BuildingGadget;
 import com.direwolf20.buildinggadgets.common.items.MockBuildingWorld;
 import com.direwolf20.buildinggadgets.common.items.ModItems;
 import com.direwolf20.buildinggadgets.common.utils.GadgetUtils;
-import com.direwolf20.buildinggadgets.common.utils.Sorter;
+import com.direwolf20.buildinggadgets.common.utils.MagicHelpers;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
@@ -48,7 +48,7 @@ public class BuildingRender extends AbstractRender {
         GlStateManager.blendFunc(GL11.GL_CONSTANT_ALPHA, GL11.GL_ONE_MINUS_CONSTANT_ALPHA);
 
         // Sort the coords by distance to player.
-        List<BlockPos> sortedCoordinates = Sorter.Blocks.byDistance(locations, mc.player);
+        List<BlockPos> sortedCoordinates = MagicHelpers.byDistance(locations, mc.player);
         for (BlockPos coordinate : sortedCoordinates) {
             GlStateManager.pushMatrix();//Push matrix again just because
             GlStateManager.translate(coordinate.getX(), coordinate.getY(), coordinate.getZ());//Now move the render position to the locations we want to render at

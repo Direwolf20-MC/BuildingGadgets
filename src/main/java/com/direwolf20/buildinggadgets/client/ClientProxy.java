@@ -1,6 +1,7 @@
 package com.direwolf20.buildinggadgets.client;
 
 import com.direwolf20.buildinggadgets.client.renders.BuildingRender;
+import com.direwolf20.buildinggadgets.client.renders.CopyRender;
 import com.direwolf20.buildinggadgets.client.renders.DestructionRender;
 import com.direwolf20.buildinggadgets.client.renders.ExchangerRender;
 import com.direwolf20.buildinggadgets.common.blocks.ModBlocks;
@@ -8,11 +9,10 @@ import com.direwolf20.buildinggadgets.common.blocks.Models.BakedModelLoader;
 import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManagerContainer;
 import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
 import com.direwolf20.buildinggadgets.common.entities.*;
-import com.direwolf20.buildinggadgets.common.items.ModItems;
 import com.direwolf20.buildinggadgets.common.gadgets.*;
+import com.direwolf20.buildinggadgets.common.items.ModItems;
 import com.direwolf20.buildinggadgets.common.proxy.CommonProxy;
 import com.direwolf20.buildinggadgets.common.utils.PasteContainerMeshDefinition;
-import com.direwolf20.buildinggadgets.common.utils.ToolRenders;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.entity.player.EntityPlayer;
@@ -29,9 +29,9 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 
-import static com.direwolf20.buildinggadgets.common.items.ModItems.buildingGadget;
+import java.awt.*;
 
-import java.awt.Color;
+import static com.direwolf20.buildinggadgets.common.items.ModItems.buildingGadget;
 
 @Mod.EventBusSubscriber(value = Side.CLIENT)
 public class ClientProxy extends CommonProxy {
@@ -92,7 +92,7 @@ public class ClientProxy extends CommonProxy {
             } else if (gadget.getItem() instanceof ExchangingGadget) {
                 new ExchangerRender().render(evt, player, gadget);
             } else if (gadget.getItem() instanceof CopyGadget) {
-                ToolRenders.renderPasteOverlay(evt, player, gadget);
+                new CopyRender().render(evt, player, gadget);
             } else if (gadget.getItem() instanceof DestructionGadget) {
                 new DestructionRender().render(evt, player, gadget);
             }

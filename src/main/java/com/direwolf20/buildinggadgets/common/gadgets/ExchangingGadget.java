@@ -8,7 +8,7 @@ import com.direwolf20.buildinggadgets.common.items.MockBuildingWorld;
 import com.direwolf20.buildinggadgets.common.items.ModItems;
 import com.direwolf20.buildinggadgets.common.utils.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.utils.InventoryManipulation;
-import com.direwolf20.buildinggadgets.common.utils.RayTraceHelper;
+import com.direwolf20.buildinggadgets.common.utils.MagicHelpers;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
@@ -160,7 +160,7 @@ public class ExchangingGadget extends AbstractGadget {
         boolean fuzzyMode = AbstractGadget.getFuzzy(stack);
 
         if (coords.size() == 0) { //If we don't have an anchor, build in the current spot
-            RayTraceResult lookingAt = RayTraceHelper.rayTrace(player, AbstractGadget.shouldRayTraceFluid(stack));
+            RayTraceResult lookingAt = MagicHelpers.rayTrace(player, AbstractGadget.shouldRayTraceFluid(stack));
             if (lookingAt == null) { //If we aren't looking at anything, exit
                 return false;
             }

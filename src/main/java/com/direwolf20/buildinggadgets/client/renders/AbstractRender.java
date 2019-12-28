@@ -3,11 +3,9 @@ package com.direwolf20.buildinggadgets.client.renders;
 import com.direwolf20.buildinggadgets.client.RemoteInventoryCache;
 import com.direwolf20.buildinggadgets.common.blocks.ModBlocks;
 import com.direwolf20.buildinggadgets.common.gadgets.AbstractGadget;
+import com.direwolf20.buildinggadgets.common.gadgets.CopyGadget;
 import com.direwolf20.buildinggadgets.common.items.capability.CapabilityProviderEnergy;
-import com.direwolf20.buildinggadgets.common.utils.GadgetUtils;
-import com.direwolf20.buildinggadgets.common.utils.InventoryManipulation;
-import com.direwolf20.buildinggadgets.common.utils.RayTraceHelper;
-import com.direwolf20.buildinggadgets.common.utils.UniqueItem;
+import com.direwolf20.buildinggadgets.common.utils.*;
 import com.google.common.collect.Multiset;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -15,6 +13,7 @@ import net.minecraft.client.renderer.BlockRendererDispatcher;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.player.EntityPlayer;
@@ -23,7 +22,6 @@ import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.client.ForgeHooksClient;
 import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
@@ -37,9 +35,10 @@ import static com.direwolf20.buildinggadgets.common.utils.GadgetUtils.getAnchor;
 
 public abstract class AbstractRender {
     public static final Minecraft mc = Minecraft.getMinecraft();
-    public static final BlockRendererDispatcher rendererDispatcher = mc.getBlockRendererDispatcher();
-    public static final IBlockState emptyBlockState = Blocks.AIR.getDefaultState();
     private static final IBlockState effectBlockState = ModBlocks.effectBlock.getDefaultState();
+
+    static final BlockRendererDispatcher rendererDispatcher = mc.getBlockRendererDispatcher();
+    static final IBlockState emptyBlockState = Blocks.AIR.getDefaultState();
 
     private static RemoteInventoryCache cacheInventory = new RemoteInventoryCache(false);
     public static void setInventoryCache(Multiset<UniqueItem> cache) {
@@ -56,15 +55,11 @@ public abstract class AbstractRender {
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder bufferBuilder = tessellator.getBuffer();
 
-        Vec3d playerPos = new Vec3d(
-                player.lastTickPosX + (player.posX - player.lastTickPosX) * evt.getPartialTicks(),
-                player.lastTickPosY + (player.posY - player.lastTickPosY) * evt.getPartialTicks(),
-                player.lastTickPosZ + (player.posZ - player.lastTickPosZ) * evt.getPartialTicks()
-        );
+        RenderManager manager = mc.getRenderManager();
 
         // Setup and translate to the players pos
         mc.renderEngine.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
-        GlStateManager.translate(-playerPos.x, -playerPos.y, -playerPos.z);
+        GlStateManager.translate(-manager.viewerPosX, -manager.viewerPosY, -manager.viewerPosZ);
 
         // Check if we have a bound inventory
         Integer dim = GadgetUtils.getDIMFromNBT(gadget, "boundTE");
@@ -73,13 +68,12 @@ public abstract class AbstractRender {
         if( dim != null && pos != null && dim == mc.player.dimension )
             renderSingleBlock(tessellator, bufferBuilder, pos, .94f, 1f, 0, .35f);
 
-
         // Validate that we should render
-        RayTraceResult trace = RayTraceHelper.rayTrace(mc.player, AbstractGadget.shouldRayTraceFluid(gadget));
+        RayTraceResult trace = MagicHelpers.rayTrace(mc.player, AbstractGadget.shouldRayTraceFluid(gadget));
         List<BlockPos> existingLocations = getAnchor(gadget);
 
         // Perform a typical render
-        if( existingLocations.size() == 0 ) {
+        if( existingLocations.size() == 0 && !(gadget.getItem() instanceof CopyGadget) ) {
             if( trace != null && trace.typeOfHit != RayTraceResult.Type.MISS) {
                 IBlockState traceBlock = mc.player.world.getBlockState(trace.getBlockPos());
 
@@ -97,7 +91,7 @@ public abstract class AbstractRender {
 
     // Figure out how many of the block we're rendering we have in the inventory of the player.
     // todo: figure out if this actually is working as intended.
-    public static ItemStack getItemWithSilk(IBlockState gadgetBlock) {
+    static ItemStack getItemWithSilk(IBlockState gadgetBlock) {
         ItemStack itemStack;
         if (gadgetBlock.getBlock().canSilkHarvest(mc.player.world, BlockPos.ORIGIN, gadgetBlock, mc.player))
             itemStack = InventoryManipulation.getSilkTouchDrop(gadgetBlock);
@@ -110,16 +104,16 @@ public abstract class AbstractRender {
         return itemStack;
     }
 
-    public static long getItemCount(ItemStack itemStack) {
+    static long getItemCount(ItemStack itemStack) {
         return getItemCount(itemStack, cacheInventory);
     }
 
-    public static long getItemCount(ItemStack itemStack, RemoteInventoryCache cacheInventory) {
+    private static long getItemCount(ItemStack itemStack, RemoteInventoryCache cacheInventory) {
         long hasBlocks = InventoryManipulation.countItem(itemStack, mc.player, cacheInventory);
         return hasBlocks + InventoryManipulation.countPaste(mc.player);
     }
 
-    public static int getGadgetEnergy(ItemStack stack) {
+    static int getGadgetEnergy(ItemStack stack) {
         if (mc.player.capabilities.isCreativeMode || (!stack.hasCapability(CapabilityEnergy.ENERGY, null) && !stack.isItemStackDamageable()))
             return 1000000;
 
@@ -128,7 +122,7 @@ public abstract class AbstractRender {
                 : stack.getMaxDamage() - stack.getItemDamage();
     }
 
-    public static void renderSingleBlock(Tessellator tessellator, BufferBuilder bufferBuilder, BlockPos pos, float red, float green, float blue, float alpha) {
+    static void renderSingleBlock(Tessellator tessellator, BufferBuilder bufferBuilder, BlockPos pos, float red, float green, float blue, float alpha) {
         GlStateManager.pushMatrix();
         GlStateManager.alphaFunc(GL11.GL_GREATER, 0.0001F);
         GlStateManager.disableTexture2D();

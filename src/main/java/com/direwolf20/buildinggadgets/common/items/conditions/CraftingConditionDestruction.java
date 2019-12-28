@@ -1,4 +1,4 @@
-package com.direwolf20.buildinggadgets.common.utils;
+package com.direwolf20.buildinggadgets.common.items.conditions;
 
 import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
 import com.google.gson.JsonObject;
@@ -7,10 +7,10 @@ import net.minecraftforge.common.crafting.JsonContext;
 
 import java.util.function.BooleanSupplier;
 
-public class CraftingCondition implements IConditionFactory {
+public class CraftingConditionDestruction implements IConditionFactory {
     @Override
     public BooleanSupplier parse(JsonContext jsonContext, JsonObject jsonObject) {
-        return () -> SyncedConfig.enablePaste;
+        return () -> SyncedConfig.enableDestructionGadget;
     }
 
 }

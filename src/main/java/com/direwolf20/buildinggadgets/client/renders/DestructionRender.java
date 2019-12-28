@@ -2,7 +2,7 @@ package com.direwolf20.buildinggadgets.client.renders;
 
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.gadgets.DestructionGadget;
-import com.direwolf20.buildinggadgets.common.utils.Sorter;
+import com.direwolf20.buildinggadgets.common.utils.MagicHelpers;
 import com.direwolf20.buildinggadgets.common.utils.UniqueItemStack;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -64,7 +64,7 @@ public class DestructionRender extends AbstractRender {
         GlStateManager.enableBlend();
         GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
 
-        List<BlockPos> sortedCoordinates = Sorter.Blocks.byDistance(coordinates, player);
+        List<BlockPos> sortedCoordinates = MagicHelpers.byDistance(coordinates, player);
         for (BlockPos coordinate : sortedCoordinates) {
             boolean invisible = true;
             IBlockState state = player.world.getBlockState(coordinate);
