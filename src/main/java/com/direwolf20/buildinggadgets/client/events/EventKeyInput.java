@@ -54,7 +54,5 @@ public class EventKeyInput {
             PacketHandler.INSTANCE.sendToServer(new PacketToggleFuzzy());
         else if (connectedArea.isPressed())
             PacketHandler.INSTANCE.sendToServer(new PacketToggleConnectedArea());
-        else if (dev != null && dev.isPressed() && BuildingGadgets.getDev().isIsDev())
-            BuildingGadgets.getDev().onKeyPress();
     }
 }

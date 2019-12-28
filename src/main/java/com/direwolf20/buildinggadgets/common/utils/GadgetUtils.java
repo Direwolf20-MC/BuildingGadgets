@@ -419,33 +419,31 @@ public class GadgetUtils {
     }
 
     public static void writePOSToNBT(ItemStack stack, @Nullable BlockPos pos, String tagName) {
-        NBTTagCompound tagCompound = stack.getTagCompound();
-        if (tagCompound == null) {
-            tagCompound = new NBTTagCompound();
-        }
+        NBTTagCompound tagCompound = AbstractGadget.getOrNewTag(stack);
+
         if (pos == null) {
-            if (tagCompound.getTag(tagName) != null) {
+            if (tagCompound.hasKey(tagName)) {
                 tagCompound.removeTag(tagName);
                 stack.setTagCompound(tagCompound);
             }
             return;
         }
+
         tagCompound.setTag(tagName, NBTUtil.createPosTag(pos));
         stack.setTagCompound(tagCompound);
     }
 
     public static void writePOSToNBT(ItemStack stack, @Nullable BlockPos pos, String tagName, Integer dim) {
-        NBTTagCompound tagCompound = stack.getTagCompound();
-        if (tagCompound == null) {
-            tagCompound = new NBTTagCompound();
-        }
+        NBTTagCompound tagCompound = AbstractGadget.getOrNewTag(stack);
+
         if (pos == null) {
-            if (tagCompound.getTag(tagName) != null) {
+            if (tagCompound.hasKey(tagName)) {
                 tagCompound.removeTag(tagName);
                 stack.setTagCompound(tagCompound);
             }
             return;
         }
+
         NBTTagCompound posTag = NBTUtil.createPosTag(pos);
         posTag.setInteger("dim", dim);
         tagCompound.setTag(tagName, posTag);

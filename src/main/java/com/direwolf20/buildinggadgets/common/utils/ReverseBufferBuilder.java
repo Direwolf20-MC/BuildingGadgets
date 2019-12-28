@@ -16,7 +16,7 @@ import java.util.Arrays;
 import java.util.BitSet;
 
 /**
- * This class differs from {@link BufferBuilder BufferBuilder} only in that the Comparator arguments of {@link Arrays#sort(Integer[], Comparator) Arrays#sort}
+ * This class differs from {@link BufferBuilder BufferBuilder} only in that the Comparator arguments of Arrays#sort}
  * are compared in reverse order in {@link ReverseBufferBuilder#sortVertexData sortVertexData}
  */
 public class ReverseBufferBuilder extends BufferBuilder {

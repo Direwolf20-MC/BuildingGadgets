@@ -1,6 +1,5 @@
 package com.direwolf20.buildinggadgets.client;
 
-import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.gadgets.AbstractGadget;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
@@ -32,9 +31,6 @@ public class KeyBindings {
         fuzzy = createBinding("fuzzy", Keyboard.KEY_NONE);
         connectedArea = createBinding("connected_area", Keyboard.KEY_NONE);
         rotateMirror = createBinding("rotate_mirror", Keyboard.KEY_NONE);
-
-        if(BuildingGadgets.getDev().isIsDev())
-            dev = createBinding("dev", Keyboard.KEY_BACKSLASH);
     }
 
     private static KeyBinding createBinding(String name, int key) {
