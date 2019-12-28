@@ -58,23 +58,12 @@ public class CopyGadget extends AbstractGadget implements ITemplate {
     }
 
     public CopyGadget() {
-        super("copypastetool");
-        setMaxDamage(SyncedConfig.durabilityCopyPaste);
-    }
-
-    @Override
-    public int getMaxDamage(ItemStack stack) {
-        return SyncedConfig.poweredByFE ? 0 : SyncedConfig.durabilityCopyPaste;
-    }
-
-    @Override
-    public int getEnergyCost(ItemStack tool) {
-        return SyncedConfig.energyCostCopyPaste;
-    }
-
-    @Override
-    public int getDamageCost(ItemStack tool) {
-        return SyncedConfig.damageCostCopyPaste;
+        super(
+                "copypastetool",
+                SyncedConfig.durabilityCopyPaste,
+                SyncedConfig.energyCostCopyPaste,
+                SyncedConfig.damageCostCopyPaste
+        );
     }
 
     private static void setAnchor(ItemStack stack, BlockPos anchorPos) {
@@ -222,8 +211,7 @@ public class CopyGadget extends AbstractGadget implements ITemplate {
     public void addInformation(ItemStack stack, @Nullable World world, List<String> list, ITooltipFlag b) {
         super.addInformation(stack, world, list, b);
         list.add(TextFormatting.AQUA + I18n.format("tooltip.gadget.mode") + ": " + getToolMode(stack));
-        addInformationRayTraceFluid(list, stack);
-        addEnergyInformation(list, stack);
+
         EventTooltip.addTemplatePadding(stack, list);
     }
 

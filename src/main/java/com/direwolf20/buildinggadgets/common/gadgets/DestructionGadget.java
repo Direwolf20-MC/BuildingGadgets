@@ -45,13 +45,11 @@ import java.util.*;
 public class DestructionGadget extends AbstractGadget {
 
     public DestructionGadget() {
-        super("destructiontool");
-        setMaxDamage(SyncedConfig.durabilityDestruction);
-    }
-
-    @Override
-    public int getMaxDamage(ItemStack stack) {
-        return SyncedConfig.poweredByFE ? 0 : SyncedConfig.durabilityDestruction;
+        super(
+            "destructiontool",
+                SyncedConfig.durabilityDestruction,
+                0, 0
+        );
     }
 
     @Override
@@ -76,22 +74,19 @@ public class DestructionGadget extends AbstractGadget {
     @Override
     public void addInformation(ItemStack stack, @Nullable World world, List<String> list, ITooltipFlag b) {
         super.addInformation(stack, world, list, b);
+
         list.add(TextFormatting.RED + I18n.format("tooltip.gadget.destroywarning"));
         list.add(TextFormatting.AQUA + I18n.format("tooltip.gadget.destroyshowoverlay") + ": " + getOverlay(stack));
         list.add(TextFormatting.YELLOW + I18n.format("tooltip.gadget.connected_area") + ": " + getConnectedArea(stack));
+
         if (SyncedConfig.nonFuzzyEnabledDestruction)
             list.add(TextFormatting.GOLD + I18n.format("tooltip.gadget.fuzzy") + ": " + getFuzzy(stack));
-
-        addInformationRayTraceFluid(list, stack);
-        addEnergyInformation(list,stack);
     }
 
     @Nullable
     public static String getUUID(ItemStack stack) {
-        NBTTagCompound tagCompound = stack.getTagCompound();
-        if (tagCompound == null) {
-            tagCompound = new NBTTagCompound();
-        }
+        NBTTagCompound tagCompound = getOrNewTag(stack);
+
         String uuid = tagCompound.getString("UUID");
         if (uuid.isEmpty()) {
             UUID uid = UUID.randomUUID();
@@ -99,26 +94,21 @@ public class DestructionGadget extends AbstractGadget {
             stack.setTagCompound(tagCompound);
             uuid = uid.toString();
         }
+
         return uuid;
     }
 
     public static void setToolValue(ItemStack stack, int value, String valueName) {
-        //Store the tool's range in NBT as an Integer
-        NBTTagCompound tagCompound = stack.getTagCompound();
-        if (tagCompound == null) {
-            tagCompound = new NBTTagCompound();
-        }
+        // Store the tool's range in NBT as an Integer
+        NBTTagCompound tagCompound = getOrNewTag(stack);
+
         tagCompound.setInteger(valueName, value);
         stack.setTagCompound(tagCompound);
     }
 
     public static int getToolValue(ItemStack stack, String valueName) {
-        //Store the tool's range in NBT as an Integer
-        NBTTagCompound tagCompound = stack.getTagCompound();
-        if (tagCompound == null) {
-            tagCompound = new NBTTagCompound();
-        }
-        return tagCompound.getInteger(valueName);
+        // Store the tool's range in NBT as an Integer
+        return getOrNewTag(stack).getInteger(valueName);
     }
 
     public static boolean getOverlay(ItemStack stack) {
@@ -139,10 +129,8 @@ public class DestructionGadget extends AbstractGadget {
     }
 
     public static void setOverlay(ItemStack stack, boolean showOverlay) {
-        NBTTagCompound tagCompound = stack.getTagCompound();
-        if (tagCompound == null) {
-            tagCompound = new NBTTagCompound();
-        }
+        NBTTagCompound tagCompound = getOrNewTag(stack);
+
         tagCompound.setBoolean("overlay", showOverlay);
         stack.setTagCompound(tagCompound);
     }

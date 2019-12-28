@@ -5,6 +5,7 @@ import com.direwolf20.buildinggadgets.common.items.ItemModBase;
 import com.direwolf20.buildinggadgets.common.items.capability.CapabilityProviderEnergy;
 
 import net.minecraft.client.resources.I18n;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
@@ -13,6 +14,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.energy.CapabilityEnergy;
@@ -22,34 +24,38 @@ import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Optional;
 
-import static com.direwolf20.buildinggadgets.common.tools.GadgetUtils.withSuffix;
+import static com.direwolf20.buildinggadgets.common.tools.GadgetUtils.*;
 
 public abstract class AbstractGadget extends ItemModBase {
+    private int maxDamage;
+    private int energyCost;
+    private int damageCost;
 
-    public AbstractGadget(String name) {
+    public AbstractGadget(String name, int maxDamage, int energyCost, int damageCost) {
         super(name);
+
+        this.maxDamage = maxDamage;
+        this.energyCost = energyCost;
+        this.damageCost = damageCost;
+
+        if( !SyncedConfig.poweredByFE )
+            setMaxDamage(maxDamage);
+
         setMaxStackSize(1);
     }
 
-    public int getEnergyMax() {
-        return SyncedConfig.energyMax;
+    @Override
+    public void addInformation(ItemStack stack, @Nullable World world, List<String> list, ITooltipFlag b) {
+        super.addInformation(stack, world, list, b);
+
+        if (stack.hasCapability(CapabilityEnergy.ENERGY, null)) {
+            IEnergyStorage energy = CapabilityProviderEnergy.getCap(stack);
+            list.add(TextFormatting.WHITE + I18n.format("tooltip.gadget.energy") + ": " + withSuffix(energy.getEnergyStored()) + "/" + withSuffix(energy.getMaxEnergyStored()));
+        }
+
+        list.add(TextFormatting.BLUE + I18n.format("tooltip.gadget.raytrace_fluid") + ": " + shouldRayTraceFluid(stack));
     }
 
-    @Override
-    @Nullable
-    public ICapabilityProvider initCapabilities(ItemStack stack, @Nullable NBTTagCompound tag) {
-        return new CapabilityProviderEnergy(stack, this::getEnergyMax);
-    }
-
-    @Override
-    public boolean isDamageable() {
-        return true;
-    }
-
-    @Override
-    public boolean isRepairable() {
-        return false;
-    }
 
     @Override
     public double getDurabilityForDisplay(ItemStack stack) {
@@ -57,7 +63,7 @@ public abstract class AbstractGadget extends ItemModBase {
             IEnergyStorage energy = CapabilityProviderEnergy.getCap(stack);
             return 1D - ((double) energy.getEnergyStored() / (double) energy.getMaxEnergyStored());
         }
-        //return (double)stack.getItemDamage() / (double)stack.getMaxDamage();
+
         return super.getDurabilityForDisplay(stack);
     }
 
@@ -67,7 +73,7 @@ public abstract class AbstractGadget extends ItemModBase {
             IEnergyStorage energy = CapabilityProviderEnergy.getCap(stack);
             return MathHelper.hsvToRGB(Math.max(0.0F, (float) energy.getEnergyStored() / (float) energy.getMaxEnergyStored()) / 3.0F, 1.0F, 1.0F);
         }
-        //return MathHelper.hsvToRGB(Math.max(0.0F, (float) (1.0F - getDurabilityForDisplay(stack))) / 3.0F, 1.0F, 1.0F);
+
         return super.getRGBDurabilityForDisplay(stack);
     }
 
@@ -77,7 +83,7 @@ public abstract class AbstractGadget extends ItemModBase {
             IEnergyStorage energy = CapabilityProviderEnergy.getCap(stack);
             return energy.getEnergyStored() != energy.getMaxEnergyStored();
         }
-        //return (stack.getItemDamage() > 0);
+
         return super.isDamaged(stack);
     }
 
@@ -90,7 +96,7 @@ public abstract class AbstractGadget extends ItemModBase {
             IEnergyStorage energy = CapabilityProviderEnergy.getCap(stack);
             return energy.getEnergyStored() != energy.getMaxEnergyStored();
         }
-        //return stack.isItemDamaged();
+
         return super.showDurabilityBar(stack);
     }
 
@@ -116,10 +122,6 @@ public abstract class AbstractGadget extends ItemModBase {
         return Optional.of(heldItem);
     }
 
-    public abstract int getEnergyCost(ItemStack tool);
-
-    public abstract int getDamageCost(ItemStack tool);
-
     public boolean canUse(ItemStack tool, EntityPlayer player) {
         if (player.capabilities.isCreativeMode)
             return true;
@@ -140,13 +142,44 @@ public abstract class AbstractGadget extends ItemModBase {
             tool.damageItem(getDamageCost(tool), player);
     }
 
-    protected void addEnergyInformation(List<String> list, ItemStack stack) {
-        if (stack.hasCapability(CapabilityEnergy.ENERGY, null)) {
-            IEnergyStorage energy = CapabilityProviderEnergy.getCap(stack);
-            list.add(TextFormatting.WHITE + I18n.format("tooltip.gadget.energy") + ": " + withSuffix(energy.getEnergyStored()) + "/" + withSuffix(energy.getMaxEnergyStored()));
-        }
+    public int getEnergyMax() {
+        return SyncedConfig.energyMax;
     }
 
+    @Override
+    @Nullable
+    public ICapabilityProvider initCapabilities(ItemStack stack, @Nullable NBTTagCompound tag) {
+        return new CapabilityProviderEnergy(stack, this::getEnergyMax);
+    }
+
+    @Override
+    public boolean isDamageable() {
+        return true;
+    }
+
+    @Override
+    public boolean isRepairable() {
+        return false;
+    }
+
+    @Override
+    public int getMaxDamage(ItemStack stack) {
+        return SyncedConfig.poweredByFE ? 0 : this.maxDamage;
+    }
+
+    public int getEnergyCost(ItemStack tool) {
+        return this.energyCost;
+    }
+
+    public int getDamageCost(ItemStack tool) {
+        return this.damageCost;
+    }
+
+    /**
+     * ------------------------------------
+     * NBT METHOD
+     * ------------------------------------
+     */
     public static boolean getFuzzy(ItemStack stack) {
         return getOrNewTag(stack).getBoolean("fuzzy");
     }
@@ -173,10 +206,6 @@ public abstract class AbstractGadget extends ItemModBase {
     public static void toggleRayTraceFluid(EntityPlayer player, ItemStack stack) {
         getOrNewTag(stack).setBoolean("raytrace_fluid", !shouldRayTraceFluid(stack));
         player.sendStatusMessage(new TextComponentString(TextFormatting.AQUA + new TextComponentTranslation("message.gadget.raytrace_fluid").getUnformattedComponentText() + ": " + shouldRayTraceFluid(stack)), true);
-    }
-
-    public static void addInformationRayTraceFluid(List<String> tooltip, ItemStack stack) {
-        tooltip.add(TextFormatting.BLUE + I18n.format("tooltip.gadget.raytrace_fluid") + ": " + shouldRayTraceFluid(stack));
     }
 
     /**

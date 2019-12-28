@@ -45,24 +45,16 @@ public class ExchangingGadget extends AbstractGadget {
     public static final MockBuildingWorld fakeWorld = new MockBuildingWorld();
 
     public ExchangingGadget() {
-        super("exchangertool");
+        super(
+                "exchangertool",
+                SyncedConfig.durabilityExchanger,
+                SyncedConfig.energyCostExchanger,
+                SyncedConfig.damageCostExchanger
+        );
+
         setMaxDamage(SyncedConfig.durabilityExchanger);
     }
 
-    @Override
-    public int getMaxDamage(ItemStack stack) {
-        return SyncedConfig.poweredByFE ? 0 : SyncedConfig.durabilityExchanger;
-    }
-
-    @Override
-    public int getEnergyCost(ItemStack tool) {
-        return SyncedConfig.energyCostExchanger;
-    }
-
-    @Override
-    public int getDamageCost(ItemStack tool) {
-        return SyncedConfig.damageCostExchanger;
-    }
 
     @Override
     public int getItemEnchantability() {
@@ -117,13 +109,12 @@ public class ExchangingGadget extends AbstractGadget {
     @Override
     public void addInformation(ItemStack stack, @Nullable World world, List<String> list, ITooltipFlag b) {
         super.addInformation(stack, world, list, b);
+
         list.add(TextFormatting.DARK_GREEN + I18n.format("tooltip.gadget.block") + ": " + getToolBlock(stack).getBlock().getLocalizedName());
         ExchangingModes mode = getToolMode(stack);
         list.add(TextFormatting.AQUA + I18n.format("tooltip.gadget.mode") + ": " + (mode == SURFACE && getConnectedArea(stack) ? I18n.format("tooltip.gadget.connected") + " " : "") + mode);
         list.add(TextFormatting.LIGHT_PURPLE + I18n.format("tooltip.gadget.range") + ": " + getToolRange(stack));
         list.add(TextFormatting.GOLD + I18n.format("tooltip.gadget.fuzzy") + ": " + getFuzzy(stack));
-        addInformationRayTraceFluid(list, stack);
-        addEnergyInformation(list, stack);
     }
 
     @Override
@@ -296,5 +287,4 @@ public class ExchangingGadget extends AbstractGadget {
     public boolean hasEffect(ItemStack stack) {
         return false;
     }
-
 }

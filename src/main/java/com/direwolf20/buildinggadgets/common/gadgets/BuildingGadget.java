@@ -41,47 +41,37 @@ public class BuildingGadget extends AbstractGadget {
     private static final MockBuildingWorld fakeWorld = new MockBuildingWorld();
 
     public BuildingGadget() {
-        super("buildingtool");
-        setMaxDamage(SyncedConfig.durabilityBuilder);
-    }
-
-    @Override
-    public int getMaxDamage(ItemStack stack) {
-        return SyncedConfig.poweredByFE ? 0 : SyncedConfig.durabilityBuilder;
-    }
-
-    @Override
-    public int getEnergyCost(ItemStack tool) {
-        return SyncedConfig.energyCostBuilder;
-    }
-
-    @Override
-    public int getDamageCost(ItemStack tool) {
-        return SyncedConfig.damageCostBuilder;
+        super(
+                "buildingtool",
+                SyncedConfig.durabilityBuilder,
+                SyncedConfig.energyCostBuilder,
+                SyncedConfig.damageCostBuilder
+        );
     }
 
     private static void setToolMode(ItemStack stack, BuildingModes mode) {
-        //Store the tool's mode in NBT as a string
-        NBTTagCompound tagCompound = stack.getTagCompound();
-        if (tagCompound == null) {
-            tagCompound = new NBTTagCompound();
-        }
+        // Store the tool's mode in NBT as a string
+        NBTTagCompound tagCompound = getOrNewTag(stack);
+
         tagCompound.setString("mode", mode.name());
         stack.setTagCompound(tagCompound);
     }
 
     public static BuildingModes getToolMode(ItemStack stack) {
-        NBTTagCompound tagCompound = stack.getTagCompound();
         BuildingModes mode = BuildingModes.BUILD_TO_ME;
-        if (tagCompound == null) {
+
+        NBTTagCompound tagCompound = getOrNewTag(stack);
+        if (tagCompound.hasKey("mode")) {
             setToolMode(stack, mode);
             return mode;
         }
+
         try {
             mode = BuildingModes.valueOf(tagCompound.getString("mode"));
         } catch (Exception e) {
             setToolMode(stack, mode);
         }
+
         return mode;
     }
 
@@ -99,8 +89,10 @@ public class BuildingGadget extends AbstractGadget {
     public void addInformation(ItemStack stack, @Nullable World world, List<String> list, ITooltipFlag b) {
         //Add tool information to the tooltip
         super.addInformation(stack, world, list, b);
-        list.add(TextFormatting.DARK_GREEN + I18n.format("tooltip.gadget.block") + ": " + getToolBlock(stack).getBlock().getLocalizedName());
+
         BuildingModes mode = getToolMode(stack);
+
+        list.add(TextFormatting.DARK_GREEN + I18n.format("tooltip.gadget.block") + ": " + getToolBlock(stack).getBlock().getLocalizedName());
         list.add(TextFormatting.AQUA + I18n.format("tooltip.gadget.mode") + ": " + (mode == BuildingModes.SURFACE && getConnectedArea(stack) ? I18n.format("tooltip.gadget.connected") + " " : "") + mode);
 
         if (getToolMode(stack) != BuildingModes.BUILD_TO_ME)
@@ -109,19 +101,14 @@ public class BuildingGadget extends AbstractGadget {
         if (getToolMode(stack) == BuildingModes.SURFACE)
             list.add(TextFormatting.GOLD + I18n.format("tooltip.gadget.fuzzy") + ": " + getFuzzy(stack));
 
-        addInformationRayTraceFluid(list, stack);
         list.add(TextFormatting.YELLOW + I18n.format("tooltip.gadget.building.place_atop") + ": " + shouldPlaceAtop(stack));
-        addEnergyInformation(list, stack);
     }
 
     @Override
     public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
         //On item use, if sneaking, select the block clicked on, else build -- This is called when you right click a tool NOT on a block.
         ItemStack itemstack = player.getHeldItem(hand);
-        /*NBTTagCompound tagCompound = itemstack.getTagCompound();
-        ByteBuf buf = Unpooled.buffer(16);
-        ByteBufUtils.writeTag(buf,tagCompound);
-        System.out.println(buf.readableBytes());*/
+
         player.setActiveHand(hand);
         if (!world.isRemote) {
             if (player.isSneaking()) {
@@ -181,7 +168,6 @@ public class BuildingGadget extends AbstractGadget {
             return false;
 
         IBlockState blockState = getToolBlock(heldItem);
-
         if (blockState != Blocks.AIR.getDefaultState()) { //Don't attempt a build if a block is not chosen -- Typically only happens on a new tool.
             IBlockState state = Blocks.AIR.getDefaultState(); //Initialize a new State Variable for use in the fake world
             fakeWorld.setWorldAndState(player.world, blockState, coordinates); // Initialize the fake world's blocks
@@ -189,12 +175,9 @@ public class BuildingGadget extends AbstractGadget {
                 if (fakeWorld.getWorldType() != WorldType.DEBUG_ALL_BLOCK_STATES) {
                     try { //Get the state of the block in the fake world (This lets fences be connected, etc)
                         state = blockState.getActualState(fakeWorld, coordinate);
-                    } catch (Exception var8) {
-                    }
+                    } catch (Exception ignored) {}
                 }
-                //Get the extended block state in the fake world
-                //Disabled to fix Chisel
-                //state = state.getBlock().getExtendedState(state, fakeWorld, coordinate);
+
                 if (placeBlock(world, player, coordinate, state)) {
                     undoCoords.add(coordinate);//If we successfully place the block, add the location to the undo list.
                 }
