@@ -1,7 +1,8 @@
-package com.direwolf20.buildinggadgets.common;
+package com.direwolf20.buildinggadgets.client;
 
 import com.direwolf20.buildinggadgets.client.ClientProxy;
 
+import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
 
@@ -10,7 +11,7 @@ public enum ModSounds {
 
     private SoundEvent sound;
 
-    private ModSounds(String name) {
+    ModSounds(String name) {
         ResourceLocation loc = new ResourceLocation(BuildingGadgets.MODID, name);
         sound = new SoundEvent(loc).setRegistryName(name);
     }

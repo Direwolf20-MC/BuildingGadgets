@@ -132,7 +132,7 @@ public class BuildingGadget extends AbstractGadget {
         } else if (!player.isSneaking()) {
             AbstractRender.updateInventoryCache();
         }
-        return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, itemstack);
+        return new ActionResult<>(EnumActionResult.SUCCESS, itemstack);
     }
 
     public void setMode(EntityPlayer player, ItemStack heldItem, int modeInt) {

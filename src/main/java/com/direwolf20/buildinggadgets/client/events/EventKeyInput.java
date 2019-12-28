@@ -1,9 +1,9 @@
 package com.direwolf20.buildinggadgets.client.events;
 
-import com.direwolf20.buildinggadgets.client.gui.BuildingRadial;
-import com.direwolf20.buildinggadgets.client.gui.CopyRadial;
-import com.direwolf20.buildinggadgets.client.gui.DestructionRadial;
-import com.direwolf20.buildinggadgets.client.gui.ExchangingRadial;
+import com.direwolf20.buildinggadgets.client.screens.BuildingRadial;
+import com.direwolf20.buildinggadgets.client.screens.CopyRadial;
+import com.direwolf20.buildinggadgets.client.screens.DestructionRadial;
+import com.direwolf20.buildinggadgets.client.screens.ExchangingRadial;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.gadgets.*;
 import com.direwolf20.buildinggadgets.common.network.*;

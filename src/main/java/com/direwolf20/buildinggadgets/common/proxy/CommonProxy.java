@@ -1,9 +1,9 @@
 package com.direwolf20.buildinggadgets.common.proxy;
 
 
-import com.direwolf20.buildinggadgets.client.gui.GuiProxy;
+import com.direwolf20.buildinggadgets.client.screens.GuiProxy;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
-import com.direwolf20.buildinggadgets.common.ModSounds;
+import com.direwolf20.buildinggadgets.client.ModSounds;
 import com.direwolf20.buildinggadgets.common.blocks.*;
 import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManager;
 import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManagerTileEntity;

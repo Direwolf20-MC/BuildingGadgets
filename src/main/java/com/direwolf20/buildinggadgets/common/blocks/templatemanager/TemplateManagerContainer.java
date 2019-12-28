@@ -10,8 +10,8 @@ import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 
 public class TemplateManagerContainer extends Container {
-    public static final String TEXTURE_LOC_SLOT_TOOL = BuildingGadgets.MODID + ":gui/slot_copypastetool";
-    public static final String TEXTURE_LOC_SLOT_TEMPLATE = BuildingGadgets.MODID + ":gui/slot_template";
+    public static final String TEXTURE_LOC_SLOT_TOOL = BuildingGadgets.MODID + ":screens/slot_copypastetool";
+    public static final String TEXTURE_LOC_SLOT_TEMPLATE = BuildingGadgets.MODID + ":screens/slot_template";
     private TemplateManagerTileEntity te;
 
     public TemplateManagerContainer(IInventory playerInventory, TemplateManagerTileEntity te) {

@@ -1,5 +1,6 @@
-package com.direwolf20.buildinggadgets.client.gui;
+package com.direwolf20.buildinggadgets.client.screens;
 
+import com.direwolf20.buildinggadgets.common.gadgets.CopyGadget;
 import net.minecraft.item.ItemStack;
 
 public class CopyRadial extends AbstractRadialMenu {
@@ -10,5 +11,14 @@ public class CopyRadial extends AbstractRadialMenu {
 
     public CopyRadial(ItemStack gadget) {
         super(icons, gadget);
+
+        this.modeIndex = CopyGadget.getToolMode(gadget).ordinal();
+    }
+
+    @Override
+    public void initGui() {
+        super.initGui();
+
+        this.sortButtons();
     }
 }

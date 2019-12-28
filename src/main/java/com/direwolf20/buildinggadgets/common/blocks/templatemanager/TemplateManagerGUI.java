@@ -70,7 +70,7 @@ public class TemplateManagerGUI extends GuiContainer {
     private TemplateManagerTileEntity te;
     private TemplateManagerContainer container;
 
-    private static final ResourceLocation background = new ResourceLocation(BuildingGadgets.MODID, "textures/gui/testcontainer.png");
+    private static final ResourceLocation background = new ResourceLocation(BuildingGadgets.MODID, "textures/screens/testcontainer.png");
 
     public TemplateManagerGUI(TemplateManagerTileEntity tileEntity, TemplateManagerContainer container) {
         super(container);

@@ -1,4 +1,4 @@
-package com.direwolf20.buildinggadgets.client.gui;
+package com.direwolf20.buildinggadgets.client.screens;
 
 import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManagerContainer;
 import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManagerGUI;

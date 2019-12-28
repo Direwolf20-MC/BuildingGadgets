@@ -3,9 +3,9 @@
  * Chisel is Open Source and distributed under GNU GPL v2
  */
 
-package com.direwolf20.buildinggadgets.client.gui;
+package com.direwolf20.buildinggadgets.client.screens;
 
-import com.direwolf20.buildinggadgets.client.gui.components.DireButton;
+import com.direwolf20.buildinggadgets.client.screens.components.DireButton;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.gadgets.DestructionGadget;
 import com.direwolf20.buildinggadgets.common.network.PacketDestructionGUI;
@@ -41,7 +41,7 @@ public class DestructionScreen extends GuiScreen {
 
     ItemStack destructionTool;
 
-    private static final ResourceLocation background = new ResourceLocation(BuildingGadgets.MODID, "textures/gui/testcontainer.png");
+    private static final ResourceLocation background = new ResourceLocation(BuildingGadgets.MODID, "textures/screens/testcontainer.png");
 
     public DestructionScreen(ItemStack tool) {
         super();

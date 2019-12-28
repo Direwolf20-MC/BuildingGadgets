@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.common.gadgets;
 
-import com.direwolf20.buildinggadgets.client.gui.GuiProxy;
+import com.direwolf20.buildinggadgets.client.screens.GuiProxy;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.blocks.ModBlocks;

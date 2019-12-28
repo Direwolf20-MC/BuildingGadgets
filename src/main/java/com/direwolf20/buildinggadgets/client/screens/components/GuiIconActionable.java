@@ -1,7 +1,7 @@
-package com.direwolf20.buildinggadgets.client.gui.components;
+package com.direwolf20.buildinggadgets.client.screens.components;
 
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
-import com.direwolf20.buildinggadgets.common.ModSounds;
+import com.direwolf20.buildinggadgets.client.ModSounds;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.client.audio.SoundHandler;
@@ -9,13 +9,12 @@ import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.ResourceLocation;
-import org.lwjgl.Sys;
 
 import java.awt.*;
 import java.util.function.Predicate;
 
 /**
- * A one stop shop for all your icon gui related needs. We support colors,
+ * A one stop shop for all your icon screens related needs. We support colors,
  * icons, selected and deselected states, sound and loads more. Come on
  * down!
  */

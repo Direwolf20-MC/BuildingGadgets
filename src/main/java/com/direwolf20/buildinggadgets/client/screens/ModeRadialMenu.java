@@ -4,13 +4,13 @@
 // * Psi License: http://psi.vazkii.us/license.php
 // */
 //
-//package com.direwolf20.buildinggadgets.client.gui;
+//package com.direwolf20.buildinggadgets.client.screens;
 //
 //import com.direwolf20.buildinggadgets.client.KeyBindings;
-//import com.direwolf20.buildinggadgets.client.gui.components.GuiIconActionable;
-//import com.direwolf20.buildinggadgets.client.gui.components.GuiSliderInt;
+//import com.direwolf20.buildinggadgets.client.screens.components.GuiIconActionable;
+//import com.direwolf20.buildinggadgets.client.screens.components.GuiSliderInt;
 //import com.direwolf20.buildinggadgets.common.BuildingGadgets;
-//import com.direwolf20.buildinggadgets.common.ModSounds;
+//import com.direwolf20.buildinggadgets.client.ModSounds;
 //import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
 //import com.direwolf20.buildinggadgets.common.gadgets.*;
 //import com.direwolf20.buildinggadgets.common.gadgets.building.BuildingModes;
@@ -22,8 +22,8 @@
 //import com.google.common.collect.ImmutableSet;
 //
 //import net.minecraft.client.Minecraft;
-//import net.minecraft.client.gui.GuiButton;
-//import net.minecraft.client.gui.GuiScreen;
+//import net.minecraft.client.screens.GuiButton;
+//import net.minecraft.client.screens.GuiScreen;
 //import net.minecraft.client.renderer.GlStateManager;
 //import net.minecraft.client.renderer.RenderHelper;
 //import net.minecraft.client.settings.GameSettings;
@@ -47,24 +47,24 @@
 //public class ModeRadialMenu extends GuiScreen {
 //
 //    private static final ResourceLocation[] signsBuilding = new ResourceLocation[]{
-//        new ResourceLocation(BuildingGadgets.MODID, "textures/gui/mode/build_to_me.png"),
-//        new ResourceLocation(BuildingGadgets.MODID, "textures/gui/mode/vertical_column.png"),
-//        new ResourceLocation(BuildingGadgets.MODID, "textures/gui/mode/horizontal_column.png"),
-//        new ResourceLocation(BuildingGadgets.MODID, "textures/gui/mode/vertical_wall.png"),
-//        new ResourceLocation(BuildingGadgets.MODID, "textures/gui/mode/horizontal_wall.png"),
-//        new ResourceLocation(BuildingGadgets.MODID, "textures/gui/mode/stairs.png"),
-//        new ResourceLocation(BuildingGadgets.MODID, "textures/gui/mode/grid.png"),
-//        new ResourceLocation(BuildingGadgets.MODID, "textures/gui/mode/surface.png")
+//        new ResourceLocation(BuildingGadgets.MODID, "textures/screens/mode/build_to_me.png"),
+//        new ResourceLocation(BuildingGadgets.MODID, "textures/screens/mode/vertical_column.png"),
+//        new ResourceLocation(BuildingGadgets.MODID, "textures/screens/mode/horizontal_column.png"),
+//        new ResourceLocation(BuildingGadgets.MODID, "textures/screens/mode/vertical_wall.png"),
+//        new ResourceLocation(BuildingGadgets.MODID, "textures/screens/mode/horizontal_wall.png"),
+//        new ResourceLocation(BuildingGadgets.MODID, "textures/screens/mode/stairs.png"),
+//        new ResourceLocation(BuildingGadgets.MODID, "textures/screens/mode/grid.png"),
+//        new ResourceLocation(BuildingGadgets.MODID, "textures/screens/mode/surface.png")
 //    };
 //    private static final ResourceLocation[] signsExchanger = new ResourceLocation[]{
-//        new ResourceLocation(BuildingGadgets.MODID, "textures/gui/mode/surface.png"),
-//        new ResourceLocation(BuildingGadgets.MODID, "textures/gui/mode/vertical_column.png"),
-//        new ResourceLocation(BuildingGadgets.MODID, "textures/gui/mode/horizontal_column.png"),
-//        new ResourceLocation(BuildingGadgets.MODID, "textures/gui/mode/grid.png")
+//        new ResourceLocation(BuildingGadgets.MODID, "textures/screens/mode/surface.png"),
+//        new ResourceLocation(BuildingGadgets.MODID, "textures/screens/mode/vertical_column.png"),
+//        new ResourceLocation(BuildingGadgets.MODID, "textures/screens/mode/horizontal_column.png"),
+//        new ResourceLocation(BuildingGadgets.MODID, "textures/screens/mode/grid.png")
 //    };
 //    private static final ResourceLocation[] signsCopyPaste = new ResourceLocation[]{
-//        new ResourceLocation(BuildingGadgets.MODID, "textures/gui/mode/copy.png"),
-//        new ResourceLocation(BuildingGadgets.MODID, "textures/gui/mode/paste.png")
+//        new ResourceLocation(BuildingGadgets.MODID, "textures/screens/mode/copy.png"),
+//        new ResourceLocation(BuildingGadgets.MODID, "textures/screens/mode/paste.png")
 //    };
 //    private int timeIn = 0;
 //    private int slotSelected = -1;
@@ -94,78 +94,25 @@
 //        boolean isDestruction = tool.getItem() instanceof DestructionGadget;
 //        ScreenPosition right = isDestruction ? ScreenPosition.TOP : ScreenPosition.RIGHT;
 //        ScreenPosition left = isDestruction ? ScreenPosition.BOTTOM : ScreenPosition.LEFT;
-//        if (isDestruction) {
-//            addButton(new PositionedIconActionable("Show Overlay", "destroy_overlay", right, send -> {
-//                if (send) PacketHandler.INSTANCE.sendToServer(new PacketChangeRange());
-//                return DestructionGadget.getOverlay(getAsStack());
-//            }));
-//        } else {
-//            addButton(new PositionedIconActionable("Rotate", "rotate", left, false, send -> {
-//                if (send) PacketHandler.INSTANCE.sendToServer(new PacketRotateMirror(PacketRotateMirror.Operation.ROTATE));
-//                return false;
-//            }));
-//            addButton(new PositionedIconActionable("Mirror", "mirror", left, false, send -> {
-//                if (send) PacketHandler.INSTANCE.sendToServer(new PacketRotateMirror(PacketRotateMirror.Operation.MIRROR));
-//                return false;
-//            }));
-//        }
+//
 //        if (!(tool.getItem() instanceof CopyGadget)) {
 //            if (!isDestruction || SyncedConfig.nonFuzzyEnabledDestruction) {
-//                GuiButton button = new PositionedIconActionable("Fuzzy", "fuzzy", right, send -> {
+//                GuiButton button = new ZeroButton("Fuzzy", "fuzzy", right, send -> {
 //                    if (send) PacketHandler.INSTANCE.sendToServer(new PacketToggleFuzzy());
 //                    return AbstractGadget.getFuzzy(getAsStack());
 //                });
 //                addButton(button);
 //                conditionalButtons.add(button);
 //            }
-//            GuiButton button = new PositionedIconActionable("Connected area", "connected_area", right, send -> {
+//
+//            GuiButton button = new ZeroButton("Connected area", "connected_area", right, send -> {
 //                if (send) PacketHandler.INSTANCE.sendToServer(new PacketToggleConnectedArea());
 //                return AbstractGadget.getConnectedArea(getAsStack());
 //            });
 //            addButton(button);
 //            conditionalButtons.add(button);
-//            if (!isDestruction) {
-//                int widthSlider = 82;
-//                sliderRange = new GuiSliderInt(width / 2 - widthSlider / 2, height / 2 + 72, widthSlider, 14, "Range ", "", 1, SyncedConfig.maxRange,
-//                    GadgetUtils.getToolRange(tool), false, true, Color.DARK_GRAY, slider -> {
-//                        if (slider.getValueInt() != GadgetUtils.getToolRange(getAsStack()))
-//                            PacketHandler.INSTANCE.sendToServer(new PacketChangeRange(slider.getValueInt()));
-//                    }, (slider, amount) -> {
-//                        int value = slider.getValueInt();
-//                        int valueNew = MathHelper.clamp(value + amount, 1, SyncedConfig.maxRange);
-//                        slider.setValue(valueNew);
-//                        slider.updateSlider();
-//                    });
-//                sliderRange.precision = 1;
-//                sliderRange.getComponents().forEach(this::addButton);
-//            }
 //        }
-//        addButton(new PositionedIconActionable("Place on fluids", "raytrace_fluid", right, send -> {
-//            if (send) PacketHandler.INSTANCE.sendToServer(new PacketToggleRayTraceFluid());
-//            return AbstractGadget.shouldRayTraceFluid(getAsStack());
-//        }));
-//        if (tool.getItem() instanceof BuildingGadget) {
-//            addButton(new PositionedIconActionable("Place on top", "building_place_atop", right, send -> {
-//                if (send) PacketHandler.INSTANCE.sendToServer(new PacketToggleBlockPlacement());
-//                return BuildingGadget.shouldPlaceAtop(getAsStack());
-//            }));
-//        }
-//        addButton(new PositionedIconActionable("Anchor", "anchor", left, send -> {
-//            if (send) PacketHandler.INSTANCE.sendToServer(new PacketAnchor());
-//            ItemStack stack = getAsStack();
-//            if (stack.getItem() instanceof CopyGadget)
-//                return CopyGadget.getAnchor(stack) != null;
-////            else if (stack.getItem() instanceof DestructionGadget)
-////                return DestructionGadget.getAnchor(stack) != null;
 //
-//            return !GadgetUtils.getAnchor(stack).isEmpty();
-//        }));
-//        if (!(tool.getItem() instanceof ExchangingGadget)) {
-//            addButton(new PositionedIconActionable("Undo", "undo", left, false, send -> {
-//                if (send) PacketHandler.INSTANCE.sendToServer(new PacketUndo());
-//                return false;
-//            }));
-//        }
 //        updateButtons(tool);
 //    }
 //
@@ -177,10 +124,10 @@
 //        boolean isDestruction = tool.getItem() instanceof DestructionGadget;
 //        ScreenPosition right = isDestruction ? ScreenPosition.BOTTOM : ScreenPosition.RIGHT;
 //        for (int i = 0; i < buttonList.size(); i++) {
-//            if (!(buttonList.get(i) instanceof PositionedIconActionable))
+//            if (!(buttonList.get(i) instanceof ZeroButton))
 //                continue;
 //
-//            PositionedIconActionable button = (PositionedIconActionable) buttonList.get(i);
+//            ZeroButton button = (ZeroButton) buttonList.get(i);
 //            if (!button.visible) continue;
 //            int offset;
 //            boolean isRight = button.position == right;
@@ -201,10 +148,10 @@
 //        posRight = resetPos(tool, padding, posRight);
 //        posLeft = resetPos(tool, padding, posLeft);
 //        for (int i = 0; i < buttonList.size(); i++) {
-//            if (!(buttonList.get(i) instanceof PositionedIconActionable))
+//            if (!(buttonList.get(i) instanceof ZeroButton))
 //                continue;
 //
-//            PositionedIconActionable button = (PositionedIconActionable) buttonList.get(i);
+//            ZeroButton button = (ZeroButton) buttonList.get(i);
 //            if (!button.visible) continue;
 //            boolean isRight = button.position == right;
 //            int pos = isRight ? posRight : posLeft;
@@ -242,8 +189,8 @@
 //        if (segments != 0) {
 //            inRange = dist > radiusMin && dist < radiusMax;
 //            for (GuiButton button : buttonList) {
-//                if (button instanceof PositionedIconActionable)
-//                    ((PositionedIconActionable) button).setFaded(inRange);
+//                if (button instanceof ZeroButton)
+//                    ((ZeroButton) button).setFaded(inRange);
 //            }
 //        }
 //        GlStateManager.pushMatrix();
@@ -395,10 +342,10 @@
 //
 //    private void renderHoverHelpText(int mx, int my) {
 ////        buttonList.forEach(button -> {
-////            if (!(button instanceof PositionedIconActionable))
+////            if (!(button instanceof ZeroButton))
 ////                return;
 ////
-////            PositionedIconActionable helpTextProvider = (PositionedIconActionable) button;
+////            ZeroButton helpTextProvider = (ZeroButton) button;
 ////            if (helpTextProvider.isHovered(mx, my)) {
 ////                Color color = button instanceof GuiButtonSelect && ((GuiButtonSelect) button).isSelected() ? Color.GREEN : Color.WHITE;
 ////                String text = helpTextProvider.getHoverHelpText();
@@ -473,16 +420,16 @@
 //        RIGHT, LEFT, BOTTOM, TOP
 //    }
 //
-//    private static class PositionedIconActionable extends GuiIconActionable {
+//    private static class ZeroButton extends GuiIconActionable {
 //        public ScreenPosition position;
 //
-//        PositionedIconActionable(String message, String icon, ScreenPosition position, boolean isSelectable, Predicate<Boolean> action) {
+//        ZeroButton(String message, String icon, ScreenPosition position, boolean isSelectable, Predicate<Boolean> action) {
 //            super(0, 0, icon, message, isSelectable, action);
 //
 //            this.position = position;
 //        }
 //
-//        PositionedIconActionable(String message, String icon, ScreenPosition position, Predicate<Boolean> action) {
+//        ZeroButton(String message, String icon, ScreenPosition position, Predicate<Boolean> action) {
 //            this(message, icon, position, true, action);
 //        }
 //    }

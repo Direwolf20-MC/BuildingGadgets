@@ -1,4 +1,4 @@
-package com.direwolf20.buildinggadgets.client.gui.components;
+package com.direwolf20.buildinggadgets.client.screens.components;
 
 import com.direwolf20.buildinggadgets.client.ClientProxy;
 import com.google.common.collect.ImmutableSet;

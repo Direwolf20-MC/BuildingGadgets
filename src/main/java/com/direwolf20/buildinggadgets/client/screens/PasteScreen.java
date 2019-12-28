@@ -3,9 +3,9 @@
  * Chisel is Open Source and distributed under GNU GPL v2
  */
 
-package com.direwolf20.buildinggadgets.client.gui;
+package com.direwolf20.buildinggadgets.client.screens;
 
-import com.direwolf20.buildinggadgets.client.gui.components.DireButton;
+import com.direwolf20.buildinggadgets.client.screens.components.DireButton;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.gadgets.CopyGadget;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
@@ -35,7 +35,7 @@ public class PasteScreen extends GuiScreen {
 
     ItemStack tool;
 
-    private static final ResourceLocation background = new ResourceLocation(BuildingGadgets.MODID, "textures/gui/testcontainer.png");
+    private static final ResourceLocation background = new ResourceLocation(BuildingGadgets.MODID, "textures/screens/testcontainer.png");
 
     public PasteScreen(ItemStack tool) {
         super();
