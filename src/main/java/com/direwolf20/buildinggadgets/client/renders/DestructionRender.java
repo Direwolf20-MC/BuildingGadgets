@@ -2,8 +2,8 @@ package com.direwolf20.buildinggadgets.client.renders;
 
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.gadgets.DestructionGadget;
-import com.direwolf20.buildinggadgets.common.tools.Sorter;
-import com.direwolf20.buildinggadgets.common.tools.UniqueItemStack;
+import com.direwolf20.buildinggadgets.common.utils.Sorter;
+import com.direwolf20.buildinggadgets.common.utils.UniqueItemStack;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import net.minecraft.block.state.IBlockState;

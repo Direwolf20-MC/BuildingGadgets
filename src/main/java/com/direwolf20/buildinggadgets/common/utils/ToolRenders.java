@@ -1,4 +1,4 @@
-package com.direwolf20.buildinggadgets.common.tools;
+package com.direwolf20.buildinggadgets.common.utils;
 
 import com.direwolf20.buildinggadgets.common.blocks.ModBlocks;
 import com.direwolf20.buildinggadgets.common.gadgets.CopyGadget;
@@ -89,7 +89,7 @@ public class ToolRenders {
                 return;
             }
 
-            //Don't draw on top of blocks being built by our tools.
+            //Don't draw on top of blocks being built by our utils.
             IBlockState startBlock = world.getBlockState(startPos);
             if (startBlock == ModBlocks.effectBlock.getDefaultState()) return;
 

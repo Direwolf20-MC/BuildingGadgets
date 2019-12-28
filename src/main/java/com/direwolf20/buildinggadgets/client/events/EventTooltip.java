@@ -10,10 +10,10 @@ import com.direwolf20.buildinggadgets.client.RemoteInventoryCache;
 import com.direwolf20.buildinggadgets.common.gadgets.CopyGadget;
 import com.direwolf20.buildinggadgets.common.items.ITemplate;
 import com.direwolf20.buildinggadgets.common.items.ModItems;
-import com.direwolf20.buildinggadgets.common.tools.BlockMap;
-import com.direwolf20.buildinggadgets.common.tools.InventoryManipulation;
-import com.direwolf20.buildinggadgets.common.tools.PasteToolBufferBuilder;
-import com.direwolf20.buildinggadgets.common.tools.UniqueItem;
+import com.direwolf20.buildinggadgets.common.utils.BlockMap;
+import com.direwolf20.buildinggadgets.common.utils.InventoryManipulation;
+import com.direwolf20.buildinggadgets.common.utils.PasteToolBufferBuilder;
+import com.direwolf20.buildinggadgets.common.utils.UniqueItem;
 import com.google.common.collect.Multiset;
 
 import net.minecraft.block.state.IBlockState;

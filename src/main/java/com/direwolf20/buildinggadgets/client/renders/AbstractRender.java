@@ -4,10 +4,10 @@ import com.direwolf20.buildinggadgets.client.RemoteInventoryCache;
 import com.direwolf20.buildinggadgets.common.blocks.ModBlocks;
 import com.direwolf20.buildinggadgets.common.gadgets.AbstractGadget;
 import com.direwolf20.buildinggadgets.common.items.capability.CapabilityProviderEnergy;
-import com.direwolf20.buildinggadgets.common.tools.GadgetUtils;
-import com.direwolf20.buildinggadgets.common.tools.InventoryManipulation;
-import com.direwolf20.buildinggadgets.common.tools.RayTraceHelper;
-import com.direwolf20.buildinggadgets.common.tools.UniqueItem;
+import com.direwolf20.buildinggadgets.common.utils.GadgetUtils;
+import com.direwolf20.buildinggadgets.common.utils.InventoryManipulation;
+import com.direwolf20.buildinggadgets.common.utils.RayTraceHelper;
+import com.direwolf20.buildinggadgets.common.utils.UniqueItem;
 import com.google.common.collect.Multiset;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -33,7 +33,7 @@ import org.lwjgl.opengl.GL14;
 
 import java.util.List;
 
-import static com.direwolf20.buildinggadgets.common.tools.GadgetUtils.getAnchor;
+import static com.direwolf20.buildinggadgets.common.utils.GadgetUtils.getAnchor;
 
 public abstract class AbstractRender {
     public static final Minecraft mc = Minecraft.getMinecraft();

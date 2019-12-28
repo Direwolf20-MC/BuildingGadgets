@@ -1,4 +1,4 @@
-package com.direwolf20.buildinggadgets.common.tools;
+package com.direwolf20.buildinggadgets.common.utils;
 
 import com.direwolf20.buildinggadgets.common.gadgets.AbstractGadget;
 import com.direwolf20.buildinggadgets.common.gadgets.CopyGadget;

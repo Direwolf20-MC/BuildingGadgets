@@ -8,9 +8,9 @@ import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
 import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.common.gadgets.history.HistoryEntry;
 import com.direwolf20.buildinggadgets.common.gadgets.history.HistoryStack;
-import com.direwolf20.buildinggadgets.common.tools.GadgetUtils;
-import com.direwolf20.buildinggadgets.common.tools.RayTraceHelper;
-import com.direwolf20.buildinggadgets.common.tools.WorldSave;
+import com.direwolf20.buildinggadgets.common.utils.GadgetUtils;
+import com.direwolf20.buildinggadgets.common.utils.RayTraceHelper;
+import com.direwolf20.buildinggadgets.common.utils.WorldSave;
 
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;

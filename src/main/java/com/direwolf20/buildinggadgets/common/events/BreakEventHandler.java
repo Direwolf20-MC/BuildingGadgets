@@ -2,7 +2,7 @@ package com.direwolf20.buildinggadgets.common.events;
 
 import com.direwolf20.buildinggadgets.common.gadgets.AbstractGadget;
 import com.direwolf20.buildinggadgets.common.gadgets.ExchangingGadget;
-import com.direwolf20.buildinggadgets.common.tools.InventoryManipulation;
+import com.direwolf20.buildinggadgets.common.utils.InventoryManipulation;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.event.world.BlockEvent;

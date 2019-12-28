@@ -6,9 +6,9 @@ import com.direwolf20.buildinggadgets.common.entities.BlockBuildEntity;
 import com.direwolf20.buildinggadgets.common.gadgets.building.ExchangingModes;
 import com.direwolf20.buildinggadgets.common.items.MockBuildingWorld;
 import com.direwolf20.buildinggadgets.common.items.ModItems;
-import com.direwolf20.buildinggadgets.common.tools.GadgetUtils;
-import com.direwolf20.buildinggadgets.common.tools.InventoryManipulation;
-import com.direwolf20.buildinggadgets.common.tools.RayTraceHelper;
+import com.direwolf20.buildinggadgets.common.utils.GadgetUtils;
+import com.direwolf20.buildinggadgets.common.utils.InventoryManipulation;
+import com.direwolf20.buildinggadgets.common.utils.RayTraceHelper;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
@@ -23,7 +23,6 @@ import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.text.Style;
-import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
@@ -39,7 +38,7 @@ import javax.annotation.Nullable;
 import java.util.*;
 
 import static com.direwolf20.buildinggadgets.common.gadgets.building.ExchangingModes.SURFACE;
-import static com.direwolf20.buildinggadgets.common.tools.GadgetUtils.*;
+import static com.direwolf20.buildinggadgets.common.utils.GadgetUtils.*;
 
 public class ExchangingGadget extends AbstractGadget {
     public static final MockBuildingWorld fakeWorld = new MockBuildingWorld();

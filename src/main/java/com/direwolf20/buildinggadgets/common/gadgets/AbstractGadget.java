@@ -24,7 +24,7 @@ import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Optional;
 
-import static com.direwolf20.buildinggadgets.common.tools.GadgetUtils.*;
+import static com.direwolf20.buildinggadgets.common.utils.GadgetUtils.*;
 
 public abstract class AbstractGadget extends ItemModBase {
     private int maxDamage;

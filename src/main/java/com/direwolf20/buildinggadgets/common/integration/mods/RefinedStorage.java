@@ -7,9 +7,9 @@ import javax.annotation.Nullable;
 
 import com.direwolf20.buildinggadgets.common.integration.IntegrationHandler.IntegratedMod;
 import com.direwolf20.buildinggadgets.common.integration.NetworkProvider;
-import com.direwolf20.buildinggadgets.common.tools.NetworkIO;
-import com.direwolf20.buildinggadgets.common.tools.NetworkIO.Operation;
-import com.direwolf20.buildinggadgets.common.tools.NetworkIO.StackProviderVanilla;
+import com.direwolf20.buildinggadgets.common.utils.NetworkIO;
+import com.direwolf20.buildinggadgets.common.utils.NetworkIO.Operation;
+import com.direwolf20.buildinggadgets.common.utils.NetworkIO.StackProviderVanilla;
 import com.raoulvdberge.refinedstorage.api.network.INetwork;
 import com.raoulvdberge.refinedstorage.api.network.node.INetworkNodeProxy;
 import com.raoulvdberge.refinedstorage.api.network.security.Permission;
