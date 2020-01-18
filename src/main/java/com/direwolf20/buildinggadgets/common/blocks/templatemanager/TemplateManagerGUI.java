@@ -125,10 +125,8 @@ public class TemplateManagerGUI extends GuiContainer {
     }
 
     private GuiButton createAndAddButton(int id, int x, int y, int witdth, int height, String text) {
-//        GuiButtonHelpText button = new GuiButtonHelpText(id, this.guiLeft + x, this.guiTop + y, witdth, height, text, text.toLowerCase());
-//        helpTextProviders.add(button);
-//        return button;
-        return null;
+        //        helpTextProviders.add(button);
+        return new GuiButton(id, this.guiLeft + x, this.guiTop + y, witdth, height, text);
     }
 
     @Override
@@ -136,8 +134,8 @@ public class TemplateManagerGUI extends GuiContainer {
         GlStateManager.color(1, 1, 1, 1);
         mc.getTextureManager().bindTexture(background);
         drawTexturedModalRect(guiLeft, guiTop, 0, 0, xSize, ySize);
-        if (!buttonCopy.isMouseOver() && !buttonPaste.isMouseOver())
-            drawTexturedModalRectReverseX(guiLeft + 112, guiTop + 41, 176, 0, 22, 15, buttonLoad.isMouseOver());
+//        if (!buttonCopy.isMouseOver() && !buttonPaste.isMouseOver())
+//            drawTexturedModalRectReverseX(guiLeft + 112, guiTop + 41, 176, 0, 22, 15, buttonLoad.isMouseOver());
 
         this.nameField.drawTextBox();
         drawStructure();
