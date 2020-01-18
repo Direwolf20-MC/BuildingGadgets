@@ -10,9 +10,9 @@ import com.direwolf20.buildinggadgets.common.integration.IPasteRecipeRegistry;
 import com.direwolf20.buildinggadgets.common.integration.IntegrationHandler.IntegratedMod;
 import com.direwolf20.buildinggadgets.common.integration.IntegrationHandler.Phase;
 import com.direwolf20.buildinggadgets.common.integration.NetworkProvider;
-import com.direwolf20.buildinggadgets.common.tools.NetworkIO;
-import com.direwolf20.buildinggadgets.common.tools.NetworkIO.IStackProvider;
-import com.direwolf20.buildinggadgets.common.tools.NetworkIO.Operation;
+import com.direwolf20.buildinggadgets.common.utils.NetworkIO;
+import com.direwolf20.buildinggadgets.common.utils.NetworkIO.IStackProvider;
+import com.direwolf20.buildinggadgets.common.utils.NetworkIO.Operation;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Streams;
 

@@ -1,14 +1,12 @@
 package com.direwolf20.buildinggadgets.common.network;
 
-import com.direwolf20.buildinggadgets.common.gadgets.GadgetBuilding;
-import com.direwolf20.buildinggadgets.common.gadgets.GadgetCopyPaste;
-import com.direwolf20.buildinggadgets.common.gadgets.GadgetExchanger;
-import com.direwolf20.buildinggadgets.common.gadgets.GadgetGeneric;
-import com.direwolf20.buildinggadgets.common.tools.GadgetUtils;
+import com.direwolf20.buildinggadgets.common.gadgets.*;
+import com.direwolf20.buildinggadgets.common.gadgets.BuildingGadget;
+import com.direwolf20.buildinggadgets.common.gadgets.AbstractGadget;
+import com.direwolf20.buildinggadgets.common.utils.GadgetUtils;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
@@ -37,8 +35,8 @@ public class PacketRotateMirror implements IMessage {
             buf.writeInt(operation.ordinal());
     }
 
-    public static enum Operation {
-        ROTATE, MIRROR;
+    public enum Operation {
+        ROTATE, MIRROR
     }
 
     public static class Handler implements IMessageHandler<PacketRotateMirror, IMessage> {
@@ -46,12 +44,14 @@ public class PacketRotateMirror implements IMessage {
         public IMessage onMessage(PacketRotateMirror message, MessageContext ctx) {
             FMLCommonHandler.instance().getWorldThread(ctx.netHandler).addScheduledTask(() -> {
                 EntityPlayer player = ctx.getServerHandler().player;
-                ItemStack stack = GadgetGeneric.getGadget(player);
-                Operation operation = message.operation != null ? message.operation : (player.isSneaking() ? Operation.MIRROR : Operation.ROTATE);
-                if (stack.getItem() instanceof GadgetBuilding || stack.getItem() instanceof GadgetExchanger)
-                    GadgetUtils.rotateOrMirrorToolBlock(stack, player, operation);
-                else if (stack.getItem() instanceof GadgetCopyPaste)
-                    GadgetCopyPaste.rotateOrMirrorBlocks(stack, player, operation);
+
+                AbstractGadget.getGadget(player).ifPresent(gadget -> {
+                    Operation operation = message.operation != null ? message.operation : (player.isSneaking() ? Operation.MIRROR : Operation.ROTATE);
+                    if (gadget.getItem() instanceof BuildingGadget || gadget.getItem() instanceof ExchangingGadget)
+                        GadgetUtils.rotateOrMirrorToolBlock(gadget, player, operation);
+                    else if (gadget.getItem() instanceof CopyGadget)
+                        CopyGadget.rotateOrMirrorBlocks(gadget, player, operation);
+                });
             });
             return null;
         }

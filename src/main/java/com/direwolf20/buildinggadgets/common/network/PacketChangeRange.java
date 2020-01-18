@@ -1,11 +1,10 @@
 package com.direwolf20.buildinggadgets.common.network;
 
 import com.direwolf20.buildinggadgets.common.gadgets.*;
-import com.direwolf20.buildinggadgets.common.tools.GadgetUtils;
+import com.direwolf20.buildinggadgets.common.utils.GadgetUtils;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
@@ -41,22 +40,20 @@ public class PacketChangeRange implements IMessage {
 
         private void handle(PacketChangeRange message, MessageContext ctx) {
             EntityPlayerMP playerEntity = ctx.getServerHandler().player;
-            ItemStack heldItem = GadgetGeneric.getGadget(playerEntity);
-            if (heldItem.isEmpty())
-                return;
-
-            if (message.range >= 0)
-                GadgetUtils.setToolRange(heldItem, message.range);
-            else if (heldItem.getItem() instanceof GadgetBuilding) {
-                GadgetBuilding gadgetBuilding = (GadgetBuilding) (heldItem.getItem());
-                gadgetBuilding.rangeChange(playerEntity, heldItem);
-            } else if (heldItem.getItem() instanceof GadgetExchanger) {
-                GadgetExchanger gadgetExchanger = (GadgetExchanger) (heldItem.getItem());
-                gadgetExchanger.rangeChange(playerEntity, heldItem);
-            } else if (heldItem.getItem() instanceof GadgetDestruction) {
-                GadgetDestruction gadgetDestruction = (GadgetDestruction) (heldItem.getItem());
-                gadgetDestruction.switchOverlay(playerEntity, heldItem);
-            }
+            AbstractGadget.getGadget(playerEntity).ifPresent(gadget -> {
+                if (message.range >= 0)
+                    GadgetUtils.setToolRange(gadget, message.range);
+                else if (gadget.getItem() instanceof BuildingGadget) {
+                    BuildingGadget buildingGadget = (BuildingGadget) (gadget.getItem());
+                    buildingGadget.rangeChange(playerEntity, gadget);
+                } else if (gadget.getItem() instanceof ExchangingGadget) {
+                    ExchangingGadget exchangingGadget = (ExchangingGadget) (gadget.getItem());
+                    exchangingGadget.rangeChange(playerEntity, gadget);
+                } else if (gadget.getItem() instanceof DestructionGadget) {
+                    DestructionGadget destructionGadget = (DestructionGadget) (gadget.getItem());
+                    destructionGadget.switchOverlay(playerEntity, gadget);
+                }
+            });
         }
     }
 }

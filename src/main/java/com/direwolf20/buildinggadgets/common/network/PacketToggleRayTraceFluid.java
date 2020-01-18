@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.common.network;
 
-import com.direwolf20.buildinggadgets.common.gadgets.GadgetGeneric;
+import com.direwolf20.buildinggadgets.common.gadgets.AbstractGadget;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -16,9 +16,8 @@ public class PacketToggleRayTraceFluid extends PacketEmpty {
         public IMessage onMessage(PacketToggleRayTraceFluid message, MessageContext ctx) {
             FMLCommonHandler.instance().getWorldThread(ctx.netHandler).addScheduledTask(() -> {
                 EntityPlayer player = ctx.getServerHandler().player;
-                ItemStack stack = GadgetGeneric.getGadget(player);
-                if (!stack.isEmpty())
-                    GadgetGeneric.toggleRayTraceFluid(player, stack);
+
+                AbstractGadget.getGadget(player).ifPresent(gadget -> AbstractGadget.toggleRayTraceFluid(player, gadget));
             });
             return null;
         }

@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.common.network;
 
-import com.direwolf20.buildinggadgets.common.gadgets.GadgetCopyPaste;
+import com.direwolf20.buildinggadgets.common.gadgets.CopyGadget;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
@@ -47,12 +47,12 @@ public class PacketPasteGUI implements IMessage {
         private void handle(PacketPasteGUI message, MessageContext ctx) {
             EntityPlayerMP playerEntity = ctx.getServerHandler().player;
 
-            ItemStack heldItem = GadgetCopyPaste.getGadget(playerEntity);
+            ItemStack heldItem = CopyGadget.getAsStack(playerEntity);
             if (heldItem.isEmpty()) return;
 
-            GadgetCopyPaste.setX(heldItem, message.X);
-            GadgetCopyPaste.setY(heldItem, message.Y);
-            GadgetCopyPaste.setZ(heldItem, message.Z);
+            CopyGadget.setX(heldItem, message.X);
+            CopyGadget.setY(heldItem, message.Y);
+            CopyGadget.setZ(heldItem, message.Z);
         }
     }
 }

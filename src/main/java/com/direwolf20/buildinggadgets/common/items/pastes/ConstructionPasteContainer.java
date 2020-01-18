@@ -1,7 +1,6 @@
 package com.direwolf20.buildinggadgets.common.items.pastes;
 
-import com.direwolf20.buildinggadgets.common.tools.InventoryManipulation;
-import com.direwolf20.buildinggadgets.common.config.utils.NBTTool;
+import com.direwolf20.buildinggadgets.common.utils.InventoryManipulation;
 import net.minecraft.client.renderer.block.model.ModelBakery;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.util.ITooltipFlag;
@@ -19,7 +18,7 @@ import javax.annotation.Nullable;
 import java.util.List;
 import java.util.function.IntSupplier;
 
-import static com.direwolf20.buildinggadgets.common.gadgets.GadgetGeneric.getOrNewTag;
+import static com.direwolf20.buildinggadgets.common.gadgets.AbstractGadget.getOrNewTag;
 
 public class ConstructionPasteContainer extends GenericPasteContainer {
 

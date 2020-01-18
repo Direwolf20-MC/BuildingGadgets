@@ -1,18 +1,13 @@
 package com.direwolf20.buildinggadgets.client.events;
 
-import com.direwolf20.buildinggadgets.client.KeyBindings;
-import com.direwolf20.buildinggadgets.client.gui.ModeRadialMenu;
+import com.direwolf20.buildinggadgets.client.screens.BuildingRadial;
+import com.direwolf20.buildinggadgets.client.screens.CopyRadial;
+import com.direwolf20.buildinggadgets.client.screens.DestructionRadial;
+import com.direwolf20.buildinggadgets.client.screens.ExchangingRadial;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
-import com.direwolf20.buildinggadgets.common.gadgets.GadgetGeneric;
-import com.direwolf20.buildinggadgets.common.network.PacketAnchor;
-import com.direwolf20.buildinggadgets.common.network.PacketChangeRange;
-import com.direwolf20.buildinggadgets.common.network.PacketHandler;
-import com.direwolf20.buildinggadgets.common.network.PacketRotateMirror;
-import com.direwolf20.buildinggadgets.common.network.PacketToggleConnectedArea;
-import com.direwolf20.buildinggadgets.common.network.PacketToggleFuzzy;
-import com.direwolf20.buildinggadgets.common.network.PacketUndo;
+import com.direwolf20.buildinggadgets.common.gadgets.*;
+import com.direwolf20.buildinggadgets.common.network.*;
 import net.minecraft.client.Minecraft;
-import net.minecraft.item.ItemStack;
 import net.minecraftforge.client.settings.KeyModifier;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -36,11 +31,17 @@ public class EventKeyInput {
 
     private static void handleEventInput() {
         if (menuSettings.isKeyDown() && ((menuSettings.getKeyModifier() == KeyModifier.NONE && KeyModifier.getActiveModifier() == KeyModifier.NONE) || menuSettings.getKeyModifier() != KeyModifier.NONE)) {
-            //PacketHandler.INSTANCE.sendToServer(new PacketToggleMode());
             Minecraft mc = Minecraft.getMinecraft();
-            ItemStack tool = GadgetGeneric.getGadget(mc.player);
-            if (!tool.isEmpty())
-                mc.displayGuiScreen(new ModeRadialMenu(tool));
+            AbstractGadget.getGadget(mc.player).ifPresent(gadget -> {
+                if( gadget.getItem() instanceof BuildingGadget )
+                    mc.displayGuiScreen(new BuildingRadial(gadget));
+                else if( gadget.getItem() instanceof ExchangingGadget)
+                    mc.displayGuiScreen(new ExchangingRadial(gadget));
+                else if( gadget.getItem() instanceof CopyGadget)
+                    mc.displayGuiScreen(new CopyRadial(gadget));
+                else if( gadget.getItem() instanceof DestructionGadget)
+                    mc.displayGuiScreen(new DestructionRadial(gadget));
+            });
         } else if (range.isPressed())
             PacketHandler.INSTANCE.sendToServer(new PacketChangeRange());
         else if (rotateMirror.isPressed())
@@ -53,7 +54,5 @@ public class EventKeyInput {
             PacketHandler.INSTANCE.sendToServer(new PacketToggleFuzzy());
         else if (connectedArea.isPressed())
             PacketHandler.INSTANCE.sendToServer(new PacketToggleConnectedArea());
-        else if (dev != null && dev.isPressed() && BuildingGadgets.getDev().isIsDev())
-            BuildingGadgets.getDev().onKeyPress();
     }
 }

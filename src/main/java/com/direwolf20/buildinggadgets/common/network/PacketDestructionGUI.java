@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.common.network;
 
-import com.direwolf20.buildinggadgets.common.gadgets.GadgetDestruction;
+import com.direwolf20.buildinggadgets.common.gadgets.DestructionGadget;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
@@ -53,14 +53,14 @@ public class PacketDestructionGUI implements IMessage {
         private void handle(PacketDestructionGUI message, MessageContext ctx) {
             EntityPlayerMP playerEntity = ctx.getServerHandler().player;
 
-            ItemStack heldItem = GadgetDestruction.getGadget(playerEntity);
+            ItemStack heldItem = DestructionGadget.getAsStack(playerEntity);
             if (heldItem.isEmpty()) return;
 
-            GadgetDestruction.setToolValue(heldItem, message.left, "left");
-            GadgetDestruction.setToolValue(heldItem, message.right, "right");
-            GadgetDestruction.setToolValue(heldItem, message.up, "up");
-            GadgetDestruction.setToolValue(heldItem, message.down, "down");
-            GadgetDestruction.setToolValue(heldItem, message.depth, "depth");
+            DestructionGadget.setToolValue(heldItem, message.left, "left");
+            DestructionGadget.setToolValue(heldItem, message.right, "right");
+            DestructionGadget.setToolValue(heldItem, message.up, "up");
+            DestructionGadget.setToolValue(heldItem, message.down, "down");
+            DestructionGadget.setToolValue(heldItem, message.depth, "depth");
         }
     }
 }

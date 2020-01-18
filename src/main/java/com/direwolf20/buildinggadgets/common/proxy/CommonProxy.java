@@ -1,21 +1,21 @@
 package com.direwolf20.buildinggadgets.common.proxy;
 
 
-import com.direwolf20.buildinggadgets.client.gui.GuiProxy;
+import com.direwolf20.buildinggadgets.client.screens.GuiProxy;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
-import com.direwolf20.buildinggadgets.common.ModSounds;
+import com.direwolf20.buildinggadgets.client.ModSounds;
 import com.direwolf20.buildinggadgets.common.blocks.*;
 import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManager;
 import com.direwolf20.buildinggadgets.common.blocks.templatemanager.TemplateManagerTileEntity;
 import com.direwolf20.buildinggadgets.common.config.CompatConfig;
 import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
 import com.direwolf20.buildinggadgets.common.entities.ModEntities;
+import com.direwolf20.buildinggadgets.common.gadgets.BuildingGadget;
+import com.direwolf20.buildinggadgets.common.gadgets.DestructionGadget;
 import com.direwolf20.buildinggadgets.common.integration.IntegrationHandler;
 import com.direwolf20.buildinggadgets.common.items.Template;
-import com.direwolf20.buildinggadgets.common.gadgets.GadgetBuilding;
-import com.direwolf20.buildinggadgets.common.gadgets.GadgetCopyPaste;
-import com.direwolf20.buildinggadgets.common.gadgets.GadgetDestruction;
-import com.direwolf20.buildinggadgets.common.gadgets.GadgetExchanger;
+import com.direwolf20.buildinggadgets.common.gadgets.CopyGadget;
+import com.direwolf20.buildinggadgets.common.gadgets.ExchangingGadget;
 import com.direwolf20.buildinggadgets.common.items.pastes.ConstructionChunkDense;
 import com.direwolf20.buildinggadgets.common.items.pastes.ConstructionPaste;
 import com.direwolf20.buildinggadgets.common.items.pastes.ConstructionPasteContainer;
@@ -80,13 +80,13 @@ public class CommonProxy {
 
     @SubscribeEvent
     public static void registerItems(RegistryEvent.Register<Item> event) {
-        event.getRegistry().register(new GadgetBuilding());
-        event.getRegistry().register(new GadgetExchanger());
-        event.getRegistry().register(new GadgetCopyPaste());
+        event.getRegistry().register(new BuildingGadget());
+        event.getRegistry().register(new ExchangingGadget());
+        event.getRegistry().register(new CopyGadget());
         event.getRegistry().register(new ItemBlock(ModBlocks.templateManager).setRegistryName(ModBlocks.templateManager.getRegistryName()));
         event.getRegistry().register(new Template());
         if (SyncedConfig.enableDestructionGadget) {
-            event.getRegistry().register(new GadgetDestruction());
+            event.getRegistry().register(new DestructionGadget());
         }
         if (SyncedConfig.enablePaste) {
             event.getRegistry().register(new ItemBlock(ModBlocks.constructionBlockDense).setRegistryName(ModBlocks.constructionBlockDense.getRegistryName()));

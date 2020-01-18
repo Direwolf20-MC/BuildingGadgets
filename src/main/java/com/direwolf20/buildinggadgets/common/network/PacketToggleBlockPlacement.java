@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.common.network;
 
-import com.direwolf20.buildinggadgets.common.gadgets.GadgetBuilding;
-import com.direwolf20.buildinggadgets.common.gadgets.GadgetGeneric;
+import com.direwolf20.buildinggadgets.common.gadgets.AbstractGadget;
+import com.direwolf20.buildinggadgets.common.gadgets.BuildingGadget;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -17,9 +17,11 @@ public class PacketToggleBlockPlacement extends PacketEmpty {
         public IMessage onMessage(PacketToggleBlockPlacement message, MessageContext ctx) {
             FMLCommonHandler.instance().getWorldThread(ctx.netHandler).addScheduledTask(() -> {
                 EntityPlayer player = ctx.getServerHandler().player;
-                ItemStack stack = GadgetGeneric.getGadget(player);
-                if (stack.getItem() instanceof GadgetBuilding)
-                    GadgetBuilding.togglePlaceAtop(player, stack);
+
+                AbstractGadget.getGadget(player).ifPresent(gadget -> {
+                    if (gadget.getItem() instanceof BuildingGadget)
+                        BuildingGadget.togglePlaceAtop(player, gadget);
+                });
             });
             return null;
         }

@@ -1,10 +1,10 @@
 package com.direwolf20.buildinggadgets.client.renders;
 
-import com.direwolf20.buildinggadgets.common.gadgets.GadgetBuilding;
+import com.direwolf20.buildinggadgets.common.gadgets.BuildingGadget;
 import com.direwolf20.buildinggadgets.common.items.MockBuildingWorld;
 import com.direwolf20.buildinggadgets.common.items.ModItems;
-import com.direwolf20.buildinggadgets.common.tools.GadgetUtils;
-import com.direwolf20.buildinggadgets.common.tools.Sorter;
+import com.direwolf20.buildinggadgets.common.utils.GadgetUtils;
+import com.direwolf20.buildinggadgets.common.utils.MagicHelpers;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
@@ -37,7 +37,7 @@ public class BuildingRender extends AbstractRender {
         // todo: replace with actual mode methods
         List<BlockPos> locations = existingLocations.size() != 0
                 ? existingLocations
-                : GadgetBuilding.getToolMode(gadget).getMode().getCollection(mc.player, mc.player.world, renderBlockState, rayTraceResult.getBlockPos(), rayTraceResult.sideHit, GadgetUtils.getToolRange(gadget), GadgetBuilding.shouldPlaceAtop(gadget), GadgetBuilding.getFuzzy(gadget));
+                : BuildingGadget.getToolMode(gadget).getMode().getCollection(mc.player, mc.player.world, renderBlockState, rayTraceResult.getBlockPos(), rayTraceResult.sideHit, GadgetUtils.getToolRange(gadget), BuildingGadget.shouldPlaceAtop(gadget), BuildingGadget.getFuzzy(gadget));
 
         IBlockState state = emptyBlockState;
         // Prepare the mock world using a mock world lets us render things properly, like fences connecting.
@@ -48,7 +48,7 @@ public class BuildingRender extends AbstractRender {
         GlStateManager.blendFunc(GL11.GL_CONSTANT_ALPHA, GL11.GL_ONE_MINUS_CONSTANT_ALPHA);
 
         // Sort the coords by distance to player.
-        List<BlockPos> sortedCoordinates = Sorter.Blocks.byDistance(locations, mc.player);
+        List<BlockPos> sortedCoordinates = MagicHelpers.byDistance(locations, mc.player);
         for (BlockPos coordinate : sortedCoordinates) {
             GlStateManager.pushMatrix();//Push matrix again just because
             GlStateManager.translate(coordinate.getX(), coordinate.getY(), coordinate.getZ());//Now move the render position to the locations we want to render at
@@ -76,8 +76,8 @@ public class BuildingRender extends AbstractRender {
         for (BlockPos coordinate : locations) { //Now run through the UNSORTED list of coords, to show which blocks won't place if you don't have enough of them.
             playerItemCount --;
             remainingEnergy -= gadget.hasCapability(CapabilityEnergy.ENERGY, null)
-                    ? ModItems.gadgetBuilding.getEnergyCost(gadget)
-                    : ModItems.gadgetBuilding.getDamageCost(gadget);
+                    ? ModItems.buildingGadget.getEnergyCost(gadget)
+                    : ModItems.buildingGadget.getDamageCost(gadget);
 
             if (playerItemCount < 0 || remainingEnergy < 0)
                 renderSingleBlock(tessellator, bufferBuilder, coordinate, 1f, 0, 0, .33f);

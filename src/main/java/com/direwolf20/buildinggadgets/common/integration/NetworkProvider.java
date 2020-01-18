@@ -7,7 +7,7 @@ import javax.annotation.Nullable;
 
 import com.direwolf20.buildinggadgets.common.integration.IntegrationHandler.IIntegratedMod;
 import com.direwolf20.buildinggadgets.common.integration.IntegrationHandler.Phase;
-import com.direwolf20.buildinggadgets.common.tools.NetworkIO.Operation;
+import com.direwolf20.buildinggadgets.common.utils.NetworkIO.Operation;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;

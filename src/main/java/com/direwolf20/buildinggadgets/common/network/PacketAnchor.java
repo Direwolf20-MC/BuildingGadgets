@@ -1,9 +1,8 @@
 package com.direwolf20.buildinggadgets.common.network;
 
 import com.direwolf20.buildinggadgets.common.gadgets.*;
-import com.direwolf20.buildinggadgets.common.tools.GadgetUtils;
+import com.direwolf20.buildinggadgets.common.utils.GadgetUtils;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
@@ -20,19 +19,17 @@ public class PacketAnchor extends PacketEmpty {
 
         private void handle(MessageContext ctx) {
             EntityPlayerMP playerEntity = ctx.getServerHandler().player;
-            ItemStack heldItem = GadgetGeneric.getGadget(playerEntity);
-            if (heldItem.isEmpty())
-                return;
-
-            if (heldItem.getItem() instanceof GadgetBuilding) {
-                GadgetUtils.anchorBlocks(playerEntity, heldItem);
-            } else if (heldItem.getItem() instanceof GadgetExchanger) {
-                GadgetUtils.anchorBlocks(playerEntity, heldItem);
-            } else if (heldItem.getItem() instanceof GadgetCopyPaste) {
-                GadgetCopyPaste.anchorBlocks(playerEntity, heldItem);
-            } else if (heldItem.getItem() instanceof GadgetDestruction) {
-                GadgetUtils.anchorBlocks(playerEntity, heldItem);
-            }
+            AbstractGadget.getGadget(playerEntity).ifPresent(gadget -> {
+                if (gadget.getItem() instanceof BuildingGadget) {
+                    GadgetUtils.anchorBlocks(playerEntity, gadget);
+                } else if (gadget.getItem() instanceof ExchangingGadget) {
+                    GadgetUtils.anchorBlocks(playerEntity, gadget);
+                } else if (gadget.getItem() instanceof CopyGadget) {
+                    CopyGadget.anchorBlocks(playerEntity, gadget);
+                } else if (gadget.getItem() instanceof DestructionGadget) {
+                    GadgetUtils.anchorBlocks(playerEntity, gadget);
+                }
+            });
         }
     }
 }

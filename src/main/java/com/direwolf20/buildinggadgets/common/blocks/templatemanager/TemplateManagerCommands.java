@@ -1,13 +1,13 @@
 package com.direwolf20.buildinggadgets.common.blocks.templatemanager;
 
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
+import com.direwolf20.buildinggadgets.common.gadgets.CopyGadget;
 import com.direwolf20.buildinggadgets.common.items.ITemplate;
 import com.direwolf20.buildinggadgets.common.items.ModItems;
 import com.direwolf20.buildinggadgets.common.items.Template;
-import com.direwolf20.buildinggadgets.common.gadgets.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.network.PacketBlockMap;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
-import com.direwolf20.buildinggadgets.common.tools.*;
+import com.direwolf20.buildinggadgets.common.utils.*;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
 import net.minecraft.block.state.IBlockState;
@@ -71,7 +71,7 @@ public class TemplateManagerCommands {
         tagCompound.setInteger("copycounter", template.getCopyCounter(itemStack0));
         tagCompound.setString("UUID", template.getUUID(itemStack0));
         tagCompound.setString("owner", player.getName());
-        if (template.equals(ModItems.gadgetCopyPaste)) {
+        if (template.equals(ModItems.copyGadget)) {
             worldSave.addToMap(UUID, tagCompound);
         } else {
             templateWorldSave.addToMap(UUID, tagCompound);
@@ -112,7 +112,7 @@ public class TemplateManagerCommands {
         if (UUID == null) return;
         if (UUIDTemplate == null) return;
 
-        boolean isTool = itemStack0.getItem().equals(ModItems.gadgetCopyPaste);
+        boolean isTool = itemStack0.getItem().equals(ModItems.copyGadget);
         NBTTagCompound tagCompound = isTool ? worldSave.getCompoundFromUUID(UUID) : templateWorldSave.getCompoundFromUUID(UUID);
         templateTagCompound = tagCompound.copy();
         template.incrementCopyCounter(templateStack);
@@ -183,7 +183,7 @@ public class TemplateManagerCommands {
 
         Multiset<UniqueItem> itemCountMap = HashMultiset.create();
         Map<IBlockState, UniqueItem> intStackMap = mapIntState.intStackMap;
-        List<BlockMap> blockMapList = GadgetCopyPaste.getBlockMapList(templateTagCompound);
+        List<BlockMap> blockMapList = CopyGadget.getBlockMapList(templateTagCompound);
         for (BlockMap blockMap : blockMapList) {
             UniqueItem uniqueItem = intStackMap.get(blockMap.state);
             if (!(uniqueItem == null)) {
@@ -219,7 +219,7 @@ public class TemplateManagerCommands {
     public static void copyTemplate(TemplateManagerContainer container) {
         ItemStack itemStack0 = container.getSlot(0).getStack();
         if (itemStack0.getItem() instanceof ITemplate) {
-            NBTTagCompound tagCompound = PasteToolBufferBuilder.getTagFromUUID(ModItems.gadgetCopyPaste.getUUID(itemStack0));
+            NBTTagCompound tagCompound = PasteToolBufferBuilder.getTagFromUUID(ModItems.copyGadget.getUUID(itemStack0));
             if (tagCompound == null) {
                 Minecraft.getMinecraft().player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.copyfailed").getUnformattedComponentText()), false);
                 return;
@@ -230,7 +230,7 @@ public class TemplateManagerCommands {
             newCompound.setTag("mapIntState", tagCompound.getTag("mapIntState"));
             GadgetUtils.writePOSToNBT(newCompound, GadgetUtils.getPOSFromNBT(tagCompound, "startPos"), "startPos", 0);
             GadgetUtils.writePOSToNBT(newCompound, GadgetUtils.getPOSFromNBT(tagCompound, "endPos"), "endPos", 0);
-            //Map<UniqueItem, Integer> tagMap = GadgetCopyPaste.getItemCountMap(itemStack0);
+            //Map<UniqueItem, Integer> tagMap = CopyGadget.getItemCountMap(itemStack0);
             //NBTTagList tagList = GadgetUtils.itemCountToNBT(tagMap);
             //newCompound.setTag("itemcountmap", tagList);
             try {

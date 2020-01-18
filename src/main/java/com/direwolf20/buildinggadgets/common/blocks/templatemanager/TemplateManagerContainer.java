@@ -10,8 +10,8 @@ import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 
 public class TemplateManagerContainer extends Container {
-    public static final String TEXTURE_LOC_SLOT_TOOL = BuildingGadgets.MODID + ":gui/slot_copypastetool";
-    public static final String TEXTURE_LOC_SLOT_TEMPLATE = BuildingGadgets.MODID + ":gui/slot_template";
+    public static final String TEXTURE_LOC_SLOT_TOOL = BuildingGadgets.MODID + ":screens/slot_copypastetool";
+    public static final String TEXTURE_LOC_SLOT_TEMPLATE = BuildingGadgets.MODID + ":screens/slot_template";
     private TemplateManagerTileEntity te;
 
     public TemplateManagerContainer(IInventory playerInventory, TemplateManagerTileEntity te) {
@@ -65,7 +65,7 @@ public class TemplateManagerContainer extends Container {
 
         if (slot != null && slot.getHasStack()) {
             ItemStack itemstack1 = slot.getStack();
-            //if (!(itemstack1.getItem() instanceof GadgetCopyPaste) && !itemstack1.getItem().equals(Items.PAPER) && !(itemstack1.getItem() instanceof Template))
+            //if (!(itemstack1.getItem() instanceof CopyGadget) && !itemstack1.getItem().equals(Items.PAPER) && !(itemstack1.getItem() instanceof Template))
             //    return itemstack;
             itemstack = itemstack1.copy();
 

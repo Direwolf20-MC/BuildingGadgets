@@ -1,10 +1,10 @@
 package com.direwolf20.buildinggadgets.client.events;
 
+import com.direwolf20.buildinggadgets.common.gadgets.CopyGadget;
 import com.direwolf20.buildinggadgets.common.items.ITemplate;
-import com.direwolf20.buildinggadgets.common.gadgets.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.PacketRequestBlockMap;
-import com.direwolf20.buildinggadgets.common.tools.PasteToolBufferBuilder;
+import com.direwolf20.buildinggadgets.common.utils.PasteToolBufferBuilder;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -39,7 +39,7 @@ public class EventClientTick {
                 String UUID = template.getUUID(stack);
                 if (UUID != null && PasteToolBufferBuilder.isUpdateNeeded(UUID, stack)) {
                     //System.out.println("BlockMap Update Needed for UUID: " + UUID + " in slot " + i);
-                    PacketHandler.INSTANCE.sendToServer(new PacketRequestBlockMap(template.getUUID(stack), !(template instanceof GadgetCopyPaste)));
+                    PacketHandler.INSTANCE.sendToServer(new PacketRequestBlockMap(template.getUUID(stack), !(template instanceof CopyGadget)));
                     joinedWorld = true;
                 }
             }

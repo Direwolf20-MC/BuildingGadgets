@@ -1,8 +1,8 @@
 package com.direwolf20.buildinggadgets.common.items;
 
-import com.direwolf20.buildinggadgets.common.tools.GadgetUtils;
-import com.direwolf20.buildinggadgets.common.tools.UniqueItem;
-import com.direwolf20.buildinggadgets.common.tools.WorldSave;
+import com.direwolf20.buildinggadgets.common.utils.GadgetUtils;
+import com.direwolf20.buildinggadgets.common.utils.UniqueItem;
+import com.direwolf20.buildinggadgets.common.utils.WorldSave;
 import com.google.common.collect.Multiset;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;

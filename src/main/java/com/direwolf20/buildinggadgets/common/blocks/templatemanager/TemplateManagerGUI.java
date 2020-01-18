@@ -11,9 +11,9 @@ import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.PacketTemplateManagerLoad;
 import com.direwolf20.buildinggadgets.common.network.PacketTemplateManagerPaste;
 import com.direwolf20.buildinggadgets.common.network.PacketTemplateManagerSave;
-import com.direwolf20.buildinggadgets.common.tools.GadgetUtils;
-import com.direwolf20.buildinggadgets.common.tools.PasteToolBufferBuilder;
-import com.direwolf20.buildinggadgets.common.tools.ToolDireBuffer;
+import com.direwolf20.buildinggadgets.common.utils.GadgetUtils;
+import com.direwolf20.buildinggadgets.common.utils.PasteToolBufferBuilder;
+import com.direwolf20.buildinggadgets.common.utils.ReverseBufferBuilder;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiTextField;
@@ -42,7 +42,6 @@ import org.lwjgl.util.glu.Project;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
 import java.util.List;
 
 public class TemplateManagerGUI extends GuiContainer {
@@ -71,7 +70,7 @@ public class TemplateManagerGUI extends GuiContainer {
     private TemplateManagerTileEntity te;
     private TemplateManagerContainer container;
 
-    private static final ResourceLocation background = new ResourceLocation(BuildingGadgets.MODID, "textures/gui/testcontainer.png");
+    private static final ResourceLocation background = new ResourceLocation(BuildingGadgets.MODID, "textures/screens/testcontainer.png");
 
     public TemplateManagerGUI(TemplateManagerTileEntity tileEntity, TemplateManagerContainer container) {
         super(container);
@@ -168,11 +167,11 @@ public class TemplateManagerGUI extends GuiContainer {
 
         //float rotX = 165, rotY = 0, zoom = 1;
         if (!itemstack.isEmpty()) {
-            String UUID = ModItems.gadgetCopyPaste.getUUID(itemstack);
-            ToolDireBuffer bufferBuilder = PasteToolBufferBuilder.getBufferFromMap(UUID);
+            String UUID = ModItems.copyGadget.getUUID(itemstack);
+            ReverseBufferBuilder bufferBuilder = PasteToolBufferBuilder.getBufferFromMap(UUID);
             if (bufferBuilder != null) {
-                BlockPos startPos = ModItems.gadgetCopyPaste.getStartPos(itemstack);
-                BlockPos endPos = ModItems.gadgetCopyPaste.getEndPos(itemstack);
+                BlockPos startPos = ModItems.copyGadget.getStartPos(itemstack);
+                BlockPos endPos = ModItems.copyGadget.getEndPos(itemstack);
                 if (startPos == null || endPos == null) return;
                 double lengthX = Math.abs(startPos.getX() - endPos.getX());
                 double lengthY = Math.abs(startPos.getY() - endPos.getY());

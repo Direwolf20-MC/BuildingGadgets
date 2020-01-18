@@ -1,9 +1,9 @@
 package com.direwolf20.buildinggadgets.client.renders;
 
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
-import com.direwolf20.buildinggadgets.common.gadgets.GadgetDestruction;
-import com.direwolf20.buildinggadgets.common.tools.Sorter;
-import com.direwolf20.buildinggadgets.common.tools.UniqueItemStack;
+import com.direwolf20.buildinggadgets.common.gadgets.DestructionGadget;
+import com.direwolf20.buildinggadgets.common.utils.MagicHelpers;
+import com.direwolf20.buildinggadgets.common.utils.UniqueItemStack;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import net.minecraft.block.state.IBlockState;
@@ -32,10 +32,10 @@ public class DestructionRender extends AbstractRender {
 
     @Override
     public void gadgetRender(Tessellator tessellator, BufferBuilder bufferBuilder, RayTraceResult rayTraceResult, ItemStack gadget, List<BlockPos> existingLocations) {
-        if (!GadgetDestruction.getOverlay(gadget))
+        if (!DestructionGadget.getOverlay(gadget))
             return;
 
-        List<BlockPos> coordinates = GadgetDestruction.getArea(mc.player.world, rayTraceResult, mc.player, gadget, existingLocations);
+        List<BlockPos> coordinates = DestructionGadget.getArea(mc.player.world, rayTraceResult, mc.player, gadget, existingLocations);
 
         if( coordinates.size() == 0 )
             return;
@@ -64,7 +64,7 @@ public class DestructionRender extends AbstractRender {
         GlStateManager.enableBlend();
         GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
 
-        List<BlockPos> sortedCoordinates = Sorter.Blocks.byDistance(coordinates, player);
+        List<BlockPos> sortedCoordinates = MagicHelpers.byDistance(coordinates, player);
         for (BlockPos coordinate : sortedCoordinates) {
             boolean invisible = true;
             IBlockState state = player.world.getBlockState(coordinate);

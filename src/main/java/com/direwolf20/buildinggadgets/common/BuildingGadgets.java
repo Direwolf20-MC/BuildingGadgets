@@ -1,6 +1,5 @@
 package com.direwolf20.buildinggadgets.common;
 
-import com.direwolf20.buildinggadgets.client.Developer;
 import com.direwolf20.buildinggadgets.common.commands.DeleteBlockMapsCommand;
 import com.direwolf20.buildinggadgets.common.commands.FindBlockMapsCommand;
 import com.direwolf20.buildinggadgets.common.items.ModItems;
@@ -20,8 +19,6 @@ import org.apache.logging.log4j.Logger;
 
 @Mod(modid = BuildingGadgets.MODID, name = BuildingGadgets.MODNAME, version = BuildingGadgets.VERSION, updateJSON = BuildingGadgets.UPDATE_JSON, dependencies = BuildingGadgets.DEPENDENCIES, useMetadata = true)
 public class BuildingGadgets {
-    private static final Developer DEV = new Developer();
-
     public static final String MODID = "buildinggadgets";
     public static final String MODNAME = "Building Gadgets";
     public static final String VERSION = "@VERSION@";
@@ -31,7 +28,7 @@ public class BuildingGadgets {
     public static final CreativeTabs BUILDING_CREATIVE_TAB = new CreativeTabs(new TextComponentTranslation("buildingGadgets").getUnformattedComponentText()) {
         @Override
         public ItemStack getTabIconItem() {
-            ItemStack stack = new ItemStack(ModItems.gadgetBuilding);
+            ItemStack stack = new ItemStack(ModItems.buildingGadget);
             stack.setTagCompound(new NBTTagCompound());
             stack.getTagCompound().setByte("creative", (byte) 0); 
             return stack;
@@ -66,10 +63,5 @@ public class BuildingGadgets {
     public void serverLoad(FMLServerStartingEvent event) {
         event.registerServerCommand(new FindBlockMapsCommand());
         event.registerServerCommand(new DeleteBlockMapsCommand());
-    }
-
-    // Returns our singleton Dev instance.
-    public static Developer getDev() {
-        return DEV;
     }
 }

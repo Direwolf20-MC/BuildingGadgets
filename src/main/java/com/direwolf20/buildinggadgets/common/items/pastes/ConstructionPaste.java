@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.common.items.pastes;
 
 import com.direwolf20.buildinggadgets.common.items.ItemModBase;
-import com.direwolf20.buildinggadgets.common.tools.InventoryManipulation;
+import com.direwolf20.buildinggadgets.common.utils.InventoryManipulation;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ActionResult;

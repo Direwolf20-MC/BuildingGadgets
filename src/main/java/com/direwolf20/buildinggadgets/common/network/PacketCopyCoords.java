@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.common.network;
 
+import com.direwolf20.buildinggadgets.common.gadgets.CopyGadget;
 import com.direwolf20.buildinggadgets.common.items.ModItems;
-import com.direwolf20.buildinggadgets.common.gadgets.GadgetCopyPaste;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
@@ -50,12 +50,12 @@ public class PacketCopyCoords implements IMessage {
         private void handle(PacketCopyCoords message, MessageContext ctx) {
             EntityPlayerMP playerEntity = ctx.getServerHandler().player;
 
-            ItemStack heldItem = GadgetCopyPaste.getGadget(playerEntity);
+            ItemStack heldItem = CopyGadget.getAsStack(playerEntity);
             if (heldItem.isEmpty()) return;
 
             BlockPos startPos = message.start;
             BlockPos endPos = message.end;
-            GadgetCopyPaste tool = ModItems.gadgetCopyPaste;
+            CopyGadget tool = ModItems.copyGadget;
             if (startPos.equals(BlockPos.ORIGIN) && endPos.equals(BlockPos.ORIGIN)) {
                 tool.setStartPos(heldItem, null);
                 tool.setEndPos(heldItem, null);
@@ -63,7 +63,7 @@ public class PacketCopyCoords implements IMessage {
             } else {
                 tool.setStartPos(heldItem, startPos);
                 tool.setEndPos(heldItem, endPos);
-                GadgetCopyPaste.copyBlocks(heldItem, playerEntity, playerEntity.world, tool.getStartPos(heldItem), tool.getEndPos(heldItem));
+                CopyGadget.copyBlocks(heldItem, playerEntity, playerEntity.world, tool.getStartPos(heldItem), tool.getEndPos(heldItem));
             }
         }
     }

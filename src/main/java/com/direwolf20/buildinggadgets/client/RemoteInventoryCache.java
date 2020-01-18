@@ -9,9 +9,9 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.PacketSetRemoteInventoryCache;
-import com.direwolf20.buildinggadgets.common.tools.GadgetUtils;
-import com.direwolf20.buildinggadgets.common.tools.InventoryManipulation.IRemoteInventoryProvider;
-import com.direwolf20.buildinggadgets.common.tools.UniqueItem;
+import com.direwolf20.buildinggadgets.common.utils.GadgetUtils;
+import com.direwolf20.buildinggadgets.common.utils.InventoryManipulation.IRemoteInventoryProvider;
+import com.direwolf20.buildinggadgets.common.utils.UniqueItem;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.Multiset;
 

@@ -1,7 +1,6 @@
 package com.direwolf20.buildinggadgets.client;
 
-import com.direwolf20.buildinggadgets.common.BuildingGadgets;
-import com.direwolf20.buildinggadgets.common.gadgets.GadgetGeneric;
+import com.direwolf20.buildinggadgets.common.gadgets.AbstractGadget;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraftforge.client.settings.IKeyConflictContext;
@@ -32,9 +31,6 @@ public class KeyBindings {
         fuzzy = createBinding("fuzzy", Keyboard.KEY_NONE);
         connectedArea = createBinding("connected_area", Keyboard.KEY_NONE);
         rotateMirror = createBinding("rotate_mirror", Keyboard.KEY_NONE);
-
-        if(BuildingGadgets.getDev().isIsDev())
-            dev = createBinding("dev", Keyboard.KEY_BACKSLASH);
     }
 
     private static KeyBinding createBinding(String name, int key) {
@@ -48,7 +44,7 @@ public class KeyBindings {
         @Override
         public boolean isActive() {
             return !KeyConflictContext.GUI.isActive() && Minecraft.getMinecraft().player != null
-                    && !GadgetGeneric.getGadget(Minecraft.getMinecraft().player).isEmpty();
+                    && AbstractGadget.getGadget(Minecraft.getMinecraft().player).isPresent();
         }
 
         @Override
