@@ -40,9 +40,11 @@ public class InventoryManipulation {
         if (player.capabilities.isCreativeMode) {
             return true;
         }
+
         if (itemStack.getItem() instanceof ConstructionPaste) {
             itemStack = addPasteToContainer(player, itemStack);
         }
+
         if (itemStack.getCount() == 0) {
             return true;
         }
@@ -107,6 +109,7 @@ public class InventoryManipulation {
             return true;
         }
 
+        // Attempt to collect the remote inv
         ItemStack tool = GadgetGeneric.getGadget(player);
         IItemHandler remoteInventory = GadgetUtils.getRemoteInventory(tool, world, player);
         if (remoteInventory != null) {
@@ -120,13 +123,14 @@ public class InventoryManipulation {
         }
 
 
+        // Check the player has a inventory
         IItemHandler currentInv = player.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
         if( currentInv == null )
             return false;
 
         List<Integer> slots = findItem(itemStack.getItem(), itemStack.getMetadata(), currentInv);
         List<IItemHandler> invContainers = findInvContainers(player);
-
+        System.out.println(slots);
         if (invContainers.size() > 0) {
             for (IItemHandler container : invContainers) {
                 for (int i = 0; i < container.getSlots(); i++) {
@@ -138,14 +142,20 @@ public class InventoryManipulation {
                 }
             }
         }
-        if (slots.size() == 0) {
+
+        if (slots.size() == 0)
             return false;
+
+        ItemStack stackInSlot = ItemStack.EMPTY;
+        for(int slotId : slots) {
+            stackInSlot = currentInv.getStackInSlot(slotId);
+            if (stackInSlot.getCount() >= count)
+                break;
         }
-        int slot = slots.get(0);
-        ItemStack stackInSlot = currentInv.getStackInSlot(slot);
-        if (stackInSlot.getCount() < count) {
+
+        if( stackInSlot.isEmpty() )
             return false;
-        }
+
         stackInSlot.shrink(count);
         return true;
     }
