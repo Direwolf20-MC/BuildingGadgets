@@ -561,8 +561,14 @@ public class ToolRenders {
             if (state.getBlock().canSilkHarvest(world, BlockPos.ORIGIN, state, player))
                 itemStack = InventoryManipulation.getSilkTouchDrop(state);
 
-            if (itemStack.isEmpty())
-                itemStack = state.getBlock().getPickBlock(state, null, world, BlockPos.ORIGIN, player);
+            if (itemStack.isEmpty()) {
+                try {
+                    itemStack = state.getBlock().getPickBlock(state, null, world, BlockPos.ORIGIN, player);
+                } catch (Exception ignored) {
+                    // This may introduce issues. I hope it doesn't
+                    itemStack = InventoryManipulation.getSilkTouchDrop(state);
+                }
+            }
 
             return itemStack;
         }
