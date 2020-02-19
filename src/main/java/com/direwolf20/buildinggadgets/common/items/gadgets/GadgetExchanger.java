@@ -226,6 +226,7 @@ public class GadgetExchanger extends GadgetGeneric {
             itemStack = constructionPaste.copy();
             useConstructionPaste = true;
         }
+
         if (!player.isAllowEdit()) {
             return false;
         }
@@ -243,10 +244,6 @@ public class GadgetExchanger extends GadgetGeneric {
         if (!GadgetExchanger.canPlaceBlockAt(world, pos, setBlock, currentBlock))
             return false;
 
-        this.applyDamage(tool, player);
-
-        currentBlock.getBlock().harvestBlock(world, player, pos, currentBlock, world.getTileEntity(pos), tool);
-
         BlockSnapshot blockSnapshot = BlockSnapshot.getBlockSnapshot(world, pos);
         if (!GadgetGeneric.EmitEvent.placeBlock(player, blockSnapshot, player.getHorizontalFacing(), player.getActiveHand())) {
             return false;
@@ -255,10 +252,16 @@ public class GadgetExchanger extends GadgetGeneric {
         boolean useItemSuccess;
         if (useConstructionPaste) {
             useItemSuccess = InventoryManipulation.usePaste(player, 1);
+
         } else {
             useItemSuccess = InventoryManipulation.useItem(itemStack, player, neededItems, world);
         }
+
         if (useItemSuccess) {
+            // Only do something if the use actually happened... How was this logic overlooked? #432
+            this.applyDamage(tool, player);
+            currentBlock.getBlock().harvestBlock(world, player, pos, currentBlock, world.getTileEntity(pos), tool);
+
             world.spawnEntity(new BlockBuildEntity(world, pos, player, setBlock, 3, getToolActualBlock(tool), useConstructionPaste));
             return true;
         }
