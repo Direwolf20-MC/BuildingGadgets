@@ -33,13 +33,10 @@ public class ItemEnergyForge extends EnergyStorage {
      */
     @Override
     public int extractEnergy(int maxExtract, boolean simulate) {
-        System.out.println("EXTRACT");
         return 0;
     }
 
     public int extractPower(int maxExtract, boolean simulate) {
-        System.out.println("Safe extract");
-
         updateMaxEnergy();
         return changeEnergy(super.extractEnergy(maxExtract, simulate), simulate);
     }
