@@ -1,6 +1,20 @@
 # Building Gadgets Changelog
 The format of this document is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and should continue to adhere to the conventions outlined in the Keep a Changelog guidelines.
 
+## [2.8.0 - 1.12.2] - 2020-02-19
+Firstly, `12 MILLION` downloads and counting! What a milestone. Thank you to everyone who has downloaded and enjoyed BuildingGadgets! Secondly
+`2.8.0` of BuildingGadgets marks the first of what I hope to be only a few final releases for `1.12.2`. We have big plans for `1.14` onwards and hope to see all of you in the newer Minecraft versions :heart:
+
+### Changed
+- Rewrote the way we extract items from inventories. We now have an actual defined flow of `Remote / Bound inventory` then `Player inventory`. This also fixes some weird issues with having partly enough items in one or the other inventory.
+
+### Fixed
+- Fixed a pretty major dupe bug using the exchanger and some DireDurps! (Huge thanks to [dh458](https://github.com/dh458))
+- Sudo Fixed a few crashes by catching their errors instead of crashing Minecraft. Seems fair... :D
+
+### Removed
+- Removed some console spam, sorry about that. Sometimes debug code sneaks it way into a release.
+
 ## [2.7.4 - 1.12.2] - 2019-11-07
 Release note: We're nearing the final versions of Building Gadgets for Minecraft 1.12 and will be winding down on the release schedule. 1.14 is going strong and we'd recommend you check it out :D
 ### Added
