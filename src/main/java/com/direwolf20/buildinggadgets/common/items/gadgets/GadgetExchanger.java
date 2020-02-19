@@ -250,12 +250,10 @@ public class GadgetExchanger extends GadgetGeneric {
         }
 
         boolean useItemSuccess;
-        if (useConstructionPaste) {
+        if (useConstructionPaste)
             useItemSuccess = InventoryManipulation.usePaste(player, 1);
-
-        } else {
+        else
             useItemSuccess = InventoryManipulation.useItem(itemStack, player, neededItems, world);
-        }
 
         if (useItemSuccess) {
             // Only do something if the use actually happened... How was this logic overlooked? #432
@@ -265,6 +263,7 @@ public class GadgetExchanger extends GadgetGeneric {
             world.spawnEntity(new BlockBuildEntity(world, pos, player, setBlock, 3, getToolActualBlock(tool), useConstructionPaste));
             return true;
         }
+
         return false;
     }
 

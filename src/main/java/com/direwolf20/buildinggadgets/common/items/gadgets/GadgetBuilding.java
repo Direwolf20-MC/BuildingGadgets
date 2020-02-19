@@ -286,8 +286,6 @@ public class GadgetBuilding extends GadgetGeneric {
         if (!this.canUse(heldItem, player))
             return false;
 
-        this.applyDamage(heldItem, player);
-
         //ItemStack constructionStack = InventoryManipulation.getSilkTouchDrop(ModBlocks.constructionBlock.getDefaultState());
         boolean useItemSuccess;
         if (useConstructionPaste) {
@@ -296,6 +294,7 @@ public class GadgetBuilding extends GadgetGeneric {
             useItemSuccess = InventoryManipulation.useItem(itemStack, player, neededItems, world);
         }
         if (useItemSuccess) {
+            this.applyDamage(heldItem, player);
             world.spawnEntity(new BlockBuildEntity(world, pos, player, setBlock, 1, getToolActualBlock(heldItem), useConstructionPaste));
             return true;
         }

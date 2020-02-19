@@ -104,60 +104,47 @@ public class InventoryManipulation {
     /**
      * Call {@link GadgetUtils#clearCachedRemoteInventory GadgetUtils#clearCachedRemoteInventory} when done using this method
      */
-    public static boolean useItem(ItemStack itemStack, EntityPlayer player, int count, World world) {
-        if (player.capabilities.isCreativeMode) {
+    public static boolean useItem(ItemStack target, EntityPlayer player, int amountRequired, World world) {
+        if (player.capabilities.isCreativeMode)
             return true;
-        }
+
+        int amountLeft = amountRequired;
 
         // Attempt to collect the remote inv
         ItemStack tool = GadgetGeneric.getGadget(player);
         IItemHandler remoteInventory = GadgetUtils.getRemoteInventory(tool, world, player);
-        if (remoteInventory != null) {
-            for (int i = 0; i < remoteInventory.getSlots(); i++) {
-                ItemStack containerItem = remoteInventory.getStackInSlot(i);
-                if (containerItem.getItem() == itemStack.getItem() && containerItem.getMetadata() == itemStack.getMetadata() && containerItem.getCount() >= count) {
-                    remoteInventory.extractItem(i, count, false);
-                    return true;
-                }
-            }
-        }
 
+        // Attempt to use the remote inventory
+        // The extract will return how many items it was about to supply
+        amountLeft -= extractFromInventory(remoteInventory, target, amountRequired);
+        if( amountLeft <= 0 )
+            return true;
 
         // Check the player has a inventory
         IItemHandler currentInv = player.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
-        if( currentInv == null )
-            return false;
+        amountLeft -= extractFromInventory(currentInv, target, amountLeft);
 
-        List<Integer> slots = findItem(itemStack.getItem(), itemStack.getMetadata(), currentInv);
-        List<IItemHandler> invContainers = findInvContainers(player);
-        System.out.println(slots);
-        if (invContainers.size() > 0) {
-            for (IItemHandler container : invContainers) {
-                for (int i = 0; i < container.getSlots(); i++) {
-                    ItemStack containerItem = container.getStackInSlot(i);
-                    if (containerItem.getItem() == itemStack.getItem() && containerItem.getMetadata() == itemStack.getMetadata() && containerItem.getCount() >= count) {
-                        container.extractItem(i, count, false);
-                        return true;
-                    }
-                }
+        return amountLeft < amountRequired;
+    }
+
+    private static int extractFromInventory(IItemHandler inventory, ItemStack target, int amountRequired) {
+        int amountSaturated = 0;
+        if( inventory == null )
+            return amountSaturated;
+
+        for (int i = 0; i < inventory.getSlots(); i++) {
+            ItemStack containerItem = inventory.getStackInSlot(i);
+            if (containerItem.getItem() == target.getItem() && containerItem.getMetadata() == target.getMetadata()) {
+                ItemStack stack = inventory.extractItem(i, amountRequired, false);
+                amountSaturated += stack.getCount();
             }
-        }
 
-        if (slots.size() == 0)
-            return false;
-
-        ItemStack stackInSlot = ItemStack.EMPTY;
-        for(int slotId : slots) {
-            stackInSlot = currentInv.getStackInSlot(slotId);
-            if (stackInSlot.getCount() >= count)
+            // Don't continue to check if we've saturated the amount.
+            if( amountSaturated >= amountRequired )
                 break;
         }
 
-        if( stackInSlot.isEmpty() )
-            return false;
-
-        stackInSlot.shrink(count);
-        return true;
+        return amountSaturated;
     }
 
     public interface IRemoteInventoryProvider {

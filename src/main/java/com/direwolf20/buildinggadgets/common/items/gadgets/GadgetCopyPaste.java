@@ -545,8 +545,6 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
         if (!this.canUse(heldItem, player))
             return;
 
-        this.applyDamage(heldItem, player);
-
         boolean useItemSuccess;
         if (useConstructionPaste) {
             useItemSuccess = InventoryManipulation.usePaste(player, 1);
@@ -554,6 +552,7 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
             useItemSuccess = InventoryManipulation.useItem(itemStack, player, neededItems, world);
         }
         if (useItemSuccess) {
+            this.applyDamage(heldItem, player);
             world.spawnEntity(new BlockBuildEntity(world, pos, player, state, 1, state, useConstructionPaste));
         }
 
