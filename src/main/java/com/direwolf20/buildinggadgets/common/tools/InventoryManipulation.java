@@ -23,6 +23,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
+import scala.xml.dtd.EMPTY;
 
 import java.util.*;
 
@@ -381,7 +382,15 @@ public class InventoryManipulation {
     public static IBlockState getSpecificStates(IBlockState originalState, World world, EntityPlayer player, BlockPos pos, ItemStack tool) {
         IBlockState placeState;
         Block block = originalState.getBlock();
-        ItemStack item = block.getPickBlock(originalState, null, world, pos, player);
+
+        ItemStack item;
+        try {
+            item = block.getPickBlock(originalState, null, world, pos, player);
+        } catch (Exception ignored) {
+            // This may introduce issues. I hope it doesn't
+            item = InventoryManipulation.getSilkTouchDrop(originalState);
+        }
+
         int meta = item.getMetadata();
         try {
             placeState = originalState.getBlock().getStateForPlacement(world, pos, EnumFacing.UP, 0, 0, 0, meta, player, EnumHand.MAIN_HAND);
