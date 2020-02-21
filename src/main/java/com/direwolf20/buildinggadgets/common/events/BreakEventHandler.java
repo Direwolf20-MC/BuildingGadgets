@@ -2,6 +2,7 @@ package com.direwolf20.buildinggadgets.common.events;
 
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
 import com.direwolf20.buildinggadgets.common.tools.InventoryManipulation;
+import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.event.world.BlockEvent;
@@ -25,7 +26,9 @@ public class BreakEventHandler {
             return;
 
         List<ItemStack> drops = event.getDrops();
-        drops.removeIf(item -> InventoryManipulation.giveItem(item, player, event.getWorld()));
+        drops.forEach(drop -> drop = InventoryManipulation.giveItem(drop, player, event.getWorld()));
+
+//        drops.removeIf(item -> InventoryManipulation.giveItem(item, player, event.getWorld()).isEmpty());
     }
 }
 

@@ -10,10 +10,7 @@ import com.direwolf20.buildinggadgets.client.RemoteInventoryCache;
 import com.direwolf20.buildinggadgets.common.items.ITemplate;
 import com.direwolf20.buildinggadgets.common.items.ModItems;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
-import com.direwolf20.buildinggadgets.common.tools.BlockMap;
-import com.direwolf20.buildinggadgets.common.tools.InventoryManipulation;
-import com.direwolf20.buildinggadgets.common.tools.PasteToolBufferBuilder;
-import com.direwolf20.buildinggadgets.common.tools.UniqueItem;
+import com.direwolf20.buildinggadgets.common.tools.*;
 import com.google.common.collect.Multiset;
 
 import net.minecraft.block.state.IBlockState;
@@ -151,7 +148,7 @@ public class EventTooltip {
                 int hasAmt = InventoryManipulation.countPaste(Minecraft.getMinecraft().player);
                 int x = bx + (j % STACKS_PER_LINE) * 18;
                 int y = by + (j / STACKS_PER_LINE) * 20;
-                renderRequiredBlocks(pasteItemStack, x, y, hasAmt, InventoryManipulation.longToInt(totalMissing));
+                renderRequiredBlocks(pasteItemStack, x, y, hasAmt, MathTool.longToInt(totalMissing));
                 j++;
             }
         }

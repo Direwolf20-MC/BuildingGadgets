@@ -44,4 +44,12 @@ public final class MathTool {
         return addForNonOdd(i, 1);
     }
 
+    public static int longToInt(long count)
+    {
+        try {
+            return Math.toIntExact(count);
+        } catch (ArithmeticException e) {
+            return Integer.MAX_VALUE;
+        }
+    }
 }
