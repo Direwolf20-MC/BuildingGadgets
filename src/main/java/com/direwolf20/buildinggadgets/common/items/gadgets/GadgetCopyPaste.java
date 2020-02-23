@@ -36,10 +36,7 @@ import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.BlockSnapshot;
-import net.minecraftforge.event.ForgeEventFactory;
-import net.minecraftforge.event.world.BlockEvent;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -495,6 +492,9 @@ public class GadgetCopyPaste extends GadgetGeneric implements ITemplate {
     }
 
     private void placeBlock(World world, BlockPos pos, EntityPlayer player, IBlockState state, Map<IBlockState, UniqueItem> IntStackMap) {
+        if( world.isOutsideBuildHeight(pos) )
+            return;
+
         IBlockState testState = world.getBlockState(pos);
         if ((SyncedConfig.canOverwriteBlocks && !testState.getBlock().isReplaceable(world, pos)) ||
                 (!SyncedConfig.canOverwriteBlocks && testState.getBlock().isAir(testState, world, pos)))

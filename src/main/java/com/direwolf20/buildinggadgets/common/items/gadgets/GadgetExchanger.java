@@ -23,10 +23,7 @@ import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldType;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.BlockSnapshot;
-import net.minecraftforge.event.ForgeEventFactory;
-import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -190,6 +187,10 @@ public class GadgetExchanger extends GadgetGeneric {
     }
 
     private boolean exchangeBlock(World world, EntityPlayer player, BlockPos pos, IBlockState setBlock) {
+        // This is unlikely but good to be sure
+        if( world.isOutsideBuildHeight(pos) )
+            return false;
+
         IBlockState currentBlock = world.getBlockState(pos);
         ItemStack itemStack;
         boolean useConstructionPaste = false;
