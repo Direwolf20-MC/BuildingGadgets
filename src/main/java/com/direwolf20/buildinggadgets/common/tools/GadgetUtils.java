@@ -1,6 +1,7 @@
 package com.direwolf20.buildinggadgets.common.tools;
 
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockTileEntity;
+import com.direwolf20.buildinggadgets.common.blocks.EffectBlock;
 import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
 import com.direwolf20.buildinggadgets.common.integration.NetworkProvider;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetBuilding;
@@ -36,7 +37,6 @@ import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 
@@ -284,7 +284,7 @@ public class GadgetUtils {
             return;
 
         IBlockState state = world.getBlockState(pos);
-        if (result == EnumActionResult.FAIL || SyncedConfig.blockBlacklist.contains(state.getBlock())) {
+        if (result == EnumActionResult.FAIL || SyncedConfig.blockBlacklist.contains(state.getBlock()) || state.getBlock() instanceof EffectBlock ) {
             player.sendStatusMessage(new TextComponentString(TextFormatting.RED + new TextComponentTranslation("message.gadget.invalidblock").getUnformattedComponentText()), true);
             return;
         }
