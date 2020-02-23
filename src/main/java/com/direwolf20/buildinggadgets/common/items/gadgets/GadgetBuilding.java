@@ -239,6 +239,9 @@ public class GadgetBuilding extends GadgetGeneric {
         if (!player.isAllowEdit())
             return false;
 
+        if( world.isOutsideBuildHeight(pos) )
+            return false;
+
         ItemStack heldItem = getGadget(player);
         if (heldItem.isEmpty())
             return false;

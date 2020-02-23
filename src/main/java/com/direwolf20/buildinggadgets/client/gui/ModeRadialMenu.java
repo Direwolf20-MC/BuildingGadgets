@@ -28,7 +28,6 @@ import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TextComponentString;
@@ -162,6 +161,7 @@ public class ModeRadialMenu extends GuiScreen {
                 return GadgetBuilding.shouldPlaceAtop(getGadget());
             }));
         }
+
         addButton(new ZeroButton(left, "anchor", "anchor", send -> {
             if (send)
                 PacketHandler.INSTANCE.sendToServer(new PacketAnchor());
