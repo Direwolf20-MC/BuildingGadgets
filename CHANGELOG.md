@@ -1,6 +1,18 @@
 # Building Gadgets Changelog
 The format of this document is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and should continue to adhere to the conventions outlined in the Keep a Changelog guidelines.
 
+## [2.8.1 - 1.12.2] - 2020-02-23
+Woops, I broke it. Dank Nulls now work again with some other nice improvements for one of the final `1.12.2` versions. This version comes with some rewrites on the inventory system so please post any issues to the [Building Gadgets Github](https://github.com/Direwolf20-MC/BuildingGadgets/issues/new/)
+
+### Changed
+- Rewrote how the Gadgets insert items back into the inventories, It now follows in the extracting systems footsteps and flows from the Linked inventory to the Players inventory and finally looking for any inventory bound inventories (Dank Null)
+- Added the Astral Sorcery Flare to the blacklist by default as it causes some odd issues with the Copy Paste Gadget.
+  
+### Fixed
+- Fixed the Dank Null support that I removed by accident.. Woops, sorry about that.
+- Fixed the Gadgets being able to build above the world height (and below)
+- Fixed the Gadgets being able to select our Effect Block (The one that shrinks and grows). This was mostly an issue in Creative. 
+
 ## [2.8.0 - 1.12.2] - 2020-02-19
 Firstly, `12 MILLION` downloads and counting! What a milestone. Thank you to everyone who has downloaded and enjoyed BuildingGadgets! Secondly
 `2.8.0` of BuildingGadgets marks the first of what I hope to be only a few final releases for `1.12.2`. We have big plans for `1.14` onwards and hope to see all of you in the newer Minecraft versions :heart:
