@@ -161,7 +161,6 @@ public class ModeRadialMenu extends GuiScreen {
                 return GadgetBuilding.shouldPlaceAtop(getGadget());
             }));
         }
-
         addButton(new ZeroButton(left, "anchor", "anchor", send -> {
             if (send)
                 PacketHandler.INSTANCE.sendToServer(new PacketAnchor());
