@@ -4,6 +4,7 @@ import com.direwolf20.buildinggadgets.common.items.gadgets.AbstractGadget;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetDestruction;
 import com.direwolf20.buildinggadgets.common.registry.OurBlocks;
 import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.renderer.BufferBuilder;
@@ -45,23 +46,28 @@ public class DestructionRender extends BaseRenderer {
 
         Vec3d playerPos = getMc().gameRenderer.getActiveRenderInfo().getProjectedView();
 
-        GlStateManager.pushMatrix();
-        GlStateManager.translated(-playerPos.getX(), -playerPos.getY(), -playerPos.getZ());
+        MatrixStack stack = evt.getMatrixStack();
+        stack.push();
+        stack.translate(-playerPos.getX(), -playerPos.getY(), -playerPos.getZ());
+
+        RenderSystem.pushMatrix();
+        RenderSystem.multMatrix(stack.getLast().getMatrix());
+        stack.pop();
 
 //        try {
-//            GlStateManager.callList(cacheDestructionOverlay.get(new ImmutableTriple<>(new UniqueItemStack(heldItem), startBlock, facing.ordinal()), () -> {
+//            RenderSystem.callList(cacheDestructionOverlay.get(new ImmutableTriple<>(new UniqueItemStack(heldItem), startBlock, facing.ordinal()), () -> {
 //                int displayList = GLAllocation.generateDisplayLists(1);
-//                GlStateManager.newList(displayList, GL11.GL_COMPILE);
+//                RenderSystem.newList(displayList, GL11.GL_COMPILE);
                 this.renderOverlay(player, world, startBlock, facing, heldItem);
-//                GlStateManager.endList();
+//                RenderSystem.endList();
 //                return displayList;
 //            }));
 //        } catch (ExecutionException e) {
 //            BuildingGadgets.LOG.error("Error encountered while rendering destruction gadget overlay", e);
 //        }
 
-        GlStateManager.enableLighting();
-        GlStateManager.popMatrix();
+        RenderSystem.enableLighting();
+        RenderSystem.popMatrix();
     }
 
     private void renderOverlay(PlayerEntity player, World world, BlockPos startBlock, Direction facing, ItemStack heldItem) {
