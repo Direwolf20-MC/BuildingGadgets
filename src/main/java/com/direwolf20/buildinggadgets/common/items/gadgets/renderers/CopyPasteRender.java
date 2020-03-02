@@ -23,6 +23,7 @@ import com.direwolf20.buildinggadgets.common.world.FakeDelegationWorld;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.RemovalListener;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.block.*;
@@ -78,13 +79,13 @@ public class CopyPasteRender extends BaseRenderer {
         Vec3d playerPos = getMc().gameRenderer.getActiveRenderInfo().getProjectedView();
         if (GadgetCopyPaste.getToolMode(heldItem) == GadgetCopyPaste.ToolMode.COPY) {
             GadgetCopyPaste.getSelectedRegion(heldItem).ifPresent(region -> {
-                renderCopy(playerPos, region);
+                renderCopy(evt, playerPos, region);
             });
         } else
             renderPaste(evt, player, heldItem, playerPos);
     }
 
-    private void renderCopy(Vec3d playerPos, Region region) {
+    private void renderCopy(RenderWorldLastEvent evt, Vec3d playerPos, Region region) {
         BlockPos startPos = region.getMin();
         BlockPos endPos = region.getMax();
         BlockPos blankPos = new BlockPos(0, 0, 0);
@@ -102,23 +103,28 @@ public class CopyPasteRender extends BaseRenderer {
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder bufferbuilder = tessellator.getBuffer();
 
-        GlStateManager.pushMatrix();
-        GlStateManager.translated(- playerPos.getX(), - playerPos.getY(), - playerPos.getZ());//The render starts at the player, so we subtract the player coords and move the render to 0,0,0
+        MatrixStack stack = evt.getMatrixStack();
+        stack.push();
+        stack.translate(- playerPos.getX(), - playerPos.getY(), - playerPos.getZ());
 
-        GlStateManager.disableLighting();
-        GlStateManager.disableTexture();
-        GlStateManager.enableBlend();
+        RenderSystem.pushMatrix();
+        RenderSystem.multMatrix(stack.getLast().getMatrix());
+        stack.pop();
+
+        RenderSystem.disableLighting();
+        RenderSystem.disableTexture();
+        RenderSystem.enableBlend();
         RenderSystem.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
 
         renderCopyOutline(tessellator, bufferbuilder, x, y, z, dx, dy, dz, 255, 223, 127); // Draw the box around the blocks we've copied.
 
-        GlStateManager.lineWidth(1.0F);
-        GlStateManager.enableLighting();
-        GlStateManager.enableTexture();
-        GlStateManager.enableDepthTest();
-        GlStateManager.depthMask(true);
+        RenderSystem.lineWidth(1.0F);
+        RenderSystem.enableLighting();
+        RenderSystem.enableTexture();
+        RenderSystem.enableDepthTest();
+        RenderSystem.depthMask(true);
 
-        GlStateManager.popMatrix();
+        RenderSystem.popMatrix();
     }
 
     private void renderPaste(RenderWorldLastEvent evt, PlayerEntity player, ItemStack heldItem, Vec3d playerPos) {
@@ -186,9 +192,9 @@ public class CopyPasteRender extends BaseRenderer {
             BlockPos targetPos = target.getPos();
             BlockState state = context.getWorld().getBlockState(target.getPos());
             TileEntity te = context.getWorld().getTileEntity(target.getPos());
-            GlStateManager.pushMatrix();//Push matrix again in order to apply these settings individually
-            GlStateManager.translatef(targetPos.getX(), targetPos.getY(), targetPos.getZ());//The render starts at the player, so we subtract the player coords and move the render to 0,0,0
-            GlStateManager.enableBlend();
+            RenderSystem.pushMatrix();//Push matrix again in order to apply these settings individually
+            RenderSystem.translatef(targetPos.getX(), targetPos.getY(), targetPos.getZ());//The render starts at the player, so we subtract the player coords and move the render to 0,0,0
+            RenderSystem.enableBlend();
             GL14.glBlendColor(1F, 1F, 1F, 0.6f); //Set the alpha of the blocks we are rendering
             try {
                 // todo: fix
@@ -214,7 +220,7 @@ public class CopyPasteRender extends BaseRenderer {
             } catch (Exception e) {
                 erroredCache.put(target.getData(), true);
             }
-            GlStateManager.popMatrix();
+            RenderSystem.popMatrix();
         }
         Tessellator.getInstance().draw();
         GL14.glBlendColor(1F, 1F, 1F, 1f); //Set the alpha of the blocks we are rendering

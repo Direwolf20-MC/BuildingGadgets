@@ -19,10 +19,7 @@ public class VectorHelper {
         double rayTraceRange = Config.GENERAL.rayTraceRange.get();
         RayTraceResult result = player.pick(rayTraceRange, 0f, rayTraceFluid != RayTraceContext.FluidMode.NONE);
 
-        if( result.getType() == RayTraceResult.Type.BLOCK )
-            return (BlockRayTraceResult) result;
-
-        return null;
+        return (BlockRayTraceResult) result;
 // 1.14 method
 //        Vec3d look = player.getLookVec();
 //        Vec3d start = player.getPositionVec().add(0, player.getEyeHeight(), 0);

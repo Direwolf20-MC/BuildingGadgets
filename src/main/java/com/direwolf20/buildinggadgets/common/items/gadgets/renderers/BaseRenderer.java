@@ -11,6 +11,7 @@ import com.direwolf20.buildinggadgets.common.util.tools.UniqueItem;
 import com.direwolf20.buildinggadgets.common.world.FakeBuilderWorld;
 import com.google.common.collect.Multiset;
 import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.Minecraft;
@@ -74,18 +75,18 @@ public abstract class BaseRenderer {
                                 .subtract(pos.getX(), pos.getY(), pos.getZ())
                                 .add(.005f, .005f, -.005f);
 
-        GlStateManager.pushMatrix();
-        GlStateManager.enableBlend();
+        RenderSystem.pushMatrix();
+        RenderSystem.enableBlend();
 
-        GlStateManager.blendFunc(GL14.GL_CONSTANT_ALPHA, GL14.GL_ONE_MINUS_CONSTANT_ALPHA);
-        GlStateManager.translated(-renderPos.getX(), -renderPos.getY(), -renderPos.getZ());
-        GlStateManager.rotatef(-90.0F, 0.0F, 1.0F, 0.0F);
-        GlStateManager.scalef(1.01f, 1.01f, 1.01f);
+        RenderSystem.blendFunc(GL14.GL_CONSTANT_ALPHA, GL14.GL_ONE_MINUS_CONSTANT_ALPHA);
+        RenderSystem.translated(-renderPos.getX(), -renderPos.getY(), -renderPos.getZ());
+        RenderSystem.rotatef(-90.0F, 0.0F, 1.0F, 0.0F);
+        RenderSystem.scalef(1.01f, 1.01f, 1.01f);
         GL14.glBlendColor(1F, 1F, 1F, 0.35f);
 
         getMc().getBlockRendererDispatcher().renderBlock(Blocks.YELLOW_STAINED_GLASS.getDefaultState(), evt.getMatrixStack(), IRenderTypeBuffer.getImpl(Tessellator.getInstance().getBuffer()), 0, 0);
 
-        GlStateManager.popMatrix();
+        RenderSystem.popMatrix();
     }
 
     int getEnergy(PlayerEntity player, ItemStack heldItem) {
@@ -120,11 +121,11 @@ public abstract class BaseRenderer {
 
     protected BufferBuilder setupMissingRender() {
         BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
-        GlStateManager.alphaFunc(GL11.GL_GREATER, 0.0001F);
-        GlStateManager.disableTexture();
-        GlStateManager.depthMask(false);
-        GlStateManager.enableBlend();
-        GlStateManager.blendFunc(GL14.GL_CONSTANT_ALPHA, GL14.GL_ONE_MINUS_CONSTANT_ALPHA);
+        RenderSystem.alphaFunc(GL11.GL_GREATER, 0.0001F);
+        RenderSystem.disableTexture();
+        RenderSystem.depthMask(false);
+        RenderSystem.enableBlend();
+        RenderSystem.blendFunc(GL14.GL_CONSTANT_ALPHA, GL14.GL_ONE_MINUS_CONSTANT_ALPHA);
         GL14.glBlendColor(1F, 1F, 1F, 0.3f); //Set the alpha of the blocks we are rendering
         bufferBuilder.begin(GL14.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
         return bufferBuilder;

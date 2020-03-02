@@ -194,7 +194,7 @@ public class GadgetCopyPaste extends AbstractGadget {
         BlockPos pos = ((AbstractGadget) stack.getItem()).getAnchor(stack);
         if (pos == null) {
             BlockRayTraceResult res = VectorHelper.getLookingAt(playerEntity, stack);
-            if (res.getType() == Type.MISS)
+            if (res == null || res.getType() == Type.MISS)
                 return Optional.empty();
             pos = res.getPos().offset(res.getFace());
         }

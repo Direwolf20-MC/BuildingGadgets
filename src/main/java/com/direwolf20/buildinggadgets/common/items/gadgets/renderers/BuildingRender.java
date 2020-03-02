@@ -15,6 +15,7 @@ import com.direwolf20.buildinggadgets.common.registry.OurBlocks;
 import com.direwolf20.buildinggadgets.common.util.helpers.SortingHelper;
 import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
 import com.direwolf20.buildinggadgets.common.util.tools.CapabilityUtil;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
@@ -95,9 +96,14 @@ public class BuildingRender extends BaseRenderer {
                 //Prepare the fake world -- using a fake world lets us render things properly, like fences connecting.
                 getBuilderWorld().setWorldAndState(player.world, renderBlockState, coordinates);
 
+                MatrixStack stack = evt.getMatrixStack();
+                stack.push();
+                stack.translate(playerPos.getX(), playerPos.getY(), playerPos.getZ());
+
                 //Save the current position that is being rendered (I think)
                 RenderSystem.pushMatrix();
-                RenderSystem.translated(- playerPos.getX(), - playerPos.getY(), - playerPos.getZ());//The render starts at the player, so we subtract the player coords and move the render to 0,0,0
+                RenderSystem.multMatrix(stack.getLast().getMatrix());
+
                 RenderSystem.pushTextureAttributes();
                 //Enable Blending (So we can have transparent effect)
                 RenderSystem.enableBlend();
@@ -111,7 +117,9 @@ public class BuildingRender extends BaseRenderer {
                 BlockRendererDispatcher dispatcher = getMc().getBlockRendererDispatcher();
                 for (BlockPos coordinate : renderCoordinates) {
                     RenderSystem.pushMatrix();//Push matrix again just because
-                    RenderSystem.translatef(coordinate.getX(), coordinate.getY(), coordinate.getZ());//Now move the render position to the coordinates we want to render at
+                    RenderSystem.multMatrix(stack.getLast().getMatrix());
+                    stack.push();
+                    stack.translate(coordinate.getX(), coordinate.getY(), coordinate.getZ());
                     RenderSystem.rotatef(-90.0F, 0.0F, 1.0F, 0.0F); //Rotate it because i'm not sure why but we need to
                     GL14.glBlendColor(1F, 1F, 1F, 0.55f); //Set the alpha of the blocks we are rendering
                     if (getBuilderWorld().getWorldType() != WorldType.DEBUG_ALL_BLOCK_STATES) { //Get the block state in the fake world
@@ -127,6 +135,7 @@ public class BuildingRender extends BaseRenderer {
                         BuildingGadgets.LOG.trace("Block at {} with state {} threw exception, whilst rendering", coordinate, state, t);
                     }
                     //Move the render position back to where it was
+                    stack.pop();
                     RenderSystem.popMatrix();
                 }
                 Tessellator.getInstance().draw();
@@ -155,10 +164,10 @@ public class BuildingRender extends BaseRenderer {
                     if (teRender != null && ! getInvalidTileEntities().contains(te)) {
                         for (BlockPos coordinate : coordinates) {
                             te.setPos(coordinate);
-                            RenderSystem.pushMatrix();
+                            stack.push();
+                            stack.translate(coordinate.getX(), coordinate.getY(), coordinate.getZ());
+                            RenderSystem.multMatrix(stack.getLast().getMatrix());
                             RenderSystem.color4f(1F, 1F, 1F, 1F);
-                            RenderSystem.translated(-playerPos.getX(), -playerPos.getY(), -playerPos.getZ());//The render starts at the player, so we subtract the player coords and move the render to 0,0,0
-                            RenderSystem.translatef(coordinate.getX(), coordinate.getY(), coordinate.getZ());
                             RenderSystem.scalef(1.0f, 1.0f, 1.0f); //Block scale 1 = full sized block
                             RenderSystem.enableBlend(); //We have to do this in the loop because the TE Render removes blend when its done
                             RenderSystem.blendFunc(GL14.GL_CONSTANT_ALPHA, GL14.GL_ONE_MINUS_CONSTANT_ALPHA);
@@ -173,6 +182,7 @@ public class BuildingRender extends BaseRenderer {
                             }
                             RenderSystem.disableFog();
                             RenderSystem.popMatrix();
+                            stack.pop();
                         }
                     }
                 }
