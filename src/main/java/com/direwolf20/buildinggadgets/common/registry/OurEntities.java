@@ -6,13 +6,12 @@ import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference.EntityReference;
 import net.minecraft.entity.EntityClassification;
 import net.minecraft.entity.EntityType;
+import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.registries.ObjectHolder;
 
 /**
  * @implNote This class does not require a builder like {@link OurItems} or {@link OurBlocks}
@@ -21,9 +20,7 @@ import net.minecraftforge.registries.ObjectHolder;
  */
 @EventBusSubscriber(modid = Reference.MODID, bus = Bus.MOD)
 public class OurEntities {
-private OurEntities() {} 
-    @ObjectHolder(EntityReference.CONSTRUCTION_BLOCK_ENTITY)
-    public static EntityType<ConstructionBlockEntity> CONSTRUCTION_BLOCK;
+private OurEntities() {}
 
     /**
      * Our only Entity is the one used to show the animation of a block
@@ -36,17 +33,22 @@ private OurEntities() {}
                         .setTrackingRange(64)
                         .setUpdateInterval(1)
                         .setShouldReceiveVelocityUpdates(false)
-                        .setCustomClientFactory(((spawnEntity, world) -> new ConstructionBlockEntity(CONSTRUCTION_BLOCK, world)))
+                        .setCustomClientFactory(((spawnEntity, world) -> new ConstructionBlockEntity(ConstructionBlockEntity.TYPE, world)))
                         .build("")
                         .setRegistryName(EntityReference.CONSTRUCTION_BLOCK_ENTITY_RL)
         );
     }
 
-    /**
-     * Called from the runWhenOn(Dist.CLIENT...) method somewhere else.
-     * This is a client side only render.
-     */
-    public static void registerModels() {
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(event -> RenderingRegistry.registerEntityRenderingHandler(CONSTRUCTION_BLOCK, ConstructionBlockEntityRender::new));
+    @SubscribeEvent
+    public static void registerModels(ModelRegistryEvent evt) {
+        RenderingRegistry.registerEntityRenderingHandler(ConstructionBlockEntity.TYPE, ConstructionBlockEntityRender::new);
     }
+
+//    /**
+//     * Called from the runWhenOn(Dist.CLIENT...) method somewhere else.
+//     * This is a client side only render.
+//     */
+//    public static void registerModels() {
+//        FMLJavaModLoadingContext.get().getModEventBus().addListener(event -> RenderingRegistry.registerEntityRenderingHandler(ConstructionBlockEntity.TYPE, ConstructionBlockEntityRender::new));
+//    }
 }

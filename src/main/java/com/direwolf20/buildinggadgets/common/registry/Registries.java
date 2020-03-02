@@ -71,7 +71,7 @@ public final class Registries {
         OurItems.setup();
 
         DistExecutor.runWhenOn(Dist.CLIENT, () -> () -> {
-            OurEntities.registerModels();
+//            OurEntities.registerModels();
             OurBlocks.OurTileEntities.registerRenderers();
         });
     }
