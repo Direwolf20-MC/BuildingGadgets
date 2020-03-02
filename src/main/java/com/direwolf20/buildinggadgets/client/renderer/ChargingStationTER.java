@@ -2,54 +2,59 @@ package com.direwolf20.buildinggadgets.client.renderer;
 
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.tiles.ChargingStationTileEntity;
-import com.direwolf20.buildinggadgets.common.util.exceptions.CapabilityNotPresentException;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
+import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.energy.CapabilityEnergy;
+import net.minecraft.tileentity.TileEntity;
 import org.lwjgl.opengl.GL11;
 
 
-public class ChargingStationTER extends TileEntityRenderer<ChargingStationTileEntity> {
+public class ChargingStationTER<T extends TileEntity> extends TileEntityRenderer<ChargingStationTileEntity> {
     private static final float CHARGE_UPDATE_BORDER = 0.005f;
 
-    public ChargingStationTER() {
+    public ChargingStationTER(TileEntityRendererDispatcher rendererDispatcherIn) {
+        super(rendererDispatcherIn);
     }
 
-    @Override
-    public void render(ChargingStationTileEntity te, double x, double y, double z, float partialTicks, int destroyStage) {
-        ItemStack stack = te.getRenderStack();
-        if (! stack.isEmpty()) {
-            GlStateManager.pushLightingAttributes();
-            GlStateManager.pushMatrix();
-
-            // Translate to the location of our tile entity
-            GlStateManager.translated(x, y, z);
-            GlStateManager.disableRescaleNormal();
-            // Render our item
-            renderItem(te);
-
-            //Render our sphere
-
-            renderSphere(te);
-
-            //Render Lightning
-
-            if (te.isChargingItem(stack.getCapability(CapabilityEnergy.ENERGY).orElseThrow(CapabilityNotPresentException::new)) &&
-                    //don't render more then 16 Blocks away from the Block
-                    SphereSegmentation.BY_DISTANCE.compare(te.getLastRenderedSegmentation(), SphereSegmentation.MEDIUM_SEGMENTATION) < 0)
-                renderLightning(te);
-            GlStateManager.popMatrix();
-            GlStateManager.popAttributes();
-        }
-
-    }
+    // todo: fix 1.14
+//    @Override
+//    public void render(ChargingStationTileEntity te, double x, double y, double z, float partialTicks, int destroyStage) {
+//        ItemStack stack = te.getRenderStack();
+//        if (! stack.isEmpty()) {
+//            GlStateManager.pushLightingAttributes();
+//            GlStateManager.pushMatrix();
+//
+//            // Translate to the location of our tile entity
+//            GlStateManager.translated(x, y, z);
+//            GlStateManager.disableRescaleNormal();
+//            // Render our item
+//            renderItem(te);
+//
+//            //Render our sphere
+//
+//            renderSphere(te);
+//
+//            //Render Lightning
+//
+//            if (te.isChargingItem(stack.getCapability(CapabilityEnergy.ENERGY).orElseThrow(CapabilityNotPresentException::new)) &&
+//                    //don't render more then 16 Blocks away from the Block
+//                    SphereSegmentation.BY_DISTANCE.compare(te.getLastRenderedSegmentation(), SphereSegmentation.MEDIUM_SEGMENTATION) < 0)
+//                renderLightning(te);
+//            GlStateManager.popMatrix();
+//            GlStateManager.popAttributes();
+//        }
+//
+//    }
 
     private void renderLightning(ChargingStationTileEntity te) {
         //Just toying with this - i Think the effect i have in my mind is way too complex for my weak programming skills
@@ -144,15 +149,15 @@ public class ChargingStationTER extends TileEntityRenderer<ChargingStationTileEn
         float blue = 0f;
         float alpha = 0.5f;
 
-        GlStateManager.pushMatrix();
-        GlStateManager.pushLightingAttributes();
+        RenderSystem.pushMatrix();
+        RenderSystem.pushLightingAttributes();
 
-        GlStateManager.enableBlend();
-        GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
-        GlStateManager.disableTexture();
-        GlStateManager.translated(.5, 1.5, .5);
-        //GlStateManager.depthMask(false);
-        GlStateManager.shadeModel(GL11.GL_SMOOTH);
+        RenderSystem.enableBlend();
+        RenderSystem.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
+        RenderSystem.disableTexture();
+        RenderSystem.translated(.5, 1.5, .5);
+        //RenderSystem.depthMask(false);
+        RenderSystem.shadeModel(GL11.GL_SMOOTH);
         Tessellator t = Tessellator.getInstance();
 
         BufferBuilder bufferBuilder = t.getBuffer();
@@ -205,10 +210,15 @@ public class ChargingStationTER extends TileEntityRenderer<ChargingStationTileEn
         // Translate to the center of the block and .9 points higher
         GlStateManager.translated(.5, 1.5, .5);
         GlStateManager.scalef(.4f, .4f, .4f);
-        float rotation = (float) (getWorld().getGameTime() % 80);
+        float rotation = (float) (te.getWorld().getGameTime() % 80);
         GlStateManager.rotatef(360f * rotation / 80f, 0, 1, 0);
         Minecraft.getInstance().getItemRenderer().renderItem(stack, ItemCameraTransforms.TransformType.NONE);
 
         GlStateManager.popMatrix();
+    }
+
+    @Override
+    public void render(ChargingStationTileEntity tileEntityIn, float partialTicks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int combinedLightIn, int combinedOverlayIn) {
+
     }
 }

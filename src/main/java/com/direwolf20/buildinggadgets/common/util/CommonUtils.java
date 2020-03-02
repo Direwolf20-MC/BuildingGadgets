@@ -143,18 +143,14 @@ public final class CommonUtils {
     }
 
     public static BlockRayTraceResult fakeRayTrace(Vec3d simulatePos, BlockPos pos) {
-        return fakeRayTrace(simulatePos.getX(), simulatePos.getY(), simulatePos.getZ(), pos);
-    }
-
-    public static BlockRayTraceResult fakeRayTrace(double simX, double simY, double simZ, BlockPos pos) {
-        Vec3d simVec = new Vec3d(pos).subtract(simX, simY, simZ);
+        Vec3d simVec = new Vec3d(pos).subtract(simulatePos);
         Direction dir = Direction.getFacingFromVector(simVec.getX(), simVec.getY(), simVec.getZ());
         return new BlockRayTraceResult(simVec, dir, pos, false);
     }
 
     public static MaterialList estimateRequiredItems(Iterable<PlacementTarget> buildView, IBuildContext context) {
         PlayerEntity player = context.getBuildingPlayer();
-        return estimateRequiredItems(buildView, context, player != null ? new Vec3d(player.posX, player.posY, player.posZ) : null);
+        return estimateRequiredItems(buildView, context, player != null ? player.getPositionVec() : null);
     }
 
     public static MaterialList estimateRequiredItems(Iterable<PlacementTarget> buildView, IBuildContext context, @Nullable Vec3d simulatePos) {

@@ -47,6 +47,6 @@ private OurEntities() {}
      * This is a client side only render.
      */
     public static void registerModels() {
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(event -> RenderingRegistry.registerEntityRenderingHandler(ConstructionBlockEntity.class, ConstructionBlockEntityRender::new));
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(event -> RenderingRegistry.registerEntityRenderingHandler(CONSTRUCTION_BLOCK, ConstructionBlockEntityRender::new));
     }
 }

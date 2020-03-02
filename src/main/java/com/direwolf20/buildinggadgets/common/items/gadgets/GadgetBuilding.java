@@ -143,13 +143,13 @@ public class GadgetBuilding extends ModeGadget implements IAtopPlacingGadget {
 
         player.setActiveHand(hand);
         if (!world.isRemote) {
-            if (player.isSneaking()) {
+            if (player.isShiftKeyDown()) {
                 selectBlock(itemstack, player);
             } else if (player instanceof ServerPlayerEntity) {
                 build((ServerPlayerEntity) player, itemstack);
             }
         } else {
-            if (!player.isSneaking()) {
+            if (!player.isShiftKeyDown()) {
                 BaseRenderer.updateInventoryCache();
             } else {
                 if (Screen.hasControlDown())
@@ -169,7 +169,7 @@ public class GadgetBuilding extends ModeGadget implements IAtopPlacingGadget {
         //Called when the range change hotkey is pressed
         int range = getToolRange(heldItem);
         int changeAmount = (getToolMode(heldItem) != BuildingMode.SURFACE || (range % 2 == 0)) ? 1 : 2;
-        if (player.isSneaking())
+        if (player.isShiftKeyDown())
             range = (range == 1) ? Config.GADGETS.maxRange.get() : range - changeAmount;
         else
             range = (range >= Config.GADGETS.maxRange.get()) ? 1 : range + changeAmount;

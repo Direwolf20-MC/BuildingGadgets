@@ -23,6 +23,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.world.*;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.biome.BiomeManager;
 import net.minecraft.world.border.WorldBorder;
 import net.minecraft.world.chunk.AbstractChunkProvider;
 import net.minecraft.world.chunk.ChunkStatus;
@@ -30,6 +31,7 @@ import net.minecraft.world.chunk.IChunk;
 import net.minecraft.world.dimension.Dimension;
 import net.minecraft.world.gen.Heightmap;
 import net.minecraft.world.gen.Heightmap.Type;
+import net.minecraft.world.lighting.WorldLightManager;
 import net.minecraft.world.storage.WorldInfo;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -235,6 +237,16 @@ public class FakeDelegationWorld implements IWorld {
     }
 
     @Override
+    public Biome getNoiseBiomeRaw(int x, int y, int z) {
+        return null;
+    }
+
+    @Override
+    public WorldLightManager getLightManager() {
+        return null;
+    }
+
+    @Override
     public int getLightFor(LightType type, BlockPos pos) {
         return delegate.getLightFor(type, pos);
     }
@@ -253,6 +265,11 @@ public class FakeDelegationWorld implements IWorld {
     @Override
     public int getSkylightSubtracted() {
         return delegate.getSkylightSubtracted();
+    }
+
+    @Override
+    public BiomeManager getBiomeManager() {
+        return null;
     }
 
     @Override
@@ -346,6 +363,11 @@ public class FakeDelegationWorld implements IWorld {
         return ! this.getBlockState(pos).isAir(this, pos) && removeBlock(pos, true);
     }
 
+    @Override
+    public boolean destroyBlock(BlockPos p_225521_1_, boolean p_225521_2_, @Nullable Entity p_225521_3_) {
+        return false;
+    }
+
     //-------------------Extra Methods--------------------
 
     @Nullable
@@ -424,7 +446,7 @@ public class FakeDelegationWorld implements IWorld {
                         entity.setPos(pos);
                         //if we pass our wrapped world down to this, it will cause it to determine an errornous blockstate...
                         //we'd need to reflect into the te...
-                        entity.setWorld(null);
+                        entity.setWorldAndPos(null, pos);
                         entity.onLoad();
                     }
                 } catch (Exception e) {

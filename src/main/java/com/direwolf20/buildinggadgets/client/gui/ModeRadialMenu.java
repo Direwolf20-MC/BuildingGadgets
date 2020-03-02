@@ -38,7 +38,6 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.StringTextComponent;
 import org.lwjgl.opengl.GL11;
 
-import javax.vecmath.Vector2f;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -391,7 +390,7 @@ public class ModeRadialMenu extends Screen {
         GlStateManager.enableRescaleNormal();
         GlStateManager.enableBlend();
         GlStateManager.blendFuncSeparate(770, 771, 1, 0);
-        RenderHelper.enableGUIStandardItemLighting();
+        RenderHelper.enableStandardItemLighting();
 
         float s = 2.25F * fract;
         GlStateManager.scalef(s, s, s);
@@ -438,7 +437,7 @@ public class ModeRadialMenu extends Screen {
 
     @Override
     public void tick() {
-        if (!InputMappings.isKeyDown(Minecraft.getInstance().mainWindow.getHandle(), KeyBindings.menuSettings.getKey().getKeyCode())) {
+        if (!InputMappings.isKeyDown(Minecraft.getInstance().getMainWindow().getHandle(), KeyBindings.menuSettings.getKey().getKeyCode())) {
             onClose();
             changeMode();
         }
@@ -534,6 +533,24 @@ public class ModeRadialMenu extends Screen {
 
         PositionedIconActionable(RadialTranslation message, String icon, ScreenPosition position, Predicate<Boolean> action) {
             this(message, icon, position, true, action);
+        }
+    }
+
+    private static class Vector2f {
+        public float x;
+        public float y;
+
+        public Vector2f(float x, float y) {
+            this.x = x;
+            this.y = y;
+        }
+
+        public final float dot(Vector2f v1) {
+            return (this.x*v1.x + this.y*v1.y);
+        }
+
+        public final float length() {
+            return (float) Math.sqrt(this.x*this.x + this.y*this.y);
         }
     }
 }

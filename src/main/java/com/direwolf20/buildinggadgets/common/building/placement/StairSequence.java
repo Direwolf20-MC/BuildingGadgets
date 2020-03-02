@@ -5,7 +5,6 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.AbstractIterator;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockPos.MutableBlockPos;
 
 import javax.annotation.Nonnull;
 import java.util.Iterator;
@@ -60,7 +59,7 @@ final class StairSequence implements IPositionPlacementSequence {
     @Nonnull
     public Iterator<BlockPos> iterator() {
         return new AbstractIterator<BlockPos>() {
-            private MutableBlockPos current = new MutableBlockPos(base);
+            private BlockPos.Mutable current = new BlockPos.Mutable(base);
             private int i = 0;
 
             {

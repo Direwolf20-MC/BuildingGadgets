@@ -1,9 +1,10 @@
 package com.direwolf20.buildinggadgets.common.containers;
 
+import com.direwolf20.buildinggadgets.common.util.ref.Reference;
+import net.minecraft.inventory.container.Slot;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.SlotItemHandler;
-
-import javax.annotation.Nullable;
 
 public class SlotTemplateManager extends SlotItemHandler {
     private String backgroundLoc;
@@ -14,9 +15,8 @@ public class SlotTemplateManager extends SlotItemHandler {
     }
 
     @Override
-    @Nullable
-    public String getSlotTexture() {
-        return backgroundLoc;
+    public Slot setBackground(ResourceLocation atlas, ResourceLocation sprite) {
+        return super.setBackground(atlas, new ResourceLocation(Reference.MODID, this.backgroundLoc));
     }
 
     @Override

@@ -113,8 +113,8 @@ public final class OurBlocks {
         @OnlyIn(Dist.CLIENT)
         static void registerRenderers() {
             FMLJavaModLoadingContext.get().getModEventBus().addListener(event -> {
-                ClientRegistry.bindTileEntitySpecialRenderer(EffectBlockTileEntity.class, new EffectBlockTER());
-                ClientRegistry.bindTileEntitySpecialRenderer(ChargingStationTileEntity.class, new ChargingStationTER());
+                ClientRegistry.bindTileEntityRenderer(EFFECT_BLOCK_TYPE, dispatcher -> new EffectBlockTER(dispatcher));
+                ClientRegistry.bindTileEntityRenderer(CHARGING_STATION_TYPE, dispatcher -> new ChargingStationTER(dispatcher));
             });
         }
     }

@@ -4,7 +4,6 @@ import com.direwolf20.buildinggadgets.common.building.PlacementTarget;
 import com.direwolf20.buildinggadgets.common.building.tilesupport.TileSupport;
 import com.direwolf20.buildinggadgets.common.building.view.IBuildContext;
 import com.direwolf20.buildinggadgets.common.capability.IPrivateEnergy;
-import com.direwolf20.buildinggadgets.common.capability.ItemEnergyForge;
 import com.direwolf20.buildinggadgets.common.inventory.IItemIndex;
 import com.direwolf20.buildinggadgets.common.inventory.InventoryHelper;
 import com.direwolf20.buildinggadgets.common.inventory.MatchResult;
@@ -64,7 +63,7 @@ public final class PlacementChecker {
         RayTraceResult targetRayTrace = null;
         if (context.getBuildingPlayer() != null) {
             PlayerEntity player = context.getBuildingPlayer();
-            targetRayTrace = CommonUtils.fakeRayTrace(player.posX, player.posY, player.posZ, target.getPos());
+            targetRayTrace = CommonUtils.fakeRayTrace(player.getPositionVec(), target.getPos());
         }
         MaterialList materials = target.getRequiredMaterials(context, targetRayTrace);
         MatchResult match = index.tryMatch(materials);

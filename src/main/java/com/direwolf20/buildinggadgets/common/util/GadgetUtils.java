@@ -5,7 +5,6 @@ import com.direwolf20.buildinggadgets.common.building.BlockData;
 import com.direwolf20.buildinggadgets.common.building.modes.BuildingMode;
 import com.direwolf20.buildinggadgets.common.building.modes.ExchangingMode;
 import com.direwolf20.buildinggadgets.common.capability.CapabilityTemplate;
-import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.inventory.InventoryHelper;
 import com.direwolf20.buildinggadgets.common.items.InventoryWrapper;
 import com.direwolf20.buildinggadgets.common.items.gadgets.AbstractGadget;
@@ -326,7 +325,7 @@ public class GadgetUtils {
             return;
         Optional<BlockData> data = InventoryHelper.getSafeBlockData(player, lookingAt.getPos(), player.getActiveHand());
         data.ifPresent(placeState -> {
-            BlockState actualState = placeState.getState().getExtendedState(world, lookingAt.getPos());
+            BlockState actualState = placeState.getState(); //.getExtendedState(world, lookingAt.getPos()); 1.14 @todo: fix?
 
             setToolBlock(stack, placeState);
             setToolActualBlock(stack, new BlockData(actualState, placeState.getTileData()));

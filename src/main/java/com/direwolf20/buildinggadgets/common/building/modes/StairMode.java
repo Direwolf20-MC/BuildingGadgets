@@ -36,16 +36,16 @@ public class StairMode extends AtopSupportedMode {
         int range = GadgetUtils.getToolRange(tool);
         Direction side = sideHit.getAxis().isVertical() ? player.getHorizontalFacing().getOpposite() : sideHit;
 
-        if (original.getY() > player.posY + 1)
+        if (original.getY() > player.getPosY() + 1)
             return Stair.create(transformed, side, Direction.DOWN, range);
-        else if (original.getY() < player.posY - 2)
+        else if (original.getY() < player.getPosY() - 2)
             return Stair.create(transformed, side, Direction.UP, range);
         return Stair.create(transformed, side.getOpposite(), Direction.UP, range);
     }
 
     @Override
     public BlockPos transformAtop(PlayerEntity player, BlockPos hit, Direction sideHit, ItemStack tool) {
-        if (hit.getY() > player.posY + 1) {
+        if (hit.getY() > player.getPosY() + 1) {
             Direction side = sideHit.getAxis().isVertical() ? player.getHorizontalFacing() : sideHit;
             return hit.down().offset(side);
         }

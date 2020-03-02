@@ -153,7 +153,7 @@ public class GadgetExchanger extends ModeGadget {
         ItemStack itemstack = player.getHeldItem(hand);
         player.setActiveHand(hand);
         if (!world.isRemote) {
-            if (player.isSneaking()) {
+            if (player.isShiftKeyDown()) {
                 //Remove debug code
                 //EnergyUtil.getCap(itemstack).ifPresent(energy -> energy.receiveEnergy(105000, false));
                 selectBlock(itemstack, player);
@@ -161,7 +161,7 @@ public class GadgetExchanger extends ModeGadget {
                 exchange((ServerPlayerEntity) player, itemstack);
             }
         } else {
-            if (! player.isSneaking()) {
+            if (! player.isShiftKeyDown()) {
                 BaseRenderer.updateInventoryCache();
             } else {
                 if (Screen.hasControlDown()) {
@@ -181,7 +181,7 @@ public class GadgetExchanger extends ModeGadget {
     public static void rangeChange(PlayerEntity player, ItemStack heldItem) {
         int range = getToolRange(heldItem);
         int changeAmount = (getToolMode(heldItem) == ExchangingMode.GRID || (range % 2 == 0)) ? 1 : 2;
-        if (player.isSneaking()) {
+        if (player.isShiftKeyDown()) {
             range = (range <= 1) ? Config.GADGETS.maxRange.get() : range - changeAmount;
         } else {
             range = (range >= Config.GADGETS.maxRange.get()) ? 1 : range + changeAmount;

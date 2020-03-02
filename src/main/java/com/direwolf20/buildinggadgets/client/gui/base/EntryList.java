@@ -24,9 +24,9 @@ public class EntryList<E extends AbstractListEntry<E>> extends ExtendedList<E> {
     @Override
     public void render(int mouseX, int mouseY, float partialTicks) {
         glEnable(GL_SCISSOR_TEST);
-        double guiScaleFactor = Minecraft.getInstance().mainWindow.getGuiScaleFactor();
+        double guiScaleFactor = Minecraft.getInstance().getMainWindow().getGuiScaleFactor();
         glScissor((int) (getLeft() * guiScaleFactor),
-                (int) (Minecraft.getInstance().mainWindow.getHeight() - (getBottom() * guiScaleFactor)),
+                (int) (Minecraft.getInstance().getMainWindow().getHeight() - (getBottom() * guiScaleFactor)),
                 (int) (width * guiScaleFactor),
                 (int) (height * guiScaleFactor));
         renderParts(mouseX, mouseY, partialTicks);

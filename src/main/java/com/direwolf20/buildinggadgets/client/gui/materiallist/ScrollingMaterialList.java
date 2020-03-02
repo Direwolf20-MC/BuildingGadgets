@@ -10,6 +10,7 @@ import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Multiset;
 import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.widget.list.ExtendedList;
 import net.minecraft.client.renderer.RenderHelper;
@@ -170,12 +171,12 @@ class ScrollingMaterialList extends EntryList<Entry> {
         }
 
         private void drawIcon(ItemStack item, int slotX, int slotY) {
-            GlStateManager.pushMatrix();
-            RenderHelper.enableGUIStandardItemLighting();
+            RenderSystem.pushMatrix();
+            RenderHelper.enableStandardItemLighting();
             Minecraft.getInstance().getItemRenderer().renderItemAndEffectIntoGUI(item, slotX, slotY);
-            GlStateManager.disableLighting();
-            GlStateManager.color3f(1, 1, 1);
-            GlStateManager.popMatrix();
+            RenderSystem.disableLighting();
+            RenderSystem.color3f(1, 1, 1);
+            RenderSystem.popMatrix();
         }
 
         private boolean hasEnoughItems() {

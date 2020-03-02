@@ -3,6 +3,7 @@ package com.direwolf20.buildinggadgets.common.util.helpers;
 import com.direwolf20.buildinggadgets.common.building.PlacementTarget;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 
 import java.util.*;
 import java.util.function.Function;
@@ -41,11 +42,10 @@ public class SortingHelper {
         }
 
         public static <T> Stream<T> byDistance(Stream<T> stream, Function<T, ? extends BlockPos> posExtractor, PlayerEntity player) {
-            double x = player.posX,
-                    y = player.posY + player.getEyeHeight(),
-                    z = player.posZ;
+            Vec3d pos = player.getPositionVec().add(0, player.getEyeHeight(), 0);
+
             return stream
-                    .map(t -> new TargetObject<T>(posExtractor.apply(t).distanceSq(x, y, z, true), t))
+                    .map(t -> new TargetObject<T>(posExtractor.apply(t).distanceSq(pos.x, pos.y, pos.z, true), t))
                     .sorted(TargetObject.BY_DISTANCE)
                     .map(TargetObject::getTarget);
         }

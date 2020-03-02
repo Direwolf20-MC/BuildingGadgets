@@ -17,9 +17,7 @@ import net.minecraft.state.StateContainer;
 import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 import net.minecraft.world.storage.loot.LootContext.Builder;
@@ -35,7 +33,7 @@ public class ChargingStationBlock extends Block {
     public static final BooleanProperty LIT = BlockStateProperties.LIT;
 
     public ChargingStationBlock(Properties builder) {
-        super(builder);
+        super(builder.notSolid());
         setDefaultState(getStateContainer().getBaseState().with(FACING, Direction.NORTH).with(LIT, Boolean.FALSE));
     }
 
@@ -90,23 +88,31 @@ public class ChargingStationBlock extends Block {
     }
 
     @Override
-    @Deprecated
-    public boolean isSolid(BlockState state) {
-        return false;
-    }
-
-    @Override
-    public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult blockRayTraceResult) {
+    public void onBlockClicked(BlockState state, World worldIn, BlockPos pos, PlayerEntity player) {
         // Only execute on the server
         if (worldIn.isRemote)
-            return true;
+            return;
 
         TileEntity te = worldIn.getTileEntity(pos);
         if (! (te instanceof ChargingStationTileEntity))
-            return false;
+            return;
+
         NetworkHooks.openGui((ServerPlayerEntity) player, (INamedContainerProvider) te, pos);
-        return true;
     }
+
+//   1.14 - replacement above
+//    @Override
+//    public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult blockRayTraceResult) {
+//        // Only execute on the server
+//        if (worldIn.isRemote)
+//            return true;
+//
+//        TileEntity te = worldIn.getTileEntity(pos);
+//        if (! (te instanceof ChargingStationTileEntity))
+//            return false;
+//        NetworkHooks.openGui((ServerPlayerEntity) player, (INamedContainerProvider) te, pos);
+//        return true;
+//    }
 
     @Override
     public int getLightValue(BlockState state) {

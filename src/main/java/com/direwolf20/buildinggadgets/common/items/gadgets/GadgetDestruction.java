@@ -157,7 +157,7 @@ public class GadgetDestruction extends AbstractGadget {
         player.setActiveHand(hand);
 
         if (!world.isRemote) {
-            if (! player.isSneaking()) {
+            if (! player.isShiftKeyDown()) {
                 BlockPos anchorPos = getAnchor(stack);
                 Direction anchorSide = getAnchorSide(stack);
                 if (anchorPos != null && anchorSide != null) {
@@ -175,7 +175,7 @@ public class GadgetDestruction extends AbstractGadget {
 
                 return new ActionResult<>(ActionResultType.FAIL, stack);
             }
-        } else if (player.isSneaking()) {
+        } else if (player.isShiftKeyDown()) {
             GuiMod.DESTRUCTION.openScreen(player);
         }
         return new ActionResult<>(ActionResultType.SUCCESS, stack);

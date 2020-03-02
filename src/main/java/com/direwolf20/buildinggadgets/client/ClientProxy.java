@@ -12,18 +12,18 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.SimpleSound;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.RenderTypeLookup;
 import net.minecraft.client.renderer.model.BakedQuad;
 import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.model.ItemOverrideList;
 import net.minecraft.client.renderer.model.ModelResourceLocation;
-import net.minecraft.client.renderer.texture.MissingTextureSprite;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IEnviromentBlockReader;
+import net.minecraft.world.ILightReader;
 import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
@@ -73,6 +73,11 @@ public class ClientProxy {
             }
 
             @Override
+            public boolean func_230044_c_() {
+                return false;
+            }
+
+            @Override
             public boolean isBuiltInRenderer() {
                 return false;
             }
@@ -86,10 +91,10 @@ public class ClientProxy {
             public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, Random rand, IModelData modelData) {
                 IBakedModel model;
                 facadeState = modelData.getData(ConstructionBlockTileEntity.FACADE_STATE);
-                BlockRenderLayer layer = MinecraftForgeClient.getRenderLayer();
+                RenderType layer = MinecraftForgeClient.getRenderLayer();
                 if (facadeState == null || facadeState == Blocks.AIR.getDefaultState())
                     facadeState = OurBlocks.constructionBlockDense.getDefaultState();
-                if (layer != null && ! facadeState.getBlock().canRenderInLayer(facadeState, layer)) { // always render in the null layer or the block-breaking textures don't show up
+                if (layer != null && ! RenderTypeLookup.canRenderInLayer(facadeState, layer)) { // always render in the null layer or the block-breaking textures don't show up
                     return Collections.emptyList();
                 }
                 model = Minecraft.getInstance().getBlockRendererDispatcher().getBlockModelShapes().getModel(facadeState);
@@ -99,7 +104,7 @@ public class ClientProxy {
 
             @Override
             public TextureAtlasSprite getParticleTexture() {
-                return MissingTextureSprite.func_217790_a();
+                return null;
             }
 
             @Override
@@ -107,9 +112,9 @@ public class ClientProxy {
                 return null;
             }
 
-            @Override
             @Nonnull
-            public IModelData getModelData(@Nonnull IEnviromentBlockReader world, @Nonnull BlockPos pos, @Nonnull BlockState state, @Nonnull IModelData tileData) {
+            @Override
+            public IModelData getModelData(@Nonnull ILightReader world, @Nonnull BlockPos pos, @Nonnull BlockState state, @Nonnull IModelData tileData) {
                 return tileData;
             }
         };
@@ -119,6 +124,11 @@ public class ClientProxy {
 
             @Override
             public boolean isGui3d() {
+                return false;
+            }
+
+            @Override
+            public boolean func_230044_c_() {
                 return false;
             }
 
@@ -136,10 +146,10 @@ public class ClientProxy {
             public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, Random rand, IModelData modelData) {
                 IBakedModel model;
                 facadeState = modelData.getData(ConstructionBlockTileEntity.FACADE_STATE);
-                BlockRenderLayer layer = MinecraftForgeClient.getRenderLayer();
+                RenderType layer = MinecraftForgeClient.getRenderLayer();
                 if (facadeState == null || facadeState == Blocks.AIR.getDefaultState())
                     facadeState = OurBlocks.constructionBlockDense.getDefaultState();
-                if (layer != null && ! facadeState.getBlock().canRenderInLayer(facadeState, layer)) { // always render in the null layer or the block-breaking textures don't show up
+                if (layer != null && ! RenderTypeLookup.canRenderInLayer(facadeState, layer)) { // always render in the null layer or the block-breaking textures don't show up
                     return Collections.emptyList();
                 }
                 model = Minecraft.getInstance().getBlockRendererDispatcher().getBlockModelShapes().getModel(facadeState);
@@ -149,7 +159,7 @@ public class ClientProxy {
 
             @Override
             public TextureAtlasSprite getParticleTexture() {
-                return MissingTextureSprite.func_217790_a();
+                return null; // MissingTextureSprite.func_217790_a(); 1.14
             }
 
             @Override
@@ -157,9 +167,9 @@ public class ClientProxy {
                 return null;
             }
 
-            @Override
             @Nonnull
-            public IModelData getModelData(@Nonnull IEnviromentBlockReader world, @Nonnull BlockPos pos, @Nonnull BlockState state, @Nonnull IModelData tileData) {
+            @Override
+            public IModelData getModelData(@Nonnull ILightReader world, @Nonnull BlockPos pos, @Nonnull BlockState state, @Nonnull IModelData tileData) {
                 return tileData;
             }
         };

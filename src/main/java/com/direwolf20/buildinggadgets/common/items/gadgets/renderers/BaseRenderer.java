@@ -51,14 +51,14 @@ public abstract class BaseRenderer {
         bindBlocks();
 
         if( this.isLinkable() )
-            BaseRenderer.renderLinkedInventoryOutline(heldItem, player);
+            BaseRenderer.renderLinkedInventoryOutline(event, heldItem, player);
     }
 
     protected void bindBlocks() {
         getMc().getTextureManager().bindTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
     }
 
-    private static void renderLinkedInventoryOutline(ItemStack item, PlayerEntity player) {
+    private static void renderLinkedInventoryOutline(RenderWorldLastEvent evt, ItemStack item, PlayerEntity player) {
         // This is problematic as you use REMOTE_INVENTORY_POS to get the dimension instead of REMOTE_INVENTORY_DIM
         ResourceLocation dim = GadgetUtils.getDIMFromNBT(item, NBTKeys.REMOTE_INVENTORY_POS);
         BlockPos pos = GadgetUtils.getPOSFromNBT(item, NBTKeys.REMOTE_INVENTORY_POS);
@@ -215,13 +215,5 @@ public abstract class BaseRenderer {
 
     static Set<TileEntity> getInvalidTileEntities() {
         return invalidTileEntities;
-    }
-
-    /**
-     * Pulls the static player pos from TileEntityRender (updated from the worldRender)
-     * into a Vec3d to be used to get the players pos.
-     */
-    static Vec3d getPlayerPos() {
-        return new Vec3d(TileEntityRendererDispatcher.staticPlayerX, TileEntityRendererDispatcher.staticPlayerY, TileEntityRendererDispatcher.staticPlayerZ);
     }
 }

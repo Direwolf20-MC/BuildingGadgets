@@ -126,11 +126,13 @@ public final class Undo {
         DataCompressor<Multiset<IUniqueObject<?>>> itemObjectIncrementer = new DataCompressor<>();
         DataCompressor<ITileDataSerializer> serializerObjectIncrementer = new DataCompressor<>();
         CompoundNBT res = new CompoundNBT();
+
         ListNBT infoList = NBTHelper.serializeMap(dataMap, NBTUtil::writeBlockPos, i -> i.serialize(dataObjectIncrementer, itemObjectIncrementer));
         ListNBT dataList = dataObjectIncrementer.write(d -> d.serialize(serializerObjectIncrementer, true));
         ListNBT itemSetList = itemObjectIncrementer.write(ms -> NBTHelper.writeIterable(ms.entrySet(), entry -> writeEntry(entry, itemSerializerIncrementer)));
-        ListNBT dataSerializerList = serializerObjectIncrementer.write(ts -> new StringNBT(ts.getRegistryName().toString()));
-        ListNBT itemSerializerList = itemSerializerIncrementer.write(s -> new StringNBT(s.getRegistryName().toString()));
+        ListNBT dataSerializerList = serializerObjectIncrementer.write(ts -> StringNBT.valueOf(ts.getRegistryName().toString()));
+        ListNBT itemSerializerList = itemSerializerIncrementer.write(s -> StringNBT.valueOf(s.getRegistryName().toString()));
+
         res.putString(NBTKeys.WORLD_SAVE_DIM, dim.getRegistryName().toString());
         res.put(NBTKeys.WORLD_SAVE_UNDO_BLOCK_LIST, infoList);
         res.put(NBTKeys.WORLD_SAVE_UNDO_DATA_LIST, dataList);
@@ -138,6 +140,7 @@ public final class Undo {
         res.put(NBTKeys.WORLD_SAVE_UNDO_ITEMS_LIST, itemSetList);
         res.put(NBTKeys.WORLD_SAVE_UNDO_ITEMS_SERIALIZER_LIST, itemSerializerList);
         res.put(NBTKeys.WORLD_SAVE_UNDO_BOUNDS, boundingBox.serialize());
+
         return res;
     }
 

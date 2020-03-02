@@ -16,18 +16,15 @@ import net.minecraft.state.BooleanProperty;
 import net.minecraft.state.IProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.world.IBlockReader;
-import net.minecraft.world.IEnviromentBlockReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
+import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.IPlantable;
 
 import javax.annotation.Nullable;
@@ -51,12 +48,18 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
     }
 
     @Override
-    @Deprecated
-    public boolean isSolid(BlockState state) {
-        boolean bright = state.get(ConstructionBlock.BRIGHT);
-        return ! bright;
-        //return this.blocksMovement && this.getRenderLayer() == BlockRenderLayer.SOLID;
+    public boolean isAir(BlockState state, IBlockReader world, BlockPos pos) {
+        return !state.get(ConstructionBlock.BRIGHT);
     }
+
+// 1.14 code
+//    @Override
+//    @Deprecated
+//    public boolean isSolid(BlockState state) {
+//        boolean bright = state.get(ConstructionBlock.BRIGHT);
+//        return ! bright;
+//        //return this.blocksMovement && this.getRenderLayer() == BlockRenderLayer.SOLID;
+//    }
 
     @Override
     protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
@@ -94,10 +97,12 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
         return BlockRenderType.MODEL;
     }
 
-    @Override
-    public boolean canRenderInLayer(BlockState state, BlockRenderLayer layer) {
-        return true; // delegated to FacadeBakedModel#getQuads
-    }
+// 1.14 code
+//    @Override
+//    public boolean canRenderInLayer(BlockState state, BlockRenderLayer layer) {
+//        return true; // delegated to FacadeBakedModel#getQuads
+//    }
+//
 
     @Override
     public int getOpacity(BlockState state, IBlockReader worldIn, BlockPos pos) {
@@ -108,11 +113,12 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
         return 255;
     }
 
-    @Override
-    public boolean doesSideBlockRendering(BlockState state, IEnviromentBlockReader world, BlockPos pos, Direction face) {
-        BlockState mimic = getActualMimicBlock(world, pos);
-        return !isMimicNull(mimic) ? mimic.doesSideBlockRendering(world, pos, face) : super.doesSideBlockRendering(state, world, pos, face);
-    }
+// 1.14 code
+//    @Override
+//    public boolean doesSideBlockRendering(BlockState state, IBlockReader world, BlockPos pos, Direction face) {
+//        BlockState mimic = getActualMimicBlock(world, pos);
+//        return !isMimicNull(mimic) ? mimic.doesSideBlockRendering(world, pos, face) : super.doesSideBlockRendering(state, world, pos, face);
+//    }
 
     public void initColorHandler(BlockColors blockColors) {
         blockColors.register((state, world, pos, tintIndex) -> {
@@ -215,17 +221,17 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
     }
 
     @Override
-    public void randomTick(BlockState state, World worldIn, BlockPos pos, Random random) {
-        BlockState mimic = getActualMimicBlock(worldIn, pos);
+    public void randomTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
+        BlockState mimic = getActualMimicBlock(world, pos);
         if (!isMimicNull(mimic)) {
-            mimic.randomTick(worldIn, pos, random);
+            mimic.randomTick(world, pos, random);
         } else {
-            super.randomTick(state, worldIn, pos, random);
+            super.randomTick(state, world, pos, random);
         }
     }
 
     @Override
-    public void tick(BlockState state, World worldIn, BlockPos pos, Random random) {
+    public void tick(BlockState state, ServerWorld worldIn, BlockPos pos, Random random) {
         BlockState mimic = getActualMimicBlock(worldIn, pos);
         if (!isMimicNull(mimic)) {
             mimic.getBlock().tick(state, worldIn, pos, random);
@@ -279,11 +285,12 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
         return !isMimicNull(mimic) ? mimic.getPlayerRelativeBlockHardness(player, worldIn, pos) : super.getPlayerRelativeBlockHardness(state, player, worldIn, pos);
     }
 
-    @Override
-    public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult rayTraceResult) {
-        BlockState mimic = getActualMimicBlock(worldIn, pos);
-        return ! isMimicNull(mimic) ? super.onBlockActivated(state, worldIn, pos, player, hand, rayTraceResult) : super.onBlockActivated(state, worldIn, pos, player, hand, rayTraceResult);
-    }
+// 1.14
+//    @Override
+//    public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult rayTraceResult) {
+//        BlockState mimic = getActualMimicBlock(worldIn, pos);
+//        return ! isMimicNull(mimic) ? super.onBlockActivated(state, worldIn, pos, player, hand, rayTraceResult) : super.onBlockActivated(state, worldIn, pos, player, hand, rayTraceResult);
+//    }
 
     /**
      * Called when the given entity walks on this Block

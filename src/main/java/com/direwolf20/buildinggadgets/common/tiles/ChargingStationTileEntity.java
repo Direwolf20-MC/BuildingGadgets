@@ -10,7 +10,6 @@ import com.direwolf20.buildinggadgets.common.util.exceptions.CapabilityNotPresen
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.util.tools.CapabilityUtil;
 import com.google.common.base.Preconditions;
-import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.block.AbstractFurnaceBlock;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
@@ -402,7 +401,8 @@ public class ChargingStationTileEntity extends TileEntity implements ITickableTi
     }
 
     public void genCallList() {
-        callList = GlStateManager.genLists(1);
+        // 1.14 - todo: fix
+//        callList = GlStateManager.genLists(1);
     }
 
     private final class ChargingStationEnergyStorage extends CappedEnergyStorage {

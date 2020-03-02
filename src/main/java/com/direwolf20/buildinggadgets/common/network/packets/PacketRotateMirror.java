@@ -41,7 +41,7 @@ public class PacketRotateMirror {
                     return;
 
                 ItemStack stack = AbstractGadget.getGadget(player);
-                Operation operation = msg.operation != null ? msg.operation : (player.isSneaking() ? Operation.MIRROR : Operation.ROTATE);
+                Operation operation = msg.operation != null ? msg.operation : (player.isShiftKeyDown() ? Operation.MIRROR : Operation.ROTATE);
                 switch (operation) {
                     case MIRROR:
                         ((AbstractGadget) stack.getItem()).onMirror(stack, player);

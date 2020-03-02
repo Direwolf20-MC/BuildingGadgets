@@ -14,7 +14,6 @@ import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.inventory.IItemIndex;
 import com.direwolf20.buildinggadgets.common.inventory.InventoryHelper;
 import com.direwolf20.buildinggadgets.common.inventory.RecordingItemIndex;
-import com.direwolf20.buildinggadgets.common.items.gadgets.AbstractGadget;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.template.Template;
 import com.direwolf20.buildinggadgets.common.util.helpers.SortingHelper.RenderSorter;
@@ -25,8 +24,11 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.RemovalListener;
 import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.block.*;
-import net.minecraft.client.renderer.*;
+import net.minecraft.client.renderer.BlockRendererDispatcher;
+import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
@@ -38,7 +40,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
-import net.minecraftforge.client.model.data.EmptyModelData;
 import net.minecraftforge.energy.CapabilityEnergy;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL14;
@@ -51,7 +52,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 public class CopyPasteRender extends BaseRenderer {
-    private ChestRenderer chestRenderer;
+//    private ChestRenderer chestRenderer;
     private final Cache<RenderKey, RenderInfo> renderCache = CacheBuilder.newBuilder()
             .expireAfterWrite(1, TimeUnit.SECONDS)
             .removalListener((RemovalListener<RenderKey, RenderInfo>) notification -> notification.getValue().onRemove())
@@ -62,11 +63,12 @@ public class CopyPasteRender extends BaseRenderer {
             .expireAfterAccess(1, TimeUnit.MINUTES)
             .build();
 
-    public ChestRenderer getChestRenderer() {
-        if (chestRenderer == null)
-            chestRenderer = new ChestRenderer();
-        return chestRenderer;
-    }
+    // 1.14
+//    public ChestRenderer getChestRenderer() {
+//        if (chestRenderer == null)
+//            chestRenderer = new ChestRenderer();
+//        return chestRenderer;
+//    }
 
     @Override
     public void render(RenderWorldLastEvent evt, PlayerEntity player, ItemStack heldItem) {
@@ -106,7 +108,7 @@ public class CopyPasteRender extends BaseRenderer {
         GlStateManager.disableLighting();
         GlStateManager.disableTexture();
         GlStateManager.enableBlend();
-        GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
+        RenderSystem.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
 
         renderCopyOutline(tessellator, bufferbuilder, x, y, z, dx, dy, dz, 255, 223, 127); // Draw the box around the blocks we've copied.
 
@@ -129,11 +131,12 @@ public class CopyPasteRender extends BaseRenderer {
                 GadgetCopyPaste.getActivePos(player, heldItem).ifPresent(startPos -> {
                     try {
                         RenderInfo info = renderCache.get(new RenderKey(id, startPos), () -> {
-                            int displayList = GLAllocation.generateDisplayLists(1);
-                            GlStateManager.newList(displayList, GL11.GL_COMPILE);
-                            this.performRender(world, player, heldItem, startPos, provider.getTemplateForKey(key), partialTicks);
-                            GlStateManager.endList();
-                            return new RenderInfo(displayList);
+                            // todo: fix
+//                            int displayList = GLAllocation.generateDisplayLists(1);
+//                            GlStateManager.newList(displayList, GL11.GL_COMPILE);
+//                            this.performRender(world, player, heldItem, startPos, provider.getTemplateForKey(key), partialTicks);
+//                            GlStateManager.endList();
+                            return new RenderInfo( 0 );//displayList);
                         });
                         info.render(playerPos);
                     } catch (ExecutionException e) {
@@ -188,8 +191,9 @@ public class CopyPasteRender extends BaseRenderer {
             GlStateManager.enableBlend();
             GL14.glBlendColor(1F, 1F, 1F, 0.6f); //Set the alpha of the blocks we are rendering
             try {
-                if (state.getRenderType() == BlockRenderType.MODEL)
-                    dispatcher.renderBlock(state, targetPos, context.getWorld(), builder, rand, te != null ? te.getModelData() : EmptyModelData.INSTANCE);
+                // todo: fix
+//                if (state.getRenderType() == BlockRenderType.MODEL)
+//                    dispatcher.renderBlock(state, targetPos, context.getWorld(), builder, rand, te != null ? te.getModelData() : EmptyModelData.INSTANCE);
             } catch (Exception e) {
                 BuildingGadgets.LOG.trace("Caught exception whilst rendering {}.", state, e);
             }
@@ -197,10 +201,12 @@ public class CopyPasteRender extends BaseRenderer {
                 if (te != null && ! erroredCache.get(target.getData(), () -> false)) {
                     TileEntityRenderer<TileEntity> renderer = teDispatcher.getRenderer(te);
                     if (renderer != null) {
-                        if (te.hasFastRenderer())
-                            renderer.renderTileEntityFast(te, 0, 0, 0, partialTicks, - 1, builder);
-                        else {
-                            renderer.render(te, 0, 0, 0, partialTicks, - 1);
+                        if (te.hasFastRenderer()) {
+                            // todo: fix
+//                            renderer.render(te, 0, 0, 0, partialTicks, - 1, builder);
+                        } else {
+                            // todo: fix
+//                            renderer.render(te, 0, 0, 0, partialTicks, - 1);
                             bindBlocks(); //some blocks (all vanilla tiles I tested) rebind the atlas!
                         }
                     }
@@ -358,12 +364,14 @@ public class CopyPasteRender extends BaseRenderer {
             //Save the current position that is being rendered
             GlStateManager.pushMatrix();
             GlStateManager.translated(- playerPos.getX(), - playerPos.getY(), - playerPos.getZ());//The render starts at the player, so we subtract the player coords and move the render to 0,0,0
-            GlStateManager.callList(callList);
+            // todo: fix
+//            GlStateManager.callList(callList);
             GlStateManager.popMatrix();
         }
 
         private void onRemove() {
-            GLAllocation.deleteDisplayLists(callList);
+            // todo: fix
+//            GLAllocation.deleteDisplayLists(callList);
         }
     }
 }

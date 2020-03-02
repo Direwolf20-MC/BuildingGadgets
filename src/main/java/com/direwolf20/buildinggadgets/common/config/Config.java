@@ -313,7 +313,7 @@ public class Config {
         BuildingGadgets.LOG.debug("Loaded {} config file {}", Reference.MODID, configEvent.getConfig().getFileName());
     }
 
-    public static void onFileChange(final ModConfig.ConfigReloading configEvent) {
+    public static void onFileChange(final ModConfig.Reloading configEvent) {
         BuildingGadgets.LOG.fatal(CORE, "{} config just got changed on the file system!", Reference.MODID);
     }
 }

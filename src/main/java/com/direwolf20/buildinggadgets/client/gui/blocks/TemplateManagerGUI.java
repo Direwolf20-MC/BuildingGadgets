@@ -12,8 +12,6 @@ import com.direwolf20.buildinggadgets.common.building.view.IBuildView;
 import com.direwolf20.buildinggadgets.common.building.view.SimpleBuildContext;
 import com.direwolf20.buildinggadgets.common.capability.CapabilityTemplate;
 import com.direwolf20.buildinggadgets.common.containers.TemplateManagerContainer;
-import com.direwolf20.buildinggadgets.common.inventory.materials.MaterialList;
-import com.direwolf20.buildinggadgets.common.inventory.materials.objects.IUniqueObject;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketTemplateManagerTemplateCreated;
 import com.direwolf20.buildinggadgets.common.registry.OurItems;
@@ -31,10 +29,9 @@ import com.direwolf20.buildinggadgets.common.util.lang.MessageTranslation;
 import com.direwolf20.buildinggadgets.common.util.lang.Styles;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.direwolf20.buildinggadgets.common.world.FakeDelegationWorld;
-import com.google.common.collect.ImmutableMultiset;
-import com.google.common.collect.ImmutableSet;
 import com.google.gson.JsonParseException;
 import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
@@ -63,7 +60,6 @@ import net.minecraftforge.client.model.data.EmptyModelData;
 import net.minecraftforge.common.util.LazyOptional;
 import org.lwjgl.opengl.GL11;
 
-import java.awt.*;
 import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.Random;
@@ -325,7 +321,7 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
     }
 
     private void renderPanel() {
-        double scale = getMinecraft().mainWindow.getGuiScaleFactor();
+        double scale = getMinecraft().getMainWindow().getGuiScaleFactor();
 
         BlockPos startPos = template.getHeader().getBoundingBox().getMin();
         BlockPos endPos = template.getHeader().getBoundingBox().getMax();
@@ -359,7 +355,7 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
         GlStateManager.multMatrix(Matrix4f.perspective(60, (float) panel.getWidth() / panel.getHeight(), 0.01F, 4000));
         GlStateManager.matrixMode(GL11.GL_MODELVIEW);
         GlStateManager.viewport((int) Math.round((guiLeft + panel.getX()) * scale),
-                (int) Math.round(getMinecraft().mainWindow.getFramebufferHeight() - (guiTop + panel.getY() + panel.getHeight()) * scale),
+                (int) Math.round(getMinecraft().getMainWindow().getFramebufferHeight() - (guiTop + panel.getY() + panel.getHeight()) * scale),
                 (int) Math.round(panel.getWidth() * scale),
                 (int) Math.round(panel.getHeight() * scale));
 
@@ -373,22 +369,22 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
         if (startPos.getX() >= endPos.getX())
             moveX--;
 
-        GlStateManager.translated((moveX) / 1.75, -Math.abs(startPos.getY() - endPos.getY()) / 1.75, 0);
-        GlStateManager.translated(panX, -panY, 0);
-        GlStateManager.translated(((startPos.getX() - endPos.getX()) / 2) * -1, ((startPos.getY() - endPos.getY()) / 2) * -1, ((startPos.getZ() - endPos.getZ()) / 2) * -1);
-        GlStateManager.rotatef(-rotX, 1, 0, 0);
-        GlStateManager.rotatef(rotY, 0, 1, 0);
-        GlStateManager.translated(((startPos.getX() - endPos.getX()) / 2), ((startPos.getY() - endPos.getY()) / 2), ((startPos.getZ() - endPos.getZ()) / 2));
+        RenderSystem.translated((moveX) / 1.75, -Math.abs(startPos.getY() - endPos.getY()) / 1.75, 0);
+        RenderSystem.translated(panX, -panY, 0);
+        RenderSystem.translated(((startPos.getX() - endPos.getX()) / 2) * -1, ((startPos.getY() - endPos.getY()) / 2) * -1, ((startPos.getZ() - endPos.getZ()) / 2) * -1);
+        RenderSystem.rotatef(-rotX, 1, 0, 0);
+        RenderSystem.rotatef(rotY, 0, 1, 0);
+        RenderSystem.translated(((startPos.getX() - endPos.getX()) / 2), ((startPos.getY() - endPos.getY()) / 2), ((startPos.getZ() - endPos.getZ()) / 2));
 
         getMinecraft().getTextureManager().bindTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
 
-        GlStateManager.callList(displayList);
+        RenderSystem.callList(displayList);
 
-        GlStateManager.popMatrix();
-        GlStateManager.matrixMode(GL11.GL_PROJECTION);
-        GlStateManager.popMatrix();
-        GlStateManager.matrixMode(GL11.GL_MODELVIEW);
-        GlStateManager.viewport(0, 0, getMinecraft().mainWindow.getFramebufferWidth(), getMinecraft().mainWindow.getFramebufferHeight());
+        RenderSystem.popMatrix();
+        RenderSystem.matrixMode(GL11.GL_PROJECTION);
+        RenderSystem.popMatrix();
+        RenderSystem.matrixMode(GL11.GL_MODELVIEW);
+        RenderSystem.viewport(0, 0, getMinecraft().getMainWindow().getFramebufferWidth(), getMinecraft().getMainWindow().getFramebufferHeight());
     }
 
     private void resetViewport() {

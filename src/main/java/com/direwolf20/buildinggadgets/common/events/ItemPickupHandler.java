@@ -15,7 +15,7 @@ public class ItemPickupHandler {
         ItemEntity entityItem = event.getItem();
         ItemStack itemStack = entityItem.getItem();
         if (itemStack.getItem() instanceof ConstructionPaste) {
-            itemStack = InventoryHelper.addPasteToContainer(event.getEntityPlayer(), itemStack);
+            itemStack = InventoryHelper.addPasteToContainer(event.getPlayer(), itemStack);
             entityItem.setItem(itemStack);
         }
     }

@@ -9,13 +9,13 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.SoundHandler;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.util.SoundEvents;
-import net.minecraftforge.fml.client.config.GuiSlider;
+import net.minecraftforge.fml.client.gui.widget.Slider;
 
 import java.awt.*;
 import java.util.Collection;
 import java.util.function.BiConsumer;
 
-public class GuiSliderInt extends GuiSlider {
+public class GuiSliderInt extends Slider {
     private int colorBackground, colorSliderBackground, colorSlider;
     private BiConsumer<GuiSliderInt, Integer> increment;
     private int value;

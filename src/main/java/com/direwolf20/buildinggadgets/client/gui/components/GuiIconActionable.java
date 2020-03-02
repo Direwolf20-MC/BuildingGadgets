@@ -3,6 +3,7 @@ package com.direwolf20.buildinggadgets.client.gui.components;
 import com.direwolf20.buildinggadgets.common.registry.OurSounds;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.SimpleSound;
 import net.minecraft.client.audio.SoundHandler;
@@ -85,20 +86,20 @@ public class GuiIconActionable extends Button {
         if( !visible )
             return;
 
-        GlStateManager.enableBlend();
-        GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
-        GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
+        RenderSystem.enableBlend();
+        RenderSystem.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
+        RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
 
-        GlStateManager.disableTexture();
-        GlStateManager.color4f(activeColor.getRed() / 255f, activeColor.getGreen() / 255f, activeColor.getBlue() / 255f, .15f);
+        RenderSystem.disableTexture();
+        RenderSystem.color4f(activeColor.getRed() / 255f, activeColor.getGreen() / 255f, activeColor.getBlue() / 255f, .15f);
         blit(this.x, this.y, 0, 0, this.width, this.height, this.width, this.height);
-        GlStateManager.enableTexture();
+        RenderSystem.enableTexture();
 
-        GlStateManager.color4f(activeColor.getRed() / 255f, activeColor.getGreen() / 255f, activeColor.getBlue() / 255f, alpha);
+        RenderSystem.color4f(activeColor.getRed() / 255f, activeColor.getGreen() / 255f, activeColor.getBlue() / 255f, alpha);
         Minecraft.getInstance().getTextureManager().bindTexture(selected ? selectedTexture : deselectedTexture);
         blit(this.x, this.y, 0, 0, this.width, this.height, this.width, this.height);
 
         if( mouseX >= x && mouseY >= y && mouseX < x + width && mouseY < y + height )
-            drawString(Minecraft.getInstance().fontRenderer, this.getMessage(), mouseX > (Minecraft.getInstance().mainWindow.getScaledWidth() / 2) ?  mouseX + 2 : mouseX - Minecraft.getInstance().fontRenderer.getStringWidth(getMessage()), mouseY - 10, activeColor.getRGB());
+            drawString(Minecraft.getInstance().fontRenderer, this.getMessage(), mouseX > (Minecraft.getInstance().getMainWindow().getScaledWidth() / 2) ?  mouseX + 2 : mouseX - Minecraft.getInstance().fontRenderer.getStringWidth(getMessage()), mouseY - 10, activeColor.getRGB());
     }
 }

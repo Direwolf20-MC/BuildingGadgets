@@ -14,7 +14,6 @@ import net.minecraft.block.*;
 import net.minecraft.block.material.PushReaction;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
@@ -136,15 +135,16 @@ public class EffectBlock extends Block {
         return BlockRenderType.INVISIBLE;
     }
 
-    /**
-     * Gets the render layer this block will render on. SOLID for solid blocks, CUTOUT or CUTOUT_MIPPED for on-off
-     * transparency (glass, reeds), TRANSLUCENT for fully blended transparency (stained glass)
-     */
-    @Override
-    public BlockRenderLayer getRenderLayer() {
-        // Since the effect block has no model rendering at all, which means we don't need blending, simply cutout is fine
-        return BlockRenderLayer.CUTOUT;
-    }
+// 1.14
+//    /**
+//     * Gets the render layer this block will render on. SOLID for solid blocks, CUTOUT or CUTOUT_MIPPED for on-off
+//     * transparency (glass, reeds), TRANSLUCENT for fully blended transparency (stained glass)
+//     */
+//    @Override
+//    public BlockRenderLayer getRenderLayer() {
+//        // Since the effect block has no model rendering at all, which means we don't need blending, simply cutout is fine
+//        return BlockRenderLayer.CUTOUT;
+//    }
 
     /**
      * This gets a complete list of items dropped from this block.
