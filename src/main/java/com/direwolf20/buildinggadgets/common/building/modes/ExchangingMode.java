@@ -126,8 +126,10 @@ public enum ExchangingMode {
             //Test whether all surrounding Blocks are opaque on the side, which touches this Block
             boolean hasVisibleSide = false;
             for (Direction dir : Direction.values()) {
+                // todo: flag: might cause issues
                 BlockPos offset = pos.offset(dir);
-                if (! fakeWorld.getBlockState(offset).doesSideBlockRendering(fakeWorld, pos, dir.getOpposite())) {
+                BlockState state = fakeWorld.getBlockState(offset);
+                if (! state.isSideInvisible(state, dir.getOpposite())) {
                     hasVisibleSide = true;
                     break;
                 }

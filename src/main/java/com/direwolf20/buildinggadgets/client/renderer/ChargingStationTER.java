@@ -2,6 +2,7 @@ package com.direwolf20.buildinggadgets.client.renderer;
 
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.tiles.ChargingStationTileEntity;
+import com.direwolf20.buildinggadgets.common.util.exceptions.CapabilityNotPresentException;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -16,6 +17,7 @@ import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraftforge.energy.CapabilityEnergy;
 import org.lwjgl.opengl.GL11;
 
 
@@ -64,34 +66,34 @@ public class ChargingStationTER<T extends TileEntity> extends TileEntityRenderer
         float blue = 0f;
         float alpha = 1f;
 
-        GlStateManager.pushMatrix();
-        GlStateManager.pushLightingAttributes();
+        RenderSystem.pushMatrix();
+        RenderSystem.pushLightingAttributes();
 
-        GlStateManager.enableBlend();
-        GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
-        GlStateManager.disableTexture();
-        GlStateManager.translated(.5, 1, .5);
-        //GlStateManager.depthMask(false);
-        GlStateManager.shadeModel(GL11.GL_SMOOTH);
-        GlStateManager.disableDepthTest();
+        RenderSystem.enableBlend();
+        RenderSystem.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
+        RenderSystem.disableTexture();
+        RenderSystem.translated(.5, 1, .5);
+        //RenderSystem.depthMask(false);
+        RenderSystem.shadeModel(GL11.GL_SMOOTH);
+        RenderSystem.disableDepthTest();
         Tessellator t = Tessellator.getInstance();
 
         BufferBuilder bufferBuilder = t.getBuffer();
 
         bufferBuilder.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION_COLOR);
-        GlStateManager.lineWidth(3);
+        RenderSystem.lineWidth(3);
         double x2 = te.getLightningX();
         double z2 = te.getLightningZ();
         bufferBuilder.pos(x2, 0, z2).color(red, green, blue, alpha).endVertex();
         bufferBuilder.pos(0, 0.5, 0).color(red, green, blue, alpha).endVertex();
         t.draw();
 
-        //GlStateManager.depthMask(true);
-        GlStateManager.enableDepthTest();
-        GlStateManager.disableBlend();
-        GlStateManager.enableTexture();
-        GlStateManager.popAttributes();
-        GlStateManager.popMatrix();
+        //RenderSystem.depthMask(true);
+        RenderSystem.enableDepthTest();
+        RenderSystem.disableBlend();
+        RenderSystem.enableTexture();
+        RenderSystem.popAttributes();
+        RenderSystem.popMatrix();
     }
 
     private void renderSphere(ChargingStationTileEntity te) {
@@ -113,22 +115,22 @@ public class ChargingStationTER<T extends TileEntity> extends TileEntityRenderer
                 createCallList(te, newSegmentation);
             } else if (te.getCallList() == 0)
                 createCallList(te);
-            else
-                GlStateManager.callList(te.getCallList());
+//            else
+//                GlStateManager.callList(te.getCallList());
         }
     }
 
     private void createCallList(ChargingStationTileEntity te) {
         te.updateSegmentation(te.getSegmentation());
-        createCallList(te, te.getSegmentation());
+//        createCallList(te, te.getSegmentation());
     }
 
     private void createCallList(ChargingStationTileEntity te, SphereSegmentation segmentation) {
-        if (te.getCallList() == 0)
-            te.genCallList();
-        GlStateManager.newList(te.getCallList(), GL11.GL_COMPILE_AND_EXECUTE);
+//        if (te.getCallList() == 0)
+//            te.genCallList();
+//        GlStateManager.newList(te.getCallList(), GL11.GL_COMPILE_AND_EXECUTE);
         performRenderSphere(te, segmentation.getSegments());
-        GlStateManager.endList();
+//        GlStateManager.endList();
     }
 
     private void performRenderSphere(ChargingStationTileEntity te, int segments) {
@@ -198,11 +200,7 @@ public class ChargingStationTER<T extends TileEntity> extends TileEntityRenderer
         GlStateManager.popMatrix();
     }
 
-    private void renderParticles(ChargingStationTileEntity te) {
-
-    }
-
-    private void renderItem(ChargingStationTileEntity te) {
+    private void renderItem(ChargingStationTileEntity te, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int combinedLightIn, int combinedOverlayIn) {
         ItemStack stack = te.getRenderStack();
         RenderHelper.enableStandardItemLighting();
         GlStateManager.enableLighting();
@@ -212,13 +210,36 @@ public class ChargingStationTER<T extends TileEntity> extends TileEntityRenderer
         GlStateManager.scalef(.4f, .4f, .4f);
         float rotation = (float) (te.getWorld().getGameTime() % 80);
         GlStateManager.rotatef(360f * rotation / 80f, 0, 1, 0);
-        Minecraft.getInstance().getItemRenderer().renderItem(stack, ItemCameraTransforms.TransformType.NONE);
+
+        Minecraft.getInstance().getItemRenderer().renderItem(stack, ItemCameraTransforms.TransformType.NONE, combinedLightIn, combinedOverlayIn, matrixStackIn, bufferIn );
 
         GlStateManager.popMatrix();
     }
 
     @Override
-    public void render(ChargingStationTileEntity tileEntityIn, float partialTicks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int combinedLightIn, int combinedOverlayIn) {
+    public void render(ChargingStationTileEntity te, float partialTicks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int combinedLightIn, int combinedOverlayIn) {
+        ItemStack stack = te.getRenderStack();
+        if (! stack.isEmpty()) {
+            RenderSystem.pushLightingAttributes();
+            RenderSystem.pushMatrix();
 
+            // Translate to the location of our tile entity
+            RenderSystem.translated(te.getPos().getX(), te.getPos().getY(), te.getPos().getZ());
+            RenderSystem.disableRescaleNormal();
+            // Render our item
+            renderItem(te, matrixStackIn, bufferIn, combinedLightIn, combinedOverlayIn);
+
+            //Render our sphere
+            renderSphere(te);
+
+            //Render Lightning
+            if (te.isChargingItem(stack.getCapability(CapabilityEnergy.ENERGY).orElseThrow(CapabilityNotPresentException::new)) &&
+                    //don't render more then 16 Blocks away from the Block
+                    SphereSegmentation.BY_DISTANCE.compare(te.getLastRenderedSegmentation(), SphereSegmentation.MEDIUM_SEGMENTATION) < 0)
+                renderLightning(te);
+
+            RenderSystem.popMatrix();
+            RenderSystem.popAttributes();
+        }
     }
 }

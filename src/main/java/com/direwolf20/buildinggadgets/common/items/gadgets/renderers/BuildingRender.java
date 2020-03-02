@@ -15,11 +15,12 @@ import com.direwolf20.buildinggadgets.common.registry.OurBlocks;
 import com.direwolf20.buildinggadgets.common.util.helpers.SortingHelper;
 import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
 import com.direwolf20.buildinggadgets.common.util.tools.CapabilityUtil;
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.renderer.BlockRendererDispatcher;
 import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
@@ -53,7 +54,7 @@ public class BuildingRender extends BaseRenderer {
         super.render(evt, player, heldItem);
 
         BlockRayTraceResult lookingAt = VectorHelper.getLookingAt(player, heldItem);
-        Vec3d playerPos = BaseRenderer.getPlayerPos();
+        Vec3d playerPos = getMc().gameRenderer.getActiveRenderInfo().getProjectedView();
 
         BlockState state = BaseRenderer.AIR;
         List<BlockPos> coordinates = getAnchor(heldItem);
@@ -95,23 +96,23 @@ public class BuildingRender extends BaseRenderer {
                 getBuilderWorld().setWorldAndState(player.world, renderBlockState, coordinates);
 
                 //Save the current position that is being rendered (I think)
-                GlStateManager.pushMatrix();
-                GlStateManager.translated(- playerPos.getX(), - playerPos.getY(), - playerPos.getZ());//The render starts at the player, so we subtract the player coords and move the render to 0,0,0
-                GlStateManager.pushTextureAttributes();
+                RenderSystem.pushMatrix();
+                RenderSystem.translated(- playerPos.getX(), - playerPos.getY(), - playerPos.getZ());//The render starts at the player, so we subtract the player coords and move the render to 0,0,0
+                RenderSystem.pushTextureAttributes();
                 //Enable Blending (So we can have transparent effect)
-                GlStateManager.enableBlend();
+                RenderSystem.enableBlend();
                 //This blend function allows you to use a constant alpha, which is defined later
-                GlStateManager.blendFunc(GL14.GL_CONSTANT_ALPHA, GL14.GL_ONE_MINUS_CONSTANT_ALPHA);
+                RenderSystem.blendFunc(GL14.GL_CONSTANT_ALPHA, GL14.GL_ONE_MINUS_CONSTANT_ALPHA);
 
-                GlStateManager.blendFunc(GL14.GL_CONSTANT_ALPHA, GL14.GL_ONE_MINUS_CONSTANT_ALPHA);
+                RenderSystem.blendFunc(GL14.GL_CONSTANT_ALPHA, GL14.GL_ONE_MINUS_CONSTANT_ALPHA);
                 BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
                 bufferBuilder.begin(GL14.GL_QUADS, DefaultVertexFormats.BLOCK);
                 Random rand = new Random();
                 BlockRendererDispatcher dispatcher = getMc().getBlockRendererDispatcher();
                 for (BlockPos coordinate : renderCoordinates) {
-                    GlStateManager.pushMatrix();//Push matrix again just because
-                    GlStateManager.translatef(coordinate.getX(), coordinate.getY(), coordinate.getZ());//Now move the render position to the coordinates we want to render at
-                    GlStateManager.rotatef(-90.0F, 0.0F, 1.0F, 0.0F); //Rotate it because i'm not sure why but we need to
+                    RenderSystem.pushMatrix();//Push matrix again just because
+                    RenderSystem.translatef(coordinate.getX(), coordinate.getY(), coordinate.getZ());//Now move the render position to the coordinates we want to render at
+                    RenderSystem.rotatef(-90.0F, 0.0F, 1.0F, 0.0F); //Rotate it because i'm not sure why but we need to
                     GL14.glBlendColor(1F, 1F, 1F, 0.55f); //Set the alpha of the blocks we are rendering
                     if (getBuilderWorld().getWorldType() != WorldType.DEBUG_ALL_BLOCK_STATES) { //Get the block state in the fake world
                         try {
@@ -121,12 +122,12 @@ public class BuildingRender extends BaseRenderer {
                     }
                     try {
                         if (state.getRenderType() == BlockRenderType.MODEL)
-                            dispatcher.renderBlock(state, coordinate, world, bufferBuilder, rand, EmptyModelData.INSTANCE);
+                            dispatcher.renderBlock(state, evt.getMatrixStack(), IRenderTypeBuffer.getImpl(Tessellator.getInstance().getBuffer()), 0, 0, EmptyModelData.INSTANCE);
                     } catch (Throwable t) {
                         BuildingGadgets.LOG.trace("Block at {} with state {} threw exception, whilst rendering", coordinate, state, t);
                     }
                     //Move the render position back to where it was
-                    GlStateManager.popMatrix();
+                    RenderSystem.popMatrix();
                 }
                 Tessellator.getInstance().draw();
                 bufferBuilder = setupMissingRender();
@@ -154,36 +155,36 @@ public class BuildingRender extends BaseRenderer {
                     if (teRender != null && ! getInvalidTileEntities().contains(te)) {
                         for (BlockPos coordinate : coordinates) {
                             te.setPos(coordinate);
-                            GlStateManager.pushMatrix();
-                            GlStateManager.color4f(1F, 1F, 1F, 1F);
-                            GlStateManager.translated(-playerPos.getX(), -playerPos.getY(), -playerPos.getZ());//The render starts at the player, so we subtract the player coords and move the render to 0,0,0
-                            GlStateManager.translatef(coordinate.getX(), coordinate.getY(), coordinate.getZ());
-                            GlStateManager.scalef(1.0f, 1.0f, 1.0f); //Block scale 1 = full sized block
-                            GlStateManager.enableBlend(); //We have to do this in the loop because the TE Render removes blend when its done
-                            GlStateManager.blendFunc(GL14.GL_CONSTANT_ALPHA, GL14.GL_ONE_MINUS_CONSTANT_ALPHA);
+                            RenderSystem.pushMatrix();
+                            RenderSystem.color4f(1F, 1F, 1F, 1F);
+                            RenderSystem.translated(-playerPos.getX(), -playerPos.getY(), -playerPos.getZ());//The render starts at the player, so we subtract the player coords and move the render to 0,0,0
+                            RenderSystem.translatef(coordinate.getX(), coordinate.getY(), coordinate.getZ());
+                            RenderSystem.scalef(1.0f, 1.0f, 1.0f); //Block scale 1 = full sized block
+                            RenderSystem.enableBlend(); //We have to do this in the loop because the TE Render removes blend when its done
+                            RenderSystem.blendFunc(GL14.GL_CONSTANT_ALPHA, GL14.GL_ONE_MINUS_CONSTANT_ALPHA);
                             try {
-                                teRender.render(te, 0, 0, 0, evt.getPartialTicks(), - 1);
+                                teRender.render(te, evt.getPartialTicks(), evt.getMatrixStack(), IRenderTypeBuffer.getImpl(Tessellator.getInstance().getBuffer()), 0, 0);
                             } catch (Exception e) {
                                 BuildingGadgets.LOG.warn("TER Exception with block type: " + state);
                                 getInvalidTileEntities().add(te);
-                                GlStateManager.disableFog();
-                                GlStateManager.popMatrix();
+                                RenderSystem.disableFog();
+                                RenderSystem.popMatrix();
                                 break;
                             }
-                            GlStateManager.disableFog();
-                            GlStateManager.popMatrix();
+                            RenderSystem.disableFog();
+                            RenderSystem.popMatrix();
                         }
                     }
                 }
 
                 //Set blending back to the default mode
-                GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+                RenderSystem.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
                 ForgeHooksClient.setRenderLayer(MinecraftForgeClient.getRenderLayer());
                 //Disable blend
-                GlStateManager.disableBlend();
+                RenderSystem.disableBlend();
                 //Pop from the original push in this method
-                GlStateManager.popAttributes();
-                GlStateManager.popMatrix();
+                RenderSystem.popAttributes();
+                RenderSystem.popMatrix();
             }
         }
     }

@@ -75,7 +75,7 @@ public class CopyPasteRender extends BaseRenderer {
         if (heldItem.isEmpty())
             return;
         super.render(evt, player, heldItem);
-        Vec3d playerPos = getPlayerPos();
+        Vec3d playerPos = getMc().gameRenderer.getActiveRenderInfo().getProjectedView();
         if (GadgetCopyPaste.getToolMode(heldItem) == GadgetCopyPaste.ToolMode.COPY) {
             GadgetCopyPaste.getSelectedRegion(heldItem).ifPresent(region -> {
                 renderCopy(playerPos, region);

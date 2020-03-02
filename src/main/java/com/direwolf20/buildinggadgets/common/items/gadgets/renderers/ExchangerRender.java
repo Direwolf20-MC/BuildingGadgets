@@ -20,6 +20,8 @@ import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.renderer.BlockRendererDispatcher;
 import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.IRenderTypeBuffer;
+import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.entity.player.PlayerEntity;
@@ -33,6 +35,7 @@ import net.minecraft.world.WorldType;
 import net.minecraftforge.client.ForgeHooksClient;
 import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
+import net.minecraftforge.client.model.data.EmptyModelData;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.IEnergyStorage;
 import org.lwjgl.opengl.GL11;
@@ -50,7 +53,7 @@ public class ExchangerRender extends BaseRenderer {
         super.render(evt, player, heldItem);
 
         BlockRayTraceResult lookingAt = VectorHelper.getLookingAt(player, heldItem);
-        Vec3d playerPos = BaseRenderer.getPlayerPos();
+        Vec3d playerPos = getMc().gameRenderer.getActiveRenderInfo().getProjectedView();
 
         BlockState state = AIR;
         List<BlockPos> coordinates = getAnchor(heldItem);
@@ -125,8 +128,7 @@ public class ExchangerRender extends BaseRenderer {
                 try {
                     //cannot render into buffer, because we can't scale it in that case, which causes z-Fighting
                     if (state.getRenderType() == BlockRenderType.MODEL)
-                        dispatcher.renderBlockBrightness(state, 1f);
-                    //dispatcher.renderBlock(state, coordinate, world, builder, rand, EmptyModelData.INSTANCE);
+                        dispatcher.renderBlock(state, evt.getMatrixStack(), IRenderTypeBuffer.getImpl(Tessellator.getInstance().getBuffer()), 0, 0, EmptyModelData.INSTANCE);
                 } catch (Throwable t) {
                     BuildingGadgets.LOG.trace("Block at {} with state {} threw exception, whilst rendering", coordinate, state, t);
                 }
@@ -165,7 +167,8 @@ public class ExchangerRender extends BaseRenderer {
                         GlStateManager.enableBlend(); //We have to do this in the loop because the TE Render removes blend when its done
                         GlStateManager.blendFunc(GL14.GL_CONSTANT_ALPHA, GL14.GL_ONE_MINUS_CONSTANT_ALPHA);
                         try {
-                            teRender.render(te, 0, 0, 0, evt.getPartialTicks(), - 1);
+                            // 0 0 is not right for this method todo: fix!
+                            teRender.render(te, evt.getPartialTicks(), evt.getMatrixStack(), IRenderTypeBuffer.getImpl(Tessellator.getInstance().getBuffer()), 0, 0);
                         } catch (Exception e) {
                             getInvalidTileEntities().add(te);
                             GlStateManager.disableFog();

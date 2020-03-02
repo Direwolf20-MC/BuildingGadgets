@@ -15,11 +15,11 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.texture.AtlasTexture;
-import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.container.PlayerContainer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
@@ -51,11 +51,11 @@ public abstract class BaseRenderer {
         bindBlocks();
 
         if( this.isLinkable() )
-            BaseRenderer.renderLinkedInventoryOutline(event, heldItem, player);
+            BaseRenderer.renderLinkedInventoryOutline(evt, heldItem, player);
     }
 
     protected void bindBlocks() {
-        getMc().getTextureManager().bindTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
+        getMc().getTextureManager().bindTexture(PlayerContainer.LOCATION_BLOCKS_TEXTURE);
     }
 
     private static void renderLinkedInventoryOutline(RenderWorldLastEvent evt, ItemStack item, PlayerEntity player) {
@@ -70,7 +70,9 @@ public abstract class BaseRenderer {
         if (dimension == null || player.dimension != dimension)
             return;
 
-        Vec3d renderPos = BaseRenderer.getPlayerPos().subtract(pos.getX(), pos.getY(), pos.getZ()).add(.005f, .005f, -.005f);
+        Vec3d renderPos = getMc().gameRenderer.getActiveRenderInfo().getProjectedView()
+                                .subtract(pos.getX(), pos.getY(), pos.getZ())
+                                .add(.005f, .005f, -.005f);
 
         GlStateManager.pushMatrix();
         GlStateManager.enableBlend();
@@ -81,7 +83,8 @@ public abstract class BaseRenderer {
         GlStateManager.scalef(1.01f, 1.01f, 1.01f);
         GL14.glBlendColor(1F, 1F, 1F, 0.35f);
 
-        getMc().getBlockRendererDispatcher().renderBlockBrightness(Blocks.YELLOW_STAINED_GLASS.getDefaultState(), 1f);
+        getMc().getBlockRendererDispatcher().renderBlock(Blocks.YELLOW_STAINED_GLASS.getDefaultState(), evt.getMatrixStack(), IRenderTypeBuffer.getImpl(Tessellator.getInstance().getBuffer()), 0, 0);
+
         GlStateManager.popMatrix();
     }
 
